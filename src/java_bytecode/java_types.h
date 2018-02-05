@@ -522,6 +522,65 @@ to_java_specialized_generic_class_type(typet &type)
   return static_cast<const java_specialized_generic_class_typet &>(type);
 }
 
+/// Type for a generic symbol, extends symbol_typet with a
+/// vector of java generic types.
+/// This is used to store the type of generic superclasses and interfaces.
+class java_generic_symbol_typet : public symbol_typet
+{
+public:
+  typedef std::vector<reference_typet> generic_typest;
+
+  java_generic_symbol_typet(
+    const symbol_typet &type,
+    const std::string &base_ref,
+    const std::string &class_name_prefix)
+    : symbol_typet(type)
+  {
+    set(ID_C_java_generic_symbol, true);
+    const typet &base_type = java_type_from_string(base_ref, class_name_prefix);
+    PRECONDITION(is_java_generic_type(base_type));
+    const java_generic_typet gen_base_type = to_java_generic_type(base_type);
+    generic_types().insert(
+      generic_types().end(),
+      gen_base_type.generic_type_arguments().begin(),
+      gen_base_type.generic_type_arguments().end());
+  }
+
+  const generic_typest &generic_types() const
+  {
+    return (const generic_typest &)(find(ID_generic_types).get_sub());
+  }
+
+  generic_typest &generic_types()
+  {
+    return (generic_typest &)(add(ID_generic_types).get_sub());
+  }
+};
+
+/// \param type: the type to check
+/// \return true if the type is a symbol type with generics
+inline bool is_java_generic_symbol_type(const typet &type)
+{
+  return type.get_bool(ID_C_java_generic_symbol);
+}
+
+/// \param type: the type to convert
+/// \return the converted type
+inline const java_generic_symbol_typet &
+to_java_generic_symbol_type(const typet &type)
+{
+  PRECONDITION(is_java_generic_symbol_type(type));
+  return static_cast<const java_generic_symbol_typet &>(type);
+}
+
+/// \param type: the type to convert
+/// \return the converted type
+inline java_generic_symbol_typet &to_java_generic_symbol_type(typet &type)
+{
+  PRECONDITION(is_java_generic_symbol_type(type));
+  return static_cast<java_generic_symbol_typet &>(type);
+}
+
 /// Take a signature string and remove everything in angle brackets allowing for
 /// the type to be parsed normally, for example
 /// `java.util.HashSet<java.lang.Integer>` will be turned into

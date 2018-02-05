@@ -347,3 +347,50 @@ require_type::require_symbol(const typet &type, const irep_idt &identifier)
   }
   return result;
 }
+
+/// Verify a given type is a java generic symbol type
+/// \param type The type to check
+/// \param identifier The identifier to match
+/// \return The type, cast to a java_generic_symbol_typet
+java_generic_symbol_typet require_type::require_java_generic_symbol_type(
+  const typet &type,
+  const std::string &identifier)
+{
+  symbol_typet symbol_type = require_symbol(type, identifier);
+  REQUIRE(is_java_generic_symbol_type(type));
+  return to_java_generic_symbol_type(type);
+}
+
+/// Verify a given type is a java generic symbol type, checking
+/// that it's associated type arguments match a given set of identifiers.
+/// Expected usage is something like this:
+///
+/// require_java_generic_symbol_type(type, "java::Generic",
+///   {{require_type::type_argument_kindt::Inst, "java::java.lang.Integer"},
+///    {require_type::type_argument_kindt::Var, "T"}})
+///
+/// \param type The type to check
+/// \param identifier The identifier to match
+/// \param type_expectations A set of type argument kinds and identifiers
+///  which should be expected as the type arguments of the given generic type
+/// \return The given type, cast to a java_generic_symbol_typet
+java_generic_symbol_typet require_type::require_java_generic_symbol_type(
+  const typet &type,
+  const std::string &identifier,
+  const require_type::expected_type_argumentst &type_expectations)
+{
+  const java_generic_symbol_typet &generic_base_type =
+    require_java_generic_symbol_type(type, identifier);
+
+  const java_generic_typet::generic_type_argumentst &generic_type_arguments =
+    generic_base_type.generic_types();
+  REQUIRE(generic_type_arguments.size() == type_expectations.size());
+  REQUIRE(
+    std::equal(
+      generic_type_arguments.begin(),
+      generic_type_arguments.end(),
+      type_expectations.begin(),
+      require_java_generic_type_argument_expectation));
+
+  return generic_base_type;
+}
