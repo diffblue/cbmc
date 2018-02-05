@@ -44,7 +44,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_symbol_table.h>
 #include <goto-programs/show_properties.h>
-#include <goto-programs/remove_java_new.h>
 
 #include <goto-symex/adjust_float_expressions.h>
 
@@ -735,9 +734,7 @@ bool jbmc_parse_optionst::process_goto_functions(
 {
   try
   {
-    remove_java_new(goto_model, get_message_handler());
-
-    status() << "Removal of virtual functions" << eom;
+    status() << "Running GOTO functions transformation passes" << eom;
     // remove catch and throw (introduces instanceof but request it is removed)
     remove_exceptions(
       goto_model, remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
