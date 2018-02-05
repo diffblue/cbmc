@@ -79,6 +79,7 @@ protected:
     if(index==0 || index>=constant_pool.size())
     {
       error() << "invalid constant pool index (" << index << ")" << eom;
+      error() << "constant pool size: " << constant_pool.size() << eom;
       throw 0;
     }
 
