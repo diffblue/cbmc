@@ -839,51 +839,12 @@ void goto_convertt::do_array_op(
   array_op_statement.operands()=arguments;
   array_op_statement.add_source_location()=function.source_location();
 
+  // lhs is only used with array_equal, in all other cases it should be nil (as
+  // they are of type void)
+  if(id == ID_array_equal)
+    array_op_statement.copy_to_operands(lhs);
+
   copy(array_op_statement, OTHER, dest);
-}
-
-void goto_convertt::do_array_equal(
-  const exprt &lhs,
-  const exprt &function,
-  const exprt::operandst &arguments,
-  goto_programt &dest)
-{
-  if(arguments.size()!=2)
-  {
-    error().source_location=function.find_source_location();
-    error() << "array_equal expects two arguments" << eom;
-    throw 0;
-  }
-
-  const typet &arg0_type=ns.follow(arguments[0].type());
-  const typet &arg1_type=ns.follow(arguments[1].type());
-
-  if(arg0_type.id()!=ID_pointer ||
-     arg1_type.id()!=ID_pointer)
-  {
-    error().source_location=function.find_source_location();
-    error() << "array_equal expects pointer arguments" << eom;
-    throw 0;
-  }
-
-  if(lhs.is_not_nil())
-  {
-    code_assignt assignment;
-
-    // add dereferencing here
-    dereference_exprt lhs_array, rhs_array;
-    lhs_array.op0()=arguments[0];
-    rhs_array.op0()=arguments[1];
-    lhs_array.type()=arg0_type.subtype();
-    rhs_array.type()=arg1_type.subtype();
-
-    assignment.lhs()=lhs;
-    assignment.rhs()=binary_exprt(
-      lhs_array, ID_array_equal, rhs_array, lhs.type());
-    assignment.add_source_location()=function.source_location();
-
-    convert(assignment, dest);
-  }
 }
 
 bool is_lvalue(const exprt &expr)
@@ -1214,7 +1175,7 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier==CPROVER_PREFIX "array_equal")
   {
-    do_array_equal(lhs, function, arguments, dest);
+    do_array_op(ID_array_equal, lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "array_set")
   {

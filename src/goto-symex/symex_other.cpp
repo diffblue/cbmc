@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
+#include <util/invariant.h>
 #include <util/rename.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
@@ -257,6 +258,57 @@ void goto_symext::symex_other(
     code_assignt assignment;
     assignment.lhs()=clean_code.op0();
     assignment.rhs()=array_of_exprt(clean_code.op1(), array_type);
+    symex_assign(state, assignment);
+  }
+  else if(statement==ID_array_equal)
+  {
+    DATA_INVARIANT(
+      code.operands().size() == 3,
+      "array_equal expected to take three arguments");
+
+    codet clean_code(code);
+
+    // we need to add dereferencing for the first two operands
+    dereference_exprt d0, d1;
+    d0.op0()=code.op0();
+    d0.type()=empty_typet();
+    d1.op0()=code.op1();
+    d1.type()=empty_typet();
+
+    clean_code.op0()=d0;
+    clean_code.op1()=d1;
+
+    clean_expr(clean_code.op0(), state, false);
+    exprt op0_offset=from_integer(0, index_type());
+    if(clean_code.op0().id()==byte_extract_id() &&
+       clean_code.op0().type().id()==ID_empty)
+    {
+      op0_offset=to_byte_extract_expr(clean_code.op0()).offset();
+      clean_code.op0()=clean_code.op0().op0();
+    }
+    clean_expr(clean_code.op1(), state, false);
+    exprt op1_offset=from_integer(0, index_type());
+    if(clean_code.op1().id()==byte_extract_id() &&
+       clean_code.op1().type().id()==ID_empty)
+    {
+      op1_offset=to_byte_extract_expr(clean_code.op1()).offset();
+      clean_code.op1()=clean_code.op1().op0();
+    }
+
+    process_array_expr(clean_code.op0());
+    clean_expr(clean_code.op0(), state, false);
+    process_array_expr(clean_code.op1());
+    clean_expr(clean_code.op1(), state, false);
+
+    if(!base_type_eq(clean_code.op0().type(),
+                     clean_code.op1().type(), ns))
+    {
+      clean_code.op2() = false_exprt();
+    }
+
+    code_assignt assignment(
+      clean_code.op2(),
+      equal_exprt(clean_code.op0(), clean_code.op1()));
     symex_assign(state, assignment);
   }
   else if(statement==ID_user_specified_predicate ||
