@@ -947,6 +947,12 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     {
       u2 start_pc=read_u2();
       u2 end_pc=read_u2();
+
+      INVARIANT(
+        start_pc < end_pc,
+        "The start_pc must be less than the end_pc as this is the range the "
+        "exception is active");
+
       u2 handler_pc=read_u2();
       u2 catch_type=read_u2();
       method.exception_table[e].start_pc=start_pc;
