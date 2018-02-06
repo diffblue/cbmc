@@ -171,7 +171,7 @@ string_refinementt::string_refinementt(const infot &info, bool):
 string_refinementt::string_refinementt(const infot &info):
   string_refinementt(info, validate(info)) { }
 
-/// display the current index set, for debugging
+/// Write index set to the given stream, use for debugging
 static void display_index_set(
   messaget::mstreamt &stream,
   const namespacet &ns,
@@ -669,6 +669,7 @@ union_find_replacet string_identifiers_resolution_from_equations(
   return result;
 }
 
+/// Output a vector of equations to the given stream, used for debugging.
 void output_equations(
   std::ostream &output,
   const std::vector<equal_exprt> &equations,
@@ -1021,8 +1022,12 @@ void string_refinementt::add_lemma(
 
 /// Get a model of an array and put it in a certain form.
 /// If the model is incomplete or if it is too big, return no value.
-/// \par parameters: an expression representing an array and an expression
-/// representing an integer
+/// \param super_get: function returning the valuation of an expression
+///        in a model
+/// \param ns: namespace
+/// \param max_string_length: maximum length of strings to analyze
+/// \param stream: output stream for warning messages
+/// \param arr: expression of type array representing a string
 /// \return an optional array expression or array_of_exprt
 static optionalt<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
@@ -1104,7 +1109,7 @@ static optionalt<exprt> get_array(
 
 /// convert the content of a string to a more readable representation. This
 /// should only be used for debugging.
-/// \par parameters: a constant array expression and a integer expression
+/// \param arr: a constant array expression
 /// \return a string
 static std::string string_of_array(const array_exprt &arr)
 {
