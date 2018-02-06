@@ -109,6 +109,15 @@ public:
     internal_symbol_base_map.clear();
     internal_symbol_module_map.clear();
   }
+
+  virtual iteratort begin() override
+  {
+    return iteratort(internal_symbols.begin());
+  }
+  virtual iteratort end() override
+  {
+    return iteratort(internal_symbols.end());
+  }
 };
 
 #endif // CPROVER_UTIL_SYMBOL_TABLE_H

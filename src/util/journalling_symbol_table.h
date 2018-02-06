@@ -124,6 +124,17 @@ public:
     base_symbol_table.clear();
   }
 
+  virtual iteratort begin() override
+  {
+    return iteratort(
+      base_symbol_table.begin(), [this](const irep_idt &id) { on_update(id); });
+  }
+  virtual iteratort end() override
+  {
+    return iteratort(
+      base_symbol_table.end(), [this](const irep_idt &id) { on_update(id); });
+  }
+
   const changesett &get_inserted() const
   {
     return inserted;
