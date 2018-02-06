@@ -141,6 +141,24 @@ protected:
   explicit depth_iterator_baset(const exprt &root)
   { this->push_expr(root); }
 
+  template <typename other_depth_iterator_t>
+  friend class depth_iterator_baset;
+
+  /// Create iterator starting at the supplied node (root)
+  /// with the path already followed by the passed other_depth_iterator_t
+  /// \remarks The passed depth_iterator_baset may be of a different derived
+  ///   type to the current depth_iterator_baset
+  /// \param expr: The expr that the passed iterator is rooted at
+  /// \param it: The iterator to make a copy of
+  template <typename other_depth_iterator_t>
+  depth_iterator_baset(
+    const exprt &expr,
+    const depth_iterator_baset<other_depth_iterator_t> &it)
+    : m_stack(it.m_stack)
+  {
+    PRECONDITION(&expr == &m_stack.front().expr.get());
+  }
+
   /// Destructor
   /// Protected to discourage upcasting
   ~depth_iterator_baset()=default;
@@ -158,21 +176,25 @@ protected:
   exprt &mutate()
   {
     PRECONDITION(!m_stack.empty());
-    auto expr=std::ref(const_cast<exprt &>(m_stack.front().expr.get()));
+    // Cast the root expr to non-const
+    auto expr = &const_cast<exprt &>(m_stack.front().expr.get());
     for(auto &state : m_stack)
     {
-      auto &operands=expr.get().operands();
+      // This deliberately breaks sharing as expr is now non-const
+      auto &operands = expr->operands();
+      // Get non-const iterators corresponding to the existing ones
       const auto i=operands.size()-(state.end-state.it);
       const auto it=operands.begin()+i;
-      state.expr=expr.get();
+      state.expr = *expr;
       state.it=it;
       state.end=operands.end();
+      // Get the expr for the next level down to use in the next iteration
       if(!(state==m_stack.back()))
       {
-        expr=std::ref(*it);
+        expr = &*it;
       }
     }
-    return expr.get();
+    return *expr;
   }
 
   /// Pushes expression onto the stack
@@ -210,11 +232,33 @@ public:
     depth_iterator_baset(expr) { }
   /// Create an end iterator
   const_depth_iteratort()=default;
+
+  /// Convert iterator to non-const
+  /// \remarks You must pass a non-const reference to the root exprt that
+  /// this iterator was created from to validate that you have non-const
+  /// access to this expression
+  /// \param expr: a non-const reference to the root exprt that this iterator
+  /// was created from
+  /// \returns A non-const iterator pointing to the same element as this
+  /// iterator
+  depth_iteratort get_mutable(exprt &expr);
 };
 
 class depth_iteratort final:
   public depth_iterator_baset<depth_iteratort>
 {
+private:
+  friend class const_depth_iteratort;
+
+  /// Create iterator starting at the supplied node (root)
+  /// with the path already followed by the passed const_depth_iteratort
+  /// \param expr: The expr that the passed iterator is rooted at
+  /// \param it: The iterator to make a copy of
+  depth_iteratort(exprt &expr, const const_depth_iteratort &it)
+    : depth_iterator_baset(expr, it)
+  {
+  }
+
 public:
   /// Create an end iterator
   depth_iteratort()=default;
@@ -227,6 +271,11 @@ public:
   exprt &mutate()
   { return depth_iterator_baset::mutate(); }
 };
+
+inline depth_iteratort const_depth_iteratort::get_mutable(exprt &expr)
+{
+  return depth_iteratort(expr, *this);
+}
 
 class const_unique_depth_iteratort final:
   public depth_iterator_baset<const_unique_depth_iteratort>
