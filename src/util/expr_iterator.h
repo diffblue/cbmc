@@ -73,9 +73,22 @@ public:
   typedef const exprt *pointer;   // NOLINT
   typedef const exprt &reference; // NOLINT
   typedef std::forward_iterator_tag iterator_category; // NOLINT
-  bool operator==(const depth_iterator_t &other) const
+
+  template <typename other_depth_iterator_t>
+  friend class depth_iterator_baset;
+
+  template <typename other_depth_iterator_t>
+  bool operator==(
+    const depth_iterator_baset<other_depth_iterator_t> &other) const
   {
     return m_stack==other.m_stack;
+  }
+
+  template <typename other_depth_iterator_t>
+  bool operator!=(
+    const depth_iterator_baset<other_depth_iterator_t> &other) const
+  {
+    return !(*this == other);
   }
 
   /// Preincrement operator
@@ -152,27 +165,39 @@ protected:
   depth_iterator_baset &operator=(depth_iterator_baset &&other)
   { m_stack=std::move(other.m_stack); }
 
-  /// Obtain non-const exprt reference. Performs a copy-on-write on
-  /// the root node as a side effect. To be called only if a the root
-  /// is a non-const exprt. Do not call on the end() iterator
+  const exprt &get_root()
+  {
+    return m_stack.front().expr.get();
+  }
+
+  /// Obtain non-const exprt reference. Performs a copy-on-write on the root
+  /// node as a side effect.
+  /// \remarks
+  ///   To be called only if a the root is a non-const exprt.
+  ///   Do not call on the end() iterator
   exprt &mutate()
   {
     PRECONDITION(!m_stack.empty());
-    auto expr=std::ref(const_cast<exprt &>(m_stack.front().expr.get()));
+    // Cast the root expr to non-const
+    exprt *expr = &const_cast<exprt &>(get_root());
     for(auto &state : m_stack)
     {
-      auto &operands=expr.get().operands();
+      // This deliberately breaks sharing as expr is now non-const
+      auto &operands = expr->operands();
+      // Get iterators into the operands of the new expr corresponding to the
+      // ones into the operands of the old expr
       const auto i=operands.size()-(state.end-state.it);
       const auto it=operands.begin()+i;
-      state.expr=expr.get();
+      state.expr = *expr;
       state.it=it;
       state.end=operands.end();
+      // Get the expr for the next level down to use in the next iteration
       if(!(state==m_stack.back()))
       {
-        expr=std::ref(*it);
+        expr = &*it;
       }
     }
-    return expr.get();
+    return *expr;
   }
 
   /// Pushes expression onto the stack
@@ -194,13 +219,6 @@ private:
   { return static_cast<depth_iterator_t &>(*this); }
 };
 
-template<typename T, typename std::enable_if<
-  std::is_base_of<depth_iterator_baset<T>, T>::value, int>::type=0>
-bool operator!=(
-  const T &left,
-  const T &right)
-{ return !(left==right); }
-
 class const_depth_iteratort final:
   public depth_iterator_baset<const_depth_iteratort>
 {
@@ -215,17 +233,58 @@ public:
 class depth_iteratort final:
   public depth_iterator_baset<depth_iteratort>
 {
+private:
+  /// If this is non-empty then the root is currently const and this function
+  /// must be called before any mutations occur
+  std::function<exprt &()> mutate_root;
+
 public:
   /// Create an end iterator
   depth_iteratort()=default;
+
   /// Create iterator starting at the supplied node (root)
   /// All mutations of the child nodes will be reflected on this node
-  explicit depth_iteratort(exprt &expr):
-    depth_iterator_baset(expr) { }
-  /// Obtain non-const reference to the pointed exprt instance
-  /// Modifies root expression
+  /// \param expr: The root node to begin iteration at
+  explicit depth_iteratort(exprt &expr) : depth_iterator_baset(expr)
+  {
+  }
+
+  /// Create iterator starting at the supplied node (root)
+  /// If mutations of the child nodes are required then the passed
+  /// mutate_root function will be called to get a non-const copy of the same
+  /// root on which the mutations will be done.
+  /// \param expr: The root node to begin iteration at
+  /// \param mutate_root: The function to call to get a non-const copy of the
+  ///   same root expression passed in the expr parameter
+  explicit depth_iteratort(
+    const exprt &expr,
+    std::function<exprt &()> mutate_root)
+    : depth_iterator_baset(expr), mutate_root(std::move(mutate_root))
+  {
+    // If you don't provide a mutate_root function then you must pass a
+    // non-const exprt (use the other constructor).
+    PRECONDITION(this->mutate_root);
+  }
+
+  /// Obtain non-const reference to the exprt instance currently pointed to
+  /// by the iterator.
+  /// If the iterator is currently using a const root exprt then calls
+  /// mutate_root to get a non-const root and copies it if it is shared
+  /// \returns A non-const reference to the element this iterator is
+  ///   currently pointing to
   exprt &mutate()
-  { return depth_iterator_baset::mutate(); }
+  {
+    if(mutate_root)
+    {
+      exprt &new_root = mutate_root();
+      INVARIANT(
+        &new_root.read() == &get_root().read(),
+        "mutate_root must return the same root node that depth_iteratort was "
+        "constructed with");
+      mutate_root = nullptr;
+    }
+    return depth_iterator_baset::mutate();
+  }
 };
 
 class const_unique_depth_iteratort final:

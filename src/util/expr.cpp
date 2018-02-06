@@ -526,6 +526,10 @@ const_depth_iteratort exprt::depth_cbegin() const
 { return const_depth_iteratort(*this); }
 const_depth_iteratort exprt::depth_cend() const
 { return const_depth_iteratort(); }
+depth_iteratort exprt::depth_begin(std::function<exprt &()> mutate_root) const
+{
+  return depth_iteratort(*this, std::move(mutate_root));
+}
 
 const_unique_depth_iteratort exprt::unique_depth_begin() const
 { return const_unique_depth_iteratort(*this); }

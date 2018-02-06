@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define OPERANDS_IN_GETSUB
 
+#include <functional>
 #include "type.h"
 
 #define forall_operands(it, expr) \
@@ -172,6 +173,7 @@ public:
   const_depth_iteratort depth_end() const;
   const_depth_iteratort depth_cbegin() const;
   const_depth_iteratort depth_cend() const;
+  depth_iteratort depth_begin(std::function<exprt &()> mutate_root) const;
   const_unique_depth_iteratort unique_depth_begin() const;
   const_unique_depth_iteratort unique_depth_end() const;
   const_unique_depth_iteratort unique_depth_cbegin() const;

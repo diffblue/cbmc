@@ -1,10 +1,6 @@
-/*******************************************************************\
+// Copyright 2018 DiffBlue Limited. All Rights Reserved.
 
- Module: Example Catch Tests
-
- Author: DiffBlue Limited. All rights reserved.
-
-\*******************************************************************/
+/// \file Tests for depth_iteratort and friends
 
 #include <testing-utils/catch.hpp>
 #include <util/expr.h>
@@ -155,4 +151,88 @@ TEST_CASE("next_sibling_or_parent, next parent ")
   it++;
   it.next_sibling_or_parent();
   REQUIRE(it==input[0].depth_end());
+}
+
+/// The mutate_root feature of depth_iteratort can be useful when you have an
+/// `exprt` and want to depth iterate its first operand. As part of that
+/// iteration you may or may not decide to mutate one of the children,
+/// depending on the state of those children. If you do not decide to mutate
+/// a child then you probably don't want to call the non-const version of
+/// `op0()` because that will break sharing, so you create the depth iterator
+/// with the const `exprt` returned from the const invocation of `op0()`, but
+/// if you decide during iteration that you do want to mutate a child then
+/// you can call the non-const version of `op0()` on the original `exprt` in
+/// order to get a non-const `exprt` that the iterator can copy-on-write
+/// update to change the child. At this point the iterator needs to be
+/// informed that it is now safe to write to the `exprt` it contains. This is
+/// achieved by providing a call-back function to the iterator.
+SCENARIO("depth_iterator_mutate_root", "[core][utils][depth_iterator]")
+{
+  GIVEN("A sample expression with a child with id() == ID_1")
+  {
+    // Set up test expression
+    exprt test_expr;
+    // This is the expression we will iterate over
+    exprt test_root;
+    // This is the expression we might mutate when we find it
+    exprt test_operand(ID_1);
+    test_root.move_to_operands(test_operand);
+    test_expr.move_to_operands(test_root);
+    WHEN("Iteration occurs without mutation")
+    {
+      // Create shared copies
+      exprt original_expr = test_expr;
+      exprt expr = original_expr;
+      THEN("Shared copy should return object with same address from read()")
+      {
+        REQUIRE(&expr.read() == &original_expr.read());
+      }
+      // Create iterator on first operand of expr
+      // We don't want to copy-on-write expr, so we get its first operand
+      // using a const reference to it
+      const exprt &root = static_cast<const exprt &>(expr).op0();
+      // This function gets a mutable version of root but in so doing it
+      // copy-on-writes expr
+      auto get_non_const_root = [&expr]() -> exprt & { return expr.op0(); };
+      // Create the iterator over root
+      depth_iteratort it = root.depth_begin(get_non_const_root);
+      for(; it != root.depth_cend(); ++it)
+      {
+        if(it->id() == ID_0) // This will never happen
+          it.mutate().id(ID_1);
+      }
+      THEN("No breaking of sharing should have occurred")
+      {
+        REQUIRE(&expr.read() == &original_expr.read());
+      }
+    }
+    WHEN("Iteration occurs with mutation")
+    {
+      // Create shared copies
+      exprt original_expr = test_expr;
+      exprt expr = original_expr;
+      THEN("Shared copy should return object with same address from read()")
+      {
+        REQUIRE(&expr.read() == &original_expr.read());
+      }
+      // Create iterator on first operand of expr
+      // We don't want to copy-on-write expr, so we get its first operand
+      // using a const reference to it
+      const exprt &root = static_cast<const exprt &>(expr).op0();
+      // This function gets a mutable version of root but in so doing it
+      // copy-on-writes expr
+      auto get_non_const_root = [&expr]() -> exprt & { return expr.op0(); };
+      // Create the iterator over root
+      depth_iteratort it = root.depth_begin(get_non_const_root);
+      for(; it != root.depth_cend(); ++it)
+      {
+        if(it->id() == ID_1)
+          it.mutate().id(ID_0);
+      }
+      THEN("Breaking of sharing should have occurred")
+      {
+        REQUIRE(&expr.read() != &original_expr.read());
+      }
+    }
+  }
 }
