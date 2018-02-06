@@ -45,6 +45,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 #include <regex>
 
+/// Given a string of the format '?blah?', will return true when compared
+/// against a string that matches appart from any characters that are '?'
+/// in the original string. Equivalent to doing a regex match on '.blah.'
 class patternt
 {
 public:
