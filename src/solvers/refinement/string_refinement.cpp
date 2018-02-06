@@ -29,8 +29,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <java_bytecode/java_types.h>
 #include <unordered_set>
 
-static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
-
 static bool is_valid_string_constraint(
   messaget::mstreamt &stream,
   const namespacet &ns,
@@ -123,6 +121,12 @@ static optionalt<exprt> get_array(
   const std::size_t max_string_length,
   messaget::mstreamt &stream,
   const array_string_exprt &arr);
+
+static exprt substitute_array_access(
+  const index_exprt &index_expr,
+  const std::function<symbol_exprt(const irep_idt &, const typet &)>
+    &symbol_generator,
+  const bool left_propagate);
 
 /// Convert index-value map to a vector of values. If a value for an
 /// index is not defined, set it to the value referenced by the next higher
@@ -1218,35 +1222,61 @@ void debug_model(
 }
 
 /// Create a new expression where 'with' expressions on arrays are replaced by
-/// 'if' expressions. e.g. for an array access arr[x], where: `arr :=
+/// 'if' expressions. e.g. for an array access arr[index], where: `arr :=
 /// array_of(12) with {0:=24} with {2:=42}` the constructed expression will be:
 /// `index==0 ? 24 : index==2 ? 42 : 12`
+/// If `left_propagate` is set to true, the expression will look like
+/// `index<=0 ? 24 : index<=2 ? 42 : 12`
 /// \param expr: A (possibly nested) 'with' expression on an `array_of`
-///   expression
+///   expression. The function checks that the expression is of the form
+///   `with_expr(with_expr(...(array_of(...)))`. This is the form in which
+///   array valuations coming from the underlying solver are given.
 /// \param index: An index with which to build the equality condition
 /// \return An expression containing no 'with' expression
-static exprt substitute_array_with_expr(const exprt &expr, const exprt &index)
+static exprt substitute_array_access(
+  const with_exprt &expr,
+  const exprt &index,
+  const bool left_propagate)
 {
-  if(expr.id()==ID_with)
+  std::vector<std::pair<std::size_t, exprt>> entries;
+  std::reference_wrapper<const exprt> ref =
+    std::ref(static_cast<const exprt &>(expr));
+  while(can_cast_expr<with_exprt>(ref.get()))
   {
-    const with_exprt &with_expr=to_with_expr(expr);
-    const exprt &then_expr=with_expr.new_value();
-    exprt else_expr=substitute_array_with_expr(with_expr.old(), index);
-    const typet &type=then_expr.type();
-    CHECK_RETURN(else_expr.type()==type);
-    CHECK_RETURN(index.type()==with_expr.where().type());
-    return if_exprt(
-      equal_exprt(index, with_expr.where()), then_expr, else_expr, type);
+    const auto &with_expr = expr_dynamic_cast<with_exprt>(ref.get());
+    auto current_index = numeric_cast_v<std::size_t>(with_expr.where());
+    entries.push_back(std::make_pair(current_index, with_expr.new_value()));
+    ref = with_expr.old();
   }
-  else
+
+  // This function only handles 'with' and 'array_of' expressions
+  PRECONDITION(ref.get().id() == ID_array_of);
+
+  // sort entries by increasing index
+  std::sort(
+    entries.begin(),
+    entries.end(),
+    [](
+      const std::pair<std::size_t, exprt> &a,
+      const std::pair<std::size_t, exprt> &b) { return a.first < b.first; });
+
+  exprt result = expr_dynamic_cast<array_of_exprt>(ref.get()).what();
+  for(const auto &entry : entries)
   {
-    // Only handle 'with' expressions and 'array_of' expressions.
-    INVARIANT(
-      expr.id()==ID_array_of,
-      string_refinement_invariantt("only handles 'with' and 'array_of' "
-        "expressions, and expr is 'with' is handled above"));
-    return to_array_of_expr(expr).what();
+    const exprt &then_expr = entry.second;
+    const typet &type = then_expr.type();
+    CHECK_RETURN(type == result.type());
+    const exprt entry_index = from_integer(entry.first, index.type());
+    if(left_propagate)
+    {
+      const binary_relation_exprt index_small_eq(index, ID_le, entry_index);
+      result = if_exprt(index_small_eq, then_expr, result, type);
+    }
+    else
+      result =
+        if_exprt(equal_exprt(index, entry_index), then_expr, result, type);
   }
+  return result;
 }
 
 /// Fill an array represented by a list of with_expr by propagating values to
@@ -1257,9 +1287,8 @@ static exprt substitute_array_with_expr(const exprt &expr, const exprt &index)
 /// \param string_max_length: bound on the length of strings
 /// \return an array expression with filled in values, or expr if it is simply
 ///   an `ARRAY_OF(x)` expression
-exprt fill_in_array_with_expr(
-  const exprt &expr,
-  const std::size_t string_max_length)
+static array_exprt
+fill_in_array_with_expr(const exprt &expr, const std::size_t string_max_length)
 {
   PRECONDITION(expr.type().id()==ID_array);
   PRECONDITION(expr.id()==ID_with || expr.id()==ID_array_of);
@@ -1325,112 +1354,129 @@ exprt fill_in_array_expr(const array_exprt &expr, std::size_t string_max_length)
   return result;
 }
 
-/// create an equivalent expression where array accesses and 'with' expressions
+/// Create an equivalent expression where array accesses are replaced by 'if'
+/// expressions: for instance in array access `arr[index]`, where:
+/// `arr := {12, 24, 48}` the constructed expression will be:
+///    `index==0 ? 12 : index==1 ? 24 : 48`
+static exprt substitute_array_access(
+  const array_exprt &array_expr,
+  const exprt &index,
+  const std::function<symbol_exprt(const irep_idt &, const typet &)>
+    &symbol_generator)
+{
+  const typet &char_type = array_expr.type().subtype();
+  const std::vector<exprt> &operands = array_expr.operands();
+
+  exprt result = symbol_generator("out_of_bound_access", char_type);
+
+  for(std::size_t i = 0; i < operands.size(); ++i)
+  {
+    // Go in reverse order so that smaller indexes appear first in the result
+    const std::size_t pos = operands.size() - 1 - i;
+    const equal_exprt equals(index, from_integer(pos, java_int_type()));
+    if(operands[pos].type() != char_type)
+    {
+      INVARIANT(
+        operands[pos].id() == ID_unknown,
+        string_refinement_invariantt(
+          "elements can only have type char or "
+          "unknown, and it is not char type"));
+      result = if_exprt(equals, exprt(ID_unknown, char_type), result);
+    }
+    else
+      result = if_exprt(equals, operands[pos], result);
+  }
+  return result;
+}
+
+static exprt substitute_array_access(
+  const if_exprt &if_expr,
+  const exprt &index,
+  const std::function<symbol_exprt(const irep_idt &, const typet &)>
+    &symbol_generator,
+  const bool left_propagate)
+{
+  // Substitute recursively in branches of conditional expressions
+  const exprt true_case = substitute_array_access(
+    index_exprt(if_expr.true_case(), index), symbol_generator, left_propagate);
+  const exprt false_case = substitute_array_access(
+    index_exprt(if_expr.false_case(), index), symbol_generator, left_propagate);
+
+  return if_exprt(if_expr.cond(), true_case, false_case);
+}
+
+static exprt substitute_array_access(
+  const index_exprt &index_expr,
+  const std::function<symbol_exprt(const irep_idt &, const typet &)>
+    &symbol_generator,
+  const bool left_propagate)
+{
+  const exprt &array = index_expr.array();
+
+  if(array.id() == ID_symbol)
+    return index_expr;
+  if(auto array_of = expr_try_dynamic_cast<array_of_exprt>(array))
+    return array_of->op();
+  if(auto array_with = expr_try_dynamic_cast<with_exprt>(array))
+    return substitute_array_access(
+      *array_with, index_expr.index(), left_propagate);
+  if(auto array_expr = expr_try_dynamic_cast<array_exprt>(array))
+    return substitute_array_access(
+      *array_expr, index_expr.index(), symbol_generator);
+  if(auto if_expr = expr_try_dynamic_cast<if_exprt>(array))
+    return substitute_array_access(
+      *if_expr, index_expr.index(), symbol_generator, left_propagate);
+
+  UNREACHABLE;
+}
+
+/// Auxiliary function for substitute_array_access
+/// Performs the same operation but modifies the argument instead of returning
+/// the resulting expression.
+static void substitute_array_access_in_place(
+  exprt &expr,
+  const std::function<symbol_exprt(const irep_idt &, const typet &)>
+    &symbol_generator,
+  const bool left_propagate)
+{
+  if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr))
+  {
+    expr =
+      substitute_array_access(*index_expr, symbol_generator, left_propagate);
+  }
+
+  for(auto &op : expr.operands())
+    substitute_array_access_in_place(op, symbol_generator, left_propagate);
+}
+
+/// Create an equivalent expression where array accesses and 'with' expressions
 /// are replaced by 'if' expressions, in particular:
-///  * for an array access `arr[x]`, where:
+///  * for an array access `arr[index]`, where:
 ///    `arr := {12, 24, 48}` the constructed expression will be:
 ///    `index==0 ? 12 : index==1 ? 24 : 48`
-///  * for an array access `arr[x]`, where:
+///  * for an array access `arr[index]`, where:
 ///    `arr := array_of(12) with {0:=24} with {2:=42}` the constructed
 ///    expression will be: `index==0 ? 24 : index==2 ? 42 : 12`
 ///  * for an array access `(g1?arr1:arr2)[x]` where `arr1 := {12}` and
 ///    `arr2 := {34}`, the constructed expression will be: `g1 ? 12 : 34`
 ///  * for an access in an empty array `{ }[x]` returns a fresh symbol, this
 ///    corresponds to a non-deterministic result
+/// Note that if left_propagate is set to true, the `with` case will result in
+/// something like: `index <= 0 ? 24 : index <= 2 ? 42 : 12`
 /// \param expr: an expression containing array accesses
 /// \param symbol_generator: function which given a prefix and a type generates
 ///        a fresh symbol of the given type
+/// \param left_propagate: should values be propagated to the left in with
+///        expressions
 /// \return an expression containing no array access
-static void substitute_array_access(
-  exprt &expr,
+exprt substitute_array_access(
+  exprt expr,
   const std::function<symbol_exprt(const irep_idt &, const typet &)>
-    &symbol_generator)
+    &symbol_generator,
+  const bool left_propagate)
 {
-  for(auto &op : expr.operands())
-    substitute_array_access(op, symbol_generator);
-
-  if(expr.id()==ID_index)
-  {
-    index_exprt &index_expr=to_index_expr(expr);
-
-    if(index_expr.array().id()==ID_symbol)
-    {
-      expr=index_expr;
-      return;
-    }
-
-    if(index_expr.array().id()==ID_with)
-    {
-      expr=substitute_array_with_expr(index_expr.array(), index_expr.index());
-      return;
-    }
-
-    if(index_expr.array().id()==ID_array_of)
-    {
-      expr=to_array_of_expr(index_expr.array()).op();
-      return;
-    }
-
-    if(index_expr.array().id()==ID_if)
-    {
-      // Substitute recursively in branches of conditional expressions
-      if_exprt if_expr=to_if_expr(index_expr.array());
-      exprt true_case=index_exprt(if_expr.true_case(), index_expr.index());
-      substitute_array_access(true_case, symbol_generator);
-      exprt false_case=index_exprt(if_expr.false_case(), index_expr.index());
-      substitute_array_access(false_case, symbol_generator);
-      expr=if_exprt(if_expr.cond(), true_case, false_case);
-      return;
-    }
-
-    DATA_INVARIANT(
-      index_expr.array().id()==ID_array,
-      string_refinement_invariantt("and index expression must be on a symbol, "
-        "with, array_of, if, or array, and all cases besides array are handled "
-        "above"));
-    array_exprt &array_expr=to_array_expr(index_expr.array());
-
-    const typet &char_type = index_expr.array().type().subtype();
-
-    // Access to an empty array is undefined (non deterministic result)
-    if(array_expr.operands().empty())
-    {
-      expr = symbol_generator("out_of_bound_access", char_type);
-      return;
-    }
-
-    size_t last_index=array_expr.operands().size()-1;
-
-    exprt ite=array_expr.operands().back();
-
-    if(ite.type()!=char_type)
-    {
-      // We have to manually set the type for unknown values
-      INVARIANT(
-        ite.id()==ID_unknown,
-        string_refinement_invariantt("the last element can only have type char "
-          "or unknown, and it is not char type"));
-      ite.type()=char_type;
-    }
-
-    auto op_it=++array_expr.operands().rbegin();
-
-    for(size_t i=last_index-1;
-        op_it!=array_expr.operands().rend(); ++op_it, --i)
-    {
-      equal_exprt equals(index_expr.index(), from_integer(i, java_int_type()));
-      if(op_it->type()!=char_type)
-      {
-        INVARIANT(
-          op_it->id()==ID_unknown,
-          string_refinement_invariantt("elements can only have type char or "
-            "unknown, and it is not char type"));
-        op_it->type()=char_type;
-      }
-      ite=if_exprt(equals, *op_it, ite);
-    }
-    expr=ite;
-  }
+  substitute_array_access_in_place(expr, symbol_generator, left_propagate);
+  return expr;
 }
 
 /// Negates the constraint to be fed to a solver. The intended usage is to find
@@ -1657,12 +1703,10 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
     negaxiom = simplify_expr(negaxiom, ns);
-    exprt with_concretized_arrays =
-      concretize_arrays_in_expression(negaxiom, max_string_length, ns);
-
-    substitute_array_access(with_concretized_arrays, gen_symbol);
 
     stream << indent << i << ".\n";
+    const exprt with_concretized_arrays =
+      substitute_array_access(negaxiom, gen_symbol, true);
     debug_check_axioms_step(
       stream, ns, axiom, axiom_in_model, negaxiom, with_concretized_arrays);
 
@@ -1713,10 +1757,8 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
       negation_of_not_contains_constraint(nc_axiom_in_model, univ_var);
 
     negaxiom = simplify_expr(negaxiom, ns);
-    exprt with_concrete_arrays =
-      concretize_arrays_in_expression(negaxiom, max_string_length, ns);
-
-    substitute_array_access(with_concrete_arrays, gen_symbol);
+    const exprt with_concrete_arrays =
+      substitute_array_access(negaxiom, gen_symbol, true);
 
     stream << indent << i << ".\n";
     debug_check_axioms_step(
