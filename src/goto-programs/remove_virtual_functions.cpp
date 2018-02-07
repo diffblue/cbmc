@@ -276,6 +276,8 @@ void remove_virtual_functionst::remove_virtual_function(
     const irep_idt property_class=it->source_location.get_property_class();
     const irep_idt comment=it->source_location.get_comment();
     it->source_location=target->source_location;
+    // mark instruction as originating from a removed virtual function call
+    it->source_location.set_java_removed_virtual_call();
     it->function=target->function;
     if(!property_class.empty())
       it->source_location.set_property_class(property_class);
