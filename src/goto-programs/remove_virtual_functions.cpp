@@ -142,7 +142,6 @@ void remove_virtual_functionst::remove_virtual_function(
   goto_programt new_code_gotos;
 
   exprt this_expr=code.arguments()[0];
-  const auto &last_function_symbol=functions.back().symbol_expr;
 
   const typet &this_type=this_expr.type();
   INVARIANT(this_type.id() == ID_pointer, "this parameter must be a pointer");
@@ -163,50 +162,67 @@ void remove_virtual_functionst::remove_virtual_function(
     newinst->source_location=vcall_source_loc;
   }
 
+  // Filter out function for which the type is not loaded
+  dispatch_table_entriest filtered_functions;
+  for(const dispatch_table_entryt &fun : functions)
+  {
+    const constant_exprt class_id(fun.class_id, string_typet());
+    if(fun.symbol_expr.get_identifier().empty())
+    {
+      goto_programt::targett target_for_assertion =
+        new_code_calls.add_instruction();
+      target_for_assertion->source_location = vcall_source_loc;
+
+      // No definition for this type, assume this is not the current type
+      target_for_assertion->make_assertion(notequal_exprt(class_id, c_id2));
+      target_for_assertion->source_location.set_comment(
+        ("cannot find calls for " +
+         id2string(code.function().get(ID_identifier)) + " dispatching " +
+         id2string(fun.class_id)));
+    }
+    else
+      filtered_functions.push_back(fun);
+  }
+
   std::map<irep_idt, goto_programt::targett> calls;
+  const auto &last_function_symbol = filtered_functions.back().symbol_expr;
   // Note backwards iteration, to get the fallback candidate first.
-  for(auto it=functions.crbegin(), itend=functions.crend(); it!=itend; ++it)
+  for(auto it = filtered_functions.crbegin(),
+           itend = filtered_functions.crend();
+      it != itend;
+      ++it)
   {
     const auto &fun=*it;
+
     auto insertit=calls.insert(
       {fun.symbol_expr.get_identifier(), goto_programt::targett()});
 
     // Only create one call sequence per possible target:
     if(insertit.second)
     {
-      goto_programt::targett t1=new_code_calls.add_instruction();
-      t1->source_location=vcall_source_loc;
-      if(!fun.symbol_expr.get_identifier().empty())
-      {
+      goto_programt::targett target_for_call = new_code_calls.add_instruction();
+      target_for_call->source_location = vcall_source_loc;
+
       // call function
-        t1->make_function_call(code);
-        auto &newcall=to_code_function_call(t1->code);
-        newcall.function()=fun.symbol_expr;
-        // Cast the `this` pointer to the correct type for the new callee:
-        const auto &callee_type=
-          to_code_type(ns.lookup(fun.symbol_expr.get_identifier()).type);
-        const code_typet::parametert *this_param = callee_type.get_this();
-        INVARIANT(
-          this_param != nullptr,
-          "Virtual function callees must have a `this` argument");
-        typet need_type=this_param->type();
-        if(!type_eq(newcall.arguments()[0].type(), need_type, ns))
-          newcall.arguments()[0].make_typecast(need_type);
-      }
-      else
-      {
-        // No definition for this type; shouldn't be possible...
-        t1->make_assertion(false_exprt());
-        t1->source_location.set_comment(
-          ("cannot find calls for " +
-           id2string(code.function().get(ID_identifier)) + " dispatching " +
-           id2string(fun.class_id)));
-      }
-      insertit.first->second=t1;
+      target_for_call->make_function_call(code);
+      auto &newcall = to_code_function_call(target_for_call->code);
+      newcall.function() = fun.symbol_expr;
+      // Cast the `this` pointer to the correct type for the new callee:
+      const auto &callee_type =
+        to_code_type(ns.lookup(fun.symbol_expr.get_identifier()).type);
+      const code_typet::parametert *this_param = callee_type.get_this();
+      INVARIANT(
+        this_param != nullptr,
+        "Virtual function callees must have a `this` argument");
+      typet need_type = this_param->type();
+      if(!type_eq(newcall.arguments()[0].type(), need_type, ns))
+        newcall.arguments()[0].make_typecast(need_type);
+
+      insertit.first->second = target_for_call;
       // goto final
-      goto_programt::targett t3=new_code_calls.add_instruction();
-      t3->source_location=vcall_source_loc;
-      t3->make_goto(t_final, true_exprt());
+      goto_programt::targett target_for_goto = new_code_calls.add_instruction();
+      target_for_goto->source_location = vcall_source_loc;
+      target_for_goto->make_goto(t_final, true_exprt());
     }
 
     // If this calls the fallback function we just fall through.
@@ -214,10 +230,12 @@ void remove_virtual_functionst::remove_virtual_function(
     if(fallback_action!=virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION ||
        fun.symbol_expr!=last_function_symbol)
     {
-      exprt c_id1=constant_exprt(fun.class_id, string_typet());
-      goto_programt::targett t4=new_code_gotos.add_instruction();
-      t4->source_location=vcall_source_loc;
-      t4->make_goto(insertit.first->second, equal_exprt(c_id1, c_id2));
+      const constant_exprt c_id1(fun.class_id, string_typet());
+      goto_programt::targett target_for_goto_condition =
+        new_code_gotos.add_instruction();
+      target_for_goto_condition->source_location = vcall_source_loc;
+      target_for_goto_condition->make_goto(
+        insertit.first->second, equal_exprt(c_id1, c_id2));
     }
   }
 
