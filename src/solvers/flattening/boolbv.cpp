@@ -637,17 +637,9 @@ bool boolbvt::is_unbounded_array(const typet &type) const
   if(unbounded_array==unbounded_arrayt::U_ALL)
     return true;
 
-  const exprt &size=to_array_type(type).size();
-
-  mp_integer s;
-  if(to_integer(size, s))
-    return true;
-
-  if(unbounded_array==unbounded_arrayt::U_AUTO)
-    if(s>MAX_FLATTENED_ARRAY_SIZE)
-      return true;
-
-  return false;
+  const auto s = numeric_cast<mp_integer>(to_array_type(type).size());
+  return !s.has_value() || (unbounded_array == unbounded_arrayt::U_AUTO &&
+                            *s > MAX_FLATTENED_ARRAY_SIZE);
 }
 
 void boolbvt::print_assignment(std::ostream &out) const
