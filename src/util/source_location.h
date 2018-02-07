@@ -151,6 +151,19 @@ public:
     return set(ID_basic_block_covered_lines, covered_lines);
   }
 
+  /// Add comment to source location as originating from removed virtual call
+  void set_java_removed_virtual_call()
+  {
+    set(ID_C_java_removed_virtual_call, true);
+  }
+
+  /// Get information about whether call originated from a removed virtual
+  /// function call
+  bool get_java_removed_virtual_call() const
+  {
+    return get_bool(ID_C_java_removed_virtual_call);
+  }
+
   void set_hide()
   {
     set(ID_hide, true);
