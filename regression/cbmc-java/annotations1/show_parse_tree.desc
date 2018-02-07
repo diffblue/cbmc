@@ -1,0 +1,11 @@
+KNOWNBUG
+annotations.class
+--verbosity 10 --show-parse-tree
+^EXIT=0$
+^SIGNAL=0$
+^\s*@java::ClassAnnotation$
+^\s*@java::MethodAnnotation$
+--
+--
+The purpose of the test is ensuring that annotations can be shown in the parse
+tree.
