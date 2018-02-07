@@ -497,14 +497,12 @@ exprt prop_conv_solvert::get(const exprt &expr) const
     }
   }
 
-  exprt tmp=expr;
-
-  Forall_operands(it, tmp)
+  exprt tmp = expr;
+  for(auto &op : tmp.operands())
   {
-    exprt tmp_op=get(*it);
-    it->swap(tmp_op);
+    exprt tmp_op = get(op);
+    op.swap(tmp_op);
   }
-
   return tmp;
 }
 
