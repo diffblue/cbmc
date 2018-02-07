@@ -168,12 +168,14 @@ SCENARIO("test_value_set_analysis",
 {
   GIVEN("Normal and custom value-set analysis of CustomVSATest::test")
   {
+    config.set_arch("none");
+    config.main = "";
     null_message_handlert null_output;
     cmdlinet command_line;
 
     // This classpath is the default, but the config object
     // is global and previous unit tests may have altered it
-    command_line.set("java-cp-include-files", ".");
+    command_line.set("java-cp-include-files", "CustomVSATest.class");
     config.java.classpath={"."};
     command_line.args.push_back("pointer-analysis/CustomVSATest.jar");
 

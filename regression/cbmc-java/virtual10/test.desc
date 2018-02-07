@@ -1,0 +1,6 @@
+CORE
+E.class
+--show-goto-functions
+IF.*"java::D"
+IF.*"java::O"
+IF.*"java::C"

@@ -43,6 +43,7 @@ SRC += unit_tests.cpp \
        util/simplify_expr.cpp \
        util/symbol_table.cpp \
        catch_example.cpp \
+       java_bytecode/java_virtual_functions/virtual_functions.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I.
