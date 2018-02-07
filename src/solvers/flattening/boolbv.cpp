@@ -433,13 +433,7 @@ bvt boolbvt::convert_function_application(
 
 literalt boolbvt::convert_rest(const exprt &expr)
 {
-  if(expr.type().id()!=ID_bool)
-  {
-    error() << "boolbvt::convert_rest got non-boolean operand: "
-            << expr.pretty() << eom;
-    throw 0;
-  }
-
+  PRECONDITION(expr.type().id() == ID_bool);
   const exprt::operandst &operands=expr.operands();
 
   if(expr.id()==ID_typecast)
@@ -451,9 +445,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     return convert_verilog_case_equality(to_binary_relation_expr(expr));
   else if(expr.id()==ID_notequal)
   {
-    if(expr.operands().size()!=2)
-      throw "notequal expects two operands";
-
+    DATA_INVARIANT(expr.operands().size() == 2, "notequal expects two operands");
     return !convert_equality(equal_exprt(expr.op0(), expr.op1()));
   }
   else if(expr.id()==ID_ieee_float_equal ||
@@ -480,57 +472,37 @@ literalt boolbvt::convert_rest(const exprt &expr)
   else if(expr.id()==ID_index)
   {
     bvt bv=convert_index(to_index_expr(expr));
-
-    if(bv.size()!=1)
-      throw "convert_index returned non-bool bitvector";
-
+    CHECK_RETURN(bv.size() == 1);
     return bv[0];
   }
   else if(expr.id()==ID_member)
   {
     bvt bv=convert_member(to_member_expr(expr));
-
-    if(bv.size()!=1)
-      throw "convert_member returned non-bool bitvector";
-
+    CHECK_RETURN(bv.size() == 1);
     return bv[0];
   }
   else if(expr.id()==ID_case)
   {
     bvt bv=convert_case(expr);
-
-    if(bv.size()!=1)
-      throw "convert_case returned non-bool bitvector";
-
+    CHECK_RETURN(bv.size() == 1);
     return bv[0];
   }
   else if(expr.id()==ID_cond)
   {
     bvt bv=convert_cond(expr);
-
-    if(bv.size()!=1)
-      throw "convert_cond returned non-bool bitvector";
-
+    CHECK_RETURN(bv.size() == 1);
     return bv[0];
   }
   else if(expr.id()==ID_sign)
   {
-    if(expr.operands().size()!=1)
-      throw "sign expects one operand";
-
+    DATA_INVARIANT(expr.operands().size() == 1, "sign expects one operand");
     const bvt &bv=convert_bv(operands[0]);
-
-    if(bv.empty())
-      throw "sign operator takes one non-empty operand";
-
-    if(operands[0].type().id()==ID_signedbv)
+    CHECK_RETURN(!bv.empty());
+    const irep_idt type_id = operands[0].type().id();
+    if(type_id == ID_signedbv || type_id == ID_fixedbv || type_id == ID_floatbv)
       return bv[bv.size()-1];
-    else if(operands[0].type().id()==ID_unsignedbv)
+    if(type_id == ID_unsignedbv)
       return const_literal(false);
-    else if(operands[0].type().id()==ID_fixedbv)
-      return bv[bv.size()-1];
-    else if(operands[0].type().id()==ID_floatbv)
-      return bv[bv.size()-1];
   }
   else if(expr.id()==ID_reduction_or  || expr.id()==ID_reduction_and  ||
           expr.id()==ID_reduction_nor || expr.id()==ID_reduction_nand ||
@@ -542,9 +514,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     return convert_overflow(expr);
   else if(expr.id()==ID_isnan)
   {
-    if(expr.operands().size()!=1)
-      throw "isnan expects one operand";
-
+    DATA_INVARIANT(expr.operands().size() == 1, "isnan expects one operand");
     const bvt &bv=convert_bv(operands[0]);
 
     if(expr.op0().type().id()==ID_floatbv)
@@ -552,16 +522,13 @@ literalt boolbvt::convert_rest(const exprt &expr)
       float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
       return float_utils.is_NaN(bv);
     }
-    else if(expr.op0().type().id()==ID_fixedbv)
+    else if(expr.op0().type().id() == ID_fixedbv)
       return const_literal(false);
   }
   else if(expr.id()==ID_isfinite)
   {
-    if(expr.operands().size()!=1)
-      throw "isfinite expects one operand";
-
+    DATA_INVARIANT(expr.operands().size() == 1, "isfinite expects one operand");
     const bvt &bv=convert_bv(operands[0]);
-
     if(expr.op0().type().id()==ID_floatbv)
     {
       float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
@@ -569,37 +536,31 @@ literalt boolbvt::convert_rest(const exprt &expr)
         !float_utils.is_infinity(bv),
         !float_utils.is_NaN(bv));
     }
-    else if(expr.op0().type().id()==ID_fixedbv)
+    else if(expr.op0().type().id() == ID_fixedbv)
       return const_literal(true);
   }
   else if(expr.id()==ID_isinf)
   {
-    if(expr.operands().size()!=1)
-      throw "isinf expects one operand";
-
+    DATA_INVARIANT(expr.operands().size() == 1, "isinf expects one operand");
     const bvt &bv=convert_bv(operands[0]);
-
     if(expr.op0().type().id()==ID_floatbv)
     {
       float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
       return float_utils.is_infinity(bv);
     }
-    else if(expr.op0().type().id()==ID_fixedbv)
+    else if(expr.op0().type().id() == ID_fixedbv)
       return const_literal(false);
   }
   else if(expr.id()==ID_isnormal)
   {
-    if(expr.operands().size()!=1)
-      throw "isnormal expects one operand";
-
-    const bvt &bv=convert_bv(operands[0]);
-
+    DATA_INVARIANT(expr.operands().size() == 1, "isnormal expects one operand");
     if(expr.op0().type().id()==ID_floatbv)
     {
+      const bvt &bv = convert_bv(operands[0]);
       float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
       return float_utils.is_normal(bv);
     }
-    else if(expr.op0().type().id()==ID_fixedbv)
+    else if(expr.op0().type().id() == ID_fixedbv)
       return const_literal(true);
   }
 
