@@ -660,17 +660,16 @@ void boolbvt::print_assignment(std::ostream &out) const
     out << pair.first << "=" << pair.second.get_value(prop) << '\n';
 }
 
-void boolbvt::build_offset_map(const struct_typet &src, offset_mapt &dest)
+boolbvt::offset_mapt boolbvt::build_offset_map(const struct_typet &src)
 {
-  const struct_typet::componentst &components=
-    src.components();
-
-  dest.resize(components.size());
-  std::size_t offset=0;
-  for(std::size_t i=0; i<components.size(); i++)
+  const struct_typet::componentst &components = src.components();
+  offset_mapt dest;
+  dest.reserve(components.size());
+  std::size_t offset = 0;
+  for(const auto &comp : components)
   {
-    std::size_t comp_width=boolbv_width(components[i].type());
-    dest[i]=offset;
-    offset+=comp_width;
+    dest.push_back(offset);
+    offset += boolbv_width(comp.type());
   }
+  return dest;
 }

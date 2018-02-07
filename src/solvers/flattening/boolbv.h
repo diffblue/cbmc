@@ -250,7 +250,7 @@ protected:
   void post_process_quantifiers();
 
   typedef std::vector<std::size_t> offset_mapt;
-  void build_offset_map(const struct_typet &src, offset_mapt &dest);
+  offset_mapt build_offset_map(const struct_typet &src);
 
   // strings
   numbering<irep_idt> string_numbering;

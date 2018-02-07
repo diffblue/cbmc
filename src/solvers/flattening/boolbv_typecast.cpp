@@ -530,10 +530,8 @@ bool boolbvt::type_conversion(
           op_struct.components();
 
         // build offset maps
-        offset_mapt op_offsets, dest_offsets;
-
-        build_offset_map(op_struct, op_offsets);
-        build_offset_map(dest_struct, dest_offsets);
+        const offset_mapt op_offsets = build_offset_map(op_struct);
+        const offset_mapt dest_offsets = build_offset_map(dest_struct);
 
         // build name map
         typedef std::map<irep_idt, std::size_t> op_mapt;
