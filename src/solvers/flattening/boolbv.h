@@ -65,10 +65,7 @@ public:
   }
 
   // get literals for variables/expressions, if available
-  virtual bool literal(
-    const exprt &expr,
-    std::size_t bit,
-    literalt &literal) const;
+  virtual optionalt<literalt> literal(const exprt &expr, std::size_t bit) const;
 
   using arrayst::literal;
 

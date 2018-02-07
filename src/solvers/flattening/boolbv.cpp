@@ -29,15 +29,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/floatbv/float_utils.h>
 #include <solvers/lowering/expr_lowering.h>
 
-bool boolbvt::literal(
-  const exprt &expr,
-  const std::size_t bit,
-  literalt &dest) const
+optionalt<literalt>
+boolbvt::literal(const exprt &expr, const std::size_t bit) const
 {
   if(expr.type().id()==ID_bool)
   {
     assert(bit==0);
-    return prop_conv_solvert::literal(expr, dest);
+    return prop_conv_solvert::literal(expr);
   }
   else
   {
@@ -50,16 +48,15 @@ bool boolbvt::literal(
         map.mapping.find(identifier);
 
       if(it_m==map.mapping.end())
-        return true;
+        return {};
 
       const boolbv_mapt::map_entryt &map_entry=it_m->second;
 
       assert(bit<map_entry.literal_map.size());
       if(!map_entry.literal_map[bit].is_set)
-        return true;
+        return {};
 
-      dest=map_entry.literal_map[bit].l;
-      return false;
+      return map_entry.literal_map[bit].l;
     }
     else if(expr.id()==ID_index)
     {
@@ -76,7 +73,7 @@ bool boolbvt::literal(
 
       std::size_t offset=integer2unsigned(index*element_width);
 
-      return literal(index_expr.array(), bit+offset, dest);
+      return literal(index_expr.array(), bit + offset);
     }
     else if(expr.id()==ID_member)
     {
@@ -96,7 +93,7 @@ bool boolbvt::literal(
         const typet &subtype=it->type();
 
         if(it->get_name()==component_name)
-          return literal(expr.op0(), bit+offset, dest);
+          return literal(expr.op0(), bit + offset);
 
         std::size_t element_width=boolbv_width(subtype);
 
