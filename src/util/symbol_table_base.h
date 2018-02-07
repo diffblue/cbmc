@@ -8,6 +8,7 @@
 #ifndef CPROVER_UTIL_SYMBOL_TABLE_BASE_H
 #define CPROVER_UTIL_SYMBOL_TABLE_BASE_H
 
+#include <functional>
 #include <iosfwd>
 #include <map>
 #include <unordered_map>
@@ -117,6 +118,78 @@ public:
   virtual void clear() = 0;
 
   void show(std::ostream &out) const;
+
+  class iteratort
+  {
+  private:
+    symbolst::iterator it;
+    std::function<void(const irep_idt &id)> on_get_writeable;
+
+  public:
+    explicit iteratort(symbolst::iterator it) : it(std::move(it))
+    {
+    }
+
+    iteratort(
+        const iteratort &it,
+        std::function<void(const irep_idt &id)> on_get_writeable)
+      : it(it.it), on_get_writeable(std::move(on_get_writeable))
+    {
+    }
+
+    // The following typedefs are NOLINT as they are needed by the STL
+    typedef symbolst::iterator::difference_type difference_type;     // NOLINT
+    typedef symbolst::const_iterator::value_type value_type;         // NOLINT
+    typedef symbolst::const_iterator::pointer pointer;               // NOLINT
+    typedef symbolst::const_iterator::reference reference;           // NOLINT
+    typedef symbolst::iterator::iterator_category iterator_category; // NOLINT
+
+    bool operator==(const iteratort &other) const
+    {
+      return it == other.it;
+    }
+
+    /// Preincrement operator
+    /// Do not call on the end() iterator
+    iteratort &operator++()
+    {
+      ++it;
+      return *this;
+    }
+
+    /// Post-increment operator
+    /// \remarks Expensive copy. Avoid if possible.
+    iteratort operator++(int)
+    {
+      iteratort copy(*this);
+      this->operator++();
+      return copy;
+    }
+
+    /// Dereference operator
+    /// \remarks Dereferencing end() iterator is undefined behaviour
+    reference operator*() const
+    {
+      return *it;
+    }
+
+    /// Dereference operator (member access)
+    /// \remarks Dereferencing end() iterator is undefined behaviour
+    pointer operator->() const
+    {
+      return &**this;
+    }
+
+    symbolt &get_writeable_symbol(const irep_idt &identifier)
+    {
+      if(on_get_writeable)
+        on_get_writeable((*this)->first);
+      return it->second;
+    }
+  };
+
+  virtual iteratort begin() = 0;
+  virtual iteratort end() = 0;
 };
 
 std::ostream &
