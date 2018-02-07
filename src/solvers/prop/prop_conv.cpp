@@ -54,7 +54,7 @@ bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
 
 literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
 {
-  std::pair<symbolst::iterator, bool> result=
+  auto result =
     symbols.insert(std::pair<irep_idt, literalt>(identifier, literalt()));
 
   if(!result.second)
@@ -172,10 +172,9 @@ literalt prop_conv_solvert::convert(const exprt &expr)
       prop.set_frozen(literal);
     return literal;
   }
-  // check cache first
 
-  std::pair<cachet::iterator, bool> result=
-    cache.insert(std::pair<exprt, literalt>(expr, literalt()));
+  // check cache first
+  auto result = cache.insert({expr, literalt()});
 
   if(!result.second)
     return result.first->second;
