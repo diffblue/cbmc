@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "prop_conv.h"
+#include <algorithm>
 
 /// determine whether a variable is in the final conflict
 bool prop_convt::is_in_conflict(literalt l) const
@@ -368,16 +369,12 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.type().id() == ID_bool);
 
-  bool boolean=true;
+  const bool has_only_boolean_operands = std::all_of(
+    expr.operands().begin(),
+    expr.operands().end(),
+    [](const exprt &expr) { return expr.type().id() == ID_bool; });
 
-  forall_operands(it, expr)
-    if(it->type().id()!=ID_bool)
-    {
-      boolean=false;
-      break;
-    }
-
-  if(boolean)
+  if(has_only_boolean_operands)
   {
     if(expr.id()==ID_not)
     {
