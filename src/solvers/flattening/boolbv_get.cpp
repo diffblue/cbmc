@@ -62,7 +62,7 @@ exprt boolbvt::get(const exprt &expr) const
     }
   }
 
-  return SUB::get(expr);
+  return baset::get(expr);
 }
 
 exprt boolbvt::bv_get_rec(

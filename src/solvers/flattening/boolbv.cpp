@@ -561,7 +561,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
       return const_literal(true);
   }
 
-  return SUB::convert_rest(expr);
+  return baset::convert_rest(expr);
 }
 
 bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
@@ -602,7 +602,7 @@ void boolbvt::set_to(const exprt &expr, bool value)
   const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr);
   if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))
     return;
-  SUB::set_to(expr, value);
+  baset::set_to(expr, value);
 }
 
 exprt boolbvt::make_bv_expr(const typet &type, const bvt &bv)

@@ -26,7 +26,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     const bvt &bv1=convert_bv(operands[1]);
 
     if(bv0.size()!=bv1.size())
-      return SUB::convert_rest(expr);
+      return baset::convert_rest(expr);
 
     bv_utilst::representationt rep=
       expr.op0().type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
@@ -43,7 +43,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
 
     if(operands[0].type().id()!=ID_unsignedbv &&
        operands[0].type().id()!=ID_signedbv)
-      return SUB::convert_rest(expr);
+      return baset::convert_rest(expr);
 
     bvt bv0=convert_bv(operands[0]);
     bvt bv1=convert_bv(operands[1]);
@@ -205,5 +205,5 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     }
   }
 
-  return SUB::convert_rest(expr);
+  return baset::convert_rest(expr);
 }

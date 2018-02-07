@@ -16,6 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class bv_pointerst:public boolbvt
 {
+private:
+  typedef boolbvt baset;
+
 public:
   bv_pointerst(const namespacet &_ns, propt &_prop);
 
@@ -23,9 +26,6 @@ public:
 
 protected:
   pointer_logict pointer_logic;
-
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef boolbvt SUB;
 
   unsigned object_bits, offset_bits, bits;
 

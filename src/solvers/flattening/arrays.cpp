@@ -62,7 +62,7 @@ literalt arrayst::record_array_equality(
 
   array_equalities.back().f1=op0;
   array_equalities.back().f2=op1;
-  array_equalities.back().l=SUB::equality(op0, op1);
+  array_equalities.back().l = baset::equality(op0, op1);
 
   arrays.make_union(op0, op1);
   collect_arrays(op0);

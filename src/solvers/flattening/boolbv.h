@@ -53,7 +53,7 @@ public:
 
   void clear_cache() override
   {
-    SUB::clear_cache();
+    baset::clear_cache();
     bv_cache.clear();
   }
 
@@ -61,7 +61,7 @@ public:
   {
     post_process_quantifiers();
     functions.post_process();
-    SUB::post_process();
+    baset::post_process();
   }
 
   // get literals for variables/expressions, if available
@@ -100,7 +100,7 @@ protected:
   virtual bool boolbv_set_equality_to_true(const equal_exprt &expr);
 
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef arrayst SUB;
+  typedef arrayst baset;
 
   void conversion_failed(const exprt &expr, bvt &bv)
   {

@@ -50,7 +50,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     std::size_t width_op1=boolbv_width(operands[1].type());
 
     if(width_op0==0 || width_op1==0)
-      return SUB::convert_rest(expr);
+      return baset::convert_rest(expr);
 
     std::size_t index_width = std::max(address_bits(width_op0), width_op1);
     unsignedbv_typet index_type(index_width);
@@ -90,5 +90,5 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     }
   }
 
-  return SUB::convert_rest(expr);
+  return baset::convert_rest(expr);
 }

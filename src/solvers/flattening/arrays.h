@@ -27,17 +27,18 @@ class update_exprt;
 
 class arrayst:public equalityt
 {
+private:
+  typedef equalityt baset;
+
 public:
   arrayst(const namespacet &_ns, propt &_prop);
 
   void post_process() override
   {
     post_process_arrays();
-    SUB::post_process();
+    baset::post_process();
   }
 
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef equalityt SUB;
 
   literalt record_array_equality(const equal_exprt &expr);
   void record_array_index(const index_exprt &expr);
