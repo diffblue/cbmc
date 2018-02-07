@@ -228,53 +228,11 @@ std::string expr2javat::convert_constant(
   else if((src.type()==java_float_type()) ||
           (src.type()==java_double_type()))
   {
-    ieee_floatt ieee_repr(to_constant_expr(src));
-    std::string result;
-
-    bool is_java_float=(src.type()==java_float_type());
-    if(ieee_repr.is_zero())
-    {
-      if(ieee_repr.get_sign())
-        result+='-';
-      result+="0.0";
-      if(is_java_float)
-        result+='f';
-      return result;
-    }
-
-    if(ieee_repr.is_NaN())
-    {
-       if(is_java_float)
-         return "Float.NaN";
-       else
-         return "Double.NaN";
-    }
-
-    if(ieee_repr.is_infinity())
-    {
-      if(is_java_float)
-      {
-        if(ieee_repr.get_sign())
-          return "Float.NEGATIVE_INFINITY";
-        else
-          return "Float.POSITIVE_INFINITY";
-      }
-      else
-      {
-        if(ieee_repr.get_sign())
-          return "Double.NEGATIVE_INFINITY";
-        else
-          return "Double.POSITIVE_INFINITY";
-      }
-    }
-
-    std::stringstream buffer;
-    buffer << std::hexfloat;
-    if(is_java_float)
-      buffer << ieee_repr.to_float() << 'f';
-    else
-      buffer << ieee_repr.to_double();
-    return buffer.str();
+    // This converts NaNs to the canonical NaN
+    const ieee_floatt ieee_repr(to_constant_expr(src));
+    if(ieee_repr.is_double())
+      return floating_point_to_java_string(ieee_repr.to_double());
+    return floating_point_to_java_string(ieee_repr.to_float());
   }
 
 
