@@ -72,10 +72,6 @@ class prop_conv_solvert:public prop_convt
 public:
   prop_conv_solvert(const namespacet &_ns, propt &_prop):
     prop_convt(_ns),
-    use_cache(true),
-    equality_propagation(true),
-    freeze_all(false),
-    post_processing_done(false),
     prop(_prop) { }
 
   virtual ~prop_conv_solvert() { }
@@ -106,9 +102,9 @@ public:
   // get literal for expression, if available
   virtual bool literal(const exprt &expr, literalt &literal) const;
 
-  bool use_cache;
-  bool equality_propagation;
-  bool freeze_all; // freezing variables (for incremental solving)
+  bool use_cache = true;
+  bool equality_propagation = true;
+  bool freeze_all = false; // freezing variables (for incremental solving)
 
   virtual void clear_cache() { cache.clear();}
 
@@ -126,7 +122,7 @@ public:
 protected:
   virtual void post_process();
 
-  bool post_processing_done;
+  bool post_processing_done = false;
 
   // get a _boolean_ value from counterexample if not valid
   virtual bool get_bool(const exprt &expr, tvt &value) const;
