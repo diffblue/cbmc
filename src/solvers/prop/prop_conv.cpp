@@ -547,6 +547,6 @@ exprt prop_conv_solvert::get(const exprt &expr) const
 
 void prop_conv_solvert::print_assignment(std::ostream &out) const
 {
-  for(const auto &it : symbols)
-    out << it.first << " = " << prop.l_get(it.second) << "\n";
+  for(const auto &symbol : symbols)
+    out << symbol.first << " = " << prop.l_get(symbol.second) << '\n';
 }
