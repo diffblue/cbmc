@@ -650,35 +650,25 @@ void boolbvt::set_to(const exprt &expr, bool value)
   return SUB::set_to(expr, value);
 }
 
-void boolbvt::make_bv_expr(const typet &type, const bvt &bv, exprt &dest)
+exprt boolbvt::make_bv_expr(const typet &type, const bvt &bv)
 {
-  dest=exprt(ID_bv_literals, type);
+  exprt dest(ID_bv_literals, type);
   irept::subt &bv_sub=dest.add(ID_bv).get_sub();
-
   bv_sub.resize(bv.size());
 
   for(std::size_t i=0; i<bv.size(); i++)
     bv_sub[i].id(std::to_string(bv[i].get()));
+  return dest;
 }
 
-void boolbvt::make_free_bv_expr(const typet &type, exprt &dest)
+exprt boolbvt::make_free_bv_expr(const typet &type)
 {
-  std::size_t width=boolbv_width(type);
-
-  if(width==0)
-  {
-    error() << "failed to get width of " << type.pretty() << eom;
-    throw 0;
-  }
-
-  bvt bv;
-  bv.resize(width);
-
-  // make result free variables
-  Forall_literals(it, bv)
-    *it=prop.new_variable();
-
-  make_bv_expr(type, bv, dest);
+  const std::size_t width = boolbv_width(type);
+  PRECONDITION(width != 0);
+  bvt bv(width);
+  for(auto &lit : bv)
+    lit = prop.new_variable();
+  return make_bv_expr(type, bv);
 }
 
 bool boolbvt::is_unbounded_array(const typet &type) const

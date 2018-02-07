@@ -176,8 +176,8 @@ protected:
   virtual bvt convert_function_application(
     const function_application_exprt &expr);
 
-  virtual void make_bv_expr(const typet &type, const bvt &bv, exprt &dest);
-  virtual void make_free_bv_expr(const typet &type, exprt &dest);
+  virtual exprt make_bv_expr(const typet &type, const bvt &bv);
+  virtual exprt make_free_bv_expr(const typet &type);
 
   void convert_with(
     const typet &type,
