@@ -38,9 +38,9 @@ void prop_convt::set_frozen(const literalt)
 
 void prop_convt::set_frozen(const bvt &bv)
 {
-  for(unsigned i=0; i<bv.size(); i++)
-    if(!bv[i].is_constant())
-      set_frozen(bv[i]);
+  for(const auto &bit : bv)
+    if(!bit.is_constant())
+      set_frozen(bit);
 }
 
 bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
