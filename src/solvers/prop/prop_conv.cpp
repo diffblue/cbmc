@@ -22,18 +22,18 @@ Author: Daniel Kroening, kroening@kroening.com
 /// determine whether a variable is in the final conflict
 bool prop_convt::is_in_conflict(literalt l) const
 {
-  assert(false);
+  UNREACHABLE;
   return false;
 }
 
 void prop_convt::set_assumptions(const bvt &)
 {
-  assert(false);
+  UNREACHABLE;
 }
 
 void prop_convt::set_frozen(const literalt)
 {
-  assert(false);
+  UNREACHABLE;
 }
 
 void prop_convt::set_frozen(const bvt &bv)
