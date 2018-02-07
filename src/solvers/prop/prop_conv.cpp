@@ -477,16 +477,12 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
   statistics() << "Solving with " << prop.solver_text() << eom;
 
-  propt::resultt result=prop.prop_solve();
-
-  switch(result)
+  switch(prop.prop_solve())
   {
     case propt::resultt::P_SATISFIABLE: return resultt::D_SATISFIABLE;
     case propt::resultt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
     default: return resultt::D_ERROR;
   }
-
-  return resultt::D_ERROR;
 }
 
 exprt prop_conv_solvert::get(const exprt &expr) const
