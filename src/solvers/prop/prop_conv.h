@@ -131,7 +131,7 @@ protected:
   bool post_processing_done = false;
 
   // get a _boolean_ value from counterexample if not valid
-  virtual bool get_bool(const exprt &expr, tvt &value) const;
+  virtual optionalt<tvt> get_bool(const exprt &expr) const;
 
   virtual literalt convert_rest(const exprt &expr);
   virtual literalt convert_bool(const exprt &expr);
