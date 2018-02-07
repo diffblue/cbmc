@@ -101,5 +101,8 @@ operator()(const source_locationt &source_location) const
   if(source_location.is_built_in())
     return false;
 
+  if(source_location.get_java_removed_virtual_call())
+    return false;
+
   return true;
 }
