@@ -208,13 +208,7 @@ literalt prop_conv_solvert::convert(const exprt &expr)
 
 literalt prop_conv_solvert::convert_bool(const exprt &expr)
 {
-  if(expr.type().id()!=ID_bool)
-  {
-    std::string msg="prop_convt::convert_bool got "
-                    "non-boolean expression: ";
-    msg+=expr.pretty();
-    throw msg;
-  }
+  PRECONDITION(expr.type().id() == ID_bool);
 
   const exprt::operandst &op=expr.operands();
 
@@ -280,8 +274,9 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   else if(expr.id()==ID_or || expr.id()==ID_and || expr.id()==ID_xor ||
           expr.id()==ID_nor || expr.id()==ID_nand)
   {
-    if(op.empty())
-      throw "operator `"+expr.id_string()+"' takes at least one operand";
+    INVARIANT(
+      !op.empty(),
+      "operator `" + expr.id_string() + "' takes at least one operand");
 
     bvt bv;
 
@@ -304,16 +299,12 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   }
   else if(expr.id()==ID_not)
   {
-    if(op.size()!=1)
-      throw "not takes one operand";
-
+    INVARIANT(op.size() == 1, "not takes one operand");
     return !convert(op.front());
   }
   else if(expr.id()==ID_equal || expr.id()==ID_notequal)
   {
-    if(op.size()!=2)
-      throw "equality takes two operands";
-
+    INVARIANT(op.size() == 2, "equality takes two operands");
     bool equal=(expr.id()==ID_equal);
 
     if(op[0].type().id()==ID_bool &&
@@ -387,13 +378,7 @@ bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 
 void prop_conv_solvert::set_to(const exprt &expr, bool value)
 {
-  if(expr.type().id()!=ID_bool)
-  {
-    std::string msg="prop_convt::set_to got "
-                    "non-boolean expression: ";
-    msg+=expr.pretty();
-    throw msg;
-  }
+  PRECONDITION(expr.type().id() == ID_bool);
 
   bool boolean=true;
 
