@@ -8,17 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "prop_conv.h"
 
-#include <cassert>
-#include <cstdlib>
-#include <map>
-
-#include <util/std_expr.h>
-#include <util/symbol.h>
-#include <util/threeval.h>
-
-#include "prop.h"
-#include "literal_expr.h"
-
 /// determine whether a variable is in the final conflict
 bool prop_convt::is_in_conflict(literalt l) const
 {
