@@ -299,29 +299,13 @@ literalt prop_conv_solvert::convert_rest(const exprt &expr)
 
 bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 {
-  if(!equality_propagation)
+  if(!equality_propagation || expr.lhs().id() != ID_symbol)
     return true;
 
-  // optimization for constraint of the form
-  // new_variable = value
-
-  if(expr.lhs().id()==ID_symbol)
-  {
-    const irep_idt &identifier=
-      to_symbol_expr(expr.lhs()).get_identifier();
-
-    literalt tmp=convert(expr.rhs());
-
-    std::pair<symbolst::iterator, bool> result=
-      symbols.insert(std::pair<irep_idt, literalt>(identifier, tmp));
-
-    if(result.second)
-      return false; // ok, inserted!
-
-    // nah, already there
-  }
-
-  return true;
+  const irep_idt &identifier = to_symbol_expr(expr.lhs()).get_identifier();
+  const literalt tmp = convert(expr.rhs());
+  const bool inserted = symbols.emplace(identifier, tmp).second;
+  return !inserted;
 }
 
 void prop_conv_solvert::set_to(const exprt &expr, bool value)
