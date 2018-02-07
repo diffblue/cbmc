@@ -631,23 +631,12 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
 void boolbvt::set_to(const exprt &expr, bool value)
 {
-  if(expr.type().id()!=ID_bool)
-  {
-    error() << "boolbvt::set_to got non-boolean operand: "
-            << expr.pretty() << eom;
-    throw 0;
-  }
+  PRECONDITION(expr.type().id() == ID_bool);
 
-  if(value)
-  {
-    if(expr.id()==ID_equal)
-    {
-      if(!boolbv_set_equality_to_true(to_equal_expr(expr)))
-        return;
-    }
-  }
-
-  return SUB::set_to(expr, value);
+  const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr);
+  if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))
+    return;
+  SUB::set_to(expr, value);
 }
 
 exprt boolbvt::make_bv_expr(const typet &type, const bvt &bv)
