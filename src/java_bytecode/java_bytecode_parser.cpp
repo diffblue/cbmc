@@ -948,6 +948,7 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
       u2 start_pc=read_u2();
       u2 end_pc=read_u2();
 
+      // from the class file format spec ("4.7.3. The Code Attribute" for Java8)
       INVARIANT(
         start_pc < end_pc,
         "The start_pc must be less than the end_pc as this is the range the "
