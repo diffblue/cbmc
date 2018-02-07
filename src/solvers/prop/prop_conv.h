@@ -74,29 +74,35 @@ public:
     prop_convt(_ns),
     prop(_prop) { }
 
-  virtual ~prop_conv_solvert() { }
+  virtual ~prop_conv_solvert() = default;
 
   // overloading from decision_proceduret
-  virtual void set_to(const exprt &expr, bool value) override;
-  virtual decision_proceduret::resultt dec_solve() override;
-  virtual void print_assignment(std::ostream &out) const override;
-  virtual std::string decision_procedure_text() const override
+  void set_to(const exprt &expr, bool value) override;
+  decision_proceduret::resultt dec_solve() override;
+  void print_assignment(std::ostream &out) const override;
+  std::string decision_procedure_text() const override
   { return "propositional reduction"; }
-  virtual exprt get(const exprt &expr) const override;
+  exprt get(const exprt &expr) const override;
 
   // overloading from prop_convt
   using prop_convt::set_frozen;
   virtual tvt l_get(literalt a) const override { return prop.l_get(a); }
-  virtual void set_frozen(literalt a) override { prop.set_frozen(a); }
-  virtual void set_assumptions(const bvt &_assumptions) override
+  void set_frozen(literalt a) override
+  {
+    prop.set_frozen(a);
+  }
+  void set_assumptions(const bvt &_assumptions) override
   { prop.set_assumptions(_assumptions); }
-  virtual bool has_set_assumptions() const override
+  bool has_set_assumptions() const override
   { return prop.has_set_assumptions(); }
-  virtual void set_all_frozen() override { freeze_all = true; }
-  virtual literalt convert(const exprt &expr) override;
-  virtual bool is_in_conflict(literalt l) const override
+  void set_all_frozen() override
+  {
+    freeze_all = true;
+  }
+  literalt convert(const exprt &expr) override;
+  bool is_in_conflict(literalt l) const override
   { return prop.is_in_conflict(l); }
-  virtual bool has_is_in_conflict() const override
+  bool has_is_in_conflict() const override
   { return prop.has_is_in_conflict(); }
 
   // get literal for expression, if available

@@ -99,7 +99,7 @@ protected:
   boolbv_mapt map;
 
   // overloading
-  virtual literalt convert_rest(const exprt &expr) override;
+  literalt convert_rest(const exprt &expr) override;
   virtual bool boolbv_set_equality_to_true(const equal_exprt &expr);
 
   // NOLINTNEXTLINE(readability/identifiers)
