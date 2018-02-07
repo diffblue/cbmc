@@ -540,6 +540,43 @@ void goto_convertt::do_cpp_new(
   dest.destructive_append(tmp_initializer);
 }
 
+void goto_convertt::do_java_new(
+  const exprt &lhs,
+  const side_effect_exprt &rhs,
+  goto_programt &dest)
+{
+  PRECONDITION(!lhs.is_nil());
+  PRECONDITION(rhs.operands().empty());
+  PRECONDITION(rhs.type().id() == ID_pointer);
+  source_locationt location=rhs.source_location();
+  typet object_type=rhs.type().subtype();
+
+  // build size expression
+  exprt object_size=size_of_expr(object_type, ns);
+  CHECK_RETURN(object_size.is_not_nil());
+
+  // we produce a malloc side-effect, which stays
+  side_effect_exprt malloc_expr(ID_allocate);
+  malloc_expr.copy_to_operands(object_size);
+  // could use true and get rid of the code below
+  malloc_expr.copy_to_operands(false_exprt());
+  malloc_expr.type()=rhs.type();
+
+  goto_programt::targett t_n=dest.add_instruction(ASSIGN);
+  t_n->code=code_assignt(lhs, malloc_expr);
+  t_n->source_location=location;
+
+  // zero-initialize the object
+  dereference_exprt deref(lhs, object_type);
+  exprt zero_object=
+    zero_initializer(object_type, location, ns, get_message_handler());
+  set_class_identifier(
+    to_struct_expr(zero_object), ns, to_symbol_type(object_type));
+  goto_programt::targett t_i=dest.add_instruction(ASSIGN);
+  t_i->code=code_assignt(deref, zero_object);
+  t_i->source_location=location;
+}
+
 void goto_convertt::do_java_new_array(
   const exprt &lhs,
   const side_effect_exprt &rhs,
