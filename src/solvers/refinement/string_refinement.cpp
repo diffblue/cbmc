@@ -954,7 +954,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         if(axioms.not_contains.empty())
         {
           error() << "dec_solve: current index set is empty, "
-                  << "this should not happen" << eom;
+                  << "consider increasing the gap between string-max-length "
+                  << "and string-max-input-length" << eom;
           return resultt::D_ERROR;
         }
         else
