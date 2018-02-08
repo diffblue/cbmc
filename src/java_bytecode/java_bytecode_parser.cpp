@@ -711,6 +711,13 @@ void java_bytecode_parsert::rbytecode(
       wide_instruction=true;
       address++;
       bytecode=read_u1();
+      // The only valid instructions following a wide byte are
+      // [ifald]load, [ifald]store, ret and iinc
+      // All of these have either format of v, or V
+      INVARIANT(
+        bytecodes[bytecode].format == 'v' || bytecodes[bytecode].format == 'V',
+        "Unexpected wide instruction: " +
+          id2string(bytecodes[bytecode].mnemonic));
     }
 
     instructions.push_back(instructiont());
