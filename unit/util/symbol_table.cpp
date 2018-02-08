@@ -5,6 +5,25 @@
 #include <testing-utils/catch.hpp>
 #include <util/journalling_symbol_table.h>
 
+TEST_CASE("Iterating through a symbol table", "[core][utils][symbol_tablet]")
+{
+  symbol_tablet symbol_table;
+
+  symbolt symbol;
+  irep_idt symbol_name = "Test";
+  symbol.name = symbol_name;
+
+  symbol_table.insert(symbol);
+
+  int counter = 0;
+  for(auto &entry : symbol_table)
+  {
+    ++counter;
+  }
+
+  REQUIRE(counter == 1);
+}
+
 SCENARIO("journalling_symbol_table_writer",
   "[core][utils][journalling_symbol_table_writer]")
 {
