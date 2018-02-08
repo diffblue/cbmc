@@ -71,6 +71,17 @@ public:
     return run(goto_functions);
   }
 
+  void add_loop_unwind_handler(symex_bmct::loop_unwind_handlert handler)
+  {
+    symex.add_loop_unwind_handler(handler);
+  }
+
+  void add_unwind_recursion_handler(
+    symex_bmct::recursion_unwind_handlert handler)
+  {
+    symex.add_recursion_unwind_handler(handler);
+  }
+
 protected:
   const optionst &options;
   symbol_tablet new_symbol_table;

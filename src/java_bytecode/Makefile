@@ -18,6 +18,7 @@ SRC = bytecode_info.cpp \
       java_bytecode_typecheck_type.cpp \
       java_class_loader.cpp \
       java_class_loader_limit.cpp \
+      java_enum_static_init_unwind_handler.cpp \
       java_entry_point.cpp \
       java_local_variable_table.cpp \
       java_object_factory.cpp \
