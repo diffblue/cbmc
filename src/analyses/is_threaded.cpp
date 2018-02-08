@@ -48,11 +48,9 @@ public:
            old_is_threaded!=is_threaded;
   }
 
-  void transform(
-    locationt from,
-    locationt to,
-    ai_baset &ai,
-    const namespacet &ns) final override
+  void
+  transform(locationt from, locationt to, ai_baset &ai, const namespacet &ns)
+    final override
   {
     // assert(reachable);
 

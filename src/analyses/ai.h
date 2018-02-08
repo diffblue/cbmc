@@ -53,7 +53,7 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns)=0;
+    const namespacet &ns) = 0;
 
   virtual void output(
     std::ostream &out,

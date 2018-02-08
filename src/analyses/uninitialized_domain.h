@@ -29,11 +29,9 @@ public:
   typedef std::set<irep_idt> uninitializedt;
   uninitializedt uninitialized;
 
-  void transform(
-    locationt from,
-    locationt to,
-    ai_baset &ai,
-    const namespacet &ns) final override;
+  void
+  transform(locationt from, locationt to, ai_baset &ai, const namespacet &ns)
+    final override;
 
   void output(
     std::ostream &out,

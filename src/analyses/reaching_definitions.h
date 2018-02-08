@@ -113,11 +113,9 @@ public:
     bv_container=&_bv_container;
   }
 
-  void transform(
-    locationt from,
-    locationt to,
-    ai_baset &ai,
-    const namespacet &ns) final override;
+  void
+  transform(locationt from, locationt to, ai_baset &ai, const namespacet &ns)
+    final override;
 
   void output(
     std::ostream &out,
