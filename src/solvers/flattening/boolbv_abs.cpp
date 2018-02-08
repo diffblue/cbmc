@@ -14,26 +14,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/floatbv/float_utils.h>
 
-bvt boolbvt::convert_abs(const exprt &expr)
+bvt boolbvt::convert_abs(const abs_exprt &expr)
 {
-  std::size_t width=boolbv_width(expr.type());
+  const std::size_t width = boolbv_width(expr.type());
 
   if(width==0)
     return conversion_failed(expr);
 
-  const exprt::operandst &operands=expr.operands();
+  const bvt &op_bv=convert_bv(expr.op());
 
-  if(operands.size()!=1)
-    throw "abs takes one operand";
-
-  const exprt &op0=expr.op0();
-
-  const bvt &op_bv=convert_bv(op0);
-
-  if(op0.type()!=expr.type())
+  if(expr.op().type()!=expr.type())
     return conversion_failed(expr);
 
-  bvtypet bvtype=get_bvtype(expr.type());
+  const bvtypet bvtype = get_bvtype(expr.type());
 
   if(bvtype==bvtypet::IS_FIXED ||
      bvtype==bvtypet::IS_SIGNED ||
