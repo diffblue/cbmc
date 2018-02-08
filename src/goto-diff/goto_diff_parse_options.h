@@ -14,6 +14,7 @@ Author: Peter Schrammel
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
+#include <util/timestamper.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
@@ -27,6 +28,7 @@ class optionst;
   "(json-ui)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   "(verbosity):(version)" \
+  OPT_TIMESTAMP \
   "u(unified)(change-impact)(forward-impact)(backward-impact)" \
   "(compact-output)"
 

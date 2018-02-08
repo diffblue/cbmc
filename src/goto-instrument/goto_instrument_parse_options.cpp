@@ -1568,5 +1568,6 @@ void goto_instrument_parse_optionst::help()
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
+    HELP_TIMESTAMP
     "\n";
 }

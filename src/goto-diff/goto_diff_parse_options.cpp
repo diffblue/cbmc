@@ -501,5 +501,6 @@ void goto_diff_parse_optionst::help()
     "Other options:\n"
     " --version                    show version and exit\n"
     " --json-ui                    use JSON-formatted output\n"
+    HELP_TIMESTAMP
     "\n";
 }

@@ -956,5 +956,6 @@ void jbmc_parse_optionst::help()
     " --json-ui                    use JSON-formatted output\n"
     HELP_GOTO_TRACE
     " --verbosity #                verbosity level\n"
+    HELP_TIMESTAMP
     "\n";
 }

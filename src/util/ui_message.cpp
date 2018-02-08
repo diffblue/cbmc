@@ -19,7 +19,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cmdline.h"
 
 ui_message_handlert::ui_message_handlert(
-  uit __ui, const std::string &program):_ui(__ui)
+  uit __ui,
+  const std::string &program,
+  timestampert::clockt clock_type)
+  : _ui(__ui), time(timestampert::make(clock_type))
 {
   switch(__ui)
   {
@@ -52,12 +55,19 @@ ui_message_handlert::ui_message_handlert(
 
 ui_message_handlert::ui_message_handlert(
   const class cmdlinet &cmdline,
-  const std::string &program):
-  ui_message_handlert(
-    cmdline.isset("xml-ui")?uit::XML_UI:
-    cmdline.isset("json-ui")?uit::JSON_UI:
-    uit::PLAIN,
-    program)
+  const std::string &program)
+  : ui_message_handlert(
+      cmdline.isset("xml-ui") ? uit::XML_UI : cmdline.isset("json-ui")
+                                                ? uit::JSON_UI
+                                                : uit::PLAIN,
+      program,
+      cmdline.isset("timestamp")
+        ? cmdline.get_value("timestamp") == "monotonic"
+            ? timestampert::clockt::MONOTONIC
+            : cmdline.get_value("timestamp") == "wall"
+                ? timestampert::clockt::WALL_CLOCK
+                : timestampert::clockt::NONE
+        : timestampert::clockt::NONE)
 {
 }
 
@@ -99,7 +109,9 @@ void ui_message_handlert::print(
     case uit::PLAIN:
     {
       console_message_handlert console_message_handler;
-      console_message_handler.print(level, message);
+      std::stringstream ss;
+      ss << time->stamp() << message;
+      console_message_handler.print(level, ss.str());
     }
     break;
 

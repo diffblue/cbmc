@@ -103,6 +103,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
+#include <util/timestamper.h>
 
 #include <langapi/language.h>
 
@@ -135,6 +136,7 @@ class optionst;
   "(show-local-may-alias)" \
   "(json):(xml):" \
   "(text):(dot):" \
+  OPT_TIMESTAMP \
   "(unreachable-instructions)(unreachable-functions)" \
   "(reachable-functions)" \
   "(intervals)(show-intervals)" \
