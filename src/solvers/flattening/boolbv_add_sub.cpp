@@ -26,39 +26,30 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
      type.id()!=ID_vector)
     return conversion_failed(expr);
 
-  std::size_t width=boolbv_width(type);
-
+  const std::size_t width = boolbv_width(type);
   if(width==0)
     return conversion_failed(expr);
 
   const exprt::operandst &operands=expr.operands();
 
-  if(operands.empty())
-    throw "operator "+expr.id_string()+" takes at least one operand";
-
+  INVARIANT(
+    !operands.empty(),
+    "operator " + expr.id_string() + " takes at least one operand");
   const exprt &op0=expr.op0();
   DATA_INVARIANT(
     op0.type() == type, "add/sub with mixed types:\n" + expr.pretty());
 
   bvt bv=convert_bv(op0);
 
-  if(bv.size()!=width)
-    throw "convert_add_sub: unexpected operand 0 width";
+  const typet arithmetic_type =
+    (type.id() == ID_vector || type.id() == ID_complex)
+      ? ns.follow(type.subtype())
+      : type;
 
-  bool subtract=(expr.id()==ID_minus ||
-                 expr.id()=="no-overflow-minus");
-
-  bool no_overflow=(expr.id()=="no-overflow-plus" ||
-                    expr.id()=="no-overflow-minus");
-
-  typet arithmetic_type=
-    (type.id()==ID_vector || type.id()==ID_complex)?
-      ns.follow(type.subtype()):type;
-
-  bv_utilst::representationt rep=
-    (arithmetic_type.id()==ID_signedbv ||
-     arithmetic_type.id()==ID_fixedbv)?bv_utilst::representationt::SIGNED:
-                                       bv_utilst::representationt::UNSIGNED;
+  const bv_utilst::representationt rep =
+    (arithmetic_type.id() == ID_signedbv || arithmetic_type.id() == ID_fixedbv)
+      ? bv_utilst::representationt::SIGNED
+      : bv_utilst::representationt::UNSIGNED;
 
   for(exprt::operandst::const_iterator
       it=operands.begin()+1;
@@ -75,13 +66,12 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
     if(type.id()==ID_vector || type.id()==ID_complex)
     {
       const typet &subtype=ns.follow(type.subtype());
+      const std::size_t sub_width = boolbv_width(subtype);
+      INVARIANT(
+        sub_width != 0 && width % sub_width == 0,
+        "convert_add_sub: unexpected vector operand width");
 
-      std::size_t sub_width=boolbv_width(subtype);
-
-      if(sub_width==0 || width%sub_width!=0)
-        throw "convert_add_sub: unexpected vector operand width";
-
-      std::size_t size=width/sub_width;
+      const std::size_t size = width / sub_width;
       bv.resize(width);
 
       for(std::size_t i=0; i<size; i++)
