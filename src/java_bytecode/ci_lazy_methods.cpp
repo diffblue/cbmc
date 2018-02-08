@@ -36,14 +36,16 @@ ci_lazy_methodst::ci_lazy_methodst(
   java_class_loadert &java_class_loader,
   const std::vector<irep_idt> &extra_needed_classes,
   const select_pointer_typet &pointer_type_selector,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  const synthetic_methods_mapt &synthetic_methods)
   : messaget(message_handler),
     main_class(main_class),
     main_jar_classes(main_jar_classes),
     lazy_methods_extra_entry_points(lazy_methods_extra_entry_points),
     java_class_loader(java_class_loader),
     extra_needed_classes(extra_needed_classes),
-    pointer_type_selector(pointer_type_selector)
+    pointer_type_selector(pointer_type_selector),
+    synthetic_methods(synthetic_methods)
 {
   // build the class hierarchy
   class_hierarchy(symbol_table);
@@ -196,7 +198,8 @@ bool ci_lazy_methodst::operator()(
       // Don't keep functions that belong to this language that we haven't
       // converted above
       if(
-        method_bytecode.contains_method(sym.first) &&
+        (method_bytecode.contains_method(sym.first) ||
+         synthetic_methods.count(sym.first)) &&
         !methods_already_populated.count(sym.first))
       {
         continue;
