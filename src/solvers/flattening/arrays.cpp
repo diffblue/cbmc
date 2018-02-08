@@ -34,7 +34,7 @@ void arrayst::record_array_index(const index_exprt &index)
   // we are not allowed to put the index directly in the
   //   entry for the root of the equivalence class
   //   because this map is accessed during building the error trace
-  std::size_t number=arrays.number(index.array());
+  const std::size_t number = arrays.number(index.array());
   index_map[number].insert(index.index());
   update_indices.insert(number);
 }
@@ -45,14 +45,9 @@ literalt arrayst::record_array_equality(
   const exprt &op0=equality.op0();
   const exprt &op1=equality.op1();
 
-  // check types
-  if(!base_type_eq(op0.type(), op1.type(), ns))
-  {
-    prop.error() << equality.pretty() << messaget::eom;
-    DATA_INVARIANT(
-      false,
-      "record_array_equality got equality without matching types");
-  }
+  DATA_INVARIANT(
+    base_type_eq(op0.type(), op1.type(), ns),
+    "record_array_equality should get matching types");
 
   DATA_INVARIANT(
     ns.follow(op0.type()).id()==ID_array,
