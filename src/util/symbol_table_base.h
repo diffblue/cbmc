@@ -144,6 +144,11 @@ public:
     typedef symbolst::const_iterator::reference reference;           // NOLINT
     typedef symbolst::iterator::iterator_category iterator_category; // NOLINT
 
+    bool operator!=(const iteratort &other) const
+    {
+      return it != other.it;
+    }
+
     bool operator==(const iteratort &other) const
     {
       return it == other.it;
