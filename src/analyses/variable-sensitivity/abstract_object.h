@@ -31,6 +31,7 @@
 #include <map>
 #include <iosfwd>
 #include <algorithm>
+#include <stack>
 
 #include <goto-programs/goto_program.h>
 #include <util/expr.h>
@@ -98,6 +99,19 @@ public:
 
   virtual exprt to_constant() const;
 
+  virtual abstract_object_pointert read(
+    const abstract_environmentt &env,
+    const exprt &specifier,
+    const namespacet &ns) const;
+
+  virtual abstract_object_pointert write(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const std::stack<exprt> stack,
+    const exprt &specifier,
+    const abstract_object_pointert value,
+    bool merging_write) const;
+
   virtual void output(
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
@@ -109,29 +123,94 @@ public:
     return abstract_object_pointert(mutable_clone());
   }
 
+  /**
+   * Determine whether 'this' abstract_object has been modified in comparison
+   * to a previous 'before' state.
+   * \param before The abstract_object_pointert to use as a reference to
+   * compare against
+   * \return true if 'this' is considered to have been modified in comparison
+   * to 'before', false otherwise.
+   */
+  virtual bool has_been_modified(const abstract_object_pointert before) const
+    {
+      // Default implementation, with no other information to go on
+      // falls back to relying on copy-on-write and pointer inequality
+      // to indicate if an abstract_objectt has been modified
+      return this != before.get();
+    };
+
   static abstract_object_pointert merge(
     abstract_object_pointert op1,
     abstract_object_pointert op2,
     bool &out_modifications);
 
-  abstract_object_pointert update_last_written_locations(
-      const locationst &locations,
-      const bool update_sub_elements) const;
-  locationst get_last_written_locations() const;
+  virtual abstract_object_pointert update_location_context(
+    const locationst &locations,
+    const bool update_sub_elements) const;
 
-  static void output_last_written_locations(
-    std::ostream &out,
-    const abstract_objectt::locationst &locations);
+  // Const versions must perform copy-on-write
+  abstract_object_pointert make_top() const
+  {
+    if(is_top())
+      return shared_from_this();
+
+    internal_abstract_object_pointert clone = mutable_clone();
+    clone->make_top();
+    return clone;
+  }
+
+  abstract_object_pointert clear_top() const
+  {
+    if(!is_top())
+      return shared_from_this();
+
+    internal_abstract_object_pointert clone = mutable_clone();
+    clone->clear_top();
+    return clone;
+  }
+
+  /**
+   * Pure virtual interface required of a client that can apply a copy-on-write
+   * operation to a given abstract_object_pointert.
+   */
+  struct abstract_object_visitort
+  {
+    virtual abstract_object_pointert visit(
+      const abstract_object_pointert element) const = 0;
+  };
+
+  /**
+   * Apply a visitor operation to all sub elements of this abstract_object.
+   * A sub element might be a member of a struct, or an element of an array,
+   * for instance, but this is entirely determined by the particular
+   * derived instance of abstract_objectt.
+   *
+   * \param visitor an instance of a visitor class that will be applied to
+   * all sub elements
+   * \return A new abstract_object if it's contents is modifed, or this if
+   * no modification is needed
+   */
+  virtual abstract_object_pointert visit_sub_elements(
+    const abstract_object_visitort &visitor) const
+  { return shared_from_this(); }
+
 
 private:
   // To enforce copy-on-write these are private and have read-only accessors
   typet t;
   bool bottom;
-  locationst last_written_locations;
+  bool top;
 
-  abstract_object_pointert abstract_object_merge(
+  // Hooks to allow a sub-class to perform its own operations on
+  // setting/clearing top
+  virtual void make_top_internal() {}
+  virtual void clear_top_internal() {}
+
+  // Hook for a subclass to perform any additional operations as
+  // part of an abstract_object_merge
+  virtual abstract_object_pointert abstract_object_merge_internal(
     const abstract_object_pointert other) const;
-  locationst get_location_union(const locationst &locations) const;
+
 protected:
   template<class T>
   using internal_sharing_ptrt=std::shared_ptr<T>;
@@ -145,15 +224,8 @@ protected:
     return internal_abstract_object_pointert(new abstract_objectt(*this));
   }
 
-  void set_last_written_locations(const locationst &locations);
-
-  virtual void update_sub_elements(const locationst &locations)
-  {}
-
-  bool top;
-
-  // The one exception is merge in descendant classes, which needs this
-  void make_top() { top=true; }
+  abstract_object_pointert abstract_object_merge(
+    const abstract_object_pointert other) const;
 
   bool should_use_base_merge(const abstract_object_pointert other) const;
 
@@ -165,6 +237,10 @@ protected:
     const std::map<keyt, abstract_object_pointert> &map1,
     const std::map<keyt, abstract_object_pointert> &map2,
     std::map<keyt, abstract_object_pointert> &out_map);
+
+  // The one exception is merge in descendant classes, which needs this
+  void make_top() { top=true; this->make_top_internal(); }
+  void clear_top() { top=false; this->clear_top_internal(); }
 };
 
 template<typename keyt>

@@ -55,8 +55,8 @@ void variable_sensitivity_domaint::transform(
       const abstract_objectt::locationst write_location={ from };
       abstract_object_pointert top_object=
         abstract_state.abstract_object_factory(
-          to_code_decl(instruction.code).symbol().type(), ns, true)
-            ->update_last_written_locations(write_location, true);
+            to_code_decl(instruction.code).symbol().type(), ns, true)
+          ->update_location_context(write_location, true);
       abstract_state.assign(
           to_code_decl(instruction.code).symbol(), top_object, ns);
     }
@@ -81,8 +81,8 @@ void variable_sensitivity_domaint::transform(
       const code_assignt &inst = to_code_assign(instruction.code);
 
       const abstract_objectt::locationst write_location={ from };
-      abstract_object_pointert rhs = abstract_state.eval(inst.rhs(), ns)
-          ->update_last_written_locations(write_location, true);
+      abstract_object_pointert rhs =abstract_state.eval(inst.rhs(), ns)
+        ->update_location_context(write_location, true);
       abstract_state.assign(inst.lhs(), rhs, ns);
     }
     break;
@@ -431,17 +431,17 @@ void variable_sensitivity_domaint::transform_function_call(
         {
           if(called_arg.type().id()==ID_pointer)
           {
-            sharing_ptrt<pointer_abstract_objectt> pointer_value=
-              std::dynamic_pointer_cast<const pointer_abstract_objectt>(
-                abstract_state.eval(called_arg, ns));
+            abstract_object_pointert pointer_value=
+              abstract_state.eval(called_arg, ns);
 
             assert(pointer_value);
 
             // Write top to the pointer
-            pointer_value->write_dereference(
+            pointer_value->write(
               abstract_state,
               ns,
               std::stack<exprt>(),
+              nil_exprt(),
               abstract_state.abstract_object_factory(
                 called_arg.type().subtype(), ns, true), false);
           }
@@ -481,7 +481,8 @@ void variable_sensitivity_domaint::transform_function_call(
 
         // Evaluate the expression that is being
         // passed into the function call (called_arg)
-        abstract_object_pointert param_val=abstract_state.eval(called_arg, ns)->update_last_written_locations({ from }, true);
+        abstract_object_pointert param_val=abstract_state.eval(called_arg, ns)
+          ->update_location_context({from}, true);
 
         // Assign the evaluated value to the symbol associated with the
         // parameter of the function

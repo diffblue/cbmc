@@ -35,21 +35,37 @@ public:
   void output(
     std::ostream &out, const ai_baset &ai, const namespacet &ns) const override;
 
-  virtual abstract_object_pointert read_index(
+  virtual abstract_object_pointert read(
     const abstract_environmentt &env,
-    const index_exprt &index,
+    const exprt &specifier,
     const namespacet &ns) const override;
 
-  virtual sharing_ptrt<array_abstract_objectt> write_index(
+  virtual abstract_object_pointert write(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const std::stack<exprt> stack,
+    const exprt &specifier,
+    const abstract_object_pointert value,
+    bool merging_write) const override;
+
+  virtual abstract_object_pointert visit_sub_elements(
+    const abstract_object_visitort &visitor) const override;
+
+protected:
+  CLONE
+
+  abstract_object_pointert read_index(
+    const abstract_environmentt &env,
+    const index_exprt &index,
+    const namespacet &ns) const;
+
+  sharing_ptrt<array_abstract_objectt> write_index(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,
     const index_exprt &index_expr,
     const abstract_object_pointert value,
-    bool merging_write) const override;
-
-protected:
-  CLONE
+    bool merging_write) const;
 
   virtual abstract_object_pointert merge(
     abstract_object_pointert other) const override;
@@ -72,8 +88,6 @@ private:
 
   abstract_object_pointert constant_array_merge(
     const constant_array_pointert other) const;
-
-  virtual void update_sub_elements(const locationst &locations) override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ARRAY_ABSTRACT_OBJECT_H

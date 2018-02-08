@@ -25,6 +25,22 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+  virtual abstract_object_pointert read(
+    const abstract_environmentt &env,
+    const exprt &specifier,
+    const namespacet &ns) const override;
+
+  virtual abstract_object_pointert write(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const std::stack<exprt> stack,
+    const exprt &specifier,
+    const abstract_object_pointert value,
+    bool merging_write) const override;
+
+protected:
+  CLONE
+
   // struct interface
   virtual abstract_object_pointert read_component(
     const abstract_environmentt &environment,
@@ -38,9 +54,6 @@ public:
     const member_exprt &member_expr,
     const abstract_object_pointert value,
     bool merging_write) const;
-
-protected:
-  CLONE
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_STRUCT_ABSTRACT_OBJECT_H

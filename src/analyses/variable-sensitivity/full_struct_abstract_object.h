@@ -31,6 +31,24 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+  virtual void output(
+    std::ostream &out,
+    const class ai_baset &ai,
+    const class namespacet &ns) const override;
+
+  virtual abstract_object_pointert visit_sub_elements(
+    const abstract_object_visitort &visitor) const override;
+
+private:
+  // no entry means component is top
+  typedef std::map<irep_idt, abstract_object_pointert> struct_mapt;
+  struct_mapt map;
+
+  abstract_object_pointert merge_constant_structs(
+    constant_struct_pointert other) const;
+
+protected:
+  CLONE
 
   // struct interface
   virtual abstract_object_pointert read_component(
@@ -45,24 +63,6 @@ public:
     const member_exprt &member_expr,
     const abstract_object_pointert value,
     bool merging_write) const override;
-
-  virtual void output(
-    std::ostream &out,
-    const class ai_baset &ai,
-    const class namespacet &ns) const override;
-
-private:
-  // no entry means component is top
-  typedef std::map<irep_idt, abstract_object_pointert> struct_mapt;
-  struct_mapt map;
-
-  virtual void update_sub_elements(const locationst &locations) override;
-
-  abstract_object_pointert merge_constant_structs(
-    constant_struct_pointert other) const;
-
-protected:
-  CLONE
 
   bool verify() const;
   // Set the state of this to the merge result of op1 and op2 and

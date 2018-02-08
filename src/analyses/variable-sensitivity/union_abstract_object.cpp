@@ -77,6 +77,54 @@ union_abstract_objectt::union_abstract_objectt(
   assert(ns.follow(expr.type()).id()==ID_union);
 }
 
+/**
+ * A helper function to evaluate an abstract object contained
+ * within a container object. More precise abstractions may override this
+ * to return more precise results.
+ *
+ * \param env the abstract environment
+ * \param specifier a modifier expression, such as an array index or field
+ * specifier used to indicate access to a specific component
+ * \param ns the current namespace
+ *
+ * \return the abstract_objectt representing the value of the read component.
+ */
+abstract_object_pointert union_abstract_objectt::read(
+  const abstract_environmentt &env,
+  const exprt &specifier,
+  const namespacet &ns) const
+{
+  return read_component(env, to_member_expr(specifier), ns);
+}
+
+/**
+ * A helper function to evaluate writing to a component of an
+ * abstract object. More precise abstractions may override this to
+ * update what they are storing for a specific component.
+ *
+ * \param environment the abstract environment
+ * \param ns the current namespace
+ * \param stack the remaining stack of expressions on the LHS to evaluate
+ * \param specifier the expression uses to access a specific component
+ * \param value the value we are trying to write to the component
+ * \param merging_write if true, this and all future writes will be merged
+ * with the current value
+ *
+ * \return the abstract_objectt representing the result of writing
+ * to a specific component.
+ */
+abstract_object_pointert union_abstract_objectt::write(
+  abstract_environmentt &environment,
+  const namespacet &ns,
+  const std::stack<exprt> stack,
+  const exprt &specifier,
+  const abstract_object_pointert value,
+  bool merging_write) const
+{
+  return write_component(
+    environment, ns, stack, to_member_expr(specifier), value, merging_write);
+}
+
 /*******************************************************************\
 
 Function: union_abstract_objectt::read_component

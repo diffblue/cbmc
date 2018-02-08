@@ -185,8 +185,6 @@ sharing_ptrt<struct_abstract_objectt>
   internal_sharing_ptrt<full_struct_abstract_objectt> copy(
     new full_struct_abstract_objectt(*this));
 
-  copy->set_last_written_locations(value->get_last_written_locations());
-
   if(!stack.empty())
   {
     abstract_object_pointert starting_value;
@@ -204,7 +202,7 @@ sharing_ptrt<struct_abstract_objectt>
 
     copy->map[c]=
       environment.write(starting_value, value, stack, ns, merging_write);
-    copy->top=false;
+    copy->clear_top();
     assert(copy->verify());
     return copy;
   }
@@ -244,7 +242,7 @@ sharing_ptrt<struct_abstract_objectt>
     else
     {
       copy->map[c]=value;
-      copy->top=false;
+      copy->clear_top();
       assert(!copy->is_bottom());
     }
 
@@ -283,12 +281,6 @@ void full_struct_abstract_objectt::output(
     }
     out << "." << entry.first << "=";
     entry.second->output(out, ai, ns);
-
-    // Start outputting specific last_written_locations
-    out << " @ ";
-    output_last_written_locations(out,
-        entry.second->get_last_written_locations());
-
   }
   out << "}";
 }
@@ -394,27 +386,29 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
   }
 }
 
-/*******************************************************************\
-
-Function: full_struct_abstract_objectt::update_sub_elements
-
-  Inputs:
-   locations - Locations to write
-
- Outputs: None
-
- Purpose: Updates write location for sub-elements.
-
-          For example, if a=b where a and b are structs, this will
-          update the write location for components too.
-
-\*******************************************************************/
-
-void full_struct_abstract_objectt::update_sub_elements(
-    const locationst &locations)
+/**
+ * Apply a visitor operation to all sub elements of this abstract_object.
+ * A sub element might be a member of a struct, or an element of an array,
+ * for instance, but this is entirely determined by the particular
+ * derived instance of abstract_objectt.
+ *
+ * \param visitor an instance of a visitor class that will be applied to
+ * all sub elements
+ * \return A new abstract_object if it's contents is modifed, or this if
+ * no modification is needed
+ */
+abstract_object_pointert
+  full_struct_abstract_objectt::visit_sub_elements(
+  const abstract_object_visitort &visitor) const
 {
-  for(auto &item: map)
+  const auto &result=
+    std::dynamic_pointer_cast<full_struct_abstract_objectt>(
+      mutable_clone());
+
+  for(auto &item : result->map)
   {
-    item.second=item.second->update_last_written_locations(locations, true);
+    item.second=visitor.visit(item.second);
   }
+
+  return result;
 }

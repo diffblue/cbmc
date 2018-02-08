@@ -81,7 +81,7 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
       map[mp_integer(index)]=environment.eval(entry, ns);
       ++index;
     }
-    top=false;
+    clear_top();
   }
 }
 
@@ -193,16 +193,59 @@ void constant_array_abstract_objectt::output(
     {
       out << "[" << entry.first << "] = ";
       entry.second->output(out, ai, ns);
-
-      // Start outputting specific last_written_locations
-      out << " @ ";
-      output_last_written_locations(out,
-          entry.second->get_last_written_locations());
-
       out << "\n";
     }
     out << "}";
   }
+}
+
+/**
+ * A helper function to evaluate an abstract object contained
+ * within a container object. More precise abstractions may override this
+ * to return more precise results.
+ *
+ * \param env the abstract environment
+ * \param specifier a modifier expression, such as an array index or field
+ * specifier used to indicate access to a specific component
+ * \param ns the current namespace
+ *
+ * \return the abstract_objectt representing the value of the read component.
+ */
+abstract_object_pointert constant_array_abstract_objectt::read(
+  const abstract_environmentt &env,
+  const exprt &specifier,
+  const namespacet &ns) const
+{
+  return read_index(env, to_index_expr(specifier), ns);
+}
+
+/**
+ * A helper function to evaluate writing to a component of an
+ * abstract object. More precise abstractions may override this to
+ * update what they are storing for a specific component.
+ *
+ * \param environment the abstract environment
+ * \param ns the current namespace
+ * \param stack the remaining stack of expressions on the LHS to evaluate
+ * \param specifier the expression uses to access a specific component
+ * \param value the value we are trying to write to the component
+ * \param merging_write if true, this and all future writes will be merged
+ * with the current value
+ *
+ * \return the abstract_objectt representing the result of writing
+ * to a specific component.
+ */
+abstract_object_pointert constant_array_abstract_objectt::write(
+  abstract_environmentt &environment,
+  const namespacet &ns,
+  const std::stack<exprt> stack,
+  const exprt &specifier,
+  const abstract_object_pointert value,
+  bool merging_write) const
+{
+  return write_index(
+    environment, ns, stack, to_index_expr(specifier), value,
+    merging_write);
 }
 
 /*******************************************************************\
@@ -305,7 +348,7 @@ sharing_ptrt<array_abstract_objectt>
       {
         if(is_top())
         {
-          copy->top=false;
+          copy->clear_top();
         }
 
         copy->map[index_value]=value;
@@ -341,7 +384,7 @@ sharing_ptrt<array_abstract_objectt>
 
         if(is_top())
         {
-          copy->top=false;
+          copy->clear_top();
         }
         copy->map[index_value]=environment.write(
           array_entry, value, stack, ns, merging_write);
@@ -358,7 +401,7 @@ sharing_ptrt<array_abstract_objectt>
               array_entry.second, value, stack, ns, true);
           if(is_top())
           {
-            copy->top=false;
+            copy->clear_top();
           }
         }
 
@@ -424,27 +467,29 @@ bool constant_array_abstract_objectt::eval_index(
   }
 }
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::update_sub_elements
-
-  Inputs:
-   locations - Locations to write
-
- Outputs: None
-
- Purpose: Updates write location for sub-elements.
-
-          For example, if a[2] = {5, 6}, this will update
-          the write location for objects 5 and 6 as well as a.
-
-\*******************************************************************/
-
-void constant_array_abstract_objectt::update_sub_elements(
-    const locationst &locations)
+/**
+ * Apply a visitor operation to all sub elements of this abstract_object.
+ * A sub element might be a member of a struct, or an element of an array,
+ * for instance, but this is entirely determined by the particular
+ * derived instance of abstract_objectt.
+ *
+ * \param visitor an instance of a visitor class that will be applied to
+ * all sub elements
+ * \return A new abstract_object if it's contents is modifed, or this if
+ * no modification is needed
+ */
+abstract_object_pointert
+constant_array_abstract_objectt::visit_sub_elements(
+  const abstract_object_visitort &visitor) const
 {
-  for(auto &item: map)
+  const auto &result=
+    std::dynamic_pointer_cast<constant_array_abstract_objectt>(
+      mutable_clone());
+
+  for(auto &item : result->map)
   {
-    item.second=item.second->update_last_written_locations(locations, true);
+    item.second=visitor.visit(item.second);
   }
+
+  return result;
 }

@@ -68,29 +68,14 @@ abstract_object_pointert abstract_environmentt::eval(
     member_exprt member_expr(to_member_expr(simplified_expr));
 
     const exprt &parent = member_expr.compound();
-    bool is_union = ns.follow(parent.type()).id() == ID_union;
 
-    if(is_union)
-    {
-      sharing_ptrt<union_abstract_objectt> union_abstract_object=
-        std::dynamic_pointer_cast<const union_abstract_objectt>(
-          eval(parent, ns));
-
-      return union_abstract_object->read_component(*this, member_expr, ns);
-    }
-    else
-    { // is struct
-      sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
-        std::dynamic_pointer_cast<const struct_abstract_objectt>(
-          eval(member_expr.compound(), ns));
-      return struct_abstract_object->read_component(*this, member_expr, ns);
-    }
+    abstract_object_pointert parent_abstract_object=eval(parent, ns);
+    return parent_abstract_object->read(*this, member_expr, ns);
   }
   else if(simplified_id==ID_address_of)
   {
-    sharing_ptrt<pointer_abstract_objectt> pointer_object=
-      std::dynamic_pointer_cast<const pointer_abstract_objectt>(
-        abstract_object_factory(simplified_expr.type(), simplified_expr, ns));
+    abstract_object_pointert pointer_object=
+      abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
 
     // Store the abstract object in the pointer
     return pointer_object;
@@ -98,20 +83,18 @@ abstract_object_pointert abstract_environmentt::eval(
   else if(simplified_id==ID_dereference)
   {
     dereference_exprt dereference(to_dereference_expr(simplified_expr));
-    sharing_ptrt<pointer_abstract_objectt> pointer_abstract_object=
-      std::dynamic_pointer_cast<const pointer_abstract_objectt>(
-        eval(dereference.pointer(), ns));
+    abstract_object_pointert pointer_abstract_object=
+      eval(dereference.pointer(), ns);
 
-    return pointer_abstract_object->read_dereference(*this, ns);
+    return pointer_abstract_object->read(*this, nil_exprt(), ns);
   }
   else if(simplified_id==ID_index)
   {
     index_exprt index_expr(to_index_expr(simplified_expr));
-    sharing_ptrt<array_abstract_objectt> array_abstract_object=
-      std::dynamic_pointer_cast<const array_abstract_objectt>(
-        eval(index_expr.array(), ns));
+    abstract_object_pointert array_abstract_object=
+      eval(index_expr.array(), ns);
 
-    return array_abstract_object->read_index(*this, index_expr, ns);
+    return array_abstract_object->read(*this, index_expr, ns);
   }
   else if(simplified_id==ID_array)
   {
@@ -255,9 +238,7 @@ bool abstract_environmentt::assign(
 
     if(final_value != map[symbol_expr])
     {
-      map[symbol_expr]=final_value
-          ->update_last_written_locations(
-              value->get_last_written_locations(), false);
+      map[symbol_expr]=final_value;
     }
   }
   return true;
@@ -309,56 +290,18 @@ abstract_object_pointert abstract_environmentt::write(
   // is inserted back into the map
   if(stack_head_id==ID_index)
   {
-    sharing_ptrt<array_abstract_objectt> array_abstract_object=
-      std::dynamic_pointer_cast<const array_abstract_objectt>(lhs);
-
-    sharing_ptrt<array_abstract_objectt> modified_array=
-      array_abstract_object->write_index(
+    return lhs->write(
         *this, ns, remaining_stack, to_index_expr(next_expr), rhs, merge_write);
-
-    return modified_array;
   }
   else if(stack_head_id==ID_member)
   {
-
-    const member_exprt &member_expr = to_member_expr(next_expr);
-    const exprt &parent = member_expr.compound();
-    bool is_union = ns.follow(parent.type()).id() == ID_union;
-
-    if(is_union)
-    {
-      sharing_ptrt<union_abstract_objectt> union_abstract_object=
-        std::dynamic_pointer_cast<const union_abstract_objectt>(lhs);
-
-      sharing_ptrt<union_abstract_objectt> modified_union=
-        union_abstract_object->write_component(
-          *this, ns, remaining_stack, member_expr, rhs, merge_write);
-
-      return modified_union;
-    }
-    else
-    {
-      sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
-        std::dynamic_pointer_cast<const struct_abstract_objectt>(lhs);
-
-      const member_exprt next_member_expr(to_member_expr(next_expr));
-      sharing_ptrt<struct_abstract_objectt> modified_struct=
-        struct_abstract_object->write_component(
-          *this, ns, remaining_stack, next_member_expr, rhs, merge_write);
-
-      return modified_struct;
-    }
+    return lhs->write(
+      *this, ns, remaining_stack, to_member_expr(next_expr), rhs, merge_write);
   }
   else if(stack_head_id==ID_dereference)
   {
-    sharing_ptrt<pointer_abstract_objectt> pointer_abstract_object=
-      std::dynamic_pointer_cast<const pointer_abstract_objectt>(lhs);
-
-    sharing_ptrt<pointer_abstract_objectt> modified_pointer=
-      pointer_abstract_object->write_dereference(
-        *this, ns, remaining_stack, rhs, merge_write);
-
-    return modified_pointer;
+    return lhs->write(
+      *this, ns, remaining_stack, nil_exprt(), rhs, merge_write);
   }
   else
   {
@@ -688,10 +631,6 @@ void abstract_environmentt::output(
     out << entry.first.get_identifier()
         << " (" << ") -> ";
     entry.second->output(out, ai, ns);
-
-    out << " @ ";
-    entry.second->output_last_written_locations(
-        out, entry.second->get_last_written_locations());
     out << "\n";
   }
   out << "}\n";
@@ -778,59 +717,8 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
     const auto &second_entry = second.map.find(entry.first);
     if (second_entry != second.map.end())
     {
-      // for the last written write locations to match
-      // each location in one must be equal to precisely one location
-      // in the other
-      // Since a set can assume at most one match
-
-      const abstract_objectt::locationst &first_write_locations=
-        entry.second->get_last_written_locations();
-      const abstract_objectt::locationst &second_write_locations=
-        second_entry->second->get_last_written_locations();
-
-      class location_ordert
-      {
-      public:
-        bool operator()(
-          goto_programt::const_targett instruction,
-          goto_programt::const_targett other_instruction)
-        {
-          return instruction->location_number>
-            other_instruction->location_number;
-        }
-      };
-
-      typedef std::set<goto_programt::const_targett, location_ordert>
-        sorted_locationst;
-
-      sorted_locationst lhs_location;
-      for(const auto &entry:first_write_locations)
-      {
-        lhs_location.insert(entry);
-      }
-
-
-      sorted_locationst rhs_location;
-      for(const auto &entry:second_write_locations)
-      {
-        rhs_location.insert(entry);
-      }
-
-      abstract_objectt::locationst intersection;
-      std::set_intersection(
-        lhs_location.cbegin(),
-        lhs_location.cend(),
-        rhs_location.cbegin(),
-        rhs_location.cend(),
-        std::inserter(intersection, intersection.end()),
-        location_ordert());
-      bool all_matched=intersection.size()==first_write_locations.size() &&
-        intersection.size()==second_write_locations.size();
-
-      if (!all_matched)
-      {
+      if(second_entry->second->has_been_modified(entry.second))
         symbols_diff.push_back(entry.first);
-      }
     }
   }
 
