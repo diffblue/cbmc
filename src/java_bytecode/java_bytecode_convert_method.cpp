@@ -2324,6 +2324,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       results[1]=op[0];
       results[0]=op[1];
     }
+    else if(statement=="nop")
+    {
+      c=code_skipt();
+    }
     else
     {
       c=codet(statement);
