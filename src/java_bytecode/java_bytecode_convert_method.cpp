@@ -906,34 +906,6 @@ static void gather_symbol_live_ranges(
   }
 }
 
-/// See above
-/// \par parameters: `se`: Symbol expression referring to a static field
-/// `basename`: The static field's basename
-/// \return Creates a symbol table entry for the static field if one doesn't
-///   exist already.
-void java_bytecode_convert_methodt::check_static_field_stub(
-  const symbol_exprt &symbol_expr,
-  const irep_idt &basename)
-{
-  const auto &id=symbol_expr.get_identifier();
-  if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
-  {
-    // Create a stub, to be overwritten if/when the real class is loaded.
-    symbolt new_symbol;
-    new_symbol.is_static_lifetime=true;
-    new_symbol.is_lvalue=true;
-    new_symbol.is_state_var=true;
-    new_symbol.name=id;
-    new_symbol.base_name=basename;
-    new_symbol.type=symbol_expr.type();
-    new_symbol.pretty_name=new_symbol.name;
-    new_symbol.mode=ID_java;
-    new_symbol.is_type=false;
-    new_symbol.value.make_nil();
-    symbol_table.add(new_symbol);
-  }
-}
-
 /// Each static access to classname should be prefixed with a check for
 /// necessary static init; this returns a call implementing that check.
 /// \param classname: Class name
@@ -2026,8 +1998,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
         field_name.find("$assertionsDisabled")!=std::string::npos;
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
 
-      // If external, create a symbol table entry for this static field:
-      check_static_field_stub(symbol_expr, field_name);
+      INVARIANT(
+        symbol_table.has_symbol(symbol_expr.get_identifier()),
+        "getstatic symbol should have been created before method conversion");
 
       if(needed_lazy_methods)
       {
@@ -2081,8 +2054,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
 
-      // If external, create a symbol table entry for this static field:
-      check_static_field_stub(symbol_expr, field_name);
+      INVARIANT(
+        symbol_table.has_symbol(symbol_expr.get_identifier()),
+        "putstatic symbol should have been created before method conversion");
 
       if(needed_lazy_methods && arg0.type().id() == ID_symbol)
       {

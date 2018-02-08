@@ -19,7 +19,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ci_lazy_methods.h"
 #include "ci_lazy_methods_needed.h"
 #include "java_class_loader.h"
+#include "java_static_initializers.h"
 #include "java_string_library_preprocess.h"
+#include "object_factory_parameters.h"
+#include "synthetic_methods_map.h"
 
 #include <java_bytecode/select_pointer_type.h>
 
@@ -53,10 +56,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "                                  the purpose of lazy method loading\n"                       /* NOLINT(*) */ \
   "                                  A '.*' wildcard is allowed to specify all class members\n"
 
-#define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
-#define MAX_NONDET_STRING_LENGTH std::numeric_limits<std::int32_t>::max()
-#define MAX_NONDET_TREE_DEPTH 5
-
 class symbolt;
 
 enum lazy_methods_modet
@@ -64,26 +63,6 @@ enum lazy_methods_modet
   LAZY_METHODS_MODE_EAGER,
   LAZY_METHODS_MODE_CONTEXT_INSENSITIVE,
   LAZY_METHODS_MODE_CONTEXT_SENSITIVE
-};
-
-struct object_factory_parameterst final
-{
-  /// Maximum value for the non-deterministically-chosen length of an array.
-  size_t max_nondet_array_length=MAX_NONDET_ARRAY_LENGTH_DEFAULT;
-
-  /// Maximum value for the non-deterministically-chosen length of a string.
-  size_t max_nondet_string_length=MAX_NONDET_STRING_LENGTH;
-
-  /// Maximum depth for object hierarchy on input.
-  /// Used to prevent object factory to loop infinitely during the
-  /// generation of code that allocates/initializes data structures of recursive
-  /// data types or unbounded depth. We bound the maximum number of times we
-  /// dereference a pointer using a 'depth counter'. We set a pointer to null if
-  /// such depth becomes >= than this maximum value.
-  size_t max_nondet_tree_depth=MAX_NONDET_TREE_DEPTH;
-
-  /// Force string content to be ASCII printable characters when set to true.
-  bool string_printable = false;
 };
 
 class java_bytecode_languaget:public languaget
@@ -192,6 +171,8 @@ protected:
 
 private:
   const std::unique_ptr<const select_pointer_typet> pointer_type_selector;
+  synthetic_methods_mapt synthetic_methods;
+  stub_global_initializer_factoryt stub_global_initializer_factory;
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();

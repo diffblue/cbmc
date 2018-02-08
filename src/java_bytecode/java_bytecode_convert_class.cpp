@@ -377,6 +377,10 @@ void java_bytecode_convert_classt::convert(
     new_symbol.name=id2string(class_symbol.name)+"."+id2string(f.name);
     new_symbol.base_name=f.name;
     new_symbol.type=field_type;
+    // Annotating the type with ID_C_class to provide a static field -> class
+    // link matches the method used by java_bytecode_convert_method::convert
+    // for methods.
+    new_symbol.type.set(ID_C_class, class_symbol.name);
     new_symbol.pretty_name=id2string(class_symbol.pretty_name)+
       "."+id2string(f.name);
     new_symbol.mode=ID_java;

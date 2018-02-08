@@ -7,6 +7,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 \*******************************************************************/
 
 #include "java_static_initializers.h"
+#include "java_object_factory.h"
 #include <goto-programs/class_hierarchy.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
@@ -16,6 +17,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 // Disable linter here to allow a std::string constant, since that holds
 // a length, whereas a cstr would require strlen every time.
 const std::string clinit_wrapper_suffix = "::clinit_wrapper"; // NOLINT(*)
+const std::string clinit_function_suffix = ".<clinit>:()V"; // NOLINT(*)
 
 /// Get the Java static initializer wrapper name for a given class (the wrapper
 /// checks if static initialization has already been done before invoking the
@@ -26,18 +28,6 @@ const std::string clinit_wrapper_suffix = "::clinit_wrapper"; // NOLINT(*)
 irep_idt clinit_wrapper_name(const irep_idt &class_name)
 {
   return id2string(class_name) + clinit_wrapper_suffix;
-}
-
-/// Get the class name from a clinit wrapper name. This is the opposite of
-/// `clinit_wrapper_name`.
-/// \param wrapper_name: clinit wrapper name
-/// \return class name
-static irep_idt clinit_wrapper_name_to_class_name(const irep_idt &wrapper_name)
-{
-  const std::string &wrapper_str = id2string(wrapper_name);
-  PRECONDITION(wrapper_str.size() > clinit_wrapper_suffix.size());
-  return wrapper_str.substr(
-    0, wrapper_str.size() - clinit_wrapper_suffix.size());
 }
 
 /// Check if function_id is a clinit wrapper
@@ -63,7 +53,7 @@ static irep_idt clinit_already_run_variable_name(const irep_idt &class_name)
 /// \return Static initializer symbol name
 static irep_idt clinit_function_name(const irep_idt &class_name)
 {
-  return id2string(class_name) + ".<clinit>:()V";
+  return id2string(class_name) + clinit_function_suffix;
 }
 
 /// Checks whether a static initializer wrapper is needed for a given class,
@@ -97,8 +87,13 @@ static bool needs_clinit_wrapper(
 /// \param class_name: class symbol name
 /// \param symbol_table: global symbol table; will gain a clinit_wrapper symbol
 ///   and a corresponding has-run-already global.
+/// \param synthetic_methods: synthetic method type map. The new clinit wrapper
+///   symbol will be recorded, such that we get a callback to produce its body
+///   if and when required.
 static void create_clinit_wrapper_symbols(
-  const irep_idt &class_name, symbol_tablet &symbol_table)
+  const irep_idt &class_name,
+  symbol_tablet &symbol_table,
+  synthetic_methods_mapt &synthetic_methods)
 {
   const irep_idt &already_run_name =
     clinit_already_run_variable_name(class_name);
@@ -122,9 +117,21 @@ static void create_clinit_wrapper_symbols(
   wrapper_method_symbol.pretty_name = wrapper_method_symbol.name;
   wrapper_method_symbol.base_name = "clinit_wrapper";
   wrapper_method_symbol.type = wrapper_method_type;
+  // Note this use of a type-comment to provide a back-link from a method
+  // to its associated class is the same one used in
+  // java_bytecode_convert_methodt::convert
+  wrapper_method_symbol.type.set(ID_C_class, class_name);
   wrapper_method_symbol.mode = ID_java;
   failed = symbol_table.add(wrapper_method_symbol);
   INVARIANT(!failed, "clinit-wrapper symbol should be fresh");
+
+  auto insert_result = synthetic_methods.emplace(
+    wrapper_method_symbol.name,
+    synthetic_method_typet::STATIC_INITIALIZER_WRAPPER);
+  INVARIANT(
+    insert_result.second,
+    "synthetic methods map should not already contain entry for "
+    "clinit wrapper");
 }
 
 /// Produces the static initialiser wrapper body for the given function.
@@ -133,7 +140,7 @@ static void create_clinit_wrapper_symbols(
 /// \param symbol_table: global symbol table
 /// \return the body of the static initialiser wrapper
 codet get_clinit_wrapper_body(
-  const irep_idt &function_id, const symbol_tablet &symbol_table)
+  const irep_idt &function_id, const symbol_table_baset &symbol_table)
 {
   // Assume that class C extends class C' and implements interfaces
   // I1, ..., In. We now create the following function (possibly recursively
@@ -154,7 +161,10 @@ codet get_clinit_wrapper_body(
   //     java::C::<clinit>();
   //   }
   // }
-  irep_idt class_name = clinit_wrapper_name_to_class_name(function_id);
+  const symbolt &wrapper_method_symbol = symbol_table.lookup_ref(function_id);
+  irep_idt class_name = wrapper_method_symbol.type.get(ID_C_class);
+  INVARIANT(
+    !class_name.empty(), "wrapper function should be annotated with its class");
   const symbolt &already_run_symbol =
     symbol_table.lookup_ref(clinit_already_run_variable_name(class_name));
 
@@ -204,7 +214,9 @@ codet get_clinit_wrapper_body(
 
 /// Create static initializer wrappers for all classes that need them.
 /// \param symbol_table: global symbol table
-void create_static_initializer_wrappers(symbol_tablet &symbol_table)
+void create_static_initializer_wrappers(
+  symbol_tablet &symbol_table,
+  synthetic_methods_mapt &synthetic_methods)
 {
   // Top-sort the class hierarchy, such that we visit parents before children,
   // and can so identify parents that need static initialisation by whether we
@@ -218,6 +230,156 @@ void create_static_initializer_wrappers(symbol_tablet &symbol_table)
   {
     const irep_idt &class_identifier = class_graph[node].class_identifier;
     if(needs_clinit_wrapper(class_identifier, symbol_table))
-      create_clinit_wrapper_symbols(class_identifier, symbol_table);
+    {
+      create_clinit_wrapper_symbols(
+        class_identifier, symbol_table, synthetic_methods);
+    }
   }
+}
+
+/// Advance map iterator to next distinct key
+/// \param in: iterator to advance
+/// \param end: end of container iterator
+template<class itertype>
+static itertype advance_to_next_key(itertype in, itertype end)
+{
+  PRECONDITION(in != end);
+  auto initial_key = in->first;
+  while(in != end && in->first == initial_key)
+    ++in;
+  return in;
+}
+
+/// Create static initializer symbols for each distinct class that has stub
+/// globals.
+/// \param symbol_table: global symbol table. Will gain static initializer
+///   method symbols for each class that has a stub global in `stub_globals_set`
+/// \param stub_globals_set: set of stub global symbols
+/// \param synthetic_methods: map of synthetic method types. We record the new
+///   static initialiser such that we get a callback to provide its body as and
+///   when it is required.
+void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
+  symbol_tablet &symbol_table,
+  const std::unordered_set<irep_idt, irep_id_hash> &stub_globals_set,
+  synthetic_methods_mapt &synthetic_methods)
+{
+  // Populate map from class id -> stub globals:
+  for(const irep_idt &stub_global : stub_globals_set)
+  {
+    const irep_idt class_id =
+      symbol_table.lookup_ref(stub_global).type.get(ID_C_class);
+    INVARIANT(
+      !class_id.empty(),
+      "static field should be annotated with its defining class");
+    stub_globals_by_class.insert({class_id, stub_global});
+  }
+
+  // For each distinct class that has stub globals, create a clinit symbol:
+
+  for(auto it = stub_globals_by_class.begin(),
+        itend = stub_globals_by_class.end();
+      it != itend;
+      it = advance_to_next_key(it, itend))
+  {
+    const irep_idt static_init_name = clinit_function_name(it->first);
+
+    INVARIANT(
+      !symbol_table.has_symbol(static_init_name),
+      "a class cannot be both incomplete, and so have stub static fields, and "
+      "also define a static initializer");
+
+    code_typet thunk_type;
+    thunk_type.return_type() = void_typet();
+
+    symbolt static_init_symbol;
+    static_init_symbol.name = static_init_name;
+    static_init_symbol.pretty_name = static_init_name;
+    static_init_symbol.base_name = "clinit():V";
+    static_init_symbol.mode = ID_java;
+    static_init_symbol.type = thunk_type;
+    // Note this use of a type-comment to provide a back-link from a method
+    // to its associated class is the same one used in
+    // java_bytecode_convert_methodt::convert
+    static_init_symbol.type.set(ID_C_class, it->first);
+
+    bool failed = symbol_table.add(static_init_symbol);
+    INVARIANT(!failed, "symbol should not already exist");
+
+    auto insert_result = synthetic_methods.emplace(
+      static_init_symbol.name,
+      synthetic_method_typet::STUB_CLASS_STATIC_INITIALIZER);
+    INVARIANT(
+      insert_result.second,
+      "synthetic methods map should not already contain entry for "
+      "stub static initializer");
+  }
+}
+
+/// Check if a symbol is a well-known non-null global
+/// \param symbolid: symbol id to check
+/// \return true if this static field is known never to be null
+static bool is_non_null_library_global(const irep_idt &symbolid)
+{
+  static const std::unordered_set<irep_idt, irep_id_hash> non_null_globals =
+  {
+    "java::java.lang.System.out",
+    "java::java.lang.System.err",
+    "java::java.lang.System.in"
+  };
+  return non_null_globals.count(symbolid);
+}
+
+/// Create the body of a synthetic static initializer (clinit method),
+/// which initialise stub globals in the same manner as
+/// java_static_lifetime_init, only delayed until first reference by virtue of
+/// being given in a static initializer rather than directly in
+/// __CPROVER_initialize.
+/// \param function_id: synthetic static initializer id
+/// \param symbol_table: global symbol table; may gain local variables created
+///   for the new static initializer
+/// \param object_factory_parameters: object factory parameters used to populate
+///   the stub globals and objects reachable from them
+/// \param pointer_type_selector: used to choose concrete types for abstract-
+///   typed globals and fields.
+/// \return synthetic static initializer body.
+codet stub_global_initializer_factoryt::get_stub_initializer_body(
+  const irep_idt &function_id,
+  symbol_table_baset &symbol_table,
+  const object_factory_parameterst &object_factory_parameters,
+  const select_pointer_typet &pointer_type_selector)
+{
+  const symbolt &stub_initializer_symbol = symbol_table.lookup_ref(function_id);
+  irep_idt class_id = stub_initializer_symbol.type.get(ID_C_class);
+  INVARIANT(
+    !class_id.empty(),
+    "synthetic static initializer should be annotated with its class");
+  code_blockt static_init_body;
+
+  // Add a standard nondet initialisation for each global declared on this
+  // class. Note this is the same invocation used in
+  // java_static_lifetime_init.
+
+  auto class_globals = stub_globals_by_class.equal_range(class_id);
+  INVARIANT(
+    class_globals.first != class_globals.second,
+    "class with synthetic clinit should have at least one global to init");
+
+  for(auto it = class_globals.first; it != class_globals.second; ++it)
+  {
+    const symbol_exprt new_global_symbol =
+      symbol_table.lookup_ref(it->second).symbol_expr();
+    gen_nondet_init(
+      new_global_symbol,
+      static_init_body,
+      symbol_table,
+      source_locationt(),
+      false,
+      allocation_typet::DYNAMIC,
+      !is_non_null_library_global(it->second),
+      object_factory_parameters,
+      pointer_type_selector,
+      update_in_placet::NO_UPDATE_IN_PLACE);
+  }
+
+  return static_init_body;
 }

@@ -246,10 +246,6 @@ protected:
 
   const bytecode_infot &get_bytecode_info(const irep_idt &statement);
 
-  void check_static_field_stub(
-    const symbol_exprt &se,
-    const irep_idt &basename);
-
   bool class_needs_clinit(const irep_idt &classname);
   exprt get_or_create_clinit_wrapper(const irep_idt &classname);
   codet get_clinit_call(const irep_idt &classname);
