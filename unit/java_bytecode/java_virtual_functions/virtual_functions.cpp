@@ -13,7 +13,8 @@
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <util/config.h>
-
+#include <goto-instrument/cover.h>
+#include <util/options.h>
 #include <util/std_expr.h>
 
 void check_function_call(
@@ -113,8 +114,54 @@ SCENARIO(
           }
         }
       }
-
       REQUIRE(found_function);
+
+      WHEN("basic blocks are instrumented")
+      {
+        optionst options;
+        options.set_option("cover", "location");
+        THEN("instrumentation assertions are inserted")
+        {
+          REQUIRE_FALSE(
+            instrument_cover_goals(
+              options, new_table, new_goto_functions, null_output));
+        }
+        THEN(
+          "instructions are marked as originating from virtual function call "
+          "removal")
+        {
+          auto function = new_goto_functions.function_map.find(function_name);
+          REQUIRE(function != new_goto_functions.function_map.end());
+
+          const goto_programt &goto_program = function->second.body;
+          auto it = std::find_if(
+            goto_program.instructions.begin(),
+            goto_program.instructions.end(),
+            [](const goto_programt::instructiont &instruction) {
+              return instruction.type == goto_program_instruction_typet::GOTO &&
+                     instruction.guard.id() == ID_equal;
+            });
+          REQUIRE(it != goto_program.instructions.end());
+          THEN(
+            "all instructions that share the same bytecode index "
+            "are marked as originating from a removed virtual function "
+            "call and there is no GOTO ASSERT")
+          {
+            const source_locationt &loc = it->source_location;
+            REQUIRE(loc != source_locationt::nil());
+            REQUIRE(!loc.get_java_bytecode_index().empty());
+
+            while(it->source_location != source_locationt::nil() &&
+                  it->source_location.get_java_bytecode_index() ==
+                    loc.get_java_bytecode_index())
+            {
+              REQUIRE(it->source_location.get_java_removed_virtual_call());
+              REQUIRE(it->type != goto_program_instruction_typet::ASSERT);
+              ++it;
+            }
+          }
+        }
+      }
     }
   }
 }
