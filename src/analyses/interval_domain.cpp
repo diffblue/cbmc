@@ -59,8 +59,7 @@ void interval_domaint::transform(
   locationt from,
   locationt to,
   ai_baset &ai,
-  const namespacet &ns,
-  ai_domain_baset::edge_typet /*edge_type*/)
+  const namespacet &ns)
 {
   const goto_programt::instructiont &instruction=*from;
   switch(instruction.type)

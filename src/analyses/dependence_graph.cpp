@@ -187,8 +187,7 @@ void dep_graph_domaint::transform(
   goto_programt::const_targett from,
   goto_programt::const_targett to,
   ai_baset &ai,
-  const namespacet &ns,
-  ai_domain_baset::edge_typet /*edge_type*/)
+  const namespacet &ns)
 {
   dependence_grapht *dep_graph=dynamic_cast<dependence_grapht*>(&ai);
   assert(dep_graph!=nullptr);

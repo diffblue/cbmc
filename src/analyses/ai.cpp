@@ -365,8 +365,7 @@ bool ai_baset::visit(
       // initialize state, if necessary
       get_state(to_l);
 
-      new_values.transform(
-        l, to_l, *this, ns, ai_domain_baset::edge_typet::FUNCTION_LOCAL);
+      new_values.transform(l, to_l, *this, ns);
 
       if(merge(new_values, l, to_l))
         have_new_values=true;
@@ -399,8 +398,7 @@ bool ai_baset::do_function_call(
   {
     // if we don't have a body, we just do an edige call -> return
     std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
-    tmp_state->transform(
-      l_call, l_return, *this, ns, ai_domain_baset::edge_typet::FUNCTION_LOCAL);
+    tmp_state->transform(l_call, l_return, *this, ns);
 
     return merge(*tmp_state, l_call, l_return);
   }
@@ -417,8 +415,7 @@ bool ai_baset::do_function_call(
 
     // do the edge from the call site to the beginning of the function
     std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
-    tmp_state->transform(
-      l_call, l_begin, *this, ns, ai_domain_baset::edge_typet::CALL);
+    tmp_state->transform(l_call, l_begin, *this, ns);
 
     bool new_data=false;
 
@@ -445,8 +442,7 @@ bool ai_baset::do_function_call(
       return false; // function exit point not reachable
 
     std::unique_ptr<statet> tmp_state(make_temporary_state(end_state));
-    tmp_state->transform(
-      l_end, l_return, *this, ns, ai_domain_baset::edge_typet::RETURN);
+    tmp_state->transform(l_end, l_return, *this, ns);
 
     // Propagate those
     return merge(*tmp_state, l_end, l_return);
