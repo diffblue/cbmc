@@ -188,7 +188,7 @@ void dep_graph_domaint::transform(
   goto_programt::const_targett to,
   ai_baset &ai,
   const namespacet &ns,
-  ai_domain_baset::edge_typet edge_type)
+  ai_domain_baset::edge_typet /*edge_type*/)
 {
   dependence_grapht *dep_graph=dynamic_cast<dependence_grapht*>(&ai);
   assert(dep_graph!=nullptr);
@@ -196,9 +196,10 @@ void dep_graph_domaint::transform(
   // propagate control dependencies across function calls
   if(from->is_function_call())
   {
-    const goto_programt::const_targett next = std::next(from);
+    goto_programt::const_targett next=from;
+    ++next;
 
-    if(edge_type == ai_domain_baset::edge_typet::FUNCTION_LOCAL)
+    if(next==to)
     {
       control_dependencies(from, to, *dep_graph);
     }
