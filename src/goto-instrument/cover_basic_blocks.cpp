@@ -89,7 +89,7 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
 
 unsigned cover_basic_blockst::block_of(goto_programt::const_targett t) const
 {
-  block_mapt::const_iterator it = block_map.find(t);
+  const auto it = block_map.find(t);
   INVARIANT(it != block_map.end(), "instruction must be part of a block");
   return it->second;
 }
@@ -118,7 +118,7 @@ void cover_basic_blockst::select_unique_java_bytecode_indices(
 
   forall_goto_program_instructions(it, goto_program)
   {
-    unsigned block_nr = block_of(it);
+    const unsigned block_nr = block_of(it);
     if(blocks_seen.find(block_nr) != blocks_seen.end())
       continue;
 
@@ -184,7 +184,7 @@ void cover_basic_blockst::report_block_anomalies(
   std::set<unsigned> blocks_seen;
   forall_goto_program_instructions(it, goto_program)
   {
-    unsigned block_nr = block_of(it);
+    const unsigned block_nr = block_of(it);
     const block_infot &block_info = block_infos.at(block_nr);
 
     if(
