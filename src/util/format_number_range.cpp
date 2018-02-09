@@ -16,9 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "format_number_range.h"
 
 /// create shorter representation for output
-/// \par parameters: vector of numbers
+/// \param parameters: vector of numbers
 /// \return string of compressed number range representation
-std::string format_number_ranget::operator()(std::vector<unsigned> &numbers)
+std::string format_number_range(std::vector<unsigned> &numbers)
 {
   std::string number_range;
   std::sort(numbers.begin(), numbers.end());

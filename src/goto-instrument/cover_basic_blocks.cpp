@@ -223,7 +223,6 @@ void cover_basic_blockst::update_covered_lines(block_infot &block_info)
   INVARIANT(!cover_set.empty(), "covered lines set must not be empty");
   std::vector<unsigned> line_list(cover_set.begin(), cover_set.end());
 
-  format_number_ranget format_lines;
-  std::string covered_lines = format_lines(line_list);
+  std::string covered_lines = format_number_range(line_list);
   block_info.source_location.set_basic_block_covered_lines(covered_lines);
 }
