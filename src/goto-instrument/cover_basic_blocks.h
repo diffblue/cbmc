@@ -38,16 +38,6 @@ public:
   virtual const source_locationt &
   source_location_of(std::size_t block_nr) const = 0;
 
-  /// Select an instruction to be instrumented for each basic block such that
-  /// the java bytecode indices for each basic block is unique
-  /// \param goto_program The goto program
-  /// \param message_handler The message handler
-  virtual void select_unique_java_bytecode_indices(
-    const goto_programt &goto_program,
-    message_handlert &message_handler)
-  {
-  }
-
   /// Outputs the list of blocks
   virtual void output(std::ostream &out) const = 0;
 
@@ -82,14 +72,6 @@ public:
   ///   instrumentation representative of the given block
   const source_locationt &
   source_location_of(std::size_t block_nr) const override;
-
-  /// Select an instruction to be instrumented for each basic block such that
-  /// the java bytecode indices for each basic block is unique
-  /// \param goto_program The goto program
-  /// \param message_handler The message handler
-  void select_unique_java_bytecode_indices(
-    const goto_programt &goto_program,
-    message_handlert &message_handler) override;
 
   /// Output warnings about ignored blocks
   /// \param goto_program The goto program
@@ -132,6 +114,37 @@ private:
   static optionalt<std::size_t> continuation_of_block(
     const goto_programt::const_targett &instruction,
     block_mapt &block_map);
+};
+
+class cover_basic_blocks_javat final : public cover_blocks_baset
+{
+private:
+  // map block number to first instruction of the block
+  std::vector<goto_programt::const_targett> block_infos;
+  // map block number to its location
+  std::vector<source_locationt> block_locations;
+  // map java indexes to block indexes
+  std::unordered_map<irep_idt, std::size_t, irep_id_hash> index_to_block;
+
+public:
+  explicit cover_basic_blocks_javat(const goto_programt &_goto_program);
+
+  /// \param t a goto instruction
+  /// \return block number the given goto instruction is part of
+  std::size_t block_of(goto_programt::const_targett t) const override;
+
+  /// \param block_number a block number
+  /// \return first instruction of the given block
+  optionalt<goto_programt::const_targett>
+  instruction_of(std::size_t block_number) const override;
+
+  /// \param block_number a block number
+  /// \return source location corresponding to the given block
+  const source_locationt &
+  source_location_of(std::size_t block_number) const override;
+
+  /// Outputs the list of blocks
+  void output(std::ostream &out) const override;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_BASIC_BLOCKS_H
