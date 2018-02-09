@@ -60,7 +60,7 @@ void rd_range_domaint::transform(
   locationt to,
   ai_baset &ai,
   const namespacet &ns,
-  ai_domain_baset::edge_typet edge_type)
+  ai_domain_baset::edge_typet /*edge_type*/)
 {
   reaching_definitions_analysist *rd=
     dynamic_cast<reaching_definitions_analysist*>(&ai);
@@ -79,7 +79,7 @@ void rd_range_domaint::transform(
     transform_start_thread(ns, *rd);
   // do argument-to-parameter assignments
   else if(from->is_function_call())
-    transform_function_call(ns, from, to, *rd, edge_type);
+    transform_function_call(ns, from, to, *rd);
   // cleanup parameters
   else if(from->is_end_function())
     transform_end_function(ns, from, to, *rd);
@@ -170,13 +170,15 @@ void rd_range_domaint::transform_function_call(
   const namespacet &ns,
   locationt from,
   locationt to,
-  reaching_definitions_analysist &rd,
-  ai_domain_baset::edge_typet edge_type)
+  reaching_definitions_analysist &rd)
 {
   const code_function_callt &code=to_code_function_call(from->code);
 
+  goto_programt::const_targett next=from;
+  ++next;
+
   // only if there is an actual call, i.e., we have a body
-  if(edge_type != ai_domain_baset::edge_typet::FUNCTION_LOCAL)
+  if(next!=to)
   {
     for(valuest::iterator it=values.begin();
         it!=values.end();

@@ -218,8 +218,7 @@ private:
     const namespacet &ns,
     locationt from,
     locationt to,
-    reaching_definitions_analysist &rd,
-    ai_domain_baset::edge_typet edge_type);
+    reaching_definitions_analysist &rd);
   void transform_end_function(
     const namespacet &ns,
     locationt from,
