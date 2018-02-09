@@ -4,7 +4,7 @@ public class test_delete_char_at
    {
       StringBuilder s = new StringBuilder();
       s.append("Abc");
-      s.deleteCharAt(1);
+      org.cprover.CProverString.deleteCharAt(s, 1);
       String str = s.toString();
       assert(!str.equals("Ac"));
    }
