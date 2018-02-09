@@ -183,7 +183,19 @@ public:
 
   const_iterator find(const T &node) const
   {
-    return std::find(begin(), end(), node);
+    std::less<T> less;
+    // FIXME This works around a bug in other parts of the code
+    // in particular, dependence_graph.cpp,
+    // where iterators to different lists than those that are
+    // stored in this set are passed to find.
+    // The Debug libstdc++ will (correctly!) run into an assertion failure
+    // using std::find. std::less for some reason doesn't trigger this assertion
+    // failure, so we use this as an ugly workaround until that code is fixed.
+
+    // NOLINTNEXTLINE
+    return std::find_if(cbegin(), cend(), [&](const T &other_node) {
+      return !less(node, other_node) && !less(other_node, node);
+    });
   }
 
   /// The size of the set; Linear time on the first call,
