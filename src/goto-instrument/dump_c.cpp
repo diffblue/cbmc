@@ -82,8 +82,10 @@ void dump_ct::operator()(std::ostream &os)
       }
     }
   }
-  forall_symbols(it, symbols_transparent.symbols)
-    copied_symbol_table.add(it->second);
+  for(const auto &symbol_pair : symbols_transparent.symbols)
+  {
+    copied_symbol_table.add(symbol_pair.second);
+  }
 
   typedef std::unordered_map<irep_idt, unsigned, irep_id_hash> unique_tagst;
   unique_tagst unique_tags;

@@ -614,14 +614,18 @@ void java_bytecode_instrument(
     message_handler);
 
   std::vector<irep_idt> symbols_to_instrument;
-  forall_symbols(s_it, symbol_table.symbols)
+  for(const auto &symbol_pair : symbol_table.symbols)
   {
-    if(s_it->second.value.id()==ID_code)
-      symbols_to_instrument.push_back(s_it->first);
+    if(symbol_pair.second.value.id() == ID_code)
+    {
+      symbols_to_instrument.push_back(symbol_pair.first);
+    }
   }
 
   // instrument(...) can add symbols to the table, so it's
   // not safe to hold a reference to a symbol across a call.
   for(const auto &symbol : symbols_to_instrument)
+  {
     instrument(to_code(symbol_table.get_writeable_ref(symbol).value));
+  }
 }

@@ -1156,20 +1156,17 @@ void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
 
   used_byt used_by;
 
-  forall_symbols(s_it, src_symbol_table.symbols)
+  for(const auto &symbol_pair : src_symbol_table.symbols)
   {
-    if(s_it->second.is_type)
+    if(symbol_pair.second.is_type)
     {
       // find type and array-size symbols
       find_symbols_sett symbols_used;
-      find_type_and_expr_symbols(s_it->second.type, symbols_used);
+      find_type_and_expr_symbols(symbol_pair.second.type, symbols_used);
 
-      for(find_symbols_sett::const_iterator
-          it=symbols_used.begin();
-          it!=symbols_used.end();
-          it++)
+      for(const auto &symbol_used : symbols_used)
       {
-        used_by[*it].insert(s_it->first);
+        used_by[symbol_used].insert(symbol_pair.first);
       }
     }
   }
@@ -1305,18 +1302,18 @@ void linkingt::typecheck()
 
   id_sett needs_to_be_renamed;
 
-  forall_symbols(s_it, src_symbol_table.symbols)
+  for(const auto &symbol_pair : src_symbol_table.symbols)
   {
-    symbol_tablet::symbolst::const_iterator
-      m_it=main_symbol_table.symbols.find(s_it->first);
+    symbol_tablet::symbolst::const_iterator m_it =
+      main_symbol_table.symbols.find(symbol_pair.first);
 
-    if(m_it!=main_symbol_table.symbols.end() && // duplicate
-       needs_renaming(m_it->second, s_it->second))
+    if(
+      m_it != main_symbol_table.symbols.end() && // duplicate
+      needs_renaming(m_it->second, symbol_pair.second))
     {
-      needs_to_be_renamed.insert(s_it->first);
+      needs_to_be_renamed.insert(symbol_pair.first);
       #ifdef DEBUG
-      debug() << "LINKING: needs to be renamed: "
-              << s_it->first << eom;
+      debug() << "LINKING: needs to be renamed: " << symbol_pair.first << eom;
       #endif
     }
   }
