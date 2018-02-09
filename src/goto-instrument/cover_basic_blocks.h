@@ -82,7 +82,7 @@ protected:
 
   /// create list of covered lines as CSV string and set as property of source
   /// location of basic block, compress to ranges if applicable
-  void update_covered_lines(block_infot &block_info);
+  static void update_covered_lines(block_infot &block_info);
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_BASIC_BLOCKS_H
