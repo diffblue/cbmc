@@ -18,7 +18,7 @@ Author: Peter Schrammel
 #include <util/message.h>
 
 enum class coverage_criteriont;
-class cover_basic_blockst;
+class cover_blocks_baset;
 class goal_filterst;
 
 /// Base class for goto program coverage instrumenters
@@ -40,7 +40,7 @@ public:
   /// \param basic_blocks: detected basic blocks
   virtual void operator()(
     goto_programt &goto_program,
-    const cover_basic_blockst &basic_blocks) const
+    const cover_blocks_baset &basic_blocks) const
   {
     Forall_goto_program_instructions(i_it, goto_program)
     {
@@ -59,7 +59,7 @@ protected:
   virtual void instrument(
     goto_programt &,
     goto_programt::targett &,
-    const cover_basic_blockst &) const = 0;
+    const cover_blocks_baset &) const = 0;
 
   void initialize_source_location(
     goto_programt::targett t,
@@ -94,13 +94,13 @@ public:
   /// \param basic_blocks: detected basic blocks of the goto program
   void operator()(
     goto_programt &goto_program,
-    const cover_basic_blockst &basic_blocks) const
+    const cover_blocks_baset &basic_blocks) const
   {
     for(const auto &instrumenter : instrumenters)
       (*instrumenter)(goto_program, basic_blocks);
   }
 
-protected:
+private:
   std::vector<std::unique_ptr<cover_instrumenter_baset>> instrumenters;
 };
 
@@ -119,7 +119,7 @@ protected:
   void instrument(
     goto_programt &,
     goto_programt::targett &,
-    const cover_basic_blockst &) const override;
+    const cover_blocks_baset &) const override;
 };
 
 /// Branch coverage instrumenter
@@ -137,7 +137,7 @@ protected:
   void instrument(
     goto_programt &,
     goto_programt::targett &,
-    const cover_basic_blockst &) const override;
+    const cover_blocks_baset &) const override;
 };
 
 /// Condition coverage instrumenter
@@ -155,7 +155,7 @@ protected:
   void instrument(
     goto_programt &,
     goto_programt::targett &,
-    const cover_basic_blockst &) const override;
+    const cover_blocks_baset &) const override;
 };
 
 /// Decision coverage instrumenter
@@ -173,7 +173,7 @@ protected:
   void instrument(
     goto_programt &,
     goto_programt::targett &,
-    const cover_basic_blockst &) const override;
+    const cover_blocks_baset &) const override;
 };
 
 /// MC/DC coverage instrumenter
@@ -191,7 +191,7 @@ protected:
   void instrument(
     goto_programt &,
     goto_programt::targett &,
-    const cover_basic_blockst &) const override;
+    const cover_blocks_baset &) const override;
 };
 
 /// Path coverage instrumenter
@@ -209,7 +209,7 @@ protected:
   void instrument(
     goto_programt &,
     goto_programt::targett &,
-    const cover_basic_blockst &) const override;
+    const cover_blocks_baset &) const override;
 };
 
 /// Assertion coverage instrumenter
@@ -227,7 +227,7 @@ protected:
   void instrument(
     goto_programt &,
     goto_programt::targett &,
-    const cover_basic_blockst &) const override;
+    const cover_blocks_baset &) const override;
 };
 
 /// __CPROVER_cover coverage instrumenter
@@ -245,7 +245,7 @@ protected:
   void instrument(
     goto_programt &,
     goto_programt::targett &,
-    const cover_basic_blockst &) const override;
+    const cover_blocks_baset &) const override;
 };
 
 void cover_instrument_end_of_function(
