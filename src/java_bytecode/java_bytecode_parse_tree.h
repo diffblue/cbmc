@@ -197,8 +197,7 @@ public:
         }
     };
 
-    typedef std::vector<lambda_method_handlet> lambda_method_handlest;
-    typedef std::map<irep_idt, lambda_method_handlest>
+    typedef std::map<std::pair<irep_idt, size_t>, lambda_method_handlet>
       lambda_method_handle_mapt;
     lambda_method_handle_mapt lambda_method_handle_map;
 
