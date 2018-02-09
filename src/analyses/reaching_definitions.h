@@ -113,12 +113,9 @@ public:
     bv_container=&_bv_container;
   }
 
-  void transform(
-    locationt from,
-    locationt to,
-    ai_baset &ai,
-    const namespacet &ns,
-    ai_domain_baset::edge_typet edge_type) final override;
+  void
+  transform(locationt from, locationt to, ai_baset &ai, const namespacet &ns)
+    final override;
 
   void output(
     std::ostream &out,
@@ -218,8 +215,7 @@ private:
     const namespacet &ns,
     locationt from,
     locationt to,
-    reaching_definitions_analysist &rd,
-    ai_domain_baset::edge_typet edge_type);
+    reaching_definitions_analysist &rd);
   void transform_end_function(
     const namespacet &ns,
     locationt from,

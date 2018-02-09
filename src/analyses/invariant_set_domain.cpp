@@ -17,13 +17,14 @@ void invariant_set_domaint::transform(
   locationt from_l,
   locationt to_l,
   ai_baset &ai,
-  const namespacet &ns,
-  ai_domain_baset::edge_typet /*edge_type*/)
+  const namespacet &ns)
 {
   switch(from_l->type)
   {
   case GOTO:
     {
+      // Comparing iterators is safe as the target must be within the same list
+      // of instructions because this is a GOTO.
       exprt tmp(from_l->guard);
 
       goto_programt::const_targett next=from_l;

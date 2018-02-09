@@ -31,13 +31,6 @@ class ai_baset;
 class ai_domain_baset
 {
 public:
-  enum class edge_typet
-  {
-    FUNCTION_LOCAL,
-    CALL,
-    RETURN,
-  };
-
   // The constructor is expected to produce 'false'
   // or 'bottom'
   ai_domain_baset()
@@ -55,13 +48,21 @@ public:
   // b) there is an edge from the last instruction (END_FUNCTION)
   //    of the function to the instruction _following_ the call site
   //    (this also needs to set the LHS, if applicable)
+  //
+  // "this" is the domain before the instruction "from"
+  // "from" is the instruction to be interpretted
+  // "to" is the next instruction (for GOTO, FUNCTION_CALL, END_FUNCTION)
+  //
+  // PRECONDITION(from.is_dereferenceable(), "Must not be _::end()")
+  // PRECONDITION(to.is_dereferenceable(), "Must not be _::end()")
+  // PRECONDITION(are_comparable(from,to) ||
+  //              (from->is_function_call() || from->is_end_function())
 
   virtual void transform(
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns,
-    edge_typet edge_type) = 0;
+    const namespacet &ns) = 0;
 
   virtual void output(
     std::ostream &out,
@@ -98,6 +99,11 @@ public:
   //
   // This computes the join between "this" and "b".
   // Return true if "this" has changed.
+  // In the usual case, "b" is the updated state after "from"
+  // and "this" is the state before "to".
+  //
+  // PRECONDITION(from.is_dereferenceable(), "Must not be _::end()")
+  // PRECONDITION(to.is_dereferenceable(), "Must not be _::end()")
 
   // This method allows an expression to be simplified / evaluated using the
   // current state.  It is used to evaluate assertions and in program

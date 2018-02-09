@@ -269,8 +269,7 @@ void custom_bitvector_domaint::transform(
   locationt from,
   locationt to,
   ai_baset &ai,
-  const namespacet &ns,
-  ai_domain_baset::edge_typet edge_type)
+  const namespacet &ns)
 {
   // upcast of ai
   custom_bitvector_analysist &cba=
@@ -397,7 +396,7 @@ void custom_bitvector_domaint::transform(
         else
         {
           // only if there is an actual call, i.e., we have a body
-          if(edge_type != ai_domain_baset::edge_typet::FUNCTION_LOCAL)
+          if(from->function != to->function)
           {
             const code_typet &code_type=
               to_code_type(ns.lookup(identifier).type);
@@ -520,6 +519,8 @@ void custom_bitvector_domaint::transform(
     {
       exprt guard=instruction.guard;
 
+      // Comparing iterators is safe as the target must be within the same list
+      // of instructions because this is a GOTO.
       if(to!=from->get_target())
         guard.make_not();
 
