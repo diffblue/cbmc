@@ -107,6 +107,9 @@ exprt object_factory(
   allocation_typet alloc_type,
   const source_locationt &location);
 
+typedef std::unordered_map<irep_idt, std::stack<reference_typet>,
+  irep_id_hash> generic_parameter_specialization_mapt;
+
 enum class update_in_placet
 {
   NO_UPDATE_IN_PLACE,

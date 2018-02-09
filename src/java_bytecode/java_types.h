@@ -120,10 +120,14 @@ public:
     return const_cast<type_variablet &>(type_variables().front());
   }
 
+  const irep_idt get_name() const
+  {
+    return type_variable().get_identifier();
+  }
+
   const std::string get_parameter_class_name() const
   {
-    const std::string &parameter_name =
-      type_variable().get_identifier().c_str();
+    const std::string &parameter_name = get_name().c_str();
     PRECONDITION(has_prefix(parameter_name, "java::"));
     int prefix_length = std::string("java::").length();
     const std::string name = parameter_name.substr(

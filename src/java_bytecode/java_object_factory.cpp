@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_utils.h"
 #include "java_string_library_preprocess.h"
 #include "java_root_class.h"
+#include "generic_parameter_specialization_map_keys.h"
 
 static symbolt &new_tmp_symbol(
   symbol_table_baset &symbol_table,
@@ -67,6 +68,16 @@ class java_object_factoryt
   /// the non-det initialization when we see the type for the second time in
   /// this set AND the tree depth becomes >= than the maximum value above.
   std::unordered_set<irep_idt, irep_id_hash> recursion_set;
+
+  /// Every time the non-det generator visits a type and the type is generic
+  /// (either a struct or a pointer), the following map is used to store and
+  /// look up the concrete types of the generic paramaters in the current
+  /// scope. Note that not all generic parameters need to have a concrete
+  /// type, e.g., the method under test is generic. The types are removed
+  /// from the map when the scope changes. Note that in different depths
+  /// of the scope the parameters can be specialized with different types
+  /// so we keep a stack of types for each parameter.
+  generic_parameter_specialization_mapt generic_parameter_specialization_map;
 
   /// The symbol table.
   symbol_table_baset &symbol_table;
@@ -1151,6 +1162,15 @@ void java_object_factoryt::gen_nondet_init(
   {
     // dereferenced type
     const pointer_typet &pointer_type=to_pointer_type(type);
+
+    // If we are about to initialize a generic pointer type, add its concrete
+    // types to the map and delete them on leaving this function scope.
+    generic_parameter_specialization_map_keyst
+      generic_parameter_specialization_map_keys(
+        generic_parameter_specialization_map);
+    generic_parameter_specialization_map_keys.insert_pairs_for_pointer(
+      pointer_type, ns.follow(pointer_type.subtype()));
+
     gen_nondet_pointer_init(
       assignments,
       expr,
@@ -1164,6 +1184,21 @@ void java_object_factoryt::gen_nondet_init(
   else if(type.id()==ID_struct)
   {
     const struct_typet struct_type=to_struct_type(type);
+
+    // If we are about to initialize a generic class (as a superclass object
+    // for a different object), add its concrete types to the map and delete
+    // them on leaving this function scope.
+    generic_parameter_specialization_map_keyst
+      generic_parameter_specialization_map_keys(
+        generic_parameter_specialization_map);
+    if(is_sub)
+    {
+      const typet &symbol = override_ ? override_type : expr.type();
+      PRECONDITION(symbol.id() == ID_symbol);
+      generic_parameter_specialization_map_keys.insert_pairs_for_symbol(
+        to_symbol_type(symbol), struct_type);
+    }
+
     gen_nondet_struct_init(
       assignments,
       expr,
