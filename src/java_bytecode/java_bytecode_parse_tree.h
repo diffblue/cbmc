@@ -173,7 +173,7 @@ public:
     bool is_abstract=false;
     bool is_enum=false;
     bool is_public=false, is_protected=false, is_private=false;
-    bool read_attribute_bootstrapmethods = false;
+    bool attribute_bootstrapmethods_read = false;
     size_t enum_elements=0;
 
     enum class method_handle_typet
@@ -184,8 +184,9 @@ public:
       UNKNOWN_HANDLE
     };
 
-    struct lambda_method_handlet
+    class lambda_method_handlet
     {
+    public:
       method_handle_typet handle_type;
       irep_idt lambda_method_name;
       irep_idt interface_type;
