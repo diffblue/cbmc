@@ -23,9 +23,9 @@ void cover_location_instrumentert::instrument(
     i_it->make_skip();
 
   unsigned block_nr = basic_blocks.block_of(i_it);
-  goto_programt::const_targett in_t = basic_blocks.instruction_of(block_nr);
+  const auto representative_instruction = basic_blocks.instruction_of(block_nr);
   // we only instrument the selected instruction
-  if(in_t == i_it)
+  if(representative_instruction && *representative_instruction == i_it)
   {
     std::string b = std::to_string(block_nr + 1); // start with 1
     std::string id = id2string(i_it->function) + "#" + b;

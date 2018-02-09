@@ -92,7 +92,7 @@ unsigned cover_basic_blockst::block_of(goto_programt::const_targett t) const
   return it->second;
 }
 
-goto_programt::const_targett
+optionalt<goto_programt::const_targett>
 cover_basic_blockst::instruction_of(unsigned block_nr) const
 {
   INVARIANT(block_nr < block_infos.size(), "block number out of range");
@@ -122,7 +122,7 @@ void cover_basic_blockst::select_unique_java_bytecode_indices(
 
     INVARIANT(block_nr < block_infos.size(), "block number out of range");
     block_infot &block_info = block_infos.at(block_nr);
-    if(block_info.representative_inst == goto_program.instructions.end())
+    if(!block_info.representative_inst)
     {
       if(!it->source_location.get_java_bytecode_index().empty())
       {
@@ -144,7 +144,7 @@ void cover_basic_blockst::select_unique_java_bytecode_indices(
         }
       }
     }
-    else if(it == block_info.representative_inst)
+    else if(it == *block_info.representative_inst)
     {
       // check the existing representative
       if(!it->source_location.get_java_bytecode_index().empty())
@@ -159,7 +159,7 @@ void cover_basic_blockst::select_unique_java_bytecode_indices(
         else
         {
           // clash, reset to search for a new one
-          block_info.representative_inst = goto_program.instructions.end();
+          block_info.representative_inst = {};
           block_info.source_location = source_locationt::nil();
           msg.debug() << it->function << " block " << (block_nr + 1)
                       << ", location " << it->location_number

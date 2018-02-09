@@ -31,7 +31,8 @@ public:
   /// \param block_nr a block number
   /// \return  the instruction selected for
   ///   instrumentation representative of the given block
-  goto_programt::const_targett instruction_of(unsigned block_nr) const;
+  optionalt<goto_programt::const_targett>
+  instruction_of(unsigned block_nr) const;
 
   /// \param block_nr a block number
   /// \return  the source location selected for
@@ -64,7 +65,7 @@ protected:
   struct block_infot
   {
     /// the program location to instrument for this block
-    goto_programt::const_targett representative_inst;
+    optionalt<goto_programt::const_targett> representative_inst;
 
     /// the source location representative for this block
     // (we need a separate copy of source locations because we attach
