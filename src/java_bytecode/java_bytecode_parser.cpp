@@ -1431,7 +1431,7 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
       u2 num_bootstrap_arguments = read_u2();
 
       lambda_method_handlet handle;
-      status() << "INFO: parse BootstrapMethod handle "
+      debug() << "INFO: parse BootstrapMethod handle "
                << num_bootstrap_arguments << " #args"
                << eom;
       parse_methodhandle(entry, handle);
@@ -1483,7 +1483,7 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
             return;
 
           lambda_method_handlet real_handle;
-          status() << "INFO: parse lambda handle" << eom;
+          debug() << "INFO: parse lambda handle" << eom;
           const pool_entryt &lambda_entry = pool_entry(arg_index2);
           parse_methodhandle(lambda_entry, real_handle);
           if(
@@ -1502,14 +1502,14 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
             real_handle.method_type = pool_entry(arg3.ref1).s;
             parsed_class.lambda_method_handle_map[parsed_class.name].push_back(
               real_handle);
-            status()
+            debug()
               << "lambda function reference "
               << id2string(real_handle.lambda_method_name) << " in class \""
               << parsed_class.name << "\""
               << "\n  interface type is "
-              << id2string(real_handle.interface_type = pool_entry(arg1.ref1).s)
+              << id2string(pool_entry(arg1.ref1).s)
               << "\n  method type is "
-              << id2string(real_handle.interface_type = pool_entry(arg3.ref1).s)
+              << id2string(pool_entry(arg3.ref1).s)
               << eom;
           }
         }
