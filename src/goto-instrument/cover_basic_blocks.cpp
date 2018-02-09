@@ -15,6 +15,20 @@ Author: Peter Schrammel
 #include <util/message.h>
 #include <util/string2int.h>
 
+optionalt<unsigned> cover_basic_blockst::continuation_of_block(
+  const goto_programt::const_targett &instruction,
+  cover_basic_blockst::block_mapt &block_map)
+{
+  if(instruction->incoming_edges.size() != 1)
+    return {};
+
+  const goto_programt::targett in_t = *instruction->incoming_edges.cbegin();
+  if(in_t->is_goto() && !in_t->is_backwards_goto() && in_t->guard.is_true())
+    return block_map[in_t];
+
+  return {};
+}
+
 cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
 {
   bool next_is_target = true;
@@ -25,25 +39,13 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
     // Is it a potential beginning of a block?
     if(next_is_target || it->is_target())
     {
-      // We keep the block number if this potential block
-      // is a continuation of a previous block through
-      // unconditional forward gotos; otherwise we increase the
-      // block number.
-      bool increase_block_nr = true;
-      if(it->incoming_edges.size() == 1)
+      if(auto block_number = continuation_of_block(it, block_map))
       {
-        goto_programt::targett in_t = *it->incoming_edges.begin();
-        if(
-          in_t->is_goto() && !in_t->is_backwards_goto() &&
-          in_t->guard.is_true())
-        {
-          current_block = block_map[in_t];
-          increase_block_nr = false;
-        }
+        current_block = *block_number;
       }
-      if(increase_block_nr)
+      else
       {
-        block_infos.push_back(block_infot());
+        block_infos.emplace_back();
         block_infos.back().representative_inst = it;
         block_infos.back().source_location = source_locationt::nil();
         current_block = block_infos.size() - 1;

@@ -83,6 +83,12 @@ protected:
   /// create list of covered lines as CSV string and set as property of source
   /// location of basic block, compress to ranges if applicable
   static void update_covered_lines(block_infot &block_info);
+
+  /// If this block is a continuation of a previous block through unconditional
+  /// forward gotos, return this blocks number.
+  static optionalt<unsigned> continuation_of_block(
+    const goto_programt::const_targett &instruction,
+    block_mapt &block_map);
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_BASIC_BLOCKS_H
