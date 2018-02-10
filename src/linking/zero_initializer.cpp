@@ -13,15 +13,43 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <sstream>
 
+#include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/message.h>
 #include <util/arith_tools.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/symbol.h>
 #include <util/pointer_offset_size.h>
 
 #include <util/c_types.h>
 #include <ansi-c/expr2c.h>
+
+static void set_class_identifier(
+  struct_exprt &expr,
+  const namespacet &ns,
+  const symbol_typet &class_type)
+{
+  const struct_typet &struct_type=
+    to_struct_type(ns.follow(expr.type()));
+  const struct_typet::componentst &components=struct_type.components();
+
+  if(components.empty())
+    return;
+  PRECONDITION(!expr.operands().empty());
+
+  if(components.front().get_name()=="@class_identifier")
+  {
+    DATA_INVARIANT(
+      expr.op0().id()==ID_constant, "expected to replace constant");
+    expr.op0()=constant_exprt(class_type.get_identifier(), string_typet());
+  }
+  else
+  {
+    DATA_INVARIANT(expr.op0().id()==ID_struct, "expected nested struct");
+    set_class_identifier(to_struct_expr(expr.op0()), ns, class_type);
+  }
+}
 
 class zero_initializert:public messaget
 {
@@ -194,7 +222,7 @@ exprt zero_initializert::zero_initializer_rec(
     const struct_typet::componentst &components=
       to_struct_type(type).components();
 
-    exprt value(ID_struct, type);
+    struct_exprt value(type);
 
     value.operands().reserve(components.size());
 
@@ -273,6 +301,10 @@ exprt zero_initializert::zero_initializer_rec(
     // we might have mangled the type for arrays, so keep that
     if(ns.follow(type).id()!=ID_array)
       result.type()=type;
+
+    // Java symbol types are structs (classes) -- fix up the class identifier
+    if(ns.lookup(type).mode==ID_java)
+      set_class_identifier(to_struct_expr(result), ns, to_symbol_type(type));
 
     return result;
   }
