@@ -16,8 +16,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <memory>
 
-#include <util/language.h>
 #include <util/make_unique.h> // unique_ptr
+
+#include <langapi/language.h>
 
 #include "cpp_parse_tree.h"
 

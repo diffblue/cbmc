@@ -14,8 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <memory>
 
-#include <util/language.h>
 #include <util/make_unique.h>
+
+#include <langapi/language.h>
 
 #include "ansi_c_parse_tree.h"
 

@@ -16,9 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <memory> // unique_ptr
 
-#include <util/language.h>
-
+#include <langapi/language.h>
 #include <langapi/mode.h>
+
 #include <goto-programs/system_library_symbols.h>
 
 class dump_ct

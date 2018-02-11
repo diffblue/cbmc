@@ -12,9 +12,10 @@
 #include <memory>
 
 #include <util/config.h>
-#include <util/language.h>
 #include <util/message.h>
+
 #include <java_bytecode/java_bytecode_language.h>
+
 #include <testing-utils/load_java_class.h>
 
 SCENARIO("java_bytecode_convert_abstract_class",

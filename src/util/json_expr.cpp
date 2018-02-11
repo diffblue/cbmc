@@ -20,10 +20,10 @@ Author: Peter Schrammel
 #include "std_expr.h"
 #include "config.h"
 #include "identifier.h"
-#include "language.h"
 #include "invariant.h"
 
 #include <langapi/mode.h>
+#include <langapi/language.h>
 
 #include <memory>
 

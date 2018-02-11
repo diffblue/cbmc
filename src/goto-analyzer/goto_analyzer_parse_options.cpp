@@ -46,8 +46,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/interval_domain.h>
 
 #include <langapi/mode.h>
+#include <langapi/language.h>
 
-#include <util/language.h>
 #include <util/options.h>
 #include <util/config.h>
 #include <util/string2int.h>

@@ -14,8 +14,10 @@
 #define CPROVER_TESTING_UTILS_LOAD_JAVA_CLASS_H
 
 #include <util/symbol_table.h>
-#include <util/language.h>
+
 #include <goto-programs/goto_model.h>
+
+#include <langapi/language.h>
 
 symbol_tablet load_java_class(
   const std::string &java_class_name,

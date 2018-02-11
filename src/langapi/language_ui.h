@@ -11,9 +11,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #define CPROVER_LANGAPI_LANGUAGE_UI_H
 
 #include <util/message.h>
-#include <util/language_file.h>
 #include <util/symbol_table.h>
 #include <util/ui_message.h>
+
+#include "language_file.h"
 
 class cmdlinet;
 

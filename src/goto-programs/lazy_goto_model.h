@@ -6,7 +6,7 @@
 #ifndef CPROVER_GOTO_PROGRAMS_LAZY_GOTO_MODEL_H
 #define CPROVER_GOTO_PROGRAMS_LAZY_GOTO_MODEL_H
 
-#include <util/language_file.h>
+#include <langapi/language_file.h>
 
 #include "goto_model.h"
 #include "lazy_goto_functions_map.h"

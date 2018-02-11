@@ -9,18 +9,19 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Abstract interface to support a programming language
 
-#ifndef CPROVER_UTIL_LANGUAGE_H
-#define CPROVER_UTIL_LANGUAGE_H
+#ifndef CPROVER_LANGAPI_LANGUAGE_H
+#define CPROVER_LANGAPI_LANGUAGE_H
 
 #include <unordered_set>
 #include <iosfwd>
 #include <string>
 #include <memory> // unique_ptr
+
 #include <util/symbol.h>
 #include <util/std_types.h>
-#include <goto-programs/system_library_symbols.h>
+#include <util/message.h>
 
-#include "message.h"
+#include <goto-programs/system_library_symbols.h>
 
 typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
 

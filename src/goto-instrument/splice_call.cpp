@@ -14,11 +14,15 @@ Date: July 2017
 // useful for context/ environment setting in arbitrary nodes
 
 #include "splice_call.h"
+
 #include <util/message.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
-#include <util/language.h>
+
+#include <langapi/language.h>
+
 #include <goto-programs/goto_functions.h>
+
 #include <algorithm>
 
 // split the argument in caller/ callee two-position vector
