@@ -17,15 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "arith_tools.h"
 
-void make_next_state(exprt &expr)
-{
-  Forall_operands(it, expr)
-    make_next_state(*it);
-
-  if(expr.id()==ID_symbol)
-    expr.id(ID_next_symbol);
-}
-
 exprt make_binary(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
