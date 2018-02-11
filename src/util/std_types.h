@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_UTIL_STD_TYPES_H
 #define CPROVER_UTIL_STD_TYPES_H
 
@@ -1670,5 +1669,75 @@ inline complex_typet &to_complex_type(typet &type)
   PRECONDITION(type.id()==ID_complex);
   return static_cast<complex_typet &>(type);
 }
+
+/*! \brief A type for mathematical functions (do not
+           confuse with functions/methods in code)
+*/
+class mathematical_function_typet:public typet
+{
+public:
+  mathematical_function_typet():typet(ID_mathematical_function)
+  {
+    subtypes().resize(2);
+  }
+
+  // the domain of the function is composed of zero, one, or
+  // many variables
+  class variablet:public irept
+  {
+  public:
+    // the identifier is optional
+    irep_idt get_identifier() const
+    {
+      return get(ID_identifier);
+    }
+
+    void set_identifier(const irep_idt &identifier)
+    {
+      return set(ID_identifier, identifier);
+    }
+
+    typet &type()
+    {
+      return static_cast<typet &>(add(ID_type));
+    }
+
+    const typet &type() const
+    {
+      return static_cast<const typet &>(find(ID_type));
+    }
+  };
+
+  using domaint=std::vector<variablet>;
+
+  domaint &domain()
+  {
+    return (domaint &)subtypes()[0].subtypes();
+  }
+
+  const domaint &domain() const
+  {
+    return (const domaint &)subtypes()[0].subtypes();
+  }
+
+  variablet &add_variable()
+  {
+    auto &d=domain();
+    d.push_back(variablet());
+    return d.back();
+  }
+
+  // The codomain is the set of values that the
+  // function maps to (the "target")
+  typet &codomain()
+  {
+    return subtypes()[1];
+  }
+
+  const typet &codomain() const
+  {
+    return subtypes()[1];
+  }
+};
 
 #endif // CPROVER_UTIL_STD_TYPES_H
