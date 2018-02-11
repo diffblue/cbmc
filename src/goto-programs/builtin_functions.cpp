@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/c_types.h>
 #include <util/rational.h>
 #include <util/replace_expr.h>
 #include <util/rational_tools.h>
@@ -29,8 +30,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/zero_initializer.h>
 
-#include <util/c_types.h>
 #include <ansi-c/string_constant.h>
+
+#include <langapi/language_util.h>
 
 #include "format_strings.h"
 #include "class_identifier.h"

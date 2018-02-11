@@ -26,8 +26,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 
-#ifdef DEBUG
 #include <langapi/language_util.h>
+
+#ifdef DEBUG
 #include <iostream>
 #endif
 

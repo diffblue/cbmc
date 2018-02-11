@@ -20,6 +20,8 @@ Author: Peter Schrammel
 #include <util/simplify_expr.h>
 #include <util/cprover_prefix.h>
 
+#include <langapi/language_util.h>
+
 void constant_propagator_domaint::assign_rec(
   valuest &values,
   const exprt &lhs,

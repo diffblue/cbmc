@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Goto Program Template
 
-#include "goto_program_template.h"
+#include "goto_program.h"
 
 #include <ostream>
 

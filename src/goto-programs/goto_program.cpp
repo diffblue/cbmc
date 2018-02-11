@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_program.h"
 
 #include <ostream>
+#include <iomanip>
 
 #include <util/std_expr.h>
 
@@ -34,7 +35,7 @@ std::ostream &goto_programt::output_instruction(
   const namespacet &ns,
   const irep_idt &identifier,
   std::ostream &out,
-  const goto_program_templatet::instructiont &instruction) const
+  const instructiont &instruction) const
 {
   out << "        // " << instruction.location_number << " ";
 
@@ -482,3 +483,149 @@ std::string as_string(
     throw "unknown statement";
   }
 }
+
+void goto_programt::compute_loop_numbers()
+{
+  unsigned nr=0;
+  for(auto &i : instructions)
+    if(i.is_backwards_goto())
+      i.loop_number=nr++;
+}
+
+void goto_programt::update()
+{
+  compute_incoming_edges();
+  compute_target_numbers();
+  compute_location_numbers();
+  compute_loop_numbers();
+}
+
+std::ostream &goto_programt::output(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  std::ostream &out) const
+{
+  // output program
+
+  for(const auto &instruction : instructions)
+    output_instruction(ns, identifier, out, instruction);
+
+  return out;
+}
+
+void goto_programt::compute_target_numbers()
+{
+  // reset marking
+
+  for(auto &i : instructions)
+    i.target_number=instructiont::nil_target;
+
+  // mark the goto targets
+
+  for(const auto &i : instructions)
+  {
+    for(const auto &t : i.targets)
+    {
+      if(t!=instructions.end())
+        t->target_number=0;
+    }
+  }
+
+  // number the targets properly
+  unsigned cnt=0;
+
+  for(auto &i : instructions)
+  {
+    if(i.is_target())
+    {
+      i.target_number=++cnt;
+      assert(i.target_number!=0);
+    }
+  }
+
+  // check the targets!
+  // (this is a consistency check only)
+
+  for(const auto &i : instructions)
+  {
+    for(const auto &t : i.targets)
+    {
+      if(t!=instructions.end())
+      {
+        assert(t->target_number!=0);
+        assert(t->target_number!=instructiont::nil_target);
+      }
+    }
+  }
+}
+
+void goto_programt::copy_from(const goto_programt &src)
+{
+  // Definitions for mapping between the two programs
+  typedef std::map<const_targett, targett> targets_mappingt;
+  targets_mappingt targets_mapping;
+
+  clear();
+
+  // Loop over program - 1st time collects targets and copy
+
+  for(instructionst::const_iterator
+      it=src.instructions.begin();
+      it!=src.instructions.end();
+      ++it)
+  {
+    auto new_instruction=add_instruction();
+    targets_mapping[it]=new_instruction;
+    *new_instruction=*it;
+  }
+
+  // Loop over program - 2nd time updates targets
+
+  for(auto &i : instructions)
+  {
+    for(auto &t : i.targets)
+    {
+      targets_mappingt::iterator
+        m_target_it=targets_mapping.find(t);
+
+      if(m_target_it==targets_mapping.end())
+        throw "copy_from: target not found";
+
+      t=m_target_it->second;
+    }
+  }
+
+  compute_incoming_edges();
+  compute_target_numbers();
+}
+
+// number them
+bool goto_programt::has_assertion() const
+{
+  for(const auto &i : instructions)
+    if(i.is_assert() && !i.guard.is_true())
+      return true;
+
+  return false;
+}
+
+void goto_programt::compute_incoming_edges()
+{
+  for(auto &i : instructions)
+  {
+    i.incoming_edges.clear();
+  }
+
+  for(instructionst::iterator
+      it=instructions.begin();
+      it!=instructions.end();
+      ++it)
+  {
+    for(const auto &s : get_successors(it))
+    {
+      if(s!=instructions.end())
+        s->incoming_edges.insert(it);
+    }
+  }
+}
+

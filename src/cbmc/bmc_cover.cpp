@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bmc.h"
 
 #include <chrono>
+#include <iomanip>
 
 #include <util/xml.h>
 #include <util/xml_expr.h>
@@ -24,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/build_goto_trace.h>
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
+
+#include <langapi/language_util.h>
 
 #include "bv_cbmc.h"
 

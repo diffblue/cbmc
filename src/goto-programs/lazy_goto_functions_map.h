@@ -25,19 +25,18 @@
 ///   each program, in sequence, after it is converted.
 /// 3. Analyses will then access functions using the `at` function
 /// \tparam bodyt: The type of the function bodies, usually goto_programt
-template<typename bodyt>
 class lazy_goto_functions_mapt final
 {
 public:
   // NOLINTNEXTLINE(readability/identifiers)  - name matches those used in STL
   typedef irep_idt key_type;
   // NOLINTNEXTLINE(readability/identifiers)  - name matches those used in STL
-  typedef goto_function_templatet<bodyt> &mapped_type;
+  typedef goto_functiont &mapped_type;
   /// The type of elements returned by const members
   // NOLINTNEXTLINE(readability/identifiers)  - name matches mapped_type
-  typedef const goto_function_templatet<bodyt> &const_mapped_type;
+  typedef const goto_functiont &const_mapped_type;
   // NOLINTNEXTLINE(readability/identifiers)  - name matches those used in STL
-  typedef std::pair<const key_type, goto_function_templatet<bodyt>> value_type;
+  typedef std::pair<const key_type, goto_functiont> value_type;
   // NOLINTNEXTLINE(readability/identifiers)  - name matches those used in STL
   typedef value_type &reference;
   // NOLINTNEXTLINE(readability/identifiers)  - name matches those used in STL
@@ -57,7 +56,7 @@ public:
     post_process_functiont;
 
 private:
-  typedef std::map<key_type, goto_function_templatet<bodyt>> underlying_mapt;
+  typedef std::map<key_type, goto_functiont> underlying_mapt;
   underlying_mapt &goto_functions;
   /// Names of functions that are already fully available in the programt state.
   /// \remarks These functions do not need processing before being returned
@@ -151,7 +150,7 @@ private:
     const key_type &name,
     symbol_table_baset &function_symbol_table) const
   {
-    typename underlying_mapt::iterator it=goto_functions.find(name);
+    underlying_mapt::iterator it=goto_functions.find(name);
     if(it!=goto_functions.end())
       return *it;
     // Fill in symbol table entry body if not already done

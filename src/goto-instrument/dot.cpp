@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <sstream>
 
+#include <langapi/language_util.h>
+
 #define DOTGRAPHSETTINGS  "color=black;" \
                           "orientation=portrait;" \
                           "fontsize=20;"\
