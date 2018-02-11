@@ -234,8 +234,6 @@ protected:
   void convert_end_thread(const codet &code, goto_programt &dest);
   void convert_atomic_begin(const codet &code, goto_programt &dest);
   void convert_atomic_end(const codet &code, goto_programt &dest);
-  void convert_bp_enforce(const codet &code, goto_programt &dest);
-  void convert_bp_abortif(const codet &code, goto_programt &dest);
   void convert_msc_try_finally(const codet &code, goto_programt &dest);
   void convert_msc_try_except(const codet &code, goto_programt &dest);
   void convert_msc_leave(const codet &code, goto_programt &dest);

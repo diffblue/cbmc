@@ -515,10 +515,6 @@ void goto_convertt::convert(
     convert_atomic_begin(code, dest);
   else if(statement==ID_atomic_end)
     convert_atomic_end(code, dest);
-  else if(statement==ID_bp_enforce)
-    convert_bp_enforce(code, dest);
-  else if(statement==ID_bp_abortif)
-    convert_bp_abortif(code, dest);
   else if(statement==ID_cpp_delete ||
           statement=="cpp_delete[]")
     convert_cpp_delete(code, dest);
@@ -1602,88 +1598,6 @@ void goto_convertt::convert_atomic_end(
   }
 
   copy(code, ATOMIC_END, dest);
-}
-
-void goto_convertt::convert_bp_enforce(
-  const codet &code,
-  goto_programt &dest)
-{
-  if(code.operands().size()!=2)
-  {
-    error().source_location=code.find_source_location();
-    error() << "bp_enfroce expects two arguments" << eom;
-    throw 0;
-  }
-
-  // do an assume
-  exprt op=code.op0();
-
-  clean_expr(op, dest);
-
-  goto_programt::targett t=dest.add_instruction(ASSUME);
-  t->guard=op;
-  t->source_location=code.source_location();
-
-  // change the assignments
-
-  goto_programt tmp;
-  convert(to_code(code.op1()), tmp);
-
-  if(!op.is_true())
-  {
-    exprt constraint(op);
-    make_next_state(constraint);
-
-    Forall_goto_program_instructions(it, tmp)
-    {
-      if(it->is_assign())
-      {
-        assert(it->code.get(ID_statement)==ID_assign);
-
-        // add constrain
-        codet constrain(ID_bp_constrain);
-        constrain.reserve_operands(2);
-        constrain.move_to_operands(it->code);
-        constrain.copy_to_operands(constraint);
-        it->code.swap(constrain);
-
-        it->type=OTHER;
-      }
-      else if(it->is_other() &&
-              it->code.get(ID_statement)==ID_bp_constrain)
-      {
-        // add to constraint
-        assert(it->code.operands().size()==2);
-        it->code.op1()=
-          and_exprt(it->code.op1(), constraint);
-      }
-    }
-  }
-
-  dest.destructive_append(tmp);
-}
-
-void goto_convertt::convert_bp_abortif(
-  const codet &code,
-  goto_programt &dest)
-{
-  if(code.operands().size()!=1)
-  {
-    error().source_location=code.find_source_location();
-    error() << "bp_abortif expects one argument" << eom;
-    throw 0;
-  }
-
-  // do an assert
-  exprt op=code.op0();
-
-  clean_expr(op, dest);
-
-  op.make_not();
-
-  goto_programt::targett t=dest.add_instruction(ASSERT);
-  t->guard.swap(op);
-  t->source_location=code.source_location();
 }
 
 void goto_convertt::convert_ifthenelse(
