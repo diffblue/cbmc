@@ -11,10 +11,4 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "decision_procedure.h"
 
-#include <cassert>
 
-bool decision_proceduret::in_core(const exprt &expr)
-{
-  UNREACHABLE;
-  return true;
-}

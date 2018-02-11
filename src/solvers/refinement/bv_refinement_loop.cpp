@@ -101,7 +101,7 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
   }
 
   prop.set_assumptions(assumptions);
-  propt::resultt result=prop.prop_solve();
+  propt::resultt result=prop();
   prop.set_assumptions(parent_assumptions);
 
   switch(result)
