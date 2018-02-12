@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <json/json_parser.h>
 
 #include "interpreter_class.h"
+#include "json_goto_trace.h"
 #include "remove_returns.h"
 
 const std::size_t interpretert::npos=std::numeric_limits<size_t>::max();
@@ -151,8 +152,8 @@ void interpretert::command()
   }
   else if(ch=='j')
   {
-    jsont json_steps;
-    convert(ns, steps, json_steps);
+    json_arrayt json_steps;
+    convert<json_arrayt>(ns, steps, json_steps);
     ch=tolower(command[1]);
     if(ch==' ')
     {
