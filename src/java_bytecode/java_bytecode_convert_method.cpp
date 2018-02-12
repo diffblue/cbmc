@@ -2764,7 +2764,8 @@ void java_bytecode_convert_method(
   message_handlert &message_handler,
   size_t max_array_length,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
-  java_string_library_preprocesst &string_preprocess)
+  java_string_library_preprocesst &string_preprocess,
+  const class_hierarchyt &class_hierarchy)
 {
   static const std::unordered_set<std::string> methods_to_ignore
   {
@@ -2795,7 +2796,8 @@ void java_bytecode_convert_method(
     message_handler,
     max_array_length,
     needed_lazy_methods,
-    string_preprocess);
+    string_preprocess,
+    class_hierarchy);
 
   java_bytecode_convert_method(class_symbol, method);
 }
@@ -2803,11 +2805,19 @@ void java_bytecode_convert_method(
 /// Returns true iff method \p methodid from class \p classname is
 /// a method inherited from a class (and not an interface!) from which
 /// \p classname inherits, either directly or indirectly.
+/// \param classname: class whose method is referenced
+/// \param methodid: method basename
 bool java_bytecode_convert_methodt::is_method_inherited(
-  const irep_idt &classname, const irep_idt &methodid) const
+  const irep_idt &classname,
+  const irep_idt &methodid) const
 {
   resolve_inherited_componentt::inherited_componentt inherited_method =
-    get_inherited_component(classname, methodid, classname, symbol_table);
+    get_inherited_component(
+      classname,
+      methodid,
+      classname,
+      symbol_table,
+      class_hierarchy);
   return inherited_method.is_valid();
 }
 

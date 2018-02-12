@@ -34,7 +34,8 @@ void java_bytecode_convert_method(
   message_handlert &message_handler,
   size_t max_array_length,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
-  java_string_library_preprocesst &string_preprocess);
+  java_string_library_preprocesst &string_preprocess,
+  const class_hierarchyt &class_hierarchy);
 
 void java_bytecode_convert_method_lazy(
   const symbolt &class_symbol,

@@ -336,15 +336,18 @@ std::string pretty_print_java_type(const std::string &fqn_java_type)
 ///   component. The user class is relevant when determining whether package-
 ///   scoped components are visible from a particular use site.
 /// \param symbol_table: global symbol table.
+/// \param class_hierarchy: global class hierarchy.
 /// \return the concrete component referred to if any is found, or an invalid
 ///   resolve_inherited_componentt::inherited_componentt otherwise.
 resolve_inherited_componentt::inherited_componentt get_inherited_component(
   const irep_idt &component_class_id,
   const irep_idt &component_name,
   const irep_idt &user_class_id,
-  const symbol_tablet &symbol_table)
+  const symbol_tablet &symbol_table,
+  const class_hierarchyt &class_hierarchy)
 {
-  resolve_inherited_componentt component_resolver(symbol_table);
+  resolve_inherited_componentt component_resolver(
+    symbol_table, class_hierarchy);
   const resolve_inherited_componentt::inherited_componentt resolved_component =
     component_resolver(component_class_id, component_name);
 

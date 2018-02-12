@@ -426,9 +426,11 @@ static void create_stub_global_symbol(
 /// static fields, and nondet-initialised for primitives.
 /// \param parse_tree: class bytecode
 /// \param symbol_table: symbol table; may gain new symbols
+/// \param class_hierarchy: global class hierarchy
 static void create_stub_global_symbols(
   const java_bytecode_parse_treet &parse_tree,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  const class_hierarchyt &class_hierarchy)
 {
   namespacet ns(symbol_table);
   for(const auto &method : parse_tree.parsed_class.methods)
@@ -454,7 +456,8 @@ static void create_stub_global_symbols(
             class_id,
             component,
             "java::" + id2string(parse_tree.parsed_class.name),
-            symbol_table);
+            symbol_table,
+            class_hierarchy);
         if(!referred_component.is_valid())
         {
           irep_idt identifier =
@@ -523,6 +526,10 @@ bool java_bytecode_languaget::typecheck(
       return true;
   }
 
+  // Now that all classes have been created in the symbol table we can populate
+  // the class hierarchy:
+  class_hierarchy(symbol_table);
+
   // find and mark all implicitly generic class types
   // this can only be done once all the class symbols have been created
   for(const auto &c : java_class_loader.class_map)
@@ -582,7 +589,8 @@ bool java_bytecode_languaget::typecheck(
       journalling_symbol_tablet::wrap(symbol_table);
     for(const auto &c : java_class_loader.class_map)
     {
-      create_stub_global_symbols(c.second, symbol_table_journal);
+      create_stub_global_symbols(
+        c.second, symbol_table_journal, class_hierarchy);
     }
 
     stub_global_initializer_factory.create_stub_global_initializer_symbols(
@@ -875,7 +883,8 @@ bool java_bytecode_languaget::convert_single_method(
       get_message_handler(),
       max_user_array_length,
       std::move(needed_lazy_methods),
-      string_preprocess);
+      string_preprocess,
+      class_hierarchy);
     return false;
   }
 
