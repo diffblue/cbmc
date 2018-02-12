@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "source_location.h"
 #include "xml.h"
 
+class json_stream_arrayt;
+
 class message_handlert
 {
 public:
@@ -31,6 +33,12 @@ public:
   virtual void print(unsigned level, const xmlt &xml)
   {
     // no-op by default
+  }
+
+  /// Return the underlying JSON stream
+  virtual json_stream_arrayt &get_json_stream()
+  {
+    UNREACHABLE;
   }
 
   virtual void print(unsigned level, const jsont &json)
@@ -230,6 +238,13 @@ public:
     mstreamt &operator << (mstreamt &(*func)(mstreamt &))
     {
       return func(*this);
+    }
+
+    /// Returns a reference to the top-level JSON array stream
+    json_stream_arrayt &json_stream()
+    {
+      *this << eom; // force end of previous message
+      return message.message_handler->get_json_stream();
     }
 
   private:
