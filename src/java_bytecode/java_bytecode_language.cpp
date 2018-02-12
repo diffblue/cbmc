@@ -460,15 +460,29 @@ static void create_stub_global_symbols(
             class_hierarchy);
         if(!referred_component.is_valid())
         {
+          // Create a new stub global on the first incomplete (stub) parent of
+          // the class that was referred to:
+          irep_idt add_to_class_id = class_id;
+          while(!symbol_table.lookup_ref(add_to_class_id).type.get_bool(
+                  ID_incomplete_class))
+          {
+            const class_hierarchyt::idst &parents =
+              class_hierarchy.class_map.at(add_to_class_id).parents;
+            INVARIANT(
+              !parents.empty(),
+              "unresolved global reference should come from incomplete class");
+            add_to_class_id = parents[0];
+          }
+
           irep_idt identifier =
-            id2string(class_id) + "." + id2string(component);
+            id2string(add_to_class_id) + "." + id2string(component);
 
           create_stub_global_symbol(
             symbol_table,
             identifier,
             component,
             instruction.args[0].type(),
-            class_id);
+            add_to_class_id);
         }
       }
     }
