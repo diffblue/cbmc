@@ -12,8 +12,9 @@
 #include <util/cmdline.h>
 #include <util/config.h>
 #include <util/journalling_symbol_table.h>
-#include <util/language.h>
 #include <util/unicode.h>
+
+#include <langapi/language.h>
 
 #include <fstream>
 

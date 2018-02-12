@@ -14,8 +14,9 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include <memory>
 
-#include <util/language.h>
 #include <util/make_unique.h>
+
+#include <langapi/language.h>
 
 #include "jsil_parse_tree.h"
 

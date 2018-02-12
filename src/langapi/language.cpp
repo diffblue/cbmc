@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "language.h"
 
-#include "expr.h"
+#include <util/expr.h>
 #include <util/symbol.h>
 #include <util/symbol_table.h>
 #include <util/prefix.h>

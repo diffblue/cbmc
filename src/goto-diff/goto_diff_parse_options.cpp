@@ -18,9 +18,10 @@ Author: Peter Schrammel
 
 #include <util/string2int.h>
 #include <util/config.h>
-#include <util/language.h>
 #include <util/options.h>
 #include <util/make_unique.h>
+
+#include <langapi/language.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>

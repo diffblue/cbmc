@@ -35,8 +35,6 @@ SRC = arith_tools.cpp \
       json.cpp \
       json_expr.cpp \
       json_irep.cpp \
-      language.cpp \
-      language_file.cpp \
       lispexpr.cpp \
       lispirep.cpp \
       memory_info.cpp \

@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 
-#ifndef CPROVER_UTIL_LANGUAGE_FILE_H
-#define CPROVER_UTIL_LANGUAGE_FILE_H
+#ifndef CPROVER_LANGAPI_LANGUAGE_FILE_H
+#define CPROVER_LANGAPI_LANGUAGE_FILE_H
 
 #include <iosfwd>
 #include <set>
@@ -16,8 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <memory> // unique_ptr
 
-#include "message.h"
-#include "symbol_table.h"
+#include <util/message.h>
+#include <util/symbol_table.h>
+
 #include "language.h"
 
 class language_filet;

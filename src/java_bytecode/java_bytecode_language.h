@@ -12,9 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <memory>
 
-#include <util/language.h>
 #include <util/cmdline.h>
 #include <util/make_unique.h>
+
+#include <langapi/language.h>
 
 #include "ci_lazy_methods.h"
 #include "ci_lazy_methods_needed.h"

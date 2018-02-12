@@ -14,7 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
-#include <util/language.h>
+
+#include <langapi/language.h>
 
 #include <analyses/goto_check.h>
 

@@ -7,10 +7,12 @@
 #define CPROVER_GOTO_PROGRAMS_LAZY_GOTO_FUNCTIONS_MAP_H
 
 #include <unordered_set>
+
 #include "goto_functions.h"
 #include "goto_convert_functions.h"
+
 #include <util/message.h>
-#include <util/language_file.h>
+#include <langapi/language_file.h>
 #include <util/journalling_symbol_table.h>
 
 /// Provides a wrapper for a map of lazily loaded goto_functiont.

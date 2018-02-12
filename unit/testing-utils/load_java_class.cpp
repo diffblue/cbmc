@@ -11,7 +11,6 @@
 #include <iostream>
 
 #include <util/config.h>
-#include <util/language.h>
 #include <util/options.h>
 #include <util/suffix.h>
 

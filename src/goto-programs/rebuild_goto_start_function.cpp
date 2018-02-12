@@ -8,12 +8,14 @@
 
 #include "rebuild_goto_start_function.h"
 
-#include <util/language.h>
 #include <util/symbol.h>
 #include <util/symbol_table.h>
 #include <util/prefix.h>
 #include <util/cmdline.h>
+
 #include <langapi/mode.h>
+#include <langapi/language.h>
+
 #include <memory>
 
 /// To rebuild the _start function in the event the program was compiled into

@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <cstring>
 #endif
 
-#include <util/language.h>
+#include "language.h"
 
 struct language_entryt
 {

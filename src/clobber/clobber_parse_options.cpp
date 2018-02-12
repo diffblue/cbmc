@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/string2int.h>
 #include <util/config.h>
-#include <util/language.h>
 #include <util/options.h>
 #include <util/memory_info.h>
 

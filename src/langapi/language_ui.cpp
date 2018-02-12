@@ -13,11 +13,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 
 #include <util/namespace.h>
-#include <util/language.h>
 #include <util/cmdline.h>
 #include <util/config.h>
 #include <util/unicode.h>
 
+#include "language.h"
 #include "mode.h"
 
 /// Constructor
