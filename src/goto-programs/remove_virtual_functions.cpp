@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "class_hierarchy.h"
 #include "class_identifier.h"
 
-#include <goto-programs/resolve_concrete_function_call.h>
+#include <goto-programs/resolve_inherited_component.h>
 
 #include <util/c_types.h>
 #include <util/prefix.h>
@@ -48,7 +48,7 @@ protected:
 
   void get_functions(const exprt &, dispatch_table_entriest &);
   typedef std::function<
-    resolve_concrete_function_callt::concrete_function_callt(
+    resolve_inherited_componentt::inherited_componentt(
       const irep_idt &,
       const irep_idt &)>
     function_call_resolvert;
@@ -343,13 +343,14 @@ void remove_virtual_functionst::get_child_functions_rec(
     }
     if(function.symbol_expr == symbol_exprt())
     {
-      const resolve_concrete_function_callt::concrete_function_callt
+      const resolve_inherited_componentt::inherited_componentt
         &resolved_call = resolve_function_call(child, component_name);
       if(resolved_call.is_valid())
       {
         function.class_id = resolved_call.get_class_identifier();
         const symbolt &called_symbol =
-          symbol_table.lookup_ref(resolved_call.get_virtual_method_name());
+          symbol_table.lookup_ref(
+            resolved_call.get_full_component_identifier());
 
         function.symbol_expr = called_symbol.symbol_expr();
         function.symbol_expr.set(
@@ -384,7 +385,7 @@ void remove_virtual_functionst::get_functions(
   const std::string function_name_string(id2string(function_name));
   INVARIANT(!class_id.empty(), "All virtual functions must have a class");
 
-  resolve_concrete_function_callt get_virtual_call_target(
+  resolve_inherited_componentt get_virtual_call_target(
     symbol_table, class_hierarchy);
   const function_call_resolvert resolve_function_call =
     [&get_virtual_call_target](
@@ -392,7 +393,7 @@ void remove_virtual_functionst::get_functions(
       return get_virtual_call_target(class_id, function_name);
     };
 
-  const resolve_concrete_function_callt::concrete_function_callt
+  const resolve_inherited_componentt::inherited_componentt
     &resolved_call = get_virtual_call_target(class_id, function_name);
 
   dispatch_table_entryt root_function;
@@ -402,7 +403,7 @@ void remove_virtual_functionst::get_functions(
     root_function.class_id=resolved_call.get_class_identifier();
 
     const symbolt &called_symbol =
-      symbol_table.lookup_ref(resolved_call.get_virtual_method_name());
+      symbol_table.lookup_ref(resolved_call.get_full_component_identifier());
 
     root_function.symbol_expr=called_symbol.symbol_expr();
     root_function.symbol_expr.set(
@@ -454,7 +455,7 @@ exprt remove_virtual_functionst::get_method(
   const irep_idt &component_name) const
 {
   const irep_idt &id=
-    resolve_concrete_function_callt::build_virtual_method_name(
+    resolve_inherited_componentt::build_full_component_identifier(
       class_id, component_name);
 
   const symbolt *symbol;

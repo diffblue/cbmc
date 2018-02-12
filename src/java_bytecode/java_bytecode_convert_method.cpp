@@ -36,7 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/cfg.h>
 #include <goto-programs/remove_exceptions.h>
 #include <goto-programs/class_hierarchy.h>
-#include <goto-programs/resolve_concrete_function_call.h>
+#include <goto-programs/resolve_inherited_component.h>
 #include <analyses/cfg_dominators.h>
 
 #include <limits>
@@ -2806,9 +2806,9 @@ void java_bytecode_convert_method(
 bool java_bytecode_convert_methodt::is_method_inherited(
   const irep_idt &classname, const irep_idt &methodid) const
 {
-  resolve_concrete_function_callt call_resolver(symbol_table);
-  const resolve_concrete_function_callt ::concrete_function_callt &
-    resolved_call=call_resolver(classname, methodid);
+  resolve_inherited_componentt call_resolver(symbol_table);
+  const resolve_inherited_componentt::inherited_componentt resolved_call =
+    call_resolver(classname, methodid);
 
   // resolved_call is a pair (class-name, method-name) found by walking the
   // chain of class inheritance (not interfaces!) and stopping on the first
@@ -2817,7 +2817,7 @@ bool java_bytecode_convert_methodt::is_method_inherited(
   if(resolved_call.is_valid())
   {
     const symbolt &function_symbol=
-      *symbol_table.lookup(resolved_call.get_virtual_method_name());
+      *symbol_table.lookup(resolved_call.get_full_component_identifier());
 
     INVARIANT(function_symbol.type.id()==ID_code, "Function must be code");
 
