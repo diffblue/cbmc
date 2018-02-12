@@ -18,7 +18,7 @@
 /// access to goto programs while they are still under construction.
 /// The intended workflow:
 /// 1. The front-end registers the functions that are potentially
-///   available, probably by use of util/language_files.h
+///   available, probably by use of langapi/language_file.h
 /// 2. The main function registers functions that should be run on
 ///   each program, in sequence, after it is converted.
 /// 3. Analyses will then access functions using the `at` function
