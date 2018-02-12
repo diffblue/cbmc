@@ -325,3 +325,82 @@ std::string pretty_print_java_type(const std::string &fqn_java_type)
     result = result.substr(java_lang_string.length());
   return result;
 }
+
+/// Finds an inherited component (method or field), taking component visibility
+/// into account.
+/// \param component_class_id: class to start searching from. For example, if
+///   trying to resolve a reference to A.b, component_class_id is "A".
+/// \param component_name: component basename to search for. If searching for
+///   A.b, this is "b".
+/// \param user_class_id: class identifier making reference to the sought
+///   component. The user class is relevant when determining whether package-
+///   scoped components are visible from a particular use site.
+/// \param symbol_table: global symbol table.
+/// \return the concrete component referred to if any is found, or an invalid
+///   resolve_inherited_componentt::inherited_componentt otherwise.
+resolve_inherited_componentt::inherited_componentt get_inherited_component(
+  const irep_idt &component_class_id,
+  const irep_idt &component_name,
+  const irep_idt &user_class_id,
+  const symbol_tablet &symbol_table)
+{
+  resolve_inherited_componentt component_resolver(symbol_table);
+  const resolve_inherited_componentt::inherited_componentt resolved_component =
+    component_resolver(component_class_id, component_name);
+
+  // resolved_component is a pair (class-name, component-name) found by walking
+  // the chain of class inheritance (not interfaces!) and stopping on the first
+  // class that contains a component of equal name and type to `component_name`
+
+  if(resolved_component.is_valid())
+  {
+    // Directly defined on the class referred to?
+    if(component_class_id == resolved_component.get_class_identifier())
+      return resolved_component;
+
+    // No, may be inherited from some parent class; check it is visible:
+    const symbolt &component_symbol=
+      *symbol_table.lookup(resolved_component.get_full_component_identifier());
+
+    const auto &access=component_symbol.type.get(ID_access);
+    if(access==ID_public || access==ID_protected)
+    {
+      // since the component is public, it is inherited
+      return resolved_component;
+    }
+
+    // components with the default access modifier are only
+    // accessible within the same package.
+    if(access==ID_default)
+    {
+      const std::string &class_package=
+        java_class_to_package(id2string(component_class_id));
+      const std::string &component_package=
+        java_class_to_package(
+          id2string(
+            resolved_component.get_class_identifier()));
+      if(component_package == class_package)
+        return resolved_component;
+      else
+        return resolve_inherited_componentt::inherited_componentt();
+    }
+
+    if(access==ID_private)
+    {
+      // We return not-found because the component found by the
+      // component_resolver above proves that `component_name` cannot be
+      // inherited (assuming that the original Java code compiles). This is
+      // because, as we walk the inheritance chain for `classname` from Object
+      // to `classname`, a component can only become "more accessible". So, if
+      // the last occurrence is private, all others before must be private as
+      // well, and none is inherited in `classname`.
+      return resolve_inherited_componentt::inherited_componentt();
+    }
+
+    UNREACHABLE; // Unexpected access modifier
+  }
+  else
+  {
+    return resolve_inherited_componentt::inherited_componentt();
+  }
+}
