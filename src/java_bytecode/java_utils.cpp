@@ -362,7 +362,10 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
     const symbolt &component_symbol=
       *symbol_table.lookup(resolved_component.get_full_component_identifier());
 
-    const auto &access=component_symbol.type.get(ID_access);
+    irep_idt access = component_symbol.type.get(ID_access);
+    if(access.empty())
+      access = component_symbol.type.get(ID_C_access);
+
     if(access==ID_public || access==ID_protected)
     {
       // since the component is public, it is inherited

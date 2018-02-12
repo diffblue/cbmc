@@ -448,10 +448,18 @@ static void create_stub_global_symbols(
         irep_idt class_id = instruction.args[0].get_string(ID_class);
         INVARIANT(
           !class_id.empty(), "get/putstatic should specify a class");
-        irep_idt identifier = id2string(class_id) + "." + id2string(component);
 
-        if(!symbol_table.has_symbol(identifier))
+        resolve_inherited_componentt::inherited_componentt referred_component =
+          get_inherited_component(
+            class_id,
+            component,
+            "java::" + id2string(parse_tree.parsed_class.name),
+            symbol_table);
+        if(!referred_component.is_valid())
         {
+          irep_idt identifier =
+            id2string(class_id) + "." + id2string(component);
+
           create_stub_global_symbol(
             symbol_table,
             identifier,
