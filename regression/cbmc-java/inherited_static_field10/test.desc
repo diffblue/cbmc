@@ -1,0 +1,11 @@
+CORE
+Test.class
+
+Stub static field x found for non-stub type java::Test\. In future this will be a fatal error\.
+assertion at file Test\.java line 6 .* FAILURE
+^VERIFICATION FAILED$
+--
+Stub static field x found for non-stub type java::Parent\. In future this will be a fatal error\.
+--
+This test is the same as inherited_static_field9, except that the version of Parent we run against
+has a private static field that Test's 'x' cannot be referring to.

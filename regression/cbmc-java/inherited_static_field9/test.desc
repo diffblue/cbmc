@@ -1,0 +1,13 @@
+CORE
+Test.class
+
+Stub static field x found for non-stub type java::Test\. In future this will be a fatal error\.
+Stub static field x found for non-stub type java::Parent\. In future this will be a fatal error\.
+assertion at file Test\.java line 6 .* FAILURE
+^VERIFICATION FAILED$
+--
+--
+This tests the corner case where static fields are found on non-stub types, here caused
+by compiling Test.class against a version of Parent.class (in directory compile_against)
+that has a static field but then analysing it with one that doesn't have that field.
+In future, as the warning messages we check for note, this will be a fatal error.

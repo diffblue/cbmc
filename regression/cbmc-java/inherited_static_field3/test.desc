@@ -1,0 +1,7 @@
+CORE
+Test.class
+
+^VERIFICATION SUCCESSFUL$
+--
+--
+This is the same as test inherited_static_field1, except Test's parent is opaque.

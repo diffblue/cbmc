@@ -1,0 +1,9 @@
+CORE
+Test.class
+
+assertion at file Test\.java line 6 .* FAILURE
+^VERIFICATION FAILED$
+--
+--
+This checks that jbmc knows that the hidden field Grandparent.x is not the same
+as Test.x, which resolves to Parent.x.

@@ -25,6 +25,7 @@ SRC += unit_tests.cpp \
        miniBDD_new.cpp \
        java_bytecode/java_string_library_preprocess/convert_exprt_to_string_exprt.cpp \
        java_bytecode/java_utils_test.cpp \
+       java_bytecode/inherited_static_fields/inherited_static_fields.cpp \
        pointer-analysis/custom_value_set_analysis.cpp \
        sharing_node.cpp \
        solvers/refinement/string_constraint_generator_valueof/calculate_max_string_length.cpp \

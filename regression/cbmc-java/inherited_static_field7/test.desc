@@ -1,0 +1,9 @@
+CORE
+Test.class
+
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test must pass, as there is only one opaque parent (interface_with_static).
+In particular this one makes sure we don't identify Object as opaque and guess that
+java.lang.Object.x exists (since we know Object doesn't have static fields).

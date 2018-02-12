@@ -1,0 +1,8 @@
+CORE
+Test.class
+
+^VERIFICATION SUCCESSFUL$
+--
+--
+This checks that jbmc knows that Test.x and InterfaceWithStatic.x are the same field.
+All types are concrete (not stubs).
