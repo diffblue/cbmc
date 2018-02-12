@@ -405,6 +405,10 @@ static void create_stub_global_symbol(
   new_symbol.base_name = symbol_basename;
   new_symbol.type = symbol_type;
   new_symbol.type.set(ID_C_class, class_id);
+  // Public access is a guess; it encourages merging like-typed static fields,
+  // whereas a more restricted visbility would encourage separating them.
+  // Neither is correct, as without the class file we can't know the truth.
+  new_symbol.type.set(ID_C_access, ID_public);
   new_symbol.pretty_name = new_symbol.name;
   new_symbol.mode = ID_java;
   new_symbol.is_type = false;
