@@ -28,11 +28,6 @@ class symbolt;
 class typet;
 class namespacet;
 
-/// \deprecated This function will eventually be removed. Use functions
-/// from \ref util/std_expr.h instead.
-
-void make_next_state(exprt &);
-
 /// splits an expression with >=3 operands into nested binary expressions
 exprt make_binary(const exprt &);
 

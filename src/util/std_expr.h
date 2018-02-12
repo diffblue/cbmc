@@ -3837,11 +3837,6 @@ inline void validate_expr(const array_update_exprt &value)
 class member_exprt:public unary_exprt
 {
 public:
-  // deprecated, and will go away -- use either of the two below
-  explicit member_exprt(const typet &_type):unary_exprt(ID_member, _type)
-  {
-  }
-
   member_exprt(
     const exprt &op,
     const irep_idt &component_name,

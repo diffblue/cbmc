@@ -52,9 +52,6 @@ public:
     return dec_solve();
   }
 
-  // old-style, will go away
-  virtual bool in_core(const exprt &expr);
-
   // return a textual description of the decision procedure
   virtual std::string decision_procedure_text() const=0;
 

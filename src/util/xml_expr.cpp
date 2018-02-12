@@ -159,7 +159,8 @@ xmlt xml(
       std::size_t width=to_bitvector_type(type).get_width();
 
       result.name="integer";
-      result.set_attribute("binary", expr.get_string(ID_value));
+      result.set_attribute("binary",
+        id2string(to_constant_expr(expr).get_value()));
       result.set_attribute("width", width);
 
       const typet &underlying_type=
@@ -182,7 +183,7 @@ xmlt xml(
         result.set_attribute("c_type", sig+"long long int");
 
       mp_integer i;
-      if(!to_integer(expr, i))
+      if(!to_integer(to_constant_expr(expr), i))
         result.data=integer2string(i);
     }
     else if(type.id()==ID_c_enum)
@@ -193,7 +194,7 @@ xmlt xml(
       result.set_attribute("c_type", "enum");
 
       mp_integer i;
-      if(!to_integer(expr, i))
+      if(!to_integer(to_constant_expr(expr), i))
         result.data=integer2string(i);
     }
     else if(type.id()==ID_c_enum_tag)
