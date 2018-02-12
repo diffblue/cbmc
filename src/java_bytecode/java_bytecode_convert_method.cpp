@@ -1996,7 +1996,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const auto &field_name=arg0.get_string(ID_component_name);
       const bool is_assertions_disabled_field=
         field_name.find("$assertionsDisabled")!=std::string::npos;
-      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
+
+      symbol_expr.set_identifier(
+        get_static_field(arg0.get_string(ID_class), field_name));
 
       INVARIANT(
         symbol_table.has_symbol(symbol_expr.get_identifier()),
@@ -2025,6 +2027,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
       results[0]=java_bytecode_promotion(symbol_expr);
 
+      // Note this initialiser call deliberately inits the class used to make
+      // the reference, which may be a child of the class that actually defines
+      // the field.
       codet clinit_call=get_clinit_call(arg0.get_string(ID_class));
       if(clinit_call.get_statement()!=ID_skip)
         c=clinit_call;
@@ -2052,7 +2057,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(op.size()==1 && results.empty());
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
-      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
+      symbol_expr.set_identifier(
+        get_static_field(arg0.get_string(ID_class), field_name));
 
       INVARIANT(
         symbol_table.has_symbol(symbol_expr.get_identifier()),
@@ -2067,6 +2073,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_blockt block;
       block.add_source_location()=i_it->source_location;
 
+      // Note this initialiser call deliberately inits the class used to make
+      // the reference, which may be a child of the class that actually defines
+      // the field.
       codet clinit_call=get_clinit_call(arg0.get_string(ID_class));
       if(clinit_call.get_statement()!=ID_skip)
         block.move_to_operands(clinit_call);
@@ -2820,6 +2829,30 @@ bool java_bytecode_convert_methodt::is_method_inherited(
       class_hierarchy,
       false);
   return inherited_method.is_valid();
+}
+
+/// Get static field identifier referred to by `class_identifier.component_name`
+/// Note this may be inherited from either a parent or an interface.
+/// \param class_identifier: class used to refer to the field
+/// \param component_name: component (static field) name
+/// \return identifier of the actual concrete field referred to
+irep_idt java_bytecode_convert_methodt::get_static_field(
+  const irep_idt &class_identifier,
+  const irep_idt &component_name) const
+{
+  resolve_inherited_componentt::inherited_componentt inherited_method =
+    get_inherited_component(
+      class_identifier,
+      component_name,
+      symbol_table.lookup_ref(current_method).type.get(ID_C_class),
+      symbol_table,
+      class_hierarchy,
+      true);
+
+  INVARIANT(
+    inherited_method.is_valid(), "static field should be in symbol table");
+
+  return inherited_method.get_full_component_identifier();
 }
 
 /// create temporary variables if a write instruction can have undesired side-

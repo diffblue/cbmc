@@ -257,6 +257,9 @@ protected:
     const irep_idt &classname,
     const irep_idt &methodid) const;
 
+  irep_idt get_static_field(
+    const irep_idt &class_identifier, const irep_idt &component_name) const;
+
   enum class bytecode_write_typet { VARIABLE, ARRAY_REF, STATIC_FIELD, FIELD};
   void save_stack_entries(
     const std::string &,
