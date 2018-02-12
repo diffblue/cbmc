@@ -420,6 +420,39 @@ static void create_stub_global_symbol(
     !add_failed, "caller should have checked symbol not already in table");
 }
 
+/// Find any incomplete ancestor of a given class
+/// \param start_class_id: class to start searching from
+/// \param symbol_table: global symbol table
+/// \param class_hierarchy: global class hierarchy
+/// \return first incomplete ancestor encountered,
+///   including start_class_id itself.
+static irep_idt get_any_incomplete_ancestor(
+  const irep_idt &start_class_id,
+  const symbol_tablet &symbol_table,
+  const class_hierarchyt &class_hierarchy)
+{
+  // Depth-first search: return the first ancestor with ID_incomplete_class, or
+  // irep_idt() if none found.
+  std::vector<irep_idt> classes_to_check;
+  classes_to_check.push_back(start_class_id);
+
+  while(!classes_to_check.empty())
+  {
+    irep_idt to_check = classes_to_check.back();
+    classes_to_check.pop_back();
+
+    if(symbol_table.lookup_ref(to_check).type.get_bool(ID_incomplete_class))
+      return to_check;
+
+    const class_hierarchyt::idst &parents =
+      class_hierarchy.class_map.at(to_check).parents;
+    classes_to_check.insert(
+      classes_to_check.end(), parents.begin(), parents.end());
+  }
+
+  INVARIANT(false, "input class id should have some incomplete ancestor");
+}
+
 /// Search for getstatic and putstatic instructions in a class' bytecode and
 /// create stub symbols for any static fields that aren't already in the symbol
 /// table. The new symbols are null-initialised for reference-typed globals /
@@ -463,19 +496,12 @@ static void create_stub_global_symbols(
             true);
         if(!referred_component.is_valid())
         {
-          // Create a new stub global on the first incomplete (stub) parent of
-          // the class that was referred to:
-          irep_idt add_to_class_id = class_id;
-          while(!symbol_table.lookup_ref(add_to_class_id).type.get_bool(
-                  ID_incomplete_class))
-          {
-            const class_hierarchyt::idst &parents =
-              class_hierarchy.class_map.at(add_to_class_id).parents;
-            INVARIANT(
-              !parents.empty(),
-              "unresolved global reference should come from incomplete class");
-            add_to_class_id = parents[0];
-          }
+          // Create a new stub global on an arbitrary incomplete ancestor of the
+          // class that was referred to. This is just a guess, but we have no
+          // better information to go on.
+          irep_idt add_to_class_id =
+            get_any_incomplete_ancestor(
+              class_id, symbol_table, class_hierarchy);
 
           irep_idt identifier =
             id2string(add_to_class_id) + "." + id2string(component);
