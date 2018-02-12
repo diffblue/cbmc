@@ -437,13 +437,20 @@ bool c_preprocess_visual_studio(
       // yes, both _WIN32 and _WIN64 get defined
       command_file << "/D_WIN64" << "\n";
     }
+    else if(config.ansi_c.int_width == 16 && config.ansi_c.pointer_width == 32)
+    {
+      // 16-bit LP32 is an artificial architecture we simulate when using --16
+      DATA_INVARIANT(
+        pointer_diff_type() == signed_long_int_type(),
+        "Pointer difference expected to be long int typed");
+      command_file << "/D__PTRDIFF_TYPE__=long" << '\n';
+    }
     else
     {
       DATA_INVARIANT(
         pointer_diff_type()==signed_int_type(),
         "Pointer difference expected to be int typed");
       command_file << "/D__PTRDIFF_TYPE__=int" << "\n";
-      command_file << "/U_WIN64" << "\n";
     }
 
     if(config.ansi_c.char_is_unsigned)

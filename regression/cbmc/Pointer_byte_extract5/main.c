@@ -1,4 +1,4 @@
-#include <stdlib.h>
+void *malloc(__CPROVER_size_t);
 
 typedef union
 {

@@ -1,5 +1,6 @@
-#include <stdlib.h>
 #include <assert.h>
+
+void *malloc(__CPROVER_size_t);
 
 int main(int argc, char** argv)
 {
