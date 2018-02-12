@@ -57,7 +57,9 @@ public:
   };
 
   inherited_componentt operator()(
-    const irep_idt &class_id, const irep_idt &component_name);
+    const irep_idt &class_id,
+    const irep_idt &component_name,
+    bool include_interfaces);
 
   static irep_idt build_full_component_identifier(
     const irep_idt &class_name, const irep_idt &component_name);

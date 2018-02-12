@@ -337,6 +337,8 @@ std::string pretty_print_java_type(const std::string &fqn_java_type)
 ///   scoped components are visible from a particular use site.
 /// \param symbol_table: global symbol table.
 /// \param class_hierarchy: global class hierarchy.
+/// \param include_interfaces: if true, search for the given component in all
+///   ancestors including interfaces, rather than just parents.
 /// \return the concrete component referred to if any is found, or an invalid
 ///   resolve_inherited_componentt::inherited_componentt otherwise.
 resolve_inherited_componentt::inherited_componentt get_inherited_component(
@@ -344,12 +346,13 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
   const irep_idt &component_name,
   const irep_idt &user_class_id,
   const symbol_tablet &symbol_table,
-  const class_hierarchyt &class_hierarchy)
+  const class_hierarchyt &class_hierarchy,
+  bool include_interfaces)
 {
   resolve_inherited_componentt component_resolver(
     symbol_table, class_hierarchy);
   const resolve_inherited_componentt::inherited_componentt resolved_component =
-    component_resolver(component_class_id, component_name);
+    component_resolver(component_class_id, component_name, include_interfaces);
 
   // resolved_component is a pair (class-name, component-name) found by walking
   // the chain of class inheritance (not interfaces!) and stopping on the first

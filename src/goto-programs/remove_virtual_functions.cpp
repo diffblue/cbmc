@@ -390,11 +390,11 @@ void remove_virtual_functionst::get_functions(
   const function_call_resolvert resolve_function_call =
     [&get_virtual_call_target](
       const irep_idt &class_id, const irep_idt &function_name) {
-      return get_virtual_call_target(class_id, function_name);
+    return get_virtual_call_target(class_id, function_name, false);
     };
 
   const resolve_inherited_componentt::inherited_componentt
-    &resolved_call = get_virtual_call_target(class_id, function_name);
+    &resolved_call = get_virtual_call_target(class_id, function_name, false);
 
   dispatch_table_entryt root_function;
 

@@ -2817,7 +2817,8 @@ bool java_bytecode_convert_methodt::is_method_inherited(
       methodid,
       classname,
       symbol_table,
-      class_hierarchy);
+      class_hierarchy,
+      false);
   return inherited_method.is_valid();
 }
 

@@ -451,13 +451,16 @@ static void create_stub_global_symbols(
         INVARIANT(
           !class_id.empty(), "get/putstatic should specify a class");
 
+        // The final 'true' parameter here includes interfaces, as they can
+        // define static fields.
         resolve_inherited_componentt::inherited_componentt referred_component =
           get_inherited_component(
             class_id,
             component,
             "java::" + id2string(parse_tree.parsed_class.name),
             symbol_table,
-            class_hierarchy);
+            class_hierarchy,
+            true);
         if(!referred_component.is_valid())
         {
           // Create a new stub global on the first incomplete (stub) parent of

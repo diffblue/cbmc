@@ -103,6 +103,7 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
   const irep_idt &component_name,
   const irep_idt &user_class_id,
   const symbol_tablet &symbol_table,
-  const class_hierarchyt &class_hierarchy);
+  const class_hierarchyt &class_hierarchy,
+  bool include_interfaces);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

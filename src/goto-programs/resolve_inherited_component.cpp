@@ -40,17 +40,25 @@ resolve_inherited_componentt::resolve_inherited_componentt(
 /// \param class_id: The name of the class the function is being called on
 /// \param component_name: The base name of the component (i.e. without the
 ///   class specifier)
+/// \param include_interfaces: If true, consider inheritence from interfaces
+///   (parent types other than the first listed)
 /// \return The concrete component that has been resolved
 resolve_inherited_componentt::inherited_componentt
   resolve_inherited_componentt::operator()(
-    const irep_idt &class_id, const irep_idt &component_name)
+    const irep_idt &class_id,
+    const irep_idt &component_name,
+    bool include_interfaces)
 {
   PRECONDITION(!class_id.empty());
   PRECONDITION(!component_name.empty());
 
-  irep_idt current_class=class_id;
-  while(!current_class.empty())
+  std::vector<irep_idt> classes_to_visit;
+  classes_to_visit.push_back(class_id);
+  while(!classes_to_visit.empty())
   {
+    irep_idt current_class = classes_to_visit.back();
+    classes_to_visit.pop_back();
+
     const irep_idt &full_component_identifier=
       build_full_component_identifier(current_class, component_name);
 
@@ -62,9 +70,16 @@ resolve_inherited_componentt::inherited_componentt
     const class_hierarchyt::idst &parents=
       class_hierarchy.class_map[current_class].parents;
 
-    if(parents.empty())
-      break;
-    current_class=parents.front();
+    if(include_interfaces)
+    {
+      classes_to_visit.insert(
+        classes_to_visit.end(), parents.begin(), parents.end());
+    }
+    else
+    {
+      if(!parents.empty())
+        classes_to_visit.push_back(parents.front());
+    }
   }
 
   return inherited_componentt();
