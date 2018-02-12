@@ -22,6 +22,7 @@ SRC = adjust_float_expressions.cpp \
       symex_decl.cpp \
       symex_dereference.cpp \
       symex_dereference_state.cpp \
+      symex_flatten_structs.cpp \
       symex_function_call.cpp \
       symex_goto.cpp \
       symex_main.cpp \
