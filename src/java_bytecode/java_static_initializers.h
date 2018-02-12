@@ -27,7 +27,8 @@ void create_static_initializer_wrappers(
   synthetic_methods_mapt &synthetic_methods);
 
 codet get_clinit_wrapper_body(
-  const irep_idt &function_id, const symbol_table_baset &symbol_table);
+  const irep_idt &function_id,
+  symbol_table_baset &symbol_table);
 
 class stub_global_initializer_factoryt
 {
