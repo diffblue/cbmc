@@ -106,4 +106,6 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
   const class_hierarchyt &class_hierarchy,
   bool include_interfaces);
 
+bool is_non_null_library_global(const irep_idt &);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

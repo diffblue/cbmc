@@ -390,12 +390,17 @@ static void generate_constant_global_variables(
 /// \param symbol_basename: new symbol basename
 /// \param symbol_type: new symbol type
 /// \param class_id: class id that directly encloses this static field
+/// \param force_nondet_init: if true, always leave the symbol's value nil so it
+///   gets nondet initialised during __CPROVER_initialize. Otherwise, pointer-
+///   typed globals are initialised null and we expect a synthetic clinit method
+///   to be created later.
 static void create_stub_global_symbol(
   symbol_table_baset &symbol_table,
   const irep_idt &symbol_id,
   const irep_idt &symbol_basename,
   const typet &symbol_type,
-  const irep_idt &class_id)
+  const irep_idt &class_id,
+  bool force_nondet_init)
 {
   symbolt new_symbol;
   new_symbol.is_static_lifetime = true;
@@ -415,7 +420,7 @@ static void create_stub_global_symbol(
   // If pointer-typed, initialise to null and a static initialiser will be
   // created to initialise on first reference. If primitive-typed, specify
   // nondeterministic initialisation by setting a nil value.
-  if(symbol_type.id() == ID_pointer)
+  if(symbol_type.id() == ID_pointer && !force_nondet_init)
     new_symbol.value = null_pointer_exprt(to_pointer_type(symbol_type));
   else
     new_symbol.value.make_nil();
@@ -454,7 +459,7 @@ static irep_idt get_any_incomplete_ancestor(
       classes_to_check.end(), parents.begin(), parents.end());
   }
 
-  INVARIANT(false, "input class id should have some incomplete ancestor");
+  return irep_idt();
 }
 
 /// Search for getstatic and putstatic instructions in a class' bytecode and
@@ -464,10 +469,13 @@ static irep_idt get_any_incomplete_ancestor(
 /// \param parse_tree: class bytecode
 /// \param symbol_table: symbol table; may gain new symbols
 /// \param class_hierarchy: global class hierarchy
+/// \param log: message handler used to log warnings when stub static fields are
+///   found belonging to non-stub classes.
 static void create_stub_global_symbols(
   const java_bytecode_parse_treet &parse_tree,
   symbol_table_baset &symbol_table,
-  const class_hierarchyt &class_hierarchy)
+  const class_hierarchyt &class_hierarchy,
+  messaget &log)
 {
   namespacet ns(symbol_table);
   for(const auto &method : parse_tree.parsed_class.methods)
@@ -507,6 +515,28 @@ static void create_stub_global_symbols(
             get_any_incomplete_ancestor(
               class_id, symbol_table, class_hierarchy);
 
+          // If there are no incomplete ancestors to ascribe the missing field
+          // to, we must have an incomplete model of a class or simply a
+          // version mismatch of some kind. Normally this would be an error, but
+          // our models library currently triggers this error in some cases
+          // (notably java.lang.System, which is missing System.in/out/err).
+          // Therefore for this case we ascribe the missing field to the class
+          // it was directly referenced from, and fall back to initialising the
+          // field in __CPROVER_initialize, rather than try to create or augment
+          // a clinit method for a non-stub class.
+
+          bool no_incomplete_ancestors = add_to_class_id.empty();
+          if(no_incomplete_ancestors)
+          {
+            add_to_class_id = class_id;
+
+            // TODO forbid this again once the models library has been checked
+            // for missing static fields.
+            log.warning() << "Stub static field " << component << " found for "
+                          << "non-stub type " << class_id << ". In future this "
+                          << "will be a fatal error." << messaget::eom;
+          }
+
           irep_idt identifier =
             id2string(add_to_class_id) + "." + id2string(component);
 
@@ -515,7 +545,8 @@ static void create_stub_global_symbols(
             identifier,
             component,
             instruction.args[0].type(),
-            add_to_class_id);
+            add_to_class_id,
+            no_incomplete_ancestors);
         }
       }
     }
@@ -637,7 +668,7 @@ bool java_bytecode_languaget::typecheck(
     for(const auto &c : java_class_loader.class_map)
     {
       create_stub_global_symbols(
-        c.second, symbol_table_journal, class_hierarchy);
+        c.second, symbol_table_journal, class_hierarchy, *this);
     }
 
     stub_global_initializer_factory.create_stub_global_initializer_symbols(

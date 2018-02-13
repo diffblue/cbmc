@@ -8,6 +8,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "java_static_initializers.h"
 #include "java_object_factory.h"
+#include "java_utils.h"
 #include <goto-programs/class_hierarchy.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
@@ -266,8 +267,20 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
   // Populate map from class id -> stub globals:
   for(const irep_idt &stub_global : stub_globals_set)
   {
+    const symbolt &global_symbol = symbol_table.lookup_ref(stub_global);
+    if(global_symbol.value.is_nil())
+    {
+      // This symbol is already nondet-initialised during __CPROVER_initialize
+      // (generated in java_static_lifetime_init). In future this will only
+      // be the case for primitive-typed fields, but for now reference-typed
+      // fields can also be treated this way in the exceptional case that they
+      // belong to a non-stub class. Skip the field, as it does not need a
+      // synthetic static initializer.
+      continue;
+    }
+
     const irep_idt class_id =
-      symbol_table.lookup_ref(stub_global).type.get(ID_C_class);
+      global_symbol.type.get(ID_C_class);
     INVARIANT(
       !class_id.empty(),
       "static field should be annotated with its defining class");
@@ -283,6 +296,9 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
   {
     const irep_idt static_init_name = clinit_function_name(it->first);
 
+    INVARIANT(
+      symbol_table.lookup_ref(it->first).type.get_bool(ID_incomplete_class),
+      "only incomplete classes should be given synthetic static initialisers");
     INVARIANT(
       !symbol_table.has_symbol(static_init_name),
       "a class cannot be both incomplete, and so have stub static fields, and "
@@ -313,20 +329,6 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
       "synthetic methods map should not already contain entry for "
       "stub static initializer");
   }
-}
-
-/// Check if a symbol is a well-known non-null global
-/// \param symbolid: symbol id to check
-/// \return true if this static field is known never to be null
-static bool is_non_null_library_global(const irep_idt &symbolid)
-{
-  static const std::unordered_set<irep_idt, irep_id_hash> non_null_globals =
-  {
-    "java::java.lang.System.out",
-    "java::java.lang.System.err",
-    "java::java.lang.System.in"
-  };
-  return non_null_globals.count(symbolid);
 }
 
 /// Create the body of a synthetic static initializer (clinit method),
