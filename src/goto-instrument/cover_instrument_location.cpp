@@ -22,20 +22,19 @@ void cover_location_instrumentert::instrument(
   if(is_non_cover_assertion(i_it))
     i_it->make_skip();
 
-  unsigned block_nr = basic_blocks.block_of(i_it);
-  goto_programt::const_targett in_t = basic_blocks.instruction_of(block_nr);
+  const unsigned block_nr = basic_blocks.block_of(i_it);
+  const auto representative_instruction = basic_blocks.instruction_of(block_nr);
   // we only instrument the selected instruction
-  if(in_t == i_it)
+  if(representative_instruction && *representative_instruction == i_it)
   {
-    std::string b = std::to_string(block_nr + 1); // start with 1
-    std::string id = id2string(i_it->function) + "#" + b;
-    source_locationt source_location =
-      basic_blocks.source_location_of(block_nr);
+    const std::string b = std::to_string(block_nr + 1); // start with 1
+    const std::string id = id2string(i_it->function) + "#" + b;
+    const auto source_location = basic_blocks.source_location_of(block_nr);
 
     // filter goals
     if(goal_filters(source_location))
     {
-      std::string comment = "block " + b;
+      const std::string comment = "block " + b;
       const irep_idt function = i_it->function;
       goto_program.insert_before_swap(i_it);
       i_it->make_assertion(false_exprt());
