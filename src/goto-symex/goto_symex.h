@@ -37,8 +37,7 @@ class side_effect_exprt;
 class symex_targett;
 class typecast_exprt;
 
-/*! \brief The main class for the forward symbolic simulator
-*/
+/// \brief The main class for the forward symbolic simulator
 class goto_symext
 {
 public:
@@ -68,17 +67,23 @@ public:
 
   typedef goto_symex_statet statet;
 
-  /** symex all at once, starting from entry point */
-  virtual void operator()(
+  /// \brief symex entire program starting from entry point
+  ///
+  /// The state that goto_symext maintains has a large memory footprint.
+  /// This method deallocates the state as soon as symbolic execution
+  /// has completed, so use it if you don't care about having the state
+  /// around afterwards.
+  virtual void symex_from_entry_point_of(
     const goto_functionst &goto_functions);
 
-  /** symex starting from given goto program */
-  virtual void operator()(
-    const goto_functionst &goto_functions,
-    const goto_programt &goto_program);
-
-  /** start symex in a given state */
-  virtual void operator()(
+  //// \brief symex entire program starting from entry point
+  ///
+  /// This method uses the `state` argument as the symbolic execution
+  /// state, which is useful for examining the state after this method
+  /// returns. The state that goto_symext maintains has a large memory
+  /// footprint, so if keeping the state around is not necessary,
+  /// clients should instead call goto_symext::symex_from_entry_point_of().
+  virtual void symex_with_state(
     statet &state,
     const goto_functionst &goto_functions,
     const goto_programt &goto_program);
@@ -91,12 +96,13 @@ public:
   /// \param goto_functions GOTO model to symex.
   /// \param first Entry point in form of a first instruction.
   /// \param limit Final instruction, which itself will not be symexed.
-  virtual void operator()(
+  virtual void symex_instruction_range(
     statet &state,
     const goto_functionst &goto_functions,
     goto_programt::const_targett first,
     goto_programt::const_targett limit);
 
+protected:
   /// Initialise the symbolic execution and the given state with <code>pc</code>
   /// as entry point.
   /// \param state Symex state to initialise.
@@ -104,7 +110,7 @@ public:
   /// \param pc first instruction to symex
   /// \param limit final instruction, which itself will not
   /// be symexed.
-  void symex_entry_point(
+  void initialize_entry_point(
     statet &state,
     const goto_functionst &goto_functions,
     goto_programt::const_targett pc,
@@ -122,6 +128,7 @@ public:
     const goto_functionst &goto_functions,
     statet &state);
 
+public:
   // these bypass the target maps
   virtual void symex_step_goto(statet &state, bool taken);
 

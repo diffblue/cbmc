@@ -124,7 +124,7 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
   }
 }
 
-void goto_symext::symex_entry_point(
+void goto_symext::initialize_entry_point(
   statet &state,
   const goto_functionst &goto_functions,
   const goto_programt::const_targett pc,
@@ -159,14 +159,13 @@ void goto_symext::symex_threaded_step(
   }
 }
 
-/// symex from given state
-void goto_symext::operator()(
+void goto_symext::symex_with_state(
   statet &state,
   const goto_functionst &goto_functions,
   const goto_programt &goto_program)
 {
   PRECONDITION(!goto_program.instructions.empty());
-  symex_entry_point(
+  initialize_entry_point(
     state,
     goto_functions,
     goto_program.instructions.begin(),
@@ -179,28 +178,20 @@ void goto_symext::operator()(
   state.dirty=nullptr;
 }
 
-void goto_symext::operator()(
+void goto_symext::symex_instruction_range(
   statet &state,
   const goto_functionst &goto_functions,
   const goto_programt::const_targett first,
   const goto_programt::const_targett limit)
 {
-  symex_entry_point(state, goto_functions, first, limit);
+  initialize_entry_point(state, goto_functions, first, limit);
   while(state.source.pc->function!=limit->function || state.source.pc!=limit)
     symex_threaded_step(state, goto_functions);
 }
 
-/// symex starting from given program
-void goto_symext::operator()(
-  const goto_functionst &goto_functions,
-  const goto_programt &goto_program)
-{
-  statet state;
-  operator() (state, goto_functions, goto_program);
-}
-
 /// symex from entry point
-void goto_symext::operator()(const goto_functionst &goto_functions)
+void goto_symext::symex_from_entry_point_of(
+    const goto_functionst &goto_functions)
 {
   goto_functionst::function_mapt::const_iterator it=
     goto_functions.function_map.find(goto_functionst::entry_point());
@@ -210,7 +201,8 @@ void goto_symext::operator()(const goto_functionst &goto_functions)
 
   const goto_programt &body=it->second.body;
 
-  operator()(goto_functions, body);
+  statet state;
+  symex_with_state(state, goto_functions, body);
 }
 
 /// do just one step

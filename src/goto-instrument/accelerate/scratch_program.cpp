@@ -39,7 +39,7 @@ bool scratch_programt::check_sat(bool do_slice)
   symex.constant_propagation=constant_propagation;
   goto_symex_statet::propagationt::valuest constants;
 
-  symex(symex_state, functions, *this);
+  symex.symex_with_state(symex_state, functions, *this);
 
   if(do_slice)
   {
