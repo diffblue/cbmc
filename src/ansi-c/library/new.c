@@ -72,30 +72,32 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 inline void __delete(void *ptr)
 {
   __CPROVER_HIDE:;
+  // is it dynamic?
+  __CPROVER_precondition(ptr==0 || __CPROVER_DYNAMIC_OBJECT(ptr),
+                         "delete argument must be dynamic object");
+  __CPROVER_precondition(__CPROVER_POINTER_OFFSET(ptr)==0,
+                         "delete argument must have offset zero");
+
+  // catch double delete
+  __CPROVER_precondition(ptr==0 || __CPROVER_deallocated!=ptr, "double delete");
+
+  // catch people who call delete for objects allocated with new[]
+  __CPROVER_precondition(ptr==0 ||
+                         __CPROVER_malloc_object!=ptr ||
+                         !__CPROVER_malloc_is_new_array,
+                         "delete of array object");
+
   // If ptr is NULL, no operation is performed.
   // This is a requirement by the standard, not generosity!
   if(ptr!=0)
   {
-    // is it dynamic?
-    __CPROVER_assert(__CPROVER_DYNAMIC_OBJECT(ptr),
-                     "delete argument must be dynamic object");
-    __CPROVER_assert(__CPROVER_POINTER_OFFSET(ptr)==0,
-                     "delete argument must have offset zero");
-
-    // catch double delete
-    __CPROVER_assert(__CPROVER_deallocated!=ptr, "double delete");
-
-    // catch people who call delete for objects allocated with new[]
-    __CPROVER_assert(__CPROVER_malloc_object!=ptr ||
-                     !__CPROVER_malloc_is_new_array,
-                     "delete of array object");
-
     // non-deterministically record as deallocated
     __CPROVER_bool record=__VERIFIER_nondet___CPROVER_bool();
     __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
 
     // detect memory leaks
-    if(__CPROVER_memory_leak==ptr) __CPROVER_memory_leak=0;
+    if(__CPROVER_memory_leak==ptr)
+      __CPROVER_memory_leak=0;
   }
 }
 
@@ -108,22 +110,25 @@ inline void __delete_array(void *ptr)
   __CPROVER_HIDE:;
   // If ptr is NULL, no operation is performed.
   // This is a requirement by the standard, not generosity!
+
+  // is it dynamic?
+  __CPROVER_precondition(ptr==0 || __CPROVER_DYNAMIC_OBJECT(ptr),
+                         "delete argument must be dynamic object");
+  __CPROVER_precondition(ptr==0 || __CPROVER_POINTER_OFFSET(ptr)==0,
+                         "delete argument must have offset zero");
+
+  // catch double delete
+  __CPROVER_precondition(ptr==0 || __CPROVER_deallocated!=ptr,
+                         "double delete");
+
+  // catch people who call delete[] for objects allocated with new
+  __CPROVER_precondition(ptr==0 ||
+                         __CPROVER_malloc_object!=ptr ||
+                         __CPROVER_malloc_is_new_array,
+                         "delete[] of non-array object");
+
   if(ptr!=0)
   {
-    // is it dynamic?
-    __CPROVER_assert(__CPROVER_DYNAMIC_OBJECT(ptr),
-                     "delete argument must be dynamic object");
-    __CPROVER_assert(__CPROVER_POINTER_OFFSET(ptr)==0,
-                     "delete argument must have offset zero");
-
-    // catch double delete
-    __CPROVER_assert(__CPROVER_deallocated!=ptr, "double delete");
-
-    // catch people who call delete[] for objects allocated with new
-    __CPROVER_assert(__CPROVER_malloc_object!=ptr ||
-                     __CPROVER_malloc_is_new_array,
-                     "delete[] of non-array object");
-
     // non-deterministically record as deallocated
     __CPROVER_bool record=__VERIFIER_nondet___CPROVER_bool();
     __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
