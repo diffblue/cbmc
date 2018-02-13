@@ -7,10 +7,11 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 struct hostent *gethostbyname(const char *name)
 {
   __CPROVER_HIDE:;
-  (void)*name;
   #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_assert(__CPROVER_is_zero_string(name), "gethostbyname zero-termination of name argument");
+  __CPROVER_precondition(__CPROVER_is_zero_string(name),
+                         "gethostbyname zero-termination of name argument");
   #endif
+  (void)*name;
 
   __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
   if(error) return 0;

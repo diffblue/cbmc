@@ -32,7 +32,8 @@ int unlink(const char *s)
   __CPROVER_HIDE:;
   (void)*s;
   #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_assert(__CPROVER_is_zero_string(s), "unlink zero-termination");
+  __CPROVER_precondition(__CPROVER_is_zero_string(s),
+                         "unlink zero-termination");
   #endif
   int retval=__VERIFIER_nondet_int();
   return retval;
