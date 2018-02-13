@@ -151,7 +151,7 @@ void goto_symext::symex_allocate(
       code_assignt assignment(size_symbol.symbol_expr(), size);
       size=assignment.lhs();
 
-      symex_assign_rec(state, assignment);
+      symex_assign(state, assignment);
     }
   }
 
@@ -187,7 +187,7 @@ void goto_symext::symex_allocate(
     if(zero_value.is_not_nil())
     {
       code_assignt assignment(value_symbol.symbol_expr(), zero_value);
-      symex_assign_rec(state, assignment);
+      symex_assign(state, assignment);
     }
     else
       throw "failed to zero initialize dynamic object";
@@ -212,7 +212,7 @@ void goto_symext::symex_allocate(
   if(rhs.type()!=lhs.type())
     rhs.make_typecast(lhs.type());
 
-  symex_assign_rec(state, code_assignt(lhs, rhs));
+  symex_assign(state, code_assignt(lhs, rhs));
 }
 
 irep_idt get_symbol(const exprt &src)
@@ -276,7 +276,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
     }
   }
 
-  symex_assign_rec(state, code_assignt(lhs, rhs));
+  symex_assign(state, code_assignt(lhs, rhs));
 }
 
 irep_idt get_string_argument_rec(const exprt &src)
@@ -458,7 +458,7 @@ void goto_symext::symex_cpp_new(
   else
     rhs.copy_to_operands(symbol.symbol_expr());
 
-  symex_assign_rec(state, code_assignt(lhs, rhs));
+  symex_assign(state, code_assignt(lhs, rhs));
 }
 
 void goto_symext::symex_cpp_delete(

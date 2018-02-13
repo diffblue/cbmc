@@ -130,7 +130,7 @@ void goto_symext::parameter_assignments(
         }
       }
 
-      symex_assign_rec(state, code_assignt(lhs, rhs));
+      symex_assign(state, code_assignt(lhs, rhs));
     }
 
     if(it1!=arguments.end())
@@ -162,7 +162,7 @@ void goto_symext::parameter_assignments(
 
       symbol_exprt lhs=symbol_exprt(id, it1->type());
 
-      symex_assign_rec(state, code_assignt(lhs, *it1));
+      symex_assign(state, code_assignt(lhs, *it1));
     }
   }
   else if(it1!=arguments.end())
@@ -275,7 +275,7 @@ void goto_symext::symex_function_call_code(
       side_effect_expr_nondett rhs(call.lhs().type());
       rhs.add_source_location()=call.source_location();
       code_assignt code(call.lhs(), rhs);
-      symex_assign_rec(state, code);
+      symex_assign(state, code);
     }
 
     symex_transition(state);
@@ -455,7 +455,7 @@ void goto_symext::return_assignment(statet &state)
           "assignment.lhs().type():\n"+assignment.lhs().type().pretty()+"\n"+
           "assignment.rhs().type():\n"+assignment.rhs().type().pretty();
 
-      symex_assign_rec(state, assignment);
+      symex_assign(state, assignment);
     }
   }
   else

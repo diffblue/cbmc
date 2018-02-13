@@ -305,8 +305,7 @@ protected:
   virtual void do_simplify(exprt &expr);
 
   // virtual void symex_block(statet &state, const codet &code);
-  void symex_assign_rec(statet &state, const code_assignt &code);
-  virtual void symex_assign(statet &state, const code_assignt &code);
+  void symex_assign(statet &state, const code_assignt &code);
 
   // havocs the given object
   void havoc_rec(statet &, const guardt &, const exprt &);
