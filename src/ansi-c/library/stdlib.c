@@ -162,24 +162,26 @@ inline void free(void *ptr)
   __CPROVER_precondition(ptr==0 || __CPROVER_POINTER_OFFSET(ptr)==0,
                          "free argument has offset zero");
 
+  // catch double free
+  __CPROVER_precondition(ptr==0 || __CPROVER_deallocated!=ptr,
+                         "double free");
+
+  // catch people who try to use free(...) for stuff
+  // allocated with new[]
+  __CPROVER_precondition(ptr==0 ||
+                         __CPROVER_malloc_object!=ptr ||
+                         !__CPROVER_malloc_is_new_array,
+                         "free called for new[] object");
+
   if(ptr!=0)
   {
-    // catch double free
-    if(__CPROVER_deallocated==ptr)
-      __CPROVER_assert(0, "double free");
-
-    // catch people who try to use free(...) for stuff
-    // allocated with new[]
-    __CPROVER_assert(__CPROVER_malloc_object!=ptr ||
-                     !__CPROVER_malloc_is_new_array,
-                     "free called for new[] object");
-
     // non-deterministically record as deallocated
     __CPROVER_bool record=__VERIFIER_nondet___CPROVER_bool();
     if(record) __CPROVER_deallocated=ptr;
 
     // detect memory leaks
-    if(__CPROVER_memory_leak==ptr) __CPROVER_memory_leak=0;
+    if(__CPROVER_memory_leak==ptr)
+      __CPROVER_memory_leak=0;
   }
 }
 
@@ -206,7 +208,7 @@ inline long strtol(const char *nptr, char **endptr, int base)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_assert(__CPROVER_is_zero_string(nptr),
+  __CPROVER_precondition(__CPROVER_is_zero_string(nptr),
     "zero-termination of argument of strtol");
   #endif
 
@@ -329,7 +331,7 @@ inline char *getenv(const char *name)
 
   (void)*name;
   #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_assert(__CPROVER_is_zero_string(name),
+  __CPROVER_precondition(__CPROVER_is_zero_string(name),
     "zero-termination of argument of getenv");
   #endif
 
@@ -367,6 +369,9 @@ inline void *realloc(void *ptr, __CPROVER_size_t malloc_size)
 {
   __CPROVER_HIDE:;
 
+  __CPROVER_precondition(ptr==0 || __CPROVER_DYNAMIC_OBJECT(ptr),
+                         "realloc argument is dynamic object");
+
   // if ptr is NULL, this behaves like malloc
   if(ptr==0)
     return malloc(malloc_size);
@@ -378,9 +383,6 @@ inline void *realloc(void *ptr, __CPROVER_size_t malloc_size)
     free(ptr);
     return malloc(1);
   }
-
-  __CPROVER_assert(__CPROVER_DYNAMIC_OBJECT(ptr),
-                   "realloc argument is dynamic object");
 
   // this shouldn't move if the new size isn't bigger
   void *res;
