@@ -20,6 +20,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/refinement/string_refinement.h>
 
 #include <iomanip>
+#include <numeric>
 #include <stack>
 #include <util/expr_iterator.h>
 #include <util/arith_tools.h>
@@ -1221,6 +1222,68 @@ void debug_model(
   stream << messaget::eom;
 }
 
+sparse_arrayt::sparse_arrayt(const with_exprt &expr)
+{
+  auto ref = std::ref(static_cast<const exprt &>(expr));
+  while(can_cast_expr<with_exprt>(ref.get()))
+  {
+    const auto &with_expr = expr_dynamic_cast<with_exprt>(ref.get());
+    const auto current_index = numeric_cast_v<std::size_t>(with_expr.where());
+    entries.emplace_back(current_index, with_expr.new_value());
+    ref = with_expr.old();
+  }
+
+  // This function only handles 'with' and 'array_of' expressions
+  PRECONDITION(ref.get().id() == ID_array_of);
+  default_value = expr_dynamic_cast<array_of_exprt>(ref.get()).what();
+}
+
+exprt sparse_arrayt::to_if_expression(const exprt &index) const
+{
+  return std::accumulate(
+    entries.begin(),
+    entries.end(),
+    default_value,
+    [&](
+      const exprt if_expr,
+      const std::pair<std::size_t, exprt> &entry) { // NOLINT
+      const exprt entry_index = from_integer(entry.first, index.type());
+      const exprt &then_expr = entry.second;
+      CHECK_RETURN(then_expr.type() == if_expr.type());
+      const equal_exprt index_equal(index, entry_index);
+      return if_exprt(index_equal, then_expr, if_expr, if_expr.type());
+    });
+}
+
+interval_sparse_arrayt::interval_sparse_arrayt(const with_exprt &expr)
+  : sparse_arrayt(expr)
+{
+  // Entries are sorted so that successive entries correspond to intervals
+  std::sort(
+    entries.begin(),
+    entries.end(),
+    [](
+      const std::pair<std::size_t, exprt> &a,
+      const std::pair<std::size_t, exprt> &b) { return a.first < b.first; });
+}
+
+exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const
+{
+  return std::accumulate(
+    entries.rbegin(),
+    entries.rend(),
+    default_value,
+    [&](
+      const exprt if_expr,
+      const std::pair<std::size_t, exprt> &entry) { // NOLINT
+      const exprt entry_index = from_integer(entry.first, index.type());
+      const exprt &then_expr = entry.second;
+      CHECK_RETURN(then_expr.type() == if_expr.type());
+      const binary_relation_exprt index_small_eq(index, ID_le, entry_index);
+      return if_exprt(index_small_eq, then_expr, if_expr, if_expr.type());
+    });
+}
+
 /// Create a new expression where 'with' expressions on arrays are replaced by
 /// 'if' expressions. e.g. for an array access arr[index], where: `arr :=
 /// array_of(12) with {0:=24} with {2:=42}` the constructed expression will be:
@@ -1238,45 +1301,8 @@ static exprt substitute_array_access(
   const exprt &index,
   const bool left_propagate)
 {
-  std::vector<std::pair<std::size_t, exprt>> entries;
-  std::reference_wrapper<const exprt> ref =
-    std::ref(static_cast<const exprt &>(expr));
-  while(can_cast_expr<with_exprt>(ref.get()))
-  {
-    const auto &with_expr = expr_dynamic_cast<with_exprt>(ref.get());
-    auto current_index = numeric_cast_v<std::size_t>(with_expr.where());
-    entries.push_back(std::make_pair(current_index, with_expr.new_value()));
-    ref = with_expr.old();
-  }
-
-  // This function only handles 'with' and 'array_of' expressions
-  PRECONDITION(ref.get().id() == ID_array_of);
-
-  // sort entries by increasing index
-  std::sort(
-    entries.begin(),
-    entries.end(),
-    [](
-      const std::pair<std::size_t, exprt> &a,
-      const std::pair<std::size_t, exprt> &b) { return a.first < b.first; });
-
-  exprt result = expr_dynamic_cast<array_of_exprt>(ref.get()).what();
-  for(const auto &entry : entries)
-  {
-    const exprt &then_expr = entry.second;
-    const typet &type = then_expr.type();
-    CHECK_RETURN(type == result.type());
-    const exprt entry_index = from_integer(entry.first, index.type());
-    if(left_propagate)
-    {
-      const binary_relation_exprt index_small_eq(index, ID_le, entry_index);
-      result = if_exprt(index_small_eq, then_expr, result, type);
-    }
-    else
-      result =
-        if_exprt(equal_exprt(index, entry_index), then_expr, result, type);
-  }
-  return result;
+  return left_propagate ? interval_sparse_arrayt(expr).to_if_expression(index)
+                        : sparse_arrayt(expr).to_if_expression(index);
 }
 
 /// Fill an array represented by a list of with_expr by propagating values to
