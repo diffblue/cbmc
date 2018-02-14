@@ -2027,7 +2027,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
       results[0]=java_bytecode_promotion(symbol_expr);
 
-      // Note this initialiser call deliberately inits the class used to make
+      // Note this initializer call deliberately inits the class used to make
       // the reference, which may be a child of the class that actually defines
       // the field.
       codet clinit_call=get_clinit_call(arg0.get_string(ID_class));
@@ -2073,7 +2073,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_blockt block;
       block.add_source_location()=i_it->source_location;
 
-      // Note this initialiser call deliberately inits the class used to make
+      // Note this initializer call deliberately inits the class used to make
       // the reference, which may be a child of the class that actually defines
       // the field.
       codet clinit_call=get_clinit_call(arg0.get_string(ID_class));

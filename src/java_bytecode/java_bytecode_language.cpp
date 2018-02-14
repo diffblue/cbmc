@@ -391,8 +391,8 @@ static void generate_constant_global_variables(
 /// \param symbol_type: new symbol type
 /// \param class_id: class id that directly encloses this static field
 /// \param force_nondet_init: if true, always leave the symbol's value nil so it
-///   gets nondet initialised during __CPROVER_initialize. Otherwise, pointer-
-///   typed globals are initialised null and we expect a synthetic clinit method
+///   gets nondet initialized during __CPROVER_initialize. Otherwise, pointer-
+///   typed globals are initialized null and we expect a synthetic clinit method
 ///   to be created later.
 static void create_stub_global_symbol(
   symbol_table_baset &symbol_table,
@@ -464,8 +464,8 @@ static irep_idt get_any_incomplete_ancestor(
 
 /// Search for getstatic and putstatic instructions in a class' bytecode and
 /// create stub symbols for any static fields that aren't already in the symbol
-/// table. The new symbols are null-initialised for reference-typed globals /
-/// static fields, and nondet-initialised for primitives.
+/// table. The new symbols are null-initialized for reference-typed globals /
+/// static fields, and nondet-initialized for primitives.
 /// \param parse_tree: class bytecode
 /// \param symbol_table: symbol table; may gain new symbols
 /// \param class_hierarchy: global class hierarchy
