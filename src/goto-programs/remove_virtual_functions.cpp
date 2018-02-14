@@ -434,7 +434,8 @@ void remove_virtual_functionst::get_functions(
   std::sort(
     functions.begin(),
     functions.end(),
-    [&root_function](const dispatch_table_entryt &a, dispatch_table_entryt &b) {
+    [](const dispatch_table_entryt &a, dispatch_table_entryt &b)
+    {
       if(
         has_prefix(
           id2string(a.symbol_expr.get_identifier()), "java::java.lang.Object"))
