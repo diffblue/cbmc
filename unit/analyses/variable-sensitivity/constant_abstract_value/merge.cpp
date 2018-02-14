@@ -7,29 +7,24 @@
 \*******************************************************************/
 
 #include <typeinfo>
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 
-
-// Debug printer for irept
-std::ostream &operator<<(std::ostream &os, const irept &value)
-{
-  os << value.pretty();
-  return os;
-}
 
 SCENARIO("merge_constant_abstract_value",
   "[core][analyses][variable-sensitivity][constant_abstract_value][merge]")
 {
   GIVEN("An environment with two values: 1 and 2")
   {
-    const exprt val1=constant_exprt::integer_constant(1);
-    const exprt val2=constant_exprt::integer_constant(2);
+    const exprt val1=from_integer(1, integer_typet());
+    const exprt val2=from_integer(2, integer_typet());
 
     abstract_environmentt enviroment;
     enviroment.make_top();

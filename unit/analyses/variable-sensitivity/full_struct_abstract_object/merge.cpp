@@ -7,7 +7,7 @@
 \*******************************************************************/
 
 #include <typeinfo>
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 #include <util/namespace.h>
 #include <util/options.h>
 #include <util/symbol_table.h>
@@ -23,6 +23,7 @@
 
 
 #include <iostream>
+#include <util/arith_tools.h>
 
 typedef constant_array_abstract_objectt::constant_array_pointert
   constant_array_abstract_object_pointert;
@@ -64,7 +65,7 @@ public:
           enviroment,
           ns,
           std::stack<exprt>(),
-          member_exprt(nil_exprt(), component.get_name()),
+          member_exprt(nil_exprt(), component.get_name(), component.type()),
           enviroment.eval(op, ns),
           false);
       result=
@@ -112,20 +113,20 @@ SCENARIO("merge_full_struct_abstract_object",
     struct_type.components().push_back(comp_c);
 
     struct_exprt val1(struct_type);
-    val1.operands().push_back(constant_exprt::integer_constant(1));
-    val1.operands().push_back(constant_exprt::integer_constant(2));
-    val1.operands().push_back(constant_exprt::integer_constant(3));
+    val1.operands().push_back(from_integer(1, integer_typet()));
+    val1.operands().push_back(from_integer(2, integer_typet()));
+    val1.operands().push_back(from_integer(3, integer_typet()));
 
     // struct val1 = {.a = 1, .b = 4, .c = 5}
     struct_exprt val2(struct_type);
-    val2.operands().push_back(constant_exprt::integer_constant(1));
-    val2.operands().push_back(constant_exprt::integer_constant(4));
-    val2.operands().push_back(constant_exprt::integer_constant(5));
+    val2.operands().push_back(from_integer(1, integer_typet()));
+    val2.operands().push_back(from_integer(4, integer_typet()));
+    val2.operands().push_back(from_integer(5, integer_typet()));
 
     // index_exprt for reading from an array
-    const member_exprt a(nil_exprt(), "a");
-    const member_exprt b(nil_exprt(), "b");
-    const member_exprt c(nil_exprt(), "c");
+    const member_exprt a(nil_exprt(), "a", integer_typet());
+    const member_exprt b(nil_exprt(), "b", integer_typet());
+    const member_exprt c(nil_exprt(), "c", integer_typet());
 
     abstract_environmentt enviroment;
     enviroment.make_top();
