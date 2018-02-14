@@ -23,6 +23,8 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include <solvers/miniBDD/miniBDD.h>
 
+#include <unordered_map>
+
 class namespacet;
 
 /*! \brief TO_BE_DOCUMENTED

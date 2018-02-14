@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr.h"
 
+#include <unordered_map>
+
 class replace_symbolt
 {
 public:

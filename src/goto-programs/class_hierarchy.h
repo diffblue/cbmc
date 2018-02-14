@@ -16,6 +16,7 @@ Date: April 2016
 
 #include <iosfwd>
 #include <map>
+#include <unordered_map>
 
 #include <util/graph.h>
 #include <util/namespace.h>

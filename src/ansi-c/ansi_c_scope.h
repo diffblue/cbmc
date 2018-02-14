@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/irep.h>
 
+#include <unordered_map>
+
 enum class ansi_c_id_classt
 {
   ANSI_C_UNKNOWN,
