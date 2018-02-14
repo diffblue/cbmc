@@ -1,0 +1,5 @@
+CORE
+Test.class
+--show-goto-functions
+java::Opaque\.<clinit>:\(\)V
+java::Opaque::clinit_wrapper

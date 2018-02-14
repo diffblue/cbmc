@@ -1,0 +1,6 @@
+CORE
+Test.class
+--lazy-methods --show-goto-functions
+--
+java::Unused::clinit_wrapper
+Unused\.<clinit>\(\)
