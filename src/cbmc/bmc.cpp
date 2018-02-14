@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bmc.h"
 
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -18,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/source_location.h>
 #include <util/string_utils.h>
-#include <util/time_stopping.h>
 #include <util/message.h>
 #include <util/json.h>
 #include <util/cprover_prefix.h>
@@ -154,20 +154,20 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
 
   prop_conv.set_message_handler(get_message_handler());
 
-  // stop the time
-  absolute_timet sat_start=current_time();
+  auto now = std::chrono::steady_clock::now();
+  auto sat_start = std::chrono::time_point_cast<std::chrono::seconds>(now);
 
   do_conversion();
 
   status() << "Running " << prop_conv.decision_procedure_text() << eom;
 
   decision_proceduret::resultt dec_result=prop_conv.dec_solve();
-  // output runtime
 
   {
-    absolute_timet sat_stop=current_time();
-    status() << "Runtime decision procedure: "
-             << (sat_stop-sat_start) << "s" << eom;
+    now = std::chrono::steady_clock::now();
+    auto sat_stop = std::chrono::time_point_cast<std::chrono::seconds>(now);
+    status() << "Runtime decision procedure: " << (sat_stop - sat_start).count()
+             << "s" << eom;
   }
 
   return dec_result;

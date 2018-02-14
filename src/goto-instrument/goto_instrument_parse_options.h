@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
+#include <util/timestamper.h>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/show_goto_functions.h>
@@ -66,6 +67,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-claims)(show-properties)(property):" \
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
   "(cav11)" \
+  OPT_TIMESTAMP \
   "(show-natural-loops)(accelerate)(havoc-loops)" \
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)(json-ui)(show-loops)" \

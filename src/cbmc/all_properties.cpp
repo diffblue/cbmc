@@ -11,7 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "all_properties_class.h"
 
-#include <util/time_stopping.h>
+#include <chrono>
+
 #include <util/xml.h>
 #include <util/json.h>
 
@@ -56,8 +57,8 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   solver.set_message_handler(get_message_handler());
 
-  // stop the time
-  absolute_timet sat_start=current_time();
+  auto now = std::chrono::steady_clock::now();
+  auto sat_start = std::chrono::time_point_cast<std::chrono::seconds>(now);
 
   bmc.do_conversion();
 
@@ -131,12 +132,12 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
         g.second.status=goalt::statust::SUCCESS;
   }
 
-  // output runtime
-
   {
-    absolute_timet sat_stop=current_time();
-    status() << "Runtime decision procedure: "
-             << (sat_stop-sat_start) << "s" << eom;
+    now = std::chrono::steady_clock::now();
+    auto sat_stop = std::chrono::time_point_cast<std::chrono::seconds>(now);
+
+    status() << "Runtime decision procedure: " << (sat_stop - sat_start).count()
+             << "s" << eom;
   }
 
   // report
