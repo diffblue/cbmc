@@ -1510,7 +1510,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?aload"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
 
       char type_char=statement[0];
 
@@ -1541,7 +1541,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
     {
-      PRECONDITION(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
 
       INVARIANT(
         arg0.id() != ID_java_string_literal && arg0.id() != ID_type,
@@ -1562,7 +1562,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="jsr" || statement=="jsr_w")
     {
       // As 'goto', except we must also push the subroutine return address:
-      PRECONDITION(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "jsr argument should be an integer");
@@ -1659,7 +1659,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("if_?cmp??"))
     {
-      PRECONDITION(op.size()==2 && results.empty());
+      PRECONDITION(op.size() == 2 && results.empty());
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "if_?cmp?? argument should be an integer");
@@ -1697,7 +1697,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       INVARIANT(!id.empty(), "unexpected bytecode-if");
 
-      PRECONDITION(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "if?? argument should be an integer");
@@ -1718,7 +1718,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("ifnonnull"))
     {
-      PRECONDITION(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "ifnonnull argument should be an integer");
@@ -1735,7 +1735,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("ifnull"))
     {
-      PRECONDITION(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "ifnull argument should be an integer");
@@ -1777,32 +1777,32 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?xor"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=bitxor_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?or"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=bitor_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?and"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=bitand_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?shl"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=shl_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?shr"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=ashr_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?ushr"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       const typet type=java_type_from_char(statement[0]);
 
       const std::size_t width=type.get_size_t(ID_width);
@@ -1821,32 +1821,32 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?add"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=plus_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?sub"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=minus_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?div"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=div_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?mul"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=mult_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?neg"))
     {
-      PRECONDITION(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
       results[0]=unary_minus_exprt(op[0], op[0].type());
     }
     else if(statement==patternt("?rem"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       if(statement=="frem" || statement=="drem")
         results[0]=rem_exprt(op[0], op[1]);
       else
@@ -1854,7 +1854,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?cmp"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
 
       // The integer result on the stack is:
       //  0 if op[0] equals op[1]
@@ -1878,7 +1878,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?cmp?"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       const int nan_value(statement[4]=='l' ? -1 : 1);
       const typet result_type(java_int_type());
       const exprt nan_result(from_integer(nan_value, result_type));
@@ -1906,24 +1906,24 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?cmpl"))
     {
-      PRECONDITION(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=binary_relation_exprt(op[0], ID_lt, op[1]);
     }
     else if(statement=="dup")
     {
-      PRECONDITION(op.size()==1 && results.size()==2);
+      PRECONDITION(op.size() == 1 && results.size() == 2);
       results[0]=results[1]=op[0];
     }
     else if(statement=="dup_x1")
     {
-      PRECONDITION(op.size()==2 && results.size()==3);
+      PRECONDITION(op.size() == 2 && results.size() == 3);
       results[0]=op[1];
       results[1]=op[0];
       results[2]=op[1];
     }
     else if(statement=="dup_x2")
     {
-      PRECONDITION(op.size()==3 && results.size()==4);
+      PRECONDITION(op.size() == 3 && results.size() == 4);
       results[0]=op[2];
       results[1]=op[0];
       results[2]=op[1];
@@ -1978,20 +1978,20 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="dconst")
     {
-      PRECONDITION(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
     }
     else if(statement=="fconst")
     {
-      PRECONDITION(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
     }
     else if(statement=="getfield")
     {
-      PRECONDITION(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
       results[0]=java_bytecode_promotion(to_member(op[0], arg0));
     }
     else if(statement=="getstatic")
     {
-      PRECONDITION(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       const bool is_assertions_disabled_field=
@@ -2041,7 +2041,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="putfield")
     {
-      PRECONDITION(op.size()==2 && results.empty());
+      PRECONDITION(op.size() == 2 && results.empty());
       code_blockt block;
       save_stack_entries(
         "stack_field",
@@ -2054,7 +2054,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="putstatic")
     {
-      PRECONDITION(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(
@@ -2091,7 +2091,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?2?")) // i2c etc.
     {
-      PRECONDITION(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
       typet type=java_type_from_char(statement[2]);
       results[0]=op[0];
       if(results[0].type()!=type)
@@ -2100,7 +2100,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="new")
     {
       // use temporary since the stack symbol might get duplicated
-      PRECONDITION(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
       const reference_typet ref_type=java_reference_type(arg0.type());
       exprt java_new_expr=side_effect_exprt(ID_java_new, ref_type);
 
@@ -2125,7 +2125,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
             statement=="anewarray")
     {
       // the op is the array size
-      PRECONDITION(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
 
       char element_type;
 
@@ -2217,7 +2217,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="arraylength")
     {
-      PRECONDITION(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
 
       exprt pointer=
         typecast_exprt(op[0], java_array_type(statement[0]));
@@ -2233,7 +2233,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="tableswitch" ||
             statement=="lookupswitch")
     {
-      PRECONDITION(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
 
       // we turn into switch-case
       code_switcht code_switch;
@@ -2294,7 +2294,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="instanceof")
     {
-      PRECONDITION(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
 
       results[0]=
         binary_predicate_exprt(op[0], ID_java_instanceof, arg0);
@@ -2329,7 +2329,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="swap")
     {
-      PRECONDITION(op.size()==2 && results.size()==2);
+      PRECONDITION(op.size() == 2 && results.size() == 2);
       results[1]=op[0];
       results[0]=op[1];
     }
@@ -2465,7 +2465,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     for(const unsigned address : a_it->second.successors)
     {
       address_mapt::iterator a_it2=address_map.find(address);
-      CHECK_RETURN(a_it2!=address_map.end());
+      CHECK_RETURN(a_it2 != address_map.end());
 
       // clear the stack if this is an exception handler
       for(const auto &exception_row : method.exception_table)
