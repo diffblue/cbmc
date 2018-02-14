@@ -17,11 +17,6 @@
                                        it_end=(expr).upper_bound(base_name); \
       it!=it_end; ++it)
 
-#define forall_symbol_module_map(it, expr, module) \
-  for(symbol_module_mapt::const_iterator it=(expr).lower_bound(module), \
-                                         it_end=(expr).upper_bound(module); \
-      it!=it_end; ++it)
-
 
 /// \brief The symbol table
 /// \ingroup gr_symbol_table
