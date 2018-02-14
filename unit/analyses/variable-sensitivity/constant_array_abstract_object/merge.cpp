@@ -7,7 +7,7 @@
 \*******************************************************************/
 
 #include <typeinfo>
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 #include <util/namespace.h>
 #include <util/options.h>
 #include <util/symbol_table.h>
@@ -20,6 +20,7 @@
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/constant_array_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <util/arith_tools.h>
 
 typedef constant_array_abstract_objectt::constant_array_pointert
   constant_array_abstract_object_pointert;
@@ -74,27 +75,27 @@ SCENARIO("merge_constant_array_abstract_object",
   GIVEN("Two arrays of size 3, whose first elements are the same")
   {
     const array_typet array_type(
-      integer_typet(), constant_exprt::integer_constant(3));
+      integer_typet(), from_integer(3, integer_typet()));
 
     // int val1[3] = {1, 2, 3}
     exprt val1=array_exprt(array_type);
-    val1.operands().push_back(constant_exprt::integer_constant(1));
-    val1.operands().push_back(constant_exprt::integer_constant(2));
-    val1.operands().push_back(constant_exprt::integer_constant(3));
+    val1.operands().push_back(from_integer(1, integer_typet()));
+    val1.operands().push_back(from_integer(2, integer_typet()));
+    val1.operands().push_back(from_integer(3, integer_typet()));
 
     // int val2[3] = {1, 4, 5}
     exprt val2=array_exprt(array_type);
-    val2.operands().push_back(constant_exprt::integer_constant(1));
-    val2.operands().push_back(constant_exprt::integer_constant(4));
-    val2.operands().push_back(constant_exprt::integer_constant(5));
+    val2.operands().push_back(from_integer(1, integer_typet()));
+    val2.operands().push_back(from_integer(4, integer_typet()));
+    val2.operands().push_back(from_integer(5, integer_typet()));
 
     // index_exprt for reading from an array
     const index_exprt i0=
-      index_exprt(nil_exprt(), constant_exprt::integer_constant(0));
+      index_exprt(nil_exprt(), from_integer(0, integer_typet()));
     const index_exprt i1=
-      index_exprt(nil_exprt(), constant_exprt::integer_constant(1));
+      index_exprt(nil_exprt(), from_integer(1, integer_typet()));
     const index_exprt i2=
-      index_exprt(nil_exprt(), constant_exprt::integer_constant(2));
+      index_exprt(nil_exprt(), from_integer(2, integer_typet()));
 
     abstract_environmentt enviroment;
     enviroment.make_top();

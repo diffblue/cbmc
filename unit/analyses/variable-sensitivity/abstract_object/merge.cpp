@@ -6,7 +6,7 @@
 
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <util/std_types.h>
