@@ -13,11 +13,11 @@ Date: March 2016
 
 #include "symex_coverage.h"
 
+#include <chrono>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
-#include <util/time_stopping.h>
 #include <util/xml.h>
 #include <util/string2int.h>
 #include <util/cprover_prefix.h>
@@ -387,6 +387,10 @@ void symex_coveraget::build_cobertura(
   std::string overall_branch_rate_str=
     rate(overall_cov.branches_covered, overall_cov.branches_total);
 
+  auto now = std::chrono::system_clock::now();
+  auto current_time = std::chrono::time_point_cast<std::chrono::seconds>(now);
+  std::time_t tt = std::chrono::system_clock::to_time_t(current_time);
+
   // <coverage line-rate="0.0" branch-rate="0.0" lines-covered="1"
   //           lines-valid="1" branches-covered="1"
   //           branches-valid="1" complexity="0.0"
@@ -404,7 +408,7 @@ void symex_coveraget::build_cobertura(
   xml_coverage.set_attribute("complexity", "0.0");
   xml_coverage.set_attribute("version", "2.1.1");
   xml_coverage.set_attribute("timestamp",
-                             std::to_string(current_time().get_t()));
+                             std::to_string(tt));
 
   xmlt &packages=xml_coverage.new_element("packages");
 

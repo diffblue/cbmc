@@ -84,8 +84,6 @@ SRC = arith_tools.cpp \
       tempdir.cpp \
       tempfile.cpp \
       threeval.cpp \
-      time_stopping.cpp \
-      timer.cpp \
       type.cpp \
       type_eq.cpp \
       typecheck.cpp \
