@@ -26,18 +26,18 @@ public:
   /// \param t a goto instruction
   /// \return the block number of the block
   ///         the given goto instruction is part of
-  unsigned block_of(goto_programt::const_targett t) const;
+  std::size_t block_of(goto_programt::const_targett t) const;
 
   /// \param block_nr a block number
   /// \return  the instruction selected for
   ///   instrumentation representative of the given block
   optionalt<goto_programt::const_targett>
-  instruction_of(unsigned block_nr) const;
+  instruction_of(std::size_t block_nr) const;
 
   /// \param block_nr a block number
   /// \return  the source location selected for
   ///   instrumentation representative of the given block
-  const source_locationt &source_location_of(unsigned block_nr) const;
+  const source_locationt &source_location_of(std::size_t block_nr) const;
 
   /// Select an instruction to be instrumented for each basic block such that
   /// the java bytecode indices for each basic block is unique
@@ -58,7 +58,7 @@ public:
   void output(std::ostream &out) const;
 
 private:
-  typedef std::map<goto_programt::const_targett, unsigned> block_mapt;
+  typedef std::map<goto_programt::const_targett, std::size_t> block_mapt;
 
   struct block_infot
   {
@@ -71,7 +71,7 @@ private:
     source_locationt source_location;
 
     /// the set of lines belonging to this block
-    std::unordered_set<unsigned> lines;
+    std::unordered_set<std::size_t> lines;
   };
 
   /// map program locations to block numbers
@@ -85,7 +85,7 @@ private:
 
   /// If this block is a continuation of a previous block through unconditional
   /// forward gotos, return this blocks number.
-  static optionalt<unsigned> continuation_of_block(
+  static optionalt<std::size_t> continuation_of_block(
     const goto_programt::const_targett &instruction,
     block_mapt &block_map);
 };

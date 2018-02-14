@@ -15,7 +15,7 @@ Author: Peter Schrammel
 #include <util/message.h>
 #include <util/string2int.h>
 
-optionalt<unsigned> cover_basic_blockst::continuation_of_block(
+optionalt<std::size_t> cover_basic_blockst::continuation_of_block(
   const goto_programt::const_targett &instruction,
   cover_basic_blockst::block_mapt &block_map)
 {
@@ -32,7 +32,7 @@ optionalt<unsigned> cover_basic_blockst::continuation_of_block(
 cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
 {
   bool next_is_target = true;
-  unsigned current_block = 0;
+  std::size_t current_block = 0;
 
   forall_goto_program_instructions(it, _goto_program)
   {
@@ -87,7 +87,7 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
     update_covered_lines(block_info);
 }
 
-unsigned cover_basic_blockst::block_of(goto_programt::const_targett t) const
+std::size_t cover_basic_blockst::block_of(goto_programt::const_targett t) const
 {
   const auto it = block_map.find(t);
   INVARIANT(it != block_map.end(), "instruction must be part of a block");
@@ -95,14 +95,14 @@ unsigned cover_basic_blockst::block_of(goto_programt::const_targett t) const
 }
 
 optionalt<goto_programt::const_targett>
-cover_basic_blockst::instruction_of(unsigned block_nr) const
+cover_basic_blockst::instruction_of(const std::size_t block_nr) const
 {
   INVARIANT(block_nr < block_infos.size(), "block number out of range");
   return block_infos.at(block_nr).representative_inst;
 }
 
 const source_locationt &
-cover_basic_blockst::source_location_of(unsigned block_nr) const
+cover_basic_blockst::source_location_of(const std::size_t block_nr) const
 {
   INVARIANT(block_nr < block_infos.size(), "block number out of range");
   return block_infos.at(block_nr).source_location;
@@ -113,12 +113,12 @@ void cover_basic_blockst::select_unique_java_bytecode_indices(
   message_handlert &message_handler)
 {
   messaget msg(message_handler);
-  std::set<unsigned> blocks_seen;
+  std::set<std::size_t> blocks_seen;
   std::set<irep_idt> bytecode_indices_seen;
 
   forall_goto_program_instructions(it, goto_program)
   {
-    const unsigned block_nr = block_of(it);
+    const std::size_t block_nr = block_of(it);
     if(blocks_seen.find(block_nr) != blocks_seen.end())
       continue;
 
@@ -181,10 +181,10 @@ void cover_basic_blockst::report_block_anomalies(
   message_handlert &message_handler)
 {
   messaget msg(message_handler);
-  std::set<unsigned> blocks_seen;
+  std::set<std::size_t> blocks_seen;
   forall_goto_program_instructions(it, goto_program)
   {
-    const unsigned block_nr = block_of(it);
+    const std::size_t block_nr = block_of(it);
     const block_infot &block_info = block_infos.at(block_nr);
 
     if(
