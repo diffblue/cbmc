@@ -28,7 +28,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/refinement/string_constraint_generator.h>
 #include <solvers/refinement/string_refinement_invariant.h>
 
-#define MAX_NB_REFINEMENT 100
+#define DEFAULT_MAX_NB_REFINEMENT std::numeric_limits<size_t>::max()
 #define CHARACTER_FOR_UNKNOWN '?'
 
 struct index_set_pairt
