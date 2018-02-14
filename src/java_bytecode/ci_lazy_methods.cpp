@@ -13,7 +13,7 @@
 #include <util/suffix.h>
 #include <java_bytecode/java_string_library_preprocess.h>
 
-#include <goto-programs/resolve_concrete_function_call.h>
+#include <goto-programs/resolve_inherited_component.h>
 #include <goto-programs/remove_exceptions.h>
 
 /// Constructor for lazy-method loading
@@ -568,12 +568,12 @@ irep_idt ci_lazy_methodst::get_virtual_method_target(
   if(!needed_classes.count(classname))
     return irep_idt();
 
-  resolve_concrete_function_callt call_resolver(symbol_table, class_hierarchy);
-  const resolve_concrete_function_callt ::concrete_function_callt &
-    resolved_call=call_resolver(classname, call_basename);
+  resolve_inherited_componentt call_resolver(symbol_table, class_hierarchy);
+  const resolve_inherited_componentt::inherited_componentt resolved_call =
+    call_resolver(classname, call_basename, false);
 
   if(resolved_call.is_valid())
-    return resolved_call.get_virtual_method_name();
+    return resolved_call.get_full_component_identifier();
   else
     return irep_idt();
 }

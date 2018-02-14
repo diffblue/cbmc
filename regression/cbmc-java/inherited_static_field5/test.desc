@@ -1,0 +1,8 @@
+CORE
+Test.class
+
+^VERIFICATION SUCCESSFUL$
+--
+--
+This is the same as inherited_static_field2, except that Test's parent is opaque. It must pass because
+the field 'x' should be found on InterfaceWithStatic, and so not created as a stub on OpaqueParent.

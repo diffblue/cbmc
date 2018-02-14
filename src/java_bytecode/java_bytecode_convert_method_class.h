@@ -35,14 +35,16 @@ public:
     message_handlert &_message_handler,
     size_t _max_array_length,
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
-    java_string_library_preprocesst &_string_preprocess)
+    java_string_library_preprocesst &_string_preprocess,
+    const class_hierarchyt &class_hierarchy)
     : messaget(_message_handler),
       symbol_table(symbol_table),
       max_array_length(_max_array_length),
       needed_lazy_methods(std::move(needed_lazy_methods)),
       string_preprocess(_string_preprocess),
       slots_for_parameters(0),
-      method_has_this(false)
+      method_has_this(false),
+      class_hierarchy(class_hierarchy)
   {
   }
 
@@ -116,6 +118,7 @@ protected:
   bool method_has_this;
   std::map<irep_idt, bool> class_has_clinit_method;
   std::map<irep_idt, bool> any_superclass_has_clinit_method;
+  class_hierarchyt class_hierarchy;
 
   enum instruction_sizet
   {
@@ -253,6 +256,9 @@ protected:
   bool is_method_inherited(
     const irep_idt &classname,
     const irep_idt &methodid) const;
+
+  irep_idt get_static_field(
+    const irep_idt &class_identifier, const irep_idt &component_name) const;
 
   enum class bytecode_write_typet { VARIABLE, ARRAY_REF, STATIC_FIELD, FIELD};
   void save_stack_entries(

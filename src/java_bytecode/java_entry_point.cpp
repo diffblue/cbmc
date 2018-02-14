@@ -118,6 +118,8 @@ static void java_static_lifetime_init(
             allow_null=false;
           if(allow_null && is_java_string_literal_id(nameid))
             allow_null=false;
+          if(allow_null && is_non_null_library_global(nameid))
+            allow_null = false;
         }
         gen_nondet_init(
           sym.symbol_expr(),

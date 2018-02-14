@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
+#include <goto-programs/resolve_inherited_component.h>
+
 bool java_is_array_type(const typet &type);
 
 void generate_class_stub(
@@ -95,5 +97,15 @@ exprt make_function_application(
 irep_idt strip_java_namespace_prefix(const irep_idt &to_strip);
 
 std::string pretty_print_java_type(const std::string &fqn_java_type);
+
+resolve_inherited_componentt::inherited_componentt get_inherited_component(
+  const irep_idt &component_class_id,
+  const irep_idt &component_name,
+  const irep_idt &user_class_id,
+  const symbol_tablet &symbol_table,
+  const class_hierarchyt &class_hierarchy,
+  bool include_interfaces);
+
+bool is_non_null_library_global(const irep_idt &);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

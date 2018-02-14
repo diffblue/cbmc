@@ -1,0 +1,8 @@
+CORE
+Test.class
+
+^VERIFICATION SUCCESSFUL$
+--
+--
+This checks that jbmc knows that test.x and parent.x refer to the same field.
+Both test and parent are concrete (available) classes.

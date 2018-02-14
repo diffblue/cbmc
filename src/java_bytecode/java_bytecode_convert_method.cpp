@@ -36,7 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/cfg.h>
 #include <goto-programs/remove_exceptions.h>
 #include <goto-programs/class_hierarchy.h>
-#include <goto-programs/resolve_concrete_function_call.h>
+#include <goto-programs/resolve_inherited_component.h>
 #include <analyses/cfg_dominators.h>
 
 #include <limits>
@@ -1996,7 +1996,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const auto &field_name=arg0.get_string(ID_component_name);
       const bool is_assertions_disabled_field=
         field_name.find("$assertionsDisabled")!=std::string::npos;
-      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
+
+      symbol_expr.set_identifier(
+        get_static_field(arg0.get_string(ID_class), field_name));
 
       INVARIANT(
         symbol_table.has_symbol(symbol_expr.get_identifier()),
@@ -2025,6 +2027,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
       results[0]=java_bytecode_promotion(symbol_expr);
 
+      // Note this initializer call deliberately inits the class used to make
+      // the reference, which may be a child of the class that actually defines
+      // the field.
       codet clinit_call=get_clinit_call(arg0.get_string(ID_class));
       if(clinit_call.get_statement()!=ID_skip)
         c=clinit_call;
@@ -2052,7 +2057,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(op.size()==1 && results.empty());
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
-      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
+      symbol_expr.set_identifier(
+        get_static_field(arg0.get_string(ID_class), field_name));
 
       INVARIANT(
         symbol_table.has_symbol(symbol_expr.get_identifier()),
@@ -2067,6 +2073,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_blockt block;
       block.add_source_location()=i_it->source_location;
 
+      // Note this initializer call deliberately inits the class used to make
+      // the reference, which may be a child of the class that actually defines
+      // the field.
       codet clinit_call=get_clinit_call(arg0.get_string(ID_class));
       if(clinit_call.get_statement()!=ID_skip)
         block.move_to_operands(clinit_call);
@@ -2764,7 +2773,8 @@ void java_bytecode_convert_method(
   message_handlert &message_handler,
   size_t max_array_length,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
-  java_string_library_preprocesst &string_preprocess)
+  java_string_library_preprocesst &string_preprocess,
+  const class_hierarchyt &class_hierarchy)
 {
   static const std::unordered_set<std::string> methods_to_ignore
   {
@@ -2795,7 +2805,8 @@ void java_bytecode_convert_method(
     message_handler,
     max_array_length,
     needed_lazy_methods,
-    string_preprocess);
+    string_preprocess,
+    class_hierarchy);
 
   java_bytecode_convert_method(class_symbol, method);
 }
@@ -2803,58 +2814,45 @@ void java_bytecode_convert_method(
 /// Returns true iff method \p methodid from class \p classname is
 /// a method inherited from a class (and not an interface!) from which
 /// \p classname inherits, either directly or indirectly.
+/// \param classname: class whose method is referenced
+/// \param methodid: method basename
 bool java_bytecode_convert_methodt::is_method_inherited(
-  const irep_idt &classname, const irep_idt &methodid) const
+  const irep_idt &classname,
+  const irep_idt &methodid) const
 {
-  resolve_concrete_function_callt call_resolver(symbol_table);
-  const resolve_concrete_function_callt ::concrete_function_callt &
-    resolved_call=call_resolver(classname, methodid);
+  resolve_inherited_componentt::inherited_componentt inherited_method =
+    get_inherited_component(
+      classname,
+      methodid,
+      classname,
+      symbol_table,
+      class_hierarchy,
+      false);
+  return inherited_method.is_valid();
+}
 
-  // resolved_call is a pair (class-name, method-name) found by walking the
-  // chain of class inheritance (not interfaces!) and stopping on the first
-  // class that contains a method of equal name and type to `methodid`
+/// Get static field identifier referred to by `class_identifier.component_name`
+/// Note this may be inherited from either a parent or an interface.
+/// \param class_identifier: class used to refer to the field
+/// \param component_name: component (static field) name
+/// \return identifier of the actual concrete field referred to
+irep_idt java_bytecode_convert_methodt::get_static_field(
+  const irep_idt &class_identifier,
+  const irep_idt &component_name) const
+{
+  resolve_inherited_componentt::inherited_componentt inherited_method =
+    get_inherited_component(
+      class_identifier,
+      component_name,
+      symbol_table.lookup_ref(current_method).type.get(ID_C_class),
+      symbol_table,
+      class_hierarchy,
+      true);
 
-  if(resolved_call.is_valid())
-  {
-    const symbolt &function_symbol=
-      *symbol_table.lookup(resolved_call.get_virtual_method_name());
+  INVARIANT(
+    inherited_method.is_valid(), "static field should be in symbol table");
 
-    INVARIANT(function_symbol.type.id()==ID_code, "Function must be code");
-
-    const auto &access=function_symbol.type.get(ID_access);
-    if(access==ID_public || access==ID_protected)
-    {
-      // since the method is public, it is a public method of `classname`, it is
-      // inherited
-      return true;
-    }
-
-    // methods with the default access modifier are only
-    // accessible within the same package.
-    if(access==ID_default)
-    {
-      const std::string &class_package=
-        java_class_to_package(id2string(classname));
-      const std::string &method_package=
-        java_class_to_package(id2string(resolved_call.get_class_identifier()));
-      return method_package==class_package;
-    }
-
-    if(access==ID_private)
-    {
-      // We return false because the method found by the call_resolver above
-      // proves that `methodid` cannot be inherited (assuming that the original
-      // Java code compiles). This is because, as we walk the inheritance chain
-      // for `classname` from Object to `classname`, a method can only become
-      // "more accessible". So, if the last occurrence is private, all others
-      // before must be private as well, and none is inherited in `classname`.
-      return false;
-    }
-
-    INVARIANT(false, "Unexpected access modifier.");
-  }
-
-  return false;
+  return inherited_method.get_full_component_identifier();
 }
 
 /// create temporary variables if a write instruction can have undesired side-

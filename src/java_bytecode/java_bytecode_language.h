@@ -174,6 +174,7 @@ private:
   const std::unique_ptr<const select_pointer_typet> pointer_type_selector;
   synthetic_methods_mapt synthetic_methods;
   stub_global_initializer_factoryt stub_global_initializer_factory;
+  class_hierarchyt class_hierarchy;
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();

@@ -391,6 +391,20 @@ void java_bytecode_convert_classt::convert(
       "."+id2string(f.name);
     new_symbol.mode=ID_java;
     new_symbol.is_type=false;
+
+    // These annotations use `ID_C_access` instead of `ID_access` like methods
+    // to avoid type clashes in expressions like `some_static_field = 0`, where
+    // with ID_access the constant '0' would need to have an access modifier
+    // too, or else appear to have incompatible type.
+    if(f.is_public)
+      new_symbol.type.set(ID_C_access, ID_public);
+    else if(f.is_protected)
+      new_symbol.type.set(ID_C_access, ID_protected);
+    else if(f.is_private)
+      new_symbol.type.set(ID_C_access, ID_private);
+    else
+      new_symbol.type.set(ID_C_access, ID_default);
+
     const namespacet ns(symbol_table);
     new_symbol.value=
       zero_initializer(
