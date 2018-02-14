@@ -84,9 +84,9 @@ public:
   /// footprint, so if keeping the state around is not necessary,
   /// clients should instead call goto_symext::symex_from_entry_point_of().
   virtual void symex_with_state(
-    statet &state,
-    const goto_functionst &goto_functions,
-    const goto_programt &goto_program);
+    statet &,
+    const goto_functionst &,
+    const goto_programt &);
 
   /// Symexes from the first instruction and the given state, terminating as
   /// soon as the last instruction is reached.  This is useful to explicitly
@@ -97,8 +97,8 @@ public:
   /// \param first Entry point in form of a first instruction.
   /// \param limit Final instruction, which itself will not be symexed.
   virtual void symex_instruction_range(
-    statet &state,
-    const goto_functionst &goto_functions,
+    statet &,
+    const goto_functionst &,
     goto_programt::const_targett first,
     goto_programt::const_targett limit);
 
@@ -111,8 +111,8 @@ protected:
   /// \param limit final instruction, which itself will not
   /// be symexed.
   void initialize_entry_point(
-    statet &state,
-    const goto_functionst &goto_functions,
+    statet &,
+    const goto_functionst &,
     goto_programt::const_targett pc,
     goto_programt::const_targett limit);
 
@@ -121,16 +121,16 @@ protected:
   /// \param state Current GOTO symex step.
   /// \param goto_functions GOTO model to symex.
   void symex_threaded_step(
-    statet &state, const goto_functionst &goto_functions);
+    statet &, const goto_functionst &);
 
   /** execute just one step */
   virtual void symex_step(
-    const goto_functionst &goto_functions,
-    statet &state);
+    const goto_functionst &,
+    statet &);
 
 public:
   // these bypass the target maps
-  virtual void symex_step_goto(statet &state, bool taken);
+  virtual void symex_step_goto(statet &, bool taken);
 
   // statistics
   unsigned total_vccs, remaining_vccs;
@@ -160,37 +160,33 @@ protected:
   // b) remove pointer dereferencing
   // c) rewrite array_equal expression into equality
   void clean_expr(
-    exprt &expr, statet &state, bool write);
+    exprt &, statet &, bool write);
 
-  void replace_array_equal(exprt &expr);
-  void trigger_auto_object(const exprt &expr, statet &state);
-  void initialize_auto_object(const exprt &expr, statet &state);
-  void process_array_expr(exprt &expr);
-  void process_array_expr_rec(exprt &expr, const typet &type) const;
-  exprt make_auto_object(const typet &type);
-
-  virtual void dereference(
-    exprt &expr,
-    statet &state,
-    const bool write);
+  void replace_array_equal(exprt &);
+  void trigger_auto_object(const exprt &, statet &);
+  void initialize_auto_object(const exprt &, statet &);
+  void process_array_expr(exprt &);
+  void process_array_expr_rec(exprt &, const typet &) const;
+  exprt make_auto_object(const typet &);
+  virtual void dereference(exprt &, statet &, const bool write);
 
   void dereference_rec(
-    exprt &expr,
-    statet &state,
-    guardt &guard,
+    exprt &,
+    statet &,
+    guardt &,
     const bool write);
 
   void dereference_rec_address_of(
-    exprt &expr,
-    statet &state,
-    guardt &guard);
+    exprt &,
+    statet &,
+    guardt &);
 
   static bool is_index_member_symbol_if(const exprt &expr);
 
   exprt address_arithmetic(
-    const exprt &expr,
-    statet &state,
-    guardt &guard,
+    const exprt &,
+    statet &,
+    guardt &,
     bool keep_array);
 
   // guards
@@ -199,9 +195,10 @@ protected:
 
   // symex
   virtual void symex_transition(
-    statet &state,
+    statet &,
     goto_programt::const_targett to,
     bool is_backwards_goto=false);
+
   virtual void symex_transition(statet &state)
   {
     goto_programt::const_targett next=state.source.pc;
@@ -209,31 +206,28 @@ protected:
     symex_transition(state, next);
   }
 
-  virtual void symex_goto(statet &state);
-  virtual void symex_start_thread(statet &state);
-  virtual void symex_atomic_begin(statet &state);
-  virtual void symex_atomic_end(statet &state);
-  virtual void symex_decl(statet &state);
-  virtual void symex_decl(statet &state, const symbol_exprt &expr);
-  virtual void symex_dead(statet &state);
-
-  virtual void symex_other(
-    const goto_functionst &goto_functions,
-    statet &state);
+  virtual void symex_goto(statet &);
+  virtual void symex_start_thread(statet &);
+  virtual void symex_atomic_begin(statet &);
+  virtual void symex_atomic_end(statet &);
+  virtual void symex_decl(statet &);
+  virtual void symex_decl(statet &, const symbol_exprt &expr);
+  virtual void symex_dead(statet &);
+  virtual void symex_other(const goto_functionst &, statet &);
 
   virtual void vcc(
-    const exprt &expr,
+    const exprt &,
     const std::string &msg,
-    statet &state);
+    statet &);
 
-  virtual void symex_assume(statet &state, const exprt &cond);
+  virtual void symex_assume(statet &, const exprt &cond);
 
   // gotos
-  void merge_gotos(statet &state);
+  void merge_gotos(statet &);
 
   virtual void merge_goto(
     const statet::goto_statet &goto_state,
-    statet &state);
+    statet &);
 
   void merge_value_sets(
     const statet::goto_statet &goto_state,
@@ -241,7 +235,7 @@ protected:
 
   void phi_function(
     const statet::goto_statet &goto_state,
-    statet &state);
+    statet &);
 
   // determine whether to unwind a loop -- true indicates abort,
   // with false we continue.
@@ -249,33 +243,33 @@ protected:
     const symex_targett::sourcet &source,
     unsigned unwind);
 
-  virtual void loop_bound_exceeded(statet &state, const exprt &guard);
+  virtual void loop_bound_exceeded(statet &, const exprt &guard);
 
   // function calls
 
-  void pop_frame(statet &state);
-  void return_assignment(statet &state);
+  void pop_frame(statet &);
+  void return_assignment(statet &);
 
   virtual void no_body(const irep_idt &identifier)
   {
   }
 
   virtual void symex_function_call(
-    const goto_functionst &goto_functions,
-    statet &state,
-    const code_function_callt &call);
+    const goto_functionst &,
+    statet &,
+    const code_function_callt &);
 
-  virtual void symex_end_of_function(statet &state);
+  virtual void symex_end_of_function(statet &);
 
   virtual void symex_function_call_symbol(
-    const goto_functionst &goto_functions,
-    statet &state,
-    const code_function_callt &call);
+    const goto_functionst &,
+    statet &,
+    const code_function_callt &);
 
   virtual void symex_function_call_code(
-    const goto_functionst &goto_functions,
-    statet &state,
-    const code_function_callt &call);
+    const goto_functionst &,
+    statet &,
+    const code_function_callt &);
 
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
@@ -284,29 +278,26 @@ protected:
 
   void parameter_assignments(
     const irep_idt function_identifier,
-    const goto_functionst::goto_functiont &goto_function,
-    statet &state,
+    const goto_functionst::goto_functiont &,
+    statet &,
     const exprt::operandst &arguments);
 
   void locality(
     const irep_idt function_identifier,
-    statet &state,
-    const goto_functionst::goto_functiont &goto_function);
+    statet &,
+    const goto_functionst::goto_functiont &);
 
   void add_end_of_function(
     exprt &code,
     const irep_idt &identifier);
 
   // exceptions
+  void symex_throw(statet &);
+  void symex_catch(statet &);
 
-  void symex_throw(statet &state);
-  void symex_catch(statet &state);
+  virtual void do_simplify(exprt &);
 
-  virtual void do_simplify(exprt &expr);
-
-  // virtual void symex_block(statet &state, const codet &code);
-  void symex_assign_rec(statet &state, const code_assignt &code);
-  virtual void symex_assign(statet &state, const code_assignt &code);
+  void symex_assign(statet &, const code_assignt &);
 
   // havocs the given object
   void havoc_rec(statet &, const guardt &, const exprt &);
@@ -314,77 +305,77 @@ protected:
   typedef symex_targett::assignment_typet assignment_typet;
 
   void symex_assign_rec(
-    statet &state,
+    statet &,
     const exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &guard,
-    assignment_typet assignment_type);
+    guardt &,
+    assignment_typet);
   void symex_assign_symbol(
-    statet &state,
+    statet &,
     const ssa_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &guard,
-    assignment_typet assignment_type);
+    guardt &,
+    assignment_typet);
   void symex_assign_typecast(
-    statet &state,
+    statet &,
     const typecast_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &guard,
-    assignment_typet assignment_type);
+    guardt &,
+    assignment_typet);
   void symex_assign_array(
-    statet &state,
+    statet &,
     const index_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &guard,
-    assignment_typet assignment_type);
+    guardt &,
+    assignment_typet);
   void symex_assign_struct_member(
-    statet &state,
+    statet &,
     const member_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &guard,
-    assignment_typet assignment_type);
+    guardt &,
+    assignment_typet);
   void symex_assign_if(
-    statet &state,
+    statet &,
     const if_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &guard,
-    assignment_typet assignment_type);
+    guardt &,
+    assignment_typet);
   void symex_assign_byte_extract(
-    statet &state,
+    statet &,
     const byte_extract_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &guard,
-    assignment_typet assignment_type);
+    guardt &,
+    assignment_typet);
 
   static exprt add_to_lhs(const exprt &lhs, const exprt &what);
 
   virtual void symex_gcc_builtin_va_arg_next(
-    statet &state, const exprt &lhs, const side_effect_exprt &code);
+    statet &, const exprt &lhs, const side_effect_exprt &);
   virtual void symex_allocate(
-    statet &state, const exprt &lhs, const side_effect_exprt &code);
-  virtual void symex_cpp_delete(statet &state, const codet &code);
+    statet &, const exprt &lhs, const side_effect_exprt &);
+  virtual void symex_cpp_delete(statet &, const codet &);
   virtual void symex_cpp_new(
-    statet &state, const exprt &lhs, const side_effect_exprt &code);
-  virtual void symex_fkt(statet &state, const code_function_callt &code);
-  virtual void symex_macro(statet &state, const code_function_callt &code);
-  virtual void symex_trace(statet &state, const code_function_callt &code);
-  virtual void symex_printf(statet &state, const exprt &lhs, const exprt &rhs);
-  virtual void symex_input(statet &state, const codet &code);
-  virtual void symex_output(statet &state, const codet &code);
+    statet &, const exprt &lhs, const side_effect_exprt &);
+  virtual void symex_fkt(statet &, const code_function_callt &);
+  virtual void symex_macro(statet &, const code_function_callt &);
+  virtual void symex_trace(statet &, const code_function_callt &);
+  virtual void symex_printf(statet &, const exprt &lhs, const exprt &rhs);
+  virtual void symex_input(statet &, const codet &);
+  virtual void symex_output(statet &, const codet &);
 
   static unsigned nondet_count;
   static unsigned dynamic_counter;
 
-  void read(exprt &expr);
-  void replace_nondet(exprt &expr);
-  void rewrite_quantifiers(exprt &expr, statet &state);
+  void read(exprt &);
+  void replace_nondet(exprt &);
+  void rewrite_quantifiers(exprt &, statet &);
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_H

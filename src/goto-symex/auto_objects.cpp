@@ -76,7 +76,7 @@ void goto_symext::initialize_auto_object(
         address_of_expr);
 
       code_assignt assignment(expr, rhs);
-      symex_assign_rec(state, assignment);
+      symex_assign(state, assignment);
     }
   }
 }

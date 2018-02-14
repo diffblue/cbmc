@@ -20,18 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // #define USE_UPDATE
 
-void goto_symext::symex_assign_rec(
-  statet &state,
-  const code_assignt &code)
-{
-  code_assignt deref_code=code;
-
-  clean_expr(deref_code.lhs(), state, true);
-  clean_expr(deref_code.rhs(), state, false);
-
-  symex_assign(state, deref_code);
-}
-
 void goto_symext::symex_assign(
   statet &state,
   const code_assignt &code)
@@ -39,8 +27,8 @@ void goto_symext::symex_assign(
   exprt lhs=code.lhs();
   exprt rhs=code.rhs();
 
-  replace_nondet(lhs);
-  replace_nondet(rhs);
+  clean_expr(lhs, state, true);
+  clean_expr(rhs, state, false);
 
   if(rhs.id()==ID_side_effect)
   {

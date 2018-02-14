@@ -293,7 +293,7 @@ void goto_symext::symex_step(
 
   case ASSIGN:
     if(!state.guard.is_false())
-      symex_assign_rec(state, to_code_assign(instruction.code));
+      symex_assign(state, to_code_assign(instruction.code));
 
     symex_transition(state);
     break;
