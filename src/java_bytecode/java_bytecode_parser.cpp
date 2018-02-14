@@ -210,6 +210,125 @@ protected:
 #define VTYPE_INFO_OBJECT      7
 #define VTYPE_INFO_UNINIT      8
 
+
+class structured_pool_entryt
+{
+public:
+  explicit structured_pool_entryt(java_bytecode_parsert::pool_entryt entry)
+    : tag(entry.tag)
+  {
+  }
+
+  u1 get_tag() const { return tag; }
+
+  typedef std::function<java_bytecode_parsert::pool_entryt &(u2)> pool_entry_lookupt;
+  typedef java_bytecode_parsert::pool_entryt pool_entryt;
+
+protected:
+  static std::string read_utf8_constant(const pool_entryt &entry)
+  {
+    INVARIANT(
+      entry.tag == CONSTANT_Utf8, "Name entry must be a constant UTF-8");
+    return id2string(entry.s);
+  }
+
+private:
+  u1 tag;
+};
+
+/// Corresponds to the CONSTANT_Class_info Structure
+/// Described in Java 8 specification 4.4.1
+class class_infot : public structured_pool_entryt
+{
+public:
+  explicit class_infot(const pool_entryt &entry): structured_pool_entryt(entry)
+  {
+    PRECONDITION(entry.tag == CONSTANT_Class);
+    name_index=entry.ref1;
+  }
+
+  std::string get_name(pool_entry_lookupt pool_entry) const
+  {
+    const pool_entryt &name_entry = pool_entry(name_index);
+    return read_utf8_constant(name_entry);
+  }
+
+private:
+  u2 name_index;
+};
+
+/// Corresponds to the CONSTANT_NameAndType_info Structure
+/// Described in Java 8 specification 4.4.6
+class name_and_type_infot : public structured_pool_entryt
+{
+public:
+  explicit name_and_type_infot(java_bytecode_parsert::pool_entryt entry)
+    : structured_pool_entryt(entry)
+  {
+    PRECONDITION(entry.tag == CONSTANT_NameAndType);
+    name_index = entry.ref1;
+    descriptor_index = entry.ref2;
+  }
+
+  std::string get_name(pool_entry_lookupt pool_entry) const
+  {
+    const pool_entryt &name_entry = pool_entry(name_index);
+    return read_utf8_constant(name_entry);
+  }
+
+  std::string get_descriptor(pool_entry_lookupt pool_entry) const
+  {
+    const pool_entryt &descriptor_entry = pool_entry(descriptor_index);
+    return read_utf8_constant(descriptor_entry);
+  }
+
+private:
+  u2 name_index;
+  u2 descriptor_index;
+};
+
+class base_ref_infot : public structured_pool_entryt
+{
+public:
+  explicit base_ref_infot(pool_entryt entry)
+    : structured_pool_entryt(entry)
+  {
+    static std::set<u1> info_tags = {
+      CONSTANT_Fieldref, CONSTANT_Methodref, CONSTANT_InterfaceMethodref};
+    PRECONDITION(info_tags.find(entry.tag) != info_tags.end());
+    class_index=entry.ref1;
+    name_and_type_index=entry.ref2;
+  }
+
+  u1 get_class_index() const { return class_index; }
+  u1 get_name_and_type_index() const { return name_and_type_index; }
+
+  name_and_type_infot get_name_and_type(pool_entry_lookupt pool_entry) const
+  {
+    const pool_entryt &name_and_type_entry =
+      pool_entry(name_and_type_index);
+
+    INVARIANT(
+      name_and_type_entry.tag == CONSTANT_NameAndType,
+      "name_and_typeindex did not correspond to a name_and_type in the constants "
+        "pool");
+
+    return name_and_type_infot{name_and_type_entry};
+  }
+
+  class_infot get_class(pool_entry_lookupt pool_entry) const
+  {
+    const pool_entryt &class_entry =
+      pool_entry(class_index);
+
+    return class_infot{class_entry};
+  }
+
+private:
+  u2 class_index;
+  u2 name_and_type_index;
+};
+
 bool java_bytecode_parsert::parse()
 {
   try
