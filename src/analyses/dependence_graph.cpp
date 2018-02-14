@@ -76,7 +76,7 @@ void dep_graph_domaint::control_dependencies(
      from->is_assume())
     control_deps.insert(from);
 
-  const irep_idt id=goto_programt::get_function_id(from);
+  const irep_idt id=from->function;
   const cfg_post_dominatorst &pd=dep_graph.cfg_post_dominators().at(id);
 
   // check all candidates for M

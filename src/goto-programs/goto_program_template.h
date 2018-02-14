@@ -387,20 +387,11 @@ public:
   }
 
   static const irep_idt get_function_id(
-    const_targett l)
-  {
-    while(!l->is_end_function())
-      ++l;
-
-    return l->function;
-  }
-
-  static const irep_idt get_function_id(
     const goto_program_templatet<codeT, guardT> &p)
   {
-    assert(!p.empty());
+    PRECONDITION(!p.empty());
 
-    return get_function_id(--p.instructions.end());
+    return p.instructions.back().function;
   }
 
   template <typename Target>

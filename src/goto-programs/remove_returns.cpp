@@ -244,8 +244,7 @@ void remove_returnst::operator()(
   if(goto_function.body.empty())
     return;
 
-  replace_returns(
-    goto_programt::get_function_id(goto_function.body), goto_function);
+  replace_returns(model_function.get_function_id(), goto_function);
   do_function_calls(function_is_stub, goto_function.body);
 }
 
