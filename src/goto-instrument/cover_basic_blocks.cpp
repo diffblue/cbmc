@@ -65,6 +65,7 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
 
     // set representative program location to instrument
     if(
+      !it->function.empty() &&
       !it->source_location.is_nil() &&
       !it->source_location.get_file().empty() &&
       !it->source_location.get_line().empty() &&
