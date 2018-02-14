@@ -8,10 +8,6 @@
 
 #include "symbol_table_base.h"
 
-#define forall_symbols(it, expr) \
-  for(symbol_tablet::symbolst::const_iterator it=(expr).begin(); \
-      it!=(expr).end(); ++it)
-
 #define forall_symbol_base_map(it, expr, base_name) \
   for(symbol_base_mapt::const_iterator it=(expr).lower_bound(base_name), \
                                        it_end=(expr).upper_bound(base_name); \
