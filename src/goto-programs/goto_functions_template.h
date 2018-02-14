@@ -62,6 +62,14 @@ public:
     parameter_identifiers.clear();
   }
 
+  /// update the function member in each instruction
+  /// \param function_id: the `function_id` used for assigning empty function
+  ///   members
+  void update_instructions_function(const irep_idt &function_id)
+  {
+    body.update_instructions_function(function_id);
+  }
+
   void swap(goto_function_templatet &other)
   {
     body.swap(other.body);
@@ -149,12 +157,23 @@ public:
   void compute_target_numbers();
   void compute_incoming_edges();
 
+  /// update the function member in each instruction by setting it to
+  /// the goto function's identifier
+  void update_instructions_function()
+  {
+    for(auto &func : function_map)
+    {
+      func.second.update_instructions_function(func.first);
+    }
+  }
+
   void update()
   {
     compute_incoming_edges();
     compute_target_numbers();
     compute_location_numbers();
     compute_loop_numbers();
+    update_instructions_function();
   }
 
   static inline irep_idt entry_point()

@@ -521,6 +521,22 @@ public:
     }
   }
 
+  /// Sets the `function` member of each instruction if not yet set
+  /// Note that a goto program need not be a goto function and therefore,
+  /// we cannot do this in update(), but only at the level of
+  /// of goto_functionst where goto programs are guaranteed to be
+  /// named functions.
+  void update_instructions_function(const irep_idt &function_id)
+  {
+    for(auto &instruction : instructions)
+    {
+      if(instruction.function.empty())
+      {
+        instruction.function = function_id;
+      }
+    }
+  }
+
   /// Compute location numbers
   void compute_location_numbers()
   {
