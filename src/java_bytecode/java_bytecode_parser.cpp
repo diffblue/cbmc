@@ -1829,9 +1829,7 @@ java_bytecode_parsert::parse_method_handle(const pool_entryt &entry)
     (entry.ref1 > 0 && entry.ref1 < 10),
     "reference kind of Methodhandle must be in the range of 1 to 9");
 
-  const pool_entryt ref_entry = pool_entry(entry.ref2);
-  const auto &class_entry = pool_entry(ref_entry.ref1);
-  const auto &nameandtype_entry = pool_entry(ref_entry.ref2);
+  const base_ref_infot ref_entry{pool_entry(entry.ref2)};
 
   method_handle_kindt  method_handle_kind = (method_handle_kindt)entry.ref1;
   switch(method_handle_kind)
@@ -1841,35 +1839,43 @@ java_bytecode_parsert::parse_method_handle(const pool_entryt &entry)
   case method_handle_kindt::REF_putField:
   case method_handle_kindt::REF_putStatic:
   {
-    INVARIANT(ref_entry.tag == CONSTANT_Fieldref, "4.4.2");
+    INVARIANT(ref_entry.get_tag() == CONSTANT_Fieldref, "4.4.2");
     break;
   }
   case method_handle_kindt::REF_invokeVirtual:
   case method_handle_kindt::REF_newInvokeSpecial:
   {
 
-    INVARIANT(ref_entry.tag == CONSTANT_Methodref, "4.4.2");
+    INVARIANT(ref_entry.get_tag() == CONSTANT_Methodref, "4.4.2");
     break;
   }
   case method_handle_kindt::REF_invokeStatic:
   case method_handle_kindt::REF_invokeSpecial:
   {
     INVARIANT(
-      ref_entry.tag == CONSTANT_Methodref ||
-      ref_entry.tag == CONSTANT_InterfaceMethodref,
+      ref_entry.get_tag() == CONSTANT_Methodref ||
+      ref_entry.get_tag() == CONSTANT_InterfaceMethodref,
       "4.4.2");
     break;
   }
   case method_handle_kindt::REF_invokeInterface:
   {
-    INVARIANT(ref_entry.tag == CONSTANT_InterfaceMethodref,"");
+    INVARIANT(ref_entry.get_tag() == CONSTANT_InterfaceMethodref,"");
     break;
   }
   }
+
+  const std::function<pool_entryt &(u2)> pool_entry_lambda =
+    [this](u2 index) -> pool_entryt & { return pool_entry(index); };
+
+  const class_infot &class_entry=ref_entry.get_class(pool_entry_lambda);
+  const name_and_type_infot &name_and_type =
+    ref_entry.get_name_and_type(pool_entry_lambda);
+
   const std::string method_name =
-    id2string(pool_entry(class_entry.ref1).s) + "." +
-    id2string(pool_entry(nameandtype_entry.ref1).s) +
-    id2string(pool_entry(nameandtype_entry.ref2).s);
+    class_entry.get_name(pool_entry_lambda) + "." +
+    name_and_type.get_name(pool_entry_lambda) +
+    name_and_type.get_descriptor(pool_entry_lambda);
 
   if(
     method_name ==
