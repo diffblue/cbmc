@@ -877,14 +877,7 @@ bool java_bytecode_languaget::convert_single_method(
 bool java_bytecode_languaget::final(symbol_table_baset &symbol_table)
 {
   PRECONDITION(language_options_initialized);
-
-  return recreate_initialize(
-    symbol_table,
-    main_class,
-    get_message_handler(),
-    assume_inputs_non_null,
-    object_factory_parameters,
-    get_pointer_type_selector());
+  return false;
 }
 
 void java_bytecode_languaget::show_parse(std::ostream &out)
