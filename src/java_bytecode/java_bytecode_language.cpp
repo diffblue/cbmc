@@ -788,7 +788,8 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     java_class_loader,
     java_load_classes,
     get_pointer_type_selector(),
-    get_message_handler());
+    get_message_handler(),
+    synthetic_methods);
 
   return method_gather(symbol_table, method_bytecode, method_converter);
 }

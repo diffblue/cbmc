@@ -23,6 +23,7 @@
 #include <java_bytecode/java_class_loader.h>
 #include <java_bytecode/ci_lazy_methods_needed.h>
 #include <java_bytecode/select_pointer_type.h>
+#include <java_bytecode/synthetic_methods_map.h>
 
 class java_string_library_preprocesst;
 
@@ -99,7 +100,8 @@ public:
     java_class_loadert &java_class_loader,
     const std::vector<irep_idt> &extra_needed_classes,
     const select_pointer_typet &pointer_type_selector,
-    message_handlert &message_handler);
+    message_handlert &message_handler,
+    const synthetic_methods_mapt &synthetic_methods);
 
   // not const since messaget
   bool operator()(
@@ -164,6 +166,7 @@ private:
   java_class_loadert &java_class_loader;
   const std::vector<irep_idt> &extra_needed_classes;
   const select_pointer_typet &pointer_type_selector;
+  const synthetic_methods_mapt &synthetic_methods;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_GATHER_METHODS_LAZILY_H

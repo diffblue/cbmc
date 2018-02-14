@@ -1,0 +1,6 @@
+CORE
+Test.class
+--lazy-methods --show-goto-functions
+--
+java::Opaque\.<clinit>:\(\)V
+java::Opaque::clinit_wrapper
