@@ -429,13 +429,15 @@ static void create_stub_global_symbol(
     !add_failed, "caller should have checked symbol not already in table");
 }
 
-/// Find any incomplete ancestor of a given class
+/// Find any incomplete ancestor of a given class that can have a stub static
+/// field attached to it. This specifically excludes java.lang.Object, which we
+/// know cannot have static fields.
 /// \param start_class_id: class to start searching from
 /// \param symbol_table: global symbol table
 /// \param class_hierarchy: global class hierarchy
 /// \return first incomplete ancestor encountered,
 ///   including start_class_id itself.
-static irep_idt get_any_incomplete_ancestor(
+static irep_idt get_any_incomplete_ancestor_for_stub_static_field(
   const irep_idt &start_class_id,
   const symbol_tablet &symbol_table,
   const class_hierarchyt &class_hierarchy)
@@ -450,8 +452,12 @@ static irep_idt get_any_incomplete_ancestor(
     irep_idt to_check = classes_to_check.back();
     classes_to_check.pop_back();
 
-    if(symbol_table.lookup_ref(to_check).type.get_bool(ID_incomplete_class))
+    // Exclude java.lang.Object because it can
+    if(symbol_table.lookup_ref(to_check).type.get_bool(ID_incomplete_class) &&
+       to_check != "java::java.lang.Object")
+    {
       return to_check;
+    }
 
     const class_hierarchyt::idst &parents =
       class_hierarchy.class_map.at(to_check).parents;
@@ -512,7 +518,7 @@ static void create_stub_global_symbols(
           // class that was referred to. This is just a guess, but we have no
           // better information to go on.
           irep_idt add_to_class_id =
-            get_any_incomplete_ancestor(
+            get_any_incomplete_ancestor_for_stub_static_field(
               class_id, symbol_table, class_hierarchy);
 
           // If there are no incomplete ancestors to ascribe the missing field
