@@ -1678,6 +1678,21 @@ void java_bytecode_parsert::parse_local_variable_type_table(methodt &method)
   }
 }
 
+/// Correspond to the different valid values for field reference_kind
+/// From Java 8 spec 4.4.8
+enum class method_handle_kindt
+{
+  REF_getField = 1,
+  REF_getStatic = 2,
+  REF_putField = 3,
+  REF_putStatic = 4,
+  REF_invokeVirtual = 5,
+  REF_invokeStatic = 6,
+  REF_invokeSpecial = 7,
+  REF_newInvokeSpecial = 8,
+  REF_invokeInterface = 9
+};
+
 /// Read method handle pointed to from constant pool entry at index, return type
 /// of method handle and name if lambda function is found.
 /// \param entry: the constant pool entry of the methodhandle_info structure
@@ -1690,14 +1705,48 @@ java_bytecode_parsert::parse_method_handle(const pool_entryt &entry)
     entry.tag == CONSTANT_MethodHandle,
     "constant pool entry must be a MethodHandle");
   lambda_method_handlet lambda_method_handle;
-  const auto &ref_entry = pool_entry(entry.ref2);
+
   INVARIANT(
     (entry.ref1 > 0 && entry.ref1 < 10),
     "reference kind of Methodhandle must be in the range of 1 to 9");
 
+  const pool_entryt ref_entry = pool_entry(entry.ref2);
   const auto &class_entry = pool_entry(ref_entry.ref1);
   const auto &nameandtype_entry = pool_entry(ref_entry.ref2);
 
+  method_handle_kindt  method_handle_kind = (method_handle_kindt)entry.ref1;
+  switch(method_handle_kind)
+  {
+  case method_handle_kindt::REF_getField:
+  case method_handle_kindt::REF_getStatic:
+  case method_handle_kindt::REF_putField:
+  case method_handle_kindt::REF_putStatic:
+  {
+    INVARIANT(ref_entry.tag == CONSTANT_Fieldref, "4.4.2");
+    break;
+  }
+  case method_handle_kindt::REF_invokeVirtual:
+  case method_handle_kindt::REF_newInvokeSpecial:
+  {
+
+    INVARIANT(ref_entry.tag == CONSTANT_Methodref, "4.4.2");
+    break;
+  }
+  case method_handle_kindt::REF_invokeStatic:
+  case method_handle_kindt::REF_invokeSpecial:
+  {
+    INVARIANT(
+      ref_entry.tag == CONSTANT_Methodref ||
+      ref_entry.tag == CONSTANT_InterfaceMethodref,
+      "4.4.2");
+    break;
+  }
+  case method_handle_kindt::REF_invokeInterface:
+  {
+    INVARIANT(ref_entry.tag == CONSTANT_InterfaceMethodref,"");
+    break;
+  }
+  }
   const std::string method_name =
     id2string(pool_entry(class_entry.ref1).s) + "." +
     id2string(pool_entry(nameandtype_entry.ref1).s) +
