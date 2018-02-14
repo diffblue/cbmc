@@ -98,14 +98,14 @@ optionalt<goto_programt::const_targett>
 cover_basic_blockst::instruction_of(const std::size_t block_nr) const
 {
   INVARIANT(block_nr < block_infos.size(), "block number out of range");
-  return block_infos.at(block_nr).representative_inst;
+  return block_infos[block_nr].representative_inst;
 }
 
 const source_locationt &
 cover_basic_blockst::source_location_of(const std::size_t block_nr) const
 {
   INVARIANT(block_nr < block_infos.size(), "block number out of range");
-  return block_infos.at(block_nr).source_location;
+  return block_infos[block_nr].source_location;
 }
 
 void cover_basic_blockst::report_block_anomalies(
