@@ -4,7 +4,16 @@ covered1.class
 ^EXIT=0$
 ^SIGNAL=0$
 .*\"coveredLines\": \"22\",$
-.*\"coveredLines\": \"4,6,7,23-25,31-33,36\",$
+.*\"coveredLines\": \"4\",$
+.*\"coveredLines\": \"6\",$
+.*\"coveredLines\": \"7\",$
+.*\"coveredLines\": \"23\",$
+.*\"coveredLines\": \"24\",$
+.*\"coveredLines\": \"25\",$
+.*\"coveredLines\": \"31\",$
+.*\"coveredLines\": \"32\",$
+.*\"coveredLines\": \"33\",$
+.*\"coveredLines\": \"36\",$
 .*\"coveredLines\": \"26\",$
 .*\"coveredLines\": \"28\",$
 .*\"coveredLines\": \"28\",$
