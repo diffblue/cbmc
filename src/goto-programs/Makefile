@@ -47,7 +47,6 @@ SRC = basic_blocks.cpp \
       remove_instanceof.cpp \
       remove_returns.cpp \
       remove_skip.cpp \
-      remove_static_init_loops.cpp \
       remove_unreachable.cpp \
       remove_unused_functions.cpp \
       remove_vector.cpp \

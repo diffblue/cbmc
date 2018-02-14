@@ -206,6 +206,12 @@ void java_bytecode_convert_classt::convert(const classt &c)
   class_type.set(ID_abstract, c.is_abstract);
   if(c.is_enum)
   {
+    if(max_array_length != 0 && c.enum_elements > max_array_length)
+    {
+      warning() << "Java Enum " << c.name << " won't work properly because max "
+                << "array length (" << max_array_length << ") is less than the "
+                << "enum size (" << c.enum_elements << ")" << eom;
+    }
     class_type.set(
       ID_java_enum_static_unwind,
       std::to_string(c.enum_elements+1));

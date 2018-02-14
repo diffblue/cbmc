@@ -110,27 +110,49 @@ bool symex_bmct::get_unwind(
 {
   const irep_idt id=goto_programt::loop_id(*source.pc);
 
-  // We use the most specific limit we have,
-  // and 'infinity' when we have none.
-
+  tvt abort_unwind_decision;
   unsigned this_loop_limit=std::numeric_limits<unsigned>::max();
 
-  loop_limitst &this_thread_limits=
-    thread_loop_limits[source.thread_nr];
-
-  loop_limitst::const_iterator l_it=this_thread_limits.find(id);
-  if(l_it!=this_thread_limits.end())
-    this_loop_limit=l_it->second;
-  else
+  for(auto handler : loop_unwind_handlers)
   {
-    l_it=loop_limits.find(id);
-    if(l_it!=loop_limits.end())
-      this_loop_limit=l_it->second;
-    else if(max_unwind_is_set)
-      this_loop_limit=max_unwind;
+    abort_unwind_decision =
+      handler(
+        source.pc->function,
+        source.pc->loop_number,
+        unwind,
+        this_loop_limit);
+    if(abort_unwind_decision.is_known())
+      break;
   }
 
-  bool abort=unwind>=this_loop_limit;
+  // If no handler gave an opinion, use standard command-line --unwindset
+  // / --unwind options to decide:
+  if(abort_unwind_decision.is_unknown())
+  {
+    // We use the most specific limit we have,
+    // and 'infinity' when we have none.
+
+    loop_limitst &this_thread_limits=
+      thread_loop_limits[source.thread_nr];
+
+    loop_limitst::const_iterator l_it=this_thread_limits.find(id);
+    if(l_it!=this_thread_limits.end())
+      this_loop_limit=l_it->second;
+    else
+    {
+      l_it=loop_limits.find(id);
+      if(l_it!=loop_limits.end())
+        this_loop_limit=l_it->second;
+      else if(max_unwind_is_set)
+        this_loop_limit=max_unwind;
+    }
+
+    abort_unwind_decision = tvt(unwind >= this_loop_limit);
+  }
+
+  INVARIANT(
+    abort_unwind_decision.is_known(), "unwind decision should be taken by now");
+  bool abort = abort_unwind_decision.is_true();
 
   log.statistics() << (abort ? "Not unwinding" : "Unwinding") << " loop " << id
                    << " iteration " << unwind;
@@ -149,27 +171,44 @@ bool symex_bmct::get_unwind_recursion(
   const unsigned thread_nr,
   unsigned unwind)
 {
-  // We use the most specific limit we have,
-  // and 'infinity' when we have none.
-
+  tvt abort_unwind_decision;
   unsigned this_loop_limit=std::numeric_limits<unsigned>::max();
 
-  loop_limitst &this_thread_limits=
-    thread_loop_limits[thread_nr];
-
-  loop_limitst::const_iterator l_it=this_thread_limits.find(id);
-  if(l_it!=this_thread_limits.end())
-    this_loop_limit=l_it->second;
-  else
+  for(auto handler : recursion_unwind_handlers)
   {
-    l_it=loop_limits.find(id);
-    if(l_it!=loop_limits.end())
-      this_loop_limit=l_it->second;
-    else if(max_unwind_is_set)
-      this_loop_limit=max_unwind;
+    abort_unwind_decision = handler(id, unwind, this_loop_limit);
+    if(abort_unwind_decision.is_known())
+      break;
   }
 
-  bool abort=unwind>this_loop_limit;
+  // If no handler gave an opinion, use standard command-line --unwindset
+  // / --unwind options to decide:
+  if(abort_unwind_decision.is_unknown())
+  {
+    // We use the most specific limit we have,
+    // and 'infinity' when we have none.
+
+    loop_limitst &this_thread_limits=
+      thread_loop_limits[thread_nr];
+
+    loop_limitst::const_iterator l_it=this_thread_limits.find(id);
+    if(l_it!=this_thread_limits.end())
+      this_loop_limit=l_it->second;
+    else
+    {
+      l_it=loop_limits.find(id);
+      if(l_it!=loop_limits.end())
+        this_loop_limit=l_it->second;
+      else if(max_unwind_is_set)
+        this_loop_limit=max_unwind;
+    }
+
+    abort_unwind_decision = tvt(unwind>this_loop_limit);
+  }
+
+  INVARIANT(
+    abort_unwind_decision.is_known(), "unwind decision should be taken by now");
+  bool abort = abort_unwind_decision.is_true();
 
   if(unwind>0 || abort)
   {

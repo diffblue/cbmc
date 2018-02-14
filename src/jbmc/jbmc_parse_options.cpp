@@ -39,7 +39,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_skip.h>
-#include <goto-programs/remove_static_init_loops.h>
 #include <goto-programs/replace_java_nondet.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
@@ -57,6 +56,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 
 #include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/java_enum_static_init_unwind_handler.h>
 
 #include <cbmc/cbmc_solvers.h>
 #include <cbmc/bmc.h>
@@ -491,11 +491,6 @@ int jbmc_parse_optionst::doit()
   if(set_properties(goto_model))
     return 7; // should contemplate EX_USAGE from sysexits.h
 
-  // unwinds <clinit> loops to number of enum elements
-  // side effect: add this as explicit unwind to unwind set
-  if(options.get_bool_option("java-unwind-enum-static"))
-    remove_static_init_loops(goto_model, options, get_message_handler());
-
   // get solver
   cbmc_solverst jbmc_solvers(
     options,
@@ -524,6 +519,24 @@ int jbmc_parse_optionst::doit()
     goto_model.symbol_table,
     get_message_handler(),
     prop_conv);
+
+  // unwinds <clinit> loops to number of enum elements
+  if(options.get_bool_option("java-unwind-enum-static"))
+  {
+    bmc.add_loop_unwind_handler(
+      [&goto_model]
+      (const irep_idt &function_id,
+       unsigned loop_number,
+       unsigned unwind,
+       unsigned &max_unwind) { // NOLINT (*)
+        return java_enum_static_init_unwind_handler(
+          function_id,
+          loop_number,
+          unwind,
+          max_unwind,
+          goto_model.symbol_table);
+      });
+  }
 
   // do actual BMC
   return do_bmc(bmc, goto_model);
