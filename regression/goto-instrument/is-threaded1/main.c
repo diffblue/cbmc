@@ -1,6 +1,11 @@
 
 int x;
 
+void func3()
+{
+  x = 6;
+}
+
 void func2()
 {
   x = 3;
