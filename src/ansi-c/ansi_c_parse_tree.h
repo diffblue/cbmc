@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_declaration.h"
 
+#include <list>
+
 class ansi_c_parse_treet
 {
 public:

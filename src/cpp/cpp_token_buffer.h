@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_token.h"
 
+#include <list>
+
 class cpp_token_buffert
 {
 public:

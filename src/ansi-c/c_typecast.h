@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/expr.h>
 
+#include <list>
+
 // try a type cast from expr.type() to type
 //
 // false: typecast successful, expr modified

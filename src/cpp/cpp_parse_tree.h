@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_item.h"
 
+#include <list>
+
 class cpp_parse_treet
 {
 public:

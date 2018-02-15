@@ -60,7 +60,7 @@ public:
   virtual ~bmct() { }
 
   // additional stuff
-  expr_listt bmc_constraints;
+  std::list<exprt> bmc_constraints;
 
   void set_ui(ui_message_handlert::uit _ui) { ui=_ui; }
 

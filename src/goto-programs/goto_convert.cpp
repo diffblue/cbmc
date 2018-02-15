@@ -1898,9 +1898,9 @@ void goto_convertt::generate_conditional_branch(
     std::list<exprt> op;
     collect_operands(guard, guard.id(), op);
 
-    forall_expr_list(it, op)
+    for(const auto &expr : op)
       generate_conditional_branch(
-        boolean_negate(*it), target_false, source_location, dest);
+        boolean_negate(expr), target_false, source_location, dest);
 
     goto_programt::targett t_true=dest.add_instruction();
     t_true->make_goto(target_true);
@@ -1921,9 +1921,8 @@ void goto_convertt::generate_conditional_branch(
     std::list<exprt> op;
     collect_operands(guard, guard.id(), op);
 
-    forall_expr_list(it, op)
-      generate_conditional_branch(
-        *it, target_true, source_location, dest);
+    for(const auto &expr : op)
+      generate_conditional_branch(expr, target_true, source_location, dest);
 
     goto_programt::targett t_false=dest.add_instruction();
     t_false->make_goto(target_false);

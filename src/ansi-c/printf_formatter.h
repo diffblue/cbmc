@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr.h>
 #include <util/namespace.h>
 
+#include <list>
+
 class printf_formattert
 {
 public:
