@@ -17,6 +17,7 @@ install:
     Move-Item win_bison.exe bin\bison.exe -force
     Move-Item win_flex.exe bin\flex.exe -force
     Move-Item FlexLexer.h include\FlexLexer.h -force
+    Remove-Item bin\data -Force -Recurse -ErrorAction SilentlyContinue
     Move-Item data bin\data -force
     bison -V
     flex -V
