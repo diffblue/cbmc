@@ -150,7 +150,7 @@ void full_slicert::add_jumps(
       continue;
     }
 
-    const irep_idt id=goto_programt::get_function_id(j.PC);
+    const irep_idt id=j.PC->function;
     const cfg_post_dominatorst &pd=post_dominators.at(id);
 
     cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e=
@@ -184,7 +184,7 @@ void full_slicert::add_jumps(
 
         if(cfg[entry->second].node_required)
         {
-          const irep_idt id2=goto_programt::get_function_id(*d_it);
+          const irep_idt id2=(*d_it)->function;
           INVARIANT(id==id2,
                     "goto/jump expected to be within a single function");
 

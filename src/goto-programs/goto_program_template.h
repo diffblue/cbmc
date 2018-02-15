@@ -387,20 +387,11 @@ public:
   }
 
   static const irep_idt get_function_id(
-    const_targett l)
-  {
-    while(!l->is_end_function())
-      ++l;
-
-    return l->function;
-  }
-
-  static const irep_idt get_function_id(
     const goto_program_templatet<codeT, guardT> &p)
   {
-    assert(!p.empty());
+    PRECONDITION(!p.empty());
 
-    return get_function_id(--p.instructions.end());
+    return p.instructions.back().function;
   }
 
   template <typename Target>
@@ -518,6 +509,22 @@ public:
         nr != std::numeric_limits<unsigned>::max(),
         "Too many location numbers assigned");
       i.location_number=nr++;
+    }
+  }
+
+  /// Sets the `function` member of each instruction if not yet set
+  /// Note that a goto program need not be a goto function and therefore,
+  /// we cannot do this in update(), but only at the level of
+  /// of goto_functionst where goto programs are guaranteed to be
+  /// named functions.
+  void update_instructions_function(const irep_idt &function_id)
+  {
+    for(auto &instruction : instructions)
+    {
+      if(instruction.function.empty())
+      {
+        instruction.function = function_id;
+      }
     }
   }
 

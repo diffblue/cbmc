@@ -721,6 +721,9 @@ void jbmc_parse_optionst::process_goto_function(
         symbol_table.lookup_ref(new_symbol_name),
         symbol_table);
     }
+
+    // update the function member in each instruction
+    function.update_instructions_function();
   }
 
   catch(const char *e)
