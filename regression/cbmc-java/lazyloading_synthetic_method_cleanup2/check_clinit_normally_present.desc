@@ -1,7 +1,6 @@
 CORE
 Test.class
---show-goto-functions
+--show-goto-functions --function Test.main
 java::Unused1::clinit_wrapper
 java::Unused2::clinit_wrapper
 Unused2\.<clinit>\(\)
-

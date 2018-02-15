@@ -1,6 +1,6 @@
 CORE
 Break.class
---show-goto-functions
+--show-goto-functions --function Break.main
 ^EXIT=0$
 ^SIGNAL=0$
 dead i;

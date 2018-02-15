@@ -1,6 +1,6 @@
 CORE
 Test.class
---cover location --trace --json-ui --unwind 5
+--cover location --trace --json-ui --unwind 5 --function Test.main
 activate-multi-line-match
 EXIT=0
 SIGNAL=0

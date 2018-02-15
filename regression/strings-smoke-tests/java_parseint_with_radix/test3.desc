@@ -1,6 +1,6 @@
 CORE
 Test3.class
---refine-strings --verbosity 10 --string-max-length 1000
+--refine-strings --verbosity 10 --string-max-length 1000 --function Test3.main
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 8.* SUCCESS$
