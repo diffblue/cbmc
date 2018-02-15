@@ -1888,14 +1888,14 @@ java_bytecode_parsert::parse_method_handle(const pool_entryt &entry)
       method_handle_typet::BOOTSTRAP_METHOD_HANDLE;
   }
   else if(
-    has_prefix(id2string(pool_entry(nameandtype_entry.ref1).s), "lambda$"))
+    has_prefix(name_and_type.get_name(pool_entry_lambda), "lambda$"))
   {
     // names seem to be lambda$POSTFIX$NUM
     // where POSTFIX is FUN for a function name in which the lambda is define
     //                   "static" when it is a static member of the class
     //                   "new" when it is a class variable, instantiated in <init>
     lambda_method_handle.lambda_method_name =
-      pool_entry(nameandtype_entry.ref1).s;
+      name_and_type.get_name(pool_entry_lambda);
     lambda_method_handle.handle_type =
       method_handle_typet::LAMBDA_METHOD_HANDLE;
   }
