@@ -1,6 +1,6 @@
 CORE
 Test.class
---program-only
+--program-only --function Test.main
 ^EXIT=0$
 ^SIGNAL=0$
 C\.f

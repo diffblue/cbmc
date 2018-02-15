@@ -1,6 +1,6 @@
 CORE
 MemberTest.class
---refine-strings --verbosity 10 --string-max-length 29 --java-assume-inputs-non-null
+--refine-strings --verbosity 10 --string-max-length 29 --java-assume-inputs-non-null --function MemberTest.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

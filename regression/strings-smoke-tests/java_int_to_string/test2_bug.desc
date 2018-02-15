@@ -1,6 +1,6 @@
 KNOWNBUG
 Test2.class
---refine-strings --verbosity 10
+--refine-strings --verbosity 10 --function Test2.main
 ^EXIT=10$
 ^SIGNAL=0$
 assertion.* line 7 .* SUCCESS$

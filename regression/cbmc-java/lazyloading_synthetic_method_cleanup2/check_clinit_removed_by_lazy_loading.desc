@@ -1,6 +1,6 @@
 CORE
 Test.class
---lazy-methods --show-goto-functions
+--lazy-methods --show-goto-functions --function Test.main
 --
 java::Unused1::clinit_wrapper
 java::Unused2::clinit_wrapper

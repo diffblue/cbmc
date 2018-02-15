@@ -1,6 +1,6 @@
 CORE
 test_append_string.class
---refine-strings --verbosity 10 --string-max-length 1000
+--refine-strings --verbosity 10 --string-max-length 1000 --function test_append_string.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

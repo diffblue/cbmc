@@ -14,7 +14,8 @@ class Test {
         // The condition enforced by cproverNondetInitialize should hold
         // even though the parameter is a subtype of Test, not directly an
         // instance of Test itself.
-        assert nondetInput.arr.length == 1;
+        if(nondetInput != null)
+            assert nondetInput.arr.length == 1;
     }
 
 }

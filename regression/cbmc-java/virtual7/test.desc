@@ -1,6 +1,6 @@
 CORE
 test.class
---show-goto-functions
+--show-goto-functions --function test.main
 ^EXIT=0$
 ^SIGNAL=0$
 IF.*"java::C".*THEN GOTO [12]
