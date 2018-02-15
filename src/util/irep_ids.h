@@ -16,6 +16,8 @@ Author: Reuben Thomas, reuben.thomas@me.com
 
 #ifdef USE_DSTRING
 #include "dstring.h"
+#else
+#include <string>
 #endif
 
 /// \file The irep_ids are generated using a technique called
