@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 
 #include <util/invariant.h>
 #include <util/std_types.h>
