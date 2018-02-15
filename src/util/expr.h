@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <functional>
 #include "type.h"
 
+#include <list>
+
 #define forall_operands(it, expr) \
   if((expr).has_operands()) /* NOLINT(readability/braces) */ \
     for(exprt::operandst::const_iterator it=(expr).operands().begin(), \
