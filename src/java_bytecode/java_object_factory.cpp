@@ -1034,7 +1034,7 @@ void java_object_factoryt::gen_nondet_struct_init(
       if(skip_classid)
         continue;
 
-      irep_idt qualified_clsid="java::"+as_string(class_identifier);
+      irep_idt qualified_clsid = "java::" + id2string(class_identifier);
       constant_exprt ci(qualified_clsid, string_typet());
       code_assignt code(me, ci);
       code.add_source_location()=loc;
@@ -1329,13 +1329,13 @@ void java_object_factoryt::gen_nondet_array_init(
   exprt java_zero=from_integer(0, java_int_type());
   assignments.copy_to_operands(code_assignt(counter_expr, java_zero));
 
-  std::string head_name=as_string(counter.base_name)+"_header";
+  std::string head_name = id2string(counter.base_name) + "_header";
   code_labelt init_head_label(head_name, code_skipt());
   code_gotot goto_head(head_name);
 
   assignments.move_to_operands(init_head_label);
 
-  std::string done_name=as_string(counter.base_name)+"_done";
+  std::string done_name = id2string(counter.base_name) + "_done";
   code_labelt init_done_label(done_name, code_skipt());
   code_gotot goto_done(done_name);
 

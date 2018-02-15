@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 #include <util/std_types.h>
+#include <util/string_container.h>
 #include <util/symbol_table.h>
 #include <util/ieee_float.h>
 #include <util/fixedbv.h>
@@ -642,7 +643,7 @@ exprt interpretert::get_value(
   {
     // Strings are currently encoded by their irep_idt ID.
     return constant_exprt(
-      irep_idt::make_from_table_index(rhs[integer2size_t(offset)].to_long()),
+      get_string_container().get_string(rhs[integer2size_t(offset)].to_long()),
       type);
   }
 
