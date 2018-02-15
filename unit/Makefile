@@ -68,6 +68,7 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               ../src/util/util$(LIBEXT) \
               ../src/big-int/big-int$(LIBEXT) \
               ../src/goto-programs/goto-programs$(LIBEXT) \
+              ../src/goto-instrument/goto-instrument$(LIBEXT) \
               ../src/pointer-analysis/pointer-analysis$(LIBEXT) \
               ../src/langapi/langapi$(LIBEXT) \
               ../src/assembler/assembler$(LIBEXT) \

@@ -36,7 +36,16 @@ target_include_directories(unit
     ${CBMC_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
-target_link_libraries(unit testing-utils ansi-c solvers java_bytecode)
+target_link_libraries(
+        unit
+        testing-utils
+        ansi-c
+        solvers
+        java_bytecode
+        goto-programs
+        goto-instrument-lib
+)
+
 add_test(
     NAME unit
     COMMAND $<TARGET_FILE:unit>
