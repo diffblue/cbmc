@@ -12,7 +12,9 @@ Author: Reuben Thomas, reuben.thomas@me.com
 #ifndef CPROVER_UTIL_IREP_IDS_H
 #define CPROVER_UTIL_IREP_IDS_H
 
+#ifndef USE_STD_STRING
 #define USE_DSTRING
+#endif
 
 #ifdef USE_DSTRING
 #include "dstring.h"

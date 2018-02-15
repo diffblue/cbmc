@@ -142,7 +142,7 @@ jobs:
         - CCACHE_CPP2=yes
         - EXTRA_CXXFLAGS="-DNDEBUG"
 
-    # Ubuntu Linux with glibc using clang++-3.7, debug mode
+    # Ubuntu Linux with glibc using clang++-3.7, debug mode, disable USE_DSTRING
     - stage: Test different OS/CXX/Flags
       os: linux
       sudo: false
@@ -165,7 +165,7 @@ jobs:
       env:
         - COMPILER="ccache clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
-        - EXTRA_CXXFLAGS="-DDEBUG"
+        - EXTRA_CXXFLAGS="-DDEBUG -DUSE_STD_STRING"
       script: echo "Not running any tests for a debug build."
 
     # cmake build using g++-5
