@@ -33,6 +33,9 @@ void java_bytecode_parse_treet::classt::swap(
   other.fields.swap(fields);
   other.methods.swap(methods);
   other.annotations.swap(annotations);
+  std::swap(
+    other.attribute_bootstrapmethods_read, attribute_bootstrapmethods_read);
+  std::swap(other.lambda_method_handle_map, lambda_method_handle_map);
 }
 
 void java_bytecode_parse_treet::output(std::ostream &out) const
