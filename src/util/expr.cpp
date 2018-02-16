@@ -21,64 +21,40 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void exprt::move_to_operands(exprt &expr)
 {
-  operandst &op=operands();
-  op.push_back(static_cast<const exprt &>(get_nil_irep()));
-  op.back().swap(expr);
+  move_to_sub(expr);
 }
 
 void exprt::move_to_operands(exprt &e1, exprt &e2)
 {
-  operandst &op=operands();
-  #ifndef USE_LIST
-  op.reserve(op.size()+2);
-  #endif
-  op.push_back(static_cast<const exprt &>(get_nil_irep()));
-  op.back().swap(e1);
-  op.push_back(static_cast<const exprt &>(get_nil_irep()));
-  op.back().swap(e2);
+  reserve_operands(get_operands_size() + 2);
+  move_to_sub(e1);
+  move_to_sub(e2);
 }
 
 void exprt::move_to_operands(exprt &e1, exprt &e2, exprt &e3)
 {
-  operandst &op=operands();
-  #ifndef USE_LIST
-  op.reserve(op.size()+3);
-  #endif
-  op.push_back(static_cast<const exprt &>(get_nil_irep()));
-  op.back().swap(e1);
-  op.push_back(static_cast<const exprt &>(get_nil_irep()));
-  op.back().swap(e2);
-  op.push_back(static_cast<const exprt &>(get_nil_irep()));
-  op.back().swap(e3);
+  reserve_operands(get_operands_size() + 3);
+  move_to_sub(e1);
+  move_to_sub(e2);
+  move_to_sub(e3);
 }
 
-void exprt::copy_to_operands(const exprt &expr)
+void exprt::copy_to_operands(exprt expr)
 {
-  operands().push_back(expr);
+  // Move the copy created by passing the argument by value to the operands
+  move_to_operands(expr);
 }
 
-void exprt::copy_to_operands(const exprt &e1, const exprt &e2)
+void exprt::copy_to_operands(exprt e1, exprt e2)
 {
-  operandst &op=operands();
-  #ifndef USE_LIST
-  op.reserve(op.size()+2);
-  #endif
-  op.push_back(e1);
-  op.push_back(e2);
+  // Move the copies created by passing the arguments by value to the operands
+  move_to_operands(e1, e2);
 }
 
-void exprt::copy_to_operands(
-  const exprt &e1,
-  const exprt &e2,
-  const exprt &e3)
+void exprt::copy_to_operands(exprt e1, exprt e2, exprt e3)
 {
-  operandst &op=operands();
-  #ifndef USE_LIST
-  op.reserve(op.size()+3);
-  #endif
-  op.push_back(e1);
-  op.push_back(e2);
-  op.push_back(e3);
+  // Move the copies created by passing the arguments by value to the operands
+  move_to_operands(e1, e2, e3);
 }
 
 void exprt::make_typecast(const typet &_type)
@@ -105,7 +81,7 @@ void exprt::make_not()
 
   if(id()==ID_not && operands().size()==1)
   {
-    new_expr.swap(operands().front());
+    new_expr.swap(op0());
   }
   else
   {

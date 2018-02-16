@@ -93,17 +93,23 @@ public:
   const exprt &op3() const
   { return operands()[3]; }
 
+  operandst::size_type get_operands_size() const
+  {
+    return get_sub_size();
+  }
   void reserve_operands(operandst::size_type n)
-  { operands().reserve(n) ; }
+  {
+    reserve_sub(n);
+  }
 
   // destroys expr, e1, e2, e3
   void move_to_operands(exprt &expr);
   void move_to_operands(exprt &e1, exprt &e2);
   void move_to_operands(exprt &e1, exprt &e2, exprt &e3);
   // does not destroy expr, e1, e2, e3
-  void copy_to_operands(const exprt &expr);
-  void copy_to_operands(const exprt &e1, const exprt &e2);
-  void copy_to_operands(const exprt &e1, const exprt &e2, const exprt &e3);
+  void copy_to_operands(exprt expr);
+  void copy_to_operands(exprt e1, exprt e2);
+  void copy_to_operands(exprt e1, exprt e2, exprt e3);
 
   // the following are deprecated -- use constructors instead
   void make_typecast(const typet &_type);

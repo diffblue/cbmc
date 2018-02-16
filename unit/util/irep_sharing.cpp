@@ -7,7 +7,7 @@
 
 #ifdef SHARING
 
-SCENARIO("irept_sharing_trade_offs", "[!mayfail][core][utils][irept]")
+SCENARIO("irept_sharing", "[core][utils][irept]")
 {
   GIVEN("An irept created with move_to_sub")
   {
@@ -21,35 +21,6 @@ SCENARIO("irept_sharing_trade_offs", "[!mayfail][core][utils][irept]")
       irept irep = test_irep;
       REQUIRE(&irep.read() == &test_irep.read());
     }
-    THEN("Changing subs in the original using a reference taken before "
-      "copying should not change them in the copy")
-    {
-      irept &sub = test_irep.get_sub()[0];
-      irept irep = test_irep;
-      sub.id(ID_0);
-      REQUIRE(test_irep.get_sub()[0].id() == ID_0);
-      REQUIRE(irep.get_sub()[0].id() == ID_1);
-    }
-    THEN("Holding a reference to a sub should not prevent sharing")
-    {
-      irept &sub = test_irep.get_sub()[0];
-      irept irep = test_irep;
-      REQUIRE(&irep.read() == &test_irep.read());
-      sub = irept(ID_0);
-      REQUIRE(irep.get_sub()[0].id() == test_irep.get_sub()[0].id());
-    }
-  }
-}
-
-SCENARIO("irept_sharing", "[core][utils][irept]")
-{
-  GIVEN("An irept created with move_to_sub")
-  {
-    irept test_irep(ID_1);
-    irept test_subirep(ID_1);
-    irept test_subsubirep(ID_1);
-    test_subirep.move_to_sub(test_subsubirep);
-    test_irep.move_to_sub(test_subirep);
     THEN("Copies of a copy should return object with the same address")
     {
       irept irep1 = test_irep;
@@ -68,6 +39,15 @@ SCENARIO("irept_sharing", "[core][utils][irept]")
       irep.get_sub()[0].id(ID_0);
       REQUIRE(test_irep.get_sub()[0].id() == ID_1);
       REQUIRE(irep.get_sub()[0].id() == ID_0);
+    }
+    THEN("Changing subs in the original using a reference taken before "
+      "copying should not change them in the copy")
+    {
+      irept &sub = test_irep.get_sub()[0];
+      irept irep = test_irep;
+      sub.id(ID_0);
+      REQUIRE(test_irep.get_sub()[0].id() == ID_0);
+      REQUIRE(irep.get_sub()[0].id() == ID_1);
     }
     THEN("Getting a reference to a sub in a copy should break sharing")
     {
@@ -104,7 +84,7 @@ SCENARIO("irept_sharing", "[core][utils][irept]")
 
 #include <util/expr.h>
 
-SCENARIO("exprt_sharing_trade_offs", "[!mayfail][core][utils][exprt]")
+SCENARIO("exprt_sharing", "[core][utils][exprt]")
 {
   GIVEN("An expression created with move_to_operands")
   {
@@ -118,35 +98,6 @@ SCENARIO("exprt_sharing_trade_offs", "[!mayfail][core][utils][exprt]")
       exprt expr = test_expr;
       REQUIRE(&expr.read() == &test_expr.read());
     }
-    THEN("Changing operands in the original using a reference taken before "
-      "copying should not change them in the copy")
-    {
-      exprt &operand = test_expr.op0();
-      exprt expr = test_expr;
-      operand.id(ID_0);
-      REQUIRE(test_expr.op0().id() == ID_0);
-      REQUIRE(expr.op0().id() == ID_1);
-    }
-    THEN("Holding a reference to an operand should not prevent sharing")
-    {
-      exprt &operand = test_expr.op0();
-      exprt expr = test_expr;
-      REQUIRE(&expr.read() == &test_expr.read());
-      operand = exprt(ID_0);
-      REQUIRE(expr.op0().id() == test_expr.op0().id());
-    }
-  }
-}
-
-SCENARIO("exprt_sharing", "[core][utils][exprt]")
-{
-  GIVEN("An expression created with move_to_operands")
-  {
-    exprt test_expr(ID_1);
-    exprt test_subexpr(ID_1);
-    exprt test_subsubexpr(ID_1);
-    test_subexpr.move_to_operands(test_subsubexpr);
-    test_expr.move_to_operands(test_subexpr);
     THEN("Copies of a copy should return object with the same address")
     {
       exprt expr1 = test_expr;
@@ -165,6 +116,15 @@ SCENARIO("exprt_sharing", "[core][utils][exprt]")
       expr.op0().id(ID_0);
       REQUIRE(test_expr.op0().id() == ID_1);
       REQUIRE(expr.op0().id() == ID_0);
+    }
+    THEN("Changing operands in the original using a reference taken before "
+      "copying should not change them in the copy")
+    {
+      exprt &operand = test_expr.op0();
+      exprt expr = test_expr;
+      operand.id(ID_0);
+      REQUIRE(test_expr.op0().id() == ID_0);
+      REQUIRE(expr.op0().id() == ID_1);
     }
     THEN("Getting a reference to an operand in a copy should break sharing")
     {

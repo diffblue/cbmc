@@ -57,14 +57,14 @@ const irept &get_nil_irep()
 
 void irept::move_to_named_sub(const irep_namet &name, irept &irep)
 {
-  add(name).swap(irep);
+  add(name, std::move(irep));
   irep.clear();
 }
 
 void irept::move_to_sub(irept &irep)
 {
-  get_sub().push_back(get_nil_irep());
-  get_sub().back().swap(irep);
+  write(true).sub.push_back(std::move(irep));
+  irep.clear();
 }
 
 const irep_idt &irept::get(const irep_namet &name) const
@@ -121,13 +121,13 @@ long long irept::get_long_long(const irep_namet &name) const
 
 void irept::set(const irep_namet &name, const long long value)
 {
-  add(name).id(std::to_string(value));
+  set(name, std::to_string(value));
 }
 
 void irept::remove(const irep_namet &name)
 {
-  named_subt &s=
-    is_comment(name)?get_comments():get_named_sub();
+  named_subt &s =
+    is_comment(name) ? write(true).comments : write(true).named_sub;
 
   #ifdef SUB_IS_LIST
   named_subt::iterator it=named_subt_lower_bound(s, name);
@@ -160,47 +160,23 @@ const irept &irept::find(const irep_namet &name) const
   return it->second;
 }
 
-irept &irept::add(const irep_namet &name)
+irept &irept::add(const irep_namet &name, bool mark_sharable)
 {
-  named_subt &s=
-    is_comment(name)?get_comments():get_named_sub();
+  named_subt &s =
+    is_comment(name)
+      ? write(mark_sharable).comments : write(mark_sharable).named_sub;
 
   #ifdef SUB_IS_LIST
+
   named_subt::iterator it=named_subt_lower_bound(s, name);
-
-  if(it==s.end() ||
-     it->first!=name)
-    it=s.insert(it, std::make_pair(name, irept()));
-
+  if(it == s.end() || it->first != name)
+    it = s.emplace(it, name, irept());
   return it->second;
+
   #else
+
   return s[name];
-  #endif
-}
 
-irept &irept::add(const irep_namet &name, const irept &irep)
-{
-  named_subt &s=
-    is_comment(name)?get_comments():get_named_sub();
-
-  #ifdef SUB_IS_LIST
-  named_subt::iterator it=named_subt_lower_bound(s, name);
-
-  if(it==s.end() ||
-     it->first!=name)
-    it=s.insert(it, std::make_pair(name, irep));
-  else
-    it->second=irep;
-
-  return it->second;
-  #else
-  std::pair<named_subt::iterator, bool> entry=
-    s.insert(std::make_pair(name, irep));
-
-  if(!entry.second)
-    entry.first->second=irep;
-
-  return entry.first->second;
   #endif
 }
 

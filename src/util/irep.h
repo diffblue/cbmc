@@ -125,8 +125,14 @@ public:
   }
 
   const irept &find(const irep_namet &name) const;
-  irept &add(const irep_namet &name);
-  irept &add(const irep_namet &name, const irept &irep);
+  irept &add(const irep_namet &name)
+  {
+    return add(name, false);
+  }
+  void add(const irep_namet &name, irept irep)
+  {
+    add(name, true) = std::move(irep);
+  }
 
   const std::string &get_string(const irep_namet &name) const
   {
@@ -141,7 +147,9 @@ public:
   long long get_long_long(const irep_namet &name) const;
 
   void set(const irep_namet &name, const irep_idt &value)
-  { add(name).id(value); }
+  {
+    add(name, true).id(value);
+  }
   void set(const irep_namet &name, const irept &irep)
   { add(name, irep); }
   void set(const irep_namet &name, const long long value);
@@ -176,6 +184,16 @@ public:
     return write(false).sub;
   }
   const subt &get_sub() const { return read().sub; }
+  subt::size_type get_sub_size() const
+  {
+    return read().sub.size();
+  }
+  void reserve_sub(subt::size_type n)
+  {
+#ifndef USE_LIST
+    write(true).sub.reserve(n);
+#endif
+  }
   named_subt &get_named_sub()
   {
     return write(false).named_sub;
@@ -199,6 +217,20 @@ protected:
   { return !name.empty() && name[0]=='#'; }
 
 private:
+  /// Adds a new irept to the comments or named_sub collection with the given
+  /// name or retrieves the existing irept with the matching name
+  /// \remarks
+  /// If name starts with a hash symbol ('#') then the comments collection is
+  /// used, otherwise the named_sub collection is used
+  /// If the reference returned by this call is potentially held long enough
+  /// that a copy of this irept could be made before it is disposed of then you
+  /// must pass false for mark_sharable to ensure safe behaviour.
+  /// \param name: The name of the irept to add/retrieve
+  /// \param mark_sharable: If false then future copies of this irept will
+  /// not use sharing
+  /// \returns The added or retrieved irept
+  irept &add(const irep_namet &name, bool mark_sharable);
+
   class dt
 #ifdef SHARING
     : public copy_on_write_pointeet<unsigned>
