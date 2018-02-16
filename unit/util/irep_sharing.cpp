@@ -93,6 +93,16 @@ SCENARIO("irept_sharing", "[core][utils][irept]")
       REQUIRE(&irep.read() != &test_irep.read());
       REQUIRE(irep.id() != test_irep.id());
     }
+    // the following would be desirable for irept to be safe, but we know it
+    // presently does not hold; see #1855 for a proposed solution
+    // THEN("Holding a reference to an operand should prevent sharing")
+    // {
+    //   irept &operand = test_irep.get_sub()[0];
+    //   irept irep = test_irep;
+    //   REQUIRE(&irep.read() != &test_irep.read());
+    //   operand = irept(ID_0);
+    //   REQUIRE(irep.get_sub()[0].id() != test_irep.get_sub()[0].id());
+    // }
     THEN("Changing an id should not prevent sharing")
     {
       test_irep.id(ID_0);
@@ -190,6 +200,16 @@ SCENARIO("exprt_sharing", "[core][utils][exprt]")
       REQUIRE(&expr.read() != &test_expr.read());
       REQUIRE(expr.id() != test_expr.id());
     }
+    // the following would be desirable for irept to be safe, but we know it
+    // presently does not hold; see #1855 for a proposed solution
+    // THEN("Holding a reference to an operand should prevent sharing")
+    // {
+    //   exprt &operand = test_expr.op0();
+    //   exprt expr = test_expr;
+    //   REQUIRE(&expr.read() != &test_expr.read());
+    //   operand = exprt(ID_0);
+    //   REQUIRE(expr.op0().id() != test_expr.op0().id());
+    // }
     THEN("Changing an id should not prevent sharing")
     {
       test_expr.id(ID_0);
