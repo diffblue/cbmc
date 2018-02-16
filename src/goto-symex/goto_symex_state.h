@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_target.h"
 
-class dirtyt;
+class incremental_dirtyt;
 
 // central data structure: state
 class goto_symex_statet final
@@ -340,9 +340,12 @@ public:
   bool l2_thread_read_encoding(ssa_exprt &expr, const namespacet &ns);
   bool l2_thread_write_encoding(const ssa_exprt &expr, const namespacet &ns);
 
+  void populate_dirty_for_function(
+    const irep_idt &id, const goto_functionst::goto_functiont &);
+
   void switch_to_thread(unsigned t);
   bool record_events;
-  std::unique_ptr<const dirtyt> dirty;
+  std::unique_ptr<incremental_dirtyt> dirty;
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H

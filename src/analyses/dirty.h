@@ -25,6 +25,10 @@ public:
   typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
   typedef goto_functionst::goto_functiont goto_functiont;
 
+  dirtyt()
+  {
+  }
+
   explicit dirtyt(const goto_functiont &goto_function)
   {
     build(goto_function);
@@ -53,6 +57,11 @@ public:
     return dirty;
   }
 
+  void add_function(const goto_functiont &goto_function)
+  {
+    build(goto_function);
+  }
+
 protected:
   void build(const goto_functiont &goto_function);
 
@@ -70,5 +79,28 @@ inline std::ostream &operator<<(
   dirty.output(out);
   return out;
 }
+
+/// Wrapper for dirtyt that permits incremental population, ensuring each
+/// function is analysed exactly once.
+class incremental_dirtyt
+{
+public:
+  void populate_dirty_for_function(
+    const irep_idt &id, const goto_functionst::goto_functiont &function);
+
+  bool operator()(const irep_idt &id) const
+  {
+    return dirty(id);
+  }
+
+  bool operator()(const symbol_exprt &expr) const
+  {
+    return dirty(expr);
+  }
+
+private:
+  dirtyt dirty;
+  std::unordered_set<irep_idt, irep_id_hash> dirty_processed_functions;
+};
 
 #endif // CPROVER_ANALYSES_DIRTY_H

@@ -72,3 +72,14 @@ void dirtyt::output(std::ostream &out) const
   for(const auto &d : dirty)
     out << d << '\n';
 }
+
+/// Analyse the given function with dirtyt if it hasn't been seen before
+/// \param id: function id to analyse
+/// \param function: function to analyse
+void incremental_dirtyt::populate_dirty_for_function(
+  const irep_idt &id, const goto_functionst::goto_functiont &function)
+{
+  auto insert_result = dirty_processed_functions.insert(id);
+  if(insert_result.second)
+    dirty.add_function(function);
+}

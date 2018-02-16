@@ -126,7 +126,7 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
 
 void goto_symext::initialize_entry_point(
   statet &state,
-  const goto_functionst &goto_functions,
+  const get_goto_functiont &get_goto_function,
   const goto_programt::const_targett pc,
   const goto_programt::const_targett limit)
 {
@@ -136,15 +136,20 @@ void goto_symext::initialize_entry_point(
   state.top().end_of_function=limit;
   state.top().calling_location.pc=state.top().end_of_function;
   state.symex_target=&target;
-  state.dirty=util_make_unique<dirtyt>(goto_functions);
+  state.dirty=util_make_unique<incremental_dirtyt>();
+
+  INVARIANT(
+    !pc->function.empty(), "all symexed instructions should have a function");
+  state.dirty->populate_dirty_for_function(
+    pc->function, get_goto_function(pc->function));
 
   symex_transition(state, state.source.pc);
 }
 
 void goto_symext::symex_threaded_step(
-  statet &state, const goto_functionst &goto_functions)
+  statet &state, const get_goto_functiont &get_goto_function)
 {
-  symex_step(goto_functions, state);
+  symex_step(get_goto_function, state);
 
   // is there another thread to execute?
   if(state.call_stack().empty() &&
@@ -159,21 +164,39 @@ void goto_symext::symex_threaded_step(
   }
 }
 
+static goto_symext::get_goto_functiont get_function_from_goto_functions(
+  const goto_functionst &goto_functions)
+{
+  return [&goto_functions](const irep_idt &key) ->
+    const goto_functionst::goto_functiont & { // NOLINT(*)
+    return goto_functions.function_map.at(key);
+  };
+}
+
 void goto_symext::symex_with_state(
   statet &state,
   const goto_functionst &goto_functions,
   const goto_programt &goto_program)
 {
+  symex_with_state(
+    state, get_function_from_goto_functions(goto_functions), goto_program);
+}
+
+void goto_symext::symex_with_state(
+  statet &state,
+  const get_goto_functiont &get_goto_function,
+  const goto_programt &goto_program)
+{
   PRECONDITION(!goto_program.instructions.empty());
   initialize_entry_point(
     state,
-    goto_functions,
+    get_goto_function,
     goto_program.instructions.begin(),
     prev(goto_program.instructions.end()));
   PRECONDITION(state.top().end_of_function->is_end_function());
 
   while(!state.call_stack().empty())
-    symex_threaded_step(state, goto_functions);
+    symex_threaded_step(state, get_goto_function);
 
   state.dirty=nullptr;
 }
@@ -184,30 +207,48 @@ void goto_symext::symex_instruction_range(
   const goto_programt::const_targett first,
   const goto_programt::const_targett limit)
 {
-  initialize_entry_point(state, goto_functions, first, limit);
+  symex_instruction_range(
+    state, get_function_from_goto_functions(goto_functions), first, limit);
+}
+
+void goto_symext::symex_instruction_range(
+  statet &state,
+  const get_goto_functiont &get_goto_function,
+  const goto_programt::const_targett first,
+  const goto_programt::const_targett limit)
+{
+  initialize_entry_point(state, get_goto_function, first, limit);
   while(state.source.pc->function!=limit->function || state.source.pc!=limit)
-    symex_threaded_step(state, goto_functions);
+    symex_threaded_step(state, get_goto_function);
+}
+
+void goto_symext::symex_from_entry_point_of(
+  const goto_functionst &goto_functions)
+{
+  symex_from_entry_point_of(get_function_from_goto_functions(goto_functions));
 }
 
 /// symex from entry point
 void goto_symext::symex_from_entry_point_of(
-    const goto_functionst &goto_functions)
+  const get_goto_functiont &get_goto_function)
 {
-  goto_functionst::function_mapt::const_iterator it=
-    goto_functions.function_map.find(goto_functionst::entry_point());
-
-  if(it==goto_functions.function_map.end())
+  const goto_functionst::goto_functiont *start_function;
+  try
+  {
+    start_function = &get_goto_function(goto_functionst::entry_point());
+  }
+  catch(const std::out_of_range &error)
+  {
     throw "the program has no entry point";
-
-  const goto_programt &body=it->second.body;
+  }
 
   statet state;
-  symex_with_state(state, goto_functions, body);
+  symex_with_state(state, get_goto_function, start_function->body);
 }
 
 /// do just one step
 void goto_symext::symex_step(
-  const goto_functionst &goto_functions,
+  const get_goto_functiont &get_goto_function,
   statet &state)
 {
   #if 0
@@ -312,7 +353,7 @@ void goto_symext::symex_step(
       Forall_expr(it, deref_code.arguments())
         clean_expr(*it, state, false);
 
-      symex_function_call(goto_functions, state, deref_code);
+      symex_function_call(get_goto_function, state, deref_code);
     }
     else
       symex_transition(state);
@@ -320,7 +361,7 @@ void goto_symext::symex_step(
 
   case OTHER:
     if(!state.guard.is_false())
-      symex_other(goto_functions, state);
+      symex_other(state);
 
     symex_transition(state);
     break;

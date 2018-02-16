@@ -128,7 +128,7 @@ protected:
   // overloaded from goto_symext
   //
   virtual void symex_step(
-    const goto_functionst &goto_functions,
+    const get_goto_functiont &get_goto_function,
     statet &state);
 
   virtual void merge_goto(

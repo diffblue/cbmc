@@ -31,7 +31,7 @@ symex_bmct::symex_bmct(
 
 /// show progress
 void symex_bmct::symex_step(
-  const goto_functionst &goto_functions,
+  const get_goto_functiont &get_goto_function,
   statet &state)
 {
   const source_locationt &source_location=state.source.pc->source_location;
@@ -63,12 +63,12 @@ void symex_bmct::symex_step(
     log.statistics() << log.eom;
   }
 
-  goto_symext::symex_step(goto_functions, state);
+  goto_symext::symex_step(get_goto_function, state);
 
   if(record_coverage &&
      // avoid an invalid iterator in state.source.pc
      (!cur_pc->is_end_function() ||
-      cur_pc->function!=goto_functions.entry_point()))
+      cur_pc->function!=goto_functionst::entry_point()))
   {
     // forward goto will effectively be covered via phi function,
     // which does not invoke symex_step; as symex_step is called
