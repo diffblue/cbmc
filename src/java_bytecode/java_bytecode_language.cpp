@@ -488,9 +488,10 @@ bool java_bytecode_languaget::typecheck(
      get_message_handler(),
      max_user_array_length,
      method_bytecode,
-     lazy_methods_mode,
      string_preprocess))
-       return true;
+    {
+      return true;
+    }
   }
 
   // first generate a new struct symbol for each class and a new function symbol
@@ -510,9 +511,10 @@ bool java_bytecode_languaget::typecheck(
         get_message_handler(),
         max_user_array_length,
         method_bytecode,
-        lazy_methods_mode,
         string_preprocess))
+    {
       return true;
+    }
   }
 
   // find and mark all implicitly generic class types

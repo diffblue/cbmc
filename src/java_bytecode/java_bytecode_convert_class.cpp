@@ -37,13 +37,11 @@ public:
     message_handlert &_message_handler,
     size_t _max_array_length,
     method_bytecodet &method_bytecode,
-    lazy_methods_modet _lazy_methods_mode,
     java_string_library_preprocesst &_string_preprocess)
     : messaget(_message_handler),
       symbol_table(_symbol_table),
       max_array_length(_max_array_length),
       method_bytecode(method_bytecode),
-      lazy_methods_mode(_lazy_methods_mode),
       string_preprocess(_string_preprocess)
   {
   }
@@ -75,7 +73,6 @@ protected:
   symbol_tablet &symbol_table;
   const size_t max_array_length;
   method_bytecodet &method_bytecode;
-  lazy_methods_modet lazy_methods_mode;
   java_string_library_preprocesst &string_preprocess;
 
   // conversion
@@ -604,7 +601,6 @@ bool java_bytecode_convert_class(
   message_handlert &message_handler,
   size_t max_array_length,
   method_bytecodet &method_bytecode,
-  lazy_methods_modet lazy_methods_mode,
   java_string_library_preprocesst &string_preprocess)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
@@ -612,7 +608,6 @@ bool java_bytecode_convert_class(
     message_handler,
     max_array_length,
     method_bytecode,
-    lazy_methods_mode,
     string_preprocess);
 
   try
