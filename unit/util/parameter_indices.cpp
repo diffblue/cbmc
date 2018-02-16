@@ -21,7 +21,7 @@ void check_consistency(const symbolt &symbol)
     REQUIRE(parameter_indices.at(parameter_ids.at(i)) == i);
 }
 
-TEST_CASE("Parmeter indices consistency", "[core][util][parameter_indices]")
+TEST_CASE("Parameter indices consistency", "[core][util][parameter_indices]")
 {
   symbol_tablet symbol_table = load_java_class("ParameterIndicesTest", "util/");
   check_consistency(
