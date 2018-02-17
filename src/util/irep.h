@@ -121,6 +121,7 @@ public:
   {
     if(data!=&empty_d)
     {
+      // NOLINTNEXTLINE(build/deprecated)
       assert(data->ref_count!=0);
       data->ref_count++;
       #ifdef IREP_DEBUG
