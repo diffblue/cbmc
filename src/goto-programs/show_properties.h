@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class namespacet;
 class goto_modelt;
 class symbol_tablet;
+class goto_programt;
 class goto_functionst;
 class message_handlert;
 
@@ -42,5 +43,16 @@ void show_properties(
 optionalt<source_locationt> find_property(
     const irep_idt &property,
     const goto_functionst &goto_functions);
+
+/// \brief Collects the properties in the goto program into a `json_arrayt`
+/// \param json_properties: JSON array to hold the properties
+/// \param ns: namespace
+/// \param identifier: function id of the goto program
+/// \param goto_program: the goto program
+void convert_properties_json(
+  json_arrayt &json_properties,
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const goto_programt &goto_program);
 
 #endif // CPROVER_GOTO_PROGRAMS_SHOW_PROPERTIES_H
