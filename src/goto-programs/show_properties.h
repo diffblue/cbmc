@@ -19,13 +19,16 @@ class namespacet;
 class goto_modelt;
 class symbol_tablet;
 class goto_functionst;
+class message_handlert;
 
 void show_properties(
   const goto_modelt &,
+  message_handlert &message_handler,
   ui_message_handlert::uit ui);
 
 void show_properties(
   const namespacet &ns,
+  message_handlert &message_handler,
   ui_message_handlert::uit ui,
   const goto_functionst &goto_functions);
 
