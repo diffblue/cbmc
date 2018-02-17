@@ -11,6 +11,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "java_enum_static_init_unwind_handler.h"
 
+#include <util/invariant.h>
 #include <util/suffix.h>
 
 /// Unwind handler that special-cases the clinit (static initializer) functions
