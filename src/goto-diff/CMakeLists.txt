@@ -13,6 +13,7 @@ target_link_libraries(goto-diff-lib
     linking
     big-int
     pointer-analysis
+    goto-instrument-lib
     goto-programs
     assembler
     analyses

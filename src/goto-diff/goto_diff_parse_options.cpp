@@ -20,16 +20,23 @@ Author: Peter Schrammel
 #include <util/config.h>
 #include <util/options.h>
 #include <util/make_unique.h>
+#include <util/exit_codes.h>
 
 #include <langapi/language.h>
 
 #include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/instrument_preconditions.h>
+#include <goto-programs/mm_io.h>
 #include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_returns.h>
+#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/remove_skip.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -38,6 +45,11 @@ Author: Peter Schrammel
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
+
+#include <goto-symex/rewrite_union.h>
+#include <goto-symex/adjust_float_expressions.h>
+
+#include <goto-instrument/cover.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
@@ -99,7 +111,7 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("show-vcc", true);
 
   if(cmdline.isset("cover"))
-    options.set_option("cover", cmdline.get_value("cover"));
+    parse_cover_options(cmdline, options);
 
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
@@ -122,22 +134,8 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("cpp11"))
     config.cpp.set_cpp11();
 
-  if(cmdline.isset("no-simplify"))
-    options.set_option("simplify", false);
-  else
-    options.set_option("simplify", true);
-
-  if(cmdline.isset("all-claims") || // will go away
-     cmdline.isset("all-properties")) // use this one
-    options.set_option("all-properties", true);
-  else
-    options.set_option("all-properties", false);
-
-  if(cmdline.isset("unwind"))
-    options.set_option("unwind", cmdline.get_value("unwind"));
-
-  if(cmdline.isset("depth"))
-    options.set_option("depth", cmdline.get_value("depth"));
+  // all checks supported by goto_check
+  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   if(cmdline.isset("debug-level"))
     options.set_option("debug-level", cmdline.get_value("debug-level"));
@@ -308,10 +306,6 @@ int goto_diff_parse_optionst::doit()
      cmdline.isset("forward-impact") ||
      cmdline.isset("backward-impact"))
   {
-    // Workaround to avoid deps not propagating between return and end_func
-    remove_returns(goto_model1);
-    remove_returns(goto_model2);
-
     impact_modet impact_mode=
       cmdline.isset("forward-impact") ?
       impact_modet::FORWARD :
@@ -393,6 +387,9 @@ int goto_diff_parse_optionst::get_goto_program(
       goto_model.goto_functions,
       ui_message_handler);
 
+    if(process_goto_program(options, goto_model))
+      return 6;
+
     // if we had a second argument then we will handle it next
     if(arg2!="")
       cmdline.args[0]=arg2;
@@ -405,46 +402,72 @@ bool goto_diff_parse_optionst::process_goto_program(
   const optionst &options,
   goto_modelt &goto_model)
 {
-  symbol_tablet &symbol_table = goto_model.symbol_table;
-  goto_functionst &goto_functions = goto_model.goto_functions;
-
   try
   {
-    namespacet ns(symbol_table);
-
     // Remove inline assembler; this needs to happen before
     // adding the library.
     remove_asm(goto_model);
 
     // add the library
-    link_to_library(symbol_table, goto_functions, ui_message_handler);
+    link_to_library(goto_model, get_message_handler());
 
     // remove function pointers
-    status() << "Function Pointer Removal" << eom;
+    status() << "Removal of function pointers and virtual functions" << eom;
     remove_function_pointers(
-      get_message_handler(),
-      symbol_table,
-      goto_functions,
-      cmdline.isset("pointer-check"));
+      get_message_handler(), goto_model, cmdline.isset("pointer-check"));
 
-    // do partial inlining
-    status() << "Partial Inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    // Java virtual functions -> explicit dispatch tables:
+    remove_virtual_functions(goto_model);
+    // remove catch and throw
+    remove_exceptions(goto_model);
+    // Java instanceof -> clsid comparison:
+    remove_instanceof(goto_model);
+
+    mm_io(goto_model);
+
+    // instrument library preconditions
+    instrument_preconditions(goto_model);
 
     // remove returns, gcc vectors, complex
-    remove_returns(symbol_table, goto_functions);
-    remove_vector(symbol_table, goto_functions);
-    remove_complex(symbol_table, goto_functions);
+    remove_returns(goto_model);
+    remove_vector(goto_model);
+    remove_complex(goto_model);
+    rewrite_union(goto_model);
 
-    // add failed symbols
-    // needs to be done before pointer analysis
-    add_failed_symbols(symbol_table);
+    // add generic checks
+    status() << "Generic Property Instrumentation" << eom;
+    goto_check(options, goto_model);
+
+    // checks don't know about adjusted float expressions
+    adjust_float_expressions(goto_model);
 
     // recalculate numbers, etc.
-    goto_functions.update();
+    goto_model.goto_functions.update();
 
     // add loop ids
-    goto_functions.compute_loop_numbers();
+    goto_model.goto_functions.compute_loop_numbers();
+
+    // remove skips such that trivial GOTOs are deleted and not considered
+    // for coverage annotation:
+    remove_skip(goto_model);
+
+    // instrument cover goals
+    if(cmdline.isset("cover"))
+    {
+      if(instrument_cover_goals(options, goto_model, get_message_handler()))
+        return true;
+    }
+
+    // label the assertions
+    // This must be done after adding assertions and
+    // before using the argument of the "property" option.
+    // Do not re-label after using the property slicer because
+    // this would cause the property identifiers to change.
+    label_properties(goto_model);
+
+    // remove any skips introduced since coverage instrumentation
+    remove_skip(goto_model);
+    goto_model.goto_functions.update();
   }
 
   catch(const char *e)
@@ -459,14 +482,16 @@ bool goto_diff_parse_optionst::process_goto_program(
     return true;
   }
 
-  catch(int)
+  catch(int e)
   {
+    error() << "Numeric exception: " << e << eom;
     return true;
   }
 
   catch(const std::bad_alloc &)
   {
     error() << "Out of memory" << eom;
+    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
     return true;
   }
 
@@ -476,6 +501,7 @@ bool goto_diff_parse_optionst::process_goto_program(
 /// display command line help
 void goto_diff_parse_optionst::help()
 {
+  // clang-format off
   std::cout <<
     "\n"
     // NOLINTNEXTLINE(whitespace/line_length)
@@ -498,9 +524,15 @@ void goto_diff_parse_optionst::help()
     "  --backward-impact           output unified diff with forward&backward/forward/backward dependencies\n"
     " --compact-output             output dependencies in compact mode\n"
     "\n"
+    "Program instrumentation options:\n"
+    HELP_GOTO_CHECK
+    " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
+    "Java Bytecode frontend options:\n"
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     "Other options:\n"
     " --version                    show version and exit\n"
     " --json-ui                    use JSON-formatted output\n"
     HELP_TIMESTAMP
     "\n";
+  // clang-format on
 }
