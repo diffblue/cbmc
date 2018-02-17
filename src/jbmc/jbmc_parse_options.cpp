@@ -878,6 +878,7 @@ void jbmc_parse_optionst::help()
 
   std::cout << "   * *\n";
 
+  // clang-format off
   std::cout <<
     "* *              Daniel Kroening, Edmund Clarke             * *\n"
     "* * Carnegie Mellon University, Computer Science Department * *\n"
@@ -889,7 +890,7 @@ void jbmc_parse_optionst::help()
     " jbmc class                   name of class to be checked\n"
     "\n"
     "Analysis options:\n"
-    " --show-properties            show the properties, but don't run analysis\n" // NOLINT(*)
+    HELP_SHOW_PROPERTIES
     " --symex-coverage-report f    generate a Cobertura XML coverage report in f\n" // NOLINT(*)
     " --property id                only check one specific property\n"
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
@@ -962,4 +963,5 @@ void jbmc_parse_optionst::help()
     " --verbosity #                verbosity level\n"
     HELP_TIMESTAMP
     "\n";
+  // clang-format on
 }

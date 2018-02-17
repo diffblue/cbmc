@@ -1452,6 +1452,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 /// display command line help
 void goto_instrument_parse_optionst::help()
 {
+  // clang-format off
   std::cout <<
     "\n"
     "* *     Goto-Instrument " CBMC_VERSION " - Copyright (C) 2008-2013       * *\n" // NOLINT(*)
@@ -1475,7 +1476,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Diagnosis:\n"
     " --show-loops                 show the loops in the program\n"
-    " --show-properties            show the properties\n"
+    HELP_SHOW_PROPERTIES
     " --show-symbol-table          show symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
@@ -1570,4 +1571,5 @@ void goto_instrument_parse_optionst::help()
     " --json-ui                    use JSON-formatted output\n"
     HELP_TIMESTAMP
     "\n";
+  // clang-format on
 }

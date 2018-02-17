@@ -815,6 +815,7 @@ void goto_analyzer_parse_optionst::help()
 
   std::cout << " * *\n";
 
+  // clang-format off
   std::cout <<
     "* *                Daniel Kroening, DiffBlue                * *\n"
     "* *                 kroening@kroening.com                   * *\n"
@@ -898,8 +899,7 @@ void goto_analyzer_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --show-properties            show the properties, but don't run analysis\n"
+    HELP_SHOW_PROPERTIES
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
@@ -908,4 +908,5 @@ void goto_analyzer_parse_optionst::help()
     " --version                    show version and exit\n"
     HELP_TIMESTAMP
     "\n";
+  // clang-format on
 }

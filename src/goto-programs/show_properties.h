@@ -22,6 +22,14 @@ class goto_programt;
 class goto_functionst;
 class message_handlert;
 
+// clang-format off
+#define OPT_SHOW_PROPERTIES \
+  "(show-properties)"
+
+#define HELP_SHOW_PROPERTIES \
+  " --show-properties            show the properties, but don't run analysis\n" // NOLINT(*)
+// clang-format on
+
 void show_properties(
   const goto_modelt &,
   message_handlert &message_handler,

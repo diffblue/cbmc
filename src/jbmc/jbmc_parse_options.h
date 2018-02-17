@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_trace.h>
 #include <goto-programs/lazy_goto_model.h>
+#include <goto-programs/show_properties.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 
@@ -55,7 +56,7 @@ class optionst;
   OPT_SHOW_GOTO_FUNCTIONS \
   "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
-  "(show-properties)" \
+  OPT_SHOW_PROPERTIES \
   "(drop-unused-functions)" \
   "(property):(stop-on-fail)(trace)" \
   "(verbosity):" \
