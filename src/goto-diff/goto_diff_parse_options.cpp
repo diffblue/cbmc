@@ -242,7 +242,7 @@ int goto_diff_parse_optionst::doit()
   if(cmdline.isset("version"))
   {
     std::cout << CBMC_VERSION << '\n';
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   //
@@ -264,7 +264,7 @@ int goto_diff_parse_optionst::doit()
   if(cmdline.args.size()!=2)
   {
     error() << "Please provide two programs to compare" << eom;
-    return 6;
+    return CPROVER_EXIT_INCORRECT_TASK;
   }
 
   goto_modelt goto_model1, goto_model2;
@@ -282,7 +282,7 @@ int goto_diff_parse_optionst::doit()
   {
     show_loop_ids(get_ui(), goto_model1);
     show_loop_ids(get_ui(), goto_model2);
-    return true;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(
@@ -299,7 +299,7 @@ int goto_diff_parse_optionst::doit()
       get_message_handler(),
       ui_message_handler.get_ui(),
       cmdline.isset("list-goto-functions"));
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(cmdline.isset("change-impact") ||
@@ -318,7 +318,7 @@ int goto_diff_parse_optionst::doit()
       impact_mode,
       cmdline.isset("compact-output"));
 
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(cmdline.isset("unified") ||
@@ -328,7 +328,7 @@ int goto_diff_parse_optionst::doit()
     u();
     u.output(std::cout);
 
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   syntactic_difft sd(goto_model1, goto_model2, get_message_handler());
@@ -336,7 +336,7 @@ int goto_diff_parse_optionst::doit()
   sd();
   sd.output_functions(std::cout);
 
-  return 0;
+  return CPROVER_EXIT_SUCCESS;
 }
 
 int goto_diff_parse_optionst::get_goto_program(
@@ -353,7 +353,7 @@ int goto_diff_parse_optionst::get_goto_program(
         goto_model.symbol_table,
         goto_model.goto_functions,
         languages.get_message_handler()))
-      return 6;
+      return CPROVER_EXIT_INCORRECT_TASK;
 
     config.set(cmdline);
 
@@ -374,7 +374,7 @@ int goto_diff_parse_optionst::get_goto_program(
     if(languages.parse() ||
        languages.typecheck() ||
        languages.final())
-      return 6;
+      return CPROVER_EXIT_INCORRECT_TASK;
 
     // we no longer need any parse trees or language files
     languages.clear_parse();
@@ -388,7 +388,7 @@ int goto_diff_parse_optionst::get_goto_program(
       ui_message_handler);
 
     if(process_goto_program(options, goto_model))
-      return 6;
+      return CPROVER_EXIT_INTERNAL_ERROR;
 
     // if we had a second argument then we will handle it next
     if(arg2!="")
