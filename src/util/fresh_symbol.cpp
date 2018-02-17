@@ -11,6 +11,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "fresh_symbol.h"
 
+#include "invariant.h"
 #include "namespace.h"
 #include "rename.h"
 #include "symbol.h"
