@@ -53,6 +53,8 @@ Author: Peter Schrammel
 
 #include <pointer-analysis/add_failed_symbols.h>
 
+#include <java_bytecode/java_bytecode_language.h>
+
 #include <langapi/mode.h>
 
 #include <cbmc/version.h>
@@ -234,6 +236,8 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
             << " must not be given together" << eom;
     exit(1);
   }
+
+  options.set_option("show-properties", cmdline.isset("show-properties"));
 }
 
 /// invoke main modules
@@ -331,10 +335,10 @@ int goto_diff_parse_optionst::doit()
     return CPROVER_EXIT_SUCCESS;
   }
 
-  syntactic_difft sd(goto_model1, goto_model2, get_message_handler());
+  syntactic_difft sd(goto_model1, goto_model2, options, get_message_handler());
   sd.set_ui(get_ui());
   sd();
-  sd.output_functions(std::cout);
+  sd.output_functions();
 
   return CPROVER_EXIT_SUCCESS;
 }
@@ -516,6 +520,7 @@ void goto_diff_parse_optionst::help()
     "\n"
     "Diff options:\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    HELP_SHOW_PROPERTIES
     " --syntactic                  do syntactic diff (default)\n"
     " -u | --unified               output unified diff\n"
     " --change-impact | \n"

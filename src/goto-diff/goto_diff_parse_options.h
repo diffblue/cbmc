@@ -20,6 +20,7 @@ Author: Peter Schrammel
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/show_properties.h>
 
 #include "goto_diff_languages.h"
 
@@ -30,6 +31,7 @@ class optionst;
 #define GOTO_DIFF_OPTIONS \
   "(json-ui)" \
   OPT_SHOW_GOTO_FUNCTIONS \
+  OPT_SHOW_PROPERTIES \
   OPT_GOTO_CHECK \
   "(cover):" \
   "(verbosity):(version)" \
