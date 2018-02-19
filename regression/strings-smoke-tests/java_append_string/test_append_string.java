@@ -17,7 +17,7 @@ public class test_append_string
         String init = sb.toString();
         if(str.length() >= 4)
         {
-            sb.append(str, 2, 4);
+            org.cprover.CProverString.append(sb, str, 2, 4);
             String res = sb.toString();
             assert(res.startsWith(init));
             assert(res.endsWith(org.cprover.CProverString.substring(str, 2, 4)));

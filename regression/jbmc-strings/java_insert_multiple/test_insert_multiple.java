@@ -3,8 +3,8 @@ public class test_insert_multiple
    public static void main(/*String[] argv*/)
    {
       StringBuilder sb = new StringBuilder("ad");
-      sb.insert(1, 'c');
-      sb.insert(1, "b");
+      org.cprover.CProverString.insert(sb, 1, 'c');
+      org.cprover.CProverString.insert(sb, 1, "b");
       String s = sb.toString();
       assert(!s.equals("abcd"));
    }

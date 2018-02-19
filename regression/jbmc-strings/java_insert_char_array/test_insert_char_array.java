@@ -11,7 +11,7 @@ public class test_insert_char_array
     public static void insert(StringBuilder sb, int pos, char arr[])
     {
         String s=stringOfCharArray(arr);
-        sb.insert(pos, s);
+        org.cprover.CProverString.insert(sb, pos, s);
     }
     public static void main(int i)
     {
