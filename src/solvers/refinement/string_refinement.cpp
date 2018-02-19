@@ -166,11 +166,14 @@ static bool validate(const string_refinementt::infot &info)
   return true;
 }
 
-string_refinementt::string_refinementt(const infot &info, bool):
-  supert(info),
-  config_(info),
-  loop_bound_(info.refinement_bound),
-  generator(info, *info.ns) { }
+string_refinementt::string_refinementt(const infot &info, bool)
+  : supert(info),
+    config_(info),
+    loop_bound_(info.refinement_bound),
+    max_string_length(info.max_string_length),
+    generator(*info.ns)
+{
+}
 
 string_refinementt::string_refinementt(const infot &info):
   string_refinementt(info, validate(info)) { }
@@ -734,13 +737,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   {
     bool satisfied;
     std::vector<exprt> counter_examples;
-    std::tie(satisfied, counter_examples)=check_axioms(
+    std::tie(satisfied, counter_examples) = check_axioms(
       axioms,
       generator,
       get,
       debug(),
       ns,
-      generator.max_string_length,
+      max_string_length,
       config_.use_counter_example,
       supert::config_.ui,
       symbol_resolve);
@@ -778,13 +781,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     {
       bool satisfied;
       std::vector<exprt> counter_examples;
-      std::tie(satisfied, counter_examples)=check_axioms(
+      std::tie(satisfied, counter_examples) = check_axioms(
         axioms,
         generator,
         get,
         debug(),
         ns,
-        generator.max_string_length,
+        max_string_length,
         config_.use_counter_example,
         supert::config_.ui,
         symbol_resolve);
@@ -2143,7 +2146,7 @@ exprt string_refinementt::get(const exprt &expr) const
 
     if(
       const auto arr_model_opt =
-        get_array(super_get, ns, generator.max_string_length, debug(), arr))
+        get_array(super_get, ns, max_string_length, debug(), arr))
       return *arr_model_opt;
 
     if(generator.get_created_strings().count(arr))
