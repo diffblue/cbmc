@@ -24,7 +24,8 @@ class remove_virtual_functionst
 {
 public:
   remove_virtual_functionst(
-    const symbol_table_baset &_symbol_table);
+    const symbol_table_baset &_symbol_table,
+    const class_hierarchyt &_class_hierarchy);
 
   void operator()(goto_functionst &goto_functions);
 
@@ -36,17 +37,17 @@ public:
     const dispatch_table_entriest &functions,
     virtual_dispatch_fallback_actiont fallback_action);
 
+  void get_functions(const exprt &, dispatch_table_entriest &);
+
 protected:
   const namespacet ns;
   const symbol_table_baset &symbol_table;
 
-  class_hierarchyt class_hierarchy;
+  const class_hierarchyt &class_hierarchy;
 
   void remove_virtual_function(
     goto_programt &goto_program,
     goto_programt::targett target);
-
-  void get_functions(const exprt &, dispatch_table_entriest &);
   typedef std::function<
     resolve_inherited_componentt::inherited_componentt(
       const irep_idt &,
@@ -64,11 +65,12 @@ protected:
 };
 
 remove_virtual_functionst::remove_virtual_functionst(
-  const symbol_table_baset &_symbol_table):
-  ns(_symbol_table),
-  symbol_table(_symbol_table)
+  const symbol_table_baset &_symbol_table,
+  const class_hierarchyt &_class_hierarchy)
+  : ns(_symbol_table),
+    symbol_table(_symbol_table),
+    class_hierarchy(_class_hierarchy)
 {
-  class_hierarchy(symbol_table);
 }
 
 void remove_virtual_functionst::remove_virtual_function(
@@ -528,7 +530,9 @@ void remove_virtual_functions(
   const symbol_table_baset &symbol_table,
   goto_functionst &goto_functions)
 {
-  remove_virtual_functionst rvf(symbol_table);
+  class_hierarchyt class_hierarchy;
+  class_hierarchy(symbol_table);
+  remove_virtual_functionst rvf(symbol_table, class_hierarchy);
   rvf(goto_functions);
 }
 
@@ -540,7 +544,9 @@ void remove_virtual_functions(goto_modelt &goto_model)
 
 void remove_virtual_functions(goto_model_functiont &function)
 {
-  remove_virtual_functionst rvf(function.get_symbol_table());
+  class_hierarchyt class_hierarchy;
+  class_hierarchy(function.get_symbol_table());
+  remove_virtual_functionst rvf(function.get_symbol_table(), class_hierarchy);
   bool changed = rvf.remove_virtual_functions(
     function.get_goto_function().body);
   // Give fresh location numbers to `function`, in case it has grown:
@@ -555,8 +561,20 @@ void remove_virtual_function(
   const dispatch_table_entriest &dispatch_table,
   virtual_dispatch_fallback_actiont fallback_action)
 {
-  remove_virtual_functionst rvf(goto_model.symbol_table);
+  class_hierarchyt class_hierarchy;
+  class_hierarchy(goto_model.symbol_table);
+  remove_virtual_functionst rvf(goto_model.symbol_table, class_hierarchy);
 
   rvf.remove_virtual_function(
     goto_program, instruction, dispatch_table, fallback_action);
+}
+
+void collect_virtual_function_callees(
+  const exprt &function,
+  const symbol_table_baset &symbol_table,
+  const class_hierarchyt &class_hierarchy,
+  dispatch_table_entriest &overridden_functions)
+{
+  remove_virtual_functionst instance(symbol_table, class_hierarchy);
+  instance.get_functions(function, overridden_functions);
 }
