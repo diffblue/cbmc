@@ -239,9 +239,19 @@ void java_bytecode_convert_classt::convert(const classt &c)
       extract_generic_superclass_reference(c.signature);
     if(superclass_ref.has_value())
     {
-      const java_generic_symbol_typet generic_base(
-        base, superclass_ref.value(), qualified_classname);
-      class_type.add_base(generic_base);
+      try
+      {
+        const java_generic_symbol_typet generic_base(
+          base, superclass_ref.value(), qualified_classname);
+        class_type.add_base(generic_base);
+      }
+      catch(unsupported_java_class_signature_exceptiont)
+      {
+        debug() << "unsupported generic superclass signature "
+                << id2string(*superclass_ref)
+                << " falling back on using the descriptor" << eom;
+        class_type.add_base(base);
+      }
     }
     else
     {
@@ -268,9 +278,19 @@ void java_bytecode_convert_classt::convert(const classt &c)
       extract_generic_interface_reference(c.signature, id2string(interface));
     if(interface_ref.has_value())
     {
-      const java_generic_symbol_typet generic_base(
-        base, interface_ref.value(), qualified_classname);
-      class_type.add_base(generic_base);
+      try
+      {
+        const java_generic_symbol_typet generic_base(
+          base, interface_ref.value(), qualified_classname);
+        class_type.add_base(generic_base);
+      }
+      catch(unsupported_java_class_signature_exceptiont)
+      {
+        debug() << "unsupported generic interface signature "
+                << id2string(*interface_ref)
+                << " falling back on using the descriptor" << eom;
+        class_type.add_base(base);
+      }
     }
     else
     {

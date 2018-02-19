@@ -169,3 +169,23 @@ Generic<InterfaceGeneric> implements InterfaceGeneric<T>
       return f;
   }
 }
+
+class GenericBounds extends Generic<Class<?>> {
+  // references exist only to load these class files, too
+  GenericBoundsUpper gen_upper;
+  GenericBoundsLower gen_lower;
+  GenericInterface gen_interface;
+
+}
+
+class GenericBoundsUpper extends Generic<Class<? extends Class>> {
+}
+
+class GenericBoundsLower extends Generic<Class<? super Class>> {
+}
+
+class GenericInterface implements InterfaceGeneric<Class<? extends Class>> {
+  public Class<? extends Class> someMethod(){
+    return null;
+  }
+}

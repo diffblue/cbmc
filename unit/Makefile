@@ -45,6 +45,7 @@ SRC += unit_tests.cpp \
        util/symbol_table.cpp \
        catch_example.cpp \
        java_bytecode/java_virtual_functions/virtual_functions.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_superclasses.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I.
