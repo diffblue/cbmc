@@ -47,6 +47,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/strings/string_refinement/substitute_array_list.cpp \
        solvers/strings/string_refinement/union_find_replace.cpp \
        util/allocate_objects.cpp \
+       solvers/refinement/bv_refinement/add_lemma.cpp \
        util/cmdline.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr.cpp \
