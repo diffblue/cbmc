@@ -184,7 +184,6 @@ private:
   array_string_exprt
   char_array_of_pointer(const exprt &pointer, const exprt &length);
 
-  void add_default_axioms(const array_string_exprt &s);
   exprt axiom_for_is_positive_index(const exprt &x);
 
   void add_constraint_on_characters(
