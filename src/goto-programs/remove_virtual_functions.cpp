@@ -96,6 +96,28 @@ void remove_virtual_functionst::remove_virtual_function(
     virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION);
 }
 
+/// Create a concrete function call to replace a virtual one
+/// \param call [in/out]: the function call to update
+/// \param function_symbol: the function to be called
+/// \param ns: namespace
+static void create_static_function_call(
+  code_function_callt &call,
+  const symbol_exprt &function_symbol,
+  const namespacet &ns)
+{
+  call.function() = function_symbol;
+  // Cast the `this` pointer to the correct type for the new callee:
+  const auto &callee_type =
+    to_code_type(ns.lookup(function_symbol.get_identifier()).type);
+  const code_typet::parametert *this_param = callee_type.get_this();
+  INVARIANT(
+    this_param != nullptr,
+    "Virtual function callees must have a `this` argument");
+  typet need_type = this_param->type();
+  if(!type_eq(call.arguments()[0].type(), need_type, ns))
+    call.arguments()[0].make_typecast(need_type);
+}
+
 void remove_virtual_functionst::remove_virtual_function(
   goto_programt &goto_program,
   goto_programt::targett target,
@@ -121,8 +143,10 @@ void remove_virtual_functionst::remove_virtual_function(
     if(functions.begin()->symbol_expr==symbol_exprt())
       target->make_skip();
     else
-      to_code_function_call(target->code).function()=
-        functions.begin()->symbol_expr;
+    {
+      create_static_function_call(
+        to_code_function_call(target->code), functions.front().symbol_expr, ns);
+    }
     return;
   }
 
@@ -187,18 +211,8 @@ void remove_virtual_functionst::remove_virtual_function(
       {
       // call function
         t1->make_function_call(code);
-        auto &newcall=to_code_function_call(t1->code);
-        newcall.function()=fun.symbol_expr;
-        // Cast the `this` pointer to the correct type for the new callee:
-        const auto &callee_type=
-          to_code_type(ns.lookup(fun.symbol_expr.get_identifier()).type);
-        const code_typet::parametert *this_param = callee_type.get_this();
-        INVARIANT(
-          this_param != nullptr,
-          "Virtual function callees must have a `this` argument");
-        typet need_type=this_param->type();
-        if(!type_eq(newcall.arguments()[0].type(), need_type, ns))
-          newcall.arguments()[0].make_typecast(need_type);
+        create_static_function_call(
+          to_code_function_call(t1->code), fun.symbol_expr, ns);
       }
       else
       {
