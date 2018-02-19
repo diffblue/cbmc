@@ -47,17 +47,17 @@ void uninitializedt::get_tracking(goto_programt::const_targett i_it)
 {
   std::list<exprt> objects=objects_read(*i_it);
 
-  forall_expr_list(o_it, objects)
+  for(const auto &object : objects)
   {
-    if(o_it->id()==ID_symbol)
+    if(object.id() == ID_symbol)
     {
-      const irep_idt &identifier=to_symbol_expr(*o_it).get_identifier();
+      const irep_idt &identifier = to_symbol_expr(object).get_identifier();
       const std::set<irep_idt> &uninitialized=
         uninitialized_analysis[i_it].uninitialized;
       if(uninitialized.find(identifier)!=uninitialized.end())
         tracking.insert(identifier);
     }
-    else if(o_it->id()==ID_dereference)
+    else if(object.id() == ID_dereference)
     {
     }
   }
@@ -142,11 +142,11 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
         uninitialized_analysis[i_it].uninitialized;
 
       // check tracking variables
-      forall_expr_list(it, read)
+      for(const auto &object : read)
       {
-        if(it->id()==ID_symbol)
+        if(object.id() == ID_symbol)
         {
-          const irep_idt &identifier=to_symbol_expr(*it).get_identifier();
+          const irep_idt &identifier = to_symbol_expr(object).get_identifier();
 
           if(uninitialized.find(identifier)!=uninitialized.end())
           {
@@ -169,11 +169,11 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
       }
 
       // set tracking variables
-      forall_expr_list(it, written)
+      for(const auto &object : written)
       {
-        if(it->id()==ID_symbol)
+        if(object.id() == ID_symbol)
         {
-          const irep_idt &identifier=to_symbol_expr(*it).get_identifier();
+          const irep_idt &identifier = to_symbol_expr(object).get_identifier();
 
           if(tracking.find(identifier)!=tracking.end())
           {

@@ -20,8 +20,7 @@ class symex_slicet
 public:
   void slice(symex_target_equationt &equation);
 
-  void slice(symex_target_equationt &equation,
-             const expr_listt &expressions);
+  void slice(symex_target_equationt &, const std::list<exprt> &);
 
   void collect_open_variables(
     const symex_target_equationt &equation,

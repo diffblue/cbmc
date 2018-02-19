@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 #include <iosfwd>
+#include <list>
 #include <set>
 #include <limits>
 #include <sstream>

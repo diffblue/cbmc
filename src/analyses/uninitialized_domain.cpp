@@ -16,6 +16,8 @@ Date: January 2010
 #include <util/std_expr.h>
 #include <util/std_code.h>
 
+#include <list>
+
 void uninitialized_domaint::transform(
   locationt from,
   locationt to,
@@ -43,10 +45,12 @@ void uninitialized_domaint::transform(
       std::list<exprt> read=expressions_read(*from);
       std::list<exprt> written=expressions_written(*from);
 
-      forall_expr_list(it, written) assign(*it);
+      for(const auto &expr : written)
+        assign(expr);
 
       // we only care about the *first* uninitalized use
-      forall_expr_list(it, read) assign(*it);
+      for(const auto &expr : read)
+        assign(expr);
     }
   }
 }

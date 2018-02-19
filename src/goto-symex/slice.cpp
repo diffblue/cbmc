@@ -33,11 +33,11 @@ void symex_slicet::get_symbols(const typet &type)
 
 void symex_slicet::slice(
   symex_target_equationt &equation,
-  const expr_listt &exprs)
+  const std::list<exprt> &exprs)
 {
   // collect dependencies
-  forall_expr_list(expr_it, exprs)
-    get_symbols(*expr_it);
+  for(const auto &expr : exprs)
+    get_symbols(expr);
 
   slice(equation);
 }
@@ -229,8 +229,9 @@ void collect_open_variables(
 /// \param equation: symex trace to be sliced
 /// \param expression: list of expressions, targets for slicing
 /// \return None. But equation is modified as a side-effect.
-void slice(symex_target_equationt &equation,
-           const expr_listt &expressions)
+void slice(
+  symex_target_equationt &equation,
+  const std::list<exprt> &expressions)
 {
   symex_slicet symex_slice;
   symex_slice.slice(equation, expressions);

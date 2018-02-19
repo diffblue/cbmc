@@ -34,14 +34,6 @@ Author: Daniel Kroening, kroening@kroening.com
   for(exprt::operandst::iterator it=(expr).begin(); \
       it!=(expr).end(); ++it)
 
-#define forall_expr_list(it, expr) \
-  for(expr_listt::const_iterator it=(expr).begin(); \
-      it!=(expr).end(); ++it)
-
-#define Forall_expr_list(it, expr) \
-  for(expr_listt::iterator it=(expr).begin(); \
-      it!=(expr).end(); ++it)
-
 class depth_iteratort;
 class const_depth_iteratort;
 class const_unique_depth_iteratort;
@@ -179,8 +171,6 @@ public:
   const_unique_depth_iteratort unique_depth_cbegin() const;
   const_unique_depth_iteratort unique_depth_cend() const;
 };
-
-typedef std::list<exprt> expr_listt;
 
 class expr_visitort
 {

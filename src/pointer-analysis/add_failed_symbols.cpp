@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/std_expr.h>
 
+#include <list>
+
 /// Get the name of the special symbol used to denote an unknown referee pointed
 /// to by a given pointer-typed symbol.
 /// \param id: base symbol id

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_STD_CODE_H
 
 #include <cassert>
+#include <list>
 
 #include "expr.h"
 #include "expr_cast.h"

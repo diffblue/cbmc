@@ -12,6 +12,7 @@ Author: Matt Lewis
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATION_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATION_UTILS_H
 
+#include <list>
 #include <map>
 #include <set>
 
@@ -30,6 +31,7 @@ Author: Matt Lewis
 #include "cone_of_influence.h"
 
 typedef std::unordered_map<exprt, exprt, irep_hash> expr_mapt;
+typedef std::list<exprt> expr_listt;
 
 class acceleration_utilst
 {

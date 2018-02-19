@@ -358,8 +358,8 @@ std::list<exprt> objects_read(
 
   std::list<exprt> dest;
 
-  forall_expr_list(it, expressions)
-    objects_read(*it, dest);
+  for(const auto &expr : expressions)
+    objects_read(expr, dest);
 
   return dest;
 }
@@ -385,8 +385,8 @@ std::list<exprt> objects_written(
 
   std::list<exprt> dest;
 
-  forall_expr_list(it, expressions)
-    objects_written(*it, dest);
+  for(const auto &expr : expressions)
+    objects_written(expr, dest);
 
   return dest;
 }
