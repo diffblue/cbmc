@@ -109,6 +109,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/show_properties.h>
 
 #include <analyses/ai.h>
 #include <analyses/goto_check.h>
@@ -119,6 +120,7 @@ class bmct;
 class goto_functionst;
 class optionst;
 
+// clang-format off
 #define GOTO_ANALYSER_OPTIONS \
   OPT_FUNCTIONS \
   "D:I:(std89)(std99)(std11)" \
@@ -126,10 +128,11 @@ class optionst;
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   OPT_SHOW_GOTO_FUNCTIONS \
+  OPT_SHOW_PROPERTIES \
   OPT_GOTO_CHECK \
   "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)" \
-  "(show-properties)(show-reachable-properties)(property):" \
+  "(show-reachable-properties)(property):" \
   "(verbosity):(version)" \
   "(gcc)(arch):" \
   "(taint):(show-taint)" \
@@ -147,6 +150,7 @@ class optionst;
   "(location-sensitive)(concurrent)" \
   "(no-simplify-slicing)" \
   JAVA_BYTECODE_LANGUAGE_OPTIONS
+// clang-format on
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,

@@ -18,10 +18,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/show_properties.h>
 #include <goto-programs/remove_const_function_pointers.h>
 
 #include <analyses/goto_check.h>
 
+// clang-format off
 #define GOTO_INSTRUMENT_OPTIONS \
   "(all)" \
   "(document-claims-latex)(document-claims-html)" \
@@ -51,6 +53,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(stack-depth):(nondet-static)" \
   "(function-enter):(function-exit):(branch):" \
   OPT_SHOW_GOTO_FUNCTIONS \
+  OPT_SHOW_PROPERTIES \
   "(drop-unused-functions)" \
   "(show-value-sets)" \
   "(show-global-may-alias)" \
@@ -64,7 +67,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_REMOVE_CONST_FUNCTION_POINTERS \
   "(print-internal-representation)" \
   "(remove-function-pointers)" \
-  "(show-claims)(show-properties)(property):" \
+  "(show-claims)(property):" \
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
   "(cav11)" \
   OPT_TIMESTAMP \
@@ -81,8 +84,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-threaded)(list-calls-args)(print-path-lengths)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\
-  "(splice-call):" \
-
+  "(splice-call):"
+// clang-format on
 
 class goto_instrument_parse_optionst:
   public parse_options_baset,

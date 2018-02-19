@@ -19,23 +19,27 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/show_properties.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 
 class goto_functionst;
 class optionst;
 
+// clang-format off
 #define CLOBBER_OPTIONS \
   "(depth):(context-bound):(unwind):" \
   OPT_GOTO_CHECK \
   OPT_SHOW_GOTO_FUNCTIONS \
+  OPT_SHOW_PROPERTIES \
   "(no-assertions)(no-assumptions)" \
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
   "(string-abstraction)" \
-  "(show-locs)(show-vcc)(show-properties)(show-trace)" \
+  "(show-locs)(show-vcc)(show-trace)" \
   "(property):" \
   JAVA_BYTECODE_LANGUAGE_OPTIONS
+// clang-format on
 
 class clobber_parse_optionst:
   public parse_options_baset,

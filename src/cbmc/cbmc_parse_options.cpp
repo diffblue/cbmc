@@ -534,7 +534,8 @@ int cbmc_parse_optionst::doit()
   if(cmdline.isset("show-claims") || // will go away
      cmdline.isset("show-properties")) // use this one
   {
-    show_properties(goto_model, ui_message_handler.get_ui());
+    show_properties(
+      goto_model, get_message_handler(), ui_message_handler.get_ui());
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -923,7 +924,7 @@ void cbmc_parse_optionst::help()
     " cbmc file.c ...              source file names\n"
     "\n"
     "Analysis options:\n"
-    " --show-properties            show the properties, but don't run analysis\n" // NOLINT(*)
+    HELP_SHOW_PROPERTIES
     " --symex-coverage-report f    generate a Cobertura XML coverage report in f\n" // NOLINT(*)
     " --property id                only check one specific property\n"
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)

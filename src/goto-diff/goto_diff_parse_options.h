@@ -12,25 +12,33 @@ Author: Peter Schrammel
 #ifndef CPROVER_GOTO_DIFF_GOTO_DIFF_PARSE_OPTIONS_H
 #define CPROVER_GOTO_DIFF_GOTO_DIFF_PARSE_OPTIONS_H
 
+#include <analyses/goto_check.h>
+
 #include <util/ui_message.h>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/show_properties.h>
 
 #include "goto_diff_languages.h"
 
 class goto_modelt;
 class optionst;
 
+// clang-format off
 #define GOTO_DIFF_OPTIONS \
   "(json-ui)" \
   OPT_SHOW_GOTO_FUNCTIONS \
+  OPT_SHOW_PROPERTIES \
+  OPT_GOTO_CHECK \
+  "(cover):" \
   "(verbosity):(version)" \
   OPT_TIMESTAMP \
   "u(unified)(change-impact)(forward-impact)(backward-impact)" \
   "(compact-output)"
+// clang-format on
 
 class goto_diff_parse_optionst:
   public parse_options_baset,

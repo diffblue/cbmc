@@ -11,40 +11,26 @@ Author: Peter Schrammel
 
 #include "goto_diff.h"
 
-#include <util/json_expr.h>
+#include <goto-programs/show_properties.h>
 
-std::ostream &goto_difft::output_functions(std::ostream &out) const
+#include <util/json_expr.h>
+#include <util/options.h>
+
+/// Output diff result
+void goto_difft::output_functions() const
 {
-  namespacet ns1(goto_model1.symbol_table);
-  namespacet ns2(goto_model2.symbol_table);
   switch(ui)
   {
     case ui_message_handlert::uit::PLAIN:
     {
-      out << "total number of functions: " << total_functions_count << "\n";
-      out << "new functions:\n";
-      for(irep_id_sett::const_iterator it=new_functions.begin();
-          it!=new_functions.end(); ++it)
-      {
-        const symbolt &symbol = ns2.lookup(*it);
-        out << "  " << symbol.location.get_file() << ": " << *it << "\n";
-      }
-
-      out << "modified functions:\n";
-      for(irep_id_sett::const_iterator it=modified_functions.begin();
-          it!=modified_functions.end(); ++it)
-      {
-        const symbolt &symbol = ns2.lookup(*it);
-        out << "  " << symbol.location.get_file() << ": " << *it << "\n";
-      }
-
-      out << "deleted functions:\n";
-      for(irep_id_sett::const_iterator it=deleted_functions.begin();
-          it!=deleted_functions.end(); ++it)
-      {
-        const symbolt &symbol = ns1.lookup(*it);
-        out << "  " << symbol.location.get_file() << ": " << *it << "\n";
-      }
+      result() << "total number of functions: " << total_functions_count
+               << '\n';
+      output_function_group("new functions", new_functions, goto_model2);
+      output_function_group(
+        "modified functions", modified_functions, goto_model2);
+      output_function_group(
+        "deleted functions", deleted_functions, goto_model1);
+      result() << eom;
       break;
     }
     case ui_message_handlert::uit::JSON_UI:
@@ -52,54 +38,115 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
       json_objectt json_result;
       json_result["totalNumberOfFunctions"]=
         json_stringt(std::to_string(total_functions_count));
-      convert_function_group
-        (json_result["newFunctions"].make_array(), new_functions);
-      convert_function_group(
-        json_result["modifiedFunctions"].make_array(), modified_functions);
-      convert_function_group(
-        json_result["deletedFunctions"].make_array(), deleted_functions);
-      out << ",\n" << json_result;
+      convert_function_group_json(
+        json_result["newFunctions"].make_array(), new_functions, goto_model2);
+      convert_function_group_json(
+        json_result["modifiedFunctions"].make_array(),
+        modified_functions,
+        goto_model2);
+      convert_function_group_json(
+        json_result["deletedFunctions"].make_array(),
+        deleted_functions,
+        goto_model1);
+      result() << json_result;
       break;
     }
     case ui_message_handlert::uit::XML_UI:
     {
-      out << "not supported yet";
+      error() << "XML output not supported yet" << eom;
     }
   }
-  return out;
 }
 
-void goto_difft::convert_function_group(
+/// Output group of functions in plain text format
+/// \param group_name: the name of the group, e.g. "modified functions"
+/// \param function_group: set of function ids in the group
+/// \param goto_model: the goto model
+void goto_difft::output_function_group(
+  const std::string &group_name,
+  const irep_id_sett &function_group,
+  const goto_modelt &goto_model) const
+{
+  result() << group_name << ":\n";
+  for(const auto &function_name : function_group)
+  {
+    output_function(function_name, goto_model);
+  }
+}
+
+/// Output function information in plain text format
+/// \param function_name: the function id
+/// \param goto_model: the goto model
+void goto_difft::output_function(
+  const irep_idt &function_name,
+  const goto_modelt &goto_model) const
+{
+  namespacet ns(goto_model.symbol_table);
+  const symbolt &symbol = ns.lookup(function_name);
+
+  result() << "  " << symbol.location.get_file() << ": " << function_name
+           << '\n';
+
+  if(options.get_bool_option("show-properties"))
+  {
+    const auto goto_function_it =
+      goto_model.goto_functions.function_map.find(function_name);
+    CHECK_RETURN(
+      goto_function_it != goto_model.goto_functions.function_map.end());
+    const goto_programt &goto_program = goto_function_it->second.body;
+
+    for(const auto &ins : goto_program.instructions)
+    {
+      if(!ins.is_assert())
+        continue;
+
+      const source_locationt &source_location = ins.source_location;
+      irep_idt property_id = source_location.get_property_id();
+      result() << "    " << property_id << '\n';
+    }
+  }
+}
+
+/// Convert a function group to JSON
+/// \param result: the JSON array to be populated
+/// \param function_group: set of function ids in the group
+/// \param goto_model: the goto model
+void goto_difft::convert_function_group_json(
   json_arrayt &result,
-  const irep_id_sett &function_group) const
+  const irep_id_sett &function_group,
+  const goto_modelt &goto_model) const
 {
-  for(irep_id_sett::const_iterator it=function_group.begin();
-      it!=function_group.end(); ++it)
+  for(const auto &function_name : function_group)
   {
-    convert_function(result.push_back(jsont()).make_object(), *it);
+    convert_function_json(
+      result.push_back(jsont()).make_object(), function_name, goto_model);
   }
 }
 
-void goto_difft::convert_function(
+/// Convert function information to JSON
+/// \param result: the JSON object to be populated
+/// \param function_name: the function id
+/// \param goto_model: the goto model
+void goto_difft::convert_function_json(
   json_objectt &result,
-  const irep_idt &function_name) const
+  const irep_idt &function_name,
+  const goto_modelt &goto_model) const
 {
-  // the function may be in goto_model1 or goto_model2
-  if(
-    goto_model1.goto_functions.function_map.find(function_name) !=
-    goto_model1.goto_functions.function_map.end())
+  namespacet ns(goto_model.symbol_table);
+  const symbolt &symbol = ns.lookup(function_name);
+
+  result["name"] = json_stringt(id2string(function_name));
+  result["sourceLocation"] = json(symbol.location);
+
+  if(options.get_bool_option("show-properties"))
   {
-    const symbolt &symbol =
-      namespacet(goto_model1.symbol_table).lookup(function_name);
-    result["sourceLocation"] = json(symbol.location);
+    const auto goto_function_it =
+      goto_model.goto_functions.function_map.find(function_name);
+    CHECK_RETURN(
+      goto_function_it != goto_model.goto_functions.function_map.end());
+    const goto_programt &goto_program = goto_function_it->second.body;
+
+    convert_properties_json(
+      result["properties"].make_array(), ns, function_name, goto_program);
   }
-  else if(
-    goto_model2.goto_functions.function_map.find(function_name) !=
-    goto_model2.goto_functions.function_map.end())
-  {
-    const symbolt &symbol =
-      namespacet(goto_model2.symbol_table).lookup(function_name);
-    result["sourceLocation"] = json(symbol.location);
-  }
-  result["name"]=json_stringt(id2string(function_name));
 }

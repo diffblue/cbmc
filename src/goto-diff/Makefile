@@ -15,6 +15,18 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../pointer-analysis/pointer-analysis$(LIBEXT) \
+      ../goto-instrument/cover$(OBJEXT) \
+      ../goto-instrument/cover_basic_blocks$(OBJEXT) \
+      ../goto-instrument/cover_filter$(OBJEXT) \
+      ../goto-instrument/cover_instrument_branch$(OBJEXT) \
+      ../goto-instrument/cover_instrument_condition$(OBJEXT) \
+      ../goto-instrument/cover_instrument_decision$(OBJEXT) \
+      ../goto-instrument/cover_instrument_location$(OBJEXT) \
+      ../goto-instrument/cover_instrument_mcdc$(OBJEXT) \
+      ../goto-instrument/cover_instrument_other$(OBJEXT) \
+      ../goto-instrument/cover_util$(OBJEXT) \
+      ../goto-symex/adjust_float_expressions$(OBJEXT) \
+      ../goto-symex/rewrite_union$(OBJEXT) \
       ../analyses/analyses$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
