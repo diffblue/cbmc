@@ -163,7 +163,8 @@ std::ostream &goto_programt::output_instruction(
       unsigned i=0;
       const irept::subt &exception_list=
         instruction.code.find(ID_exception_list).get_sub();
-      assert(instruction.targets.size()==exception_list.size());
+      DATA_INVARIANT(instruction.targets.size()==exception_list.size(),
+                     "size of target list");
       for(instructiont::targetst::const_iterator
             gt_it=instruction.targets.begin();
           gt_it!=instruction.targets.end();
@@ -220,8 +221,10 @@ void goto_programt::get_decl_identifiers(
   {
     if(it->is_decl())
     {
-      assert(it->code.get_statement()==ID_decl);
-      assert(it->code.operands().size()==1);
+      DATA_INVARIANT(it->code.get_statement()==ID_decl,
+                     "declaration statements");
+      DATA_INVARIANT(it->code.operands().size()==1,
+                     "operand of declaration statement");
       const symbol_exprt &symbol_expr=to_symbol_expr(it->code.op0());
       decl_identifiers.insert(symbol_expr.get_identifier());
     }
@@ -539,7 +542,7 @@ void goto_programt::compute_target_numbers()
     if(i.is_target())
     {
       i.target_number=++cnt;
-      assert(i.target_number!=0);
+      DATA_INVARIANT(i.target_number!=0, "target numbers");
     }
   }
 
@@ -552,8 +555,10 @@ void goto_programt::compute_target_numbers()
     {
       if(t!=instructions.end())
       {
-        assert(t->target_number!=0);
-        assert(t->target_number!=instructiont::nil_target);
+        DATA_INVARIANT(t->target_number!=0,
+                       "target numbers");
+        DATA_INVARIANT(t->target_number!=instructiont::nil_target,
+                       "target numbers");
       }
     }
   }

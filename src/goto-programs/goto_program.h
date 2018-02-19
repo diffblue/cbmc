@@ -188,7 +188,7 @@ public:
     /// target
     targett get_target() const
     {
-      assert(targets.size()==1);
+      PRECONDITION(targets.size()==1);
       return targets.front();
     }
 
@@ -398,7 +398,7 @@ public:
   static const irep_idt get_function_id(
     const goto_programt &p)
   {
-    assert(!p.empty());
+    PRECONDITION(!p.empty());
 
     return get_function_id(--p.instructions.end());
   }
@@ -411,7 +411,7 @@ public:
   /// Insertion that preserves jumps to "target".
   void insert_before_swap(targett target)
   {
-    assert(target!=instructions.end());
+    PRECONDITION(target!=instructions.end());
     const auto next=std::next(target);
     instructions.insert(next, instructiont())->swap(*target);
   }
@@ -430,7 +430,7 @@ public:
     targett target,
     goto_programt &p)
   {
-    assert(target!=instructions.end());
+    PRECONDITION(target!=instructions.end());
     if(p.instructions.empty())
       return;
     insert_before_swap(target, p.instructions.front());
@@ -586,9 +586,10 @@ public:
 
   targett get_end_function()
   {
-    assert(!instructions.empty());
+    PRECONDITION(!instructions.empty());
     const auto end_function=std::prev(instructions.end());
-    assert(end_function->is_end_function());
+    DATA_INVARIANT(end_function->is_end_function(),
+                   "goto program ends on END_FUNCTION");
     return end_function;
   }
 
@@ -671,6 +672,7 @@ inline bool order_const_target(
   return &_i1<&_i2;
 }
 
+// NOLINTNEXTLINE(readability/identifiers)
 struct const_target_hash
 {
   std::size_t operator()(
