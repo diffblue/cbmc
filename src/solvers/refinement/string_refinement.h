@@ -87,12 +87,12 @@ private:
     /// Concretize strings after solver is finished
     bool trace=false;
     bool use_counter_example=true;
+    std::size_t max_string_length;
   };
 public:
   /// string_refinementt constructor arguments
   struct infot:
     public bv_refinementt::infot,
-    public string_constraint_generatort::infot,
     public configt { };
 
   explicit string_refinementt(const infot &);
@@ -112,6 +112,7 @@ private:
 
   const configt config_;
   std::size_t loop_bound_;
+  std::size_t max_string_length;
   string_constraint_generatort generator;
 
   // Simple constraints that have been given to the solver

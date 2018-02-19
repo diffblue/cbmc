@@ -28,11 +28,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
 
-string_constraint_generatort::string_constraint_generatort(
-  const string_constraint_generatort::infot &info,
-  const namespacet &ns)
-  : max_string_length(info.string_max_length),
-    ns(ns)
+string_constraint_generatort::string_constraint_generatort(const namespacet &ns)
+  : ns(ns)
 {
 }
 

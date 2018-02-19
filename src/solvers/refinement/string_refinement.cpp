@@ -167,11 +167,14 @@ static bool validate(const string_refinementt::infot &info)
   return true;
 }
 
-string_refinementt::string_refinementt(const infot &info, bool):
-  supert(info),
-  config_(info),
-  loop_bound_(info.refinement_bound),
-  generator(info, *info.ns) { }
+string_refinementt::string_refinementt(const infot &info, bool)
+  : supert(info),
+    config_(info),
+    loop_bound_(info.refinement_bound),
+    max_string_length(info.max_string_length),
+    generator(*info.ns)
+{
+}
 
 string_refinementt::string_refinementt(const infot &info):
   string_refinementt(info, validate(info)) { }
@@ -866,13 +869,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   {
     bool satisfied;
     std::vector<exprt> counter_examples;
-    std::tie(satisfied, counter_examples)=check_axioms(
+    std::tie(satisfied, counter_examples) = check_axioms(
       axioms,
       generator,
       get,
       debug(),
       ns,
-      generator.max_string_length,
+      max_string_length,
       config_.use_counter_example,
       supert::config_.ui,
       symbol_resolve);
@@ -914,13 +917,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     {
       bool satisfied;
       std::vector<exprt> counter_examples;
-      std::tie(satisfied, counter_examples)=check_axioms(
+      std::tie(satisfied, counter_examples) = check_axioms(
         axioms,
         generator,
         get,
         debug(),
         ns,
-        generator.max_string_length,
+        max_string_length,
         config_.use_counter_example,
         supert::config_.ui,
         symbol_resolve);
@@ -2428,13 +2431,13 @@ exprt string_refinementt::get(const exprt &expr) const
     array_string_exprt &arr = to_array_string_expr(ecopy);
     arr.length() = generator.get_length_of_string_array(arr);
     const auto arr_model_opt =
-      get_array(super_get, ns, generator.max_string_length, debug(), arr);
+      get_array(super_get, ns, max_string_length, debug(), arr);
     // \todo Refactor with get array in model
     if(arr_model_opt)
     {
       const exprt arr_model = simplify_expr(*arr_model_opt, ns);
-      const exprt concretized_array = concretize_arrays_in_expression(
-        arr_model, generator.max_string_length, ns);
+      const exprt concretized_array =
+        concretize_arrays_in_expression(arr_model, max_string_length, ns);
       return concretized_array;
     }
     else
@@ -2449,8 +2452,8 @@ exprt string_refinementt::get(const exprt &expr) const
             array_exprt(array_typet(arr.type().subtype(), length));
           for(size_t i = 0; i < *n; i++)
             arr_model.copy_to_operands(exprt(ID_unknown, arr.type().subtype()));
-          const exprt concretized_array = concretize_arrays_in_expression(
-            arr_model, generator.max_string_length, ns);
+          const exprt concretized_array =
+            concretize_arrays_in_expression(arr_model, max_string_length, ns);
           return concretized_array;
         }
       }
