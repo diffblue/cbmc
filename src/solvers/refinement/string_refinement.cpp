@@ -1065,7 +1065,8 @@ static optionalt<exprt> get_array(
   auto n_opt = numeric_cast<std::size_t>(size_val);
   if(!n_opt)
   {
-    stream << "(sr::get_array) size is not valid" << eom;
+    stream << "(sr::get_array) size is not valid: "
+           << from_expr(ns, "", size_val) << eom;
     return {};
   }
   std::size_t n = *n_opt;
@@ -1075,7 +1076,8 @@ static optionalt<exprt> get_array(
 
   if(n>max_string_length)
   {
-    stream << "(sr::get_array) long string (size=" << n << ")" << eom;
+    stream << "(sr::get_array) long string (size=" << n << "):"
+           << from_expr(ns, "", arr_val) << eom;
     return {};
   }
 
@@ -1646,7 +1648,7 @@ static void debug_check_axioms_step(
 {
   static const std::string indent = "  ";
   static const std::string indent2 = "    ";
-  stream << indent2 << "- axiom:\n" << indent2 << indent;
+  stream << indent2 << "- axiom:" << messaget::eom << indent2 << indent;
 
   if(axiom.id() == ID_string_constraint)
     stream << from_expr(ns, "", to_string_constraint(axiom));
@@ -1654,7 +1656,9 @@ static void debug_check_axioms_step(
     stream << from_expr(ns, "", to_string_not_contains_constraint(axiom));
   else
     stream << from_expr(ns, "", axiom);
-  stream << '\n' << indent2 << "- axiom_in_model:\n" << indent2 << indent;
+  stream << '\n'
+         << indent2 << "- axiom_in_model:" << messaget::eom << indent2
+         << indent;
 
   if(axiom_in_model.id() == ID_string_constraint)
     stream << from_expr(ns, "", to_string_constraint(axiom_in_model));
@@ -1666,10 +1670,10 @@ static void debug_check_axioms_step(
 
   stream << '\n'
          << indent2 << "- negated_axiom:\n"
-         << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
+         << indent2 << indent << from_expr(ns, "", negaxiom) << messaget::eom;
   stream << indent2 << "- negated_axiom_with_concretized_arrays:\n"
          << indent2 << indent << from_expr(ns, "", with_concretized_arrays)
-         << '\n';
+         << messaget::eom;
 }
 
 /// \return true if the current model satisfies all the axioms
@@ -1790,7 +1794,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     const exprt with_concrete_arrays =
       substitute_array_access(negaxiom, gen_symbol, true);
 
-    stream << indent << i << ".\n";
+    stream << indent << i << '.' << eom;
     debug_check_axioms_step(
       stream, ns, nc_axiom, nc_axiom_in_model, negaxiom, with_concrete_arrays);
 
