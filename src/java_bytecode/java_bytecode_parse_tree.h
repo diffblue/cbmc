@@ -178,12 +178,11 @@ public:
 
     enum class method_handle_typet
     {
-      BOOTSTRAP_METHOD_HANDLE,
-      BOOTSTRAP_METHOD_HANDLE_ALT,
       LAMBDA_METHOD_HANDLE,
       UNKNOWN_HANDLE
     };
 
+    typedef std::vector<u2> u2_valuest;
     class lambda_method_handlet
     {
     public:
@@ -191,10 +190,10 @@ public:
       irep_idt lambda_method_name;
       irep_idt interface_type;
       irep_idt method_type;
-      lambda_method_handlet()
-        : handle_type(method_handle_typet::UNKNOWN_HANDLE)
-        {
-        }
+      u2_valuest u2_values;
+      lambda_method_handlet() : handle_type(method_handle_typet::UNKNOWN_HANDLE)
+      {
+      }
     };
 
     typedef std::map<std::pair<irep_idt, size_t>, lambda_method_handlet>
