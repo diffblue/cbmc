@@ -13,6 +13,7 @@ Date: March 2016
 
 #include "symex_coverage.h"
 
+#include <ctime>
 #include <chrono>
 #include <iostream>
 #include <fstream>
