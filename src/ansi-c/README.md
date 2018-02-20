@@ -25,7 +25,7 @@ various threading interfaces.
 
 \section preprocessing Preprocessing & Parsing
 
-In the \ref ansi-c and \ref java_bytecode directories
+In the \ref ansi-c directory
 
 **Key classes:**
 * \ref languaget and its subclasses
@@ -46,7 +46,7 @@ digraph G {
 
 \section type-checking Type-checking
 
-In the \ref ansi-c and \ref java_bytecode directories.
+In the \ref ansi-c directory
 
 **Key classes:**
 * \ref languaget and its subclasses
