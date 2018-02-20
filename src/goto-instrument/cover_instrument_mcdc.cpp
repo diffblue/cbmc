@@ -11,6 +11,8 @@ Author: Daniel Kroening
 
 #include "cover_instrument.h"
 
+#include <langapi/language_util.h>
+
 #include <algorithm>
 
 #include "cover_util.h"

@@ -110,7 +110,7 @@ public:
   symbol_tablet &symbol_table;
 
 private:
-  const lazy_goto_functions_mapt<goto_programt> goto_functions;
+  const lazy_goto_functions_mapt goto_functions;
   language_filest language_files;
 
   // Function/module processing functions

@@ -13,6 +13,7 @@ Date: March 2016
 
 #include "symex_coverage.h"
 
+#include <ctime>
 #include <chrono>
 #include <iostream>
 #include <fstream>
@@ -22,6 +23,8 @@ Date: March 2016
 #include <util/string2int.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
+
+#include <langapi/language_util.h>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_returns.h>

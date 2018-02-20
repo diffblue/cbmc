@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml_expr.h>
 #include <util/simplify_expr.h>
 
+#include <langapi/language_util.h>
+
 #include <iostream>
 
 void custom_bitvector_domaint::set_bit(

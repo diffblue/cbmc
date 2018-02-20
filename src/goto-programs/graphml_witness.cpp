@@ -18,7 +18,9 @@ Author: Daniel Kroening
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 
-#include <goto-programs/goto_program_template.h>
+#include <langapi/language_util.h>
+
+#include "goto_program.h"
 
 void graphml_witnesst::remove_l0_l1(exprt &expr)
 {

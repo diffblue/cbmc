@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_program.h"
 
 #include <ostream>
+#include <iomanip>
 
 #include <util/std_expr.h>
 
@@ -34,7 +35,7 @@ std::ostream &goto_programt::output_instruction(
   const namespacet &ns,
   const irep_idt &identifier,
   std::ostream &out,
-  const goto_program_templatet::instructiont &instruction) const
+  const instructiont &instruction) const
 {
   out << "        // " << instruction.location_number << " ";
 
@@ -162,7 +163,8 @@ std::ostream &goto_programt::output_instruction(
       unsigned i=0;
       const irept::subt &exception_list=
         instruction.code.find(ID_exception_list).get_sub();
-      assert(instruction.targets.size()==exception_list.size());
+      DATA_INVARIANT(instruction.targets.size()==exception_list.size(),
+                     "size of target list");
       for(instructiont::targetst::const_iterator
             gt_it=instruction.targets.begin();
           gt_it!=instruction.targets.end();
@@ -219,8 +221,10 @@ void goto_programt::get_decl_identifiers(
   {
     if(it->is_decl())
     {
-      assert(it->code.get_statement()==ID_decl);
-      assert(it->code.operands().size()==1);
+      DATA_INVARIANT(it->code.get_statement()==ID_decl,
+                     "declaration statements");
+      DATA_INVARIANT(it->code.operands().size()==1,
+                     "operand of declaration statement");
       const symbol_exprt &symbol_expr=to_symbol_expr(it->code.op0());
       decl_identifiers.insert(symbol_expr.get_identifier());
     }
@@ -482,3 +486,151 @@ std::string as_string(
     throw "unknown statement";
   }
 }
+
+void goto_programt::compute_loop_numbers()
+{
+  unsigned nr=0;
+  for(auto &i : instructions)
+    if(i.is_backwards_goto())
+      i.loop_number=nr++;
+}
+
+void goto_programt::update()
+{
+  compute_incoming_edges();
+  compute_target_numbers();
+  compute_location_numbers();
+  compute_loop_numbers();
+}
+
+std::ostream &goto_programt::output(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  std::ostream &out) const
+{
+  // output program
+
+  for(const auto &instruction : instructions)
+    output_instruction(ns, identifier, out, instruction);
+
+  return out;
+}
+
+void goto_programt::compute_target_numbers()
+{
+  // reset marking
+
+  for(auto &i : instructions)
+    i.target_number=instructiont::nil_target;
+
+  // mark the goto targets
+
+  for(const auto &i : instructions)
+  {
+    for(const auto &t : i.targets)
+    {
+      if(t!=instructions.end())
+        t->target_number=0;
+    }
+  }
+
+  // number the targets properly
+  unsigned cnt=0;
+
+  for(auto &i : instructions)
+  {
+    if(i.is_target())
+    {
+      i.target_number=++cnt;
+      DATA_INVARIANT(i.target_number!=0, "target numbers");
+    }
+  }
+
+  // check the targets!
+  // (this is a consistency check only)
+
+  for(const auto &i : instructions)
+  {
+    for(const auto &t : i.targets)
+    {
+      if(t!=instructions.end())
+      {
+        DATA_INVARIANT(t->target_number!=0,
+                       "target numbers");
+        DATA_INVARIANT(t->target_number!=instructiont::nil_target,
+                       "target numbers");
+      }
+    }
+  }
+}
+
+void goto_programt::copy_from(const goto_programt &src)
+{
+  // Definitions for mapping between the two programs
+  typedef std::map<const_targett, targett> targets_mappingt;
+  targets_mappingt targets_mapping;
+
+  clear();
+
+  // Loop over program - 1st time collects targets and copy
+
+  for(instructionst::const_iterator
+      it=src.instructions.begin();
+      it!=src.instructions.end();
+      ++it)
+  {
+    auto new_instruction=add_instruction();
+    targets_mapping[it]=new_instruction;
+    *new_instruction=*it;
+  }
+
+  // Loop over program - 2nd time updates targets
+
+  for(auto &i : instructions)
+  {
+    for(auto &t : i.targets)
+    {
+      targets_mappingt::iterator
+        m_target_it=targets_mapping.find(t);
+
+      if(m_target_it==targets_mapping.end())
+        throw "copy_from: target not found";
+
+      t=m_target_it->second;
+    }
+  }
+
+  compute_incoming_edges();
+  compute_target_numbers();
+}
+
+// number them
+bool goto_programt::has_assertion() const
+{
+  for(const auto &i : instructions)
+    if(i.is_assert() && !i.guard.is_true())
+      return true;
+
+  return false;
+}
+
+void goto_programt::compute_incoming_edges()
+{
+  for(auto &i : instructions)
+  {
+    i.incoming_edges.clear();
+  }
+
+  for(instructionst::iterator
+      it=instructions.begin();
+      it!=instructions.end();
+      ++it)
+  {
+    for(const auto &s : get_successors(it))
+    {
+      if(s!=instructions.end())
+        s->incoming_edges.insert(it);
+    }
+  }
+}
+

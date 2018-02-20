@@ -23,6 +23,8 @@ Date: April 2010
 #include <util/simplify_expr.h>
 #include <util/make_unique.h>
 
+#include <langapi/language_util.h>
+
 #include <goto-programs/goto_functions.h>
 
 #include <pointer-analysis/goto_program_dereference.h>

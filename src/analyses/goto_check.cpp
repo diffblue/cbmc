@@ -28,6 +28,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/options.h>
 
+#include <langapi/language_util.h>
+
 #include "local_bitvector_analysis.h"
 
 class goto_checkt

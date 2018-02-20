@@ -1301,7 +1301,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
 
   /* now test whether this part of the code can exist */
   goto_functionst::function_mapt map;
-  goto_function_templatet<goto_programt> one_interleaving;
+  goto_functiont one_interleaving;
   one_interleaving.body.copy_from(interleaving);
   map.insert(std::make_pair(
     goto_functionst::entry_point(),

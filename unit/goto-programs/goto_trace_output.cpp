@@ -7,7 +7,7 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
-#include <goto-programs/goto_program_template.h>
+#include <goto-programs/goto_program.h>
 #include <goto-programs/goto_trace.h>
 #include <iostream>
 

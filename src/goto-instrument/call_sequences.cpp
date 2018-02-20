@@ -22,6 +22,8 @@ Date: April 2013
 
 #include <goto-programs/goto_model.h>
 
+#include <langapi/language_util.h>
+
 void show_call_sequences(
   const irep_idt &caller,
   const goto_programt &goto_program)

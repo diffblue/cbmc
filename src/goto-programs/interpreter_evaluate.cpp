@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
 
+#include <langapi/language_util.h>
+
 /// Reads a memory address and loads it into the `dest` variable.
 /// Marks cell as `READ_BEFORE_WRITTEN` if cell has never been written.
 void interpretert::read(

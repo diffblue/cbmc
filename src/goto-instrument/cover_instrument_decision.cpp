@@ -11,6 +11,8 @@ Author: Daniel Kroening
 
 #include "cover_instrument.h"
 
+#include <langapi/language_util.h>
+
 #include "cover_util.h"
 
 void cover_decision_instrumentert::instrument(
