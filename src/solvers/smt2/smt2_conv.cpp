@@ -189,6 +189,15 @@ exprt smt2_convt::get(const exprt &expr) const
     if(it!=identifier_map.end())
       return it->second.value;
   }
+  else if(expr.id()==ID_nondet_symbol)
+  {
+    const irep_idt &id=to_nondet_symbol_expr(expr).get_identifier();
+
+    identifier_mapt::const_iterator it=identifier_map.find(id);
+
+    if(it!=identifier_map.end())
+      return it->second.value;
+  }
   else if(expr.id()==ID_member)
   {
     const member_exprt &member_expr=to_member_expr(expr);
@@ -239,7 +248,15 @@ constant_exprt smt2_convt::parse_literal(
       value=string2integer(s.substr(2), 16);
     }
     else
-      PARSERERROR("smt2_convt::parse_literal can't parse \""+s+"\"");
+    {
+      // Numeral
+      value=string2integer(s);
+    }
+  }
+  else if(src.get_sub().size()==2 &&
+          src.get_sub()[0].id()=="-") // (- 100)
+  {
+    value=-string2integer(src.get_sub()[1].id_string());
   }
   else if(src.get_sub().size()==3 &&
           src.get_sub()[0].id()=="_" &&
@@ -433,6 +450,9 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
 
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
+     type.id()==ID_integer ||
+     type.id()==ID_rational ||
+     type.id()==ID_real ||
      type.id()==ID_bv ||
      type.id()==ID_fixedbv ||
      type.id()==ID_floatbv)
@@ -970,7 +990,9 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     assert(expr.operands().size()==1);
 
-    if(expr.type().id()==ID_rational)
+    if(expr.type().id()==ID_rational ||
+       expr.type().id()==ID_integer ||
+       expr.type().id()==ID_real)
     {
       out << "(- ";
       convert_expr(expr.op0());
@@ -1816,7 +1838,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
        src_type.id()==ID_unsignedbv ||
        src_type.id()==ID_c_bool ||
        src_type.id()==ID_fixedbv ||
-       src_type.id()==ID_pointer)
+       src_type.id()==ID_pointer ||
+       src_type.id()==ID_integer)
     {
       out << "(not (= ";
       convert_expr(src);
@@ -2260,6 +2283,17 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> float");
+  }
+  else if(dest_type.id()==ID_integer)
+  {
+    if(src_type.id()==ID_bool)
+    {
+      out << "(ite ";
+      convert_expr(src);
+      out <<" 1 0)";
+    }
+    else
+      UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> integer");
   }
   else if(dest_type.id()==ID_c_bit_field)
   {
@@ -2847,19 +2881,41 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
   {
     convert_expr(expr.op0());
   }
-  else if(expr.operands().size()==2)
+  else
   {
-    if(expr.type().id()==ID_unsignedbv ||
-       expr.type().id()==ID_signedbv ||
-       expr.type().id()==ID_fixedbv)
+    if(expr.type().id()==ID_rational ||
+       expr.type().id()==ID_integer ||
+       expr.type().id()==ID_real)
+    {
+      // these are multi-ary in SMT-LIB2
+      out << "(+";
+
+      for(const auto &op : expr.operands())
+      {
+        out << ' ';
+        convert_expr(op);
+      }
+
+      out << ')';
+    }
+    else if(expr.type().id()==ID_unsignedbv ||
+            expr.type().id()==ID_signedbv ||
+            expr.type().id()==ID_fixedbv)
     {
       // These could be chained, i.e., need not be binary,
       // but at least MathSat doesn't like that.
-      out << "(bvadd ";
-      convert_expr(expr.op0());
-      out << " ";
-      convert_expr(expr.op1());
-      out << ")";
+      if(expr.operands().size()==2)
+      {
+        out << "(bvadd ";
+        convert_expr(expr.op0());
+        out << " ";
+        convert_expr(expr.op1());
+        out << ")";
+      }
+      else
+      {
+        convert_plus(to_plus_expr(make_binary(expr)));
+      }
     }
     else if(expr.type().id()==ID_floatbv)
     {
@@ -2870,41 +2926,40 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
     }
     else if(expr.type().id()==ID_pointer)
     {
-      exprt p=expr.op0(), i=expr.op1();
-
-      if(p.type().id()!=ID_pointer)
-        p.swap(i);
-
-      if(p.type().id()!=ID_pointer)
-        INVALIDEXPR("unexpected mixture in pointer arithmetic");
-
-      mp_integer element_size=
-        pointer_offset_size(expr.type().subtype(), ns);
-      assert(element_size>0);
-
-      out << "(bvadd ";
-      convert_expr(p);
-      out << " ";
-
-      if(element_size>=2)
+      if(expr.operands().size()==2)
       {
-        out << "(bvmul ";
-        convert_expr(i);
-        out << " (_ bv" << element_size
-            << " " << boolbv_width(expr.type()) << "))";
+        exprt p=expr.op0(), i=expr.op1();
+
+        if(p.type().id()!=ID_pointer)
+          p.swap(i);
+
+        if(p.type().id()!=ID_pointer)
+          INVALIDEXPR("unexpected mixture in pointer arithmetic");
+
+        mp_integer element_size=
+          pointer_offset_size(expr.type().subtype(), ns);
+        CHECK_RETURN(element_size>0);
+
+        out << "(bvadd ";
+        convert_expr(p);
+        out << " ";
+
+        if(element_size>=2)
+        {
+          out << "(bvmul ";
+          convert_expr(i);
+          out << " (_ bv" << element_size
+              << " " << boolbv_width(expr.type()) << "))";
+        }
+        else
+          convert_expr(i);
+
+        out << ')';
       }
       else
-        convert_expr(i);
-
-      out << ")";
-    }
-    else if(expr.type().id()==ID_rational)
-    {
-      out << "(+";
-      convert_expr(expr.op0());
-      out << " ";
-      convert_expr(expr.op1());
-      out << ")";
+      {
+        convert_plus(to_plus_expr(make_binary(expr)));
+      }
     }
     else if(expr.type().id()==ID_vector)
     {
@@ -2947,10 +3002,6 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
     }
     else
       UNEXPECTEDCASE("unsupported type for +: "+expr.type().id_string());
-  }
-  else
-  {
-    convert_plus(to_plus_expr(make_binary(expr)));
   }
 }
 
@@ -3054,7 +3105,15 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
 {
   assert(expr.operands().size()==2);
 
-  if(expr.type().id()==ID_unsignedbv ||
+  if(expr.type().id()==ID_integer)
+  {
+    out << "(- ";
+    convert_expr(expr.op0());
+    out << " ";
+    convert_expr(expr.op1());
+    out << ")";
+  }
+  else if(expr.type().id()==ID_unsignedbv ||
      expr.type().id()==ID_signedbv ||
      expr.type().id()==ID_fixedbv)
   {
@@ -3285,7 +3344,9 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
 
     out << "))"; // bvmul, extract
   }
-  else if(expr.type().id()==ID_rational)
+  else if(expr.type().id()==ID_rational ||
+          expr.type().id()==ID_integer ||
+          expr.type().id()==ID_real)
   {
     out << "(*";
 
@@ -4378,7 +4439,8 @@ void smt2_convt::convert_type(const typet &type)
       out << "(_ BitVec "
           << floatbv_type.get_width() << ")";
   }
-  else if(type.id()==ID_rational)
+  else if(type.id()==ID_rational ||
+          type.id()==ID_real)
     out << "Real";
   else if(type.id()==ID_integer)
     out << "Int";

@@ -1,0 +1,7 @@
+CORE smt-backend
+main.c
+--trace --smt2
+^EXIT=10$
+^SIGNAL=0$
+^  b=100
+--
