@@ -108,6 +108,12 @@ public:
     copy_to_operands(code);
   }
 
+  void add(codet code, const source_locationt &loc)
+  {
+    code.add_source_location() = loc;
+    add(code);
+  }
+
   void append(const code_blockt &extra_block);
 
   // This is the closing '}' or 'END' at the end of a block
