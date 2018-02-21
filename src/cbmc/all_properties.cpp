@@ -57,8 +57,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   solver.set_message_handler(get_message_handler());
 
-  auto now = std::chrono::steady_clock::now();
-  auto sat_start = std::chrono::time_point_cast<std::chrono::seconds>(now);
+  auto solver_start=std::chrono::steady_clock::now();
 
   bmc.do_conversion();
 
@@ -133,10 +132,10 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   }
 
   {
-    now = std::chrono::steady_clock::now();
-    auto sat_stop = std::chrono::time_point_cast<std::chrono::seconds>(now);
+    auto solver_stop = std::chrono::steady_clock::now();
 
-    status() << "Runtime decision procedure: " << (sat_stop - sat_start).count()
+    status() << "Runtime decision procedure: "
+             << std::chrono::duration<double>(solver_stop-solver_start).count()
              << "s" << eom;
   }
 
