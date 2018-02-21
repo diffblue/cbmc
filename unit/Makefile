@@ -36,6 +36,7 @@ SRC += unit_tests.cpp \
        solvers/refinement/string_refinement/has_subtype.cpp \
        solvers/refinement/string_refinement/substitute_array_list.cpp \
        solvers/refinement/string_refinement/string_symbol_resolution.cpp \
+       solvers/refinement/string_refinement/sparse_array.cpp \
        solvers/refinement/string_refinement/union_find_replace.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr_iterator.cpp \
