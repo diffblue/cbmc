@@ -27,7 +27,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
-#include <java_bytecode/java_types.h>
 #include <unordered_set>
 
 static bool is_valid_string_constraint(
