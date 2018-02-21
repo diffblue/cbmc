@@ -203,6 +203,7 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2/smt2_conv.cpp \
       smt2/smt2_dec.cpp \
       smt2/smt2_parser.cpp \
+      smt2/smt2_tokenizer.cpp \
       smt2/smt2irep.cpp \
       # Empty last line
 
