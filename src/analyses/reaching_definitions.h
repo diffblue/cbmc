@@ -128,22 +128,22 @@ public:
   void make_top() final override
   {
     values.clear();
-    if(bv_container)
-      bv_container->clear();
+    bv_container = nullptr;
     has_values=tvt(true);
   }
 
   void make_bottom() final override
   {
     values.clear();
-    if(bv_container)
-      bv_container->clear();
+    bv_container = nullptr;
     has_values=tvt(false);
   }
 
   void make_entry() final override
   {
-    make_top();
+    values.clear();
+    bv_container = nullptr;
+    has_values = tvt::unknown();
   }
 
   bool is_top() const override final
