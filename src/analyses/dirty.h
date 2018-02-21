@@ -17,49 +17,80 @@ Date: March 2013
 #include <unordered_set>
 
 #include <util/std_expr.h>
+#include <util/invariant.h>
 #include <goto-programs/goto_functions.h>
 
 class dirtyt
 {
+private:
+  void die_if_uninitialized() const
+  {
+    INVARIANT(
+      initialized,
+      "Uninitialized dirtyt. This dirtyt was constructed using the default "
+      "constructor and not subsequently initialized using "
+      "dirtyt::build().");
+  }
+
 public:
+  bool initialized;
   typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
   typedef goto_functionst::goto_functiont goto_functiont;
 
-  dirtyt()
+  /// \post dirtyt objects that are created through this constructor are not
+  /// safe to use. If you copied a dirtyt (for example, by adding an object
+  /// that owns a dirtyt to a container and then copying it back out), you will
+  /// need to re-initialize the dirtyt by calling dirtyt::build().
+  dirtyt() : initialized(false)
   {
   }
 
-  explicit dirtyt(const goto_functiont &goto_function)
+  explicit dirtyt(const goto_functiont &goto_function) : initialized(false)
   {
     build(goto_function);
+    initialized = true;
   }
 
-  explicit dirtyt(const goto_functionst &goto_functions)
+  explicit dirtyt(const goto_functionst &goto_functions) : initialized(false)
   {
-    forall_goto_functions(it, goto_functions)
-      build(it->second);
+    build(goto_functions);
+    // build(g_funs) responsible for setting initialized to true, since
+    // it is public and can be called independently
   }
 
   void output(std::ostream &out) const;
 
   bool operator()(const irep_idt &id) const
   {
+    die_if_uninitialized();
     return dirty.find(id)!=dirty.end();
   }
 
   bool operator()(const symbol_exprt &expr) const
   {
+    die_if_uninitialized();
     return operator()(expr.get_identifier());
   }
 
   const id_sett &get_dirty_ids() const
   {
+    die_if_uninitialized();
     return dirty;
   }
 
   void add_function(const goto_functiont &goto_function)
   {
     build(goto_function);
+    initialized = true;
+  }
+
+  void build(const goto_functionst &goto_functions)
+  {
+    // dirtyts should not be initialized twice
+    PRECONDITION(!initialized);
+    forall_goto_functions(it, goto_functions)
+      build(it->second);
+    initialized = true;
   }
 
 protected:

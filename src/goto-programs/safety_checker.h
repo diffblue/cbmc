@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // this is just an interface -- it won't actually do any checking!
 
+#include <util/invariant.h>
 #include <util/message.h>
 
 #include "goto_trace.h"
@@ -45,4 +46,39 @@ protected:
   const namespacet &ns;
 };
 
+/// \brief The worst of two results
+inline safety_checkert::resultt &
+operator&=(safety_checkert::resultt &a, safety_checkert::resultt const &b)
+{
+  switch(a)
+  {
+  case safety_checkert::resultt::ERROR:
+    return a;
+  case safety_checkert::resultt::SAFE:
+    a = b;
+    return a;
+  case safety_checkert::resultt::UNSAFE:
+    a = b == safety_checkert::resultt::ERROR ? b : a;
+    return a;
+  }
+  UNREACHABLE;
+}
+
+/// \brief The best of two results
+inline safety_checkert::resultt &
+operator|=(safety_checkert::resultt &a, safety_checkert::resultt const &b)
+{
+  switch(a)
+  {
+  case safety_checkert::resultt::SAFE:
+    return a;
+  case safety_checkert::resultt::ERROR:
+    a = b;
+    return a;
+  case safety_checkert::resultt::UNSAFE:
+    a = b == safety_checkert::resultt::SAFE ? b : a;
+    return a;
+  }
+  UNREACHABLE;
+}
 #endif // CPROVER_GOTO_PROGRAMS_SAFETY_CHECKER_H

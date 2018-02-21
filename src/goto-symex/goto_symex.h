@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 
 #include "goto_symex_state.h"
+#include "symex_target_equation.h"
 
 class typet;
 class code_typet;
@@ -34,28 +35,53 @@ class symbol_exprt;
 class member_exprt;
 class namespacet;
 class side_effect_exprt;
-class symex_targett;
 class typecast_exprt;
 
 /// \brief The main class for the forward symbolic simulator
+///
+/// Higher-level architectural information on symbolic execution is
+/// documented in the \ref symex-overview
+/// "Symbolic execution module page".
 class goto_symext
 {
 public:
+  typedef goto_symex_statet statet;
+
+  /// \brief Information saved at a conditional goto to resume execution
+  struct branch_pointt
+  {
+    symex_target_equationt equation;
+    statet state;
+
+    explicit branch_pointt(const symex_target_equationt &e, const statet &s)
+      : equation(e), state(s, &equation)
+    {
+    }
+
+    explicit branch_pointt(const branch_pointt &other)
+      : equation(other.equation), state(other.state, &equation)
+    {
+    }
+  };
+
+  typedef std::list<branch_pointt> branch_worklistt;
+
   goto_symext(
     message_handlert &mh,
-    const namespacet &_ns,
-    symbol_tablet &_new_symbol_table,
-    symex_targett &_target)
+    const symbol_tablet &outer_symbol_table,
+    symex_target_equationt &_target,
+    branch_worklistt &branch_worklist)
     : total_vccs(0),
       remaining_vccs(0),
       constant_propagation(true),
-      new_symbol_table(_new_symbol_table),
       language_mode(),
-      ns(_ns),
+      outer_symbol_table(outer_symbol_table),
+      ns(outer_symbol_table),
       target(_target),
       atomic_section_counter(0),
       log(mh),
-      guard_identifier("goto_symex::\\guard")
+      guard_identifier("goto_symex::\\guard"),
+      branch_worklist(branch_worklist)
   {
     options.set_option("simplify", true);
     options.set_option("assertions", true);
@@ -64,8 +90,6 @@ public:
   virtual ~goto_symext()
   {
   }
-
-  typedef goto_symex_statet statet;
 
   typedef
     std::function<const goto_functionst::goto_functiont &(const irep_idt &)>
@@ -78,7 +102,18 @@ public:
   /// has completed, so use it if you don't care about having the state
   /// around afterwards.
   virtual void symex_from_entry_point_of(
-    const goto_functionst &goto_functions);
+    const goto_functionst &goto_functions,
+    symbol_tablet &new_symbol_table);
+
+  /// Performs symbolic execution using a state and equation that have
+  /// already been used to symex part of the program. The state is not
+  /// re-initialized; instead, symbolic execution resumes from the program
+  /// counter of the saved state.
+  virtual void resume_symex_from_saved_state(
+    const goto_functionst &goto_functions,
+    const statet &saved_state,
+    symex_target_equationt *const saved_equation,
+    symbol_tablet &new_symbol_table);
 
   /// \brief symex entire program starting from entry point
   ///
@@ -87,7 +122,8 @@ public:
   /// has completed, so use it if you don't care about having the state
   /// around afterwards.
   virtual void symex_from_entry_point_of(
-    const get_goto_functiont &get_goto_function);
+    const get_goto_functiont &get_goto_function,
+    symbol_tablet &new_symbol_table);
 
   //// \brief symex entire program starting from entry point
   ///
@@ -99,7 +135,7 @@ public:
   virtual void symex_with_state(
     statet &,
     const goto_functionst &,
-    const goto_programt &);
+    symbol_tablet &);
 
   //// \brief symex entire program starting from entry point
   ///
@@ -111,7 +147,7 @@ public:
   virtual void symex_with_state(
     statet &,
     const get_goto_functiont &,
-    const goto_programt &);
+    symbol_tablet &);
 
   /// Symexes from the first instruction and the given state, terminating as
   /// soon as the last instruction is reached.  This is useful to explicitly
@@ -162,7 +198,6 @@ protected:
   void symex_threaded_step(
     statet &, const get_goto_functiont &);
 
-  /** execute just one step */
   virtual void symex_step(
     const get_goto_functiont &,
     statet &);
@@ -177,22 +212,35 @@ public:
   bool constant_propagation;
 
   optionst options;
-  symbol_tablet &new_symbol_table;
 
   /// language_mode: ID_java, ID_C or another language identifier
   /// if we know the source language in use, irep_idt() otherwise.
   irep_idt language_mode;
 
 protected:
-  const namespacet &ns;
-  symex_targett &target;
+  /// The symbol table associated with the goto-program that we're
+  /// executing. This symbol table will not additionally contain objects
+  /// that are dynamically created as part of symbolic execution; the
+  /// names of those object are stored in the symbol table passed as the
+  /// `new_symbol_table` argument to the `symex_*` methods.
+  const symbol_tablet &outer_symbol_table;
+
+  /// Initialized just before symbolic execution begins, to point to
+  /// both `outer_symbol_table` and the symbol table owned by the
+  /// `goto_symex_statet` object used during symbolic execution. That
+  /// symbol table must be owned by goto_symex_statet rather than passed
+  /// in, in case the state is saved and resumed. This namespacet is
+  /// used during symbolic execution to look up names from the original
+  /// goto-program, and the names of dynamically-created objects.
+  namespacet ns;
+  symex_target_equationt &target;
   unsigned atomic_section_counter;
 
   mutable messaget log;
 
   friend class symex_dereference_statet;
 
-  void new_name(symbolt &symbol);
+  void new_name(symbolt &symbol, statet &state);
 
   // this does the following:
   // a) rename non-det choices
@@ -206,7 +254,7 @@ protected:
   void initialize_auto_object(const exprt &, statet &);
   void process_array_expr(exprt &);
   void process_array_expr_rec(exprt &, const typet &) const;
-  exprt make_auto_object(const typet &);
+  exprt make_auto_object(const typet &, statet &);
   virtual void dereference(exprt &, statet &, const bool write);
 
   void dereference_rec(
@@ -415,6 +463,8 @@ protected:
   void read(exprt &);
   void replace_nondet(exprt &);
   void rewrite_quantifiers(exprt &, statet &);
+
+  branch_worklistt &branch_worklist;
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_H

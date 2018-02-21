@@ -22,7 +22,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_trace.h>
 
+#include "bmc.h"
 #include "xml_interface.h"
+#include "cbmc_solvers.h"
 
 class bmct;
 class goto_functionst;
@@ -30,21 +32,21 @@ class optionst;
 
 // clang-format off
 #define CBMC_OPTIONS \
-  "(program-only)(preprocess)(slice-by-trace):" \
+  OPT_BMC \
+  "(preprocess)(slice-by-trace):" \
   OPT_FUNCTIONS \
-  "(no-simplify)(unwind):(unwindset):(slice-formula)(full-slice)" \
+  "(no-simplify)(full-slice)" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \
   "D:I:(c89)(c99)(c11)(cpp98)(cpp03)(cpp11)" \
   "(object-bits):" \
-  "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
   OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
   "(no-built-in-assertions)" \
   "(xml-ui)(xml-interface)(json-ui)" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \
   "(no-sat-preprocessor)" \
-  "(no-pretty-names)(beautify)" \
+  "(beautify)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
   "(refine-strings)" \
   "(string-printable)" \
@@ -54,8 +56,7 @@ class optionst;
   "(little-endian)(big-endian)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
-  "(show-loops)" \
-  "(show-symbol-table)(show-parse-tree)(show-vcc)" \
+  "(show-symbol-table)(show-parse-tree)" \
   "(drop-unused-functions)" \
   "(property):(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \
@@ -69,7 +70,6 @@ class optionst;
   "(arrays-uf-always)(arrays-uf-never)" \
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
-  "(graphml-witness):" \
   "(localize-faults)(localize-faults-method):" \
   OPT_GOTO_TRACE \
   "(claim):(show-claims)(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
@@ -101,7 +101,6 @@ protected:
   int get_goto_program(const optionst &);
   bool process_goto_program(const optionst &);
   bool set_properties();
-  int do_bmc(bmct &);
 };
 
 #endif // CPROVER_CBMC_CBMC_PARSE_OPTIONS_H

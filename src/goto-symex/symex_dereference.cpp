@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
+#include <util/invariant.h>
 #include <util/pointer_offset_size.h>
 #include <util/arith_tools.h>
 #include <util/base_type.h>
@@ -200,7 +201,7 @@ exprt goto_symext::address_arithmetic(
        expr.get_bool(ID_C_SSA_symbol))
     {
       offset=compute_pointer_offset(expr, ns);
-      assert(offset>=0);
+      PRECONDITION(offset >= 0);
     }
 
     if(offset>0)
@@ -249,11 +250,7 @@ void goto_symext::dereference_rec(
     symex_dereference_statet symex_dereference_state(*this, state);
 
     value_set_dereferencet dereference(
-      ns,
-      new_symbol_table,
-      options,
-      symex_dereference_state,
-      language_mode);
+      ns, state.symbol_table, options, symex_dereference_state, language_mode);
 
     // std::cout << "**** " << from_expr(ns, "", tmp1) << '\n';
     exprt tmp2=
@@ -351,7 +348,7 @@ void goto_symext::dereference(
   // in order to distinguish addresses of local variables
   // from different frames. Would be enough to rename
   // symbols whose address is taken.
-  assert(!state.call_stack().empty());
+  PRECONDITION(!state.call_stack().empty());
   state.rename(expr, ns, goto_symex_statet::L1);
 
   // start the recursion!

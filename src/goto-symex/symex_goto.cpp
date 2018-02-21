@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-#include <cassert>
 #include <algorithm>
 
+#include <util/invariant.h>
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
@@ -43,7 +43,8 @@ void goto_symext::symex_goto(statet &state)
 
   target.goto_instruction(state.guard.as_expr(), new_guard, state.source);
 
-  assert(!instruction.targets.empty());
+  DATA_INVARIANT(
+    !instruction.targets.empty(), "goto should have at least one target");
 
   // we only do deterministic gotos for now
   if(instruction.targets.size()!=1)
@@ -99,6 +100,27 @@ void goto_symext::symex_goto(statet &state)
     }
   }
 
+  exprt simpl_state_guard = state.guard.as_expr();
+  do_simplify(simpl_state_guard);
+
+  // No point executing both branches of an unconditional goto.
+  if(
+    new_guard.is_true() && // We have an unconditional goto, AND
+    // either there are no blocks between us and the target in the
+    // surrounding scope
+    (simpl_state_guard.is_true() ||
+     // or there is another block, but we're doing path exploration so
+     // we're going to skip over it for now and return to it later.
+     options.get_bool_option("paths")))
+  {
+    DATA_INVARIANT(
+      instruction.targets.size() > 0,
+      "Instruction is an unconditional goto with no target: " +
+        instruction.code.pretty());
+    symex_transition(state, instruction.get_target(), true);
+    return;
+  }
+
   goto_programt::const_targett new_state_pc, state_pc;
   symex_targett::sourcet original_source=state.source;
 
@@ -126,12 +148,56 @@ void goto_symext::symex_goto(statet &state)
     state_pc=goto_target;
   }
 
+  // Normally the next instruction to execute would be state_pc and we save
+  // new_state_pc for later. But if we're executing from a saved state, then
+  // new_state_pc should be the state that we saved from earlier, so let's
+  // execute that instead.
+  if(state.has_saved_target)
+  {
+    INVARIANT(
+      new_state_pc == state.saved_target,
+      "Tried to explore the other path of a branch, but the next "
+      "instruction along that path is not the same as the instruction "
+      "that we saved at the branch point. Saved instruction is " +
+        state.saved_target->code.pretty() +
+        "\nwe were intending "
+        "to explore " +
+        new_state_pc->code.pretty() +
+        "\nthe "
+        "instruction we think we saw on a previous path exploration is " +
+        state_pc->code.pretty());
+    goto_programt::const_targett tmp = new_state_pc;
+    new_state_pc = state_pc;
+    state_pc = tmp;
+    log.debug() << "Resuming from '" << state_pc->code.source_location() << "'"
+                << log.eom;
+  }
+  else if(options.get_bool_option("paths"))
+  {
+    // At this point, `state_pc` is the instruction we should execute
+    // immediately, and `new_state_pc` is the instruction that we should execute
+    // later (after we've finished exploring this branch). For path-based
+    // exploration, save `new_state_pc` to the saved state that we will resume
+    // executing from, so that goto_symex::symex_goto() knows that we've already
+    // explored the branch starting from `state_pc` when it is later called at
+    // this branch.
+    branch_pointt branch_point(target, state);
+    branch_point.state.saved_target = new_state_pc;
+    branch_point.state.has_saved_target = true;
+    // `forward` tells us where the branch we're _currently_ executing is
+    // pointing to; this needs to be inverted for the branch that we're saving,
+    // so let its truth value for `backwards` be the same as ours for `forward`.
+    branch_point.state.saved_target_is_backwards = forward;
+    branch_worklist.push_back(branch_point);
+    log.debug() << "Saving '" << new_state_pc->source_location << "'"
+                << log.eom;
+  }
+
   // put into state-queue
   statet::goto_state_listt &goto_state_list=
     state.top().goto_state_map[new_state_pc];
 
   goto_state_list.push_back(statet::goto_statet(state));
-  statet::goto_statet &new_state=goto_state_list.back();
 
   symex_transition(state, state_pc, !forward);
 
@@ -175,17 +241,31 @@ void goto_symext::symex_goto(statet &state)
       state.rename(guard_expr, ns);
     }
 
-    if(forward)
+    if(state.has_saved_target)
     {
-      new_state.guard.add(guard_expr);
-      guard_expr.make_not();
-      state.guard.add(guard_expr);
+      if(forward)
+        state.guard.add(guard_expr);
+      else
+      {
+        guard_expr.make_not();
+        state.guard.add(guard_expr);
+      }
     }
     else
     {
-      state.guard.add(guard_expr);
-      guard_expr.make_not();
-      new_state.guard.add(guard_expr);
+      statet::goto_statet &new_state = goto_state_list.back();
+      if(forward)
+      {
+        new_state.guard.add(guard_expr);
+        guard_expr.make_not();
+        state.guard.add(guard_expr);
+      }
+      else
+      {
+        state.guard.add(guard_expr);
+        guard_expr.make_not();
+        new_state.guard.add(guard_expr);
+      }
     }
   }
 }
@@ -306,9 +386,9 @@ void goto_symext::phi_function(
     const symbolt &symbol=ns.lookup(obj_identifier);
 
     // shared?
-    if(dest_state.atomic_section_id==0 &&
-       dest_state.threads.size()>=2 &&
-       (symbol.is_shared() || (*dest_state.dirty)(symbol.name)))
+    if(
+      dest_state.atomic_section_id == 0 && dest_state.threads.size() >= 2 &&
+      (symbol.is_shared() || (dest_state.dirty)(symbol.name)))
       continue; // no phi nodes for shared stuff
 
     // don't merge (thread-)locals across different threads, which

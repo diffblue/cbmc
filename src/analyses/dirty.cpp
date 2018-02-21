@@ -69,6 +69,7 @@ void dirtyt::find_dirty_address_of(const exprt &expr)
 
 void dirtyt::output(std::ostream &out) const
 {
+  die_if_uninitialized();
   for(const auto &d : dirty)
     out << d << '\n';
 }
