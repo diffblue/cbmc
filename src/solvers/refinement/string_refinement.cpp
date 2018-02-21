@@ -1278,6 +1278,25 @@ interval_sparse_arrayt::interval_sparse_arrayt(const with_exprt &expr)
       const std::pair<std::size_t, exprt> &b) { return a.first < b.first; });
 }
 
+interval_sparse_arrayt::interval_sparse_arrayt(
+  const array_exprt &expr,
+  const exprt &extra_value)
+{
+  default_value = extra_value;
+  if(expr.operands().empty())
+    return;
+
+  entries.emplace_back(0, expr.operands()[0]);
+
+  for(std::size_t i = 1; i < expr.operands().size(); ++i)
+  {
+    if(entries.back().second == expr.operands()[i])
+      entries.back().first = i;
+    else
+      entries.emplace_back(i, expr.operands()[i]);
+  }
+}
+
 exprt interval_sparse_arrayt::to_if_expression(
   const exprt &index,
   const std::size_t max_index) const
@@ -1406,6 +1425,8 @@ exprt fill_in_array_expr(const array_exprt &expr, std::size_t string_max_length)
 /// expressions: for instance in array access `arr[index]`, where:
 /// `arr := {12, 24, 48}` the constructed expression will be:
 ///    `index==0 ? 12 : index==1 ? 24 : 48`
+/// Avoids repetition so `arr := {12, 12, 24, 48}` will give
+///    `index<=1 ? 12 : index==1 ? 24 : 48`
 static exprt substitute_array_access(
   const array_exprt &array_expr,
   const exprt &index,
@@ -1414,28 +1435,9 @@ static exprt substitute_array_access(
   const std::size_t max_index)
 {
   const typet &char_type = array_expr.type().subtype();
-  const std::vector<exprt> &operands = array_expr.operands();
-
-  exprt result = symbol_generator("out_of_bound_access", char_type);
-
-  for(std::size_t i = 0; i < operands.size() && i < max_index; ++i)
-  {
-    // Go in reverse order so that smaller indexes appear first in the result
-    const std::size_t pos = operands.size() - 1 - i;
-    const equal_exprt equals(index, from_integer(pos, java_int_type()));
-    if(operands[pos].type() != char_type)
-    {
-      INVARIANT(
-        operands[pos].id() == ID_unknown,
-        string_refinement_invariantt(
-          "elements can only have type char or "
-          "unknown, and it is not char type"));
-      result = if_exprt(equals, exprt(ID_unknown, char_type), result);
-    }
-    else
-      result = if_exprt(equals, operands[pos], result);
-  }
-  return result;
+  const exprt default_val = symbol_generator("out_of_bound_access", char_type);
+  const interval_sparse_arrayt sparse_array(array_expr, default_val);
+  return sparse_array.to_if_expression(index, max_index);
 }
 
 static exprt substitute_array_access(

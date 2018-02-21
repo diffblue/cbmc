@@ -63,6 +63,7 @@ public:
 protected:
   exprt default_value;
   std::vector<std::pair<std::size_t, exprt>> entries;
+  sparse_arrayt() = default;
 };
 
 /// Represents arrays by the indexes up to which the value remains the same.
@@ -77,6 +78,7 @@ public:
   /// `arr[k]` is `a`, for all index between `i` (exclusive) and `j` it is `b`
   /// and for the others it is `x`.
   explicit interval_sparse_arrayt(const with_exprt &expr);
+  interval_sparse_arrayt(const array_exprt &expr, const exprt &default_value);
   exprt to_if_expression(
     const exprt &index,
     std::size_t max_index =
