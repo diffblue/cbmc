@@ -15,7 +15,7 @@ Author: Peter Schrammel
 #include <util/message.h>
 #include <util/string2int.h>
 
-optionalt<unsigned> cover_basic_blockst::continuation_of_block(
+optionalt<std::size_t> cover_basic_blockst::continuation_of_block(
   const goto_programt::const_targett &instruction,
   cover_basic_blockst::block_mapt &block_map)
 {
@@ -32,7 +32,7 @@ optionalt<unsigned> cover_basic_blockst::continuation_of_block(
 cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
 {
   bool next_is_target = true;
-  unsigned current_block = 0;
+  std::size_t current_block = 0;
 
   forall_goto_program_instructions(it, _goto_program)
   {
@@ -87,7 +87,7 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
     update_covered_lines(block_info);
 }
 
-unsigned cover_basic_blockst::block_of(goto_programt::const_targett t) const
+std::size_t cover_basic_blockst::block_of(goto_programt::const_targett t) const
 {
   const auto it = block_map.find(t);
   INVARIANT(it != block_map.end(), "instruction must be part of a block");
@@ -95,85 +95,17 @@ unsigned cover_basic_blockst::block_of(goto_programt::const_targett t) const
 }
 
 optionalt<goto_programt::const_targett>
-cover_basic_blockst::instruction_of(unsigned block_nr) const
+cover_basic_blockst::instruction_of(const std::size_t block_nr) const
 {
   INVARIANT(block_nr < block_infos.size(), "block number out of range");
-  return block_infos.at(block_nr).representative_inst;
+  return block_infos[block_nr].representative_inst;
 }
 
 const source_locationt &
-cover_basic_blockst::source_location_of(unsigned block_nr) const
+cover_basic_blockst::source_location_of(const std::size_t block_nr) const
 {
   INVARIANT(block_nr < block_infos.size(), "block number out of range");
-  return block_infos.at(block_nr).source_location;
-}
-
-void cover_basic_blockst::select_unique_java_bytecode_indices(
-  const goto_programt &goto_program,
-  message_handlert &message_handler)
-{
-  messaget msg(message_handler);
-  std::set<unsigned> blocks_seen;
-  std::set<irep_idt> bytecode_indices_seen;
-
-  forall_goto_program_instructions(it, goto_program)
-  {
-    const unsigned block_nr = block_of(it);
-    if(blocks_seen.find(block_nr) != blocks_seen.end())
-      continue;
-
-    INVARIANT(block_nr < block_infos.size(), "block number out of range");
-    block_infot &block_info = block_infos.at(block_nr);
-    if(!block_info.representative_inst)
-    {
-      if(!it->source_location.get_java_bytecode_index().empty())
-      {
-        // search for a representative
-        if(
-          bytecode_indices_seen
-            .insert(it->source_location.get_java_bytecode_index())
-            .second)
-        {
-          block_info.representative_inst = it;
-          block_info.source_location = it->source_location;
-          update_covered_lines(block_info);
-          blocks_seen.insert(block_nr);
-          msg.debug() << it->function << " block " << (block_nr + 1)
-                      << ": location " << it->location_number
-                      << ", bytecode-index "
-                      << it->source_location.get_java_bytecode_index()
-                      << " selected for instrumentation." << messaget::eom;
-        }
-      }
-    }
-    else if(it == *block_info.representative_inst)
-    {
-      // check the existing representative
-      if(!it->source_location.get_java_bytecode_index().empty())
-      {
-        if(
-          bytecode_indices_seen
-            .insert(it->source_location.get_java_bytecode_index())
-            .second)
-        {
-          blocks_seen.insert(block_nr);
-        }
-        else
-        {
-          // clash, reset to search for a new one
-          block_info.representative_inst = {};
-          block_info.source_location = source_locationt::nil();
-          msg.debug() << it->function << " block " << (block_nr + 1)
-                      << ", location " << it->location_number
-                      << ": bytecode-index "
-                      << it->source_location.get_java_bytecode_index()
-                      << " already instrumented."
-                      << " Searching for alternative instruction"
-                      << " to instrument." << messaget::eom;
-        }
-      }
-    }
-  }
+  return block_infos[block_nr].source_location;
 }
 
 void cover_basic_blockst::report_block_anomalies(
@@ -181,10 +113,10 @@ void cover_basic_blockst::report_block_anomalies(
   message_handlert &message_handler)
 {
   messaget msg(message_handler);
-  std::set<unsigned> blocks_seen;
+  std::set<std::size_t> blocks_seen;
   forall_goto_program_instructions(it, goto_program)
   {
-    const unsigned block_nr = block_of(it);
+    const std::size_t block_nr = block_of(it);
     const block_infot &block_info = block_infos.at(block_nr);
 
     if(
@@ -227,4 +159,49 @@ void cover_basic_blockst::update_covered_lines(block_infot &block_info)
 
   std::string covered_lines = format_number_range(line_list);
   block_info.source_location.set_basic_block_covered_lines(covered_lines);
+}
+
+cover_basic_blocks_javat::cover_basic_blocks_javat(
+  const goto_programt &_goto_program)
+{
+  forall_goto_program_instructions(it, _goto_program)
+  {
+    const auto &location = it->source_location;
+    const auto &bytecode_index = location.get_java_bytecode_index();
+    if(index_to_block.emplace(bytecode_index, block_infos.size()).second)
+    {
+      block_infos.push_back(it);
+      block_locations.push_back(location);
+      block_locations.back().set_basic_block_covered_lines(location.get_line());
+    }
+  }
+}
+
+std::size_t
+cover_basic_blocks_javat::block_of(goto_programt::const_targett t) const
+{
+  const auto &bytecode_index = t->source_location.get_java_bytecode_index();
+  const auto it = index_to_block.find(bytecode_index);
+  INVARIANT(it != index_to_block.end(), "instruction must be part of a block");
+  return it->second;
+}
+
+optionalt<goto_programt::const_targett>
+cover_basic_blocks_javat::instruction_of(const std::size_t block_nr) const
+{
+  PRECONDITION(block_nr < block_infos.size());
+  return block_infos[block_nr];
+}
+
+const source_locationt &
+cover_basic_blocks_javat::source_location_of(const std::size_t block_nr) const
+{
+  PRECONDITION(block_nr < block_locations.size());
+  return block_locations[block_nr];
+}
+
+void cover_basic_blocks_javat::output(std::ostream &out) const
+{
+  for(std::size_t i = 0; i < block_locations.size(); ++i)
+    out << block_locations[i] << " -> " << i << '\n';
 }

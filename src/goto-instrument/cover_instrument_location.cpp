@@ -17,12 +17,12 @@ Author: Daniel Kroening
 void cover_location_instrumentert::instrument(
   goto_programt &goto_program,
   goto_programt::targett &i_it,
-  const cover_basic_blockst &basic_blocks) const
+  const cover_blocks_baset &basic_blocks) const
 {
   if(is_non_cover_assertion(i_it))
     i_it->make_skip();
 
-  const unsigned block_nr = basic_blocks.block_of(i_it);
+  const std::size_t block_nr = basic_blocks.block_of(i_it);
   const auto representative_instruction = basic_blocks.instruction_of(block_nr);
   // we only instrument the selected instruction
   if(representative_instruction && *representative_instruction == i_it)

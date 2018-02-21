@@ -24,18 +24,23 @@ Date: May 2016
 /// Applies instrumenters to given goto program
 /// \param goto_program: the goto program
 /// \param instrumenters: the instrumenters
+/// \param mode: mode of the function to instrument (for instance ID_C or
+///        ID_java)
 /// \param message_handler: a message handler
 void instrument_cover_goals(
   goto_programt &goto_program,
   const cover_instrumenterst &instrumenters,
+  const irep_idt &mode,
   message_handlert &message_handler)
 {
-  cover_basic_blockst basic_blocks(goto_program);
-  basic_blocks.select_unique_java_bytecode_indices(
-    goto_program, message_handler);
-  basic_blocks.report_block_anomalies(goto_program, message_handler);
+  const std::unique_ptr<cover_blocks_baset> basic_blocks =
+    mode == ID_java ? std::unique_ptr<cover_blocks_baset>(
+                        new cover_basic_blocks_javat(goto_program))
+                    : std::unique_ptr<cover_blocks_baset>(
+                        new cover_basic_blockst(goto_program));
 
-  instrumenters(goto_program, basic_blocks);
+  basic_blocks->report_block_anomalies(goto_program, message_handler);
+  instrumenters(goto_program, *basic_blocks);
 }
 
 /// Instruments goto program for a given coverage criterion
@@ -43,6 +48,9 @@ void instrument_cover_goals(
 /// \param goto_program: the goto program
 /// \param criterion: the coverage criterion
 /// \param message_handler: a message handler
+/// \deprecated use instrument_cover_goals(goto_programt &goto_program,
+/// const cover_instrumenterst &instrumenters,
+/// message_handlert &message_handler, const irep_idt mode) instead
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
@@ -55,7 +63,8 @@ void instrument_cover_goals(
   cover_instrumenterst instrumenters;
   instrumenters.add_from_criterion(criterion, symbol_table, goal_filters);
 
-  instrument_cover_goals(goto_program, instrumenters, message_handler);
+  instrument_cover_goals(
+    goto_program, instrumenters, ID_unknown, message_handler);
 }
 
 /// Create and add an instrumenter based on the given criterion
@@ -257,7 +266,7 @@ static void instrument_cover_goals(
   if(config.function_filters(function_id, function))
   {
     instrument_cover_goals(
-      function.body, config.cover_instrumenters, message_handler);
+      function.body, config.cover_instrumenters, config.mode, message_handler);
     changed = true;
   }
 
@@ -320,6 +329,7 @@ bool instrument_cover_goals(
 
   Forall_goto_functions(f_it, goto_functions)
   {
+    config->mode = symbol_table.lookup(f_it->first)->mode;
     instrument_cover_goals(
       *config, f_it->first, f_it->second, message_handler);
   }

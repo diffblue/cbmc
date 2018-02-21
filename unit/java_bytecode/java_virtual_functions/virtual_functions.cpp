@@ -8,13 +8,13 @@
 
 #include <testing-utils/catch.hpp>
 #include <testing-utils/load_java_class.h>
-#include <testing-utils/require_goto_statements.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <util/config.h>
-
-#include <util/std_expr.h>
+#include <goto-instrument/cover.h>
+#include <util/options.h>
+#include <iostream>
 
 void check_function_call(
   const equal_exprt &eq_expr,
@@ -115,6 +115,54 @@ SCENARIO(
       }
 
       REQUIRE(found_function);
+
+      WHEN("basic blocks are instrumented")
+      {
+        optionst options;
+        options.set_option("cover", "location");
+        REQUIRE_FALSE(
+          instrument_cover_goals(
+            options, new_table, new_goto_functions, null_output));
+
+        auto function = new_goto_functions.function_map.find(function_name);
+        REQUIRE(function != new_goto_functions.function_map.end());
+
+        const goto_programt &goto_program = function->second.body;
+        // Skip the first instruction which is a declaration with no location
+        auto it = std::next(goto_program.instructions.begin());
+        REQUIRE(it != goto_program.instructions.end());
+
+        THEN(
+          "Each instruction with a new bytecode index begins with ASSERT"
+          " and coverage assertions are at the beginning of the block")
+        {
+          irep_idt current_index;
+
+          while(it->type != goto_program_instruction_typet::END_FUNCTION)
+          {
+            const source_locationt &loc = it->source_location;
+            REQUIRE(loc != source_locationt::nil());
+            REQUIRE_FALSE(loc.get_java_bytecode_index().empty());
+            const auto new_index = loc.get_java_bytecode_index();
+
+            if(new_index != current_index)
+            {
+              current_index = new_index;
+              // instruction with a new bytecode index begins with ASSERT
+              REQUIRE(it->type == goto_program_instruction_typet::ASSERT);
+              // the assertion corresponds to a line coverage goal
+              REQUIRE_FALSE(loc.get_basic_block_covered_lines().empty());
+            }
+            else
+            {
+              // there is no line coverage goal in the middle of a block
+              REQUIRE(loc.get_basic_block_covered_lines().empty());
+            }
+
+            ++it;
+          }
+        }
+      }
     }
   }
 }
