@@ -257,6 +257,8 @@ int goto_instrument_parse_optionst::doit()
                     << "\n\n";
         }
       }
+
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-value-sets"))
@@ -1494,6 +1496,8 @@ void goto_instrument_parse_optionst::help()
     // NOLINTNEXTLINE(whitespace/line_length)
     " --reachable-call-graph       show graph of function calls potentially reachable from main function\n"
     " --class-hierarchy            show class hierarchy\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --show-threaded              show instructions that may be executed by more than one thread\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"

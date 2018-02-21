@@ -33,10 +33,8 @@ public:
     locationt from,
     locationt to)
   {
-    // assert(src.reachable);
-
-    if(!src.reachable)
-      return false;
+    INVARIANT(src.reachable,
+              "Abstract states are only merged at reachable locations");
 
     bool old_reachable=reachable;
     bool old_is_threaded=is_threaded;
@@ -52,10 +50,8 @@ public:
   transform(locationt from, locationt to, ai_baset &ai, const namespacet &ns)
     final override
   {
-    // assert(reachable);
-
-    if(!reachable)
-      return;
+    INVARIANT(reachable,
+              "Transformers are only applied at reachable locations");
 
     if(from->is_start_thread())
       is_threaded=true;
