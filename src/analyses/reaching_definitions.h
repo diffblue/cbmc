@@ -17,15 +17,23 @@ Date: February 2013
 #define CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 
 #include <util/base_exceptions.h>
+#include <util/make_unique.h>
+#include <util/pointer_offset_size.h>
+#include <util/prefix.h>
 #include <util/threeval.h>
 
-#include "ai.h"
-#include "goto_rw.h"
+#include <pointer-analysis/value_set_analysis_fi.h>
+
+#include <analyses/ai.h>
+#include <analyses/dirty.h>
+#include <analyses/goto_rw.h>
+#include <analyses/is_threaded.h>
+
+#include <memory>
 
 class value_setst;
 class is_threadedt;
 class dirtyt;
-class reaching_definitions_analysist;
 
 // requirement: V has a member "identifier" of type irep_idt
 template<typename V>
@@ -97,16 +105,28 @@ inline bool operator<(
   return false;
 }
 
-class rd_range_domaint:public ai_domain_baset
+struct infot
 {
-public:
-  rd_range_domaint():
-    ai_domain_baset(),
-    has_values(false),
-    bv_container(nullptr)
+  infot(value_setst &value_sets, is_threadedt &is_threaded, dirtyt &is_dirty)
+    : value_sets(value_sets), is_threaded(is_threaded), is_dirty(is_dirty)
   {
   }
 
+  value_setst &value_sets;
+  is_threadedt &is_threaded;
+  dirtyt &is_dirty;
+};
+
+template <bool remove_locals>
+class rd_range_domain_baset : public ai_domain_baset
+{
+protected:
+  rd_range_domain_baset()
+    : ai_domain_baset(), has_values(false), bv_container(nullptr)
+  {
+  }
+
+public:
   void set_bitvector_container(
     sparse_bitvector_analysist<reaching_definitiont> &_bv_container)
   {
@@ -125,53 +145,6 @@ public:
     output(out);
   }
 
-  void make_top() final override
-  {
-    values.clear();
-    bv_container = nullptr;
-    has_values=tvt(true);
-  }
-
-  void make_bottom() final override
-  {
-    values.clear();
-    bv_container = nullptr;
-    has_values=tvt(false);
-  }
-
-  void make_entry() final override
-  {
-    values.clear();
-    bv_container = nullptr;
-    has_values = tvt::unknown();
-  }
-
-  bool is_top() const override final
-  {
-    DATA_INVARIANT(!has_values.is_true() || values.empty(),
-                   "If domain is top, the value map must be empty");
-    return has_values.is_true();
-  }
-
-  bool is_bottom() const override final
-  {
-    DATA_INVARIANT(!has_values.is_false() || values.empty(),
-                   "If domain is bottom, the value map must be empty");
-    return has_values.is_false();
-  }
-
-  // returns true iff there is something new
-  bool merge(
-    const rd_range_domaint &other,
-    locationt from,
-    locationt to);
-
-  bool merge_shared(
-    const rd_range_domaint &other,
-    locationt from,
-    locationt to,
-    const namespacet &ns);
-
   // each element x represents a range of bits [x.first, x.second)
   typedef std::multimap<range_spect, range_spect> rangest;
   typedef std::map<locationt, rangest> ranges_at_loct;
@@ -182,7 +155,7 @@ public:
     export_cache[identifier].clear();
   }
 
-private:
+protected:
   tvt has_values;
 
   sparse_bitvector_analysist<reaching_definitiont> *bv_container;
@@ -202,101 +175,98 @@ private:
   #endif
   mutable export_cachet export_cache;
 
-  void populate_cache(const irep_idt &identifier) const;
+  virtual infot get_info(ai_baset &ai) = 0;
 
-  void transform_dead(
-    const namespacet &ns,
-    locationt from);
-  void transform_start_thread(
-    const namespacet &ns,
-    reaching_definitions_analysist &rd);
-  void transform_function_call(
-    const namespacet &ns,
-    locationt from,
-    locationt to,
-    reaching_definitions_analysist &rd);
-  void transform_end_function(
+  virtual void populate_cache(const irep_idt &identifier) const = 0;
+
+  virtual void transform_dead(const namespacet &ns, locationt from) = 0;
+
+  virtual void transform_start_thread(const namespacet &ns, ai_baset &ai) = 0;
+
+  virtual void transform_function_call(
     const namespacet &ns,
     locationt from,
     locationt to,
-    reaching_definitions_analysist &rd);
+    ai_baset &ai) = 0;
+
+  virtual void transform_end_function(
+    const namespacet &ns,
+    locationt from,
+    locationt to,
+    ai_baset &ai) = 0;
+
   void transform_assign(
     const namespacet &ns,
     locationt from,
     locationt to,
-    reaching_definitions_analysist &rd);
+    ai_baset &ai);
 
-  void kill(
+  virtual void kill(
     const irep_idt &identifier,
     const range_spect &range_start,
-    const range_spect &range_end);
+    const range_spect &range_end) = 0;
+
   void kill_inf(
     const irep_idt &identifier,
     const range_spect &range_start);
-  bool gen(
+
+  virtual bool gen(
     locationt from,
     const irep_idt &identifier,
     const range_spect &range_start,
-    const range_spect &range_end);
+    const range_spect &range_end) = 0;
 
-  void output(std::ostream &out) const;
-
-  bool merge_inner(
-    values_innert &dest,
-    const values_innert &other);
+  virtual void output(std::ostream &out) const = 0;
 };
 
-class reaching_definitions_analysist:
-  public concurrency_aware_ait<rd_range_domaint>,
-  public sparse_bitvector_analysist<reaching_definitiont>
+template <typename rd_range_domain>
+class reaching_definitions_analysis_ait
+  : public concurrency_aware_ait<rd_range_domain>,
+    public sparse_bitvector_analysist<reaching_definitiont>
 {
 public:
-  // constructor
-  explicit reaching_definitions_analysist(const namespacet &_ns);
+  using typename concurrency_aware_ait<rd_range_domain>::statet;
 
-  virtual ~reaching_definitions_analysist();
+  explicit reaching_definitions_analysis_ait(const namespacet &ns) : ns(ns)
+  {
+  }
+  virtual ~reaching_definitions_analysis_ait() = default;
 
-  virtual void initialize(
-    const goto_functionst &goto_functions) override;
+  virtual void initialize(const goto_functionst &goto_functions) override
+  {
+    auto value_sets_ = util_make_unique<value_set_analysis_fit>(ns);
+    (*value_sets_)(goto_functions);
+    value_sets = std::move(value_sets_);
+
+    is_threaded = util_make_unique<is_threadedt>(goto_functions);
+    is_dirty = util_make_unique<dirtyt>(goto_functions);
+
+    concurrency_aware_ait<rd_range_domain>::initialize(goto_functions);
+  }
 
   virtual statet &get_state(goto_programt::const_targett l) override
   {
-    statet &s=concurrency_aware_ait<rd_range_domaint>::get_state(l);
+    statet &s = concurrency_aware_ait<rd_range_domain>::get_state(l);
 
-    rd_range_domaint *rd_state=dynamic_cast<rd_range_domaint*>(&s);
+    rd_range_domain *rd_state = dynamic_cast<rd_range_domain *>(&s);
     INVARIANT_STRUCTURED(
-      rd_state!=nullptr,
+      rd_state != nullptr,
       bad_cast_exceptiont,
-      "rd_state has type rd_range_domaint");
+      "rd_state has type rd_range_domain");
 
     rd_state->set_bitvector_container(*this);
 
     return s;
   }
 
-  value_setst &get_value_sets() const
-  {
-    assert(value_sets);
-    return *value_sets;
-  }
-
-  const is_threadedt &get_is_threaded() const
-  {
-    assert(is_threaded);
-    return *is_threaded;
-  }
-
-  const dirtyt &get_is_dirty() const
-  {
-    assert(is_dirty);
-    return *is_dirty;
-  }
-
-protected:
-  const namespacet &ns;
   std::unique_ptr<value_setst> value_sets;
   std::unique_ptr<is_threadedt> is_threaded;
   std::unique_ptr<dirtyt> is_dirty;
+
+protected:
+  const namespacet &ns;
 };
+
+#include "reaching_definitions.cpp"
 
 #endif // CPROVER_ANALYSES_REACHING_DEFINITIONS_H
