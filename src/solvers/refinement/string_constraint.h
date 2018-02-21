@@ -90,6 +90,8 @@ exprt univ_within_bounds(const string_constraintt &axiom);
 std::string to_string(const string_constraintt &expr);
 
 /// Checks the data invariant for string_constraintt
+/// \param stream : output stream
+/// \param [in] ns: namespace for `from_expr`
 /// \param [in] constraint: the string constraint to check
 /// \return whether the constraint satisfies the invariant
 bool is_valid_string_constraint(
