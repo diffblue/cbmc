@@ -56,7 +56,9 @@ public:
 
   /// Creates an if_expr corresponding to the result of accessing the array
   /// at the given index
-  virtual exprt to_if_expression(const exprt &index) const;
+  virtual exprt to_if_expression(
+    const exprt &index,
+    std::size_t max_index = std::numeric_limits<std::size_t>::max()) const;
 
 protected:
   exprt default_value;
@@ -75,7 +77,10 @@ public:
   /// `arr[k]` is `a`, for all index between `i` (exclusive) and `j` it is `b`
   /// and for the others it is `x`.
   explicit interval_sparse_arrayt(const with_exprt &expr);
-  exprt to_if_expression(const exprt &index) const override;
+  exprt to_if_expression(
+    const exprt &index,
+    std::size_t max_index =
+      std::numeric_limits<std::size_t>::max()) const override;
 };
 
 class string_refinementt final: public bv_refinementt
@@ -157,6 +162,7 @@ exprt substitute_array_access(
   exprt expr,
   const std::function<symbol_exprt(const irep_idt &, const typet &)>
     &symbol_generator,
-  const bool left_propagate);
+  bool left_propagate,
+  std::size_t max_index);
 
 #endif
