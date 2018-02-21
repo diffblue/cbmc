@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
+#include <goto-programs/generate_function_bodies.h>
+
 // clang-format off
 #define GOTO_INSTRUMENT_OPTIONS \
   "(all)" \
@@ -86,7 +88,9 @@ Author: Daniel Kroening, kroening@kroening.com
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\
   "(splice-call):" \
-  OPT_REMOVE_CALLS_NO_BODY
+  OPT_REMOVE_CALLS_NO_BODY \
+  OPT_REPLACE_FUNCTION_BODY
+
 // clang-format on
 
 class goto_instrument_parse_optionst:

@@ -1448,6 +1448,19 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       throw 0;
   }
 
+  if(cmdline.isset("generate-function-body"))
+  {
+    auto generate_implementation = generate_function_bodies_factory(
+      cmdline.get_value("generate-function-body-options"),
+      goto_model.symbol_table,
+      *message_handler);
+    generate_function_bodies(
+      std::regex(cmdline.get_value("generate-function-body")),
+      *generate_implementation,
+      goto_model,
+      *message_handler);
+  }
+
   // recalculate numbers, etc.
   goto_model.goto_functions.update();
 }
@@ -1522,9 +1535,10 @@ void goto_instrument_parse_optionst::help()
     " --check-invariant function   instruments invariant checking function\n"
     " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
     " --splice-call caller,callee  prepends a call to callee in the body of caller\n"  // NOLINT(*)
+    " --undefined-function-is-assume-false\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    " --undefined-function-is-assume-false\n" // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
+    HELP_REPLACE_FUNCTION_BODY
     "\n"
     "Loop transformations:\n"
     " --k-induction <k>            check loops with k-induction\n"

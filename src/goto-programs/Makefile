@@ -53,6 +53,7 @@ SRC = basic_blocks.cpp \
       remove_vector.cpp \
       remove_virtual_functions.cpp \
       replace_java_nondet.cpp \
+      generate_function_bodies.cpp \
       resolve_inherited_component.cpp \
       safety_checker.cpp \
       set_properties.cpp \

@@ -1,3 +1,10 @@
+5.9
+===
+* GOTO-INSTRUMENT: --generate-function-body can be used to
+  generate bodies for functions that don't have a body
+  in the goto code. This supercedes the functionality
+  of --undefined-function-is-assume-false
+
 5.8
 ===
 

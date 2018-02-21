@@ -30,6 +30,8 @@ void split_string(
   std::string &right,
   bool strip=false);
 
+std::vector<std::string> split_string(const std::string &s, char delim);
+
 std::string trim_from_last_delimiter(
   const std::string &s,
   const char delim);

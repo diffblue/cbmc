@@ -99,6 +99,13 @@ void split_string(
   right=result[1];
 }
 
+std::vector<std::string> split_string(const std::string &s, char delim)
+{
+  std::vector<std::string> result;
+  split_string(s, delim, result);
+  return result;
+}
+
 std::string trim_from_last_delimiter(
   const std::string &s,
   const char delim)
