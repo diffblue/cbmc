@@ -86,11 +86,11 @@ Author: Daniel Kroening, kroening@kroening.com
   "(horn)(skip-loops):(apply-code-contracts)(model-argc-argv):" \
   "(show-threaded)(list-calls-args)(print-path-lengths)" \
   "(undefined-function-is-assume-false)" \
-  "(remove-function-body):"\
+  "(remove-function-body):" \
   "(splice-call):" \
   OPT_REMOVE_CALLS_NO_BODY \
-  OPT_REPLACE_FUNCTION_BODY
-
+  OPT_REPLACE_FUNCTION_BODY \
+  "(sharing)"
 // clang-format on
 
 class goto_instrument_parse_optionst:

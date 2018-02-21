@@ -217,6 +217,8 @@ protected:
     const range_spect &range_end) = 0;
 
   virtual void output(std::ostream &out) const = 0;
+
+  void output(const irep_idt &identifier, std::ostream &out) const;
 };
 
 template <typename rd_range_domain>

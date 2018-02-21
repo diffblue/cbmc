@@ -151,3 +151,31 @@ rd_range_domain_baset<remove_locals>::get(const irep_idt &identifier) const
   else
     return entry->second;
 }
+
+template <bool remove_locals>
+void rd_range_domain_baset<remove_locals>::output(
+  const irep_idt &identifier,
+  std::ostream &out) const
+{
+  const ranges_at_loct &ranges = get(identifier);
+
+  out << "  " << identifier << "[";
+
+  for(typename ranges_at_loct::const_iterator itl = ranges.begin();
+      itl != ranges.end();
+      ++itl)
+    for(typename rangest::const_iterator itr = itl->second.begin();
+        itr != itl->second.end();
+        ++itr)
+    {
+      if(itr != itl->second.begin() || itl != ranges.begin())
+        out << ";";
+
+      out << itr->first << ":" << itr->second;
+      out << "@" << itl->first->location_number;
+    }
+
+  out << "]\n";
+
+  clear_cache(identifier);
+}

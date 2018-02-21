@@ -18,7 +18,7 @@ void rd_range_domain_without_sharingt<remove_locals>::populate_cache(
 {
   assert(bv_container);
 
-  valuest::const_iterator v_entry = values.find(identifier);
+  typename valuest::const_iterator v_entry = values.find(identifier);
   if(v_entry == values.end() || v_entry->second.empty())
     return;
 
@@ -41,7 +41,7 @@ void rd_range_domain_without_sharingt<remove_locals>::transform_dead(
   const irep_idt &identifier =
     to_symbol_expr(to_code_dead(from->code).symbol()).get_identifier();
 
-  valuest::iterator entry = values.find(identifier);
+  typename valuest::iterator entry = values.find(identifier);
 
   if(entry != values.end())
   {
@@ -57,7 +57,8 @@ void rd_range_domain_without_sharingt<remove_locals>::transform_start_thread(
 {
   infot info = get_info(ai);
 
-  for(valuest::iterator it = values.begin(); it != values.end();) // no ++it
+  for(typename valuest::iterator it = values.begin();
+      it != values.end();) // no ++it
   {
     const irep_idt &identifier = it->first;
 
@@ -65,7 +66,7 @@ void rd_range_domain_without_sharingt<remove_locals>::transform_start_thread(
     {
       export_cache.erase(identifier);
 
-      valuest::iterator next = it;
+      typename valuest::iterator next = it;
       ++next;
       values.erase(it);
       it = next;
@@ -89,7 +90,8 @@ void rd_range_domain_without_sharingt<remove_locals>::transform_function_call(
   // only if there is an actual call, i.e., we have a body
   if(from->function != to->function)
   {
-    for(valuest::iterator it = values.begin(); it != values.end();) // no ++it
+    for(typename valuest::iterator it = values.begin();
+        it != values.end();) // no ++it
     {
       const irep_idt &identifier = it->first;
 
@@ -101,7 +103,7 @@ void rd_range_domain_without_sharingt<remove_locals>::transform_function_call(
       {
         export_cache.erase(identifier);
 
-        valuest::iterator next = it;
+        typename valuest::iterator next = it;
         ++next;
         values.erase(it);
         it = next;
@@ -191,7 +193,7 @@ void rd_range_domain_without_sharingt<remove_locals>::transform_end_function(
     if(identifier.empty())
       continue;
 
-    valuest::iterator entry = values.find(identifier);
+    typename valuest::iterator entry = values.find(identifier);
 
     if(entry != values.end())
     {
@@ -229,14 +231,14 @@ void rd_range_domain_without_sharingt<remove_locals>::kill(
 
   assert(range_end > range_start);
 
-  valuest::iterator entry = values.find(identifier);
+  typename valuest::iterator entry = values.find(identifier);
   if(entry == values.end())
     return;
 
   bool clear_export_cache = false;
   values_innert new_values;
 
-  for(values_innert::iterator it = entry->second.begin();
+  for(typename values_innert::iterator it = entry->second.begin();
       it != entry->second.end();) // no ++it
   {
     const reaching_definitiont &v = bv_container->get(*it);
@@ -293,7 +295,7 @@ void rd_range_domain_without_sharingt<remove_locals>::kill(
   if(clear_export_cache)
     export_cache.erase(identifier);
 
-  values_innert::iterator it = entry->second.begin();
+  typename values_innert::iterator it = entry->second.begin();
   for(const auto &id : new_values)
   {
     while(it != entry->second.end() && *it < id)
@@ -398,28 +400,7 @@ void rd_range_domain_without_sharingt<remove_locals>::output(
   for(const auto &value : values)
   {
     const irep_idt &identifier = value.first;
-
-    const ranges_at_loct &ranges = get(identifier);
-
-    out << "  " << identifier << "[";
-
-    for(typename ranges_at_loct::const_iterator itl = ranges.begin();
-        itl != ranges.end();
-        ++itl)
-      for(typename rangest::const_iterator itr = itl->second.begin();
-          itr != itl->second.end();
-          ++itr)
-      {
-        if(itr != itl->second.begin() || itl != ranges.begin())
-          out << ";";
-
-        out << itr->first << ":" << itr->second;
-        out << "@" << itl->first->location_number;
-      }
-
-    out << "]\n";
-
-    clear_cache(identifier);
+    output(identifier, out);
   }
 }
 
@@ -454,7 +435,7 @@ bool rd_range_domain_without_sharingt<remove_locals>::merge_inner(
     }
   }
 #else
-  values_innert::iterator itr = dest.begin();
+  typename values_innert::iterator itr = dest.begin();
   for(const auto &id : other)
   {
     while(itr != dest.end() && *itr < id)
@@ -485,7 +466,7 @@ bool rd_range_domain_without_sharingt<remove_locals>::merge(
   bool changed = has_values.is_false();
   has_values = tvt::unknown();
 
-  valuest::iterator it = values.begin();
+  typename valuest::iterator it = values.begin();
   for(const auto &value : other.values)
   {
     while(it != values.end() && it->first < value.first)
@@ -530,7 +511,7 @@ bool rd_range_domain_without_sharingt<remove_locals>::merge_shared(
   bool changed = has_values.is_false();
   has_values = tvt::unknown();
 
-  valuest::iterator it = values.begin();
+  typename valuest::iterator it = values.begin();
   for(const auto &value : other.values)
   {
     const irep_idt &identifier = value.first;

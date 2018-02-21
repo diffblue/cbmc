@@ -13,13 +13,14 @@ Date: February 2013
 /// Range-based reaching definitions analysis (following Field- Sensitive
 ///   Program Dependence Analysis, Litvak et al., FSE 2010)
 
-#ifndef CPROVER_ANALYSES_REACHING_DEFINITIONS_WITHOUT_SHARING_H
-#define CPROVER_ANALYSES_REACHING_DEFINITIONS_WITHOUT_SHARING_H
+#ifndef CPROVER_ANALYSES_REACHING_DEFINITIONS_WITH_SHARING_H
+#define CPROVER_ANALYSES_REACHING_DEFINITIONS_WITH_SHARING_H
 
 #include <util/base_exceptions.h>
 #include <util/make_unique.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
+#include <util/sharing_map.h>
 #include <util/threeval.h>
 
 #include <pointer-analysis/value_set_analysis_fi.h>
@@ -37,8 +38,8 @@ class value_setst;
 class is_threadedt;
 class dirtyt;
 
-template <bool remove_locals = true>
-class rd_range_domain_without_sharingt
+template <bool remove_locals = false>
+class rd_range_domain_with_sharingt
   : public rd_range_domain_baset<remove_locals>
 {
 public:
@@ -92,22 +93,18 @@ public:
 
   // returns true iff there is something new
   bool merge(
-    const rd_range_domain_without_sharingt &other,
+    const rd_range_domain_with_sharingt &other,
     locationt from,
     locationt to);
 
   bool merge_shared(
-    const rd_range_domain_without_sharingt &other,
+    const rd_range_domain_with_sharingt &other,
     locationt from,
     locationt to,
     const namespacet &ns);
 
 private:
-#ifdef USE_DSTRING
-  typedef std::map<irep_idt, values_innert> valuest;
-#else
-  typedef std::unordered_map<irep_idt, values_innert, irep_id_hash> valuest;
-#endif
+  typedef sharing_mapt<irep_idt, values_innert, irep_id_hash> valuest;
   valuest values;
 
   infot get_info(ai_baset &ai);
@@ -142,15 +139,11 @@ private:
     const range_spect &range_end);
 
   void output(std::ostream &out) const;
-
-  bool merge_inner(values_innert &dest, const values_innert &other);
 };
 
-typedef rd_range_domain_without_sharingt<true> rd_range_domaint;
+typedef reaching_definitions_analysis_ait<rd_range_domain_with_sharingt<false>>
+  reaching_definitions_with_sharing_analysist;
 
-typedef reaching_definitions_analysis_ait<rd_range_domaint>
-  reaching_definitions_analysist;
+#include "reaching_definitions_with_sharing.cpp"
 
-#include "reaching_definitions_without_sharing.cpp"
-
-#endif // CPROVER_ANALYSES_REACHING_DEFINITIONS_WITHOUT_SHARING_H
+#endif // CPROVER_ANALYSES_REACHING_DEFINITIONS_WITH_SHARING_H
