@@ -28,7 +28,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/refined_string_type.h>
 #include <util/string_expr.h>
 #include <langapi/language_util.h>
-#include <java_bytecode/java_types.h>
 #include <util/union_find_replace.h>
 
 ///  ### Universally quantified string constraint
@@ -65,9 +64,11 @@ public:
   exprt index_guard = true_exprt(); // Index guard
   exprt body;                       // value constraint
   symbol_exprt univ_var;
-  // \todo avoid depending on java type
-  exprt lower_bound = from_integer(0, java_int_type());
   exprt upper_bound;
+  optionalt<exprt> lower_bound; // empty defaults to 0
+
+  /// \return lower_bound if it has been set, expression for 0 otherwise
+  exprt get_lower_bound() const;
 };
 
 inline void
@@ -77,7 +78,8 @@ replace(string_constraintt &axiom, const union_find_replacet &symbol_resolve)
   symbol_resolve.replace_expr(axiom.body);
   symbol_resolve.replace_expr(axiom.univ_var);
   symbol_resolve.replace_expr(axiom.upper_bound);
-  symbol_resolve.replace_expr(axiom.lower_bound);
+  if(axiom.lower_bound)
+    symbol_resolve.replace_expr(*axiom.lower_bound);
 }
 
 exprt univ_within_bounds(const string_constraintt &axiom);
