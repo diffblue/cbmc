@@ -12,9 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cnf.h"
 
 #include <algorithm>
-#include <cassert>
-#include <iostream>
 #include <set>
+
+#include <util/invariant.h>
 
 // #define VERBOSE
 
@@ -426,10 +426,12 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
   for(const auto l : bv)
   {
     // we never use index 0
-    assert(l.var_no()!=0);
+    INVARIANT(l.var_no() != 0, "variable 0 must not be used");
 
     // we never use 'unused_var_no'
-    assert(l.var_no()!=literalt::unused_var_no());
+    INVARIANT(
+      l.var_no() != literalt::unused_var_no(),
+      "variable 'unused_var_no' must not be used");
 
     if(l.is_true())
       return true; // clause satisfied
@@ -437,11 +439,10 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
     if(l.is_false())
       continue; // will remove later
 
-    if(l.var_no()>=_no_variables)
-      std::cout << "l.var_no()=" << l.var_no()
-                << " _no_variables=" << _no_variables << '\n';
-
-    assert(l.var_no()<_no_variables);
+    INVARIANT(
+      l.var_no() < _no_variables,
+      "unknown variable " + std::to_string(l.var_no()) +
+        " (no_variables = " + std::to_string(_no_variables) + " )");
   }
 
   // now copy
