@@ -1,0 +1,20 @@
+CORE
+IntegerTests.class
+-refine-strings --string-max-length 100 IntegerTests.class --function IntegerTests.testMyGenSet --cover location
+^EXIT=0$
+^SIGNAL=0$
+coverage.* line 4 function java::IntegerTests.testMyGenSet.* bytecode-index 1 .* SATISFIED
+coverage.* line 4 function java::IntegerTests.testMyGenSet.* bytecode-index 3 .* SATISFIED
+coverage.* line 5 function java::IntegerTests.testMyGenSet.* bytecode-index 4 .* SATISFIED
+coverage.* line 5 function java::IntegerTests.testMyGenSet.* bytecode-index 6 .* SATISFIED
+coverage.* line 5 function java::IntegerTests.testMyGenSet.* bytecode-index 7 .* SATISFIED
+coverage.* line 6 function java::IntegerTests.testMyGenSet.* bytecode-index 10 .* SATISFIED
+coverage.* line 6 function java::IntegerTests.testMyGenSet.* bytecode-index 13 .* SATISFIED
+coverage.* line 6 function java::IntegerTests.testMyGenSet.* bytecode-index 14 .* SATISFIED
+coverage.* line 7 function java::IntegerTests.testMyGenSet.* bytecode-index 17 .* SATISFIED
+coverage.* line 7 function java::IntegerTests.testMyGenSet.* bytecode-index 18 .* SATISFIED
+coverage.* line 8 function java::IntegerTests.testMyGenSet.* bytecode-index 22 .* SATISFIED
+coverage.* line 7 function java::IntegerTests.testMyGenSet.* bytecode-index 20 .* SATISFIED
+coverage.* line 7 function java::IntegerTests.testMyGenSet.* bytecode-index 21 .* SATISFIED
+coverage.* line 8 function java::IntegerTests.testMyGenSet.* bytecode-index 23 .* SATISFIED
+coverage.* line 8 function java::IntegerTests.testMyGenSet.* bytecode-index 24 .* SATISFIED
