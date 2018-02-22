@@ -193,78 +193,6 @@ void rd_range_domain_with_sharingt<remove_locals>::transform_end_function(
 }
 
 template <bool remove_locals>
-void rd_range_domain_with_sharingt<remove_locals>::kill(
-  const irep_idt &identifier,
-  const range_spect &range_start,
-  const range_spect &range_end)
-{
-  assert(range_start >= 0);
-  // -1 for objects of infinite/unknown size
-  if(range_end == -1)
-  {
-    kill_inf(identifier, range_start);
-    return;
-  }
-
-  assert(range_end > range_start);
-
-  auto &r = values.find(identifier);
-  if(!r.second)
-    return;
-
-  values_innert &current_values = r.first;
-  values_innert new_values;
-
-  for(typename values_innert::iterator it = current_values.begin();
-      it != current_values.end();) // no ++it
-  {
-    const reaching_definitiont &v = bv_container->get(*it);
-
-    if(v.bit_begin >= range_end)
-      ++it;
-    else if(v.bit_end != -1 && v.bit_end <= range_start)
-      ++it;
-    else if(
-      v.bit_begin >= range_start && v.bit_end != -1 &&
-      v.bit_end <= range_end) // rs <= a < b <= re
-    {
-      current_values.erase(it++);
-    }
-    else if(v.bit_begin >= range_start) // rs <= a <= re < b
-    {
-      reaching_definitiont v_new = v;
-      v_new.bit_begin = range_end;
-      new_values.insert(bv_container->add(v_new));
-
-      current_values.erase(it++);
-    }
-    else if(v.bit_end == -1 || v.bit_end > range_end) // a <= rs < re < b
-    {
-      reaching_definitiont v_new = v;
-      v_new.bit_end = range_start;
-
-      reaching_definitiont v_new2 = v;
-      v_new2.bit_begin = range_end;
-
-      new_values.insert(bv_container->add(v_new));
-      new_values.insert(bv_container->add(v_new2));
-
-      current_values.erase(it++);
-    }
-    else // a <= rs < b <= re
-    {
-      reaching_definitiont v_new = v;
-      v_new.bit_end = range_start;
-      new_values.insert(bv_container->add(v_new));
-
-      current_values.erase(it++);
-    }
-  }
-
-  current_values.insert(new_values.begin(), new_values.end());
-}
-
-template <bool remove_locals>
 bool rd_range_domain_with_sharingt<remove_locals>::gen(
   locationt from,
   const irep_idt &identifier,
@@ -315,6 +243,17 @@ void rd_range_domain_with_sharingt<remove_locals>::output(
     const irep_idt &identifier = value.first;
     output(identifier, out);
   }
+}
+
+template <bool remove_locals>
+values_innert &rd_range_domain_with_sharingt<remove_locals>::get_values_inner(
+  const irep_idt &identifier)
+{
+  auto &r = values.find(identifier);
+  if(!r.second)
+    return values_inner_empty;
+
+  return r.first;
 }
 
 /// \return returns true iff there is something new

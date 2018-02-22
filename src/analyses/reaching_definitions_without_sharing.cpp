@@ -46,7 +46,6 @@ void rd_range_domain_without_sharingt<remove_locals>::transform_dead(
   if(entry != values.end())
   {
     values.erase(entry);
-    export_cache.erase(identifier);
   }
 }
 
@@ -64,8 +63,6 @@ void rd_range_domain_without_sharingt<remove_locals>::transform_start_thread(
 
     if(!ns.lookup(identifier).is_shared() && !info.is_dirty(identifier))
     {
-      export_cache.erase(identifier);
-
       typename valuest::iterator next = it;
       ++next;
       values.erase(it);
@@ -101,8 +98,6 @@ void rd_range_domain_without_sharingt<remove_locals>::transform_function_call(
         (ns.lookup(identifier, sym) || !sym->is_shared()) &&
         !info.is_dirty(identifier))
       {
-        export_cache.erase(identifier);
-
         typename valuest::iterator next = it;
         ++next;
         values.erase(it);
@@ -198,7 +193,6 @@ void rd_range_domain_without_sharingt<remove_locals>::transform_end_function(
     if(entry != values.end())
     {
       values.erase(entry);
-      export_cache.erase(identifier);
     }
   }
 
@@ -212,103 +206,6 @@ void rd_range_domain_without_sharingt<remove_locals>::transform_end_function(
     rd_state->
 #endif
     transform_assign(ns, from, call, ai);
-  }
-}
-
-template <bool remove_locals>
-void rd_range_domain_without_sharingt<remove_locals>::kill(
-  const irep_idt &identifier,
-  const range_spect &range_start,
-  const range_spect &range_end)
-{
-  assert(range_start >= 0);
-  // -1 for objects of infinite/unknown size
-  if(range_end == -1)
-  {
-    kill_inf(identifier, range_start);
-    return;
-  }
-
-  assert(range_end > range_start);
-
-  typename valuest::iterator entry = values.find(identifier);
-  if(entry == values.end())
-    return;
-
-  bool clear_export_cache = false;
-  values_innert new_values;
-
-  for(typename values_innert::iterator it = entry->second.begin();
-      it != entry->second.end();) // no ++it
-  {
-    const reaching_definitiont &v = bv_container->get(*it);
-
-    if(v.bit_begin >= range_end)
-      ++it;
-    else if(v.bit_end != -1 && v.bit_end <= range_start)
-      ++it;
-    else if(
-      v.bit_begin >= range_start && v.bit_end != -1 &&
-      v.bit_end <= range_end) // rs <= a < b <= re
-    {
-      clear_export_cache = true;
-
-      entry->second.erase(it++);
-    }
-    else if(v.bit_begin >= range_start) // rs <= a <= re < b
-    {
-      clear_export_cache = true;
-
-      reaching_definitiont v_new = v;
-      v_new.bit_begin = range_end;
-      new_values.insert(bv_container->add(v_new));
-
-      entry->second.erase(it++);
-    }
-    else if(v.bit_end == -1 || v.bit_end > range_end) // a <= rs < re < b
-    {
-      clear_export_cache = true;
-
-      reaching_definitiont v_new = v;
-      v_new.bit_end = range_start;
-
-      reaching_definitiont v_new2 = v;
-      v_new2.bit_begin = range_end;
-
-      new_values.insert(bv_container->add(v_new));
-      new_values.insert(bv_container->add(v_new2));
-
-      entry->second.erase(it++);
-    }
-    else // a <= rs < b <= re
-    {
-      clear_export_cache = true;
-
-      reaching_definitiont v_new = v;
-      v_new.bit_end = range_start;
-      new_values.insert(bv_container->add(v_new));
-
-      entry->second.erase(it++);
-    }
-  }
-
-  if(clear_export_cache)
-    export_cache.erase(identifier);
-
-  typename values_innert::iterator it = entry->second.begin();
-  for(const auto &id : new_values)
-  {
-    while(it != entry->second.end() && *it < id)
-      ++it;
-    if(it == entry->second.end() || id < *it)
-    {
-      entry->second.insert(it, id);
-    }
-    else if(it != entry->second.end())
-    {
-      assert(*it == id);
-      ++it;
-    }
   }
 }
 
@@ -336,8 +233,6 @@ bool rd_range_domain_without_sharingt<remove_locals>::gen(
 
   if(!values[identifier].insert(bv_container->add(v)).second)
     return false;
-
-  export_cache.erase(identifier);
 
 #if 0
   range_spect merged_range_end=range_end;
@@ -402,6 +297,18 @@ void rd_range_domain_without_sharingt<remove_locals>::output(
     const irep_idt &identifier = value.first;
     output(identifier, out);
   }
+}
+
+template <bool remove_locals>
+values_innert &
+rd_range_domain_without_sharingt<remove_locals>::get_values_inner(
+  const irep_idt &identifier)
+{
+  typename valuest::iterator entry = values.find(identifier);
+  if(entry == values.end())
+    return values_inner_empty;
+
+  return entry->second;
 }
 
 /// \return returns true iff there is something new
@@ -483,7 +390,6 @@ bool rd_range_domain_without_sharingt<remove_locals>::merge(
       if(merge_inner(it->second, value.second))
       {
         changed = true;
-        export_cache.erase(it->first);
       }
 
       ++it;
@@ -535,7 +441,6 @@ bool rd_range_domain_without_sharingt<remove_locals>::merge_shared(
       if(merge_inner(it->second, value.second))
       {
         changed = true;
-        export_cache.erase(it->first);
       }
 
       ++it;

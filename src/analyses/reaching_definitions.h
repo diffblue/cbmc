@@ -105,6 +105,8 @@ inline bool operator<(
   return false;
 }
 
+namespace
+{
 struct infot
 {
   infot(value_setst &value_sets, is_threadedt &is_threaded, dirtyt &is_dirty)
@@ -116,6 +118,10 @@ struct infot
   is_threadedt &is_threaded;
   dirtyt &is_dirty;
 };
+
+typedef std::set<std::size_t> values_innert;
+std::set<std::size_t> values_inner_empty;
+}
 
 template <bool remove_locals>
 class rd_range_domain_baset : public ai_domain_baset
@@ -201,10 +207,10 @@ protected:
     locationt to,
     ai_baset &ai);
 
-  virtual void kill(
+  void kill(
     const irep_idt &identifier,
     const range_spect &range_start,
-    const range_spect &range_end) = 0;
+    const range_spect &range_end);
 
   void kill_inf(
     const irep_idt &identifier,
@@ -219,6 +225,8 @@ protected:
   virtual void output(std::ostream &out) const = 0;
 
   void output(const irep_idt &identifier, std::ostream &out) const;
+
+  virtual values_innert &get_values_inner(const irep_idt &identifier) = 0;
 };
 
 template <typename rd_range_domain>

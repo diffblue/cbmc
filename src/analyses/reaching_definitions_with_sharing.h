@@ -49,9 +49,9 @@ public:
   using typename rd_range_domain_baset<remove_locals>::ranges_at_loct;
   using typename rd_range_domain_baset<remove_locals>::rangest;
   using rd_range_domain_baset<remove_locals>::export_cache;
-  using typename rd_range_domain_baset<remove_locals>::values_innert;
 
   using rd_range_domain_baset<remove_locals>::transform_assign;
+  using rd_range_domain_baset<remove_locals>::kill;
   using rd_range_domain_baset<remove_locals>::kill_inf;
   using rd_range_domain_baset<remove_locals>::get;
   using rd_range_domain_baset<remove_locals>::clear_cache;
@@ -127,11 +127,6 @@ private:
     locationt to,
     ai_baset &ai);
 
-  void kill(
-    const irep_idt &identifier,
-    const range_spect &range_start,
-    const range_spect &range_end);
-
   bool gen(
     locationt from,
     const irep_idt &identifier,
@@ -139,6 +134,8 @@ private:
     const range_spect &range_end);
 
   void output(std::ostream &out) const;
+
+  values_innert &get_values_inner(const irep_idt &identifier);
 };
 
 typedef reaching_definitions_analysis_ait<rd_range_domain_with_sharingt<false>>
