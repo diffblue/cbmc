@@ -205,22 +205,6 @@ void rd_range_domain_baset<remove_locals>::kill(
 }
 
 template <bool remove_locals>
-const typename rd_range_domain_baset<remove_locals>::ranges_at_loct &
-rd_range_domain_baset<remove_locals>::get(const irep_idt &identifier) const
-{
-  populate_cache(identifier);
-
-  static ranges_at_loct empty;
-
-  export_cachet::const_iterator entry=export_cache.find(identifier);
-
-  if(entry==export_cache.end())
-    return empty;
-  else
-    return entry->second;
-}
-
-template <bool remove_locals>
 void rd_range_domain_baset<remove_locals>::output(
   const irep_idt &identifier,
   std::ostream &out) const

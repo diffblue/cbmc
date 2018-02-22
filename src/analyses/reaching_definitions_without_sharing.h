@@ -102,6 +102,8 @@ public:
     locationt to,
     const namespacet &ns);
 
+  const ranges_at_loct &get(const irep_idt &identifier) const;
+
 private:
 #ifdef USE_DSTRING
   typedef std::map<irep_idt, values_innert> valuest;
@@ -111,8 +113,6 @@ private:
   valuest values;
 
   infot get_info(ai_baset &ai);
-
-  void populate_cache(const irep_idt &identifier) const;
 
   void transform_dead(const namespacet &ns, locationt from);
 

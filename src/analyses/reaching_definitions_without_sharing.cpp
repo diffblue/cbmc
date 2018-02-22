@@ -13,24 +13,34 @@ infot rd_range_domain_without_sharingt<remove_locals>::get_info(ai_baset &ai)
 }
 
 template <bool remove_locals>
-void rd_range_domain_without_sharingt<remove_locals>::populate_cache(
+const typename rd_range_domain_baset<remove_locals>::ranges_at_loct &
+rd_range_domain_without_sharingt<remove_locals>::get(
   const irep_idt &identifier) const
 {
   assert(bv_container);
 
-  typename valuest::const_iterator v_entry = values.find(identifier);
-  if(v_entry == values.end() || v_entry->second.empty())
-    return;
+  static ranges_at_loct empty;
 
-  ranges_at_loct &export_entry = export_cache[identifier];
+  // Return cached value
+  auto e_it = export_cache.find(identifier);
+  if(e_it != export_cache.end())
+    return e_it->second;
 
-  for(const auto &id : v_entry->second)
+  // Check if values available
+  auto v_it = values.find(identifier);
+  if(v_it == values.end() || v_it->second.empty())
+    return empty;
+
+  ranges_at_loct &entry = export_cache[identifier];
+
+  for(const auto &id : v_it->second)
   {
     const reaching_definitiont &v = bv_container->get(id);
 
-    export_entry[v.definition_at].insert(
-      std::make_pair(v.bit_begin, v.bit_end));
+    entry[v.definition_at].insert(std::make_pair(v.bit_begin, v.bit_end));
   }
+
+  return entry;
 }
 
 template <bool remove_locals>
