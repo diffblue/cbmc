@@ -14,15 +14,11 @@ Date:   June 2017
 #include <util/fresh_symbol.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 #include <util/c_types.h>
 
 #include <goto-programs/goto_functions.h>
 
 #include "java_bytecode_convert_class.h"
-#include "java_entry_point.h"
-#include "java_root_class.h"
-#include "java_types.h"
 #include "java_utils.h"
 
 class java_bytecode_instrumentt:public messaget
@@ -39,7 +35,7 @@ public:
   {
   }
 
-  void operator()(exprt &expr);
+  void operator()(codet &code);
 
 protected:
   symbol_table_baset &symbol_table;
@@ -73,29 +69,26 @@ protected:
     const exprt &length,
     const source_locationt &original_loc);
 
-  void instrument_code(exprt &expr);
+  void instrument_code(codet &code);
   void add_expr_instrumentation(code_blockt &block, const exprt &expr);
   void prepend_instrumentation(codet &code, code_blockt &instrumentation);
-  codet instrument_expr(const exprt &expr);
+  optionalt<codet> instrument_expr(const exprt &expr);
 };
 
-
-const std::vector<irep_idt> exception_needed_classes =
-{
+const std::vector<std::string> exception_needed_classes = { // NOLINT
   "java.lang.ArithmeticException",
   "java.lang.ArrayIndexOutOfBoundsException",
   "java.lang.ClassCastException",
   "java.lang.NegativeArraySizeException",
-  "java.lang.NullPointerException"
-};
+  "java.lang.NullPointerException"};
 
 /// Creates a class stub for exc_name and generates a
 ///  conditional GOTO such that exc_name is thrown when
 ///  cond is met.
-/// \par parameters: `cond`: condition to be met in order
+/// \param cond: condition to be met in order
 /// to throw an exception
-/// `original_loc`: source location in the original program
-/// `exc_name`: the name of the exception to be thrown
+/// \param original_loc: source location in the original program
+/// \param exc_name: the name of the exception to be thrown
 /// \return Returns the code initialising the throwing the
 /// exception
 codet java_bytecode_instrumentt::throw_exception(
@@ -178,9 +171,9 @@ codet java_bytecode_instrumentt::check_arithmetic_exception(
 /// and throws ArrayIndexOutofBoundsException/generates an assertion
 /// if necessary; Exceptions are thrown when the `throw_runtime_exceptions`
 /// flag is set. Otherwise, assertions are emitted.
-/// \par parameters: `array_struct`: the array being accessed
-/// `idx`: index into the array
-/// `original_loc: source location in the original code
+/// \param array_struct: array being accessed
+/// \param idx: index into the array
+/// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an ArrayIndexOutPfBoundsException
 /// or emits an assertion checking the array access
@@ -223,9 +216,9 @@ codet java_bytecode_instrumentt::check_array_access(
 /// ClassCastException/generates an assertion when necessary;
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
 /// Otherwise, assertions are emitted.
-/// \par parameters: `class1`: the subclass
-/// `class2`: the super class
-/// `original_loc: source location in the original code
+/// \param class1: the subclass
+/// \param class2: the super class
+/// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an ClassCastException or emits an
 /// assertion checking the subtype relation
@@ -272,7 +265,7 @@ codet java_bytecode_instrumentt::check_class_cast(
 /// generates an assertion when necessary;
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
 /// Otherwise, assertions are emitted.
-/// \par parameters: `expr`: the checked expression
+/// \param expr: the checked expression
 /// `original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an NullPointerException or emits an
@@ -302,8 +295,8 @@ codet java_bytecode_instrumentt::check_null_dereference(
 /// generates an assertion when necessary;
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
 /// Otherwise, assertions are emitted.
-/// \par parameters: `length`: the checked length
-/// `original_loc: source location in the original code
+/// \param length: the checked length
+/// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an NegativeArraySizeException
 /// or emits an assertion checking the subtype relation
@@ -335,13 +328,12 @@ void java_bytecode_instrumentt::add_expr_instrumentation(
   code_blockt &block,
   const exprt &expr)
 {
-  codet expr_instrumentation=instrument_expr(expr);
-  if(expr_instrumentation!=code_skipt())
+  if(optionalt<codet> expr_instrumentation = instrument_expr(expr))
   {
-    if(expr_instrumentation.get_statement()==ID_block)
-      block.append(to_code_block(expr_instrumentation));
+    if(expr_instrumentation->get_statement() == ID_block)
+      block.append(to_code_block(*expr_instrumentation));
     else
-      block.move_to_operands(expr_instrumentation);
+      block.move_to_operands(*expr_instrumentation);
   }
 }
 
@@ -365,10 +357,9 @@ void java_bytecode_instrumentt::prepend_instrumentation(
 
 /// Augments `expr` with instrumentation in the form of either
 /// assertions or runtime exceptions
-/// \par parameters: `expr`: the expression to be instrumented
-void java_bytecode_instrumentt::instrument_code(exprt &expr)
+/// \param `expr` the expression to be instrumented
+void java_bytecode_instrumentt::instrument_code(codet &code)
 {
-  codet &code=to_code(expr);
   source_locationt old_source_location=code.source_location();
 
   const irep_idt &statement=code.get_statement();
@@ -480,19 +471,17 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
 
 /// Computes the instrumentation for `expr` in the form of
 /// either assertions or runtime exceptions.
-/// \par parameters: `expr`: the expression for which we compute
+/// \param expr: the expression for which we compute
 /// instrumentation
-/// \return: The instrumentation required for `expr`
-codet java_bytecode_instrumentt::instrument_expr(
-  const exprt &expr)
+/// \return: The instrumentation for `expr` if required
+optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
 {
   code_blockt result;
   // First check our operands:
   forall_operands(it, expr)
   {
-    codet op_result=instrument_expr(*it);
-    if(op_result!=code_skipt())
-      result.move_to_operands(op_result);
+    if(optionalt<codet> op_result = instrument_expr(*it))
+      result.move_to_operands(*op_result);
   }
 
   // Add any check due at this node:
@@ -524,7 +513,7 @@ codet java_bytecode_instrumentt::instrument_expr(
     const irep_idt &statement=side_effect_expr.get_statement();
     if(statement==ID_throw)
     {
-      // this corresponds to athrow and so we check that
+      // this corresponds to a throw and so we check that
       // we don't throw null
       result.copy_to_operands(
         check_null_dereference(
@@ -533,7 +522,7 @@ codet java_bytecode_instrumentt::instrument_expr(
     }
     else if(statement==ID_java_new_array)
     {
-      // this correpond to new array so we check that
+      // this corresponds to new array so we check that
       // length is >=0
       result.copy_to_operands(
         check_array_length(
@@ -563,16 +552,16 @@ codet java_bytecode_instrumentt::instrument_expr(
   }
 
   if(result==code_blockt())
-    return code_skipt();
+    return {};
   else
     return result;
 }
 
 /// Instruments `expr`
-/// \par parameters: `expr`: the expression to be instrumented
-void java_bytecode_instrumentt::operator()(exprt &expr)
+/// \param expr: the expression to be instrumented
+void java_bytecode_instrumentt::operator()(codet &code)
 {
-  instrument_code(expr);
+  instrument_code(code);
 }
 
 /// Instruments the code attached to `symbol` with
@@ -601,7 +590,7 @@ void java_bytecode_instrument_symbol(
     "java_bytecode_instrument expects a code-typed symbol but was called with"
       " " + id2string(symbol.name) + " which has a value with an id of " +
       id2string(symbol.value.id()));
-  instrument(symbol.value);
+  instrument(to_code(symbol.value));
 }
 
 /// Instruments all the code in the symbol_table with
@@ -634,5 +623,5 @@ void java_bytecode_instrument(
   // instrument(...) can add symbols to the table, so it's
   // not safe to hold a reference to a symbol across a call.
   for(const auto &symbol : symbols_to_instrument)
-    instrument(symbol_table.get_writeable_ref(symbol).value);
+    instrument(to_code(symbol_table.get_writeable_ref(symbol).value));
 }

@@ -26,6 +26,6 @@ void java_bytecode_instrument(
   const bool throw_runtime_exceptions,
   message_handlert &_message_handler);
 
-extern const std::vector<irep_idt> exception_needed_classes;
+extern const std::vector<std::string> exception_needed_classes;
 
 #endif
