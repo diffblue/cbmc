@@ -1,0 +1,19 @@
+CORE
+IntegerTests.class
+-refine-strings --string-max-length 100 IntegerTests.class --function IntegerTests.testMySet --cover location
+^EXIT=0$
+^SIGNAL=0$
+coverage.* line 12 function java::IntegerTests.testMySet.* bytecode-index 1 .* SATISFIED
+coverage.* line 12 function java::IntegerTests.testMySet.* bytecode-index 3 .* SATISFIED
+coverage.* line 13 function java::IntegerTests.testMySet.* bytecode-index 4 .* SATISFIED
+coverage.* line 13 function java::IntegerTests.testMySet.* bytecode-index 6 .* SATISFIED
+coverage.* line 13 function java::IntegerTests.testMySet.* bytecode-index 7 .* SATISFIED
+coverage.* line 14 function java::IntegerTests.testMySet.* bytecode-index 12 .* SATISFIED
+coverage.* line 14 function java::IntegerTests.testMySet.* bytecode-index 13 .* SATISFIED
+coverage.* line 15 function java::IntegerTests.testMySet.* bytecode-index 16 .* SATISFIED
+coverage.* line 15 function java::IntegerTests.testMySet.* bytecode-index 17 .* SATISFIED
+coverage.* line 16 function java::IntegerTests.testMySet.* bytecode-index 21 .* SATISFIED
+coverage.* line 15 function java::IntegerTests.testMySet.* bytecode-index 19 .* SATISFIED
+coverage.* line 15 function java::IntegerTests.testMySet.* bytecode-index 20 .* SATISFIED
+coverage.* line 16 function java::IntegerTests.testMySet.* bytecode-index 22 .* SATISFIED
+coverage.* line 16 function java::IntegerTests.testMySet.* bytecode-index 23 .* SATISFIED
