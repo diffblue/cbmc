@@ -31,6 +31,11 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #define DEFAULT_MAX_NB_REFINEMENT std::numeric_limits<size_t>::max()
 #define CHARACTER_FOR_UNKNOWN '?'
 
+// The following default for max string length is largely enough for most
+// programs and avoids potential problems with overflows, and running out
+// of memory because of a string that is too large.
+#define DEFAULT_MAX_STRING_LENGTH (1 << 30)
+
 struct index_set_pairt
 {
   std::map<exprt, std::set<exprt>> cumulative;
