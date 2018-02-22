@@ -103,39 +103,39 @@ public:
     locationt to,
     const namespacet &ns);
 
-  const ranges_at_loct &get(const irep_idt &identifier) const;
+  const ranges_at_loct &get(const irep_idt &identifier) const override;
 
 private:
   typedef sharing_mapt<irep_idt, values_innert, irep_id_hash> valuest;
   valuest values;
 
-  infot get_info(ai_baset &ai);
+  infot get_info(ai_baset &ai) override;
 
-  void transform_dead(const namespacet &ns, locationt from);
+  void transform_dead(const namespacet &ns, locationt from) override;
 
-  void transform_start_thread(const namespacet &ns, ai_baset &ai);
+  void transform_start_thread(const namespacet &ns, ai_baset &ai) override;
 
   void transform_function_call(
     const namespacet &ns,
     locationt from,
     locationt to,
-    ai_baset &ai);
+    ai_baset &ai) override;
 
   void transform_end_function(
     const namespacet &ns,
     locationt from,
     locationt to,
-    ai_baset &ai);
+    ai_baset &ai) override;
 
   bool gen(
     locationt from,
     const irep_idt &identifier,
     const range_spect &range_start,
-    const range_spect &range_end);
+    const range_spect &range_end) override;
 
-  void output(std::ostream &out) const;
+  void output(std::ostream &out) const override;
 
-  values_innert &get_values_inner(const irep_idt &identifier);
+  values_innert &get_values_inner(const irep_idt &identifier) override;
 };
 
 typedef reaching_definitions_analysis_ait<rd_range_domain_with_sharingt<false>>

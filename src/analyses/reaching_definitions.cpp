@@ -1,3 +1,13 @@
+/*******************************************************************\
+
+Module: Range-based reaching definitions analysis (following Field-
+        Sensitive Program Dependence Analysis, Litvak et al., FSE 2010)
+
+Author: Michael Tautschnig
+
+Date: February 2013
+
+\*******************************************************************/
 
 template <bool remove_locals>
 void rd_range_domain_baset<remove_locals>::transform(
@@ -6,7 +16,7 @@ void rd_range_domain_baset<remove_locals>::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
-  assert(bv_container);
+  PRECONDITION(bv_container);
 
   // kill values
   if(from->is_dead())
@@ -106,7 +116,7 @@ void rd_range_domain_baset<remove_locals>::kill_inf(
   const irep_idt &identifier,
   const range_spect &range_start)
 {
-  assert(range_start>=0);
+  PRECONDITION(range_start >= 0);
 
 #if 0
   valuest::iterator entry=values.find(identifier);
@@ -142,7 +152,7 @@ void rd_range_domain_baset<remove_locals>::kill(
   const range_spect &range_start,
   const range_spect &range_end)
 {
-  assert(range_start>=0);
+  PRECONDITION(range_start >= 0);
   // -1 for objects of infinite/unknown size
   if(range_end == -1)
   {
@@ -150,7 +160,7 @@ void rd_range_domain_baset<remove_locals>::kill(
     return;
   }
 
-  assert(range_end > range_start);
+  PRECONDITION(range_end > range_start);
 
   values_innert &current_values = get_values_inner(identifier);
   values_innert new_values;

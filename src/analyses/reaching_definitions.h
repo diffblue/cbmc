@@ -17,6 +17,7 @@ Date: February 2013
 #define CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 
 #include <util/base_exceptions.h>
+#include <util/invariant.h>
 #include <util/make_unique.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
@@ -42,7 +43,7 @@ class sparse_bitvector_analysist
 public:
   const V &get(const std::size_t value_index) const
   {
-    assert(value_index<values.size());
+    PRECONDITION(value_index < values.size());
     return values[value_index]->first;
   }
 
@@ -98,9 +99,10 @@ inline bool operator<(
   if(b.bit_end<a.bit_end)
     return false;
 
-  // we do not expect comparison of unrelated definitions
-  // as this operator< is only used in sparse_bitvector_analysist
-  assert(a.identifier==b.identifier);
+  INVARIANT(
+    a.identifier == b.identifier,
+    "No comparison of unrelated definitions"
+    "as operator< is only used in sparse_bitvector_analysist");
 
   return false;
 }

@@ -1,3 +1,13 @@
+/*******************************************************************\
+
+Module: Range-based reaching definitions analysis (following Field-
+        Sensitive Program Dependence Analysis, Litvak et al., FSE 2010)
+
+Author: Michael Tautschnig
+
+Date: February 2013
+
+\*******************************************************************/
 
 template <bool remove_locals>
 infot rd_range_domain_with_sharingt<remove_locals>::get_info(ai_baset &ai)
@@ -13,11 +23,11 @@ infot rd_range_domain_with_sharingt<remove_locals>::get_info(ai_baset &ai)
 }
 
 template <bool remove_locals>
-const typename rd_range_domain_baset<remove_locals>::ranges_at_loct &
+const typename rd_range_domain_with_sharingt<remove_locals>::ranges_at_loct &
 rd_range_domain_with_sharingt<remove_locals>::get(
   const irep_idt &identifier) const
 {
-  assert(bv_container);
+  PRECONDITION(bv_container);
 
   static ranges_at_loct empty;
 
@@ -211,10 +221,10 @@ bool rd_range_domain_with_sharingt<remove_locals>::gen(
   if(range_start == 0 && range_end == 0)
     return false;
 
-  assert(range_start >= 0);
+  PRECONDITION(range_start >= 0);
 
   // -1 for objects of infinite/unknown size
-  assert(range_end > range_start || range_end == -1);
+  PRECONDITION(range_end > range_start || range_end == -1);
 
   reaching_definitiont v;
   v.identifier = identifier;
@@ -273,19 +283,16 @@ bool rd_range_domain_with_sharingt<remove_locals>::merge(
 {
   bool changed = false;
 
-  if(other.has_values.is_false())
+  if(other.is_bottom())
   {
-    assert(other.values.empty());
     return false;
   }
 
-  if(has_values.is_false())
+  if(is_bottom())
   {
-    assert(values.empty());
-
     values = other.values;
 
-    assert(!other.has_values.is_true());
+    INVARIANT(!other.is_top(), "top unused");
     has_values = other.has_values;
 
     return true;
@@ -315,7 +322,7 @@ bool rd_range_domain_with_sharingt<remove_locals>::merge(
       if(inner != inner_other)
       {
         auto &v = values.find(k);
-        assert(v.second);
+        INVARIANT(v.second, "key exists as in_both is true");
 
         values_innert &inner = v.first;
 

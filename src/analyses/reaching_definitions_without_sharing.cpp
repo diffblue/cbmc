@@ -1,3 +1,13 @@
+/*******************************************************************\
+
+Module: Range-based reaching definitions analysis (following Field-
+        Sensitive Program Dependence Analysis, Litvak et al., FSE 2010)
+
+Author: Michael Tautschnig
+
+Date: February 2013
+
+\*******************************************************************/
 
 template <bool remove_locals>
 infot rd_range_domain_without_sharingt<remove_locals>::get_info(ai_baset &ai)
@@ -13,11 +23,11 @@ infot rd_range_domain_without_sharingt<remove_locals>::get_info(ai_baset &ai)
 }
 
 template <bool remove_locals>
-const typename rd_range_domain_baset<remove_locals>::ranges_at_loct &
+const typename rd_range_domain_without_sharingt<remove_locals>::ranges_at_loct &
 rd_range_domain_without_sharingt<remove_locals>::get(
   const irep_idt &identifier) const
 {
-  assert(bv_container);
+  PRECONDITION(bv_container);
 
   static ranges_at_loct empty;
 
@@ -230,10 +240,10 @@ bool rd_range_domain_without_sharingt<remove_locals>::gen(
   if(range_start == 0 && range_end == 0)
     return false;
 
-  assert(range_start >= 0);
+  PRECONDITION(range_start >= 0);
 
   // -1 for objects of infinite/unknown size
-  assert(range_end > range_start || range_end == -1);
+  PRECONDITION(range_end > range_start || range_end == -1);
 
   reaching_definitiont v;
   v.identifier = identifier;
@@ -364,7 +374,7 @@ bool rd_range_domain_without_sharingt<remove_locals>::merge_inner(
     }
     else if(itr != dest.end())
     {
-      assert(*itr == id);
+      INVARIANT(*itr == id, "!= handled by other cases");
       ++itr;
     }
   }
@@ -395,7 +405,7 @@ bool rd_range_domain_without_sharingt<remove_locals>::merge(
     }
     else if(it != values.end())
     {
-      assert(it->first == value.first);
+      INVARIANT(it->first == value.first, "!= handled by other cases");
 
       if(merge_inner(it->second, value.second))
       {
@@ -446,7 +456,7 @@ bool rd_range_domain_without_sharingt<remove_locals>::merge_shared(
     }
     else if(it != values.end())
     {
-      assert(it->first == value.first);
+      INVARIANT(it->first == value.first, "!= handled by other cases");
 
       if(merge_inner(it->second, value.second))
       {
