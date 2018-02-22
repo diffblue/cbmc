@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 #include <util/base_type.h>
+#include <util/invariant.h>
 
 #include <langapi/language_util.h>
 
@@ -19,12 +20,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 literalt boolbvt::convert_equality(const equal_exprt &expr)
 {
-  if(!base_type_eq(expr.lhs().type(), expr.rhs().type(), ns))
-  {
-    std::cout << "######### lhs: " << expr.lhs().pretty() << '\n';
-    std::cout << "######### rhs: " << expr.rhs().pretty() << '\n';
-    throw "equality without matching types";
-  }
+  const bool is_base_type_eq =
+    base_type_eq(expr.lhs().type(), expr.rhs().type(), ns);
+  DATA_INVARIANT(
+    is_base_type_eq,
+    std::string("equality without matching types:\n") + "######### lhs: " +
+      expr.lhs().pretty() + '\n' + "######### rhs: " + expr.rhs().pretty());
 
   // see if it is an unbounded array
   if(is_unbounded_array(expr.lhs().type()))
@@ -68,12 +69,13 @@ literalt boolbvt::convert_verilog_case_equality(
   // This is 4-valued comparison, i.e., z===z, x===x etc.
   // The result is always Boolean.
 
-  if(!base_type_eq(expr.lhs().type(), expr.rhs().type(), ns))
-  {
-    std::cout << "######### lhs: " << expr.lhs().pretty() << '\n';
-    std::cout << "######### rhs: " << expr.rhs().pretty() << '\n';
-    throw "verilog_case_equality without matching types";
-  }
+  const bool is_base_type_eq =
+    base_type_eq(expr.lhs().type(), expr.rhs().type(), ns);
+  DATA_INVARIANT(
+    is_base_type_eq,
+    std::string("verilog_case_equality without matching types:\n") +
+      "######### lhs: " + expr.lhs().pretty() + '\n' +
+      "######### rhs: " + expr.rhs().pretty());
 
   const bvt &bv0=convert_bv(expr.lhs());
   const bvt &bv1=convert_bv(expr.rhs());
