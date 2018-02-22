@@ -559,4 +559,68 @@ SCENARIO(
 
     // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
+
+  THEN("There should be a symbol for the `ExtendImplicit` class")
+  {
+    std::string class_prefix = "java::GenericBase$ExtendImplicit";
+    REQUIRE(new_symbol_table.has_symbol(class_prefix));
+
+    const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
+    const class_typet &derived_class_type =
+      require_type::require_java_implicitly_generic_class(derived_symbol.type);
+
+    THEN("The base for superclass is implicitly generic")
+    {
+      REQUIRE(derived_class_type.bases().size() == 1);
+      const typet &base_type = derived_class_type.bases().at(0).type();
+      require_type::require_java_generic_symbol_type(
+        base_type,
+        "java::GenericBase$ImplicitGeneric",
+        {{require_type::type_argument_kindt::Var, "java::GenericBase::T"}});
+    }
+  }
+
+  THEN("There should be a symbol for the `ExtendImplicitAndExplicit` class")
+  {
+    std::string class_prefix = "java::GenericBase$ExtendImplicitAndExplicit";
+    REQUIRE(new_symbol_table.has_symbol(class_prefix));
+
+    const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
+    const class_typet &derived_class_type =
+      require_type::require_java_implicitly_generic_class(derived_symbol.type);
+
+    THEN("The base for superclass is generic *and* implicitly generic")
+    {
+      REQUIRE(derived_class_type.bases().size() == 1);
+      const typet &base_type = derived_class_type.bases().at(0).type();
+      require_type::require_java_generic_symbol_type(
+        base_type,
+        "java::GenericBase$ImplicitAndExplicitGeneric",
+        {{require_type::type_argument_kindt::Var, "java::GenericBase::T"},
+         {require_type::type_argument_kindt::Var,
+          "java::GenericBase$ExtendImplicitAndExplicit::S"}});
+    }
+  }
+
+  THEN("There should be a symbol for the `ExtendImplicitAndExplicit` class")
+  {
+    std::string class_prefix = "java::GenericBase2$ExtendImplicitAndExplicit";
+    REQUIRE(new_symbol_table.has_symbol(class_prefix));
+
+    const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
+    const class_typet &derived_class_type =
+      require_type::require_java_implicitly_generic_class(derived_symbol.type);
+
+    THEN("The base for superclass is generic *and* implicitly generic")
+    {
+      REQUIRE(derived_class_type.bases().size() == 1);
+      const typet &base_type = derived_class_type.bases().at(0).type();
+      require_type::require_java_generic_symbol_type(
+        base_type,
+        "java::GenericBase2$ImplicitAndExplicitGeneric",
+        {{require_type::type_argument_kindt::Var, "java::GenericBase2::T"},
+         {require_type::type_argument_kindt::Var, "java::GenericBase2::S"},
+         {require_type::type_argument_kindt::Var, "java::GenericBase2::S"}});
+    }
+  }
 }

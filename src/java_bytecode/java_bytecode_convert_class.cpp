@@ -112,8 +112,10 @@ extract_generic_superclass_reference(const optionalt<std::string> &signature)
       signature.value().substr(start, (end - start) + 1);
 
     // if the superclass is generic then the reference is of form
-    // Lsuperclass-name<generic-types;>;
-    if(has_suffix(superclass_ref, ">;"))
+    // `Lsuperclass-name<generic-types;>;` if it is implicitly generic, then the
+    // reference is of the form
+    // `Lsuperclass-name<Tgeneric-types;>.Innerclass-Name`
+    if(superclass_ref.find('<') != std::string::npos)
       return superclass_ref;
   }
   return {};
