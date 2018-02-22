@@ -1783,8 +1783,13 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     debug_check_axioms_step(
       stream, ns, axiom, axiom_in_model, negaxiom, with_concretized_arrays);
 
-    if(const auto &witness=
-       find_counter_example(ns, ui, with_concretized_arrays, univ_var))
+    const binary_relation_exprt bound_counter_example(
+      univ_var, ID_le, from_integer(max_string_length, univ_var.type()));
+    const and_exprt negated_with_univ_bound(
+      with_concretized_arrays, bound_counter_example);
+    if(
+      const auto &witness =
+        find_counter_example(ns, ui, negated_with_univ_bound, univ_var))
     {
       stream << indent2 << "- violated_for: " << univ_var.get_identifier()
              << "=" << from_expr(ns, "", *witness) << eom;
@@ -1837,7 +1842,14 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     debug_check_axioms_step(
       stream, ns, nc_axiom, nc_axiom_in_model, negaxiom, with_concrete_arrays);
 
-    if(const auto witness = find_counter_example(ns, ui, negaxiom, univ_var))
+    const binary_relation_exprt bound_counter_example(
+      univ_var, ID_le, from_integer(max_string_length, univ_var.type()));
+    const and_exprt negated_with_univ_bound(
+      with_concrete_arrays, bound_counter_example);
+
+    if(
+      const auto witness =
+        find_counter_example(ns, ui, negated_with_univ_bound, univ_var))
     {
       stream << indent2 << "- violated_for: " << univ_var.get_identifier()
              << "=" << from_expr(ns, "", *witness) << eom;
