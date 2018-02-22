@@ -689,6 +689,44 @@ void output_equations(
            << " == " << from_expr(ns, "", equations[i].rhs()) << std::endl;
 }
 
+/// Make character array accesses at index greater than max_index return
+/// CHARACTER_FOR_UNKNOWN.
+///
+/// For an index_expr `s[i]` we return `(0 <= i <= max_index ? s[i] : '?')`
+/// \param index_expr : an access expression in an array of characters
+/// \param max_index : maximal index up to which array access is meaningful
+/// \return index_expr with the added guard
+static exprt add_guard_to_array_accesses(
+  const index_exprt &index_expr,
+  const std::size_t max_index)
+{
+  PRECONDITION(index_expr.type().id() == ID_unsignedbv);
+  const exprt &index = index_expr.index();
+  // The guard is `0 <= index && index <= max_index`
+  const and_exprt guard(
+    binary_relation_exprt(index, ID_ge, from_integer(0, index.type())),
+    binary_relation_exprt(index, ID_le, from_integer(max_index, index.type())));
+  const exprt unknown = from_integer(CHARACTER_FOR_UNKNOWN, index_expr.type());
+  return if_exprt(guard, index_expr, unknown);
+}
+
+// NOLINTNEXTLINE
+/// \copybrief add_guard_to_array_accesses(index_exprt &index_expr, const std::size_t max_index)
+/// For instance `s[i] == 'a'` would be replaced by
+/// `(i <= max_index ? s[i] : '?') == 'a'`
+/// \param [out] expr : expression in which we replace the accesses
+/// \param max_index : maximal index up to which array access is meaningful
+static void
+add_guard_to_array_accesses(exprt &expr, const std::size_t max_index)
+{
+  for(exprt &op : expr.operands())
+    add_guard_to_array_accesses(op, max_index);
+
+  const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr);
+  if(index_expr && is_char_type(index_expr->type()))
+    expr = add_guard_to_array_accesses(*index_expr, max_index);
+}
+
 /// Main decision procedure of the solver. Looks for a valuation of variables
 /// compatible with the constraints that have been given to `set_to` so far.
 ///
@@ -901,14 +939,14 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   initial_index_set(index_sets, ns, axioms);
   update_index_set(index_sets, ns, current_constraints);
   current_constraints.clear();
-  for(const auto &instance :
-        generate_instantiations(
-          debug(),
-          ns,
-          generator,
-          index_sets,
-          axioms))
+
+  std::vector<exprt> instances =
+    generate_instantiations(debug(), ns, generator, index_sets, axioms);
+  for(auto &instance : instances)
+  {
+    add_guard_to_array_accesses(instance, max_string_length);
     add_lemma(instance);
+  }
 
   while((loop_bound_--)>0)
   {
@@ -963,14 +1001,14 @@ decision_proceduret::resultt string_refinementt::dec_solve()
           debug() << "dec_solve: current index set is empty" << eom;
       }
       current_constraints.clear();
-      for(const auto &instance :
-        generate_instantiations(
-          debug(),
-          ns,
-          generator,
-          index_sets,
-          axioms))
+
+      std::vector<exprt> instances =
+        generate_instantiations(debug(), ns, generator, index_sets, axioms);
+      for(auto &instance : instances)
+      {
+        add_guard_to_array_accesses(instance, max_string_length);
         add_lemma(instance);
+      }
     }
     else
     {
