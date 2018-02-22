@@ -232,7 +232,7 @@ public:
     const typet &type,
     const irep_idt &component_name,
     const irep_idt &class_name)
-    : exprt(ID_fieldref, type)
+    : exprt(ID_empty_string, type)
   {
     set(ID_class, class_name);
     set(ID_component_name, component_name);
