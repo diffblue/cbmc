@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <iostream>
+#include <util/invariant.h>
 
 bvt boolbvt::convert_case(const exprt &expr)
 {
@@ -49,15 +49,11 @@ bvt boolbvt::convert_case(const exprt &expr)
       break;
 
     case COMPARE:
-      if(compare_bv.size()!=op.size())
-      {
-        std::cerr << "compare operand: " << compare_bv.size()
-                  << "\noperand: " << op.size() << '\n'
-                  << it->pretty()
-                  << '\n';
-
-        throw "size of compare operand does not match";
-      }
+      DATA_INVARIANT(
+        compare_bv.size() == op.size(),
+        std::string("size of compare operand does not match:\n") +
+          "compare operand: " + std::to_string(compare_bv.size()) +
+          "\noperand: " + std::to_string(op.size()) + '\n' + it->pretty());
 
       compare_literal=bv_utils.equal(compare_bv, op);
       compare_literal=prop.land(!previous_compare, compare_literal);
@@ -68,15 +64,11 @@ bvt boolbvt::convert_case(const exprt &expr)
       break;
 
     case VALUE:
-      if(bv.size()!=op.size())
-      {
-        std::cerr << "result size: " << bv.size()
-                  << "\noperand: " << op.size() << '\n'
-                  << it->pretty()
-                  << '\n';
-
-        throw "size of value operand does not match";
-      }
+      DATA_INVARIANT(
+        bv.size() == op.size(),
+        std::string("size of value operand does not match:\n") +
+          "result size: " + std::to_string(bv.size()) +
+          "\noperand: " + std::to_string(op.size()) + '\n' + it->pretty());
 
       {
         literalt value_literal=bv_utils.equal(bv, op);

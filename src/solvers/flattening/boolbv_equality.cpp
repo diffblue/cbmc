@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <iostream>
-
 #include <util/std_expr.h>
 #include <util/base_type.h>
 #include <util/invariant.h>
@@ -44,14 +42,12 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
   const bvt &bv0=convert_bv(expr.lhs());
   const bvt &bv1=convert_bv(expr.rhs());
 
-  if(bv0.size()!=bv1.size())
-  {
-    std::cerr << "lhs: " << expr.lhs().pretty() << '\n';
-    std::cerr << "lhs size: " << bv0.size() << '\n';
-    std::cerr << "rhs: " << expr.rhs().pretty() << '\n';
-    std::cerr << "rhs size: " << bv1.size() << '\n';
-    throw "unexpected size mismatch on equality";
-  }
+  DATA_INVARIANT(
+    bv0.size() == bv1.size(),
+    std::string("unexpected size mismatch on equality:\n") + "lhs: " +
+      expr.lhs().pretty() + '\n' + "lhs size: " + std::to_string(bv0.size()) +
+      '\n' + "rhs: " + expr.rhs().pretty() + '\n' +
+      "rhs size: " + std::to_string(bv1.size()));
 
   if(bv0.empty())
   {
@@ -80,14 +76,12 @@ literalt boolbvt::convert_verilog_case_equality(
   const bvt &bv0=convert_bv(expr.lhs());
   const bvt &bv1=convert_bv(expr.rhs());
 
-  if(bv0.size()!=bv1.size())
-  {
-    std::cerr << "lhs: " << expr.lhs().pretty() << '\n';
-    std::cerr << "lhs size: " << bv0.size() << '\n';
-    std::cerr << "rhs: " << expr.rhs().pretty() << '\n';
-    std::cerr << "rhs size: " << bv1.size() << '\n';
-    throw "unexpected size mismatch on verilog_case_equality";
-  }
+  DATA_INVARIANT(
+    bv0.size() == bv1.size(),
+    std::string("unexpected size mismatch on verilog_case_equality:\n") +
+      "lhs: " + expr.lhs().pretty() + '\n' + "lhs size: " +
+      std::to_string(bv0.size()) + '\n' + "rhs: " + expr.rhs().pretty() + '\n' +
+      "rhs size: " + std::to_string(bv1.size()));
 
   if(expr.id()==ID_verilog_case_inequality)
     return !bv_utils.equal(bv0, bv1);
