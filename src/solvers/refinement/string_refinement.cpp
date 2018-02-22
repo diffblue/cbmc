@@ -2397,18 +2397,17 @@ static exprt instantiate(
   const exprt &str,
   const exprt &val)
 {
-  exprt idx=find_index(axiom.body(), str, axiom.univ_var());
+  const exprt idx = find_index(axiom.body(), str, axiom.univ_var());
   if(idx.is_nil())
     return true_exprt();
 
-  exprt r=compute_inverse_function(stream, axiom.univ_var(), val, idx);
+  const exprt r = compute_inverse_function(stream, axiom.univ_var(), val, idx);
   implies_exprt instance(axiom.premise(), axiom.body());
   replace_expr(axiom.univ_var(), r, instance);
   // We are not sure the index set contains only positive numbers
-  exprt bounds=and_exprt(
+  and_exprt bounds(
     axiom.univ_within_bounds(),
-    binary_relation_exprt(
-      from_integer(0, val.type()), ID_le, val));
+    binary_relation_exprt(from_integer(0, val.type()), ID_le, val));
   replace_expr(axiom.univ_var(), r, bounds);
   return implies_exprt(bounds, instance);
 }
