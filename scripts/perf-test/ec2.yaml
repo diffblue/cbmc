@@ -151,6 +151,7 @@ Resources:
                     # install packages
                     apt-get -y update
                     apt-get install -y git time wget binutils awscli make jq
+                    apt-get install -y zip unzip
                     apt-get install -y gcc libc6-dev-i386
 
                     # cgroup set up for benchexec
@@ -203,9 +204,14 @@ Resources:
                     update-rc.d ec2-terminate defaults
                     systemctl start ec2-terminate
 
+                    # update benchexec
+                    cd /mnt/benchexec
+                    git pull
+
                     # prepare for tool packaging
                     cd /mnt
                     cd cprover-sv-comp
+                    git pull
                     mkdir -p src/cbmc/
                     touch LICENSE
                     cd ..
@@ -290,10 +296,13 @@ Resources:
                         aws s3 cp s3://${S3Bucket}/${PerfTestId}/$cfg/cbmc \
                                 src/cbmc/cbmc
                         chmod a+x src/cbmc/cbmc
-                        make CBMC=. YEAR=N CBMC-sv-comp-N.tar.gz
+                        make CBMC=. cbmc.zip
                         cd ../run
-                        tar xzf ../cprover-sv-comp/CBMC-sv-comp-N.tar.gz
-                        rm ../cprover-sv-comp/CBMC-sv-comp-N.tar.gz
+                        unzip ../cprover-sv-comp/cbmc.zip
+                        mv cbmc cbmc-zip
+                        mv cbmc-zip/* .
+                        rmdir cbmc-zip
+                        rm ../cprover-sv-comp/cbmc.zip
 
                         date
                         echo "Task: $t"
