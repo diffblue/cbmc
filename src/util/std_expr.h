@@ -4807,4 +4807,61 @@ public:
   }
 };
 
+/*! \brief The popcount (counting the number of bits set to 1) expression
+*/
+class popcount_exprt: public unary_exprt
+{
+public:
+  popcount_exprt(): unary_exprt(ID_popcount)
+  {
+  }
+
+  popcount_exprt(const exprt &_op, const typet &_type)
+    : unary_exprt(ID_popcount, _op, _type)
+  {
+  }
+
+  explicit popcount_exprt(const exprt &_op)
+    : unary_exprt(ID_popcount, _op, _op.type())
+  {
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref popcount_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * popcount_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref popcount_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const popcount_exprt &to_popcount_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_popcount);
+  DATA_INVARIANT(expr.operands().size() == 1, "popcount must have one operand");
+  return static_cast<const popcount_exprt &>(expr);
+}
+
+/*! \copydoc to_popcount_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline popcount_exprt &to_popcount_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_popcount);
+  DATA_INVARIANT(expr.operands().size() == 1, "popcount must have one operand");
+  return static_cast<popcount_exprt &>(expr);
+}
+
+template <>
+inline bool can_cast_expr<popcount_exprt>(const exprt &base)
+{
+  return base.id() == ID_popcount;
+}
+inline void validate_expr(const popcount_exprt &value)
+{
+  validate_operands(value, 1, "popcount must have one operand");
+}
+
 #endif // CPROVER_UTIL_STD_EXPR_H

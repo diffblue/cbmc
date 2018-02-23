@@ -136,20 +136,19 @@ bool simplify_exprt::simplify_sign(exprt &expr)
   return true;
 }
 
-bool simplify_exprt::simplify_popcount(exprt &expr)
+bool simplify_exprt::simplify_popcount(popcount_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return true;
+  const exprt &op = expr.op();
 
-  if(expr.op0().is_constant())
+  if(op.is_constant())
   {
-    const typet &type=ns.follow(expr.op0().type());
+    const typet &type=ns.follow(op.type());
 
     if(type.id()==ID_signedbv ||
        type.id()==ID_unsignedbv)
     {
       mp_integer value;
-      if(!to_integer(expr.op0(), value))
+      if(!to_integer(op, value))
       {
         std::size_t result;
 
@@ -157,7 +156,8 @@ bool simplify_exprt::simplify_popcount(exprt &expr)
           if(value.is_odd())
             result++;
 
-        expr=from_integer(result, expr.type());
+        exprt simp_result = from_integer(result, expr.type());
+        expr.swap(simp_result);
 
         return false;
       }
@@ -2334,8 +2334,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_abs(expr) && result;
   else if(expr.id()==ID_sign)
     result=simplify_sign(expr) && result;
-  else if(expr.id()==ID_popcount)
-    result=simplify_popcount(expr) && result;
+  else if(expr.id() == ID_popcount)
+    result = simplify_popcount(to_popcount_expr(expr)) && result;
 
   #ifdef DEBUGX
   if(!result
