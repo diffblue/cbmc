@@ -1,0 +1,8 @@
+CORE
+VirtualFunctions.class
+--lazy-methods --java-max-vla-length 48 --unwind 8 --java-unwind-enum-static --trace --cover location --function VirtualFunctions.check --show-goto-functions
+ \(struct VirtualFunctions\$B \*\)a \. VirtualFunctions\$B\.f:\(\)V\(\);$
+ a \. VirtualFunctions\$A\.f:\(\)V\(\);$
+ b \. VirtualFunctions\$B\.f:\(\)V\(\);$
+ \(struct VirtualFunctions\$B \*\)c \. VirtualFunctions\$B\.f:\(\)V\(\);$
+--
