@@ -708,7 +708,12 @@ void c_typecheck_baset::typecheck_declaration(
 
         // alias function need not have been declared yet, thus
         // can't lookup
-        symbol.value=symbol_exprt(full_spec.alias);
+        // also cater for renaming/placement in sections
+        const auto &renaming_entry = asm_label_map.find(full_spec.alias);
+        if(renaming_entry == asm_label_map.end())
+          symbol.value = symbol_exprt(full_spec.alias);
+        else
+          symbol.value = symbol_exprt(renaming_entry->second);
         symbol.is_macro=true;
       }
 
