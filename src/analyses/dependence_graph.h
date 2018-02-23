@@ -162,7 +162,19 @@ private:
   node_indext node_id;
 
   typedef std::set<goto_programt::const_targett> depst;
-  depst control_deps, data_deps;
+
+  // Set of locations with control instructions on which the instruction at this
+  // location has a control dependency on
+  depst control_deps;
+
+  // Set of locations with control instructions from which there is a path in
+  // the CFG to the current location (with the locations being in the same
+  // function). The set control_deps is a subset of this set.
+  depst control_dep_candidates;
+
+  // Set of locations with instructions on which the instruction at this
+  // location has a data dependency on
+  depst data_deps;
 
   friend const depst &
     dependence_graph_test_get_control_deps(const dep_graph_domaint &);
