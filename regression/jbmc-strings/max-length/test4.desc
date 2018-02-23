@@ -1,0 +1,11 @@
+CORE
+Test.class
+--refine-strings --verbosity 10 --string-max-length 4000 --function Test.checkMaxLength
+^SIGNAL=0$
+--
+^EXIT=0$
+assertion.* line 25 function java::Test.checkMaxLength.* bytecode-index 26: SUCCESS
+--
+The solver may give an ERROR because the value of string-max-length is too
+small to give an answer about the assertion.
+So we just check that the answer is not success.
