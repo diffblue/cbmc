@@ -1113,15 +1113,49 @@ static optionalt<exprt> get_array(
   const array_typet ret_type(char_type, from_integer(n, index_type));
   array_exprt ret(ret_type);
 
+  if(n==0)
+    return empty_ret;
+
   if(n>max_string_length)
   {
     stream << "(sr::get_array) long string (size=" << n << "):"
            << from_expr(ns, "", arr_val) << eom;
-    return {};
   }
 
-  if(n==0)
-    return empty_ret;
+  if(arr_val.id()=="array-list")
+  {
+    DATA_INVARIANT(
+      arr_val.operands().size()%2 == 0,
+      "array-list must have even number of operands");
+    std::map<std::size_t, exprt> initial_map;
+    exprt array = array_of_exprt(
+      from_integer(CHARACTER_FOR_UNKNOWN, char_type), ret_type);
+    for(size_t i = 0; i < arr_val.operands().size(); i += 2)
+    {
+      const exprt &index = arr_val.operands()[i];
+      const auto idx = numeric_cast<std::size_t>(index);
+      if(idx.has_value() && *idx < max_string_length)
+      {
+        const exprt new_value = arr_val.operands()[i + 1];
+        array = with_exprt(array, from_integer(*idx, index_type), new_value);
+      }
+    }
+    return array;
+  }
+  else if(arr_val.id() == ID_array)
+  {
+    ret.operands().insert(
+      ret.operands().end(),
+      arr_val.operands().begin(),
+      arr_val.operands().size() >= n ? arr_val.operands().begin() + n
+                                     : arr_val.operands().end());
+    return ret;
+  }
+  else
+  {
+    stream << "get_array: not an array or array list" << eom;
+    return {};
+  }
 
   if(arr_val.id()=="array-list")
   {
@@ -2533,25 +2567,17 @@ exprt string_refinementt::get(const exprt &expr) const
         concretize_arrays_in_expression(arr_model, max_string_length, ns);
       return concretized_array;
     }
-    else
+    else if(generator.get_created_strings().count(arr))
     {
-      auto set = generator.get_created_strings();
-      if(set.find(arr) != set.end())
-      {
-        exprt length = super_get(arr.length());
-        if(const auto n = numeric_cast<std::size_t>(length))
-        {
-          exprt arr_model =
-            array_exprt(array_typet(arr.type().subtype(), length));
-          for(size_t i = 0; i < *n; i++)
-            arr_model.copy_to_operands(exprt(ID_unknown, arr.type().subtype()));
-          const exprt concretized_array =
-            concretize_arrays_in_expression(arr_model, max_string_length, ns);
-          return concretized_array;
-        }
-      }
-      return arr;
+      const exprt default_char =
+        from_integer(CHARACTER_FOR_UNKNOWN, arr.type().subtype());
+      const exprt length_expr = super_get(arr.length());
+      const array_typet type(arr.type().subtype(), length_expr);
+      const array_of_exprt array_of(default_char, type);
+      return fill_in_array_with_expr(array_of, max_string_length);
     }
+    else
+      return arr;
   }
   return supert::get(ecopy);
 }
