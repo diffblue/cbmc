@@ -68,9 +68,10 @@ class dep_graph_domaint:public ai_domain_baset
 public:
   typedef grapht<dep_nodet>::node_indext node_indext;
 
-  dep_graph_domaint():
-    has_values(false),
-    node_id(std::numeric_limits<node_indext>::max())
+  dep_graph_domaint()
+    : has_values(false),
+      node_id(std::numeric_limits<node_indext>::max()),
+      has_changed(false)
   {
   }
 
@@ -101,6 +102,7 @@ public:
 
     has_values=tvt(true);
     control_deps.clear();
+    control_dep_candidates.clear();
     data_deps.clear();
   }
 
@@ -111,12 +113,24 @@ public:
 
     has_values=tvt(false);
     control_deps.clear();
+    control_dep_candidates.clear();
     data_deps.clear();
+
+    has_changed = false;
   }
 
   void make_entry() final override
   {
-    make_top();
+    DATA_INVARIANT(
+      node_id != std::numeric_limits<node_indext>::max(),
+      "node_id must not be valid");
+
+    has_values = tvt::unknown();
+    control_deps.clear();
+    control_dep_candidates.clear();
+    data_deps.clear();
+
+    has_changed = false;
   }
 
   bool is_top() const final override
@@ -124,9 +138,11 @@ public:
     DATA_INVARIANT(node_id!=std::numeric_limits<node_indext>::max(),
                    "node_id must be valid");
 
-    DATA_INVARIANT(!has_values.is_true() ||
-                   (control_deps.empty() && data_deps.empty()),
-                   "If the domain is top, it must have no dependencies");
+    DATA_INVARIANT(
+      !has_values.is_true() ||
+        (control_deps.empty() && control_dep_candidates.empty() &&
+         data_deps.empty()),
+      "If the domain is top, it must have no dependencies");
 
     return has_values.is_true();
   }
@@ -136,9 +152,11 @@ public:
     DATA_INVARIANT(node_id!=std::numeric_limits<node_indext>::max(),
                    "node_id must be valid");
 
-    DATA_INVARIANT(!has_values.is_false() ||
-                   (control_deps.empty() && data_deps.empty()),
-                   "If the domain is bottom, it must have no dependencies");
+    DATA_INVARIANT(
+      !has_values.is_false() ||
+        (control_deps.empty() && control_dep_candidates.empty() &&
+         data_deps.empty()),
+      "If the domain is bottom, it must have no dependencies");
 
     return has_values.is_false();
   }
@@ -160,6 +178,7 @@ public:
 private:
   tvt has_values;
   node_indext node_id;
+  bool has_changed;
 
   typedef std::set<goto_programt::const_targett> depst;
 

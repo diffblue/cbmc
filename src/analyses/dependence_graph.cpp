@@ -27,18 +27,27 @@ bool dep_graph_domaint::merge(
   goto_programt::const_targett from,
   goto_programt::const_targett to)
 {
-  bool changed = false;
+  // An abstract state at location `to` may be non-bottom even if
+  // `merge(..., `to`) has not been called so far. This is due to the special
+  // handling of function entry edges (see transform()).
+  bool changed = is_bottom() || has_changed;
 
-  if(is_bottom())
+  // For computing the data dependencies, we would not need a fixpoint
+  // computation. The data dependencies at a location are computed from the
+  // result of the reaching definitions analysis at that location
+  // (in data_dependencies()). Thus, we only need to set the data dependencies
+  // part of an abstract state at a certain location once.
+  if(changed && data_deps.empty())
   {
-    has_values = tvt::unknown();
     data_deps = src.data_deps;
-    changed = true;
+    has_values = tvt::unknown();
   }
 
   changed |= util_inplace_set_union(control_deps, src.control_deps);
   changed |=
     util_inplace_set_union(control_dep_candidates, src.control_dep_candidates);
+
+  has_changed = false;
 
   return changed;
 }
@@ -206,8 +215,15 @@ void dep_graph_domaint::transform(
         dynamic_cast<dep_graph_domaint*>(&(dep_graph->get_state(next)));
       assert(s!=nullptr);
 
-      util_inplace_set_union(s->control_deps, control_deps);
-      util_inplace_set_union(s->control_dep_candidates, control_dep_candidates);
+      if(s->is_bottom())
+      {
+        s->has_values = tvt::unknown();
+        s->has_changed = true;
+      }
+
+      s->has_changed |= util_inplace_set_union(s->control_deps, control_deps);
+      s->has_changed |= util_inplace_set_union(
+        s->control_dep_candidates, control_dep_candidates);
 
       control_deps.clear();
       control_dep_candidates.clear();
