@@ -3,11 +3,11 @@ main.c
 --cover location
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main\.coverage\.1\] .* function main block 1: SATISFIED$
+^\[main\.coverage\.1\] .* function main block 1.*: SATISFIED$
 (1 of 1|3 of 3) covered \(100\.0%\)$
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-^\[main\.coverage\..\] .* function main block .: FAILED$
+^\[main\.coverage\..\] .* function main block .*: FAILED$
 --
 On Windows/Visual Studio, "assert" does not introduce any branching.

@@ -35,7 +35,10 @@ void cover_location_instrumentert::instrument(
     // filter goals
     if(goal_filters(source_location))
     {
-      const std::string comment = "block " + b;
+      const std::string source_lines =
+        id2string(source_location.get_basic_block_source_lines());
+      const std::string comment =
+        "block " + b + " (lines " + source_lines + ")";
       goto_program.insert_before_swap(i_it);
       i_it->make_assertion(false_exprt());
       i_it->source_location = source_location;

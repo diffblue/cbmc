@@ -3,13 +3,13 @@ main.c
 --cover location
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.coverage.1\] file main.c line 19 function main block 1: SATISFIED$
-^\[main.coverage.2\] file main.c line 20 function main block 2: SATISFIED$
-^\[func.coverage.1\] file main.c line 3 function func block 1: SATISFIED$
-^\[func.coverage.2\] file main.c line 6 function func block 2: FAILED$
-^\[func.coverage.3\] file main.c line 8 function func block 3: FAILED$
-^\[func.coverage.4\] file main.c line 12 function func block 4: FAILED$
-^\[func.coverage.5\] file main.c line 15 function func block 5: SATISFIED$
+^\[main.coverage.1\] file main.c line 19 function main block 1.*: SATISFIED$
+^\[main.coverage.2\] file main.c line 20 function main block 2.*: SATISFIED$
+^\[func.coverage.1\] file main.c line 3 function func block 1.*: SATISFIED$
+^\[func.coverage.2\] file main.c line 6 function func block 2.*: FAILED$
+^\[func.coverage.3\] file main.c line 8 function func block 3.*: FAILED$
+^\[func.coverage.4\] file main.c line 12 function func block 4.*: FAILED$
+^\[func.coverage.5\] file main.c line 15 function func block 5.*: SATISFIED$
 ^\*\* 4 of 7 covered \(57.1%\)
 --
 ^warning: ignoring

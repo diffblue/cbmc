@@ -89,6 +89,11 @@ public:
     return get(ID_basic_block_covered_lines);
   }
 
+  const irep_idt &get_basic_block_source_lines() const
+  {
+    return get(ID_basic_block_source_lines);
+  }
+
   void set_file(const irep_idt &file)
   {
     set(ID_file, file);
@@ -153,6 +158,11 @@ public:
   void set_basic_block_covered_lines(const irep_idt &covered_lines)
   {
     return set(ID_basic_block_covered_lines, covered_lines);
+  }
+
+  void set_basic_block_source_lines(const irep_idt &source_lines)
+  {
+    return set(ID_basic_block_source_lines, source_lines);
   }
 
   void set_hide()

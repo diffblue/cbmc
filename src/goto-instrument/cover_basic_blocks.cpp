@@ -61,7 +61,10 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
     // update lines belonging to block
     const irep_idt &line = it->source_location.get_line();
     if(!line.empty())
+    {
       block_info.lines.insert(unsafe_string2unsigned(id2string(line)));
+      block_info.source_lines.insert(it->source_location);
+    }
 
     // set representative program location to instrument
     if(
@@ -84,7 +87,10 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
   }
 
   for(auto &block_info : block_infos)
+  {
     update_covered_lines(block_info);
+    update_source_lines(block_info);
+  }
 }
 
 std::size_t cover_basic_blockst::block_of(goto_programt::const_targett t) const
@@ -162,19 +168,46 @@ void cover_basic_blockst::update_covered_lines(block_infot &block_info)
   block_info.source_location.set_basic_block_covered_lines(covered_lines);
 }
 
+void cover_basic_blockst::update_source_lines(block_infot &block_info)
+{
+  if(block_info.source_location.is_nil())
+    return;
+
+  const auto &source_lines = block_info.source_lines;
+  std::string str = source_lines.to_string();
+  INVARIANT(!str.empty(), "source lines set must not be empty");
+  block_info.source_location.set_basic_block_source_lines(str);
+}
+
 cover_basic_blocks_javat::cover_basic_blocks_javat(
   const goto_programt &_goto_program)
 {
+  std::set<std::size_t> source_lines_requiring_update;
+
   forall_goto_program_instructions(it, _goto_program)
   {
     const auto &location = it->source_location;
     const auto &bytecode_index = location.get_java_bytecode_index();
-    if(index_to_block.emplace(bytecode_index, block_infos.size()).second)
+    auto entry = index_to_block.emplace(bytecode_index, block_infos.size());
+    if(entry.second)
     {
       block_infos.push_back(it);
       block_locations.push_back(location);
       block_locations.back().set_basic_block_covered_lines(location.get_line());
+      block_source_lines.emplace_back(location);
+      source_lines_requiring_update.insert(entry.first->second);
     }
+    else
+    {
+      block_source_lines[entry.first->second].insert(location);
+      source_lines_requiring_update.insert(entry.first->second);
+    }
+  }
+
+  for(std::size_t i : source_lines_requiring_update)
+  {
+    block_locations.at(i).set_basic_block_source_lines(
+      block_source_lines.at(i).to_string());
   }
 }
 
