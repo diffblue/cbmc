@@ -75,8 +75,10 @@ void class_hierarchy_grapht::populate(const symbol_tablet &symbol_table)
       {
         const irep_idt &parent = to_symbol_type(base.type()).get_identifier();
         if(!parent.empty())
+        {
           add_edge(
             nodes_by_name.at(parent), nodes_by_name.at(symbol_pair.first));
+        }
       }
     }
   }

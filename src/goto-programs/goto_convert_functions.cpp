@@ -45,7 +45,9 @@ void goto_convert_functionst::goto_convert(goto_functionst &functions)
       symbol_pair.second.type.id() == ID_code &&
       (symbol_pair.second.mode == ID_C || symbol_pair.second.mode == ID_cpp ||
        symbol_pair.second.mode == ID_java || symbol_pair.second.mode == "jsil"))
+    {
       symbol_list.push_back(symbol_pair.first);
+    }
   }
 
   for(const auto &id : symbol_list)
@@ -62,7 +64,9 @@ void goto_convert_functionst::goto_convert(goto_functionst &functions)
     if(!symbol_pair.second.is_type &&
        symbol_pair.second.type.id()==ID_code &&
        symbol_pair.second.value.is_not_nil())
+    {
       symbol_pair.second.value=codet();
+    }
   }
   #endif
 }
