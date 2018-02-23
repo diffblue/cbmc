@@ -16,6 +16,7 @@ Date: August 2013
 
 #include <cassert>
 
+#include <util/container_utils.h>
 #include <util/json.h>
 #include <util/json_expr.h>
 
@@ -26,36 +27,16 @@ bool dep_graph_domaint::merge(
   goto_programt::const_targett from,
   goto_programt::const_targett to)
 {
-  bool changed=has_values.is_false();
-  has_values=tvt::unknown();
+  bool changed = false;
 
-  depst::iterator it=control_deps.begin();
-  for(const auto &c_dep : src.control_deps)
+  if(is_bottom())
   {
-    while(it!=control_deps.end() && *it<c_dep)
-      ++it;
-    if(it==control_deps.end() || c_dep<*it)
-    {
-      control_deps.insert(it, c_dep);
-      changed=true;
-    }
-    else if(it!=control_deps.end())
-      ++it;
+    has_values = tvt::unknown();
+    data_deps = src.data_deps;
+    changed = true;
   }
 
-  it=data_deps.begin();
-  for(const auto &d_dep : src.data_deps)
-  {
-    while(it!=data_deps.end() && *it<d_dep)
-      ++it;
-    if(it==data_deps.end() || d_dep<*it)
-    {
-      data_deps.insert(it, d_dep);
-      changed=true;
-    }
-    else if(it!=data_deps.end())
-      ++it;
-  }
+  changed |= util_inplace_set_union(control_deps, src.control_deps);
 
   return changed;
 }
@@ -208,17 +189,7 @@ void dep_graph_domaint::transform(
         dynamic_cast<dep_graph_domaint*>(&(dep_graph->get_state(next)));
       assert(s!=nullptr);
 
-      depst::iterator it=s->control_deps.begin();
-      for(const auto &c_dep : control_deps)
-      {
-        while(it!=s->control_deps.end() && *it<c_dep)
-          ++it;
-        if(it==s->control_deps.end() || c_dep<*it)
-          s->control_deps.insert(it, c_dep);
-        else if(it!=s->control_deps.end())
-          ++it;
-      }
-
+      util_inplace_set_union(s->control_deps, control_deps);
       control_deps.clear();
     }
   }
