@@ -537,9 +537,8 @@ void java_bytecode_parsert::rconstant_pool()
         symbol_typet class_symbol=
           java_classname(id2string(class_name_entry.s));
 
-        exprt fieldref("fieldref", type);
-        fieldref.set(ID_class, class_symbol.get_identifier());
-        fieldref.set(ID_component_name, name_entry.s);
+        fieldref_exprt fieldref(
+          type, name_entry.s, class_symbol.get_identifier());
 
         it->expr=fieldref;
       }
