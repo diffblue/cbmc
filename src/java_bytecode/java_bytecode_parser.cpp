@@ -756,8 +756,10 @@ void java_bytecode_parsert::rbytecode(
     case 'o': // two byte branch offset, signed
       {
         s2 offset=read_u2();
+        // By converting the signed offset into an absolute address (by adding
+        // the current address) the number represented becomes unsigned.
         instruction.args.push_back(
-          from_integer(address+offset, signedbv_typet(16)));
+          from_integer(address+offset, unsignedbv_typet(16)));
       }
       address+=2;
       break;
@@ -765,8 +767,10 @@ void java_bytecode_parsert::rbytecode(
     case 'O': // four byte branch offset, signed
       {
         s4 offset=read_u4();
+        // By converting the signed offset into an absolute address (by adding
+        // the current address) the number represented becomes unsigned.
         instruction.args.push_back(
-          from_integer(address+offset, signedbv_typet(32)));
+          from_integer(address+offset, unsignedbv_typet(32)));
       }
       address+=4;
       break;
@@ -820,8 +824,10 @@ void java_bytecode_parsert::rbytecode(
 
         // now default value
         s4 default_value=read_u4();
+        // By converting the signed offset into an absolute address (by adding
+        // the current address) the number represented becomes unsigned.
         instruction.args.push_back(
-          from_integer(base_offset+default_value, signedbv_typet(32)));
+          from_integer(base_offset+default_value, unsignedbv_typet(32)));
         address+=4;
 
         // number of pairs
@@ -834,8 +840,10 @@ void java_bytecode_parsert::rbytecode(
           s4 offset=read_u4();
           instruction.args.push_back(
             from_integer(match, signedbv_typet(32)));
+          // By converting the signed offset into an absolute address (by adding
+          // the current address) the number represented becomes unsigned.
           instruction.args.push_back(
-            from_integer(base_offset+offset, signedbv_typet(32)));
+            from_integer(base_offset+offset, unsignedbv_typet(32)));
           address+=8;
         }
       }
@@ -867,8 +875,10 @@ void java_bytecode_parsert::rbytecode(
         {
           s4 offset=read_u4();
           instruction.args.push_back(from_integer(i, signedbv_typet(32)));
+          // By converting the signed offset into an absolute address (by adding
+          // the current address) the number represented becomes unsigned.
           instruction.args.push_back(
-            from_integer(base_offset+offset, signedbv_typet(32)));
+            from_integer(base_offset+offset, unsignedbv_typet(32)));
           address+=4;
         }
       }
