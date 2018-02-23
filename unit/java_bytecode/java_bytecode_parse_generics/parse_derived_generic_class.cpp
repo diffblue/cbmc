@@ -36,8 +36,6 @@ SCENARIO(
         {{require_type::type_argument_kindt::Inst,
           "java::Interface_Implementation"}});
     }
-
-    // TODO: Check that specialised superclass is created. TG-1419
   }
 
   THEN("There should be a symbol for the DerivedGenericInst2 class")
@@ -61,8 +59,6 @@ SCENARIO(
           "java::Interface_Implementation"},
          {require_type::type_argument_kindt::Inst, "java::java.lang.Integer"}});
     }
-
-    // TODO: Check that specialised superclass is created. TG-1419
   }
 
   THEN("There should be a symbol for the DerivedGenericUninst class")
@@ -85,8 +81,6 @@ SCENARIO(
         {{require_type::type_argument_kindt::Var,
           "java::DerivedGenericUninst::T"}});
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418
   }
 
   THEN("There should be a symbol for the DerivedGenericMixed1 class")
@@ -109,8 +103,6 @@ SCENARIO(
         {{require_type::type_argument_kindt::Inst,
           "java::Interface_Implementation"}});
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN("There should be a symbol for the DerivedGenericMixed2 class")
@@ -134,8 +126,6 @@ SCENARIO(
           "java::DerivedGenericMixed2::T"},
          {require_type::type_argument_kindt::Inst, "java::java.lang.Integer"}});
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN("There should be a symbol for the ContainsInnerClass$InnerClass class")
@@ -157,8 +147,6 @@ SCENARIO(
         "java::Generic",
         {{require_type::type_argument_kindt::Inst, "java::java.lang.Integer"}});
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN(
@@ -183,8 +171,6 @@ SCENARIO(
         {{require_type::type_argument_kindt::Var,
           "java::ContainsInnerClass$InnerClassGeneric::T"}});
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN(
@@ -210,8 +196,6 @@ SCENARIO(
         {{require_type::type_argument_kindt::Var,
           "java::ContainsInnerClassGeneric::T"}});
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN("There should be a symbol for the ThreeHierarchy class")
@@ -233,8 +217,6 @@ SCENARIO(
         "java::DerivedGenericMixed2",
         {{require_type::type_argument_kindt::Inst, "java::java.lang.String"}});
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN(
@@ -268,8 +250,6 @@ SCENARIO(
             "java::java.lang.Integer"}});
       }
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN(
@@ -302,8 +282,6 @@ SCENARIO(
             "java::ImplementsInterfaceGenericUnspec::E"}});
       }
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN(
@@ -342,8 +320,6 @@ SCENARIO(
         require_type::require_symbol(base_type, "java::Interface");
       }
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN(
@@ -386,8 +362,6 @@ SCENARIO(
             "java::java.lang.Integer"}});
       }
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN(
@@ -432,8 +406,6 @@ SCENARIO(
             "java::ExtendsAndImplementsGeneric::T"}});
       }
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN(
@@ -471,8 +443,6 @@ SCENARIO(
              "java::java.lang.Integer"}});
       }
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN(
@@ -517,8 +487,6 @@ SCENARIO(
              "java::java.lang.Integer"}});
       }
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN(
@@ -556,8 +524,6 @@ SCENARIO(
              "java::ExtendsAndImplementsSameInterfaceGeneric::T"}});
       }
     }
-
-    // TODO: Check that specialised superclass is created. TG-1418, TG-1419
   }
 
   THEN("There should be a symbol for the `ExtendImplicit` class")
