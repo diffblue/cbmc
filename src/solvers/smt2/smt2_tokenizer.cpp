@@ -219,9 +219,13 @@ smt2_tokenizert::tokent smt2_tokenizert::next_token()
 
     case ';': // comment
       // skip until newline
-      while(in->get(ch) && ch!='\n')
+      while(in->get(ch))
       {
-        // ignore
+        if(ch=='\n')
+        {
+          line_no++;
+          break;
+        }
       }
       break;
 
