@@ -216,9 +216,9 @@ INCLUDES += -I .. \
   $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
 	$(PRECOSAT_INCLUDE) $(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
 
-CLEANFILES = solvers$(LIBEXT)
+CLEANFILES = solvers$(LIBEXT) smt2_solver$(EXEEXT)
 
-all: solvers$(LIBEXT)
+all: solvers$(LIBEXT) smt2_solver$(EXEEXT)
 
 ifneq ($(SQUOLEM2),)
   CP_CXXFLAGS += -DHAVE_QBF_CORE
@@ -232,9 +232,15 @@ endif
 
 -include $(SRC:.cpp=.d)
 
-###############################################################################
-
-solvers$(LIBEXT): $(OBJ) $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
+SOLVER_LIB = $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
         $(MINISAT2_LIB) $(SMVSAT_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
 	$(PRECOSAT_LIB) $(PICOSAT_LIB) $(LINGELING_LIB) $(GLUCOSE_LIB)
+
+###############################################################################
+
+solvers$(LIBEXT): $(OBJ) $(SOLVER_LIB)
 	$(LINKLIB) $(LIBSOLVER)
+
+smt2_solver$(EXEEXT): $(OBJ) smt2/smt2_solver$(OBJEXT) \
+	../util/util$(LIBEXT) ../langapi/langapi$(LIBEXT) ../big-int/big-int$(LIBEXT) $(SOLVER_LIB)
+	$(LINKBIN) $(LIBSOLVER)
