@@ -65,26 +65,23 @@ public:
 class equation_symbol_mappingt
 {
 public:
-  // Record index of the equations that contain a given expression
+  /// Record the fact that equation `i` contains expression `expr`
+  void add(const std::size_t i, const exprt &expr);
+
+  /// \param i: index corresponding to an equation
+  /// \return vector of expressions contained in the equation with the given
+  ///   index `i`
+  std::vector<exprt> find_expressions(const std::size_t i);
+
+  /// \param expr: an expression
+  /// \return vector of equations containing the given expression `expr`
+  std::vector<std::size_t> find_equations(const exprt &expr);
+
+private:
+  /// Record index of the equations that contain a given expression
   std::map<exprt, std::vector<std::size_t>> equations_containing;
-  // Record expressions that are contained in the equation with the given index
+  /// Record expressions that are contained in the equation with the given index
   std::unordered_map<std::size_t, std::vector<exprt>> strings_in_equation;
-
-  void add(const std::size_t i, const exprt &expr)
-  {
-    equations_containing[expr].push_back(i);
-    strings_in_equation[i].push_back(expr);
-  }
-
-  std::vector<exprt> find_expressions(const std::size_t i)
-  {
-    return strings_in_equation[i];
-  }
-
-  std::vector<std::size_t> find_equations(const exprt &expr)
-  {
-    return equations_containing[expr];
-  }
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_UTIL_H
