@@ -43,7 +43,7 @@ bvt float_utilst::from_signed_integer(const bvt &src)
   result.exponent=
     bv_utils.build_constant(
       src.size()-1,
-      address_bits(src.size()-1).to_long()+1);
+      address_bits(src.size() - 1) + 1);
 
   return rounder(result);
 }
@@ -58,7 +58,7 @@ bvt float_utilst::from_unsigned_integer(const bvt &src)
   result.exponent=
     bv_utils.build_constant(
       src.size()-1,
-      address_bits(src.size()-1).to_long()+1);
+      address_bits(src.size() - 1) + 1);
 
   result.sign=const_literal(false);
 
@@ -388,7 +388,7 @@ bvt float_utilst::limit_distance(
   const bvt &dist,
   mp_integer limit)
 {
-  std::size_t nb_bits=integer2unsigned(address_bits(limit));
+  std::size_t nb_bits = address_bits(limit);
 
   bvt upper_bits=dist;
   upper_bits.erase(upper_bits.begin(), upper_bits.begin()+nb_bits);
@@ -790,7 +790,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
   // The worst-case shift is the number of fraction
   // bits minus one, in case the faction is one exactly.
   assert(!fraction.empty());
-  unsigned depth=integer2unsigned(address_bits(fraction.size()-1));
+  std::size_t depth = address_bits(fraction.size() - 1);
 
   if(exponent.size()<depth)
     exponent=bv_utils.sign_extension(exponent, depth);
@@ -903,9 +903,7 @@ bvt float_utilst::rounder(const unbiased_floatt &src)
       aligned_exponent=src.exponent;
 
   {
-    std::size_t exponent_bits=
-      std::max((std::size_t)integer2size_t(address_bits(spec.f)),
-               (std::size_t)spec.e)+1;
+    std::size_t exponent_bits = std::max(address_bits(spec.f), spec.e) + 1;
 
     // before normalization, make sure exponent is large enough
     if(aligned_exponent.size()<exponent_bits)

@@ -233,7 +233,7 @@ exprt float_bvt::from_signed_integer(
   result.exponent=
     from_integer(
       src_width-1,
-      signedbv_typet(address_bits(src_width-1).to_long()+1));
+      signedbv_typet(address_bits(src_width - 1) + 1));
 
   return rounder(result, rm, spec);
 }
@@ -253,7 +253,7 @@ exprt float_bvt::from_unsigned_integer(
   result.exponent=
     from_integer(
       src_width-1,
-      signedbv_typet(address_bits(src_width-1).to_long()+1));
+      signedbv_typet(address_bits(src_width - 1) + 1));
 
   result.sign=false_exprt();
 
@@ -573,7 +573,7 @@ exprt float_bvt::limit_distance(
   const exprt &dist,
   mp_integer limit)
 {
-  std::size_t nb_bits=integer2unsigned(address_bits(limit));
+  std::size_t nb_bits = address_bits(limit);
   std::size_t dist_width=to_unsignedbv_type(dist.type()).get_width();
 
   if(dist_width<=nb_bits)
@@ -889,7 +889,7 @@ void float_bvt::normalization_shift(
   std::size_t exponent_bits=to_signedbv_type(exponent.type()).get_width();
   assert(fraction_bits!=0);
 
-  unsigned depth=integer2unsigned(address_bits(fraction_bits-1));
+  std::size_t depth = address_bits(fraction_bits - 1);
 
   if(exponent_bits<depth)
     exponent=typecast_exprt(exponent, signedbv_typet(depth));
@@ -1019,9 +1019,7 @@ exprt float_bvt::rounder(
         aligned_exponent=src.exponent;
 
   {
-    std::size_t exponent_bits=
-      std::max((std::size_t)integer2size_t(address_bits(spec.f)),
-               (std::size_t)spec.e)+1;
+    std::size_t exponent_bits = std::max(address_bits(spec.f), spec.e) + 1;
 
     // before normalization, make sure exponent is large enough
     if(to_signedbv_type(aligned_exponent.type()).get_width()<exponent_bits)
