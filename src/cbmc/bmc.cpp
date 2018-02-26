@@ -170,7 +170,7 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   {
     auto solver_stop = std::chrono::steady_clock::now();
     status() << "Runtime decision procedure: "
-             << std::chrono::duration<double>(solver_start-solver_stop).count()
+             << std::chrono::duration<double>(solver_stop-solver_start).count()
              << "s" << eom;
   }
 
