@@ -807,9 +807,8 @@ bool goto_analyzer_parse_optionst::process_goto_program(
 /// display command line help
 void goto_analyzer_parse_optionst::help()
 {
-  std::cout <<
-    "\n"
-    "* * GOTO-ANALYZER " CBMC_VERSION " - Copyright (C) 2017 ";
+  std::cout << "\n"
+               "* * GOTO-ANALYZER " CBMC_VERSION " - Copyright (C) 2017-2018 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
 
@@ -817,8 +816,8 @@ void goto_analyzer_parse_optionst::help()
 
   // clang-format off
   std::cout <<
-    "* *                Daniel Kroening, DiffBlue                * *\n"
-    "* *                 kroening@kroening.com                   * *\n"
+    "* *                  Daniel Kroening, DiffBlue                   * *\n"
+    "* *                   kroening@kroening.com                      * *\n"
     "\n"
     "Usage:                       Purpose:\n"
     "\n"

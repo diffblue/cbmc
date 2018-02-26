@@ -849,7 +849,7 @@ void cbmc_parse_optionst::help()
   // clang-format off
   std::cout <<
     "\n"
-    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2017 ";
+    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2018 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
 
