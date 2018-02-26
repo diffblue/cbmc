@@ -8,10 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 
-#include <cassert>
-
 #include "fixedbv.h"
 #include "ieee_float.h"
+#include "invariant.h"
 #include "std_types.h"
 #include "std_expr.h"
 
@@ -207,11 +206,17 @@ constant_exprt from_integer(
 }
 
 /// ceil(log2(size))
-mp_integer address_bits(const mp_integer &size)
+std::size_t address_bits(const mp_integer &size)
 {
-  mp_integer result, x=2;
+  // in theory an arbitrary-precision integer could be as large as
+  // numeric_limits<std::size_t>::max() * CHAR_BIT (but then we would only be
+  // able to store 2^CHAR_BIT many of those; the implementation of mp_integer as
+  // BigInt is much more restricted as its size is stored as an unsigned int
+  std::size_t result = 1;
 
-  for(result=1; x<size; result+=1, x*=2) {}
+  for(mp_integer x = 2; x < size; ++result, x *= 2) {}
+
+  INVARIANT(power(2, result) >= size, "address_bits(size) >= log2(size)");
 
   return result;
 }
@@ -222,7 +227,7 @@ mp_integer address_bits(const mp_integer &size)
 mp_integer power(const mp_integer &base,
                  const mp_integer &exponent)
 {
-  assert(exponent>=0);
+  PRECONDITION(exponent >= 0);
 
   /* There are a number of special cases which are:
    *  A. very common

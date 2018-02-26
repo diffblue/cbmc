@@ -155,7 +155,7 @@ Target numeric_cast_v(const exprt &arg)
 constant_exprt from_integer(const mp_integer &int_value, const typet &type);
 
 // ceil(log2(size))
-mp_integer address_bits(const mp_integer &size);
+std::size_t address_bits(const mp_integer &size);
 
 mp_integer power(const mp_integer &base, const mp_integer &exponent);
 
