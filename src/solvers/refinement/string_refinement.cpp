@@ -488,35 +488,6 @@ static union_find_replacet generate_symbol_resolution_from_equations(
   return solver;
 }
 
-/// Maps equation to expressions contained in them and conversely expressions to
-/// equations that contain them. This can be used on a subset of expressions
-/// which interests us, in particular strings. Equations are identified by an
-/// index of type `std::size_t` for more efficient insertion and lookup.
-class equation_symbol_mappingt
-{
-public:
-  // Record index of the equations that contain a given expression
-  std::map<exprt, std::vector<std::size_t>> equations_containing;
-  // Record expressions that are contained in the equation with the given index
-  std::unordered_map<std::size_t, std::vector<exprt>> strings_in_equation;
-
-  void add(const std::size_t i, const exprt &expr)
-  {
-    equations_containing[expr].push_back(i);
-    strings_in_equation[i].push_back(expr);
-  }
-
-  std::vector<exprt> find_expressions(const std::size_t i)
-  {
-    return strings_in_equation[i];
-  }
-
-  std::vector<std::size_t> find_equations(const exprt &expr)
-  {
-    return equations_containing[expr];
-  }
-};
-
 /// This is meant to be used on the lhs of an equation with string subtype.
 /// \param lhs: expression which is either of string type, or a symbol
 ///   representing a struct with some string members
@@ -1217,68 +1188,6 @@ void debug_model(
            << format(super_get(symbol)) << '\n';
   }
   stream << messaget::eom;
-}
-
-sparse_arrayt::sparse_arrayt(const with_exprt &expr)
-{
-  auto ref = std::ref(static_cast<const exprt &>(expr));
-  while(can_cast_expr<with_exprt>(ref.get()))
-  {
-    const auto &with_expr = expr_dynamic_cast<with_exprt>(ref.get());
-    const auto current_index = numeric_cast_v<std::size_t>(with_expr.where());
-    entries.emplace_back(current_index, with_expr.new_value());
-    ref = with_expr.old();
-  }
-
-  // This function only handles 'with' and 'array_of' expressions
-  PRECONDITION(ref.get().id() == ID_array_of);
-  default_value = expr_dynamic_cast<array_of_exprt>(ref.get()).what();
-}
-
-exprt sparse_arrayt::to_if_expression(const exprt &index) const
-{
-  return std::accumulate(
-    entries.begin(),
-    entries.end(),
-    default_value,
-    [&](
-      const exprt if_expr,
-      const std::pair<std::size_t, exprt> &entry) { // NOLINT
-      const exprt entry_index = from_integer(entry.first, index.type());
-      const exprt &then_expr = entry.second;
-      CHECK_RETURN(then_expr.type() == if_expr.type());
-      const equal_exprt index_equal(index, entry_index);
-      return if_exprt(index_equal, then_expr, if_expr, if_expr.type());
-    });
-}
-
-interval_sparse_arrayt::interval_sparse_arrayt(const with_exprt &expr)
-  : sparse_arrayt(expr)
-{
-  // Entries are sorted so that successive entries correspond to intervals
-  std::sort(
-    entries.begin(),
-    entries.end(),
-    [](
-      const std::pair<std::size_t, exprt> &a,
-      const std::pair<std::size_t, exprt> &b) { return a.first < b.first; });
-}
-
-exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const
-{
-  return std::accumulate(
-    entries.rbegin(),
-    entries.rend(),
-    default_value,
-    [&](
-      const exprt if_expr,
-      const std::pair<std::size_t, exprt> &entry) { // NOLINT
-      const exprt entry_index = from_integer(entry.first, index.type());
-      const exprt &then_expr = entry.second;
-      CHECK_RETURN(then_expr.type() == if_expr.type());
-      const binary_relation_exprt index_small_eq(index, ID_le, entry_index);
-      return if_exprt(index_small_eq, then_expr, if_expr, if_expr.type());
-    });
 }
 
 /// Create a new expression where 'with' expressions on arrays are replaced by
