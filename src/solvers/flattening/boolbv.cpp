@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv_type.h"
 
 #include "../floatbv/float_utils.h"
+#include "../lowering/expr_lowering.h"
 
 bool boolbvt::literal(
   const exprt &expr,
@@ -305,6 +306,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
       float_utils.debug2(bv0, bv1);
     return bv;
   }
+  else if(expr.id() == ID_popcount)
+    return convert_bv(lower_popcount(to_popcount_expr(expr), ns));
 
   return conversion_failed(expr);
 }
