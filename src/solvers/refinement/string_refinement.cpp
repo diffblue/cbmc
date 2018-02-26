@@ -2168,14 +2168,7 @@ static optionalt<exprt> find_counter_example(
   const symbol_exprt &var)
 {
   satcheck_no_simplifiert sat_check;
-  bv_refinementt::infot info;
-  info.ns=&ns;
-  info.prop=&sat_check;
-  info.refine_arithmetic=true;
-  info.refine_arrays=true;
-  info.max_node_refinement=5;
-  info.ui=ui;
-  bv_refinementt solver(info);
+  boolbvt solver(ns, sat_check);
   solver << axiom;
 
   if(solver()==decision_proceduret::resultt::D_SATISFIABLE)
