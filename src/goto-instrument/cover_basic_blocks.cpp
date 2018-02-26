@@ -74,13 +74,7 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
       block_info.source_location = it->source_location;
     }
 
-    next_is_target =
-#if 0
-      // Disabled for being too messy
-      it->is_goto() || it->is_function_call() || it->is_assume();
-#else
-      it->is_goto() || it->is_function_call();
-#endif
+    next_is_target = it->is_goto() || it->is_function_call() || it->is_assume();
   }
 
   for(auto &block_info : block_infos)
