@@ -130,7 +130,8 @@ linker_script_merget::linker_script_merget(
     replacement_predicates(
     {
       replacement_predicatet("address of array's first member",
-        [](const exprt expr){ return to_symbol_expr(expr.op0().op0()); },
+        [](const exprt &expr) -> const symbol_exprt&
+        { return to_symbol_expr(expr.op0().op0()); },
         [](const exprt expr)
         {
           return expr.id()==ID_address_of &&
@@ -146,7 +147,8 @@ linker_script_merget::linker_script_merget(
                  expr.op0().op1().type().id()==ID_signedbv;
         }),
       replacement_predicatet("address of array",
-        [](const exprt expr){ return to_symbol_expr(expr.op0()); },
+        [](const exprt &expr) -> const symbol_exprt&
+        { return to_symbol_expr(expr.op0()); },
         [](const exprt expr)
         {
           return expr.id()==ID_address_of &&
@@ -156,14 +158,16 @@ linker_script_merget::linker_script_merget(
                  expr.op0().type().id()==ID_array;
         }),
       replacement_predicatet("array variable",
-        [](const exprt expr){ return to_symbol_expr(expr); },
+        [](const exprt &expr) -> const symbol_exprt&
+        { return to_symbol_expr(expr); },
         [](const exprt expr)
         {
           return expr.id()==ID_symbol &&
                  expr.type().id()==ID_array;
         }),
       replacement_predicatet("pointer (does not need pointerizing)",
-        [](const exprt expr){ return to_symbol_expr(expr); },
+        [](const exprt &expr) -> const symbol_exprt&
+        { return to_symbol_expr(expr); },
         [](const exprt expr)
         {
           return expr.id()==ID_symbol &&
@@ -280,7 +284,8 @@ int linker_script_merget::pointerize_subexprs_of(
     {
       if(!pattern.match(expr))
         continue;
-      const symbol_exprt &inner_symbol=pattern.inner_symbol(expr);
+      // take a copy, expr will be changed below
+      const symbol_exprt inner_symbol=pattern.inner_symbol(expr);
       if(pair.first!=inner_symbol.get_identifier())
         continue;
       tmp=replace_expr(expr, linker_values, inner_symbol, pair.first,
