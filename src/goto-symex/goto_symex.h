@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 
 #include "goto_symex_state.h"
+#include "path_storage.h"
 #include "symex_target_equation.h"
 
 class byte_extract_exprt;
@@ -47,30 +48,11 @@ class goto_symext
 public:
   typedef goto_symex_statet statet;
 
-  /// \brief Information saved at a conditional goto to resume execution
-  struct branch_pointt
-  {
-    symex_target_equationt equation;
-    statet state;
-
-    explicit branch_pointt(const symex_target_equationt &e, const statet &s)
-      : equation(e), state(s, &equation)
-    {
-    }
-
-    explicit branch_pointt(const branch_pointt &other)
-      : equation(other.equation), state(other.state, &equation)
-    {
-    }
-  };
-
-  typedef std::list<branch_pointt> branch_worklistt;
-
   goto_symext(
     message_handlert &mh,
     const symbol_tablet &outer_symbol_table,
     symex_target_equationt &_target,
-    branch_worklistt &branch_worklist)
+    path_storaget &path_storage)
     : total_vccs(0),
       remaining_vccs(0),
       constant_propagation(true),
@@ -81,7 +63,7 @@ public:
       atomic_section_counter(0),
       log(mh),
       guard_identifier("goto_symex::\\guard"),
-      branch_worklist(branch_worklist)
+      path_storage(path_storage)
   {
     options.set_option("simplify", true);
     options.set_option("assertions", true);
@@ -462,7 +444,7 @@ protected:
   void replace_nondet(exprt &);
   void rewrite_quantifiers(exprt &, statet &);
 
-  branch_worklistt &branch_worklist;
+  path_storaget &path_storage;
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_H

@@ -22,8 +22,8 @@ symex_bmct::symex_bmct(
   message_handlert &mh,
   const symbol_tablet &outer_symbol_table,
   symex_target_equationt &_target,
-  goto_symext::branch_worklistt &branch_worklist)
-  : goto_symext(mh, outer_symbol_table, _target, branch_worklist),
+  path_storaget &path_storage)
+  : goto_symext(mh, outer_symbol_table, _target, path_storage),
     record_coverage(false),
     max_unwind(0),
     max_unwind_is_set(false),

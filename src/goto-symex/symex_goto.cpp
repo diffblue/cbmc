@@ -181,14 +181,14 @@ void goto_symext::symex_goto(statet &state)
     // executing from, so that goto_symex::symex_goto() knows that we've already
     // explored the branch starting from `state_pc` when it is later called at
     // this branch.
-    branch_pointt branch_point(target, state);
+    path_storaget::patht branch_point(target, state);
     branch_point.state.saved_target = new_state_pc;
     branch_point.state.has_saved_target = true;
     // `forward` tells us where the branch we're _currently_ executing is
     // pointing to; this needs to be inverted for the branch that we're saving,
     // so let its truth value for `backwards` be the same as ours for `forward`.
     branch_point.state.saved_target_is_backwards = forward;
-    branch_worklist.push_back(branch_point);
+    path_storage.push(branch_point);
     log.debug() << "Saving '" << new_state_pc->source_location << "'"
                 << log.eom;
   }

@@ -605,7 +605,8 @@ int bmct::do_language_agnostic_bmc(
   const symbol_tablet &symbol_table = model.get_symbol_table();
   message_handlert &mh = message.get_message_handler();
   safety_checkert::resultt result;
-  goto_symext::branch_worklistt worklist;
+  std::unique_ptr<path_storaget> worklist =
+    path_storaget::make(path_storaget::disciplinet::FIFO);
   try
   {
     {
@@ -614,17 +615,17 @@ int bmct::do_language_agnostic_bmc(
       std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
       cbmc_solver = solvers.get_solver();
       prop_convt &pc = cbmc_solver->prop_conv();
-      bmct bmc(opts, symbol_table, mh, pc, worklist, callback_after_symex);
+      bmct bmc(opts, symbol_table, mh, pc, *worklist, callback_after_symex);
       bmc.set_ui(ui);
       if(driver_configure_bmc)
         driver_configure_bmc(bmc, symbol_table);
       result = bmc.run(model);
     }
     INVARIANT(
-      opts.get_bool_option("paths") || worklist.empty(),
+      opts.get_bool_option("paths") || worklist->empty(),
       "the worklist should be empty after doing full-program "
       "model checking, but the worklist contains " +
-        std::to_string(worklist.size()) + " unexplored branches.");
+        std::to_string(worklist->size()) + " unexplored branches.");
 
     // When model checking, the bmc.run() above will already have explored
     // the entire program, and result contains the verification result. The
@@ -641,10 +642,10 @@ int bmct::do_language_agnostic_bmc(
     // difference between the implementations of perform_symbolic_exection()
     // in bmct and path_explorert, for more information.
 
-    while(!worklist.empty())
+    while(!worklist->empty())
     {
       message.status() << "___________________________\n"
-                       << "Starting new path (" << worklist.size()
+                       << "Starting new path (" << worklist->size()
                        << " to go)\n"
                        << message.eom;
       cbmc_solverst solvers(opts, symbol_table, message.get_message_handler());
@@ -652,7 +653,7 @@ int bmct::do_language_agnostic_bmc(
       std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
       cbmc_solver = solvers.get_solver();
       prop_convt &pc = cbmc_solver->prop_conv();
-      goto_symext::branch_pointt &resume = worklist.front();
+      path_storaget::patht &resume = worklist->peek();
       path_explorert pe(
         opts,
         symbol_table,
@@ -660,12 +661,12 @@ int bmct::do_language_agnostic_bmc(
         pc,
         resume.equation,
         resume.state,
-        worklist,
+        *worklist,
         callback_after_symex);
       if(driver_configure_bmc)
         driver_configure_bmc(pe, symbol_table);
       result &= pe.run(model);
-      worklist.pop_front();
+      worklist->pop();
     }
   }
   catch(const char *error_msg)
@@ -701,7 +702,7 @@ void bmct::perform_symbolic_execution(
 {
   symex.symex_from_entry_point_of(get_goto_function, symex_symbol_table);
   INVARIANT(
-    options.get_bool_option("paths") || branch_worklist.empty(),
+    options.get_bool_option("paths") || path_storage.empty(),
     "Branch points were saved even though we should have been "
     "executing the entire program and merging paths");
 }
