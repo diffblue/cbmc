@@ -215,6 +215,9 @@ codet get_clinit_wrapper_body(
 
 /// Create static initializer wrappers for all classes that need them.
 /// \param symbol_table: global symbol table
+/// \param synthetic_methods: synthetic methods map. Will be extended noting
+///   that any wrapper belongs to this code, and so `get_clinit_wrapper_body`
+///   should be used to produce the method body when required.
 void create_static_initializer_wrappers(
   symbol_tablet &symbol_table,
   synthetic_methods_mapt &synthetic_methods)
