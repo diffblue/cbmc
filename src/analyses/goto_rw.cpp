@@ -127,6 +127,11 @@ void rw_range_sett::get_objects_dereference(
 {
   const exprt &pointer=deref.pointer();
   get_objects_rec(get_modet::READ, pointer);
+
+  // we don't have points-to information, dereferencing will yield some
+  // in-memory object
+  const symbolt &memory_symbol = ns.lookup(CPROVER_PREFIX "memory");
+  get_objects_rec(mode, memory_symbol.symbol_expr(), -1, size);
 }
 
 void rw_range_sett::get_objects_byte_extract(
@@ -612,6 +617,13 @@ void rw_range_set_value_sett::get_objects_dereference(
   if(object.is_not_nil() &&
      !value_set_dereferencet::has_dereference(object))
     get_objects_rec(mode, object, range_start, new_size);
+  else
+  {
+    // we don't have sufficient points-to information, dereferencing will yield
+    // some in-memory object
+    const symbolt &memory_symbol = ns.lookup(CPROVER_PREFIX "memory");
+    get_objects_rec(mode, memory_symbol.symbol_expr(), -1, size);
+  }
 }
 
 void guarded_range_domaint::output(
