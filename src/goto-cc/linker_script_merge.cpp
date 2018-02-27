@@ -132,7 +132,7 @@ linker_script_merget::linker_script_merget(
       replacement_predicatet("address of array's first member",
         [](const exprt &expr) -> const symbol_exprt&
         { return to_symbol_expr(expr.op0().op0()); },
-        [](const exprt expr)
+        [](const exprt &expr, const namespacet &ns)
         {
           return expr.id()==ID_address_of &&
                  expr.type().id()==ID_pointer &&
@@ -149,7 +149,7 @@ linker_script_merget::linker_script_merget(
       replacement_predicatet("address of array",
         [](const exprt &expr) -> const symbol_exprt&
         { return to_symbol_expr(expr.op0()); },
-        [](const exprt expr)
+        [](const exprt &expr, const namespacet &ns)
         {
           return expr.id()==ID_address_of &&
                  expr.type().id()==ID_pointer &&
@@ -157,10 +157,21 @@ linker_script_merget::linker_script_merget(
                  expr.op0().id()==ID_symbol &&
                  expr.op0().type().id()==ID_array;
         }),
+      replacement_predicatet("address of struct",
+        [](const exprt &expr) -> const symbol_exprt&
+        { return to_symbol_expr(expr.op0()); },
+        [](const exprt &expr, const namespacet &ns)
+        {
+          return expr.id()==ID_address_of &&
+                 expr.type().id()==ID_pointer &&
+
+                 expr.op0().id()==ID_symbol &&
+                 ns.follow(expr.op0().type()).id()==ID_struct;
+        }),
       replacement_predicatet("array variable",
         [](const exprt &expr) -> const symbol_exprt&
         { return to_symbol_expr(expr); },
-        [](const exprt expr)
+        [](const exprt &expr, const namespacet &ns)
         {
           return expr.id()==ID_symbol &&
                  expr.type().id()==ID_array;
@@ -168,7 +179,7 @@ linker_script_merget::linker_script_merget(
       replacement_predicatet("pointer (does not need pointerizing)",
         [](const exprt &expr) -> const symbol_exprt&
         { return to_symbol_expr(expr); },
-        [](const exprt expr)
+        [](const exprt &expr, const namespacet &ns)
         {
           return expr.id()==ID_symbol &&
                  expr.type().id()==ID_pointer;
@@ -181,6 +192,8 @@ int linker_script_merget::pointerize_linker_defined_symbols(
       symbol_tablet &symbol_table,
       const linker_valuest &linker_values)
 {
+  const namespacet ns(symbol_table);
+
   int ret=0;
   // First, pointerize the actual linker-defined symbols
   for(const auto &pair : linker_values)
@@ -208,7 +221,8 @@ int linker_script_merget::pointerize_linker_defined_symbols(
     int fail=pointerize_subexprs_of(
       symbol_table.get_writeable_ref(pair.first).value,
       to_pointerize,
-      linker_values);
+      linker_values,
+      ns);
     if(to_pointerize.empty() && fail==0)
       continue;
     ret=1;
@@ -233,7 +247,8 @@ int linker_script_merget::pointerize_linker_defined_symbols(
         if(to_pointerize.empty())
           continue;
         debug() << "Pointerizing a program expression..." << eom;
-        int fail=pointerize_subexprs_of(*insts, to_pointerize, linker_values);
+        int fail = pointerize_subexprs_of(
+          *insts, to_pointerize, linker_values, ns);
         if(to_pointerize.empty() && fail==0)
           continue;
         ret=1;
@@ -276,13 +291,14 @@ int linker_script_merget::replace_expr(
 int linker_script_merget::pointerize_subexprs_of(
     exprt &expr,
     std::list<symbol_exprt> &to_pointerize,
-    const linker_valuest &linker_values)
+    const linker_valuest &linker_values,
+    const namespacet &ns)
 {
   int fail=0, tmp=0;
   for(auto const &pair : linker_values)
     for(auto const &pattern : replacement_predicates)
     {
-      if(!pattern.match(expr))
+      if(!pattern.match(expr, ns))
         continue;
       // take a copy, expr will be changed below
       const symbol_exprt inner_symbol=pattern.inner_symbol(expr);
@@ -310,7 +326,7 @@ int linker_script_merget::pointerize_subexprs_of(
 
   for(auto &op : expr.operands())
   {
-    tmp=pointerize_subexprs_of(op, to_pointerize, linker_values);
+    tmp=pointerize_subexprs_of(op, to_pointerize, linker_values, ns);
     fail=tmp?tmp:fail;
   }
   return fail;
