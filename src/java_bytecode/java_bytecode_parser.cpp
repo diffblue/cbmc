@@ -711,6 +711,13 @@ void java_bytecode_parsert::rbytecode(
       wide_instruction=true;
       address++;
       bytecode=read_u1();
+      // The only valid instructions following a wide byte are
+      // [ifald]load, [ifald]store, ret and iinc
+      // All of these have either format of v, or V
+      INVARIANT(
+        bytecodes[bytecode].format == 'v' || bytecodes[bytecode].format == 'V',
+        "Unexpected wide instruction: " +
+          id2string(bytecodes[bytecode].mnemonic));
     }
 
     instructions.push_back(instructiont());
@@ -749,7 +756,6 @@ void java_bytecode_parsert::rbytecode(
         instruction.args.push_back(from_integer(c, signedbv_typet(8)));
       }
       address+=1;
-
       break;
 
     case 'o': // two byte branch offset, signed
@@ -776,10 +782,20 @@ void java_bytecode_parsert::rbytecode(
 
     case 'v': // local variable index (one byte)
       {
-        u1 v=read_u1();
-        instruction.args.push_back(from_integer(v, unsignedbv_typet(8)));
+        if(wide_instruction)
+        {
+          u2 v = read_u2();
+          instruction.args.push_back(from_integer(v, unsignedbv_typet(16)));
+          address += 2;
+        }
+        else
+        {
+          u1 v = read_u1();
+          instruction.args.push_back(from_integer(v, unsignedbv_typet(8)));
+          address += 1;
+        }
       }
-      address+=1;
+
       break;
 
     case 'V':

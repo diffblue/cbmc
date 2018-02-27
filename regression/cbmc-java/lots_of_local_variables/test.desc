@@ -1,0 +1,6 @@
+CORE
+TooManyLocals.class
+--function TooManyLocals.test
+VERIFICATION SUCCESSFUL
+\[java::TooManyLocals\.test:\(\)V\.assertion\.1\] .*: SUCCESS
+EXIT=0
