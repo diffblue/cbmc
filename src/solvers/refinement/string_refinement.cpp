@@ -287,6 +287,23 @@ static void substitute_function_applications_in_equations(
     substitute_function_applications(eq.rhs(), generator);
 }
 
+/// Fill the array_pointer correspondence and replace the right hand sides of
+/// the corresponding equations
+static void make_char_array_pointer_associations(
+  string_constraint_generatort &generator,
+  std::vector<equal_exprt> &equations)
+{
+  for(equal_exprt &eq : equations)
+  {
+    if(
+      const auto fun_app =
+        expr_try_dynamic_cast<function_application_exprt>(eq.rhs()))
+    {
+      if(const auto result = generator.make_array_pointer_association(*fun_app))
+        eq.rhs() = *result;
+    }
+  }
+}
 
 void replace_symbols_in_equations(
   const union_find_replacet &symbol_resolve,
@@ -658,8 +675,17 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       string_id_symbol_resolve.replace_expr(eq.rhs());
   }
 
+  make_char_array_pointer_associations(generator, equations);
+
 #ifdef DEBUG
   output_equations(debug(), equations, ns);
+
+  string_dependencest dependences;
+  for(const equal_exprt &eq : equations)
+    add_node(dependences, eq, generator.array_pool);
+
+  debug() << "dec_solve: dependence graph:" << eom;
+  dependences.output_dot(debug());
 #endif
 
   debug() << "dec_solve: Replace function applications" << eom;
@@ -671,8 +697,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
 #ifdef DEBUG
   debug() << "dec_solve: arrays_of_pointers:" << eom;
-  for(auto pair :
-      generator.array_pointer_correspondance.get_arrays_of_pointers())
+  for(auto pair : generator.array_pool.get_arrays_of_pointers())
   {
     debug() << "  * " << format(pair.first) << "\t--> " << format(pair.second)
             << " : " << format(pair.second.type()) << eom;

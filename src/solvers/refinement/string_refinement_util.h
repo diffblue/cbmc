@@ -10,6 +10,7 @@
 #define CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_UTIL_H
 
 #include "string_constraint.h"
+#include "string_constraint_generator.h"
 
 /// For now, any unsigned bitvector type of width smaller or equal to 16 is
 /// considered a character.
@@ -139,5 +140,204 @@ private:
   /// Record expressions that are contained in the equation with the given index
   std::unordered_map<std::size_t, std::vector<exprt>> strings_in_equation;
 };
+
+/// Base class for string functions that are built in the solver
+class string_builtin_functiont
+{
+public:
+  string_builtin_functiont() = default;
+  string_builtin_functiont(const string_builtin_functiont &) = delete;
+
+  virtual optionalt<array_string_exprt> string_result() const
+  {
+    return {};
+  }
+
+  virtual std::vector<array_string_exprt> string_arguments() const
+  {
+    return {};
+  }
+};
+
+/// String builtin_function transforming one string into another
+class string_transformation_builtin_functiont : public string_builtin_functiont
+{
+public:
+  array_string_exprt result;
+  array_string_exprt input;
+  std::vector<exprt> args;
+  exprt return_code;
+  optionalt<array_string_exprt> string_result() const override
+  {
+    return result;
+  }
+  std::vector<array_string_exprt> string_arguments() const override
+  {
+    return {input};
+  }
+};
+
+/// String inserting a string into another one
+class string_insertion_builtin_functiont : public string_builtin_functiont
+{
+public:
+  array_string_exprt result;
+  array_string_exprt input1;
+  array_string_exprt input2;
+  std::vector<exprt> args;
+  exprt return_code;
+
+  /// Constructor from arguments of a function application
+  string_insertion_builtin_functiont(
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool);
+
+  optionalt<array_string_exprt> string_result() const override
+  {
+    return result;
+  }
+  std::vector<array_string_exprt> string_arguments() const override
+  {
+    return {input1, input2};
+  }
+};
+
+/// String creation from other types
+class string_creation_builtin_functiont : public string_builtin_functiont
+{
+public:
+  array_string_exprt result;
+  std::vector<exprt> args;
+  exprt return_code;
+
+  optionalt<array_string_exprt> string_result() const override
+  {
+    return result;
+  }
+};
+
+/// String test
+class string_test_builtin_functiont : public string_builtin_functiont
+{
+public:
+  exprt result;
+  std::vector<array_string_exprt> under_test;
+  std::vector<exprt> args;
+  std::vector<array_string_exprt> string_arguments() const override
+  {
+    return under_test;
+  }
+};
+
+/// Keep track of dependencies between strings.
+/// Each string points to builtin_function calls on which it depends,
+/// each builtin_function points to the strings on which the result depend.
+class string_dependencest
+{
+public:
+  /// A builtin_function node is just an index in the `builtin_function_nodes`
+  /// vector.
+  class builtin_function_nodet
+  {
+  public:
+    std::size_t index;
+    explicit builtin_function_nodet(std::size_t i) : index(i)
+    {
+    }
+  };
+
+  /// A string node points to builtin_function on which it depends
+  class string_nodet
+  {
+  public:
+    std::vector<builtin_function_nodet> dependencies;
+
+    // In case it depends on a builtin_function we don't support yet
+    bool depends_on_unknown_builtin_function = false;
+  };
+
+  string_nodet &get_node(const array_string_exprt &e);
+
+  /// `builtin_function` is reset to an empty pointer after the node is created
+  builtin_function_nodet
+  make_node(std::unique_ptr<string_builtin_functiont> &builtin_function);
+  const std::vector<builtin_function_nodet> &
+  dependencies(const string_nodet &node) const;
+  const string_builtin_functiont &
+  get_builtin_function(const builtin_function_nodet &node) const;
+
+  /// Add edge from node for `e` to node for `builtin_function`
+  void add_dependency(
+    const array_string_exprt &e,
+    const builtin_function_nodet &builtin_function);
+
+  /// Mark node for `e` as depending on unknown builtin_function
+  void add_unknown_dependency(const array_string_exprt &e);
+
+  void output_dot(std::ostream &stream) const;
+
+private:
+  /// Set of nodes representing builtin_functions
+  std::vector<std::unique_ptr<string_builtin_functiont>> builtin_function_nodes;
+
+  /// Set of nodes representing strings
+  std::vector<string_nodet> string_nodes;
+
+  /// Nodes describing dependencies of a string: values of the map correspond
+  /// to indexes in the vector `string_nodes`.
+  std::unordered_map<array_string_exprt, std::size_t, irep_hash>
+    node_index_pool;
+
+  /// Common index for all nodes (both strings and builtin_functions) so that we
+  /// can reuse generic algorithms of util/graph.h
+  /// Even indexes correspond to builtin_function nodes, odd indexes to string
+  /// nodes.
+  typedef std::size_t node_indext;
+
+  /// \return total number of nodes
+  node_indext size() const;
+
+  /// \param n: builtin function node
+  /// \return index corresponding to builtin function node `n`
+  node_indext node_index(const builtin_function_nodet &n) const;
+
+  /// \param s: array expression representing a string
+  /// \return index corresponding to an string exprt s
+  node_indext node_index(const array_string_exprt &s) const;
+
+  /// \param i: index of a node
+  /// \return corresponding node if the index corresponds to a builtin function
+  ///   node, empty optional otherwise
+  optionalt<builtin_function_nodet>
+  get_builtin_function_node(node_indext i) const;
+
+  /// \param i: index of a node
+  /// \return corresponding node if the index corresponds to a string
+  ///   node, empty optional otherwise
+  optionalt<string_nodet> get_string_node(node_indext i) const;
+
+  /// Applies `f` on all successors of the node with index `i`
+  void for_each_successor(
+    const node_indext &i,
+    const std::function<void(const node_indext &)> &f) const;
+};
+
+/// When right hand side of equation is a builtin_function add
+/// a "string_builtin_function" node to the graph and connect it to the strings
+/// on which it depends and which depends on it.
+/// If the string builtin_function is not a supported one, mark all the string
+/// arguments as depending on an unknown builtin_function.
+/// \param dependencies: graph to which we add the node
+/// \param equation: an equation whose right hand side is possibly a call to a
+///   string builtin_function.
+/// \param array_pool: array pool containing arrays corresponding to the string
+///   exprt arguments of the builtin_function call
+/// \return true if a node was added, if false is returned it either means that
+///   the right hand side is not a function application
+/// \todo there should be a class with just the three functions we require here
+bool add_node(
+  string_dependencest &dependencies,
+  const equal_exprt &equation,
+  array_poolt &array_pool);
 
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_UTIL_H
