@@ -87,8 +87,8 @@ constant_exprt string_constraint_generatort::constant_char(
 /// \par parameters: a prefix and a type
 /// \return a symbol of type tp whose name starts with "string_refinement#"
 ///   followed by prefix
-symbol_exprt string_constraint_generatort::fresh_symbol(
-  const irep_idt &prefix, const typet &type)
+symbol_exprt symbol_generatort::
+operator()(const irep_idt &prefix, const typet &type)
 {
   std::ostringstream buf;
   buf << "string_refinement#" << prefix << "#" << ++symbol_count;

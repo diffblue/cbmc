@@ -27,6 +27,17 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/constexpr.def>
 #include <solvers/refinement/string_constraint.h>
 
+/// Generation of fresh symbols of a given type
+class symbol_generatort final
+{
+public:
+  symbol_exprt
+  operator()(const irep_idt &prefix, const typet &type = bool_typet());
+
+private:
+  unsigned symbol_count = 0;
+};
+
 class string_constraint_generatort final
 {
 public:
@@ -69,22 +80,19 @@ public:
     return index_exprt(witness.at(c), univ_val);
   }
 
-  symbol_exprt fresh_symbol(
-    const irep_idt &prefix, const typet &type=bool_typet());
-  symbol_exprt fresh_univ_index(const irep_idt &prefix, const typet &type);
-
-
   exprt add_axioms_for_function_application(
     const function_application_exprt &expr);
 
-  symbol_exprt fresh_exist_index(const irep_idt &prefix, const typet &type);
+  symbol_generatort fresh_symbol;
 
   const std::map<exprt, array_string_exprt> &get_arrays_of_pointers() const
   {
     return arrays_of_pointers_;
   }
+  symbol_exprt fresh_univ_index(const irep_idt &prefix, const typet &type);
 
   exprt get_length_of_string_array(const array_string_exprt &s) const;
+  symbol_exprt fresh_exist_index(const irep_idt &prefix, const typet &type);
 
   // Type used by primitives to signal errors
   const signedbv_typet get_return_code_type()
@@ -349,7 +357,6 @@ public:
   std::map<string_not_contains_constraintt, symbol_exprt> witness;
 private:
   std::set<array_string_exprt> created_strings;
-  unsigned symbol_count=0;
   const messaget message;
 
   std::vector<exprt> lemmas;
