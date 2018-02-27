@@ -14,11 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <fstream>
 
+#include <util/json.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
-#include <util/json.h>
-
-#include <ansi-c/string_constant.h>
+#include <util/string_constant.h>
 
 #include <goto-programs/class_hierarchy.h>
 

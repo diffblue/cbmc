@@ -14,13 +14,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <cstdlib>
 #include <algorithm>
 
-#include <util/std_types.h>
-#include <util/std_expr.h>
 #include <util/arith_tools.h>
-#include <util/prefix.h>
-
 #include <util/c_types.h>
-#include <ansi-c/string_constant.h>
+#include <util/prefix.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/string_constant.h>
+
 #include <ansi-c/anonymous_member.h>
 
 #include "cpp_typecheck.h"

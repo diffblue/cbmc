@@ -19,10 +19,10 @@
 static int isatty(int) { return 0; }
 #endif
 
+#include <util/string_constant.h>
 #include <util/unicode.h>
 
 #include "preprocessor_line.h"
-#include "string_constant.h"
 
 #include "literals/convert_float_literal.h"
 #include "literals/convert_integer_literal.h"

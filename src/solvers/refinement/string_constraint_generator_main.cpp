@@ -20,12 +20,13 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_constraint_generator.h>
 
 #include <limits>
-#include <ansi-c/string_constant.h>
 #include <java_bytecode/java_types.h>
 #include <solvers/refinement/string_refinement_invariant.h>
+
 #include <util/arith_tools.h>
 #include <util/pointer_predicates.h>
 #include <util/ssa_expr.h>
+#include <util/string_constant.h>
 
 string_constraint_generatort::string_constraint_generatort(
   const string_constraint_generatort::infot &info,

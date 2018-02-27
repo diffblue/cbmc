@@ -35,7 +35,6 @@ SRC = anonymous_member.cpp \
       padding.cpp \
       preprocessor_line.cpp \
       printf_formatter.cpp \
-      string_constant.cpp \
       type2name.cpp \
       # Empty last line
 

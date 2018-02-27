@@ -12,18 +12,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <set>
 
-#include <util/symbol.h>
-#include <util/mp_arith.h>
 #include <util/arith_tools.h>
 #include <util/magic.h>
-#include <util/replace_expr.h>
-#include <util/std_types.h>
+#include <util/mp_arith.h>
 #include <util/prefix.h>
+#include <util/replace_expr.h>
 #include <util/std_expr.h>
-#include <util/threeval.h>
+#include <util/std_types.h>
 #include <util/string2int.h>
-
-#include <ansi-c/string_constant.h>
+#include <util/string_constant.h>
+#include <util/symbol.h>
+#include <util/threeval.h>
 
 #include "boolbv_type.h"
 

@@ -14,17 +14,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
-#include <util/fixedbv.h>
-#include <util/pointer_offset_size.h>
 #include <util/base_type.h>
-#include <util/ieee_float.h>
 #include <util/byte_operators.h>
-#include <util/config.h>
 #include <util/c_types.h>
-
-#include <ansi-c/string_constant.h>
+#include <util/config.h>
+#include <util/fixedbv.h>
+#include <util/ieee_float.h>
+#include <util/pointer_offset_size.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/string_constant.h>
 
 #include <langapi/language_util.h>
 

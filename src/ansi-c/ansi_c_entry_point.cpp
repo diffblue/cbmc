@@ -11,17 +11,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <cstdlib>
 
-#include <util/namespace.h>
-#include <util/std_expr.h>
 #include <util/arith_tools.h>
-#include <util/std_code.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/namespace.h>
 #include <util/prefix.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/string_constant.h>
 #include <util/symbol.h>
-
-#include <util/c_types.h>
-#include <ansi-c/string_constant.h>
 
 #include <goto-programs/goto_functions.h>
 #include <linking/static_lifetime_init.h>

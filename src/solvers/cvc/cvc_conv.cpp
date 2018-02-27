@@ -14,13 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
 #include <util/find_symbols.h>
 #include <util/pointer_offset_size.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 #include <util/string2int.h>
-
-#include <ansi-c/string_constant.h>
+#include <util/string_constant.h>
 
 void cvc_convt::print_assignment(std::ostream &out) const
 {
