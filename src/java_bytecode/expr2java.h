@@ -20,6 +20,8 @@ class expr2javat:public expr2ct
 {
 public:
   explicit expr2javat(const namespacet &_ns):expr2ct(_ns) { }
+  virtual std::string convert(const typet &src) override;
+  virtual std::string convert(const exprt &src) override;
 
 protected:
   virtual std::string convert_with_precedence(

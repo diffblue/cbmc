@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANSI_C_C_QUALIFIERS_H
 
 #include <iosfwd>
+#include <memory>
 
 #include <util/expr.h>
 
@@ -28,7 +29,13 @@ public:
     read(src);
   }
 
-  void clear()
+  c_qualifierst(const c_qualifierst &other) = delete;
+  virtual c_qualifierst &operator=(const c_qualifierst &other);
+  virtual std::unique_ptr<c_qualifierst> clone() const;
+
+  virtual ~c_qualifierst() = default;
+
+  virtual void clear()
   {
     is_constant=false;
     is_volatile=false;
@@ -50,13 +57,13 @@ public:
 
   // will likely add alignment here as well
 
-  std::string as_string() const;
-  void read(const typet &src);
-  void write(typet &src) const;
+  virtual std::string as_string() const;
+  virtual void read(const typet &src);
+  virtual void write(typet &src) const;
 
   static void clear(typet &dest);
 
-  bool is_subset_of(const c_qualifierst &q) const
+  virtual bool is_subset_of(const c_qualifierst &q) const
   {
     return (!is_constant || q.is_constant) &&
            (!is_volatile || q.is_volatile) &&
@@ -69,7 +76,7 @@ public:
     // is_transparent_union isn't checked
   }
 
-  bool operator==(const c_qualifierst &other) const
+  virtual bool operator==(const c_qualifierst &other) const
   {
     return is_constant==other.is_constant &&
            is_volatile==other.is_volatile &&
@@ -86,7 +93,7 @@ public:
     return !(*this==other);
   }
 
-  c_qualifierst &operator+=(const c_qualifierst &b)
+  virtual c_qualifierst &operator+=(const c_qualifierst &b)
   {
     is_constant|=b.is_constant;
     is_volatile|=b.is_volatile;
@@ -99,7 +106,7 @@ public:
     return *this;
   }
 
-  unsigned count() const
+  virtual std::size_t count() const
   {
     return is_constant+is_volatile+is_restricted+is_atomic+
            is_ptr32+is_ptr64+is_noreturn;

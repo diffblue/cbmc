@@ -19,11 +19,21 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
 
-#include <ansi-c/c_qualifiers.h>
 #include <ansi-c/c_misc.h>
 #include <ansi-c/expr2c_class.h>
 
+#include "java_qualifiers.h"
 #include "java_types.h"
+
+std::string expr2javat::convert(const typet &src)
+{
+  return convert_rec(src, java_qualifierst(ns), "");
+}
+
+std::string expr2javat::convert(const exprt &src)
+{
+  return expr2ct::convert(src);
+}
 
 std::string expr2javat::convert_code_function_call(
   const code_function_callt &src,
@@ -244,7 +254,8 @@ std::string expr2javat::convert_rec(
   const c_qualifierst &qualifiers,
   const std::string &declarator)
 {
-  c_qualifierst new_qualifiers(qualifiers);
+  std::unique_ptr<c_qualifierst> clone = qualifiers.clone();
+  c_qualifierst &new_qualifiers = *clone;
   new_qualifiers.read(src);
 
   const std::string d=
@@ -307,7 +318,7 @@ std::string expr2javat::convert_rec(
     const typet &return_type=code_type.return_type();
     dest+=" -> "+convert(return_type);
 
-    return dest;
+    return q + dest;
   }
   else
     return expr2ct::convert_rec(src, qualifiers, declarator);

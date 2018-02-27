@@ -132,7 +132,8 @@ std::string expr2cppt::convert_rec(
   const c_qualifierst &qualifiers,
   const std::string &declarator)
 {
-  c_qualifierst new_qualifiers(qualifiers);
+  std::unique_ptr<c_qualifierst> clone = qualifiers.clone();
+  c_qualifierst &new_qualifiers = *clone;
   new_qualifiers.read(src);
 
   const std::string d=
