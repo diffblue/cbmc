@@ -146,6 +146,12 @@ inline java_class_typet &to_java_class_type(typet &type)
   return static_cast<java_class_typet &>(type);
 }
 
+template <>
+inline bool can_cast_type<java_class_typet>(const typet &type)
+{
+  return can_cast_type<class_typet>(type);
+}
+
 typet java_int_type();
 typet java_long_type();
 typet java_short_type();
