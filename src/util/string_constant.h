@@ -6,12 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifndef CPROVER_UTIL_STRING_CONSTANT_H
+#define CPROVER_UTIL_STRING_CONSTANT_H
 
-#ifndef CPROVER_ANSI_C_STRING_CONSTANT_H
-#define CPROVER_ANSI_C_STRING_CONSTANT_H
-
-#include <util/std_expr.h>
-#include <util/expr.h>
+#include "std_expr.h"
+#include "expr.h"
 
 class string_constantt:public exprt
 {

@@ -13,24 +13,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/c_types.h>
-#include <util/rational.h>
-#include <util/replace_expr.h>
-#include <util/rational_tools.h>
-#include <util/source_location.h>
-#include <util/cprover_prefix.h>
-#include <util/prefix.h>
 #include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/cprover_prefix.h>
+#include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
+#include <util/prefix.h>
+#include <util/rational.h>
+#include <util/rational_tools.h>
+#include <util/replace_expr.h>
 #include <util/simplify_expr.h>
+#include <util/source_location.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
+#include <util/string_constant.h>
 #include <util/symbol.h>
-#include <util/pointer_predicates.h>
-#include <util/pointer_offset_size.h>
 
 #include <linking/zero_initializer.h>
-
-#include <ansi-c/string_constant.h>
 
 #include <langapi/language_util.h>
 

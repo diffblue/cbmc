@@ -13,13 +13,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <string>
 
-#include <util/parser.h>
-#include <util/std_expr.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
+#include <util/parser.h>
 #include <util/prefix.h>
-
-#include <ansi-c/string_constant.h>
+#include <util/std_expr.h>
+#include <util/string_constant.h>
 
 #include "java_bytecode_parse_tree.h"
 #include "java_types.h"

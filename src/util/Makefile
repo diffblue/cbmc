@@ -74,6 +74,7 @@ SRC = arith_tools.cpp \
       std_expr.cpp \
       std_types.cpp \
       string2int.cpp \
+      string_constant.cpp \
       string_container.cpp \
       string_hash.cpp \
       string_utils.cpp \

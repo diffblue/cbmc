@@ -9,8 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "thread_instrumentation.h"
 
 #include <util/c_types.h>
-
-#include <ansi-c/string_constant.h>
+#include <util/string_constant.h>
 
 #include <goto-programs/goto_model.h>
 

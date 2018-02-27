@@ -22,12 +22,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
+#include <util/string_constant.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 
 #include "c_typecast.h"
 #include "c_qualifiers.h"
-#include "string_constant.h"
 #include "anonymous_member.h"
 #include "padding.h"
 
