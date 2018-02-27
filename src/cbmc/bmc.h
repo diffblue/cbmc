@@ -211,21 +211,17 @@ protected:
   virtual resultt all_properties(
     const goto_functionst &goto_functions,
     prop_convt &solver);
-  virtual resultt stop_on_fail(
-    const goto_functionst &goto_functions,
-    prop_convt &solver);
+  virtual resultt stop_on_fail(prop_convt &solver);
   virtual void show_program();
   virtual void report_success();
   virtual void report_failure();
 
   virtual void error_trace();
-  void output_graphml(
-    resultt result,
-    const goto_functionst &goto_functions);
+  void output_graphml(resultt result);
 
   void get_memory_model();
   void slice();
-  void show(const goto_functionst &);
+  void show();
 
   bool cover(
     const goto_functionst &goto_functions,
