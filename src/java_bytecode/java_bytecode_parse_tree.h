@@ -173,7 +173,32 @@ public:
     bool is_abstract=false;
     bool is_enum=false;
     bool is_public=false, is_protected=false, is_private=false;
+    bool attribute_bootstrapmethods_read = false;
     size_t enum_elements=0;
+
+    enum class method_handle_typet
+    {
+      LAMBDA_METHOD_HANDLE,
+      UNKNOWN_HANDLE
+    };
+
+    typedef std::vector<u2> u2_valuest;
+    class lambda_method_handlet
+    {
+    public:
+      method_handle_typet handle_type;
+      irep_idt lambda_method_name;
+      irep_idt interface_type;
+      irep_idt method_type;
+      u2_valuest u2_values;
+      lambda_method_handlet() : handle_type(method_handle_typet::UNKNOWN_HANDLE)
+      {
+      }
+    };
+
+    typedef std::map<std::pair<irep_idt, size_t>, lambda_method_handlet>
+      lambda_method_handle_mapt;
+    lambda_method_handle_mapt lambda_method_handle_map;
 
     typedef std::list<irep_idt> implementst;
     implementst implements;

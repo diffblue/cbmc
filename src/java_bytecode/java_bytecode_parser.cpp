@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
+#include <util/optional.h>
 
 #include "java_bytecode_parse_tree.h"
 #include "java_types.h"
@@ -47,6 +48,13 @@ public:
   typedef java_bytecode_parse_treet::instructiont instructiont;
   typedef java_bytecode_parse_treet::annotationt annotationt;
   typedef java_bytecode_parse_treet::annotationst annotationst;
+  typedef java_bytecode_parse_treet::classt::method_handle_typet
+    method_handle_typet;
+  typedef java_bytecode_parse_treet::classt::lambda_method_handlet
+    lambda_method_handlet;
+  typedef java_bytecode_parse_treet::classt::lambda_method_handle_mapt
+    lambda_method_handle_mapt;
+  typedef java_bytecode_parse_treet::classt::u2_valuest u2_valuest;
 
   java_bytecode_parse_treet parse_tree;
 
@@ -126,6 +134,9 @@ protected:
   void get_class_refs();
   void get_class_refs_rec(const typet &);
   void parse_local_variable_type_table(methodt &method);
+  optionalt<lambda_method_handlet>
+  parse_method_handle(const class method_handle_infot &entry);
+  void read_bootstrapmethods_entry(classt &);
 
   void skip_bytes(std::size_t bytes)
   {
@@ -201,6 +212,204 @@ protected:
 #define VTYPE_INFO_UNINIT_THIS 6
 #define VTYPE_INFO_OBJECT      7
 #define VTYPE_INFO_UNINIT      8
+
+class structured_pool_entryt
+{
+public:
+  explicit structured_pool_entryt(java_bytecode_parsert::pool_entryt entry)
+    : tag(entry.tag)
+  {
+  }
+
+  u1 get_tag() const
+  {
+    return tag;
+  }
+
+  typedef std::function<java_bytecode_parsert::pool_entryt &(u2)>
+    pool_entry_lookupt;
+  typedef java_bytecode_parsert::pool_entryt pool_entryt;
+
+protected:
+  static std::string read_utf8_constant(const pool_entryt &entry)
+  {
+    INVARIANT(
+      entry.tag == CONSTANT_Utf8, "Name entry must be a constant UTF-8");
+    return id2string(entry.s);
+  }
+
+private:
+  u1 tag;
+};
+
+/// Corresponds to the CONSTANT_Class_info Structure
+/// Described in Java 8 specification 4.4.1
+class class_infot : public structured_pool_entryt
+{
+public:
+  explicit class_infot(const pool_entryt &entry) : structured_pool_entryt(entry)
+  {
+    PRECONDITION(entry.tag == CONSTANT_Class);
+    name_index = entry.ref1;
+  }
+
+  std::string get_name(pool_entry_lookupt pool_entry) const
+  {
+    const pool_entryt &name_entry = pool_entry(name_index);
+    return read_utf8_constant(name_entry);
+  }
+
+private:
+  u2 name_index;
+};
+
+/// Corresponds to the CONSTANT_NameAndType_info Structure
+/// Described in Java 8 specification 4.4.6
+class name_and_type_infot : public structured_pool_entryt
+{
+public:
+  explicit name_and_type_infot(java_bytecode_parsert::pool_entryt entry)
+    : structured_pool_entryt(entry)
+  {
+    PRECONDITION(entry.tag == CONSTANT_NameAndType);
+    name_index = entry.ref1;
+    descriptor_index = entry.ref2;
+  }
+
+  std::string get_name(pool_entry_lookupt pool_entry) const
+  {
+    const pool_entryt &name_entry = pool_entry(name_index);
+    return read_utf8_constant(name_entry);
+  }
+
+  std::string get_descriptor(pool_entry_lookupt pool_entry) const
+  {
+    const pool_entryt &descriptor_entry = pool_entry(descriptor_index);
+    return read_utf8_constant(descriptor_entry);
+  }
+
+private:
+  u2 name_index;
+  u2 descriptor_index;
+};
+
+class base_ref_infot : public structured_pool_entryt
+{
+public:
+  explicit base_ref_infot(pool_entryt entry) : structured_pool_entryt(entry)
+  {
+    static std::set<u1> info_tags = {
+      CONSTANT_Fieldref, CONSTANT_Methodref, CONSTANT_InterfaceMethodref};
+    PRECONDITION(info_tags.find(entry.tag) != info_tags.end());
+    class_index = entry.ref1;
+    name_and_type_index = entry.ref2;
+  }
+
+  u1 get_class_index() const
+  {
+    return class_index;
+  }
+  u1 get_name_and_type_index() const
+  {
+    return name_and_type_index;
+  }
+
+  name_and_type_infot get_name_and_type(pool_entry_lookupt pool_entry) const
+  {
+    const pool_entryt &name_and_type_entry = pool_entry(name_and_type_index);
+
+    INVARIANT(
+      name_and_type_entry.tag == CONSTANT_NameAndType,
+      "name_and_typeindex did not correspond to a name_and_type in the "
+      "constant pool");
+
+    return name_and_type_infot{name_and_type_entry};
+  }
+
+  class_infot get_class(pool_entry_lookupt pool_entry) const
+  {
+    const pool_entryt &class_entry = pool_entry(class_index);
+
+    return class_infot{class_entry};
+  }
+
+private:
+  u2 class_index;
+  u2 name_and_type_index;
+};
+
+class method_handle_infot : public structured_pool_entryt
+{
+public:
+  /// Correspond to the different valid values for field reference_kind From
+  /// Java 8 spec 4.4.8
+  /// (https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html)
+  enum class method_handle_kindt
+  {
+    REF_getField = 1,
+    REF_getStatic = 2,
+    REF_putField = 3,
+    REF_putStatic = 4,
+    REF_invokeVirtual = 5,
+    REF_invokeStatic = 6,
+    REF_invokeSpecial = 7,
+    REF_newInvokeSpecial = 8,
+    REF_invokeInterface = 9
+  };
+
+  explicit method_handle_infot(java_bytecode_parsert::pool_entryt entry)
+    : structured_pool_entryt(entry)
+  {
+    PRECONDITION(entry.tag == CONSTANT_MethodHandle);
+    PRECONDITION(entry.ref1 > 0 && entry.ref1 < 10); // Java 8 spec 4.4.8
+    reference_kind = static_cast<method_handle_kindt>(entry.ref1);
+    reference_index = entry.ref2;
+  }
+
+  base_ref_infot get_reference(pool_entry_lookupt pool_entry) const
+  {
+    const base_ref_infot ref_entry{pool_entry(reference_index)};
+
+    // validate the correctness of the constant pool entry
+    switch(reference_kind)
+    {
+    case method_handle_kindt::REF_getField:
+    case method_handle_kindt::REF_getStatic:
+    case method_handle_kindt::REF_putField:
+    case method_handle_kindt::REF_putStatic:
+    {
+      INVARIANT(ref_entry.get_tag() == CONSTANT_Fieldref, "4.4.2");
+      break;
+    }
+    case method_handle_kindt::REF_invokeVirtual:
+    case method_handle_kindt::REF_newInvokeSpecial:
+    {
+      INVARIANT(ref_entry.get_tag() == CONSTANT_Methodref, "4.4.2");
+      break;
+    }
+    case method_handle_kindt::REF_invokeStatic:
+    case method_handle_kindt::REF_invokeSpecial:
+    {
+      INVARIANT(
+        ref_entry.get_tag() == CONSTANT_Methodref ||
+          ref_entry.get_tag() == CONSTANT_InterfaceMethodref,
+        "4.4.2");
+      break;
+    }
+    case method_handle_kindt::REF_invokeInterface:
+    {
+      INVARIANT(ref_entry.get_tag() == CONSTANT_InterfaceMethodref, "");
+      break;
+    }
+    }
+
+    return ref_entry;
+  }
+
+private:
+  method_handle_kindt reference_kind;
+  u2 reference_index;
+};
 
 bool java_bytecode_parsert::parse()
 {
@@ -1406,6 +1615,18 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
   {
     rRuntimeAnnotation_attribute(parsed_class.annotations);
   }
+  else if(attribute_name == "BootstrapMethods")
+  {
+    // for this attribute
+    // cf. https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.23
+    INVARIANT(
+      !parsed_class.attribute_bootstrapmethods_read,
+      "only one BootstrapMethods argument is allowed in a class file");
+
+    // mark as read in parsed class
+    parsed_class.attribute_bootstrapmethods_read = true;
+    read_bootstrapmethods_entry(parsed_class);
+  }
   else
     skip_bytes(attribute_length);
 }
@@ -1532,5 +1753,181 @@ void java_bytecode_parsert::parse_local_variable_type_table(methodt &method)
     INVARIANT(
       found,
       "Entry in LocalVariableTypeTable must be present in LVT");
+  }
+}
+
+/// Read method handle pointed to from constant pool entry at index, return type
+/// of method handle and name if lambda function is found.
+/// \param entry: the constant pool entry of the methodhandle_info structure
+/// \returns: the method_handle type of the methodhandle_structure,
+/// either for a recognized bootstrap method or for a lambda function
+optionalt<java_bytecode_parsert::lambda_method_handlet>
+java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
+{
+  const std::function<pool_entryt &(u2)> pool_entry_lambda =
+    [this](u2 index) -> pool_entryt & { return pool_entry(index); };
+
+  const base_ref_infot &ref_entry = entry.get_reference(pool_entry_lambda);
+
+  const class_infot &class_entry = ref_entry.get_class(pool_entry_lambda);
+  const name_and_type_infot &name_and_type =
+    ref_entry.get_name_and_type(pool_entry_lambda);
+
+  const std::string method_name =
+    class_entry.get_name(pool_entry_lambda) + "." +
+    name_and_type.get_name(pool_entry_lambda) +
+    name_and_type.get_descriptor(pool_entry_lambda);
+
+  lambda_method_handlet lambda_method_handle;
+
+  if(has_prefix(name_and_type.get_name(pool_entry_lambda), "lambda$"))
+  {
+    // names seem to be lambda$POSTFIX$NUM
+    // where POSTFIX is FUN for a function name in which the lambda is define
+    //                "static" when it is a static member of the class
+    //                "new" when it is a class variable, instantiated in <init>
+    lambda_method_handle.lambda_method_name =
+      name_and_type.get_name(pool_entry_lambda);
+    lambda_method_handle.handle_type =
+      method_handle_typet::LAMBDA_METHOD_HANDLE;
+
+    return lambda_method_handle;
+  }
+
+  return {};
+}
+
+/// Read all entries of the `BootstrapMethods` attribute of a class file.
+/// \param parsed_class: the class representation of the class file that is
+/// currently parsed
+void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
+{
+  u2 num_bootstrap_methods = read_u2();
+  for(size_t i = 0; i < num_bootstrap_methods; i++)
+  {
+    u2 bootstrap_methodhandle_ref = read_u2();
+    const pool_entryt &entry = pool_entry(bootstrap_methodhandle_ref);
+
+    method_handle_infot method_handle{entry};
+
+    u2 num_bootstrap_arguments = read_u2();
+    debug() << "INFO: parse BootstrapMethod handle " << num_bootstrap_arguments
+            << " #args" << eom;
+
+    // read u2 values of entry into vector
+    u2_valuest u2_values(num_bootstrap_arguments);
+    for(size_t i = 0; i < num_bootstrap_arguments; i++)
+      u2_values[i] = read_u2();
+
+    // try parsing bootstrap method handle
+    if(num_bootstrap_arguments >= 3)
+    {
+      // each entry contains a MethodHandle structure
+      // u2 tag
+      // u2 reference kind which must be in the range from 1 to 9
+      // u2 reference index into the constant pool
+      //
+      // reference kinds use the following
+      // 1 to 4 must point to a CONSTANT_Fieldref structure
+      // 5 or 8 must point to a CONSTANT_Methodref structure
+      // 6 or 7 must point to a CONSTANT_Methodref or
+      // CONSTANT_InterfaceMethodref structure, if the class file version
+      // number is 52.0 or above, to a CONSTANT_Methodref only in the case
+      // of less than 52.0
+      // 9 must point to a CONSTANT_InterfaceMethodref structure
+
+      // the index must point to a CONSTANT_String
+      //                           CONSTANT_Class
+      //                           CONSTANT_Integer
+      //                           CONSTANT_Long
+      //                           CONSTANT_Float
+      //                           CONSTANT_Double
+      //                           CONSTANT_MethodHandle
+      //                           CONSTANT_MethodType
+
+      // We read the three arguments here to see whether they correspond to
+      // our hypotheses for this being a lambda function entry.
+
+      u2 argument_index1 = u2_values[0];
+      u2 argument_index2 = u2_values[1];
+      u2 argument_index3 = u2_values[2];
+
+      // The additional arguments for the altmetafactory call are skipped,
+      // as they are currently not used. We verify though that they are of
+      // CONSTANT_Integer type, cases where this does not hold will be
+      // analyzed further.
+      bool recognized = true;
+      for(size_t i = 3; i < num_bootstrap_arguments; i++)
+      {
+        u2 skipped_argument = u2_values[i];
+        recognized &= pool_entry(skipped_argument).tag == CONSTANT_Integer;
+      }
+      if(!recognized)
+      {
+        debug() << "format of BootstrapMethods entry not recognized" << eom;
+        lambda_method_handlet lambda_method_handle;
+        lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
+        lambda_method_handle.u2_values = std::move(u2_values);
+        parsed_class.lambda_method_handle_map[{parsed_class.name, i}] =
+          lambda_method_handle;
+        return;
+      }
+      const pool_entryt &interface_type_argument = pool_entry(argument_index1);
+      const pool_entryt &method_handle_argument = pool_entry(argument_index2);
+      const pool_entryt &method_type_argument = pool_entry(argument_index3);
+
+      if(
+        !(interface_type_argument.tag == CONSTANT_MethodType &&
+          method_handle_argument.tag == CONSTANT_MethodHandle &&
+          method_type_argument.tag == CONSTANT_MethodType))
+      {
+        lambda_method_handlet lambda_method_handle;
+        lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
+        lambda_method_handle.u2_values = std::move(u2_values);
+        parsed_class.lambda_method_handle_map[{parsed_class.name, i}] =
+          lambda_method_handle;
+        return;
+      }
+
+      debug() << "INFO: parse lambda handle" << eom;
+      optionalt<lambda_method_handlet> lambda_method_handle =
+        parse_method_handle(method_handle_infot{method_handle_argument});
+
+      if(
+        !lambda_method_handle.has_value() ||
+        lambda_method_handle->handle_type !=
+          method_handle_typet::LAMBDA_METHOD_HANDLE)
+      {
+        lambda_method_handle->u2_values = std::move(u2_values);
+        error() << "ERROR: could not parse lambda function method handle"
+                << eom;
+      }
+      else
+      {
+        lambda_method_handle->interface_type =
+          pool_entry(interface_type_argument.ref1).s;
+        lambda_method_handle->method_type =
+          pool_entry(method_type_argument.ref1).s;
+        lambda_method_handle->u2_values = std::move(u2_values);
+        debug() << "lambda function reference "
+                << id2string(lambda_method_handle->lambda_method_name)
+                << " in class \"" << parsed_class.name << "\""
+                << "\n  interface type is "
+                << id2string(pool_entry(interface_type_argument.ref1).s)
+                << "\n  method type is "
+                << id2string(pool_entry(method_type_argument.ref1).s) << eom;
+      }
+      parsed_class.lambda_method_handle_map[{parsed_class.name, i}] =
+        *lambda_method_handle;
+    }
+    else
+    {
+      lambda_method_handlet lambda_method_handle;
+      lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
+      lambda_method_handle.u2_values = std::move(u2_values);
+      parsed_class.lambda_method_handle_map[{parsed_class.name, i}] =
+        lambda_method_handle;
+      error() << "ERROR: num_bootstrap_arguments must be at least 3" << eom;
+    }
   }
 }
