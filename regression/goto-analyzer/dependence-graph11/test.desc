@@ -1,10 +1,11 @@
 CORE
 main.c
---show --dependence-graph --text -
+--dependence-graph --show
 activate-multi-line-match
 EXIT=0
 SIGNAL=0
-\/\/ ([0-9]+) file.*\n.*IF.*g_in1.*THEN GOTO(.*\n)*Control dependencies: \1\n\n.*\n.*g_out = 1
+// Assignment has a control dependency on the if
+\/\/ ([0-9]+).*\n.*IF.*a < 10.*THEN(.*\n)*Control dependencies: \1\n(.*\n){2,3}.*a = 1
 --
 ^warning: ignoring
 --
@@ -13,10 +14,10 @@ location number). The intention is to check whether the assignment has a control
 dependency on the goto statement.
 
         // <N> file main.c line 7 function main
-        IF !(g_in1 != 0) THEN GOTO 3
+        IF !(i < 10) THEN GOTO 1
 ...
 **** 3 file main.c line 9 function main
 Control dependencies: <N>
 
         // 3 file main.c line 9 function main
-        g_out = 1;
+        a = 1;
