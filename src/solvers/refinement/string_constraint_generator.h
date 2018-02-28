@@ -136,6 +136,12 @@ public:
 
   array_poolt array_pool;
 
+  /// Associate array to pointer, and array to length
+  /// \return an expression if the given function application is one of
+  ///   associate pointer and associate length
+  optionalt<exprt>
+  make_array_pointer_association(const function_application_exprt &expr);
+
   // Type used by primitives to signal errors
   const signedbv_typet get_return_code_type()
   {

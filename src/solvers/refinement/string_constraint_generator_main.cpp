@@ -438,6 +438,17 @@ static irep_idt get_function_name(const function_application_exprt &expr)
                            : to_symbol_expr(name).get_identifier();
 }
 
+optionalt<exprt> string_constraint_generatort::make_array_pointer_association(
+  const function_application_exprt &expr)
+{
+  const irep_idt &id = get_function_name(expr);
+  if(id == ID_cprover_associate_array_to_pointer_func)
+    return associate_array_to_pointer(expr);
+  else if(id == ID_cprover_associate_length_to_array_func)
+    return associate_length_to_array(expr);
+  return {};
+}
+
 /// strings contained in this call are converted to objects of type
 /// `string_exprt`, through adding axioms. Axioms are then added to enforce that
 /// the result corresponds to the function application.
