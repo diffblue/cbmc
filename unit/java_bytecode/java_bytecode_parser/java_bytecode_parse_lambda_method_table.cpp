@@ -7,6 +7,7 @@
 \*******************************************************************/
 
 #include <algorithm>
+#include <functional>
 #include <util/message.h>
 #include <util/config.h>
 
@@ -21,17 +22,28 @@
 typedef java_bytecode_parse_treet::classt::lambda_method_handlet
   lambda_method_handlet;
 
+void run_test_with_compilers(
+  const std::function<void(std::string)> &test_with_compiler)
+{
+  test_with_compiler("openjdk_8");
+  test_with_compiler("eclipse");
+  test_with_compiler("oracle_8");
+  test_with_compiler("oracle_9");
+}
+
 SCENARIO(
   "lambda_method_handle_map with static lambdas",
   "[core][java_bytecode][java_bytecode_parse_lambda_method_handle]")
 {
+  run_test_with_compilers([](const std::string &compiler)
+  {
   null_message_handlert message_handler;
-  GIVEN("A class with a static lambda variables")
+  GIVEN("A class with a static lambda variables from " + compiler + " compiler.")
   {
     java_bytecode_parse_treet parse_tree;
     java_bytecode_parse(
-      "./java_bytecode/java_bytecode_parser/lambda_examples/"
-      "StaticLambdas.class",
+      "./java_bytecode/java_bytecode_parser/lambda_examples/" +
+      compiler + "_classes/StaticLambdas.class",
       parse_tree,
       message_handler);
     WHEN("Parsing that class")
@@ -275,18 +287,21 @@ SCENARIO(
       }
     }
   }
+  });
 }
 SCENARIO(
   "lambda_method_handle_map with local lambdas",
   "[core][java_bytecode][java_bytecode_parse_lambda_method_handle]")
 {
+  run_test_with_compilers([](const std::string &compiler)
+  {
   null_message_handlert message_handler;
-  GIVEN("A method with local lambdas")
+  GIVEN("A method with local lambdas from " + compiler + " compiler.")
   {
     java_bytecode_parse_treet parse_tree;
     java_bytecode_parse(
-      "./java_bytecode/java_bytecode_parser/lambda_examples/"
-      "LocalLambdas.class",
+      "./java_bytecode/java_bytecode_parser/lambda_examples/" +
+      compiler + "_classes/LocalLambdas.class",
       parse_tree,
       message_handler);
     WHEN("Parsing that class")
@@ -524,18 +539,21 @@ SCENARIO(
       }
     }
   }
+  });
 }
 SCENARIO(
   "lambda_method_handle_map with member lambdas",
   "[core][java_bytecode][java_bytecode_parse_lambda_method_handle]")
 {
+  run_test_with_compilers([](const std::string &compiler)
+  {
   null_message_handlert message_handler;
-  GIVEN("A class that has lambdas as member variables")
+  GIVEN("A class that has lambdas as member variables from " + compiler + " compiler.")
   {
     java_bytecode_parse_treet parse_tree;
     java_bytecode_parse(
-      "./java_bytecode/java_bytecode_parser/lambda_examples/"
-      "MemberLambdas.class",
+      "./java_bytecode/java_bytecode_parser/lambda_examples/" +
+      compiler + "_classes/MemberLambdas.class",
       parse_tree,
       message_handler);
     WHEN("Parsing that class")
@@ -796,21 +814,24 @@ SCENARIO(
       }
     }
   }
+  });
 }
 SCENARIO(
   "lambda_method_handle_map with member lambdas capturing outer class "
   "variables",
   "[core][java_bytecode][java_bytecode_parse_lambda_method_handle]")
 {
+  run_test_with_compilers([](const std::string &compiler)
+  {
   null_message_handlert message_handler;
   GIVEN(
     "An inner class with member variables as lambdas that capture outer "
-    "variables")
+    "variables from " + compiler + " compiler.")
   {
     java_bytecode_parse_treet parse_tree;
     java_bytecode_parse(
-      "./java_bytecode/java_bytecode_parser/lambda_examples/"
-      "OuterMemberLambdas$Inner.class",
+      "./java_bytecode/java_bytecode_parser/lambda_examples/" +
+      compiler + "_classes/OuterMemberLambdas$Inner.class",
       parse_tree,
       message_handler);
     WHEN("Parsing that class")
@@ -932,4 +953,5 @@ SCENARIO(
       }
     }
   }
+  });
 }
