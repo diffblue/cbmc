@@ -430,6 +430,14 @@ array_string_exprt array_poolt::of_argument(const exprt &arg)
   return find(string_argument.op1(), string_argument.op0());
 }
 
+static irep_idt get_function_name(const function_application_exprt &expr)
+{
+  const exprt &name = expr.function();
+  PRECONDITION(name.id() == ID_symbol);
+  return is_ssa_expr(name) ? to_ssa_expr(name).get_object_name()
+                           : to_symbol_expr(name).get_identifier();
+}
+
 /// strings contained in this call are converted to objects of type
 /// `string_exprt`, through adding axioms. Axioms are then added to enforce that
 /// the result corresponds to the function application.
@@ -438,12 +446,7 @@ array_string_exprt array_poolt::of_argument(const exprt &arg)
 exprt string_constraint_generatort::add_axioms_for_function_application(
   const function_application_exprt &expr)
 {
-  const exprt &name=expr.function();
-  PRECONDITION(name.id()==ID_symbol);
-
-  const irep_idt &id=is_ssa_expr(name)?to_ssa_expr(name).get_object_name():
-    to_symbol_expr(name).get_identifier();
-
+  const irep_idt &id = get_function_name(expr);
   exprt res;
 
   if(id==ID_cprover_char_literal_func)
