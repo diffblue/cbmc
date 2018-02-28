@@ -11,9 +11,13 @@
 #include <numeric>
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_types.h>
+
 #include <langapi/mode.h>
+#include <langapi/language_util.h>
+
 #include <solvers/refinement/string_constraint_instantiation.h>
 #include <solvers/sat/satcheck.h>
+
 #include <util/simplify_expr.h>
 #include <util/config.h>
 

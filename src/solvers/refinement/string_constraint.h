@@ -20,11 +20,13 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_H
 
-#include <solvers/refinement/bv_refinement.h>
-#include <solvers/refinement/string_refinement_invariant.h>
+#include "bv_refinement.h"
+#include "string_refinement_invariant.h"
+
+#include <util/format_expr.h>
+#include <util/format_type.h>
 #include <util/refined_string_type.h>
 #include <util/string_expr.h>
-#include <langapi/language_util.h>
 
 ///  ### Universally quantified string constraint
 ///
@@ -147,15 +149,14 @@ extern inline string_constraintt &to_string_constraint(exprt &expr)
 /// \param [in] expr: constraint to render
 /// \return rendered string
 inline std::string from_expr(
-  const namespacet &ns,
   const irep_idt &identifier,
   const string_constraintt &expr)
 {
-  return "forall "+from_expr(ns, identifier, expr.univ_var())+" in ["+
-    from_expr(ns, identifier, expr.lower_bound())+", "+
-    from_expr(ns, identifier, expr.upper_bound())+"). "+
-    from_expr(ns, identifier, expr.premise())+" => "+
-    from_expr(ns, identifier, expr.body());
+  std::ostringstream out;
+  out << "forall " << format(expr.univ_var()) << " in ["
+      << format(expr.lower_bound()) << ", " << format(expr.upper_bound())
+      << "). " << format(expr.premise()) << " => " << format(expr.body());
+  return out.str();
 }
 
 /// Constraints to encode non containement of strings.
@@ -222,18 +223,17 @@ public:
 /// \param [in] expr: constraint to render
 /// \return rendered string
 inline std::string from_expr(
-  const namespacet &ns,
   const irep_idt &identifier,
   const string_not_contains_constraintt &expr)
 {
-  return "forall x in ["+
-    from_expr(ns, identifier, expr.univ_lower_bound())+", "+
-    from_expr(ns, identifier, expr.univ_upper_bound())+"). "+
-    from_expr(ns, identifier, expr.premise())+" => ("+
-    "exists y in ["+from_expr(ns, identifier, expr.exists_lower_bound())+", "+
-    from_expr(ns, identifier, expr.exists_upper_bound())+"). "+
-    from_expr(ns, identifier, expr.s0())+"[x+y] != "+
-    from_expr(ns, identifier, expr.s1())+"[y])";
+  std::ostringstream out;
+  out << "forall x in [" << format(expr.univ_lower_bound()) << ", "
+      << format(expr.univ_upper_bound()) << "). " << format(expr.premise())
+      << " => ("
+      << "exists y in [" << format(expr.exists_lower_bound()) << ", "
+      << format(expr.exists_upper_bound()) << "). " << format(expr.s0())
+      << "[x+y] != " << format(expr.s1()) << "[y])";
+  return out.str();
 }
 
 inline const string_not_contains_constraintt
