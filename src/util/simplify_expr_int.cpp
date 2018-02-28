@@ -10,18 +10,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include "base_type.h"
-#include "rational.h"
-#include "expr.h"
-#include "namespace.h"
-#include "config.h"
-#include "bv_arithmetic.h"
-#include "std_expr.h"
-#include "expr_util.h"
 #include "arith_tools.h"
+#include "base_type.h"
+#include "bv_arithmetic.h"
+#include "config.h"
+#include "expr.h"
+#include "expr_util.h"
 #include "fixedbv.h"
-#include "rational_tools.h"
 #include "ieee_float.h"
+#include "namespace.h"
+#include "rational.h"
+#include "rational_tools.h"
+#include "std_expr.h"
+#include "string2int.h"
 
 bool simplify_exprt::simplify_bswap(bswap_exprt &expr)
 {
@@ -47,6 +48,114 @@ bool simplify_exprt::simplify_bswap(bswap_exprt &expr)
 
     constant_exprt c = from_integer(new_value, expr.type());
     expr.swap(c);
+    return false;
+  }
+
+  return true;
+}
+
+static bool sum_expr(exprt &dest, const exprt &expr)
+{
+  if(!dest.is_constant() || !expr.is_constant())
+    return true;
+
+  if(dest.type()!=expr.type())
+    return true;
+
+  const irep_idt &type_id=dest.type().id();
+
+  if(type_id==ID_integer || type_id==ID_natural)
+  {
+    dest.set(ID_value, integer2string(
+      string2integer(dest.get_string(ID_value))+
+      string2integer(expr.get_string(ID_value))));
+    return false;
+  }
+  else if(type_id==ID_rational)
+  {
+    rationalt a, b;
+    if(!to_rational(dest, a) && !to_rational(expr, b))
+    {
+      exprt a_plus_b=from_rational(a+b);
+      dest.set(ID_value, a_plus_b.get_string(ID_value));
+      return false;
+    }
+  }
+  else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
+  {
+    dest.set(ID_value, integer2binary(
+      binary2integer(dest.get_string(ID_value), false)+
+      binary2integer(expr.get_string(ID_value), false),
+      unsafe_string2unsigned(dest.type().get_string(ID_width))));
+    return false;
+  }
+  else if(type_id==ID_fixedbv)
+  {
+    dest.set(ID_value, integer2binary(
+      binary2integer(dest.get_string(ID_value), false)+
+      binary2integer(expr.get_string(ID_value), false),
+      unsafe_string2unsigned(dest.type().get_string(ID_width))));
+    return false;
+  }
+  else if(type_id==ID_floatbv)
+  {
+    ieee_floatt f(to_constant_expr(dest));
+    f+=ieee_floatt(to_constant_expr(expr));
+    dest=f.to_expr();
+    return false;
+  }
+
+  return true;
+}
+
+static bool mul_expr(exprt &dest, const exprt &expr)
+{
+  if(!dest.is_constant() || !expr.is_constant())
+    return true;
+
+  if(dest.type()!=expr.type())
+    return true;
+
+  const irep_idt &type_id=dest.type().id();
+
+  if(type_id==ID_integer || type_id==ID_natural)
+  {
+    dest.set(ID_value, integer2string(
+      string2integer(dest.get_string(ID_value))*
+      string2integer(expr.get_string(ID_value))));
+    return false;
+  }
+  else if(type_id==ID_rational)
+  {
+    rationalt a, b;
+    if(!to_rational(dest, a) && !to_rational(expr, b))
+    {
+      exprt a_mul_b=from_rational(a*b);
+      dest.set(ID_value, a_mul_b.get_string(ID_value));
+      return false;
+    }
+  }
+  else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
+  {
+    // the following works for signed and unsigned integers
+    dest.set(ID_value, integer2binary(
+      binary2integer(dest.get_string(ID_value), false)*
+      binary2integer(expr.get_string(ID_value), false),
+      unsafe_string2unsigned(dest.type().get_string(ID_width))));
+    return false;
+  }
+  else if(type_id==ID_fixedbv)
+  {
+    fixedbvt f(to_constant_expr(dest));
+    f*=fixedbvt(to_constant_expr(expr));
+    dest=f.to_expr();
+    return false;
+  }
+  else if(type_id==ID_floatbv)
+  {
+    ieee_floatt f(to_constant_expr(dest));
+    f*=ieee_floatt(to_constant_expr(expr));
+    dest=f.to_expr();
     return false;
   }
 
@@ -104,7 +213,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
       if(found)
       {
         // update the constant factor
-        if(!constant->mul(*it))
+        if(!mul_expr(*constant, *it))
           do_erase=true;
       }
       else
@@ -356,7 +465,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
            it->is_constant() &&
            next->is_constant())
         {
-          it->sum(*next);
+          sum_expr(*it, *next);
           operands.erase(next);
         }
       }
@@ -408,7 +517,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
           }
           else
           {
-            if(!const_sum->sum(*it))
+            if(!sum_expr(*const_sum, *it))
             {
               *it=from_integer(0, it->type());
               assert(it->is_not_nil());
