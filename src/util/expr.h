@@ -6,13 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_UTIL_EXPR_H
 #define CPROVER_UTIL_EXPR_H
 
-#include <functional>
 #include "type.h"
 
+#include <functional>
 #include <list>
 
 #define forall_operands(it, expr) \
