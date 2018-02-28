@@ -564,10 +564,6 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     res=add_axioms_for_intern(expr);
   else if(id==ID_cprover_string_format_func)
     res=add_axioms_for_format(expr);
-  else if(id == ID_cprover_associate_array_to_pointer_func)
-    res = associate_array_to_pointer(expr);
-  else if(id == ID_cprover_associate_length_to_array_func)
-    res = associate_length_to_array(expr);
   else if(id == ID_cprover_string_constrain_characters_func)
     res = add_axioms_for_constrain_characters(expr);
   else
