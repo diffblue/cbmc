@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
   JBMC
   Bounded Model Checking for Java
-  Copyright (C) 2017 Daniel Kroening <kroening@kroening.com>
+  Copyright (C) 2017-2018 Daniel Kroening <kroening@kroening.com>
 
 */
 

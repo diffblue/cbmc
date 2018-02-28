@@ -1,4 +1,4 @@
-// Copyright 2016-2017 Diffblue Limited. All Rights Reserved.
+// Copyright 2016-2018 Diffblue Limited. All Rights Reserved.
 
 /// \file
 /// A lazy wrapper for goto_functionst.
