@@ -2355,8 +2355,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt popcount_expr(ID_popcount, expr.type());
-    popcount_expr.operands()=expr.arguments();
+    popcount_exprt popcount_expr(expr.arguments().front(), expr.type());
     popcount_expr.add_source_location()=source_location;
 
     return popcount_expr;
