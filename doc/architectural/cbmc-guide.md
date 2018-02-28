@@ -597,5 +597,5 @@ they are in the code.
 [^2]: Or references, if reference counted data sharing is enabled. It is
     enabled by default; see the `SHARING` macro.
 
-[^3]: When `USE_DSTRING` is enabled (it is by default), this is actually
+[^3]: Unless `USE_STD_STRING` is set, this is actually
 a `dstring` and thus an integer which is a reference into a string table

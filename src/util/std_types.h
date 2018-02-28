@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "expr_cast.h"
 
+#include <unordered_map>
+
 class constant_exprt;
 
 /*! \defgroup gr_std_types Conversion to specific types

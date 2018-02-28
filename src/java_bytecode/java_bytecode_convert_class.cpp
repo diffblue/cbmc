@@ -687,7 +687,7 @@ static void find_and_replace_parameter(
 {
   // get the name of the parameter, e.g., `T` from `java::Class::T`
   const std::string &parameter_full_name =
-    as_string(parameter.type_variable_ref().get_identifier());
+    id2string(parameter.type_variable_ref().get_identifier());
   const std::string &parameter_name =
     parameter_full_name.substr(parameter_full_name.rfind("::") + 2);
 
@@ -698,7 +698,7 @@ static void find_and_replace_parameter(
     [&parameter_name](const java_generic_parametert &replacement_param)
     {
       const std::string &replacement_parameter_full_name =
-        as_string(replacement_param.type_variable().get_identifier());
+        id2string(replacement_param.type_variable().get_identifier());
       return parameter_name.compare(
                replacement_parameter_full_name.substr(
                  replacement_parameter_full_name.rfind("::") + 2)) == 0;
@@ -708,7 +708,7 @@ static void find_and_replace_parameter(
   if(replacement_parameter_p != replacement_parameters.end())
   {
     const std::string &replacement_parameter_full_name =
-      as_string(replacement_parameter_p->type_variable().get_identifier());
+      id2string(replacement_parameter_p->type_variable().get_identifier());
 
     // the replacement parameter is a viable one, i.e., it comes from an outer
     // class

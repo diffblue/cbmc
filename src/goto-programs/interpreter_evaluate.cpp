@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/fixedbv.h>
 #include <util/std_expr.h>
+#include <util/string_container.h>
 #include <util/pointer_offset_size.h>
 
 #include <langapi/language_util.h>
@@ -394,7 +395,7 @@ void interpretert::evaluate(
       if(show)
         warning() << "string decoding not fully implemented "
                   << length << eom;
-      mp_integer tmp=value.get_no();
+      mp_integer tmp = get_string_container()[id2string(value)];
       dest.push_back(tmp);
       return;
     }
