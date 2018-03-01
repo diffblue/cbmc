@@ -160,8 +160,8 @@ exprt string_constraint_generatort::add_axioms_from_int_with_radix(
   }
 
   const typet &char_type = res.content().type().subtype();
-  exprt radix_as_char=typecast_exprt(radix, char_type);
-  exprt radix_input_type=typecast_exprt(radix, type);
+  const typecast_exprt radix_as_char(radix, char_type);
+  const typecast_exprt radix_input_type(radix, type);
   const bool strict_formatting=true;
 
   add_axioms_for_correct_number_format(

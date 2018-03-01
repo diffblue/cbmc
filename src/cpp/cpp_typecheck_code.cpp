@@ -315,8 +315,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         assign.add_source_location() = code.source_location();
         assign.copy_to_operands(symbol_expr, code.op0());
         typecheck_side_effect_assignment(assign);
-        code_expressiont new_code;
-        new_code.expression()=assign;
+        code_expressiont new_code(assign);
         code.swap(new_code);
       }
       else
@@ -400,10 +399,8 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     if(is_typedef)
       continue;
 
-    codet decl_statement(ID_decl);
-    decl_statement.reserve_operands(2);
+    code_declt decl_statement(cpp_symbol_expr(symbol));
     decl_statement.add_source_location()=symbol.location;
-    decl_statement.copy_to_operands(cpp_symbol_expr(symbol));
 
     // Do we have an initializer that's not code?
     if(symbol.value.is_not_nil() &&

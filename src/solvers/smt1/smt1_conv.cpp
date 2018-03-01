@@ -174,6 +174,7 @@ exprt smt1_convt::ce_value(
   }
   else if(type.id()==ID_array)
   {
+    const array_typet &array_type = to_array_type(type);
     const typet &subtype=ns.follow(type.subtype());
 
     // arrays in structs are flat, no index
@@ -182,12 +183,12 @@ exprt smt1_convt::ce_value(
       // we can only do fixed-size arrays
       mp_integer size;
 
-      if(!to_integer(to_array_type(type).size(), size))
+      if(!to_integer(array_type.size(), size))
       {
         std::size_t size_int=integer2unsigned(size);
         std::size_t sub_width=value.size()/size_int;
-        exprt array_list(ID_array, type);
-        array_list.operands().resize(size_int);
+        array_exprt array_list(array_type);
+        array_list.reserve_operands(size_int);
 
         std::size_t offset=value.size();
 
@@ -195,8 +196,7 @@ exprt smt1_convt::ce_value(
         {
           offset-=sub_width;
           std::string sub_value=value.substr(offset, sub_width);
-          array_list.operands()[i]=
-            ce_value(subtype, "", sub_value, true);
+          array_list.copy_to_operands(ce_value(subtype, "", sub_value, true));
         }
 
         return array_list;
@@ -244,8 +244,7 @@ void smt1_convt::array_index(const exprt &expr)
   typet t=array_index_type();
   if(t==expr.type())
     return convert_expr(expr, true);
-  exprt tmp(ID_typecast, t);
-  tmp.copy_to_operands(expr);
+  const typecast_exprt tmp(expr, t);
   convert_expr(tmp, true);
 }
 
@@ -322,8 +321,7 @@ void smt1_convt::convert_address_of_rec(
       mp_integer offset=member_offset(struct_type, component_name, ns);
       assert(offset>=0);
 
-      typet index_type(ID_unsignedbv);
-      index_type.set(ID_width, boolbv_width(result_type));
+      const unsignedbv_typet index_type(boolbv_width(result_type));
 
       out << "(bvadd ";
       convert_address_of_rec(struct_op, result_type);
@@ -3090,11 +3088,10 @@ exprt smt1_convt::binary2struct(
   if(total_width==0)
     throw "failed to get struct width";
 
-  exprt e(ID_struct, type);
-  e.operands().resize(components.size());
+  struct_exprt e(type);
+  e.reserve_operands(components.size());
 
   std::size_t index=binary.size();
-  std::size_t i=0;
   for(const auto &comp : components)
   {
     const typet &sub_type=ns.follow(comp.type());
@@ -3107,7 +3104,7 @@ exprt smt1_convt::binary2struct(
     index-=sub_size;
     std::string cval=binary.substr(index, sub_size);
 
-    e.operands()[i++]=ce_value(sub_type, "", cval, true);
+    e.copy_to_operands(ce_value(sub_type, "", cval, true));
   }
 
   return e;

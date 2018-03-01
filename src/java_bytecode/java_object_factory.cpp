@@ -195,11 +195,9 @@ exprt allocate_dynamic_object(
   {
     INVARIANT(!object_size.is_nil(), "Size of Java objects should be known");
     // malloc expression
-    exprt malloc_expr=side_effect_exprt(ID_allocate);
+    side_effect_exprt malloc_expr(ID_allocate, pointer_type(allocate_type));
     malloc_expr.copy_to_operands(object_size);
     malloc_expr.copy_to_operands(false_exprt());
-    typet result_type=pointer_type(allocate_type);
-    malloc_expr.type()=result_type;
     // create a symbol for the malloc expression so we can initialize
     // without having to do it potentially through a double-deref, which
     // breaks the to-SSA phase.
@@ -212,10 +210,10 @@ exprt allocate_dynamic_object(
     code_assignt assign=code_assignt(malloc_sym.symbol_expr(), malloc_expr);
     assign.add_source_location()=loc;
     output_code.copy_to_operands(assign);
-    malloc_expr=malloc_sym.symbol_expr();
+    exprt malloc_symbol_expr=malloc_sym.symbol_expr();
     if(cast_needed)
-      malloc_expr=typecast_exprt(malloc_expr, target_expr.type());
-    code_assignt code(target_expr, malloc_expr);
+      malloc_symbol_expr=typecast_exprt(malloc_symbol_expr, target_expr.type());
+    code_assignt code(target_expr, malloc_symbol_expr);
     code.add_source_location()=loc;
     output_code.copy_to_operands(code);
     return malloc_sym.symbol_expr();
@@ -517,10 +515,9 @@ static mp_integer max_value(const typet &type)
 /// \return code allocation object and assigning `lhs`
 static codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
 {
-  side_effect_exprt alloc(ID_allocate);
+  side_effect_exprt alloc(ID_allocate, lhs.type());
   alloc.copy_to_operands(size);
   alloc.copy_to_operands(false_exprt());
-  alloc.type() = lhs.type();
   return code_assignt(lhs, alloc);
 }
 
@@ -1247,7 +1244,7 @@ void java_object_factoryt::allocate_nondet_length_array(
   java_new_array.copy_to_operands(length_sym_expr);
   java_new_array.set(ID_length_upper_bound, max_length_expr);
   java_new_array.type().subtype().set(ID_C_element_type, element_type);
-  codet assign=code_assignt(lhs, java_new_array);
+  code_assignt assign(lhs, java_new_array);
   assign.add_source_location()=loc;
   assignments.copy_to_operands(assign);
 }
@@ -1296,7 +1293,7 @@ void java_object_factoryt::gen_nondet_array_init(
 
   dereference_exprt deref_expr(expr, expr.type().subtype());
   const auto &comps=struct_type.components();
-  exprt length_expr=member_exprt(deref_expr, "length", comps[1].type());
+  const member_exprt length_expr(deref_expr, "length", comps[1].type());
   exprt init_array_expr=member_exprt(deref_expr, "data", comps[2].type());
 
   if(init_array_expr.type()!=pointer_type(element_type))
@@ -1356,7 +1353,7 @@ void java_object_factoryt::gen_nondet_array_init(
     assignments.move_to_operands(max_test);
   }
 
-  exprt arraycellref=dereference_exprt(
+  const dereference_exprt arraycellref(
     plus_exprt(array_init_symexpr, counter_expr, array_init_symexpr.type()),
     array_init_symexpr.type().subtype());
 

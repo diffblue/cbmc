@@ -274,7 +274,7 @@ void goto_symext::symex_other(
                    "havoc_object must have one operand");
 
     // we need to add dereferencing for the first operand
-    exprt object=dereference_exprt(code.op0(), empty_typet());
+    dereference_exprt object(code.op0(), empty_typet());
     clean_expr(object, state, true);
 
     havoc_rec(state, guardt(), object);

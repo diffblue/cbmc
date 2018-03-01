@@ -270,12 +270,9 @@ bool generate_ansi_c_start_function(
         // assume argc is at least one
         exprt one=from_integer(1, argc_symbol.type);
 
-        exprt ge(ID_ge, typet(ID_bool));
-        ge.copy_to_operands(argc_symbol.symbol_expr(), one);
+        const binary_relation_exprt ge(argc_symbol.symbol_expr(), ID_ge, one);
 
-        codet assumption;
-        assumption.set_statement(ID_assume);
-        assumption.move_to_operands(ge);
+        code_assumet assumption(ge);
         init_code.move_to_operands(assumption);
       }
 
@@ -286,12 +283,10 @@ bool generate_ansi_c_start_function(
 
         exprt bound_expr=from_integer(upper_bound, argc_symbol.type);
 
-        exprt le(ID_le, typet(ID_bool));
-        le.copy_to_operands(argc_symbol.symbol_expr(), bound_expr);
+        const binary_relation_exprt le(
+          argc_symbol.symbol_expr(), ID_le, bound_expr);
 
-        codet assumption;
-        assumption.set_statement(ID_assume);
-        assumption.move_to_operands(le);
+        code_assumet assumption(le);
         init_code.move_to_operands(assumption);
       }
 
@@ -325,12 +320,10 @@ bool generate_ansi_c_start_function(
 
         exprt max_minus_one=from_integer(max-1, envp_size_symbol.type);
 
-        exprt le(ID_le, bool_typet());
-        le.copy_to_operands(envp_size_symbol.symbol_expr(), max_minus_one);
+        const binary_relation_exprt le(
+          envp_size_symbol.symbol_expr(), ID_le, max_minus_one);
 
-        codet assumption;
-        assumption.set_statement(ID_assume);
-        assumption.move_to_operands(le);
+        code_assumet assumption(le);
         init_code.move_to_operands(assumption);
       }
 
@@ -341,8 +334,7 @@ bool generate_ansi_c_start_function(
         exprt zero_string(ID_zero_string, array_typet());
         zero_string.type().subtype()=char_type();
         zero_string.type().set(ID_size, "infinity");
-        exprt index(ID_index, char_type());
-        index.copy_to_operands(zero_string, from_integer(0, uint_type()));
+        const index_exprt index(zero_string, from_integer(0, uint_type()));
         exprt address_of=address_of_exprt(index, pointer_type(char_type()));
 
         if(argv_symbol.type.subtype()!=address_of.type())
@@ -358,13 +350,11 @@ bool generate_ansi_c_start_function(
 
       {
         // assign argv[argc] to NULL
-        exprt null(ID_constant, argv_symbol.type.subtype());
-        null.set(ID_value, ID_NULL);
+        const null_pointer_exprt null(
+          to_pointer_type(argv_symbol.type.subtype()));
 
-        exprt index_expr(ID_index, argv_symbol.type.subtype());
-        index_expr.copy_to_operands(
-          argv_symbol.symbol_expr(),
-          argc_symbol.symbol_expr());
+        index_exprt index_expr(
+          argv_symbol.symbol_expr(), argc_symbol.symbol_expr());
 
         // disable bounds check on that one
         index_expr.set("bounds_check", false);
@@ -378,23 +368,17 @@ bool generate_ansi_c_start_function(
         const symbolt &envp_size_symbol=ns.lookup("envp_size'");
 
         // assume envp[envp_size] is NULL
-        exprt null(ID_constant, envp_symbol.type.subtype());
-        null.set(ID_value, ID_NULL);
+        const null_pointer_exprt null(
+          to_pointer_type(envp_symbol.type.subtype()));
 
-        exprt index_expr(ID_index, envp_symbol.type.subtype());
-        index_expr.copy_to_operands(
-          envp_symbol.symbol_expr(),
-          envp_size_symbol.symbol_expr());
-
+        index_exprt index_expr(
+          envp_symbol.symbol_expr(), envp_size_symbol.symbol_expr());
         // disable bounds check on that one
         index_expr.set("bounds_check", false);
 
-        exprt is_null(ID_equal, typet(ID_bool));
-        is_null.copy_to_operands(index_expr, null);
+        const equal_exprt is_null(index_expr, null);
 
-        codet assumption2;
-        assumption2.set_statement(ID_assume);
-        assumption2.move_to_operands(is_null);
+        code_assumet assumption2(is_null);
         init_code.move_to_operands(assumption2);
       }
 

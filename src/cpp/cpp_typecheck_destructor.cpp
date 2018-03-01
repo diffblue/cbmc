@@ -159,8 +159,10 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
     assert(bit->find(ID_type).id()==ID_symbol);
     const symbolt &psymb = lookup(bit->find(ID_type).get(ID_identifier));
 
-    exprt object(ID_dereference);
-    object.operands().push_back(exprt("cpp-this"));
+    // TODO(tautschnig): object is not type checked before passing it to
+    // cpp_destructor even though cpp_destructor makes heavy use of the .type()
+    // member
+    dereference_exprt object(exprt("cpp-this"), nil_typet());
     object.add_source_location() = source_location;
 
     exprt dtor_code =

@@ -1824,10 +1824,9 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         implies_exprt instance(axiom.premise(), axiom.body());
         replace_expr(axiom.univ_var(), val, instance);
         // We are not sure the index set contains only positive numbers
-        exprt bounds=and_exprt(
+        and_exprt bounds(
           axiom.univ_within_bounds(),
-          binary_relation_exprt(
-            from_integer(0, val.type()), ID_le, val));
+          binary_relation_exprt(from_integer(0, val.type()), ID_le, val));
         replace_expr(axiom.univ_var(), val, bounds);
         const implies_exprt counter(bounds, instance);
 
@@ -2308,10 +2307,9 @@ static exprt instantiate(
   implies_exprt instance(axiom.premise(), axiom.body());
   replace_expr(axiom.univ_var(), r, instance);
   // We are not sure the index set contains only positive numbers
-  exprt bounds=and_exprt(
+  and_exprt bounds(
     axiom.univ_within_bounds(),
-    binary_relation_exprt(
-      from_integer(0, val.type()), ID_le, val));
+    binary_relation_exprt(from_integer(0, val.type()), ID_le, val));
   replace_expr(axiom.univ_var(), r, bounds);
   return implies_exprt(bounds, instance);
 }

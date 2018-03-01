@@ -83,8 +83,7 @@ void qdimacs_coret::simplify_extractbits(exprt &expr) const
           new_operands.push_back(*oit);
         }
 
-        exprt new_value(ID_constant, it->first.type());
-        new_value.set(ID_value, value_string);
+        const constant_exprt new_value(value_string, it->first.type());
         new_operands.push_back(equality_exprt(it->first, new_value));
 
         #if 0

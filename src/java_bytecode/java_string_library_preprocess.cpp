@@ -993,7 +993,7 @@ codet java_string_library_preprocesst::make_float_to_string_code(
   // Getting the argument
   code_typet::parameterst params=type.parameters();
   PRECONDITION(params.size()==1);
-  exprt arg=symbol_exprt(params[0].get_identifier(), params[0].type());
+  const symbol_exprt arg(params[0].get_identifier(), params[0].type());
 
   // Holder for output code
   code_blockt code;
@@ -1137,7 +1137,7 @@ codet java_string_library_preprocesst::make_init_function_from_call(
 
   // The first parameter is the object to be initialized
   PRECONDITION(!params.empty());
-  exprt arg_this=symbol_exprt(params[0].get_identifier(), params[0].type());
+  const symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
   if(ignore_first_arg)
     params.erase(params.begin());
 
@@ -1180,7 +1180,7 @@ codet java_string_library_preprocesst::
   code.add(
     make_assign_function_from_call(function_name, type, loc, symbol_table),
     loc);
-  exprt arg_this=symbol_exprt(params[0].get_identifier(), params[0].type());
+  const symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
   code.add(code_returnt(arg_this), loc);
   return code;
 }
@@ -1525,7 +1525,7 @@ codet java_string_library_preprocesst::make_object_get_class_code(
   symbol_table_baset &symbol_table)
 {
   code_typet::parameterst params=type.parameters();
-  exprt this_obj=symbol_exprt(params[0].get_identifier(), params[0].type());
+  const symbol_exprt this_obj(params[0].get_identifier(), params[0].type());
 
   // Code to be returned
   code_blockt code;

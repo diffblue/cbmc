@@ -228,8 +228,7 @@ void goto_checkt::div_by_zero_check(
   if(zero.is_nil())
     throw "no zero of argument type of operator "+expr.id_string();
 
-  exprt inequality(ID_notequal, bool_typet());
-  inequality.copy_to_operands(expr.op1(), zero);
+  const notequal_exprt inequality(expr.op1(), zero);
 
   add_guarded_claim(
     inequality,
@@ -329,8 +328,7 @@ void goto_checkt::mod_by_zero_check(
   if(zero.is_nil())
     throw "no zero of argument type of operator "+expr.id_string();
 
-  exprt inequality(ID_notequal, bool_typet());
-  inequality.copy_to_operands(expr.op1(), zero);
+  const notequal_exprt inequality(expr.op1(), zero);
 
   add_guarded_claim(
     inequality,
@@ -374,13 +372,13 @@ void goto_checkt::conversion_check(
         if(new_width>=old_width)
           return; // always ok
 
-        binary_relation_exprt no_overflow_upper(ID_le);
-        no_overflow_upper.lhs()=expr.op0();
-        no_overflow_upper.rhs()=from_integer(power(2, new_width-1)-1, old_type);
+        const binary_relation_exprt no_overflow_upper(
+          expr.op0(),
+          ID_le,
+          from_integer(power(2, new_width - 1) - 1, old_type));
 
-        binary_relation_exprt no_overflow_lower(ID_ge);
-        no_overflow_lower.lhs()=expr.op0();
-        no_overflow_lower.rhs()=from_integer(-power(2, new_width-1), old_type);
+        const binary_relation_exprt no_overflow_lower(
+          expr.op0(), ID_ge, from_integer(-power(2, new_width - 1), old_type));
 
         add_guarded_claim(
           and_exprt(no_overflow_lower, no_overflow_upper),
@@ -396,9 +394,10 @@ void goto_checkt::conversion_check(
         if(new_width>=old_width+1)
           return; // always ok
 
-        binary_relation_exprt no_overflow_upper(ID_le);
-        no_overflow_upper.lhs()=expr.op0();
-        no_overflow_upper.rhs()=from_integer(power(2, new_width-1)-1, old_type);
+        const binary_relation_exprt no_overflow_upper(
+          expr.op0(),
+          ID_le,
+          from_integer(power(2, new_width - 1) - 1, old_type));
 
         add_guarded_claim(
           no_overflow_upper,
@@ -413,15 +412,13 @@ void goto_checkt::conversion_check(
         // Note that the fractional part is truncated!
         ieee_floatt upper(to_floatbv_type(old_type));
         upper.from_integer(power(2, new_width-1));
-        binary_relation_exprt no_overflow_upper(ID_lt);
-        no_overflow_upper.lhs()=expr.op0();
-        no_overflow_upper.rhs()=upper.to_expr();
+        const binary_relation_exprt no_overflow_upper(
+          expr.op0(), ID_lt, upper.to_expr());
 
         ieee_floatt lower(to_floatbv_type(old_type));
         lower.from_integer(-power(2, new_width-1)-1);
-        binary_relation_exprt no_overflow_lower(ID_gt);
-        no_overflow_lower.lhs()=expr.op0();
-        no_overflow_lower.rhs()=lower.to_expr();
+        const binary_relation_exprt no_overflow_lower(
+          expr.op0(), ID_gt, lower.to_expr());
 
         add_guarded_claim(
           and_exprt(no_overflow_lower, no_overflow_upper),
@@ -443,9 +440,8 @@ void goto_checkt::conversion_check(
         if(new_width>=old_width-1)
         {
           // only need lower bound check
-          binary_relation_exprt no_overflow_lower(ID_ge);
-          no_overflow_lower.lhs()=expr.op0();
-          no_overflow_lower.rhs()=from_integer(0, old_type);
+          const binary_relation_exprt no_overflow_lower(
+            expr.op0(), ID_ge, from_integer(0, old_type));
 
           add_guarded_claim(
             no_overflow_lower,
@@ -458,13 +454,11 @@ void goto_checkt::conversion_check(
         else
         {
           // need both
-          binary_relation_exprt no_overflow_upper(ID_le);
-          no_overflow_upper.lhs()=expr.op0();
-          no_overflow_upper.rhs()=from_integer(power(2, new_width)-1, old_type);
+          const binary_relation_exprt no_overflow_upper(
+            expr.op0(), ID_le, from_integer(power(2, new_width) - 1, old_type));
 
-          binary_relation_exprt no_overflow_lower(ID_ge);
-          no_overflow_lower.lhs()=expr.op0();
-          no_overflow_lower.rhs()=from_integer(0, old_type);
+          const binary_relation_exprt no_overflow_lower(
+            expr.op0(), ID_ge, from_integer(0, old_type));
 
           add_guarded_claim(
             and_exprt(no_overflow_lower, no_overflow_upper),
@@ -481,9 +475,8 @@ void goto_checkt::conversion_check(
         if(new_width>=old_width)
           return; // always ok
 
-        binary_relation_exprt no_overflow_upper(ID_le);
-        no_overflow_upper.lhs()=expr.op0();
-        no_overflow_upper.rhs()=from_integer(power(2, new_width)-1, old_type);
+        const binary_relation_exprt no_overflow_upper(
+          expr.op0(), ID_le, from_integer(power(2, new_width) - 1, old_type));
 
         add_guarded_claim(
           no_overflow_upper,
@@ -498,15 +491,13 @@ void goto_checkt::conversion_check(
         // Note that the fractional part is truncated!
         ieee_floatt upper(to_floatbv_type(old_type));
         upper.from_integer(power(2, new_width)-1);
-        binary_relation_exprt no_overflow_upper(ID_lt);
-        no_overflow_upper.lhs()=expr.op0();
-        no_overflow_upper.rhs()=upper.to_expr();
+        const binary_relation_exprt no_overflow_upper(
+          expr.op0(), ID_lt, upper.to_expr());
 
         ieee_floatt lower(to_floatbv_type(old_type));
         lower.from_integer(-1);
-        binary_relation_exprt no_overflow_lower(ID_gt);
-        no_overflow_lower.lhs()=expr.op0();
-        no_overflow_lower.rhs()=lower.to_expr();
+        const binary_relation_exprt no_overflow_lower(
+          expr.op0(), ID_gt, lower.to_expr());
 
         add_guarded_claim(
           and_exprt(no_overflow_lower, no_overflow_upper),
@@ -665,8 +656,8 @@ void goto_checkt::float_overflow_check(
     if(ns.follow(expr.op0().type()).id()==ID_floatbv)
     {
       // float-to-float
-      unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
-      unary_exprt new_inf(ID_isinf, expr, bool_typet());
+      const isinf_exprt op0_inf(expr.op0());
+      const isinf_exprt new_inf(expr);
 
       or_exprt overflow_check(op0_inf, not_exprt(new_inf));
 
@@ -681,7 +672,7 @@ void goto_checkt::float_overflow_check(
     else
     {
       // non-float-to-float
-      unary_exprt new_inf(ID_isinf, expr, bool_typet());
+      const isinf_exprt new_inf(expr);
 
       add_guarded_claim(
         not_exprt(new_inf),
@@ -699,8 +690,8 @@ void goto_checkt::float_overflow_check(
     assert(expr.operands().size()==2);
 
     // Can overflow if dividing by something small
-    unary_exprt new_inf(ID_isinf, expr, bool_typet());
-    unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
+    const isinf_exprt new_inf(expr);
+    const isinf_exprt op0_inf(expr.op0());
 
     or_exprt overflow_check(op0_inf, not_exprt(new_inf));
 
@@ -730,9 +721,9 @@ void goto_checkt::float_overflow_check(
     if(expr.operands().size()==2)
     {
       // Can overflow
-      unary_exprt new_inf(ID_isinf, expr, bool_typet());
-      unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
-      unary_exprt op1_inf(ID_isinf, expr.op1(), bool_typet());
+      const isinf_exprt new_inf(expr);
+      const isinf_exprt op0_inf(expr.op0());
+      const isinf_exprt op1_inf(expr.op1());
 
       or_exprt overflow_check(op0_inf, op1_inf, not_exprt(new_inf));
 
@@ -791,11 +782,11 @@ void goto_checkt::nan_check(
     // there a two ways to get a new NaN on division:
     // 0/0 = NaN and x/inf = NaN
     // (note that x/0 = +-inf for x!=0 and x!=inf)
-    exprt zero_div_zero=and_exprt(
+    const and_exprt zero_div_zero(
       ieee_float_equal_exprt(expr.op0(), from_integer(0, expr.op0().type())),
       ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())));
 
-    exprt div_inf=unary_exprt(ID_isinf, expr.op1(), bool_typet());
+    const isinf_exprt div_inf(expr.op1());
 
     isnan=or_exprt(zero_div_zero, div_inf);
   }
@@ -807,13 +798,13 @@ void goto_checkt::nan_check(
     assert(expr.operands().size()==2);
 
     // Inf * 0 is NaN
-    exprt inf_times_zero=and_exprt(
-      unary_exprt(ID_isinf, expr.op0(), bool_typet()),
+    const and_exprt inf_times_zero(
+      isinf_exprt(expr.op0()),
       ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())));
 
-    exprt zero_times_inf=and_exprt(
+    const and_exprt zero_times_inf(
       ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())),
-      unary_exprt(ID_isinf, expr.op0(), bool_typet()));
+      isinf_exprt(expr.op0()));
 
     isnan=or_exprt(inf_times_zero, zero_times_inf);
   }
@@ -1055,13 +1046,9 @@ void goto_checkt::pointer_validity_check(
 
     if(flags.is_unknown() || flags.is_dynamic_heap())
     {
-      exprt dynamic_bounds=
-        or_exprt(dynamic_object_lower_bound(pointer, ns, access_lb),
-                 dynamic_object_upper_bound(
-                   pointer,
-                   dereference_type,
-                   ns,
-                   access_ub));
+      const or_exprt dynamic_bounds(
+        dynamic_object_lower_bound(pointer, ns, access_lb),
+        dynamic_object_upper_bound(pointer, dereference_type, ns, access_ub));
 
       add_guarded_claim(
         or_exprt(
@@ -1080,13 +1067,9 @@ void goto_checkt::pointer_validity_check(
        flags.is_dynamic_local() ||
        flags.is_static_lifetime())
     {
-      exprt object_bounds=
-        or_exprt(object_lower_bound(pointer, ns, access_lb),
-                 object_upper_bound(
-                   pointer,
-                   dereference_type,
-                   ns,
-                   access_ub));
+      const or_exprt object_bounds(
+        object_lower_bound(pointer, ns, access_lb),
+        object_upper_bound(pointer, dereference_type, ns, access_ub));
 
       add_guarded_claim(
         or_exprt(allocs, dynamic_object(pointer), not_exprt(object_bounds)),
@@ -1672,12 +1655,11 @@ void goto_checkt::goto_check(
           exprt lhs=ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
           if(!base_type_eq(lhs.type(), address_of_expr.type(), ns))
             address_of_expr.make_typecast(lhs.type());
-          exprt rhs=
-            if_exprt(
-              side_effect_expr_nondett(bool_typet()),
-              address_of_expr,
-              lhs,
-              lhs.type());
+          const if_exprt rhs(
+            side_effect_expr_nondett(bool_typet()),
+            address_of_expr,
+            lhs,
+            lhs.type());
           t->source_location=i.source_location;
           t->code=code_assignt(lhs, rhs);
           t->code.add_source_location()=i.source_location;

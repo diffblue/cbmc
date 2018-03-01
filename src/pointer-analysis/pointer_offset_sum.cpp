@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "pointer_offset_sum.h"
 
+#include <util/std_expr.h>
+
 exprt pointer_offset_sum(const exprt &a, const exprt &b)
 {
   if(a.id()==ID_unknown)
@@ -22,10 +24,9 @@ exprt pointer_offset_sum(const exprt &a, const exprt &b)
   else if(b.is_zero())
     return a;
 
-  exprt new_offset(ID_plus, a.type());
-  new_offset.copy_to_operands(a, b);
+  plus_exprt new_offset(a, b);
 
-  if(new_offset.op1().type()!=a.type())
+  if(b.type() != a.type())
     new_offset.op1().make_typecast(a.type());
 
   return new_offset;

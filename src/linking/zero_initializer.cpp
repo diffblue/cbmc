@@ -132,8 +132,7 @@ exprt zero_initializert::zero_initializer_rec(
 
       if(array_type.size().id()==ID_infinity)
       {
-        exprt value(ID_array_of, type);
-        value.copy_to_operands(tmpval);
+        array_of_exprt value(tmpval, array_type);
         value.add_source_location()=source_location;
         return value;
       }
@@ -194,7 +193,7 @@ exprt zero_initializert::zero_initializer_rec(
     const struct_typet::componentst &components=
       to_struct_type(type).components();
 
-    exprt value(ID_struct, type);
+    struct_exprt value(type);
 
     value.operands().reserve(components.size());
 
@@ -205,8 +204,7 @@ exprt zero_initializert::zero_initializer_rec(
     {
       if(it->type().id()==ID_code)
       {
-        constant_exprt code_value(it->type());
-        code_value.set_value(ID_nil);
+        constant_exprt code_value(ID_nil, it->type());
         code_value.add_source_location()=source_location;
         value.copy_to_operands(code_value);
       }

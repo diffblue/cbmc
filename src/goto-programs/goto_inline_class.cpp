@@ -232,9 +232,7 @@ void goto_inlinet::replace_return(
       }
       else if(!it->code.operands().empty())
       {
-        codet expression(ID_expression);
-        expression.move_to_operands(it->code.op0());
-        it->code=expression;
+        it->code=code_expressiont(it->code.op0());
         it->type=OTHER;
         it++;
       }

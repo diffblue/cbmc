@@ -137,13 +137,8 @@ exprt convert_float_literal(const std::string &src)
 
   if(is_imaginary)
   {
-    complex_typet complex_type;
-    complex_type.subtype()=result.type();
-    exprt complex_expr(ID_complex, complex_type);
-    complex_expr.operands().resize(2);
-    complex_expr.op0()=from_integer(0, result.type());
-    complex_expr.op1()=result;
-    return complex_expr;
+    const complex_typet complex_type(result.type());
+    return complex_exprt(from_integer(0, result.type()), result, complex_type);
   }
 
   return result;

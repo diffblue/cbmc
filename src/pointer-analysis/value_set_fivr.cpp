@@ -272,8 +272,7 @@ void value_set_fivrt::flatten_rec(
       if(fi==values.end())
       {
         // this is some static object, keep it in.
-        exprt se(ID_symbol, o.type().subtype());
-        se.set(ID_identifier, o.get(ID_identifier));
+        const symbol_exprt se(o.get(ID_identifier), o.type().subtype());
         insert_from(dest, se, 0);
       }
       else
@@ -987,10 +986,8 @@ void value_set_fivrt::get_reference_set_sharing_rec(
         insert_from(dest, exprt(ID_unknown, expr.type()));
       else
       {
-        exprt index_expr(ID_index, expr.type());
-        index_expr.operands().resize(2);
-        index_expr.op0()=object;
-        index_expr.op1()=from_integer(0, index_type());
+        index_exprt index_expr(
+          object, from_integer(0, index_type()), expr.type());
 
         // adjust type?
         if(object.type().id()!="#REF#" &&
@@ -1047,9 +1044,7 @@ void value_set_fivrt::get_reference_set_sharing_rec(
       {
         offsett o = it->second;
 
-        exprt member_expr(ID_member, expr.type());
-        member_expr.copy_to_operands(object);
-        member_expr.set(ID_component_name, component_name);
+        member_exprt member_expr(object, component_name, expr.type());
 
         // adjust type?
         if(ns.follow(struct_op.type())!=ns.follow(object.type()))
@@ -1117,9 +1112,7 @@ void value_set_fivrt::assign(
       if(subtype.id()==ID_code)
         continue;
 
-      exprt lhs_member(ID_member, subtype);
-      lhs_member.set(ID_component_name, name);
-      lhs_member.copy_to_operands(lhs);
+      const member_exprt lhs_member(lhs, name, subtype);
 
       exprt rhs_member;
 
@@ -1177,8 +1170,8 @@ void value_set_fivrt::assign(
   }
   else if(type.id()==ID_array)
   {
-    exprt lhs_index(ID_index, type.subtype());
-    lhs_index.copy_to_operands(lhs, exprt(ID_unknown, index_type()));
+    const index_exprt lhs_index(
+      lhs, exprt(ID_unknown, index_type()), type.subtype());
 
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
@@ -1207,16 +1200,16 @@ void value_set_fivrt::assign(
       {
         assert(rhs.operands().size()==3);
 
-        exprt op0_index(ID_index, type.subtype());
-        op0_index.copy_to_operands(rhs.op0(), exprt(ID_unknown, index_type()));
+        const index_exprt op0_index(
+          rhs.op0(), exprt(ID_unknown, index_type()), type.subtype());
 
         assign(lhs_index, op0_index, ns, add_to_sets);
         assign(lhs_index, rhs.op2(), ns, true);
       }
       else
       {
-        exprt rhs_index(ID_index, type.subtype());
-        rhs_index.copy_to_operands(rhs, exprt(ID_unknown, index_type()));
+        const index_exprt rhs_index(
+          rhs, exprt(ID_unknown, index_type()), type.subtype());
         assign(lhs_index, rhs_index, ns, true);
       }
     }
@@ -1517,8 +1510,7 @@ void value_set_fivrt::do_function_call(
     const std::string identifier="value_set::" + id2string(function) + "::" +
                                  "argument$"+std::to_string(i);
     add_var(identifier, "");
-    exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
-//    std::cout << arguments[i] << '\n';
+    const symbol_exprt dummy_lhs(identifier, arguments[i].type());
 
     assign(dummy_lhs, arguments[i], ns, true);
 
@@ -1551,7 +1543,7 @@ void value_set_fivrt::do_function_call(
       symbol_exprt("value_set::" + id2string(function) + "::" +
                    "argument$"+std::to_string(i), it->type());
 
-    exprt actual_lhs=symbol_exprt(identifier, it->type());
+    const symbol_exprt actual_lhs(identifier, it->type());
     assign(actual_lhs, v_expr, ns, true);
     i++;
   }

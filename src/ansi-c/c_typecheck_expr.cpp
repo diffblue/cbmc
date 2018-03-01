@@ -896,23 +896,19 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
 
     if(fc.lhs().is_nil())
     {
-      codet code_expr(ID_expression);
+      code_expressiont code_expr(sideeffect);
       code_expr.add_source_location() = fc.source_location();
-      code_expr.move_to_operands(sideeffect);
       last.swap(code_expr);
     }
     else
     {
-      codet code_expr(ID_expression);
-      code_expr.add_source_location() = fc.source_location();
-
-      exprt assign(ID_side_effect);
-      assign.set(ID_statement, ID_assign);
+      side_effect_exprt assign(ID_assign, sideeffect.type());
       assign.add_source_location()=fc.source_location();
       assign.move_to_operands(fc.lhs(), sideeffect);
-      assign.type()=assign.op1().type();
 
-      code_expr.move_to_operands(assign);
+      code_expressiont code_expr(assign);
+      code_expr.add_source_location() = fc.source_location();
+
       last.swap(code_expr);
     }
   }
@@ -1446,8 +1442,7 @@ void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
 
   // turn x->y into (*x).y
 
-  exprt deref(ID_dereference);
-  deref.move_to_operands(expr.op0());
+  dereference_exprt deref(expr.op0());
   deref.add_source_location()=expr.source_location();
 
   typecheck_expr_dereference(deref);
@@ -1974,10 +1969,9 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   }
   else
   {
-    exprt tmp(ID_dereference, f_op_type.subtype());
+    dereference_exprt tmp(f_op, f_op_type.subtype());
     tmp.set(ID_C_implicit, true);
     tmp.add_source_location()=f_op.source_location();
-    tmp.move_to_operands(f_op);
     f_op.swap(tmp);
   }
 
@@ -2038,9 +2032,8 @@ exprt c_typecheck_baset::do_special_functions(
 
     typecheck_function_call_arguments(expr);
 
-    exprt get_must_expr=
-      binary_predicate_exprt(
-        expr.arguments()[0], "get_must", expr.arguments()[1]);
+    binary_predicate_exprt get_must_expr(
+      expr.arguments()[0], "get_must", expr.arguments()[1]);
     get_must_expr.add_source_location()=source_location;
 
     return get_must_expr;
@@ -2056,9 +2049,8 @@ exprt c_typecheck_baset::do_special_functions(
 
     typecheck_function_call_arguments(expr);
 
-    exprt get_may_expr=
-      binary_predicate_exprt(
-        expr.arguments()[0], "get_may", expr.arguments()[1]);
+    binary_predicate_exprt get_may_expr(
+      expr.arguments()[0], "get_may", expr.arguments()[1]);
     get_may_expr.add_source_location()=source_location;
 
     return get_may_expr;
@@ -2072,8 +2064,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    predicate_exprt same_object_expr(ID_invalid_pointer);
-    same_object_expr.operands()=expr.arguments();
+    exprt same_object_expr = invalid_pointer(expr.arguments().front());
     same_object_expr.add_source_location()=source_location;
 
     return same_object_expr;
@@ -2202,8 +2193,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt isnan_expr(ID_isnan, bool_typet());
-    isnan_expr.operands()=expr.arguments();
+    isnan_exprt isnan_expr(expr.arguments().front());
     isnan_expr.add_source_location()=source_location;
 
     return isnan_expr;
@@ -2219,8 +2209,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt isfinite_expr(ID_isfinite, bool_typet());
-    isfinite_expr.operands()=expr.arguments();
+    isfinite_exprt isfinite_expr(expr.arguments().front());
     isfinite_expr.add_source_location()=source_location;
 
     return isfinite_expr;
@@ -2267,8 +2256,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt abs_expr(ID_abs, expr.type());
-    abs_expr.operands()=expr.arguments();
+    abs_exprt abs_expr(expr.arguments().front());
     abs_expr.add_source_location()=source_location;
 
     return abs_expr;
@@ -2282,8 +2270,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt malloc_expr=side_effect_exprt(ID_allocate);
-    malloc_expr.type()=expr.type();
+    side_effect_exprt malloc_expr(ID_allocate, expr.type());
     malloc_expr.add_source_location()=source_location;
     malloc_expr.operands()=expr.arguments();
 
@@ -2301,8 +2288,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt isinf_expr(ID_isinf, bool_typet());
-    isinf_expr.operands()=expr.arguments();
+    isinf_exprt isinf_expr(expr.arguments().front());
     isinf_expr.add_source_location()=source_location;
 
     return isinf_expr;
@@ -2318,8 +2304,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt isnormal_expr(ID_isnormal, bool_typet());
-    isnormal_expr.operands()=expr.arguments();
+    isnormal_exprt isnormal_expr(expr.arguments().front());
     isnormal_expr.add_source_location()=source_location;
 
     return isnormal_expr;
@@ -2338,8 +2323,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt sign_expr(ID_sign, bool_typet());
-    sign_expr.operands()=expr.arguments();
+    sign_exprt sign_expr(expr.arguments().front());
     sign_expr.add_source_location()=source_location;
 
     return sign_expr;

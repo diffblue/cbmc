@@ -98,15 +98,10 @@ void invariant_propagationt::get_objects_rec(
   {
     const struct_typet &struct_type=to_struct_type(t);
 
-    const struct_typet::componentst &c=struct_type.components();
-
-    exprt member_expr(ID_member);
-    member_expr.copy_to_operands(src);
-
-    for(const auto &component : c)
+    for(const auto &component : struct_type.components())
     {
-      member_expr.set(ID_component_name, component.get_name());
-      member_expr.type()=component.type();
+      const member_exprt member_expr(
+        src, component.get_name(), component.type());
       // recursive call
       get_objects_rec(member_expr, dest);
     }

@@ -103,7 +103,7 @@ codet cpp_typecheckt::cpp_constructor(
     }
     else*/
     {
-      codet new_code(ID_block);
+      code_blockt new_code;
 
       // for each element of the array, call the default constructor
       for(mp_integer i=0; i < s; ++i)
@@ -113,16 +113,12 @@ codet cpp_typecheckt::cpp_constructor(
         exprt constant=from_integer(i, index_type());
         constant.add_source_location()=source_location;
 
-        exprt index(ID_index);
-        index.copy_to_operands(object);
-        index.copy_to_operands(constant);
+        index_exprt index(object, constant);
         index.add_source_location()=source_location;
 
         if(!operands.empty())
         {
-          exprt operand(ID_index);
-          operand.copy_to_operands(operands.front());
-          operand.copy_to_operands(constant);
+          index_exprt operand(operands.front(), constant);
           operand.add_source_location()=source_location;
           tmp_operands.push_back(operand);
         }
@@ -202,16 +198,14 @@ codet cpp_typecheckt::cpp_constructor(
       to_struct_type(tmp_type);
 
     // set most-derived bits
-    codet block(ID_block);
+    code_blockt block;
     for(std::size_t i=0; i < struct_type.components().size(); i++)
     {
       const irept &component=struct_type.components()[i];
       if(component.get(ID_base_name)!="@most_derived")
         continue;
 
-      exprt member(ID_member, bool_typet());
-      member.set(ID_component_name, component.get(ID_name));
-      member.copy_to_operands(object_tc);
+      member_exprt member(object_tc, component.get(ID_name), bool_typet());
       member.add_source_location()=source_location;
       member.set(ID_C_lvalue, object_tc.get_bool(ID_C_lvalue));
 
@@ -224,8 +218,7 @@ codet cpp_typecheckt::cpp_constructor(
       assign.add_source_location()=source_location;
       assign.move_to_operands(member, val);
       typecheck_side_effect_assignment(assign);
-      code_expressiont code_exp;
-      code_exp.expression()=assign;
+      code_expressiont code_exp(assign);
       block.move_to_operands(code_exp);
     }
 

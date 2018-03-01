@@ -1029,9 +1029,7 @@ bool simplify_exprt::simplify_extractbits(exprt &expr)
       svalue.substr(width-integer2size_t(start)-1,
                     integer2size_t(start-end+1));
 
-    exprt tmp(ID_constant, expr.type());
-    tmp.set(ID_value, extracted_value);
-    expr.swap(tmp);
+    expr = constant_exprt(extracted_value, expr.type());
 
     return false;
   }
@@ -1151,9 +1149,7 @@ bool simplify_exprt::simplify_bitnot(exprt &expr)
         for(auto &ch : value)
           ch=(ch=='0')?'1':'0';
 
-        exprt tmp(ID_constant, op.type());
-        tmp.set(ID_value, value);
-        expr.swap(tmp);
+        expr = constant_exprt(value, op.type());
         return false;
       }
     }

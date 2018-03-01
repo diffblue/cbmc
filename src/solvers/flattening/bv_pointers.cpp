@@ -407,8 +407,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       return bv;
     }
 
-    exprt neg_op1=unary_exprt(
-      ID_unary_minus, expr.op1(), expr.op1().type());
+    const unary_minus_exprt neg_op1(expr.op1());
 
     bv=convert_bv(expr.op0());
 

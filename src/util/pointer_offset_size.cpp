@@ -326,8 +326,7 @@ exprt size_of_expr(
     if(size.type()!=sub.type())
       size.make_typecast(sub.type());
 
-    exprt result=mult_exprt(size, sub);
-
+    mult_exprt result(size, sub);
     simplify(result, ns);
 
     return result;
@@ -347,7 +346,7 @@ exprt size_of_expr(
     if(size.type()!=sub.type())
       size.make_typecast(sub.type());
 
-    exprt result=mult_exprt(size, sub);
+    mult_exprt result(size, sub);
     simplify(result, ns);
 
     return result;
@@ -360,7 +359,7 @@ exprt size_of_expr(
 
     const exprt size=from_integer(2, sub.type());
 
-    exprt result=mult_exprt(size, sub);
+    mult_exprt result(size, sub);
     simplify(result, ns);
 
     return result;

@@ -198,11 +198,7 @@ const exprt qbf_squolem_coret::f_get(literalt l)
     const exprt &sym=it->second.first;
     unsigned index=it->second.second;
 
-    exprt extract_expr(ID_extractbit, typet(ID_bool));
-    extract_expr.copy_to_operands(sym);
-    typet uint_type(ID_unsignedbv);
-    uint_type.set(ID_width, 32);
-    extract_expr.copy_to_operands(from_integer(index, uint_type));
+    extractbit_exprt extract_expr(sym, from_integer(index, integer_typet()));
 
     if(l.sign())
       extract_expr.negate();
@@ -257,7 +253,7 @@ const exprt qbf_squolem_coret::f_get_cnf(WitnessStack *wsp)
 
   while(p!=NULL)
   {
-    exprt clause=or_exprt();
+    or_exprt clause;
 
     for(unsigned i=0; i<p->size; i++)
     {
@@ -299,7 +295,7 @@ const exprt qbf_squolem_coret::f_get_dnf(WitnessStack *wsp)
 
   while(p!=NULL)
   {
-    exprt cube=and_exprt();
+    and_exprt cube;
 
     for(unsigned i=0; i<p->size; i++)
     {
