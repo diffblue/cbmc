@@ -943,10 +943,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   std::vector<exprt> instances =
     generate_instantiations(debug(), ns, generator, index_sets, axioms);
   for(auto &instance : instances)
-  {
-    add_guard_to_array_accesses(instance, max_string_length);
     add_lemma(instance);
-  }
 
   while((loop_bound_--)>0)
   {
@@ -1005,10 +1002,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       std::vector<exprt> instances =
         generate_instantiations(debug(), ns, generator, index_sets, axioms);
       for(auto &instance : instances)
-      {
-        add_guard_to_array_accesses(instance, max_string_length);
         add_lemma(instance);
-      }
     }
     else
     {
@@ -1032,13 +1026,14 @@ void string_refinementt::add_lemma(
   if(!seen_instances.insert(lemma).second)
     return;
 
-  current_constraints.push_back(lemma);
+  exprt lemma_copy = lemma;
+  add_guard_to_array_accesses(lemma_copy, max_string_length);
+  current_constraints.push_back(lemma_copy);
 
-  exprt simple_lemma=lemma;
   if(simplify_lemma)
-    simplify(simple_lemma, ns);
+    simplify(lemma_copy, ns);
 
-  if(simple_lemma.is_true())
+  if(lemma_copy.is_true())
   {
 #if 0
     debug() << "string_refinementt::add_lemma : tautology" << eom;
@@ -1046,11 +1041,11 @@ void string_refinementt::add_lemma(
     return;
   }
 
-  symbol_resolve.replace_expr(simple_lemma);
+  symbol_resolve.replace_expr(lemma_copy);
 
   // Replace empty arrays with array_of expression because the solver cannot
   // handle empty arrays.
-  for(auto it = simple_lemma.depth_begin(); it != simple_lemma.depth_end();)
+  for(auto it = lemma_copy.depth_begin(); it != lemma_copy.depth_end();)
   {
     if(it->id() == ID_array && it->operands().empty())
     {
@@ -1063,9 +1058,9 @@ void string_refinementt::add_lemma(
       ++it;
   }
 
-  debug() << "adding lemma " << from_expr(ns, "", simple_lemma) << eom;
+  debug() << "adding lemma " << from_expr(ns, "", lemma_copy) << eom;
 
-  prop.l_set_to_true(convert(simple_lemma));
+  prop.l_set_to_true(convert(lemma_copy));
 }
 
 /// Get a model of an array and put it in a certain form.
