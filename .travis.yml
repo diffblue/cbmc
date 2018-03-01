@@ -95,28 +95,6 @@ jobs:
         - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
 
-    # Ubuntu Linux with glibc using g++-5, debug mode
-    - stage: Test different OS/CXX/Flags
-      os: linux
-      sudo: false
-      compiler: gcc
-      cache: ccache
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - libwww-perl
-            - g++-5
-            - libubsan0
-      before_install:
-        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
-      # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
-      env:
-        - COMPILER="ccache g++-5"
-        - EXTRA_CXXFLAGS="-DDEBUG"
-      script: echo "Not running any tests for a debug build."
-
     # Ubuntu Linux with glibc using clang++-3.7, no-debug mode
     - stage: Test different OS/CXX/Flags
       os: linux
