@@ -126,7 +126,7 @@ void remove_internal_symbols(
         is_file_local=false;
     }
 
-    if(is_type)
+    if(is_type || symbol.is_macro)
     {
       // never EXPORTED by itself
     }
