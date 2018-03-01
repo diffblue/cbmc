@@ -518,25 +518,12 @@ void java_bytecode_convert_methodt::convert(
     param_index==slots_for_parameters,
     "java_parameter_count and local computation must agree");
 
-  const bool is_virtual=!m.is_static && !m.is_final;
-
-  // Construct a methodt, which lives within the class type; this object is
-  // never used for anything useful and could be removed
-  class_typet::methodt method;
-  method.set_base_name(m.base_name);
-  method.set_name(method_identifier);
-  method.set(ID_abstract, m.is_abstract);
-  method.set(ID_is_virtual, is_virtual);
-  method.type()=member_type;
-  if(is_constructor(method))
-    method.set(ID_constructor, true);
-
   // Check the fields that can't change are valid
   INVARIANT(
-    method_symbol.name==method.get_name(),
+    method_symbol.name==method_identifier,
     "Name of method symbol shouldn't change");
   INVARIANT(
-    method_symbol.base_name==method.get_base_name(),
+    method_symbol.base_name==m.base_name,
     "Base name of method symbol shouldn't change");
   INVARIANT(
     method_symbol.module.empty(),
@@ -550,16 +537,21 @@ void java_bytecode_convert_methodt::convert(
   // The pretty name of a constructor includes the base name of the class
   // instead of the internal method name "<init>". For regular methods, it's
   // just the base name of the method.
-  if(method.get_base_name()=="<init>")
-    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
-                              id2string(class_symbol.base_name)+"()";
+  if(method_symbol.base_name=="<init>")
+  {
+    method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
+                                id2string(class_symbol.base_name) + "()";
+    INVARIANT(
+      member_type.get_bool(ID_constructor),
+      "Member type should have already been marked as a constructor");
+  }
   else
-    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
-                              id2string(method.get_base_name())+"()";
+  {
+    method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
+                                id2string(m.base_name) + "()";
+  }
 
   method_symbol.type=member_type;
-  if(is_constructor(method))
-    method_symbol.type.set(ID_constructor, true);
 
   current_method=method_symbol.name;
   method_has_this=code_type.has_this();
