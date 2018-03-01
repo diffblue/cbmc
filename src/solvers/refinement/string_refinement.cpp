@@ -723,11 +723,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       generator.fresh_symbol("not_contains_witness", witness_type);
   }
 
-  for(exprt lemma : generator.get_lemmas())
-  {
-    symbol_resolve.replace_expr(lemma);
+  for(const exprt &lemma : generator.get_lemmas())
     add_lemma(lemma);
-  }
 
   // Initial try without index set
   const auto get = [this](const exprt &expr) { return this->get(expr); };
