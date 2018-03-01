@@ -54,11 +54,12 @@ bool simplify_exprt::simplify_bswap(bswap_exprt &expr)
   return true;
 }
 
-static bool sum_expr(exprt &dest, const exprt &expr)
+//! produce a sum of two constant expressions of the same type
+//! \return 'false' iff this was successful
+static bool sum_expr(
+  constant_exprt &dest,
+  const constant_exprt &expr)
 {
-  if(!dest.is_constant() || !expr.is_constant())
-    return true;
-
   if(dest.type()!=expr.type())
     return true;
 
@@ -66,9 +67,9 @@ static bool sum_expr(exprt &dest, const exprt &expr)
 
   if(type_id==ID_integer || type_id==ID_natural)
   {
-    dest.set(ID_value, integer2string(
-      string2integer(dest.get_string(ID_value))+
-      string2integer(expr.get_string(ID_value))));
+    dest.set_value(integer2string(
+      string2integer(id2string(dest.get_value()))+
+      string2integer(id2string(expr.get_value()))));
     return false;
   }
   else if(type_id==ID_rational)
@@ -76,25 +77,24 @@ static bool sum_expr(exprt &dest, const exprt &expr)
     rationalt a, b;
     if(!to_rational(dest, a) && !to_rational(expr, b))
     {
-      exprt a_plus_b=from_rational(a+b);
-      dest.set(ID_value, a_plus_b.get_string(ID_value));
+      dest=from_rational(a+b);
       return false;
     }
   }
   else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
   {
-    dest.set(ID_value, integer2binary(
-      binary2integer(dest.get_string(ID_value), false)+
-      binary2integer(expr.get_string(ID_value), false),
-      unsafe_string2unsigned(dest.type().get_string(ID_width))));
+    dest.set_value(integer2binary(
+      binary2integer(id2string(dest.get_value()), false)+
+      binary2integer(id2string(expr.get_value()), false),
+      to_bitvector_type(dest.type()).get_width()));
     return false;
   }
   else if(type_id==ID_fixedbv)
   {
-    dest.set(ID_value, integer2binary(
-      binary2integer(dest.get_string(ID_value), false)+
-      binary2integer(expr.get_string(ID_value), false),
-      unsafe_string2unsigned(dest.type().get_string(ID_width))));
+    dest.set_value(integer2binary(
+      binary2integer(id2string(dest.get_value()), false)+
+      binary2integer(id2string(expr.get_value()), false),
+      to_bitvector_type(dest.type()).get_width()));
     return false;
   }
   else if(type_id==ID_floatbv)
@@ -108,11 +108,12 @@ static bool sum_expr(exprt &dest, const exprt &expr)
   return true;
 }
 
-static bool mul_expr(exprt &dest, const exprt &expr)
+//! produce a product of two expressions of the same type
+//! \return 'false' iff this was successful
+static bool mul_expr(
+  constant_exprt &dest,
+  const constant_exprt &expr)
 {
-  if(!dest.is_constant() || !expr.is_constant())
-    return true;
-
   if(dest.type()!=expr.type())
     return true;
 
@@ -120,9 +121,9 @@ static bool mul_expr(exprt &dest, const exprt &expr)
 
   if(type_id==ID_integer || type_id==ID_natural)
   {
-    dest.set(ID_value, integer2string(
-      string2integer(dest.get_string(ID_value))*
-      string2integer(expr.get_string(ID_value))));
+    dest.set_value(integer2string(
+      string2integer(id2string(dest.get_value()))*
+      string2integer(id2string(expr.get_value()))));
     return false;
   }
   else if(type_id==ID_rational)
@@ -130,18 +131,17 @@ static bool mul_expr(exprt &dest, const exprt &expr)
     rationalt a, b;
     if(!to_rational(dest, a) && !to_rational(expr, b))
     {
-      exprt a_mul_b=from_rational(a*b);
-      dest.set(ID_value, a_mul_b.get_string(ID_value));
+      dest=from_rational(a*b);
       return false;
     }
   }
   else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
   {
     // the following works for signed and unsigned integers
-    dest.set(ID_value, integer2binary(
-      binary2integer(dest.get_string(ID_value), false)*
-      binary2integer(expr.get_string(ID_value), false),
-      unsafe_string2unsigned(dest.type().get_string(ID_width))));
+    dest.set_value(integer2binary(
+      binary2integer(id2string(dest.get_value()), false)*
+      binary2integer(id2string(expr.get_value()), false),
+      to_bitvector_type(dest.type()).get_width()));
     return false;
   }
   else if(type_id==ID_fixedbv)
@@ -213,7 +213,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
       if(found)
       {
         // update the constant factor
-        if(!mul_expr(*constant, *it))
+        if(!mul_expr(to_constant_expr(*constant), to_constant_expr(*it)))
           do_erase=true;
       }
       else
@@ -465,7 +465,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
            it->is_constant() &&
            next->is_constant())
         {
-          sum_expr(*it, *next);
+          sum_expr(to_constant_expr(*it), to_constant_expr(*next));
           operands.erase(next);
         }
       }
@@ -517,7 +517,8 @@ bool simplify_exprt::simplify_plus(exprt &expr)
           }
           else
           {
-            if(!sum_expr(*const_sum, *it))
+            if(!sum_expr(to_constant_expr(*const_sum), 
+                         to_constant_expr(*it)))
             {
               *it=from_integer(0, it->type());
               assert(it->is_not_nil());
