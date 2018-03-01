@@ -1947,18 +1947,11 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         const exprt &val=v.second;
         const string_constraintt &axiom=axioms.universal[v.first];
 
-        implies_exprt instance(axiom.premise(), axiom.body());
+        implies_exprt instance(
+          and_exprt(axiom.univ_within_bounds(), axiom.premise()), axiom.body());
         replace_expr(axiom.univ_var(), val, instance);
-        // We are not sure the index set contains only positive numbers
-        exprt bounds=and_exprt(
-          axiom.univ_within_bounds(),
-          binary_relation_exprt(
-            from_integer(0, val.type()), ID_le, val));
-        replace_expr(axiom.univ_var(), val, bounds);
-        const implies_exprt counter(bounds, instance);
-
-        stream << "  -  " << from_expr(ns, "", counter) << eom;
-        lemmas.push_back(counter);
+        stream << "  -  " << from_expr(ns, "", instance) << eom;
+        lemmas.push_back(instance);
       }
 
       for(const auto &v : violated_not_contains)
