@@ -256,11 +256,11 @@ const exprt java_bytecode_convert_methodt::variable(
 ///   message handler to collect warnings
 /// \return
 ///   the constructed member type
-typet member_type_lazy(const std::string &descriptor,
-                       const optionalt<std::string> &signature,
-                       const std::string &class_name,
-                       const std::string &method_name,
-                       message_handlert &message_handler)
+code_typet member_type_lazy(const std::string &descriptor,
+                            const optionalt<std::string> &signature,
+                            const std::string &class_name,
+                            const std::string &method_name,
+                            message_handlert &message_handler)
 {
   // In order to construct the method type, we can either use signature or
   // descriptor. Since only signature contains the generics info, we want to
@@ -285,7 +285,7 @@ typet member_type_lazy(const std::string &descriptor,
       if(to_code_type(member_type_from_signature).parameters().size()==
          to_code_type(member_type_from_descriptor).parameters().size())
       {
-        return member_type_from_signature;
+        return to_code_type(member_type_from_signature);
       }
       else
       {
@@ -303,7 +303,7 @@ typet member_type_lazy(const std::string &descriptor,
         << descriptor << message.eom;
     }
   }
-  return member_type_from_descriptor;
+  return to_code_type(member_type_from_descriptor);
 }
 
 /// This creates a method symbol in the symtab, but doesn't actually perform
@@ -324,7 +324,7 @@ void java_bytecode_convert_method_lazy(
 {
   symbolt method_symbol;
 
-  typet member_type=member_type_lazy(
+  code_typet member_type=member_type_lazy(
     m.descriptor,
     m.signature,
     id2string(class_symbol.name),
@@ -337,13 +337,13 @@ void java_bytecode_convert_method_lazy(
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
   if(m.is_public)
-    member_type.set(ID_access, ID_public);
+    member_type.set_access(ID_public);
   else if(m.is_protected)
-    member_type.set(ID_access, ID_protected);
+    member_type.set_access(ID_protected);
   else if(m.is_private)
-    member_type.set(ID_access, ID_private);
+    member_type.set_access(ID_private);
   else
-    member_type.set(ID_access, ID_default);
+    member_type.set_access(ID_default);
 
   if(method_symbol.base_name=="<init>")
   {
@@ -360,8 +360,7 @@ void java_bytecode_convert_method_lazy(
   // do we need to add 'this' as a parameter?
   if(!m.is_static)
   {
-    code_typet &code_type=to_code_type(member_type);
-    code_typet::parameterst &parameters=code_type.parameters();
+    code_typet::parameterst &parameters=member_type.parameters();
     code_typet::parametert this_p;
     const reference_typet object_ref_type=
       java_reference_type(symbol_typet(class_symbol.name));
