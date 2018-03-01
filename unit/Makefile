@@ -28,6 +28,7 @@ SRC += unit_tests.cpp \
        java_bytecode/inherited_static_fields/inherited_static_fields.cpp \
        pointer-analysis/custom_value_set_analysis.cpp \
        sharing_node.cpp \
+       sharing_map.cpp \
        solvers/refinement/string_constraint_generator_valueof/calculate_max_string_length.cpp \
        solvers/refinement/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
        solvers/refinement/string_constraint_generator_valueof/is_digit_with_radix.cpp \

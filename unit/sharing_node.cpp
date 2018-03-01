@@ -2,9 +2,6 @@
 
 /// \file Tests for sharing-node utility
 
-#include <iostream>
-#include <cassert>
-
 #include <util/sharing_node.h>
 #include <testing-utils/catch.hpp>
 
@@ -12,7 +9,7 @@ void sharing_node_test()
 {
   typedef sharing_nodet<std::string, std::string> snt;
 
-  // internal node test
+  SECTION("Internal nodes")
   {
     snt sn1;
     const snt &sn2=sn1;
@@ -51,7 +48,7 @@ void sharing_node_test()
     REQUIRE(sn2.is_empty());
   }
 
-  // container node test
+  SECTION("Container nodes")
   {
     snt sn1;
 
@@ -78,7 +75,7 @@ void sharing_node_test()
     REQUIRE(p2->get_container().size()==1);
   }
 
-  // copy test 1
+  SECTION("Copy test 1")
   {
     snt sn1;
     snt sn2;
@@ -96,7 +93,7 @@ void sharing_node_test()
     REQUIRE(sn2.data.use_count()==2);
   }
 
-  // copy test 2
+  SECTION("Copy test 2")
   {
     snt sn1;
     const snt &sn1c=sn1;
