@@ -508,10 +508,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       exprt adjusted_offset;
 
       // are we doing a byte?
-      mp_integer element_size=
-        dereference_type.id()==ID_empty?
-        pointer_offset_size(char_type(), ns):
-        pointer_offset_size(dereference_type, ns);
+      mp_integer element_size =
+        pointer_offset_size(root_object_type.subtype(), ns);
 
       if(element_size==1)
       {
@@ -520,7 +518,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       }
       else if(element_size<=0)
       {
-        throw "unknown or invalid type size of:\n"+dereference_type.pretty();
+        throw "unknown or invalid type size of:\n" +
+          root_object_type.subtype().pretty();
       }
       else
       {

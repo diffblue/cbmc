@@ -11,15 +11,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-#include <cassert>
-
 #include <util/arith_tools.h>
+#include <util/invariant.h>
 #include <util/rename.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/byte_operators.h>
-
+#include <util/pointer_offset_size.h>
 #include <util/c_types.h>
 
 void goto_symext::havoc_rec(
@@ -135,128 +134,128 @@ void goto_symext::symex_other(
   else if(statement==ID_array_copy ||
           statement==ID_array_replace)
   {
-    assert(code.operands().size()==2);
-
-    codet clean_code(code);
+    // array_copy and array_replace take two pointers (to arrays); we need to:
+    // 1. dereference the pointers (via clean_expr)
+    // 2. find the actual array objects/candidates for objects (via
+    // process_array_expr)
+    // 3. build an assignment where the type on lhs and rhs is:
+    // - array_copy: the type of the first array (even if the second is smaller)
+    // - array_replace: the type of the second array (even if it is smaller)
+    DATA_INVARIANT(
+      code.operands().size() == 2,
+      "array_copy/array_replace takes two operands");
 
     // we need to add dereferencing for both operands
-    dereference_exprt d0, d1;
-    d0.op0()=code.op0();
-    d0.type()=empty_typet();
-    d1.op0()=code.op1();
-    d1.type()=empty_typet();
+    dereference_exprt dest_array(code.op0());
+    clean_expr(dest_array, state, true);
+    dereference_exprt src_array(code.op1());
+    clean_expr(src_array, state, false);
 
-    clean_code.op0()=d0;
-    clean_code.op1()=d1;
+    // obtain the actual arrays
+    process_array_expr(dest_array);
+    process_array_expr(src_array);
 
-    clean_expr(clean_code.op0(), state, true);
-    exprt op0_offset=from_integer(0, index_type());
-    if(clean_code.op0().id()==byte_extract_id() &&
-       clean_code.op0().type().id()==ID_empty)
-    {
-      op0_offset=to_byte_extract_expr(clean_code.op0()).offset();
-      clean_code.op0()=clean_code.op0().op0();
-    }
-    clean_expr(clean_code.op1(), state, false);
-    exprt op1_offset=from_integer(0, index_type());
-    if(clean_code.op1().id()==byte_extract_id() &&
-       clean_code.op1().type().id()==ID_empty)
-    {
-      op1_offset=to_byte_extract_expr(clean_code.op1()).offset();
-      clean_code.op1()=clean_code.op1().op0();
-    }
-
-    process_array_expr(clean_code.op0());
-    clean_expr(clean_code.op0(), state, true);
-    process_array_expr(clean_code.op1());
-    clean_expr(clean_code.op1(), state, false);
-
-
-    if(!base_type_eq(clean_code.op0().type(),
-                     clean_code.op1().type(), ns) ||
-       !op0_offset.is_zero() || !op1_offset.is_zero())
+    // check for size (or type) mismatch and adjust
+    if(!base_type_eq(dest_array.type(), src_array.type(), ns))
     {
       byte_extract_exprt be(byte_extract_id());
 
       if(statement==ID_array_copy)
       {
-        be.op()=clean_code.op1();
-        be.offset()=op1_offset;
-        be.type()=clean_code.op0().type();
-        clean_code.op1()=be;
-
-        if(!op0_offset.is_zero())
-        {
-          byte_extract_exprt op0(
-            byte_extract_id(),
-            clean_code.op0(),
-            op0_offset,
-            clean_code.op0().type());
-          clean_code.op0()=op0;
-        }
+        be.op()=src_array;
+        be.offset()=from_integer(0, index_type());
+        be.type()=dest_array.type();
+        src_array.swap(be);
+        do_simplify(src_array);
       }
       else
       {
         // ID_array_replace
-        be.op()=clean_code.op0();
-        be.offset()=op0_offset;
-        be.type()=clean_code.op1().type();
-        clean_code.op0()=be;
-
-        if(!op1_offset.is_zero())
-        {
-          byte_extract_exprt op1(
-            byte_extract_id(),
-            clean_code.op1(),
-            op1_offset,
-            clean_code.op1().type());
-          clean_code.op1()=op1;
-        }
+        be.op()=dest_array;
+        be.offset()=from_integer(0, index_type());
+        be.type()=src_array.type();
+        dest_array.swap(be);
+        do_simplify(dest_array);
       }
     }
 
-    code_assignt assignment;
-    assignment.lhs()=clean_code.op0();
-    assignment.rhs()=clean_code.op1();
+    code_assignt assignment(dest_array, src_array);
     symex_assign(state, assignment);
   }
   else if(statement==ID_array_set)
   {
-    assert(code.operands().size()==2);
-
-    codet clean_code(code);
+    // array_set takes a pointer (to an array) and a value that each element
+    // should be set to; we need to:
+    // 1. dereference the pointer (via clean_expr)
+    // 2. find the actual array object/candidates for objects (via
+    // process_array_expr)
+    // 3. use the type of the resulting array to construct an array_of
+    // expression
+    DATA_INVARIANT(code.operands().size() == 2, "array_set takes two operands");
 
     // we need to add dereferencing for the first operand
-    dereference_exprt d0;
-    d0.op0()=code.op0();
-    d0.type()=empty_typet();
+    exprt array_expr = dereference_exprt(code.op0());
+    clean_expr(array_expr, state, true);
 
-    clean_code.op0()=d0;
+    // obtain the actual array(s)
+    process_array_expr(array_expr);
 
-    clean_expr(clean_code.op0(), state, true);
-    if(clean_code.op0().id()==byte_extract_id() &&
-       clean_code.op0().type().id()==ID_empty)
-      clean_code.op0()=clean_code.op0().op0();
-    clean_expr(clean_code.op1(), state, false);
+    // prepare to build the array_of
+    exprt value = code.op1();
+    clean_expr(value, state, false);
 
-    process_array_expr(clean_code.op0());
-    clean_expr(clean_code.op0(), state, true);
+    // we might have a memset-style update of a non-array type - convert to a
+    // byte array
+    if(array_expr.type().id() != ID_array)
+    {
+      exprt array_size = size_of_expr(array_expr.type(), ns);
+      do_simplify(array_size);
+      array_expr =
+        byte_extract_exprt(
+          byte_extract_id(),
+          array_expr,
+          from_integer(0, index_type()),
+          array_typet(char_type(), array_size));
+    }
 
-    const typet &op0_type=ns.follow(clean_code.op0().type());
+    const array_typet &array_type = to_array_type(array_expr.type());
 
-    if(op0_type.id()!=ID_array)
-      throw "array_set expects array operand";
+    if(!base_type_eq(array_type.subtype(), value.type(), ns))
+      value.make_typecast(array_type.subtype());
 
-    const array_typet &array_type=
-      to_array_type(op0_type);
+    code_assignt assignment(array_expr, array_of_exprt(value, array_type));
+    symex_assign(state, assignment);
+  }
+  else if(statement==ID_array_equal)
+  {
+    // array_equal takes two pointers (to arrays) and the symbol that the result
+    // should get assigned to; we need to:
+    // 1. dereference the pointers (via clean_expr)
+    // 2. find the actual array objects/candidates for objects (via
+    // process_array_expr)
+    // 3. build an assignment where the lhs is the previous third argument, and
+    // the right-hand side is an equality over the arrays, if their types match;
+    // if the types don't match the result trivially is false
+    DATA_INVARIANT(
+      code.operands().size() == 3,
+      "array_equal expected to take three arguments");
 
-    if(!base_type_eq(array_type.subtype(),
-                     clean_code.op1().type(), ns))
-      clean_code.op1().make_typecast(array_type.subtype());
+    // we need to add dereferencing for the first two
+    dereference_exprt array1(code.op0());
+    clean_expr(array1, state, false);
+    dereference_exprt array2(code.op1());
+    clean_expr(array2, state, false);
 
-    code_assignt assignment;
-    assignment.lhs()=clean_code.op0();
-    assignment.rhs()=array_of_exprt(clean_code.op1(), array_type);
+    // obtain the actual arrays
+    process_array_expr(array1);
+    process_array_expr(array2);
+
+    code_assignt assignment(code.op2(), equal_exprt(array1, array2));
+
+    // check for size (or type) mismatch
+    if(!base_type_eq(array1.type(), array2.type(), ns))
+      assignment.lhs() = false_exprt();
+
     symex_assign(state, assignment);
   }
   else if(statement==ID_user_specified_predicate ||
