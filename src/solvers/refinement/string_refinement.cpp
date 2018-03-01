@@ -2431,14 +2431,15 @@ static exprt instantiate(
     return true_exprt();
 
   const exprt r = compute_inverse_function(stream, axiom.univ_var(), val, idx);
-  implies_exprt instance(axiom.premise(), axiom.body());
+  implies_exprt instance(
+    and_exprt(
+      and_exprt(
+        binary_relation_exprt(axiom.univ_var(), ID_ge, axiom.lower_bound()),
+        binary_relation_exprt(axiom.univ_var(), ID_lt, axiom.upper_bound())),
+      axiom.premise()),
+    axiom.body());
   replace_expr(axiom.univ_var(), r, instance);
-  // We are not sure the index set contains only positive numbers
-  and_exprt bounds(
-    axiom.univ_within_bounds(),
-    binary_relation_exprt(from_integer(0, val.type()), ID_le, val));
-  replace_expr(axiom.univ_var(), r, bounds);
-  return implies_exprt(bounds, instance);
+  return instance;
 }
 
 /// Instantiates a quantified formula representing `not_contains` by
