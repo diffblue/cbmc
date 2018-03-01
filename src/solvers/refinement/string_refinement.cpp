@@ -1478,9 +1478,12 @@ exprt fill_in_array_expr(const array_exprt &expr, std::size_t string_max_length)
   const auto &array_size_opt = numeric_cast<std::size_t>(array_type.size());
 
   if(array_size_opt && *array_size_opt > 0)
+  {
+    const std::size_t last_index = *array_size_opt <= string_max_length
+                                   ? *array_size_opt - 1 : string_max_length;
     initial_map.emplace(
-      *array_size_opt - 1,
-      from_integer(CHARACTER_FOR_UNKNOWN, array_type.subtype()));
+      last_index, from_integer(CHARACTER_FOR_UNKNOWN, array_type.subtype()));
+  }
 
   for(std::size_t i = 0; i < expr.operands().size(); ++i)
   {
