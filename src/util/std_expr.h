@@ -4744,13 +4744,12 @@ inline void validate_expr(const let_exprt &value)
   validate_operands(value, 3, "Let must have three operands");
 }
 
-
-/*! \brief A forall expression
+/*! \brief A base class for quantifier expressions
 */
-class forall_exprt:public binary_exprt
+class quantifier_exprt:public binary_predicate_exprt
 {
 public:
-  forall_exprt():binary_exprt(ID_forall)
+  explicit quantifier_exprt(const irep_idt &_id):binary_predicate_exprt(_id)
   {
     op0()=symbol_exprt();
   }
@@ -4776,34 +4775,60 @@ public:
   }
 };
 
-/*! \brief An exists expression
+/*! \brief Cast a generic exprt to a \ref quantifier_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * quantifier_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref quantifier_exprt
+ *
+ * \ingroup gr_std_expr
 */
-class exists_exprt:public binary_exprt
+inline const quantifier_exprt &to_quantifier_expr(const exprt &expr)
+{
+  DATA_INVARIANT(expr.operands().size()==2,
+                 "quantifier expressions must have two operands");
+  return static_cast<const quantifier_exprt &>(expr);
+}
+
+/*! \copydoc to_quantifier_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline quantifier_exprt &to_quantifier_expr(exprt &expr)
+{
+  DATA_INVARIANT(expr.operands().size()==2,
+                 "quantifier expressions must have two operands");
+  return static_cast<quantifier_exprt &>(expr);
+}
+
+template<> inline bool can_cast_expr<quantifier_exprt>(const exprt &base)
+{
+  return true;
+}
+inline void validate_expr(const quantifier_exprt &value)
+{
+  validate_operands(value, 2,
+    "quantifier expressions must have two operands");
+}
+
+/*! \brief A forall expression
+*/
+class forall_exprt:public quantifier_exprt
 {
 public:
-  exists_exprt():binary_exprt(ID_exists)
+  forall_exprt():quantifier_exprt(ID_forall)
   {
-    op0()=symbol_exprt();
   }
+};
 
-  symbol_exprt &symbol()
+/*! \brief An exists expression
+*/
+class exists_exprt:public quantifier_exprt
+{
+public:
+  exists_exprt():quantifier_exprt(ID_exists)
   {
-    return static_cast<symbol_exprt &>(op0());
-  }
-
-  const symbol_exprt &symbol() const
-  {
-    return static_cast<const symbol_exprt &>(op0());
-  }
-
-  exprt &where()
-  {
-    return op1();
-  }
-
-  const exprt &where() const
-  {
-    return op1();
   }
 };
 
