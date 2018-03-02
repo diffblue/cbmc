@@ -3,6 +3,7 @@ version: 0.2
 phases:
   install:
     commands:
+      - apt-get install -y software-properties-common
       - add-apt-repository ppa:ubuntu-toolchain-r/test
       - apt-get update -y
       - apt-get install -y g++-5 flex bison make git libwww-perl patch
