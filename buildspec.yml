@@ -3,11 +3,13 @@ version: 0.2
 phases:
   install:
     commands:
+      - apt-get update -y
       - apt-get install -y software-properties-common
-      - add-apt-repository ppa:ubuntu-toolchain-r/test
+      - add-apt-repository -y ppa:ubuntu-toolchain-r/test
       - apt-get update -y
       - apt-get install -y g++-5 flex bison make git libwww-perl patch
       - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
+      - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
   build:
     commands:
       - echo Build started on `date`
