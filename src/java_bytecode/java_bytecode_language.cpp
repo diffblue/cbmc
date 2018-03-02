@@ -58,8 +58,8 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   object_factory_parameters.string_printable = cmd.isset("string-printable");
   if(cmd.isset("java-max-vla-length"))
     max_user_array_length=std::stoi(cmd.get_value("java-max-vla-length"));
-  if(cmd.isset("lazy-methods-context-sensitive"))
-    lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_SENSITIVE;
+  if(cmd.isset("symex-driven-lazy-loading"))
+    lazy_methods_mode=LAZY_METHODS_MODE_EXTERNAL_DRIVER;
   else if(cmd.isset("lazy-methods"))
     lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_INSENSITIVE;
   else
