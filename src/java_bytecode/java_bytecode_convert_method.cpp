@@ -120,13 +120,9 @@ static bool operator==(const irep_idt &what, const patternt &pattern)
   return pattern==what;
 }
 
-// name contains <init> or <clinit>
-bool java_bytecode_convert_methodt::is_constructor(
-  const class_typet::methodt &method)
+static bool is_constructor(const irep_idt &method_name)
 {
-  const std::string &name(id2string(method.get_name()));
-  const std::string::size_type &npos(std::string::npos);
-  return npos!=name.find("<init>") || npos!=name.find("<clinit>");
+  return id2string(method_name).find("<init>") != std::string::npos;
 }
 
 exprt::operandst java_bytecode_convert_methodt::pop(std::size_t n)
@@ -345,7 +341,7 @@ void java_bytecode_convert_method_lazy(
   else
     member_type.set_access(ID_default);
 
-  if(method_symbol.base_name=="<init>")
+  if(is_constructor(method_symbol.base_name))
   {
     method_symbol.pretty_name=
       id2string(class_symbol.pretty_name)+"."+
@@ -537,7 +533,7 @@ void java_bytecode_convert_methodt::convert(
   // The pretty name of a constructor includes the base name of the class
   // instead of the internal method name "<init>". For regular methods, it's
   // just the base name of the method.
-  if(method_symbol.base_name=="<init>")
+  if(is_constructor(method_symbol.base_name))
   {
     method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
                                 id2string(class_symbol.base_name) + "()";
@@ -1271,9 +1267,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           // constructors.
           if(statement=="invokespecial")
           {
-            if(
-              id2string(arg0.get(ID_identifier)).find("<init>") !=
-              std::string::npos)
+            if(is_constructor(arg0.get(ID_identifier)))
             {
               if(needed_lazy_methods)
                 needed_lazy_methods->add_needed_class(classname);
