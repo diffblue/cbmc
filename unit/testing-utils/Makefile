@@ -1,6 +1,5 @@
 SRC = \
   c_to_expr.cpp \
-  generic_utils.cpp \
   load_java_class.cpp \
   require_expr.cpp \
   require_goto_statements.cpp \
