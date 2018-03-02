@@ -48,7 +48,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
-#include <goto-instrument/cover.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
@@ -378,6 +377,23 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
       cmdline.get_value("symex-coverage-report"));
 
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
+
+  if(cmdline.isset("symex-driven-lazy-loading"))
+  {
+    options.set_option("symex-driven-lazy-loading", true);
+    for(const char *opt :
+      { "nondet-static",
+        "full-slice",
+        "show-properties",
+        "lazy-methods" })
+    {
+      if(cmdline.isset(opt))
+      {
+        throw std::string("Option ") + opt +
+          " can't be used with --symex-driven-lazy-loading";
+      }
+    }
+  }
 }
 
 /// invoke main modules
@@ -472,24 +488,7 @@ int jbmc_parse_optionst::doit()
     return 0;
   }
 
-  std::unique_ptr<goto_modelt> goto_model_ptr;
-  int get_goto_program_ret=get_goto_program(goto_model_ptr, options);
-  if(get_goto_program_ret!=-1)
-    return get_goto_program_ret;
-
-  goto_modelt &goto_model = *goto_model_ptr;
-
-  if(cmdline.isset("show-properties"))
-  {
-    show_properties(
-      goto_model, get_message_handler(), ui_message_handler.get_ui());
-    return 0; // should contemplate EX_OK from sysexits.h
-  }
-
-  if(set_properties(goto_model))
-    return 7; // should contemplate EX_USAGE from sysexits.h
-
-  std::function<void(bmct &, const symbol_tablet &)> configure_bmc;
+  std::function<void(bmct &, const symbol_tablet &)> configure_bmc = nullptr;
   if(options.get_bool_option("java-unwind-enum-static"))
   {
     configure_bmc = [](
@@ -508,15 +507,76 @@ int jbmc_parse_optionst::doit()
         });
     };
   }
+
+  if(!cmdline.isset("symex-driven-lazy-loading"))
+  {
+    std::unique_ptr<goto_modelt> goto_model_ptr;
+    int get_goto_program_ret=get_goto_program(goto_model_ptr, options);
+    if(get_goto_program_ret!=-1)
+      return get_goto_program_ret;
+
+    goto_modelt &goto_model = *goto_model_ptr;
+
+    if(cmdline.isset("show-properties"))
+    {
+      show_properties(
+        goto_model, get_message_handler(), ui_message_handler.get_ui());
+      return 0; // should contemplate EX_OK from sysexits.h
+    }
+
+    if(set_properties(goto_model))
+      return 7; // should contemplate EX_USAGE from sysexits.h
+
+    // The `configure_bmc` callback passed will enable enum-unwind-static if
+    // applicable.
+    return bmct::do_language_agnostic_bmc(
+      options, goto_model, ui_message_handler.get_ui(), *this, configure_bmc);
+  }
   else
   {
-    configure_bmc = [](
-      bmct &bmc, const symbol_tablet &symbol_table) { // NOLINT (*)
-      // NOOP
+    // Use symex-driven lazy loading:
+    lazy_goto_modelt lazy_goto_model=lazy_goto_modelt::from_handler_object(
+      *this, options, get_message_handler());
+    lazy_goto_model.initialize(cmdline);
+
+    // The precise wording of this error matches goto-symex's complaint when no
+    // __CPROVER_start exists (if we just go ahead and run it anyway it will
+    // trip an invariant when it tries to load it)
+    if(!lazy_goto_model.symbol_table.has_symbol(goto_functionst::entry_point()))
+    {
+      error() << "the program has no entry point";
+      return 6;
+    }
+
+    // Add failed symbols for any symbol created prior to loading any
+    // particular function:
+    add_failed_symbols(lazy_goto_model.symbol_table);
+
+    // If applicable, parse the coverage instrumentation configuration, which
+    // will be used in process_goto_function:
+    cover_config =
+      get_cover_config(
+        options, lazy_goto_model.symbol_table, get_message_handler());
+
+    // Provide show-goto-functions and similar dump functions after symex
+    // executes. If --paths is active, these dump routines run after every
+    // paths iteration. Its return value indicates that if we ran any dump
+    // function, then we should skip the actual solver phase.
+    auto callback_after_symex = [this, &lazy_goto_model]() { // NOLINT (*)
+      return show_loaded_functions(lazy_goto_model);
     };
+
+    // The `configure_bmc` callback passed will enable enum-unwind-static if
+    // applicable.
+    return
+      bmct::do_language_agnostic_bmc(
+        options,
+        lazy_goto_model,
+        ui_message_handler.get_ui(),
+        *this,
+        configure_bmc,
+        callback_after_symex);
   }
-  return bmct::do_language_agnostic_bmc(
-    options, goto_model, ui_message_handler.get_ui(), *this, configure_bmc);
 }
 
 bool jbmc_parse_optionst::set_properties(goto_modelt &goto_model)
@@ -643,12 +703,29 @@ void jbmc_parse_optionst::process_goto_function(
   journalling_symbol_tablet &symbol_table = function.get_symbol_table();
   namespacet ns(symbol_table);
   goto_functionst::goto_functiont &goto_function = function.get_goto_function();
+
+  bool using_symex_driven_loading =
+    options.get_bool_option("symex-driven-lazy-loading");
+
   try
   {
     // Removal of RTTI inspection:
     remove_instanceof(goto_function, symbol_table);
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(function);
+
+    if(using_symex_driven_loading)
+    {
+      // remove exceptions
+      // If using symex-driven function loading we need to do this now so that
+      // symex doesn't have to cope with exception-handling constructs; however
+      // the results are slightly worse than running it in whole-program mode
+      // (e.g. dead catch sites will be retained)
+      remove_exceptions(
+        goto_function.body,
+        symbol_table,
+        remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
+    }
 
     auto function_is_stub =
       [&symbol_table, &model](const irep_idt &id) { // NOLINT(*)
@@ -699,6 +776,28 @@ void jbmc_parse_optionst::process_goto_function(
         symbol_table);
     }
 
+    // If using symex-driven function loading we must insert the coverage goals
+    // now so symex sees its targets; otherwise we leave this until
+    // process_goto_functions, as we haven't run remove_exceptions yet, and that
+    // pass alters the CFG.
+    if(using_symex_driven_loading)
+    {
+      // instrument cover goals
+      if(cmdline.isset("cover"))
+      {
+        INVARIANT(
+          cover_config != nullptr, "cover config should have been parsed");
+        instrument_cover_goals(*cover_config, function, get_message_handler());
+      }
+
+      // label the assertions
+      label_properties(goto_function.body);
+
+      goto_function.body.update();
+      function.compute_location_numbers();
+      goto_function.body.compute_loop_numbers();
+    }
+
     // update the function member in each instruction
     function.update_instructions_function();
   }
@@ -722,6 +821,39 @@ void jbmc_parse_optionst::process_goto_function(
   }
 }
 
+bool jbmc_parse_optionst::show_loaded_functions(
+  const abstract_goto_modelt &goto_model)
+{
+  if(cmdline.isset("show-symbol-table"))
+  {
+    show_symbol_table(
+      goto_model.get_symbol_table(), ui_message_handler.get_ui());
+    return true;
+  }
+
+  if(cmdline.isset("show-loops"))
+  {
+    show_loop_ids(ui_message_handler.get_ui(), goto_model.get_goto_functions());
+    return true;
+  }
+
+  if(
+    cmdline.isset("show-goto-functions") ||
+    cmdline.isset("list-goto-functions"))
+  {
+    namespacet ns(goto_model.get_symbol_table());
+    show_goto_functions(
+      ns,
+      get_message_handler(),
+      ui_message_handler.get_ui(),
+      goto_model.get_goto_functions(),
+      cmdline.isset("list-goto-functions"));
+    return true;
+  }
+
+  return false;
+}
+
 bool jbmc_parse_optionst::process_goto_functions(
   goto_modelt &goto_model,
   const optionst &options)
@@ -729,7 +861,17 @@ bool jbmc_parse_optionst::process_goto_functions(
   try
   {
     status() << "Running GOTO functions transformation passes" << eom;
-    // remove catch and throw (introduces instanceof but request it is removed)
+
+    bool using_symex_driven_loading =
+      options.get_bool_option("symex-driven-lazy-loading");
+
+    // When using symex-driven lazy loading, *all* relevant processing is done
+    // during process_goto_function, so we have nothing to do here.
+    if(using_symex_driven_loading)
+      return false;
+
+    // remove catch and throw
+    // (introduces instanceof but request it is removed)
     remove_exceptions(
       goto_model, remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
 
@@ -865,6 +1007,8 @@ void jbmc_parse_optionst::help()
     // This one is handled by jbmc_parse_options not by the Java frontend,
     // hence its presence here:
     " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n" // NOLINT(*)
+    // Currently only supported in the JBMC frontend:
+    " --symex-driven-lazy-loading  only load functions when first entered by symbolic execution\n" // NOLINT(*)
     "\n"
     "BMC options:\n"
     HELP_BMC
