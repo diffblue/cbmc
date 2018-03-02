@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - apt-get update -y
+      - apt-get install -y g++ gcc flex bison make git libwww-perl patch
+  build:
+    commands:
+      - echo Build started on `date`
+      - (cd src ; make minisat2-download)
+      - (cd src ; make)
+  post_build:
+    commands:
+      - echo Build completed on `date`
+artifacts:
+  files:
