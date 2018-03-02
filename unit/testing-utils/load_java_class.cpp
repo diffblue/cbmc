@@ -88,7 +88,7 @@ symbol_tablet load_java_class(
   // Construct a lazy_goto_modelt
   null_message_handlert message_handler;
   lazy_goto_modelt lazy_goto_model(
-    [] (goto_model_functiont &function, const can_produce_functiont &cpf) { }, // NOLINT (*)
+    [] (goto_model_functiont &function, const abstract_goto_modelt &model) { }, // NOLINT (*)
     [] (goto_modelt &goto_model) { return false; }, // NOLINT (*)
     message_handler);
 
