@@ -814,6 +814,9 @@ void java_bytecode_languaget::methods_provided(id_sett &methods) const
   // Add all concrete methods to map
   for(const auto &kv : method_bytecode)
     methods.insert(kv.first);
+  // Add all synthetic methods to map
+  for(const auto &kv : synthetic_methods)
+    methods.insert(kv.first);
 }
 
 /// \brief Promote a lazy-converted method (one whose type is known but whose
