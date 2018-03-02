@@ -450,7 +450,7 @@ SHARING_MAPT2(, size_type)::erase(
     return 0;
 
   node_type *del=nullptr;
-  unsigned del_bit;
+  unsigned del_bit = 0;
 
   size_t key=hash()(k);
   node_type *p=&map;
@@ -472,18 +472,15 @@ SHARING_MAPT2(, size_type)::erase(
 
   _sm_assert(p->is_container());
 
-  {
-    const containert &c=as_const(p)->get_container();
+  const containert &c = as_const(p)->get_container();
 
-    if(c.size()==1)
-    {
-      del->remove_child(del_bit);
-      num--;
-      return 1;
-    }
+  if(c.size() == 1)
+  {
+    del->remove_child(del_bit);
+    num--;
+    return 1;
   }
 
-  containert &c=p->get_container();
   _sm_assert(c.size()>1);
   p->remove_leaf(k);
   num--;
