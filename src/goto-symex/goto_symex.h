@@ -105,16 +105,6 @@ public:
     const goto_functionst &goto_functions,
     symbol_tablet &new_symbol_table);
 
-  /// Performs symbolic execution using a state and equation that have
-  /// already been used to symex part of the program. The state is not
-  /// re-initialized; instead, symbolic execution resumes from the program
-  /// counter of the saved state.
-  virtual void resume_symex_from_saved_state(
-    const goto_functionst &goto_functions,
-    const statet &saved_state,
-    symex_target_equationt *const saved_equation,
-    symbol_tablet &new_symbol_table);
-
   /// \brief symex entire program starting from entry point
   ///
   /// The state that goto_symext maintains has a large memory footprint.
@@ -123,6 +113,16 @@ public:
   /// around afterwards.
   virtual void symex_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
+    symbol_tablet &new_symbol_table);
+
+  /// Performs symbolic execution using a state and equation that have
+  /// already been used to symex part of the program. The state is not
+  /// re-initialized; instead, symbolic execution resumes from the program
+  /// counter of the saved state.
+  virtual void resume_symex_from_saved_state(
+    const get_goto_functiont &get_goto_function,
+    const statet &saved_state,
+    symex_target_equationt *const saved_equation,
     symbol_tablet &new_symbol_table);
 
   //// \brief symex entire program starting from entry point

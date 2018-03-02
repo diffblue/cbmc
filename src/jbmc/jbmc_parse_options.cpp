@@ -489,12 +489,12 @@ int jbmc_parse_optionst::doit()
   if(set_properties(goto_model))
     return 7; // should contemplate EX_USAGE from sysexits.h
 
-  std::function<void(bmct &, const goto_modelt &)> configure_bmc;
+  std::function<void(bmct &, const symbol_tablet &)> configure_bmc;
   if(options.get_bool_option("java-unwind-enum-static"))
   {
     configure_bmc = [](
-      bmct &bmc, const goto_modelt &goto_model) { // NOLINT (*)
-        bmc.add_loop_unwind_handler([&goto_model](
+      bmct &bmc, const symbol_tablet &symbol_table) { // NOLINT (*)
+        bmc.add_loop_unwind_handler([&symbol_table](
                                       const irep_idt &function_id,
                                       unsigned loop_number,
                                       unsigned unwind,
@@ -504,14 +504,14 @@ int jbmc_parse_optionst::doit()
             loop_number,
             unwind,
             max_unwind,
-            goto_model.symbol_table);
+            symbol_table);
         });
     };
   }
   else
   {
     configure_bmc = [](
-      bmct &bmc, const goto_modelt &goto_model) { // NOLINT (*)
+      bmct &bmc, const symbol_tablet &symbol_table) { // NOLINT (*)
       // NOOP
     };
   }
@@ -637,7 +637,7 @@ int jbmc_parse_optionst::get_goto_program(
 
 void jbmc_parse_optionst::process_goto_function(
   goto_model_functiont &function,
-  const can_produce_functiont &available_functions,
+  const abstract_goto_modelt &model,
   const optionst &options)
 {
   journalling_symbol_tablet &symbol_table = function.get_symbol_table();
@@ -651,9 +651,9 @@ void jbmc_parse_optionst::process_goto_function(
     remove_virtual_functions(function);
 
     auto function_is_stub =
-      [&symbol_table, &available_functions](const irep_idt &id) { // NOLINT(*)
+      [&symbol_table, &model](const irep_idt &id) { // NOLINT(*)
         return symbol_table.lookup_ref(id).value.is_nil() &&
-               !available_functions.can_produce_function(id);
+               !model.can_produce_function(id);
       };
 
     remove_returns(function, function_is_stub);

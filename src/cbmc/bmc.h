@@ -90,9 +90,14 @@ public:
       !options.get_option("symex-coverage-report").empty();
   }
 
-  virtual resultt run(const goto_functionst &goto_functions);
+  virtual resultt run(const goto_functionst &goto_functions)
+  {
+    wrapper_goto_modelt model(outer_symbol_table, goto_functions);
+    return run(model);
+  }
+  resultt run(abstract_goto_modelt &);
   void setup();
-  safety_checkert::resultt execute(const goto_functionst &);
+  safety_checkert::resultt execute(abstract_goto_modelt &);
   virtual ~bmct() { }
 
   // additional stuff
@@ -118,22 +123,13 @@ public:
     symex.add_recursion_unwind_handler(handler);
   }
 
-  /// \brief common BMC code, invoked from language-specific frontends
-  ///
-  /// Do bounded model-checking after all language-specific program
-  /// preprocessing has been completed by language-specific frontends.
-  /// Language-specific frontends may customize the \ref bmct objects
-  /// that are used for model-checking by supplying a function object to
-  /// the `frontend_configure_bmc` parameter of this function; the
-  /// function object will be called with every \ref bmct object that
-  /// is constructed by `do_language_agnostic_bmc`.
   static int do_language_agnostic_bmc(
     const optionst &opts,
-    const goto_modelt &goto_model,
+    abstract_goto_modelt &goto_model,
     const ui_message_handlert::uit &ui,
     messaget &message,
-    std::function<void(bmct &, const goto_modelt &)> frontend_configure_bmc =
-      [](bmct &_bmc, const goto_modelt &) { // NOLINT (*)
+    std::function<void(bmct &, const symbol_tablet &)> frontend_configure_bmc =
+      [](bmct &_bmc, const symbol_tablet &) { // NOLINT (*)
         // Empty default implementation
       });
 
@@ -240,8 +236,8 @@ private:
   /// invoke the symbolic executor in a class-specific way. This
   /// implementation invokes goto_symext::operator() to perform
   /// full-program model-checking from the entry point of the program.
-  virtual void
-  perform_symbolic_execution(const goto_functionst &goto_functions);
+  virtual void perform_symbolic_execution(
+    goto_symext::get_goto_functiont get_goto_function);
 };
 
 /// \brief Symbolic execution from a saved branch point
@@ -285,8 +281,8 @@ private:
   /// This overrides the base implementation to call the symbolic executor with
   /// the saved symex_target_equationt, symbol_tablet, and goto_symex_statet
   /// provided as arguments to the constructor of this class.
-  void
-  perform_symbolic_execution(const goto_functionst &goto_functions) override;
+  void perform_symbolic_execution(
+    goto_symext::get_goto_functiont get_goto_function) override;
 
 #define OPT_BMC                                                                \
   "(program-only)"                                                             \

@@ -357,11 +357,25 @@ void bmct::setup()
     setup_unwind();
 }
 
-safety_checkert::resultt bmct::execute(const goto_functionst &goto_functions)
+safety_checkert::resultt bmct::execute(
+  abstract_goto_modelt &goto_model)
 {
   try
   {
-    perform_symbolic_execution(goto_functions);
+    auto get_goto_function = [&goto_model](const irep_idt &id) ->
+      const goto_functionst::goto_functiont &
+    {
+      return goto_model.get_goto_function(id);
+    };
+
+    perform_symbolic_execution(get_goto_function);
+
+    // Borrow a reference to the goto functions map. This reference, or
+    // iterators pointing into it, must not be stored by this function or its
+    // callees, as goto_model.get_goto_function (as used by symex)
+    // will have side-effects on it.
+    const goto_functionst &goto_functions =
+      goto_model.get_goto_functions();
 
     // add a partial ordering, if required
     if(equation.has_threads())
@@ -492,11 +506,11 @@ void bmct::slice()
 }
 
 safety_checkert::resultt bmct::run(
-  const goto_functionst &goto_functions)
+  abstract_goto_modelt &goto_model)
 {
   setup();
 
-  return execute(goto_functions);
+  return execute(goto_model);
 }
 
 safety_checkert::resultt bmct::decide(
@@ -595,29 +609,38 @@ void bmct::setup_unwind()
     symex.set_unwind_limit(options.get_unsigned_int_option("unwind"));
 }
 
+/// Perform core BMC, using an abstract model to supply GOTO function bodies
+/// (perhaps created on demand).
+/// \param opts: command-line options affecting BMC
+/// \param model: provides goto function bodies and the symbol table, perhaps
+//    creating those function bodies on demand.
+/// \param ui: user-interface mode (plain text, XML output, JSON output, ...)
+/// \param message: used for logging
+/// \param frontend_configure_bmc: function provided by the frontend program,
+///   which applies frontend-specific configuration to a bmct before running.
 int bmct::do_language_agnostic_bmc(
   const optionst &opts,
-  const goto_modelt &goto_model,
+  abstract_goto_modelt &model,
   const ui_message_handlert::uit &ui,
   messaget &message,
-  std::function<void(bmct &, const goto_modelt &)> frontend_configure_bmc)
+  std::function<void(bmct &, const symbol_tablet &)> frontend_configure_bmc)
 {
+  const symbol_tablet &symbol_table = model.get_symbol_table();
   message_handlert &mh = message.get_message_handler();
   safety_checkert::resultt result;
   goto_symext::branch_worklistt worklist;
   try
   {
     {
-      cbmc_solverst solvers(
-        opts, goto_model.symbol_table, message.get_message_handler());
+      cbmc_solverst solvers(opts, symbol_table, message.get_message_handler());
       solvers.set_ui(ui);
       std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
       cbmc_solver = solvers.get_solver();
       prop_convt &pc = cbmc_solver->prop_conv();
-      bmct bmc(opts, goto_model.symbol_table, mh, pc, worklist);
+      bmct bmc(opts, symbol_table, mh, pc, worklist);
       bmc.set_ui(ui);
-      frontend_configure_bmc(bmc, goto_model);
-      result = bmc.run(goto_model.goto_functions);
+      frontend_configure_bmc(bmc, symbol_table);
+      result = bmc.run(model);
     }
     INVARIANT(
       opts.get_bool_option("paths") || worklist.empty(),
@@ -646,8 +669,7 @@ int bmct::do_language_agnostic_bmc(
                        << "Starting new path (" << worklist.size()
                        << " to go)\n"
                        << message.eom;
-      cbmc_solverst solvers(
-        opts, goto_model.symbol_table, message.get_message_handler());
+      cbmc_solverst solvers(opts, symbol_table, message.get_message_handler());
       solvers.set_ui(ui);
       std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
       cbmc_solver = solvers.get_solver();
@@ -655,14 +677,14 @@ int bmct::do_language_agnostic_bmc(
       goto_symext::branch_pointt &resume = worklist.front();
       path_explorert pe(
         opts,
-        goto_model.symbol_table,
+        symbol_table,
         mh,
         pc,
         resume.equation,
         resume.state,
         worklist);
-      frontend_configure_bmc(pe, goto_model);
-      result &= pe.run(goto_model.goto_functions);
+      frontend_configure_bmc(pe, symbol_table);
+      result &= pe.run(model);
       worklist.pop_front();
     }
   }
@@ -694,9 +716,10 @@ int bmct::do_language_agnostic_bmc(
   UNREACHABLE;
 }
 
-void bmct::perform_symbolic_execution(const goto_functionst &goto_functions)
+void bmct::perform_symbolic_execution(
+  goto_symext::get_goto_functiont get_goto_function)
 {
-  symex.symex_from_entry_point_of(goto_functions, symex_symbol_table);
+  symex.symex_from_entry_point_of(get_goto_function, symex_symbol_table);
   INVARIANT(
     options.get_bool_option("paths") || branch_worklist.empty(),
     "Branch points were saved even though we should have been "
@@ -704,8 +727,8 @@ void bmct::perform_symbolic_execution(const goto_functionst &goto_functions)
 }
 
 void path_explorert::perform_symbolic_execution(
-  const goto_functionst &goto_functions)
+  goto_symext::get_goto_functiont get_goto_function)
 {
   symex.resume_symex_from_saved_state(
-    goto_functions, saved_state, &equation, symex_symbol_table);
+    get_goto_function, saved_state, &equation, symex_symbol_table);
 }

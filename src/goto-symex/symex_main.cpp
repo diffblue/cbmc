@@ -211,14 +211,11 @@ void goto_symext::symex_with_state(
 }
 
 void goto_symext::resume_symex_from_saved_state(
-  const goto_functionst &goto_functions,
+  const get_goto_functiont &get_goto_function,
   const statet &saved_state,
   symex_target_equationt *const saved_equation,
   symbol_tablet &new_symbol_table)
 {
-  const get_goto_functiont get_goto_function = get_function_from_goto_functions(
-      goto_functions);
-
   // saved_state contains a pointer to a symex_target_equationt that is
   // almost certainly stale. This is because equations are owned by bmcts,
   // and we construct a new bmct for every path that we execute. We're on a
