@@ -36,9 +36,9 @@ class bmc_covert:
 {
 public:
   bmc_covert(
-    const goto_functionst &_goto_functions,
+    const goto_functions_providert &function_provider,
     bmct &_bmc):
-    goto_functions(_goto_functions), solver(_bmc.prop_conv), bmc(_bmc)
+    function_provider(function_provider), solver(_bmc.prop_conv), bmc(_bmc)
   {
   }
 
@@ -138,7 +138,7 @@ public:
   }
 
 protected:
-  const goto_functionst &goto_functions;
+  const goto_functions_providert &function_provider;
   prop_convt &solver;
   bmct &bmc;
 };
@@ -199,9 +199,10 @@ bool bmc_covert::operator()()
 
   // Collect _all_ goals in `goal_map'.
   // This maps property IDs to 'goalt'
-  forall_goto_functions(f_it, goto_functions)
+  for(const irep_idt &function_id : function_provider.get_available_functions())
   {
-    forall_goto_program_instructions(i_it, f_it->second.body)
+    forall_goto_program_instructions(
+      i_it, function_provider.get_existing_goto_function(function_id).body)
     {
       if(i_it->is_assert())
         goal_map[id(i_it)]=
@@ -429,10 +430,10 @@ bool bmc_covert::operator()()
 
 /// Try to cover all goals
 bool bmct::cover(
-  const goto_functionst &goto_functions,
+  const goto_functions_providert &goto_functions_provider,
   const optionst::value_listt &criteria)
 {
-  bmc_covert bmc_cover(goto_functions, *this);
+  bmc_covert bmc_cover(goto_functions_provider, *this);
   bmc_cover.set_message_handler(get_message_handler());
   return bmc_cover();
 }

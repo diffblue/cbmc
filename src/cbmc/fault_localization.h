@@ -26,12 +26,11 @@ class fault_localizationt:
 {
 public:
   explicit fault_localizationt(
-    const goto_functionst &_goto_functions,
+    const goto_functions_providert &_goto_functions_provider,
     bmct &_bmc,
     const optionst &_options)
     :
-    bmc_all_propertiest(_goto_functions, _bmc.prop_conv, _bmc),
-    goto_functions(_goto_functions),
+    bmc_all_propertiest(_goto_functions_provider, _bmc.prop_conv, _bmc),
     bmc(_bmc),
     options(_options)
   {
@@ -45,7 +44,6 @@ public:
   virtual void goal_covered(const cover_goalst::goalt &);
 
 protected:
-  const goto_functionst &goto_functions;
   bmct &bmc;
   const optionst &options;
 

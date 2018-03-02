@@ -22,10 +22,10 @@ class bmc_all_propertiest:
 {
 public:
   bmc_all_propertiest(
-    const goto_functionst &_goto_functions,
+    const goto_functions_providert &function_provider,
     prop_convt &_solver,
     bmct &_bmc):
-    goto_functions(_goto_functions), solver(_solver), bmc(_bmc)
+    function_provider(function_provider), solver(_solver), bmc(_bmc)
   {
   }
 
@@ -85,7 +85,7 @@ public:
   goal_mapt goal_map;
 
 protected:
-  const goto_functionst &goto_functions;
+  const goto_functions_providert &function_provider;
   prop_convt &solver;
   bmct &bmc;
 

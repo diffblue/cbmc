@@ -26,7 +26,7 @@ Date: March 2016
 
 #include <langapi/language_util.h>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_functions_provider.h>
 #include <goto-programs/remove_returns.h>
 
 class coverage_recordt
@@ -53,7 +53,8 @@ class goto_program_coverage_recordt:public coverage_recordt
 public:
   goto_program_coverage_recordt(
     const namespacet &ns,
-    goto_functionst::function_mapt::const_iterator gf_it,
+    const irep_idt &function_id,
+    const goto_functionst::goto_functiont &goto_function,
     const symex_coveraget::coveraget &coverage);
 
   const irep_idt &get_file() const
@@ -136,16 +137,19 @@ static std::string rate_detailed(
 
 goto_program_coverage_recordt::goto_program_coverage_recordt(
   const namespacet &ns,
-  goto_functionst::function_mapt::const_iterator gf_it,
+  const irep_idt &function_id,
+  const goto_functionst::goto_functiont &goto_function,
   const symex_coveraget::coveraget &coverage):
   coverage_recordt("method")
 {
-  assert(gf_it->second.body_available());
+  INVARIANT(
+    goto_function.body_available(),
+    "GOTO coverage records should not be created for stub functions");
 
   // identify the file name, inlined functions aren't properly
   // accounted for
   goto_programt::const_targett end_function=
-    --gf_it->second.body.instructions.end();
+    --goto_function.body.instructions.end();
   assert(end_function->is_end_function());
   file_name=end_function->source_location.get_file();
   assert(!file_name.empty());
@@ -153,7 +157,7 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
   // compute the maximum coverage of individual source-code lines
   coverage_lines_mapt coverage_lines_map;
   compute_coverage_lines(
-    gf_it->second.body,
+    goto_function.body,
     file_name,
     coverage,
     coverage_lines_map);
@@ -170,14 +174,14 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
   //     <line number="30" hits="1" branch="false"/>
   //   </lines>
   // </method>
-  xml.set_attribute("name", id2string(gf_it->first));
+  xml.set_attribute("name", id2string(function_id));
 
   code_typet sig_type=
-    original_return_type(ns.get_symbol_table(), gf_it->first);
+    original_return_type(ns.get_symbol_table(), function_id);
   if(sig_type.is_nil())
-    sig_type=gf_it->second.type;
+    sig_type=goto_function.type;
   xml.set_attribute("signature",
-                    from_type(ns, gf_it->first, sig_type));
+                    from_type(ns, function_id, sig_type));
 
   xml.set_attribute("line-rate",
                     rate_detailed(lines_covered, lines_total));
@@ -303,20 +307,24 @@ void goto_program_coverage_recordt::compute_coverage_lines(
 }
 
 void symex_coveraget::compute_overall_coverage(
-  const goto_functionst &goto_functions,
+  const goto_functions_providert &goto_functions_provider,
   coverage_recordt &dest) const
 {
   typedef std::map<irep_idt, coverage_recordt> file_recordst;
   file_recordst file_records;
 
-  forall_goto_functions(gf_it, goto_functions)
+  for(const irep_idt &function_id :
+        goto_functions_provider.get_available_functions())
   {
-    if(!gf_it->second.body_available() ||
-       gf_it->first==goto_functions.entry_point() ||
-       gf_it->first==CPROVER_PREFIX "initialize")
+    const goto_functionst::goto_functiont &goto_function =
+      goto_functions_provider.get_existing_goto_function(function_id);
+    if(!goto_function.body_available() ||
+       function_id==goto_functionst::entry_point() ||
+       function_id==CPROVER_PREFIX "initialize")
       continue;
 
-    goto_program_coverage_recordt func_cov(ns, gf_it, coverage);
+    goto_program_coverage_recordt func_cov(
+      ns, function_id, goto_function, coverage);
 
     std::pair<file_recordst::iterator, bool> entry=
       file_records.insert(std::make_pair(func_cov.get_file(),
@@ -379,11 +387,11 @@ void symex_coveraget::compute_overall_coverage(
 }
 
 void symex_coveraget::build_cobertura(
-  const goto_functionst &goto_functions,
+  const goto_functions_providert &goto_functions_provider,
   xmlt &xml_coverage) const
 {
   coverage_recordt overall_cov("package");
-  compute_overall_coverage(goto_functions, overall_cov);
+  compute_overall_coverage(goto_functions_provider, overall_cov);
 
   std::string overall_line_rate_str=
     rate(overall_cov.lines_covered, overall_cov.lines_total);
@@ -424,11 +432,11 @@ void symex_coveraget::build_cobertura(
 }
 
 bool symex_coveraget::output_report(
-  const goto_functionst &goto_functions,
+  const goto_functions_providert &goto_functions_provider,
   std::ostream &os) const
 {
   xmlt xml_coverage("coverage");
-  build_cobertura(goto_functions, xml_coverage);
+  build_cobertura(goto_functions_provider, xml_coverage);
 
   os << "<?xml version=\"1.0\"?>\n";
   os << "<!DOCTYPE coverage SYSTEM \""
@@ -439,17 +447,16 @@ bool symex_coveraget::output_report(
 }
 
 bool symex_coveraget::generate_report(
-  const goto_functionst &goto_functions,
+  const goto_functions_providert &goto_functions_provider,
   const std::string &path) const
 {
   assert(!path.empty());
 
   if(path=="-")
-    return output_report(goto_functions, std::cout);
+    return output_report(goto_functions_provider, std::cout);
   else
   {
     std::ofstream out(path.c_str());
-    return output_report(goto_functions, out);
+    return output_report(goto_functions_provider, out);
   }
 }
-

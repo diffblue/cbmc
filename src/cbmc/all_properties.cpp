@@ -63,10 +63,15 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   // Collect _all_ goals in `goal_map'.
   // This maps property IDs to 'goalt'
-  forall_goto_functions(f_it, goto_functions)
-    forall_goto_program_instructions(i_it, f_it->second.body)
+  for(const irep_idt &function_id : function_provider.get_available_functions())
+  {
+    forall_goto_program_instructions(
+      i_it, function_provider.get_existing_goto_function(function_id).body)
+    {
       if(i_it->is_assert())
         goal_map[i_it->source_location.get_property_id()]=goalt(*i_it);
+    }
+  }
 
   // get the conditions for these goals from formula
   // collect all 'instances' of the properties
@@ -230,10 +235,10 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
 }
 
 safety_checkert::resultt bmct::all_properties(
-  const goto_functionst &goto_functions,
+  const goto_functions_providert &function_provider,
   prop_convt &solver)
 {
-  bmc_all_propertiest bmc_all_properties(goto_functions, solver, *this);
+  bmc_all_propertiest bmc_all_properties(function_provider, solver, *this);
   bmc_all_properties.set_message_handler(get_message_handler());
   return bmc_all_properties();
 }

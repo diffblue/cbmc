@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt2/smt2_dec.h>
 
 #include <goto-programs/goto_trace.h>
+#include <goto-programs/goto_functions_provider.h>
 
 #include <goto-symex/symex_target_equation.h>
 #include <goto-programs/goto_model.h>
@@ -90,9 +91,14 @@ public:
       !options.get_option("symex-coverage-report").empty();
   }
 
-  virtual resultt run(const goto_functionst &goto_functions);
+  virtual resultt run(const goto_functionst &goto_functions)
+  {
+    eager_goto_functions_providert provider(goto_functions);
+    return run(provider);
+  }
+  resultt run(goto_functions_providert &goto_functions_provider);
   void setup();
-  safety_checkert::resultt execute(const goto_functionst &);
+  safety_checkert::resultt execute(goto_functions_providert &);
   virtual ~bmct() { }
 
   // additional stuff
@@ -118,6 +124,14 @@ public:
     symex.add_recursion_unwind_handler(handler);
   }
 
+  static int do_language_agnostic_bmc(
+    const optionst &opts,
+    const symbol_tablet &symbol_table,
+    goto_functions_providert &goto_functions_provider,
+    const ui_message_handlert::uit &ui,
+    messaget &message,
+    std::function<void(bmct &, const symbol_tablet &)> frontend_configure_bmc);
+
   /// \brief common BMC code, invoked from language-specific frontends
   ///
   /// Do bounded model-checking after all language-specific program
@@ -132,10 +146,20 @@ public:
     const goto_modelt &goto_model,
     const ui_message_handlert::uit &ui,
     messaget &message,
-    std::function<void(bmct &, const goto_modelt &)> frontend_configure_bmc =
-      [](bmct &_bmc, const goto_modelt &) { // NOLINT (*)
+    std::function<void(bmct &, const symbol_tablet &)> frontend_configure_bmc =
+      [](bmct &_bmc, const symbol_tablet &) { // NOLINT (*)
         // Empty default implementation
-      });
+      })
+  {
+    eager_goto_functions_providert provider(goto_model.goto_functions);
+    return do_language_agnostic_bmc(
+      opts,
+      goto_model.symbol_table,
+      provider,
+      ui,
+      message,
+      frontend_configure_bmc);
+  }
 
 protected:
   /// \brief Constructor for path exploration from saved state
@@ -188,9 +212,7 @@ protected:
   virtual decision_proceduret::resultt
     run_decision_procedure(prop_convt &prop_conv);
 
-  virtual resultt decide(
-    const goto_functionst &,
-    prop_convt &);
+  virtual resultt decide(const goto_functions_providert &, prop_convt &);
 
   // unwinding
   virtual void setup_unwind();
@@ -209,7 +231,7 @@ protected:
   }
 
   virtual resultt all_properties(
-    const goto_functionst &goto_functions,
+    const goto_functions_providert &goto_functions,
     prop_convt &solver);
   virtual resultt stop_on_fail(prop_convt &solver);
   virtual void show_program();
@@ -224,7 +246,7 @@ protected:
   void show();
 
   bool cover(
-    const goto_functionst &goto_functions,
+    const goto_functions_providert &goto_functions_provider,
     const optionst::value_listt &criteria);
 
   friend class bmc_all_propertiest;
@@ -240,8 +262,8 @@ private:
   /// invoke the symbolic executor in a class-specific way. This
   /// implementation invokes goto_symext::operator() to perform
   /// full-program model-checking from the entry point of the program.
-  virtual void
-  perform_symbolic_execution(const goto_functionst &goto_functions);
+  virtual void perform_symbolic_execution(
+    goto_symext::get_goto_functiont get_goto_function);
 };
 
 /// \brief Symbolic execution from a saved branch point
@@ -285,8 +307,8 @@ private:
   /// This overrides the base implementation to call the symbolic executor with
   /// the saved symex_target_equationt, symbol_tablet, and goto_symex_statet
   /// provided as arguments to the constructor of this class.
-  void
-  perform_symbolic_execution(const goto_functionst &goto_functions) override;
+  void perform_symbolic_execution(
+    goto_symext::get_goto_functiont get_goto_function) override;
 
 #define OPT_BMC                                                                \
   "(program-only)"                                                             \

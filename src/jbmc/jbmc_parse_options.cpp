@@ -489,12 +489,12 @@ int jbmc_parse_optionst::doit()
   if(set_properties(goto_model))
     return 7; // should contemplate EX_USAGE from sysexits.h
 
-  std::function<void(bmct &, const goto_modelt &)> configure_bmc;
+  std::function<void(bmct &, const symbol_tablet &)> configure_bmc;
   if(options.get_bool_option("java-unwind-enum-static"))
   {
     configure_bmc = [](
-      bmct &bmc, const goto_modelt &goto_model) { // NOLINT (*)
-        bmc.add_loop_unwind_handler([&goto_model](
+      bmct &bmc, const symbol_tablet &symbol_table) { // NOLINT (*)
+        bmc.add_loop_unwind_handler([&symbol_table](
                                       const irep_idt &function_id,
                                       unsigned loop_number,
                                       unsigned unwind,
@@ -504,14 +504,14 @@ int jbmc_parse_optionst::doit()
             loop_number,
             unwind,
             max_unwind,
-            goto_model.symbol_table);
+            symbol_table);
         });
     };
   }
   else
   {
     configure_bmc = [](
-      bmct &bmc, const goto_modelt &goto_model) { // NOLINT (*)
+      bmct &bmc, const symbol_tablet &goto_model) { // NOLINT (*)
       // NOOP
     };
   }
