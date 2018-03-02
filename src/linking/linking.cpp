@@ -452,15 +452,23 @@ void linkingt::duplicate_code_symbol(
     const code_typet &old_t=to_code_type(old_symbol.type);
     const code_typet &new_t=to_code_type(new_symbol.type);
 
-    // if one of them was an implicit declaration, just issue a warning
+    // if one of them was an implicit declaration then only conflicts on the
+    // return type are an error as we would end up with assignments with
+    // mismatching types; as we currently do not patch these by inserting type
+    // casts we need to fail hard
     if(!old_symbol.location.get_function().empty() &&
        old_symbol.value.is_nil())
     {
-      // issue a warning and overwrite
-      link_warning(
-        old_symbol,
-        new_symbol,
-        "implicit function declaration");
+      if(base_type_eq(old_t.return_type(), new_t.return_type(), ns))
+         link_warning(
+           old_symbol,
+           new_symbol,
+           "implicit function declaration");
+      else
+        link_error(
+          old_symbol,
+          new_symbol,
+          "implicit function declaration");
 
       old_symbol.type=new_symbol.type;
       old_symbol.location=new_symbol.location;
@@ -469,11 +477,16 @@ void linkingt::duplicate_code_symbol(
     else if(!new_symbol.location.get_function().empty() &&
             new_symbol.value.is_nil())
     {
-      // issue a warning
-      link_warning(
-        old_symbol,
-        new_symbol,
-        "ignoring conflicting implicit function declaration");
+      if(base_type_eq(old_t.return_type(), new_t.return_type(), ns))
+        link_warning(
+          old_symbol,
+          new_symbol,
+          "ignoring conflicting implicit function declaration");
+      else
+        link_error(
+          old_symbol,
+          new_symbol,
+          "implicit function declaration");
     }
     // handle (incomplete) function prototypes
     else if(base_type_eq(old_t.return_type(), new_t.return_type(), ns) &&
