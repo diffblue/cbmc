@@ -1244,7 +1244,10 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
 
   make_index_type(index_expr);
 
-  const typet &final_array_type=follow(array_expr.type());
+  // array_expr is a reference to one of expr.operands(), when that vector is
+  // swapped below the reference is no longer valid. final_array_type exists
+  // beyond that point so can't be a reference
+  const typet final_array_type = follow(array_expr.type());
 
   if(final_array_type.id()==ID_array ||
      final_array_type.id()==ID_vector)
