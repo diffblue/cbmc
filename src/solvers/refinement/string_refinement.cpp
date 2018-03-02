@@ -119,7 +119,7 @@ static std::vector<exprt> instantiate(
 static optionalt<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
-  const std::size_t max_string_length,
+  std::size_t max_string_length,
   messaget::mstreamt &stream,
   const array_string_exprt &arr);
 
@@ -127,7 +127,8 @@ static exprt substitute_array_access(
   const index_exprt &index_expr,
   const std::function<symbol_exprt(const irep_idt &, const typet &)>
     &symbol_generator,
-  const bool left_propagate);
+  bool left_propagate,
+  std::size_t max_index);
 
 /// Convert index-value map to a vector of values. If a value for an
 /// index is not defined, set it to the value referenced by the next higher
@@ -167,11 +168,14 @@ static bool validate(const string_refinementt::infot &info)
   return true;
 }
 
-string_refinementt::string_refinementt(const infot &info, bool):
-  supert(info),
-  config_(info),
-  loop_bound_(info.refinement_bound),
-  generator(info, *info.ns) { }
+string_refinementt::string_refinementt(const infot &info, bool)
+  : supert(info),
+    config_(info),
+    loop_bound_(info.refinement_bound),
+    max_string_length(info.max_string_length),
+    generator(*info.ns)
+{
+}
 
 string_refinementt::string_refinementt(const infot &info):
   string_refinementt(info, validate(info)) { }
@@ -685,6 +689,44 @@ void output_equations(
            << " == " << from_expr(ns, "", equations[i].rhs()) << std::endl;
 }
 
+/// Make character array accesses at index greater than max_index return
+/// CHARACTER_FOR_UNKNOWN.
+///
+/// For an index_expr `s[i]` we return `(0 <= i <= max_index ? s[i] : '?')`
+/// \param index_expr : an access expression in an array of characters
+/// \param max_index : maximal index up to which array access is meaningful
+/// \return index_expr with the added guard
+static exprt add_guard_to_array_accesses(
+  const index_exprt &index_expr,
+  const std::size_t max_index)
+{
+  PRECONDITION(index_expr.type().id() == ID_unsignedbv);
+  const exprt &index = index_expr.index();
+  // The guard is `0 <= index && index <= max_index`
+  const and_exprt guard(
+    binary_relation_exprt(index, ID_ge, from_integer(0, index.type())),
+    binary_relation_exprt(index, ID_le, from_integer(max_index, index.type())));
+  const exprt unknown = from_integer(CHARACTER_FOR_UNKNOWN, index_expr.type());
+  return if_exprt(guard, index_expr, unknown);
+}
+
+// NOLINTNEXTLINE
+/// \copybrief add_guard_to_array_accesses(index_exprt &index_expr, const std::size_t max_index)
+/// For instance `s[i] == 'a'` would be replaced by
+/// `(i <= max_index ? s[i] : '?') == 'a'`
+/// \param [out] expr : expression in which we replace the accesses
+/// \param max_index : maximal index up to which array access is meaningful
+static void
+add_guard_to_array_accesses(exprt &expr, const std::size_t max_index)
+{
+  for(exprt &op : expr.operands())
+    add_guard_to_array_accesses(op, max_index);
+
+  const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr);
+  if(index_expr && is_char_type(index_expr->type()))
+    expr = add_guard_to_array_accesses(*index_expr, max_index);
+}
+
 /// Main decision procedure of the solver. Looks for a valuation of variables
 /// compatible with the constraints that have been given to `set_to` so far.
 ///
@@ -853,11 +895,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       generator.fresh_symbol("not_contains_witness", witness_type);
   }
 
-  for(exprt lemma : generator.get_lemmas())
-  {
-    symbol_resolve.replace_expr(lemma);
+  for(const exprt &lemma : generator.get_lemmas())
     add_lemma(lemma);
-  }
 
   // Initial try without index set
   const auto get = [this](const exprt &expr) { return this->get(expr); };
@@ -866,13 +905,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   {
     bool satisfied;
     std::vector<exprt> counter_examples;
-    std::tie(satisfied, counter_examples)=check_axioms(
+    std::tie(satisfied, counter_examples) = check_axioms(
       axioms,
       generator,
       get,
       debug(),
       ns,
-      generator.max_string_length,
+      max_string_length,
       config_.use_counter_example,
       supert::config_.ui,
       symbol_resolve);
@@ -897,13 +936,10 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   initial_index_set(index_sets, ns, axioms);
   update_index_set(index_sets, ns, current_constraints);
   current_constraints.clear();
-  for(const auto &instance :
-        generate_instantiations(
-          debug(),
-          ns,
-          generator,
-          index_sets,
-          axioms))
+
+  std::vector<exprt> instances =
+    generate_instantiations(debug(), ns, generator, index_sets, axioms);
+  for(auto &instance : instances)
     add_lemma(instance);
 
   while((loop_bound_--)>0)
@@ -914,13 +950,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     {
       bool satisfied;
       std::vector<exprt> counter_examples;
-      std::tie(satisfied, counter_examples)=check_axioms(
+      std::tie(satisfied, counter_examples) = check_axioms(
         axioms,
         generator,
         get,
         debug(),
         ns,
-        generator.max_string_length,
+        max_string_length,
         config_.use_counter_example,
         supert::config_.ui,
         symbol_resolve);
@@ -951,20 +987,18 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         if(axioms.not_contains.empty())
         {
           error() << "dec_solve: current index set is empty, "
-                  << "this should not happen" << eom;
+                  << "consider increasing the gap between string-max-length "
+                  << "and string-max-input-length" << eom;
           return resultt::D_ERROR;
         }
         else
           debug() << "dec_solve: current index set is empty" << eom;
       }
       current_constraints.clear();
-      for(const auto &instance :
-        generate_instantiations(
-          debug(),
-          ns,
-          generator,
-          index_sets,
-          axioms))
+
+      std::vector<exprt> instances =
+        generate_instantiations(debug(), ns, generator, index_sets, axioms);
+      for(auto &instance : instances)
         add_lemma(instance);
     }
     else
@@ -989,13 +1023,14 @@ void string_refinementt::add_lemma(
   if(!seen_instances.insert(lemma).second)
     return;
 
-  current_constraints.push_back(lemma);
+  exprt lemma_copy = lemma;
+  add_guard_to_array_accesses(lemma_copy, max_string_length);
+  current_constraints.push_back(lemma_copy);
 
-  exprt simple_lemma=lemma;
   if(simplify_lemma)
-    simplify(simple_lemma, ns);
+    simplify(lemma_copy, ns);
 
-  if(simple_lemma.is_true())
+  if(lemma_copy.is_true())
   {
 #if 0
     debug() << "string_refinementt::add_lemma : tautology" << eom;
@@ -1003,11 +1038,11 @@ void string_refinementt::add_lemma(
     return;
   }
 
-  symbol_resolve.replace_expr(simple_lemma);
+  symbol_resolve.replace_expr(lemma_copy);
 
   // Replace empty arrays with array_of expression because the solver cannot
   // handle empty arrays.
-  for(auto it = simple_lemma.depth_begin(); it != simple_lemma.depth_end();)
+  for(auto it = lemma_copy.depth_begin(); it != lemma_copy.depth_end();)
   {
     if(it->id() == ID_array && it->operands().empty())
     {
@@ -1020,9 +1055,9 @@ void string_refinementt::add_lemma(
       ++it;
   }
 
-  debug() << "adding lemma " << from_expr(ns, "", simple_lemma) << eom;
+  debug() << "adding lemma " << from_expr(ns, "", lemma_copy) << eom;
 
-  prop.l_set_to_true(convert(simple_lemma));
+  prop.l_set_to_true(convert(lemma_copy));
 }
 
 /// Get a model of an array and put it in a certain form.
@@ -1061,7 +1096,8 @@ static optionalt<exprt> get_array(
   auto n_opt = numeric_cast<std::size_t>(size_val);
   if(!n_opt)
   {
-    stream << "(sr::get_array) size is not valid" << eom;
+    stream << "(sr::get_array) size is not valid: "
+           << from_expr(ns, "", size_val) << eom;
     return {};
   }
   std::size_t n = *n_opt;
@@ -1069,14 +1105,49 @@ static optionalt<exprt> get_array(
   const array_typet ret_type(char_type, from_integer(n, index_type));
   array_exprt ret(ret_type);
 
-  if(n>max_string_length)
-  {
-    stream << "(sr::get_array) long string (size=" << n << ")" << eom;
-    return {};
-  }
-
   if(n==0)
     return empty_ret;
+
+  if(n>max_string_length)
+  {
+    stream << "(sr::get_array) long string (size=" << n << "):"
+           << from_expr(ns, "", arr_val) << eom;
+  }
+
+  if(arr_val.id()=="array-list")
+  {
+    DATA_INVARIANT(
+      arr_val.operands().size()%2 == 0,
+      "array-list must have even number of operands");
+    std::map<std::size_t, exprt> initial_map;
+    exprt array = array_of_exprt(
+      from_integer(CHARACTER_FOR_UNKNOWN, char_type), ret_type);
+    for(size_t i = 0; i < arr_val.operands().size(); i += 2)
+    {
+      const exprt &index = arr_val.operands()[i];
+      const auto idx = numeric_cast<std::size_t>(index);
+      if(idx.has_value() && *idx < max_string_length)
+      {
+        const exprt new_value = arr_val.operands()[i + 1];
+        array = with_exprt(array, from_integer(*idx, index_type), new_value);
+      }
+    }
+    return array;
+  }
+  else if(arr_val.id() == ID_array)
+  {
+    ret.operands().insert(
+      ret.operands().end(),
+      arr_val.operands().begin(),
+      arr_val.operands().size() >= n ? arr_val.operands().begin() + n
+                                     : arr_val.operands().end());
+    return ret;
+  }
+  else
+  {
+    stream << "get_array: not an array or array list" << eom;
+    return {};
+  }
 
   if(arr_val.id()=="array-list")
   {
@@ -1238,21 +1309,25 @@ sparse_arrayt::sparse_arrayt(const with_exprt &expr)
   default_value = expr_dynamic_cast<array_of_exprt>(ref.get()).what();
 }
 
-exprt sparse_arrayt::to_if_expression(const exprt &index) const
+exprt sparse_arrayt::to_if_expression(
+  const exprt &index,
+  const std::size_t max_index) const
 {
   return std::accumulate(
     entries.begin(),
     entries.end(),
     default_value,
-    [&](
-      const exprt if_expr,
-      const std::pair<std::size_t, exprt> &entry) { // NOLINT
-      const exprt entry_index = from_integer(entry.first, index.type());
-      const exprt &then_expr = entry.second;
-      CHECK_RETURN(then_expr.type() == if_expr.type());
-      const equal_exprt index_equal(index, entry_index);
-      return if_exprt(index_equal, then_expr, if_expr, if_expr.type());
-    });
+    [&](const exprt if_expr, const std::pair<std::size_t, exprt> &entry)
+      -> exprt { // NOLINT
+        if(entry.first > max_index)
+          return if_expr;
+
+        const exprt entry_index = from_integer(entry.first, index.type());
+        const exprt &then_expr = entry.second;
+        CHECK_RETURN(then_expr.type() == if_expr.type());
+        const equal_exprt index_equal(index, entry_index);
+        return if_exprt(index_equal, then_expr, if_expr, if_expr.type());
+      });
 }
 
 interval_sparse_arrayt::interval_sparse_arrayt(const with_exprt &expr)
@@ -1267,21 +1342,44 @@ interval_sparse_arrayt::interval_sparse_arrayt(const with_exprt &expr)
       const std::pair<std::size_t, exprt> &b) { return a.first < b.first; });
 }
 
-exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const
+interval_sparse_arrayt::interval_sparse_arrayt(
+  const array_exprt &expr,
+  const exprt &extra_value)
+{
+  default_value = extra_value;
+  if(expr.operands().empty())
+    return;
+
+  entries.emplace_back(0, expr.operands()[0]);
+
+  for(std::size_t i = 1; i < expr.operands().size(); ++i)
+  {
+    if(entries.back().second == expr.operands()[i])
+      entries.back().first = i;
+    else
+      entries.emplace_back(i, expr.operands()[i]);
+  }
+}
+
+exprt interval_sparse_arrayt::to_if_expression(
+  const exprt &index,
+  const std::size_t max_index) const
 {
   return std::accumulate(
     entries.rbegin(),
     entries.rend(),
     default_value,
-    [&](
-      const exprt if_expr,
-      const std::pair<std::size_t, exprt> &entry) { // NOLINT
-      const exprt entry_index = from_integer(entry.first, index.type());
-      const exprt &then_expr = entry.second;
-      CHECK_RETURN(then_expr.type() == if_expr.type());
-      const binary_relation_exprt index_small_eq(index, ID_le, entry_index);
-      return if_exprt(index_small_eq, then_expr, if_expr, if_expr.type());
-    });
+    [&](const exprt if_expr, const std::pair<std::size_t, exprt> &entry)
+      -> exprt { // NOLINT
+        if(entry.first > max_index)
+          return if_expr;
+
+        const exprt entry_index = from_integer(entry.first, index.type());
+        const exprt &then_expr = entry.second;
+        CHECK_RETURN(then_expr.type() == if_expr.type());
+        const binary_relation_exprt index_small_eq(index, ID_le, entry_index);
+        return if_exprt(index_small_eq, then_expr, if_expr, if_expr.type());
+      });
 }
 
 /// Create a new expression where 'with' expressions on arrays are replaced by
@@ -1295,14 +1393,21 @@ exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const
 ///   `with_expr(with_expr(...(array_of(...)))`. This is the form in which
 ///   array valuations coming from the underlying solver are given.
 /// \param index: An index with which to build the equality condition
+/// \param left_propagate: whether values of the array should be propagated to
+///        the left
+/// \param max_index: maximum index up to which we concretize, beyond this index
+///        the array will take the default value (given at the bottom of the
+///        with expression)
 /// \return An expression containing no 'with' expression
 static exprt substitute_array_access(
   const with_exprt &expr,
   const exprt &index,
-  const bool left_propagate)
+  const bool left_propagate,
+  const std::size_t max_index)
 {
-  return left_propagate ? interval_sparse_arrayt(expr).to_if_expression(index)
-                        : sparse_arrayt(expr).to_if_expression(index);
+  return left_propagate
+           ? interval_sparse_arrayt(expr).to_if_expression(index, max_index)
+           : sparse_arrayt(expr).to_if_expression(index, max_index);
 }
 
 /// Fill an array represented by a list of with_expr by propagating values to
@@ -1327,7 +1432,7 @@ fill_in_array_with_expr(const exprt &expr, const std::size_t string_max_length)
   const auto &array_size_opt = numeric_cast<std::size_t>(array_type.size());
   if(array_size_opt && *array_size_opt > 0)
     initial_map.emplace(
-      *array_size_opt - 1,
+      std::min(*array_size_opt - 1, string_max_length),
       from_integer(CHARACTER_FOR_UNKNOWN, array_type.subtype()));
 
   for(exprt it=expr; it.id()==ID_with; it=to_with_expr(it).old())
@@ -1365,9 +1470,12 @@ exprt fill_in_array_expr(const array_exprt &expr, std::size_t string_max_length)
   const auto &array_size_opt = numeric_cast<std::size_t>(array_type.size());
 
   if(array_size_opt && *array_size_opt > 0)
+  {
+    const std::size_t last_index = *array_size_opt <= string_max_length
+                                   ? *array_size_opt - 1 : string_max_length;
     initial_map.emplace(
-      *array_size_opt - 1,
-      from_integer(CHARACTER_FOR_UNKNOWN, array_type.subtype()));
+      last_index, from_integer(CHARACTER_FOR_UNKNOWN, array_type.subtype()));
+  }
 
   for(std::size_t i = 0; i < expr.operands().size(); ++i)
   {
@@ -1384,35 +1492,19 @@ exprt fill_in_array_expr(const array_exprt &expr, std::size_t string_max_length)
 /// expressions: for instance in array access `arr[index]`, where:
 /// `arr := {12, 24, 48}` the constructed expression will be:
 ///    `index==0 ? 12 : index==1 ? 24 : 48`
+/// Avoids repetition so `arr := {12, 12, 24, 48}` will give
+///    `index<=1 ? 12 : index==1 ? 24 : 48`
 static exprt substitute_array_access(
   const array_exprt &array_expr,
   const exprt &index,
   const std::function<symbol_exprt(const irep_idt &, const typet &)>
-    &symbol_generator)
+    &symbol_generator,
+  const std::size_t max_index)
 {
   const typet &char_type = array_expr.type().subtype();
-  const std::vector<exprt> &operands = array_expr.operands();
-
-  exprt result = symbol_generator("out_of_bound_access", char_type);
-
-  for(std::size_t i = 0; i < operands.size(); ++i)
-  {
-    // Go in reverse order so that smaller indexes appear first in the result
-    const std::size_t pos = operands.size() - 1 - i;
-    const equal_exprt equals(index, from_integer(pos, java_int_type()));
-    if(operands[pos].type() != char_type)
-    {
-      INVARIANT(
-        operands[pos].id() == ID_unknown,
-        string_refinement_invariantt(
-          "elements can only have type char or "
-          "unknown, and it is not char type"));
-      result = if_exprt(equals, exprt(ID_unknown, char_type), result);
-    }
-    else
-      result = if_exprt(equals, operands[pos], result);
-  }
-  return result;
+  const exprt default_val = symbol_generator("out_of_bound_access", char_type);
+  const interval_sparse_arrayt sparse_array(array_expr, default_val);
+  return sparse_array.to_if_expression(index, max_index);
 }
 
 static exprt substitute_array_access(
@@ -1420,13 +1512,20 @@ static exprt substitute_array_access(
   const exprt &index,
   const std::function<symbol_exprt(const irep_idt &, const typet &)>
     &symbol_generator,
-  const bool left_propagate)
+  const bool left_propagate,
+  const std::size_t max_index)
 {
   // Substitute recursively in branches of conditional expressions
   const exprt true_case = substitute_array_access(
-    index_exprt(if_expr.true_case(), index), symbol_generator, left_propagate);
+    index_exprt(if_expr.true_case(), index),
+    symbol_generator,
+    left_propagate,
+    max_index);
   const exprt false_case = substitute_array_access(
-    index_exprt(if_expr.false_case(), index), symbol_generator, left_propagate);
+    index_exprt(if_expr.false_case(), index),
+    symbol_generator,
+    left_propagate,
+    max_index);
 
   return if_exprt(if_expr.cond(), true_case, false_case);
 }
@@ -1435,23 +1534,32 @@ static exprt substitute_array_access(
   const index_exprt &index_expr,
   const std::function<symbol_exprt(const irep_idt &, const typet &)>
     &symbol_generator,
-  const bool left_propagate)
+  const bool left_propagate,
+  const std::size_t max_index)
 {
   const exprt &array = index_expr.array();
 
   if(array.id() == ID_symbol)
     return index_expr;
+
   if(auto array_of = expr_try_dynamic_cast<array_of_exprt>(array))
     return array_of->op();
+
   if(auto array_with = expr_try_dynamic_cast<with_exprt>(array))
     return substitute_array_access(
-      *array_with, index_expr.index(), left_propagate);
+      *array_with, index_expr.index(), left_propagate, max_index);
+
   if(auto array_expr = expr_try_dynamic_cast<array_exprt>(array))
     return substitute_array_access(
-      *array_expr, index_expr.index(), symbol_generator);
+      *array_expr, index_expr.index(), symbol_generator, max_index);
+
   if(auto if_expr = expr_try_dynamic_cast<if_exprt>(array))
     return substitute_array_access(
-      *if_expr, index_expr.index(), symbol_generator, left_propagate);
+      *if_expr,
+      index_expr.index(),
+      symbol_generator,
+      left_propagate,
+      max_index);
 
   UNREACHABLE;
 }
@@ -1463,16 +1571,18 @@ static void substitute_array_access_in_place(
   exprt &expr,
   const std::function<symbol_exprt(const irep_idt &, const typet &)>
     &symbol_generator,
-  const bool left_propagate)
+  const bool left_propagate,
+  const std::size_t max_index)
 {
   if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr))
   {
-    expr =
-      substitute_array_access(*index_expr, symbol_generator, left_propagate);
+    expr = substitute_array_access(
+      *index_expr, symbol_generator, left_propagate, max_index);
   }
 
   for(auto &op : expr.operands())
-    substitute_array_access_in_place(op, symbol_generator, left_propagate);
+    substitute_array_access_in_place(
+      op, symbol_generator, left_propagate, max_index);
 }
 
 /// Create an equivalent expression where array accesses and 'with' expressions
@@ -1499,9 +1609,11 @@ exprt substitute_array_access(
   exprt expr,
   const std::function<symbol_exprt(const irep_idt &, const typet &)>
     &symbol_generator,
-  const bool left_propagate)
+  const bool left_propagate,
+  const std::size_t max_index)
 {
-  substitute_array_access_in_place(expr, symbol_generator, left_propagate);
+  substitute_array_access_in_place(
+    expr, symbol_generator, left_propagate, max_index);
   return expr;
 }
 
@@ -1642,7 +1754,7 @@ static void debug_check_axioms_step(
 {
   static const std::string indent = "  ";
   static const std::string indent2 = "    ";
-  stream << indent2 << "- axiom:\n" << indent2 << indent;
+  stream << indent2 << "- axiom:" << messaget::eom << indent2 << indent;
 
   if(axiom.id() == ID_string_constraint)
     stream << from_expr(ns, "", to_string_constraint(axiom));
@@ -1650,7 +1762,9 @@ static void debug_check_axioms_step(
     stream << from_expr(ns, "", to_string_not_contains_constraint(axiom));
   else
     stream << from_expr(ns, "", axiom);
-  stream << '\n' << indent2 << "- axiom_in_model:\n" << indent2 << indent;
+  stream << '\n'
+         << indent2 << "- axiom_in_model:" << messaget::eom << indent2
+         << indent;
 
   if(axiom_in_model.id() == ID_string_constraint)
     stream << from_expr(ns, "", to_string_constraint(axiom_in_model));
@@ -1662,10 +1776,10 @@ static void debug_check_axioms_step(
 
   stream << '\n'
          << indent2 << "- negated_axiom:\n"
-         << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
+         << indent2 << indent << from_expr(ns, "", negaxiom) << messaget::eom;
   stream << indent2 << "- negated_axiom_with_concretized_arrays:\n"
          << indent2 << indent << from_expr(ns, "", with_concretized_arrays)
-         << '\n';
+         << messaget::eom;
 }
 
 /// \return true if the current model satisfies all the axioms
@@ -1732,12 +1846,17 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     stream << indent << i << ".\n";
     const exprt with_concretized_arrays =
-      substitute_array_access(negaxiom, gen_symbol, true);
+      substitute_array_access(negaxiom, gen_symbol, true, max_string_length);
     debug_check_axioms_step(
       stream, ns, axiom, axiom_in_model, negaxiom, with_concretized_arrays);
 
-    if(const auto &witness=
-       find_counter_example(ns, ui, with_concretized_arrays, univ_var))
+    const binary_relation_exprt bound_counter_example(
+      univ_var, ID_le, from_integer(max_string_length, univ_var.type()));
+    const and_exprt negated_with_univ_bound(
+      with_concretized_arrays, bound_counter_example);
+    if(
+      const auto &witness =
+        find_counter_example(ns, ui, negated_with_univ_bound, univ_var))
     {
       stream << indent2 << "- violated_for: " << univ_var.get_identifier()
              << "=" << from_expr(ns, "", *witness) << eom;
@@ -1784,13 +1903,20 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     negaxiom = simplify_expr(negaxiom, ns);
     const exprt with_concrete_arrays =
-      substitute_array_access(negaxiom, gen_symbol, true);
+      substitute_array_access(negaxiom, gen_symbol, true, max_string_length);
 
-    stream << indent << i << ".\n";
+    stream << indent << i << '.' << eom;
     debug_check_axioms_step(
       stream, ns, nc_axiom, nc_axiom_in_model, negaxiom, with_concrete_arrays);
 
-    if(const auto witness = find_counter_example(ns, ui, negaxiom, univ_var))
+    const binary_relation_exprt bound_counter_example(
+      univ_var, ID_le, from_integer(max_string_length, univ_var.type()));
+    const and_exprt negated_with_univ_bound(
+      with_concrete_arrays, bound_counter_example);
+
+    if(
+      const auto witness =
+        find_counter_example(ns, ui, negated_with_univ_bound, univ_var))
     {
       stream << indent2 << "- violated_for: " << univ_var.get_identifier()
              << "=" << from_expr(ns, "", *witness) << eom;
@@ -1821,18 +1947,11 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         const exprt &val=v.second;
         const string_constraintt &axiom=axioms.universal[v.first];
 
-        implies_exprt instance(axiom.premise(), axiom.body());
+        implies_exprt instance(
+          and_exprt(axiom.univ_within_bounds(), axiom.premise()), axiom.body());
         replace_expr(axiom.univ_var(), val, instance);
-        // We are not sure the index set contains only positive numbers
-        exprt bounds=and_exprt(
-          axiom.univ_within_bounds(),
-          binary_relation_exprt(
-            from_integer(0, val.type()), ID_le, val));
-        replace_expr(axiom.univ_var(), val, bounds);
-        const implies_exprt counter(bounds, instance);
-
-        stream << "  -  " << from_expr(ns, "", counter) << eom;
-        lemmas.push_back(counter);
+        stream << "  -  " << from_expr(ns, "", instance) << eom;
+        lemmas.push_back(instance);
       }
 
       for(const auto &v : violated_not_contains)
@@ -2300,20 +2419,20 @@ static exprt instantiate(
   const exprt &str,
   const exprt &val)
 {
-  exprt idx=find_index(axiom.body(), str, axiom.univ_var());
+  const exprt idx = find_index(axiom.body(), str, axiom.univ_var());
   if(idx.is_nil())
     return true_exprt();
 
-  exprt r=compute_inverse_function(stream, axiom.univ_var(), val, idx);
-  implies_exprt instance(axiom.premise(), axiom.body());
+  const exprt r = compute_inverse_function(stream, axiom.univ_var(), val, idx);
+  implies_exprt instance(
+    and_exprt(
+      and_exprt(
+        binary_relation_exprt(axiom.univ_var(), ID_ge, axiom.lower_bound()),
+        binary_relation_exprt(axiom.univ_var(), ID_lt, axiom.upper_bound())),
+      axiom.premise()),
+    axiom.body());
   replace_expr(axiom.univ_var(), r, instance);
-  // We are not sure the index set contains only positive numbers
-  exprt bounds=and_exprt(
-    axiom.univ_within_bounds(),
-    binary_relation_exprt(
-      from_integer(0, val.type()), ID_le, val));
-  replace_expr(axiom.univ_var(), r, bounds);
-  return implies_exprt(bounds, instance);
+  return instance;
 }
 
 /// Instantiates a quantified formula representing `not_contains` by
@@ -2428,34 +2547,26 @@ exprt string_refinementt::get(const exprt &expr) const
     array_string_exprt &arr = to_array_string_expr(ecopy);
     arr.length() = generator.get_length_of_string_array(arr);
     const auto arr_model_opt =
-      get_array(super_get, ns, generator.max_string_length, debug(), arr);
+      get_array(super_get, ns, max_string_length, debug(), arr);
     // \todo Refactor with get array in model
     if(arr_model_opt)
     {
       const exprt arr_model = simplify_expr(*arr_model_opt, ns);
-      const exprt concretized_array = concretize_arrays_in_expression(
-        arr_model, generator.max_string_length, ns);
+      const exprt concretized_array =
+        concretize_arrays_in_expression(arr_model, max_string_length, ns);
       return concretized_array;
     }
-    else
+    else if(generator.get_created_strings().count(arr))
     {
-      auto set = generator.get_created_strings();
-      if(set.find(arr) != set.end())
-      {
-        exprt length = super_get(arr.length());
-        if(const auto n = numeric_cast<std::size_t>(length))
-        {
-          exprt arr_model =
-            array_exprt(array_typet(arr.type().subtype(), length));
-          for(size_t i = 0; i < *n; i++)
-            arr_model.copy_to_operands(exprt(ID_unknown, arr.type().subtype()));
-          const exprt concretized_array = concretize_arrays_in_expression(
-            arr_model, generator.max_string_length, ns);
-          return concretized_array;
-        }
-      }
-      return arr;
+      const exprt default_char =
+        from_integer(CHARACTER_FOR_UNKNOWN, arr.type().subtype());
+      const exprt length_expr = super_get(arr.length());
+      const array_typet type(arr.type().subtype(), length_expr);
+      const array_of_exprt array_of(default_char, type);
+      return fill_in_array_with_expr(array_of, max_string_length);
     }
+    else
+      return arr;
   }
   return supert::get(ecopy);
 }
@@ -2476,14 +2587,7 @@ static optionalt<exprt> find_counter_example(
   const symbol_exprt &var)
 {
   satcheck_no_simplifiert sat_check;
-  bv_refinementt::infot info;
-  info.ns=&ns;
-  info.prop=&sat_check;
-  info.refine_arithmetic=true;
-  info.refine_arrays=true;
-  info.max_node_refinement=5;
-  info.ui=ui;
-  bv_refinementt solver(info);
+  boolbvt solver(ns, sat_check);
   solver << axiom;
 
   if(solver()==decision_proceduret::resultt::D_SATISFIABLE)

@@ -28,11 +28,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
 
-string_constraint_generatort::string_constraint_generatort(
-  const string_constraint_generatort::infot &info,
-  const namespacet &ns)
-  : max_string_length(info.string_max_length),
-    ns(ns)
+string_constraint_generatort::string_constraint_generatort(const namespacet &ns)
+  : ns(ns)
 {
 }
 
@@ -181,7 +178,6 @@ array_string_exprt string_constraint_generatort::fresh_string(
   symbol_exprt content = fresh_symbol("string_content", array_type);
   array_string_exprt str = to_array_string_expr(content);
   created_strings.insert(str);
-  add_default_axioms(str);
   return str;
 }
 
@@ -249,7 +245,7 @@ string_constraint_generatort::associate_char_array_to_char_pointer(
   auto insert_result =
     arrays_of_pointers_.insert(std::make_pair(char_pointer, array_sym));
   array_string_exprt result = to_array_string_expr(insert_result.first->second);
-  add_default_axioms(result);
+  created_strings.insert(result);
   return result;
 }
 
@@ -287,7 +283,7 @@ exprt string_constraint_generatort::associate_array_to_pointer(
     arrays_of_pointers_.insert(std::make_pair(pointer_expr, array_expr));
   INVARIANT(
     it_bool.second, "should not associate two arrays to the same pointer");
-  add_default_axioms(to_array_string_expr(array_expr));
+  created_strings.emplace(to_array_string_expr(array_expr));
   return from_integer(0, f.type());
 }
 
@@ -318,27 +314,6 @@ string_constraint_generatort::get_string_expr(const exprt &expr)
   PRECONDITION(is_refined_string_type(expr.type()));
   const refined_string_exprt &str = to_string_expr(expr);
   return char_array_of_pointer(str.content(), str.length());
-}
-
-/// adds standard axioms about the length of the string and its content: * its
-/// length should be positive * it should not exceed max_string_length * if
-/// force_printable_characters is true then all characters should belong to the
-/// range of ASCII characters between ' ' and '~'
-/// \param s: a string expression
-/// \return a string expression that is linked to the argument through axioms
-///   that are added to the list
-void string_constraint_generatort::add_default_axioms(
-  const array_string_exprt &s)
-{
-  // If `s` was already added we do nothing.
-  if(!created_strings.insert(s).second)
-    return;
-
-  const exprt index_zero = from_integer(0, s.length().type());
-  lemmas.push_back(s.axiom_for_length_ge(index_zero));
-
-  if(max_string_length!=std::numeric_limits<size_t>::max())
-    lemmas.push_back(s.axiom_for_length_le(max_string_length));
 }
 
 /// Add constraint on characters of a string.

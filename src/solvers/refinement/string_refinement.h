@@ -31,6 +31,11 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #define DEFAULT_MAX_NB_REFINEMENT std::numeric_limits<size_t>::max()
 #define CHARACTER_FOR_UNKNOWN '?'
 
+// The following default for max string length is largely enough for most
+// programs and avoids potential problems with overflows, and running out
+// of memory because of a string that is too large.
+#define DEFAULT_MAX_STRING_LENGTH (1 << 30)
+
 struct index_set_pairt
 {
   std::map<exprt, std::set<exprt>> cumulative;
@@ -56,11 +61,14 @@ public:
 
   /// Creates an if_expr corresponding to the result of accessing the array
   /// at the given index
-  virtual exprt to_if_expression(const exprt &index) const;
+  virtual exprt to_if_expression(
+    const exprt &index,
+    std::size_t max_index = std::numeric_limits<std::size_t>::max()) const;
 
 protected:
   exprt default_value;
   std::vector<std::pair<std::size_t, exprt>> entries;
+  sparse_arrayt() = default;
 };
 
 /// Represents arrays by the indexes up to which the value remains the same.
@@ -75,7 +83,11 @@ public:
   /// `arr[k]` is `a`, for all index between `i` (exclusive) and `j` it is `b`
   /// and for the others it is `x`.
   explicit interval_sparse_arrayt(const with_exprt &expr);
-  exprt to_if_expression(const exprt &index) const override;
+  interval_sparse_arrayt(const array_exprt &expr, const exprt &default_value);
+  exprt to_if_expression(
+    const exprt &index,
+    std::size_t max_index =
+      std::numeric_limits<std::size_t>::max()) const override;
 };
 
 class string_refinementt final: public bv_refinementt
@@ -87,12 +99,12 @@ private:
     /// Concretize strings after solver is finished
     bool trace=false;
     bool use_counter_example=true;
+    std::size_t max_string_length;
   };
 public:
   /// string_refinementt constructor arguments
   struct infot:
     public bv_refinementt::infot,
-    public string_constraint_generatort::infot,
     public configt { };
 
   explicit string_refinementt(const infot &);
@@ -112,6 +124,7 @@ private:
 
   const configt config_;
   std::size_t loop_bound_;
+  std::size_t max_string_length;
   string_constraint_generatort generator;
 
   // Simple constraints that have been given to the solver
@@ -156,6 +169,7 @@ exprt substitute_array_access(
   exprt expr,
   const std::function<symbol_exprt(const irep_idt &, const typet &)>
     &symbol_generator,
-  const bool left_propagate);
+  bool left_propagate,
+  std::size_t max_index);
 
 #endif

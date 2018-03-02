@@ -37,14 +37,7 @@ public:
   // Used by format function
   class format_specifiert;
 
-  /// Arguments pack for the string_constraint_generator constructor
-  struct infot
-  {
-    /// Max length of non-deterministic strings
-    size_t string_max_length=std::numeric_limits<size_t>::max();
-  };
-
-  string_constraint_generatort(const infot& info, const namespacet& ns);
+  explicit string_constraint_generatort(const namespacet &ns);
 
   /// Axioms are of three kinds: universally quantified string constraint,
   /// not contains string constraints and simple formulas.
@@ -108,7 +101,6 @@ private:
   array_string_exprt
   char_array_of_pointer(const exprt &pointer, const exprt &length);
 
-  void add_default_axioms(const array_string_exprt &s);
   exprt axiom_for_is_positive_index(const exprt &x);
 
   void add_constraint_on_characters(
@@ -344,7 +336,6 @@ private:
 
   // MEMBERS
 public:
-  const size_t max_string_length;
   // Used to store information about witnesses for not_contains constraints
   std::map<string_not_contains_constraintt, symbol_exprt> witness;
 private:
