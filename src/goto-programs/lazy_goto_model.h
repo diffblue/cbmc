@@ -118,6 +118,15 @@ public:
     return goto_functions.get_converted_goto_function(id);
   }
 
+  /// Deprecated accessor to retrieve the internal goto_functionst.
+  /// Use with care; concurrent use of get_goto_function will have side-effects
+  /// on this map which may surprise users, including invalidating any iterators
+  /// they have stored.
+  const goto_functionst &get_goto_functions_deprecated() const
+  {
+    return goto_model->goto_functions;
+  }
+
 private:
   std::unique_ptr<goto_modelt> goto_model;
 

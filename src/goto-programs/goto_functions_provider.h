@@ -47,6 +47,12 @@ public:
   /// functions set and symbol table, as their bodies are produced on demand.
   virtual std::unordered_set<irep_idt, irep_id_hash> get_available_functions()
     const = 0;
+
+  /// DEPRECATED accessor to get a raw goto_functionst. Only recommended for use
+  /// with code currently being ported to the new interface, as concurrent use
+  /// of get_goto_function may invalidate iterators or otherwise surprise users
+  /// by modifying the map underneath them.
+  virtual const goto_functionst &get_goto_functions_deprecated() const = 0;
 };
 
 /// GOTO functions view backing onto a goto_functionst object. All functions are
@@ -79,6 +85,11 @@ public:
     for(const auto &id_and_body : goto_functions.function_map)
       result.insert(id_and_body.first);
     return result;
+  }
+
+  const goto_functionst &get_goto_functions_deprecated() const override
+  {
+    return goto_functions;
   }
 
 private:
@@ -116,6 +127,11 @@ public:
     const override
   {
     return lazy_goto_model.get_converted_functions();
+  }
+
+  const goto_functionst &get_goto_functions_deprecated() const override
+  {
+    return lazy_goto_model.get_goto_functions_deprecated();
   }
 
 private:
