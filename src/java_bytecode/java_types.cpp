@@ -713,6 +713,37 @@ bool is_valid_java_array(const struct_typet &type)
     data_component_valid;
 }
 
+/// Compares the types, including checking element types if both types are
+/// arrays.
+/// \param type1 First type to compare
+/// \param type2 Second type to compare
+/// \return True if the types are equal, including elemnt types if they are
+/// both arrays
+bool equal_java_types(const typet &type1, const typet &type2)
+{
+  bool arrays_with_same_element_type = true;
+  if(
+    type1.id() == ID_pointer && type2.id() == ID_pointer &&
+    type1.subtype().id() == ID_symbol && type2.subtype().id() == ID_symbol)
+  {
+    const symbol_typet &subtype_symbol1 = to_symbol_type(type1.subtype());
+    const symbol_typet &subtype_symbol2 = to_symbol_type(type2.subtype());
+    if(
+      subtype_symbol1.get_identifier() == subtype_symbol2.get_identifier() &&
+      is_java_array_tag(subtype_symbol1.get_identifier()))
+    {
+      const typet &array_element_type1 =
+        java_array_element_type(subtype_symbol1);
+      const typet &array_element_type2 =
+        java_array_element_type(subtype_symbol2);
+
+      arrays_with_same_element_type =
+        equal_java_types(array_element_type1, array_element_type2);
+    }
+  }
+  return (type1 == type2 && arrays_with_same_element_type);
+}
+
 void get_dependencies_from_generic_parameters_rec(
   const typet &t,
   std::set<irep_idt> &refs)

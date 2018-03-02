@@ -753,18 +753,19 @@ void java_object_factoryt::gen_nondet_pointer_init(
   const update_in_placet &update_in_place)
 {
   PRECONDITION(expr.type().id()==ID_pointer);
-  const pointer_typet &replacement_pointer_type=
-    pointer_type_selector.convert_pointer_type(pointer_type, ns);
+  const pointer_typet &replacement_pointer_type =
+    pointer_type_selector.convert_pointer_type(
+      pointer_type, generic_parameter_specialization_map, ns);
 
   // If we are changing the pointer, we generate code for creating a pointer
   // to the substituted type instead
-  if(replacement_pointer_type!=pointer_type)
+  // TODO if we are comparing array types we need to compare their element
+  // types. this is for now done by implementing equality function especially
+  // for java types, technical debt TG-2707
+  if(!equal_java_types(replacement_pointer_type, pointer_type))
   {
-    const symbol_exprt real_pointer_symbol=gen_nondet_subtype_pointer_init(
-      assignments,
-      alloc_type,
-      replacement_pointer_type,
-      depth);
+    const symbol_exprt real_pointer_symbol = gen_nondet_subtype_pointer_init(
+      assignments, alloc_type, replacement_pointer_type, depth);
 
     // Having created a pointer to object of type replacement_pointer_type
     // we now assign it back to the original pointer with a cast

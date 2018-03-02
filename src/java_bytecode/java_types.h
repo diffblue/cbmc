@@ -90,6 +90,8 @@ size_t find_closing_semi_colon_for_reference_type(
 bool is_java_array_tag(const irep_idt &tag);
 bool is_valid_java_array(const struct_typet &);
 
+bool equal_java_types(const typet &type1, const typet &type2);
+
 /// Class to hold a Java generic type parameter (also called type variable),
 /// e.g., `T` in `List<T>`.
 /// The bound can specify type requirements.
