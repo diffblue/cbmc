@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_typecheck_base.h"
 
 #include <util/config.h>
-#include <linking/zero_initializer.h>
 
 #include "ansi_c_declaration.h"
 
@@ -670,11 +669,10 @@ void c_typecheck_baset::typecheck_return(codet &code)
        return_type.id()!=ID_destructor)
     {
       // gcc doesn't actually complain, it just warns!
-      // We'll put a zero here, which is dubious.
-      exprt zero=
-        zero_initializer(
-          return_type, code.source_location(), *this, get_message_handler());
-      code.copy_to_operands(zero);
+      warning().source_location = code.source_location();
+      warning() << "non-void function should return a value" << eom;
+
+      code.copy_to_operands(side_effect_expr_nondett(return_type));
     }
   }
   else if(code.operands().size()==1)
