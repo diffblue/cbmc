@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Test-Suite Generation with BMC
 
-#include "bmc.h"
+#include "ccover_bmc.h"
 
 #include <chrono>
 #include <iomanip>
@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include "bv_cbmc.h"
+#include <cbmc/bv_cbmc.h>
 
 class bmc_covert:
   public cover_goalst::observert,
@@ -38,7 +38,7 @@ class bmc_covert:
 public:
   bmc_covert(
     const goto_functionst &_goto_functions,
-    bmct &_bmc):
+    ccover_bmct &_bmc):
     goto_functions(_goto_functions), solver(_bmc.prop_conv), bmc(_bmc)
   {
   }
@@ -141,7 +141,7 @@ public:
 protected:
   const goto_functionst &goto_functions;
   prop_convt &solver;
-  bmct &bmc;
+  ccover_bmct &bmc;
 };
 
 static bool is_failed_assumption_step(
@@ -420,7 +420,7 @@ bool bmc_covert::operator()()
 }
 
 /// Try to cover all goals
-bool bmct::cover(const goto_functionst &goto_functions)
+bool ccover_bmct::cover(const goto_functionst &goto_functions)
 {
   bmc_covert bmc_cover(goto_functions, *this);
   bmc_cover.set_message_handler(get_message_handler());

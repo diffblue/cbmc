@@ -52,6 +52,8 @@ set_target_properties(
     big-int
     cbmc
     cbmc-lib
+    ccover
+    ccover-lib
     cpp
     driver
     goto-analyzer

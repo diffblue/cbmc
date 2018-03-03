@@ -96,6 +96,8 @@ src/memory-models/mm_y.tab.h
 # binaries
 src/cbmc/cbmc
 src/cbmc/cbmc.exe
+src/ccover/ccover
+src/ccover/ccover.exe
 src/goto-analyzer/goto-analyzer
 src/goto-analyzer/goto-analyzer.exe
 src/goto-cc/goto-cc
