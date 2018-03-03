@@ -26,7 +26,7 @@ public:
   replacement_predicatet(
       const std::string &description,
       const std::function<const symbol_exprt&(const exprt&)> inner_symbol,
-      const std::function<bool(const exprt&)> match)
+      const std::function<bool(const exprt&, const namespacet&)> match)
     : _description(description),
       _inner_symbol(inner_symbol),
       _match(match)
@@ -50,15 +50,15 @@ public:
   /// If this function returns true, the entire expression should be replaced by
   /// a pointer whose underlying symbol is the symbol returned by
   /// replacement_predicatet::inner_symbol().
-  const bool match(const exprt &expr) const
+  const bool match(const exprt &expr, const namespacet &ns) const
   {
-    return _match(expr);
+    return _match(expr, ns);
   };
 
 private:
   std::string _description;
   std::function<const symbol_exprt&(const exprt&)> _inner_symbol;
-  std::function<bool(const exprt&)> _match;
+  std::function<bool(const exprt&, const namespacet&)> _match;
 };
 
 /// \brief Synthesise definitions of symbols that are defined in linker scripts
@@ -105,10 +105,10 @@ protected:
 
   /// \brief Write linker script definitions to `linker_data`.
   int get_linker_script_data(
-      jsont &linker_data,
       std::list<irep_idt> &linker_defined_symbols,
       const symbol_tablet &symbol_table,
-      const std::string &out_file);
+      const std::string &out_file,
+      const std::string &def_out_file);
 
   /// \brief Write a list of definitions derived from `data` into gp's
   ///        `instructions` member.
@@ -165,6 +165,7 @@ protected:
   /// \param to_pointerize  The symbols that are contained in the subexpressions
   ///                       that we will pointerize.
   /// \param linker_values the names of symbols defined in linker scripts.
+  /// \param ns a namespace to look up types.
   ///
   /// The subexpressions that we pointerize should be in one-to-one
   /// correspondence with the symbols in `to_pointerize`. Every time we
@@ -175,7 +176,8 @@ protected:
   int pointerize_subexprs_of(
       exprt &expr,
       std::list<symbol_exprt> &to_pointerize,
-      const linker_valuest &linker_values);
+      const linker_valuest &linker_values,
+      const namespacet &ns);
 
   /// \brief do the actual replacement of an expr with a new pointer expr
   int replace_expr(

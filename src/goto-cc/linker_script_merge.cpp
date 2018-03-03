@@ -38,12 +38,25 @@ int linker_script_merget::add_linker_script_definitions()
   const std::string &elf_file=*elf_binaries.begin();
   const std::string &goto_file=*goto_binaries.begin();
 
-  jsont data;
+  temporary_filet linker_def_outfile("goto-cc-linker-info", ".json");
   std::list<irep_idt> linker_defined_symbols;
-  int fail=get_linker_script_data(
-      data, linker_defined_symbols, compiler.symbol_table, elf_file);
+  int fail=
+    get_linker_script_data(
+      linker_defined_symbols,
+      compiler.symbol_table,
+      elf_file,
+      linker_def_outfile());
+  // ignore linker script parsing failures until the code is tested more widely
   if(fail!=0)
+    return 0;
+
+  jsont data;
+  fail=parse_json(linker_def_outfile(), get_message_handler(), data);
+  if(fail!=0)
+  {
+    error() << "Problem parsing linker script JSON data" << eom;
     return fail;
+  }
 
   fail=linker_data_is_malformed(data);
   if(fail!=0)
@@ -117,8 +130,9 @@ linker_script_merget::linker_script_merget(
     replacement_predicates(
     {
       replacement_predicatet("address of array's first member",
-        [](const exprt expr){ return to_symbol_expr(expr.op0().op0()); },
-        [](const exprt expr)
+        [](const exprt &expr) -> const symbol_exprt&
+        { return to_symbol_expr(expr.op0().op0()); },
+        [](const exprt &expr, const namespacet &ns)
         {
           return expr.id()==ID_address_of &&
                  expr.type().id()==ID_pointer &&
@@ -133,8 +147,9 @@ linker_script_merget::linker_script_merget(
                  expr.op0().op1().type().id()==ID_signedbv;
         }),
       replacement_predicatet("address of array",
-        [](const exprt expr){ return to_symbol_expr(expr.op0()); },
-        [](const exprt expr)
+        [](const exprt &expr) -> const symbol_exprt&
+        { return to_symbol_expr(expr.op0()); },
+        [](const exprt &expr, const namespacet &ns)
         {
           return expr.id()==ID_address_of &&
                  expr.type().id()==ID_pointer &&
@@ -142,16 +157,29 @@ linker_script_merget::linker_script_merget(
                  expr.op0().id()==ID_symbol &&
                  expr.op0().type().id()==ID_array;
         }),
+      replacement_predicatet("address of struct",
+        [](const exprt &expr) -> const symbol_exprt&
+        { return to_symbol_expr(expr.op0()); },
+        [](const exprt &expr, const namespacet &ns)
+        {
+          return expr.id()==ID_address_of &&
+                 expr.type().id()==ID_pointer &&
+
+                 expr.op0().id()==ID_symbol &&
+                 ns.follow(expr.op0().type()).id()==ID_struct;
+        }),
       replacement_predicatet("array variable",
-        [](const exprt expr){ return to_symbol_expr(expr); },
-        [](const exprt expr)
+        [](const exprt &expr) -> const symbol_exprt&
+        { return to_symbol_expr(expr); },
+        [](const exprt &expr, const namespacet &ns)
         {
           return expr.id()==ID_symbol &&
                  expr.type().id()==ID_array;
         }),
       replacement_predicatet("pointer (does not need pointerizing)",
-        [](const exprt expr){ return to_symbol_expr(expr); },
-        [](const exprt expr)
+        [](const exprt &expr) -> const symbol_exprt&
+        { return to_symbol_expr(expr); },
+        [](const exprt &expr, const namespacet &ns)
         {
           return expr.id()==ID_symbol &&
                  expr.type().id()==ID_pointer;
@@ -164,6 +192,8 @@ int linker_script_merget::pointerize_linker_defined_symbols(
       symbol_tablet &symbol_table,
       const linker_valuest &linker_values)
 {
+  const namespacet ns(symbol_table);
+
   int ret=0;
   // First, pointerize the actual linker-defined symbols
   for(const auto &pair : linker_values)
@@ -191,7 +221,8 @@ int linker_script_merget::pointerize_linker_defined_symbols(
     int fail=pointerize_subexprs_of(
       symbol_table.get_writeable_ref(pair.first).value,
       to_pointerize,
-      linker_values);
+      linker_values,
+      ns);
     if(to_pointerize.empty() && fail==0)
       continue;
     ret=1;
@@ -216,7 +247,8 @@ int linker_script_merget::pointerize_linker_defined_symbols(
         if(to_pointerize.empty())
           continue;
         debug() << "Pointerizing a program expression..." << eom;
-        int fail=pointerize_subexprs_of(*insts, to_pointerize, linker_values);
+        int fail = pointerize_subexprs_of(
+          *insts, to_pointerize, linker_values, ns);
         if(to_pointerize.empty() && fail==0)
           continue;
         ret=1;
@@ -259,15 +291,17 @@ int linker_script_merget::replace_expr(
 int linker_script_merget::pointerize_subexprs_of(
     exprt &expr,
     std::list<symbol_exprt> &to_pointerize,
-    const linker_valuest &linker_values)
+    const linker_valuest &linker_values,
+    const namespacet &ns)
 {
   int fail=0, tmp=0;
   for(auto const &pair : linker_values)
     for(auto const &pattern : replacement_predicates)
     {
-      if(!pattern.match(expr))
+      if(!pattern.match(expr, ns))
         continue;
-      const symbol_exprt &inner_symbol=pattern.inner_symbol(expr);
+      // take a copy, expr will be changed below
+      const symbol_exprt inner_symbol=pattern.inner_symbol(expr);
       if(pair.first!=inner_symbol.get_identifier())
         continue;
       tmp=replace_expr(expr, linker_values, inner_symbol, pair.first,
@@ -292,7 +326,7 @@ int linker_script_merget::pointerize_subexprs_of(
 
   for(auto &op : expr.operands())
   {
-    tmp=pointerize_subexprs_of(op, to_pointerize, linker_values);
+    tmp=pointerize_subexprs_of(op, to_pointerize, linker_values, ns);
     fail=tmp?tmp:fail;
   }
   return fail;
@@ -625,23 +659,24 @@ int linker_script_merget::ls_data2instructions(
 #endif
 
 int linker_script_merget::get_linker_script_data(
-    jsont &linker_data,
     std::list<irep_idt> &linker_defined_symbols,
     const symbol_tablet &symbol_table,
-    const std::string &out_file)
+    const std::string &out_file,
+    const std::string &def_out_file)
 {
   for(auto const &pair : symbol_table.symbols)
-    if(pair.second.is_extern && pair.second.value.is_nil()
-    && pair.second.name!="__CPROVER_memory")
+    if(pair.second.is_extern && pair.second.value.is_nil() &&
+       pair.second.name!="__CPROVER_memory")
       linker_defined_symbols.push_back(pair.second.name);
 
   std::ostringstream linker_def_str;
-  std::copy(linker_defined_symbols.begin(), linker_defined_symbols.end(),
-      std::ostream_iterator<irep_idt>(linker_def_str, "\n"));
+  std::copy(
+    linker_defined_symbols.begin(),
+    linker_defined_symbols.end(),
+    std::ostream_iterator<irep_idt>(linker_def_str, "\n"));
   debug() << "Linker-defined symbols: [" << linker_def_str.str() << "]\n"
           << eom;
 
-  temporary_filet linker_def_outfile("goto-cc-linker-info", ".json");
   temporary_filet linker_def_infile("goto-cc-linker-defs", "");
   std::ofstream linker_def_file(linker_def_infile());
   linker_def_file << linker_def_str.str();
@@ -653,29 +688,24 @@ int linker_script_merget::get_linker_script_data(
     "--script",   cmdline.get_value('T'),
     "--object",   out_file,
     "--sym-file", linker_def_infile(),
-    "--out-file", linker_def_outfile()
+    "--out-file", def_out_file
   };
-  if(cmdline.isset("verbosity"))
-  {
-    unsigned verb=safe_string2unsigned(cmdline.get_value("verbosity"));
-    if(verb>9)
-      argv.push_back("--very-verbose");
-    else if(verb>4)
-      argv.push_back("--verbose");
-  }
 
-  int rc=run(argv[0], argv, linker_def_infile(), linker_def_outfile());
+  if(get_message_handler().get_verbosity()>9)
+    argv.push_back("--very-verbose");
+  else if(get_message_handler().get_verbosity()>4)
+    argv.push_back("--verbose");
+
+  debug() << "RUN:";
+  for(std::size_t i=0; i<argv.size(); i++)
+    debug() << " " << argv[i];
+  debug() << eom;
+
+  int rc=run(argv[0], argv, linker_def_infile(), def_out_file);
   if(rc!=0)
-  {
-    error() << "Problem parsing linker script" << eom;
-    return rc;
-  }
+    warning() << "Problem parsing linker script" << eom;
 
-  int fail=parse_json(linker_def_outfile(), get_message_handler(),
-      linker_data);
-  if(fail!=0)
-    error() << "Problem parsing linker script JSON data" << eom;
-  return fail;
+  return rc;
 }
 
 int linker_script_merget::goto_and_object_mismatch(

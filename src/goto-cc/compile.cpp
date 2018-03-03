@@ -346,11 +346,8 @@ bool compilet::link()
   convert_symbols(compiled_functions);
 
   // parse object files
-  while(!object_files.empty())
+  for(const auto &file_name : object_files)
   {
-    std::string file_name=object_files.front();
-    object_files.pop_front();
-
     if(read_object_and_link(file_name, symbol_table,
                             compiled_functions, get_message_handler()))
       return true;
