@@ -169,7 +169,8 @@ void goto_symext::symex_goto(statet &state)
     goto_programt::const_targett tmp = new_state_pc;
     new_state_pc = state_pc;
     state_pc = tmp;
-    log.debug() << "Resuming from '" << state_pc->code.source_location() << "'"
+
+    log.debug() << "Resuming from '" << state_pc->source_location << "'"
                 << log.eom;
   }
   else if(options.get_bool_option("paths"))
