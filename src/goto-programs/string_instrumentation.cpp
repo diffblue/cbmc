@@ -29,7 +29,7 @@ exprt is_zero_string(
   const exprt &what,
   bool write)
 {
-  exprt result=predicate_exprt("is_zero_string");
+  predicate_exprt result("is_zero_string");
   result.copy_to_operands(what);
   result.set("lhs", write);
   return result;
@@ -536,10 +536,8 @@ void string_instrumentationt::do_format_string_write(
           if(token.field_width!=0)
           {
             exprt fwidth=from_integer(token.field_width, unsigned_int_type());
-            exprt fw_1(ID_plus, unsigned_int_type());
             exprt one=from_integer(1, unsigned_int_type());
-            fw_1.move_to_operands(fwidth);
-            fw_1.move_to_operands(one); // +1 for 0-char
+            const plus_exprt fw_1(fwidth, one); // +1 for 0-char
 
             exprt fw_lt_bs;
 
@@ -548,9 +546,8 @@ void string_instrumentationt::do_format_string_write(
                 binary_relation_exprt(fw_1, ID_le, buffer_size(argument));
             else
             {
-              index_exprt index;
-              index.array()=argument;
-              index.index()=from_integer(0, unsigned_int_type());
+              const index_exprt index(
+                argument, from_integer(0, unsigned_int_type()));
               address_of_exprt aof(index);
               fw_lt_bs=binary_relation_exprt(fw_1, ID_le, buffer_size(aof));
             }
@@ -584,10 +581,9 @@ void string_instrumentationt::do_format_string_write(
           goto_programt::targett assignment=dest.add_instruction(ASSIGN);
           assignment->source_location=target->source_location;
 
-          exprt lhs(ID_dereference, arg_type.subtype());
-          lhs.copy_to_operands(argument);
+          const dereference_exprt lhs(argument, arg_type.subtype());
 
-          exprt rhs=side_effect_expr_nondett(lhs.type());
+          side_effect_expr_nondett rhs(lhs.type());
           rhs.add_source_location()=target->source_location;
 
           assignment->code=code_assignt(lhs, rhs);
@@ -629,10 +625,9 @@ void string_instrumentationt::do_format_string_write(
         goto_programt::targett assignment=dest.add_instruction(ASSIGN);
         assignment->source_location=target->source_location;
 
-        exprt lhs(ID_dereference, arg_type.subtype());
-        lhs.copy_to_operands(arguments[i]);
+        dereference_exprt lhs(arguments[i], arg_type.subtype());
 
-        exprt rhs=side_effect_expr_nondett(lhs.type());
+        side_effect_expr_nondett rhs(lhs.type());
         rhs.add_source_location()=target->source_location;
 
         assignment->code=code_assignt(lhs, rhs);
@@ -907,9 +902,8 @@ void string_instrumentationt::invalidate_buffer(
   goto_programt::targett increment=dest.add_instruction(ASSIGN);
   increment->source_location=target->source_location;
 
-  exprt plus(ID_plus, unsigned_int_type());
-  plus.copy_to_operands(cntr_sym.symbol_expr());
-  plus.copy_to_operands(from_integer(1, unsigned_int_type()));
+  const plus_exprt plus(
+    cntr_sym.symbol_expr(), from_integer(1, unsigned_int_type()));
 
   increment->code=code_assignt(cntr_sym.symbol_expr(), plus);
 
@@ -935,11 +929,8 @@ void string_instrumentationt::invalidate_buffer(
     bufp=address_of_exprt(index);
   }
 
-  exprt deref(ID_dereference, buf_type.subtype());
-  exprt b_plus_i(ID_plus, bufp.type());
-  b_plus_i.copy_to_operands(bufp);
-  b_plus_i.copy_to_operands(cntr_sym.symbol_expr());
-  deref.copy_to_operands(b_plus_i);
+  const plus_exprt b_plus_i(bufp, cntr_sym.symbol_expr());
+  const dereference_exprt deref(b_plus_i, buf_type.subtype());
 
   check->make_goto(exit);
 
@@ -956,6 +947,6 @@ void string_instrumentationt::invalidate_buffer(
         ID_gt,
         from_integer(limit, unsigned_int_type()));
 
-  exprt nondet=side_effect_expr_nondett(buf_type.subtype());
+  const side_effect_expr_nondett nondet(buf_type.subtype());
   invalidate->code=code_assignt(deref, nondet);
 }

@@ -602,8 +602,7 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
 {
   symbol_typet class_type(fieldref.get(ID_class));
 
-  exprt pointer2=
-    typecast_exprt(pointer, java_reference_type(class_type));
+  const typecast_exprt pointer2(pointer, java_reference_type(class_type));
 
   dereference_exprt obj_deref=checked_dereference(pointer2, class_type);
 
@@ -1451,8 +1450,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       char type_char=statement[0];
 
-      exprt pointer=
-        typecast_exprt(op[0], java_array_type(type_char));
+      const typecast_exprt pointer(op[0], java_array_type(type_char));
 
       dereference_exprt deref(pointer, pointer.type().subtype());
       deref.set(ID_java_member_access, true);
@@ -1515,8 +1513,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       char type_char=statement[0];
 
-      exprt pointer=
-        typecast_exprt(op[0], java_array_type(type_char));
+      const typecast_exprt pointer(op[0], java_array_type(type_char));
 
       dereference_exprt deref(pointer, pointer.type().subtype());
       deref.set(ID_java_member_access, true);
@@ -2103,7 +2100,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // use temporary since the stack symbol might get duplicated
       assert(op.empty() && results.size()==1);
       const reference_typet ref_type=java_reference_type(arg0.type());
-      exprt java_new_expr=side_effect_exprt(ID_java_new, ref_type);
+      side_effect_exprt java_new_expr(ID_java_new, ref_type);
 
       if(!i_it->source_location.get_line().empty())
         java_new_expr.add_source_location()=i_it->source_location;
@@ -2220,8 +2217,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.size()==1 && results.size()==1);
 
-      exprt pointer=
-        typecast_exprt(op[0], java_array_type(statement[0]));
+      const typecast_exprt pointer(op[0], java_array_type(statement[0]));
 
       dereference_exprt array(pointer, pointer.type().subtype());
       assert(pointer.type().subtype().id()==ID_symbol);

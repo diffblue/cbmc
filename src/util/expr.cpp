@@ -87,10 +87,7 @@ void exprt::copy_to_operands(
 
 void exprt::make_typecast(const typet &_type)
 {
-  exprt new_expr(ID_typecast);
-
-  new_expr.move_to_operands(*this);
-  new_expr.set(ID_type, _type);
+  typecast_exprt new_expr(*this, _type);
 
   swap(new_expr);
 }
@@ -218,8 +215,7 @@ void exprt::negate()
       }
       else
       {
-        exprt tmp(ID_unary_minus, type());
-        tmp.move_to_operands(*this);
+        unary_minus_exprt tmp(*this);
         swap(tmp);
       }
     }

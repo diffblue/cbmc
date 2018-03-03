@@ -94,47 +94,30 @@ exprt good_pointer_def(
   const pointer_typet &pointer_type=to_pointer_type(ns.follow(pointer.type()));
   const typet &dereference_type=pointer_type.subtype();
 
-  exprt good_dynamic_tmp1=
-    or_exprt(
-      not_exprt(malloc_object(pointer, ns)),
-      and_exprt(
-        not_exprt(
-          dynamic_object_lower_bound(
-            pointer,
-            ns,
-            nil_exprt())),
-        not_exprt(
-          dynamic_object_upper_bound(
-            pointer,
-            dereference_type,
-            ns,
-            size_of_expr(dereference_type, ns)))));
+  const or_exprt good_dynamic_tmp1(
+    not_exprt(malloc_object(pointer, ns)),
+    and_exprt(
+      not_exprt(dynamic_object_lower_bound(pointer, ns, nil_exprt())),
+      not_exprt(
+        dynamic_object_upper_bound(
+          pointer, dereference_type, ns, size_of_expr(dereference_type, ns)))));
 
-  exprt good_dynamic_tmp2=
-    and_exprt(not_exprt(deallocated(pointer, ns)),
-              good_dynamic_tmp1);
+  const and_exprt good_dynamic_tmp2(
+    not_exprt(deallocated(pointer, ns)), good_dynamic_tmp1);
 
-  exprt good_dynamic=
-    or_exprt(not_exprt(dynamic_object(pointer)),
-             good_dynamic_tmp2);
+  const or_exprt good_dynamic(
+    not_exprt(dynamic_object(pointer)), good_dynamic_tmp2);
 
-  exprt not_null=
-    not_exprt(null_pointer(pointer));
+  const not_exprt not_null(null_pointer(pointer));
 
-  exprt not_invalid=
-    not_exprt(invalid_pointer(pointer));
+  const not_exprt not_invalid(invalid_pointer(pointer));
 
-  exprt bad_other=
-    or_exprt(object_lower_bound(pointer, ns, nil_exprt()),
-             object_upper_bound(
-               pointer,
-               dereference_type,
-               ns,
-               size_of_expr(dereference_type, ns)));
+  const or_exprt bad_other(
+    object_lower_bound(pointer, ns, nil_exprt()),
+    object_upper_bound(
+      pointer, dereference_type, ns, size_of_expr(dereference_type, ns)));
 
-  exprt good_other=
-    or_exprt(dynamic_object(pointer),
-             not_exprt(bad_other));
+  const or_exprt good_other(dynamic_object(pointer), not_exprt(bad_other));
 
   return and_exprt(
     not_null,

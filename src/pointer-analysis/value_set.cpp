@@ -1149,8 +1149,8 @@ void value_sett::assign(
   }
   else if(type.id()==ID_array)
   {
-    exprt lhs_index(ID_index, type.subtype());
-    lhs_index.copy_to_operands(lhs, exprt(ID_unknown, index_type()));
+    const index_exprt lhs_index(
+      lhs, exprt(ID_unknown, index_type()), type.subtype());
 
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
@@ -1187,16 +1187,16 @@ void value_sett::assign(
       {
         assert(rhs.operands().size()==3);
 
-        exprt op0_index(ID_index, type.subtype());
-        op0_index.copy_to_operands(rhs.op0(), exprt(ID_unknown, index_type()));
+        const index_exprt op0_index(
+          rhs.op0(), exprt(ID_unknown, index_type()), type.subtype());
 
         assign(lhs_index, op0_index, ns, is_simplified, add_to_sets);
         assign(lhs_index, rhs.op2(), ns, is_simplified, true);
       }
       else
       {
-        exprt rhs_index(ID_index, type.subtype());
-        rhs_index.copy_to_operands(rhs, exprt(ID_unknown, index_type()));
+        const index_exprt rhs_index(
+          rhs, exprt(ID_unknown, index_type()), type.subtype());
         assign(lhs_index, rhs_index, ns, is_simplified, true);
       }
     }
@@ -1452,7 +1452,7 @@ void value_sett::do_function_call(
   for(std::size_t i=0; i<arguments.size(); i++)
   {
     const std::string identifier="value_set::dummy_arg_"+std::to_string(i);
-    exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
+    const symbol_exprt dummy_lhs(identifier, arguments[i].type());
     assign(dummy_lhs, arguments[i], ns, false, false);
   }
 
@@ -1472,7 +1472,7 @@ void value_sett::do_function_call(
     const exprt v_expr=
       symbol_exprt("value_set::dummy_arg_"+std::to_string(i), it->type());
 
-    exprt actual_lhs=symbol_exprt(identifier, it->type());
+    const symbol_exprt actual_lhs(identifier, it->type());
     assign(actual_lhs, v_expr, ns, true, true);
     i++;
   }

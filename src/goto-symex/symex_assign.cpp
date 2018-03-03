@@ -325,8 +325,8 @@ void goto_symext::symex_assign_array(
   // into
   //   a'==a WITH [i:=e]
 
-  exprt new_rhs(ID_with, lhs_type);
-  new_rhs.copy_to_operands(lhs_array, lhs_index, rhs);
+  with_exprt new_rhs(lhs_array, lhs_index, rhs);
+  new_rhs.type() = lhs_type;
 
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
@@ -398,8 +398,7 @@ void goto_symext::symex_assign_struct_member(
   // into
   //   a'==a WITH [c:=e]
 
-  exprt new_rhs(ID_with, lhs_struct.type());
-  new_rhs.copy_to_operands(lhs_struct, exprt(ID_member_name), rhs);
+  with_exprt new_rhs(lhs_struct, exprt(ID_member_name), rhs);
   new_rhs.op1().set(ID_component_name, component_name);
 
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);

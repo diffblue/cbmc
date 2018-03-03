@@ -278,24 +278,18 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     // The path is not monotone, so we need to introduce a quantifier to ensure
     // that the condition held for all 0 <= k < n.
     symbolt k_sym=utils.fresh_symbol("polynomial::k", unsigned_poly_type());
-    exprt k=k_sym.symbol_expr();
+    const symbol_exprt k = k_sym.symbol_expr();
 
-    exprt k_bound=
-      and_exprt(
-        binary_relation_exprt(from_integer(0, k.type()), ID_le, k),
-        binary_relation_exprt(k, ID_lt, loop_counter));
+    const and_exprt k_bound(
+      binary_relation_exprt(from_integer(0, k.type()), ID_le, k),
+      binary_relation_exprt(k, ID_lt, loop_counter));
     replace_expr(loop_counter, k, guard);
 
     simplify(guard, ns);
 
     implies_exprt implies(k_bound, guard);
 
-    exprt forall(ID_forall);
-    forall.type()=bool_typet();
-    forall.copy_to_operands(k);
-    forall.copy_to_operands(implies);
-
-    guard=forall;
+    guard = forall_exprt(k, implies);
   }
 
   // All our conditions are met -- we can finally build the accelerator!
@@ -724,7 +718,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(
     // multiplied together.  Create the term concrete_value*coefficient and add
     // it into the polynomial.
     typecast_exprt cast(it->second, expr_type);
-    exprt term=mult_exprt(concrete_value, cast);
+    const mult_exprt term(concrete_value, cast);
 
     if(rhs.is_nil())
     {
@@ -740,7 +734,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(
 
   // We now have the RHS of the polynomial.  Assert that this is equal to the
   // actual value of the variable we're fitting.
-  exprt polynomial_holds=equal_exprt(target, rhs);
+  const equal_exprt polynomial_holds(target, rhs);
 
   // Finally, assert that the polynomial equals the variable we're fitting.
   goto_programt::targett assumption=program.add_instruction(ASSUME);

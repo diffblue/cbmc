@@ -378,7 +378,7 @@ exprt smt2_convt::parse_union(
   exprt value=parse_rec(src, bv_typet(width));
   if(value.is_nil())
     return nil_exprt();
-  exprt converted=typecast_exprt(value, first.type());
+  const typecast_exprt converted(value, first.type());
   return union_exprt(first.get_name(), converted, type);
 }
 
@@ -695,13 +695,12 @@ void smt2_convt::convert_byte_update(const byte_update_exprt &expr)
   mp_integer mask=power(2, value_width)-1;
   exprt one_mask=from_integer(mask, unsignedbv_typet(total_width));
 
-  exprt distance=mult_exprt(
-    expr.offset(),
-    from_integer(8, expr.offset().type()));
+  const mult_exprt distance(
+    expr.offset(), from_integer(8, expr.offset().type()));
 
-  exprt and_expr=bitand_exprt(expr.op(), bitnot_exprt(one_mask));
-  exprt ext_value=typecast_exprt(expr.value(), one_mask.type());
-  exprt or_expr=bitor_exprt(and_expr, shl_exprt(ext_value, distance));
+  const bitand_exprt and_expr(expr.op(), bitnot_exprt(one_mask));
+  const typecast_exprt ext_value(expr.value(), one_mask.type());
+  const bitor_exprt or_expr(and_expr, shl_exprt(ext_value, distance));
 
   unflatten(wheret::BEGIN, expr.type());
   flatten2bv(or_expr);
@@ -2277,7 +2276,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     else if(src_type.id()==ID_c_bool)
     {
       // turn into proper bool
-      exprt tmp=typecast_exprt(src, bool_typet());
+      const typecast_exprt tmp(src, bool_typet());
       convert_typecast(typecast_exprt(tmp, dest_type));
     }
     else

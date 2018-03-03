@@ -337,11 +337,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     exprt is_malloc_object=same_object(pointer_expr, malloc_object);
 
     // constraint that it actually is a dynamic object
-    exprt dynamic_object_expr(ID_dynamic_object, bool_typet());
-    dynamic_object_expr.copy_to_operands(pointer_expr);
-
     // this is also our guard
-    result.pointer_guard=dynamic_object_expr;
+    result.pointer_guard = dynamic_object(pointer_expr);
 
     // can't remove here, turn into *p
     result.value=dereference_exprt(pointer_expr, dereference_type);
@@ -409,7 +406,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     }
 
     const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
-    exprt symbol_expr=symbol_exprt(memory_symbol.name, memory_symbol.type);
+    const symbol_exprt symbol_expr(memory_symbol.name, memory_symbol.type);
 
     if(base_type_eq(
          ns.follow(memory_symbol.type).subtype(),
@@ -418,16 +415,20 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // Types match already, what a coincidence!
       // We can use an index expression.
 
-      exprt index_expr=index_exprt(symbol_expr, pointer_offset(pointer_expr));
-      index_expr.type()=ns.follow(memory_symbol.type).subtype();
+      const index_exprt index_expr(
+        symbol_expr,
+        pointer_offset(pointer_expr),
+        ns.follow(memory_symbol.type).subtype());
       result.value=index_expr;
     }
     else if(dereference_type_compare(
               ns.follow(memory_symbol.type).subtype(),
               dereference_type))
     {
-      exprt index_expr=index_exprt(symbol_expr, pointer_offset(pointer_expr));
-      index_expr.type()=ns.follow(memory_symbol.type).subtype();
+      const index_exprt index_expr(
+        symbol_expr,
+        pointer_offset(pointer_expr),
+        ns.follow(memory_symbol.type).subtype());
       result.value=typecast_exprt(index_expr, dereference_type);
     }
     else

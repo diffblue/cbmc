@@ -242,8 +242,7 @@ void cpp_typecheckt::typecheck_compound_type(
   }
 
   // create type symbol
-  typet symbol_type(ID_symbol);
-  symbol_type.set(ID_identifier, symbol_name);
+  symbol_typet symbol_type(symbol_name);
   qualifiers.write(symbol_type);
   type.swap(symbol_type);
 }
@@ -1432,12 +1431,9 @@ void cpp_typecheckt::convert_anon_struct_union_member(
     cpp_scopes.current_scope().prefix+
     base_name.c_str();
 
-  typet symbol_type(ID_symbol);
-  symbol_type.set(ID_identifier, struct_union_symbol.name);
+  const symbol_typet symbol_type(struct_union_symbol.name);
 
-  struct_typet::componentt component;
-  component.set(ID_name, identifier);
-  component.type()=symbol_type;
+  struct_typet::componentt component(identifier, symbol_type);
   component.set_access(access);
   component.set_base_name(base_name);
   component.set_pretty_name(base_name);
@@ -1472,10 +1468,8 @@ bool cpp_typecheckt::get_component(
 
   for(const auto &component : components)
   {
-    exprt tmp(ID_member, component.type());
-    tmp.set(ID_component_name, component.get_name());
+    member_exprt tmp(object, component.get_name(), component.type());
     tmp.add_source_location()=source_location;
-    tmp.copy_to_operands(object);
 
     if(component.get_name()==component_name)
     {

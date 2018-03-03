@@ -669,6 +669,8 @@ void cpp_typecheckt::full_member_initialization(
 
     if(!vbases.empty())
     {
+      // TODO(tautschnig): this code doesn't seem to make much sense as the
+      // ifthenelse only gets to have two operands (instead of three)
       codet cond(ID_ifthenelse);
 
       {
@@ -681,7 +683,7 @@ void cpp_typecheckt::full_member_initialization(
         cond.move_to_operands(tmp);
       }
 
-      codet block(ID_block);
+      code_blockt block;
 
       while(!vbases.empty())
       {
@@ -792,6 +794,8 @@ void cpp_typecheckt::full_member_initialization(
 
       if(parent_it->get_bool(ID_virtual))
       {
+        // TODO(tautschnig): this code doesn't seem to make much sense as the
+        // ifthenelse only gets to have two operands (instead of three)
         codet cond(ID_ifthenelse);
 
         {

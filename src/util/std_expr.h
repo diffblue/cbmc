@@ -4754,6 +4754,14 @@ public:
     op0()=symbol_exprt();
   }
 
+  quantifier_exprt(
+    const irep_idt &_id,
+    const symbol_exprt &_symbol,
+    const exprt &_where)
+    : binary_predicate_exprt(_symbol, _id, _where)
+  {
+  }
+
   symbol_exprt &symbol()
   {
     return static_cast<symbol_exprt &>(op0());
@@ -4820,6 +4828,11 @@ public:
   forall_exprt():quantifier_exprt(ID_forall)
   {
   }
+
+  forall_exprt(const symbol_exprt &_symbol, const exprt &_where)
+    : quantifier_exprt(ID_forall, _symbol, _where)
+  {
+  }
 };
 
 /*! \brief An exists expression
@@ -4828,6 +4841,11 @@ class exists_exprt:public quantifier_exprt
 {
 public:
   exists_exprt():quantifier_exprt(ID_exists)
+  {
+  }
+
+  exists_exprt(const symbol_exprt &_symbol, const exprt &_where)
+    : quantifier_exprt(ID_exists, _symbol, _where)
   {
   }
 };

@@ -88,7 +88,7 @@ exprt dereferencet::read_object(
     index.make_typecast(simplified_offset.type());
     size.make_typecast(index.type());
 
-    exprt new_offset=plus_exprt(simplified_offset, mult_exprt(index, size));
+    const plus_exprt new_offset(simplified_offset, mult_exprt(index, size));
 
     return read_object(index_expr.array(), new_offset, type);
   }
@@ -112,7 +112,7 @@ exprt dereferencet::read_object(
 
       member_offset.make_typecast(simplified_offset.type());
 
-      exprt new_offset=plus_exprt(simplified_offset, member_offset);
+      const plus_exprt new_offset(simplified_offset, member_offset);
 
       return read_object(member_expr.struct_op(), new_offset, type);
     }
@@ -246,7 +246,7 @@ exprt dereferencet::dereference_plus(
   if(size.type()!=integer.type())
     integer.make_typecast(size.type());
 
-  exprt new_offset=plus_exprt(offset, mult_exprt(size, integer));
+  const plus_exprt new_offset(offset, mult_exprt(size, integer));
 
   return dereference_rec(pointer, new_offset, type);
 }

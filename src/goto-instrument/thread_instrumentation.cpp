@@ -39,8 +39,7 @@ void thread_exit_instrumentation(goto_programt &goto_program)
 
   goto_program.insert_before_swap(end);
 
-  exprt mutex_locked_string=
-    string_constantt("mutex-locked");
+  const string_constantt mutex_locked_string("mutex-locked");
 
   binary_exprt get_may("get_may");
 

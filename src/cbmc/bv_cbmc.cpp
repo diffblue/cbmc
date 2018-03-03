@@ -39,34 +39,23 @@ bvt bv_cbmct::convert_waitfor(const exprt &expr)
   {
     // constraint: new_cycle>=old_cycle
 
-    exprt rel_expr(ID_ge, bool_typet());
-    rel_expr.copy_to_operands(new_cycle, old_cycle);
-    set_to_true(rel_expr);
+    set_to_true(binary_relation_exprt(new_cycle, ID_ge, old_cycle));
   }
 
   {
     // constraint: new_cycle<=bound+1
 
     exprt one=from_integer(1, bound.type());
-
-    exprt bound_plus1(ID_plus, bound.type());
-    bound_plus1.reserve_operands(2);
-    bound_plus1.copy_to_operands(bound);
-    bound_plus1.move_to_operands(one);
-
-    exprt rel_expr(ID_le, bool_typet());
-    rel_expr.copy_to_operands(new_cycle, bound_plus1);
-    set_to_true(rel_expr);
+    const plus_exprt bound_plus1(bound, one);
+    set_to_true(binary_relation_exprt(new_cycle, ID_le, bound_plus1));
   }
 
   for(mp_integer i=0; i<=bound_value; i=i+1)
   {
     // replace cycle_var by old_cycle+i;
 
-    exprt old_cycle_plus_i(ID_plus, old_cycle.type());
-    old_cycle_plus_i.operands().resize(2);
-    old_cycle_plus_i.op0()=old_cycle;
-    old_cycle_plus_i.op1()=from_integer(i, old_cycle.type());
+    const plus_exprt old_cycle_plus_i(
+      old_cycle, from_integer(i, old_cycle.type()));
 
     exprt tmp_predicate=predicate;
     replace_expr(cycle_var, old_cycle_plus_i, tmp_predicate);
@@ -79,50 +68,25 @@ bvt bv_cbmct::convert_waitfor(const exprt &expr)
     //     assume(property);
 
     {
-      exprt cycle_le_bound(ID_le, bool_typet());
-      cycle_le_bound.operands().resize(2);
-      cycle_le_bound.op0()=old_cycle_plus_i;
-      cycle_le_bound.op1()=bound;
+      const binary_relation_exprt cycle_le_bound(
+        old_cycle_plus_i, ID_le, bound);
+      const binary_relation_exprt cycle_lt_new_cycle(
+        old_cycle_plus_i, ID_lt, new_cycle);
+      const and_exprt and_expr(cycle_le_bound, cycle_lt_new_cycle);
 
-      exprt cycle_lt_new_cycle(ID_lt, bool_typet());
-      cycle_lt_new_cycle.operands().resize(2);
-      cycle_lt_new_cycle.op0()=old_cycle_plus_i;
-      cycle_lt_new_cycle.op1()=new_cycle;
-
-      exprt and_expr(ID_and, bool_typet());
-      and_expr.operands().resize(2);
-      and_expr.op0().swap(cycle_le_bound);
-      and_expr.op1().swap(cycle_lt_new_cycle);
-
-      exprt top_impl(ID_implies, bool_typet());
-      top_impl.reserve_operands(2);
-      top_impl.move_to_operands(and_expr);
-      top_impl.copy_to_operands(tmp_predicate);
+      implies_exprt top_impl(and_expr, tmp_predicate);
       top_impl.op1().make_not();
 
       set_to_true(top_impl);
     }
 
     {
-      exprt cycle_le_bound(ID_le, bool_typet());
-      cycle_le_bound.operands().resize(2);
-      cycle_le_bound.op0()=old_cycle_plus_i;
-      cycle_le_bound.op1()=bound;
+      const binary_relation_exprt cycle_le_bound(
+        old_cycle_plus_i, ID_le, bound);
+      const equal_exprt cycle_eq_new_cycle(old_cycle_plus_i, new_cycle);
+      const and_exprt and_expr(cycle_le_bound, cycle_eq_new_cycle);
 
-      exprt cycle_eq_new_cycle(ID_equal, bool_typet());
-      cycle_eq_new_cycle.operands().resize(2);
-      cycle_eq_new_cycle.op0()=old_cycle_plus_i;
-      cycle_eq_new_cycle.op1()=new_cycle;
-
-      exprt and_expr(ID_and, bool_typet());
-      and_expr.operands().resize(2);
-      and_expr.op0().swap(cycle_le_bound);
-      and_expr.op1().swap(cycle_eq_new_cycle);
-
-      exprt top_impl(ID_implies, bool_typet());
-      top_impl.reserve_operands(2);
-      top_impl.move_to_operands(and_expr);
-      top_impl.copy_to_operands(tmp_predicate);
+      const implies_exprt top_impl(and_expr, tmp_predicate);
 
       set_to_true(top_impl);
     }
@@ -148,9 +112,7 @@ bvt bv_cbmct::convert_waitfor_symbol(const exprt &expr)
 
   // constraint: result<=bound
 
-  exprt rel_expr(ID_le, bool_typet());
-  rel_expr.copy_to_operands(result, bound);
-  set_to_true(rel_expr);
+  set_to_true(binary_relation_exprt(result, ID_le, bound));
 
   return convert_bitvector(result);
 }

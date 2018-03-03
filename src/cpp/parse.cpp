@@ -2957,9 +2957,7 @@ bool Parser::rDeclarator(
         tl.push_back(tl.back().subtype());
       }
 
-      typet array_type(ID_array);
-      array_type.add(ID_size).swap(expr);
-      array_type.subtype().swap(tl.back());
+      array_typet array_type(tl.back(), expr);
       tl.pop_back();
       d_outer.swap(array_type);
       while(!tl.empty())
@@ -6138,9 +6136,8 @@ bool Parser::rPostfixExpr(exprt &exp)
       lex.get_token(op);
 
       {
-        exprt tmp(ID_side_effect);
+        side_effect_exprt tmp(ID_postincrement);
         tmp.move_to_operands(exp);
-        tmp.set(ID_statement, ID_postincrement);
         set_location(tmp, op);
         exp.swap(tmp);
       }
@@ -6150,9 +6147,8 @@ bool Parser::rPostfixExpr(exprt &exp)
       lex.get_token(op);
 
       {
-        exprt tmp(ID_side_effect);
+        side_effect_exprt tmp(ID_postdecrement);
         tmp.move_to_operands(exp);
-        tmp.set(ID_statement, ID_postdecrement);
         set_location(tmp, op);
         exp.swap(tmp);
       }

@@ -101,7 +101,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         if(!is_rfi)
         {
           // if r reads from w, then w must have happened before r
-          exprt cond=implies_exprt(s, before(w, r));
+          const implies_exprt cond(s, before(w, r));
           add_constraint(equation,
             cond, "rf-order", r->source);
         }

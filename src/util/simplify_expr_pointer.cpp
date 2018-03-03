@@ -83,8 +83,7 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
           pointer_type.subtype()=expr.type();
           typecast_exprt typecast_expr(
             from_integer(step_size*index+address, index_type()), pointer_type);
-          exprt new_expr=dereference_exprt(typecast_expr, expr.type());
-          expr=new_expr;
+          expr = dereference_exprt(typecast_expr, expr.type());
           result=true;
         }
       }
@@ -120,8 +119,7 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
             pointer_type.subtype()=expr.type();
             typecast_exprt typecast_expr(
               from_integer(address+offset, index_type()), pointer_type);
-            exprt new_expr=dereference_exprt(typecast_expr, expr.type());
-            expr=new_expr;
+            expr = dereference_exprt(typecast_expr, expr.type());
             result=true;
           }
         }
@@ -193,10 +191,7 @@ bool simplify_exprt::simplify_address_of(exprt &expr)
       offset.swap(index_expr.op1());
       index_expr.op1()=from_integer(0, offset.type());
 
-      exprt addition(ID_plus, expr.type());
-      addition.move_to_operands(expr, offset);
-
-      expr.swap(addition);
+      expr = plus_exprt(expr, offset);
       return false;
     }
   }

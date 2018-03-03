@@ -491,23 +491,15 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     {
       const struct_typet &struct_type=to_struct_type(op_type);
 
-      exprt lhs_member_expr(ID_member);
-      exprt rhs_member_expr(ID_member);
-      lhs_member_expr.copy_to_operands(expr.op0());
-      rhs_member_expr.copy_to_operands(expr.op1());
 
       for(const auto &comp : struct_type.components())
       {
-        const irep_idt &component_name=comp.get(ID_name);
+        const member_exprt lhs_member_expr(
+          expr.op0(), comp.get_name(), comp.type());
+        const member_exprt rhs_member_expr(
+          expr.op1(), comp.get_name(), comp.type());
 
-        lhs_member_expr.set(ID_component_name, component_name);
-        rhs_member_expr.set(ID_component_name, component_name);
-        lhs_member_expr.type()=comp.type();
-        rhs_member_expr.type()=comp.type();
-
-        equal_exprt equality;
-        equality.lhs()=lhs_member_expr;
-        equality.rhs()=rhs_member_expr;
+        const equal_exprt equality(lhs_member_expr, rhs_member_expr);
 
         // recursive call
         strengthen_rec(equality);
@@ -870,11 +862,7 @@ exprt invariant_sett::get_constant(const exprt &expr) const
           if(expr.type().id()==ID_pointer)
           {
             if(value==0)
-            {
-              exprt tmp(ID_constant, expr.type());
-              tmp.set(ID_value, ID_NULL);
-              return tmp;
-            }
+              return null_pointer_exprt(to_pointer_type(expr.type()));
           }
           else
             return from_integer(value, expr.type());
@@ -884,9 +872,7 @@ exprt invariant_sett::get_constant(const exprt &expr) const
           if(e.type()==expr.type())
             return e;
 
-          exprt tmp(ID_typecast, expr.type());
-          tmp.copy_to_operands(e);
-          return tmp;
+          return typecast_exprt(e, expr.type());
         }
       }
   }

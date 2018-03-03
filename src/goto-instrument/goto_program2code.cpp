@@ -1375,7 +1375,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     // we don't bother setting the type
     f.lhs()=cf.lhs();
     f.function()=symbol_exprt("pthread_create", code_typet());
-    exprt n=null_pointer_exprt(pointer_type(empty_typet()));
+    const null_pointer_exprt n(pointer_type(empty_typet()));
     f.arguments().push_back(n);
     f.arguments().push_back(n);
     f.arguments().push_back(cf.function());

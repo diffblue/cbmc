@@ -508,8 +508,7 @@ void cvc_convt::convert_array_index(const exprt &expr)
   }
   else
   {
-    exprt tmp(ID_typecast, index_type());
-    tmp.copy_to_operands(expr);
+    const typecast_exprt tmp(expr, index_type());
     convert_expr(tmp);
   }
 }

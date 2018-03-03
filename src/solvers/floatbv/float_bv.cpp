@@ -131,14 +131,14 @@ exprt float_bvt::is_equal(
   // special cases: -0 and 0 are equal
   exprt is_zero0=is_zero(src0, spec);
   exprt is_zero1=is_zero(src1, spec);
-  exprt both_zero=and_exprt(is_zero0, is_zero1);
+  const and_exprt both_zero(is_zero0, is_zero1);
 
   // NaN compares to nothing
   exprt isnan0=isnan(src0, spec);
   exprt isnan1=isnan(src1, spec);
-  exprt nan=or_exprt(isnan0, isnan1);
+  const or_exprt nan(isnan0, isnan1);
 
-  exprt bitwise_equal=equal_exprt(src0, src1);
+  const equal_exprt bitwise_equal(src0, src1);
 
   return and_exprt(
     or_exprt(bitwise_equal, both_zero),
@@ -294,12 +294,12 @@ exprt float_bvt::to_integer(
 
   // if the exponent is positive, shift right
   exprt offset=from_integer(spec.f, signedbv_typet(spec.e));
-  exprt distance=minus_exprt(offset, unpacked.exponent);
-  exprt shift_result=lshr_exprt(unpacked.fraction, distance);
+  const minus_exprt distance(offset, unpacked.exponent);
+  const lshr_exprt shift_result(unpacked.fraction, distance);
 
   // if the exponent is negative, we have zero anyways
   exprt result=shift_result;
-  exprt exponent_sign=sign_exprt(unpacked.exponent);
+  const sign_exprt exponent_sign(unpacked.exponent);
 
   result=
     if_exprt(exponent_sign, from_integer(0, result.type()), result);
@@ -410,10 +410,10 @@ exprt float_bvt::subtract_exponents(
   std::size_t old_width2=to_signedbv_type(src2.exponent.type()).get_width();
   assert(old_width1==old_width2);
 
-  exprt extended_exponent1=
-    typecast_exprt(src1.exponent, signedbv_typet(old_width1+1));
-  exprt extended_exponent2=
-    typecast_exprt(src2.exponent, signedbv_typet(old_width2+1));
+  const typecast_exprt extended_exponent1(
+    src1.exponent, signedbv_typet(old_width1 + 1));
+  const typecast_exprt extended_exponent2(
+    src2.exponent, signedbv_typet(old_width2 + 1));
 
   assert(extended_exponent1.type()==extended_exponent2.type());
 
@@ -437,7 +437,7 @@ exprt float_bvt::add_sub(
 
   // figure out which operand has the bigger exponent
   const exprt exponent_difference=subtract_exponents(unpacked1, unpacked2);
-  exprt src2_bigger=sign_exprt(exponent_difference);
+  const sign_exprt src2_bigger(exponent_difference);
 
   const exprt bigger_exponent=
     if_exprt(src2_bigger, unpacked2.exponent, unpacked1.exponent);
@@ -471,12 +471,12 @@ exprt float_bvt::add_sub(
     fraction2_padded, limited_dist, sticky_bit);
 
   // sticky bit: 'or' of the bits lost by the right-shift
-  exprt fraction2_stickied=
-    bitor_exprt(fraction2_shifted,
-                concatenation_exprt(
-                                    from_integer(0, unsignedbv_typet(spec.f+3)),
-                                    sticky_bit,
-                                    fraction2_shifted.type()));
+  const bitor_exprt fraction2_stickied(
+    fraction2_shifted,
+    concatenation_exprt(
+      from_integer(0, unsignedbv_typet(spec.f + 3)),
+      sticky_bit,
+      fraction2_shifted.type()));
 
   // need to have two extra fraction bits for addition and rounding
   const exprt fraction1_ext=
@@ -487,8 +487,7 @@ exprt float_bvt::add_sub(
   unbiased_floatt result;
 
   // now add/sub them
-  exprt subtract_lit=
-    notequal_exprt(unpacked1.sign, unpacked2.sign);
+  const notequal_exprt subtract_lit(unpacked1.sign, unpacked2.sign);
 
   result.fraction=
     if_exprt(subtract_lit,
@@ -497,8 +496,8 @@ exprt float_bvt::add_sub(
 
   // sign of result
   std::size_t width=to_bitvector_type(result.fraction.type()).get_width();
-  exprt fraction_sign=
-    sign_exprt(typecast_exprt(result.fraction, signedbv_typet(width)));
+  const sign_exprt fraction_sign(
+    typecast_exprt(result.fraction, signedbv_typet(width)));
   result.fraction=
     typecast_exprt(
       abs_exprt(typecast_exprt(result.fraction, signedbv_typet(width))),
@@ -537,20 +536,19 @@ exprt float_bvt::add_sub(
         from_integer(0, result.fraction.type())));
 
   // sign
-  exprt add_sub_sign=
-    notequal_exprt(if_exprt(src2_bigger, unpacked2.sign, unpacked1.sign),
-                   fraction_sign);
+  const notequal_exprt add_sub_sign(
+    if_exprt(src2_bigger, unpacked2.sign, unpacked1.sign), fraction_sign);
 
-  exprt infinity_sign=
-    if_exprt(unpacked1.infinity, unpacked1.sign, unpacked2.sign);
+  const if_exprt infinity_sign(
+    unpacked1.infinity, unpacked1.sign, unpacked2.sign);
 
   #if 1
   rounding_mode_bitst rounding_mode_bits(rm);
 
-  exprt zero_sign=
-    if_exprt(rounding_mode_bits.round_to_minus_inf,
-                 or_exprt(unpacked1.sign, unpacked2.sign),
-                 and_exprt(unpacked1.sign, unpacked2.sign));
+  const if_exprt zero_sign(
+    rounding_mode_bits.round_to_minus_inf,
+    or_exprt(unpacked1.sign, unpacked2.sign),
+    and_exprt(unpacked1.sign, unpacked2.sign));
 
   result.sign=if_exprt(
     result.infinity,
@@ -579,15 +577,13 @@ exprt float_bvt::limit_distance(
   if(dist_width<=nb_bits)
     return dist;
 
-  exprt upper_bits=
-    extractbits_exprt(dist, dist_width-1, nb_bits,
-                      unsignedbv_typet(dist_width-nb_bits));
-  exprt upper_bits_zero=
-    equal_exprt(upper_bits, from_integer(0, upper_bits.type()));
+  const extractbits_exprt upper_bits(
+    dist, dist_width - 1, nb_bits, unsignedbv_typet(dist_width - nb_bits));
+  const equal_exprt upper_bits_zero(
+    upper_bits, from_integer(0, upper_bits.type()));
 
-  exprt lower_bits=
-    extractbits_exprt(dist, nb_bits-1, 0,
-                      unsignedbv_typet(nb_bits));
+  const extractbits_exprt lower_bits(
+    dist, nb_bits - 1, 0, unsignedbv_typet(nb_bits));
 
   return if_exprt(
     upper_bits_zero,
@@ -620,7 +616,7 @@ exprt float_bvt::mul(
   const exprt exponent1=typecast_exprt(unpacked1.exponent, new_exponent_type);
   const exprt exponent2=typecast_exprt(unpacked2.exponent, new_exponent_type);
 
-  exprt added_exponent=plus_exprt(exponent1, exponent2);
+  const plus_exprt added_exponent(exponent1, exponent2);
 
   // Adjust exponent; we are thowing in an extra fraction bit,
   // it has been extended above.
@@ -634,18 +630,12 @@ exprt float_bvt::mul(
   result.infinity=or_exprt(unpacked1.infinity, unpacked2.infinity);
 
   // NaN?
-  {
-    exprt NaN_cond(ID_or, bool_typet());
-
-    NaN_cond.copy_to_operands(isnan(src1, spec));
-    NaN_cond.copy_to_operands(isnan(src2, spec));
-
-    // infinity * 0 is NaN!
-    NaN_cond.copy_to_operands(and_exprt(unpacked1.zero, unpacked2.infinity));
-    NaN_cond.copy_to_operands(and_exprt(unpacked2.zero, unpacked1.infinity));
-
-    result.NaN=NaN_cond;
-  }
+  result.NaN = disjunction(
+    {isnan(src1, spec),
+     isnan(src2, spec),
+     // infinity * 0 is NaN!
+     and_exprt(unpacked1.zero, unpacked2.infinity),
+     and_exprt(unpacked2.zero, unpacked1.infinity)});
 
   return rounder(result, rm, spec);
 }
@@ -665,15 +655,13 @@ exprt float_bvt::div(
   std::size_t div_width=fraction_width*2+1;
 
   // pad fraction1 with zeros
-  exprt fraction1=
-    concatenation_exprt(
-      unpacked1.fraction,
-      from_integer(0, unsignedbv_typet(div_width-fraction_width)),
-      unsignedbv_typet(div_width));
+  const concatenation_exprt fraction1(
+    unpacked1.fraction,
+    from_integer(0, unsignedbv_typet(div_width - fraction_width)),
+    unsignedbv_typet(div_width));
 
   // zero-extend fraction2 to match faction1
-  const exprt fraction2=
-    typecast_exprt(unpacked2.fraction, fraction1.type());
+  const typecast_exprt fraction2(unpacked2.fraction, fraction1.type());
 
   // divide fractions
   unbiased_floatt result;
@@ -684,7 +672,7 @@ exprt float_bvt::div(
   rem=mod_exprt(fraction1, fraction2);
 
   // is there a remainder?
-  exprt have_remainder=notequal_exprt(rem, from_integer(0, rem.type()));
+  const notequal_exprt have_remainder(rem, from_integer(0, rem.type()));
 
   // we throw this into the result, as least-significant bit,
   // to get the right rounding decision
@@ -694,13 +682,13 @@ exprt float_bvt::div(
 
   // We will subtract the exponents;
   // to account for overflow, we add a bit.
-  const exprt exponent1=
-    typecast_exprt(unpacked1.exponent, signedbv_typet(spec.e+1));
-  const exprt exponent2=
-    typecast_exprt(unpacked2.exponent, signedbv_typet(spec.e+1));
+  const typecast_exprt exponent1(
+    unpacked1.exponent, signedbv_typet(spec.e + 1));
+  const typecast_exprt exponent2(
+    unpacked2.exponent, signedbv_typet(spec.e + 1));
 
   // subtract exponents
-  exprt added_exponent=minus_exprt(exponent1, exponent2);
+  const minus_exprt added_exponent(exponent1, exponent2);
 
   // adjust, as we have thown in extra fraction bits
   result.exponent=plus_exprt(
@@ -730,8 +718,7 @@ exprt float_bvt::div(
                       and_exprt(unpacked1.infinity, unpacked2.infinity))));
 
   // Division by infinity produces zero, unless we have NaN
-  exprt force_zero=
-    and_exprt(not_exprt(unpacked1.NaN), unpacked2.infinity);
+  const and_exprt force_zero(not_exprt(unpacked1.NaN), unpacked2.infinity);
 
   result.fraction=
     if_exprt(
@@ -758,46 +745,43 @@ exprt float_bvt::relation(
   // special cases: -0 and 0 are equal
   exprt is_zero1=is_zero(src1, spec);
   exprt is_zero2=is_zero(src2, spec);
-  exprt both_zero=and_exprt(is_zero1, is_zero2);
+  const and_exprt both_zero(is_zero1, is_zero2);
 
   // NaN compares to nothing
   exprt isnan1=isnan(src1, spec);
   exprt isnan2=isnan(src2, spec);
-  exprt nan=or_exprt(isnan1, isnan2);
+  const or_exprt nan(isnan1, isnan2);
 
   if(rel==relt::LT || rel==relt::LE)
   {
-    exprt bitwise_equal=equal_exprt(src1, src2);
+    const equal_exprt bitwise_equal(src1, src2);
 
     // signs different? trivial! Unless Zero.
 
-    exprt signs_different=
-      notequal_exprt(sign_bit(src1), sign_bit(src2));
+    const notequal_exprt signs_different(sign_bit(src1), sign_bit(src2));
 
     // as long as the signs match: compare like unsigned numbers
 
     // this works due to the BIAS
-    exprt less_than1=
-      binary_relation_exprt(
-        typecast_exprt(typecast_exprt(src1, bv_typet(spec.width())),
-                                      unsignedbv_typet(spec.width())),
-        ID_lt,
-        typecast_exprt(typecast_exprt(src2, bv_typet(spec.width())),
-                                      unsignedbv_typet(spec.width())));
+    const binary_relation_exprt less_than1(
+      typecast_exprt(
+        typecast_exprt(src1, bv_typet(spec.width())),
+        unsignedbv_typet(spec.width())),
+      ID_lt,
+      typecast_exprt(
+        typecast_exprt(src2, bv_typet(spec.width())),
+        unsignedbv_typet(spec.width())));
 
     // if both are negative (and not the same), need to turn around!
-    exprt less_than2=
-        notequal_exprt(less_than1,
-                       and_exprt(sign_bit(src1), sign_bit(src2)));
+    const notequal_exprt less_than2(
+      less_than1, and_exprt(sign_bit(src1), sign_bit(src2)));
 
-    exprt less_than3=
-      if_exprt(signs_different,
-        sign_bit(src1),
-        less_than2);
+    const if_exprt less_than3(signs_different, sign_bit(src1), less_than2);
 
     if(rel==relt::LT)
     {
-      exprt and_bv(ID_and, bool_typet());
+      and_exprt and_bv;
+      and_bv.reserve_operands(4);
       and_bv.copy_to_operands(less_than3);
       // for the case of two negative numbers
       and_bv.copy_to_operands(not_exprt(bitwise_equal));
@@ -808,7 +792,8 @@ exprt float_bvt::relation(
     }
     else if(rel==relt::LE)
     {
-      exprt or_bv(ID_or, bool_typet());
+      or_exprt or_bv;
+      or_bv.reserve_operands(3);
       or_bv.copy_to_operands(less_than3);
       or_bv.copy_to_operands(both_zero);
       or_bv.copy_to_operands(bitwise_equal);
@@ -820,7 +805,7 @@ exprt float_bvt::relation(
   }
   else if(rel==relt::EQ)
   {
-    exprt bitwise_equal=equal_exprt(src1, src2);
+    const equal_exprt bitwise_equal(src1, src2);
 
     return and_exprt(
       or_exprt(bitwise_equal, both_zero),
@@ -902,15 +887,16 @@ void float_bvt::normalization_shift(
     assert(fraction_bits>distance);
 
     // check if first 'distance'-many bits are zeros
-    const exprt prefix=
-      extractbits_exprt(fraction, fraction_bits-1, fraction_bits-distance,
-                        unsignedbv_typet(distance));
-    exprt prefix_is_zero=equal_exprt(prefix, from_integer(0, prefix.type()));
+    const extractbits_exprt prefix(
+      fraction,
+      fraction_bits - 1,
+      fraction_bits - distance,
+      unsignedbv_typet(distance));
+    const equal_exprt prefix_is_zero(prefix, from_integer(0, prefix.type()));
 
     // If so, shift the zeros out left by 'distance'.
     // Otherwise, leave as is.
-    const exprt shifted=
-      shl_exprt(fraction, distance);
+    const shl_exprt shifted(fraction, distance);
 
     fraction=
       if_exprt(prefix_is_zero, shifted, fraction);
@@ -953,14 +939,13 @@ void float_bvt::denormalization_shift(
   exponent=typecast_exprt(exponent, signedbv_typet(exponent_bits+1));
 #endif
 
-  exprt distance=minus_exprt(
-    from_integer(-bias+1, exponent.type()), exponent);
+  const minus_exprt distance(
+    from_integer(-bias + 1, exponent.type()), exponent);
 
   // use sign bit
-  exprt denormal=
-    and_exprt(
-      not_exprt(sign_exprt(distance)),
-      notequal_exprt(distance, from_integer(0, distance.type())));
+  const and_exprt denormal(
+    not_exprt(sign_exprt(distance)),
+    notequal_exprt(distance, from_integer(0, distance.type())));
 
 #if 1
   // Care must be taken to not loose information required for the
@@ -1072,37 +1057,31 @@ exprt float_bvt::fraction_rounding_decision(
   {
     // We keep most-significant bits, and thus the tail is made
     // of least-significant bits.
-    exprt tail=
-      extractbits_exprt(fraction, extra_bits-2, 0,
-                        unsignedbv_typet(extra_bits-2+1));
+    const extractbits_exprt tail(
+      fraction, extra_bits - 2, 0, unsignedbv_typet(extra_bits - 2 + 1));
     sticky_bit=notequal_exprt(tail, from_integer(0, tail.type()));
   }
 
   // the rounding bit is the last extra bit
   assert(extra_bits>=1);
-  exprt rounding_bit=extractbit_exprt(fraction, extra_bits-1);
+  const extractbit_exprt rounding_bit(fraction, extra_bits - 1);
 
   // we get one bit of the fraction for some rounding decisions
-  exprt rounding_least=extractbit_exprt(fraction, extra_bits);
+  const extractbit_exprt rounding_least(fraction, extra_bits);
 
   // round-to-nearest (ties to even)
-  exprt round_to_even=
-    and_exprt(rounding_bit,
-              or_exprt(rounding_least, sticky_bit));
+  const and_exprt round_to_even(
+    rounding_bit, or_exprt(rounding_least, sticky_bit));
 
   // round up
-  exprt round_to_plus_inf=
-    and_exprt(not_exprt(sign),
-              or_exprt(rounding_bit, sticky_bit));
+  const and_exprt round_to_plus_inf(
+    not_exprt(sign), or_exprt(rounding_bit, sticky_bit));
 
   // round down
-  exprt round_to_minus_inf=
-    and_exprt(sign,
-              or_exprt(rounding_bit, sticky_bit));
+  const and_exprt round_to_minus_inf(sign, or_exprt(rounding_bit, sticky_bit));
 
   // round to zero
-  exprt round_to_zero=
-    false_exprt();
+  false_exprt round_to_zero;
 
   // now select appropriate one
   return if_exprt(rounding_mode_bits.round_to_even, round_to_even,
@@ -1168,7 +1147,7 @@ void float_bvt::round_fraction(
     // post normalization of the fraction
     exprt integer_part1=result.fraction.back();
     exprt integer_part0=result.fraction[result.fraction.size()-2];
-    exprt new_integer_part=or_exprt(integer_part1, integer_part0);
+    const or_exprt new_integer_part(integer_part1, integer_part0);
 
     result.fraction.resize(result.fraction.size()-1);
     result.fraction.back()=new_integer_part;
@@ -1182,8 +1161,7 @@ void float_bvt::round_fraction(
     //  2. If the number is the largest subnormal, the increment
     //     can change the MSB making it normal.  Thus the exponent
     //     must be incremented but the fraction will be OK.
-    exprt oldMSB=
-      extractbit_exprt(result.fraction, fraction_size-1);
+    const extractbit_exprt old_msb(result.fraction, fraction_size - 1);
 
     // increment if 'increment' is true
     result.fraction=
@@ -1191,14 +1169,11 @@ void float_bvt::round_fraction(
                  typecast_exprt(increment, result.fraction.type()));
 
     // Normal overflow when old MSB == 1 and new MSB == 0
-    exprt newMSB=
-      extractbit_exprt(result.fraction, fraction_size-1);
-
-    exprt overflow=and_exprt(oldMSB, not_exprt(newMSB));
+    const extractbit_exprt new_msb(result.fraction, fraction_size - 1);
+    const and_exprt overflow(old_msb, not_exprt(new_msb));
 
     // Subnormal to normal transition when old MSB == 0 and new MSB == 1
-    exprt subnormal_to_normal=
-      and_exprt(not_exprt(oldMSB), newMSB);
+    const and_exprt subnormal_to_normal(not_exprt(old_msb), new_msb);
 
     // In case of an overflow or subnormal to normal conversion,
     // the exponent has to be incremented.
@@ -1254,26 +1229,20 @@ void float_bvt::round_exponent(
 
     // the exponent is garbage if the fractional is zero
 
-    exprt exponent_too_large=
-      and_exprt(
-        binary_relation_exprt(old_exponent, ID_ge, max_exponent),
-        notequal_exprt(
-          result.fraction,
-          from_integer(0, result.fraction.type())));
+    const and_exprt exponent_too_large(
+      binary_relation_exprt(old_exponent, ID_ge, max_exponent),
+      notequal_exprt(result.fraction, from_integer(0, result.fraction.type())));
 
 #if 1
     // Directed rounding modes round overflow to the maximum normal
     // depending on the particular mode and the sign
-    exprt overflow_to_inf=
-      or_exprt(rounding_mode_bits.round_to_even,
-      or_exprt(and_exprt(rounding_mode_bits.round_to_plus_inf,
-                         not_exprt(result.sign)),
-               and_exprt(rounding_mode_bits.round_to_minus_inf,
-                         result.sign)));
+    const or_exprt overflow_to_inf(
+      rounding_mode_bits.round_to_even,
+      or_exprt(
+        and_exprt(rounding_mode_bits.round_to_plus_inf, not_exprt(result.sign)),
+        and_exprt(rounding_mode_bits.round_to_minus_inf, result.sign)));
 
-    exprt set_to_max=
-      and_exprt(exponent_too_large, not_exprt(overflow_to_inf));
-
+    const and_exprt set_to_max(exponent_too_large, not_exprt(overflow_to_inf));
 
     exprt largest_normal_exponent=
       from_integer(
@@ -1313,8 +1282,8 @@ float_bvt::biased_floatt float_bvt::bias(
   // strip off the hidden bit
   assert(to_unsignedbv_type(src.fraction.type()).get_width()==spec.f+1);
 
-  exprt hidden_bit=extractbit_exprt(src.fraction, spec.f);
-  exprt denormal=not_exprt(hidden_bit);
+  const extractbit_exprt hidden_bit(src.fraction, spec.f);
+  const not_exprt denormal(hidden_bit);
 
   result.fraction=
     extractbits_exprt(
@@ -1391,23 +1360,20 @@ exprt float_bvt::pack(
   assert(to_unsignedbv_type(src.exponent.type()).get_width()==spec.e);
 
   // do sign -- we make this 'false' for NaN
-  exprt sign_bit=
-    if_exprt(src.NaN, false_exprt(), src.sign);
+  const if_exprt sign_bit(src.NaN, false_exprt(), src.sign);
 
   // the fraction is zero in case of infinity,
   // and one in case of NaN
-  exprt fraction=
-    if_exprt(src.NaN, from_integer(1, src.fraction.type()),
-    if_exprt(src.infinity, from_integer(0, src.fraction.type()),
-    src.fraction));
+  const if_exprt fraction(
+    src.NaN,
+    from_integer(1, src.fraction.type()),
+    if_exprt(src.infinity, from_integer(0, src.fraction.type()), src.fraction));
 
-  exprt infinity_or_NaN=
-    or_exprt(src.NaN, src.infinity);
+  const or_exprt infinity_or_NaN(src.NaN, src.infinity);
 
   // do exponent
-  exprt exponent=
-    if_exprt(infinity_or_NaN, from_integer(-1, src.exponent.type()),
-             src.exponent);
+  const if_exprt exponent(
+    infinity_or_NaN, from_integer(-1, src.exponent.type()), src.exponent);
 
   // stitch all three together
   return concatenation_exprt(
@@ -1431,7 +1397,7 @@ exprt float_bvt::sticky_right_shift(
 
   for(std::size_t stage=0; stage<dist_width; stage++)
   {
-    exprt tmp=lshr_exprt(result, d);
+    const lshr_exprt tmp(result, d);
 
     exprt lost_bits;
 
@@ -1440,8 +1406,7 @@ exprt float_bvt::sticky_right_shift(
     else
       lost_bits=result;
 
-    exprt dist_bit=
-      extractbit_exprt(dist, stage);
+    const extractbit_exprt dist_bit(dist, stage);
 
     sticky=
       or_exprt(

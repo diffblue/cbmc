@@ -191,7 +191,7 @@ exprt boolbvt::bv_get_rec(
       if(sub_width!=0 && width%sub_width==0)
       {
         std::size_t size=width/sub_width;
-        exprt value(ID_vector, type);
+        vector_exprt value(to_vector_type(type));
         value.reserve_operands(size);
 
         for(std::size_t i=0; i<size; i++)
@@ -208,11 +208,10 @@ exprt boolbvt::bv_get_rec(
 
       if(sub_width!=0 && width==sub_width*2)
       {
-        exprt value(ID_complex, type);
-        value.operands().resize(2);
-
-        value.op0()=bv_get_rec(bv, unknown, 0*sub_width, subtype);
-        value.op1()=bv_get_rec(bv, unknown, 1*sub_width, subtype);
+        const complex_exprt value(
+          bv_get_rec(bv, unknown, 0 * sub_width, subtype),
+          bv_get_rec(bv, unknown, 1 * sub_width, subtype),
+          to_complex_type(type));
 
         return value;
       }

@@ -151,15 +151,13 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   lemmas.push_back(a1);
 
   symbol_exprt qvar=fresh_univ_index("QA_suffix", index_type);
-  exprt qvar_shifted=plus_exprt(
-    qvar, minus_exprt(s1.length(), s0.length()));
+  const plus_exprt qvar_shifted(qvar, minus_exprt(s1.length(), s0.length()));
   string_constraintt a2(
     qvar, s0.length(), issuffix, equal_exprt(s0[qvar], s1[qvar_shifted]));
   constraints.push_back(a2);
 
   symbol_exprt witness=fresh_exist_index("witness_not_suffix", index_type);
-  exprt shifted=plus_exprt(
-    witness, minus_exprt(s1.length(), s0.length()));
+  const plus_exprt shifted(witness, minus_exprt(s1.length(), s0.length()));
   or_exprt constr3(
     and_exprt(
       s0.axiom_for_length_gt(s1.length()),
@@ -221,7 +219,7 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   lemmas.push_back(a3);
 
   symbol_exprt qvar=fresh_univ_index("QA_contains", index_type);
-  exprt qvar_shifted=plus_exprt(qvar, startpos);
+  const plus_exprt qvar_shifted(qvar, startpos);
   string_constraintt a4(
     qvar, s1.length(), contains, equal_exprt(s1[qvar], s0[qvar_shifted]));
   constraints.push_back(a4);
