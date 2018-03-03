@@ -169,6 +169,7 @@ jobs:
     # cmake build using g++-5
     - stage: Test different OS/CXX/Flags
       os: linux
+      compiler: gcc
       cache: ccache
       env:
         - BUILD_SYSTEM=cmake
@@ -189,6 +190,7 @@ jobs:
 
     - stage: Test different OS/CXX/Flags
       os: osx
+      compiler: clang
       cache: ccache
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
