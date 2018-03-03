@@ -7,7 +7,7 @@ phases:
       - apt-get install -y software-properties-common
       - add-apt-repository -y ppa:ubuntu-toolchain-r/test
       - apt-get update -y
-      - apt-get install -y g++-5 flex bison make git libwww-perl patch
+      - apt-get install -y g++-5 flex bison make git libwww-perl patch ccache
       - apt-get install -y openjdk-7-jdk
       - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
       - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
@@ -15,7 +15,7 @@ phases:
     commands:
       - echo Build started on `date`
       - (cd src ; make minisat2-download)
-      - (cd src ; make -j2)
+      - (cd src ; make CXX="ccache g++" -j2)
   post_build:
     commands:
       - echo Build completed on `date`
