@@ -21,3 +21,6 @@ phases:
       - echo Build completed on `date`
 artifacts:
   files:
+cache:
+  paths:
+    - '/root/.ccache/**/*'
