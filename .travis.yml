@@ -249,7 +249,7 @@ jobs:
 
 install:
   - ccache -z
-  - ccache --max-size=1G
+  - ccache --max-size=2G
   - make -C src minisat2-download
   - make -C src/ansi-c library_check
   - make -C src "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j2
