@@ -16,6 +16,7 @@ phases:
       - echo Build started on `date`
       - (cd src ; make minisat2-download)
       - (cd src ; make CXX="ccache g++" -j2)
+      - (cd regression ; make test)
   post_build:
     commands:
       - echo Build completed on `date`
