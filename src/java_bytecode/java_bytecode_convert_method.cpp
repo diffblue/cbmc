@@ -1181,6 +1181,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           java_reference_type(catch_type));
       stack.push_back(catch_var);
       code_landingpadt catch_statement(catch_var);
+      catch_statement.add_source_location() = i_it->source_location;
       catch_instruction=catch_statement;
     }
 
@@ -2395,6 +2396,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
               handler_labels[i]));
         }
 
+        catch_push.add_source_location() = i_it->source_location;
         code_blockt try_block;
         try_block.move_to_operands(catch_push);
         try_block.move_to_operands(c);
@@ -2436,6 +2438,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           start_pc=exception_row.start_pc;
           // add CATCH_POP instruction
           code_pop_catcht catch_pop;
+          catch_pop.add_source_location() = i_it->source_location;
           code_blockt end_try_block;
           end_try_block.move_to_operands(c);
           end_try_block.move_to_operands(catch_pop);
