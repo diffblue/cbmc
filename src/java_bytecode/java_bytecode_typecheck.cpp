@@ -40,8 +40,8 @@ void java_bytecode_typecheckt::typecheck()
   // and we might add new symbols.
   journalling_symbol_tablet::changesett identifiers;
   identifiers.reserve(symbol_table.symbols.size());
-  forall_symbols(s_it, symbol_table.symbols)
-    identifiers.insert(s_it->first);
+  for(const auto &symbol_pair : symbol_table.symbols)
+    identifiers.insert(symbol_pair.first);
   typecheck(identifiers);
 }
 

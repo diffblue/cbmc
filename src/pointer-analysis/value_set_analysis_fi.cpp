@@ -156,10 +156,13 @@ void value_set_analysis_fit::get_globals(
   std::list<value_set_fit::entryt> &dest)
 {
   // static ones
-  forall_symbols(it, ns.get_symbol_table().symbols)
-    if(it->second.is_lvalue &&
-       it->second.is_static_lifetime)
-      get_entries(it->second, dest);
+  for(const auto &symbol_pair : ns.get_symbol_table().symbols)
+  {
+    if(symbol_pair.second.is_lvalue && symbol_pair.second.is_static_lifetime)
+    {
+      get_entries(symbol_pair.second, dest);
+    }
+  }
 }
 
 bool value_set_analysis_fit::check_type(const typet &type)

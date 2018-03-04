@@ -114,25 +114,27 @@ bool model_argc_argv(
   // locate the body of the newly built start function as well as any
   // additional declarations we might need; the body will then be
   // converted and inserted into the start function
-  forall_symbols(it, tmp_symbol_table.symbols)
+  for(const auto &symbol_pair : tmp_symbol_table.symbols)
   {
     // add __CPROVER_assume if necessary (it might exist already)
-    if(it->first==CPROVER_PREFIX "assume" ||
-       it->first==CPROVER_PREFIX "input")
-      goto_model.symbol_table.add(it->second);
-    else if(it->first==goto_model.goto_functions.entry_point())
+    if(
+      symbol_pair.first == CPROVER_PREFIX "assume" ||
+      symbol_pair.first == CPROVER_PREFIX "input")
+      goto_model.symbol_table.add(symbol_pair.second);
+    else if(symbol_pair.first == goto_model.goto_functions.entry_point())
     {
-      value=it->second.value;
+      value = symbol_pair.second.value;
 
       replace_symbolt replace;
       replace.insert("ARGC", ns.lookup("argc'").symbol_expr());
       replace.insert("ARGV", ns.lookup("argv'").symbol_expr());
       replace(value);
     }
-    else if(has_prefix(
-        id2string(it->first),
-        id2string(goto_model.goto_functions.entry_point())+"::") &&
-      goto_model.symbol_table.add(it->second))
+    else if(
+      has_prefix(
+        id2string(symbol_pair.first),
+        id2string(goto_model.goto_functions.entry_point()) + "::") &&
+      goto_model.symbol_table.add(symbol_pair.second))
       UNREACHABLE;
   }
   POSTCONDITION(value.is_not_nil());

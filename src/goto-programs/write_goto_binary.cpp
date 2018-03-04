@@ -30,12 +30,12 @@ bool write_goto_binary_v3(
 
   write_gb_word(out, symbol_table.symbols.size());
 
-  forall_symbols(it, symbol_table.symbols)
+  for(const auto &symbol_pair : symbol_table.symbols)
   {
     // Since version 2, symbols are not converted to ireps,
     // instead they are saved in a custom binary format
 
-    const symbolt &sym = it->second;
+    const symbolt &sym = symbol_pair.second;
 
     irepconverter.reference_convert(sym.type, out);
     irepconverter.reference_convert(sym.value, out);
