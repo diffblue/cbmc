@@ -16,6 +16,7 @@ void ansi_c_internal_additions(std::string &code);
 void ansi_c_architecture_strings(std::string &code);
 
 extern const char clang_builtin_headers[];
+extern const char gcc_builtin_headers_types[];
 extern const char gcc_builtin_headers_generic[];
 extern const char gcc_builtin_headers_math[];
 extern const char gcc_builtin_headers_mem_string[];
