@@ -72,6 +72,7 @@ make_inc(gcc_builtin_headers_mips)
 make_inc(gcc_builtin_headers_omp)
 make_inc(gcc_builtin_headers_power)
 make_inc(gcc_builtin_headers_tm)
+make_inc(gcc_builtin_headers_types)
 make_inc(gcc_builtin_headers_ubsan)
 
 set(extra_dependencies
@@ -92,6 +93,7 @@ set(extra_dependencies
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_omp.inc
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_power.inc
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_tm.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_types.inc
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_ubsan.inc
     ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
 )

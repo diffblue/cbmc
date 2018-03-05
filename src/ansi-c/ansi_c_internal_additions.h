@@ -32,5 +32,6 @@ extern const char gcc_builtin_headers_mips[];
 extern const char gcc_builtin_headers_power[];
 extern const char arm_builtin_headers[];
 extern const char cw_builtin_headers[];
+extern const char windows_builtin_headers[];
 
 #endif // CPROVER_ANSI_C_ANSI_C_INTERNAL_ADDITIONS_H
