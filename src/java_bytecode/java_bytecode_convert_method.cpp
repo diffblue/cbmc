@@ -346,7 +346,7 @@ void java_bytecode_convert_method_lazy(
     method_symbol.pretty_name=
       id2string(class_symbol.pretty_name)+"."+
       id2string(class_symbol.base_name)+"()";
-    member_type.set(ID_constructor, true);
+    member_type.set_is_constructor();
   }
   else
     method_symbol.pretty_name=
@@ -538,7 +538,7 @@ void java_bytecode_convert_methodt::convert(
     method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
                                 id2string(class_symbol.base_name) + "()";
     INVARIANT(
-      member_type.get_bool(ID_constructor),
+      code_type.get_is_constructor(),
       "Member type should have already been marked as a constructor");
   }
   else
@@ -1271,7 +1271,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
             {
               if(needed_lazy_methods)
                 needed_lazy_methods->add_needed_class(classname);
-              code_type.set(ID_constructor, true);
+              code_type.set_is_constructor();
             }
             else
               code_type.set(ID_java_super_method_call, true);

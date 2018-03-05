@@ -889,6 +889,16 @@ public:
     return set(ID_access, access);
   }
 
+  bool get_is_constructor() const
+  {
+    return get_bool(ID_constructor);
+  }
+
+  void set_is_constructor()
+  {
+    set(ID_constructor, true);
+  }
+
   // this produces the list of parameter identifiers
   std::vector<irep_idt> parameter_identifiers() const
   {
