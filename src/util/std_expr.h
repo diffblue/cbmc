@@ -4812,8 +4812,9 @@ inline quantifier_exprt &to_quantifier_expr(exprt &expr)
 
 template<> inline bool can_cast_expr<quantifier_exprt>(const exprt &base)
 {
-  return true;
+  return base.id() == ID_forall || base.id() == ID_exists;
 }
+
 inline void validate_expr(const quantifier_exprt &value)
 {
   validate_operands(value, 2,
