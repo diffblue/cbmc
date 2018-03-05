@@ -10,6 +10,7 @@ SRC = anonymous_member.cpp \
       ansi_c_scope.cpp \
       ansi_c_typecheck.cpp \
       ansi_c_y.tab.cpp \
+      builtin_factory.cpp \
       c_misc.cpp \
       c_nondet_symbol_factory.cpp \
       c_preprocess.cpp \
