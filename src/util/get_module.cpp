@@ -83,9 +83,9 @@ const symbolt &get_module(
   symbolptr_listt symbolptr_list, main_symbolptr_list;
   messaget message(message_handler);
 
-  forall_symbols(it, symbol_table.symbols)
+  for(const auto &symbol_pair : symbol_table.symbols)
   {
-    const symbolt &s=it->second;
+    const symbolt &s = symbol_pair.second;
 
     if(s.type.id()!=ID_module)
       continue;

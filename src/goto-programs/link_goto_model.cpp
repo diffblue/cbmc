@@ -110,13 +110,14 @@ static bool link_functions(
   // apply macros
   rename_symbolt macro_application;
 
-  forall_symbols(it, dest_symbol_table.symbols)
-    if(it->second.is_macro && !it->second.is_type)
+  for(const auto &symbol_pair : dest_symbol_table.symbols)
+  {
+    if(symbol_pair.second.is_macro && !symbol_pair.second.is_type)
     {
-      const symbolt &symbol=it->second;
+      const symbolt &symbol = symbol_pair.second;
 
-      INVARIANT(symbol.value.id()==ID_symbol, "must have symbol");
-      const irep_idt &id=to_symbol_expr(symbol.value).get_identifier();
+      INVARIANT(symbol.value.id() == ID_symbol, "must have symbol");
+      const irep_idt &id = to_symbol_expr(symbol.value).get_identifier();
 
       #if 0
       if(!base_type_eq(symbol.type, ns.lookup(id).type, ns))
@@ -130,6 +131,7 @@ static bool link_functions(
 
       macro_application.insert_expr(symbol.name, id);
     }
+  }
 
   if(!macro_application.expr_map.empty())
     Forall_goto_functions(dest_it, dest_functions)
@@ -159,9 +161,11 @@ void link_goto_model(
   typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
   id_sett weak_symbols;
 
-  forall_symbols(it, dest.symbol_table.symbols)
-    if(it->second.is_weak)
-      weak_symbols.insert(it->first);
+  for(const auto &symbol_pair : dest.symbol_table.symbols)
+  {
+    if(symbol_pair.second.is_weak)
+      weak_symbols.insert(symbol_pair.first);
+  }
 
   linkingt linking(dest.symbol_table,
                    src.symbol_table,

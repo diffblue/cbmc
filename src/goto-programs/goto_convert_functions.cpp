@@ -38,16 +38,16 @@ void goto_convert_functionst::goto_convert(goto_functionst &functions)
   typedef std::list<irep_idt> symbol_listt;
   symbol_listt symbol_list;
 
-  forall_symbols(it, symbol_table.symbols)
+  for(const auto &symbol_pair : symbol_table.symbols)
   {
-    if(!it->second.is_type &&
-       !it->second.is_macro &&
-       it->second.type.id()==ID_code &&
-       (it->second.mode==ID_C ||
-        it->second.mode==ID_cpp ||
-        it->second.mode==ID_java ||
-        it->second.mode=="jsil"))
-      symbol_list.push_back(it->first);
+    if(
+      !symbol_pair.second.is_type && !symbol_pair.second.is_macro &&
+      symbol_pair.second.type.id() == ID_code &&
+      (symbol_pair.second.mode == ID_C || symbol_pair.second.mode == ID_cpp ||
+       symbol_pair.second.mode == ID_java || symbol_pair.second.mode == "jsil"))
+    {
+      symbol_list.push_back(symbol_pair.first);
+    }
   }
 
   for(const auto &id : symbol_list)
@@ -59,12 +59,14 @@ void goto_convert_functionst::goto_convert(goto_functionst &functions)
 
   // this removes the parse tree of the bodies from memory
   #if 0
-  Forall_symbols(it, symbol_table.symbols)
+  for(const auto &symbol_pair, symbol_table.symbols)
   {
-    if(!it->second.is_type &&
-       it->second.type.id()==ID_code &&
-       it->second.value.is_not_nil())
-      it->second.value=codet();
+    if(!symbol_pair.second.is_type &&
+       symbol_pair.second.type.id()==ID_code &&
+       symbol_pair.second.value.is_not_nil())
+    {
+      symbol_pair.second.value=codet();
+    }
   }
   #endif
 }

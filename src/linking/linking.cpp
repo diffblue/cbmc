@@ -452,15 +452,23 @@ void linkingt::duplicate_code_symbol(
     const code_typet &old_t=to_code_type(old_symbol.type);
     const code_typet &new_t=to_code_type(new_symbol.type);
 
-    // if one of them was an implicit declaration, just issue a warning
+    // if one of them was an implicit declaration then only conflicts on the
+    // return type are an error as we would end up with assignments with
+    // mismatching types; as we currently do not patch these by inserting type
+    // casts we need to fail hard
     if(!old_symbol.location.get_function().empty() &&
        old_symbol.value.is_nil())
     {
-      // issue a warning and overwrite
-      link_warning(
-        old_symbol,
-        new_symbol,
-        "implicit function declaration");
+      if(base_type_eq(old_t.return_type(), new_t.return_type(), ns))
+         link_warning(
+           old_symbol,
+           new_symbol,
+           "implicit function declaration");
+      else
+        link_error(
+          old_symbol,
+          new_symbol,
+          "implicit function declaration");
 
       old_symbol.type=new_symbol.type;
       old_symbol.location=new_symbol.location;
@@ -469,11 +477,16 @@ void linkingt::duplicate_code_symbol(
     else if(!new_symbol.location.get_function().empty() &&
             new_symbol.value.is_nil())
     {
-      // issue a warning
-      link_warning(
-        old_symbol,
-        new_symbol,
-        "ignoring conflicting implicit function declaration");
+      if(base_type_eq(old_t.return_type(), new_t.return_type(), ns))
+        link_warning(
+          old_symbol,
+          new_symbol,
+          "ignoring conflicting implicit function declaration");
+      else
+        link_error(
+          old_symbol,
+          new_symbol,
+          "implicit function declaration");
     }
     // handle (incomplete) function prototypes
     else if(base_type_eq(old_t.return_type(), new_t.return_type(), ns) &&
@@ -1156,20 +1169,17 @@ void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
 
   used_byt used_by;
 
-  forall_symbols(s_it, src_symbol_table.symbols)
+  for(const auto &symbol_pair : src_symbol_table.symbols)
   {
-    if(s_it->second.is_type)
+    if(symbol_pair.second.is_type)
     {
       // find type and array-size symbols
       find_symbols_sett symbols_used;
-      find_type_and_expr_symbols(s_it->second.type, symbols_used);
+      find_type_and_expr_symbols(symbol_pair.second.type, symbols_used);
 
-      for(find_symbols_sett::const_iterator
-          it=symbols_used.begin();
-          it!=symbols_used.end();
-          it++)
+      for(const auto &symbol_used : symbols_used)
       {
-        used_by[*it].insert(s_it->first);
+        used_by[symbol_used].insert(symbol_pair.first);
       }
     }
   }
@@ -1305,18 +1315,18 @@ void linkingt::typecheck()
 
   id_sett needs_to_be_renamed;
 
-  forall_symbols(s_it, src_symbol_table.symbols)
+  for(const auto &symbol_pair : src_symbol_table.symbols)
   {
-    symbol_tablet::symbolst::const_iterator
-      m_it=main_symbol_table.symbols.find(s_it->first);
+    symbol_tablet::symbolst::const_iterator m_it =
+      main_symbol_table.symbols.find(symbol_pair.first);
 
-    if(m_it!=main_symbol_table.symbols.end() && // duplicate
-       needs_renaming(m_it->second, s_it->second))
+    if(
+      m_it != main_symbol_table.symbols.end() && // duplicate
+      needs_renaming(m_it->second, symbol_pair.second))
     {
-      needs_to_be_renamed.insert(s_it->first);
+      needs_to_be_renamed.insert(symbol_pair.first);
       #ifdef DEBUG
-      debug() << "LINKING: needs to be renamed: "
-              << s_it->first << eom;
+      debug() << "LINKING: needs to be renamed: " << symbol_pair.first << eom;
       #endif
     }
   }

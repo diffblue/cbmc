@@ -66,7 +66,7 @@ jobs:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache g++-5"
+        - COMPILER="ccache /usr/bin/g++-5"
         - EXTRA_CXXFLAGS="-D_GLIBCXX_DEBUG"
 
     # OS X using g++
@@ -76,10 +76,8 @@ jobs:
       compiler: gcc
       cache: ccache
       before_install:
-          #we create symlink to non-ccache gcc, to be used in tests
-        - mkdir bin ; ln -s /usr/bin/gcc bin/gcc
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
-        - export PATH=/usr/local/opt/ccache/libexec:$PATH
+        - export PATH=$PATH:/usr/local/opt/ccache/libexec
       env: COMPILER="ccache g++"
 
     # OS X using clang++
@@ -90,7 +88,7 @@ jobs:
       cache: ccache
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
-        - export PATH=/usr/local/opt/ccache/libexec:$PATH
+        - export PATH=$PATH:/usr/local/opt/ccache/libexec
       env:
         - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
@@ -113,7 +111,7 @@ jobs:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache g++-5"
+        - COMPILER="ccache /usr/bin/g++-5"
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
 
@@ -138,7 +136,7 @@ jobs:
         - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
+        - COMPILER="ccache /usr/bin/clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
         - EXTRA_CXXFLAGS="-DNDEBUG"
 
@@ -163,7 +161,7 @@ jobs:
         - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
+        - COMPILER="ccache /usr/bin/clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
         - EXTRA_CXXFLAGS="-DDEBUG -DUSE_STD_STRING"
       script: echo "Not running any tests for a debug build."
@@ -171,6 +169,7 @@ jobs:
     # cmake build using g++-5
     - stage: Test different OS/CXX/Flags
       os: linux
+      compiler: gcc
       cache: ccache
       env:
         - BUILD_SYSTEM=cmake
@@ -180,19 +179,22 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+      before_install:
+        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       install:
         - ccache -z
         - ccache --max-size=1G
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=g++-5'
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++-5'
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE -j2)
 
     - stage: Test different OS/CXX/Flags
       os: osx
+      compiler: clang
       cache: ccache
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
-        - export PATH=/usr/local/opt/ccache/libexec:$PATH
+        - export PATH=$PATH:/usr/local/opt/ccache/libexec
       env:
         - BUILD_SYSTEM=cmake
         - CCACHE_CPP2=yes
@@ -247,11 +249,11 @@ jobs:
 
 install:
   - ccache -z
-  - ccache --max-size=1G
+  - ccache --max-size=2G
   - make -C src minisat2-download
   - make -C src/ansi-c library_check
-  - make -C src "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j2
-  - make -C src "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j2 clobber.dir memory-models.dir
+  - make -C src "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j3
+  - make -C src "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j3 clobber.dir memory-models.dir
 
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;

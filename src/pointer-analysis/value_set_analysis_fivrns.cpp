@@ -146,10 +146,13 @@ void value_set_analysis_fivrnst::get_globals(
   std::list<value_set_fivrnst::entryt> &dest)
 {
   // static ones
-  forall_symbols(it, ns.get_symbol_table().symbols)
-    if(it->second.is_lvalue &&
-       it->second.is_static_lifetime)
-      get_entries(it->second, dest);
+  for(const auto &it : ns.get_symbol_table().symbols)
+  {
+    if(it.second.is_lvalue && it.second.is_static_lifetime)
+    {
+      get_entries(it.second, dest);
+    }
+  }
 }
 
 bool value_set_analysis_fivrnst::check_type(const typet &type)
