@@ -90,7 +90,8 @@ jobs:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
         - export PATH=$PATH:/usr/local/opt/ccache/libexec
       env:
-        - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
+        - COMPILER="ccache clang++"
+        - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
 
     # Ubuntu Linux with glibc using g++-5, debug mode
@@ -136,9 +137,9 @@ jobs:
         - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache /usr/bin/clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
+        - COMPILER="ccache /usr/bin/clang++-3.7"
+        - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DNDEBUG"
         - CCACHE_CPP2=yes
-        - EXTRA_CXXFLAGS="-DNDEBUG"
 
     # Ubuntu Linux with glibc using clang++-3.7, debug mode, disable USE_DSTRING
     - stage: Test different OS/CXX/Flags
@@ -161,9 +162,9 @@ jobs:
         - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache /usr/bin/clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
+        - COMPILER="ccache /usr/bin/clang++-3.7"
+        - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DDEBUG -DUSE_STD_STRING"
         - CCACHE_CPP2=yes
-        - EXTRA_CXXFLAGS="-DDEBUG -DUSE_STD_STRING"
       script: echo "Not running any tests for a debug build."
 
     # cmake build using g++-5
@@ -249,16 +250,16 @@ jobs:
 
 install:
   - ccache -z
-  - ccache --max-size=2G
+  - ccache --max-size=1G
   - make -C src minisat2-download
   - make -C src/ansi-c library_check
-  - make -C src "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j3
-  - make -C src "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j3 clobber.dir memory-models.dir
+  - make -C src "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j3
+  - make -C src "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j3 clobber.dir memory-models.dir
 
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
-  - env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j2
-  - make -C unit "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j2
+  - env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2
+  - make -C unit "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2
   - make -C unit test
 
 before_cache:
