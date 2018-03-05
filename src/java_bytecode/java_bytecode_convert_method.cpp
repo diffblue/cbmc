@@ -385,9 +385,9 @@ void java_bytecode_convert_methodt::convert(
 
   // Obtain a std::vector of code_typet::parametert objects from the
   // (function) type of the symbol
-  typet member_type=method_symbol.type;
-  member_type.set(ID_C_class, class_symbol.name);
-  code_typet &code_type=to_code_type(member_type);
+
+  code_typet code_type=to_code_type(method_symbol.type);
+  code_type.set(ID_C_class, class_symbol.name);
   method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
 
@@ -547,7 +547,7 @@ void java_bytecode_convert_methodt::convert(
                                 id2string(m.base_name) + "()";
   }
 
-  method_symbol.type=member_type;
+  method_symbol.type=code_type;
 
   current_method=method_symbol.name;
   method_has_this=code_type.has_this();
