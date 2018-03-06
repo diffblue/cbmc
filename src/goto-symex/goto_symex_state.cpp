@@ -50,12 +50,9 @@ void goto_symex_statet::level0t::operator()(
     return;
 
   const symbolt *s;
-
-  if(ns.lookup(obj_identifier, s))
-  {
-    std::cerr << "level0: failed to find " << obj_identifier << '\n';
-    abort();
-  }
+  const bool found_l0 = !ns.lookup(obj_identifier, s);
+  DATA_INVARIANT(
+    found_l0, "level0: failed to find " + id2string(obj_identifier));
 
   // don't rename shared variables or functions
   if(s->type.id()==ID_code ||
