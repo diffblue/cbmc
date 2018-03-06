@@ -45,24 +45,21 @@ exprt string_constraint_generatort::add_axioms_for_set_length(
 
   // We add axioms:
   // a1 : |res|=k
-  // a2 : forall i<|res|. i < |s1|  ==> res[i] = s1[i]
-  // a3 : forall i<|res|. i >= |s1| ==> res[i] = 0
+  // a2 : forall i< min(|s1|, k) .res[i] = s1[i]
+  // a3 : forall |s1| <= i < |res|. res[i] = 0
 
   lemmas.push_back(res.axiom_for_has_length(k));
 
-  symbol_exprt idx = fresh_univ_index("QA_index_set_length", index_type);
-  string_constraintt a2(
-    idx,
-    res.length(),
-    s1.axiom_for_length_gt(idx),
-    equal_exprt(s1[idx], res[idx]));
+  const symbol_exprt idx = fresh_univ_index("QA_index_set_length", index_type);
+  const string_constraintt a2(
+    idx, minimum(s1.length(), k), equal_exprt(s1[idx], res[idx]));
   constraints.push_back(a2);
 
   symbol_exprt idx2 = fresh_univ_index("QA_index_set_length2", index_type);
   string_constraintt a3(
     idx2,
+    s1.length(),
     res.length(),
-    s1.axiom_for_length_le(idx2),
     equal_exprt(res[idx2], constant_char(0, char_type)));
   constraints.push_back(a3);
 
@@ -395,8 +392,8 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
 /// These axioms are:
 ///   1. \f$ |{\tt res}| = |{\tt str}|\f$
 ///   2. \f$ {\tt res}[{\tt pos}]={\tt char}\f$
-///   3. \f$ \forall i<|{\tt res}|.\ i \ne {\tt pos}
-///          \Rightarrow {\tt res}[i] = {\tt str}[i]\f$
+///   3. \f$ \forall i < min(|{\tt res}|, pos). {\tt res}[i] = {\tt str}[i]\f$
+///   4. \f$ \forall pos+1 <= i < |{\tt res}|.\ {\tt res}[i] = {\tt str}[i]\f$
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]`, refined_string `str`, integer `pos`,
 ///           and character `char`
@@ -413,14 +410,22 @@ exprt string_constraint_generatort::add_axioms_for_char_set(
   const exprt &character = f.arguments()[4];
 
   const binary_relation_exprt out_of_bounds(position, ID_ge, str.length());
-  lemmas.push_back(equal_exprt(res.length(), str.length()));
-  lemmas.push_back(equal_exprt(res[position], character));
+  const equal_exprt a1(res.length(), str.length());
+  lemmas.push_back(a1);
+  const equal_exprt a2(res[position], character);
+  lemmas.push_back(a2);
+
   const symbol_exprt q = fresh_univ_index("QA_char_set", position.type());
-  equal_exprt a3_body(res[q], str[q]);
-  notequal_exprt a3_guard(q, position);
-  constraints.push_back(
-    string_constraintt(
-      q, from_integer(0, q.type()), res.length(), a3_guard, a3_body));
+  const equal_exprt a3_body(res[q], str[q]);
+  const string_constraintt a3(q, minimum(res.length(), position), a3_body);
+  constraints.push_back(a3);
+
+  const symbol_exprt q2 = fresh_univ_index("QA_char_set2", position.type());
+  const plus_exprt lower_bound(position, from_integer(1, position.type()));
+  const equal_exprt a4_body(res[q2], str[q2]);
+  const string_constraintt a4(q2, lower_bound, res.length(), a4_body);
+  constraints.push_back(a4);
+
   return if_exprt(
     out_of_bounds, from_integer(1, f.type()), from_integer(0, f.type()));
 }

@@ -93,11 +93,10 @@ public:
     const symbol_exprt &_univ_var,
     const exprt &bound_inf,
     const exprt &bound_sup,
-    const exprt &prem,
     const exprt &body):
     exprt(ID_string_constraint)
   {
-    copy_to_operands(prem, body);
+    copy_to_operands(true_exprt(), body);
     copy_to_operands(_univ_var, bound_sup, bound_inf);
   }
 
@@ -105,22 +104,12 @@ public:
   string_constraintt(
     const symbol_exprt &_univ_var,
     const exprt &bound_sup,
-    const exprt &prem,
     const exprt &body):
     string_constraintt(
       _univ_var,
       from_integer(0, _univ_var.type()),
       bound_sup,
-      prem,
       body)
-  {}
-
-  // Default premise is true
-  string_constraintt(
-    const symbol_exprt &_univ_var,
-    const exprt &bound_sup,
-    const exprt &body):
-    string_constraintt(_univ_var, bound_sup, true_exprt(), body)
   {}
 
   exprt univ_within_bounds() const

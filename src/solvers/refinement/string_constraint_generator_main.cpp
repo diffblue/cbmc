@@ -369,7 +369,7 @@ void string_constraint_generatort::add_constraint_on_characters(
   const and_exprt char_in_set(
     binary_relation_exprt(chr, ID_ge, from_integer(low_char, chr.type())),
     binary_relation_exprt(chr, ID_le, from_integer(high_char, chr.type())));
-  const string_constraintt sc(qvar, start, end, true_exprt(), char_in_set);
+  const string_constraintt sc(qvar, start, end, char_in_set);
   constraints.push_back(sc);
 }
 
@@ -661,4 +661,9 @@ exprt string_constraint_generatort::add_axioms_for_char_at(
   symbol_exprt char_sym = fresh_symbol("char", str.type().subtype());
   lemmas.push_back(equal_exprt(char_sym, str[f.arguments()[1]]));
   return char_sym;
+}
+
+exprt minimum(const exprt &a, const exprt &b)
+{
+  return if_exprt(binary_relation_exprt(a, ID_le, b), a, b);
 }

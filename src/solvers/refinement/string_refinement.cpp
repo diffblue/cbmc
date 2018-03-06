@@ -1549,10 +1549,12 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     const exprt &bound_inf=axiom.lower_bound();
     const exprt &bound_sup=axiom.upper_bound();
     const exprt &prem=axiom.premise();
+    INVARIANT(
+      prem == true_exprt(), "string constraint premises are not supported");
     const exprt &body=axiom.body();
 
     const string_constraintt axiom_in_model(
-      univ_var, get(bound_inf), get(bound_sup), get(prem), get(body));
+      univ_var, get(bound_inf), get(bound_sup), get(body));
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
     negaxiom = simplify_expr(negaxiom, ns);
