@@ -252,11 +252,12 @@ const exprt java_bytecode_convert_methodt::variable(
 ///   message handler to collect warnings
 /// \return
 ///   the constructed member type
-code_typet member_type_lazy(const std::string &descriptor,
-                            const optionalt<std::string> &signature,
-                            const std::string &class_name,
-                            const std::string &method_name,
-                            message_handlert &message_handler)
+code_typet member_type_lazy(
+  const std::string &descriptor,
+  const optionalt<std::string> &signature,
+  const std::string &class_name,
+  const std::string &method_name,
+  message_handlert &message_handler)
 {
   // In order to construct the method type, we can either use signature or
   // descriptor. Since only signature contains the generics info, we want to
@@ -320,7 +321,7 @@ void java_bytecode_convert_method_lazy(
 {
   symbolt method_symbol;
 
-  code_typet member_type=member_type_lazy(
+  code_typet member_type = member_type_lazy(
     m.descriptor,
     m.signature,
     id2string(class_symbol.name),
@@ -356,7 +357,7 @@ void java_bytecode_convert_method_lazy(
   // do we need to add 'this' as a parameter?
   if(!m.is_static)
   {
-    code_typet::parameterst &parameters=member_type.parameters();
+    code_typet::parameterst &parameters = member_type.parameters();
     code_typet::parametert this_p;
     const reference_typet object_ref_type=
       java_reference_type(symbol_typet(class_symbol.name));
@@ -386,7 +387,7 @@ void java_bytecode_convert_methodt::convert(
   // Obtain a std::vector of code_typet::parametert objects from the
   // (function) type of the symbol
 
-  code_typet code_type=to_code_type(method_symbol.type);
+  code_typet code_type = to_code_type(method_symbol.type);
   code_type.set(ID_C_class, class_symbol.name);
   method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
@@ -516,10 +517,10 @@ void java_bytecode_convert_methodt::convert(
 
   // Check the fields that can't change are valid
   INVARIANT(
-    method_symbol.name==method_identifier,
+    method_symbol.name == method_identifier,
     "Name of method symbol shouldn't change");
   INVARIANT(
-    method_symbol.base_name==m.base_name,
+    method_symbol.base_name == m.base_name,
     "Base name of method symbol shouldn't change");
   INVARIANT(
     method_symbol.module.empty(),
@@ -543,11 +544,11 @@ void java_bytecode_convert_methodt::convert(
   }
   else
   {
-    method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
-                                id2string(m.base_name) + "()";
+    method_symbol.pretty_name =
+      id2string(class_symbol.pretty_name) + "." + id2string(m.base_name) + "()";
   }
 
-  method_symbol.type=code_type;
+  method_symbol.type = code_type;
 
   current_method=method_symbol.name;
   method_has_this=code_type.has_this();
