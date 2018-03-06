@@ -7,11 +7,11 @@
 \*******************************************************************/
 
 #include "load_java_class.h"
+#include "free_form_cmdline.h"
 #include <testing-utils/catch.hpp>
 #include <iostream>
 
 #include <util/config.h>
-#include <util/options.h>
 #include <util/suffix.h>
 
 #include <goto-programs/lazy_goto_model.h>
@@ -51,7 +51,8 @@ symbol_tablet load_java_class(
   const std::string &java_class_name,
   const std::string &class_path,
   const std::string &main,
-  std::unique_ptr<languaget> &&java_lang)
+  std::unique_ptr<languaget> &&java_lang,
+  const cmdlinet &command_line)
 {
   // We expect the name of the class without the .class suffix to allow us to
   // check it
@@ -66,8 +67,6 @@ symbol_tablet load_java_class(
     message_handler);
 
   // Configure the path loading
-  cmdlinet command_line;
-  command_line.set("java-cp-include-files", class_path);
   config.java.classpath.clear();
   config.java.classpath.push_back(class_path);
   config.main = main;
@@ -108,4 +107,19 @@ symbol_tablet load_java_class(
   // as this often indicates that one of these is wrong.
   REQUIRE_FALSE(class_type.get_bool(ID_incomplete_class));
   return std::move(maybe_goto_model->symbol_table);
+}
+
+symbol_tablet load_java_class(
+  const std::string &java_class_name,
+  const std::string &class_path,
+  const std::string &main,
+  std::unique_ptr<languaget> &&java_lang)
+{
+  cmdlinet command_line;
+  // TODO(tkiley): This doesn't do anything as "java-cp-include-files" is an
+  // TODO(tkiley): unknown argument. This could be changed by using the
+  // TODO(tkiley): free_form_cmdlinet
+  command_line.set("java-cp-include-files", class_path);
+  return load_java_class(
+    java_class_name, class_path, main, std::move(java_lang), command_line);
 }
