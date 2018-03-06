@@ -484,22 +484,22 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     class_type.set_tag(symbol_type_identifier);
 
     class_type.components().reserve(3);
-    class_typet::componentt comp0(
+    class_typet::componentt base_class_component(
       "@java.lang.Object", symbol_typet("java::java.lang.Object"));
-    comp0.set_pretty_name("@java.lang.Object");
-    comp0.set_base_name("@java.lang.Object");
-    class_type.components().push_back(comp0);
+    base_class_component.set_pretty_name("@java.lang.Object");
+    base_class_component.set_base_name("@java.lang.Object");
+    class_type.components().push_back(base_class_component);
 
-    class_typet::componentt comp1("length", java_int_type());
-    comp1.set_pretty_name("length");
-    comp1.set_base_name("length");
-    class_type.components().push_back(comp1);
+    class_typet::componentt length_component("length", java_int_type());
+    length_component.set_pretty_name("length");
+    length_component.set_base_name("length");
+    class_type.components().push_back(length_component);
 
-    class_typet::componentt comp2(
+    class_typet::componentt data_component(
       "data", java_reference_type(java_type_from_char(l)));
-    comp2.set_pretty_name("data");
-    comp2.set_base_name("data");
-    class_type.components().push_back(comp2);
+    data_component.set_pretty_name("data");
+    data_component.set_base_name("data");
+    class_type.components().push_back(data_component);
 
     class_type.add_base(symbol_typet("java::java.lang.Object"));
 
@@ -559,14 +559,16 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
       java_reference_type(symbol_type));
     dereference_exprt old_array(this_symbol.symbol_expr(), symbol_type);
     dereference_exprt new_array(local_symexpr, symbol_type);
-    member_exprt old_length(old_array, comp1.get_name(), comp1.type());
+    member_exprt old_length(
+      old_array, length_component.get_name(), length_component.type());
     java_new_array.copy_to_operands(old_length);
     code_assignt create_blank(local_symexpr, java_new_array);
     clone_body.move_to_operands(create_blank);
 
-
-    member_exprt old_data(old_array, comp2.get_name(), comp2.type());
-    member_exprt new_data(new_array, comp2.get_name(), comp2.type());
+    member_exprt old_data(
+      old_array, data_component.get_name(), data_component.type());
+    member_exprt new_data(
+      new_array, data_component.get_name(), data_component.type());
 
     /*
       // TODO use this instead of a loop.
@@ -585,7 +587,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     index_symbol.name=index_name;
     index_symbol.base_name="index";
     index_symbol.pretty_name=index_symbol.base_name;
-    index_symbol.type=comp1.type();
+    index_symbol.type = length_component.type();
     index_symbol.mode=ID_java;
     symbol_table.add(index_symbol);
     const auto &index_symexpr=index_symbol.symbol_expr();
@@ -616,7 +618,8 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     // End for-loop
     clone_body.move_to_operands(copy_loop);
 
-    member_exprt new_base_class(new_array, comp0.get_name(), comp0.type());
+    member_exprt new_base_class(
+      new_array, base_class_component.get_name(), base_class_component.type());
     address_of_exprt retval(new_base_class);
     code_returnt return_inst(retval);
     clone_body.move_to_operands(return_inst);
