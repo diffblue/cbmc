@@ -13,55 +13,26 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_typecheck.h"
 
 #include <util/config.h>
+#include <util/string_utils.h>
 
-#include <cstring>
 #include <ostream>
 #include <sstream>
 
-//! Advance to the next line
-static const char *next_line(const char *line)
-{
-  const char *end=strchr(line, '\n');
-
-  if(end==NULL)
-    return strchr(line, 0);
-  else
-    return end+1;
-}
-
-//! Look for given pattern in given string.
-//! Add line with pattern to 'out' if found.
-//! \return 'true' if found
 static bool find_pattern(
   const std::string &pattern,
   const char *header_file,
   std::ostream &out)
 {
-  // read line-by-line
-  const char *line, *line_end;
-
-  for(line=header_file; *line!=0; line=line_end)
+  std::istringstream hdr(header_file);
+  std::string line;
+  while(std::getline(hdr, line))
   {
-    line_end=next_line(line);
-
-    // skip spaces
-    while(*line==' ')
-      line++;
-
-    if(line[0]=='/' && line[1]=='/') // comment
+    line = strip_string(line);
+    if(has_prefix(line, "//") || line.find(pattern) == std::string::npos)
       continue;
 
-    for(const char *p=line; p<line_end; p++)
-    {
-      if(strncmp(p, pattern.c_str(), pattern.size())==0)
-      {
-        // copy the entire line to out
-        for(const char *s=line; s!=line_end; s++)
-          out << *s;
-
-        return true; // done, found
-      }
-    }
+    out << line;
+    return true;
   }
 
   return false;
