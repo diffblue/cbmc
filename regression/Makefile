@@ -1,23 +1,26 @@
-DIRS = ansi-c \
-       cbmc \
-       cbmc-cover \
-       cbmc-cpp \
+# For the best possible utilisation of multiple cores when
+# running tests in parallel, it is important that these directories are
+# listed with decreasing runtimes (i.e. longest running at the top)
+DIRS = cbmc \
        cbmc-java \
-       cbmc-java-inheritance \
-       cpp \
        goto-analyzer \
-       goto-analyzer-taint \
-       goto-cc-cbmc \
-       goto-cc-goto-analyzer \
-       goto-diff \
-       goto-gcc \
-       goto-instrument \
-       goto-instrument-typedef \
-       invariants \
-       strings \
+       ansi-c \
        jbmc-strings \
+       goto-instrument \
+       cpp \
        strings-smoke-tests \
+       cbmc-cover \
+       goto-instrument-typedef \
+       strings \
+       invariants \
+       goto-diff \
        test-script \
+       goto-analyzer-taint \
+       cbmc-java-inheritance \
+       goto-gcc \
+       goto-cc-cbmc \
+       cbmc-cpp \
+       goto-cc-goto-analyzer \
        # Empty last line
 
 # Tests under goto-gcc cannot be run on Windows, so appveyor.yml unlinks
