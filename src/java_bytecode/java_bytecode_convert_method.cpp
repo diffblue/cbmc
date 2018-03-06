@@ -2423,9 +2423,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
     for(const auto &exception_row : method.exception_table)
     {
       // add the CATCH-POP before the end of the try block
-      if(cur_pc<exception_row.end_pc &&
-         !working_set.empty() &&
-         *working_set.begin()==exception_row.end_pc)
+      auto next_instruction = std::next(a_it);
+      bool is_try_block_end =
+        next_instruction == address_map.end() ?
+        cur_pc < exception_row.end_pc :
+        next_instruction->first == exception_row.end_pc;
+
+      if(is_try_block_end)
       {
         // have we already added a CATCH-POP for the current try-catch?
         // (each row corresponds to a handler)
