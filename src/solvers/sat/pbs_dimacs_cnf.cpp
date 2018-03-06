@@ -24,11 +24,8 @@ void pbs_dimacs_cnft::write_dimacs_pb(std::ostream &out)
   std::cout << "enter: No Lit.=" << no_variables() << "\n";
 #endif
 
-  for(std::map<literalt, unsigned>::const_iterator it =
-        pb_constraintmap.begin();
-      it != pb_constraintmap.end();
-      ++it)
-    d_sum += ((*it).second);
+  for(const auto &lit_entry : pb_constraintmap)
+    d_sum += lit_entry.second;
 
   if(!optimize)
   {
@@ -52,7 +49,7 @@ void pbs_dimacs_cnft::write_dimacs_pb(std::ostream &out)
 
   for(const auto &lit_entry : pb_constraintmap)
   {
-    int dimacs_lit = lit_entry.first.dimacs();
+    const int dimacs_lit = lit_entry.first.dimacs();
     out << "v" << dimacs_lit << " c" << lit_entry.second << "\n";
   }
 
@@ -121,7 +118,7 @@ bool pbs_dimacs_cnft::pbs_solve()
 
   command += " -a > temp.out";
 
-  int res = system(command.c_str());
+  const int res = system(command.c_str());
   CHECK_RETURN(0 == res);
 
   std::ifstream file("temp.out");
@@ -224,7 +221,7 @@ propt::resultt pbs_dimacs_cnft::prop_solve()
   messaget::status() << (no_variables() - 1) << " variables, " << clauses.size()
                      << " clauses" << eom;
 
-  bool result = pbs_solve();
+  const bool result = pbs_solve();
 
   if(!result)
   {
@@ -252,7 +249,7 @@ tvt pbs_dimacs_cnft::l_get(literalt a) const
   std::cout << a << " / " << dimacs_lit << "=";
 #endif
 
-  bool neg = (dimacs_lit < 0);
+  const bool neg = (dimacs_lit < 0);
   if(neg)
     dimacs_lit = -dimacs_lit;
 
