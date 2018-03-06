@@ -144,7 +144,8 @@ symbol_tablet load_java_class(
   cmdlinet command_line;
   // TODO(tkiley): This doesn't do anything as "java-cp-include-files" is an
   // TODO(tkiley): unknown argument. This could be changed by using the
-  // TODO(tkiley): free_form_cmdlinet
+  // TODO(tkiley): free_form_cmdlinet however this causes some tests to fail.
+  // TODO(tkiley): TG-2708 to investigate and fix
   command_line.set("java-cp-include-files", class_path);
   return load_java_class(
     java_class_name, class_path, main, std::move(java_lang), command_line);
