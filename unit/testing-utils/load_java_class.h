@@ -38,4 +38,9 @@ symbol_tablet load_java_class(
   std::unique_ptr<languaget> &&java_lang,
   const cmdlinet &command_line);
 
+symbol_tablet load_java_class_lazy(
+  const std::string &java_class_name,
+  const std::string &class_path,
+  const std::string &main);
+
 #endif // CPROVER_TESTING_UTILS_LOAD_JAVA_CLASS_H
