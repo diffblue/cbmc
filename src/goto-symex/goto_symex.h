@@ -53,7 +53,8 @@ public:
     const symbol_tablet &outer_symbol_table,
     symex_target_equationt &_target,
     path_storaget &path_storage)
-    : total_vccs(0),
+    : should_pause_symex(false),
+      total_vccs(0),
       remaining_vccs(0),
       constant_propagation(true),
       language_mode(),
@@ -158,6 +159,15 @@ public:
     const get_goto_functiont &get_goto_function,
     goto_programt::const_targett first,
     goto_programt::const_targett limit);
+
+  /// \brief Have states been pushed onto the workqueue?
+  ///
+  /// If this flag is set at the end of a symbolic execution run, it means that
+  /// symex has been paused because we encountered a GOTO instruction while
+  /// doing path exploration, and thus pushed the successor states of the GOTO
+  /// onto path_storage. The symbolic execution caller should now choose which
+  /// successor state to continue executing, and resume symex from that state.
+  bool should_pause_symex;
 
 protected:
   /// Initialise the symbolic execution and the given state with <code>pc</code>

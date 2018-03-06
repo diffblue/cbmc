@@ -152,7 +152,7 @@ void goto_symext::symex_goto(statet &state)
   // new_state_pc for later. But if we're executing from a saved state, then
   // new_state_pc should be the state that we saved from earlier, so let's
   // execute that instead.
-  if(state.has_saved_target)
+  if(state.has_saved_jump_target)
   {
     INVARIANT(
       new_state_pc == state.saved_target,
@@ -170,28 +170,45 @@ void goto_symext::symex_goto(statet &state)
     new_state_pc = state_pc;
     state_pc = tmp;
 
-    log.debug() << "Resuming from '" << state_pc->source_location << "'"
-                << log.eom;
+    log.debug() << "Resuming from jump target '" << state_pc->source_location
+                << "'" << log.eom;
+  }
+  else if(state.has_saved_next_instruction)
+  {
+    log.debug() << "Resuming from next instruction '"
+                << state_pc->source_location << "'" << log.eom;
   }
   else if(options.get_bool_option("paths"))
   {
-    // At this point, `state_pc` is the instruction we should execute
-    // immediately, and `new_state_pc` is the instruction that we should execute
-    // later (after we've finished exploring this branch). For path-based
-    // exploration, save `new_state_pc` to the saved state that we will resume
-    // executing from, so that goto_symex::symex_goto() knows that we've already
-    // explored the branch starting from `state_pc` when it is later called at
-    // this branch.
-    path_storaget::patht branch_point(target, state);
-    branch_point.state.saved_target = new_state_pc;
-    branch_point.state.has_saved_target = true;
+    // We should save both the instruction after this goto, and the target of
+    // the goto.
+
+    path_storaget::patht next_instruction(target, state);
+    next_instruction.state.saved_target = state_pc;
+    next_instruction.state.has_saved_next_instruction = true;
+    next_instruction.state.saved_target_is_backwards = !forward;
+
+    path_storaget::patht jump_target(target, state);
+    jump_target.state.saved_target = new_state_pc;
+    jump_target.state.has_saved_jump_target = true;
     // `forward` tells us where the branch we're _currently_ executing is
     // pointing to; this needs to be inverted for the branch that we're saving,
     // so let its truth value for `backwards` be the same as ours for `forward`.
-    branch_point.state.saved_target_is_backwards = forward;
-    path_storage.push(branch_point);
-    log.debug() << "Saving '" << new_state_pc->source_location << "'"
+    jump_target.state.saved_target_is_backwards = forward;
+
+    log.debug() << "Saving next instruction '"
+                << next_instruction.state.saved_target->source_location << "'"
                 << log.eom;
+    log.debug() << "Saving jump target '"
+                << jump_target.state.saved_target->source_location << "'"
+                << log.eom;
+    path_storage.push(next_instruction, jump_target);
+
+    // It is now up to the caller of symex to decide which path to continue
+    // executing. Signal to the caller that states have been pushed (therefore
+    // symex has not yet completed and must be resumed), and bail out.
+    should_pause_symex = true;
+    return;
   }
 
   // put into state-queue
@@ -242,7 +259,7 @@ void goto_symext::symex_goto(statet &state)
       state.rename(guard_expr, ns);
     }
 
-    if(state.has_saved_target)
+    if(state.has_saved_jump_target)
     {
       if(forward)
         state.guard.add(guard_expr);

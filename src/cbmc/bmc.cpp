@@ -342,6 +342,9 @@ safety_checkert::resultt bmct::execute(
     const goto_functionst &goto_functions =
       goto_model.get_goto_functions();
 
+    if(symex.should_pause_symex)
+      return safety_checkert::resultt::PAUSED;
+
     // This provides the driver program the opportunity to do things like a
     // symbol-table or goto-functions dump instead of actually running the
     // checker, like show-vcc except driver-program specific.
@@ -602,9 +605,10 @@ int bmct::do_language_agnostic_bmc(
   std::function<void(bmct &, const symbol_tablet &)> driver_configure_bmc,
   std::function<bool(void)> callback_after_symex)
 {
+  safety_checkert::resultt final_result = safety_checkert::resultt::UNKNOWN;
+  safety_checkert::resultt tmp_result = safety_checkert::resultt::UNKNOWN;
   const symbol_tablet &symbol_table = model.get_symbol_table();
   message_handlert &mh = message.get_message_handler();
-  safety_checkert::resultt result;
   std::unique_ptr<path_storaget> worklist =
     path_storaget::make(path_storaget::disciplinet::FIFO);
   try
@@ -619,7 +623,9 @@ int bmct::do_language_agnostic_bmc(
       bmc.set_ui(ui);
       if(driver_configure_bmc)
         driver_configure_bmc(bmc, symbol_table);
-      result = bmc.run(model);
+      tmp_result = bmc.run(model);
+      if(tmp_result != safety_checkert::resultt::PAUSED)
+        final_result = tmp_result;
     }
     INVARIANT(
       opts.get_bool_option("paths") || worklist->empty(),
@@ -628,8 +634,8 @@ int bmct::do_language_agnostic_bmc(
         std::to_string(worklist->size()) + " unexplored branches.");
 
     // When model checking, the bmc.run() above will already have explored
-    // the entire program, and result contains the verification result. The
-    // worklist (containing paths that have not yet been explored) is thus
+    // the entire program, and final_result contains the verification result.
+    // The worklist (containing paths that have not yet been explored) is thus
     // empty, and we don't enter this loop.
     //
     // When doing path exploration, there will be some saved paths left to
@@ -644,10 +650,11 @@ int bmct::do_language_agnostic_bmc(
 
     while(!worklist->empty())
     {
-      message.status() << "___________________________\n"
-                       << "Starting new path (" << worklist->size()
-                       << " to go)\n"
-                       << message.eom;
+      if(tmp_result != safety_checkert::resultt::PAUSED)
+        message.status() << "___________________________\n"
+                         << "Starting new path (" << worklist->size()
+                         << " to go)\n"
+                         << message.eom;
       cbmc_solverst solvers(opts, symbol_table, message.get_message_handler());
       solvers.set_ui(ui);
       std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
@@ -665,7 +672,9 @@ int bmct::do_language_agnostic_bmc(
         callback_after_symex);
       if(driver_configure_bmc)
         driver_configure_bmc(pe, symbol_table);
-      result &= pe.run(model);
+      tmp_result = pe.run(model);
+      if(tmp_result != safety_checkert::resultt::PAUSED)
+        final_result &= tmp_result;
       worklist->pop();
     }
   }
@@ -685,7 +694,7 @@ int bmct::do_language_agnostic_bmc(
     throw std::current_exception();
   }
 
-  switch(result)
+  switch(final_result)
   {
   case safety_checkert::resultt::SAFE:
     return CPROVER_EXIT_VERIFICATION_SAFE;
@@ -693,6 +702,10 @@ int bmct::do_language_agnostic_bmc(
     return CPROVER_EXIT_VERIFICATION_UNSAFE;
   case safety_checkert::resultt::ERROR:
     return CPROVER_EXIT_INTERNAL_ERROR;
+  case safety_checkert::resultt::UNKNOWN:
+    return CPROVER_EXIT_INTERNAL_ERROR;
+  case safety_checkert::resultt::PAUSED:
+    UNREACHABLE;
   }
   UNREACHABLE;
 }

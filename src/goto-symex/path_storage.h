@@ -48,13 +48,29 @@ public:
   virtual ~path_storaget() = default;
 
   /// \brief Reference to the next path to resume
-  virtual patht &peek() = 0;
+  patht &peek()
+  {
+    PRECONDITION(!empty());
+    return private_peek();
+  }
 
-  /// \brief Add a path to resume to the storage
-  virtual void push(const patht &bp) = 0;
+  /// \brief Add paths to resume to the storage
+  ///
+  /// Symbolic execution is suspended when we reach a conditional goto
+  /// instruction with two successors. Thus, we always add a pair of paths to
+  /// the path storage.
+  ///
+  /// \param next_instruction the instruction following the goto instruction
+  /// \param jump_target the target instruction of the goto instruction
+  virtual void
+  push(const patht &next_instruction, const patht &jump_target) = 0;
 
   /// \brief Remove the next path to resume from the storage
-  virtual void pop() = 0;
+  void pop()
+  {
+    PRECONDITION(!empty());
+    private_pop();
+  }
 
   /// \brief How many paths does this storage contain?
   virtual std::size_t size() const = 0;
@@ -64,19 +80,27 @@ public:
   {
     return size() == 0;
   };
+
+private:
+  // Derived classes should override these methods, allowing the base class to
+  // enforce preconditions.
+  virtual patht &private_peek() = 0;
+  virtual void private_pop() = 0;
 };
 
 /// \brief FIFO save queue: paths are resumed in the order that they were saved
 class path_fifot : public path_storaget
 {
 public:
-  patht &peek() override;
-  void push(const patht &bp) override;
-  void pop() override;
+  void push(const patht &, const patht &) override;
   std::size_t size() const override;
 
 protected:
   std::list<patht> paths;
+
+private:
+  patht &private_peek() override;
+  void private_pop() override;
 };
 
 #endif /* CPROVER_GOTO_SYMEX_PATH_STORAGE_H */

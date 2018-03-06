@@ -19,17 +19,20 @@ path_storaget::make(path_storaget::disciplinet discipline)
   UNREACHABLE;
 }
 
-path_storaget::patht &path_fifot::peek()
+path_storaget::patht &path_fifot::private_peek()
 {
   return paths.front();
 }
 
-void path_fifot::push(const path_storaget::patht &bp)
+void path_fifot::push(
+  const path_storaget::patht &next_instruction,
+  const path_storaget::patht &jump_target)
 {
-  paths.push_back(bp);
+  paths.push_back(next_instruction);
+  paths.push_back(jump_target);
 }
 
-void path_fifot::pop()
+void path_fifot::private_pop()
 {
   paths.pop_front();
 }

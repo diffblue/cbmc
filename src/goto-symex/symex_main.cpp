@@ -149,6 +149,8 @@ void goto_symext::symex_threaded_step(
   statet &state, const get_goto_functiont &get_goto_function)
 {
   symex_step(get_goto_function, state);
+  if(should_pause_symex)
+    return;
 
   // is there another thread to execute?
   if(state.call_stack().empty() &&
@@ -197,10 +199,15 @@ void goto_symext::symex_with_state(
   PRECONDITION(state.top().end_of_function->is_end_function());
 
   symex_threaded_step(state, get_goto_function);
+  if(should_pause_symex)
+    return;
   while(!state.call_stack().empty())
   {
-    state.has_saved_target = false;
+    state.has_saved_jump_target = false;
+    state.has_saved_next_instruction = false;
     symex_threaded_step(state, get_goto_function);
+    if(should_pause_symex)
+      return;
   }
 
   // Clients may need to construct a namespace with both the names in
@@ -227,7 +234,6 @@ void goto_symext::resume_symex_from_saved_state(
   // its equation member point to the (valid) equation passed as an argument.
   statet state(saved_state, saved_equation);
 
-  symex_transition(state, state.source.pc);
   // Do NOT do the same initialization that `symex_with_state` does for a
   // fresh state, as that would clobber the saved state's program counter
   symex_with_state(

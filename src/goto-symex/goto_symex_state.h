@@ -372,7 +372,13 @@ public:
   incremental_dirtyt dirty;
 
   goto_programt::const_targett saved_target;
-  bool has_saved_target;
+
+  /// \brief This state is saved, with the PC pointing to the target of a GOTO
+  bool has_saved_jump_target;
+
+  /// \brief This state is saved, with the PC pointing to the next instruction
+  /// of a GOTO
+  bool has_saved_next_instruction;
   bool saved_target_is_backwards;
 
 private:
