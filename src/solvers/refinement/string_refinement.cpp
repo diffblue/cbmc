@@ -2254,6 +2254,12 @@ exprt string_refinementt::get(const exprt &expr) const
   {
     array_string_exprt &arr = to_array_string_expr(ecopy);
     arr.length() = generator.array_pool.get_length(arr);
+
+    if(
+      const auto from_dependencies =
+        dependencies.eval(arr, [&](const exprt &expr) { return get(expr); }))
+      return *from_dependencies;
+
     const auto arr_model_opt =
       get_array(super_get, ns, generator.max_string_length, debug(), arr);
     // \todo Refactor with get array in model
