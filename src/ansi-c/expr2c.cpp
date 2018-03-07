@@ -944,6 +944,26 @@ std::string expr2ct::convert_with(
   return dest;
 }
 
+std::string expr2ct::convert_let(
+  const let_exprt &src,
+  unsigned precedence)
+{
+  if(src.operands().size()<3)
+    return convert_norep(src, precedence);
+
+  unsigned p0;
+  std::string op0=convert_with_precedence(src.op0(), p0);
+
+  std::string dest="LET ";
+  dest+=convert(src.symbol());
+  dest+='=';
+  dest+=convert(src.value());
+  dest+=" IN ";
+  dest+=convert(src.where());
+
+  return dest;
+}
+
 std::string expr2ct::convert_update(
   const exprt &src,
   unsigned precedence)
@@ -3935,6 +3955,9 @@ std::string expr2ct::convert_with_precedence(
 
   else if(src.id()==ID_sizeof)
     return convert_sizeof(src, precedence);
+
+  else if(src.id()==ID_let)
+    return convert_let(to_let_expr(src), precedence=16);
 
   else if(src.id()==ID_type)
     return convert(src.type());

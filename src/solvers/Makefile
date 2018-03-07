@@ -125,6 +125,7 @@ SRC = $(BOOLEFORCE_SRC) \
       flattening/boolbv_ieee_float_rel.cpp \
       flattening/boolbv_if.cpp \
       flattening/boolbv_index.cpp \
+      flattening/boolbv_let.cpp \
       flattening/boolbv_map.cpp \
       flattening/boolbv_member.cpp \
       flattening/boolbv_mod.cpp \
