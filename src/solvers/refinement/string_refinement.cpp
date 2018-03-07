@@ -257,18 +257,23 @@ static std::vector<exprt> generate_instantiations(
 /// \param expr: an expression possibly containing function applications
 /// \param generator: generator for the string constraints
 /// \return an expression containing no function application
-static exprt substitute_function_applications(
-  exprt expr,
+static void substitute_function_applications(
+  exprt &expr,
   string_constraint_generatort &generator)
 {
-  for(auto &operand : expr.operands())
-    operand = substitute_function_applications(operand, generator);
-
-  if(expr.id() == ID_function_application)
-    return generator.add_axioms_for_function_application(
-      to_function_application_expr(expr));
-
-  return expr;
+  for(auto it = expr.depth_begin(), itend = expr.depth_end();
+      it != itend;) // No ++it
+  {
+    if(it->id() == ID_function_application)
+    {
+      it.mutate() =
+        generator.add_axioms_for_function_application(
+          to_function_application_expr(expr));
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
+  }
 }
 
 /// Remove functions applications and create the necessary axioms.
@@ -280,7 +285,7 @@ static void substitute_function_applications_in_equations(
   string_constraint_generatort &generator)
 {
   for(auto &eq : equations)
-    eq.rhs() = substitute_function_applications(eq.rhs(), generator);
+    substitute_function_applications(eq.rhs(), generator);
 }
 
 /// For now, any unsigned bitvector type of width smaller or equal to 16 is
