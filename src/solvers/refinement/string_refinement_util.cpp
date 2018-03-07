@@ -256,11 +256,11 @@ static void add_unknown_dependency_to_string_subexprs(
   {
     std::for_each(
       expr.depth_begin(), expr.depth_end(), [&](const exprt &e) { // NOLINT
-        const auto &string_struct = expr_try_dynamic_cast<struct_exprt>(e);
-        if(string_struct && string_struct->operands().size() == 2)
+        if(is_refined_string_type(e.type()))
         {
+          const auto &string_struct = expr_checked_cast<struct_exprt>(e);
           const array_string_exprt string =
-            array_pool.find(string_struct->op1(), string_struct->op0());
+            array_pool.find(string_struct.op1(), string_struct.op0());
           dependencies.add_unknown_dependency(string);
         }
       });
@@ -290,9 +290,10 @@ static void add_dependency_to_string_subexprs(
       expr.depth_begin(),
       expr.depth_end(),
       [&](const exprt &e) { // NOLINT
-        if(const auto structure = expr_try_dynamic_cast<struct_exprt>(e))
+        if(is_refined_string_type(e.type()))
         {
-          const array_string_exprt string = array_pool.of_argument(*structure);
+          const auto string_struct = expr_checked_cast<struct_exprt>(e);
+          const auto string = array_pool.of_argument(string_struct);
           dependencies.add_dependency(string, builtin_function_node);
         }
       });
