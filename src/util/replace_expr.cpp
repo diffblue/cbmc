@@ -6,41 +6,46 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include "replace_expr.h"
+#include "expr_iterator.h"
 
 bool replace_expr(const exprt &what, const exprt &by, exprt &dest)
 {
-  if(dest==what)
+  bool no_change = true;
+
+  for(auto it = dest.depth_begin(), itend = dest.depth_end();
+      it != itend;) // no ++it
   {
-    dest=by;
-    return false;
+    if(*it == what)
+    {
+      it.mutate() = by;
+      no_change = false;
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
   }
 
-  bool result=true;
-
-  Forall_operands(it, dest)
-    result=replace_expr(what, by, *it) && result;
-
-  return result;
+  return no_change;
 }
 
 bool replace_expr(const replace_mapt &what, exprt &dest)
 {
-  {
-    replace_mapt::const_iterator it=what.find(dest);
+  bool no_change = true;
 
-    if(it!=what.end())
+  for(auto it = dest.depth_begin(), itend = dest.depth_end();
+      it != itend;) // No ++it
+  {
+    replace_mapt::const_iterator findit = what.find(*it);
+    if(findit != what.end())
     {
-      dest=it->second;
-      return false;
+      it.mutate() = findit->second;
+      no_change = false;
+      it.next_sibling_or_parent();
     }
+    else
+      ++it;
   }
 
-  bool result=true;
-
-  Forall_operands(it, dest)
-    result=replace_expr(what, *it) && result;
-
-  return result;
+  return no_change;
 }
