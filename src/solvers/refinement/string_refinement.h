@@ -85,6 +85,8 @@ private:
 
   std::vector<equal_exprt> equations;
 
+  string_dependenciest dependencies;
+
   void add_lemma(const exprt &lemma, bool simplify_lemma = true);
 };
 

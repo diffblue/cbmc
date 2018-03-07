@@ -679,12 +679,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
 #ifdef DEBUG
   output_equations(debug(), equations, ns);
+#endif
 
-  string_dependenciest dependencies;
+  debug() << "dec_solve: compute dependency graph:" << eom;
   for(const equal_exprt &eq : equations)
     add_node(dependencies, eq, generator.array_pool);
 
-  debug() << "dec_solve: dependence graph:" << eom;
+#ifdef DEBUG
   dependencies.output_dot(debug());
 #endif
 
