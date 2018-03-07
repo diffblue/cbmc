@@ -16,7 +16,18 @@
 #include <util/expr_iterator.h>
 #include <util/graph.h>
 #include <util/magic.h>
+#include <util/make_unique.h>
 #include "string_refinement_util.h"
+
+/// Get the valuation of the string, given a valuation
+static optionalt<std::vector<mp_integer>> eval_string(
+  const array_string_exprt &a,
+  const std::function<exprt(const exprt &)> &get_value);
+
+/// Make a string from a constant array
+static array_string_exprt make_string(
+  const std::vector<mp_integer> &array,
+  const array_typet &array_type);
 
 bool is_char_type(const typet &type)
 {
@@ -175,6 +186,119 @@ string_insertion_builtin_functiont::string_insertion_builtin_functiont(
   args.insert(args.end(), fun_args.begin() + 4, fun_args.end());
 }
 
+optionalt<std::vector<mp_integer>> eval_string(
+  const array_string_exprt &a,
+  const std::function<exprt(const exprt &)> &get_value)
+{
+  if(a.id() == ID_if)
+  {
+    const if_exprt &ite = to_if_expr(a);
+    const exprt cond = get_value(ite.cond());
+    if(!cond.is_constant())
+      return {};
+    return cond.is_true()
+             ? eval_string(to_array_string_expr(ite.true_case()), get_value)
+             : eval_string(to_array_string_expr(ite.false_case()), get_value);
+  }
+
+  const auto size = numeric_cast<std::size_t>(get_value(a.length()));
+  const exprt content = get_value(a.content());
+  const auto &array = expr_try_dynamic_cast<array_exprt>(content);
+  if(!size || !array)
+    return {};
+
+  const auto &ops = array->operands();
+  INVARIANT(*size == ops.size(), "operands size should match string size");
+
+  std::vector<mp_integer> result;
+  const mp_integer unknown('?');
+  const auto &insert = std::back_inserter(result);
+  std::transform(
+    ops.begin(), ops.end(), insert, [unknown](const exprt &e) { // NOLINT
+      if(const auto i = numeric_cast<mp_integer>(e))
+        return *i;
+      return unknown;
+    });
+  return result;
+}
+
+array_string_exprt
+make_string(const std::vector<mp_integer> &array, const array_typet &array_type)
+{
+  const typet &char_type = array_type.subtype();
+  array_exprt array_expr(array_type);
+  const auto &insert = std::back_inserter(array_expr.operands());
+  std::transform(
+    array.begin(), array.end(), insert, [&](const mp_integer &i) { // NOLINT
+      return from_integer(i, char_type);
+    });
+  return to_array_string_expr(array_expr);
+}
+
+std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
+  const std::vector<mp_integer> &input1_value,
+  const std::vector<mp_integer> &input2_value,
+  const std::vector<mp_integer> &args_value) const
+{
+  const std::size_t start_index =
+    args_value.size() > 0 && args_value[0] > 0 ? args_value[0].to_ulong() : 0;
+  const std::size_t end_index = args_value.size() > 1 && args_value[1] > 0
+                                  ? args_value[1].to_ulong()
+                                  : input2_value.size();
+
+  std::vector<mp_integer> result(input1_value);
+  result.insert(
+    result.end(),
+    input2_value.begin() + start_index,
+    input2_value.begin() + end_index);
+  return result;
+}
+
+std::vector<mp_integer> string_insertion_builtin_functiont::eval(
+  const std::vector<mp_integer> &input1_value,
+  const std::vector<mp_integer> &input2_value,
+  const std::vector<mp_integer> &args_value) const
+{
+  PRECONDITION(args_value.size() >= 1 || args_value.size() <= 3);
+  const std::size_t &offset = numeric_cast_v<std::size_t>(args_value[0]);
+  const std::size_t &start =
+    args_value.size() > 1 ? numeric_cast_v<std::size_t>(args_value[1]) : 0;
+  const std::size_t &end = args_value.size() > 2
+                             ? numeric_cast_v<std::size_t>(args_value[2])
+                             : input2_value.size();
+
+  std::vector<mp_integer> result(input1_value);
+  result.insert(
+    result.begin() + offset,
+    input2_value.begin() + start,
+    input2_value.end() + end);
+  return result;
+}
+
+optionalt<exprt> string_insertion_builtin_functiont::eval(
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  const auto &input1_value = eval_string(input1, get_value);
+  const auto &input2_value = eval_string(input2, get_value);
+  if(!input2_value.has_value() || !input1_value.has_value())
+    return {};
+
+  std::vector<mp_integer> arg_values;
+  const auto &insert = std::back_inserter(arg_values);
+  const mp_integer unknown('?');
+  std::transform(
+    args.begin(), args.end(), insert, [&](const exprt &e) { // NOLINT
+      if(const auto val = numeric_cast<mp_integer>(get_value(e)))
+        return *val;
+      return unknown;
+    });
+
+  const auto result_value = eval(*input1_value, *input2_value, arg_values);
+  const auto length = from_integer(result_value.size(), result.length().type());
+  const array_typet type(result.type().subtype(), length);
+  return make_string(result_value, type);
+}
+
 /// Construct a string_builtin_functiont object from a function application
 /// \return a unique pointer to the created object, this unique pointer is empty
 ///   if the function does not correspond to one of the supported
@@ -192,8 +316,8 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
       new string_insertion_builtin_functiont(fun_app.arguments(), array_pool));
 
   if(id == ID_cprover_string_concat_func)
-    return std::unique_ptr<string_builtin_functiont>(
-      new string_insertion_builtin_functiont(fun_app.arguments(), array_pool));
+    return util_make_unique<string_concatenation_builtin_functiont>(
+      fun_app.arguments(), array_pool);
 
   return {};
 }

@@ -157,6 +157,9 @@ public:
   {
     return {};
   }
+
+  virtual optionalt<exprt>
+  eval(const std::function<exprt(const exprt &)> &get_value) const = 0;
 };
 
 /// String builtin_function transforming one string into another
@@ -200,6 +203,32 @@ public:
   {
     return {input1, input2};
   }
+
+  /// Evaluate the result from a concrete valuation of the arguments
+  virtual std::vector<mp_integer> eval(
+    const std::vector<mp_integer> &input1_value,
+    const std::vector<mp_integer> &input2_value,
+    const std::vector<mp_integer> &args_value) const;
+
+  optionalt<exprt>
+  eval(const std::function<exprt(const exprt &)> &get_value) const override;
+};
+
+class string_concatenation_builtin_functiont final
+  : public string_insertion_builtin_functiont
+{
+public:
+  string_concatenation_builtin_functiont(
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool)
+    : string_insertion_builtin_functiont(fun_args, array_pool)
+  {
+  }
+
+  std::vector<mp_integer> eval(
+    const std::vector<mp_integer> &input1_value,
+    const std::vector<mp_integer> &input2_value,
+    const std::vector<mp_integer> &args_value) const override;
 };
 
 /// String creation from other types
