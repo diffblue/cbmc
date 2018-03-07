@@ -1893,10 +1893,18 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       optionalt<lambda_method_handlet> lambda_method_handle =
         parse_method_handle(method_handle_infot{method_handle_argument});
 
-      if(
-        !lambda_method_handle.has_value() ||
+      if(!lambda_method_handle.has_value())
+      {
+        lambda_method_handlet lambda_method_handle;
+        lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
+        lambda_method_handle.u2_values = std::move(u2_values);
+        parsed_class.lambda_method_handle_map[{parsed_class.name, i}] =
+          lambda_method_handle;
+        return;
+      }
+      else if(
         lambda_method_handle->handle_type !=
-          method_handle_typet::LAMBDA_METHOD_HANDLE)
+        method_handle_typet::LAMBDA_METHOD_HANDLE)
       {
         lambda_method_handle->u2_values = std::move(u2_values);
         error() << "ERROR: could not parse lambda function method handle"
