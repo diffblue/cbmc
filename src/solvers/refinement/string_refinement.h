@@ -44,10 +44,11 @@ private:
   };
 public:
   /// string_refinementt constructor arguments
-  struct infot:
-    public bv_refinementt::infot,
-    public string_constraint_generatort::infot,
-    public configt { };
+  struct infot : public bv_refinementt::infot,
+                 public string_constraint_generatort::infot,
+                 public configt
+  {
+  };
 
   explicit string_refinementt(const infot &);
 

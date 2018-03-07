@@ -1862,7 +1862,7 @@ static exprt compute_inverse_function(
   return sum_over_map(elems, f.type(), neg);
 }
 
-class find_qvar_visitort: public const_expr_visitort
+class find_qvar_visitort : public const_expr_visitort
 {
 private:
   const exprt &qvar_;
