@@ -306,6 +306,12 @@ public:
   /// Mark node for `e` as depending on unknown builtin_function
   void add_unknown_dependency(const array_string_exprt &e);
 
+  /// Attempt to evaluate the given string from the dependencies and valuation
+  /// of strings on which it depends
+  optionalt<exprt> eval(
+    const array_string_exprt &s,
+    const std::function<exprt(const exprt &)> &get_value) const;
+
   void output_dot(std::ostream &stream) const;
 
 private:

@@ -481,6 +481,21 @@ string_dependenciest::get_string_node(node_indext i) const
   return {};
 }
 
+optionalt<exprt> string_dependenciest::eval(
+  const array_string_exprt &s,
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  const auto node = node_at(s);
+  if(node && node->dependencies.size() == 1)
+  {
+    const auto &f = get_builtin_function(node->dependencies[0]);
+    const auto result = f.string_result();
+    if(result && *result == s)
+      return f.eval(get_value);
+  }
+  return {};
+}
+
 bool add_node(
   string_dependenciest &dependencies,
   const equal_exprt &equation,
