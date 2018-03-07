@@ -10,6 +10,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 
+const char gcc_builtin_headers_types[]=
+"# 1 \"gcc_builtin_headers_types.h\"\n"
+#include "gcc_builtin_headers_types.inc"
+; // NOLINT(whitespace/semicolon)
+
 const char gcc_builtin_headers_generic[]=
 "# 1 \"gcc_builtin_headers_generic.h\"\n"
 #include "gcc_builtin_headers_generic.inc"
@@ -88,6 +93,10 @@ const char clang_builtin_headers[]=
 "# 1 \"clang_builtin_headers.h\"\n"
 #include "clang_builtin_headers.inc"
 ; // NOLINT(whitespace/semicolon)
+
+const char windows_builtin_headers[]=
+  "int __noop();\n"
+  "int __assume(int);\n";
 
 static std::string architecture_string(const std::string &value, const char *s)
 {
@@ -257,13 +266,7 @@ void ansi_c_internal_additions(std::string &code)
      config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE ||
      config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
   {
-    code+=gcc_builtin_headers_generic;
-    code+=gcc_builtin_headers_math;
-    code+=gcc_builtin_headers_mem_string;
-    code+=gcc_builtin_headers_omp;
-    code+=gcc_builtin_headers_tm;
-    code+=gcc_builtin_headers_ubsan;
-    code+=clang_builtin_headers;
+    code+=gcc_builtin_headers_types;
 
     // there are many more, e.g., look at
     // https://developer.apple.com/library/mac/#documentation/developertools/gcc-4.0.1/gcc/Target-Builtins.html
@@ -274,37 +277,6 @@ void ansi_c_internal_additions(std::string &code)
     {
       if(config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE)
         code+="typedef double __float128;\n"; // clang doesn't do __float128
-
-      code+=gcc_builtin_headers_ia32;
-      code+=gcc_builtin_headers_ia32_2;
-      code+=gcc_builtin_headers_ia32_3;
-      code+=gcc_builtin_headers_ia32_4;
-    }
-    else if(config.ansi_c.arch=="arm64" ||
-            config.ansi_c.arch=="armel" ||
-            config.ansi_c.arch=="armhf" ||
-            config.ansi_c.arch=="arm")
-    {
-      code+=gcc_builtin_headers_arm;
-    }
-    else if(config.ansi_c.arch=="alpha")
-    {
-      code+=gcc_builtin_headers_alpha;
-    }
-    else if(config.ansi_c.arch=="mips64el" ||
-            config.ansi_c.arch=="mipsn32el" ||
-            config.ansi_c.arch=="mipsel" ||
-            config.ansi_c.arch=="mips64" ||
-            config.ansi_c.arch=="mipsn32" ||
-            config.ansi_c.arch=="mips")
-    {
-      code+=gcc_builtin_headers_mips;
-    }
-    else if(config.ansi_c.arch=="powerpc" ||
-            config.ansi_c.arch=="ppc64" ||
-            config.ansi_c.arch=="ppc64le")
-    {
-      code+=gcc_builtin_headers_power;
     }
 
     // On 64-bit systems, gcc has typedefs

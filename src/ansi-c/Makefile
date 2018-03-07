@@ -10,6 +10,7 @@ SRC = anonymous_member.cpp \
       ansi_c_scope.cpp \
       ansi_c_typecheck.cpp \
       ansi_c_y.tab.cpp \
+      builtin_factory.cpp \
       c_misc.cpp \
       c_nondet_symbol_factory.cpp \
       c_preprocess.cpp \
@@ -43,20 +44,32 @@ INCLUDES= -I ..
 include ../config.inc
 include ../common
 
+BUILTIN_FILES = \
+  arm_builtin_headers.inc \
+  clang_builtin_headers.inc \
+  cw_builtin_headers.inc \
+  gcc_builtin_headers_alpha.inc \
+  gcc_builtin_headers_arm.inc \
+  gcc_builtin_headers_generic.inc \
+  gcc_builtin_headers_ia32-2.inc \
+  gcc_builtin_headers_ia32-3.inc \
+  gcc_builtin_headers_ia32-4.inc \
+  gcc_builtin_headers_ia32.inc \
+  gcc_builtin_headers_math.inc \
+  gcc_builtin_headers_mem_string.inc \
+  gcc_builtin_headers_mips.inc \
+  gcc_builtin_headers_omp.inc \
+  gcc_builtin_headers_power.inc \
+  gcc_builtin_headers_tm.inc \
+  gcc_builtin_headers_types.inc \
+  gcc_builtin_headers_ubsan.inc
+
 CLEANFILES = ansi-c$(LIBEXT) \
   ansi_c_y.tab.h ansi_c_y.tab.cpp ansi_c_lex.yy.cpp ansi_c_y.tab.cpp.output \
   ansi_c_y.output \
   library/converter$(EXEEXT) cprover_library.inc \
   file_converter$(EXEEXT) library_check \
-  gcc_builtin_headers_generic.inc gcc_builtin_headers_ia32.inc \
-  arm_builtin_headers.inc cw_builtin_headers.inc \
-  gcc_builtin_headers_arm.inc gcc_builtin_headers_alpha.inc \
-  gcc_builtin_headers_mips.inc gcc_builtin_headers_power.inc \
-	clang_builtin_headers.inc gcc_builtin_headers_ia32-2.inc \
-  gcc_builtin_headers_math.inc gcc_builtin_headers_omp.inc \
-  gcc_builtin_headers_tm.inc gcc_builtin_headers_ubsan.inc \
-  gcc_builtin_headers_mem_string.inc \
-  gcc_builtin_headers_ia32-3.inc gcc_builtin_headers_ia32-4.inc
+  $(BUILTIN_FILES)
 
 all: ansi-c$(LIBEXT)
 
@@ -102,34 +115,12 @@ cprover_library.inc: library/converter$(EXEEXT) library/*.c
 
 cprover_library.cpp: cprover_library.inc
 
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_generic.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_ia32.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_ia32-2.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_ia32-3.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_ia32-4.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_alpha.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_arm.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_math.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_mem_string.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_mips.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_omp.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_power.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_tm.inc
-ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_ubsan.inc
-ansi_c_internal_additions$(OBJEXT): arm_builtin_headers.inc
-ansi_c_internal_additions$(OBJEXT): cw_builtin_headers.inc
-ansi_c_internal_additions$(OBJEXT): clang_builtin_headers.inc
+ansi_c_internal_additions$(OBJEXT): $(BUILTIN_FILES)
 
-generated_files: cprover_library.inc gcc_builtin_headers_generic.inc \
-	gcc_builtin_headers_ia32.inc gcc_builtin_headers_alpha.inc \
-	gcc_builtin_headers_arm.inc gcc_builtin_headers_mips.inc \
-	gcc_builtin_headers_power.inc arm_builtin_headers.inc \
-	cw_builtin_headers.inc ansi_c_y.tab.cpp ansi_c_lex.yy.cpp \
-	ansi_c_y.tab.h clang_builtin_headers.inc gcc_builtin_headers_ia32-2.inc \
-  gcc_builtin_headers_math.inc gcc_builtin_headers_omp.inc \
-  gcc_builtin_headers_tm.inc gcc_builtin_headers_ubsan.inc \
-  gcc_builtin_headers_mem_string.inc \
-  gcc_builtin_headers_ia32-3.inc gcc_builtin_headers_ia32-4.inc
+generated_files: \
+        ansi_c_y.tab.cpp ansi_c_lex.yy.cpp ansi_c_y.tab.h \
+        cprover_library.inc \
+        $(BUILTIN_FILES)
 
 ###############################################################################
 

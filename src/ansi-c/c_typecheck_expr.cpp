@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 
+#include "builtin_factory.h"
 #include "c_typecast.h"
 #include "c_qualifiers.h"
 #include "anonymous_member.h"
@@ -1913,35 +1914,45 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 
     if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
     {
-      // This is an undeclared function. Let's just add it.
-      // We do a bit of return-type guessing, but just a bit.
-      typet return_type=signed_int_type();
+      // This is an undeclared function.
+      // Is this a builtin?
+      if(!builtin_factory(identifier, symbol_table, get_message_handler()))
+      {
+        // yes, it's a builtin
+      }
+      else
+      {
+        // This is an undeclared function that's not a builtin.
+        // Let's just add it.
+        // We do a bit of return-type guessing, but just a bit.
+        typet return_type=signed_int_type();
 
-      // The following isn't really right and sound, but there
-      // are too many idiots out there who use malloc and the like
-      // without the right header file.
-      if(identifier=="malloc" ||
-         identifier=="realloc" ||
-         identifier=="reallocf" ||
-         identifier=="valloc")
-        return_type=pointer_type(void_type()); // void *
+        // The following isn't really right and sound, but there
+        // are too many idiots out there who use malloc and the like
+        // without the right header file.
+        if(identifier=="malloc" ||
+           identifier=="realloc" ||
+           identifier=="reallocf" ||
+           identifier=="valloc")
+          return_type=pointer_type(void_type()); // void *
 
-      symbolt new_symbol;
+        symbolt new_symbol;
 
-      new_symbol.name=identifier;
-      new_symbol.base_name=identifier;
-      new_symbol.location=expr.source_location();
-      new_symbol.type=code_typet();
-      new_symbol.type.set(ID_C_incomplete, true);
-      new_symbol.type.add(ID_return_type)=return_type;
+        new_symbol.name=identifier;
+        new_symbol.base_name=identifier;
+        new_symbol.location=expr.source_location();
+        new_symbol.type=code_typet();
+        new_symbol.type.set(ID_C_incomplete, true);
+        new_symbol.type.add(ID_return_type)=return_type;
 
-      // TODO: should also guess some argument types
+        // TODO: should also guess some argument types
 
-      symbolt *symbol_ptr;
-      move_symbol(new_symbol, symbol_ptr);
+        symbolt *symbol_ptr;
+        move_symbol(new_symbol, symbol_ptr);
 
-      warning().source_location=f_op.find_source_location();
-      warning() << "function `" << identifier << "' is not declared" << eom;
+        warning().source_location=f_op.find_source_location();
+        warning() << "function `" << identifier << "' is not declared" << eom;
+      }
     }
   }
 
