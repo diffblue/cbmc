@@ -333,6 +333,15 @@ string_dependenciest::get_node(const array_string_exprt &e)
   return string_nodes.back();
 }
 
+std::unique_ptr<const string_dependenciest::string_nodet>
+string_dependenciest::node_at(const array_string_exprt &e) const
+{
+  const auto &it = node_index_pool.find(e);
+  if(it != node_index_pool.end())
+    return util_make_unique<const string_nodet>(string_nodes.at(it->second));
+  return {};
+}
+
 string_dependenciest::builtin_function_nodet string_dependenciest::make_node(
   std::unique_ptr<string_builtin_functiont> &builtin_function)
 {
