@@ -20,10 +20,10 @@ class ci_lazy_methods_neededt
 {
 public:
   ci_lazy_methods_neededt(
-    std::vector<irep_idt> &_needed_methods,
+    std::vector<irep_idt> &_callable_methods,
     std::set<irep_idt> &_instantiated_classes,
     symbol_tablet &_symbol_table):
-  needed_methods(_needed_methods),
+  callable_methods(_callable_methods),
   instantiated_classes(_instantiated_classes),
   symbol_table(_symbol_table)
   {}
@@ -33,12 +33,12 @@ public:
   bool add_needed_class(const irep_idt &);
 
 private:
-  // needed_methods is a vector because it's used as a work-list
+  // callable_methods is a vector because it's used as a work-list
   // which is periodically cleared. It can't be relied upon to
   // contain all methods that have previously been elaborated.
   // It should be changed to a set if we develop the need to use
   // it that way.
-  std::vector<irep_idt> &needed_methods;
+  std::vector<irep_idt> &callable_methods;
   // instantiated_classes on the other hand is a true set of every class
   // found so far, so we can use a membership test to avoid
   // repeatedly exploring a class hierarchy.
