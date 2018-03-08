@@ -170,6 +170,12 @@ public:
   array_string_exprt input;
   std::vector<exprt> args;
   exprt return_code;
+
+  /// Constructor from arguments of a function application
+  string_transformation_builtin_functiont(
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool);
+
   optionalt<array_string_exprt> string_result() const override
   {
     return result;
@@ -178,6 +184,31 @@ public:
   {
     return {input};
   }
+
+  /// Evaluate the result from a concrete valuation of the arguments
+  virtual std::vector<mp_integer> eval(
+    const std::vector<mp_integer> &input_value,
+    const std::vector<mp_integer> &args_value) const = 0;
+
+  optionalt<exprt>
+  eval(const std::function<exprt(const exprt &)> &get_value) const override;
+};
+
+/// Adding a character at the end of a string
+class string_concat_char_builtin_functiont
+  : public string_transformation_builtin_functiont
+{
+public:
+  string_concat_char_builtin_functiont(
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool)
+    : string_transformation_builtin_functiont(fun_args, array_pool)
+  {
+  }
+
+  std::vector<mp_integer> eval(
+    const std::vector<mp_integer> &input_value,
+    const std::vector<mp_integer> &args_value) const override;
 };
 
 /// String inserting a string into another one

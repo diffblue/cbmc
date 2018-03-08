@@ -173,6 +173,44 @@ equation_symbol_mappingt::find_equations(const exprt &expr)
   return equations_containing[expr];
 }
 
+string_transformation_builtin_functiont::
+  string_transformation_builtin_functiont(
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool)
+{
+  PRECONDITION(fun_args.size() > 2);
+  const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
+  input = array_pool.find(arg1.op1(), arg1.op0());
+  result = array_pool.find(fun_args[1], fun_args[0]);
+  args.insert(args.end(), fun_args.begin() + 3, fun_args.end());
+}
+
+optionalt<exprt> string_transformation_builtin_functiont::eval(
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  const auto &input_value = eval_string(input, get_value);
+  if(!input_value.has_value())
+    return {};
+
+  std::vector<mp_integer> arg_values;
+  const auto &insert = std::back_inserter(arg_values);
+  const mp_integer unknown('?');
+  std::transform(
+    args.begin(), args.end(), insert, [&](const exprt &e) { // NOLINT
+      if(const auto val = numeric_cast<mp_integer>(get_value(e)))
+        return *val;
+      INVARIANT(
+        get_value(e).id() == ID_unknown,
+        "array valuation should only contain constants and unknown");
+      return unknown;
+    });
+
+  const auto result_value = eval(*input_value, arg_values);
+  const auto length = from_integer(result_value.size(), result.length().type());
+  const array_typet type(result.type().subtype(), length);
+  return make_string(result_value, type);
+}
+
 string_insertion_builtin_functiont::string_insertion_builtin_functiont(
   const std::vector<exprt> &fun_args,
   array_poolt &array_pool)
@@ -254,6 +292,16 @@ std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
   return result;
 }
 
+std::vector<mp_integer> string_concat_char_builtin_functiont::eval(
+  const std::vector<mp_integer> &input_value,
+  const std::vector<mp_integer> &args_value) const
+{
+  PRECONDITION(args_value.size() == 1);
+  std::vector<mp_integer> result(input_value);
+  result.push_back(args_value[0]);
+  return result;
+}
+
 std::vector<mp_integer> string_insertion_builtin_functiont::eval(
   const std::vector<mp_integer> &input1_value,
   const std::vector<mp_integer> &input2_value,
@@ -317,6 +365,10 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
 
   if(id == ID_cprover_string_concat_func)
     return util_make_unique<string_concatenation_builtin_functiont>(
+      fun_app.arguments(), array_pool);
+
+  if(id == ID_cprover_string_concat_char_func)
+    return util_make_unique<string_concat_char_builtin_functiont>(
       fun_app.arguments(), array_pool);
 
   return {};
