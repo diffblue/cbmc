@@ -21,10 +21,10 @@ class ci_lazy_methods_neededt
 public:
   ci_lazy_methods_neededt(
     std::vector<irep_idt> &_needed_methods,
-    std::set<irep_idt> &_needed_classes,
+    std::set<irep_idt> &_instantiated_classes,
     symbol_tablet &_symbol_table):
   needed_methods(_needed_methods),
-  needed_classes(_needed_classes),
+  instantiated_classes(_instantiated_classes),
   symbol_table(_symbol_table)
   {}
 
@@ -39,10 +39,10 @@ private:
   // It should be changed to a set if we develop the need to use
   // it that way.
   std::vector<irep_idt> &needed_methods;
-  // needed_classes on the other hand is a true set of every class
+  // instantiated_classes on the other hand is a true set of every class
   // found so far, so we can use a membership test to avoid
   // repeatedly exploring a class hierarchy.
-  std::set<irep_idt> &needed_classes;
+  std::set<irep_idt> &instantiated_classes;
   symbol_tablet &symbol_table;
 };
 
