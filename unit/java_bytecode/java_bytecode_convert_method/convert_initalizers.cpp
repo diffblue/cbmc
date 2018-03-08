@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for converting abstract classes
+ Module: Unit tests for converting constructors and static initializers
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Limited.
 
 \*******************************************************************/
 
@@ -42,8 +42,10 @@ void require_is_constructor(const test_datat &test_data)
 /// Verify that a given descriptor is not marked as a constructor in the symbol
 /// table
 /// \param test_data The data to run the test on
-void require_is_static_initalizer(const test_datat &test_data)
+void require_is_static_initializer(const test_datat &test_data)
 {
+  REQUIRE(
+    test_data.constructor_descriptor.find("<clinit>") != std::string::npos);
   const symbolt &constructor =
     test_data.symbol_table.lookup_ref(test_data.constructor_descriptor);
   THEN("The constructor should be marked as a constructor")
