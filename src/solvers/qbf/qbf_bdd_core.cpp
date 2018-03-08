@@ -14,8 +14,6 @@ Author: CM Wintersteiger
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 
-#include <langapi/language_util.h>
-
 #include <cuddObj.hh> // CUDD Library
 
 /*! \cond */

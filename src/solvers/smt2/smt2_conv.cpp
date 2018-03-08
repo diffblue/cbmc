@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/fixedbv.h>
+#include <util/format_expr.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
@@ -26,8 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/string2int.h>
 #include <util/string_constant.h>
-
-#include <langapi/language_util.h>
 
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/flatten_byte_operators.h>
@@ -2079,9 +2078,10 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else
     {
-      UNEXPECTEDCASE(
-        "TODO typecast2 "+src_type.id_string()+" -> "+
-        dest_type.id_string()+" src == "+from_expr(ns, "", src));
+      std::ostringstream e_str;
+      e_str << src_type.id() << " -> " << dest_type.id()
+            << " src == " << format(src);
+      UNEXPECTEDCASE("TODO typecast2 " + e_str.str());
     }
   }
   else if(dest_type.id()==ID_fixedbv) // to fixedbv
@@ -4087,7 +4087,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
   #if 0
   out << "; CONV: "
-      << from_expr(expr) << "\n";
+      << format(expr) << "\n";
   #endif
 
   out << "; set_to " << (value?"true":"false") << "\n"

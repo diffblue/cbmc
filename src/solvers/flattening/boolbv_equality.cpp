@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/base_type.h>
 
-#include <langapi/language_util.h>
-
 #include "flatten_byte_operators.h"
 
 literalt boolbvt::convert_equality(const equal_exprt &expr)

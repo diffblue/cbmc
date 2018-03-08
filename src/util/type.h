@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_TYPE_H
 #define CPROVER_UTIL_TYPE_H
 
-#include <util/source_location.h>
+#include "source_location.h"
 
 #define SUBTYPE_IN_GETSUB
 #define SUBTYPES_IN_GETSUB

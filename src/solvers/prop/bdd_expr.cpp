@@ -11,10 +11,11 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include "bdd_expr.h"
 
-#include <langapi/language_util.h>
-
 #include <util/std_expr.h>
 #include <util/expr_util.h>
+#include <util/format_expr.h>
+
+#include <sstream>
 
 mini_bddt bdd_exprt::from_expr_rec(const exprt &expr)
 {
@@ -83,8 +84,9 @@ mini_bddt bdd_exprt::from_expr_rec(const exprt &expr)
 
     if(entry.second)
     {
-      std::string s=::from_expr(ns, "", expr);
-      entry.first->second=bdd_mgr.Var(s);
+      std::ostringstream s;
+      s << format(expr);
+      entry.first->second=bdd_mgr.Var(s.str());
 
       node_map.insert(std::make_pair(entry.first->second.var(),
                                      expr));

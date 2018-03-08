@@ -25,8 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/string_constant.h>
 
-#include <langapi/language_util.h>
-
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
 #include <solvers/flattening/flatten_byte_operators.h>
@@ -2765,12 +2763,10 @@ void smt1_convt::set_to(const exprt &expr, bool value)
 
   #if 0
   out << "; CONV: "
-                << from_expr(expr) << "\n";
+                << format(expr) << '\n';
   #endif
 
-  out << ":assumption ; set_to "
-      << (value?"true":"false") << "\n"
-      << " ";
+  out << ":assumption ; set_to " << (value ? "true" : "false") << '\n' << " ";
 
   assert(expr.type().id()==ID_bool);
 

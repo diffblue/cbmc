@@ -9,17 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Expression Representation
 
-#include "arith_tools.h"
 #include "expr.h"
 #include "expr_iterator.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
-#include "invariant.h"
-#include "mp_arith.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "std_expr.h"
-#include "string2int.h"
 
 #include <stack>
 

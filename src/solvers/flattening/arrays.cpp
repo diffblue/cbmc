@@ -8,13 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arrays.h"
 
-#include <langapi/language_util.h>
-
-#include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/arith_tools.h>
 #include <util/base_type.h>
+#include <util/format_expr.h>
 #include <util/namespace.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 #include <solvers/prop/prop.h>
 
@@ -402,10 +401,8 @@ void arrayst::update_index_map(bool update_all)
     for(const auto &index : index_entry.second)
       std::cout << "Index set (" << index_entry.first << " = "
                 << arrays.find_number(index_entry.first) << " = "
-                << from_expr(ns, "",
-                             arrays[arrays.find_number(index_entry.first)])
-                << "): "
-                << from_expr(ns, "", index) << '\n';
+                << format(arrays[arrays.find_number(index_entry.first)])
+                << "): " << format(index) << '\n';
   std::cout << "-----\n";
 #endif
 }

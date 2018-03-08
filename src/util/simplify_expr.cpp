@@ -38,7 +38,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define DEBUGX
 
 #ifdef DEBUGX
-#include <langapi/language_util.h>
 #include <iostream>
 #endif
 
@@ -2344,8 +2343,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
      #endif
      )
   {
-    std::cout << "===== " << from_expr(ns, "", old)
-              << "\n ---> " << from_expr(ns, "", expr)
+    std::cout << "===== " << format(old) << "\n ---> " << format(expr)
               << "\n";
   }
   #endif
@@ -2417,12 +2415,12 @@ bool simplify_exprt::simplify(exprt &expr)
 {
 #ifdef DEBUG_ON_DEMAND
   if(debug_on)
-    std::cout << "TO-SIMP " << from_expr(ns, "", expr) << "\n";
+    std::cout << "TO-SIMP " << format(expr) << "\n";
 #endif
   bool res=simplify_rec(expr);
 #ifdef DEBUG_ON_DEMAND
   if(debug_on)
-    std::cout << "FULLSIMP " << from_expr(ns, "", expr) << "\n";
+    std::cout << "FULLSIMP " << format(expr) << "\n";
 #endif
   return res;
 }
