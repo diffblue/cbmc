@@ -22,10 +22,10 @@
 /// \param main_jar_classes: specify main class of jar if \p main_class is empty
 /// \param lazy_methods_extra_entry_points: entry point functions to use
 /// \param java_class_loader: the Java class loader to use
-/// \param extra_needed_classes: list of class identifiers which are considered
-/// to be required and therefore their methods should not be removed via
-/// `lazy-methods`. Example of use: `ArrayList` as general implementation for
-/// `List` interface.
+/// \param extra_instantiated_classes: list of class identifiers which are
+///   considered to be required and therefore their methods should not be
+///   removed via `lazy-methods`. Example of use: `ArrayList` as general
+///   implementation for `List` interface.
 /// \param pointer_type_selector: selector to handle correct pointer types
 /// \param message_handler: the message handler to use for output
 ci_lazy_methodst::ci_lazy_methodst(
@@ -34,7 +34,7 @@ ci_lazy_methodst::ci_lazy_methodst(
   const std::vector<irep_idt> &main_jar_classes,
   const std::vector<irep_idt> &lazy_methods_extra_entry_points,
   java_class_loadert &java_class_loader,
-  const std::vector<irep_idt> &extra_needed_classes,
+  const std::vector<irep_idt> &extra_instantiated_classes,
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler,
   const synthetic_methods_mapt &synthetic_methods)
@@ -43,7 +43,7 @@ ci_lazy_methodst::ci_lazy_methodst(
     main_jar_classes(main_jar_classes),
     lazy_methods_extra_entry_points(lazy_methods_extra_entry_points),
     java_class_loader(java_class_loader),
-    extra_needed_classes(extra_needed_classes),
+    extra_instantiated_classes(extra_instantiated_classes),
     pointer_type_selector(pointer_type_selector),
     synthetic_methods(synthetic_methods)
 {
@@ -110,22 +110,22 @@ bool ci_lazy_methodst::operator()(
     extra_entry_points.begin(),
     extra_entry_points.end());
 
-  std::set<irep_idt> needed_classes;
+  std::set<irep_idt> instantiated_classes;
 
   {
-    std::vector<irep_idt> initial_needed_methods;
+    std::vector<irep_idt> initial_callable_methods;
     ci_lazy_methods_neededt initial_lazy_methods(
-      initial_needed_methods,
-      needed_classes,
+      initial_callable_methods,
+      instantiated_classes,
       symbol_table);
-    initialize_needed_classes(
+    initialize_instantiated_classes(
       method_worklist2,
       namespacet(symbol_table),
       initial_lazy_methods);
     method_worklist2.insert(
       method_worklist2.end(),
-      initial_needed_methods.begin(),
-      initial_needed_methods.end());
+      initial_callable_methods.begin(),
+      initial_callable_methods.end());
   }
 
   std::set<irep_idt> methods_already_populated;
@@ -146,9 +146,10 @@ bool ci_lazy_methodst::operator()(
         if(
           method_converter(
             mname,
-            // Note this wraps *references* to method_worklist2 & needed_classes
+            // Note this wraps *references* to method_worklist2 &
+            // instantiated_classes
             ci_lazy_methods_neededt(
-              method_worklist2, needed_classes, symbol_table)))
+              method_worklist2, instantiated_classes, symbol_table)))
         {
           // Couldn't convert this function
           continue;
@@ -174,7 +175,7 @@ bool ci_lazy_methodst::operator()(
       // This will also create a stub if a virtual callsite has no targets.
       get_virtual_method_targets(
         *callsite,
-        needed_classes,
+        instantiated_classes,
         method_worklist2,
         symbol_table);
     }
@@ -275,7 +276,7 @@ void ci_lazy_methodst::resolve_method_names(
 /// \param [out] needed_lazy_methods: Populated with all Java reference types
 ///   whose references may be passed, directly or indirectly, to any of the
 ///   functions in `entry_points`.
-void ci_lazy_methodst::initialize_needed_classes(
+void ci_lazy_methodst::initialize_instantiated_classes(
   const std::vector<irep_idt> &entry_points,
   const namespacet &ns,
   ci_lazy_methods_neededt &needed_lazy_methods)
@@ -289,7 +290,7 @@ void ci_lazy_methodst::initialize_needed_classes(
       if(param.type().id()==ID_pointer)
       {
         const pointer_typet &original_pointer=to_pointer_type(param.type());
-        initialize_all_needed_classes_from_pointer(
+        initialize_all_instantiated_classes_from_pointer(
           original_pointer, ns, needed_lazy_methods);
       }
     }
@@ -303,24 +304,27 @@ void ci_lazy_methodst::initialize_needed_classes(
   needed_lazy_methods.add_needed_class("java::java.lang.Object");
 
   // As in class_loader, ensure these classes stay available
-  for(const auto &id : extra_needed_classes)
+  for(const auto &id : extra_instantiated_classes)
     needed_lazy_methods.add_needed_class("java::" + id2string(id));
 }
 
 /// Build up list of methods for types for a pointer and any types it
 /// might be subsituted for. See
-/// `initialize_needed_classes` for more details.
+/// `initialize_instantiated_classes` for more details.
 /// \param pointer_type: The type to gather methods for.
 /// \param ns: global namespace
 /// \param [out] needed_lazy_methods: Populated with all Java reference types
 ///   whose references may be passed, directly or indirectly, to any of the
 ///   functions in `entry_points`
-void ci_lazy_methodst::initialize_all_needed_classes_from_pointer(
+void ci_lazy_methodst::initialize_all_instantiated_classes_from_pointer(
   const pointer_typet &pointer_type,
   const namespacet &ns,
   ci_lazy_methods_neededt &needed_lazy_methods)
 {
-  initialize_needed_classes_from_pointer(pointer_type, ns, needed_lazy_methods);
+  initialize_instantiated_classes_from_pointer(
+    pointer_type,
+    ns,
+    needed_lazy_methods);
 
   // TODO we should be passing here a map that maps generic parameters
   // to concrete types in the current context TG-2664
@@ -329,19 +333,19 @@ void ci_lazy_methodst::initialize_all_needed_classes_from_pointer(
 
   if(subbed_pointer_type!=pointer_type)
   {
-    initialize_needed_classes_from_pointer(
+    initialize_instantiated_classes_from_pointer(
       subbed_pointer_type, ns, needed_lazy_methods);
   }
 }
 
 /// Build up list of methods for types for a specific pointer type. See
-/// `initialize_needed_classes` for more details.
+/// `initialize_instantiated_classes` for more details.
 /// \param pointer_type: The type to gather methods for.
 /// \param ns: global namespace
 /// \param [out] needed_lazy_methods: Populated with all Java reference types
 ///   whose references may be passed, directly or indirectly, to any of the
 ///   functions in `entry_points`
-void ci_lazy_methodst::initialize_needed_classes_from_pointer(
+void ci_lazy_methodst::initialize_instantiated_classes_from_pointer(
   const pointer_typet &pointer_type,
   const namespacet &ns,
   ci_lazy_methods_neededt &needed_lazy_methods)
@@ -367,7 +371,7 @@ void ci_lazy_methodst::initialize_needed_classes_from_pointer(
     {
       if(!is_java_generic_parameter(generic_arg))
       {
-        initialize_needed_classes_from_pointer(
+        initialize_instantiated_classes_from_pointer(
           generic_arg, ns, needed_lazy_methods);
       }
     }
@@ -401,16 +405,16 @@ void ci_lazy_methodst::gather_virtual_callsites(
 /// instantiated.
 /// \param c: function call whose potential target functions should
 ///   be determined.
-/// \param needed_classes: set of classes that can be instantiated. Any
+/// \param instantiated_classes: set of classes that can be instantiated. Any
 ///   potential callee not in this set will be ignored.
 /// \param symbol_table: global symbol table
-/// \param [out] needed_methods: Populated with all possible `c` callees, taking
-///   `needed_classes` into account (virtual function overrides defined on
-///   classes that are not 'needed' are ignored)
+/// \param [out] callable_methods: Populated with all possible `c` callees,
+///   taking `instantiated_classes` into account (virtual function overrides
+///   defined on classes that are not 'needed' are ignored)
 void ci_lazy_methodst::get_virtual_method_targets(
   const code_function_callt &c,
-  const std::set<irep_idt> &needed_classes,
-  std::vector<irep_idt> &needed_methods,
+  const std::set<irep_idt> &instantiated_classes,
+  std::vector<irep_idt> &callable_methods,
   symbol_tablet &symbol_table)
 {
   const auto &called_function=c.function();
@@ -424,15 +428,13 @@ void ci_lazy_methodst::get_virtual_method_targets(
     !call_basename.empty(),
     "Virtual function must have a reasonable name after removing class");
 
-  auto old_size=needed_methods.size();
-
   const irep_idt &self_method=
     get_virtual_method_target(
-      needed_classes, call_basename, call_class, symbol_table);
+      instantiated_classes, call_basename, call_class, symbol_table);
 
   if(!self_method.empty())
   {
-    needed_methods.push_back(self_method);
+    callable_methods.push_back(self_method);
   }
 
   const auto child_classes=class_hierarchy.get_children_trans(call_class);
@@ -440,25 +442,12 @@ void ci_lazy_methodst::get_virtual_method_targets(
   {
     const auto child_method=
       get_virtual_method_target(
-        needed_classes,
+        instantiated_classes,
         call_basename,
         child_class,
         symbol_table);
     if(!child_method.empty())
-      needed_methods.push_back(child_method);
-  }
-
-  if(needed_methods.size()==old_size)
-  {
-    // Didn't find any candidate callee. Generate a stub.
-    std::string stubname=id2string(call_class)+"."+id2string(call_basename);
-    symbolt symbol;
-    symbol.name=stubname;
-    symbol.base_name=call_basename;
-    symbol.type=c.function().type();
-    symbol.value.make_nil();
-    symbol.mode=ID_java;
-    symbol_table.add(symbol);
+      callable_methods.push_back(child_method);
   }
 }
 
@@ -517,7 +506,7 @@ void ci_lazy_methodst::gather_field_types(
       if(element_type.id() == ID_pointer)
       {
         // This is a reference array -- mark its element type available.
-        initialize_all_needed_classes_from_pointer(
+        initialize_all_instantiated_classes_from_pointer(
           to_pointer_type(element_type), ns, needed_lazy_methods);
       }
     }
@@ -532,7 +521,7 @@ void ci_lazy_methodst::gather_field_types(
       {
         if(field.type().subtype().id() == ID_symbol)
         {
-          initialize_all_needed_classes_from_pointer(
+          initialize_all_instantiated_classes_from_pointer(
             to_pointer_type(field.type()), ns, needed_lazy_methods);
         }
         else
@@ -553,7 +542,7 @@ void ci_lazy_methodst::gather_field_types(
 
 /// Find a virtual callee, if one is defined and the callee type is known to
 /// exist.
-/// \param needed_classes: set of classes that can be instantiated.
+/// \param instantiated_classes: set of classes that can be instantiated.
 ///   Any potential callee not in this set will be ignored.
 /// \param call_basename: unqualified function name with type signature (e.g.
 ///   "f:(I)")
@@ -561,16 +550,16 @@ void ci_lazy_methodst::gather_field_types(
 ///   `call_basename`.
 /// \param symbol_table: global symtab
 /// \return Returns the fully qualified name of `classname`'s definition of
-///   `call_basename` if found and `classname` is present in `needed_classes`,
-///   or irep_idt() otherwise.
+///   `call_basename` if found and `classname` is present in
+///   `instantiated_classes`, or irep_idt() otherwise.
 irep_idt ci_lazy_methodst::get_virtual_method_target(
-  const std::set<irep_idt> &needed_classes,
+  const std::set<irep_idt> &instantiated_classes,
   const irep_idt &call_basename,
   const irep_idt &classname,
   const symbol_tablet &symbol_table)
 {
   // Program-wide, is this class ever instantiated?
-  if(!needed_classes.count(classname))
+  if(!instantiated_classes.count(classname))
     return irep_idt();
 
   resolve_inherited_componentt call_resolver(symbol_table, class_hierarchy);
