@@ -151,7 +151,16 @@ static optionalt<std::string> extract_generic_interface_reference(
     start =
       find_closing_semi_colon_for_reference_type(signature.value(), start) + 1;
 
-    start = signature.value().find("L" + interface_name + "<", start);
+    // if the interface name includes package name, convert dots to slashes
+    std::string interface_name_slash_to_dot = interface_name;
+    std::replace(
+      interface_name_slash_to_dot.begin(),
+      interface_name_slash_to_dot.end(),
+      '.',
+      '/');
+
+    start =
+      signature.value().find("L" + interface_name_slash_to_dot + "<", start);
     if(start != std::string::npos)
     {
       const size_t &end =

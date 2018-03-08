@@ -322,8 +322,10 @@ void ci_lazy_methodst::initialize_all_needed_classes_from_pointer(
 {
   initialize_needed_classes_from_pointer(pointer_type, ns, needed_lazy_methods);
 
-  const pointer_typet &subbed_pointer_type=
-    pointer_type_selector.convert_pointer_type(pointer_type, ns);
+  // TODO we should be passing here a map that maps generic parameters
+  // to concrete types in the current context TG-2664
+  const pointer_typet &subbed_pointer_type =
+    pointer_type_selector.convert_pointer_type(pointer_type, {}, ns);
 
   if(subbed_pointer_type!=pointer_type)
   {

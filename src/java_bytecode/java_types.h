@@ -90,6 +90,8 @@ size_t find_closing_semi_colon_for_reference_type(
 bool is_java_array_tag(const irep_idt &tag);
 bool is_valid_java_array(const struct_typet &);
 
+bool equal_java_types(const typet &type1, const typet &type2);
+
 /// Class to hold a Java generic type parameter (also called type variable),
 /// e.g., `T` in `List<T>`.
 /// The bound can specify type requirements.
@@ -120,15 +122,9 @@ public:
     return const_cast<type_variablet &>(type_variables().front());
   }
 
-  const std::string get_parameter_class_name() const
+  const irep_idt get_name() const
   {
-    const std::string &parameter_name =
-      type_variable().get_identifier().c_str();
-    PRECONDITION(has_prefix(parameter_name, "java::"));
-    int prefix_length = std::string("java::").length();
-    const std::string name = parameter_name.substr(
-      prefix_length, parameter_name.rfind("::") - prefix_length);
-    return name;
+    return type_variable().get_identifier();
   }
 
 private:
@@ -450,77 +446,6 @@ void get_dependencies_from_generic_parameters(
 void get_dependencies_from_generic_parameters(
   const typet &,
   std::set<irep_idt> &);
-
-class java_specialized_generic_class_typet : public java_class_typet
-{
-public:
-  typedef std::vector<reference_typet> generic_type_argumentst;
-
-  /// Build the specialised version of the specific class, with the specified
-  /// parameters and name.
-  /// \param generic_name: The new name for the class
-  ///   (like Generic<java::Float>)
-  /// \param originating_class: The name for the original class (like
-  ///   java::Generic)
-  /// \param new_components: The specialised components
-  /// \return The newly constructed class.
-  java_specialized_generic_class_typet(
-    const irep_idt &generic_name,
-    const java_class_typet &originating_class,
-    const struct_typet::componentst &new_components,
-    const generic_type_argumentst &specialised_parameters)
-  {
-    set(ID_C_specialized_generic_java_class, true);
-    set(ID_name, "java::" + id2string(generic_name));
-    set(ID_base_name, id2string(generic_name));
-    components() = new_components;
-    set_tag(originating_class.get_tag());
-    set_access(originating_class.get_access());
-
-    generic_type_arguments() = specialised_parameters;
-  }
-
-  /// \return vector of type variables
-  const generic_type_argumentst &generic_type_arguments() const
-  {
-    return (const generic_type_argumentst &)(find(ID_type_variables).get_sub());
-  }
-
-private:
-  /// \return vector of type variables
-  generic_type_argumentst &generic_type_arguments()
-  {
-    return (generic_type_argumentst &)(add(ID_type_variables).get_sub());
-  }
-};
-
-inline bool is_java_specialized_generic_class_type(const typet &type)
-{
-  return type.get_bool(ID_C_specialized_generic_java_class);
-}
-
-inline bool is_java_specialized_generic_class_type(typet &type)
-{
-  return type.get_bool(ID_C_specialized_generic_java_class);
-}
-
-inline java_specialized_generic_class_typet
-to_java_specialized_generic_class_type(const typet &type)
-{
-  INVARIANT(
-    is_java_specialized_generic_class_type(type),
-    "Tried to convert a type that was not a specialised generic java class");
-  return static_cast<const java_specialized_generic_class_typet &>(type);
-}
-
-inline java_specialized_generic_class_typet
-to_java_specialized_generic_class_type(typet &type)
-{
-  INVARIANT(
-    is_java_specialized_generic_class_type(type),
-    "Tried to convert a type that was not a specialised generic java class");
-  return static_cast<const java_specialized_generic_class_typet &>(type);
-}
 
 /// Type for a generic symbol, extends symbol_typet with a
 /// vector of java generic types.
