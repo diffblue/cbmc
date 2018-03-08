@@ -339,9 +339,14 @@ public:
 
   /// Attempt to evaluate the given string from the dependencies and valuation
   /// of strings on which it depends
+  /// Warning: eval uses a cache which must be cleaned everytime the valuations
+  /// given by get_value can change.
   optionalt<exprt> eval(
     const array_string_exprt &s,
     const std::function<exprt(const exprt &)> &get_value) const;
+
+  /// Clean the cache used by `eval`
+  void clean_cache();
 
   void output_dot(std::ostream &stream) const;
 
@@ -351,6 +356,8 @@ private:
 
   /// Set of nodes representing strings
   std::vector<string_nodet> string_nodes;
+
+  mutable std::vector<optionalt<exprt>> eval_string_cache;
 
   /// Nodes describing dependencies of a string: values of the map correspond
   /// to indexes in the vector `string_nodes`.

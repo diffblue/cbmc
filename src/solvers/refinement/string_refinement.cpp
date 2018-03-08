@@ -757,6 +757,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   // Initial try without index set
   const auto get = [this](const exprt &expr) { return this->get(expr); };
+  dependencies.clean_cache();
   const decision_proceduret::resultt res=supert::dec_solve();
   if(res==resultt::D_SATISFIABLE)
   {
@@ -804,6 +805,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   while((loop_bound_--)>0)
   {
+    dependencies.clean_cache();
     const decision_proceduret::resultt res=supert::dec_solve();
 
     if(res==resultt::D_SATISFIABLE)

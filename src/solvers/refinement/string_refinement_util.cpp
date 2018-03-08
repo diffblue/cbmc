@@ -537,15 +537,34 @@ optionalt<exprt> string_dependenciest::eval(
   const array_string_exprt &s,
   const std::function<exprt(const exprt &)> &get_value) const
 {
-  const auto node = node_at(s);
-  if(node && node->dependencies.size() == 1)
+  const auto &it = node_index_pool.find(s);
+  if(it == node_index_pool.end())
+    return {};
+
+  if(eval_string_cache[it->second])
+    return eval_string_cache[it->second];
+
+  const auto node = string_nodes[it->second];
+
+  if(node.dependencies.size() == 1)
   {
-    const auto &f = get_builtin_function(node->dependencies[0]);
+    const auto &f = get_builtin_function(node.dependencies[0]);
     const auto result = f.string_result();
     if(result && *result == s)
-      return f.eval(get_value);
+    {
+      const auto value_opt = f.eval(get_value);
+      eval_string_cache[it->second] = value_opt;
+      return value_opt;
+    }
   }
   return {};
+}
+
+void string_dependenciest::clean_cache()
+{
+  eval_string_cache.resize(string_nodes.size());
+  for(auto &e : eval_string_cache)
+    e.reset();
 }
 
 bool add_node(
