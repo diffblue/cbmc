@@ -1475,17 +1475,17 @@ static void debug_check_axioms_step(
   stream << indent2 << "- axiom:\n" << indent2 << indent;
 
   if(axiom.id() == ID_string_constraint)
-    stream << format(to_string_constraint(axiom));
+    stream << to_string(to_string_constraint(axiom));
   else if(axiom.id() == ID_string_not_contains_constraint)
-    stream << format(to_string_not_contains_constraint(axiom));
+    stream << to_string(to_string_not_contains_constraint(axiom));
   else
     stream << format(axiom);
   stream << '\n' << indent2 << "- axiom_in_model:\n" << indent2 << indent;
 
   if(axiom_in_model.id() == ID_string_constraint)
-    stream << format(to_string_constraint(axiom_in_model));
+    stream << to_string(to_string_constraint(axiom_in_model));
   else if(axiom_in_model.id() == ID_string_not_contains_constraint)
-    stream << format(to_string_not_contains_constraint(axiom_in_model));
+    stream << to_string(to_string_not_contains_constraint(axiom_in_model));
   else
     stream << format(axiom_in_model);
 
