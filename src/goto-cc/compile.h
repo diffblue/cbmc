@@ -53,7 +53,7 @@ public:
 
   bool add_input_file(const std::string &);
   bool find_library(const std::string &);
-  bool is_elf_file(const std::string &);
+  bool add_files_from_archive(const std::string &file_name, bool thin_archive);
 
   bool parse(const std::string &filename);
   bool parse_stdin();
