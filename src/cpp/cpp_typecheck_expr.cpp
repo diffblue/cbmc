@@ -11,7 +11,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
-#include <cstdlib>
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 #include <util/pointer_offset_size.h>
 #include <util/std_types.h>
@@ -20,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/config.h>
 #include <util/simplify_expr.h>
 #include <util/base_type.h>
+#include <util/invariant.h>
 
 #include <util/c_types.h>
 #include <ansi-c/c_qualifiers.h>
@@ -69,25 +72,27 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_expr_explicit_constructor_call(expr);
   else if(expr.is_nil())
   {
-    #if 0
+#ifdef DEBUG
+    std::cerr << "E: " << expr.pretty() << '\n';
     std::cerr << "cpp_typecheckt::typecheck_expr_main got nil\n";
-    #endif
-    abort();
+#endif
+    UNREACHABLE;
   }
   else if(expr.id()==ID_code)
   {
-    #if 0
+#ifdef DEBUG
+    std::cerr << "E: " << expr.pretty() << '\n';
     std::cerr << "cpp_typecheckt::typecheck_expr_main got code\n";
-    #endif
-    abort();
+#endif
+    UNREACHABLE;
   }
   else if(expr.id()==ID_symbol)
   {
-    #if 0
-    std::cout << "E: " << expr.pretty() << '\n';
+    // ignore here
+#ifdef DEBUG
+    std::cerr << "E: " << expr.pretty() << '\n';
     std::cerr << "cpp_typecheckt::typecheck_expr_main got symbol\n";
-    abort();
-    #endif
+#endif
   }
   else if(expr.id()=="__is_base_of")
   {

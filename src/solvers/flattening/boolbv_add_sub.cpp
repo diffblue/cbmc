@@ -8,8 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <iostream>
-
+#include <util/invariant.h>
 #include <util/std_types.h>
 
 #include "../floatbv/float_utils.h"
@@ -38,12 +37,8 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
     throw "operator "+expr.id_string()+" takes at least one operand";
 
   const exprt &op0=expr.op0();
-
-  if(op0.type()!=type)
-  {
-    std::cerr << expr.pretty() << '\n';
-    throw "add/sub with mixed types";
-  }
+  DATA_INVARIANT(
+    op0.type() == type, "add/sub with mixed types:\n" + expr.pretty());
 
   bvt bv=convert_bv(op0);
 
@@ -69,11 +64,8 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
       it=operands.begin()+1;
       it!=operands.end(); it++)
   {
-    if(it->type()!=type)
-    {
-      std::cerr << expr.pretty() << '\n';
-      throw "add/sub with mixed types";
-    }
+    DATA_INVARIANT(
+      it->type() == type, "add/sub with mixed types:\n" + expr.pretty());
 
     const bvt &op=convert_bv(*it);
 

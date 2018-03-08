@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <iostream>
+#include <util/invariant.h>
 
 bvt boolbvt::convert_cond(const exprt &expr)
 {
@@ -51,15 +51,11 @@ bvt boolbvt::convert_cond(const exprt &expr)
       {
         const bvt &op=convert_bv(*it);
 
-        if(bv.size()!=op.size())
-        {
-          std::cerr << "result size: " << bv.size()
-                    << "\noperand: " << op.size() << '\n'
-                    << it->pretty()
-                    << '\n';
-
-          throw "size of value operand does not match";
-        }
+        DATA_INVARIANT(
+          bv.size() == op.size(),
+          std::string("size of value operand does not match:\n") +
+            "result size: " + std::to_string(bv.size()) +
+            "\noperand: " + std::to_string(op.size()) + '\n' + it->pretty());
 
         literalt value_literal=bv_utils.equal(bv, op);
 

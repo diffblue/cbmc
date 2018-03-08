@@ -226,8 +226,6 @@ void bv_refinementt::check_SAT(approximationt &a)
               << "==" << integer2binary(result.pack(), spec.width()) << eom;
     #endif
 
-    // if(a.over_state==1) { debug() << "DISAGREEMENT!\n"; exit(1); }
-
     if(a.over_state<config_.max_node_refinement)
     {
       bvt r;
