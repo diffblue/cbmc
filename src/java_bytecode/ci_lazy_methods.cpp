@@ -426,8 +426,6 @@ void ci_lazy_methodst::get_virtual_method_targets(
     !call_basename.empty(),
     "Virtual function must have a reasonable name after removing class");
 
-  auto old_size=callable_methods.size();
-
   const irep_idt &self_method=
     get_virtual_method_target(
       instantiated_classes, call_basename, call_class, symbol_table);
@@ -448,19 +446,6 @@ void ci_lazy_methodst::get_virtual_method_targets(
         symbol_table);
     if(!child_method.empty())
       callable_methods.push_back(child_method);
-  }
-
-  if(callable_methods.size()==old_size)
-  {
-    // Didn't find any candidate callee. Generate a stub.
-    std::string stubname=id2string(call_class)+"."+id2string(call_basename);
-    symbolt symbol;
-    symbol.name=stubname;
-    symbol.base_name=call_basename;
-    symbol.type=c.function().type();
-    symbol.value.make_nil();
-    symbol.mode=ID_java;
-    symbol_table.add(symbol);
   }
 }
 
