@@ -29,7 +29,6 @@ struct test_datat
 /// \param test_data The data to run the test on
 void require_is_constructor(const test_datat &test_data)
 {
-
   const symbolt &constructor =
     test_data.symbol_table.lookup_ref(test_data.constructor_descriptor);
   THEN("The constructor should be marked as a constructor")
@@ -66,22 +65,18 @@ SCENARIO(
     std::string base_constructor_name = "java::ClassWithConstructors.<init>";
     WHEN("Looking at the parameterless constructor")
     {
-      require_is_constructor([&]() {
-        test_datat data;
-        data.constructor_descriptor = base_constructor_name + ":()V";
-        data.symbol_table = symbol_table;
-        return data;
-      }());
+      test_datat data;
+      data.constructor_descriptor = base_constructor_name + ":()V";
+      data.symbol_table = symbol_table;
+      require_is_constructor(data);
     }
     WHEN("Looking at the parametered constructor")
     {
-      require_is_constructor([&]() {
-        test_datat data;
-        data.constructor_descriptor =
-          base_constructor_name + ":(ILjava/lang/Object;LOpaqueClass;)V";
-        data.symbol_table = symbol_table;
-        return data;
-      }());
+      test_datat data;
+      data.constructor_descriptor =
+        base_constructor_name + ":(ILjava/lang/Object;LOpaqueClass;)V";
+      data.symbol_table = symbol_table;
+      require_is_constructor(data);
     }
   }
   GIVEN("A class without any constructors")
@@ -92,12 +87,10 @@ SCENARIO(
     std::string base_constructor_name = "java::ClassWithoutConstructors.<init>";
     WHEN("Looking at the default constructor")
     {
-      require_is_constructor([&]() {
-        test_datat data;
-        data.constructor_descriptor = base_constructor_name + ":()V";
-        data.symbol_table = symbol_table;
-        return data;
-      }());
+      test_datat data;
+      data.constructor_descriptor = base_constructor_name + ":()V";
+      data.symbol_table = symbol_table;
+      require_is_constructor(data);
     }
   }
   GIVEN("A class with both constructors and static initalisers")
@@ -109,33 +102,27 @@ SCENARIO(
     std::string base_constructor_name = base_class_name + "<init>";
     WHEN("Looking at the parameterless constructor")
     {
-      require_is_constructor([&]() {
-        test_datat data;
-        data.constructor_descriptor = base_constructor_name + ":()V";
-        data.symbol_table = symbol_table;
-        return data;
-      }());
+      test_datat data;
+      data.constructor_descriptor = base_constructor_name + ":()V";
+      data.symbol_table = symbol_table;
+      require_is_constructor(data);
     }
     WHEN("Looking at the parametered constructor")
     {
-      require_is_constructor([&]() {
-        test_datat data;
-        data.constructor_descriptor =
-          base_constructor_name + ":(ILjava/lang/Object;LOpaqueClass;)V";
-        data.symbol_table = symbol_table;
-        return data;
-      }());
+      test_datat data;
+      data.constructor_descriptor =
+        base_constructor_name + ":(ILjava/lang/Object;LOpaqueClass;)V";
+      data.symbol_table = symbol_table;
+      require_is_constructor(data);
     }
     WHEN("Looking at the static initalizer")
     {
       THEN("The static init should not be marked as a constructor")
       {
-        require_is_static_initalizer([&]() {
-          test_datat data;
-          data.constructor_descriptor = base_class_name + "<clinit>:()V";
-          data.symbol_table = symbol_table;
-          return data;
-        }());
+        test_datat data;
+        data.constructor_descriptor = base_class_name + "<clinit>:()V";
+        data.symbol_table = symbol_table;
+        require_is_static_initializer(data);
       }
     }
   }
@@ -151,23 +138,19 @@ SCENARIO(
 
     WHEN("Looking at the default constructor")
     {
-      require_is_constructor([&]() {
-        test_datat data;
-        data.constructor_descriptor = base_constructor_name + ":()V";
-        data.symbol_table = symbol_table;
-        return data;
-      }());
+      test_datat data;
+      data.constructor_descriptor = base_constructor_name + ":()V";
+      data.symbol_table = symbol_table;
+      require_is_constructor(data);
     }
     WHEN("Looking at the static initalizer")
     {
       THEN("The static init should not be marked as a constructor")
       {
-        require_is_static_initalizer([&]() {
-          test_datat data;
-          data.constructor_descriptor = base_class_name + "<clinit>:()V";
-          data.symbol_table = symbol_table;
-          return data;
-        }());
+        test_datat data;
+        data.constructor_descriptor = base_class_name + "<clinit>:()V";
+        data.symbol_table = symbol_table;
+        require_is_static_initializer(data);
       }
     }
   }
@@ -182,23 +165,19 @@ SCENARIO(
 
     WHEN("Looking at the parameterless constructor")
     {
-      require_is_constructor([&]() {
-        test_datat data;
-        data.constructor_descriptor = base_constructor_name + ":()V";
-        data.symbol_table = symbol_table;
-        return data;
-      }());
+      test_datat data;
+      data.constructor_descriptor = base_constructor_name + ":()V";
+      data.symbol_table = symbol_table;
+      require_is_constructor(data);
     }
     WHEN("Looking at the static initalizer for the opaque class")
     {
       THEN("The static init should not be marked as a constructor")
       {
-        require_is_static_initalizer([&]() {
-          test_datat data;
-          data.constructor_descriptor = "java::OpaqueClass.<clinit>:()V";
-          data.symbol_table = symbol_table;
-          return data;
-        }());
+        test_datat data;
+        data.constructor_descriptor = "java::OpaqueClass.<clinit>:()V";
+        data.symbol_table = symbol_table;
+        require_is_static_initializer(data);
       }
     }
   }
@@ -217,35 +196,29 @@ SCENARIO(
 
     WHEN("Looking at the parameterless constructor")
     {
-      require_is_constructor([&]() {
-        test_datat data;
-        data.constructor_descriptor = base_constructor_name + ":()V";
-        data.symbol_table = symbol_table;
-        return data;
-      }());
+      test_datat data;
+      data.constructor_descriptor = base_constructor_name + ":()V";
+      data.symbol_table = symbol_table;
+      require_is_constructor(data);
     }
     WHEN("Looking at the static initalizer for the opaque class")
     {
       THEN("The static init should not be marked as a constructor")
       {
-        require_is_static_initalizer([&]() {
-          test_datat data;
-          data.constructor_descriptor = "java::OpaqueClass.<clinit>:()V";
-          data.symbol_table = symbol_table;
-          return data;
-        }());
+        test_datat data;
+        data.constructor_descriptor = "java::OpaqueClass.<clinit>:()V";
+        data.symbol_table = symbol_table;
+        require_is_static_initializer(data);
       }
     }
     WHEN("Looking at the constructor for the opaque class")
     {
       THEN("The static init should not be marked as a constructor")
       {
-        require_is_constructor([&]() {
-          test_datat data;
-          data.constructor_descriptor = "java::OpaqueClass.<init>:()V";
-          data.symbol_table = symbol_table;
-          return data;
-        }());
+        test_datat data;
+        data.constructor_descriptor = "java::OpaqueClass.<init>:()V";
+        data.symbol_table = symbol_table;
+        require_is_constructor(data);
       }
     }
   }
