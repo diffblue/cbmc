@@ -54,7 +54,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///      \f$f\f$ [explicitly stated, implied].
 ///
 /// \todo The fact that we follow this grammar is not enforced at the moment.
-class string_constraintt: public exprt
+class string_constraintt : public exprt
 {
 public:
   // String constraints are of the form
@@ -158,7 +158,7 @@ inline std::string to_string(const string_constraintt &expr)
 }
 
 /// Constraints to encode non containement of strings.
-class string_not_contains_constraintt: public exprt
+class string_not_contains_constraintt : public exprt
 {
 public:
   // string_not contains_constraintt are formula of the form:
