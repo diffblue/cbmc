@@ -161,10 +161,6 @@ protected:
   void pop_residue(std::size_t n);
   void push(const exprt::operandst &o);
 
-  /// Determines whether the `method` is a constructor or a static initializer,
-  /// by checking whether its name equals either <init> or <clinit>
-  bool is_constructor(const class_typet::methodt &method);
-
   /// Returns true iff the slot index of the local variable of a method (coming
   /// from the LVT) is a parameter of that method. Assumes that
   /// `slots_for_parameters` is initialized upon call.

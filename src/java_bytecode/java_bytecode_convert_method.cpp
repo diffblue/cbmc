@@ -120,13 +120,9 @@ static bool operator==(const irep_idt &what, const patternt &pattern)
   return pattern==what;
 }
 
-// name contains <init> or <clinit>
-bool java_bytecode_convert_methodt::is_constructor(
-  const class_typet::methodt &method)
+static bool is_constructor(const irep_idt &method_name)
 {
-  const std::string &name(id2string(method.get_name()));
-  const std::string::size_type &npos(std::string::npos);
-  return npos!=name.find("<init>") || npos!=name.find("<clinit>");
+  return id2string(method_name).find("<init>") != std::string::npos;
 }
 
 exprt::operandst java_bytecode_convert_methodt::pop(std::size_t n)
@@ -256,11 +252,12 @@ const exprt java_bytecode_convert_methodt::variable(
 ///   message handler to collect warnings
 /// \return
 ///   the constructed member type
-typet member_type_lazy(const std::string &descriptor,
-                       const optionalt<std::string> &signature,
-                       const std::string &class_name,
-                       const std::string &method_name,
-                       message_handlert &message_handler)
+code_typet member_type_lazy(
+  const std::string &descriptor,
+  const optionalt<std::string> &signature,
+  const std::string &class_name,
+  const std::string &method_name,
+  message_handlert &message_handler)
 {
   // In order to construct the method type, we can either use signature or
   // descriptor. Since only signature contains the generics info, we want to
@@ -285,7 +282,7 @@ typet member_type_lazy(const std::string &descriptor,
       if(to_code_type(member_type_from_signature).parameters().size()==
          to_code_type(member_type_from_descriptor).parameters().size())
       {
-        return member_type_from_signature;
+        return to_code_type(member_type_from_signature);
       }
       else
       {
@@ -303,7 +300,7 @@ typet member_type_lazy(const std::string &descriptor,
         << descriptor << message.eom;
     }
   }
-  return member_type_from_descriptor;
+  return to_code_type(member_type_from_descriptor);
 }
 
 /// This creates a method symbol in the symtab, but doesn't actually perform
@@ -324,7 +321,7 @@ void java_bytecode_convert_method_lazy(
 {
   symbolt method_symbol;
 
-  typet member_type=member_type_lazy(
+  code_typet member_type = member_type_lazy(
     m.descriptor,
     m.signature,
     id2string(class_symbol.name),
@@ -337,20 +334,20 @@ void java_bytecode_convert_method_lazy(
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
   if(m.is_public)
-    member_type.set(ID_access, ID_public);
+    member_type.set_access(ID_public);
   else if(m.is_protected)
-    member_type.set(ID_access, ID_protected);
+    member_type.set_access(ID_protected);
   else if(m.is_private)
-    member_type.set(ID_access, ID_private);
+    member_type.set_access(ID_private);
   else
-    member_type.set(ID_access, ID_default);
+    member_type.set_access(ID_default);
 
-  if(method_symbol.base_name=="<init>")
+  if(is_constructor(method_symbol.base_name))
   {
     method_symbol.pretty_name=
       id2string(class_symbol.pretty_name)+"."+
       id2string(class_symbol.base_name)+"()";
-    member_type.set(ID_constructor, true);
+    member_type.set_is_constructor();
   }
   else
     method_symbol.pretty_name=
@@ -360,8 +357,7 @@ void java_bytecode_convert_method_lazy(
   // do we need to add 'this' as a parameter?
   if(!m.is_static)
   {
-    code_typet &code_type=to_code_type(member_type);
-    code_typet::parameterst &parameters=code_type.parameters();
+    code_typet::parameterst &parameters = member_type.parameters();
     code_typet::parametert this_p;
     const reference_typet object_ref_type=
       java_reference_type(symbol_typet(class_symbol.name));
@@ -390,9 +386,8 @@ void java_bytecode_convert_methodt::convert(
 
   // Obtain a std::vector of code_typet::parametert objects from the
   // (function) type of the symbol
-  typet member_type=method_symbol.type;
-  member_type.set(ID_C_class, class_symbol.name);
-  code_typet &code_type=to_code_type(member_type);
+  code_typet code_type = to_code_type(method_symbol.type);
+  code_type.set(ID_C_class, class_symbol.name);
   method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
 
@@ -519,25 +514,12 @@ void java_bytecode_convert_methodt::convert(
     param_index==slots_for_parameters,
     "java_parameter_count and local computation must agree");
 
-  const bool is_virtual=!m.is_static && !m.is_final;
-
-  // Construct a methodt, which lives within the class type; this object is
-  // never used for anything useful and could be removed
-  class_typet::methodt method;
-  method.set_base_name(m.base_name);
-  method.set_name(method_identifier);
-  method.set(ID_abstract, m.is_abstract);
-  method.set(ID_is_virtual, is_virtual);
-  method.type()=member_type;
-  if(is_constructor(method))
-    method.set(ID_constructor, true);
-
   // Check the fields that can't change are valid
   INVARIANT(
-    method_symbol.name==method.get_name(),
+    method_symbol.name == method_identifier,
     "Name of method symbol shouldn't change");
   INVARIANT(
-    method_symbol.base_name==method.get_base_name(),
+    method_symbol.base_name == m.base_name,
     "Base name of method symbol shouldn't change");
   INVARIANT(
     method_symbol.module.empty(),
@@ -551,16 +533,21 @@ void java_bytecode_convert_methodt::convert(
   // The pretty name of a constructor includes the base name of the class
   // instead of the internal method name "<init>". For regular methods, it's
   // just the base name of the method.
-  if(method.get_base_name()=="<init>")
-    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
-                              id2string(class_symbol.base_name)+"()";
+  if(is_constructor(method_symbol.base_name))
+  {
+    method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
+                                id2string(class_symbol.base_name) + "()";
+    INVARIANT(
+      code_type.get_is_constructor(),
+      "Member type should have already been marked as a constructor");
+  }
   else
-    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
-                              id2string(method.get_base_name())+"()";
+  {
+    method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
+                                id2string(method_symbol.base_name) + "()";
+  }
 
-  method_symbol.type=member_type;
-  if(is_constructor(method))
-    method_symbol.type.set(ID_constructor, true);
+  method_symbol.type = code_type;
 
   current_method=method_symbol.name;
   method_has_this=code_type.has_this();
@@ -1280,13 +1267,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
           // constructors.
           if(statement=="invokespecial")
           {
-            if(
-              id2string(arg0.get(ID_identifier)).find("<init>") !=
-              std::string::npos)
+            if(is_constructor(arg0.get(ID_identifier)))
             {
               if(needed_lazy_methods)
                 needed_lazy_methods->add_needed_class(classname);
-              code_type.set(ID_constructor, true);
+              code_type.set_is_constructor();
             }
             else
               code_type.set(ID_java_super_method_call, true);
