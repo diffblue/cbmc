@@ -2,7 +2,7 @@
 
  Module: Java Bytecode Language Conversion
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Ltd.
 
 \*******************************************************************/
 #ifndef CPROVER_JAVA_BYTECODE_SELECT_POINTER_TYPE_H

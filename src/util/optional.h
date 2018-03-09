@@ -3,7 +3,7 @@
  Module: typedef for optional class template. To be replaced with
  std::optional once C++17 support is enabled
 
- Author: Diffblue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

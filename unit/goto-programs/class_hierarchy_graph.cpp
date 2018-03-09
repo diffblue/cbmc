@@ -2,7 +2,7 @@
 
  Module: Unit tests for class_hierarchy_grapht
 
- Author: Diffblue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

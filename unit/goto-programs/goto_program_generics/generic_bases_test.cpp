@@ -2,7 +2,7 @@
 
  Module: Unit tests for instantiating generic superclasses and interfaces.
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Ltd.
 
 \*******************************************************************/
 #include <testing-utils/catch.hpp>

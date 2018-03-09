@@ -2,7 +2,7 @@
 
  Module: nonstd::optional unit tests
 
- Author: Diffblue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

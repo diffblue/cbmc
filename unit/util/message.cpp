@@ -2,7 +2,7 @@
 
  Module: Messaget tests
 
- Author: Diffblue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

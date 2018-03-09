@@ -2,7 +2,7 @@
 
  Module: Java Bytecode
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Ltd.
 
 \*******************************************************************/
 #include "ci_lazy_methods.h"

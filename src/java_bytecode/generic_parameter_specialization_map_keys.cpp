@@ -1,4 +1,4 @@
-/// Author: DiffBlue Limited. All Rights Reserved.
+/// Author: DiffBlue Ltd.
 
 #include "generic_parameter_specialization_map_keys.h"
 

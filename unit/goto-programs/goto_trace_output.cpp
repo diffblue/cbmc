@@ -2,7 +2,7 @@
 
  Module: Unit tests for goto_trace_stept::output
 
- Author: Diffblue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
