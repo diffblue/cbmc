@@ -1,0 +1,9 @@
+CORE
+StaticMethodRef.class
+--function StaticMethodRef.test2
+^EXIT=0
+^SIGNAL=0
+--
+--
+Tests that it doesn't crash when failing to read a `BootstrapMethods` entry and
+there is another attribute after this.
