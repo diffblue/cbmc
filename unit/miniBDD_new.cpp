@@ -2,7 +2,7 @@
 
  Module: Unit tests for miniBDD
 
- Author: DiffBlue Ltd.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

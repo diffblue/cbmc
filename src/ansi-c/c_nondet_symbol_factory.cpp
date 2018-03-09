@@ -2,7 +2,7 @@
 
 Module: C Nondet Symbol Factory
 
-Author: DiffBlue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

@@ -2,7 +2,7 @@
 
  Module: Unit tests for parsing generic classes
 
- Author: DiffBlue Ltd.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

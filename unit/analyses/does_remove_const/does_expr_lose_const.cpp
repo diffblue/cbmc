@@ -2,7 +2,7 @@
 
  Module: Does Remove Const Unit Tests
 
- Author: DiffBlue Ltd.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

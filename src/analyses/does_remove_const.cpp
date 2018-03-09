@@ -2,7 +2,7 @@
 
  Module: Analyses
 
- Author: DiffBlue Ltd.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

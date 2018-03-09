@@ -2,7 +2,7 @@
 
  Module: Java Bytecode
 
- Author: DiffBlue Ltd.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

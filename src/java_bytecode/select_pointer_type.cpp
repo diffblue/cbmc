@@ -2,7 +2,7 @@
 
  Module: Java Bytecode Language Conversion
 
- Author: DiffBlue Ltd.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

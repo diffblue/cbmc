@@ -3,7 +3,7 @@
  Module: Unit tests for concretize_array_expression in
    solvers/refinement/string_refinement.cpp
 
- Author: DiffBlue Ltd.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

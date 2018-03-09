@@ -2,7 +2,7 @@
 
  Module: exprt iterator module
 
- Author: DiffBlue Ltd.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
