@@ -316,6 +316,8 @@ public:
     std::size_t index;
     // builtin functions on which it depends
     std::vector<builtin_function_nodet> dependencies;
+    // builtin function of which it is the result
+    optionalt<builtin_function_nodet> result_from;
     // In case it depends on a builtin_function we don't support yet
     bool depends_on_unknown_builtin_function = false;
 

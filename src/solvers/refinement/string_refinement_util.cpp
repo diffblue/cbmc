@@ -497,17 +497,14 @@ optionalt<exprt> string_dependenciest::eval(
     return eval_string_cache[it->second];
 
   const auto node = string_nodes[it->second];
-
-  if(node.dependencies.size() == 1)
+  const auto &f = node.result_from;
+  if(
+    f && node.dependencies.size() == 1 &&
+    !node.depends_on_unknown_builtin_function)
   {
-    const auto &f = get_builtin_function(node.dependencies[0]);
-    const auto result = f.string_result();
-    if(result && *result == s)
-    {
-      const auto value_opt = f.eval(get_value);
-      eval_string_cache[it->second] = value_opt;
-      return value_opt;
-    }
+    const auto value_opt = get_builtin_function(*f).eval(get_value);
+    eval_string_cache[it->second] = value_opt;
+    return value_opt;
   }
   return {};
 }
@@ -544,7 +541,11 @@ bool add_node(
   if(
     const auto &string_result =
       dependencies.get_builtin_function(builtin_function_node).string_result())
+  {
     dependencies.add_dependency(*string_result, builtin_function_node);
+    auto &node = dependencies.get_node(*string_result);
+    node.result_from = builtin_function_node;
+  }
   else
     add_dependency_to_string_subexprs(
       dependencies, *fun_app, builtin_function_node, array_pool);
