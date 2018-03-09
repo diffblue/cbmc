@@ -310,10 +310,19 @@ public:
   class string_nodet
   {
   public:
+    // expression the node corresponds to
+    array_string_exprt expr;
+    // index in the string_nodes vector
+    std::size_t index;
+    // builtin functions on which it depends
     std::vector<builtin_function_nodet> dependencies;
-
     // In case it depends on a builtin_function we don't support yet
     bool depends_on_unknown_builtin_function = false;
+
+    explicit string_nodet(array_string_exprt e, const std::size_t index)
+      : expr(std::move(e)), index(index)
+    {
+    }
   };
 
   string_nodet &get_node(const array_string_exprt &e);
@@ -357,45 +366,41 @@ private:
   /// Set of nodes representing strings
   std::vector<string_nodet> string_nodes;
 
-  mutable std::vector<optionalt<exprt>> eval_string_cache;
-
   /// Nodes describing dependencies of a string: values of the map correspond
   /// to indexes in the vector `string_nodes`.
   std::unordered_map<array_string_exprt, std::size_t, irep_hash>
     node_index_pool;
 
-  /// Common index for all nodes (both strings and builtin_functions) so that we
-  /// can reuse generic algorithms of util/graph.h
-  /// Even indexes correspond to builtin_function nodes, odd indexes to string
-  /// nodes.
-  typedef std::size_t node_indext;
+  class nodet
+  {
+  public:
+    enum
+    {
+      BUILTIN,
+      STRING
+    } kind;
+    std::size_t index;
 
-  /// \return total number of nodes
-  node_indext size() const;
+    explicit nodet(const builtin_function_nodet &builtin)
+      : kind(BUILTIN), index(builtin.index)
+    {
+    }
 
-  /// \param n: builtin function node
-  /// \return index corresponding to builtin function node `n`
-  node_indext node_index(const builtin_function_nodet &n) const;
+    explicit nodet(const string_nodet &string_node)
+      : kind(STRING), index(string_node.index)
+    {
+    }
+  };
 
-  /// \param s: array expression representing a string
-  /// \return index corresponding to an string exprt s
-  node_indext node_index(const array_string_exprt &s) const;
+  mutable std::vector<optionalt<exprt>> eval_string_cache;
 
-  /// \param i: index of a node
-  /// \return corresponding node if the index corresponds to a builtin function
-  ///   node, empty optional otherwise
-  optionalt<builtin_function_nodet>
-  get_builtin_function_node(node_indext i) const;
+  /// Applies `f` on all nodes
+  void for_each_node(const std::function<void(const nodet &)> &f) const;
 
-  /// \param i: index of a node
-  /// \return corresponding node if the index corresponds to a string
-  ///   node, empty optional otherwise
-  optionalt<string_nodet> get_string_node(node_indext i) const;
-
-  /// Applies `f` on all successors of the node with index `i`
+  /// Applies `f` on all successors of the node n
   void for_each_successor(
-    const node_indext &i,
-    const std::function<void(const node_indext &)> &f) const;
+    const nodet &i,
+    const std::function<void(const nodet &)> &f) const;
 };
 
 /// When right hand side of equation is a builtin_function add

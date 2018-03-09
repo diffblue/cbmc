@@ -381,7 +381,7 @@ string_dependenciest::get_node(const array_string_exprt &e)
   if(!entry_inserted.second)
     return string_nodes[entry_inserted.first->second];
 
-  string_nodes.emplace_back();
+  string_nodes.emplace_back(e, entry_inserted.first->second);
   return string_nodes.back();
 }
 
@@ -485,54 +485,6 @@ static void add_dependency_to_string_subexprs(
   }
 }
 
-string_dependenciest::node_indext string_dependenciest::size() const
-{
-  return builtin_function_nodes.size() + string_nodes.size();
-}
-
-/// Convert an index of a string node in `string_nodes` to the node_indext for
-/// the same node
-static std::size_t string_index_to_node_index(const std::size_t string_index)
-{
-  return 2 * string_index + 1;
-}
-
-/// Convert an index of a builtin function node to the node_indext for
-/// the same node
-static std::size_t
-builtin_function_index_to_node_index(const std::size_t builtin_index)
-{
-  return 2 * builtin_index;
-}
-
-string_dependenciest::node_indext
-string_dependenciest::node_index(const builtin_function_nodet &n) const
-{
-  return builtin_function_index_to_node_index(n.index);
-}
-
-string_dependenciest::node_indext
-string_dependenciest::node_index(const array_string_exprt &s) const
-{
-  return string_index_to_node_index(node_index_pool.at(s));
-}
-
-optionalt<string_dependenciest::builtin_function_nodet>
-string_dependenciest::get_builtin_function_node(node_indext i) const
-{
-  if(i % 2 == 0)
-    return builtin_function_nodet(i / 2);
-  return {};
-}
-
-optionalt<string_dependenciest::string_nodet>
-string_dependenciest::get_string_node(node_indext i) const
-{
-  if(i % 2 == 1 && i / 2 < string_nodes.size())
-    return string_nodes[i / 2];
-  return {};
-}
-
 optionalt<exprt> string_dependenciest::eval(
   const array_string_exprt &s,
   const std::function<exprt(const exprt &)> &get_value) const
@@ -601,50 +553,58 @@ bool add_node(
 }
 
 void string_dependenciest::for_each_successor(
-  const std::size_t &i,
-  const std::function<void(const std::size_t &)> &f) const
+  const nodet &node,
+  const std::function<void(const nodet &)> &f) const
 {
-  if(const auto &builtin_function_node = get_builtin_function_node(i))
+  if(node.kind == nodet::BUILTIN)
   {
-    const string_builtin_functiont &p =
-      get_builtin_function(*builtin_function_node);
-    std::for_each(
-      p.string_arguments().begin(),
-      p.string_arguments().end(),
-      [&](const array_string_exprt &s) { f(node_index(s)); });
+    const auto &builtin = builtin_function_nodes[node.index];
+    for(const auto &s : builtin->string_arguments())
+    {
+      if(const auto node = node_at(s))
+        f(nodet(*node));
+    }
   }
-  else if(const auto &s = get_string_node(i))
+  else if(node.kind == nodet::STRING)
   {
+    const auto &s_node = string_nodes[node.index];
     std::for_each(
-      s->dependencies.begin(),
-      s->dependencies.end(),
-      [&](const builtin_function_nodet &p) { f(node_index(p)); });
+      s_node.dependencies.begin(),
+      s_node.dependencies.end(),
+      [&](const builtin_function_nodet &p) { f(nodet(p)); });
   }
   else
     UNREACHABLE;
 }
 
+void string_dependenciest::for_each_node(
+  const std::function<void(const nodet &)> &f) const
+{
+  for(const auto string_node : string_nodes)
+    f(nodet(string_node));
+  for(std::size_t i = 0; i < builtin_function_nodes.size(); ++i)
+    f(nodet(builtin_function_nodet(i)));
+}
+
 void string_dependenciest::output_dot(std::ostream &stream) const
 {
-  const auto for_each_node =
-    [&](const std::function<void(const std::size_t &)> &f) { // NOLINT
-      for(std::size_t i = 0; i < string_nodes.size(); ++i)
-        f(string_index_to_node_index(i));
-      for(std::size_t i = 0; i < builtin_function_nodes.size(); ++i)
-        f(builtin_function_index_to_node_index(i));
+  const auto for_each =
+    [&](const std::function<void(const nodet &)> &f) { // NOLINT
+      for_each_node(f);
     };
-
-  const auto for_each_succ = [&](
-    const std::size_t &i,
-    const std::function<void(const std::size_t &)> &f) { // NOLINT
-    for_each_successor(i, f);
-  };
-
-  const auto node_to_string = [&](const std::size_t &i) { // NOLINT
-    return std::to_string(i);
+  const auto for_each_succ =
+    [&](const nodet &n, const std::function<void(const nodet &)> &f) { // NOLINT
+      for_each_successor(n, f);
+    };
+  const auto node_to_string = [&](const nodet &n) { // NOLINT
+    std::stringstream ostream;
+    if(n.kind == nodet::BUILTIN)
+      ostream << "builtin_" << n.index;
+    else
+      ostream << '"' << format(string_nodes[n.index].expr) << '"';
+    return ostream.str();
   };
   stream << "digraph dependencies {\n";
-  output_dot_generic<std::size_t>(
-    stream, for_each_node, for_each_succ, node_to_string);
+  output_dot_generic<nodet>(stream, for_each, for_each_succ, node_to_string);
   stream << '}' << std::endl;
 }
