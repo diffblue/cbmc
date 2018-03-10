@@ -249,7 +249,6 @@ string_constraint_generatort::associate_char_array_to_char_pointer(
   auto insert_result =
     arrays_of_pointers_.insert(std::make_pair(char_pointer, array_sym));
   array_string_exprt result = to_array_string_expr(insert_result.first->second);
-  add_default_axioms(result);
   return result;
 }
 
@@ -410,6 +409,7 @@ array_string_exprt string_constraint_generatort::char_array_of_pointer(
   const array_typet array_type(pointer.type().subtype(), length);
   const array_string_exprt array =
     associate_char_array_to_char_pointer(pointer, array_type);
+  add_default_axioms(array);
   return array;
 }
 
