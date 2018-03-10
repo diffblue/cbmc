@@ -66,6 +66,13 @@ void remove_virtual_function(
   const dispatch_table_entriest &dispatch_table,
   virtual_dispatch_fallback_actiont fallback_action);
 
+void remove_virtual_function(
+  symbol_tablet &symbol_table,
+  goto_programt &goto_program,
+  goto_programt::targett instruction,
+  const dispatch_table_entriest &dispatch_table,
+  virtual_dispatch_fallback_actiont fallback_action);
+
 /// Given a function expression representing a virtual method of a class,
 /// the function computes all overridden methods of that virtual method.
 /// \param function: The virtual function expression for which the overridden

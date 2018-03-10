@@ -178,7 +178,8 @@ void remove_virtual_functionst::remove_virtual_function(
 
   // So long as `this` is already not `void*` typed, the second parameter
   // is ignored:
-  exprt c_id2=get_class_identifier_field(this_expr, symbol_typet(), ns);
+  exprt this_class_identifier =
+    get_class_identifier_field(this_expr, symbol_typet(), ns);
 
   // If instructed, add an ASSUME(FALSE) to handle the case where we don't
   // match any expected type:
@@ -191,16 +192,12 @@ void remove_virtual_functionst::remove_virtual_function(
 
   // get initial identifier for grouping
   INVARIANT(!functions.empty(), "Function dispatch table cannot be empty.");
-  auto last_id = functions.back().symbol_expr.get_identifier();
-  // record class_ids for disjunction
-  std::set<irep_idt> class_ids;
 
   std::map<irep_idt, goto_programt::targett> calls;
   // Note backwards iteration, to get the fallback candidate first.
   for(auto it=functions.crbegin(), itend=functions.crend(); it!=itend; ++it)
   {
     const auto &fun=*it;
-    class_ids.insert(fun.class_id);
     auto insertit=calls.insert(
       {fun.symbol_expr.get_identifier(), goto_programt::targett()});
 
@@ -232,49 +229,36 @@ void remove_virtual_functionst::remove_virtual_function(
       t3->make_goto(t_final, true_exprt());
     }
 
-    // Emit target if end of dispatch table is reached or if the next element is
-    // dispatched to another function call. Assumes entries in the functions
-    // variable to be sorted for the identifier of the function to be called.
-    auto l_it = std::next(it);
-    bool next_emit_target =
-      (l_it == functions.crend()) ||
-      l_it->symbol_expr.get_identifier() != fun.symbol_expr.get_identifier();
-
-    // The root function call is done via fall-through, so nothing to emit
-    // explicitly for this.
-    if(next_emit_target && fun.symbol_expr == last_function_symbol)
+    // Fall through to the default callee if possible:
+    if(fallback_action ==
+       virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION &&
+       fun.symbol_expr == last_function_symbol)
     {
-      class_ids.clear();
+      // Nothing to do
     }
-
-    // If this calls the fallback function we just fall through.
-    // Otherwise branch to the right call:
-    if(fallback_action!=virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION ||
-       fun.symbol_expr!=last_function_symbol)
+    else
     {
-      // create a disjunction of class_ids to test
-      if(next_emit_target && fun.symbol_expr != last_function_symbol)
+      const constant_exprt fun_class_identifier(fun.class_id, string_typet());
+      const equal_exprt class_id_test(
+        fun_class_identifier, this_class_identifier);
+
+      // If the previous GOTO goes to the same callee, join it
+      // (e.g. turning IF x GOTO y into IF x || z GOTO y)
+      if(it != functions.crbegin() &&
+         std::prev(it)->symbol_expr == fun.symbol_expr)
       {
-        exprt::operandst or_ops;
-        for(const auto &id : class_ids)
-        {
-          const constant_exprt c_id1(id, string_typet());
-          const equal_exprt class_id_test(c_id1, c_id2);
-          or_ops.push_back(class_id_test);
-        }
-
-        goto_programt::targett t4 = new_code_gotos.add_instruction();
-        t4->source_location = vcall_source_loc;
-        t4->make_goto(insertit.first->second, disjunction(or_ops));
-
-        last_id = fun.symbol_expr.get_identifier();
-        class_ids.clear();
+        INVARIANT(
+          !new_code_gotos.empty(),
+          "a dispatch table entry has been processed already, "
+          "which should have created a GOTO");
+        new_code_gotos.instructions.back().guard =
+          or_exprt(new_code_gotos.instructions.back().guard, class_id_test);
       }
-      // record class_id
-      else if(next_emit_target)
+      else
       {
-        last_id = fun.symbol_expr.get_identifier();
-        class_ids.clear();
+        goto_programt::targett new_goto = new_code_gotos.add_instruction();
+        new_goto->source_location = vcall_source_loc;
+        new_goto->make_goto(insertit.first->second, class_id_test);
       }
     }
   }
@@ -555,18 +539,33 @@ void remove_virtual_functions(goto_model_functiont &function)
 }
 
 void remove_virtual_function(
-  goto_modelt &goto_model,
+  symbol_tablet &symbol_table,
   goto_programt &goto_program,
   goto_programt::targett instruction,
   const dispatch_table_entriest &dispatch_table,
   virtual_dispatch_fallback_actiont fallback_action)
 {
   class_hierarchyt class_hierarchy;
-  class_hierarchy(goto_model.symbol_table);
-  remove_virtual_functionst rvf(goto_model.symbol_table, class_hierarchy);
+  class_hierarchy(symbol_table);
+  remove_virtual_functionst rvf(symbol_table, class_hierarchy);
 
   rvf.remove_virtual_function(
     goto_program, instruction, dispatch_table, fallback_action);
+}
+
+void remove_virtual_function(
+  goto_modelt &goto_model,
+  goto_programt &goto_program,
+  goto_programt::targett instruction,
+  const dispatch_table_entriest &dispatch_table,
+  virtual_dispatch_fallback_actiont fallback_action)
+{
+  remove_virtual_function(
+    goto_model.symbol_table,
+    goto_program,
+    instruction,
+    dispatch_table,
+    fallback_action);
 }
 
 void collect_virtual_function_callees(

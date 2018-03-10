@@ -19,6 +19,7 @@ SRC += unit_tests.cpp \
        goto-programs/goto_trace_output.cpp \
        goto-programs/class_hierarchy_output.cpp \
        goto-programs/class_hierarchy_graph.cpp \
+       goto-programs/remove_virtual_functions_without_fallback.cpp \
        java_bytecode/java_bytecode_convert_class/convert_abstract_class.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_generic_class.cpp \
        java_bytecode/java_object_factory/gen_nondet_string_init.cpp \

@@ -593,6 +593,15 @@ public:
     return end_function;
   }
 
+  const_targett get_end_function() const
+  {
+    PRECONDITION(!instructions.empty());
+    const auto end_function=std::prev(instructions.end());
+    DATA_INVARIANT(end_function->is_end_function(),
+                   "goto program ends on END_FUNCTION");
+    return end_function;
+  }
+
   /// Copy a full goto program, preserving targets
   void copy_from(const goto_programt &src);
 

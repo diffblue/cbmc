@@ -92,10 +92,17 @@ SCENARIO(
                   REQUIRE(
                     (disjunction.op0().id() == ID_equal &&
                      disjunction.op1().id() == ID_equal));
-                  const equal_exprt &eq_expr0 =
+                  equal_exprt eq_expr0 =
                     to_equal_expr(disjunction.op0());
-                  const equal_exprt &eq_expr1 =
+                  equal_exprt eq_expr1 =
                     to_equal_expr(disjunction.op1());
+
+                  if(eq_expr0.op0().id() == ID_constant &&
+                     to_constant_expr(eq_expr0.op0()).get_value() == "java::O")
+                  {
+                    // Allow either order of the D and O comparisons:
+                    std::swap(eq_expr0, eq_expr1);
+                  }
 
                   check_function_call(
                     eq_expr0,
