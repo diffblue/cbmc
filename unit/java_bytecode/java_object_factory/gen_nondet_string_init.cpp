@@ -3,7 +3,7 @@
  Module: Java string library preprocess.
          Test for converting an expression to a string expression.
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

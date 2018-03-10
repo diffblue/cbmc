@@ -2,7 +2,7 @@
 
  Module: Unit tests for expr-to-java string conversion
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

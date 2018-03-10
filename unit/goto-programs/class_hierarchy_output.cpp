@@ -2,7 +2,7 @@
 
  Module: Unit tests for class_hierarchyt output functions
 
- Author: Diffblue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

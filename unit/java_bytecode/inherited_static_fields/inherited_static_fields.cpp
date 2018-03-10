@@ -2,7 +2,7 @@
 
  Module: Unit tests for inherited static fields
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

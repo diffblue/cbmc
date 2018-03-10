@@ -4,7 +4,7 @@
          with unsupported signatures, falling back to using the raw type
          descriptors
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

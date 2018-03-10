@@ -3,7 +3,7 @@
  Module: Unit tests for string_identifiers_resolution_from_equations in
    solvers/refinement/string_refinement.cpp
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

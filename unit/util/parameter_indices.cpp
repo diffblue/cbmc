@@ -2,7 +2,7 @@
 
  Module: Parameter indices test
 
- Author: Diffblue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

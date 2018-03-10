@@ -1,4 +1,4 @@
-// Copyright 2016-2017 DiffBlue Limited. All Rights Reserved.
+/// Author: Diffblue Ltd.
 
 #include <iostream>
 

@@ -1,5 +1,4 @@
-
-// Copyright 2016-2018 DiffBlue Limited. All Rights Reserved.
+/// Author: Diffblue Ltd.
 
 /// \file
 /// A symbol table writer that records which entries have been updated

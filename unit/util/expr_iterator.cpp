@@ -1,4 +1,4 @@
-// Copyright 2018 DiffBlue Limited. All Rights Reserved.
+/// Author: Diffblue Ltd.
 
 /// \file Tests for depth_iteratort and friends
 

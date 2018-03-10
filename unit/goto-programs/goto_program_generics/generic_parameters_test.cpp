@@ -2,7 +2,7 @@
 
  Module: Unit tests for instantiating generic classes.
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 #include <testing-utils/catch.hpp>
