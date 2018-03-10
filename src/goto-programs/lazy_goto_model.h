@@ -76,6 +76,11 @@ public:
 
   void initialize(const cmdlinet &cmdline);
 
+  const goto_functionst::goto_functiont &get_goto_function(const irep_idt &id)
+  {
+    return goto_functions.at(id);
+  }
+
   /// Eagerly loads all functions from the symbol table.
   void load_all_functions() const;
 
@@ -101,6 +106,26 @@ public:
   }
 
   virtual bool can_produce_function(const irep_idt &id) const;
+
+  std::unordered_set<irep_idt, irep_id_hash> get_converted_functions() const
+  {
+    return goto_functions.get_converted_functions();
+  }
+
+  const goto_functionst::goto_functiont &get_converted_goto_function(
+    const irep_idt &id) const
+  {
+    return goto_functions.get_converted_goto_function(id);
+  }
+
+  /// Deprecated accessor to retrieve the internal goto_functionst.
+  /// Use with care; concurrent use of get_goto_function will have side-effects
+  /// on this map which may surprise users, including invalidating any iterators
+  /// they have stored.
+  const goto_functionst &get_goto_functions_deprecated() const
+  {
+    return goto_model->goto_functions;
+  }
 
 private:
   std::unique_ptr<goto_modelt> goto_model;

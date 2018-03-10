@@ -92,10 +92,10 @@ public:
   }
 
   bool output_coverage_report(
-    const goto_functionst &goto_functions,
+    const goto_functions_providert &goto_functions_provider,
     const std::string &path) const
   {
-    return symex_coverage.generate_report(goto_functions, path);
+    return symex_coverage.generate_report(goto_functions_provider, path);
   }
 
   bool record_coverage;

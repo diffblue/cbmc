@@ -21,7 +21,7 @@ Date: March 2016
 #include <goto-programs/goto_program.h>
 
 class coverage_recordt;
-class goto_functionst;
+class goto_functions_providert;
 class namespacet;
 class xmlt;
 
@@ -44,7 +44,7 @@ public:
   }
 
   bool generate_report(
-    const goto_functionst &goto_functions,
+    const goto_functions_providert &goto_functions_provider,
     const std::string &path) const;
 
 protected:
@@ -73,15 +73,15 @@ protected:
   coveraget coverage;
 
   bool output_report(
-    const goto_functionst &goto_functions,
+    const goto_functions_providert &goto_functions_provider,
     std::ostream &os) const;
 
   void build_cobertura(
-    const goto_functionst &goto_functions,
+    const goto_functions_providert &goto_functions_provider,
     xmlt &xml_coverage) const;
 
   void compute_overall_coverage(
-    const goto_functionst &goto_functions,
+    const goto_functions_providert &goto_functions_provider,
     coverage_recordt &dest) const;
 
   friend class goto_program_coverage_recordt;

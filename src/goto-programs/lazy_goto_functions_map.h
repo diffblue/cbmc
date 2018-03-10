@@ -117,6 +117,25 @@ public:
     ensure_function_loaded_internal(name);
   }
 
+  std::unordered_set<irep_idt, irep_id_hash> get_converted_functions() const
+  {
+    std::unordered_set<irep_idt, irep_id_hash> result;
+    for(const auto &id_and_body : goto_functions)
+      result.insert(id_and_body.first);
+    return result;
+  }
+
+  /// Returns the GOTO function body for function with name 'id', or throws if
+  /// that function has not been converted or does not exist.
+  /// Contrast `at(const irep_idt &)`, which converts functions on demand.
+  /// \param id: function id to retrieve
+  /// \return function body if available, or throws otherwise
+  const goto_functionst::goto_functiont &get_converted_goto_function(
+    const irep_idt &id) const
+  {
+    return goto_functions.at(id);
+  }
+
 private:
   // This returns a non-const reference, but if you use this method from a
   // const method then you should not return such a reference without making it
