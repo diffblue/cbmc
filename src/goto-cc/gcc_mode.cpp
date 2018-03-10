@@ -380,12 +380,24 @@ int gcc_modet::doit()
     return EX_OK; // Exit!
   }
 
-  if(cmdline.isset("dumpversion"))
+  if(
+    cmdline.isset("dumpmachine") || cmdline.isset("dumpspecs") ||
+    cmdline.isset("dumpversion") || cmdline.isset("print-sysroot") ||
+    cmdline.isset("print-sysroot-headers-suffix"))
   {
     if(produce_hybrid_binary)
       return run_gcc(compiler);
 
-    std::cout << "3.4.4\n";
+    // GCC will only print one of these, even when multiple arguments are
+    // passed, so we do the same
+    if(cmdline.isset("dumpmachine"))
+      std::cout << config.this_architecture() << '\n';
+    else if(cmdline.isset("dumpversion"))
+      std::cout << "3.4.4\n";
+
+    // we don't have any meaningful output for the other options, and GCC
+    // doesn't necessarily produce non-empty output either
+
     return EX_OK;
   }
 
