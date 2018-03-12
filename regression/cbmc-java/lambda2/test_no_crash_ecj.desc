@@ -1,7 +1,9 @@
 CORE
 StaticMethodRef.class
 --function StaticMethodRef.Smr
-^EXIT=0
+VERIFICATION FAILED
+EXIT=10
+SIGNAL=0
 ^SIGNAL=0
 --
 --
