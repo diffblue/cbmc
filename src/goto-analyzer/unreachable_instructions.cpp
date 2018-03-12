@@ -325,9 +325,21 @@ static void list_functions(
 
       goto_programt::const_targett end_function=
         goto_program.instructions.end();
-      --end_function;
-      assert(end_function->is_end_function());
-      last_location=end_function->source_location;
+
+      // find the last instruction with a line number
+      // TODO(tautschnig): #918 will eventually ensure that every instruction
+      // has such
+      do
+      {
+        --end_function;
+        last_location = end_function->source_location;
+      }
+      while(
+        end_function != goto_program.instructions.begin() &&
+        last_location.get_line().empty());
+
+      if(last_location.get_line().empty())
+        last_location = decl.location;
     }
     else
       // completely ignore functions without a body, both for
