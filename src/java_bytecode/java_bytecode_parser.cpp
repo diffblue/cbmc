@@ -1910,15 +1910,10 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       continue;
     }
 
-    if(
+    // If parse_method_handle can't parse the lambda method, it should return {}
+    POSTCONDITION(
       lambda_method_handle->handle_type !=
-      method_handle_typet::LAMBDA_METHOD_HANDLE)
-    {
-      lambda_method_handle->u2_values = std::move(u2_values);
-      error() << "ERROR: could not parse lambda function method handle"
-              << eom;
-      continue;
-    }
+      method_handle_typet::LAMBDA_METHOD_HANDLE);
 
     lambda_method_handle->interface_type =
       pool_entry(interface_type_argument.ref1).s;
