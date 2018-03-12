@@ -310,6 +310,18 @@ void java_bytecode_convert_classt::convert(const classt &c)
     }
   }
 
+  // now do lambda method handles (bootstrap methods)
+  for(const auto &lambda_entry : c.lambda_method_handle_map)
+  {
+    // if the handle is of unknown type, we still need to store it to preserve
+    // the correct indexing (invokedynamic instructions will retrieve
+    // method handles by index)
+    lambda_entry.second.is_unknown_handle()
+      ? class_type.add_unknown_lambda_method_handle()
+      : class_type.add_lambda_method_handle(
+          "java::" + id2string(lambda_entry.second.lambda_method_ref));
+  }
+
   // produce class symbol
   symbolt new_symbol;
   new_symbol.base_name=c.name;
