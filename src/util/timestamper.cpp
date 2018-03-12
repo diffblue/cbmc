@@ -47,8 +47,7 @@ std::string monotonic_timestampert::stamp() const
   std::lldiv_t divmod = lldiv(cnt, 1000000);
 
   std::stringstream ss;
-  ss << divmod.quot << "." << std::setfill('0') << std::setw(6) << divmod.rem
-     << " ";
+  ss << divmod.quot << "." << std::setfill('0') << std::setw(6) << divmod.rem;
   return ss.str();
 }
 
@@ -67,7 +66,7 @@ std::string wall_clock_timestampert::stamp() const
 
   std::stringstream ss;
   ss << std::put_time(&local, WALL_FORMAT) << std::setfill('0') << std::setw(6)
-     << u_seconds << " ";
+     << u_seconds;
   return ss.str();
 }
 #endif
