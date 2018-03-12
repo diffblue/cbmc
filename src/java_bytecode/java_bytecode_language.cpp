@@ -34,7 +34,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_static_initializers.h"
 #include "java_utils.h"
 #include <java_bytecode/ci_lazy_methods.h>
-#include <java_bytecode/generate_java_generic_type.h>
 
 #include "expr2java.h"
 

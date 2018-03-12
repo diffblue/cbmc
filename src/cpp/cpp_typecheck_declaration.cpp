@@ -67,9 +67,7 @@ void cpp_typecheckt::convert_anonymous_union(
     throw 0;
   }
 
-  codet decl_statement(ID_decl);
-  decl_statement.reserve_operands(2);
-  decl_statement.copy_to_operands(cpp_symbol_expr(symbol));
+  code_declt decl_statement(cpp_symbol_expr(symbol));
 
   new_code.move_to_operands(decl_statement);
 

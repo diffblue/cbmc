@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "expr_cast.h"
 
+#include <unordered_map>
+
 class constant_exprt;
 
 /*! \defgroup gr_std_types Conversion to specific types
@@ -885,6 +887,16 @@ public:
   void set_access(const irep_idt &access)
   {
     return set(ID_access, access);
+  }
+
+  bool get_is_constructor() const
+  {
+    return get_bool(ID_constructor);
+  }
+
+  void set_is_constructor()
+  {
+    set(ID_constructor, true);
   }
 
   // this produces the list of parameter identifiers

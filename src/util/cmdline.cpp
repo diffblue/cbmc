@@ -8,9 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cmdline.h"
 
-#include <cassert>
-#include <cstdlib>
-#include <iostream>
+#include <util/invariant.h>
 
 cmdlinet::cmdlinet()
 {
@@ -124,11 +122,8 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
   {
     optiont option;
 
-    if(optstring[0]==':')
-    {
-      std::cerr << "cmdlinet::parse: Invalid option string\n";
-      abort();
-    }
+    DATA_INVARIANT(
+      optstring[0] != ':', "cmdlinet::parse: Invalid option string\n");
 
     if(optstring[0]=='(')
     {

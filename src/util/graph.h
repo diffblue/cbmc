@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <algorithm>
 #include <queue>
+#include <functional>
 
 #include "invariant.h"
 
@@ -264,8 +265,11 @@ public:
 
   std::list<node_indext> topsort() const;
 
+  std::vector<node_indext> get_successors(const node_indext &n) const;
   void output_dot(std::ostream &out) const;
-  void output_dot_node(std::ostream &out, node_indext n) const;
+  void for_each_successor(
+    const node_indext &n,
+    std::function<void(const node_indext &)> f) const;
 
 protected:
   class tarjant
@@ -668,23 +672,64 @@ std::list<typename grapht<N>::node_indext> grapht<N>::topsort() const
   return nodelist;
 }
 
-template<class N>
-void grapht<N>::output_dot(std::ostream &out) const
+template <typename node_index_type>
+void output_dot_generic(
+  std::ostream &out,
+  const std::function<void(std::function<void(const node_index_type &)>)>
+    &for_each_node,
+  const std::function<
+    void(const node_index_type &, std::function<void(const node_index_type &)>)>
+    &for_each_succ,
+  const std::function<std::string(const node_index_type &)> node_to_string)
 {
-  for(node_indext n=0; n<nodes.size(); n++)
-    output_dot_node(out, n);
+  for_each_node([&](const node_index_type &i) {      // NOLINT
+    for_each_succ(i, [&](const node_index_type &n) { // NOLINT
+      out << node_to_string(i) << " -> " << node_to_string(n) << '\n';
+    });
+  });
 }
 
-template<class N>
-void grapht<N>::output_dot_node(std::ostream &out, node_indext n) const
+template <class N>
+std::vector<typename grapht<N>::node_indext>
+grapht<N>::get_successors(const node_indext &n) const
 {
-  const nodet &node=nodes[n];
+  std::vector<node_indext> result;
+  std::transform(
+    nodes[n].out.begin(),
+    nodes[n].out.end(),
+    std::back_inserter(result),
+    [&](const std::pair<node_indext, edget> &edge) { return edge.first; });
+  return result;
+}
 
-  for(typename edgest::const_iterator
-      it=node.out.begin();
-      it!=node.out.end();
-      it++)
-    out << n << " -> " << it->first << '\n';
+template <class N>
+void grapht<N>::for_each_successor(
+  const node_indext &n,
+  std::function<void(const node_indext &)> f) const
+{
+  std::for_each(
+    nodes[n].out.begin(),
+    nodes[n].out.end(),
+    [&](const std::pair<node_indext, edget> &edge) { f(edge.first); });
+}
+
+template <class N>
+void grapht<N>::output_dot(std::ostream &out) const
+{
+  const auto for_each_node =
+    [&](const std::function<void(const node_indext &)> &f) { // NOLINT
+      for(node_indext i = 0; i < nodes.size(); ++i)
+        f(i);
+    };
+
+  const auto for_each_succ = [&](
+    const node_indext &i,
+    const std::function<void(const node_indext &)> &f) { // NOLINT
+    for_each_successor(i, f);
+  };
+
+  const auto to_string = [](const node_indext &i) { return std::to_string(i); };
+  output_dot_generic<node_indext>(out, for_each_node, for_each_succ, to_string);
 }
 
 #endif // CPROVER_UTIL_GRAPH_H

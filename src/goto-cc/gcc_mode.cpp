@@ -813,7 +813,7 @@ int gcc_modet::run_gcc(const compilet &compiler)
   for(const auto &a : cmdline.parsed_argv)
     new_argv.push_back(a.arg);
 
-  if(compiler.wrote_object_files())
+  if(!act_as_ld && compiler.wrote_object_files())
   {
     // Undefine all __CPROVER macros for the system compiler
     std::map<irep_idt, std::size_t> arities;
@@ -935,12 +935,7 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
   {
     linker_script_merget ls_merge(
         compiler, output_files, goto_binaries, cmdline, gcc_message_handler);
-    const int fail=ls_merge.add_linker_script_definitions();
-    if(fail!=0)
-    {
-      error() << "Unable to merge linker script symbols" << eom;
-      return fail;
-    }
+    result=ls_merge.add_linker_script_definitions();
   }
 
   // merge output from gcc with goto-binaries

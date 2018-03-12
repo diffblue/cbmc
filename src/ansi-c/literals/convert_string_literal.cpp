@@ -16,8 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/unicode.h>
-
-#include "../string_constant.h"
+#include <util/string_constant.h>
 
 #include "unescape_string.h"
 

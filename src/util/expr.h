@@ -6,14 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_UTIL_EXPR_H
 #define CPROVER_UTIL_EXPR_H
 
-#define OPERANDS_IN_GETSUB
+#include "type.h"
 
 #include <functional>
-#include "type.h"
+#include <list>
 
 #define forall_operands(it, expr) \
   if((expr).has_operands()) /* NOLINT(readability/braces) */ \
@@ -65,18 +64,10 @@ public:
   { return !operands().empty(); }
 
   operandst &operands()
-  #ifdef OPERANDS_IN_GETSUB
   { return (operandst &)get_sub(); }
-  #else
-  { return (operandst &)(add(ID_operands).get_sub()); }
-  #endif
 
   const operandst &operands() const
-  #ifdef OPERANDS_IN_GETSUB
   { return (const operandst &)get_sub(); }
-  #else
-  { return (const operandst &)(find(ID_operands).get_sub()); }
-  #endif
 
   exprt &op0()
   { return operands().front(); }
@@ -121,11 +112,6 @@ public:
   void make_true();
   void make_false();
   void make_bool(bool value);
-  void negate();
-
-  bool sum(const exprt &expr);
-  bool mul(const exprt &expr);
-  bool subtract(const exprt &expr);
 
   bool is_constant() const;
   bool is_true() const;

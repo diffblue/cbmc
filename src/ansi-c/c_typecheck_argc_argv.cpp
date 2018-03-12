@@ -67,16 +67,12 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     }
 
     // we make the type of this thing an array of pointers
-    typet argv_type=array_typet();
-    argv_type.subtype()=op1.type().subtype();
-
     // need to add one to the size -- the array is terminated
     // with NULL
     exprt one_expr=from_integer(1, argc_new_symbol->type);
 
-    exprt size_expr(ID_plus, argc_new_symbol->type);
-    size_expr.copy_to_operands(argc_new_symbol->symbol_expr(), one_expr);
-    argv_type.add(ID_size).swap(size_expr);
+    const plus_exprt size_expr(argc_new_symbol->symbol_expr(), one_expr);
+    const array_typet argv_type(op1.type().subtype(), size_expr);
 
     symbolt argv_symbol;
 

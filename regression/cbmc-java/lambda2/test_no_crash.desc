@@ -1,0 +1,8 @@
+CORE
+SymStream.class
+--verbosity 10 --show-goto-functions
+^EXIT=0
+^SIGNAL=0
+--
+--
+just to test that it doesn't crash in this situation, cf. TG-2684

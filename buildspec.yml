@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
+      - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
+      - apt-get update -y
+      - apt-get install -y g++-5 flex bison make git libwww-perl patch ccache
+      - apt-get install -y openjdk-7-jdk
+      - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
+      - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
+  build:
+    commands:
+      - echo Build started on `date`
+      - (cd src ; make minisat2-download)
+      - (cd src ; make CXX="ccache g++" -j2)
+      - (cd regression ; make test)
+  post_build:
+    commands:
+      - echo Build completed on `date`
+artifacts:
+  files:
+cache:
+  paths:
+    - '/root/.ccache/**/*'

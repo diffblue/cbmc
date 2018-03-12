@@ -112,8 +112,10 @@ extract_generic_superclass_reference(const optionalt<std::string> &signature)
       signature.value().substr(start, (end - start) + 1);
 
     // if the superclass is generic then the reference is of form
-    // Lsuperclass-name<generic-types;>;
-    if(has_suffix(superclass_ref, ">;"))
+    // `Lsuperclass-name<generic-types;>;` if it is implicitly generic, then the
+    // reference is of the form
+    // `Lsuperclass-name<Tgeneric-types;>.Innerclass-Name`
+    if(superclass_ref.find('<') != std::string::npos)
       return superclass_ref;
   }
   return {};
@@ -149,7 +151,16 @@ static optionalt<std::string> extract_generic_interface_reference(
     start =
       find_closing_semi_colon_for_reference_type(signature.value(), start) + 1;
 
-    start = signature.value().find("L" + interface_name + "<", start);
+    // if the interface name includes package name, convert dots to slashes
+    std::string interface_name_slash_to_dot = interface_name;
+    std::replace(
+      interface_name_slash_to_dot.begin(),
+      interface_name_slash_to_dot.end(),
+      '.',
+      '/');
+
+    start =
+      signature.value().find("L" + interface_name_slash_to_dot + "<", start);
     if(start != std::string::npos)
     {
       const size_t &end =
@@ -476,31 +487,33 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     if(symbol_table.has_symbol(symbol_type_identifier))
       return;
 
-    struct_typet struct_type;
+    class_typet class_type;
     // we have the base class, java.lang.Object, length and data
     // of appropriate type
-    struct_type.set_tag(symbol_type_identifier);
+    class_type.set_tag(symbol_type_identifier);
 
-    struct_type.components().reserve(3);
-    struct_typet::componentt
-      comp0("@java.lang.Object", symbol_typet("java::java.lang.Object"));
-    comp0.set_pretty_name("@java.lang.Object");
-    comp0.set_base_name("@java.lang.Object");
-    struct_type.components().push_back(comp0);
+    class_type.components().reserve(3);
+    class_typet::componentt base_class_component(
+      "@java.lang.Object", symbol_typet("java::java.lang.Object"));
+    base_class_component.set_pretty_name("@java.lang.Object");
+    base_class_component.set_base_name("@java.lang.Object");
+    class_type.components().push_back(base_class_component);
 
-    struct_typet::componentt comp1("length", java_int_type());
-    comp1.set_pretty_name("length");
-    comp1.set_base_name("length");
-    struct_type.components().push_back(comp1);
+    class_typet::componentt length_component("length", java_int_type());
+    length_component.set_pretty_name("length");
+    length_component.set_base_name("length");
+    class_type.components().push_back(length_component);
 
-    struct_typet::componentt
-      comp2("data", java_reference_type(java_type_from_char(l)));
-    comp2.set_pretty_name("data");
-    comp2.set_base_name("data");
-    struct_type.components().push_back(comp2);
+    class_typet::componentt data_component(
+      "data", java_reference_type(java_type_from_char(l)));
+    data_component.set_pretty_name("data");
+    data_component.set_base_name("data");
+    class_type.components().push_back(data_component);
+
+    class_type.add_base(symbol_typet("java::java.lang.Object"));
 
     INVARIANT(
-      is_valid_java_array(struct_type),
+      is_valid_java_array(class_type),
       "Constructed a new type representing a Java Array "
       "object that doesn't match expectations");
 
@@ -508,7 +521,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     symbol.name=symbol_type_identifier;
     symbol.base_name=symbol_type.get(ID_C_base_name);
     symbol.is_type=true;
-    symbol.type=struct_type;
+    symbol.type = class_type;
     symbol_table.add(symbol);
 
     // Also provide a clone method:
@@ -555,14 +568,16 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
       java_reference_type(symbol_type));
     dereference_exprt old_array(this_symbol.symbol_expr(), symbol_type);
     dereference_exprt new_array(local_symexpr, symbol_type);
-    member_exprt old_length(old_array, comp1.get_name(), comp1.type());
+    member_exprt old_length(
+      old_array, length_component.get_name(), length_component.type());
     java_new_array.copy_to_operands(old_length);
     code_assignt create_blank(local_symexpr, java_new_array);
     clone_body.move_to_operands(create_blank);
 
-
-    member_exprt old_data(old_array, comp2.get_name(), comp2.type());
-    member_exprt new_data(new_array, comp2.get_name(), comp2.type());
+    member_exprt old_data(
+      old_array, data_component.get_name(), data_component.type());
+    member_exprt new_data(
+      new_array, data_component.get_name(), data_component.type());
 
     /*
       // TODO use this instead of a loop.
@@ -581,7 +596,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     index_symbol.name=index_name;
     index_symbol.base_name="index";
     index_symbol.pretty_name=index_symbol.base_name;
-    index_symbol.type=comp1.type();
+    index_symbol.type = length_component.type();
     index_symbol.mode=ID_java;
     symbol_table.add(index_symbol);
     const auto &index_symexpr=index_symbol.symbol_expr();
@@ -612,7 +627,8 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     // End for-loop
     clone_body.move_to_operands(copy_loop);
 
-    member_exprt new_base_class(new_array, comp0.get_name(), comp0.type());
+    member_exprt new_base_class(
+      new_array, base_class_component.get_name(), base_class_component.type());
     address_of_exprt retval(new_base_class);
     code_returnt return_inst(retval);
     clone_body.move_to_operands(return_inst);
@@ -685,7 +701,7 @@ static void find_and_replace_parameter(
 {
   // get the name of the parameter, e.g., `T` from `java::Class::T`
   const std::string &parameter_full_name =
-    as_string(parameter.type_variable_ref().get_identifier());
+    id2string(parameter.type_variable_ref().get_identifier());
   const std::string &parameter_name =
     parameter_full_name.substr(parameter_full_name.rfind("::") + 2);
 
@@ -696,7 +712,7 @@ static void find_and_replace_parameter(
     [&parameter_name](const java_generic_parametert &replacement_param)
     {
       const std::string &replacement_parameter_full_name =
-        as_string(replacement_param.type_variable().get_identifier());
+        id2string(replacement_param.type_variable().get_identifier());
       return parameter_name.compare(
                replacement_parameter_full_name.substr(
                  replacement_parameter_full_name.rfind("::") + 2)) == 0;
@@ -706,7 +722,7 @@ static void find_and_replace_parameter(
   if(replacement_parameter_p != replacement_parameters.end())
   {
     const std::string &replacement_parameter_full_name =
-      as_string(replacement_parameter_p->type_variable().get_identifier());
+      id2string(replacement_parameter_p->type_variable().get_identifier());
 
     // the replacement parameter is a viable one, i.e., it comes from an outer
     // class

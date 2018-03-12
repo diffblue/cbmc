@@ -3,7 +3,7 @@
  Module: Unit tests for sparse arrays
    solvers/refinement/string_refinement.cpp
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

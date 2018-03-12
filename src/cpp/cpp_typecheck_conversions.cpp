@@ -890,13 +890,10 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           qual_from.write(ptr_sub.subtype());
           make_ptr_typecast(address, ptr_sub);
 
-          exprt deref(ID_dereference);
-          deref.copy_to_operands(address);
-          deref.type()=address.type().subtype();
+          const dereference_exprt deref(address);
 
           // create temporary object
-          exprt tmp_object_expr=exprt(ID_side_effect, type);
-          tmp_object_expr.set(ID_statement, ID_temporary_object);
+          side_effect_exprt tmp_object_expr(ID_temporary_object, type);
           tmp_object_expr.add_source_location()=expr.source_location();
           tmp_object_expr.copy_to_operands(deref);
           tmp_object_expr.set(ID_C_lvalue, true);
@@ -1024,10 +1021,8 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               rank+=tmp_rank;
 
               // create temporary object
-              exprt expr_deref=
-                exprt(ID_dereference, expr_ptmp.type().subtype());
+              dereference_exprt expr_deref(expr_ptmp);
               expr_deref.set(ID_C_lvalue, true);
-              expr_deref.copy_to_operands(expr_ptmp);
               expr_deref.add_source_location()=expr.source_location();
 
               exprt new_object("new_object", type);
@@ -1692,7 +1687,7 @@ bool cpp_typecheckt::const_typecast(
     if(new_expr.type()!=type.subtype())
       return false;
 
-    exprt address_of=address_of_exprt(expr, to_pointer_type(type));
+    address_of_exprt address_of(expr, to_pointer_type(type));
     add_implicit_dereference(address_of);
     new_expr=address_of;
     return true;

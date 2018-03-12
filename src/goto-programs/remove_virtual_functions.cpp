@@ -24,7 +24,8 @@ class remove_virtual_functionst
 {
 public:
   remove_virtual_functionst(
-    const symbol_table_baset &_symbol_table);
+    const symbol_table_baset &_symbol_table,
+    const class_hierarchyt &_class_hierarchy);
 
   void operator()(goto_functionst &goto_functions);
 
@@ -36,17 +37,17 @@ public:
     const dispatch_table_entriest &functions,
     virtual_dispatch_fallback_actiont fallback_action);
 
+  void get_functions(const exprt &, dispatch_table_entriest &);
+
 protected:
   const namespacet ns;
   const symbol_table_baset &symbol_table;
 
-  class_hierarchyt class_hierarchy;
+  const class_hierarchyt &class_hierarchy;
 
   void remove_virtual_function(
     goto_programt &goto_program,
     goto_programt::targett target);
-
-  void get_functions(const exprt &, dispatch_table_entriest &);
   typedef std::function<
     resolve_inherited_componentt::inherited_componentt(
       const irep_idt &,
@@ -64,11 +65,12 @@ protected:
 };
 
 remove_virtual_functionst::remove_virtual_functionst(
-  const symbol_table_baset &_symbol_table):
-  ns(_symbol_table),
-  symbol_table(_symbol_table)
+  const symbol_table_baset &_symbol_table,
+  const class_hierarchyt &_class_hierarchy)
+  : ns(_symbol_table),
+    symbol_table(_symbol_table),
+    class_hierarchy(_class_hierarchy)
 {
-  class_hierarchy(symbol_table);
 }
 
 void remove_virtual_functionst::remove_virtual_function(
@@ -96,6 +98,28 @@ void remove_virtual_functionst::remove_virtual_function(
     virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION);
 }
 
+/// Create a concrete function call to replace a virtual one
+/// \param call [in/out]: the function call to update
+/// \param function_symbol: the function to be called
+/// \param ns: namespace
+static void create_static_function_call(
+  code_function_callt &call,
+  const symbol_exprt &function_symbol,
+  const namespacet &ns)
+{
+  call.function() = function_symbol;
+  // Cast the `this` pointer to the correct type for the new callee:
+  const auto &callee_type =
+    to_code_type(ns.lookup(function_symbol.get_identifier()).type);
+  const code_typet::parametert *this_param = callee_type.get_this();
+  INVARIANT(
+    this_param != nullptr,
+    "Virtual function callees must have a `this` argument");
+  typet need_type = this_param->type();
+  if(!type_eq(call.arguments()[0].type(), need_type, ns))
+    call.arguments()[0].make_typecast(need_type);
+}
+
 void remove_virtual_functionst::remove_virtual_function(
   goto_programt &goto_program,
   goto_programt::targett target,
@@ -121,8 +145,10 @@ void remove_virtual_functionst::remove_virtual_function(
     if(functions.begin()->symbol_expr==symbol_exprt())
       target->make_skip();
     else
-      to_code_function_call(target->code).function()=
-        functions.begin()->symbol_expr;
+    {
+      create_static_function_call(
+        to_code_function_call(target->code), functions.front().symbol_expr, ns);
+    }
     return;
   }
 
@@ -187,18 +213,8 @@ void remove_virtual_functionst::remove_virtual_function(
       {
       // call function
         t1->make_function_call(code);
-        auto &newcall=to_code_function_call(t1->code);
-        newcall.function()=fun.symbol_expr;
-        // Cast the `this` pointer to the correct type for the new callee:
-        const auto &callee_type=
-          to_code_type(ns.lookup(fun.symbol_expr.get_identifier()).type);
-        const code_typet::parametert *this_param = callee_type.get_this();
-        INVARIANT(
-          this_param != nullptr,
-          "Virtual function callees must have a `this` argument");
-        typet need_type=this_param->type();
-        if(!type_eq(newcall.arguments()[0].type(), need_type, ns))
-          newcall.arguments()[0].make_typecast(need_type);
+        create_static_function_call(
+          to_code_function_call(t1->code), fun.symbol_expr, ns);
       }
       else
       {
@@ -514,7 +530,9 @@ void remove_virtual_functions(
   const symbol_table_baset &symbol_table,
   goto_functionst &goto_functions)
 {
-  remove_virtual_functionst rvf(symbol_table);
+  class_hierarchyt class_hierarchy;
+  class_hierarchy(symbol_table);
+  remove_virtual_functionst rvf(symbol_table, class_hierarchy);
   rvf(goto_functions);
 }
 
@@ -526,7 +544,9 @@ void remove_virtual_functions(goto_modelt &goto_model)
 
 void remove_virtual_functions(goto_model_functiont &function)
 {
-  remove_virtual_functionst rvf(function.get_symbol_table());
+  class_hierarchyt class_hierarchy;
+  class_hierarchy(function.get_symbol_table());
+  remove_virtual_functionst rvf(function.get_symbol_table(), class_hierarchy);
   bool changed = rvf.remove_virtual_functions(
     function.get_goto_function().body);
   // Give fresh location numbers to `function`, in case it has grown:
@@ -541,8 +561,20 @@ void remove_virtual_function(
   const dispatch_table_entriest &dispatch_table,
   virtual_dispatch_fallback_actiont fallback_action)
 {
-  remove_virtual_functionst rvf(goto_model.symbol_table);
+  class_hierarchyt class_hierarchy;
+  class_hierarchy(goto_model.symbol_table);
+  remove_virtual_functionst rvf(goto_model.symbol_table, class_hierarchy);
 
   rvf.remove_virtual_function(
     goto_program, instruction, dispatch_table, fallback_action);
+}
+
+void collect_virtual_function_callees(
+  const exprt &function,
+  const symbol_table_baset &symbol_table,
+  const class_hierarchyt &class_hierarchy,
+  dispatch_table_entriest &overridden_functions)
+{
+  remove_virtual_functionst instance(symbol_table, class_hierarchy);
+  instance.get_functions(function, overridden_functions);
 }

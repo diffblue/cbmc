@@ -526,10 +526,7 @@ void goto_convertt::remove_temporary_object(
 
   if(expr.operands().size()==1)
   {
-    codet assignment(ID_assign);
-    assignment.reserve_operands(2);
-    assignment.copy_to_operands(new_symbol.symbol_expr());
-    assignment.move_to_operands(expr.op0());
+    const code_assignt assignment(new_symbol.symbol_expr(), expr.op0());
 
     convert(assignment, dest);
   }

@@ -1,6 +1,6 @@
 CORE
 main.c
---inline
+--inline --remove-calls-no-body
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -9,4 +9,5 @@ main.c
 ^\s*a;$
 no body.*[`]f
 --
+f\(\)
 ^warning: ignoring

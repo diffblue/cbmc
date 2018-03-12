@@ -24,12 +24,11 @@ Date: April 2016
 /// \param symbol_table: The symbol table to analyze
 void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
 {
-  forall_symbols(it, symbol_table.symbols)
+  for(const auto &symbol_pair : symbol_table.symbols)
   {
-    if(it->second.is_type && it->second.type.id()==ID_struct)
+    if(symbol_pair.second.is_type && symbol_pair.second.type.id() == ID_struct)
     {
-      const struct_typet &struct_type=
-        to_struct_type(it->second.type);
+      const struct_typet &struct_type = to_struct_type(symbol_pair.second.type);
 
       const irept::subt &bases=
         struct_type.find(ID_bases).get_sub();
@@ -40,8 +39,8 @@ void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
         if(parent.empty())
           continue;
 
-        class_map[parent].children.push_back(it->first);
-        class_map[it->first].parents.push_back(parent);
+        class_map[parent].children.push_back(symbol_pair.first);
+        class_map[symbol_pair.first].parents.push_back(parent);
       }
     }
   }
@@ -55,28 +54,31 @@ void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
 void class_hierarchy_grapht::populate(const symbol_tablet &symbol_table)
 {
   // Add nodes for all classes:
-  forall_symbols(it, symbol_table.symbols)
+  for(const auto &symbol_pair : symbol_table.symbols)
   {
-    if(it->second.is_type && it->second.type.id() == ID_struct)
+    if(symbol_pair.second.is_type && symbol_pair.second.type.id() == ID_struct)
     {
       node_indext new_node_index = add_node();
-      nodes_by_name[it->first] = new_node_index;
-      (*this)[new_node_index].class_identifier = it->first;
+      nodes_by_name[symbol_pair.first] = new_node_index;
+      (*this)[new_node_index].class_identifier = symbol_pair.first;
     }
   }
 
   // Add parent -> child edges:
-  forall_symbols(it, symbol_table.symbols)
+  for(const auto &symbol_pair : symbol_table.symbols)
   {
-    if(it->second.is_type && it->second.type.id() == ID_struct)
+    if(symbol_pair.second.is_type && symbol_pair.second.type.id() == ID_struct)
     {
-      const class_typet &class_type = to_class_type(it->second.type);
+      const class_typet &class_type = to_class_type(symbol_pair.second.type);
 
       for(const auto &base : class_type.bases())
       {
         const irep_idt &parent = to_symbol_type(base.type()).get_identifier();
         if(!parent.empty())
-          add_edge(nodes_by_name.at(parent), nodes_by_name.at(it->first));
+        {
+          add_edge(
+            nodes_by_name.at(parent), nodes_by_name.at(symbol_pair.first));
+        }
       }
     }
   }

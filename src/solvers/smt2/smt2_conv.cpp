@@ -16,19 +16,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/base_type.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/expr_util.h>
 #include <util/fixedbv.h>
+#include <util/format_expr.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
-#include <util/config.h>
 #include <util/pointer_offset_size.h>
-#include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/std_types.h>
 #include <util/string2int.h>
-
-#include <ansi-c/string_constant.h>
-
-#include <langapi/language_util.h>
+#include <util/string_constant.h>
 
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/flatten_byte_operators.h>
@@ -379,7 +377,7 @@ exprt smt2_convt::parse_union(
   exprt value=parse_rec(src, bv_typet(width));
   if(value.is_nil())
     return nil_exprt();
-  exprt converted=typecast_exprt(value, first.type());
+  const typecast_exprt converted(value, first.type());
   return union_exprt(first.get_name(), converted, type);
 }
 
@@ -696,13 +694,12 @@ void smt2_convt::convert_byte_update(const byte_update_exprt &expr)
   mp_integer mask=power(2, value_width)-1;
   exprt one_mask=from_integer(mask, unsignedbv_typet(total_width));
 
-  exprt distance=mult_exprt(
-    expr.offset(),
-    from_integer(8, expr.offset().type()));
+  const mult_exprt distance(
+    expr.offset(), from_integer(8, expr.offset().type()));
 
-  exprt and_expr=bitand_exprt(expr.op(), bitnot_exprt(one_mask));
-  exprt ext_value=typecast_exprt(expr.value(), one_mask.type());
-  exprt or_expr=bitor_exprt(and_expr, shl_exprt(ext_value, distance));
+  const bitand_exprt and_expr(expr.op(), bitnot_exprt(one_mask));
+  const typecast_exprt ext_value(expr.value(), one_mask.type());
+  const bitor_exprt or_expr(and_expr, shl_exprt(ext_value, distance));
 
   unflatten(wheret::BEGIN, expr.type());
   flatten2bv(or_expr);
@@ -2081,9 +2078,10 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else
     {
-      UNEXPECTEDCASE(
-        "TODO typecast2 "+src_type.id_string()+" -> "+
-        dest_type.id_string()+" src == "+from_expr(ns, "", src));
+      std::ostringstream e_str;
+      e_str << src_type.id() << " -> " << dest_type.id()
+            << " src == " << format(src);
+      UNEXPECTEDCASE("TODO typecast2 " + e_str.str());
     }
   }
   else if(dest_type.id()==ID_fixedbv) // to fixedbv
@@ -2278,7 +2276,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     else if(src_type.id()==ID_c_bool)
     {
       // turn into proper bool
-      exprt tmp=typecast_exprt(src, bool_typet());
+      const typecast_exprt tmp(src, bool_typet());
       convert_typecast(typecast_exprt(tmp, dest_type));
     }
     else
@@ -4089,7 +4087,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
   #if 0
   out << "; CONV: "
-      << from_expr(expr) << "\n";
+      << format(expr) << "\n";
   #endif
 
   out << "; set_to " << (value?"true":"false") << "\n"

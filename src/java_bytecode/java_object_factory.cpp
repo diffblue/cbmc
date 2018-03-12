@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_utils.h"
 #include "java_string_library_preprocess.h"
 #include "java_root_class.h"
+#include "generic_parameter_specialization_map_keys.h"
 
 static symbolt &new_tmp_symbol(
   symbol_table_baset &symbol_table,
@@ -67,6 +68,16 @@ class java_object_factoryt
   /// the non-det initialization when we see the type for the second time in
   /// this set AND the tree depth becomes >= than the maximum value above.
   std::unordered_set<irep_idt, irep_id_hash> recursion_set;
+
+  /// Every time the non-det generator visits a type and the type is generic
+  /// (either a struct or a pointer), the following map is used to store and
+  /// look up the concrete types of the generic paramaters in the current
+  /// scope. Note that not all generic parameters need to have a concrete
+  /// type, e.g., the method under test is generic. The types are removed
+  /// from the map when the scope changes. Note that in different depths
+  /// of the scope the parameters can be specialized with different types
+  /// so we keep a stack of types for each parameter.
+  generic_parameter_specialization_mapt generic_parameter_specialization_map;
 
   /// The symbol table.
   symbol_table_baset &symbol_table;
@@ -195,11 +206,9 @@ exprt allocate_dynamic_object(
   {
     INVARIANT(!object_size.is_nil(), "Size of Java objects should be known");
     // malloc expression
-    exprt malloc_expr=side_effect_exprt(ID_allocate);
+    side_effect_exprt malloc_expr(ID_allocate, pointer_type(allocate_type));
     malloc_expr.copy_to_operands(object_size);
     malloc_expr.copy_to_operands(false_exprt());
-    typet result_type=pointer_type(allocate_type);
-    malloc_expr.type()=result_type;
     // create a symbol for the malloc expression so we can initialize
     // without having to do it potentially through a double-deref, which
     // breaks the to-SSA phase.
@@ -212,10 +221,10 @@ exprt allocate_dynamic_object(
     code_assignt assign=code_assignt(malloc_sym.symbol_expr(), malloc_expr);
     assign.add_source_location()=loc;
     output_code.copy_to_operands(assign);
-    malloc_expr=malloc_sym.symbol_expr();
+    exprt malloc_symbol_expr=malloc_sym.symbol_expr();
     if(cast_needed)
-      malloc_expr=typecast_exprt(malloc_expr, target_expr.type());
-    code_assignt code(target_expr, malloc_expr);
+      malloc_symbol_expr=typecast_exprt(malloc_symbol_expr, target_expr.type());
+    code_assignt code(target_expr, malloc_symbol_expr);
     code.add_source_location()=loc;
     output_code.copy_to_operands(code);
     return malloc_sym.symbol_expr();
@@ -517,10 +526,9 @@ static mp_integer max_value(const typet &type)
 /// \return code allocation object and assigning `lhs`
 static codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
 {
-  side_effect_exprt alloc(ID_allocate);
+  side_effect_exprt alloc(ID_allocate, lhs.type());
   alloc.copy_to_operands(size);
   alloc.copy_to_operands(false_exprt());
-  alloc.type() = lhs.type();
   return code_assignt(lhs, alloc);
 }
 
@@ -745,18 +753,19 @@ void java_object_factoryt::gen_nondet_pointer_init(
   const update_in_placet &update_in_place)
 {
   PRECONDITION(expr.type().id()==ID_pointer);
-  const pointer_typet &replacement_pointer_type=
-    pointer_type_selector.convert_pointer_type(pointer_type, ns);
+  const pointer_typet &replacement_pointer_type =
+    pointer_type_selector.convert_pointer_type(
+      pointer_type, generic_parameter_specialization_map, ns);
 
   // If we are changing the pointer, we generate code for creating a pointer
   // to the substituted type instead
-  if(replacement_pointer_type!=pointer_type)
+  // TODO if we are comparing array types we need to compare their element
+  // types. this is for now done by implementing equality function especially
+  // for java types, technical debt TG-2707
+  if(!equal_java_types(replacement_pointer_type, pointer_type))
   {
-    const symbol_exprt real_pointer_symbol=gen_nondet_subtype_pointer_init(
-      assignments,
-      alloc_type,
-      replacement_pointer_type,
-      depth);
+    const symbol_exprt real_pointer_symbol = gen_nondet_subtype_pointer_init(
+      assignments, alloc_type, replacement_pointer_type, depth);
 
     // Having created a pointer to object of type replacement_pointer_type
     // we now assign it back to the original pointer with a cast
@@ -1034,7 +1043,7 @@ void java_object_factoryt::gen_nondet_struct_init(
       if(skip_classid)
         continue;
 
-      irep_idt qualified_clsid="java::"+as_string(class_identifier);
+      irep_idt qualified_clsid = "java::" + id2string(class_identifier);
       constant_exprt ci(qualified_clsid, string_typet());
       code_assignt code(me, ci);
       code.add_source_location()=loc;
@@ -1154,6 +1163,15 @@ void java_object_factoryt::gen_nondet_init(
   {
     // dereferenced type
     const pointer_typet &pointer_type=to_pointer_type(type);
+
+    // If we are about to initialize a generic pointer type, add its concrete
+    // types to the map and delete them on leaving this function scope.
+    generic_parameter_specialization_map_keyst
+      generic_parameter_specialization_map_keys(
+        generic_parameter_specialization_map);
+    generic_parameter_specialization_map_keys.insert_pairs_for_pointer(
+      pointer_type, ns.follow(pointer_type.subtype()));
+
     gen_nondet_pointer_init(
       assignments,
       expr,
@@ -1167,6 +1185,21 @@ void java_object_factoryt::gen_nondet_init(
   else if(type.id()==ID_struct)
   {
     const struct_typet struct_type=to_struct_type(type);
+
+    // If we are about to initialize a generic class (as a superclass object
+    // for a different object), add its concrete types to the map and delete
+    // them on leaving this function scope.
+    generic_parameter_specialization_map_keyst
+      generic_parameter_specialization_map_keys(
+        generic_parameter_specialization_map);
+    if(is_sub)
+    {
+      const typet &symbol = override_ ? override_type : expr.type();
+      PRECONDITION(symbol.id() == ID_symbol);
+      generic_parameter_specialization_map_keys.insert_pairs_for_symbol(
+        to_symbol_type(symbol), struct_type);
+    }
+
     gen_nondet_struct_init(
       assignments,
       expr,
@@ -1247,7 +1280,7 @@ void java_object_factoryt::allocate_nondet_length_array(
   java_new_array.copy_to_operands(length_sym_expr);
   java_new_array.set(ID_length_upper_bound, max_length_expr);
   java_new_array.type().subtype().set(ID_C_element_type, element_type);
-  codet assign=code_assignt(lhs, java_new_array);
+  code_assignt assign(lhs, java_new_array);
   assign.add_source_location()=loc;
   assignments.copy_to_operands(assign);
 }
@@ -1296,7 +1329,7 @@ void java_object_factoryt::gen_nondet_array_init(
 
   dereference_exprt deref_expr(expr, expr.type().subtype());
   const auto &comps=struct_type.components();
-  exprt length_expr=member_exprt(deref_expr, "length", comps[1].type());
+  const member_exprt length_expr(deref_expr, "length", comps[1].type());
   exprt init_array_expr=member_exprt(deref_expr, "data", comps[2].type());
 
   if(init_array_expr.type()!=pointer_type(element_type))
@@ -1329,13 +1362,13 @@ void java_object_factoryt::gen_nondet_array_init(
   exprt java_zero=from_integer(0, java_int_type());
   assignments.copy_to_operands(code_assignt(counter_expr, java_zero));
 
-  std::string head_name=as_string(counter.base_name)+"_header";
+  std::string head_name = id2string(counter.base_name) + "_header";
   code_labelt init_head_label(head_name, code_skipt());
   code_gotot goto_head(head_name);
 
   assignments.move_to_operands(init_head_label);
 
-  std::string done_name=as_string(counter.base_name)+"_done";
+  std::string done_name = id2string(counter.base_name) + "_done";
   code_labelt init_done_label(done_name, code_skipt());
   code_gotot goto_done(done_name);
 
@@ -1356,7 +1389,7 @@ void java_object_factoryt::gen_nondet_array_init(
     assignments.move_to_operands(max_test);
   }
 
-  exprt arraycellref=dereference_exprt(
+  const dereference_exprt arraycellref(
     plus_exprt(array_init_symexpr, counter_expr, array_init_symexpr.type()),
     array_init_symexpr.type().subtype());
 

@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[test_copy\.assertion\.4\] expected to fail: FAILURE$
+^\*\* 1 of 8 failed
+^VERIFICATION FAILED$
+--
+^warning: ignoring

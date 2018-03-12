@@ -2,7 +2,7 @@
 
  Module: Java Bytecode
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
@@ -98,7 +98,7 @@ public:
     const std::vector<irep_idt> &main_jar_classes,
     const std::vector<irep_idt> &lazy_methods_extra_entry_points,
     java_class_loadert &java_class_loader,
-    const std::vector<irep_idt> &extra_needed_classes,
+    const std::vector<irep_idt> &extra_instantiated_classes,
     const select_pointer_typet &pointer_type_selector,
     message_handlert &message_handler,
     const synthetic_methods_mapt &synthetic_methods);
@@ -114,17 +114,17 @@ private:
     std::vector<irep_idt> &methods,
     const symbol_tablet &symbol_table);
 
-  void initialize_needed_classes(
+  void initialize_instantiated_classes(
     const std::vector<irep_idt> &entry_points,
     const namespacet &ns,
     ci_lazy_methods_neededt &needed_lazy_methods);
 
-  void initialize_all_needed_classes_from_pointer(
+  void initialize_all_instantiated_classes_from_pointer(
     const pointer_typet &pointer_type,
     const namespacet &ns,
     ci_lazy_methods_neededt &needed_lazy_methods);
 
-  void initialize_needed_classes_from_pointer(
+  void initialize_instantiated_classes_from_pointer(
     const pointer_typet &pointer_type,
     const namespacet &ns,
     ci_lazy_methods_neededt &needed_lazy_methods);
@@ -135,8 +135,8 @@ private:
 
   void get_virtual_method_targets(
     const code_function_callt &c,
-    const std::set<irep_idt> &needed_classes,
-    std::vector<irep_idt> &needed_methods,
+    const std::set<irep_idt> &instantiated_classes,
+    std::vector<irep_idt> &callable_methods,
     symbol_tablet &symbol_table);
 
   void gather_needed_globals(
@@ -150,7 +150,7 @@ private:
     ci_lazy_methods_neededt &needed_lazy_methods);
 
   irep_idt get_virtual_method_target(
-    const std::set<irep_idt> &needed_classes,
+    const std::set<irep_idt> &instantiated_classes,
     const irep_idt &call_basename,
     const irep_idt &classname,
     const symbol_tablet &symbol_table);
@@ -164,7 +164,7 @@ private:
   std::vector<irep_idt> main_jar_classes;
   std::vector<irep_idt> lazy_methods_extra_entry_points;
   java_class_loadert &java_class_loader;
-  const std::vector<irep_idt> &extra_needed_classes;
+  const std::vector<irep_idt> &extra_instantiated_classes;
   const select_pointer_typet &pointer_type_selector;
   const synthetic_methods_mapt &synthetic_methods;
 };

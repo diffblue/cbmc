@@ -346,7 +346,7 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   lemmas.push_back(a1);
 
   symbol_exprt idx1=fresh_univ_index("QA_upper_case1", index_type);
-  exprt is_lower_case=and_exprt(
+  const and_exprt is_lower_case(
     binary_relation_exprt(char_a, ID_le, str[idx1]),
     binary_relation_exprt(str[idx1], ID_le, char_z));
   minus_exprt diff(char_A, char_a);
@@ -356,9 +356,10 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   constraints.push_back(a2);
 
   symbol_exprt idx2=fresh_univ_index("QA_upper_case2", index_type);
-  exprt is_not_lower_case=not_exprt(and_exprt(
-    binary_relation_exprt(char_a, ID_le, str[idx2]),
-    binary_relation_exprt(str[idx2], ID_le, char_z)));
+  const not_exprt is_not_lower_case(
+    and_exprt(
+      binary_relation_exprt(char_a, ID_le, str[idx2]),
+      binary_relation_exprt(str[idx2], ID_le, char_z)));
   equal_exprt eq(res[idx2], str[idx2]);
   implies_exprt body2(is_not_lower_case, eq);
   string_constraintt a3(idx2, res.length(), body2);

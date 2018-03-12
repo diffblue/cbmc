@@ -402,13 +402,10 @@ exprt flatten_byte_update(
             new_value=flatten_byte_extract(byte_extract_expr, ns);
           }
 
-          exprt where=plus_exprt(src.op1(), i_expr);
+          const plus_exprt where(src.op1(), i_expr);
 
-          with_exprt with_expr;
+          with_exprt with_expr(result, where, new_value);
           with_expr.type()=src.type();
-          with_expr.old()=result;
-          with_expr.where()=where;
-          with_expr.new_value()=new_value;
 
           result.swap(with_expr);
         }

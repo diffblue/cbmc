@@ -1,0 +1,12 @@
+CORE
+main.c
+--remove-calls-no-body
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+func3\(\)
+func4\(\)
+--
+func1\(\)
+func2\(\)
+^warning: ignoring

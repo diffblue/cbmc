@@ -1,0 +1,10 @@
+CORE
+main.c
+--function-inline func1
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+func1\(\)
+func2\(\)
+--
+^warning: ignoring

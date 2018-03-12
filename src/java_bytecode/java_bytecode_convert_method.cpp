@@ -120,13 +120,9 @@ static bool operator==(const irep_idt &what, const patternt &pattern)
   return pattern==what;
 }
 
-// name contains <init> or <clinit>
-bool java_bytecode_convert_methodt::is_constructor(
-  const class_typet::methodt &method)
+static bool is_constructor(const irep_idt &method_name)
 {
-  const std::string &name(id2string(method.get_name()));
-  const std::string::size_type &npos(std::string::npos);
-  return npos!=name.find("<init>") || npos!=name.find("<clinit>");
+  return id2string(method_name).find("<init>") != std::string::npos;
 }
 
 exprt::operandst java_bytecode_convert_methodt::pop(std::size_t n)
@@ -256,11 +252,12 @@ const exprt java_bytecode_convert_methodt::variable(
 ///   message handler to collect warnings
 /// \return
 ///   the constructed member type
-typet member_type_lazy(const std::string &descriptor,
-                       const optionalt<std::string> &signature,
-                       const std::string &class_name,
-                       const std::string &method_name,
-                       message_handlert &message_handler)
+code_typet member_type_lazy(
+  const std::string &descriptor,
+  const optionalt<std::string> &signature,
+  const std::string &class_name,
+  const std::string &method_name,
+  message_handlert &message_handler)
 {
   // In order to construct the method type, we can either use signature or
   // descriptor. Since only signature contains the generics info, we want to
@@ -285,7 +282,7 @@ typet member_type_lazy(const std::string &descriptor,
       if(to_code_type(member_type_from_signature).parameters().size()==
          to_code_type(member_type_from_descriptor).parameters().size())
       {
-        return member_type_from_signature;
+        return to_code_type(member_type_from_signature);
       }
       else
       {
@@ -303,7 +300,7 @@ typet member_type_lazy(const std::string &descriptor,
         << descriptor << message.eom;
     }
   }
-  return member_type_from_descriptor;
+  return to_code_type(member_type_from_descriptor);
 }
 
 /// This creates a method symbol in the symtab, but doesn't actually perform
@@ -324,7 +321,7 @@ void java_bytecode_convert_method_lazy(
 {
   symbolt method_symbol;
 
-  typet member_type=member_type_lazy(
+  code_typet member_type = member_type_lazy(
     m.descriptor,
     m.signature,
     id2string(class_symbol.name),
@@ -337,20 +334,20 @@ void java_bytecode_convert_method_lazy(
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
   if(m.is_public)
-    member_type.set(ID_access, ID_public);
+    member_type.set_access(ID_public);
   else if(m.is_protected)
-    member_type.set(ID_access, ID_protected);
+    member_type.set_access(ID_protected);
   else if(m.is_private)
-    member_type.set(ID_access, ID_private);
+    member_type.set_access(ID_private);
   else
-    member_type.set(ID_access, ID_default);
+    member_type.set_access(ID_default);
 
-  if(method_symbol.base_name=="<init>")
+  if(is_constructor(method_symbol.base_name))
   {
     method_symbol.pretty_name=
       id2string(class_symbol.pretty_name)+"."+
       id2string(class_symbol.base_name)+"()";
-    member_type.set(ID_constructor, true);
+    member_type.set_is_constructor();
   }
   else
     method_symbol.pretty_name=
@@ -360,8 +357,7 @@ void java_bytecode_convert_method_lazy(
   // do we need to add 'this' as a parameter?
   if(!m.is_static)
   {
-    code_typet &code_type=to_code_type(member_type);
-    code_typet::parameterst &parameters=code_type.parameters();
+    code_typet::parameterst &parameters = member_type.parameters();
     code_typet::parametert this_p;
     const reference_typet object_ref_type=
       java_reference_type(symbol_typet(class_symbol.name));
@@ -390,9 +386,8 @@ void java_bytecode_convert_methodt::convert(
 
   // Obtain a std::vector of code_typet::parametert objects from the
   // (function) type of the symbol
-  typet member_type=method_symbol.type;
-  member_type.set(ID_C_class, class_symbol.name);
-  code_typet &code_type=to_code_type(member_type);
+  code_typet code_type = to_code_type(method_symbol.type);
+  code_type.set(ID_C_class, class_symbol.name);
   method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
 
@@ -519,25 +514,12 @@ void java_bytecode_convert_methodt::convert(
     param_index==slots_for_parameters,
     "java_parameter_count and local computation must agree");
 
-  const bool is_virtual=!m.is_static && !m.is_final;
-
-  // Construct a methodt, which lives within the class type; this object is
-  // never used for anything useful and could be removed
-  class_typet::methodt method;
-  method.set_base_name(m.base_name);
-  method.set_name(method_identifier);
-  method.set(ID_abstract, m.is_abstract);
-  method.set(ID_is_virtual, is_virtual);
-  method.type()=member_type;
-  if(is_constructor(method))
-    method.set(ID_constructor, true);
-
   // Check the fields that can't change are valid
   INVARIANT(
-    method_symbol.name==method.get_name(),
+    method_symbol.name == method_identifier,
     "Name of method symbol shouldn't change");
   INVARIANT(
-    method_symbol.base_name==method.get_base_name(),
+    method_symbol.base_name == m.base_name,
     "Base name of method symbol shouldn't change");
   INVARIANT(
     method_symbol.module.empty(),
@@ -551,16 +533,21 @@ void java_bytecode_convert_methodt::convert(
   // The pretty name of a constructor includes the base name of the class
   // instead of the internal method name "<init>". For regular methods, it's
   // just the base name of the method.
-  if(method.get_base_name()=="<init>")
-    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
-                              id2string(class_symbol.base_name)+"()";
+  if(is_constructor(method_symbol.base_name))
+  {
+    method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
+                                id2string(class_symbol.base_name) + "()";
+    INVARIANT(
+      code_type.get_is_constructor(),
+      "Member type should have already been marked as a constructor");
+  }
   else
-    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
-                              id2string(method.get_base_name())+"()";
+  {
+    method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
+                                id2string(method_symbol.base_name) + "()";
+  }
 
-  method_symbol.type=member_type;
-  if(is_constructor(method))
-    method_symbol.type.set(ID_constructor, true);
+  method_symbol.type = code_type;
 
   current_method=method_symbol.name;
   method_has_this=code_type.has_this();
@@ -602,8 +589,7 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
 {
   symbol_typet class_type(fieldref.get(ID_class));
 
-  exprt pointer2=
-    typecast_exprt(pointer, java_reference_type(class_type));
+  const typecast_exprt pointer2(pointer, java_reference_type(class_type));
 
   dereference_exprt obj_deref=checked_dereference(pointer2, class_type);
 
@@ -798,7 +784,7 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   // any block-internal edges to target the inner header block.
 
   const irep_idt child_label_name=child_label.get_label();
-  std::string new_label_str=as_string(child_label_name);
+  std::string new_label_str = id2string(child_label_name);
   new_label_str+='$';
   irep_idt new_label_irep(new_label_str);
 
@@ -1019,7 +1005,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
        i_it->statement=="jsr" ||
        i_it->statement=="jsr_w")
     {
-      assert(!i_it->args.empty());
+      PRECONDITION(!i_it->args.empty());
 
       unsigned target;
       bool ret=to_unsigned_integer(to_constant_expr(i_it->args[0]), target);
@@ -1104,7 +1090,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
   {
     std::set<unsigned>::iterator cur=working_set.begin();
     address_mapt::iterator a_it=address_map.find(*cur);
-    assert(a_it!=address_map.end());
+    CHECK_RETURN(a_it != address_map.end());
     unsigned cur_pc=*cur;
     working_set.erase(cur);
 
@@ -1196,7 +1182,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="athrow")
     {
-      assert(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
 
       side_effect_expr_throwt throw_expr;
       throw_expr.add_source_location()=i_it->source_location;
@@ -1209,7 +1195,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // checkcast throws an exception in case a cast of object
       // on stack to given type fails.
       // The stack isn't modified.
-      assert(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
       binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
       code_assertt assert_class(check);
       assert_class.add_source_location().set_comment("Dynamic cast check");
@@ -1281,12 +1267,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
           // constructors.
           if(statement=="invokespecial")
           {
-            if(as_string(arg0.get(ID_identifier))
-               .find("<init>")!=std::string::npos)
+            if(is_constructor(arg0.get(ID_identifier)))
             {
               if(needed_lazy_methods)
                 needed_lazy_methods->add_needed_class(classname);
-              code_type.set(ID_constructor, true);
+              code_type.set_is_constructor();
             }
             else
               code_type.set(ID_java_super_method_call, true);
@@ -1431,14 +1416,14 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="return")
     {
-      assert(op.empty() && results.empty());
+      PRECONDITION(op.empty() && results.empty());
       c=code_returnt();
     }
     else if(statement==patternt("?return"))
     {
       // Return types are promoted in java, so this might need
       // conversion.
-      assert(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
       exprt r=op[0];
       if(r.type()!=method_return_type)
         r=typecast_exprt(r, method_return_type);
@@ -1450,8 +1435,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       char type_char=statement[0];
 
-      exprt pointer=
-        typecast_exprt(op[0], java_array_type(type_char));
+      const typecast_exprt pointer(op[0], java_array_type(type_char));
 
       dereference_exprt deref(pointer, pointer.type().subtype());
       deref.set(ID_java_member_access, true);
@@ -1485,7 +1469,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?store"))
     {
       // store value into some local variable
-      assert(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
 
       exprt var=
         variable(arg0, statement[0], i_it->address, NO_CAST);
@@ -1510,12 +1494,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?aload"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
 
       char type_char=statement[0];
 
-      exprt pointer=
-        typecast_exprt(op[0], java_array_type(type_char));
+      const typecast_exprt pointer(op[0], java_array_type(type_char));
 
       dereference_exprt deref(pointer, pointer.type().subtype());
       deref.set(ID_java_member_access, true);
@@ -1541,7 +1524,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
     {
-      assert(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
 
       INVARIANT(
         arg0.id() != ID_java_string_literal && arg0.id() != ID_type,
@@ -1552,7 +1535,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="goto" || statement=="goto_w")
     {
-      assert(op.empty() && results.empty());
+      PRECONDITION(op.empty() && results.empty());
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "goto argument should be an integer");
@@ -1562,7 +1545,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="jsr" || statement=="jsr_w")
     {
       // As 'goto', except we must also push the subroutine return address:
-      assert(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "jsr argument should be an integer");
@@ -1579,7 +1562,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // Since we have a bounded target set, make life easier on our analyses
       // and write something like:
       // if(retaddr==5) goto 5; else if(retaddr==10) goto 10; ...
-      assert(op.empty() && results.empty());
+      PRECONDITION(op.empty() && results.empty());
       c=code_blockt();
       auto retvar=variable(arg0, 'a', i_it->address, NO_CAST);
       assert(!jsr_ret_targets.empty());
@@ -1659,7 +1642,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("if_?cmp??"))
     {
-      assert(op.size()==2 && results.empty());
+      PRECONDITION(op.size() == 2 && results.empty());
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "if_?cmp?? argument should be an integer");
@@ -1697,7 +1680,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       INVARIANT(!id.empty(), "unexpected bytecode-if");
 
-      assert(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "if?? argument should be an integer");
@@ -1718,7 +1701,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("ifnonnull"))
     {
-      assert(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "ifnonnull argument should be an integer");
@@ -1735,7 +1718,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("ifnull"))
     {
-      assert(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "ifnull argument should be an integer");
@@ -1777,32 +1760,32 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?xor"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=bitxor_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?or"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=bitor_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?and"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=bitand_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?shl"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=shl_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?shr"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=ashr_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?ushr"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       const typet type=java_type_from_char(statement[0]);
 
       const std::size_t width=type.get_size_t(ID_width);
@@ -1821,32 +1804,32 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?add"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=plus_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?sub"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=minus_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?div"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=div_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?mul"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=mult_exprt(op[0], op[1]);
     }
     else if(statement==patternt("?neg"))
     {
-      assert(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
       results[0]=unary_minus_exprt(op[0], op[0].type());
     }
     else if(statement==patternt("?rem"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       if(statement=="frem" || statement=="drem")
         results[0]=rem_exprt(op[0], op[1]);
       else
@@ -1854,7 +1837,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?cmp"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
 
       // The integer result on the stack is:
       //  0 if op[0] equals op[1]
@@ -1878,7 +1861,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?cmp?"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       const int nan_value(statement[4]=='l' ? -1 : 1);
       const typet result_type(java_int_type());
       const exprt nan_result(from_integer(nan_value, result_type));
@@ -1906,24 +1889,24 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?cmpl"))
     {
-      assert(op.size()==2 && results.size()==1);
+      PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=binary_relation_exprt(op[0], ID_lt, op[1]);
     }
     else if(statement=="dup")
     {
-      assert(op.size()==1 && results.size()==2);
+      PRECONDITION(op.size() == 1 && results.size() == 2);
       results[0]=results[1]=op[0];
     }
     else if(statement=="dup_x1")
     {
-      assert(op.size()==2 && results.size()==3);
+      PRECONDITION(op.size() == 2 && results.size() == 3);
       results[0]=op[1];
       results[1]=op[0];
       results[2]=op[1];
     }
     else if(statement=="dup_x2")
     {
-      assert(op.size()==3 && results.size()==4);
+      PRECONDITION(op.size() == 3 && results.size() == 4);
       results[0]=op[2];
       results[1]=op[0];
       results[2]=op[1];
@@ -1933,7 +1916,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     // stack
     else if(statement=="dup2")
     {
-      assert(!stack.empty() && results.empty());
+      PRECONDITION(!stack.empty() && results.empty());
 
       if(get_bytecode_type_width(stack.back().type())==32)
         op=pop(2);
@@ -1945,7 +1928,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="dup2_x1")
     {
-      assert(!stack.empty() && results.empty());
+      PRECONDITION(!stack.empty() && results.empty());
 
       if(get_bytecode_type_width(stack.back().type())==32)
         op=pop(3);
@@ -1957,7 +1940,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="dup2_x2")
     {
-      assert(!stack.empty() && results.empty());
+      PRECONDITION(!stack.empty() && results.empty());
 
       if(get_bytecode_type_width(stack.back().type())==32)
         op=pop(2);
@@ -1978,20 +1961,20 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="dconst")
     {
-      assert(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
     }
     else if(statement=="fconst")
     {
-      assert(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
     }
     else if(statement=="getfield")
     {
-      assert(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
       results[0]=java_bytecode_promotion(to_member(op[0], arg0));
     }
     else if(statement=="getstatic")
     {
-      assert(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       const bool is_assertions_disabled_field=
@@ -2041,7 +2024,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="putfield")
     {
-      assert(op.size()==2 && results.empty());
+      PRECONDITION(op.size() == 2 && results.empty());
       code_blockt block;
       save_stack_entries(
         "stack_field",
@@ -2054,7 +2037,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="putstatic")
     {
-      assert(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(
@@ -2091,7 +2074,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("?2?")) // i2c etc.
     {
-      assert(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
       typet type=java_type_from_char(statement[2]);
       results[0]=op[0];
       if(results[0].type()!=type)
@@ -2100,9 +2083,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="new")
     {
       // use temporary since the stack symbol might get duplicated
-      assert(op.empty() && results.size()==1);
+      PRECONDITION(op.empty() && results.size() == 1);
       const reference_typet ref_type=java_reference_type(arg0.type());
-      exprt java_new_expr=side_effect_exprt(ID_java_new, ref_type);
+      side_effect_exprt java_new_expr(ID_java_new, ref_type);
 
       if(!i_it->source_location.get_line().empty())
         java_new_expr.add_source_location()=i_it->source_location;
@@ -2125,7 +2108,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
             statement=="anewarray")
     {
       // the op is the array size
-      assert(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
 
       char element_type;
 
@@ -2217,10 +2200,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="arraylength")
     {
-      assert(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
 
-      exprt pointer=
-        typecast_exprt(op[0], java_array_type(statement[0]));
+      const typecast_exprt pointer(op[0], java_array_type(statement[0]));
 
       dereference_exprt array(pointer, pointer.type().subtype());
       assert(pointer.type().subtype().id()==ID_symbol);
@@ -2233,7 +2215,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="tableswitch" ||
             statement=="lookupswitch")
     {
-      assert(op.size()==1 && results.empty());
+      PRECONDITION(op.size() == 1 && results.empty());
 
       // we turn into switch-case
       code_switcht code_switch;
@@ -2294,7 +2276,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="instanceof")
     {
-      assert(op.size()==1 && results.size()==1);
+      PRECONDITION(op.size() == 1 && results.size() == 1);
 
       results[0]=
         binary_predicate_exprt(op[0], ID_java_instanceof, arg0);
@@ -2329,9 +2311,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="swap")
     {
-      assert(op.size()==2 && results.size()==2);
+      PRECONDITION(op.size() == 2 && results.size() == 2);
       results[1]=op[0];
       results[0]=op[1];
+    }
+    else if(statement=="nop")
+    {
+      c=code_skipt();
     }
     else
     {
@@ -2461,7 +2447,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     for(const unsigned address : a_it->second.successors)
     {
       address_mapt::iterator a_it2=address_map.find(address);
-      assert(a_it2!=address_map.end());
+      CHECK_RETURN(a_it2 != address_map.end());
 
       // clear the stack if this is an exception handler
       for(const auto &exception_row : method.exception_table)
@@ -2495,7 +2481,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
         }
         else
         {
-          assert(a_it2->second.stack.size()==stack.size());
+          INVARIANT(
+            a_it2->second.stack.size() == stack.size(),
+            "Stack sizes should be the same.");
           stackt::const_iterator os_it=a_it2->second.stack.begin();
           for(auto &expr : stack)
           {

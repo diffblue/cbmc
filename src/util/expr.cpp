@@ -10,18 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Expression Representation
 
 #include "expr.h"
-#include <cassert>
-#include <stack>
-#include "string2int.h"
-#include "mp_arith.h"
+#include "expr_iterator.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
-#include "invariant.h"
-#include "expr_iterator.h"
 #include "rational.h"
 #include "rational_tools.h"
-#include "arith_tools.h"
 #include "std_expr.h"
+
+#include <stack>
 
 void exprt::move_to_operands(exprt &expr)
 {
@@ -87,10 +83,7 @@ void exprt::copy_to_operands(
 
 void exprt::make_typecast(const typet &_type)
 {
-  exprt new_expr(ID_typecast);
-
-  new_expr.move_to_operands(*this);
-  new_expr.set(ID_type, _type);
+  typecast_exprt new_expr(*this, _type);
 
   swap(new_expr);
 }
@@ -158,72 +151,6 @@ void exprt::make_false()
 {
   *this=exprt(ID_constant, typet(ID_bool));
   set(ID_value, ID_false);
-}
-
-void exprt::negate()
-{
-  const irep_idt &type_id=type().id();
-
-  if(type_id==ID_bool)
-    make_not();
-  else
-  {
-    if(is_constant())
-    {
-      const irep_idt &value=get(ID_value);
-
-      if(type_id==ID_integer)
-      {
-        set(ID_value, integer2string(-string2integer(id2string(value))));
-      }
-      else if(type_id==ID_unsignedbv)
-      {
-        mp_integer int_value=binary2integer(id2string(value), false);
-        typet _type=type();
-        *this=from_integer(-int_value, _type);
-      }
-      else if(type_id==ID_signedbv)
-      {
-        mp_integer int_value=binary2integer(id2string(value), true);
-        typet _type=type();
-        *this=from_integer(-int_value, _type);
-      }
-      else if(type_id==ID_fixedbv)
-      {
-        fixedbvt fixedbv_value=fixedbvt(to_constant_expr(*this));
-        fixedbv_value.negate();
-        *this=fixedbv_value.to_expr();
-      }
-      else if(type_id==ID_floatbv)
-      {
-        ieee_floatt ieee_float_value=ieee_floatt(to_constant_expr(*this));
-        ieee_float_value.negate();
-        *this=ieee_float_value.to_expr();
-      }
-      else
-      {
-        make_nil();
-        UNREACHABLE;
-      }
-    }
-    else
-    {
-      if(id()==ID_unary_minus)
-      {
-        exprt tmp;
-        DATA_INVARIANT(operands().size()==1,
-                       "Unary minus must have one operand");
-        tmp.swap(op0());
-        swap(tmp);
-      }
-      else
-      {
-        exprt tmp(ID_unary_minus, type());
-        tmp.move_to_operands(*this);
-        swap(tmp);
-      }
-    }
-  }
 }
 
 bool exprt::is_boolean() const
@@ -314,151 +241,6 @@ bool exprt::is_one() const
   }
 
   return false;
-}
-
-bool exprt::sum(const exprt &expr)
-{
-  if(!is_constant() || !expr.is_constant())
-    return true;
-  if(type()!=expr.type())
-    return true;
-
-  const irep_idt &type_id=type().id();
-
-  if(type_id==ID_integer || type_id==ID_natural)
-  {
-    set(ID_value, integer2string(
-      string2integer(get_string(ID_value))+
-      string2integer(expr.get_string(ID_value))));
-    return false;
-  }
-  else if(type_id==ID_rational)
-  {
-    rationalt a, b;
-    if(!to_rational(*this, a) && !to_rational(expr, b))
-    {
-      exprt a_plus_b=from_rational(a+b);
-      set(ID_value, a_plus_b.get_string(ID_value));
-      return false;
-    }
-  }
-  else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
-  {
-    set(ID_value, integer2binary(
-      binary2integer(get_string(ID_value), false)+
-      binary2integer(expr.get_string(ID_value), false),
-      unsafe_string2unsigned(type().get_string(ID_width))));
-    return false;
-  }
-  else if(type_id==ID_fixedbv)
-  {
-    set(ID_value, integer2binary(
-      binary2integer(get_string(ID_value), false)+
-      binary2integer(expr.get_string(ID_value), false),
-      unsafe_string2unsigned(type().get_string(ID_width))));
-    return false;
-  }
-  else if(type_id==ID_floatbv)
-  {
-    ieee_floatt f(to_constant_expr(*this));
-    f+=ieee_floatt(to_constant_expr(expr));
-    *this=f.to_expr();
-    return false;
-  }
-
-  return true;
-}
-
-bool exprt::mul(const exprt &expr)
-{
-  if(!is_constant() || !expr.is_constant())
-    return true;
-  if(type()!=expr.type())
-    return true;
-
-  const irep_idt &type_id=type().id();
-
-  if(type_id==ID_integer || type_id==ID_natural)
-  {
-    set(ID_value, integer2string(
-      string2integer(get_string(ID_value))*
-      string2integer(expr.get_string(ID_value))));
-    return false;
-  }
-  else if(type_id==ID_rational)
-  {
-    rationalt a, b;
-    if(!to_rational(*this, a) && !to_rational(expr, b))
-    {
-      exprt a_mul_b=from_rational(a*b);
-      set(ID_value, a_mul_b.get_string(ID_value));
-      return false;
-    }
-  }
-  else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
-  {
-    // the following works for signed and unsigned integers
-    set(ID_value, integer2binary(
-      binary2integer(get_string(ID_value), false)*
-      binary2integer(expr.get_string(ID_value), false),
-      unsafe_string2unsigned(type().get_string(ID_width))));
-    return false;
-  }
-  else if(type_id==ID_fixedbv)
-  {
-    fixedbvt f(to_constant_expr(*this));
-    f*=fixedbvt(to_constant_expr(expr));
-    *this=f.to_expr();
-    return false;
-  }
-  else if(type_id==ID_floatbv)
-  {
-    ieee_floatt f(to_constant_expr(*this));
-    f*=ieee_floatt(to_constant_expr(expr));
-    *this=f.to_expr();
-    return false;
-  }
-
-  return true;
-}
-
-bool exprt::subtract(const exprt &expr)
-{
-  if(!is_constant() || !expr.is_constant())
-    return true;
-
-  if(type()!=expr.type())
-    return true;
-
-  const irep_idt &type_id=type().id();
-
-  if(type_id==ID_integer || type_id==ID_natural)
-  {
-    set(ID_value, integer2string(
-      string2integer(get_string(ID_value))-
-      string2integer(expr.get_string(ID_value))));
-    return false;
-  }
-  else if(type_id==ID_rational)
-  {
-    rationalt a, b;
-    if(!to_rational(*this, a) && !to_rational(expr, b))
-    {
-      exprt a_minus_b=from_rational(a-b);
-      set(ID_value, a_minus_b.get_string(ID_value));
-      return false;
-    }
-  }
-  else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
-  {
-    set(ID_value, integer2binary(
-      binary2integer(get_string(ID_value), false)-
-      binary2integer(expr.get_string(ID_value), false),
-      unsafe_string2unsigned(type().get_string(ID_width))));
-    return false;
-  }
-
-  return true;
 }
 
 const source_locationt &exprt::find_source_location() const

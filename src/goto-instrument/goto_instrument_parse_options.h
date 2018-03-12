@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
+#include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_const_function_pointers.h>
 
 #include <analyses/goto_check.h>
@@ -84,7 +85,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-threaded)(list-calls-args)(print-path-lengths)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\
-  "(splice-call):"
+  "(splice-call):" \
+  OPT_REMOVE_CALLS_NO_BODY
 // clang-format on
 
 class goto_instrument_parse_optionst:

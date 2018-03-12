@@ -166,9 +166,8 @@ void partial_order_concurrencyt::build_clock_type(
 {
   assert(!numbering.empty());
 
-  mp_integer width=address_bits(numbering.size());
-  assert(width<std::numeric_limits<unsigned>::max());
-  clock_type=unsignedbv_typet(integer2unsigned(width));
+  std::size_t width = address_bits(numbering.size());
+  clock_type = unsignedbv_typet(width);
 }
 
 exprt partial_order_concurrencyt::before(

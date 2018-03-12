@@ -2,7 +2,7 @@
 
  Module: Unit test utilities
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
@@ -18,6 +18,7 @@
 #include <goto-programs/goto_model.h>
 
 #include <langapi/language.h>
+#include <util/cmdline.h>
 
 symbol_tablet load_java_class(
   const std::string &java_class_name,
@@ -29,5 +30,17 @@ symbol_tablet load_java_class(
   const std::string &class_path,
   const std::string &main,
   std::unique_ptr<languaget> &&java_lang);
+
+symbol_tablet load_java_class(
+  const std::string &java_class_name,
+  const std::string &class_path,
+  const std::string &main,
+  std::unique_ptr<languaget> &&java_lang,
+  const cmdlinet &command_line);
+
+symbol_tablet load_java_class_lazy(
+  const std::string &java_class_name,
+  const std::string &class_path,
+  const std::string &main);
 
 #endif // CPROVER_TESTING_UTILS_LOAD_JAVA_CLASS_H

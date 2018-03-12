@@ -244,18 +244,16 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
   if(expr.op0().id()==ID_if &&
      expr.op0().operands().size()==3)
   {
-    exprt tmp_op1=
-      binary_exprt(
-        expr.op0().op1(),
-        ID_floatbv_typecast,
-        expr.op1(),
-        dest_type);
-    exprt tmp_op2=
-      binary_exprt(
-        expr.op0().op2(),
-        ID_floatbv_typecast,
-        expr.op1(),
-        dest_type);
+    binary_exprt tmp_op1(
+      expr.op0().op1(),
+      ID_floatbv_typecast,
+      expr.op1(),
+      dest_type);
+    binary_exprt tmp_op2(
+      expr.op0().op2(),
+      ID_floatbv_typecast,
+      expr.op1(),
+      dest_type);
     simplify_floatbv_typecast(tmp_op1);
     simplify_floatbv_typecast(tmp_op2);
     expr=if_exprt(expr.op0().op0(), tmp_op1, tmp_op2, dest_type);
@@ -371,8 +369,7 @@ bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
   if(expr.op0()==expr.op1())
   {
     // x!=x is the same as saying isnan(op)
-    exprt isnan(ID_isnan, bool_typet());
-    isnan.copy_to_operands(expr.op0());
+    isnan_exprt isnan(expr.op0());
 
     if(expr.id()==ID_ieee_float_notequal)
     {

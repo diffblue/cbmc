@@ -72,9 +72,7 @@ codet cpp_typecheckt::cpp_destructor(
       exprt constant=from_integer(i, index_type());
       constant.add_source_location()=source_location;
 
-      exprt index(ID_index);
-      index.copy_to_operands(object);
-      index.copy_to_operands(constant);
+      index_exprt index(object, constant);
       index.add_source_location()=source_location;
 
       exprt i_code =

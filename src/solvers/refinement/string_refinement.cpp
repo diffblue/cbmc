@@ -178,7 +178,6 @@ string_refinementt::string_refinementt(const infot &info):
 /// Write index set to the given stream, use for debugging
 static void display_index_set(
   messaget::mstreamt &stream,
-  const namespacet &ns,
   const index_set_pairt &index_set)
 {
   const auto eom=messaget::eom;
@@ -187,7 +186,7 @@ static void display_index_set(
   for(const auto &i : index_set.cumulative)
   {
     const exprt &s=i.first;
-    stream << "IS(" << from_expr(ns, "", s) << ")=={" << eom;
+    stream << "IS(" << format(s) << ")=={" << eom;
 
     for(const auto &j : i.second)
     {
@@ -197,7 +196,7 @@ static void display_index_set(
         count_current++;
         stream << "**";
       }
-      stream << "  " << from_expr(ns, "", j) << ";" << eom;
+      stream << "  " << format(j) << ";" << eom;
       count++;
     }
     stream << "}"  << eom;
@@ -256,18 +255,23 @@ static std::vector<exprt> generate_instantiations(
 /// \param expr: an expression possibly containing function applications
 /// \param generator: generator for the string constraints
 /// \return an expression containing no function application
-static exprt substitute_function_applications(
-  exprt expr,
+static void substitute_function_applications(
+  exprt &expr,
   string_constraint_generatort &generator)
 {
-  for(auto &operand : expr.operands())
-    operand = substitute_function_applications(operand, generator);
-
-  if(expr.id() == ID_function_application)
-    return generator.add_axioms_for_function_application(
-      to_function_application_expr(expr));
-
-  return expr;
+  for(auto it = expr.depth_begin(), itend = expr.depth_end();
+      it != itend;) // No ++it
+  {
+    if(it->id() == ID_function_application)
+    {
+      it.mutate() =
+        generator.add_axioms_for_function_application(
+          to_function_application_expr(expr));
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
+  }
 }
 
 /// Remove functions applications and create the necessary axioms.
@@ -279,109 +283,25 @@ static void substitute_function_applications_in_equations(
   string_constraint_generatort &generator)
 {
   for(auto &eq : equations)
-    eq.rhs() = substitute_function_applications(eq.rhs(), generator);
+    substitute_function_applications(eq.rhs(), generator);
 }
 
-/// For now, any unsigned bitvector type of width smaller or equal to 16 is
-/// considered a character.
-/// \note type that are not characters maybe detected as characters (for
-/// instance unsigned char in C), this will make dec_solve do unnecessary
-/// steps for these, but should not affect correctness.
-/// \param type: a type
-/// \return true if the given type represents characters
-bool is_char_type(const typet &type)
+/// Fill the array_pointer correspondence and replace the right hand sides of
+/// the corresponding equations
+static void make_char_array_pointer_associations(
+  string_constraint_generatort &generator,
+  std::vector<equal_exprt> &equations)
 {
-  return type.id() == ID_unsignedbv &&
-         to_unsignedbv_type(type).get_width() <= 16;
-}
-
-/// Distinguish char array from other types.
-/// For now, any unsigned bitvector type is considered a character.
-/// \param type: a type
-/// \param ns: namespace
-/// \return true if the given type is an array of characters
-bool is_char_array_type(const typet &type, const namespacet &ns)
-{
-  if(type.id()==ID_symbol)
-    return is_char_array_type(ns.follow(type), ns);
-  return type.id() == ID_array && is_char_type(type.subtype());
-}
-
-/// For now, any unsigned bitvector type is considered a character.
-/// \param type: a type
-/// \return true if the given type represents a pointer to characters
-bool is_char_pointer_type(const typet &type)
-{
-  return type.id() == ID_pointer && is_char_type(type.subtype());
-}
-
-/// \param type: a type
-/// \param pred: a predicate
-/// \return true if one of the subtype of `type` satisfies predicate `pred`.
-///         The meaning of "subtype" is in the algebraic datatype sense:
-///         for example, the subtypes of a struct are the types of its
-///         components, the subtype of a pointer is the type it points to,
-///         etc...
-///         For instance in the type `t` defined by
-///         `{ int a; char[] b; double * c; { bool d} e}`, `int`, `char`,
-///         `double` and `bool` are subtypes of `t`.
-bool has_subtype(
-  const typet &type,
-  const std::function<bool(const typet &)> &pred)
-{
-  if(pred(type))
-    return true;
-
-  if(type.id() == ID_struct || type.id() == ID_union)
+  for(equal_exprt &eq : equations)
   {
-    const struct_union_typet &struct_type = to_struct_union_type(type);
-    return std::any_of(
-      struct_type.components().begin(),
-      struct_type.components().end(), // NOLINTNEXTLINE
-      [&](const struct_union_typet::componentt &comp) {
-        return has_subtype(comp.type(), pred);
-      });
+    if(
+      const auto fun_app =
+        expr_try_dynamic_cast<function_application_exprt>(eq.rhs()))
+    {
+      if(const auto result = generator.make_array_pointer_association(*fun_app))
+        eq.rhs() = *result;
+    }
   }
-
-  return std::any_of( // NOLINTNEXTLINE
-    type.subtypes().begin(), type.subtypes().end(), [&](const typet &t) {
-      return has_subtype(t, pred);
-    });
-}
-
-/// \param type: a type
-/// \return true if a subtype of `type` is an pointer of characters.
-///         The meaning of "subtype" is in the algebraic datatype sense:
-///         for example, the subtypes of a struct are the types of its
-///         components, the subtype of a pointer is the type it points to,
-///         etc...
-static bool has_char_pointer_subtype(const typet &type)
-{
-  return has_subtype(type, is_char_pointer_type);
-}
-
-/// \param type: a type
-/// \return true if a subtype of `type` is string_typet.
-///         The meaning of "subtype" is in the algebraic datatype sense:
-///         for example, the subtypes of a struct are the types of its
-///         components, the subtype of a pointer is the type it points to,
-///         etc...
-static bool has_string_subtype(const typet &type)
-{
-  // NOLINTNEXTLINE
-  return has_subtype(
-    type, [](const typet &subtype) { return subtype == string_typet(); });
-}
-
-/// \param expr: an expression
-/// \param ns: namespace
-/// \return true if a subexpression of `expr` is an array of characters
-static bool has_char_array_subexpr(const exprt &expr, const namespacet &ns)
-{
-  for(auto it = expr.depth_begin(); it != expr.depth_end(); ++it)
-    if(is_char_array_type(it->type(), ns))
-      return true;
-  return false;
 }
 
 void replace_symbols_in_equations(
@@ -435,16 +355,15 @@ static union_find_replacet generate_symbol_resolution_from_equations(
     const exprt &rhs = eq.rhs();
     if(lhs.id()!=ID_symbol)
     {
-      stream << log_message << "non symbol lhs: " << from_expr(ns, "", lhs)
-             << " with rhs: " << from_expr(ns, "", rhs) << eom;
+      stream << log_message << "non symbol lhs: " << format(lhs)
+             << " with rhs: " << format(rhs) << eom;
       continue;
     }
 
     if(lhs.type()!=rhs.type())
     {
-      stream << log_message << "non equal types lhs: " << from_expr(ns, "", lhs)
-             << "\n####################### rhs: " << from_expr(ns, "", rhs)
-             << eom;
+      stream << log_message << "non equal types lhs: " << format(lhs)
+             << "\n####################### rhs: " << format(rhs) << eom;
       continue;
     }
 
@@ -477,42 +396,12 @@ static union_find_replacet generate_symbol_resolution_from_equations(
       else
       {
         stream << log_message << "non struct with char pointer subexpr "
-               << from_expr(ns, "", rhs) << "\n  * of type "
-               << from_type(ns, "", rhs.type()) << eom;
+               << format(rhs) << "\n  * of type " << format(rhs.type()) << eom;
       }
     }
   }
   return solver;
 }
-
-/// Maps equation to expressions contained in them and conversely expressions to
-/// equations that contain them. This can be used on a subset of expressions
-/// which interests us, in particular strings. Equations are identified by an
-/// index of type `std::size_t` for more efficient insertion and lookup.
-class equation_symbol_mappingt
-{
-public:
-  // Record index of the equations that contain a given expression
-  std::map<exprt, std::vector<std::size_t>> equations_containing;
-  // Record expressions that are contained in the equation with the given index
-  std::unordered_map<std::size_t, std::vector<exprt>> strings_in_equation;
-
-  void add(const std::size_t i, const exprt &expr)
-  {
-    equations_containing[expr].push_back(i);
-    strings_in_equation[i].push_back(expr);
-  }
-
-  std::vector<exprt> find_expressions(const std::size_t i)
-  {
-    return strings_in_equation[i];
-  }
-
-  std::vector<std::size_t> find_equations(const exprt &expr)
-  {
-    return equations_containing[expr];
-  }
-};
 
 /// This is meant to be used on the lhs of an equation with string subtype.
 /// \param lhs: expression which is either of string type, or a symbol
@@ -642,8 +531,8 @@ union_find_replacet string_identifiers_resolution_from_equations(
       if(lhs_strings.empty())
       {
         stream << log_message << "non struct with string subtype "
-               << from_expr(ns, "", eq.lhs()) << "\n  * of type "
-               << from_type(ns, "", eq.lhs().type()) << eom;
+               << format(eq.lhs()) << "\n  * of type "
+               << format(eq.lhs().type()) << eom;
       }
 
       for(const exprt &expr : extract_strings(eq.rhs()))
@@ -680,8 +569,8 @@ void output_equations(
   const namespacet &ns)
 {
   for(std::size_t i = 0; i < equations.size(); ++i)
-    output << "  [" << i << "] " << from_expr(ns, "", equations[i].lhs())
-           << " == " << from_expr(ns, "", equations[i].rhs()) << std::endl;
+    output << "  [" << i << "] " << format(equations[i].lhs())
+           << " == " << format(equations[i].rhs()) << std::endl;
 }
 
 /// Main decision procedure of the solver. Looks for a valuation of variables
@@ -762,8 +651,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 #ifdef DEBUG
   debug() << "symbol resolve:" << eom;
   for(const auto &pair : symbol_resolve.to_vector())
-    debug() << from_expr(ns, "", pair.first) << " --> "
-            << from_expr(ns, "", pair.second) << eom;
+    debug() << format(pair.first) << " --> " << format(pair.second) << eom;
 #endif
 
   const union_find_replacet string_id_symbol_resolve =
@@ -772,8 +660,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   debug() << "symbol resolve string:" << eom;
   for(const auto &pair : string_id_symbol_resolve.to_vector())
   {
-    debug() << from_expr(ns, "", pair.first) << " --> "
-            << from_expr(ns, "", pair.second) << eom;
+    debug() << format(pair.first) << " --> " << format(pair.second) << eom;
   }
 #endif
 
@@ -787,8 +674,17 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       string_id_symbol_resolve.replace_expr(eq.rhs());
   }
 
+  make_char_array_pointer_associations(generator, equations);
+
 #ifdef DEBUG
   output_equations(debug(), equations, ns);
+
+  string_dependencest dependences;
+  for(const equal_exprt &eq : equations)
+    add_node(dependences, eq, generator.array_pool);
+
+  debug() << "dec_solve: dependence graph:" << eom;
+  dependences.output_dot(debug());
 #endif
 
   debug() << "dec_solve: Replace function applications" << eom;
@@ -800,18 +696,17 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
 #ifdef DEBUG
   debug() << "dec_solve: arrays_of_pointers:" << eom;
-  for(auto pair : generator.get_arrays_of_pointers())
+  for(auto pair : generator.array_pool.get_arrays_of_pointers())
   {
-    debug() << "  * " << from_expr(ns, "", pair.first) << "\t--> "
-            << from_expr(ns, "", pair.second) << " : "
-            << from_type(ns, "", pair.second.type()) << eom;
+    debug() << "  * " << format(pair.first) << "\t--> " << format(pair.second)
+            << " : " << format(pair.second.type()) << eom;
   }
 #endif
 
   for(const auto &eq : equations)
   {
 #ifdef DEBUG
-    debug() << "dec_solve: set_to " << from_expr(ns, "", eq) << eom;
+    debug() << "dec_solve: set_to " << format(eq) << eom;
 #endif
     supert::set_to(eq, true);
   }
@@ -943,7 +838,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       index_sets.current.clear();
       update_index_set(index_sets, ns, current_constraints);
 
-      display_index_set(debug(), ns, index_sets);
+      display_index_set(debug(), index_sets);
 
       if(index_sets.current.empty())
       {
@@ -1019,7 +914,7 @@ void string_refinementt::add_lemma(
       ++it;
   }
 
-  debug() << "adding lemma " << from_expr(ns, "", simple_lemma) << eom;
+  debug() << "adding lemma " << format(simple_lemma) << eom;
 
   prop.l_set_to_true(convert(simple_lemma));
 }
@@ -1052,8 +947,8 @@ static optionalt<exprt> get_array(
 
   if(size_val.id()!=ID_constant)
   {
-    stream << "(sr::get_array) string of unknown size: "
-           << from_expr(ns, "", size_val) << eom;
+    stream << "(sr::get_array) string of unknown size: " << format(size_val)
+           << eom;
     return {};
   }
 
@@ -1142,22 +1037,21 @@ static exprt get_char_array_and_concretize(
 {
   const auto &eom = messaget::eom;
   static const std::string indent("  ");
-  stream << "- " << from_expr(ns, "", arr) << ":\n";
-  stream << indent << indent << "- type: " << from_type(ns, "", arr.type())
-         << eom;
+  stream << "- " << format(arr) << ":\n";
+  stream << indent << indent << "- type: " << format(arr.type()) << eom;
   const auto arr_model_opt =
     get_array(super_get, ns, max_string_length, stream, arr);
   if(arr_model_opt)
   {
-    stream << indent << indent
-           << "- char_array: " << from_expr(ns, "", *arr_model_opt) << eom;
+    stream << indent << indent << "- char_array: " << format(*arr_model_opt)
+           << eom;
     const exprt simple = simplify_expr(*arr_model_opt, ns);
-    stream << indent << indent
-           << "- simplified_char_array: " << from_expr(ns, "", simple) << eom;
+    stream << indent << indent << "- simplified_char_array: " << format(simple)
+           << eom;
     const exprt concretized_array =
       concretize_arrays_in_expression(simple, max_string_length, ns);
-    stream << indent << indent << "- concretized_char_array: "
-           << from_expr(ns, "", concretized_array) << eom;
+    stream << indent << indent
+           << "- concretized_char_array: " << format(concretized_array) << eom;
 
     if(concretized_array.id() == ID_array)
     {
@@ -1169,8 +1063,8 @@ static exprt get_char_array_and_concretize(
       stream << indent << "- warning: not an array" << eom;
     }
 
-    stream << indent << indent
-           << "- type: " << from_type(ns, "", concretized_array.type()) << eom;
+    stream << indent << indent << "- type: " << format(concretized_array.type())
+           << eom;
     return concretized_array;
   }
   else
@@ -1194,93 +1088,29 @@ void debug_model(
   static const std::string indent("  ");
 
   stream << "debug_model:" << '\n';
-  for(const auto &pointer_array : generator.get_arrays_of_pointers())
+  for(const auto &pointer_array : generator.array_pool.get_arrays_of_pointers())
   {
     const auto arr = pointer_array.second;
     const exprt model = get_char_array_and_concretize(
       super_get, ns, max_string_length, stream, arr);
 
-    stream << "- " << from_expr(ns, "", arr) << ":\n"
-           << indent << "- pointer: " << from_expr(ns, "", pointer_array.first)
-           << "\n"
-           << indent << "- model: " << from_expr(ns, "", model)
-           << messaget::eom;
+    stream << "- " << format(arr) << ":\n"
+           << indent << "- pointer: " << format(pointer_array.first) << "\n"
+           << indent << "- model: " << format(model) << messaget::eom;
   }
 
   for(const auto &symbol : boolean_symbols)
   {
     stream << " - " << symbol.get_identifier() << ": "
-           << from_expr(ns, "", super_get(symbol)) << '\n';
+           << format(super_get(symbol)) << '\n';
   }
 
   for(const auto &symbol : index_symbols)
   {
     stream << " - " << symbol.get_identifier() << ": "
-           << from_expr(ns, "", super_get(symbol)) << '\n';
+           << format(super_get(symbol)) << '\n';
   }
   stream << messaget::eom;
-}
-
-sparse_arrayt::sparse_arrayt(const with_exprt &expr)
-{
-  auto ref = std::ref(static_cast<const exprt &>(expr));
-  while(can_cast_expr<with_exprt>(ref.get()))
-  {
-    const auto &with_expr = expr_dynamic_cast<with_exprt>(ref.get());
-    const auto current_index = numeric_cast_v<std::size_t>(with_expr.where());
-    entries.emplace_back(current_index, with_expr.new_value());
-    ref = with_expr.old();
-  }
-
-  // This function only handles 'with' and 'array_of' expressions
-  PRECONDITION(ref.get().id() == ID_array_of);
-  default_value = expr_dynamic_cast<array_of_exprt>(ref.get()).what();
-}
-
-exprt sparse_arrayt::to_if_expression(const exprt &index) const
-{
-  return std::accumulate(
-    entries.begin(),
-    entries.end(),
-    default_value,
-    [&](
-      const exprt if_expr,
-      const std::pair<std::size_t, exprt> &entry) { // NOLINT
-      const exprt entry_index = from_integer(entry.first, index.type());
-      const exprt &then_expr = entry.second;
-      CHECK_RETURN(then_expr.type() == if_expr.type());
-      const equal_exprt index_equal(index, entry_index);
-      return if_exprt(index_equal, then_expr, if_expr, if_expr.type());
-    });
-}
-
-interval_sparse_arrayt::interval_sparse_arrayt(const with_exprt &expr)
-  : sparse_arrayt(expr)
-{
-  // Entries are sorted so that successive entries correspond to intervals
-  std::sort(
-    entries.begin(),
-    entries.end(),
-    [](
-      const std::pair<std::size_t, exprt> &a,
-      const std::pair<std::size_t, exprt> &b) { return a.first < b.first; });
-}
-
-exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const
-{
-  return std::accumulate(
-    entries.rbegin(),
-    entries.rend(),
-    default_value,
-    [&](
-      const exprt if_expr,
-      const std::pair<std::size_t, exprt> &entry) { // NOLINT
-      const exprt entry_index = from_integer(entry.first, index.type());
-      const exprt &then_expr = entry.second;
-      CHECK_RETURN(then_expr.type() == if_expr.type());
-      const binary_relation_exprt index_small_eq(index, ID_le, entry_index);
-      return if_exprt(index_small_eq, then_expr, if_expr, if_expr.type());
-    });
 }
 
 /// Create a new expression where 'with' expressions on arrays are replaced by
@@ -1645,27 +1475,25 @@ static void debug_check_axioms_step(
   stream << indent2 << "- axiom:\n" << indent2 << indent;
 
   if(axiom.id() == ID_string_constraint)
-    stream << from_expr(ns, "", to_string_constraint(axiom));
+    stream << format(to_string_constraint(axiom));
   else if(axiom.id() == ID_string_not_contains_constraint)
-    stream << from_expr(ns, "", to_string_not_contains_constraint(axiom));
+    stream << format(to_string_not_contains_constraint(axiom));
   else
-    stream << from_expr(ns, "", axiom);
+    stream << format(axiom);
   stream << '\n' << indent2 << "- axiom_in_model:\n" << indent2 << indent;
 
   if(axiom_in_model.id() == ID_string_constraint)
-    stream << from_expr(ns, "", to_string_constraint(axiom_in_model));
+    stream << format(to_string_constraint(axiom_in_model));
   else if(axiom_in_model.id() == ID_string_not_contains_constraint)
-    stream << from_expr(
-      ns, "", to_string_not_contains_constraint(axiom_in_model));
+    stream << format(to_string_not_contains_constraint(axiom_in_model));
   else
-    stream << from_expr(ns, "", axiom_in_model);
+    stream << format(axiom_in_model);
 
   stream << '\n'
          << indent2 << "- negated_axiom:\n"
-         << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
+         << indent2 << indent << format(negaxiom) << '\n';
   stream << indent2 << "- negated_axiom_with_concretized_arrays:\n"
-         << indent2 << indent << from_expr(ns, "", with_concretized_arrays)
-         << '\n';
+         << indent2 << indent << format(with_concretized_arrays) << '\n';
 }
 
 /// \return true if the current model satisfies all the axioms
@@ -1696,8 +1524,8 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   stream << "symbol_resolve:" << eom;
   auto pairs = symbol_resolve.to_vector();
   for(const auto &pair : pairs)
-    stream << "  - " << from_expr(ns, "", pair.first) << " --> "
-           << from_expr(ns, "", pair.second) << eom;
+    stream << "  - " << format(pair.first) << " --> " << format(pair.second)
+           << eom;
 
 #ifdef DEBUG
   debug_model(
@@ -1740,7 +1568,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
        find_counter_example(ns, ui, with_concretized_arrays, univ_var))
     {
       stream << indent2 << "- violated_for: " << univ_var.get_identifier()
-             << "=" << from_expr(ns, "", *witness) << eom;
+             << "=" << format(*witness) << eom;
       violated[i]=*witness;
     }
     else
@@ -1793,7 +1621,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     if(const auto witness = find_counter_example(ns, ui, negaxiom, univ_var))
     {
       stream << indent2 << "- violated_for: " << univ_var.get_identifier()
-             << "=" << from_expr(ns, "", *witness) << eom;
+             << "=" << format(*witness) << eom;
       violated_not_contains[i]=*witness;
     }
   }
@@ -1824,14 +1652,13 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         implies_exprt instance(axiom.premise(), axiom.body());
         replace_expr(axiom.univ_var(), val, instance);
         // We are not sure the index set contains only positive numbers
-        exprt bounds=and_exprt(
+        and_exprt bounds(
           axiom.univ_within_bounds(),
-          binary_relation_exprt(
-            from_integer(0, val.type()), ID_le, val));
+          binary_relation_exprt(from_integer(0, val.type()), ID_le, val));
         replace_expr(axiom.univ_var(), val, bounds);
         const implies_exprt counter(bounds, instance);
 
-        stream << "  -  " << from_expr(ns, "", counter) << eom;
+        stream << "  -  " << format(counter) << eom;
         lemmas.push_back(counter);
       }
 
@@ -1849,7 +1676,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         const exprt counter=::instantiate_not_contains(
           axiom, indices, generator)[0];
 
-        stream << "    -  " << from_expr(ns, "", counter) << eom;
+        stream << "    -  " << format(counter) << eom;
         lemmas.push_back(counter);
       }
       return { false, lemmas };
@@ -2308,10 +2135,9 @@ static exprt instantiate(
   implies_exprt instance(axiom.premise(), axiom.body());
   replace_expr(axiom.univ_var(), r, instance);
   // We are not sure the index set contains only positive numbers
-  exprt bounds=and_exprt(
+  and_exprt bounds(
     axiom.univ_within_bounds(),
-    binary_relation_exprt(
-      from_integer(0, val.type()), ID_le, val));
+    binary_relation_exprt(from_integer(0, val.type()), ID_le, val));
   replace_expr(axiom.univ_var(), r, bounds);
   return implies_exprt(bounds, instance);
 }
@@ -2426,7 +2252,7 @@ exprt string_refinementt::get(const exprt &expr) const
   if(is_char_array_type(ecopy.type(), ns))
   {
     array_string_exprt &arr = to_array_string_expr(ecopy);
-    arr.length() = generator.get_length_of_string_array(arr);
+    arr.length() = generator.array_pool.get_length(arr);
     const auto arr_model_opt =
       get_array(super_get, ns, generator.max_string_length, debug(), arr);
     // \todo Refactor with get array in model
@@ -2575,12 +2401,12 @@ static bool is_valid_string_constraint(
   const array_index_mapt premise_indices=gather_indices(expr.premise());
   if(!premise_indices.empty())
   {
-    stream << "Premise has indices: " << from_expr(ns, "", expr) << ", map: {";
+    stream << "Premise has indices: " << format(expr) << ", map: {";
     for(const auto &pair : premise_indices)
     {
-      stream << from_expr(ns, "", pair.first) << ": {";
+      stream << format(pair.first) << ": {";
       for(const auto &i : pair.second)
-        stream << from_expr(ns, "", i) <<  ", ";
+        stream << format(i) << ", ";
     }
     stream << "}}" << eom;
     return false;
@@ -2600,8 +2426,8 @@ static bool is_valid_string_constraint(
       const exprt result=simplify_expr(equals, ns);
       if(result.is_false())
       {
-        stream << "Indices not equal: " << from_expr(ns, "", expr) << ", str: "
-               << from_expr(ns, "", pair.first) << eom;
+        stream << "Indices not equal: " << format(expr)
+               << ", str: " << format(pair.first) << eom;
         return false;
       }
     }
@@ -2609,8 +2435,8 @@ static bool is_valid_string_constraint(
     // Condition 3: f must be linear in the quantified variable
     if(!is_linear_arithmetic_expr(rep, expr.univ_var()))
     {
-      stream << "f is not linear: " << from_expr(ns, "", expr) << ", str: "
-             << from_expr(ns, "", pair.first) << eom;
+      stream << "f is not linear: " << format(expr)
+             << ", str: " << format(pair.first) << eom;
       return false;
     }
 
@@ -2618,8 +2444,7 @@ static bool is_valid_string_constraint(
     // body
     if(!universal_only_in_index(expr))
     {
-      stream << "Universal variable outside of index:"
-             << from_expr(ns, "", expr) << eom;
+      stream << "Universal variable outside of index:" << format(expr) << eom;
       return false;
     }
   }

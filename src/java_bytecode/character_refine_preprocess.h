@@ -24,6 +24,8 @@ Date:   March 2017
 #include <util/std_code.h>
 #include <util/mp_arith.h>
 
+#include <unordered_map>
+
 class character_refine_preprocesst:public messaget
 {
 public:

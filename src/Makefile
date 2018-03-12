@@ -39,7 +39,8 @@ goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
                    json.dir goto-instrument.dir
 
 goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
-               linking.dir analyses.dir solvers.dir json.dir
+               linking.dir analyses.dir goto-instrument.dir \
+               solvers.dir json.dir goto-symex.dir
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
 

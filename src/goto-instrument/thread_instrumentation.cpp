@@ -9,8 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "thread_instrumentation.h"
 
 #include <util/c_types.h>
-
-#include <ansi-c/string_constant.h>
+#include <util/string_constant.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -40,8 +39,7 @@ void thread_exit_instrumentation(goto_programt &goto_program)
 
   goto_program.insert_before_swap(end);
 
-  exprt mutex_locked_string=
-    string_constantt("mutex-locked");
+  const string_constantt mutex_locked_string("mutex-locked");
 
   binary_exprt get_may("get_may");
 

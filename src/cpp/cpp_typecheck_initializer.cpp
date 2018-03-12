@@ -195,9 +195,7 @@ void cpp_typecheckt::zero_initializer(
       if(component.get_bool(ID_is_static))
         continue;
 
-      exprt member(ID_member);
-      member.copy_to_operands(object);
-      member.set(ID_component_name, component.get(ID_name));
+      member_exprt member(object, component.get(ID_name), component.type());
 
       // recursive call
       zero_initializer(member, component.type(), source_location, ops);
@@ -221,8 +219,8 @@ void cpp_typecheckt::zero_initializer(
     exprt::operandst empty_operands;
     for(mp_integer i=0; i<size; ++i)
     {
-      exprt index(ID_index);
-      index.copy_to_operands(object, from_integer(i, index_type()));
+      index_exprt index(
+        object, from_integer(i, index_type()), array_type.subtype());
       zero_initializer(index, array_type.subtype(), source_location, ops);
     }
   }
@@ -272,8 +270,8 @@ void cpp_typecheckt::zero_initializer(
   }
   else if(final_type.id()==ID_c_enum)
   {
-    typet enum_type(ID_unsignedbv);
-    enum_type.add(ID_width)=final_type.find(ID_width);
+    const unsignedbv_typet enum_type(
+      to_bitvector_type(final_type.subtype()).get_width());
 
     exprt zero(from_integer(0, enum_type));
     zero.make_typecast(type);

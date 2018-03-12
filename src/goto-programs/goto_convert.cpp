@@ -240,10 +240,7 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
       exprt label_expr(ID_label, empty_typet());
       label_expr.set(ID_identifier, label.first);
 
-      equal_exprt guard;
-
-      guard.lhs()=pointer;
-      guard.rhs()=address_of_exprt(label_expr);
+      const equal_exprt guard(pointer, address_of_exprt(label_expr));
 
       goto_programt::targett t=
         goto_program.insert_after(g_it);
@@ -870,8 +867,7 @@ void goto_convertt::convert_cpp_delete(
     else if(code.get_statement()==ID_cpp_delete)
     {
       // just one object
-      exprt deref_op(ID_dereference, tmp_op.type().subtype());
-      deref_op.copy_to_operands(tmp_op);
+      const dereference_exprt deref_op(tmp_op);
 
       codet tmp_code=to_code(destructor);
       replace_new_object(deref_op, tmp_code);

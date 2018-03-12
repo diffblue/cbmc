@@ -17,7 +17,9 @@ SRC = arith_tools.cpp \
       find_symbols.cpp \
       fixedbv.cpp \
       format_constant.cpp \
+      format_expr.cpp \
       format_number_range.cpp \
+      format_type.cpp \
       fresh_symbol.cpp \
       get_base_name.cpp \
       get_module.cpp \
@@ -74,6 +76,7 @@ SRC = arith_tools.cpp \
       std_expr.cpp \
       std_types.cpp \
       string2int.cpp \
+      string_constant.cpp \
       string_container.cpp \
       string_hash.cpp \
       string_utils.cpp \

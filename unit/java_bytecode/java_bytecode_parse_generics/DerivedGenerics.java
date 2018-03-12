@@ -15,6 +15,9 @@ public class DerivedGenerics {
     ExtendsAndImplementsSameInterface new14;
     ExtendsAndImplementsSameInterface2 new15;
     ExtendsAndImplementsSameInterfaceGeneric new16;
+  GenericBase<?>.ExtendImplicit new17;
+  GenericBase<?>.ExtendImplicitAndExplicit<?> new18;
+  GenericBase2<?, ?>.ExtendImplicitAndExplicit new19;
 }
 
 class DerivedGenericInst extends Generic<Interface_Implementation>
@@ -187,5 +190,27 @@ class GenericBoundsLower extends Generic<Class<? super Class>> {
 class GenericInterface implements InterfaceGeneric<Class<? extends Class>> {
   public Class<? extends Class> someMethod(){
     return null;
+  }
+}
+
+// This class exists to test that subclasses of implicit generic classes have a
+// base class entry which is a Java generic symbol.
+class GenericBase<T> {
+  class ImplicitGeneric {
+  }
+  class ExtendImplicit extends ImplicitGeneric {
+  }
+  class ImplicitAndExplicitGeneric<S> {
+  }
+  class ExtendImplicitAndExplicit<S> extends ImplicitAndExplicitGeneric<S> {
+  }
+}
+
+// This class exists to test the subclasses of generic and implicitly generic
+// classes have a base class entry which is a Java generic symbol.
+class GenericBase2<T, S> {
+  class ImplicitAndExplicitGeneric<S> {
+  }
+  class ExtendImplicitAndExplicit extends ImplicitAndExplicitGeneric<S> {
   }
 }

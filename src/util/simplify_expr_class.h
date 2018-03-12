@@ -29,6 +29,7 @@ class if_exprt;
 class index_exprt;
 class member_exprt;
 class namespacet;
+class popcount_exprt;
 class tvt;
 
 #define forall_value_list(it, value_list) \
@@ -107,7 +108,7 @@ public:
   bool simplify_isnormal(exprt &expr);
   bool simplify_abs(exprt &expr);
   bool simplify_sign(exprt &expr);
-  bool simplify_popcount(exprt &expr);
+  bool simplify_popcount(popcount_exprt &expr);
 
   // auxiliary
   bool simplify_if_implies(

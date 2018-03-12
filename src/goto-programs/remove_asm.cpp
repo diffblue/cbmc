@@ -18,8 +18,8 @@ Date:   December 2014
 
 #include <util/c_types.h>
 #include <util/std_expr.h>
+#include <util/string_constant.h>
 
-#include <ansi-c/string_constant.h>
 #include <assembler/assembler_parser.h>
 
 class remove_asmt

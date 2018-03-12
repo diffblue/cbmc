@@ -138,17 +138,12 @@ void substitute_rec(
     case aliasingt::A_MAY:
       {
         // consider possible aliasing between 'what' and 'dest'
-        exprt what_address=address_of_exprt(what);
-        exprt dest_address=address_of_exprt(dest);
+        const address_of_exprt what_address(what);
+        const address_of_exprt dest_address(dest);
 
         equal_exprt alias_cond=equal_exprt(what_address, dest_address);
 
-        if_exprt if_expr;
-
-        if_expr.cond()=alias_cond;
-        if_expr.type()=dest.type();
-        if_expr.true_case()=by;
-        if_expr.false_case()=dest;
+        const if_exprt if_expr(alias_cond, by, dest, dest.type());
 
         dest=if_expr;
         return;

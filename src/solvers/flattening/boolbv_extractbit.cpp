@@ -52,10 +52,8 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     if(width_op0==0 || width_op1==0)
       return SUB::convert_rest(expr);
 
-    mp_integer index_width=
-      std::max(address_bits(width_op0), mp_integer(width_op1));
-
-    unsignedbv_typet index_type(integer2size_t(index_width));
+    std::size_t index_width = std::max(address_bits(width_op0), width_op1);
+    unsignedbv_typet index_type(index_width);
 
     equal_exprt equality;
     equality.lhs()=operands[1]; // index operand

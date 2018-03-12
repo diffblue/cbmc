@@ -1192,14 +1192,13 @@ void shared_bufferst::cfg_visitort::weak_memory(
                     choice1,
                     nondet_bool_expr);
 
-                  exprt rhs=
+                  const if_exprt rhs(
+                    read_delayed_expr,
                     if_exprt(
-                      read_delayed_expr,
-                      if_exprt(
-                        choice1_expr,
-                        dereference_exprt(new_read_expr, vars.type),
-                        to_replace_expr),
-                      to_replace_expr); // original_instruction.code.op1());
+                      choice1_expr,
+                      dereference_exprt(new_read_expr, vars.type),
+                      to_replace_expr),
+                    to_replace_expr); // original_instruction.code.op1());
 
                   shared_buffers.assignment(
                     goto_program, i_it, source_location,

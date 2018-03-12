@@ -112,6 +112,7 @@ void cpp_internal_additions(std::ostream &out)
      config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
   {
     out << "extern \"C\" {" << '\n';
+    out << c2cpp(gcc_builtin_headers_types);
     out << c2cpp(gcc_builtin_headers_generic);
     out << c2cpp(gcc_builtin_headers_math);
     out << c2cpp(gcc_builtin_headers_mem_string);

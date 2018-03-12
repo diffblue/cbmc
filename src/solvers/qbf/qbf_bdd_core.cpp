@@ -14,8 +14,6 @@ Author: CM Wintersteiger
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 
-#include <langapi/language_util.h>
-
 #include <cuddObj.hh> // CUDD Library
 
 /*! \cond */
@@ -285,12 +283,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
     const exprt &sym=it->second.first;
     unsigned index=it->second.second;
 
-    exprt extract_expr(ID_extractbit, typet(ID_bool));
-    extract_expr.copy_to_operands(sym);
-
-    typet uint_type(ID_unsignedbv);
-    uint_type.set(ID_width, 32);
-    extract_expr.copy_to_operands(from_integer(index, uint_type));
+    extractbit_exprt extract_expr(sym, from_integer(index, integer_typet()));
 
     if(l.sign())
       extract_expr.negate();
@@ -328,7 +321,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
     int *cube;
     DdGen *generator;
 
-    exprt result=or_exprt();
+    or_exprt result;
 
     Cudd_ForeachPrime(
       bdd_manager->getManager(),
@@ -337,7 +330,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
       generator,
       cube)
     {
-      exprt prime=and_exprt();
+      and_exprt prime;
 
       #if 0
       std::cout << "CUBE: ";

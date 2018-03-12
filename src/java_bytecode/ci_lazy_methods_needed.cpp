@@ -20,7 +20,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 void ci_lazy_methods_neededt::add_needed_method(
   const irep_idt &method_symbol_name)
 {
-  needed_methods.push_back(method_symbol_name);
+  callable_methods.push_back(method_symbol_name);
 }
 
 /// Notes class `class_symbol_name` will be instantiated, or a static field
@@ -32,7 +32,7 @@ void ci_lazy_methods_neededt::add_needed_method(
 bool ci_lazy_methods_neededt::add_needed_class(
   const irep_idt &class_symbol_name)
 {
-  if(!needed_classes.insert(class_symbol_name).second)
+  if(!instantiated_classes.insert(class_symbol_name).second)
     return false;
 
   const std::string &class_name_string = id2string(class_symbol_name);

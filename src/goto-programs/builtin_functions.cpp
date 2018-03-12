@@ -13,24 +13,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/c_types.h>
-#include <util/rational.h>
-#include <util/replace_expr.h>
-#include <util/rational_tools.h>
-#include <util/source_location.h>
-#include <util/cprover_prefix.h>
-#include <util/prefix.h>
 #include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/cprover_prefix.h>
+#include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
+#include <util/prefix.h>
+#include <util/rational.h>
+#include <util/rational_tools.h>
+#include <util/replace_expr.h>
 #include <util/simplify_expr.h>
+#include <util/source_location.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
+#include <util/string_constant.h>
 #include <util/symbol.h>
-#include <util/pointer_predicates.h>
-#include <util/pointer_offset_size.h>
 
 #include <linking/zero_initializer.h>
-
-#include <ansi-c/string_constant.h>
 
 #include <langapi/language_util.h>
 
@@ -61,7 +60,7 @@ void goto_convertt::do_prob_uniform(
     throw 0;
   }
 
-  exprt rhs=side_effect_exprt("prob_uniform", lhs.type());
+  side_effect_exprt rhs("prob_uniform", lhs.type());
   rhs.add_source_location()=function.source_location();
 
   if(lhs.type().id()!=ID_unsignedbv &&
@@ -139,7 +138,7 @@ void goto_convertt::do_prob_coin(
     throw 0;
   }
 
-  exprt rhs=side_effect_exprt("prob_coin", lhs.type());
+  side_effect_exprt rhs("prob_coin", lhs.type());
   rhs.add_source_location()=function.source_location();
 
   if(lhs.type()!=bool_typet())
@@ -262,8 +261,8 @@ void goto_convertt::do_scanf(
         {
           if(argument_number<arguments.size())
           {
-            exprt ptr=
-              typecast_exprt(arguments[argument_number], pointer_type(type));
+            const typecast_exprt ptr(
+              arguments[argument_number], pointer_type(type));
             argument_number++;
 
             if(type.id()==ID_array)
@@ -277,11 +276,10 @@ void goto_convertt::do_scanf(
                 new_tmp_symbol(
                   type, "scanf_string", dest, function.source_location());
 
-              exprt rhs=
-                address_of_exprt(
-                  index_exprt(
-                    tmp_symbol.symbol_expr(),
-                    from_integer(0, index_type())));
+              const address_of_exprt rhs(
+                index_exprt(
+                  tmp_symbol.symbol_expr(),
+                  from_integer(0, index_type())));
 
               // now use array copy
               codet array_copy_statement;
@@ -294,10 +292,9 @@ void goto_convertt::do_scanf(
 
               copy(array_copy_statement, OTHER, dest);
               #else
-              exprt lhs=
-                index_exprt(
-                  dereference_exprt(ptr, type), from_integer(0, index_type()));
-              exprt rhs=side_effect_expr_nondett(type.subtype());
+              const index_exprt lhs(
+                dereference_exprt(ptr, type), from_integer(0, index_type()));
+              const side_effect_expr_nondett rhs(type.subtype());
               code_assignt assign(lhs, rhs);
               assign.add_source_location()=function.source_location();
               copy(assign, ASSIGN, dest);
@@ -306,8 +303,8 @@ void goto_convertt::do_scanf(
             else
             {
               // make it nondet for now
-              exprt lhs=dereference_exprt(ptr, type);
-              exprt rhs=side_effect_expr_nondett(type);
+              const dereference_exprt lhs(ptr, type);
+              const side_effect_expr_nondett rhs(type);
               code_assignt assign(lhs, rhs);
               assign.add_source_location()=function.source_location();
               copy(assign, ASSIGN, dest);
@@ -558,11 +555,10 @@ void goto_convertt::do_java_new(
   CHECK_RETURN(object_size.is_not_nil());
 
   // we produce a malloc side-effect, which stays
-  side_effect_exprt malloc_expr(ID_allocate);
+  side_effect_exprt malloc_expr(ID_allocate, rhs.type());
   malloc_expr.copy_to_operands(object_size);
   // could use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
-  malloc_expr.type()=rhs.type();
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
   t_n->code=code_assignt(lhs, malloc_expr);
@@ -598,11 +594,10 @@ void goto_convertt::do_java_new_array(
   CHECK_RETURN(!object_size.is_nil());
 
   // we produce a malloc side-effect, which stays
-  side_effect_exprt malloc_expr(ID_allocate);
+  side_effect_exprt malloc_expr(ID_allocate, rhs.type());
   malloc_expr.copy_to_operands(object_size);
   // code use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
-  malloc_expr.type()=rhs.type();
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
   t_n->code=code_assignt(lhs, malloc_expr);
@@ -773,8 +768,7 @@ void goto_convertt::cpp_new_initializer(
     else if(rhs.get_statement()==ID_cpp_new)
     {
       // just one object
-      exprt deref_lhs(ID_dereference, rhs.type().subtype());
-      deref_lhs.copy_to_operands(lhs);
+      const dereference_exprt deref_lhs(lhs, rhs.type().subtype());
 
       replace_new_object(deref_lhs, initializer);
       convert(to_code(initializer), dest);
@@ -839,51 +833,12 @@ void goto_convertt::do_array_op(
   array_op_statement.operands()=arguments;
   array_op_statement.add_source_location()=function.source_location();
 
+  // lhs is only used with array_equal, in all other cases it should be nil (as
+  // they are of type void)
+  if(id == ID_array_equal)
+    array_op_statement.copy_to_operands(lhs);
+
   copy(array_op_statement, OTHER, dest);
-}
-
-void goto_convertt::do_array_equal(
-  const exprt &lhs,
-  const exprt &function,
-  const exprt::operandst &arguments,
-  goto_programt &dest)
-{
-  if(arguments.size()!=2)
-  {
-    error().source_location=function.find_source_location();
-    error() << "array_equal expects two arguments" << eom;
-    throw 0;
-  }
-
-  const typet &arg0_type=ns.follow(arguments[0].type());
-  const typet &arg1_type=ns.follow(arguments[1].type());
-
-  if(arg0_type.id()!=ID_pointer ||
-     arg1_type.id()!=ID_pointer)
-  {
-    error().source_location=function.find_source_location();
-    error() << "array_equal expects pointer arguments" << eom;
-    throw 0;
-  }
-
-  if(lhs.is_not_nil())
-  {
-    code_assignt assignment;
-
-    // add dereferencing here
-    dereference_exprt lhs_array, rhs_array;
-    lhs_array.op0()=arguments[0];
-    rhs_array.op0()=arguments[1];
-    lhs_array.type()=arg0_type.subtype();
-    rhs_array.type()=arg1_type.subtype();
-
-    assignment.lhs()=lhs;
-    assignment.rhs()=binary_exprt(
-      lhs_array, ID_array_equal, rhs_array, lhs.type());
-    assignment.add_source_location()=function.source_location();
-
-    convert(assignment, dest);
-  }
 }
 
 bool is_lvalue(const exprt &expr)
@@ -1214,7 +1169,7 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier==CPROVER_PREFIX "array_equal")
   {
-    do_array_equal(lhs, function, arguments, dest);
+    do_array_op(ID_array_equal, lhs, function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "array_set")
   {
@@ -1430,7 +1385,7 @@ void goto_convertt::do_function_call_symbol(
     }
 
     exprt dest_expr=make_va_list(arguments[0]);
-    exprt src_expr=typecast_exprt(arguments[1], dest_expr.type());
+    const typecast_exprt src_expr(arguments[1], dest_expr.type());
 
     if(!is_lvalue(dest_expr))
     {
@@ -1456,7 +1411,7 @@ void goto_convertt::do_function_call_symbol(
     }
 
     exprt dest_expr=make_va_list(arguments[0]);
-    exprt src_expr=typecast_exprt(
+    const typecast_exprt src_expr(
       address_of_exprt(arguments[1]), dest_expr.type());
 
     if(!is_lvalue(dest_expr))

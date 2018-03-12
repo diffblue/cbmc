@@ -1,4 +1,4 @@
-// Copyright 2017 Diffblue Limited. All Rights Reserved.
+/// Author: Diffblue Ltd.
 
 /// \file
 /// Symbol table base class interface

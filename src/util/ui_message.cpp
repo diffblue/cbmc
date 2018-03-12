@@ -110,7 +110,8 @@ void ui_message_handlert::print(
     {
       console_message_handlert console_message_handler;
       std::stringstream ss;
-      ss << time->stamp() << message;
+      const std::string timestamp = time->stamp();
+      ss << timestamp << (timestamp.empty() ? "" : " ") << message;
       console_message_handler.print(level, ss.str());
     }
     break;
@@ -244,6 +245,9 @@ void ui_message_handlert::xml_ui_msg(
 
   result.new_element("text").data=msg1;
   result.set_attribute("type", type);
+  const std::string timestamp = time->stamp();
+  if(!timestamp.empty())
+    result.set_attribute("timestamp", timestamp);
 
   std::cout << result;
   std::cout << '\n';
@@ -263,6 +267,9 @@ void ui_message_handlert::json_ui_msg(
 
   result["messageType"] = json_stringt(type);
   result["messageText"] = json_stringt(msg1);
+  const std::string timestamp = time->stamp();
+  if(!timestamp.empty())
+    result["timestamp"] = json_stringt(timestamp);
 
   // By convention a leading comma is created by every new array entry.
   // The first entry is generated in the constructor and does not have

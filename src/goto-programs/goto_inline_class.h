@@ -172,13 +172,6 @@ protected:
     const symbol_exprt &function,
     const exprt::operandst &arguments);
 
-  void insert_function_nobody(
-    goto_programt &dest,
-    const exprt &lhs,
-    goto_programt::targett target,
-    const symbol_exprt &function,
-    const exprt::operandst &arguments);
-
   void replace_return(
     goto_programt &body,
     const exprt &lhs);

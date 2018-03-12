@@ -1,4 +1,4 @@
-// Copyright 2016-2017 Diffblue Limited. All Rights Reserved.
+/// Author: Diffblue Ltd.
 
 /// \file
 /// Model for lazy loading of functions

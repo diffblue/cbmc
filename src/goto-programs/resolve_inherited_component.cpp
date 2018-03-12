@@ -2,7 +2,7 @@
 
  Module: GOTO Program Utilities
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
@@ -40,7 +40,7 @@ resolve_inherited_componentt::resolve_inherited_componentt(
 /// \param class_id: The name of the class the function is being called on
 /// \param component_name: The base name of the component (i.e. without the
 ///   class specifier)
-/// \param include_interfaces: If true, consider inheritence from interfaces
+/// \param include_interfaces: If true, consider inheritance from interfaces
 ///   (parent types other than the first listed)
 /// \return The concrete component that has been resolved
 resolve_inherited_componentt::inherited_componentt

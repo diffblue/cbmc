@@ -38,7 +38,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define DEBUGX
 
 #ifdef DEBUGX
-#include <langapi/language_util.h>
 #include <iostream>
 #endif
 
@@ -136,20 +135,19 @@ bool simplify_exprt::simplify_sign(exprt &expr)
   return true;
 }
 
-bool simplify_exprt::simplify_popcount(exprt &expr)
+bool simplify_exprt::simplify_popcount(popcount_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return true;
+  const exprt &op = expr.op();
 
-  if(expr.op0().is_constant())
+  if(op.is_constant())
   {
-    const typet &type=ns.follow(expr.op0().type());
+    const typet &type=ns.follow(op.type());
 
     if(type.id()==ID_signedbv ||
        type.id()==ID_unsignedbv)
     {
       mp_integer value;
-      if(!to_integer(expr.op0(), value))
+      if(!to_integer(op, value))
       {
         std::size_t result;
 
@@ -157,7 +155,8 @@ bool simplify_exprt::simplify_popcount(exprt &expr)
           if(value.is_odd())
             result++;
 
-        expr=from_integer(result, expr.type());
+        exprt simp_result = from_integer(result, expr.type());
+        expr.swap(simp_result);
 
         return false;
       }
@@ -430,8 +429,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   if(expr.op0().id()==ID_if &&
      expr.op0().operands().size()==3)
   {
-    exprt tmp_op1=typecast_exprt(expr.op0().op1(), expr_type);
-    exprt tmp_op2=typecast_exprt(expr.op0().op2(), expr_type);
+    typecast_exprt tmp_op1(expr.op0().op1(), expr_type);
+    typecast_exprt tmp_op2(expr.op0().op2(), expr_type);
     simplify_typecast(tmp_op1);
     simplify_typecast(tmp_op2);
     expr=if_exprt(expr.op0().op0(), tmp_op1, tmp_op2, expr_type);
@@ -1545,7 +1544,7 @@ exprt simplify_exprt::bits2expr(
     const struct_typet::componentst &components=
       struct_type.components();
 
-    exprt result=struct_exprt(type);
+    struct_exprt result(type);
     result.reserve_operands(components.size());
 
     mp_integer m_offset_bits=0;
@@ -1582,7 +1581,7 @@ exprt simplify_exprt::bits2expr(
       integer2size_t(pointer_offset_bits(type.subtype(), ns));
     assert(el_size>0);
 
-    exprt result=array_exprt(array_type);
+    array_exprt result(array_type);
     result.reserve_operands(n_el);
 
     for(std::size_t i=0; i<n_el; ++i)
@@ -2334,8 +2333,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_abs(expr) && result;
   else if(expr.id()==ID_sign)
     result=simplify_sign(expr) && result;
-  else if(expr.id()==ID_popcount)
-    result=simplify_popcount(expr) && result;
+  else if(expr.id() == ID_popcount)
+    result = simplify_popcount(to_popcount_expr(expr)) && result;
 
   #ifdef DEBUGX
   if(!result
@@ -2344,8 +2343,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
      #endif
      )
   {
-    std::cout << "===== " << from_expr(ns, "", old)
-              << "\n ---> " << from_expr(ns, "", expr)
+    std::cout << "===== " << format(old) << "\n ---> " << format(expr)
               << "\n";
   }
   #endif
@@ -2417,12 +2415,12 @@ bool simplify_exprt::simplify(exprt &expr)
 {
 #ifdef DEBUG_ON_DEMAND
   if(debug_on)
-    std::cout << "TO-SIMP " << from_expr(ns, "", expr) << "\n";
+    std::cout << "TO-SIMP " << format(expr) << "\n";
 #endif
   bool res=simplify_rec(expr);
 #ifdef DEBUG_ON_DEMAND
   if(debug_on)
-    std::cout << "FULLSIMP " << from_expr(ns, "", expr) << "\n";
+    std::cout << "FULLSIMP " << format(expr) << "\n";
 #endif
   return res;
 }

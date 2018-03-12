@@ -27,8 +27,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 exprt get_exponent(
   const exprt &src, const ieee_float_spect &spec)
 {
-  exprt exp_bits=extractbits_exprt(
-    src, spec.f+spec.e-1, spec.f, unsignedbv_typet(spec.e));
+  const extractbits_exprt exp_bits(
+    src, spec.f + spec.e - 1, spec.f, unsignedbv_typet(spec.e));
 
   // Exponent is in biased form (numbers from -128 to 127 are encoded with
   // integer from 0 to 255) we have to remove the bias.

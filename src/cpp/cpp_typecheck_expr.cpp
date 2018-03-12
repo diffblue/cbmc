@@ -11,7 +11,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
-#include <cstdlib>
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 #include <util/pointer_offset_size.h>
 #include <util/std_types.h>
@@ -20,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/config.h>
 #include <util/simplify_expr.h>
 #include <util/base_type.h>
+#include <util/invariant.h>
 
 #include <util/c_types.h>
 #include <ansi-c/c_qualifiers.h>
@@ -69,25 +72,27 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_expr_explicit_constructor_call(expr);
   else if(expr.is_nil())
   {
-    #if 0
+#ifdef DEBUG
+    std::cerr << "E: " << expr.pretty() << '\n';
     std::cerr << "cpp_typecheckt::typecheck_expr_main got nil\n";
-    #endif
-    abort();
+#endif
+    UNREACHABLE;
   }
   else if(expr.id()==ID_code)
   {
-    #if 0
+#ifdef DEBUG
+    std::cerr << "E: " << expr.pretty() << '\n';
     std::cerr << "cpp_typecheckt::typecheck_expr_main got code\n";
-    #endif
-    abort();
+#endif
+    UNREACHABLE;
   }
   else if(expr.id()==ID_symbol)
   {
-    #if 0
-    std::cout << "E: " << expr.pretty() << '\n';
+    // ignore here
+#ifdef DEBUG
+    std::cerr << "E: " << expr.pretty() << '\n';
     std::cerr << "cpp_typecheckt::typecheck_expr_main got symbol\n";
-    abort();
-    #endif
+#endif
   }
   else if(expr.id()=="__is_base_of")
   {
@@ -737,8 +742,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     if(args.size() > 0 && args[0].get(ID_C_base_name)==ID_this)
     {
       // it's a pointer to member function
-      typet symbol(ID_symbol);
-      symbol.set(ID_identifier, code_type.get(ID_C_member_name));
+      const symbol_typet symbol(code_type.get(ID_C_member_name));
       expr.op0().type().add("to-member")=symbol;
 
       if(code_type.get_bool(ID_C_is_virtual))
@@ -975,8 +979,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   {
     assert(expr.type().id()==ID_struct);
 
-    typet symb(ID_symbol);
-    symb.set(ID_identifier, expr.type().get(ID_name));
+    symbol_typet symb(expr.type().get(ID_name));
     symb.add_source_location()=expr.source_location();
 
     exprt e=expr;
@@ -1900,10 +1903,9 @@ void cpp_typecheckt::add_implicit_dereference(exprt &expr)
   if(is_reference(expr.type()))
   {
     // add implicit dereference
-    exprt tmp(ID_dereference, expr.type().subtype());
+    dereference_exprt tmp(expr);
     tmp.set(ID_C_implicit, true);
     tmp.add_source_location()=expr.source_location();
-    tmp.move_to_operands(expr);
     tmp.set(ID_C_lvalue, true);
     expr.swap(tmp);
   }
@@ -1952,8 +1954,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     if(expr.arguments().empty())
     {
       // create temporary object
-      exprt tmp_object_expr(ID_side_effect, pod);
-      tmp_object_expr.set(ID_statement, ID_temporary_object);
+      side_effect_exprt tmp_object_expr(ID_temporary_object, pod);
       tmp_object_expr.set(ID_C_lvalue, true);
       tmp_object_expr.set(ID_mode, ID_cpp);
       tmp_object_expr.add_source_location()=expr.source_location();
@@ -2030,9 +2031,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     else
     {
       assert(expr.function().type().id()==ID_pointer);
-      exprt tmp(ID_dereference, expr.function().type().subtype());
+      dereference_exprt tmp(expr.function());
       tmp.add_source_location()=expr.op0().source_location();
-      tmp.move_to_operands(expr.function());
       expr.function().swap(tmp);
     }
 
@@ -2090,9 +2090,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       assert(vtentry_member.type().id()==ID_pointer);
 
       {
-        exprt tmp(ID_dereference, vtentry_member.type().subtype());
+        dereference_exprt tmp(vtentry_member);
         tmp.add_source_location()=expr.op0().source_location();
-        tmp.move_to_operands(vtentry_member);
         vtentry_member.swap(tmp);
       }
 
@@ -2158,8 +2157,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     expr.type()=this_type.subtype();
 
     // create temporary object
-    exprt tmp_object_expr(ID_side_effect, this_type.subtype());
-    tmp_object_expr.set(ID_statement, ID_temporary_object);
+    side_effect_exprt tmp_object_expr(ID_temporary_object, this_type.subtype());
     tmp_object_expr.set(ID_C_lvalue, true);
     tmp_object_expr.set(ID_mode, ID_cpp);
     tmp_object_expr.add_source_location()=expr.source_location();
@@ -2213,9 +2211,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     typecheck_method_application(expr);
     typecheck_function_call_arguments(expr);
 
-    codet new_code(ID_expression);
-    new_code.copy_to_operands(expr);
-
+    const code_expressiont new_code(expr);
     tmp_object_expr.add(ID_initializer)=new_code;
     expr.swap(tmp_object_expr);
     return;

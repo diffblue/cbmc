@@ -12,22 +12,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <set>
 
-#include <util/symbol.h>
-#include <util/mp_arith.h>
 #include <util/arith_tools.h>
 #include <util/magic.h>
-#include <util/replace_expr.h>
-#include <util/std_types.h>
+#include <util/mp_arith.h>
 #include <util/prefix.h>
+#include <util/replace_expr.h>
 #include <util/std_expr.h>
-#include <util/threeval.h>
+#include <util/std_types.h>
 #include <util/string2int.h>
-
-#include <ansi-c/string_constant.h>
+#include <util/string_constant.h>
+#include <util/symbol.h>
+#include <util/threeval.h>
 
 #include "boolbv_type.h"
 
 #include "../floatbv/float_utils.h"
+#include "../lowering/expr_lowering.h"
 
 bool boolbvt::literal(
   const exprt &expr,
@@ -306,6 +306,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
       float_utils.debug2(bv0, bv1);
     return bv;
   }
+  else if(expr.id() == ID_popcount)
+    return convert_bv(lower_popcount(to_popcount_expr(expr), ns));
 
   return conversion_failed(expr);
 }

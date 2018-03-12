@@ -3,7 +3,7 @@ SRC = bytecode_info.cpp \
       ci_lazy_methods.cpp \
       ci_lazy_methods_needed.cpp \
       expr2java.cpp \
-      generic_arguments_name_builder.cpp \
+      generic_parameter_specialization_map_keys.cpp \
       jar_file.cpp \
       java_bytecode_convert_class.cpp \
       java_bytecode_convert_method.cpp \
@@ -29,7 +29,6 @@ SRC = bytecode_info.cpp \
       java_string_literals.cpp \
       java_types.cpp \
       java_utils.cpp \
-      generate_java_generic_type.cpp \
       mz_zip_archive.cpp \
       select_pointer_type.cpp \
       # Empty last line

@@ -267,7 +267,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
       const symbolt *symbol;
       if(!ns.lookup(id, symbol))
       {
-        exprt symbol_expr=symbol_exprt(symbol->name, symbol->type);
+        const symbol_exprt symbol_expr(symbol->name, symbol->type);
         rhs=address_of_exprt(symbol_expr);
         rhs.make_typecast(lhs.type());
       }
@@ -427,11 +427,9 @@ void goto_symext::symex_cpp_new(
 
   if(do_array)
   {
-    symbol.type=array_typet();
-    symbol.type.subtype()=code.type().subtype();
-    exprt size_arg=static_cast<const exprt&>(code.find(ID_size));
+    exprt size_arg = static_cast<const exprt &>(code.find(ID_size));
     clean_expr(size_arg, state, false);
-    symbol.type.set(ID_size, size_arg);
+    symbol.type = array_typet(code.type().subtype(), size_arg);
   }
   else
     symbol.type=code.type().subtype();
@@ -447,10 +445,7 @@ void goto_symext::symex_cpp_new(
 
   if(do_array)
   {
-    exprt index_expr(ID_index, code.type().subtype());
-    index_expr.copy_to_operands(
-      symbol.symbol_expr(),
-      from_integer(0, index_type()));
+    index_exprt index_expr(symbol.symbol_expr(), from_integer(0, index_type()));
     rhs.move_to_operands(index_expr);
   }
   else

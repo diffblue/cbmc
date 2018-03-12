@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 #include <util/std_types.h>
+#include <util/string_container.h>
 #include <util/symbol_table.h>
 #include <util/ieee_float.h>
 #include <util/fixedbv.h>
@@ -461,7 +462,7 @@ exprt interpretert::get_value(
   const typet real_type=ns.follow(type);
   if(real_type.id()==ID_struct)
   {
-    exprt result=struct_exprt(real_type);
+    struct_exprt result(real_type);
     const struct_typet &struct_type=to_struct_type(real_type);
     const struct_typet::componentst &components=struct_type.components();
 
@@ -483,7 +484,7 @@ exprt interpretert::get_value(
   else if(real_type.id()==ID_array)
   {
     // Get size of array
-    exprt result=array_exprt(to_array_type(real_type));
+    array_exprt result(to_array_type(real_type));
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
     mp_integer subtype_size=get_size(type.subtype());
     mp_integer count;
@@ -528,7 +529,7 @@ exprt interpretert::get_value(
 
   if(real_type.id()==ID_struct)
   {
-    exprt result=struct_exprt(real_type);
+    struct_exprt result(real_type);
     const struct_typet &struct_type=to_struct_type(real_type);
     const struct_typet::componentst &components=struct_type.components();
 
@@ -547,7 +548,7 @@ exprt interpretert::get_value(
   }
   else if(real_type.id()==ID_array)
   {
-    exprt result(ID_constant, type);
+    constant_exprt result(type);
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
 
     // Get size of array
@@ -613,8 +614,7 @@ exprt interpretert::get_value(
       irep_idt identifier=address_to_identifier(address);
       mp_integer offset=address_to_offset(address);
       const typet type=get_type(identifier);
-      exprt symbol_expr(ID_symbol, type);
-      symbol_expr.set(ID_identifier, identifier);
+      const symbol_exprt symbol_expr(identifier, type);
 
       if(offset==0)
         return address_of_exprt(symbol_expr);
@@ -642,7 +642,7 @@ exprt interpretert::get_value(
   {
     // Strings are currently encoded by their irep_idt ID.
     return constant_exprt(
-      irep_idt::make_from_table_index(rhs[integer2size_t(offset)].to_long()),
+      get_string_container().get_string(rhs[integer2size_t(offset)].to_long()),
       type);
   }
 
@@ -826,8 +826,7 @@ void interpretert::execute_function_call()
     for(std::size_t i=0; i<parameters.size(); i++)
     {
       const code_typet::parametert &a=parameters[i];
-      exprt symbol_expr(ID_symbol, a.type());
-      symbol_expr.set(ID_identifier, a.get_identifier());
+      const symbol_exprt symbol_expr(a.get_identifier(), a.type());
       assign(evaluate_address(symbol_expr), argument_values[i]);
     }
 

@@ -13,8 +13,7 @@ extern char *yyjsiltext;
 
 #include <util/std_expr.h>
 #include <util/std_code.h>
-
-#include <ansi-c/string_constant.h>
+#include <util/string_constant.h>
 
 #include "jsil_y.tab.h"
 /*** token declaration **************************************************/

@@ -817,9 +817,8 @@ bool jbmc_parse_optionst::process_goto_functions(
 /// display command line help
 void jbmc_parse_optionst::help()
 {
-  std::cout <<
-    "\n"
-    "* *   JBMC " CBMC_VERSION " - Copyright (C) 2001-2017 ";
+  std::cout << "\n"
+               "* *   JBMC " CBMC_VERSION " - Copyright (C) 2001-2018 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
 

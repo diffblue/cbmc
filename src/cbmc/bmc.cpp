@@ -104,9 +104,7 @@ void bmct::error_trace()
 }
 
 /// outputs witnesses in graphml format
-void bmct::output_graphml(
-  resultt result,
-  const goto_functionst &goto_functions)
+void bmct::output_graphml(resultt result)
 {
   const std::string graphml=options.get_option("graphml-witness");
   if(graphml.empty())
@@ -170,7 +168,7 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   {
     auto solver_stop = std::chrono::steady_clock::now();
     status() << "Runtime decision procedure: "
-             << std::chrono::duration<double>(solver_start-solver_stop).count()
+             << std::chrono::duration<double>(solver_stop-solver_start).count()
              << "s" << eom;
   }
 
@@ -413,7 +411,7 @@ safety_checkert::resultt bmct::execute(const goto_functionst &goto_functions)
        symex.remaining_vccs==0)
     {
       report_success();
-      output_graphml(resultt::SAFE, goto_functions);
+      output_graphml(resultt::SAFE);
       return safety_checkert::resultt::SAFE;
     }
 
@@ -508,12 +506,12 @@ safety_checkert::resultt bmct::decide(
   prop_conv.set_message_handler(get_message_handler());
 
   if(options.get_bool_option("stop-on-fail"))
-    return stop_on_fail(goto_functions, prop_conv);
+    return stop_on_fail(prop_conv);
   else
     return all_properties(goto_functions, prop_conv);
 }
 
-void bmct::show(const goto_functionst &goto_functions)
+void bmct::show()
 {
   if(options.get_bool_option("show-vcc"))
   {
@@ -526,15 +524,13 @@ void bmct::show(const goto_functionst &goto_functions)
   }
 }
 
-safety_checkert::resultt bmct::stop_on_fail(
-  const goto_functionst &goto_functions,
-  prop_convt &prop_conv)
+safety_checkert::resultt bmct::stop_on_fail(prop_convt &prop_conv)
 {
   switch(run_decision_procedure(prop_conv))
   {
   case decision_proceduret::resultt::D_UNSATISFIABLE:
     report_success();
-    output_graphml(resultt::SAFE, goto_functions);
+    output_graphml(resultt::SAFE);
     return resultt::SAFE;
 
   case decision_proceduret::resultt::D_SATISFIABLE:
@@ -545,7 +541,7 @@ safety_checkert::resultt bmct::stop_on_fail(
           dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
 
       error_trace();
-      output_graphml(resultt::UNSAFE, goto_functions);
+      output_graphml(resultt::UNSAFE);
     }
 
     report_failure();

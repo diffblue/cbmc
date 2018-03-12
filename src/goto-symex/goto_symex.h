@@ -245,15 +245,13 @@ protected:
   // this does the following:
   // a) rename non-det choices
   // b) remove pointer dereferencing
-  // c) rewrite array_equal expression into equality
+  // c) clean up byte_extract on the lhs of an assignment
   void clean_expr(
     exprt &, statet &, bool write);
 
-  void replace_array_equal(exprt &);
   void trigger_auto_object(const exprt &, statet &);
   void initialize_auto_object(const exprt &, statet &);
   void process_array_expr(exprt &);
-  void process_array_expr_rec(exprt &, const typet &) const;
   exprt make_auto_object(const typet &, statet &);
   virtual void dereference(exprt &, statet &, const bool write);
 

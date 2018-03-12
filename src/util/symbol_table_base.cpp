@@ -1,4 +1,4 @@
-// Copyright 2017 Diffblue Limited. All Rights Reserved.
+/// Author: Diffblue Ltd.
 
 #include "symbol_table_base.h"
 
@@ -38,10 +38,7 @@ void symbol_table_baset::show(std::ostream &out) const
   std::sort(
     sorted_names.begin(),
     sorted_names.end(),
-    [](const irep_idt &a, const irep_idt &b)
-    {
-      return as_string(a) < as_string(b);
-    });
+    [](const irep_idt &a, const irep_idt &b) { return a.compare(b); });
   out << "\n"
       << "Symbols:"
       << "\n";
