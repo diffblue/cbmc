@@ -2,7 +2,6 @@ import java.util.function.Function;
 import java.util.function.BiFunction;
 
 public class StaticMethodRef{
- public Integer test2(){return 2;}
  public Integer Smr(Integer ctr) {
    Function<Integer, Integer> func1  = Integer::valueOf;
 
