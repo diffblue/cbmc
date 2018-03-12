@@ -205,7 +205,6 @@ public:
       }
     };
 
-
     // TODO(tkiley): This map shouldn't be interacted with directly (instead
     // TODO(tkiley): using add_method_handle and get_method_handle and instead
     // TODO(tkiley): should be made private. TG-2785

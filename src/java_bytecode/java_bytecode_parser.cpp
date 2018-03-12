@@ -1923,13 +1923,11 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
 
     // If parse_method_handle can't parse the lambda method, it should return {}
     POSTCONDITION(
-      lambda_method_handle->handle_type !=
-      method_handle_typet::UNKNOWN_HANDLE);
+      lambda_method_handle->handle_type != method_handle_typet::UNKNOWN_HANDLE);
 
     lambda_method_handle->interface_type =
       pool_entry(interface_type_argument.ref1).s;
-    lambda_method_handle->method_type =
-      pool_entry(method_type_argument.ref1).s;
+    lambda_method_handle->method_type = pool_entry(method_type_argument.ref1).s;
     lambda_method_handle->u2_values = std::move(u2_values);
     debug() << "lambda function reference "
             << id2string(lambda_method_handle->lambda_method_name)
@@ -1937,8 +1935,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
             << "\n  interface type is "
             << id2string(pool_entry(interface_type_argument.ref1).s)
             << "\n  method type is "
-            << id2string(pool_entry(method_type_argument.ref1).s)
-            << eom;
+            << id2string(pool_entry(method_type_argument.ref1).s) << eom;
     parsed_class.add_method_handle(
       bootstrap_method_index, *lambda_method_handle);
   }
@@ -1946,7 +1943,8 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
 
 /// Creates an unknown method handle and puts it into the parsed_class
 /// \param parsed_class: The class whose bootstrap method handles we are using
-/// \param bootstrap_method_index: The current index in the bootstrap entry table
+/// \param bootstrap_method_index: The current index in the bootstrap entry
+///   table
 /// \param u2_values: The indices of the arguments for the call
 void java_bytecode_parsert::store_unknown_method_handle(
   java_bytecode_parsert::classt &parsed_class,
@@ -1955,6 +1953,5 @@ void java_bytecode_parsert::store_unknown_method_handle(
 {
   const lambda_method_handlet lambda_method_handle =
     lambda_method_handlet::create_unknown_handle(move(u2_values));
-  parsed_class.add_method_handle(
-    bootstrap_method_index, lambda_method_handle);
+  parsed_class.add_method_handle(bootstrap_method_index, lambda_method_handle);
 }
