@@ -287,106 +287,22 @@ static void substitute_function_applications_in_equations(
     substitute_function_applications(eq.rhs(), generator);
 }
 
-/// For now, any unsigned bitvector type of width smaller or equal to 16 is
-/// considered a character.
-/// \note type that are not characters maybe detected as characters (for
-/// instance unsigned char in C), this will make dec_solve do unnecessary
-/// steps for these, but should not affect correctness.
-/// \param type: a type
-/// \return true if the given type represents characters
-bool is_char_type(const typet &type)
+/// Fill the array_pointer correspondence and replace the right hand sides of
+/// the corresponding equations
+static void make_char_array_pointer_associations(
+  string_constraint_generatort &generator,
+  std::vector<equal_exprt> &equations)
 {
-  return type.id() == ID_unsignedbv &&
-         to_unsignedbv_type(type).get_width() <= 16;
-}
-
-/// Distinguish char array from other types.
-/// For now, any unsigned bitvector type is considered a character.
-/// \param type: a type
-/// \param ns: namespace
-/// \return true if the given type is an array of characters
-bool is_char_array_type(const typet &type, const namespacet &ns)
-{
-  if(type.id()==ID_symbol)
-    return is_char_array_type(ns.follow(type), ns);
-  return type.id() == ID_array && is_char_type(type.subtype());
-}
-
-/// For now, any unsigned bitvector type is considered a character.
-/// \param type: a type
-/// \return true if the given type represents a pointer to characters
-bool is_char_pointer_type(const typet &type)
-{
-  return type.id() == ID_pointer && is_char_type(type.subtype());
-}
-
-/// \param type: a type
-/// \param pred: a predicate
-/// \return true if one of the subtype of `type` satisfies predicate `pred`.
-///         The meaning of "subtype" is in the algebraic datatype sense:
-///         for example, the subtypes of a struct are the types of its
-///         components, the subtype of a pointer is the type it points to,
-///         etc...
-///         For instance in the type `t` defined by
-///         `{ int a; char[] b; double * c; { bool d} e}`, `int`, `char`,
-///         `double` and `bool` are subtypes of `t`.
-bool has_subtype(
-  const typet &type,
-  const std::function<bool(const typet &)> &pred)
-{
-  if(pred(type))
-    return true;
-
-  if(type.id() == ID_struct || type.id() == ID_union)
+  for(equal_exprt &eq : equations)
   {
-    const struct_union_typet &struct_type = to_struct_union_type(type);
-    return std::any_of(
-      struct_type.components().begin(),
-      struct_type.components().end(), // NOLINTNEXTLINE
-      [&](const struct_union_typet::componentt &comp) {
-        return has_subtype(comp.type(), pred);
-      });
+    if(
+      const auto fun_app =
+        expr_try_dynamic_cast<function_application_exprt>(eq.rhs()))
+    {
+      if(const auto result = generator.make_array_pointer_association(*fun_app))
+        eq.rhs() = *result;
+    }
   }
-
-  return std::any_of( // NOLINTNEXTLINE
-    type.subtypes().begin(), type.subtypes().end(), [&](const typet &t) {
-      return has_subtype(t, pred);
-    });
-}
-
-/// \param type: a type
-/// \return true if a subtype of `type` is an pointer of characters.
-///         The meaning of "subtype" is in the algebraic datatype sense:
-///         for example, the subtypes of a struct are the types of its
-///         components, the subtype of a pointer is the type it points to,
-///         etc...
-static bool has_char_pointer_subtype(const typet &type)
-{
-  return has_subtype(type, is_char_pointer_type);
-}
-
-/// \param type: a type
-/// \return true if a subtype of `type` is string_typet.
-///         The meaning of "subtype" is in the algebraic datatype sense:
-///         for example, the subtypes of a struct are the types of its
-///         components, the subtype of a pointer is the type it points to,
-///         etc...
-static bool has_string_subtype(const typet &type)
-{
-  // NOLINTNEXTLINE
-  return has_subtype(
-    type, [](const typet &subtype) { return subtype == string_typet(); });
-}
-
-/// \param expr: an expression
-/// \param ns: namespace
-/// \return true if a subexpression of `expr` is an array of characters
-static bool has_char_array_subexpr(const exprt &expr, const namespacet &ns)
-{
-  for(auto it = expr.depth_begin(); it != expr.depth_end(); ++it)
-    if(is_char_array_type(it->type(), ns))
-      return true;
-  return false;
 }
 
 void replace_symbols_in_equations(
@@ -487,35 +403,6 @@ static union_find_replacet generate_symbol_resolution_from_equations(
   }
   return solver;
 }
-
-/// Maps equation to expressions contained in them and conversely expressions to
-/// equations that contain them. This can be used on a subset of expressions
-/// which interests us, in particular strings. Equations are identified by an
-/// index of type `std::size_t` for more efficient insertion and lookup.
-class equation_symbol_mappingt
-{
-public:
-  // Record index of the equations that contain a given expression
-  std::map<exprt, std::vector<std::size_t>> equations_containing;
-  // Record expressions that are contained in the equation with the given index
-  std::unordered_map<std::size_t, std::vector<exprt>> strings_in_equation;
-
-  void add(const std::size_t i, const exprt &expr)
-  {
-    equations_containing[expr].push_back(i);
-    strings_in_equation[i].push_back(expr);
-  }
-
-  std::vector<exprt> find_expressions(const std::size_t i)
-  {
-    return strings_in_equation[i];
-  }
-
-  std::vector<std::size_t> find_equations(const exprt &expr)
-  {
-    return equations_containing[expr];
-  }
-};
 
 /// This is meant to be used on the lhs of an equation with string subtype.
 /// \param lhs: expression which is either of string type, or a symbol
@@ -788,8 +675,17 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       string_id_symbol_resolve.replace_expr(eq.rhs());
   }
 
+  make_char_array_pointer_associations(generator, equations);
+
 #ifdef DEBUG
   output_equations(debug(), equations, ns);
+
+  string_dependencest dependences;
+  for(const equal_exprt &eq : equations)
+    add_node(dependences, eq, generator.array_pool);
+
+  debug() << "dec_solve: dependence graph:" << eom;
+  dependences.output_dot(debug());
 #endif
 
   debug() << "dec_solve: Replace function applications" << eom;
@@ -801,7 +697,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
 #ifdef DEBUG
   debug() << "dec_solve: arrays_of_pointers:" << eom;
-  for(auto pair : generator.get_arrays_of_pointers())
+  for(auto pair : generator.array_pool.get_arrays_of_pointers())
   {
     debug() << "  * " << format(pair.first) << "\t--> " << format(pair.second)
             << " : " << format(pair.second.type()) << eom;
@@ -1193,7 +1089,7 @@ void debug_model(
   static const std::string indent("  ");
 
   stream << "debug_model:" << '\n';
-  for(const auto &pointer_array : generator.get_arrays_of_pointers())
+  for(const auto &pointer_array : generator.array_pool.get_arrays_of_pointers())
   {
     const auto arr = pointer_array.second;
     const exprt model = get_char_array_and_concretize(
@@ -1216,68 +1112,6 @@ void debug_model(
            << format(super_get(symbol)) << '\n';
   }
   stream << messaget::eom;
-}
-
-sparse_arrayt::sparse_arrayt(const with_exprt &expr)
-{
-  auto ref = std::ref(static_cast<const exprt &>(expr));
-  while(can_cast_expr<with_exprt>(ref.get()))
-  {
-    const auto &with_expr = expr_dynamic_cast<with_exprt>(ref.get());
-    const auto current_index = numeric_cast_v<std::size_t>(with_expr.where());
-    entries.emplace_back(current_index, with_expr.new_value());
-    ref = with_expr.old();
-  }
-
-  // This function only handles 'with' and 'array_of' expressions
-  PRECONDITION(ref.get().id() == ID_array_of);
-  default_value = expr_dynamic_cast<array_of_exprt>(ref.get()).what();
-}
-
-exprt sparse_arrayt::to_if_expression(const exprt &index) const
-{
-  return std::accumulate(
-    entries.begin(),
-    entries.end(),
-    default_value,
-    [&](
-      const exprt if_expr,
-      const std::pair<std::size_t, exprt> &entry) { // NOLINT
-      const exprt entry_index = from_integer(entry.first, index.type());
-      const exprt &then_expr = entry.second;
-      CHECK_RETURN(then_expr.type() == if_expr.type());
-      const equal_exprt index_equal(index, entry_index);
-      return if_exprt(index_equal, then_expr, if_expr, if_expr.type());
-    });
-}
-
-interval_sparse_arrayt::interval_sparse_arrayt(const with_exprt &expr)
-  : sparse_arrayt(expr)
-{
-  // Entries are sorted so that successive entries correspond to intervals
-  std::sort(
-    entries.begin(),
-    entries.end(),
-    [](
-      const std::pair<std::size_t, exprt> &a,
-      const std::pair<std::size_t, exprt> &b) { return a.first < b.first; });
-}
-
-exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const
-{
-  return std::accumulate(
-    entries.rbegin(),
-    entries.rend(),
-    default_value,
-    [&](
-      const exprt if_expr,
-      const std::pair<std::size_t, exprt> &entry) { // NOLINT
-      const exprt entry_index = from_integer(entry.first, index.type());
-      const exprt &then_expr = entry.second;
-      CHECK_RETURN(then_expr.type() == if_expr.type());
-      const binary_relation_exprt index_small_eq(index, ID_le, entry_index);
-      return if_exprt(index_small_eq, then_expr, if_expr, if_expr.type());
-    });
 }
 
 /// Create a new expression where 'with' expressions on arrays are replaced by
@@ -2418,7 +2252,7 @@ exprt string_refinementt::get(const exprt &expr) const
   if(is_char_array_type(ecopy.type(), ns))
   {
     array_string_exprt &arr = to_array_string_expr(ecopy);
-    arr.length() = generator.get_length_of_string_array(arr);
+    arr.length() = generator.array_pool.get_length(arr);
     const auto arr_model_opt =
       get_array(super_get, ns, generator.max_string_length, debug(), arr);
     // \todo Refactor with get array in model
