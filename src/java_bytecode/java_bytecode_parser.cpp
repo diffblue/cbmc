@@ -1803,7 +1803,9 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
 void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
 {
   u2 num_bootstrap_methods = read_u2();
-  for(size_t j = 0; j < num_bootstrap_methods; j++)
+  for(size_t bootstrap_method_index = 0;
+      bootstrap_method_index < num_bootstrap_methods;
+      ++bootstrap_method_index)
   {
     u2 bootstrap_methodhandle_ref = read_u2();
     const pool_entryt &entry = pool_entry(bootstrap_methodhandle_ref);
@@ -1868,7 +1870,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
         lambda_method_handlet lambda_method_handle;
         lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
         lambda_method_handle.u2_values = std::move(u2_values);
-        parsed_class.lambda_method_handle_map[{parsed_class.name, j}] =
+        parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
           lambda_method_handle;
       }
       else
@@ -1887,7 +1889,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
           lambda_method_handle.handle_type =
             method_handle_typet::UNKNOWN_HANDLE;
           lambda_method_handle.u2_values = std::move(u2_values);
-          parsed_class.lambda_method_handle_map[{parsed_class.name, j}] =
+          parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
             lambda_method_handle;
         }
         else
@@ -1902,7 +1904,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
             lambda_method_handle.handle_type =
               method_handle_typet::UNKNOWN_HANDLE;
             lambda_method_handle.u2_values = std::move(u2_values);
-            parsed_class.lambda_method_handle_map[{parsed_class.name, j}] =
+            parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
               lambda_method_handle;
           }
           else
@@ -1931,7 +1933,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
                       << id2string(pool_entry(method_type_argument.ref1).s)
                       << eom;
             }
-            parsed_class.lambda_method_handle_map[{parsed_class.name, j}] =
+            parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
               *lambda_method_handle;
           }
         }
@@ -1942,7 +1944,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       lambda_method_handlet lambda_method_handle;
       lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
       lambda_method_handle.u2_values = std::move(u2_values);
-      parsed_class.lambda_method_handle_map[{parsed_class.name, j}] =
+      parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
         lambda_method_handle;
       error() << "ERROR: num_bootstrap_arguments must be at least 3" << eom;
     }
