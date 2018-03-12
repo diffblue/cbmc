@@ -52,8 +52,6 @@ public:
     method_handle_typet;
   typedef java_bytecode_parse_treet::classt::lambda_method_handlet
     lambda_method_handlet;
-  typedef java_bytecode_parse_treet::classt::lambda_method_handle_mapt
-    lambda_method_handle_mapt;
   typedef java_bytecode_parse_treet::classt::u2_valuest u2_valuest;
 
   java_bytecode_parse_treet parse_tree;
@@ -1941,14 +1939,14 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
             << "\n  method type is "
             << id2string(pool_entry(method_type_argument.ref1).s)
             << eom;
-    parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
-      *lambda_method_handle;
+    parsed_class.add_method_handle(
+      bootstrap_method_index, *lambda_method_handle);
   }
 }
 
 /// Creates an unknown method handle and puts it into the parsed_class
 /// \param parsed_class: The class whose bootstrap method handles we are using
-/// \param bootstrap_method_index: The current index in the boostrap entry table
+/// \param bootstrap_method_index: The current index in the bootstrap entry table
 /// \param u2_values: The indices of the arguments for the call
 void java_bytecode_parsert::store_unknown_method_handle(
   java_bytecode_parsert::classt &parsed_class,
@@ -1957,7 +1955,6 @@ void java_bytecode_parsert::store_unknown_method_handle(
 {
   const lambda_method_handlet lambda_method_handle =
     lambda_method_handlet::create_unknown_handle(move(u2_values));
-  parsed_class
-    .lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
-    lambda_method_handle;
+  parsed_class.add_method_handle(
+    bootstrap_method_index, lambda_method_handle);
 }

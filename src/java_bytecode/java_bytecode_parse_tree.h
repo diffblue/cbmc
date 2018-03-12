@@ -205,6 +205,10 @@ public:
       }
     };
 
+
+    // TODO(tkiley): This map shouldn't be interacted with directly (instead
+    // TODO(tkiley): using add_method_handle and get_method_handle and instead
+    // TODO(tkiley): should be made private. TG-2785
     typedef std::map<std::pair<irep_idt, size_t>, lambda_method_handlet>
       lambda_method_handle_mapt;
     lambda_method_handle_mapt lambda_method_handle_map;
@@ -228,6 +232,16 @@ public:
     {
       methods.push_back(methodt());
       return methods.back();
+    }
+
+    void add_method_handle(size_t bootstrap_index, lambda_method_handlet handle)
+    {
+      lambda_method_handle_map[{name, bootstrap_index}] = handle;
+    }
+
+    const lambda_method_handlet &get_method_handle(size_t bootstrap_index) const
+    {
+      return lambda_method_handle_map.at({name, bootstrap_index});
     }
 
     void output(std::ostream &out) const;
