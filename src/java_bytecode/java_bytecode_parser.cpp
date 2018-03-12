@@ -1822,131 +1822,127 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       u2_values[i] = read_u2();
 
     // try parsing bootstrap method handle
-    if(num_bootstrap_arguments >= 3)
+    if(num_bootstrap_arguments < 3)
     {
-      // each entry contains a MethodHandle structure
-      // u2 tag
-      // u2 reference kind which must be in the range from 1 to 9
-      // u2 reference index into the constant pool
-      //
-      // reference kinds use the following
-      // 1 to 4 must point to a CONSTANT_Fieldref structure
-      // 5 or 8 must point to a CONSTANT_Methodref structure
-      // 6 or 7 must point to a CONSTANT_Methodref or
-      // CONSTANT_InterfaceMethodref structure, if the class file version
-      // number is 52.0 or above, to a CONSTANT_Methodref only in the case
-      // of less than 52.0
-      // 9 must point to a CONSTANT_InterfaceMethodref structure
-
-      // the index must point to a CONSTANT_String
-      //                           CONSTANT_Class
-      //                           CONSTANT_Integer
-      //                           CONSTANT_Long
-      //                           CONSTANT_Float
-      //                           CONSTANT_Double
-      //                           CONSTANT_MethodHandle
-      //                           CONSTANT_MethodType
-
-      // We read the three arguments here to see whether they correspond to
-      // our hypotheses for this being a lambda function entry.
-
-      u2 argument_index1 = u2_values[0];
-      u2 argument_index2 = u2_values[1];
-      u2 argument_index3 = u2_values[2];
-
-      // The additional arguments for the altmetafactory call are skipped,
-      // as they are currently not used. We verify though that they are of
-      // CONSTANT_Integer type, cases where this does not hold will be
-      // analyzed further.
-      bool recognized = true;
-      for(size_t i = 3; i < num_bootstrap_arguments; i++)
-      {
-        u2 skipped_argument = u2_values[i];
-        recognized &= pool_entry(skipped_argument).tag == CONSTANT_Integer;
-      }
-      if(!recognized)
-      {
-        debug() << "format of BootstrapMethods entry not recognized" << eom;
-        lambda_method_handlet lambda_method_handle;
-        lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
-        lambda_method_handle.u2_values = std::move(u2_values);
-        parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
-          lambda_method_handle;
-      }
-      else
-      {
-        const pool_entryt &interface_type_argument =
-          pool_entry(argument_index1);
-        const pool_entryt &method_handle_argument = pool_entry(argument_index2);
-        const pool_entryt &method_type_argument = pool_entry(argument_index3);
-
-        if(
-          !(interface_type_argument.tag == CONSTANT_MethodType &&
-            method_handle_argument.tag == CONSTANT_MethodHandle &&
-            method_type_argument.tag == CONSTANT_MethodType))
-        {
-          lambda_method_handlet lambda_method_handle;
-          lambda_method_handle.handle_type =
-            method_handle_typet::UNKNOWN_HANDLE;
-          lambda_method_handle.u2_values = std::move(u2_values);
-          parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
-            lambda_method_handle;
-        }
-        else
-        {
-          debug() << "INFO: parse lambda handle" << eom;
-          optionalt<lambda_method_handlet> lambda_method_handle =
-            parse_method_handle(method_handle_infot{method_handle_argument});
-
-          if(!lambda_method_handle.has_value())
-          {
-            lambda_method_handlet lambda_method_handle;
-            lambda_method_handle.handle_type =
-              method_handle_typet::UNKNOWN_HANDLE;
-            lambda_method_handle.u2_values = std::move(u2_values);
-            parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
-              lambda_method_handle;
-          }
-          else
-          {
-            if(
-              lambda_method_handle->handle_type !=
-              method_handle_typet::LAMBDA_METHOD_HANDLE)
-            {
-              lambda_method_handle->u2_values = std::move(u2_values);
-              error() << "ERROR: could not parse lambda function method handle"
-                      << eom;
-            }
-            else
-            {
-              lambda_method_handle->interface_type =
-                pool_entry(interface_type_argument.ref1).s;
-              lambda_method_handle->method_type =
-                pool_entry(method_type_argument.ref1).s;
-              lambda_method_handle->u2_values = std::move(u2_values);
-              debug() << "lambda function reference "
-                      << id2string(lambda_method_handle->lambda_method_name)
-                      << " in class \"" << parsed_class.name << "\""
-                      << "\n  interface type is "
-                      << id2string(pool_entry(interface_type_argument.ref1).s)
-                      << "\n  method type is "
-                      << id2string(pool_entry(method_type_argument.ref1).s)
-                      << eom;
-            }
-            parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
-              *lambda_method_handle;
-          }
-        }
-      }
+      lambda_method_handlet lambda_method_handle;
+      lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
+      lambda_method_handle.u2_values = std::move(u2_values);
+      parsed_class.lambda_method_handle_map[{parsed_class.name,
+                                             bootstrap_method_index}] =
+        lambda_method_handle;
+      error() << "ERROR: num_bootstrap_arguments must be at least 3" << eom;
+      continue;
     }
-    else
+    // each entry contains a MethodHandle structure
+    // u2 tag
+    // u2 reference kind which must be in the range from 1 to 9
+    // u2 reference index into the constant pool
+    //
+    // reference kinds use the following
+    // 1 to 4 must point to a CONSTANT_Fieldref structure
+    // 5 or 8 must point to a CONSTANT_Methodref structure
+    // 6 or 7 must point to a CONSTANT_Methodref or
+    // CONSTANT_InterfaceMethodref structure, if the class file version
+    // number is 52.0 or above, to a CONSTANT_Methodref only in the case
+    // of less than 52.0
+    // 9 must point to a CONSTANT_InterfaceMethodref structure
+
+    // the index must point to a CONSTANT_String
+    //                           CONSTANT_Class
+    //                           CONSTANT_Integer
+    //                           CONSTANT_Long
+    //                           CONSTANT_Float
+    //                           CONSTANT_Double
+    //                           CONSTANT_MethodHandle
+    //                           CONSTANT_MethodType
+
+    // We read the three arguments here to see whether they correspond to
+    // our hypotheses for this being a lambda function entry.
+
+    u2 argument_index1 = u2_values[0];
+    u2 argument_index2 = u2_values[1];
+    u2 argument_index3 = u2_values[2];
+
+    // The additional arguments for the altmetafactory call are skipped,
+    // as they are currently not used. We verify though that they are of
+    // CONSTANT_Integer type, cases where this does not hold will be
+    // analyzed further.
+    bool recognized = true;
+    for(size_t i = 3; i < num_bootstrap_arguments; i++)
     {
+      u2 skipped_argument = u2_values[i];
+      recognized &= pool_entry(skipped_argument).tag == CONSTANT_Integer;
+    }
+    if(!recognized)
+    {
+      debug() << "format of BootstrapMethods entry not recognized" << eom;
       lambda_method_handlet lambda_method_handle;
       lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
       lambda_method_handle.u2_values = std::move(u2_values);
       parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
         lambda_method_handle;
-      error() << "ERROR: num_bootstrap_arguments must be at least 3" << eom;
+      continue;
     }
+
+    const pool_entryt &interface_type_argument =
+      pool_entry(argument_index1);
+    const pool_entryt &method_handle_argument = pool_entry(argument_index2);
+    const pool_entryt &method_type_argument = pool_entry(argument_index3);
+
+    if(
+      !(interface_type_argument.tag == CONSTANT_MethodType &&
+        method_handle_argument.tag == CONSTANT_MethodHandle &&
+        method_type_argument.tag == CONSTANT_MethodType))
+    {
+      lambda_method_handlet lambda_method_handle;
+      lambda_method_handle.handle_type =
+        method_handle_typet::UNKNOWN_HANDLE;
+      lambda_method_handle.u2_values = std::move(u2_values);
+      parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
+        lambda_method_handle;
+      continue;
+    }
+
+    debug() << "INFO: parse lambda handle" << eom;
+    optionalt<lambda_method_handlet> lambda_method_handle =
+      parse_method_handle(method_handle_infot{method_handle_argument});
+
+    if(!lambda_method_handle.has_value())
+    {
+      lambda_method_handlet lambda_method_handle;
+      lambda_method_handle.handle_type =
+        method_handle_typet::UNKNOWN_HANDLE;
+      lambda_method_handle.u2_values = std::move(u2_values);
+      parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
+        lambda_method_handle;
+      continue;
+    }
+
+    if(
+      lambda_method_handle->handle_type !=
+      method_handle_typet::LAMBDA_METHOD_HANDLE)
+    {
+      lambda_method_handle->u2_values = std::move(u2_values);
+      error() << "ERROR: could not parse lambda function method handle"
+              << eom;
+      continue;
+    }
+
+    lambda_method_handle->interface_type =
+      pool_entry(interface_type_argument.ref1).s;
+    lambda_method_handle->method_type =
+      pool_entry(method_type_argument.ref1).s;
+    lambda_method_handle->u2_values = std::move(u2_values);
+    debug() << "lambda function reference "
+            << id2string(lambda_method_handle->lambda_method_name)
+            << " in class \"" << parsed_class.name << "\""
+            << "\n  interface type is "
+            << id2string(pool_entry(interface_type_argument.ref1).s)
+            << "\n  method type is "
+            << id2string(pool_entry(method_type_argument.ref1).s)
+            << eom;
+    parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
+      *lambda_method_handle;
+
   }
 }
