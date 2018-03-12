@@ -1860,9 +1860,9 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
     // We read the three arguments here to see whether they correspond to
     // our hypotheses for this being a lambda function entry.
 
-    u2 argument_index1 = u2_values[0];
-    u2 argument_index2 = u2_values[1];
-    u2 argument_index3 = u2_values[2];
+    u2 interface_type_index = u2_values[0];
+    u2 method_handle_index = u2_values[1];
+    u2 method_type_index = u2_values[2];
 
     // The additional arguments for the altmetafactory call are skipped,
     // as they are currently not used. We verify though that they are of
@@ -1883,9 +1883,9 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
     }
 
     const pool_entryt &interface_type_argument =
-      pool_entry(argument_index1);
-    const pool_entryt &method_handle_argument = pool_entry(argument_index2);
-    const pool_entryt &method_type_argument = pool_entry(argument_index3);
+      pool_entry(interface_type_index);
+    const pool_entryt &method_handle_argument = pool_entry(method_handle_index);
+    const pool_entryt &method_type_argument = pool_entry(method_type_index);
 
     if(
       !(interface_type_argument.tag == CONSTANT_MethodType &&
