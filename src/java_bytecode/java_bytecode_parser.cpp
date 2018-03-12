@@ -1926,7 +1926,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
     // If parse_method_handle can't parse the lambda method, it should return {}
     POSTCONDITION(
       lambda_method_handle->handle_type !=
-      method_handle_typet::LAMBDA_METHOD_HANDLE);
+      method_handle_typet::UNKNOWN_HANDLE);
 
     lambda_method_handle->interface_type =
       pool_entry(interface_type_argument.ref1).s;
