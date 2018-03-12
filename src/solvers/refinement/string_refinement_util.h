@@ -246,6 +246,9 @@ public:
 
   optionalt<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
+
+protected:
+  string_insertion_builtin_functiont() = default;
 };
 
 class string_concatenation_builtin_functiont final
@@ -254,10 +257,7 @@ class string_concatenation_builtin_functiont final
 public:
   string_concatenation_builtin_functiont(
     const std::vector<exprt> &fun_args,
-    array_poolt &array_pool)
-    : string_insertion_builtin_functiont(fun_args, array_pool)
-  {
-  }
+    array_poolt &array_pool);
 
   std::vector<mp_integer> eval(
     const std::vector<mp_integer> &input1_value,

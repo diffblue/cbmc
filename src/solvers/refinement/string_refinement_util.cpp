@@ -215,7 +215,21 @@ string_insertion_builtin_functiont::string_insertion_builtin_functiont(
   const std::vector<exprt> &fun_args,
   array_poolt &array_pool)
 {
-  PRECONDITION(fun_args.size() > 3);
+  PRECONDITION(fun_args.size() > 4);
+  const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
+  input1 = array_pool.find(arg1.op1(), arg1.op0());
+  const auto arg2 = expr_checked_cast<struct_exprt>(fun_args[4]);
+  input2 = array_pool.find(arg2.op1(), arg2.op0());
+  result = array_pool.find(fun_args[1], fun_args[0]);
+  args.push_back(fun_args[3]);
+  args.insert(args.end(), fun_args.begin() + 5, fun_args.end());
+}
+
+string_concatenation_builtin_functiont::string_concatenation_builtin_functiont(
+  const std::vector<exprt> &fun_args,
+  array_poolt &array_pool)
+{
+  PRECONDITION(fun_args.size() >= 4 && fun_args.size() <= 6);
   const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
   input1 = array_pool.find(arg1.op1(), arg1.op0());
   const auto arg2 = expr_checked_cast<struct_exprt>(fun_args[3]);
