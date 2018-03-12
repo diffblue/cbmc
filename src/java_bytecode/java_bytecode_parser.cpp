@@ -1827,13 +1827,6 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       u2_values[i] = read_u2();
 
     // try parsing bootstrap method handle
-    if(num_bootstrap_arguments < 3)
-    {
-      store_unknown_method_handle(
-        parsed_class, bootstrap_method_index, std::move(u2_values));
-      error() << "ERROR: num_bootstrap_arguments must be at least 3" << eom;
-      continue;
-    }
     // each entry contains a MethodHandle structure
     // u2 tag
     // u2 reference kind which must be in the range from 1 to 9
@@ -1859,6 +1852,19 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
 
     // We read the three arguments here to see whether they correspond to
     // our hypotheses for this being a lambda function entry.
+
+    // Need at least 3 arguments, the interface type, the method hanlde
+    // and the method_type, otherwise it doesn't look like a call that we
+    // understand
+    if(num_bootstrap_arguments < 3)
+    {
+      store_unknown_method_handle(
+        parsed_class, bootstrap_method_index, std::move(u2_values));
+      debug()
+        << "format of BootstrapMethods entry not recognized: too few arguments"
+        << eom;
+      continue;
+    }
 
     u2 interface_type_index = u2_values[0];
     u2 method_handle_index = u2_values[1];
