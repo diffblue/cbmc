@@ -1880,9 +1880,12 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       u2 skipped_argument = u2_values[i];
       recognized &= pool_entry(skipped_argument).tag == CONSTANT_Integer;
     }
+
     if(!recognized)
     {
-      debug() << "format of BootstrapMethods entry not recognized" << eom;
+      debug() << "format of BootstrapMethods entry not recognized: extra "
+                 "arguments of wrong type"
+              << eom;
       store_unknown_method_handle(
         parsed_class, bootstrap_method_index, std::move(u2_values));
       continue;
@@ -1898,7 +1901,9 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
         method_handle_argument.tag == CONSTANT_MethodHandle &&
         method_type_argument.tag == CONSTANT_MethodType))
     {
-      debug() << "format of BootstrapMethods entry not recognized" << eom;
+      debug() << "format of BootstrapMethods entry not recognized: arguments "
+                 "wrong type"
+              << eom;
       store_unknown_method_handle(
         parsed_class, bootstrap_method_index, std::move(u2_values));
       continue;
@@ -1910,7 +1915,9 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
 
     if(!lambda_method_handle.has_value())
     {
-      debug() << "format of BootstrapMethods entry not recognized" << eom;
+      debug() << "format of BootstrapMethods entry not recognized: method "
+                 "handle not recognised"
+              << eom;
       store_unknown_method_handle(
         parsed_class, bootstrap_method_index, std::move(u2_values));
       continue;
@@ -1936,7 +1943,6 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
             << eom;
     parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
       *lambda_method_handle;
-
   }
 }
 
