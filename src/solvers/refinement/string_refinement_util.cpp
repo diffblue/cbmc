@@ -322,8 +322,8 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
   return {};
 }
 
-string_dependencest::string_nodet &
-string_dependencest::get_node(const array_string_exprt &e)
+string_dependenciest::string_nodet &
+string_dependenciest::get_node(const array_string_exprt &e)
 {
   auto entry_inserted = node_index_pool.emplace(e, string_nodes.size());
   if(!entry_inserted.second)
@@ -333,7 +333,7 @@ string_dependencest::get_node(const array_string_exprt &e)
   return string_nodes.back();
 }
 
-string_dependencest::builtin_function_nodet string_dependencest::make_node(
+string_dependenciest::builtin_function_nodet string_dependenciest::make_node(
   std::unique_ptr<string_builtin_functiont> &builtin_function)
 {
   const builtin_function_nodet builtin_function_node(
@@ -343,21 +343,21 @@ string_dependencest::builtin_function_nodet string_dependencest::make_node(
   return builtin_function_node;
 }
 
-const string_builtin_functiont &string_dependencest::get_builtin_function(
+const string_builtin_functiont &string_dependenciest::get_builtin_function(
   const builtin_function_nodet &node) const
 {
   PRECONDITION(node.index < builtin_function_nodes.size());
   return *(builtin_function_nodes[node.index]);
 }
 
-const std::vector<string_dependencest::builtin_function_nodet> &
-string_dependencest::dependencies(
-  const string_dependencest::string_nodet &node) const
+const std::vector<string_dependenciest::builtin_function_nodet> &
+string_dependenciest::dependencies(
+  const string_dependenciest::string_nodet &node) const
 {
   return node.dependencies;
 }
 
-void string_dependencest::add_dependency(
+void string_dependenciest::add_dependency(
   const array_string_exprt &e,
   const builtin_function_nodet &builtin_function_node)
 {
@@ -365,14 +365,14 @@ void string_dependencest::add_dependency(
   string_node.dependencies.push_back(builtin_function_node);
 }
 
-void string_dependencest::add_unknown_dependency(const array_string_exprt &e)
+void string_dependenciest::add_unknown_dependency(const array_string_exprt &e)
 {
   string_nodet &string_node = get_node(e);
   string_node.depends_on_unknown_builtin_function = true;
 }
 
 static void add_unknown_dependency_to_string_subexprs(
-  string_dependencest &dependencies,
+  string_dependenciest &dependencies,
   const function_application_exprt &fun_app,
   array_poolt &array_pool)
 {
@@ -392,9 +392,9 @@ static void add_unknown_dependency_to_string_subexprs(
 }
 
 static void add_dependency_to_string_subexprs(
-  string_dependencest &dependencies,
+  string_dependenciest &dependencies,
   const function_application_exprt &fun_app,
-  const string_dependencest::builtin_function_nodet &builtin_function_node,
+  const string_dependenciest::builtin_function_nodet &builtin_function_node,
   array_poolt &array_pool)
 {
   PRECONDITION(fun_app.arguments()[0].type().id() != ID_pointer);
@@ -424,7 +424,7 @@ static void add_dependency_to_string_subexprs(
   }
 }
 
-string_dependencest::node_indext string_dependencest::size() const
+string_dependenciest::node_indext string_dependenciest::size() const
 {
   return builtin_function_nodes.size() + string_nodes.size();
 }
@@ -444,28 +444,28 @@ builtin_function_index_to_node_index(const std::size_t builtin_index)
   return 2 * builtin_index;
 }
 
-string_dependencest::node_indext
-string_dependencest::node_index(const builtin_function_nodet &n) const
+string_dependenciest::node_indext
+string_dependenciest::node_index(const builtin_function_nodet &n) const
 {
   return builtin_function_index_to_node_index(n.index);
 }
 
-string_dependencest::node_indext
-string_dependencest::node_index(const array_string_exprt &s) const
+string_dependenciest::node_indext
+string_dependenciest::node_index(const array_string_exprt &s) const
 {
   return string_index_to_node_index(node_index_pool.at(s));
 }
 
-optionalt<string_dependencest::builtin_function_nodet>
-string_dependencest::get_builtin_function_node(node_indext i) const
+optionalt<string_dependenciest::builtin_function_nodet>
+string_dependenciest::get_builtin_function_node(node_indext i) const
 {
   if(i % 2 == 0)
     return builtin_function_nodet(i / 2);
   return {};
 }
 
-optionalt<string_dependencest::string_nodet>
-string_dependencest::get_string_node(node_indext i) const
+optionalt<string_dependenciest::string_nodet>
+string_dependenciest::get_string_node(node_indext i) const
 {
   if(i % 2 == 1 && i / 2 < string_nodes.size())
     return string_nodes[i / 2];
@@ -473,7 +473,7 @@ string_dependencest::get_string_node(node_indext i) const
 }
 
 bool add_node(
-  string_dependencest &dependencies,
+  string_dependenciest &dependencies,
   const equal_exprt &equation,
   array_poolt &array_pool)
 {
@@ -505,7 +505,7 @@ bool add_node(
   return true;
 }
 
-void string_dependencest::for_each_successor(
+void string_dependenciest::for_each_successor(
   const std::size_t &i,
   const std::function<void(const std::size_t &)> &f) const
 {
@@ -529,7 +529,7 @@ void string_dependencest::for_each_successor(
     UNREACHABLE;
 }
 
-void string_dependencest::output_dot(std::ostream &stream) const
+void string_dependenciest::output_dot(std::ostream &stream) const
 {
   const auto for_each_node =
     [&](const std::function<void(const std::size_t &)> &f) { // NOLINT

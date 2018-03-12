@@ -47,7 +47,7 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
 {
   GIVEN("dependency graph")
   {
-    string_dependencest dependences;
+    string_dependenciest dependences;
     refined_string_typet string_type(java_char_type(), java_int_type());
     const exprt string1 = make_string_argument("string1");
     const exprt string2 = make_string_argument("string2");
@@ -142,7 +142,7 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
       THEN("string3 depends on primitive0")
       {
         const auto &node = dependences.get_node(char_array3);
-        const std::vector<string_dependencest::builtin_function_nodet>
+        const std::vector<string_dependenciest::builtin_function_nodet>
           &depends = dependences.dependencies(node);
         REQUIRE(depends.size() == 1);
         const auto &primitive0 = dependences.get_builtin_function(depends[0]);
@@ -159,7 +159,7 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
       THEN("string5 depends on primitive1")
       {
         const auto &node = dependences.get_node(char_array5);
-        const std::vector<string_dependencest::builtin_function_nodet>
+        const std::vector<string_dependenciest::builtin_function_nodet>
           &depends = dependences.dependencies(node);
         REQUIRE(depends.size() == 1);
         const auto &primitive1 = dependences.get_builtin_function(depends[0]);
@@ -176,7 +176,7 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
       THEN("string6 depends on primitive2")
       {
         const auto &node = dependences.get_node(char_array6);
-        const std::vector<string_dependencest::builtin_function_nodet>
+        const std::vector<string_dependenciest::builtin_function_nodet>
           &depends = dependences.dependencies(node);
         REQUIRE(depends.size() == 1);
         const auto &primitive2 = dependences.get_builtin_function(depends[0]);

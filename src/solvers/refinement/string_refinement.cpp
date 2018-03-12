@@ -680,12 +680,12 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 #ifdef DEBUG
   output_equations(debug(), equations, ns);
 
-  string_dependencest dependences;
+  string_dependenciest dependencies;
   for(const equal_exprt &eq : equations)
-    add_node(dependences, eq, generator.array_pool);
+    add_node(dependencies, eq, generator.array_pool);
 
   debug() << "dec_solve: dependence graph:" << eom;
-  dependences.output_dot(debug());
+  dependencies.output_dot(debug());
 #endif
 
   debug() << "dec_solve: Replace function applications" << eom;

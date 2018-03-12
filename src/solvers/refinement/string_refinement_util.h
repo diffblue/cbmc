@@ -259,9 +259,9 @@ public:
 };
 
 /// Keep track of dependencies between strings.
-/// Each string points to builtin_function calls on which it depends,
-/// each builtin_function points to the strings on which the result depend.
-class string_dependencest
+/// Each string points to the builtin_function calls on which it depends.
+/// Each builtin_function points to the strings on which the result depends.
+class string_dependenciest
 {
 public:
   /// A builtin_function node is just an index in the `builtin_function_nodes`
@@ -365,7 +365,7 @@ private:
 ///   the right hand side is not a function application
 /// \todo there should be a class with just the three functions we require here
 bool add_node(
-  string_dependencest &dependencies,
+  string_dependenciest &dependencies,
   const equal_exprt &equation,
   array_poolt &array_pool);
 
