@@ -2,7 +2,7 @@
 
  Module: String solver
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
