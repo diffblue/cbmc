@@ -257,6 +257,7 @@ Usage: test.pl -c CMD [OPTIONS] [DIRECTORIES ...]
   -c CMD     run tests on CMD - required option
   -i <regex> options in test.desc matching the specified perl regex are ignored
   -j <num>   run <num> tests in parallel (requires Thread::Pool::Simple)
+             if present, the environment variable TESTPL_JOBS is used as the default
   -n         dry-run: print the tests that would be run, but don't actually run them
   -p         print logs of each failed test (if any)
   -h         show this help and exit
@@ -304,11 +305,15 @@ use Getopt::Long qw(:config pass_through bundling);
 $main::VERSION = 0.1;
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
 our ($opt_c, $opt_i, $opt_j, $opt_n, $opt_p, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, %defines, @include_tags, @exclude_tags); # the variables for getopt
-$opt_j = 0;
 GetOptions("D=s" => \%defines, "X=s" => \@exclude_tags, "I=s" => \@include_tags);
 getopts('c:i:j:nphCTFK') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_c or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
-(!$opt_j || $has_thread_pool) or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
+$opt_j = $opt_j || $ENV{'TESTPL_JOBS'} || 0;
+if($opt_j && $opt_j != 1 && !$has_thread_pool) {
+  warn "Jobs set but thread pool module not found,\n"
+   . "install with 'cpan -i Thread::Pool::Simple'\n"
+   . "Or avoid setting the -j parameter or the TESTPL_JOBS variable\n";
+}
 $opt_h and &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 my $t_level = 0;
 $t_level += 2 if($opt_T);
