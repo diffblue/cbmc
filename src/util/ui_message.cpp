@@ -110,7 +110,8 @@ void ui_message_handlert::print(
     {
       console_message_handlert console_message_handler;
       std::stringstream ss;
-      ss << time->stamp() << message;
+      const std::string timestamp = time->stamp();
+      ss << timestamp << (timestamp.empty() ? "" : " ") << message;
       console_message_handler.print(level, ss.str());
     }
     break;
