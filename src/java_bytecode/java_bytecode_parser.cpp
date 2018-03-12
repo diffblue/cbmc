@@ -1895,9 +1895,9 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
     const pool_entryt &method_type_argument = pool_entry(method_type_index);
 
     if(
-      !(interface_type_argument.tag == CONSTANT_MethodType &&
-        method_handle_argument.tag == CONSTANT_MethodHandle &&
-        method_type_argument.tag == CONSTANT_MethodType))
+      interface_type_argument.tag != CONSTANT_MethodType ||
+      method_handle_argument.tag != CONSTANT_MethodHandle ||
+      method_type_argument.tag != CONSTANT_MethodType)
     {
       debug() << "format of BootstrapMethods entry not recognized: arguments "
                  "wrong type"
