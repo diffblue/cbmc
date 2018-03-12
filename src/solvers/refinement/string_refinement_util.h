@@ -145,8 +145,8 @@ private:
 class string_builtin_functiont
 {
 public:
-  string_builtin_functiont() = default;
   string_builtin_functiont(const string_builtin_functiont &) = delete;
+  virtual ~string_builtin_functiont() = default;
 
   virtual optionalt<array_string_exprt> string_result() const
   {
@@ -160,6 +160,9 @@ public:
 
   virtual optionalt<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const = 0;
+
+protected:
+  string_builtin_functiont() = default;
 };
 
 /// String builtin_function transforming one string into another
