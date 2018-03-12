@@ -186,6 +186,11 @@ protected:
   {
     return read_bytes(8);
   }
+
+  void store_unknown_method_handle(
+    classt &parsed_class,
+    size_t bootstrap_method_index,
+    u2_valuest u2_values) const;
 };
 
 #define CONSTANT_Class                7
@@ -1824,12 +1829,8 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
     // try parsing bootstrap method handle
     if(num_bootstrap_arguments < 3)
     {
-      lambda_method_handlet lambda_method_handle;
-      lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
-      lambda_method_handle.u2_values = std::move(u2_values);
-      parsed_class.lambda_method_handle_map[{parsed_class.name,
-                                             bootstrap_method_index}] =
-        lambda_method_handle;
+      store_unknown_method_handle(
+        parsed_class, bootstrap_method_index, std::move(u2_values));
       error() << "ERROR: num_bootstrap_arguments must be at least 3" << eom;
       continue;
     }
@@ -1876,11 +1877,8 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
     if(!recognized)
     {
       debug() << "format of BootstrapMethods entry not recognized" << eom;
-      lambda_method_handlet lambda_method_handle;
-      lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
-      lambda_method_handle.u2_values = std::move(u2_values);
-      parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
-        lambda_method_handle;
+      store_unknown_method_handle(
+        parsed_class, bootstrap_method_index, std::move(u2_values));
       continue;
     }
 
@@ -1894,12 +1892,9 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
         method_handle_argument.tag == CONSTANT_MethodHandle &&
         method_type_argument.tag == CONSTANT_MethodType))
     {
-      lambda_method_handlet lambda_method_handle;
-      lambda_method_handle.handle_type =
-        method_handle_typet::UNKNOWN_HANDLE;
-      lambda_method_handle.u2_values = std::move(u2_values);
-      parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
-        lambda_method_handle;
+      debug() << "format of BootstrapMethods entry not recognized" << eom;
+      store_unknown_method_handle(
+        parsed_class, bootstrap_method_index, std::move(u2_values));
       continue;
     }
 
@@ -1909,12 +1904,9 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
 
     if(!lambda_method_handle.has_value())
     {
-      lambda_method_handlet lambda_method_handle;
-      lambda_method_handle.handle_type =
-        method_handle_typet::UNKNOWN_HANDLE;
-      lambda_method_handle.u2_values = std::move(u2_values);
-      parsed_class.lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
-        lambda_method_handle;
+      debug() << "format of BootstrapMethods entry not recognized" << eom;
+      store_unknown_method_handle(
+        parsed_class, bootstrap_method_index, std::move(u2_values));
       continue;
     }
 
@@ -1945,4 +1937,20 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       *lambda_method_handle;
 
   }
+}
+
+/// Creates an unknown method handle and puts it into the parsed_class
+/// \param parsed_class: The class whose bootstrap method handles we are using
+/// \param bootstrap_method_index: The current index in the boostrap entry table
+/// \param u2_values: The indices of the arguments for the call
+void java_bytecode_parsert::store_unknown_method_handle(
+  java_bytecode_parsert::classt &parsed_class,
+  size_t bootstrap_method_index,
+  java_bytecode_parsert::u2_valuest u2_values) const
+{
+  const lambda_method_handlet lambda_method_handle =
+    lambda_method_handlet::create_unknown_handle(move(u2_values));
+  parsed_class
+    .lambda_method_handle_map[{parsed_class.name, bootstrap_method_index}] =
+    lambda_method_handle;
 }

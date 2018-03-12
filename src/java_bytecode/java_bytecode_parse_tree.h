@@ -194,6 +194,15 @@ public:
       lambda_method_handlet() : handle_type(method_handle_typet::UNKNOWN_HANDLE)
       {
       }
+
+      static lambda_method_handlet
+      create_unknown_handle(const u2_valuest params)
+      {
+        lambda_method_handlet lambda_method_handle;
+        lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
+        lambda_method_handle.u2_values = std::move(params);
+        return lambda_method_handle;
+      }
     };
 
     typedef std::map<std::pair<irep_idt, size_t>, lambda_method_handlet>
