@@ -1,0 +1,6 @@
+KNOWNBUG
+main.c
+--variable-sensitivity --structs --arrays --pointers --show
+^EXIT=0$
+^SIGNAL=0$
+--
