@@ -106,7 +106,7 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
   }
   else
   {
-    assert(type==ns.follow(e.type()));
+    PRECONDITION(type==ns.follow(e.type()));
     return abstract_object_pointert(
       new abstract_object_classt(e, enviroment, ns));
   }

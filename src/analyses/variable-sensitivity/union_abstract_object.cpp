@@ -29,7 +29,7 @@ Function: union_abstract_objectt::union_abstract_objectt
 union_abstract_objectt::union_abstract_objectt(const typet &type):
   abstract_objectt(type)
 {
-  assert(type.id()==ID_union);
+  PRECONDITION(type.id()==ID_union);
 }
 
 /*******************************************************************\
@@ -52,7 +52,7 @@ union_abstract_objectt::union_abstract_objectt(
   const typet &type, bool top, bool bottom):
     abstract_objectt(type, top, bottom)
 {
-  assert(type.id()==ID_union);
+  PRECONDITION(type.id()==ID_union);
 }
 
 /*******************************************************************\
@@ -74,7 +74,7 @@ union_abstract_objectt::union_abstract_objectt(
   const namespacet &ns):
     abstract_objectt(expr, environment, ns)
 {
-  assert(ns.follow(expr.type()).id()==ID_union);
+  PRECONDITION(ns.follow(expr.type()).id()==ID_union);
 }
 
 /**

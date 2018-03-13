@@ -29,7 +29,7 @@ Function: pointer_abstract_objectt::pointer_abstract_objectt
 pointer_abstract_objectt::pointer_abstract_objectt(const typet &t):
   abstract_objectt(t)
 {
-  assert(t.id()==ID_pointer);
+  PRECONDITION(t.id()==ID_pointer);
 }
 
 /*******************************************************************\
@@ -52,7 +52,7 @@ pointer_abstract_objectt::pointer_abstract_objectt(
   const typet &t, bool tp, bool bttm):
     abstract_objectt(t, tp, bttm)
 {
-  assert(t.id()==ID_pointer);
+  PRECONDITION(t.id()==ID_pointer);
 }
 
 /*******************************************************************\
@@ -74,7 +74,7 @@ pointer_abstract_objectt::pointer_abstract_objectt(
   const namespacet &ns):
     abstract_objectt(e, environment, ns)
 {
-  assert(e.type().id()==ID_pointer);
+  PRECONDITION(e.type().id()==ID_pointer);
 }
 
 /**

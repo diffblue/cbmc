@@ -30,7 +30,7 @@ Function: struct_abstract_objectt::struct_abstract_objectt
 struct_abstract_objectt::struct_abstract_objectt(const typet &t):
   abstract_objectt(t)
 {
-  assert(t.id()==ID_struct);
+  PRECONDITION(t.id()==ID_struct);
 }
 
 /*******************************************************************\
@@ -53,7 +53,7 @@ struct_abstract_objectt::struct_abstract_objectt(
   const typet &t, bool tp, bool bttm):
     abstract_objectt(t, tp, bttm)
 {
-  assert(t.id()==ID_struct);
+  PRECONDITION(t.id()==ID_struct);
 }
 
 /*******************************************************************\
@@ -75,7 +75,7 @@ struct_abstract_objectt::struct_abstract_objectt(
   const namespacet &ns):
   abstract_objectt(e, environment, ns)
 {
-  assert(ns.follow(e.type()).id()==ID_struct);
+  PRECONDITION(ns.follow(e.type()).id()==ID_struct);
 }
 
 /**

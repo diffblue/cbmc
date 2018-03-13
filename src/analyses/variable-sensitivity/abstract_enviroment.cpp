@@ -159,7 +159,7 @@ Function: abstract_environmentt::assign
 bool abstract_environmentt::assign(
   const exprt &expr, const abstract_object_pointert value, const namespacet &ns)
 {
-  assert(value);
+  PRECONDITION(value);
 
   if(value->is_bottom())
   {
@@ -189,7 +189,7 @@ bool abstract_environmentt::assign(
 
   if(!lhs_value)
   {
-    assert(s.id()==ID_symbol);
+    INVARIANT(s.id()==ID_symbol, "Have a symbol or a stack");
     const symbol_exprt &symbol_expr(to_symbol_expr(s));
     if(map.find(symbol_expr)==map.end())
     {
@@ -230,7 +230,7 @@ bool abstract_environmentt::assign(
   const typet &rhs_type=ns.follow(final_value->type());
 
   // Write the value for the root symbol back into the map
-  assert(lhs_type==rhs_type);
+  INVARIANT(lhs_type==rhs_type, "Assignment types must match");
   // If LHS was directly the symbol
   if(s.id()==ID_symbol)
   {
@@ -276,7 +276,7 @@ abstract_object_pointert abstract_environmentt::write(
   const namespacet &ns,
   bool merge_write)
 {
-  assert(!remaining_stack.empty());
+  PRECONDITION(!remaining_stack.empty());
   const exprt & next_expr=remaining_stack.top();
   remaining_stack.pop();
 
@@ -305,7 +305,7 @@ abstract_object_pointert abstract_environmentt::write(
   }
   else
   {
-    assert(0);
+    UNREACHABLE;
     return nullptr;
   }
 }
@@ -332,7 +332,7 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   // This should be enforced by the well-structured-ness of the
   // goto-program and the way assume is used.
 
-  assert(expr.type().id()==ID_bool);
+  PRECONDITION(expr.type().id()==ID_bool);
 
   // Evaluate the expression
   abstract_object_pointert res = eval(expr, ns);
@@ -342,7 +342,7 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   if(possibly_constant.id()!=ID_nil)  // I.E. actually a value
   {
     // Should be of the right type
-    assert(possibly_constant.type().id()==ID_bool);
+    INVARIANT(possibly_constant.type().id()==ID_bool, "simplication preserves type");
 
     if(possibly_constant.is_false())
     {

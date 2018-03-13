@@ -181,7 +181,7 @@ void variable_sensitivity_domaint::transform(
     throw "unrecognised instruction type";
   }
 
-  assert(abstract_state.verify());
+  DATA_INVARIANT(abstract_state.verify(), "Structural invariant");
 }
 
 /*******************************************************************\
@@ -281,7 +281,7 @@ bool variable_sensitivity_domaint::merge(
   // Use the abstract_environment merge
   bool any_changes=abstract_state.merge(b.abstract_state);
 
-  assert(abstract_state.verify());
+  DATA_INVARIANT(abstract_state.verify(), "Structural invariant");
   return any_changes;
 }
 
@@ -396,7 +396,7 @@ Function: variable_sensitivity_domaint::transform_function_call
 void variable_sensitivity_domaint::transform_function_call(
   locationt from, locationt to, ai_baset &ai, const namespacet &ns)
 {
-  assert(from->type==FUNCTION_CALL);
+  PRECONDITION(from->type==FUNCTION_CALL);
 
   const code_function_callt &function_call=to_code_function_call(from->code);
   const exprt &function=function_call.function();
@@ -434,7 +434,7 @@ void variable_sensitivity_domaint::transform_function_call(
             abstract_object_pointert pointer_value=
               abstract_state.eval(called_arg, ns);
 
-            assert(pointer_value);
+            CHECK_RETURN(pointer_value);
 
             // Write top to the pointer
             pointer_value->write(
@@ -475,7 +475,7 @@ void variable_sensitivity_domaint::transform_function_call(
       {
         if(parameter_it==declaration_parameters.end())
         {
-          assert(code_type.has_ellipsis());
+          INVARIANT(code_type.has_ellipsis(), "Only case for insufficient args");
           break;
         }
 
@@ -494,12 +494,14 @@ void variable_sensitivity_domaint::transform_function_call(
       }
 
       // Too few arguments so invalid code
-      assert(parameter_it==declaration_parameters.end());
+      DATA_INVARIANT(
+        parameter_it==declaration_parameters.end(),
+        "Number of arguments should match parameters");
     }
   }
   else
   {
-    assert(to==next);
+    PRECONDITION(to==next);
     abstract_state.havoc("unknown opaque function call");
   }
 }

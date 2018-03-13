@@ -28,7 +28,7 @@ Function: array_abstract_objectt::array_abstract_objectt
 array_abstract_objectt::array_abstract_objectt(const typet &t):
   abstract_objectt(t)
 {
-  assert(t.id()==ID_array);
+  PRECONDITION(t.id()==ID_array);
 }
 
 /*******************************************************************\
@@ -51,7 +51,7 @@ array_abstract_objectt::array_abstract_objectt(
   const typet &t, bool tp, bool bttm):
     abstract_objectt(t, tp, bttm)
 {
-  assert(t.id()==ID_array);
+  PRECONDITION(t.id()==ID_array);
 }
 
 /*******************************************************************\
@@ -75,7 +75,7 @@ array_abstract_objectt::array_abstract_objectt(
   const namespacet &ns):
     abstract_objectt(e, environment, ns)
 {
-  assert(e.type().id()==ID_array);
+  PRECONDITION(e.type().id()==ID_array);
 }
 
 /**
