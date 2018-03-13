@@ -230,7 +230,10 @@ bool abstract_environmentt::assign(
   const typet &rhs_type=ns.follow(final_value->type());
 
   // Write the value for the root symbol back into the map
-  INVARIANT(lhs_type==rhs_type, "Assignment types must match");
+  INVARIANT(lhs_type==rhs_type,
+            "Assignment types must match" "\n"
+            "lhs_type :" + lhs_type.pretty() + "\n"
+            "rhs_type :" + rhs_type.pretty());
   // If LHS was directly the symbol
   if(s.id()==ID_symbol)
   {
