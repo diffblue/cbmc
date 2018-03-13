@@ -1,0 +1,14 @@
+CORE
+StaticMethodRef.class
+--function StaticMethodRef.Smr
+VERIFICATION FAILED
+EXIT=10
+SIGNAL=0
+^SIGNAL=0
+--
+--
+Tests that it doesn't crash when failing to read a `BootstrapMethods` entry and
+there is another attribute after this. The EXIT=10/VERIFCATION FAILED comes from
+the fact that the invokedynamic currently returns a null object, causing our
+model of this to predict a null pointer exception. This test will need to be
+adjusted when lambdas work.
