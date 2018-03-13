@@ -772,17 +772,12 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       config_.use_counter_example,
       supert::config_.ui,
       symbol_resolve);
-    if(!satisfied)
-    {
-      for(const auto &counter : counter_examples)
-        add_lemma(counter);
-      debug() << "check_SAT: got SAT but the model is not correct" << eom;
-    }
-    else
+    if(satisfied)
     {
       debug() << "check_SAT: the model is correct" << eom;
       return resultt::D_SATISFIABLE;
     }
+    debug() << "check_SAT: got SAT but the model is not correct" << eom;
   }
   else
   {
@@ -821,19 +816,15 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         config_.use_counter_example,
         supert::config_.ui,
         symbol_resolve);
-      if(!satisfied)
-      {
-        for(const auto &counter : counter_examples)
-          add_lemma(counter);
-        debug() << "check_SAT: got SAT but the model is not correct" << eom;
-      }
-      else
+      if(satisfied)
       {
         debug() << "check_SAT: the model is correct" << eom;
         return resultt::D_SATISFIABLE;
       }
 
-      debug() <<  "refining..." << eom;
+      debug() << "check_SAT: got SAT but the model is not correct, refining..."
+              << eom;
+
       // Since the model is not correct although we got SAT, we need to refine
       // the property we are checking by adding more indices to the index set,
       // and instantiating universal formulas with this indices.
@@ -852,7 +843,12 @@ decision_proceduret::resultt string_refinementt::dec_solve()
           return resultt::D_ERROR;
         }
         else
-          debug() << "dec_solve: current index set is empty" << eom;
+        {
+          debug() << "dec_solve: current index set is empty, "
+                  << "adding counter examples" << eom;
+          for(const auto &counter : counter_examples)
+            add_lemma(counter);
+        }
       }
       current_constraints.clear();
       for(const auto &instance :
