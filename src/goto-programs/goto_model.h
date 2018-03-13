@@ -15,15 +15,20 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 #include <util/journalling_symbol_table.h>
 
+#include "abstract_goto_model.h"
 #include "goto_functions.h"
 
 // A model is a pair consisting of a symbol table
 // and the CFGs for the functions.
 
-class goto_modelt
+class goto_modelt : public abstract_goto_modelt
 {
 public:
+  /// Symbol table. Direct access is deprecated; use the abstract_goto_modelt
+  /// interface instead if possible.
   symbol_tablet symbol_table;
+  /// GOTO functions. Direct access is deprecated; use the abstract_goto_modelt
+  /// interface instead if possible.
   goto_functionst goto_functions;
 
   void clear()
@@ -66,6 +71,68 @@ public:
   }
 
   void unload(const irep_idt &name) { goto_functions.unload(name); }
+
+  // Implement the abstract goto model interface:
+
+  const goto_functionst &get_goto_functions() const override
+  {
+    return goto_functions;
+  }
+
+  const symbol_tablet &get_symbol_table() const override
+  {
+    return symbol_table;
+  }
+
+  const goto_functionst::goto_functiont &get_goto_function(
+    const irep_idt &id) override
+  {
+    return goto_functions.function_map.at(id);
+  }
+
+  bool can_produce_function(const irep_idt &id) const override
+  {
+    return goto_functions.function_map.count(id);
+  }
+};
+
+/// Class providing the abstract GOTO model interface onto an unrelated
+/// symbol table and goto_functionst.
+class wrapper_goto_modelt : public abstract_goto_modelt
+{
+public:
+  wrapper_goto_modelt(
+    const symbol_tablet &symbol_table,
+    const goto_functionst &goto_functions) :
+    symbol_table(symbol_table),
+    goto_functions(goto_functions)
+  {
+  }
+
+  const goto_functionst &get_goto_functions() const override
+  {
+    return goto_functions;
+  }
+
+  const symbol_tablet &get_symbol_table() const override
+  {
+    return symbol_table;
+  }
+
+  const goto_functionst::goto_functiont &get_goto_function(
+    const irep_idt &id) override
+  {
+    return goto_functions.function_map.at(id);
+  }
+
+  bool can_produce_function(const irep_idt &id) const override
+  {
+    return goto_functions.function_map.count(id);
+  }
+
+private:
+  const symbol_tablet &symbol_table;
+  const goto_functionst &goto_functions;
 };
 
 /// Interface providing access to a single function in a GOTO model, plus its
