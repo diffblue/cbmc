@@ -632,7 +632,7 @@ void string_dependenciest::output_dot(std::ostream &stream) const
   const auto node_to_string = [&](const nodet &n) { // NOLINT
     std::stringstream ostream;
     if(n.kind == nodet::BUILTIN)
-      ostream << "builtin_" << n.index;
+      ostream << builtin_function_nodes[n.index]->name() << n.index;
     else
       ostream << '"' << format(string_nodes[n.index].expr) << '"';
     return ostream.str();

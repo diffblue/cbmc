@@ -161,6 +161,8 @@ public:
   virtual optionalt<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const = 0;
 
+  virtual std::string name() const = 0;
+
 protected:
   string_builtin_functiont() = default;
 };
@@ -212,6 +214,11 @@ public:
   std::vector<mp_integer> eval(
     const std::vector<mp_integer> &input_value,
     const std::vector<mp_integer> &args_value) const override;
+
+  std::string name() const override
+  {
+    return "concat_char";
+  }
 };
 
 /// String inserting a string into another one
@@ -247,6 +254,11 @@ public:
   optionalt<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
 
+  std::string name() const override
+  {
+    return "insert";
+  }
+
 protected:
   string_insertion_builtin_functiont() = default;
 };
@@ -263,6 +275,11 @@ public:
     const std::vector<mp_integer> &input1_value,
     const std::vector<mp_integer> &input2_value,
     const std::vector<mp_integer> &args_value) const override;
+
+  std::string name() const override
+  {
+    return "concat";
+  }
 };
 
 /// String creation from other types
