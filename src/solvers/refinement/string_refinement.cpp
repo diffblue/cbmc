@@ -2088,26 +2088,47 @@ static void update_index_set(
 /// Finds an index on `str` used in `expr` that contains `qvar`, for instance
 /// with arguments ``(str[k]=='a')``, `str`, and `k`, the function should
 /// return `k`.
+/// If two different such indexes exist, an invariant will fail.
 /// \param [in] expr: the expression to search
 /// \param [in] str: the string which must be indexed
 /// \param [in] qvar: the universal variable that must be in the index
-/// \return an index expression in `expr` on `str` containing `qvar`
-static exprt find_index(
-  const exprt &expr, const exprt &str, const symbol_exprt &qvar)
+/// \return an index expression in `expr` on `str` containing `qvar`. Returns
+///   an empty optional when `expr` does not contain `str`.
+static optionalt<exprt>
+find_index(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 {
-  const auto it=std::find_if(
-    expr.depth_begin(),
-    expr.depth_end(),
-    [&] (const exprt &e) -> bool
+  auto index_str_containing_qvar = [&](const exprt &e) { // NOLINT
+    if(auto index_expr = expr_try_dynamic_cast<index_exprt>(e))
     {
-      return e.id()==ID_index
-             && to_index_expr(e).array()==str
-             && find_qvar(to_index_expr(e).index(), qvar);
-    });
+      const auto &arr = index_expr->array();
+      const auto str_it = std::find(arr.depth_begin(), arr.depth_end(), str);
+      return str_it != arr.depth_end() && find_qvar(index_expr->index(), qvar);
+    }
+    return false;
+  };
 
-  return it==expr.depth_end()
-         ?nil_exprt()
-         :to_index_expr(*it).index();
+  auto it = std::find_if(
+    expr.depth_begin(), expr.depth_end(), index_str_containing_qvar);
+  if(it == expr.depth_end())
+    return {};
+  const exprt &index = to_index_expr(*it).index();
+
+  // Check that there are no two such indexes
+  it.next_sibling_or_parent();
+  while(it != expr.depth_end())
+  {
+    if(index_str_containing_qvar(*it))
+    {
+      INVARIANT(
+        to_index_expr(*it).index() == index,
+        "string should always be indexed by same value in a given formula");
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
+  }
+
+  return index;
 }
 
 /// Instantiates a string constraint by substituting the quantifiers.
@@ -2128,11 +2149,11 @@ static exprt instantiate(
   const exprt &str,
   const exprt &val)
 {
-  const exprt idx = find_index(axiom.body(), str, axiom.univ_var());
-  if(idx.is_nil())
+  const optionalt<exprt> idx = find_index(axiom.body(), str, axiom.univ_var());
+  if(!idx.has_value())
     return true_exprt();
 
-  const exprt r = compute_inverse_function(stream, axiom.univ_var(), val, idx);
+  const exprt r = compute_inverse_function(stream, axiom.univ_var(), val, *idx);
   implies_exprt instance(
     and_exprt(
       binary_relation_exprt(axiom.univ_var(), ID_ge, axiom.lower_bound()),
