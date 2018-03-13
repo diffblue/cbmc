@@ -232,7 +232,7 @@ exprt boolbvt::bv_get_rec(
        case tvt::tv_enumt::TV_FALSE: ch='0'; break;
        case tvt::tv_enumt::TV_TRUE:  ch='1'; break;
        case tvt::tv_enumt::TV_UNKNOWN: ch='0'; break;
-       default: assert(false);
+       default: UNREACHABLE;
       }
     }
 
