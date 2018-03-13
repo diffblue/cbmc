@@ -1,0 +1,10 @@
+CORE
+main.c
+--variable-sensitivity  --pointers --arrays --structs --unreachable-instructions
+^EXIT=0$
+^SIGNAL=0$
+line 18 function func
+g_out = 1;
+line 24 function func
+g_out = 3;
+--
