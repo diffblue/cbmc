@@ -436,12 +436,30 @@ void string_dependenciest::add_dependency(
   const array_string_exprt &e,
   const builtin_function_nodet &builtin_function_node)
 {
+  if(e.id() == ID_if)
+  {
+    const auto if_expr = to_if_expr(e);
+    const auto &true_case = to_array_string_expr(if_expr.true_case());
+    const auto &false_case = to_array_string_expr(if_expr.false_case());
+    add_dependency(true_case, builtin_function_node);
+    add_dependency(false_case, builtin_function_node);
+    return;
+  }
   string_nodet &string_node = get_node(e);
   string_node.dependencies.push_back(builtin_function_node);
 }
 
 void string_dependenciest::add_unknown_dependency(const array_string_exprt &e)
 {
+  if(e.id() == ID_if)
+  {
+    const auto if_expr = to_if_expr(e);
+    const auto &true_case = to_array_string_expr(if_expr.true_case());
+    const auto &false_case = to_array_string_expr(if_expr.false_case());
+    add_unknown_dependency(true_case);
+    add_unknown_dependency(false_case);
+    return;
+  }
   string_nodet &string_node = get_node(e);
   string_node.depends_on_unknown_builtin_function = true;
 }

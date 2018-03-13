@@ -343,7 +343,9 @@ public:
   const string_builtin_functiont &
   get_builtin_function(const builtin_function_nodet &node) const;
 
-  /// Add edge from node for `e` to node for `builtin_function`
+  /// Add edge from node for `e` to node for `builtin_function` if `e` is a
+  /// simple array expression. If it is an `if_exprt` we add the sub-expressions
+  /// that are not `if_exprt`s instead.
   void add_dependency(
     const array_string_exprt &e,
     const builtin_function_nodet &builtin_function);
