@@ -189,6 +189,7 @@ public:
     public:
       method_handle_typet handle_type;
       irep_idt lambda_method_name;
+      irep_idt lambda_method_ref;
       irep_idt interface_type;
       irep_idt method_type;
       u2_valuest u2_values;
