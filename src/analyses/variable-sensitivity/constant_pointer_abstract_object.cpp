@@ -328,7 +328,7 @@ sharing_ptrt<pointer_abstract_objectt>
     if(stack.empty())
     {
       // We should not be changing the type of an abstract object
-      PRECONDITION(new_value->type()==type().subtype());
+      PRECONDITION(new_value->type()==ns.follow(type().subtype()));
 
       // Get an expression that we can assign to
       exprt value=value_stack.to_expression().op0();
