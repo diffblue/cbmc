@@ -843,6 +843,7 @@ void java_bytecode_parsert::rconstant_pool()
         it->expr.id("invokedynamic");
         const pool_entryt &nameandtype_entry=pool_entry(it->ref2);
         typet type=type_entry(nameandtype_entry.ref2);
+        type.set(ID_java_lambda_method_handle_index, it->ref1);
         it->expr.type()=type;
       }
       break;
