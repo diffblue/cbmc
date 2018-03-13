@@ -154,8 +154,8 @@ abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
 
       result->map=merged_map;
 
-      assert(!result->is_top());
-      assert(!result->is_bottom());
+      INVARIANT(!result->is_top(), "merge of maps doesn't generate top");
+      INVARIANT(!result->is_bottom(), "merge of maps doesn't generate bottom");
       return result;
     }
   }
@@ -277,7 +277,7 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
   }
   else
   {
-    assert(!is_bottom());
+    PRECONDITION(!is_bottom());
     mp_integer index_value;
     if(eval_index(index, env, ns, index_value))
     {

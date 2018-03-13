@@ -54,7 +54,7 @@ Function: abstract_objectt::abstract_objectt
 abstract_objectt::abstract_objectt(const typet &type, bool top, bool bottom):
   t(type), bottom(bottom), top(top)
 {
-  assert(!(top && bottom));
+  PRECONDITION(!(top && bottom));
 }
 
 /*******************************************************************\

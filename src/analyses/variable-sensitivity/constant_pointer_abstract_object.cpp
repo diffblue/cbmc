@@ -31,7 +31,7 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const typet &t):
     pointer_abstract_objectt(t)
 {
-  assert(t.id()==ID_pointer);
+  PRECONDITION(t.id()==ID_pointer);
 }
 
 /*******************************************************************\
@@ -54,7 +54,7 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const typet &t, bool tp, bool bttm):
     pointer_abstract_objectt(t, tp, bttm)
 {
-  assert(t.id()==ID_pointer);
+  PRECONDITION(t.id()==ID_pointer);
 }
 
 /*******************************************************************\
@@ -95,7 +95,7 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
     pointer_abstract_objectt(e, environment, ns),
     value_stack(e, environment, ns)
 {
-  assert(e.type().id()==ID_pointer);
+  PRECONDITION(e.type().id()==ID_pointer);
   if(value_stack.is_top_value())
   {
     make_top();
@@ -328,7 +328,7 @@ sharing_ptrt<pointer_abstract_objectt>
     if(stack.empty())
     {
       // We should not be changing the type of an abstract object
-      assert(new_value->type()==type().subtype());
+      PRECONDITION(new_value->type()==type().subtype());
 
       // Get an expression that we can assign to
       exprt value=value_stack.to_expression().op0();

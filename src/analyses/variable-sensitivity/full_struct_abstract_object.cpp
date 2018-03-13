@@ -36,8 +36,8 @@ Function: full_struct_abstract_objectt::struct_abstract_objectt
 full_struct_abstract_objectt::full_struct_abstract_objectt(const typet &t):
   struct_abstract_objectt(t)
 {
-  assert(t.id()==ID_struct);
-  assert(verify());
+  PRECONDITION(t.id()==ID_struct);
+  DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
 /*******************************************************************\
@@ -60,8 +60,8 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
   const typet &t, bool top, bool bottom):
     struct_abstract_objectt(t, top, bottom)
 {
-  assert(t.id()==ID_struct);
-  assert(verify());
+  PRECONDITION(t.id()==ID_struct);
+  DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
 /*******************************************************************\
@@ -84,7 +84,7 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
   const namespacet &ns):
     struct_abstract_objectt(e, environment, ns)
 {
-  assert(verify());
+  DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
 /*******************************************************************\
@@ -122,7 +122,7 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
   }
   else
   {
-    assert(!is_bottom());
+    PRECONDITION(!is_bottom());
 
     irep_idt c=member_expr.get_component_name();
 
@@ -203,7 +203,7 @@ sharing_ptrt<struct_abstract_objectt>
     copy->map[c]=
       environment.write(starting_value, value, stack, ns, merging_write);
     copy->clear_top();
-    assert(copy->verify());
+    DATA_INVARIANT(copy->verify(), "Structural invariants maintained");;
     return copy;
   }
   else
@@ -219,11 +219,11 @@ sharing_ptrt<struct_abstract_objectt>
     {
       if(is_top()) // struct is top
       {
-        assert(copy->verify());
+        DATA_INVARIANT(copy->verify(), "Structural invariants maintained");;
         return copy;
       }
 
-      assert(!copy->map.empty());
+      INVARIANT(!copy->map.empty(), "If not top, map cannot be empty");
 
       struct_mapt &m=copy->map;
 
@@ -231,7 +231,7 @@ sharing_ptrt<struct_abstract_objectt>
 
       if(it==m.end()) // component is top
       {
-        assert(copy->verify());
+        DATA_INVARIANT(copy->verify(), "Structural invariants maintained");;
         return copy;
       }
 
@@ -243,10 +243,10 @@ sharing_ptrt<struct_abstract_objectt>
     {
       copy->map[c]=value;
       copy->clear_top();
-      assert(!copy->is_bottom());
+      INVARIANT(!copy->is_bottom(), "top != bottom");
     }
 
-    assert(copy->verify());
+    DATA_INVARIANT(copy->verify(), "Structural invariants maintained");;
     return copy;
   }
 }
@@ -367,7 +367,7 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
       abstract_objectt::merge_maps<irep_idt>(map, other->map, merged_map);
     if(!modified)
     {
-      assert(verify());
+      DATA_INVARIANT(verify(), "Structural invariants maintained");
       return shared_from_this();
     }
     else
@@ -378,9 +378,9 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
 
       result->map=merged_map;
 
-      assert(!result->is_top());
-      assert(!result->is_bottom());
-      assert(result->verify());
+      INVARIANT(!result->is_top(), "Merge of maps will not generate top");
+      INVARIANT(!result->is_bottom(), "Merge of maps will not generate bottom");
+      DATA_INVARIANT(result->verify(), "Structural invariants maintained");
       return result;
     }
   }
