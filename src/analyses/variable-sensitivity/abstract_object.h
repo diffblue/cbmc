@@ -35,6 +35,7 @@
 
 #include <goto-programs/goto_program.h>
 #include <util/expr.h>
+#include <util/sharing_map.h>
 
 class typet;
 class constant_exprt;
@@ -116,7 +117,12 @@ public:
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
   typedef std::set<goto_programt::const_targett> locationst;
-
+  typedef sharing_mapt<irep_idt, abstract_object_pointert, irep_id_hash>
+    shared_mapt;
+    
+  static void dump_map(std::ostream out, const shared_mapt &m);
+  static void dump_map_diff(
+    std::ostream out, const shared_mapt &m1, const shared_mapt &m2);
 
   abstract_object_pointert clone() const
   {
@@ -194,7 +200,6 @@ public:
     const abstract_object_visitort &visitor) const
   { return shared_from_this(); }
 
-
 private:
   // To enforce copy-on-write these are private and have read-only accessors
   typet t;
@@ -237,6 +242,15 @@ protected:
     const std::map<keyt, abstract_object_pointert> &map1,
     const std::map<keyt, abstract_object_pointert> &map2,
     std::map<keyt, abstract_object_pointert> &out_map);
+
+
+  template<class keyt>
+  static bool merge_shared_maps(
+    const sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &map1,
+    const sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &map2,
+    sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &out_map);
+
+
 
   // The one exception is merge in descendant classes, which needs this
   void make_top() { top=true; this->make_top_internal(); }
@@ -288,5 +302,34 @@ bool abstract_objectt::merge_maps(
   return modified;
 }
 
+template<typename keyt>
+bool abstract_objectt::merge_shared_maps(
+  const sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &m1,
+  const sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &m2,
+  sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &out_map)
+{
+  typedef sharing_mapt<irep_idt, abstract_object_pointert,
+    irep_id_hash>
+    abstract_object_mapt;
+
+  bool modified=false;
+
+  abstract_object_mapt::delta_viewt delta_view;
+  m1.get_delta_view(m2, delta_view, true);
+
+  for(auto &item : delta_view)
+  {
+    bool changes = false;
+    abstract_object_pointert v_new = abstract_objectt::merge(
+      item.m, item.other_m, changes);
+    if (changes)
+    {
+      modified = true;
+      out_map[item.k] = v_new;
+    }
+  }
+
+  return modified;
+}
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H

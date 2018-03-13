@@ -71,3 +71,44 @@ abstract_valuet::abstract_valuet(
   const namespacet &ns):
     abstract_objectt(expr, environment, ns)
 {}
+
+
+void abstract_objectt::dump_map(
+  std::ostream out, const abstract_objectt::shared_mapt &m)
+{
+  shared_mapt::viewt view;
+  m.get_view(view);
+
+  out << "{";
+  bool first=true;
+  for(auto &item : view)
+  {
+    out << (first ? "" : ", ") << item.first;
+    first = false;
+  }
+  out << "}";
+}
+
+/**
+ * \brief Dump all elements in m1 that are different or missing in m2
+ * 
+ * \param m1 the 'target' sharing_map
+ * \param m2 the reference sharing map
+ */
+void abstract_objectt::dump_map_diff(
+  std::ostream out,
+  const abstract_objectt::shared_mapt &m1,
+  const abstract_objectt::shared_mapt &m2)
+{
+  shared_mapt::delta_viewt delta_view;
+  m1.get_delta_view(m2, delta_view, false);
+
+  out << "DELTA{";
+  bool first = true;
+  for(auto &item : delta_view)
+  {
+    out << (first ? "" : ", ") << item.k << "=" << item.in_both;
+    first = false;
+  }
+  out << "}";
+}

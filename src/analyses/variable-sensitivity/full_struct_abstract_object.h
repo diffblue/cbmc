@@ -13,6 +13,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include <iosfwd>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
+#include <util/sharing_map.h>
 
 class abstract_environmentt;
 class member_exprt;
@@ -21,6 +22,9 @@ class full_struct_abstract_objectt:public struct_abstract_objectt
 {
 public:
   typedef sharing_ptrt<full_struct_abstract_objectt> constant_struct_pointert;
+
+  // Define an explicit copy constructor to ensure sharing of maps
+  full_struct_abstract_objectt(const full_struct_abstract_objectt &ao);
 
   explicit full_struct_abstract_objectt(const typet &type);
 
@@ -41,8 +45,9 @@ public:
 
 private:
   // no entry means component is top
-  typedef std::map<irep_idt, abstract_object_pointert> struct_mapt;
-  struct_mapt map;
+  typedef sharing_mapt<irep_idt, abstract_object_pointert, irep_id_hash>
+    shared_struct_mapt;
+  shared_struct_mapt map;
 
   abstract_object_pointert merge_constant_structs(
     constant_struct_pointert other) const;

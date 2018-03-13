@@ -20,6 +20,18 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include <iostream>
 #endif
 
+/**
+ * \brief Explicit copy-constructor to make it clear that the shared_map
+ *        used to store the values of fields is copy-constructed as well
+ *        to ensure it shares as much data as possible.
+ */
+full_struct_abstract_objectt::full_struct_abstract_objectt(
+  const full_struct_abstract_objectt &ao):
+    struct_abstract_objectt(ao), map(ao.map)
+{
+  DATA_INVARIANT(verify(), "Structural invariants maintained");
+}
+
 /*******************************************************************\
 
 Function: full_struct_abstract_objectt::struct_abstract_objectt
@@ -124,13 +136,13 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
   {
     PRECONDITION(!is_bottom());
 
-    irep_idt c=member_expr.get_component_name();
+    const irep_idt c=member_expr.get_component_name();
 
-    struct_mapt::const_iterator it=map.find(c);
+    shared_struct_mapt::const_find_type value=map.find(c);
 
-    if(it!=map.cend())
+    if(value.second)
     {
-      return it->second;
+      return value.first;
     }
     else
     {
@@ -182,14 +194,15 @@ sharing_ptrt<struct_abstract_objectt>
         member_expr.compound().type(), false, true));
   }
 
-  internal_sharing_ptrt<full_struct_abstract_objectt> copy(
-    new full_struct_abstract_objectt(*this));
+  const auto &result=
+    std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
 
   if(!stack.empty())
   {
     abstract_object_pointert starting_value;
-    irep_idt c=member_expr.get_component_name();
-    if(map.find(c)==map.cend())
+    const irep_idt c=member_expr.get_component_name();
+    shared_struct_mapt::const_find_type old_value = map.find(c);
+    if(!old_value.second)
     {
       starting_value=
         environment.abstract_object_factory(
@@ -197,14 +210,15 @@ sharing_ptrt<struct_abstract_objectt>
     }
     else
     {
-      starting_value=map.at(c);
+      starting_value=old_value.first;
     }
 
-    copy->map[c]=
+    result->map[c] =
       environment.write(starting_value, value, stack, ns, merging_write);
-    copy->clear_top();
-    DATA_INVARIANT(copy->verify(), "Structural invariants maintained");;
-    return copy;
+
+    result->clear_top();
+    DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+    return result;
   }
   else
   {
@@ -213,41 +227,40 @@ sharing_ptrt<struct_abstract_objectt>
     std::cout << "Setting component" << std::endl;
 #endif
 
-    irep_idt c=member_expr.get_component_name();
+    const irep_idt c=member_expr.get_component_name();
 
     if(merging_write)
     {
       if(is_top()) // struct is top
       {
-        DATA_INVARIANT(copy->verify(), "Structural invariants maintained");;
-        return copy;
+        DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+        return result;
       }
 
-      INVARIANT(!copy->map.empty(), "If not top, map cannot be empty");
+      INVARIANT(!result->map.empty(), "If not top, map cannot be empty");
 
-      struct_mapt &m=copy->map;
+      shared_struct_mapt::const_find_type old_value=result->map.find(c);
 
-      struct_mapt::iterator it=m.find(c);
-
-      if(it==m.end()) // component is top
+      if(!old_value.second) // component is top
       {
-        DATA_INVARIANT(copy->verify(), "Structural invariants maintained");;
-        return copy;
+        DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+        return result;
       }
 
       bool dummy;
 
-      it->second=abstract_objectt::merge(it->second, value, dummy);
+      result->map[c] = abstract_objectt::merge(old_value.first, value, dummy);
     }
     else
     {
-      copy->map[c]=value;
-      copy->clear_top();
-      INVARIANT(!copy->is_bottom(), "top != bottom");
+      result->map[c] = value;
+      result->clear_top();
+      INVARIANT(!result->is_bottom(), "top != bottom");
     }
 
-    DATA_INVARIANT(copy->verify(), "Structural invariants maintained");;
-    return copy;
+    DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+
+    return result;
   }
 }
 
@@ -272,15 +285,27 @@ Function: full_struct_abstract_objectt::output
 void full_struct_abstract_objectt::output(
   std::ostream &out, const ai_baset &ai, const namespacet &ns) const
 {
+  // To ensure that a consistent ordering of fields is output, use
+  // the underlying type declaration for this struct to determine
+  // the ordering
+  struct_union_typet type_decl = to_struct_union_type(ns.follow(type()));
+
+  bool first = true;
+
   out << "{";
-  for(const auto &entry : map)
+  for(const auto field : type_decl.components())
   {
-    if(entry.first!=map.cbegin()->first)
+    auto value = map.find(field.get_name());
+    if(value.second)
     {
-      out << ", ";
+      if(!first)
+      {
+        out << ", ";
+      }
+      out << '.' << field.get_name() << '=';
+      value.first->output(out, ai, ns);
+      first = false;
     }
-    out << "." << entry.first << "=";
-    entry.second->output(out, ai, ns);
   }
   out << "}";
 }
@@ -362,9 +387,12 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
   }
   else
   {
-    struct_mapt merged_map;
-    bool modified=
-      abstract_objectt::merge_maps<irep_idt>(map, other->map, merged_map);
+    const auto &result=
+      std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
+
+    bool modified = abstract_objectt::merge_shared_maps<irep_idt>(
+      map, other->map, result->map);
+
     if(!modified)
     {
       DATA_INVARIANT(verify(), "Structural invariants maintained");
@@ -372,12 +400,6 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
     }
     else
     {
-      const auto &result=
-        std::dynamic_pointer_cast<full_struct_abstract_objectt>(
-          mutable_clone());
-
-      result->map=merged_map;
-
       INVARIANT(!result->is_top(), "Merge of maps will not generate top");
       INVARIANT(!result->is_bottom(), "Merge of maps will not generate bottom");
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
@@ -397,18 +419,33 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
  * \return A new abstract_object if it's contents is modifed, or this if
  * no modification is needed
  */
-abstract_object_pointert
-  full_struct_abstract_objectt::visit_sub_elements(
+abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
   const abstract_object_visitort &visitor) const
 {
   const auto &result=
-    std::dynamic_pointer_cast<full_struct_abstract_objectt>(
-      mutable_clone());
+    std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
 
-  for(auto &item : result->map)
+  bool modified = false;
+
+  shared_struct_mapt::viewt view;
+  result->map.get_view(view);
+
+  for(auto &item : view)
   {
-    item.second=visitor.visit(item.second);
+    auto newval = visitor.visit(item.second);
+    if(newval != item.second)
+    {
+      result->map[item.first] = visitor.visit(item.second);
+      modified = true;
+    }
   }
 
-  return result;
+  if(modified)
+  {
+    return result;
+  }
+  else
+  {
+    return shared_from_this();
+  }
 }
