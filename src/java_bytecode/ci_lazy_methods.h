@@ -134,7 +134,7 @@ private:
     std::vector<const code_function_callt *> &result);
 
   void get_virtual_method_targets(
-    const code_function_callt &c,
+    const exprt &called_function,
     const std::set<irep_idt> &instantiated_classes,
     std::vector<irep_idt> &callable_methods,
     symbol_tablet &symbol_table);
