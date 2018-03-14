@@ -414,6 +414,12 @@ public:
   ///
   /// \param [out] view: Empty view
   void get_view(viewt &view) const;
+  viewt get_view() const
+  {
+    viewt result;
+    get_view(result);
+    return result;
+  }
 
   /// Get a delta view of the elements in the map
   ///
