@@ -18,6 +18,7 @@
 #include <util/std_expr.h>
 #include <util/message.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
+#include <util/sharing_map.h>
 
 class abstract_environmentt
 {
@@ -80,7 +81,7 @@ protected:
     const exprt &e, const namespacet &ns) const;
 
   typedef symbol_exprt map_keyt;
-  std::map<map_keyt, abstract_object_pointert> map;
+  sharing_mapt<map_keyt, abstract_object_pointert> map;
 
 private:
   abstract_object_pointert abstract_object_factory(
