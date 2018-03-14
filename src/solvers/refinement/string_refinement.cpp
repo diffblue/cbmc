@@ -27,7 +27,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
-#include <java_bytecode/java_types.h>
 #include <unordered_set>
 
 static bool is_valid_string_constraint(
@@ -1224,6 +1223,7 @@ static exprt substitute_array_access(
     &symbol_generator)
 {
   const typet &char_type = array_expr.type().subtype();
+  const typet &index_type = to_array_type(array_expr.type()).size().type();
   const std::vector<exprt> &operands = array_expr.operands();
 
   exprt result = symbol_generator("out_of_bound_access", char_type);
@@ -1232,7 +1232,7 @@ static exprt substitute_array_access(
   {
     // Go in reverse order so that smaller indexes appear first in the result
     const std::size_t pos = operands.size() - 1 - i;
-    const equal_exprt equals(index, from_integer(pos, java_int_type()));
+    const equal_exprt equals(index, from_integer(pos, index_type));
     if(operands[pos].type() != char_type)
     {
       INVARIANT(

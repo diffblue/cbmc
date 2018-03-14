@@ -20,7 +20,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_constraint_generator.h>
 
 #include <limits>
-#include <java_bytecode/java_types.h>
+
 #include <solvers/refinement/string_refinement_invariant.h>
 
 #include <util/arith_tools.h>
