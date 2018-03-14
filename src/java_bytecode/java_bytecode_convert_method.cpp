@@ -392,7 +392,7 @@ void java_bytecode_convert_method_lazy(
   {
     convert_annotations(
       m.annotations,
-      static_cast<annotated_typet &>(static_cast<typet &>(member_type))
+      type_checked_cast<annotated_typet>(static_cast<typet &>(member_type))
         .get_annotations());
   }
 

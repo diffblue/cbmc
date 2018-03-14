@@ -47,8 +47,7 @@ void java_qualifierst::read(const typet &src)
 void java_qualifierst::write(typet &src) const
 {
   c_qualifierst::write(src);
-  auto &annotated_type = static_cast<annotated_typet &>(src);
-  annotated_type.get_annotations() = annotations;
+  type_checked_cast<annotated_typet>(src).get_annotations() = annotations;
 }
 
 qualifierst &java_qualifierst::operator+=(const qualifierst &other)

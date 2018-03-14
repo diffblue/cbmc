@@ -82,6 +82,22 @@ public:
   }
 };
 
+inline const annotated_typet &to_annotated_type(const typet &type)
+{
+  return static_cast<const annotated_typet &>(type);
+}
+
+inline annotated_typet &to_annotated_type(typet &type)
+{
+  return static_cast<annotated_typet &>(type);
+}
+
+template <>
+inline bool can_cast_type<annotated_typet>(const typet &type)
+{
+  return true;
+}
+
 class java_class_typet:public class_typet
 {
  public:
@@ -129,7 +145,7 @@ class java_class_typet:public class_typet
 
   std::vector<java_annotationt> &get_annotations()
   {
-    return static_cast<annotated_typet &>(
+    return type_checked_cast<annotated_typet>(
       static_cast<typet &>(*this)).get_annotations();
   }
 };

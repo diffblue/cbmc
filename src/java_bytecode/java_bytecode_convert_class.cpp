@@ -648,7 +648,7 @@ void java_bytecode_convert_classt::convert(
     {
       convert_annotations(
         f.annotations,
-        static_cast<annotated_typet &>(new_symbol.type).get_annotations());
+        type_checked_cast<annotated_typet>(new_symbol.type).get_annotations());
     }
 
     // Do we have the static field symbol already?
