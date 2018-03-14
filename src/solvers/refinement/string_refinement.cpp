@@ -1965,53 +1965,68 @@ static void add_to_index_set(
   }
 }
 
+/// Given an array access of the form \a s[i] assumed to be part of a formula
+/// \f$ \forall q < u. charconstraint \f$, initialize the index set of \a s
+/// so that:
+///   - \f$ i[q -> u - 1] \f$ appears in the index set of \a s if \a s is a
+///     symbol
+///   - if \a s is an array expression, all index from \a 0 to
+///     \f$ s.length - 1 \f$ are in the index set
+///   - if \a s is an if expression we apply this procedure to the true and
+///     false cases
+/// \param index_set: the index_set to initialize
+/// \param ns: namespace, used for simplifying indexes
+/// \param qvar: the quantified variable \a q
+/// \param upper_bound: bound \a u on the quantified variable
+/// \param s: expression representing a string
+/// \param i: expression representing the index at which \a s is accessed
+static void initial_index_set(
+  index_set_pairt &index_set,
+  const namespacet &ns,
+  const exprt &qvar,
+  const exprt &upper_bound,
+  const exprt &s,
+  const exprt &i)
+{
+  PRECONDITION(s.id() == ID_symbol || s.id() == ID_array || s.id() == ID_if);
+  if(s.id() == ID_array)
+  {
+    for(std::size_t j = 0; j < s.operands().size(); ++j)
+      add_to_index_set(index_set, ns, s, from_integer(j, i.type()));
+    return;
+  }
+  if(auto ite = expr_try_dynamic_cast<if_exprt>(s))
+  {
+    initial_index_set(index_set, ns, qvar, upper_bound, ite->true_case(), i);
+    initial_index_set(index_set, ns, qvar, upper_bound, ite->false_case(), i);
+    return;
+  }
+  const minus_exprt u_minus_1(upper_bound, from_integer(1, upper_bound.type()));
+  exprt i_copy = i;
+  replace_expr(qvar, u_minus_1, i_copy);
+  add_to_index_set(index_set, ns, s, i_copy);
+}
+
 static void initial_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
   const string_constraintt &axiom)
 {
   const symbol_exprt &qvar=axiom.univ_var();
-  std::list<exprt> to_process;
-  to_process.push_back(axiom.body());
-
-  while(!to_process.empty())
+  const auto &bound = axiom.upper_bound();
+  auto it = axiom.body().depth_begin();
+  const auto end = axiom.body().depth_end();
+  while(it != end)
   {
-    const exprt cur = to_process.back();
-    to_process.pop_back();
-    if(cur.id() == ID_index && is_char_type(cur.type()))
+    if(it->id() == ID_index && is_char_type(it->type()))
     {
-      const index_exprt &index_expr = to_index_expr(cur);
-      const exprt &s = index_expr.array();
-      const exprt &i = index_expr.index();
-
-      if(s.id() == ID_array)
-      {
-        for(std::size_t j = 0; j < s.operands().size(); ++j)
-          add_to_index_set(index_set, ns, s, from_integer(j, i.type()));
-      }
-      else
-      {
-        const bool has_quant_var = find_qvar(i, qvar);
-
-        // if cur is of the form s[i] and no quantified variable appears in i
-        if(!has_quant_var)
-        {
-          add_to_index_set(index_set, ns, s, i);
-        }
-        else
-        {
-          // otherwise we add k-1
-          exprt copy(i);
-          const minus_exprt kminus1(
-            axiom.upper_bound(), from_integer(1, axiom.upper_bound().type()));
-          replace_expr(qvar, kminus1, copy);
-          add_to_index_set(index_set, ns, s, copy);
-        }
-      }
+      const auto &index_expr = to_index_expr(*it);
+      const auto &s = index_expr.array();
+      initial_index_set(index_set, ns, qvar, bound, s, index_expr.index());
+      it.next_sibling_or_parent();
     }
     else
-      forall_operands(it, cur)
-        to_process.push_back(*it);
+      ++it;
   }
 }
 
