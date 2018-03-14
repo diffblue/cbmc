@@ -1641,8 +1641,6 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     if(use_counter_example)
     {
-      stream << "Adding counter-examples: " << eom;
-
       std::vector<exprt> lemmas;
 
       for(const auto &v : violated)
@@ -1658,8 +1656,6 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
           binary_relation_exprt(from_integer(0, val.type()), ID_le, val));
         replace_expr(axiom.univ_var(), val, bounds);
         const implies_exprt counter(bounds, instance);
-
-        stream << "  -  " << format(counter) << eom;
         lemmas.push_back(counter);
       }
 
@@ -1676,8 +1672,6 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         indices.insert(std::pair<exprt, exprt>(comp_val, func_val));
         const exprt counter=::instantiate_not_contains(
           axiom, indices, generator)[0];
-
-        stream << "    -  " << format(counter) << eom;
         lemmas.push_back(counter);
       }
       return { false, lemmas };
