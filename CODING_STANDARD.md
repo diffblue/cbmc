@@ -48,8 +48,11 @@ Formatting is enforced using clang-format. For more information about this, see
 # Comments
 - Do not use `/* */`
 - Each source and header file must start with a comment block stating the
-  author. See existing source for an example of the format of this block. This
-  should be followed by a Doxygen `\file` comment:
+  author in this format:
+  ```c++
+  /// Author: Diffblue Ltd.
+  ```
+  This should be followed by a Doxygen `\file` comment:
   ```c++
   /// \file
   /// <Some information about this file goes here>
