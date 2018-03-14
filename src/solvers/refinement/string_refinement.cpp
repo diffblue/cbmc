@@ -679,13 +679,14 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
 #ifdef DEBUG
   output_equations(debug(), equations, ns);
+#endif
 
-  string_dependencest dependences;
+  debug() << "dec_solve: compute dependency graph:" << eom;
   for(const equal_exprt &eq : equations)
-    add_node(dependences, eq, generator.array_pool);
+    add_node(dependencies, eq, generator.array_pool);
 
-  debug() << "dec_solve: dependence graph:" << eom;
-  dependences.output_dot(debug());
+#ifdef DEBUG
+  dependencies.output_dot(debug());
 #endif
 
   debug() << "dec_solve: Replace function applications" << eom;
@@ -756,6 +757,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   // Initial try without index set
   const auto get = [this](const exprt &expr) { return this->get(expr); };
+  dependencies.clean_cache();
   const decision_proceduret::resultt res=supert::dec_solve();
   if(res==resultt::D_SATISFIABLE)
   {
@@ -803,6 +805,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   while((loop_bound_--)>0)
   {
+    dependencies.clean_cache();
     const decision_proceduret::resultt res=supert::dec_solve();
 
     if(res==resultt::D_SATISFIABLE)
@@ -1475,17 +1478,17 @@ static void debug_check_axioms_step(
   stream << indent2 << "- axiom:\n" << indent2 << indent;
 
   if(axiom.id() == ID_string_constraint)
-    stream << format(to_string_constraint(axiom));
+    stream << to_string(to_string_constraint(axiom));
   else if(axiom.id() == ID_string_not_contains_constraint)
-    stream << format(to_string_not_contains_constraint(axiom));
+    stream << to_string(to_string_not_contains_constraint(axiom));
   else
     stream << format(axiom);
   stream << '\n' << indent2 << "- axiom_in_model:\n" << indent2 << indent;
 
   if(axiom_in_model.id() == ID_string_constraint)
-    stream << format(to_string_constraint(axiom_in_model));
+    stream << to_string(to_string_constraint(axiom_in_model));
   else if(axiom_in_model.id() == ID_string_not_contains_constraint)
-    stream << format(to_string_not_contains_constraint(axiom_in_model));
+    stream << to_string(to_string_not_contains_constraint(axiom_in_model));
   else
     stream << format(axiom_in_model);
 
@@ -1862,7 +1865,7 @@ static exprt compute_inverse_function(
   return sum_over_map(elems, f.type(), neg);
 }
 
-class find_qvar_visitort: public const_expr_visitort
+class find_qvar_visitort : public const_expr_visitort
 {
 private:
   const exprt &qvar_;
@@ -2253,6 +2256,12 @@ exprt string_refinementt::get(const exprt &expr) const
   {
     array_string_exprt &arr = to_array_string_expr(ecopy);
     arr.length() = generator.array_pool.get_length(arr);
+
+    if(
+      const auto from_dependencies =
+        dependencies.eval(arr, [&](const exprt &expr) { return get(expr); }))
+      return *from_dependencies;
+
     const auto arr_model_opt =
       get_array(super_get, ns, generator.max_string_length, debug(), arr);
     // \todo Refactor with get array in model

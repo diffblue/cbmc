@@ -16,7 +16,18 @@
 #include <util/expr_iterator.h>
 #include <util/graph.h>
 #include <util/magic.h>
+#include <util/make_unique.h>
 #include "string_refinement_util.h"
+
+/// Get the valuation of the string, given a valuation
+static optionalt<std::vector<mp_integer>> eval_string(
+  const array_string_exprt &a,
+  const std::function<exprt(const exprt &)> &get_value);
+
+/// Make a string from a constant array
+static array_string_exprt make_string(
+  const std::vector<mp_integer> &array,
+  const array_typet &array_type);
 
 bool is_char_type(const typet &type)
 {
@@ -162,17 +173,192 @@ equation_symbol_mappingt::find_equations(const exprt &expr)
   return equations_containing[expr];
 }
 
+string_transformation_builtin_functiont::
+  string_transformation_builtin_functiont(
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool)
+{
+  PRECONDITION(fun_args.size() > 2);
+  const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
+  input = array_pool.find(arg1.op1(), arg1.op0());
+  result = array_pool.find(fun_args[1], fun_args[0]);
+  args.insert(args.end(), fun_args.begin() + 3, fun_args.end());
+}
+
+optionalt<exprt> string_transformation_builtin_functiont::eval(
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  const auto &input_value = eval_string(input, get_value);
+  if(!input_value.has_value())
+    return {};
+
+  std::vector<mp_integer> arg_values;
+  const auto &insert = std::back_inserter(arg_values);
+  const mp_integer unknown('?');
+  std::transform(
+    args.begin(), args.end(), insert, [&](const exprt &e) { // NOLINT
+      if(const auto val = numeric_cast<mp_integer>(get_value(e)))
+        return *val;
+      INVARIANT(
+        get_value(e).id() == ID_unknown,
+        "array valuation should only contain constants and unknown");
+      return unknown;
+    });
+
+  const auto result_value = eval(*input_value, arg_values);
+  const auto length = from_integer(result_value.size(), result.length().type());
+  const array_typet type(result.type().subtype(), length);
+  return make_string(result_value, type);
+}
+
 string_insertion_builtin_functiont::string_insertion_builtin_functiont(
   const std::vector<exprt> &fun_args,
   array_poolt &array_pool)
 {
-  PRECONDITION(fun_args.size() > 3);
+  PRECONDITION(fun_args.size() > 4);
+  const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
+  input1 = array_pool.find(arg1.op1(), arg1.op0());
+  const auto arg2 = expr_checked_cast<struct_exprt>(fun_args[4]);
+  input2 = array_pool.find(arg2.op1(), arg2.op0());
+  result = array_pool.find(fun_args[1], fun_args[0]);
+  args.push_back(fun_args[3]);
+  args.insert(args.end(), fun_args.begin() + 5, fun_args.end());
+}
+
+string_concatenation_builtin_functiont::string_concatenation_builtin_functiont(
+  const std::vector<exprt> &fun_args,
+  array_poolt &array_pool)
+{
+  PRECONDITION(fun_args.size() >= 4 && fun_args.size() <= 6);
   const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
   input1 = array_pool.find(arg1.op1(), arg1.op0());
   const auto arg2 = expr_checked_cast<struct_exprt>(fun_args[3]);
   input2 = array_pool.find(arg2.op1(), arg2.op0());
   result = array_pool.find(fun_args[1], fun_args[0]);
   args.insert(args.end(), fun_args.begin() + 4, fun_args.end());
+}
+
+optionalt<std::vector<mp_integer>> eval_string(
+  const array_string_exprt &a,
+  const std::function<exprt(const exprt &)> &get_value)
+{
+  if(a.id() == ID_if)
+  {
+    const if_exprt &ite = to_if_expr(a);
+    const exprt cond = get_value(ite.cond());
+    if(!cond.is_constant())
+      return {};
+    return cond.is_true()
+             ? eval_string(to_array_string_expr(ite.true_case()), get_value)
+             : eval_string(to_array_string_expr(ite.false_case()), get_value);
+  }
+
+  const auto size = numeric_cast<std::size_t>(get_value(a.length()));
+  const exprt content = get_value(a.content());
+  const auto &array = expr_try_dynamic_cast<array_exprt>(content);
+  if(!size || !array)
+    return {};
+
+  const auto &ops = array->operands();
+  INVARIANT(*size == ops.size(), "operands size should match string size");
+
+  std::vector<mp_integer> result;
+  const mp_integer unknown('?');
+  const auto &insert = std::back_inserter(result);
+  std::transform(
+    ops.begin(), ops.end(), insert, [unknown](const exprt &e) { // NOLINT
+      if(const auto i = numeric_cast<mp_integer>(e))
+        return *i;
+      return unknown;
+    });
+  return result;
+}
+
+array_string_exprt
+make_string(const std::vector<mp_integer> &array, const array_typet &array_type)
+{
+  const typet &char_type = array_type.subtype();
+  array_exprt array_expr(array_type);
+  const auto &insert = std::back_inserter(array_expr.operands());
+  std::transform(
+    array.begin(), array.end(), insert, [&](const mp_integer &i) { // NOLINT
+      return from_integer(i, char_type);
+    });
+  return to_array_string_expr(array_expr);
+}
+
+std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
+  const std::vector<mp_integer> &input1_value,
+  const std::vector<mp_integer> &input2_value,
+  const std::vector<mp_integer> &args_value) const
+{
+  const std::size_t start_index =
+    args_value.size() > 0 && args_value[0] > 0 ? args_value[0].to_ulong() : 0;
+  const std::size_t end_index = args_value.size() > 1 && args_value[1] > 0
+                                  ? args_value[1].to_ulong()
+                                  : input2_value.size();
+
+  std::vector<mp_integer> result(input1_value);
+  result.insert(
+    result.end(),
+    input2_value.begin() + start_index,
+    input2_value.begin() + end_index);
+  return result;
+}
+
+std::vector<mp_integer> string_concat_char_builtin_functiont::eval(
+  const std::vector<mp_integer> &input_value,
+  const std::vector<mp_integer> &args_value) const
+{
+  PRECONDITION(args_value.size() == 1);
+  std::vector<mp_integer> result(input_value);
+  result.push_back(args_value[0]);
+  return result;
+}
+
+std::vector<mp_integer> string_insertion_builtin_functiont::eval(
+  const std::vector<mp_integer> &input1_value,
+  const std::vector<mp_integer> &input2_value,
+  const std::vector<mp_integer> &args_value) const
+{
+  PRECONDITION(args_value.size() >= 1 || args_value.size() <= 3);
+  const std::size_t &offset = numeric_cast_v<std::size_t>(args_value[0]);
+  const std::size_t &start =
+    args_value.size() > 1 ? numeric_cast_v<std::size_t>(args_value[1]) : 0;
+  const std::size_t &end = args_value.size() > 2
+                             ? numeric_cast_v<std::size_t>(args_value[2])
+                             : input2_value.size();
+
+  std::vector<mp_integer> result(input1_value);
+  result.insert(
+    result.begin() + offset,
+    input2_value.begin() + start,
+    input2_value.end() + end);
+  return result;
+}
+
+optionalt<exprt> string_insertion_builtin_functiont::eval(
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  const auto &input1_value = eval_string(input1, get_value);
+  const auto &input2_value = eval_string(input2, get_value);
+  if(!input2_value.has_value() || !input1_value.has_value())
+    return {};
+
+  std::vector<mp_integer> arg_values;
+  const auto &insert = std::back_inserter(arg_values);
+  const mp_integer unknown('?');
+  std::transform(
+    args.begin(), args.end(), insert, [&](const exprt &e) { // NOLINT
+      if(const auto val = numeric_cast<mp_integer>(get_value(e)))
+        return *val;
+      return unknown;
+    });
+
+  const auto result_value = eval(*input1_value, *input2_value, arg_values);
+  const auto length = from_integer(result_value.size(), result.length().type());
+  const array_typet type(result.type().subtype(), length);
+  return make_string(result_value, type);
 }
 
 /// Construct a string_builtin_functiont object from a function application
@@ -192,24 +378,37 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
       new string_insertion_builtin_functiont(fun_app.arguments(), array_pool));
 
   if(id == ID_cprover_string_concat_func)
-    return std::unique_ptr<string_builtin_functiont>(
-      new string_insertion_builtin_functiont(fun_app.arguments(), array_pool));
+    return util_make_unique<string_concatenation_builtin_functiont>(
+      fun_app.arguments(), array_pool);
+
+  if(id == ID_cprover_string_concat_char_func)
+    return util_make_unique<string_concat_char_builtin_functiont>(
+      fun_app.arguments(), array_pool);
 
   return {};
 }
 
-string_dependencest::string_nodet &
-string_dependencest::get_node(const array_string_exprt &e)
+string_dependenciest::string_nodet &
+string_dependenciest::get_node(const array_string_exprt &e)
 {
   auto entry_inserted = node_index_pool.emplace(e, string_nodes.size());
   if(!entry_inserted.second)
     return string_nodes[entry_inserted.first->second];
 
-  string_nodes.emplace_back();
+  string_nodes.emplace_back(e, entry_inserted.first->second);
   return string_nodes.back();
 }
 
-string_dependencest::builtin_function_nodet string_dependencest::make_node(
+std::unique_ptr<const string_dependenciest::string_nodet>
+string_dependenciest::node_at(const array_string_exprt &e) const
+{
+  const auto &it = node_index_pool.find(e);
+  if(it != node_index_pool.end())
+    return util_make_unique<const string_nodet>(string_nodes.at(it->second));
+  return {};
+}
+
+string_dependenciest::builtin_function_nodet string_dependenciest::make_node(
   std::unique_ptr<string_builtin_functiont> &builtin_function)
 {
   const builtin_function_nodet builtin_function_node(
@@ -219,36 +418,54 @@ string_dependencest::builtin_function_nodet string_dependencest::make_node(
   return builtin_function_node;
 }
 
-const string_builtin_functiont &string_dependencest::get_builtin_function(
+const string_builtin_functiont &string_dependenciest::get_builtin_function(
   const builtin_function_nodet &node) const
 {
   PRECONDITION(node.index < builtin_function_nodes.size());
   return *(builtin_function_nodes[node.index]);
 }
 
-const std::vector<string_dependencest::builtin_function_nodet> &
-string_dependencest::dependencies(
-  const string_dependencest::string_nodet &node) const
+const std::vector<string_dependenciest::builtin_function_nodet> &
+string_dependenciest::dependencies(
+  const string_dependenciest::string_nodet &node) const
 {
   return node.dependencies;
 }
 
-void string_dependencest::add_dependency(
+void string_dependenciest::add_dependency(
   const array_string_exprt &e,
   const builtin_function_nodet &builtin_function_node)
 {
+  if(e.id() == ID_if)
+  {
+    const auto if_expr = to_if_expr(e);
+    const auto &true_case = to_array_string_expr(if_expr.true_case());
+    const auto &false_case = to_array_string_expr(if_expr.false_case());
+    add_dependency(true_case, builtin_function_node);
+    add_dependency(false_case, builtin_function_node);
+    return;
+  }
   string_nodet &string_node = get_node(e);
   string_node.dependencies.push_back(builtin_function_node);
 }
 
-void string_dependencest::add_unknown_dependency(const array_string_exprt &e)
+void string_dependenciest::add_unknown_dependency(const array_string_exprt &e)
 {
+  if(e.id() == ID_if)
+  {
+    const auto if_expr = to_if_expr(e);
+    const auto &true_case = to_array_string_expr(if_expr.true_case());
+    const auto &false_case = to_array_string_expr(if_expr.false_case());
+    add_unknown_dependency(true_case);
+    add_unknown_dependency(false_case);
+    return;
+  }
   string_nodet &string_node = get_node(e);
   string_node.depends_on_unknown_builtin_function = true;
 }
 
 static void add_unknown_dependency_to_string_subexprs(
-  string_dependencest &dependencies,
+  string_dependenciest &dependencies,
   const function_application_exprt &fun_app,
   array_poolt &array_pool)
 {
@@ -256,11 +473,11 @@ static void add_unknown_dependency_to_string_subexprs(
   {
     std::for_each(
       expr.depth_begin(), expr.depth_end(), [&](const exprt &e) { // NOLINT
-        const auto &string_struct = expr_try_dynamic_cast<struct_exprt>(e);
-        if(string_struct && string_struct->operands().size() == 2)
+        if(is_refined_string_type(e.type()))
         {
+          const auto &string_struct = expr_checked_cast<struct_exprt>(e);
           const array_string_exprt string =
-            array_pool.find(string_struct->op1(), string_struct->op0());
+            array_pool.find(string_struct.op1(), string_struct.op0());
           dependencies.add_unknown_dependency(string);
         }
       });
@@ -268,9 +485,9 @@ static void add_unknown_dependency_to_string_subexprs(
 }
 
 static void add_dependency_to_string_subexprs(
-  string_dependencest &dependencies,
+  string_dependenciest &dependencies,
   const function_application_exprt &fun_app,
-  const string_dependencest::builtin_function_nodet &builtin_function_node,
+  const string_dependenciest::builtin_function_nodet &builtin_function_node,
   array_poolt &array_pool)
 {
   PRECONDITION(fun_app.arguments()[0].type().id() != ID_pointer);
@@ -290,65 +507,49 @@ static void add_dependency_to_string_subexprs(
       expr.depth_begin(),
       expr.depth_end(),
       [&](const exprt &e) { // NOLINT
-        if(const auto structure = expr_try_dynamic_cast<struct_exprt>(e))
+        if(is_refined_string_type(e.type()))
         {
-          const array_string_exprt string = array_pool.of_argument(*structure);
+          const auto string_struct = expr_checked_cast<struct_exprt>(e);
+          const auto string = array_pool.of_argument(string_struct);
           dependencies.add_dependency(string, builtin_function_node);
         }
       });
   }
 }
 
-string_dependencest::node_indext string_dependencest::size() const
+optionalt<exprt> string_dependenciest::eval(
+  const array_string_exprt &s,
+  const std::function<exprt(const exprt &)> &get_value) const
 {
-  return builtin_function_nodes.size() + string_nodes.size();
-}
+  const auto &it = node_index_pool.find(s);
+  if(it == node_index_pool.end())
+    return {};
 
-/// Convert an index of a string node in `string_nodes` to the node_indext for
-/// the same node
-static std::size_t string_index_to_node_index(const std::size_t string_index)
-{
-  return 2 * string_index + 1;
-}
+  if(eval_string_cache[it->second])
+    return eval_string_cache[it->second];
 
-/// Convert an index of a builtin function node to the node_indext for
-/// the same node
-static std::size_t
-builtin_function_index_to_node_index(const std::size_t builtin_index)
-{
-  return 2 * builtin_index;
-}
-
-string_dependencest::node_indext
-string_dependencest::node_index(const builtin_function_nodet &n) const
-{
-  return builtin_function_index_to_node_index(n.index);
-}
-
-string_dependencest::node_indext
-string_dependencest::node_index(const array_string_exprt &s) const
-{
-  return string_index_to_node_index(node_index_pool.at(s));
-}
-
-optionalt<string_dependencest::builtin_function_nodet>
-string_dependencest::get_builtin_function_node(node_indext i) const
-{
-  if(i % 2 == 0)
-    return builtin_function_nodet(i / 2);
+  const auto node = string_nodes[it->second];
+  const auto &f = node.result_from;
+  if(
+    f && node.dependencies.size() == 1 &&
+    !node.depends_on_unknown_builtin_function)
+  {
+    const auto value_opt = get_builtin_function(*f).eval(get_value);
+    eval_string_cache[it->second] = value_opt;
+    return value_opt;
+  }
   return {};
 }
 
-optionalt<string_dependencest::string_nodet>
-string_dependencest::get_string_node(node_indext i) const
+void string_dependenciest::clean_cache()
 {
-  if(i % 2 == 1 && i / 2 < string_nodes.size())
-    return string_nodes[i / 2];
-  return {};
+  eval_string_cache.resize(string_nodes.size());
+  for(auto &e : eval_string_cache)
+    e.reset();
 }
 
 bool add_node(
-  string_dependencest &dependencies,
+  string_dependenciest &dependencies,
   const equal_exprt &equation,
   array_poolt &array_pool)
 {
@@ -372,7 +573,11 @@ bool add_node(
   if(
     const auto &string_result =
       dependencies.get_builtin_function(builtin_function_node).string_result())
+  {
     dependencies.add_dependency(*string_result, builtin_function_node);
+    auto &node = dependencies.get_node(*string_result);
+    node.result_from = builtin_function_node;
+  }
   else
     add_dependency_to_string_subexprs(
       dependencies, *fun_app, builtin_function_node, array_pool);
@@ -380,51 +585,59 @@ bool add_node(
   return true;
 }
 
-void string_dependencest::for_each_successor(
-  const std::size_t &i,
-  const std::function<void(const std::size_t &)> &f) const
+void string_dependenciest::for_each_successor(
+  const nodet &node,
+  const std::function<void(const nodet &)> &f) const
 {
-  if(const auto &builtin_function_node = get_builtin_function_node(i))
+  if(node.kind == nodet::BUILTIN)
   {
-    const string_builtin_functiont &p =
-      get_builtin_function(*builtin_function_node);
-    std::for_each(
-      p.string_arguments().begin(),
-      p.string_arguments().end(),
-      [&](const array_string_exprt &s) { f(node_index(s)); });
+    const auto &builtin = builtin_function_nodes[node.index];
+    for(const auto &s : builtin->string_arguments())
+    {
+      if(const auto node = node_at(s))
+        f(nodet(*node));
+    }
   }
-  else if(const auto &s = get_string_node(i))
+  else if(node.kind == nodet::STRING)
   {
+    const auto &s_node = string_nodes[node.index];
     std::for_each(
-      s->dependencies.begin(),
-      s->dependencies.end(),
-      [&](const builtin_function_nodet &p) { f(node_index(p)); });
+      s_node.dependencies.begin(),
+      s_node.dependencies.end(),
+      [&](const builtin_function_nodet &p) { f(nodet(p)); });
   }
   else
     UNREACHABLE;
 }
 
-void string_dependencest::output_dot(std::ostream &stream) const
+void string_dependenciest::for_each_node(
+  const std::function<void(const nodet &)> &f) const
 {
-  const auto for_each_node =
-    [&](const std::function<void(const std::size_t &)> &f) { // NOLINT
-      for(std::size_t i = 0; i < string_nodes.size(); ++i)
-        f(string_index_to_node_index(i));
-      for(std::size_t i = 0; i < builtin_function_nodes.size(); ++i)
-        f(builtin_function_index_to_node_index(i));
+  for(const auto string_node : string_nodes)
+    f(nodet(string_node));
+  for(std::size_t i = 0; i < builtin_function_nodes.size(); ++i)
+    f(nodet(builtin_function_nodet(i)));
+}
+
+void string_dependenciest::output_dot(std::ostream &stream) const
+{
+  const auto for_each =
+    [&](const std::function<void(const nodet &)> &f) { // NOLINT
+      for_each_node(f);
     };
-
-  const auto for_each_succ = [&](
-    const std::size_t &i,
-    const std::function<void(const std::size_t &)> &f) { // NOLINT
-    for_each_successor(i, f);
-  };
-
-  const auto node_to_string = [&](const std::size_t &i) { // NOLINT
-    return std::to_string(i);
+  const auto for_each_succ =
+    [&](const nodet &n, const std::function<void(const nodet &)> &f) { // NOLINT
+      for_each_successor(n, f);
+    };
+  const auto node_to_string = [&](const nodet &n) { // NOLINT
+    std::stringstream ostream;
+    if(n.kind == nodet::BUILTIN)
+      ostream << builtin_function_nodes[n.index]->name() << n.index;
+    else
+      ostream << '"' << format(string_nodes[n.index].expr) << '"';
+    return ostream.str();
   };
   stream << "digraph dependencies {\n";
-  output_dot_generic<std::size_t>(
-    stream, for_each_node, for_each_succ, node_to_string);
+  output_dot_generic<nodet>(stream, for_each, for_each_succ, node_to_string);
   stream << '}' << std::endl;
 }

@@ -44,10 +44,11 @@ private:
   };
 public:
   /// string_refinementt constructor arguments
-  struct infot:
-    public bv_refinementt::infot,
-    public string_constraint_generatort::infot,
-    public configt { };
+  struct infot : public bv_refinementt::infot,
+                 public string_constraint_generatort::infot,
+                 public configt
+  {
+  };
 
   explicit string_refinementt(const infot &);
 
@@ -83,6 +84,8 @@ private:
   union_find_replacet symbol_resolve;
 
   std::vector<equal_exprt> equations;
+
+  string_dependenciest dependencies;
 
   void add_lemma(const exprt &lemma, bool simplify_lemma = true);
 };

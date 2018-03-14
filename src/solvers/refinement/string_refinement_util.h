@@ -145,8 +145,8 @@ private:
 class string_builtin_functiont
 {
 public:
-  string_builtin_functiont() = default;
   string_builtin_functiont(const string_builtin_functiont &) = delete;
+  virtual ~string_builtin_functiont() = default;
 
   virtual optionalt<array_string_exprt> string_result() const
   {
@@ -157,6 +157,14 @@ public:
   {
     return {};
   }
+
+  virtual optionalt<exprt>
+  eval(const std::function<exprt(const exprt &)> &get_value) const = 0;
+
+  virtual std::string name() const = 0;
+
+protected:
+  string_builtin_functiont() = default;
 };
 
 /// String builtin_function transforming one string into another
@@ -167,6 +175,12 @@ public:
   array_string_exprt input;
   std::vector<exprt> args;
   exprt return_code;
+
+  /// Constructor from arguments of a function application
+  string_transformation_builtin_functiont(
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool);
+
   optionalt<array_string_exprt> string_result() const override
   {
     return result;
@@ -174,6 +188,36 @@ public:
   std::vector<array_string_exprt> string_arguments() const override
   {
     return {input};
+  }
+
+  /// Evaluate the result from a concrete valuation of the arguments
+  virtual std::vector<mp_integer> eval(
+    const std::vector<mp_integer> &input_value,
+    const std::vector<mp_integer> &args_value) const = 0;
+
+  optionalt<exprt>
+  eval(const std::function<exprt(const exprt &)> &get_value) const override;
+};
+
+/// Adding a character at the end of a string
+class string_concat_char_builtin_functiont
+  : public string_transformation_builtin_functiont
+{
+public:
+  string_concat_char_builtin_functiont(
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool)
+    : string_transformation_builtin_functiont(fun_args, array_pool)
+  {
+  }
+
+  std::vector<mp_integer> eval(
+    const std::vector<mp_integer> &input_value,
+    const std::vector<mp_integer> &args_value) const override;
+
+  std::string name() const override
+  {
+    return "concat_char";
   }
 };
 
@@ -199,6 +243,42 @@ public:
   std::vector<array_string_exprt> string_arguments() const override
   {
     return {input1, input2};
+  }
+
+  /// Evaluate the result from a concrete valuation of the arguments
+  virtual std::vector<mp_integer> eval(
+    const std::vector<mp_integer> &input1_value,
+    const std::vector<mp_integer> &input2_value,
+    const std::vector<mp_integer> &args_value) const;
+
+  optionalt<exprt>
+  eval(const std::function<exprt(const exprt &)> &get_value) const override;
+
+  std::string name() const override
+  {
+    return "insert";
+  }
+
+protected:
+  string_insertion_builtin_functiont() = default;
+};
+
+class string_concatenation_builtin_functiont final
+  : public string_insertion_builtin_functiont
+{
+public:
+  string_concatenation_builtin_functiont(
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool);
+
+  std::vector<mp_integer> eval(
+    const std::vector<mp_integer> &input1_value,
+    const std::vector<mp_integer> &input2_value,
+    const std::vector<mp_integer> &args_value) const override;
+
+  std::string name() const override
+  {
+    return "concat";
   }
 };
 
@@ -230,9 +310,9 @@ public:
 };
 
 /// Keep track of dependencies between strings.
-/// Each string points to builtin_function calls on which it depends,
-/// each builtin_function points to the strings on which the result depend.
-class string_dependencest
+/// Each string points to the builtin_function calls on which it depends.
+/// Each builtin_function points to the strings on which the result depends.
+class string_dependenciest
 {
 public:
   /// A builtin_function node is just an index in the `builtin_function_nodes`
@@ -250,13 +330,27 @@ public:
   class string_nodet
   {
   public:
+    // expression the node corresponds to
+    array_string_exprt expr;
+    // index in the string_nodes vector
+    std::size_t index;
+    // builtin functions on which it depends
     std::vector<builtin_function_nodet> dependencies;
-
+    // builtin function of which it is the result
+    optionalt<builtin_function_nodet> result_from;
     // In case it depends on a builtin_function we don't support yet
     bool depends_on_unknown_builtin_function = false;
+
+    explicit string_nodet(array_string_exprt e, const std::size_t index)
+      : expr(std::move(e)), index(index)
+    {
+    }
   };
 
   string_nodet &get_node(const array_string_exprt &e);
+
+  std::unique_ptr<const string_nodet>
+  node_at(const array_string_exprt &e) const;
 
   /// `builtin_function` is reset to an empty pointer after the node is created
   builtin_function_nodet
@@ -266,13 +360,26 @@ public:
   const string_builtin_functiont &
   get_builtin_function(const builtin_function_nodet &node) const;
 
-  /// Add edge from node for `e` to node for `builtin_function`
+  /// Add edge from node for `e` to node for `builtin_function` if `e` is a
+  /// simple array expression. If it is an `if_exprt` we add the sub-expressions
+  /// that are not `if_exprt`s instead.
   void add_dependency(
     const array_string_exprt &e,
     const builtin_function_nodet &builtin_function);
 
   /// Mark node for `e` as depending on unknown builtin_function
   void add_unknown_dependency(const array_string_exprt &e);
+
+  /// Attempt to evaluate the given string from the dependencies and valuation
+  /// of strings on which it depends
+  /// Warning: eval uses a cache which must be cleaned everytime the valuations
+  /// given by get_value can change.
+  optionalt<exprt> eval(
+    const array_string_exprt &s,
+    const std::function<exprt(const exprt &)> &get_value) const;
+
+  /// Clean the cache used by `eval`
+  void clean_cache();
 
   void output_dot(std::ostream &stream) const;
 
@@ -288,38 +395,36 @@ private:
   std::unordered_map<array_string_exprt, std::size_t, irep_hash>
     node_index_pool;
 
-  /// Common index for all nodes (both strings and builtin_functions) so that we
-  /// can reuse generic algorithms of util/graph.h
-  /// Even indexes correspond to builtin_function nodes, odd indexes to string
-  /// nodes.
-  typedef std::size_t node_indext;
+  class nodet
+  {
+  public:
+    enum
+    {
+      BUILTIN,
+      STRING
+    } kind;
+    std::size_t index;
 
-  /// \return total number of nodes
-  node_indext size() const;
+    explicit nodet(const builtin_function_nodet &builtin)
+      : kind(BUILTIN), index(builtin.index)
+    {
+    }
 
-  /// \param n: builtin function node
-  /// \return index corresponding to builtin function node `n`
-  node_indext node_index(const builtin_function_nodet &n) const;
+    explicit nodet(const string_nodet &string_node)
+      : kind(STRING), index(string_node.index)
+    {
+    }
+  };
 
-  /// \param s: array expression representing a string
-  /// \return index corresponding to an string exprt s
-  node_indext node_index(const array_string_exprt &s) const;
+  mutable std::vector<optionalt<exprt>> eval_string_cache;
 
-  /// \param i: index of a node
-  /// \return corresponding node if the index corresponds to a builtin function
-  ///   node, empty optional otherwise
-  optionalt<builtin_function_nodet>
-  get_builtin_function_node(node_indext i) const;
+  /// Applies `f` on all nodes
+  void for_each_node(const std::function<void(const nodet &)> &f) const;
 
-  /// \param i: index of a node
-  /// \return corresponding node if the index corresponds to a string
-  ///   node, empty optional otherwise
-  optionalt<string_nodet> get_string_node(node_indext i) const;
-
-  /// Applies `f` on all successors of the node with index `i`
+  /// Applies `f` on all successors of the node n
   void for_each_successor(
-    const node_indext &i,
-    const std::function<void(const node_indext &)> &f) const;
+    const nodet &i,
+    const std::function<void(const nodet &)> &f) const;
 };
 
 /// When right hand side of equation is a builtin_function add
@@ -336,7 +441,7 @@ private:
 ///   the right hand side is not a function application
 /// \todo there should be a class with just the three functions we require here
 bool add_node(
-  string_dependencest &dependencies,
+  string_dependenciest &dependencies,
   const equal_exprt &equation,
   array_poolt &array_pool);
 

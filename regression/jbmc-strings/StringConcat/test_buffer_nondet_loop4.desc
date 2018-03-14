@@ -1,0 +1,14 @@
+FUTURE
+Test.class
+--refine-strings --string-max-length 1000 --string-max-input-length 100 --function Test.bufferNonDetLoop4 --depth 10000 --unwind 5  --verbosity 10 --property "java::Test.bufferNonDetLoop4:(IILjava/lang/String;)Ljava/lang/String;.assertion.1"
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+check_SAT: got SAT but the model is not correct
+--
+Using the string dependences information to compute the model, refinement
+should not be needed when the execution is deterministic.
+
+This test seems to fail with AppVeyor, we should make sure it works
+once TG-2608 is done.
