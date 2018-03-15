@@ -18,8 +18,10 @@ static array_string_exprt make_string(
 
 string_transformation_builtin_functiont::
   string_transformation_builtin_functiont(
+    const exprt &return_code,
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool)
+  : string_builtin_functiont(return_code)
 {
   PRECONDITION(fun_args.size() > 2);
   const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
@@ -55,8 +57,10 @@ optionalt<exprt> string_transformation_builtin_functiont::eval(
 }
 
 string_insertion_builtin_functiont::string_insertion_builtin_functiont(
+  const exprt &return_code,
   const std::vector<exprt> &fun_args,
   array_poolt &array_pool)
+  : string_builtin_functiont(return_code)
 {
   PRECONDITION(fun_args.size() > 4);
   const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
@@ -69,8 +73,10 @@ string_insertion_builtin_functiont::string_insertion_builtin_functiont(
 }
 
 string_concatenation_builtin_functiont::string_concatenation_builtin_functiont(
+  const exprt &return_code,
   const std::vector<exprt> &fun_args,
   array_poolt &array_pool)
+  : string_insertion_builtin_functiont(return_code)
 {
   PRECONDITION(fun_args.size() >= 4 && fun_args.size() <= 6);
   const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
@@ -209,9 +215,10 @@ optionalt<exprt> string_insertion_builtin_functiont::eval(
 }
 
 string_builtin_function_with_no_evalt::string_builtin_function_with_no_evalt(
+  const exprt &return_code,
   const function_application_exprt &f,
   array_poolt &array_pool)
-  : function_application(f)
+  : string_builtin_functiont(return_code), function_application(f)
 {
   const std::vector<exprt> &fun_args = f.arguments();
   std::size_t i = 0;

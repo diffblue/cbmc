@@ -167,6 +167,7 @@ equation_symbol_mappingt::find_equations(const exprt &expr)
 /// \return a unique pointer to the created object
 static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
   const function_application_exprt &fun_app,
+  const exprt &return_code,
   array_poolt &array_pool)
 {
   const auto name = expr_checked_cast<symbol_exprt>(fun_app.function());
@@ -175,18 +176,18 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
 
   if(id == ID_cprover_string_insert_func)
     return util_make_unique<string_insertion_builtin_functiont>(
-      fun_app.arguments(), array_pool);
+      return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_concat_func)
     return util_make_unique<string_concatenation_builtin_functiont>(
-      fun_app.arguments(), array_pool);
+      return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_concat_char_func)
     return util_make_unique<string_concat_char_builtin_functiont>(
-      fun_app.arguments(), array_pool);
+      return_code, fun_app.arguments(), array_pool);
 
   return util_make_unique<string_builtin_function_with_no_evalt>(
-    fun_app.arguments(), array_pool);
+    return_code, fun_app, array_pool);
 }
 
 string_dependenciest::string_nodet &
@@ -322,7 +323,9 @@ bool add_node(
   if(!fun_app)
     return false;
 
-  auto builtin_function = to_string_builtin_function(*fun_app, array_pool);
+  auto builtin_function =
+    to_string_builtin_function(*fun_app, equation.lhs(), array_pool);
+
   CHECK_RETURN(builtin_function != nullptr);
   const auto &builtin_function_node = dependencies.make_node(builtin_function);
   // Warning: `builtin_function` has been emptied and should not be used anymore

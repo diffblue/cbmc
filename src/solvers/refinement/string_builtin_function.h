@@ -38,8 +38,16 @@ public:
   virtual exprt
   add_constraints(string_constraint_generatort &constraint_generator) const = 0;
 
-protected:
+  exprt return_code;
+
+private:
   string_builtin_functiont() = default;
+
+protected:
+  explicit string_builtin_functiont(const exprt &return_code)
+    : return_code(return_code)
+  {
+  }
 };
 
 /// String builtin_function transforming one string into another
@@ -49,7 +57,6 @@ public:
   array_string_exprt result;
   array_string_exprt input;
   std::vector<exprt> args;
-  exprt return_code;
 
   /// Constructor from arguments of a function application.
   /// The arguments in `fun_args` should be in order:
@@ -57,6 +64,7 @@ public:
   /// a string `arg1` of type refined_string_typet, and potentially some
   /// arguments of primitive types.
   string_transformation_builtin_functiont(
+    const exprt &return_code,
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool);
 
@@ -88,9 +96,10 @@ public:
   /// an integer `result.length`, a character pointer `&result[0]`,
   /// a string `arg1` of type refined_string_typet, and a character.
   string_concat_char_builtin_functiont(
+    const exprt &return_code,
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool)
-    : string_transformation_builtin_functiont(fun_args, array_pool)
+    : string_transformation_builtin_functiont(return_code, fun_args, array_pool)
   {
   }
 
@@ -117,7 +126,6 @@ public:
   array_string_exprt input1;
   array_string_exprt input2;
   std::vector<exprt> args;
-  exprt return_code;
 
   /// Constructor from arguments of a function application.
   /// The arguments in `fun_args` should be in order:
@@ -126,6 +134,7 @@ public:
   /// a string `arg2` of type refined_string_typet,
   /// and potentially some arguments of primitive types.
   string_insertion_builtin_functiont(
+    const exprt &return_code,
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool);
 
@@ -162,7 +171,10 @@ public:
   };
 
 protected:
-  string_insertion_builtin_functiont() = default;
+  explicit string_insertion_builtin_functiont(const exprt &return_code)
+    : string_builtin_functiont(return_code)
+  {
+  }
 };
 
 class string_concatenation_builtin_functiont final
@@ -176,6 +188,7 @@ public:
   /// a string `arg2` of type refined_string_typet,
   /// optionally followed by an integer `start` and an integer `end`.
   string_concatenation_builtin_functiont(
+    const exprt &return_code,
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool);
 
@@ -240,6 +253,7 @@ public:
   std::vector<exprt> args;
 
   string_builtin_function_with_no_evalt(
+    const exprt &return_code,
     const function_application_exprt &f,
     array_poolt &array_pool);
 
