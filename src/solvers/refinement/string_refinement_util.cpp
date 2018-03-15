@@ -250,41 +250,6 @@ void string_dependenciest::add_dependency(
   string_node.dependencies.push_back(builtin_function_node);
 }
 
-void string_dependenciest::add_unknown_dependency(const array_string_exprt &e)
-{
-  if(e.id() == ID_if)
-  {
-    const auto if_expr = to_if_expr(e);
-    const auto &true_case = to_array_string_expr(if_expr.true_case());
-    const auto &false_case = to_array_string_expr(if_expr.false_case());
-    add_unknown_dependency(true_case);
-    add_unknown_dependency(false_case);
-    return;
-  }
-  string_nodet &string_node = get_node(e);
-  string_node.depends_on_unknown_builtin_function = true;
-}
-
-static void add_unknown_dependency_to_string_subexprs(
-  string_dependenciest &dependencies,
-  const function_application_exprt &fun_app,
-  array_poolt &array_pool)
-{
-  for(const auto &expr : fun_app.arguments())
-  {
-    std::for_each(
-      expr.depth_begin(), expr.depth_end(), [&](const exprt &e) { // NOLINT
-        if(is_refined_string_type(e.type()))
-        {
-          const auto &string_struct = expr_checked_cast<struct_exprt>(e);
-          const array_string_exprt string =
-            array_pool.find(string_struct.op1(), string_struct.op0());
-          dependencies.add_unknown_dependency(string);
-        }
-      });
-  }
-}
-
 static void add_dependency_to_string_subexprs(
   string_dependenciest &dependencies,
   const function_application_exprt &fun_app,
@@ -331,9 +296,7 @@ optionalt<exprt> string_dependenciest::eval(
 
   const auto node = string_nodes[it->second];
   const auto &f = node.result_from;
-  if(
-    f && node.dependencies.size() == 1 &&
-    !node.depends_on_unknown_builtin_function)
+  if(f && node.dependencies.size() == 1)
   {
     const auto value_opt = get_builtin_function(*f).eval(get_value);
     eval_string_cache[it->second] = value_opt;
@@ -360,14 +323,7 @@ bool add_node(
     return false;
 
   auto builtin_function = to_string_builtin_function(*fun_app, array_pool);
-
-  if(!builtin_function)
-  {
-    add_unknown_dependency_to_string_subexprs(
-      dependencies, *fun_app, array_pool);
-    return true;
-  }
-
+  CHECK_RETURN(builtin_function != nullptr);
   const auto &builtin_function_node = dependencies.make_node(builtin_function);
   // Warning: `builtin_function` has been emptied and should not be used anymore
 

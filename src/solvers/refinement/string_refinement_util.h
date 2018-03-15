@@ -172,8 +172,6 @@ public:
     std::vector<builtin_function_nodet> dependencies;
     // builtin function of which it is the result
     optionalt<builtin_function_nodet> result_from;
-    // In case it depends on a builtin_function we don't support yet
-    bool depends_on_unknown_builtin_function = false;
 
     explicit string_nodet(array_string_exprt e, const std::size_t index)
       : expr(std::move(e)), index(index)
@@ -200,9 +198,6 @@ public:
   void add_dependency(
     const array_string_exprt &e,
     const builtin_function_nodet &builtin_function);
-
-  /// Mark node for `e` as depending on unknown builtin_function
-  void add_unknown_dependency(const array_string_exprt &e);
 
   /// Attempt to evaluate the given string from the dependencies and valuation
   /// of strings on which it depends
