@@ -176,8 +176,8 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
                                          : name.get_identifier();
 
   if(id == ID_cprover_string_insert_func)
-    return std::unique_ptr<string_builtin_functiont>(
-      new string_insertion_builtin_functiont(fun_app.arguments(), array_pool));
+    return util_make_unique<string_insertion_builtin_functiont>(
+      fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_concat_func)
     return util_make_unique<string_concatenation_builtin_functiont>(

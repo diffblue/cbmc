@@ -208,6 +208,11 @@ public:
   optionalt<array_string_exprt> string_res;
   std::vector<array_string_exprt> string_args;
   std::vector<exprt> args;
+
+  string_builtin_function_with_no_evalt(
+    const function_application_exprt &f,
+    array_poolt &array_pool);
+
   std::string name() const override
   {
     return id2string(function_application.id());
