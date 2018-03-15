@@ -98,16 +98,14 @@ exprt string_constraint_generatort::add_axioms_for_substring(
 }
 
 /// Add axioms ensuring that `res` corresponds to the substring of `str`
-/// between indexes `start` and `end`.
+/// between indexes `start' = max(start, 0)` and
+/// `end' = max(min(end, |str|), start')`.
 ///
 /// These axioms are:
-///   1. \f$ {\tt start} < {\tt end} \Rightarrow
-///          |{\tt res}| = {\tt end} - {\tt start} \f$
-///   2. \f$ {\tt start} \ge {\tt end} \Rightarrow |{\tt res}| = 0 \f$
-///   3. \f$ |{\tt str}| > {\tt end} \f$
-///   4. \f$ \forall i<|{\tt str}|.\ {\tt res}[i]={\tt str}[{\tt start}+i] \f$
-/// \todo Should return code different from 0 if `|str| <= |end|` instead of
-///       adding constraint 3.
+///   1. \f$ |{\tt res}| = end' - start' \f$
+///   2. \f$ \forall i<|{\tt res}|.\ {\tt res}[i]={\tt str}[{\tt start'}+i] \f$
+/// \todo Should return code different from 0 if `start' != start` or
+///       `end' != end`
 /// \param res: array of characters expression
 /// \param str: array of characters expression
 /// \param start: integer expression
@@ -123,26 +121,19 @@ exprt string_constraint_generatort::add_axioms_for_substring(
   PRECONDITION(start.type()==index_type);
   PRECONDITION(end.type()==index_type);
 
-  // We add axioms:
+  const exprt start1 = maximum(start, from_integer(0, start.type()));
+  const exprt end1 = maximum(minimum(end, str.length()), start1);
 
-  implies_exprt a1(
-    binary_relation_exprt(start, ID_lt, end),
-    res.axiom_for_has_length(minus_exprt(end, start)));
-  lemmas.push_back(a1);
+  // Axiom 1.
+  lemmas.push_back(equal_exprt(res.length(), minus_exprt(end1, start1)));
 
-  exprt is_empty=res.axiom_for_has_length(from_integer(0, index_type));
-  implies_exprt a2(binary_relation_exprt(start, ID_ge, end), is_empty);
-  lemmas.push_back(a2);
+  // Axiom 2.
+  constraints.push_back([&] { // NOLINT
+    const symbol_exprt idx = fresh_univ_index("QA_index_substring", index_type);
+    return string_constraintt(
+      idx, res.length(), equal_exprt(res[idx], str[plus_exprt(start1, idx)]));
+  }());
 
-  // Warning: check what to do if the string is not long enough
-  lemmas.push_back(str.axiom_for_length_ge(end));
-
-  symbol_exprt idx=fresh_univ_index("QA_index_substring", index_type);
-  string_constraintt a4(idx,
-                        res.length(),
-                        equal_exprt(res[idx],
-                        str[plus_exprt(start, idx)]));
-  constraints.push_back(a4);
   return from_integer(0, signedbv_typet(32));
 }
 

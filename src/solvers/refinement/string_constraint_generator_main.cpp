@@ -667,3 +667,8 @@ exprt minimum(const exprt &a, const exprt &b)
 {
   return if_exprt(binary_relation_exprt(a, ID_le, b), a, b);
 }
+
+exprt maximum(const exprt &a, const exprt &b)
+{
+  return if_exprt(binary_relation_exprt(a, ID_le, b), b, a);
+}
