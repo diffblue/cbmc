@@ -94,6 +94,7 @@ minisat2-download:
 	@rm -Rf ../minisat-2.2.1
 	@mv minisat2-2.2.1 ../minisat-2.2.1
 	@(cd ../minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch)
+	@(cd ../minisat-2.2.1; patch -p1 < ../scripts/minisat64.patch)
 	@rm minisat2_2.2.1.orig.tar.gz
 
 glucose-download:

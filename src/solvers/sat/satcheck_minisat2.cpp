@@ -319,7 +319,7 @@ bool satcheck_minisat2_baset<T>::is_in_conflict(literalt a) const
 {
   int v=a.var_no();
 
-  for(int i=0; i<solver->conflict.size(); i++)
+  for(std::size_t i=0; i<solver->conflict.size(); i++)
     if(var(solver->conflict[i])==v)
       return true;
 

@@ -1,0 +1,6 @@
+#if defined __clang__
+  #pragma clang diagnostic ignored "-Wstrict-aliasing"
+#elif defined __GNUC__
+  #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#elif defined _MSC_VER
+#endif
