@@ -148,6 +148,26 @@ public:
     return signedbv_typet(32);
   }
 
+  exprt add_axioms_for_concat_char(
+    const array_string_exprt &res,
+    const array_string_exprt &s1,
+    const exprt &c);
+  exprt add_axioms_for_concat(
+    const array_string_exprt &res,
+    const array_string_exprt &s1,
+    const array_string_exprt &s2);
+  exprt add_axioms_for_concat_substr(
+    const array_string_exprt &res,
+    const array_string_exprt &s1,
+    const array_string_exprt &s2,
+    const exprt &start_index,
+    const exprt &end_index);
+  exprt add_axioms_for_insert(
+    const array_string_exprt &res,
+    const array_string_exprt &s1,
+    const array_string_exprt &s2,
+    const exprt &offset);
+
 private:
   symbol_exprt fresh_boolean(const irep_idt &prefix);
   array_string_exprt
@@ -203,21 +223,7 @@ private:
   exprt add_axioms_for_empty_string(const function_application_exprt &f);
   exprt add_axioms_for_char_set(const function_application_exprt &f);
   exprt add_axioms_for_copy(const function_application_exprt &f);
-  exprt add_axioms_for_concat(
-    const array_string_exprt &res,
-    const array_string_exprt &s1,
-    const array_string_exprt &s2);
-  exprt add_axioms_for_concat_char(
-    const array_string_exprt &res,
-    const array_string_exprt &s1,
-    const exprt &c);
   exprt add_axioms_for_concat_char(const function_application_exprt &f);
-  exprt add_axioms_for_concat_substr(
-    const array_string_exprt &res,
-    const array_string_exprt &s1,
-    const array_string_exprt &s2,
-    const exprt &start_index,
-    const exprt &end_index);
   exprt add_axioms_for_concat(const function_application_exprt &f);
   exprt add_axioms_for_concat_code_point(const function_application_exprt &f);
   exprt add_axioms_for_constant(
@@ -244,11 +250,6 @@ private:
     const typet &index_type,
     const typet &char_type);
 
-  exprt add_axioms_for_insert(
-    const array_string_exprt &res,
-    const array_string_exprt &s1,
-    const array_string_exprt &s2,
-    const exprt &offset);
   exprt add_axioms_for_insert(const function_application_exprt &f);
   exprt add_axioms_for_insert_int(const function_application_exprt &f);
   exprt add_axioms_for_insert_bool(const function_application_exprt &f);

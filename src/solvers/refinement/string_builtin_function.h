@@ -7,6 +7,7 @@
 #include <vector>
 #include <util/optional.h>
 #include <util/string_expr.h>
+#include "string_constraint_generator.h"
 
 class array_poolt;
 
@@ -31,6 +32,11 @@ public:
   eval(const std::function<exprt(const exprt &)> &get_value) const = 0;
 
   virtual std::string name() const = 0;
+
+  /// Add constraints ensuring that the value of result expression of the
+  /// builtin function corresponds to the value of the function call.
+  virtual exprt
+  add_constraints(string_constraint_generatort &constraint_generator) const = 0;
 
 protected:
   string_builtin_functiont() = default;
@@ -96,6 +102,11 @@ public:
   {
     return "concat_char";
   }
+
+  exprt add_constraints(string_constraint_generatort &generator) const override
+  {
+    return generator.add_axioms_for_concat_char(result, input, args[0]);
+  };
 };
 
 /// String inserting a string into another one
@@ -141,6 +152,15 @@ public:
     return "insert";
   }
 
+  exprt add_constraints(string_constraint_generatort &generator) const override
+  {
+    if(args.size() == 1)
+      return generator.add_axioms_for_insert(result, input1, input2, args[0]);
+    if(args.size() == 3)
+      UNIMPLEMENTED;
+    UNREACHABLE;
+  };
+
 protected:
   string_insertion_builtin_functiont() = default;
 };
@@ -168,6 +188,16 @@ public:
   {
     return "concat";
   }
+
+  exprt add_constraints(string_constraint_generatort &generator) const override
+  {
+    if(args.size() == 0)
+      return generator.add_axioms_for_concat(result, input1, input2);
+    if(args.size() == 2)
+      return generator.add_axioms_for_concat_substr(
+        result, input1, input2, args[0], args[1]);
+    UNREACHABLE;
+  };
 };
 
 /// String creation from other types
@@ -231,6 +261,11 @@ public:
   {
     return {};
   }
+
+  exprt add_constraints(string_constraint_generatort &generator) const override
+  {
+    return generator.add_axioms_for_function_application(function_application);
+  };
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_BUILTIN_FUNCTION_H
