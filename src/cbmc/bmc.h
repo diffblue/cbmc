@@ -19,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/ui_message.h>
 
-#include <java_bytecode/java_enum_static_init_unwind_handler.h>
-
 #include <solvers/prop/prop.h>
 #include <solvers/prop/prop_conv.h>
 #include <solvers/sat/cnf.h>
