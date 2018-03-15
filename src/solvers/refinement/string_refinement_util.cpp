@@ -414,3 +414,10 @@ void string_dependenciest::output_dot(std::ostream &stream) const
   output_dot_generic<nodet>(stream, for_each, for_each_succ, node_to_string);
   stream << '}' << std::endl;
 }
+
+void string_dependenciest::add_constraints(
+  string_constraint_generatort &generator)
+{
+  for(const auto &builtin : builtin_function_nodes)
+    builtin->add_constraints(generator);
+}

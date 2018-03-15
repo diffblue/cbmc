@@ -212,6 +212,8 @@ public:
 
   void output_dot(std::ostream &stream) const;
 
+  void add_constraints(string_constraint_generatort &generatort);
+
 private:
   /// Set of nodes representing builtin_functions
   std::vector<std::unique_ptr<string_builtin_functiont>> builtin_function_nodes;
