@@ -164,9 +164,7 @@ equation_symbol_mappingt::find_equations(const exprt &expr)
 }
 
 /// Construct a string_builtin_functiont object from a function application
-/// \return a unique pointer to the created object, this unique pointer is empty
-///   if the function does not correspond to one of the supported
-///   builtin_functions.
+/// \return a unique pointer to the created object
 static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
   const function_application_exprt &fun_app,
   array_poolt &array_pool)
@@ -187,7 +185,8 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
     return util_make_unique<string_concat_char_builtin_functiont>(
       fun_app.arguments(), array_pool);
 
-  return {};
+  return util_make_unique<string_builtin_function_with_no_evalt>(
+    fun_app.arguments(), array_pool);
 }
 
 string_dependenciest::string_nodet &
