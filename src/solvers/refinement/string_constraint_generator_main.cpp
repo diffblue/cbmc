@@ -39,6 +39,11 @@ const std::vector<exprt> &string_constraint_generatort::get_lemmas() const
   return lemmas;
 }
 
+void string_constraint_generatort::add_lemma(const exprt &expr)
+{
+  lemmas.push_back(expr);
+}
+
 const std::vector<string_constraintt> &
 string_constraint_generatort::get_constraints() const
 {

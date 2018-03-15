@@ -419,5 +419,8 @@ void string_dependenciest::add_constraints(
   string_constraint_generatort &generator)
 {
   for(const auto &builtin : builtin_function_nodes)
-    builtin->add_constraints(generator);
+  {
+    const exprt return_value = builtin->add_constraints(generator);
+    generator.add_lemma(equal_exprt(return_value, builtin->return_code));
+  }
 }

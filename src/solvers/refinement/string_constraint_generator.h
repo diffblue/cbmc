@@ -105,6 +105,7 @@ public:
   /// Axioms are of three kinds: universally quantified string constraint,
   /// not contains string constraints and simple formulas.
   const std::vector<exprt> &get_lemmas() const;
+  void add_lemma(const exprt &);
   const std::vector<string_constraintt> &get_constraints() const;
   const std::vector<string_not_contains_constraintt> &
   get_not_contains_constraints() const;
