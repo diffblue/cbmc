@@ -197,4 +197,35 @@ public:
   }
 };
 
+/// Functions that are not yet supported in this class but are supported by
+/// string_constraint_generatort.
+/// \note Ultimately this should be disappear, once all builtin function have
+///       a corresponding string_builtin_functiont class.
+class string_builtin_function_with_no_evalt : public string_builtin_functiont
+{
+public:
+  function_application_exprt function_application;
+  optionalt<array_string_exprt> string_res;
+  std::vector<array_string_exprt> string_args;
+  std::vector<exprt> args;
+  std::string name() const override
+  {
+    return id2string(function_application.id());
+  }
+  std::vector<array_string_exprt> string_arguments() const override
+  {
+    return std::vector<array_string_exprt>(string_args);
+  }
+  optionalt<array_string_exprt> string_result() const override
+  {
+    return string_res;
+  }
+
+  optionalt<exprt>
+  eval(const std::function<exprt(const exprt &)> &get_value) const override
+  {
+    return {};
+  }
+};
+
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_BUILTIN_FUNCTION_H
