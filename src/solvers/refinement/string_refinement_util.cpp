@@ -210,28 +210,18 @@ string_dependenciest::node_at(const array_string_exprt &e) const
   return {};
 }
 
-string_dependenciest::builtin_function_nodet string_dependenciest::make_node(
+string_dependenciest::builtin_function_nodet &string_dependenciest::make_node(
   std::unique_ptr<string_builtin_functiont> &builtin_function)
 {
-  const builtin_function_nodet builtin_function_node(
-    builtin_function_nodes.size());
-  builtin_function_nodes.emplace_back();
-  builtin_function_nodes.back().swap(builtin_function);
-  return builtin_function_node;
+  builtin_function_nodes.emplace_back(
+    std::move(builtin_function), builtin_function_nodes.size());
+  return builtin_function_nodes.back();
 }
 
 const string_builtin_functiont &string_dependenciest::get_builtin_function(
   const builtin_function_nodet &node) const
 {
-  PRECONDITION(node.index < builtin_function_nodes.size());
-  return *(builtin_function_nodes[node.index]);
-}
-
-const std::vector<string_dependenciest::builtin_function_nodet> &
-string_dependenciest::dependencies(
-  const string_dependenciest::string_nodet &node) const
-{
-  return node.dependencies;
+  return *node.data;
 }
 
 void string_dependenciest::add_dependency(
@@ -248,7 +238,7 @@ void string_dependenciest::add_dependency(
     return;
   }
   string_nodet &string_node = get_node(e);
-  string_node.dependencies.push_back(builtin_function_node);
+  string_node.dependencies.push_back(builtin_function_node.index);
 }
 
 static void add_dependency_to_string_subexprs(
@@ -299,7 +289,7 @@ optionalt<exprt> string_dependenciest::eval(
   const auto &f = node.result_from;
   if(f && node.dependencies.size() == 1)
   {
-    const auto value_opt = get_builtin_function(*f).eval(get_value);
+    const auto value_opt = builtin_function_nodes[*f].data->eval(get_value);
     eval_string_cache[it->second] = value_opt;
     return value_opt;
   }
@@ -336,7 +326,7 @@ bool add_node(
   {
     dependencies.add_dependency(*string_result, builtin_function_node);
     auto &node = dependencies.get_node(*string_result);
-    node.result_from = builtin_function_node;
+    node.result_from = builtin_function_node.index;
   }
   else
     add_dependency_to_string_subexprs(
@@ -352,7 +342,7 @@ void string_dependenciest::for_each_successor(
   if(node.kind == nodet::BUILTIN)
   {
     const auto &builtin = builtin_function_nodes[node.index];
-    for(const auto &s : builtin->string_arguments())
+    for(const auto &s : builtin.data->string_arguments())
     {
       std::vector<std::reference_wrapper<const exprt>> stack({s});
       while(!stack.empty())
@@ -377,7 +367,9 @@ void string_dependenciest::for_each_successor(
     std::for_each(
       s_node.dependencies.begin(),
       s_node.dependencies.end(),
-      [&](const builtin_function_nodet &p) { f(nodet(p)); });
+      [&](const std::size_t &index) { // NOLINT
+        f(nodet(builtin_function_nodes[index]));
+      });
   }
   else
     UNREACHABLE;
@@ -389,7 +381,7 @@ void string_dependenciest::for_each_node(
   for(const auto string_node : string_nodes)
     f(nodet(string_node));
   for(std::size_t i = 0; i < builtin_function_nodes.size(); ++i)
-    f(nodet(builtin_function_nodet(i)));
+    f(nodet(builtin_function_nodes[i]));
 }
 
 void string_dependenciest::output_dot(std::ostream &stream) const
@@ -405,7 +397,7 @@ void string_dependenciest::output_dot(std::ostream &stream) const
   const auto node_to_string = [&](const nodet &n) { // NOLINT
     std::stringstream ostream;
     if(n.kind == nodet::BUILTIN)
-      ostream << builtin_function_nodes[n.index]->name() << n.index;
+      ostream << builtin_function_nodes[n.index].data->name() << n.index;
     else
       ostream << '"' << format(string_nodes[n.index].expr) << '"';
     return ostream.str();
@@ -420,7 +412,7 @@ void string_dependenciest::add_constraints(
 {
   for(const auto &builtin : builtin_function_nodes)
   {
-    const exprt return_value = builtin->add_constraints(generator);
-    generator.add_lemma(equal_exprt(return_value, builtin->return_code));
+    const exprt return_value = builtin.data->add_constraints(generator);
+    generator.add_lemma(equal_exprt(return_value, builtin.data->return_code));
   }
 }

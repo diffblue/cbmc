@@ -149,13 +149,19 @@ private:
 class string_dependenciest
 {
 public:
-  /// A builtin_function node is just an index in the `builtin_function_nodes`
-  /// vector.
+  /// A builtin function node contains a builtin function call
   class builtin_function_nodet
   {
   public:
+    // index in the `builtin_function_nodes` vector
     std::size_t index;
-    explicit builtin_function_nodet(std::size_t i) : index(i)
+    // pointer to the builtin function
+    std::unique_ptr<string_builtin_functiont> data;
+
+    explicit builtin_function_nodet(
+      std::unique_ptr<string_builtin_functiont> d,
+      std::size_t i)
+      : index(i), data(std::move(d))
     {
     }
   };
@@ -168,10 +174,12 @@ public:
     array_string_exprt expr;
     // index in the string_nodes vector
     std::size_t index;
-    // builtin functions on which it depends
-    std::vector<builtin_function_nodet> dependencies;
+    // builtin functions on which it depends, refered by there index in
+    // builtin_function node vector.
+    // \todo should these we shared pointers?
+    std::vector<std::size_t> dependencies;
     // builtin function of which it is the result
-    optionalt<builtin_function_nodet> result_from;
+    optionalt<std::size_t> result_from;
 
     explicit string_nodet(array_string_exprt e, const std::size_t index)
       : expr(std::move(e)), index(index)
@@ -185,10 +193,8 @@ public:
   node_at(const array_string_exprt &e) const;
 
   /// `builtin_function` is reset to an empty pointer after the node is created
-  builtin_function_nodet
+  builtin_function_nodet &
   make_node(std::unique_ptr<string_builtin_functiont> &builtin_function);
-  const std::vector<builtin_function_nodet> &
-  dependencies(const string_nodet &node) const;
   const string_builtin_functiont &
   get_builtin_function(const builtin_function_nodet &node) const;
 
@@ -216,7 +222,7 @@ public:
 
 private:
   /// Set of nodes representing builtin_functions
-  std::vector<std::unique_ptr<string_builtin_functiont>> builtin_function_nodes;
+  std::vector<builtin_function_nodet> builtin_function_nodes;
 
   /// Set of nodes representing strings
   std::vector<string_nodet> string_nodes;
