@@ -436,4 +436,7 @@ size_t max_printed_string_length(const typet &type, unsigned long ul_radix);
 std::string
 utf16_constant_array_to_java(const array_exprt &arr, std::size_t length);
 
+/// \return expression representing the minimum of two expressions
+exprt minimum(const exprt &a, const exprt &b);
+
 #endif

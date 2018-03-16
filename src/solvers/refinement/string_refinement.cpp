@@ -772,17 +772,12 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       config_.use_counter_example,
       supert::config_.ui,
       symbol_resolve);
-    if(!satisfied)
-    {
-      for(const auto &counter : counter_examples)
-        add_lemma(counter);
-      debug() << "check_SAT: got SAT but the model is not correct" << eom;
-    }
-    else
+    if(satisfied)
     {
       debug() << "check_SAT: the model is correct" << eom;
       return resultt::D_SATISFIABLE;
     }
+    debug() << "check_SAT: got SAT but the model is not correct" << eom;
   }
   else
   {
@@ -821,19 +816,15 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         config_.use_counter_example,
         supert::config_.ui,
         symbol_resolve);
-      if(!satisfied)
-      {
-        for(const auto &counter : counter_examples)
-          add_lemma(counter);
-        debug() << "check_SAT: got SAT but the model is not correct" << eom;
-      }
-      else
+      if(satisfied)
       {
         debug() << "check_SAT: the model is correct" << eom;
         return resultt::D_SATISFIABLE;
       }
 
-      debug() <<  "refining..." << eom;
+      debug() << "check_SAT: got SAT but the model is not correct, refining..."
+              << eom;
+
       // Since the model is not correct although we got SAT, we need to refine
       // the property we are checking by adding more indices to the index set,
       // and instantiating universal formulas with this indices.
@@ -852,7 +843,12 @@ decision_proceduret::resultt string_refinementt::dec_solve()
           return resultt::D_ERROR;
         }
         else
-          debug() << "dec_solve: current index set is empty" << eom;
+        {
+          debug() << "dec_solve: current index set is empty, "
+                  << "adding counter examples" << eom;
+          for(const auto &counter : counter_examples)
+            add_lemma(counter);
+        }
       }
       current_constraints.clear();
       for(const auto &instance :
@@ -1553,10 +1549,12 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     const exprt &bound_inf=axiom.lower_bound();
     const exprt &bound_sup=axiom.upper_bound();
     const exprt &prem=axiom.premise();
+    INVARIANT(
+      prem == true_exprt(), "string constraint premises are not supported");
     const exprt &body=axiom.body();
 
     const string_constraintt axiom_in_model(
-      univ_var, get(bound_inf), get(bound_sup), get(prem), get(body));
+      univ_var, get(bound_inf), get(bound_sup), get(body));
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
     negaxiom = simplify_expr(negaxiom, ns);
@@ -1643,8 +1641,6 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     if(use_counter_example)
     {
-      stream << "Adding counter-examples: " << eom;
-
       std::vector<exprt> lemmas;
 
       for(const auto &v : violated)
@@ -1660,8 +1656,6 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
           binary_relation_exprt(from_integer(0, val.type()), ID_le, val));
         replace_expr(axiom.univ_var(), val, bounds);
         const implies_exprt counter(bounds, instance);
-
-        stream << "  -  " << format(counter) << eom;
         lemmas.push_back(counter);
       }
 
@@ -1678,8 +1672,6 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         indices.insert(std::pair<exprt, exprt>(comp_val, func_val));
         const exprt counter=::instantiate_not_contains(
           axiom, indices, generator)[0];
-
-        stream << "    -  " << format(counter) << eom;
         lemmas.push_back(counter);
       }
       return { false, lemmas };
@@ -1973,53 +1965,68 @@ static void add_to_index_set(
   }
 }
 
+/// Given an array access of the form \a s[i] assumed to be part of a formula
+/// \f$ \forall q < u. charconstraint \f$, initialize the index set of \a s
+/// so that:
+///   - \f$ i[q -> u - 1] \f$ appears in the index set of \a s if \a s is a
+///     symbol
+///   - if \a s is an array expression, all index from \a 0 to
+///     \f$ s.length - 1 \f$ are in the index set
+///   - if \a s is an if expression we apply this procedure to the true and
+///     false cases
+/// \param index_set: the index_set to initialize
+/// \param ns: namespace, used for simplifying indexes
+/// \param qvar: the quantified variable \a q
+/// \param upper_bound: bound \a u on the quantified variable
+/// \param s: expression representing a string
+/// \param i: expression representing the index at which \a s is accessed
+static void initial_index_set(
+  index_set_pairt &index_set,
+  const namespacet &ns,
+  const exprt &qvar,
+  const exprt &upper_bound,
+  const exprt &s,
+  const exprt &i)
+{
+  PRECONDITION(s.id() == ID_symbol || s.id() == ID_array || s.id() == ID_if);
+  if(s.id() == ID_array)
+  {
+    for(std::size_t j = 0; j < s.operands().size(); ++j)
+      add_to_index_set(index_set, ns, s, from_integer(j, i.type()));
+    return;
+  }
+  if(auto ite = expr_try_dynamic_cast<if_exprt>(s))
+  {
+    initial_index_set(index_set, ns, qvar, upper_bound, ite->true_case(), i);
+    initial_index_set(index_set, ns, qvar, upper_bound, ite->false_case(), i);
+    return;
+  }
+  const minus_exprt u_minus_1(upper_bound, from_integer(1, upper_bound.type()));
+  exprt i_copy = i;
+  replace_expr(qvar, u_minus_1, i_copy);
+  add_to_index_set(index_set, ns, s, i_copy);
+}
+
 static void initial_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
   const string_constraintt &axiom)
 {
   const symbol_exprt &qvar=axiom.univ_var();
-  std::list<exprt> to_process;
-  to_process.push_back(axiom.body());
-
-  while(!to_process.empty())
+  const auto &bound = axiom.upper_bound();
+  auto it = axiom.body().depth_begin();
+  const auto end = axiom.body().depth_end();
+  while(it != end)
   {
-    const exprt cur = to_process.back();
-    to_process.pop_back();
-    if(cur.id() == ID_index && is_char_type(cur.type()))
+    if(it->id() == ID_index && is_char_type(it->type()))
     {
-      const index_exprt &index_expr = to_index_expr(cur);
-      const exprt &s = index_expr.array();
-      const exprt &i = index_expr.index();
-
-      if(s.id() == ID_array)
-      {
-        for(std::size_t j = 0; j < s.operands().size(); ++j)
-          add_to_index_set(index_set, ns, s, from_integer(j, i.type()));
-      }
-      else
-      {
-        const bool has_quant_var = find_qvar(i, qvar);
-
-        // if cur is of the form s[i] and no quantified variable appears in i
-        if(!has_quant_var)
-        {
-          add_to_index_set(index_set, ns, s, i);
-        }
-        else
-        {
-          // otherwise we add k-1
-          exprt copy(i);
-          const minus_exprt kminus1(
-            axiom.upper_bound(), from_integer(1, axiom.upper_bound().type()));
-          replace_expr(qvar, kminus1, copy);
-          add_to_index_set(index_set, ns, s, copy);
-        }
-      }
+      const auto &index_expr = to_index_expr(*it);
+      const auto &s = index_expr.array();
+      initial_index_set(index_set, ns, qvar, bound, s, index_expr.index());
+      it.next_sibling_or_parent();
     }
     else
-      forall_operands(it, cur)
-        to_process.push_back(*it);
+      ++it;
   }
 }
 
@@ -2090,26 +2097,47 @@ static void update_index_set(
 /// Finds an index on `str` used in `expr` that contains `qvar`, for instance
 /// with arguments ``(str[k]=='a')``, `str`, and `k`, the function should
 /// return `k`.
+/// If two different such indexes exist, an invariant will fail.
 /// \param [in] expr: the expression to search
 /// \param [in] str: the string which must be indexed
 /// \param [in] qvar: the universal variable that must be in the index
-/// \return an index expression in `expr` on `str` containing `qvar`
-static exprt find_index(
-  const exprt &expr, const exprt &str, const symbol_exprt &qvar)
+/// \return an index expression in `expr` on `str` containing `qvar`. Returns
+///   an empty optional when `expr` does not contain `str`.
+static optionalt<exprt>
+find_index(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 {
-  const auto it=std::find_if(
-    expr.depth_begin(),
-    expr.depth_end(),
-    [&] (const exprt &e) -> bool
+  auto index_str_containing_qvar = [&](const exprt &e) { // NOLINT
+    if(auto index_expr = expr_try_dynamic_cast<index_exprt>(e))
     {
-      return e.id()==ID_index
-             && to_index_expr(e).array()==str
-             && find_qvar(to_index_expr(e).index(), qvar);
-    });
+      const auto &arr = index_expr->array();
+      const auto str_it = std::find(arr.depth_begin(), arr.depth_end(), str);
+      return str_it != arr.depth_end() && find_qvar(index_expr->index(), qvar);
+    }
+    return false;
+  };
 
-  return it==expr.depth_end()
-         ?nil_exprt()
-         :to_index_expr(*it).index();
+  auto it = std::find_if(
+    expr.depth_begin(), expr.depth_end(), index_str_containing_qvar);
+  if(it == expr.depth_end())
+    return {};
+  const exprt &index = to_index_expr(*it).index();
+
+  // Check that there are no two such indexes
+  it.next_sibling_or_parent();
+  while(it != expr.depth_end())
+  {
+    if(index_str_containing_qvar(*it))
+    {
+      INVARIANT(
+        to_index_expr(*it).index() == index,
+        "string should always be indexed by same value in a given formula");
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
+  }
+
+  return index;
 }
 
 /// Instantiates a string constraint by substituting the quantifiers.
@@ -2130,19 +2158,19 @@ static exprt instantiate(
   const exprt &str,
   const exprt &val)
 {
-  exprt idx=find_index(axiom.body(), str, axiom.univ_var());
-  if(idx.is_nil())
+  const optionalt<exprt> idx = find_index(axiom.body(), str, axiom.univ_var());
+  if(!idx.has_value())
     return true_exprt();
 
-  exprt r=compute_inverse_function(stream, axiom.univ_var(), val, idx);
-  implies_exprt instance(axiom.premise(), axiom.body());
+  const exprt r = compute_inverse_function(stream, axiom.univ_var(), val, *idx);
+  implies_exprt instance(
+    and_exprt(
+      binary_relation_exprt(axiom.univ_var(), ID_ge, axiom.lower_bound()),
+      binary_relation_exprt(axiom.univ_var(), ID_lt, axiom.upper_bound()),
+      axiom.premise()),
+    axiom.body());
   replace_expr(axiom.univ_var(), r, instance);
-  // We are not sure the index set contains only positive numbers
-  and_exprt bounds(
-    axiom.univ_within_bounds(),
-    binary_relation_exprt(from_integer(0, val.type()), ID_le, val));
-  replace_expr(axiom.univ_var(), r, bounds);
-  return implies_exprt(bounds, instance);
+  return instance;
 }
 
 /// Instantiates a quantified formula representing `not_contains` by

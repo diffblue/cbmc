@@ -65,7 +65,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 
   symbol_exprt n=fresh_univ_index("QA_index_of", index_type);
   string_constraintt a4(
-    n, lower_bound, index, contains, not_exprt(equal_exprt(str[n], c)));
+    n, lower_bound, index, implies_exprt(contains, notequal_exprt(str[n], c)));
   constraints.push_back(a4);
 
   symbol_exprt m=fresh_univ_index("QA_index_of", index_type);
@@ -73,8 +73,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
     m,
     lower_bound,
     str.length(),
-    not_exprt(contains),
-    not_exprt(equal_exprt(str[m], c)));
+    implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
   constraints.push_back(a5);
 
   return index;
@@ -130,8 +129,8 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   string_constraintt a3(
     qvar,
     needle.length(),
-    contains,
-    equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar]));
+    implies_exprt(
+      contains, equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar])));
   constraints.push_back(a3);
 
   // string_not contains_constraintt are formulas of the form:
@@ -221,7 +220,8 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
 
   symbol_exprt qvar=fresh_univ_index("QA_index_of_string", index_type);
   equal_exprt constr3(haystack[plus_exprt(qvar, offset)], needle[qvar]);
-  string_constraintt a3(qvar, needle.length(), contains, constr3);
+  const string_constraintt a3(
+    qvar, needle.length(), implies_exprt(contains, constr3));
   constraints.push_back(a3);
 
   // end_index is min(from_index, |str| - |substring|)
@@ -364,13 +364,14 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
     n,
     plus_exprt(index, index1),
     end_index,
-    contains,
-    notequal_exprt(str[n], c));
+    implies_exprt(contains, notequal_exprt(str[n], c)));
   constraints.push_back(a4);
 
   const symbol_exprt m = fresh_univ_index("QA_last_index_of2", index_type);
   const string_constraintt a5(
-    m, end_index, not_exprt(contains), notequal_exprt(str[m], c));
+    m,
+    end_index,
+    implies_exprt(not_exprt(contains), notequal_exprt(str[m], c)));
   constraints.push_back(a5);
 
   return index;
