@@ -1,0 +1,12 @@
+CORE
+Test.class
+--refine-strings --function Test.check
+^EXIT=10$
+^SIGNAL=0$
+assertion at file Test.java line 13 .*: SUCCESS
+assertion at file Test.java line 16 .*: FAILURE
+assertion at file Test.java line 27 .*: SUCCESS
+assertion at file Test.java line 30 .*: FAILURE
+assertion at file Test.java line 41 .*: SUCCESS
+assertion at file Test.java line 44 .*: FAILURE
+--
