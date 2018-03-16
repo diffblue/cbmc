@@ -249,7 +249,7 @@ void goto_checkt::div_by_zero_check(
 
   // add divison by zero subgoal
 
-  exprt zero=from_integer(0, expr.op1().type());
+  exprt zero=from_integer(0, ns.follow(expr.op1().type()));
 
   if(zero.is_nil())
     throw "no zero of argument type of operator "+expr.id_string();
