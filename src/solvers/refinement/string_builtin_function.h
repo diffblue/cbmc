@@ -40,6 +40,14 @@ public:
 
   exprt return_code;
 
+  /// Tells whether the builtin function can be a testing function, that is a
+  /// function that does not return a string, for instance like `equals`,
+  /// `indexOf` or `compare`.
+  virtual bool maybe_testing_function() const
+  {
+    return true;
+  }
+
 private:
   string_builtin_functiont() = default;
 
@@ -84,6 +92,11 @@ public:
 
   optionalt<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
+
+  bool maybe_testing_function() const override
+  {
+    return false;
+  }
 };
 
 /// Adding a character at the end of a string
@@ -170,6 +183,11 @@ public:
     UNREACHABLE;
   };
 
+  bool maybe_testing_function() const override
+  {
+    return false;
+  }
+
 protected:
   explicit string_insertion_builtin_functiont(const exprt &return_code)
     : string_builtin_functiont(return_code)
@@ -224,6 +242,11 @@ public:
   optionalt<array_string_exprt> string_result() const override
   {
     return result;
+  }
+
+  bool maybe_testing_function() const override
+  {
+    return false;
   }
 };
 
