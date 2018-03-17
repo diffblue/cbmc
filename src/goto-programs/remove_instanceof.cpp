@@ -14,8 +14,10 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "class_hierarchy.h"
 #include "class_identifier.h"
 
+#include <langapi/mode.h>
+#include <langapi/language.h>
+
 #include <util/fresh_symbol.h>
-#include <java_bytecode/java_types.h>
 
 #include <sstream>
 
@@ -94,18 +96,21 @@ std::size_t remove_instanceoft::lower_instanceof(
   // We actually insert the assignment instruction after the existing one.
   // This will briefly be ill-formed (use before def of instanceof_tmp) but the
   // two will subsequently switch places. This makes sure that the inserted
-  // assignement doesn't end up before any labels pointing at this instruction.
-  symbol_typet jlo=to_symbol_type(java_lang_object_type().subtype());
-  exprt object_clsid=get_class_identifier_field(check_ptr, jlo, ns);
+  // assignment doesn't end up before any labels pointing at this instruction.
+  const irep_idt &mode = get_mode_from_identifier(
+    ns, to_symbol_type(target_type).get_identifier());
+  const auto language = get_language_from_mode(mode);
+  CHECK_RETURN(language);
+  exprt object_clsid =
+    get_class_identifier_field(check_ptr, language->root_base_class_type(), ns);
 
-  symbolt &newsym=
-    get_fresh_aux_symbol(
-      object_clsid.type(),
-      "instanceof_tmp",
-      "instanceof_tmp",
-      source_locationt(),
-      ID_java,
-      symbol_table);
+  symbolt &newsym = get_fresh_aux_symbol(
+    object_clsid.type(),
+    "instanceof_tmp",
+    "instanceof_tmp",
+    source_locationt(),
+    mode,
+    symbol_table);
 
   auto newinst=goto_program.insert_after(this_inst);
   newinst->make_assignment();

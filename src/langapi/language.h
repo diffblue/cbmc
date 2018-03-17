@@ -137,6 +137,9 @@ public:
     exprt &expr,
     const namespacet &ns)=0;
 
+  /// returns the class type that contains RTTI
+  virtual symbol_typet root_base_class_type() = 0;
+
   virtual std::unique_ptr<languaget> new_language()=0;
 
   void set_should_generate_opaque_method_stubs(bool should_generate_stubs);
