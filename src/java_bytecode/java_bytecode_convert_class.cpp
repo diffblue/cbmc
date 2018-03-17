@@ -543,6 +543,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     symbol.base_name=symbol_type.get(ID_C_base_name);
     symbol.is_type=true;
     symbol.type = class_type;
+    symbol.mode = ID_java;
     symbol_table.add(symbol);
 
     // Also provide a clone method:
