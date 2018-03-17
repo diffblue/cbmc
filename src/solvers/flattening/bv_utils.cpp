@@ -482,26 +482,45 @@ bvt bv_utilst::shift(const bvt &src, const shiftt s, std::size_t dist)
   bvt result;
   result.resize(src.size());
 
+  // 'dist' is user-controlled, and thus arbitary.
+  // We thus must guard against the case in which i+dist overflows.
+  // We do so by considering the case dist>=src.size().
+
   for(std::size_t i=0; i<src.size(); i++)
   {
     literalt l;
 
     switch(s)
     {
-    case shiftt::LEFT:
+    case shiftt::SHIFT_LEFT:
+      // no underflow on i-dist because of condition dist<=i
       l=(dist<=i?src[i-dist]:const_literal(false));
       break;
 
-    case shiftt::ARIGHT:
-      l=(i+dist<src.size()?src[i+dist]:src[src.size()-1]); // sign bit
+    case shiftt::SHIFT_ARIGHT:
+      // src.size()-i won't underflow as i<src.size()
+      // Then, if dist<src.size()-i, then i+dist<src.size()
+      l=(dist<src.size()-i?src[i+dist]:src[src.size()-1]); // sign bit
       break;
 
-    case shiftt::LRIGHT:
-      l=(i+dist<src.size()?src[i+dist]:const_literal(false));
+    case shiftt::SHIFT_LRIGHT:
+      // src.size()-i won't underflow as i<src.size()
+      // Then, if dist<src.size()-i, then i+dist<src.size()
+      l=(dist<src.size()-i?src[i+dist]:const_literal(false));
+      break;
+
+    case shiftt::ROTATE_LEFT:
+      // prevent overflows by using dist%src.size()
+      l=src[(src.size()+i-(dist%src.size()))%src.size()];
+      break;
+
+    case shiftt::ROTATE_RIGHT:
+      // prevent overflows by using dist%src.size()
+      l=src[(i+(dist%src.size()))%src.size()];
       break;
 
     default:
-      assert(false);
+      UNREACHABLE;
     }
 
     result[i]=l;

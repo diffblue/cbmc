@@ -112,7 +112,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
 
     bvt bv_ext=bv_utils.extension(bv0, new_size, rep);
 
-    bvt result=bv_utils.shift(bv_ext, bv_utilst::shiftt::LEFT, bv1);
+    bvt result=bv_utils.shift(bv_ext, bv_utilst::shiftt::SHIFT_LEFT, bv1);
 
     // a negative shift is undefined; yet this isn't an overflow
     literalt neg_shift =

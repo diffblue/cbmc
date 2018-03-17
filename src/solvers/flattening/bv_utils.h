@@ -68,7 +68,11 @@ public:
   literalt overflow_sub(const bvt &op0, const bvt &op1, representationt rep);
   literalt carry_out(const bvt &op0, const bvt &op1, literalt carry_in);
 
-  enum class shiftt { LEFT, LRIGHT, ARIGHT };
+  enum class shiftt
+  {
+    SHIFT_LEFT, SHIFT_LRIGHT, SHIFT_ARIGHT, ROTATE_LEFT, ROTATE_RIGHT
+  };
+
   bvt shift(const bvt &op, const shiftt shift, std::size_t distance);
   bvt shift(const bvt &op, const shiftt shift, const bvt &distance);
 
