@@ -75,6 +75,10 @@ public:
     const typet &type,
     const bvt &literals);
 
+  void erase_literals(
+    const irep_idt &identifier,
+    const typet &type);
+
 protected:
   propt &prop;
   const namespacet &ns;

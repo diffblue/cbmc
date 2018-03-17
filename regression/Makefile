@@ -11,6 +11,7 @@ DIRS = cbmc \
        strings-smoke-tests \
        cbmc-cover \
        goto-instrument-typedef \
+       smt2_solver \
        strings \
        invariants \
        goto-diff \

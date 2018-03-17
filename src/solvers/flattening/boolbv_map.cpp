@@ -146,3 +146,10 @@ void boolbv_mapt::set_literals(
     mb.l=literal;
   }
 }
+
+void boolbv_mapt::erase_literals(
+  const irep_idt &identifier,
+  const typet &)
+{
+  mapping.erase(identifier);
+}

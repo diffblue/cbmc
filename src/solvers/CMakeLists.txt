@@ -1,3 +1,6 @@
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED true)
+
 #   We may use one of several different solver libraries.
 #   The following files wrap the chosen solver library.
 #   We remove them all from the solver-library sources list, and then add the
@@ -104,6 +107,10 @@ elseif("${sat_impl}" STREQUAL "glucose")
     target_link_libraries(solvers glucose-condensed)
 endif()
 
-target_link_libraries(solvers java_bytecode util)
+target_link_libraries(solvers util)
+
+# Executable
+add_executable(smt2_solver smt2/smt2_solver.cpp)
+target_link_libraries(smt2_solver solvers)
 
 generic_includes(solvers)
