@@ -16,6 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/resolve_inherited_component.h>
 
+#include <langapi/mode.h>
+#include <langapi/language.h>
+
 #include <util/c_types.h>
 #include <util/prefix.h>
 #include <util/type_eq.h>
@@ -317,6 +320,10 @@ void remove_virtual_functionst::get_child_functions_rec(
   if(findit==class_hierarchy.class_map.end())
     return;
 
+  const auto language = get_language_from_identifier(ns, this_id);
+  CHECK_RETURN(language);
+  const irep_idt root_base_class_type_name =
+    language->root_base_class_type().get_identifier();
   for(const auto &child : findit->second.children)
   {
     // Skip if we have already visited this and we found a function call that
@@ -326,7 +333,7 @@ void remove_virtual_functionst::get_child_functions_rec(
       it != entry_map.end() &&
       !has_prefix(
         id2string(it->second.symbol_expr.get_identifier()),
-        "java::java.lang.Object"))
+        id2string(root_base_class_type_name)))
     {
       continue;
     }
