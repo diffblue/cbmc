@@ -47,6 +47,7 @@ include ../common
 BUILTIN_FILES = \
   arm_builtin_headers.inc \
   clang_builtin_headers.inc \
+  cprover_builtin_headers.inc \
   cw_builtin_headers.inc \
   gcc_builtin_headers_alpha.inc \
   gcc_builtin_headers_arm.inc \
@@ -62,7 +63,8 @@ BUILTIN_FILES = \
   gcc_builtin_headers_power.inc \
   gcc_builtin_headers_tm.inc \
   gcc_builtin_headers_types.inc \
-  gcc_builtin_headers_ubsan.inc
+  gcc_builtin_headers_ubsan.inc \
+  windows_builtin_headers.inc
 
 CLEANFILES = ansi-c$(LIBEXT) \
   ansi_c_y.tab.h ansi_c_y.tab.cpp ansi_c_lex.yy.cpp ansi_c_y.tab.cpp.output \

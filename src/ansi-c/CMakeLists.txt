@@ -58,6 +58,7 @@ add_custom_target(library_check
 
 make_inc(arm_builtin_headers)
 make_inc(clang_builtin_headers)
+make_inc(cprover_builtin_headers)
 make_inc(cw_builtin_headers)
 make_inc(gcc_builtin_headers_alpha)
 make_inc(gcc_builtin_headers_arm)
@@ -74,11 +75,13 @@ make_inc(gcc_builtin_headers_power)
 make_inc(gcc_builtin_headers_tm)
 make_inc(gcc_builtin_headers_types)
 make_inc(gcc_builtin_headers_ubsan)
+make_inc(windows_builtin_headers)
 
 set(extra_dependencies
     ${CMAKE_CURRENT_BINARY_DIR}/arm_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/clang_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/cprover_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/cw_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_alpha.inc
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_arm.inc
@@ -95,6 +98,7 @@ set(extra_dependencies
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_tm.inc
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_types.inc
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_ubsan.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/windows_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
 )
 

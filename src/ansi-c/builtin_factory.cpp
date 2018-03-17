@@ -108,6 +108,10 @@ bool builtin_factory(
   ansi_c_internal_additions(code);
   s << code;
 
+  // our own extensions
+  if(find_pattern(pattern, cprover_builtin_headers, s))
+    return convert(identifier, s, symbol_table, mh);
+
   // this is Visual C/C++ only
   if(config.ansi_c.os==configt::ansi_ct::ost::OS_WIN)
   {
