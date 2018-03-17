@@ -19,6 +19,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include <goto-programs/remove_skip.h>
 
 #include <util/irep_ids.h>
+#include <util/invariant.h>
 
 /// Holds information about any discovered nondet methods, with extreme type-
 /// safety.
@@ -176,7 +177,7 @@ static goto_programt::targett check_and_replace_target(
   }
 
   // Look at the next instruction, ensure that it is an assignment
-  assert(next_instr->is_assign());
+  INVARIANT(next_instr->is_assign(), "expected assign instruction");
   // Get the name of the LHS of the assignment
   const auto &next_instr_assign_lhs = to_code_assign(next_instr->code).lhs();
   if(
@@ -200,7 +201,7 @@ static goto_programt::targett check_and_replace_target(
       return is_assignment_from(instr, return_identifier);
     });
 
-  assert(matching_assignment != end);
+  CHECK_RETURN(matching_assignment != end);
 
   // Assume that the LHS of *this* assignment is the actual nondet variable
   const auto &code_assign = to_code_assign(matching_assignment->code);
@@ -209,7 +210,7 @@ static goto_programt::targett check_and_replace_target(
 
   // Erase from the nondet function call to the assignment
   const auto after_matching_assignment = std::next(matching_assignment);
-  assert(after_matching_assignment != end);
+  CHECK_RETURN(after_matching_assignment != end);
 
   std::for_each(
     target,
