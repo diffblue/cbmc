@@ -1091,6 +1091,11 @@ bool java_bytecode_languaget::to_expr(
   return true; // fail for now
 }
 
+symbol_typet java_bytecode_languaget::root_base_class_type()
+{
+  return to_symbol_type(java_lang_object_type().subtype());
+}
+
 java_bytecode_languaget::~java_bytecode_languaget()
 {
 }

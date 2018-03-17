@@ -63,6 +63,12 @@ public:
     exprt &expr,
     const namespacet &ns) override;
 
+  symbol_typet root_base_class_type() override
+  {
+    // does not exist
+    UNREACHABLE;
+  }
+
   std::unique_ptr<languaget> new_language() override
   { return util_make_unique<ansi_c_languaget>(); }
 
