@@ -519,10 +519,8 @@ void goto_convertt::remove_temporary_object(
     throw 0;
   }
 
-  symbolt &new_symbol=
-    new_tmp_symbol(expr.type(), "obj", dest, expr.find_source_location());
-
-  new_symbol.mode=expr.get(ID_mode);
+  symbolt &new_symbol = new_tmp_symbol(
+    expr.type(), "obj", dest, expr.find_source_location(), expr.get(ID_mode));
 
   if(expr.operands().size()==1)
   {
@@ -596,8 +594,12 @@ void goto_convertt::remove_statement_expression(
 
   source_locationt source_location=last.find_source_location();
 
-  symbolt &new_symbol=
-    new_tmp_symbol(expr.type(), "statement_expression", dest, source_location);
+  symbolt &new_symbol = new_tmp_symbol(
+    expr.type(),
+    "statement_expression",
+    dest,
+    source_location,
+    expr.get(ID_mode));
 
   symbol_exprt tmp_symbol_expr(new_symbol.name, new_symbol.type);
   tmp_symbol_expr.add_source_location()=source_location;

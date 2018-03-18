@@ -237,8 +237,8 @@ void goto_convertt::clean_expr(
 
     if(result_is_used)
     {
-      symbolt &new_symbol=
-        new_tmp_symbol(expr.type(), "if_expr", dest, source_location);
+      symbolt &new_symbol = new_tmp_symbol(
+        expr.type(), "if_expr", dest, source_location, expr.get(ID_mode));
 
       code_assignt assignment_true;
       assignment_true.lhs()=new_symbol.symbol_expr();

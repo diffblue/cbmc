@@ -61,7 +61,8 @@ protected:
     const typet &type,
     const std::string &suffix,
     goto_programt &dest,
-    const source_locationt &);
+    const source_locationt &,
+    const irep_idt &mode);
 
   symbol_exprt make_compound_literal(
     const exprt &expr,

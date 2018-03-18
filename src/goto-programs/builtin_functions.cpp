@@ -468,8 +468,8 @@ void goto_convertt::do_cpp_new(
     assert(code_type.parameters().size()==1 ||
            code_type.parameters().size()==2);
 
-    const symbolt &tmp_symbol=
-      new_tmp_symbol(return_type, "new", dest, rhs.source_location());
+    const symbolt &tmp_symbol =
+      new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);
 
     tmp_symbol_expr=tmp_symbol.symbol_expr();
 
@@ -499,8 +499,8 @@ void goto_convertt::do_cpp_new(
     assert(code_type.parameters().size()==2 ||
            code_type.parameters().size()==3);
 
-    const symbolt &tmp_symbol=
-      new_tmp_symbol(return_type, "new", dest, rhs.source_location());
+    const symbolt &tmp_symbol =
+      new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);
 
     tmp_symbol_expr=tmp_symbol.symbol_expr();
 
@@ -663,13 +663,10 @@ void goto_convertt::do_java_new_array(
   // Must directly assign the new array to a temporary
   // because goto-symex will notice `x=side_effect_exprt` but not
   // `x=typecast_exprt(side_effect_exprt(...))`
-  symbol_exprt new_array_data_symbol=
+  symbol_exprt new_array_data_symbol =
     new_tmp_symbol(
-      data_java_new_expr.type(),
-      "new_array_data",
-      dest,
-      location)
-    .symbol_expr();
+      data_java_new_expr.type(), "new_array_data", dest, location, ID_java)
+      .symbol_expr();
   goto_programt::targett t_p2=dest.add_instruction(ASSIGN);
   t_p2->code=code_assignt(new_array_data_symbol, data_java_new_expr);
   t_p2->source_location=location;
@@ -707,8 +704,9 @@ void goto_convertt::do_java_new_array(
 
     goto_programt tmp;
 
-    symbol_exprt tmp_i=
-      new_tmp_symbol(length.type(), "index", tmp, location).symbol_expr();
+    symbol_exprt tmp_i =
+      new_tmp_symbol(length.type(), "index", tmp, location, ID_java)
+        .symbol_expr();
 
     code_fort for_loop;
 
@@ -730,8 +728,9 @@ void goto_convertt::do_java_new_array(
       plus_exprt(data, tmp_i), data.type().subtype());
 
     code_blockt for_body;
-    symbol_exprt init_sym=
-      new_tmp_symbol(sub_type, "subarray_init", tmp, location).symbol_expr();
+    symbol_exprt init_sym =
+      new_tmp_symbol(sub_type, "subarray_init", tmp, location, ID_java)
+        .symbol_expr();
 
     code_assignt init_subarray(init_sym, sub_java_new);
     code_assignt assign_subarray(

@@ -2029,16 +2029,16 @@ symbolt &goto_convertt::new_tmp_symbol(
   const typet &type,
   const std::string &suffix,
   goto_programt &dest,
-  const source_locationt &source_location)
+  const source_locationt &source_location,
+  const irep_idt &mode)
 {
-  symbolt &new_symbol=
-    get_fresh_aux_symbol(
-      type,
-      tmp_symbol_prefix,
-      "tmp_"+suffix,
-      source_location,
-      irep_idt(),
-      symbol_table);
+  symbolt &new_symbol = get_fresh_aux_symbol(
+    type,
+    tmp_symbol_prefix,
+    "tmp_" + suffix,
+    source_location,
+    mode,
+    symbol_table);
 
   code_declt decl;
   decl.symbol()=new_symbol.symbol_expr();
@@ -2055,8 +2055,8 @@ void goto_convertt::make_temp_symbol(
 {
   const source_locationt source_location=expr.find_source_location();
 
-  symbolt &new_symbol=
-    new_tmp_symbol(expr.type(), suffix, dest, source_location);
+  symbolt &new_symbol = new_tmp_symbol(
+    expr.type(), suffix, dest, source_location, expr.get(ID_mode));
 
   code_assignt assignment;
   assignment.lhs()=new_symbol.symbol_expr();
