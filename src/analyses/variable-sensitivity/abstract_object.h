@@ -244,11 +244,11 @@ protected:
     std::map<keyt, abstract_object_pointert> &out_map);
 
 
-  template<class keyt>
+  template<class keyt, typename hash>
   static bool merge_shared_maps(
-    const sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &map1,
-    const sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &map2,
-    sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &out_map);
+    const sharing_mapt<keyt, abstract_object_pointert, hash> &map1,
+    const sharing_mapt<keyt, abstract_object_pointert, hash> &map2,
+    sharing_mapt<keyt, abstract_object_pointert, hash> &out_map);
 
 
 
@@ -302,20 +302,15 @@ bool abstract_objectt::merge_maps(
   return modified;
 }
 
-template<typename keyt>
+template<typename keyt, typename hash>
 bool abstract_objectt::merge_shared_maps(
-  const sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &m1,
-  const sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &m2,
-  sharing_mapt<keyt, abstract_object_pointert, irep_id_hash> &out_map)
+  const sharing_mapt<keyt, abstract_object_pointert, hash> &m1,
+  const sharing_mapt<keyt, abstract_object_pointert, hash> &m2,
+  sharing_mapt<keyt, abstract_object_pointert, hash> &out_map)
 {
-  typedef sharing_mapt<irep_idt, abstract_object_pointert,
-    irep_id_hash>
-    abstract_object_mapt;
-
   bool modified=false;
 
-  abstract_object_mapt::delta_viewt delta_view;
-  m1.get_delta_view(m2, delta_view, true);
+  auto delta_view = m1.get_delta_view(m2, true);
 
   for(auto &item : delta_view)
   {
