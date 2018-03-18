@@ -139,9 +139,9 @@ abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
   }
   else
   {
-    array_mapt merged_map=array_mapt();
+    shared_array_mapt merged_map(map);
     bool modified=
-      abstract_objectt::merge_maps<mp_integer>(map, other->map, merged_map);
+      abstract_objectt::merge_shared_maps<mp_integer, mp_integer_hash>(map, other->map, merged_map);
     if(!modified)
     {
       return shared_from_this();
@@ -188,8 +188,11 @@ void constant_array_abstract_objectt::output(
   }
   else
   {
+    shared_array_mapt::sorted_viewt view;
+    map.get_view(view);
+
     out << "{";
-    for(const auto &entry : map)
+    for(const auto &entry : view)
     {
       out << "[" << entry.first << "] = ";
       entry.second->output(out, ai, ns);
@@ -281,14 +284,16 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
     mp_integer index_value;
     if(eval_index(index, env, ns, index_value))
     {
+      shared_array_mapt::const_find_type value = map.find(index_value);
+
       // Here we are assuming it is always in bounds
-      if(map.find(index_value)==map.cend())
+      if(!value.second)
       {
         return env.abstract_object_factory(type().subtype(), ns, true, false);
       }
       else
       {
-        return map.find(index_value)->second;
+        return value.first;
       }
     }
     else
@@ -339,7 +344,7 @@ sharing_ptrt<array_abstract_objectt>
   {
     if(stack.empty())
     {
-      auto copy=
+      auto result=
         internal_sharing_ptrt<constant_array_abstract_objectt>(
           new constant_array_abstract_objectt(*this));
 
@@ -348,11 +353,11 @@ sharing_ptrt<array_abstract_objectt>
       {
         if(is_top())
         {
-          copy->clear_top();
+          result->clear_top();
         }
 
-        copy->map[index_value]=value;
-        return copy;
+        result->map[index_value]=value;
+        return result;
       }
       else
       {
@@ -364,7 +369,7 @@ sharing_ptrt<array_abstract_objectt>
     }
     else
     {
-      auto copy=
+      auto result=
         internal_sharing_ptrt<constant_array_abstract_objectt>(
           new constant_array_abstract_objectt(*this));
 
@@ -373,9 +378,11 @@ sharing_ptrt<array_abstract_objectt>
       {
         // Here we assume the write is in bounds
         abstract_object_pointert array_entry;
-        if(map.find(index_value)!=map.cend())
+        shared_array_mapt::const_find_type old_value = map.find(index_value);
+
+        if(old_value.second)
         {
-          array_entry=map.at(index_value);
+          array_entry=old_value.first;
         }
         else
         {
@@ -384,28 +391,31 @@ sharing_ptrt<array_abstract_objectt>
 
         if(is_top())
         {
-          copy->clear_top();
+          result->clear_top();
         }
-        copy->map[index_value]=environment.write(
+        result->map[index_value]=environment.write(
           array_entry, value, stack, ns, merging_write);
 
-        return copy;
+        return result;
       }
       else
       {
-        for(const auto &array_entry : map)
+        shared_array_mapt::viewt view;
+        map.get_view(view);
+
+        for(const auto &array_entry : view)
         {
           // Merging write since we don't know which index we are writing to
-          copy->map[array_entry.first]=
+          result->map[array_entry.first]=
             environment.write(
               array_entry.second, value, stack, ns, true);
           if(is_top())
           {
-            copy->clear_top();
+            result->clear_top();
           }
         }
 
-        return copy;
+        return result;
       }
     }
   }
@@ -486,10 +496,27 @@ constant_array_abstract_objectt::visit_sub_elements(
     std::dynamic_pointer_cast<constant_array_abstract_objectt>(
       mutable_clone());
 
-  for(auto &item : result->map)
+  bool modified = false;
+
+  shared_array_mapt::viewt view;
+  result->map.get_view(view);
+
+  for(auto &item : view)
   {
-    item.second=visitor.visit(item.second);
+    auto newval = visitor.visit(item.second);
+    if(newval != item.second)
+    {
+      result->map[item.first]=newval; 
+      modified = true;
+    } 
   }
 
-  return result;
+  if(modified)
+  {
+    return result;
+  }
+  else
+  {
+    return shared_from_this();
+  }
 }

@@ -74,8 +74,15 @@ private:
   // Since we don't store for any index where the value is top
   // we don't use a regular array but instead a map of array indices
   // to the value at that index
-  typedef std::map<mp_integer, abstract_object_pointert> array_mapt;
-  array_mapt map;
+  struct mp_integer_hash
+  {
+    size_t operator()(const mp_integer &i) const { return std::hash<BigInt::ullong_t>{}(i.to_ulong()); }
+  };
+
+  typedef sharing_mapt<mp_integer, abstract_object_pointert, mp_integer_hash>
+    shared_array_mapt;
+
+  shared_array_mapt map;
 
   bool eval_index(
     const index_exprt &index,
