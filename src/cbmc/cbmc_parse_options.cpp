@@ -54,6 +54,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
 
+#include <goto-instrument/reachability_slicer.h>
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/cover.h>
@@ -801,6 +802,32 @@ bool cbmc_parse_optionst::process_goto_program(
     // this would cause the property identifiers to change.
     label_properties(goto_model);
 
+    // reachability slice?
+    if(cmdline.isset("reachability-slice-fb"))
+    {
+      if(cmdline.isset("reachability-slice"))
+      {
+        error() << "--reachability-slice and --reachability-slice-fb "
+                << "must not be given together" << eom;
+        return true;
+      }
+
+      status() << "Performing a forwards-backwards reachability slice" << eom;
+      if(cmdline.isset("property"))
+        reachability_slicer(goto_model, cmdline.get_values("property"), true);
+      else
+        reachability_slicer(goto_model, true);
+    }
+
+    if(cmdline.isset("reachability-slice"))
+    {
+      status() << "Performing a reachability slice" << eom;
+      if(cmdline.isset("property"))
+        reachability_slicer(goto_model, cmdline.get_values("property"));
+      else
+        reachability_slicer(goto_model);
+    }
+
     // full slice?
     if(cmdline.isset("full-slice"))
     {
@@ -926,6 +953,8 @@ void cbmc_parse_optionst::help()
     " --error-label label          check that label is unreachable\n"
     " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
+    HELP_REACHABILITY_SLICER
+    " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
     "\n"
     "Semantic transformations:\n"
     // NOLINTNEXTLINE(whitespace/line_length)

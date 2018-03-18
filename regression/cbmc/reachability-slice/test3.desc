@@ -1,0 +1,10 @@
+CORE
+test.c
+--reachability-slice --show-goto-functions --cover location
+1001
+1002
+1003
+1004
+--
+--
+We do not include 1005 since it might or might not be present based on where the assertion is in the block.

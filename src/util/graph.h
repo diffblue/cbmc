@@ -249,6 +249,9 @@ public:
 
   std::vector<node_indext> get_reachable(node_indext src, bool forwards) const;
 
+  std::vector<node_indext>
+  get_reachable(const std::vector<node_indext> &src, bool forwards) const;
+
   void make_chordal();
 
   // return value: number of connected subgraphs
@@ -458,15 +461,35 @@ void grapht<N>::visit_reachable(node_indext src)
     nodes[index].visited = true;
 }
 
+/// Run depth-first search on the graph, starting from a single source
+/// node.
+/// \param src The node to start the search from.
+/// \param forwards true (false) if the forward (backward) reachability
+/// should be performed.
 template<class N>
 std::vector<typename N::node_indext>
 grapht<N>::get_reachable(node_indext src, bool forwards) const
 {
+  std::vector<node_indext> src_vector;
+  src_vector.push_back(src);
+
+  return get_reachable(src_vector, forwards);
+}
+
+/// Run depth-first search on the graph, starting from multiple source
+/// nodes.
+/// \param src The nodes to start the search from.
+/// \param forwards true (false) if the forward (backward) reachability
+/// should be performed.
+template <class N>
+std::vector<typename N::node_indext> grapht<N>::get_reachable(
+  const std::vector<node_indext> &src,
+  bool forwards) const
+{
   std::vector<node_indext> result;
   std::vector<bool> visited(size(), false);
 
-  std::stack<node_indext, std::vector<node_indext>> s;
-  s.push(src);
+  std::stack<node_indext, std::vector<node_indext>> s(src);
 
   while(!s.empty())
   {

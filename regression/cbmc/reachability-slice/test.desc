@@ -1,0 +1,9 @@
+CORE
+test.c
+--reachability-slice --show-goto-functions --cover location --property foo.coverage.2
+1001
+--
+1004
+1005
+--
+We do not include 1002 and 1003, whether this is hit depends on where assertion is put
