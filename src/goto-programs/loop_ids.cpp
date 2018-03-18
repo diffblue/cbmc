@@ -87,7 +87,7 @@ void show_loop_ids_json(
 
       json_objectt &loop=loops.push_back().make_object();
       loop["name"]=json_stringt(id);
-      loop["sourceLocation"]=json(it->source_location);
+      loop["sourceLocation"] = json_exprt()(it->source_location);
     }
   }
 }
@@ -110,6 +110,7 @@ void show_loop_ids(
       forall_goto_functions(it, goto_functions)
         show_loop_ids_json(ui, it->second.body, loops);
 
+      //TODO: this needs clean up
       std::cout << ",\n" << json_result;
       break;
   }

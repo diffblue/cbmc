@@ -97,7 +97,7 @@ void bmct::show_vcc_json(std::ostream &out)
 
     const source_locationt &source_location=s_it->source.pc->source_location;
     if(source_location.is_not_nil())
-      object["sourceLocation"]=json(source_location);
+      object["sourceLocation"] = json(ns, s_it->source.pc->function, source_location);
 
     const std::string &s=s_it->comment;
     if(!s.empty())

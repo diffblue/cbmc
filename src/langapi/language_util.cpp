@@ -45,6 +45,29 @@ std::string from_type(
   return result;
 }
 
+json_objectt json(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const exprt &expr)
+{
+  std::unique_ptr<languaget> p(
+    get_language_from_identifier(ns, identifier));
+
+  std::string result;
+  return p->json(expr, ns);
+}
+
+json_objectt json(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const typet &type)
+{
+  std::unique_ptr<languaget> p(
+    get_language_from_identifier(ns, identifier));
+
+  return p->json(type, ns);
+}
+
 std::string type_to_name(
   const namespacet &ns,
   const irep_idt &identifier,
@@ -96,4 +119,15 @@ std::string type_to_name(const typet &type)
 {
   symbol_tablet symbol_table;
   return type_to_name(namespacet(symbol_table), "", type);
+}
+
+json_objectt json(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const source_locationt &source_location)
+{
+  std::unique_ptr<languaget> p(
+    get_language_from_identifier(ns, identifier));
+
+  return p->json(source_location);
 }

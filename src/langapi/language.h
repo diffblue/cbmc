@@ -31,6 +31,7 @@ class exprt;
 class namespacet;
 class typet;
 class cmdlinet;
+class json_objectt;
 
 #define OPT_FUNCTIONS \
   "(function):"
@@ -125,6 +126,16 @@ public:
     const typet &type,
     std::string &code,
     const namespacet &ns);
+
+  virtual json_objectt json(
+    const exprt &,
+    const namespacet &);
+
+  virtual json_objectt json(
+    const typet &,
+    const namespacet &);
+
+  virtual json_objectt json(const source_locationt &);
 
   virtual bool type_to_name(
     const typet &type,

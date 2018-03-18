@@ -272,6 +272,7 @@ jsont dep_graph_domaint::output_json(
   const namespacet &ns) const
 {
   json_arrayt graph;
+  json_exprt json;
 
   for(const auto &cd : control_deps)
   {
