@@ -47,6 +47,9 @@ jobs:
       install:
       script: scripts/travis_doxygen.sh
       before_cache:
+      after_success:
+        - openssl aes-256-cbc -k ${GCLOUD_TRAVIS_CBMC_KEY}
+          -in gcloud-travis-cbmc.json.enc -out gcloud-travis-cbmc.json -d
 
     # Ubuntu Linux with glibc using g++-5
     - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
