@@ -11,48 +11,38 @@
 /// Find in the parsed class a specific entry within the
 /// lambda_method_handle_map with a matching descriptor. Will fail if no
 /// matching lambda entry found.
-/// \param parsed_class: the class to inspect
-/// \param descriptor: the descriptor the lambda method should have
-/// \param entry_index: the number to skip (i.e. if multiple entries with the
-/// same descriptor
+/// \param parsed_class the class to inspect
+/// \param lambda_method_ref the reference/descriptor of the lambda method
+///   to which this lambda entry points to, must be unique
+/// \param method_type the descriptor the lambda method should have
 /// \return
 require_parse_tree::lambda_method_handlet
 require_parse_tree::require_lambda_entry_for_descriptor(
   const java_bytecode_parse_treet::classt &parsed_class,
-  const std::string &descriptor,
-  const size_t entry_index)
+  const std::string &lambda_method_ref,
+  const std::string &method_type)
 {
-  REQUIRE(entry_index < parsed_class.lambda_method_handle_map.size());
   typedef java_bytecode_parse_treet::classt::lambda_method_handle_mapt::
     value_type lambda_method_entryt;
 
-  size_t matches_found = 0;
-
-  const auto matching_lambda_entry = std::find_if(
+  INFO(
+    "Looking for entry with lambda_method_ref: " << lambda_method_ref
+                                                 << " and method_type: "
+                                                 << method_type);
+  std::vector<lambda_method_entryt> matches;
+  std::copy_if(
     parsed_class.lambda_method_handle_map.begin(),
     parsed_class.lambda_method_handle_map.end(),
-    [&descriptor, &matches_found, &entry_index](
-      const lambda_method_entryt &entry) {
-      if(entry.second.method_type == descriptor)
-      {
-        ++matches_found;
-        return matches_found == entry_index + 1;
-      }
-      return false;
+    back_inserter(matches),
+    [&method_type,
+     &lambda_method_ref](const lambda_method_entryt &entry) { //NOLINT
+      return (
+        entry.second.method_type == method_type &&
+        entry.second.lambda_method_ref == lambda_method_ref);
     });
-
-  INFO("Looking for descriptor: " << descriptor);
-  std::ostringstream found_entries;
-  for(const auto entry : parsed_class.lambda_method_handle_map)
-  {
-    found_entries << id2string(entry.first.first) << ": "
-                  << id2string(entry.second.method_type) << std::endl;
-  }
-  INFO("Found descriptors:\n" << found_entries.str());
-
-  REQUIRE(matching_lambda_entry != parsed_class.lambda_method_handle_map.end());
-
-  return matching_lambda_entry->second;
+  INFO("Number of matching lambda method entries: " << matches.size());
+  REQUIRE(matches.size() == 1);
+  return matches.at(0).second;
 }
 
 /// Finds a specific method in the parsed class with a matching name.
