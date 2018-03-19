@@ -461,6 +461,38 @@ void grapht<N>::visit_reachable(node_indext src)
     nodes[index].visited = true;
 }
 
+/// Add to `set`, nodes that are reachable from `set`.
+///
+/// This implements a depth first search using a stack: at each step we pop a
+/// node, and push on the stack all its successors that have not yet been
+/// visited.
+/// \param set: set of source nodes, must be a container with an
+///   `insert(const value_type&)` method.
+/// \param for_each_successor: function which given a node `n` and a function
+///   `f`, applies `f` on all successors of `n`.
+template <class Container, typename nodet = typename Container::value_type>
+void get_reachable(
+  Container &set,
+  const std::function<void(
+    const typename Container::value_type &,
+    const std::function<void(const typename Container::value_type &)> &)>
+    &for_each_successor)
+{
+  std::vector<nodet> stack;
+  for(const auto &elt : set)
+    stack.push_back(elt);
+
+  while(!stack.empty())
+  {
+    auto n = stack.back();
+    stack.pop_back();
+    for_each_successor(n, [&](const nodet &node) { // NOLINT
+      if(set.insert(node).second)
+        stack.push_back(node);
+    });
+  }
+}
+
 /// Run depth-first search on the graph, starting from a single source
 /// node.
 /// \param src The node to start the search from.
