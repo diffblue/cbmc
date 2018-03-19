@@ -263,6 +263,23 @@ private:
       : kind(STRING), index(string_node.index)
     {
     }
+
+    bool operator==(const nodet &n) const
+    {
+      return n.kind == kind && n.index == index;
+    }
+  };
+
+  /// Hash function for nodes
+  // NOLINTNEXTLINE(readability/identifiers)
+  struct node_hash
+  {
+    size_t
+    operator()(const string_dependenciest::nodet &node) const optional_noexcept
+    {
+      return 2 * node.index +
+             (node.kind == string_dependenciest::nodet::STRING ? 0 : 1);
+    }
   };
 
   mutable std::vector<optionalt<exprt>> eval_string_cache;
