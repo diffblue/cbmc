@@ -115,6 +115,13 @@ java_generic_symbol_typet require_java_generic_symbol_type(
   const typet &type,
   const std::string &identifier,
   const require_type::expected_type_argumentst &type_expectations);
+
+typedef java_class_typet::java_lambda_method_handlest
+  java_lambda_method_handlest;
+
+java_lambda_method_handlest require_lambda_method_handles(
+  const java_class_typet &class_type,
+  const std::vector<std::string> &expected_identifiers);
 }
 
 #endif // CPROVER_TESTING_UTILS_REQUIRE_TYPE_H
