@@ -435,7 +435,7 @@ abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
     auto newval = visitor.visit(item.second);
     if(newval != item.second)
     {
-      result->map[item.first] = visitor.visit(item.second);
+      result->map[item.first] = newval;
       modified = true;
     }
   }
