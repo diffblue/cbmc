@@ -47,6 +47,25 @@ private:
   std::string _varname;
 };
 
+class no_matching_function_callt : public std::exception
+{
+public:
+  explicit no_matching_function_callt(const irep_idt &function_identifier)
+    : function_identifier(function_identifier)
+  {
+  }
+
+  virtual const char *what() const throw()
+  {
+    std::ostringstream stringStream;
+    stringStream << "Failed to find function call for: " << function_identifier;
+    return stringStream.str().c_str();
+  }
+
+private:
+  irep_idt function_identifier;
+};
+
 pointer_assignment_locationt find_struct_component_assignments(
   const std::vector<codet> &statements,
   const irep_idt &structure_name,
@@ -85,6 +104,10 @@ const irep_idt &require_struct_array_component_assignment(
 const irep_idt &require_entry_point_argument_assignment(
   const irep_idt &argument_name,
   const std::vector<codet> &entry_point_statements);
+
+code_function_callt require_function_call(
+  const std::vector<codet> &statements,
+  const irep_idt &function_call_identifier);
 }
 
 #endif // CPROVER_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H

@@ -409,3 +409,39 @@ require_goto_statements::require_entry_point_argument_assignment(
       .get_identifier();
   return argument_tmp_name;
 }
+
+/// Verify that a collection of statements contains a function call to a
+///   function whose symbol identifier matches the provided identifier
+/// \param statements: The collection of statements to inspect
+/// \param function_call_identifier: The symbol identifier of the function
+///   that should have been called
+/// \return The first code_function_callt to the relevant function or throws a
+///   no_matching_function_callt if no call is found
+code_function_callt require_goto_statements::require_function_call(
+  const std::vector<codet> &statements,
+  const irep_idt &function_call_identifier)
+{
+  // TODO: Would appreciate some review comments on whether it makes the most sense:
+  // - return a vector of matching code_function_calls
+  // - return an optionalt with the first matching call
+  // - return a code_function_callt throwing an exception if none found
+  for(const codet &statement : statements)
+  {
+    if(statement.get_statement() == ID_function_call)
+    {
+      const code_function_callt &function_call =
+        to_code_function_call(statement);
+
+      if(function_call.function().id() == ID_symbol)
+      {
+        if(
+          to_symbol_expr(function_call.function()).get_identifier() ==
+          function_call_identifier)
+        {
+          return function_call;
+        }
+      }
+    }
+  }
+  throw no_matching_function_callt(function_call_identifier);
+}
