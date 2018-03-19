@@ -18,18 +18,10 @@
 
 #include <java_bytecode/java_bytecode_parse_tree.h>
 #include <java_bytecode/java_types.h>
+#include <testing-utils/run_test_with_compilers.h>
 
 typedef java_bytecode_parse_treet::classt::lambda_method_handlet
   lambda_method_handlet;
-
-void run_test_with_compilers(
-  const std::function<void(std::string)> &test_with_compiler)
-{
-  test_with_compiler("openjdk_8");
-  test_with_compiler("eclipse");
-  test_with_compiler("oracle_8");
-  test_with_compiler("oracle_9");
-}
 
 SCENARIO(
   "lambda_method_handle_map with static lambdas",
