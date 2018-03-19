@@ -86,6 +86,23 @@ SCENARIO(
               lambda_implementor_type_symbol.type);
 
           REQUIRE(tmp_lambda_class_type.has_base("java::SimpleLambda"));
+
+          THEN("The function in the class should call the lambda method")
+          {
+            const irep_idt method_identifier =
+              id2string(tmp_class_identifier) + ".Execute:()V";
+            const symbolt &method_symbol =
+              require_symbol::require_symbol_exists(
+                symbol_table, method_identifier);
+
+            REQUIRE(method_symbol.is_function());
+
+            const std::vector<codet> &assignments =
+              require_goto_statements::get_all_statements(method_symbol.value);
+
+            require_goto_statements::require_function_call(
+              assignments, "java::LocalLambdas.lambda$test$0:()V");
+          }
         }
       }
     }
