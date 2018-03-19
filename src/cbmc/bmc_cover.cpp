@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml.h>
 #include <util/xml_expr.h>
 #include <util/json.h>
+#include <util/json_stream.h>
 #include <util/json_expr.h>
 
 #include <solvers/prop/cover_goals.h>
@@ -346,19 +347,19 @@ bool bmc_covert::operator()()
 
     case ui_message_handlert::uit::JSON_UI:
     {
-      json_objectt json_result;
-      json_arrayt &goals_array=json_result["goals"].make_array();
+      json_stream_objectt &json_result =
+        status().json_stream().push_back_stream_object();
       for(const auto &goal_pair : goal_map)
       {
         const goalt &goal=goal_pair.second;
 
-        json_objectt &result=goals_array.push_back().make_object();
-        result["status"]=json_stringt(goal.satisfied?"satisfied":"failed");
-        result["goal"]=json_stringt(id2string(goal_pair.first));
-        result["description"]=json_stringt(goal.description);
+        json_result["status"] =
+          json_stringt(goal.satisfied ? "satisfied" : "failed");
+        json_result["goal"] = json_stringt(id2string(goal_pair.first));
+        json_result["description"] = json_stringt(goal.description);
 
         if(goal.source_location.is_not_nil())
-          result["sourceLocation"]=json(goal.source_location);
+          json_result["sourceLocation"] = json(goal.source_location);
       }
       json_result["totalGoals"]=json_numbert(std::to_string(goal_map.size()));
       json_result["goalsCovered"]=json_numbert(std::to_string(goals_covered));
@@ -369,12 +370,12 @@ bool bmc_covert::operator()()
         json_objectt &result=tests_array.push_back().make_object();
         if(bmc.options.get_bool_option("trace"))
         {
-          jsont &json_trace=result["trace"];
+          json_arrayt &json_trace = json_result["trace"].make_array();
           convert(bmc.ns, test.goto_trace, json_trace, bmc.trace_options());
         }
         else
         {
-          json_arrayt &json_test=result["inputs"].make_array();
+          json_arrayt &json_test = json_result["inputs"].make_array();
 
           for(const auto &step : test.goto_trace.steps)
           {
@@ -396,7 +397,6 @@ bool bmc_covert::operator()()
         }
       }
 
-      result() << json_result;
       break;
     }
   }

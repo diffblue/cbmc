@@ -106,11 +106,12 @@ public:
       return it->second;
   }
 
-protected:
   void output_rec(std::ostream &, unsigned indent) const;
-  static void escape_string(const std::string &, std::ostream &);
 
   static const jsont null_json_object;
+
+protected:
+  static void escape_string(const std::string &, std::ostream &);
 
   explicit jsont(kindt _kind):kind(_kind)
   {
@@ -127,6 +128,9 @@ public:
 
   typedef std::map<std::string, jsont> objectt;
   objectt object;
+  static void
+  output_object(std::ostream &out, const objectt &object, unsigned indent);
+  static void output_key(std::ostream &out, const std::string &key);
 
   std::string value;
 };

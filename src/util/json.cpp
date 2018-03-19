@@ -50,6 +50,9 @@ void jsont::escape_string(const std::string &src, std::ostream &out)
   }
 }
 
+/// Recursive printing of the json object.
+/// \param out: The stream object to have the json printed to.
+/// \param indent: The indentation level.
 void jsont::output_rec(std::ostream &out, unsigned indent) const
 {
   switch(kind)
@@ -66,23 +69,7 @@ void jsont::output_rec(std::ostream &out, unsigned indent) const
 
   case kindt::J_OBJECT:
     out << '{';
-    for(objectt::const_iterator o_it=object.begin();
-        o_it!=object.end();
-        o_it++)
-    {
-      if(o_it!=object.begin())
-        out << ',';
-
-      out << '\n';
-
-      out << std::string((indent+1)*2, ' ');
-
-      out << '"';
-      escape_string(o_it->first, out);
-      out << '"';
-      out << ": ";
-      o_it->second.output_rec(out, indent+1);
-    }
+    output_object(out, object, indent);
     if(!object.empty())
     {
       out << '\n';
@@ -131,6 +118,41 @@ void jsont::output_rec(std::ostream &out, unsigned indent) const
 
   case kindt::J_NULL: out << "null"; break;
   }
+}
+
+/// Basic handling of the printing of a JSON object.
+/// Dispatches to output_rec for most of the hard work.
+/// \param out: The stream that the JSON object is to be
+///   printed to.
+/// \param object: The JSON object.
+/// \param indent: The indentation level.
+void jsont::output_object(
+  std::ostream &out,
+  const objectt &object,
+  unsigned indent)
+{
+  for(objectt::const_iterator o_it = object.begin(); o_it != object.end();
+      o_it++)
+  {
+    if(o_it != object.begin())
+      out << ',';
+
+    // A JSON object always starts with an opening brace,
+    // after which we put a newline.
+    out << '\n';
+
+    out << std::string((indent + 1) * 2, ' ');
+
+    jsont::output_key(out, o_it->first);
+    o_it->second.output_rec(out, indent + 1);
+  }
+}
+
+void jsont::output_key(std::ostream &out, const std::string &key)
+{
+  out << '"';
+  jsont::escape_string(key, out);
+  out << "\": ";
 }
 
 void jsont::swap(jsont &other)

@@ -10,7 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_UI_MESSAGE_H
 #define CPROVER_UTIL_UI_MESSAGE_H
 
+#include <memory>
+
 #include "message.h"
+#include "json_stream.h"
 #include "timestamper.h"
 
 class ui_message_handlert : public message_handlert
@@ -25,10 +28,8 @@ public:
 
   ui_message_handlert(const class cmdlinet &, const std::string &program);
 
-  ui_message_handlert()
-    : _ui(uit::PLAIN), time(timestampert::make(timestampert::clockt::NONE))
-  {
-  }
+  /// Default constructor; implementation is in .cpp file
+  ui_message_handlert();
 
   virtual ~ui_message_handlert();
 
@@ -40,13 +41,25 @@ public:
   void set_ui(uit __ui)
   {
     _ui=__ui;
+    if(_ui == uit::JSON_UI && !json_stream)
+    {
+      json_stream =
+        std::unique_ptr<json_stream_arrayt>(new json_stream_arrayt(out));
+    }
   }
 
   virtual void flush(unsigned level) override;
 
+  json_stream_arrayt &get_json_stream() override
+  {
+    return *json_stream;
+  }
+
 protected:
   uit _ui;
   std::unique_ptr<const timestampert> time;
+  std::ostream &out;
+  std::unique_ptr<json_stream_arrayt> json_stream;
 
   virtual void print(
     unsigned level,
