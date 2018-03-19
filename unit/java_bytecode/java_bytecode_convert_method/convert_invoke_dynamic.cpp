@@ -125,6 +125,21 @@ SCENARIO(
           test_data.lambda_function_id = "java::LocalLambdas.pretendLambda:()V";
           validate_lamdba_assignement(symbol_table, instructions, test_data);
         }
+        THEN(
+          "The local variable should be assigned a non-null pointer to a "
+          "parameter interface implementor")
+        {
+          lambda_assignment_test_datat test_data;
+          test_data.lambda_variable_id = function_prefix + "::35::paramLambda";
+
+          test_data.lambda_interface = "java::ParameterLambda";
+          test_data.lambda_interface_method_descriptor =
+            ".Execute:(ILjava/lang/Object;LDummyGeneric;)V";
+          test_data.lambda_function_id =
+            "java::LocalLambdas.lambda$test$1:(ILjava/lang/"
+            "Object;LDummyGeneric;)V";
+          validate_lamdba_assignement(symbol_table, instructions, test_data);
+        }
       }
     }
   });
