@@ -17,6 +17,7 @@
 #include <util/graph.h>
 #include <util/magic.h>
 #include <util/make_unique.h>
+#include <unordered_set>
 #include "string_refinement_util.h"
 
 bool is_char_type(const typet &type)
@@ -410,9 +411,28 @@ void string_dependenciest::output_dot(std::ostream &stream) const
 void string_dependenciest::add_constraints(
   string_constraint_generatort &generator)
 {
+  std::unordered_set<nodet, node_hash> test_dependencies;
   for(const auto &builtin : builtin_function_nodes)
   {
-    const exprt return_value = builtin.data->add_constraints(generator);
-    generator.add_lemma(equal_exprt(return_value, builtin.data->return_code));
+    if(builtin.data->maybe_testing_function())
+      test_dependencies.insert(nodet(builtin));
+  }
+
+  get_reachable(
+    test_dependencies,
+    [&](
+      const nodet &n,
+      const std::function<void(const nodet &)> &f) { // NOLINT
+      for_each_successor(n, f);
+    });
+
+  for(const auto &node : test_dependencies)
+  {
+    if(node.kind == node.BUILTIN)
+    {
+      const auto &builtin = builtin_function_nodes[node.index];
+      const exprt return_value = builtin.data->add_constraints(generator);
+      generator.add_lemma(equal_exprt(return_value, builtin.data->return_code));
+    }
   }
 }
