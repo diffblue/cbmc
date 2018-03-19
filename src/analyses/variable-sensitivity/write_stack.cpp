@@ -85,7 +85,7 @@ void write_stackt::construct_stack_to_pointer(
         top_stack=true;
         return;
       }
-      offset.negate();
+      offset = unary_minus_exprt(offset);
     }
 
     abstract_object_pointert offset_value=environment.eval(offset, ns);
