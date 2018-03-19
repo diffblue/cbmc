@@ -153,28 +153,42 @@ require_goto_statements::find_pointer_assignments(
   const std::vector<codet> &instructions)
 {
   pointer_assignment_locationt locations;
+  bool found_assignment = false;
+  std::vector<irep_idt> all_symbols;
   for(const codet &statement : instructions)
   {
     if(statement.get_statement() == ID_assign)
     {
       const code_assignt &code_assign = to_code_assign(statement);
-      if(
-        code_assign.lhs().id() == ID_symbol &&
-        to_symbol_expr(code_assign.lhs()).get_identifier() == pointer_name)
+      if(code_assign.lhs().id() == ID_symbol)
       {
-        if(
-          code_assign.rhs() ==
-          null_pointer_exprt(to_pointer_type(code_assign.lhs().type())))
+        const symbol_exprt &symbol_expr = to_symbol_expr(code_assign.lhs());
+        all_symbols.push_back(symbol_expr.get_identifier());
+        if(symbol_expr.get_identifier() == pointer_name)
         {
-          locations.null_assignment = code_assign;
-        }
-        else
-        {
-          locations.non_null_assignments.push_back(code_assign);
+          if(
+            code_assign.rhs() ==
+            null_pointer_exprt(to_pointer_type(code_assign.lhs().type())))
+          {
+            locations.null_assignment = code_assign;
+          }
+          else
+          {
+            locations.non_null_assignments.push_back(code_assign);
+          }
+          found_assignment = true;
         }
       }
     }
   }
+  INFO("Looking for symbol: " << pointer_name);
+  std::ostringstream found_symbols;
+  for(const auto entry : all_symbols)
+  {
+    found_symbols << entry << std::endl;
+  }
+  INFO("Symbols: " << found_symbols.str());
+  REQUIRE(found_assignment);
 
   return locations;
 }
