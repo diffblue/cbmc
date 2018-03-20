@@ -164,6 +164,18 @@ public:
       : index(i), data(std::move(d))
     {
     }
+
+    builtin_function_nodet(builtin_function_nodet &&other)
+      : index(other.index), data(std::move(other.data))
+    {
+    }
+
+    builtin_function_nodet &operator=(builtin_function_nodet &&other)
+    {
+      index = other.index;
+      data = std::move(other.data);
+      return *this;
+    }
   };
 
   /// A string node points to builtin_function on which it depends
