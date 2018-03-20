@@ -198,7 +198,7 @@ bool abstract_environmentt::assign(
     }
     else
     {
-      lhs_value=map[symbol_expr];
+      lhs_value=map.const_find(symbol_expr).first;
     }
   }
 
@@ -239,7 +239,7 @@ bool abstract_environmentt::assign(
   {
     symbol_exprt symbol_expr=to_symbol_expr(s);
 
-    if(final_value != map[symbol_expr])
+    if(final_value != lhs_value)
     {
       map[symbol_expr]=final_value;
     }
@@ -486,32 +486,17 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
     // For each element in the intersection of map and env.map merge
     // If the result of the merge is top, remove from the map
     bool modified=false;
-    for(const auto &entry : env.map.get_view())
+    for(const auto &entry : env.map.get_delta_view(map))
     {
-      if(map.has_key(entry.first))
-      {
-        bool object_modified=false;
-        abstract_object_pointert new_object=
-          abstract_objectt::merge(
-            map[entry.first],
-            entry.second,
-            object_modified);
-
-        modified|=object_modified;
-        map[entry.first]=new_object;
-
-        // Write, even if TOP. Since we now track the write locations of an
-        // object, even if it is TOP we still have useful information about it.
-        // This is used for when we want to find out what has been modified
-        // between two locations (even if we don't know what has been written).
-      }
-      else
-      {
-        // Map doesn't contain key so the resulting map shouldn't either
-      }
+      bool object_modified=false;
+      abstract_object_pointert new_object=
+        abstract_objectt::merge(
+          entry.other_m,
+          entry.m,
+          object_modified);
+      modified|=object_modified;
+      map.find(entry.k, tvt(true)).first=new_object;
     }
-
-    // Keep TOP items too.
 
     return modified;
   }
