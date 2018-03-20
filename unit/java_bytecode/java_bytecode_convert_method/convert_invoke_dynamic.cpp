@@ -13,6 +13,7 @@
 #include <testing-utils/require_type.h>
 #include <testing-utils/run_test_with_compilers.h>
 #include <testing-utils/require_symbol.h>
+#include <util/expr_iterator.h>
 
 struct lambda_assignment_test_datat
 {
@@ -20,6 +21,8 @@ struct lambda_assignment_test_datat
   irep_idt lambda_interface;
   std::string lambda_interface_method_descriptor;
   irep_idt lambda_function_id;
+
+  std::vector<exprt> expected_params;
 };
 
 void validate_lamdba_assignement(
@@ -84,8 +87,29 @@ void validate_lamdba_assignement(
     const std::vector<codet> &assignments =
       require_goto_statements::get_all_statements(method_symbol.value);
 
-    require_goto_statements::require_function_call(
-      assignments, test_data.lambda_function_id);
+    code_function_callt function_call =
+      require_goto_statements::require_function_call(
+        assignments, test_data.lambda_function_id);
+
+    std::string variable_prefix = id2string(method_identifier) + "::";
+    // replace all symbol exprs with a prefixed symbol expr
+    std::vector<exprt> expected_args = test_data.expected_params;
+    for(exprt &arg : expected_args)
+    {
+      for(auto it = arg.depth_begin(); it != arg.depth_end(); ++it)
+      {
+        if(it->id() == ID_symbol)
+        {
+          symbol_exprt &symbol_expr = to_symbol_expr(it.mutate());
+          const irep_idt simple_id = symbol_expr.get_identifier();
+          symbol_expr.set_identifier(variable_prefix + id2string(simple_id));
+        }
+      }
+    }
+
+    REQUIRE_THAT(
+      function_call.arguments(),
+      Catch::Matchers::Vector::EqualsMatcher<exprt>{expected_args});
   }
 }
 
@@ -125,6 +149,7 @@ SCENARIO(
           test_data.lambda_interface = "java::SimpleLambda";
           test_data.lambda_interface_method_descriptor = ".Execute:()V";
           test_data.lambda_function_id = "java::LocalLambdas.pretendLambda:()V";
+          test_data.expected_params = {};
           validate_lamdba_assignement(symbol_table, instructions, test_data);
         }
         THEN(
@@ -141,6 +166,15 @@ SCENARIO(
           test_data.lambda_function_id =
             "java::LocalLambdas.lambda$test$1:(ILjava/lang/"
             "Object;LDummyGeneric;)V";
+
+          symbol_exprt integer_param{"primitive", java_int_type()};
+          symbol_exprt ref_param{"reference",
+                                 java_type_from_string("Ljava/lang/Object;")};
+          symbol_exprt generic_param{
+            "specalisedGeneric",
+            java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
+          test_data.expected_params = {integer_param, ref_param, generic_param};
+
           validate_lamdba_assignement(symbol_table, instructions, test_data);
         }
         THEN(
@@ -158,6 +192,15 @@ SCENARIO(
           test_data.lambda_function_id =
             "java::LocalLambdas.lambda$test$2:"
             "([I[Ljava/lang/Object;[LDummyGeneric;)V";
+
+          symbol_exprt integer_param{"primitive", java_type_from_string("[I")};
+          symbol_exprt ref_param{"reference",
+                                 java_type_from_string("[Ljava/lang/Object;")};
+          symbol_exprt generic_param{
+            "specalisedGeneric",
+            java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
+          test_data.expected_params = {integer_param, ref_param, generic_param};
+
           validate_lamdba_assignement(symbol_table, instructions, test_data);
         }
       }
