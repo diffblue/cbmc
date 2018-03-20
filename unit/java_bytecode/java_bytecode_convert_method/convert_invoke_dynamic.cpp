@@ -16,7 +16,7 @@
 
 struct lambda_assignment_test_datat
 {
-  irep_idt lambda_variable_id;
+  std::regex lambda_variable_id;
   irep_idt lambda_interface;
   std::string lambda_interface_method_descriptor;
   irep_idt lambda_function_id;
@@ -111,14 +111,16 @@ SCENARIO(
           require_goto_statements::get_all_statements(
             symbol_table.lookup_ref("java::LocalLambdas.test:()V").value);
 
-        const std::string function_prefix = "java::LocalLambdas.test:()V";
+        const std::string function_prefix_regex_str =
+          "java::LocalLambdas\\.test:\\(\\)V";
 
         THEN(
           "The local variable should be assigned a temp object implementing "
           "SimpleLambda")
         {
           lambda_assignment_test_datat test_data;
-          test_data.lambda_variable_id = function_prefix + "::11::simpleLambda";
+          test_data.lambda_variable_id =
+            std::regex(function_prefix_regex_str + "::\\d+::simpleLambda$");
 
           test_data.lambda_interface = "java::SimpleLambda";
           test_data.lambda_interface_method_descriptor = ".Execute:()V";
@@ -130,7 +132,8 @@ SCENARIO(
           "parameter interface implementor")
         {
           lambda_assignment_test_datat test_data;
-          test_data.lambda_variable_id = function_prefix + "::35::paramLambda";
+          test_data.lambda_variable_id =
+            std::regex(function_prefix_regex_str + "::\\d+::paramLambda$");
 
           test_data.lambda_interface = "java::ParameterLambda";
           test_data.lambda_interface_method_descriptor =
