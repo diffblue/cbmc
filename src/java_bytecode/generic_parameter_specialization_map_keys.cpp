@@ -99,15 +99,17 @@ const void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
       pointer_type.subtype().get(ID_identifier) ==
       pointer_subtype_struct.get(ID_name));
 
-    const java_generic_typet &generic_pointer =
-      to_java_generic_type(pointer_type);
-
     // If the pointer points to an incomplete class, don't treat the generics
-    if(!pointer_subtype_struct.get_bool(ID_incomplete_class))
+    // TODO TG-1996 should treat generic incomplete (mocked) classes
+    // Also do not treat generics is the class is not marked generic or
+    // implicitly generic (this may be due to unsupported class signature)
+    if(
+      !pointer_subtype_struct.get_bool(ID_incomplete_class) &&
+      (is_java_generic_class_type(pointer_subtype_struct) ||
+       is_java_implicitly_generic_class_type(pointer_subtype_struct)))
     {
-      PRECONDITION(
-        is_java_generic_class_type(pointer_subtype_struct) ||
-        is_java_implicitly_generic_class_type(pointer_subtype_struct));
+      const java_generic_typet &generic_pointer =
+        to_java_generic_type(pointer_type);
       const std::vector<java_generic_parametert> &generic_parameters =
         get_all_generic_parameters(pointer_subtype_struct);
 
@@ -135,14 +137,19 @@ const void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
   const symbol_typet &symbol_type,
   const typet &symbol_struct)
 {
-  if(is_java_generic_symbol_type(symbol_type))
+  // If the class is an incomplete class, don't treat the generics
+  // TODO TG-1996 should treat generic incomplete (mocked) classes
+  // Also do not treat generics is the class is not marked generic or
+  // implicitly generic (this may be due to unsupported class signature)
+  if(
+    is_java_generic_symbol_type(symbol_type) &&
+    !symbol_struct.get_bool(ID_incomplete_class) &&
+    (is_java_generic_class_type(symbol_struct) ||
+     is_java_implicitly_generic_class_type(symbol_struct)))
   {
-    java_generic_symbol_typet generic_symbol =
+    const java_generic_symbol_typet &generic_symbol =
       to_java_generic_symbol_type(symbol_type);
 
-    PRECONDITION(
-      is_java_generic_class_type(symbol_struct) ||
-      is_java_implicitly_generic_class_type(symbol_struct));
     const std::vector<java_generic_parametert> &generic_parameters =
       get_all_generic_parameters(symbol_struct);
 
