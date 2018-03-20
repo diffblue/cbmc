@@ -23,6 +23,7 @@ struct lambda_assignment_test_datat
   irep_idt lambda_function_id;
 
   std::vector<exprt> expected_params;
+  bool should_return_value;
 };
 
 void validate_lamdba_assignement(
@@ -110,6 +111,15 @@ void validate_lamdba_assignement(
     REQUIRE_THAT(
       function_call.arguments(),
       Catch::Matchers::Vector::EqualsMatcher<exprt>{expected_args});
+
+    if(test_data.should_return_value)
+    {
+      require_expr::require_symbol(function_call.lhs());
+    }
+    else
+    {
+      REQUIRE(function_call.lhs().is_nil());
+    }
   }
 }
 
@@ -150,6 +160,7 @@ SCENARIO(
           test_data.lambda_interface_method_descriptor = ".Execute:()V";
           test_data.lambda_function_id = "java::LocalLambdas.pretendLambda:()V";
           test_data.expected_params = {};
+          test_data.should_return_value = false;
           validate_lamdba_assignement(symbol_table, instructions, test_data);
         }
         THEN(
@@ -174,6 +185,7 @@ SCENARIO(
             "specalisedGeneric",
             java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
           test_data.expected_params = {integer_param, ref_param, generic_param};
+          test_data.should_return_value = false;
 
           validate_lamdba_assignement(symbol_table, instructions, test_data);
         }
@@ -200,7 +212,24 @@ SCENARIO(
             "specalisedGeneric",
             java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
           test_data.expected_params = {integer_param, ref_param, generic_param};
+          test_data.should_return_value = false;
 
+          validate_lamdba_assignement(symbol_table, instructions, test_data);
+        }
+        THEN(
+          "The local variable should be assigned a temp object implementing "
+          "ReturningLambdaPrimitive")
+        {
+          lambda_assignment_test_datat test_data;
+
+          test_data.lambda_variable_id = std::regex(
+            function_prefix_regex_str + "::\\d+::returnPrimitiveLambda");
+
+          test_data.lambda_interface = "java::ReturningLambdaPrimitive";
+          test_data.lambda_interface_method_descriptor = ".Execute:()I";
+          test_data.lambda_function_id = "java::LocalLambdas.lambda$test$3:()I";
+          test_data.expected_params = {};
+          test_data.should_return_value = true;
           validate_lamdba_assignement(symbol_table, instructions, test_data);
         }
       }
