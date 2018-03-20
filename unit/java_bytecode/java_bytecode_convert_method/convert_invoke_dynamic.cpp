@@ -143,6 +143,23 @@ SCENARIO(
             "Object;LDummyGeneric;)V";
           validate_lamdba_assignement(symbol_table, instructions, test_data);
         }
+        THEN(
+          "The local variable should be assigned a non-null pointer to a "
+          "array parameter interface implementor")
+        {
+          lambda_assignment_test_datat test_data;
+
+          test_data.lambda_variable_id =
+            std::regex(function_prefix_regex_str + "::\\d+::arrayParamLambda$");
+
+          test_data.lambda_interface = "java::ArrayParameterLambda";
+          test_data.lambda_interface_method_descriptor =
+            ".Execute:([I[Ljava/lang/Object;[LDummyGeneric;)V";
+          test_data.lambda_function_id =
+            "java::LocalLambdas.lambda$test$2:"
+            "([I[Ljava/lang/Object;[LDummyGeneric;)V";
+          validate_lamdba_assignement(symbol_table, instructions, test_data);
+        }
       }
     }
   });
