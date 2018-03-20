@@ -16,6 +16,8 @@
 #include <util/std_types.h>
 #include <goto-programs/goto_program.h>
 
+#include <regex>
+
 #ifndef CPROVER_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H
 #define CPROVER_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H
 
@@ -79,6 +81,10 @@ require_entry_point_statements(const symbol_tablet &symbol_table);
 
 pointer_assignment_locationt find_pointer_assignments(
   const irep_idt &pointer_name,
+  const std::vector<codet> &instructions);
+
+pointer_assignment_locationt find_pointer_assignments(
+  const std::regex &pointer_name_match,
   const std::vector<codet> &instructions);
 
 const code_declt &require_declaration_of_name(

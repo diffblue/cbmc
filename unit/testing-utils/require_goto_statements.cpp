@@ -152,6 +152,19 @@ require_goto_statements::find_pointer_assignments(
   const irep_idt &pointer_name,
   const std::vector<codet> &instructions)
 {
+  INFO("Looking for symbol: " << pointer_name);
+  std::regex special_chars{R"([-[\]{}()*+?.,\^$|#\s])"};
+  std::string sanitized =
+    std::regex_replace(id2string(pointer_name), special_chars, R"(\$&)");
+  return find_pointer_assignments(
+    std::regex("^" + sanitized + "$"), instructions);
+}
+
+require_goto_statements::pointer_assignment_locationt
+require_goto_statements::find_pointer_assignments(
+  const std::regex &pointer_name_match,
+  const std::vector<codet> &instructions)
+{
   pointer_assignment_locationt locations;
   bool found_assignment = false;
   std::vector<irep_idt> all_symbols;
@@ -164,7 +177,9 @@ require_goto_statements::find_pointer_assignments(
       {
         const symbol_exprt &symbol_expr = to_symbol_expr(code_assign.lhs());
         all_symbols.push_back(symbol_expr.get_identifier());
-        if(symbol_expr.get_identifier() == pointer_name)
+        if(
+          std::regex_search(
+            id2string(symbol_expr.get_identifier()), pointer_name_match))
         {
           if(
             code_assign.rhs() ==
@@ -181,7 +196,7 @@ require_goto_statements::find_pointer_assignments(
       }
     }
   }
-  INFO("Looking for symbol: " << pointer_name);
+
   std::ostringstream found_symbols;
   for(const auto entry : all_symbols)
   {
