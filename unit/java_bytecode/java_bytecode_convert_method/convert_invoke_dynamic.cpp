@@ -232,6 +232,48 @@ SCENARIO(
           test_data.should_return_value = true;
           validate_lamdba_assignement(symbol_table, instructions, test_data);
         }
+        THEN(
+          "The local variable should be assigned a temp object implementing "
+          "ReturningLambdaReference")
+        {
+          lambda_assignment_test_datat test_data;
+
+          test_data.lambda_variable_id = std::regex(
+            function_prefix_regex_str + "::\\d+::returnReferenceLambda");
+
+          test_data.lambda_interface = "java::ReturningLambdaReference";
+
+          test_data.lambda_interface_method_descriptor =
+            ".Execute:()Ljava/lang/Object;";
+
+          //"java::LocalLambdas.lambda$test$0:()V"
+          test_data.lambda_function_id =
+            "java::LocalLambdas.lambda$test$4:()Ljava/lang/Object;";
+          test_data.expected_params = {};
+          test_data.should_return_value = true;
+          validate_lamdba_assignement(symbol_table, instructions, test_data);
+        }
+        THEN(
+          "The local variable should be assigned a temp object implementing "
+          "ReturningLambdaSpecalisedGeneric")
+        {
+          lambda_assignment_test_datat test_data;
+
+          test_data.lambda_variable_id = std::regex(
+            function_prefix_regex_str +
+            "::\\d+::returningSpecalisedGenericLambda");
+
+          test_data.lambda_interface = "java::ReturningLambdaSpecalisedGeneric";
+
+          test_data.lambda_interface_method_descriptor =
+            ".Execute:()LDummyGeneric;";
+          test_data.lambda_function_id =
+            "java::LocalLambdas.lambda$test$5:()LDummyGeneric;";
+          test_data.expected_params = {};
+          test_data.should_return_value = true;
+          validate_lamdba_assignement(symbol_table, instructions, test_data);
+        }
+        // TODO[TG-2482]: Tests for local lambdas that capture variables
       }
     }
   });
