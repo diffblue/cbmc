@@ -42,11 +42,24 @@ jobs:
       env: NAME="DOXYGEN-CHECK"
       addons:
         apt:
+          sources:
+            - sourceline: 'deb http://packages.cloud.google.com/apt cloud-sdk-trusty main'
+              key_url: 'https://packages.cloud.google.com/apt/doc/apt-key.gpg'
           packages:
             - doxygen
+            - google-cloud-sdk
       install:
       script: scripts/travis_doxygen.sh
       before_cache:
+      after_success:
+        # Google Cloud Integration
+        - export BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
+        - openssl aes-256-cbc -k ${GCLOUD_TRAVIS_CBMC_KEY}
+          -in gcloud-travis-cbmc.json.enc -out gcloud-travis-cbmc.json -d
+        - export G_KEY=${PWD}/gcloud-travis-cbmc.json
+        - gcloud auth activate-service-account --key-file ${G_KEY}
+
+        - scripts/publish_doc.sh
 
     # Ubuntu Linux with glibc using g++-5
     - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
