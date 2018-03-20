@@ -61,7 +61,6 @@ testing-utils.dir:
 # We need to link bmc.o to the unit test, so here's everything it depends on...
 BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
           ../src/cbmc/bmc$(OBJEXT) \
-          ../src/cbmc/bmc_cover$(OBJEXT) \
           ../src/cbmc/bv_cbmc$(OBJEXT) \
           ../src/cbmc/cbmc_dimacs$(OBJEXT) \
           ../src/cbmc/cbmc_languages$(OBJEXT) \
