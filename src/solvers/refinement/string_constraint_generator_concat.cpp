@@ -55,13 +55,19 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
   lemmas.push_back(a2);
 
   symbol_exprt idx=fresh_univ_index("QA_index_concat", res.length().type());
-  string_constraintt a3(idx, s1.length(), equal_exprt(s1[idx], res[idx]));
+  string_constraintt a3;
+  a3.univ_var = idx;
+  a3.upper_bound = s1.length();
+  a3.body = equal_exprt(s1[idx], res[idx]);
   constraints.push_back(a3);
 
   symbol_exprt idx2=fresh_univ_index("QA_index_concat2", res.length().type());
   equal_exprt res_eq(
     res[plus_exprt(idx2, s1.length())], s2[plus_exprt(start_index, idx2)]);
-  string_constraintt a4(idx2, minus_exprt(end_index, start_index), res_eq);
+  string_constraintt a4;
+  a4.univ_var = idx2;
+  a4.upper_bound = minus_exprt(end_index, start_index);
+  a4.body = res_eq;
   constraints.push_back(a4);
 
   // We should have a enum type for the possible error codes
@@ -90,7 +96,10 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
   lemmas.push_back(a1);
 
   symbol_exprt idx = fresh_univ_index("QA_index_concat_char", index_type);
-  string_constraintt a2(idx, s1.length(), equal_exprt(s1[idx], res[idx]));
+  string_constraintt a2;
+  a2.univ_var = idx;
+  a2.upper_bound = s1.length();
+  a2.body = equal_exprt(s1[idx], res[idx]);
   constraints.push_back(a2);
 
   equal_exprt a3(res[s1.length()], c);

@@ -64,16 +64,19 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
     binary_relation_exprt(from_index, ID_le, zero), zero, from_index);
 
   symbol_exprt n=fresh_univ_index("QA_index_of", index_type);
-  string_constraintt a4(
-    n, lower_bound, index, implies_exprt(contains, notequal_exprt(str[n], c)));
+  string_constraintt a4;
+  a4.univ_var = n;
+  a4.lower_bound = lower_bound;
+  a4.upper_bound = index;
+  a4.body = implies_exprt(contains, not_exprt(equal_exprt(str[n], c)));
   constraints.push_back(a4);
 
   symbol_exprt m=fresh_univ_index("QA_index_of", index_type);
-  string_constraintt a5(
-    m,
-    lower_bound,
-    str.length(),
-    implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
+  string_constraintt a5;
+  a5.univ_var = m;
+  a5.lower_bound = lower_bound;
+  a5.upper_bound = str.length();
+  a5.body = implies_exprt(not_exprt(contains), notequal_exprt(str[m], c));
   constraints.push_back(a5);
 
   return index;
@@ -126,11 +129,11 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   lemmas.push_back(a2);
 
   symbol_exprt qvar=fresh_univ_index("QA_index_of_string", index_type);
-  string_constraintt a3(
-    qvar,
-    needle.length(),
-    implies_exprt(
-      contains, equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar])));
+  string_constraintt a3;
+  a3.univ_var = qvar;
+  a3.upper_bound = needle.length();
+  a3.body = implies_exprt(
+    contains, equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar]));
   constraints.push_back(a3);
 
   // string_not contains_constraintt are formulas of the form:
@@ -220,8 +223,10 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
 
   symbol_exprt qvar=fresh_univ_index("QA_index_of_string", index_type);
   equal_exprt constr3(haystack[plus_exprt(qvar, offset)], needle[qvar]);
-  const string_constraintt a3(
-    qvar, needle.length(), implies_exprt(contains, constr3));
+  string_constraintt a3;
+  a3.univ_var = qvar;
+  a3.upper_bound = needle.length();
+  a3.body = implies_exprt(contains, constr3);
   constraints.push_back(a3);
 
   // end_index is min(from_index, |str| - |substring|)
@@ -360,18 +365,18 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
     str.length());
 
   const symbol_exprt n = fresh_univ_index("QA_last_index_of1", index_type);
-  const string_constraintt a4(
-    n,
-    plus_exprt(index, index1),
-    end_index,
-    implies_exprt(contains, notequal_exprt(str[n], c)));
+  string_constraintt a4;
+  a4.univ_var = n;
+  a4.lower_bound = plus_exprt(index, index1);
+  a4.upper_bound = end_index;
+  a4.body = implies_exprt(contains, notequal_exprt(str[n], c));
   constraints.push_back(a4);
 
   const symbol_exprt m = fresh_univ_index("QA_last_index_of2", index_type);
-  const string_constraintt a5(
-    m,
-    end_index,
-    implies_exprt(not_exprt(contains), notequal_exprt(str[m], c)));
+  string_constraintt a5;
+  a5.univ_var = m;
+  a5.upper_bound = end_index;
+  a5.body = implies_exprt(not_exprt(contains), notequal_exprt(str[m], c));
   constraints.push_back(a5);
 
   return index;

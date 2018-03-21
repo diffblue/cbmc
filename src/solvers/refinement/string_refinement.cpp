@@ -29,11 +29,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/refinement/string_constraint_instantiation.h>
 #include <unordered_set>
 
-static bool is_valid_string_constraint(
-  messaget::mstreamt &stream,
-  const namespacet &ns,
-  const string_constraintt &expr);
-
 static optionalt<exprt> find_counter_example(
   const namespacet &ns,
   ui_message_handlert::uit ui,
@@ -718,7 +713,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     constraints.end(),
     std::back_inserter(axioms.universal),
     [&](string_constraintt constraint) { // NOLINT
-      symbol_resolve.replace_expr(constraint);
+      replace(constraint, symbol_resolve);
       DATA_INVARIANT(
         is_valid_string_constraint(error(), ns, constraint),
         string_refinement_invariantt(
@@ -1398,8 +1393,8 @@ static exprt negation_of_not_contains_constraint(
 static exprt negation_of_constraint(const string_constraintt &axiom)
 {
   // If the for all is vacuously true, the negation is false.
-  const exprt &lb=axiom.lower_bound();
-  const exprt &ub=axiom.upper_bound();
+  const exprt &lb = axiom.get_lower_bound();
+  const exprt &ub = axiom.upper_bound;
   if(lb.id()==ID_constant && ub.id()==ID_constant)
   {
     const auto lb_int = numeric_cast<mp_integer>(lb);
@@ -1410,11 +1405,11 @@ static exprt negation_of_constraint(const string_constraintt &axiom)
 
   // If the premise is false, the implication is trivially true, so the
   // negation is false.
-  if(axiom.premise()==false_exprt())
+  if(axiom.index_guard == false_exprt())
     return false_exprt();
 
-  and_exprt premise(axiom.premise(), axiom.univ_within_bounds());
-  and_exprt negaxiom(premise, not_exprt(axiom.body()));
+  const and_exprt premise(axiom.index_guard, univ_within_bounds(axiom));
+  const and_exprt negaxiom(premise, not_exprt(axiom.body));
 
   return negaxiom;
 }
@@ -1461,34 +1456,22 @@ exprt concretize_arrays_in_expression(
 
 /// Debugging function which outputs the different steps an axiom goes through
 /// to be checked in check axioms.
+/// \tparam T: can be either string_constraintt, string_not_contains_constraintt
+template <typename T>
 static void debug_check_axioms_step(
   messaget::mstreamt &stream,
   const namespacet &ns,
-  const exprt &axiom,
-  const exprt &axiom_in_model,
+  const T &axiom,
+  const T &axiom_in_model,
   const exprt &negaxiom,
   const exprt &with_concretized_arrays)
 {
   static const std::string indent = "  ";
   static const std::string indent2 = "    ";
   stream << indent2 << "- axiom:\n" << indent2 << indent;
-
-  if(axiom.id() == ID_string_constraint)
-    stream << to_string(to_string_constraint(axiom));
-  else if(axiom.id() == ID_string_not_contains_constraint)
-    stream << to_string(to_string_not_contains_constraint(axiom));
-  else
-    stream << format(axiom);
+  stream << to_string(axiom);
   stream << '\n' << indent2 << "- axiom_in_model:\n" << indent2 << indent;
-
-  if(axiom_in_model.id() == ID_string_constraint)
-    stream << to_string(to_string_constraint(axiom_in_model));
-  else if(axiom_in_model.id() == ID_string_not_contains_constraint)
-    stream << to_string(to_string_not_contains_constraint(axiom_in_model));
-  else
-    stream << format(axiom_in_model);
-
-  stream << '\n'
+  stream << to_string(axiom_in_model) << '\n'
          << indent2 << "- negated_axiom:\n"
          << indent2 << indent << format(negaxiom) << '\n';
   stream << indent2 << "- negated_axiom_with_concretized_arrays:\n"
@@ -1545,16 +1528,19 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   for(size_t i=0; i<axioms.universal.size(); i++)
   {
     const string_constraintt &axiom=axioms.universal[i];
-    const symbol_exprt &univ_var=axiom.univ_var();
-    const exprt &bound_inf=axiom.lower_bound();
-    const exprt &bound_sup=axiom.upper_bound();
-    const exprt &prem=axiom.premise();
+    const symbol_exprt &univ_var = axiom.univ_var;
+    const exprt &bound_inf = axiom.get_lower_bound();
+    const exprt &bound_sup = axiom.upper_bound;
+    const exprt &prem = axiom.index_guard;
     INVARIANT(
       prem == true_exprt(), "string constraint premises are not supported");
-    const exprt &body=axiom.body();
 
-    const string_constraintt axiom_in_model(
-      univ_var, get(bound_inf), get(bound_sup), get(body));
+    string_constraintt axiom_in_model;
+    axiom_in_model.univ_var = univ_var;
+    axiom_in_model.lower_bound = get(bound_inf);
+    axiom_in_model.upper_bound = get(bound_sup);
+    axiom_in_model.index_guard = get(prem);
+    axiom_in_model.body = get(axiom.body);
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
     negaxiom = simplify_expr(negaxiom, ns);
@@ -1648,13 +1634,13 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         const exprt &val=v.second;
         const string_constraintt &axiom=axioms.universal[v.first];
 
-        implies_exprt instance(axiom.premise(), axiom.body());
-        replace_expr(axiom.univ_var(), val, instance);
+        implies_exprt instance(axiom.index_guard, axiom.body);
+        replace_expr(axiom.univ_var, val, instance);
         // We are not sure the index set contains only positive numbers
         and_exprt bounds(
-          axiom.univ_within_bounds(),
+          univ_within_bounds(axiom),
           binary_relation_exprt(from_integer(0, val.type()), ID_le, val));
-        replace_expr(axiom.univ_var(), val, bounds);
+        replace_expr(axiom.univ_var, val, bounds);
         const implies_exprt counter(bounds, instance);
         lemmas.push_back(counter);
       }
@@ -1857,32 +1843,14 @@ static exprt compute_inverse_function(
   return sum_over_map(elems, f.type(), neg);
 }
 
-class find_qvar_visitort : public const_expr_visitort
-{
-private:
-  const exprt &qvar_;
-
-public:
-  bool found;
-
-  explicit find_qvar_visitort(const exprt &qvar): qvar_(qvar), found(false) {}
-
-  void operator()(const exprt &expr) override
-  {
-    if(expr==qvar_)
-      found=true;
-  }
-};
-
 /// look for the symbol and return true if it is found
 /// \param index: an index expression
 /// \param qvar: a symbol expression
 /// \return a Boolean
 static bool find_qvar(const exprt &index, const symbol_exprt &qvar)
 {
-  find_qvar_visitort v2(qvar);
-  index.visit(v2);
-  return v2.found;
+  return std::find(index.depth_begin(), index.depth_end(), qvar) !=
+         index.depth_end();
 }
 
 /// Add to the index set all the indices that appear in the formulas and the
@@ -2012,10 +1980,10 @@ static void initial_index_set(
   const namespacet &ns,
   const string_constraintt &axiom)
 {
-  const symbol_exprt &qvar=axiom.univ_var();
-  const auto &bound = axiom.upper_bound();
-  auto it = axiom.body().depth_begin();
-  const auto end = axiom.body().depth_end();
+  const symbol_exprt &qvar = axiom.univ_var;
+  const auto &bound = axiom.upper_bound;
+  auto it = axiom.body.depth_begin();
+  const auto end = axiom.body.depth_end();
   while(it != end)
   {
     if(it->id() == ID_index && is_char_type(it->type()))
@@ -2158,18 +2126,18 @@ static exprt instantiate(
   const exprt &str,
   const exprt &val)
 {
-  const optionalt<exprt> idx = find_index(axiom.body(), str, axiom.univ_var());
+  const optionalt<exprt> idx = find_index(axiom.body, str, axiom.univ_var);
   if(!idx.has_value())
     return true_exprt();
 
-  const exprt r = compute_inverse_function(stream, axiom.univ_var(), val, *idx);
+  const exprt r = compute_inverse_function(stream, axiom.univ_var, val, *idx);
   implies_exprt instance(
     and_exprt(
-      binary_relation_exprt(axiom.univ_var(), ID_ge, axiom.lower_bound()),
-      binary_relation_exprt(axiom.univ_var(), ID_lt, axiom.upper_bound()),
-      axiom.premise()),
-    axiom.body());
-  replace_expr(axiom.univ_var(), r, instance);
+      binary_relation_exprt(axiom.univ_var, ID_ge, axiom.get_lower_bound()),
+      binary_relation_exprt(axiom.univ_var, ID_lt, axiom.upper_bound),
+      axiom.index_guard),
+    axiom.body);
+  replace_expr(axiom.univ_var, r, instance);
   return instance;
 }
 
@@ -2353,138 +2321,4 @@ static optionalt<exprt> find_counter_example(
     return solver.get(var);
   else
     return { };
-}
-
-/// \related string_constraintt
-typedef std::map<exprt, std::vector<exprt>> array_index_mapt;
-
-/// \related string_constraintt
-static array_index_mapt gather_indices(const exprt &expr)
-{
-  array_index_mapt indices;
-  // clang-format off
-  std::for_each(
-    expr.depth_begin(),
-    expr.depth_end(),
-    [&](const exprt &expr)
-    {
-      const auto index_expr = expr_try_dynamic_cast<const index_exprt>(expr);
-      if(index_expr)
-        indices[index_expr->array()].push_back(index_expr->index());
-    });
-  // clang-format on
-  return indices;
-}
-
-/// \param expr: an expression
-/// \param var: a symbol
-/// \return Boolean telling whether `expr` is a linear function of `var`.
-/// \todo Add unit tests
-/// \related string_constraintt
-static bool
-is_linear_arithmetic_expr(const exprt &expr, const symbol_exprt &var)
-{
-  for(auto it = expr.depth_begin(); it != expr.depth_end();)
-  {
-    if(
-      it->id() != ID_plus && it->id() != ID_minus &&
-      it->id() != ID_unary_minus && *it != var)
-    {
-      if(find_qvar(*it, var))
-        return false;
-      else
-        it.next_sibling_or_parent();
-    }
-    else
-      ++it;
-  }
-  return true;
-}
-
-/// The universally quantified variable is only allowed to occur in index
-/// expressions in the body of a string constraint. This function returns true
-/// if this is the case and false otherwise.
-/// \related string_constraintt
-/// \param [in] expr: The string constraint to check
-/// \return true if the universal variable only occurs in index expressions,
-///   false otherwise.
-static bool universal_only_in_index(const string_constraintt &expr)
-{
-  for(auto it = expr.body().depth_begin(); it != expr.body().depth_end();)
-  {
-    if(*it == expr.univ_var())
-      return false;
-    if(it->id() == ID_index)
-      it.next_sibling_or_parent();
-    else
-      ++it;
-  }
-  return true;
-}
-
-/// Checks the data invariant for \link string_constraintt \endlink
-/// \related string_constraintt
-/// \param stream: message stream
-/// \param ns: namespace
-/// \param [in] expr: the string constraint to check
-/// \return whether the constraint satisfies the invariant
-static bool is_valid_string_constraint(
-  messaget::mstreamt &stream,
-  const namespacet &ns,
-  const string_constraintt &expr)
-{
-  const auto eom=messaget::eom;
-  // Condition 1: The premise cannot contain any string indices
-  const array_index_mapt premise_indices=gather_indices(expr.premise());
-  if(!premise_indices.empty())
-  {
-    stream << "Premise has indices: " << format(expr) << ", map: {";
-    for(const auto &pair : premise_indices)
-    {
-      stream << format(pair.first) << ": {";
-      for(const auto &i : pair.second)
-        stream << format(i) << ", ";
-    }
-    stream << "}}" << eom;
-    return false;
-  }
-
-  const array_index_mapt body_indices=gather_indices(expr.body());
-  // Must validate for each string. Note that we have an invariant that the
-  // second value in the pair is non-empty.
-  for(const auto &pair : body_indices)
-  {
-    // Condition 2: All indices of the same string must be the of the same form
-    const exprt rep=pair.second.back();
-    for(size_t j=0; j<pair.second.size()-1; j++)
-    {
-      const exprt i=pair.second[j];
-      const equal_exprt equals(rep, i);
-      const exprt result=simplify_expr(equals, ns);
-      if(result.is_false())
-      {
-        stream << "Indices not equal: " << format(expr)
-               << ", str: " << format(pair.first) << eom;
-        return false;
-      }
-    }
-
-    // Condition 3: f must be linear in the quantified variable
-    if(!is_linear_arithmetic_expr(rep, expr.univ_var()))
-    {
-      stream << "f is not linear: " << format(expr)
-             << ", str: " << format(pair.first) << eom;
-      return false;
-    }
-
-    // Condition 4: the quantified variable can only occur in indices in the
-    // body
-    if(!universal_only_in_index(expr))
-    {
-      stream << "Universal variable outside of index:" << format(expr) << eom;
-      return false;
-    }
-  }
-
-  return true;
 }

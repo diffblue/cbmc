@@ -369,7 +369,11 @@ void string_constraint_generatort::add_constraint_on_characters(
   const and_exprt char_in_set(
     binary_relation_exprt(chr, ID_ge, from_integer(low_char, chr.type())),
     binary_relation_exprt(chr, ID_le, from_integer(high_char, chr.type())));
-  const string_constraintt sc(qvar, start, end, char_in_set);
+  string_constraintt sc;
+  sc.univ_var = qvar;
+  sc.lower_bound = start;
+  sc.upper_bound = end;
+  sc.body = char_in_set;
   constraints.push_back(sc);
 }
 
