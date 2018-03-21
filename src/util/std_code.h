@@ -466,7 +466,7 @@ public:
 
   const codet &then_case() const
   {
-    return static_cast<const codet &>(op1());
+    return to_code(op1());
   }
 
   bool has_else_case() const
@@ -476,7 +476,7 @@ public:
 
   const codet &else_case() const
   {
-    return static_cast<const codet &>(op2());
+    return to_code(op2());
   }
 
   codet &then_case()
@@ -969,7 +969,7 @@ public:
 
   const codet &code() const
   {
-    return static_cast<const codet &>(op0());
+    return to_code(op0());
   }
 };
 
@@ -1038,7 +1038,7 @@ public:
 
   const codet &code() const
   {
-    return static_cast<const codet &>(op1());
+    return to_code(op1());
   }
 };
 
@@ -1619,7 +1619,7 @@ public:
 
   const codet &try_code() const
   {
-    return static_cast<const codet &>(op0());
+    return to_code(op0());
   }
 
   code_declt &get_catch_decl(unsigned i)
