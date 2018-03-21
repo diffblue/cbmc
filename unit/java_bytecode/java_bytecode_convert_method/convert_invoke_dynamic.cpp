@@ -278,3 +278,62 @@ SCENARIO(
     }
   });
 }
+
+void validate_member_variable_lambda_assignment(
+  const symbol_tablet &symbol_table,
+  const std::vector<codet> &instructions,
+  const lambda_assignment_test_datat &test_data,
+  const std::string lambda_variable_id)
+{
+  const auto lambda_assignment =
+    require_goto_statements::find_this_component_assignment(
+      instructions, lambda_variable_id);
+
+  REQUIRE(lambda_assignment.non_null_assignments.size() == 1);
+  REQUIRE_FALSE(lambda_assignment.null_assignment.has_value());
+
+  validate_lamdba_assignement(
+    symbol_table, instructions, test_data, lambda_assignment);
+}
+
+SCENARIO(
+  "Converting invokedynamic with a member lambda",
+  "[core]"
+  "[lamdba][java_bytecode][java_bytecode_convert_method][!mayfail]")
+{
+  // NOLINTNEXTLINE(whitespace/braces)
+  run_test_with_compilers([](const std::string &compiler) {
+    GIVEN(
+      "A class with a static lambda variables from " + compiler + " compiler.")
+    {
+      symbol_tablet symbol_table = load_java_class(
+        "MemberLambdas",
+        "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
+          "_classes/",
+        "MemberLambdas.<init>");
+
+      WHEN("Inspecting the assignments of the entry function")
+      {
+        const std::vector<codet> &instructions =
+          require_goto_statements::get_all_statements(
+            symbol_table.lookup_ref("java::MemberLambdas.<init>:()V").value);
+
+        const std::string function_prefix_regex_str = "java::MemberLambdas";
+
+        THEN(
+          "The local variable should be assigned a temp object implementing "
+          "SimpleLambda")
+        {
+          lambda_assignment_test_datat test_data;
+          test_data.lambda_interface = "java::SimpleLambda";
+          test_data.lambda_interface_method_descriptor = ".Execute:()V";
+          test_data.lambda_function_id = "java::MemberLambdas.lambda$new$0:()V";
+          test_data.expected_params = {};
+          test_data.should_return_value = false;
+          validate_member_variable_lambda_assignment(
+            symbol_table, instructions, test_data, "simpleLambda");
+        }
+      }
+    }
+  });
+}
