@@ -13,6 +13,7 @@
 #include <util/expr_iterator.h>
 #include <goto-programs/goto_functions.h>
 #include <java_bytecode/java_types.h>
+#include <util/suffix.h>
 
 /// Expand value of a function to include all child codets
 /// \param function_value: The value of the function (e.g. got by looking up
@@ -133,6 +134,53 @@ require_goto_statements::find_struct_component_assignments(
             {
               locations.non_null_assignments.push_back(code_assign);
             }
+          }
+        }
+      }
+    }
+  }
+  return locations;
+}
+
+/// Find assignment statements that set this->{component_name}
+/// \param statements The statements to look through
+/// \param component_name The name of the component whose assignments we are
+///   looking for.
+/// \return A collection of all non-null assignments to this component
+///   and, if present, a null assignment.
+require_goto_statements::pointer_assignment_locationt
+require_goto_statements::find_this_component_assignment(
+  const std::vector<codet> &statements,
+  const irep_idt &component_name)
+{
+  pointer_assignment_locationt locations;
+
+  for(const auto &assignment : statements)
+  {
+    if(assignment.get_statement() == ID_assign)
+    {
+      const code_assignt &code_assign = to_code_assign(assignment);
+
+      if(code_assign.lhs().id() == ID_member)
+      {
+        const member_exprt &member_expr = to_member_expr(code_assign.lhs());
+        if(
+          member_expr.get_component_name() == component_name &&
+          member_expr.op().id() == ID_dereference &&
+          member_expr.op().op0().id() == ID_symbol &&
+          has_suffix(
+            id2string(to_symbol_expr(member_expr.op().op0()).get_identifier()),
+            "this"))
+        {
+          if(
+            code_assign.rhs() ==
+            null_pointer_exprt(to_pointer_type(code_assign.lhs().type())))
+          {
+            locations.null_assignment = code_assign;
+          }
+          else
+          {
+            locations.non_null_assignments.push_back(code_assign);
           }
         }
       }

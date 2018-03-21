@@ -74,6 +74,10 @@ pointer_assignment_locationt find_struct_component_assignments(
   const optionalt<irep_idt> &superclass_name,
   const irep_idt &component_name);
 
+pointer_assignment_locationt find_this_component_assignment(
+  const std::vector<codet> &statements,
+  const irep_idt &component_name);
+
 std::vector<codet> get_all_statements(const exprt &function_value);
 
 const std::vector<codet>
