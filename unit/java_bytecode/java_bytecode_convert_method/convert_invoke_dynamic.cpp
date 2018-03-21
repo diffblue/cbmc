@@ -17,7 +17,6 @@
 
 struct lambda_assignment_test_datat
 {
-  std::regex lambda_variable_id;
   irep_idt lambda_interface;
   std::string lambda_interface_method_descriptor;
   irep_idt lambda_function_id;
@@ -46,15 +45,10 @@ struct lambda_assignment_test_datat
 void validate_lamdba_assignement(
   const symbol_tablet &symbol_table,
   const std::vector<codet> &instructions,
-  const lambda_assignment_test_datat &test_data)
+  const lambda_assignment_test_datat &test_data,
+  const require_goto_statements::pointer_assignment_locationt
+    &lambda_assignment)
 {
-  const auto lambda_assignment =
-    require_goto_statements::find_pointer_assignments(
-      test_data.lambda_variable_id, instructions);
-
-  REQUIRE(lambda_assignment.non_null_assignments.size() == 1);
-  REQUIRE_FALSE(lambda_assignment.null_assignment.has_value());
-
   const typecast_exprt &rhs_value = require_expr::require_typecast(
     lambda_assignment.non_null_assignments[0].rhs());
 
@@ -140,6 +134,25 @@ void validate_lamdba_assignement(
   }
 }
 
+/// Find the assignment to the lambda and then call validate_lamdba_assignement
+/// for full validation.
+void validate_local_variable_lambda_assignment(
+  const symbol_tablet &symbol_table,
+  const std::vector<codet> &instructions,
+  const lambda_assignment_test_datat &test_data,
+  const std::regex lambda_variable_id)
+{
+  const auto lambda_assignment =
+    require_goto_statements::find_pointer_assignments(
+      lambda_variable_id, instructions);
+
+  REQUIRE(lambda_assignment.non_null_assignments.size() == 1);
+  REQUIRE_FALSE(lambda_assignment.null_assignment.has_value());
+
+  validate_lamdba_assignement(
+    symbol_table, instructions, test_data, lambda_assignment);
+}
+
 SCENARIO(
   "Converting invokedynamic with a local lambda",
   "[core]"
@@ -170,24 +183,22 @@ SCENARIO(
           "SimpleLambda")
         {
           lambda_assignment_test_datat test_data;
-          test_data.lambda_variable_id =
-            std::regex(function_prefix_regex_str + "::\\d+::simpleLambda$");
-
           test_data.lambda_interface = "java::SimpleLambda";
           test_data.lambda_interface_method_descriptor = ".Execute:()V";
           test_data.lambda_function_id = "java::LocalLambdas.pretendLambda:()V";
           test_data.expected_params = {};
           test_data.should_return_value = false;
-          validate_lamdba_assignement(symbol_table, instructions, test_data);
+          validate_local_variable_lambda_assignment(
+            symbol_table,
+            instructions,
+            test_data,
+            std::regex(function_prefix_regex_str + "::\\d+::simpleLambda$"));
         }
         THEN(
           "The local variable should be assigned a non-null pointer to a "
           "parameter interface implementor")
         {
           lambda_assignment_test_datat test_data;
-          test_data.lambda_variable_id =
-            std::regex(function_prefix_regex_str + "::\\d+::paramLambda$");
-
           test_data.lambda_interface = "java::ParameterLambda";
           test_data.lambda_interface_method_descriptor =
             ".Execute:(ILjava/lang/Object;LDummyGeneric;)V";
@@ -204,23 +215,23 @@ SCENARIO(
           test_data.expected_params = {integer_param, ref_param, generic_param};
           test_data.should_return_value = false;
 
-          validate_lamdba_assignement(symbol_table, instructions, test_data);
+          validate_local_variable_lambda_assignment(
+            symbol_table,
+            instructions,
+            test_data,
+            std::regex(function_prefix_regex_str + "::\\d+::paramLambda$"));
         }
         THEN(
           "The local variable should be assigned a non-null pointer to a "
           "array parameter interface implementor")
         {
           lambda_assignment_test_datat test_data;
-
-          test_data.lambda_variable_id =
-            std::regex(function_prefix_regex_str + "::\\d+::arrayParamLambda$");
-
           test_data.lambda_interface = "java::ArrayParameterLambda";
           test_data.lambda_interface_method_descriptor =
             ".Execute:([I[Ljava/lang/Object;[LDummyGeneric;)V";
           test_data.lambda_function_id =
             "java::LocalLambdas.lambda$test$2:"
-            "([I[Ljava/lang/Object;[LDummyGeneric;)V";
+            "[I[Ljava/lang/Object;[LDummyGeneric;)V";
 
           symbol_exprt integer_param{"primitive", java_type_from_string("[I")};
           symbol_exprt ref_param{"reference",
@@ -231,33 +242,35 @@ SCENARIO(
           test_data.expected_params = {integer_param, ref_param, generic_param};
           test_data.should_return_value = false;
 
-          validate_lamdba_assignement(symbol_table, instructions, test_data);
+          validate_local_variable_lambda_assignment(
+            symbol_table,
+            instructions,
+            test_data,
+            std::regex(
+              function_prefix_regex_str + "::\\d+::arrayParamLambda$"));
         }
         THEN(
           "The local variable should be assigned a temp object implementing "
           "ReturningLambdaPrimitive")
         {
           lambda_assignment_test_datat test_data;
-
-          test_data.lambda_variable_id = std::regex(
-            function_prefix_regex_str + "::\\d+::returnPrimitiveLambda");
-
           test_data.lambda_interface = "java::ReturningLambdaPrimitive";
           test_data.lambda_interface_method_descriptor = ".Execute:()I";
           test_data.lambda_function_id = "java::LocalLambdas.lambda$test$3:()I";
           test_data.expected_params = {};
           test_data.should_return_value = true;
-          validate_lamdba_assignement(symbol_table, instructions, test_data);
+          validate_local_variable_lambda_assignment(
+            symbol_table,
+            instructions,
+            test_data,
+            std::regex(
+              function_prefix_regex_str + "::\\d+::returnPrimitiveLambda"));
         }
         THEN(
           "The local variable should be assigned a temp object implementing "
           "ReturningLambdaReference")
         {
           lambda_assignment_test_datat test_data;
-
-          test_data.lambda_variable_id = std::regex(
-            function_prefix_regex_str + "::\\d+::returnReferenceLambda");
-
           test_data.lambda_interface = "java::ReturningLambdaReference";
 
           test_data.lambda_interface_method_descriptor =
@@ -268,18 +281,18 @@ SCENARIO(
             "java::LocalLambdas.lambda$test$4:()Ljava/lang/Object;";
           test_data.expected_params = {};
           test_data.should_return_value = true;
-          validate_lamdba_assignement(symbol_table, instructions, test_data);
+          validate_local_variable_lambda_assignment(
+            symbol_table,
+            instructions,
+            test_data,
+            std::regex(
+              function_prefix_regex_str + "::\\d+::returnReferenceLambda"));
         }
         THEN(
           "The local variable should be assigned a temp object implementing "
           "ReturningLambdaSpecalisedGeneric")
         {
           lambda_assignment_test_datat test_data;
-
-          test_data.lambda_variable_id = std::regex(
-            function_prefix_regex_str +
-            "::\\d+::returningSpecalisedGenericLambda");
-
           test_data.lambda_interface = "java::ReturningLambdaSpecalisedGeneric";
 
           test_data.lambda_interface_method_descriptor =
@@ -288,7 +301,13 @@ SCENARIO(
             "java::LocalLambdas.lambda$test$5:()LDummyGeneric;";
           test_data.expected_params = {};
           test_data.should_return_value = true;
-          validate_lamdba_assignement(symbol_table, instructions, test_data);
+          validate_local_variable_lambda_assignment(
+            symbol_table,
+            instructions,
+            test_data,
+            std::regex(
+              function_prefix_regex_str +
+              "::\\d+::returningSpecalisedGenericLambda"));
         }
         // TODO[TG-2482]: Tests for local lambdas that capture variables
       }
