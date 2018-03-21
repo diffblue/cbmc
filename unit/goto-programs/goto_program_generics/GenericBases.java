@@ -1,21 +1,3 @@
-// Helper classes
-class Wrapper<T> {
-  public T field;
-}
-
-class IntWrapper {
-  public int i;
-}
-
-class TwoWrapper<K, V> {
-  public K first;
-  public V second;
-}
-
-interface InterfaceWrapper<T> {
-  public T method(T t);
-}
-
 // A class extending a generic class instantiated with a standard library class
 class SuperclassInst extends Wrapper<Integer> {
   public void foo() {
@@ -24,14 +6,14 @@ class SuperclassInst extends Wrapper<Integer> {
 }
 
 // A class extending a generic class instantiated with a user-defined class
-class SuperclassInst2 extends Wrapper<IntWrapper> {
+class SuperclassInst2 extends Wrapper<IWrapper> {
   public void foo() {
     this.field.i = 5;
   }
 }
 
 // A class extending an instantiated nested generic class
-class SuperclassInst3 extends Wrapper<Wrapper<IntWrapper>> {
+class SuperclassInst3 extends Wrapper<Wrapper<IWrapper>> {
   public void foo() {
     this.field.field.i = 5;
   }
@@ -54,7 +36,7 @@ class SuperclassUninstTest
 
 // A generic class extending a generic class with both instantiated and
 // uninstantiated parameters
-class SuperclassMixed<U> extends TwoWrapper<U,IntWrapper> {
+class SuperclassMixed<U> extends PairWrapper<U,IWrapper> {
   public void foo(U value) {
     this.first = value;
     this.second.i = 5;
@@ -99,7 +81,7 @@ class SuperclassInnerUninst<U> {
   }
   public Inner inner;
 
-  class InnerGen<T> extends TwoWrapper<U,T> {
+  class InnerGen<T> extends PairWrapper<U,T> {
     public void foo(U uvalue, T tvalue) {
       this.first = uvalue;
       this.second = tvalue;
@@ -113,9 +95,9 @@ class SuperclassInnerUninst<U> {
 }
 class SuperclassInnerUninstTest
 {
-  SuperclassInnerUninst<IntWrapper> f;
+  SuperclassInnerUninst<IWrapper> f;
   public void foo() {
-    IntWrapper x = new IntWrapper();
+    IWrapper x = new IWrapper();
     f.inner.foo(x);
     f.inner_gen.foo(x,true);
     f.inner_three.foo(x);

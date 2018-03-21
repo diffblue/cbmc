@@ -1,24 +1,8 @@
-class SimpleWrapper<T> {
-  public T field;
-  public T[] array_field;
-
-  public int int_field;
-}
-
-class IWrapper {
-  public int i;
-}
-
-class PairWrapper<K, V> {
-  public K key;
-  public V value;
-}
-
 public class GenericFields
 {
   IWrapper field;
   class SimpleGenericField  {
-    SimpleWrapper<IWrapper> field_input;
+    Wrapper<IWrapper> field_input;
     public void foo() {
         field_input.field.i = 5;
         field_input.array_field = new IWrapper[2];
@@ -26,8 +10,8 @@ public class GenericFields
   }
 
   class MultipleGenericFields {
-    SimpleWrapper<IWrapper> field_input1;
-    SimpleWrapper<IWrapper> field_input2;
+    Wrapper<IWrapper> field_input1;
+    Wrapper<IWrapper> field_input2;
     public void foo() {
         field_input1.field.i = 10;
         field_input2.field.i = 20;
@@ -35,7 +19,7 @@ public class GenericFields
   }
 
   class NestedGenericFields {
-    SimpleWrapper<SimpleWrapper<IWrapper>> field_input1;
+    Wrapper<Wrapper<IWrapper>> field_input1;
     public void foo() {
         field_input1.field.field.i = 30;
     }
@@ -44,19 +28,19 @@ public class GenericFields
   class PairGenericField {
     PairWrapper<IWrapper, IWrapper> field_input;
     public void foo() {
-        field_input.key.i = 40;
-        field_input.value.i = 50;
+        field_input.first.i = 40;
+        field_input.second.i = 50;
     }
   }
 
   class GenericMethodParameter {
-    public void foo(SimpleWrapper<IWrapper> v) {
+    public void foo(Wrapper<IWrapper> v) {
         v.field.i = 20;
     }
   }
 
   class GenericMethodUninstantiatedParameter {
-    public <T> void foo_unspec(SimpleWrapper<T> v) {
+    public <T> void foo_unspec(Wrapper<T> v) {
         v.int_field=10;
     }
   }

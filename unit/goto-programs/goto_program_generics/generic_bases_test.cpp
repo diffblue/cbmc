@@ -86,7 +86,7 @@ SCENARIO(
           this_tmp_name,
           {"Wrapper"},
           "field",
-          "java::IntWrapper",
+          "java::IWrapper",
           {"java::java.lang.Object"},
           entry_point_code);
       }
@@ -128,7 +128,7 @@ SCENARIO(
             wrapper_tmp_name,
             {},
             "field",
-            "java::IntWrapper",
+            "java::IWrapper",
             {},
             entry_point_code);
         }
@@ -214,7 +214,7 @@ SCENARIO(
         {
           require_goto_statements::require_struct_component_assignment(
             f_tmp_name,
-            {"TwoWrapper"},
+            {"PairWrapper"},
             "first",
             "java::java.lang.Boolean",
             {"java::java.lang.Object"},
@@ -222,9 +222,9 @@ SCENARIO(
 
           require_goto_statements::require_struct_component_assignment(
             f_tmp_name,
-            {"TwoWrapper"},
+            {"PairWrapper"},
             "second",
-            "java::IntWrapper",
+            "java::IWrapper",
             {"java::java.lang.Object"},
             entry_point_code);
         }
@@ -354,7 +354,7 @@ SCENARIO(
               inner_tmp_name,
               {"Wrapper"},
               "field",
-              "java::IntWrapper",
+              "java::IWrapper",
               {"java::java.lang.Object"},
               entry_point_code);
           }
@@ -373,14 +373,14 @@ SCENARIO(
           {
             require_goto_statements::require_struct_component_assignment(
               inner_gen_tmp_name,
-              {"TwoWrapper"},
+              {"PairWrapper"},
               "first",
-              "java::IntWrapper",
+              "java::IWrapper",
               {"java::java.lang.Object"},
               entry_point_code);
             require_goto_statements::require_struct_component_assignment(
               inner_gen_tmp_name,
-              {"TwoWrapper"},
+              {"PairWrapper"},
               "second",
               "java::java.lang.Boolean",
               {"java::java.lang.Object"},
@@ -403,7 +403,7 @@ SCENARIO(
               inner_three_tmp_name,
               {"Wrapper"},
               "field",
-              "java::IntWrapper",
+              "java::IWrapper",
               {"java::java.lang.Object"},
               entry_point_code);
           }

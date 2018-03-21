@@ -39,14 +39,14 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "this", entry_point_code);
 
-      THEN("Object 'this' has field 'field_input' of type SimpleWrapper")
+      THEN("Object 'this' has field 'field_input' of type Wrapper")
       {
         const auto &field_input_name =
           require_goto_statements::require_struct_component_assignment(
             tmp_object_name,
             {},
             "field_input",
-            "java::SimpleWrapper",
+            "java::Wrapper",
             {},
             entry_point_code);
 
@@ -100,14 +100,14 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "this", entry_point_code);
 
-      THEN("Object 'this' has field 'field_input1' of type SimpleWrapper")
+      THEN("Object 'this' has field 'field_input1' of type Wrapper")
       {
         const auto &field_input1_name =
           require_goto_statements::require_struct_component_assignment(
             tmp_object_name,
             {},
             "field_input1",
-            "java::SimpleWrapper",
+            "java::Wrapper",
             {},
             entry_point_code);
 
@@ -123,14 +123,14 @@ SCENARIO(
         }
       }
 
-      THEN("Object 'this' has field 'field_input2' of type SimpleWrapper")
+      THEN("Object 'this' has field 'field_input2' of type Wrapper")
       {
         const auto &field_input2_name =
           require_goto_statements::require_struct_component_assignment(
             tmp_object_name,
             {},
             "field_input2",
-            "java::SimpleWrapper",
+            "java::Wrapper",
             {},
             entry_point_code);
 
@@ -167,25 +167,25 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "this", entry_point_code);
 
-      THEN("Object 'this' has field 'field_input1' of type SimpleWrapper")
+      THEN("Object 'this' has field 'field_input1' of type Wrapper")
       {
         const auto &field_input1_name =
           require_goto_statements::require_struct_component_assignment(
             tmp_object_name,
             {},
             "field_input1",
-            "java::SimpleWrapper",
+            "java::Wrapper",
             {},
             entry_point_code);
 
-        THEN("Object 'field_input1' has field 'field' of type SimpleWrapper")
+        THEN("Object 'field_input1' has field 'field' of type Wrapper")
         {
           const auto &field_name =
             require_goto_statements::require_struct_component_assignment(
               field_input1_name,
               {},
               "field",
-              "java::SimpleWrapper",
+              "java::Wrapper",
               {},
               entry_point_code);
 
@@ -233,7 +233,7 @@ SCENARIO(
           require_goto_statements::require_struct_component_assignment(
             field_input_name,
             {},
-            "key",
+            "first",
             "java::IWrapper",
             {},
             entry_point_code);
@@ -244,7 +244,7 @@ SCENARIO(
           require_goto_statements::require_struct_component_assignment(
             field_input_name,
             {},
-            "value",
+            "second",
             "java::IWrapper",
             {},
             entry_point_code);
@@ -274,7 +274,7 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "v", entry_point_code);
 
-      THEN("Object 'v' is of type SimpleWrapper")
+      THEN("Object 'v' is of type Wrapper")
       {
         const auto &tmp_object_declaration =
           require_goto_statements::require_declaration_of_name(
@@ -284,7 +284,7 @@ SCENARIO(
         // and verify that it is what we expect.
         const auto &tmp_object_struct =
           to_struct_type(tmp_object_declaration.symbol().type());
-        REQUIRE(tmp_object_struct.get_tag() == "SimpleWrapper");
+        REQUIRE(tmp_object_struct.get_tag() == "Wrapper");
 
         THEN("Object 'v' has field 'field' of type IWrapper")
         {
@@ -323,7 +323,7 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "v", entry_point_code);
 
-      THEN("Object 'v' is of type SimpleWrapper")
+      THEN("Object 'v' is of type Wrapper")
       {
         const auto &tmp_object_declaration =
           require_goto_statements::require_declaration_of_name(
@@ -333,7 +333,7 @@ SCENARIO(
         // and verify that it is what we expect.
         const auto &tmp_object_struct =
           to_struct_type(tmp_object_declaration.symbol().type());
-        REQUIRE(tmp_object_struct.get_tag() == "SimpleWrapper");
+        REQUIRE(tmp_object_struct.get_tag() == "Wrapper");
 
         THEN(
           "Object 'v' has field 'field' of type Object (upper bound of the "
