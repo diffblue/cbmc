@@ -292,17 +292,19 @@ std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
   const std::vector<mp_integer> &input2_value,
   const std::vector<mp_integer> &args_value) const
 {
-  const std::size_t start_index =
-    args_value.size() > 0 && args_value[0] > 0 ? args_value[0].to_ulong() : 0;
-  const std::size_t end_index = args_value.size() > 1 && args_value[1] > 0
-                                  ? args_value[1].to_ulong()
-                                  : input2_value.size();
+  const auto start_index =
+    args_value.size() > 0 && args_value[0] > 0 ? args_value[0] : mp_integer(0);
+  const mp_integer input2_size(input2_value.size());
+  const auto end_index =
+    args_value.size() > 1
+      ? std::max(std::min(args_value[1], input2_size), start_index)
+      : input2_size;
 
   std::vector<mp_integer> result(input1_value);
   result.insert(
     result.end(),
-    input2_value.begin() + start_index,
-    input2_value.begin() + end_index);
+    input2_value.begin() + numeric_cast_v<std::size_t>(start_index),
+    input2_value.begin() + numeric_cast_v<std::size_t>(end_index));
   return result;
 }
 
@@ -322,18 +324,22 @@ std::vector<mp_integer> string_insertion_builtin_functiont::eval(
   const std::vector<mp_integer> &args_value) const
 {
   PRECONDITION(args_value.size() >= 1 || args_value.size() <= 3);
-  const std::size_t &offset = numeric_cast_v<std::size_t>(args_value[0]);
-  const std::size_t &start =
-    args_value.size() > 1 ? numeric_cast_v<std::size_t>(args_value[1]) : 0;
-  const std::size_t &end = args_value.size() > 2
-                             ? numeric_cast_v<std::size_t>(args_value[2])
-                             : input2_value.size();
+  const auto offset = std::max(args_value[0], mp_integer(0));
+  const auto start = args_value.size() > 1
+                       ? std::max(args_value[1], mp_integer(0))
+                       : mp_integer(0);
+
+  const mp_integer input2_size(input2_value.size());
+  const auto end =
+    args_value.size() > 2
+      ? std::max(std::min(args_value[2], input2_size), mp_integer(0))
+      : input2_size;
 
   std::vector<mp_integer> result(input1_value);
   result.insert(
-    result.begin() + offset,
-    input2_value.begin() + start,
-    input2_value.end() + end);
+    result.begin() + numeric_cast_v<std::size_t>(offset),
+    input2_value.begin() + numeric_cast_v<std::size_t>(start),
+    input2_value.begin() + numeric_cast_v<std::size_t>(end));
   return result;
 }
 

@@ -1,0 +1,6 @@
+CORE
+Test.class
+--refine-strings --unwind 10 --string-max-input-length 6  --function Test.testSuccess
+^EXIT=0$
+^SIGNAL=0$
+assertion at file Test.java line 21.*: SUCCESS

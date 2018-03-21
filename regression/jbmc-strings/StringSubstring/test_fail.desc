@@ -1,0 +1,10 @@
+CORE
+Test.class
+--refine-strings --unwind 10 --string-max-input-length 6 --function Test.testFail
+^EXIT=10$
+^SIGNAL=0$
+assertion at file Test.java line 37 .*: FAILURE
+assertion at file Test.java line 39 .*: FAILURE
+assertion at file Test.java line 41 .*: FAILURE
+assertion at file Test.java line 43 .*: FAILURE
+assertion at file Test.java line 45 .*: FAILURE
