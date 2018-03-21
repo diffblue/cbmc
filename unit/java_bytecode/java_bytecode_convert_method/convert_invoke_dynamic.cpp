@@ -26,6 +26,23 @@ struct lambda_assignment_test_datat
   bool should_return_value;
 };
 
+/// Verifies for a given function that contains:
+///  {lambda_variable_id} = invokedynamic method_handle_index
+/// code looks
+/// like:
+///  tmp_object_symbol = java_new(lambda_tmp_type)
+///  {lambda_variable_id} = (cast)tmp_object_symbol
+/// and the type lambda_tmp_type:
+///  implements {lambda_interface}
+///  has method {lambda_interface_method_descriptor}
+/// and the method body looks like
+///  function_call_exprt(
+///    should_return_value ? symbol_exprt : nil_exprt,
+///    {lambda_function_id},
+///    {expected_params})
+/// \param symbol_table: The loaded symbol table
+/// \param instructions: The instructions of the method that calls invokedynamic
+/// \param test_data: The parameters for the test
 void validate_lamdba_assignement(
   const symbol_tablet &symbol_table,
   const std::vector<codet> &instructions,
