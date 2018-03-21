@@ -103,3 +103,15 @@ class SuperclassInnerUninstTest
     f.inner_three.foo(x);
   }
 }
+
+class SuperclassUnsupported extends UnsupportedWrapper1<SuperclassUnsupported> {
+  public void foo() {
+    this.field = new SuperclassUnsupported();
+  }
+}
+
+class SuperclassMocked extends MockedWrapper<IWrapper> {
+  public void foo() {
+      this.field.i = 5;
+    }
+}

@@ -9,6 +9,7 @@
 #include <testing-utils/load_java_class.h>
 #include <testing-utils/require_goto_statements.h>
 #include <util/config.h>
+#include <testing-utils/require_type.h>
 
 // NOTE: To inspect these tests at any point, use expr2java.
 // A good way to verify the validity of a test is to iterate
@@ -408,6 +409,102 @@ SCENARIO(
               entry_point_code);
           }
         }
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "Ignore generics for incomplete and non-generic bases",
+  "[core][goto_program_generics][generic_bases_test]")
+{
+  GIVEN(
+    "A class extending a generic class with unsupported class signature (thus"
+    " not marked as generic)")
+  {
+    const symbol_tablet &symbol_table = load_java_class(
+      "SuperclassUnsupported",
+      "./goto-programs/goto_program_generics",
+      "SuperclassUnsupported.foo");
+
+    THEN("The struct for UnsupportedWrapper1 is complete and non-generic")
+    {
+      const std::string superclass_name = "java::UnsupportedWrapper1";
+      REQUIRE(symbol_table.has_symbol(superclass_name));
+
+      const symbolt &superclass_symbol =
+        symbol_table.lookup_ref(superclass_name);
+      require_type::require_java_non_generic_class(superclass_symbol.type);
+    }
+
+    WHEN("The method input argument is created in the entry point function")
+    {
+      const std::vector<codet> &entry_point_code =
+        require_goto_statements::require_entry_point_statements(symbol_table);
+
+      // For an explanation of this part, look at the comments for the similar
+      // parts of the previous tests.
+      const irep_idt &this_tmp_name =
+        require_goto_statements::require_entry_point_argument_assignment(
+          "this", entry_point_code);
+
+      THEN("Object 'this' created has unspecialized inherited field")
+      {
+        require_goto_statements::require_struct_component_assignment(
+          this_tmp_name,
+          {"UnsupportedWrapper1"},
+          "field",
+          "java::java.lang.Object",
+          {},
+          entry_point_code);
+      }
+    }
+  }
+
+  GIVEN(
+    "A class extending a generic class that is mocked (thus incomplete and not "
+    "marked as generic)")
+  {
+    const symbol_tablet &symbol_table = load_java_class(
+      "SuperclassMocked",
+      "./goto-programs/goto_program_generics",
+      "SuperclassMocked.foo");
+
+    THEN("The struct for MockedWrapper is incomplete and not-generic")
+    {
+      const std::string superclass_name = "java::MockedWrapper";
+      REQUIRE(symbol_table.has_symbol(superclass_name));
+
+      const symbolt &superclass_symbol =
+        symbol_table.lookup_ref(superclass_name);
+      const java_class_typet &superclass_type =
+        to_java_class_type(to_class_type(superclass_symbol.type));
+      REQUIRE(
+        to_class_type(superclass_symbol.type).get_bool(ID_incomplete_class));
+      REQUIRE(!is_java_generic_class_type(superclass_type));
+      REQUIRE(!is_java_implicitly_generic_class_type(superclass_type));
+    }
+
+    WHEN("The method input argument is created in the entry point function")
+    {
+      const std::vector<codet> &entry_point_code =
+        require_goto_statements::require_entry_point_statements(symbol_table);
+
+      // For an explanation of this part, look at the comments for the similar
+      // parts of the previous tests.
+      const irep_idt &this_tmp_name =
+        require_goto_statements::require_entry_point_argument_assignment(
+          "this", entry_point_code);
+
+      THEN("Object 'this' created has unspecialized inherited field")
+      {
+        require_goto_statements::require_struct_component_assignment(
+          this_tmp_name,
+          {"MockedWrapper"},
+          "field",
+          "java::java.lang.Object",
+          {},
+          entry_point_code);
       }
     }
   }

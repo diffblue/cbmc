@@ -80,3 +80,35 @@ public class GenericFields
     }
   }
 }
+
+// class that implements two generic interfaces
+class InterfacesImplementation implements InterfaceWrapper<IWrapper>,
+                         InterfacePairWrapper<IWrapper, IWrapper> {
+  public IWrapper method(IWrapper t) {
+    return t;
+  }
+  public IWrapper method(IWrapper t, IWrapper tt) {
+    if (t.i>0)
+    {
+      return t;
+    }
+    else
+    {
+      return tt;
+    }
+  }
+}
+class GenericFieldUnsupported {
+  public UnsupportedWrapper2<InterfacesImplementation> f;
+  public void foo() {
+    f.field.method(new IWrapper(0));
+    f.field.method(new IWrapper(0), new IWrapper(2));
+  }
+}
+
+class GenericFieldMocked {
+  public MockedWrapper<IWrapper> f;
+  public void foo() {
+    f.field.i = 0;
+  }
+}

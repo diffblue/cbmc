@@ -23,3 +23,24 @@ class PairWrapper<K, V> {
 interface InterfaceWrapper<T> {
   public T method(T t);
 }
+
+// generic interface with two parameters
+interface InterfacePairWrapper<K, V> {
+  public K method(K k, V v);
+}
+
+// generic class with unsupported signature - generic bound
+class UnsupportedWrapper1<T extends UnsupportedWrapper1<T>> {
+  public T field;
+}
+
+// generic class with unsupported signature - multiple bounds
+class UnsupportedWrapper2<T extends InterfaceWrapper & InterfacePairWrapper>
+{
+  public T field;
+}
+
+// generic mocked class, make sure the .class file is not available
+class MockedWrapper<T> {
+  public T field;
+}
