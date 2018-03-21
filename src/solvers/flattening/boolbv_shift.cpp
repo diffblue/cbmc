@@ -30,9 +30,6 @@ bvt boolbvt::convert_shift(const binary_exprt &expr)
   if(width==0)
     return conversion_failed(expr);
 
-  if(expr.operands().size()!=2)
-    throw "shifting takes two operands";
-
   const bvt &op=convert_bv(expr.op0());
 
   if(op.size()!=width)
@@ -41,11 +38,15 @@ bvt boolbvt::convert_shift(const binary_exprt &expr)
   bv_utilst::shiftt shift;
 
   if(expr.id()==ID_shl)
-    shift=bv_utilst::shiftt::LEFT;
+    shift=bv_utilst::shiftt::SHIFT_LEFT;
   else if(expr.id()==ID_ashr)
-    shift=bv_utilst::shiftt::ARIGHT;
+    shift=bv_utilst::shiftt::SHIFT_ARIGHT;
   else if(expr.id()==ID_lshr)
-    shift=bv_utilst::shiftt::LRIGHT;
+    shift=bv_utilst::shiftt::SHIFT_LRIGHT;
+  else if(expr.id()==ID_rol)
+    shift=bv_utilst::shiftt::ROTATE_LEFT;
+  else if(expr.id()==ID_ror)
+    shift=bv_utilst::shiftt::ROTATE_RIGHT;
   else
     throw "unexpected shift operator";
 

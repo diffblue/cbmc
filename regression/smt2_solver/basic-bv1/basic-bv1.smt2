@@ -14,6 +14,10 @@
 (define-fun b09 () Bool (= (bvlshr #xf0 #x03) #x1e)) ; unsigned (logical) shift right
 (define-fun b10 () Bool (= (bvashr #xf0 #x03) #xfe)) ; signed (arithmetical) shift right#x0a
 
+; rotation
+(define-fun b11 () Bool (= ((_ rotate_left 2) #xf7) #xdf)) ; rotation left
+(define-fun b12 () Bool (= ((_ rotate_right 2) #x07) #xc1)) ; rotation right
+
 ; Bitwise Operations
 
 (define-fun w1 () Bool (= (bvor #x6 #x3) #x7))   ; bitwise or
@@ -56,7 +60,7 @@
 ; all must be true
 
 (assert (not (and
-  b01 b02 b03 b04 b05 b06 b07 b08 b09 b10
+  b01 b02 b03 b04 b05 b06 b07 b08 b09 b10 b11 b12
   d01
   power-test
   p1 p2 p3 p4 p5 p6 p7 p8)))

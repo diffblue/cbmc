@@ -106,7 +106,7 @@ bvt float_utilst::to_integer(
                                        unpacked.exponent.size());
     bvt distance=bv_utils.sub(offset, unpacked.exponent);
     bvt shift_result=bv_utils.shift(
-      fraction, bv_utilst::shiftt::LRIGHT, distance);
+      fraction, bv_utilst::shiftt::SHIFT_LRIGHT, distance);
 
     // if the exponent is negative, we have zero anyways
     bvt result=shift_result;
@@ -809,7 +809,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
     // If so, shift the zeros out left by 'distance'.
     // Otherwise, leave as is.
     const bvt shifted=
-      bv_utils.shift(fraction, bv_utilst::shiftt::LEFT, distance);
+      bv_utils.shift(fraction, bv_utilst::shiftt::SHIFT_LEFT, distance);
 
     fraction=
       bv_utils.select(prefix_is_zero, shifted, fraction);
@@ -1281,7 +1281,7 @@ bvt float_utilst::sticky_right_shift(
   {
     if(dist[stage]!=const_literal(false))
     {
-      bvt tmp=bv_utils.shift(result, bv_utilst::shiftt::LRIGHT, d);
+      bvt tmp=bv_utils.shift(result, bv_utilst::shiftt::SHIFT_LRIGHT, d);
 
       bvt lost_bits;
 

@@ -216,7 +216,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_div(to_div_expr(expr));
   else if(expr.id()==ID_mod)
     return convert_mod(to_mod_expr(expr));
-  else if(expr.id()==ID_shl || expr.id()==ID_ashr || expr.id()==ID_lshr)
+  else if(expr.id()==ID_shl || expr.id()==ID_ashr || expr.id()==ID_lshr ||
+          expr.id()==ID_rol || expr.id()==ID_ror)
     return convert_shift(to_shift_expr(expr));
   else if(expr.id()==ID_floatbv_plus || expr.id()==ID_floatbv_minus ||
           expr.id()==ID_floatbv_mult || expr.id()==ID_floatbv_div ||
