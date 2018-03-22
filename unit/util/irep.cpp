@@ -14,6 +14,57 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       REQUIRE(sizeof(irept) == sizeof(void *));
     }
 
+    THEN("The storage size of an irept is fixed")
+    {
+#ifdef SHARING
+      const std::size_t ref_count_size = sizeof(unsigned);
+#else
+      const std::size_t ref_count_size = 0;
+#endif
+
+#ifndef USE_STRING
+      const std::size_t data_size = sizeof(dstringt);
+      REQUIRE(sizeof(dstringt) == sizeof(unsigned));
+#else
+      const std::size_t data_size = sizeof(std::string);
+      REQUIRE(sizeof(std::string) == sizeof(void *));
+#endif
+
+      const std::size_t sub_size = sizeof(std::vector<int>);
+#ifndef _GLIBCXX_DEBUG
+      REQUIRE(sizeof(std::vector<int>) == 3 * sizeof(void *));
+#endif
+
+#ifndef SUB_IS_LIST
+      const std::size_t named_size = sizeof(std::map<int, int>);
+#  ifndef _GLIBCXX_DEBUG
+#    ifdef __APPLE__
+      REQUIRE(sizeof(std::map<int, int>) == 3 * sizeof(void *));
+#    elif defined(_WIN32)
+      REQUIRE(sizeof(std::map<int, int>) == 2 * sizeof(void *));
+#    else
+      REQUIRE(sizeof(std::map<int, int>) == 6 * sizeof(void *));
+#    endif
+#  endif
+#else
+      const std::size_t named_size = sizeof(std::list<int>);
+#  ifndef _GLIBCXX_DEBUG
+      REQUIRE(sizeof(std::list<int>) == 3 * sizeof(void *));
+#  endif
+#endif
+
+#ifdef HASH_CODE
+      const std::size_t hash_code_size = sizeof(std::size_t);
+#else
+      const std::size_t hash_code_size = 0;
+#endif
+
+      REQUIRE(
+        sizeof(irept::dt) ==
+        ref_count_size + data_size + sub_size + 2 * named_size +
+          hash_code_size);
+    }
+
     THEN("get_nil_irep yields ID_nil")
     {
       REQUIRE(get_nil_irep().id() == ID_nil);
@@ -88,7 +139,7 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       REQUIRE(irep.find("a_new_element").id() == "some_id");
 
       irept irep2("second_irep");
-      irep.add("a_new_element", irep2);
+      irept &e2 = irep.add("a_new_element", irep2);
       REQUIRE(irep.find("a_new_element").id() == "second_irep");
       REQUIRE(irep.get_named_sub().size() == 1);
 
