@@ -22,10 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_cast.h"
 
 
-/*! \defgroup gr_std_expr Conversion to specific expressions
- *  Conversion to subclasses of @ref exprt
-*/
-
 /*! \brief A transition system, consisting of
            state invariant, initial state predicate,
            and transition predicate
@@ -56,7 +52,7 @@ public:
  * \param expr Source expression
  * \return Object of type \ref transt
  *
- * \ingroup gr_std_expr
+
 */
 inline const transt &to_trans_expr(const exprt &expr)
 {

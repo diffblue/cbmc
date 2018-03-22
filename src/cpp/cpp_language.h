@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_LANGUAGE_H
 #define CPROVER_CPP_CPP_LANGUAGE_H
 
-/*! \defgroup gr_cpp C++ front-end */
-
 #include <memory>
 
 #include <util/make_unique.h> // unique_ptr

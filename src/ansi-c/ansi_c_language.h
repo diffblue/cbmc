@@ -10,8 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_ANSI_C_LANGUAGE_H
 #define CPROVER_ANSI_C_ANSI_C_LANGUAGE_H
 
-/*! \defgroup gr_ansi_c ANSI-C front-end */
-
 #include <memory>
 
 #include <util/make_unique.h>

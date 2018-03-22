@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class constant_exprt;
 
-/*! \defgroup gr_std_types Conversion to specific types
+/*!
  *  Conversion to subclasses of @ref typet
 */
 
