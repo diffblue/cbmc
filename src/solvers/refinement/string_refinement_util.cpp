@@ -396,8 +396,21 @@ void string_dependenciest::for_each_successor(
     const auto &builtin = builtin_function_nodes[node.index];
     for(const auto &s : builtin->string_arguments())
     {
-      if(const auto node = node_at(s))
-        f(nodet(*node));
+      std::vector<std::reference_wrapper<const exprt>> stack({s});
+      while(!stack.empty())
+      {
+        const auto current = stack.back();
+        stack.pop_back();
+        if(const auto if_expr = expr_try_dynamic_cast<if_exprt>(current.get()))
+        {
+          stack.emplace_back(if_expr->true_case());
+          stack.emplace_back(if_expr->false_case());
+        }
+        else if(const auto node = node_at(to_array_string_expr(current)))
+          f(nodet(*node));
+        else
+          UNREACHABLE;
+      }
     }
   }
   else if(node.kind == nodet::STRING)
