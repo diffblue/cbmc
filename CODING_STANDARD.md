@@ -66,8 +66,8 @@ Formatting is enforced using clang-format. For more information about this, see
   /// This sentence, until the first dot followed by whitespace, becomes
   /// the brief description. More detailed text follows. Feel free to
   /// break this into paragraphs to aid readability.
-  /// \param arg_name: This parameter doesn't need much description
-  /// \param [out] long_arg_name: This parameter is mutated by the function.
+  /// \param arg_name This parameter doesn't need much description
+  /// \param [out] long_arg_name This parameter is mutated by the function.
   ///   Extra info about the parameter gets indented an extra two columns,
   ///   like this.
   /// \return The return value is literally the value returned by the
@@ -77,6 +77,7 @@ Formatting is enforced using clang-format. For more information about this, see
 - The priority of documentation is readability. Therefore, feel free to use
   Doxygen features, or to add whitespace for multi-paragraph comment blocks if
   necessary.
+- Do not use colon after `\param` name, e.g., `\param arg_name ...` is ok while `\param arg_name: ...` should be avoided 
 - A comment block should immediately precede the definition of the entity it
   documents, which will generally mean that it will live in the source file.
   This allows us to take advantage of the one definition rule. If each entity
