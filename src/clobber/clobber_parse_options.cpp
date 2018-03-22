@@ -398,7 +398,7 @@ void clobber_parse_optionst::help()
     " --big-endian                 allow big-endian word-byte conversions\n"
     " --unsigned-char              make \"char\" unsigned by default\n"
     " --show-parse-tree            show parse tree\n"
-    " --show-symbol-table          show symbol table\n"
+    " --show-symbol-table          show loaded symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
     " --ppc-macos                  set MACOS/PPC architecture\n"
     " --mm model                   set memory model (default: sc)\n"

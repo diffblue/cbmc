@@ -1480,7 +1480,7 @@ void goto_instrument_parse_optionst::help()
     "Diagnosis:\n"
     " --show-loops                 show the loops in the program\n"
     HELP_SHOW_PROPERTIES
-    " --show-symbol-table          show symbol table\n"
+    " --show-symbol-table          show loaded symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)

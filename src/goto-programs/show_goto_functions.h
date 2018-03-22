@@ -24,8 +24,8 @@ class goto_functionst;
   "(list-goto-functions)"
 
 #define HELP_SHOW_GOTO_FUNCTIONS \
-  " --show-goto-functions        show goto program\n" \
-  " --list-goto-functions        list goto functions\n"
+  " --show-goto-functions        show loaded goto program\n" \
+  " --list-goto-functions        list loaded goto functions\n"
 // clang-format on
 
 void show_goto_functions(
