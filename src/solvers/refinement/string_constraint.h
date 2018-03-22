@@ -118,6 +118,11 @@ public:
       binary_relation_exprt(lower_bound(), ID_le, univ_var()),
       binary_relation_exprt(upper_bound(), ID_gt, univ_var()));
   }
+
+  exprt negation() const
+  {
+    return and_exprt(univ_within_bounds(), not_exprt(body()));
+  }
 };
 
 extern inline const string_constraintt &to_string_constraint(const exprt &expr)

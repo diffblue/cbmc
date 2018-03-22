@@ -1236,38 +1236,6 @@ static exprt negation_of_not_contains_constraint(
   return and_exprt(univ_bounds, get(constraint.premise()), equal_strings);
 }
 
-/// Negates the constraint to be fed to a solver. The intended usage is to find
-/// an assignment of the universal variable that would violate the axiom. To
-/// avoid false positives, the symbols other than the universal variable should
-/// have been replaced by their valuation in the current model.
-/// \pre Symbols other than the universal variable should have been replaced by
-///   their valuation in the current model.
-/// \param axiom: the not_contains constraint to add the negation of
-/// \return: the negation of the axiom under the current evaluation
-static exprt negation_of_constraint(const string_constraintt &axiom)
-{
-  // If the for all is vacuously true, the negation is false.
-  const exprt &lb=axiom.lower_bound();
-  const exprt &ub=axiom.upper_bound();
-  if(lb.id()==ID_constant && ub.id()==ID_constant)
-  {
-    const auto lb_int = numeric_cast<mp_integer>(lb);
-    const auto ub_int = numeric_cast<mp_integer>(ub);
-    if(!lb_int || !ub_int || ub_int<=lb_int)
-      return false_exprt();
-  }
-
-  // If the premise is false, the implication is trivially true, so the
-  // negation is false.
-  if(axiom.premise()==false_exprt())
-    return false_exprt();
-
-  and_exprt premise(axiom.premise(), axiom.univ_within_bounds());
-  and_exprt negaxiom(premise, not_exprt(axiom.body()));
-
-  return negaxiom;
-}
-
 /// Debugging function which outputs the different steps an axiom goes through
 /// to be checked in check axioms.
 static void debug_check_axioms_step(
@@ -1365,7 +1333,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     const string_constraintt axiom_in_model(
       univ_var, get(bound_inf), get(bound_sup), get(body));
 
-    exprt negaxiom=negation_of_constraint(axiom_in_model);
+    exprt negaxiom = axiom_in_model.negation();
     negaxiom = simplify_expr(negaxiom, ns);
 
     stream << indent << i << ".\n";
