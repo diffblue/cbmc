@@ -1,5 +1,9 @@
 \ingroup module_hidden
-\page cbmc-hacking CBMC Hacking HOWTO
+\page tutorial Tutorials
+
+\section cbmc_tutorial CBMC Developer Tutorial
+
+\tableofcontents
 
 \author Kareem Khazem
 
@@ -180,14 +184,13 @@ there any functions that you didn't expect to see?
 The following is quite difficult to follow from doxygen, but: the value
 type of `function_map` is `goto_function_templatet<goto_programt>`.
 
-
 <div class=memdoc>
 **Task:** Read the documentation for `goto_function_templatet<bodyT>`
 and `goto_programt`.
 </div>
 
-Each goto_programt object contains a list of
-\ref goto_program_templatet::instructiont called
+Each \ref goto_programt object contains a list of
+\ref goto_programt::instructiont called
 `instructions`.  Each instruction has a field called `code`, which has
 type \ref codet.
 
@@ -204,11 +207,11 @@ for a codet look like this:
       0: symbol
           * type: array
               * size: nil
-                  * type: 
-              * #source_location: 
+                  * type:
+              * #source_location:
                 * file: src/main.c
                 * line: 18
-                * function: 
+                * function:
                 * working_directory: /some/dir
               0: unsignedbv
                   * width: 8

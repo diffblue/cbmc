@@ -3,8 +3,6 @@
 /// \file
 /// Symbol table base class interface
 
-/// \defgroup gr_symbol_table Symbol Table
-
 #ifndef CPROVER_UTIL_SYMBOL_TABLE_BASE_H
 #define CPROVER_UTIL_SYMBOL_TABLE_BASE_H
 
