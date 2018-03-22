@@ -45,7 +45,11 @@ public:
   std::vector<exprt> args;
   exprt return_code;
 
-  /// Constructor from arguments of a function application
+  /// Constructor from arguments of a function application.
+  /// The arguments in `fun_args` should be in order:
+  /// an integer `result.length`, a character pointer `&result[0]`,
+  /// a string `arg1` of type refined_string_typet, and potentially some
+  /// arguments of primitive types.
   string_transformation_builtin_functiont(
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool);
@@ -73,6 +77,10 @@ class string_concat_char_builtin_functiont
   : public string_transformation_builtin_functiont
 {
 public:
+  /// Constructor from arguments of a function application.
+  /// The arguments in `fun_args` should be in order:
+  /// an integer `result.length`, a character pointer `&result[0]`,
+  /// a string `arg1` of type refined_string_typet, and a character.
   string_concat_char_builtin_functiont(
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool)
@@ -100,7 +108,12 @@ public:
   std::vector<exprt> args;
   exprt return_code;
 
-  /// Constructor from arguments of a function application
+  /// Constructor from arguments of a function application.
+  /// The arguments in `fun_args` should be in order:
+  /// an integer `result.length`, a character pointer `&result[0]`,
+  /// a string `arg1` of type refined_string_typet,
+  /// a string `arg2` of type refined_string_typet,
+  /// and potentially some arguments of primitive types.
   string_insertion_builtin_functiont(
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool);
@@ -136,6 +149,12 @@ class string_concatenation_builtin_functiont final
   : public string_insertion_builtin_functiont
 {
 public:
+  /// Constructor from arguments of a function application.
+  /// The arguments in `fun_args` should be in order:
+  /// an integer `result.length`, a character pointer `&result[0]`,
+  /// a string `arg1` of type refined_string_typet,
+  /// a string `arg2` of type refined_string_typet,
+  /// optionally followed by an integer `start` and an integer `end`.
   string_concatenation_builtin_functiont(
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool);
