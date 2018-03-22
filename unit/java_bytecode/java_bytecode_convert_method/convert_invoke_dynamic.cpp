@@ -469,3 +469,163 @@ SCENARIO(
     }
   });
 }
+
+void validate_static_member_variable_lambda_assignment(
+  const symbol_tablet &symbol_table,
+  const std::vector<codet> &instructions,
+  const lambda_assignment_test_datat &test_data,
+  const std::string static_field_name)
+{
+  const auto lambda_assignment =
+    require_goto_statements::find_pointer_assignments(
+      static_field_name, instructions);
+
+  REQUIRE(lambda_assignment.non_null_assignments.size() == 1);
+  REQUIRE_FALSE(lambda_assignment.null_assignment.has_value());
+
+  validate_lamdba_assignement(
+    symbol_table, instructions, test_data, lambda_assignment);
+}
+
+SCENARIO(
+  "Converting invokedynamic with a static member lambda",
+  "[core]"
+  "[lamdba][java_bytecode][java_bytecode_convert_method][!mayfail]")
+{
+  // NOLINTNEXTLINE(whitespace/braces)
+  run_test_with_compilers([](const std::string &compiler) {
+    GIVEN(
+      "A class with a static lambda variables from " + compiler + " compiler.")
+    {
+      symbol_tablet symbol_table = load_java_class(
+        "StaticLambdas",
+        "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
+          "_classes/",
+        "StaticLambdas.<clinit>");
+
+      WHEN("Inspecting the assignments of the entry function")
+      {
+        const std::vector<codet> &instructions =
+          require_goto_statements::get_all_statements(
+            symbol_table.lookup_ref("java::StaticLambdas.<clinit>:()V").value);
+
+        const std::string function_prefix_regex_str = "java::StaticLambdas";
+
+        THEN(
+          "The local variable should be assigned a temp object implementing "
+          "SimpleLambda")
+        {
+          lambda_assignment_test_datat test_data;
+          test_data.lambda_interface = "java::SimpleLambda";
+          test_data.lambda_interface_method_descriptor = ".Execute:()V";
+          test_data.lambda_function_id =
+            "java::StaticLambdas.lambda$static$0:()V";
+          test_data.expected_params = {};
+          test_data.should_return_value = false;
+          validate_static_member_variable_lambda_assignment(
+            symbol_table,
+            instructions,
+            test_data,
+            function_prefix_regex_str + ".simpleLambda");
+        }
+        THEN(
+          "The local variable should be assigned a temp object implementing "
+          "ParameterLambda")
+        {
+          lambda_assignment_test_datat test_data;
+          test_data.lambda_interface = "java::ParameterLambda";
+          test_data.lambda_interface_method_descriptor =
+            ".Execute:(ILjava/lang/Object;LDummyGeneric;)V";
+          test_data.lambda_function_id =
+            "java::StaticLambdas.lambda$static$1:"
+            "(ILjava/lang/Object;LDummyGeneric;)V";
+
+          symbol_exprt integer_param{"primitive", java_int_type()};
+          symbol_exprt ref_param{"reference",
+                                 java_type_from_string("Ljava/lang/Object;")};
+          symbol_exprt generic_param{
+            "specalisedGeneric",
+            java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
+          test_data.expected_params = {integer_param, ref_param, generic_param};
+
+          test_data.should_return_value = false;
+          validate_member_variable_lambda_assignment(
+            symbol_table, instructions, test_data, "paramLambda");
+        }
+        THEN(
+          "The local variable should be assigned a non-null pointer to a "
+          "array parameter interface implementor")
+        {
+          lambda_assignment_test_datat test_data;
+          test_data.lambda_interface = "java::ArrayParameterLambda";
+          test_data.lambda_interface_method_descriptor =
+            ".Execute:([I[Ljava/lang/Object;[LDummyGeneric;)V";
+          test_data.lambda_function_id =
+            "java::StaticLambdas.lambda$static$2:"
+            "([I[Ljava/lang/Object;[LDummyGeneric;)V";
+
+          symbol_exprt integer_param{"primitive", java_type_from_string("[I")};
+          symbol_exprt ref_param{"reference",
+                                 java_type_from_string("[Ljava/lang/Object;")};
+          symbol_exprt generic_param{
+            "specalisedGeneric",
+            java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
+          test_data.expected_params = {integer_param, ref_param, generic_param};
+          test_data.should_return_value = false;
+
+          validate_member_variable_lambda_assignment(
+            symbol_table, instructions, test_data, "arrayParamLambda");
+        }
+        THEN(
+          "The local variable should be assigned a temp object implementing "
+          "ReturningLambdaPrimitive")
+        {
+          lambda_assignment_test_datat test_data;
+          test_data.lambda_interface = "java::ReturningLambdaPrimitive";
+          test_data.lambda_interface_method_descriptor = ".Execute:()I";
+          test_data.lambda_function_id =
+            "java::StaticLambdas.lambda$static$3:()I";
+          test_data.expected_params = {};
+          test_data.should_return_value = true;
+          validate_member_variable_lambda_assignment(
+            symbol_table, instructions, test_data, "returnPrimitiveLambda");
+        }
+        THEN(
+          "The local variable should be assigned a temp object implementing "
+          "ReturningLambdaReference")
+        {
+          lambda_assignment_test_datat test_data;
+          test_data.lambda_interface = "java::ReturningLambdaReference";
+          test_data.lambda_interface_method_descriptor =
+            ".Execute:()Ljava/lang/Object;";
+          test_data.lambda_function_id =
+            "java::StaticLambdas.lambda$static$4:()Ljava/lang/Object;";
+          test_data.expected_params = {};
+          test_data.should_return_value = true;
+          validate_member_variable_lambda_assignment(
+            symbol_table, instructions, test_data, "returnReferenceLambda");
+        }
+        THEN(
+          "The local variable should be assigned a temp object implementing "
+          "ReturningLambdaSpecalisedGeneric")
+        {
+          lambda_assignment_test_datat test_data;
+          test_data.lambda_interface = "java::ReturningLambdaSpecalisedGeneric";
+          test_data.lambda_interface_method_descriptor =
+            ".Execute:()LDummyGeneric;";
+          test_data.lambda_function_id =
+            "java::StaticLambdas.lambda$static$5:()LDummyGeneric;";
+          test_data.expected_params = {};
+          test_data.should_return_value = true;
+          validate_member_variable_lambda_assignment(
+            symbol_table,
+            instructions,
+            test_data,
+            "returningSpecalisedGenericLambda");
+        }
+
+        // TODO[TG-2486]: Tests for member lambdas that capture member variables
+      }
+    }
+  });
+}
