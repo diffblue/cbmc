@@ -119,6 +119,9 @@ bool replace_symbolt::replace(
 
 bool replace_symbolt::have_to_replace(const exprt &dest) const
 {
+  if(expr_map.empty() && type_map.empty())
+    return false;
+
   // first look at type
 
   if(have_to_replace(dest.type()))
@@ -211,6 +214,9 @@ bool replace_symbolt::replace(typet &dest) const
 
 bool replace_symbolt::have_to_replace(const typet &dest) const
 {
+  if(expr_map.empty() && type_map.empty())
+    return false;
+
   if(dest.has_subtype())
     if(have_to_replace(dest.subtype()))
       return true;
