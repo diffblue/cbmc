@@ -96,15 +96,12 @@ optionalt<std::vector<mp_integer>> eval_string(
              : eval_string(to_array_string_expr(ite.false_case()), get_value);
   }
 
-  const auto size = numeric_cast<std::size_t>(get_value(a.length()));
   const exprt content = get_value(a.content());
   const auto &array = expr_try_dynamic_cast<array_exprt>(content);
-  if(!size || !array)
+  if(!array)
     return {};
 
   const auto &ops = array->operands();
-  INVARIANT(*size == ops.size(), "operands size should match string size");
-
   std::vector<mp_integer> result;
   const mp_integer unknown('?');
   const auto &insert = std::back_inserter(result);
