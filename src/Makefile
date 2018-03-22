@@ -107,4 +107,7 @@ ipasir-build: ipasir-download
 	$(MAKE) -C ../ipasir/sat/picosat961 libipasirpicosat961.a
 	@(cd ../ipasir; ln -sf sat/picosat961/libipasirpicosat961.a libipasir.a)
 
+doc :
+	doxygen
+
 .PHONY: ipasir-build minisat2-download glucose-download cprover-jar-build
