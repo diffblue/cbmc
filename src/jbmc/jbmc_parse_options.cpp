@@ -384,7 +384,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     for(const char *opt :
       { "nondet-static",
         "full-slice",
-        "show-properties",
         "lazy-methods" })
     {
       if(cmdline.isset(opt))
@@ -848,6 +847,17 @@ bool jbmc_parse_optionst::show_loaded_functions(
       ui_message_handler.get_ui(),
       goto_model.get_goto_functions(),
       cmdline.isset("list-goto-functions"));
+    return true;
+  }
+
+  if(cmdline.isset("show-properties"))
+  {
+    namespacet ns(goto_model.get_symbol_table());
+    show_properties(
+      ns,
+      get_message_handler(),
+      ui_message_handler.get_ui(),
+      goto_model.get_goto_functions());
     return true;
   }
 
