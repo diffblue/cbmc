@@ -1,7 +1,27 @@
+\ingroup module_hidden
 \defgroup ansi-c ansi-c
 # Folder ansi-c
 
-\author Kareem Khazem
+\author Kareem Khazem, Martin Brain
+
+\section overview Overview
+
+Contains the front-end for ANSI C, plus a variety of common extensions.
+This parses the file, performs some basic sanity checks (this is one
+area in which the UI could be improved; patches most welcome) and then
+produces a goto-program (see below). The parser is a traditional Flex /
+Bison system.
+
+`internal_addition.c` contains the implementation of various ‘magic’
+functions that are that allow control of the analysis from the source
+code level. These include assertions, assumptions, atomic blocks, memory
+fences and rounding modes.
+
+The `library/` subdirectory contains versions of some of the C standard
+header files that make use of the CPROVER built-in functions. This
+allows CPROVER programs to be ‘aware’ of the functionality and model it
+correctly. Examples include `stdio.c`, `string.c`, `setjmp.c` and
+various threading interfaces.
 
 \section preprocessing Preprocessing & Parsing
 
@@ -24,8 +44,6 @@ digraph G {
 \enddot
 
 
-
----
 \section type-checking Type-checking
 
 In the \ref ansi-c and \ref java_bytecode directories.
@@ -112,3 +130,28 @@ called symbols. Thus, for example:
   parameter and return types of the function. The value of the symbol is
   the function's body (a \ref codet), and the symbol is stored in the
   symbol table with `foo` as the key.
+
+
+\section performance Parsing performance considerations
+
+* Measured on trunk/regression/ansi-c/windows_h_VS_2012/main.i
+
+* 13%: Copying into i_preprocessed
+
+* 5%: ansi_c_parser.read()
+
+* 53%: yyansi_clex()
+
+* 29%: parser (without typechecking)
+
+\section references Compiler References
+
+CodeWarrior C Compilers Reference 3.2:
+
+http://cache.freescale.com/files/soft_dev_tools/doc/ref_manual/CCOMPILERRM.pdf
+
+http://cache.freescale.com/files/soft_dev_tools/doc/ref_manual/ASMX86RM.pdf
+
+ARM 4.1 Compiler Reference:
+
+http://infocenter.arm.com/help/topic/com.arm.doc.dui0491c/DUI0491C_arm_compiler_reference.pdf

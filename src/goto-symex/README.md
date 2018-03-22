@@ -1,7 +1,25 @@
+\ingroup module_hidden
 \defgroup goto-symex goto-symex
+
 # Folder goto-symex
 
-\author Kareem Khazem
+\author Kareem Khazem, Martin Brain
+
+This directory contains a symbolic evaluation system for goto-programs.
+This takes a goto-program and translates it to an equation system by
+traversing the program, branching and merging and unwinding loops as
+needed. Each reverse goto has a separate counter (the actual counting is
+handled by `cbmc`, see the `–unwind` and `–unwind-set` options). When a
+counter limit is reach, an assertion can be added to explicitly show
+when analysis is incomplete.  The symbolic execution includes constant
+folding so loops that have a constant number of iterations will be
+handled completely (assuming the unwinding limit is sufficient).
+
+The output of the symbolic execution is a system of equations; an object
+containing a list of `symex_target_elements`, each of which are
+equalities between `expr` expressions. See `symex_target_equation.h`.
+The output is in static, single assignment (SSA) form, which is *not*
+the case for goto-programs.
 
 \section symbolic-execution Symbolic Execution
 

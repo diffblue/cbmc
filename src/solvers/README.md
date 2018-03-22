@@ -1,8 +1,111 @@
+\ingroup module_hidden
 \defgroup solvers solvers
 # Folder solvers
 
-\defgroup string_solver_interface String solver interface
-\author Romain Brenguier
+\authors Romain Brenguier, Kareem Khazem, Martin Brain
+
+\section overview Overview
+
+The basic role of solvers is to answer whether the set of equations given
+is satisfiable.
+One example usage, is to determine whether an assertion in a
+program can be violated.
+We refer to \ref goto-symex for how CBMC and JBMC convert a input program
+and property to a set of equations.
+
+The secondary role of solvers is to provide a satisfying assignment of
+the variables of the equations, this can for instance be used to construct
+a trace.
+
+The `solvers/` directory contains interfaces to a number of
+different decision procedures, roughly one per directory.
+
+* prop/:   The basic and common functionality. The key file is
+  `prop_conv.h` which defines `prop_convt`.  This is the base class that
+  is used to interface to the decision procedures. The key functions are
+  `convert` which takes an `exprt` and converts it to the appropriate,
+  solver specific, data structures and `dec_solve` (inherited from
+  `decision_proceduret`) which invokes the actual decision procedures.
+  Individual decision procedures (named `*_dect`) objects can be created
+  but `prop_convt` is the preferred interface for code that uses them.
+
+* flattening/:   A library that converts operations to bit-vectors,
+  including calling the conversions in `floatbv` as necessary. Is
+  implemented as a simple conversion (with caching) and then a
+  post-processing function that adds extra constraints. This is not used
+  by the SMT or CVC back-ends.
+
+* dplib/:   Provides the `dplib_dect` object which used the decision
+  procedure library from “Decision Procedures : An Algorithmic Point of
+  View”.
+
+* cvc/:   Provides the `cvc_dect` type which interfaces to the old (pre
+  SMTLib) input format for the CVC family of solvers.  This format is
+  still supported by depreciated in favour of SMTLib 2.
+
+* smt1/:   Provides the `smt1_dect` type which converts the formulae to
+  SMTLib version 1 and then invokes one of Boolector, CVC3, OpenSMT,
+  Yices, MathSAT or Z3. Again, note that this format is depreciated.
+
+* smt2/:   Provides the `smt2_dect` type which functions in a similar
+  way to `smt1_dect`, calling Boolector, CVC3, MathSAT, Yices or Z3.
+  Note that the interaction with the solver is batched and uses
+  temporary files rather than using the interactive command supported by
+  SMTLib 2. With the `–fpa` option, this output mode will not flatten
+  the floating point arithmetic and instead output the proposed SMTLib
+  floating point standard.
+
+* qbf/:   Back-ends for a variety of QBF solvers. Appears to be no
+  longer used or maintained.
+
+* sat/:   Back-ends for a variety of SAT solvers and DIMACS output.
+
+\section sat-smt-encoding SAT/SMT Encoding
+
+In the \ref solvers directory.
+
+**Key classes:**
+* \ref literalt
+* \ref boolbvt
+* \ref propt
+
+\dot
+digraph G {
+	node [shape=box];
+	rankdir="LR";
+	1 [shape=none, label=""];
+	2 [label="goto conversion"];
+	3 [shape=none, label=""];
+	1 -> 2 [label="equations"];
+	2 -> 3 [label="propositional variables as bitvectors, constraints"];
+}
+\enddot
+
+
+---
+
+\section decision-procedure Decision Procedure
+
+In the \ref solvers directory.
+
+**Key classes:**
+* symex_target_equationt
+* \ref propt
+* \ref bmct
+
+\dot
+digraph G {
+	node [shape=box];
+	rankdir="LR";
+	1 [shape=none, label=""];
+	2 [label="goto conversion"];
+	3 [shape=none, label=""];
+	1 -> 2 [label="propositional variables as bitvectors, constraints"];
+	2 -> 3 [label="solutions"];
+}
+\enddot
+
+\section string-solver-interface String Solver Interface
 
 The string solver is particularly aimed at string logic, but since it inherits
 from \ref bv_refinementt it is also capable of handling arithmetic, array logic,
@@ -241,3 +344,11 @@ This is done by generate_instantiations(messaget::mstreamt &stream, const namesp
 \copydetails check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, std::size_t max_string_length, bool use_counter_example, ui_message_handlert::uit ui, const union_find_replacet &symbol_resolve)
 \link check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, std::size_t max_string_length, bool use_counter_example, ui_message_handlert::uit ui, const union_find_replacet &symbol_resolve)
   (See function documentation...) \endlink
+
+\section floatbv Floatbv Directory
+
+This library contains the code that is used to convert floating point
+variables (`floatbv`) to bit vectors (`bv`).  This is referred to as
+‘bit-blasting’ and is called in the `solver` code during conversion to
+SAT or SMT. It also contains the abstraction code described in the
+FMCAD09 paper.
