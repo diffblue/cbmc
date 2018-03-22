@@ -99,10 +99,14 @@ const void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
       pointer_type.subtype().get(ID_identifier) ==
       pointer_subtype_struct.get(ID_name));
 
-    // If the pointer points to an incomplete class, don't treat the generics
-    // TODO TG-1996 should treat generic incomplete (mocked) classes
-    // Also do not treat generics is the class is not marked generic or
-    // implicitly generic (this may be due to unsupported class signature)
+    // If the pointer points to:
+    // - an incomplete class or
+    // - a class that is neither generic nor implicitly generic (this
+    //  may be due to unsupported class signature)
+    // then ignore the generic types in the pointer and do not add any pairs.
+    // TODO TG-1996 should decide how mocking and generics should work
+    // together. Currently an incomplete class is never marked as generic. If
+    // this changes in TG-1996 then the condition below should be updated.
     if(
       !pointer_subtype_struct.get_bool(ID_incomplete_class) &&
       (is_java_generic_class_type(pointer_subtype_struct) ||
@@ -137,10 +141,14 @@ const void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
   const symbol_typet &symbol_type,
   const typet &symbol_struct)
 {
-  // If the class is an incomplete class, don't treat the generics
-  // TODO TG-1996 should treat generic incomplete (mocked) classes
-  // Also do not treat generics is the class is not marked generic or
-  // implicitly generic (this may be due to unsupported class signature)
+  // If the struct is:
+  // - an incomplete class or
+  // - a class that is neither generic nor implicitly generic (this
+  //  may be due to unsupported class signature)
+  // then ignore the generic types in the symbol_type and do not add any pairs.
+  // TODO TG-1996 should decide how mocking and generics should work
+  // together. Currently an incomplete class is never marked as generic. If
+  // this changes in TG-1996 then the condition below should be updated.
   if(
     is_java_generic_symbol_type(symbol_type) &&
     !symbol_struct.get_bool(ID_incomplete_class) &&
