@@ -1,10 +1,8 @@
-\page string-solver String solver
+\defgroup solvers solvers
+# Folder solvers
 
+\defgroup string_solver_interface String solver interface
 \author Romain Brenguier
-
-\tableofcontents
-
-\section string_solver_interface String solver interface
 
 The string solver is particularly aimed at string logic, but since it inherits
 from \ref bv_refinementt it is also capable of handling arithmetic, array logic,

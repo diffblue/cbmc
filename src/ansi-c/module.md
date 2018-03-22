@@ -1,5 +1,5 @@
-\ingroup module_hidden
-\defgroup module_ansi-c ANSI-C Language Front-end
+\defgroup ansi-c ansi-c
+# Folder ansi-c
 
 \author Kareem Khazem
 

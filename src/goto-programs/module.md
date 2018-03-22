@@ -1,5 +1,5 @@
-\ingroup module_hidden
-\defgroup module_goto-programs Goto Conversion & Instrumentation
+\defgroup goto-programs goto-programs
+# Folder goto-programs
 
 \author Kareem Khazem
 

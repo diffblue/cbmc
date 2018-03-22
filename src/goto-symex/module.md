@@ -1,5 +1,5 @@
-\ingroup module_hidden
-\defgroup module_goto-symex Symbolic Execution & Counterexample Production
+\defgroup goto-symex goto-symex
+# Folder goto-symex
 
 \author Kareem Khazem
 

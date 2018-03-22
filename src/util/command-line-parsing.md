@@ -1,5 +1,7 @@
-\ingroup module_hidden
-\defgroup module_command-line-parsing Command Line Parsing
+\defgroup util util
+# Folder util
+
+`util/` is filled with useful tools.
 
 \dot
 digraph G {
