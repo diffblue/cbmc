@@ -2,9 +2,11 @@ default: tests.log
 
 test:
 	@../test.pl -p -c ../../../src/jbmc/jbmc
+	@../test.pl -p -c "../../../src/jbmc/jbmc --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure
 
 tests.log: ../test.pl
 	@../test.pl -p -c ../../../src/jbmc/jbmc
+	@../test.pl -p -c "../../../src/jbmc/jbmc --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure
 
 show:
 	@for dir in *; do \

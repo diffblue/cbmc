@@ -1,4 +1,4 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 method_parameters.class
 --verbosity 10 --show-symbol-table
 ^EXIT=0$
@@ -8,3 +8,5 @@ method_parameters.class
 The purpose of the test is ensuring that the bytecode -> symbol table AST
 generation happens correctly. The generated .class file DOES contain LVTs, i.e.,
 it has been compiled with with "javac -g".
+
+This doesn't work under symex-driven lazy loading because no entry-point function is given.

@@ -377,6 +377,15 @@ safety_checkert::resultt bmct::execute(
     const goto_functionst &goto_functions =
       goto_model.get_goto_functions();
 
+    // This provides the driver program the opportunity to do things like a
+    // symbol-table or goto-functions dump instead of actually running the
+    // checker, like show-vcc except driver-program specific.
+    // In particular clients that use symex-driven program loading need to print
+    // GOTO functions after symex, as function bodies are not produced until
+    // symex first requests them.
+    if(driver_callback_after_symex && driver_callback_after_symex())
+      return safety_checkert::resultt::SAFE; // to indicate non-error
+
     // add a partial ordering, if required
     if(equation.has_threads())
     {
@@ -616,14 +625,15 @@ void bmct::setup_unwind()
 //    creating those function bodies on demand.
 /// \param ui: user-interface mode (plain text, XML output, JSON output, ...)
 /// \param message: used for logging
-/// \param frontend_configure_bmc: function provided by the frontend program,
-///   which applies frontend-specific configuration to a bmct before running.
+/// \param driver_configure_bmc: function provided by the driver program,
+///   which applies driver-specific configuration to a bmct before running.
 int bmct::do_language_agnostic_bmc(
   const optionst &opts,
   abstract_goto_modelt &model,
   const ui_message_handlert::uit &ui,
   messaget &message,
-  std::function<void(bmct &, const symbol_tablet &)> frontend_configure_bmc)
+  std::function<void(bmct &, const symbol_tablet &)> driver_configure_bmc,
+  std::function<bool(void)> callback_after_symex)
 {
   const symbol_tablet &symbol_table = model.get_symbol_table();
   message_handlert &mh = message.get_message_handler();
@@ -637,9 +647,10 @@ int bmct::do_language_agnostic_bmc(
       std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
       cbmc_solver = solvers.get_solver();
       prop_convt &pc = cbmc_solver->prop_conv();
-      bmct bmc(opts, symbol_table, mh, pc, worklist);
+      bmct bmc(opts, symbol_table, mh, pc, worklist, callback_after_symex);
       bmc.set_ui(ui);
-      frontend_configure_bmc(bmc, symbol_table);
+      if(driver_configure_bmc)
+        driver_configure_bmc(bmc, symbol_table);
       result = bmc.run(model);
     }
     INVARIANT(
@@ -682,8 +693,10 @@ int bmct::do_language_agnostic_bmc(
         pc,
         resume.equation,
         resume.state,
-        worklist);
-      frontend_configure_bmc(pe, symbol_table);
+        worklist,
+        callback_after_symex);
+      if(driver_configure_bmc)
+        driver_configure_bmc(pe, symbol_table);
       result &= pe.run(model);
       worklist.pop_front();
     }

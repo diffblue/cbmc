@@ -1,4 +1,4 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 Gn.class
 --cover location
 ^EXIT=0$
@@ -9,3 +9,6 @@ Gn.class
 .*file Gn.java line 11 function java::Gn.foo1:\(LGn;\)V bytecode-index 5 block 3: FAILED
 .*file Gn.java line 13 function java::Gn.main:\(\[Ljava/lang/String;\)V bytecode-index 2 block 2: SATISFIED
 --
+--
+This fails under symex-driven lazy loading because the FAILED blocks occur in functions that are unreachable
+from the entry point, so with symex-driven loading the functions foo1 and the constructor don't get created at all.

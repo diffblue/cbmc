@@ -1,6 +1,8 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 ArrayListEquals.class
 --lazy-methods --java-max-vla-length 48 --unwind 8 --java-unwind-enum-static --trace --cover location --function ArrayListEquals.check2 --show-goto-functions
 e2 . ArrayList\$Itr.hasNext:\(\)Z\(\);
 --
 e2 . ListIterator.hasNext:\(\)Z\(\);
+--
+This doesn't work under symex-driven lazy loading because it is incompatible with --lazy-methods

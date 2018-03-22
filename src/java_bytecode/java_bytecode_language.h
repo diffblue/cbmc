@@ -63,7 +63,7 @@ enum lazy_methods_modet
 {
   LAZY_METHODS_MODE_EAGER,
   LAZY_METHODS_MODE_CONTEXT_INSENSITIVE,
-  LAZY_METHODS_MODE_CONTEXT_SENSITIVE
+  LAZY_METHODS_MODE_EXTERNAL_DRIVER
 };
 
 class java_bytecode_languaget:public languaget

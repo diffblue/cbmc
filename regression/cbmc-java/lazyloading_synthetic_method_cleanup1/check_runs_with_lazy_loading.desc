@@ -1,4 +1,7 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 Test.class
 --lazy-methods --function Test.main
 VERIFICATION SUCCESSFUL
+--
+--
+This doesn't work under symex-driven lazy loading because it is incompatible with --lazy-methods

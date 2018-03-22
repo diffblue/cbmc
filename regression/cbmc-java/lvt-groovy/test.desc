@@ -1,7 +1,8 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 DetectSplitPackagesTask.class
 --show-symbol-table
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
+This doesn't work under symex-driven lazy loading because no entry-point function is given.

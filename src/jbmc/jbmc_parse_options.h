@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_trace.h>
 #include <goto-programs/lazy_goto_model.h>
 #include <goto-programs/show_properties.h>
+#include <goto-instrument/cover.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 
@@ -72,7 +73,8 @@ class optionst;
   JAVA_BYTECODE_LANGUAGE_OPTIONS \
   "(java-unwind-enum-static)" \
   "(localize-faults)(localize-faults-method):" \
-  OPT_GOTO_TRACE
+  OPT_GOTO_TRACE \
+  "(symex-driven-lazy-loading)"
 // clang-format on
 
 class jbmc_parse_optionst:
@@ -97,11 +99,13 @@ public:
 
 protected:
   ui_message_handlert ui_message_handler;
+  std::unique_ptr<cover_configt> cover_config;
 
   void eval_verbosity();
   void get_command_line_options(optionst &);
   int get_goto_program(
     std::unique_ptr<goto_modelt> &goto_model, const optionst &);
+  bool show_loaded_functions(const abstract_goto_modelt &goto_model);
 
   bool set_properties(goto_modelt &goto_model);
 };
