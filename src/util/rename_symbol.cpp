@@ -32,7 +32,8 @@ bool rename_symbolt::rename(exprt &dest) const
 
   // first look at type
 
-  if(have_to_rename(dest.type()))
+  const exprt &const_dest(dest);
+  if(have_to_rename(const_dest.type()))
     if(!rename(dest.type()))
       result=false;
 
