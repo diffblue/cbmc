@@ -5,6 +5,8 @@ CORE
 "first line": 3,
 "function": "not_called",
 "last line": 6
+^EXIT=0$
+^SIGNAL=0$
 --
 "last line":[[:space:]]*$
 ^warning: ignoring

@@ -5,6 +5,8 @@ Stub static field x found for non-stub type java::Test\. In future this will be 
 Stub static field x found for non-stub type java::Parent\. In future this will be a fatal error\.
 assertion at file Test\.java line 6 .* FAILURE
 ^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
 --
 --
 This tests the corner case where static fields are found on non-stub types, here caused

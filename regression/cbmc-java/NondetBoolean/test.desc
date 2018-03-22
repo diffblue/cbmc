@@ -2,5 +2,7 @@ CORE
 NondetBoolean.class
 --function NondetBoolean.main
 ^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
 --
 ^warning: ignoring

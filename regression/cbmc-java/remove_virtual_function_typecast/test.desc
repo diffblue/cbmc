@@ -5,6 +5,8 @@ VirtualFunctions.class
  a \. VirtualFunctions\$A\.f:\(\)V\(\);$
  b \. VirtualFunctions\$B\.f:\(\)V\(\);$
  \(struct VirtualFunctions\$B \*\)c \. VirtualFunctions\$B\.f:\(\)V\(\);$
+^EXIT=0$
+^SIGNAL=0$
 --
 --
 This doesn't work under symex-driven lazy loading because it is incompatible with --lazy-methods

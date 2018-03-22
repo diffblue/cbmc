@@ -2,6 +2,7 @@ CORE
 main.c
 --verbosity 2
 ^main.c:3:1: warning: function has return void but a return statement returning signed int$
+^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring

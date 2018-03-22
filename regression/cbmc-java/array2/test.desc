@@ -2,5 +2,7 @@ CORE
 test.class
 --function test.f --cover location
 \d+ of \d+ covered
+^EXIT=0$
+^SIGNAL=0$
 --
 ^warning: ignoring

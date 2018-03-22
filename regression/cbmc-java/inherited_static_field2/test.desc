@@ -2,6 +2,8 @@ CORE
 Test.class
 --function Test.main
 ^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
 --
 --
 This checks that jbmc knows that Test.x and InterfaceWithStatic.x are the same field.

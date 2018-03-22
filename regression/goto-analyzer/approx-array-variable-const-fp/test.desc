@@ -5,6 +5,7 @@ main.c
 ^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f2 THEN GOTO [0-9]$
 ^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f3 THEN GOTO [0-9]$
 ^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f4 THEN GOTO [0-9]$
+^EXIT=0$
 ^SIGNAL=0$
 --
 ^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f1 THEN GOTO [0-9]$

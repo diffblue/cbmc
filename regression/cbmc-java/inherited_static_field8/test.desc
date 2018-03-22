@@ -4,6 +4,8 @@ Test.class
 assertion at file Test\.java line 6 .* SUCCESS
 assertion at file Test\.java line 7 .* FAILURE
 ^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
 --
 --
 This test is the same as inherited_static_field4, except that Test's grandparent is opaque.

@@ -2,5 +2,7 @@ CORE
 NondetGenericWithNull.class
 --function NondetGenericWithNull.main
 ^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
 --
 ^warning: ignoring

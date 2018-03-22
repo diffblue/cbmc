@@ -4,3 +4,5 @@ E.class
 IF.*"java::D"
 IF.*"java::O"
 IF.*"java::C"
+^EXIT=0$
+^SIGNAL=0$

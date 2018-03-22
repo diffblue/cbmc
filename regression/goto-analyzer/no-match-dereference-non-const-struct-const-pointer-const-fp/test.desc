@@ -11,6 +11,7 @@ main.c
 ^\s*IF \*container_container\.container == f7 THEN GOTO [0-9]$
 ^\s*IF \*container_container\.container == f8 THEN GOTO [0-9]$
 ^\s*IF \*container_container\.container == f9 THEN GOTO [0-9]$
+^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring
