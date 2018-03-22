@@ -116,7 +116,10 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       // Simplify may remove the lower bound if the type
       // is correct.
-      prop.l_set_to_true(convert(simplify_expr(implication, ns)));
+      simplify(implication, ns);
+      const bvt &bv2 = convert_bv(implication);
+      CHECK_RETURN(bv2.size() == 1);
+      prop.l_set_to_true(bv2[0]);
 
       return bv;
     }
@@ -159,9 +162,11 @@ bvt boolbvt::convert_index(const index_exprt &expr)
           "past the array's end");
 
         // Cache comparisons and equalities
-        prop.l_set_to_true(convert(implies_exprt(
+        const bvt &bv2 = convert_bv(implies_exprt(
           equal_exprt(index, from_integer(i, index.type())),
-          equal_exprt(result, *it++))));
+          equal_exprt(result, *it++)));
+        CHECK_RETURN(bv2.size() == 1);
+        prop.l_set_to_true(bv2[0]);
       }
 
       return bv;
@@ -208,9 +213,10 @@ bvt boolbvt::convert_index(const index_exprt &expr)
           equal_bv[j] = prop.lequal(
             bv[j], array_bv[numeric_cast_v<std::size_t>(offset + j)]);
 
-        prop.l_set_to_true(prop.limplies(
-          convert(equal_exprt(index, from_integer(i, index.type()))),
-          prop.land(equal_bv)));
+        const bvt &index_eq =
+          convert_bv(equal_exprt(index, from_integer(i, index.type())));
+        CHECK_RETURN(index_eq.size() == 1);
+        prop.l_set_to_true(prop.limplies(index_eq[0], prop.land(equal_bv)));
       }
     }
     else
@@ -229,8 +235,10 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       for(mp_integer i=0; i<array_size; i=i+1)
       {
-        literalt e =
-          convert(equal_exprt(index, from_integer(i, constant_type)));
+        const bvt &eq_bv =
+          convert_bv(equal_exprt(index, from_integer(i, constant_type)));
+        CHECK_RETURN(eq_bv.size() == 1);
+        literalt e = eq_bv[0];
 
         mp_integer offset=i*width;
 

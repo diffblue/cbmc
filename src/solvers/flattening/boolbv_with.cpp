@@ -167,7 +167,9 @@ void boolbvt::convert_with_array(
   {
     exprt counter=from_integer(i, counter_type);
 
-    literalt eq_lit=convert(equal_exprt(op1, counter));
+    const bvt &eq_bv = convert_bv(equal_exprt(op1, counter));
+    CHECK_RETURN(eq_bv.size() == 1);
+    literalt eq_lit = eq_bv[0];
 
     const std::size_t offset = numeric_cast_v<std::size_t>(i * op2_bv.size());
 
@@ -183,7 +185,9 @@ void boolbvt::convert_with_bv(
   const bvt &prev_bv,
   bvt &next_bv)
 {
-  literalt l=convert(op2);
+  const bvt &bv = convert_bv(op2);
+  CHECK_RETURN(bv.size() == 1);
+  literalt l = bv[0];
 
   if(const auto op1_value = numeric_cast<mp_integer>(op1))
   {
@@ -201,7 +205,9 @@ void boolbvt::convert_with_bv(
   {
     exprt counter=from_integer(i, counter_type);
 
-    literalt eq_lit=convert(equal_exprt(op1, counter));
+    const bvt &eq_bv = convert_bv(equal_exprt(op1, counter));
+    CHECK_RETURN(eq_bv.size() == 1);
+    literalt eq_lit = eq_bv[0];
 
     next_bv[i]=prop.lselect(eq_lit, l, prev_bv[i]);
   }

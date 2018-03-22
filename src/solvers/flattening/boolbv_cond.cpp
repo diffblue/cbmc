@@ -41,7 +41,9 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
     {
       if(condition)
       {
-        cond_literal=convert(*it);
+        const bvt &cond_bv = convert_bv(*it);
+        CHECK_RETURN(cond_bv.size() == 1);
+        cond_literal = cond_bv[0];
         cond_literal=prop.land(!previous_cond, cond_literal);
 
         previous_cond=prop.lor(previous_cond, cond_literal);
@@ -70,7 +72,9 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
       const exprt &cond=expr.operands()[i-2];
       const exprt &value=expr.operands()[i-1];
 
-      literalt cond_literal=convert(cond);
+      const bvt &cond_bv = convert_bv(cond);
+      CHECK_RETURN(cond_bv.size() == 1);
+      literalt cond_literal = cond_bv[0];
 
       const bvt &op = convert_bv(value, bv.size());
 

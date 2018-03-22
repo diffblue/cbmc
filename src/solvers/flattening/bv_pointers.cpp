@@ -197,7 +197,9 @@ bool bv_pointerst::convert_address_of_rec(
   {
     const if_exprt &ifex=to_if_expr(expr);
 
-    literalt cond=convert(ifex.cond());
+    const bvt &cond_bv = convert_bv(ifex.cond());
+    CHECK_RETURN(cond_bv.size() == 1);
+    literalt cond = cond_bv[0];
 
     bvt bv1, bv2;
 

@@ -161,9 +161,10 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
           else
             equal_bv[j]=const_literal(true);
 
-        prop.l_set_to_true(prop.limplies(
-          convert(equal_exprt(expr.offset(), from_integer(i, constant_type))),
-          prop.land(equal_bv)));
+        const bvt &eq_bv = convert_bv(
+          equal_exprt(expr.offset(), from_integer(i, constant_type)));
+        CHECK_RETURN(eq_bv.size() == 1);
+        prop.l_set_to_true(prop.limplies(eq_bv[0], prop.land(equal_bv)));
       }
     }
     else
@@ -173,8 +174,10 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 
       for(std::size_t i=0; i<bytes; i++)
       {
-        literalt e =
-          convert(equal_exprt(expr.offset(), from_integer(i, constant_type)));
+        const bvt &eq_bv = convert_bv(
+          equal_exprt(expr.offset(), from_integer(i, constant_type)));
+        CHECK_RETURN(eq_bv.size() == 1);
+        literalt e = eq_bv[0];
 
         std::size_t offset=i*byte_width;
 

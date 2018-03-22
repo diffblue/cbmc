@@ -16,7 +16,9 @@ bvt boolbvt::convert_if(const if_exprt &expr)
   if(width==0)
     return bvt(); // An empty bit-vector if.
 
-  literalt cond=convert(expr.cond());
+  const bvt &cond_bv = convert_bv(expr.cond());
+  CHECK_RETURN(cond_bv.size() == 1);
+  literalt cond = cond_bv[0];
 
   const bvt &true_case_bv = convert_bv(expr.true_case(), width);
   const bvt &false_case_bv = convert_bv(expr.false_case(), width);
