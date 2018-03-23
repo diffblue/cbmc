@@ -217,6 +217,14 @@ public:
     const array_string_exprt &e,
     const builtin_function_nodet &builtin_function);
 
+  /// Applies `f` to each node on which `node` depends
+  void for_each_dependency(
+    const string_nodet &node,
+    const std::function<void(const builtin_function_nodet &)> &f) const;
+  void for_each_dependency(
+    const builtin_function_nodet &node,
+    const std::function<void(const string_nodet &)> &f) const;
+
   /// Attempt to evaluate the given string from the dependencies and valuation
   /// of strings on which it depends
   /// Warning: eval uses a cache which must be cleaned everytime the valuations

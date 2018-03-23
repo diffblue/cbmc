@@ -336,47 +336,59 @@ bool add_node(
   return true;
 }
 
+void string_dependenciest::for_each_dependency(
+  const builtin_function_nodet &node,
+  const std::function<void(const string_nodet &)> &f) const
+{
+  for(const auto &s : node.data->string_arguments())
+  {
+    std::vector<std::reference_wrapper<const exprt>> stack({s});
+    while(!stack.empty())
+    {
+      const auto current = stack.back();
+      stack.pop_back();
+      if(const auto if_expr = expr_try_dynamic_cast<if_exprt>(current.get()))
+      {
+        stack.emplace_back(if_expr->true_case());
+        stack.emplace_back(if_expr->false_case());
+      }
+      else if(const auto string_node = node_at(to_array_string_expr(current)))
+        f(*string_node);
+      else
+      {
+        std::cout << "Warning no node for " << format(current) << std::endl;
+        //UNREACHABLE;
+      }
+    }
+  }
+}
+
+void string_dependenciest::for_each_dependency(
+  const string_nodet &node,
+  const std::function<void(const builtin_function_nodet &)> &f) const
+{
+  for(const std::size_t &index : node.dependencies)
+    f(builtin_function_nodes[index]);
+}
+
 void string_dependenciest::for_each_successor(
   const nodet &node,
   const std::function<void(const nodet &)> &f) const
 {
-  if(node.kind == nodet::BUILTIN)
+  switch(node.kind)
   {
-    const auto &builtin = builtin_function_nodes[node.index];
-    for(const auto &s : builtin.data->string_arguments())
-    {
-      std::vector<std::reference_wrapper<const exprt>> stack({s});
-      while(!stack.empty())
-      {
-        const auto current = stack.back();
-        stack.pop_back();
-        if(const auto if_expr = expr_try_dynamic_cast<if_exprt>(current.get()))
-        {
-          stack.emplace_back(if_expr->true_case());
-          stack.emplace_back(if_expr->false_case());
-        }
-        else if(const auto node = node_at(to_array_string_expr(current)))
-          f(nodet(*node));
-        else
-        {
-          std::cout << "Warning no node for " << format(current) << std::endl;
-          //UNREACHABLE;
-        }
-      }
-    }
+  case nodet::BUILTIN:
+    for_each_dependency(
+      builtin_function_nodes[node.index],
+      [&](const string_nodet &n) { return f(nodet(n)); });
+    break;
+
+  case nodet::STRING:
+    for_each_dependency(
+      string_nodes[node.index],
+      [&](const builtin_function_nodet &n) { return f(nodet(n)); });
+    break;
   }
-  else if(node.kind == nodet::STRING)
-  {
-    const auto &s_node = string_nodes[node.index];
-    std::for_each(
-      s_node.dependencies.begin(),
-      s_node.dependencies.end(),
-      [&](const std::size_t &index) { // NOLINT
-        f(nodet(builtin_function_nodes[index]));
-      });
-  }
-  else
-    UNREACHABLE;
 }
 
 void string_dependenciest::for_each_node(
