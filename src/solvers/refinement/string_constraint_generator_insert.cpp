@@ -40,8 +40,7 @@ exprt string_constraint_generatort::add_axioms_for_insert(
     maximum(from_integer(0, index_type), minimum(s1.length(), offset));
 
   // Axiom 1.
-  lemmas.push_back(
-    equal_exprt(res.length(), plus_exprt(s1.length(), s2.length())));
+  lemmas.push_back(length_constraint_for_insert(res, s1, s2, offset));
 
   // Axiom 2.
   constraints.push_back([&] { // NOLINT
@@ -67,6 +66,17 @@ exprt string_constraint_generatort::add_axioms_for_insert(
   }());
 
   return from_integer(0, get_return_code_type());
+}
+
+/// Add axioms ensuring the length of `res` corresponds that of `s1` where we
+/// inserted `s2` at position `offset`.
+exprt length_constraint_for_insert(
+  const array_string_exprt &res,
+  const array_string_exprt &s1,
+  const array_string_exprt &s2,
+  const exprt &offset)
+{
+  return equal_exprt(res.length(), plus_exprt(s1.length(), s2.length()));
 }
 
 /// Insertion of a string in another at a specific index

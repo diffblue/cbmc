@@ -444,4 +444,23 @@ exprt minimum(const exprt &a, const exprt &b);
 /// \return expression representing the maximum of two expressions
 exprt maximum(const exprt &a, const exprt &b);
 
+exprt length_constraint_for_concat_char(
+  const array_string_exprt &res,
+  const array_string_exprt &s1);
+exprt length_constraint_for_concat(
+  const array_string_exprt &res,
+  const array_string_exprt &s1,
+  const array_string_exprt &s2);
+exprt length_constraint_for_concat_substr(
+  const array_string_exprt &res,
+  const array_string_exprt &s1,
+  const array_string_exprt &s2,
+  const exprt &start_index,
+  const exprt &end_index);
+exprt length_constraint_for_insert(
+  const array_string_exprt &res,
+  const array_string_exprt &s1,
+  const array_string_exprt &s2,
+  const exprt &offset);
+
 #endif
