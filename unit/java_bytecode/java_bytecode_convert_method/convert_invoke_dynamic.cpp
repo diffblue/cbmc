@@ -99,9 +99,13 @@ void validate_lamdba_assignement(
     const std::vector<codet> &assignments =
       require_goto_statements::get_all_statements(method_symbol.value);
 
-    code_function_callt function_call =
-      require_goto_statements::require_function_call(
+    std::vector<code_function_callt> function_calls =
+      require_goto_statements::find_function_calls(
         assignments, test_data.lambda_function_id);
+
+    INFO("Looking for function call of " << test_data.lambda_function_id);
+    REQUIRE(function_calls.size() == 1);
+    const code_function_callt &function_call = function_calls[0];
 
     std::string variable_prefix = id2string(method_identifier) + "::";
     // replace all symbol exprs with a prefixed symbol expr
