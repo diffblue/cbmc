@@ -176,7 +176,7 @@ SCENARIO(
             symbol_table.lookup_ref("java::LocalLambdas.test:()V").value);
 
         const std::string function_prefix_regex_str =
-          "java::LocalLambdas\\.test:\\(\\)V";
+          R"(java::LocalLambdas\.test:\(\)V)";
 
         THEN(
           "The local variable should be assigned a temp object implementing "
@@ -192,7 +192,7 @@ SCENARIO(
             symbol_table,
             instructions,
             test_data,
-            std::regex(function_prefix_regex_str + "::\\d+::simpleLambda$"));
+            std::regex(function_prefix_regex_str + R"(::\d+::simpleLambda$)"));
         }
         THEN(
           "The local variable should be assigned a non-null pointer to a "
@@ -219,7 +219,7 @@ SCENARIO(
             symbol_table,
             instructions,
             test_data,
-            std::regex(function_prefix_regex_str + "::\\d+::paramLambda$"));
+            std::regex(function_prefix_regex_str + R"(::\d+::paramLambda$)"));
         }
         THEN(
           "The local variable should be assigned a non-null pointer to a "
@@ -247,7 +247,7 @@ SCENARIO(
             instructions,
             test_data,
             std::regex(
-              function_prefix_regex_str + "::\\d+::arrayParamLambda$"));
+              function_prefix_regex_str + R"(::\d+::arrayParamLambda$)"));
         }
         THEN(
           "The local variable should be assigned a temp object implementing "
@@ -264,7 +264,7 @@ SCENARIO(
             instructions,
             test_data,
             std::regex(
-              function_prefix_regex_str + "::\\d+::returnPrimitiveLambda"));
+              function_prefix_regex_str + R"(::\d+::returnPrimitiveLambda$)"));
         }
         THEN(
           "The local variable should be assigned a temp object implementing "
@@ -286,7 +286,7 @@ SCENARIO(
             instructions,
             test_data,
             std::regex(
-              function_prefix_regex_str + "::\\d+::returnReferenceLambda"));
+              function_prefix_regex_str + R"(::\d+::returnReferenceLambda$)"));
         }
         THEN(
           "The local variable should be assigned a temp object implementing "
@@ -307,7 +307,7 @@ SCENARIO(
             test_data,
             std::regex(
               function_prefix_regex_str +
-              "::\\d+::returningSpecalisedGenericLambda"));
+              R"(::\d+::returningSpecalisedGenericLambda$)"));
         }
         // TODO[TG-2482]: Tests for local lambdas that capture variables
       }
