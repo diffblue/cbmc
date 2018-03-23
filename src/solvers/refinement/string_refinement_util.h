@@ -238,6 +238,9 @@ public:
 
   void output_dot(std::ostream &stream) const;
 
+  /// For all builtin call on which a test (or an unsupported buitin)
+  /// result depends, add the corresponding constraints. For the other builtin
+  /// only add constraints on the length.
   void add_constraints(string_constraint_generatort &generatort);
 
 private:

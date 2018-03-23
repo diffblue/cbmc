@@ -442,13 +442,15 @@ void string_dependenciest::add_constraints(
       for_each_successor(n, f);
     });
 
-  for(const auto &node : test_dependencies)
+  for(const auto &node : builtin_function_nodes)
   {
-    if(node.kind == node.BUILTIN)
+    if(test_dependencies.count(nodet(node)))
     {
       const auto &builtin = builtin_function_nodes[node.index];
       const exprt return_value = builtin.data->add_constraints(generator);
       generator.add_lemma(equal_exprt(return_value, builtin.data->return_code));
     }
+    else
+      generator.add_lemma(node.data->length_constraint());
   }
 }
