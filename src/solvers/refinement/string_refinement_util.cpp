@@ -339,6 +339,15 @@ bool add_node(
     dependencies.add_dependency(*string_result, builtin_function_node);
     auto &node = dependencies.get_node(*string_result);
     node.result_from = builtin_function_node.index;
+
+    // Ensure all atomic strings in the argument have an associated node
+    for(const auto arg : builtin_function_node.data->string_arguments())
+    {
+      for_each_atomic_string(
+        arg, [&](const array_string_exprt &atomic) { // NOLINT
+          (void)dependencies.get_node(atomic);
+        });
+    }
   }
   else
     add_dependency_to_string_subexprs(
@@ -366,10 +375,7 @@ void string_dependenciest::for_each_dependency(
       else if(const auto string_node = node_at(to_array_string_expr(current)))
         f(*string_node);
       else
-      {
-        std::cout << "Warning no node for " << format(current) << std::endl;
-        //UNREACHABLE;
-      }
+        UNREACHABLE;
     }
   }
 }
