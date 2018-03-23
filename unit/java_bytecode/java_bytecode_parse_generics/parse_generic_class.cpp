@@ -27,7 +27,7 @@ SCENARIO(
 
       const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
       const java_generic_class_typet &java_generic_class =
-        require_type::require_java_generic_class(
+        require_type::require_complete_java_generic_class(
           class_symbol.type, {class_prefix + "::T"});
 
       const struct_typet class_struct = to_struct_type(class_symbol.type);
@@ -79,7 +79,7 @@ SCENARIO(
 
       const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
       const java_generic_class_typet &java_generic_class =
-        require_type::require_java_generic_class(
+        require_type::require_complete_java_generic_class(
           class_symbol.type, {class_prefix + "::T", class_prefix + "::U"});
 
       const struct_typet class_struct = to_struct_type(class_symbol.type);

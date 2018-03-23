@@ -24,7 +24,7 @@ SCENARIO(
     const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &class_type =
-      require_type::require_java_non_generic_class(class_symbol.type);
+      require_type::require_complete_java_non_generic_class(class_symbol.type);
 
     THEN("The field component should be a pointer to java::Generic")
     {

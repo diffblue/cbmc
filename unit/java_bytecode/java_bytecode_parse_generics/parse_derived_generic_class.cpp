@@ -24,7 +24,8 @@ SCENARIO(
 
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
     const class_typet &derived_class_type =
-      require_type::require_java_non_generic_class(derived_symbol.type);
+      require_type::require_complete_java_non_generic_class(
+        derived_symbol.type);
 
     THEN("The base for superclass has the correct generic type information")
     {
@@ -46,7 +47,8 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_non_generic_class(derived_symbol.type);
+      require_type::require_complete_java_non_generic_class(
+        derived_symbol.type);
 
     THEN("The base for superclass has the correct generic type information")
     {
@@ -69,7 +71,7 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_generic_class(derived_symbol.type);
+      require_type::require_complete_java_generic_class(derived_symbol.type);
 
     THEN("The base for superclasss has the correct generic type information")
     {
@@ -91,7 +93,7 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_generic_class(derived_symbol.type);
+      require_type::require_complete_java_generic_class(derived_symbol.type);
 
     THEN("The base for superclass has the correct generic type information")
     {
@@ -113,7 +115,7 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_generic_class(derived_symbol.type);
+      require_type::require_complete_java_generic_class(derived_symbol.type);
 
     THEN("The base for superclass has the correct generic type information")
     {
@@ -136,7 +138,8 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_non_generic_class(derived_symbol.type);
+      require_type::require_complete_java_non_generic_class(
+        derived_symbol.type);
 
     THEN("The base for superclass has the correct generic type information")
     {
@@ -159,7 +162,7 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_generic_class(derived_symbol.type);
+      require_type::require_complete_java_generic_class(derived_symbol.type);
 
     THEN("The base for superclass has the correct generic type information")
     {
@@ -183,7 +186,7 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_implicitly_generic_class(
+      require_type::require_complete_java_implicitly_generic_class(
         derived_symbol.type, {"java::ContainsInnerClassGeneric::T"});
 
     THEN("The base for superclass has the correct generic type information")
@@ -206,7 +209,8 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_non_generic_class(derived_symbol.type);
+      require_type::require_complete_java_non_generic_class(
+        derived_symbol.type);
 
     THEN("The base for superclass has the correct generic type information")
     {
@@ -229,7 +233,8 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_non_generic_class(derived_symbol.type);
+      require_type::require_complete_java_non_generic_class(
+        derived_symbol.type);
 
     THEN("The bases have the correct generic type information")
     {
@@ -261,7 +266,7 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_generic_class(derived_symbol.type);
+      require_type::require_complete_java_generic_class(derived_symbol.type);
 
     THEN("The bases have the correct generic type information")
     {
@@ -294,7 +299,8 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_non_generic_class(derived_symbol.type);
+      require_type::require_complete_java_non_generic_class(
+        derived_symbol.type);
 
     THEN("The bases have the correct generic type information")
     {
@@ -332,7 +338,8 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_non_generic_class(derived_symbol.type);
+      require_type::require_complete_java_non_generic_class(
+        derived_symbol.type);
 
     THEN("The bases have the correct generic type information")
     {
@@ -374,7 +381,7 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_generic_class(derived_symbol.type);
+      require_type::require_complete_java_generic_class(derived_symbol.type);
 
     THEN("The bases have the correct generic type information")
     {
@@ -418,7 +425,8 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_non_generic_class(derived_symbol.type);
+      require_type::require_complete_java_non_generic_class(
+        derived_symbol.type);
 
     THEN("The bases have the correct generic type information")
     {
@@ -455,7 +463,8 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_non_generic_class(derived_symbol.type);
+      require_type::require_complete_java_non_generic_class(
+        derived_symbol.type);
 
     THEN("The bases have the correct generic type information")
     {
@@ -499,7 +508,7 @@ SCENARIO(
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &derived_class_type =
-      require_type::require_java_generic_class(derived_symbol.type);
+      require_type::require_complete_java_generic_class(derived_symbol.type);
 
     THEN("The bases have the correct generic type information")
     {
@@ -533,7 +542,8 @@ SCENARIO(
 
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
     const class_typet &derived_class_type =
-      require_type::require_java_implicitly_generic_class(derived_symbol.type);
+      require_type::require_complete_java_implicitly_generic_class(
+        derived_symbol.type);
 
     THEN("The base for superclass is implicitly generic")
     {
@@ -553,7 +563,8 @@ SCENARIO(
 
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
     const class_typet &derived_class_type =
-      require_type::require_java_implicitly_generic_class(derived_symbol.type);
+      require_type::require_complete_java_implicitly_generic_class(
+        derived_symbol.type);
 
     THEN("The base for superclass is generic *and* implicitly generic")
     {
@@ -575,7 +586,8 @@ SCENARIO(
 
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
     const class_typet &derived_class_type =
-      require_type::require_java_implicitly_generic_class(derived_symbol.type);
+      require_type::require_complete_java_implicitly_generic_class(
+        derived_symbol.type);
 
     THEN("The base for superclass is generic *and* implicitly generic")
     {

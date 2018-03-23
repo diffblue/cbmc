@@ -70,9 +70,20 @@ const typet &require_java_non_generic_type(
   const typet &type,
   const optionalt<symbol_typet> &expect_subtype);
 
+class_typet require_complete_class(const typet &class_type);
+
+class_typet require_incomplete_class(const typet &class_type);
+
 java_generic_class_typet require_java_generic_class(const typet &class_type);
 
 java_generic_class_typet require_java_generic_class(
+  const typet &class_type,
+  const std::initializer_list<irep_idt> &type_variables);
+
+java_generic_class_typet
+require_complete_java_generic_class(const typet &class_type);
+
+java_generic_class_typet require_complete_java_generic_class(
   const typet &class_type,
   const std::initializer_list<irep_idt> &type_parameters);
 
@@ -83,7 +94,18 @@ java_implicitly_generic_class_typet require_java_implicitly_generic_class(
   const typet &class_type,
   const std::initializer_list<irep_idt> &implicit_type_variables);
 
+java_implicitly_generic_class_typet
+require_complete_java_implicitly_generic_class(const typet &class_type);
+
+java_implicitly_generic_class_typet
+require_complete_java_implicitly_generic_class(
+  const typet &class_type,
+  const std::initializer_list<irep_idt> &implicit_type_variables);
+
 java_class_typet require_java_non_generic_class(const typet &class_type);
+
+java_class_typet
+require_complete_java_non_generic_class(const typet &class_type);
 
 java_generic_symbol_typet require_java_generic_symbol_type(
   const typet &type,
