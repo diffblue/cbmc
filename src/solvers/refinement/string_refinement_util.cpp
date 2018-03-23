@@ -358,7 +358,10 @@ void string_dependenciest::for_each_successor(
         else if(const auto node = node_at(to_array_string_expr(current)))
           f(nodet(*node));
         else
-          UNREACHABLE;
+        {
+          std::cout << "Warning no node for " << format(current) << std::endl;
+          //UNREACHABLE;
+        }
       }
     }
   }
