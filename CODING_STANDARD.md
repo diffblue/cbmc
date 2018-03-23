@@ -77,7 +77,7 @@ Formatting is enforced using clang-format. For more information about this, see
 - The priority of documentation is readability. Therefore, feel free to use
   Doxygen features, or to add whitespace for multi-paragraph comment blocks if
   necessary.
-- Do not use colon after `\param` name, e.g., `\param arg_name ...` is ok while `\param arg_name: ...` should be avoided 
+- When describing parameters of functions, you may use a colon after the parameter name but if you choose to do so, do not add a space between the name and the colon as this will show in the generated documentation. For example, both `\param arg_name ...` and `\param arg_name: ...` are fine but `\param arg_name : ...` should be avoided. 
 - A comment block should immediately precede the definition of the entity it
   documents, which will generally mean that it will live in the source file.
   This allows us to take advantage of the one definition rule. If each entity
