@@ -1,4 +1,4 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 A.class
 --reachability-slice --show-goto-functions --cover location
 1001
@@ -6,3 +6,6 @@ A.class
 1003
 1004
 1005
+--
+--
+Doesn't work with symex-driven lazy loading because the reachability slicer is a whole-program pass.
