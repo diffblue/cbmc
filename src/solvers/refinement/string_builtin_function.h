@@ -38,6 +38,10 @@ public:
   virtual exprt
   add_constraints(string_constraint_generatort &constraint_generator) const = 0;
 
+  /// Constraint ensuring that the length of the strings are coherent with
+  /// the function call.
+  virtual exprt length_constraint() const = 0;
+
   exprt return_code;
 
   /// Tells whether the builtin function can be a testing function, that is a
@@ -128,7 +132,12 @@ public:
   exprt add_constraints(string_constraint_generatort &generator) const override
   {
     return generator.add_axioms_for_concat_char(result, input, args[0]);
-  };
+  }
+
+  exprt length_constraint() const override
+  {
+    return length_constraint_for_concat_char(result, input);
+  }
 };
 
 /// String inserting a string into another one
@@ -183,6 +192,15 @@ public:
     UNREACHABLE;
   };
 
+  exprt length_constraint() const override
+  {
+    if(args.size() == 1)
+      return length_constraint_for_insert(result, input1, input2, args[0]);
+    if(args.size() == 3)
+      UNIMPLEMENTED;
+    UNREACHABLE;
+  };
+
   bool maybe_testing_function() const override
   {
     return false;
@@ -229,6 +247,16 @@ public:
         result, input1, input2, args[0], args[1]);
     UNREACHABLE;
   };
+
+  exprt length_constraint() const override
+  {
+    if(args.size() == 0)
+      return length_constraint_for_concat(result, input1, input2);
+    if(args.size() == 2)
+      return length_constraint_for_concat_substr(
+        result, input1, input2, args[0], args[1]);
+    UNREACHABLE;
+  }
 };
 
 /// String creation from other types
@@ -303,6 +331,13 @@ public:
   {
     return generator.add_axioms_for_function_application(function_application);
   };
+
+  exprt length_constraint() const override
+  {
+    // For now, there is no need for implementing that as `add_constraints`
+    // should always be called on these functions
+    UNIMPLEMENTED;
+  }
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_BUILTIN_FUNCTION_H
