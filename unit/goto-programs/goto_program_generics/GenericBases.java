@@ -97,7 +97,7 @@ class SuperclassInnerUninstTest
 {
   SuperclassInnerUninst<IWrapper> f;
   public void foo() {
-    IWrapper x = new IWrapper();
+    IWrapper x = new IWrapper(0);
     f.inner.foo(x);
     f.inner_gen.foo(x,true);
     f.inner_three.foo(x);
@@ -110,7 +110,7 @@ class SuperclassUnsupported extends UnsupportedWrapper1<SuperclassUnsupported> {
   }
 }
 
-class SuperclassMocked extends MockedWrapper<IWrapper> {
+class SuperclassOpaque extends OpaqueWrapper<IWrapper> {
   public void foo() {
       this.field.i = 5;
     }

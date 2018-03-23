@@ -106,8 +106,8 @@ class GenericFieldUnsupported {
   }
 }
 
-class GenericFieldMocked {
-  public MockedWrapper<IWrapper> f;
+class GenericFieldOpaque {
+  public OpaqueWrapper<IWrapper> f;
   public void foo() {
     f.field.i = 0;
   }

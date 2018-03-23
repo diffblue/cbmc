@@ -10,6 +10,7 @@
 #include <testing-utils/require_goto_statements.h>
 #include <util/config.h>
 #include <testing-utils/require_type.h>
+#include <testing-utils/require_symbol.h>
 
 // NOTE: To inspect these tests at any point, use expr2java.
 // A good way to verify the validity of a test is to iterate
@@ -504,18 +505,20 @@ SCENARIO(
 
     THEN("The struct for UnsupportedWrapper2 is complete and non-generic")
     {
-      const std::string superclass_name = "java::UnsupportedWrapper2";
-      REQUIRE(symbol_table.has_symbol(superclass_name));
-
+      const std::string field_class_name = "java::UnsupportedWrapper2";
       const symbolt &superclass_symbol =
-        symbol_table.lookup_ref(superclass_name);
-      require_type::require_java_non_generic_class(superclass_symbol.type);
+        require_symbol::require_symbol_exists(symbol_table, field_class_name);
+
+      require_type::require_complete_java_non_generic_class(
+        superclass_symbol.type);
     }
 
     WHEN("The method input argument is created in the entry point function")
     {
-      // For an explanation of this part, look at the comments for the similar
-      // parts of the previous tests.
+      // We trace the creation of the object that is being supplied as
+      // the input to the method under test. There must be one non-null
+      // assignment only, and usually looks like this:
+      //   this = &tmp_object_factory$1;
       const std::vector<codet> &entry_point_code =
         require_goto_statements::require_entry_point_statements(symbol_table);
 
@@ -525,6 +528,10 @@ SCENARIO(
 
       THEN("Object 'this' has field 'f' of type UnsupportedWrapper2")
       {
+        // tmp_object_factory$1.f = &tmp_object_factory$2;
+        // struct UnsupportedWrapper2 { struct java.lang.Object
+        //   @java.lang.Object; struct java.lang.Object *field; }
+        //   tmp_object_factory$2;
         const auto &field_input_name =
           require_goto_statements::require_struct_component_assignment(
             tmp_object_name,
@@ -536,6 +543,9 @@ SCENARIO(
 
         THEN("Object 'f' has unspecialized field 'field'")
         {
+          // tmp_object_factory$2.field = &tmp_object_factory$3;
+          // struct java.lang.Object { __CPROVER_string @class_identifier;
+          //   boolean @lock; } tmp_object_factory$3;
           require_goto_statements::require_struct_component_assignment(
             field_input_name,
             {},
@@ -553,23 +563,18 @@ SCENARIO(
     "incomplete and not marked as generic)")
   {
     const symbol_tablet &symbol_table = load_java_class(
-      "GenericFieldMocked",
+      "GenericFieldOpaque",
       "./goto-programs/goto_program_generics",
-      "GenericFieldMocked.foo");
+      "GenericFieldOpaque.foo");
 
-    THEN("The struct for MockedWrapper is incomplete and not-generic")
+    THEN("The struct for OpaqueWrapper is incomplete and not-generic")
     {
-      const std::string superclass_name = "java::MockedWrapper";
-      REQUIRE(symbol_table.has_symbol(superclass_name));
+      const std::string field_class_name = "java::OpaqueWrapper";
+      const symbolt &field_class_symbol =
+        require_symbol::require_symbol_exists(symbol_table, field_class_name);
 
-      const symbolt &superclass_symbol =
-        symbol_table.lookup_ref(superclass_name);
-      const java_class_typet &superclass_type =
-        to_java_class_type(to_class_type(superclass_symbol.type));
-      REQUIRE(
-        to_class_type(superclass_symbol.type).get_bool(ID_incomplete_class));
-      REQUIRE(!is_java_generic_class_type(superclass_type));
-      REQUIRE(!is_java_implicitly_generic_class_type(superclass_type));
+      require_type::require_incomplete_class(field_class_symbol.type);
+      require_type::require_java_non_generic_class(field_class_symbol.type);
     }
 
     WHEN("The method input argument is created in the entry point function")
@@ -583,14 +588,14 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "this", entry_point_code);
 
-      THEN("Object 'this' has field 'f' of type MockedWrapper")
+      THEN("Object 'this' has field 'f' of type OpaqueWrapper")
       {
         const auto &field_input_name =
           require_goto_statements::require_struct_component_assignment(
             tmp_object_name,
             {},
             "f",
-            "java::MockedWrapper",
+            "java::OpaqueWrapper",
             {},
             entry_point_code);
 

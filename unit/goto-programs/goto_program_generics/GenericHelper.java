@@ -40,7 +40,7 @@ class UnsupportedWrapper2<T extends InterfaceWrapper & InterfacePairWrapper>
   public T field;
 }
 
-// generic mocked class, make sure the .class file is not available
-class MockedWrapper<T> {
+// generic opaque class, make sure the .class file is not available
+class OpaqueWrapper<T> {
   public T field;
 }
