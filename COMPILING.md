@@ -21,11 +21,11 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    The GNU Make needs to be version 3.81 or higher.
    On Debian-like distributions, do
    ```
-   apt-get install g++ gcc flex bison make git libwww-perl patch
+   apt-get install g++ gcc flex bison make git libwww-perl patch openjdk-7-jdk
    ```
    On Red Hat/Fedora or derivates, do
    ```
-   yum install gcc gcc-c++ flex bison perl-libwww-perl patch devtoolset-6
+   yum install gcc gcc-c++ flex bison perl-libwww-perl patch devtoolset-6 java-1.7.0-openjdk-devel
    ```
    Note that you need g++ version 4.9 or newer.
 2. As a user, get the CBMC source via
@@ -91,7 +91,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
 1. As root, get the necessary tools:
    ```
-   pkg install bash gmake git www/p5-libwww patch flex bison
+   pkg install bash gmake git www/p5-libwww patch flex bison openjdk
    ```
 2. As a user, get the CBMC source via
    ```
@@ -186,11 +186,11 @@ require manual modification of build files.
    --version`. To install all build dependencies:
    - On Debian-like distributions, do
      ```
-     apt-get install cmake g++ gcc flex bison make git libwww-perl patch
+     apt-get install cmake g++ gcc flex bison make git libwww-perl patch openjdk-7-jdk
      ```
    - On Red Hat/Fedora or derivates, do
      ```
-     yum install cmake gcc gcc-c++ flex bison perl-libwww-perl patch devtoolset-6
+     yum install cmake gcc gcc-c++ flex bison perl-libwww-perl patch devtoolset-6 java-1.7.0-openjdk-devel
      ```
    - On macOS, do
      ```
