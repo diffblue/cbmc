@@ -3,6 +3,8 @@
 
 [CProver Wiki](http://www.cprover.org/wiki)
 
+[CProver Documentation](http://cprover.diffblue.com)
+
 About
 =====
 

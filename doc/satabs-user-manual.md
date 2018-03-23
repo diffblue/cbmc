@@ -1,3 +1,4 @@
+\ingroup module_hidden
 \page other_documentation Other Documentation
 
 \section satabs SATABS

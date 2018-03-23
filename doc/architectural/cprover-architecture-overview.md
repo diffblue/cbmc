@@ -3,7 +3,7 @@
 
 \author Martin Brain, Peter Schrammel
 
-# Overview of CPROVER Directories
+\section overview-dirs Overview of CPROVER Directories
 
 ## `src/`
 
@@ -90,7 +90,7 @@ The `–help` option gives instructions for use and the
 format of the description files.
 
 
-# General Information
+\section general-info General Information
 
 First off, read the \ref cbmc-user-manual "CBMC User Manual". It describes
 how to get, build and use CBMC. This document covers the
