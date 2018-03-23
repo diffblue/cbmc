@@ -36,11 +36,11 @@ public class Lambdatest {
 
     public int k(int x) {
         a.x = 10;
-        
+
         Function<Integer, Integer> foo = (y) -> y * a.x;
         return foo.apply(x);
     }
-    
+
     public int l(int x) {
         b.y = 10;
         Function<Integer, Integer> foo = (y) -> {
@@ -74,6 +74,19 @@ public class Lambdatest {
 
     public boolean custom(Integer i) {
         return custom.is_ok(i);
+    }
+
+    public static void main(String[] args) {
+        // Uses all of the above test functions, to ensure they are loaded under
+        // symex-driven loading:
+
+        Lambdatest lt = new Lambdatest();
+        lt.f(0.0f, 0, 0);
+        lt.i(0);
+        lt.j(0);
+        lt.k(0);
+        lt.l(0);
+        lt.m(0);
     }
 }
 
