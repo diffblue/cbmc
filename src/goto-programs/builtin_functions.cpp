@@ -969,11 +969,11 @@ void goto_convertt::do_function_call_symbol(
 
     copy(function_call, FUNCTION_CALL, dest);
 
-    if(arguments.size()!=1 && arguments.size()!=2)
+    if(arguments.size() != 1 && arguments.size() != 2 && arguments.size() != 3)
     {
       error().source_location=function.find_source_location();
       error() << "`" << identifier
-              << "' expected to have one or two arguments" << eom;
+              << "' expected to have one, two or three arguments" << eom;
       throw 0;
     }
 
