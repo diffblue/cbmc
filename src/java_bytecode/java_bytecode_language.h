@@ -172,6 +172,10 @@ protected:
 
 private:
   const std::unique_ptr<const select_pointer_typet> pointer_type_selector;
+
+  /// Maps synthetic method names on to the particular type of synthetic method
+  /// (static initializer, initializer wrapper, etc). For full documentation see
+  /// synthetic_method_map.h
   synthetic_methods_mapt synthetic_methods;
   stub_global_initializer_factoryt stub_global_initializer_factory;
   class_hierarchyt class_hierarchy;
