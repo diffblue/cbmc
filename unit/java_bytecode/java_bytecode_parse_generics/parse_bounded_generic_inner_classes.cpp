@@ -23,7 +23,7 @@ SCENARIO(
 
   const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
   const java_class_typet &java_class_type =
-    require_type::require_java_non_generic_class(class_symbol.type);
+    require_type::require_complete_java_non_generic_class(class_symbol.type);
 
   WHEN("Parsing an inner class with type variable")
   {
@@ -33,7 +33,7 @@ SCENARIO(
     {
       const symbolt &class_symbol = new_symbol_table.lookup_ref(inner_name);
       const java_generic_class_typet &java_generic_class_type =
-        require_type::require_java_generic_class(
+        require_type::require_complete_java_generic_class(
           class_symbol.type, {inner_name + "::E"});
 
       THEN("The fields are of correct types")
@@ -56,7 +56,7 @@ SCENARIO(
       const symbolt &class_symbol =
         new_symbol_table.lookup_ref(boundedinner_name);
       const java_generic_class_typet &java_generic_class_type =
-        require_type::require_java_generic_class(
+        require_type::require_complete_java_generic_class(
           class_symbol.type, {boundedinner_name + "::NUM"});
 
       // TODO extend when bounds are parsed correctly - TG-1286
@@ -94,7 +94,7 @@ SCENARIO(
         new_symbol_table.lookup_ref(doubleboundedinner_name);
       // TODO the symbol should be generic - TG-1349
       //      const java_generic_class_typet &java_generic_class_type =
-      //        require_type::require_java_generic_class(
+      //        require_type::require_complete_java_generic_class(
       //          class_symbol.type, {doubleboundedinner_name + "::T"});
 
       // TODO extend when bounds are parsed correctly - TG-1286
@@ -121,7 +121,7 @@ SCENARIO(
       const symbolt &class_symbol =
         new_symbol_table.lookup_ref(twoelementinner_name);
       const java_generic_class_typet &java_generic_class_type =
-        require_type::require_java_generic_class(
+        require_type::require_complete_java_generic_class(
           class_symbol.type,
           {twoelementinner_name + "::K", twoelementinner_name + "::V"});
 

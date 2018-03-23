@@ -26,7 +26,7 @@ SCENARIO(
     const symbolt &class_symbol =
       new_symbol_table.lookup_ref(outer_class_prefix);
     const java_generic_class_typet &generic_class =
-      require_type::require_java_generic_class(
+      require_type::require_complete_java_generic_class(
         class_symbol.type, {outer_class_prefix + "::T"});
     THEN("There is a field f1 of generic type with correct arguments")
     {
@@ -68,7 +68,7 @@ SCENARIO(
     THEN("It has correct implicit generic types")
     {
       const java_implicitly_generic_class_typet &java_class =
-        require_type::require_java_implicitly_generic_class(
+        require_type::require_complete_java_implicitly_generic_class(
           class_symbol.type, {outer_class_prefix + "::T"});
 
       THEN(
@@ -105,7 +105,7 @@ SCENARIO(
     THEN("It has correct implicit generic types")
     {
       const java_implicitly_generic_class_typet &java_class =
-        require_type::require_java_implicitly_generic_class(
+        require_type::require_complete_java_implicitly_generic_class(
           class_symbol.type, {outer_class_prefix + "::T"});
 
       THEN(
@@ -149,10 +149,10 @@ SCENARIO(
 
     THEN("It has correct generic types and implicit generic types")
     {
-      require_type::require_java_implicitly_generic_class(
+      require_type::require_complete_java_implicitly_generic_class(
         class_symbol.type, {outer_class_prefix + "::T"});
       const java_generic_class_typet &generic_class =
-        require_type::require_java_generic_class(
+        require_type::require_complete_java_generic_class(
           class_symbol.type, {generic_inner_class_prefix + "::U"});
 
       THEN(
@@ -194,10 +194,10 @@ SCENARIO(
 
     THEN("It has correct generic types and implicit generic types")
     {
-      require_type::require_java_implicitly_generic_class(
+      require_type::require_complete_java_implicitly_generic_class(
         class_symbol.type,
         {outer_class_prefix + "::T", outer_class_prefix + "$GenericInner::U"});
-      require_type::require_java_generic_class(
+      require_type::require_complete_java_generic_class(
         class_symbol.type, {generic_inner_inner_class_prefix + "::V"});
     }
   }
@@ -212,7 +212,7 @@ SCENARIO(
     THEN("It has correct generic types and no implicit generic types")
     {
       REQUIRE(!is_java_implicitly_generic_class_type(class_symbol.type));
-      require_type::require_java_generic_class(
+      require_type::require_complete_java_generic_class(
         class_symbol.type, {static_inner_class_prefix + "::U"});
     }
   }

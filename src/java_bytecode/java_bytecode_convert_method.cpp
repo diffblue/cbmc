@@ -286,18 +286,21 @@ code_typet member_type_lazy(
       }
       else
       {
-        message.warning() << "method: " << class_name << "." << method_name
-          << "\n signature: " << signature.value() << "\n descriptor: "
-          << descriptor << "\n different number of parameters, reverting to "
-          "descriptor" << message.eom;
+        message.warning() << "Method: " << class_name << "." << method_name
+                          << "\n signature: " << signature.value()
+                          << "\n descriptor: " << descriptor
+                          << "\n different number of parameters, reverting to "
+                             "descriptor"
+                          << message.eom;
       }
     }
-    catch(unsupported_java_class_signature_exceptiont &e)
+    catch(const unsupported_java_class_signature_exceptiont &e)
     {
-      message.warning() << "method: " << class_name << "." << method_name
-        << "\n could not parse signature: " << signature.value() << "\n "
-        << e.what() << "\n" << " reverting to descriptor: "
-        << descriptor << message.eom;
+      message.warning() << "Method: " << class_name << "." << method_name
+                        << "\n could not parse signature: " << signature.value()
+                        << "\n " << e.what() << "\n"
+                        << " reverting to descriptor: " << descriptor
+                        << message.eom;
     }
   }
   return to_code_type(member_type_from_descriptor);

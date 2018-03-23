@@ -202,10 +202,12 @@ void java_bytecode_convert_classt::convert(const classt &c)
       }
       class_type=generic_class_type;
     }
-    catch(unsupported_java_class_signature_exceptiont)
+    catch(const unsupported_java_class_signature_exceptiont &e)
     {
-      warning() << "we currently don't support parsing for example double "
-        "bounded, recursive and wild card generics" << eom;
+      warning() << "Class: " << c.name
+                << "\n could not parse signature: " << c.signature.value()
+                << "\n " << e.what() << "\n ignoring that the class is generic"
+                << eom;
     }
   }
 
@@ -253,11 +255,12 @@ void java_bytecode_convert_classt::convert(const classt &c)
           base, superclass_ref.value(), qualified_classname);
         class_type.add_base(generic_base);
       }
-      catch(unsupported_java_class_signature_exceptiont)
+      catch(const unsupported_java_class_signature_exceptiont &e)
       {
-        debug() << "unsupported generic superclass signature "
-                << id2string(*superclass_ref)
-                << " falling back on using the descriptor" << eom;
+        warning() << "Superclass: " << c.extends << " of class: " << c.name
+                  << "\n could not parse signature: " << superclass_ref.value()
+                  << "\n " << e.what()
+                  << "\n ignoring that the superclass is generic" << eom;
         class_type.add_base(base);
       }
     }
@@ -292,11 +295,12 @@ void java_bytecode_convert_classt::convert(const classt &c)
           base, interface_ref.value(), qualified_classname);
         class_type.add_base(generic_base);
       }
-      catch(unsupported_java_class_signature_exceptiont)
+      catch(const unsupported_java_class_signature_exceptiont &e)
       {
-        debug() << "unsupported generic interface signature "
-                << id2string(*interface_ref)
-                << " falling back on using the descriptor" << eom;
+        warning() << "Interface: " << interface << " of class: " << c.name
+                  << "\n could not parse signature: " << interface_ref.value()
+                  << "\n " << e.what()
+                  << "\n ignoring that the interface is generic" << eom;
         class_type.add_base(base);
       }
     }

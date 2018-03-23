@@ -9,6 +9,8 @@
 #include <testing-utils/load_java_class.h>
 #include <testing-utils/require_goto_statements.h>
 #include <util/config.h>
+#include <testing-utils/require_type.h>
+#include <testing-utils/require_symbol.h>
 
 // NOTE: To inspect these tests at any point, use expr2java.
 // A good way to verify the validity of a test is to iterate
@@ -39,14 +41,14 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "this", entry_point_code);
 
-      THEN("Object 'this' has field 'field_input' of type SimpleWrapper")
+      THEN("Object 'this' has field 'field_input' of type Wrapper")
       {
         const auto &field_input_name =
           require_goto_statements::require_struct_component_assignment(
             tmp_object_name,
             {},
             "field_input",
-            "java::SimpleWrapper",
+            "java::Wrapper",
             {},
             entry_point_code);
 
@@ -100,14 +102,14 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "this", entry_point_code);
 
-      THEN("Object 'this' has field 'field_input1' of type SimpleWrapper")
+      THEN("Object 'this' has field 'field_input1' of type Wrapper")
       {
         const auto &field_input1_name =
           require_goto_statements::require_struct_component_assignment(
             tmp_object_name,
             {},
             "field_input1",
-            "java::SimpleWrapper",
+            "java::Wrapper",
             {},
             entry_point_code);
 
@@ -123,14 +125,14 @@ SCENARIO(
         }
       }
 
-      THEN("Object 'this' has field 'field_input2' of type SimpleWrapper")
+      THEN("Object 'this' has field 'field_input2' of type Wrapper")
       {
         const auto &field_input2_name =
           require_goto_statements::require_struct_component_assignment(
             tmp_object_name,
             {},
             "field_input2",
-            "java::SimpleWrapper",
+            "java::Wrapper",
             {},
             entry_point_code);
 
@@ -167,25 +169,25 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "this", entry_point_code);
 
-      THEN("Object 'this' has field 'field_input1' of type SimpleWrapper")
+      THEN("Object 'this' has field 'field_input1' of type Wrapper")
       {
         const auto &field_input1_name =
           require_goto_statements::require_struct_component_assignment(
             tmp_object_name,
             {},
             "field_input1",
-            "java::SimpleWrapper",
+            "java::Wrapper",
             {},
             entry_point_code);
 
-        THEN("Object 'field_input1' has field 'field' of type SimpleWrapper")
+        THEN("Object 'field_input1' has field 'field' of type Wrapper")
         {
           const auto &field_name =
             require_goto_statements::require_struct_component_assignment(
               field_input1_name,
               {},
               "field",
-              "java::SimpleWrapper",
+              "java::Wrapper",
               {},
               entry_point_code);
 
@@ -233,7 +235,7 @@ SCENARIO(
           require_goto_statements::require_struct_component_assignment(
             field_input_name,
             {},
-            "key",
+            "first",
             "java::IWrapper",
             {},
             entry_point_code);
@@ -244,7 +246,7 @@ SCENARIO(
           require_goto_statements::require_struct_component_assignment(
             field_input_name,
             {},
-            "value",
+            "second",
             "java::IWrapper",
             {},
             entry_point_code);
@@ -274,7 +276,7 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "v", entry_point_code);
 
-      THEN("Object 'v' is of type SimpleWrapper")
+      THEN("Object 'v' is of type Wrapper")
       {
         const auto &tmp_object_declaration =
           require_goto_statements::require_declaration_of_name(
@@ -284,7 +286,7 @@ SCENARIO(
         // and verify that it is what we expect.
         const auto &tmp_object_struct =
           to_struct_type(tmp_object_declaration.symbol().type());
-        REQUIRE(tmp_object_struct.get_tag() == "SimpleWrapper");
+        REQUIRE(tmp_object_struct.get_tag() == "Wrapper");
 
         THEN("Object 'v' has field 'field' of type IWrapper")
         {
@@ -323,7 +325,7 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "v", entry_point_code);
 
-      THEN("Object 'v' is of type SimpleWrapper")
+      THEN("Object 'v' is of type Wrapper")
       {
         const auto &tmp_object_declaration =
           require_goto_statements::require_declaration_of_name(
@@ -333,7 +335,7 @@ SCENARIO(
         // and verify that it is what we expect.
         const auto &tmp_object_struct =
           to_struct_type(tmp_object_declaration.symbol().type());
-        REQUIRE(tmp_object_struct.get_tag() == "SimpleWrapper");
+        REQUIRE(tmp_object_struct.get_tag() == "Wrapper");
 
         THEN(
           "Object 'v' has field 'field' of type Object (upper bound of the "
@@ -481,6 +483,131 @@ SCENARIO(
               {},
               entry_point_code);
           }
+        }
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "Ignore generic parameters in fields and methods with incomplete and "
+  "non-generic types",
+  "[core][goto_program_generics][generic_parameters_test]")
+{
+  GIVEN(
+    "A class with a generic field pointing to a class with unsupported "
+    "signature (thus not marked as generic)")
+  {
+    const symbol_tablet &symbol_table = load_java_class(
+      "GenericFieldUnsupported",
+      "./goto-programs/goto_program_generics",
+      "GenericFieldUnsupported.foo");
+
+    THEN("The struct for UnsupportedWrapper2 is complete and non-generic")
+    {
+      const std::string field_class_name = "java::UnsupportedWrapper2";
+      const symbolt &superclass_symbol =
+        require_symbol::require_symbol_exists(symbol_table, field_class_name);
+
+      require_type::require_complete_java_non_generic_class(
+        superclass_symbol.type);
+    }
+
+    WHEN("The method input argument is created in the entry point function")
+    {
+      // We trace the creation of the object that is being supplied as
+      // the input to the method under test. There must be one non-null
+      // assignment only, and usually looks like this:
+      //   this = &tmp_object_factory$1;
+      const std::vector<codet> &entry_point_code =
+        require_goto_statements::require_entry_point_statements(symbol_table);
+
+      const irep_idt &tmp_object_name =
+        require_goto_statements::require_entry_point_argument_assignment(
+          "this", entry_point_code);
+
+      THEN("Object 'this' has field 'f' of type UnsupportedWrapper2")
+      {
+        // tmp_object_factory$1.f = &tmp_object_factory$2;
+        // struct UnsupportedWrapper2 { struct java.lang.Object
+        //   @java.lang.Object; struct java.lang.Object *field; }
+        //   tmp_object_factory$2;
+        const auto &field_input_name =
+          require_goto_statements::require_struct_component_assignment(
+            tmp_object_name,
+            {},
+            "f",
+            "java::UnsupportedWrapper2",
+            {},
+            entry_point_code);
+
+        THEN("Object 'f' has unspecialized field 'field'")
+        {
+          // tmp_object_factory$2.field = &tmp_object_factory$3;
+          // struct java.lang.Object { __CPROVER_string @class_identifier;
+          //   boolean @lock; } tmp_object_factory$3;
+          require_goto_statements::require_struct_component_assignment(
+            field_input_name,
+            {},
+            "field",
+            "java::java.lang.Object",
+            {},
+            entry_point_code);
+        }
+      }
+    }
+  }
+
+  GIVEN(
+    "A class with a generic field pointing to a mocked class (thus "
+    "incomplete and not marked as generic)")
+  {
+    const symbol_tablet &symbol_table = load_java_class(
+      "GenericFieldOpaque",
+      "./goto-programs/goto_program_generics",
+      "GenericFieldOpaque.foo");
+
+    THEN("The struct for OpaqueWrapper is incomplete and not-generic")
+    {
+      const std::string field_class_name = "java::OpaqueWrapper";
+      const symbolt &field_class_symbol =
+        require_symbol::require_symbol_exists(symbol_table, field_class_name);
+
+      require_type::require_incomplete_class(field_class_symbol.type);
+      require_type::require_java_non_generic_class(field_class_symbol.type);
+    }
+
+    WHEN("The method input argument is created in the entry point function")
+    {
+      // For an explanation of this part, look at the comments for the similar
+      // parts of the previous tests.
+      const std::vector<codet> &entry_point_code =
+        require_goto_statements::require_entry_point_statements(symbol_table);
+
+      const irep_idt &tmp_object_name =
+        require_goto_statements::require_entry_point_argument_assignment(
+          "this", entry_point_code);
+
+      THEN("Object 'this' has field 'f' of type OpaqueWrapper")
+      {
+        const auto &field_input_name =
+          require_goto_statements::require_struct_component_assignment(
+            tmp_object_name,
+            {},
+            "f",
+            "java::OpaqueWrapper",
+            {},
+            entry_point_code);
+
+        THEN("Object 'f' has unspecialized field 'field'")
+        {
+          require_goto_statements::require_struct_component_assignment(
+            field_input_name,
+            {},
+            "field",
+            "java::java.lang.Object",
+            {},
+            entry_point_code);
         }
       }
     }

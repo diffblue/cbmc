@@ -9,6 +9,8 @@
 #include <testing-utils/load_java_class.h>
 #include <testing-utils/require_goto_statements.h>
 #include <util/config.h>
+#include <testing-utils/require_type.h>
+#include <testing-utils/require_symbol.h>
 
 // NOTE: To inspect these tests at any point, use expr2java.
 // A good way to verify the validity of a test is to iterate
@@ -86,7 +88,7 @@ SCENARIO(
           this_tmp_name,
           {"Wrapper"},
           "field",
-          "java::IntWrapper",
+          "java::IWrapper",
           {"java::java.lang.Object"},
           entry_point_code);
       }
@@ -128,7 +130,7 @@ SCENARIO(
             wrapper_tmp_name,
             {},
             "field",
-            "java::IntWrapper",
+            "java::IWrapper",
             {},
             entry_point_code);
         }
@@ -214,7 +216,7 @@ SCENARIO(
         {
           require_goto_statements::require_struct_component_assignment(
             f_tmp_name,
-            {"TwoWrapper"},
+            {"PairWrapper"},
             "first",
             "java::java.lang.Boolean",
             {"java::java.lang.Object"},
@@ -222,9 +224,9 @@ SCENARIO(
 
           require_goto_statements::require_struct_component_assignment(
             f_tmp_name,
-            {"TwoWrapper"},
+            {"PairWrapper"},
             "second",
-            "java::IntWrapper",
+            "java::IWrapper",
             {"java::java.lang.Object"},
             entry_point_code);
         }
@@ -354,7 +356,7 @@ SCENARIO(
               inner_tmp_name,
               {"Wrapper"},
               "field",
-              "java::IntWrapper",
+              "java::IWrapper",
               {"java::java.lang.Object"},
               entry_point_code);
           }
@@ -373,14 +375,14 @@ SCENARIO(
           {
             require_goto_statements::require_struct_component_assignment(
               inner_gen_tmp_name,
-              {"TwoWrapper"},
+              {"PairWrapper"},
               "first",
-              "java::IntWrapper",
+              "java::IWrapper",
               {"java::java.lang.Object"},
               entry_point_code);
             require_goto_statements::require_struct_component_assignment(
               inner_gen_tmp_name,
-              {"TwoWrapper"},
+              {"PairWrapper"},
               "second",
               "java::java.lang.Boolean",
               {"java::java.lang.Object"},
@@ -403,11 +405,108 @@ SCENARIO(
               inner_three_tmp_name,
               {"Wrapper"},
               "field",
-              "java::IntWrapper",
+              "java::IWrapper",
               {"java::java.lang.Object"},
               entry_point_code);
           }
         }
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "Ignore generics for incomplete and non-generic bases",
+  "[core][goto_program_generics][generic_bases_test]")
+{
+  GIVEN(
+    "A class extending a generic class with unsupported class signature (thus"
+    " not marked as generic)")
+  {
+    const symbol_tablet &symbol_table = load_java_class(
+      "SuperclassUnsupported",
+      "./goto-programs/goto_program_generics",
+      "SuperclassUnsupported.foo");
+
+    THEN("The struct for UnsupportedWrapper1 is complete and non-generic")
+    {
+      const std::string superclass_name = "java::UnsupportedWrapper1";
+      const symbolt &superclass_symbol =
+        require_symbol::require_symbol_exists(symbol_table, superclass_name);
+
+      require_type::require_complete_java_non_generic_class(
+        superclass_symbol.type);
+    }
+
+    WHEN("The method input argument is created in the entry point function")
+    {
+      const std::vector<codet> &entry_point_code =
+        require_goto_statements::require_entry_point_statements(symbol_table);
+
+      // We trace the creation of the object that is being supplied as
+      // the input to the method under test. There must be one non-null
+      // assignment only, and usually looks like this:
+      //   this = &tmp_object_factory$1;
+      const irep_idt &this_tmp_name =
+        require_goto_statements::require_entry_point_argument_assignment(
+          "this", entry_point_code);
+
+      THEN("Object 'this' created has unspecialized inherited field")
+      {
+        //   tmp_object_factory$1.@UnsupportedWrapper1.field =
+        // &tmp_object_factory$2;
+        // struct java.lang.Object { __CPROVER_string @class_identifier;
+        //   boolean @lock; } tmp_object_factory$2;
+        require_goto_statements::require_struct_component_assignment(
+          this_tmp_name,
+          {"UnsupportedWrapper1"},
+          "field",
+          "java::java.lang.Object",
+          {},
+          entry_point_code);
+      }
+    }
+  }
+
+  GIVEN(
+    "A class extending a generic class that is mocked (thus incomplete and not "
+    "marked as generic)")
+  {
+    const symbol_tablet &symbol_table = load_java_class(
+      "SuperclassOpaque",
+      "./goto-programs/goto_program_generics",
+      "SuperclassOpaque.foo");
+
+    THEN("The struct for OpaqueWrapper is incomplete and not-generic")
+    {
+      const std::string superclass_name = "java::OpaqueWrapper";
+      const symbolt &superclass_symbol =
+        require_symbol::require_symbol_exists(symbol_table, superclass_name);
+
+      require_type::require_incomplete_class(superclass_symbol.type);
+      require_type::require_java_non_generic_class(superclass_symbol.type);
+    }
+
+    WHEN("The method input argument is created in the entry point function")
+    {
+      const std::vector<codet> &entry_point_code =
+        require_goto_statements::require_entry_point_statements(symbol_table);
+
+      // For an explanation of this part, look at the comments for the similar
+      // parts of the previous tests.
+      const irep_idt &this_tmp_name =
+        require_goto_statements::require_entry_point_argument_assignment(
+          "this", entry_point_code);
+
+      THEN("Object 'this' created has unspecialized inherited field")
+      {
+        require_goto_statements::require_struct_component_assignment(
+          this_tmp_name,
+          {"OpaqueWrapper"},
+          "field",
+          "java::java.lang.Object",
+          {},
+          entry_point_code);
       }
     }
   }
