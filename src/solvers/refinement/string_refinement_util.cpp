@@ -20,6 +20,12 @@
 #include <unordered_set>
 #include "string_refinement_util.h"
 
+/// Applies `f` on all strings contained in `e` that are not if-expressions.
+/// For instance on input `cond1?s1:cond2?s2:s3` we apply `f` on s1, s2 and s3.
+static void for_each_atomic_string(
+  const array_string_exprt &e,
+  const std::function<void(const array_string_exprt &)> f);
+
 bool is_char_type(const typet &type)
 {
   return type.id() == ID_unsignedbv &&
@@ -225,21 +231,26 @@ const string_builtin_functiont &string_dependenciest::get_builtin_function(
   return *node.data;
 }
 
+static void for_each_atomic_string(
+  const array_string_exprt &e,
+  const std::function<void(const array_string_exprt &)> f)
+{
+  if(e.id() != ID_if)
+    return f(e);
+
+  const auto if_expr = to_if_expr(e);
+  for_each_atomic_string(to_array_string_expr(if_expr.true_case()), f);
+  for_each_atomic_string(to_array_string_expr(if_expr.false_case()), f);
+}
+
 void string_dependenciest::add_dependency(
   const array_string_exprt &e,
   const builtin_function_nodet &builtin_function_node)
 {
-  if(e.id() == ID_if)
-  {
-    const auto if_expr = to_if_expr(e);
-    const auto &true_case = to_array_string_expr(if_expr.true_case());
-    const auto &false_case = to_array_string_expr(if_expr.false_case());
-    add_dependency(true_case, builtin_function_node);
-    add_dependency(false_case, builtin_function_node);
-    return;
-  }
-  string_nodet &string_node = get_node(e);
-  string_node.dependencies.push_back(builtin_function_node.index);
+  for_each_atomic_string(e, [&](const array_string_exprt &s) { //NOLINT
+    string_nodet &string_node = get_node(s);
+    string_node.dependencies.push_back(builtin_function_node.index);
+  });
 }
 
 static void add_dependency_to_string_subexprs(
