@@ -202,7 +202,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
       }
       class_type=generic_class_type;
     }
-    catch(unsupported_java_class_signature_exceptiont &e)
+    catch(const unsupported_java_class_signature_exceptiont &e)
     {
       warning() << "Class: " << c.name
                 << "\n could not parse signature: " << c.signature.value()
@@ -255,7 +255,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
           base, superclass_ref.value(), qualified_classname);
         class_type.add_base(generic_base);
       }
-      catch(unsupported_java_class_signature_exceptiont &e)
+      catch(const unsupported_java_class_signature_exceptiont &e)
       {
         warning() << "Superclass: " << c.extends << " of class: " << c.name
                   << "\n could not parse signature: " << superclass_ref.value()
@@ -295,7 +295,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
           base, interface_ref.value(), qualified_classname);
         class_type.add_base(generic_base);
       }
-      catch(unsupported_java_class_signature_exceptiont &e)
+      catch(const unsupported_java_class_signature_exceptiont &e)
       {
         warning() << "Interface: " << interface << " of class: " << c.name
                   << "\n could not parse signature: " << interface_ref.value()
