@@ -24,11 +24,11 @@ c_qualifierst &c_qualifierst::operator=(const c_qualifierst &other)
   return *this;
 }
 
-std::unique_ptr<c_qualifierst> c_qualifierst::clone() const
+std::unique_ptr<qualifierst> c_qualifierst::clone() const
 {
   auto other = util_make_unique<c_qualifierst>();
   *other = *this;
-  return other;
+  return std::move(other);
 }
 
 std::string c_qualifierst::as_string() const
@@ -141,9 +141,7 @@ void c_qualifierst::clear(typet &dest)
 }
 
 /// pretty-print the qualifiers
-std::ostream &operator << (
-  std::ostream &out,
-  const c_qualifierst &c_qualifiers)
+std::ostream &operator<<(std::ostream &out, const qualifierst &qualifiers)
 {
-  return out << c_qualifiers.as_string();
+  return out << qualifiers.as_string();
 }

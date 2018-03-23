@@ -19,30 +19,7 @@ java_qualifierst &java_qualifierst::operator=(const java_qualifierst &other)
   return *this;
 }
 
-java_qualifierst &java_qualifierst::operator=(java_qualifierst &&other)
-{
-  INVARIANT(
-    &other.ns == &ns,
-    "Can only assign from a java_qualifierst using the same namespace");
-  annotations = std::move(other.annotations);
-  c_qualifierst::operator=(other);
-  return *this;
-}
-
-c_qualifierst &java_qualifierst::operator=(const c_qualifierst &c_other)
-{
-  auto other = dynamic_cast<const java_qualifierst *>(&c_other);
-  if(other != nullptr)
-    *this = *other;
-  else
-  {
-    annotations.clear();
-    c_qualifierst::operator=(c_other);
-  }
-  return *this;
-}
-
-std::unique_ptr<c_qualifierst> java_qualifierst::clone() const
+std::unique_ptr<qualifierst> java_qualifierst::clone() const
 {
   auto other = util_make_unique<java_qualifierst>(ns);
   *other = *this;
@@ -74,37 +51,36 @@ void java_qualifierst::write(typet &src) const
   annotated_type.get_annotations() = annotations;
 }
 
-c_qualifierst &java_qualifierst::operator+=(const c_qualifierst &c_other)
+qualifierst &java_qualifierst::operator+=(const qualifierst &other)
 {
-  c_qualifierst::operator+=(c_other);
-  auto other = dynamic_cast<const java_qualifierst *>(&c_other);
-  if(other != nullptr)
+  c_qualifierst::operator+=(other);
+  auto jq = dynamic_cast<const java_qualifierst *>(&other);
+  if(jq != nullptr)
   {
     std::copy(
-      other->annotations.begin(),
-      other->annotations.end(),
+      jq->annotations.begin(),
+      jq->annotations.end(),
       std::back_inserter(annotations));
   }
   return *this;
 }
 
-bool java_qualifierst::operator==(const c_qualifierst &c_other) const
+bool java_qualifierst::operator==(const qualifierst &other) const
 {
-  auto other = dynamic_cast<const java_qualifierst *>(&c_other);
-  if(other == nullptr)
+  auto jq = dynamic_cast<const java_qualifierst *>(&other);
+  if(jq == nullptr)
     return false;
-  return
-    c_qualifierst::operator==(c_other) && annotations == other->annotations;
+  return c_qualifierst::operator==(other) && annotations == jq->annotations;
 }
 
-bool java_qualifierst::is_subset_of(const c_qualifierst &c_other) const
+bool java_qualifierst::is_subset_of(const qualifierst &other) const
 {
-  if(!c_qualifierst::is_subset_of(c_other))
+  if(!c_qualifierst::is_subset_of(other))
     return false;
-  auto other = dynamic_cast<const java_qualifierst *>(&c_other);
-  if(other == nullptr)
+  auto jq = dynamic_cast<const java_qualifierst *>(&other);
+  if(jq == nullptr)
     return annotations.empty();
-  auto &other_a = other->annotations;
+  auto &other_a = jq->annotations;
   for(const auto &annotation : annotations)
   {
     if(std::find(other_a.begin(), other_a.end(), annotation) == other_a.end())

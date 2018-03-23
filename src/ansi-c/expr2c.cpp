@@ -162,11 +162,11 @@ std::string expr2ct::convert(const typet &src)
 
 std::string expr2ct::convert_rec(
   const typet &src,
-  const c_qualifierst &qualifiers,
+  const qualifierst &qualifiers,
   const std::string &declarator)
 {
-  std::unique_ptr<c_qualifierst> clone = qualifiers.clone();
-  c_qualifierst &new_qualifiers = *clone;
+  std::unique_ptr<qualifierst> clone = qualifiers.clone();
+  c_qualifierst &new_qualifiers = dynamic_cast<c_qualifierst &>(*clone);
   new_qualifiers.read(src);
 
   std::string q=new_qualifiers.as_string();
@@ -737,7 +737,7 @@ std::string expr2ct::convert_struct_type(
 /// \return A C-like type declaration of an array
 std::string expr2ct::convert_array_type(
   const typet &src,
-  const c_qualifierst &qualifiers,
+  const qualifierst &qualifiers,
   const std::string &declarator_str)
 {
   return convert_array_type(src, qualifiers, declarator_str, true);
@@ -753,7 +753,7 @@ std::string expr2ct::convert_array_type(
 /// \return A C-like type declaration of an array
 std::string expr2ct::convert_array_type(
   const typet &src,
-  const c_qualifierst &qualifiers,
+  const qualifierst &qualifiers,
   const std::string &declarator_str,
   bool inc_size_if_possible)
 {

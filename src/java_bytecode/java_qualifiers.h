@@ -20,12 +20,12 @@ public:
     : ns(ns)
   {}
 
+protected:
   java_qualifierst &operator=(const java_qualifierst &other);
-  java_qualifierst &operator=(java_qualifierst &&other);
-  virtual c_qualifierst &operator=(const c_qualifierst &other) override;
-  virtual std::unique_ptr<c_qualifierst> clone() const override;
+public:
+  virtual std::unique_ptr<qualifierst> clone() const override;
 
-  virtual c_qualifierst &operator+=(const c_qualifierst &other) override;
+  virtual qualifierst &operator+=(const qualifierst &other) override;
 
   const std::vector<java_annotationt> &get_annotations() const
   {
@@ -38,8 +38,8 @@ public:
   virtual void read(const typet &src) override;
   virtual void write(typet &src) const override;
 
-  virtual bool is_subset_of(const c_qualifierst &other) const override;
-  virtual bool operator==(const c_qualifierst &other) const override;
+  virtual bool is_subset_of(const qualifierst &other) const override;
+  virtual bool operator==(const qualifierst &other) const override;
 
   virtual std::string as_string() const override;
 };

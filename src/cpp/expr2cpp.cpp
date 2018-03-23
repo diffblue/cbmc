@@ -41,7 +41,7 @@ protected:
 
   std::string convert_rec(
     const typet &src,
-    const c_qualifierst &qualifiers,
+    const qualifierst &qualifiers,
     const std::string &declarator) override;
 
   typedef std::unordered_set<std::string, string_hash> id_sett;
@@ -129,11 +129,11 @@ std::string expr2cppt::convert_constant(
 
 std::string expr2cppt::convert_rec(
   const typet &src,
-  const c_qualifierst &qualifiers,
+  const qualifierst &qualifiers,
   const std::string &declarator)
 {
-  std::unique_ptr<c_qualifierst> clone = qualifiers.clone();
-  c_qualifierst &new_qualifiers = *clone;
+  std::unique_ptr<qualifierst> clone = qualifiers.clone();
+  qualifierst &new_qualifiers = *clone;
   new_qualifiers.read(src);
 
   const std::string d=
