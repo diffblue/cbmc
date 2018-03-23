@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "string2int.h"
 #include "string_utils.h"
 
+#include <map>
 #include <ostream>
 #include <stack>
 

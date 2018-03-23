@@ -51,9 +51,16 @@ void irep_hash_container_baset::pack(
   const irept::named_subt &named_sub=irep.get_named_sub();
   const irept::named_subt &comments=irep.get_comments();
 
-  packed.reserve(
-    1+1+sub.size()+named_sub.size()*2+
-    (full?comments.size()*2:0));
+#ifdef SUB_IS_LIST
+  const std::size_t named_sub_size =
+    std::distance(named_sub.begin(), named_sub.end());
+  const std::size_t comments_size = full ?
+    std::distance(comments.begin(), comments.end()) : 0;
+#else
+  const std::size_t named_sub_size = named_sub.size();
+  const std::size_t comments_size = full ? comments.size() : 0;
+#endif
+  packed.reserve(1 + 1 + sub.size() + named_sub_size * 2 + comments_size * 2);
 
   packed.push_back(irep_id_hash()(irep.id()));
 
@@ -61,7 +68,7 @@ void irep_hash_container_baset::pack(
   forall_irep(it, sub)
     packed.push_back(number(*it));
 
-  packed.push_back(named_sub.size());
+  packed.push_back(named_sub_size);
   forall_named_irep(it, named_sub)
   {
     packed.push_back(irep_id_hash()(it->first)); // id
@@ -70,7 +77,7 @@ void irep_hash_container_baset::pack(
 
   if(full)
   {
-    packed.push_back(comments.size());
+    packed.push_back(comments_size);
     forall_named_irep(it, comments)
     {
       packed.push_back(irep_id_hash()(it->first)); // id

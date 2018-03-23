@@ -46,9 +46,17 @@ void irep2lisp(const irept &src, lispexprt &dest)
   dest.value="";
   dest.type=lispexprt::List;
 
-  dest.reserve(2+2*src.get_sub().size()
-                +2*src.get_named_sub().size()
-                +2*src.get_comments().size());
+#ifdef SUB_IS_LIST
+  const std::size_t named_sub_size =
+    std::distance(src.get_named_sub().begin(), src.get_named_sub().end());
+  const std::size_t comments_size =
+    std::distance(src.get_comments().begin(), src.get_comments().end());
+#else
+  const std::size_t named_sub_size = src.get_named_sub().size();
+  const std::size_t comments_size = src.get_comments().size();
+#endif
+  dest.reserve(
+    2 + 2 * src.get_sub().size() + 2 * named_sub_size + 2 * comments_size);
 
   lispexprt id;
   id.type=lispexprt::String;

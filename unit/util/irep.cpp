@@ -141,11 +141,15 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       irept irep2("second_irep");
       irep.add("a_new_element", irep2);
       REQUIRE(irep.find("a_new_element").id() == "second_irep");
-      REQUIRE(irep.get_named_sub().size() == 1);
+      std::size_t named_sub_size = std::distance(
+        irep.get_named_sub().begin(), irep.get_named_sub().end());
+      REQUIRE(named_sub_size == 1);
 
       irep.add("#a_comment", irep2);
       REQUIRE(irep.find("#a_comment").id() == "second_irep");
-      REQUIRE(irep.get_comments().size() == 1);
+      std::size_t comments_size =
+        std::distance(irep.get_comments().begin(), irep.get_comments().end());
+      REQUIRE(comments_size == 1);
 
       irept bak(irep);
       irep.remove("no_such_id");
@@ -159,19 +163,29 @@ SCENARIO("irept_memory", "[core][utils][irept]")
 
       irep.move_to_named_sub("another_entry", irep2);
       REQUIRE(irep.get_sub().size() == 1);
-      REQUIRE(irep.get_named_sub().size() == 1);
-      REQUIRE(irep.get_comments().size() == 1);
+      named_sub_size = std::distance(
+        irep.get_named_sub().begin(), irep.get_named_sub().end());
+      REQUIRE(named_sub_size == 1);
+      comments_size =
+        std::distance(irep.get_comments().begin(), irep.get_comments().end());
+      REQUIRE(comments_size == 1);
 
       irept irep3;
       irep.move_to_named_sub("#a_comment", irep3);
       REQUIRE(irep.find("#a_comment").id().empty());
       REQUIRE(irep.get_sub().size() == 1);
-      REQUIRE(irep.get_named_sub().size() == 1);
-      REQUIRE(irep.get_comments().size() == 1);
+      named_sub_size = std::distance(
+        irep.get_named_sub().begin(), irep.get_named_sub().end());
+      REQUIRE(named_sub_size == 1);
+      comments_size =
+        std::distance(irep.get_comments().begin(), irep.get_comments().end());
+      REQUIRE(comments_size == 1);
 
       irept irep4;
       irep.move_to_named_sub("#another_comment", irep4);
-      REQUIRE(irep.get_comments().size() == 2);
+      comments_size =
+        std::distance(irep.get_comments().begin(), irep.get_comments().end());
+      REQUIRE(comments_size == 2);
     }
 
     THEN("Setting and getting works")
