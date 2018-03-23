@@ -94,9 +94,15 @@ const char clang_builtin_headers[]=
 #include "clang_builtin_headers.inc"
 ; // NOLINT(whitespace/semicolon)
 
+const char cprover_builtin_headers[]=
+"# 1 \"cprover_builtin_headers.h\"\n"
+#include "cprover_builtin_headers.inc"
+; // NOLINT(whitespace/semicolon)
+
 const char windows_builtin_headers[]=
-  "int __noop();\n"
-  "int __assume(int);\n";
+"# 1 \"windows_builtin_headers.h\"\n"
+#include "windows_builtin_headers.inc"
+; // NOLINT(whitespace/semicolon)
 
 static std::string architecture_string(const std::string &value, const char *s)
 {
@@ -114,68 +120,28 @@ static std::string architecture_string(int value, const char *s)
 
 void ansi_c_internal_additions(std::string &code)
 {
+  // do the built-in types and variables
   code+=
     "# 1 \"<built-in-additions>\"\n"
     "typedef __typeof__(sizeof(int)) __CPROVER_size_t;\n"
-    "void __CPROVER_assume(__CPROVER_bool assumption);\n"
-    "void __VERIFIER_assume(__CPROVER_bool assumption);\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "void __CPROVER_assert(__CPROVER_bool assertion, const char *description);\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "void __CPROVER_precondition(__CPROVER_bool precondition, const char *description);\n"
-    "void __CPROVER_havoc_object(void *);\n"
-    "__CPROVER_bool __CPROVER_equal();\n"
-    "__CPROVER_bool __CPROVER_same_object(const void *, const void *);\n"
-    "__CPROVER_bool __CPROVER_invalid_pointer(const void *);\n"
-    "__CPROVER_bool __CPROVER_is_zero_string(const void *);\n"
-    "__CPROVER_size_t __CPROVER_zero_string_length(const void *);\n"
-    "__CPROVER_size_t __CPROVER_buffer_size(const void *);\n"
-
-    "__CPROVER_bool __CPROVER_get_flag(const void *, const char *);\n"
-    "void __CPROVER_set_must(const void *, const char *);\n"
-    "void __CPROVER_clear_must(const void *, const char *);\n"
-    "void __CPROVER_set_may(const void *, const char *);\n"
-    "void __CPROVER_clear_may(const void *, const char *);\n"
-    "void __CPROVER_cleanup(const void *, const void *);\n"
-    "__CPROVER_bool __CPROVER_get_must(const void *, const char *);\n"
-    "__CPROVER_bool __CPROVER_get_may(const void *, const char *);\n"
-
     "const unsigned __CPROVER_constant_infinity_uint;\n"
     "typedef void __CPROVER_integer;\n"
     "typedef void __CPROVER_rational;\n"
-    "void __CPROVER_initialize(void);\n"
-    "void __CPROVER_input(const char *id, ...);\n"
-    "void __CPROVER_output(const char *id, ...);\n"
-    "void __CPROVER_cover(__CPROVER_bool condition);\n"
-
-    // concurrency-related
-    "void __CPROVER_atomic_begin();\n"
-    "void __CPROVER_atomic_end();\n"
-    "void __CPROVER_fence(const char *kind, ...);\n"
     "__CPROVER_thread_local unsigned long __CPROVER_thread_id=0;\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     "__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];\n"
     "unsigned long __CPROVER_next_thread_id=0;\n"
-
-    // traces
-    "void CBMC_trace(int lvl, const char *event, ...);\n"
-
-    // pointers
-    "unsigned __CPROVER_POINTER_OBJECT(const void *p);\n"
-    "signed __CPROVER_POINTER_OFFSET(const void *p);\n"
-    "__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);\n"
-    "extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    "void __CPROVER_allocated_memory(__CPROVER_size_t address, __CPROVER_size_t extent);\n"
+    "extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];\n"
 
     // malloc
-    "void *__CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero);\n"
     "const void *__CPROVER_deallocated=0;\n"
     "const void *__CPROVER_dead_object=0;\n"
     "const void *__CPROVER_malloc_object=0;\n"
     "__CPROVER_size_t __CPROVER_malloc_size;\n"
     "__CPROVER_bool __CPROVER_malloc_is_new_array=0;\n" // for C++
     "const void *__CPROVER_memory_leak=0;\n"
+    "void *__CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero);\n"
 
     // this is ANSI-C
     // NOLINTNEXTLINE(whitespace/line_length)
@@ -188,63 +154,8 @@ void ansi_c_internal_additions(std::string &code)
     "extern __CPROVER_thread_local const char __PRETTY_FUNCTION__[__CPROVER_constant_infinity_uint];\n"
 
     // float stuff
-    "__CPROVER_bool __CPROVER_isnanf(float f);\n"
-    "__CPROVER_bool __CPROVER_isnand(double f);\n"
-    "__CPROVER_bool __CPROVER_isnanld(long double f);\n"
-    "__CPROVER_bool __CPROVER_isfinitef(float f);\n"
-    "__CPROVER_bool __CPROVER_isfinited(double f);\n"
-    "__CPROVER_bool __CPROVER_isfiniteld(long double f);\n"
-    "__CPROVER_bool __CPROVER_isinff(float f);\n"
-    "__CPROVER_bool __CPROVER_isinfd(double f);\n"
-    "__CPROVER_bool __CPROVER_isinfld(long double f);\n"
-    "__CPROVER_bool __CPROVER_isnormalf(float f);\n"
-    "__CPROVER_bool __CPROVER_isnormald(double f);\n"
-    "__CPROVER_bool __CPROVER_isnormalld(long double f);\n"
-    "__CPROVER_bool __CPROVER_signf(float f);\n"
-    "__CPROVER_bool __CPROVER_signd(double f);\n"
-    "__CPROVER_bool __CPROVER_signld(long double f);\n"
-    "double __CPROVER_inf(void);\n"
-    "float __CPROVER_inff(void);\n"
-    "long double __CPROVER_infl(void);\n"
     "int __CPROVER_thread_local __CPROVER_rounding_mode="+
       std::to_string(config.ansi_c.rounding_mode)+";\n"
-    "int __CPROVER_isgreaterf(float f, float g);\n"
-    "int __CPROVER_isgreaterd(double f, double g);\n"
-    "int __CPROVER_isgreaterequalf(float f, float g);\n"
-    "int __CPROVER_isgreaterequald(double f, double g);\n"
-    "int __CPROVER_islessf(float f, float g);\n"
-    "int __CPROVER_islessd(double f, double g);\n"
-    "int __CPROVER_islessequalf(float f, float g);\n"
-    "int __CPROVER_islessequald(double f, double g);\n"
-    "int __CPROVER_islessgreaterf(float f, float g);\n"
-    "int __CPROVER_islessgreaterd(double f, double g);\n"
-    "int __CPROVER_isunorderedf(float f, float g);\n"
-    "int __CPROVER_isunorderedd(double f, double g);\n"
-
-    // absolute value
-    "int __CPROVER_abs(int x);\n"
-    "long int __CPROVER_labs(long int x);\n"
-    "long int __CPROVER_llabs(long long int x);\n"
-    "double __CPROVER_fabs(double x);\n"
-    "long double __CPROVER_fabsl(long double x);\n"
-    "float __CPROVER_fabsf(float x);\n"
-
-    // arrays
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);\n"
-    // overwrite all of *dest (possibly using nondet values), even
-    // if *src is smaller
-    "void __CPROVER_array_copy(const void *dest, const void *src);\n"
-    // replace at most size-of-*src bytes in *dest
-    "void __CPROVER_array_replace(const void *dest, const void *src);\n"
-    "void __CPROVER_array_set(const void *dest, ...);\n"
-
-    // k-induction
-    "void __CPROVER_k_induction_hint(unsigned min, unsigned max, "
-      "unsigned step, unsigned loop_free);\n"
-
-    // format string-related
-    "int __CPROVER_scanf(const char *, ...);\n"
 
     // pipes, write, read, close
     "struct __CPROVER_pipet {\n"
@@ -258,7 +169,10 @@ void ansi_c_internal_additions(std::string &code)
     // offset to make sure we don't collide with other fds
     "extern const int __CPROVER_pipe_offset;\n"
     "unsigned __CPROVER_pipe_count=0;\n"
-
+    "\n"
+    // This function needs to be declared, or otherwise can't be called
+    // by the entry-point construction.
+    "void __CPROVER_initialize(void);\n"
     "\n";
 
   // GCC junk stuff, also for CLANG and ARM
