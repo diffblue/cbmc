@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define SUB_IS_LIST
 
 #ifdef SUB_IS_LIST
-#include <list>
+#include <forward_list>
 #else
 #include <map>
 #endif
@@ -160,11 +160,11 @@ public:
   // use std::forward_list or std::vector< unique_ptr<T> > to save
   // memory and increase efficiency.
 
-  #ifdef SUB_IS_LIST
-  typedef std::list<std::pair<irep_namet, irept> > named_subt;
-  #else
+#ifdef SUB_IS_LIST
+  typedef std::forward_list<std::pair<irep_namet, irept>> named_subt;
+#else
   typedef std::map<irep_namet, irept> named_subt;
-  #endif
+#endif
 
   bool is_nil() const { return id()==ID_nil; }
   bool is_not_nil() const { return id()!=ID_nil; }

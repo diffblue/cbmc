@@ -152,9 +152,9 @@ void irept::nonrecursive_destructor(dt *old_data)
 
     if(d->ref_count==0)
     {
-      stack.reserve(stack.size()+
-                    d->named_sub.size()+
-                    d->sub.size());
+      stack.reserve(
+        stack.size() + std::distance(d->named_sub.begin(), d->named_sub.end()) +
+        d->sub.size());
 
       for(named_subt::iterator
           it=d->named_sub.begin();
@@ -263,7 +263,12 @@ void irept::remove(const irep_namet &name)
   named_subt::iterator it=named_subt_lower_bound(s, name);
 
   if(it!=s.end() && it->first==name)
-    s.erase(it);
+  {
+    named_subt::iterator before = s.before_begin();
+    while(std::next(before) != it)
+      ++before;
+    s.erase_after(before);
+  }
 #else
   s.erase(name);
 #endif
@@ -298,7 +303,12 @@ irept &irept::add(const irep_namet &name)
 
   if(it==s.end() ||
      it->first!=name)
-    it=s.insert(it, std::make_pair(name, irept()));
+  {
+    named_subt::iterator before = s.before_begin();
+    while(std::next(before) != it)
+      ++before;
+    it = s.emplace_after(before, name, irept());
+  }
 
   return it->second;
 #else
@@ -315,7 +325,12 @@ irept &irept::add(const irep_namet &name, const irept &irep)
 
   if(it==s.end() ||
      it->first!=name)
-    it=s.insert(it, std::make_pair(name, irep));
+  {
+    named_subt::iterator before = s.before_begin();
+    while(std::next(before) != it)
+      ++before;
+    it = s.emplace_after(before, name, irep);
+  }
   else
     it->second=irep;
 
@@ -407,13 +422,24 @@ bool irept::full_eq(const irept &other) const
 
   const irept::subt &i1_sub=get_sub();
   const irept::subt &i2_sub=other.get_sub();
+
+  if(i1_sub.size() != i2_sub.size())
+    return false;
+
   const irept::named_subt &i1_named_sub=get_named_sub();
   const irept::named_subt &i2_named_sub=other.get_named_sub();
 
+#ifdef SUB_IS_LIST
   if(
-    i1_sub.size() != i2_sub.size() ||
-    i1_named_sub.size() != i2_named_sub.size())
+    std::distance(i1_named_sub.begin(), i1_named_sub.end()) !=
+    std::distance(i2_named_sub.begin(), i2_named_sub.end()))
+  {
     return false;
+  }
+#else
+  if(i1_named_sub.size() != i2_named_sub.size())
+    return false;
+#endif
 
   for(std::size_t i=0; i<i1_sub.size(); i++)
     if(!i1_sub[i].full_eq(i2_sub[i]))
@@ -667,7 +693,13 @@ std::size_t irept::full_hash() const
     result=hash_combine(result, it->second.full_hash());
   }
 
-  result = hash_finalize(result, named_sub.size() + sub.size());
+#ifdef SUB_IS_LIST
+  const std::size_t named_sub_size =
+    std::distance(named_sub.begin(), named_sub.end());
+#else
+  const std::size_t named_sub_size = named_sub.size();
+#endif
+  result = hash_finalize(result, named_sub_size + sub.size());
 
   return result;
 }

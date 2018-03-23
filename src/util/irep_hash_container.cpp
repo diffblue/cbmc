@@ -54,7 +54,13 @@ void irep_hash_container_baset::pack(
   {
     // we pack: the irep id, the sub size, the subs, the named-sub size, and
     // each of the named subs with their ids
-    packed.reserve(1 + 1 + sub.size() + 1 + named_sub.size() * 2);
+#ifdef SUB_IS_LIST
+    const std::size_t named_sub_size =
+      std::distance(named_sub.begin(), named_sub.end());
+#else
+    const std::size_t named_sub_size = named_sub.size();
+#endif
+    packed.reserve(1 + 1 + sub.size() + 1 + named_sub_size * 2);
 
     packed.push_back(irep_id_hash()(irep.id()));
 
@@ -62,7 +68,7 @@ void irep_hash_container_baset::pack(
     forall_irep(it, sub)
       packed.push_back(number(*it));
 
-    packed.push_back(named_sub.size());
+    packed.push_back(named_sub_size);
     for(const auto &sub_irep : named_sub)
     {
       packed.push_back(irep_id_hash()(sub_irep.first)); // id
