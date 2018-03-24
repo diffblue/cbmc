@@ -62,9 +62,8 @@ Resources:
                     phases:
                         install:
                             commands:
-                                - apt-get update -y
-                                - apt-get install -y software-properties-common
-                                - add-apt-repository ppa:ubuntu-toolchain-r/test
+                                - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
+                                - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
                                 - apt-get update -y
                                 - apt-get install -y libwww-perl g++-5 flex bison git openjdk-7-jdk
                                 - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
@@ -105,9 +104,8 @@ Resources:
                     phases:
                         install:
                             commands:
-                                - apt-get update -y
-                                - apt-get install -y software-properties-common
-                                - add-apt-repository ppa:ubuntu-toolchain-r/test
+                                - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
+                                - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
                                 - apt-get update -y
                                 - apt-get install -y libwww-perl g++-5 flex bison git openjdk-7-jdk
                                 - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
