@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_PARSE_TREE_H
 
 #include <set>
+#include <map>
 
 #include <util/optional.h>
 #include <util/std_code.h>
