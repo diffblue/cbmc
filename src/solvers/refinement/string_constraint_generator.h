@@ -110,6 +110,9 @@ public:
   const std::vector<string_not_contains_constraintt> &
   get_not_contains_constraints() const;
 
+  /// Clear all constraints and lemmas
+  void clear_constraints();
+
   /// Boolean symbols for the results of some string functions
   const std::vector<symbol_exprt> &get_boolean_symbols() const;
 

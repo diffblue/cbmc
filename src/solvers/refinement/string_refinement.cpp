@@ -639,6 +639,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       string_id_symbol_resolve.replace_expr(eq.rhs());
   }
 
+  // Generator is also used by get, so we have to use it as a class member
+  // but we make sure it is cleared at each `dec_solve` call.
+  generator.clear_constraints();
   make_char_array_pointer_associations(generator, equations);
 
 #ifdef DEBUG
@@ -658,8 +661,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 #endif
 
   debug() << "dec_solve: add constraints" << eom;
-  // Generator is also used by get, that's why we use a class member
-  dependencies.add_constraints(generator);
+ dependencies.add_constraints(generator);
 
 #ifdef DEBUG
   output_equations(debug(), equations, ns);

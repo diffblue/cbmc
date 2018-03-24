@@ -323,6 +323,13 @@ string_constraint_generatort::get_string_expr(const exprt &expr)
   return char_array_of_pointer(str.content(), str.length());
 }
 
+void string_constraint_generatort::clear_constraints()
+{
+  lemmas.clear();
+  constraints.clear();
+  not_contains_constraints.clear();
+}
+
 /// adds standard axioms about the length of the string and its content: * its
 /// length should be positive * it should not exceed max_string_length * if
 /// force_printable_characters is true then all characters should belong to the
