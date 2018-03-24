@@ -3,6 +3,7 @@ main.c
 --show-goto-functions --verbosity 10 --pointer-check
 ^Removing function pointers and virtual functions$
 ^\s*ASSERT FALSE // invalid function pointer$
+^EXIT=0$
 ^SIGNAL=0$
 function func: replacing function pointer by 0 possible targets
 --

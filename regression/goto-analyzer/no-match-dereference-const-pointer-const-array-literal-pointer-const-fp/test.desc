@@ -11,6 +11,7 @@ main.c
 ^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f7 THEN GOTO [0-9]$
 ^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f8 THEN GOTO [0-9]$
 ^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f9 THEN GOTO [0-9]$
+^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring

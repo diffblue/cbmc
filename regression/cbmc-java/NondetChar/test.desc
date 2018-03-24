@@ -2,5 +2,7 @@ CORE
 NondetChar.class
 --function NondetChar.main
 ^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
 --
 ^warning: ignoring

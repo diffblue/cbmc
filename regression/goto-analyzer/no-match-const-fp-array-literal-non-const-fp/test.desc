@@ -11,6 +11,7 @@ main.c
 ^\s*IF fp2 == f7 THEN GOTO [0-9]$
 ^\s*IF fp2 == f8 THEN GOTO [0-9]$
 ^\s*IF fp2 == f9 THEN GOTO [0-9]$
+^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring

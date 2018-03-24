@@ -6,6 +6,7 @@ main.c
 ^\s*IF fp == f3 THEN GOTO [0-9]$
 ^\s*IF fp == f4 THEN GOTO [0-9]$
 ^\s*ASSERT FALSE // invalid function pointer$
+^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring

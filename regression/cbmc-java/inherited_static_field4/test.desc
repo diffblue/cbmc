@@ -3,6 +3,8 @@ Test.class
 --function Test.main
 assertion at file Test\.java line 6 .* FAILURE
 ^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
 --
 --
 This checks that jbmc knows that the hidden field Grandparent.x is not the same

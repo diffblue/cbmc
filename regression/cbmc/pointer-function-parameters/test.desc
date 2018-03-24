@@ -6,5 +6,7 @@ main.c
 ^a=\(\(signed int \*\)NULL\), tmp\$\d+=[^,]*$
 ^a=&tmp\$\d+!0, tmp\$\d+=4$
 ^a=&tmp\$\d+!0, tmp\$\d+=([012356789][0-9]*|4[0-9]+)$
+^EXIT=0$
+^SIGNAL=0$
 --
 ^warning: ignoring

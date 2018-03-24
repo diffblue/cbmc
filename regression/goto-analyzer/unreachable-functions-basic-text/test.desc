@@ -2,5 +2,7 @@ CORE
 ../unreachable-instructions-basic-text/unreachable.c
 --unreachable-functions
 unreachable.c not_called 3 6$
+^EXIT=0$
+^SIGNAL=0$
 --
 ^warning: ignoring

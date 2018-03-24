@@ -2,6 +2,8 @@ CORE
 Test.class
 --function Test.main
 ^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
 --
 --
 This test must pass, as there is only one opaque parent (interface_with_static).

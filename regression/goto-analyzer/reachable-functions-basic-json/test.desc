@@ -5,6 +5,8 @@ CORE
 "function": "dead_inside",$
 "function": "obviously_dead",$
 "function": "not_obviously_dead",$
+^EXIT=0$
+^SIGNAL=0$
 --
 "last line":[[:space:]]*$
 ^warning: ignoring

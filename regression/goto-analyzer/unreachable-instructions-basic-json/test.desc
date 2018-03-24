@@ -17,5 +17,7 @@ CORE
 "function": "dead_inside",
 "line": "12",
 "statement": "y = y \+ 1;"
+^EXIT=0$
+^SIGNAL=0$
 --
 ^warning: ignoring

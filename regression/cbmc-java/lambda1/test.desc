@@ -1,6 +1,6 @@
 CORE
 Lambdatest.class
---verbosity 10 --show-goto-functions
+--verbosity 10 --show-goto-functions --function Lambdatest.main
 lambda function reference lambda\$new\$0 in class \"Lambdatest\"
 lambda function reference lambda\$new\$1 in class \"Lambdatest\"
 lambda function reference lambda\$f\$2 in class \"Lambdatest\"
@@ -10,3 +10,10 @@ lambda function reference lambda\$k\$5 in class \"Lambdatest\"
 lambda function reference lambda\$l\$6 in class \"Lambdatest\"
 lambda function reference lambda\$m\$7 in class \"Lambdatest\"
 lambda function reference lambda\$static\$0 in class \"B\"
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Incompatible with symex-driven lazy loading because this test wants to process
+everything in the given class, not the functions reachable from a particular
+entry point, which is required for symex-driven loading.

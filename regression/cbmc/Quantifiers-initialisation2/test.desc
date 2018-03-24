@@ -9,3 +9,5 @@ main.c
 ^\[main.assertion.5\] assertion c\[.*\] >= c\[.*\]: SUCCESS$
 ^\*\* 1 of 5 failed
 ^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$

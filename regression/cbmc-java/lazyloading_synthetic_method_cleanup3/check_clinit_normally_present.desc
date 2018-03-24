@@ -3,3 +3,5 @@ Test.class
 --show-goto-functions --function Test.main
 java::Opaque\.<clinit>:\(\)V
 java::Opaque::clinit_wrapper
+^EXIT=0$
+^SIGNAL=0$

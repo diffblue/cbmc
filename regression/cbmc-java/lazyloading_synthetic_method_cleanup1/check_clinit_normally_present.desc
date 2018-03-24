@@ -3,3 +3,5 @@ Test.class
 --show-goto-functions --function Test.main
 java::Unused::clinit_wrapper
 Unused\.<clinit>\(\)
+^EXIT=0$
+^SIGNAL=0$
