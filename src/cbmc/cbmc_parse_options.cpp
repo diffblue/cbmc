@@ -942,7 +942,7 @@ void cbmc_parse_optionst::help()
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
-    " --show-symbol-table          show symbol table\n"
+    " --show-symbol-table          show loaded symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"

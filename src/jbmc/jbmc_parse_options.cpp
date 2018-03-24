@@ -1027,7 +1027,7 @@ void jbmc_parse_optionst::help()
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
-    " --show-symbol-table          show symbol table\n"
+    " --show-symbol-table          show loaded symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
@@ -1050,6 +1050,9 @@ void jbmc_parse_optionst::help()
     " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n" // NOLINT(*)
     // Currently only supported in the JBMC frontend:
     " --symex-driven-lazy-loading  only load functions when first entered by symbolic execution\n" // NOLINT(*)
+    "                              Note --show-symbol-table/goto-functions/properties output\n" // NOLINT(*)
+    "                              will be restricted to loaded methods in this case, and only\n" // NOLINT(*)
+    "                              output after the symex phase\n"
     "\n"
     "BMC options:\n"
     HELP_BMC

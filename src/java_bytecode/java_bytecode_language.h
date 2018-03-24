@@ -52,6 +52,8 @@ Author: Daniel Kroening, kroening@kroening.com
   " --java-cp-include-files          regexp or JSON list of files to load (with '@' prefix)\n"   /* NOLINT(*) */ \
   " --lazy-methods                   only translate methods that appear to be reachable from\n"  /* NOLINT(*) */ \
   "                                  the --function entry point or main class\n"                 /* NOLINT(*) */ \
+  "                                  Note --show-symbol-table/goto-functions/properties output\n"/* NOLINT(*) */ \
+  "                                  will be restricted to loaded methods in this case\n"        /* NOLINT(*) */ \
   " --lazy-methods-extra-entry-point METHODNAME\n"                                               /* NOLINT(*) */ \
   "                                  treat METHODNAME as a possible program entry point for\n"   /* NOLINT(*) */ \
   "                                  the purpose of lazy method loading\n"                       /* NOLINT(*) */ \
