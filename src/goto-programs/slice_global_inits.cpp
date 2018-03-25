@@ -13,10 +13,9 @@ Date:   December 2016
 
 #include "slice_global_inits.h"
 
-#include <unordered_set>
-
 #include <analyses/call_graph.h>
 
+#include <util/find_symbols.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/cprover_prefix.h>
@@ -46,23 +45,7 @@ void slice_global_inits(goto_modelt &goto_model)
 
   // gather all symbols used by reachable functions
 
-  class symbol_collectort:public const_expr_visitort
-  {
-  public:
-    virtual void operator()(const exprt &expr)
-    {
-      if(expr.id()==ID_symbol)
-      {
-        const symbol_exprt &symbol_expr=to_symbol_expr(expr);
-        const irep_idt id=symbol_expr.get_identifier();
-        symbols.insert(id);
-      }
-    }
-
-    std::unordered_set<irep_idt, irep_id_hash> symbols;
-  };
-
-  symbol_collectort visitor;
+  find_symbols_sett symbols;
 
   for(std::size_t node_idx = 0; node_idx < directed_graph.size(); ++node_idx)
   {
@@ -76,11 +59,11 @@ void slice_global_inits(goto_modelt &goto_model)
     forall_goto_program_instructions(i_it, goto_program)
     {
       const codet &code=i_it->code;
-      code.visit(visitor);
+      find_symbols(code, symbols, true, false);
+      const exprt &expr = i_it->guard;
+      find_symbols(expr, symbols, true, false);
     }
   }
-
-  const std::unordered_set<irep_idt, irep_id_hash> &symbols=visitor.symbols;
 
   // now remove unnecessary initializations
 
