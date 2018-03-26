@@ -169,8 +169,8 @@ SCENARIO(
     {
       symbol_tablet symbol_table = load_java_class(
         "LocalLambdas",
-        "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-          "_classes/",
+        "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+          compiler + "_classes/",
         "LocalLambdas.test");
 
       WHEN("Inspecting the assignments of the entry function")
@@ -348,8 +348,8 @@ SCENARIO(
     {
       symbol_tablet symbol_table = load_java_class(
         "MemberLambdas",
-        "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-          "_classes/",
+        "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+          compiler + "_classes/",
         "MemberLambdas.<init>");
 
       WHEN("Inspecting the assignments of the entry function")
@@ -503,8 +503,8 @@ SCENARIO(
     {
       symbol_tablet symbol_table = load_java_class(
         "StaticLambdas",
-        "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-          "_classes/",
+        "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+          compiler + "_classes/",
         "StaticLambdas.<clinit>");
 
       WHEN("Inspecting the assignments of the entry function")

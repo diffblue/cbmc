@@ -18,7 +18,8 @@ SCENARIO(
   {
     const symbol_tablet symbol_table = load_java_class_lazy(
       "LocalLambdas",
-      "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/",
+      "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/"
+      "openjdk_8_classes",
       "LocalLambdas.test");
 
     THEN("Then the lambdas should be loaded")
@@ -68,7 +69,8 @@ SCENARIO(
   {
     const symbol_tablet symbol_table = load_java_class_lazy(
       "MemberLambdas",
-      "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/",
+      "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/"
+      "openjdk_8_classes",
       "MemberLambdas.test");
 
     THEN("Then the lambdas should be loaded")
@@ -117,7 +119,8 @@ SCENARIO(
   {
     const symbol_tablet symbol_table = load_java_class_lazy(
       "StaticLambdas",
-      "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/",
+      "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/"
+      "openjdk_8_classes",
       "StaticLambdas.test");
 
     THEN("Then the lambdas should be loaded")
@@ -166,7 +169,8 @@ SCENARIO(
   {
     const symbol_tablet symbol_table = load_java_class_lazy(
       "OuterMemberLambdas$Inner",
-      "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/",
+      "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/"
+      "openjdk_8_classes",
       "OuterMemberLambdas$Inner.test");
 
     THEN("Then the lambdas should be loaded")
@@ -192,7 +196,8 @@ SCENARIO(
 {
   const symbol_tablet symbol_table = load_java_class_lazy(
     "ExternalLambdaAccessor",
-    "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/",
+    "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/"
+    "openjdk_8_classes",
     "ExternalLambdaAccessor.test");
 
   THEN("Then the lambdas should be loaded")
