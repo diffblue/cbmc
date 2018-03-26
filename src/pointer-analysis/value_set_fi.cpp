@@ -33,13 +33,13 @@ hash_numbering<irep_idt, irep_id_hash> value_set_fit::function_numbering;
 static const char *alloc_adapter_prefix="alloc_adaptor::";
 
 #define forall_objects(it, map) \
-  for(object_map_dt::const_iterator (it) = (map).begin(); \
-  (it)!=(map).end(); \
+  for(object_map_dt::const_iterator it = (map).begin(); \
+  it!=(map).end(); \
   (it)++)
 
 #define Forall_objects(it, map) \
-  for(object_map_dt::iterator (it) = (map).begin(); \
-  (it)!=(map).end(); \
+  for(object_map_dt::iterator it = (map).begin(); \
+  it!=(map).end(); \
   (it)++)
 
 void value_set_fit::output(

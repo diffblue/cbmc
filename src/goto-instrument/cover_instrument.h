@@ -25,6 +25,7 @@ class goal_filterst;
 class cover_instrumenter_baset
 {
 public:
+  virtual ~cover_instrumenter_baset() = default;
   cover_instrumenter_baset(
     const symbol_tablet &_symbol_table,
     const goal_filterst &_goal_filters,

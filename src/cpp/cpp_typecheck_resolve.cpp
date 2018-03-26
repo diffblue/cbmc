@@ -588,8 +588,6 @@ void cpp_typecheck_resolvet::make_constructors(
 {
   resolve_identifierst new_identifiers;
 
-  resolve_identifierst::iterator next;
-
   for(resolve_identifierst::iterator
       it=identifiers.begin();
       it!=identifiers.end();

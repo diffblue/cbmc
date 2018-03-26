@@ -33,24 +33,24 @@ hash_numbering<irep_idt, irep_id_hash> value_set_fivrt::function_numbering;
 static const char *alloc_adapter_prefix="alloc_adaptor::";
 
 #define forall_objects(it, map) \
-  for(object_map_dt::const_iterator (it)=(map).begin(); \
-  (it)!=(map).end(); \
+  for(object_map_dt::const_iterator it=(map).begin(); \
+  it!=(map).end(); \
   (it)++)
 
 #define forall_valid_objects(it, map) \
-  for(object_map_dt::const_iterator (it)=(map).begin(); \
-  (it)!=(map).end(); \
+  for(object_map_dt::const_iterator it=(map).begin(); \
+  it!=(map).end(); \
   (it)++) \
-    if((map).is_valid_at((it)->first, from_function, from_target_index))
+    if((map).is_valid_at(it->first, from_function, from_target_index))
 
 #define Forall_objects(it, map) \
-  for(object_map_dt::iterator (it)=(map).begin(); \
-  (it)!=(map).end(); \
+  for(object_map_dt::iterator it=(map).begin(); \
+  it!=(map).end(); \
   (it)++)
 
 #define Forall_valid_objects(it, map) \
-  for(object_map_dt::iterator (it)=(map).begin(); \
-      (it)!=(map).end(); \
+  for(object_map_dt::iterator it=(map).begin(); \
+      it!=(map).end(); \
       (it)++) \
     if((map).is_valid_at((it)->first, from_function, from_target_index)) /* NOLINT(*) */
 

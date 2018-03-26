@@ -21,6 +21,7 @@ class message_handlert;
 class cover_blocks_baset
 {
 public:
+  virtual ~cover_blocks_baset() = default;
   /// \param t a goto instruction
   /// \return the block number of the block
   ///         the given goto instruction is part of
