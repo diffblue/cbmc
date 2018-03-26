@@ -160,7 +160,7 @@ void validate_local_variable_lambda_assignment(
 SCENARIO(
   "Converting invokedynamic with a local lambda",
   "[core]"
-  "[lamdba][java_bytecode][java_bytecode_convert_method][!mayfail]")
+  "[lambdas][java_bytecode][java_bytecode_convert_method][!mayfail]")
 {
   // NOLINTNEXTLINE(whitespace/braces)
   run_test_with_compilers([](const std::string &compiler) {
