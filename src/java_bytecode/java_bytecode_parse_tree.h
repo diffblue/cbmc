@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class java_bytecode_parse_treet
 {
 public:
+  virtual ~java_bytecode_parse_treet() = default;
   class annotationt
   {
   public:
@@ -157,11 +158,14 @@ public:
       is_synchronized(false)
     {
     }
+
+    virtual ~methodt() = default;
   };
 
   class fieldt:public membert
   {
   public:
+    virtual ~fieldt() = default;
     virtual void output(std::ostream &out) const;
     bool is_enum;
   };
