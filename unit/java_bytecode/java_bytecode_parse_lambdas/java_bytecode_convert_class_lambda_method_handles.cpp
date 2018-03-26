@@ -24,8 +24,8 @@ SCENARIO(
     {
       const symbol_tablet &new_symbol_table = load_java_class(
         "StaticLambdas",
-        "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-          "_classes/");
+        "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+          compiler + "_classes/");
 
       std::string class_prefix = "java::StaticLambdas";
       REQUIRE(new_symbol_table.has_symbol(class_prefix));
@@ -90,8 +90,8 @@ SCENARIO(
     {
       const symbol_tablet &new_symbol_table = load_java_class(
         "LocalLambdas",
-        "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-          "_classes/");
+        "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+          compiler + "_classes/");
 
       std::string class_prefix = "java::LocalLambdas";
       REQUIRE(new_symbol_table.has_symbol(class_prefix));
@@ -161,8 +161,8 @@ SCENARIO(
     {
       const symbol_tablet &new_symbol_table = load_java_class(
         "MemberLambdas",
-        "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-          "_classes/");
+        "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+          compiler + "_classes/");
 
       std::string class_prefix = "java::MemberLambdas";
       REQUIRE(new_symbol_table.has_symbol(class_prefix));
@@ -227,8 +227,8 @@ SCENARIO(
     {
       const symbol_tablet &new_symbol_table = load_java_class(
         "OuterMemberLambdas$Inner",
-        "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-          "_classes/");
+        "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+          compiler + "_classes/");
 
       std::string class_prefix = "java::OuterMemberLambdas$Inner";
       REQUIRE(new_symbol_table.has_symbol(class_prefix));

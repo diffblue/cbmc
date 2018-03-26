@@ -35,8 +35,8 @@ SCENARIO(
     {
       java_bytecode_parse_treet parse_tree;
       java_bytecode_parse(
-        "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-          "_classes/StaticLambdas.class",
+        "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+          compiler + "_classes/StaticLambdas.class",
         parse_tree,
         message_handler);
       WHEN("Parsing that class")
@@ -347,8 +347,8 @@ SCENARIO(
       {
         java_bytecode_parse_treet parse_tree;
         java_bytecode_parse(
-          "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-            "_classes/LocalLambdas.class",
+          "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+            compiler + "_classes/LocalLambdas.class",
           parse_tree,
           message_handler);
         WHEN("Parsing that class")
@@ -657,8 +657,8 @@ SCENARIO(
       {
         java_bytecode_parse_treet parse_tree;
         java_bytecode_parse(
-          "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-            "_classes/MemberLambdas.class",
+          "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+            compiler + "_classes/MemberLambdas.class",
           parse_tree,
           message_handler);
         WHEN("Parsing that class")
@@ -993,8 +993,8 @@ SCENARIO(
       {
         java_bytecode_parse_treet parse_tree;
         java_bytecode_parse(
-          "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-            "_classes/OuterMemberLambdas$Inner.class",
+          "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+            compiler + "_classes/OuterMemberLambdas$Inner.class",
           parse_tree,
           message_handler);
         WHEN("Parsing that class")
