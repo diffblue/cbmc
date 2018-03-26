@@ -633,6 +633,18 @@ void grapht<N>::tarjan(tarjant &t, node_indext v) const
   }
 }
 
+/// Computes strongly-connected components of a graph and yields a vector
+/// expressing a mapping from nodes to components indices. For example, if nodes
+/// 1 and 3 are in SCC 0, and nodes 0, 2 and 4 are in SCC 1, this will leave
+/// `subgraph_nr` holding `{ 1, 0, 1, 0, 1 }`, and the function will return 2
+/// (the number of distinct SCCs).
+/// Lower-numbered SCCs are closer to the leaves, so in the particular case
+/// of a DAG, sorting by SCC number gives a topological sort, and for a cyclic
+/// graph the SCCs are topologically sorted but arbitrarily ordered internally.
+/// \param subgraph_nr [in, out]: should be pre-allocated with enough storage
+///   for one entry per graph node. Will be populated with the SCC indices of
+///   each node.
+/// \return the number of distinct SCCs.
 template<class N>
 std::size_t grapht<N>::SCCs(std::vector<node_indext> &subgraph_nr) const
 {
