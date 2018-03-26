@@ -1,6 +1,6 @@
-FUTURE
+CORE
 Test.class
---refine-strings --string-max-length 1000 --string-max-input-length 100 --function Test.bufferNonDetLoop5 --depth 10000 --unwind 5  --verbosity 10
+--refine-strings --string-max-length 1000 --string-max-input-length 100 --function Test.bufferNonDetLoop5 --depth 10000 --unwind 3 --verbosity 10
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
