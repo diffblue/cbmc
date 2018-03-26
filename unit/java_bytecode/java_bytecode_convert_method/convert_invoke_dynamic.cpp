@@ -14,6 +14,7 @@
 #include <testing-utils/run_test_with_compilers.h>
 #include <testing-utils/require_symbol.h>
 #include <util/expr_iterator.h>
+#include <goto-programs/class_hierarchy.h>
 
 struct lambda_assignment_test_datat
 {
@@ -85,6 +86,24 @@ void validate_lamdba_assignement(
     require_type::require_complete_class(lambda_implementor_type_symbol.type);
 
   REQUIRE(tmp_lambda_class_type.has_base(test_data.lambda_interface));
+  REQUIRE(tmp_lambda_class_type.has_base("java::java.lang.Object"));
+
+  class_hierarchyt class_hierarchy;
+  class_hierarchy(symbol_table);
+
+  const auto &parents = class_hierarchy.get_parents_trans(tmp_class_identifier);
+  REQUIRE_THAT(
+    parents,
+    Catch::Matchers::Vector::ContainsElementMatcher<irep_idt>{
+      test_data.lambda_interface});
+
+  const auto &interface_children =
+    class_hierarchy.get_children_trans(test_data.lambda_interface);
+
+  REQUIRE_THAT(
+    interface_children,
+    Catch::Matchers::Vector::ContainsElementMatcher<irep_idt>{
+      tmp_class_identifier});
 
   THEN("The function in the class should call the lambda method")
   {
