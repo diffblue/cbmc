@@ -3,7 +3,7 @@
  Module: Unit tests for dependency graph
    solvers/refinement/string_refinement.cpp
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Ltd.
 
 \*******************************************************************/
 
@@ -47,7 +47,7 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
 {
   GIVEN("dependency graph")
   {
-    string_dependenciest dependences;
+    string_dependenciest dependencies;
     refined_string_typet string_type(java_char_type(), java_int_type());
     const exprt string1 = make_string_argument("string1");
     const exprt string2 = make_string_argument("string2");
@@ -93,11 +93,11 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
       symbol_generatort generator;
       array_poolt array_pool(generator);
 
-      bool success = add_node(dependences, equation1, array_pool);
+      bool success = add_node(dependencies, equation1, array_pool);
       REQUIRE(success);
-      success = add_node(dependences, equation2, array_pool);
+      success = add_node(dependencies, equation2, array_pool);
       REQUIRE(success);
-      success = add_node(dependences, equation3, array_pool);
+      success = add_node(dependencies, equation3, array_pool);
       REQUIRE(success);
 
 #ifdef DEBUG // useful output for visualizing the graph
@@ -105,9 +105,7 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
         register_language(new_java_bytecode_language);
         symbol_tablet symbol_table;
         namespacet ns(symbol_table);
-        dependencies.output_dot(std::cerr, [&](const exprt &expr) { // NOLINT
-          return from_expr(ns, "", expr);
-        });
+        dependencies.output_dot(std::cerr);
       }
 #endif
 
@@ -141,53 +139,59 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
 
       THEN("string3 depends on primitive0")
       {
-        const auto &node = dependences.get_node(char_array3);
-        const std::vector<string_dependenciest::builtin_function_nodet>
-          &depends = dependences.dependencies(node);
-        REQUIRE(depends.size() == 1);
-        const auto &primitive0 = dependences.get_builtin_function(depends[0]);
-
-        THEN("primitive0 depends on string1 and string2")
-        {
-          const auto &depends2 = primitive0.string_arguments();
-          REQUIRE(depends2.size() == 2);
-          REQUIRE(depends2[0] == char_array1);
-          REQUIRE(depends2[1] == char_array2);
-        }
+        const auto &node = dependencies.get_node(char_array3);
+        std::size_t nb_dependencies = 0;
+        dependencies.for_each_dependency(
+          node,
+          [&](const string_dependenciest::builtin_function_nodet &n) { // NOLINT
+            nb_dependencies++;
+            THEN("primitive0 depends on string1 and string2")
+            {
+              const auto &depends2 = n.data->string_arguments();
+              REQUIRE(depends2.size() == 2);
+              REQUIRE(depends2[0] == char_array1);
+              REQUIRE(depends2[1] == char_array2);
+            }
+          });
+        REQUIRE(nb_dependencies == 1);
       }
 
       THEN("string5 depends on primitive1")
       {
-        const auto &node = dependences.get_node(char_array5);
-        const std::vector<string_dependenciest::builtin_function_nodet>
-          &depends = dependences.dependencies(node);
-        REQUIRE(depends.size() == 1);
-        const auto &primitive1 = dependences.get_builtin_function(depends[0]);
-
-        THEN("primitive1 depends on string3 and string4")
-        {
-          const auto &depends2 = primitive1.string_arguments();
-          REQUIRE(depends2.size() == 2);
-          REQUIRE(depends2[0] == char_array3);
-          REQUIRE(depends2[1] == char_array4);
-        }
+        const auto &node = dependencies.get_node(char_array5);
+        std::size_t nb_dependencies = 0;
+        dependencies.for_each_dependency(
+          node,
+          [&](const string_dependenciest::builtin_function_nodet &n) { // NOLINT
+            nb_dependencies++;
+            THEN("primitive1 depends on string3 and string4")
+            {
+              const auto &depends2 = n.data->string_arguments();
+              REQUIRE(depends2.size() == 2);
+              REQUIRE(depends2[0] == char_array3);
+              REQUIRE(depends2[1] == char_array4);
+            }
+          });
+        REQUIRE(nb_dependencies == 1);
       }
 
       THEN("string6 depends on primitive2")
       {
-        const auto &node = dependences.get_node(char_array6);
-        const std::vector<string_dependenciest::builtin_function_nodet>
-          &depends = dependences.dependencies(node);
-        REQUIRE(depends.size() == 1);
-        const auto &primitive2 = dependences.get_builtin_function(depends[0]);
-
-        THEN("primitive2 depends on string5 and string2")
-        {
-          const auto &depends2 = primitive2.string_arguments();
-          REQUIRE(depends2.size() == 2);
-          REQUIRE(depends2[0] == char_array5);
-          REQUIRE(depends2[1] == char_array2);
-        }
+        const auto &node = dependencies.get_node(char_array6);
+        std::size_t nb_dependencies = 0;
+        dependencies.for_each_dependency(
+          node,
+          [&](const string_dependenciest::builtin_function_nodet &n) { // NOLINT
+            nb_dependencies++;
+            THEN("primitive2 depends on string5 and string2")
+            {
+              const auto &depends2 = n.data->string_arguments();
+              REQUIRE(depends2.size() == 2);
+              REQUIRE(depends2[0] == char_array5);
+              REQUIRE(depends2[1] == char_array2);
+            }
+          });
+        REQUIRE(nb_dependencies == 1);
       }
     }
   }

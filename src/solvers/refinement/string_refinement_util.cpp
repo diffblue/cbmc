@@ -17,7 +17,14 @@
 #include <util/graph.h>
 #include <util/magic.h>
 #include <util/make_unique.h>
+#include <unordered_set>
 #include "string_refinement_util.h"
+
+/// Applies `f` on all strings contained in `e` that are not if-expressions.
+/// For instance on input `cond1?s1:cond2?s2:s3` we apply `f` on s1, s2 and s3.
+static void for_each_atomic_string(
+  const array_string_exprt &e,
+  const std::function<void(const array_string_exprt &)> f);
 
 bool is_char_type(const typet &type)
 {
@@ -164,11 +171,10 @@ equation_symbol_mappingt::find_equations(const exprt &expr)
 }
 
 /// Construct a string_builtin_functiont object from a function application
-/// \return a unique pointer to the created object, this unique pointer is empty
-///   if the function does not correspond to one of the supported
-///   builtin_functions.
+/// \return a unique pointer to the created object
 static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
   const function_application_exprt &fun_app,
+  const exprt &return_code,
   array_poolt &array_pool)
 {
   const auto name = expr_checked_cast<symbol_exprt>(fun_app.function());
@@ -176,18 +182,19 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
                                          : name.get_identifier();
 
   if(id == ID_cprover_string_insert_func)
-    return std::unique_ptr<string_builtin_functiont>(
-      new string_insertion_builtin_functiont(fun_app.arguments(), array_pool));
+    return util_make_unique<string_insertion_builtin_functiont>(
+      return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_concat_func)
     return util_make_unique<string_concatenation_builtin_functiont>(
-      fun_app.arguments(), array_pool);
+      return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_concat_char_func)
     return util_make_unique<string_concat_char_builtin_functiont>(
-      fun_app.arguments(), array_pool);
+      return_code, fun_app.arguments(), array_pool);
 
-  return {};
+  return util_make_unique<string_builtin_function_with_no_evalt>(
+    return_code, fun_app, array_pool);
 }
 
 string_dependenciest::string_nodet &
@@ -210,80 +217,40 @@ string_dependenciest::node_at(const array_string_exprt &e) const
   return {};
 }
 
-string_dependenciest::builtin_function_nodet string_dependenciest::make_node(
+string_dependenciest::builtin_function_nodet &string_dependenciest::make_node(
   std::unique_ptr<string_builtin_functiont> &builtin_function)
 {
-  const builtin_function_nodet builtin_function_node(
-    builtin_function_nodes.size());
-  builtin_function_nodes.emplace_back();
-  builtin_function_nodes.back().swap(builtin_function);
-  return builtin_function_node;
+  builtin_function_nodes.emplace_back(
+    std::move(builtin_function), builtin_function_nodes.size());
+  return builtin_function_nodes.back();
 }
 
 const string_builtin_functiont &string_dependenciest::get_builtin_function(
   const builtin_function_nodet &node) const
 {
-  PRECONDITION(node.index < builtin_function_nodes.size());
-  return *(builtin_function_nodes[node.index]);
+  return *node.data;
 }
 
-const std::vector<string_dependenciest::builtin_function_nodet> &
-string_dependenciest::dependencies(
-  const string_dependenciest::string_nodet &node) const
+static void for_each_atomic_string(
+  const array_string_exprt &e,
+  const std::function<void(const array_string_exprt &)> f)
 {
-  return node.dependencies;
+  if(e.id() != ID_if)
+    return f(e);
+
+  const auto if_expr = to_if_expr(e);
+  for_each_atomic_string(to_array_string_expr(if_expr.true_case()), f);
+  for_each_atomic_string(to_array_string_expr(if_expr.false_case()), f);
 }
 
 void string_dependenciest::add_dependency(
   const array_string_exprt &e,
   const builtin_function_nodet &builtin_function_node)
 {
-  if(e.id() == ID_if)
-  {
-    const auto if_expr = to_if_expr(e);
-    const auto &true_case = to_array_string_expr(if_expr.true_case());
-    const auto &false_case = to_array_string_expr(if_expr.false_case());
-    add_dependency(true_case, builtin_function_node);
-    add_dependency(false_case, builtin_function_node);
-    return;
-  }
-  string_nodet &string_node = get_node(e);
-  string_node.dependencies.push_back(builtin_function_node);
-}
-
-void string_dependenciest::add_unknown_dependency(const array_string_exprt &e)
-{
-  if(e.id() == ID_if)
-  {
-    const auto if_expr = to_if_expr(e);
-    const auto &true_case = to_array_string_expr(if_expr.true_case());
-    const auto &false_case = to_array_string_expr(if_expr.false_case());
-    add_unknown_dependency(true_case);
-    add_unknown_dependency(false_case);
-    return;
-  }
-  string_nodet &string_node = get_node(e);
-  string_node.depends_on_unknown_builtin_function = true;
-}
-
-static void add_unknown_dependency_to_string_subexprs(
-  string_dependenciest &dependencies,
-  const function_application_exprt &fun_app,
-  array_poolt &array_pool)
-{
-  for(const auto &expr : fun_app.arguments())
-  {
-    std::for_each(
-      expr.depth_begin(), expr.depth_end(), [&](const exprt &e) { // NOLINT
-        if(is_refined_string_type(e.type()))
-        {
-          const auto &string_struct = expr_checked_cast<struct_exprt>(e);
-          const array_string_exprt string =
-            array_pool.find(string_struct.op1(), string_struct.op0());
-          dependencies.add_unknown_dependency(string);
-        }
-      });
-  }
+  for_each_atomic_string(e, [&](const array_string_exprt &s) { //NOLINT
+    string_nodet &string_node = get_node(s);
+    string_node.dependencies.push_back(builtin_function_node.index);
+  });
 }
 
 static void add_dependency_to_string_subexprs(
@@ -332,11 +299,9 @@ optionalt<exprt> string_dependenciest::eval(
 
   const auto node = string_nodes[it->second];
   const auto &f = node.result_from;
-  if(
-    f && node.dependencies.size() == 1 &&
-    !node.depends_on_unknown_builtin_function)
+  if(f && node.dependencies.size() == 1)
   {
-    const auto value_opt = get_builtin_function(*f).eval(get_value);
+    const auto value_opt = builtin_function_nodes[*f].data->eval(get_value);
     eval_string_cache[it->second] = value_opt;
     return value_opt;
   }
@@ -360,15 +325,10 @@ bool add_node(
   if(!fun_app)
     return false;
 
-  auto builtin_function = to_string_builtin_function(*fun_app, array_pool);
+  auto builtin_function =
+    to_string_builtin_function(*fun_app, equation.lhs(), array_pool);
 
-  if(!builtin_function)
-  {
-    add_unknown_dependency_to_string_subexprs(
-      dependencies, *fun_app, array_pool);
-    return true;
-  }
-
+  CHECK_RETURN(builtin_function != nullptr);
   const auto &builtin_function_node = dependencies.make_node(builtin_function);
   // Warning: `builtin_function` has been emptied and should not be used anymore
 
@@ -378,7 +338,16 @@ bool add_node(
   {
     dependencies.add_dependency(*string_result, builtin_function_node);
     auto &node = dependencies.get_node(*string_result);
-    node.result_from = builtin_function_node;
+    node.result_from = builtin_function_node.index;
+
+    // Ensure all atomic strings in the argument have an associated node
+    for(const auto arg : builtin_function_node.data->string_arguments())
+    {
+      for_each_atomic_string(
+        arg, [&](const array_string_exprt &atomic) { // NOLINT
+          (void)dependencies.get_node(atomic);
+        });
+    }
   }
   else
     add_dependency_to_string_subexprs(
@@ -387,42 +356,56 @@ bool add_node(
   return true;
 }
 
+void string_dependenciest::for_each_dependency(
+  const builtin_function_nodet &node,
+  const std::function<void(const string_nodet &)> &f) const
+{
+  for(const auto &s : node.data->string_arguments())
+  {
+    std::vector<std::reference_wrapper<const exprt>> stack({s});
+    while(!stack.empty())
+    {
+      const auto current = stack.back();
+      stack.pop_back();
+      if(const auto if_expr = expr_try_dynamic_cast<if_exprt>(current.get()))
+      {
+        stack.emplace_back(if_expr->true_case());
+        stack.emplace_back(if_expr->false_case());
+      }
+      else if(const auto string_node = node_at(to_array_string_expr(current)))
+        f(*string_node);
+      else
+        UNREACHABLE;
+    }
+  }
+}
+
+void string_dependenciest::for_each_dependency(
+  const string_nodet &node,
+  const std::function<void(const builtin_function_nodet &)> &f) const
+{
+  for(const std::size_t &index : node.dependencies)
+    f(builtin_function_nodes[index]);
+}
+
 void string_dependenciest::for_each_successor(
   const nodet &node,
   const std::function<void(const nodet &)> &f) const
 {
-  if(node.kind == nodet::BUILTIN)
+  switch(node.kind)
   {
-    const auto &builtin = builtin_function_nodes[node.index];
-    for(const auto &s : builtin->string_arguments())
-    {
-      std::vector<std::reference_wrapper<const exprt>> stack({s});
-      while(!stack.empty())
-      {
-        const auto current = stack.back();
-        stack.pop_back();
-        if(const auto if_expr = expr_try_dynamic_cast<if_exprt>(current.get()))
-        {
-          stack.emplace_back(if_expr->true_case());
-          stack.emplace_back(if_expr->false_case());
-        }
-        else if(const auto node = node_at(to_array_string_expr(current)))
-          f(nodet(*node));
-        else
-          UNREACHABLE;
-      }
-    }
+  case nodet::BUILTIN:
+    for_each_dependency(
+      builtin_function_nodes[node.index],
+      [&](const string_nodet &n) { return f(nodet(n)); });
+    break;
+
+  case nodet::STRING:
+    for_each_dependency(
+      string_nodes[node.index],
+      [&](const builtin_function_nodet &n) { return f(nodet(n)); });
+    break;
   }
-  else if(node.kind == nodet::STRING)
-  {
-    const auto &s_node = string_nodes[node.index];
-    std::for_each(
-      s_node.dependencies.begin(),
-      s_node.dependencies.end(),
-      [&](const builtin_function_nodet &p) { f(nodet(p)); });
-  }
-  else
-    UNREACHABLE;
 }
 
 void string_dependenciest::for_each_node(
@@ -431,7 +414,7 @@ void string_dependenciest::for_each_node(
   for(const auto string_node : string_nodes)
     f(nodet(string_node));
   for(std::size_t i = 0; i < builtin_function_nodes.size(); ++i)
-    f(nodet(builtin_function_nodet(i)));
+    f(nodet(builtin_function_nodes[i]));
 }
 
 void string_dependenciest::output_dot(std::ostream &stream) const
@@ -447,7 +430,8 @@ void string_dependenciest::output_dot(std::ostream &stream) const
   const auto node_to_string = [&](const nodet &n) { // NOLINT
     std::stringstream ostream;
     if(n.kind == nodet::BUILTIN)
-      ostream << builtin_function_nodes[n.index]->name() << n.index;
+      ostream << '"' << builtin_function_nodes[n.index].data->name() << '_'
+              << n.index << '"';
     else
       ostream << '"' << format(string_nodes[n.index].expr) << '"';
     return ostream.str();
@@ -455,4 +439,35 @@ void string_dependenciest::output_dot(std::ostream &stream) const
   stream << "digraph dependencies {\n";
   output_dot_generic<nodet>(stream, for_each, for_each_succ, node_to_string);
   stream << '}' << std::endl;
+}
+
+void string_dependenciest::add_constraints(
+  string_constraint_generatort &generator)
+{
+  std::unordered_set<nodet, node_hash> test_dependencies;
+  for(const auto &builtin : builtin_function_nodes)
+  {
+    if(builtin.data->maybe_testing_function())
+      test_dependencies.insert(nodet(builtin));
+  }
+
+  get_reachable(
+    test_dependencies,
+    [&](
+      const nodet &n,
+      const std::function<void(const nodet &)> &f) { // NOLINT
+      for_each_successor(n, f);
+    });
+
+  for(const auto &node : builtin_function_nodes)
+  {
+    if(test_dependencies.count(nodet(node)))
+    {
+      const auto &builtin = builtin_function_nodes[node.index];
+      const exprt return_value = builtin.data->add_constraints(generator);
+      generator.add_lemma(equal_exprt(return_value, builtin.data->return_code));
+    }
+    else
+      generator.add_lemma(node.data->length_constraint());
+  }
 }

@@ -18,8 +18,10 @@ static array_string_exprt make_string(
 
 string_transformation_builtin_functiont::
   string_transformation_builtin_functiont(
+    const exprt &return_code,
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool)
+  : string_builtin_functiont(return_code)
 {
   PRECONDITION(fun_args.size() > 2);
   const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
@@ -55,8 +57,10 @@ optionalt<exprt> string_transformation_builtin_functiont::eval(
 }
 
 string_insertion_builtin_functiont::string_insertion_builtin_functiont(
+  const exprt &return_code,
   const std::vector<exprt> &fun_args,
   array_poolt &array_pool)
+  : string_builtin_functiont(return_code)
 {
   PRECONDITION(fun_args.size() > 4);
   const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
@@ -69,8 +73,10 @@ string_insertion_builtin_functiont::string_insertion_builtin_functiont(
 }
 
 string_concatenation_builtin_functiont::string_concatenation_builtin_functiont(
+  const exprt &return_code,
   const std::vector<exprt> &fun_args,
   array_poolt &array_pool)
+  : string_insertion_builtin_functiont(return_code)
 {
   PRECONDITION(fun_args.size() >= 4 && fun_args.size() <= 6);
   const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
@@ -206,4 +212,34 @@ optionalt<exprt> string_insertion_builtin_functiont::eval(
   const auto length = from_integer(result_value.size(), result.length().type());
   const array_typet type(result.type().subtype(), length);
   return make_string(result_value, type);
+}
+
+string_builtin_function_with_no_evalt::string_builtin_function_with_no_evalt(
+  const exprt &return_code,
+  const function_application_exprt &f,
+  array_poolt &array_pool)
+  : string_builtin_functiont(return_code), function_application(f)
+{
+  const std::vector<exprt> &fun_args = f.arguments();
+  std::size_t i = 0;
+  if(fun_args.size() >= 2 && fun_args[1].type().id() == ID_pointer)
+  {
+    string_res = array_pool.find(fun_args[1], fun_args[0]);
+    i = 2;
+  }
+
+  for(; i < fun_args.size(); ++i)
+  {
+    const auto arg = expr_try_dynamic_cast<struct_exprt>(fun_args[i]);
+    // TODO: use is_refined_string_type ?
+    if(
+      arg && arg->operands().size() == 2 &&
+      arg->op1().type().id() == ID_pointer)
+    {
+      INVARIANT(is_refined_string_type(arg->type()), "should be a string");
+      string_args.push_back(array_pool.find(arg->op1(), arg->op0()));
+    }
+    else
+      args.push_back(fun_args[i]);
+  }
 }

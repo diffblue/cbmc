@@ -1,0 +1,12 @@
+CORE
+Test.class
+--refine-strings --string-max-length 1000 --string-max-input-length 100 --verbosity 10 Test.class --function Test.test
+^EXIT=0$
+^SIGNAL=0$
+assertion at file Test.java line 20 .*: SUCCESS
+string_refinement::check_axioms: 3 universal axioms
+--
+--
+We check there are exactly 3 universal formulas considered by the solver (2 for
+`t = s.concat("_foo")` and 1 for `t.endsWith("foo")`).
+The other concatenations should be ignored.

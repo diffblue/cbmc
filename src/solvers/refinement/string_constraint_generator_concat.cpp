@@ -43,10 +43,8 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
   const exprt end1 = maximum(minimum(end_index, s2.length()), start1);
 
   // Axiom 1.
-  lemmas.push_back([&] { // NOLINT
-    const plus_exprt res_length(s1.length(), minus_exprt(end1, start1));
-    return equal_exprt(res.length(), res_length);
-  }());
+  lemmas.push_back(
+    length_constraint_for_concat_substr(res, s1, s2, start_index, end_index));
 
   // Axiom 2.
   constraints.push_back([&] { // NOLINT
@@ -67,6 +65,34 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
   return from_integer(0, get_return_code_type());
 }
 
+/// Add axioms enforcing that the length of `res` is that of the concatenation
+/// of `s1` with the substring of `s2` starting at index `start'`
+/// and ending at index `end'`.
+/// Where start_index' is max(0, start) and end' is
+/// max(min(end, s2.length), start')
+exprt length_constraint_for_concat_substr(
+  const array_string_exprt &res,
+  const array_string_exprt &s1,
+  const array_string_exprt &s2,
+  const exprt &start,
+  const exprt &end)
+{
+  const exprt start1 = maximum(start, from_integer(0, start.type()));
+  const exprt end1 = maximum(minimum(end, s2.length()), start1);
+  const plus_exprt res_length(s1.length(), minus_exprt(end1, start1));
+  return equal_exprt(res.length(), res_length);
+}
+
+/// Add axioms enforcing that the length of `res` is that of the concatenation
+/// of `s1` with `s2`
+exprt length_constraint_for_concat(
+  const array_string_exprt &res,
+  const array_string_exprt &s1,
+  const array_string_exprt &s2)
+{
+  return equal_exprt(res.length(), plus_exprt(s1.length(), s2.length()));
+}
+
 /// Add axioms enforcing that `res` is the concatenation of `s1` with
 /// character `c`.
 /// These axioms are :
@@ -84,9 +110,7 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
   const exprt &c)
 {
   const typet &index_type = res.length().type();
-  const equal_exprt a1(
-    res.length(), plus_exprt(s1.length(), from_integer(1, index_type)));
-  lemmas.push_back(a1);
+  lemmas.push_back(length_constraint_for_concat_char(res, s1));
 
   symbol_exprt idx = fresh_univ_index("QA_index_concat_char", index_type);
   string_constraintt a2(idx, s1.length(), equal_exprt(s1[idx], res[idx]));
@@ -97,6 +121,16 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
 
   // We should have a enum type for the possible error codes
   return from_integer(0, get_return_code_type());
+}
+
+/// Add axioms enforcing that the length of `res` is that of the concatenation
+/// of `s1` with
+exprt length_constraint_for_concat_char(
+  const array_string_exprt &res,
+  const array_string_exprt &s1)
+{
+  return equal_exprt(
+    res.length(), plus_exprt(s1.length(), from_integer(1, s1.length().type())));
 }
 
 /// Add axioms enforcing that `res` is equal to the concatenation of `s1` and

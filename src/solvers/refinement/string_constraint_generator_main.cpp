@@ -39,6 +39,11 @@ const std::vector<exprt> &string_constraint_generatort::get_lemmas() const
   return lemmas;
 }
 
+void string_constraint_generatort::add_lemma(const exprt &expr)
+{
+  lemmas.push_back(expr);
+}
+
 const std::vector<string_constraintt> &
 string_constraint_generatort::get_constraints() const
 {
@@ -316,6 +321,13 @@ string_constraint_generatort::get_string_expr(const exprt &expr)
   PRECONDITION(is_refined_string_type(expr.type()));
   const refined_string_exprt &str = to_string_expr(expr);
   return char_array_of_pointer(str.content(), str.length());
+}
+
+void string_constraint_generatort::clear_constraints()
+{
+  lemmas.clear();
+  constraints.clear();
+  not_contains_constraints.clear();
 }
 
 /// adds standard axioms about the length of the string and its content: * its

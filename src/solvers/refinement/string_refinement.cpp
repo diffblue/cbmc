@@ -251,41 +251,6 @@ static std::vector<exprt> generate_instantiations(
   return lemmas;
 }
 
-/// Remove functions applications and create the necessary axioms.
-/// \param expr: an expression possibly containing function applications
-/// \param generator: generator for the string constraints
-/// \return an expression containing no function application
-static void substitute_function_applications(
-  exprt &expr,
-  string_constraint_generatort &generator)
-{
-  for(auto it = expr.depth_begin(), itend = expr.depth_end();
-      it != itend;) // No ++it
-  {
-    if(it->id() == ID_function_application)
-    {
-      it.mutate() =
-        generator.add_axioms_for_function_application(
-          to_function_application_expr(expr));
-      it.next_sibling_or_parent();
-    }
-    else
-      ++it;
-  }
-}
-
-/// Remove functions applications and create the necessary axioms.
-/// \param equations: vector of equations
-/// \param generator: generator for the string constraints
-/// \return vector of equations where function application have been replaced
-static void substitute_function_applications_in_equations(
-  std::vector<equal_exprt> &equations,
-  string_constraint_generatort &generator)
-{
-  for(auto &eq : equations)
-    substitute_function_applications(eq.rhs(), generator);
-}
-
 /// Fill the array_pointer correspondence and replace the right hand sides of
 /// the corresponding equations
 static void make_char_array_pointer_associations(
@@ -674,23 +639,30 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       string_id_symbol_resolve.replace_expr(eq.rhs());
   }
 
+  // Generator is also used by get, so we have to use it as a class member
+  // but we make sure it is cleared at each `dec_solve` call.
+  generator.clear_constraints();
   make_char_array_pointer_associations(generator, equations);
 
 #ifdef DEBUG
   output_equations(debug(), equations, ns);
 #endif
 
-  debug() << "dec_solve: compute dependency graph:" << eom;
-  for(const equal_exprt &eq : equations)
-    add_node(dependencies, eq, generator.array_pool);
+  debug() << "dec_solve: compute dependency graph and remove function "
+          << "applications captured by the dependencies:" << eom;
+  const auto new_equation_end = std::remove_if(
+    equations.begin(), equations.end(), [&](const equal_exprt &eq) { // NOLINT
+      return add_node(dependencies, eq, generator.array_pool);
+    });
+  equations.erase(new_equation_end, equations.end());
 
 #ifdef DEBUG
   dependencies.output_dot(debug());
 #endif
 
-  debug() << "dec_solve: Replace function applications" << eom;
-  // Generator is also used by get, that's why we use a class member
-  substitute_function_applications_in_equations(equations, generator);
+  debug() << "dec_solve: add constraints" << eom;
+ dependencies.add_constraints(generator);
+
 #ifdef DEBUG
   output_equations(debug(), equations, ns);
 #endif
