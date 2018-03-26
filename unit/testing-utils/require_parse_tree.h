@@ -46,8 +46,8 @@ struct expected_instructiont
     java_bytecode_parse_treet::instructiont actual_instruction) const;
 
 private:
-  const irep_idt instruction_mnemoic;
-  const std::vector<exprt> instruction_arguments;
+  irep_idt instruction_mnemoic;
+  std::vector<exprt> instruction_arguments;
 };
 
 typedef std::vector<expected_instructiont> expected_instructionst;
