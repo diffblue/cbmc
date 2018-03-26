@@ -930,53 +930,56 @@ java_string_library_preprocesst::string_literal_to_string_expr(
 /// \param symbol_table: symbol table
 /// \return Code corresponding to:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// string_expr1 = {this->length; *this->data}
-/// string_expr2 = {arg->length; *arg->data}
-/// return cprover_string_equal(string_expr1, string_expr2)
+/// IF arg->@class_identifier == "java.lang.String"
+/// THEN
+///   string_expr1 = {this->length; *this->data}
+///   string_expr2 = {arg->length; *arg->data}
+///   bool string_equals_tmp = cprover_string_equal(string_expr1, string_expr2)
+///   return string_equals_tmp
+/// ELSE
+///   return false
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 codet java_string_library_preprocesst::make_equals_function_code(
   const code_typet &type,
   const source_locationt &loc,
   symbol_table_baset &symbol_table)
 {
-  code_blockt code;
+  const typet &return_type = type.return_type();
   exprt::operandst ops;
   for(const auto &p : type.parameters())
   {
     symbol_exprt sym(p.get_identifier(), p.type());
     ops.push_back(sym);
   }
-  exprt::operandst args=process_equals_function_operands(
-    ops, loc, symbol_table, code);
 
-  member_exprt class_identifier(
-    checked_dereference(ops[1], ops[1].type().subtype()),
-    "@class_identifier",
-    string_typet());
+  code_ifthenelset code;
+  code.cond() = [&] {
+    const member_exprt class_identifier(
+      checked_dereference(ops[1], ops[1].type().subtype()),
+      "@class_identifier",
+      string_typet());
+    return equal_exprt(
+      class_identifier,
+      constant_exprt("java::java.lang.String", string_typet()));
+  }();
 
-  // Check the object argument is a String.
-  equal_exprt arg_is_string(
-    class_identifier, constant_exprt("java::java.lang.String", string_typet()));
+  code.then_case() = [&] {
+    code_blockt instance_case;
+    // Check content equality
+    const symbolt string_equals_sym = get_fresh_aux_symbol(
+      return_type, "string_equals", "str_eq", loc, ID_java, symbol_table);
+    const symbol_exprt string_equals = string_equals_sym.symbol_expr();
+    instance_case.add(code_declt(string_equals), loc);
+    const exprt::operandst args =
+      process_equals_function_operands(ops, loc, symbol_table, instance_case);
+    const auto fun_app = make_function_application(
+      ID_cprover_string_equal_func, args, return_type, symbol_table);
+    instance_case.add(code_assignt(string_equals, fun_app), loc);
+    instance_case.add(code_returnt(string_equals), loc);
+    return instance_case;
+  }();
 
-  // Check content equality
-  const symbolt string_equals_sym = get_fresh_aux_symbol(
-    java_boolean_type(), "string_equals", "str_eq", loc, ID_java, symbol_table);
-  const symbol_exprt string_equals = string_equals_sym.symbol_expr();
-  code.add(code_declt(string_equals), loc);
-  code.add(
-    code_assignt(
-      string_equals,
-      make_function_application(
-        ID_cprover_string_equal_func, args, type.return_type(), symbol_table)),
-    loc);
-
-  code.add(
-    code_returnt(
-      if_exprt(
-        arg_is_string,
-        string_equals,
-        from_integer(false, java_boolean_type()))),
-    loc);
+  code.else_case() = code_returnt(from_integer(false, return_type));
   return code;
 }
 
