@@ -105,6 +105,9 @@ void validate_lamdba_assignement(
     Catch::Matchers::Vector::ContainsElementMatcher<irep_idt>{
       tmp_class_identifier});
 
+  require_type::require_component(tmp_lambda_class_type, "@java.lang.Object");
+  // TODO verify the components of the class have been set correctly
+
   THEN("The function in the class should call the lambda method")
   {
     const irep_idt method_identifier =
