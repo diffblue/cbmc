@@ -843,6 +843,7 @@ void java_bytecode_parsert::rconstant_pool()
         it->expr.id("invokedynamic");
         const pool_entryt &nameandtype_entry=pool_entry(it->ref2);
         typet type=type_entry(nameandtype_entry.ref2);
+        type.set(ID_java_lambda_method_handle_index, it->ref1);
         it->expr.type()=type;
       }
       break;
@@ -1776,9 +1777,9 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
   const name_and_type_infot &name_and_type =
     ref_entry.get_name_and_type(pool_entry_lambda);
 
-  const std::string method_name =
+  const std::string method_ref =
     class_entry.get_name(pool_entry_lambda) + "." +
-    name_and_type.get_name(pool_entry_lambda) +
+    name_and_type.get_name(pool_entry_lambda) + ':' +
     name_and_type.get_descriptor(pool_entry_lambda);
 
   lambda_method_handlet lambda_method_handle;
@@ -1791,6 +1792,7 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
     //                "new" when it is a class variable, instantiated in <init>
     lambda_method_handle.lambda_method_name =
       name_and_type.get_name(pool_entry_lambda);
+    lambda_method_handle.lambda_method_ref = method_ref;
     lambda_method_handle.handle_type =
       method_handle_typet::LAMBDA_METHOD_HANDLE;
 

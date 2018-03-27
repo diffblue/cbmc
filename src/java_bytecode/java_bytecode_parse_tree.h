@@ -193,6 +193,7 @@ public:
     public:
       method_handle_typet handle_type;
       irep_idt lambda_method_name;
+      irep_idt lambda_method_ref;
       irep_idt interface_type;
       irep_idt method_type;
       u2_valuest u2_values;
@@ -207,6 +208,11 @@ public:
         lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
         lambda_method_handle.u2_values = std::move(params);
         return lambda_method_handle;
+      }
+
+      bool is_unknown_handle() const
+      {
+        return handle_type == method_handle_typet::UNKNOWN_HANDLE;
       }
     };
 

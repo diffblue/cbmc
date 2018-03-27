@@ -306,6 +306,25 @@ code_typet member_type_lazy(
   return to_code_type(member_type_from_descriptor);
 }
 
+/// Retrieves the symbol of the lambda method associated with the given
+/// lambda method handle (bootstrap method).
+/// \param lambda_method_handles Vector of lambda method handles (bootstrap
+///   methods) of the class where the lambda is called
+/// \param index Index of the lambda method handle in the vector
+/// \return Symbol of the lambda method if the method handle does not have an
+///   unknown type
+optionalt<symbolt> java_bytecode_convert_methodt::get_lambda_method_symbol(
+  const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
+  const size_t &index)
+{
+  const symbol_exprt &lambda_method_handle = lambda_method_handles.at(index);
+  // If the lambda method handle has an unknown type, it does not refer to
+  // any symbol (it is a symbol expression with empty identifier)
+  if(!lambda_method_handle.get_identifier().empty())
+    return symbol_table.lookup_ref(lambda_method_handle.get_identifier());
+  return {};
+}
+
 /// This creates a method symbol in the symtab, but doesn't actually perform
 /// method conversion just yet. The caller should call
 /// java_bytecode_convert_method later to give the symbol/method a body.
@@ -555,7 +574,11 @@ void java_bytecode_convert_methodt::convert(
   current_method=method_symbol.name;
   method_has_this=code_type.has_this();
   if((!m.is_abstract) && (!m.is_native))
-    method_symbol.value=convert_instructions(m, code_type, method_symbol.name);
+    method_symbol.value = convert_instructions(
+      m,
+      code_type,
+      method_symbol.name,
+      to_java_class_type(class_symbol.type).lambda_method_handles());
 }
 
 const bytecode_infot &java_bytecode_convert_methodt::get_bytecode_info(
@@ -926,7 +949,8 @@ static unsigned get_bytecode_type_width(const typet &ty)
 codet java_bytecode_convert_methodt::convert_instructions(
   const methodt &method,
   const code_typet &method_type,
-  const irep_idt &method_name)
+  const irep_idt &method_name,
+  const java_class_typet::java_lambda_method_handlest &lambda_method_handles)
 {
   const instructionst &instructions=method.instructions;
 
@@ -1211,7 +1235,19 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="invokedynamic")
     {
       // not used in Java
-      code_typet &code_type=to_code_type(arg0.type());
+      code_typet &code_type = to_code_type(arg0.type());
+
+      const optionalt<symbolt> &lambda_method_symbol = get_lambda_method_symbol(
+        lambda_method_handles,
+        code_type.get_int(ID_java_lambda_method_handle_index));
+      if(lambda_method_symbol.has_value())
+        debug() << "Converting invokedynamic for lambda: "
+                << lambda_method_symbol.value().name << eom;
+      else
+        debug() << "Converting invokedynamic for lambda with unknown handle "
+                   "type"
+                << eom;
+
       const code_typet::parameterst &parameters(code_type.parameters());
 
       pop(parameters.size());

@@ -480,3 +480,31 @@ java_generic_symbol_typet require_type::require_java_generic_symbol_type(
 
   return generic_base_type;
 }
+
+/// Verify that the lambda method handles of a class match the given
+/// expectation.
+/// \param class_struct class type to be verified
+/// \param expected_identifiers expected list of lambda method handle
+///   references
+/// \return lambda method handles of the class
+require_type::java_lambda_method_handlest
+require_type::require_lambda_method_handles(
+  const java_class_typet &class_type,
+  const std::vector<std::string> &expected_identifiers)
+{
+  const require_type::java_lambda_method_handlest &lambda_method_handles =
+    class_type.lambda_method_handles();
+  REQUIRE(lambda_method_handles.size() == expected_identifiers.size());
+
+  REQUIRE(
+    std::equal(
+      lambda_method_handles.begin(),
+      lambda_method_handles.end(),
+      expected_identifiers.begin(),
+      [](
+        const symbol_exprt &lambda_method_handle,
+        const std::string &expected_identifier) { //NOLINT
+        return lambda_method_handle.get_identifier() == expected_identifier;
+      }));
+  return lambda_method_handles;
+}

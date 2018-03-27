@@ -18,18 +18,10 @@
 
 #include <java_bytecode/java_bytecode_parse_tree.h>
 #include <java_bytecode/java_types.h>
+#include <testing-utils/run_test_with_compilers.h>
 
 typedef java_bytecode_parse_treet::classt::lambda_method_handlet
   lambda_method_handlet;
-
-void run_test_with_compilers(
-  const std::function<void(std::string)> &test_with_compiler)
-{
-  test_with_compiler("openjdk_8");
-  test_with_compiler("eclipse");
-  test_with_compiler("oracle_8");
-  test_with_compiler("oracle_9");
-}
 
 SCENARIO(
   "lambda_method_handle_map with static lambdas",
@@ -43,8 +35,8 @@ SCENARIO(
     {
       java_bytecode_parse_treet parse_tree;
       java_bytecode_parse(
-        "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-          "_classes/StaticLambdas.class",
+        "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+          compiler + "_classes/StaticLambdas.class",
         parse_tree,
         message_handler);
       WHEN("Parsing that class")
@@ -61,180 +53,212 @@ SCENARIO(
           "returns and the method it references should have an appropriate "
           "descriptor")
         {
+          const std::string lambda_method_ref =
+            compiler == "eclipse" ? "StaticLambdas.lambda$0:()V"
+                                  : "StaticLambdas.lambda$static$0:()V";
+          const std::string method_type = "()V";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, "()V");
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == "()V");
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
         }
 
         // Parameter lambdas
         THEN(
           "There should be an entry for the lambda that takes parameters and "
-          "the "
-          "method it references should have an appropriate descriptor")
+          "the method it references should have an appropriate descriptor")
         {
-          std::string descriptor = "(ILjava/lang/Object;LDummyGeneric;)V";
+          const std::string lambda_method_ref =
+            compiler == "eclipse"
+              ? "StaticLambdas.lambda$1:(ILjava/lang/Object;LDummyGeneric;)V"
+              : "StaticLambdas.lambda$static$1:(ILjava/lang/"
+                "Object;LDummyGeneric;)V";
+          const std::string method_type =
+            "(ILjava/lang/Object;LDummyGeneric;)V";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, descriptor);
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
         }
         THEN(
           "There should be an entry for the lambda that takes array "
-          "parameters "
-          "and the method it references should have an appropriate "
+          "parameters and the method it references should have an appropriate "
           "descriptor")
         {
-          std::string descriptor = "([I[Ljava/lang/Object;[LDummyGeneric;)V";
+          const std::string lambda_method_ref =
+            compiler == "eclipse"
+              ? "StaticLambdas.lambda$2:([I[Ljava/lang/Object;[LDummyGeneric;)V"
+              : "StaticLambdas.lambda$static$2:([I[Ljava/lang/"
+                "Object;[LDummyGeneric;)V";
+          const std::string method_type =
+            "([I[Ljava/lang/Object;[LDummyGeneric;)V";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, descriptor);
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
         }
 
         // Return lambdas
         THEN(
           "There should be an entry for the lambda that returns a primitive "
-          "and "
-          "the method it references should have an appropriate descriptor")
+          "and the method it references should have an appropriate descriptor")
         {
-          std::string descriptor = "()I";
+          const std::string lambda_method_ref =
+            compiler == "eclipse" ? "StaticLambdas.lambda$3:()I"
+                                  : "StaticLambdas.lambda$static$3:()I";
+          const std::string method_type = "()I";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, descriptor);
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
         }
         THEN(
           "There should be an entry for the lambda that returns a reference "
-          "type "
-          "and the method it references should have an appropriate "
+          "type and the method it references should have an appropriate "
           "descriptor")
         {
-          std::string descriptor = "()Ljava/lang/Object;";
+          const std::string lambda_method_ref =
+            compiler == "eclipse"
+              ? "StaticLambdas.lambda$4:()Ljava/lang/Object;"
+              : "StaticLambdas.lambda$static$4:()Ljava/lang/Object;";
+          const std::string method_type = "()Ljava/lang/Object;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, descriptor);
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
         }
         THEN(
           "There should be an entry for the lambda that returns a "
-          "specialised "
-          "generic type and the method it references should have an "
-          "appropriate "
-          "descriptor")
+          "specialised generic type and the method it references should have "
+          "an appropriate descriptor")
         {
-          std::string descriptor = "()LDummyGeneric;";
+          const std::string lambda_method_ref =
+            compiler == "eclipse"
+              ? "StaticLambdas.lambda$5:()LDummyGeneric;"
+              : "StaticLambdas.lambda$static$5:()LDummyGeneric;";
+          const std::string method_type = "()LDummyGeneric;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, descriptor);
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
         }
 
         // Array returning lambdas
         THEN(
           "There should be an entry for the lambda that returns an array of "
           "primitives and the method it references should have an "
-          "appropriate "
-          "descriptor")
+          "appropriate descriptor")
         {
-          std::string descriptor = "()[I";
+          const std::string lambda_method_ref =
+            compiler == "eclipse" ? "StaticLambdas.lambda$6:()[I"
+                                  : "StaticLambdas.lambda$static$6:()[I";
+          const std::string method_type = "()[I";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, descriptor);
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
         }
         THEN(
           "There should be an entry for the lambda that returns an array of "
           "reference types and the method it references should have an "
           "appropriate descriptor")
         {
-          std::string descriptor = "()[Ljava/lang/Object;";
+          const std::string lambda_method_ref =
+            compiler == "eclipse"
+              ? "StaticLambdas.lambda$7:()[Ljava/lang/Object;"
+              : "StaticLambdas.lambda$static$7:()[Ljava/lang/Object;";
+          const std::string method_type = "()[Ljava/lang/Object;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, descriptor);
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
         }
         THEN(
           "There should be an entry for the lambda that returns an array of "
           "specialised generic types and the method it references should "
-          "have an "
-          "appropriate descriptor")
+          "have an appropriate descriptor")
         {
-          std::string descriptor = "()[LDummyGeneric;";
+          const std::string lambda_method_ref =
+            compiler == "eclipse"
+              ? "StaticLambdas.lambda$8:()[LDummyGeneric;"
+              : "StaticLambdas.lambda$static$8:()[LDummyGeneric;";
+          const std::string method_type = "()[LDummyGeneric;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, descriptor);
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
         }
 
         // Capturing lamdbas
         THEN(
           "There should be an entry for the lambda that returns a primitive "
-          "and "
-          "the method it references should have an appropriate descriptor")
+          "and the method it references should have an appropriate descriptor")
         {
-          std::string descriptor = "()I";
+          const std::string lambda_method_ref =
+            compiler == "eclipse" ? "StaticLambdas.lambda$9:()I"
+                                  : "StaticLambdas.lambda$static$9:()I";
+          const std::string method_type = "()I";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, descriptor, 1);
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
 
           const typet primitive_type = java_int_type();
 
           fieldref_exprt fieldref{// NOLINT(whitespace/braces)
                                   primitive_type,
                                   "staticPrimitive",
-                                  "java::StaticLambdas"};
+                                  "StaticLambdas"};
 
           std::vector<require_parse_tree::expected_instructiont>
             expected_instructions{{"getstatic", {fieldref}}, {"ireturn", {}}};
@@ -244,27 +268,30 @@ SCENARIO(
         }
         THEN(
           "There should be an entry for the lambda that returns a reference "
-          "type "
-          "and the method it references should have an appropriate "
+          "type and the method it references should have an appropriate "
           "descriptor")
         {
-          std::string descriptor = "()Ljava/lang/Object;";
+          const std::string lambda_method_ref =
+            compiler == "eclipse"
+              ? "StaticLambdas.lambda$10:()Ljava/lang/Object;"
+              : "StaticLambdas.lambda$static$10:()Ljava/lang/Object;";
+          const std::string method_type = "()Ljava/lang/Object;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, descriptor, 1);
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
 
           const reference_typet dummy_generic_reference_type =
-            java_reference_type(symbol_typet{"java::java.lang.Object"});
+            java_reference_type(symbol_typet{"java.lang.Object"});
 
-          fieldref_exprt fieldref{dummy_generic_reference_type,
-                                  "staticReference",
-                                  "java::StaticLambdas"};
+          // NOLINTNEXTLINE(whitespace/braces)
+          fieldref_exprt fieldref{
+            dummy_generic_reference_type, "staticReference", "StaticLambdas"};
 
           std::vector<require_parse_tree::expected_instructiont>
             expected_instructions{{"getstatic", {fieldref}}, {"areturn", {}}};
@@ -274,28 +301,30 @@ SCENARIO(
         }
         THEN(
           "There should be an entry for the lambda that returns a "
-          "specialised "
-          "generic type and the method it references should have an "
-          "appropriate "
-          "descriptor")
+          "specialised generic type and the method it references should have "
+          "an appropriate descriptor")
         {
-          std::string descriptor = "()LDummyGeneric;";
+          const std::string lambda_method_ref =
+            compiler == "eclipse"
+              ? "StaticLambdas.lambda$11:()LDummyGeneric;"
+              : "StaticLambdas.lambda$static$11:()LDummyGeneric;";
+          const std::string method_type = "()LDummyGeneric;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, descriptor, 1);
+              parsed_class, lambda_method_ref, method_type);
 
           const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
           const java_bytecode_parse_treet::methodt &lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
-          REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+          REQUIRE(id2string(lambda_method.descriptor) == method_type);
 
           const reference_typet dummy_generic_reference_type =
-            java_reference_type(symbol_typet{"java::DummyGeneric"});
+            java_reference_type(symbol_typet{"DummyGeneric"});
 
           fieldref_exprt fieldref{dummy_generic_reference_type,
                                   "staticSpecalisedGeneric",
-                                  "java::StaticLambdas"};
+                                  "StaticLambdas"};
 
           std::vector<require_parse_tree::expected_instructiont>
             expected_instructions{{"getstatic", {fieldref}}, {"areturn", {}}};
@@ -318,8 +347,8 @@ SCENARIO(
       {
         java_bytecode_parse_treet parse_tree;
         java_bytecode_parse(
-          "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-            "_classes/LocalLambdas.class",
+          "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+            compiler + "_classes/LocalLambdas.class",
           parse_tree,
           message_handler);
         WHEN("Parsing that class")
@@ -336,155 +365,187 @@ SCENARIO(
             "returns and the method it references should have an appropriate "
             "descriptor")
           {
+            const std::string lambda_method_ref =
+              compiler == "eclipse" ? "LocalLambdas.lambda$0:()V"
+                                    : "LocalLambdas.lambda$test$0:()V";
+            const std::string method_type = "()V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, "()V");
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == "()V");
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
 
           // Parameter lambdas
           THEN(
             "There should be an entry for the lambda that takes parameters and "
-            "the "
-            "method it references should have an appropriate descriptor")
+            "the method it references should have an appropriate descriptor")
           {
-            std::string descriptor = "(ILjava/lang/Object;LDummyGeneric;)V";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "LocalLambdas.lambda$1:(ILjava/lang/Object;LDummyGeneric;)V"
+                : "LocalLambdas.lambda$test$1:(ILjava/lang/"
+                  "Object;LDummyGeneric;)V";
+            const std::string method_type =
+              "(ILjava/lang/Object;LDummyGeneric;)V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
           THEN(
             "There should be an entry for the lambda that takes array "
-            "parameters "
-            "and the method it references should have an appropriate "
-            "descriptor")
+            "parameters and the method it references should have an "
+            "appropriate descriptor")
           {
-            std::string descriptor = "([I[Ljava/lang/Object;[LDummyGeneric;)V";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "LocalLambdas.lambda$2:([I[Ljava/lang/"
+                  "Object;[LDummyGeneric;)V"
+                : "LocalLambdas.lambda$test$2:([I[Ljava/lang/"
+                  "Object;[LDummyGeneric;)V";
+            const std::string method_type =
+              "([I[Ljava/lang/Object;[LDummyGeneric;)V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
 
           // Return lambdas
           THEN(
             "There should be an entry for the lambda that returns a primitive "
-            "and "
-            "the method it references should have an appropriate descriptor")
-          {
-            std::string descriptor = "()I";
-            const lambda_method_handlet &lambda_entry =
-              require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
-
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
-
-            const auto lambda_method = require_parse_tree::require_method(
-              parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
-          }
-          THEN(
-            "There should be an entry for the lambda that returns a reference "
-            "type "
             "and the method it references should have an appropriate "
             "descriptor")
           {
-            std::string descriptor = "()Ljava/lang/Object;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse" ? "LocalLambdas.lambda$3:()I"
+                                    : "LocalLambdas.lambda$test$3:()I";
+            const std::string method_type = "()I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
+          }
+          THEN(
+            "There should be an entry for the lambda that returns a reference "
+            "type and the method it references should have an appropriate "
+            "descriptor")
+          {
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "LocalLambdas.lambda$4:()Ljava/lang/Object;"
+                : "LocalLambdas.lambda$test$4:()Ljava/lang/Object;";
+            const std::string method_type = "()Ljava/lang/Object;";
+            const lambda_method_handlet &lambda_entry =
+              require_parse_tree::require_lambda_entry_for_descriptor(
+                parsed_class, lambda_method_ref, method_type);
+
+            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+
+            const auto lambda_method = require_parse_tree::require_method(
+              parsed_class, lambda_impl_name);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
           THEN(
             "There should be an entry for the lambda that returns a "
-            "specialised "
-            "generic type and the method it references should have an "
-            "appropriate "
-            "descriptor")
+            "specialised generic type and the method it references should have "
+            "an appropriate descriptor")
           {
-            std::string descriptor = "()LDummyGeneric;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "LocalLambdas.lambda$5:()LDummyGeneric;"
+                : "LocalLambdas.lambda$test$5:()LDummyGeneric;";
+            const std::string method_type = "()LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
 
           // Array returning lambdas
           THEN(
             "There should be an entry for the lambda that returns an array of "
             "primitives and the method it references should have an "
-            "appropriate "
-            "descriptor")
+            "appropriate descriptor")
           {
-            std::string descriptor = "()[I";
+            const std::string lambda_method_ref =
+              compiler == "eclipse" ? "LocalLambdas.lambda$6:()[I"
+                                    : "LocalLambdas.lambda$test$6:()[I";
+            const std::string method_type = "()[I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
           THEN(
             "There should be an entry for the lambda that returns an array of "
             "reference types and the method it references should have an "
             "appropriate descriptor")
           {
-            std::string descriptor = "()[Ljava/lang/Object;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "LocalLambdas.lambda$7:()[Ljava/lang/Object;"
+                : "LocalLambdas.lambda$test$7:()[Ljava/lang/Object;";
+            const std::string method_type = "()[Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
           THEN(
             "There should be an entry for the lambda that returns an array of "
             "specialised generic types and the method it references should "
-            "have an "
-            "appropriate descriptor")
+            "have an appropriate descriptor")
           {
-            std::string descriptor = "()[LDummyGeneric;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "LocalLambdas.lambda$8:()[LDummyGeneric;"
+                : "LocalLambdas.lambda$test$8:()[LDummyGeneric;";
+            const std::string method_type = "()[LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
 
           // Capturing lamdbas
@@ -493,10 +554,13 @@ SCENARIO(
             "local variable and the method it references should have an "
             "appropriate descriptor")
           {
-            std::string descriptor = "()I";
+            const std::string lambda_method_ref =
+              compiler == "eclipse" ? "LocalLambdas.lambda$9:(I)I"
+                                    : "LocalLambdas.lambda$test$9:(I)I";
+            const std::string method_type = "()I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor, 1);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
@@ -514,16 +578,21 @@ SCENARIO(
           }
           THEN(
             "There should be an entry for the lambda that returns a reference "
-            "type "
-            "local variable  and the method it references should have an "
+            "type local variable  and the method it references should have an "
             "appropriate descriptor")
           {
             // Since it is a local variable, the corresponding method takes the
             // captured variable as an input
-            std::string descriptor = "()Ljava/lang/Object;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "LocalLambdas.lambda$10:(Ljava/lang/Object;)Ljava/"
+                  "lang/Object;"
+                : "LocalLambdas.lambda$test$10:(Ljava/lang/Object;)Ljava/"
+                  "lang/Object;";
+            const std::string method_type = "()Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor, 1);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
@@ -541,17 +610,19 @@ SCENARIO(
           }
           THEN(
             "There should be an entry for the lambda that returns a "
-            "specialised "
-            "generic type local variable  and the method it references should "
-            "have "
-            "an appropriate descriptor")
+            "specialised generic type local variable  and the method it "
+            "references should have an appropriate descriptor")
           {
             // Since it is a local variable, the corresponding method takes the
             // captured variable as an input
-            std::string descriptor = "()LDummyGeneric;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "LocalLambdas.lambda$11:(LDummyGeneric;)LDummyGeneric;"
+                : "LocalLambdas.lambda$test$11:(LDummyGeneric;)LDummyGeneric;";
+            const std::string method_type = "()LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor, 1);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
@@ -586,8 +657,8 @@ SCENARIO(
       {
         java_bytecode_parse_treet parse_tree;
         java_bytecode_parse(
-          "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-            "_classes/MemberLambdas.class",
+          "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+            compiler + "_classes/MemberLambdas.class",
           parse_tree,
           message_handler);
         WHEN("Parsing that class")
@@ -604,155 +675,186 @@ SCENARIO(
             "returns and the method it references should have an appropriate "
             "descriptor")
           {
+            const std::string lambda_method_ref =
+              compiler == "eclipse" ? "MemberLambdas.lambda$0:()V"
+                                    : "MemberLambdas.lambda$new$0:()V";
+            const std::string method_type = "()V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, "()V");
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == "()V");
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
 
           // Parameter lambdas
           THEN(
             "There should be an entry for the lambda that takes parameters and "
-            "the "
-            "method it references should have an appropriate descriptor")
+            "the method it references should have an appropriate descriptor")
           {
-            std::string descriptor = "(ILjava/lang/Object;LDummyGeneric;)V";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "MemberLambdas.lambda$1:(ILjava/lang/Object;LDummyGeneric;)V"
+                : "MemberLambdas.lambda$new$1:(ILjava/lang/"
+                  "Object;LDummyGeneric;)V";
+            const std::string method_type =
+              "(ILjava/lang/Object;LDummyGeneric;)V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
           THEN(
             "There should be an entry for the lambda that takes array "
-            "parameters "
-            "and the method it references should have an appropriate "
-            "descriptor")
+            "parameters and the method it references should have an "
+            "appropriate descriptor")
           {
-            std::string descriptor = "([I[Ljava/lang/Object;[LDummyGeneric;)V";
+            const std::string lambda_method_ref =
+              compiler == "eclipse" ? "MemberLambdas.lambda$2:([I[Ljava/lang/"
+                                      "Object;[LDummyGeneric;)V"
+                                    : "MemberLambdas.lambda$new$2:([I[Ljava/"
+                                      "lang/Object;[LDummyGeneric;)V";
+            const std::string method_type =
+              "([I[Ljava/lang/Object;[LDummyGeneric;)V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
 
           // Return lambdas
           THEN(
             "There should be an entry for the lambda that returns a primitive "
-            "and "
-            "the method it references should have an appropriate descriptor")
-          {
-            std::string descriptor = "()I";
-            const lambda_method_handlet &lambda_entry =
-              require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
-
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
-
-            const auto lambda_method = require_parse_tree::require_method(
-              parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
-          }
-          THEN(
-            "There should be an entry for the lambda that returns a reference "
-            "type "
             "and the method it references should have an appropriate "
             "descriptor")
           {
-            std::string descriptor = "()Ljava/lang/Object;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse" ? "MemberLambdas.lambda$3:()I"
+                                    : "MemberLambdas.lambda$new$3:()I";
+            const std::string method_type = "()I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
+          }
+          THEN(
+            "There should be an entry for the lambda that returns a reference "
+            "type and the method it references should have an appropriate "
+            "descriptor")
+          {
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "MemberLambdas.lambda$4:()Ljava/lang/Object;"
+                : "MemberLambdas.lambda$new$4:()Ljava/lang/Object;";
+            const std::string method_type = "()Ljava/lang/Object;";
+            const lambda_method_handlet &lambda_entry =
+              require_parse_tree::require_lambda_entry_for_descriptor(
+                parsed_class, lambda_method_ref, method_type);
+
+            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+
+            const auto lambda_method = require_parse_tree::require_method(
+              parsed_class, lambda_impl_name);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
           THEN(
             "There should be an entry for the lambda that returns a "
-            "specialised "
-            "generic type and the method it references should have an "
-            "appropriate "
-            "descriptor")
+            "specialised generic type and the method it references should have "
+            "an appropriate descriptor")
           {
-            std::string descriptor = "()LDummyGeneric;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "MemberLambdas.lambda$5:()LDummyGeneric;"
+                : "MemberLambdas.lambda$new$5:()LDummyGeneric;";
+            const std::string method_type = "()LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
 
           // Array returning lambdas
           THEN(
             "There should be an entry for the lambda that returns an array of "
             "primitives and the method it references should have an "
-            "appropriate "
-            "descriptor")
+            "appropriate descriptor")
           {
-            std::string descriptor = "()[I";
+            const std::string lambda_method_ref =
+              compiler == "eclipse" ? "MemberLambdas.lambda$6:()[I"
+                                    : "MemberLambdas.lambda$new$6:()[I";
+            const std::string method_type = "()[I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
           THEN(
             "There should be an entry for the lambda that returns an array of "
             "reference types and the method it references should have an "
             "appropriate descriptor")
           {
-            std::string descriptor = "()[Ljava/lang/Object;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "MemberLambdas.lambda$7:()[Ljava/lang/Object;"
+                : "MemberLambdas.lambda$new$7:()[Ljava/lang/Object;";
+            const std::string method_type = "()[Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
           THEN(
             "There should be an entry for the lambda that returns an array of "
             "specialised generic types and the method it references should "
-            "have an "
-            "appropriate descriptor")
+            "have an appropriate descriptor")
           {
-            std::string descriptor = "()[LDummyGeneric;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "MemberLambdas.lambda$8:()[LDummyGeneric;"
+                : "MemberLambdas.lambda$new$8:()[LDummyGeneric;";
+            const std::string method_type = "()[LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
-            REQUIRE(id2string(lambda_method.descriptor) == descriptor);
+            REQUIRE(id2string(lambda_method.descriptor) == method_type);
           }
 
           // Capturing lamdbas
@@ -761,10 +863,13 @@ SCENARIO(
             "local variable and the method it references should have an "
             "appropriate descriptor")
           {
-            std::string descriptor = "()I";
+            const std::string lambda_method_ref =
+              compiler == "eclipse" ? "MemberLambdas.lambda$9:()I"
+                                    : "MemberLambdas.lambda$new$9:()I";
+            const std::string method_type = "()I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor, 1);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
@@ -778,7 +883,7 @@ SCENARIO(
             const fieldref_exprt primitive_fieldref{// NOLINT(whitespace/braces)
                                                     java_int_type(),
                                                     "memberPrimitive",
-                                                    "java::MemberLambdas"};
+                                                    "MemberLambdas"};
 
             std::vector<require_parse_tree::expected_instructiont>
               expected_instructions{{"aload_0", {}}, // load this of stack
@@ -790,16 +895,19 @@ SCENARIO(
           }
           THEN(
             "There should be an entry for the lambda that returns a reference "
-            "type "
-            "local variable  and the method it references should have an "
+            "type local variable  and the method it references should have an "
             "appropriate descriptor")
           {
             // Since it is a local variable, the corresponding method takes the
             // captured variable as an input
-            std::string descriptor = "()Ljava/lang/Object;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "MemberLambdas.lambda$10:()Ljava/lang/Object;"
+                : "MemberLambdas.lambda$new$10:()Ljava/lang/Object;";
+            const std::string method_type = "()Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor, 1);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
@@ -810,13 +918,11 @@ SCENARIO(
             REQUIRE_FALSE(lambda_method.is_static);
 
             const reference_typet dummy_generic_reference_type =
-              java_reference_type(symbol_typet{"java::java.lang.Object"});
+              java_reference_type(symbol_typet{"java.lang.Object"});
 
             // NOLINTNEXTLINE(whitespace/braces)
             const fieldref_exprt reference_fieldref{
-              dummy_generic_reference_type,
-              "memberReference",
-              "java::MemberLambdas"};
+              dummy_generic_reference_type, "memberReference", "MemberLambdas"};
 
             std::vector<require_parse_tree::expected_instructiont>
               expected_instructions{{"aload_0", {}}, // load this of stack
@@ -828,17 +934,19 @@ SCENARIO(
           }
           THEN(
             "There should be an entry for the lambda that returns a "
-            "specialised "
-            "generic type local variable  and the method it references should "
-            "have "
-            "an appropriate descriptor")
+            "specialised generic type local variable  and the method it "
+            "references should have an appropriate descriptor")
           {
             // Since it is a local variable, the corresponding method takes the
             // captured variable as an input
-            std::string descriptor = "()LDummyGeneric;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "MemberLambdas.lambda$11:()LDummyGeneric;"
+                : "MemberLambdas.lambda$new$11:()LDummyGeneric;";
+            const std::string method_type = "()LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor, 1);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
@@ -849,13 +957,13 @@ SCENARIO(
             REQUIRE_FALSE(lambda_method.is_static);
 
             const reference_typet dummy_generic_reference_type =
-              java_reference_type(symbol_typet{"java::DummyGeneric"});
+              java_reference_type(symbol_typet{"DummyGeneric"});
 
             // NOLINTNEXTLINE(whitespace/braces)
             const fieldref_exprt generic_reference_fieldref{
               dummy_generic_reference_type,
               "memberSpecalisedGeneric",
-              "java::MemberLambdas"};
+              "MemberLambdas"};
 
             // since just returning the parameter, nothing to put on the stack
             std::vector<require_parse_tree::expected_instructiont>
@@ -885,8 +993,8 @@ SCENARIO(
       {
         java_bytecode_parse_treet parse_tree;
         java_bytecode_parse(
-          "./java_bytecode/java_bytecode_parser/lambda_examples/" + compiler +
-            "_classes/OuterMemberLambdas$Inner.class",
+          "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+            compiler + "_classes/OuterMemberLambdas$Inner.class",
           parse_tree,
           message_handler);
         WHEN("Parsing that class")
@@ -899,20 +1007,24 @@ SCENARIO(
 
           // Field ref for getting the outer class
           const reference_typet outer_class_reference_type =
-            java_reference_type(symbol_typet{"java::OuterMemberLambdas"});
-          const fieldref_exprt outer_fieldref{outer_class_reference_type,
-                                              "this$0",
-                                              "java::OuterMemberLambdas$Inner"};
+            java_reference_type(symbol_typet{"OuterMemberLambdas"});
+          // NOLINTNEXTLINE(whitespace/braces)
+          const fieldref_exprt outer_fieldref{
+            outer_class_reference_type, "this$0", "OuterMemberLambdas$Inner"};
 
           THEN(
             "There should be an entry for the lambda that returns a primitive "
             "local variable and the method it references should have an "
             "appropriate descriptor")
           {
-            std::string descriptor = "()I";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "OuterMemberLambdas$Inner.lambda$0:()I"
+                : "OuterMemberLambdas$Inner.lambda$new$0:()I";
+            const std::string method_type = "()I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
@@ -925,7 +1037,7 @@ SCENARIO(
 
             // NOLINTNEXTLINE(whitespace/braces)
             const fieldref_exprt primitive_fieldref{
-              java_int_type(), "memberPrimitive", "java::OuterMemberLambdas"};
+              java_int_type(), "memberPrimitive", "OuterMemberLambdas"};
 
             std::vector<require_parse_tree::expected_instructiont>
               expected_instructions{{"aload_0", {}}, // load this of stack
@@ -938,16 +1050,19 @@ SCENARIO(
           }
           THEN(
             "There should be an entry for the lambda that returns a reference "
-            "type "
-            "local variable  and the method it references should have an "
+            "type local variable  and the method it references should have an "
             "appropriate descriptor")
           {
             // Since it is a local variable, the corresponding method takes the
             // captured variable as an input
-            std::string descriptor = "()Ljava/lang/Object;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "OuterMemberLambdas$Inner.lambda$1:()Ljava/lang/Object;"
+                : "OuterMemberLambdas$Inner.lambda$new$1:()Ljava/lang/Object;";
+            const std::string method_type = "()Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
@@ -958,13 +1073,13 @@ SCENARIO(
             REQUIRE_FALSE(lambda_method.is_static);
 
             const reference_typet dummy_generic_reference_type =
-              java_reference_type(symbol_typet{"java::java.lang.Object"});
+              java_reference_type(symbol_typet{"java.lang.Object"});
 
             // NOLINTNEXTLINE(whitespace/braces)
             const fieldref_exprt reference_fieldref{
               dummy_generic_reference_type,
               "memberReference",
-              "java::OuterMemberLambdas"};
+              "OuterMemberLambdas"};
 
             std::vector<require_parse_tree::expected_instructiont>
               expected_instructions{{"aload_0", {}}, // load this of stack
@@ -977,17 +1092,19 @@ SCENARIO(
           }
           THEN(
             "There should be an entry for the lambda that returns a "
-            "specialised "
-            "generic type local variable  and the method it references should "
-            "have "
-            "an appropriate descriptor")
+            "specialised generic type local variable  and the method it "
+            "references should have an appropriate descriptor")
           {
             // Since it is a local variable, the corresponding method takes the
             // captured variable as an input
-            std::string descriptor = "()LDummyGeneric;";
+            const std::string lambda_method_ref =
+              compiler == "eclipse"
+                ? "OuterMemberLambdas$Inner.lambda$2:()LDummyGeneric;"
+                : "OuterMemberLambdas$Inner.lambda$new$2:()LDummyGeneric;";
+            const std::string method_type = "()LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, descriptor);
+                parsed_class, lambda_method_ref, method_type);
 
             const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
 
@@ -998,13 +1115,13 @@ SCENARIO(
             REQUIRE_FALSE(lambda_method.is_static);
 
             const reference_typet dummy_generic_reference_type =
-              java_reference_type(symbol_typet{"java::DummyGeneric"});
+              java_reference_type(symbol_typet{"DummyGeneric"});
 
             // NOLINTNEXTLINE(whitespace/braces)
             const fieldref_exprt generic_reference_fieldref{
               dummy_generic_reference_type,
               "memberSpecalisedGeneric",
-              "java::OuterMemberLambdas"};
+              "OuterMemberLambdas"};
 
             // since just returning the parameter, nothing to put on the stack
             std::vector<require_parse_tree::expected_instructiont>

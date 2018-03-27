@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/c_types.h>
 #include <util/optional.h>
+#include <util/std_expr.h>
 
 class java_class_typet:public class_typet
 {
@@ -29,6 +30,30 @@ class java_class_typet:public class_typet
   void set_access(const irep_idt &access)
   {
     return set(ID_access, access);
+  }
+
+  typedef std::vector<symbol_exprt> java_lambda_method_handlest;
+
+  const java_lambda_method_handlest &lambda_method_handles() const
+  {
+    return (const java_lambda_method_handlest &)find(
+             ID_java_lambda_method_handles)
+      .get_sub();
+  }
+
+  java_lambda_method_handlest &lambda_method_handles()
+  {
+    return (java_lambda_method_handlest &)add(ID_java_lambda_method_handles)
+      .get_sub();
+  }
+
+  void add_lambda_method_handle(const irep_idt &identifier)
+  {
+    lambda_method_handles().emplace_back(identifier);
+  }
+  void add_unknown_lambda_method_handle()
+  {
+    lambda_method_handles().emplace_back();
   }
 };
 
