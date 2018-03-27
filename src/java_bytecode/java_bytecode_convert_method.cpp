@@ -311,11 +311,10 @@ code_typet member_type_lazy(
 /// \param lambda_method_handles Vector of lambda method handles (bootstrap
 ///   methods) of the class where the lambda is called
 /// \param index Index of the lambda method handle in the vector
-/// \return Symbol of the lambda method if the method handle does not have an
-///   unknown type
+/// \return Symbol of the lambda method if the method handle has a known type
 optionalt<symbolt> java_bytecode_convert_methodt::get_lambda_method_symbol(
   const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
-  const size_t &index)
+  const size_t index)
 {
   const symbol_exprt &lambda_method_handle = lambda_method_handles.at(index);
   // If the lambda method handle has an unknown type, it does not refer to

@@ -40,7 +40,6 @@ require_parse_tree::require_lambda_entry_for_descriptor(
         entry.second.method_type == method_type &&
         entry.second.lambda_method_ref == lambda_method_ref);
     });
-  INFO("Number of matching lambda method entries: " << matches.size());
   REQUIRE(matches.size() == 1);
   return matches.at(0).second;
 }

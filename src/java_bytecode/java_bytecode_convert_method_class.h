@@ -237,7 +237,7 @@ protected:
 
   optionalt<symbolt> get_lambda_method_symbol(
     const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
-    const size_t &index);
+    const size_t index);
 
   // conversion
   void convert(const symbolt &class_symbol, const methodt &);

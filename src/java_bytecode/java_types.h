@@ -49,10 +49,12 @@ class java_class_typet:public class_typet
 
   void add_lambda_method_handle(const irep_idt &identifier)
   {
+    // creates a symbol_exprt for the identifier and pushes it in the vector
     lambda_method_handles().emplace_back(identifier);
   }
   void add_unknown_lambda_method_handle()
   {
+    // creates empty symbol_exprt and pushes it in the vector
     lambda_method_handles().emplace_back();
   }
 };
