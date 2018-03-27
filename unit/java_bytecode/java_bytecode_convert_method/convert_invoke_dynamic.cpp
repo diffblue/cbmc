@@ -43,15 +43,15 @@ struct lambda_assignment_test_datat
 /// \param symbol_table: The loaded symbol table
 /// \param instructions: The instructions of the method that calls invokedynamic
 /// \param test_data: The parameters for the test
+/// \param lambda_assignment: The assignment statement for the lambda method
 void validate_lambda_assignment(
   const symbol_tablet &symbol_table,
   const std::vector<codet> &instructions,
   const lambda_assignment_test_datat &test_data,
-  const require_goto_statements::pointer_assignment_locationt
-  &lambda_assignment)
+  const code_assignt &lambda_assignment)
 {
-  const typecast_exprt &rhs_value = require_expr::require_typecast(
-    lambda_assignment.non_null_assignments[0].rhs());
+  const typecast_exprt &rhs_value =
+    require_expr::require_typecast(lambda_assignment.rhs());
 
   const symbol_exprt &rhs_symbol =
     require_expr::require_symbol(rhs_value.op0());
@@ -85,8 +85,8 @@ void validate_lambda_assignment(
   const class_typet &tmp_lambda_class_type =
     require_type::require_complete_class(lambda_implementor_type_symbol.type);
 
-  REQUIRE(tmp_lambda_class_type.has_base(test_data.lambda_interface));
   REQUIRE(tmp_lambda_class_type.has_base("java::java.lang.Object"));
+  REQUIRE(tmp_lambda_class_type.has_base(test_data.lambda_interface));
 
   class_hierarchyt class_hierarchy;
   class_hierarchy(symbol_table);
@@ -94,6 +94,7 @@ void validate_lambda_assignment(
   const auto &parents = class_hierarchy.get_parents_trans(tmp_class_identifier);
   REQUIRE_THAT(
     parents,
+    // NOLINTNEXTLINE(whitespace/braces)
     Catch::Matchers::Vector::ContainsElementMatcher<irep_idt>{
       test_data.lambda_interface});
 
@@ -102,6 +103,7 @@ void validate_lambda_assignment(
 
   REQUIRE_THAT(
     interface_children,
+    // NOLINTNEXTLINE(whitespace/braces)
     Catch::Matchers::Vector::ContainsElementMatcher<irep_idt>{
       tmp_class_identifier});
 
@@ -110,16 +112,6 @@ void validate_lambda_assignment(
 
   const symbol_typet &super_class_type = require_type::require_symbol(
     super_class_component.type(), "java::java.lang.Object");
-
-  const symbolt &base_class_symbol = require_symbol::require_symbol_exists(
-    symbol_table, super_class_type.get_identifier());
-
-  REQUIRE(base_class_symbol.is_type);
-  const class_typet &super_class_type_struct =
-    require_type::require_incomplete_class(base_class_symbol.type);
-
-  require_type::require_component(super_class_type_struct, "@class_identifier");
-  // TODO verify the components of the class have been set correctly
 
   THEN("The function in the class should call the lambda method")
   {
@@ -175,6 +167,11 @@ void validate_lambda_assignment(
 
 /// Find the assignment to the lambda and then call validate_lamdba_assignement
 /// for full validation.
+/// \param symbol_table: The loaded symbol table
+/// \param instructions: The instructions of the method that calls invokedynamic
+/// \param test_data: The parameters for the test
+/// \param lambda_variable_id: A regex matching the name of the variable which
+///   stores the lambda
 void validate_local_variable_lambda_assignment(
   const symbol_tablet &symbol_table,
   const std::vector<codet> &instructions,
@@ -189,7 +186,10 @@ void validate_local_variable_lambda_assignment(
   REQUIRE_FALSE(lambda_assignment.null_assignment.has_value());
 
   validate_lambda_assignment(
-    symbol_table, instructions, test_data, lambda_assignment);
+    symbol_table,
+    instructions,
+    test_data,
+    lambda_assignment.non_null_assignments[0]);
 }
 
 SCENARIO(
@@ -248,6 +248,7 @@ SCENARIO(
           symbol_exprt integer_param{"primitive", java_int_type()};
           symbol_exprt ref_param{"reference",
                                  java_type_from_string("Ljava/lang/Object;")};
+          // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
             java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
@@ -275,6 +276,8 @@ SCENARIO(
           symbol_exprt integer_param{"primitive", java_type_from_string("[I")};
           symbol_exprt ref_param{"reference",
                                  java_type_from_string("[Ljava/lang/Object;")};
+
+          // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
             java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
@@ -315,7 +318,6 @@ SCENARIO(
           test_data.lambda_interface_method_descriptor =
             ".Execute:()Ljava/lang/Object;";
 
-          //"java::LocalLambdas.lambda$test$0:()V"
           test_data.lambda_function_id =
             "java::LocalLambdas.lambda$test$4:()Ljava/lang/Object;";
           test_data.expected_params = {};
@@ -348,7 +350,8 @@ SCENARIO(
               function_prefix_regex_str +
               R"(::\d+::returningSpecalisedGenericLambda$)"));
         }
-        // TODO[TG-2482]: Tests for local lambdas that capture variables
+        // TODO(tkiley): Tests for local lambdas that capture
+        // TODO(tkiley): variables [TG-2482]
       }
     }
   });
@@ -356,6 +359,11 @@ SCENARIO(
 
 /// Find the assignment to the lambda in the constructor
 /// and then call validate_lamdba_assignement for full validation.
+/// \param symbol_table: The loaded symbol table
+/// \param instructions: The instructions of the method that calls invokedynamic
+/// \param test_data: The parameters for the test
+/// \param lambda_variable_id: The name of the member variable that stores the
+///  lambda
 void validate_member_variable_lambda_assignment(
   const symbol_tablet &symbol_table,
   const std::vector<codet> &instructions,
@@ -370,7 +378,10 @@ void validate_member_variable_lambda_assignment(
   REQUIRE_FALSE(lambda_assignment.null_assignment.has_value());
 
   validate_lambda_assignment(
-    symbol_table, instructions, test_data, lambda_assignment);
+    symbol_table,
+    instructions,
+    test_data,
+    lambda_assignment.non_null_assignments[0]);
 }
 
 SCENARIO(
@@ -423,8 +434,9 @@ SCENARIO(
             "(ILjava/lang/Object;LDummyGeneric;)V";
 
           symbol_exprt integer_param{"primitive", java_int_type()};
-          symbol_exprt ref_param{"reference",
+          symbol_exprt ref_param{"reference", // NOLINT(whitespace/braces)
                                  java_type_from_string("Ljava/lang/Object;")};
+          // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
             java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
@@ -447,8 +459,9 @@ SCENARIO(
             "([I[Ljava/lang/Object;[LDummyGeneric;)V";
 
           symbol_exprt integer_param{"primitive", java_type_from_string("[I")};
-          symbol_exprt ref_param{"reference",
+          symbol_exprt ref_param{"reference", // NOLINT(whitespace/braces)
                                  java_type_from_string("[Ljava/lang/Object;")};
+          // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
             java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
@@ -505,7 +518,8 @@ SCENARIO(
             "returningSpecalisedGenericLambda");
         }
 
-        // TODO[TG-2486]: Tests for member lambdas that capture member variables
+        // TODO(tkiley): Tests for member lambdas that capture member variables
+        // TODO(tkiley): [TG-2486]
       }
     }
   });
@@ -513,6 +527,11 @@ SCENARIO(
 
 /// Find the assignment to the lambda  in the <clinit> and then call
 /// validate_lamdba_assignement for full validation.
+/// \param symbol_table: The loaded symbol table
+/// \param instructions: The instructions of the method that calls invokedynamic
+/// \param test_data: The parameters for the test
+/// \param static_field_name: The name of the static variable that stores the
+///  lambda
 void validate_static_member_variable_lambda_assignment(
   const symbol_tablet &symbol_table,
   const std::vector<codet> &instructions,
@@ -527,7 +546,10 @@ void validate_static_member_variable_lambda_assignment(
   REQUIRE_FALSE(lambda_assignment.null_assignment.has_value());
 
   validate_lambda_assignment(
-    symbol_table, instructions, test_data, lambda_assignment);
+    symbol_table,
+    instructions,
+    test_data,
+    lambda_assignment.non_null_assignments[0]);
 }
 
 SCENARIO(
@@ -586,6 +608,7 @@ SCENARIO(
           symbol_exprt integer_param{"primitive", java_int_type()};
           symbol_exprt ref_param{"reference",
                                  java_type_from_string("Ljava/lang/Object;")};
+          // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
             java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
@@ -610,6 +633,7 @@ SCENARIO(
           symbol_exprt integer_param{"primitive", java_type_from_string("[I")};
           symbol_exprt ref_param{"reference",
                                  java_type_from_string("[Ljava/lang/Object;")};
+          // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
             java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
@@ -667,7 +691,8 @@ SCENARIO(
             "returningSpecalisedGenericLambda");
         }
 
-        // TODO[TG-2486]: Tests for member lambdas that capture member variables
+        // TODO(tkiley): Tests for member lambdas that capture member variables
+        // TODO(tkiley): [TG-2486]
       }
     }
   });
