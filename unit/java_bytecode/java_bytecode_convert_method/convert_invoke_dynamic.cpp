@@ -105,7 +105,20 @@ void validate_lamdba_assignement(
     Catch::Matchers::Vector::ContainsElementMatcher<irep_idt>{
       tmp_class_identifier});
 
-  require_type::require_component(tmp_lambda_class_type, "@java.lang.Object");
+  const java_class_typet::componentt super_class_component =
+    require_type::require_component(tmp_lambda_class_type, "@java.lang.Object");
+
+  const symbol_typet &super_class_type = require_type::require_symbol(
+    super_class_component.type(), "java::java.lang.Object");
+
+  const symbolt &base_class_symbol = require_symbol::require_symbol_exists(
+    symbol_table, super_class_type.get_identifier());
+
+  REQUIRE(base_class_symbol.is_type);
+  const class_typet &super_class_type_struct =
+    require_type::require_incomplete_class(base_class_symbol.type);
+
+  require_type::require_component(super_class_type_struct, "@class_identifier");
   // TODO verify the components of the class have been set correctly
 
   THEN("The function in the class should call the lambda method")
