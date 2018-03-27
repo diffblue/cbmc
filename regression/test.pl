@@ -91,6 +91,7 @@ sub test($$$$$$$$$) {
   # not given (implying run all tests) or it matches at least one include-tag.
 
   my $include_tags_length = @$include_tags;
+  # If any include tags are passed then only include tests including those tags
   my $passes_tag_tests = ($include_tags_length == 0);
   foreach my $include_tag (@$include_tags) {
     if(exists($tags_set{$include_tag})) {
@@ -102,6 +103,19 @@ sub test($$$$$$$$$) {
     if(exists($tags_set{$exclude_tag})) {
       $passes_tag_tests = 0;
     }
+  }
+
+  # Exclude tests that have an OS- tag that doesn't match the current
+  # architecture
+  my $os;
+  if($^O eq "linux") { $os = "LINUX" }
+  if($^O eq "cygwin") { $os = "WINDOWS" }
+  if($^O eq "msys") { $os = "WINDOWS" }
+  if($^O eq "MSWin32") { $os = "WINDOWS" }
+  if($^O eq "darwin") { $os = "MACOS" }
+
+  if(not exists($tags_set{"OS-" . $os}) and grep { "OS-" eq substr($_, 0, length("OS-")) } @tags) {
+    $passes_tag_tests = 0;
   }
 
   # If the 4th line is activate-multi-line-match we enable multi-line checks
