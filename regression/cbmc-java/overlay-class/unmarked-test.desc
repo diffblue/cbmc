@@ -1,0 +1,16 @@
+CORE
+Test.class
+--classpath `./format_classpath.sh . annotations unmarked-overlay` --verbosity 10
+^Getting class `Test' from file \.[\\/]Test\.class$
+^Getting class `Test' from file unmarked-overlay[\\/]Test\.class$
+^Skipping duplicate definition of class Test not marked with OverlayClassImplementation$
+^Adding symbol:  field 'x'$
+^Adding symbol:  method 'java::Test\.main:\(\[Ljava/lang/String;\)V'$
+^Adding symbol:  method 'java::Test\.notOverlain:\(\)V'$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^Skipping class Test marked with OverlayClassImplementation but found before original definition$
+^Adding symbol from overlay class
+exists in an overlay class without being marked as an overlay and also exists in the underlying class

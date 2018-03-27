@@ -85,15 +85,15 @@ bool ci_lazy_methodst::operator()(
       reachable_classes.push_back(main_class);
     else
       reachable_classes = main_jar_classes;
-    for(const auto &classname : reachable_classes)
+    for(const irep_idt &class_name : reachable_classes)
     {
-      const auto &methods=
-        java_class_loader.class_map.at(classname).parsed_class.methods;
+      const auto &methods =
+        java_class_loader.get_original_class(class_name).parsed_class.methods;
       for(const auto &method : methods)
       {
-        const irep_idt methodid="java::"+id2string(classname)+"."+
-          id2string(method.name)+":"+
-          id2string(method.descriptor);
+        const irep_idt methodid =
+          "java::" + id2string(class_name) + "." + id2string(method.name)
+            + ":" + id2string(method.descriptor);
         method_worklist2.push_back(methodid);
       }
     }
