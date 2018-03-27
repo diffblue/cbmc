@@ -23,7 +23,7 @@ struct lambda_assignment_test_datat
   irep_idt lambda_function_id;
 
   std::vector<exprt> expected_params;
-  bool should_return_value;
+  bool should_return_value = true;
 };
 
 /// Verifies for a given function that contains:
@@ -43,12 +43,12 @@ struct lambda_assignment_test_datat
 /// \param symbol_table: The loaded symbol table
 /// \param instructions: The instructions of the method that calls invokedynamic
 /// \param test_data: The parameters for the test
-void validate_lamdba_assignement(
+void validate_lambda_assignment(
   const symbol_tablet &symbol_table,
   const std::vector<codet> &instructions,
   const lambda_assignment_test_datat &test_data,
   const require_goto_statements::pointer_assignment_locationt
-    &lambda_assignment)
+  &lambda_assignment)
 {
   const typecast_exprt &rhs_value = require_expr::require_typecast(
     lambda_assignment.non_null_assignments[0].rhs());
@@ -188,7 +188,7 @@ void validate_local_variable_lambda_assignment(
   REQUIRE(lambda_assignment.non_null_assignments.size() == 1);
   REQUIRE_FALSE(lambda_assignment.null_assignment.has_value());
 
-  validate_lamdba_assignement(
+  validate_lambda_assignment(
     symbol_table, instructions, test_data, lambda_assignment);
 }
 
@@ -261,7 +261,7 @@ SCENARIO(
             std::regex(function_prefix_regex_str + R"(::\d+::paramLambda$)"));
         }
         THEN(
-          "The local variable should be assigned a non-null pointer to a "
+          "The local variable should be assigned a non-null pointer to an "
           "array parameter interface implementor")
         {
           lambda_assignment_test_datat test_data;
@@ -354,6 +354,8 @@ SCENARIO(
   });
 }
 
+/// Find the assignment to the lambda in the constructor
+/// and then call validate_lamdba_assignement for full validation.
 void validate_member_variable_lambda_assignment(
   const symbol_tablet &symbol_table,
   const std::vector<codet> &instructions,
@@ -367,7 +369,7 @@ void validate_member_variable_lambda_assignment(
   REQUIRE(lambda_assignment.non_null_assignments.size() == 1);
   REQUIRE_FALSE(lambda_assignment.null_assignment.has_value());
 
-  validate_lamdba_assignement(
+  validate_lambda_assignment(
     symbol_table, instructions, test_data, lambda_assignment);
 }
 
@@ -433,7 +435,7 @@ SCENARIO(
             symbol_table, instructions, test_data, "paramLambda");
         }
         THEN(
-          "The local variable should be assigned a non-null pointer to a "
+          "The local variable should be assigned a non-null pointer to an "
           "array parameter interface implementor")
         {
           lambda_assignment_test_datat test_data;
@@ -509,6 +511,8 @@ SCENARIO(
   });
 }
 
+/// Find the assignment to the lambda  in the <clinit> and then call
+/// validate_lamdba_assignement for full validation.
 void validate_static_member_variable_lambda_assignment(
   const symbol_tablet &symbol_table,
   const std::vector<codet> &instructions,
@@ -522,7 +526,7 @@ void validate_static_member_variable_lambda_assignment(
   REQUIRE(lambda_assignment.non_null_assignments.size() == 1);
   REQUIRE_FALSE(lambda_assignment.null_assignment.has_value());
 
-  validate_lamdba_assignement(
+  validate_lambda_assignment(
     symbol_table, instructions, test_data, lambda_assignment);
 }
 
@@ -592,7 +596,7 @@ SCENARIO(
             symbol_table, instructions, test_data, "paramLambda");
         }
         THEN(
-          "The local variable should be assigned a non-null pointer to a "
+          "The local variable should be assigned a non-null pointer to an "
           "array parameter interface implementor")
         {
           lambda_assignment_test_datat test_data;
