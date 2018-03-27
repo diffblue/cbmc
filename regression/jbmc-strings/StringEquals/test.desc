@@ -3,10 +3,10 @@ Test.class
 --refine-strings --string-max-length 40 --function Test.check
 ^EXIT=10$
 ^SIGNAL=0$
-assertion at file Test.java line 6 .* SUCCESS
-assertion at file Test.java line 8 .* FAILURE
-assertion at file Test.java line 10 .* SUCCESS
-assertion at file Test.java line 12 .* FAILURE
-assertion at file Test.java line 14 .* SUCCESS
-assertion at file Test.java line 16 .* FAILURE
+assertion at file Test.java line 9 .* SUCCESS
+assertion at file Test.java line 11 .* FAILURE
+assertion at file Test.java line 13 .* SUCCESS
+assertion at file Test.java line 15 .* FAILURE
+assertion at file Test.java line 17 .* SUCCESS
+assertion at file Test.java line 19 .* FAILURE
 --

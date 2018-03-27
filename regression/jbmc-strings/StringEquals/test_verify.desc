@@ -1,0 +1,11 @@
+KNOWNBUG
+Test.class
+--refine-strings --string-max-input-length 5 --string-max-length 100 --unwind 10 --function Test.verify --java-throw-runtime-exceptions
+^EXIT=0$
+^SIGNAL=0$
+assertion at file Test.java line 60 .* SUCCESS
+--
+--
+null case not handled currently
+TG-2179
+
