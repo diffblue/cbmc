@@ -79,9 +79,10 @@ class remove_exceptionst
   typedef std::vector<std::pair<
     irep_idt, goto_programt::targett>> catch_handlerst;
   typedef std::vector<catch_handlerst> stack_catcht;
-  typedef std::function<bool(const irep_idt &)> function_may_throwt;
 
 public:
+  typedef std::function<bool(const irep_idt &)> function_may_throwt;
+
   explicit remove_exceptionst(
     symbol_table_baset &_symbol_table,
     function_may_throwt _function_may_throw,
@@ -570,10 +571,10 @@ void remove_exceptions(
   const namespacet ns(symbol_table);
   std::map<irep_idt, std::set<irep_idt>> exceptions_map;
   uncaught_exceptions(goto_functions, ns, exceptions_map);
-  // NOLINTNEXTLINE
-  auto function_may_throw = [&exceptions_map](const irep_idt &id) {
-    return !exceptions_map[id].empty();
-  };
+  remove_exceptionst::function_may_throwt function_may_throw =
+    [&exceptions_map](const irep_idt &id) { // NOLINT(whitespace/braces)
+      return !exceptions_map[id].empty();
+    };
   remove_exceptionst remove_exceptions(
     symbol_table,
     function_may_throw,
@@ -599,7 +600,8 @@ void remove_exceptions(
   symbol_table_baset &symbol_table,
   remove_exceptions_typest type)
 {
-  auto any_function_may_throw = [](const irep_idt &id) { return true; };
+  remove_exceptionst::function_may_throwt any_function_may_throw =
+    [](const irep_idt &id) { return true; };
 
   remove_exceptionst remove_exceptions(
     symbol_table,
