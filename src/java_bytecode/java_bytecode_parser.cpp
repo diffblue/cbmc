@@ -1777,9 +1777,13 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
   const name_and_type_infot &name_and_type =
     ref_entry.get_name_and_type(pool_entry_lambda);
 
+  std::string class_name = class_entry.get_name(pool_entry_lambda);
+  // replace '.' for '$' (inner classes)
+  std::replace(class_name.begin(), class_name.end(), '.', '$');
+  // replace '/' for '.' (package)
+  std::replace(class_name.begin(), class_name.end(), '/', '.');
   const std::string method_ref =
-    class_entry.get_name(pool_entry_lambda) + "." +
-    name_and_type.get_name(pool_entry_lambda) + ':' +
+    class_name + "." + name_and_type.get_name(pool_entry_lambda) + ':' +
     name_and_type.get_descriptor(pool_entry_lambda);
 
   lambda_method_handlet lambda_method_handle;

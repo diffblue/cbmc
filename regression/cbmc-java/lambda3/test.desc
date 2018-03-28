@@ -1,0 +1,8 @@
+CORE
+LambdaTest/Test.class
+--show-symbol-table --function LambdaTest.Test.recvLambda
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This is to verify that parsing lambdas in a package does not crash.
