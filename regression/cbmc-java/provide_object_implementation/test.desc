@@ -1,4 +1,4 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 java/lang/Object.class
 
 ^EXIT=6$
@@ -6,3 +6,5 @@ java/lang/Object.class
 ^the program has no entry point$
 --
 ^failed to add class symbol java::java\.lang\.Object$
+--
+symex-driven lazy loading should emit "the program has no entry point" but currently doesn't
