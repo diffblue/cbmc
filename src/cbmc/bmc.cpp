@@ -627,6 +627,8 @@ void bmct::setup_unwind()
 /// \param message: used for logging
 /// \param driver_configure_bmc: function provided by the driver program,
 ///   which applies driver-specific configuration to a bmct before running.
+/// \param callback_after_symex: optional callback to be run after symex.
+///   See class member `bmct::driver_callback_after_symex` for details.
 int bmct::do_language_agnostic_bmc(
   const optionst &opts,
   abstract_goto_modelt &model,
