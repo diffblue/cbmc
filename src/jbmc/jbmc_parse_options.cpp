@@ -716,6 +716,69 @@ void jbmc_parse_optionst::process_goto_function(
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(function);
 
+    // map (function_call id, location number) -> set of parameters
+    std::map<std::pair<irep_idt, unsigned>, std::set<irep_idt>>
+      function_param_map;
+    for(const goto_programt::instructiont &instruction :
+        goto_function.body.instructions)
+    {
+      if(instruction.type == goto_program_instruction_typet::FUNCTION_CALL)
+      {
+        const code_function_callt &fun_call =
+          to_code_function_call(instruction.code);
+
+        const symbol_exprt &fun = to_symbol_expr(fun_call.function());
+        status() << "\nINFO: found function call to "
+                 << fun.get_identifier()
+                 << " in function " << id2string(instruction.function)
+                 << eom;
+        const code_typet &fun_call_type = to_code_type(fun.type());
+        for(const auto &parameter : fun_call_type.parameters())
+        {
+          status() << " param type " << parameter.type().id();
+          if(parameter.get_this())
+          {
+            status() << " is this";
+          }
+          status() << eom;
+        }
+
+        std::set<irep_idt> function_params;
+        for(const auto &arg : fun_call.arguments())
+        {
+          // record symbol parameters, in general local variables that are used
+          // as parameters in the function call
+          if(arg.id() == ID_symbol)
+          {
+            const irep_idt &param_name = to_symbol_expr(arg).get_identifier();
+            function_params.insert(param_name);
+            status() << " found param " << param_name << eom;
+          }
+          else if(arg.id() == ID_constant)
+          {
+            status() << "  constant " << to_constant_expr(arg).get_value()
+                     << eom;
+          }
+          else
+          {
+            status() << "  unknown " << id2string(arg.id()) << eom;
+          }
+        }
+        function_param_map[{fun.get_identifier(),
+                            instruction.location_number}] = function_params;
+      }
+    }
+    for(const auto &entry : function_param_map)
+    {
+      status() << "INFO: call (" << entry.first.first
+               << ", location number: " << entry.first.second << " ) ";
+      for(const auto &param : entry.second)
+      {
+        status() << id2string(param) << " ";
+      }
+      status() << eom;
+    }
+
     if(using_symex_driven_loading)
     {
       // remove exceptions
