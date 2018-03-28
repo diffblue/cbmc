@@ -185,6 +185,12 @@ void java_bytecode_convert_classt::operator()(
   PRECONDITION(!parse_trees.empty());
   const irep_idt &class_name = parse_trees.front().parsed_class.name;
 
+  if(symbol_table.has_symbol("java::" + id2string(class_name)))
+  {
+    debug() << "Skip class " << class_name << " (already loaded)" << eom;
+    return;
+  }
+
   // Add array types to the symbol table
   add_array_types(symbol_table);
 
