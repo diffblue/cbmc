@@ -1580,7 +1580,8 @@ codet java_string_library_preprocesst::make_object_get_class_code(
   fun_call.lhs()=class1;
   fun_call.arguments().push_back(string1);
   code_typet fun_type;
-  fun_type.return_type()=string1.type();
+  fun_type.parameters().push_back(code_typet::parametert(string_ptr_type));
+  fun_type.return_type()=class_type;
   fun_call.function().type()=fun_type;
   code.add(fun_call, loc);
 
