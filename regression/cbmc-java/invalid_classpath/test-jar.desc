@@ -1,0 +1,7 @@
+KNOWNBUG
+Test.class
+--classpath ./NotHere.jar
+^EXIT=6$
+^SIGNAL=0$
+^the program has no entry point$
+^failed to load class `Test'$

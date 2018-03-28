@@ -1,0 +1,7 @@
+CORE
+Test.class
+--classpath ./NotHere
+^EXIT=6$
+^SIGNAL=0$
+^the program has no entry point$
+^failed to load class `Test'$
