@@ -16,6 +16,7 @@
 #define CPROVER_TESTING_UTILS_REQUIRE_EXPR_H
 
 #include <util/std_expr.h>
+#include <util/std_code.h>
 
 // NOLINTNEXTLINE(readability/namespace)
 namespace require_expr
@@ -28,6 +29,14 @@ namespace require_expr
 
   symbol_exprt require_symbol(
     const exprt &expr, const irep_idt &symbol_name);
+
+  symbol_exprt require_symbol(const exprt &expr);
+
+  typecast_exprt require_typecast(const exprt &expr);
+
+  side_effect_exprt require_side_effect_expr(
+    const exprt &expr,
+    const irep_idt &side_effect_statement);
 }
 
 #endif // CPROVER_TESTING_UTILS_REQUIRE_EXPR_H

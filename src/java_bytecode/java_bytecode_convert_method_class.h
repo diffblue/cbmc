@@ -250,8 +250,6 @@ protected:
 
   const bytecode_infot &get_bytecode_info(const irep_idt &statement);
 
-  bool class_needs_clinit(const irep_idt &classname);
-  exprt get_or_create_clinit_wrapper(const irep_idt &classname);
   codet get_clinit_call(const irep_idt &classname);
 
   bool is_method_inherited(

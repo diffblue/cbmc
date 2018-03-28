@@ -17,6 +17,7 @@
 #include <goto-programs/lazy_goto_model.h>
 
 #include <java_bytecode/java_bytecode_language.h>
+#include <util/file_util.h>
 
 /// Go through the process of loading, type-checking and finalising loading a
 /// specific class file to build the symbol table. The functions are converted
@@ -127,6 +128,12 @@ symbol_tablet load_java_class(
   REQUIRE(class_symbol.is_type);
   const typet &class_type=class_symbol.type;
   REQUIRE(class_type.id()==ID_struct);
+
+  // Log the working directory to help people identify the common error
+  // of wrong working directory (should be the `unit` directory when running
+  // the unit tests).
+  std::string path = get_current_working_directory();
+  INFO("Working directory: " << path);
 
   // if this fails it indicates the class was not loaded
   // Check your working directory and the class path is correctly configured

@@ -13,6 +13,7 @@
 #include <util/expr_iterator.h>
 #include <goto-programs/goto_functions.h>
 #include <java_bytecode/java_types.h>
+#include <util/suffix.h>
 
 /// Expand value of a function to include all child codets
 /// \param function_value: The value of the function (e.g. got by looking up
@@ -141,6 +142,53 @@ require_goto_statements::find_struct_component_assignments(
   return locations;
 }
 
+/// Find assignment statements that set this->{component_name}
+/// \param statements The statements to look through
+/// \param component_name The name of the component whose assignments we are
+///   looking for.
+/// \return A collection of all non-null assignments to this component
+///   and, if present, a null assignment.
+require_goto_statements::pointer_assignment_locationt
+require_goto_statements::find_this_component_assignment(
+  const std::vector<codet> &statements,
+  const irep_idt &component_name)
+{
+  pointer_assignment_locationt locations;
+
+  for(const auto &assignment : statements)
+  {
+    if(assignment.get_statement() == ID_assign)
+    {
+      const code_assignt &code_assign = to_code_assign(assignment);
+
+      if(code_assign.lhs().id() == ID_member)
+      {
+        const member_exprt &member_expr = to_member_expr(code_assign.lhs());
+        if(
+          member_expr.get_component_name() == component_name &&
+          member_expr.op().id() == ID_dereference &&
+          member_expr.op().op0().id() == ID_symbol &&
+          has_suffix(
+            id2string(to_symbol_expr(member_expr.op().op0()).get_identifier()),
+            "this"))
+        {
+          if(
+            code_assign.rhs() ==
+            null_pointer_exprt(to_pointer_type(code_assign.lhs().type())))
+          {
+            locations.null_assignment = code_assign;
+          }
+          else
+          {
+            locations.non_null_assignments.push_back(code_assign);
+          }
+        }
+      }
+    }
+  }
+  return locations;
+}
+
 /// For a given variable name, gets the assignments to it in the provided
 /// instructions.
 /// \param pointer_name: The name of the variable
@@ -152,29 +200,58 @@ require_goto_statements::find_pointer_assignments(
   const irep_idt &pointer_name,
   const std::vector<codet> &instructions)
 {
+  INFO("Looking for symbol: " << pointer_name);
+  std::regex special_chars{R"([-[\]{}()*+?.,\^$|#\s])"};
+  std::string sanitized =
+    std::regex_replace(id2string(pointer_name), special_chars, R"(\$&)");
+  return find_pointer_assignments(
+    std::regex("^" + sanitized + "$"), instructions);
+}
+
+require_goto_statements::pointer_assignment_locationt
+require_goto_statements::find_pointer_assignments(
+  const std::regex &pointer_name_match,
+  const std::vector<codet> &instructions)
+{
   pointer_assignment_locationt locations;
+  bool found_assignment = false;
+  std::vector<irep_idt> all_symbols;
   for(const codet &statement : instructions)
   {
     if(statement.get_statement() == ID_assign)
     {
       const code_assignt &code_assign = to_code_assign(statement);
-      if(
-        code_assign.lhs().id() == ID_symbol &&
-        to_symbol_expr(code_assign.lhs()).get_identifier() == pointer_name)
+      if(code_assign.lhs().id() == ID_symbol)
       {
+        const symbol_exprt &symbol_expr = to_symbol_expr(code_assign.lhs());
+        all_symbols.push_back(symbol_expr.get_identifier());
         if(
-          code_assign.rhs() ==
-          null_pointer_exprt(to_pointer_type(code_assign.lhs().type())))
+          std::regex_search(
+            id2string(symbol_expr.get_identifier()), pointer_name_match))
         {
-          locations.null_assignment = code_assign;
-        }
-        else
-        {
-          locations.non_null_assignments.push_back(code_assign);
+          if(
+            code_assign.rhs() ==
+            null_pointer_exprt(to_pointer_type(code_assign.lhs().type())))
+          {
+            locations.null_assignment = code_assign;
+          }
+          else
+          {
+            locations.non_null_assignments.push_back(code_assign);
+          }
+          found_assignment = true;
         }
       }
     }
   }
+
+  std::ostringstream found_symbols;
+  for(const auto entry : all_symbols)
+  {
+    found_symbols << entry << std::endl;
+  }
+  INFO("Symbols: " << found_symbols.str());
+  REQUIRE(found_assignment);
 
   return locations;
 }
@@ -394,4 +471,36 @@ require_goto_statements::require_entry_point_argument_assignment(
     to_symbol_expr(to_address_of_expr(argument_assignment.rhs()).object())
       .get_identifier();
   return argument_tmp_name;
+}
+
+/// Verify that a collection of statements contains a function call to a
+///   function whose symbol identifier matches the provided identifier
+/// \param statements: The collection of statements to inspect
+/// \param function_call_identifier: The symbol identifier of the function
+///   that should have been called
+/// \return All calls to the matching function inside the statements
+std::vector<code_function_callt> require_goto_statements::find_function_calls(
+  const std::vector<codet> &statements,
+  const irep_idt &function_call_identifier)
+{
+  std::vector<code_function_callt> function_calls;
+  for(const codet &statement : statements)
+  {
+    if(statement.get_statement() == ID_function_call)
+    {
+      const code_function_callt &function_call =
+        to_code_function_call(statement);
+
+      if(function_call.function().id() == ID_symbol)
+      {
+        if(
+          to_symbol_expr(function_call.function()).get_identifier() ==
+          function_call_identifier)
+        {
+          function_calls.push_back(function_call);
+        }
+      }
+    }
+  }
+  return function_calls;
 }
