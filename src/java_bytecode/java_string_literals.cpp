@@ -106,6 +106,9 @@ symbol_exprt get_or_create_string_literal_symbol(
   // contents as well:
   if(string_refinement_enabled)
   {
+    const array_exprt data =
+      utf16_to_array(utf8_to_utf16_little_endian(id2string(value)));
+
     struct_exprt literal_init(new_symbol.type);
     literal_init.operands().resize(jls_struct.components().size());
     const std::size_t jlo_nb = jls_struct.component_number("@java.lang.Object");
@@ -113,7 +116,7 @@ symbol_exprt get_or_create_string_literal_symbol(
 
     const std::size_t length_nb = jls_struct.component_number("length");
     const typet &length_type = jls_struct.components()[length_nb].type();
-    const exprt length = from_integer(id2string(value).size(), length_type);
+    const exprt length = from_integer(data.operands().size(), length_type);
     literal_init.operands()[length_nb] = length;
 
     // Initialize the string with a constant utf-16 array:
@@ -127,8 +130,7 @@ symbol_exprt get_or_create_string_literal_symbol(
     // These are basically const global data:
     array_symbol.is_static_lifetime = true;
     array_symbol.is_state_var = true;
-    array_symbol.value =
-      utf16_to_array(utf8_to_utf16_little_endian(id2string(value)));
+    array_symbol.value = data;
     array_symbol.type = array_symbol.value.type();
 
     if(symbol_table.add(array_symbol))
