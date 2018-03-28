@@ -1,0 +1,6 @@
+CORE
+Test.class
+--refine-strings --string-max-input-length 20 --string-max-length 100 --unwind 30 --function Test.verifyNonNull
+^EXIT=0$
+^SIGNAL=0$
+assertion at file Test.java line 48 .* SUCCESS
