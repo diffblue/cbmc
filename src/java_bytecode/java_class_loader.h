@@ -160,7 +160,6 @@ private:
   optionalt<java_bytecode_parse_treet> get_class_from_jar(
     const irep_idt &class_name,
     const std::string &jar_file,
-    const jar_indext &jar_index,
     java_class_loader_limitt &class_loader_limit);
 };
 

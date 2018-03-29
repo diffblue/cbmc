@@ -81,9 +81,9 @@ java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
 optionalt<java_bytecode_parse_treet> java_class_loadert::get_class_from_jar(
   const irep_idt &class_name,
   const std::string &jar_file,
-  const jar_indext &jar_index,
   java_class_loader_limitt &class_loader_limit)
 {
+  jar_indext &jar_index = jars_by_path.at(jar_file);
   auto jar_index_it = jar_index.find(class_name);
   if(jar_index_it == jar_index.end())
     return {};
@@ -112,11 +112,9 @@ java_class_loadert::get_parse_tree(
   // First add all given JAR files
   for(const auto &jar_file : jar_files)
   {
-    jar_index_optcreft index = read_jar_file(class_loader_limit, jar_file);
-    if(!index)
-      continue;
+    read_jar_file(class_loader_limit, jar_file);
     optionalt<java_bytecode_parse_treet> parse_tree =
-      get_class_from_jar(class_name, jar_file, *index, class_loader_limit);
+      get_class_from_jar(class_name, jar_file, class_loader_limit);
     if(parse_tree)
       parse_trees.push_back(*parse_tree);
   }
@@ -132,14 +130,12 @@ java_class_loadert::get_parse_tree(
 
     // This does not read from the jar file but from the jar_filet object we
     // just created
-    jar_index_optcreft index = read_jar_file(class_loader_limit, core_models);
-    if(index)
-    {
-      optionalt<java_bytecode_parse_treet> parse_tree =
-        get_class_from_jar(class_name, core_models, *index, class_loader_limit);
-      if(parse_tree)
-        parse_trees.push_back(*parse_tree);
-    }
+    read_jar_file(class_loader_limit, core_models);
+
+    optionalt<java_bytecode_parse_treet> parse_tree =
+      get_class_from_jar(class_name, core_models, class_loader_limit);
+    if(parse_tree)
+      parse_trees.push_back(*parse_tree);
   }
 
   // Then add everything on the class path
@@ -147,11 +143,10 @@ java_class_loadert::get_parse_tree(
   {
     if(has_suffix(cp_entry, ".jar"))
     {
-      jar_index_optcreft index = read_jar_file(class_loader_limit, cp_entry);
-      if(!index)
-        continue;
+      read_jar_file(class_loader_limit, cp_entry);
+
       optionalt<java_bytecode_parse_treet> parse_tree =
-        get_class_from_jar(class_name, cp_entry, *index, class_loader_limit);
+        get_class_from_jar(class_name, cp_entry, class_loader_limit);
       if(parse_tree)
         parse_trees.push_back(*parse_tree);
     }
