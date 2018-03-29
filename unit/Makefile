@@ -45,6 +45,8 @@ SRC += unit_tests.cpp \
        solvers/refinement/string_refinement/union_find_replace.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr_iterator.cpp \
+       util/irep.cpp \
+       util/irep_sharing.cpp \
        util/message.cpp \
        util/parameter_indices.cpp \
        util/simplify_expr.cpp \
