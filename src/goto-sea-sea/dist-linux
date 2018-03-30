@@ -1,0 +1,26 @@
+#!/bin/bash
+make
+strip goto-sea-sea
+
+VERSION=`./goto-sea-sea --version`
+VERSION_FILE=`echo $VERSION | sed "y/./-/"`
+
+echo $VERSION_FILE
+
+(cd ../goto-sea-sea; make; strip goto-sea-sea)
+(cd ../goto-inkstrument; make; strip goto-inkstrument)
+
+mkdir /tmp/goto-sea-sea-dist
+cp goto-sea-sea /tmp/goto-sea-sea-dist/
+cp ../goto-inkstrument/goto-inkstrument /tmp/goto-sea-sea-dist/
+cp ../../LICENSE /tmp/goto-sea-sea-dist/
+cp ../../scripts/ls_parse.py /tmp/goto-sea-sea-dist/
+cd /tmp/goto-sea-sea-dist
+tar cfz goto-sea-sea-${VERSION_FILE}-linux.tgz goto-sea-sea \
+  goto-inkstrument LICENSE ls_parse.py
+
+echo Copying.
+scp goto-sea-sea-${VERSION_FILE}-linux.tgz kroening@dkr0.inf.ethz.ch:/home/www/cprover.org/goto-sea-sea/download/
+
+cd /tmp
+rm -R /tmp/goto-sea-sea-dist

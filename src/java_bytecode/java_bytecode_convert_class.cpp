@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/std_expr.h>
 
-#include <linking/zero_initializer.h>
+#include <inking/zero_initializer.h>
 #include <util/suffix.h>
 
 class java_bytecode_convert_classt:public messaget

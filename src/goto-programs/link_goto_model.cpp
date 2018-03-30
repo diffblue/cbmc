@@ -17,7 +17,7 @@ Author: Michael Tautschnig, Daniel Kroening
 #include <util/symbol.h>
 #include <util/rename_symbol.h>
 
-#include <linking/linking_class.h>
+#include <inking/inking_class.h>
 
 #include "goto_model.h"
 
@@ -99,10 +99,10 @@ static bool link_functions(
       }
       else
       {
-        // the linking code will have ensured that types match
+        // the inking code will have ensured that types match
         rename_symbol(src_func.type);
         INVARIANT(base_type_eq(in_dest_symbol_table.type, src_func.type, ns),
-                  "linking ensures that types match");
+                  "inking ensures that types match");
       }
     }
   }
@@ -167,11 +167,11 @@ void link_goto_model(
       weak_symbols.insert(symbol_pair.first);
   }
 
-  linkingt linking(dest.symbol_table,
+  inkingt inking(dest.symbol_table,
                    src.symbol_table,
                    message_handler);
 
-  if(linking.typecheck_main())
+  if(inking.typecheck_main())
     throw 0;
 
   if(link_functions(
@@ -179,8 +179,8 @@ void link_goto_model(
       dest.goto_functions,
       src.symbol_table,
       src.goto_functions,
-      linking.rename_symbol,
+      inking.rename_symbol,
       weak_symbols,
-      linking.object_type_updates))
+      inking.object_type_updates))
     throw 0;
 }

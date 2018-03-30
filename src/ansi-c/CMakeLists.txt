@@ -123,4 +123,4 @@ set_source_files_properties(
 
 generic_includes(ansi-c)
 
-target_link_libraries(ansi-c util linking goto-programs assembler)
+target_link_libraries(ansi-c util inking goto-programs assembler)

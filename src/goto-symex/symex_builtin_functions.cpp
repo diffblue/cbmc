@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant_utils.h>
 #include <util/c_types.h>
 
-#include <linking/zero_initializer.h>
+#include <inking/zero_initializer.h>
 
 #include "goto_symex_state.h"
 

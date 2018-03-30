@@ -11,7 +11,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "java_types.h"
 #include "java_utils.h"
 
-#include <linking/zero_initializer.h>
+#include <inking/zero_initializer.h>
 
 #include <util/arith_tools.h>
 #include <util/namespace.h>

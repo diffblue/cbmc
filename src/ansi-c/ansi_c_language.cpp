@@ -15,8 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/get_base_name.h>
 
-#include <linking/linking.h>
-#include <linking/remove_internal_symbols.h>
+#include <inking/inking.h>
+#include <inking/remove_internal_symbols.h>
 
 #include "ansi_c_entry_point.h"
 #include "ansi_c_typecheck.h"
@@ -118,7 +118,7 @@ bool ansi_c_languaget::typecheck(
 
   remove_internal_symbols(new_symbol_table);
 
-  if(linking(symbol_table, new_symbol_table, get_message_handler()))
+  if(inking(symbol_table, new_symbol_table, get_message_handler()))
     return true;
 
   return false;

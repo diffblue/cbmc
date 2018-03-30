@@ -5,8 +5,8 @@ umask u=rwx,g=rx,o=rx
 
 make cbmc-mac-signed
 
-(cd ../goto-cc; make goto-cc-mac-signed)
-(cd ../goto-instrument; make goto-instrument-mac-signed)
+(cd ../goto-sea-sea; make goto-sea-sea-mac-signed)
+(cd ../goto-inkstrument; make goto-inkstrument-mac-signed)
 
 VERSION=`./cbmc --version`
 VERSION_FILE=`echo $VERSION | sed "y/./-/"`
@@ -22,8 +22,8 @@ mkdir /tmp/cbmc-dist/package-root/usr/local/bin
 mkdir /tmp/cbmc-dist/resources
 mkdir /tmp/cbmc-dist/resources/en.lproj
 
-cp ../cbmc/cbmc ../goto-cc/goto-cc \
-  ../goto-instrument/goto-instrument /tmp/cbmc-dist/package-root/usr/local/bin/
+cp ../cbmc/cbmc ../goto-sea-sea/goto-sea-sea \
+  ../goto-inkstrument/goto-inkstrument /tmp/cbmc-dist/package-root/usr/local/bin/
 cp ../../LICENSE /tmp/cbmc-dist/resources/license.html
 cp distribution.xml /tmp/cbmc-dist/
 

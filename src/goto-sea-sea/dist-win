@@ -1,0 +1,26 @@
+#!/bin/bash
+
+make
+strip goto-sea-sea.exe
+
+VERSION=`./goto-sea-sea.exe --version`
+VERSION_FILE=`echo $VERSION | sed "y/./-/"`
+
+(cd ../goto-sea-sea; make; strip goto-sea-sea.exe)
+(cd ../goto-inkstrument; make; strip goto-inkstrument.exe)
+
+echo $VERSION_FILE
+
+mkdir /tmp/goto-sea-sea-dist
+cp goto-sea-sea.exe /tmp/goto-sea-sea-dist/
+cp ../goto-inkstrument/goto-inkstrument.exe /tmp/goto-sea-sea-dist/
+cp ../../LICENSE /tmp/goto-sea-sea-dist/
+cd /tmp/goto-sea-sea-dist
+zip -9 goto-sea-sea-${VERSION_FILE}-win.zip goto-sea-sea.exe \
+  goto-inkstrument.exe LICENSE
+
+echo Copying.
+scp goto-sea-sea-${VERSION_FILE}-win.zip kroening@dkr0.inf.ethz.ch:/home/www/cprover.org/goto-sea-sea/download/
+
+cd /tmp
+rm -R /tmp/goto-sea-sea-dist

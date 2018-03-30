@@ -225,7 +225,7 @@ bool read_bin_goto_object(
     case 2:
       message.error() <<
           "The input was compiled with an old version of "
-          "goto-cc; please recompile" << messaget::eom;
+          "goto-sea-sea; please recompile" << messaget::eom;
       return true;
 
     case 3:
@@ -238,7 +238,7 @@ bool read_bin_goto_object(
     default:
       message.error() <<
           "The input was compiled with an unsupported version of "
-          "goto-cc; please recompile" << messaget::eom;
+          "goto-sea-sea; please recompile" << messaget::eom;
       return true;
     }
   }

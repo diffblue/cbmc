@@ -46,9 +46,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-symex/adjust_float_expressions.h>
 
-#include <goto-instrument/full_slicer.h>
-#include <goto-instrument/reachability_slicer.h>
-#include <goto-instrument/nondet_static.h>
+#include <goto-inkstrument/full_slicer.h>
+#include <goto-inkstrument/reachability_slicer.h>
+#include <goto-inkstrument/nondet_static.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
@@ -998,7 +998,36 @@ bool jbmc_parse_optionst::process_goto_functions(
 /// display command line help
 void jbmc_parse_optionst::help()
 {
-  std::cout << "\n"
+  std::cout <<
+    "\n"
+    "                                         _________             \n"
+    "        _______.         _    _     .___/         \            \n"
+    "       /        -_      / \  / \   /  _  _        |            \n"
+    "       |    _   _ \     |  \/  |  /  / \/ \       |            \n"
+    "       |   / \ / \|     \      /  |  |.||.|       /            \n"
+    "       |   |.| |.||      \    /   |  \_/\_/      /             \n"
+    "       \_  \_/ \_//       \  /     \  ___      _/              \n"
+    "         \      _/         \/       \_\_/     /                \n"
+    "         |   \_/                  ___\|      /                 \n"
+    "        ..____/_..               /.-_/o\____/..                \n"
+    "       .. || o\o \~.o.         //~   //..|| \\ ..              \n"
+    "      ..  |/ .||    \\..     //     || ..|| ||  ..             \n"
+    "      .. //o .o\\    || .. //      // .. // ||   .             \n"
+    "     ..  ||  .. \o   \\  //.     //  ..  || ||   ..            \n"
+    "   ..   o//  ..  \\   ^\// ..  //    .  |/ .\|    ..           \n"
+    "  ..    //  ..    ||   /\    .//    .. //  . \\   ..           \n"
+    "  ..   |/  ..     \|  //\|   ||     ../|  .. ||   ..           \n"
+    "       o  ..       o  l  o  //..     .|\ ..  \\  ..            \n"
+    "         ..                |/  ..     |/ ..   \| ..            \n"
+    "                           o    .     o        o               \n"
+    "                                                               \n"
+    "                ____________  ________                         \n"
+    "               |_  | ___ |  \/  /  __ \                        \n"
+    "                 | | |_/ | .  . | /  \/                        \n"
+    "                 | | ___ | |\/| | |                            \n"
+    "             /\__/ | |_/ | |  | | \__/\                        \n"
+    "             \____/\____/\_|  |_/\____/                        \n"
+    "                                                               \n"
                "* *   JBMC " CBMC_VERSION " - Copyright (C) 2001-2018 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";

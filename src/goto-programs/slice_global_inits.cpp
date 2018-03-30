@@ -24,7 +24,7 @@ Date:   December 2016
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_skip.h>
 
-#include <linking/static_lifetime_init.h>
+#include <inking/static_lifetime_init.h>
 
 void slice_global_inits(goto_modelt &goto_model)
 {

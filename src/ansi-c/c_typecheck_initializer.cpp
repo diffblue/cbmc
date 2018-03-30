@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_constant.h>
 #include <util/type_eq.h>
 
-#include <linking/zero_initializer.h>
+#include <inking/zero_initializer.h>
 
 #include "anonymous_member.h"
 

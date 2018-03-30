@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/source_location.h>
 #include <util/symbol.h>
 
-#include <linking/zero_initializer.h>
+#include <inking/zero_initializer.h>
 #include <ansi-c/c_typecast.h>
 
 #include "expr2cpp.h"

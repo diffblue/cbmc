@@ -59,7 +59,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   if(symbol.is_file_local)
   {
     // file-local stuff -- stays as is
-    // collisions are resolved during linking
+    // collisions are resolved during inking
   }
   else if(symbol.is_extern && !is_function)
   {

@@ -12,7 +12,7 @@ endif
 #CXXFLAGS += -O2 -DNDEBUG
 #CXXFLAGS += -O0 -g
 
-# If GLPK is available; this is used by goto-instrument and musketeer.
+# If GLPK is available; this is used by goto-inkstrument and musketeer.
 #LIB_GLPK = -lglpk
 
 # SAT-solvers we have
@@ -28,7 +28,7 @@ endif
 #SMVSAT =
 
 # Extra library for SAT solver. This should link to the archive file to be used
-# when linking against an IPASIR solver.
+# when inking against an IPASIR solver.
 LIBSOLVER =
 
 ifneq ($(PRECOSAT),)

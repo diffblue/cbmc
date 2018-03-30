@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <ansi-c/c_qualifiers.h>
 
-#include <linking/zero_initializer.h>
+#include <inking/zero_initializer.h>
 
 #include "cpp_type2name.h"
 #include "cpp_convert_type.h"

@@ -57,7 +57,7 @@ from strings to `goto_programt`’s and iteration macros are provided.
 Note that `goto_function_templatet` (no `s`) is defined in the same
 header as `goto_functions_templatet` and is gives the C type for the
 function and Boolean which indicates whether the body is available
-(before linking this might not always be true). Also note the slightly
+(before inking this might not always be true). Also note the slightly
 counter-intuitive naming; `goto_functionst` instances are the top level
 structure representing the program and contain `goto_programt` instances
 which represent the individual functions. At the time of writing
@@ -347,7 +347,7 @@ previous stage:
 
     The order of instructions in a list of instructions---as well as the
     targets of GOTOs---are both displayed as arrows when viewing a
-    goto-program as a Graphviz DOT file with `goto-instrument --dot`.
+    goto-program as a Graphviz DOT file with `goto-inkstrument --dot`.
     The semantics of a goto-program is: the next instruction is the next
     instruction in the list, unless the current instruction has a
     target; in that case, check the guard of the instruction, and jump

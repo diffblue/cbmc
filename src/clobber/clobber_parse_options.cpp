@@ -32,7 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/xml_goto_trace.h>
 
-#include <goto-instrument/dump_c.h>
+#include <goto-inkstrument/dump_c.h>
 
 #include <langapi/mode.h>
 

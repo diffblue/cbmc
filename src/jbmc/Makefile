@@ -4,7 +4,7 @@ SRC = jbmc_main.cpp \
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../java_bytecode/java_bytecode$(LIBEXT) \
-      ../linking/linking$(LIBEXT) \
+      ../inking/inking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
@@ -17,19 +17,19 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../pointer-analysis/add_failed_symbols$(OBJEXT) \
       ../pointer-analysis/rewrite_index$(OBJEXT) \
       ../pointer-analysis/goto_program_dereference$(OBJEXT) \
-      ../goto-instrument/full_slicer$(OBJEXT) \
-      ../goto-instrument/reachability_slicer$(OBJEXT) \
-      ../goto-instrument/nondet_static$(OBJEXT) \
-      ../goto-instrument/cover$(OBJEXT) \
-      ../goto-instrument/cover_basic_blocks$(OBJEXT) \
-      ../goto-instrument/cover_filter$(OBJEXT) \
-      ../goto-instrument/cover_instrument_branch$(OBJEXT) \
-      ../goto-instrument/cover_instrument_condition$(OBJEXT) \
-      ../goto-instrument/cover_instrument_decision$(OBJEXT) \
-      ../goto-instrument/cover_instrument_location$(OBJEXT) \
-      ../goto-instrument/cover_instrument_mcdc$(OBJEXT) \
-      ../goto-instrument/cover_instrument_other$(OBJEXT) \
-      ../goto-instrument/cover_util$(OBJEXT) \
+      ../goto-inkstrument/full_slicer$(OBJEXT) \
+      ../goto-inkstrument/reachability_slicer$(OBJEXT) \
+      ../goto-inkstrument/nondet_static$(OBJEXT) \
+      ../goto-inkstrument/cover$(OBJEXT) \
+      ../goto-inkstrument/cover_basic_blocks$(OBJEXT) \
+      ../goto-inkstrument/cover_filter$(OBJEXT) \
+      ../goto-inkstrument/cover_instrument_branch$(OBJEXT) \
+      ../goto-inkstrument/cover_instrument_condition$(OBJEXT) \
+      ../goto-inkstrument/cover_instrument_decision$(OBJEXT) \
+      ../goto-inkstrument/cover_instrument_location$(OBJEXT) \
+      ../goto-inkstrument/cover_instrument_mcdc$(OBJEXT) \
+      ../goto-inkstrument/cover_instrument_other$(OBJEXT) \
+      ../goto-inkstrument/cover_util$(OBJEXT) \
       ../analyses/analyses$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
