@@ -447,11 +447,9 @@ bool linkingt::needs_renaming_non_type(
   // We first take care of file-local non-type symbols.
   // These are static functions, or static variables
   // inside static function bodies.
-  if(new_symbol.is_file_local ||
-     old_symbol.is_file_local)
-    return true;
-
-  return false;
+  return (new_symbol.is_file_local || old_symbol.is_file_local) &&
+         (new_symbol.type.id() != ID_code || new_symbol.is_compiled() ||
+          new_symbol.value != old_symbol.value);
 }
 
 void linkingt::duplicate_code_symbol(
@@ -773,19 +771,18 @@ void linkingt::duplicate_code_symbol(
       old_symbol.location=new_symbol.location;
       old_symbol.is_macro=new_symbol.is_macro;
     }
-    else if(to_code_type(old_symbol.type).get_inlined())
-    {
-      // ok, silently ignore
-    }
     else if(base_type_eq(old_symbol.type, new_symbol.type, ns))
     {
-      // keep the one in old_symbol -- libraries come last!
-      warning().source_location=new_symbol.location;
+      if(!new_symbol.is_file_local || !old_symbol.is_file_local)
+      {
+        // keep the one in old_symbol -- libraries come last!
+        warning().source_location = new_symbol.location;
 
-      warning() << "function '" << old_symbol.name << "' in module '"
-                << new_symbol.module
-                << "' is shadowed by a definition in module '"
-                << old_symbol.module << "'" << eom;
+        warning() << "function '" << old_symbol.name << "' in module '"
+                  << new_symbol.module
+                  << "' is shadowed by a definition in module '"
+                  << old_symbol.module << "'" << eom;
+      }
     }
     else
       link_error(

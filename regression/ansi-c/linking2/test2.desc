@@ -1,0 +1,13 @@
+CORE
+main.c
+other.c --verbosity 10 -DTEST2
+^EXIT=0$
+^SIGNAL=0$
+^Functions: 6; 6 have a body.$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The implementation of a function named "foo" (void foo(int x)) differs between
+translation units; as at least one of them is static this is acceptable at link
+time and can be resolved by renaming one of them.
