@@ -1,0 +1,13 @@
+CORE
+main.c
+other.c --verbosity 10
+^EXIT=0$
+^SIGNAL=0$
+^Functions: 5; 5 have a body.$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The implementation of a function named "foo" (static inline void foo(int x)) is
+the same in both translation units, thus linking can safely discard one of the
+copies and does not need to do any renaming.

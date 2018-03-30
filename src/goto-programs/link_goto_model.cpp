@@ -48,15 +48,45 @@ static bool link_functions(
   goto_functionst &dest_functions,
   const symbol_tablet &src_symbol_table,
   goto_functionst &src_functions,
-  const rename_symbolt &rename_symbol,
+  rename_symbolt &rename_symbol,
   const std::unordered_set<irep_idt> &weak_symbols)
 {
   namespacet ns(dest_symbol_table);
   namespacet src_ns(src_symbol_table);
 
+  // remove any unnecessary duplicates
+  std::unordered_set<irep_idt> duplicates;
+  for(const auto &f_pair : src_functions.function_map)
+  {
+    rename_symbolt::expr_mapt::iterator rename_it =
+      rename_symbol.expr_map.find(f_pair.first);
+    if(rename_it == rename_symbol.expr_map.end())
+      continue;
+
+    std::string new_name = id2string(rename_it->second);
+    std::string::size_type suffix_pos = new_name.find("$link");
+    if(suffix_pos == std::string::npos)
+      continue;
+
+    irep_idt original_name = new_name.substr(0, suffix_pos);
+    goto_functionst::function_mapt::iterator existing_func =
+      dest_functions.function_map.find(original_name);
+    if(existing_func == dest_functions.function_map.end())
+      continue;
+
+    if(f_pair.second.body.equals(existing_func->second.body))
+    {
+      duplicates.insert(f_pair.first);
+      rename_symbol.expr_map.erase(rename_it);
+    }
+  }
+
   // merge functions
   for(auto &gf_entry : src_functions.function_map)
   {
+    if(duplicates.find(gf_entry.first) != duplicates.end())
+      continue;
+
     // the function might have been renamed
     rename_symbolt::expr_mapt::const_iterator e_it =
       rename_symbol.expr_map.find(gf_entry.first);
