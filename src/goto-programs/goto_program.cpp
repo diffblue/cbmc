@@ -634,3 +634,45 @@ void goto_programt::compute_incoming_edges()
   }
 }
 
+bool goto_programt::instructiont::equals(const instructiont &other) const
+{
+  // clang-format off
+  return
+    type == other.type &&
+    code == other.code &&
+    guard == other.guard &&
+    targets.size() == other.targets.size() &&
+    labels == other.labels;
+  // clang-format on
+}
+
+bool goto_programt::equals(const goto_programt &other) const
+{
+  if(instructions.size() != other.instructions.size())
+    return false;
+
+  goto_programt::const_targett other_it = other.instructions.begin();
+  for(const auto &ins : instructions)
+  {
+    if(!ins.equals(*other_it))
+      return false;
+
+    // the number of targets is the same as instructiont::equals returned "true"
+    auto other_target_it = other_it->targets.begin();
+    for(const auto t : ins.targets)
+    {
+      if(
+        t->location_number - ins.location_number !=
+        (*other_target_it)->location_number - other_it->location_number)
+      {
+        return false;
+      }
+
+      ++other_target_it;
+    }
+
+    ++other_it;
+  }
+
+  return true;
+}
