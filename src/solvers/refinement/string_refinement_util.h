@@ -119,6 +119,11 @@ public:
   {
   }
 
+  /// Initialize an array expression to sparse array representation, avoiding
+  /// repetition of identical successive values and setting the default to
+  /// `extra_value`.
+  interval_sparse_arrayt(const array_exprt &expr, const exprt &extra_value);
+
   exprt to_if_expression(const exprt &index) const override;
 };
 

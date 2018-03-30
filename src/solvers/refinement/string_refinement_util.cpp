@@ -140,6 +140,24 @@ exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const
     });
 }
 
+interval_sparse_arrayt::interval_sparse_arrayt(
+  const array_exprt &expr,
+  const exprt &extra_value)
+  : sparse_arrayt(extra_value)
+{
+  const auto &operands = expr.operands();
+  exprt last_added = extra_value;
+  for(std::size_t i = 0; i < operands.size(); ++i)
+  {
+    const std::size_t index = operands.size() - 1 - i;
+    if(operands[index].id() != ID_unknown && operands[index] != last_added)
+    {
+      entries[index] = operands[index];
+      last_added = operands[index];
+    }
+  }
+}
+
 void equation_symbol_mappingt::add(const std::size_t i, const exprt &expr)
 {
   equations_containing[expr].push_back(i);
