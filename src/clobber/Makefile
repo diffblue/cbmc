@@ -4,7 +4,7 @@ SRC = clobber_main.cpp \
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../cpp/cpp$(LIBEXT) \
        ../java_bytecode/java_bytecode$(LIBEXT) \
-       ../linking/linking$(LIBEXT) \
+       ../inking/inking$(LIBEXT) \
        ../big-int/big-int$(LIBEXT) \
        ../goto-programs/goto-programs$(LIBEXT) \
        ../analyses/analyses$(LIBEXT) \
@@ -16,8 +16,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../goto-symex/adjust_float_expressions$(OBJEXT) \
        ../goto-symex/rewrite_union$(OBJEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
-       ../goto-instrument/dump_c$(OBJEXT) \
-       ../goto-instrument/goto_program2code$(OBJEXT) \
+       ../goto-inkstrument/dump_c$(OBJEXT) \
+       ../goto-inkstrument/goto_program2code$(OBJEXT) \
        ../miniz/miniz$(OBJEXT)
 
 INCLUDES= -I ..

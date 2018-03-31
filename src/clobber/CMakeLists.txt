@@ -10,7 +10,7 @@ generic_includes(clobber-lib)
 target_link_libraries(clobber-lib
     ansi-c
     cpp
-    linking
+    inking
     big-int
     goto-programs
     analyses
@@ -21,7 +21,7 @@ target_link_libraries(clobber-lib
     util
     goto-symex
     pointer-analysis
-    goto-instrument-lib
+    goto-inkstrument-lib
 )
 
 add_if_library(clobber-lib bv_refinement)

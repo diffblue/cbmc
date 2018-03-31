@@ -101,8 +101,8 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
   CP_CXXFLAGS += -MMD -MP -std=c++11 -U__STRICT_ANSI__
-  # Cygwin-g++ has problems with statically linking exception code.
-  # If linking fails, remove -static.
+  # Cygwin-g++ has problems with statically inking exception code.
+  # If inking fails, remove -static.
   LINKFLAGS = -static -std=c++11
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)

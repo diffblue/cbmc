@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_constant.h>
 #include <util/symbol.h>
 
-#include <linking/zero_initializer.h>
+#include <inking/zero_initializer.h>
 
 #include <langapi/language_util.h>
 

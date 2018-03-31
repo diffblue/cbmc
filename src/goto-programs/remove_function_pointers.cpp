@@ -53,7 +53,7 @@ protected:
   // remove_const_function_pointerst to successfully narrow to a small
   // subset of possible functions and just leave the function pointer
   // as it is.
-  // This can be activated in goto-instrument using
+  // This can be activated in goto-inkstrument using
   // --remove-const-function-pointers instead of --remove-function-pointers
   bool only_resolve_const_fps;
 

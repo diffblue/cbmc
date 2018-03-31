@@ -80,13 +80,13 @@ bool read_goto_binary(
   else if(hdr[0]==0x7f && hdr[1]=='E' && hdr[2]=='L' && hdr[3]=='F')
   {
     // ELF binary.
-    // This _may_ have a goto-cc section.
+    // This _may_ have a goto-sea-sea section.
     try
     {
       elf_readert elf_reader(in);
 
       for(unsigned i=0; i<elf_reader.number_of_sections; i++)
-        if(elf_reader.section_name(i)=="goto-cc")
+        if(elf_reader.section_name(i)=="goto-sea-sea")
         {
           in.seekg(elf_reader.section_offset(i));
           return read_bin_goto_object(
@@ -95,7 +95,7 @@ bool read_goto_binary(
 
       // section not found
       messaget(message_handler).error() <<
-        "failed to find goto-cc section in ELF binary" << messaget::eom;
+        "failed to find goto-sea-sea section in ELF binary" << messaget::eom;
     }
 
     catch(const char *s)
@@ -177,12 +177,12 @@ bool is_goto_binary(const std::string &filename)
   }
   else if(hdr[0]==0x7f && hdr[1]=='E' && hdr[2]=='L' && hdr[3]=='F')
   {
-    // this _may_ have a goto-cc section
+    // this _may_ have a goto-sea-sea section
     try
     {
       in.seekg(0);
       elf_readert elf_reader(in);
-      if(elf_reader.has_section("goto-cc"))
+      if(elf_reader.has_section("goto-sea-sea"))
         return true;
     }
 

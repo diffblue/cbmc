@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_trace.h>
 #include <goto-programs/lazy_goto_model.h>
 #include <goto-programs/show_properties.h>
-#include <goto-instrument/cover.h>
+#include <goto-inkstrument/cover.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 

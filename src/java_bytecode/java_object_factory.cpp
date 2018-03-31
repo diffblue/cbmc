@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/invariant.h>
 
-#include <linking/zero_initializer.h>
+#include <inking/zero_initializer.h>
 
 #include <goto-programs/goto_functions.h>
 

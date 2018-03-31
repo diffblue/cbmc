@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/replace_symbol.h>
 #include <util/get_base_name.h>
 
-#include <linking/linking.h>
+#include <inking/inking.h>
 
 #include <ansi-c/ansi_c_entry_point.h>
 #include <ansi-c/c_preprocess.h>
@@ -131,7 +131,7 @@ bool cpp_languaget::typecheck(
       cpp_parse_tree, new_symbol_table, module, get_message_handler()))
     return true;
 
-  return linking(symbol_table, new_symbol_table, get_message_handler());
+  return inking(symbol_table, new_symbol_table, get_message_handler());
 }
 
 bool cpp_languaget::generate_support_functions(

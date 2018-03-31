@@ -31,7 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/string2int.h>
 
-#include <linking/zero_initializer.h>
+#include <inking/zero_initializer.h>
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/remove_exceptions.h>

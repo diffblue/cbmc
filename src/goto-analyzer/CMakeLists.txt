@@ -10,7 +10,7 @@ generic_includes(goto-analyzer-lib)
 target_link_libraries(goto-analyzer-lib
     ansi-c
     cpp
-    linking
+    inking
     big-int
     goto-programs
     analyses

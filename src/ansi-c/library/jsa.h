@@ -391,7 +391,7 @@ __CPROVER_jsa_inline _Bool __CPROVER_jsa__internal_is_in_valid_list(
 ;
 #endif
 
-__CPROVER_jsa_inline void __CPROVER_jsa__internal_assume_linking_correct(
+__CPROVER_jsa_inline void __CPROVER_jsa__internal_assume_inking_correct(
     const __CPROVER_jsa_abstract_heapt * const heap,
     const __CPROVER_jsa_node_id_t node_id,
     const __CPROVER_jsa_node_id_t prev,
@@ -419,7 +419,7 @@ __CPROVER_jsa_inline void __CPROVER_jsa__internal_assume_linking_correct(
 ;
 #endif
 
-__CPROVER_jsa_inline void __CPROVER_jsa__internal_assume_valid_iterator_linking(
+__CPROVER_jsa_inline void __CPROVER_jsa__internal_assume_valid_iterator_inking(
     const __CPROVER_jsa_abstract_heapt * const h,
     const __CPROVER_jsa_list_id_t list,
     const __CPROVER_jsa_node_id_t node_id,
@@ -596,7 +596,7 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_heap(
         __CPROVER_jsa_assume(h->list_head_nodes[node_list] == cnode);
       __CPROVER_jsa_assume(__CPROVER_jsa__internal_is_valid_node_id(nxt));
       __CPROVER_jsa_assume(__CPROVER_jsa__internal_is_valid_node_id(prev));
-      __CPROVER_jsa__internal_assume_linking_correct(h, cnode, prev, nxt);
+      __CPROVER_jsa__internal_assume_inking_correct(h, cnode, prev, nxt);
     }
   }
 #if 0 < __CPROVER_JSA_MAX_ABSTRACT_NODES
@@ -610,7 +610,7 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_heap(
     __CPROVER_jsa_assume(__CPROVER_jsa__internal_is_valid_node_id(prev));
     const __CPROVER_jsa_id_t nid=
       __CPROVER_jsa__internal_get_abstract_node_id(anode);
-    __CPROVER_jsa__internal_assume_linking_correct(h, nid, prev, nxt);
+    __CPROVER_jsa__internal_assume_inking_correct(h, nid, prev, nxt);
   }
 #endif
 #if 0 < __CPROVER_JSA_MAX_ABSTRACT_RANGES
@@ -644,9 +644,9 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_heap(
     else
     {
       __CPROVER_jsa_assume(list < h->list_count);
-      __CPROVER_jsa__internal_assume_valid_iterator_linking(
+      __CPROVER_jsa__internal_assume_valid_iterator_inking(
         h, list, next_node, next_index);
-      __CPROVER_jsa__internal_assume_valid_iterator_linking(
+      __CPROVER_jsa__internal_assume_valid_iterator_inking(
         h, list, prev_node, prev_index);
       if(__CPROVER_jsa_null!=next_node && __CPROVER_jsa_null != prev_node)
         __CPROVER_jsa__internal_assume_is_neighbour(

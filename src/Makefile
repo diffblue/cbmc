@@ -1,10 +1,10 @@
-DIRS = ansi-c big-int cbmc jbmc cpp goto-cc goto-instrument goto-programs \
-       goto-symex langapi pointer-analysis solvers util linking xmllang \
+DIRS = ansi-c big-int cbmc jbmc cpp goto-sea-sea goto-inkstrument goto-programs \
+       goto-symex langapi pointer-analysis solvers util inking xmllang \
        assembler analyses java_bytecode \
        json goto-analyzer jsil goto-diff clobber \
        memory-models miniz
 
-all: cbmc.dir jbmc.dir goto-cc.dir goto-instrument.dir \
+all: cbmc.dir jbmc.dir goto-sea-sea.dir goto-inkstrument.dir \
      goto-analyzer.dir goto-diff.dir
 
 ###############################################################################
@@ -17,7 +17,7 @@ $(patsubst %, %.dir, $(filter-out big-int util, $(DIRS))): util.dir
 .PHONY: languages
 .PHONY: clean
 
-cpp.dir: ansi-c.dir linking.dir
+cpp.dir: ansi-c.dir inking.dir
 
 java_bytecode.dir: miniz.dir
 
@@ -25,24 +25,24 @@ languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir java_bytecode.dir \
            jsil.dir
 
-goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
-                     goto-symex.dir linking.dir analyses.dir solvers.dir \
+goto-inkstrument.dir: languages goto-programs.dir pointer-analysis.dir \
+                     goto-symex.dir inking.dir analyses.dir solvers.dir \
                      json.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
-          pointer-analysis.dir goto-programs.dir linking.dir \
-          goto-instrument.dir
+          pointer-analysis.dir goto-programs.dir inking.dir \
+          goto-inkstrument.dir
 
 jbmc.dir: java_bytecode.dir cbmc.dir
 
-goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
-                   json.dir goto-instrument.dir
+goto-analyzer.dir: languages analyses.dir goto-programs.dir inking.dir \
+                   json.dir goto-inkstrument.dir
 
 goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
-               linking.dir analyses.dir goto-instrument.dir \
+               inking.dir analyses.dir goto-inkstrument.dir \
                solvers.dir json.dir goto-symex.dir
 
-goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
+goto-sea-sea.dir: languages pointer-analysis.dir goto-programs.dir inking.dir
 
 # building for a particular directory
 

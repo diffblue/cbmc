@@ -10,10 +10,10 @@ generic_includes(goto-diff-lib)
 target_link_libraries(goto-diff-lib
     ansi-c
     cpp
-    linking
+    inking
     big-int
     pointer-analysis
-    goto-instrument-lib
+    goto-inkstrument-lib
     goto-programs
     assembler
     analyses

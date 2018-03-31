@@ -13,13 +13,13 @@ target_link_libraries(cbmc-lib
     assembler
     big-int
     cpp
-    goto-instrument-lib
+    goto-inkstrument-lib
     goto-programs
     goto-symex
     java_bytecode
     json
     langapi
-    linking
+    inking
     pointer-analysis
     solvers
     util

@@ -49,7 +49,7 @@ Author: Peter Schrammel
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
 
-#include <goto-instrument/cover.h>
+#include <goto-inkstrument/cover.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 

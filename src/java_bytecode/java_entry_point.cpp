@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 #include <iostream>
 
-#include <linking/static_lifetime_init.h>
+#include <inking/static_lifetime_init.h>
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>

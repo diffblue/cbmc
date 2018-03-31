@@ -25,7 +25,7 @@ Author: Diffblue Ltd.
 #include <util/std_types.h>
 #include <util/string_constant.h>
 
-#include <linking/zero_initializer.h>
+#include <inking/zero_initializer.h>
 
 #include <goto-programs/goto_functions.h>
 

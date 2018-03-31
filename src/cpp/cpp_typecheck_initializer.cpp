@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
 
-#include <linking/zero_initializer.h>
+#include <inking/zero_initializer.h>
 
 #include "cpp_util.h"
 

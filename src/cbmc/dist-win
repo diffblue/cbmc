@@ -8,19 +8,19 @@ VERSION_FILE=`echo $VERSION | sed "y/./-/"`
 
 echo $VERSION_FILE
 
-(cd ../goto-cc; make; strip goto-cc.exe ; cp goto-cc.exe goto-cl.exe)
-(cd ../goto-instrument; make; strip goto-instrument.exe)
+(cd ../goto-sea-sea; make; strip goto-sea-sea.exe ; cp goto-sea-sea.exe goto-cl.exe)
+(cd ../goto-inkstrument; make; strip goto-inkstrument.exe)
 
 mkdir /tmp/cbmc-dist
 cp ../cbmc/cbmc.exe \
-   ../goto-cc/goto-cl.exe ../goto-instrument/goto-instrument.exe \
+   ../goto-sea-sea/goto-cl.exe ../goto-inkstrument/goto-inkstrument.exe \
    /tmp/cbmc-dist/
 cp ~/progr/cbmc.vs64/src/cbmc/cbmc.exe /tmp/cbmc-dist/cbmc64.exe
 cp ../../LICENSE /tmp/cbmc-dist/LICENSE.txt
 unix2dos /tmp/cbmc-dist/LICENSE.txt
 cd /tmp/cbmc-dist
 zip -9 cbmc-${VERSION_FILE}-win.zip cbmc.exe \
-  cbmc64.exe goto-instrument.exe goto-cl.exe LICENSE.txt
+  cbmc64.exe goto-inkstrument.exe goto-cl.exe LICENSE.txt
 
 echo Copying.
 scp cbmc-${VERSION_FILE}-win.zip kroening@dkr-srv.cs.ox.ac.uk:/srv/www/cprover.org/cbmc/download/

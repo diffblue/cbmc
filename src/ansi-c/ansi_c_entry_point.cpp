@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 
 #include <goto-programs/goto_functions.h>
-#include <linking/static_lifetime_init.h>
+#include <inking/static_lifetime_init.h>
 
 #include "c_nondet_symbol_factory.h"
 
