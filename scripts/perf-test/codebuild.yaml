@@ -74,7 +74,7 @@ Resources:
                                 - echo ${Repository} > COMMIT_INFO
                                 - git rev-parse --short HEAD >> COMMIT_INFO
                                 - git log HEAD^..HEAD >> COMMIT_INFO
-                                - make -C src minisat2-download glucose-download
+                                - make -C src minisat2-download glucose-download cadical-download
                                 - make -C src -j8
                     artifacts:
                         files:
@@ -116,7 +116,7 @@ Resources:
                                 - echo ${Repository} > COMMIT_INFO
                                 - git rev-parse --short HEAD >> COMMIT_INFO
                                 - git log HEAD^..HEAD >> COMMIT_INFO
-                                - make -C src minisat2-download glucose-download
+                                - make -C src minisat2-download glucose-download cadical-download
                                 - make -C src -j8 CXXFLAGS="-O2 -pg -g -finline-limit=4" LINKFLAGS="-pg"
                     artifacts:
                         files:
