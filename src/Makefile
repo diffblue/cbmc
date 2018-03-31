@@ -107,6 +107,15 @@ ipasir-build: ipasir-download
 	$(MAKE) -C ../ipasir/sat/picosat961 libipasirpicosat961.a
 	@(cd ../ipasir; ln -sf sat/picosat961/libipasirpicosat961.a libipasir.a)
 
+cadical_release = rel-06w
+cadical-download:
+	@echo "Downloading CaDiCaL $(cadical_release)"
+	@curl -L https://github.com/arminbiere/cadical/archive/$(cadical_release).tar.gz | tar xz
+	@rm -Rf ../cadical
+	@mv cadical-$(cadical_release) ../cadical
+	@(cd ../cadical; patch -p1 < ../scripts/cadical-patch)
+	@cd ../cadical && CXX=$(CXX) CXXFLAGS=-O3 ./configure --debug && make
+
 doc :
 	doxygen
 
