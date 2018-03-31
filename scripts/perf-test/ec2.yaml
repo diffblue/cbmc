@@ -212,7 +212,7 @@ Resources:
                     cd /mnt
                     cd cprover-sv-comp
                     git pull
-                    mkdir -p src/cbmc/
+                    mkdir -p src/cbmc src/goto-cc
                     touch LICENSE
                     cd ..
                     mkdir -p run
@@ -292,10 +292,12 @@ Resources:
                                 --receipt-handle $msg
 
                         cd /mnt/cprover-sv-comp
-                        rm -f src/cbmc/cbmc
+                        rm -f src/cbmc/cbmc src/goto-cc/goto-cc
                         aws s3 cp s3://${S3Bucket}/${PerfTestId}/$cfg/cbmc \
                                 src/cbmc/cbmc
-                        chmod a+x src/cbmc/cbmc
+                        aws s3 cp s3://${S3Bucket}/${PerfTestId}/$cfg/goto-cc \
+                                src/goto-cc/goto-cc
+                        chmod a+x src/cbmc/cbmc src/goto-cc/goto-cc
                         make CBMC=. cbmc.zip
                         cd ../run
                         unzip ../cprover-sv-comp/cbmc.zip
@@ -357,11 +359,16 @@ Resources:
                                 -N $max_par -c 1
                             if ls *.gmon.out.* >/dev/null 2>&1
                             then
-                                gprof --sum ./cbmc-binary *.gmon.out.*
+                                gprof --sum ./cbmc-binary cbmc*.gmon.out.*
                                 gprof ./cbmc-binary gmon.sum > sum.profile-$t
+                                rm -f gmon.sum
+                                gprof --sum ./goto-cc goto-cc*.gmon.out.*
+                                gprof ./goto-cc gmon.sum > sum.goto-cc-profile-$t
                                 rm -f gmon.sum gmon.out *.gmon.out.*
                                 aws s3 cp sum.profile-$t \
                                     s3://${S3Bucket}/${PerfTestId}/$cfg/sum.profile-$t
+                                aws s3 cp sum.goto-cc-profile-$t \
+                                    s3://${S3Bucket}/${PerfTestId}/$cfg/sum.goto-cc-profile-$t
                             fi
                         fi
                         rm -rf logs-$t sum.profile-$t

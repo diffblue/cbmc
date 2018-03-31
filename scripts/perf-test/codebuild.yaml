@@ -79,6 +79,7 @@ Resources:
                     artifacts:
                         files:
                             - src/cbmc/cbmc
+                            - src/goto-cc/goto-cc
                             - COMMIT_INFO
                         discard-paths: yes
                 Type: !Ref RepoType
@@ -121,6 +122,7 @@ Resources:
                     artifacts:
                         files:
                             - src/cbmc/cbmc
+                            - src/goto-cc/goto-cc
                             - COMMIT_INFO
                         discard-paths: yes
                 Type: !Ref RepoType
