@@ -265,24 +265,25 @@ def select_region(session, mode, region, instance_type):
             min_region, min_az, min_price))
 
     # http://aws-ubuntu.herokuapp.com/
-    # 20170919 - Ubuntu 16.04 LTS (xenial) - hvm:ebs-ssd
+    # 20180306 - Ubuntu 16.04 LTS (xenial) - hvm:ebs-ssd
     AMI_ids = {
         "Mappings": {
             "RegionMap": {
-                "ap-northeast-1": {"64": "ami-8422ebe2"},
-                "ap-northeast-2": {"64": "ami-0f6fb461"},
-                "ap-south-1": {"64": "ami-08a5e367"},
-                "ap-southeast-1": {"64": "ami-e6d3a585"},
-                "ap-southeast-2": {"64": "ami-391ff95b"},
-                "ca-central-1": {"64": "ami-e59c2581"},
-                "eu-central-1": {"64": "ami-5a922335"},
-                "eu-west-1": {"64": "ami-17d11e6e"},
-                "eu-west-2": {"64": "ami-e1f2e185"},
-                "sa-east-1": {"64": "ami-a3e39ecf"},
-                "us-east-1": {"64": "ami-d651b8ac"},
-                "us-east-2": {"64": "ami-9686a4f3"},
-                "us-west-1": {"64": "ami-2d5c6d4d"},
-                "us-west-2": {"64": "ami-ecc63a94"}
+                "ap-northeast-1": { "64": "ami-0d74386b" },
+                "ap-northeast-2": { "64": "ami-a414b9ca" },
+                "ap-south-1": { "64": "ami-0189d76e" },
+                "ap-southeast-1": { "64": "ami-52d4802e" },
+                "ap-southeast-2": { "64": "ami-d38a4ab1" },
+                "ca-central-1": { "64": "ami-ae55d2ca" },
+                "eu-central-1": { "64": "ami-7c412f13" },
+                "eu-west-1": { "64": "ami-f90a4880" },
+                "eu-west-2": { "64": "ami-f4f21593" },
+                "eu-west-3": { "64": "ami-0e55e373" },
+                "sa-east-1": { "64": "ami-423d772e" },
+                "us-east-1": { "64": "ami-43a15f3e" },
+                "us-east-2": { "64": "ami-916f59f4" },
+                "us-west-1": { "64": "ami-925144f2" },
+                "us-west-2": { "64": "ami-4e79ed36" }
             }
         }
     }
