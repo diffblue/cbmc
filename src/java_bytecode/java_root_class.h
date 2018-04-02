@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_ROOT_CLASS_H
 
 #include <util/std_expr.h>
+#include <util/source_location.h>
 
 // adds expected members for a root class,
 // which is usually java.lang.Object
@@ -21,7 +22,8 @@ void java_root_class(
 void java_root_class_init(
   struct_exprt &jlo,
   const struct_typet &root_type,
-  bool lock,
-  const irep_idt &class_identifier);
+  const source_locationt &location,
+  const irep_idt &class_identifier,
+  const namespacet &ns);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_ROOT_CLASS_H

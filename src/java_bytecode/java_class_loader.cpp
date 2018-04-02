@@ -31,31 +31,35 @@ unsigned char java_core_models[] = { JAVA_CORE_MODELS_DATA };
 java_bytecode_parse_treet &java_class_loadert::operator()(
   const irep_idt &class_name)
 {
-  std::stack<irep_idt> queue;
+  std::stack<irep_idt> stack;
+
+  stack.push(class_name);
+
+  // Require java.lang.Throwable as the catch-type used for
+  // universal exception handlers:
+  stack.push("java.lang.Throwable");
+
+  // add java.lang.Class
+  stack.push("java.lang.Class");
+
+  // java.lang.String
+  stack.push("java.lang.String");
 
   // Always require java.lang.Object, as it is the base of
   // internal classes such as array types.
-  queue.push("java.lang.Object");
-  // java.lang.String
-  queue.push("java.lang.String");
-  // add java.lang.Class
-  queue.push("java.lang.Class");
-  // Require java.lang.Throwable as the catch-type used for
-  // universal exception handlers:
-  queue.push("java.lang.Throwable");
-  queue.push(class_name);
+  stack.push("java.lang.Object");
 
   // Require user provided classes to be loaded even without explicit reference
   for(const auto &id : java_load_classes)
-    queue.push(id);
+    stack.push(id);
 
   java_class_loader_limitt class_loader_limit(
     get_message_handler(), java_cp_include_files);
 
-  while(!queue.empty())
+  while(!stack.empty())
   {
-    irep_idt c=queue.top();
-    queue.pop();
+    irep_idt c = stack.top();
+    stack.pop();
 
     // do we have the class already?
     if(class_map.find(c)!=class_map.end())
@@ -66,12 +70,12 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
     java_bytecode_parse_treet &parse_tree=
       get_parse_tree(class_loader_limit, c);
 
-    // add any dependencies to queue
+    // add any dependencies to stack
     for(java_bytecode_parse_treet::class_refst::const_iterator
         it=parse_tree.class_refs.begin();
         it!=parse_tree.class_refs.end();
         it++)
-      queue.push(*it);
+      stack.push(*it);
 
     // Add any extra dependencies provided by our caller:
     if(get_extra_class_refs)
@@ -80,7 +84,7 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
         get_extra_class_refs(c);
 
       for(const irep_idt &id : extra_class_refs)
-        queue.push(id);
+        stack.push(id);
     }
   }
 
