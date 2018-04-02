@@ -70,6 +70,8 @@ def parse_args():
     parser.add_argument('-B', '--code-build', type=str,
                         default=same_dir('codebuild.yaml'),
                         help='Non-default CodeBuild template to use')
+    parser.add_argument('-W', '--witness-check', action='store_true',
+                        help='Run witness checks after benchmarking')
 
     args = parser.parse_args()
 
@@ -504,7 +506,7 @@ def seed_queue(session, region, queue, task_set):
 def run_perf_test(
         session, mode, region, az, ami, instance_type, sqs_arn, sqs_url,
         parallel, snapshot_id, instance_terminated_arn, bucket_name,
-        perf_test_id, price, ssh_key_name):
+        perf_test_id, price, ssh_key_name, witness_check):
     # create an EC2 instance and trigger benchmarking
     logger = logging.getLogger('perf_test')
 
@@ -572,6 +574,10 @@ def run_perf_test(
                 {
                     'ParameterKey': 'SSHKeyName',
                     'ParameterValue': ssh_key_name
+                },
+                {
+                    'ParameterKey': 'WitnessCheck',
+                    'ParameterValue': str(witness_check)
                 }
             ],
             Capabilities=['CAPABILITY_NAMED_IAM'])
@@ -668,7 +674,7 @@ def main():
             session, args.mode, region, az, ami, args.instance_type,
             sqs_arn, sqs_url, args.parallel, snapshot_id,
             instance_terminated_arn, bucket_name, perf_test_id, price,
-            args.ssh_key_name)
+            args.ssh_key_name, args.witness_check)
 
     return 0
 
