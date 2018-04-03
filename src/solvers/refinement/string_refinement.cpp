@@ -23,7 +23,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <numeric>
 #include <stack>
 #include <util/expr_iterator.h>
-#include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
