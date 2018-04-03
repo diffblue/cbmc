@@ -46,7 +46,7 @@ static optionalt<exprt> find_counter_example(
 ///   * the negation of `a` is an existential formula `b`;
 ///   * we substituted symbols in `b` by their values found in `get`;
 ///   * arrays are concretized, meaning we attribute a value for characters that
-///     are unknown to get, for details see concretize_arrays_in_expression;
+///     are unknown to get, for details see substitute_array_access;
 ///   * `b` is simplified and array accesses are replaced by expressions
 ///     without arrays;
 ///   * we give lemma `b` to a fresh solver;
@@ -1080,81 +1080,6 @@ static exprt substitute_array_access(
                         : sparse_arrayt(expr).to_if_expression(index);
 }
 
-/// Fill an array represented by a list of with_expr by propagating values to
-/// the left. For instance `ARRAY_OF(12) WITH[2:=24] WITH[4:=42]` will give
-/// `{ 24, 24, 24, 42, 42 }`
-/// \param expr: an array expression in the form
-///   `ARRAY_OF(x) WITH [i0:=v0] ... WITH [iN:=vN]`
-/// \param string_max_length: bound on the length of strings
-/// \return an array expression with filled in values, or expr if it is simply
-///   an `ARRAY_OF(x)` expression
-static array_exprt
-fill_in_array_with_expr(const exprt &expr, const std::size_t string_max_length)
-{
-  PRECONDITION(expr.type().id()==ID_array);
-  PRECONDITION(expr.id()==ID_with || expr.id()==ID_array_of);
-  const array_typet &array_type = to_array_type(expr.type());
-
-  // Map of the parts of the array that are initialized
-  std::map<std::size_t, exprt> initial_map;
-
-  // Set the last index to be sure the array will have the right length
-  const auto &array_size_opt = numeric_cast<std::size_t>(array_type.size());
-  if(array_size_opt && *array_size_opt > 0)
-    initial_map.emplace(
-      *array_size_opt - 1,
-      from_integer(CHARACTER_FOR_UNKNOWN, array_type.subtype()));
-
-  for(exprt it=expr; it.id()==ID_with; it=to_with_expr(it).old())
-  {
-    // Add to `initial_map` all the pairs (index,value) contained in `WITH`
-    // statements
-    const with_exprt &with_expr = to_with_expr(it);
-    const exprt &then_expr=with_expr.new_value();
-    const auto index =
-      numeric_cast_v<std::size_t>(to_constant_expr(with_expr.where()));
-    if(
-      index < string_max_length && (!array_size_opt || index < *array_size_opt))
-      initial_map.emplace(index, then_expr);
-  }
-
-  array_exprt result(array_type);
-  result.operands() = fill_in_map_as_vector(initial_map);
-  return result;
-}
-
-/// Fill an array represented by an array_expr by propagating values to
-/// the left for unknown values. For instance `{ 24 , * , * , 42, * }` will give
-/// `{ 24, 42, 42, 42, '?' }`
-/// \param expr: an array expression
-/// \param string_max_length: bound on the length of strings
-/// \return an array expression with filled in values
-exprt fill_in_array_expr(const array_exprt &expr, std::size_t string_max_length)
-{
-  PRECONDITION(expr.type().id() == ID_array);
-  const array_typet &array_type = to_array_type(expr.type());
-  PRECONDITION(array_type.subtype().id() == ID_unsignedbv);
-
-  // Map of the parts of the array that are initialized
-  std::map<std::size_t, exprt> initial_map;
-  const auto &array_size_opt = numeric_cast<std::size_t>(array_type.size());
-
-  if(array_size_opt && *array_size_opt > 0)
-    initial_map.emplace(
-      *array_size_opt - 1,
-      from_integer(CHARACTER_FOR_UNKNOWN, array_type.subtype()));
-
-  for(std::size_t i = 0; i < expr.operands().size(); ++i)
-  {
-    if(i < string_max_length && expr.operands()[i].id() != ID_unknown)
-      initial_map[i] = expr.operands()[i];
-  }
-
-  array_exprt result(array_type);
-  result.operands()=fill_in_map_as_vector(initial_map);
-  return result;
-}
-
 /// Create an equivalent expression where array accesses are replaced by 'if'
 /// expressions: for instance in array access `arr[index]`, where:
 /// `arr := {12, 24, 48}` the constructed expression will be:
@@ -1346,46 +1271,6 @@ static exprt negation_of_constraint(const string_constraintt &axiom)
   and_exprt negaxiom(premise, not_exprt(axiom.body()));
 
   return negaxiom;
-}
-
-/// Result of the solver `supert` should not be interpreted literally for char
-/// arrays as not all indices are present in the index set.
-/// In the given expression, we populate arrays at the indices for which the
-/// solver has no constraint by copying values to the left.
-/// For example an expression `ARRAY_OF(0) WITH [1:=2] WITH [4:=3]` would
-/// be interpreted as `{ 2, 2, 3, 3, 3}`.
-/// \param expr: expression to interpret
-/// \param string_max_length: maximum size of arrays to consider
-/// \param ns: namespace, used to determine what is an array of character
-/// \return the interpreted expression
-exprt concretize_arrays_in_expression(
-  exprt expr,
-  std::size_t string_max_length,
-  const namespacet &ns)
-{
-  auto it=expr.depth_begin();
-  const auto end=expr.depth_end();
-  while(it!=end)
-  {
-    if(is_char_array_type(it->type(), ns))
-    {
-      if(it->id() == ID_with || it->id() == ID_array_of)
-      {
-        it.mutate() = fill_in_array_with_expr(*it, string_max_length);
-        it.next_sibling_or_parent();
-      }
-      else if(it->id() == ID_array)
-      {
-        it.mutate() = fill_in_array_expr(to_array_expr(*it), string_max_length);
-        it.next_sibling_or_parent();
-      }
-      else
-        ++it; // ignoring other expressions
-    }
-    else
-      ++it;
-  }
-  return expr;
 }
 
 /// Debugging function which outputs the different steps an axiom goes through
@@ -2253,11 +2138,7 @@ exprt string_refinementt::get(const exprt &expr) const
     if(
       const auto arr_model_opt =
         get_array(super_get, ns, generator.max_string_length, debug(), arr))
-    {
-      // \todo get_array should take care of the concretization
-      return concretize_arrays_in_expression(
-        *arr_model_opt, generator.max_string_length, ns);
-    }
+      return *arr_model_opt;
 
     if(generator.get_created_strings().count(arr))
     {

@@ -93,10 +93,6 @@ private:
 };
 
 exprt substitute_array_lists(exprt expr, std::size_t string_max_length);
-exprt concretize_arrays_in_expression(
-  exprt expr,
-  std::size_t string_max_length,
-  const namespacet &ns);
 
 // Declaration required for unit-test:
 union_find_replacet string_identifiers_resolution_from_equations(
