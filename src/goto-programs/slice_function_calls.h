@@ -19,6 +19,12 @@ class slice_function_callst
 {
   const std::string &slice_function;
 
+  // maps a variable name to a list of scopes in the form of instruction numbers
+  // bounds
+  typedef std::map<irep_idt, std::list<std::pair<unsigned, unsigned>>>
+    variable_bounds_mapt;
+  variable_bounds_mapt compute_variable_bounds(const goto_functiont &);
+
 public:
   slice_function_callst(const std::string &_slice_function)
     : slice_function(_slice_function)

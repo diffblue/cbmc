@@ -14,6 +14,8 @@ Author: Matthias Güdemann, matthias.guedemann@diffblue.com
 #include <iostream>
 #endif
 
+#include <util/suffix.h>
+
 void slice_function_calls(
   goto_model_functiont &goto_function,
   const std::string &slice_function)
@@ -27,6 +29,21 @@ void slice_function_calls(
 
 void slice_function_callst::operator()(goto_model_functiont &goto_function)
 {
+  variable_bounds_mapt variable_bounds_map =
+    compute_variable_bounds(goto_function.get_goto_function());
+
+#ifdef DEBUG
+  for(const auto &entry : variable_bounds_map)
+  {
+    std::cout << "variable " << id2string(entry.first);
+    for(const auto &listentry : entry.second)
+    {
+      std::cout << " in [" << listentry.first << ", " << listentry.second
+                << "]" << std::endl;
+    }
+  }
+#endif
+
 #ifdef DEBUG
   std::cout << "slicing away function call to " << slice_function << std::endl;
 #endif
@@ -42,6 +59,10 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
         to_code_function_call(instruction.code);
 
       const symbol_exprt &fun = to_symbol_expr(fun_call.function());
+
+      const irep_idt &function_id = fun.get_identifier();
+      if(!has_suffix(id2string(function_id), slice_function))
+        continue;
 
 #ifdef DEBUG
       std::cout << "\nINFO: found function call to " << fun.get_identifier()
@@ -103,6 +124,52 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
     std::cout << std::endl;
   }
 #endif
+}
+
+slice_function_callst::variable_bounds_mapt
+slice_function_callst::compute_variable_bounds(
+  const goto_functiont &goto_function)
+{
+  slice_function_callst::variable_bounds_mapt variable_bounds_map;
+
+  std::map<irep_idt, unsigned> declarations;
+
+  // search for declaration / dead pairs
+  //
+  // note: in Java, scopes cannot overlap!
+  for(const auto &instruction : goto_function.body.instructions)
+  {
+    if(instruction.type == goto_program_instruction_typet::DECL)
+    {
+      const code_declt &decl = to_code_decl(instruction.code);
+      const irep_idt &var_name = decl.get_identifier();
+      DATA_INVARIANT(
+        declarations.find(var_name) == declarations.end(),
+        "declarations cannot overlap");
+      declarations[var_name] = instruction.location_number;
+    }
+    else if(instruction.type == goto_program_instruction_typet::DEAD)
+    {
+      const code_deadt &dead = to_code_dead(instruction.code);
+      const irep_idt &var_name = dead.get_identifier();
+      DATA_INVARIANT(
+        declarations.find(var_name) != declarations.end(),
+        "closing scope of undeclared variable");
+      if(variable_bounds_map.find(var_name) == variable_bounds_map.end())
+      {
+        variable_bounds_map[var_name] = {
+          {declarations[var_name], instruction.location_number}};
+      }
+      else
+      {
+        variable_bounds_map[var_name].push_back(
+          {declarations[var_name], instruction.location_number});
+        declarations.erase(var_name);
+      }
+    }
+  }
+
+  return variable_bounds_map;
 }
 
 #undef DEBUG
