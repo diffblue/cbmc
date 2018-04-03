@@ -18,12 +18,15 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// at index `end_index'`.
 /// Where start_index' is max(0, start_index) and end_index' is
 /// max(min(end_index, s2.length), start_index')
+/// If s1.length + end_index' - start_index' is greater than the maximal integer
+/// of the type of res.length, then the result gets truncated to the size
+/// of this maximal integer.
 ///
 /// These axioms are:
-///   1. \f$|res| = |s_1| + end\_index' - start\_index' \f$
+///   1. \f$|res| = overflow ? |s_1| + end\_index' - start\_index'
+///                          : max_int \f$
 ///   2. \f$\forall i<|s_1|. res[i]=s_1[i] \f$
-///   3. \f$\forall i< end\_index' - start\_index'.\ res[i+|s_1|]
-///        = s_2[start\_index'+i]\f$
+///   3. \f$\forall i< |res| - |s_1|.\ res[i+|s_1|] = s_2[start\_index'+i]\f$
 ///
 /// \param res: an array of characters expression
 /// \param s1: an array of characters expression
@@ -59,7 +62,8 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
       fresh_univ_index("QA_index_concat2", res.length().type());
     const equal_exprt res_eq(
       res[plus_exprt(idx2, s1.length())], s2[plus_exprt(start1, idx2)]);
-    return string_constraintt(idx2, minus_exprt(end1, start1), res_eq);
+    const minus_exprt upper_bound(res.length(), s1.length());
+    return string_constraintt(idx2, upper_bound, res_eq);
   }());
 
   return from_integer(0, get_return_code_type());
@@ -77,10 +81,13 @@ exprt length_constraint_for_concat_substr(
   const exprt &start,
   const exprt &end)
 {
+  PRECONDITION(res.length().type().id() == ID_signedbv);
   const exprt start1 = maximum(start, from_integer(0, start.type()));
   const exprt end1 = maximum(minimum(end, s2.length()), start1);
   const plus_exprt res_length(s1.length(), minus_exprt(end1, start1));
-  return equal_exprt(res.length(), res_length);
+  const exprt overflow = sum_overflows(res_length);
+  const exprt max_int = to_signedbv_type(res.length().type()).largest_expr();
+  return equal_exprt(res.length(), if_exprt(overflow, max_int, res_length));
 }
 
 /// Add axioms enforcing that the length of `res` is that of the concatenation
