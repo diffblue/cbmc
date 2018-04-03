@@ -72,6 +72,7 @@ class optionst;
   "(arrays-uf-always)(arrays-uf-never)" \
   "(no-arch)(arch):" \
   JAVA_BYTECODE_LANGUAGE_OPTIONS \
+  "(slice-function-calls):" \
   "(java-unwind-enum-static)" \
   "(localize-faults)(localize-faults-method):" \
   OPT_GOTO_TRACE \

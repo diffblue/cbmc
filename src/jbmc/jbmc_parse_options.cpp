@@ -43,6 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_symbol_table.h>
 #include <goto-programs/show_properties.h>
+#include <goto-programs/slice_function_calls.h>
 
 #include <goto-symex/adjust_float_expressions.h>
 
@@ -204,6 +205,14 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   options.set_option(
     "slice-formula",
     cmdline.isset("slice-formula"));
+
+  if(cmdline.isset("slice-function-calls"))
+  {
+    options.set_option(
+      "slice-function-calls", cmdline.get_value("slice-function-calls"));
+  }
+  else
+    options.set_option("slice-function-calls", "");
 
   // simplify if conditions and branches
   if(cmdline.isset("no-simplify-if"))
@@ -716,68 +725,9 @@ void jbmc_parse_optionst::process_goto_function(
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(function);
 
-    // map (function_call id, location number) -> set of parameters
-    std::map<std::pair<irep_idt, unsigned>, std::set<irep_idt>>
-      function_param_map;
-    for(const goto_programt::instructiont &instruction :
-        goto_function.body.instructions)
-    {
-      if(instruction.type == goto_program_instruction_typet::FUNCTION_CALL)
-      {
-        const code_function_callt &fun_call =
-          to_code_function_call(instruction.code);
-
-        const symbol_exprt &fun = to_symbol_expr(fun_call.function());
-        status() << "\nINFO: found function call to "
-                 << fun.get_identifier()
-                 << " in function " << id2string(instruction.function)
-                 << eom;
-        const code_typet &fun_call_type = to_code_type(fun.type());
-        for(const auto &parameter : fun_call_type.parameters())
-        {
-          status() << " param type " << parameter.type().id();
-          if(parameter.get_this())
-          {
-            status() << " is this";
-          }
-          status() << eom;
-        }
-
-        std::set<irep_idt> function_params;
-        for(const auto &arg : fun_call.arguments())
-        {
-          // record symbol parameters, in general local variables that are used
-          // as parameters in the function call
-          if(arg.id() == ID_symbol)
-          {
-            const irep_idt &param_name = to_symbol_expr(arg).get_identifier();
-            function_params.insert(param_name);
-            status() << " found param " << param_name << eom;
-          }
-          else if(arg.id() == ID_constant)
-          {
-            status() << "  constant " << to_constant_expr(arg).get_value()
-                     << eom;
-          }
-          else
-          {
-            status() << "  unknown " << id2string(arg.id()) << eom;
-          }
-        }
-        function_param_map[{fun.get_identifier(),
-                            instruction.location_number}] = function_params;
-      }
-    }
-    for(const auto &entry : function_param_map)
-    {
-      status() << "INFO: call (" << entry.first.first
-               << ", location number: " << entry.first.second << " ) ";
-      for(const auto &param : entry.second)
-      {
-        status() << id2string(param) << " ";
-      }
-      status() << eom;
-    }
+    // slice function calls and their directly dependent parameters
+    slice_function_calls(
+      function, options.get_option("slice-function-calls"));
 
     if(using_symex_driven_loading)
     {
