@@ -482,7 +482,7 @@ union_find_replacet string_identifiers_resolution_from_equations(
         equations_to_treat.push(i);
 
       std::vector<exprt> rhs_strings = extract_strings(eq.rhs());
-      for(const auto expr : rhs_strings)
+      for(const auto &expr : rhs_strings)
         equation_map.add(i, expr);
     }
     else if(eq.lhs().type().id() != ID_pointer &&
@@ -490,7 +490,7 @@ union_find_replacet string_identifiers_resolution_from_equations(
     {
       std::vector<exprt> lhs_strings = extract_strings_from_lhs(eq.lhs());
 
-      for(const auto expr : lhs_strings)
+      for(const auto &expr : lhs_strings)
         equation_map.add(i, expr);
 
       if(lhs_strings.empty())
