@@ -935,50 +935,21 @@ static optionalt<exprt> get_array(
   }
   std::size_t n = *n_opt;
 
-  const array_typet ret_type(char_type, from_integer(n, index_type));
-  array_exprt ret(ret_type);
-
-  if(n>max_string_length)
+  if(n > MAX_CONCRETE_STRING_SIZE)
   {
     stream << "(sr::get_array) long string (size=" << n << ")" << eom;
-    return {};
+    std::ostringstream msg;
+    msg << "consider reducing string-max-input-length so that no string "
+        << "exceeds " << MAX_CONCRETE_STRING_SIZE << " in length and make sure"
+        << " all functions returning strings are available in the classpath";
+    throw string_refinement_invariantt(msg.str());
   }
 
-  if(n==0)
-    return empty_ret;
-
-  if(arr_val.id()=="array-list")
-  {
-    DATA_INVARIANT(
-      arr_val.operands().size()%2==0,
-      string_refinement_invariantt("and index expression must be on a symbol, "
-                                   "with, array_of, if, or array, and all "
-                                   "cases besides array are handled above"));
-    std::map<std::size_t, exprt> initial_map;
-    for(size_t i = 0; i < arr_val.operands().size(); i += 2)
-    {
-      exprt index = arr_val.operands()[i];
-      if(auto idx = numeric_cast<std::size_t>(index))
-      {
-        if(*idx < n)
-          initial_map[*idx] = arr_val.operands()[i + 1];
-      }
-    }
-
-    // Pad the concretized values to the left to assign the uninitialized
-    // values of result.
-    ret.operands()=fill_in_map_as_vector(initial_map);
-    return ret;
-  }
-  else if(arr_val.id()==ID_array)
-  {
-    // copy the `n` first elements of `arr_val`
-    for(size_t i=0; i<arr_val.operands().size() && i<n; i++)
-      ret.move_to_operands(arr_val.operands()[i]);
-    return ret;
-  }
-  else
-    return {};
+  if(
+    const auto &array = interval_sparse_arrayt::of_expr(
+      arr_val, from_integer(CHARACTER_FOR_UNKNOWN, char_type)))
+    return array->concretize(n, index_type);
+  return {};
 }
 
 /// convert the content of a string to a more readable representation. This
