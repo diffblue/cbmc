@@ -141,6 +141,9 @@ public:
   static optionalt<interval_sparse_arrayt>
   of_expr(const exprt &expr, const exprt &extra_value);
 
+  /// Convert to an array representation, ignores elements at index >= size
+  array_exprt concretize(std::size_t size, const typet &index_type) const;
+
   /// Get the value at the specified index.
   /// Complexity is linear in the number of entries.
   exprt at(std::size_t index) const override;
