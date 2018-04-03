@@ -145,23 +145,6 @@ exprt sum_overflows(const plus_exprt &sum)
     notequal_exprt(op1_negative, sum_negative));
 }
 
-/// Create a plus expression while adding extra constraints to axioms in order
-/// to prevent overflows.
-/// \param op1: First term of the sum
-/// \param op2: Second term of the sum
-/// \return A plus expression representing the sum of the arguments
-/// \deprecated
-plus_exprt string_constraint_generatort::plus_exprt_with_overflow_check(
-  const exprt &op1, const exprt &op2)
-{
-  const plus_exprt sum(plus_exprt(op1, op2));
-  // We prevent overflows by adding the following constraint:
-  // If the signs of the two operands are the same, then the sign of the sum
-  // should also be the same.
-  lemmas.push_back(not_exprt(sum_overflows(sum)));
-  return sum;
-}
-
 /// Associate an actual finite length to infinite arrays
 /// \param s: array expression representing a string
 /// \return expression for the length of `s`
