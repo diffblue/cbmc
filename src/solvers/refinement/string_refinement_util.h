@@ -132,6 +132,11 @@ public:
 
   exprt to_if_expression(const exprt &index) const override;
 
+  /// If the expression is an array_exprt or a with_exprt uses the appropriate
+  /// constructor, otherwise returns empty optional.
+  static optionalt<interval_sparse_arrayt>
+  of_expr(const exprt &expr, const exprt &extra_value);
+
 private:
   explicit interval_sparse_arrayt(exprt default_value)
     : sparse_arrayt(default_value)

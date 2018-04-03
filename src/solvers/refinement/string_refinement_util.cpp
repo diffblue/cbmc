@@ -176,6 +176,18 @@ interval_sparse_arrayt interval_sparse_arrayt::of_array_list(
   return sparse_array;
 }
 
+optionalt<interval_sparse_arrayt>
+interval_sparse_arrayt::of_expr(const exprt &expr, const exprt &extra_value)
+{
+  if(const auto &array_expr = expr_try_dynamic_cast<array_exprt>(expr))
+    return interval_sparse_arrayt(*array_expr, extra_value);
+  if(const auto &with_expr = expr_try_dynamic_cast<with_exprt>(expr))
+    return interval_sparse_arrayt(*with_expr);
+  if(expr.id() == "array-list")
+    return of_array_list(expr, extra_value);
+  return {};
+}
+
 void equation_symbol_mappingt::add(const std::size_t i, const exprt &expr)
 {
   equations_containing[expr].push_back(i);
