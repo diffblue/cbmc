@@ -989,34 +989,35 @@ static exprt get_char_array_and_concretize(
   if(arr_model_opt)
   {
     stream << indent << indent << "- char_array: " << format(*arr_model_opt)
+           << '\n';
+    stream << indent << indent << "- type : " << format(arr_model_opt->type())
            << eom;
     const exprt simple = simplify_expr(*arr_model_opt, ns);
     stream << indent << indent << "- simplified_char_array: " << format(simple)
            << eom;
-    const exprt concretized_array =
-      concretize_arrays_in_expression(simple, max_string_length, ns);
-    stream << indent << indent
-           << "- concretized_char_array: " << format(concretized_array) << eom;
-
-    if(concretized_array.id() == ID_array)
+    if(
+      const auto concretized_array = get_array(
+        super_get, ns, max_string_length, stream, to_array_string_expr(simple)))
     {
-      stream << indent << indent << "- as_string: \""
-             << string_of_array(to_array_expr(concretized_array)) << "\"\n";
-    }
-    else
-    {
-      stream << indent << "- warning: not an array" << eom;
-    }
+      stream << indent << indent
+             << "- concretized_char_array: " << format(*concretized_array)
+             << eom;
 
-    stream << indent << indent << "- type: " << format(concretized_array.type())
-           << eom;
-    return concretized_array;
+      if(
+        const auto array_expr =
+          expr_try_dynamic_cast<array_exprt>(*concretized_array))
+      {
+        stream << indent << indent << "- as_string: \""
+               << string_of_array(*array_expr) << "\"\n";
+      }
+      else
+        stream << indent << "- warning: not an array" << eom;
+      return *concretized_array;
+    }
+    return simple;
   }
-  else
-  {
-    stream << indent << indent << "- incomplete model" << eom;
-    return arr;
-  }
+  stream << indent << indent << "- incomplete model" << eom;
+  return arr;
 }
 
 /// Display part of the current model by mapping the variables created by the
