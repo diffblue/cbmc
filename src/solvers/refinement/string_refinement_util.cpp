@@ -158,6 +158,24 @@ interval_sparse_arrayt::interval_sparse_arrayt(
   }
 }
 
+interval_sparse_arrayt interval_sparse_arrayt::of_array_list(
+  const exprt &expr,
+  const exprt &extra_value)
+{
+  PRECONDITION(expr.operands().size() % 2 == 0);
+  interval_sparse_arrayt sparse_array(extra_value);
+  for(std::size_t i = 0; i < expr.operands().size(); i += 2)
+  {
+    const auto index = numeric_cast<std::size_t>(expr.operands()[i]);
+    INVARIANT(
+      expr.operands()[i + 1].type() == extra_value.type(),
+      "all values in array should have the same type");
+    if(index.has_value() && expr.operands()[i + 1].id() != ID_unknown)
+      sparse_array.entries[*index] = expr.operands()[i + 1];
+  }
+  return sparse_array;
+}
+
 void equation_symbol_mappingt::add(const std::size_t i, const exprt &expr)
 {
   equations_containing[expr].push_back(i);
