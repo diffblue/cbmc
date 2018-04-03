@@ -352,8 +352,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   lemmas.push_back(a3);
 
   const exprt index1 = from_integer(1, index_type);
-  const exprt from_index_plus_one =
-    plus_exprt_with_overflow_check(from_index, index1);
+  const plus_exprt from_index_plus_one(from_index, index1);
   const if_exprt end_index(
     binary_relation_exprt(from_index_plus_one, ID_le, str.length()),
     from_index_plus_one,
