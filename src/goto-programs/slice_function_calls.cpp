@@ -8,8 +8,6 @@ Author: Matthias Güdemann, matthias.guedemann@diffblue.com
 
 #include "slice_function_calls.h"
 
-#define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -171,5 +169,3 @@ slice_function_callst::compute_variable_bounds(
 
   return variable_bounds_map;
 }
-
-#undef DEBUG
