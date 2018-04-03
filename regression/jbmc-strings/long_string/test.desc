@@ -1,0 +1,11 @@
+CORE
+Test.class
+--refine-strings --function Test.check --string-max-input-length 2000000
+^EXIT=10$
+^SIGNAL=0$
+assertion at file Test.java line 21 .* FAILURE
+--
+--
+This checks that the solver manage to violate assertions even when this requires
+some very long strings, as long as they don't exceed the arbitrary limit that
+is set by the solver (64M characters).
