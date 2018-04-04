@@ -2228,13 +2228,9 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
 /// \return evaluated expression
 exprt string_refinementt::get(const exprt &expr) const
 {
-  // clang-format off
-  const auto super_get = [this](const exprt &expr)
-  {
+  const auto super_get = [this](const exprt &expr) {
     return supert::get(expr);
   };
-  // clang-format on
-
   exprt ecopy(expr);
   (void)symbol_resolve.replace_expr(ecopy);
 
@@ -2248,35 +2244,25 @@ exprt string_refinementt::get(const exprt &expr) const
         dependencies.eval(arr, [&](const exprt &expr) { return get(expr); }))
       return *from_dependencies;
 
-    const auto arr_model_opt =
-      get_array(super_get, ns, generator.max_string_length, debug(), arr);
-    // \todo Refactor with get array in model
-    if(arr_model_opt)
+    if(
+      const auto arr_model_opt =
+        get_array(super_get, ns, generator.max_string_length, debug(), arr))
     {
-      const exprt arr_model = simplify_expr(*arr_model_opt, ns);
-      const exprt concretized_array = concretize_arrays_in_expression(
-        arr_model, generator.max_string_length, ns);
-      return concretized_array;
+      // \todo get_array should take care of the concretization
+      return concretize_arrays_in_expression(
+        *arr_model_opt, generator.max_string_length, ns);
     }
-    else
+
+    if(generator.get_created_strings().count(arr))
     {
-      auto set = generator.get_created_strings();
-      if(set.find(arr) != set.end())
+      const exprt length = super_get(arr.length());
+      if(const auto n = numeric_cast<std::size_t>(length))
       {
-        exprt length = super_get(arr.length());
-        if(const auto n = numeric_cast<std::size_t>(length))
-        {
-          exprt arr_model =
-            array_exprt(array_typet(arr.type().subtype(), length));
-          for(size_t i = 0; i < *n; i++)
-            arr_model.copy_to_operands(exprt(ID_unknown, arr.type().subtype()));
-          const exprt concretized_array = concretize_arrays_in_expression(
-            arr_model, generator.max_string_length, ns);
-          return concretized_array;
-        }
+        const array_exprt arr_model(array_typet(arr.type().subtype(), length));
+        return fill_in_array_expr(arr_model, generator.max_string_length);
       }
-      return arr;
     }
+    return arr;
   }
   return supert::get(ecopy);
 }
