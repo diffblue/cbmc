@@ -2222,8 +2222,8 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
 /// Evaluates the given expression in the valuation found by
 /// string_refinementt::dec_solve.
 ///
-/// The difference with supert::get is that arrays of characters need to be
-/// concretized. See concretize_arrays_in_expression for how it is done.
+/// Arrays of characters are interpreted differently from the result of
+/// supert::get: values are propagated to the left to fill unknown.
 /// \param expr: an expression
 /// \return evaluated expression
 exprt string_refinementt::get(const exprt &expr) const
@@ -2233,6 +2233,41 @@ exprt string_refinementt::get(const exprt &expr) const
   };
   exprt ecopy(expr);
   (void)symbol_resolve.replace_expr(ecopy);
+
+  // Special treatment for index expressions
+  const auto &index_expr = expr_try_dynamic_cast<index_exprt>(ecopy);
+  if(index_expr && is_char_type(index_expr->type()))
+  {
+    std::reference_wrapper<const exprt> current(index_expr->array());
+    while(current.get().id() == ID_if)
+    {
+      const auto &if_expr = expr_dynamic_cast<if_exprt>(current.get());
+      const exprt cond = get(if_expr.cond());
+      if(cond.is_true())
+        current = std::cref(if_expr.true_case());
+      else if(cond.is_false())
+        current = std::cref(if_expr.false_case());
+      else
+        UNREACHABLE;
+    }
+    const auto array = supert::get(current.get());
+    const auto index = get(index_expr->index());
+    const exprt unknown =
+      from_integer(CHARACTER_FOR_UNKNOWN, index_expr->type());
+    if(
+      const auto sparse_array = interval_sparse_arrayt::of_expr(array, unknown))
+    {
+      if(const auto index_value = numeric_cast<std::size_t>(index))
+        return sparse_array->at(*index_value);
+      return sparse_array->to_if_expression(index);
+    }
+
+    INVARIANT(
+      array.id() == ID_symbol,
+      "apart from symbols, array valuations can be interpreted as sparse "
+      "arrays");
+    return index_exprt(array, index);
+  }
 
   if(is_char_array_type(ecopy.type(), ns))
   {
