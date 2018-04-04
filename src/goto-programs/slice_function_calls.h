@@ -9,11 +9,38 @@ Author: Matthias Güdemann, matthias.guedemann@diffblue.com
 #ifndef CPROVER_GOTO_PROGRAMS_SLICE_FUNCTION_CALLS_H
 #define CPROVER_GOTO_PROGRAMS_SLICE_FUNCTION_CALLS_H
 
-#include "goto_model.h"
-
 #include <string>
 
+#include <util/graph.h>
+
+#include "goto_model.h"
+
 void slice_function_calls(goto_model_functiont &, const std::string &);
+
+enum class slice_node_typet
+{
+  FUNCTION_PARAMETER,
+  LOCAL_VARIABLE,
+  FUNCTION_CALL
+};
+
+struct slice_param_boundst
+{
+  unsigned upper_bound = 0;
+  unsigned lower_bound = 0;
+};
+
+struct slice_nodet : public graph_nodet<empty_edget>
+{
+  slice_node_typet slice_node_type;
+  irep_idt name;
+  // bounds only used for local variables
+  slice_param_boundst slice_param_bounds;
+  unsigned location_number = 0;
+};
+
+typedef grapht<slice_nodet> slice_function_grapht;
+typedef std::list<slice_nodet> slice_nodest;
 
 class slice_function_callst
 {
@@ -21,9 +48,14 @@ class slice_function_callst
 
   // maps a variable name to a list of scopes in the form of instruction numbers
   // bounds
-  typedef std::map<irep_idt, std::list<std::pair<unsigned, unsigned>>>
+  typedef std::map<irep_idt, std::list<slice_param_boundst>>
     variable_bounds_mapt;
   variable_bounds_mapt compute_variable_bounds(const goto_functiont &);
+
+  slice_nodest get_function_parameters(
+    variable_bounds_mapt &,
+    const std::set<irep_idt> &,
+    unsigned location_number);
 
 public:
   slice_function_callst(const std::string &_slice_function)

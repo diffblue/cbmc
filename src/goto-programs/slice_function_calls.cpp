@@ -36,8 +36,8 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
     std::cout << "variable " << id2string(entry.first);
     for(const auto &listentry : entry.second)
     {
-      std::cout << " in [" << listentry.first << ", " << listentry.second
-                << "]" << std::endl;
+      std::cout << " in [" << listentry.lower_bound << ", "
+                << listentry.upper_bound << "]" << std::endl;
     }
   }
 #endif
@@ -110,9 +110,11 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
     }
   }
 
-#ifdef DEBUG
+  // construct graph
+  slice_function_grapht slice_function_graph;
   for(const auto &entry : function_param_map)
   {
+#ifdef DEBUG
     std::cout << "INFO: call (" << entry.first.first
               << ", location number: " << entry.first.second << " ) ";
     for(const auto &param : entry.second)
@@ -120,8 +122,28 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
       std::cout << id2string(param) << " ";
     }
     std::cout << std::endl;
-  }
 #endif
+
+    slice_nodet root_node;
+    root_node.slice_node_type = slice_node_typet::FUNCTION_CALL;
+    root_node.name = entry.first.first;
+    root_node.location_number = entry.first.second;
+    slice_nodet::node_indext root_index = slice_function_graph.add_node();
+    slice_function_graph[root_index] = root_node;
+
+    slice_nodest slice_nodes = get_function_parameters(
+      variable_bounds_map, entry.second, entry.first.second);
+
+    for(const auto &node : slice_nodes)
+    {
+      slice_nodet::node_indext index = slice_function_graph.add_node();
+      slice_function_graph[index] = node;
+      slice_function_graph.add_edge(root_index, index);
+#ifdef DEBUG
+      std::cout << "connect " << root_index << " and " << index << std::endl;
+#endif
+    }
+  }
 }
 
 slice_function_callst::variable_bounds_mapt
@@ -155,17 +177,63 @@ slice_function_callst::compute_variable_bounds(
         "closing scope of undeclared variable");
       if(variable_bounds_map.find(var_name) == variable_bounds_map.end())
       {
-        variable_bounds_map[var_name] = {
-          {declarations[var_name], instruction.location_number}};
+        slice_param_boundst slice_param_bound;
+        slice_param_bound.lower_bound = declarations[var_name];
+        slice_param_bound.upper_bound = instruction.location_number;
+        variable_bounds_map[var_name] = {slice_param_bound};
       }
       else
       {
-        variable_bounds_map[var_name].push_back(
-          {declarations[var_name], instruction.location_number});
+        slice_param_boundst slice_param_bound;
+        slice_param_bound.lower_bound = declarations[var_name];
+        slice_param_bound.upper_bound = instruction.location_number;
+        variable_bounds_map[var_name].push_back(slice_param_bound);
         declarations.erase(var_name);
       }
     }
   }
 
   return variable_bounds_map;
+}
+
+/// gets the correct slice_nodet for the given location number of the function
+/// call
+slice_nodest slice_function_callst::get_function_parameters(
+  variable_bounds_mapt &variable_bounds_map,
+  const std::set<irep_idt> &param_set,
+  unsigned location_number)
+{
+  slice_nodest slice_nodes;
+  for(const auto &var_name : param_set)
+  {
+    // is a function parameter
+    if(variable_bounds_map.find(var_name) == variable_bounds_map.end())
+    {
+      slice_nodet slice_node;
+      slice_node.name = var_name;
+      slice_node.slice_node_type = slice_node_typet::FUNCTION_PARAMETER;
+      slice_nodes.push_back(slice_node);
+    }
+    else
+    {
+      bool found = false;
+      for(const auto &bounds : variable_bounds_map[var_name])
+      {
+        if(
+          location_number >= bounds.lower_bound &&
+          location_number <= bounds.upper_bound)
+        {
+          slice_nodet slice_node;
+          slice_node.name = var_name;
+          slice_node.slice_param_bounds = bounds;
+          slice_node.slice_node_type = slice_node_typet::LOCAL_VARIABLE;
+          slice_nodes.push_back(slice_node);
+          found = true;
+          break;
+        }
+      }
+      DATA_INVARIANT(found, "local variable must be in scope");
+    }
+  }
+  return slice_nodes;
 }
