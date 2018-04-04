@@ -148,7 +148,7 @@ public:
   /// Complexity is linear in the number of entries.
   exprt at(std::size_t index) const override;
 
-private:
+  /// Array containing the same value at each index.
   explicit interval_sparse_arrayt(exprt default_value)
     : sparse_arrayt(default_value)
   {

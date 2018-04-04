@@ -2264,8 +2264,9 @@ exprt string_refinementt::get(const exprt &expr) const
       const exprt length = super_get(arr.length());
       if(const auto n = numeric_cast<std::size_t>(length))
       {
-        const array_exprt arr_model(array_typet(arr.type().subtype(), length));
-        return fill_in_array_expr(arr_model, generator.max_string_length);
+        const interval_sparse_arrayt sparse_array(
+          from_integer(CHARACTER_FOR_UNKNOWN, arr.type().subtype()));
+        return sparse_array.concretize(*n, length.type());
       }
     }
     return arr;
