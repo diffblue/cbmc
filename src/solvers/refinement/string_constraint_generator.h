@@ -447,6 +447,9 @@ exprt minimum(const exprt &a, const exprt &b);
 /// \return expression representing the maximum of two expressions
 exprt maximum(const exprt &a, const exprt &b);
 
+/// \return Boolean true when the sum of the two expressions overflows
+exprt sum_overflows(const plus_exprt &sum);
+
 exprt length_constraint_for_concat_char(
   const array_string_exprt &res,
   const array_string_exprt &s1);

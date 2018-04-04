@@ -130,30 +130,35 @@ symbol_exprt string_constraint_generatort::fresh_boolean(
   return b;
 }
 
+exprt sum_overflows(const plus_exprt &sum)
+{
+  PRECONDITION(sum.operands().size() == 2);
+  const exprt zero = from_integer(0, sum.op0().type());
+  const binary_relation_exprt op0_negative(sum.op0(), ID_lt, zero);
+  const binary_relation_exprt op1_negative(sum.op1(), ID_lt, zero);
+  const binary_relation_exprt sum_negative(sum, ID_lt, zero);
+
+  // overflow happens when we add two values of same sign but their sum has a
+  // different sign
+  return and_exprt(
+    equal_exprt(op0_negative, op1_negative),
+    notequal_exprt(op1_negative, sum_negative));
+}
+
 /// Create a plus expression while adding extra constraints to axioms in order
 /// to prevent overflows.
 /// \param op1: First term of the sum
 /// \param op2: Second term of the sum
 /// \return A plus expression representing the sum of the arguments
+/// \deprecated
 plus_exprt string_constraint_generatort::plus_exprt_with_overflow_check(
   const exprt &op1, const exprt &op2)
 {
-  plus_exprt sum(plus_exprt(op1, op2));
-
-  exprt zero=from_integer(0, op1.type());
-
-  binary_relation_exprt neg1(op1, ID_lt, zero);
-  binary_relation_exprt neg2(op2, ID_lt, zero);
-  binary_relation_exprt neg_sum(sum, ID_lt, zero);
-
+  const plus_exprt sum(plus_exprt(op1, op2));
   // We prevent overflows by adding the following constraint:
   // If the signs of the two operands are the same, then the sign of the sum
   // should also be the same.
-  implies_exprt no_overflow(equal_exprt(neg1, neg2),
-                            equal_exprt(neg1, neg_sum));
-
-  lemmas.push_back(no_overflow);
-
+  lemmas.push_back(not_exprt(sum_overflows(sum)));
   return sum;
 }
 
