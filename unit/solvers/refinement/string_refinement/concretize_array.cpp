@@ -1,7 +1,7 @@
 /*******************************************************************\
 
- Module: Unit tests for concretize_array_expression in
-   solvers/refinement/string_refinement.cpp
+ Module: Unit tests for interval_sparse_arrayt::concretizein
+   solvers/refinement/string_refinement_util.cpp
 
  Author: Diffblue Ltd.
 
@@ -18,6 +18,7 @@
 SCENARIO("concretize_array_expression",
   "[core][solvers][refinement][string_refinement]")
 {
+  // Arrange
   const typet char_type=unsignedbv_typet(16);
   const typet int_type=signedbv_typet(32);
   const exprt index1=from_integer(1, int_type);
@@ -27,33 +28,29 @@ SCENARIO("concretize_array_expression",
   const exprt index100=from_integer(100, int_type);
   const exprt char0=from_integer('0', char_type);
   const exprt index2=from_integer(2, int_type);
+  const exprt charz = from_integer('z', char_type);
   array_typet array_type(char_type, infinity_exprt(int_type));
 
   // input_expr is
-  // `'0' + (ARRAY_OF(0) WITH [1:=x] WITH [4:=y] WITH [100:=z])[2]`
-  const plus_exprt input_expr(
-    from_integer('0', char_type),
-    index_exprt(
+  // ARRAY_OF(0) WITH [1:=x] WITH [4:=y] WITH [100:=z]`
+  const with_exprt input_expr(
+    with_exprt(
       with_exprt(
-        with_exprt(
-          with_exprt(
-            array_of_exprt(from_integer(0, char_type), array_type),
-            index1,
-            charx),
-          index4,
-          chary),
-        index100,
-        from_integer('z', char_type)),
-      index2));
+        array_of_exprt(from_integer(0, char_type), array_type), index1, charx),
+      index4,
+      chary),
+    index100,
+    charz);
 
-  // String max length is 50, so index 100 should get ignored.
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-  const exprt concrete = concretize_arrays_in_expression(input_expr, 50, ns);
+  // Act
+  const interval_sparse_arrayt sparse_array(input_expr);
+  // String size is 7, so index 100 should get ignored.
+  const exprt concrete = sparse_array.concretize(7, int_type);
 
-  // The expected result is `'0' + { 'x', 'x', 'y', 'y', 'y' }`
-  array_exprt array(array_type);
-  array.operands()={charx, charx, chary, chary, chary};
-  const plus_exprt expected(char0, index_exprt(array, index2));
+  // Assert
+  array_exprt expected(array_type);
+  // The expected result is `{ 'x', 'x', 'y', 'y', 'y', 'z', 'z' }`
+  expected.operands() = {charx, charx, chary, chary, chary, charz, charz};
+  to_array_type(expected.type()).size() = from_integer(7, int_type);
   REQUIRE(concrete==expected);
 }
