@@ -96,6 +96,10 @@ public:
   /// at the given index
   virtual exprt to_if_expression(const exprt &index) const;
 
+  /// Get the value at the specified index.
+  /// Complexity is linear in the number of entries.
+  virtual exprt at(std::size_t index) const;
+
 protected:
   exprt default_value;
   std::map<std::size_t, exprt> entries;
@@ -136,6 +140,10 @@ public:
   /// constructor, otherwise returns empty optional.
   static optionalt<interval_sparse_arrayt>
   of_expr(const exprt &expr, const exprt &extra_value);
+
+  /// Get the value at the specified index.
+  /// Complexity is linear in the number of entries.
+  exprt at(std::size_t index) const override;
 
 private:
   explicit interval_sparse_arrayt(exprt default_value)

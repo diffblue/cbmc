@@ -123,6 +123,12 @@ exprt sparse_arrayt::to_if_expression(const exprt &index) const
     });
 }
 
+exprt sparse_arrayt::at(const std::size_t index) const
+{
+  const auto it = entries.find(index);
+  return it != entries.end() ? it->second : default_value;
+}
+
 exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const
 {
   return std::accumulate(
@@ -186,6 +192,13 @@ interval_sparse_arrayt::of_expr(const exprt &expr, const exprt &extra_value)
   if(expr.id() == "array-list")
     return of_array_list(expr, extra_value);
   return {};
+}
+
+exprt interval_sparse_arrayt::at(const std::size_t index) const
+{
+  // First element at or after index
+  const auto it = entries.lower_bound(index);
+  return it != entries.end() ? it->second : default_value;
 }
 
 void equation_symbol_mappingt::add(const std::size_t i, const exprt &expr)
