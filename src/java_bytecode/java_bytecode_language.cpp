@@ -234,13 +234,13 @@ static void infer_opaque_type_fields(
          instruction.statement == "putfield")
       {
         const exprt &fieldref = instruction.args[0];
-        const symbolt *class_symbol =
-          symbol_table.lookup(fieldref.get(ID_class));
+        irep_idt class_symbol_id = fieldref.get(ID_class);
+        const symbolt *class_symbol = symbol_table.lookup(class_symbol_id);
         INVARIANT(
-          class_symbol != nullptr, "all field types should have been loaded");
+          class_symbol != nullptr,
+          "all types containing fields should have been loaded");
 
         const class_typet *class_type = &to_class_type(class_symbol->type);
-        irep_idt class_symbol_id = fieldref.get(ID_class);
         const irep_idt &component_name = fieldref.get(ID_component_name);
         while(!class_type->has_component(component_name))
         {
@@ -249,22 +249,24 @@ static void infer_opaque_type_fields(
             // Accessing a field of an incomplete (opaque) type.
             symbolt &writable_class_symbol =
               symbol_table.get_writeable_ref(class_symbol_id);
-            auto &add_to_components =
+            auto &components =
               to_struct_type(writable_class_symbol.type).components();
-            add_to_components.push_back(
-              struct_typet::componentt(component_name, fieldref.type()));
-            add_to_components.back().set_base_name(component_name);
-            add_to_components.back().set_pretty_name(component_name);
+            components.emplace_back(component_name, fieldref.type());
+            components.back().set_base_name(component_name);
+            components.back().set_pretty_name(component_name);
             break;
           }
           else
           {
             // Not present here: check the superclass.
             INVARIANT(
-              class_type->bases().size() != 0,
-              "class missing an expected field should have a superclass");
+              !class_type->bases().empty(),
+              "class '" + id2string(class_symbol->name)
+                + "' (which was missing a field '" + id2string(component_name)
+                + "' referenced from method '" + id2string(method.name)
+                + "') should have an opaque superclass");
             const symbol_typet &superclass_type =
-              to_symbol_type(class_type->bases()[0].type());
+              to_symbol_type(class_type->bases().front().type());
             class_symbol_id = superclass_type.get_identifier();
             class_type = &to_class_type(ns.follow(superclass_type));
           }
