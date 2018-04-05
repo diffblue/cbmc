@@ -254,6 +254,9 @@ public:
   /// only add constraints on the length.
   void add_constraints(string_constraint_generatort &generatort);
 
+  /// Clear the content of the dependency graph
+  void clear();
+
 private:
   /// Set of nodes representing builtin_functions
   std::vector<builtin_function_nodet> builtin_function_nodes;

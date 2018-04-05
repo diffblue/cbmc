@@ -259,6 +259,14 @@ void string_dependenciest::add_dependency(
   });
 }
 
+void string_dependenciest::clear()
+{
+  builtin_function_nodes.clear();
+  string_nodes.clear();
+  node_index_pool.clear();
+  clean_cache();
+}
+
 static void add_dependency_to_string_subexprs(
   string_dependenciest &dependencies,
   const function_application_exprt &fun_app,
