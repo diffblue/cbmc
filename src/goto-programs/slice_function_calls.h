@@ -56,6 +56,26 @@ class slice_function_callst
     variable_bounds_mapt &,
     const std::set<irep_idt> &,
     unsigned location_number);
+  bool is_referenced(
+    const goto_programt::instructiont &,
+    const variable_bounds_mapt &,
+    const irep_idt &);
+
+  /// visit `exprt` and collect symbols that represent local variables that are
+  /// referenced in it
+  class local_variable_visitort : public const_expr_visitort
+  {
+    const variable_bounds_mapt &variable_bounds_map;
+    std::set<irep_idt> &seen;
+  public:
+    local_variable_visitort(
+      const variable_bounds_mapt &_variable_bounds_map,
+      std::set<irep_idt> &_seen)
+      : variable_bounds_map(_variable_bounds_map), seen(_seen)
+    {
+    }
+    void operator()(const exprt &expr) override;
+  };
 
 public:
   slice_function_callst(const std::string &_slice_function)

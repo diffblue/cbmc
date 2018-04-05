@@ -143,6 +143,26 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
       std::cout << "connect " << root_index << " and " << index << std::endl;
 #endif
     }
+
+#ifdef DEBUG
+    // see where the function parameters are also referenced
+    for(const auto &instruction :
+        goto_function.get_goto_function().body.instructions)
+    {
+      for(const auto &node : slice_nodes)
+      {
+        if(instruction.location_number >= node.slice_param_bounds.lower_bound &&
+           instruction.location_number <= node.slice_param_bounds.upper_bound)
+        {
+          if(is_referenced(instruction, variable_bounds_map, node.name))
+          {
+            std::cout << "Found " << node.name << " in instruction "
+                      << instruction.to_string() << std::endl;
+          }
+        }
+      }
+    }
+#endif
   }
 }
 
@@ -208,13 +228,14 @@ slice_nodest slice_function_callst::get_function_parameters(
   {
     // is a function parameter
     if(variable_bounds_map.find(var_name) == variable_bounds_map.end())
-    {
-      slice_nodet slice_node;
-      slice_node.name = var_name;
-      slice_node.slice_node_type = slice_node_typet::FUNCTION_PARAMETER;
-      slice_nodes.push_back(slice_node);
-    }
-    else
+    // {
+    //   slice_nodet slice_node;
+    //   slice_node.name = var_name;
+    //   slice_node.slice_node_type = slice_node_typet::FUNCTION_PARAMETER;
+    //   slice_nodes.push_back(slice_node);
+    // }
+    // else
+      continue;
     {
       bool found = false;
       for(const auto &bounds : variable_bounds_map[var_name])
@@ -236,4 +257,81 @@ slice_nodest slice_function_callst::get_function_parameters(
     }
   }
   return slice_nodes;
+}
+
+/// Checks whether a variable is used in a GOTO instruction. This doesn't
+/// concern declarations of that variable, assignment or dead statements.
+bool slice_function_callst::is_referenced(
+  const goto_programt::instructiont &instruction,
+  const variable_bounds_mapt &variable_bounds_map,
+  const irep_idt &name)
+{
+  std::set<irep_idt> seen;
+  local_variable_visitort local_variable_visitor(variable_bounds_map, seen);
+
+  switch(instruction.type)
+  {
+    // inspect guard
+  case goto_program_instruction_typet::GOTO:
+  case goto_program_instruction_typet::ASSUME:
+  case goto_program_instruction_typet::ASSERT:
+  {
+    instruction.guard.visit(local_variable_visitor);
+    break;
+  }
+
+  // inspect rhs
+  case goto_program_instruction_typet::ASSIGN:
+  {
+    const code_assignt &code_assign = to_code_assign(instruction.code);
+    code_assign.rhs().visit(local_variable_visitor);
+    break;
+  }
+
+  // inspect function parameter
+  case goto_program_instruction_typet::FUNCTION_CALL:
+  {
+    const code_function_callt &fun_call =
+      to_code_function_call(instruction.code);
+    for(const auto &argument : fun_call.arguments())
+      argument.visit(local_variable_visitor);
+    break;
+  }
+
+    // cannot be referenced in the following instructions
+  case goto_program_instruction_typet::RETURN:
+  case goto_program_instruction_typet::DECL:
+  case goto_program_instruction_typet::DEAD:
+  case goto_program_instruction_typet::OTHER:
+  case goto_program_instruction_typet::SKIP:
+  case goto_program_instruction_typet::LOCATION:
+  case goto_program_instruction_typet::ATOMIC_BEGIN:
+  case goto_program_instruction_typet::ATOMIC_END:
+  case goto_program_instruction_typet::END_FUNCTION:
+  case goto_program_instruction_typet::START_THREAD:
+  case goto_program_instruction_typet::THROW:
+  case goto_program_instruction_typet::CATCH:
+    break;
+
+  default:
+    UNREACHABLE;
+  }
+
+  return seen.find(name) != seen.end();
+}
+
+/// visit expr and collect symbols
+void slice_function_callst::local_variable_visitort::operator()(const exprt &expr)
+{
+  if(expr.id() == ID_symbol)
+  {
+    const symbol_exprt symbol_expr = to_symbol_expr(expr);
+    const irep_idt &identifier = symbol_expr.get_identifier();
+
+    // record symbol identifier if it is in variable bounds map
+    if(variable_bounds_map.find(identifier) != variable_bounds_map.end())
+    {
+      seen.insert(identifier);
+    }
+  }
 }
