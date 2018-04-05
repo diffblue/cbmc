@@ -1194,6 +1194,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           java_reference_type(catch_type));
       stack.push_back(catch_var);
       code_landingpadt catch_statement(catch_var);
+      catch_statement.add_source_location() = i_it->source_location;
       catch_instruction=catch_statement;
     }
 
@@ -2418,6 +2419,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
               handler_labels[i]));
         }
 
+        catch_push.add_source_location() = i_it->source_location;
         code_blockt try_block;
         try_block.move_to_operands(catch_push);
         try_block.move_to_operands(c);
@@ -2444,9 +2446,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
     for(const auto &exception_row : method.exception_table)
     {
       // add the CATCH-POP before the end of the try block
-      if(cur_pc<exception_row.end_pc &&
-         !working_set.empty() &&
-         *working_set.begin()==exception_row.end_pc)
+      auto next_instruction = std::next(a_it);
+      bool is_try_block_end =
+        next_instruction == address_map.end() ?
+        cur_pc < exception_row.end_pc :
+        next_instruction->first == exception_row.end_pc;
+
+      if(is_try_block_end)
       {
         // have we already added a CATCH-POP for the current try-catch?
         // (each row corresponds to a handler)
@@ -2459,6 +2465,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           start_pc=exception_row.start_pc;
           // add CATCH_POP instruction
           code_pop_catcht catch_pop;
+          catch_pop.add_source_location() = i_it->source_location;
           code_blockt end_try_block;
           end_try_block.move_to_operands(c);
           end_try_block.move_to_operands(catch_pop);
