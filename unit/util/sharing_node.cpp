@@ -2,121 +2,203 @@
 
 /// \file Tests for sharing-node utility
 
+#define SHARING_NODE_INTERNAL_CHECKS
+
 #include <testing-utils/catch.hpp>
 #include <util/sharing_node.h>
 
 void sharing_node_test()
 {
-  typedef sharing_nodet<std::string, std::string> snt;
-
-  SECTION("Internal nodes")
+  SECTION("Leaf test")
   {
-    snt sn1;
-    const snt &sn2 = sn1;
+    typedef sharing_node_leaft<int, int> leaft;
 
-    const snt *p2;
+    // Basic leaf
+    {
+      const leaft leaf(1, 2);
 
-    REQUIRE(sn1.is_empty());
+      REQUIRE(!leaf.empty());
+      REQUIRE(leaf.shares_with(leaf));
+      REQUIRE(leaf.get_key() == 1);
+      REQUIRE(leaf.get_value() == 2);
+    }
 
-    sn1.add_child(0);
-    sn1.add_child(1);
-    sn1.add_child(2);
+    // Shared leaf
+    {
+      const leaft leaf1(1, 2);
+      const leaft leaf2(leaf1);
 
-    REQUIRE(!sn2.is_empty());
-    REQUIRE(sn2.is_internal());
-    REQUIRE(!sn2.is_container());
-    REQUIRE(!sn2.is_leaf());
+      REQUIRE(leaf1.shares_with(leaf2));
+      REQUIRE(leaf2.get_key() == 1);
+      REQUIRE(leaf2.get_value() == 2);
+    }
 
-    REQUIRE(sn2.get_sub().size() == 3);
+    // Modify shared leaf
+    {
+      const leaft leaf1(1, 2);
+      leaft leaf2(leaf1);
 
-    p2 = sn2.find_child(0);
-    REQUIRE(p2 != nullptr);
+      REQUIRE(leaf2.shares_with(leaf1));
 
-    p2 = sn1.find_child(0);
-    REQUIRE(p2 != nullptr);
+      auto &v = leaf2.get_value();
+      v = 3;
+      REQUIRE(leaf2.get_value() == 3);
+      REQUIRE(!leaf2.shares_with(leaf1));
+    }
 
-    p2 = sn2.find_child(3);
-    REQUIRE(p2 == nullptr);
+    // Detaching
+    {
+      leaft leaf(1, 2);
 
-    p2 = sn1.find_child(3);
-    REQUIRE(p2 == nullptr);
+      auto p = leaf.data.get();
+      leaf.write();
 
-    sn1.remove_child(0);
-    REQUIRE(sn2.get_sub().size() == 2);
-
-    sn1.clear();
-    REQUIRE(sn2.is_empty());
+      REQUIRE(leaf.data.get() == p);
+    }
   }
 
-  SECTION("Container nodes")
+  SECTION("Inner node test")
   {
-    snt sn1;
+    typedef sharing_node_innert<int, int> innert;
 
-    snt *p1;
-    const snt *p2;
+    // Empty container
+    {
+      const innert c;
 
-    sn1.add_child(0);
-    sn1.add_child(1);
+      REQUIRE(c.empty());
+    }
 
-    p1 = sn1.add_child(2);
-    p2 = p1;
+    // Single container
+    {
+      innert c;
+      const innert &cc = c;
 
-    REQUIRE(p1->find_leaf("a") == nullptr);
-    REQUIRE(p2->find_leaf("a") == nullptr);
+      c.place_leaf(1, 2);
+      c.place_leaf(3, 4);
 
-    p1->place_leaf("a", "b");
-    REQUIRE(p2->get_container().size() == 1);
-    p1->place_leaf("c", "d");
-    REQUIRE(p2->get_container().size() == 2);
+      REQUIRE(!cc.get_container().empty());
+      REQUIRE(cc.find_leaf(1) != nullptr);
+      REQUIRE(cc.find_leaf(3) != nullptr);
 
-    REQUIRE(p2->is_container());
+      auto leaf = c.find_leaf(1);
+      REQUIRE(leaf->get_key() == 1);
+      REQUIRE(leaf->get_value() == 2);
 
-    p1->remove_leaf("a");
-    REQUIRE(p2->get_container().size() == 1);
+      c.remove_leaf(1);
+      c.remove_leaf(3);
+
+      REQUIRE(cc.get_container().empty());
+    }
+
+    // Shared container
+    {
+      innert c1;
+      c1.place_leaf(1, 2);
+      c1.place_leaf(3, 4);
+
+      innert c2(c1);
+      auto leaf = c2.find_leaf(1);
+      auto &v = leaf->get_value();
+      v = 7;
+
+      REQUIRE(!c1.shares_with(c2));
+
+      {
+        auto leaf1 = c1.find_leaf(1);
+        auto leaf2 = c2.find_leaf(1);
+
+        REQUIRE(!leaf1->shares_with(*leaf2));
+      }
+
+      {
+        auto leaf1 = c1.find_leaf(3);
+        auto leaf2 = c2.find_leaf(3);
+
+        REQUIRE(leaf1->shares_with(*leaf2));
+      }
+    }
+
+    // Internal node mapping to other internal nodes
+    {
+      innert i;
+      const innert &ci = i;
+
+      i.add_child(0);
+
+      REQUIRE(!i.empty());
+      REQUIRE(!i.get_to_map().empty());
+      REQUIRE(ci.find_child(0) != nullptr);
+
+      i.remove_child(0);
+
+      REQUIRE(i.get_to_map().empty());
+      REQUIRE(ci.find_child(0) == nullptr);
+
+      innert *p;
+
+      p = i.add_child(1);
+
+      REQUIRE(p != nullptr);
+    }
   }
 
-  SECTION("Copy test 1")
+  SECTION("Combined")
   {
-    snt sn1;
-    snt sn2;
+    typedef sharing_node_leaft<int, int> leaft;
+    typedef sharing_node_innert<int, int> innert;
 
-    sn2 = sn1;
-    REQUIRE(sn1.data.use_count() == 3);
-    REQUIRE(sn2.data.use_count() == 3);
+    innert map;
 
-    sn1.add_child(0);
-    REQUIRE(sn1.data.use_count() == 1);
-    // the newly created node is empty as well
-    REQUIRE(sn2.data.use_count() == 3);
+    REQUIRE(map.empty());
 
-    sn2 = sn1;
-    REQUIRE(sn2.data.use_count() == 2);
-  }
+    innert *ip;
+    innert *cp;
+    leaft *lp;
 
-  SECTION("Copy test 2")
-  {
-    snt sn1;
-    const snt &sn1c = sn1;
-    snt *p;
+    // Add 0 -> 0 -> (0, 1)
 
-    p = sn1.add_child(0);
-    p->place_leaf("x", "y");
+    ip = &map;
 
-    p = sn1.add_child(1);
-    p->place_leaf("a", "b");
-    p->place_leaf("c", "d");
+    ip = ip->add_child(0);
+    REQUIRE(ip != nullptr);
 
-    snt sn2;
-    const snt &sn2c = sn2;
-    sn2 = sn1;
+    cp = ip->add_child(0);
+    REQUIRE(cp != nullptr);
 
-    REQUIRE(sn1.is_internal());
-    REQUIRE(sn2.is_internal());
+    lp = cp->place_leaf(0, 1);
+    REQUIRE(lp != nullptr);
 
-    sn1.remove_child(0);
-    REQUIRE(sn1c.get_sub().size() == 1);
+    // Add 1 -> 2 -> (3, 4)
 
-    REQUIRE(sn2c.get_sub().size() == 2);
+    ip = &map;
+
+    ip = ip->add_child(1);
+    REQUIRE(ip != nullptr);
+
+    cp = ip->add_child(2);
+    REQUIRE(cp != nullptr);
+
+    lp = cp->place_leaf(3, 4);
+    REQUIRE(lp != nullptr);
+
+    // Add 1 -> 3 -> (4, 5)
+
+    ip = &map;
+
+    ip = ip->add_child(1);
+    REQUIRE(ip != nullptr);
+
+    cp = ip->add_child(3);
+    REQUIRE(cp != nullptr);
+
+    lp = cp->place_leaf(4, 5);
+    REQUIRE(lp != nullptr);
+
+    // Copy
+
+    innert map2(map);
+
+    REQUIRE(map2.shares_with(map));
   }
 }
 

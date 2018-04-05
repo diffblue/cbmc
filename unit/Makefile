@@ -27,6 +27,7 @@ SRC += unit_tests.cpp \
        util/message.cpp \
        util/optional.cpp \
        util/sharing_node.cpp \
+       util/sharing_map.cpp \
        util/small_map.cpp \
        util/small_shared_two_way_ptr.cpp \
        util/string_utils/split_string.cpp \
