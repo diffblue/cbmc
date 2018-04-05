@@ -37,7 +37,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(java-cp-include-files):"                                                   \
   "(lazy-methods)"                                                             \
   "(lazy-methods-extra-entry-point):"                                          \
-  "(java-load-class):"
+  "(java-load-class):"                                                         \
+  "(java-no-load-class):"
 
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP /*NOLINT*/                                          \
   " --no-core-models                 don't load internally provided models for core classes in\n"/* NOLINT(*) */ \
@@ -181,6 +182,8 @@ private:
   synthetic_methods_mapt synthetic_methods;
   stub_global_initializer_factoryt stub_global_initializer_factory;
   class_hierarchyt class_hierarchy;
+  // List of classes to never load
+  std::unordered_set<std::string> no_load_classes;
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_CLASS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_CLASS_H
 
+#include <unordered_set>
 #include <util/symbol_table.h>
 #include <util/message.h>
 
@@ -25,7 +26,8 @@ bool java_bytecode_convert_class(
   message_handlert &message_handler,
   size_t max_array_length,
   method_bytecodet &,
-  java_string_library_preprocesst &string_preprocess);
+  java_string_library_preprocesst &string_preprocess,
+  const std::unordered_set<std::string> &no_load_classes);
 
 void mark_java_implicitly_generic_class_type(
   const irep_idt &class_name,
