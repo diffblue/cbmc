@@ -208,6 +208,7 @@ array_exprt interval_sparse_arrayt::concretize(
   const array_typet array_type(
     default_value.type(), from_integer(size, index_type));
   array_exprt array(array_type);
+  array.operands().reserve(size);
 
   std::size_t current_index = 0;
   for(const auto &pair : entries)
