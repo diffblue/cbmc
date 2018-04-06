@@ -35,7 +35,8 @@ public:
     mode(modet::NONE),
     cpp98(false),
     cpp11(false),
-    for_has_scope(false)
+    for_has_scope(false),
+    symbol_table(nullptr)
   {
   }
 
@@ -59,6 +60,8 @@ public:
     // set up global scope
     scopes.clear();
     scopes.push_back(scopet());
+
+    symbol_table = nullptr;
   }
 
   // internal state of the scanner
@@ -139,6 +142,14 @@ public:
     lookup(base_name, identifier, false, true);
     return identifier;
   }
+
+  void set_symbol_table(const symbol_tablet &st)
+  {
+    symbol_table = &st;
+  }
+
+private:
+  const symbol_tablet *symbol_table;
 };
 
 extern ansi_c_parsert ansi_c_parser;

@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/make_unique.h>
+#include <util/symbol_table.h>
 
 #include <langapi/language.h>
 
@@ -29,6 +30,9 @@ public:
   bool parse(
     std::istream &instream,
     const std::string &path) override;
+
+  bool
+  parse(std::istream &instream, const std::string &path, const symbol_tablet &);
 
   bool generate_support_functions(
     symbol_tablet &symbol_table) override;
@@ -75,6 +79,7 @@ public:
 protected:
   ansi_c_parse_treet parse_tree;
   std::string parse_path;
+  symbol_tablet new_symbol_table;
 };
 
 std::unique_ptr<languaget> new_ansi_c_language();
