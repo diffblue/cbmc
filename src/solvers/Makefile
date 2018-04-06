@@ -218,7 +218,7 @@ INCLUDES += -I .. \
 	$(PRECOSAT_INCLUDE) $(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
 
 CLEANFILES = solvers$(LIBEXT) \
-  smt2_solver$(EXEEXT) smt2/smt2_solver$(OBJEXT) smt2/smt2_solver.d
+  smt2_solver$(EXEEXT) smt2/smt2_solver$(OBJEXT) smt2/smt2_solver$(DEPEXT)
 
 all: solvers$(LIBEXT) smt2_solver$(EXEEXT)
 
@@ -229,10 +229,6 @@ ifneq ($(CUDD),)
   CP_CXXFLAGS += -DHAVE_QBF_CORE
 endif
 endif
-
-# extra dependencies
-
--include $(SRC:.cpp=.d)
 
 SOLVER_LIB = $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
         $(MINISAT2_LIB) $(SMVSAT_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
