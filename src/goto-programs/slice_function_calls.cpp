@@ -132,26 +132,30 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
     root_node.node_index = root_index;
     slice_function_graph[root_index] = root_node;
 
+    unsigned slice_function_location = root_node.location_number;
+
     slice_nodest slice_nodes = get_function_parameters(
       variable_bounds_map, entry.second, entry.first.second);
 
     for(auto &node : slice_nodes)
     {
       slice_nodet::node_indext index = slice_function_graph.add_node();
+      node.node_index = index;
       slice_function_graph[index] = node;
       slice_function_graph.add_edge(root_index, index);
-      node.node_index = index;
 
 #ifdef DEBUG
       std::cout << "connect " << root_index << " and " << index << std::endl;
 #endif
     }
 
-#ifdef DEBUG
     // see where the function parameters are also referenced
     for(const auto &instruction :
         goto_function.get_goto_function().body.instructions)
     {
+      if(instruction.location_number == slice_function_location)
+        continue;
+
       for(const auto &node : slice_nodes)
       {
         if(instruction.location_number >= node.slice_param_bounds.lower_bound &&
@@ -159,13 +163,26 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
         {
           if(is_referenced(instruction, variable_bounds_map, node.name))
           {
+#ifdef DEBUG
             std::cout << "Found " << node.name << " in instruction "
                       << instruction.to_string() << std::endl;
+#endif
+            // create new "other" node
+            slice_nodet slice_node;
+            slice_node.slice_node_type = slice_node_typet::OTHER;
+            slice_node.location_number = instruction.location_number;
+            slice_nodet::node_indext node_index = slice_function_graph.add_node();
+            slice_node.node_index = node_index;
+            slice_function_graph[node_index] = slice_node;
+            slice_function_graph.add_edge(node_index, node.node_index);
+#ifdef DEBUG
+            std::cout << "connect " << node_index << " and " << node.node_index
+                      << std::endl;
+#endif
           }
         }
       }
     }
-#endif
   }
 }
 

@@ -21,7 +21,8 @@ enum class slice_node_typet
 {
   FUNCTION_PARAMETER,
   LOCAL_VARIABLE,
-  FUNCTION_CALL
+  FUNCTION_CALL,
+  OTHER
 };
 
 struct slice_param_boundst
