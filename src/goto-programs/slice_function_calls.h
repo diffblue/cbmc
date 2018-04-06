@@ -37,6 +37,7 @@ struct slice_nodet : public graph_nodet<empty_edget>
   // bounds only used for local variables
   slice_param_boundst slice_param_bounds;
   unsigned location_number = 0;
+  node_indext node_index;
 };
 
 typedef grapht<slice_nodet> slice_function_grapht;

@@ -129,16 +129,19 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
     root_node.name = entry.first.first;
     root_node.location_number = entry.first.second;
     slice_nodet::node_indext root_index = slice_function_graph.add_node();
+    root_node.node_index = root_index;
     slice_function_graph[root_index] = root_node;
 
     slice_nodest slice_nodes = get_function_parameters(
       variable_bounds_map, entry.second, entry.first.second);
 
-    for(const auto &node : slice_nodes)
+    for(auto &node : slice_nodes)
     {
       slice_nodet::node_indext index = slice_function_graph.add_node();
       slice_function_graph[index] = node;
       slice_function_graph.add_edge(root_index, index);
+      node.node_index = index;
+
 #ifdef DEBUG
       std::cout << "connect " << root_index << " and " << index << std::endl;
 #endif
