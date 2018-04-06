@@ -24,6 +24,7 @@ ifeq ($(filter-out Unix MinGW OSX OSX_Universal FreeBSD,$(BUILD_ENV_)),)
   # Linux-ish
   LIBEXT = .a
   OBJEXT = .o
+  DEPEXT = .d
 ifeq ($(BUILD_ENV_),MinGW)
   EXEEXT = .exe
 else
@@ -96,6 +97,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   # use these for Cygwin:
   LIBEXT = .a
   OBJEXT = .o
+  DEPEXT = .d
   EXEEXT = .exe
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
@@ -128,6 +130,7 @@ else ifeq ($(BUILD_ENV_),MSVC)
   # use these for Visual Studio:
   LIBEXT = .lib
   OBJEXT = .obj
+  DEPEXT = .dep
   EXEEXT = .exe
   CFLAGS ?= /W3 /O2 /GF
   CXXFLAGS ?= /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF
@@ -208,7 +211,7 @@ CP_CXXFLAGS += $(CXXFLAGS) $(INCLUDES)
 OBJ += $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC)))
 OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))
 
-.SUFFIXES: .cc .d .cpp
+.SUFFIXES: .cc $(DEPEXT) .cpp
 
 %.o:%.cpp
 	$(CXX) -c $(CP_CXXFLAGS) -o $@ $<
@@ -231,9 +234,9 @@ OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))
 
 clean:
 	$(RM) $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC))) \
-		$(patsubst %.cpp, %.d, $(filter %.cpp, $(SRC))) \
+		$(patsubst %.cpp, %$(DEPEXT), $(filter %.cpp, $(SRC))) \
 		$(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC))) \
-		$(patsubst %.cc, %.d, $(filter %.cc, $(SRC))) \
+		$(patsubst %.cc, %$(DEPEXT), $(filter %.cc, $(SRC))) \
 		$(CLEANFILES)
 
 .PHONY: first_target clean all
@@ -250,8 +253,8 @@ sources: Makefile
 # include .depend
 # endif
 
-D_FILES1 = $(SRC:.c=.d)
-D_FILES = $(D_FILES1:.cpp=.d)
+D_FILES1 = $(SRC:.c=$(DEPEXT))
+D_FILES = $(D_FILES1:.cpp=$(DEPEXT))
 
 -include $(D_FILES)
 
