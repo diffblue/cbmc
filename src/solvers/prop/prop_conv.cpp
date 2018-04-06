@@ -62,7 +62,7 @@ literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
     return result.first->second;
 
   literalt literal=prop.new_variable();
-  prop.set_variable_name(literal, id2string(identifier));
+  prop.set_variable_name(literal, identifier);
 
   // insert
   result.first->second=literal;
