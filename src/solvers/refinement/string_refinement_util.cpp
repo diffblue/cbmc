@@ -210,16 +210,15 @@ array_exprt interval_sparse_arrayt::concretize(
   array_exprt array(array_type);
   array.operands().reserve(size);
 
-  std::size_t current_index = 0;
-  for(const auto &pair : entries)
-  {
-    for(; current_index <= pair.first && current_index < size; ++current_index)
-      array.operands().push_back(pair.second);
-  }
-  for(; current_index < size; ++current_index)
-    array.operands().push_back(default_value);
+  auto it = entries.begin();
+  for(; it != entries.end() && it->first < size; ++it)
+    array.operands().resize(it->first + 1, it->second);
+
+  array.operands().resize(
+    size, it == entries.end() ? default_value : it->second);
   return array;
 }
+
 void equation_symbol_mappingt::add(const std::size_t i, const exprt &expr)
 {
   equations_containing[expr].push_back(i);
