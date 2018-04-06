@@ -841,6 +841,8 @@ IREP_ID_TWO(java_lambda_method_handles, lambda_method_handles)
 IREP_ID_ONE(havoc_object)
 IREP_ID_TWO(overflow_shl, overflow-shl)
 IREP_ID_TWO(C_no_initialization_required, #no_initialization_required)
+IREP_ID_TWO(overlay_class, java::com.diffblue.OverlayClassImplementation)
+IREP_ID_TWO(overlay_method, java::com.diffblue.OverlayMethodImplementation)
 
 #undef IREP_ID_ONE
 #undef IREP_ID_TWO
