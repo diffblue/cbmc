@@ -1,10 +1,8 @@
+#ifdef LIBRARY_CHECK
+#include <setjmp.h>
+#endif
 
 /* FUNCTION: longjmp */
-
-#ifndef __CPROVER_SETJMP_H_INCLUDED
-#include <setjmp.h>
-#define __CPROVER_SETJMP_H_INCLUDED
-#endif
 
 inline void longjmp(jmp_buf env, int val)
 {
@@ -16,11 +14,6 @@ inline void longjmp(jmp_buf env, int val)
 
 /* FUNCTION: _longjmp */
 
-#ifndef __CPROVER_SETJMP_H_INCLUDED
-#include <setjmp.h>
-#define __CPROVER_SETJMP_H_INCLUDED
-#endif
-
 inline void _longjmp(jmp_buf env, int val)
 {
   // does not return
@@ -31,11 +24,6 @@ inline void _longjmp(jmp_buf env, int val)
 
 /* FUNCTION: siglongjmp */
 
-#ifndef __CPROVER_SETJMP_H_INCLUDED
-#include <setjmp.h>
-#define __CPROVER_SETJMP_H_INCLUDED
-#endif
-
 inline void siglongjmp(sigjmp_buf env, int val)
 {
   // does not return
@@ -45,11 +33,6 @@ inline void siglongjmp(sigjmp_buf env, int val)
 }
 
 /* FUNCTION: setjmp */
-
-#ifndef __CPROVER_SETJMP_H_INCLUDED
-#include <setjmp.h>
-#define __CPROVER_SETJMP_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 

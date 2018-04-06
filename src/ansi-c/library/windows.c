@@ -1,7 +1,12 @@
+#ifdef _WIN32
+#ifdef LIBRARY_CHECK
+#include <windows.h>
+#endif
+#endif
+
 /* FUNCTION: QueryPerformanceFrequency */
 
 #ifdef _WIN32
-#include <windows.h>
 
 BOOL QueryPerformanceFrequency(LARGE_INTEGER *lpFrequency)
 {
@@ -18,7 +23,6 @@ BOOL QueryPerformanceFrequency(LARGE_INTEGER *lpFrequency)
 /* FUNCTION: ExitThread */
 
 #ifdef _WIN32
-#include <windows.h>
 
 inline VOID ExitThread(DWORD dwExitCode)
 {
@@ -30,7 +34,6 @@ inline VOID ExitThread(DWORD dwExitCode)
 /* FUNCTION: CreateThread */
 
 #ifdef _WIN32
-#include <windows.h>
 
 inline HANDLE CreateThread(
   LPSECURITY_ATTRIBUTES lpThreadAttributes,

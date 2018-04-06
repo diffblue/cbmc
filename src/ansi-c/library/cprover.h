@@ -38,6 +38,7 @@ void __CPROVER_cover(__CPROVER_bool condition);
 
 void __CPROVER_input(const char *id, ...);
 void __CPROVER_output(const char *id, ...);
+int __CPROVER_printf(const char *fmt, ...);
 
 // concurrency-related
 void __CPROVER_atomic_begin();

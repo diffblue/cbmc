@@ -1,15 +1,16 @@
+#ifdef LIBRARY_CHECK
+#include <getopt.h>
+#endif
+
 /* FUNCTION: getopt */
 
 extern char *optarg;
 extern int optind;
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
+__CPROVER_size_t strlen(const char *s);
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-size_t __VERIFIER_nondet_size_t();
+__CPROVER_size_t __VERIFIER_nondet_size_t();
 
 inline int getopt(
   int argc, char * const argv[], const char *optstring)
@@ -23,7 +24,7 @@ inline int getopt(
   if(optind>=argc || argv[optind][0]!='-')
     return -1;
 
-  size_t result_index=__VERIFIER_nondet_size_t();
+  __CPROVER_size_t result_index = __VERIFIER_nondet_size_t();
   __CPROVER_assume(
     result_index<strlen(optstring) && optstring[result_index]!=':');
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -49,7 +50,7 @@ inline int getopt(
       ++optind;
     }
     else
-      optarg=NULL;
+      optarg = 0;
   }
 
   return result;
@@ -57,10 +58,7 @@ inline int getopt(
 
 /* FUNCTION: getopt_long */
 
-#ifndef __CPROVER_GETOPT_H_INCLUDED
-#include <getopt.h>
-#define __CPROVER_GETOPT_H_INCLUDED
-#endif
+int getopt(int argc, char *const argv[], const char *optstring);
 
 inline int getopt_long(
   int argc,

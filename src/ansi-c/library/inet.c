@@ -1,11 +1,16 @@
+#ifndef _WIN32
+#ifdef LIBRARY_CHECK
+#include <arpa/inet.h>
+#undef htonl
+#undef htons
+#undef ntohl
+#undef ntohs
+#endif
+#endif
+
 /* FUNCTION: inet_addr */
 
 #ifndef _WIN32
-
-#ifndef __CPROVER_INET_H_INCLUDED
-#include <arpa/inet.h>
-#define __CPROVER_INET_H_INCLUDED
-#endif
 
 in_addr_t __VERIFIER_nondet_in_addr_t();
 
@@ -27,11 +32,6 @@ in_addr_t inet_addr(const char *cp)
 /* FUNCTION: inet_aton */
 
 #ifndef _WIN32
-
-#ifndef __CPROVER_INET_H_INCLUDED
-#include <arpa/inet.h>
-#define __CPROVER_INET_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 
@@ -55,11 +55,6 @@ int inet_aton(const char *cp, struct in_addr *pin)
 
 #ifndef _WIN32
 
-#ifndef __CPROVER_INET_H_INCLUDED
-#include <arpa/inet.h>
-#define __CPROVER_INET_H_INCLUDED
-#endif
-
 in_addr_t __VERIFIER_nondet_in_addr_t();
 
 in_addr_t inet_network(const char *cp)
@@ -79,16 +74,9 @@ in_addr_t inet_network(const char *cp)
 
 /* FUNCTION: htonl */
 
-#ifndef __CPROVER_STDINT_H_INCLUDED
-#include <stdint.h>
-#define __CPROVER_STDINT_H_INCLUDED
-#endif
+unsigned int __builtin_bswap32(unsigned int);
 
-#undef htonl
-
-uint32_t __builtin_bswap32(uint32_t);
-
-uint32_t htonl(uint32_t hostlong)
+unsigned int htonl(unsigned int hostlong)
 {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   return __builtin_bswap32(hostlong);
@@ -99,16 +87,9 @@ uint32_t htonl(uint32_t hostlong)
 
 /* FUNCTION: htons */
 
-#ifndef __CPROVER_STDINT_H_INCLUDED
-#include <stdint.h>
-#define __CPROVER_STDINT_H_INCLUDED
-#endif
+unsigned short __builtin_bswap16(unsigned short);
 
-#undef htons
-
-uint16_t __builtin_bswap16(uint16_t);
-
-uint16_t htons(uint16_t hostshort)
+unsigned short htons(unsigned short hostshort)
 {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   return __builtin_bswap16(hostshort);
@@ -120,16 +101,9 @@ uint16_t htons(uint16_t hostshort)
 
 /* FUNCTION: ntohl */
 
-#ifndef __CPROVER_STDINT_H_INCLUDED
-#include <stdint.h>
-#define __CPROVER_STDINT_H_INCLUDED
-#endif
+unsigned int __builtin_bswap32(unsigned int);
 
-#undef ntohl
-
-uint32_t __builtin_bswap32(uint32_t);
-
-uint32_t ntohl(uint32_t netlong)
+unsigned int ntohl(unsigned int netlong)
 {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   return __builtin_bswap32(netlong);
@@ -141,16 +115,9 @@ uint32_t ntohl(uint32_t netlong)
 
 /* FUNCTION: ntohs */
 
-#ifndef __CPROVER_STDINT_H_INCLUDED
-#include <stdint.h>
-#define __CPROVER_STDINT_H_INCLUDED
-#endif
+unsigned short __builtin_bswap16(unsigned short);
 
-#undef ntohs
-
-uint16_t __builtin_bswap16(uint16_t);
-
-uint16_t ntohs(uint16_t netshort)
+unsigned short ntohs(unsigned short netshort)
 {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   return __builtin_bswap16(netshort);

@@ -714,11 +714,6 @@ __CPROVER_hide:;
  *      square root (i.e. the real value of the square root rounded).
  */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -801,11 +796,6 @@ float sqrtf(float f)
 
 /* The same caveats as sqrtf apply */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -871,11 +861,6 @@ double sqrt(double d)
 /* FUNCTION: sqrtl */
 
 /* The same caveats as sqrtf apply */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -962,34 +947,28 @@ long double sqrtl(long double d)
 
 /* FUNCTION: fmax */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-double fmax(double f, double g) { return ((f >= g) || isnan(g)) ? f : g; }
+double fmax(double f, double g)
+{
+  return ((f >= g) || __CPROVER_isnand(g)) ? f : g;
+}
 
 /* FUNCTION : fmaxf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-float fmaxf(float f, float g) { return ((f >= g) || isnan(g)) ? f : g; }
+float fmaxf(float f, float g)
+{
+  return ((f >= g) || __CPROVER_isnanf(g)) ? f : g;
+}
 
 
 /* FUNCTION : fmaxl */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-long double fmaxl(long double f, long double g) { return ((f >= g) || isnan(g)) ? f : g; }
+long double fmaxl(long double f, long double g)
+{
+  return ((f >= g) || __CPROVER_isnanld(g)) ? f : g;
+}
 
 
 /* ISO 9899:2011
@@ -1006,33 +985,27 @@ long double fmaxl(long double f, long double g) { return ((f >= g) || isnan(g)) 
 
 /* FUNCTION: fmin */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
- 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-double fmin(double f, double g) { return ((f <= g) || isnan(g)) ? f : g; }
+double fmin(double f, double g)
+{
+  return ((f <= g) || __CPROVER_isnand(g)) ? f : g;
+}
 
 /* FUNCTION: fminf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB 
-float fminf(float f, float g) { return ((f <= g) || isnan(g)) ? f : g; }
+float fminf(float f, float g)
+{
+  return ((f <= g) || __CPROVER_isnanf(g)) ? f : g;
+}
 
 /* FUNCTION: fminl */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB 
-long double fminl(long double f, long double g) { return ((f <= g) || isnan(g)) ? f : g; }
+long double fminl(long double f, long double g)
+{
+  return ((f <= g) || __CPROVER_isnanld(g)) ? f : g;
+}
 
 
 /* ISO 9899:2011
@@ -1045,30 +1018,15 @@ long double fminl(long double f, long double g) { return ((f <= g) || isnan(g)) 
 
 /* FUNCTION: fdim */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 double fdim(double f, double g) { return ((f > g) ? f - g : +0.0); }
 
 
 /* FUNCTION: fdimf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 float fdimf(float f, float g) { return ((f > g) ? f - g : +0.0f); }
 
 
 /* FUNCTION: fdiml */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 long double fdiml(long double f, long double g) { return ((f > g) ? f - g : +0.0); }
 
@@ -1077,15 +1035,8 @@ long double fdiml(long double f, long double g) { return ((f > g) ? f - g : +0.0
 /* FUNCTION: __sort_of_CPROVER_round_to_integral */
 // TODO : Should be a real __CPROVER function to convert to SMT-LIB
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
+int fegetround();
+int fesetround(int);
 
 double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
 {
@@ -1116,15 +1067,8 @@ double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
 /* FUNCTION: __sort_of_CPROVER_round_to_integralf */
 // TODO : Should be a real __CPROVER function to convert to SMT-LIB
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
+int fegetround();
+int fesetround(int);
 
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
 {
@@ -1156,15 +1100,8 @@ float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
 /* FUNCTION: __sort_of_CPROVER_round_to_integrall */
 // TODO : Should be a real __CPROVER function to convert to SMT-LIB
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
+int fegetround();
+int fesetround(int);
 
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
 {
@@ -1200,11 +1137,6 @@ long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double
 
 /* FUNCTION: ceil */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -1218,11 +1150,6 @@ double ceil(double x)
 }
 
 /* FUNCTION: ceilf */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -1238,11 +1165,6 @@ float ceilf(float x)
 
 
 /* FUNCTION: ceill */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -1264,11 +1186,6 @@ long double ceill(long double x)
 
 /* FUNCTION: floor */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -1282,11 +1199,6 @@ double floor(double x)
 }
 
 /* FUNCTION: floorf */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -1302,11 +1214,6 @@ float floorf(float x)
 
 
 /* FUNCTION: floorl */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -1329,11 +1236,6 @@ long double floorl(long double x)
 
 /* FUNCTION: trunc */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -1347,11 +1249,6 @@ double trunc(double x)
 }
 
 /* FUNCTION: truncf */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -1367,11 +1264,6 @@ float truncf(float x)
 
 
 /* FUNCTION: truncl */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -1393,11 +1285,6 @@ long double truncl(long double x)
  */
 
 /* FUNCTION: round */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -1430,11 +1317,6 @@ double round(double x)
 
 /* FUNCTION: roundf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -1466,11 +1348,6 @@ float roundf(float x)
 
 
 /* FUNCTION: roundl */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -1512,17 +1389,8 @@ long double roundl(long double x)
 
 /* FUNCTION: nearbyint */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+int fegetround();
 
 double nearbyint(double x)
 {
@@ -1531,17 +1399,8 @@ double nearbyint(double x)
 
 /* FUNCTION: nearbyintf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+int fegetround();
 
 float nearbyintf(float x)
 {
@@ -1551,17 +1410,8 @@ float nearbyintf(float x)
 
 /* FUNCTION: nearbyintl */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+int fegetround();
 
 long double nearbyintl(long double x)
 {
@@ -1579,17 +1429,8 @@ long double nearbyintl(long double x)
 
 /* FUNCTION: rint */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+int fegetround();
 
 double rint(double x)
 {
@@ -1598,17 +1439,8 @@ double rint(double x)
 
 /* FUNCTION: rintf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+int fegetround();
 
 float rintf(float x)
 {
@@ -1617,17 +1449,8 @@ float rintf(float x)
 
 /* FUNCTION: rintl */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+int fegetround();
 
 long double rintl(long double x)
 {
@@ -1647,17 +1470,8 @@ long double rintl(long double x)
 
 /* FUNCTION: lrint */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+int fegetround();
 
 long int lrint(double x)
 {
@@ -1669,17 +1483,8 @@ long int lrint(double x)
 
 /* FUNCTION: lrintf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+int fegetround();
 
 long int lrintf(float x)
 {
@@ -1692,17 +1497,8 @@ long int lrintf(float x)
 
 /* FUNCTION: lrintl */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+int fegetround();
 
 long int lrintl(long double x)
 {
@@ -1715,17 +1511,8 @@ long int lrintl(long double x)
 
 /* FUNCTION: llrint */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+int fegetround();
 
 long long int llrint(double x)
 {
@@ -1737,17 +1524,8 @@ long long int llrint(double x)
 
 /* FUNCTION: llrintf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+int fegetround();
 
 long long int llrintf(float x)
 {
@@ -1760,17 +1538,8 @@ long long int llrintf(float x)
 
 /* FUNCTION: llrintl */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+int fegetround();
 
 long long int llrintl(long double x)
 {
@@ -1791,11 +1560,6 @@ long long int llrintl(long double x)
  */
 
 /* FUNCTION: lround */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -1829,11 +1593,6 @@ long int lround(double x)
 
 /* FUNCTION: lroundf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -1865,11 +1624,6 @@ long int lroundf(float x)
 
 
 /* FUNCTION: lroundl */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -1903,11 +1657,6 @@ long int lroundl(long double x)
 
 /* FUNCTION: llround */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -1938,11 +1687,6 @@ long long int llround(double x)
 }
 
 /* FUNCTION: llroundf */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -1975,11 +1719,6 @@ long long int llroundf(float x)
 
 
 /* FUNCTION: llroundl */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -2021,11 +1760,6 @@ long long int llroundl(long double x)
 
 /* FUNCTION: modf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -2040,11 +1774,6 @@ double modf(double x, double *iptr)
 }
 
 /* FUNCTION: modff */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -2061,11 +1790,6 @@ float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 
 /* FUNCTION: modfl */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -2145,11 +1869,6 @@ long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long
 
 /* FUNCTION: fmod */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -2162,11 +1881,6 @@ double fmod(double x, double y) { return __sort_of_CPROVER_remainder(FE_TOWARDZE
 
 /* FUNCTION: fmodf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -2178,11 +1892,6 @@ float fmodf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TOWARDZER
 
 
 /* FUNCTION: fmodl */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -2210,11 +1919,6 @@ long double fmodl(long double x, long double y) { return __sort_of_CPROVER_remai
 
 /* FUNCTION: remainder */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -2227,11 +1931,6 @@ double remainder(double x, double y) { return __sort_of_CPROVER_remainder(FE_TON
 
 /* FUNCTION: remainderf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
 #define __CPROVER_FENV_H_INCLUDED
@@ -2243,11 +1942,6 @@ float remainderf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TONE
 
 
 /* FUNCTION: remainderl */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_FENV_H_INCLUDED
 #include <fenv.h>
@@ -2271,47 +1965,26 @@ long double remainderl(long double x, long double y) { return __sort_of_CPROVER_
 
 /* FUNCTION: copysign */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-double fabs (double d);
-
 double copysign(double x, double y)
 {
-  double abs = fabs(x);
-  return (signbit(y)) ? -abs : abs;
+  double abs = __CPROVER_fabs(x);
+  return (__CPROVER_signd(y)) ? -abs : abs;
 }
 
 /* FUNCTION: copysignf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-float fabsf (float d);
-
 float copysignf(float x, float y)
 {
-  float abs = fabs(x);
-  return (signbit(y)) ? -abs : abs;
+  float abs = __CPROVER_fabs(x);
+  return (__CPROVER_signf(y)) ? -abs : abs;
 }
 
 /* FUNCTION: copysignl */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-long double fabsl (long double d);
-
 long double copysignl(long double x, long double y)
 {
-  long double abs = fabsl(x);
-  return (signbit(y)) ? -abs : abs;
+  long double abs = __CPROVER_fabsl(x);
+  return (__CPROVER_signld(y)) ? -abs : abs;
 }
 
 

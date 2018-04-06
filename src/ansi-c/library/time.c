@@ -1,11 +1,8 @@
-/* FUNCTION: time */
-
-#ifndef __CPROVER_TIME_H_INCLUDED
+#ifdef LIBRARY_CHECK
 #include <time.h>
-#define __CPROVER_TIME_H_INCLUDED
 #endif
 
-#undef time
+/* FUNCTION: time */
 
 time_t __VERIFIER_nondet_time_t();
 
@@ -17,13 +14,6 @@ time_t time(time_t *tloc)
 }
 
 /* FUNCTION: gmtime */
-
-#ifndef __CPROVER_TIME_H_INCLUDED
-#include <time.h>
-#define __CPROVER_TIME_H_INCLUDED
-#endif
-
-#undef gmtime
 
 struct tm *gmtime(const time_t *clock)
 {
@@ -43,13 +33,6 @@ struct tm *gmtime(const time_t *clock)
 
 /* FUNCTION: gmtime_r */
 
-#ifndef __CPROVER_TIME_H_INCLUDED
-#include <time.h>
-#define __CPROVER_TIME_H_INCLUDED
-#endif
-
-#undef gmtime
-
 struct tm *gmtime_r(const time_t *clock, struct tm *result)
 {
   // need to set the fields to something meaningful
@@ -58,13 +41,6 @@ struct tm *gmtime_r(const time_t *clock, struct tm *result)
 }
 
 /* FUNCTION: localtime */
-
-#ifndef __CPROVER_TIME_H_INCLUDED
-#include <time.h>
-#define __CPROVER_TIME_H_INCLUDED
-#endif
-
-#undef localtime
 
 struct tm *localtime(const time_t *clock)
 {
@@ -84,13 +60,6 @@ struct tm *localtime(const time_t *clock)
 
 /* FUNCTION: localtime_r */
 
-#ifndef __CPROVER_TIME_H_INCLUDED
-#include <time.h>
-#define __CPROVER_TIME_H_INCLUDED
-#endif
-
-#undef localtime
-
 struct tm *localtime_r(const time_t *clock, struct tm *result)
 {
   // need to set the fields to something meaningful
@@ -99,13 +68,6 @@ struct tm *localtime_r(const time_t *clock, struct tm *result)
 }
 
 /* FUNCTION: mktime */
-
-#ifndef __CPROVER_TIME_H_INCLUDED
-#include <time.h>
-#define __CPROVER_TIME_H_INCLUDED
-#endif
-
-#undef mktime
 
 time_t __VERIFIER_nondet_time_t();
 
@@ -118,13 +80,6 @@ time_t mktime(struct tm *timeptr)
 
 /* FUNCTION: timegm */
 
-#ifndef __CPROVER_TIME_H_INCLUDED
-#include <time.h>
-#define __CPROVER_TIME_H_INCLUDED
-#endif
-
-#undef timegm
-
 time_t __VERIFIER_nondet_time_t();
 
 time_t timegm(struct tm *timeptr)
@@ -135,11 +90,6 @@ time_t timegm(struct tm *timeptr)
 }
 
 /* FUNCTION: asctime */
-
-#ifndef __CPROVER_TIME_H_INCLUDED
-#include <time.h>
-#define __CPROVER_TIME_H_INCLUDED
-#endif
 
 char *asctime(const struct tm *timeptr)
 {
@@ -156,11 +106,6 @@ char *asctime(const struct tm *timeptr)
 }
 
 /* FUNCTION: ctime */
-
-#ifndef __CPROVER_TIME_H_INCLUDED
-#include <time.h>
-#define __CPROVER_TIME_H_INCLUDED
-#endif
 
 char *ctime(const time_t *clock)
 {
