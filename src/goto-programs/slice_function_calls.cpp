@@ -112,6 +112,8 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
 
   // construct graph
   slice_function_grapht slice_function_graph;
+  std::set<unsigned> location_numbers_to_remove;
+
   for(const auto &entry : function_param_map)
   {
 #ifdef DEBUG
@@ -180,6 +182,106 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
                       << std::endl;
 #endif
           }
+        }
+      }
+    }
+
+    size_t graph_size = slice_function_graph.size();
+
+    // remove edges from dependency graph
+    bool changed = true;
+    while(changed)
+    {
+      changed = false;
+      // find sliceable (non-OTHER) node without incoming dependencies
+      for(size_t i = 0; i < graph_size; i++)
+      {
+        const slice_nodet &slice_node = slice_function_graph[i];
+        if(slice_node.slice_node_type == slice_node_typet::OTHER)
+          continue;
+
+        const auto &in_edges = slice_function_graph.in(i);
+        const auto &out_edges = slice_function_graph.out(i);
+        if(in_edges.empty() && !out_edges.empty())
+        {
+#ifdef DEBUG
+          std::cout << "found empty in_edges for active node " << i << std::endl;
+#endif
+          for(const auto &out_edge : out_edges)
+          {
+            slice_function_graph.remove_edge(i, out_edge.first);
+#ifdef DEBUG
+            std::cout << "remove (" << i << ", " << out_edge.first << ") ";
+#endif
+          }
+          changed = true;
+#ifdef DEBUG
+          std::cout << std::endl;
+#endif
+
+          // add sliced function call to instructions to remove
+          if(slice_node.slice_node_type == slice_node_typet::FUNCTION_CALL)
+            location_numbers_to_remove.insert(slice_node.location_number);
+        }
+      }
+    }
+  }
+
+  // remove decl/dead/assign for unused variables
+  std::set<irep_idt> sliced_local_variables;
+  size_t graph_size = slice_function_graph.size();
+  for(size_t i = 0; i < graph_size; i++)
+  {
+    const slice_nodet &slice_node = slice_function_graph[i];
+    if(slice_node.slice_node_type == slice_node_typet::LOCAL_VARIABLE)
+    {
+      if(slice_function_graph.in(i).empty())
+        sliced_local_variables.insert(slice_node.name);
+    }
+  }
+
+  // transform instructions to slice into SKIP
+  for(auto &instruction : goto_function.get_goto_function().body.instructions)
+  {
+    if(
+      location_numbers_to_remove.find(instruction.location_number) !=
+      location_numbers_to_remove.end())
+    {
+      instruction.make_skip();
+    }
+    else if(
+      instruction.type == goto_program_instruction_typet::DECL)
+    {
+      const code_declt &code_decl = to_code_decl(instruction.code);
+      if(
+        sliced_local_variables.find(code_decl.get_identifier()) !=
+        sliced_local_variables.end())
+      {
+        instruction.make_skip();
+      }
+    }
+    else if(instruction.type == goto_program_instruction_typet::DEAD)
+    {
+      const code_deadt &code_dead = to_code_dead(instruction.code);
+      if(
+        sliced_local_variables.find(code_dead.get_identifier()) !=
+        sliced_local_variables.end())
+      {
+        instruction.make_skip();
+      }
+    }
+    else if(instruction.type == goto_program_instruction_typet::ASSIGN)
+    {
+      const code_assignt &code_assign = to_code_assign(instruction.code);
+      const exprt &lhs = code_assign.lhs();
+      if(lhs.id() == ID_symbol)
+      {
+        const symbol_exprt &lhs_symbol_expr = to_symbol_expr(lhs);
+        if(
+          sliced_local_variables.find(lhs_symbol_expr.get_identifier()) !=
+          sliced_local_variables.end())
+        {
+          instruction.make_skip();
         }
       }
     }
