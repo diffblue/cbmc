@@ -217,7 +217,8 @@ INCLUDES += -I .. \
   $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
 	$(PRECOSAT_INCLUDE) $(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
 
-CLEANFILES = solvers$(LIBEXT) smt2_solver$(EXEEXT)
+CLEANFILES = solvers$(LIBEXT) \
+  smt2_solver$(EXEEXT) smt2/smt2_solver$(OBJEXT) smt2/smt2_solver.d
 
 all: solvers$(LIBEXT) smt2_solver$(EXEEXT)
 
