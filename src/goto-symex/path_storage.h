@@ -84,6 +84,22 @@ private:
   virtual void private_pop() = 0;
 };
 
+/// \brief LIFO save queue: depth-first search, try to finish paths
+class path_lifot : public path_storaget
+{
+public:
+  void push(const patht &, const patht &) override;
+  std::size_t size() const override;
+
+protected:
+  std::list<path_storaget::patht>::iterator last_peeked;
+  std::list<patht> paths;
+
+private:
+  patht &private_peek() override;
+  void private_pop() override;
+};
+
 /// \brief FIFO save queue: paths are resumed in the order that they were saved
 class path_fifot : public path_storaget
 {
@@ -134,7 +150,7 @@ public:
 protected:
   std::string default_strategy() const
   {
-    return "fifo";
+    return "lifo";
   }
 
   /// Map from the name of a strategy (to be supplied on the command line), to
