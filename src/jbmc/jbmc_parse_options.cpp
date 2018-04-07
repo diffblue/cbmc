@@ -56,6 +56,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_enum_static_init_unwind_handler.h>
 #include <java_bytecode/replace_java_nondet.h>
+#include <java_bytecode/remove_java_new.h>
 
 #include <cbmc/version.h>
 
@@ -711,6 +712,8 @@ void jbmc_parse_optionst::process_goto_function(
 
   try
   {
+    // Replace Java new side effects
+    remove_java_new(goto_function, symbol_table, get_message_handler());
     // Removal of RTTI inspection:
     remove_instanceof(goto_function, symbol_table);
     // Java virtual functions -> explicit dispatch tables:
