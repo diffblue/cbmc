@@ -754,42 +754,14 @@ void goto_convertt::convert_assign(
     Forall_operands(it, rhs)
       clean_expr(*it, dest);
 
+    // TODO: This should be done in a separate pass
     do_cpp_new(lhs, to_side_effect_expr(rhs), dest);
   }
-  else if(rhs.id()==ID_side_effect &&
-          rhs.get(ID_statement)==ID_java_new)
-  {
-    Forall_operands(it, rhs)
-      clean_expr(*it, dest);
-
-    do_java_new(lhs, to_side_effect_expr(rhs), dest);
-  }
-  else if(rhs.id()==ID_side_effect &&
-          rhs.get(ID_statement)==ID_java_new_array)
-  {
-    Forall_operands(it, rhs)
-      clean_expr(*it, dest);
-
-    do_java_new_array(lhs, to_side_effect_expr(rhs), dest);
-  }
-  else if(
-    rhs.id() == ID_side_effect &&
-    (rhs.get(ID_statement) == ID_allocate ||
-     rhs.get(ID_statement) == ID_java_new_array_data))
+  else
   {
     // just preserve
     Forall_operands(it, rhs)
       clean_expr(*it, dest);
-
-    code_assignt new_assign(code);
-    new_assign.lhs()=lhs;
-    new_assign.rhs()=rhs;
-
-    copy(new_assign, ASSIGN, dest);
-  }
-  else
-  {
-    clean_expr(rhs, dest);
 
     if(lhs.id()==ID_typecast)
     {
