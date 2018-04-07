@@ -24,7 +24,6 @@ OBJ += ../big-int/big-int$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
-      ../java_bytecode/java_bytecode$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \

@@ -19,7 +19,6 @@ target_link_libraries(goto-cc-lib
     langapi
 )
 
-add_if_library(goto-cc-lib java_bytecode)
 add_if_library(goto-cc-lib jsil)
 
 # Executable

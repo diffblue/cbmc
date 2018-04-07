@@ -25,7 +25,6 @@ target_link_libraries(clobber-lib
 )
 
 add_if_library(clobber-lib bv_refinement)
-add_if_library(clobber-lib java_bytecode)
 add_if_library(clobber-lib specc)
 add_if_library(clobber-lib php)
 
