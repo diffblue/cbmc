@@ -199,7 +199,6 @@ SRC = $(BOOLEFORCE_SRC) \
       sat/cnf_clause_list.cpp \
       sat/dimacs_cnf.cpp \
       sat/pbs_dimacs_cnf.cpp \
-      sat/read_dimacs_cnf.cpp \
       sat/resolution_proof.cpp \
       sat/satcheck.cpp \
       smt1/smt1_conv.cpp \
