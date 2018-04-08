@@ -77,13 +77,6 @@ ifneq ($(LINGELING),)
   CP_CXXFLAGS += -DHAVE_LINGELING
 endif
 
-ifneq ($(LIMMAT),)
-  LIMMAT_SRC=sat/satcheck_limmat.cpp
-  LIMMAT_INCLUDE=-I $(LIMMAT)
-  LIMMAT_LIB=$(LIMMAT)/liblimmat$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_LIMMAT
-endif
-
 SRC = $(BOOLEFORCE_SRC) \
       $(CHAFF_SRC) \
       $(CUDD_SRC) \
@@ -96,7 +89,6 @@ SRC = $(BOOLEFORCE_SRC) \
       $(PRECOSAT_SRC) \
       $(SMVSAT_SRC) \
       $(SQUOLEM2_SRC) \
-      $(LIMMAT_SRC) \
       cvc/cvc_conv.cpp \
       cvc/cvc_dec.cpp \
       flattening/arrays.cpp \

@@ -44,9 +44,6 @@ set(booleforce_source
 set(minibdd_source
     ${CMAKE_CURRENT_SOURCE_DIR}/miniBDD/example.cpp
 )
-set(limmat_source
-    ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_limmat.cpp
-)
 
 file(GLOB_RECURSE sources "*.cpp" "*.h")
 list(REMOVE_ITEM sources
@@ -62,7 +59,6 @@ list(REMOVE_ITEM sources
     ${lingeling_source}
     ${booleforce_source}
     ${minibdd_source}
-    ${limmat_source}
 )
 
 add_library(solvers ${sources})
