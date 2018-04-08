@@ -36,12 +36,6 @@ ifneq ($(GLUCOSE),)
   CP_CXXFLAGS += -DHAVE_GLUCOSE -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
 endif
 
-ifneq ($(SMVSAT),)
-  SMVSAT_SRC=sat/satcheck_smvsat.cpp
-  SMVSAT_INCLUDE=-I $(SMVSAT)/include
-  SMVSAT_LIB=$(SMVSAT)/lib/libsmvsat$(LIBEXT)
-endif
-
 ifneq ($(SQUOLEM2),)
   SQUOLEM2_SRC=qbf/qbf_squolem.cpp qbf/qbf_squolem_core.cpp
   SQUOLEM2_INCLUDE=-I $(SQUOLEM2)
@@ -87,7 +81,6 @@ SRC = $(BOOLEFORCE_SRC) \
       $(MINISAT_SRC) \
       $(PICOSAT_SRC) \
       $(PRECOSAT_SRC) \
-      $(SMVSAT_SRC) \
       $(SQUOLEM2_SRC) \
       cvc/cvc_conv.cpp \
       cvc/cvc_dec.cpp \
@@ -205,7 +198,7 @@ SRC = $(BOOLEFORCE_SRC) \
 INCLUDES += -I .. \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \
   $(IPASIR_INCLUDE) \
-  $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
+  $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
 	$(PRECOSAT_INCLUDE) $(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
 
 CLEANFILES = solvers$(LIBEXT) \
@@ -222,7 +215,7 @@ endif
 endif
 
 SOLVER_LIB = $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
-        $(MINISAT2_LIB) $(SMVSAT_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
+        $(MINISAT2_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
 	$(PRECOSAT_LIB) $(PICOSAT_LIB) $(LINGELING_LIB) $(GLUCOSE_LIB)
 
 ###############################################################################

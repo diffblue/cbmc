@@ -25,7 +25,6 @@ endif
 #MINISAT2 = ../../minisat-2.2.1
 #IPASIR = ../../ipasir
 #GLUCOSE = ../../glucose-syrup
-#SMVSAT =
 
 # Extra library for SAT solver. This should link to the archive file to be used
 # when linking against an IPASIR solver.
@@ -61,10 +60,6 @@ endif
 
 ifneq ($(GLUCOSE),)
   CP_CXXFLAGS += -DSATCHECK_GLUCOSE
-endif
-
-ifneq ($(SMVSAT),)
-  CP_CXXFLAGS += -DSATCHECK_SMVSAT
 endif
 
 # Signing identity for MacOS Gatekeeper
