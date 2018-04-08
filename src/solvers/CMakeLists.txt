@@ -26,9 +26,6 @@ set(cudd_source
     ${CMAKE_CURRENT_SOURCE_DIR}/qbf/qbf_bdd_core.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qbf/qbf_skizzo_core.cpp
 )
-set(precosat_source
-    ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_precosat.cpp
-)
 set(picosat_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_picosat.cpp
 )
@@ -50,7 +47,6 @@ list(REMOVE_ITEM sources
     ${glucose_source}
     ${squolem2_source}
     ${cudd_source}
-    ${precosat_source}
     ${picosat_source}
     ${lingeling_source}
     ${booleforce_source}

@@ -159,16 +159,12 @@ else
 endif
 
 # select default solver to be minisat2 if no other is specified
-ifeq ($(BOOLEFORCE)$(CHAFF)$(GLUCOSE)$(IPASIR)$(LINGELING)$(MINISAT)$(MINISAT2)$(PICOSAT)$(PRECOSAT),)
+ifeq ($(BOOLEFORCE)$(CHAFF)$(GLUCOSE)$(IPASIR)$(LINGELING)$(MINISAT)$(MINISAT2)$(PICOSAT),)
   MINISAT2 = ../../minisat-2.2.1
 endif
 
 ifneq ($(IPASIR),)
   CP_CXXFLAGS += -DHAVE_IPASIR
-endif
-
-ifneq ($(PRECOSAT),)
-  CP_CXXFLAGS += -DHAVE_PRECOSAT
 endif
 
 ifneq ($(PICOSAT),)
