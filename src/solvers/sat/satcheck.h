@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define SATCHECK_MINISAT2
 // #define SATCHECK_GLUCOSE
 // #define SATCHECK_BOOLEFORCE
-// #define SATCHECK_PRECOSAT
 // #define SATCHECK_PICOSAT
 // #define SATCHECK_LINGELING
 
@@ -45,10 +44,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #if defined(HAVE_BOOLEFORCE) && !defined(SATCHECK_BOOLEFORCE)
 #define SATCHECK_BOOLEFORCE
-#endif
-
-#if defined(HAVE_PRECOSAT) && !defined(SATCHECK_PRECOSAT)
-#define SATCHECK_PRECOSAT
 #endif
 
 #if defined(HAVE_PICOSAT) && !defined(SATCHECK_PICOSAT)
@@ -93,13 +88,6 @@ typedef satcheck_minisat_no_simplifiert satcheck_no_simplifiert;
 
 typedef satcheck_ipasirt satcheckt;
 typedef satcheck_ipasirt satcheck_no_simplifiert;
-
-#elif defined SATCHECK_PRECOSAT
-
-#include "satcheck_precosat.h"
-
-typedef satcheck_precosatt satcheckt;
-typedef satcheck_precosatt satcheck_no_simplifiert;
 
 #elif defined SATCHECK_PICOSAT
 

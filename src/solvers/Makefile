@@ -36,12 +36,6 @@ ifneq ($(GLUCOSE),)
   CP_CXXFLAGS += -DHAVE_GLUCOSE -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
 endif
 
-ifneq ($(SMVSAT),)
-  SMVSAT_SRC=sat/satcheck_smvsat.cpp
-  SMVSAT_INCLUDE=-I $(SMVSAT)/include
-  SMVSAT_LIB=$(SMVSAT)/lib/libsmvsat$(LIBEXT)
-endif
-
 ifneq ($(SQUOLEM2),)
   SQUOLEM2_SRC=qbf/qbf_squolem.cpp qbf/qbf_squolem_core.cpp
   SQUOLEM2_INCLUDE=-I $(SQUOLEM2)
@@ -54,13 +48,6 @@ ifneq ($(CUDD),)
   CUDD_LIB=-L $(CUDD)/cudd -L $(CUDD)/util -L $(CUDD)/mtr \
            -L $(CUDD)/st -L $(CUDD)/obj -L $(CUDD)/dddmp \
            -L $(CUDD)/epd -lobj -lcudd -lmtr -lst -lutil -lepd -ldddmp
-endif
-
-ifneq ($(PRECOSAT),)
-  PRECOSAT_SRC=sat/satcheck_precosat.cpp
-  PRECOSAT_INCLUDE=-I $(PRECOSAT)
-  PRECOSAT_LIB=$(PRECOSAT)/precosat$(OBJEXT)
-  CP_CXXFLAGS += -DHAVE_PRECOSAT
 endif
 
 ifneq ($(PICOSAT),)
@@ -77,13 +64,6 @@ ifneq ($(LINGELING),)
   CP_CXXFLAGS += -DHAVE_LINGELING
 endif
 
-ifneq ($(LIMMAT),)
-  LIMMAT_SRC=sat/satcheck_limmat.cpp
-  LIMMAT_INCLUDE=-I $(LIMMAT)
-  LIMMAT_LIB=$(LIMMAT)/liblimmat$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_LIMMAT
-endif
-
 SRC = $(BOOLEFORCE_SRC) \
       $(CHAFF_SRC) \
       $(CUDD_SRC) \
@@ -93,10 +73,7 @@ SRC = $(BOOLEFORCE_SRC) \
       $(IPASIR_SRC) \
       $(MINISAT_SRC) \
       $(PICOSAT_SRC) \
-      $(PRECOSAT_SRC) \
-      $(SMVSAT_SRC) \
       $(SQUOLEM2_SRC) \
-      $(LIMMAT_SRC) \
       cvc/cvc_conv.cpp \
       cvc/cvc_dec.cpp \
       flattening/arrays.cpp \
@@ -199,7 +176,6 @@ SRC = $(BOOLEFORCE_SRC) \
       sat/cnf_clause_list.cpp \
       sat/dimacs_cnf.cpp \
       sat/pbs_dimacs_cnf.cpp \
-      sat/read_dimacs_cnf.cpp \
       sat/resolution_proof.cpp \
       sat/satcheck.cpp \
       smt1/smt1_conv.cpp \
@@ -214,8 +190,8 @@ SRC = $(BOOLEFORCE_SRC) \
 INCLUDES += -I .. \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \
   $(IPASIR_INCLUDE) \
-  $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
-	$(PRECOSAT_INCLUDE) $(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
+  $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
+	$(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
 
 CLEANFILES = solvers$(LIBEXT) \
   smt2_solver$(EXEEXT) smt2/smt2_solver$(OBJEXT) smt2/smt2_solver$(DEPEXT)
@@ -231,8 +207,8 @@ endif
 endif
 
 SOLVER_LIB = $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
-        $(MINISAT2_LIB) $(SMVSAT_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
-	$(PRECOSAT_LIB) $(PICOSAT_LIB) $(LINGELING_LIB) $(GLUCOSE_LIB)
+        $(MINISAT2_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
+        $(PICOSAT_LIB) $(LINGELING_LIB) $(GLUCOSE_LIB)
 
 ###############################################################################
 

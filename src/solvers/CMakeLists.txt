@@ -18,9 +18,6 @@ set(minisat2_source
 set(glucose_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_glucose.cpp
 )
-set(smvsat_source
-    ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_smvsat.cpp
-)
 set(squolem2_source
     ${CMAKE_CURRENT_SOURCE_DIR}/qbf/qbf_squolem.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qbf/qbf_squolem_core.cpp
@@ -28,9 +25,6 @@ set(squolem2_source
 set(cudd_source
     ${CMAKE_CURRENT_SOURCE_DIR}/qbf/qbf_bdd_core.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qbf/qbf_skizzo_core.cpp
-)
-set(precosat_source
-    ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_precosat.cpp
 )
 set(picosat_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_picosat.cpp
@@ -44,9 +38,6 @@ set(booleforce_source
 set(minibdd_source
     ${CMAKE_CURRENT_SOURCE_DIR}/miniBDD/example.cpp
 )
-set(limmat_source
-    ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_limmat.cpp
-)
 
 file(GLOB_RECURSE sources "*.cpp" "*.h")
 list(REMOVE_ITEM sources
@@ -54,15 +45,12 @@ list(REMOVE_ITEM sources
     ${minisat_source}
     ${minisat2_source}
     ${glucose_source}
-    ${smvsat_source}
     ${squolem2_source}
     ${cudd_source}
-    ${precosat_source}
     ${picosat_source}
     ${lingeling_source}
     ${booleforce_source}
     ${minibdd_source}
-    ${limmat_source}
 )
 
 add_library(solvers ${sources})
