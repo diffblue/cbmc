@@ -41,7 +41,6 @@ SRC = arith_tools.cpp \
       lispexpr.cpp \
       lispirep.cpp \
       memory_info.cpp \
-      memory_limit.cpp \
       merge_irep.cpp \
       message.cpp \
       mp_arith.cpp \
