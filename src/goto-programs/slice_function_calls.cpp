@@ -65,12 +65,12 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
 #ifdef DEBUG
   for(const auto &entry : variable_set)
   {
-    std::cout << "variable " << id2string(entry) << std::endl;
+    std::cout << "variable " << id2string(entry) << "\n";
   }
 #endif
 
 #ifdef DEBUG
-  std::cout << "slicing away function call to " << slice_function << std::endl;
+  std::cout << "slicing away function call to " << slice_function << "\n";
 #endif
   // map (function_call id, location number) -> set of parameters
   std::map<std::pair<irep_idt, unsigned>, std::set<irep_idt>>
@@ -91,8 +91,7 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
 
 #ifdef DEBUG
       std::cout << "\nINFO: found function call to " << fun.get_identifier()
-                << " in function " << id2string(instruction.function)
-                << std::endl;
+                << " in function " << id2string(instruction.function) << "\n";
       const code_typet &fun_call_type = to_code_type(fun.type());
       for(const auto &parameter : fun_call_type.parameters())
       {
@@ -101,7 +100,7 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
         {
           std::cout << " is this";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }
 #endif
 
@@ -115,20 +114,20 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
           const irep_idt &param_name = to_symbol_expr(arg).get_identifier();
           function_params.insert(param_name);
 #ifdef DEBUG
-          std::cout << " found param " << param_name << std::endl;
+          std::cout << " found param " << param_name << "\n";
 #endif
         }
         else if(arg.id() == ID_constant)
         {
 #ifdef DEBUG
           std::cout << "  constant " << to_constant_expr(arg).get_value()
-                    << std::endl;
+                    << "\n";
 #endif
         }
         else
         {
 #ifdef DEBUG
-          std::cout << "  unknown " << id2string(arg.id()) << std::endl;
+          std::cout << "  unknown " << id2string(arg.id()) << "\n";
 #endif
         }
       }
@@ -150,7 +149,7 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
     {
       std::cout << id2string(param) << " ";
     }
-    std::cout << std::endl;
+    std::cout << "\n";
 #endif
 
     slice_nodet root_node;
@@ -174,7 +173,7 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
       slice_function_graph.add_edge(root_index, index);
 
 #ifdef DEBUG
-      std::cout << "connect " << root_index << " and " << index << std::endl;
+      std::cout << "connect " << root_index << " and " << index << "\n";
 #endif
     }
 
@@ -190,7 +189,7 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
         {
 #ifdef DEBUG
           std::cout << "Found " << node.name << " in instruction "
-                    << instruction.to_string() << std::endl;
+                    << instruction.to_string() << "\n";
 #endif
           // create new "other" node
           slice_nodet slice_node;
@@ -202,7 +201,7 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
           slice_function_graph.add_edge(node_index, node.node_index);
 #ifdef DEBUG
           std::cout << "connect " << node_index << " and " << node.node_index
-                    << std::endl;
+                    << "\n";
 #endif
         }
       }
@@ -227,8 +226,7 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
         if(in_edges.empty() && !out_edges.empty())
         {
 #ifdef DEBUG
-          std::cout << "found empty in_edges for active node " << i
-                    << std::endl;
+          std::cout << "found empty in_edges for active node " << i << "\n";
 #endif
           for(const auto &out_edge : out_edges)
           {
@@ -239,7 +237,7 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
           }
           changed = true;
 #ifdef DEBUG
-          std::cout << std::endl;
+          std::cout << "\n";
 #endif
 
           // add sliced function call to instructions to remove

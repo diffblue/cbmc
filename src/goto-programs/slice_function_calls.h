@@ -62,14 +62,14 @@ class slice_function_callst
     std::set<irep_idt> &seen;
 
   public:
-    local_variable_visitort(std::set<irep_idt> &_seen) : seen(_seen)
+    explicit local_variable_visitort(std::set<irep_idt> &_seen) : seen(_seen)
     {
     }
     void operator()(const exprt &expr) override;
   };
 
 public:
-  slice_function_callst(const std::string &_slice_function)
+  explicit slice_function_callst(const std::string &_slice_function)
     : slice_function(_slice_function)
   {
   }
