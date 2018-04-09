@@ -25,19 +25,12 @@ enum class slice_node_typet
   OTHER
 };
 
-struct slice_param_boundst
-{
-  unsigned upper_bound = 0;
-  unsigned lower_bound = 0;
-};
-
 struct slice_nodet : public graph_nodet<empty_edget>
 {
   slice_node_typet slice_node_type;
   irep_idt name;
-  // bounds only used for local variables
-  slice_param_boundst slice_param_bounds;
   unsigned location_number = 0;
+  // node index in dependency graph
   node_indext node_index;
 };
 
@@ -48,32 +41,28 @@ class slice_function_callst
 {
   const std::string &slice_function;
 
-  // maps a variable name to a list of scopes in the form of instruction numbers
-  // bounds
-  typedef std::map<irep_idt, std::list<slice_param_boundst>>
-    variable_bounds_mapt;
-  variable_bounds_mapt compute_variable_bounds(const goto_functiont &);
+  std::set<irep_idt> compute_variable_set(const goto_functiont &);
 
   slice_nodest get_function_parameters(
-    variable_bounds_mapt &,
+    const std::set<irep_idt> &,
     const std::set<irep_idt> &,
     unsigned location_number);
   bool is_referenced(
     const goto_programt::instructiont &,
-    const variable_bounds_mapt &,
+    const std::set<irep_idt> &,
     const irep_idt &);
 
   /// visit `exprt` and collect symbols that represent local variables that are
   /// referenced in it
   class local_variable_visitort : public const_expr_visitort
   {
-    const variable_bounds_mapt &variable_bounds_map;
+    const std::set<irep_idt> &variable_set;
     std::set<irep_idt> &seen;
   public:
     local_variable_visitort(
-      const variable_bounds_mapt &_variable_bounds_map,
+      const std::set<irep_idt> &_variable_set,
       std::set<irep_idt> &_seen)
-      : variable_bounds_map(_variable_bounds_map), seen(_seen)
+      : variable_set(_variable_set), seen(_seen)
     {
     }
     void operator()(const exprt &expr) override;

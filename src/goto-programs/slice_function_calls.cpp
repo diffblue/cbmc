@@ -27,18 +27,13 @@ void slice_function_calls(
 
 void slice_function_callst::operator()(goto_model_functiont &goto_function)
 {
-  variable_bounds_mapt variable_bounds_map =
-    compute_variable_bounds(goto_function.get_goto_function());
+  std::set<irep_idt> variable_set =
+    compute_variable_set(goto_function.get_goto_function());
 
 #ifdef DEBUG
-  for(const auto &entry : variable_bounds_map)
+  for(const auto &entry : variable_set)
   {
-    std::cout << "variable " << id2string(entry.first);
-    for(const auto &listentry : entry.second)
-    {
-      std::cout << " in [" << listentry.lower_bound << ", "
-                << listentry.upper_bound << "]" << std::endl;
-    }
+    std::cout << "variable " << id2string(entry) << std::endl;
   }
 #endif
 
@@ -137,7 +132,7 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
     unsigned slice_function_location = root_node.location_number;
 
     slice_nodest slice_nodes = get_function_parameters(
-      variable_bounds_map, entry.second, entry.first.second);
+      variable_set, entry.second, entry.first.second);
 
     for(auto &node : slice_nodes)
     {
@@ -160,28 +155,24 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
 
       for(const auto &node : slice_nodes)
       {
-        if(instruction.location_number >= node.slice_param_bounds.lower_bound &&
-           instruction.location_number <= node.slice_param_bounds.upper_bound)
+        if(is_referenced(instruction, variable_set, node.name))
         {
-          if(is_referenced(instruction, variable_bounds_map, node.name))
-          {
 #ifdef DEBUG
-            std::cout << "Found " << node.name << " in instruction "
-                      << instruction.to_string() << std::endl;
+          std::cout << "Found " << node.name << " in instruction "
+                    << instruction.to_string() << std::endl;
 #endif
-            // create new "other" node
-            slice_nodet slice_node;
-            slice_node.slice_node_type = slice_node_typet::OTHER;
-            slice_node.location_number = instruction.location_number;
-            slice_nodet::node_indext node_index = slice_function_graph.add_node();
-            slice_node.node_index = node_index;
-            slice_function_graph[node_index] = slice_node;
-            slice_function_graph.add_edge(node_index, node.node_index);
+          // create new "other" node
+          slice_nodet slice_node;
+          slice_node.slice_node_type = slice_node_typet::OTHER;
+          slice_node.location_number = instruction.location_number;
+          slice_nodet::node_indext node_index = slice_function_graph.add_node();
+          slice_node.node_index = node_index;
+          slice_function_graph[node_index] = slice_node;
+          slice_function_graph.add_edge(node_index, node.node_index);
 #ifdef DEBUG
-            std::cout << "connect " << node_index << " and " << node.node_index
-                      << std::endl;
+          std::cout << "connect " << node_index << " and " << node.node_index
+                    << std::endl;
 #endif
-          }
         }
       }
     }
@@ -288,17 +279,16 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
   }
 }
 
-slice_function_callst::variable_bounds_mapt
-slice_function_callst::compute_variable_bounds(
-  const goto_functiont &goto_function)
+std::set<irep_idt>
+slice_function_callst::compute_variable_set(const goto_functiont &goto_function)
 {
-  slice_function_callst::variable_bounds_mapt variable_bounds_map;
-
+  std::set<irep_idt> variable_set;
   std::map<irep_idt, unsigned> declarations;
 
   // search for declaration / dead pairs
   //
   // note: in Java, scopes cannot overlap!
+  // note: in GOTO programs, scopes are encoded in variable names
   for(const auto &instruction : goto_function.body.instructions)
   {
     if(instruction.type == goto_program_instruction_typet::DECL)
@@ -317,31 +307,25 @@ slice_function_callst::compute_variable_bounds(
       DATA_INVARIANT(
         declarations.find(var_name) != declarations.end(),
         "closing scope of undeclared variable");
-      if(variable_bounds_map.find(var_name) == variable_bounds_map.end())
+      if(variable_set.find(var_name) == variable_set.end())
       {
-        slice_param_boundst slice_param_bound;
-        slice_param_bound.lower_bound = declarations[var_name];
-        slice_param_bound.upper_bound = instruction.location_number;
-        variable_bounds_map[var_name] = {slice_param_bound};
+        variable_set.insert(var_name);
+        declarations.erase(var_name);
       }
       else
       {
-        slice_param_boundst slice_param_bound;
-        slice_param_bound.lower_bound = declarations[var_name];
-        slice_param_bound.upper_bound = instruction.location_number;
-        variable_bounds_map[var_name].push_back(slice_param_bound);
-        declarations.erase(var_name);
+        UNREACHABLE;
       }
     }
   }
 
-  return variable_bounds_map;
+  return variable_set;
 }
 
 /// gets the correct slice_nodet for the given location number of the function
 /// call
 slice_nodest slice_function_callst::get_function_parameters(
-  variable_bounds_mapt &variable_bounds_map,
+  const std::set<irep_idt> &variable_set,
   const std::set<irep_idt> &param_set,
   unsigned location_number)
 {
@@ -349,33 +333,12 @@ slice_nodest slice_function_callst::get_function_parameters(
   for(const auto &var_name : param_set)
   {
     // is a function parameter
-    if(variable_bounds_map.find(var_name) == variable_bounds_map.end())
-    // {
-    //   slice_nodet slice_node;
-    //   slice_node.name = var_name;
-    //   slice_node.slice_node_type = slice_node_typet::FUNCTION_PARAMETER;
-    //   slice_nodes.push_back(slice_node);
-    // }
-    // else
-      continue;
+    if(variable_set.find(var_name) != variable_set.end())
     {
-      bool found = false;
-      for(const auto &bounds : variable_bounds_map[var_name])
-      {
-        if(
-          location_number >= bounds.lower_bound &&
-          location_number <= bounds.upper_bound)
-        {
-          slice_nodet slice_node;
-          slice_node.name = var_name;
-          slice_node.slice_param_bounds = bounds;
-          slice_node.slice_node_type = slice_node_typet::LOCAL_VARIABLE;
-          slice_nodes.push_back(slice_node);
-          found = true;
-          break;
-        }
-      }
-      DATA_INVARIANT(found, "local variable must be in scope");
+      slice_nodet slice_node;
+      slice_node.name = var_name;
+      slice_node.slice_node_type = slice_node_typet::LOCAL_VARIABLE;
+      slice_nodes.push_back(slice_node);
     }
   }
   return slice_nodes;
@@ -385,11 +348,11 @@ slice_nodest slice_function_callst::get_function_parameters(
 /// concern declarations of that variable, assignment or dead statements.
 bool slice_function_callst::is_referenced(
   const goto_programt::instructiont &instruction,
-  const variable_bounds_mapt &variable_bounds_map,
+  const std::set<irep_idt> &variable_set,
   const irep_idt &name)
 {
   std::set<irep_idt> seen;
-  local_variable_visitort local_variable_visitor(variable_bounds_map, seen);
+  local_variable_visitort local_variable_visitor(variable_set, seen);
 
   switch(instruction.type)
   {
@@ -451,7 +414,7 @@ void slice_function_callst::local_variable_visitort::operator()(const exprt &exp
     const irep_idt &identifier = symbol_expr.get_identifier();
 
     // record symbol identifier if it is in variable bounds map
-    if(variable_bounds_map.find(identifier) != variable_bounds_map.end())
+    if(variable_set.find(identifier) != variable_set.end())
     {
       seen.insert(identifier);
     }
