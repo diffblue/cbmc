@@ -17,6 +17,7 @@ Author: Matthias Güdemann, matthias.guedemann@diffblue.com
 
 void slice_function_calls(goto_model_functiont &, const std::string &);
 
+/// Enumeration identifying the type of node in dependency graph
 enum class slice_node_typet
 {
   FUNCTION_PARAMETER,
@@ -25,6 +26,7 @@ enum class slice_node_typet
   OTHER
 };
 
+/// Node type for dependency graph
 struct slice_nodet : public graph_nodet<empty_edget>
 {
   slice_node_typet slice_node_type;
@@ -37,6 +39,9 @@ struct slice_nodet : public graph_nodet<empty_edget>
 typedef grapht<slice_nodet> slice_function_grapht;
 typedef std::list<slice_nodet> slice_nodest;
 
+/// Class to remove selected function calls from a GOTO program in
+/// JBMC. Searches for a matching function call and removes all local variables
+/// that are only used in that call as parameters.
 class slice_function_callst
 {
   const std::string &slice_function;
@@ -47,22 +52,16 @@ class slice_function_callst
     const std::set<irep_idt> &,
     const std::set<irep_idt> &,
     unsigned location_number);
-  bool is_referenced(
-    const goto_programt::instructiont &,
-    const std::set<irep_idt> &,
-    const irep_idt &);
+  bool is_referenced(const goto_programt::instructiont &, const irep_idt &);
 
-  /// visit `exprt` and collect symbols that represent local variables that are
-  /// referenced in it
+  /// Visitor `exprt` and collect symbol identifiers that are used are used in
+  /// it
   class local_variable_visitort : public const_expr_visitort
   {
-    const std::set<irep_idt> &variable_set;
     std::set<irep_idt> &seen;
+
   public:
-    local_variable_visitort(
-      const std::set<irep_idt> &_variable_set,
-      std::set<irep_idt> &_seen)
-      : variable_set(_variable_set), seen(_seen)
+    local_variable_visitort(std::set<irep_idt> &_seen) : seen(_seen)
     {
     }
     void operator()(const exprt &expr) override;

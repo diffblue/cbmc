@@ -14,6 +14,9 @@ Author: Matthias Güdemann, matthias.guedemann@diffblue.com
 
 #include <util/suffix.h>
 
+/// Remove function call and parameter definitions the call depends on
+/// \param goto_function: the GOTO function to change
+/// \param slice_function: the name of the function to slice away
 void slice_function_calls(
   goto_model_functiont &goto_function,
   const std::string &slice_function)
@@ -25,6 +28,21 @@ void slice_function_calls(
   sfc(goto_function);
 }
 
+/// Slice away selected function call and parameters that have no other
+/// dependencies than the sliced function call.
+///
+/// Builds a dependency graph (DAG) with nodes specifying the function call,
+/// local variables, function parameter of the containing GOTO function and
+/// "OTHER" GOTO instructions. A GOTO instruction is considered to be dependent
+/// on a local variable if in any of its expressions the symbol corresponding to
+/// that variable appears. After the construction we iteratively remove nodes
+/// with no incoming nodes, i.e., nodes on which no other node depends, starting
+/// with the removal of the sliced function call.
+///
+/// For each such freed local variable which is also a parameter to the sliced
+/// function, we remove its DECL, DEAD and ASSIGN instructions.
+///
+/// \param goto_function: the GOTO function to change
 void slice_function_callst::operator()(goto_model_functiont &goto_function)
 {
   std::set<irep_idt> variable_set =
@@ -155,7 +173,7 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
 
       for(const auto &node : slice_nodes)
       {
-        if(is_referenced(instruction, variable_set, node.name))
+        if(is_referenced(instruction, node.name))
         {
 #ifdef DEBUG
           std::cout << "Found " << node.name << " in instruction "
@@ -279,6 +297,10 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
   }
 }
 
+/// Compute set of local variables, identified by corresponding DECL / DEAD GOTO
+/// instructions.
+/// \param goto_function: the GOTO function to analyze
+/// \return: set of symbol identifiers of local variables in the function.
 std::set<irep_idt>
 slice_function_callst::compute_variable_set(const goto_functiont &goto_function)
 {
@@ -322,8 +344,11 @@ slice_function_callst::compute_variable_set(const goto_functiont &goto_function)
   return variable_set;
 }
 
-/// gets the correct slice_nodet for the given location number of the function
-/// call
+/// Gets the correct slice_nodet for the given location function call.
+/// \param variable_set: set of identifiers of local variables
+/// \param param_set: set of names of function parameters
+/// \param: location_number GOTO location number of function call
+/// \return list of slice_nodes for dependency graph
 slice_nodest slice_function_callst::get_function_parameters(
   const std::set<irep_idt> &variable_set,
   const std::set<irep_idt> &param_set,
@@ -346,13 +371,15 @@ slice_nodest slice_function_callst::get_function_parameters(
 
 /// Checks whether a variable is used in a GOTO instruction. This doesn't
 /// concern declarations of that variable, assignment or dead statements.
+/// \param instruction: the GOTO instruction to analyze
+/// \param name: the name of the variable to search
+/// \return true if found in the `exprt` of the instruction, else false
 bool slice_function_callst::is_referenced(
   const goto_programt::instructiont &instruction,
-  const std::set<irep_idt> &variable_set,
   const irep_idt &name)
 {
   std::set<irep_idt> seen;
-  local_variable_visitort local_variable_visitor(variable_set, seen);
+  local_variable_visitort local_variable_visitor(seen);
 
   switch(instruction.type)
   {
@@ -405,7 +432,9 @@ bool slice_function_callst::is_referenced(
   return seen.find(name) != seen.end();
 }
 
-/// visit expr and collect symbols
+/// Visit expression and collect symbols, implements `operator()` of
+/// `const_expr_visitort`.
+/// \param expr: expression to visit
 void slice_function_callst::local_variable_visitort::operator()(const exprt &expr)
 {
   if(expr.id() == ID_symbol)
@@ -413,10 +442,6 @@ void slice_function_callst::local_variable_visitort::operator()(const exprt &exp
     const symbol_exprt symbol_expr = to_symbol_expr(expr);
     const irep_idt &identifier = symbol_expr.get_identifier();
 
-    // record symbol identifier if it is in variable bounds map
-    if(variable_set.find(identifier) != variable_set.end())
-    {
-      seen.insert(identifier);
-    }
+    seen.insert(identifier);
   }
 }
