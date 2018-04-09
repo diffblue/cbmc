@@ -1,0 +1,8 @@
+CORE
+params.class
+--refine-strings --show-goto-functions --function params.f0
+^EXIT=0$
+^SIGNAL=0$
+struct java\.lang\.String \*s;
+s = \&foo;
+this \. params.log:\(Ljava/lang/String;\)V\(s\);
