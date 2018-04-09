@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 
+#include "flatten_byte_extract_exceptions.h"
 #include "flatten_byte_operators.h"
 
 /// rewrite an object into its individual bytes
@@ -25,6 +26,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// max_bytes  if not nil, use as upper bound of the number of bytes to unpack
 /// ns  namespace for type lookups
 /// \return array of bytes in the sequence found in memory
+/// \throws flatten_byte_extract_exceptiont Raised is unable to unpack the
+/// object because of either non constant size, byte misalignment or
+/// non-constant component width.
 static exprt unpack_rec(
   const exprt &src,
   bool little_endian,
@@ -63,7 +67,9 @@ static exprt unpack_rec(
     mp_integer num_elements;
     if(to_integer(max_bytes, num_elements) &&
        to_integer(array_type.size(), num_elements))
-      throw "cannot unpack array of non-const size:\n"+type.pretty();
+    {
+      throw non_const_array_sizet(array_type, max_bytes);
+    }
 
     // all array members will have the same structure; do this just
     // once and then replace the dummy symbol by a suitable index
@@ -97,8 +103,9 @@ static exprt unpack_rec(
 
       // the next member would be misaligned, abort
       if(element_width<=0 || element_width%8!=0)
-        throw "cannot unpack struct with non-byte aligned components:\n"+
-          struct_type.pretty();
+      {
+        throw non_byte_alignedt(struct_type, comp, element_width);
+      }
 
       member_exprt member(src, comp.get_name(), comp.type());
       exprt sub=unpack_rec(member, little_endian, max_bytes, ns, true);
@@ -115,8 +122,9 @@ static exprt unpack_rec(
     if(bits<0)
     {
       if(to_integer(max_bytes, bits))
-        throw "cannot unpack object of non-constant width:\n"+
-          src.pretty();
+      {
+        throw non_constant_widtht(src, max_bytes);
+      }
       else
         bits*=8;
     }
@@ -300,8 +308,9 @@ exprt flatten_byte_extract(
   {
     mp_integer op0_bits=pointer_offset_bits(unpacked.op().type(), ns);
     if(op0_bits<0)
-      throw "byte_extract flatting with non-constant size:\n"+
-        unpacked.pretty();
+    {
+      throw non_const_byte_extraction_sizet(unpacked);
+    }
     else
       size_bits=op0_bits;
   }
