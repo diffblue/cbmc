@@ -15,7 +15,8 @@ Author: Matthias Güdemann, matthias.guedemann@diffblue.com
 
 #include "goto_model.h"
 
-void slice_function_calls(goto_model_functiont &, const std::string &);
+void slice_function_calls(goto_functiont &, const std::string &);
+void slice_function_calls(goto_modelt &, const std::string &);
 
 /// Enumeration identifying the type of node in dependency graph
 enum class slice_node_typet
@@ -72,7 +73,7 @@ public:
     : slice_function(_slice_function)
   {
   }
-  void operator()(goto_model_functiont &);
+  void operator()(goto_functiont &);
 };
 
 #endif // CPROVER_GOTO_PROGRAMS_SLICE_FUNCTION_CALLS_H

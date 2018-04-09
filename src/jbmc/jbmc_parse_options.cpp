@@ -727,7 +727,7 @@ void jbmc_parse_optionst::process_goto_function(
 
     // slice function calls and their directly dependent parameters
     slice_function_calls(
-      function, options.get_option("slice-function-calls"));
+      function.get_goto_function(), options.get_option("slice-function-calls"));
 
     if(using_symex_driven_loading)
     {

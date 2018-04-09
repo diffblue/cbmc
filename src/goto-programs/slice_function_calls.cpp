@@ -18,7 +18,7 @@ Author: Matthias Güdemann, matthias.guedemann@diffblue.com
 /// \param goto_function: the GOTO function to change
 /// \param slice_function: the name of the function to slice away
 void slice_function_calls(
-  goto_model_functiont &goto_function,
+  goto_functiont &goto_function,
   const std::string &slice_function)
 {
   if(slice_function.empty())
@@ -26,6 +26,21 @@ void slice_function_calls(
 
   slice_function_callst sfc(slice_function);
   sfc(goto_function);
+}
+
+/// Remove function call and parameter definitions the call depends on
+/// \param goto_model: the GOTO model to change
+/// \param slice_function: the name of the function to slice away
+void slice_function_calls(
+  goto_modelt &goto_model,
+  const std::string &slice_function)
+{
+  if(slice_function.empty())
+    return;
+
+  slice_function_callst sfc(slice_function);
+  for(auto &goto_function : goto_model.goto_functions.function_map)
+    sfc(goto_function.second);
 }
 
 /// Slice away selected function call and parameters that have no other
@@ -43,10 +58,9 @@ void slice_function_calls(
 /// function, we remove its DECL, DEAD and ASSIGN instructions.
 ///
 /// \param goto_function: the GOTO function to change
-void slice_function_callst::operator()(goto_model_functiont &goto_function)
+void slice_function_callst::operator()(goto_functiont &goto_function)
 {
-  std::set<irep_idt> variable_set =
-    compute_variable_set(goto_function.get_goto_function());
+  std::set<irep_idt> variable_set = compute_variable_set(goto_function);
 
 #ifdef DEBUG
   for(const auto &entry : variable_set)
@@ -62,7 +76,7 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
   std::map<std::pair<irep_idt, unsigned>, std::set<irep_idt>>
     function_param_map;
   for(const goto_programt::instructiont &instruction :
-        goto_function.get_goto_function().body.instructions)
+      goto_function.body.instructions)
   {
     if(instruction.type == goto_program_instruction_typet::FUNCTION_CALL)
     {
@@ -149,8 +163,8 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
 
     unsigned slice_function_location = root_node.location_number;
 
-    slice_nodest slice_nodes = get_function_parameters(
-      variable_set, entry.second, entry.first.second);
+    slice_nodest slice_nodes =
+      get_function_parameters(variable_set, entry.second, entry.first.second);
 
     for(auto &node : slice_nodes)
     {
@@ -165,8 +179,7 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
     }
 
     // see where the function parameters are also referenced
-    for(const auto &instruction :
-        goto_function.get_goto_function().body.instructions)
+    for(const auto &instruction : goto_function.body.instructions)
     {
       if(instruction.location_number == slice_function_location)
         continue;
@@ -214,7 +227,8 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
         if(in_edges.empty() && !out_edges.empty())
         {
 #ifdef DEBUG
-          std::cout << "found empty in_edges for active node " << i << std::endl;
+          std::cout << "found empty in_edges for active node " << i
+                    << std::endl;
 #endif
           for(const auto &out_edge : out_edges)
           {
@@ -250,7 +264,7 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
   }
 
   // transform instructions to slice into SKIP
-  for(auto &instruction : goto_function.get_goto_function().body.instructions)
+  for(auto &instruction : goto_function.body.instructions)
   {
     if(
       location_numbers_to_remove.find(instruction.location_number) !=
@@ -258,8 +272,7 @@ void slice_function_callst::operator()(goto_model_functiont &goto_function)
     {
       instruction.make_skip();
     }
-    else if(
-      instruction.type == goto_program_instruction_typet::DECL)
+    else if(instruction.type == goto_program_instruction_typet::DECL)
     {
       const code_declt &code_decl = to_code_decl(instruction.code);
       if(
@@ -383,7 +396,7 @@ bool slice_function_callst::is_referenced(
 
   switch(instruction.type)
   {
-    // inspect guard
+  // inspect guard
   case goto_program_instruction_typet::GOTO:
   case goto_program_instruction_typet::ASSUME:
   case goto_program_instruction_typet::ASSERT:
@@ -410,7 +423,7 @@ bool slice_function_callst::is_referenced(
     break;
   }
 
-    // cannot be referenced in the following instructions
+  // cannot be referenced in the following instructions
   case goto_program_instruction_typet::RETURN:
   case goto_program_instruction_typet::DECL:
   case goto_program_instruction_typet::DEAD:
@@ -435,7 +448,8 @@ bool slice_function_callst::is_referenced(
 /// Visit expression and collect symbols, implements `operator()` of
 /// `const_expr_visitort`.
 /// \param expr: expression to visit
-void slice_function_callst::local_variable_visitort::operator()(const exprt &expr)
+void slice_function_callst::local_variable_visitort::
+operator()(const exprt &expr)
 {
   if(expr.id() == ID_symbol)
   {
