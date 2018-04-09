@@ -22,6 +22,12 @@ Date: May 2007
 #include "irep_hash_container.h"
 #include "irep.h"
 
+class irep_serialization_errort:public std::runtime_error
+{
+public:
+  explicit irep_serialization_errort(const std::string &error);
+};
+
 void write_gb_word(std::ostream &, std::size_t);
 void write_gb_string(std::ostream &, const std::string &);
 

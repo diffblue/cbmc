@@ -18,6 +18,11 @@ Date: May 2007
 
 #include "string_hash.h"
 
+irep_serialization_errort::irep_serialization_errort(const std::string &error):
+  std::runtime_error(error)
+{
+}
+
 void irep_serializationt::write_irep(
   std::ostream &out,
   const irept &irep)
@@ -225,11 +230,17 @@ void write_gb_string(std::ostream &out, const std::string &s)
 /// \return a string
 irep_idt irep_serializationt::read_gb_string(std::istream &in)
 {
-  char c;
+  char c='\0';
   size_t length=0;
 
   while((c=static_cast<char>(in.get()))!=0)
   {
+    if(!in.good())
+    {
+      throw irep_serialization_errort(
+        "found non-null-terminated string while parsing input");
+    }
+
     if(length>=read_buffer.size())
       read_buffer.resize(read_buffer.size()*2, 0);
 
