@@ -1649,6 +1649,27 @@ template<> inline bool can_cast_expr<array_exprt>(const exprt &base)
   return base.id()==ID_array;
 }
 
+/// Array constructor from a list of index-element pairs
+/// Operands are index/value pairs, alternating.
+class array_list_exprt : public exprt
+{
+public:
+  explicit array_list_exprt(const array_typet &_type)
+    : exprt(ID_array_list, _type)
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<array_list_exprt>(const exprt &base)
+{
+  return base.id() == ID_array_list;
+}
+
+inline void validate_expr(const array_list_exprt &value)
+{
+  PRECONDITION(value.operands().size() % 2 == 0);
+}
 
 /*! \brief vector constructor from list of elements
 */
