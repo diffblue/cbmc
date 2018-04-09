@@ -37,12 +37,14 @@ public:
     message_handlert &_message_handler,
     size_t _max_array_length,
     method_bytecodet &method_bytecode,
-    java_string_library_preprocesst &_string_preprocess)
+    java_string_library_preprocesst &_string_preprocess,
+    const std::unordered_set<std::string> &no_load_classes)
     : messaget(_message_handler),
       symbol_table(_symbol_table),
       max_array_length(_max_array_length),
       method_bytecode(method_bytecode),
-      string_preprocess(_string_preprocess)
+      string_preprocess(_string_preprocess),
+      no_load_classes(no_load_classes)
   {
   }
 
@@ -51,7 +53,9 @@ public:
     // add array types to the symbol table
     add_array_types(symbol_table);
 
-    bool loading_success=parse_tree.loading_successful;
+    const bool loading_success =
+      parse_tree.loading_successful &&
+      !no_load_classes.count(id2string(parse_tree.parsed_class.name));
     if(loading_success)
       convert(parse_tree.parsed_class);
 
@@ -81,6 +85,7 @@ protected:
 
   // see definition below for more info
   static void add_array_types(symbol_tablet &symbol_table);
+  std::unordered_set<std::string> no_load_classes;
 };
 
 /// Auxiliary function to extract the generic superclass reference from the
@@ -667,14 +672,16 @@ bool java_bytecode_convert_class(
   message_handlert &message_handler,
   size_t max_array_length,
   method_bytecodet &method_bytecode,
-  java_string_library_preprocesst &string_preprocess)
+  java_string_library_preprocesst &string_preprocess,
+  const std::unordered_set<std::string> &no_load_classes)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
     symbol_table,
     message_handler,
     max_array_length,
     method_bytecode,
-    string_preprocess);
+    string_preprocess,
+    no_load_classes);
 
   try
   {
