@@ -360,7 +360,7 @@ slice_function_callst::compute_variable_set(const goto_functiont &goto_function)
 /// Gets the correct slice_nodet for the given location function call.
 /// \param variable_set: set of identifiers of local variables
 /// \param param_set: set of names of function parameters
-/// \param: location_number GOTO location number of function call
+/// \param location_number: GOTO location number of function call
 /// \return list of slice_nodes for dependency graph
 slice_nodest slice_function_callst::get_function_parameters(
   const std::set<irep_idt> &variable_set,
