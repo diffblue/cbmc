@@ -228,12 +228,17 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
 #ifdef DEBUG
           std::cout << "found empty in_edges for active node " << i << "\n";
 #endif
+          std::set<slice_nodet::node_indext> remove_edges_to;
           for(const auto &out_edge : out_edges)
           {
-            slice_function_graph.remove_edge(i, out_edge.first);
+            remove_edges_to.insert(out_edge.first);
 #ifdef DEBUG
             std::cout << "remove (" << i << ", " << out_edge.first << ") ";
 #endif
+          }
+          for(const slice_nodet::node_indext index : remove_edges_to)
+          {
+            slice_function_graph.remove_edge(i, index);
           }
           changed = true;
 #ifdef DEBUG
