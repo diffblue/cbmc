@@ -189,7 +189,7 @@ interval_sparse_arrayt::of_expr(const exprt &expr, const exprt &extra_value)
     return interval_sparse_arrayt(*array_expr, extra_value);
   if(const auto &with_expr = expr_try_dynamic_cast<with_exprt>(expr))
     return interval_sparse_arrayt(*with_expr);
-  if(expr.id() == "array-list")
+  if(expr.id() == ID_array_list)
     return of_array_list(expr, extra_value);
   return {};
 }

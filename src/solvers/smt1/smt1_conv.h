@@ -158,7 +158,7 @@ protected:
     const std::string &value)
   {
     exprt tmp=ce_value(identifier.type, index, value, false);
-    if(tmp.id()=="array-list" && identifier.value.id()=="array-list")
+    if(tmp.id() == ID_array_list && identifier.value.id() == ID_array_list)
     {
       forall_operands(it, tmp)
         identifier.value.copy_to_operands(*it);

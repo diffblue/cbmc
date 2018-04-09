@@ -20,7 +20,7 @@ SCENARIO("substitute_array_list",
 {
   const typet char_type=unsignedbv_typet(16);
   const typet int_type=signedbv_typet(32);
-  exprt arr("array-list");
+  exprt arr(ID_array_list);
   const exprt index0=from_integer(0, int_type);
   const exprt charx=from_integer('x', char_type);
   const exprt index1=from_integer(1, int_type);

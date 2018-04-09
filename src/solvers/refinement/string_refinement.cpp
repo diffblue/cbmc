@@ -2050,7 +2050,7 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
   for(auto &operand : expr.operands())
     operand = substitute_array_lists(operand, string_max_length);
 
-  if(expr.id()=="array-list")
+  if(expr.id() == ID_array_list)
   {
     DATA_INVARIANT(
       expr.operands().size()>=2,

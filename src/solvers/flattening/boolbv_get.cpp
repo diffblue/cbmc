@@ -375,7 +375,7 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
 
   if(size_mpint>100 || size.id()==ID_infinity)
   {
-    result=exprt("array-list", type);
+    result = exprt(ID_array_list, type);
     result.type().set(ID_size, integer2string(size_mpint));
 
     result.operands().reserve(values.size()*2);

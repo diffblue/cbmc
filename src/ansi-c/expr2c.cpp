@@ -3913,7 +3913,7 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()==ID_array)
     return convert_array(src, precedence);
 
-  else if(src.id()=="array-list")
+  else if(src.id() == ID_array_list)
     return convert_array_list(src, precedence);
 
   else if(src.id()==ID_typecast)

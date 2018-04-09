@@ -219,7 +219,7 @@ exprt smt1_convt::ce_value(
       if(index_expr.is_nil())
         return nil_exprt();
 
-      exprt array_list("array-list", type);
+      exprt array_list(ID_array_list, type);
       array_list.copy_to_operands(index_expr, value_expr);
 
       return array_list;
