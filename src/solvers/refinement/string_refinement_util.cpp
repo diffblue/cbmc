@@ -97,7 +97,7 @@ sparse_arrayt::sparse_arrayt(const with_exprt &expr)
   {
     const auto &with_expr = expr_dynamic_cast<with_exprt>(ref.get());
     const auto current_index = numeric_cast_v<std::size_t>(with_expr.where());
-    entries.emplace_back(current_index, with_expr.new_value());
+    entries[current_index] = with_expr.new_value();
     ref = with_expr.old();
   }
 
@@ -121,18 +121,6 @@ exprt sparse_arrayt::to_if_expression(const exprt &index) const
       const equal_exprt index_equal(index, entry_index);
       return if_exprt(index_equal, then_expr, if_expr, if_expr.type());
     });
-}
-
-interval_sparse_arrayt::interval_sparse_arrayt(const with_exprt &expr)
-  : sparse_arrayt(expr)
-{
-  // Entries are sorted so that successive entries correspond to intervals
-  std::sort(
-    entries.begin(),
-    entries.end(),
-    [](
-      const std::pair<std::size_t, exprt> &a,
-      const std::pair<std::size_t, exprt> &b) { return a.first < b.first; });
 }
 
 exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const

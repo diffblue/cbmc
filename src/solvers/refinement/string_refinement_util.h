@@ -98,7 +98,10 @@ public:
 
 protected:
   exprt default_value;
-  std::vector<std::pair<std::size_t, exprt>> entries;
+  std::map<std::size_t, exprt> entries;
+  explicit sparse_arrayt(exprt default_value) : default_value(default_value)
+  {
+  }
 };
 
 /// Represents arrays by the indexes up to which the value remains the same.
@@ -112,7 +115,10 @@ public:
   /// converted to an array `arr` where for all index `k` smaller than `i`,
   /// `arr[k]` is `a`, for all index between `i` (exclusive) and `j` it is `b`
   /// and for the others it is `x`.
-  explicit interval_sparse_arrayt(const with_exprt &expr);
+  explicit interval_sparse_arrayt(const with_exprt &expr) : sparse_arrayt(expr)
+  {
+  }
+
   exprt to_if_expression(const exprt &index) const override;
 };
 
