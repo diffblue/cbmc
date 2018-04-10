@@ -18,6 +18,7 @@ Date: May 2016
 #include <util/make_unique.h>
 #include <util/cmdline.h>
 #include <util/options.h>
+#include <util/deprecate.h>
 
 #include "cover_basic_blocks.h"
 
@@ -51,6 +52,10 @@ void instrument_cover_goals(
 /// \deprecated use instrument_cover_goals(goto_programt &goto_program,
 /// const cover_instrumenterst &instrumenters,
 /// message_handlert &message_handler, const irep_idt mode) instead
+DEPRECATED(
+  "use instrument_cover_goals(goto_programt &goto_program,"
+  "const cover_instrumenterst &instrumenters,"
+  "message_handlert &message_handler, const irep_idt mode) instead")
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,

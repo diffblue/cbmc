@@ -12,6 +12,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   equals, equalsIgnoreCase, compareTo, hashCode, intern
 
 #include <solvers/refinement/string_constraint_generator.h>
+#include <util/deprecate.h>
 
 /// Equality of the content of two strings
 ///
@@ -267,6 +268,7 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
 /// \deprecated never tested
 /// \param f: function application with one string argument
 /// \return a string expression
+DEPRECATED("never tested")
 symbol_exprt string_constraint_generatort::add_axioms_for_intern(
   const function_application_exprt &f)
 {

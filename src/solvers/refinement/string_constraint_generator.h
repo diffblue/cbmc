@@ -25,6 +25,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/replace_expr.h>
 #include <util/refined_string_type.h>
 #include <util/constexpr.def>
+#include <util/deprecate.h>
 #include <solvers/refinement/string_constraint.h>
 
 /// Generation of fresh symbols of a given type
@@ -351,6 +352,7 @@ private:
   /// \todo This function is underspecified, we do not compute the exact value
   /// but over approximate it.
   /// \deprecated This is Java specific and should be implemented in Java.
+  DEPRECATED("This is Java specific and should be implemented in Java")
   exprt add_axioms_for_code_point_count(const function_application_exprt &f);
 
   /// Add axioms corresponding the String.offsetByCodePointCount java function

@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "optional.h"
 #include "invariant.h"
 
+#include "deprecate.h"
+
 class exprt;
 class constant_exprt;
 class typet;
@@ -21,10 +23,12 @@ class typet;
 // this one will go away
 // returns 'true' on error
 /// \deprecated: use the constant_exprt version instead
+DEPRECATED("Use the constant_exprt version instead")
 bool to_integer(const exprt &expr, mp_integer &int_value);
 
 // returns 'true' on error
 /// \deprecated: use numeric_cast<mp_integer> instead
+DEPRECATED("Use numeric_cast<mp_integer> instead")
 bool to_integer(const constant_exprt &expr, mp_integer &int_value);
 
 // returns 'true' on error

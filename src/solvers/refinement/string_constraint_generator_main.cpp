@@ -26,6 +26,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/pointer_predicates.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
+#include <util/deprecate.h>
 
 string_constraint_generatort::string_constraint_generatort(
   const string_constraint_generatort::infot &info,
@@ -581,6 +582,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
 /// \param f: function application with one argument, which is a string,
 /// or three arguments: string, integer offset and count
 /// \return a new string expression
+DEPRECATED("should use substring instead")
 exprt string_constraint_generatort::add_axioms_for_copy(
   const function_application_exprt &f)
 {

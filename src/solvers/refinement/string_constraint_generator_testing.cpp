@@ -12,6 +12,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
+#include <util/deprecate.h>
 
 /// Add axioms stating that the returned expression is true exactly when the
 /// first string is a prefix of the second one, starting at position offset.
@@ -97,6 +98,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
 /// \deprecated should use `string_length(s)==0` instead
 /// \param f: function application with a string argument
 /// \return a Boolean expression
+DEPRECATED("should use `string_length(s)==0` instead")
 exprt string_constraint_generatort::add_axioms_for_is_empty(
   const function_application_exprt &f)
 {
