@@ -146,7 +146,7 @@ exprt allocate_dynamic_object(
   std::vector<const symbolt *> &symbols_created,
   bool cast_needed = false);
 
-void allocate_dynamic_object_with_decl(
+exprt allocate_dynamic_object_with_decl(
   const exprt &target_expr,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
