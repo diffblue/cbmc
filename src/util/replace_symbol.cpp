@@ -35,7 +35,8 @@ bool replace_symbolt::replace(
 
   // first look at type
 
-  if(have_to_replace(dest.type()))
+  const exprt &const_dest(dest);
+  if(have_to_replace(const_dest.type()))
     if(!replace(dest.type()))
       result=false;
 
@@ -94,31 +95,24 @@ bool replace_symbolt::replace(
         result=false;
   }
 
-  const irept &c_sizeof_type=dest.find(ID_C_c_sizeof_type);
+  const typet &c_sizeof_type =
+    static_cast<const typet&>(dest.find(ID_C_c_sizeof_type));
+  if(c_sizeof_type.is_not_nil() && have_to_replace(c_sizeof_type))
+    result &= replace(static_cast<typet&>(dest.add(ID_C_c_sizeof_type)));
 
-  if(c_sizeof_type.is_not_nil())
-  {
-    typet &type=static_cast<typet &>(dest.add(ID_C_c_sizeof_type));
-
-    if(!replace(type))
-      result=false;
-  }
-
-  const irept &va_arg_type=dest.find(ID_C_va_arg_type);
-
-  if(va_arg_type.is_not_nil())
-  {
-    typet &type=static_cast<typet &>(dest.add(ID_C_va_arg_type));
-
-    if(!replace(type))
-      result=false;
-  }
+  const typet &va_arg_type =
+    static_cast<const typet&>(dest.find(ID_C_va_arg_type));
+  if(va_arg_type.is_not_nil() && have_to_replace(va_arg_type))
+    result &= replace(static_cast<typet&>(dest.add(ID_C_va_arg_type)));
 
   return result;
 }
 
 bool replace_symbolt::have_to_replace(const exprt &dest) const
 {
+  if(expr_map.empty() && type_map.empty())
+    return false;
+
   // first look at type
 
   if(have_to_replace(dest.type()))
@@ -211,6 +205,9 @@ bool replace_symbolt::replace(typet &dest) const
 
 bool replace_symbolt::have_to_replace(const typet &dest) const
 {
+  if(expr_map.empty() && type_map.empty())
+    return false;
+
   if(dest.has_subtype())
     if(have_to_replace(dest.subtype()))
       return true;
