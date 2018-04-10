@@ -62,9 +62,7 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
 {
   std::set<irep_idt> variable_set = compute_variable_set(goto_function);
 
-  // map (function_call id, location number) -> set of parameters
-  std::map<std::pair<irep_idt, unsigned>, std::set<irep_idt>>
-    function_param_map;
+  function_param_mapt function_param_map;
   for(const goto_programt::instructiont &instruction :
       goto_function.body.instructions)
   {
@@ -94,149 +92,14 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
     }
   }
 
-  // construct graph
-  slice_function_grapht slice_function_graph;
-  std::set<unsigned> location_numbers_to_remove;
+  slice_function_grapht slice_function_graph =
+    construct_dependency_graph(function_param_map, variable_set, goto_function);
 
-  for(const auto &entry : function_param_map)
-  {
-    slice_nodet root_node;
-    root_node.slice_node_type = slice_node_typet::FUNCTION_CALL;
-    root_node.name = entry.first.first;
-    root_node.location_number = entry.first.second;
-    slice_nodet::node_indext root_index = slice_function_graph.add_node();
-    root_node.node_index = root_index;
-    slice_function_graph[root_index] = root_node;
+  std::set<unsigned> location_numbers_to_remove =
+    reduce_dependency_graph(slice_function_graph);
 
-    unsigned slice_function_location = root_node.location_number;
-
-    slice_nodest slice_nodes =
-      get_function_parameters(variable_set, entry.second, entry.first.second);
-
-    for(auto &node : slice_nodes)
-    {
-      slice_nodet::node_indext index = slice_function_graph.add_node();
-      node.node_index = index;
-      slice_function_graph[index] = node;
-      slice_function_graph.add_edge(root_index, index);
-    }
-
-    // see where the function parameters are also referenced
-    for(const auto &instruction : goto_function.body.instructions)
-    {
-      if(instruction.location_number == slice_function_location)
-        continue;
-
-      for(const auto &node : slice_nodes)
-      {
-        if(is_referenced(instruction, node.name))
-        {
-          // create new "other" node
-          slice_nodet slice_node;
-          slice_node.slice_node_type = slice_node_typet::OTHER;
-          slice_node.location_number = instruction.location_number;
-          slice_nodet::node_indext node_index = slice_function_graph.add_node();
-          slice_node.node_index = node_index;
-          slice_function_graph[node_index] = slice_node;
-          slice_function_graph.add_edge(node_index, node.node_index);
-        }
-      }
-    }
-
-    size_t graph_size = slice_function_graph.size();
-
-    // remove edges from dependency graph
-    bool changed = true;
-    while(changed)
-    {
-      changed = false;
-      // find sliceable (non-OTHER) node without incoming dependencies
-      for(size_t i = 0; i < graph_size; i++)
-      {
-        const slice_nodet &slice_node = slice_function_graph[i];
-        if(slice_node.slice_node_type == slice_node_typet::OTHER)
-          continue;
-
-        const auto &in_edges = slice_function_graph.in(i);
-        const auto &out_edges = slice_function_graph.out(i);
-        if(in_edges.empty() && !out_edges.empty())
-        {
-          std::set<slice_nodet::node_indext> remove_edges_to;
-          for(const auto &out_edge : out_edges)
-          {
-            remove_edges_to.insert(out_edge.first);
-          }
-          for(const slice_nodet::node_indext index : remove_edges_to)
-          {
-            slice_function_graph.remove_edge(i, index);
-          }
-          changed = true;
-          // add sliced function call to instructions to remove
-          if(slice_node.slice_node_type == slice_node_typet::FUNCTION_CALL)
-            location_numbers_to_remove.insert(slice_node.location_number);
-        }
-      }
-    }
-  }
-
-  // remove decl/dead/assign for unused variables
-  std::set<irep_idt> sliced_local_variables;
-  size_t graph_size = slice_function_graph.size();
-  for(size_t i = 0; i < graph_size; i++)
-  {
-    const slice_nodet &slice_node = slice_function_graph[i];
-    if(slice_node.slice_node_type == slice_node_typet::LOCAL_VARIABLE)
-    {
-      if(slice_function_graph.in(i).empty())
-        sliced_local_variables.insert(slice_node.name);
-    }
-  }
-
-  // transform instructions to slice into SKIP
-  for(auto &instruction : goto_function.body.instructions)
-  {
-    if(
-      location_numbers_to_remove.find(instruction.location_number) !=
-      location_numbers_to_remove.end())
-    {
-      instruction.make_skip();
-    }
-    else if(instruction.type == goto_program_instruction_typet::DECL)
-    {
-      const code_declt &code_decl = to_code_decl(instruction.code);
-      if(
-        sliced_local_variables.find(code_decl.get_identifier()) !=
-        sliced_local_variables.end())
-      {
-        instruction.make_skip();
-      }
-    }
-    else if(instruction.type == goto_program_instruction_typet::DEAD)
-    {
-      const code_deadt &code_dead = to_code_dead(instruction.code);
-      if(
-        sliced_local_variables.find(code_dead.get_identifier()) !=
-        sliced_local_variables.end())
-      {
-        instruction.make_skip();
-      }
-    }
-    else if(instruction.type == goto_program_instruction_typet::ASSIGN)
-    {
-      const code_assignt &code_assign = to_code_assign(instruction.code);
-      const exprt &lhs = code_assign.lhs();
-      if(lhs.id() == ID_symbol)
-      {
-        const symbol_exprt &lhs_symbol_expr = to_symbol_expr(lhs);
-        if(
-          sliced_local_variables.find(lhs_symbol_expr.get_identifier()) !=
-          sliced_local_variables.end())
-        {
-          instruction.make_skip();
-        }
-      }
-    }
-  }
+  transform_goto_function(
+    goto_function, location_numbers_to_remove, slice_function_graph);
 }
 
 /// Compute set of local variables, identified by corresponding DECL / DEAD GOTO
@@ -372,6 +235,192 @@ bool slice_function_callst::is_referenced(
   }
 
   return seen.find(name) != seen.end();
+}
+
+/// Construct dependency graph for function slicer. For each entry of the
+/// function map, dependencies for the function arguments are stored in the
+/// graph.
+/// \param function_param_map: map from function call to local variables the
+///   call depends on
+/// \param variable_set: set of local variables
+/// \param goto_function: the GOTO function to analyze
+/// \return graph of dependencies on the stored function calls
+slice_function_grapht slice_function_callst::construct_dependency_graph(
+  const function_param_mapt &function_param_map,
+  const std::set<irep_idt> &variable_set,
+  const goto_functiont &goto_function)
+{
+  // construct graph
+  slice_function_grapht slice_function_graph;
+
+  for(const auto &entry : function_param_map)
+  {
+    slice_nodet root_node;
+    root_node.slice_node_type = slice_node_typet::FUNCTION_CALL;
+    root_node.name = entry.first.first;
+    root_node.location_number = entry.first.second;
+    slice_nodet::node_indext root_index = slice_function_graph.add_node();
+    root_node.node_index = root_index;
+    slice_function_graph[root_index] = root_node;
+
+    unsigned slice_function_location = root_node.location_number;
+
+    slice_nodest slice_nodes =
+      get_function_parameters(variable_set, entry.second, entry.first.second);
+
+    for(auto &node : slice_nodes)
+    {
+      slice_nodet::node_indext index = slice_function_graph.add_node();
+      node.node_index = index;
+      slice_function_graph[index] = node;
+      slice_function_graph.add_edge(root_index, index);
+    }
+
+    // see where the function parameters are also referenced
+    for(const auto &instruction : goto_function.body.instructions)
+    {
+      if(instruction.location_number == slice_function_location)
+        continue;
+
+      for(const auto &node : slice_nodes)
+      {
+        if(is_referenced(instruction, node.name))
+        {
+          // create new "other" node
+          slice_nodet slice_node;
+          slice_node.slice_node_type = slice_node_typet::OTHER;
+          slice_node.location_number = instruction.location_number;
+          slice_nodet::node_indext node_index = slice_function_graph.add_node();
+          slice_node.node_index = node_index;
+          slice_function_graph[node_index] = slice_node;
+          slice_function_graph.add_edge(node_index, node.node_index);
+        }
+      }
+    }
+  }
+
+  return slice_function_graph;
+}
+
+/// Slicing of the GOTO program, according to the dependencies in the dependency
+/// graph. A node `a` is considered to be dependent on another node `b` if an
+/// edge `b->a` exists in the graph. Any `FUNCTION_CALL` or `LOCAL_VARIABLE`
+/// node is removed if it has no incoming edge. The removal is iterated until a
+/// fix-point is reached.
+/// \param slice_function_graph: the dependency graph
+/// \return the set of location numbers of GOTO instructions that can be removed
+std::set<unsigned> slice_function_callst::reduce_dependency_graph(
+  slice_function_grapht &slice_function_graph)
+{
+  std::set<unsigned> location_numbers_to_remove;
+
+  const size_t graph_size = slice_function_graph.size();
+
+  // remove edges from dependency graph
+  bool changed = true;
+  while(changed)
+  {
+    changed = false;
+    // find sliceable (non-OTHER) node without incoming dependencies
+    for(size_t i = 0; i < graph_size; i++)
+    {
+      const slice_nodet &slice_node = slice_function_graph[i];
+      if(slice_node.slice_node_type == slice_node_typet::OTHER)
+        continue;
+
+      const auto &in_edges = slice_function_graph.in(i);
+      const auto &out_edges = slice_function_graph.out(i);
+      if(in_edges.empty() && !out_edges.empty())
+      {
+        std::set<slice_nodet::node_indext> remove_edges_to;
+        for(const auto &out_edge : out_edges)
+        {
+          remove_edges_to.insert(out_edge.first);
+        }
+        for(const slice_nodet::node_indext index : remove_edges_to)
+        {
+          slice_function_graph.remove_edge(i, index);
+        }
+        changed = true;
+        // add sliced function call to instructions to remove
+        if(slice_node.slice_node_type == slice_node_typet::FUNCTION_CALL)
+          location_numbers_to_remove.insert(slice_node.location_number);
+      }
+    }
+  }
+
+  return location_numbers_to_remove;
+}
+
+/// Makes SKIP out of each GOTO instruction that is sliced away. Removal of
+/// SKIPs is assumed to be done in a later stage before GOTO analysis.
+/// \param goto_function: the GOTO function to be analyzed / changed
+/// \param location_numbers_to_remove: the location numbers of the instructions
+///   to remove, in addition to DECL / DEAD / ASSIGN of unused local variables
+/// \param slice_function_graph: the dependency graph
+void slice_function_callst::transform_goto_function(
+  goto_functiont &goto_function,
+  const std::set<unsigned> &location_numbers_to_remove,
+  const slice_function_grapht &slice_function_graph)
+{
+  // remove decl/dead/assign for unused variables
+  std::set<irep_idt> sliced_local_variables;
+  size_t graph_size = slice_function_graph.size();
+  for(size_t i = 0; i < graph_size; i++)
+  {
+    const slice_nodet &slice_node = slice_function_graph[i];
+    if(slice_node.slice_node_type == slice_node_typet::LOCAL_VARIABLE)
+    {
+      if(slice_function_graph.in(i).empty())
+        sliced_local_variables.insert(slice_node.name);
+    }
+  }
+
+  // transform instructions to slice into SKIP
+  for(auto &instruction : goto_function.body.instructions)
+  {
+    if(
+      location_numbers_to_remove.find(instruction.location_number) !=
+      location_numbers_to_remove.end())
+    {
+      instruction.make_skip();
+    }
+    else if(instruction.type == goto_program_instruction_typet::DECL)
+    {
+      const code_declt &code_decl = to_code_decl(instruction.code);
+      if(
+        sliced_local_variables.find(code_decl.get_identifier()) !=
+        sliced_local_variables.end())
+      {
+        instruction.make_skip();
+      }
+    }
+    else if(instruction.type == goto_program_instruction_typet::DEAD)
+    {
+      const code_deadt &code_dead = to_code_dead(instruction.code);
+      if(
+        sliced_local_variables.find(code_dead.get_identifier()) !=
+        sliced_local_variables.end())
+      {
+        instruction.make_skip();
+      }
+    }
+    else if(instruction.type == goto_program_instruction_typet::ASSIGN)
+    {
+      const code_assignt &code_assign = to_code_assign(instruction.code);
+      const exprt &lhs = code_assign.lhs();
+      if(lhs.id() == ID_symbol)
+      {
+        const symbol_exprt &lhs_symbol_expr = to_symbol_expr(lhs);
+        if(
+          sliced_local_variables.find(lhs_symbol_expr.get_identifier()) !=
+          sliced_local_variables.end())
+        {
+          instruction.make_skip();
+        }
+      }
+    }
+  }
 }
 
 /// Visit expression and collect symbols, implements `operator()` of
