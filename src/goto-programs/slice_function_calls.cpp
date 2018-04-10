@@ -62,16 +62,6 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
 {
   std::set<irep_idt> variable_set = compute_variable_set(goto_function);
 
-#ifdef DEBUG
-  for(const auto &entry : variable_set)
-  {
-    std::cout << "variable " << id2string(entry) << "\n";
-  }
-#endif
-
-#ifdef DEBUG
-  std::cout << "slicing away function call to " << slice_function << "\n";
-#endif
   // map (function_call id, location number) -> set of parameters
   std::map<std::pair<irep_idt, unsigned>, std::set<irep_idt>>
     function_param_map;
@@ -89,21 +79,6 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
       if(!has_suffix(id2string(function_id), slice_function))
         continue;
 
-#ifdef DEBUG
-      std::cout << "\nINFO: found function call to " << fun.get_identifier()
-                << " in function " << id2string(instruction.function) << "\n";
-      const code_typet &fun_call_type = to_code_type(fun.type());
-      for(const auto &parameter : fun_call_type.parameters())
-      {
-        std::cout << " param type " << parameter.type().id();
-        if(parameter.get_this())
-        {
-          std::cout << " is this";
-        }
-        std::cout << "\n";
-      }
-#endif
-
       std::set<irep_idt> function_params;
       for(const auto &arg : fun_call.arguments())
       {
@@ -113,22 +88,6 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
         {
           const irep_idt &param_name = to_symbol_expr(arg).get_identifier();
           function_params.insert(param_name);
-#ifdef DEBUG
-          std::cout << " found param " << param_name << "\n";
-#endif
-        }
-        else if(arg.id() == ID_constant)
-        {
-#ifdef DEBUG
-          std::cout << "  constant " << to_constant_expr(arg).get_value()
-                    << "\n";
-#endif
-        }
-        else
-        {
-#ifdef DEBUG
-          std::cout << "  unknown " << id2string(arg.id()) << "\n";
-#endif
         }
       }
       function_param_map[{fun.get_identifier(), instruction.location_number}] =
@@ -142,16 +101,6 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
 
   for(const auto &entry : function_param_map)
   {
-#ifdef DEBUG
-    std::cout << "INFO: call (" << entry.first.first
-              << ", location number: " << entry.first.second << " ) ";
-    for(const auto &param : entry.second)
-    {
-      std::cout << id2string(param) << " ";
-    }
-    std::cout << "\n";
-#endif
-
     slice_nodet root_node;
     root_node.slice_node_type = slice_node_typet::FUNCTION_CALL;
     root_node.name = entry.first.first;
@@ -171,10 +120,6 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
       node.node_index = index;
       slice_function_graph[index] = node;
       slice_function_graph.add_edge(root_index, index);
-
-#ifdef DEBUG
-      std::cout << "connect " << root_index << " and " << index << "\n";
-#endif
     }
 
     // see where the function parameters are also referenced
@@ -187,10 +132,6 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
       {
         if(is_referenced(instruction, node.name))
         {
-#ifdef DEBUG
-          std::cout << "Found " << node.name << " in instruction "
-                    << instruction.to_string() << "\n";
-#endif
           // create new "other" node
           slice_nodet slice_node;
           slice_node.slice_node_type = slice_node_typet::OTHER;
@@ -199,10 +140,6 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
           slice_node.node_index = node_index;
           slice_function_graph[node_index] = slice_node;
           slice_function_graph.add_edge(node_index, node.node_index);
-#ifdef DEBUG
-          std::cout << "connect " << node_index << " and " << node.node_index
-                    << "\n";
-#endif
         }
       }
     }
@@ -225,26 +162,16 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
         const auto &out_edges = slice_function_graph.out(i);
         if(in_edges.empty() && !out_edges.empty())
         {
-#ifdef DEBUG
-          std::cout << "found empty in_edges for active node " << i << "\n";
-#endif
           std::set<slice_nodet::node_indext> remove_edges_to;
           for(const auto &out_edge : out_edges)
           {
             remove_edges_to.insert(out_edge.first);
-#ifdef DEBUG
-            std::cout << "remove (" << i << ", " << out_edge.first << ") ";
-#endif
           }
           for(const slice_nodet::node_indext index : remove_edges_to)
           {
             slice_function_graph.remove_edge(i, index);
           }
           changed = true;
-#ifdef DEBUG
-          std::cout << "\n";
-#endif
-
           // add sliced function call to instructions to remove
           if(slice_node.slice_node_type == slice_node_typet::FUNCTION_CALL)
             location_numbers_to_remove.insert(slice_node.location_number);
