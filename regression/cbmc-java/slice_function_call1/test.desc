@@ -1,0 +1,9 @@
+CORE
+params.class
+--refine-strings --show-goto-functions --slice-function-calls "params.log:\(Ljava/lang/String;\)V" --function params.f0
+^EXIT=0$
+^SIGNAL=0$
+--
+struct java\.lang\.String \*s;
+s = \&foo;
+this \. params.log:\(Ljava/lang/String;\)V\(s\);

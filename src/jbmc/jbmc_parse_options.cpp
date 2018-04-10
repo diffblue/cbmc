@@ -43,6 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_symbol_table.h>
 #include <goto-programs/show_properties.h>
+#include <goto-programs/slice_function_calls.h>
 
 #include <goto-symex/adjust_float_expressions.h>
 
@@ -204,6 +205,14 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   options.set_option(
     "slice-formula",
     cmdline.isset("slice-formula"));
+
+  if(cmdline.isset("slice-function-calls"))
+  {
+    options.set_option(
+      "slice-function-calls", cmdline.get_value("slice-function-calls"));
+  }
+  else
+    options.set_option("slice-function-calls", "");
 
   // simplify if conditions and branches
   if(cmdline.isset("no-simplify-if"))
@@ -715,6 +724,10 @@ void jbmc_parse_optionst::process_goto_function(
     remove_instanceof(goto_function, symbol_table);
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(function);
+
+    // slice function calls and their directly dependent parameters
+    slice_function_calls(
+      function.get_goto_function(), options.get_option("slice-function-calls"));
 
     if(using_symex_driven_loading)
     {
