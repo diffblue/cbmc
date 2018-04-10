@@ -96,9 +96,16 @@ public:
   /// at the given index
   virtual exprt to_if_expression(const exprt &index) const;
 
+  /// Get the value at the specified index.
+  /// Complexity is linear in the number of entries.
+  virtual exprt at(std::size_t index) const;
+
 protected:
   exprt default_value;
-  std::vector<std::pair<std::size_t, exprt>> entries;
+  std::map<std::size_t, exprt> entries;
+  explicit sparse_arrayt(exprt default_value) : default_value(default_value)
+  {
+  }
 };
 
 /// Represents arrays by the indexes up to which the value remains the same.
@@ -112,8 +119,40 @@ public:
   /// converted to an array `arr` where for all index `k` smaller than `i`,
   /// `arr[k]` is `a`, for all index between `i` (exclusive) and `j` it is `b`
   /// and for the others it is `x`.
-  explicit interval_sparse_arrayt(const with_exprt &expr);
+  explicit interval_sparse_arrayt(const with_exprt &expr) : sparse_arrayt(expr)
+  {
+  }
+
+  /// Initialize an array expression to sparse array representation, avoiding
+  /// repetition of identical successive values and setting the default to
+  /// `extra_value`.
+  interval_sparse_arrayt(const array_exprt &expr, const exprt &extra_value);
+
+  /// Initialize a sparse array from an array represented by a list of
+  /// index-value pairs, and setting the default to `extra_value`.
+  /// Indexes must be constant expressions, and negative indexes are ignored.
+  static interval_sparse_arrayt
+  of_array_list(const exprt &expr, const exprt &extra_value);
+
   exprt to_if_expression(const exprt &index) const override;
+
+  /// If the expression is an array_exprt or a with_exprt uses the appropriate
+  /// constructor, otherwise returns empty optional.
+  static optionalt<interval_sparse_arrayt>
+  of_expr(const exprt &expr, const exprt &extra_value);
+
+  /// Convert to an array representation, ignores elements at index >= size
+  array_exprt concretize(std::size_t size, const typet &index_type) const;
+
+  /// Get the value at the specified index.
+  /// Complexity is linear in the number of entries.
+  exprt at(std::size_t index) const override;
+
+  /// Array containing the same value at each index.
+  explicit interval_sparse_arrayt(exprt default_value)
+    : sparse_arrayt(default_value)
+  {
+  }
 };
 
 /// Maps equation to expressions contained in them and conversely expressions to
@@ -242,6 +281,9 @@ public:
   /// result depends, add the corresponding constraints. For the other builtin
   /// only add constraints on the length.
   void add_constraints(string_constraint_generatort &generatort);
+
+  /// Clear the content of the dependency graph
+  void clear();
 
 private:
   /// Set of nodes representing builtin_functions

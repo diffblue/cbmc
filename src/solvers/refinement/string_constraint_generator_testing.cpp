@@ -36,11 +36,10 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   symbol_exprt isprefix=fresh_boolean("isprefix");
   const typet &index_type=str.length().type();
 
-  implies_exprt a1(
-    isprefix,
-    str.axiom_for_length_ge(plus_exprt_with_overflow_check(
-      prefix.length(), offset)));
-  lemmas.push_back(a1);
+  // Axiom 1.
+  lemmas.push_back(
+    implies_exprt(
+      isprefix, str.axiom_for_length_ge(plus_exprt(prefix.length(), offset))));
 
   symbol_exprt qvar=fresh_univ_index("QA_isprefix", index_type);
   string_constraintt a2(

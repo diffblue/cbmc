@@ -358,6 +358,7 @@ exprt string_constraint_generatort::add_axioms_for_format(
   const typet &index_type = res.length().type();
 
   for(const format_elementt &fe : format_strings)
+  {
     if(fe.is_format_specifier())
     {
       const format_specifiert &fs=fe.get_format_specifier();
@@ -392,24 +393,37 @@ exprt string_constraint_generatort::add_axioms_for_format(
         add_axioms_for_constant(str, fe.get_format_text().get_content());
       intermediary_strings.push_back(str);
     }
+  }
+
+  exprt return_code = from_integer(0, get_return_code_type());
 
   if(intermediary_strings.empty())
-    return to_array_string_expr(
-      array_exprt(array_typet(char_type, from_integer(0, index_type))));
-
-  auto it=intermediary_strings.begin();
-  array_string_exprt str = *(it++);
-  exprt return_code = from_integer(0, signedbv_typet(32));
-  for(; it!=intermediary_strings.end(); ++it)
   {
+    lemmas.push_back(equal_exprt(res.length(), from_integer(0, index_type)));
+    return return_code;
+  }
+
+  array_string_exprt str = intermediary_strings[0];
+
+  if(intermediary_strings.size() == 1)
+  {
+    // Copy the first string
+    return add_axioms_for_substring(
+      res, str, from_integer(0, index_type), str.length());
+  }
+
+  // start after the first string and stop before the last
+  for(std::size_t i = 1; i < intermediary_strings.size() - 1; ++i)
+  {
+    const array_string_exprt &intermediary = intermediary_strings[i];
     const array_string_exprt fresh = fresh_string(index_type, char_type);
     return_code =
-      bitor_exprt(return_code, add_axioms_for_concat(fresh, str, *it));
+      bitor_exprt(return_code, add_axioms_for_concat(fresh, str, intermediary));
     str = fresh;
   }
-  // Copy
-  add_axioms_for_substring(res, str, from_integer(0, index_type), str.length());
-  return return_code;
+
+  return bitor_exprt(
+    return_code, add_axioms_for_concat(res, str, intermediary_strings.back()));
 }
 
 /// Construct a string from a constant array.

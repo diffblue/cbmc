@@ -23,7 +23,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <numeric>
 #include <stack>
 #include <util/expr_iterator.h>
-#include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
@@ -47,7 +46,7 @@ static optionalt<exprt> find_counter_example(
 ///   * the negation of `a` is an existential formula `b`;
 ///   * we substituted symbols in `b` by their values found in `get`;
 ///   * arrays are concretized, meaning we attribute a value for characters that
-///     are unknown to get, for details see concretize_arrays_in_expression;
+///     are unknown to get, for details see substitute_array_access;
 ///   * `b` is simplified and array accesses are replaced by expressions
 ///     without arrays;
 ///   * we give lemma `b` to a fresh solver;
@@ -482,7 +481,7 @@ union_find_replacet string_identifiers_resolution_from_equations(
         equations_to_treat.push(i);
 
       std::vector<exprt> rhs_strings = extract_strings(eq.rhs());
-      for(const auto expr : rhs_strings)
+      for(const auto &expr : rhs_strings)
         equation_map.add(i, expr);
     }
     else if(eq.lhs().type().id() != ID_pointer &&
@@ -490,7 +489,7 @@ union_find_replacet string_identifiers_resolution_from_equations(
     {
       std::vector<exprt> lhs_strings = extract_strings_from_lhs(eq.lhs());
 
-      for(const auto expr : lhs_strings)
+      for(const auto &expr : lhs_strings)
         equation_map.add(i, expr);
 
       if(lhs_strings.empty())
@@ -648,20 +647,24 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   output_equations(debug(), equations, ns);
 #endif
 
+  // The object `dependencies` is also used by get, so we have to use it as a
+  // class member but we make sure it is cleared at each `dec_solve` call.
+  dependencies.clear();
   debug() << "dec_solve: compute dependency graph and remove function "
           << "applications captured by the dependencies:" << eom;
-  const auto new_equation_end = std::remove_if(
-    equations.begin(), equations.end(), [&](const equal_exprt &eq) { // NOLINT
-      return add_node(dependencies, eq, generator.array_pool);
-    });
-  equations.erase(new_equation_end, equations.end());
+  std::vector<exprt> local_equations;
+  for(const equal_exprt &eq : equations)
+  {
+    if(!add_node(dependencies, eq, generator.array_pool))
+      local_equations.push_back(eq);
+  }
 
 #ifdef DEBUG
   dependencies.output_dot(debug());
 #endif
 
   debug() << "dec_solve: add constraints" << eom;
- dependencies.add_constraints(generator);
+  dependencies.add_constraints(generator);
 
 #ifdef DEBUG
   output_equations(debug(), equations, ns);
@@ -676,7 +679,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   }
 #endif
 
-  for(const auto &eq : equations)
+  for(const auto &eq : local_equations)
   {
 #ifdef DEBUG
     debug() << "dec_solve: set_to " << format(eq) << eom;
@@ -931,50 +934,21 @@ static optionalt<exprt> get_array(
   }
   std::size_t n = *n_opt;
 
-  const array_typet ret_type(char_type, from_integer(n, index_type));
-  array_exprt ret(ret_type);
-
-  if(n>max_string_length)
+  if(n > MAX_CONCRETE_STRING_SIZE)
   {
     stream << "(sr::get_array) long string (size=" << n << ")" << eom;
-    return {};
+    std::ostringstream msg;
+    msg << "consider reducing string-max-input-length so that no string "
+        << "exceeds " << MAX_CONCRETE_STRING_SIZE << " in length and make sure"
+        << " all functions returning strings are available in the classpath";
+    throw string_refinement_invariantt(msg.str());
   }
 
-  if(n==0)
-    return empty_ret;
-
-  if(arr_val.id()=="array-list")
-  {
-    DATA_INVARIANT(
-      arr_val.operands().size()%2==0,
-      string_refinement_invariantt("and index expression must be on a symbol, "
-                                   "with, array_of, if, or array, and all "
-                                   "cases besides array are handled above"));
-    std::map<std::size_t, exprt> initial_map;
-    for(size_t i = 0; i < arr_val.operands().size(); i += 2)
-    {
-      exprt index = arr_val.operands()[i];
-      if(auto idx = numeric_cast<std::size_t>(index))
-      {
-        if(*idx < n)
-          initial_map[*idx] = arr_val.operands()[i + 1];
-      }
-    }
-
-    // Pad the concretized values to the left to assign the uninitialized
-    // values of result.
-    ret.operands()=fill_in_map_as_vector(initial_map);
-    return ret;
-  }
-  else if(arr_val.id()==ID_array)
-  {
-    // copy the `n` first elements of `arr_val`
-    for(size_t i=0; i<arr_val.operands().size() && i<n; i++)
-      ret.move_to_operands(arr_val.operands()[i]);
-    return ret;
-  }
-  else
-    return {};
+  if(
+    const auto &array = interval_sparse_arrayt::of_expr(
+      arr_val, from_integer(CHARACTER_FOR_UNKNOWN, char_type)))
+    return array->concretize(n, index_type);
+  return {};
 }
 
 /// convert the content of a string to a more readable representation. This
@@ -1015,34 +989,35 @@ static exprt get_char_array_and_concretize(
   if(arr_model_opt)
   {
     stream << indent << indent << "- char_array: " << format(*arr_model_opt)
+           << '\n';
+    stream << indent << indent << "- type : " << format(arr_model_opt->type())
            << eom;
     const exprt simple = simplify_expr(*arr_model_opt, ns);
     stream << indent << indent << "- simplified_char_array: " << format(simple)
            << eom;
-    const exprt concretized_array =
-      concretize_arrays_in_expression(simple, max_string_length, ns);
-    stream << indent << indent
-           << "- concretized_char_array: " << format(concretized_array) << eom;
-
-    if(concretized_array.id() == ID_array)
+    if(
+      const auto concretized_array = get_array(
+        super_get, ns, max_string_length, stream, to_array_string_expr(simple)))
     {
-      stream << indent << indent << "- as_string: \""
-             << string_of_array(to_array_expr(concretized_array)) << "\"\n";
-    }
-    else
-    {
-      stream << indent << "- warning: not an array" << eom;
-    }
+      stream << indent << indent
+             << "- concretized_char_array: " << format(*concretized_array)
+             << eom;
 
-    stream << indent << indent << "- type: " << format(concretized_array.type())
-           << eom;
-    return concretized_array;
+      if(
+        const auto array_expr =
+          expr_try_dynamic_cast<array_exprt>(*concretized_array))
+      {
+        stream << indent << indent << "- as_string: \""
+               << string_of_array(*array_expr) << "\"\n";
+      }
+      else
+        stream << indent << "- warning: not an array" << eom;
+      return *concretized_array;
+    }
+    return simple;
   }
-  else
-  {
-    stream << indent << indent << "- incomplete model" << eom;
-    return arr;
-  }
+  stream << indent << indent << "- incomplete model" << eom;
+  return arr;
 }
 
 /// Display part of the current model by mapping the variables created by the
@@ -1105,85 +1080,12 @@ static exprt substitute_array_access(
                         : sparse_arrayt(expr).to_if_expression(index);
 }
 
-/// Fill an array represented by a list of with_expr by propagating values to
-/// the left. For instance `ARRAY_OF(12) WITH[2:=24] WITH[4:=42]` will give
-/// `{ 24, 24, 24, 42, 42 }`
-/// \param expr: an array expression in the form
-///   `ARRAY_OF(x) WITH [i0:=v0] ... WITH [iN:=vN]`
-/// \param string_max_length: bound on the length of strings
-/// \return an array expression with filled in values, or expr if it is simply
-///   an `ARRAY_OF(x)` expression
-static array_exprt
-fill_in_array_with_expr(const exprt &expr, const std::size_t string_max_length)
-{
-  PRECONDITION(expr.type().id()==ID_array);
-  PRECONDITION(expr.id()==ID_with || expr.id()==ID_array_of);
-  const array_typet &array_type = to_array_type(expr.type());
-
-  // Map of the parts of the array that are initialized
-  std::map<std::size_t, exprt> initial_map;
-
-  // Set the last index to be sure the array will have the right length
-  const auto &array_size_opt = numeric_cast<std::size_t>(array_type.size());
-  if(array_size_opt && *array_size_opt > 0)
-    initial_map.emplace(
-      *array_size_opt - 1,
-      from_integer(CHARACTER_FOR_UNKNOWN, array_type.subtype()));
-
-  for(exprt it=expr; it.id()==ID_with; it=to_with_expr(it).old())
-  {
-    // Add to `initial_map` all the pairs (index,value) contained in `WITH`
-    // statements
-    const with_exprt &with_expr = to_with_expr(it);
-    const exprt &then_expr=with_expr.new_value();
-    const auto index =
-      numeric_cast_v<std::size_t>(to_constant_expr(with_expr.where()));
-    if(
-      index < string_max_length && (!array_size_opt || index < *array_size_opt))
-      initial_map.emplace(index, then_expr);
-  }
-
-  array_exprt result(array_type);
-  result.operands() = fill_in_map_as_vector(initial_map);
-  return result;
-}
-
-/// Fill an array represented by an array_expr by propagating values to
-/// the left for unknown values. For instance `{ 24 , * , * , 42, * }` will give
-/// `{ 24, 42, 42, 42, '?' }`
-/// \param expr: an array expression
-/// \param string_max_length: bound on the length of strings
-/// \return an array expression with filled in values
-exprt fill_in_array_expr(const array_exprt &expr, std::size_t string_max_length)
-{
-  PRECONDITION(expr.type().id() == ID_array);
-  const array_typet &array_type = to_array_type(expr.type());
-  PRECONDITION(array_type.subtype().id() == ID_unsignedbv);
-
-  // Map of the parts of the array that are initialized
-  std::map<std::size_t, exprt> initial_map;
-  const auto &array_size_opt = numeric_cast<std::size_t>(array_type.size());
-
-  if(array_size_opt && *array_size_opt > 0)
-    initial_map.emplace(
-      *array_size_opt - 1,
-      from_integer(CHARACTER_FOR_UNKNOWN, array_type.subtype()));
-
-  for(std::size_t i = 0; i < expr.operands().size(); ++i)
-  {
-    if(i < string_max_length && expr.operands()[i].id() != ID_unknown)
-      initial_map[i] = expr.operands()[i];
-  }
-
-  array_exprt result(array_type);
-  result.operands()=fill_in_map_as_vector(initial_map);
-  return result;
-}
-
 /// Create an equivalent expression where array accesses are replaced by 'if'
 /// expressions: for instance in array access `arr[index]`, where:
 /// `arr := {12, 24, 48}` the constructed expression will be:
 ///    `index==0 ? 12 : index==1 ? 24 : 48`
+/// Avoids repetition so `arr := {12, 12, 24, 48}` will give
+///    `index<=1 ? 12 : index==1 ? 24 : 48`
 static exprt substitute_array_access(
   const array_exprt &array_expr,
   const exprt &index,
@@ -1191,29 +1093,9 @@ static exprt substitute_array_access(
     &symbol_generator)
 {
   const typet &char_type = array_expr.type().subtype();
-  const typet &index_type = to_array_type(array_expr.type()).size().type();
-  const std::vector<exprt> &operands = array_expr.operands();
-
-  exprt result = symbol_generator("out_of_bound_access", char_type);
-
-  for(std::size_t i = 0; i < operands.size(); ++i)
-  {
-    // Go in reverse order so that smaller indexes appear first in the result
-    const std::size_t pos = operands.size() - 1 - i;
-    const equal_exprt equals(index, from_integer(pos, index_type));
-    if(operands[pos].type() != char_type)
-    {
-      INVARIANT(
-        operands[pos].id() == ID_unknown,
-        string_refinement_invariantt(
-          "elements can only have type char or "
-          "unknown, and it is not char type"));
-      result = if_exprt(equals, exprt(ID_unknown, char_type), result);
-    }
-    else
-      result = if_exprt(equals, operands[pos], result);
-  }
-  return result;
+  const exprt default_val = symbol_generator("out_of_bound_access", char_type);
+  const interval_sparse_arrayt sparse_array(array_expr, default_val);
+  return sparse_array.to_if_expression(index);
 }
 
 static exprt substitute_array_access(
@@ -1389,46 +1271,6 @@ static exprt negation_of_constraint(const string_constraintt &axiom)
   and_exprt negaxiom(premise, not_exprt(axiom.body()));
 
   return negaxiom;
-}
-
-/// Result of the solver `supert` should not be interpreted literally for char
-/// arrays as not all indices are present in the index set.
-/// In the given expression, we populate arrays at the indices for which the
-/// solver has no constraint by copying values to the left.
-/// For example an expression `ARRAY_OF(0) WITH [1:=2] WITH [4:=3]` would
-/// be interpreted as `{ 2, 2, 3, 3, 3}`.
-/// \param expr: expression to interpret
-/// \param string_max_length: maximum size of arrays to consider
-/// \param ns: namespace, used to determine what is an array of character
-/// \return the interpreted expression
-exprt concretize_arrays_in_expression(
-  exprt expr,
-  std::size_t string_max_length,
-  const namespacet &ns)
-{
-  auto it=expr.depth_begin();
-  const auto end=expr.depth_end();
-  while(it!=end)
-  {
-    if(is_char_array_type(it->type(), ns))
-    {
-      if(it->id() == ID_with || it->id() == ID_array_of)
-      {
-        it.mutate() = fill_in_array_with_expr(*it, string_max_length);
-        it.next_sibling_or_parent();
-      }
-      else if(it->id() == ID_array)
-      {
-        it.mutate() = fill_in_array_expr(to_array_expr(*it), string_max_length);
-        it.next_sibling_or_parent();
-      }
-      else
-        ++it; // ignoring other expressions
-    }
-    else
-      ++it;
-  }
-  return expr;
 }
 
 /// Debugging function which outputs the different steps an axiom goes through
@@ -2236,21 +2078,52 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
 /// Evaluates the given expression in the valuation found by
 /// string_refinementt::dec_solve.
 ///
-/// The difference with supert::get is that arrays of characters need to be
-/// concretized. See concretize_arrays_in_expression for how it is done.
+/// Arrays of characters are interpreted differently from the result of
+/// supert::get: values are propagated to the left to fill unknown.
 /// \param expr: an expression
 /// \return evaluated expression
 exprt string_refinementt::get(const exprt &expr) const
 {
-  // clang-format off
-  const auto super_get = [this](const exprt &expr)
-  {
+  const auto super_get = [this](const exprt &expr) {
     return supert::get(expr);
   };
-  // clang-format on
-
   exprt ecopy(expr);
   (void)symbol_resolve.replace_expr(ecopy);
+
+  // Special treatment for index expressions
+  const auto &index_expr = expr_try_dynamic_cast<index_exprt>(ecopy);
+  if(index_expr && is_char_type(index_expr->type()))
+  {
+    std::reference_wrapper<const exprt> current(index_expr->array());
+    while(current.get().id() == ID_if)
+    {
+      const auto &if_expr = expr_dynamic_cast<if_exprt>(current.get());
+      const exprt cond = get(if_expr.cond());
+      if(cond.is_true())
+        current = std::cref(if_expr.true_case());
+      else if(cond.is_false())
+        current = std::cref(if_expr.false_case());
+      else
+        UNREACHABLE;
+    }
+    const auto array = supert::get(current.get());
+    const auto index = get(index_expr->index());
+    const exprt unknown =
+      from_integer(CHARACTER_FOR_UNKNOWN, index_expr->type());
+    if(
+      const auto sparse_array = interval_sparse_arrayt::of_expr(array, unknown))
+    {
+      if(const auto index_value = numeric_cast<std::size_t>(index))
+        return sparse_array->at(*index_value);
+      return sparse_array->to_if_expression(index);
+    }
+
+    INVARIANT(
+      array.id() == ID_symbol,
+      "apart from symbols, array valuations can be interpreted as sparse "
+      "arrays");
+    return index_exprt(array, index);
+  }
 
   if(is_char_array_type(ecopy.type(), ns))
   {
@@ -2262,35 +2135,22 @@ exprt string_refinementt::get(const exprt &expr) const
         dependencies.eval(arr, [&](const exprt &expr) { return get(expr); }))
       return *from_dependencies;
 
-    const auto arr_model_opt =
-      get_array(super_get, ns, generator.max_string_length, debug(), arr);
-    // \todo Refactor with get array in model
-    if(arr_model_opt)
+    if(
+      const auto arr_model_opt =
+        get_array(super_get, ns, generator.max_string_length, debug(), arr))
+      return *arr_model_opt;
+
+    if(generator.get_created_strings().count(arr))
     {
-      const exprt arr_model = simplify_expr(*arr_model_opt, ns);
-      const exprt concretized_array = concretize_arrays_in_expression(
-        arr_model, generator.max_string_length, ns);
-      return concretized_array;
-    }
-    else
-    {
-      auto set = generator.get_created_strings();
-      if(set.find(arr) != set.end())
+      const exprt length = super_get(arr.length());
+      if(const auto n = numeric_cast<std::size_t>(length))
       {
-        exprt length = super_get(arr.length());
-        if(const auto n = numeric_cast<std::size_t>(length))
-        {
-          exprt arr_model =
-            array_exprt(array_typet(arr.type().subtype(), length));
-          for(size_t i = 0; i < *n; i++)
-            arr_model.copy_to_operands(exprt(ID_unknown, arr.type().subtype()));
-          const exprt concretized_array = concretize_arrays_in_expression(
-            arr_model, generator.max_string_length, ns);
-          return concretized_array;
-        }
+        const interval_sparse_arrayt sparse_array(
+          from_integer(CHARACTER_FOR_UNKNOWN, arr.type().subtype()));
+        return sparse_array.concretize(*n, length.type());
       }
-      return arr;
     }
+    return arr;
   }
   return supert::get(ecopy);
 }

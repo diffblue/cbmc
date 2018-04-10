@@ -175,9 +175,8 @@ exprt string_constraint_generatort::add_axioms_for_trim(
   const symbol_exprt idx = fresh_exist_index("index_trim", index_type);
   const exprt space_char = from_integer(' ', char_type);
 
-  exprt a1=str.axiom_for_length_ge(
-    plus_exprt_with_overflow_check(idx, res.length()));
-  lemmas.push_back(a1);
+  // Axiom 1.
+  lemmas.push_back(str.axiom_for_length_ge(plus_exprt(idx, res.length())));
 
   binary_relation_exprt a2(idx, ID_ge, from_integer(0, index_type));
   lemmas.push_back(a2);
@@ -197,32 +196,31 @@ exprt string_constraint_generatort::add_axioms_for_trim(
   string_constraintt a6(n, idx, non_print);
   constraints.push_back(a6);
 
-  symbol_exprt n2=fresh_univ_index("QA_index_trim2", index_type);
-  minus_exprt bound(str.length(), plus_exprt_with_overflow_check(idx,
-                                                                 res.length()));
-  binary_relation_exprt eqn2(
-    str[plus_exprt(idx, plus_exprt(res.length(), n2))],
-    ID_le,
-    space_char);
-
-  string_constraintt a7(n2, bound, eqn2);
-  constraints.push_back(a7);
+  // Axiom 7.
+  constraints.push_back([&] { // NOLINT
+    const symbol_exprt n2 = fresh_univ_index("QA_index_trim2", index_type);
+    const minus_exprt bound(minus_exprt(str.length(), idx), res.length());
+    const binary_relation_exprt eqn2(
+      str[plus_exprt(idx, plus_exprt(res.length(), n2))], ID_le, space_char);
+    return string_constraintt(n2, bound, eqn2);
+  }());
 
   symbol_exprt n3=fresh_univ_index("QA_index_trim3", index_type);
   equal_exprt eqn3(res[n3], str[plus_exprt(n3, idx)]);
   string_constraintt a8(n3, res.length(), eqn3);
   constraints.push_back(a8);
 
-  minus_exprt index_before(
-    plus_exprt_with_overflow_check(idx, res.length()),
-      from_integer(1, index_type));
-  binary_relation_exprt no_space_before(str[index_before], ID_gt, space_char);
-  or_exprt a9(
-    equal_exprt(idx, str.length()),
-    and_exprt(
-      binary_relation_exprt(str[idx], ID_gt, space_char),
-      no_space_before));
-  lemmas.push_back(a9);
+  // Axiom 9.
+  lemmas.push_back([&] {
+    const plus_exprt index_before(
+      idx, minus_exprt(res.length(), from_integer(1, index_type)));
+    const binary_relation_exprt no_space_before(
+      str[index_before], ID_gt, space_char);
+    return or_exprt(
+      equal_exprt(idx, str.length()),
+      and_exprt(
+        binary_relation_exprt(str[idx], ID_gt, space_char), no_space_before));
+  }());
   return from_integer(0, f.type());
 }
 
@@ -511,10 +509,7 @@ exprt string_constraint_generatort::add_axioms_for_delete_char_at(
   const array_string_exprt str = get_string_expr(f.arguments()[2]);
   exprt index_one=from_integer(1, str.length().type());
   return add_axioms_for_delete(
-    res,
-    str,
-    f.arguments()[3],
-    plus_exprt_with_overflow_check(f.arguments()[3], index_one));
+    res, str, f.arguments()[3], plus_exprt(f.arguments()[3], index_one));
 }
 
 /// Add axioms stating that `res` corresponds to the input `str`

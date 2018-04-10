@@ -177,8 +177,6 @@ private:
   array_string_exprt
   fresh_string(const typet &index_type, const typet &char_type);
   array_string_exprt get_string_expr(const exprt &expr);
-  plus_exprt plus_exprt_with_overflow_check(const exprt &op1, const exprt &op2);
-
 
   static constant_exprt constant_char(int i, const typet &char_type);
 
@@ -446,6 +444,9 @@ exprt minimum(const exprt &a, const exprt &b);
 
 /// \return expression representing the maximum of two expressions
 exprt maximum(const exprt &a, const exprt &b);
+
+/// \return Boolean true when the sum of the two expressions overflows
+exprt sum_overflows(const plus_exprt &sum);
 
 exprt length_constraint_for_concat_char(
   const array_string_exprt &res,

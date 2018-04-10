@@ -97,7 +97,7 @@ sparse_arrayt::sparse_arrayt(const with_exprt &expr)
   {
     const auto &with_expr = expr_dynamic_cast<with_exprt>(ref.get());
     const auto current_index = numeric_cast_v<std::size_t>(with_expr.where());
-    entries.emplace_back(current_index, with_expr.new_value());
+    entries[current_index] = with_expr.new_value();
     ref = with_expr.old();
   }
 
@@ -123,16 +123,10 @@ exprt sparse_arrayt::to_if_expression(const exprt &index) const
     });
 }
 
-interval_sparse_arrayt::interval_sparse_arrayt(const with_exprt &expr)
-  : sparse_arrayt(expr)
+exprt sparse_arrayt::at(const std::size_t index) const
 {
-  // Entries are sorted so that successive entries correspond to intervals
-  std::sort(
-    entries.begin(),
-    entries.end(),
-    [](
-      const std::pair<std::size_t, exprt> &a,
-      const std::pair<std::size_t, exprt> &b) { return a.first < b.first; });
+  const auto it = entries.find(index);
+  return it != entries.end() ? it->second : default_value;
 }
 
 exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const
@@ -150,6 +144,79 @@ exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const
       const binary_relation_exprt index_small_eq(index, ID_le, entry_index);
       return if_exprt(index_small_eq, then_expr, if_expr, if_expr.type());
     });
+}
+
+interval_sparse_arrayt::interval_sparse_arrayt(
+  const array_exprt &expr,
+  const exprt &extra_value)
+  : sparse_arrayt(extra_value)
+{
+  const auto &operands = expr.operands();
+  exprt last_added = extra_value;
+  for(std::size_t i = 0; i < operands.size(); ++i)
+  {
+    const std::size_t index = operands.size() - 1 - i;
+    if(operands[index].id() != ID_unknown && operands[index] != last_added)
+    {
+      entries[index] = operands[index];
+      last_added = operands[index];
+    }
+  }
+}
+
+interval_sparse_arrayt interval_sparse_arrayt::of_array_list(
+  const exprt &expr,
+  const exprt &extra_value)
+{
+  PRECONDITION(expr.operands().size() % 2 == 0);
+  interval_sparse_arrayt sparse_array(extra_value);
+  for(std::size_t i = 0; i < expr.operands().size(); i += 2)
+  {
+    const auto index = numeric_cast<std::size_t>(expr.operands()[i]);
+    INVARIANT(
+      expr.operands()[i + 1].type() == extra_value.type(),
+      "all values in array should have the same type");
+    if(index.has_value() && expr.operands()[i + 1].id() != ID_unknown)
+      sparse_array.entries[*index] = expr.operands()[i + 1];
+  }
+  return sparse_array;
+}
+
+optionalt<interval_sparse_arrayt>
+interval_sparse_arrayt::of_expr(const exprt &expr, const exprt &extra_value)
+{
+  if(const auto &array_expr = expr_try_dynamic_cast<array_exprt>(expr))
+    return interval_sparse_arrayt(*array_expr, extra_value);
+  if(const auto &with_expr = expr_try_dynamic_cast<with_exprt>(expr))
+    return interval_sparse_arrayt(*with_expr);
+  if(expr.id() == "array-list")
+    return of_array_list(expr, extra_value);
+  return {};
+}
+
+exprt interval_sparse_arrayt::at(const std::size_t index) const
+{
+  // First element at or after index
+  const auto it = entries.lower_bound(index);
+  return it != entries.end() ? it->second : default_value;
+}
+
+array_exprt interval_sparse_arrayt::concretize(
+  std::size_t size,
+  const typet &index_type) const
+{
+  const array_typet array_type(
+    default_value.type(), from_integer(size, index_type));
+  array_exprt array(array_type);
+  array.operands().reserve(size);
+
+  auto it = entries.begin();
+  for(; it != entries.end() && it->first < size; ++it)
+    array.operands().resize(it->first + 1, it->second);
+
+  array.operands().resize(
+    size, it == entries.end() ? default_value : it->second);
+  return array;
 }
 
 void equation_symbol_mappingt::add(const std::size_t i, const exprt &expr)
@@ -251,6 +318,14 @@ void string_dependenciest::add_dependency(
     string_nodet &string_node = get_node(s);
     string_node.dependencies.push_back(builtin_function_node.index);
   });
+}
+
+void string_dependenciest::clear()
+{
+  builtin_function_nodes.clear();
+  string_nodes.clear();
+  node_index_pool.clear();
+  clean_cache();
 }
 
 static void add_dependency_to_string_subexprs(

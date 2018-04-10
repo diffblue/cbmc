@@ -1,0 +1,9 @@
+CORE
+Test.class
+--refine-strings --function Test.checkAbort
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+This tests should abort, because concretizing a string of the required
+length may take to much memory.
