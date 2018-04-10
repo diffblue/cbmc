@@ -75,8 +75,7 @@ void slice_function_callst::operator()(goto_functiont &goto_function)
 
       const symbol_exprt &fun = to_symbol_expr(fun_call.function());
 
-      const irep_idt &function_id = fun.get_identifier();
-      if(!has_suffix(id2string(function_id), slice_function))
+      if(!std::regex_search(id2string(fun.get_identifier()), slice_function))
         continue;
 
       std::set<irep_idt> function_params;

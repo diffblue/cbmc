@@ -9,6 +9,7 @@ Author: Matthias Güdemann, matthias.guedemann@diffblue.com
 #ifndef CPROVER_GOTO_PROGRAMS_SLICE_FUNCTION_CALLS_H
 #define CPROVER_GOTO_PROGRAMS_SLICE_FUNCTION_CALLS_H
 
+#include <regex>
 #include <string>
 
 #include <util/graph.h>
@@ -45,7 +46,7 @@ typedef std::list<slice_nodet> slice_nodest;
 /// that are only used in that call as parameters.
 class slice_function_callst
 {
-  const std::string &slice_function;
+  const std::regex slice_function;
 
   std::set<irep_idt> compute_variable_set(const goto_functiont &);
 
