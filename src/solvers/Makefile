@@ -11,7 +11,7 @@ ifneq ($(MINISAT),)
   MINISAT_INCLUDE=-I $(MINISAT)
   MINISAT_LIB=$(MINISAT)/Solver$(OBJEXT) $(MINISAT)/Proof$(OBJEXT) $(MINISAT)/File$(OBJEXT)
   CP_CXXFLAGS += -DHAVE_MINISAT
-  CLEANFILES += $(MINISAT_LIB) $(patsubst %$(OBJEXT), %.d, $(MINISAT_LIB))
+  CLEANFILES += $(MINISAT_LIB) $(patsubst %$(OBJEXT), %$(DEPEXT), $(MINISAT_LIB))
 endif
 
 ifneq ($(MINISAT2),)
@@ -19,7 +19,7 @@ ifneq ($(MINISAT2),)
   MINISAT2_INCLUDE=-I $(MINISAT2)
   MINISAT2_LIB=$(MINISAT2)/minisat/simp/SimpSolver$(OBJEXT) $(MINISAT2)/minisat/core/Solver$(OBJEXT)
   CP_CXXFLAGS += -DHAVE_MINISAT2 -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
-  CLEANFILES += $(MINISAT2_LIB) $(patsubst %$(OBJEXT), %.d, $(MINISAT2_LIB))
+  CLEANFILES += $(MINISAT2_LIB) $(patsubst %$(OBJEXT), %$(DEPEXT), $(MINISAT2_LIB))
 endif
 
 ifneq ($(IPASIR),)
@@ -35,7 +35,7 @@ ifneq ($(GLUCOSE),)
   GLUCOSE_INCLUDE=-I $(GLUCOSE)
   GLUCOSE_LIB=$(GLUCOSE)/simp/SimpSolver$(OBJEXT) $(GLUCOSE)/core/Solver$(OBJEXT)
   CP_CXXFLAGS += -DHAVE_GLUCOSE -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
-  CLEANFILES += $(GLUCOSE_LIB) $(patsubst %$(OBJEXT), %.d, $(GLUCOSE_LIB))
+  CLEANFILES += $(GLUCOSE_LIB) $(patsubst %$(OBJEXT), %$(DEPEXT), $(GLUCOSE_LIB))
 endif
 
 ifneq ($(SQUOLEM2),)
@@ -214,6 +214,11 @@ endif
 SOLVER_LIB = $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
         $(MINISAT2_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
         $(PICOSAT_LIB) $(LINGELING_LIB) $(GLUCOSE_LIB) $(CADICAL_LIB)
+
+SOLVER_OBJS = $(filter %$(OBJEXT), $(SOLVER_LIB))
+ifneq ($(SOLVER_OBJS),)
+-include $(SOLVER_OBJS:$(OBJEXT)=$(DEPEXT))
+endif
 
 ###############################################################################
 
