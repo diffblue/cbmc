@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_literals.h"
 #include "java_utils.h"
 
+#define JAVA_MAIN_METHOD "main:([Ljava/lang/String;)V"
+
 static void create_initialize(symbol_table_baset &symbol_table)
 {
   // If __CPROVER_initialize already exists, replace it. It may already exist
@@ -242,6 +244,27 @@ static void java_static_lifetime_init(
   }
 }
 
+/// Checks whether the given symbol is a valid java main method
+/// i.e. it must be public, static, called 'main' and
+/// have signature void(String[])
+/// \param function: the function symbol
+/// \return true if it is a valid main method
+bool is_java_main(const symbolt &function)
+{
+  bool named_main = has_suffix(id2string(function.name), JAVA_MAIN_METHOD);
+  const code_typet &function_type = to_code_type(function.type);
+  const typet &string_array_type = java_type_from_string("[Ljava/lang/String;");
+  // checks whether the function is static and has a single String[] parameter
+  bool is_static = !function_type.has_this();
+  // this should be implied by the signature
+  const code_typet::parameterst &parameters = function_type.parameters();
+  bool has_correct_type = function_type.return_type().id() == ID_empty &&
+                          parameters.size() == 1 &&
+                          parameters[0].type().full_eq(string_array_type);
+  bool public_access = function_type.get(ID_access) == ID_public;
+  return named_main && is_static && has_correct_type && public_access;
+}
+
 ///  Extends \p init_code with code that allocates the objects used as test
 ///  arguments for the function under test (\p function) and
 ///  non-deterministically initializes them.
@@ -268,24 +291,7 @@ exprt::operandst java_build_arguments(
   // certain method arguments cannot be allowed to be null, we set the following
   // variable to true iff the method under test is the "main" method, which will
   // be called (by the jvm) with arguments that are never null
-  bool is_default_entry_point(config.main.empty());
-  bool is_main=is_default_entry_point;
-
-  // if walks like a duck and quacks like a duck, it is a duck!
-  if(!is_main)
-  {
-    bool named_main=has_suffix(config.main, ".main");
-    const typet &string_array_type=
-      java_type_from_string("[Ljava.lang.String;");
-    // checks whether the function is static and has a single String[] parameter
-    bool has_correct_type=
-      to_code_type(function.type).return_type().id()==ID_empty &&
-      (!to_code_type(function.type).has_this()) &&
-      parameters.size()==1 &&
-      parameters[0].type().full_eq(string_array_type);
-    bool public_access = function.type.get(ID_access) == ID_public;
-    is_main = named_main && has_correct_type && public_access;
-  }
+  bool is_main = is_java_main(function);
 
   // we iterate through all the parameters of the function under test, allocate
   // an object for that parameter (recursively allocating other objects
@@ -455,37 +461,25 @@ main_function_resultt get_main_symbol(
 
     // are we given a main class?
     if(main_class.empty())
-      return main_function_resultt::NotFound; // silently ignore
-
-    std::string entry_method = id2string(main_class) + ".main";
-
-    std::string prefix="java::"+entry_method+":";
-
-    // look it up
-    std::set<const symbolt *> matches;
-
-    for(const auto &named_symbol : symbol_table.symbols)
     {
-      if(named_symbol.second.type.id() == ID_code
-        && has_prefix(id2string(named_symbol.first), prefix))
-      {
-        matches.insert(&named_symbol.second);
-      }
-    }
-
-    if(matches.empty())
-      // Not found, silently ignore
+      // no, but we allow this situation to output symbol table,
+      // goto functions, etc
       return main_function_resultt::NotFound;
-
-    if(matches.size() > 1)
-    {
-      message.error()
-        << "main method in `" << main_class
-        << "' is ambiguous" << messaget::eom;
-      return main_function_resultt::Error;  // give up with error, no main
     }
 
-    return **matches.begin(); // Return found function
+    std::string entry_method =
+      "java::" + id2string(main_class) + "." + JAVA_MAIN_METHOD;
+    const symbolt *symbol = symbol_table.lookup(entry_method);
+
+    // has the class a correct main method?
+    if(!symbol || !is_java_main(*symbol))
+    {
+      // no, but we allow this situation to output symbol table,
+      // goto functions, etc
+      return main_function_resultt::NotFound;
+    }
+
+    return *symbol;
   }
 }
 
