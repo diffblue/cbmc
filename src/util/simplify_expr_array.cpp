@@ -167,7 +167,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
       return false;
     }
   }
-  else if(array.id()=="array-list")
+  else if(array.id() == ID_array_list)
   {
     // These are index/value pairs, alternating.
     for(size_t i=0; i<array.operands().size()/2; i++)

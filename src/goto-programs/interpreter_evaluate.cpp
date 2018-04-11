@@ -934,7 +934,7 @@ void interpretert::evaluate(
               return;
           }
         }
-        else if(expr.op0().id()=="array-list")
+        else if(expr.op0().id() == ID_array_list)
         {
           // This sort of construct comes from boolbv_get, but doesn't seem
           // to have an exprt yet. Its operands are a list of key-value pairs.

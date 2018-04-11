@@ -131,8 +131,9 @@ public:
   /// Initialize a sparse array from an array represented by a list of
   /// index-value pairs, and setting the default to `extra_value`.
   /// Indexes must be constant expressions, and negative indexes are ignored.
-  static interval_sparse_arrayt
-  of_array_list(const exprt &expr, const exprt &extra_value);
+  interval_sparse_arrayt(
+    const array_list_exprt &expr,
+    const exprt &extra_value);
 
   exprt to_if_expression(const exprt &index) const override;
 

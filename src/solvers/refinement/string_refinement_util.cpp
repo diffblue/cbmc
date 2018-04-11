@@ -164,12 +164,12 @@ interval_sparse_arrayt::interval_sparse_arrayt(
   }
 }
 
-interval_sparse_arrayt interval_sparse_arrayt::of_array_list(
-  const exprt &expr,
+interval_sparse_arrayt::interval_sparse_arrayt(
+  const array_list_exprt &expr,
   const exprt &extra_value)
+  : interval_sparse_arrayt(extra_value)
 {
   PRECONDITION(expr.operands().size() % 2 == 0);
-  interval_sparse_arrayt sparse_array(extra_value);
   for(std::size_t i = 0; i < expr.operands().size(); i += 2)
   {
     const auto index = numeric_cast<std::size_t>(expr.operands()[i]);
@@ -177,9 +177,8 @@ interval_sparse_arrayt interval_sparse_arrayt::of_array_list(
       expr.operands()[i + 1].type() == extra_value.type(),
       "all values in array should have the same type");
     if(index.has_value() && expr.operands()[i + 1].id() != ID_unknown)
-      sparse_array.entries[*index] = expr.operands()[i + 1];
+      entries[*index] = expr.operands()[i + 1];
   }
-  return sparse_array;
 }
 
 optionalt<interval_sparse_arrayt>
@@ -189,8 +188,8 @@ interval_sparse_arrayt::of_expr(const exprt &expr, const exprt &extra_value)
     return interval_sparse_arrayt(*array_expr, extra_value);
   if(const auto &with_expr = expr_try_dynamic_cast<with_exprt>(expr))
     return interval_sparse_arrayt(*with_expr);
-  if(expr.id() == "array-list")
-    return of_array_list(expr, extra_value);
+  if(const auto &array_list = expr_try_dynamic_cast<array_list_exprt>(expr))
+    return interval_sparse_arrayt(*array_list, extra_value);
   return {};
 }
 
