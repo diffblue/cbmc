@@ -14,6 +14,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 #include <util/simplify_expr.h>
+#include <util/deprecate.h>
 
 #include <cmath>
 #include <solvers/floatbv/float_bv.h>
@@ -40,6 +41,7 @@ exprt string_constraint_generatort::add_axioms_from_int(
 /// \deprecated should use add_axioms_from_int instead
 /// \param f: function application with one long argument
 /// \return a new string expression
+DEPRECATED("should use add_axioms_from_int instead")
 exprt string_constraint_generatort::add_axioms_from_long(
   const function_application_exprt &f)
 {
@@ -54,9 +56,10 @@ exprt string_constraint_generatort::add_axioms_from_long(
 }
 
 /// Add axioms corresponding to the String.valueOf(Z) java function.
-/// \deprecated this is specific to Java
+/// \deprecated This is Java specific and should be implemented in Java instead
 /// \param f: function application with a Boolean argument
 /// \return a new string expression
+DEPRECATED("This is Java specific and should be implemented in Java instead")
 exprt string_constraint_generatort::add_axioms_from_bool(
   const function_application_exprt &f)
 {
@@ -68,10 +71,11 @@ exprt string_constraint_generatort::add_axioms_from_bool(
 
 /// Add axioms stating that the returned string equals "true" when the Boolean
 /// expression is true and "false" when it is false.
-/// \deprecated This is language dependent
+/// \deprecated This is Java specific and should be implemented in Java instead
 /// \param res: string expression for the result
 /// \param b: Boolean expression
 /// \return code 0 on success
+DEPRECATED("This is Java specific and should be implemented in Java instead")
 exprt string_constraint_generatort::add_axioms_from_bool(
   const array_string_exprt &res,
   const exprt &b)
@@ -200,6 +204,7 @@ exprt string_constraint_generatort::int_of_hex_char(const exprt &chr)
 /// \param res: string expression for the result
 /// \param i: an integer argument
 /// \return code 0 on success
+DEPRECATED("use add_axioms_from_int which takes a radix argument instead")
 exprt string_constraint_generatort::add_axioms_from_int_hex(
   const array_string_exprt &res,
   const exprt &i)

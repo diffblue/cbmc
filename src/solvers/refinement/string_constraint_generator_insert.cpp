@@ -11,6 +11,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
+#include <util/deprecate.h>
 
 /// Add axioms ensuring the result `res` corresponds to `s1` where we
 /// inserted `s2` at position `offset`.
@@ -126,10 +127,11 @@ exprt string_constraint_generatort::add_axioms_for_insert(
 }
 
 /// add axioms corresponding to the StringBuilder.insert(I) java function
-/// \deprecated
+/// \deprecated should convert the value to string and call insert
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and an integer
 /// \return an expression
+DEPRECATED("should convert the value to string and call insert")
 exprt string_constraint_generatort::add_axioms_for_insert_int(
   const function_application_exprt &f)
 {
@@ -150,6 +152,7 @@ exprt string_constraint_generatort::add_axioms_for_insert_int(
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a Boolean
 /// \return a new string expression
+DEPRECATED("should convert the value to string and call insert")
 exprt string_constraint_generatort::add_axioms_for_insert_bool(
   const function_application_exprt &f)
 {
@@ -190,6 +193,7 @@ exprt string_constraint_generatort::add_axioms_for_insert_char(
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a double
 /// \return a string expression
+DEPRECATED("should convert the value to string and call insert")
 exprt string_constraint_generatort::add_axioms_for_insert_double(
   const function_application_exprt &f)
 {
@@ -211,6 +215,7 @@ exprt string_constraint_generatort::add_axioms_for_insert_double(
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a float
 /// \return a new string expression
+DEPRECATED("should convert the value to string and call insert")
 exprt string_constraint_generatort::add_axioms_for_insert_float(
   const function_application_exprt &f)
 {
