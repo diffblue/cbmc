@@ -209,7 +209,8 @@ public:
 
     mstreamt &operator << (const xmlt &data)
     {
-      *this << eom; // force end of previous message
+      if(this->tellp() > 0)
+        *this << eom; // force end of previous message
       if(message.message_handler)
       {
         message.message_handler->print(message_level, data);
@@ -219,7 +220,8 @@ public:
 
     mstreamt &operator << (const json_objectt &data)
     {
-      *this << eom; // force end of previous message
+      if(this->tellp() > 0)
+        *this << eom; // force end of previous message
       if(message.message_handler)
       {
         message.message_handler->print(message_level, data);
@@ -243,7 +245,8 @@ public:
     /// Returns a reference to the top-level JSON array stream
     json_stream_arrayt &json_stream()
     {
-      *this << eom; // force end of previous message
+      if(this->tellp() > 0)
+        *this << eom; // force end of previous message
       return message.message_handler->get_json_stream();
     }
 
