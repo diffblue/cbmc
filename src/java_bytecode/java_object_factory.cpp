@@ -248,7 +248,8 @@ exprt allocate_dynamic_object(
 /// \param symbol_table: symbol table
 /// \param loc: location in the source
 /// \param output_code: code block to which the necessary code is added
-void allocate_dynamic_object_with_decl(
+/// \return the dynamic object created
+exprt allocate_dynamic_object_with_decl(
   const exprt &target_expr,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
@@ -257,8 +258,7 @@ void allocate_dynamic_object_with_decl(
   std::vector<const symbolt *> symbols_created;
   code_blockt tmp_block;
   const typet &allocate_type=target_expr.type().subtype();
-  // We will not use the malloc site and can safely ignore it
-  (void) allocate_dynamic_object(
+  const exprt dynamic_object = allocate_dynamic_object(
     target_expr,
     allocate_type,
     symbol_table,
@@ -278,6 +278,7 @@ void allocate_dynamic_object_with_decl(
 
   for(const exprt &code : tmp_block.operands())
     output_code.add(to_code(code));
+  return dynamic_object;
 }
 
 /// Installs a new symbol in the symbol table, pushing the corresponding symbolt
@@ -701,11 +702,12 @@ static bool add_nondet_string_pointer_initialization(
   if(!struct_type.has_component("data") || !struct_type.has_component("length"))
     return true;
 
-  allocate_dynamic_object_with_decl(expr, symbol_table, loc, code);
+  const exprt malloc_site =
+    allocate_dynamic_object_with_decl(expr, symbol_table, loc, code);
 
   code.add(
     initialize_nondet_string_struct(
-      dereference_exprt(expr, struct_type),
+      dereference_exprt(malloc_site, struct_type),
       max_nondet_string_length,
       loc,
       symbol_table,
