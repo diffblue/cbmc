@@ -182,6 +182,35 @@ jobs:
         - CCACHE_CPP2=yes
       script: echo "Not running any tests for a debug build."
 
+    # Ubuntu Linux with glibc using g++-5
+    - stage: Test different OS/CXX/Flags
+      os: linux
+      sudo: false
+      compiler: gcc
+      cache: ccache
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - libwww-perl
+            - g++-5
+            - libubsan0
+            - parallel
+      before_install:
+        - |
+          if [[ "${TRAVIS_EVENT_TYPE}" != "cron" ]]
+          then
+            echo "This is not a cron build and build is not needed."
+            travis_terminate 0
+          fi
+        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
+      # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
+      env:
+        - NAME="configuration HASH_CODE"
+        - COMPILER="ccache /usr/bin/g++-5"
+        - EXTRA_CXXFLAGS="-D_GLIBCXX_DEBUG -DHASH_CODE"
+
     # cmake build using g++-5
     - stage: Test different OS/CXX/Flags
       os: linux
