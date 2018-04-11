@@ -237,10 +237,16 @@ private:
   dt &write(bool mark_shareable)
   {
 #ifdef SHARING
-    return data.write(mark_shareable);
+    dt &retval = data.write(mark_shareable);
 #else
-    return data;
+    dt &retval = data;
 #endif
+
+#ifdef HASH_CODE
+    retval.hash_code = 0;
+#endif
+
+    return retval;
   }
 
 public:
