@@ -91,6 +91,12 @@ public:
     const char **argv,
     const std::string &extra_options);
 
+  /// \brief Set the options that have default values
+  ///
+  /// This function can be called from clients that wish to emulate CBMC's
+  /// default behaviour, for example unit tests.
+  static void set_default_options(optionst &);
+
 protected:
   goto_modelt goto_model;
   ui_message_handlert ui_message_handler;
