@@ -97,6 +97,15 @@ public:
   /// default behaviour, for example unit tests.
   static void set_default_options(optionst &);
 
+  static bool process_goto_program(goto_modelt &, const optionst &, messaget &);
+
+  static int get_goto_program(
+    goto_modelt &,
+    const optionst &,
+    const cmdlinet &,
+    messaget &,
+    ui_message_handlert &);
+
 protected:
   goto_modelt goto_model;
   ui_message_handlert ui_message_handler;
@@ -105,8 +114,6 @@ protected:
   void register_languages();
   void get_command_line_options(optionst &);
   void preprocessing();
-  int get_goto_program(const optionst &);
-  bool process_goto_program(const optionst &);
   bool set_properties();
 };
 

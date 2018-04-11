@@ -321,7 +321,8 @@ private:
   "                              (use --show-loops to get the loop IDs)\n"     \
   " --show-vcc                   show the verification conditions\n"           \
   " --slice-formula              remove assignments unrelated to property\n"   \
-  " --unwinding-assertions       generate unwinding assertions\n"              \
+  " --unwinding-assertions       generate unwinding assertions (cannot be\n"   \
+  "                              used with --cover or --partial-loops)\n"      \
   " --partial-loops              permit paths with partial loops\n"            \
   " --no-pretty-names            do not simplify identifiers\n"                \
   " --graphml-witness filename   write the witness in GraphML format to "      \
