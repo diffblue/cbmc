@@ -31,6 +31,7 @@ class exprt;
 class namespacet;
 class typet;
 class cmdlinet;
+class json_objectt;
 
 #define OPT_FUNCTIONS \
   "(function):"
@@ -126,6 +127,16 @@ public:
     std::string &code,
     const namespacet &ns);
 
+  virtual json_objectt json(
+    const exprt &,
+    const namespacet &);
+
+  virtual json_objectt json(
+    const typet &,
+    const namespacet &);
+
+  virtual json_objectt json(const source_locationt &);
+
   virtual bool type_to_name(
     const typet &type,
     std::string &name,
@@ -136,6 +147,9 @@ public:
     const std::string &module,
     exprt &expr,
     const namespacet &ns)=0;
+
+  /// returns the class type that contains RTTI
+  virtual symbol_typet root_base_class_type() = 0;
 
   virtual std::unique_ptr<languaget> new_language()=0;
 

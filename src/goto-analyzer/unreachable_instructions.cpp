@@ -16,9 +16,10 @@ Date: April 2016
 #include <sstream>
 
 #include <util/json.h>
-#include <util/json_expr.h>
 #include <util/file_util.h>
 #include <util/xml.h>
+
+#include <langapi/language_util.h>
 
 #include <analyses/cfg_dominators.h>
 
@@ -157,7 +158,7 @@ static void add_to_json(
     // print info for file actually with full path
     json_objectt &i_entry=dead_ins.push_back().make_object();
     const source_locationt &l=it->second->source_location;
-    i_entry["sourceLocation"]=json(l);
+    i_entry["sourceLocation"] = json(ns, it->second->function, l);
     i_entry["statement"]=json_stringt(s);
   }
 }

@@ -247,6 +247,7 @@ void java_string_library_preprocesst::add_string_type(
   string_symbol->pretty_name=id2string(class_name);
   string_symbol->type=string_type;
   string_symbol->is_type=true;
+  string_symbol->mode = ID_java;
 }
 
 /// add a symbol in the table with static lifetime and name containing

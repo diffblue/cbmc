@@ -137,7 +137,7 @@ void convert_properties_json(
       json_property["coveredLines"]=
         json_stringt(
           id2string(source_location.get_basic_block_covered_lines()));
-    json_property["sourceLocation"]=json(source_location);
+    json_property["sourceLocation"] = json(ns, identifier, source_location);
     json_property["description"]=json_stringt(id2string(description));
     json_property["expression"]=
       json_stringt(from_expr(ns, identifier, ins.guard));

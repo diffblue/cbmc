@@ -23,6 +23,7 @@ Author: Daniel Kroening
 #include <util/simplify_expr.h>
 #include <util/json_irep.h>
 #include <langapi/language_util.h>
+#include <langapi/mode.h>
 
 /// Convert an ASSERT goto_trace step.
 /// \param [out] json_failure: The JSON object that
@@ -123,39 +124,28 @@ void convert_decl(
 
   full_lhs_string = from_expr(ns, identifier, simplified);
 
-  const symbolt *symbol;
   irep_idt base_name, display_name;
 
-  if(!ns.lookup(identifier, symbol))
-  {
-    base_name = symbol->base_name;
-    display_name = symbol->display_name();
-    if(type_string == "")
-      type_string = from_type(ns, identifier, symbol->type);
+  const symbolt *symbol;
+  bool not_found = ns.lookup(identifier, symbol);
+  CHECK_RETURN(!not_found);
+  base_name = symbol->base_name;
+  display_name = symbol->display_name();
 
-    json_assignment["mode"] = json_stringt(id2string(symbol->mode));
-    exprt simplified = simplify_expr(step.full_lhs_value, ns);
+  json_assignment["mode"] = json_stringt(id2string(symbol->mode));
 
-    full_lhs_value = json(simplified, ns, symbol->mode);
-  }
-  else
-  {
-    DATA_INVARIANT(
-      step.full_lhs_value.is_not_nil(),
-      "full_lhs_value in assignment must not be nil");
-    full_lhs_value = json(step.full_lhs_value, ns, ID_unknown);
-  }
-
-  json_assignment["value"] = full_lhs_value;
-  json_assignment["lhs"] = json_stringt(full_lhs_string);
+  const exprt value_simplified = simplify_expr(step.full_lhs_value, ns);
+  json_assignment["value"] = json(ns, identifier, value_simplified);
+  json_assignment["lhs"]=json_stringt(full_lhs_string);
   if(trace_options.json_full_lhs)
   {
     // Not language specific, still mangled, fully-qualified name of lhs
-    json_assignment["rawLhs"] = json_irept(true).convert_from_irep(simplified);
+    json_assignment["rawLhs"] =
+      json_irept(true).convert_from_irep(simplified);
   }
-  json_assignment["hidden"] = jsont::json_boolean(step.hidden);
-  json_assignment["internal"] = jsont::json_boolean(step.internal);
-  json_assignment["thread"] = json_numbert(std::to_string(step.thread_nr));
+  json_assignment["hidden"]=jsont::json_boolean(step.hidden);
+  json_assignment["internal"]=jsont::json_boolean(step.internal);
+  json_assignment["thread"]=json_numbert(std::to_string(step.thread_nr));
 
   json_assignment["assignmentType"] = json_stringt(
     step.assignment_type == goto_trace_stept::assignment_typet::ACTUAL_PARAMETER
@@ -186,20 +176,17 @@ void convert_output(
   json_output["outputID"] = json_stringt(id2string(step.io_id));
 
   // Recovering the mode from the function
-  irep_idt mode;
-  const symbolt *function_name;
-  if(ns.lookup(source_location.get_function(), function_name))
-    // Failed to find symbol
-    mode = ID_unknown;
-  else
-    mode = function_name->mode;
+  const irep_idt mode =
+    get_mode_from_identifier(ns, source_location.get_function());
   json_output["mode"] = json_stringt(id2string(mode));
-  json_arrayt &json_values = json_output["values"].make_array();
+  json_arrayt &json_values=json_output["values"].make_array();
 
   for(const auto &arg : step.io_args)
   {
-    arg.is_nil() ? json_values.push_back(json_stringt(""))
-                 : json_values.push_back(json(arg, ns, mode));
+    if(arg.is_nil())
+      json_values.push_back(json_stringt(""));
+    else
+      json_values.push_back(json(ns, source_location.get_function(), arg));
   }
 
   if(!location.is_null())
@@ -229,20 +216,17 @@ void convert_input(
   json_input["inputID"] = json_stringt(id2string(step.io_id));
 
   // Recovering the mode from the function
-  irep_idt mode;
-  const symbolt *function_name;
-  if(ns.lookup(source_location.get_function(), function_name))
-    // Failed to find symbol
-    mode = ID_unknown;
-  else
-    mode = function_name->mode;
-  json_input["mode"] = json_stringt(id2string(mode));
-  json_arrayt &json_values = json_input["values"].make_array();
+  const irep_idt mode =
+    get_mode_from_identifier(ns, source_location.get_function());
+  json_input["mode"]=json_stringt(id2string(mode));
+  json_arrayt &json_values=json_input["values"].make_array();
 
   for(const auto &arg : step.io_args)
   {
-    arg.is_nil() ? json_values.push_back(json_stringt(""))
-                 : json_values.push_back(json(arg, ns, mode));
+    if(arg.is_nil())
+      json_values.push_back(json_stringt(""));
+    else
+      json_values.push_back(json(ns, source_location.get_function(), arg));
   }
 
   if(!location.is_null())
@@ -277,7 +261,7 @@ void convert_return(
   json_objectt &json_function = json_call_return["function"].make_object();
   json_function["displayName"] = json_stringt(id2string(symbol.display_name()));
   json_function["identifier"] = json_stringt(id2string(step.identifier));
-  json_function["sourceLocation"] = json(symbol.location);
+  json_function["sourceLocation"] = json(ns, step.identifier, symbol.location);
 
   if(!location.is_null())
     json_call_return["sourceLocation"] = location;

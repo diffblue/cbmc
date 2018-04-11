@@ -468,8 +468,8 @@ void goto_convertt::do_cpp_new(
     assert(code_type.parameters().size()==1 ||
            code_type.parameters().size()==2);
 
-    const symbolt &tmp_symbol=
-      new_tmp_symbol(return_type, "new", dest, rhs.source_location());
+    const symbolt &tmp_symbol =
+      new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);
 
     tmp_symbol_expr=tmp_symbol.symbol_expr();
 
@@ -499,8 +499,8 @@ void goto_convertt::do_cpp_new(
     assert(code_type.parameters().size()==2 ||
            code_type.parameters().size()==3);
 
-    const symbolt &tmp_symbol=
-      new_tmp_symbol(return_type, "new", dest, rhs.source_location());
+    const symbolt &tmp_symbol =
+      new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);
 
     tmp_symbol_expr=tmp_symbol.symbol_expr();
 
@@ -537,217 +537,6 @@ void goto_convertt::do_cpp_new(
   cpp_new_initializer(lhs, rhs, tmp_initializer);
 
   dest.destructive_append(tmp_initializer);
-}
-
-void goto_convertt::do_java_new(
-  const exprt &lhs,
-  const side_effect_exprt &rhs,
-  goto_programt &dest)
-{
-  PRECONDITION(!lhs.is_nil());
-  PRECONDITION(rhs.operands().empty());
-  PRECONDITION(rhs.type().id() == ID_pointer);
-  source_locationt location=rhs.source_location();
-  typet object_type=rhs.type().subtype();
-
-  // build size expression
-  exprt object_size=size_of_expr(object_type, ns);
-  CHECK_RETURN(object_size.is_not_nil());
-
-  // we produce a malloc side-effect, which stays
-  side_effect_exprt malloc_expr(ID_allocate, rhs.type());
-  malloc_expr.copy_to_operands(object_size);
-  // could use true and get rid of the code below
-  malloc_expr.copy_to_operands(false_exprt());
-
-  goto_programt::targett t_n=dest.add_instruction(ASSIGN);
-  t_n->code=code_assignt(lhs, malloc_expr);
-  t_n->source_location=location;
-
-  // zero-initialize the object
-  dereference_exprt deref(lhs, object_type);
-  exprt zero_object=
-    zero_initializer(object_type, location, ns, get_message_handler());
-  set_class_identifier(
-    to_struct_expr(zero_object), ns, to_symbol_type(object_type));
-  goto_programt::targett t_i=dest.add_instruction(ASSIGN);
-  t_i->code=code_assignt(deref, zero_object);
-  t_i->source_location=location;
-}
-
-void goto_convertt::do_java_new_array(
-  const exprt &lhs,
-  const side_effect_exprt &rhs,
-  goto_programt &dest)
-{
-  PRECONDITION(!lhs.is_nil()); // do_java_new_array without lhs not implemented
-  PRECONDITION(rhs.operands().size() >= 1); // one per dimension
-  PRECONDITION(rhs.type().id() == ID_pointer);
-
-  source_locationt location=rhs.source_location();
-  typet object_type=rhs.type().subtype();
-  PRECONDITION(ns.follow(object_type).id() == ID_struct);
-
-  // build size expression
-  exprt object_size=size_of_expr(object_type, ns);
-
-  CHECK_RETURN(!object_size.is_nil());
-
-  // we produce a malloc side-effect, which stays
-  side_effect_exprt malloc_expr(ID_allocate, rhs.type());
-  malloc_expr.copy_to_operands(object_size);
-  // code use true and get rid of the code below
-  malloc_expr.copy_to_operands(false_exprt());
-
-  goto_programt::targett t_n=dest.add_instruction(ASSIGN);
-  t_n->code=code_assignt(lhs, malloc_expr);
-  t_n->source_location=location;
-
-  const struct_typet &struct_type=to_struct_type(ns.follow(object_type));
-
-  // Ideally we would have a check for `is_valid_java_array(struct_type)` but
-  // `is_valid_java_array is part of the java_bytecode module and we cannot
-  // introduce such dependencies. We do this simple check instead:
-  PRECONDITION(struct_type.components().size()==3);
-
-  // Init base class:
-  dereference_exprt deref(lhs, object_type);
-  exprt zero_object=
-    zero_initializer(object_type, location, ns, get_message_handler());
-  set_class_identifier(
-    to_struct_expr(zero_object), ns, to_symbol_type(object_type));
-  goto_programt::targett t_i=dest.add_instruction(ASSIGN);
-  t_i->code=code_assignt(deref, zero_object);
-  t_i->source_location=location;
-
-  // if it's an array, we need to set the length field
-  member_exprt length(
-    deref,
-    struct_type.components()[1].get_name(),
-    struct_type.components()[1].type());
-  goto_programt::targett t_s=dest.add_instruction(ASSIGN);
-  t_s->code=code_assignt(length, rhs.op0());
-  t_s->source_location=location;
-
-  // we also need to allocate space for the data
-  member_exprt data(
-    deref,
-    struct_type.components()[2].get_name(),
-    struct_type.components()[2].type());
-
-  // Allocate a (struct realtype**) instead of a (void**) if possible.
-  const irept &given_element_type=object_type.find(ID_C_element_type);
-  typet allocate_data_type;
-  if(given_element_type.is_not_nil())
-  {
-    allocate_data_type=
-      pointer_type(static_cast<const typet &>(given_element_type));
-  }
-  else
-    allocate_data_type=data.type();
-
-  side_effect_exprt data_java_new_expr(
-    ID_java_new_array_data, allocate_data_type);
-
-  // The instruction may specify a (hopefully small) upper bound on the
-  // array size, in which case we allocate a fixed-length array that may
-  // be larger than the `length` member rather than use a true variable-
-  // length array, which produces a more complex formula in the current
-  // backend.
-  const irept size_bound=rhs.find(ID_length_upper_bound);
-  if(size_bound.is_nil())
-    data_java_new_expr.set(ID_size, rhs.op0());
-  else
-    data_java_new_expr.set(ID_size, size_bound);
-
-  // Must directly assign the new array to a temporary
-  // because goto-symex will notice `x=side_effect_exprt` but not
-  // `x=typecast_exprt(side_effect_exprt(...))`
-  symbol_exprt new_array_data_symbol=
-    new_tmp_symbol(
-      data_java_new_expr.type(),
-      "new_array_data",
-      dest,
-      location)
-    .symbol_expr();
-  goto_programt::targett t_p2=dest.add_instruction(ASSIGN);
-  t_p2->code=code_assignt(new_array_data_symbol, data_java_new_expr);
-  t_p2->source_location=location;
-
-  goto_programt::targett t_p=dest.add_instruction(ASSIGN);
-  exprt cast_java_new=new_array_data_symbol;
-  if(cast_java_new.type()!=data.type())
-    cast_java_new=typecast_exprt(cast_java_new, data.type());
-  t_p->code=code_assignt(data, cast_java_new);
-  t_p->source_location=location;
-
-  // zero-initialize the data
-  if(!rhs.get_bool(ID_skip_initialize))
-  {
-    exprt zero_element=
-      zero_initializer(
-        data.type().subtype(),
-        location,
-        ns,
-        get_message_handler());
-    codet array_set(ID_array_set);
-    array_set.copy_to_operands(new_array_data_symbol, zero_element);
-    goto_programt::targett t_d=dest.add_instruction(OTHER);
-    t_d->code=array_set;
-    t_d->source_location=location;
-  }
-
-  // multi-dimensional?
-
-  if(rhs.operands().size()>=2)
-  {
-    // produce
-    // for(int i=0; i<size; i++) tmp[i]=java_new(dim-1);
-    // This will be converted recursively.
-
-    goto_programt tmp;
-
-    symbol_exprt tmp_i=
-      new_tmp_symbol(length.type(), "index", tmp, location).symbol_expr();
-
-    code_fort for_loop;
-
-    side_effect_exprt sub_java_new=rhs;
-    sub_java_new.operands().erase(sub_java_new.operands().begin());
-
-    assert(rhs.type().id()==ID_pointer);
-    typet sub_type=
-      static_cast<const typet &>(rhs.type().subtype().find("#element_type"));
-    assert(sub_type.id()==ID_pointer);
-    sub_java_new.type()=sub_type;
-
-    side_effect_exprt inc(ID_assign);
-    inc.operands().resize(2);
-    inc.op0()=tmp_i;
-    inc.op1()=plus_exprt(tmp_i, from_integer(1, tmp_i.type()));
-
-    dereference_exprt deref_expr(
-      plus_exprt(data, tmp_i), data.type().subtype());
-
-    code_blockt for_body;
-    symbol_exprt init_sym=
-      new_tmp_symbol(sub_type, "subarray_init", tmp, location).symbol_expr();
-
-    code_assignt init_subarray(init_sym, sub_java_new);
-    code_assignt assign_subarray(
-      deref_expr,
-      typecast_exprt(init_sym, deref_expr.type()));
-    for_body.move_to_operands(init_subarray);
-    for_body.move_to_operands(assign_subarray);
-
-    for_loop.init()=code_assignt(tmp_i, from_integer(0, tmp_i.type()));
-    for_loop.cond()=binary_relation_exprt(tmp_i, ID_lt, rhs.op0());
-    for_loop.iter()=inc;
-    for_loop.body()=for_body;
-
-    convert(for_loop, tmp);
-    dest.destructive_append(tmp);
-  }
 }
 
 /// builds a goto program for object initialization after new

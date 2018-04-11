@@ -60,6 +60,12 @@ public:
     exprt &expr,
     const namespacet &ns) override;
 
+  virtual symbol_typet root_base_class_type() override
+  {
+    // unused
+    UNREACHABLE;
+  }
+
   virtual std::unique_ptr<languaget> new_language() override
   { return util_make_unique<jsil_languaget>(); }
 

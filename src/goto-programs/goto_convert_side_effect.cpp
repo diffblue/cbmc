@@ -379,7 +379,7 @@ void goto_convertt::remove_function_call(
 
     new_base_name+='_';
     new_base_name+=id2string(symbol.base_name);
-    new_base_name+="$"+std::to_string(++temporary_counter);
+    new_base_name += "$0";
 
     new_symbol.base_name=new_base_name;
     new_symbol.mode=symbol.mode;
@@ -387,6 +387,7 @@ void goto_convertt::remove_function_call(
 
   new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
 
+  // ensure that the name is unique
   new_name(new_symbol);
 
   {
@@ -429,10 +430,11 @@ void goto_convertt::remove_cpp_new(
 
   auxiliary_symbolt new_symbol;
 
-  new_symbol.base_name="new_ptr$"+std::to_string(++temporary_counter);
+  new_symbol.base_name = "new_ptr$0";
   new_symbol.type=expr.type();
   new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
 
+  // ensure that the name is unique
   new_name(new_symbol);
 
   code_declt decl;
@@ -480,11 +482,12 @@ void goto_convertt::remove_malloc(
   {
     auxiliary_symbolt new_symbol;
 
-    new_symbol.base_name="malloc_value$"+std::to_string(++temporary_counter);
+    new_symbol.base_name = "malloc_value$0";
     new_symbol.type=expr.type();
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
     new_symbol.location=expr.source_location();
 
+    // ensure that the name is unique
     new_name(new_symbol);
 
     code_declt decl;
@@ -519,10 +522,8 @@ void goto_convertt::remove_temporary_object(
     throw 0;
   }
 
-  symbolt &new_symbol=
-    new_tmp_symbol(expr.type(), "obj", dest, expr.find_source_location());
-
-  new_symbol.mode=expr.get(ID_mode);
+  symbolt &new_symbol = new_tmp_symbol(
+    expr.type(), "obj", dest, expr.find_source_location(), expr.get(ID_mode));
 
   if(expr.operands().size()==1)
   {
@@ -596,8 +597,12 @@ void goto_convertt::remove_statement_expression(
 
   source_locationt source_location=last.find_source_location();
 
-  symbolt &new_symbol=
-    new_tmp_symbol(expr.type(), "statement_expression", dest, source_location);
+  symbolt &new_symbol = new_tmp_symbol(
+    expr.type(),
+    "statement_expression",
+    dest,
+    source_location,
+    expr.get(ID_mode));
 
   symbol_exprt tmp_symbol_expr(new_symbol.name, new_symbol.type);
   tmp_symbol_expr.add_source_location()=source_location;

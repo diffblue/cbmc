@@ -75,6 +75,12 @@ public:
     exprt &expr,
     const namespacet &ns) override;
 
+  symbol_typet root_base_class_type() override
+  {
+    // TODO: need a synthetic wrapper with a member that holds the type_info
+    UNIMPLEMENTED;
+  }
+
   std::unique_ptr<languaget> new_language() override
   { return util_make_unique<cpp_languaget>(); }
 

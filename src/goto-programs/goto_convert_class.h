@@ -34,7 +34,6 @@ public:
     messaget(_message_handler),
     symbol_table(_symbol_table),
     ns(_symbol_table),
-    temporary_counter(0),
     tmp_symbol_prefix("goto_convertt")
   {
   }
@@ -46,7 +45,6 @@ public:
 protected:
   symbol_table_baset &symbol_table;
   namespacet ns;
-  unsigned temporary_counter;
   std::string tmp_symbol_prefix;
 
   void goto_convert_rec(const codet &code, goto_programt &dest);
@@ -61,7 +59,8 @@ protected:
     const typet &type,
     const std::string &suffix,
     goto_programt &dest,
-    const source_locationt &);
+    const source_locationt &,
+    const irep_idt &mode);
 
   symbol_exprt make_compound_literal(
     const exprt &expr,
