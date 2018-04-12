@@ -877,7 +877,7 @@ codet java_string_library_preprocesst::code_assign_string_expr_to_java_string(
 /// \param symbol_table: symbol table
 /// \param [out] code: code block that gets appended the following code:
 /// ~~~~~~~~~~~~~~~~~~~~~~
-/// lhs.length=rhs->length
+/// lhs.length = rhs==null ? 0 : rhs->length
 /// lhs.data=rhs->data
 /// ~~~~~~~~~~~~~~~~~~~~~~
 void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
@@ -898,8 +898,13 @@ void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
 
   const dereference_exprt deref = checked_dereference(rhs, deref_type);
 
-  // Fields of the string object
-  const exprt rhs_length = get_length(deref, symbol_table);
+  // Although we should not reach this code if rhs is null, the association
+  // `pointer -> length` is added to the solver anyway, so we have to make sure
+  // the length is set to something reasonable.
+  const auto rhs_length = if_exprt(
+    equal_exprt(rhs, null_pointer_exprt(to_pointer_type(rhs.type()))),
+    from_integer(0, lhs.length().type()),
+    get_length(deref, symbol_table));
 
   // Assignments
   code.add(code_assignt(lhs.length(), rhs_length), loc);
