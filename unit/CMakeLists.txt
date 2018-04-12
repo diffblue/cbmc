@@ -5,7 +5,6 @@ file(GLOB_RECURSE testing_utils "testing-utils/*.cpp" "testing-utils/*.h")
 list(REMOVE_ITEM sources
     # Used in executables
     ${CMAKE_CURRENT_SOURCE_DIR}/miniBDD.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/string_utils.cpp
 
     # Don't build
     ${CMAKE_CURRENT_SOURCE_DIR}/sharing_map.cpp
@@ -63,14 +62,3 @@ target_include_directories(miniBDD
 target_link_libraries(miniBDD solvers ansi-c)
 add_test(NAME miniBDD COMMAND $<TARGET_FILE:miniBDD>)
 set_tests_properties(miniBDD PROPERTIES LABELS "CORE;CBMC")
-
-add_executable(string_utils string_utils.cpp)
-target_include_directories(string_utils
-    PUBLIC
-    ${CBMC_BINARY_DIR}
-    ${CBMC_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
-target_link_libraries(string_utils solvers ansi-c)
-add_test(NAME string_utils COMMAND $<TARGET_FILE:string_utils>)
-set_tests_properties(string_utils PROPERTIES LABELS "CORE;CBMC")

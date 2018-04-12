@@ -47,6 +47,8 @@ SRC += unit_tests.cpp \
        util/optional.cpp \
        util/parameter_indices.cpp \
        util/simplify_expr.cpp \
+       util/string_utils/split_string.cpp \
+       util/string_utils/strip_string.cpp \
        util/symbol_table.cpp \
        catch_example.cpp \
        java_bytecode/java_virtual_functions/virtual_functions.cpp \
@@ -85,7 +87,6 @@ OBJ += $(CPROVER_LIBS) testing-utils/testing-utils$(LIBEXT)
 
 TESTS = unit_tests$(EXEEXT) \
         miniBDD$(EXEEXT) \
-        string_utils$(EXEEXT) \
         # Empty last line
 
 CLEANFILES = $(TESTS)
@@ -103,7 +104,4 @@ unit_tests$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 
 miniBDD$(EXEEXT): miniBDD$(OBJEXT) $(CPROVER_LIBS)
-	$(LINKBIN)
-
-string_utils$(EXEEXT): string_utils$(OBJEXT) $(CPROVER_LIBS)
 	$(LINKBIN)
