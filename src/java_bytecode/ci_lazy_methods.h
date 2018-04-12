@@ -131,7 +131,7 @@ private:
 
   void gather_virtual_callsites(
     const exprt &e,
-    std::vector<const code_function_callt *> &result);
+    std::unordered_set<exprt, irep_hash> &result);
 
   void get_virtual_method_targets(
     const exprt &called_function,

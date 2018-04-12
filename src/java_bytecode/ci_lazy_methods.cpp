@@ -121,7 +121,7 @@ bool ci_lazy_methodst::operator()(
   }
 
   std::unordered_set<irep_idt> methods_already_populated;
-  std::vector<const code_function_callt *> virtual_callsites;
+  std::unordered_set<exprt, irep_hash> virtual_function_calls;
 
   bool any_new_methods = true;
   while(any_new_methods)
@@ -148,8 +148,7 @@ bool ci_lazy_methodst::operator()(
           continue;
         }
         gather_virtual_callsites(
-          symbol_table.lookup_ref(mname).value,
-          virtual_callsites);
+          symbol_table.lookup_ref(mname).value, virtual_function_calls);
         any_new_methods=true;
       }
     }
@@ -158,15 +157,9 @@ bool ci_lazy_methodst::operator()(
     // possible virtual function call targets:
 
     debug() << "CI lazy methods: add virtual method targets ("
-            << virtual_callsites.size()
-            << " callsites)"
-            << eom;
+            << virtual_function_calls.size() << " callsites)" << eom;
 
-    std::unordered_set<exprt, irep_hash> unique_functions;
-    for(const code_function_callt *virtual_callsite : virtual_callsites)
-      unique_functions.insert(virtual_callsite->function());
-
-    for(const exprt &function : unique_functions)
+    for(const exprt &function : virtual_function_calls)
     {
       // This will also create a stub if a virtual callsite has no targets.
       get_virtual_method_targets(
@@ -376,7 +369,7 @@ void ci_lazy_methodst::initialize_instantiated_classes_from_pointer(
 ///   e that calls a virtual function.
 void ci_lazy_methodst::gather_virtual_callsites(
   const exprt &e,
-  std::vector<const code_function_callt *> &result)
+  std::unordered_set<exprt, irep_hash> &result)
 {
   if(e.id()!=ID_code)
     return;
@@ -384,7 +377,7 @@ void ci_lazy_methodst::gather_virtual_callsites(
   if(c.get_statement()==ID_function_call &&
      to_code_function_call(c).function().id()==ID_virtual_function)
   {
-    result.push_back(&to_code_function_call(c));
+    result.insert(to_code_function_call(c).function());
   }
   else
   {
