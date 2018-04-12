@@ -298,7 +298,7 @@ void ui_message_handlert::json_ui_msg(
   // By convention a leading comma is created by every new array entry.
   // The first entry is generated in the constructor and does not have
   //  a trailing comma.
-  std::cout << ",\n" << result;
+  out << ",\n" << result;
 }
 
 void ui_message_handlert::flush(unsigned level)
