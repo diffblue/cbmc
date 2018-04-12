@@ -12,12 +12,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symex_target_equation.h"
 
 #include <util/std_expr.h>
+#include <util/unwrap_nested_exception.h>
 
 #include <langapi/language_util.h>
-#include <solvers/prop/prop_conv.h>
-#include <solvers/prop/prop.h>
+#include <solvers/flattening/bv_conversion_exceptions.h>
 #include <solvers/prop/literal_expr.h>
+#include <solvers/prop/prop.h>
+#include <solvers/prop/prop_conv.h>
 
+#include "equation_conversion_exceptions.h"
 #include "goto_symex_state.h"
 
 /// read from a shared variable
@@ -368,7 +371,17 @@ void symex_target_equationt::constraint(
 void symex_target_equationt::convert(
   prop_convt &prop_conv)
 {
-  convert_guards(prop_conv);
+  try
+  {
+    convert_guards(prop_conv);
+  }
+  catch(guard_conversion_exceptiont &guard_conversion_exception)
+  {
+    // unwrap the except and throw like normal
+    const std::string full_error = unwrap_exception(guard_conversion_exception);
+    throw full_error;
+  }
+
   convert_assignments(prop_conv);
   convert_decls(prop_conv);
   convert_assumptions(prop_conv);
@@ -417,7 +430,16 @@ void symex_target_equationt::convert_guards(
     if(step.ignore)
       step.guard_literal=const_literal(false);
     else
-      step.guard_literal=prop_conv.convert(step.guard);
+    {
+      try
+      {
+        step.guard_literal = prop_conv.convert(step.guard);
+      }
+      catch(const bitvector_conversion_exceptiont &conversion_exception)
+      {
+        std::throw_with_nested(guard_conversion_exceptiont(step));
+      }
+    }
   }
 }
 
