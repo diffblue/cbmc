@@ -184,6 +184,7 @@ jobs:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env:
+        - NAME="DEBUG"
         - COMPILER="ccache /usr/bin/g++-5"
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
@@ -215,7 +216,7 @@ jobs:
         - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DNDEBUG"
         - CCACHE_CPP2=yes
 
-    # Ubuntu Linux with glibc using clang++-3.7, debug mode, disable USE_DSTRING
+    # Ubuntu Linux with glibc using clang++-3.7, debug mode
     - stage: Test different OS/CXX/Flags
       os: linux
       sudo: false
@@ -237,8 +238,9 @@ jobs:
         - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
+        - NAME="DEBUG"
         - COMPILER="ccache /usr/bin/clang++-3.7"
-        - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DDEBUG -DUSE_STD_STRING"
+        - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DDEBUG"
         - CCACHE_CPP2=yes
       script: echo "Not running any tests for a debug build."
 
@@ -282,6 +284,28 @@ jobs:
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE -j2)
 
+    # Ubuntu Linux with glibc using g++-5, disable USE_DSTRING
+    - stage: Test different OS/CXX/Flags
+      os: linux
+      sudo: false
+      compiler: gcc
+      cache: ccache
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - libwww-perl
+            - g++-5
+            - libubsan0
+            - parallel
+      before_install:
+        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
+      # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
+      env:
+        - NAME="USE_STD_STRING"
+        - COMPILER="ccache /usr/bin/g++-5"
+        - EXTRA_CXXFLAGS="-D_GLIBCXX_DEBUG -DUSE_STD_STRING"
 
     # Run Coverity
     - stage: Test different OS/CXX/Flags
