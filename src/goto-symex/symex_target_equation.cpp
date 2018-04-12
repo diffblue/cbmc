@@ -437,7 +437,7 @@ void symex_target_equationt::convert_guards(
       }
       catch(const bitvector_conversion_exceptiont &conversion_exception)
       {
-        std::throw_with_nested(guard_conversion_exceptiont(step));
+        std::throw_with_nested(guard_conversion_exceptiont(step, ns));
       }
     }
   }

@@ -78,7 +78,7 @@ public:
       options(_options),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table, symex_symbol_table),
-      equation(),
+      equation(ns),
       branch_worklist(_branch_worklist),
       symex(_message_handler, outer_symbol_table, equation, branch_worklist),
       prop_conv(_prop_conv),

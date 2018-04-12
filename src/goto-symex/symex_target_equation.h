@@ -32,7 +32,10 @@ class prop_convt;
 class symex_target_equationt:public symex_targett
 {
 public:
-  symex_target_equationt() = default;
+  explicit symex_target_equationt(const namespacet &ns) : ns(ns)
+  {
+  }
+
   virtual ~symex_target_equationt() = default;
 
   // read event
@@ -320,6 +323,9 @@ protected:
   // for enforcing sharing in the expressions stored
   merge_irept merge_irep;
   void merge_ireps(SSA_stept &SSA_step);
+
+private:
+  const namespacet &ns;
 };
 
 inline bool operator<(

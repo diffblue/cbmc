@@ -14,6 +14,7 @@ Author: Diffblue Ltd.
 
 #include <ostream>
 #include <util/namespace.h>
+#include <langapi/language_util.h>
 #include "symex_target_equation.h"
 
 class guard_conversion_exceptiont : public std::runtime_error
@@ -26,6 +27,8 @@ public:
   {
     std::ostringstream error_msg;
     error_msg << runtime_error::what();
+    error_msg << "\nSource GOTO statement: "
+              << from_expr(ns, "java", step.source.pc->code);
     error_msg << "\nStep:\n";
     step.output(ns, error_msg);
     error_message = error_msg.str();
