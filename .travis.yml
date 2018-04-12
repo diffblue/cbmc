@@ -109,6 +109,28 @@ jobs:
         - EXTRA_CXXFLAGS="-D_GLIBCXX_DEBUG"
       script: echo "Tests are run in the next stage."
 
+    # cmake build using g++-5
+    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
+      os: linux
+      compiler: gcc
+      cache: ccache
+      env:
+        - BUILD_SYSTEM=cmake
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      before_install:
+        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
+      install:
+        - ccache -z
+        - ccache --max-size=1G
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++-5'
+        - cmake --build build -- -j4
+      script: echo "Tests are run in the next stage."
+
     # Ubuntu Linux with glibc using g++-5
     - stage: Test different OS/CXX/Flags
       os: linux
