@@ -152,6 +152,12 @@ bvt boolbvt::conversion_failed(const exprt &expr)
   return prop.new_variables(width);
 }
 
+/// TODO
+/// \param expr: TODO
+/// \return TODO
+/// \throws bitvector_conversion_exceptiont raised if converting byte_extraction
+/// goes wrong.
+/// TODO: extend for other types of conversion exception (diffblue/cbmc#2103).
 bvt boolbvt::convert_bitvector(const exprt &expr)
 {
   if(expr.type().id()==ID_bool)

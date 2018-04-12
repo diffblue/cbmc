@@ -11,10 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
-#include <util/std_expr.h>
 #include <util/byte_operators.h>
 #include <util/endianness_map.h>
+#include <util/std_expr.h>
 
+#include "bv_conversion_exceptions.h"
+#include "flatten_byte_extract_exceptions.h"
 #include "flatten_byte_operators.h"
 
 bvt map_bv(const endianness_mapt &map, const bvt &src)
@@ -42,8 +44,16 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   // if we extract from an unbounded array, call the flattening code
   if(is_unbounded_array(expr.op().type()))
   {
-    exprt tmp=flatten_byte_extract(expr, ns);
-    return convert_bv(tmp);
+    try
+    {
+      exprt tmp = flatten_byte_extract(expr, ns);
+      return convert_bv(tmp);
+    }
+    catch(const flatten_byte_extract_exceptiont &byte_extract_flatten_exception)
+    {
+      std::throw_with_nested(
+        bitvector_conversion_exceptiont("Can't convert byte_extraction", expr));
+    }
   }
 
   std::size_t width=boolbv_width(expr.type());
