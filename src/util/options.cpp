@@ -57,6 +57,11 @@ unsigned int optionst::get_unsigned_int_option(const std::string &option) const
   return value.empty()?0:safe_string2unsigned(value);
 }
 
+bool optionst::is_set(const std::string &option) const
+{
+  return option_map.find(option) != option_map.end();
+}
+
 const std::string optionst::get_option(const std::string &option) const
 {
   option_mapt::const_iterator it=
