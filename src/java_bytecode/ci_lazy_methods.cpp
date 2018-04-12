@@ -72,8 +72,7 @@ bool ci_lazy_methodst::operator()(
   method_bytecodet &method_bytecode,
   const method_convertert &method_converter)
 {
-  std::vector<irep_idt> method_worklist1;
-  std::vector<irep_idt> method_worklist2;
+  std::vector<irep_idt> methods_to_convert_later;
 
   main_function_resultt main_function =
     get_main_symbol(symbol_table, main_class, get_message_handler());
@@ -95,19 +94,19 @@ bool ci_lazy_methodst::operator()(
         const irep_idt methodid =
           "java::" + id2string(class_name) + "." + id2string(method.name)
             + ":" + id2string(method.descriptor);
-        method_worklist2.push_back(methodid);
+        methods_to_convert_later.push_back(methodid);
       }
     }
   }
   else
-    method_worklist2.push_back(main_function.main_function.name);
+    methods_to_convert_later.push_back(main_function.main_function.name);
 
   // Add any extra entry points specified; we should elaborate these in the
   // same way as the main function.
   std::vector<irep_idt> extra_entry_points=lazy_methods_extra_entry_points;
   resolve_method_names(extra_entry_points, symbol_table);
-  method_worklist2.insert(
-    method_worklist2.begin(),
+  methods_to_convert_later.insert(
+    methods_to_convert_later.begin(),
     extra_entry_points.begin(),
     extra_entry_points.end());
 
@@ -120,11 +119,9 @@ bool ci_lazy_methodst::operator()(
       instantiated_classes,
       symbol_table);
     initialize_instantiated_classes(
-      method_worklist2,
-      namespacet(symbol_table),
-      initial_lazy_methods);
-    method_worklist2.insert(
-      method_worklist2.end(),
+      methods_to_convert_later, namespacet(symbol_table), initial_lazy_methods);
+    methods_to_convert_later.insert(
+      methods_to_convert_later.end(),
       initial_callable_methods.begin(),
       initial_callable_methods.end());
   }
@@ -136,10 +133,11 @@ bool ci_lazy_methodst::operator()(
   while(any_new_methods)
   {
     any_new_methods=false;
-    while(!method_worklist2.empty())
+    while(!methods_to_convert_later.empty())
     {
-      std::swap(method_worklist1, method_worklist2);
-      for(const auto &mname : method_worklist1)
+      std::vector<irep_idt> methods_to_convert;
+      std::swap(methods_to_convert, methods_to_convert_later);
+      for(const auto &mname : methods_to_convert)
       {
         if(!methods_already_populated.insert(mname).second)
           continue;
@@ -147,10 +145,10 @@ bool ci_lazy_methodst::operator()(
         if(
           method_converter(
             mname,
-            // Note this wraps *references* to method_worklist2 &
+            // Note this wraps *references* to methods_to_convert_later &
             // instantiated_classes
             ci_lazy_methods_neededt(
-              method_worklist2, instantiated_classes, symbol_table)))
+              methods_to_convert_later, instantiated_classes, symbol_table)))
         {
           // Couldn't convert this function
           continue;
@@ -160,7 +158,6 @@ bool ci_lazy_methodst::operator()(
           virtual_callsites);
         any_new_methods=true;
       }
-      method_worklist1.clear();
     }
 
     // Given the object types we now know may be created, populate more
@@ -179,7 +176,7 @@ bool ci_lazy_methodst::operator()(
     {
       // This will also create a stub if a virtual callsite has no targets.
       get_virtual_method_targets(
-        function, instantiated_classes, method_worklist2, symbol_table);
+        function, instantiated_classes, methods_to_convert_later, symbol_table);
     }
   }
 
