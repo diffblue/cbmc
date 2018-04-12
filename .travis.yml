@@ -4,7 +4,7 @@ jobs:
   include:
 
     - &formatting-stage
-      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
       env: NAME="clang-format"
       addons:
         apt:
@@ -32,20 +32,20 @@ jobs:
       before_cache:
 
     - &linter-stage
-      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
       env: NAME="CPP-LINT"
       install:
       script: scripts/travis_lint.sh
       before_cache:
 
     - &string-table-check
-      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
       env: NAME="string-table"
       install:
       script: scripts/string_table_check.sh
       before_cache:
 
-    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
       env:
         NAME: "DOXYGEN-CHECK"
         DOXYGEN_VERSION: "1.8.14"
@@ -87,7 +87,30 @@ jobs:
         - scripts/publish_doc.sh
 
     # Ubuntu Linux with glibc using g++-5
-    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
+      os: linux
+      sudo: false
+      compiler: gcc
+      cache: ccache
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - libwww-perl
+            - g++-5
+            - libubsan0
+            - parallel
+      before_install:
+        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
+      # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
+      env:
+        - COMPILER="ccache /usr/bin/g++-5"
+        - EXTRA_CXXFLAGS="-D_GLIBCXX_DEBUG"
+      script: echo "Tests are run in the next stage."
+
+    # Ubuntu Linux with glibc using g++-5
+    - stage: Test different OS/CXX/Flags
       os: linux
       sudo: false
       compiler: gcc
