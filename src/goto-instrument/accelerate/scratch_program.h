@@ -40,7 +40,7 @@ public:
       symbol_table(_symbol_table),
       symex_symbol_table(),
       ns(symbol_table, symex_symbol_table),
-      equation(),
+      equation(ns),
       branch_worklist(),
       symex(mh, symbol_table, equation, branch_worklist),
       satcheck(util_make_unique<satcheckt>()),
