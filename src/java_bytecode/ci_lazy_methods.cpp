@@ -392,10 +392,10 @@ void ci_lazy_methodst::gather_virtual_callsites(
 ///   should be determined.
 /// \param instantiated_classes: set of classes that can be instantiated. Any
 ///   potential callee not in this set will be ignored.
-/// \param symbol_table: global symbol table
 /// \param [out] callable_methods: Populated with all possible `c` callees,
 ///   taking `instantiated_classes` into account (virtual function overrides
 ///   defined on classes that are not 'needed' are ignored)
+/// \param symbol_table: global symbol table
 void ci_lazy_methodst::get_virtual_method_targets(
   const exprt &called_function,
   const std::unordered_set<irep_idt> &instantiated_classes,
