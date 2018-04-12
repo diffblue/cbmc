@@ -22,8 +22,8 @@ void java_class_loader_limitt::setup_class_load_limit(
     throw "class regexp cannot be empty, `get_language_options` not called?";
 
   // '@' signals file reading with list of class files to load
-  regex_match=java_cp_include_files[0]!='@';
-  if(regex_match)
+  use_regex_match = java_cp_include_files[0] != '@';
+  if(use_regex_match)
     regex_matcher=std::regex(java_cp_include_files);
   else
   {
@@ -49,16 +49,14 @@ void java_class_loader_limitt::setup_class_load_limit(
 
 /// \par parameters: class file name
 /// \return true if file should be loaded, else false
-bool java_class_loader_limitt::load_class_file(const irep_idt &file_name)
+bool java_class_loader_limitt::load_class_file(const std::string &file_name)
 {
-  if(regex_match)
+  if(use_regex_match)
   {
-    return std::regex_match(
-      id2string(file_name),
-      string_matcher,
-      regex_matcher);
+    std::smatch string_matches;
+    return std::regex_match(file_name, string_matches, regex_matcher);
   }
-  // load .class file only if it is in the match set
   else
-    return set_matcher.find(id2string(file_name))!=set_matcher.end();
+    // load .class file only if it is in the match set
+    return set_matcher.find(file_name) != set_matcher.end();
 }

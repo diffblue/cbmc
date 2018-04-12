@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_parse_tree.h"
 
+#include <algorithm>
 #include <ostream>
 
 #include <util/symbol_table.h>
@@ -117,6 +118,25 @@ void java_bytecode_parse_treet::annotationt::element_value_pairt::output(
 
   out << '"' << element_name << '"' << '=';
   out << expr2java(value, ns);
+}
+
+bool java_bytecode_parse_treet::does_annotation_exist(
+  const annotationst &annotations,
+  const irep_idt &annotation_type_name)
+{
+  return
+    std::find_if(
+      annotations.begin(),
+      annotations.end(),
+      [&annotation_type_name](const annotationt &annotation)
+      {
+        if(annotation.type.id() != ID_pointer)
+          return false;
+        typet type = annotation.type.subtype();
+        return
+          type.id() == ID_symbol
+          && to_symbol_type(type).get_identifier() == annotation_type_name;
+      }) != annotations.end();
 }
 
 void java_bytecode_parse_treet::methodt::output(std::ostream &out) const

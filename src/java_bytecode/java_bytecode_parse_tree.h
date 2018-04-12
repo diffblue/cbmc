@@ -44,6 +44,10 @@ public:
 
   typedef std::vector<annotationt> annotationst;
 
+  static bool does_annotation_exist(
+    const annotationst &annotations,
+    const irep_idt &annotation_type_name);
+
   class instructiont
   {
   public:

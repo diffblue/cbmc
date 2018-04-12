@@ -43,7 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
-  java_class_loader.use_core_models=!cmd.isset("no-core-models");
+  java_class_loader.set_use_core_models(!cmd.isset("no-core-models"));
   string_refinement_enabled=cmd.isset("refine-strings");
   throw_runtime_exceptions=cmd.isset("java-throw-runtime-exceptions");
   if(cmd.isset("java-max-input-array-length"))
@@ -194,7 +194,7 @@ bool java_bytecode_languaget::parse(
     {
       status() << "JAR file without entry point: loading class files" << eom;
       java_class_loader.load_entire_jar(class_loader_limit, path);
-      for(const auto &kv : java_class_loader.jar_map.at(path).entries)
+      for(const auto &kv : java_class_loader.get_jar_index(path))
         main_jar_classes.push_back(kv.first);
     }
     else
@@ -234,13 +234,13 @@ static void infer_opaque_type_fields(
          instruction.statement == "putfield")
       {
         const exprt &fieldref = instruction.args[0];
-        const symbolt *class_symbol =
-          symbol_table.lookup(fieldref.get(ID_class));
+        irep_idt class_symbol_id = fieldref.get(ID_class);
+        const symbolt *class_symbol = symbol_table.lookup(class_symbol_id);
         INVARIANT(
-          class_symbol != nullptr, "all field types should have been loaded");
+          class_symbol != nullptr,
+          "all types containing fields should have been loaded");
 
         const class_typet *class_type = &to_class_type(class_symbol->type);
-        irep_idt class_symbol_id = fieldref.get(ID_class);
         const irep_idt &component_name = fieldref.get(ID_component_name);
         while(!class_type->has_component(component_name))
         {
@@ -249,22 +249,24 @@ static void infer_opaque_type_fields(
             // Accessing a field of an incomplete (opaque) type.
             symbolt &writable_class_symbol =
               symbol_table.get_writeable_ref(class_symbol_id);
-            auto &add_to_components =
+            auto &components =
               to_struct_type(writable_class_symbol.type).components();
-            add_to_components.push_back(
-              struct_typet::componentt(component_name, fieldref.type()));
-            add_to_components.back().set_base_name(component_name);
-            add_to_components.back().set_pretty_name(component_name);
+            components.emplace_back(component_name, fieldref.type());
+            components.back().set_base_name(component_name);
+            components.back().set_pretty_name(component_name);
             break;
           }
           else
           {
             // Not present here: check the superclass.
             INVARIANT(
-              class_type->bases().size() != 0,
-              "class missing an expected field should have a superclass");
+              !class_type->bases().empty(),
+              "class '" + id2string(class_symbol->name)
+                + "' (which was missing a field '" + id2string(component_name)
+                + "' referenced from method '" + id2string(method.name)
+                + "') should have an opaque superclass");
             const symbol_typet &superclass_type =
-              to_symbol_type(class_type->bases()[0].type());
+              to_symbol_type(class_type->bases().front().type());
             class_symbol_id = superclass_type.get_identifier();
             class_type = &to_class_type(ns.follow(superclass_type));
           }
@@ -577,9 +579,9 @@ bool java_bytecode_languaget::typecheck(
   // Must load java.lang.Object first to avoid stubbing
   // This ordering could alternatively be enforced by
   // moving the code below to the class loader.
-  java_class_loadert::class_mapt::const_iterator it=
-    java_class_loader.class_map.find("java.lang.Object");
-  if(it!=java_class_loader.class_map.end())
+  java_class_loadert::parse_tree_with_overridest_mapt::const_iterator it =
+    java_class_loader.get_class_with_overlays_map().find("java.lang.Object");
+  if(it != java_class_loader.get_class_with_overlays_map().end())
   {
     if(
       java_bytecode_convert_class(
@@ -597,17 +599,14 @@ bool java_bytecode_languaget::typecheck(
 
   // first generate a new struct symbol for each class and a new function symbol
   // for every method
-  for(java_class_loadert::class_mapt::const_iterator
-      c_it=java_class_loader.class_map.begin();
-      c_it!=java_class_loader.class_map.end();
-      c_it++)
+  for(const auto &class_trees : java_class_loader.get_class_with_overlays_map())
   {
-    if(c_it->second.parsed_class.name.empty())
+    if(class_trees.second.front().parsed_class.name.empty())
       continue;
 
     if(
       java_bytecode_convert_class(
-        c_it->second,
+        class_trees.second,
         symbol_table,
         get_message_handler(),
         max_user_array_length,
@@ -625,14 +624,14 @@ bool java_bytecode_languaget::typecheck(
 
   // find and mark all implicitly generic class types
   // this can only be done once all the class symbols have been created
-  for(const auto &c : java_class_loader.class_map)
+  for(const auto &c : java_class_loader.get_class_with_overlays_map())
   {
-    if(c.second.parsed_class.name.empty())
+    if(c.second.front().parsed_class.name.empty())
       continue;
     try
     {
       mark_java_implicitly_generic_class_type(
-        c.second.parsed_class.name, symbol_table);
+        c.second.front().parsed_class.name, symbol_table);
     }
     catch(missing_outer_class_symbol_exceptiont &)
     {
@@ -646,9 +645,10 @@ bool java_bytecode_languaget::typecheck(
   // Infer fields on opaque types based on the method instructions just loaded.
   // For example, if we don't have bytecode for field x of class A, but we can
   // see an int-typed getfield instruction referring to it, add that field now.
-  for(const auto &c : java_class_loader.class_map)
+  for(auto &class_to_trees : java_class_loader.get_class_with_overlays_map())
   {
-    infer_opaque_type_fields(c.second, symbol_table);
+    for(const java_bytecode_parse_treet &parse_tree : class_to_trees.second)
+      infer_opaque_type_fields(parse_tree, symbol_table);
   }
 
   // Create global variables for constants (String and Class literals) up front.
@@ -656,12 +656,13 @@ bool java_bytecode_languaget::typecheck(
   // literal globals' existence when __CPROVER_initialize is generated in
   // `generate_support_functions`.
   const std::size_t before_constant_globals_size = symbol_table.symbols.size();
-  for(auto &c : java_class_loader.class_map)
+  for(auto &class_to_trees : java_class_loader.get_class_with_overlays_map())
   {
-    generate_constant_global_variables(
-      c.second,
-      symbol_table,
-      string_refinement_enabled);
+    for(java_bytecode_parse_treet &parse_tree : class_to_trees.second)
+    {
+      generate_constant_global_variables(
+        parse_tree, symbol_table, string_refinement_enabled);
+    }
   }
   status() << "Java: added "
            << (symbol_table.symbols.size() - before_constant_globals_size)
@@ -680,10 +681,13 @@ bool java_bytecode_languaget::typecheck(
   {
     journalling_symbol_tablet symbol_table_journal =
       journalling_symbol_tablet::wrap(symbol_table);
-    for(const auto &c : java_class_loader.class_map)
+    for(auto &class_to_trees : java_class_loader.get_class_with_overlays_map())
     {
-      create_stub_global_symbols(
-        c.second, symbol_table_journal, class_hierarchy, *this);
+      for(const java_bytecode_parse_treet &parse_tree : class_to_trees.second)
+      {
+        create_stub_global_symbols(
+          parse_tree, symbol_table_journal, class_hierarchy, *this);
+      }
     }
 
     stub_global_initializer_factory.create_stub_global_initializer_symbols(
@@ -996,7 +1000,20 @@ bool java_bytecode_languaget::final(symbol_table_baset &symbol_table)
 
 void java_bytecode_languaget::show_parse(std::ostream &out)
 {
-  java_class_loader(main_class).output(out);
+  java_class_loadert::parse_tree_with_overlayst &parse_trees =
+    java_class_loader(main_class);
+  parse_trees.front().output(out);
+  if(parse_trees.size() > 1)
+  {
+    out << "\n\nClass has the following overlays:\n\n";
+    for(auto parse_tree_it = std::next(parse_trees.begin());
+      parse_tree_it != parse_trees.end();
+      ++parse_tree_it)
+    {
+      parse_tree_it->output(out);
+    }
+    out << "End of class overlays.\n";
+  }
 }
 
 std::unique_ptr<languaget> new_java_bytecode_language()

@@ -48,23 +48,53 @@ public:
   {
   }
 
-  void operator()(const java_bytecode_parse_treet &parse_tree)
+  /// Converts all the class parse trees into a class symbol and adds it to the
+  /// symbol table.
+  /// \param parse_trees: The parse trees found for the class to be converted.
+  /// \remarks
+  ///   Allows multiple definitions of the same class to appear on the
+  ///   classpath, so long as all but the first definition are marked with the
+  ///   attribute `\@java::com.diffblue.OverlayClassImplementation`.
+  ///   Overlay class definitions can contain methods with the same signature
+  ///   as methods in the original class, so long as these are marked with the
+  ///   attribute `\@java::com.diffblue.OverlayMethodImplementation`; such
+  ///   overlay methods are replaced in the original file with the version
+  ///   found in the last overlay on the classpath. Later definitions can
+  ///   also contain new supporting methods and fields that are merged in.
+  ///   This will allow insertion of Java methods into library classes to
+  ///   handle, for example, modelling dependency injection.
+  void operator()(
+    const java_class_loadert::parse_tree_with_overlayst &parse_trees)
   {
-    // add array types to the symbol table
+    PRECONDITION(!parse_trees.empty());
+    const java_bytecode_parse_treet &parse_tree = parse_trees.front();
+
+    // Add array types to the symbol table
     add_array_types(symbol_table);
 
     const bool loading_success =
       parse_tree.loading_successful &&
       !no_load_classes.count(id2string(parse_tree.parsed_class.name));
     if(loading_success)
-      convert(parse_tree.parsed_class);
+    {
+      overlay_classest overlay_classes;
+      for(auto overlay_class_it = std::next(parse_trees.begin());
+          overlay_class_it != parse_trees.end();
+          ++overlay_class_it)
+      {
+        overlay_classes.push_front(std::cref(overlay_class_it->parsed_class));
+      }
+      convert(parse_tree.parsed_class, overlay_classes);
+    }
 
-    if(string_preprocess.is_known_string_type(parse_tree.parsed_class.name))
-      string_preprocess.add_string_type(
-        parse_tree.parsed_class.name, symbol_table);
+    // Add as string type if relevant
+    const irep_idt &class_name = parse_tree.parsed_class.name;
+    if(string_preprocess.is_known_string_type(class_name))
+      string_preprocess.add_string_type(class_name, symbol_table);
     else if(!loading_success)
+      // Generate stub if couldn't load from bytecode and wasn't string type
       generate_class_stub(
-        parse_tree.parsed_class.name,
+        class_name,
         symbol_table,
         get_message_handler(),
         struct_union_typet::componentst{});
@@ -72,19 +102,29 @@ public:
 
   typedef java_bytecode_parse_treet::classt classt;
   typedef java_bytecode_parse_treet::fieldt fieldt;
+  typedef java_bytecode_parse_treet::methodt methodt;
 
-protected:
+private:
   symbol_tablet &symbol_table;
   const size_t max_array_length;
   method_bytecodet &method_bytecode;
   java_string_library_preprocesst &string_preprocess;
 
   // conversion
-  void convert(const classt &c);
+  typedef std::list<std::reference_wrapper<const classt>> overlay_classest;
+  void convert(const classt &c, const overlay_classest &overlay_classes);
   void convert(symbolt &class_symbol, const fieldt &f);
 
   // see definition below for more info
   static void add_array_types(symbol_tablet &symbol_table);
+
+  static bool is_overlay_method(const methodt &method);
+
+  bool check_field_exists(
+    const fieldt &field,
+    const irep_idt &qualified_fieldname,
+    const struct_union_typet::componentst &fields) const;
+
   std::unordered_set<std::string> no_load_classes;
 };
 
@@ -176,7 +216,12 @@ static optionalt<std::string> extract_generic_interface_reference(
   return {};
 }
 
-void java_bytecode_convert_classt::convert(const classt &c)
+/// Convert a class, adding symbols to the symbol table for its members
+/// \param c: Bytecode of the class to convert
+/// \param overlay_classes: Bytecode of any overlays for the class to convert
+void java_bytecode_convert_classt::convert(
+  const classt &c,
+  const overlay_classest &overlay_classes)
 {
   std::string qualified_classname="java::"+id2string(c.name);
   if(symbol_table.has_symbol(qualified_classname))
@@ -347,20 +392,115 @@ void java_bytecode_convert_classt::convert(const classt &c)
     throw 0;
   }
 
-  // now do fields
+  // Now do fields
+  const class_typet::componentst &fields =
+    to_class_type(class_symbol->type).components();
+  // Include fields from overlay classes as they will be required by the
+  // methods defined there
+  for(auto overlay_class : overlay_classes)
+  {
+    for(const auto &field : overlay_class.get().fields)
+    {
+      std::string field_id = qualified_classname + "." + id2string(field.name);
+      if(check_field_exists(field, field_id, fields))
+      {
+        std::string err =
+          "Duplicate field definition for " + field_id + " in overlay class";
+        // TODO: This could just be a warning if the types match
+        error() << err << eom;
+        throw err.c_str();
+      }
+      debug()
+        << "Adding symbol from overlay class:  field '" << field.name << "'"
+        << eom;
+      convert(*class_symbol, field);
+      POSTCONDITION(check_field_exists(field, field_id, fields));
+    }
+  }
   for(const auto &field : c.fields)
   {
+    std::string field_id = qualified_classname + "." + id2string(field.name);
+    if(check_field_exists(field, field_id, fields))
+    {
+      // TODO: This could be a warning if the types match
+      error()
+        << "Field definition for " << field_id
+        << " already loaded from overlay class" << eom;
+      continue;
+    }
     debug() << "Adding symbol:  field '" << field.name << "'" << eom;
     convert(*class_symbol, field);
+    POSTCONDITION(check_field_exists(field, field_id, fields));
   }
 
-  // now do methods
-  for(const auto &method : c.methods)
+  // Now do methods
+  std::set<irep_idt> overlay_methods;
+  for(auto overlay_class : overlay_classes)
+  {
+    for(const methodt &method : overlay_class.get().methods)
+    {
+      const irep_idt method_identifier =
+        qualified_classname + "." + id2string(method.name)
+          + ":" + method.descriptor;
+      if(method_bytecode.contains_method(method_identifier))
+      {
+        // This method has already been discovered and added to method_bytecode
+        // while parsing an overlay class that appears later in the classpath
+        // (we're working backwards)
+        // Warn the user if the definition already found was not an overlay,
+        // otherwise simply don't load this earlier definition
+        if(overlay_methods.count(method_identifier) == 0)
+        {
+          // This method was defined in a previous class definition without
+          // being marked as an overlay method
+          warning()
+            << "Method " << method_identifier
+            << " exists in an overlay class without being marked as an "
+              "overlay and also exists in another overlay class that appears "
+              "earlier in the classpath"
+            << eom;
+        }
+        continue;
+      }
+      // Always run the lazy pre-stage, as it symbol-table
+      // registers the function.
+      debug()
+        << "Adding symbol from overlay class:  method '" << method_identifier
+        << "'" << eom;
+      java_bytecode_convert_method_lazy(
+        *class_symbol,
+        method_identifier,
+        method,
+        symbol_table,
+        get_message_handler());
+      method_bytecode.add(qualified_classname, method_identifier, method);
+      if(is_overlay_method(method))
+        overlay_methods.insert(method_identifier);
+    }
+  }
+  for(const methodt &method : c.methods)
   {
     const irep_idt method_identifier=
-      id2string(qualified_classname)+
-      "."+id2string(method.name)+
-      ":"+method.descriptor;
+      qualified_classname + "." + id2string(method.name)
+        + ":" + method.descriptor;
+    if(method_bytecode.contains_method(method_identifier))
+    {
+      // This method has already been discovered while parsing an overlay
+      // class
+      // If that definition is an overlay then we simply don't load this
+      // original definition and we remove it from the list of overlays
+      if(overlay_methods.erase(method_identifier) == 0)
+      {
+        // This method was defined in a previous class definition without
+        // being marked as an overlay method
+        warning()
+          << "Method " << method_identifier
+          << " exists in an overlay class without being marked as an overlay "
+            "and also exists in the underlying class"
+          << eom;
+      }
+      continue;
+    }
     // Always run the lazy pre-stage, as it symbol-table
     // registers the function.
     debug() << "Adding symbol:  method '" << method_identifier << "'" << eom;
@@ -371,6 +511,21 @@ void java_bytecode_convert_classt::convert(const classt &c)
       symbol_table,
       get_message_handler());
     method_bytecode.add(qualified_classname, method_identifier, method);
+    if(is_overlay_method(method))
+    {
+      warning()
+        << "Method " << method_identifier
+        << " marked as an overlay where defined in the underlying class" << eom;
+    }
+  }
+  if(!overlay_methods.empty())
+  {
+    error()
+      << "Overlay methods defined in overlay classes did not exist in the "
+        "underlying class:\n";
+    for(const irep_idt &method_id : overlay_methods)
+      error() << "  " << method_id << "\n";
+    error() << eom;
   }
 
   // is this a root class?
@@ -378,6 +533,27 @@ void java_bytecode_convert_classt::convert(const classt &c)
     java_root_class(*class_symbol);
 }
 
+bool java_bytecode_convert_classt::check_field_exists(
+  const java_bytecode_parse_treet::fieldt &field,
+  const irep_idt &qualified_fieldname,
+  const struct_union_typet::componentst &fields) const
+{
+  if(field.is_static)
+    return symbol_table.has_symbol(qualified_fieldname);
+
+  auto existing_field = std::find_if(
+    fields.begin(),
+    fields.end(),
+    [&field](const struct_union_typet::componentt &f)
+    {
+      return f.get_name() == field.name;
+    });
+  return existing_field != fields.end();
+}
+
+/// Convert a field, adding a symbol to teh symbol table for it
+/// \param class_symbol: The already added symbol for the containing class
+/// \param f: The bytecode for the field to convert
 void java_bytecode_convert_classt::convert(
   symbolt &class_symbol,
   const fieldt &f)
@@ -666,8 +842,14 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
   }
 }
 
+bool java_bytecode_convert_classt::is_overlay_method(const methodt &method)
+{
+  return java_bytecode_parse_treet::does_annotation_exist(
+    method.annotations, ID_overlay_method);
+}
+
 bool java_bytecode_convert_class(
-  const java_bytecode_parse_treet &parse_tree,
+  const java_class_loadert::parse_tree_with_overlayst &parse_trees,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
@@ -685,7 +867,7 @@ bool java_bytecode_convert_class(
 
   try
   {
-    java_bytecode_convert_class(parse_tree);
+    java_bytecode_convert_class(parse_trees);
     return false;
   }
 
