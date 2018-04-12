@@ -933,12 +933,17 @@ static optionalt<exprt> get_array(
 
   if(n > MAX_CONCRETE_STRING_SIZE)
   {
-    stream << "(sr::get_array) long string (size=" << n << ")" << eom;
-    std::ostringstream msg;
-    msg << "consider reducing string-max-input-length so that no string "
-        << "exceeds " << MAX_CONCRETE_STRING_SIZE << " in length and make sure"
-        << " all functions returning strings are available in the classpath";
-    throw string_refinement_invariantt(msg.str());
+    stream << "(sr::get_array) long string (size " << format(arr.length())
+           << " = " << n << ") " << format(arr) << eom;
+    stream << "(sr::get_array) consider reducing string-max-input-length so "
+              "that no string exceeds "
+           << MAX_CONCRETE_STRING_SIZE
+           << " in length and "
+              "make sure all functions returning strings are loaded"
+           << eom;
+    stream << "(sr::get_array) this can also happen on invalid object access"
+           << eom;
+    return nil_exprt();
   }
 
   if(
