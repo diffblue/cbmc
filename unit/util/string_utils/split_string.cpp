@@ -134,6 +134,58 @@ SCENARIO("split_string", "[core][utils][string_utils][split_string]")
       run_on_all_variants(string, ',', expected_results);
     }
   }
+  GIVEN("A whitespace delimter")
+  {
+    std::string string = "a\nb\nc";
+    const char delimiter = '\n';
+
+    WHEN("Not stripping, not removing empty")
+    {
+      std::vector<std::string> result;
+      split_string(string, delimiter, result, false, false);
+
+      THEN("Should get expected vector")
+      {
+        std::vector<std::string> expected_result = {"a", "b", "c"};
+        REQUIRE_THAT(
+          result,
+          Catch::Matchers::Vector::EqualsMatcher<std::string>{expected_result});
+      }
+    }
+    WHEN("Not stripping, removing empty")
+    {
+      std::vector<std::string> result;
+      split_string(string, delimiter, result, false, true);
+
+      THEN("Should get expected vector")
+      {
+        std::vector<std::string> expected_result = {"a", "b", "c"};
+        REQUIRE_THAT(
+          result,
+          Catch::Matchers::Vector::EqualsMatcher<std::string>{expected_result});
+      }
+    }
+    WHEN("Stripping, not removing empty")
+    {
+      std::vector<std::string> result;
+      THEN("Should throw an exception")
+      {
+        REQUIRE_THROWS_AS(
+          split_string(string, delimiter, result, true, false),
+          std::invalid_argument);
+      }
+    }
+    WHEN("Stripping and removing empty")
+    {
+      std::vector<std::string> result;
+      THEN("Should throw an exception")
+      {
+        REQUIRE_THROWS_AS(
+          split_string(string, delimiter, result, true, true),
+          std::invalid_argument);
+      }
+    }
+  }
 }
 
 SCENARIO("split_string into two", "[core][utils][string_utils][split_string]")
@@ -152,6 +204,33 @@ SCENARIO("split_string into two", "[core][utils][string_utils][split_string]")
       {
         REQUIRE(s1 == "a");
         REQUIRE(s2 == "b");
+      }
+    }
+  }
+  GIVEN("A string and a whitespace delimiter")
+  {
+    std::string string = "a\nb";
+    const char delimiter = '\n';
+
+    WHEN("Splitting in two and not stripping")
+    {
+      std::string s1;
+      std::string s2;
+      split_string(string, delimiter, s1, s2, false);
+      THEN("The string should be split")
+      {
+        REQUIRE(s1 == "a");
+        REQUIRE(s2 == "b");
+      }
+    }
+    WHEN("Splitting in two and stripping")
+    {
+      THEN("An invalid argument exception should be raised")
+      {
+        std::string s1;
+        std::string s2;
+        REQUIRE_THROWS_AS(
+          split_string(string, delimiter, s1, s2, true), std::invalid_argument);
       }
     }
   }
