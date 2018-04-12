@@ -425,26 +425,16 @@ void ci_lazy_methodst::get_virtual_method_targets(
     !call_basename.empty(),
     "Virtual function must have a reasonable name after removing class");
 
-  const irep_idt &self_method=
-    get_virtual_method_target(
-      instantiated_classes, call_basename, call_class, symbol_table);
+  class_hierarchyt::idst self_and_child_classes =
+    class_hierarchy.get_children_trans(call_class);
+  self_and_child_classes.push_back(call_class);
 
-  if(!self_method.empty())
+  for(const irep_idt &class_name : self_and_child_classes)
   {
-    callable_methods.push_back(self_method);
-  }
-
-  const auto child_classes=class_hierarchy.get_children_trans(call_class);
-  for(const auto &child_class : child_classes)
-  {
-    const auto child_method=
-      get_virtual_method_target(
-        instantiated_classes,
-        call_basename,
-        child_class,
-        symbol_table);
-    if(!child_method.empty())
-      callable_methods.push_back(child_method);
+    const irep_idt method_name = get_virtual_method_target(
+      instantiated_classes, call_basename, class_name, symbol_table);
+    if(!method_name.empty())
+      callable_methods.push_back(method_name);
   }
 }
 
