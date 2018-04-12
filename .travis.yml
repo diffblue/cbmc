@@ -4,7 +4,7 @@ jobs:
   include:
 
     - &formatting-stage
-      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
+      stage: Linter + Doxygen + non-debug builds
       env: NAME="clang-format"
       addons:
         apt:
@@ -32,20 +32,20 @@ jobs:
       before_cache:
 
     - &linter-stage
-      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
+      stage: Linter + Doxygen + non-debug builds
       env: NAME="CPP-LINT"
       install:
       script: scripts/travis_lint.sh
       before_cache:
 
     - &string-table-check
-      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
+      stage: Linter + Doxygen + non-debug builds
       env: NAME="string-table"
       install:
       script: scripts/string_table_check.sh
       before_cache:
 
-    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
+    - stage: Linter + Doxygen + non-debug builds
       env:
         NAME: "DOXYGEN-CHECK"
         DOXYGEN_VERSION: "1.8.14"
@@ -87,7 +87,7 @@ jobs:
         - scripts/publish_doc.sh
 
     # Ubuntu Linux with glibc using g++-5
-    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
+    - stage: Linter + Doxygen + non-debug builds
       os: linux
       sudo: false
       compiler: gcc
@@ -110,7 +110,7 @@ jobs:
       script: echo "Tests are run in the next stage."
 
     # cmake build using g++-5
-    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 build
+    - stage: Linter + Doxygen + non-debug builds
       os: linux
       compiler: gcc
       cache: ccache
@@ -131,8 +131,48 @@ jobs:
         - cmake --build build -- -j4
       script: echo "Tests are run in the next stage."
 
+    # OS X using clang++
+    - stage: Linter + Doxygen + non-debug builds
+      os: osx
+      sudo: false
+      compiler: clang
+      cache: ccache
+      before_install:
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel
+        - export PATH=$PATH:/usr/local/opt/ccache/libexec
+      env: COMPILER="ccache clang++"
+      script: echo "Tests are run in the next stage."
+
+    # Ubuntu Linux with glibc using clang++-3.7, no-debug mode
+    - stage: Linter + Doxygen + non-debug builds
+      os: linux
+      sudo: false
+      compiler: clang
+      cache: ccache
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - libwww-perl
+            - clang-3.7
+            - libstdc++-5-dev
+            - libubsan0
+            - parallel
+            - libc6-dev-i386
+      before_install:
+        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
+        - export CCACHE_CPP2=yes
+      # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
+      env:
+        - COMPILER="ccache /usr/bin/clang++-3.7"
+        - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DNDEBUG"
+        - CCACHE_CPP2=yes
+      script: echo "Tests are run in the next stage."
+
     # Ubuntu Linux with glibc using g++-5
-    - stage: Test different OS/CXX/Flags
+    - stage: Linter + Doxygen + non-debug builds
       os: linux
       sudo: false
       compiler: gcc
@@ -153,6 +193,24 @@ jobs:
       env:
         - COMPILER="ccache /usr/bin/g++-5"
         - EXTRA_CXXFLAGS="-D_GLIBCXX_DEBUG"
+      script: echo "Tests are run in the next stage."
+
+    - stage: Linter + Doxygen + non-debug builds
+      os: osx
+      compiler: clang
+      cache: ccache
+      before_install:
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
+        - export PATH=$PATH:/usr/local/opt/ccache/libexec
+      env:
+        - BUILD_SYSTEM=cmake
+        - CCACHE_CPP2=yes
+      install:
+        - ccache -z
+        - ccache --max-size=1G
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_OSX_ARCHITECTURES=x86_64'
+        - cmake --build build -- -j4
+      script: echo "Tests are run in the next stage."
 
     # OS X using clang++
     - stage: Test different OS/CXX/Flags
