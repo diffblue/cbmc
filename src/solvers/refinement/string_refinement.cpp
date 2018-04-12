@@ -1123,9 +1123,6 @@ static exprt substitute_array_access(
   const bool left_propagate)
 {
   const exprt &array = index_expr.array();
-
-  if(array.id() == ID_symbol)
-    return index_expr;
   if(auto array_of = expr_try_dynamic_cast<array_of_exprt>(array))
     return array_of->op();
   if(auto array_with = expr_try_dynamic_cast<with_exprt>(array))
@@ -1138,7 +1135,12 @@ static exprt substitute_array_access(
     return substitute_array_access(
       *if_expr, index_expr.index(), symbol_generator, left_propagate);
 
-  UNREACHABLE;
+  INVARIANT(
+    array.is_nil() || array.id() == ID_symbol,
+    std::string(
+      "in case the array is unknown, it should be a symbol or nil, id: ")
+    + id2string(array.id()));
+  return index_expr;
 }
 
 /// Auxiliary function for substitute_array_access
@@ -2121,9 +2123,11 @@ exprt string_refinementt::get(const exprt &expr) const
     }
 
     INVARIANT(
-      array.id() == ID_symbol,
-      "apart from symbols, array valuations can be interpreted as sparse "
-      "arrays");
+      array.is_nil() || array.id() == ID_symbol,
+      std::string(
+        "apart from symbols, array valuations can be interpreted as "
+        "sparse arrays, id: ") +
+      id2string(array.id()));
     return index_exprt(array, index);
   }
 
