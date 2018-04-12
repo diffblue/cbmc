@@ -3,10 +3,6 @@
 # Source files for test utilities
 SRC = unit_tests.cpp \
       catch_example.cpp \
-      util/expr_iterator.cpp \
-      util/optional.cpp \
-      analyses/call_graph.cpp \
-      java_bytecode/java_bytecode_convert_class/convert_abstract_class.cpp \
       # Empty last line
 
 # Test source files
@@ -48,6 +44,7 @@ SRC += unit_tests.cpp \
        util/irep.cpp \
        util/irep_sharing.cpp \
        util/message.cpp \
+       util/optional.cpp \
        util/parameter_indices.cpp \
        util/simplify_expr.cpp \
        util/symbol_table.cpp \
