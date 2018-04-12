@@ -132,8 +132,8 @@ bool ci_lazy_methodst::operator()(
   std::set<irep_idt> methods_already_populated;
   std::vector<const code_function_callt *> virtual_callsites;
 
-  bool any_new_methods=false;
-  do
+  bool any_new_methods = true;
+  while(any_new_methods)
   {
     any_new_methods=false;
     while(!method_worklist2.empty())
@@ -182,7 +182,6 @@ bool ci_lazy_methodst::operator()(
         function, instantiated_classes, method_worklist2, symbol_table);
     }
   }
-  while(any_new_methods);
 
   // Remove symbols for methods that were declared but never used:
   symbol_tablet keep_symbols;
