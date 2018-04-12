@@ -598,6 +598,7 @@ void bmct::setup_unwind()
 /// \param callback_after_symex: optional callback to be run after symex.
 ///   See class member `bmct::driver_callback_after_symex` for details.
 int bmct::do_language_agnostic_bmc(
+  const path_strategy_choosert &path_strategy_chooser,
   const optionst &opts,
   abstract_goto_modelt &model,
   const ui_message_handlert::uit &ui,
@@ -609,8 +610,12 @@ int bmct::do_language_agnostic_bmc(
   safety_checkert::resultt tmp_result = safety_checkert::resultt::UNKNOWN;
   const symbol_tablet &symbol_table = model.get_symbol_table();
   message_handlert &mh = message.get_message_handler();
-  std::unique_ptr<path_storaget> worklist =
-    path_storaget::make(path_storaget::disciplinet::FIFO);
+  std::unique_ptr<path_storaget> worklist;
+  std::string strategy = opts.get_option("exploration-strategy");
+  INVARIANT(
+    path_strategy_chooser.is_valid_strategy(strategy),
+    "Front-end passed us invalid path strategy '" + strategy + "'");
+  worklist = path_strategy_chooser.get(strategy);
   try
   {
     {

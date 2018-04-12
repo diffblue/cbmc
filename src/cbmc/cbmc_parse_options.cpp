@@ -68,7 +68,8 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):
   parse_options_baset(CBMC_OPTIONS, argc, argv),
   xml_interfacet(cmdline),
   messaget(ui_message_handler),
-  ui_message_handler(cmdline, "CBMC " CBMC_VERSION)
+  ui_message_handler(cmdline, "CBMC " CBMC_VERSION),
+  path_strategy_chooser()
 {
 }
 
@@ -79,7 +80,8 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):
   parse_options_baset(CBMC_OPTIONS+extra_options, argc, argv),
   xml_interfacet(cmdline),
   messaget(ui_message_handler),
-  ui_message_handler(cmdline, "CBMC " CBMC_VERSION)
+  ui_message_handler(cmdline, "CBMC " CBMC_VERSION),
+  path_strategy_chooser()
 {
 }
 
@@ -146,8 +148,13 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
-  if(cmdline.isset("paths"))
-    options.set_option("paths", true);
+  if(cmdline.isset("show-symex-strategies"))
+  {
+    std::cout << path_strategy_chooser.show_strategies();
+    exit(CPROVER_EXIT_SUCCESS);
+  }
+
+  path_strategy_chooser.set_path_strategy_options(cmdline, options, *this);
 
   if(cmdline.isset("program-only"))
     options.set_option("program-only", true);
@@ -531,7 +538,11 @@ int cbmc_parse_optionst::doit()
     return CPROVER_EXIT_SET_PROPERTIES_FAILED;
 
   return bmct::do_language_agnostic_bmc(
-    options, goto_model, ui_message_handler.get_ui(), *this);
+    path_strategy_chooser,
+    options,
+    goto_model,
+    ui_message_handler.get_ui(),
+    *this);
 }
 
 bool cbmc_parse_optionst::set_properties()

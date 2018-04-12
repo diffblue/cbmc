@@ -27,6 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 #include <goto-instrument/cover.h>
 
+#include <goto-symex/path_storage.h>
+
 #include <java_bytecode/java_bytecode_language.h>
 
 class bmct;
@@ -103,6 +105,7 @@ public:
 protected:
   ui_message_handlert ui_message_handler;
   std::unique_ptr<cover_configt> cover_config;
+  path_strategy_choosert path_strategy_chooser;
 
   void eval_verbosity();
   void get_command_line_options(optionst &);
