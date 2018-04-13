@@ -507,7 +507,7 @@ void value_sett::get_value_set_rec(
     if(expr.get(ID_value)==ID_NULL &&
        expr_type.id()==ID_pointer)
     {
-      insert(dest, exprt("NULL-object", expr_type.subtype()), 0);
+      insert(dest, exprt(ID_null_object, expr_type.subtype()), 0);
     }
     else if(expr_type.id()==ID_unsignedbv ||
             expr_type.id()==ID_signedbv)
@@ -538,7 +538,7 @@ void value_sett::get_value_set_rec(
       // integer-to-pointer
 
       if(expr.op0().is_zero())
-        insert(dest, exprt("NULL-object", expr_type.subtype()), 0);
+        insert(dest, exprt(ID_null_object, expr_type.subtype()), 0);
       else
       {
         // see if we have something for the integer
@@ -1409,7 +1409,7 @@ void value_sett::assign_rec(
     // someone writes into a string-constant
     // evil guy
   }
-  else if(lhs.id()=="NULL-object")
+  else if(lhs.id() == ID_null_object)
   {
     // evil as well
   }

@@ -301,7 +301,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
   valuet result;
 
-  if(root_object.id()=="NULL-object")
+  if(root_object.id() == ID_null_object)
   {
     if(options.get_bool_option("pointer-check"))
     {

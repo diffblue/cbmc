@@ -528,7 +528,7 @@ void value_set_fit::get_value_set_rec(
     if(expr.get(ID_value)==ID_NULL &&
        expr.type().id()==ID_pointer)
     {
-      insert(dest, exprt("NULL-object", expr.type().subtype()), 0);
+      insert(dest, exprt(ID_null_object, expr.type().subtype()), 0);
       return;
     }
   }
@@ -1318,7 +1318,7 @@ void value_set_fit::assign_rec(
     // someone writes into a string-constant
     // evil guy
   }
-  else if(lhs.id()=="NULL-object")
+  else if(lhs.id() == ID_null_object)
   {
     // evil as well
   }

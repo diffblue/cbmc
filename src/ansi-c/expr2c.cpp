@@ -3555,10 +3555,7 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()=="pointer_difference")
     return convert_pointer_difference(src, precedence=16);
 
-  else if(src.id()=="NULL-object")
-    return "NULL-object";
-
-  else if(src.id()==ID_null_object)
+  else if(src.id() == ID_null_object)
     return "NULL-object";
 
   else if(src.id()==ID_integer_address ||

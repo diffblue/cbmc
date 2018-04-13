@@ -320,7 +320,7 @@ SCENARIO("test_value_set_analysis",
         REQUIRE(exprs_with_id(normal_exprs_after, ID_dynamic_object)==1);
 
         REQUIRE(test_exprs_after.size()==1);
-        REQUIRE(exprs_with_id(test_exprs_after, "NULL-object")==1);
+        REQUIRE(exprs_with_id(test_exprs_after, ID_null_object)==1);
       }
     }
   }
