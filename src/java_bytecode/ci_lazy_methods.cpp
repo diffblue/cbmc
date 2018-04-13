@@ -161,7 +161,6 @@ bool ci_lazy_methodst::operator()(
 
     for(const exprt &function : virtual_function_calls)
     {
-      // This will also create a stub if a virtual callsite has no targets.
       get_virtual_method_targets(
         function, instantiated_classes, methods_to_convert_later, symbol_table);
     }
