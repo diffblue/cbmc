@@ -647,9 +647,6 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   output_equations(debug(), equations, ns);
 #endif
 
-  // The object `dependencies` is also used by get, so we have to use it as a
-  // class member but we make sure it is cleared at each `dec_solve` call.
-  dependencies.clear();
   debug() << "dec_solve: compute dependency graph and remove function "
           << "applications captured by the dependencies:" << eom;
   std::vector<exprt> local_equations;
@@ -658,6 +655,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     if(!add_node(dependencies, eq, generator.array_pool))
       local_equations.push_back(eq);
   }
+  equations.clear();
 
 #ifdef DEBUG
   dependencies.output_dot(debug());
