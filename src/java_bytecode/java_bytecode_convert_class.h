@@ -29,6 +29,10 @@ bool java_bytecode_convert_class(
   java_string_library_preprocesst &string_preprocess,
   const std::unordered_set<std::string> &no_load_classes);
 
+void convert_annotations(
+  const java_bytecode_parse_treet::annotationst &parsed_annotations,
+  std::vector<java_annotationt> &annotations);
+
 void mark_java_implicitly_generic_class_type(
   const irep_idt &class_name,
   symbol_tablet &symbol_table);

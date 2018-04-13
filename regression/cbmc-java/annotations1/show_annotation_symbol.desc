@@ -1,0 +1,12 @@
+CORE
+annotations.class
+--verbosity 10 --show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+^Type\.\.\.\.\.\.\.\.: @java::ClassAnnotation struct annotations
+^Type\.\.\.\.\.\.\.\.: @java::MethodAnnotation \(struct annotations \*\) -> void$
+^Type\.\.\.\.\.\.\.\.: @java::FieldAnnotation int$
+--
+--
+The purpose of the test is ensuring that annotations can be shown in the symbol
+table.

@@ -844,6 +844,7 @@ IREP_ID_TWO(overflow_shl, overflow-shl)
 IREP_ID_TWO(C_no_initialization_required, #no_initialization_required)
 IREP_ID_TWO(overlay_class, java::com.diffblue.OverlayClassImplementation)
 IREP_ID_TWO(overlay_method, java::com.diffblue.OverlayMethodImplementation)
+IREP_ID_ONE(annotations)
 
 #undef IREP_ID_ONE
 #undef IREP_ID_TWO

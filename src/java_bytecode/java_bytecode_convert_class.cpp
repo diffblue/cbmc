@@ -103,6 +103,7 @@ public:
   typedef java_bytecode_parse_treet::classt classt;
   typedef java_bytecode_parse_treet::fieldt fieldt;
   typedef java_bytecode_parse_treet::methodt methodt;
+  typedef java_bytecode_parse_treet::annotationt annotationt;
 
 private:
   symbol_tablet &symbol_table;
@@ -372,6 +373,10 @@ void java_bytecode_convert_classt::convert(
           "java::" + id2string(lambda_entry.second.lambda_method_ref));
   }
 
+  // Load annotations
+  if(!c.annotations.empty())
+    convert_annotations(c.annotations, class_type.get_annotations());
+
   // produce class symbol
   symbolt new_symbol;
   new_symbol.base_name=c.name;
@@ -638,6 +643,14 @@ void java_bytecode_convert_classt::convert(
         ns,
         get_message_handler());
 
+    // Load annotations
+    if(!f.annotations.empty())
+    {
+      convert_annotations(
+        f.annotations,
+        type_checked_cast<annotated_typet>(new_symbol.type).get_annotations());
+    }
+
     // Do we have the static field symbol already?
     const auto s_it=symbol_table.symbols.find(new_symbol.name);
     if(s_it!=symbol_table.symbols.end())
@@ -650,7 +663,7 @@ void java_bytecode_convert_classt::convert(
   {
     class_typet &class_type=to_class_type(class_symbol.type);
 
-    class_type.components().push_back(class_typet::componentt());
+    class_type.components().emplace_back();
     class_typet::componentt &component=class_type.components().back();
 
     component.set_name(f.name);
@@ -666,6 +679,14 @@ void java_bytecode_convert_classt::convert(
       component.set_access(ID_public);
     else
       component.set_access(ID_default);
+
+    // Load annotations
+    if(!f.annotations.empty())
+    {
+      convert_annotations(
+        f.annotations,
+        static_cast<annotated_typet &>(component.type()).get_annotations());
+    }
   }
 }
 
@@ -976,6 +997,29 @@ static void find_and_replace_parameters(
     {
       find_and_replace_parameters(gen_type, replacement_parameters);
     }
+  }
+}
+
+/// Convert parsed annotations into the symbol table
+/// \param parsed_annotations: The parsed annotations to convert
+/// \param annotations: The java_annotationt collection to populate
+void convert_annotations(
+  const java_bytecode_parse_treet::annotationst &parsed_annotations,
+  std::vector<java_annotationt> &annotations)
+{
+  for(const auto &annotation : parsed_annotations)
+  {
+    annotations.emplace_back(annotation.type);
+    std::vector<java_annotationt::valuet> &values =
+      annotations.back().get_values();
+    std::transform(
+      annotation.element_value_pairs.begin(),
+      annotation.element_value_pairs.end(),
+      std::back_inserter(values),
+      [](const decltype(annotation.element_value_pairs)::value_type &value)
+      {
+        return java_annotationt::valuet(value.element_name, value.value);
+      });
   }
 }
 

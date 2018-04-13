@@ -387,6 +387,15 @@ void java_bytecode_convert_method_lazy(
     parameters.insert(parameters.begin(), this_p);
   }
 
+  // Load annotations
+  if(!m.annotations.empty())
+  {
+    convert_annotations(
+      m.annotations,
+      type_checked_cast<annotated_typet>(static_cast<typet &>(member_type))
+        .get_annotations());
+  }
+
   method_symbol.type=member_type;
   symbol_table.add(method_symbol);
 }

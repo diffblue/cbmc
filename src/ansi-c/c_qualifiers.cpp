@@ -9,6 +9,27 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_qualifiers.h"
 
 #include <ostream>
+#include <util/make_unique.h>
+
+c_qualifierst &c_qualifierst::operator=(const c_qualifierst &other)
+{
+  is_constant = other.is_constant;
+  is_volatile = other.is_volatile;
+  is_restricted = other.is_restricted;
+  is_atomic = other.is_atomic;
+  is_noreturn = other.is_noreturn;
+  is_ptr32 = other.is_ptr32;
+  is_ptr64 = other.is_ptr64;
+  is_transparent_union = other.is_transparent_union;
+  return *this;
+}
+
+std::unique_ptr<qualifierst> c_qualifierst::clone() const
+{
+  auto other = util_make_unique<c_qualifierst>();
+  *other = *this;
+  return std::move(other);
+}
 
 std::string c_qualifierst::as_string() const
 {
@@ -120,9 +141,7 @@ void c_qualifierst::clear(typet &dest)
 }
 
 /// pretty-print the qualifiers
-std::ostream &operator << (
-  std::ostream &out,
-  const c_qualifierst &c_qualifiers)
+std::ostream &operator<<(std::ostream &out, const qualifierst &qualifiers)
 {
-  return out << c_qualifiers.as_string();
+  return out << qualifiers.as_string();
 }

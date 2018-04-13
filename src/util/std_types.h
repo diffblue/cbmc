@@ -328,6 +328,12 @@ inline struct_typet &to_struct_type(typet &type)
   return static_cast<struct_typet &>(type);
 }
 
+template <>
+inline bool can_cast_type<struct_typet>(const typet &type)
+{
+  return type.id() == ID_struct;
+}
+
 /*! \brief C++ class type
 */
 class class_typet:public struct_typet
@@ -430,6 +436,12 @@ inline class_typet &to_class_type(typet &type)
 {
   PRECONDITION(type.id()==ID_struct);
   return static_cast<class_typet &>(type);
+}
+
+template <>
+inline bool can_cast_type<class_typet>(const typet &type)
+{
+  return can_cast_type<struct_typet>(type) && type.get_bool(ID_C_class);
 }
 
 /*! \brief The union type
