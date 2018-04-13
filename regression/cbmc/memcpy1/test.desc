@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-\[(__builtin___memcpy_chk|memcpy)\.pointer_dereference\.16\] dereference failure: pointer outside object bounds in \*\(\(\(const char \*\)src \+ \(signed long (long )?int\)n\) - \(signed long (long )?int\)1\): FAILURE$
+\[(__builtin___memcpy_chk|memcpy)\.pointer_dereference\.16\] dereference failure: pointer outside object bounds in \*\(\(\(const char \*\)src \+ \(signed (long (long )?)?int\)n\) - (\(signed long (long )?int\))?1\): FAILURE$
 \*\* 1 of 17 failed
 --
 ^warning: ignoring
