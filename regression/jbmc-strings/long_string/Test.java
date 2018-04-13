@@ -30,7 +30,9 @@ public class Test {
         String u = s.concat(t);
 
         // Filter out
-        if(u.length() < 67_108_864)
+        // 67_108_864 corresponds to the maximum length for which the solver
+        // will concretize the string.
+        if(u.length() <= 67_108_864)
             return;
         if(CProverString.charAt(u, 2_000_000) != 'b')
             return;
