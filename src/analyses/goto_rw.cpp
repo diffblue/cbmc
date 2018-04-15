@@ -127,8 +127,11 @@ void rw_range_sett::get_objects_dereference(
 {
   const exprt &pointer=deref.pointer();
   get_objects_rec(get_modet::READ, pointer);
-  if(mode!=get_modet::READ)
-    get_objects_rec(mode, pointer);
+
+  // we don't have points-to information, dereferencing will yield some
+  // in-memory object
+  const symbolt &memory_symbol = ns.lookup(CPROVER_PREFIX "memory");
+  get_objects_rec(mode, memory_symbol.symbol_expr(), -1, size);
 }
 
 void rw_range_sett::get_objects_byte_extract(
@@ -413,14 +416,13 @@ void rw_range_sett::get_objects_typecast(
 
 void rw_range_sett::get_objects_address_of(const exprt &object)
 {
-  if(object.id()==ID_string_constant ||
+  if(object.id()==ID_symbol ||
+     object.id()==ID_string_constant ||
      object.id()==ID_label ||
      object.id()==ID_array ||
      object.id()=="NULL-object")
     // constant, nothing to do
     return;
-  else if(object.id()==ID_symbol)
-    get_objects_rec(get_modet::READ, object);
   else if(object.id()==ID_dereference)
     get_objects_rec(get_modet::READ, object);
   else if(object.id()==ID_index)
@@ -563,11 +565,6 @@ void rw_range_sett::get_objects_rec(
   {
     // dereferencing may yield some weird ones, ignore these
   }
-  else if(mode==get_modet::LHS_W)
-  {
-    forall_operands(it, expr)
-      get_objects_rec(mode, *it);
-  }
   else
     throw "rw_range_sett: assignment to `"+expr.id_string()+"' not handled";
 }
@@ -620,6 +617,13 @@ void rw_range_set_value_sett::get_objects_dereference(
   if(object.is_not_nil() &&
      !value_set_dereferencet::has_dereference(object))
     get_objects_rec(mode, object, range_start, new_size);
+  else
+  {
+    // we don't have sufficient points-to information, dereferencing will yield
+    // some in-memory object
+    const symbolt &memory_symbol = ns.lookup(CPROVER_PREFIX "memory");
+    get_objects_rec(mode, memory_symbol.symbol_expr(), -1, size);
+  }
 }
 
 void guarded_range_domaint::output(
