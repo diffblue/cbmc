@@ -445,6 +445,8 @@ void remove_virtual_functionst::get_functions(
         has_prefix(
           id2string(b.symbol_expr.get_identifier()), "java::java.lang.Object"))
         return true;
+      else if(a.symbol_expr.get_identifier() == b.symbol_expr.get_identifier())
+        return a.class_id < b.class_id;
       else
         return a.symbol_expr.get_identifier() < b.symbol_expr.get_identifier();
     });
