@@ -43,6 +43,9 @@ exprt is_not_zero(const exprt &, const namespacet &ns);
 /// and swapping false and true
 exprt boolean_negate(const exprt &);
 
+/// returns true if the expression has a subexpression that satisfies pred
+bool has_subexpr(const exprt &, const std::function<bool(const exprt &)> &pred);
+
 /// returns true if the expression has a subexpression with given ID
 bool has_subexpr(const exprt &, const irep_idt &);
 

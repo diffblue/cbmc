@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_util.h"
 
 #include "expr.h"
+#include "expr_iterator.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
 #include "std_expr.h"
@@ -120,16 +121,18 @@ exprt boolean_negate(const exprt &src)
     return not_exprt(src);
 }
 
+bool has_subexpr(
+  const exprt &expr,
+  const std::function<bool(const exprt &)> &pred)
+{
+  const auto it = std::find_if(expr.depth_begin(), expr.depth_end(), pred);
+  return it != expr.depth_end();
+}
+
 bool has_subexpr(const exprt &src, const irep_idt &id)
 {
-  if(src.id()==id)
-    return true;
-
-  forall_operands(it, src)
-    if(has_subexpr(*it, id))
-      return true;
-
-  return false;
+  return has_subexpr(
+    src, [&](const exprt &subexpr) { return subexpr.id() == id; });
 }
 
 bool has_subtype(

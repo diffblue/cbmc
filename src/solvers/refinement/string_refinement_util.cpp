@@ -53,11 +53,8 @@ bool has_char_pointer_subtype(const typet &type, const namespacet &ns)
 
 bool has_char_array_subexpr(const exprt &expr, const namespacet &ns)
 {
-  const auto it = std::find_if(
-    expr.depth_begin(), expr.depth_end(), [&](const exprt &e) { // NOLINT
-      return is_char_array_type(e.type(), ns);
-    });
-  return it != expr.depth_end();
+  return has_subexpr(
+    expr, [&](const exprt &e) { return is_char_array_type(e.type(), ns); });
 }
 
 sparse_arrayt::sparse_arrayt(const with_exprt &expr)
