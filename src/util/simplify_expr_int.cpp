@@ -1147,6 +1147,32 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
 
     return false;
   }
+  else if(expr.src().id() == ID_concatenation)
+  {
+    // the most-significant bit comes first in an concatenation_exprt, hence we
+    // count down
+    mp_integer offset = width;
+
+    forall_operands(it, expr.src())
+    {
+      mp_integer op_width = pointer_offset_bits(it->type(), ns);
+
+      if(op_width <= 0)
+        return true;
+
+      if(start + 1 == offset && end + op_width == offset)
+      {
+        exprt tmp = *it;
+        if(tmp.type() != expr.type())
+          return true;
+
+        expr.swap(tmp);
+        return false;
+      }
+
+      offset -= op_width;
+    }
+  }
 
   return true;
 }
