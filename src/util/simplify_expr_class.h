@@ -28,6 +28,7 @@ class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
 class exprt;
+class extractbits_exprt;
 class if_exprt;
 class index_exprt;
 class member_exprt;
@@ -66,7 +67,7 @@ public:
 
   bool simplify_typecast(exprt &expr);
   bool simplify_extractbit(exprt &expr);
-  bool simplify_extractbits(exprt &expr);
+  bool simplify_extractbits(extractbits_exprt &expr);
   bool simplify_concatenation(exprt &expr);
   bool simplify_mult(exprt &expr);
   bool simplify_div(exprt &expr);
