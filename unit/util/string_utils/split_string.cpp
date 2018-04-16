@@ -8,6 +8,84 @@
 #include <testing-utils/catch.hpp>
 #include <util/string_utils.h>
 
+struct expected_resultst
+{
+  std::vector<std::string> no_strip_no_remove;
+  std::vector<std::string> strip_no_remove;
+  std::vector<std::string> no_strip_remove_empty;
+  std::vector<std::string> strip_remove_empty;
+};
+
+/// For a given string and delimiter, use the split_string function with all
+/// the possible combinations of stripping whitespace and removing empty
+/// elements.
+/// \param string: The string to split
+/// \param delimiter: The delimter to split on
+/// \param expected_results: The results expected for each of the versions of
+/// the method
+void run_on_all_variants(
+  std::string string,
+  char delimiter,
+  const expected_resultst &expected_results)
+{
+  WHEN("Not stripping, not removing empty")
+  {
+    std::vector<std::string> result;
+    split_string(string, delimiter, result, false, false);
+
+    THEN("Should get expected vector")
+    {
+      REQUIRE_THAT(
+        result,
+        // NOLINTNEXTLINE(whitespace/braces)
+        Catch::Matchers::Vector::EqualsMatcher<std::string>{
+          expected_results.no_strip_no_remove});
+    }
+  }
+  WHEN("Not stripping, removing empty")
+  {
+    std::vector<std::string> result;
+    split_string(string, delimiter, result, false, true);
+
+    THEN("Should get expected vector")
+    {
+      REQUIRE_THAT(
+        result,
+        // NOLINTNEXTLINE(whitespace/braces)
+        Catch::Matchers::Vector::EqualsMatcher<std::string>{
+          expected_results.no_strip_remove_empty});
+    }
+  }
+  WHEN("Stripping, not removing empty")
+  {
+    std::vector<std::string> result;
+    split_string(string, delimiter, result, true, false);
+
+    THEN("Should get expected vector")
+    {
+      REQUIRE_THAT(
+        result,
+        // NOLINTNEXTLINE(whitespace/braces)
+        Catch::Matchers::Vector::EqualsMatcher<std::string>{
+          expected_results.strip_no_remove});
+    }
+  }
+  WHEN("Stripping and removing empty")
+  {
+    std::vector<std::string> result;
+    split_string(string, delimiter, result, true, true);
+
+    THEN("Should get expected vector")
+    {
+      REQUIRE_THAT(
+        result,
+        // NOLINTNEXTLINE(whitespace/braces)
+        Catch::Matchers::Vector::EqualsMatcher<std::string>{
+          expected_results.strip_remove_empty});
+    }
+  }
+}
+
 SCENARIO("split_string", "[core][utils][string_utils][split_string]")
 {
   GIVEN("A non whitespace delimited string with two elements")
@@ -15,58 +93,13 @@ SCENARIO("split_string", "[core][utils][string_utils][split_string]")
     const char delimiter = ',';
     const std::string string = " a,, x , ,";
 
-    WHEN("Not stripping, not removing empty")
-    {
-      std::vector<std::string> result;
-      split_string(string, delimiter, result, false, false);
+    expected_resultst expected_results;
+    expected_results.no_strip_no_remove = {" a", "", " x ", " ", ""};
+    expected_results.strip_no_remove = {"a", "", "x", "", ""};
+    expected_results.no_strip_remove_empty = {" a", " x ", " "};
+    expected_results.strip_remove_empty = {"a", "x"};
 
-      THEN("All the elements should remain")
-      {
-        std::vector<std::string> expected_result = {" a", "", " x ", " ", ""};
-        REQUIRE_THAT(
-          result,
-          Catch::Matchers::Vector::EqualsMatcher<std::string>{expected_result});
-      }
-    }
-    WHEN("Stripping, not removing empty")
-    {
-      std::vector<std::string> result;
-      split_string(string, delimiter, result, true, false);
-
-      THEN("All whitespace borders should be removed but all elements remain")
-      {
-        std::vector<std::string> expected_result = {"a", "", "x", "", ""};
-        REQUIRE_THAT(
-          result,
-          Catch::Matchers::Vector::EqualsMatcher<std::string>{expected_result});
-      }
-    }
-    WHEN("Not stripping, removing empty")
-    {
-      std::vector<std::string> result;
-      split_string(string, delimiter, result, false, true);
-
-      THEN("All empty elements should be removed")
-      {
-        std::vector<std::string> expected_result = {" a", " x ", " "};
-        REQUIRE_THAT(
-          result,
-          Catch::Matchers::Vector::EqualsMatcher<std::string>{expected_result});
-      }
-    }
-    WHEN("Stripping and removing empty")
-    {
-      std::vector<std::string> result;
-      split_string(string, delimiter, result, true, true);
-
-      THEN("Should get the two parts in the vector")
-      {
-        std::vector<std::string> expected_result = {"a", "x"};
-        REQUIRE_THAT(
-          result,
-          Catch::Matchers::Vector::EqualsMatcher<std::string>{expected_result});
-      }
-    }
+    run_on_all_variants(string, delimiter, expected_results);
   }
 }
 
