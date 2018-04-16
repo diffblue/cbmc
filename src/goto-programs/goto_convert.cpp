@@ -26,13 +26,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 #include "destructor.h"
+#include "remove_skip.h"
 
 static bool is_empty(const goto_programt &goto_program)
 {
   forall_goto_program_instructions(it, goto_program)
-    if(!it->is_skip() ||
-       !it->labels.empty() ||
-       !it->code.is_nil())
+    if(!is_skip(goto_program, it))
       return false;
 
   return true;
@@ -1723,6 +1722,11 @@ void goto_convertt::generate_ifthenelse(
     true_case.instructions.back().guard=boolean_negate(guard);
     dest.destructive_append(true_case);
     true_case.instructions.clear();
+    if(
+      is_empty(false_case) ||
+      (is_size_one(false_case) &&
+       is_skip(false_case, false_case.instructions.begin())))
+      return;
   }
 
   // similarly, do guarded assertions directly
@@ -1736,6 +1740,28 @@ void goto_convertt::generate_ifthenelse(
     false_case.instructions.back().guard=guard;
     dest.destructive_append(false_case);
     false_case.instructions.clear();
+    if(
+      is_empty(true_case) ||
+      (is_size_one(true_case) &&
+       is_skip(true_case, true_case.instructions.begin())))
+      return;
+  }
+
+  // a special case for C libraries that use
+  // (void)((cond) || (assert(0),0))
+  if(
+    is_empty(false_case) && true_case.instructions.size() == 2 &&
+    true_case.instructions.front().is_assert() &&
+    true_case.instructions.front().guard.is_false() &&
+    true_case.instructions.front().labels.empty() &&
+    true_case.instructions.back().labels.empty())
+  {
+    true_case.instructions.front().guard = boolean_negate(guard);
+    true_case.instructions.erase(--true_case.instructions.end());
+    dest.destructive_append(true_case);
+    true_case.instructions.clear();
+
+    return;
   }
 
   // Flip around if no 'true' case code.
