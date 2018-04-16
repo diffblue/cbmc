@@ -143,7 +143,19 @@ static bool is_assignment_from(
 
 /// Given an iterator into a list of instructions, modify the list to replace
 /// 'nondet' library functions with CBMC-native nondet expressions, and return
-/// an iterator to the next instruction to check.
+/// an iterator to the next instruction to check. It's important to note that
+/// this method also deals with the fact that in the GOTO program it assigns
+/// function return values to temporary variables, performs validation and then
+/// assigns the value into the actual variable.
+///
+/// Example:
+///
+///   return_tmp0=org.cprover.CProver.nondetWithoutNull:()Ljava/lang/Object;();
+///   ... Various validations of type and value here.
+///   obj = (<type-of-obj>)return_tmp0;
+///
+/// We're going to replace all of these lines with
+///   return_tmp0 = NONDET(<type-of-obj>)
 /// \param goto_program: The goto program to modify.
 /// \param target: A single step of the goto program which may be erased and
 ///   replaced.
@@ -161,40 +173,68 @@ static goto_programt::targett check_and_replace_target(
     return next_instr;
   }
 
-  // Look at the next instruction, ensure that it is an assignment
-  assert(next_instr->is_assign());
-  // Get the name of the LHS of the assignment
-  const auto &next_instr_assign_lhs=to_code_assign(next_instr->code).lhs();
-  if(!(next_instr_assign_lhs.id()==ID_symbol &&
-       !next_instr_assign_lhs.has_operands()))
+  // If we haven't removed returns yet, our function call will have a variable
+  // on its left hand side.
+  const bool remove_returns_not_run =
+    to_code_function_call(target->code).lhs().is_not_nil();
+
+  irep_idt return_identifier;
+  if(remove_returns_not_run)
   {
-    return next_instr;
+    return_identifier =
+      to_symbol_expr(to_code_function_call(target->code).lhs())
+        .get_identifier();
   }
-  const auto return_identifier=
-    to_symbol_expr(next_instr_assign_lhs).get_identifier();
+  else
+  {
+    // If not, we need to look at the next line instead.
+    DATA_INVARIANT(
+      next_instr->is_assign(),
+      "the code_function_callt for a nondet-returning library function should "
+      "either have a variable for the return value in its lhs() or the next "
+      "instruction should be an assignment of the return value to a temporary "
+      "variable");
+    const exprt &return_value_assignment =
+      to_code_assign(next_instr->code).lhs();
 
-  auto &instructions=goto_program.instructions;
-  const auto end=instructions.end();
+    // If the assignment is null, return.
+    if(
+      !(return_value_assignment.id() == ID_symbol &&
+        !return_value_assignment.has_operands()))
+    {
+      return next_instr;
+    }
 
-  // Look for an instruction where this name is on the RHS of an assignment
-  const auto matching_assignment=std::find_if(
+    // Otherwise it's the temporary variable.
+    return_identifier =
+      to_symbol_expr(return_value_assignment).get_identifier();
+  }
+
+  // Look for the assignment of the temporary return variable into our target
+  // variable.
+  const auto end = goto_program.instructions.end();
+  auto assignment_instruction = std::find_if(
     next_instr,
     end,
-    [&return_identifier](const goto_programt::instructiont &instr)
-    {
+    [&return_identifier](const goto_programt::instructiont &instr) {
       return is_assignment_from(instr, return_identifier);
     });
 
-  assert(matching_assignment!=end);
+  INVARIANT(
+    assignment_instruction != end,
+    "failed to find assignment of the temporary return variable into our "
+    "target variable");
 
   // Assume that the LHS of *this* assignment is the actual nondet variable
-  const auto &code_assign=to_code_assign(matching_assignment->code);
+  const auto &code_assign = to_code_assign(assignment_instruction->code);
   const auto nondet_var=code_assign.lhs();
   const auto source_loc=target->source_location;
 
   // Erase from the nondet function call to the assignment
-  const auto after_matching_assignment=std::next(matching_assignment);
-  assert(after_matching_assignment!=end);
+  const auto after_matching_assignment = std::next(assignment_instruction);
+  INVARIANT(
+    after_matching_assignment != end,
+    "goto_program missing END_FUNCTION instruction");
 
   std::for_each(
     target,
