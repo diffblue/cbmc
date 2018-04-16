@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void set_properties(
   goto_programt &goto_program,
-  std::unordered_set<irep_idt, irep_id_hash> &property_set)
+  unordered_id_sett &property_set)
 {
   for(goto_programt::instructionst::iterator
       it=goto_program.instructions.begin();
@@ -28,8 +28,7 @@ void set_properties(
 
     irep_idt property_id=it->source_location.get_property_id();
 
-    std::unordered_set<irep_idt, irep_id_hash>::iterator
-      c_it=property_set.find(property_id);
+    unordered_id_sett::iterator c_it = property_set.find(property_id);
 
     if(c_it==property_set.end())
       it->type=SKIP;
@@ -102,7 +101,7 @@ void set_properties(
   goto_functionst &goto_functions,
   const std::list<std::string> &properties)
 {
-  std::unordered_set<irep_idt, irep_id_hash> property_set;
+  unordered_id_sett property_set;
 
   property_set.insert(properties.begin(), properties.end());
 

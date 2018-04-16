@@ -1893,11 +1893,14 @@ bool java_string_library_preprocesst::is_known_string_type(
 
 void java_string_library_preprocesst::initialize_known_type_table()
 {
-  string_types=
-    std::unordered_set<irep_idt, irep_id_hash>{"java.lang.String",
-                                               "java.lang.StringBuilder",
-                                               "java.lang.CharSequence",
-                                               "java.lang.StringBuffer"};
+  string_types =
+    unordered_id_sett
+    {
+      "java.lang.String",
+      "java.lang.StringBuilder",
+      "java.lang.CharSequence",
+      "java.lang.StringBuffer"
+    };
 }
 
 /// fill maps with correspondence from java method names to conversion functions

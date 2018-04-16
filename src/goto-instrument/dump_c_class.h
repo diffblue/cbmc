@@ -52,7 +52,7 @@ protected:
   std::unique_ptr<languaget> language;
   const bool harness;
 
-  typedef std::unordered_set<irep_idt, irep_id_hash> convertedt;
+  typedef unordered_id_sett convertedt;
   convertedt converted_compound, converted_global, converted_enum;
 
   std::set<std::string> system_headers;
@@ -68,7 +68,7 @@ protected:
     irep_idt typedef_name;
     std::string type_decl_str;
     bool early;
-    std::unordered_set<irep_idt, irep_id_hash> dependencies;
+    unordered_id_sett dependencies;
 
     explicit typedef_infot(const irep_idt &name):
       typedef_name(name),
@@ -108,7 +108,7 @@ protected:
   void collect_typedefs_rec(
     const typet &type,
     bool early,
-    std::unordered_set<irep_idt, irep_id_hash> &dependencies);
+    unordered_id_sett &dependencies);
   void gather_global_typedefs();
   void dump_typedefs(std::ostream &os) const;
 

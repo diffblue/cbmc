@@ -94,7 +94,7 @@ protected:
   virtual std::string to_string(const exprt &expr);
   virtual std::string to_string(const typet &type);
 
-  std::unordered_set<irep_idt, irep_id_hash> already_typechecked;
+  unordered_id_sett already_typechecked;
 };
 
 #endif // CPROVER_JSIL_JSIL_TYPECHECK_H

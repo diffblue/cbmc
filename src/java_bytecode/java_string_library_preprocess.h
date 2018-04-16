@@ -141,7 +141,7 @@ private:
     };
 
   // A set tells us what java types should be considered as string objects
-  std::unordered_set<irep_idt, irep_id_hash> string_types;
+  unordered_id_sett string_types;
 
   codet make_equals_function_code(
     const code_typet &type,

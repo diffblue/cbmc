@@ -47,7 +47,7 @@ static bool link_functions(
   const symbol_tablet &src_symbol_table,
   goto_functionst &src_functions,
   const rename_symbolt &rename_symbol,
-  const std::unordered_set<irep_idt, irep_id_hash> &weak_symbols,
+  const unordered_id_sett &weak_symbols,
   const replace_symbolt &object_type_updates)
 {
   namespacet ns(dest_symbol_table);

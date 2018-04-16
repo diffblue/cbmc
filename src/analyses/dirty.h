@@ -130,7 +130,7 @@ public:
 
 private:
   dirtyt dirty;
-  std::unordered_set<irep_idt, irep_id_hash> dirty_processed_functions;
+  unordered_id_sett dirty_processed_functions;
 };
 
 #endif // CPROVER_ANALYSES_DIRTY_H
