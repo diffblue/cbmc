@@ -169,8 +169,7 @@ void unreachable_instructions(
 {
   json_arrayt json_result;
 
-  std::set<irep_idt> called=
-    compute_called_functions(goto_model);
+  id_sett called = compute_called_functions(goto_model);
 
   const namespacet ns(goto_model.symbol_table);
 
@@ -293,7 +292,7 @@ static void xml_output_function(
 
 static void list_functions(
   const goto_modelt &goto_model,
-  const std::set<irep_idt> called,
+  const id_sett called,
   const optionst &options,
   std::ostream &os,
   bool unreachable)
@@ -389,7 +388,7 @@ void unreachable_functions(
   else
     options.set_option("text", true);
 
-  std::set<irep_idt> called = compute_called_functions(goto_model);
+  id_sett called = compute_called_functions(goto_model);
 
   list_functions(goto_model, called, options, os, true);
 }
@@ -405,17 +404,17 @@ void reachable_functions(
   else
     options.set_option("text", true);
 
-  std::set<irep_idt> called = compute_called_functions(goto_model);
+  id_sett called = compute_called_functions(goto_model);
 
   list_functions(goto_model, called, options, os, false);
 }
 
 
-std::set<irep_idt> compute_called_functions_from_ai(
+id_sett compute_called_functions_from_ai(
   const goto_modelt &goto_model,
   const ai_baset &ai)
 {
-  std::set<irep_idt> called;
+  id_sett called;
 
   forall_goto_functions(f_it, goto_model.goto_functions)
   {
@@ -438,7 +437,7 @@ bool static_unreachable_functions(
   message_handlert &message_handler,
   std::ostream &out)
 {
-  std::set<irep_idt> called = compute_called_functions_from_ai(goto_model, ai);
+  id_sett called = compute_called_functions_from_ai(goto_model, ai);
 
   list_functions(goto_model, called, options, out, true);
 
@@ -452,7 +451,7 @@ bool static_reachable_functions(
   message_handlert &message_handler,
   std::ostream &out)
 {
-  std::set<irep_idt> called = compute_called_functions_from_ai(goto_model, ai);
+  id_sett called = compute_called_functions_from_ai(goto_model, ai);
 
   list_functions(goto_model, called, options, out, false);
 

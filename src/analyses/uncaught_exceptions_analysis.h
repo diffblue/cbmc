@@ -29,7 +29,7 @@ class uncaught_exceptions_domaint
                  const namespacet &);
 
   void join(const irep_idt &);
-  void join(const std::set<irep_idt> &);
+  void join(const id_sett &);
   void join(const std::vector<irep_idt> &);
 
   void make_top()
@@ -42,14 +42,14 @@ class uncaught_exceptions_domaint
 
   static exprt get_exception_symbol(const exprt &exor);
 
-  const std::set<irep_idt>  &get_elements() const;
+  const id_sett &get_elements() const;
 
   void operator()(const namespacet &ns);
 
- private:
-  typedef std::vector<std::set<irep_idt>> stack_caughtt;
+private:
+  typedef std::vector<id_sett> stack_caughtt;
   stack_caughtt stack_caught;
-  std::set<irep_idt> thrown;
+  id_sett thrown;
   class_hierarchyt class_hierarchy;
 };
 
@@ -58,7 +58,7 @@ class uncaught_exceptions_domaint
 class uncaught_exceptions_analysist
 {
 public:
-  typedef std::map<irep_idt, std::set<irep_idt>> exceptions_mapt;
+  typedef std::map<irep_idt, id_sett> exceptions_mapt;
 
   void collect_uncaught_exceptions(
     const goto_functionst &,
@@ -81,6 +81,6 @@ public:
 void uncaught_exceptions(
   const goto_functionst &,
   const namespacet &,
-  std::map<irep_idt, std::set<irep_idt>> &);
+  std::map<irep_idt, id_sett> &);
 
 #endif

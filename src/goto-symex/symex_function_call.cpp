@@ -376,15 +376,14 @@ void goto_symext::locality(
     state.threads[state.source.thread_nr].function_frame[function_identifier];
   frame_nr++;
 
-  std::set<irep_idt> local_identifiers;
+  id_sett local_identifiers;
 
   get_local_identifiers(goto_function, local_identifiers);
 
   statet::framet &frame=state.top();
 
-  for(std::set<irep_idt>::const_iterator
-      it=local_identifiers.begin();
-      it!=local_identifiers.end();
+  for(id_sett::const_iterator it = local_identifiers.begin();
+      it != local_identifiers.end();
       it++)
   {
     // get L0 name

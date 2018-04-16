@@ -228,8 +228,7 @@ protected:
   void convert_specc_notify(const codet &code, goto_programt &dest);
   void convert_specc_wait(const codet &code, goto_programt &dest);
   void convert_specc_par(const codet &code, goto_programt &dest);
-  void convert_specc_event(const exprt &op,
-                           std::set<irep_idt> &events);
+  void convert_specc_event(const exprt &op, id_sett &events);
   void convert_start_thread(const codet &code, goto_programt &dest);
   void convert_end_thread(const codet &code, goto_programt &dest);
   void convert_atomic_begin(const codet &code, goto_programt &dest);

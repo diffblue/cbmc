@@ -21,11 +21,11 @@ class ci_lazy_methods_neededt
 public:
   ci_lazy_methods_neededt(
     std::vector<irep_idt> &_callable_methods,
-    std::set<irep_idt> &_instantiated_classes,
-    symbol_tablet &_symbol_table):
-  callable_methods(_callable_methods),
-  instantiated_classes(_instantiated_classes),
-  symbol_table(_symbol_table)
+    id_sett &_instantiated_classes,
+    symbol_tablet &_symbol_table)
+    : callable_methods(_callable_methods),
+      instantiated_classes(_instantiated_classes),
+      symbol_table(_symbol_table)
   {}
 
   void add_needed_method(const irep_idt &);
@@ -42,7 +42,7 @@ private:
   // instantiated_classes on the other hand is a true set of every class
   // found so far, so we can use a membership test to avoid
   // repeatedly exploring a class hierarchy.
-  std::set<irep_idt> &instantiated_classes;
+  id_sett &instantiated_classes;
   symbol_tablet &symbol_table;
 };
 

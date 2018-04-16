@@ -61,7 +61,7 @@ public:
   typedef std::map<irep_idt, irep_idt> original_identifierst;
 
   // we remember all L1 renamings
-  typedef std::set<irep_idt> l1_historyt;
+  typedef id_sett l1_historyt;
   l1_historyt l1_history;
 
   struct renaming_levelt
@@ -273,7 +273,7 @@ public:
 
     renaming_levelt::current_namest old_level1;
 
-    typedef std::set<irep_idt> local_objectst;
+    typedef id_sett local_objectst;
     local_objectst local_objects;
 
     framet():

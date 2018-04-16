@@ -78,7 +78,7 @@ public:
 
   /* instructions in violation cycles (to instrument): */
   // variables in the cycles
-  std::set<irep_idt> cycles;
+  id_sett cycles;
   // events instrumented: var->locations in the code
   std::multimap<irep_idt, source_locationt> cycles_loc;
   // events in cycles: var->locations (for read instrumentations)
@@ -202,7 +202,7 @@ public:
     unsigned max_thread;
 
     /* data propagated through the CFG */
-    std::set<irep_idt> past_writes;
+    id_sett past_writes;
 
   public:
     cfg_visitort(shared_bufferst &_shared, symbol_tablet &_symbol_table,
@@ -228,11 +228,11 @@ protected:
   unsigned nb_threads;
 
   // instrumentations (not to be instrumented again)
-  std::set<irep_idt> instrumentations;
+  id_sett instrumentations;
 
   // variables (non necessarily shared) affected by reads delay
 public:
-  std::set<irep_idt> affected_by_delay_set;
+  id_sett affected_by_delay_set;
 
 protected:
   // for fresh variables

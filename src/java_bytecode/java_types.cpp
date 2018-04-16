@@ -744,9 +744,7 @@ bool equal_java_types(const typet &type1, const typet &type2)
   return (type1 == type2 && arrays_with_same_element_type);
 }
 
-void get_dependencies_from_generic_parameters_rec(
-  const typet &t,
-  std::set<irep_idt> &refs)
+void get_dependencies_from_generic_parameters_rec(const typet &t, id_sett &refs)
 {
   // Java generic type that holds different types in its type arguments
   if(is_java_generic_type(t))
@@ -793,7 +791,7 @@ void get_dependencies_from_generic_parameters_rec(
 /// \param refs [out]: the set to insert the names of the found dependencies
 void get_dependencies_from_generic_parameters(
   const std::string &signature,
-  std::set<irep_idt> &refs)
+  id_sett &refs)
 {
   try
   {
@@ -827,9 +825,7 @@ void get_dependencies_from_generic_parameters(
 /// only appear as generic type argument, not as a field reference.
 /// \param t: the type to analyze
 /// \param refs [out]: the set to insert the names of the found dependencies
-void get_dependencies_from_generic_parameters(
-  const typet &t,
-  std::set<irep_idt> &refs)
+void get_dependencies_from_generic_parameters(const typet &t, id_sett &refs)
 {
   get_dependencies_from_generic_parameters_rec(t, refs);
 }

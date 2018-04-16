@@ -4475,13 +4475,11 @@ void smt2_convt::convert_type(const typet &type)
 
 void smt2_convt::find_symbols(const typet &type)
 {
-  std::set<irep_idt> recstack;
+  id_sett recstack;
   find_symbols_rec(type, recstack);
 }
 
-void smt2_convt::find_symbols_rec(
-  const typet &type,
-  std::set<irep_idt> &recstack)
+void smt2_convt::find_symbols_rec(const typet &type, id_sett &recstack)
 {
   if(type.id()==ID_array)
   {

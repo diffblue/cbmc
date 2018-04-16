@@ -57,7 +57,7 @@ void thread_exit_instrumentation(goto_programt &goto_program)
 void thread_exit_instrumentation(goto_modelt &goto_model)
 {
   // we'll look for START THREAD
-  std::set<irep_idt> thread_fkts;
+  id_sett thread_fkts;
 
   forall_goto_functions(f_it, goto_model.goto_functions)
   {

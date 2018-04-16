@@ -213,8 +213,6 @@ public:
       it=(functions).function_map.begin(); \
       it!=(functions).function_map.end(); it++)
 
-void get_local_identifiers(
-  const goto_functiont &,
-  std::set<irep_idt> &dest);
+void get_local_identifiers(const goto_functiont &, id_sett &dest);
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_FUNCTIONS_H

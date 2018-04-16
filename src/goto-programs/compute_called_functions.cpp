@@ -14,9 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 /// get all functions whose address is taken
-void compute_address_taken_functions(
-  const exprt &src,
-  std::set<irep_idt> &address_taken)
+void compute_address_taken_functions(const exprt &src, id_sett &address_taken)
 {
   forall_operands(it, src)
     compute_address_taken_functions(*it, address_taken);
@@ -33,9 +31,7 @@ void compute_address_taken_functions(
 }
 
 /// get all functions in the expression
-void compute_functions(
-  const exprt &src,
-  std::set<irep_idt> &address_taken)
+void compute_functions(const exprt &src, id_sett &address_taken)
 {
   forall_operands(it, src)
     compute_functions(*it, address_taken);
@@ -48,7 +44,7 @@ void compute_functions(
 /// get all functions whose address is taken
 void compute_address_taken_functions(
   const goto_programt &goto_program,
-  std::set<irep_idt> &address_taken)
+  id_sett &address_taken)
 {
   forall_goto_program_instructions(it, goto_program)
   {
@@ -60,28 +56,26 @@ void compute_address_taken_functions(
 /// get all functions whose address is taken
 void compute_address_taken_functions(
   const goto_functionst &goto_functions,
-  std::set<irep_idt> &address_taken)
+  id_sett &address_taken)
 {
   forall_goto_functions(it, goto_functions)
     compute_address_taken_functions(it->second.body, address_taken);
 }
 
 /// get all functions whose address is taken
-std::set<irep_idt> compute_address_taken_functions(
-  const goto_functionst &goto_functions)
+id_sett compute_address_taken_functions(const goto_functionst &goto_functions)
 {
-  std::set<irep_idt> address_taken;
+  id_sett address_taken;
   compute_address_taken_functions(goto_functions, address_taken);
   return address_taken;
 }
 
 /// computes the functions that are (potentially) called
-std::set<irep_idt> compute_called_functions(
-  const goto_functionst &goto_functions)
+id_sett compute_called_functions(const goto_functionst &goto_functions)
 {
-  std::set<irep_idt> working_queue;
-  std::set<irep_idt> done;
-  std::set<irep_idt> functions;
+  id_sett working_queue;
+  id_sett done;
+  id_sett functions;
 
   // start from entry point
   working_queue.insert(goto_functions.entry_point());
@@ -123,8 +117,7 @@ std::set<irep_idt> compute_called_functions(
 }
 
 /// computes the functions that are (potentially) called
-std::set<irep_idt> compute_called_functions(
-  const goto_modelt &goto_model)
+id_sett compute_called_functions(const goto_modelt &goto_model)
 {
   return compute_called_functions(goto_model.goto_functions);
 }

@@ -204,7 +204,7 @@ protected:
     std::set<event_idt> unknown_write_nodes;
 
     /* set of functions visited so far -- we don't handle recursive functions */
-    std::set<irep_idt> functions_met;
+    id_sett functions_met;
 
     cfg_visitort(namespacet &_ns, instrumentert &_instrumenter)
     :ns(_ns), instrumenter(_instrumenter), egraph(_instrumenter.egraph),
@@ -323,7 +323,7 @@ public:
      the cycles, and locations of all the variables on the critical cycles */
   /* TODO: those maps are here to interface easily with weak_mem.cpp,
      but a rewriting of weak_mem can eliminate them */
-  std::set<irep_idt> var_to_instr;
+  id_sett var_to_instr;
   std::multimap<irep_idt, source_locationt> id2loc;
   std::multimap<irep_idt, source_locationt> id2cycloc;
 

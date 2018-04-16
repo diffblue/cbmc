@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void global_may_alias_domaint::assign_lhs_aliases(
   const exprt &lhs,
-  const std::set<irep_idt> &alias_set)
+  const id_sett &alias_set)
 {
   if(lhs.id()==ID_symbol)
   {
@@ -30,7 +30,7 @@ void global_may_alias_domaint::assign_lhs_aliases(
 
 void global_may_alias_domaint::get_rhs_aliases(
   const exprt &rhs,
-  std::set<irep_idt> &alias_set)
+  id_sett &alias_set)
 {
   if(rhs.id()==ID_symbol)
   {
@@ -58,7 +58,7 @@ void global_may_alias_domaint::get_rhs_aliases(
 
 void global_may_alias_domaint::get_rhs_aliases_address_of(
   const exprt &rhs,
-  std::set<irep_idt> &alias_set)
+  id_sett &alias_set)
 {
   if(rhs.id()==ID_symbol)
   {
@@ -92,7 +92,7 @@ void global_may_alias_domaint::transform(
     {
       const code_assignt &code_assign=to_code_assign(instruction.code);
 
-      std::set<irep_idt> aliases;
+      id_sett aliases;
       get_rhs_aliases(code_assign.rhs(), aliases);
       assign_lhs_aliases(code_assign.lhs(), aliases);
     }

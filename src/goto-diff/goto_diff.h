@@ -51,12 +51,11 @@ protected:
   ui_message_handlert::uit ui;
 
   unsigned total_functions_count;
-  typedef std::set<irep_idt> irep_id_sett;
-  irep_id_sett new_functions, modified_functions, deleted_functions;
+  id_sett new_functions, modified_functions, deleted_functions;
 
   void output_function_group(
     const std::string &group_name,
-    const irep_id_sett &function_group,
+    const id_sett &function_group,
     const goto_modelt &goto_model) const;
   void output_function(
     const irep_idt &function_name,
@@ -64,7 +63,7 @@ protected:
 
   void convert_function_group_json(
     json_arrayt &result,
-    const irep_id_sett &function_group,
+    const id_sett &function_group,
     const goto_modelt &goto_model) const;
   void convert_function_json(
     json_objectt &result,

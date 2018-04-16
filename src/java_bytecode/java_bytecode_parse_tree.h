@@ -274,7 +274,7 @@ public:
 
   void output(std::ostream &out) const;
 
-  typedef std::set<irep_idt> class_refst;
+  typedef id_sett class_refst;
   class_refst class_refs;
 
   bool loading_successful;

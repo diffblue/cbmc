@@ -64,7 +64,7 @@ void goto_difft::output_functions() const
 /// \param goto_model: the goto model
 void goto_difft::output_function_group(
   const std::string &group_name,
-  const irep_id_sett &function_group,
+  const id_sett &function_group,
   const goto_modelt &goto_model) const
 {
   result() << group_name << ":\n";
@@ -113,7 +113,7 @@ void goto_difft::output_function(
 /// \param goto_model: the goto model
 void goto_difft::convert_function_group_json(
   json_arrayt &result,
-  const irep_id_sett &function_group,
+  const id_sett &function_group,
   const goto_modelt &goto_model) const
 {
   for(const auto &function_name : function_group)

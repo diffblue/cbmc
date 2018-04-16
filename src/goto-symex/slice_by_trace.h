@@ -29,12 +29,12 @@ public:
 
  protected:
   const namespacet &ns;
-  typedef std::set<irep_idt> alphabett;
+  typedef id_sett alphabett;
   alphabett alphabet;
   bool alphabet_parity;
   std::string semantics;
 
-  typedef std::pair<std::set<irep_idt>, bool> event_sett;
+  typedef std::pair<id_sett, bool> event_sett;
   typedef std::vector<event_sett> event_tracet;
 
   event_tracet sigma;

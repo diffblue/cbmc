@@ -1270,8 +1270,9 @@ void shared_bufferst::cfg_visitort::weak_memory(
       i_it++;
 
       // does it for all the previous statements
-      for(std::set<irep_idt>::iterator s_it=past_writes.begin();
-        s_it!=past_writes.end(); s_it++)
+      for(id_sett::iterator s_it = past_writes.begin();
+          s_it != past_writes.end();
+          s_it++)
       {
         shared_buffers.det_flush(
           goto_program, i_it, source_location, *s_it,

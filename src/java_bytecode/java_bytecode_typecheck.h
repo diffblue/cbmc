@@ -75,7 +75,7 @@ protected:
   virtual std::string to_string(const exprt &expr);
   virtual std::string to_string(const typet &type);
 
-  std::set<irep_idt> already_typechecked;
+  id_sett already_typechecked;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_TYPECHECK_H

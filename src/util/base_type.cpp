@@ -18,8 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "symbol.h"
 
-void base_type_rec(
-  typet &type, const namespacet &ns, std::set<irep_idt> &symb)
+void base_type_rec(typet &type, const namespacet &ns, id_sett &symb)
 {
   if(type.id()==ID_symbol ||
      type.id()==ID_c_enum_tag ||
@@ -78,7 +77,7 @@ void base_type_rec(
 
 void base_type(typet &type, const namespacet &ns)
 {
-  std::set<irep_idt> symb;
+  id_sett symb;
   base_type_rec(type, ns, symb);
 }
 

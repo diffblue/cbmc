@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 
 std::string get_cprover_library_text(
-  const std::set<irep_idt> &functions,
+  const id_sett &functions,
   const symbol_tablet &);
 
 void add_library(
@@ -25,7 +25,7 @@ void add_library(
   message_handlert &);
 
 void add_cprover_library(
-  const std::set<irep_idt> &functions,
+  const id_sett &functions,
   symbol_tablet &,
   message_handlert &);
 

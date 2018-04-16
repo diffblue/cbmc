@@ -26,7 +26,7 @@ public:
   }
 
   // Locals that are declared but may not be initialized
-  typedef std::set<irep_idt> uninitializedt;
+  typedef id_sett uninitializedt;
   uninitializedt uninitialized;
 
   void

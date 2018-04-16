@@ -74,10 +74,7 @@ void goto_functionst::compute_loop_numbers()
   }
 }
 
-
-void get_local_identifiers(
-  const goto_functiont &goto_function,
-  std::set<irep_idt> &dest)
+void get_local_identifiers(const goto_functiont &goto_function, id_sett &dest)
 {
   goto_function.body.get_decl_identifiers(dest);
 

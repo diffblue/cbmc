@@ -159,7 +159,7 @@ void cpp_typecheck_resolvet::remove_duplicates(
   resolve_identifierst old_identifiers;
   old_identifiers.swap(identifiers);
 
-  std::set<irep_idt> ids;
+  id_sett ids;
   std::set<exprt> other;
 
   for(resolve_identifierst::const_iterator
@@ -1016,7 +1016,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
     throw 0;
   }
 
-  std::set<irep_idt> primary_templates;
+  id_sett primary_templates;
 
   for(cpp_scopest::id_sett::const_iterator
       it=id_set.begin();

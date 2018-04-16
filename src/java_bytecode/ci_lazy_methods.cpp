@@ -110,7 +110,7 @@ bool ci_lazy_methodst::operator()(
     extra_entry_points.begin(),
     extra_entry_points.end());
 
-  std::set<irep_idt> instantiated_classes;
+  id_sett instantiated_classes;
 
   {
     std::vector<irep_idt> initial_callable_methods;
@@ -128,7 +128,7 @@ bool ci_lazy_methodst::operator()(
       initial_callable_methods.end());
   }
 
-  std::set<irep_idt> methods_already_populated;
+  id_sett methods_already_populated;
   std::vector<const code_function_callt *> virtual_callsites;
 
   bool any_new_methods=false;
@@ -414,7 +414,7 @@ void ci_lazy_methodst::gather_virtual_callsites(
 ///   defined on classes that are not 'needed' are ignored)
 void ci_lazy_methodst::get_virtual_method_targets(
   const exprt &called_function,
-  const std::set<irep_idt> &instantiated_classes,
+  const id_sett &instantiated_classes,
   std::vector<irep_idt> &callable_methods,
   symbol_tablet &symbol_table)
 {
@@ -553,7 +553,7 @@ void ci_lazy_methodst::gather_field_types(
 ///   `call_basename` if found and `classname` is present in
 ///   `instantiated_classes`, or irep_idt() otherwise.
 irep_idt ci_lazy_methodst::get_virtual_method_target(
-  const std::set<irep_idt> &instantiated_classes,
+  const id_sett &instantiated_classes,
   const irep_idt &call_basename,
   const irep_idt &classname,
   const symbol_tablet &symbol_table)

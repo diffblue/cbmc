@@ -808,7 +808,7 @@ void interpretert::execute_function_call()
     frame.return_value_address=return_value_address;
 
     // local variables
-    std::set<irep_idt> locals;
+    id_sett locals;
     get_local_identifiers(f_it->second, locals);
 
     for(const auto &id : locals)

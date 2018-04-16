@@ -213,7 +213,7 @@ void symex_slice_by_tracet::parse_events(std::string read_line)
     parity=false;
   if(!parity)
     read_line=read_line.substr(1, read_line.size()-1);
-  std::set<irep_idt> eis;
+  id_sett eis;
   size_t vlength=read_line.length();
   for(size_t vidx=0; vidx < vlength; vidx++)
   {

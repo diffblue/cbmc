@@ -37,7 +37,7 @@ protected:
 
   // The variables that need tracking,
   // i.e., are uninitialized and may be read?
-  std::set<irep_idt> tracking;
+  id_sett tracking;
 
   void get_tracking(goto_programt::const_targett i_it);
 };
@@ -52,8 +52,7 @@ void uninitializedt::get_tracking(goto_programt::const_targett i_it)
     if(object.id() == ID_symbol)
     {
       const irep_idt &identifier = to_symbol_expr(object).get_identifier();
-      const std::set<irep_idt> &uninitialized=
-        uninitialized_analysis[i_it].uninitialized;
+      const id_sett &uninitialized = uninitialized_analysis[i_it].uninitialized;
       if(uninitialized.find(identifier)!=uninitialized.end())
         tracking.insert(identifier);
     }
@@ -74,10 +73,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
     get_tracking(i_it);
 
   // add tracking symbols to symbol table
-  for(std::set<irep_idt>::const_iterator
-      it=tracking.begin();
-      it!=tracking.end();
-      it++)
+  for(id_sett::const_iterator it = tracking.begin(); it != tracking.end(); it++)
   {
     const symbolt &symbol=ns.lookup(*it);
 
@@ -138,8 +134,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
       // const code_function_callt &code_function_call=
       //  to_code_function_call(instruction.code);
 
-      const std::set<irep_idt> &uninitialized=
-        uninitialized_analysis[i_it].uninitialized;
+      const id_sett &uninitialized = uninitialized_analysis[i_it].uninitialized;
 
       // check tracking variables
       for(const auto &object : read)

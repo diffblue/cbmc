@@ -63,7 +63,7 @@ private:
 
   struct doc_claimt
   {
-    std::set<irep_idt> comment_set;
+    id_sett comment_set;
   };
 
   enum { HTML, LATEX } format;
@@ -314,9 +314,8 @@ void document_propertiest::doit()
 
       out << '\n';
 
-      for(std::set<irep_idt>::const_iterator
-          s_it=it->second.comment_set.begin();
-          s_it!=it->second.comment_set.end();
+      for(id_sett::const_iterator s_it = it->second.comment_set.begin();
+          s_it != it->second.comment_set.end();
           s_it++)
         out << "\\claim{" << escape_latex(id2string(*s_it), false)
             << "}\n";
@@ -341,9 +340,8 @@ void document_propertiest::doit()
 
       out << '\n';
 
-      for(std::set<irep_idt>::const_iterator
-          s_it=it->second.comment_set.begin();
-          s_it!=it->second.comment_set.end();
+      for(id_sett::const_iterator s_it = it->second.comment_set.begin();
+          s_it != it->second.comment_set.end();
           s_it++)
         out << "<div class=\"description\">\n"
             << escape_html(id2string(*s_it)) << '\n'

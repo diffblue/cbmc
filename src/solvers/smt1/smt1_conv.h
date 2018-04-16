@@ -118,10 +118,10 @@ protected:
   void convert_literal(const literalt l);
 
   // auxiliary methods
-  std::set<irep_idt> quantified_symbols;
+  id_sett quantified_symbols;
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
-  void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
+  void find_symbols_rec(const typet &type, id_sett &recstack);
   void flatten_array(const exprt &op);
 
   // booleans vs. bit-vector[1]

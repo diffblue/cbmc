@@ -127,7 +127,7 @@ irep_idt resolve_friendly_method_name(
   if(friendly_name.rfind(':')==std::string::npos)
   {
     std::string prefix=qualified_name+':';
-    std::set<irep_idt> matches;
+    id_sett matches;
 
     for(const auto &s : symbol_table.symbols)
       if(has_prefix(id2string(s.first), prefix) &&
