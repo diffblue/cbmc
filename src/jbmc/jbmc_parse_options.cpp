@@ -44,7 +44,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_symbol_table.h>
 #include <goto-programs/show_properties.h>
 
-#include <goto-symex/adjust_float_expressions.h>
+#include <util/adjust_float_expressions.h>
 
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/reachability_slicer.h>

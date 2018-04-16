@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 #include <algorithm>
+#include <util/adjust_float_expressions.h>
 
 #include "c_types.h"
 #include "rational.h"
@@ -2270,9 +2271,27 @@ bool simplify_exprt::simplify_node(exprt &expr)
   else if(expr.id()==ID_good_pointer)
     result=simplify_good_pointer(expr) && result;
   else if(expr.id()==ID_div)
-    result=simplify_div(expr) && result;
+  {
+    if(expr.type().id() == ID_floatbv)
+    {
+      adjust_float_expressions(expr, ns);
+      result = simplify_rec(expr);
+    }
+    else
+    {
+      result = simplify_div(expr) && result;
+    }
+  }
   else if(expr.id()==ID_mod)
-    result=simplify_mod(expr) && result;
+    if(expr.type().id() == ID_floatbv)
+    {
+      adjust_float_expressions(expr, ns);
+      result = simplify_rec(expr);
+    }
+    else
+    {
+      result = simplify_mod(expr) && result;
+    }
   else if(expr.id()==ID_bitnot)
     result=simplify_bitnot(expr) && result;
   else if(expr.id()==ID_bitand ||
@@ -2284,11 +2303,35 @@ bool simplify_exprt::simplify_node(exprt &expr)
   else if(expr.id()==ID_power)
     result=simplify_power(expr) && result;
   else if(expr.id()==ID_plus)
-    result=simplify_plus(expr) && result;
+    if(expr.type().id() == ID_floatbv)
+    {
+      adjust_float_expressions(expr, ns);
+      result = simplify_rec(expr);
+    }
+    else
+    {
+      result = simplify_plus(expr) && result;
+    }
   else if(expr.id()==ID_minus)
-    result=simplify_minus(expr) && result;
+    if(expr.type().id() == ID_floatbv)
+    {
+      adjust_float_expressions(expr, ns);
+      result = simplify_rec(expr);
+    }
+    else
+    {
+      result = simplify_minus(expr) && result;
+    }
   else if(expr.id()==ID_mult)
-    result=simplify_mult(expr) && result;
+    if(expr.type().id() == ID_floatbv)
+    {
+      adjust_float_expressions(expr, ns);
+      result = simplify_rec(expr);
+    }
+    else
+    {
+      result = simplify_mult(expr) && result;
+    }
   else if(expr.id()==ID_floatbv_plus ||
           expr.id()==ID_floatbv_minus ||
           expr.id()==ID_floatbv_mult ||
