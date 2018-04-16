@@ -87,6 +87,14 @@ std::size_t remove_instanceoft::lower_instanceof(
   std::vector<irep_idt> children=
     class_hierarchy.get_children_trans(target_name);
   children.push_back(target_name);
+  // Sort alphabetically to make order of generated disjuncts
+  // independent of class loading order
+  std::sort(
+    children.begin(),
+    children.end(),
+    [](const irep_idt &a, const irep_idt &b) { // NOLINT
+      return a.compare(b) < 0;
+    });
 
   // Insert an instruction before the new check that assigns the clsid we're
   // checking for to a temporary, as GOTO program if-expressions should
