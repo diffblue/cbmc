@@ -396,17 +396,6 @@ public:
     bases().push_back(baset(base));
   }
 
-  bool has_base(const irep_idt &id) const
-  {
-    for(const auto &b : bases())
-    {
-      if(to_symbol_type(b.type()).get(ID_identifier)==id)
-        return true;
-    }
-
-    return false;
-  }
-
   /// Return the base with the given name, if exists.
   /// \param id The name of the base we are looking for.
   /// \return The base if exists.
@@ -418,6 +407,11 @@ public:
         return b;
     }
     return {};
+  }
+
+  bool has_base(const irep_idt &id) const
+  {
+    return get_base(id).has_value();
   }
 
   bool is_abstract() const
