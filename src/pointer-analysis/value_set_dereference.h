@@ -72,10 +72,6 @@ public:
     const guardt &guard,
     const modet mode);
 
-  /*! \brief Returns 'true' iff the given expression contains unary '*'
-  */
-  static bool has_dereference(const exprt &expr);
-
   typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
 private:

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program_dereference.h"
 
+#include <util/expr_util.h>
 #include <util/simplify_expr.h>
 #include <util/base_type.h>
 #include <util/std_code.h>
@@ -97,7 +98,7 @@ void goto_program_dereferencet::dereference_rec(
   guardt &guard,
   const value_set_dereferencet::modet mode)
 {
-  if(!dereference.has_dereference(expr))
+  if(!has_subexpr(expr, ID_dereference))
     return;
 
   if(expr.id()==ID_and || expr.id()==ID_or)
@@ -114,7 +115,7 @@ void goto_program_dereferencet::dereference_rec(
         throw expr.id_string()+" takes Boolean operands only, but got "+
               op.pretty();
 
-      if(dereference.has_dereference(op))
+      if(has_subexpr(op, ID_dereference))
         dereference_rec(op, guard, value_set_dereferencet::modet::READ);
 
       if(expr.id()==ID_or)
@@ -146,8 +147,8 @@ void goto_program_dereferencet::dereference_rec(
 
     dereference_rec(expr.op0(), guard, value_set_dereferencet::modet::READ);
 
-    bool o1=dereference.has_dereference(expr.op1());
-    bool o2=dereference.has_dereference(expr.op2());
+    bool o1 = has_subexpr(expr.op1(), ID_dereference);
+    bool o2 = has_subexpr(expr.op2(), ID_dereference);
 
     if(o1)
     {
