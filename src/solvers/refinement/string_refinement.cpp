@@ -28,6 +28,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
 #include <unordered_set>
+#include <util/magic.h>
 
 static bool is_valid_string_constraint(
   messaget::mstreamt &stream,
