@@ -38,13 +38,13 @@ SRC += unit_tests.cpp \
        solvers/refinement/string_constraint_instantiation/instantiate_not_contains.cpp \
        solvers/refinement/string_refinement/concretize_array.cpp \
        solvers/refinement/string_refinement/dependency_graph.cpp \
-       solvers/refinement/string_refinement/has_subtype.cpp \
        solvers/refinement/string_refinement/substitute_array_list.cpp \
        solvers/refinement/string_refinement/string_symbol_resolution.cpp \
        solvers/refinement/string_refinement/sparse_array.cpp \
        solvers/refinement/string_refinement/union_find_replace.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr_iterator.cpp \
+       util/has_subtype.cpp \
        util/irep.cpp \
        util/irep_sharing.cpp \
        util/message.cpp \

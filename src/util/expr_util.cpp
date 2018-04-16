@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_util.h"
 
 #include "expr.h"
+#include "expr_iterator.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
 #include "std_expr.h"
@@ -120,16 +121,56 @@ exprt boolean_negate(const exprt &src)
     return not_exprt(src);
 }
 
+bool has_subexpr(
+  const exprt &expr,
+  const std::function<bool(const exprt &)> &pred)
+{
+  const auto it = std::find_if(expr.depth_begin(), expr.depth_end(), pred);
+  return it != expr.depth_end();
+}
+
 bool has_subexpr(const exprt &src, const irep_idt &id)
 {
-  if(src.id()==id)
-    return true;
+  return has_subexpr(
+    src, [&](const exprt &subexpr) { return subexpr.id() == id; });
+}
 
-  forall_operands(it, src)
-    if(has_subexpr(*it, id))
-      return true;
+bool has_subtype(
+  const typet &type,
+  const std::function<bool(const typet &)> &pred,
+  const namespacet &ns)
+{
+  if(pred(type))
+    return true;
+  else if(type.id() == ID_symbol)
+    return has_subtype(ns.follow(type), pred, ns);
+  else if(type.id() == ID_c_enum_tag)
+    return has_subtype(ns.follow_tag(to_c_enum_tag_type(type)), pred, ns);
+  else if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    const struct_union_typet &struct_union_type = to_struct_union_type(type);
+
+    for(const auto &comp : struct_union_type.components())
+      if(has_subtype(comp.type(), pred, ns))
+        return true;
+  }
+  // do not look into pointer subtypes as this could cause unbounded recursion
+  else if(type.id() == ID_array || type.id() == ID_vector)
+    return has_subtype(type.subtype(), pred, ns);
+  else if(type.has_subtypes())
+  {
+    for(const auto &subtype : type.subtypes())
+      if(has_subtype(subtype, pred, ns))
+        return true;
+  }
 
   return false;
+}
+
+bool has_subtype(const typet &type, const irep_idt &id, const namespacet &ns)
+{
+  return has_subtype(
+    type, [&](const typet &subtype) { return subtype.id() == id; }, ns);
 }
 
 if_exprt lift_if(const exprt &src, std::size_t operand_number)

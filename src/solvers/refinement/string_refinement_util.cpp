@@ -11,6 +11,7 @@
 #include <functional>
 #include <iostream>
 #include <util/arith_tools.h>
+#include <util/expr_util.h>
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
 #include <util/expr_iterator.h>
@@ -45,49 +46,15 @@ bool is_char_pointer_type(const typet &type)
   return type.id() == ID_pointer && is_char_type(type.subtype());
 }
 
-bool has_subtype(
-  const typet &type,
-  const std::function<bool(const typet &)> &pred)
+bool has_char_pointer_subtype(const typet &type, const namespacet &ns)
 {
-  if(pred(type))
-    return true;
-
-  if(type.id() == ID_struct || type.id() == ID_union)
-  {
-    const struct_union_typet &struct_type = to_struct_union_type(type);
-    return std::any_of(
-      struct_type.components().begin(),
-      struct_type.components().end(), // NOLINTNEXTLINE
-      [&](const struct_union_typet::componentt &comp) {
-        return has_subtype(comp.type(), pred);
-      });
-  }
-
-  return std::any_of( // NOLINTNEXTLINE
-    type.subtypes().begin(), type.subtypes().end(), [&](const typet &t) {
-      return has_subtype(t, pred);
-    });
-}
-
-bool has_char_pointer_subtype(const typet &type)
-{
-  return has_subtype(type, is_char_pointer_type);
-}
-
-bool has_string_subtype(const typet &type)
-{
-  // NOLINTNEXTLINE
-  return has_subtype(
-    type, [](const typet &subtype) { return subtype == string_typet(); });
+  return has_subtype(type, is_char_pointer_type, ns);
 }
 
 bool has_char_array_subexpr(const exprt &expr, const namespacet &ns)
 {
-  const auto it = std::find_if(
-    expr.depth_begin(), expr.depth_end(), [&](const exprt &e) { // NOLINT
-      return is_char_array_type(e.type(), ns);
-    });
-  return it != expr.depth_end();
+  return has_subexpr(
+    expr, [&](const exprt &e) { return is_char_array_type(e.type(), ns); });
 }
 
 sparse_arrayt::sparse_arrayt(const with_exprt &expr)
