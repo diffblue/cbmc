@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <cassert>
 #include <iosfwd>
+#include <unordered_set>
 
 #include "irep_ids.h"
 
@@ -43,6 +44,8 @@ typedef std::string irep_namet;
 // NOLINTNEXTLINE(readability/identifiers)
 typedef string_hash irep_id_hash;
 #endif
+
+typedef std::unordered_set<irep_idt, irep_id_hash> unordered_id_sett;
 
 inline const std::string &id2string(const irep_idt &d)
 {

@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_program2codet
 {
   typedef std::list<irep_idt> id_listt;
-  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
   typedef std::map<goto_programt::const_targett, goto_programt::const_targett>
     loopt;
   typedef std::unordered_map<irep_idt, unsigned, irep_id_hash> dead_mapt;
@@ -47,23 +46,23 @@ class goto_program2codet
 
 public:
   goto_program2codet(
-      const irep_idt &identifier,
-      const goto_programt &_goto_program,
-      symbol_tablet &_symbol_table,
-      code_blockt &_dest,
-      id_listt &_local_static,
-      id_listt &_type_names,
-      const id_sett &_typedef_names,
-      std::set<std::string> &_system_headers):
-    func_name(identifier),
-    goto_program(_goto_program),
-    symbol_table(_symbol_table),
-    ns(_symbol_table),
-    toplevel_block(_dest),
-    local_static(_local_static),
-    type_names(_type_names),
-    typedef_names(_typedef_names),
-    system_headers(_system_headers)
+    const irep_idt &identifier,
+    const goto_programt &_goto_program,
+    symbol_tablet &_symbol_table,
+    code_blockt &_dest,
+    id_listt &_local_static,
+    id_listt &_type_names,
+    const unordered_id_sett &_typedef_names,
+    std::set<std::string> &_system_headers)
+    : func_name(identifier),
+      goto_program(_goto_program),
+      symbol_table(_symbol_table),
+      ns(_symbol_table),
+      toplevel_block(_dest),
+      local_static(_local_static),
+      type_names(_type_names),
+      typedef_names(_typedef_names),
+      system_headers(_system_headers)
   {
     assert(local_static.empty());
 
@@ -84,18 +83,18 @@ protected:
   code_blockt &toplevel_block;
   id_listt &local_static;
   id_listt &type_names;
-  const id_sett &typedef_names;
+  const unordered_id_sett &typedef_names;
   std::set<std::string> &system_headers;
   std::unordered_set<exprt, irep_hash> va_list_expr;
 
   natural_loopst loops;
   loopt loop_map;
-  id_sett labels_in_use;
+  unordered_id_sett labels_in_use;
   dead_mapt dead_map;
   loop_last_stackt loop_last_stack;
-  id_sett local_static_set;
-  id_sett type_names_set;
-  id_sett const_removed;
+  unordered_id_sett local_static_set;
+  unordered_id_sett type_names_set;
+  unordered_id_sett const_removed;
 
   void build_loop_map();
   void build_dead_map();

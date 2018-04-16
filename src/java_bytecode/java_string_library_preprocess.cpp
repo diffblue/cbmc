@@ -1827,7 +1827,7 @@ void add_keys_to_container(const TMap &map, TContainer &container)
 }
 
 void java_string_library_preprocesst::get_all_function_names(
-  id_sett &methods) const
+  unordered_id_sett &methods) const
 {
   for(const id_mapt *map : id_maps)
     add_keys_to_container(*map, methods);

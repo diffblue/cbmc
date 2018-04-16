@@ -158,8 +158,7 @@ void link_goto_model(
   goto_modelt &src,
   message_handlert &message_handler)
 {
-  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
-  id_sett weak_symbols;
+  unordered_id_sett weak_symbols;
 
   for(const auto &symbol_pair : dest.symbol_table.symbols)
   {
