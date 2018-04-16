@@ -181,7 +181,7 @@ private:
 
   static constant_exprt constant_char(int i, const typet &char_type);
 
-  array_string_exprt
+  const array_string_exprt &
   char_array_of_pointer(const exprt &pointer, const exprt &length);
 
   exprt axiom_for_is_positive_index(const exprt &x);
