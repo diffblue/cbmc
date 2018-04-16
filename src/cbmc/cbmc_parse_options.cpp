@@ -999,8 +999,9 @@ void cbmc_parse_optionst::help()
     " --refine                     use refinement procedure (experimental)\n"
     " --refine-strings             use string refinement (experimental)\n"
     " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
-    " --string-max-length          add constraint on the length of strings\n" // NOLINT(*)
     " --string-max-input-length    add constraint on the length of input strings\n" // NOLINT(*)
+    " --string-max-length          add constraint on the length of strings"
+    "                              (deprecated: use string-max-input-length instead)\n" // NOLINT(*)
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
