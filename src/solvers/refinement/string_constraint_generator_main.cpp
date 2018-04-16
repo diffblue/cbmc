@@ -389,13 +389,11 @@ array_string_exprt array_poolt::find(const exprt &pointer, const exprt &length)
 /// Adds creates a new array if it does not already exists
 /// \todo This should be replaced
 /// by array_poolt.make_char_array_for_char_pointer
-array_string_exprt string_constraint_generatort::char_array_of_pointer(
+const array_string_exprt &string_constraint_generatort::char_array_of_pointer(
   const exprt &pointer,
   const exprt &length)
 {
-  const array_string_exprt array = array_pool.find(pointer, length);
-  created_strings.insert(array);
-  return array;
+  return *created_strings.insert(array_pool.find(pointer, length)).first;
 }
 
 array_string_exprt array_poolt::find(const refined_string_exprt &str)
