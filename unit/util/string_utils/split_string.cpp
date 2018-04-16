@@ -101,6 +101,39 @@ SCENARIO("split_string", "[core][utils][string_utils][split_string]")
 
     run_on_all_variants(string, delimiter, expected_results);
   }
+  GIVEN("An empty string")
+  {
+    std::string string = "";
+    WHEN("Splitting it")
+    {
+      expected_resultst expected_results;
+      expected_results.no_strip_no_remove = {""};
+      expected_results.strip_no_remove = {""};
+
+      // TODO(tkiley): This is probably wrong, since I'd expect removing empty
+      // TODO(tkiley): elements to return an empty vector here.
+      expected_results.no_strip_remove_empty = {""};
+      expected_results.strip_remove_empty = {""};
+
+      run_on_all_variants(string, ',', expected_results);
+    }
+  }
+  GIVEN("A whitespace only string")
+  {
+    std::string string = "    ";
+    WHEN("Splitting it")
+    {
+      expected_resultst expected_results;
+      expected_results.no_strip_no_remove = {"    "};
+      expected_results.strip_no_remove = {""};
+      expected_results.no_strip_remove_empty = {"    "};
+      // TODO(tkiley): This is probably wrong, since I'd expect removing empty
+      // TODO(tkiley): elements to return an empty vector here.
+      expected_results.strip_remove_empty = {""};
+
+      run_on_all_variants(string, ',', expected_results);
+    }
+  }
 }
 
 SCENARIO("split_string into two", "[core][utils][string_utils][split_string]")
