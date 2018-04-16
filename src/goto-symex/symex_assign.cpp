@@ -150,11 +150,11 @@ void goto_symext::symex_assign_rec(
   else if(lhs.id()==ID_typecast)
     symex_assign_typecast(
       state, to_typecast_expr(lhs), full_lhs, rhs, guard, assignment_type);
-  else if(lhs.id()==ID_string_constant ||
-          lhs.id()=="NULL-object" ||
-          lhs.id()=="zero_string" ||
-          lhs.id()=="is_zero_string" ||
-          lhs.id()=="zero_string_length")
+  else if(lhs.id() == ID_string_constant ||
+          lhs.id() == ID_null_object ||
+          lhs.id() == "zero_string" ||
+          lhs.id() == "is_zero_string" ||
+          lhs.id() == "zero_string_length")
   {
     // ignore
   }
@@ -355,7 +355,7 @@ void goto_symext::symex_assign_struct_member(
   {
     assert(lhs_struct.operands().size()==1);
 
-    if(lhs_struct.op0().id()=="NULL-object")
+    if(lhs_struct.op0().id() == ID_null_object)
     {
       // ignore, and give up
       return;

@@ -862,7 +862,7 @@ void interpretert::build_memory_map()
 {
   // put in a dummy for NULL
   memory.resize(1);
-  inverse_memory_map[0]="NULL-OBJECT";
+  inverse_memory_map[0] = ID_null_object;
 
   num_dynamic_objects=0;
   dynamic_types.clear();

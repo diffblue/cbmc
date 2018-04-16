@@ -506,7 +506,7 @@ bool ai_baset::do_function_call_rec(
     // We can't really do this here -- we rely on
     // these being removed by some previous analysis.
   }
-  else if(function.id()=="NULL-object")
+  else if(function.id() == ID_null_object)
   {
     // ignore, can't be a function
   }

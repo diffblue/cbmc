@@ -894,7 +894,7 @@ exprt string_abstractiont::build_unknown(whatt what, bool write)
   typet type=build_type(what);
 
   if(write)
-    return exprt("NULL-object", type);
+    return exprt(ID_null_object, type);
 
   exprt result;
 
@@ -916,7 +916,7 @@ exprt string_abstractiont::build_unknown(whatt what, bool write)
 exprt string_abstractiont::build_unknown(const typet &type, bool write)
 {
   if(write)
-    return exprt("NULL-object", type);
+    return exprt(ID_null_object, type);
 
   // create an uninitialized dummy symbol
   // because of a lack of contextual information we can't build a nice name

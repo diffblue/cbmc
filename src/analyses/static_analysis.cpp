@@ -397,8 +397,8 @@ void static_analysis_baset::do_function_call_rec(
       }
     }
   }
-  else if(function.id()=="NULL-object" ||
-          function.id()==ID_integer_address)
+  else if(function.id() == ID_null_object ||
+          function.id() == ID_integer_address)
   {
     // ignore, can't be a function
   }

@@ -1036,10 +1036,10 @@ void invariant_sett::modifies(const exprt &lhs)
     assert(lhs.operands().size()==2);
     modifies(lhs.op0());
   }
-  else if(lhs.id()=="NULL-object" ||
-          lhs.id()=="is_zero_string" ||
-          lhs.id()=="zero_string" ||
-          lhs.id()=="zero_string_length")
+  else if(lhs.id() == ID_null_object ||
+          lhs.id() == "is_zero_string" ||
+          lhs.id() == "zero_string" ||
+          lhs.id() == "zero_string_length")
   {
     // ignore
   }

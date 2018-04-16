@@ -116,7 +116,7 @@ bool bv_pointerst::convert_address_of_rec(
     add_addr(expr, bv);
     return false;
   }
-  else if(expr.id()=="NULL-object")
+  else if(expr.id() == ID_null_object)
   {
     encode(pointer_logic.get_null_object(), bv);
     return false;

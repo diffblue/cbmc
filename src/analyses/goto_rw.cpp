@@ -242,7 +242,7 @@ void rw_range_sett::get_objects_index(
   const range_spect &range_start,
   const range_spect &size)
 {
-  if(expr.array().id()=="NULL-object")
+  if(expr.array().id() == ID_null_object)
     return;
 
   range_spect sub_size=0;
@@ -413,10 +413,10 @@ void rw_range_sett::get_objects_typecast(
 
 void rw_range_sett::get_objects_address_of(const exprt &object)
 {
-  if(object.id()==ID_string_constant ||
-     object.id()==ID_label ||
-     object.id()==ID_array ||
-     object.id()=="NULL-object")
+  if(object.id() == ID_string_constant ||
+     object.id() == ID_label ||
+     object.id() == ID_array ||
+     object.id() == ID_null_object)
     // constant, nothing to do
     return;
   else if(object.id()==ID_symbol)
@@ -558,8 +558,8 @@ void rw_range_sett::get_objects_rec(
     forall_operands(it, expr)
       get_objects_rec(mode, *it);
   }
-  else if(expr.id()=="NULL-object" ||
-          expr.id()==ID_string_constant)
+  else if(expr.id() == ID_null_object ||
+          expr.id() == ID_string_constant)
   {
     // dereferencing may yield some weird ones, ignore these
   }

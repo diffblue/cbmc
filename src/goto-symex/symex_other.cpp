@@ -34,7 +34,7 @@ void goto_symext::havoc_rec(
       lhs=dest;
     else
       lhs=if_exprt(
-        guard.as_expr(), dest, exprt("NULL-object", dest.type()));
+        guard.as_expr(), dest, exprt(ID_null_object, dest.type()));
 
     code_assignt assignment;
     assignment.lhs()=lhs;
