@@ -1213,12 +1213,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="athrow")
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
-
-      side_effect_expr_throwt throw_expr;
-      throw_expr.add_source_location()=i_it->source_location;
-      throw_expr.copy_to_operands(op[0]);
-      c=code_expressiont(throw_expr);
-      results[0]=op[0];
+      convert_athrow(i_it->source_location, op, c, results);
     }
     else if(statement=="checkcast")
     {
@@ -2186,6 +2181,19 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+void java_bytecode_convert_methodt::convert_athrow(
+  const source_locationt &location,
+  const exprt::operandst &op,
+  codet &c,
+  exprt::operandst &results) const
+{
+  side_effect_expr_throwt throw_expr;
+  throw_expr.add_source_location() = location;
+  throw_expr.copy_to_operands(op[0]);
+  c = code_expressiont(throw_expr);
+  results[0] = op[0];
 }
 
 codet &java_bytecode_convert_methodt::do_exception_handling(

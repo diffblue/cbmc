@@ -430,5 +430,11 @@ protected:
     const std::set<unsigned int> &working_set,
     unsigned int cur_pc,
     codet &c);
+
+  void convert_athrow(
+    const source_locationt &location,
+    const exprt::operandst &op,
+    codet &c,
+    exprt::operandst &results) const;
 };
 #endif
