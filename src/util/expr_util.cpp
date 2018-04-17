@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr_util.h"
 
+#include <unordered_set>
 #include "expr.h"
 #include "expr_iterator.h"
 #include "fixedbv.h"
@@ -140,28 +141,36 @@ bool has_subtype(
   const std::function<bool(const typet &)> &pred,
   const namespacet &ns)
 {
-  if(pred(type))
-    return true;
-  else if(type.id() == ID_symbol)
-    return has_subtype(ns.follow(type), pred, ns);
-  else if(type.id() == ID_c_enum_tag)
-    return has_subtype(ns.follow_tag(to_c_enum_tag_type(type)), pred, ns);
-  else if(type.id() == ID_struct || type.id() == ID_union)
-  {
-    const struct_union_typet &struct_union_type = to_struct_union_type(type);
+  std::vector<std::reference_wrapper<const typet>> stack;
+  std::unordered_set<typet, irep_hash> visited;
 
-    for(const auto &comp : struct_union_type.components())
-      if(has_subtype(comp.type(), pred, ns))
-        return true;
-  }
-  // do not look into pointer subtypes as this could cause unbounded recursion
-  else if(type.id() == ID_array || type.id() == ID_vector)
-    return has_subtype(type.subtype(), pred, ns);
-  else if(type.has_subtypes())
+  const auto push_if_not_visited = [&](const typet &t) {
+    if(visited.insert(t).second)
+      stack.emplace_back(t);
+  };
+
+  push_if_not_visited(type);
+  while(!stack.empty())
   {
-    for(const auto &subtype : type.subtypes())
-      if(has_subtype(subtype, pred, ns))
-        return true;
+    const typet &top = stack.back().get();
+    stack.pop_back();
+
+    if(pred(top))
+      return true;
+    else if(top.id() == ID_symbol)
+      push_if_not_visited(ns.follow(top));
+    else if(top.id() == ID_c_enum_tag)
+      push_if_not_visited(ns.follow_tag(to_c_enum_tag_type(top)));
+    else if(top.id() == ID_struct || top.id() == ID_union)
+    {
+      for(const auto &comp : to_struct_union_type(top).components())
+        push_if_not_visited(comp.type());
+    }
+    else
+    {
+      for(const auto &subtype : top.subtypes())
+        push_if_not_visited(subtype);
+    }
   }
 
   return false;
