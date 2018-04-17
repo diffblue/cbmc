@@ -305,6 +305,12 @@ protected:
 
   exprt
   convert_aload(const irep_idt &statement, const exprt::operandst &op) const;
+
+  code_blockt convert_ret(
+    const std::vector<unsigned int> &jsr_ret_targets,
+    const exprt &arg0,
+    const source_locationt &location,
+    unsigned address);
 };
 
 #endif

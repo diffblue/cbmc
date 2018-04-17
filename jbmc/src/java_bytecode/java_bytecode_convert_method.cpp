@@ -1514,31 +1514,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // and write something like:
       // if(retaddr==5) goto 5; else if(retaddr==10) goto 10; ...
       PRECONDITION(op.empty() && results.empty());
-      c=code_blockt();
-      auto retvar=variable(arg0, 'a', i_it->address, NO_CAST);
       assert(!jsr_ret_targets.empty());
-      for(size_t idx=0, idxlim=jsr_ret_targets.size(); idx!=idxlim; ++idx)
-      {
-        irep_idt number=std::to_string(jsr_ret_targets[idx]);
-        code_gotot g(label(number));
-        g.add_source_location()=i_it->source_location;
-        if(idx==idxlim-1)
-          c.move_to_operands(g);
-        else
-        {
-          code_ifthenelset branch;
-          auto address_ptr=
-            from_integer(
-              jsr_ret_targets[idx],
-              unsignedbv_typet(64));
-          address_ptr.type()=pointer_type(void_typet());
-          branch.cond()=equal_exprt(retvar, address_ptr);
-          branch.cond().add_source_location()=i_it->source_location;
-          branch.then_case()=g;
-          branch.add_source_location()=i_it->source_location;
-          c.move_to_operands(branch);
-        }
-      }
+      c = convert_ret(
+        jsr_ret_targets, arg0, i_it->source_location, i_it->address);
     }
     else if(statement=="iconst_m1")
     {
@@ -2613,6 +2591,37 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+code_blockt java_bytecode_convert_methodt::convert_ret(
+  const std::vector<unsigned int> &jsr_ret_targets,
+  const exprt &arg0,
+  const source_locationt &location,
+  const unsigned address)
+{
+  code_blockt c;
+  auto retvar = variable(arg0, 'a', address, NO_CAST);
+  for(size_t idx = 0, idxlim = jsr_ret_targets.size(); idx != idxlim; ++idx)
+  {
+    irep_idt number = std::to_string(jsr_ret_targets[idx]);
+    code_gotot g(label(number));
+    g.add_source_location() = location;
+    if(idx == idxlim - 1)
+      c.move_to_operands(g);
+    else
+    {
+      code_ifthenelset branch;
+      auto address_ptr =
+        from_integer(jsr_ret_targets[idx], unsignedbv_typet(64));
+      address_ptr.type() = pointer_type(void_typet());
+      branch.cond() = equal_exprt(retvar, address_ptr);
+      branch.cond().add_source_location() = location;
+      branch.then_case() = g;
+      branch.add_source_location() = location;
+      c.move_to_operands(branch);
+    }
+  }
+  return c;
 }
 
 exprt java_bytecode_convert_methodt::convert_aload(
