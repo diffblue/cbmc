@@ -99,6 +99,7 @@ SRC = arith_tools.cpp \
       xml.cpp \
       xml_expr.cpp \
       xml_irep.cpp \
+			adjust_float_expressions.cpp \
       # Empty last line
 
 INCLUDES= -I ..

@@ -1,5 +1,4 @@
-SRC = adjust_float_expressions.cpp \
-      auto_objects.cpp \
+SRC = auto_objects.cpp \
       build_goto_trace.cpp \
       goto_symex.cpp \
       goto_symex_state.cpp \

@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ieee_float.h"
 #include "std_expr.h"
 #include "arith_tools.h"
+#include "symbol.h"
 
 bool simplify_exprt::simplify_isinf(exprt &expr)
 {
@@ -276,7 +277,18 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
 
   exprt op0=expr.op0();
   exprt op1=expr.op1();
-  exprt op2=expr.op2(); // rounding mode
+  exprt attached_rounding_mode = expr.op2(); // rounding mode
+  if(attached_rounding_mode.id() == ID_symbol)
+  {
+    const symbolt *p_rounding_sym;
+    if(
+      !ns.lookup(
+        to_symbol_expr(attached_rounding_mode).get_identifier(),
+        p_rounding_sym))
+    {
+      attached_rounding_mode = p_rounding_sym->value;
+    }
+  }
 
   assert(ns.follow(op0.type())==type);
   assert(ns.follow(op1.type())==type);
@@ -285,13 +297,15 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
   // Thus, we don't re-sort the operands.
   // We only merge constants!
 
-  if(op0.is_constant() && op1.is_constant() && op2.is_constant())
+  if(
+    op0.is_constant() && op1.is_constant() &&
+    attached_rounding_mode.is_constant())
   {
     ieee_floatt v0(to_constant_expr(op0));
     ieee_floatt v1(to_constant_expr(op1));
 
     mp_integer rounding_mode;
-    if(!to_integer(op2, rounding_mode))
+    if(!to_integer(attached_rounding_mode, rounding_mode))
     {
       v0.rounding_mode=
         (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);

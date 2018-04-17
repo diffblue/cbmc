@@ -47,7 +47,7 @@ Author: Peter Schrammel
 #include <goto-programs/link_to_library.h>
 
 #include <goto-symex/rewrite_union.h>
-#include <goto-symex/adjust_float_expressions.h>
+#include <util/adjust_float_expressions.h>
 
 #include <goto-instrument/cover.h>
 
