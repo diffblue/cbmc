@@ -766,6 +766,13 @@ void java_object_factoryt::gen_nondet_pointer_init(
   // for java types, technical debt TG-2707
   if(!equal_java_types(replacement_pointer_type, pointer_type))
   {
+    // update generic_parameter_specialization_map for the new pointer
+    generic_parameter_specialization_map_keyst
+      generic_parameter_specialization_map_keys(
+        generic_parameter_specialization_map);
+    generic_parameter_specialization_map_keys.insert_pairs_for_pointer(
+      replacement_pointer_type, ns.follow(replacement_pointer_type.subtype()));
+
     const symbol_exprt real_pointer_symbol = gen_nondet_subtype_pointer_init(
       assignments, alloc_type, replacement_pointer_type, depth);
 

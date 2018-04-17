@@ -604,6 +604,19 @@ public:
   {
     return (generic_typest &)(add(ID_generic_types).get_sub());
   }
+
+  /// Check if this symbol has the given generic type. If yes, return its index
+  /// in the vector of generic types.
+  /// \param type The type we are looking for.
+  /// \return The index of the type in the vector of generic types.
+  optionalt<size_t> generic_type_index(const reference_typet &type) const
+  {
+    const auto &type_pointer =
+      std::find(generic_types().begin(), generic_types().end(), type);
+    if(type_pointer != generic_types().end())
+      return type_pointer - generic_types().begin();
+    return {};
+  }
 };
 
 /// \param type: the type to check
