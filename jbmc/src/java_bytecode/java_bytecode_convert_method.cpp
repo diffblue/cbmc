@@ -1808,30 +1808,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         symbol_table.has_symbol(symbol_expr.get_identifier()),
         "putstatic symbol should have been created before method conversion");
 
-      if(needed_lazy_methods && arg0.type().id() == ID_symbol)
-      {
-        needed_lazy_methods->add_needed_class(
-          to_symbol_type(arg0.type()).get_identifier());
-      }
-
-      code_blockt block;
-      block.add_source_location()=i_it->source_location;
-
-      // Note this initializer call deliberately inits the class used to make
-      // the reference, which may be a child of the class that actually defines
-      // the field.
-      codet clinit_call=get_clinit_call(arg0.get_string(ID_class));
-      if(clinit_call.get_statement()!=ID_skip)
-        block.move_to_operands(clinit_call);
-
-      save_stack_entries(
-        "stack_static_field",
-        symbol_expr.type(),
-        block,
-        bytecode_write_typet::STATIC_FIELD,
-        symbol_expr.get_identifier());
-      block.copy_to_operands(code_assignt(symbol_expr, op[0]));
-      c=block;
+      c = convert_putstatic(i_it->source_location, arg0, op, symbol_expr);
     }
     else if(statement==patternt("?2?")) // i2c etc.
     {
@@ -2423,6 +2400,38 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+codet java_bytecode_convert_methodt::convert_putstatic(
+  const source_locationt &location,
+  const exprt &arg0,
+  const exprt::operandst &op,
+  const symbol_exprt &symbol_expr)
+{
+  if(needed_lazy_methods && arg0.type().id() == ID_symbol)
+  {
+    needed_lazy_methods->add_needed_class(
+      to_symbol_type(arg0.type()).get_identifier());
+  }
+
+  code_blockt block;
+  block.add_source_location() = location;
+
+  // Note this initializer call deliberately inits the class used to make
+  // the reference, which may be a child of the class that actually defines
+  // the field.
+  codet clinit_call = get_clinit_call(arg0.get_string(ID_class));
+  if(clinit_call.get_statement() != ID_skip)
+    block.move_to_operands(clinit_call);
+
+  save_stack_entries(
+    "stack_static_field",
+    symbol_expr.type(),
+    block,
+    bytecode_write_typet::STATIC_FIELD,
+    symbol_expr.get_identifier());
+  block.copy_to_operands(code_assignt(symbol_expr, op[0]));
+  return block;
 }
 
 codet java_bytecode_convert_methodt::convert_putfield(

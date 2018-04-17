@@ -389,5 +389,11 @@ protected:
     exprt::operandst &results);
 
   codet convert_putfield(const exprt &arg0, const exprt::operandst &op);
+
+  codet convert_putstatic(
+    const source_locationt &location,
+    const exprt &arg0,
+    const exprt::operandst &op,
+    const symbol_exprt &symbol_expr);
 };
 #endif
