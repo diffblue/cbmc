@@ -387,5 +387,7 @@ protected:
     bool is_assertions_disabled_field,
     codet &c,
     exprt::operandst &results);
+
+  codet convert_putfield(const exprt &arg0, const exprt::operandst &op);
 };
 #endif

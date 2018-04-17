@@ -1794,15 +1794,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="putfield")
     {
       PRECONDITION(op.size() == 2 && results.empty());
-      code_blockt block;
-      save_stack_entries(
-        "stack_field",
-        op[1].type(),
-        block,
-        bytecode_write_typet::FIELD,
-        arg0.get(ID_component_name));
-      block.copy_to_operands(code_assignt(to_member(op[0], arg0), op[1]));
-      c=block;
+      c = convert_putfield(arg0, op);
     }
     else if(statement=="putstatic")
     {
@@ -2433,8 +2425,23 @@ codet java_bytecode_convert_methodt::convert_instructions(
   return code;
 }
 
+codet java_bytecode_convert_methodt::convert_putfield(
+  const exprt &arg0,
+  const exprt::operandst &op)
+{
+  code_blockt block;
+  save_stack_entries(
+    "stack_field",
+    op[1].type(),
+    block,
+    bytecode_write_typet::FIELD,
+    arg0.get(ID_component_name));
+  block.copy_to_operands(code_assignt(to_member(op[0], arg0), op[1]));
+  return block;
+}
+
 void java_bytecode_convert_methodt::convert_getstatic(
-  exprt &arg0,
+  const exprt &arg0,
   const symbol_exprt &symbol_expr,
   const bool is_assertions_disabled_field,
   codet &c,
