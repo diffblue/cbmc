@@ -35,21 +35,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_root_class.h"
 #include "generic_parameter_specialization_map_keys.h"
 
-static symbolt &new_tmp_symbol(
-  symbol_table_baset &symbol_table,
-  const source_locationt &loc,
-  const typet &type,
-  const std::string &prefix = "tmp_object_factory")
-{
-  return get_fresh_aux_symbol(
-    type,
-    "",
-    prefix,
-    loc,
-    ID_java,
-    symbol_table);
-}
-
 class java_object_factoryt
 {
   /// Every new variable initialized by the code emitted by the methods of this
@@ -195,6 +180,7 @@ exprt allocate_dynamic_object(
   const typet &allocate_type,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &output_code,
   std::vector<const symbolt *> &symbols_created,
   bool cast_needed)
@@ -212,11 +198,13 @@ exprt allocate_dynamic_object(
     // create a symbol for the malloc expression so we can initialize
     // without having to do it potentially through a double-deref, which
     // breaks the to-SSA phase.
-    symbolt &malloc_sym=new_tmp_symbol(
-      symbol_table,
-      loc,
+    symbolt &malloc_sym = get_fresh_aux_symbol(
       pointer_type(allocate_type),
-      "malloc_site");
+      id2string(function_id),
+      "malloc_site",
+      loc,
+      ID_java,
+      symbol_table);
     symbols_created.push_back(&malloc_sym);
     code_assignt assign=code_assignt(malloc_sym.symbol_expr(), malloc_expr);
     assign.add_source_location()=loc;
@@ -253,6 +241,7 @@ exprt allocate_dynamic_object_with_decl(
   const exprt &target_expr,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &output_code)
 {
   std::vector<const symbolt *> symbols_created;
@@ -263,6 +252,7 @@ exprt allocate_dynamic_object_with_decl(
     allocate_type,
     symbol_table,
     loc,
+    function_id,
     tmp_block,
     symbols_created,
     false);
@@ -306,7 +296,13 @@ exprt java_object_factoryt::allocate_object(
     case allocation_typet::LOCAL:
     case allocation_typet::GLOBAL:
     {
-      symbolt &aux_symbol=new_tmp_symbol(symbol_table, loc, allocate_type);
+      symbolt &aux_symbol = get_fresh_aux_symbol(
+        allocate_type,
+        id2string(object_factory_parameters.function_id),
+        "tmp_object_factory",
+        loc,
+        ID_java,
+        symbol_table);
       if(alloc_type==allocation_typet::GLOBAL)
         aux_symbol.is_static_lifetime=true;
       symbols_created.push_back(&aux_symbol);
@@ -327,6 +323,7 @@ exprt java_object_factoryt::allocate_object(
         allocate_type,
         symbol_table,
         loc,
+        object_factory_parameters.function_id,
         assignments,
         symbols_created,
         cast_needed);
@@ -569,6 +566,7 @@ codet initialize_nondet_string_struct(
   const exprt &obj,
   const std::size_t &max_nondet_string_length,
   const source_locationt &loc,
+  const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   bool printable)
 {
@@ -608,8 +606,13 @@ codet initialize_nondet_string_struct(
   {
     /// \todo Refactor with make_nondet_string_expr
     // length_expr = nondet(int);
-    const symbolt length_sym =
-      new_tmp_symbol(symbol_table, loc, java_int_type());
+    const symbolt length_sym = get_fresh_aux_symbol(
+      java_int_type(),
+      id2string(function_id),
+      "tmp_object_factory",
+      loc,
+      ID_java,
+      symbol_table);
     const symbol_exprt length_expr = length_sym.symbol_expr();
     const side_effect_expr_nondett nondet_length(length_expr.type());
     code.add(code_declt(length_expr));
@@ -646,7 +649,7 @@ codet initialize_nondet_string_struct(
     // data_expr = nondet(char[INFINITY]) // we use infinity for variable size
     const dereference_exprt data_expr(data_pointer);
     const exprt nondet_array =
-      make_nondet_infinite_char_array(symbol_table, loc, code);
+      make_nondet_infinite_char_array(symbol_table, loc, function_id, code);
     code.add(code_assignt(data_expr, nondet_array));
 
     struct_expr.copy_to_operands(length_expr);
@@ -692,6 +695,7 @@ static bool add_nondet_string_pointer_initialization(
   bool printable,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &code)
 {
   const namespacet ns(symbol_table);
@@ -702,14 +706,15 @@ static bool add_nondet_string_pointer_initialization(
   if(!struct_type.has_component("data") || !struct_type.has_component("length"))
     return true;
 
-  const exprt malloc_site =
-    allocate_dynamic_object_with_decl(expr, symbol_table, loc, code);
+  const exprt malloc_site = allocate_dynamic_object_with_decl(
+    expr, symbol_table, loc, function_id, code);
 
   code.add(
     initialize_nondet_string_struct(
       dereference_exprt(malloc_site, struct_type),
       max_nondet_string_length,
       loc,
+      function_id,
       symbol_table,
       printable));
   return false;
@@ -862,6 +867,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
       object_factory_parameters.string_printable,
       symbol_table,
       loc,
+      object_factory_parameters.function_id,
       assignments);
   }
   else
@@ -967,7 +973,13 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   const pointer_typet &replacement_pointer,
   size_t depth)
 {
-  symbolt new_symbol=new_tmp_symbol(symbol_table, loc, replacement_pointer);
+  symbolt new_symbol = get_fresh_aux_symbol(
+    replacement_pointer,
+    id2string(object_factory_parameters.function_id),
+    "tmp_object_factory",
+    loc,
+    ID_java,
+    symbol_table);
 
   // Generate a new object into this new symbol
   gen_nondet_init(
@@ -1253,11 +1265,13 @@ void java_object_factoryt::allocate_nondet_length_array(
   const exprt &max_length_expr,
   const typet &element_type)
 {
-  symbolt &length_sym=new_tmp_symbol(
-    symbol_table,
-    loc,
+  symbolt &length_sym = get_fresh_aux_symbol(
     java_int_type(),
-    "nondet_array_length");
+    id2string(object_factory_parameters.function_id),
+    "nondet_array_length",
+    loc,
+    ID_java,
+    symbol_table);
   symbols_created.push_back(&length_sym);
   const auto &length_sym_expr=length_sym.symbol_expr();
 
@@ -1347,11 +1361,13 @@ void java_object_factoryt::gen_nondet_array_init(
 
   // Interpose a new symbol, as the goto-symex stage can't handle array indexing
   // via a cast.
-  symbolt &array_init_symbol=new_tmp_symbol(
-    symbol_table,
-    loc,
+  symbolt &array_init_symbol = get_fresh_aux_symbol(
     init_array_expr.type(),
-    "array_data_init");
+    id2string(object_factory_parameters.function_id),
+    "array_data_init",
+    loc,
+    ID_java,
+    symbol_table);
   symbols_created.push_back(&array_init_symbol);
   const auto &array_init_symexpr=array_init_symbol.symbol_expr();
   codet data_assign=code_assignt(array_init_symexpr, init_array_expr);
@@ -1360,11 +1376,13 @@ void java_object_factoryt::gen_nondet_array_init(
 
   // Emit init loop for(array_init_iter=0; array_init_iter!=array.length;
   //                  ++array_init_iter) init(array[array_init_iter]);
-  symbolt &counter=new_tmp_symbol(
-    symbol_table,
-    loc,
+  symbolt &counter = get_fresh_aux_symbol(
     length_expr.type(),
-    "array_init_iter");
+    id2string(object_factory_parameters.function_id),
+    "array_init_iter",
+    loc,
+    ID_java,
+    symbol_table);
   symbols_created.push_back(&counter);
   exprt counter_expr=counter.symbol_expr();
 

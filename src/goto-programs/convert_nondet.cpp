@@ -17,6 +17,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include <java_bytecode/java_object_factory.h> // gen_nondet_init
 
 #include <util/irep_ids.h>
+#include <util/fresh_symbol.h>
 
 #include <memory>
 
@@ -135,11 +136,13 @@ void convert_nondet(
   message_handlert &message_handler,
   const object_factory_parameterst &object_factory_parameters)
 {
+  object_factory_parameterst parameters = object_factory_parameters;
+  parameters.function_id = function.get_function_id();
   convert_nondet(
     function.get_goto_function().body,
     function.get_symbol_table(),
     message_handler,
-    object_factory_parameters);
+    parameters);
 
   function.compute_location_numbers();
 }
@@ -158,6 +161,8 @@ void convert_nondet(
 
     if(symbol.mode==ID_java)
     {
+      object_factory_parameterst parameters = object_factory_parameters;
+      parameters.function_id = f_it.first;
       convert_nondet(
         f_it.second.body,
         symbol_table,

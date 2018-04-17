@@ -106,14 +106,13 @@ std::size_t remove_instanceoft::lower_instanceof(
   symbol_typet jlo=to_symbol_type(java_lang_object_type().subtype());
   exprt object_clsid=get_class_identifier_field(check_ptr, jlo, ns);
 
-  symbolt &newsym=
-    get_fresh_aux_symbol(
-      object_clsid.type(),
-      "instanceof_tmp",
-      "instanceof_tmp",
-      source_locationt(),
-      ID_java,
-      symbol_table);
+  symbolt &newsym = get_fresh_aux_symbol(
+    object_clsid.type(),
+    id2string(this_inst->function),
+    "instanceof_tmp",
+    source_locationt(),
+    ID_java,
+    symbol_table);
 
   auto newinst=goto_program.insert_after(this_inst);
   newinst->make_assignment();

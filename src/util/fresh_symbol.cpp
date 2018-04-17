@@ -11,16 +11,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "fresh_symbol.h"
 
-// This needs to be outside get_fresh_aux_symbol
-// to make it available for both reset_temporary_counter
-// and get_fresh_aux_symbol
-static size_t temporary_counter=0;
-
-// This is useful with loading multiple GOTO models
-void reset_temporary_counter()
-{
-  temporary_counter=0;
-}
+#include "namespace.h"
+#include "rename.h"
 
 /// Installs a fresh-named symbol with the requested name pattern
 /// \par parameters: `type`: type of new symbol
@@ -38,19 +30,23 @@ symbolt &get_fresh_aux_symbol(
   const irep_idt &symbol_mode,
   symbol_table_baset &symbol_table)
 {
-  // Loop until find a name that doesn't clash with a non-auxilliary symbol
-  while(true)
+  namespacet ns(symbol_table);
+  irep_idt identifier = basename_prefix;
+  std::size_t prefix_size = 0;
+  if(!name_prefix.empty())
   {
-    auxiliary_symbolt new_symbol(
-      // Distinguish local variables with the same name
-      basename_prefix + "$" + std::to_string(++temporary_counter),
-      type);
-    if(!name_prefix.empty())
-      new_symbol.name=name_prefix+"::"+id2string(new_symbol.base_name);
-    new_symbol.location=source_location;
-    new_symbol.mode=symbol_mode;
-    std::pair<symbolt &, bool> res=symbol_table.insert(std::move(new_symbol));
-    if(res.second)
-      return res.first;
+    identifier = name_prefix + "::" + basename_prefix;
+    prefix_size = name_prefix.size() + 2;
   }
+  get_new_name(identifier, ns, '$');
+  std::string basename = id2string(identifier).substr(prefix_size);
+
+  auxiliary_symbolt new_symbol(basename, type);
+  new_symbol.name = identifier;
+  new_symbol.location = source_location;
+  new_symbol.mode = symbol_mode;
+  std::pair<symbolt &, bool> res = symbol_table.insert(std::move(new_symbol));
+  CHECK_RETURN(res.second);
+
+  return res.first;
 }

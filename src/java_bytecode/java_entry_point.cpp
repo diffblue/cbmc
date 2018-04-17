@@ -203,19 +203,21 @@ exprt::operandst java_build_arguments(
     bool allow_null=
       !assume_init_pointers_not_null && !is_main && !is_this;
 
+    object_factory_parameterst parameters = object_factory_parameters;
+    parameters.function_id = function.name;
+
     // generate code to allocate and non-deterministicaly initialize the
     // argument
-    main_arguments[param_number]=
-      object_factory(
-        p.type(),
-        base_name,
-        init_code,
-        allow_null,
-        symbol_table,
-        object_factory_parameters,
-        allocation_typet::LOCAL,
-        function.location,
-        pointer_type_selector);
+    main_arguments[param_number] = object_factory(
+      p.type(),
+      base_name,
+      init_code,
+      allow_null,
+      symbol_table,
+      parameters,
+      allocation_typet::LOCAL,
+      function.location,
+      pointer_type_selector);
 
     // record as an input
     codet input(ID_input);

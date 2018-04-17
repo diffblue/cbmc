@@ -32,8 +32,6 @@ TEST_CASE("Convert exprt to string exprt")
 {
   GIVEN("A location, a string expression, and a symbol table")
   {
-    reset_temporary_counter();
-
     source_locationt loc;
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);

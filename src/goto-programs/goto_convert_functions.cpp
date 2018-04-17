@@ -147,8 +147,6 @@ void goto_convert_functionst::convert_function(
 
   // make tmp variables local to function
   tmp_symbol_prefix=id2string(symbol.name)+"::$tmp::";
-  temporary_counter=0;
-  reset_temporary_counter();
 
   f.type=to_code_type(symbol.type);
 

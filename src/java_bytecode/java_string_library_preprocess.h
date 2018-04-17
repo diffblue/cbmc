@@ -100,8 +100,11 @@ private:
   const typet index_type;
   const refined_string_typet refined_string_type;
 
-  typedef std::function<
-    codet(const code_typet &, const source_locationt &, symbol_table_baset &)>
+  typedef std::function<codet(
+    const code_typet &,
+    const source_locationt &,
+    const irep_idt &,
+    symbol_table_baset &)>
     conversion_functiont;
 
   typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> id_mapt;
@@ -148,41 +151,49 @@ private:
   codet make_equals_function_code(
     const code_typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_float_to_string_code(
     const code_typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_string_to_char_array_code(
     const code_typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_tablet &symbol_table);
 
   codet make_string_format_code(
     const code_typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_copy_string_code(
     const code_typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_copy_constructor_code(
     const code_typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_string_length_code(
     const code_typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_object_get_class_code(
     const code_typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   // Helper functions
@@ -241,18 +252,21 @@ private:
 
   refined_string_exprt make_nondet_string_expr(
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table,
     code_blockt &code);
 
   exprt allocate_fresh_string(
     const typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table,
     code_blockt &code);
 
   exprt allocate_fresh_array(
     const typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_tablet &symbol_table,
     code_blockt &code);
 
@@ -329,6 +343,7 @@ private:
     int index,
     const struct_typet &structured_type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table,
     code_blockt &code);
 
@@ -344,12 +359,14 @@ private:
   codet make_init_from_array_code(
     const code_typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 };
 
 exprt make_nondet_infinite_char_array(
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &code);
 
 void add_pointer_to_array_association(

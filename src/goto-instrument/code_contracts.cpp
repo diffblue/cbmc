@@ -250,7 +250,7 @@ const symbolt &code_contractst::new_tmp_symbol(
 {
   return get_fresh_aux_symbol(
     type,
-    "",
+    id2string(source_location.get_function()),
     "tmp_cc",
     source_location,
     irep_idt(),
