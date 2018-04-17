@@ -1034,18 +1034,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
        i_it->statement=="invokespecial" ||
        i_it->statement=="invokeinterface")
     {
-      // find the corresponding try-catch blocks and add the handlers
-      // to the targets
-      for(const auto &exception_row : method.exception_table)
-      {
-        if(i_it->address>=exception_row.start_pc &&
-           i_it->address<exception_row.end_pc)
-        {
-          a_entry.first->second.successors.push_back(
-            exception_row.handler_pc);
-          targets.insert(exception_row.handler_pc);
-        }
-      }
+      const std::vector<unsigned int> handler =
+        try_catch_handler(i_it->address, method.exception_table);
+      std::list<unsigned int> &successors = a_entry.first->second.successors;
+      successors.insert(successors.end(), handler.begin(), handler.end());
+      targets.insert(handler.begin(), handler.end());
     }
 
     if(i_it->statement=="goto" ||
@@ -2724,6 +2717,20 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+std::vector<unsigned> java_bytecode_convert_methodt::try_catch_handler(
+  const unsigned int address,
+  const java_bytecode_parse_treet::methodt::exception_tablet &exception_table)
+  const
+{
+  std::vector<unsigned> result;
+  for(const auto &exception_row : exception_table)
+  {
+    if(address >= exception_row.start_pc && address < exception_row.end_pc)
+      result.push_back(exception_row.handler_pc);
+  }
+  return result;
 }
 
 /// This uses a cut-down version of the logic in
