@@ -1614,28 +1614,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="iinc")
     {
-      code_blockt block;
-      block.add_source_location()=i_it->source_location;
-      // search variable on stack
-      const exprt &locvar=variable(arg0, 'i', i_it->address, NO_CAST);
-      save_stack_entries(
-        "stack_iinc",
-        java_int_type(),
-        block,
-        bytecode_write_typet::VARIABLE,
-        to_symbol_expr(locvar).get_identifier());
-
-      code_assignt code_assign;
-      code_assign.lhs()=
-        variable(arg0, 'i', i_it->address, NO_CAST);
-      exprt arg1_int_type=arg1;
-      if(arg1.type()!=java_int_type())
-        arg1_int_type.make_typecast(java_int_type());
-      code_assign.rhs()=plus_exprt(
-        variable(arg0, 'i', i_it->address, CAST_AS_NEEDED),
-        arg1_int_type);
-      block.copy_to_operands(code_assign);
-      c=block;
+      c = convert_iinc(arg0, arg1, i_it->source_location, i_it->address);
     }
     else if(statement==patternt("?xor"))
     {
@@ -2541,6 +2520,34 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+codet java_bytecode_convert_methodt::convert_iinc(
+  const exprt &arg0,
+  const exprt &arg1,
+  const source_locationt &location,
+  const unsigned address)
+{
+  code_blockt block;
+  block.add_source_location() = location;
+  // search variable on stack
+  const exprt &locvar = variable(arg0, 'i', address, NO_CAST);
+  save_stack_entries(
+    "stack_iinc",
+    java_int_type(),
+    block,
+    bytecode_write_typet::VARIABLE,
+    to_symbol_expr(locvar).get_identifier());
+
+  code_assignt code_assign;
+  code_assign.lhs() = variable(arg0, 'i', address, NO_CAST);
+  exprt arg1_int_type = arg1;
+  if(arg1.type() != java_int_type())
+    arg1_int_type.make_typecast(java_int_type());
+  code_assign.rhs() =
+    plus_exprt(variable(arg0, 'i', address, CAST_AS_NEEDED), arg1_int_type);
+  block.copy_to_operands(code_assign);
+  return block;
 }
 
 codet java_bytecode_convert_methodt::convert_ifnull(

@@ -362,10 +362,10 @@ protected:
     const mp_integer &number,
     const source_locationt &location) const;
 
-  codet convert_ifnull(
-    java_bytecode_convert_methodt::address_mapt &address_map,
-    const exprt::operandst &op,
-    const mp_integer &number,
-    const source_locationt &location);
+  codet convert_iinc(
+    const exprt &arg0,
+    const exprt &arg1,
+    const source_locationt &location,
+    unsigned address);
 };
 #endif
