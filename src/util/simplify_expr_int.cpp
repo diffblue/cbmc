@@ -18,7 +18,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_util.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
+#include "invariant.h"
 #include "namespace.h"
+#include "pointer_offset_size.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "std_expr.h"
@@ -1101,47 +1103,75 @@ bool simplify_exprt::simplify_power(exprt &expr)
 }
 
 /// Simplifies extracting of bits from a constant.
-bool simplify_exprt::simplify_extractbits(exprt &expr)
+bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
 {
-  assert(expr.operands().size()==3);
-
-  const typet &op0_type=expr.op0().type();
+  const typet &op0_type = expr.src().type();
 
   if(!is_bitvector_type(op0_type) &&
      !is_bitvector_type(expr.type()))
     return true;
 
-  if(expr.op0().is_constant())
+  mp_integer start, end;
+
+  if(to_integer(expr.upper(), start))
+    return true;
+
+  if(to_integer(expr.lower(), end))
+    return true;
+
+  const mp_integer width = pointer_offset_bits(op0_type, ns);
+
+  if(start < 0 || start >= width || end < 0 || end >= width)
+    return true;
+
+  DATA_INVARIANT(
+    start >= end,
+    "extractbits must have upper() >= lower()");
+
+  if(expr.src().is_constant())
   {
-    std::size_t width=to_bitvector_type(op0_type).get_width();
-    mp_integer start, end;
-
-    if(to_integer(expr.op1(), start))
-      return true;
-
-    if(to_integer(expr.op2(), end))
-      return true;
-
-    if(start<0 || start>=width ||
-       end<0 || end>=width)
-      return true;
-
-    assert(start>=end); // is this always the case??
-
-    const irep_idt &value=expr.op0().get(ID_value);
+    const irep_idt &value = to_constant_expr(expr.src()).get_value();
 
     if(value.size()!=width)
       return true;
 
     std::string svalue=id2string(value);
 
-    std::string extracted_value=
-      svalue.substr(width-integer2size_t(start)-1,
-                    integer2size_t(start-end+1));
+    std::string extracted_value =
+      svalue.substr(
+        integer2size_t(width - start - 1),
+        integer2size_t(start - end + 1));
 
-    expr = constant_exprt(extracted_value, expr.type());
+    constant_exprt result(extracted_value, expr.type());
+    expr.swap(result);
 
     return false;
+  }
+  else if(expr.src().id() == ID_concatenation)
+  {
+    // the most-significant bit comes first in an concatenation_exprt, hence we
+    // count down
+    mp_integer offset = width;
+
+    forall_operands(it, expr.src())
+    {
+      mp_integer op_width = pointer_offset_bits(it->type(), ns);
+
+      if(op_width <= 0)
+        return true;
+
+      if(start + 1 == offset && end + op_width == offset)
+      {
+        exprt tmp = *it;
+        if(tmp.type() != expr.type())
+          return true;
+
+        expr.swap(tmp);
+        return false;
+      }
+
+      offset -= op_width;
+    }
   }
 
   return true;
