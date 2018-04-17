@@ -1687,30 +1687,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?cmp?"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
-      const int nan_value(statement[4]=='l' ? -1 : 1);
-      const typet result_type(java_int_type());
-      const exprt nan_result(from_integer(nan_value, result_type));
-
-      // (value1 == NaN || value2 == NaN) ?
-      //   nan_value : value1  < value2 ? -1 : value2 < value1  1 ? 1 : 0;
-      // (value1 == NaN || value2 == NaN) ?
-      //   nan_value : value1 == value2 ? 0  : value1 < value2 -1 ? 1 : 0;
-
-      isnan_exprt nan_op0(op[0]);
-      isnan_exprt nan_op1(op[1]);
-      exprt one=from_integer(1, result_type);
-      exprt minus_one=from_integer(-1, result_type);
-      results[0]=
-        if_exprt(
-          or_exprt(nan_op0, nan_op1),
-          nan_result,
-          if_exprt(
-            ieee_float_equal_exprt(op[0], op[1]),
-            from_integer(0, result_type),
-            if_exprt(
-              binary_relation_exprt(op[0], ID_lt, op[1]),
-              minus_one,
-              one)));
+      results = convert_cmp2(statement, op, results);
     }
     else if(statement==patternt("?cmpl"))
     {
@@ -2487,6 +2464,34 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+exprt::operandst &java_bytecode_convert_methodt::convert_cmp2(
+  const irep_idt &statement,
+  const exprt::operandst &op,
+  exprt::operandst &results) const
+{
+  const int nan_value(statement[4] == 'l' ? -1 : 1);
+  const typet result_type(java_int_type());
+  const exprt nan_result(from_integer(nan_value, result_type));
+
+  // (value1 == NaN || value2 == NaN) ?
+  //   nan_value : value1  < value2 ? -1 : value2 < value1  1 ? 1 : 0;
+  // (value1 == NaN || value2 == NaN) ?
+  //   nan_value : value1 == value2 ? 0  : value1 < value2 -1 ? 1 : 0;
+
+  isnan_exprt nan_op0(op[0]);
+  isnan_exprt nan_op1(op[1]);
+  exprt one = from_integer(1, result_type);
+  exprt minus_one = from_integer(-1, result_type);
+  results[0] = if_exprt(
+    or_exprt(nan_op0, nan_op1),
+    nan_result,
+    if_exprt(
+      ieee_float_equal_exprt(op[0], op[1]),
+      from_integer(0, result_type),
+      if_exprt(binary_relation_exprt(op[0], ID_lt, op[1]), minus_one, one)));
+  return results;
 }
 
 exprt::operandst &java_bytecode_convert_methodt::convert_cmp(
