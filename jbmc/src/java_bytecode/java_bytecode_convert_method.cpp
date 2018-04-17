@@ -1622,16 +1622,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="pop" || statement=="pop2")
     {
-      // these are skips
-      c=code_skipt();
-
-      // pop2 removes two single-word items from the stack (e.g. two
-      // integers, or an integer and an object reference) or one
-      // two-word item (i.e. a double or a long).
-      // http://cs.au.dk/~mis/dOvs/jvmspec/ref-pop2.html
-      if(statement=="pop2" &&
-         get_bytecode_type_width(op[0].type())==32)
-        pop(1);
+      c = convert_pop(statement, op);
     }
     else if(statement=="instanceof")
     {
@@ -1899,6 +1890,22 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+codet java_bytecode_convert_methodt::convert_pop(
+  const irep_idt &statement,
+  const exprt::operandst &op)
+{
+  // these are skips
+  codet c = code_skipt();
+
+  // pop2 removes two single-word items from the stack (e.g. two
+  // integers, or an integer and an object reference) or one
+  // two-word item (i.e. a double or a long).
+  // http://cs.au.dk/~mis/dOvs/jvmspec/ref-pop2.html
+  if(statement == "pop2" && get_bytecode_type_width(op[0].type()) == 32)
+    pop(1);
+  return c;
 }
 
 codet java_bytecode_convert_methodt::convert_switch(

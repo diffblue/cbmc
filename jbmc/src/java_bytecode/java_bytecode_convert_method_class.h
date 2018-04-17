@@ -468,5 +468,7 @@ protected:
     const exprt::operandst &op,
     const java_bytecode_parse_treet::instructiont::argst &args,
     const source_locationt &location);
+
+  codet convert_pop(const irep_idt &statement, const exprt::operandst &op);
 };
 #endif
