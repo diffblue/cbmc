@@ -1221,14 +1221,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // on stack to given type fails.
       // The stack isn't modified.
       PRECONDITION(op.size() == 1 && results.size() == 1);
-      binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
-      code_assertt assert_class(check);
-      assert_class.add_source_location().set_comment("Dynamic cast check");
-      assert_class.add_source_location().set_property_class("bad-dynamic-cast");
-      // we add this assert such that we can recognise it
-      // during the instrumentation phase
-      c=std::move(assert_class);
-      results[0]=op[0];
+      convert_checkcast(arg0, op, c, results);
     }
     else if(statement=="invokedynamic")
     {
@@ -2181,6 +2174,22 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+void java_bytecode_convert_methodt::convert_checkcast(
+  const exprt &arg0,
+  const exprt::operandst &op,
+  codet &c,
+  exprt::operandst &results) const
+{
+  binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
+  code_assertt assert_class(check);
+  assert_class.add_source_location().set_comment("Dynamic cast check");
+  assert_class.add_source_location().set_property_class("bad-dynamic-cast");
+  // we add this assert such that we can recognise it
+  // during the instrumentation phase
+  c = std::move(assert_class);
+  results[0] = op[0];
 }
 
 void java_bytecode_convert_methodt::convert_athrow(

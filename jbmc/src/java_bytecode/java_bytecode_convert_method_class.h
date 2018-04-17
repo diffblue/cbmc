@@ -436,5 +436,11 @@ protected:
     const exprt::operandst &op,
     codet &c,
     exprt::operandst &results) const;
+
+  void convert_checkcast(
+    const exprt &arg0,
+    const exprt::operandst &op,
+    codet &c,
+    exprt::operandst &results) const;
 };
 #endif
