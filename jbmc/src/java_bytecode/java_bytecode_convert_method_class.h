@@ -110,7 +110,10 @@ public:
     size_t length;
     bool is_parameter;
     std::vector<holet> holes;
-    variablet() : symbol_expr(), start_pc(0), length(0), is_parameter(false) {}
+
+    variablet() : symbol_expr(), start_pc(0), length(0), is_parameter(false)
+    {
+    }
   };
 
 protected:
@@ -124,8 +127,8 @@ protected:
 
   enum instruction_sizet
   {
-    INST_INDEX=2,
-    INST_INDEX_CONST=3
+    INST_INDEX = 2,
+    INST_INDEX_CONST = 3
   };
 
   // return corresponding reference of variable
@@ -161,6 +164,7 @@ protected:
   exprt::operandst pop(std::size_t n);
 
   void pop_residue(std::size_t n);
+
   void push(const exprt::operandst &o);
 
   /// Returns true iff the slot index of the local variable of a method (coming
@@ -168,15 +172,17 @@ protected:
   /// `slots_for_parameters` is initialized upon call.
   bool is_parameter(const local_variablet &v)
   {
-    return v.index<slots_for_parameters;
+    return v.index < slots_for_parameters;
   }
 
   struct converted_instructiont
   {
     converted_instructiont(
       const instructionst::const_iterator &it,
-      const codet &_code):source(it), code(_code), done(false)
-      {}
+      const codet &_code)
+      : source(it), code(_code), done(false)
+    {
+    }
 
     instructionst::const_iterator source;
     std::list<unsigned> successors;
@@ -211,9 +217,19 @@ protected:
     bool leaf;
     std::vector<unsigned> branch_addresses;
     std::vector<block_tree_nodet> branch;
-    block_tree_nodet():leaf(false) {}
-    explicit block_tree_nodet(bool l):leaf(l) {}
-    static block_tree_nodet get_leaf() { return block_tree_nodet(true); }
+
+    block_tree_nodet() : leaf(false)
+    {
+    }
+
+    explicit block_tree_nodet(bool l) : leaf(l)
+    {
+    }
+
+    static block_tree_nodet get_leaf()
+    {
+      return block_tree_nodet(true);
+    }
   };
 
   static void replace_goto_target(
@@ -235,7 +251,7 @@ protected:
     unsigned address_limit,
     unsigned next_block_start_address,
     const address_mapt &amap,
-    bool allow_merge=true);
+    bool allow_merge = true);
 
   optionalt<symbolt> get_lambda_method_symbol(
     const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
@@ -261,13 +277,21 @@ protected:
   irep_idt get_static_field(
     const irep_idt &class_identifier, const irep_idt &component_name) const;
 
-  enum class bytecode_write_typet { VARIABLE, ARRAY_REF, STATIC_FIELD, FIELD};
+  enum class bytecode_write_typet
+  {
+    VARIABLE,
+    ARRAY_REF,
+    STATIC_FIELD,
+    FIELD
+  };
+
   void save_stack_entries(
     const std::string &,
     const typet &,
     code_blockt &,
     const bytecode_write_typet,
     const irep_idt &);
+
   void create_stack_tmp_var(
     const std::string &,
     const typet &,
@@ -311,6 +335,12 @@ protected:
     const exprt &arg0,
     const source_locationt &location,
     unsigned address);
-};
+
+  codet convert_if_cmp(
+    const java_bytecode_convert_methodt::address_mapt &address_map,
+    const irep_idt &statement,
+    const exprt::operandst &op,
+    const mp_integer &number,
+    const source_locationt &location) const;
 
 #endif

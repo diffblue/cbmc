@@ -1575,26 +1575,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "if_?cmp?? argument should be an integer");
-
-      code_ifthenelset code_branch;
-      const irep_idt cmp_op=get_if_cmp_operator(statement);
-
-      binary_relation_exprt condition(op[0], cmp_op, op[1]);
-
-      exprt &lhs(condition.lhs());
-      exprt &rhs(condition.rhs());
-      const typet &lhs_type(lhs.type());
-      if(lhs_type!=rhs.type())
-        rhs=typecast_exprt(rhs, lhs_type);
-
-      code_branch.cond()=condition;
-      code_branch.cond().add_source_location()=i_it->source_location;
-      code_branch.then_case()=code_gotot(label(integer2string(number)));
-      code_branch.then_case().add_source_location()=
-        address_map.at(integer2unsigned(number)).source->source_location;
-      code_branch.add_source_location()=i_it->source_location;
-
-      c=code_branch;
+      c = convert_if_cmp(
+        address_map, statement, op, number, i_it->source_location);
     }
     else if(statement==patternt("if??"))
     {
@@ -2591,6 +2573,34 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+codet java_bytecode_convert_methodt::convert_if_cmp(
+  const java_bytecode_convert_methodt::address_mapt &address_map,
+  const irep_idt &statement,
+  const exprt::operandst &op,
+  const mp_integer &number,
+  const source_locationt &location) const
+{
+  code_ifthenelset code_branch;
+  const irep_idt cmp_op = get_if_cmp_operator(statement);
+
+  binary_relation_exprt condition(op[0], cmp_op, op[1]);
+
+  exprt &lhs(condition.lhs());
+  exprt &rhs(condition.rhs());
+  const typet &lhs_type(lhs.type());
+  if(lhs_type != rhs.type())
+    rhs = typecast_exprt(rhs, lhs_type);
+
+  code_branch.cond() = condition;
+  code_branch.cond().add_source_location() = location;
+  code_branch.then_case() = code_gotot(label(integer2string(number)));
+  code_branch.then_case().add_source_location() =
+    address_map.at(integer2unsigned(number)).source->source_location;
+  code_branch.add_source_location() = location;
+
+  return code_branch;
 }
 
 code_blockt java_bytecode_convert_methodt::convert_ret(
