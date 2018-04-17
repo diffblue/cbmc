@@ -1842,31 +1842,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       op=pop(dimension);
       assert(results.size()==1);
-
-      const reference_typet ref_type=
-        java_reference_type(arg0.type());
-
-      side_effect_exprt java_new_array(ID_java_new_array, ref_type);
-      java_new_array.operands()=op;
-
-      if(!i_it->source_location.get_line().empty())
-        java_new_array.add_source_location()=i_it->source_location;
-
-      code_blockt create;
-
-      if(max_array_length!=0)
-      {
-        constant_exprt size_limit=
-          from_integer(max_array_length, java_int_type());
-        binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
-        code_assumet assume_le_max_size(le_max_size);
-        create.move_to_operands(assume_le_max_size);
-      }
-
-      const exprt tmp=tmp_variable("newarray", ref_type);
-      create.copy_to_operands(code_assignt(tmp, java_new_array));
-      c=std::move(create);
-      results[0]=tmp;
+      convert_multianewarray(i_it->source_location, arg0, op, c, results);
     }
     else if(statement=="arraylength")
     {
@@ -2332,6 +2308,37 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+void java_bytecode_convert_methodt::convert_multianewarray(
+  const source_locationt &location,
+  const exprt &arg0,
+  const exprt::operandst &op,
+  codet &c,
+  exprt::operandst &results)
+{
+  const reference_typet ref_type = java_reference_type(arg0.type());
+
+  side_effect_exprt java_new_array(ID_java_new_array, ref_type);
+  java_new_array.operands() = op;
+
+  if(!location.get_line().empty())
+    java_new_array.add_source_location() = location;
+
+  code_blockt create;
+
+  if(max_array_length != 0)
+  {
+    constant_exprt size_limit = from_integer(max_array_length, java_int_type());
+    binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
+    code_assumet assume_le_max_size(le_max_size);
+    create.move_to_operands(assume_le_max_size);
+  }
+
+  const exprt tmp = tmp_variable("newarray", ref_type);
+  create.copy_to_operands(code_assignt(tmp, java_new_array));
+  c = std::move(create);
+  results[0] = tmp;
 }
 
 void java_bytecode_convert_methodt::convert_newarray(

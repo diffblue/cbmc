@@ -409,5 +409,12 @@ protected:
     const exprt::operandst &op,
     codet &c,
     exprt::operandst &results);
+
+  void convert_multianewarray(
+    const source_locationt &location,
+    const exprt &arg0,
+    const exprt::operandst &op,
+    codet &c,
+    exprt::operandst &results);
 };
 #endif
