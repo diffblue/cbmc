@@ -1933,17 +1933,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="monitorexit")
     {
-      // becomes a function call
-      code_typet type;
-      type.return_type()=void_typet();
-      type.parameters().resize(1);
-      type.parameters()[0].type()=java_reference_type(void_typet());
-      code_function_callt call;
-      call.function()=symbol_exprt("java::monitorexit", type);
-      call.lhs().make_nil();
-      call.arguments().push_back(op[0]);
-      call.add_source_location()=i_it->source_location;
-      c=call;
+      c = convert_monitorexit(i_it->source_location, op);
     }
     else if(statement=="swap")
     {
@@ -2307,6 +2297,22 @@ codet &java_bytecode_convert_methodt::do_exception_handling(
     }
   }
   return c;
+}
+
+codet java_bytecode_convert_methodt::convert_monitorexit(
+  const source_locationt &location,
+  const exprt::operandst &op) const
+{
+  code_typet type;
+  type.return_type() = void_typet();
+  type.parameters().resize(1);
+  type.parameters()[0].type() = java_reference_type(void_typet());
+  code_function_callt call;
+  call.function() = symbol_exprt("java::monitorexit", type);
+  call.lhs().make_nil();
+  call.arguments().push_back(op[0]);
+  call.add_source_location() = location;
+  return call;
 }
 
 codet java_bytecode_convert_methodt::convert_monitorenter(

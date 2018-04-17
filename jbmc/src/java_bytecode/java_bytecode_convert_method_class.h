@@ -421,6 +421,10 @@ protected:
     const source_locationt &location,
     const exprt::operandst &op) const;
 
+  codet convert_monitorexit(
+    const source_locationt &location,
+    const exprt::operandst &op) const;
+
   codet &do_exception_handling(
     const methodt &method,
     const std::set<unsigned int> &working_set,
