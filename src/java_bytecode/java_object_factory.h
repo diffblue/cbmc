@@ -142,6 +142,7 @@ exprt allocate_dynamic_object(
   const typet &allocate_type,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &output_code,
   std::vector<const symbolt *> &symbols_created,
   bool cast_needed = false);
@@ -150,12 +151,14 @@ exprt allocate_dynamic_object_with_decl(
   const exprt &target_expr,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &output_code);
 
 codet initialize_nondet_string_struct(
   const exprt &obj,
   const std::size_t &max_nondet_string_length,
   const source_locationt &loc,
+  const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   bool printable);
 

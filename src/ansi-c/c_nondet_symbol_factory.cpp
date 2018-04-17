@@ -43,8 +43,8 @@ static const symbolt &c_new_tmp_symbol(
   const bool static_lifetime,
   const std::string &prefix="tmp")
 {
-  symbolt &tmp_symbol=
-    get_fresh_aux_symbol(type, "", prefix, loc, ID_C, symbol_table);
+  symbolt &tmp_symbol = get_fresh_aux_symbol(
+    type, id2string(loc.get_function()), prefix, loc, ID_C, symbol_table);
   tmp_symbol.is_static_lifetime=static_lifetime;
 
   return tmp_symbol;

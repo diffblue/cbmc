@@ -48,8 +48,8 @@ SCENARIO(
 
     WHEN("Initialisation code for a string is generated")
     {
-      const codet code =
-        initialize_nondet_string_struct(expr, 20, loc, symbol_table, false);
+      const codet code = initialize_nondet_string_struct(
+        expr, 20, loc, "test", symbol_table, false);
 
       THEN("Code is produced")
       {

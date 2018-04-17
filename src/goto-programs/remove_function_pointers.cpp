@@ -233,14 +233,13 @@ void remove_function_pointerst::fix_return_type(
        code_type.return_type(), ns))
     return;
 
-  symbolt &tmp_symbol=
-    get_fresh_aux_symbol(
-      code_type.return_type(),
-      "remove_function_pointers",
-      "tmp_return_val",
-      function_call.source_location(),
-      irep_idt(),
-      symbol_table);
+  symbolt &tmp_symbol = get_fresh_aux_symbol(
+    code_type.return_type(),
+    id2string(function_call.source_location().get_function()),
+    "tmp_return_val",
+    function_call.source_location(),
+    irep_idt(),
+    symbol_table);
 
   symbol_exprt tmp_symbol_expr;
   tmp_symbol_expr.type()=tmp_symbol.type;

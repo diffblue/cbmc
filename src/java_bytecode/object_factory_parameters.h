@@ -34,6 +34,9 @@ struct object_factory_parameterst final
 
   /// Force string content to be ASCII printable characters when set to true.
   bool string_printable = false;
+
+  /// Function id, used as a prefix for identifiers of temporaries
+  irep_idt function_id;
 };
 
 #endif

@@ -114,6 +114,9 @@ static void create_clinit_wrapper_symbols(
   symbolt wrapper_method_symbol;
   code_typet wrapper_method_type;
   wrapper_method_type.return_type() = void_typet();
+  // Ensure the parameters property is there
+  // to avoid trouble in irept comparisons
+  wrapper_method_type.parameters();
   wrapper_method_symbol.name = clinit_wrapper_name(class_name);
   wrapper_method_symbol.pretty_name = wrapper_method_symbol.name;
   wrapper_method_symbol.base_name = "clinit_wrapper";
@@ -369,6 +372,9 @@ codet stub_global_initializer_factoryt::get_stub_initializer_body(
     class_globals.first != class_globals.second,
     "class with synthetic clinit should have at least one global to init");
 
+  object_factory_parameterst parameters = object_factory_parameters;
+  parameters.function_id = function_id;
+
   for(auto it = class_globals.first; it != class_globals.second; ++it)
   {
     const symbol_exprt new_global_symbol =
@@ -381,7 +387,7 @@ codet stub_global_initializer_factoryt::get_stub_initializer_body(
       false,
       allocation_typet::DYNAMIC,
       !is_non_null_library_global(it->second),
-      object_factory_parameters,
+      parameters,
       pointer_type_selector,
       update_in_placet::NO_UPDATE_IN_PLACE);
   }
