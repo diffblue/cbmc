@@ -1,0 +1,20 @@
+CORE
+main.c
+--call-graph
+^EXIT=0$
+^SIGNAL=0$
+^main -> func2$
+^main -> func1$
+^main -> func4$
+^funca -> func9$
+^func9 -> funca$
+^func8 -> func7$
+^func7 -> func8$
+^__CPROVER__start -> __CPROVER_initialize$
+^__CPROVER__start -> main$
+^func2 -> func3$
+^func0 -> func0$
+^func4 -> func5$
+^func5 -> func4$
+--
+^warning: ignoring
