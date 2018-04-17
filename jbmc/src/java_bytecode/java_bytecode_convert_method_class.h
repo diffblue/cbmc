@@ -324,7 +324,7 @@ protected:
     const irep_idt &statement,
     const exprt &arg0,
     const exprt::operandst &op,
-    unsigned address,
+    const unsigned address,
     const source_locationt &location);
 
   exprt
@@ -334,7 +334,7 @@ protected:
     const std::vector<unsigned int> &jsr_ret_targets,
     const exprt &arg0,
     const source_locationt &location,
-    unsigned address);
+    const unsigned address);
 
   codet convert_if_cmp(
     const java_bytecode_convert_methodt::address_mapt &address_map,
@@ -343,4 +343,11 @@ protected:
     const mp_integer &number,
     const source_locationt &location) const;
 
+  codet convert_if(
+    const java_bytecode_convert_methodt::address_mapt &address_map,
+    const exprt::operandst &op,
+    const irep_idt &id,
+    const mp_integer &number,
+    const source_locationt &location) const;
+};
 #endif

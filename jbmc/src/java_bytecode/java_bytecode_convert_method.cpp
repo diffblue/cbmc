@@ -1590,25 +1590,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
         irep_idt();
 
       INVARIANT(!id.empty(), "unexpected bytecode-if");
-
       PRECONDITION(op.size() == 1 && results.empty());
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "if?? argument should be an integer");
-
-      code_ifthenelset code_branch;
-      code_branch.cond()=
-        binary_relation_exprt(op[0], id, from_integer(0, op[0].type()));
-      code_branch.cond().add_source_location()=i_it->source_location;
-      code_branch.cond().add_source_location().set_function(method_id);
-      code_branch.then_case()=code_gotot(label(integer2string(number)));
-      code_branch.then_case().add_source_location()=
-        address_map.at(integer2unsigned(number)).source->source_location;
-      code_branch.then_case().add_source_location().set_function(method_id);
-      code_branch.add_source_location()=i_it->source_location;
-      code_branch.add_source_location().set_function(method_id);
-
-      c=code_branch;
+      c = convert_if(address_map, op, id, number, i_it->source_location);
     }
     else if(statement==patternt("ifnonnull"))
     {
@@ -2573,6 +2559,27 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+codet java_bytecode_convert_methodt::convert_if(
+  const java_bytecode_convert_methodt::address_mapt &address_map,
+  const exprt::operandst &op,
+  const irep_idt &id,
+  const mp_integer &number,
+  const source_locationt &location) const
+{
+  code_ifthenelset code_branch;
+  code_branch.cond() =
+    binary_relation_exprt(op[0], id, from_integer(0, op[0].type()));
+  code_branch.cond().add_source_location() = location;
+  code_branch.cond().add_source_location().set_function(method_id);
+  code_branch.then_case() = code_gotot(label(integer2string(number)));
+  code_branch.then_case().add_source_location() =
+    address_map.at(integer2unsigned(number)).source->source_location;
+  code_branch.then_case().add_source_location().set_function(method_id);
+  code_branch.add_source_location() = location;
+  code_branch.add_source_location().set_function(method_id);
+  return code_branch;
 }
 
 codet java_bytecode_convert_methodt::convert_if_cmp(
