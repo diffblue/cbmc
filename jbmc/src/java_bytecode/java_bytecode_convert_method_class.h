@@ -290,6 +290,21 @@ protected:
     const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
     const source_locationt &location,
     const exprt &arg0);
+
+  codet convert_astore(
+    const irep_idt &statement,
+    const exprt::operandst &op,
+    const source_locationt &location);
+
+  codet convert_store(
+    const irep_idt &statement,
+    const exprt &arg0,
+    const exprt::operandst &op,
+    unsigned address,
+    const source_locationt &location);
+
+  exprt
+  convert_aload(const irep_idt &statement, const exprt::operandst &op) const;
 };
 
 #endif

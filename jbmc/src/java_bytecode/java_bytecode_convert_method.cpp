@@ -1452,88 +1452,19 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?astore"))
     {
       assert(op.size()==3 && results.empty());
-
-      char type_char=statement[0];
-
-      const typecast_exprt pointer(op[0], java_array_type(type_char));
-
-      dereference_exprt deref(pointer, pointer.type().subtype());
-      deref.set(ID_java_member_access, true);
-
-      const member_exprt data_ptr(
-        deref,
-        "data",
-        pointer_type(java_type_from_char(type_char)));
-
-      plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
-      // tag it so it's easy to identify during instrumentation
-      data_plus_offset.set(ID_java_array_access, true);
-      typet element_type=data_ptr.type().subtype();
-      const dereference_exprt element(data_plus_offset, element_type);
-
-      code_blockt block;
-      block.add_source_location()=i_it->source_location;
-
-      save_stack_entries(
-        "stack_astore",
-        element_type,
-        block,
-        bytecode_write_typet::ARRAY_REF,
-        "");
-
-      code_assignt array_put(element, op[2]);
-      array_put.add_source_location()=i_it->source_location;
-      block.move_to_operands(array_put);
-      c=block;
+      c = convert_astore(statement, op, i_it->source_location);
     }
     else if(statement==patternt("?store"))
     {
       // store value into some local variable
       PRECONDITION(op.size() == 1 && results.empty());
-
-      exprt var=
-        variable(arg0, statement[0], i_it->address, NO_CAST);
-      const irep_idt &var_name=to_symbol_expr(var).get_identifier();
-
-      exprt toassign=op[0];
-      if('a'==statement[0] && toassign.type()!=var.type())
-        toassign=typecast_exprt(toassign, var.type());
-
-      code_blockt block;
-
-      save_stack_entries(
-        "stack_store",
-        toassign.type(),
-        block,
-        bytecode_write_typet::VARIABLE,
-        var_name);
-      code_assignt assign(var, toassign);
-      assign.add_source_location()=i_it->source_location;
-      block.copy_to_operands(assign);
-      c=block;
+      c = convert_store(
+        statement, arg0, op, i_it->address, i_it->source_location);
     }
     else if(statement==patternt("?aload"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
-
-      char type_char=statement[0];
-
-      const typecast_exprt pointer(op[0], java_array_type(type_char));
-
-      dereference_exprt deref(pointer, pointer.type().subtype());
-      deref.set(ID_java_member_access, true);
-
-      const member_exprt data_ptr(
-        deref,
-        "data",
-        pointer_type(java_type_from_char(type_char)));
-
-      plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
-      // tag it so it's easy to identify during instrumentation
-      data_plus_offset.set(ID_java_array_access, true);
-      typet element_type=data_ptr.type().subtype();
-      dereference_exprt element(data_plus_offset, element_type);
-      results[0]=java_bytecode_promotion(element);
+      results[0] = convert_aload(statement, op);
     }
     else if(statement==patternt("?load"))
     {
@@ -2682,6 +2613,87 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+exprt java_bytecode_convert_methodt::convert_aload(
+  const irep_idt &statement,
+  const exprt::operandst &op) const
+{
+  const char &type_char = statement[0];
+  const typecast_exprt pointer(op[0], java_array_type(type_char));
+
+  dereference_exprt deref(pointer, pointer.type().subtype());
+  deref.set(ID_java_member_access, true);
+
+  const member_exprt data_ptr(
+    deref, "data", pointer_type(java_type_from_char(type_char)));
+
+  plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
+  // tag it so it's easy to identify during instrumentation
+  data_plus_offset.set(ID_java_array_access, true);
+  const typet &element_type = data_ptr.type().subtype();
+  const dereference_exprt element(data_plus_offset, element_type);
+  return java_bytecode_promotion(element);
+}
+
+codet java_bytecode_convert_methodt::convert_store(
+  const irep_idt &statement,
+  const exprt &arg0,
+  const exprt::operandst &op,
+  const unsigned address,
+  const source_locationt &location)
+{
+  const exprt var = variable(arg0, statement[0], address, NO_CAST);
+  const irep_idt &var_name = to_symbol_expr(var).get_identifier();
+
+  exprt toassign = op[0];
+  if('a' == statement[0] && toassign.type() != var.type())
+    toassign = typecast_exprt(toassign, var.type());
+
+  code_blockt block;
+
+  save_stack_entries(
+    "stack_store",
+    toassign.type(),
+    block,
+    bytecode_write_typet::VARIABLE,
+    var_name);
+  code_assignt assign(var, toassign);
+  assign.add_source_location() = location;
+  block.move(assign);
+  return block;
+}
+
+codet java_bytecode_convert_methodt::convert_astore(
+  const irep_idt &statement,
+  const exprt::operandst &op,
+  const source_locationt &location)
+{
+  const char type_char = statement[0];
+  const typecast_exprt pointer(op[0], java_array_type(type_char));
+
+  dereference_exprt deref(pointer, pointer.type().subtype());
+  deref.set(ID_java_member_access, true);
+
+  const member_exprt data_ptr(
+    deref, "data", pointer_type(java_type_from_char(type_char)));
+
+  plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
+  // tag it so it's easy to identify during instrumentation
+  data_plus_offset.set(ID_java_array_access, true);
+  const typet &element_type = data_ptr.type().subtype();
+  const dereference_exprt element(data_plus_offset, element_type);
+
+  code_blockt block;
+  block.add_source_location() = location;
+
+  save_stack_entries(
+    "stack_astore", element_type, block, bytecode_write_typet::ARRAY_REF, "");
+
+  code_assignt array_put(element, op[2]);
+  array_put.add_source_location() = location;
+  block.move(array_put);
+  return block;
 }
 
 optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
