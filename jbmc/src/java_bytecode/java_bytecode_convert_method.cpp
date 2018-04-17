@@ -1234,7 +1234,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
         results[0] = *res;
       }
     }
-    // replace calls to CProver.assume
     else if(statement=="invokestatic" &&
             id2string(arg0.get(ID_identifier))==
             "java::org.cprover.CProver.assume:(Z)V")
@@ -1242,16 +1241,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const code_typet &code_type=to_code_type(arg0.type());
       INVARIANT(code_type.parameters().size()==1,
                 "function expected to have exactly one parameter");
-
-      exprt operand = pop(1)[0];
-      // we may need to adjust the type of the argument
-      if(operand.type()!=bool_typet())
-        operand.make_typecast(bool_typet());
-
-      c=code_assumet(operand);
-      source_locationt loc=i_it->source_location;
-      loc.set_function(method_id);
-      c.add_source_location()=loc;
+      c = replace_call_to_cprover_assume(i_it->source_location, c);
     }
     else if(statement=="invokeinterface" ||
             statement=="invokespecial" ||
@@ -2174,6 +2164,21 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+codet &java_bytecode_convert_methodt::replace_call_to_cprover_assume(
+  source_locationt location,
+  codet &c)
+{
+  exprt operand = pop(1)[0];
+  // we may need to adjust the type of the argument
+  if(operand.type() != bool_typet())
+    operand.make_typecast(bool_typet());
+
+  c = code_assumet(operand);
+  location.set_function(method_id);
+  c.add_source_location() = location;
+  return c;
 }
 
 void java_bytecode_convert_methodt::convert_checkcast(

@@ -442,5 +442,7 @@ protected:
     const exprt::operandst &op,
     codet &c,
     exprt::operandst &results) const;
+
+  codet &replace_call_to_cprover_assume(source_locationt location, codet &c);
 };
 #endif
