@@ -444,5 +444,12 @@ protected:
     exprt::operandst &results) const;
 
   codet &replace_call_to_cprover_assume(source_locationt location, codet &c);
+
+  void convert_invoke(
+    source_locationt location,
+    const irep_idt &statement,
+    exprt &arg0,
+    codet &c,
+    exprt::operandst &results);
 };
 #endif

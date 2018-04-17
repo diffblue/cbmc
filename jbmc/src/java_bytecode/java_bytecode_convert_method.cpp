@@ -1248,169 +1248,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
             statement=="invokevirtual" ||
             statement=="invokestatic")
     {
-      const bool use_this(statement!="invokestatic");
-      const bool is_virtual(
-        statement=="invokevirtual" || statement=="invokeinterface");
-
-      code_typet &code_type=to_code_type(arg0.type());
-      code_typet::parameterst &parameters(code_type.parameters());
-
-      if(use_this)
-      {
-        if(parameters.empty() || !parameters[0].get_this())
-        {
-          irep_idt classname=arg0.get(ID_C_class);
-          typet thistype=symbol_typet(classname);
-          // Note invokespecial is used for super-method calls as well as
-          // constructors.
-          if(statement=="invokespecial")
-          {
-            if(is_constructor(arg0.get(ID_identifier)))
-            {
-              if(needed_lazy_methods)
-                needed_lazy_methods->add_needed_class(classname);
-              code_type.set_is_constructor();
-            }
-            else
-              code_type.set(ID_java_super_method_call, true);
-          }
-          reference_typet object_ref_type=java_reference_type(thistype);
-          code_typet::parametert this_p(object_ref_type);
-          this_p.set_this();
-          this_p.set_base_name("this");
-          parameters.insert(parameters.begin(), this_p);
-        }
-      }
-
-      code_function_callt call;
-      source_locationt loc=i_it->source_location;
-      loc.set_function(method_id);
-
-      call.add_source_location()=loc;
-      call.arguments()=pop(parameters.size());
-
-      // double-check a bit
-      if(use_this)
-      {
-        const exprt &this_arg=call.arguments().front();
-        INVARIANT(this_arg.type().id()==ID_pointer,
-                  "first argument must be a pointer");
-      }
-
-      // do some type adjustment for the arguments,
-      // as Java promotes arguments
-      // Also cast pointers since intermediate locals
-      // can be void*.
-
-      for(std::size_t i=0; i<parameters.size(); i++)
-      {
-        const typet &type=parameters[i].type();
-        if(type==java_boolean_type() ||
-           type==java_char_type() ||
-           type==java_byte_type() ||
-           type==java_short_type() ||
-           type.id()==ID_pointer)
-        {
-          assert(i<call.arguments().size());
-          if(type!=call.arguments()[i].type())
-            call.arguments()[i].make_typecast(type);
-        }
-      }
-
-      // do some type adjustment for return values
-
-      const typet &return_type=code_type.return_type();
-
-      if(return_type.id()!=ID_empty)
-      {
-        // return types are promoted in Java
-        call.lhs()=tmp_variable("return", return_type);
-        exprt promoted=java_bytecode_promotion(call.lhs());
-        results.resize(1);
-        results[0]=promoted;
-      }
-
-      assert(arg0.id()==ID_virtual_function);
-
-      // If we don't have a definition for the called symbol, and we won't
-      // inherit a definition from a super-class, we create a new symbol and
-      // insert it in the symbol table. The name and type of the method are
-      // derived from the information we have in the call.
-      // We fix the access attribute to ID_public, because of the following
-      // reasons:
-      // - We don't know the orignal access attribute and since the .class file
-      //   unavailable, we have no way to know.
-      // - Whatever it was, we assume that the bytecode we are translating
-      //   compiles correctly, so such a method has to be accessible from this
-      //   method.
-      // - We will never generate code that calls that method unless we
-      //   translate bytecode that calls that method. As a result we will never
-      //   generate code that may wrongly assume that such a method is
-      //   accessible if we assume that its access attribute is "more
-      //   accessible" than it actually is.
-      irep_idt id=arg0.get(ID_identifier);
-      if(symbol_table.symbols.find(id)==symbol_table.symbols.end() &&
-         !(is_virtual && is_method_inherited(arg0.get(ID_C_class), arg0.get(ID_component_name))))
-      {
-        symbolt symbol;
-        symbol.name=id;
-        symbol.base_name=arg0.get(ID_C_base_name);
-        symbol.pretty_name=
-          id2string(arg0.get(ID_C_class)).substr(6)+"."+
-          id2string(symbol.base_name)+"()";
-        symbol.type=arg0.type();
-        symbol.type.set(ID_access, ID_public);
-        symbol.value.make_nil();
-        symbol.mode=ID_java;
-        assign_parameter_names(
-          to_code_type(symbol.type),
-          symbol.name,
-          symbol_table);
-
-        debug()
-          << "Generating codet:  new opaque symbol: method '"
-          << symbol.name << "'" << eom;
-        symbol_table.add(symbol);
-      }
-
-      if(is_virtual)
-      {
-        // dynamic binding
-        assert(use_this);
-        assert(!call.arguments().empty());
-        call.function()=arg0;
-        // Populate needed methods later,
-        // once we know what object types can exist.
-      }
-      else
-      {
-        // static binding
-        call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
-        if(needed_lazy_methods)
-        {
-          needed_lazy_methods->add_needed_method(arg0.get(ID_identifier));
-          // Calling a static method causes static initialization:
-          needed_lazy_methods->add_needed_class(arg0.get(ID_C_class));
-        }
-      }
-
-      call.function().add_source_location()=loc;
-
-      // Replacing call if it is a function of the Character library,
-      // returning the same call otherwise
-      c=string_preprocess.replace_character_call(call);
-
-      if(!use_this)
-      {
-        codet clinit_call=get_clinit_call(arg0.get(ID_C_class));
-        if(clinit_call.get_statement()!=ID_skip)
-        {
-          code_blockt ret_block;
-          ret_block.move_to_operands(clinit_call);
-          ret_block.move_to_operands(c);
-          c=std::move(ret_block);
-        }
-      }
+      convert_invoke(i_it->source_location, statement, arg0, c, results);
     }
     else if(statement=="return")
     {
@@ -2164,6 +2002,174 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+void java_bytecode_convert_methodt::convert_invoke(
+  source_locationt location,
+  const irep_idt &statement,
+  exprt &arg0,
+  codet &c,
+  exprt::operandst &results)
+{
+  const bool use_this(statement != "invokestatic");
+  const bool is_virtual(
+    statement == "invokevirtual" || statement == "invokeinterface");
+
+  code_typet &code_type = to_code_type(arg0.type());
+  code_typet::parameterst &parameters(code_type.parameters());
+
+  if(use_this)
+  {
+    if(parameters.empty() || !parameters[0].get_this())
+    {
+      irep_idt classname = arg0.get(ID_C_class);
+      typet thistype = symbol_typet(classname);
+      // Note invokespecial is used for super-method calls as well as
+      // constructors.
+      if(statement == "invokespecial")
+      {
+        if(is_constructor(arg0.get(ID_identifier)))
+        {
+          if(needed_lazy_methods)
+            needed_lazy_methods->add_needed_class(classname);
+          code_type.set_is_constructor();
+        }
+        else
+          code_type.set(ID_java_super_method_call, true);
+      }
+      reference_typet object_ref_type = java_reference_type(thistype);
+      code_typet::parametert this_p(object_ref_type);
+      this_p.set_this();
+      this_p.set_base_name("this");
+      parameters.insert(parameters.begin(), this_p);
+    }
+  }
+
+  code_function_callt call;
+  location.set_function(method_id);
+
+  call.add_source_location() = location;
+  call.arguments() = pop(parameters.size());
+
+  // double-check a bit
+  if(use_this)
+  {
+    const exprt &this_arg = call.arguments().front();
+    INVARIANT(
+      this_arg.type().id() == ID_pointer, "first argument must be a pointer");
+  }
+
+  // do some type adjustment for the arguments,
+  // as Java promotes arguments
+  // Also cast pointers since intermediate locals
+  // can be void*.
+
+  for(std::size_t i = 0; i < parameters.size(); i++)
+  {
+    const typet &type = parameters[i].type();
+    if(
+      type == java_boolean_type() || type == java_char_type() ||
+      type == java_byte_type() || type == java_short_type() ||
+      type.id() == ID_pointer)
+    {
+      assert(i < call.arguments().size());
+      if(type != call.arguments()[i].type())
+        call.arguments()[i].make_typecast(type);
+    }
+  }
+
+  // do some type adjustment for return values
+
+  const typet &return_type = code_type.return_type();
+
+  if(return_type.id() != ID_empty)
+  {
+    // return types are promoted in Java
+    call.lhs() = tmp_variable("return", return_type);
+    exprt promoted = java_bytecode_promotion(call.lhs());
+    results.resize(1);
+    results[0] = promoted;
+  }
+
+  assert(arg0.id() == ID_virtual_function);
+
+  // If we don't have a definition for the called symbol, and we won't
+  // inherit a definition from a super-class, we create a new symbol and
+  // insert it in the symbol table. The name and type of the method are
+  // derived from the information we have in the call.
+  // We fix the access attribute to ID_public, because of the following
+  // reasons:
+  // - We don't know the orignal access attribute and since the .class file
+  //   unavailable, we have no way to know.
+  // - Whatever it was, we assume that the bytecode we are translating
+  //   compiles correctly, so such a method has to be accessible from this
+  //   method.
+  // - We will never generate code that calls that method unless we
+  //   translate bytecode that calls that method. As a result we will never
+  //   generate code that may wrongly assume that such a method is
+  //   accessible if we assume that its access attribute is "more
+  //   accessible" than it actually is.
+  irep_idt id = arg0.get(ID_identifier);
+  if(
+    symbol_table.symbols.find(id) == symbol_table.symbols.end() &&
+    !(is_virtual &&
+      is_method_inherited(arg0.get(ID_C_class), arg0.get(ID_component_name))))
+  {
+    symbolt symbol;
+    symbol.name = id;
+    symbol.base_name = arg0.get(ID_C_base_name);
+    symbol.pretty_name = id2string(arg0.get(ID_C_class)).substr(6) + "." +
+                         id2string(symbol.base_name) + "()";
+    symbol.type = arg0.type();
+    symbol.type.set(ID_access, ID_public);
+    symbol.value.make_nil();
+    symbol.mode = ID_java;
+    assign_parameter_names(
+      to_code_type(symbol.type), symbol.name, symbol_table);
+
+    debug() << "Generating codet:  new opaque symbol: method '" << symbol.name
+            << "'" << eom;
+    symbol_table.add(symbol);
+  }
+
+  if(is_virtual)
+  {
+    // dynamic binding
+    assert(use_this);
+    assert(!call.arguments().empty());
+    call.function() = arg0;
+    // Populate needed methods later,
+    // once we know what object types can exist.
+  }
+  else
+  {
+    // static binding
+    call.function() = symbol_exprt(arg0.get(ID_identifier), arg0.type());
+    if(needed_lazy_methods)
+    {
+      needed_lazy_methods->add_needed_method(arg0.get(ID_identifier));
+      // Calling a static method causes static initialization:
+      needed_lazy_methods->add_needed_class(arg0.get(ID_C_class));
+    }
+  }
+
+  call.function().add_source_location() = location;
+
+  // Replacing call if it is a function of the Character library,
+  // returning the same call otherwise
+  c = string_preprocess.replace_character_call(call);
+
+  if(!use_this)
+  {
+    codet clinit_call = get_clinit_call(arg0.get(ID_C_class));
+    if(clinit_call.get_statement() != ID_skip)
+    {
+      code_blockt ret_block;
+      ret_block.move_to_operands(clinit_call);
+      ret_block.move_to_operands(c);
+      c = std::move(ret_block);
+    }
+  }
 }
 
 codet &java_bytecode_convert_methodt::replace_call_to_cprover_assume(
