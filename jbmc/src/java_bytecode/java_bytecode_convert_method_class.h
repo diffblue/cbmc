@@ -451,5 +451,10 @@ protected:
     exprt &arg0,
     codet &c,
     exprt::operandst &results);
+
+  exprt::operandst &convert_const(
+    const irep_idt &statement,
+    const exprt &arg0,
+    exprt::operandst &results) const;
 };
 #endif

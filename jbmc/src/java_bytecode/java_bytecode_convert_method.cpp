@@ -1342,38 +1342,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?const"))
     {
       assert(results.size()==1);
-
-      const char type_char=statement[0];
-      const bool is_double('d'==type_char);
-      const bool is_float('f'==type_char);
-
-      if(is_double || is_float)
-      {
-        const ieee_float_spect spec(
-          is_float?ieee_float_spect::single_precision():
-          ieee_float_spect::double_precision());
-
-        ieee_floatt value(spec);
-        if(arg0.type().id()!=ID_floatbv)
-        {
-          mp_integer number;
-          bool ret=to_integer(to_constant_expr(arg0), number);
-          DATA_INVARIANT(!ret, "failed to convert constant");
-          value.from_integer(number);
-        }
-        else
-          value.from_expr(to_constant_expr(arg0));
-
-        results[0]=value.to_expr();
-      }
-      else
-      {
-        mp_integer value;
-        bool ret=to_integer(to_constant_expr(arg0), value);
-        DATA_INVARIANT(!ret, "failed to convert constant");
-        const typet type=java_type_from_char(statement[0]);
-        results[0]=from_integer(value, type);
-      }
+      results = convert_const(statement, arg0, results);
     }
     else if(statement==patternt("?ipush"))
     {
@@ -2002,6 +1971,45 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+exprt::operandst &java_bytecode_convert_methodt::convert_const(
+  const irep_idt &statement,
+  const exprt &arg0,
+  exprt::operandst &results) const
+{
+  const char type_char = statement[0];
+  const bool is_double('d' == type_char);
+  const bool is_float('f' == type_char);
+
+  if(is_double || is_float)
+  {
+    const ieee_float_spect spec(
+      is_float ? ieee_float_spect::single_precision()
+               : ieee_float_spect::double_precision());
+
+    ieee_floatt value(spec);
+    if(arg0.type().id() != ID_floatbv)
+    {
+      mp_integer number;
+      bool ret = to_integer(to_constant_expr(arg0), number);
+      DATA_INVARIANT(!ret, "failed to convert constant");
+      value.from_integer(number);
+    }
+    else
+      value.from_expr(to_constant_expr(arg0));
+
+    results[0] = value.to_expr();
+  }
+  else
+  {
+    mp_integer value;
+    bool ret = to_integer(to_constant_expr(arg0), value);
+    DATA_INVARIANT(!ret, "failed to convert constant");
+    const typet type = java_type_from_char(statement[0]);
+    results[0] = from_integer(value, type);
+  }
+  return results;
 }
 
 void java_bytecode_convert_methodt::convert_invoke(
