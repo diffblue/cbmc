@@ -1602,16 +1602,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       mp_integer number;
       bool ret=to_integer(to_constant_expr(arg0), number);
       INVARIANT(!ret, "ifnonnull argument should be an integer");
-      code_ifthenelset code_branch;
-      const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
-      const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
-      code_branch.cond()=binary_relation_exprt(lhs, ID_notequal, rhs);
-      code_branch.then_case()=code_gotot(label(integer2string(number)));
-      code_branch.then_case().add_source_location()=
-        address_map.at(integer2unsigned(number)).source->source_location;
-      code_branch.add_source_location()=i_it->source_location;
-
-      c=code_branch;
+      c = convert_ifnonull(address_map, op, number, i_it->source_location);
     }
     else if(statement==patternt("ifnull"))
     {
@@ -2559,6 +2550,23 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+codet java_bytecode_convert_methodt::convert_ifnonull(
+  const java_bytecode_convert_methodt::address_mapt &address_map,
+  const exprt::operandst &op,
+  const mp_integer &number,
+  const source_locationt &location) const
+{
+  code_ifthenelset code_branch;
+  const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
+  const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
+  code_branch.cond() = binary_relation_exprt(lhs, ID_notequal, rhs);
+  code_branch.then_case() = code_gotot(label(integer2string(number)));
+  code_branch.then_case().add_source_location() =
+    address_map.at(integer2unsigned(number)).source->source_location;
+  code_branch.add_source_location() = location;
+  return code_branch;
 }
 
 codet java_bytecode_convert_methodt::convert_if(

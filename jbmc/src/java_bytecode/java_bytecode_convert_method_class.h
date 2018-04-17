@@ -349,5 +349,17 @@ protected:
     const irep_idt &id,
     const mp_integer &number,
     const source_locationt &location) const;
+
+  codet convert_ifnonull(
+    const java_bytecode_convert_methodt::address_mapt &address_map,
+    const exprt::operandst &op,
+    const mp_integer &number,
+    const source_locationt &location) const;
+
+  codet convert_ifnull(
+    java_bytecode_convert_methodt::address_mapt &address_map,
+    const exprt::operandst &op,
+    const mp_integer &number,
+    const source_locationt &location);
 };
 #endif
