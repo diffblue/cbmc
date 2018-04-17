@@ -1929,17 +1929,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="monitorenter")
     {
-      // becomes a function call
-      code_typet type;
-      type.return_type()=void_typet();
-      type.parameters().resize(1);
-      type.parameters()[0].type()=java_reference_type(void_typet());
-      code_function_callt call;
-      call.function()=symbol_exprt("java::monitorenter", type);
-      call.lhs().make_nil();
-      call.arguments().push_back(op[0]);
-      call.add_source_location()=i_it->source_location;
-      c=call;
+      c = convert_monitorenter(i_it->source_location, op);
     }
     else if(statement=="monitorexit")
     {
@@ -2308,6 +2298,22 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+codet java_bytecode_convert_methodt::convert_monitorenter(
+  const source_locationt &location,
+  const exprt::operandst &op) const
+{
+  code_typet type;
+  type.return_type() = void_typet();
+  type.parameters().resize(1);
+  type.parameters()[0].type() = java_reference_type(void_typet());
+  code_function_callt call;
+  call.function() = symbol_exprt("java::monitorenter", type);
+  call.lhs().make_nil();
+  call.arguments().push_back(op[0]);
+  call.add_source_location() = location;
+  return call;
 }
 
 void java_bytecode_convert_methodt::convert_multianewarray(

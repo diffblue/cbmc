@@ -416,5 +416,9 @@ protected:
     const exprt::operandst &op,
     codet &c,
     exprt::operandst &results);
+
+  codet convert_monitorenter(
+    const source_locationt &location,
+    const exprt::operandst &op) const;
 };
 #endif
