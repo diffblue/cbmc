@@ -1068,10 +1068,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(i_it->statement=="jsr" ||
          i_it->statement=="jsr_w")
       {
-        assert(
-          next!=instructions.end() &&
-          "jsr without valid return address?");
         auto next = std::next(i_it);
+        DATA_INVARIANT(
+          next != instructions.end(), "jsr should have valid return address");
         targets.insert(next->address);
         jsr_ret_targets.push_back(next->address);
       }
