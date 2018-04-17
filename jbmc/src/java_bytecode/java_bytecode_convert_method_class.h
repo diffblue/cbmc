@@ -420,5 +420,11 @@ protected:
   codet convert_monitorenter(
     const source_locationt &location,
     const exprt::operandst &op) const;
+
+  codet &do_exception_handling(
+    const methodt &method,
+    const std::set<unsigned int> &working_set,
+    unsigned int cur_pc,
+    codet &c);
 };
 #endif

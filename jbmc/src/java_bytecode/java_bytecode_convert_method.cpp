@@ -1961,109 +1961,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       c.operands()=op;
     }
 
-    // next we do the exception handling
-    std::vector<irep_idt> exception_ids;
-    std::vector<irep_idt> handler_labels;
-
-    // for each try-catch add a CATCH-PUSH instruction
-    // each CATCH-PUSH records a list of all the handler labels
-    // together with a list of all the exception ids
-
-    // be aware of different try-catch blocks with the same starting pc
-    std::size_t pos=0;
-    std::size_t end_pc=0;
-    while(pos<method.exception_table.size())
-    {
-      // check if this is the beginning of a try block
-      for(; pos<method.exception_table.size(); ++pos)
-      {
-        // unexplored try-catch?
-        if(cur_pc==method.exception_table[pos].start_pc && end_pc==0)
-        {
-          end_pc=method.exception_table[pos].end_pc;
-        }
-
-        // currently explored try-catch?
-        if(cur_pc==method.exception_table[pos].start_pc &&
-           method.exception_table[pos].end_pc==end_pc)
-        {
-          exception_ids.push_back(
-            method.exception_table[pos].catch_type.get_identifier());
-          // record the exception handler in the CATCH-PUSH
-          // instruction by generating a label corresponding to
-          // the handler's pc
-          handler_labels.push_back(
-            label(std::to_string(method.exception_table[pos].handler_pc)));
-        }
-        else
-          break;
-      }
-
-      // add the actual PUSH-CATCH instruction
-      if(!exception_ids.empty())
-      {
-        code_push_catcht catch_push;
-        INVARIANT(
-          exception_ids.size()==handler_labels.size(),
-          "Exception tags and handler labels should be 1-to-1");
-        code_push_catcht::exception_listt &exception_list=
-          catch_push.exception_list();
-        for(size_t i=0; i<exception_ids.size(); ++i)
-        {
-          exception_list.push_back(
-            code_push_catcht::exception_list_entryt(
-              exception_ids[i],
-              handler_labels[i]));
-        }
-
-        code_blockt try_block;
-        try_block.move_to_operands(catch_push);
-        try_block.move_to_operands(c);
-        c=try_block;
-      }
-      else
-      {
-        // advance
-        ++pos;
-      }
-
-      // reset
-      end_pc=0;
-      exception_ids.clear();
-      handler_labels.clear();
-    }
-
-    // next add the CATCH-POP instructions
-    size_t start_pc=0;
-    // as the first try block may have start_pc 0, we
-    // must track it separately
-    bool first_handler=false;
-    // check if this is the end of a try block
-    for(const auto &exception_row : method.exception_table)
-    {
-      // add the CATCH-POP before the end of the try block
-      if(cur_pc<exception_row.end_pc &&
-         !working_set.empty() &&
-         *working_set.begin()==exception_row.end_pc)
-      {
-        // have we already added a CATCH-POP for the current try-catch?
-        // (each row corresponds to a handler)
-        if(exception_row.start_pc!=start_pc || !first_handler)
-        {
-          if(!first_handler)
-            first_handler=true;
-          // remember the beginning of the try-catch so that we don't add
-          // another CATCH-POP for the same try-catch
-          start_pc=exception_row.start_pc;
-          // add CATCH_POP instruction
-          code_pop_catcht catch_pop;
-          code_blockt end_try_block;
-          end_try_block.move_to_operands(c);
-          end_try_block.move_to_operands(catch_pop);
-          c=end_try_block;
-        }
-      }
-    }
+    c = do_exception_handling(method, working_set, cur_pc, c);
 
     // Finally if this is the beginning of a catch block (already determined
     // before the big bytecode switch), insert the exception 'landing pad'
@@ -2298,6 +2196,117 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+codet &java_bytecode_convert_methodt::do_exception_handling(
+  const java_bytecode_convert_methodt::methodt &method,
+  const std::set<unsigned int> &working_set,
+  unsigned int cur_pc,
+  codet &c)
+{
+  std::vector<irep_idt> exception_ids;
+  std::vector<irep_idt> handler_labels;
+
+  // for each try-catch add a CATCH-PUSH instruction
+  // each CATCH-PUSH records a list of all the handler labels
+  // together with a list of all the exception ids
+
+  // be aware of different try-catch blocks with the same starting pc
+  std::size_t pos = 0;
+  std::size_t end_pc = 0;
+  while(pos < method.exception_table.size())
+  {
+    // check if this is the beginning of a try block
+    for(; pos < method.exception_table.size(); ++pos)
+    {
+      // unexplored try-catch?
+      if(cur_pc == method.exception_table[pos].start_pc && end_pc == 0)
+      {
+        end_pc = method.exception_table[pos].end_pc;
+      }
+
+      // currently explored try-catch?
+      if(
+        cur_pc == method.exception_table[pos].start_pc &&
+        method.exception_table[pos].end_pc == end_pc)
+      {
+        exception_ids.push_back(
+          method.exception_table[pos].catch_type.get_identifier());
+        // record the exception handler in the CATCH-PUSH
+        // instruction by generating a label corresponding to
+        // the handler's pc
+        handler_labels.push_back(
+          label(std::to_string(method.exception_table[pos].handler_pc)));
+      }
+      else
+        break;
+    }
+
+    // add the actual PUSH-CATCH instruction
+    if(!exception_ids.empty())
+    {
+      code_push_catcht catch_push;
+      INVARIANT(
+        exception_ids.size() == handler_labels.size(),
+        "Exception tags and handler labels should be 1-to-1");
+      code_push_catcht::exception_listt &exception_list =
+        catch_push.exception_list();
+      for(size_t i = 0; i < exception_ids.size(); ++i)
+      {
+        exception_list.push_back(
+          code_push_catcht::exception_list_entryt(
+            exception_ids[i], handler_labels[i]));
+      }
+
+      code_blockt try_block;
+      try_block.move_to_operands(catch_push);
+      try_block.move_to_operands(c);
+      c = try_block;
+    }
+    else
+    {
+      // advance
+      ++pos;
+    }
+
+    // reset
+    end_pc = 0;
+    exception_ids.clear();
+    handler_labels.clear();
+  }
+
+  // next add the CATCH-POP instructions
+  size_t start_pc = 0;
+  // as the first try block may have start_pc 0, we
+  // must track it separately
+  bool first_handler = false;
+  // check if this is the end of a try block
+  for(const auto &exception_row : method.exception_table)
+  {
+    // add the CATCH-POP before the end of the try block
+    if(
+      cur_pc < exception_row.end_pc && !working_set.empty() &&
+      *working_set.begin() == exception_row.end_pc)
+    {
+      // have we already added a CATCH-POP for the current try-catch?
+      // (each row corresponds to a handler)
+      if(exception_row.start_pc != start_pc || !first_handler)
+      {
+        if(!first_handler)
+          first_handler = true;
+        // remember the beginning of the try-catch so that we don't add
+        // another CATCH-POP for the same try-catch
+        start_pc = exception_row.start_pc;
+        // add CATCH_POP instruction
+        code_pop_catcht catch_pop;
+        code_blockt end_try_block;
+        end_try_block.move_to_operands(c);
+        end_try_block.move_to_operands(catch_pop);
+        c = end_try_block;
+      }
+    }
+  }
+  return c;
 }
 
 codet java_bytecode_convert_methodt::convert_monitorenter(
