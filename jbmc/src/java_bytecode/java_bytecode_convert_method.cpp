@@ -1749,7 +1749,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
       else
         op=pop(1);
 
-      assert(!stack.empty());
       exprt::operandst op2;
 
       if(get_bytecode_type_width(stack.back().type())==32)
