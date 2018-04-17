@@ -1091,17 +1091,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       ret_instructions.push_back(i_it);
     }
   }
-
-  // Draw edges from every `ret` to every `jsr` successor. Could do better with
-  // flow analysis to distinguish multiple subroutines within the same function.
-  for(const auto retinst : ret_instructions)
-  {
-    auto &a_entry=address_map.at(retinst->address);
-    a_entry.successors.insert(
-      a_entry.successors.end(),
-      jsr_ret_targets.begin(),
-      jsr_ret_targets.end());
-  }
+  draw_edges_from_ret_to_jsr(address_map, jsr_ret_targets, ret_instructions);
 
   for(const auto &address : address_map)
   {
@@ -2717,6 +2707,22 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+void java_bytecode_convert_methodt::draw_edges_from_ret_to_jsr(
+  java_bytecode_convert_methodt::address_mapt &address_map,
+  const std::vector<unsigned int> &jsr_ret_targets,
+  const std::vector<
+    std::vector<java_bytecode_parse_treet::instructiont>::const_iterator>
+    &ret_instructions) const
+{ // Draw edges from every `ret` to every `jsr` successor. Could do better with
+  // flow analysis to distinguish multiple subroutines within the same function.
+  for(const auto &retinst : ret_instructions)
+  {
+    auto &a_entry = address_map.at(retinst->address);
+    a_entry.successors.insert(
+      a_entry.successors.end(), jsr_ret_targets.begin(), jsr_ret_targets.end());
+  }
 }
 
 std::vector<unsigned> java_bytecode_convert_methodt::try_catch_handler(

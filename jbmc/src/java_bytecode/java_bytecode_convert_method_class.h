@@ -279,4 +279,12 @@ protected:
     const java_bytecode_parse_treet::methodt::exception_tablet &exception_table)
     const;
 
+  void draw_edges_from_ret_to_jsr(
+    address_mapt &address_map,
+    const std::vector<unsigned int> &jsr_ret_targets,
+    const std::vector<
+      std::vector<java_bytecode_parse_treet::instructiont>::const_iterator>
+      &ret_instructions) const;
+};
+
 #endif
