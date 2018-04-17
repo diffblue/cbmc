@@ -138,6 +138,8 @@ public:
 
   valuest values;
 
+  bool try_evaluate(exprt &expr, const namespacet &ns) const;
+
 protected:
   void assign_rec(
     valuest &values,

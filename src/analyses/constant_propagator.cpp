@@ -22,6 +22,7 @@ Author: Peter Schrammel
 #include <util/cprover_prefix.h>
 
 #include <langapi/language_util.h>
+#include <goto-programs/adjust_float_expressions.h>
 
 void constant_propagator_domaint::assign_rec(
   valuest &values,
@@ -35,8 +36,7 @@ void constant_propagator_domaint::assign_rec(
   const symbol_exprt &s=to_symbol_expr(lhs);
 
   exprt tmp=rhs;
-  values.replace_const(tmp);
-  simplify(tmp, ns);
+  try_evaluate(tmp, ns);
 
   if(tmp.is_constant())
     values.set_to(s, tmp);
@@ -99,10 +99,10 @@ void constant_propagator_domaint::transform(
     // Comparing iterators is safe as the target must be within the same list
     // of instructions because this is a GOTO.
     if(from->get_target()==to)
-      g=simplify_expr(from->guard, ns);
+      g = from->guard;
     else
-      g=simplify_expr(not_exprt(from->guard), ns);
-
+      g = not_exprt(from->guard);
+    try_evaluate(g, ns);
     if(g.is_false())
      values.set_to_bottom();
     else
@@ -269,10 +269,7 @@ bool constant_propagator_domaint::ai_simplify(
   exprt &condition,
   const namespacet &ns) const
 {
-  bool b=values.replace_const.replace(condition);
-  b&=simplify(condition, ns);
-
-  return b;
+  return try_evaluate(condition, ns);
 }
 
 
@@ -504,6 +501,21 @@ bool constant_propagator_domaint::merge(
   return values.merge(other.values);
 }
 
+/// Attempt to evaluate expression using domain knowledge
+/// This function changes the expression that is passed into it.
+/// \param expr The expression to evaluate
+/// \param ns The namespace for symbols in the expression
+/// \return True if the expression is unchanged, false otherwise
+bool constant_propagator_domaint::try_evaluate(
+  exprt &expr,
+  const namespacet &ns) const
+{
+  adjust_float_expressions(expr, ns);
+  bool did_not_change_anything = values.replace_const.replace(expr);
+  did_not_change_anything &= simplify(expr, ns);
+  return did_not_change_anything;
+}
+
 void constant_propagator_ait::replace(
   goto_functionst &goto_functions,
   const namespacet &ns)
@@ -529,38 +541,34 @@ void constant_propagator_ait::replace(
 
     if(it->is_goto() || it->is_assume() || it->is_assert())
     {
-      s_it->second.values.replace_const(it->guard);
-      simplify(it->guard, ns);
+      s_it->second.try_evaluate(it->guard, ns);
     }
     else if(it->is_assign())
     {
       exprt &rhs=to_code_assign(it->code).rhs();
-      s_it->second.values.replace_const(rhs);
-      simplify(rhs, ns);
+      s_it->second.try_evaluate(rhs, ns);
       if(rhs.id()==ID_constant)
         rhs.add_source_location()=it->code.op0().source_location();
     }
     else if(it->is_function_call())
     {
-      s_it->second.values.replace_const(
-        to_code_function_call(it->code).function());
-
-      simplify(to_code_function_call(it->code).function(), ns);
+      exprt &function = to_code_function_call(it->code).function();
+      s_it->second.try_evaluate(function, ns);
 
       exprt::operandst &args=
         to_code_function_call(it->code).arguments();
 
-      for(exprt::operandst::iterator o_it=args.begin();
-          o_it!=args.end(); ++o_it)
+      for(auto &arg : args)
       {
-        s_it->second.values.replace_const(*o_it);
-        simplify(*o_it, ns);
+        s_it->second.try_evaluate(arg, ns);
       }
     }
     else if(it->is_other())
     {
       if(it->code.get_statement()==ID_expression)
-        s_it->second.values.replace_const(it->code);
+      {
+        s_it->second.try_evaluate(it->code, ns);
+      }
     }
   }
 }
