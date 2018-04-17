@@ -367,5 +367,10 @@ protected:
     const exprt &arg1,
     const source_locationt &location,
     unsigned address);
+
+  exprt::operandst &convert_ushr(
+    const irep_idt &statement,
+    const exprt::operandst &op,
+    exprt::operandst &results) const;
 };
 #endif

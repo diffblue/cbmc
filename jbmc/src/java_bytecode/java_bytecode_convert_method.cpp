@@ -1644,21 +1644,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?ushr"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
-      const typet type=java_type_from_char(statement[0]);
-
-      const std::size_t width=type.get_size_t(ID_width);
-      typet target=unsignedbv_typet(width);
-
-      exprt lhs=op[0];
-      if(lhs.type()!=target)
-        lhs.make_typecast(target);
-      exprt rhs=op[1];
-      if(rhs.type()!=target)
-        rhs.make_typecast(target);
-
-      results[0]=lshr_exprt(lhs, rhs);
-      if(results[0].type()!=op[0].type())
-        results[0].make_typecast(op[0].type());
+      results = convert_ushr(statement, op, results);
     }
     else if(statement==patternt("?add"))
     {
@@ -2520,6 +2506,29 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+exprt::operandst &java_bytecode_convert_methodt::convert_ushr(
+  const irep_idt &statement,
+  const exprt::operandst &op,
+  exprt::operandst &results) const
+{
+  const typet type = java_type_from_char(statement[0]);
+
+  const std::size_t width = type.get_size_t(ID_width);
+  typet target = unsignedbv_typet(width);
+
+  exprt lhs = op[0];
+  if(lhs.type() != target)
+    lhs.make_typecast(target);
+  exprt rhs = op[1];
+  if(rhs.type() != target)
+    rhs.make_typecast(target);
+
+  results[0] = lshr_exprt(lhs, rhs);
+  if(results[0].type() != op[0].type())
+    results[0].make_typecast(op[0].type());
+  return results;
 }
 
 codet java_bytecode_convert_methodt::convert_iinc(
