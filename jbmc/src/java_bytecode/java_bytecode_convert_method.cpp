@@ -1682,26 +1682,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?cmp"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
-
-      // The integer result on the stack is:
-      //  0 if op[0] equals op[1]
-      // -1 if op[0] is less than op[1]
-      //  1 if op[0] is greater than op[1]
-
-      const typet t=java_int_type();
-      exprt one=from_integer(1, t);
-      exprt minus_one=from_integer(-1, t);
-
-      if_exprt greater=if_exprt(
-        binary_relation_exprt(op[0], ID_gt, op[1]),
-        one,
-        minus_one);
-
-      results[0]=
-        if_exprt(
-          binary_relation_exprt(op[0], ID_equal, op[1]),
-          from_integer(0, t),
-          greater);
+      results = convert_cmp(op, results);
     }
     else if(statement==patternt("?cmp?"))
     {
@@ -2506,6 +2487,26 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+exprt::operandst &java_bytecode_convert_methodt::convert_cmp(
+  const exprt::operandst &op,
+  exprt::operandst &results) const
+{ // The integer result on the stack is:
+  //  0 if op[0] equals op[1]
+  // -1 if op[0] is less than op[1]
+  //  1 if op[0] is greater than op[1]
+
+  const typet t = java_int_type();
+  exprt one = from_integer(1, t);
+  exprt minus_one = from_integer(-1, t);
+
+  if_exprt greater =
+    if_exprt(binary_relation_exprt(op[0], ID_gt, op[1]), one, minus_one);
+
+  results[0] = if_exprt(
+    binary_relation_exprt(op[0], ID_equal, op[1]), from_integer(0, t), greater);
+  return results;
 }
 
 exprt::operandst &java_bytecode_convert_methodt::convert_ushr(

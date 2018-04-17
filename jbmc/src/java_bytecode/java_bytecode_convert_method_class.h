@@ -372,5 +372,8 @@ protected:
     const irep_idt &statement,
     const exprt::operandst &op,
     exprt::operandst &results) const;
+
+  exprt::operandst &
+  convert_cmp(const exprt::operandst &op, exprt::operandst &results) const;
 };
 #endif
