@@ -380,5 +380,12 @@ protected:
     const irep_idt &statement,
     const exprt::operandst &op,
     exprt::operandst &results) const;
+
+  void convert_getstatic(
+    const exprt &arg0,
+    const symbol_exprt &symbol_expr,
+    bool is_assertions_disabled_field,
+    codet &c,
+    exprt::operandst &results);
 };
 #endif

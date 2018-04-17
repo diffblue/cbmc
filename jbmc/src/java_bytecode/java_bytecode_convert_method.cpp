@@ -1788,40 +1788,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
         symbol_table.has_symbol(symbol_expr.get_identifier()),
         "getstatic symbol should have been created before method conversion");
 
-      if(needed_lazy_methods)
-      {
-        if(arg0.type().id()==ID_symbol)
-        {
-          needed_lazy_methods->add_needed_class(
-            to_symbol_type(arg0.type()).get_identifier());
-        }
-        else if(arg0.type().id()==ID_pointer)
-        {
-          const auto &pointer_type=to_pointer_type(arg0.type());
-          if(pointer_type.subtype().id()==ID_symbol)
-          {
-            needed_lazy_methods->add_needed_class(
-              to_symbol_type(pointer_type.subtype()).get_identifier());
-          }
-        }
-        else if(is_assertions_disabled_field)
-        {
-          needed_lazy_methods->add_needed_class(arg0.get_string(ID_class));
-        }
-      }
-      results[0]=java_bytecode_promotion(symbol_expr);
-
-      // Note this initializer call deliberately inits the class used to make
-      // the reference, which may be a child of the class that actually defines
-      // the field.
-      codet clinit_call=get_clinit_call(arg0.get_string(ID_class));
-      if(clinit_call.get_statement()!=ID_skip)
-        c=clinit_call;
-      else if(is_assertions_disabled_field)
-      {
-        // set $assertionDisabled to false
-        c=code_assignt(symbol_expr, false_exprt());
-      }
+      convert_getstatic(
+        arg0, symbol_expr, is_assertions_disabled_field, c, results);
     }
     else if(statement=="putfield")
     {
@@ -2463,6 +2431,49 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+void java_bytecode_convert_methodt::convert_getstatic(
+  exprt &arg0,
+  const symbol_exprt &symbol_expr,
+  const bool is_assertions_disabled_field,
+  codet &c,
+  exprt::operandst &results)
+{
+  if(needed_lazy_methods)
+  {
+    if(arg0.type().id() == ID_symbol)
+    {
+      needed_lazy_methods->add_needed_class(
+        to_symbol_type(arg0.type()).get_identifier());
+    }
+    else if(arg0.type().id() == ID_pointer)
+    {
+      const auto &pointer_type = to_pointer_type(arg0.type());
+      if(pointer_type.subtype().id() == ID_symbol)
+      {
+        needed_lazy_methods->add_needed_class(
+          to_symbol_type(pointer_type.subtype()).get_identifier());
+      }
+    }
+    else if(is_assertions_disabled_field)
+    {
+      needed_lazy_methods->add_needed_class(arg0.get_string(ID_class));
+    }
+  }
+  results[0] = java_bytecode_promotion(symbol_expr);
+
+  // Note this initializer call deliberately inits the class used to make
+  // the reference, which may be a child of the class that actually defines
+  // the field.
+  codet clinit_call = get_clinit_call(arg0.get_string(ID_class));
+  if(clinit_call.get_statement() != ID_skip)
+    c = clinit_call;
+  else if(is_assertions_disabled_field)
+  {
+    // set $assertionDisabled to false
+    c = code_assignt(symbol_expr, false_exprt());
+  }
 }
 
 exprt::operandst &java_bytecode_convert_methodt::convert_cmp2(
