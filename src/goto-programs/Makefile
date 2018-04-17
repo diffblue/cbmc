@@ -43,9 +43,7 @@ SRC = basic_blocks.cpp \
       remove_calls_no_body.cpp \
       remove_complex.cpp \
       remove_const_function_pointers.cpp \
-      remove_exceptions.cpp \
       remove_function_pointers.cpp \
-      remove_instanceof.cpp \
       remove_returns.cpp \
       remove_skip.cpp \
       remove_unreachable.cpp \

@@ -12,13 +12,17 @@
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_virtual_functions.h>
-#include <util/config.h>
-#include <goto-instrument/cover.h>
-#include <util/options.h>
-#include <iostream>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/replace_java_nondet.h>
-#include <goto-programs/remove_instanceof.h>
+
+#include <java_bytecode/remove_instanceof.h>
+
+#include <util/config.h>
+#include <util/options.h>
+
+#include <goto-instrument/cover.h>
+
+#include <iostream>
 
 void validate_method_removal(
   std::list<goto_programt::instructiont> instructions)

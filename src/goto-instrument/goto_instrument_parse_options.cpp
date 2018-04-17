@@ -26,8 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
-#include <goto-programs/remove_exceptions.h>
-#include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
@@ -50,6 +48,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/add_failed_symbols.h>
 #include <pointer-analysis/show_value_sets.h>
+
+#include <java_bytecode/remove_exceptions.h>
+#include <java_bytecode/remove_instanceof.h>
 
 #include <analyses/natural_loops.h>
 #include <analyses/global_may_alias.h>

@@ -29,9 +29,7 @@ Author: Peter Schrammel
 #include <goto-programs/mm_io.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
-#include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_returns.h>
-#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_asm.h>
@@ -54,6 +52,8 @@ Author: Peter Schrammel
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/remove_instanceof.h>
+#include <java_bytecode/remove_exceptions.h>
 
 #include <langapi/mode.h>
 

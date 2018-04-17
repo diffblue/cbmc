@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_library_preprocess.h"
 #include "java_types.h"
 #include "java_utils.h"
+#include "remove_exceptions.h"
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -34,7 +35,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/zero_initializer.h>
 
 #include <goto-programs/cfg.h>
-#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/resolve_inherited_component.h>
 #include <analyses/cfg_dominators.h>
