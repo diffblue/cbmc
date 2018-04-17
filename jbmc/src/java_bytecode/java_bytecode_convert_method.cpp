@@ -1822,64 +1822,14 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       // use temporary since the stack symbol might get duplicated
       PRECONDITION(op.empty() && results.size() == 1);
-      convert_new(i_it, arg0, c, results);
+      convert_new(i_it->source_location, arg0, c, results);
     }
     else if(statement=="newarray" ||
             statement=="anewarray")
     {
       // the op is the array size
       PRECONDITION(op.size() == 1 && results.size() == 1);
-
-      char element_type;
-
-      if(statement=="newarray")
-      {
-        irep_idt id=arg0.type().id();
-
-        if(id==ID_bool)
-          element_type='z';
-        else if(id==ID_char)
-          element_type='c';
-        else if(id==ID_float)
-          element_type='f';
-        else if(id==ID_double)
-          element_type='d';
-        else if(id==ID_byte)
-          element_type='b';
-        else if(id==ID_short)
-          element_type='s';
-        else if(id==ID_int)
-          element_type='i';
-        else if(id==ID_long)
-          element_type='j';
-        else
-          element_type='?';
-      }
-      else
-        element_type='a';
-
-      const reference_typet ref_type=
-        java_array_type(element_type);
-
-      side_effect_exprt java_new_array(ID_java_new_array, ref_type);
-      java_new_array.copy_to_operands(op[0]);
-
-      if(!i_it->source_location.get_line().empty())
-        java_new_array.add_source_location()=i_it->source_location;
-
-      c=code_blockt();
-
-      if(max_array_length!=0)
-      {
-        constant_exprt size_limit=
-          from_integer(max_array_length, java_int_type());
-        binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
-        code_assumet assume_le_max_size(le_max_size);
-        c.move_to_operands(assume_le_max_size);
-      }
-      const exprt tmp=tmp_variable("newarray", ref_type);
-      c.copy_to_operands(code_assignt(tmp, java_new_array));
-      results[0]=tmp;
+      convert_newarray(i_it->source_location, statement, arg0, op, c, results);
     }
     else if(statement=="multianewarray")
     {
@@ -2382,6 +2332,64 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+void java_bytecode_convert_methodt::convert_newarray(
+  const source_locationt &location,
+  const irep_idt &statement,
+  const exprt &arg0,
+  const exprt::operandst &op,
+  codet &c,
+  exprt::operandst &results)
+{
+  char element_type;
+
+  if(statement == "newarray")
+  {
+    irep_idt id = arg0.type().id();
+
+    if(id == ID_bool)
+      element_type = 'z';
+    else if(id == ID_char)
+      element_type = 'c';
+    else if(id == ID_float)
+      element_type = 'f';
+    else if(id == ID_double)
+      element_type = 'd';
+    else if(id == ID_byte)
+      element_type = 'b';
+    else if(id == ID_short)
+      element_type = 's';
+    else if(id == ID_int)
+      element_type = 'i';
+    else if(id == ID_long)
+      element_type = 'j';
+    else
+      element_type = '?';
+  }
+  else
+    element_type = 'a';
+
+  const reference_typet ref_type = java_array_type(element_type);
+
+  side_effect_exprt java_new_array(ID_java_new_array, ref_type);
+  java_new_array.copy_to_operands(op[0]);
+
+  if(!location.get_line().empty())
+    java_new_array.add_source_location() = location;
+
+  c = code_blockt();
+
+  if(max_array_length != 0)
+  {
+    constant_exprt size_limit = from_integer(max_array_length, java_int_type());
+    binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
+    code_assumet assume_le_max_size(le_max_size);
+    c.move_to_operands(assume_le_max_size);
+  }
+  const exprt tmp = tmp_variable("newarray", ref_type);
+  c.copy_to_operands(code_assignt(tmp, java_new_array));
+  results[0] = tmp;
 }
 
 void java_bytecode_convert_methodt::convert_new(

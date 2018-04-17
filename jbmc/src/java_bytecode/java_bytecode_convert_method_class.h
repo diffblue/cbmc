@@ -401,5 +401,13 @@ protected:
     const exprt &arg0,
     codet &c,
     exprt::operandst &results);
+
+  void convert_newarray(
+    const source_locationt &location,
+    const irep_idt &statement,
+    const exprt &arg0,
+    const exprt::operandst &op,
+    codet &c,
+    exprt::operandst &results);
 };
 #endif
