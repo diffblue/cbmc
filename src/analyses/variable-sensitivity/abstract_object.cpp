@@ -15,6 +15,7 @@
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
 #include <util/type.h>
+#include <goto-programs/adjust_float_expressions.h>
 
 #include "abstract_object.h"
 
@@ -182,12 +183,14 @@ abstract_object_pointert abstract_objectt::expression_transform(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  exprt constant_replaced_expr=expr;
+  exprt adjusted_expr = expr;
+  adjust_float_expressions(adjusted_expr, ns);
+  exprt constant_replaced_expr = adjusted_expr;
   constant_replaced_expr.operands().clear();
 
   // Two passes over the expression - one for simplification,
   // another to check if there are any top subexpressions left
-  for(const exprt &op : expr.operands())
+  for(const exprt &op : adjusted_expr.operands())
   {
     abstract_object_pointert lhs_abstract_object=environment.eval(op, ns);
     const exprt &lhs_value=lhs_abstract_object->to_constant();
@@ -204,7 +207,6 @@ abstract_object_pointert abstract_objectt::expression_transform(
       constant_replaced_expr.operands().push_back(lhs_value);
     }
   }
-
   exprt simplified = simplify_expr(constant_replaced_expr, ns);
 
   for(const exprt &op : simplified.operands())
