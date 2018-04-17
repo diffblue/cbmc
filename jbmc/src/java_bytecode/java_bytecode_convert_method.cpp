@@ -1822,25 +1822,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       // use temporary since the stack symbol might get duplicated
       PRECONDITION(op.empty() && results.size() == 1);
-      const reference_typet ref_type=java_reference_type(arg0.type());
-      side_effect_exprt java_new_expr(ID_java_new, ref_type);
-
-      if(!i_it->source_location.get_line().empty())
-        java_new_expr.add_source_location()=i_it->source_location;
-
-      const exprt tmp=tmp_variable("new", ref_type);
-      c=code_assignt(tmp, java_new_expr);
-      c.add_source_location()=i_it->source_location;
-      codet clinit_call=
-        get_clinit_call(to_symbol_type(arg0.type()).get_identifier());
-      if(clinit_call.get_statement()!=ID_skip)
-      {
-        code_blockt ret_block;
-        ret_block.move_to_operands(clinit_call);
-        ret_block.move_to_operands(c);
-        c=std::move(ret_block);
-      }
-      results[0]=tmp;
+      convert_new(i_it, arg0, c, results);
     }
     else if(statement=="newarray" ||
             statement=="anewarray")
@@ -2400,6 +2382,33 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+void java_bytecode_convert_methodt::convert_new(
+  const source_locationt &location,
+  const exprt &arg0,
+  codet &c,
+  exprt::operandst &results)
+{
+  const reference_typet ref_type = java_reference_type(arg0.type());
+  side_effect_exprt java_new_expr(ID_java_new, ref_type);
+
+  if(!location.get_line().empty())
+    java_new_expr.add_source_location() = location;
+
+  const exprt tmp = tmp_variable("new", ref_type);
+  c = code_assignt(tmp, java_new_expr);
+  c.add_source_location() = location;
+  codet clinit_call =
+    get_clinit_call(to_symbol_type(arg0.type()).get_identifier());
+  if(clinit_call.get_statement() != ID_skip)
+  {
+    code_blockt ret_block;
+    ret_block.move_to_operands(clinit_call);
+    ret_block.move_to_operands(c);
+    c = std::move(ret_block);
+  }
+  results[0] = tmp;
 }
 
 codet java_bytecode_convert_methodt::convert_putstatic(

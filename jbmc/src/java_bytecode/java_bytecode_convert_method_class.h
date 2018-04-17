@@ -395,5 +395,11 @@ protected:
     const exprt &arg0,
     const exprt::operandst &op,
     const symbol_exprt &symbol_expr);
+
+  void convert_new(
+    const source_locationt &location,
+    const exprt &arg0,
+    codet &c,
+    exprt::operandst &results);
 };
 #endif
