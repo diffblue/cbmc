@@ -1097,9 +1097,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
   {
     for(unsigned s : address.second.successors)
     {
-      address_mapt::iterator a_it=address_map.find(s);
-      assert(a_it!=address_map.end());
-
+      const auto a_it = address_map.find(s);
+      CHECK_RETURN(a_it != address_map.end());
       a_it->second.predecessors.insert(address.first);
     }
   }
@@ -1121,28 +1120,26 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
   while(!working_set.empty())
   {
-    address_mapt::iterator a_it=address_map.find(*cur);
-    CHECK_RETURN(a_it != address_map.end());
     auto cur = working_set.begin();
+    auto address_it = address_map.find(*cur);
+    CHECK_RETURN(address_it != address_map.end());
+    auto &instruction = address_it->second;
     unsigned cur_pc=*cur;
     working_set.erase(cur);
 
-    if(a_it->second.done)
+    if(instruction.done)
       continue;
-    working_set
-      .insert(a_it->second.successors.begin(), a_it->second.successors.end());
+    working_set.insert(
+      instruction.successors.begin(), instruction.successors.end());
 
-    instructionst::const_iterator i_it=a_it->second.source;
-    stack.swap(a_it->second.stack);
-    a_it->second.stack.clear();
-    codet &c=a_it->second.code;
+    instructionst::const_iterator i_it = instruction.source;
+    stack.swap(instruction.stack);
+    instruction.stack.clear();
+    codet &c = instruction.code;
 
     assert(
-      stack.empty() ||
-      a_it->second.predecessors.size()<=1 ||
-      has_prefix(
-        stack.front().get_string(ID_C_base_name),
-        "$stack"));
+      stack.empty() || instruction.predecessors.size() <= 1 ||
+      has_prefix(stack.front().get_string(ID_C_base_name), "$stack"));
 
     irep_idt statement=i_it->statement;
     exprt arg0=i_it->args.size()>=1?i_it->args[0]:nil_exprt();
@@ -2488,8 +2485,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
     push(results);
 
-    a_it->second.done=true;
-    for(const unsigned address : a_it->second.successors)
+    instruction.done = true;
+    for(const unsigned address : instruction.successors)
     {
       address_mapt::iterator a_it2=address_map.find(address);
       CHECK_RETURN(a_it2 != address_map.end());
