@@ -1618,50 +1618,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
             statement=="lookupswitch")
     {
       PRECONDITION(op.size() == 1 && results.empty());
-
-      // we turn into switch-case
-      code_switcht code_switch;
-      code_switch.add_source_location()=i_it->source_location;
-      code_switch.value()=op[0];
-      code_blockt code_block;
-      code_block.add_source_location()=i_it->source_location;
-
-      bool is_label=true;
-      for(instructiont::argst::const_iterator
-          a_it=i_it->args.begin();
-          a_it!=i_it->args.end();
-          a_it++, is_label=!is_label)
-      {
-        if(is_label)
-        {
-          code_switch_caset code_case;
-          code_case.add_source_location()=i_it->source_location;
-
-          mp_integer number;
-          bool ret=to_integer(to_constant_expr(*a_it), number);
-          DATA_INVARIANT(!ret, "case label expected to be integer");
-          code_case.code()=code_gotot(label(integer2string(number)));
-          code_case.code().add_source_location()=
-            address_map.at(integer2unsigned(number)).source->source_location;
-
-          if(a_it==i_it->args.begin())
-            code_case.set_default();
-          else
-          {
-            instructiont::argst::const_iterator prev=a_it;
-            prev--;
-            code_case.case_op()=*prev;
-            if(code_case.case_op().type()!=op[0].type())
-              code_case.case_op().make_typecast(op[0].type());
-            code_case.case_op().add_source_location()=i_it->source_location;
-          }
-
-          code_block.add(code_case);
-        }
-      }
-
-      code_switch.body()=code_block;
-      c=code_switch;
+      c = convert_switch(address_map, op, i_it->args, i_it->source_location);
     }
     else if(statement=="pop" || statement=="pop2")
     {
@@ -1942,6 +1899,55 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+codet java_bytecode_convert_methodt::convert_switch(
+  java_bytecode_convert_methodt::address_mapt &address_map,
+  const exprt::operandst &op,
+  const java_bytecode_parse_treet::instructiont::argst &args,
+  const source_locationt &location)
+{
+  // we turn into switch-case
+  code_switcht code_switch;
+  code_switch.add_source_location() = location;
+  code_switch.value() = op[0];
+  code_blockt code_block;
+  code_block.add_source_location() = location;
+
+  bool is_label = true;
+  for(auto a_it = args.begin(); a_it != args.end();
+      a_it++, is_label = !is_label)
+  {
+    if(is_label)
+    {
+      code_switch_caset code_case;
+      code_case.add_source_location() = location;
+
+      mp_integer number;
+      bool ret = to_integer(to_constant_expr(*a_it), number);
+      DATA_INVARIANT(!ret, "case label expected to be integer");
+      code_case.code() = code_gotot(label(integer2string(number)));
+      code_case.code().add_source_location() =
+        address_map.at(integer2unsigned(number)).source->source_location;
+
+      if(a_it == args.begin())
+        code_case.set_default();
+      else
+      {
+        auto prev = a_it;
+        prev--;
+        code_case.case_op() = *prev;
+        if(code_case.case_op().type() != op[0].type())
+          code_case.case_op().make_typecast(op[0].type());
+        code_case.case_op().add_source_location() = location;
+      }
+
+      code_block.add(code_case);
+    }
+  }
+
+  code_switch.body() = code_block;
+  return code_switch;
 }
 
 void java_bytecode_convert_methodt::convert_dup2(
