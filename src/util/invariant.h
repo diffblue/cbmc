@@ -124,8 +124,8 @@ class invariant_failedt: public std::logic_error
 // This is *not* recommended as it can result in unpredictable behaviour
 // including silently reporting incorrect results.
 // This is also useful for checking side-effect freedom.
-#define INVARIANT(CONDITION, REASON) do {} while(0)
-#define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) do {} while(0)
+#define INVARIANT(CONDITION, REASON) do {} while(false)
+#define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) do {} while(false)
 
 #elif defined(CPROVER_INVARIANT_ASSERT)
 // Not recommended but provided for backwards compatability
@@ -202,19 +202,21 @@ inline void invariant_violated_string(
 #define __this_function__ __func__
 #endif
 
-#define INVARIANT(CONDITION, REASON) \
-  do /* NOLINT */ \
-  { \
-  if(!(CONDITION)) \
-    invariant_violated_string(__FILE__, __this_function__, __LINE__, (REASON)); /* NOLINT */  \
-  } while(0)
+#define INVARIANT(CONDITION, REASON)                                           \
+  do /* NOLINT */                                                              \
+  {                                                                            \
+    if(!(CONDITION))                                                           \
+      invariant_violated_string(                                               \
+        __FILE__, __this_function__, __LINE__, (REASON)); /* NOLINT */         \
+  } while(false)
 
-#define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) \
-  do /* NOLINT */ \
-  { \
-  if(!(CONDITION)) \
-    invariant_violated_structured<TYPENAME>(__FILE__, __this_function__, __LINE__, __VA_ARGS__); /* NOLINT */ \
-  } while(0)
+#define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...)                         \
+  do /* NOLINT */                                                              \
+  {                                                                            \
+    if(!(CONDITION))                                                           \
+      invariant_violated_structured<TYPENAME>(                                 \
+        __FILE__, __this_function__, __LINE__, __VA_ARGS__); /* NOLINT */      \
+  } while(false)
 
 #endif // End CPROVER_DO_NOT_CHECK / CPROVER_ASSERT / ... if block
 
@@ -260,8 +262,8 @@ inline void invariant_violated_string(
 
 // The following should not be used in new code and are only intended
 // to migrate documentation and "error handling" in older code
-#define TODO           INVARIANT(0, "Todo")
-#define UNIMPLEMENTED  INVARIANT(0, "Unimplemented")
-#define UNHANDLED_CASE INVARIANT(0, "Unhandled case")
+#define TODO           INVARIANT(false, "Todo")
+#define UNIMPLEMENTED  INVARIANT(false, "Unimplemented")
+#define UNHANDLED_CASE INVARIANT(false, "Unhandled case")
 
 #endif // CPROVER_UTIL_INVARIANT_H
