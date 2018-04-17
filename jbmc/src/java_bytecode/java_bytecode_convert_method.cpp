@@ -1514,22 +1514,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="dup2_x2")
     {
       PRECONDITION(!stack.empty() && results.empty());
-
-      if(get_bytecode_type_width(stack.back().type())==32)
-        op=pop(2);
-      else
-        op=pop(1);
-
-      exprt::operandst op2;
-
-      if(get_bytecode_type_width(stack.back().type())==32)
-        op2=pop(2);
-      else
-        op2=pop(1);
-
-      results.insert(results.end(), op.begin(), op.end());
-      results.insert(results.end(), op2.begin(), op2.end());
-      results.insert(results.end(), op.begin(), op.end());
+      convert_dup2_x2(op, results);
     }
     else if(statement=="dconst")
     {
@@ -1982,6 +1967,27 @@ void java_bytecode_convert_methodt::convert_dup2_x1(
     op = pop(2);
 
   results.insert(results.end(), op.begin() + 1, op.end());
+  results.insert(results.end(), op.begin(), op.end());
+}
+
+void java_bytecode_convert_methodt::convert_dup2_x2(
+  exprt::operandst &op,
+  exprt::operandst &results)
+{
+  if(get_bytecode_type_width(stack.back().type()) == 32)
+    op = pop(2);
+  else
+    op = pop(1);
+
+  exprt::operandst op2;
+
+  if(get_bytecode_type_width(stack.back().type()) == 32)
+    op2 = pop(2);
+  else
+    op2 = pop(1);
+
+  results.insert(results.end(), op.begin(), op.end());
+  results.insert(results.end(), op2.begin(), op2.end());
   results.insert(results.end(), op.begin(), op.end());
 }
 
