@@ -1238,34 +1238,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="invokedynamic")
     {
       // not used in Java
-      code_typet &code_type = to_code_type(arg0.type());
-
-      const optionalt<symbolt> &lambda_method_symbol = get_lambda_method_symbol(
-        lambda_method_handles,
-        code_type.get_int(ID_java_lambda_method_handle_index));
-      if(lambda_method_symbol.has_value())
-        debug() << "Converting invokedynamic for lambda: "
-                << lambda_method_symbol.value().name << eom;
-      else
-        debug() << "Converting invokedynamic for lambda with unknown handle "
-                   "type"
-                << eom;
-
-      const code_typet::parameterst &parameters(code_type.parameters());
-
-      pop(parameters.size());
-
-      const typet &return_type=code_type.return_type();
-
-      if(return_type.id()!=ID_empty)
+      if(
+        const auto res = convert_invoke_dynamic(
+          lambda_method_handles, i_it->source_location, arg0))
       {
         results.resize(1);
-        results[0]=
-          zero_initializer(
-            return_type,
-            i_it->source_location,
-            namespacet(symbol_table),
-            get_message_handler());
+        results[0] = *res;
       }
     }
     // replace calls to CProver.assume
@@ -2704,6 +2682,37 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
+  const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
+  const source_locationt &location,
+  const exprt &arg0)
+{
+  const code_typet &code_type = to_code_type(arg0.type());
+
+  const optionalt<symbolt> &lambda_method_symbol = get_lambda_method_symbol(
+    lambda_method_handles,
+    code_type.get_int(ID_java_lambda_method_handle_index));
+  if(lambda_method_symbol.has_value())
+    debug() << "Converting invokedynamic for lambda: "
+            << lambda_method_symbol.value().name << eom;
+  else
+    debug() << "Converting invokedynamic for lambda with unknown handle "
+               "type"
+            << eom;
+
+  const code_typet::parameterst &parameters(code_type.parameters());
+
+  pop(parameters.size());
+
+  const typet &return_type = code_type.return_type();
+
+  if(return_type.id() == ID_empty)
+    return {};
+
+  return zero_initializer(
+    return_type, location, namespacet(symbol_table), get_message_handler());
 }
 
 void java_bytecode_convert_methodt::draw_edges_from_ret_to_jsr(

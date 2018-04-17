@@ -285,6 +285,11 @@ protected:
     const std::vector<
       std::vector<java_bytecode_parse_treet::instructiont>::const_iterator>
       &ret_instructions) const;
+
+  optionalt<exprt> convert_invoke_dynamic(
+    const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
+    const source_locationt &location,
+    const exprt &arg0);
 };
 
 #endif
