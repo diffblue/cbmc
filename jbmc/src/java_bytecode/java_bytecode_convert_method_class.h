@@ -457,6 +457,8 @@ protected:
     const exprt &arg0,
     exprt::operandst &results) const;
 
+  void convert_dup2_x1(exprt::operandst &op, exprt::operandst &results);
+
   void convert_dup2(exprt::operandst &op, exprt::operandst &results);
 };
 #endif
