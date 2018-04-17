@@ -1504,14 +1504,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="dup2")
     {
       PRECONDITION(!stack.empty() && results.empty());
-
-      if(get_bytecode_type_width(stack.back().type())==32)
-        op=pop(2);
-      else
-        op=pop(1);
-
-      results.insert(results.end(), op.begin(), op.end());
-      results.insert(results.end(), op.begin(), op.end());
+      convert_dup2(op, results);
     }
     else if(statement=="dup2_x1")
     {
@@ -1971,6 +1964,19 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.move_to_operands(block);
 
   return code;
+}
+
+void java_bytecode_convert_methodt::convert_dup2(
+  exprt::operandst &op,
+  exprt::operandst &results)
+{
+  if(get_bytecode_type_width(stack.back().type()) == 32)
+    op = pop(2);
+  else
+    op = pop(1);
+
+  results.insert(results.end(), op.begin(), op.end());
+  results.insert(results.end(), op.begin(), op.end());
 }
 
 exprt::operandst &java_bytecode_convert_methodt::convert_const(
