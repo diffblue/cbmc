@@ -23,9 +23,9 @@ static std::function<bool(const typet &)> is_type(const typet &t1)
   return f;
 }
 
-SCENARIO("has_subtype", "[core][solvers][refinement][string_refinement]")
+SCENARIO("has_subtype", "[core][utils][has_subtype]")
 {
-  const symbol_tablet symbol_table;
+  symbol_tablet symbol_table;
   const namespacet ns(symbol_table);
 
   const typet char_type = java_char_type();
@@ -61,6 +61,34 @@ SCENARIO("has_subtype", "[core][solvers][refinement][string_refinement]")
     THEN("int is not a subtype")
     {
       REQUIRE_FALSE(has_subtype(ptr_type, is_type(int_type), ns));
+    }
+  }
+
+  GIVEN("a recursive struct definition")
+  {
+    symbol_typet symbol_type("A-struct");
+    struct_typet::componentt comp("ptr", pointer_type(symbol_type));
+    struct_typet struct_type;
+    struct_type.components().push_back(comp);
+
+    symbolt s;
+    s.type = struct_type;
+    s.name = "A-struct";
+    s.is_type = true;
+    symbol_table.add(s);
+
+    THEN("has_subtype terminates")
+    {
+      REQUIRE_FALSE(
+        has_subtype(struct_type, [&](const typet &t) { return false; }, ns));
+    }
+    THEN("symbol type is a subtype")
+    {
+      REQUIRE(has_subtype(struct_type, is_type(pointer_type(symbol_type)), ns));
+    }
+    THEN("struct type is a subtype")
+    {
+      REQUIRE(has_subtype(struct_type, is_type(struct_type), ns));
     }
   }
 }
