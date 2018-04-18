@@ -1,0 +1,11 @@
+KNOWNBUG
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Symbolic execution currently messes up the typing in "p = a + b + p;" making the
+right-hand side signed long rather than a pointer.
