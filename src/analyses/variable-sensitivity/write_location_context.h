@@ -1,12 +1,12 @@
 /*******************************************************************\
 
- Module: analyses variable-sensitivity
+ Module: analyses variable-sensitivity write_location_context
 
  Author: Diffblue Ltd.
 
 \*******************************************************************/
-#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_DEPENDENCY_CONTEXT_ABSTRACT_OBJECT_H
-#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_DEPENDENCY_CONTEXT_ABSTRACT_OBJECT_H
+#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_LOCATION_CONTEXT_H
+#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_LOCATION_CONTEXT_H
 
 #include <stack>
 #include <analyses/variable-sensitivity/abstract_object.h>
@@ -24,12 +24,12 @@
  * of this, 'context_abstract_objectt<T>' which provides the same
  * constructors as the standard 'abstract_objectt' class.
  */
-class dependency_context_abstract_objectt: public abstract_objectt
+class write_location_contextt: public abstract_objectt
 {
 public:
   // These constructors mirror those in the base abstract_objectt, but with
   // the addition of an extra argument which is the abstract_objectt to wrap.
-  explicit dependency_context_abstract_objectt(
+  explicit write_location_contextt(
     const abstract_object_pointert child,
     const typet &type):
       abstract_objectt(type)
@@ -37,7 +37,7 @@ public:
     child_abstract_object = child;
   }
 
-  dependency_context_abstract_objectt(
+  write_location_contextt(
     const abstract_object_pointert child,
     const typet &type,
     bool top,
@@ -47,7 +47,7 @@ public:
     child_abstract_object = child;
   }
 
-  explicit dependency_context_abstract_objectt(
+  explicit write_location_contextt(
     const abstract_object_pointert child,
     const exprt &expr,
     const abstract_environmentt &environment,
@@ -57,7 +57,7 @@ public:
     child_abstract_object = child;
   }
 
-  virtual ~dependency_context_abstract_objectt() {}
+  virtual ~write_location_contextt() {}
 
   // Standard abstract_objectt interface
 
@@ -170,32 +170,32 @@ private:
  * context information
  */
 template <class AOT>
-class context_abstract_objectt: public dependency_context_abstract_objectt
+class typed_write_location_contextt: public write_location_contextt
 {
 public:
-  explicit context_abstract_objectt(const typet &type):
-    dependency_context_abstract_objectt(
+  explicit typed_write_location_contextt(const typet &type):
+    write_location_contextt(
       abstract_object_pointert(new AOT(type)), type) {}
 
-  context_abstract_objectt(
+  typed_write_location_contextt(
     const typet &type,
     bool top,
     bool bottom):
-      dependency_context_abstract_objectt(
+      write_location_contextt(
         abstract_object_pointert(new AOT(type, top, bottom)),
           type,
           top,
           bottom) {}
 
-  explicit context_abstract_objectt(
+  explicit typed_write_location_contextt(
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns):
-      dependency_context_abstract_objectt(
+      write_location_contextt(
         abstract_object_pointert(new AOT(expr, environment, ns)),
         expr,
         environment,
         ns) {}
 };
-// NOLINTNEXTLINE(whitespace/line_length)
-#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_DEPENDENCY_CONTEXT_ABSTRACT_OBJECT_H
+
+#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_LOCATION_CONTEXT_H

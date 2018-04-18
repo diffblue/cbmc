@@ -101,44 +101,44 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
   {
   case CONSTANT:
     return initialize_abstract_object<
-      context_abstract_objectt<constant_abstract_valuet>>(
+      typed_write_location_contextt<constant_abstract_valuet>>(
         followed_type, top, bottom, e, environment, ns);
   case ARRAY_SENSITIVE:
     return initialize_abstract_object<
-      context_abstract_objectt<constant_array_abstract_objectt>>(
+      typed_write_location_contextt<constant_array_abstract_objectt>>(
         followed_type, top, bottom, e, environment, ns);
   case ARRAY_INSENSITIVE:
     return initialize_abstract_object<
-      context_abstract_objectt<array_abstract_objectt>>(
+      typed_write_location_contextt<array_abstract_objectt>>(
         followed_type, top, bottom, e, environment, ns);
   case POINTER_SENSITIVE:
     return initialize_abstract_object<
-      context_abstract_objectt<constant_pointer_abstract_objectt>>(
+      typed_write_location_contextt<constant_pointer_abstract_objectt>>(
         followed_type, top, bottom, e, environment, ns);
   case POINTER_INSENSITIVE:
     return initialize_abstract_object<
-      context_abstract_objectt<pointer_abstract_objectt>>(
+      typed_write_location_contextt<pointer_abstract_objectt>>(
         followed_type, top, bottom, e, environment, ns);
   case STRUCT_SENSITIVE:
     return initialize_abstract_object<
-      context_abstract_objectt<full_struct_abstract_objectt>>(
+      typed_write_location_contextt<full_struct_abstract_objectt>>(
         followed_type, top, bottom, e, environment, ns);
   case STRUCT_INSENSITIVE:
     return initialize_abstract_object<
-      context_abstract_objectt<struct_abstract_objectt>>(
+      typed_write_location_contextt<struct_abstract_objectt>>(
         followed_type, top, bottom, e, environment, ns);
   case UNION_INSENSITIVE:
     return initialize_abstract_object<
-      context_abstract_objectt<union_abstract_objectt>>(
+      typed_write_location_contextt<union_abstract_objectt>>(
         followed_type, top, bottom, e, environment, ns);
   case TWO_VALUE:
     return initialize_abstract_object<
-      context_abstract_objectt<abstract_objectt>>(
+      typed_write_location_contextt<abstract_objectt>>(
         followed_type, top, bottom, e, environment, ns);
   default:
     UNREACHABLE;
     return initialize_abstract_object<
-      context_abstract_objectt<abstract_objectt>>(
+      typed_write_location_contextt<abstract_objectt>>(
         followed_type, top, bottom, e, environment, ns);
   }
 }
