@@ -110,8 +110,8 @@ void overflow_instrumentert::overflow_expr(
     }
 
     const typet &old_type=ns.follow(expr.op0().type());
-    const std::size_t new_width = expr.type().get_size_t(ID_width);
-    const std::size_t old_width = old_type.get_size_t(ID_width);
+    const std::size_t new_width = to_bitvector_type(expr.type()).get_width();
+    const std::size_t old_width = to_bitvector_type(old_type).get_width();
 
     if(type.id()==ID_signedbv)
     {

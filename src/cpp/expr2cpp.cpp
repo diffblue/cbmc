@@ -295,7 +295,8 @@ std::string expr2cppt::convert_rec(
   }
   else if(src.id()==ID_verilog_signedbv ||
           src.id()==ID_verilog_unsignedbv)
-    return "sc_lv["+id2string(src.get(ID_width))+"]"+d;
+    return "sc_lv[" + std::to_string(to_bitvector_type(src).get_width()) + "]" +
+           d;
   else if(src.id()==ID_unassigned)
     return "?";
   else if(src.id()==ID_code)

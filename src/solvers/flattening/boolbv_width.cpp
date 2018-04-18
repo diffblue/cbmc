@@ -105,7 +105,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
           type_id==ID_verilog_unsignedbv)
   {
     // we encode with two bits
-    std::size_t size = type.get_size_t(ID_width);
+    std::size_t size = to_bitvector_type(type).get_width();
     DATA_INVARIANT(
       size > 0, "verilog bitvector width shall be greater than zero");
     entry.total_width = size * 2;
@@ -175,7 +175,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   else if(type_id==ID_c_enum)
   {
     // these have a subtype
-    entry.total_width = type.subtype().get_size_t(ID_width);
+    entry.total_width = to_bitvector_type(type.subtype()).get_width();
     CHECK_RETURN(entry.total_width > 0);
   }
   else if(type_id==ID_incomplete_c_enum)

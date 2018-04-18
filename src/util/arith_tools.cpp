@@ -153,7 +153,7 @@ constant_exprt from_integer(
   else if(type_id==ID_c_enum)
   {
     const std::size_t width =
-      to_c_enum_type(type).subtype().get_size_t(ID_width);
+      to_bitvector_type(to_c_enum_type(type).subtype()).get_width();
     return constant_exprt(integer2bvrep(int_value, width), type);
   }
   else if(type_id==ID_c_bool)

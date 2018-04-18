@@ -43,7 +43,7 @@ void bv_spect::from_type(const typet &type)
   else
     UNREACHABLE;
 
-  width=unsafe_string2unsigned(type.get_string(ID_width));
+  width = to_bitvector_type(type).get_width();
 }
 
 void bv_arithmetict::print(std::ostream &out) const

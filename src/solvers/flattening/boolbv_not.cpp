@@ -19,9 +19,10 @@ bvt boolbvt::convert_not(const not_exprt &expr)
   if(op_type.id()!=ID_verilog_signedbv ||
      op_type.id()!=ID_verilog_unsignedbv)
   {
-    if((expr.type().id()==ID_verilog_signedbv ||
-        expr.type().id()==ID_verilog_unsignedbv) &&
-        expr.type().get_size_t(ID_width) == 1)
+    if(
+      (expr.type().id() == ID_verilog_signedbv ||
+       expr.type().id() == ID_verilog_unsignedbv) &&
+      to_bitvector_type(expr.type()).get_width() == 1)
     {
       literalt has_x_or_z=bv_utils.verilog_bv_has_x_or_z(op_bv);
       literalt normal_bits_zero=

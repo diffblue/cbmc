@@ -784,8 +784,8 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
     typecheck_expr(size);
 
     bool size_is_unsigned=(size.type().id()==ID_unsignedbv);
-    typet integer_type(size_is_unsigned?ID_unsignedbv:ID_signedbv);
-    integer_type.set(ID_width, config.ansi_c.int_width);
+    bitvector_typet integer_type(
+      size_is_unsigned ? ID_unsignedbv : ID_signedbv, config.ansi_c.int_width);
     implicit_typecast(size, integer_type);
 
     expr.set(ID_statement, ID_cpp_new_array);
