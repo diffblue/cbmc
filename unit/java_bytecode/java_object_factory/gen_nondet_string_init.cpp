@@ -59,7 +59,7 @@ SCENARIO(
         const std::regex numbers("\\$[0-9]*");
         for(auto op : code.operands())
         {
-          const std::string line = from_expr(ns, "", op);
+          const std::string line = from_expr(ns, "arg", op);
           code_string.push_back(
             std::regex_replace(
               std::regex_replace(line, spaces, " "), numbers, ""));

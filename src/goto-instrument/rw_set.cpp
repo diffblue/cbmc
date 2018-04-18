@@ -29,7 +29,7 @@ void rw_set_baset::output(std::ostream &out) const
       it++)
   {
     out << it->second.object << " if "
-        << from_expr(ns, "", it->second.guard) << '\n';
+        << from_expr(ns, it->second.object, it->second.guard) << '\n';
   }
 
   out << '\n';
@@ -40,7 +40,7 @@ void rw_set_baset::output(std::ostream &out) const
       it++)
   {
     out << it->second.object << " if "
-        << from_expr(ns, "", it->second.guard) << '\n';
+        << from_expr(ns, it->second.object, it->second.guard) << '\n';
   }
 }
 

@@ -21,8 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/guard.h>
-
-#include <langapi/language_util.h>
+#include <util/format_expr.h>
 
 void symex_slice_by_tracet::slice_by_trace(
   std::string trace_files,
@@ -258,10 +257,10 @@ void symex_slice_by_tracet::compute_ts_back(
 
 #if 0
       std::cout << "EVENT:  " << event << '\n';
-      std::cout << "GUARD:  " << from_expr(ns, "", guard) << '\n';
+      std::cout << "GUARD:  " << format(guard) << '\n';
       for(size_t j=0; j < t.size(); j++)
       {
-        std::cout << "t[" << j << "]=" << from_expr(ns, "", t[j]) <<
+        std::cout << "t[" << j << "]=" << format(t[j]) <<
           '\n';
       }
 #endif

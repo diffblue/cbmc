@@ -465,9 +465,9 @@ bool compilet::parse(const std::string &file_name)
   if(override_language!="")
   {
     if(override_language=="c++" || override_language=="c++-header")
-      languagep=get_language_from_mode("cpp");
+      languagep = get_language_from_mode(ID_cpp);
     else
-      languagep=get_language_from_mode("C");
+      languagep = get_language_from_mode(ID_C);
   }
   else
     languagep=get_language_from_filename(file_name);

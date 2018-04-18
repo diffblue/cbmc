@@ -147,7 +147,8 @@ void convert(
 
         for(const auto &arg : step.io_args)
         {
-          xml_output.new_element("value").data=from_expr(ns, "", arg);
+          xml_output.new_element("value").data =
+            from_expr(ns, step.pc->function, arg);
           xml_output.new_element("value_expression").
             new_element(xml(arg, ns));
         }
@@ -165,7 +166,8 @@ void convert(
 
         for(const auto &arg : step.io_args)
         {
-          xml_input.new_element("value").data=from_expr(ns, "", arg);
+          xml_input.new_element("value").data =
+            from_expr(ns, step.pc->function, arg);
           xml_input.new_element("value_expression").
             new_element(xml(arg, ns));
         }

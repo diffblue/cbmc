@@ -1002,7 +1002,7 @@ void goto_convertt::do_function_call_symbol(
     t->source_location.set("user-provided", true);
     t->source_location.set_property_class(ID_assertion);
     t->source_location.set_comment(
-      "assertion "+id2string(from_expr(ns, "", t->guard)));
+      "assertion " + id2string(from_expr(ns, identifier, t->guard)));
 
     // let's double-check the type of the argument
     if(t->guard.type().id()!=ID_bool)

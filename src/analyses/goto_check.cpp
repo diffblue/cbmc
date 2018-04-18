@@ -28,7 +28,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/options.h>
 
-#include <langapi/language_util.h>
+#include <langapi/language.h>
+#include <langapi/mode.h>
 
 #include "local_bitvector_analysis.h"
 
@@ -80,9 +81,8 @@ protected:
   void check_rec(
     const exprt &expr,
     guardt &guard,
-    bool address,
-    const irep_idt &mode);
-  void check(const exprt &expr, const irep_idt &mode);
+    bool address);
+  void check(const exprt &expr);
 
   void bounds_check(const index_exprt &expr, const guardt &guard);
   void div_by_zero_check(const div_exprt &expr, const guardt &guard);
@@ -94,8 +94,7 @@ protected:
     const dereference_exprt &expr,
     const guardt &guard,
     const exprt &access_lb,
-    const exprt &access_ub,
-    const irep_idt &mode);
+    const exprt &access_ub);
   void integer_overflow_check(const exprt &expr, const guardt &guard);
   void conversion_check(const exprt &expr, const guardt &guard);
   void float_overflow_check(const exprt &expr, const guardt &guard);
@@ -141,6 +140,8 @@ protected:
   typedef std::pair<exprt, exprt> allocationt;
   typedef std::list<allocationt> allocationst;
   allocationst allocations;
+
+  irep_idt mode;
 };
 
 void goto_checkt::collect_allocations(
@@ -917,8 +918,7 @@ void goto_checkt::pointer_validity_check(
   const dereference_exprt &expr,
   const guardt &guard,
   const exprt &access_lb,
-  const exprt &access_ub,
-  const irep_idt &mode)
+  const exprt &access_ub)
 {
   if(!enable_pointer_check)
     return;
@@ -1274,7 +1274,8 @@ void goto_checkt::add_guarded_claim(
 
     goto_programt::targett t=new_code.add_instruction(type);
 
-    std::string source_expr_string=from_expr(ns, "", src_expr);
+    std::string source_expr_string;
+    get_language_from_mode(mode)->from_expr(src_expr, source_expr_string, ns);
 
     t->guard.swap(new_expr);
     t->source_location=source_location;
@@ -1283,11 +1284,7 @@ void goto_checkt::add_guarded_claim(
   }
 }
 
-void goto_checkt::check_rec(
-  const exprt &expr,
-  guardt &guard,
-  bool address,
-  const irep_idt &mode)
+void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
 {
   // we don't look into quantifiers
   if(expr.id()==ID_exists || expr.id()==ID_forall)
@@ -1298,18 +1295,18 @@ void goto_checkt::check_rec(
     if(expr.id()==ID_dereference)
     {
       assert(expr.operands().size()==1);
-      check_rec(expr.op0(), guard, false, mode);
+      check_rec(expr.op0(), guard, false);
     }
     else if(expr.id()==ID_index)
     {
       assert(expr.operands().size()==2);
-      check_rec(expr.op0(), guard, true, mode);
-      check_rec(expr.op1(), guard, false, mode);
+      check_rec(expr.op0(), guard, true);
+      check_rec(expr.op1(), guard, false);
     }
     else
     {
       forall_operands(it, expr)
-        check_rec(*it, guard, true, mode);
+        check_rec(*it, guard, true);
     }
     return;
   }
@@ -1317,7 +1314,7 @@ void goto_checkt::check_rec(
   if(expr.id()==ID_address_of)
   {
     assert(expr.operands().size()==1);
-    check_rec(expr.op0(), guard, true, mode);
+    check_rec(expr.op0(), guard, true);
     return;
   }
   else if(expr.id()==ID_and || expr.id()==ID_or)
@@ -1334,7 +1331,7 @@ void goto_checkt::check_rec(
         throw "`"+expr.id_string()+"' takes Boolean operands only, but got "+
               op.pretty();
 
-      check_rec(op, guard, false, mode);
+      check_rec(op, guard, false);
 
       if(expr.id()==ID_or)
         guard.add(not_exprt(op));
@@ -1359,19 +1356,19 @@ void goto_checkt::check_rec(
       throw msg;
     }
 
-    check_rec(expr.op0(), guard, false, mode);
+    check_rec(expr.op0(), guard, false);
 
     {
       guardt old_guard=guard;
       guard.add(expr.op0());
-      check_rec(expr.op1(), guard, false, mode);
+      check_rec(expr.op1(), guard, false);
       guard.swap(old_guard);
     }
 
     {
       guardt old_guard=guard;
       guard.add(not_exprt(expr.op0()));
-      check_rec(expr.op2(), guard, false, mode);
+      check_rec(expr.op2(), guard, false);
       guard.swap(old_guard);
     }
 
@@ -1384,7 +1381,7 @@ void goto_checkt::check_rec(
     const dereference_exprt &deref=
       to_dereference_expr(member.struct_op());
 
-    check_rec(deref.op0(), guard, false, mode);
+    check_rec(deref.op0(), guard, false);
 
     exprt access_ub=nil_exprt();
 
@@ -1394,13 +1391,13 @@ void goto_checkt::check_rec(
     if(member_offset.is_not_nil() && size.is_not_nil())
       access_ub=plus_exprt(member_offset, size);
 
-    pointer_validity_check(deref, guard, member_offset, access_ub, mode);
+    pointer_validity_check(deref, guard, member_offset, access_ub);
 
     return;
   }
 
   forall_operands(it, expr)
-    check_rec(*it, guard, false, mode);
+    check_rec(*it, guard, false);
 
   if(expr.id()==ID_index)
   {
@@ -1462,21 +1459,21 @@ void goto_checkt::check_rec(
       to_dereference_expr(expr),
       guard,
       nil_exprt(),
-      size_of_expr(expr.type(), ns),
-      mode);
+      size_of_expr(expr.type(), ns));
 }
 
-void goto_checkt::check(const exprt &expr, const irep_idt &mode)
+void goto_checkt::check(const exprt &expr)
 {
   guardt guard;
-  check_rec(expr, guard, false, mode);
+  check_rec(expr, guard, false);
 }
 
 void goto_checkt::goto_check(
   goto_functiont &goto_function,
-  const irep_idt &mode)
+  const irep_idt &_mode)
 {
   assertions.clear();
+  mode = _mode;
 
   local_bitvector_analysist local_bitvector_analysis_obj(goto_function);
   local_bitvector_analysis=&local_bitvector_analysis_obj;
@@ -1497,7 +1494,7 @@ void goto_checkt::goto_check(
        i.is_target())
       assertions.clear();
 
-    check(i.guard, mode);
+    check(i.guard);
 
     // magic ERROR label?
     for(const auto &label : error_labels)
@@ -1523,20 +1520,20 @@ void goto_checkt::goto_check(
 
       if(statement==ID_expression)
       {
-        check(i.code, mode);
+        check(i.code);
       }
       else if(statement==ID_printf)
       {
         forall_operands(it, i.code)
-          check(*it, mode);
+          check(*it);
       }
     }
     else if(i.is_assign())
     {
       const code_assignt &code_assign=to_code_assign(i.code);
 
-      check(code_assign.lhs(), mode);
-      check(code_assign.rhs(), mode);
+      check(code_assign.lhs());
+      check(code_assign.rhs());
 
       // the LHS might invalidate any assertion
       invalidate(code_assign.lhs());
@@ -1576,7 +1573,7 @@ void goto_checkt::goto_check(
       }
 
       forall_operands(it, code_function_call)
-        check(*it, mode);
+        check(*it);
 
       // the call might invalidate any assertion
       assertions.clear();
@@ -1585,7 +1582,7 @@ void goto_checkt::goto_check(
     {
       if(i.code.operands().size()==1)
       {
-        check(i.code.op0(), mode);
+        check(i.code.op0());
         // the return value invalidate any assertion
         invalidate(i.code.op0());
       }

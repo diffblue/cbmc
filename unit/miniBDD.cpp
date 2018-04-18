@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
+#include <util/format_expr.h>
+
 #include <solvers/miniBDD/miniBDD.h>
 
 void test1()
@@ -71,8 +73,6 @@ void test3()
 
 void test4()
 {
-  register_language(new_ansi_c_language);
-
   symbol_exprt a("a", bool_typet());
   symbol_exprt b("b", bool_typet());
 
@@ -81,12 +81,12 @@ void test4()
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
-  std::cout << from_expr(ns, "", o) << std::endl;
+  std::cout << format(o) << std::endl;
 
   bdd_exprt t(ns);
   t.from_expr(o);
 
-  std::cout << from_expr(ns, "", t.as_expr()) << std::endl;
+  std::cout << format(t.as_expr()) << std::endl;
 }
 
 int main()

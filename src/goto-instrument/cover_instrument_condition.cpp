@@ -33,7 +33,7 @@ void cover_condition_instrumentert::instrument(
 
     for(const auto &c : conditions)
     {
-      const std::string c_string = from_expr(ns, "", c);
+      const std::string c_string = from_expr(ns, i_it->function, c);
 
       const std::string comment_t = "condition `" + c_string + "' true";
       const irep_idt function = i_it->function;

@@ -277,7 +277,7 @@ void value_set_fivrnst::get_value_set(
   #if 0
   for(std::list<exprt>::const_iterator it=value_set.begin();
       it!=value_set.end(); it++)
-    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << '\n';
+    std::cout << "GET_VALUE_SET: " << format(*it) << '\n';
   #endif
 }
 
@@ -622,8 +622,7 @@ void value_set_fivrnst::get_reference_set_rec(
   const namespacet &ns) const
 {
   #if 0
-  std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr)
-            << '\n';
+  std::cout << "GET_REFERENCE_SET_REC EXPR: " << format(expr) << '\n';
   #endif
 
   if(expr.id()==ID_symbol ||
@@ -648,7 +647,7 @@ void value_set_fivrnst::get_reference_set_rec(
     #if 0
     for(expr_sett::const_iterator it=value_set.begin();
         it!=value_set.end(); it++)
-      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << '\n';
+      std::cout << "VALUE_SET: " << format(*it) << '\n';
     #endif
 
     return;
@@ -769,8 +768,8 @@ void value_set_fivrnst::assign(
 {
   #if 0
   std::cout << "ASSIGN LHS: " << lhs << '\n';
-  std::cout << "ASSIGN LTYPE: " << ns.follow(lhs.type()) << '\n';
-  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << '\n';
+  std::cout << "ASSIGN LTYPE: " << format(ns.follow(lhs.type())) << '\n';
+  std::cout << "ASSIGN RHS: " << format(rhs) << '\n';
   #endif
 
   if(rhs.id()==ID_if)

@@ -13,10 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef DEBUG
 #include <iostream>
+#include <util/format_expr.h>
 #endif
 
 #include <cassert>
+#include <sstream>
 
+#include <util/format_type.h>
 #include <util/invariant.h>
 #include <util/string2int.h>
 #include <util/expr_util.h>
@@ -39,8 +42,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_typecast.h>
 
 #include <pointer-analysis/value_set.h>
-
-#include <langapi/language_util.h>
 
 #include "pointer_offset_sum.h"
 
@@ -88,7 +89,7 @@ exprt value_set_dereferencet::dereference(
   const typet &type=pointer.type().subtype();
 
   #if 0
-  std::cout << "DEREF: " << from_expr(ns, "", pointer) << '\n';
+  std::cout << "DEREF: " << format(pointer) << '\n';
   #endif
 
   // collect objects the pointer may point to
@@ -101,7 +102,7 @@ exprt value_set_dereferencet::dereference(
       it=points_to_set.begin();
       it!=points_to_set.end();
       it++)
-    std::cout << "P: " << from_expr(ns, "", *it) << '\n';
+    std::cout << "P: " << format(*it) << '\n';
   #endif
 
   // get the values of these
@@ -116,8 +117,8 @@ exprt value_set_dereferencet::dereference(
     valuet value=build_reference_to(*it, mode, pointer, guard);
 
     #if 0
-    std::cout << "V: " << from_expr(ns, "", value.pointer_guard) << " --> ";
-    std::cout << from_expr(ns, "", value.value) << '\n';
+    std::cout << "V: " << format(value.pointer_guard) << " --> ";
+    std::cout << format(value.value) << '\n';
     #endif
 
     values.push_back(value);
@@ -201,7 +202,7 @@ exprt value_set_dereferencet::dereference(
   }
 
   #if 0
-  std::cout << "R: " << from_expr(ns, "", value) << "\n\n";
+  std::cout << "R: " << format(value) << "\n\n";
   #endif
 
   return value;
@@ -291,7 +292,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &object=o.object();
 
   #if 0
-  std::cout << "O: " << from_expr(ns, "", root_object) << '\n';
+  std::cout << "O: " << format(root_object) << '\n';
   #endif
 
   valuet result;
@@ -569,15 +570,13 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       {
         if(options.get_bool_option("pointer-check"))
         {
-          std::string msg="memory model not applicable (got `";
-          msg+=from_type(ns, "", result.value.type());
-          msg+="', expected `";
-          msg+=from_type(ns, "", dereference_type);
-          msg+="')";
+          std::ostringstream msg;
+          msg << "memory model not applicable (got `"
+              << format(result.value.type()) << "', expected `"
+              << format(dereference_type) << "')";
 
           dereference_callback.dereference_failure(
-            "pointer dereference",
-            msg, tmp_guard);
+            "pointer dereference", msg.str(), tmp_guard);
         }
 
         return valuet(); // give up, no way that this is ok
