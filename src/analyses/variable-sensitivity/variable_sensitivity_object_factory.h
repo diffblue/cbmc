@@ -16,7 +16,9 @@
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/full_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/union_abstract_object.h>
+#include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/write_location_context.h>
+#include <analyses/variable-sensitivity/data_dependency_context.h>
 #include <util/options.h>
 #include <util/namespace.h>
 
@@ -63,10 +65,20 @@ private:
     const exprt &e,
     const abstract_environmentt &enviroment,
     const namespacet &ns);
+  template <class abstract_object_class, class context_classt>
+  abstract_object_pointert initialize_context_abstract_object(
+    const typet type,
+    bool top,
+    bool bottom,
+    const exprt &e,
+    const abstract_environmentt &enviroment,
+    const namespacet &ns);
   bool has_variables_flag;
   bool has_structs_flag;
   bool has_arrays_flag;
   bool has_pointers_flag;
+  bool has_last_written_location_context_flag;
+  bool has_data_dependencies_context_flag;
   bool initialized;
 };
 
@@ -99,16 +111,46 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
     const abstract_environmentt &enviroment,
     const namespacet &ns)
 {
+  if(has_data_dependencies_context_flag)
+    return initialize_context_abstract_object<
+      abstract_object_classt, data_dependency_contextt>(
+        type, top, bottom, e, enviroment, ns);
+  if(has_last_written_location_context_flag)
+    return initialize_context_abstract_object<
+      abstract_object_classt, write_location_contextt>(
+        type, top, bottom, e, enviroment, ns);
+  else
+    return initialize_context_abstract_object<
+      abstract_object_classt, context_abstract_objectt>(
+        type, top, bottom, e, enviroment, ns);
+}
+
+template <class abstract_object_classt, class context_classt>
+abstract_object_pointert variable_sensitivity_object_factoryt::
+  initialize_context_abstract_object(
+    const typet type,
+    bool top,
+    bool bottom,
+    const exprt &e,
+    const abstract_environmentt &enviroment,
+    const namespacet &ns)
+{
   if(top || bottom)
   {
     return abstract_object_pointert(
-      new abstract_object_classt(type, top, bottom));
+      new context_classt(
+        abstract_object_pointert(
+          new abstract_object_classt(type, top, bottom)),
+        type, top, bottom));
   }
   else
   {
     PRECONDITION(type==ns.follow(e.type()));
     return abstract_object_pointert(
-      new abstract_object_classt(e, enviroment, ns));
+      new context_classt(
+        abstract_object_pointert(
+          new abstract_object_classt(e, enviroment, ns)),
+        e, enviroment, ns));
   }
 }
 
