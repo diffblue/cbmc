@@ -454,7 +454,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       virtual_name="@dtor";
 
     // The method may be virtual implicitly.
-    std::set<irep_idt> virtual_bases;
+    id_sett virtual_bases;
 
     for(const auto &comp : components)
     {
@@ -1614,7 +1614,7 @@ bool cpp_typecheckt::check_component_access(
 
 void cpp_typecheckt::get_bases(
   const struct_typet &type,
-  std::set<irep_idt> &set_bases) const
+  id_sett &set_bases) const
 {
   const irept::subt &bases=type.find(ID_bases).get_sub();
 
@@ -1662,7 +1662,7 @@ bool cpp_typecheckt::subtype_typecast(
   if(from.get(ID_name)==to.get(ID_name))
     return true;
 
-  std::set<irep_idt> bases;
+  id_sett bases;
 
   get_bases(from, bases);
 

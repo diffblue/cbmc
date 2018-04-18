@@ -34,10 +34,10 @@ static symbolt create_void_function_symbol(
 static bool multimap_key_matches(
   const std::multimap<irep_idt, irep_idt> &map,
   const irep_idt &key,
-  const std::set<irep_idt> &values)
+  const id_sett &values)
 {
   auto matching_values=map.equal_range(key);
-  std::set<irep_idt> matching_set;
+  id_sett matching_set;
   for(auto it=matching_values.first; it!=matching_values.second; ++it)
     matching_set.insert(it->second);
   return matching_set==values;
@@ -195,7 +195,7 @@ SCENARIO("call_graph",
 
       THEN("We expect A to have successors {A, B}")
       {
-        std::set<irep_idt> successors = get_callees(exported, "A");
+        id_sett successors = get_callees(exported, "A");
         REQUIRE(successors.size() == 2);
         REQUIRE(successors.count("A"));
         REQUIRE(successors.count("B"));
@@ -203,15 +203,14 @@ SCENARIO("call_graph",
 
       THEN("We expect C to have predecessors {B}")
       {
-        std::set<irep_idt> predecessors = get_callers(exported, "C");
+        id_sett predecessors = get_callers(exported, "C");
         REQUIRE(predecessors.size() == 1);
         REQUIRE(predecessors.count("B"));
       }
 
       THEN("We expect all of {A, B, C, D} to be reachable from A")
       {
-        std::set<irep_idt> successors =
-          get_reachable_functions(exported, "A");
+        id_sett successors = get_reachable_functions(exported, "A");
         REQUIRE(successors.size() == 4);
         REQUIRE(successors.count("A"));
         REQUIRE(successors.count("B"));
@@ -221,8 +220,7 @@ SCENARIO("call_graph",
 
       THEN("We expect {D, B, A} to be able to reach D")
       {
-        std::set<irep_idt> predecessors =
-          get_reaching_functions(exported, "D");
+        id_sett predecessors = get_reaching_functions(exported, "D");
         REQUIRE(predecessors.size() == 3);
         REQUIRE(predecessors.count("A"));
         REQUIRE(predecessors.count("B"));

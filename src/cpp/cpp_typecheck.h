@@ -304,12 +304,12 @@ protected:
   void clean_up();
 
   void add_base_components(
-        const struct_typet &from,
-        const irep_idt &access,
-        struct_typet &to,
-        std::set<irep_idt> &bases,
-        std::set<irep_idt> &vbases,
-        bool is_virtual);
+    const struct_typet &from,
+    const irep_idt &access,
+    struct_typet &to,
+    id_sett &bases,
+    id_sett &vbases,
+    bool is_virtual);
 
   bool cast_away_constness(const typet &t1,
                            const typet &t2) const;
@@ -552,8 +552,7 @@ public:
 
   virtual void implicit_typecast(exprt &expr, const typet &type);
 
-  void get_bases(const struct_typet &type,
-     std::set<irep_idt> &set_bases) const;
+  void get_bases(const struct_typet &type, id_sett &set_bases) const;
 
   void get_virtual_bases(const struct_typet &type,
      std::list<irep_idt> &vbases) const;

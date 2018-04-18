@@ -819,7 +819,7 @@ const select_pointer_typet &
 /// \return Populates `methods` with the complete list of lazy methods that are
 ///   available to convert (those which are valid parameters for
 ///   `convert_lazy_method`)
-void java_bytecode_languaget::methods_provided(id_sett &methods) const
+void java_bytecode_languaget::methods_provided(unordered_id_sett &methods) const
 {
   // Add all string solver methods to map
   string_preprocess.get_all_function_names(methods);

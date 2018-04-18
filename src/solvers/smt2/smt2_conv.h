@@ -171,7 +171,7 @@ protected:
   // auxiliary methods
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
-  void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
+  void find_symbols_rec(const typet &type, id_sett &recstack);
 
   // letification
   typedef std::pair<unsigned, symbol_exprt> let_count_idt;
@@ -225,7 +225,7 @@ protected:
   void convert_floatbv(const exprt &expr);
   std::string type2id(const typet &) const;
   std::string floatbv_suffix(const exprt &) const;
-  std::set<irep_idt> bvfp_set; // already converted
+  id_sett bvfp_set; // already converted
 
   class smt2_symbolt:public exprt
   {

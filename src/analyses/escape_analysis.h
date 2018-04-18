@@ -82,7 +82,7 @@ public:
 
   struct cleanupt
   {
-    std::set<irep_idt> cleanup_functions;
+    id_sett cleanup_functions;
   };
 
   // We track a set of 'cleanup functions' for specific
@@ -93,13 +93,13 @@ public:
 
 private:
   tvt has_values;
-  void assign_lhs_cleanup(const exprt &, const std::set<irep_idt> &);
-  void get_rhs_cleanup(const exprt &, std::set<irep_idt> &);
-  void assign_lhs_aliases(const exprt &, const std::set<irep_idt> &);
-  void get_rhs_aliases(const exprt &, std::set<irep_idt> &);
-  void get_rhs_aliases_address_of(const exprt &, std::set<irep_idt> &);
+  void assign_lhs_cleanup(const exprt &, const id_sett &);
+  void get_rhs_cleanup(const exprt &, id_sett &);
+  void assign_lhs_aliases(const exprt &, const id_sett &);
+  void get_rhs_aliases(const exprt &, id_sett &);
+  void get_rhs_aliases_address_of(const exprt &, id_sett &);
   irep_idt get_function(const exprt &);
-  void check_lhs(const exprt &, std::set<irep_idt> &);
+  void check_lhs(const exprt &, id_sett &);
 
   friend class escape_analysist;
 
@@ -122,7 +122,7 @@ protected:
     goto_functionst::goto_functiont &,
     goto_programt::targett,
     const exprt &,
-    const std::set<irep_idt> &,
+    const id_sett &,
     bool is_object,
     const namespacet &);
 };

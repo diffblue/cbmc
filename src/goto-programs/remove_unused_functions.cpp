@@ -24,7 +24,7 @@ void remove_unused_functions(
   goto_functionst &functions,
   message_handlert &message_handler)
 {
-  std::set<irep_idt> used_functions;
+  id_sett used_functions;
   std::list<goto_functionst::function_mapt::iterator> unused_functions;
   find_used_functions(
     goto_functionst::entry_point(), functions, used_functions);
@@ -55,10 +55,9 @@ void remove_unused_functions(
 void find_used_functions(
   const irep_idt &start,
   goto_functionst &functions,
-  std::set<irep_idt> &seen)
+  id_sett &seen)
 {
-  std::pair<std::set<irep_idt>::const_iterator, bool> res =
-    seen.insert(start);
+  std::pair<id_sett::const_iterator, bool> res = seen.insert(start);
 
   if(!res.second)
     return;

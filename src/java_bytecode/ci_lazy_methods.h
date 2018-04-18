@@ -135,7 +135,7 @@ private:
 
   void get_virtual_method_targets(
     const exprt &called_function,
-    const std::set<irep_idt> &instantiated_classes,
+    const id_sett &instantiated_classes,
     std::vector<irep_idt> &callable_methods,
     symbol_tablet &symbol_table);
 
@@ -150,7 +150,7 @@ private:
     ci_lazy_methods_neededt &needed_lazy_methods);
 
   irep_idt get_virtual_method_target(
-    const std::set<irep_idt> &instantiated_classes,
+    const id_sett &instantiated_classes,
     const irep_idt &call_basename,
     const irep_idt &classname,
     const symbol_tablet &symbol_table);

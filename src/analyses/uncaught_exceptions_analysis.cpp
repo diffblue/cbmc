@@ -42,8 +42,7 @@ void uncaught_exceptions_domaint::join(
   thrown.insert(element);
 }
 
-void uncaught_exceptions_domaint::join(
-  const std::set<irep_idt> &elements)
+void uncaught_exceptions_domaint::join(const id_sett &elements)
 {
   thrown.insert(elements.begin(), elements.end());
 }
@@ -89,9 +88,9 @@ void uncaught_exceptions_domaint::transform(
     {
       if(!instruction.targets.empty()) // push
       {
-        std::set<irep_idt> caught;
+        id_sett caught;
         stack_caught.push_back(caught);
-        std::set<irep_idt> &last_caught=stack_caught.back();
+        id_sett &last_caught = stack_caught.back();
         const irept::subt &exception_list=
           instruction.code.find(ID_exception_list).get_sub();
 
@@ -107,7 +106,7 @@ void uncaught_exceptions_domaint::transform(
       {
         if(!stack_caught.empty())
         {
-          const std::set<irep_idt> &caught=stack_caught.back();
+          const id_sett &caught = stack_caught.back();
           join(caught);
           // remove the caught exceptions
           for(const auto &exc_id : caught)
@@ -137,7 +136,7 @@ void uncaught_exceptions_domaint::transform(
 }
 
 /// Returns the value of the private member thrown
-const std::set<irep_idt> &uncaught_exceptions_domaint::get_elements() const
+const id_sett &uncaught_exceptions_domaint::get_elements() const
 {
   return thrown;
 }
@@ -173,7 +172,7 @@ void uncaught_exceptions_analysist::collect_uncaught_exceptions(
         domain.transform(instr_it, *this, ns);
       }
       // did our estimation for the current function improve?
-      const std::set<irep_idt> &elements=domain.get_elements();
+      const id_sett &elements = domain.get_elements();
       if(exceptions_map[current_function->first].size()<elements.size())
       {
         change=true;
@@ -227,7 +226,7 @@ void uncaught_exceptions_analysist::operator()(
 void uncaught_exceptions(
   const goto_functionst &goto_functions,
   const namespacet &ns,
-  std::map<irep_idt, std::set<irep_idt>> &exceptions_map)
+  std::map<irep_idt, id_sett> &exceptions_map)
 {
   uncaught_exceptions_analysist exceptions;
   exceptions(goto_functions, ns, exceptions_map);

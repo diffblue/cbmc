@@ -135,7 +135,7 @@ public:
   std::set<std::string> extensions() const override;
 
   void modules_provided(std::set<std::string> &modules) override;
-  virtual void methods_provided(id_sett &methods) const override;
+  virtual void methods_provided(unordered_id_sett &methods) const override;
   virtual void convert_lazy_method(
     const irep_idt &function_id,
     symbol_table_baset &symbol_table) override;

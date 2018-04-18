@@ -31,8 +31,6 @@ Date:   March 2017
 // Arbitrary limit of 10 arguments for the number of arguments to String.format
 #define MAX_FORMAT_ARGS 10
 
-typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
-
 class java_string_library_preprocesst:public messaget
 {
 public:
@@ -48,7 +46,7 @@ public:
   void initialize_refined_string_type();
 
   bool implements_function(const irep_idt &function_id) const;
-  void get_all_function_names(id_sett &methods) const;
+  void get_all_function_names(unordered_id_sett &methods) const;
 
   exprt
   code_for_function(const symbolt &symbol, symbol_table_baset &symbol_table);
@@ -146,7 +144,7 @@ private:
     };
 
   // A set tells us what java types should be considered as string objects
-  std::unordered_set<irep_idt, irep_id_hash> string_types;
+  unordered_id_sett string_types;
 
   codet make_equals_function_code(
     const code_typet &type,

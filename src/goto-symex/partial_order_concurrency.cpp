@@ -28,7 +28,7 @@ partial_order_concurrencyt::~partial_order_concurrencyt()
 void partial_order_concurrencyt::add_init_writes(
   symex_target_equationt &equation)
 {
-  std::unordered_set<irep_idt, irep_id_hash> init_done;
+  unordered_id_sett init_done;
   bool spawn_seen=false;
 
   symex_target_equationt::SSA_stepst init_steps;

@@ -34,7 +34,7 @@
 class journalling_symbol_tablet : public symbol_table_baset
 {
 public:
-  typedef std::unordered_set<irep_idt, irep_id_hash> changesett;
+  typedef unordered_id_sett changesett;
 
 private:
   symbol_table_baset &base_symbol_table;

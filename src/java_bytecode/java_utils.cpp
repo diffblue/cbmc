@@ -127,7 +127,7 @@ irep_idt resolve_friendly_method_name(
   if(friendly_name.rfind(':')==std::string::npos)
   {
     std::string prefix=qualified_name+':';
-    std::set<irep_idt> matches;
+    id_sett matches;
 
     for(const auto &s : symbol_table.symbols)
       if(has_prefix(id2string(s.first), prefix) &&
@@ -420,11 +420,11 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
 /// \return true if this static field is known never to be null
 bool is_non_null_library_global(const irep_idt &symbolid)
 {
-  static const std::unordered_set<irep_idt, irep_id_hash> non_null_globals =
-  {
-    "java::java.lang.System.out",
-    "java::java.lang.System.err",
-    "java::java.lang.System.in"
-  };
+  static const unordered_id_sett non_null_globals =
+    {
+      "java::java.lang.System.out",
+      "java::java.lang.System.err",
+      "java::java.lang.System.in"
+    };
   return non_null_globals.count(symbolid);
 }

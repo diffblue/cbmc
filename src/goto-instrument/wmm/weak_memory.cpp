@@ -228,15 +228,15 @@ void weak_memory(
   shared_buffers.affected_by_delay(
     goto_model.symbol_table, value_sets, goto_model.goto_functions);
 
-  for(std::set<irep_idt>::iterator it=
-    shared_buffers.affected_by_delay_set.begin();
-    it!=shared_buffers.affected_by_delay_set.end();
-    it++)
+  for(id_sett::iterator it = shared_buffers.affected_by_delay_set.begin();
+      it != shared_buffers.affected_by_delay_set.end();
+      it++)
     message.debug()<<id2string(*it)<<messaget::eom;
 
   message.status()<<"I instrument:"<<messaget::eom;
-  for(std::set<irep_idt>::iterator it=shared_buffers.cycles.begin();
-    it!=shared_buffers.cycles.end(); it++)
+  for(id_sett::iterator it = shared_buffers.cycles.begin();
+      it != shared_buffers.cycles.end();
+      it++)
   {
     typedef std::multimap<irep_idt, source_locationt>::iterator m_itt;
     const std::pair<m_itt, m_itt> ran=

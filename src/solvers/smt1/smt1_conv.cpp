@@ -3019,13 +3019,11 @@ void smt1_convt::from_bool_end(const typet &type, bool bool_as_bv)
 
 void smt1_convt::find_symbols(const typet &type)
 {
-  std::set<irep_idt> rec_stack;
+  id_sett rec_stack;
   find_symbols_rec(type, rec_stack);
 }
 
-void smt1_convt::find_symbols_rec(
-  const typet &type,
-  std::set<irep_idt> &recstack)
+void smt1_convt::find_symbols_rec(const typet &type, id_sett &recstack)
 {
   if(type.id()==ID_array)
   {

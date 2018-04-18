@@ -613,7 +613,7 @@ void dump_ct::cleanup_decl(
 
   tmp.add_instruction(END_FUNCTION);
 
-  std::unordered_set<irep_idt, irep_id_hash> typedef_names;
+  unordered_id_sett typedef_names;
   for(const auto &td : typedef_map)
     typedef_names.insert(td.first);
 
@@ -640,7 +640,7 @@ void dump_ct::cleanup_decl(
 ///   function declarations or struct definitions
 void dump_ct::collect_typedefs(const typet &type, bool early)
 {
-  std::unordered_set<irep_idt, irep_id_hash> deps;
+  unordered_id_sett deps;
   collect_typedefs_rec(type, early, deps);
 }
 
@@ -654,12 +654,12 @@ void dump_ct::collect_typedefs(const typet &type, bool early)
 void dump_ct::collect_typedefs_rec(
   const typet &type,
   bool early,
-  std::unordered_set<irep_idt, irep_id_hash> &dependencies)
+  unordered_id_sett &dependencies)
 {
   if(system_symbols.is_type_internal(type, system_headers))
     return;
 
-  std::unordered_set<irep_idt, irep_id_hash> local_deps;
+  unordered_id_sett local_deps;
 
   if(type.id()==ID_code)
   {
@@ -769,10 +769,9 @@ void dump_ct::dump_typedefs(std::ostream &os) const
   // output
   std::map<std::string, typedef_infot> to_insert;
 
-  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
-  id_sett typedefs_done;
-  std::unordered_map<irep_idt, id_sett, irep_id_hash>
-    forward_deps, reverse_deps;
+  unordered_id_sett typedefs_done;
+  std::unordered_map<irep_idt, unordered_id_sett, irep_id_hash> forward_deps,
+    reverse_deps;
 
   for(const auto &td : typedef_map)
     if(!td.second.type_decl_str.empty())
@@ -805,8 +804,9 @@ void dump_ct::dump_typedefs(std::ostream &os) const
       continue;
 
     // reduce remaining dependencies
-    id_sett &r_deps=r_it->second;
-    for(id_sett::iterator it=r_deps.begin(); it!=r_deps.end(); ) // no ++it
+    unordered_id_sett &r_deps = r_it->second;
+    for(unordered_id_sett::iterator it = r_deps.begin();
+        it != r_deps.end();) // no ++it
     {
       auto f_it=forward_deps.find(*it);
       if(f_it==forward_deps.end()) // might be done already
@@ -816,7 +816,7 @@ void dump_ct::dump_typedefs(std::ostream &os) const
       }
 
       // update dependencies
-      id_sett &f_deps=f_it->second;
+      unordered_id_sett &f_deps = f_it->second;
       PRECONDITION(!f_deps.empty());
       PRECONDITION(f_deps.find(t.typedef_name)!=f_deps.end());
       f_deps.erase(t.typedef_name);
@@ -986,7 +986,7 @@ void dump_ct::convert_function_declaration(
     code_blockt b;
     std::list<irep_idt> type_decls, local_static;
 
-    std::unordered_set<irep_idt, irep_id_hash> typedef_names;
+    unordered_id_sett typedef_names;
     for(const auto &td : typedef_map)
       typedef_names.insert(td.first);
 

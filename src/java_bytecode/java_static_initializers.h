@@ -38,7 +38,7 @@ class stub_global_initializer_factoryt
 public:
   void create_stub_global_initializer_symbols(
     symbol_tablet &symbol_table,
-    const std::unordered_set<irep_idt, irep_id_hash> &stub_globals_set,
+    const unordered_id_sett &stub_globals_set,
     synthetic_methods_mapt &synthetic_methods);
 
   codet get_stub_initializer_body(
@@ -50,7 +50,7 @@ public:
 
 void create_stub_global_initializers(
   symbol_tablet &symbol_table,
-  const std::unordered_set<irep_idt, irep_id_hash> &stub_globals_set,
+  const unordered_id_sett &stub_globals_set,
   const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector);
 

@@ -236,7 +236,7 @@ public:
   std::map<const irep_idt, const irep_idt> dereferenced_from;
 
   /* is var a read or write */
-  std::set<irep_idt> set_reads;
+  id_sett set_reads;
 
 #ifdef LOCAL_MAY
   rw_set_with_trackt(

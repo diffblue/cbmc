@@ -569,7 +569,7 @@ void remove_exceptions(
   remove_exceptions_typest type)
 {
   const namespacet ns(symbol_table);
-  std::map<irep_idt, std::set<irep_idt>> exceptions_map;
+  std::map<irep_idt, id_sett> exceptions_map;
   uncaught_exceptions(goto_functions, ns, exceptions_map);
   remove_exceptionst::function_may_throwt function_may_throw =
     [&exceptions_map](const irep_idt &id) { // NOLINT(whitespace/braces)

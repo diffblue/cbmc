@@ -16,20 +16,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // compute the set of functions whose address is taken
 
-void compute_address_taken_functions(
-  const exprt &,
-  std::set<irep_idt> &);
+void compute_address_taken_functions(const exprt &, id_sett &);
 
-void compute_address_taken_functions(
-  const goto_programt &,
-  std::set<irep_idt> &);
+void compute_address_taken_functions(const goto_programt &, id_sett &);
 
-void compute_address_taken_functions(
-  const goto_functionst &,
-  std::set<irep_idt> &);
+void compute_address_taken_functions(const goto_functionst &, id_sett &);
 
 // computes the functions that are (potentially) called
-std::set<irep_idt> compute_called_functions(const goto_functionst &);
-std::set<irep_idt> compute_called_functions(const goto_modelt &);
+id_sett compute_called_functions(const goto_functionst &);
+id_sett compute_called_functions(const goto_modelt &);
 
 #endif // CPROVER_GOTO_PROGRAMS_COMPUTE_CALLED_FUNCTIONS_H

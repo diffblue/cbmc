@@ -79,9 +79,9 @@ public:
 private:
   tvt has_values;
 
-  void assign_lhs_aliases(const exprt &, const std::set<irep_idt> &);
-  void get_rhs_aliases(const exprt &, std::set<irep_idt> &);
-  void get_rhs_aliases_address_of(const exprt &, std::set<irep_idt> &);
+  void assign_lhs_aliases(const exprt &, const id_sett &);
+  void get_rhs_aliases(const exprt &, id_sett &);
+  void get_rhs_aliases_address_of(const exprt &, id_sett &);
 };
 
 class global_may_alias_analysist:public ait<global_may_alias_domaint>

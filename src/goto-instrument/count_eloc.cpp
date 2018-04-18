@@ -21,7 +21,7 @@ Date: December 2012
 
 #include <goto-programs/cfg.h>
 
-typedef std::unordered_set<irep_idt, irep_id_hash> linest;
+typedef unordered_id_sett linest;
 typedef std::unordered_map<irep_idt, linest, irep_id_hash> filest;
 typedef std::unordered_map<irep_idt, filest, irep_id_hash> working_dirst;
 

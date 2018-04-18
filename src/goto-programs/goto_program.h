@@ -608,7 +608,7 @@ public:
   /// Does the goto program have an assertion?
   bool has_assertion() const;
 
-  typedef std::set<irep_idt> decl_identifierst;
+  typedef id_sett decl_identifierst;
   /// get the variables in decl statements
   void get_decl_identifiers(decl_identifierst &decl_identifiers) const;
 };

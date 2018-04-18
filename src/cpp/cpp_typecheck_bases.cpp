@@ -15,8 +15,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 {
-  std::set<irep_idt> bases;
-  std::set<irep_idt> vbases;
+  id_sett bases;
+  id_sett vbases;
 
   irep_idt default_class_access=
     type.get_bool(ID_C_class)?ID_private:ID_public;
@@ -121,8 +121,8 @@ void cpp_typecheckt::add_base_components(
   const struct_typet &from,
   const irep_idt &access,
   struct_typet &to,
-  std::set<irep_idt> &bases,
-  std::set<irep_idt> &vbases,
+  id_sett &bases,
+  id_sett &vbases,
   bool is_virtual)
 {
   const irep_idt &from_name = from.get(ID_name);

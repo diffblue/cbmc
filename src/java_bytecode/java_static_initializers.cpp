@@ -267,7 +267,7 @@ static itertype advance_to_next_key(itertype in, itertype end)
 ///   when it is required.
 void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
   symbol_tablet &symbol_table,
-  const std::unordered_set<irep_idt, irep_id_hash> &stub_globals_set,
+  const unordered_id_sett &stub_globals_set,
   synthetic_methods_mapt &synthetic_methods)
 {
   // Populate map from class id -> stub globals:

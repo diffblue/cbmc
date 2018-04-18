@@ -23,7 +23,7 @@ struct cprover_library_entryt
 ; // NOLINT(whitespace/semicolon)
 
 std::string get_cprover_library_text(
-  const std::set<irep_idt> &functions,
+  const id_sett &functions,
   const symbol_tablet &symbol_table)
 {
   std::ostringstream library_text;
@@ -64,7 +64,7 @@ std::string get_cprover_library_text(
 }
 
 void add_cprover_library(
-  const std::set<irep_idt> &functions,
+  const id_sett &functions,
   symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {

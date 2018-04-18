@@ -41,16 +41,15 @@ void link_to_library(
   message.status() << "Adding CPROVER library ("
                    << config.ansi_c.arch << ")" << messaget::eom;
 
-  std::set<irep_idt> added_functions;
+  id_sett added_functions;
 
   while(true)
   {
-    std::set<irep_idt> called_functions=
-      compute_called_functions(goto_functions);
+    id_sett called_functions = compute_called_functions(goto_functions);
 
     // eliminate those for which we already have a body
 
-    std::set<irep_idt> missing_functions;
+    id_sett missing_functions;
 
     for(const auto &id : called_functions)
     {

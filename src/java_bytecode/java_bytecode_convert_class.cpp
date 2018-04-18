@@ -439,7 +439,7 @@ void java_bytecode_convert_classt::convert(
   }
 
   // Now do methods
-  std::set<irep_idt> overlay_methods;
+  id_sett overlay_methods;
   for(auto overlay_class : overlay_classes)
   {
     for(const methodt &method : overlay_class.get().methods)

@@ -38,7 +38,7 @@ protected:
   void define_constants(const exprt &);
   void expand_function_applications(exprt &);
 
-  std::set<irep_idt> constants_done;
+  id_sett constants_done;
 };
 
 void smt2_solvert::define_constants(const exprt &expr)

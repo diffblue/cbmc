@@ -193,13 +193,13 @@ protected:
   typedef goto_functionst::function_mapt cachet;
   cachet cache;
 
-  typedef std::unordered_set<irep_idt, irep_id_hash> finished_sett;
+  typedef unordered_id_sett finished_sett;
   finished_sett finished_set;
 
-  typedef std::unordered_set<irep_idt, irep_id_hash> recursion_sett;
+  typedef unordered_id_sett recursion_sett;
   recursion_sett recursion_set;
 
-  typedef std::unordered_set<irep_idt, irep_id_hash> no_body_sett;
+  typedef unordered_id_sett no_body_sett;
   no_body_sett no_body_set;
 };
 

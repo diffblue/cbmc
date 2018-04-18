@@ -23,8 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/system_library_symbols.h>
 
-typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
-
 class symbol_tablet;
 class symbol_table_baset;
 class exprt;
@@ -79,7 +77,7 @@ public:
 
   // add lazy functions provided to set
 
-  virtual void methods_provided(id_sett &methods) const
+  virtual void methods_provided(unordered_id_sett &methods) const
   { }
 
   // populate a lazy method

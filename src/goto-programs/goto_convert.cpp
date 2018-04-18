@@ -1478,9 +1478,7 @@ void goto_convertt::convert_specc_notify(
   copy(code, OTHER, dest);
 }
 
-void goto_convertt::convert_specc_event(
-  const exprt &op,
-  std::set<irep_idt> &events)
+void goto_convertt::convert_specc_event(const exprt &op, id_sett &events)
 {
   if(op.id()==ID_or || op.id()==ID_and)
   {

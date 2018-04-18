@@ -564,12 +564,8 @@ inline const optionalt<size_t> java_generics_get_index_for_subtype(
   return std::distance(gen_types.cbegin(), iter);
 }
 
-void get_dependencies_from_generic_parameters(
-  const std::string &,
-  std::set<irep_idt> &);
-void get_dependencies_from_generic_parameters(
-  const typet &,
-  std::set<irep_idt> &);
+void get_dependencies_from_generic_parameters(const std::string &, id_sett &);
+void get_dependencies_from_generic_parameters(const typet &, id_sett &);
 
 /// Type for a generic symbol, extends symbol_typet with a
 /// vector of java generic types.

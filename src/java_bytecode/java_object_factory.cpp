@@ -52,7 +52,7 @@ class java_object_factoryt
   /// non-det generator visits a type, the type is added to this set. We forbid
   /// the non-det initialization when we see the type for the second time in
   /// this set AND the tree depth becomes >= than the maximum value above.
-  std::unordered_set<irep_idt, irep_id_hash> recursion_set;
+  unordered_id_sett recursion_set;
 
   /// Every time the non-det generator visits a type and the type is generic
   /// (either a struct or a pointer), the following map is used to store and
@@ -462,7 +462,7 @@ void java_object_factoryt::gen_pointer_target_init(
 class recursion_set_entryt
 {
   /// Recursion set to modify
-  std::unordered_set<irep_idt, irep_id_hash> &recursion_set;
+  unordered_id_sett &recursion_set;
   /// Entry to erase on destruction, if non-empty
   irep_idt erase_entry;
 
@@ -470,8 +470,7 @@ public:
   /// Initialize a recursion-set entry owner operating on a given set.
   /// Initially it does not own any set entry.
   /// \param _recursion_set: set to operate on.
-  explicit recursion_set_entryt(
-    std::unordered_set<irep_idt, irep_id_hash> &_recursion_set)
+  explicit recursion_set_entryt(unordered_id_sett &_recursion_set)
     : recursion_set(_recursion_set)
   { }
 

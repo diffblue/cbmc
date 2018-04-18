@@ -81,7 +81,7 @@ void taint_analysist::instrument(
           const irep_idt &identifier=
             to_symbol_expr(function).get_identifier();
 
-          std::set<irep_idt> identifiers;
+          id_sett identifiers;
 
           identifiers.insert(identifier);
 

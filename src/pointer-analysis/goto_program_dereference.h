@@ -87,7 +87,7 @@ protected:
     const value_set_dereferencet::modet mode);
 
 #if 0
-  const std::set<irep_idt> *valid_local_variables;
+  const id_sett *valid_local_variables;
 #endif
   source_locationt dereference_location;
   goto_programt::const_targett current_target;

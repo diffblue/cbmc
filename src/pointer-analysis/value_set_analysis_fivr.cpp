@@ -128,7 +128,7 @@ void value_set_analysis_fivrt::add_vars(
   forall_goto_functions(f_it, goto_functions)
   {
     // get the locals
-    std::set<irep_idt> locals;
+    id_sett locals;
     get_local_identifiers(f_it->second, locals);
 
     for(auto l : locals)
