@@ -634,51 +634,10 @@ void goto_convertt::do_java_new_array(
     deref,
     struct_type.components()[2].get_name(),
     struct_type.components()[2].type());
-
-  // Allocate a (struct realtype**) instead of a (void**) if possible.
-  const irept &given_element_type=object_type.find(ID_C_element_type);
-  typet allocate_data_type;
-  if(given_element_type.is_not_nil())
-  {
-    allocate_data_type=
-      pointer_type(static_cast<const typet &>(given_element_type));
-  }
-  else
-    allocate_data_type=data.type();
-
-  side_effect_exprt data_java_new_expr(
-    ID_java_new_array_data, allocate_data_type);
-
-  // The instruction may specify a (hopefully small) upper bound on the
-  // array size, in which case we allocate a fixed-length array that may
-  // be larger than the `length` member rather than use a true variable-
-  // length array, which produces a more complex formula in the current
-  // backend.
-  const irept size_bound=rhs.find(ID_length_upper_bound);
-  if(size_bound.is_nil())
-    data_java_new_expr.set(ID_size, rhs.op0());
-  else
-    data_java_new_expr.set(ID_size, size_bound);
-
-  // Must directly assign the new array to a temporary
-  // because goto-symex will notice `x=side_effect_exprt` but not
-  // `x=typecast_exprt(side_effect_exprt(...))`
-  symbol_exprt new_array_data_symbol=
-    new_tmp_symbol(
-      data_java_new_expr.type(),
-      "new_array_data",
-      dest,
-      location)
-    .symbol_expr();
-  goto_programt::targett t_p2=dest.add_instruction(ASSIGN);
-  t_p2->code=code_assignt(new_array_data_symbol, data_java_new_expr);
-  t_p2->source_location=location;
-
+  side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
+  data_cpp_new_expr.set(ID_size, rhs.op0());
   goto_programt::targett t_p=dest.add_instruction(ASSIGN);
-  exprt cast_java_new=new_array_data_symbol;
-  if(cast_java_new.type()!=data.type())
-    cast_java_new=typecast_exprt(cast_java_new, data.type());
-  t_p->code=code_assignt(data, cast_java_new);
+  t_p->code=code_assignt(data, data_cpp_new_expr);
   t_p->source_location=location;
 
   // zero-initialize the data
@@ -691,7 +650,7 @@ void goto_convertt::do_java_new_array(
         ns,
         get_message_handler());
     codet array_set(ID_array_set);
-    array_set.copy_to_operands(new_array_data_symbol, zero_element);
+    array_set.copy_to_operands(data, zero_element);
     goto_programt::targett t_d=dest.add_instruction(OTHER);
     t_d->code=array_set;
     t_d->source_location=location;
