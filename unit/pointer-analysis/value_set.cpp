@@ -311,4 +311,91 @@ SCENARIO(
       }
     }
   }
+
+  GIVEN("A base value-set")
+  {
+    value_sett base_value_set;
+
+    // Create int i; int *ptr;
+
+    signedbv_typet int32_type(32);
+
+    symbolt i;
+    i.name = "i";
+    i.base_name = "i";
+    i.pretty_name = "i";
+    i.type = int32_type;
+    i.is_static_lifetime = true;
+    symbol_table.add(i);
+
+    symbolt ptr;
+    ptr.name = "ptr";
+    ptr.base_name = "ptr";
+    ptr.pretty_name = "ptr";
+    ptr.type = pointer_typet(int32_type, 64);
+    ptr.is_static_lifetime = true;
+    symbol_table.add(ptr);
+
+    // Assign ptr = &i (in the base value-set):
+
+    code_assignt assign_ptr(
+      ptr.symbol_expr(), address_of_exprt(i.symbol_expr()));
+    base_value_set.apply_code(assign_ptr, ns);
+
+    value_set.set_base_value_set(&base_value_set);
+
+    WHEN("Querying ptr via the base value-set")
+    {
+      value_setst::valuest result;
+      base_value_set.get_value_set(ptr.symbol_expr(), result, ns);
+
+      THEN("The answer should be { &i }")
+      {
+        REQUIRE(result.size() == 1);
+        REQUIRE(object_descriptor_matches(*result.begin(), i.symbol_expr()));
+      }
+
+      WHEN("Querying ptr via the child value-set")
+      {
+        value_setst::valuest child_result;
+        value_set.get_value_set(ptr.symbol_expr(), child_result, ns);
+
+        THEN("The answer should also be { &i }")
+        {
+          REQUIRE(result == child_result);
+        }
+      }
+
+      WHEN("ptr is weakly updated in the child value-set")
+      {
+        null_pointer_exprt null_pointer(to_pointer_type(ptr.type));
+
+        // Final 'true' parameter makes this a weak write:
+        value_set.assign(ptr.symbol_expr(), null_pointer, ns, false, true);
+
+        WHEN("ptr is queried again")
+        {
+          value_setst::valuest requery_result;
+          value_set.get_value_set(ptr.symbol_expr(), requery_result, ns);
+
+          THEN("The answer should be { null, &i }")
+          {
+            REQUIRE(requery_result.size() == 2);
+
+            bool found_i = false, found_null = false;
+            for(const exprt &result : requery_result)
+            {
+              if(object_descriptor_matches(result, i.symbol_expr()))
+                found_i = true;
+              else if(object_descriptor_matches(result, null_pointer))
+                found_null = true;
+            }
+
+            REQUIRE(found_i);
+            REQUIRE(found_null);
+          }
+        }
+      }
+    }
+  }
 }
