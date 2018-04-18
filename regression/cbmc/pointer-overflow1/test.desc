@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-overflow-check --unsigned-overflow-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.overflow\.\d+\] line \d+ (pointer )?arithmetic overflow on .*sizeof\(signed int\) .* : SUCCESS
+^VERIFICATION FAILED$
+^\*\* 8 of 11 failed
+--
+^\[main\.overflow\.\d+\] line \d+ (pointer )?arithmetic overflow on .*sizeof\(signed int\) .* : FAILURE
+^warning: ignoring
