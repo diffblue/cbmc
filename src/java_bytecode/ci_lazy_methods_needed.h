@@ -14,18 +14,19 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <vector>
 #include <set>
+#include <unordered_set>
 #include <util/symbol_table.h>
 
 class ci_lazy_methods_neededt
 {
 public:
   ci_lazy_methods_neededt(
-    std::vector<irep_idt> &_callable_methods,
-    std::set<irep_idt> &_instantiated_classes,
-    symbol_tablet &_symbol_table):
-  callable_methods(_callable_methods),
-  instantiated_classes(_instantiated_classes),
-  symbol_table(_symbol_table)
+    std::unordered_set<irep_idt> &_callable_methods,
+    std::unordered_set<irep_idt> &_instantiated_classes,
+    symbol_tablet &_symbol_table)
+    : callable_methods(_callable_methods),
+      instantiated_classes(_instantiated_classes),
+      symbol_table(_symbol_table)
   {}
 
   void add_needed_method(const irep_idt &);
@@ -38,11 +39,11 @@ private:
   // contain all methods that have previously been elaborated.
   // It should be changed to a set if we develop the need to use
   // it that way.
-  std::vector<irep_idt> &callable_methods;
+  std::unordered_set<irep_idt> &callable_methods;
   // instantiated_classes on the other hand is a true set of every class
   // found so far, so we can use a membership test to avoid
   // repeatedly exploring a class hierarchy.
-  std::set<irep_idt> &instantiated_classes;
+  std::unordered_set<irep_idt> &instantiated_classes;
   symbol_tablet &symbol_table;
 };
 
