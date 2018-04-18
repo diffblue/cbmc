@@ -27,7 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/adjust_float_expressions.h>
-#include <goto-programs/convert_nondet.h>
 #include <goto-programs/lazy_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/goto_convert_functions.h>

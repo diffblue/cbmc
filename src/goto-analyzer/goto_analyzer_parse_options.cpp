@@ -56,6 +56,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exit_codes.h>
 
 #include <cbmc/version.h>
+#include <goto-programs/adjust_float_expressions.h>
 
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
@@ -477,6 +478,7 @@ int goto_analyzer_parse_optionst::doit()
 /// Depending on the command line mode, run one of the analysis tasks
 int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 {
+  adjust_float_expressions(goto_model);
   if(options.get_bool_option("taint"))
   {
     std::string taint_file=cmdline.get_value("taint");

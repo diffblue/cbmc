@@ -16,13 +16,16 @@ Author: Peter Schrammel
 #include <util/format_expr.h>
 #endif
 
+#include <util/ieee_float.h>
 #include <util/find_symbols.h>
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 #include <util/cprover_prefix.h>
 
 #include <langapi/language_util.h>
-#include <goto-programs/adjust_float_expressions.h>
+
+#include <algorithm>
+#include <array>
 
 void constant_propagator_domaint::assign_rec(
   valuest &values,
@@ -36,7 +39,7 @@ void constant_propagator_domaint::assign_rec(
   const symbol_exprt &s=to_symbol_expr(lhs);
 
   exprt tmp=rhs;
-  try_evaluate(tmp, ns);
+  partial_evaluate(tmp, ns);
 
   if(tmp.is_constant())
     values.set_to(s, tmp);
@@ -102,7 +105,7 @@ void constant_propagator_domaint::transform(
       g = from->guard;
     else
       g = not_exprt(from->guard);
-    try_evaluate(g, ns);
+    partial_evaluate(g, ns);
     if(g.is_false())
      values.set_to_bottom();
     else
@@ -269,7 +272,7 @@ bool constant_propagator_domaint::ai_simplify(
   exprt &condition,
   const namespacet &ns) const
 {
-  return try_evaluate(condition, ns);
+  return partial_evaluate(condition, ns);
 }
 
 
@@ -506,11 +509,64 @@ bool constant_propagator_domaint::merge(
 /// \param expr The expression to evaluate
 /// \param ns The namespace for symbols in the expression
 /// \return True if the expression is unchanged, false otherwise
-bool constant_propagator_domaint::try_evaluate(
+bool constant_propagator_domaint::partial_evaluate(
   exprt &expr,
   const namespacet &ns) const
 {
-  adjust_float_expressions(expr, ns);
+  // if the current rounding mode is top we can
+  // still get a non-top result by trying all rounding
+  // modes and checking if the results are all the same
+  if(!values.is_constant(symbol_exprt(ID_cprover_rounding_mode_str)))
+  {
+    return partial_evaluate_with_all_rounding_modes(expr, ns);
+  }
+  return replace_constants_and_simplify(expr, ns);
+}
+
+/// Attempt to evaluate an expression in all rounding modes.
+///
+/// If the result is the same for all rounding modes, change
+/// expr to that result and return false. Otherwise, return true.
+bool constant_propagator_domaint::partial_evaluate_with_all_rounding_modes(
+  exprt &expr,
+  const namespacet &ns) const
+{ // NOLINTNEXTLINE (whitespace/braces)
+  auto rounding_modes = std::array<ieee_floatt::rounding_modet, 4>{
+    // NOLINTNEXTLINE (whitespace/braces)
+    {ieee_floatt::ROUND_TO_EVEN,
+     ieee_floatt::ROUND_TO_ZERO,
+     ieee_floatt::ROUND_TO_MINUS_INF,
+     // NOLINTNEXTLINE (whitespace/braces)
+     ieee_floatt::ROUND_TO_PLUS_INF}};
+  exprt first_result;
+  for(std::size_t i = 0; i < rounding_modes.size(); ++i)
+  {
+    constant_propagator_domaint child(*this);
+    child.values.set_to(
+      ID_cprover_rounding_mode_str,
+      from_integer(rounding_modes[i], integer_typet()));
+    exprt result = expr;
+    if(child.replace_constants_and_simplify(result, ns))
+    {
+      return true;
+    }
+    else if(i == 0)
+    {
+      first_result = result;
+    }
+    else if(result != first_result)
+    {
+      return true;
+    }
+  }
+  expr = first_result;
+  return false;
+}
+
+bool constant_propagator_domaint::replace_constants_and_simplify(
+  exprt &expr,
+  const namespacet &ns) const
+{
   bool did_not_change_anything = values.replace_const.replace(expr);
   did_not_change_anything &= simplify(expr, ns);
   return did_not_change_anything;
@@ -541,33 +597,33 @@ void constant_propagator_ait::replace(
 
     if(it->is_goto() || it->is_assume() || it->is_assert())
     {
-      s_it->second.try_evaluate(it->guard, ns);
+      s_it->second.partial_evaluate(it->guard, ns);
     }
     else if(it->is_assign())
     {
       exprt &rhs=to_code_assign(it->code).rhs();
-      s_it->second.try_evaluate(rhs, ns);
+      s_it->second.partial_evaluate(rhs, ns);
       if(rhs.id()==ID_constant)
         rhs.add_source_location()=it->code.op0().source_location();
     }
     else if(it->is_function_call())
     {
       exprt &function = to_code_function_call(it->code).function();
-      s_it->second.try_evaluate(function, ns);
+      s_it->second.partial_evaluate(function, ns);
 
       exprt::operandst &args=
         to_code_function_call(it->code).arguments();
 
       for(auto &arg : args)
       {
-        s_it->second.try_evaluate(arg, ns);
+        s_it->second.partial_evaluate(arg, ns);
       }
     }
     else if(it->is_other())
     {
       if(it->code.get_statement()==ID_expression)
       {
-        s_it->second.try_evaluate(it->code, ns);
+        s_it->second.partial_evaluate(it->code, ns);
       }
     }
   }
