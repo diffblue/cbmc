@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 
 ^EXIT=10$
@@ -7,5 +7,5 @@ main.c
 --
 ^warning: ignoring
 --
-Symbolic execution currently messes up the typing in "p = a + b + p;" making the
+The simplifier previously messed up the typing in "p = a + b + p;" making the
 right-hand side signed long rather than a pointer.

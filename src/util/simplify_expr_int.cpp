@@ -472,7 +472,9 @@ bool simplify_exprt::simplify_plus(exprt &expr)
     // ((T*)p+a)+b -> (T*)p+(a+b)
     if(
       plus_expr.type().id() == ID_pointer && plus_expr.operands().size() == 2 &&
-      plus_expr.op0().id() == ID_plus && plus_expr.op0().operands().size() == 2)
+      plus_expr.op0().id() == ID_plus &&
+      plus_expr.op0().type().id() == ID_pointer &&
+      plus_expr.op0().operands().size() == 2)
     {
       exprt op0 = plus_expr.op0();
 
