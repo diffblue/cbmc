@@ -1,6 +1,6 @@
 /*******************************************************************\
 
- Module: analyses variable-sensitivity
+ Module: analyses variable-sensitivity write_location_context
 
  Author: Diffblue Ltd.
 
@@ -9,21 +9,21 @@
 #include <util/std_types.h>
 #include <ostream>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
-#include "dependency_context_abstract_object.h"
+#include "write_location_context.h"
 
-void dependency_context_abstract_objectt::set_child(
+void write_location_contextt::set_child(
   const abstract_object_pointert &child)
 {
   child_abstract_object = child;
 }
 
-void dependency_context_abstract_objectt::make_top_internal()
+void write_location_contextt::make_top_internal()
 {
   if(!child_abstract_object->is_top())
     set_child(child_abstract_object->make_top());
 }
 
-void dependency_context_abstract_objectt::clear_top_internal()
+void write_location_contextt::clear_top_internal()
 {
   if(child_abstract_object->is_top())
     set_child(child_abstract_object->clear_top());
@@ -41,12 +41,12 @@ void dependency_context_abstract_objectt::clear_top_internal()
  * updated
  */
 abstract_object_pointert
-  dependency_context_abstract_objectt::update_location_context(
+  write_location_contextt::update_location_context(
     const abstract_objectt::locationst &locations,
     const bool update_sub_elements) const
 {
   const auto &result=
-    std::dynamic_pointer_cast<dependency_context_abstract_objectt>(
+    std::dynamic_pointer_cast<write_location_contextt>(
       mutable_clone());
 
   if(update_sub_elements)
@@ -63,7 +63,7 @@ abstract_object_pointert
 }
 
 abstract_objectt::locationst
-  dependency_context_abstract_objectt::get_last_written_locations() const
+  write_location_contextt::get_last_written_locations() const
 {
   return last_written_locations;
 }
@@ -82,7 +82,7 @@ abstract_objectt::locationst
  * For the dependency context, the operation is simply delegated to the
  * child object
  */
-abstract_object_pointert dependency_context_abstract_objectt::read(
+abstract_object_pointert write_location_contextt::read(
   const abstract_environmentt &env,
   const exprt &specifier,
   const namespacet &ns) const
@@ -106,7 +106,7 @@ abstract_object_pointert dependency_context_abstract_objectt::read(
  * \return the abstract_objectt representing the result of writing
  * to a specific component.
  */
-abstract_object_pointert dependency_context_abstract_objectt::write(
+abstract_object_pointert write_location_contextt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> stack,
@@ -125,13 +125,13 @@ abstract_object_pointert dependency_context_abstract_objectt::write(
   // Need to ensure the result of the write is still wrapped in a dependency
   // context
   const auto &result=
-    std::dynamic_pointer_cast<dependency_context_abstract_objectt>(
+    std::dynamic_pointer_cast<write_location_contextt>(
       mutable_clone());
 
   // Update the child and record the updated write locations
   result->set_child(updated_child);
   auto value_context=
-    std::dynamic_pointer_cast<const dependency_context_abstract_objectt>(value);
+    std::dynamic_pointer_cast<const write_location_contextt>(value);
 
   if(value_context)
   {
@@ -151,11 +151,11 @@ abstract_object_pointert dependency_context_abstract_objectt::write(
  * \return the result of the merge, or 'this' if the merge would not change
  * the current abstract object
  */
-abstract_object_pointert dependency_context_abstract_objectt::merge(
+abstract_object_pointert write_location_contextt::merge(
   abstract_object_pointert other) const
 {
   auto cast_other=
-    std::dynamic_pointer_cast<const dependency_context_abstract_objectt>(other);
+    std::dynamic_pointer_cast<const write_location_contextt>(other);
 
   if(cast_other)
   {
@@ -175,7 +175,7 @@ abstract_object_pointert dependency_context_abstract_objectt::merge(
     if(child_modified || merge_locations)
     {
       const auto &result=
-        std::dynamic_pointer_cast<dependency_context_abstract_objectt>(
+        std::dynamic_pointer_cast<write_location_contextt>(
           mutable_clone());
       if(child_modified)
       {
@@ -209,11 +209,11 @@ abstract_object_pointert dependency_context_abstract_objectt::merge(
  * \return the result of the merge
  */
 abstract_object_pointert
-  dependency_context_abstract_objectt::abstract_object_merge_internal(
+  write_location_contextt::abstract_object_merge_internal(
     const abstract_object_pointert other) const
 {
   auto other_context=
-    std::dynamic_pointer_cast<const dependency_context_abstract_objectt>(other);
+    std::dynamic_pointer_cast<const write_location_contextt>(other);
 
   if(other_context)
   {
@@ -235,7 +235,7 @@ abstract_object_pointert
  *
  * \param locations the locations to set
  */
-void dependency_context_abstract_objectt::set_last_written_locations(
+void write_location_contextt::set_last_written_locations(
   const abstract_objectt::locationst &locations)
 {
   last_written_locations=locations;
@@ -253,7 +253,7 @@ void dependency_context_abstract_objectt::set_last_written_locations(
  * \return the resolved expression
  */
 abstract_object_pointert
-  dependency_context_abstract_objectt::expression_transform(
+  write_location_contextt::expression_transform(
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns) const
@@ -269,7 +269,7 @@ abstract_object_pointert
  * (that contains the object ... )
  * \param ns the current namespace
  */
-void dependency_context_abstract_objectt::output(
+void write_location_contextt::output(
   std::ostream &out, const ai_baset &ai, const namespacet &ns) const
 {
   child_abstract_object->output(out, ai, ns);
@@ -288,7 +288,7 @@ void dependency_context_abstract_objectt::output(
  * \return the union of this objects location set, and 'locations'
  */
 abstract_objectt::locationst
-  dependency_context_abstract_objectt::get_location_union(
+  write_location_contextt::get_location_union(
     const locationst &locations) const
 {
   locationst existing_locations=get_last_written_locations();
@@ -307,7 +307,7 @@ abstract_objectt::locationst
  * \return true if 'this' is considered to have been modified in comparison
  * to 'before', false otherwise.
  */
-bool dependency_context_abstract_objectt::has_been_modified(
+bool write_location_contextt::has_been_modified(
   const abstract_object_pointert before) const
 {
   if(this==before.get())
@@ -317,7 +317,7 @@ bool dependency_context_abstract_objectt::has_been_modified(
   }
 
   auto before_context=
-    std::dynamic_pointer_cast<const dependency_context_abstract_objectt>
+    std::dynamic_pointer_cast<const write_location_contextt>
       (before);
 
   if(!before_context)
@@ -388,7 +388,7 @@ bool dependency_context_abstract_objectt::has_been_modified(
  * \param out the stream on which to output the locations
  * \param locations the set of locations to output
  */
-void dependency_context_abstract_objectt::output_last_written_locations(
+void write_location_contextt::output_last_written_locations(
   std::ostream &out,
   const abstract_objectt::locationst &locations)
 {
