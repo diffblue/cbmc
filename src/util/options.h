@@ -28,6 +28,9 @@ public:
   unsigned int get_unsigned_int_option(const std::string &option) const;
   const value_listt &get_list_option(const std::string &option) const;
 
+  /// N.B. opts.is_set("foo") does not imply opts.get_bool_option("foo")
+  bool is_set(const std::string &option) const;
+
   void set_option(const std::string &option, const bool value);
   void set_option(const std::string &option, const int value);
   void set_option(const std::string &option, const unsigned value);

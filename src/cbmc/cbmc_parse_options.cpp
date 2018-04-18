@@ -85,6 +85,22 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):
 {
 }
 
+void cbmc_parse_optionst::set_default_options(optionst &options)
+{
+  // Default true
+  options.set_option("assertions", true);
+  options.set_option("assumptions", true);
+  options.set_option("built-in-assertions", true);
+  options.set_option("pretty-names", true);
+  options.set_option("propagation", true);
+  options.set_option("sat-preprocessor", true);
+  options.set_option("simplify", true);
+  options.set_option("simplify-if", true);
+
+  // Other default
+  options.set_option("arrays-uf", "auto");
+}
+
 void cbmc_parse_optionst::eval_verbosity()
 {
   // this is our default verbosity
@@ -105,6 +121,30 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(config.set(cmdline))
   {
     usage_error();
+    exit(CPROVER_EXIT_USAGE_ERROR);
+  }
+
+  cbmc_parse_optionst::set_default_options(options);
+
+  if(cmdline.isset("cover") && cmdline.isset("unwinding-assertions"))
+  {
+    error() << "--cover and --unwinding-assertions must not be given together"
+            << eom;
+    exit(CPROVER_EXIT_USAGE_ERROR);
+  }
+
+  if(cmdline.isset("partial-loops") && cmdline.isset("unwinding-assertions"))
+  {
+    error() << "--partial-loops and --unwinding-assertions must not be given "
+            << "together" << eom;
+    exit(CPROVER_EXIT_USAGE_ERROR);
+  }
+
+  if(cmdline.isset("reachability-slice") &&
+     cmdline.isset("reachability-slice-fb"))
+  {
+    error() << "--reachability-slice and --reachability-slice-fb must not be "
+            << "given together" << eom;
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
@@ -141,17 +181,31 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("cpp11"))
     config.cpp.set_cpp11();
 
+  if(cmdline.isset("property"))
+    options.set_option("property", cmdline.get_values("property"));
+
+  if(cmdline.isset("drop-unused-functions"))
+    options.set_option("drop-unused-functions", true);
+
+  if(cmdline.isset("string-abstraction"))
+    options.set_option("string-abstraction", true);
+
+  if(cmdline.isset("reachability-slice-fb"))
+    options.set_option("reachability-slice-fb", true);
+
+  if(cmdline.isset("reachability-slice"))
+    options.set_option("reachability-slice", true);
+
+  if(cmdline.isset("nondet-static"))
+    options.set_option("nondet-static", true);
+
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
-  else
-    options.set_option("simplify", true);
 
   if(cmdline.isset("stop-on-fail") ||
      cmdline.isset("dimacs") ||
      cmdline.isset("outfile"))
     options.set_option("stop-on-fail", true);
-  else
-    options.set_option("stop-on-fail", false);
 
   if(cmdline.isset("trace") ||
      cmdline.isset("stop-on-fail"))
@@ -184,8 +238,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // constant propagation
   if(cmdline.isset("no-propagation"))
     options.set_option("propagation", false);
-  else
-    options.set_option("propagation", true);
 
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
@@ -193,59 +245,34 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // check assertions
   if(cmdline.isset("no-assertions"))
     options.set_option("assertions", false);
-  else
-    options.set_option("assertions", true);
 
   // use assumptions
   if(cmdline.isset("no-assumptions"))
     options.set_option("assumptions", false);
-  else
-    options.set_option("assumptions", true);
 
   // magic error label
   if(cmdline.isset("error-label"))
     options.set_option("error-label", cmdline.get_values("error-label"));
 
   // generate unwinding assertions
-  if(cmdline.isset("cover"))
-    options.set_option("unwinding-assertions", false);
-  else
-  {
-    options.set_option(
-      "unwinding-assertions",
-      cmdline.isset("unwinding-assertions"));
-  }
+  if(cmdline.isset("unwinding-assertions"))
+    options.set_option("unwinding-assertions", true);
 
-  // generate unwinding assumptions otherwise
-  options.set_option(
-    "partial-loops",
-    cmdline.isset("partial-loops"));
-
-  if(options.get_bool_option("partial-loops") &&
-     options.get_bool_option("unwinding-assertions"))
-  {
-    error() << "--partial-loops and --unwinding-assertions "
-            << "must not be given together" << eom;
-    exit(CPROVER_EXIT_USAGE_ERROR);
-  }
+  if(cmdline.isset("partial-loops"))
+    options.set_option("partial-loops", true);
 
   // remove unused equations
-  options.set_option(
-    "slice-formula",
-    cmdline.isset("slice-formula"));
+  if(cmdline.isset("slice-formula"))
+    options.set_option("slice-formula", true);
 
   // simplify if conditions and branches
   if(cmdline.isset("no-simplify-if"))
     options.set_option("simplify-if", false);
-  else
-    options.set_option("simplify-if", true);
 
   if(cmdline.isset("arrays-uf-always"))
     options.set_option("arrays-uf", "always");
   else if(cmdline.isset("arrays-uf-never"))
     options.set_option("arrays-uf", "never");
-  else
-    options.set_option("arrays-uf", "auto");
 
   if(cmdline.isset("dimacs"))
     options.set_option("dimacs", true);
@@ -387,12 +414,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("no-sat-preprocessor"))
     options.set_option("sat-preprocessor", false);
-  else
-    options.set_option("sat-preprocessor", true);
 
-  options.set_option(
-    "pretty-names",
-    !cmdline.isset("no-pretty-names"));
+  if(cmdline.isset("no-pretty-names"))
+    options.set_option("pretty-names", false);
 
   if(cmdline.isset("outfile"))
     options.set_option("outfile", cmdline.get_value("outfile"));
@@ -527,7 +551,8 @@ int cbmc_parse_optionst::doit()
     return CPROVER_EXIT_SUCCESS;
   }
 
-  int get_goto_program_ret=get_goto_program(options);
+  int get_goto_program_ret =
+    get_goto_program(goto_model, options, cmdline, *this, ui_message_handler);
 
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
@@ -580,17 +605,21 @@ bool cbmc_parse_optionst::set_properties()
 }
 
 int cbmc_parse_optionst::get_goto_program(
-  const optionst &options)
+  goto_modelt &goto_model,
+  const optionst &options,
+  const cmdlinet &cmdline,
+  messaget &log,
+  ui_message_handlert &ui_message_handler)
 {
   if(cmdline.args.empty())
   {
-    error() << "Please provide a program to verify" << eom;
+    log.error() << "Please provide a program to verify" << log.eom;
     return CPROVER_EXIT_INCORRECT_TASK;
   }
 
   try
   {
-    goto_model=initialize_goto_model(cmdline, get_message_handler());
+    goto_model = initialize_goto_model(cmdline, ui_message_handler);
 
     if(cmdline.isset("show-symbol-table"))
     {
@@ -598,7 +627,7 @@ int cbmc_parse_optionst::get_goto_program(
       return CPROVER_EXIT_SUCCESS;
     }
 
-    if(process_goto_program(options))
+    if(cbmc_parse_optionst::process_goto_program(goto_model, options, log))
       return CPROVER_EXIT_INTERNAL_ERROR;
 
     // show it?
@@ -615,36 +644,36 @@ int cbmc_parse_optionst::get_goto_program(
     {
       show_goto_functions(
         goto_model,
-        get_message_handler(),
+        ui_message_handler,
         ui_message_handler.get_ui(),
         cmdline.isset("list-goto-functions"));
       return CPROVER_EXIT_SUCCESS;
     }
 
-    status() << config.object_bits_info() << eom;
+    log.status() << config.object_bits_info() << log.eom;
   }
 
   catch(const char *e)
   {
-    error() << e << eom;
+    log.error() << e << log.eom;
     return CPROVER_EXIT_EXCEPTION;
   }
 
   catch(const std::string &e)
   {
-    error() << e << eom;
+    log.error() << e << log.eom;
     return CPROVER_EXIT_EXCEPTION;
   }
 
   catch(int e)
   {
-    error() << "Numeric exception : " << e << eom;
+    log.error() << "Numeric exception : " << e << log.eom;
     return CPROVER_EXIT_EXCEPTION;
   }
 
   catch(const std::bad_alloc &)
   {
-    error() << "Out of memory" << eom;
+    log.error() << "Out of memory" << log.eom;
     return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
   }
 
@@ -709,7 +738,9 @@ void cbmc_parse_optionst::preprocessing()
 }
 
 bool cbmc_parse_optionst::process_goto_program(
-  const optionst &options)
+  goto_modelt &goto_model,
+  const optionst &options,
+  messaget &log)
 {
   try
   {
@@ -718,17 +749,17 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_asm(goto_model);
 
     // add the library
-    link_to_library(goto_model, get_message_handler());
+    link_to_library(goto_model, log.get_message_handler());
 
-    if(cmdline.isset("string-abstraction"))
-      string_instrumentation(goto_model, get_message_handler());
+    if(options.get_bool_option("string-abstraction"))
+      string_instrumentation(goto_model, log.get_message_handler());
 
     // remove function pointers
-    status() << "Removal of function pointers and virtual functions" << eom;
+    log.status() << "Removal of function pointers and virtual functions" << eom;
     remove_function_pointers(
-      get_message_handler(),
+      log.get_message_handler(),
       goto_model,
-      cmdline.isset("pointer-check"));
+      options.get_bool_option("pointer-check"));
     // remove catch and throw (introduces instanceof)
     remove_exceptions(goto_model);
 
@@ -744,7 +775,7 @@ bool cbmc_parse_optionst::process_goto_program(
     rewrite_union(goto_model);
 
     // add generic checks
-    status() << "Generic Property Instrumentation" << eom;
+    log.status() << "Generic Property Instrumentation" << eom;
     goto_check(options, goto_model);
 
     // checks don't know about adjusted float expressions
@@ -752,19 +783,18 @@ bool cbmc_parse_optionst::process_goto_program(
 
     // ignore default/user-specified initialization
     // of variables with static lifetime
-    if(cmdline.isset("nondet-static"))
+    if(options.get_bool_option("nondet-static"))
     {
-      status() << "Adding nondeterministic initialization "
-                  "of static/global variables" << eom;
+      log.status() << "Adding nondeterministic initialization "
+                      "of static/global variables"
+                   << eom;
       nondet_static(goto_model);
     }
 
-    if(cmdline.isset("string-abstraction"))
+    if(options.get_bool_option("string-abstraction"))
     {
-      status() << "String Abstraction" << eom;
-      string_abstraction(
-        goto_model,
-        get_message_handler());
+      log.status() << "String Abstraction" << eom;
+      string_abstraction(goto_model, log.get_message_handler());
     }
 
     // add failed symbols
@@ -777,11 +807,11 @@ bool cbmc_parse_optionst::process_goto_program(
     // add loop ids
     goto_model.goto_functions.compute_loop_numbers();
 
-    if(cmdline.isset("drop-unused-functions"))
+    if(options.get_bool_option("drop-unused-functions"))
     {
       // Entry point will have been set before and function pointers removed
-      status() << "Removing unused functions" << eom;
-      remove_unused_functions(goto_model, get_message_handler());
+      log.status() << "Removing unused functions" << eom;
+      remove_unused_functions(goto_model, log.get_message_handler());
     }
 
     // remove skips such that trivial GOTOs are deleted and not considered
@@ -789,9 +819,9 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_skip(goto_model);
 
     // instrument cover goals
-    if(cmdline.isset("cover"))
+    if(options.is_set("cover"))
     {
-      if(instrument_cover_goals(options, goto_model, get_message_handler()))
+      if(instrument_cover_goals(options, goto_model, log.get_message_handler()))
         return true;
     }
 
@@ -803,37 +833,32 @@ bool cbmc_parse_optionst::process_goto_program(
     label_properties(goto_model);
 
     // reachability slice?
-    if(cmdline.isset("reachability-slice-fb"))
+    if(options.get_bool_option("reachability-slice-fb"))
     {
-      if(cmdline.isset("reachability-slice"))
-      {
-        error() << "--reachability-slice and --reachability-slice-fb "
-                << "must not be given together" << eom;
-        return true;
-      }
-
-      status() << "Performing a forwards-backwards reachability slice" << eom;
-      if(cmdline.isset("property"))
-        reachability_slicer(goto_model, cmdline.get_values("property"), true);
+      log.status() << "Performing a forwards-backwards reachability slice"
+                   << eom;
+      if(options.is_set("property"))
+        reachability_slicer(
+          goto_model, options.get_list_option("property"), true);
       else
         reachability_slicer(goto_model, true);
     }
 
-    if(cmdline.isset("reachability-slice"))
+    if(options.get_bool_option("reachability-slice"))
     {
-      status() << "Performing a reachability slice" << eom;
-      if(cmdline.isset("property"))
-        reachability_slicer(goto_model, cmdline.get_values("property"));
+      log.status() << "Performing a reachability slice" << eom;
+      if(options.is_set("property"))
+        reachability_slicer(goto_model, options.get_list_option("property"));
       else
         reachability_slicer(goto_model);
     }
 
     // full slice?
-    if(cmdline.isset("full-slice"))
+    if(options.get_bool_option("full-slice"))
     {
-      status() << "Performing a full slice" << eom;
-      if(cmdline.isset("property"))
-        property_slicer(goto_model, cmdline.get_values("property"));
+      log.status() << "Performing a full slice" << eom;
+      if(options.is_set("property"))
+        property_slicer(goto_model, options.get_list_option("property"));
       else
         full_slicer(goto_model);
     }
@@ -844,25 +869,25 @@ bool cbmc_parse_optionst::process_goto_program(
 
   catch(const char *e)
   {
-    error() << e << eom;
+    log.error() << e << eom;
     return true;
   }
 
   catch(const std::string &e)
   {
-    error() << e << eom;
+    log.error() << e << eom;
     return true;
   }
 
   catch(int e)
   {
-    error() << "Numeric exception : " << e << eom;
+    log.error() << "Numeric exception : " << e << eom;
     return true;
   }
 
   catch(const std::bad_alloc &)
   {
-    error() << "Out of memory" << eom;
+    log.error() << "Out of memory" << eom;
     exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
     return true;
   }
