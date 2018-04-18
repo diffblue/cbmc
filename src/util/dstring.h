@@ -175,4 +175,18 @@ inline std::ostream &operator<<(std::ostream &out, const dstringt &a)
   return a.operator<<(out);
 }
 
+// NOLINTNEXTLINE [allow specialisation within 'std']
+namespace std
+{
+/// Default hash function of `dstringt` for use with STL containers.
+template <>
+struct hash<dstringt> // NOLINT(readability/identifiers)
+{
+  size_t operator()(const dstringt &dstring) const
+  {
+    return dstring.hash();
+  }
+};
+}
+
 #endif // CPROVER_UTIL_DSTRING_H
