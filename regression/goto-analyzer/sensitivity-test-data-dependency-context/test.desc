@@ -1,0 +1,12 @@
+CORE
+data-dependency-context.c
+--variable --structs --arrays --data-dependencies --show
+// Enable multi-line checking
+activate-multi-line-match
+EXIT=0
+SIGNAL=0
+st \(\) -> \{.a=.* @ \[2, 47\]\[Data dependencies: 47, 2\]\[Data dominators: \], .b=.* @ \[5, 47\]\[Data dependencies: 47, 5\]\[Data dominators: \]\} @ \[2, 5, 47\]\[Data dependencies: 47, 5, 2\]\[Data dominators: 47\]
+ar \(\) -> \{\[0\] = .* @ \[11, 42\]\[Data dependencies: 42, 11\]\[Data dominators: \]\n\[1\] = .* @ \[14, 42\]\[Data dependencies: 42, 14\]\[Data dominators: \]\n\} @ \[11, 14, 42\]\[Data dependencies: 42, 14, 11\]\[Data dominators: 42\]
+arr \(\) -> \{\[0\] = .* @ \[19\]\[Data dependencies: 19\]\[Data dominators: 19\]\n\[1\] = .* @ \[20\]\[Data dependencies: 20\]\[Data dominators: 20\]\n\[2\] = .* @ \[21, 23\]\[Data dependencies: 23, 21, 20\]\[Data dominators: \]\n\} @ \[21, 23\]\[Data dependencies: 43, 23, 21, 20, 19\]\[Data dominators: 43\]
+--
+^warning: ignoring

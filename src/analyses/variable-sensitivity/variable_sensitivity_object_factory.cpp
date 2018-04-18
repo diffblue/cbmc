@@ -100,46 +100,36 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
   switch(abstract_object_type)
   {
   case CONSTANT:
-    return initialize_abstract_object<
-      typed_write_location_contextt<constant_abstract_valuet>>(
-        followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<constant_abstract_valuet>(
+      followed_type, top, bottom, e, environment, ns);
   case ARRAY_SENSITIVE:
-    return initialize_abstract_object<
-      typed_write_location_contextt<constant_array_abstract_objectt>>(
-        followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<constant_array_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns);
   case ARRAY_INSENSITIVE:
-    return initialize_abstract_object<
-      typed_write_location_contextt<array_abstract_objectt>>(
-        followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<array_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns);
   case POINTER_SENSITIVE:
-    return initialize_abstract_object<
-      typed_write_location_contextt<constant_pointer_abstract_objectt>>(
-        followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<constant_pointer_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns);
   case POINTER_INSENSITIVE:
-    return initialize_abstract_object<
-      typed_write_location_contextt<pointer_abstract_objectt>>(
-        followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<pointer_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns);
   case STRUCT_SENSITIVE:
-    return initialize_abstract_object<
-      typed_write_location_contextt<full_struct_abstract_objectt>>(
-        followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<full_struct_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns);
   case STRUCT_INSENSITIVE:
-    return initialize_abstract_object<
-      typed_write_location_contextt<struct_abstract_objectt>>(
-        followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<struct_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns);
   case UNION_INSENSITIVE:
-    return initialize_abstract_object<
-      typed_write_location_contextt<union_abstract_objectt>>(
-        followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<union_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns);
   case TWO_VALUE:
-    return initialize_abstract_object<
-      typed_write_location_contextt<abstract_objectt>>(
-        followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns);
   default:
     UNREACHABLE;
-    return initialize_abstract_object<
-      typed_write_location_contextt<abstract_objectt>>(
-        followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns);
   }
 }
 
@@ -163,5 +153,8 @@ void variable_sensitivity_object_factoryt::set_options(const optionst &options)
   has_structs_flag=options.get_bool_option("structs");
   has_arrays_flag=options.get_bool_option("arrays");
   has_pointers_flag=options.get_bool_option("pointers");
+  has_last_written_location_context_flag=true; // For efficency of 3way merge
+  has_data_dependencies_context_flag=
+    options.get_bool_option("data-dependencies");
   initialized=true;
 }

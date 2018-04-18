@@ -120,38 +120,4 @@ private:
     const abstract_objectt::locationst &locations);
 };
 
-/**
- * Templated extension of the abstract implementation, used as a wrapper around
- * other abstract_objectt classes to enable the factory to instantiate the
- * context information
- */
-template <class AOT>
-class typed_write_location_contextt: public write_location_contextt
-{
-public:
-  explicit typed_write_location_contextt(const typet &type):
-    write_location_contextt(
-      abstract_object_pointert(new AOT(type)), type) {}
-
-  typed_write_location_contextt(
-    const typet &type,
-    bool top,
-    bool bottom):
-      write_location_contextt(
-        abstract_object_pointert(new AOT(type, top, bottom)),
-          type,
-          top,
-          bottom) {}
-
-  explicit typed_write_location_contextt(
-    const exprt &expr,
-    const abstract_environmentt &environment,
-    const namespacet &ns):
-      write_location_contextt(
-        abstract_object_pointert(new AOT(expr, environment, ns)),
-        expr,
-        environment,
-        ns) {}
-};
-
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_LOCATION_CONTEXT_H
