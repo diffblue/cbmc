@@ -17,6 +17,8 @@ Date:   September 2009
 
 #include "goto_model.h"
 
+#include "remove_skip.h"
+
 class remove_returnst
 {
 public:
@@ -342,6 +344,8 @@ bool remove_returnst::restore_returns(
 
   goto_programt &goto_program=f_it->second.body;
 
+  bool did_something = false;
+
   Forall_goto_program_instructions(i_it, goto_program)
   {
     if(i_it->is_assign())
@@ -355,8 +359,12 @@ bool remove_returnst::restore_returns(
       const exprt rhs = assign.rhs();
       i_it->make_return();
       i_it->code = code_returnt(rhs);
+      did_something = true;
     }
   }
+
+  if(did_something)
+    remove_skip(goto_program);
 
   return false;
 }

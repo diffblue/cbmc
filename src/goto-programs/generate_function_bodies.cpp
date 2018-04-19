@@ -13,6 +13,8 @@ Author: Diffblue Ltd.
 #include <util/make_unique.h>
 #include <util/string_utils.h>
 
+#include "remove_skip.h"
+
 void generate_function_bodiest::generate_function_body(
   goto_functiont &function,
   symbol_tablet &symbol_table,
@@ -307,6 +309,8 @@ protected:
     }
     auto end_function_instruction = add_instruction();
     end_function_instruction->make_end_function();
+
+    remove_skip(function.body);
   }
 
 private:

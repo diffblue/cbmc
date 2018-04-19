@@ -174,9 +174,6 @@ int goto_instrument_parse_optionst::doit()
         goto_unwindt goto_unwind;
         goto_unwind(goto_model, unwindset, unwind_strategy);
 
-        goto_model.goto_functions.update();
-        goto_model.goto_functions.compute_loop_numbers();
-
         if(cmdline.isset("log"))
         {
           std::string filename=cmdline.get_value("log");
@@ -202,6 +199,10 @@ int goto_instrument_parse_optionst::doit()
             std::cout << result << '\n';
           }
         }
+
+        // goto_unwind holds references to instructions, only do remove_skip
+        // after having generated the log above
+        remove_skip(goto_model);
       }
     }
 

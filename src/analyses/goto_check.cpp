@@ -31,6 +31,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language.h>
 #include <langapi/mode.h>
 
+#include <goto-programs/remove_skip.h>
+
 #include "local_bitvector_analysis.h"
 
 class goto_checkt
@@ -1501,6 +1503,8 @@ void goto_checkt::goto_check(
   assertions.clear();
   mode = _mode;
 
+  bool did_something = false;
+
   local_bitvector_analysist local_bitvector_analysis_obj(goto_function);
   local_bitvector_analysis=&local_bitvector_analysis_obj;
 
@@ -1651,6 +1655,7 @@ void goto_checkt::goto_check(
          (!is_user_provided && !enable_built_in_assertions))
       {
         i.make_skip();
+        did_something = true;
       }
     }
     else if(i.is_assume())
@@ -1658,6 +1663,7 @@ void goto_checkt::goto_check(
       if(!enable_assumptions)
       {
         i.make_skip();
+        did_something = true;
       }
     }
     else if(i.is_dead())
@@ -1745,6 +1751,7 @@ void goto_checkt::goto_check(
     }
 
     // insert new instructions -- make sure targets are not moved
+    did_something |= !new_code.instructions.empty();
 
     while(!new_code.instructions.empty())
     {
@@ -1753,6 +1760,9 @@ void goto_checkt::goto_check(
       it++;
     }
   }
+
+  if(did_something)
+    remove_skip(goto_program);
 }
 
 void goto_check(

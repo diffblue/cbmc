@@ -66,14 +66,14 @@ class dispatch_table_entryt
 typedef std::vector<dispatch_table_entryt> dispatch_table_entriest;
 typedef std::map<irep_idt, dispatch_table_entryt> dispatch_table_entries_mapt;
 
-void remove_virtual_function(
+goto_programt::targett remove_virtual_function(
   goto_modelt &goto_model,
   goto_programt &goto_program,
   goto_programt::targett instruction,
   const dispatch_table_entriest &dispatch_table,
   virtual_dispatch_fallback_actiont fallback_action);
 
-void remove_virtual_function(
+goto_programt::targett remove_virtual_function(
   symbol_tablet &symbol_table,
   goto_programt &goto_program,
   goto_programt::targett instruction,
