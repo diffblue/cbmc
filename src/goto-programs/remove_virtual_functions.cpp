@@ -536,11 +536,7 @@ void remove_virtual_functions(goto_model_functiont &function)
   class_hierarchyt class_hierarchy;
   class_hierarchy(function.get_symbol_table());
   remove_virtual_functionst rvf(function.get_symbol_table(), class_hierarchy);
-  bool changed = rvf.remove_virtual_functions(
-    function.get_goto_function().body);
-  // Give fresh location numbers to `function`, in case it has grown:
-  if(changed)
-    function.compute_location_numbers();
+  rvf.remove_virtual_functions(function.get_goto_function().body);
 }
 
 void remove_virtual_function(

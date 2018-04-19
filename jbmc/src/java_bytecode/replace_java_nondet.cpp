@@ -288,8 +288,6 @@ void replace_java_nondet(goto_model_functiont &function)
   goto_programt &program = function.get_goto_function().body;
   replace_java_nondet(program);
 
-  function.compute_location_numbers();
-
   remove_skip(program);
 }
 
@@ -299,8 +297,6 @@ void replace_java_nondet(goto_functionst &goto_functions)
   {
     replace_java_nondet(goto_program.second.body);
   }
-
-  goto_functions.compute_location_numbers();
 
   remove_skip(goto_functions);
 }
