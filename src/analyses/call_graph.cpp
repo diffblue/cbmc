@@ -41,8 +41,10 @@ call_grapht::call_grapht(
 {
   forall_goto_functions(f_it, goto_functions)
   {
-    const goto_programt &body=f_it->second.body;
-    add(f_it->first, body);
+    const irep_idt &function_name = f_it->first;
+    const goto_programt &body = f_it->second.body;
+    nodes.insert(function_name);
+    add(function_name, body);
   }
 }
 
@@ -84,12 +86,14 @@ call_grapht::call_grapht(
     const goto_programt &goto_program=
       goto_functions.function_map.at(function).body;
 
+    nodes.insert(function);
+
     forall_callsites(
       goto_program,
       [&](goto_programt::const_targett i_it, const irep_idt &callee)
       {
         add(function, callee, i_it);
-        if(graph.find(callee)==graph.end())
+        if(edges.find(callee)==edges.end())
           pending_stack.push(callee);
       }
     ); // NOLINT
@@ -129,7 +133,9 @@ void call_grapht::add(
   const irep_idt &caller,
   const irep_idt &callee)
 {
-  graph.insert(std::pair<irep_idt, irep_idt>(caller, callee));
+  edges.insert({caller, callee});
+  nodes.insert(caller);
+  nodes.insert(callee);
 }
 
 /// Add edge with optional callsite information
@@ -152,7 +158,8 @@ void call_grapht::add(
 call_grapht call_grapht::get_inverted() const
 {
   call_grapht result;
-  for(const auto &caller_callee : graph)
+  result.nodes = nodes;
+  for(const auto &caller_callee : edges)
     result.add(caller_callee.second, caller_callee.first);
   return result;
 }
@@ -197,7 +204,12 @@ call_grapht::directed_grapht call_grapht::get_directed_graph() const
   call_grapht::directed_grapht ret;
   function_indicest function_indices(ret);
 
-  for(const auto &edge : graph)
+  // To make sure we include unreachable functions we first create indices
+  // for all nodes in the graph
+  for(const irep_idt &function_name : nodes)
+    function_indices[function_name];
+
+  for(const auto &edge : edges)
   {
     auto a_index=function_indices[edge.first];
     auto b_index=function_indices[edge.second];
@@ -237,7 +249,7 @@ void call_grapht::output_dot(std::ostream &out) const
 {
   out << "digraph call_graph {\n";
 
-  for(const auto &edge : graph)
+  for(const auto &edge : edges)
   {
     out << "  \"" << edge.first << "\" -> "
         << "\"" << edge.second << "\" "
@@ -252,7 +264,7 @@ void call_grapht::output_dot(std::ostream &out) const
 
 void call_grapht::output(std::ostream &out) const
 {
-  for(const auto &edge : graph)
+  for(const auto &edge : edges)
   {
     out << edge.first << " -> " << edge.second << "\n";
     if(collect_callsites)
@@ -267,7 +279,7 @@ void call_grapht::output_xml(std::ostream &out) const
   if(collect_callsites)
     out << "<!-- XML call-graph representation does not document callsites yet."
       " If you need this, edit call_grapht::output_xml -->\n";
-  for(const auto &edge : graph)
+  for(const auto &edge : edges)
   {
     out << "<call_graph_edge caller=\"";
     xmlt::escape_attribute(id2string(edge.first), out);

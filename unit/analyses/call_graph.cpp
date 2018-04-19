@@ -64,6 +64,7 @@ SCENARIO("call_graph",
     // }
     // void C() { }
     // void D() { }
+    // void E() { }
 
     goto_modelt goto_model;
     code_typet void_function_type;
@@ -101,6 +102,8 @@ SCENARIO("call_graph",
       create_void_function_symbol("C", code_skipt()));
     goto_model.symbol_table.add(
       create_void_function_symbol("D", code_skipt()));
+    goto_model.symbol_table.add(
+      create_void_function_symbol("E", code_skipt()));
 
     stream_message_handlert msg(std::cout);
     goto_convert(goto_model, msg);
@@ -111,7 +114,7 @@ SCENARIO("call_graph",
     {
       THEN("We expect A -> { A, B, B }, B -> { C, D }")
       {
-        const auto &check_graph=call_graph_from_goto_functions.graph;
+        const auto &check_graph=call_graph_from_goto_functions.edges;
         REQUIRE(check_graph.size()==5);
         REQUIRE(multimap_key_matches(check_graph, "A", {"A", "B", "B"}));
         REQUIRE(multimap_key_matches(check_graph, "B", {"C", "D"}));
@@ -128,7 +131,7 @@ SCENARIO("call_graph",
         call_graph_from_goto_functions.get_inverted();
       THEN("We expect A -> { A }, B -> { A, A }, C -> { B }, D -> { B }")
       {
-        const auto &check_graph=inverse_call_graph_from_goto_functions.graph;
+        const auto &check_graph=inverse_call_graph_from_goto_functions.edges;
         REQUIRE(check_graph.size()==5);
         REQUIRE(multimap_key_matches(check_graph, "A", {"A"}));
         REQUIRE(multimap_key_matches(check_graph, "B", {"A", "A"}));
@@ -143,9 +146,9 @@ SCENARIO("call_graph",
       THEN("We expect two callsites for the A -> B edge, one for all others")
       {
         const auto &check_callsites=call_graph_from_goto_functions.callsites;
-        for(const auto &edge : call_graph_from_goto_functions.graph)
+        for(const auto &edge : call_graph_from_goto_functions.edges)
         {
-          if(edge==call_grapht::grapht::value_type("A", "B"))
+          if(edge==call_grapht::edgest::value_type("A", "B"))
             REQUIRE(check_callsites.at(edge).size()==2);
           else
             REQUIRE(check_callsites.at(edge).size()==1);
@@ -167,7 +170,7 @@ SCENARIO("call_graph",
         call_grapht::create_from_root_function(goto_model, "B", false);
       THEN("We expect only B -> C and B -> D in the resulting graph")
       {
-        const auto &check_graph=call_graph_from_b.graph;
+        const auto &check_graph=call_graph_from_b.edges;
         REQUIRE(check_graph.size()==2);
         REQUIRE(multimap_key_matches(check_graph, "B", {"C", "D"}));
       }
@@ -182,6 +185,11 @@ SCENARIO("call_graph",
       std::map<irep_idt, node_indext> nodes_by_name;
       for(node_indext i=0; i<exported.size(); ++i)
         nodes_by_name[exported[i].function]=i;
+
+      THEN("We expect 5 nodes")
+      {
+        REQUIRE(exported.size() == 5);
+      }
 
       THEN("We expect edges A -> { A, B }, B -> { C, D }")
       {
@@ -228,6 +236,14 @@ SCENARIO("call_graph",
         REQUIRE(predecessors.count("B"));
         REQUIRE(predecessors.count("D"));
       }
+
+      THEN("We expect {E} to be able to reach E")
+      {
+        std::set<irep_idt> predecessors =
+          get_reaching_functions(exported, "E");
+        REQUIRE(predecessors.size() == 1);
+        REQUIRE(predecessors.count("E"));
+      }
     }
 
     WHEN("The call graph, with call sites, is exported as a grapht")
@@ -240,6 +256,11 @@ SCENARIO("call_graph",
       std::map<irep_idt, node_indext> nodes_by_name;
       for(node_indext i=0; i<exported.size(); ++i)
         nodes_by_name[exported[i].function]=i;
+
+      THEN("We expect 5 nodes")
+      {
+        REQUIRE(exported.size() == 5);
+      }
 
       THEN("We expect edges A -> { A, B }, B -> { C, D }")
       {

@@ -62,11 +62,14 @@ public:
   void output(std::ostream &out) const;
   void output_xml(std::ostream &out) const;
 
-  /// Type of the call graph. Note parallel edges (e.g. A having two callsites
-  /// both targeting B) result in multiple graph edges.
-  typedef std::multimap<irep_idt, irep_idt> grapht;
+  /// Type of the nodes in the call graph.
+  typedef std::unordered_set<irep_idt, irep_id_hash> nodest;
 
-  /// Type of a call graph edge in `grapht`
+  /// Type of the edges in the call graph. Note parallel edges (e.g. A having
+  /// two callsites both targeting B) result in multiple graph edges.
+  typedef std::multimap<irep_idt, irep_idt> edgest;
+
+  /// Type of a call graph edge in `edgest`
   typedef std::pair<irep_idt, irep_idt> edget;
 
   /// Type of a callsite stored in member `callsites`
@@ -84,7 +87,8 @@ public:
   /// backward compatibility; use `get_directed_graph()` to get a generic
   /// directed graph representation that provides more graph algorithms
   /// (shortest path, SCCs and so on).
-  grapht graph;
+  edgest edges;
+  nodest nodes;
 
   /// Map from call-graph edges to a set of callsites that make the given call.
   callsitest callsites;
