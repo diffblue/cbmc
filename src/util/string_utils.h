@@ -18,10 +18,10 @@ std::string strip_string(const std::string &s);
 
 void split_string(
   const std::string &s,
-  char delim, // must not be a whitespace character
+  char delim,
   std::vector<std::string> &result,
-  bool strip=false, // strip whitespace from elements
-  bool remove_empty=false); // remove empty elements
+  bool strip = false,
+  bool remove_empty = false);
 
 void split_string(
   const std::string &s,

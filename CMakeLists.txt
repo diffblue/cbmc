@@ -75,7 +75,6 @@ set_target_properties(
     mmcc
     pointer-analysis
     solvers
-    string_utils
     test-bigint
     testing-utils
     unit
