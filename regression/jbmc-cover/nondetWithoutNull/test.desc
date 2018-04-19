@@ -5,7 +5,10 @@ Test.class
 ^SIGNAL=0$
 file Test.java line 7 .*: SATISFIED
 file Test.java line 9 .*: SATISFIED
-file Test.java line 10 .*: FAILED
-file Test.java line 12 .*: SATISFIED
+file Test.java line 11 .*: SATISFIED
+file Test.java line 12 .*: FAILED
+file Test.java line 14 .*: SATISFIED
+file Test.java line 15 .*: FAILED
+file Test.java line 17 .*: SATISFIED
 
 

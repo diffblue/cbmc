@@ -3,8 +3,13 @@
 import org.cprover.CProver;
 
 public class Test {
+    public final static Object stat = CProver.nondetWithoutNull();
+    
     public static int check() {
 	Object o = CProver.nondetWithoutNull();
+
+	if(stat == null)
+	    return -1;
 
 	if(o == null)
 	    return 0;
