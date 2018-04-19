@@ -107,13 +107,9 @@ public final class CProver
 
   public static <T> T nondetWithoutNull()
   {
-    if (enableNondet)
-    {
-      throw new RuntimeException(
-          "Cannot execute program with CProver.nondetWithoutNull<T>(T)");
-    }
-
-    return null;
+    T t = nondetWithNull();
+    assume(t != null);
+    return t;
   }
 
   public static void startThread(int id)
