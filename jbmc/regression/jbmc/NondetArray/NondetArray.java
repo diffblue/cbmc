@@ -4,7 +4,7 @@ class NondetArray
 {
   void main()
   {
-    Object[] obj = CProver.nondetWithoutNull();
+    Object[] obj = CProver.<Object[]>nondetWithoutNull();
     assert obj != null;
   }
 }

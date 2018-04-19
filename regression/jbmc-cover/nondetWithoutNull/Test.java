@@ -16,4 +16,17 @@ public class Test {
 
 	return 1;
     }
+
+    public static int check2() {
+	Integer i = CProver.nondetWithNull();
+
+	if(i == null)
+	    return -1;
+	
+	if(i instanceof Integer)
+	    return 0;
+
+	return 1;
+    }
+
 }
