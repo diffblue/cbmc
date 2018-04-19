@@ -809,6 +809,8 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
     cmdline.isset("pointer-check"));
   status() << "Virtual function removal" << eom;
   remove_virtual_functions(goto_model);
+  status() << "Cleaning inline assembler statements" << eom;
+  remove_asm(goto_model);
 }
 
 /// Remove function pointers that can be resolved by analysing const variables
@@ -1184,12 +1186,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     if(cmdline.isset("mm"))
     {
-      // TODO: move to wmm/weak_mem, and copy goto_functions AFTER some of the
-      // modifications. Do the analysis on the copy, after remove_asm, and
-      // instrument the original (without remove_asm)
-      remove_asm(goto_model);
-      goto_model.goto_functions.update();
-
       std::string mm=cmdline.get_value("mm");
       memory_modelt model;
 
