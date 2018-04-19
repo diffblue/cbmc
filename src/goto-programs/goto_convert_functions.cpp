@@ -152,7 +152,7 @@ void goto_convert_functionst::convert_function(
   f.type=to_code_type(symbol.type);
 
   if(symbol.value.is_nil() ||
-     symbol.value.id()=="compiled") /* goto_inline may have removed the body */
+     symbol.is_compiled()) /* goto_inline may have removed the body */
     return;
 
   if(symbol.value.id()!=ID_code)

@@ -699,6 +699,7 @@ IREP_ID_ONE(w_ok)
 IREP_ID_ONE(super_class)
 IREP_ID_ONE(exceptions_thrown_list)
 IREP_ID_TWO(C_java_method_type, #java_method_type)
+IREP_ID_ONE(compiled)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree

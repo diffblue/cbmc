@@ -724,15 +724,13 @@ void compilet::convert_symbols(goto_functionst &dest)
         symbol_table.symbols.find(*it);
       assert(s_it!=symbol_table.symbols.end());
 
-      if(s_it->second.type.id()==ID_code &&
-         !s_it->second.is_macro &&
-         !s_it->second.is_type &&
-          s_it->second.value.id()!="compiled" &&
-          s_it->second.value.is_not_nil())
+      if(
+        s_it->second.is_function() && !s_it->second.is_compiled() &&
+        s_it->second.value.is_not_nil())
       {
         debug() << "Compiling " << s_it->first << eom;
         converter.convert_function(s_it->first, dest.function_map[s_it->first]);
-        symbol_table.get_writeable_ref(*it).value=exprt("compiled");
+        symbol_table.get_writeable_ref(*it).set_compiled();
       }
     }
   }
