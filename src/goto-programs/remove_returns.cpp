@@ -314,7 +314,7 @@ code_typet original_return_type(
   return type;
 }
 
-/// turns 'return x' into an assignment to fkt#return_value
+/// turns an assignment to fkt#return_value back into 'return x'
 bool remove_returnst::restore_returns(
   goto_functionst::function_mapt::iterator f_it)
 {
