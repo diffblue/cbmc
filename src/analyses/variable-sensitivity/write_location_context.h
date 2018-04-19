@@ -5,13 +5,20 @@
  Author: Diffblue Ltd.
 
 \*******************************************************************/
+
+/**
+ * \file
+ *  Maintain a context in the variable sensitvity domain that records
+ *  write locations for a given abstract_objectt. This enables more
+ *  accurate merging at three_way_merge.
+ */
+
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_LOCATION_CONTEXT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_LOCATION_CONTEXT_H
 
 #include <stack>
-#include <analyses/variable-sensitivity/abstract_object.h>
+#include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <iostream>
-#include "array_abstract_object.h"
 
 /**
  * General implementation of an abstract_objectt which tracks the
@@ -24,38 +31,27 @@
  * of this, 'context_abstract_objectt<T>' which provides the same
  * constructors as the standard 'abstract_objectt' class.
  */
-class write_location_contextt: public abstract_objectt
+class write_location_contextt: public context_abstract_objectt
 {
 public:
-  // These constructors mirror those in the base abstract_objectt, but with
-  // the addition of an extra argument which is the abstract_objectt to wrap.
   explicit write_location_contextt(
     const abstract_object_pointert child,
     const typet &type):
-      abstract_objectt(type)
-  {
-    child_abstract_object = child;
-  }
+      context_abstract_objectt(child, type) { }
 
   write_location_contextt(
     const abstract_object_pointert child,
     const typet &type,
     bool top,
     bool bottom):
-      abstract_objectt(type, top, bottom)
-  {
-    child_abstract_object = child;
-  }
+      context_abstract_objectt(child, type, top, bottom) { }
 
   explicit write_location_contextt(
     const abstract_object_pointert child,
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns):
-      abstract_objectt(expr, environment, ns)
-  {
-    child_abstract_object = child;
-  }
+      context_abstract_objectt(child, expr, environment, ns) { }
 
   virtual ~write_location_contextt() {}
 
@@ -88,34 +84,9 @@ public:
 
   locationst get_location_union(const locationst &locations) const;
 
-  virtual const typet &type() const
-  {
-    return child_abstract_object->type();
-  }
-
-  virtual bool is_top() const override
-  {
-    return child_abstract_object->is_top();
-  }
-
-  virtual bool is_bottom() const override
-  {
-    return child_abstract_object->is_bottom();
-  }
-
-  abstract_object_pointert expression_transform(
-    const exprt &expr,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const;
-
-  virtual exprt to_constant() const override
-  {
-    return child_abstract_object->to_constant();
-  }
-
   virtual void output(
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const
-  override;
+      override;
 
 
 protected:
@@ -124,10 +95,8 @@ protected:
   virtual abstract_object_pointert merge(
     abstract_object_pointert other) const override;
 
-  virtual abstract_object_pointert read(
-    const abstract_environmentt &env,
-    const exprt &specifier,
-    const namespacet &ns) const override;
+  virtual abstract_object_pointert abstract_object_merge_internal(
+    const abstract_object_pointert other) const override;
 
   virtual abstract_object_pointert write(
     abstract_environmentt &environment,
@@ -146,23 +115,10 @@ protected:
 private:
   // To enforce copy-on-write these are private and have read-only accessors
   abstract_objectt::locationst last_written_locations;
-  abstract_object_pointert child_abstract_object;
-
-  // These are internal hooks that allow sub-classes to perform additional
-  // actions when an abstract_object is set/unset to TOP
-  virtual void make_top_internal() override;
-  virtual void clear_top_internal() override;
-
-  virtual abstract_object_pointert abstract_object_merge_internal(
-    const abstract_object_pointert other) const override;
 
   void set_last_written_locations(
     const abstract_objectt::locationst &locations);
-
-  void set_child(
-    const abstract_object_pointert &child);
 };
-
 
 /**
  * Templated extension of the abstract implementation, used as a wrapper around

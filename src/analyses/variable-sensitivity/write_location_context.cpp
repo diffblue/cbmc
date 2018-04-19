@@ -11,24 +11,6 @@
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include "write_location_context.h"
 
-void write_location_contextt::set_child(
-  const abstract_object_pointert &child)
-{
-  child_abstract_object = child;
-}
-
-void write_location_contextt::make_top_internal()
-{
-  if(!child_abstract_object->is_top())
-    set_child(child_abstract_object->make_top());
-}
-
-void write_location_contextt::clear_top_internal()
-{
-  if(child_abstract_object->is_top())
-    set_child(child_abstract_object->clear_top());
-}
-
 /**
  * Update the location context for an abstract object, potentially
  * propogating the update to any children of this abstract object.
@@ -66,28 +48,6 @@ abstract_objectt::locationst
   write_location_contextt::get_last_written_locations() const
 {
   return last_written_locations;
-}
-
-/**
- * A helper function to evaluate an abstract object contained
- * within a container object. More precise abstractions may override this
- * to return more precise results.
- *
- * \param env the abstract environment
- * \param specifier a modifier expression, such as an array index or field
- * specifier used to indicate access to a specific component
- * \param ns the current namespace
- *
- * \return the abstract_objectt representing the value of the read component.
- * For the dependency context, the operation is simply delegated to the
- * child object
- */
-abstract_object_pointert write_location_contextt::read(
-  const abstract_environmentt &env,
-  const exprt &specifier,
-  const namespacet &ns) const
-{
-  return child_abstract_object->read(env, specifier, ns);
 }
 
 /**
@@ -242,26 +202,6 @@ void write_location_contextt::set_last_written_locations(
 }
 
 /**
- * Try to resolve an expression with the maximum level of precision
- * available.
- *
- * \param expr the expression to evaluate and find the result of. This will
- * be the symbol referred to be op0()
- * \param environment the abstract environment in which to resolve 'expr'
- * \param ns the current namespace
- *
- * \return the resolved expression
- */
-abstract_object_pointert
-  write_location_contextt::expression_transform(
-    const exprt &expr,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const
-{
-  return child_abstract_object->expression_transform(expr, environment, ns);
-}
-
-/**
  * Output a representation of the value of this abstract object
  *
  * \param out the stream to write to
@@ -272,7 +212,7 @@ abstract_object_pointert
 void write_location_contextt::output(
   std::ostream &out, const ai_baset &ai, const namespacet &ns) const
 {
-  child_abstract_object->output(out, ai, ns);
+  context_abstract_objectt::output(out, ai, ns);
 
   // Output last written locations immediately following the child output
   out << " @ ";
