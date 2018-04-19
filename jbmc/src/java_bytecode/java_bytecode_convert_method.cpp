@@ -2832,7 +2832,6 @@ void java_bytecode_convert_method(
     "nondetFloat",
     "nondetDouble",
     "nondetWithNull",
-    "nondetWithoutNull",
     "notModelled",
     "atomicBegin",
     "atomicEnd",

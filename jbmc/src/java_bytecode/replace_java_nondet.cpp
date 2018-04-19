@@ -70,15 +70,14 @@ is_nondet_returning_object(const code_function_callt &function_call)
   const auto function_name = id2string(function_symbol.get_identifier());
   const std::regex reg(
     R"(.*org\.cprover\.CProver\.nondet)"
-    R"((?:Boolean|Byte|Char|Short|Int|Long|Float|Double|With(out)?Null.*))");
+    R"((?:Boolean|Byte|Char|Short|Int|Long|Float|Double|WithNull.*))");
   std::smatch match_results;
   if(!std::regex_match(function_name, match_results, reg))
   {
     return nondet_instruction_infot();
   }
 
-  return nondet_instruction_infot(
-    nondet_instruction_infot::is_nullablet(!match_results[1].matched));
+  return nondet_instruction_infot(nondet_instruction_infot::is_nullablet(true));
 }
 
 /// Check whether the instruction is a function call which matches one of the
@@ -161,7 +160,7 @@ static bool is_assignment_from(
 ///
 /// Example:
 ///
-///   return_tmp0=org.cprover.CProver.nondetWithoutNull:()Ljava/lang/Object;();
+///   return_tmp0=org.cprover.CProver.nondetWithNull:()Ljava/lang/Object;();
 ///   ... Various validations of type and value here.
 ///   obj = (<type-of-obj>)return_tmp0;
 ///
