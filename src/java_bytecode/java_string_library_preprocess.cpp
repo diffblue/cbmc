@@ -1853,7 +1853,7 @@ void add_keys_to_container(const TMap &map, TContainer &container)
 }
 
 void java_string_library_preprocesst::get_all_function_names(
-  id_sett &methods) const
+  std::unordered_set<irep_idt> &methods) const
 {
   for(const id_mapt *map : id_maps)
     add_keys_to_container(*map, methods);
@@ -1919,11 +1919,10 @@ bool java_string_library_preprocesst::is_known_string_type(
 
 void java_string_library_preprocesst::initialize_known_type_table()
 {
-  string_types=
-    std::unordered_set<irep_idt, irep_id_hash>{"java.lang.String",
-                                               "java.lang.StringBuilder",
-                                               "java.lang.CharSequence",
-                                               "java.lang.StringBuffer"};
+  string_types = std::unordered_set<irep_idt>{"java.lang.String",
+                                              "java.lang.StringBuilder",
+                                              "java.lang.CharSequence",
+                                              "java.lang.StringBuffer"};
 }
 
 /// fill maps with correspondence from java method names to conversion functions

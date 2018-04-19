@@ -47,7 +47,7 @@ static bool link_functions(
   const symbol_tablet &src_symbol_table,
   goto_functionst &src_functions,
   const rename_symbolt &rename_symbol,
-  const std::unordered_set<irep_idt, irep_id_hash> &weak_symbols,
+  const std::unordered_set<irep_idt> &weak_symbols,
   const replace_symbolt &object_type_updates)
 {
   namespacet ns(dest_symbol_table);
@@ -158,8 +158,7 @@ void link_goto_model(
   goto_modelt &src,
   message_handlert &message_handler)
 {
-  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
-  id_sett weak_symbols;
+  std::unordered_set<irep_idt> weak_symbols;
 
   for(const auto &symbol_pair : dest.symbol_table.symbols)
   {

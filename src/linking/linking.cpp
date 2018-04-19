@@ -1162,7 +1162,8 @@ bool linkingt::needs_renaming_type(
   return true; // different
 }
 
-void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
+void linkingt::do_type_dependencies(
+  std::unordered_set<irep_idt> &needs_to_be_renamed)
 {
   // Any type that uses a symbol that will be renamed also
   // needs to be renamed, and so on, until saturation.
@@ -1186,9 +1187,9 @@ void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
 
   std::stack<irep_idt> queue;
 
-  for(id_sett::const_iterator
-      d_it=needs_to_be_renamed.begin();
-      d_it!=needs_to_be_renamed.end();
+  for(std::unordered_set<irep_idt>::const_iterator d_it =
+        needs_to_be_renamed.begin();
+      d_it != needs_to_be_renamed.end();
       d_it++)
     queue.push(*d_it);
 
@@ -1197,11 +1198,10 @@ void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
     irep_idt id=queue.top();
     queue.pop();
 
-    const id_sett &u=used_by[id];
+    const std::unordered_set<irep_idt> &u = used_by[id];
 
-    for(id_sett::const_iterator
-        d_it=u.begin();
-        d_it!=u.end();
+    for(std::unordered_set<irep_idt>::const_iterator d_it = u.begin();
+        d_it != u.end();
         d_it++)
       if(needs_to_be_renamed.insert(*d_it).second)
       {
@@ -1214,7 +1214,8 @@ void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
   }
 }
 
-void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
+void linkingt::rename_symbols(
+  const std::unordered_set<irep_idt> &needs_to_be_renamed)
 {
   namespacet src_ns(src_symbol_table);
 
@@ -1258,7 +1259,7 @@ void linkingt::copy_symbols()
   }
 
   // Move over all the non-colliding ones
-  id_sett collisions;
+  std::unordered_set<irep_idt> collisions;
 
   for(const auto &named_symbol : src_symbols)
   {
@@ -1313,7 +1314,7 @@ void linkingt::typecheck()
 
   // PHASE 1: identify symbols to be renamed
 
-  id_sett needs_to_be_renamed;
+  std::unordered_set<irep_idt> needs_to_be_renamed;
 
   for(const auto &symbol_pair : src_symbol_table.symbols)
   {

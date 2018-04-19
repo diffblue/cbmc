@@ -34,7 +34,6 @@ private:
 
 public:
   bool initialized;
-  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
   typedef goto_functionst::goto_functiont goto_functiont;
 
   /// \post dirtyt objects that are created through this constructor are not
@@ -72,7 +71,7 @@ public:
     return operator()(expr.get_identifier());
   }
 
-  const id_sett &get_dirty_ids() const
+  const std::unordered_set<irep_idt> &get_dirty_ids() const
   {
     die_if_uninitialized();
     return dirty;
@@ -97,7 +96,7 @@ protected:
   void build(const goto_functiont &goto_function);
 
   // variables whose address is taken
-  id_sett dirty;
+  std::unordered_set<irep_idt> dirty;
 
   void find_dirty(const exprt &expr);
   void find_dirty_address_of(const exprt &expr);
@@ -131,7 +130,7 @@ public:
 
 private:
   dirtyt dirty;
-  std::unordered_set<irep_idt, irep_id_hash> dirty_processed_functions;
+  std::unordered_set<irep_idt> dirty_processed_functions;
 };
 
 #endif // CPROVER_ANALYSES_DIRTY_H

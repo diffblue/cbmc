@@ -147,7 +147,7 @@ protected:
 
   virtual void no_body(const irep_idt &identifier);
 
-  std::unordered_set<irep_idt, irep_id_hash> body_warnings;
+  std::unordered_set<irep_idt> body_warnings;
 
   symex_coveraget symex_coverage;
 };
