@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symex_target_equation.h"
 
 #include <util/std_expr.h>
+#include <util/throw_with_nested.h>
 #include <util/unwrap_nested_exception.h>
 
 #include <langapi/language_util.h>
@@ -437,7 +438,7 @@ void symex_target_equationt::convert_guards(
       }
       catch(const bitvector_conversion_exceptiont &conversion_exception)
       {
-        std::throw_with_nested(guard_conversion_exceptiont(step, ns));
+        util_throw_with_nested(guard_conversion_exceptiont(step, ns));
       }
     }
   }

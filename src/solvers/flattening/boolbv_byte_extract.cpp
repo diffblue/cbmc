@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/endianness_map.h>
 #include <util/std_expr.h>
+#include <util/throw_with_nested.h>
 
 #include "bv_conversion_exceptions.h"
 #include "flatten_byte_extract_exceptions.h"
@@ -51,7 +52,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
     }
     catch(const flatten_byte_extract_exceptiont &byte_extract_flatten_exception)
     {
-      std::throw_with_nested(
+      util_throw_with_nested(
         bitvector_conversion_exceptiont("Can't convert byte_extraction", expr));
     }
   }

@@ -40,7 +40,7 @@ public:
   {
   }
 
-  const char *what() const noexcept override
+  const char *what() const optional_noexcept override
   {
     return error_message.c_str();
   }
