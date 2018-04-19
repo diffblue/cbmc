@@ -40,7 +40,7 @@ public:
     computed_error_message = error_message.str();
   }
 
-  const char *what() const noexcept override
+  const char *what() const optional_noexcept override
   {
     return computed_error_message.c_str();
   }
@@ -73,7 +73,7 @@ public:
     computed_error_message = error_message.str();
   }
 
-  const char *what() const noexcept override
+  const char *what() const optional_noexcept override
   {
     return computed_error_message.c_str();
   }
@@ -103,7 +103,7 @@ public:
     computed_error_message = error_message.str();
   }
 
-  const char *what() const noexcept override
+  const char *what() const optional_noexcept override
   {
     return computed_error_message.c_str();
   }
@@ -130,7 +130,7 @@ public:
     computed_error_message = error_message.str();
   }
 
-  const char *what() const noexcept override
+  const char *what() const optional_noexcept override
   {
     return computed_error_message.c_str();
   }

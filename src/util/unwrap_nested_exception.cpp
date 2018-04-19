@@ -10,6 +10,7 @@ Author: Diffblue Ltd.
 #include "invariant.h"
 #include "string_utils.h"
 #include "suffix.h"
+#include "throw_with_nested.h"
 
 #include <sstream>
 #include <vector>
@@ -32,7 +33,7 @@ std::string unwrap_exception(const std::exception &e, int level)
 
   try
   {
-    std::rethrow_if_nested(e);
+    util_rethrow_if_nested(e);
   }
   catch(const std::exception &e)
   {
