@@ -29,8 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_constant.h>
 #include <util/suffix.h>
 
-#include <goto-programs/remove_exceptions.h>
-
+#include "remove_exceptions.h"
 #include "java_object_factory.h"
 #include "java_types.h"
 #include "java_utils.h"

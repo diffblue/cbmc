@@ -36,9 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/mm_io.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_function_pointers.h>
-#include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_returns.h>
-#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_asm.h>
@@ -760,8 +758,6 @@ bool cbmc_parse_optionst::process_goto_program(
       log.get_message_handler(),
       goto_model,
       options.get_bool_option("pointer-check"));
-    // remove catch and throw (introduces instanceof)
-    remove_exceptions(goto_model);
 
     mm_io(goto_model);
 

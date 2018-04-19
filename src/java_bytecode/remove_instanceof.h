@@ -9,12 +9,13 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// \file
 /// Remove Instance-of Operators
 
-#ifndef CPROVER_GOTO_PROGRAMS_REMOVE_INSTANCEOF_H
-#define CPROVER_GOTO_PROGRAMS_REMOVE_INSTANCEOF_H
+#ifndef CPROVER_JAVA_BYTECODE_REMOVE_INSTANCEOF_H
+#define CPROVER_JAVA_BYTECODE_REMOVE_INSTANCEOF_H
 
 #include <util/symbol_table.h>
-#include "goto_functions.h"
-#include "goto_model.h"
+
+#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 void remove_instanceof(
   goto_programt::targett target,

@@ -32,9 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/remove_virtual_functions.h>
-#include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_returns.h>
-#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_skip.h>
@@ -56,6 +54,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_enum_static_init_unwind_handler.h>
+#include <java_bytecode/remove_instanceof.h>
+#include <java_bytecode/remove_exceptions.h>
 
 #include <cbmc/version.h>
 
