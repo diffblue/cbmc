@@ -4,12 +4,12 @@ public class RegexSubstitution03
 {
    public static void main(String[] args)
    {
-      String firstString = "DiffBlue ***";
+      String firstString = "Diffblue ***";
       String secondString = "Automatic Test Case Generation";
 
       firstString = firstString.replaceAll("\\*", "^");
 
-      assert firstString.equals("DiffBlue ^^^");
+      assert firstString.equals("Diffblue ^^^");
 
       secondString = secondString.replaceAll("Automatic", "Automated");
 
