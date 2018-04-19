@@ -115,7 +115,7 @@ private:
     const symbol_tablet &symbol_table);
 
   void initialize_instantiated_classes(
-    const std::vector<irep_idt> &entry_points,
+    const std::unordered_set<irep_idt> &entry_points,
     const namespacet &ns,
     ci_lazy_methods_neededt &needed_lazy_methods);
 
@@ -131,12 +131,12 @@ private:
 
   void gather_virtual_callsites(
     const exprt &e,
-    std::vector<const code_function_callt *> &result);
+    std::unordered_set<exprt, irep_hash> &result);
 
   void get_virtual_method_targets(
     const exprt &called_function,
-    const std::set<irep_idt> &instantiated_classes,
-    std::vector<irep_idt> &callable_methods,
+    const std::unordered_set<irep_idt> &instantiated_classes,
+    std::unordered_set<irep_idt> &callable_methods,
     symbol_tablet &symbol_table);
 
   void gather_needed_globals(
@@ -150,7 +150,7 @@ private:
     ci_lazy_methods_neededt &needed_lazy_methods);
 
   irep_idt get_virtual_method_target(
-    const std::set<irep_idt> &instantiated_classes,
+    const std::unordered_set<irep_idt> &instantiated_classes,
     const irep_idt &call_basename,
     const irep_idt &classname,
     const symbol_tablet &symbol_table);

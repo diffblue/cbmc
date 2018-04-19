@@ -20,7 +20,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 void ci_lazy_methods_neededt::add_needed_method(
   const irep_idt &method_symbol_name)
 {
-  callable_methods.push_back(method_symbol_name);
+  callable_methods.insert(method_symbol_name);
 }
 
 /// Notes class `class_symbol_name` will be instantiated, or a static field

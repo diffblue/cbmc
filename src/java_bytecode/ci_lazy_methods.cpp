@@ -72,8 +72,7 @@ bool ci_lazy_methodst::operator()(
   method_bytecodet &method_bytecode,
   const method_convertert &method_converter)
 {
-  std::vector<irep_idt> method_worklist1;
-  std::vector<irep_idt> method_worklist2;
+  std::unordered_set<irep_idt> methods_to_convert_later;
 
   main_function_resultt main_function =
     get_main_symbol(symbol_table, main_class, get_message_handler());
@@ -95,51 +94,46 @@ bool ci_lazy_methodst::operator()(
         const irep_idt methodid =
           "java::" + id2string(class_name) + "." + id2string(method.name)
             + ":" + id2string(method.descriptor);
-        method_worklist2.push_back(methodid);
+        methods_to_convert_later.insert(methodid);
       }
     }
   }
   else
-    method_worklist2.push_back(main_function.main_function.name);
+    methods_to_convert_later.insert(main_function.main_function.name);
 
   // Add any extra entry points specified; we should elaborate these in the
   // same way as the main function.
   std::vector<irep_idt> extra_entry_points=lazy_methods_extra_entry_points;
   resolve_method_names(extra_entry_points, symbol_table);
-  method_worklist2.insert(
-    method_worklist2.begin(),
-    extra_entry_points.begin(),
-    extra_entry_points.end());
+  methods_to_convert_later.insert(
+    extra_entry_points.begin(), extra_entry_points.end());
 
-  std::set<irep_idt> instantiated_classes;
+  std::unordered_set<irep_idt> instantiated_classes;
 
   {
-    std::vector<irep_idt> initial_callable_methods;
+    std::unordered_set<irep_idt> initial_callable_methods;
     ci_lazy_methods_neededt initial_lazy_methods(
-      initial_callable_methods,
-      instantiated_classes,
-      symbol_table);
+      initial_callable_methods, instantiated_classes, symbol_table);
     initialize_instantiated_classes(
-      method_worklist2,
-      namespacet(symbol_table),
-      initial_lazy_methods);
-    method_worklist2.insert(
-      method_worklist2.end(),
-      initial_callable_methods.begin(),
-      initial_callable_methods.end());
+      methods_to_convert_later, namespacet(symbol_table), initial_lazy_methods);
+    methods_to_convert_later.insert(
+      initial_callable_methods.begin(), initial_callable_methods.end());
   }
 
-  std::set<irep_idt> methods_already_populated;
-  std::vector<const code_function_callt *> virtual_callsites;
+  std::unordered_set<irep_idt> methods_already_populated;
+  std::unordered_set<exprt, irep_hash> virtual_function_calls;
 
-  bool any_new_methods=false;
-  do
+  bool any_new_classes = true;
+  while(any_new_classes)
+  {bool any_new_methods = true;
+  while(any_new_methods)
   {
     any_new_methods=false;
-    while(!method_worklist2.empty())
+    while(!methods_to_convert_later.empty())
     {
-      std::swap(method_worklist1, method_worklist2);
-      for(const auto &mname : method_worklist1)
+      std::unordered_set<irep_idt> methods_to_convert;
+      std::swap(methods_to_convert, methods_to_convert_later);
+      for(const auto &mname : methods_to_convert)
       {
         if(!methods_already_populated.insert(mname).second)
           continue;
@@ -147,42 +141,74 @@ bool ci_lazy_methodst::operator()(
         if(
           method_converter(
             mname,
-            // Note this wraps *references* to method_worklist2 &
+            // Note this wraps *references* to methods_to_convert_later &
             // instantiated_classes
             ci_lazy_methods_neededt(
-              method_worklist2, instantiated_classes, symbol_table)))
+              methods_to_convert_later, instantiated_classes, symbol_table)))
         {
           // Couldn't convert this function
           continue;
         }
         gather_virtual_callsites(
-          symbol_table.lookup_ref(mname).value,
-          virtual_callsites);
+          symbol_table.lookup_ref(mname).value, virtual_function_calls);
         any_new_methods=true;
       }
-      method_worklist1.clear();
     }
 
-    // Given the object types we now know may be created, populate more
-    // possible virtual function call targets:
+      // Given the object types we now know may be created, populate more
+      // possible virtual function call targets:
 
-    debug() << "CI lazy methods: add virtual method targets ("
-            << virtual_callsites.size()
-            << " callsites)"
-            << eom;
+      debug() << "CI lazy methods: add virtual method targets ("
+              << virtual_function_calls.size() << " callsites)" << eom;
 
-    std::unordered_set<exprt, irep_hash> unique_functions;
-    for(const code_function_callt *virtual_callsite : virtual_callsites)
-      unique_functions.insert(virtual_callsite->function());
+      for(const exprt &function : virtual_function_calls)
+      {
+        get_virtual_method_targets(
+          function,
+          instantiated_classes,
+          methods_to_convert_later,
+          symbol_table);
+      }
+    }
 
-    for(const exprt &function : unique_functions)
+    any_new_classes = false;
+
+    // Look for virtual callsites with no candidate targets. If we have
+    // invokevirtual A.f and we don't believe either A or any of its children
+    // may exist, we assume specifically A is somehow instantiated. Note this
+    // may result in an abstract class being classified as instantiated, which
+    // stands in for some unknown concrete subclass: in this case the called
+    // method will be a stub.
+    for(const exprt &virtual_function_call : virtual_function_calls)
     {
-      // This will also create a stub if a virtual callsite has no targets.
+      std::unordered_set<irep_idt> candidate_target_methods;
       get_virtual_method_targets(
-        function, instantiated_classes, method_worklist2, symbol_table);
+        virtual_function_call,
+        instantiated_classes,
+        candidate_target_methods,
+        symbol_table);
+
+      if(!candidate_target_methods.empty())
+        continue;
+
+      // Add the call class to instantiated_classes and assert that it
+      // didn't already exist
+      const irep_idt &call_class = virtual_function_call.get(ID_C_class);
+      auto ret_class = instantiated_classes.insert(call_class);
+      CHECK_RETURN(ret_class.second);
+      any_new_classes = true;
+
+      // Check that `get_virtual_method_target` returns a method now
+      const irep_idt &call_basename =
+        virtual_function_call.get(ID_component_name);
+      const irep_idt method_name = get_virtual_method_target(
+        instantiated_classes, call_basename, call_class, symbol_table);
+      CHECK_RETURN(!method_name.empty());
+
+      // Add what it returns to methods_to_convert_later
+      methods_to_convert_later.insert(method_name);
     }
   }
-  while(any_new_methods);
 
   // Remove symbols for methods that were declared but never used:
   symbol_tablet keep_symbols;
@@ -279,7 +305,7 @@ void ci_lazy_methodst::resolve_method_names(
 ///   whose references may be passed, directly or indirectly, to any of the
 ///   functions in `entry_points`.
 void ci_lazy_methodst::initialize_instantiated_classes(
-  const std::vector<irep_idt> &entry_points,
+  const std::unordered_set<irep_idt> &entry_points,
   const namespacet &ns,
   ci_lazy_methods_neededt &needed_lazy_methods)
 {
@@ -386,7 +412,7 @@ void ci_lazy_methodst::initialize_instantiated_classes_from_pointer(
 ///   e that calls a virtual function.
 void ci_lazy_methodst::gather_virtual_callsites(
   const exprt &e,
-  std::vector<const code_function_callt *> &result)
+  std::unordered_set<exprt, irep_hash> &result)
 {
   if(e.id()!=ID_code)
     return;
@@ -394,7 +420,7 @@ void ci_lazy_methodst::gather_virtual_callsites(
   if(c.get_statement()==ID_function_call &&
      to_code_function_call(c).function().id()==ID_virtual_function)
   {
-    result.push_back(&to_code_function_call(c));
+    result.insert(to_code_function_call(c).function());
   }
   else
   {
@@ -409,14 +435,14 @@ void ci_lazy_methodst::gather_virtual_callsites(
 ///   should be determined.
 /// \param instantiated_classes: set of classes that can be instantiated. Any
 ///   potential callee not in this set will be ignored.
-/// \param symbol_table: global symbol table
 /// \param [out] callable_methods: Populated with all possible `c` callees,
 ///   taking `instantiated_classes` into account (virtual function overrides
 ///   defined on classes that are not 'needed' are ignored)
+/// \param symbol_table: global symbol table
 void ci_lazy_methodst::get_virtual_method_targets(
   const exprt &called_function,
-  const std::set<irep_idt> &instantiated_classes,
-  std::vector<irep_idt> &callable_methods,
+  const std::unordered_set<irep_idt> &instantiated_classes,
+  std::unordered_set<irep_idt> &callable_methods,
   symbol_tablet &symbol_table)
 {
   PRECONDITION(called_function.id()==ID_virtual_function);
@@ -429,26 +455,16 @@ void ci_lazy_methodst::get_virtual_method_targets(
     !call_basename.empty(),
     "Virtual function must have a reasonable name after removing class");
 
-  const irep_idt &self_method=
-    get_virtual_method_target(
-      instantiated_classes, call_basename, call_class, symbol_table);
+  class_hierarchyt::idst self_and_child_classes =
+    class_hierarchy.get_children_trans(call_class);
+  self_and_child_classes.push_back(call_class);
 
-  if(!self_method.empty())
+  for(const irep_idt &class_name : self_and_child_classes)
   {
-    callable_methods.push_back(self_method);
-  }
-
-  const auto child_classes=class_hierarchy.get_children_trans(call_class);
-  for(const auto &child_class : child_classes)
-  {
-    const auto child_method=
-      get_virtual_method_target(
-        instantiated_classes,
-        call_basename,
-        child_class,
-        symbol_table);
-    if(!child_method.empty())
-      callable_methods.push_back(child_method);
+    const irep_idt method_name = get_virtual_method_target(
+      instantiated_classes, call_basename, class_name, symbol_table);
+    if(!method_name.empty())
+      callable_methods.insert(method_name);
   }
 }
 
@@ -554,7 +570,7 @@ void ci_lazy_methodst::gather_field_types(
 ///   `call_basename` if found and `classname` is present in
 ///   `instantiated_classes`, or irep_idt() otherwise.
 irep_idt ci_lazy_methodst::get_virtual_method_target(
-  const std::set<irep_idt> &instantiated_classes,
+  const std::unordered_set<irep_idt> &instantiated_classes,
   const irep_idt &call_basename,
   const irep_idt &classname,
   const symbol_tablet &symbol_table)
