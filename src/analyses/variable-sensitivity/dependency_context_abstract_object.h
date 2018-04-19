@@ -2,7 +2,7 @@
 
  Module: analyses variable-sensitivity
 
- Author: Chris Ryder, chris.ryder@diffblue.com
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_DEPENDENCY_CONTEXT_ABSTRACT_OBJECT_H

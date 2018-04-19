@@ -2,7 +2,7 @@
 
  Module: analyses variable-sensitivity
 
- Author: Chris Ryder, chris.ryder@diffblue.com
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
