@@ -85,6 +85,7 @@ public:
     irep_idt calling_function;
     function_assignmentst return_assignments;
     function_assignmentst param_assignments;
+    function_assignmentst exception_assignments;
   };
 
   // list_input_varst maps function identifiers onto a vector of [name = value]
