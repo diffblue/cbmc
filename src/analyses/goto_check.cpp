@@ -1649,12 +1649,16 @@ void goto_checkt::goto_check(
       if((is_user_provided && !enable_assertions &&
           i.source_location.get_property_class()!="error label") ||
          (!is_user_provided && !enable_built_in_assertions))
-        i.type=SKIP;
+      {
+        i.make_skip();
+      }
     }
     else if(i.is_assume())
     {
       if(!enable_assumptions)
-        i.type=SKIP;
+      {
+        i.make_skip();
+      }
     }
     else if(i.is_dead())
     {

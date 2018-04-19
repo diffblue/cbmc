@@ -32,7 +32,7 @@ void set_properties(
       property_set.find(property_id);
 
     if(c_it==property_set.end())
-      it->type=SKIP;
+      it->make_skip();
     else
       property_set.erase(c_it);
   }
