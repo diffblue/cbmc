@@ -59,8 +59,7 @@ protected:
 
   system_library_symbolst system_symbols;
 
-  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash>
-    declared_enum_constants_mapt;
+  typedef std::unordered_map<irep_idt, irep_idt> declared_enum_constants_mapt;
   declared_enum_constants_mapt declared_enum_constants;
 
   struct typedef_infot
@@ -129,8 +128,7 @@ protected:
     const typet &type,
     std::ostream &os);
 
-  typedef std::unordered_map<irep_idt, code_declt, irep_id_hash>
-          local_static_declst;
+  typedef std::unordered_map<irep_idt, code_declt> local_static_declst;
 
   void convert_global_variable(
       const symbolt &symbol,

@@ -930,8 +930,7 @@ public:
     return result;
   }
 
-  typedef
-    std::unordered_map<irep_idt, std::size_t, irep_id_hash> parameter_indicest;
+  typedef std::unordered_map<irep_idt, std::size_t> parameter_indicest;
 
   /// Get a map from parameter name to its index
   parameter_indicest parameter_indices() const

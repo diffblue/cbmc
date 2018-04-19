@@ -40,8 +40,7 @@ void invariant_propagationt::add_objects(
   goto_program.get_decl_identifiers(locals);
 
   // cache the list for the locals to speed things up
-  typedef std::unordered_map<irep_idt, object_listt, irep_id_hash>
-    object_cachet;
+  typedef std::unordered_map<irep_idt, object_listt> object_cachet;
   object_cachet object_cache;
 
   forall_goto_program_instructions(i_it, goto_program)
@@ -133,8 +132,7 @@ void invariant_propagationt::add_objects(
     const goto_programt &goto_program=f_it->second.body;
 
     // cache the list for the locals to speed things up
-    typedef std::unordered_map<irep_idt, object_listt, irep_id_hash>
-      object_cachet;
+    typedef std::unordered_map<irep_idt, object_listt> object_cachet;
     object_cachet object_cache;
 
     forall_goto_program_instructions(i_it, goto_program)

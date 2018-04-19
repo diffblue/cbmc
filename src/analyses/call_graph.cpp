@@ -165,7 +165,7 @@ class function_indicest
   call_grapht::directed_grapht &graph;
 
 public:
-  std::unordered_map<irep_idt, node_indext, irep_id_hash> function_indices;
+  std::unordered_map<irep_idt, node_indext> function_indices;
 
   explicit function_indicest(call_grapht::directed_grapht &graph):
     graph(graph)

@@ -36,8 +36,7 @@ private:
   typedef const code_function_callt &conversion_inputt;
   typedef codet (*conversion_functiont)(conversion_inputt &target);
   // A table tells us what method to call for each java method signature
-  std::unordered_map<irep_idt, conversion_functiont, irep_id_hash>
-    conversion_table;
+  std::unordered_map<irep_idt, conversion_functiont> conversion_table;
 
   // Conversion functions
   static exprt expr_of_char_count(const exprt &chr, const typet &type);

@@ -112,7 +112,7 @@ protected:
   unsigned max_unwind;
   bool max_unwind_is_set;
 
-  typedef std::unordered_map<irep_idt, unsigned, irep_id_hash> loop_limitst;
+  typedef std::unordered_map<irep_idt, unsigned> loop_limitst;
   loop_limitst loop_limits;
 
   typedef std::map<unsigned, loop_limitst> thread_loop_limitst;

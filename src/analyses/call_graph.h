@@ -115,7 +115,7 @@ public:
     friend class call_grapht;
 
     /// Maps function names onto node indices
-    std::unordered_map<irep_idt, node_indext, irep_id_hash> nodes_by_name;
+    std::unordered_map<irep_idt, node_indext> nodes_by_name;
 
   public:
     /// Find the graph node by function name
@@ -124,8 +124,7 @@ public:
     optionalt<node_indext> get_node_index(const irep_idt &function) const;
 
     /// Type of the node name -> node index map.
-    typedef
-      std::unordered_map<irep_idt, node_indext, irep_id_hash> nodes_by_namet;
+    typedef std::unordered_map<irep_idt, node_indext> nodes_by_namet;
 
     /// Get the node name -> node index map
     /// \return node-by-name map

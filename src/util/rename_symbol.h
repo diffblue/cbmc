@@ -25,8 +25,8 @@ class typet;
 class rename_symbolt
 {
 public:
-  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> expr_mapt;
-  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> type_mapt;
+  typedef std::unordered_map<irep_idt, irep_idt> expr_mapt;
+  typedef std::unordered_map<irep_idt, irep_idt> type_mapt;
 
   void insert_expr(const irep_idt &old_id,
                    const irep_idt &new_id)

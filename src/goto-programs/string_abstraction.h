@@ -134,7 +134,7 @@ protected:
   typet string_struct;
   goto_programt initialization;
 
-  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> localst;
+  typedef std::unordered_map<irep_idt, irep_idt> localst;
   localst locals;
 
   void abstract(goto_programt &dest);

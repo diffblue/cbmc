@@ -125,7 +125,7 @@ private:
   // map block number to its location
   std::vector<source_locationt> block_locations;
   // map java indexes to block indexes
-  std::unordered_map<irep_idt, std::size_t, irep_id_hash> index_to_block;
+  std::unordered_map<irep_idt, std::size_t> index_to_block;
 
 public:
   explicit cover_basic_blocks_javat(const goto_programt &_goto_program);

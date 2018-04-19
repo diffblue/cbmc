@@ -105,11 +105,10 @@ private:
     symbol_table_baset &)>
     conversion_functiont;
 
-  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> id_mapt;
+  typedef std::unordered_map<irep_idt, irep_idt> id_mapt;
 
   // Table mapping each java method signature to the code generating function
-  std::unordered_map<irep_idt, conversion_functiont, irep_id_hash>
-    conversion_table;
+  std::unordered_map<irep_idt, conversion_functiont> conversion_table;
 
   // Some Java functions have an equivalent in the solver that we will
   // call with the same argument and will return the same result

@@ -31,8 +31,7 @@ codet get_clinit_wrapper_body(
 class stub_global_initializer_factoryt
 {
   /// Maps class symbols onto the stub globals that belong to them
-  typedef std::unordered_multimap<irep_idt, irep_idt, irep_id_hash>
-    stub_globals_by_classt;
+  typedef std::unordered_multimap<irep_idt, irep_idt> stub_globals_by_classt;
   stub_globals_by_classt stub_globals_by_class;
 
 public:

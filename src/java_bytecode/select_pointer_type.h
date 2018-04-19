@@ -16,7 +16,7 @@
 #include <stack>
 #include "java_types.h"
 
-typedef std::unordered_map<irep_idt, std::stack<reference_typet>, irep_id_hash>
+typedef std::unordered_map<irep_idt, std::stack<reference_typet>>
   generic_parameter_specialization_mapt;
 
 class namespacet;

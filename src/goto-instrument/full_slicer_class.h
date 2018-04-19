@@ -62,7 +62,7 @@ protected:
   typedef std::vector<cfgt::entryt> dep_node_to_cfgt;
   typedef std::stack<cfgt::entryt> queuet;
   typedef std::list<cfgt::entryt> jumpst;
-  typedef std::unordered_map<irep_idt, queuet, irep_id_hash> decl_deadt;
+  typedef std::unordered_map<irep_idt, queuet> decl_deadt;
 
   void fixedpoint(
     goto_functionst &goto_functions,

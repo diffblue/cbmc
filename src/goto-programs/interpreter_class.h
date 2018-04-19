@@ -104,7 +104,7 @@ protected:
 
   const goto_functionst &goto_functions;
 
-  typedef std::unordered_map<irep_idt, mp_integer, irep_id_hash> memory_mapt;
+  typedef std::unordered_map<irep_idt, mp_integer> memory_mapt;
   typedef std::map<mp_integer, irep_idt> inverse_memory_mapt;
   memory_mapt memory_map;
   inverse_memory_mapt inverse_memory_map;

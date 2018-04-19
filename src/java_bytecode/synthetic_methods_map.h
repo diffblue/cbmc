@@ -34,7 +34,7 @@ enum class synthetic_method_typet
 };
 
 /// Maps method names on to a synthetic method kind.
-typedef std::unordered_map<irep_idt, synthetic_method_typet, irep_id_hash>
+typedef std::unordered_map<irep_idt, synthetic_method_typet>
   synthetic_methods_mapt;
 
 #endif

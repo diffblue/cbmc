@@ -171,10 +171,7 @@ protected:
   namespacet ns;
 
   // X -> Y iff Y uses X for new symbol type IDs X and Y
-  typedef std::unordered_map<irep_idt,
-                             std::unordered_set<irep_idt>,
-                             irep_id_hash>
-    used_byt;
+  typedef std::unordered_map<irep_idt, std::unordered_set<irep_idt>> used_byt;
 
   irep_idt rename(irep_idt);
 
