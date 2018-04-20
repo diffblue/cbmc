@@ -69,7 +69,14 @@ bool is_skip(const goto_programt &body, goto_programt::const_targett it)
 }
 
 /// remove unnecessary skip statements
-void remove_skip(goto_programt &goto_program)
+/// \param goto_program  goto program containing the instructions to be cleaned
+/// in the range [begin, end)
+/// \param begin  iterator pointing to first instruction to be considered
+/// \param end  iterator pointing beyond last instruction to be considered
+void remove_skip(
+  goto_programt &goto_program,
+  goto_programt::targett begin,
+  goto_programt::targett end)
 {
   // This needs to be a fixed-point, as
   // removing a skip can turn a goto into a skip.
@@ -86,9 +93,7 @@ void remove_skip(goto_programt &goto_program)
 
     // remove skip statements
 
-    for(goto_programt::instructionst::iterator
-        it=goto_program.instructions.begin();
-        it!=goto_program.instructions.end();)
+    for(goto_programt::instructionst::iterator it = begin; it != end;)
     {
       goto_programt::targett old_target=it;
 
@@ -99,7 +104,7 @@ void remove_skip(goto_programt &goto_program)
       {
         // don't remove the last skip statement,
         // it could be a target
-        if(it==--goto_program.instructions.end())
+        if(it == std::prev(end))
           break;
 
         // save labels
@@ -121,23 +126,23 @@ void remove_skip(goto_programt &goto_program)
         it++;
     }
 
-    // adjust gotos
-
-    Forall_goto_program_instructions(i_it, goto_program)
-      if(i_it->is_goto() || i_it->is_start_thread() || i_it->is_catch())
+    // adjust gotos across the full goto program body
+    for(auto &ins : goto_program.instructions)
+    {
+      if(ins.is_goto() || ins.is_start_thread() || ins.is_catch())
       {
-        for(goto_programt::instructiont::targetst::iterator
-            t_it=i_it->targets.begin();
-            t_it!=i_it->targets.end();
-            t_it++)
+        for(auto &target : ins.targets)
         {
-          new_targetst::const_iterator
-            result=new_targets.find(*t_it);
+          new_targetst::const_iterator result = new_targets.find(target);
 
           if(result!=new_targets.end())
-            *t_it=result->second;
+            target = result->second;
         }
       }
+    }
+
+    while(new_targets.find(begin) != new_targets.end())
+      ++begin;
 
     // now delete the skips -- we do so after adjusting the
     // gotos to avoid dangling targets
@@ -145,15 +150,28 @@ void remove_skip(goto_programt &goto_program)
       goto_program.instructions.erase(new_target.first);
 
     // remove the last skip statement unless it's a target
-    goto_program.compute_incoming_edges();
+    goto_program.compute_target_numbers();
 
-    if(
-      !goto_program.instructions.empty() &&
-      is_skip(goto_program, --goto_program.instructions.end()) &&
-      !goto_program.instructions.back().is_target())
-      goto_program.instructions.pop_back();
+    if(begin != end)
+    {
+      goto_programt::targett last = std::prev(end);
+      if(begin == last)
+        ++begin;
+
+      if(is_skip(goto_program, last) && !last->is_target())
+        goto_program.instructions.erase(last);
+    }
   }
   while(goto_program.instructions.size()<old_size);
+}
+
+/// remove unnecessary skip statements
+void remove_skip(goto_programt &goto_program)
+{
+  remove_skip(
+    goto_program,
+    goto_program.instructions.begin(),
+    goto_program.instructions.end());
 }
 
 /// remove unnecessary skip statements

@@ -22,4 +22,9 @@ void remove_skip(goto_programt &);
 void remove_skip(goto_functionst &);
 void remove_skip(goto_modelt &);
 
+void remove_skip(
+  goto_programt &goto_program,
+  goto_programt::targett begin,
+  const goto_programt::targett end);
+
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_SKIP_H
