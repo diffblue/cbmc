@@ -388,10 +388,8 @@ void code_contractst::operator()()
     goto_functions.function_map.find(CPROVER_PREFIX "initialize");
   assert(i_it!=goto_functions.function_map.end());
 
-  for(std::unordered_set<irep_idt>::const_iterator it = summarized.begin();
-      it != summarized.end();
-      ++it)
-    add_contract_check(*it, i_it->second.body);
+  for(const auto &contract : summarized)
+    add_contract_check(contract, i_it->second.body);
 
   // remove skips
   remove_skip(i_it->second.body);

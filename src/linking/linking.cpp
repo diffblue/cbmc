@@ -1195,20 +1195,18 @@ void linkingt::do_type_dependencies(
 
   while(!queue.empty())
   {
-    irep_idt id=queue.top();
+    irep_idt id = queue.top();
     queue.pop();
 
     const std::unordered_set<irep_idt> &u = used_by[id];
 
-    for(std::unordered_set<irep_idt>::const_iterator d_it = u.begin();
-        d_it != u.end();
-        d_it++)
-      if(needs_to_be_renamed.insert(*d_it).second)
+    for(const auto &dep : u)
+      if(needs_to_be_renamed.insert(dep).second)
       {
-        queue.push(*d_it);
+        queue.push(dep);
         #ifdef DEBUG
         debug() << "LINKING: needs to be renamed (dependency): "
-                << *d_it << eom;
+                << dep << eom;
         #endif
       }
   }
