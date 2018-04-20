@@ -2,9 +2,9 @@ public class StringBuilderChars01
 {
    public static void main(String[] args)
    {
-      StringBuilder buffer = new StringBuilder("DiffBlue Limited");
+      StringBuilder buffer = new StringBuilder("Diffblue Limited");
 	  
-      assert buffer.toString().equals("DiffBlue Limited");
+      assert buffer.toString().equals("Diffblue Limited");
       assert buffer.charAt(0)!=buffer.charAt(4);
 
       char[] charArray = new char[buffer.length()];
