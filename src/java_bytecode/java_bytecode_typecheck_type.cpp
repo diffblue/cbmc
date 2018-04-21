@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_typecheck.h"
 
+#include <util/invariant.h>
 #include <util/std_types.h>
 
 void java_bytecode_typecheckt::typecheck_type(typet &type)
@@ -19,17 +20,12 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
   {
     irep_idt identifier=to_symbol_type(type).get_identifier();
 
-    symbol_tablet::symbolst::const_iterator s_it=
-      symbol_table.symbols.find(identifier);
-
-    // must exist already in the symbol table
-    if(s_it==symbol_table.symbols.end())
-    {
-      error() << "failed to find type symbol "<< identifier << eom;
-      throw 0;
-    }
-
-    assert(s_it->second.is_type);
+    auto type_symbol = symbol_table.lookup(identifier);
+    DATA_INVARIANT(
+      type_symbol, "symbol " + id2string(identifier) + " must exist already");
+    DATA_INVARIANT(
+      type_symbol->is_type,
+      "symbol " + id2string(identifier) + " must be a type");
   }
   else if(type.id()==ID_pointer)
   {
@@ -55,7 +51,8 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
 
 void java_bytecode_typecheckt::typecheck_type_symbol(symbolt &symbol)
 {
-  assert(symbol.is_type);
+  DATA_INVARIANT(
+    symbol.is_type, "symbol " + id2string(symbol.name) + " must be a type");
 
   symbol.mode = ID_java;
   typecheck_type(symbol.type);
