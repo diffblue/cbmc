@@ -192,7 +192,7 @@ protected:
   void get_l1_name(exprt &expr) const;
 
   // this maps L1 names to (L2) types
-  typedef std::unordered_map<irep_idt, typet, irep_id_hash> l1_typest;
+  typedef std::unordered_map<irep_idt, typet> l1_typest;
   l1_typest l1_types;
 
 public:
@@ -298,8 +298,7 @@ public:
       unsigned count;
       bool is_recursion;
     };
-    typedef std::unordered_map<irep_idt, loop_infot, irep_id_hash>
-      loop_iterationst;
+    typedef std::unordered_map<irep_idt, loop_infot> loop_iterationst;
     loop_iterationst loop_iterations;
   };
 

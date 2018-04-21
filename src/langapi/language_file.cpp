@@ -144,7 +144,7 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
       // register lazy methods.
       // TODO: learn about modules and generalise this
       // to module-providing languages if required.
-      id_sett lazy_method_ids;
+      std::unordered_set<irep_idt> lazy_method_ids;
       file.second.language->methods_provided(lazy_method_ids);
       for(const auto &id : lazy_method_ids)
         lazy_method_map[id]=&file.second;

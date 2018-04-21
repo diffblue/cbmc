@@ -45,8 +45,7 @@ protected:
 
   unsigned temporary_counter;
 
-  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
-  id_sett summarized;
+  std::unordered_set<irep_idt> summarized;
 
   void code_contracts(goto_functionst::goto_functiont &goto_function);
 
@@ -389,10 +388,8 @@ void code_contractst::operator()()
     goto_functions.function_map.find(CPROVER_PREFIX "initialize");
   assert(i_it!=goto_functions.function_map.end());
 
-  for(id_sett::const_iterator it=summarized.begin();
-      it!=summarized.end();
-      ++it)
-    add_contract_check(*it, i_it->second.body);
+  for(const auto &contract : summarized)
+    add_contract_check(contract, i_it->second.body);
 
   // remove skips
   remove_skip(i_it->second.body);

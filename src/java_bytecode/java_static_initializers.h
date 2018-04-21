@@ -31,14 +31,13 @@ codet get_clinit_wrapper_body(
 class stub_global_initializer_factoryt
 {
   /// Maps class symbols onto the stub globals that belong to them
-  typedef std::unordered_multimap<irep_idt, irep_idt, irep_id_hash>
-    stub_globals_by_classt;
+  typedef std::unordered_multimap<irep_idt, irep_idt> stub_globals_by_classt;
   stub_globals_by_classt stub_globals_by_class;
 
 public:
   void create_stub_global_initializer_symbols(
     symbol_tablet &symbol_table,
-    const std::unordered_set<irep_idt, irep_id_hash> &stub_globals_set,
+    const std::unordered_set<irep_idt> &stub_globals_set,
     synthetic_methods_mapt &synthetic_methods);
 
   codet get_stub_initializer_body(
@@ -50,7 +49,7 @@ public:
 
 void create_stub_global_initializers(
   symbol_tablet &symbol_table,
-  const std::unordered_set<irep_idt, irep_id_hash> &stub_globals_set,
+  const std::unordered_set<irep_idt> &stub_globals_set,
   const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector);
 

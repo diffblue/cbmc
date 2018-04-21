@@ -31,8 +31,6 @@ Date:   March 2017
 // Arbitrary limit of 10 arguments for the number of arguments to String.format
 #define MAX_FORMAT_ARGS 10
 
-typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
-
 class java_string_library_preprocesst:public messaget
 {
 public:
@@ -48,7 +46,7 @@ public:
   void initialize_refined_string_type();
 
   bool implements_function(const irep_idt &function_id) const;
-  void get_all_function_names(id_sett &methods) const;
+  void get_all_function_names(std::unordered_set<irep_idt> &methods) const;
 
   exprt
   code_for_function(const symbolt &symbol, symbol_table_baset &symbol_table);
@@ -107,11 +105,10 @@ private:
     symbol_table_baset &)>
     conversion_functiont;
 
-  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> id_mapt;
+  typedef std::unordered_map<irep_idt, irep_idt> id_mapt;
 
   // Table mapping each java method signature to the code generating function
-  std::unordered_map<irep_idt, conversion_functiont, irep_id_hash>
-    conversion_table;
+  std::unordered_map<irep_idt, conversion_functiont> conversion_table;
 
   // Some Java functions have an equivalent in the solver that we will
   // call with the same argument and will return the same result
@@ -146,7 +143,7 @@ private:
     };
 
   // A set tells us what java types should be considered as string objects
-  std::unordered_set<irep_idt, irep_id_hash> string_types;
+  std::unordered_set<irep_idt> string_types;
 
   codet make_equals_function_code(
     const code_typet &type,

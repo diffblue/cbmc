@@ -25,7 +25,7 @@ class symbol_tablet;
 class symbol_table_baset
 {
 public:
-  typedef std::unordered_map<irep_idt, symbolt, irep_id_hash> symbolst;
+  typedef std::unordered_map<irep_idt, symbolt> symbolst;
 
 public:
   const symbolst &symbols;

@@ -52,15 +52,14 @@ protected:
   std::unique_ptr<languaget> language;
   const bool harness;
 
-  typedef std::unordered_set<irep_idt, irep_id_hash> convertedt;
+  typedef std::unordered_set<irep_idt> convertedt;
   convertedt converted_compound, converted_global, converted_enum;
 
   std::set<std::string> system_headers;
 
   system_library_symbolst system_symbols;
 
-  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash>
-    declared_enum_constants_mapt;
+  typedef std::unordered_map<irep_idt, irep_idt> declared_enum_constants_mapt;
   declared_enum_constants_mapt declared_enum_constants;
 
   struct typedef_infot
@@ -68,7 +67,7 @@ protected:
     irep_idt typedef_name;
     std::string type_decl_str;
     bool early;
-    std::unordered_set<irep_idt, irep_id_hash> dependencies;
+    std::unordered_set<irep_idt> dependencies;
 
     explicit typedef_infot(const irep_idt &name):
       typedef_name(name),
@@ -108,7 +107,7 @@ protected:
   void collect_typedefs_rec(
     const typet &type,
     bool early,
-    std::unordered_set<irep_idt, irep_id_hash> &dependencies);
+    std::unordered_set<irep_idt> &dependencies);
   void gather_global_typedefs();
   void dump_typedefs(std::ostream &os) const;
 
@@ -129,8 +128,7 @@ protected:
     const typet &type,
     std::ostream &os);
 
-  typedef std::unordered_map<irep_idt, code_declt, irep_id_hash>
-          local_static_declst;
+  typedef std::unordered_map<irep_idt, code_declt> local_static_declst;
 
   void convert_global_variable(
       const symbolt &symbol,

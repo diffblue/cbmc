@@ -38,8 +38,6 @@ public:
   replace_symbolt object_type_updates;
 
 protected:
-  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
-
   bool needs_renaming_type(
     const symbolt &old_symbol,
     const symbolt &new_symbol);
@@ -58,9 +56,9 @@ protected:
       return needs_renaming_non_type(old_symbol, new_symbol);
   }
 
-  void do_type_dependencies(id_sett &);
+  void do_type_dependencies(std::unordered_set<irep_idt> &);
 
-  void rename_symbols(const id_sett &needs_to_be_renamed);
+  void rename_symbols(const std::unordered_set<irep_idt> &needs_to_be_renamed);
   void copy_symbols();
 
   void duplicate_non_type_symbol(
@@ -94,8 +92,8 @@ protected:
     const symbolt &old_symbol;
     const symbolt &new_symbol;
     bool set_to_new;
-    id_sett o_symbols;
-    id_sett n_symbols;
+    std::unordered_set<irep_idt> o_symbols;
+    std::unordered_set<irep_idt> n_symbols;
   };
 
   bool adjust_object_type_rec(
@@ -173,12 +171,12 @@ protected:
   namespacet ns;
 
   // X -> Y iff Y uses X for new symbol type IDs X and Y
-  typedef std::unordered_map<irep_idt, id_sett, irep_id_hash> used_byt;
+  typedef std::unordered_map<irep_idt, std::unordered_set<irep_idt>> used_byt;
 
   irep_idt rename(irep_idt);
 
   // the new IDs created by renaming
-  id_sett renamed_ids;
+  std::unordered_set<irep_idt> renamed_ids;
 };
 
 #endif // CPROVER_LINKING_LINKING_CLASS_H

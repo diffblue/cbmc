@@ -877,7 +877,7 @@ void c_typecheck_baset::typecheck_compound_body(
   // scan for duplicate members
 
   {
-    std::unordered_set<irep_idt, irep_id_hash> members;
+    std::unordered_set<irep_idt> members;
 
     for(struct_union_typet::componentst::iterator
         it=components.begin();

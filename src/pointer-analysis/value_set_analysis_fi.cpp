@@ -47,7 +47,7 @@ void value_set_analysis_fit::add_vars(
   goto_program.get_decl_identifiers(locals);
 
   // cache the list for the locals to speed things up
-  typedef std::unordered_map<irep_idt, entry_listt, irep_id_hash> entry_cachet;
+  typedef std::unordered_map<irep_idt, entry_listt> entry_cachet;
   entry_cachet entry_cache;
 
   value_set_fit &v=state.value_set;

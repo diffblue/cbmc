@@ -19,8 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/pointer_offset_size.h>
 #include <util/invariant.h>
 
-typedef std::unordered_map<irep_idt, std::pair<size_t, bool>, irep_id_hash>
-  symbol_numbert;
+typedef std::unordered_map<irep_idt, std::pair<size_t, bool>> symbol_numbert;
 
 static std::string type2name(
   const typet &type,

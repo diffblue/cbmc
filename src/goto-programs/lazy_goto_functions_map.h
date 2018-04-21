@@ -61,7 +61,7 @@ private:
   /// Names of functions that are already fully available in the programt state.
   /// \remarks These functions do not need processing before being returned
   /// whenever they are requested
-  mutable std::unordered_set<irep_idt, irep_id_hash> processed_functions;
+  mutable std::unordered_set<irep_idt> processed_functions;
 
   language_filest &language_files;
   symbol_tablet &symbol_table;

@@ -75,8 +75,7 @@ class class_hierarchy_grapht : public grapht<class_hierarchy_graph_nodet>
 {
 public:
   /// Maps class identifiers onto node indices
-  typedef std::unordered_map<irep_idt, node_indext, irep_id_hash>
-    nodes_by_namet;
+  typedef std::unordered_map<irep_idt, node_indext> nodes_by_namet;
 
   void populate(const symbol_tablet &);
 

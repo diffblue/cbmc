@@ -60,7 +60,7 @@ public:
 protected:
   typedef typename std::map<V, std::size_t> inner_mapt;
   std::vector<typename inner_mapt::const_iterator> values;
-  std::unordered_map<irep_idt, inner_mapt, irep_id_hash> value_map;
+  std::unordered_map<irep_idt, inner_mapt> value_map;
 };
 
 struct reaching_definitiont
@@ -191,15 +191,14 @@ private:
   #ifdef USE_DSTRING
   typedef std::map<irep_idt, values_innert> valuest;
   #else
-  typedef std::unordered_map<irep_idt, values_innert, irep_id_hash> valuest;
+  typedef std::unordered_map<irep_idt, values_innert> valuest;
   #endif
   valuest values;
 
   #ifdef USE_DSTRING
   typedef std::map<irep_idt, ranges_at_loct> export_cachet;
   #else
-  typedef std::unordered_map<irep_idt, ranges_at_loct, irep_id_hash>
-    export_cachet;
+  typedef std::unordered_map<irep_idt, ranges_at_loct> export_cachet;
   #endif
   mutable export_cachet export_cache;
 
