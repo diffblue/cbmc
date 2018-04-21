@@ -18,9 +18,7 @@ Author: CM Wintersteiger, 2006
 
 #include <util/prefix.h>
 
-/// parses the command line options into a cmdlinet
-/// \par parameters: argument count, argument strings
-/// \return none
+// clang-format off
 // non-gcc options
 const char *goto_cc_options_with_separated_argument[]=
 {
@@ -163,6 +161,8 @@ const char *gcc_options_without_argument[]=
   "-print-multi-directory",
   "-print-multi-lib",
   "-print-search-dirs",
+  "-print-sysroot",
+  "-print-sysroot-headers-suffix",
   "-Q",
   "-Qn",
   "-Qy",
@@ -211,7 +211,11 @@ const char *gcc_options_without_argument[]=
   "-fast", // Apple only
   nullptr
 };
+// clang-format on
 
+/// parses the command line options into a cmdlinet
+/// \par parameters: argument count, argument strings
+/// \return none
 bool gcc_cmdlinet::parse(int argc, const char **argv)
 {
   assert(argc>0);
