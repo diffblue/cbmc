@@ -350,7 +350,7 @@ void value_set_fit::get_value_set(
 
   #if 0
   for(expr_sett::const_iterator it=value_set.begin(); it!=value_set.end(); it++)
-    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << '\n';
+    std::cout << "GET_VALUE_SET: " << format(*it) << '\n';
   #endif
 }
 
@@ -375,7 +375,7 @@ void value_set_fit::get_value_set_rec(
   gvs_recursion_sett &recursion_set) const
 {
   #if 0
-  std::cout << "GET_VALUE_SET_REC EXPR: " << from_expr(ns, "", expr)
+  std::cout << "GET_VALUE_SET_REC EXPR: " << format(expr)
             << '\n';
   std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << '\n';
   std::cout << '\n';
@@ -768,7 +768,7 @@ void value_set_fit::get_reference_set_sharing_rec(
   const namespacet &ns) const
 {
   #if 0
-  std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr)
+  std::cout << "GET_REFERENCE_SET_REC EXPR: " << format(expr)
             << '\n';
   #endif
 
@@ -843,7 +843,7 @@ void value_set_fit::get_reference_set_sharing_rec(
     for(expr_sett::const_iterator it=value_set.begin();
         it!=value_set.end();
         it++)
-      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << '\n';
+      std::cout << "VALUE_SET: " << format(*it) << '\n';
     #endif
 
     return;
@@ -960,8 +960,8 @@ void value_set_fit::assign(
   const namespacet &ns)
 {
   #if 0
-  std::cout << "ASSIGN LHS: " << from_expr(ns, "", lhs) << '\n';
-  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << '\n';
+  std::cout << "ASSIGN LHS: " << format(lhs) << '\n';
+  std::cout << "ASSIGN RHS: " << format(rhs) << '\n';
   #endif
 
   if(rhs.id()==ID_if)
@@ -1200,7 +1200,7 @@ void value_set_fit::assign_rec(
   assign_recursion_sett &recursion_set)
 {
   #if 0
-  std::cout << "ASSIGN_REC LHS: " << from_expr(ns, "", lhs) << '\n';
+  std::cout << "ASSIGN_REC LHS: " << format(lhs) << '\n';
   std::cout << "ASSIGN_REC SUFFIX: " << suffix << '\n';
 
   for(object_map_dt::const_iterator it=values_rhs.read().begin();

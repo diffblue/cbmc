@@ -457,7 +457,10 @@ void local_may_aliast::output(
           if(loc_info.aliases.find(j)==i)
           {
             assert(j<objects.size());
-            out << ' ' << from_expr(ns, "", objects[j]);
+            irep_idt identifier = "";
+            if(objects[j].id() == ID_symbol)
+              identifier = to_symbol_expr(objects[j]).get_identifier();
+            out << ' ' << from_expr(ns, identifier, objects[j]);
           }
 
         out << " }";

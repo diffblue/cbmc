@@ -297,8 +297,8 @@ void goto_symext::symex_step(
   #if 0
   std::cout << "\ninstruction type is " << state.source.pc->type << '\n';
   std::cout << "Location: " << state.source.pc->source_location << '\n';
-  std::cout << "Guard: " << from_expr(ns, "", state.guard.as_expr()) << '\n';
-  std::cout << "Code: " << from_expr(ns, "", state.source.pc->code) << '\n';
+  std::cout << "Guard: " << format(state.guard.as_expr()) << '\n';
+  std::cout << "Code: " << format(state.source.pc->code) << '\n';
   #endif
 
   PRECONDITION(!state.threads.empty());

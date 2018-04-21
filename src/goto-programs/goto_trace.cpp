@@ -110,7 +110,7 @@ void goto_trace_stept::output(
 
       if(comment!="")
         out << "  " << comment << "\n";
-      out << "  " << from_expr(ns, "", pc->guard) << "\n";
+      out << "  " << from_expr(ns, pc->function, pc->guard) << "\n";
       out << "\n";
     }
   }
@@ -273,7 +273,8 @@ void show_goto_trace(
         out << "  " << step.comment << "\n";
 
         if(step.pc->is_assert())
-          out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
+          out << "  " << from_expr(ns, step.pc->function, step.pc->guard)
+              << '\n';
 
         out << "\n";
       }
@@ -288,7 +289,8 @@ void show_goto_trace(
           out << "  " << step.pc->source_location << "\n";
 
         if(step.pc->is_assume())
-          out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
+          out << "  " << from_expr(ns, step.pc->function, step.pc->guard)
+              << '\n';
 
         out << "\n";
       }
@@ -354,7 +356,7 @@ void show_goto_trace(
         {
           if(l_it!=step.io_args.begin())
             out << ";";
-          out << " " << from_expr(ns, "", *l_it);
+          out << " " << from_expr(ns, step.pc->function, *l_it);
 
           // the binary representation
           out << " (" << trace_value_binary(*l_it, ns) << ")";
@@ -375,7 +377,7 @@ void show_goto_trace(
       {
         if(l_it!=step.io_args.begin())
           out << ";";
-        out << " " << from_expr(ns, "", *l_it);
+        out << " " << from_expr(ns, step.pc->function, *l_it);
 
         // the binary representation
         out << " (" << trace_value_binary(*l_it, ns) << ")";

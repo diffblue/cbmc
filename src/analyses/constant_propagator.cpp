@@ -13,6 +13,7 @@ Author: Peter Schrammel
 
 #ifdef DEBUG
 #include <iostream>
+#include <util/format_expr.h>
 #endif
 
 #include <util/find_symbols.h>
@@ -219,7 +220,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
   const namespacet &ns)
 {
 #ifdef DEBUG
-  std::cout << "two_way_propagate_rec: " << from_expr(ns, "", expr) << '\n';
+  std::cout << "two_way_propagate_rec: " << format(expr) << '\n';
 #endif
 
   bool change=false;
@@ -379,7 +380,7 @@ void constant_propagator_domaint::valuest::output(
 
   for(const auto &p : replace_const.expr_map)
   {
-    out << ' ' << p.first << "=" << from_expr(ns, "", p.second) << '\n';
+    out << ' ' << p.first << "=" << from_expr(ns, p.first, p.second) << '\n';
   }
 }
 

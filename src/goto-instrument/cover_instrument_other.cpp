@@ -57,7 +57,8 @@ void cover_cover_instrumentert::instrument(
       code_function_call.arguments().size() == 1)
     {
       const exprt c = code_function_call.arguments()[0];
-      std::string comment = "condition `" + from_expr(ns, "", c) + "'";
+      std::string comment =
+        "condition `" + from_expr(ns, i_it->function, c) + "'";
       i_it->guard = not_exprt(c);
       i_it->type = ASSERT;
       i_it->code.clear();

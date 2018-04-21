@@ -131,6 +131,8 @@ std::string inv_object_storet::build_string(const exprt &expr) const
 
   // we also like "address_of" and "reference_to"
   // if the object is constant
+  // we don't know what mode (language) we are in, so we rely on the default
+  // language to be reasonable for from_expr
   if(is_constant_address(expr))
     return from_expr(ns, "", expr);
 
@@ -884,7 +886,6 @@ std::string inv_object_storet::to_string(
   unsigned a,
   const irep_idt &identifier) const
 {
-  // return from_expr(ns, "", get_expr(a));
   return id2string(map[a]);
 }
 

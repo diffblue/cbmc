@@ -673,7 +673,7 @@ void cover_mcdc_instrumentert::instrument(
                                   ? "decision/condition"
                                   : is_decision ? "decision" : "condition";
 
-      std::string p_string = from_expr(ns, "", p);
+      std::string p_string = from_expr(ns, i_it->function, p);
 
       std::string comment_t = description + " `" + p_string + "' true";
       const irep_idt function = i_it->function;
@@ -710,7 +710,7 @@ void cover_mcdc_instrumentert::instrument(
 
     for(const auto &p : controlling)
     {
-      std::string p_string = from_expr(ns, "", p);
+      std::string p_string = from_expr(ns, i_it->function, p);
 
       std::string description =
         "MC/DC independence condition `" + p_string + "'";

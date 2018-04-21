@@ -135,7 +135,9 @@ std::string create_info(std::vector<exprt> &lemmas, const namespacet &ns)
   for(auto &lemma : lemmas)
   {
     simplify(lemma, ns);
-    new_lemmas+=from_expr(ns, "", lemma)+"\n\n";
+    std::string lemma_string;
+    get_language_from_mode(ID_java)->from_expr(lemma, lemma_string, ns);
+    new_lemmas += lemma_string + "\n\n";
   }
   return "Instantiated lemmas:\n"+new_lemmas;
 }
@@ -163,6 +165,7 @@ SCENARIO("instantiate_not_contains",
 {
   // For printing expression
   register_language(new_java_bytecode_language);
+  std::unique_ptr<languaget> java_lang = get_language_from_mode(ID_java);
   symbol_tablet symtbl;
   const namespacet ns(symtbl);
 
@@ -205,7 +208,9 @@ SCENARIO("instantiate_not_contains",
       axioms,
       [&](const std::string &accu, string_constraintt sc) { // NOLINT
         simplify(sc, ns);
-        return accu + from_expr(ns, "", sc) + "\n\n";
+        std::string s;
+        java_lang->from_expr(sc, s, ns);
+        return accu + s + "\n\n";
       });
 
     const auto nc_contraints = generator.get_not_contains_constraints();
@@ -218,7 +223,9 @@ SCENARIO("instantiate_not_contains",
         simplify(sc, ns);
         generator.witness[sc] = generator.fresh_symbol("w", t.witness_type());
         nc_axioms.push_back(sc);
-        return accu + from_expr(ns, "", sc) + "\n\n";
+        std::string s;
+        java_lang->from_expr(sc, s, ns);
+        return accu + s + "\n\n";
       });
 
     const auto lemmas = generator.get_lemmas();
@@ -228,7 +235,9 @@ SCENARIO("instantiate_not_contains",
       axioms,
       [&](const std::string &accu, exprt axiom) { // NOLINT
         simplify(axiom, ns);
-        return accu + from_expr(ns, "", axiom) + "\n\n";
+        std::string s;
+        java_lang->from_expr(axiom, s, ns);
+        return accu + s + "\n\n";
       });
 
     INFO("Original axioms:\n");
@@ -294,7 +303,9 @@ SCENARIO("instantiate_not_contains",
       generator.fresh_symbol("w", t.witness_type());
 
     INFO("Original axiom:\n");
-    INFO(from_expr(ns, "", vacuous)+"\n\n");
+    std::string s;
+    java_lang->from_expr(vacuous, s, ns);
+    INFO(s + "\n\n");
 
     WHEN("we instantiate and simplify")
     {
@@ -348,7 +359,9 @@ SCENARIO("instantiate_not_contains",
       generator.fresh_symbol("w", t.witness_type());
 
     INFO("Original axiom:\n");
-    INFO(from_expr(ns, "", trivial)+"\n\n");
+    std::string s;
+    java_lang->from_expr(trivial, s, ns);
+    INFO(s + "\n\n");
 
     WHEN("we instantiate and simplify")
     {
@@ -403,7 +416,9 @@ SCENARIO("instantiate_not_contains",
       generator.fresh_symbol("w", t.witness_type());
 
     INFO("Original axiom:\n");
-    INFO(from_expr(ns, "", trivial)+"\n\n");
+    std::string s;
+    java_lang->from_expr(trivial, s, ns);
+    INFO(s + "\n\n");
 
     WHEN("we instantiate and simplify")
     {
@@ -461,7 +476,9 @@ SCENARIO("instantiate_not_contains",
       generator.fresh_symbol("w", t.witness_type());
 
     INFO("Original axiom:\n");
-    INFO(from_expr(ns, "", trivial)+"\n\n");
+    std::string s;
+    java_lang->from_expr(trivial, s, ns);
+    INFO(s + "\n\n");
 
     WHEN("we instantiate and simplify")
     {
@@ -516,7 +533,9 @@ SCENARIO("instantiate_not_contains",
       generator.fresh_symbol("w", t.witness_type());
 
     INFO("Original axiom:\n");
-    INFO(from_expr(ns, "", trivial)+"\n\n");
+    std::string s;
+    java_lang->from_expr(trivial, s, ns);
+    INFO(s + "\n\n");
 
     WHEN("we instantiate and simplify")
     {

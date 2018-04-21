@@ -618,9 +618,11 @@ void symex_target_equationt::SSA_stept::output(
   switch(type)
   {
   case goto_trace_stept::typet::ASSERT:
-    out << "ASSERT " << from_expr(ns, "", cond_expr) << '\n'; break;
+    out << "ASSERT " << from_expr(ns, source.pc->function, cond_expr) << '\n';
+    break;
   case goto_trace_stept::typet::ASSUME:
-    out << "ASSUME " << from_expr(ns, "", cond_expr) << '\n'; break;
+    out << "ASSUME " << from_expr(ns, source.pc->function, cond_expr) << '\n';
+    break;
   case goto_trace_stept::typet::LOCATION:
     out << "LOCATION" << '\n'; break;
   case goto_trace_stept::typet::INPUT:
@@ -630,7 +632,7 @@ void symex_target_equationt::SSA_stept::output(
 
   case goto_trace_stept::typet::DECL:
     out << "DECL" << '\n';
-    out << from_expr(ns, "", ssa_lhs) << '\n';
+    out << from_expr(ns, source.pc->function, ssa_lhs) << '\n';
     break;
 
   case goto_trace_stept::typet::ASSIGNMENT:
@@ -684,19 +686,20 @@ void symex_target_equationt::SSA_stept::output(
   case goto_trace_stept::typet::MEMORY_BARRIER:
     out << "MEMORY_BARRIER\n"; break;
   case goto_trace_stept::typet::GOTO:
-    out << "IF " << from_expr(ns, "", cond_expr) << " GOTO\n"; break;
+    out << "IF " << from_expr(ns, source.pc->function, cond_expr) << " GOTO\n";
+    break;
 
   default: UNREACHABLE;
   }
 
   if(is_assert() || is_assume() || is_assignment() || is_constraint())
-    out << from_expr(ns, "", cond_expr) << '\n';
+    out << from_expr(ns, source.pc->function, cond_expr) << '\n';
 
   if(is_assert() || is_constraint())
     out << comment << '\n';
 
   if(is_shared_read() || is_shared_write())
-    out << from_expr(ns, "", ssa_lhs) << '\n';
+    out << from_expr(ns, source.pc->function, ssa_lhs) << '\n';
 
-  out << "Guard: " << from_expr(ns, "", guard) << '\n';
+  out << "Guard: " << from_expr(ns, source.pc->function, guard) << '\n';
 }

@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef DEBUG
 #include <iostream>
-#include <langapi/language_util.h>
+#include <util/format_expr.h>
 #endif
 
 #include <util/std_expr.h>
@@ -37,7 +37,7 @@ exprt dereferencet::operator()(const exprt &pointer)
   const typet &type=pointer.type().subtype();
 
   #ifdef DEBUG
-  std::cout << "DEREF: " << from_expr(ns, "", pointer) << '\n';
+  std::cout << "DEREF: " << format(pointer) << '\n';
   #endif
 
   return dereference_rec(

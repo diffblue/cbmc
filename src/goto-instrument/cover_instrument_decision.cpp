@@ -32,7 +32,7 @@ void cover_decision_instrumentert::instrument(
 
     for(const auto &d : decisions)
     {
-      const std::string d_string = from_expr(ns, "", d);
+      const std::string d_string = from_expr(ns, i_it->function, d);
 
       const std::string comment_t = "decision `" + d_string + "' true";
       const irep_idt function = i_it->function;
