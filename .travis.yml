@@ -38,6 +38,13 @@ jobs:
       script: scripts/travis_lint.sh
       before_cache:
 
+    - &string-table-check
+      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+      env: NAME="string-table"
+      install:
+      script: scripts/string_table_check.sh
+      before_cache:
+
     - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
       env: NAME="DOXYGEN-CHECK"
       addons:
