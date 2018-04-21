@@ -839,11 +839,11 @@ exprt cpp_typecheck_resolvet::do_builtin(
                             << ": " << original_scope->prefix
                             << messaget::eom;
   }
-  else if(base_name=="size_t")
+  else if(base_name == ID_size_t)
   {
     dest=type_exprt(size_type());
   }
-  else if(base_name=="ssize_t")
+  else if(base_name == ID_ssize_t)
   {
     dest=type_exprt(signed_size_type());
   }

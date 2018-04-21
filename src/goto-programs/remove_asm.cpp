@@ -195,7 +195,7 @@ void remove_asmt::process_instruction(
       {
         gcc_asm_function_call("__asm_"+id2string(command), code, tmp_dest);
       }
-      else if(command=="sync") // Power
+      else if(command == ID_sync) // Power
       {
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->source_location=code.source_location();
@@ -210,7 +210,7 @@ void remove_asmt::process_instruction(
         t->code.set(ID_RRcumul, true);
         t->code.set(ID_WRcumul, true);
       }
-      else if(command=="lwsync") // Power
+      else if(command == ID_lwsync) // Power
       {
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->source_location=code.source_location();
@@ -223,7 +223,7 @@ void remove_asmt::process_instruction(
         t->code.set(ID_RWcumul, true);
         t->code.set(ID_RRcumul, true);
       }
-      else if(command=="isync") // Power
+      else if(command == ID_isync) // Power
       {
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->source_location=code.source_location();
