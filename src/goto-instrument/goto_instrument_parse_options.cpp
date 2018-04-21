@@ -49,9 +49,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/add_failed_symbols.h>
 #include <pointer-analysis/show_value_sets.h>
 
-#include <java_bytecode/remove_exceptions.h>
-#include <java_bytecode/remove_instanceof.h>
-
 #include <analyses/natural_loops.h>
 #include <analyses/global_may_alias.h>
 #include <analyses/local_bitvector_analysis.h>
@@ -841,11 +838,6 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
     cmdline.isset("pointer-check"));
   status() << "Virtual function removal" << eom;
   remove_virtual_functions(goto_model);
-  status() << "Catch and throw removal" << eom;
-  // This introduces instanceof, so order is important:
-  remove_exceptions(goto_model);
-  status() << "Java instanceof removal" << eom;
-  remove_instanceof(goto_model);
 }
 
 /// Remove function pointers that can be resolved by analysing const variables
