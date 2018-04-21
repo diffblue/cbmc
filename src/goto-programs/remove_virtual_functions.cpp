@@ -12,8 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
+#include <langapi/language.h>
+#include <langapi/mode.h>
+
+#include <util/c_types.h>
+#include <util/prefix.h>
 #include <util/type_eq.h>
 
+#include "class_hierarchy.h"
 #include "class_identifier.h"
 #include "goto_model.h"
 #include "resolve_inherited_component.h"

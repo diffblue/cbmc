@@ -16,14 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <memory>
 
-#include <util/string2int.h>
-#include <util/config.h>
-#include <util/unicode.h>
-#include <util/invariant.h>
-
-#include <langapi/language.h>
-
 #include <ansi-c/ansi_c_language.h>
+
+#include <cbmc/version.h>
 
 #include <goto-programs/convert_nondet.h>
 #include <goto-programs/lazy_goto_model.h>
@@ -31,34 +26,38 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/loop_ids.h>
-#include <goto-programs/remove_virtual_functions.h>
-#include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_asm.h>
-#include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/remove_exceptions.h>
+#include <goto-programs/remove_instanceof.h>
+#include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_symbol_table.h>
 #include <goto-programs/show_properties.h>
 
-#include <goto-symex/adjust_float_expressions.h>
-
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/reachability_slicer.h>
 #include <goto-instrument/nondet_static.h>
 
-#include <pointer-analysis/add_failed_symbols.h>
-
-#include <langapi/mode.h>
+#include <goto-symex/adjust_float_expressions.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_enum_static_init_unwind_handler.h>
-#include <java_bytecode/remove_exceptions.h>
-#include <java_bytecode/remove_instanceof.h>
-#include <java_bytecode/remove_java_new.h>
 #include <java_bytecode/replace_java_nondet.h>
+#include <java_bytecode/remove_java_new.h>
 
-#include <cbmc/version.h>
+#include <langapi/mode.h>
+#include <langapi/language.h>
+
+#include <pointer-analysis/add_failed_symbols.h>
+
+#include <util/string2int.h>
+#include <util/config.h>
+#include <util/unicode.h>
+#include <util/invariant.h>
 
 jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv):
   parse_options_baset(JBMC_OPTIONS, argc, argv),

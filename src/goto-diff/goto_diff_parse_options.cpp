@@ -16,53 +16,52 @@ Author: Peter Schrammel
 #include <iostream>
 #include <memory>
 
-#include <util/string2int.h>
-#include <util/config.h>
-#include <util/options.h>
-#include <util/make_unique.h>
-#include <util/exit_codes.h>
-
-#include <langapi/language.h>
+#include <cbmc/version.h>
 
 #include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/instrument_preconditions.h>
-#include <goto-programs/mm_io.h>
-#include <goto-programs/remove_function_pointers.h>
-#include <goto-programs/remove_virtual_functions.h>
-#include <goto-programs/remove_returns.h>
-#include <goto-programs/remove_vector.h>
-#include <goto-programs/remove_complex.h>
-#include <goto-programs/remove_asm.h>
-#include <goto-programs/remove_unused_functions.h>
-#include <goto-programs/remove_skip.h>
 #include <goto-programs/goto_inline.h>
+#include <goto-programs/instrument_preconditions.h>
+#include <goto-programs/link_to_library.h>
+#include <goto-programs/loop_ids.h>
+#include <goto-programs/mm_io.h>
+#include <goto-programs/read_goto_binary.h>
+#include <goto-programs/remove_asm.h>
+#include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_exceptions.h>
+#include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_instanceof.h>
+#include <goto-programs/remove_returns.h>
+#include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_vector.h>
+#include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
-#include <goto-programs/read_goto_binary.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
-#include <goto-programs/loop_ids.h>
-#include <goto-programs/link_to_library.h>
-
-#include <goto-symex/rewrite_union.h>
-#include <goto-symex/adjust_float_expressions.h>
 
 #include <goto-instrument/cover.h>
 
-#include <pointer-analysis/add_failed_symbols.h>
+#include <goto-symex/adjust_float_expressions.h>
+#include <goto-symex/rewrite_union.h>
 
 #include <java_bytecode/java_bytecode_language.h>
-#include <java_bytecode/remove_instanceof.h>
-#include <java_bytecode/remove_exceptions.h>
 
+#include <langapi/language.h>
 #include <langapi/mode.h>
 
-#include <cbmc/version.h>
+#include <pointer-analysis/add_failed_symbols.h>
 
+#include <util/config.h>
+#include <util/exit_codes.h>
+#include <util/make_unique.h>
+#include <util/options.h>
+#include <util/string2int.h>
+
+#include "change_impact.h"
 #include "goto_diff.h"
 #include "syntactic_diff.h"
 #include "unified_diff.h"
-#include "change_impact.h"
 
 goto_diff_parse_optionst::goto_diff_parse_optionst(int argc, const char **argv):
   parse_options_baset(GOTO_DIFF_OPTIONS, argc, argv),

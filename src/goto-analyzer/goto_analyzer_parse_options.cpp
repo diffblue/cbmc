@@ -16,38 +16,41 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <memory>
 
-#include <ansi-c/ansi_c_language.h>
-#include <cpp/cpp_language.h>
-#include <java_bytecode/java_bytecode_language.h>
-#include <jsil/jsil_language.h>
+#include <analyses/constant_propagator.h>
+#include <analyses/dependence_graph.h>
+#include <analyses/goto_check.h>
+#include <analyses/interval_domain.h>
+#include <analyses/is_threaded.h>
+#include <analyses/local_may_alias.h>
 
+#include <ansi-c/ansi_c_language.h>
+
+#include <cbmc/version.h>
+
+#include <cpp/cpp_language.h>
+
+#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
-#include <goto-programs/set_properties.h>
+#include <goto-programs/link_to_library.h>
+#include <goto-programs/read_goto_binary.h>
+#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_asm.h>
-#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
-#include <goto-programs/read_goto_binary.h>
-#include <goto-programs/goto_inline.h>
-#include <goto-programs/link_to_library.h>
 
-#include <analyses/is_threaded.h>
-#include <analyses/goto_check.h>
-#include <analyses/local_may_alias.h>
-#include <analyses/constant_propagator.h>
-#include <analyses/dependence_graph.h>
-#include <analyses/interval_domain.h>
-
-#include <java_bytecode/remove_exceptions.h>
-#include <java_bytecode/remove_instanceof.h>
-
-#include <langapi/mode.h>
 #include <langapi/language.h>
+#include <langapi/mode.h>
+
+#include <java_bytecode/java_bytecode_language.h>
+#include <jsil/jsil_language.h>
 
 #include <util/options.h>
 #include <util/config.h>
@@ -55,13 +58,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 #include <util/exit_codes.h>
 
-#include <cbmc/version.h>
-
-#include "taint_analysis.h"
-#include "unreachable_instructions.h"
 #include "static_show_domain.h"
 #include "static_simplifier.h"
 #include "static_verifier.h"
+#include "taint_analysis.h"
+#include "unreachable_instructions.h"
 
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,

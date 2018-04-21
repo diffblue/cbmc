@@ -13,14 +13,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+#include "bytecode_info.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_convert_method_class.h"
-#include "bytecode_info.h"
 #include "java_static_initializers.h"
 #include "java_string_library_preprocess.h"
 #include "java_types.h"
 #include "java_utils.h"
-#include "remove_exceptions.h"
+
+#include <analyses/cfg_dominators.h>
+
+#include <goto-programs/cfg.h>
+#include <goto-programs/class_hierarchy.h>
+#include <goto-programs/remove_exceptions.h>
+#include <goto-programs/resolve_inherited_component.h>
+
+#include <linking/zero_initializer.h>
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -32,18 +40,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/string2int.h>
 
-#include <linking/zero_initializer.h>
-
-#include <goto-programs/cfg.h>
-#include <goto-programs/class_hierarchy.h>
-#include <goto-programs/resolve_inherited_component.h>
-#include <analyses/cfg_dominators.h>
-
-#include <limits>
 #include <algorithm>
 #include <functional>
-#include <unordered_set>
+#include <limits>
 #include <regex>
+#include <unordered_set>
 
 /// Given a string of the format '?blah?', will return true when compared
 /// against a string that matches appart from any characters that are '?'

@@ -11,11 +11,11 @@
 #include "java_class_loader.h"
 #include "java_utils.h"
 #include "java_string_library_preprocess.h"
-#include "remove_exceptions.h"
 
+#include <goto-programs/remove_exceptions.h>
+#include <goto-programs/resolve_inherited_component.h>
 #include <util/suffix.h>
 
-#include <goto-programs/resolve_inherited_component.h>
 
 /// Constructor for lazy-method loading
 /// \param symbol_table: the symbol table to use

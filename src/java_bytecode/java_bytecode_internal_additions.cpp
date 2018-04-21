@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_internal_additions.h"
 
 // For INFLIGHT_EXCEPTION_VARIABLE_NAME
-#include "remove_exceptions.h"
+#include <goto-programs/remove_exceptions.h>
 
 #include <util/std_types.h>
 #include <util/cprover_prefix.h>
