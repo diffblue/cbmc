@@ -774,7 +774,7 @@ exprt smt2_parsert::function_application()
         }
         else if(id=="rotate_left" ||
                 id=="rotate_right" ||
-                id=="repeat" ||
+                id == ID_repeat ||
                 id=="sign_extend" ||
                 id=="zero_extend")
         {
@@ -826,7 +826,7 @@ exprt smt2_parsert::function_application()
 
             return typecast_exprt(op[0], unsigned_type);
           }
-          else if(id=="repeat")
+          else if(id == ID_repeat)
           {
             return nil_exprt();
           }

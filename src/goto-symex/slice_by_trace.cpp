@@ -244,7 +244,7 @@ void symex_slice_by_tracet::compute_ts_back(
        !i->io_args.empty() &&
        i->io_args.front().id()=="trace_event")
     {
-      irep_idt event=i->io_args.front().get("event");
+      irep_idt event = i->io_args.front().get(ID_event);
 
       if(!alphabet.empty())
       {
