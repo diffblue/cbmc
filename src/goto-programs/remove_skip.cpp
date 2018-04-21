@@ -172,13 +172,18 @@ void remove_skip(goto_programt &goto_program)
     goto_program,
     goto_program.instructions.begin(),
     goto_program.instructions.end());
+
+  goto_program.update();
 }
 
 /// remove unnecessary skip statements
 void remove_skip(goto_functionst &goto_functions)
 {
   Forall_goto_functions(f_it, goto_functions)
-    remove_skip(f_it->second.body);
+    remove_skip(
+      f_it->second.body,
+      f_it->second.body.instructions.begin(),
+      f_it->second.body.instructions.end());
 
   // we may remove targets
   goto_functions.update();
@@ -188,4 +193,3 @@ void remove_skip(goto_modelt &goto_model)
 {
   remove_skip(goto_model.goto_functions);
 }
-
