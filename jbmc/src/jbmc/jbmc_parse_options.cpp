@@ -983,7 +983,6 @@ bool jbmc_parse_optionst::process_goto_functions(
 
     // remove any skips introduced since coverage instrumentation
     remove_skip(goto_model);
-    goto_model.goto_functions.update();
   }
 
   catch(const char *e)

@@ -451,10 +451,7 @@ bool remove_function_pointerst::remove_function_pointers(
     }
 
   if(did_something)
-  {
     remove_skip(goto_program);
-    goto_program.update();
-  }
 
   return did_something;
 }

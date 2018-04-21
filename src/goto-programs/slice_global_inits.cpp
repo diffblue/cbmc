@@ -88,5 +88,4 @@ void slice_global_inits(goto_modelt &goto_model)
   }
 
   remove_skip(goto_functions);
-  goto_functions.update();
 }

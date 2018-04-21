@@ -707,7 +707,6 @@ int goto_instrument_parse_optionst::doit()
       accelerate_functions(
         goto_model, get_message_handler(), cmdline.isset("z3"));
       remove_skip(goto_model);
-      goto_model.goto_functions.update();
     }
 
     if(cmdline.isset("horn-encoding"))

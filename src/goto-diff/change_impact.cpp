@@ -132,7 +132,6 @@ void full_slicert::operator()(
 
   // remove the skips
   remove_skip(goto_functions);
-  goto_functions.update();
 }
 
 
