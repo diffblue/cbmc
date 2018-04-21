@@ -9,12 +9,11 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 /// \file
 /// Replace Java Nondet expressions
 
-#include "goto-programs/replace_java_nondet.h"
-#include "goto-programs/goto_convert.h"
-#include "goto-programs/goto_model.h"
-#include "goto-programs/remove_skip.h"
+#include "replace_java_nondet.h"
 
-#include "util/irep_ids.h"
+#include <goto-programs/goto_convert.h>
+#include <goto-programs/goto_model.h>
+#include <goto-programs/remove_skip.h>
 
 #include <algorithm>
 #include <regex>
