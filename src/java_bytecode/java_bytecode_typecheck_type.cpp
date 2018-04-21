@@ -57,5 +57,6 @@ void java_bytecode_typecheckt::typecheck_type_symbol(symbolt &symbol)
 {
   assert(symbol.is_type);
 
+  symbol.mode = ID_java;
   typecheck_type(symbol.type);
 }
