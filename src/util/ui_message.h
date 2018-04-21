@@ -52,6 +52,7 @@ public:
 
   json_stream_arrayt &get_json_stream() override
   {
+    PRECONDITION(json_stream!=nullptr);
     return *json_stream;
   }
 
