@@ -18,3 +18,5 @@ target_include_directories(glucose-condensed
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+target_link_libraries(glucose-condensed util)
