@@ -382,8 +382,6 @@ void linkingt::link_error(
   error() << "new definition in module `" << new_symbol.module
           << "' " << new_symbol.location << '\n'
           << type_to_string_verbose(ns, new_symbol) << eom;
-
-  throw 0;
 }
 
 void linkingt::link_warning(
@@ -573,6 +571,9 @@ void linkingt::duplicate_code_symbol(
         old_symbol,
         new_symbol,
         "conflicting parameter counts of function declarations");
+
+      // error logged, continue typechecking other symbols
+      return;
     }
     else
     {
@@ -602,19 +603,31 @@ void linkingt::duplicate_code_symbol(
       if(o_it!=old_t.parameters().end())
       {
         if(!new_t.has_ellipsis() && old_symbol.value.is_not_nil())
+        {
           link_error(
             old_symbol,
             new_symbol,
             "conflicting parameter counts of function declarations");
+
+          // error logged, continue typechecking other symbols
+          return;
+        }
+
         replace=new_symbol.value.is_not_nil();
       }
       else if(n_it!=new_t.parameters().end())
       {
         if(!old_t.has_ellipsis() && new_symbol.value.is_not_nil())
+        {
           link_error(
             old_symbol,
             new_symbol,
             "conflicting parameter counts of function declarations");
+
+          // error logged, continue typechecking other symbols
+          return;
+        }
+
         replace=new_symbol.value.is_not_nil();
       }
 
@@ -708,6 +721,9 @@ void linkingt::duplicate_code_symbol(
           old_symbol,
           new_symbol,
           "conflicting function declarations");
+
+        // error logged, continue typechecking other symbols
+        return;
       }
       else
       {
@@ -876,10 +892,15 @@ bool linkingt::adjust_object_type_rec(
       equal_exprt eq(old_size, new_size);
 
       if(!simplify_expr(eq, ns).is_true())
+      {
         link_error(
           info.old_symbol,
           info.new_symbol,
           "conflicting array sizes for variable");
+
+        // error logged, continue typechecking other symbols
+        return true;
+      }
     }
 
     return false;
@@ -958,6 +979,9 @@ void linkingt::duplicate_object_symbol(
         old_symbol,
         new_symbol,
         "conflicting types for variable");
+
+      // error logged, continue typechecking other symbols
+      return;
     }
     else if(set_to_new)
       old_symbol.type=new_symbol.type;
@@ -1022,10 +1046,15 @@ void linkingt::duplicate_non_type_symbol(
   bool is_code_new_symbol=new_symbol.type.id()==ID_code;
 
   if(is_code_old_symbol!=is_code_new_symbol)
+  {
     link_error(
       old_symbol,
       new_symbol,
       "conflicting definition for symbol");
+
+    // error logged, continue typechecking other symbols
+    return;
+  }
 
   if(is_code_old_symbol)
     duplicate_code_symbol(old_symbol, new_symbol);
@@ -1048,10 +1077,15 @@ void linkingt::duplicate_type_symbol(
   assert(new_symbol.is_type);
 
   if(!old_symbol.is_type)
+  {
     link_error(
       old_symbol,
       new_symbol,
       "conflicting definition for symbol");
+
+    // error logged, continue typechecking other symbols
+    return;
+  }
 
   if(old_symbol.type==new_symbol.type)
     return;
