@@ -114,21 +114,42 @@ public:
 
   // conversion of expressions
 
+  /// Formats the given expression in a language-specific way
+  /// \param expr: the expression to format
+  /// \param code: the formatted expression
+  /// \param ns: a namespace
+  /// \return false if conversion succeeds
   virtual bool from_expr(
     const exprt &expr,
     std::string &code,
     const namespacet &ns);
 
+  /// Formats the given type in a language-specific way
+  /// \param type: the type to format
+  /// \param code: the formatted type
+  /// \param ns: a namespace
+  /// \return false if conversion succeeds
   virtual bool from_type(
     const typet &type,
     std::string &code,
     const namespacet &ns);
 
+  /// Encodes the given type in a language-specific way
+  /// \param type: the type to encode
+  /// \param name: the encoded type
+  /// \param ns: a namespace
+  /// \return false if the conversion succeeds
   virtual bool type_to_name(
     const typet &type,
     std::string &name,
     const namespacet &ns);
 
+  /// Parses the given string into an expression
+  /// \param code: the string to parse
+  /// \param module: prefix to be used for identifiers
+  /// \param expr: the parsed expression
+  /// \param ns: a namespace
+  /// \return false if the conversion succeeds
   virtual bool to_expr(
     const std::string &code,
     const std::string &module,
