@@ -36,7 +36,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_skip.h>
-#include <goto-programs/replace_java_nondet.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_symbol_table.h>
@@ -56,6 +55,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/java_enum_static_init_unwind_handler.h>
 #include <java_bytecode/remove_instanceof.h>
 #include <java_bytecode/remove_exceptions.h>
+#include <java_bytecode/replace_java_nondet.h>
 
 #include <cbmc/version.h>
 

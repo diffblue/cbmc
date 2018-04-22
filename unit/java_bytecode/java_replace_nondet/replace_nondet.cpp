@@ -13,9 +13,9 @@
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_returns.h>
-#include <goto-programs/replace_java_nondet.h>
 
 #include <java_bytecode/remove_instanceof.h>
+#include <java_bytecode/replace_java_nondet.h>
 
 #include <util/config.h>
 #include <util/options.h>

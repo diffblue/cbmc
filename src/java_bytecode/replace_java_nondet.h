@@ -9,8 +9,8 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 /// \file
 /// Replace Java Nondet expressions
 
-#ifndef CPROVER_GOTO_PROGRAMS_REPLACE_JAVA_NONDET_H
-#define CPROVER_GOTO_PROGRAMS_REPLACE_JAVA_NONDET_H
+#ifndef CPROVER_JAVA_BYTECODE_REPLACE_JAVA_NONDET_H
+#define CPROVER_JAVA_BYTECODE_REPLACE_JAVA_NONDET_H
 
 class goto_modelt;
 class goto_functionst;
