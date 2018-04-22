@@ -31,6 +31,10 @@ struct language_entryt
 typedef std::list<language_entryt> languagest;
 languagest languages;
 
+/// Register a language
+/// Note: registering a language is required for using the functions
+///   in language_util.h
+/// \param factory: a language factory, e.g. `new_ansi_c_language`
 void register_language(language_factoryt factory)
 {
   languages.push_back(language_entryt());
@@ -40,6 +44,9 @@ void register_language(language_factoryt factory)
   languages.back().mode=l->id();
 }
 
+/// Get the language corresponding to the given mode
+/// \param mode: the mode, e.g. `ID_C`
+/// \return the language or `nullptr` if the language has not been registered
 std::unique_ptr<languaget> get_language_from_mode(const irep_idt &mode)
 {
   for(const auto &language : languages)
@@ -87,6 +94,10 @@ get_language_from_identifier(const namespacet &ns, const irep_idt &identifier)
   return language;
 }
 
+/// Get the language corresponding to the registered file name extensions
+/// \param filename: a filename
+/// \return the corresponding language or `nullptr` if the extension cannot
+///   be resolved to any registered language
 std::unique_ptr<languaget> get_language_from_filename(
   const std::string &filename)
 {
@@ -122,6 +133,8 @@ std::unique_ptr<languaget> get_language_from_filename(
   return nullptr;
 }
 
+/// Returns the default language
+/// \return the first registered language
 std::unique_ptr<languaget> get_default_language()
 {
   PRECONDITION(!languages.empty());
