@@ -14,7 +14,6 @@ Author: Thomas Kiley
 #include <iostream>
 #include <sstream>
 
-#include <util/json_expr.h>
 #include <util/json_irep.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>

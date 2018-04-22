@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/message.h>
 #include <util/json.h>
-#include <util/json_expr.h>
 
 #include "goto_functions.h"
 

@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml_expr.h>
 #include <util/json.h>
 #include <util/json_stream.h>
-#include <util/json_expr.h>
 
 #include <solvers/prop/cover_goals.h>
 #include <solvers/prop/literal_expr.h>

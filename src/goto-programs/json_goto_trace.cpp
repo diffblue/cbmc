@@ -14,7 +14,6 @@ Author: Daniel Kroening
 #include "json_goto_trace.h"
 #include "goto_trace.h"
 
-#include <util/json_expr.h>
 #include <util/json.h>
 #include <util/json_stream.h>
 #include <util/arith_tools.h>

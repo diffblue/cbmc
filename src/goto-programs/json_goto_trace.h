@@ -18,7 +18,6 @@ Date: November 2005
 
 #include <util/json.h>
 #include <util/json_stream.h>
-#include <util/json_expr.h>
 #include <util/invariant.h>
 
 #include <langapi/mode.h>

@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #include <util/json.h>
-#include <util/json_expr.h>
 
 void bmct::show_vcc_plain(std::ostream &out)
 {

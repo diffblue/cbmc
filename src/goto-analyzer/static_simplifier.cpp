@@ -6,6 +6,8 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 \*******************************************************************/
 
+#include "static_simplifier.h"
+
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unreachable.h>
 #include <goto-programs/write_goto_binary.h>
@@ -13,9 +15,6 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <util/xml.h>
 #include <util/xml_expr.h>
 #include <util/json.h>
-#include <util/json_expr.h>
-
-#include "static_simplifier.h"
 
 
 /// Simplifies the program using the information in the abstract domain.

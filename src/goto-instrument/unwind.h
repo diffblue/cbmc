@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_INSTRUMENT_UNWIND_H
 
 #include <util/json.h>
-#include <util/json_expr.h>
 #include <goto-programs/goto_model.h>
 
 class goto_modelt;
