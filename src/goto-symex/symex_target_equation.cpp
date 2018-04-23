@@ -375,21 +375,20 @@ void symex_target_equationt::convert(
   try
   {
     convert_guards(prop_conv);
+    convert_assignments(prop_conv);
+    convert_decls(prop_conv);
+    convert_assumptions(prop_conv);
+    convert_assertions(prop_conv);
+    convert_goto_instructions(prop_conv);
+    convert_io(prop_conv);
+    convert_constraints(prop_conv);
   }
-  catch(guard_conversion_exceptiont &guard_conversion_exception)
+  catch(const equation_conversion_exceptiont &conversion_exception)
   {
     // unwrap the except and throw like normal
-    const std::string full_error = unwrap_exception(guard_conversion_exception);
+    const std::string full_error = unwrap_exception(conversion_exception);
     throw full_error;
   }
-
-  convert_assignments(prop_conv);
-  convert_decls(prop_conv);
-  convert_assumptions(prop_conv);
-  convert_assertions(prop_conv);
-  convert_goto_instructions(prop_conv);
-  convert_io(prop_conv);
-  convert_constraints(prop_conv);
 }
 
 /// converts assignments
@@ -416,7 +415,16 @@ void symex_target_equationt::convert_decls(
     {
       // The result is not used, these have no impact on
       // the satisfiability of the formula.
-      prop_conv.convert(step.cond_expr);
+      try
+      {
+        prop_conv.convert(step.cond_expr);
+      }
+      catch(const bitvector_conversion_exceptiont &conversion_exception)
+      {
+        util_throw_with_nested(
+          equation_conversion_exceptiont(
+            "Error converting decls for step", step, ns));
+      }
     }
   }
 }
@@ -438,7 +446,9 @@ void symex_target_equationt::convert_guards(
       }
       catch(const bitvector_conversion_exceptiont &conversion_exception)
       {
-        util_throw_with_nested(guard_conversion_exceptiont(step, ns));
+        util_throw_with_nested(
+          equation_conversion_exceptiont(
+            "Error converting guard for step", step, ns));
       }
     }
   }
@@ -456,7 +466,18 @@ void symex_target_equationt::convert_assumptions(
       if(step.ignore)
         step.cond_literal=const_literal(true);
       else
-        step.cond_literal=prop_conv.convert(step.cond_expr);
+      {
+        try
+        {
+          step.cond_literal = prop_conv.convert(step.cond_expr);
+        }
+        catch(const bitvector_conversion_exceptiont &conversion_exception)
+        {
+          util_throw_with_nested(
+            equation_conversion_exceptiont(
+              "Error converting assumptions for step", step, ns));
+        }
+      }
     }
   }
 }
@@ -473,7 +494,18 @@ void symex_target_equationt::convert_goto_instructions(
       if(step.ignore)
         step.cond_literal=const_literal(true);
       else
-        step.cond_literal=prop_conv.convert(step.cond_expr);
+      {
+        try
+        {
+          step.cond_literal = prop_conv.convert(step.cond_expr);
+        }
+        catch(const bitvector_conversion_exceptiont &conversion_exception)
+        {
+          util_throw_with_nested(
+            equation_conversion_exceptiont(
+              "Error converting goto instructions for step", step, ns));
+        }
+      }
     }
   }
 }
@@ -542,7 +574,16 @@ void symex_target_equationt::convert_assertions(
         step.cond_expr);
 
       // do the conversion
-      step.cond_literal=prop_conv.convert(implication);
+      try
+      {
+        step.cond_literal = prop_conv.convert(implication);
+      }
+      catch(const bitvector_conversion_exceptiont &conversion_exception)
+      {
+        util_throw_with_nested(
+          equation_conversion_exceptiont(
+            "Error converting assertions for step", step, ns));
+      }
 
       // store disjunct
       disjuncts.push_back(literal_exprt(!step.cond_literal));
