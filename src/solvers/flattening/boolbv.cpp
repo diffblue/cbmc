@@ -631,54 +631,33 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
 void boolbvt::set_to(const exprt &expr, bool value)
 {
-  if(expr.type().id()!=ID_bool)
-  {
-    error() << "boolbvt::set_to got non-boolean operand: "
-            << expr.pretty() << eom;
-    throw 0;
-  }
+  PRECONDITION(expr.type().id() == ID_bool);
 
-  if(value)
-  {
-    if(expr.id()==ID_equal)
-    {
-      if(!boolbv_set_equality_to_true(to_equal_expr(expr)))
-        return;
-    }
-  }
-
-  return SUB::set_to(expr, value);
+  const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr);
+  if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))
+    return;
+  SUB::set_to(expr, value);
 }
 
-void boolbvt::make_bv_expr(const typet &type, const bvt &bv, exprt &dest)
+exprt boolbvt::make_bv_expr(const typet &type, const bvt &bv)
 {
-  dest=exprt(ID_bv_literals, type);
+  exprt dest(ID_bv_literals, type);
   irept::subt &bv_sub=dest.add(ID_bv).get_sub();
-
   bv_sub.resize(bv.size());
 
   for(std::size_t i=0; i<bv.size(); i++)
     bv_sub[i].id(std::to_string(bv[i].get()));
+  return dest;
 }
 
-void boolbvt::make_free_bv_expr(const typet &type, exprt &dest)
+exprt boolbvt::make_free_bv_expr(const typet &type)
 {
-  std::size_t width=boolbv_width(type);
-
-  if(width==0)
-  {
-    error() << "failed to get width of " << type.pretty() << eom;
-    throw 0;
-  }
-
-  bvt bv;
-  bv.resize(width);
-
-  // make result free variables
-  Forall_literals(it, bv)
-    *it=prop.new_variable();
-
-  make_bv_expr(type, bv, dest);
+  const std::size_t width = boolbv_width(type);
+  PRECONDITION(width != 0);
+  bvt bv(width);
+  for(auto &lit : bv)
+    lit = prop.new_variable();
+  return make_bv_expr(type, bv);
 }
 
 bool boolbvt::is_unbounded_array(const typet &type) const
@@ -708,12 +687,8 @@ bool boolbvt::is_unbounded_array(const typet &type) const
 void boolbvt::print_assignment(std::ostream &out) const
 {
   arrayst::print_assignment(out);
-
-  for(const auto &it : map.mapping)
-  {
-    out << it.first << "="
-        << it.second.get_value(prop) << '\n';
-  }
+  for(const auto &pair : map.mapping)
+    out << pair.first << "=" << pair.second.get_value(prop) << '\n';
 }
 
 void boolbvt::build_offset_map(const struct_typet &src, offset_mapt &dest)

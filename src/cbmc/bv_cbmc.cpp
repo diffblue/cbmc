@@ -20,13 +20,11 @@ bvt bv_cbmct::convert_waitfor(const exprt &expr)
     throw 0;
   }
 
-  exprt new_cycle;
   const exprt &old_cycle=expr.op0();
   const exprt &cycle_var=expr.op1();
   const exprt &bound=expr.op2();
   const exprt &predicate=expr.op3();
-
-  make_free_bv_expr(expr.type(), new_cycle);
+  const exprt new_cycle = make_free_bv_expr(expr.type());
 
   mp_integer bound_value;
   if(to_integer(bound, bound_value))
@@ -98,18 +96,9 @@ bvt bv_cbmct::convert_waitfor(const exprt &expr)
 
 bvt bv_cbmct::convert_waitfor_symbol(const exprt &expr)
 {
-  if(expr.operands().size()!=1)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "waitfor_symbol expected to have one operand" << eom;
-    throw 0;
-  }
-
-  exprt result;
+  PRECONDITION(expr.operands().size() == 1);
   const exprt &bound=expr.op0();
-
-  make_free_bv_expr(expr.type(), result);
-
+  const exprt result = make_free_bv_expr(expr.type());
   // constraint: result<=bound
 
   set_to_true(binary_relation_exprt(result, ID_le, bound));

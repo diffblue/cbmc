@@ -7,40 +7,30 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "prop_conv.h"
-
-#include <cassert>
-#include <cstdlib>
-#include <map>
-
-#include <util/std_expr.h>
-#include <util/symbol.h>
-#include <util/threeval.h>
-
-#include "prop.h"
-#include "literal_expr.h"
+#include <algorithm>
 
 /// determine whether a variable is in the final conflict
 bool prop_convt::is_in_conflict(literalt l) const
 {
-  assert(false);
+  UNREACHABLE;
   return false;
 }
 
 void prop_convt::set_assumptions(const bvt &)
 {
-  assert(false);
+  UNREACHABLE;
 }
 
 void prop_convt::set_frozen(const literalt)
 {
-  assert(false);
+  UNREACHABLE;
 }
 
 void prop_convt::set_frozen(const bvt &bv)
 {
-  for(unsigned i=0; i<bv.size(); i++)
-    if(!bv[i].is_constant())
-      set_frozen(bv[i]);
+  for(const auto &bit : bv)
+    if(!bit.is_constant())
+      set_frozen(bit);
 }
 
 bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
@@ -65,17 +55,14 @@ bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
 
 literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
 {
-  std::pair<symbolst::iterator, bool> result=
+  auto result =
     symbols.insert(std::pair<irep_idt, literalt>(identifier, literalt()));
 
   if(!result.second)
     return result.first->second;
 
-  // produce new variable
   literalt literal=prop.new_variable();
-
-  // set the name of the new variable
-  prop.set_variable_name(literal, id2string(identifier));
+  prop.set_variable_name(literal, identifier);
 
   // insert
   result.first->second=literal;
@@ -183,10 +170,9 @@ literalt prop_conv_solvert::convert(const exprt &expr)
       prop.set_frozen(literal);
     return literal;
   }
-  // check cache first
 
-  std::pair<cachet::iterator, bool> result=
-    cache.insert(std::pair<exprt, literalt>(expr, literalt()));
+  // check cache first
+  auto result = cache.insert({expr, literalt()});
 
   if(!result.second)
     return result.first->second;
@@ -208,13 +194,7 @@ literalt prop_conv_solvert::convert(const exprt &expr)
 
 literalt prop_conv_solvert::convert_bool(const exprt &expr)
 {
-  if(expr.type().id()!=ID_bool)
-  {
-    std::string msg="prop_convt::convert_bool got "
-                    "non-boolean expression: ";
-    msg+=expr.pretty();
-    throw msg;
-  }
+  PRECONDITION(expr.type().id() == ID_bool);
 
   const exprt::operandst &op=expr.operands();
 
@@ -280,8 +260,9 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   else if(expr.id()==ID_or || expr.id()==ID_and || expr.id()==ID_xor ||
           expr.id()==ID_nor || expr.id()==ID_nand)
   {
-    if(op.empty())
-      throw "operator `"+expr.id_string()+"' takes at least one operand";
+    INVARIANT(
+      !op.empty(),
+      "operator `" + expr.id_string() + "' takes at least one operand");
 
     bvt bv;
 
@@ -304,16 +285,12 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   }
   else if(expr.id()==ID_not)
   {
-    if(op.size()!=1)
-      throw "not takes one operand";
-
+    INVARIANT(op.size() == 1, "not takes one operand");
     return !convert(op.front());
   }
   else if(expr.id()==ID_equal || expr.id()==ID_notequal)
   {
-    if(op.size()!=2)
-      throw "equality takes two operands";
-
+    INVARIANT(op.size() == 2, "equality takes two operands");
     bool equal=(expr.id()==ID_equal);
 
     if(op[0].type().id()==ID_bool &&
@@ -387,24 +364,14 @@ bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 
 void prop_conv_solvert::set_to(const exprt &expr, bool value)
 {
-  if(expr.type().id()!=ID_bool)
-  {
-    std::string msg="prop_convt::set_to got "
-                    "non-boolean expression: ";
-    msg+=expr.pretty();
-    throw msg;
-  }
+  PRECONDITION(expr.type().id() == ID_bool);
 
-  bool boolean=true;
+  const bool has_only_boolean_operands = std::all_of(
+    expr.operands().begin(),
+    expr.operands().end(),
+    [](const exprt &expr) { return expr.type().id() == ID_bool; });
 
-  forall_operands(it, expr)
-    if(it->type().id()!=ID_bool)
-    {
-      boolean=false;
-      break;
-    }
-
-  if(boolean)
+  if(has_only_boolean_operands)
   {
     if(expr.id()==ID_not)
     {
@@ -507,16 +474,12 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
   statistics() << "Solving with " << prop.solver_text() << eom;
 
-  propt::resultt result=prop.prop_solve();
-
-  switch(result)
+  switch(prop.prop_solve())
   {
     case propt::resultt::P_SATISFIABLE: return resultt::D_SATISFIABLE;
     case propt::resultt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
     default: return resultt::D_ERROR;
   }
-
-  return resultt::D_ERROR;
 }
 
 exprt prop_conv_solvert::get(const exprt &expr) const
@@ -534,19 +497,17 @@ exprt prop_conv_solvert::get(const exprt &expr) const
     }
   }
 
-  exprt tmp=expr;
-
-  Forall_operands(it, tmp)
+  exprt tmp = expr;
+  for(auto &op : tmp.operands())
   {
-    exprt tmp_op=get(*it);
-    it->swap(tmp_op);
+    exprt tmp_op = get(op);
+    op.swap(tmp_op);
   }
-
   return tmp;
 }
 
 void prop_conv_solvert::print_assignment(std::ostream &out) const
 {
-  for(const auto &it : symbols)
-    out << it.first << " = " << prop.l_get(it.second) << "\n";
+  for(const auto &symbol : symbols)
+    out << symbol.first << " = " << prop.l_get(symbol.second) << '\n';
 }
