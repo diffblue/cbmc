@@ -32,7 +32,6 @@ class prop_convt;
 class symex_target_equationt:public symex_targett
 {
 public:
-  symex_target_equationt() = default;
   virtual ~symex_target_equationt() = default;
 
   // read event
