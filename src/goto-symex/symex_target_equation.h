@@ -32,10 +32,7 @@ class prop_convt;
 class symex_target_equationt:public symex_targett
 {
 public:
-  explicit symex_target_equationt(const namespacet &ns) : ns(ns)
-  {
-  }
-
+  symex_target_equationt() = default;
   virtual ~symex_target_equationt() = default;
 
   // read event
@@ -260,9 +257,12 @@ public:
     {
     }
 
+    DEPRECATED("Use output without ns param")
     void output(
       const namespacet &ns,
       std::ostream &out) const;
+
+    void output(std::ostream &out) const;
   };
 
   std::size_t count_assertions() const
@@ -323,9 +323,6 @@ protected:
   // for enforcing sharing in the expressions stored
   merge_irept merge_irep;
   void merge_ireps(SSA_stept &SSA_step);
-
-private:
-  const namespacet &ns;
 };
 
 inline bool operator<(
