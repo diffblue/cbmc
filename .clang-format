@@ -84,7 +84,7 @@ NamespaceIndentation: None
 PenaltyBreakString: 10000
 PointerAlignment: Right
 ReflowComments: 'false'
-SortIncludes: 'false'
+SortIncludes: 'true'
 SpaceAfterCStyleCast: 'false'
 SpaceBeforeAssignmentOperators: 'true'
 SpaceBeforeParens: Never
