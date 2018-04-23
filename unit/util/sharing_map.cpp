@@ -43,13 +43,13 @@ void sharing_map_interface_test()
   {
     smt sm;
 
-    smt::const_find_type r1=sm.insert(std::make_pair("i", "0"));
+    smt::const_find_type r1 = sm.insert(std::make_pair("i", "0"));
     REQUIRE(r1.second);
 
-    smt::const_find_type r2=sm.insert("j", "1");
+    smt::const_find_type r2 = sm.insert("j", "1");
     REQUIRE(r2.second);
 
-    smt::const_find_type r3=sm.insert(std::make_pair("i", "0"));
+    smt::const_find_type r3 = sm.insert(std::make_pair("i", "0"));
     REQUIRE(!r3.second);
 
     REQUIRE(sm.size() == 2);
@@ -61,12 +61,12 @@ void sharing_map_interface_test()
     smt sm1;
     smt sm2(sm1);
 
-    smt::find_type r1=sm1.place("i", "0");
+    smt::find_type r1 = sm1.place("i", "0");
     REQUIRE(r1.second);
     REQUIRE(!sm2.has_key("i"));
 
-    std::string &s1=r1.first;
-    s1="1";
+    std::string &s1 = r1.first;
+    s1 = "1";
 
     REQUIRE(sm1.at("i") == "1");
   }
@@ -77,36 +77,40 @@ void sharing_map_interface_test()
     sm.insert("i", "0");
     sm.insert("j", "1");
 
-    const smt &sm2=sm;
+    const smt &sm2 = sm;
 
     std::string s;
-    s=sm2.at("i");
+    s = sm2.at("i");
     REQUIRE(s == "0");
 
-    try {
+    try
+    {
       sm2.at("k");
       REQUIRE(false);
-    } catch (...) {}
+    }
+    catch(...)
+    {
+    }
 
-    s=sm2.at("j");
+    s = sm2.at("j");
     REQUIRE(s == "1");
 
     REQUIRE(sm.has_key("i"));
     REQUIRE(sm.has_key("j"));
     REQUIRE(!sm.has_key("k"));
 
-    std::string &s2=sm.at("i");
-    s2="3";
+    std::string &s2 = sm.at("i");
+    s2 = "3";
     REQUIRE(sm2.at("i") == "3");
 
     REQUIRE(sm.size() == 2);
 
-    smt::find_type r=sm.find("i");
+    smt::find_type r = sm.find("i");
     REQUIRE(r.second);
-    r.first="4";
+    r.first = "4";
     REQUIRE(sm2.at("i") == "4");
 
-    smt::const_find_type rc=sm2.find("k");
+    smt::const_find_type rc = sm2.find("k");
     REQUIRE(!rc.second);
   }
 
@@ -154,10 +158,10 @@ void sharing_map_interface_test()
     sm["i"];
     REQUIRE(sm.has_key("i"));
 
-    sm["i"]="0";
+    sm["i"] = "0";
     REQUIRE(sm.at("i") == "0");
 
-    sm["j"]="1";
+    sm["j"] = "1";
     REQUIRE(sm.at("j") == "1");
   }
 }
@@ -165,7 +169,7 @@ void sharing_map_interface_test()
 void sharing_map_copy_test()
 {
   smt sm1;
-  const smt &sm2=sm1;
+  const smt &sm2 = sm1;
 
   fill(sm1);
 
@@ -173,8 +177,8 @@ void sharing_map_copy_test()
   REQUIRE(sm2.find("j").first == "1");
   REQUIRE(sm2.find("k").first == "2");
 
-  smt sm3=sm1;
-  const smt &sm4=sm3;
+  smt sm3 = sm1;
+  const smt &sm4 = sm3;
 
   REQUIRE(sm3.erase("l") == 0);
   REQUIRE(sm3.erase("i") == 1);
@@ -195,7 +199,7 @@ public:
 
   bool operator==(const some_keyt &other) const
   {
-    return s==other.s;
+    return s == other.s;
   }
 };
 
@@ -237,9 +241,9 @@ void sharing_map_view_test()
   SECTION("View")
   {
     smt sm;
-  
+
     fill(sm);
-  
+
     smt::viewt view;
     sm.get_view(view);
 
@@ -270,7 +274,7 @@ void sharing_map_view_test()
     fill(sm1);
 
     smt sm2(sm1);
-    
+
     smt::delta_viewt delta_view;
 
     sm1.get_delta_view(sm2, delta_view);
@@ -287,10 +291,10 @@ void sharing_map_view_test()
     fill(sm1);
 
     smt sm2(sm1);
-    auto r=sm2.find("i");
+    auto r = sm2.find("i");
     REQUIRE(r.second);
-    r.first="3";
-    
+    r.first = "3";
+
     smt::delta_viewt delta_view;
 
     sm1.get_delta_view(sm2, delta_view);
