@@ -132,7 +132,7 @@ public:
   typedef sharing_mapt<key_type, mapped_type, hash, key_equal> self_type;
   typedef sharing_nodet<key_type, mapped_type, key_equal> node_type;
 
-  typedef size_t size_type;
+  typedef std::size_t size_type;
 
   /// Return type of methods that retrieve a const reference to a value. First
   /// component is a reference to the value (or a dummy value if the given key
@@ -165,13 +165,13 @@ public:
   static const std::string not_found_msg;
 
   /// Number of bits in the hash deemed significant
-  static const size_t bits;
+  static const std::size_t bits;
 
   /// Size of a chunk of the hash that represents a character
-  static const size_t chunk;
+  static const std::size_t chunk;
 
-  static const size_t mask;
-  static const size_t steps;
+  static const std::size_t mask;
+  static const std::size_t steps;
 
   // interface
 
@@ -536,9 +536,9 @@ SHARING_MAPT2(, node_type *)::get_container_node(const key_type &k)
   size_t key=hash()(k);
   node_type *p=&map;
 
-  for(unsigned i=0; i<steps; i++)
+  for(std::size_t i = 0; i < steps; i++)
   {
-    unsigned bit=key&mask;
+    std::size_t bit = key & mask;
     key>>=chunk;
 
     p=p->add_child(bit);
@@ -552,9 +552,9 @@ SHARING_MAPT2(const, node_type *)::get_container_node(const key_type &k) const
   size_t key=hash()(k);
   const node_type *p=&map;
 
-  for(unsigned i=0; i<steps; i++)
+  for(std::size_t i = 0; i < steps; i++)
   {
-    unsigned bit=key&mask;
+    std::size_t bit = key & mask;
     key>>=chunk;
 
     p=p->find_child(bit);
@@ -598,14 +598,14 @@ SHARING_MAPT2(, size_type)::erase(
     return 0;
 
   node_type *del=nullptr;
-  unsigned del_bit = 0;
+  std::size_t del_bit = 0;
 
   size_t key=hash()(k);
   node_type *p=&map;
 
-  for(unsigned i=0; i<steps; i++)
+  for(std::size_t i = 0; i < steps; i++)
   {
-    unsigned bit=key&mask;
+    std::size_t bit = key & mask;
     key>>=chunk;
 
     const subt &sub=as_const(p)->get_sub();
@@ -712,8 +712,6 @@ SHARING_MAPT2(, const_find_type)::insert(
 ///
 /// \param k: The key of the element to insert
 /// \param m: The mapped value to insert
-/// \param key_exists: Hint to indicate whether the element is known to exist
-///   (possible values false or unknown)
 /// \return Pair of reference to existing or newly inserted element, and boolean
 ///   indicating if new element was inserted
 SHARING_MAPT2(, find_type)::place(
@@ -778,8 +776,6 @@ SHARING_MAPT2(, find_type)::find(
 /// - Best case: O(H)
 ///
 /// \param k: The key of the element to search
-/// \param key_exists: Hint to indicate whether the element is known to exist
-///   (possible values `unknown` or `true`)
 /// \return Pair of const reference to found value (or dummy value if not
 ///   found), and boolean indicating if element was found.
 SHARING_MAPT2(, const_find_type)::find(const key_type &k) const

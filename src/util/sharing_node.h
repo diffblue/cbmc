@@ -45,7 +45,7 @@ public:
 
   typedef sharing_nodet<key_type, mapped_type, key_equal> self_type;
 
-  typedef std::map<unsigned, self_type> subt;
+  typedef std::map<std::size_t, self_type> subt;
   typedef std::list<self_type> containert;
 
   typedef const std::pair<const self_type &, const bool> const_find_type;
@@ -156,7 +156,7 @@ public:
 
   // internal nodes
 
-  const self_type *find_child(const unsigned n) const
+  const self_type *find_child(const std::size_t n) const
   {
     const subt &s=get_sub();
     typename subt::const_iterator it=s.find(n);
@@ -167,13 +167,13 @@ public:
     return nullptr;
   }
 
-  self_type *add_child(const unsigned n)
+  self_type *add_child(const std::size_t n)
   {
     subt &s=get_sub();
     return &s[n];
   }
 
-  void remove_child(const unsigned n)
+  void remove_child(const std::size_t n)
   {
     subt &s=get_sub();
     size_t r=s.erase(n);
