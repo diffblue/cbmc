@@ -786,15 +786,20 @@ void symex_target_equationt::SSA_stept::output(std::ostream &out) const
   switch(type)
   {
   case goto_trace_stept::typet::ASSERT:
-    out << "ASSERT " << format(cond_expr) << '\n'; break;
+    out << "ASSERT " << format(cond_expr) << '\n';
+    break;
   case goto_trace_stept::typet::ASSUME:
-    out << "ASSUME " << format(cond_expr) << '\n'; break;
+    out << "ASSUME " << format(cond_expr) << '\n';
+    break;
   case goto_trace_stept::typet::LOCATION:
-    out << "LOCATION" << '\n'; break;
+    out << "LOCATION" << '\n';
+    break;
   case goto_trace_stept::typet::INPUT:
-    out << "INPUT" << '\n'; break;
+    out << "INPUT" << '\n';
+    break;
   case goto_trace_stept::typet::OUTPUT:
-    out << "OUTPUT" << '\n'; break;
+    out << "OUTPUT" << '\n';
+    break;
 
   case goto_trace_stept::typet::DECL:
     out << "DECL" << '\n';
@@ -832,29 +837,41 @@ void symex_target_equationt::SSA_stept::output(std::ostream &out) const
     break;
 
   case goto_trace_stept::typet::DEAD:
-    out << "DEAD\n"; break;
+    out << "DEAD\n";
+    break;
   case goto_trace_stept::typet::FUNCTION_CALL:
-    out << "FUNCTION_CALL\n"; break;
+    out << "FUNCTION_CALL\n";
+    break;
   case goto_trace_stept::typet::FUNCTION_RETURN:
-    out << "FUNCTION_RETURN\n"; break;
+    out << "FUNCTION_RETURN\n";
+    break;
   case goto_trace_stept::typet::CONSTRAINT:
-    out << "CONSTRAINT\n"; break;
+    out << "CONSTRAINT\n";
+    break;
   case goto_trace_stept::typet::SHARED_READ:
-    out << "SHARED READ\n"; break;
+    out << "SHARED READ\n";
+    break;
   case goto_trace_stept::typet::SHARED_WRITE:
-    out << "SHARED WRITE\n"; break;
+    out << "SHARED WRITE\n";
+    break;
   case goto_trace_stept::typet::ATOMIC_BEGIN:
-    out << "ATOMIC_BEGIN\n"; break;
+    out << "ATOMIC_BEGIN\n";
+    break;
   case goto_trace_stept::typet::ATOMIC_END:
-    out << "AUTOMIC_END\n"; break;
+    out << "AUTOMIC_END\n";
+    break;
   case goto_trace_stept::typet::SPAWN:
-    out << "SPAWN\n"; break;
+    out << "SPAWN\n";
+    break;
   case goto_trace_stept::typet::MEMORY_BARRIER:
-    out << "MEMORY_BARRIER\n"; break;
+    out << "MEMORY_BARRIER\n";
+    break;
   case goto_trace_stept::typet::GOTO:
-    out << "IF " << format(cond_expr) << " GOTO\n"; break;
+    out << "IF " << format(cond_expr) << " GOTO\n";
+    break;
 
-  default: UNREACHABLE;
+  default:
+    UNREACHABLE;
   }
 
   if(is_assert() || is_assume() || is_assignment() || is_constraint())
