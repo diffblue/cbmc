@@ -152,9 +152,11 @@ bvt boolbvt::conversion_failed(const exprt &expr)
   return prop.new_variables(width);
 }
 
-/// TODO
-/// \param expr: TODO
-/// \return TODO
+/// Converts an expression into its gate-level representation and returns a
+/// vector of literals corresponding to the outputs of the Boolean circuit.
+/// \param expr: Expression to convert
+/// \return A vector of literals corresponding to the outputs of the Boolean
+///   circuit
 /// \throws bitvector_conversion_exceptiont raised if converting byte_extraction
 /// goes wrong.
 /// TODO: extend for other types of conversion exception (diffblue/cbmc#2103).
