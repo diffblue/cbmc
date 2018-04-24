@@ -161,7 +161,7 @@ bool java_bytecode_languaget::parse(
   {
     string_preprocess.initialize_known_type_table();
 
-    auto get_string_base_classes = [this](const irep_idt &id) { // NOLINT (*)
+    auto get_string_base_classes = [this](const irep_idt &id) {
       return string_preprocess.get_string_type_base_classes(id);
     };
 
