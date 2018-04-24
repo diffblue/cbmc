@@ -17,7 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_functionst;
 class goto_modelt;
 
-bool is_skip(const goto_programt &, goto_programt::const_targett);
+bool is_skip(
+  const goto_programt &,
+  goto_programt::const_targett,
+  bool ignore_labels = false);
 void remove_skip(goto_programt &);
 void remove_skip(goto_functionst &);
 void remove_skip(goto_modelt &);

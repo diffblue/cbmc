@@ -12,12 +12,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "remove_skip.h"
 #include "goto_model.h"
 
-bool is_skip(const goto_programt &body, goto_programt::const_targett it)
+/// Determine whether the instruction is semantically equivalent to a skip
+/// (no-op).  This includes a skip, but also if(false) goto ..., goto next;
+///  next: ..., and (void)0.
+/// \param body  goto program containing the instruction
+/// \param it  instruction iterator that is tested for being a skip (or
+/// equivalent)
+/// \param ignore_labels  If the caller takes care of moving labels, then even
+/// skip statements carrying labels can be treated as skips (even though they
+/// may carry key information such as error labels).
+/// \return True, iff it is equivalent to a skip.
+bool is_skip(
+  const goto_programt &body,
+  goto_programt::const_targett it,
+  bool ignore_labels)
 {
-  // we won't remove labelled statements
-  // (think about error labels or the like)
-
-  if(!it->labels.empty())
+  if(!ignore_labels && !it->labels.empty())
     return false;
 
   if(it->is_skip())
@@ -100,12 +110,17 @@ void remove_skip(
       // for collecting labels
       std::list<irep_idt> labels;
 
-      while(is_skip(goto_program, it))
+      while(is_skip(goto_program, it, true))
       {
         // don't remove the last skip statement,
         // it could be a target
-        if(it == std::prev(end))
+        if(
+          it == std::prev(end) ||
+          (std::next(it)->is_end_function() &&
+           (!labels.empty() || !it->labels.empty())))
+        {
           break;
+        }
 
         // save labels
         labels.splice(labels.end(), it->labels);
