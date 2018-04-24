@@ -1823,10 +1823,8 @@ void goto_convertt::generate_ifthenelse(
   // Note this depends on the fact that `instructions` is a std::list
   // and so goto-program-destructive-append preserves iterator validity.
   if(is_guarded_goto)
-    guarded_gotos.push_back({ // NOLINT(whitespace/braces)
-      tmp_v.instructions.begin(),
-      tmp_w.instructions.begin(),
-      guard});
+    guarded_gotos.push_back(
+      {tmp_v.instructions.begin(), tmp_w.instructions.begin(), guard});
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);

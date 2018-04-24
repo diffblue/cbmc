@@ -249,9 +249,7 @@ static goto_programt::targett check_and_replace_target(
     "goto_program missing END_FUNCTION instruction");
 
   std::for_each(
-    target,
-    after_matching_assignment,
-    [](goto_programt::instructiont &instr) { // NOLINT (*)
+    target, after_matching_assignment, [](goto_programt::instructiont &instr) {
       instr.make_skip();
     });
 

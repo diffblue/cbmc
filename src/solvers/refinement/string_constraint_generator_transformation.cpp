@@ -128,7 +128,7 @@ exprt string_constraint_generatort::add_axioms_for_substring(
   lemmas.push_back(equal_exprt(res.length(), minus_exprt(end1, start1)));
 
   // Axiom 2.
-  constraints.push_back([&] { // NOLINT
+  constraints.push_back([&] {
     const symbol_exprt idx = fresh_univ_index("QA_index_substring", index_type);
     return string_constraintt(
       idx, res.length(), equal_exprt(res[idx], str[plus_exprt(start1, idx)]));
@@ -197,7 +197,7 @@ exprt string_constraint_generatort::add_axioms_for_trim(
   constraints.push_back(a6);
 
   // Axiom 7.
-  constraints.push_back([&] { // NOLINT
+  constraints.push_back([&] {
     const symbol_exprt n2 = fresh_univ_index("QA_index_trim2", index_type);
     const minus_exprt bound(minus_exprt(str.length(), idx), res.length());
     const binary_relation_exprt eqn2(
@@ -473,7 +473,7 @@ exprt string_constraint_generatort::add_axioms_for_replace(
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   if(
     const auto maybe_chars =
-      to_char_pair(f.arguments()[3], f.arguments()[4], [this](const exprt &e) { // NOLINT
+      to_char_pair(f.arguments()[3], f.arguments()[4], [this](const exprt &e) {
         return get_string_expr(e);
       }))
   {

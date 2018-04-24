@@ -90,9 +90,7 @@ std::size_t remove_instanceoft::lower_instanceof(
   // Sort alphabetically to make order of generated disjuncts
   // independent of class loading order
   std::sort(
-    children.begin(),
-    children.end(),
-    [](const irep_idt &a, const irep_idt &b) { // NOLINT
+    children.begin(), children.end(), [](const irep_idt &a, const irep_idt &b) {
       return a.compare(b) < 0;
     });
 

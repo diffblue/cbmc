@@ -53,11 +53,11 @@ public:
     message_handlert &message_handler)
   {
     return lazy_goto_modelt(
-      [&handler, &options]
-      (goto_model_functiont &fun, const abstract_goto_modelt &model) { // NOLINT(*)
+      [&handler,
+       &options](goto_model_functiont &fun, const abstract_goto_modelt &model) {
         handler.process_goto_function(fun, model, options);
       },
-      [&handler, &options] (goto_modelt &goto_model) -> bool { // NOLINT(*)
+      [&handler, &options](goto_modelt &goto_model) -> bool {
         return handler.process_goto_functions(goto_model, options);
       },
       message_handler);

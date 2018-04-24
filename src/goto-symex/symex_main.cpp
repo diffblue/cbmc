@@ -166,8 +166,8 @@ void goto_symext::symex_threaded_step(
 static goto_symext::get_goto_functiont get_function_from_goto_functions(
   const goto_functionst &goto_functions)
 {
-  return [&goto_functions](const irep_idt &key) ->
-    const goto_functionst::goto_functiont & { // NOLINT(*)
+  return [&goto_functions](
+           const irep_idt &key) -> const goto_functionst::goto_functiont & {
     return goto_functions.function_map.at(key);
   };
 }

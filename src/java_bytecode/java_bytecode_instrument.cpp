@@ -75,7 +75,7 @@ protected:
   optionalt<codet> instrument_expr(const exprt &expr);
 };
 
-const std::vector<std::string> exception_needed_classes = { // NOLINT
+const std::vector<std::string> exception_needed_classes = {
   "java.lang.ArithmeticException",
   "java.lang.ArrayIndexOutOfBoundsException",
   "java.lang.ClassCastException",

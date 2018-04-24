@@ -206,7 +206,7 @@ SCENARIO("instantiate_not_contains",
       constraints.begin(),
       constraints.end(),
       axioms,
-      [&](const std::string &accu, string_constraintt sc) { // NOLINT
+      [&](const std::string &accu, string_constraintt sc) {
         simplify(sc, ns);
         std::string s;
         java_lang->from_expr(sc, s, ns);
@@ -218,8 +218,7 @@ SCENARIO("instantiate_not_contains",
       nc_contraints.begin(),
       nc_contraints.end(),
       axioms,
-      [&](
-        const std::string &accu, string_not_contains_constraintt sc) { // NOLINT
+      [&](const std::string &accu, string_not_contains_constraintt sc) {
         simplify(sc, ns);
         generator.witness[sc] = generator.fresh_symbol("w", t.witness_type());
         nc_axioms.push_back(sc);
@@ -233,7 +232,7 @@ SCENARIO("instantiate_not_contains",
       lemmas.begin(),
       lemmas.end(),
       axioms,
-      [&](const std::string &accu, exprt axiom) { // NOLINT
+      [&](const std::string &accu, exprt axiom) {
         simplify(axiom, ns);
         std::string s;
         java_lang->from_expr(axiom, s, ns);

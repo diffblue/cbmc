@@ -692,7 +692,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     constraints.begin(),
     constraints.end(),
     std::back_inserter(axioms.universal),
-    [&](string_constraintt constraint) { // NOLINT
+    [&](string_constraintt constraint) {
       symbol_resolve.replace_expr(constraint);
       DATA_INVARIANT(
         is_valid_string_constraint(error(), ns, constraint),
@@ -707,14 +707,14 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     not_contains_constraints.begin(),
     not_contains_constraints.end(),
     std::back_inserter(axioms.not_contains),
-    [&](string_not_contains_constraintt axiom) { // NOLINT
+    [&](string_not_contains_constraintt axiom) {
       symbol_resolve.replace_expr(axiom);
       return axiom;
     });
 
   for(const auto &nc_axiom : axioms.not_contains)
   {
-    const auto &witness_type = [&] { // NOLINT
+    const auto &witness_type = [&] {
       const auto &rtype = to_array_type(nc_axiom.s0().type());
       const typet &index_type = rtype.size().type();
       return array_typet(index_type, infinity_exprt(index_type));
@@ -1920,7 +1920,7 @@ static void update_index_set(
 static optionalt<exprt>
 find_index(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 {
-  auto index_str_containing_qvar = [&](const exprt &e) { // NOLINT
+  auto index_str_containing_qvar = [&](const exprt &e) {
     if(auto index_expr = expr_try_dynamic_cast<index_exprt>(e))
     {
       const auto &arr = index_expr->array();
