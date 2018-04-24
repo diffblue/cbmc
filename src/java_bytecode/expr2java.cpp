@@ -350,7 +350,8 @@ std::string expr2javat::convert_java_new(
 {
   std::string dest;
 
-  if(src.get(ID_statement)==ID_java_new_array)
+  if(src.get(ID_statement)==ID_java_new_array ||
+     src.get(ID_statement)==ID_java_new_array_data)
   {
     dest="new";
 
@@ -398,7 +399,8 @@ std::string expr2javat::convert_with_precedence(
     return convert_java_instanceof(src, precedence=15);
   else if(src.id()==ID_side_effect &&
           (src.get(ID_statement)==ID_java_new ||
-           src.get(ID_statement)==ID_java_new_array))
+           src.get(ID_statement)==ID_java_new_array ||
+           src.get(ID_statement)==ID_java_new_array_data))
     return convert_java_new(src, precedence=15);
   else if(src.id()==ID_side_effect &&
           src.get(ID_statement)==ID_throw)
