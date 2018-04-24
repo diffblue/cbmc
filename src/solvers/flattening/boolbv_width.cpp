@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/std_types.h>
@@ -136,13 +135,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     else
     {
       mp_integer total = *array_size * sub_width;
-      if(total>(1<<30)) // realistic limit
-        throw analysis_exceptiont("array too large for flattening");
-
-      if(total < 0)
-        entry.total_width = 0;
-      else
-        entry.total_width = numeric_cast_v<std::size_t>(total);
+      entry.total_width = numeric_cast_v<std::size_t>(total);
     }
   }
   else if(type_id==ID_vector)
@@ -153,9 +146,6 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     const auto vector_size = numeric_cast_v<mp_integer>(vector_type.size());
 
     mp_integer total = vector_size * sub_width;
-    if(total > (1 << 30)) // realistic limit
-      throw analysis_exceptiont("vector too large for flattening");
-
     entry.total_width = numeric_cast_v<std::size_t>(vector_size * sub_width);
   }
   else if(type_id==ID_complex)
