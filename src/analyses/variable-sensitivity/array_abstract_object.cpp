@@ -95,7 +95,7 @@ abstract_object_pointert array_abstract_objectt::read(
   const exprt &specifier,
   const namespacet &ns) const
 {
-  return read_index(env, to_index_expr(specifier), ns);
+  return this->read_index(env, to_index_expr(specifier), ns);
 }
 
 /**
@@ -122,7 +122,7 @@ abstract_object_pointert array_abstract_objectt::write(
   const abstract_object_pointert value,
   bool merging_write) const
 {
-  return write_index(
+  return this->write_index(
     environment, ns, stack, to_index_expr(specifier), value, merging_write);
 }
 

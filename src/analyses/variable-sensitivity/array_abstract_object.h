@@ -42,12 +42,12 @@ public:
 protected:
   CLONE
 
-  abstract_object_pointert read_index(
+  virtual abstract_object_pointert read_index(
     const abstract_environmentt &env,
     const index_exprt &index,
     const namespacet &ns) const;
 
-  sharing_ptrt<array_abstract_objectt> write_index(
+  virtual sharing_ptrt<array_abstract_objectt> write_index(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,
