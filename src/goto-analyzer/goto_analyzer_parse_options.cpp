@@ -48,6 +48,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/constant_propagator.h>
 #include <analyses/dependence_graph.h>
 #include <analyses/interval_domain.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_dependence_graph.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 
@@ -298,6 +299,17 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("structs", cmdline.isset("structs"));
       options.set_option("data-dependencies", cmdline.isset("data-dependencies"));
     }
+    else if(cmdline.isset("dependence-graph-vs"))
+    {
+      options.set_option("dependence-graph-vs", true);
+      options.set_option("domain set", true);
+
+      // Configuration of variable sensitivity domain
+      options.set_option("pointers", cmdline.isset("pointers"));
+      options.set_option("arrays", cmdline.isset("arrays"));
+      options.set_option("structs", cmdline.isset("structs"));
+      options.set_option("data-dependencies", true);
+    }
 
     // Reachability questions, when given with a domain swap from specific
     // to general tasks so that they can use the domain & parameterisations.
@@ -361,6 +373,10 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     else if(options.get_bool_option("variable-sensitivity"))
     {
       domain=new ait<variable_sensitivity_domaint>();
+    }
+    else if(options.get_bool_option("dependence-graph-vs"))
+    {
+      domain=new ait<variable_sensitivity_dependence_grapht>;
     }
   }
   else if(options.get_bool_option("concurrent"))
@@ -770,6 +786,7 @@ void goto_analyzer_parse_optionst::help()
     " --intervals                  interval domain\n"
     " --non-null                   non-null domain\n"
     " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
+    " --dependence-graph-vs        data dependencies between instructions using variable sensitivity\n" // NOLINT(*)
     " --variable-sensitivity       a highly configurable non-relational domain"
     "\n"
     "Output options:\n"

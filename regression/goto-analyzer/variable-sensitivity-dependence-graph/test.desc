@@ -1,0 +1,37 @@
+CORE
+main.c
+file1.c file2.c --dependence-graph-vs --structs --arrays --show
+EXIT=0
+SIGNAL=0
+^Data dependencies: 53$
+^Data dependencies: 53$
+^Data dependencies: 1, 53$
+^Data dependencies: 4, 53$
+^Data dependencies: 1, 4, 53$
+^Data dependencies: 48$
+^Data dependencies: 48$
+^Data dependencies: 10, 48$
+^Data dependencies: 13, 48$
+^Data dependencies: 10, 13, 48$
+^Data dependencies: 19$
+^Data dependencies: 18$
+^Data dependencies: 19$
+^Data dependencies: 19, 20, 22$
+^Data dependencies: 1, 53, 57$
+^Data dependencies: 4, 53, 60$
+^Data dependencies: 1, 4, 53, 57, 60$
+^Data dependencies: 10, 48, 68$
+^Data dependencies: 13, 48, 71$
+^Data dependencies: 10, 13, 48, 68, 71$
+^Data dependencies: 1, 53$
+^Data dependencies: 4, 53$
+^Data dependencies: 1, 53, 57$
+^Data dependencies: 4, 53, 60$
+^Data dependencies: 1, 4, 53, 57, 60$
+^Data dependencies: 10, 48$
+^Data dependencies: 13, 48$
+^Data dependencies: 10, 48, 68$
+^Data dependencies: 13, 48, 71$
+^Data dependencies: 10, 13, 48, 68, 71$
+--
+^warning: ignoring
