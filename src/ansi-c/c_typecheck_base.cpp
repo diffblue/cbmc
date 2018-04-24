@@ -708,7 +708,12 @@ void c_typecheck_baset::typecheck_declaration(
 
         // alias function need not have been declared yet, thus
         // can't lookup
-        symbol.value=symbol_exprt(full_spec.alias);
+        // also cater for renaming/placement in sections
+        const auto &renaming_entry = asm_label_map.find(full_spec.alias);
+        if(renaming_entry == asm_label_map.end())
+          symbol.value = symbol_exprt(full_spec.alias);
+        else
+          symbol.value = symbol_exprt(renaming_entry->second);
         symbol.is_macro=true;
       }
 
@@ -716,8 +721,18 @@ void c_typecheck_baset::typecheck_declaration(
         apply_asm_label(full_spec.asm_label, symbol);
       else
       {
-        std::string asm_name;
-        asm_name=id2string(full_spec.section)+"$$";
+        // section name is not empty, do a bit of parsing
+        std::string asm_name = id2string(full_spec.section);
+        if(asm_name[0] != '.')
+        {
+          warning().source_location = symbol.location;
+          warning() << "section name `" << asm_name
+                    << "' expected to start with `.'" << eom;
+        }
+        std::string::size_type primary_section = asm_name.find('.', 1);
+        if(primary_section != std::string::npos)
+          asm_name.resize(primary_section);
+        asm_name += "$$";
         if(!full_spec.asm_label.empty())
           asm_name+=id2string(full_spec.asm_label);
         else
