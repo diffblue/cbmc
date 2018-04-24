@@ -705,10 +705,10 @@ int bmct::do_language_agnostic_bmc(
     message.error() << error_msg << message.eom;
     return CPROVER_EXIT_EXCEPTION;
   }
-  catch(...)
+  catch(std::runtime_error &e)
   {
-    message.error() << "unable to get solver" << message.eom;
-    throw std::current_exception();
+    message.error() << e.what() << message.eom;
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   switch(result)
