@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define SATCHECK_BOOLEFORCE
 // #define SATCHECK_PICOSAT
 // #define SATCHECK_LINGELING
+// #define SATCHECK_CADICAL
 
 #if defined(HAVE_IPASIR) && !defined(SATCHECK_IPASIR)
 #define SATCHECK_IPASIR
@@ -52,6 +53,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #if defined(HAVE_LINGELING) && !defined(SATCHECK_LINGELING)
 #define SATCHECK_LINGELING
+#endif
+
+#if defined(HAVE_CADICAL) && !defined(SATCHECK_CADICAL)
+#define SATCHECK_CADICAL
 #endif
 
 #if defined SATCHECK_ZCHAFF
@@ -109,6 +114,13 @@ typedef satcheck_lingelingt satcheck_no_simplifiert;
 
 typedef satcheck_glucose_simplifiert satcheckt;
 typedef satcheck_glucose_no_simplifiert satcheck_no_simplifiert;
+
+#elif defined SATCHECK_CADICAL
+
+#include "satcheck_cadical.h"
+
+typedef satcheck_cadicalt satcheckt;
+typedef satcheck_cadicalt satcheck_no_simplifiert;
 
 #endif
 

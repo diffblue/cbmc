@@ -67,6 +67,13 @@ ifneq ($(LINGELING),)
   CP_CXXFLAGS += -DHAVE_LINGELING
 endif
 
+ifneq ($(CADICAL),)
+  CADICAL_SRC=sat/satcheck_cadical.cpp
+  CADICAL_INCLUDE=-I $(CADICAL)/src
+  CADICAL_LIB=$(CADICAL)/build/libcadical$(LIBEXT)
+  CP_CXXFLAGS += -DHAVE_CADICAL
+endif
+
 SRC = $(BOOLEFORCE_SRC) \
       $(CHAFF_SRC) \
       $(CUDD_SRC) \
@@ -77,6 +84,7 @@ SRC = $(BOOLEFORCE_SRC) \
       $(MINISAT_SRC) \
       $(PICOSAT_SRC) \
       $(SQUOLEM2_SRC) \
+      $(CADICAL_SRC) \
       cvc/cvc_conv.cpp \
       cvc/cvc_dec.cpp \
       flattening/arrays.cpp \
@@ -194,7 +202,7 @@ INCLUDES += -I .. \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \
   $(IPASIR_INCLUDE) \
   $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
-	$(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
+	$(PICOSAT_INCLUDE) $(LINGELING_INCLUDE) $(CADICAL_INCLUDE)
 
 CLEANFILES += solvers$(LIBEXT) \
   smt2_solver$(EXEEXT) smt2/smt2_solver$(OBJEXT) smt2/smt2_solver$(DEPEXT)
@@ -211,7 +219,7 @@ endif
 
 SOLVER_LIB = $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
         $(MINISAT2_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
-        $(PICOSAT_LIB) $(LINGELING_LIB) $(GLUCOSE_LIB)
+        $(PICOSAT_LIB) $(LINGELING_LIB) $(GLUCOSE_LIB) $(CADICAL_LIB)
 
 ###############################################################################
 
