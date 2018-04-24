@@ -42,11 +42,14 @@ member_offset_iterator &member_offset_iterator::operator++()
     {
       // take the extra bytes needed
       std::size_t w=to_c_bit_field_type(comp.type()).get_width();
-      for(; w>bit_field_bits; ++current.second, bit_field_bits+=8) {}
-      bit_field_bits-=w;
+      bit_field_bits += w;
+      current.second += bit_field_bits / 8;
+      bit_field_bits %= 8;
     }
     else
     {
+      DATA_INVARIANT(
+        bit_field_bits == 0, "padding ensures offset at byte boundaries");
       const typet &subtype=comp.type();
       mp_integer sub_size=pointer_offset_size(subtype, ns);
       if(sub_size==-1)
@@ -287,13 +290,15 @@ exprt member_offset_expr(
     if(it->type().id()==ID_c_bit_field)
     {
       std::size_t w=to_c_bit_field_type(it->type()).get_width();
-      std::size_t bytes;
-      for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8) {}
-      bit_field_bits-=w;
+      bit_field_bits += w;
+      const std::size_t bytes = bit_field_bits / 8;
+      bit_field_bits %= 8;
       result=plus_exprt(result, from_integer(bytes, result.type()));
     }
     else
     {
+      DATA_INVARIANT(
+        bit_field_bits == 0, "padding ensures offset at byte boundaries");
       const typet &subtype=it->type();
       exprt sub_size=size_of_expr(subtype, ns);
       if(sub_size.is_nil())
@@ -381,13 +386,15 @@ exprt size_of_expr(
       if(it->type().id()==ID_c_bit_field)
       {
         std::size_t w=to_c_bit_field_type(it->type()).get_width();
-        std::size_t bytes;
-        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8) {}
-        bit_field_bits-=w;
+        bit_field_bits += w;
+        const std::size_t bytes = bit_field_bits / 8;
+        bit_field_bits %= 8;
         result=plus_exprt(result, from_integer(bytes, result.type()));
       }
       else
       {
+        DATA_INVARIANT(
+          bit_field_bits == 0, "padding ensures offset at byte boundaries");
         const typet &subtype=it->type();
         exprt sub_size=size_of_expr(subtype, ns);
         if(sub_size.is_nil())
