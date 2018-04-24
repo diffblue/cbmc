@@ -523,10 +523,19 @@ void symex_target_equationt::convert_constraints(
   {
     if(step.is_constraint())
     {
-      if(step.ignore)
-        continue;
-
-      decision_procedure.set_to_true(step.cond_expr);
+      if(!step.ignore)
+      {
+        try
+        {
+          decision_procedure.set_to_true(step.cond_expr);
+        }
+        catch(const bitvector_conversion_exceptiont &conversion_exception)
+        {
+          util_throw_with_nested(
+            equation_conversion_exceptiont(
+              "Error converting constraints for step", step));
+        }
+      }
     }
   }
 }
