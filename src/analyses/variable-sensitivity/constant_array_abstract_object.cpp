@@ -29,7 +29,9 @@ Function: constant_array_abstract_objectt::constant_array_abstract_objectt
 
 constant_array_abstract_objectt::constant_array_abstract_objectt(typet type):
 array_abstract_objectt(type)
-{}
+{
+  DATA_INVARIANT(verify(), "Structural invariants maintained");
+}
 
 /*******************************************************************\
 
@@ -50,7 +52,9 @@ Function: constant_array_abstract_objectt::constant_array_abstract_objectt
 constant_array_abstract_objectt::constant_array_abstract_objectt(
   typet type, bool top, bool bottom):
 array_abstract_objectt(type, top, bottom)
-{}
+{
+  DATA_INVARIANT(verify(), "Structural invariants maintained");
+}
 
 /*******************************************************************\
 
@@ -83,6 +87,29 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
     }
     clear_top();
   }
+  DATA_INVARIANT(verify(), "Structural invariants maintained");
+}
+
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::verify
+
+  Inputs:
+
+ Outputs: Returns true if the struct is valid
+
+ Purpose: To validate that the struct object is in a valid state.
+          This means either it is top or bottom, or if neither of those
+          then there exists something in the map of components.
+          If there is something in the map, then it can't be top or bottom
+
+\*******************************************************************/
+
+bool constant_array_abstract_objectt::verify() const
+{
+  // Either the object is top or bottom (=> map empty)
+  // or the map is not empty => neither top nor bottom
+  return (is_top() || is_bottom()) == map.empty();
 }
 
 /*******************************************************************\
@@ -139,23 +166,23 @@ abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
   }
   else
   {
-    shared_array_mapt merged_map(map);
-    bool modified=
-      abstract_objectt::merge_shared_maps<mp_integer, mp_integer_hash>(map, other->map, merged_map);
+    const auto &result=
+      std::dynamic_pointer_cast<constant_array_abstract_objectt>(mutable_clone());
+
+    bool modified =
+      abstract_objectt::merge_shared_maps<mp_integer, mp_integer_hash>(
+        map, other->map, result->map);
+
     if(!modified)
     {
+      DATA_INVARIANT(verify(), "Structural invariants maintained");
       return shared_from_this();
     }
     else
     {
-      const auto &result=
-        std::dynamic_pointer_cast<constant_array_abstract_objectt>(
-          mutable_clone());
-
-      result->map=merged_map;
-
-      INVARIANT(!result->is_top(), "merge of maps doesn't generate top");
-      INVARIANT(!result->is_bottom(), "merge of maps doesn't generate bottom");
+      INVARIANT(!result->is_top(), "Merge of maps will not generate top");
+      INVARIANT(!result->is_bottom(), "Merge of maps will not generate bottom");
+      DATA_INVARIANT(result->verify(), "Structural invariants maintained");
       return result;
     }
   }
@@ -200,55 +227,6 @@ void constant_array_abstract_objectt::output(
     }
     out << "}";
   }
-}
-
-/**
- * A helper function to evaluate an abstract object contained
- * within a container object. More precise abstractions may override this
- * to return more precise results.
- *
- * \param env the abstract environment
- * \param specifier a modifier expression, such as an array index or field
- * specifier used to indicate access to a specific component
- * \param ns the current namespace
- *
- * \return the abstract_objectt representing the value of the read component.
- */
-abstract_object_pointert constant_array_abstract_objectt::read(
-  const abstract_environmentt &env,
-  const exprt &specifier,
-  const namespacet &ns) const
-{
-  return read_index(env, to_index_expr(specifier), ns);
-}
-
-/**
- * A helper function to evaluate writing to a component of an
- * abstract object. More precise abstractions may override this to
- * update what they are storing for a specific component.
- *
- * \param environment the abstract environment
- * \param ns the current namespace
- * \param stack the remaining stack of expressions on the LHS to evaluate
- * \param specifier the expression uses to access a specific component
- * \param value the value we are trying to write to the component
- * \param merging_write if true, this and all future writes will be merged
- * with the current value
- *
- * \return the abstract_objectt representing the result of writing
- * to a specific component.
- */
-abstract_object_pointert constant_array_abstract_objectt::write(
-  abstract_environmentt &environment,
-  const namespacet &ns,
-  const std::stack<exprt> stack,
-  const exprt &specifier,
-  const abstract_object_pointert value,
-  bool merging_write) const
-{
-  return write_index(
-    environment, ns, stack, to_index_expr(specifier), value,
-    merging_write);
 }
 
 /*******************************************************************\
@@ -340,84 +318,102 @@ sharing_ptrt<array_abstract_objectt>
     return array_abstract_objectt::write_index(
       environment, ns, stack, index_expr, value, merging_write);
   }
-  else
+
+  const auto &result=
+    std::dynamic_pointer_cast<constant_array_abstract_objectt>(mutable_clone());
+
+  if(!stack.empty())
   {
-    if(stack.empty())
+    mp_integer index_value;
+    if(eval_index(index_expr, environment, ns, index_value))
     {
-      auto result=
-        internal_sharing_ptrt<constant_array_abstract_objectt>(
-          new constant_array_abstract_objectt(*this));
+      // We were able to evaluate the index to a value, which we
+      // assume is in bounds...
+      abstract_object_pointert starting_value;
+      shared_array_mapt::const_find_type old_value = map.find(index_value);
 
-      mp_integer index_value;
-      if(!merging_write && eval_index(index_expr, environment, ns, index_value))
+      if(!old_value.second)
       {
-        if(is_top())
-        {
-          result->clear_top();
-        }
-
-        result->map[index_value]=value;
-        return result;
+        starting_value=get_top_entry(environment, ns);
       }
       else
       {
-        // try to write to all
-        // TODO(tkiley): Merge with each entry
-        return array_abstract_objectt::write_index(
-          environment, ns, stack, index_expr, value, merging_write);
+        starting_value=old_value.first;
       }
+
+      result->map[index_value] =
+        environment.write(starting_value, value, stack, ns, merging_write);
+
+      result->clear_top();
+      DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+      return result;
     }
     else
     {
-      auto result=
-        internal_sharing_ptrt<constant_array_abstract_objectt>(
-          new constant_array_abstract_objectt(*this));
+      // We were not able to evaluate the index to a value
+      shared_array_mapt::viewt view;
+      map.get_view(view);
 
-      mp_integer index_value;
-      if(eval_index(index_expr, environment, ns, index_value))
+      for(const auto &starting_value : view)
       {
-        // Here we assume the write is in bounds
-        abstract_object_pointert array_entry;
-        shared_array_mapt::const_find_type old_value = map.find(index_value);
+        // Merging write since we don't know which index we are writing to
+        result->map[starting_value.first]=
+          environment.write(
+            starting_value.second, value, stack, ns, true);
+        result->clear_top();
+      }
 
-        if(old_value.second)
-        {
-          array_entry=old_value.first;
-        }
-        else
-        {
-          array_entry=get_top_entry(environment, ns);
-        }
+      DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+      return result;
+    }
+  }
+  else
+  {
+    mp_integer index_value;
 
+    if(eval_index(index_expr, environment, ns, index_value))
+    {
+      // We were able to evalute the index expression to a constant
+      if(merging_write)
+      {
         if(is_top())
         {
-          result->clear_top();
+          DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+          return result;
         }
-        result->map[index_value]=environment.write(
-          array_entry, value, stack, ns, merging_write);
 
+        INVARIANT(!result->map.empty(), "If not top, map cannot be empty");
+     
+        shared_array_mapt::const_find_type old_value=
+          result->map.find(index_value);
+
+        if(!old_value.second) // Array element is top
+        {
+          DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+          return result;
+        }
+
+        bool dummy;
+
+        result->map[index_value] = 
+          abstract_objectt::merge(old_value.first, value, dummy);
+
+        DATA_INVARIANT(result->verify(), "Structural invariants maintained");
         return result;
       }
       else
       {
-        shared_array_mapt::viewt view;
-        map.get_view(view);
-
-        for(const auto &array_entry : view)
-        {
-          // Merging write since we don't know which index we are writing to
-          result->map[array_entry.first]=
-            environment.write(
-              array_entry.second, value, stack, ns, true);
-          if(is_top())
-          {
-            result->clear_top();
-          }
-        }
-
+        result->map[index_value] = value;
+        result->clear_top();
+        DATA_INVARIANT(result->verify(), "Structural invariants maintained");
         return result;
       }
     }
+
+    // try to write to all
+    // TODO(tkiley): Merge with each entry
+    return array_abstract_objectt::write_index(
+      environment, ns, stack, index_expr, value, merging_write);
   }
 }
 
