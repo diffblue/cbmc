@@ -1431,24 +1431,30 @@ void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
 
   const typet &final_op0_type=follow(expr.op0().type());
 
-  if(final_op0_type.id()!=ID_pointer &&
-     final_op0_type.id()!=ID_array)
+  if(final_op0_type.id()==ID_array)
+  {
+    // a->f is the same as a[0].f
+    exprt zero=from_integer(0, index_type());
+    index_exprt index_expr(expr.op0(), zero, final_op0_type.subtype());
+    index_expr.set(ID_C_lvalue, true);
+    expr.op0().swap(index_expr);
+  }
+  else if(final_op0_type.id()==ID_pointer)
+  {
+    // turn x->y into (*x).y
+    dereference_exprt deref_expr(expr.op0());
+    deref_expr.add_source_location()=expr.source_location();
+    typecheck_expr_dereference(deref_expr);
+    expr.op0().swap(deref_expr);
+  }
+  else
   {
     err_location(expr);
-    error() << "ptrmember operator requires pointer type "
+    error() << "ptrmember operator requires pointer or array type "
                "on left hand side, but got `"
             << to_string(expr.op0().type()) << "'" << eom;
     throw 0;
   }
-
-  // turn x->y into (*x).y
-
-  dereference_exprt deref(expr.op0());
-  deref.add_source_location()=expr.source_location();
-
-  typecheck_expr_dereference(deref);
-
-  expr.op0().swap(deref);
 
   expr.id(ID_member);
   typecheck_expr_member(expr);
