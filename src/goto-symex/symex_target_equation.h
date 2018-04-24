@@ -32,7 +32,6 @@ class prop_convt;
 class symex_target_equationt:public symex_targett
 {
 public:
-  symex_target_equationt() = default;
   virtual ~symex_target_equationt() = default;
 
   // read event
@@ -257,9 +256,12 @@ public:
     {
     }
 
+    DEPRECATED("Use output without ns param")
     void output(
       const namespacet &ns,
       std::ostream &out) const;
+
+    void output(std::ostream &out) const;
   };
 
   std::size_t count_assertions() const
