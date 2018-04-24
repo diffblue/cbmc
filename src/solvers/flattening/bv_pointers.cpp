@@ -136,7 +136,7 @@ bool bv_pointerst::convert_address_of_rec(
     {
       // this should be gone
       bv=convert_pointer_type(array);
-      POSTCONDITION(bv.size()==bits);
+      CHECK_RETURN(bv.size()==bits);
     }
     else if(array_type.id()==ID_array ||
             array_type.id()==ID_incomplete_array ||
@@ -144,7 +144,7 @@ bool bv_pointerst::convert_address_of_rec(
     {
       if(convert_address_of_rec(array, bv))
         return true;
-      POSTCONDITION(bv.size()==bits);
+      CHECK_RETURN(bv.size()==bits);
     }
     else
       UNREACHABLE;
@@ -155,7 +155,22 @@ bool bv_pointerst::convert_address_of_rec(
     DATA_INVARIANT(size>0, "array subtype expected to have non-zero size");
 
     offset_arithmetic(bv, size, index);
-    POSTCONDITION(bv.size()==bits);
+    CHECK_RETURN(bv.size()==bits);
+    return false;
+  }
+  else if(expr.id()==ID_byte_extract_little_endian ||
+          expr.id()==ID_byte_extract_big_endian)
+  {
+    const auto &byte_extract_expr=to_byte_extract_expr(expr);
+
+    // recursive call
+    if(convert_address_of_rec(byte_extract_expr.op(), bv))
+      return true;
+
+    CHECK_RETURN(bv.size()==bits);
+
+    offset_arithmetic(bv, 1, byte_extract_expr.offset());
+    CHECK_RETURN(bv.size()==bits);
     return false;
   }
   else if(expr.id()==ID_member)
@@ -296,7 +311,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       return bv;
     }
 
-    POSTCONDITION(bv.size()==bits);
+    CHECK_RETURN(bv.size()==bits);
     return bv;
   }
   else if(expr.id()==ID_constant)
@@ -334,13 +349,13 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       {
         count++;
         bv=convert_bv(*it);
-        POSTCONDITION(bv.size()==bits);
+        CHECK_RETURN(bv.size()==bits);
 
         typet pointer_sub_type=it->type().subtype();
         if(pointer_sub_type.id()==ID_empty)
           pointer_sub_type=char_type();
         size=pointer_offset_size(pointer_sub_type, ns);
-        POSTCONDITION(size>0);
+        CHECK_RETURN(size>0);
       }
     }
 
