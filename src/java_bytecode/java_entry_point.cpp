@@ -203,7 +203,7 @@ exprt::operandst java_build_arguments(
       !assume_init_pointers_not_null && !is_main && !is_this;
 
     object_factory_parameterst parameters = object_factory_parameters;
-    parameters.function_id = function.name;
+    parameters.function_id = goto_functionst::entry_point();
 
     // generate code to allocate and non-deterministicaly initialize the
     // argument
