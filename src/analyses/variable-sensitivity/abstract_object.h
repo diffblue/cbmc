@@ -255,6 +255,11 @@ protected:
   // The one exception is merge in descendant classes, which needs this
   void make_top() { top=true; this->make_top_internal(); }
   void clear_top() { top=false; this->clear_top_internal(); }
+
+  abstract_object_pointert try_transform_expr_with_all_rounding_modes(
+    const exprt &expr,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
 };
 
 template<typename keyt>

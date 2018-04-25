@@ -6,6 +6,7 @@
 
 \*******************************************************************/
 
+#include <array>
 #include <iostream>
 
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
@@ -16,6 +17,8 @@
 #include <util/simplify_expr.h>
 #include <util/type.h>
 #include <goto-programs/adjust_float_expressions.h>
+#include <util/ieee_float.h>
+#include <util/arith_tools.h>
 
 #include "abstract_object.h"
 
@@ -183,6 +186,17 @@ abstract_object_pointert abstract_objectt::expression_transform(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
+  // try finding the rounding mode. If it's not constant, try
+  // seeing if we can get the same result with all rounding modes
+  auto rounding_mode_symbol =
+    symbol_exprt("__CPROVER_rounding_mode", signedbv_typet(32));
+  auto rounding_mode_value = environment.eval(rounding_mode_symbol, ns);
+  auto rounding_mode_constant = rounding_mode_value->to_constant();
+  if(rounding_mode_constant.is_nil())
+  {
+    return try_transform_expr_with_all_rounding_modes(expr, environment, ns);
+  }
+
   exprt adjusted_expr = expr;
   adjust_float_expressions(adjusted_expr, ns);
   exprt constant_replaced_expr = adjusted_expr;
@@ -221,6 +235,49 @@ abstract_object_pointert abstract_objectt::expression_transform(
   }
 
   return environment.abstract_object_factory(simplified.type(), simplified, ns);
+}
+
+abstract_object_pointert
+abstract_objectt::try_transform_expr_with_all_rounding_modes(
+  const exprt &expr,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  const symbol_exprt rounding_mode_symbol =
+    symbol_exprt("__CPROVER_rounding_mode", signedbv_typet(32));
+  // NOLINTNEXTLINE (whitespace/braces)
+  auto rounding_modes = std::array<ieee_floatt::rounding_modet, 4>{
+    // NOLINTNEXTLINE (whitespace/braces)
+    {ieee_floatt::ROUND_TO_EVEN,
+     ieee_floatt::ROUND_TO_ZERO,
+     ieee_floatt::ROUND_TO_MINUS_INF,
+     // NOLINTNEXTLINE (whitespace/braces)
+     ieee_floatt::ROUND_TO_PLUS_INF}};
+  std::vector<abstract_object_pointert> possible_results;
+  for(auto current_rounding_mode : rounding_modes)
+  {
+    abstract_environmentt child_env(environment);
+    child_env.assign(
+      rounding_mode_symbol,
+      child_env.abstract_object_factory(
+        signedbv_typet(32),
+        from_integer(
+          mp_integer(static_cast<int>(current_rounding_mode)),
+          signedbv_typet(32)),
+        ns),
+      ns);
+    possible_results.push_back(expression_transform(expr, child_env, ns));
+  }
+  auto first = possible_results.front()->to_constant();
+  for(auto const &possible_result : possible_results)
+  {
+    auto current = possible_result->to_constant();
+    if(current.is_nil() || current != first)
+    {
+      return environment.abstract_object_factory(expr.type(), ns);
+    }
+  }
+  return possible_results.front();
 }
 
 /**
