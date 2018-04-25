@@ -16,6 +16,8 @@
 
 #include <goto-programs/lazy_goto_model.h>
 
+#include <langapi/mode.h>
+
 #include <java_bytecode/java_bytecode_language.h>
 #include <util/file_util.h>
 
@@ -37,11 +39,13 @@ symbol_tablet load_java_class_lazy(
   free_form_cmdlinet lazy_command_line;
   lazy_command_line.add_flag("lazy-methods");
 
+  register_language(new_java_bytecode_language);
+
   return load_java_class(
     java_class_name,
     class_path,
     main,
-    new_java_bytecode_language(),
+    get_language_from_mode(ID_java),
     lazy_command_line);
 }
 
@@ -59,8 +63,10 @@ symbol_tablet load_java_class(
   const std::string &class_path,
   const std::string &main)
 {
+  register_language(new_java_bytecode_language);
+
   return load_java_class(
-    java_class_name, class_path, main, new_java_bytecode_language());
+    java_class_name, class_path, main, get_language_from_mode(ID_java));
 }
 
 /// Go through the process of loading, type-checking and finalising loading a

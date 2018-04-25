@@ -66,6 +66,9 @@ void goto_symext::symex_allocate(
 
   exprt size=code.op0();
   typet object_type=nil_typet();
+  auto function_symbol = outer_symbol_table.lookup(state.source.pc->function);
+  INVARIANT(function_symbol, "function associated with instruction not found");
+  const irep_idt &mode = function_symbol->mode;
 
   // is the type given?
   if(code.type().id()==ID_pointer && code.type().subtype().id()!=ID_empty)
@@ -142,7 +145,7 @@ void goto_symext::symex_allocate(
       size_symbol.name="symex_dynamic::"+id2string(size_symbol.base_name);
       size_symbol.is_lvalue=true;
       size_symbol.type=tmp_size.type();
-      size_symbol.mode=ID_C;
+      size_symbol.mode = mode;
 
       state.symbol_table.add(size_symbol);
 
@@ -161,7 +164,7 @@ void goto_symext::symex_allocate(
   value_symbol.is_lvalue=true;
   value_symbol.type=object_type;
   value_symbol.type.set("#dynamic", true);
-  value_symbol.mode=ID_C;
+  value_symbol.mode = mode;
 
   state.symbol_table.add(value_symbol);
 
