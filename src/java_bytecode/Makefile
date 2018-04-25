@@ -31,9 +31,10 @@ SRC = bytecode_info.cpp \
       java_types.cpp \
       java_utils.cpp \
       mz_zip_archive.cpp \
-      replace_java_nondet.cpp \
       remove_exceptions.cpp \
       remove_instanceof.cpp \
+      remove_java_new.cpp \
+      replace_java_nondet.cpp \
       select_pointer_type.cpp \
       # Empty last line
 

@@ -753,30 +753,43 @@ void goto_convertt::convert_assign(
     Forall_operands(it, rhs)
       clean_expr(*it, dest);
 
+    // TODO: This should be done in a separate pass
     do_cpp_new(lhs, to_side_effect_expr(rhs), dest);
-  }
-  else if(rhs.id()==ID_side_effect &&
-          rhs.get(ID_statement)==ID_java_new)
-  {
-    Forall_operands(it, rhs)
-      clean_expr(*it, dest);
-
-    do_java_new(lhs, to_side_effect_expr(rhs), dest);
-  }
-  else if(rhs.id()==ID_side_effect &&
-          rhs.get(ID_statement)==ID_java_new_array)
-  {
-    Forall_operands(it, rhs)
-      clean_expr(*it, dest);
-
-    do_java_new_array(lhs, to_side_effect_expr(rhs), dest);
   }
   else if(
     rhs.id() == ID_side_effect &&
-    (rhs.get(ID_statement) == ID_allocate ||
-     rhs.get(ID_statement) == ID_java_new_array_data))
+    (rhs.get(ID_statement) == ID_assign ||
+     rhs.get(ID_statement) == ID_postincrement ||
+     rhs.get(ID_statement) == ID_preincrement ||
+     rhs.get(ID_statement) == ID_statement_expression))
   {
-    // just preserve
+    // handle above side effects
+    clean_expr(rhs, dest);
+
+    if(lhs.id() == ID_typecast)
+    {
+      DATA_INVARIANT(
+        lhs.operands().size() == 1, "Typecast must have one operand");
+
+      // add a typecast to the rhs
+      exprt new_rhs = rhs;
+      rhs.make_typecast(lhs.op0().type());
+
+      // remove typecast from lhs
+      exprt tmp = lhs.op0();
+      lhs.swap(tmp);
+    }
+
+    code_assignt new_assign(code);
+    new_assign.lhs() = lhs;
+    new_assign.rhs() = rhs;
+
+    copy(new_assign, ASSIGN, dest);
+  }
+  else if(rhs.id() == ID_side_effect)
+  {
+    // preserve side effects that will be handled at later stages,
+    // such as allocate, new operators of other languages, e.g. java, etc
     Forall_operands(it, rhs)
       clean_expr(*it, dest);
 
@@ -788,6 +801,7 @@ void goto_convertt::convert_assign(
   }
   else
   {
+    // do everything else
     clean_expr(rhs, dest);
 
     if(lhs.id()==ID_typecast)
