@@ -8,13 +8,14 @@ Author: Chris Smowton, chris@smowton.net
 
 #include <testing-utils/catch.hpp>
 
-#include <util/config.h>
-#include <langapi/mode.h>
-#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/goto_inline.h>
+#include <goto-programs/initialize_goto_model.h>
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_types.h>
+#include <java_bytecode/remove_java_new.h>
+#include <langapi/mode.h>
 #include <pointer-analysis/value_set_analysis.h>
+#include <util/config.h>
 
 /// An example customised value_sett. It makes a series of small changes
 /// to the underlying value_sett logic, which can then be verified by the
@@ -182,6 +183,9 @@ SCENARIO("test_value_set_analysis",
 
     goto_modelt goto_model=
       initialize_goto_model(command_line, null_output);
+
+    null_message_handlert message_handler;
+    remove_java_new(goto_model, message_handler);
 
     namespacet ns(goto_model.symbol_table);
 
