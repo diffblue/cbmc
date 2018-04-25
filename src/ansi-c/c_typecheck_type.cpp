@@ -581,10 +581,9 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       new_symbol.base_name=id2string(current_symbol.base_name)+suffix;
       new_symbol.type=size.type();
       new_symbol.type.set(ID_C_constant, true);
-      new_symbol.is_type=false;
-      new_symbol.is_static_lifetime=false;
       new_symbol.value=size;
       new_symbol.location=source_location;
+      new_symbol.mode = mode;
 
       symbol_table.add(new_symbol);
 
