@@ -27,6 +27,14 @@ const char *irep_ids_table[]=
 
 #ifdef USE_DSTRING
 
+enum class idt:unsigned
+{
+#define IREP_ID_ONE(the_id) id_##the_id,
+#define IREP_ID_TWO(the_id, str) id_##the_id,
+
+#include "irep_ids.def" // NOLINT(build/include)
+};
+
 #define IREP_ID_ONE(the_id)                                                    \
   const dstringt ID_##the_id=dstringt::make_from_table_index(                  \
       static_cast<unsigned>(idt::id_##the_id));
