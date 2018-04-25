@@ -138,14 +138,15 @@ void goto_symext::symex_allocate(
     {
       exprt &size=to_array_type(object_type).size();
 
-      symbolt size_symbol;
+      auxiliary_symbolt size_symbol;
 
       size_symbol.base_name=
         "dynamic_object_size"+std::to_string(dynamic_counter);
       size_symbol.name="symex_dynamic::"+id2string(size_symbol.base_name);
-      size_symbol.is_lvalue=true;
       size_symbol.type=tmp_size.type();
       size_symbol.mode = mode;
+      size_symbol.type.set(ID_C_constant, true);
+      size_symbol.value = size;
 
       state.symbol_table.add(size_symbol);
 
