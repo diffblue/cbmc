@@ -91,10 +91,6 @@ public:
   void swap(symbolt &b);
   void show(std::ostream &out) const;
 
-  // serialization
-  irept to_irep() const;
-  void from_irep(const irept &src);
-
   class symbol_exprt symbol_expr() const;
 
   bool is_shared() const
