@@ -33,11 +33,11 @@ void variable_sensitivity_dependence_grapht::eval_data_deps(
     // If the expression was able to be eval'ed to something with data
     // dependencies, then that's all we need to gather.
     for (const auto dep : res->get_data_dependencies())
-      deps.insert(dep);
+      deps[dep].insert(expr);
   }
   else
   {
-    // If the expression could not be eval'ed to somethign with data
+    // If the expression could not be eval'ed to something with data
     // dependencies, then it may have been some sort of compound expression,
     // so attempt to eval the data dependencies for all the operands, taking
     // the union of them all.
@@ -98,8 +98,11 @@ bool variable_sensitivity_dependence_grapht::merge(
 
   for (auto bdep : cast_b.domain_data_deps)
   {
-    auto result = domain_data_deps.insert(bdep);
-    changed |= result.second;
+    for(exprt bexpr : bdep.second)
+    {
+      auto result = domain_data_deps[bdep.first].insert(bexpr);
+      changed |= result.second;
+    }
   }
 
   return changed;
@@ -155,7 +158,18 @@ void variable_sensitivity_dependence_grapht::output(
         if(!first)
           out << ", ";
 
-        out << dep->location_number;
+        out << dep.first->location_number;
+        out << " [";
+        bool first_expr = true;
+        for (auto &expr : dep.second)
+        {
+          if (!first_expr)
+            out << ", ";
+
+          out << from_expr(ns, "", expr);
+          first_expr = false;
+        }
+        out << "]";
 
         first = false;
       }
@@ -181,10 +195,20 @@ jsont variable_sensitivity_dependence_grapht::output_json(
   {
     json_objectt &link=graph.push_back().make_object();
     link["locationNumber"]=
-      json_numbert(std::to_string(dep->location_number));
-    link["sourceLocation"]=json(dep->source_location);
-    json_stringt(dep->source_location.as_string());
+      json_numbert(std::to_string(dep.first->location_number));
+    link["sourceLocation"]=json(dep.first->source_location);
+    json_stringt(dep.first->source_location.as_string());
     link["type"]=json_stringt("data");
+
+    const std::set<exprt> &expr_set=dep.second;
+    json_arrayt &expressions=link["expressions"].make_array();
+
+    for(const exprt &e : expr_set)
+    {
+      json_objectt &object=expressions.push_back().make_object();
+      object["expression"]=json_stringt(from_expr(ns, "", e));
+      object["certainty"]=json_stringt("maybe");
+    }
   }
 
   return graph;

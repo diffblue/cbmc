@@ -55,7 +55,7 @@ private:
       return a->location_number < b->location_number;
     }
   };
-  typedef std::set<goto_programt::const_targett, dependency_ordert> data_depst;
+  typedef std::map<goto_programt::const_targett, std::set<exprt>, dependency_ordert> data_depst;
   data_depst domain_data_deps;
 
   void eval_data_deps(
