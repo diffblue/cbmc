@@ -572,7 +572,7 @@ void remove_exceptions(
   std::map<irep_idt, std::set<irep_idt>> exceptions_map;
   uncaught_exceptions(goto_functions, ns, exceptions_map);
   remove_exceptionst::function_may_throwt function_may_throw =
-    [&exceptions_map](const irep_idt &id) { // NOLINT(whitespace/braces)
+    [&exceptions_map](const irep_idt &id) {
       return !exceptions_map[id].empty();
     };
   remove_exceptionst remove_exceptions(

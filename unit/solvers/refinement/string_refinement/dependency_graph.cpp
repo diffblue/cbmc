@@ -142,8 +142,7 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
         const auto &node = dependencies.get_node(char_array3);
         std::size_t nb_dependencies = 0;
         dependencies.for_each_dependency(
-          node,
-          [&](const string_dependenciest::builtin_function_nodet &n) { // NOLINT
+          node, [&](const string_dependenciest::builtin_function_nodet &n) {
             nb_dependencies++;
             THEN("primitive0 depends on string1 and string2")
             {
@@ -161,8 +160,7 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
         const auto &node = dependencies.get_node(char_array5);
         std::size_t nb_dependencies = 0;
         dependencies.for_each_dependency(
-          node,
-          [&](const string_dependenciest::builtin_function_nodet &n) { // NOLINT
+          node, [&](const string_dependenciest::builtin_function_nodet &n) {
             nb_dependencies++;
             THEN("primitive1 depends on string3 and string4")
             {

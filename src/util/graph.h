@@ -486,7 +486,7 @@ void get_reachable(
   {
     auto n = stack.back();
     stack.pop_back();
-    for_each_successor(n, [&](const nodet &node) { // NOLINT
+    for_each_successor(n, [&](const nodet &node) {
       if(set.insert(node).second)
         stack.push_back(node);
     });
@@ -749,8 +749,8 @@ void output_dot_generic(
     &for_each_succ,
   const std::function<std::string(const node_index_type &)> node_to_string)
 {
-  for_each_node([&](const node_index_type &i) {      // NOLINT
-    for_each_succ(i, [&](const node_index_type &n) { // NOLINT
+  for_each_node([&](const node_index_type &i) {
+    for_each_succ(i, [&](const node_index_type &n) {
       out << node_to_string(i) << " -> " << node_to_string(n) << '\n';
     });
   });
@@ -784,14 +784,13 @@ template <class N>
 void grapht<N>::output_dot(std::ostream &out) const
 {
   const auto for_each_node =
-    [&](const std::function<void(const node_indext &)> &f) { // NOLINT
+    [&](const std::function<void(const node_indext &)> &f) {
       for(node_indext i = 0; i < nodes.size(); ++i)
         f(i);
     };
 
   const auto for_each_succ = [&](
-    const node_indext &i,
-    const std::function<void(const node_indext &)> &f) { // NOLINT
+    const node_indext &i, const std::function<void(const node_indext &)> &f) {
     for_each_successor(i, f);
   };
 

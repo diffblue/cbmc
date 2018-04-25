@@ -19,13 +19,10 @@
 /// \return true if a suitable symbol_exprt is found
 static bool contains_symbol_reference(const exprt &expr, const irep_idt &id)
 {
-  return
-    std::any_of(
-      expr.depth_begin(),
-      expr.depth_end(),
-      [id](const exprt &e) { // NOLINT (*)
-        return e.id() == ID_symbol && to_symbol_expr(e).get_identifier() == id;
-      });
+  return std::any_of(
+    expr.depth_begin(), expr.depth_end(), [id](const exprt &e) {
+      return e.id() == ID_symbol && to_symbol_expr(e).get_identifier() == id;
+    });
 }
 
 SCENARIO(

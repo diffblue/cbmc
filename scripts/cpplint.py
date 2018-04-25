@@ -3972,14 +3972,6 @@ def CheckBracesSpacing(filename, clean_lines, linenum, nesting_state, error):
       error(filename, linenum, 'whitespace/braces', 5,
             'Missing space before {')
 
-  # Make sure '} else {' has spaces.
-  # if Search(r'}else', line):
-  #   error(filename, linenum, 'whitespace/braces', 5,
-  #        'Missing space before else')
-  if (Search(r'^.*[^\s].*}$', line) or Search(r'^.*[^\s].*{$', line)) and not(Search(r'{[^}]*}', line)):
-     error(filename, linenum, 'whitespace/braces', 5,
-           'Put braces on a separate next line')
-
   # You shouldn't have a space before a semicolon at the end of the line.
   # There's a special case for "for" since the style guide allows space before
   # the semicolon there.

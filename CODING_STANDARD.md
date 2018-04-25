@@ -19,7 +19,10 @@ Formatting is enforced using clang-format. For more information about this, see
       - Nested function calls do not need to be broken up into separate lines
         even if the outer function call does.
 - If a method is bigger than 50 lines, break it into parts.
-- Put matching `{ }` into the same column.
+- Put matching `{ }` into the same column, except for initializer lists and
+  lambdas, where you should place `{` directly after the closing `)`. This is
+  to comply with clang-format, which doesn't support aligned curly braces in
+  these cases.
 - Spaces around binary operators (`=`, `+`, `==` ...)
 - Space after comma (parameter lists, argument lists, ...)
 - Space after colon inside `for`

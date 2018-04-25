@@ -66,7 +66,7 @@ std::string floating_point_to_java_string(float_type value)
     return class_name + ".POSITIVE_INFINITY";
   if(std::isinf(value) && value <= 0.)
     return class_name + ".NEGATIVE_INFINITY";
-  const std::string decimal = [&]() -> std::string { // NOLINT
+  const std::string decimal = [&]() -> std::string {
     // Using ostringstream instead of to_string to get string without
     // trailing zeros
     std::ostringstream raw_stream;
@@ -76,7 +76,7 @@ std::string floating_point_to_java_string(float_type value)
       return raw_decimal + ".0";
     return raw_decimal;
   }();
-  const bool is_lossless = [&] { // NOLINT
+  const bool is_lossless = [&] {
     if(value == std::numeric_limits<float_type>::min())
       return true;
     try
@@ -88,7 +88,7 @@ std::string floating_point_to_java_string(float_type value)
       return false;
     }
   }();
-  const std::string lossless = [&]() -> std::string { // NOLINT
+  const std::string lossless = [&]() -> std::string {
     if(is_lossless)
       return decimal;
     std::ostringstream stream;

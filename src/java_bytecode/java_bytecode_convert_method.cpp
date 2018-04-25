@@ -895,10 +895,8 @@ static void gather_symbol_live_ranges(
   if(e.id()==ID_symbol)
   {
     const auto &symexpr=to_symbol_expr(e);
-    auto findit=
-      result.insert({ // NOLINT(whitespace/braces)
-        symexpr.get_identifier(),
-        java_bytecode_convert_methodt::variablet()});
+    auto findit = result.insert(
+      {symexpr.get_identifier(), java_bytecode_convert_methodt::variablet()});
     auto &var=findit.first->second;
     if(findit.second)
     {

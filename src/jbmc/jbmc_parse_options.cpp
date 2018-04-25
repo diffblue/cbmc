@@ -493,13 +493,13 @@ int jbmc_parse_optionst::doit()
   std::function<void(bmct &, const symbol_tablet &)> configure_bmc = nullptr;
   if(options.get_bool_option("java-unwind-enum-static"))
   {
-    configure_bmc = [](
-      bmct &bmc, const symbol_tablet &symbol_table) { // NOLINT (*)
-        bmc.add_loop_unwind_handler([&symbol_table](
-                                      const irep_idt &function_id,
-                                      unsigned loop_number,
-                                      unsigned unwind,
-                                      unsigned &max_unwind) { // NOLINT (*)
+    configure_bmc = [](bmct &bmc, const symbol_tablet &symbol_table) {
+      bmc.add_loop_unwind_handler(
+        [&symbol_table](
+          const irep_idt &function_id,
+          unsigned loop_number,
+          unsigned unwind,
+          unsigned &max_unwind) {
           return java_enum_static_init_unwind_handler(
             function_id,
             loop_number,
@@ -564,7 +564,7 @@ int jbmc_parse_optionst::doit()
     // executes. If --paths is active, these dump routines run after every
     // paths iteration. Its return value indicates that if we ran any dump
     // function, then we should skip the actual solver phase.
-    auto callback_after_symex = [this, &lazy_goto_model]() { // NOLINT (*)
+    auto callback_after_symex = [this, &lazy_goto_model]() {
       return show_loaded_functions(lazy_goto_model);
     };
 
@@ -729,11 +729,10 @@ void jbmc_parse_optionst::process_goto_function(
         remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
     }
 
-    auto function_is_stub =
-      [&symbol_table, &model](const irep_idt &id) { // NOLINT(*)
-        return symbol_table.lookup_ref(id).value.is_nil() &&
-               !model.can_produce_function(id);
-      };
+    auto function_is_stub = [&symbol_table, &model](const irep_idt &id) {
+      return symbol_table.lookup_ref(id).value.is_nil() &&
+             !model.can_produce_function(id);
+    };
 
     remove_returns(function, function_is_stub);
 
