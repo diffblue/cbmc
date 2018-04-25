@@ -39,6 +39,11 @@ Author: Daniel Poetzl
   CV typename sharing_mapt<keyT, valueT, hashT, predT>::ST \
   sharing_mapt<keyT, valueT, hashT, predT>
 
+// Note: Due to a bug in Visual Studio we need to add an additional "const"
+// qualifier to the return values of insert(), place(), and find(). The type
+// defined in sharing_mapt already includes the const qualifier, but it is lost
+// when accessed from outside the class. This is fixed in Visual Studio 15.6.
+
 /// A map implemented as a tree where subtrees can be shared between different
 /// maps.
 ///
@@ -673,10 +678,8 @@ SHARING_MAPT2(, size_type)::erase_all(
 ///   (possible values `false` or `unknown`)
 /// \return Pair of const reference to existing or newly inserted element, and
 ///   boolean indicating if new element was inserted
-SHARING_MAPT2(, const_find_type)::insert(
-  const key_type &k,
-  const mapped_type &m,
-  const tvt &key_exists)
+SHARING_MAPT2(const, const_find_type)
+::insert(const key_type &k, const mapped_type &m, const tvt &key_exists)
 {
   _sn_assert(!key_exists.is_true());
 
@@ -697,9 +700,8 @@ SHARING_MAPT2(, const_find_type)::insert(
 }
 
 // Insert element, return const reference
-SHARING_MAPT2(, const_find_type)::insert(
-  const value_type &p,
-  const tvt &key_exists)
+SHARING_MAPT2(const, const_find_type)
+::insert(const value_type &p, const tvt &key_exists)
 {
   return insert(p.first, p.second, key_exists);
 }
@@ -714,9 +716,7 @@ SHARING_MAPT2(, const_find_type)::insert(
 /// \param m: The mapped value to insert
 /// \return Pair of reference to existing or newly inserted element, and boolean
 ///   indicating if new element was inserted
-SHARING_MAPT2(, find_type)::place(
-  const key_type &k,
-  const mapped_type &m)
+SHARING_MAPT2(const, find_type)::place(const key_type &k, const mapped_type &m)
 {
   node_type *c=get_container_node(k);
   _sm_assert(c!=nullptr);
@@ -733,8 +733,7 @@ SHARING_MAPT2(, find_type)::place(
 }
 
 /// Insert element, return non-const reference
-SHARING_MAPT2(, find_type)::place(
-  const value_type &p)
+SHARING_MAPT2(const, find_type)::place(const value_type &p)
 {
   return place(p.first, p.second);
 }
@@ -750,9 +749,7 @@ SHARING_MAPT2(, find_type)::place(
 ///   (possible values `unknown` or `true`)
 /// \return Pair of reference to found value (or dummy value if not found), and
 ///   boolean indicating if element was found.
-SHARING_MAPT2(, find_type)::find(
-  const key_type &k,
-  const tvt &key_exists)
+SHARING_MAPT2(const, find_type)::find(const key_type &k, const tvt &key_exists)
 {
   _sm_assert(!key_exists.is_false());
 
@@ -778,7 +775,7 @@ SHARING_MAPT2(, find_type)::find(
 /// \param k: The key of the element to search
 /// \return Pair of const reference to found value (or dummy value if not
 ///   found), and boolean indicating if element was found.
-SHARING_MAPT2(, const_find_type)::find(const key_type &k) const
+SHARING_MAPT2(const, const_find_type)::find(const key_type &k) const
 {
   const node_type *p=get_leaf_node(k);
 
