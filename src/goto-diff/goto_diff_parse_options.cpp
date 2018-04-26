@@ -24,6 +24,7 @@ Author: Peter Schrammel
 
 #include <langapi/language.h>
 
+#include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/mm_io.h>
@@ -45,7 +46,6 @@ Author: Peter Schrammel
 #include <goto-programs/link_to_library.h>
 
 #include <goto-symex/rewrite_union.h>
-#include <goto-symex/adjust_float_expressions.h>
 
 #include <goto-instrument/cover.h>
 
