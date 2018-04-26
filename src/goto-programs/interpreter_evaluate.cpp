@@ -389,14 +389,11 @@ void interpretert::evaluate(
     }
     else if(expr.type().id()==ID_string)
     {
-      irep_idt value=to_constant_expr(expr).get_value();
-      const char *str=value.c_str();
-      std::size_t length=strlen(str)+1;
+      const std::string &value = id2string(to_constant_expr(expr).get_value());
       if(show)
         warning() << "string decoding not fully implemented "
-                  << length << eom;
-      mp_integer tmp = get_string_container()[id2string(value)];
-      dest.push_back(tmp);
+                  << value.size() + 1 << eom;
+      dest.push_back(get_string_container()[value]);
       return;
     }
     else
