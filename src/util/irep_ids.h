@@ -33,14 +33,6 @@ Author: Reuben Thomas, reuben.thomas@me.com
 /// into a const extern irep_idt with the variable name `ID_param` and the
 /// string value `"contents"`.
 
-enum class idt:unsigned
-{
-#define IREP_ID_ONE(the_id) id_##the_id,
-#define IREP_ID_TWO(the_id, str) id_##the_id,
-
-#include "irep_ids.def"
-};
-
 #ifdef USE_DSTRING
 
 #define IREP_ID_ONE(the_id) extern const dstringt ID_##the_id;
@@ -53,6 +45,6 @@ enum class idt:unsigned
 
 #endif
 
-#include "irep_ids.def" // NOLINT(build/include)
+#include "irep_ids.def"
 
 #endif
