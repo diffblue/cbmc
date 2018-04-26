@@ -17,6 +17,39 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_types.h"
 #include "namespace.h"
 #include "symbol.h"
+#include "union_find.h"
+
+class base_type_eqt
+{
+public:
+  explicit base_type_eqt(const namespacet &_ns):ns(_ns)
+  {
+  }
+
+  bool base_type_eq(const typet &type1, const typet &type2)
+  {
+    identifiers.clear();
+    return base_type_eq_rec(type1, type2);
+  }
+
+  bool base_type_eq(const exprt &expr1, const exprt &expr2)
+  {
+    identifiers.clear();
+    return base_type_eq_rec(expr1, expr2);
+  }
+
+  virtual ~base_type_eqt() { }
+
+protected:
+  const namespacet &ns;
+
+  virtual bool base_type_eq_rec(const typet &type1, const typet &type2);
+  virtual bool base_type_eq_rec(const exprt &expr1, const exprt &expr2);
+
+  // for loop avoidance
+  typedef union_find<irep_idt> identifierst;
+  identifierst identifiers;
+};
 
 void base_type_rec(
   typet &type, const namespacet &ns, std::set<irep_idt> &symb)
