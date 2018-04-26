@@ -11,8 +11,8 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <util/xml.h>
 #include <util/xml_expr.h>
 #include <util/json.h>
-#include <util/json_expr.h>
 
+#include <langapi/language_util.h>
 
 /// Runs the analyzer and then prints out the domain
 /// \param goto_model: the program analyzed
@@ -78,7 +78,7 @@ bool static_verifier(
           ++unknown;
         }
 
-        j["sourceLocation"]=json(i_it->source_location);
+        j["sourceLocation"] = json(ns, i_it->function, i_it->source_location);
       }
     }
     m.status() << "Writing JSON report" << messaget::eom;

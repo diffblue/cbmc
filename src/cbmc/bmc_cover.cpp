@@ -359,7 +359,8 @@ bool bmc_covert::operator()()
         json_result["description"] = json_stringt(goal.description);
 
         if(goal.source_location.is_not_nil())
-          json_result["sourceLocation"] = json(goal.source_location);
+          json_result["sourceLocation"] = json(
+            bmc.ns, goal.source_location.get_function(), goal.source_location);
       }
       json_result["totalGoals"]=json_numbert(std::to_string(goal_map.size()));
       json_result["goalsCovered"]=json_numbert(std::to_string(goals_covered));
@@ -384,8 +385,8 @@ bool bmc_covert::operator()()
               json_objectt json_input;
               json_input["id"]=json_stringt(id2string(step.io_id));
               if(step.io_args.size()==1)
-                json_input["value"]=
-                  json(step.io_args.front(), bmc.ns, ID_unknown);
+                json_input["value"] =
+                  json(bmc.ns, step.pc->function, step.io_args.front());
               json_test.push_back(json_input);
             }
           }

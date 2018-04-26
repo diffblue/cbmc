@@ -13,8 +13,9 @@ Author: Peter Schrammel
 
 #include <goto-programs/show_properties.h>
 
-#include <util/json_expr.h>
 #include <util/options.h>
+
+#include <langapi/language_util.h>
 
 /// Output diff result
 void goto_difft::output_functions() const
@@ -136,7 +137,7 @@ void goto_difft::convert_function_json(
   const symbolt &symbol = ns.lookup(function_name);
 
   result["name"] = json_stringt(id2string(function_name));
-  result["sourceLocation"] = json(symbol.location);
+  result["sourceLocation"] = json(ns, function_name, symbol.location);
 
   if(options.get_bool_option("show-properties"))
   {

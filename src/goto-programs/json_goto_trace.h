@@ -21,6 +21,9 @@ Date: November 2005
 #include <util/json_expr.h>
 #include <util/invariant.h>
 
+#include <langapi/mode.h>
+#include <langapi/language_util.h>
+
 /// This is structure is here to facilitate
 /// passing arguments to the conversion
 /// functions.
@@ -127,8 +130,10 @@ void convert(
 
     jsont json_location;
 
-    source_location.is_not_nil() && !source_location.get_file().empty()
-      ? json_location = json(source_location)
+    source_location.is_not_nil() && !source_location.get_file().empty() &&
+        !source_location.get_function().empty()
+      ? json_location =
+          json(ns, source_location.get_function(), source_location)
       : json_location = json_nullt();
 
     // NOLINTNEXTLINE(whitespace/braces)

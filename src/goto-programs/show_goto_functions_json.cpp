@@ -75,8 +75,8 @@ json_objectt show_goto_functions_jsont::convert(
 
         if(instruction.code.source_location().is_not_nil())
         {
-          instruction_entry["sourceLocation"]=
-            json(instruction.code.source_location());
+          instruction_entry["sourceLocation"] =
+            json(ns, instruction.function, instruction.code.source_location());
         }
 
         std::ostringstream instruction_builder;
