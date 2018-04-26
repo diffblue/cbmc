@@ -196,8 +196,9 @@ exprt goto_symext::address_arithmetic(
     if(expr.id()==ID_symbol &&
        expr.get_bool(ID_C_SSA_symbol))
     {
-      offset=compute_pointer_offset(expr, ns);
-      PRECONDITION(offset >= 0);
+      auto offset_opt = compute_pointer_offset(expr, ns);
+      PRECONDITION(offset_opt.has_value());
+      offset = *offset_opt;
     }
 
     if(offset>0)

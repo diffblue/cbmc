@@ -68,21 +68,25 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
       if(is_dereference_integer_object(expr.op0(), address))
       {
         // push index into address
+        auto step_size = pointer_offset_size(expr.type(), ns);
 
-        mp_integer step_size, index;
-
-        step_size=pointer_offset_size(expr.type(), ns);
-
-        if(!to_integer(expr.op1(), index) &&
-           step_size!=-1)
+        if(step_size.has_value())
         {
-          pointer_typet pointer_type=
-            to_pointer_type(to_dereference_expr(expr.op0()).pointer().type());
-          pointer_type.subtype()=expr.type();
-          typecast_exprt typecast_expr(
-            from_integer(step_size*index+address, index_type()), pointer_type);
-          expr = dereference_exprt(typecast_expr, expr.type());
-          result=true;
+          mp_integer index;
+
+          if(!to_integer(expr.op1(), index))
+          {
+            pointer_typet pointer_type =
+              to_pointer_type(to_dereference_expr(expr.op0()).pointer().type());
+            pointer_type.subtype() = expr.type();
+
+            typecast_exprt typecast_expr(
+              from_integer((*step_size) * index + address, index_type()),
+              pointer_type);
+
+            expr = dereference_exprt(typecast_expr, expr.type());
+            result = true;
+          }
         }
       }
 
@@ -109,14 +113,14 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
         {
           const struct_typet &struct_type=to_struct_type(op_type);
           const irep_idt &member=to_member_expr(expr).get_component_name();
-          mp_integer offset=member_offset(struct_type, member, ns);
-          if(offset!=-1)
+          auto offset = member_offset(struct_type, member, ns);
+          if(offset.has_value())
           {
             pointer_typet pointer_type=
               to_pointer_type(to_dereference_expr(expr.op0()).pointer().type());
             pointer_type.subtype()=expr.type();
             typecast_exprt typecast_expr(
-              from_integer(address+offset, index_type()), pointer_type);
+              from_integer(address + *offset, index_type()), pointer_type);
             expr = dereference_exprt(typecast_expr, expr.type());
             result=true;
           }
@@ -231,11 +235,11 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     if(ptr.operands().size()!=1)
       return true;
 
-    mp_integer offset=compute_pointer_offset(ptr.op0(), ns);
+    auto offset = compute_pointer_offset(ptr.op0(), ns);
 
-    if(offset!=-1)
+    if(offset.has_value())
     {
-      expr=from_integer(offset, expr.type());
+      expr = from_integer(*offset, expr.type());
       return false;
     }
   }
@@ -335,10 +339,9 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     if(pointer_sub_type.id()==ID_empty)
       pointer_sub_type=char_type();
 
-    mp_integer element_size=
-      pointer_offset_size(pointer_sub_type, ns);
+    auto element_size = pointer_offset_size(pointer_sub_type, ns);
 
-    if(element_size<0)
+    if(!element_size.has_value())
       return true;
 
     // this might change the type of the pointer!
@@ -357,8 +360,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
     simplify_node(sum);
 
-    exprt size_expr=
-      from_integer(element_size, expr.type());
+    exprt size_expr = from_integer(*element_size, expr.type());
 
     binary_exprt product(sum, ID_mult, size_expr, expr.type());
 
@@ -393,8 +395,8 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
         return true;
 
       // The constant address consists of OBJECT-ID || OFFSET.
-      mp_integer offset_bits=
-        pointer_offset_bits(ptr.type(), ns)-config.bv_encoding.object_bits;
+      mp_integer offset_bits =
+        *pointer_offset_bits(ptr.type(), ns) - config.bv_encoding.object_bits;
       number%=power(2, offset_bits);
 
       expr=from_integer(number, expr.type());

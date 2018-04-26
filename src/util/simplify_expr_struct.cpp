@@ -156,12 +156,12 @@ bool simplify_exprt::simplify_member(exprt &expr)
         return true;
 
       // add member offset to index
-      mp_integer offset_int=member_offset(struct_type, component_name, ns);
-      if(offset_int==-1)
+      auto offset_int = member_offset(struct_type, component_name, ns);
+      if(!offset_int.has_value())
         return true;
 
       const exprt &struct_offset=op.op1();
-      exprt member_offset=from_integer(offset_int, struct_offset.type());
+      exprt member_offset = from_integer(*offset_int, struct_offset.type());
       plus_exprt final_offset(struct_offset, member_offset);
       simplify_node(final_offset);
 
@@ -203,12 +203,11 @@ bool simplify_exprt::simplify_member(exprt &expr)
     }
 
     // need to convert!
-    mp_integer target_size=
-      pointer_offset_size(expr.type(), ns);
+    auto target_size = pointer_offset_size(expr.type(), ns);
 
-    if(target_size!=-1)
+    if(target_size.has_value())
     {
-      mp_integer target_bits=target_size*8;
+      mp_integer target_bits = target_size.value() * 8;
       const auto bits=expr2bits(op, true);
 
       if(bits.has_value() &&

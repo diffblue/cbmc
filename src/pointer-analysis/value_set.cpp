@@ -283,18 +283,18 @@ bool value_sett::eval_pointer_offset(
       else
       {
         const exprt &object=object_numbering[it->first];
-        mp_integer ptr_offset=compute_pointer_offset(object, ns);
+        auto ptr_offset = compute_pointer_offset(object, ns);
 
-        if(ptr_offset<0)
+        if(!ptr_offset.has_value())
           return false;
 
-        ptr_offset += *it->second;
+        *ptr_offset += *it->second;
 
-        if(mod && ptr_offset!=previous_offset)
+        if(mod && *ptr_offset != previous_offset)
           return false;
 
-        new_expr=from_integer(ptr_offset, expr.type());
-        previous_offset=ptr_offset;
+        new_expr = from_integer(*ptr_offset, expr.type());
+        previous_offset = *ptr_offset;
         mod=true;
       }
 
@@ -623,15 +623,15 @@ void value_sett::get_value_set_rec(
         if(pointer_sub_type.id()==ID_empty)
           pointer_sub_type=char_type();
 
-        mp_integer size=pointer_offset_size(pointer_sub_type, ns);
+        auto size = pointer_offset_size(pointer_sub_type, ns);
 
-        if(size<=0)
+        if(!size.has_value() || (*size) == 0)
         {
           i_is_set=false;
         }
         else
         {
-          i*=size;
+          i *= *size;
 
           if(expr.id()==ID_minus)
             i.negate();
@@ -890,11 +890,13 @@ void value_sett::get_value_set_rec(
       {
         const irep_idt &name = c.get_name();
 
-        mp_integer comp_offset=member_offset(struct_type, name, ns);
+        auto comp_offset = member_offset(struct_type, name, ns);
 
-        if(comp_offset>op1_offset)
+        if(!comp_offset.has_value())
+          continue;
+        else if(*comp_offset > op1_offset)
           break;
-        else if(comp_offset!=op1_offset)
+        else if(*comp_offset != op1_offset)
           continue;
 
         found=true;
@@ -1066,12 +1068,12 @@ void value_sett::get_reference_set_rec(
         }
         else if(!to_integer(offset, i) && o)
         {
-          mp_integer size=pointer_offset_size(array_type.subtype(), ns);
+          auto size = pointer_offset_size(array_type.subtype(), ns);
 
-          if(size<=0)
+          if(!size.has_value() || *size == 0)
             o.reset();
           else
-            *o = i * size;
+            *o = i * (*size);
         }
         else
           o.reset();

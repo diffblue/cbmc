@@ -26,12 +26,12 @@ exprt lower_popcount(const popcount_exprt &expr, const namespacet &ns)
 
   // make sure the operand width is a power of two
   exprt x = expr.op();
-  const mp_integer x_width = pointer_offset_bits(x.type(), ns);
-  CHECK_RETURN(x_width > 0);
-  const std::size_t bits = address_bits(x_width);
+  const auto x_width = pointer_offset_bits(x.type(), ns);
+  CHECK_RETURN(x_width.has_value() && *x_width >= 1);
+  const std::size_t bits = address_bits(*x_width);
   const std::size_t new_width = integer2size_t(power(2, bits));
   const bool need_typecast =
-    new_width > x_width || x.type().id() != ID_unsignedbv;
+    new_width > *x_width || x.type().id() != ID_unsignedbv;
   if(need_typecast)
     x.make_typecast(unsignedbv_typet(new_width));
 

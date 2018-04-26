@@ -51,12 +51,12 @@ void print_struct_alignment_problems(
         {
           const typet &it_type = it_next->type();
           const namespacet ns(symbol_table);
-          mp_integer size = pointer_offset_size(it_type, ns);
+          auto size = pointer_offset_size(it_type, ns);
 
-          if(size < 0)
+          if(!size.has_value())
             throw "type of unknown size:\n" + it_type.pretty();
 
-          cumulated_length += size;
+          cumulated_length += *size;
           // [it_mem;it_next] cannot be covered by an instruction
           if(cumulated_length > config.ansi_c.memory_operand_size)
           {
@@ -92,13 +92,13 @@ void print_struct_alignment_problems(
       #if 0
       const namespacet ns(symbol_table);
       const array_typet array=to_array_type(symbol_pair.second.type);
-      const mp_integer size=
+      const auto size=
         pointer_offset_size(array.subtype(), ns);
 
-      if(size<0)
+      if(!size.has_value())
         throw "type of unknown size:\n"+it_type.pretty();
 
-      if(2*integer2long(size)<=config.ansi_c.memory_operand_size)
+      if(2*integer2long(*size)<=config.ansi_c.memory_operand_size)
       {
         out << "\nWARNING: "
             << "declaration of an array at "

@@ -3617,9 +3617,9 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()==ID_bswap)
     return convert_function(
       src,
-      "__builtin_bswap"+
-      integer2string(pointer_offset_bits(src.op0().type(), ns)),
-      precedence=16);
+      "__builtin_bswap" +
+        integer2string(*pointer_offset_bits(src.op0().type(), ns)),
+      precedence = 16);
 
   else if(src.id()==ID_isnormal)
     return convert_function(src, "isnormal", precedence=16);

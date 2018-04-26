@@ -190,12 +190,12 @@ bool simplify_exprt::simplify_index(exprt &expr)
       // This rewrites byte_extract(s, o, array_type)[i]
       // to byte_extract(s, o+offset, sub_type)
 
-      mp_integer sub_size=pointer_offset_size(array_type.subtype(), ns);
-      if(sub_size==-1)
+      auto sub_size = pointer_offset_size(array_type.subtype(), ns);
+      if(!sub_size.has_value())
         return true;
 
       // add offset to index
-      mult_exprt offset(from_integer(sub_size, array.op1().type()), index);
+      mult_exprt offset(from_integer(*sub_size, array.op1().type()), index);
       plus_exprt final_offset(array.op1(), offset);
       simplify_node(final_offset);
 

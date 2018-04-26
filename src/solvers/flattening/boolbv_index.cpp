@@ -335,11 +335,13 @@ bvt boolbvt::convert_index(
     o.build(array, ns);
     CHECK_RETURN(o.offset().id() != ID_unknown);
 
-    const mp_integer subtype_bytes =
+    const auto subtype_bytes_opt =
       pointer_offset_size(array_type.subtype(), ns);
+    CHECK_RETURN(subtype_bytes_opt.has_value());
+
     exprt new_offset = simplify_expr(
       plus_exprt(
-        o.offset(), from_integer(index * subtype_bytes, o.offset().type())),
+        o.offset(), from_integer(index * (*subtype_bytes_opt), o.offset().type())),
       ns);
 
     byte_extract_exprt be(
