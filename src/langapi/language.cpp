@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "language.h"
 
 #include <util/expr.h>
+#include <util/json_expr.h>
 #include <util/symbol.h>
 #include <util/symbol_table.h>
 #include <util/prefix.h>
@@ -50,6 +51,21 @@ bool languaget::from_type(
 {
   code=type.pretty();
   return false;
+}
+
+json_objectt languaget::json(const exprt &expr, const namespacet &ns)
+{
+  return ::json(expr, ns, ID_unknown);
+}
+
+json_objectt languaget::json(const typet &type, const namespacet &ns)
+{
+  return ::json(type, ns, ID_unknown);
+}
+
+json_objectt languaget::json(const source_locationt &source_location)
+{
+  return ::json(source_location);
 }
 
 bool languaget::type_to_name(

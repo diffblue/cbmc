@@ -134,6 +134,24 @@ public:
     std::string &code,
     const namespacet &ns);
 
+  /// Formats the given expression as a JSON object in a language-specific way
+  /// \param expr: the expression to format
+  /// \param ns: a namespace
+  /// \return the JSON object
+  virtual json_objectt json(const exprt &, const namespacet &);
+
+  /// Formats the given type as a JSON object in a language-specific way
+  /// \param type: the type to format
+  /// \param ns: a namespace
+  /// \return the JSON object
+  virtual json_objectt json(const typet &, const namespacet &);
+
+  /// Formats the given source location as a JSON object
+  ///   in a language-specific way
+  /// \param source_location: the source location to format
+  /// \return the JSON object
+  virtual json_objectt json(const source_locationt &);
+
   /// Encodes the given type in a language-specific way
   /// \param type: the type to encode
   /// \param name: the encoded type
