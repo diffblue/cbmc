@@ -26,6 +26,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
 
+#include <linking/static_lifetime_init.h>
+
 #include "goto_program2code.h"
 #include "dump_c_class.h"
 
@@ -953,7 +955,7 @@ void dump_ct::cleanup_harness(code_blockt &b)
         symbol_exprt &s=to_symbol_expr(func);
         if(s.get_identifier()==ID_main)
           s.set_identifier(CPROVER_PREFIX+id2string(ID_main));
-        else if(s.get_identifier()==CPROVER_PREFIX "initialize")
+        else if(s.get_identifier() == INITIALIZE_FUNCTION)
           continue;
       }
     }

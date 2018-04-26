@@ -28,6 +28,8 @@ Date: 2012
 #include <util/message.h>
 #include <util/std_expr.h>
 
+#include <linking/static_lifetime_init.h>
+
 #include "../rw_set.h"
 #include "fence.h"
 
@@ -168,7 +170,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
   instrumenter.message.debug() << "visit function "
                                << function << messaget::eom;
 
-  if(function==CPROVER_PREFIX "initialize")
+  if(function == INITIALIZE_FUNCTION)
   {
     return;
   }

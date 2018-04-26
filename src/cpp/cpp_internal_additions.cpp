@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_internal_additions.h>
 
+#include <linking/static_lifetime_init.h>
+
 std::string c2cpp(const std::string &s)
 {
   std::string result;
@@ -75,7 +77,7 @@ void cpp_internal_additions(std::ostream &out)
 
   // CPROVER extensions
   out << "extern \"C\" const unsigned __CPROVER::constant_infinity_uint;\n";
-  out << "extern \"C\" void __CPROVER_initialize();" << '\n';
+  out << "extern \"C\" void " INITIALIZE_FUNCTION "();" << '\n';
   out << "extern \"C\" void __CPROVER::input(const char *id, ...);" << '\n';
   out << "extern \"C\" void __CPROVER::output(const char *id, ...);" << '\n';
   out << "extern \"C\" void __CPROVER::cover(bool condition);" << '\n';

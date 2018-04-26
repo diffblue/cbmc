@@ -29,6 +29,8 @@ Date: September 2011
 
 #include <goto-programs/remove_skip.h>
 
+#include <linking/static_lifetime_init.h>
+
 #include "../rw_set.h"
 
 #include "shared_buffers.h"
@@ -135,7 +137,7 @@ void weak_memory(
 
   // all access to shared variables is pushed into assignments
   Forall_goto_functions(f_it, goto_model.goto_functions)
-    if(f_it->first!=CPROVER_PREFIX "initialize" &&
+    if(f_it->first != INITIALIZE_FUNCTION &&
       f_it->first!=goto_functionst::entry_point())
       introduce_temporaries(value_sets, goto_model.symbol_table, f_it->first,
         f_it->second.body,
