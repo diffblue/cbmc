@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #define CPROVER_CPP_CPP_NAME_H
 
 #include <util/expr.h>
+#include <util/invariant.h>
 
 class cpp_namet:public irept
 {
@@ -142,13 +143,13 @@ public:
 
 inline cpp_namet &to_cpp_name(irept &cpp_name)
 {
-  assert(cpp_name.id() == ID_cpp_name);
+  PRECONDITION(cpp_name.id() == ID_cpp_name);
   return static_cast<cpp_namet &>(cpp_name);
 }
 
 inline const cpp_namet &to_cpp_name(const irept &cpp_name)
 {
-  assert(cpp_name.id() == ID_cpp_name);
+  PRECONDITION(cpp_name.id() == ID_cpp_name);
   return static_cast<const cpp_namet &>(cpp_name);
 }
 
