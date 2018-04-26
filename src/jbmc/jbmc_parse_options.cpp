@@ -53,8 +53,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_enum_static_init_unwind_handler.h>
-#include <java_bytecode/remove_instanceof.h>
 #include <java_bytecode/remove_exceptions.h>
+#include <java_bytecode/remove_instanceof.h>
+#include <java_bytecode/remove_java_new.h>
 #include <java_bytecode/replace_java_nondet.h>
 
 #include <cbmc/version.h>
@@ -762,6 +763,9 @@ void jbmc_parse_optionst::process_goto_function(
 
     // add generic checks
     goto_check(ns, options, ID_java, function.get_goto_function());
+
+    // Replace Java new side effects
+    remove_java_new(goto_function, symbol_table, get_message_handler());
 
     // checks don't know about adjusted float expressions
     adjust_float_expressions(goto_function, ns);
