@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 #include <string>
 
+#include "optional.h"
+
 class cmdlinet
 {
 public:
@@ -53,13 +55,13 @@ protected:
       hasval(false),
       islong(false),
       optchar(0)
-      {}
+    {}
   };
 
   std::vector<optiont> options;
 
-  int getoptnr(char option) const;
-  int getoptnr(const std::string &option) const;
+  optionalt<std::size_t> getoptnr(char option) const;
+  optionalt<std::size_t> getoptnr(const std::string &option) const;
 };
 
 #endif // CPROVER_UTIL_CMDLINE_H
