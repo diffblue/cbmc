@@ -3,4 +3,4 @@ add_library(util ${sources})
 
 generic_includes(util)
 
-target_link_libraries(util big-int langapi)
+target_link_libraries(util big-int)

@@ -25,8 +25,6 @@ languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir java_bytecode.dir \
            jsil.dir
 
-solvers.dir: util.dir langapi.dir
-
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
                      goto-symex.dir linking.dir analyses.dir solvers.dir \
                      json.dir
