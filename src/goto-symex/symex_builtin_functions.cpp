@@ -11,24 +11,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-#include <util/expr_util.h>
-#include <util/message.h>
 #include <util/arith_tools.h>
-#include <util/cprover_prefix.h>
-#include <util/std_types.h>
-#include <util/pointer_offset_size.h>
-#include <util/symbol_table.h>
-#include <util/std_expr.h>
-#include <util/std_code.h>
-#include <util/simplify_expr.h>
-#include <util/prefix.h>
-#include <util/string2int.h>
-#include <util/invariant_utils.h>
 #include <util/c_types.h>
+#include <util/invariant_utils.h>
+#include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
+#include <util/string2int.h>
 
 #include <linking/zero_initializer.h>
-
-#include "goto_symex_state.h"
 
 inline static typet c_sizeof_type_rec(const exprt &expr)
 {

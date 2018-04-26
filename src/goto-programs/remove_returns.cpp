@@ -14,7 +14,8 @@ Date:   September 2009
 #include "remove_returns.h"
 
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
+
+#include "goto_model.h"
 
 class remove_returnst
 {

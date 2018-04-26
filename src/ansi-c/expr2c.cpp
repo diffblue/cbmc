@@ -13,23 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 
 #include <map>
-#include <set>
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/std_types.h>
-#include <util/std_code.h>
-#include <util/ieee_float.h>
-#include <util/fixedbv.h>
-#include <util/prefix.h>
-#include <util/lispirep.h>
-#include <util/lispexpr.h>
-#include <util/namespace.h>
-#include <util/symbol.h>
-#include <util/suffix.h>
 #include <util/find_symbols.h>
+#include <util/fixedbv.h>
+#include <util/lispexpr.h>
+#include <util/lispirep.h>
+#include <util/namespace.h>
 #include <util/pointer_offset_size.h>
+#include <util/suffix.h>
+#include <util/symbol.h>
 
 #include "c_misc.h"
 #include "c_qualifiers.h"

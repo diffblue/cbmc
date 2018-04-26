@@ -9,13 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_NUMBERING_H
 #define CPROVER_UTIL_NUMBERING_H
 
-#include <cassert>
 #include <map>
 #include <unordered_map>
 #include <vector>
 
-#include <util/invariant.h>
-#include <util/optional.h>
+#include "invariant.h"
+#include "optional.h"
 
 /// \tparam Map a map from a key type to some numeric type
 template <typename Map>

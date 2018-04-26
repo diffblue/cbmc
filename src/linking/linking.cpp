@@ -12,15 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "linking.h"
 
 #include <cassert>
-#include <stack>
+#include <deque>
+#include <unordered_set>
 
-#include <util/find_symbols.h>
-#include <util/source_location.h>
 #include <util/base_type.h>
-#include <util/std_expr.h>
-#include <util/std_types.h>
-#include <util/simplify_expr.h>
+#include <util/find_symbols.h>
 #include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
 
 #include <langapi/language_util.h>
 

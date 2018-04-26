@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <stack>
 
+#include "goto_functions.h"
+
 /// remove unreachable code
 void remove_unreachable(goto_programt &goto_program)
 {

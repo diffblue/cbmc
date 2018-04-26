@@ -11,35 +11,29 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <algorithm>
 
-#include "c_types.h"
-#include "rational.h"
-#include "simplify_expr_class.h"
-#include "mp_arith.h"
 #include "arith_tools.h"
-#include "replace_expr.h"
-#include "std_types.h"
-#include "expr_util.h"
-#include "std_expr.h"
-#include "fixedbv.h"
-#include "pointer_offset_size.h"
-#include "rational_tools.h"
-#include "config.h"
 #include "base_type.h"
-#include "type_eq.h"
-#include "namespace.h"
-#include "threeval.h"
-#include "pointer_predicates.h"
-#include "prefix.h"
 #include "byte_operators.h"
-#include "bv_arithmetic.h"
+#include "c_types.h"
+#include "config.h"
 #include "endianness_map.h"
+#include "expr_util.h"
+#include "fixedbv.h"
+#include "namespace.h"
+#include "pointer_offset_size.h"
+#include "rational.h"
+#include "rational_tools.h"
 #include "simplify_utils.h"
+#include "std_expr.h"
+#include "type_eq.h"
 
 // #define DEBUGX
 
 #ifdef DEBUGX
 #include <iostream>
 #endif
+
+#include "simplify_expr_class.h"
 
 // #define USE_CACHE
 

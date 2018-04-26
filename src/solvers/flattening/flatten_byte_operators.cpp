@@ -6,19 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/c_types.h>
-#include <util/expr.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
+#include "flatten_byte_operators.h"
+
 #include <util/arith_tools.h>
-#include <util/pointer_offset_size.h>
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/namespace.h>
+#include <util/pointer_offset_size.h>
 #include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 
 #include "flatten_byte_extract_exceptions.h"
-#include "flatten_byte_operators.h"
 
 /// rewrite an object into its individual bytes
 /// \par parameters: src  object to unpack

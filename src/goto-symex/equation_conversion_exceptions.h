@@ -12,7 +12,7 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_GOTO_SYMEX_EQUATION_CONVERSION_EXCEPTIONS_H
 #define CPROVER_GOTO_SYMEX_EQUATION_CONVERSION_EXCEPTIONS_H
 
-#include <ostream>
+#include <sstream>
 
 #include <util/format_expr.h>
 

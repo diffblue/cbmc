@@ -11,14 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "pointer_predicates.h"
 
+#include "arith_tools.h"
 #include "c_types.h"
 #include "cprover_prefix.h"
 #include "namespace.h"
-#include "std_expr.h"
-#include "expr_util.h"
-#include "arith_tools.h"
 #include "pointer_offset_size.h"
-#include "config.h"
+#include "std_expr.h"
 #include "symbol.h"
 
 exprt pointer_object(const exprt &p)

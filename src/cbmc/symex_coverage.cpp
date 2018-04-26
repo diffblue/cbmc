@@ -13,16 +13,13 @@ Date: March 2016
 
 #include "symex_coverage.h"
 
-#include <ctime>
 #include <chrono>
-#include <iostream>
+#include <ctime>
 #include <fstream>
-#include <sstream>
+#include <iostream>
 
-#include <util/xml.h>
 #include <util/string2int.h>
-#include <util/cprover_prefix.h>
-#include <util/prefix.h>
+#include <util/xml.h>
 
 #include <langapi/language_util.h>
 

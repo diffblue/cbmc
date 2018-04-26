@@ -10,17 +10,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include "c_types.h"
-#include "expr.h"
-#include "namespace.h"
-#include "std_expr.h"
-#include "pointer_offset_size.h"
 #include "arith_tools.h"
+#include "c_types.h"
 #include "config.h"
 #include "expr_util.h"
-#include "threeval.h"
-#include "prefix.h"
+#include "namespace.h"
+#include "pointer_offset_size.h"
 #include "pointer_predicates.h"
+#include "std_expr.h"
+#include "threeval.h"
 
 static bool is_dereference_integer_object(
   const exprt &expr,

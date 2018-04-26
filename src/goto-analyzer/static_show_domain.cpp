@@ -8,6 +8,8 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include "static_show_domain.h"
 
+#include <util/options.h>
+
 #include <analyses/dependence_graph.h>
 
 /// Runs the analyzer and then prints out the domain

@@ -10,9 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_RATIONAL_H
 #define CPROVER_UTIL_RATIONAL_H
 
-#include <cassert>
-#include <vector>
-
 #include "mp_arith.h"
 
 class constant_exprt;

@@ -14,10 +14,12 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <string>
 
-#include <util/irep.h>
-#include <util/source_location.h>
-#include <util/symbol_table.h>
-#include <util/type.h>
+#include "irep.h"
+
+class source_locationt;
+class symbolt;
+class symbol_table_baset;
+class typet;
 
 symbolt &get_fresh_aux_symbol(
   const typet &type,

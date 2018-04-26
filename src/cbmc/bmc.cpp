@@ -12,35 +12,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bmc.h"
 
 #include <chrono>
-#include <exception>
-#include <fstream>
 #include <iostream>
-#include <memory>
 
 #include <util/exit_codes.h>
 #include <util/string2int.h>
-#include <util/source_location.h>
 #include <util/string_utils.h>
-#include <util/memory_info.h>
-#include <util/message.h>
-#include <util/json.h>
-#include <util/json_stream.h>
-#include <util/cprover_prefix.h>
 
-#include <langapi/mode.h>
 #include <langapi/language_util.h>
 
-#include <goto-programs/goto_model.h>
-#include <goto-programs/xml_goto_trace.h>
-#include <goto-programs/json_goto_trace.h>
 #include <goto-programs/graphml_witness.h>
+#include <goto-programs/json_goto_trace.h>
+#include <goto-programs/xml_goto_trace.h>
 
 #include <goto-symex/build_goto_trace.h>
+#include <goto-symex/memory_model_pso.h>
 #include <goto-symex/slice.h>
 #include <goto-symex/slice_by_trace.h>
-#include <goto-symex/memory_model_sc.h>
-#include <goto-symex/memory_model_tso.h>
-#include <goto-symex/memory_model_pso.h>
 
 #include <linking/static_lifetime_init.h>
 

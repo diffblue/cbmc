@@ -9,7 +9,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_UTIL_UNION_FIND_REPLACE_H
 #define CPROVER_UTIL_UNION_FIND_REPLACE_H
 
-#include <util/replace_expr.h>
+#include "replace_expr.h"
 
 /// Similar interface to union-find for expressions, with a function for
 /// replacing sub-expressions by their result for find.

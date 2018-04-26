@@ -14,14 +14,12 @@ Date: June 2003
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_FUNCTIONS_H
 
-#include "goto_program.h"
+#include <iosfwd>
 
-#include <ostream>
-#include <cassert>
-
-#include <util/std_types.h>
-#include <util/symbol.h>
 #include <util/cprover_prefix.h>
+#include <util/std_types.h>
+
+#include "goto_program.h"
 
 class goto_functiont
 {

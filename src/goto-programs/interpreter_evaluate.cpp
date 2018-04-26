@@ -11,16 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "interpreter_class.h"
 
-#include <iostream>
-#include <sstream>
-#include <cstring>
-
-#include <util/ieee_float.h>
-#include <util/invariant.h>
 #include <util/fixedbv.h>
-#include <util/std_expr.h>
-#include <util/string_container.h>
+#include <util/ieee_float.h>
 #include <util/pointer_offset_size.h>
+#include <util/string_container.h>
 
 #include <langapi/language_util.h>
 

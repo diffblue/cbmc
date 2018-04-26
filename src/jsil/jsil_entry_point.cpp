@@ -13,10 +13,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include <util/arith_tools.h>
 #include <util/config.h>
-#include <util/symbol_table.h>
 #include <util/message.h>
-#include <util/std_types.h>
-#include <util/cprover_prefix.h>
 
 #include <goto-programs/goto_functions.h>
 

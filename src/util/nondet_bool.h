@@ -12,8 +12,8 @@ Author: Chris Smowton, chris@smowton.net
 #ifndef CPROVER_UTIL_NONDET_BOOL_H
 #define CPROVER_UTIL_NONDET_BOOL_H
 
-#include <util/std_types.h>
-#include <util/std_expr.h>
+#include "std_expr.h"
+#include "std_types.h"
 
 /// \par parameters: Desired type (C_bool or plain bool)
 /// \return nondet expr of that type

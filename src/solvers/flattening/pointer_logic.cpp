@@ -15,9 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/std_expr.h>
-#include <util/prefix.h>
+#include <util/invariant.h>
 #include <util/pointer_offset_size.h>
+#include <util/prefix.h>
+#include <util/std_expr.h>
 
 bool pointer_logict::is_dynamic_object(const exprt &expr) const
 {

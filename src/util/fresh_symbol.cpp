@@ -13,6 +13,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "namespace.h"
 #include "rename.h"
+#include "symbol.h"
+#include "symbol_table_base.h"
 
 /// Installs a fresh-named symbol with the requested name pattern
 /// \par parameters: `type`: type of new symbol

@@ -12,13 +12,14 @@ Author: Peter Schrammel
 #ifndef CPROVER_GOTO_DIFF_GOTO_DIFF_H
 #define CPROVER_GOTO_DIFF_GOTO_DIFF_H
 
-#include <goto-programs/goto_model.h>
-
-#include <util/json.h>
 #include <util/ui_message.h>
 
-#include <ostream>
+#include <iosfwd>
+#include <set>
 
+class goto_modelt;
+class json_arrayt;
+class json_objectt;
 class optionst;
 
 class goto_difft:public messaget

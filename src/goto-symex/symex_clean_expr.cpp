@@ -12,11 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 
 #include <util/arith_tools.h>
-#include <util/std_expr.h>
-#include <util/cprover_prefix.h>
 #include <util/base_type.h>
-#include <util/pointer_offset_size.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/pointer_offset_size.h>
 
 /// Given an expression, find the root object and the offset into it.
 ///

@@ -11,9 +11,14 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 #include "remove_const_function_pointers.h"
 
-#include <ansi-c/c_qualifiers.h>
-#include <util/simplify_expr.h>
 #include <util/arith_tools.h>
+#include <util/simplify_expr.h>
+#include <util/std_expr.h>
+#include <util/symbol_table.h>
+
+#include <ansi-c/c_qualifiers.h>
+
+#include "goto_functions.h"
 
 #define LOG(message, irep) \
   debug() << "Case " << __LINE__ << " : " << message << "\n" \

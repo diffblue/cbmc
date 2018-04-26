@@ -11,21 +11,13 @@ Author: Diffblue Ltd.
 
 #include "c_nondet_symbol_factory.h"
 
-#include <set>
-#include <sstream>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/namespace.h>
-#include <util/pointer_offset_size.h>
-#include <util/prefix.h>
-#include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
-
-#include <linking/zero_initializer.h>
 
 #include <goto-programs/goto_functions.h>
 
