@@ -291,6 +291,8 @@ protected:
     symex_transition(state, next);
   }
 
+  bool try_resolve_classid_operations(exprt &guard);
+
   virtual void symex_goto(statet &);
   virtual void symex_start_thread(statet &);
   virtual void symex_atomic_begin(statet &);
