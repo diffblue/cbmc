@@ -425,7 +425,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
     if(std::string(s, 1, std::string::npos)==ms_cl_flags[j])
     {
       cmdlinet::optiont option;
-      int optnr;
+      optionalt<std::size_t> optnr;
 
       if(s.size()==2)
       {
@@ -442,13 +442,13 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
         optnr=getoptnr(option.optstring);
       }
 
-      if(optnr==-1)
+      if(!optnr.has_value())
       {
         options.push_back(option);
         optnr=options.size()-1;
       }
 
-      options[optnr].isset=true;
+      options[*optnr].isset=true;
       return;
     }
   }
@@ -461,7 +461,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
     {
       cmdlinet::optiont option;
 
-      int optnr;
+      optionalt<std::size_t> optnr;
 
       if(ms_cl_prefix.size()==1)
       {
@@ -478,14 +478,14 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
         optnr=getoptnr(option.optstring);
       }
 
-      if(optnr==-1)
+      if(!optnr.has_value())
       {
         options.push_back(option);
         optnr=options.size()-1;
       }
 
-      options[optnr].isset=true;
-      options[optnr].values.push_back(
+      options[*optnr].isset=true;
+      options[*optnr].values.push_back(
         std::string(s, ms_cl_prefix.size()+1, std::string::npos));
 
       return;
