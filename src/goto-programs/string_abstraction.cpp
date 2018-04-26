@@ -11,8 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "string_abstraction.h"
 
-#include <cstring>
+#include <algorithm>
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/pointer_predicates.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
@@ -759,7 +761,11 @@ bool string_abstractiont::build(const exprt &object, exprt &dest, bool write)
 
   if(object.id()==ID_string_constant)
   {
-    mp_integer str_len=strlen(object.get(ID_value).c_str());
+    const std::string &str_value = id2string(object.get(ID_value));
+    // make sure we handle the case of a string constant with string-terminating
+    // \0 in it
+    const std::size_t str_len =
+      std::min(str_value.size(), str_value.find('\0'));
     return build_symbol_constant(str_len, str_len+1, dest);
   }
 
