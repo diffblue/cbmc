@@ -450,7 +450,7 @@ SHARING_MAPT2(, size_type)::erase(
     return 0;
 
   node_type *del=nullptr;
-  unsigned del_bit;
+  unsigned del_bit = 0;
 
   size_t key=hash()(k);
   node_type *p=&map;
@@ -472,18 +472,15 @@ SHARING_MAPT2(, size_type)::erase(
 
   _sm_assert(p->is_container());
 
-  {
-    const containert &c=as_const(p)->get_container();
+  const containert &c = as_const(p)->get_container();
 
-    if(c.size()==1)
-    {
-      del->remove_child(del_bit);
-      num--;
-      return 1;
-    }
+  if(c.size() == 1)
+  {
+    del->remove_child(del_bit);
+    num--;
+    return 1;
   }
 
-  containert &c=p->get_container();
   _sm_assert(c.size()>1);
   p->remove_leaf(k);
   num--;
@@ -505,10 +502,8 @@ SHARING_MAPT2(, size_type)::erase_all(
   return cnt;
 }
 
-SHARING_MAPT2(, const_find_type)::insert(
-  const key_type &k,
-  const mapped_type &m,
-  const tvt &key_exists)
+SHARING_MAPT2(const, const_find_type)
+::insert(const key_type &k, const mapped_type &m, const tvt &key_exists)
 {
   _sn_assert(!key_exists.is_true());
 
@@ -528,16 +523,13 @@ SHARING_MAPT2(, const_find_type)::insert(
   return const_find_type(as_const(p)->get_value(), true);
 }
 
-SHARING_MAPT2(, const_find_type)::insert(
-  const value_type &p,
-  const tvt &key_exists)
+SHARING_MAPT2(const, const_find_type)
+::insert(const value_type &p, const tvt &key_exists)
 {
   return insert(p.first, p.second, key_exists);
 }
 
-SHARING_MAPT2(, find_type)::place(
-  const key_type &k,
-  const mapped_type &m)
+SHARING_MAPT2(const, find_type)::place(const key_type &k, const mapped_type &m)
 {
   node_type *c=get_container_node(k);
   _sm_assert(c!=nullptr);
@@ -553,15 +545,12 @@ SHARING_MAPT2(, find_type)::place(
   return find_type(p->get_value(), true);
 }
 
-SHARING_MAPT2(, find_type)::place(
-  const value_type &p)
+SHARING_MAPT2(const, find_type)::place(const value_type &p)
 {
   return place(p.first, p.second);
 }
 
-SHARING_MAPT2(, find_type)::find(
-  const key_type &k,
-  const tvt &key_exists)
+SHARING_MAPT2(const, find_type)::find(const key_type &k, const tvt &key_exists)
 {
   _sm_assert(!key_exists.is_false());
 
@@ -578,7 +567,7 @@ SHARING_MAPT2(, find_type)::find(
 
 }
 
-SHARING_MAPT2(, const_find_type)::find(const key_type &k) const
+SHARING_MAPT2(const, const_find_type)::find(const key_type &k) const
 {
   const node_type *p=get_leaf_node(k);
 

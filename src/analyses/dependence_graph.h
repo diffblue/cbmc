@@ -20,7 +20,7 @@ Date: August 2013
 
 #include "ai.h"
 #include "cfg_dominators.h"
-#include "reaching_definitions.h"
+#include "reaching_definitions_without_sharing.h"
 
 class dependence_grapht;
 
