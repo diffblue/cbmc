@@ -24,6 +24,8 @@ Date: April 2013
 
 #include <langapi/language_util.h>
 
+#include <linking/static_lifetime_init.h>
+
 void show_call_sequences(
   const irep_idt &caller,
   const goto_programt &goto_program)
@@ -286,7 +288,7 @@ static void list_calls_and_arguments(
       continue;
 
     const irep_idt &identifier=to_symbol_expr(f).get_identifier();
-    if(identifier=="__CPROVER_initialize")
+    if(identifier == INITIALIZE_FUNCTION)
       continue;
 
     std::string name=from_expr(ns, identifier, f);

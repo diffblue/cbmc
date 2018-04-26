@@ -13,7 +13,7 @@ Date: September 2011
 
 #include "mmio.h"
 
-#include <util/cprover_prefix.h>
+#include <linking/static_lifetime_init.h>
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_functions.h>
@@ -169,7 +169,7 @@ void mmio(
   // now instrument
 
   Forall_goto_functions(f_it, goto_model.goto_functions)
-    if(f_it->first!=CPROVER_PREFIX "initialize" &&
+    if(f_it->first != INITIALIZE_FUNCTION &&
        f_it->first!=goto_functionst::entry_point())
       mmio(value_sets, goto_model.symbol_table,
 #ifdef LOCAL_MAY

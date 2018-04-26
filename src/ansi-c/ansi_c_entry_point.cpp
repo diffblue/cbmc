@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 
 #include <goto-programs/goto_functions.h>
+
 #include <linking/static_lifetime_init.h>
 
 #include "c_nondet_symbol_factory.h"
@@ -217,7 +218,7 @@ bool generate_ansi_c_start_function(
     if(init_it==symbol_table.symbols.end())
     {
       messaget message(message_handler);
-      message.error() << "failed to find " CPROVER_PREFIX "initialize symbol"
+      message.error() << "failed to find " INITIALIZE_FUNCTION " symbol"
                       << messaget::eom;
       return true;
     }

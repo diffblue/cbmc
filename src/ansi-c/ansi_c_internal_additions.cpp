@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 
+#include <linking/static_lifetime_init.h>
+
 const char gcc_builtin_headers_types[]=
 "# 1 \"gcc_builtin_headers_types.h\"\n"
 #include "gcc_builtin_headers_types.inc"
@@ -172,7 +174,7 @@ void ansi_c_internal_additions(std::string &code)
     "\n"
     // This function needs to be declared, or otherwise can't be called
     // by the entry-point construction.
-    "void __CPROVER_initialize(void);\n"
+    "void " INITIALIZE_FUNCTION "(void);\n"
     "\n";
 
   // GCC junk stuff, also for CLANG and ARM

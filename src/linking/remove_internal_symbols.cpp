@@ -18,6 +18,8 @@ Author: Daniel Kroening
 #include <util/cprover_prefix.h>
 #include <util/config.h>
 
+#include "static_lifetime_init.h"
+
 void get_symbols_rec(
   const namespacet &ns,
   const symbolt &symbol,
@@ -84,7 +86,7 @@ void remove_internal_symbols(
   special.insert("envp'");
   special.insert("envp_size'");
   special.insert(CPROVER_PREFIX "memory");
-  special.insert(CPROVER_PREFIX "initialize");
+  special.insert(INITIALIZE_FUNCTION);
   special.insert(CPROVER_PREFIX "malloc_size");
   special.insert(CPROVER_PREFIX "deallocated");
   special.insert(CPROVER_PREFIX "dead_object");

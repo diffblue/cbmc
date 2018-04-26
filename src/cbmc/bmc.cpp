@@ -42,6 +42,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/memory_model_tso.h>
 #include <goto-symex/memory_model_pso.h>
 
+#include <linking/static_lifetime_init.h>
+
 #include "cbmc_solvers.h"
 #include "counterexample_beautification.h"
 #include "fault_localization.h"
@@ -338,7 +340,7 @@ void bmct::setup()
 
   {
     const symbolt *init_symbol;
-    if(!ns.lookup(CPROVER_PREFIX "initialize", init_symbol))
+    if(!ns.lookup(INITIALIZE_FUNCTION, init_symbol))
       symex.language_mode=init_symbol->mode;
   }
 

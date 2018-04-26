@@ -11,9 +11,7 @@ Author: Peter Schrammel
 
 #include "cover_filter.h"
 
-#include <json/json_parser.h>
-
-#include <util/message.h>
+#include <linking/static_lifetime_init.h>
 
 /// Filter out functions that are not considered provided by the user
 /// \param identifier: a function name
@@ -26,7 +24,7 @@ bool internal_functions_filtert::operator()(
   if(identifier == goto_functionst::entry_point())
     return false;
 
-  if(identifier == (CPROVER_PREFIX "initialize"))
+  if(identifier == INITIALIZE_FUNCTION)
     return false;
 
   if(goto_function.is_hidden())

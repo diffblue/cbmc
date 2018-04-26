@@ -41,6 +41,8 @@ Date: June 2006
 
 #include <langapi/mode.h>
 
+#include <linking/static_lifetime_init.h>
+
 #include <cbmc/version.h>
 
 #define DOTGRAPHSETTINGS  "color=black;" \
@@ -372,7 +374,7 @@ bool compilet::link()
     // new symbols may have been added to a previously linked file
     // make sure a new entry point is created that contains all
     // static initializers
-    compiled_functions.function_map.erase("__CPROVER_initialize");
+    compiled_functions.function_map.erase(INITIALIZE_FUNCTION);
 
     symbol_table.remove(goto_functionst::entry_point());
     compiled_functions.function_map.erase(goto_functionst::entry_point());

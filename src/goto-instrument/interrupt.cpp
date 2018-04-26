@@ -13,15 +13,7 @@ Date: September 2011
 
 #include "interrupt.h"
 
-#include <util/cprover_prefix.h>
-#include <util/std_expr.h>
-#include <util/std_code.h>
-#include <util/prefix.h>
-#include <util/symbol_table.h>
-
-#include <goto-programs/goto_functions.h>
-
-#include "rw_set.h"
+#include <linking/static_lifetime_init.h>
 
 #ifdef LOCAL_MAY
 #include <analyses/local_may_alias.h>
@@ -203,7 +195,7 @@ void interrupt(
   // now instrument
 
   Forall_goto_functions(f_it, goto_model.goto_functions)
-    if(f_it->first!=CPROVER_PREFIX "initialize" &&
+    if(f_it->first != INITIALIZE_FUNCTION &&
        f_it->first!=goto_functionst::entry_point() &&
        f_it->first!=isr.get_identifier())
       interrupt(
