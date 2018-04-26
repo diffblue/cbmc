@@ -65,7 +65,7 @@ bool goto_cc_cmdlinet::prefix_in_list(
 
 std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
 {
-  int optnr;
+  optionalt<std::size_t> optnr;
   cmdlinet::optiont option;
 
   if(has_prefix(opt_string, "--")) // starts with -- ?
@@ -107,13 +107,13 @@ std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
   }
 
   // new?
-  if(optnr==-1)
+  if(!optnr.has_value())
   {
     options.push_back(option);
     return options.size()-1;
   }
 
-  return optnr;
+  return *optnr;
 }
 
 void goto_cc_cmdlinet::add_infile_arg(const std::string &arg)
