@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 #include <map>
 #include <vector>
-#include <ostream>
+#include <iosfwd>
 #include <cassert>
 #include <algorithm>
 #include <queue>

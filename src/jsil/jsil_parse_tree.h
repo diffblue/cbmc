@@ -12,7 +12,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #ifndef CPROVER_JSIL_JSIL_PARSE_TREE_H
 #define CPROVER_JSIL_JSIL_PARSE_TREE_H
 
-#include <ostream>
+#include <iosfwd>
 #include <list>
 
 #include <util/std_expr.h>
