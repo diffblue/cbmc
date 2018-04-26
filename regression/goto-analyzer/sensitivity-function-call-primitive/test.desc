@@ -3,7 +3,7 @@ main.c
 --variable --pointers --arrays --structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[bar\.assertion\.1\] .* assertion other==4: Success$
-^\[main\.assertion\.1\] .* assertion y==5: Success$
+^\[bar\.assertion\.1\] line 5 assertion other==4: SUCCESS$
+^\[main\.assertion\.1\] line 13 assertion y==5: SUCCESS$
 --
 ^warning: ignoring

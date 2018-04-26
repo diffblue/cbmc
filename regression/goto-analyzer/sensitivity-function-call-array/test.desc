@@ -3,10 +3,10 @@ main.c
 --variable --pointers --arrays --structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main\.assertion\.1\] .* assertion \*arr_y==2: Success$
-^\[main\.assertion\.2\] .* assertion p2arr==arr_y: Success$
-^\[main\.assertion\.3\] .* assertion \*p2arr==2: Success$
-^\[bar\.assertion\.1\] .* assertion \*arr_unmodified==1: Success$
-^\[bar\.assertion\.2\] .* assertion \*arr_modified==2: Success$
+^\[main\.assertion\.1\] line 12 assertion \*arr_y==2: SUCCESS$
+^\[main\.assertion\.2\] line 15 assertion p2arr==arr_y: SUCCESS$
+^\[main\.assertion\.3\] line 16 assertion \*p2arr==2: SUCCESS$
+^\[bar\.assertion\.1\] line 22 assertion \*arr_unmodified==1: SUCCESS$
+^\[bar\.assertion\.2\] line 28 assertion \*arr_modified==2: SUCCESS$
 --
 ^warning: ignoring

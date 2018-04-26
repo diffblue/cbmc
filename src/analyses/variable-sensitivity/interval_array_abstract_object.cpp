@@ -143,7 +143,8 @@ bool interval_array_abstract_objectt::eval_index(
   auto index_interval = eval_and_get_as_interval(index.index(), env, ns);
   if(index_interval.is_single_value_interval())
   {
-    out_index = numeric_cast_v<mp_integer>(index_interval.get_lower());
+    out_index =
+      numeric_cast_v<mp_integer>(to_constant_expr(index_interval.get_lower()));
     return true;
   }
   return false;

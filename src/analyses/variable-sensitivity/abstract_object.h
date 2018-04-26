@@ -131,7 +131,7 @@ public:
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
   typedef std::set<goto_programt::const_targett> locationst;
-  typedef sharing_mapt<irep_idt, abstract_object_pointert, irep_id_hash>
+  typedef sharing_mapt<irep_idt, abstract_object_pointert, false, irep_id_hash>
     shared_mapt;
 
   static void dump_map(std::ostream out, const shared_mapt &m);
@@ -277,9 +277,9 @@ protected:
 
   template<class keyt, typename hash>
   static bool merge_shared_maps(
-    const sharing_mapt<keyt, abstract_object_pointert, hash> &map1,
-    const sharing_mapt<keyt, abstract_object_pointert, hash> &map2,
-    sharing_mapt<keyt, abstract_object_pointert, hash> &out_map);
+    const sharing_mapt<keyt, abstract_object_pointert, false, hash> &map1,
+    const sharing_mapt<keyt, abstract_object_pointert, false, hash> &map2,
+    sharing_mapt<keyt, abstract_object_pointert, false, hash> &out_map);
 
 
 
@@ -335,23 +335,25 @@ bool abstract_objectt::merge_maps(
 
 template<typename keyt, typename hash>
 bool abstract_objectt::merge_shared_maps(
-  const sharing_mapt<keyt, abstract_object_pointert, hash> &m1,
-  const sharing_mapt<keyt, abstract_object_pointert, hash> &m2,
-  sharing_mapt<keyt, abstract_object_pointert, hash> &out_map)
+  const sharing_mapt<keyt, abstract_object_pointert, false, hash> &m1,
+  const sharing_mapt<keyt, abstract_object_pointert, false, hash> &m2,
+  sharing_mapt<keyt, abstract_object_pointert, false, hash> &out_map)
 {
   bool modified=false;
 
-  auto delta_view = m1.get_delta_view(m2, true);
+  typename sharing_mapt<keyt, abstract_object_pointert, false, hash>::
+  delta_viewt delta_view;
+  m1.get_delta_view(m2, delta_view, true);
 
   for(auto &item : delta_view)
   {
     bool changes = false;
     abstract_object_pointert v_new = abstract_objectt::merge(
-      item.m, item.other_m, changes);
+      item.m, item.get_other_map_value(), changes);
     if (changes)
     {
       modified = true;
-      out_map[item.k] = v_new;
+      out_map.replace(item.k, v_new);
     }
   }
 

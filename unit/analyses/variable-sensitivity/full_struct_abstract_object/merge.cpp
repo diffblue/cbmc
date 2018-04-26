@@ -7,7 +7,7 @@
 \*******************************************************************/
 
 #include <typeinfo>
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/namespace.h>
 #include <util/options.h>
 #include <util/symbol_table.h>
@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <util/arith_tools.h>
+#include <util/mathematical_types.h>
 
 typedef constant_array_abstract_objectt::constant_array_pointert
   constant_array_abstract_object_pointert;

@@ -3,6 +3,6 @@ main.c
 --function main --variable --structs --interval-values --verify
 ^EXIT=0$
 ^SIGNAL=0$
-\[main\.assertion\.1\] .* bs\.byte==10: Success
-\[main\.assertion\.2\] .* bs\.bitfield==1: Success
+\[main\.assertion\.1\] line 12 bs\.byte==10: SUCCESS
+\[main\.assertion\.2\] line 13 bs\.bitfield==1: SUCCESS
 --

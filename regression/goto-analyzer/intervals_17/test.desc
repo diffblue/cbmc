@@ -3,6 +3,6 @@ main.c
 --intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main\.assertion\.1\] .* y\s*<=\s*10: Success$
+^\[main\.assertion\.1\] line 14 y <= 10: SUCCESS$
 --
 ^warning: ignoring

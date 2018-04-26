@@ -81,7 +81,7 @@ interval_from_x_lt_value(const exprt &value)
     return constant_interval_exprt(
       min_exprt(value.type()), from_integer(integer_value - 1, value.type()));
   else
-    return constant_interval_exprt().bottom();
+    return constant_interval_exprt::bottom(value.type());
 }
 
 static inline constant_interval_exprt
@@ -92,7 +92,7 @@ interval_from_x_gt_value(const exprt &value)
     return constant_interval_exprt(
       from_integer(integer_value + 1, value.type()), max_exprt(value.type()));
   else
-    return constant_interval_exprt().bottom();
+    return constant_interval_exprt::bottom(value.type());
 }
 
 static inline bool represents_interval(exprt e)
@@ -446,7 +446,7 @@ interval_abstract_valuet::interval_abstract_valuet(
 {}
 
 interval_abstract_valuet::interval_abstract_valuet(
-  constant_interval_exprt e,
+  const constant_interval_exprt e,
   int merge_count)
   : abstract_valuet(e.type(), e.is_top() || merge_count > 10, e.is_bottom()),
     interval(e),

@@ -3,7 +3,7 @@ main.c
 --function test_param_function --variable --pointers --arrays --structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-[test_param_function.assertion.1] .* a==5: Success
-[test_param_function.assertion.2] .* a==10: Unknown
-[test_param_function.assertion.3] .* b==7: Success
+\[test_param_function.assertion\.1\] line 15 a==5: SUCCESS
+\[test_param_function.assertion\.2\] line 24 a==10: UNKNOWN
+\[test_param_function.assertion\.3\] line 25 b==7: SUCCESS
 --

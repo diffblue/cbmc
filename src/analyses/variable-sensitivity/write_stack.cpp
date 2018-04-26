@@ -15,6 +15,7 @@
 #include <unordered_set>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
 
@@ -42,7 +43,7 @@ write_stackt::write_stackt(
     construct_stack_to_pointer(
       address_of_exprt(
         index_exprt(
-          expr, from_integer(0, integer_typet()))), environment, ns);
+          expr, from_integer(0, size_type()))), environment, ns);
   }
   else
   {
@@ -195,7 +196,7 @@ exprt write_stackt::to_expression() const
     }
   }
   address_of_exprt top_expr(access_expr);
-  return top_expr;
+  return std::move(top_expr);
 }
 
 /// Is the stack representing an unknown value and hence can't be written to

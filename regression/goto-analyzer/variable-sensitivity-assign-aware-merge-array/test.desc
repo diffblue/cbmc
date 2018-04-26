@@ -3,9 +3,9 @@ main.c
 --function pass_param --variable --pointers --arrays --structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-\[pass_param\.assertion\.1\] .* b\[0\]==0: Success
-\[pass_param\.assertion\.2\] .* b\[1\]==5: Success
-\[pass_param\.assertion\.3\] .* b\[1\]==5: Unknown
-\[pass_param\.assertion\.4\] .* b\[1\]==6: Unknown
-\[pass_param\.assertion\.5\] .* b\[0\]==0: Success
+\[pass_param\.assertion\.1\] line 13 b\[0\]==0: SUCCESS
+\[pass_param\.assertion\.2\] line 16 b\[1\]==5: SUCCESS
+\[pass_param\.assertion\.3\] line 22 b\[1\]==5: UNKNOWN
+\[pass_param\.assertion\.4\] line 23 b\[1\]==6: UNKNOWN
+\[pass_param\.assertion\.5\] line 26 b\[0\]==0: SUCCESS
 --

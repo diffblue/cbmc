@@ -73,7 +73,9 @@ class variable_sensitivity_domaint:public ai_domain_baset
 {
 public:
   virtual void transform(
+    const irep_idt &function_from,
     locationt from,
+    const irep_idt &function_to,
     locationt to,
     ai_baset &ai,
     const namespacet &ns) override;
@@ -128,7 +130,7 @@ private:
 
   bool ignore_function_call_transform(const irep_idt &function_id) const;
 
-  std::vector<symbol_exprt> get_modified_symbols(
+  std::vector<irep_idt> get_modified_symbols(
     const variable_sensitivity_domaint &other) const;
 
   void apply_domain(

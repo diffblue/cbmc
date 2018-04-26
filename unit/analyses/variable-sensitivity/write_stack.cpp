@@ -9,7 +9,7 @@
 /// \file
 /// Unit tests for construction of write stack
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <stack>
 #include <iostream>

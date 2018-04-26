@@ -23,6 +23,7 @@
 class abstract_environmentt
 {
 public:
+  using map_keyt = irep_idt;
   abstract_environmentt();
   // These three are really the heart of the method
   virtual abstract_object_pointert eval(
@@ -70,7 +71,7 @@ public:
 
   bool verify() const;
 
-  static std::vector<symbol_exprt> modified_symbols(
+  static std::vector<abstract_environmentt::map_keyt> modified_symbols(
     const abstract_environmentt &first,
     const abstract_environmentt &second);
 
@@ -83,7 +84,6 @@ protected:
   virtual abstract_object_pointert eval_expression(
     const exprt &e, const namespacet &ns) const;
 
-  typedef symbol_exprt map_keyt;
   sharing_mapt<map_keyt, abstract_object_pointert> map;
 
 private:

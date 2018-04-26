@@ -1,5 +1,5 @@
 CORE
-../dependence-graph15/main.c
+main.c
 --show --dependence-graph-vs
 activate-multi-line-match
 ^EXIT=0$
