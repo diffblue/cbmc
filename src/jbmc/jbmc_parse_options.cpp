@@ -1012,6 +1012,20 @@ bool jbmc_parse_optionst::process_goto_functions(
   return false;
 }
 
+bool jbmc_parse_optionst::can_generate_function_body(const irep_idt &name)
+{
+  return false;
+}
+
+bool jbmc_parse_optionst::generate_function_body(
+  const irep_idt &function_name,
+  symbol_table_baset &symbol_table,
+  goto_functiont &function,
+  bool body_available)
+{
+  return false;
+}
+
 /// display command line help
 void jbmc_parse_optionst::help()
 {

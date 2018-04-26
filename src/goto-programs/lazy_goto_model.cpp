@@ -22,6 +22,8 @@
 lazy_goto_modelt::lazy_goto_modelt(
   post_process_functiont post_process_function,
   post_process_functionst post_process_functions,
+  can_generate_function_bodyt driver_program_can_generate_function_body,
+  generate_function_bodyt driver_program_generate_function_body,
   message_handlert &message_handler)
   : goto_model(new goto_modelt()),
     symbol_table(goto_model->symbol_table),
@@ -41,9 +43,15 @@ lazy_goto_modelt::lazy_goto_modelt(
           function);
         this->post_process_function(model_function, *this);
       },
+      driver_program_can_generate_function_body,
+      driver_program_generate_function_body,
       message_handler),
-    post_process_function(std::move(post_process_function)),
-    post_process_functions(std::move(post_process_functions)),
+    post_process_function(post_process_function),
+    post_process_functions(post_process_functions),
+    driver_program_can_generate_function_body(
+      driver_program_can_generate_function_body),
+    driver_program_generate_function_body(
+      driver_program_generate_function_body),
     message_handler(message_handler)
 {
   language_files.set_message_handler(message_handler);
@@ -68,10 +76,12 @@ lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
           function);
         this->post_process_function(model_function, *this);
       },
+      other.driver_program_can_generate_function_body,
+      other.driver_program_generate_function_body,
       other.message_handler),
     language_files(std::move(other.language_files)),
-    post_process_function(std::move(other.post_process_function)),
-    post_process_functions(std::move(other.post_process_functions)),
+    post_process_function(other.post_process_function),
+    post_process_functions(other.post_process_functions),
     message_handler(other.message_handler)
 {
 }
