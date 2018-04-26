@@ -10,8 +10,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #define CPROVER_UTIL_INVARIANT_TYPES_H
 
 #include "invariant.h"
-
-#include <util/irep.h>
+#include "irep.h"
 
 #include <string>
 

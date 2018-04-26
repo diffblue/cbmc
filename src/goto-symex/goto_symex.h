@@ -14,13 +14,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/options.h>
 #include <util/message.h>
-#include <util/byte_operators.h>
 
 #include <goto-programs/goto_functions.h>
 
 #include "goto_symex_state.h"
 #include "symex_target_equation.h"
 
+class byte_extract_exprt;
 class typet;
 class code_typet;
 class symbol_tablet;

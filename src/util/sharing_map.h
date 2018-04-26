@@ -15,17 +15,15 @@ Author: Daniel Poetzl
 #include <string>
 #include <stack>
 #include <vector>
-#include <map>
 #include <stdexcept>
 #include <functional>
 #include <memory>
 #include <iosfwd>
 #include <cassert>
 
-#include <util/string2int.h>
-#include <util/threeval.h>
-#include <util/irep.h>
-#include <util/sharing_node.h>
+#include "irep.h"
+#include "sharing_node.h"
+#include "threeval.h"
 
 #define _sm_assert(b) assert(b)
 //#define _sm_assert(b)

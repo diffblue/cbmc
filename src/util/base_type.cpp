@@ -11,11 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "base_type.h"
 
-#include <cassert>
 #include <set>
 
-#include "std_types.h"
 #include "namespace.h"
+#include "std_types.h"
 #include "symbol.h"
 #include "union_find.h"
 

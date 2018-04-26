@@ -11,10 +11,11 @@ Author: Peter Schrammel
 
 #include "goto_diff.h"
 
-#include <goto-programs/show_properties.h>
-
 #include <util/json_expr.h>
 #include <util/options.h>
+
+#include <goto-programs/goto_model.h>
+#include <goto-programs/show_properties.h>
 
 /// Output diff result
 void goto_difft::output_functions() const

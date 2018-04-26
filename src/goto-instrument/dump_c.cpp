@@ -11,16 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dump_c.h"
 
-#include <sstream>
-#include <cctype>
-
-#include <util/config.h>
-#include <util/invariant.h>
-#include <util/prefix.h>
-#include <util/suffix.h>
-#include <util/find_symbols.h>
 #include <util/base_type.h>
-#include <util/cprover_prefix.h>
+#include <util/config.h>
+#include <util/find_symbols.h>
+#include <util/invariant.h>
 #include <util/replace_symbol.h>
 
 #include <ansi-c/ansi_c_language.h>
@@ -28,8 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/static_lifetime_init.h>
 
-#include "goto_program2code.h"
 #include "dump_c_class.h"
+#include "goto_program2code.h"
 
 inline std::ostream &operator << (std::ostream &out, dump_ct &src)
 {

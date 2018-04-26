@@ -13,7 +13,6 @@ Date: February 2016
 
 #include "code_contracts.h"
 
-#include <util/cprover_prefix.h>
 #include <util/fresh_symbol.h>
 #include <util/replace_symbol.h>
 

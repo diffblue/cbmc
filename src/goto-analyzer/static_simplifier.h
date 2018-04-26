@@ -11,12 +11,10 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include <iosfwd>
 
-#include <util/message.h>
-#include <util/options.h>
-
-#include <goto-programs/goto_model.h>
-
-#include <analyses/ai.h>
+class ai_baset;
+class goto_modelt;
+class message_handlert;
+class optionst;
 
 bool static_simplifier(
   goto_modelt &,

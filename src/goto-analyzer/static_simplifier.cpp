@@ -6,17 +6,17 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 \*******************************************************************/
 
+#include "static_simplifier.h"
+
+#include <util/message.h>
+#include <util/options.h>
+
+#include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unreachable.h>
 #include <goto-programs/write_goto_binary.h>
 
-#include <util/xml.h>
-#include <util/xml_expr.h>
-#include <util/json.h>
-#include <util/json_expr.h>
-
-#include "static_simplifier.h"
-
+#include <analyses/ai.h>
 
 /// Simplifies the program using the information in the abstract domain.
 /// \param goto_model: the program analyzed

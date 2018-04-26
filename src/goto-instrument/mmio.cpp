@@ -15,18 +15,6 @@ Date: September 2011
 
 #include <linking/static_lifetime_init.h>
 
-#include <goto-programs/goto_program.h>
-#include <goto-programs/goto_functions.h>
-
-#if 0
-#include <util/std_expr.h>
-#include <util/guard.h>
-#include <util/prefix.h>
-
-#include <goto-programs/remove_skip.h>
-#endif
-
-#include "interrupt.h"
 #include "rw_set.h"
 
 #ifdef LOCAL_MAY

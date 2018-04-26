@@ -15,23 +15,18 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 #endif
 
-#include <util/pointer_offset_size.h>
-#include <util/std_types.h>
 #include <util/arith_tools.h>
-#include <util/std_expr.h>
-#include <util/config.h>
-#include <util/simplify_expr.h>
 #include <util/base_type.h>
-#include <util/invariant.h>
-
 #include <util/c_types.h>
+#include <util/config.h>
+#include <util/pointer_offset_size.h>
+
 #include <ansi-c/c_qualifiers.h>
 
 #include <linking/zero_initializer.h>
 
-#include "cpp_type2name.h"
-#include "cpp_convert_type.h"
 #include "cpp_exception_id.h"
+#include "cpp_type2name.h"
 #include "expr2cpp.h"
 
 bool cpp_typecheckt::find_parent(

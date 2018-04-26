@@ -12,15 +12,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_GRAPH_H
 #define CPROVER_UTIL_GRAPH_H
 
-#include <list>
-#include <stack>
-#include <map>
-#include <vector>
-#include <iosfwd>
-#include <cassert>
 #include <algorithm>
-#include <queue>
+#include <cassert>
 #include <functional>
+#include <iosfwd>
+#include <list>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
 
 #include "invariant.h"
 

@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <vector>
 #include <string>
-#include <cassert>
-#include <iosfwd>
 
 #include "irep_ids.h"
 

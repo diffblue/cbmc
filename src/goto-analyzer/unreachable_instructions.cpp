@@ -13,17 +13,15 @@ Date: April 2016
 
 #include "unreachable_instructions.h"
 
-#include <sstream>
-
-#include <util/json.h>
-#include <util/json_expr.h>
 #include <util/file_util.h>
+#include <util/json_expr.h>
+#include <util/options.h>
 #include <util/xml.h>
 
-#include <analyses/cfg_dominators.h>
-
-#include <goto-programs/goto_model.h>
 #include <goto-programs/compute_called_functions.h>
+
+#include <analyses/ai.h>
+#include <analyses/cfg_dominators.h>
 
 typedef std::map<unsigned, goto_programt::const_targett> dead_mapt;
 

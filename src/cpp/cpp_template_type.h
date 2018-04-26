@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/invariant.h>
 #include <util/type.h>
-#include <util/expr.h>
 
 #include "cpp_template_parameter.h"
 

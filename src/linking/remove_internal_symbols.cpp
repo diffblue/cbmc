@@ -11,12 +11,11 @@ Author: Daniel Kroening
 
 #include "remove_internal_symbols.h"
 
-#include <util/symbol_table.h>
-#include <util/namespace.h>
-#include <util/find_symbols.h>
-#include <util/std_types.h>
-#include <util/cprover_prefix.h>
 #include <util/config.h>
+#include <util/find_symbols.h>
+#include <util/namespace.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
 
 #include "static_lifetime_init.h"
 

@@ -14,8 +14,15 @@ Date: April 2016
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
 
-#include "goto_model.h"
+#include <util/std_expr.h>
+
 #include "class_hierarchy.h"
+#include "goto_program.h"
+
+class goto_functionst;
+class goto_model_functiont;
+class goto_modelt;
+class symbol_table_baset;
 
 // remove virtual function calls
 // and replace by case-split

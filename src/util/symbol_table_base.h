@@ -6,12 +6,8 @@
 #ifndef CPROVER_UTIL_SYMBOL_TABLE_BASE_H
 #define CPROVER_UTIL_SYMBOL_TABLE_BASE_H
 
-#include <functional>
-#include <iosfwd>
 #include <map>
 #include <unordered_map>
-
-#include <util/optional.h>
 
 #include "symbol.h"
 

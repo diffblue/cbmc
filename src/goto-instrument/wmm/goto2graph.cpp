@@ -16,17 +16,8 @@ Date: 2012
 #include <vector>
 #include <string>
 #include <fstream>
-#include <limits>
 
-#ifndef _WIN32
-#include <cstdlib>
-#endif
-
-#include <util/prefix.h>
-#include <util/cprover_prefix.h>
 #include <util/options.h>
-#include <util/message.h>
-#include <util/std_expr.h>
 
 #include <linking/static_lifetime_init.h>
 

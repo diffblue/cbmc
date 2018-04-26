@@ -15,9 +15,7 @@ Date: April 2013
 
 #include <stack>
 #include <iostream>
-#include <unordered_set>
 
-#include <util/std_expr.h>
 #include <util/simplify_expr.h>
 
 #include <goto-programs/goto_model.h>

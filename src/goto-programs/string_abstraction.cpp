@@ -16,13 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_predicates.h>
-#include <util/std_expr.h>
-#include <util/std_code.h>
-#include <util/message.h>
-#include <util/arith_tools.h>
 #include <util/type_eq.h>
-
-#include <util/c_types.h>
 
 #include "pointer_arithmetic.h"
 

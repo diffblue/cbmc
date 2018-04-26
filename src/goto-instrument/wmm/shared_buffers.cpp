@@ -8,12 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "shared_buffers.h"
 
+#include <util/c_types.h>
+
 #include <linking/static_lifetime_init.h>
 
-#include "fence.h"
 #include "../rw_set.h"
-
-#include <util/c_types.h>
+#include "fence.h"
 
 /// returns a unique id (for fresh variables)
 std::string shared_bufferst::unique(void)

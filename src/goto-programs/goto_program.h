@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 
-#include <cassert>
 #include <iosfwd>
 #include <set>
 #include <limits>

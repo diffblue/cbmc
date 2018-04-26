@@ -8,32 +8,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_object_factory.h"
 
-#include <unordered_set>
-#include <sstream>
-
-#include <util/arith_tools.h>
 #include <util/fresh_symbol.h>
-#include <util/c_types.h>
-#include <util/std_code.h>
-#include <util/std_expr.h>
-#include <util/namespace.h>
 #include <util/nondet_bool.h>
-#include <util/nondet_ifthenelse.h>
 #include <util/pointer_offset_size.h>
-#include <util/prefix.h>
-#include <util/invariant.h>
-
-#include <linking/zero_initializer.h>
 
 #include <goto-programs/goto_functions.h>
 
-#include <java_bytecode/select_pointer_type.h>
-
-#include "java_types.h"
-#include "java_utils.h"
-#include "java_string_library_preprocess.h"
-#include "java_root_class.h"
 #include "generic_parameter_specialization_map_keys.h"
+#include "java_root_class.h"
 
 class java_object_factoryt
 {

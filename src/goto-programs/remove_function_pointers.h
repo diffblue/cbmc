@@ -14,8 +14,11 @@ Date: June 2003
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTION_POINTERS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTION_POINTERS_H
 
-#include "goto_model.h"
-#include <util/message.h>
+class goto_functionst;
+class goto_programt;
+class goto_modelt;
+class message_handlert;
+class symbol_tablet;
 
 // remove indirect function calls
 // and replace by case-split

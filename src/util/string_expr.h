@@ -12,9 +12,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_UTIL_STRING_EXPR_H
 #define CPROVER_UTIL_STRING_EXPR_H
 
-#include <util/std_expr.h>
-#include <util/arith_tools.h>
-#include <util/refined_string_type.h>
+#include "arith_tools.h"
+#include "refined_string_type.h"
+#include "std_expr.h"
 
 // Given an representation of strings as exprt that implements `length` and
 // `content` this provides additional useful methods.

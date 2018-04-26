@@ -13,6 +13,8 @@ Author: CM Wintersteiger
 
 #include <util/message.h>
 
+#include "goto_model.h"
+
 void remove_unused_functions(
   goto_modelt &goto_model,
   message_handlert &message_handler)

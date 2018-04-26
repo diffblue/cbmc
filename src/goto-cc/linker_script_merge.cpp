@@ -6,31 +6,24 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 
 \*******************************************************************/
 
-#include <json/json_parser.h>
+#include "linker_script_merge.h"
 
 #include <algorithm>
-#include <cstdio>
-#include <iostream>
-#include <iterator>
 #include <fstream>
+#include <iterator>
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/expr.h>
-#include <util/get_base_name.h>
 #include <util/magic.h>
-#include <util/prefix.h>
 #include <util/run.h>
-#include <util/string2int.h>
 #include <util/tempfile.h>
+
+#include <json/json_parser.h>
 
 #include <linking/static_lifetime_init.h>
 #include <linking/zero_initializer.h>
 
 #include <goto-programs/read_goto_binary.h>
-
-#include "compile.h"
-#include "linker_script_merge.h"
 
 int linker_script_merget::add_linker_script_definitions()
 {

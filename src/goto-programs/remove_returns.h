@@ -14,9 +14,16 @@ Date:   September 2009
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H
 
-#include <goto-programs/goto_model.h>
+#include <functional>
+
+#include <util/std_types.h>
 
 #define RETURN_VALUE_SUFFIX "#return_value"
+
+class goto_functionst;
+class goto_model_functiont;
+class goto_modelt;
+class symbol_table_baset;
 
 // Turns 'return x' into an assignment to fkt#return_value,
 // unless the function returns void,

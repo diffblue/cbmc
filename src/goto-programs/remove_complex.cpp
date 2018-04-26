@@ -14,6 +14,10 @@ Date:   September 2014
 #include "remove_complex.h"
 
 #include <util/arith_tools.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+
+#include "goto_model.h"
 
 static exprt complex_member(const exprt &expr, irep_idt id)
 {

@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_SSA_EXPR_H
 #define CPROVER_UTIL_SSA_EXPR_H
 
-#include <util/std_expr.h>
+#include "std_expr.h"
 
 /*! \brief Expression providing an SSA-renamed symbol of expressions
 */

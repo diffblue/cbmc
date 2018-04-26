@@ -16,34 +16,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/format_expr.h>
 #endif
 
-#include <cassert>
-#include <sstream>
-
-#include <util/format_type.h>
-#include <util/invariant.h>
-#include <util/string2int.h>
-#include <util/expr_util.h>
-#include <util/base_type.h>
 #include <util/arith_tools.h>
-#include <util/rename.h>
 #include <util/array_name.h>
+#include <util/base_type.h>
+#include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/config.h>
-#include <util/std_expr.h>
 #include <util/cprover_prefix.h>
-#include <util/pointer_offset_size.h>
-#include <util/symbol_table.h>
+#include <util/format_type.h>
 #include <util/guard.h>
 #include <util/options.h>
+#include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
-#include <util/byte_operators.h>
+#include <util/rename.h>
 #include <util/ssa_expr.h>
-#include <util/c_types.h>
 
 #include <ansi-c/c_typecast.h>
-
-#include <pointer-analysis/value_set.h>
-
-#include "pointer_offset_sum.h"
 
 // global data, horrible
 unsigned int value_set_dereferencet::invalid_counter=0;

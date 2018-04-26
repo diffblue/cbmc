@@ -14,13 +14,7 @@ Date: November 2011
 
 #include "nondet_static.h"
 
-#include <util/namespace.h>
-#include <util/std_expr.h>
-#include <util/cprover_prefix.h>
-#include <util/prefix.h>
-
 #include <goto-programs/goto_model.h>
-#include <goto-programs/goto_functions.h>
 
 #include <linking/static_lifetime_init.h>
 

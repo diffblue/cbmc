@@ -13,16 +13,6 @@ Date: February 2006
 
 #include "race_check.h"
 
-#include <util/std_expr.h>
-#include <util/guard.h>
-#include <util/symbol_table.h>
-#include <util/prefix.h>
-#include <util/cprover_prefix.h>
-
-#include <goto-programs/goto_program.h>
-#include <goto-programs/goto_functions.h>
-
-#include <pointer-analysis/value_sets.h>
 #include <goto-programs/remove_skip.h>
 
 #include <linking/static_lifetime_init.h>

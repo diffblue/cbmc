@@ -15,7 +15,6 @@ Author: Daniel Poetzl
 #include <list>
 #include <map>
 #include <memory>
-#include <cassert>
 
 #include "invariant.h"
 
