@@ -68,10 +68,11 @@ TEST_CASE("Convert exprt to string exprt")
               std::regex_replace(line, spaces, " "), numbers, ""));
         }
 
-        const std::vector<std::string> reference_code = { // NOLINT
+        const std::vector<std::string> reference_code = {
+          // NOLINT
           "char *cprover_string_content;",
           "int cprover_string_length;",
-          "cprover_string_length = a->length;",
+          "cprover_string_length = a == null ? 0 : a->length;",
           "cprover_string_content = a->data;"};
 
         for(std::size_t i = 0;

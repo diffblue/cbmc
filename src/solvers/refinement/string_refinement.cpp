@@ -28,6 +28,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
 #include <unordered_set>
+#include <util/magic.h>
 
 static bool is_valid_string_constraint(
   messaget::mstreamt &stream,
@@ -166,11 +167,14 @@ static bool validate(const string_refinementt::infot &info)
   return true;
 }
 
-string_refinementt::string_refinementt(const infot &info, bool):
-  supert(info),
-  config_(info),
-  loop_bound_(info.refinement_bound),
-  generator(info, *info.ns) { }
+string_refinementt::string_refinementt(const infot &info, bool)
+  : supert(info),
+    config_(info),
+    loop_bound_(info.refinement_bound),
+    max_string_length(info.max_string_length),
+    generator(*info.ns)
+{
+}
 
 string_refinementt::string_refinementt(const infot &info):
   string_refinementt(info, validate(info)) { }
@@ -723,11 +727,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       generator.fresh_symbol("not_contains_witness", witness_type);
   }
 
-  for(exprt lemma : generator.get_lemmas())
-  {
-    symbol_resolve.replace_expr(lemma);
+  for(const exprt &lemma : generator.get_lemmas())
     add_lemma(lemma);
-  }
 
   // Initial try without index set
   const auto get = [this](const exprt &expr) { return this->get(expr); };
@@ -737,13 +738,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   {
     bool satisfied;
     std::vector<exprt> counter_examples;
-    std::tie(satisfied, counter_examples)=check_axioms(
+    std::tie(satisfied, counter_examples) = check_axioms(
       axioms,
       generator,
       get,
       debug(),
       ns,
-      generator.max_string_length,
+      max_string_length,
       config_.use_counter_example,
       supert::config_.ui,
       symbol_resolve);
@@ -781,13 +782,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     {
       bool satisfied;
       std::vector<exprt> counter_examples;
-      std::tie(satisfied, counter_examples)=check_axioms(
+      std::tie(satisfied, counter_examples) = check_axioms(
         axioms,
         generator,
         get,
         debug(),
         ns,
-        generator.max_string_length,
+        max_string_length,
         config_.use_counter_example,
         supert::config_.ui,
         symbol_resolve);
@@ -936,12 +937,17 @@ static optionalt<exprt> get_array(
 
   if(n > MAX_CONCRETE_STRING_SIZE)
   {
-    stream << "(sr::get_array) long string (size=" << n << ")" << eom;
-    std::ostringstream msg;
-    msg << "consider reducing string-max-input-length so that no string "
-        << "exceeds " << MAX_CONCRETE_STRING_SIZE << " in length and make sure"
-        << " all functions returning strings are available in the classpath";
-    throw string_refinement_invariantt(msg.str());
+    stream << "(sr::get_array) long string (size " << format(arr.length())
+           << " = " << n << ") " << format(arr) << eom;
+    stream << "(sr::get_array) consider reducing string-max-input-length so "
+              "that no string exceeds "
+           << MAX_CONCRETE_STRING_SIZE
+           << " in length and "
+              "make sure all functions returning strings are loaded"
+           << eom;
+    stream << "(sr::get_array) this can also happen on invalid object access"
+           << eom;
+    return nil_exprt();
   }
 
   if(
@@ -1121,9 +1127,6 @@ static exprt substitute_array_access(
   const bool left_propagate)
 {
   const exprt &array = index_expr.array();
-
-  if(array.id() == ID_symbol)
-    return index_expr;
   if(auto array_of = expr_try_dynamic_cast<array_of_exprt>(array))
     return array_of->op();
   if(auto array_with = expr_try_dynamic_cast<with_exprt>(array))
@@ -1136,7 +1139,12 @@ static exprt substitute_array_access(
     return substitute_array_access(
       *if_expr, index_expr.index(), symbol_generator, left_propagate);
 
-  UNREACHABLE;
+  INVARIANT(
+    array.is_nil() || array.id() == ID_symbol,
+    std::string(
+      "in case the array is unknown, it should be a symbol or nil, id: ")
+    + id2string(array.id()));
+  return index_expr;
 }
 
 /// Auxiliary function for substitute_array_access
@@ -2119,9 +2127,11 @@ exprt string_refinementt::get(const exprt &expr) const
     }
 
     INVARIANT(
-      array.id() == ID_symbol,
-      "apart from symbols, array valuations can be interpreted as sparse "
-      "arrays");
+      array.is_nil() || array.id() == ID_symbol,
+      std::string(
+        "apart from symbols, array valuations can be interpreted as "
+        "sparse arrays, id: ") +
+      id2string(array.id()));
     return index_exprt(array, index);
   }
 
@@ -2137,7 +2147,7 @@ exprt string_refinementt::get(const exprt &expr) const
 
     if(
       const auto arr_model_opt =
-        get_array(super_get, ns, generator.max_string_length, debug(), arr))
+        get_array(super_get, ns, max_string_length, debug(), arr))
       return *arr_model_opt;
 
     if(generator.get_created_strings().count(arr))
@@ -2171,14 +2181,7 @@ static optionalt<exprt> find_counter_example(
   const symbol_exprt &var)
 {
   satcheck_no_simplifiert sat_check;
-  bv_refinementt::infot info;
-  info.ns=&ns;
-  info.prop=&sat_check;
-  info.refine_arithmetic=true;
-  info.refine_arrays=true;
-  info.max_node_refinement=5;
-  info.ui=ui;
-  bv_refinementt solver(info);
+  boolbvt solver(ns, sat_check);
   solver << axiom;
 
   if(solver()==decision_proceduret::resultt::D_SATISFIABLE)

@@ -55,6 +55,10 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   if(cmd.isset("string-max-input-length"))
     object_factory_parameters.max_nondet_string_length=
       std::stoi(cmd.get_value("string-max-input-length"));
+  else if(cmd.isset("string-max-length"))
+    object_factory_parameters.max_nondet_string_length =
+      std::stoi(cmd.get_value("string-max-length"));
+
   object_factory_parameters.string_printable = cmd.isset("string-printable");
   if(cmd.isset("java-max-vla-length"))
     max_user_array_length=std::stoi(cmd.get_value("java-max-vla-length"));

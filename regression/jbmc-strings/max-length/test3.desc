@@ -1,0 +1,6 @@
+CORE
+Test.class
+--refine-strings --verbosity 10 --string-max-length 4001 --function Test.checkMaxLength
+^EXIT=10$
+^SIGNAL=0$
+assertion.* line 25 function java::Test.checkMaxLength.* bytecode-index 26: FAILURE

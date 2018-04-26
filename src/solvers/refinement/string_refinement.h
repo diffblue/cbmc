@@ -31,8 +31,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #define DEFAULT_MAX_NB_REFINEMENT std::numeric_limits<size_t>::max()
 #define CHARACTER_FOR_UNKNOWN '?'
-// Limit the size of strings in traces to 64M chars to avoid memout
-#define MAX_CONCRETE_STRING_SIZE (1 << 26)
 
 class string_refinementt final: public bv_refinementt
 {
@@ -43,11 +41,11 @@ private:
     /// Concretize strings after solver is finished
     bool trace=false;
     bool use_counter_example=true;
+    std::size_t max_string_length;
   };
 public:
   /// string_refinementt constructor arguments
   struct infot : public bv_refinementt::infot,
-                 public string_constraint_generatort::infot,
                  public configt
   {
   };
@@ -69,6 +67,7 @@ private:
 
   const configt config_;
   std::size_t loop_bound_;
+  std::size_t max_string_length;
   string_constraint_generatort generator;
 
   // Simple constraints that have been given to the solver
