@@ -6,12 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include "typecheck.h"
+
+#include "invariant.h"
 
 bool typecheckt::typecheck_main()
 {
-  assert(message_handler);
+  PRECONDITION(message_handler);
 
   const unsigned errors_before=
     message_handler->get_message_count(messaget::M_ERROR);

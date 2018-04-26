@@ -173,14 +173,15 @@ void template_mapt::build(
   }
 
   // these should have been typechecked before
-  assert(instance.size()==template_parameters.size());
+  DATA_INVARIANT(
+    instance.size() == template_parameters.size(),
+    "template instantiation expected to match declaration");
 
   for(cpp_template_args_tct::argumentst::const_iterator
       i_it=instance.begin();
       i_it!=instance.end();
       i_it++, t_it++)
   {
-    assert(t_it!=template_parameters.end());
     set(*t_it, *i_it);
   }
 }
