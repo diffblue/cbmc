@@ -10,14 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 #include <cassert>
-#include <cctype>
-#include <cstdio>
-
-#ifdef _WIN32
-#ifndef __MINGW32__
-#define snprintf sprintf_s
-#endif
-#endif
+#include <sstream>
 
 #include <map>
 #include <set>
@@ -2258,9 +2251,9 @@ std::string expr2ct::convert_array(
           dest+=static_cast<char>(ch);
         else
         {
-          char hexbuf[10];
-          snprintf(hexbuf, sizeof(hexbuf), "\\x%x", ch);
-          dest+=hexbuf;
+          std::ostringstream oss;
+          oss << "\\x" << std::hex << ch;
+          dest += oss.str();
           last_was_hex=true;
         }
       }
