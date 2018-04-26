@@ -12,8 +12,7 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 #ifndef CPROVER_XMLLANG_GRAPHML_H
 #define CPROVER_XMLLANG_GRAPHML_H
 
-#include <istream>
-#include <ostream>
+#include <iosfwd>
 #include <string>
 
 #include <util/irep.h>

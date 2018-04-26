@@ -15,7 +15,7 @@ Date: March 2016
 #define CPROVER_CBMC_SYMEX_COVERAGE_H
 
 #include <string>
-#include <ostream>
+#include <iosfwd>
 #include <map>
 
 #include <goto-programs/goto_program.h>

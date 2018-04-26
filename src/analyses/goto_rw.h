@@ -13,7 +13,7 @@ Date: April 2010
 #define CPROVER_ANALYSES_GOTO_RW_H
 
 #include <map>
-#include <ostream>
+#include <iosfwd>
 #include <limits>
 #include <memory> // unique_ptr
 

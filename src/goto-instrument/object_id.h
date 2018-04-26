@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_INSTRUMENT_OBJECT_ID_H
 
 #include <set>
-#include <ostream>
+#include <iosfwd>
 
 #include <util/std_expr.h>
 #include <util/std_code.h>

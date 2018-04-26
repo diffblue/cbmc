@@ -10,7 +10,7 @@ Author: Daniel Poetzl
 #ifndef CPROVER_UTIL_STRING_UTILS_H
 #define CPROVER_UTIL_STRING_UTILS_H
 
-#include <ostream>
+#include <iosfwd>
 #include <string>
 #include <vector>
 
