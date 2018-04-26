@@ -55,17 +55,17 @@ bool languaget::from_type(
 
 json_objectt languaget::json(const exprt &expr, const namespacet &ns)
 {
-  return ::json(expr, ns, ID_unknown);
+  return json_exprt()(expr, ns);
 }
 
 json_objectt languaget::json(const typet &type, const namespacet &ns)
 {
-  return ::json(type, ns, ID_unknown);
+  return json_exprt()(type, ns);
 }
 
 json_objectt languaget::json(const source_locationt &source_location)
 {
-  return ::json(source_location);
+  return json_exprt()(source_location);
 }
 
 bool languaget::type_to_name(

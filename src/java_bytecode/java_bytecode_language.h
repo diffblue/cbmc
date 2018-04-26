@@ -127,6 +127,12 @@ public:
     exprt &expr,
     const namespacet &ns) override;
 
+  json_objectt json(const exprt &, const namespacet &) override;
+
+  json_objectt json(const typet &, const namespacet &) override;
+
+  json_objectt json(const source_locationt &) override;
+
   std::unique_ptr<languaget> new_language() override
   { return util_make_unique<java_bytecode_languaget>(); }
 

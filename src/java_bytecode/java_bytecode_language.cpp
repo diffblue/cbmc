@@ -34,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_static_initializers.h"
 #include "java_utils.h"
 #include <java_bytecode/ci_lazy_methods.h>
+#include "java_json_expr.h"
 
 #include "expr2java.h"
 
@@ -1085,6 +1086,24 @@ bool java_bytecode_languaget::to_expr(
   #endif
 
   return true; // fail for now
+}
+
+json_objectt
+java_bytecode_languaget::json(const exprt &expr, const namespacet &ns)
+{
+  return java_json_exprt()(expr, ns);
+}
+
+json_objectt
+java_bytecode_languaget::json(const typet &type, const namespacet &ns)
+{
+  return java_json_exprt()(type, ns);
+}
+
+json_objectt
+java_bytecode_languaget::json(const source_locationt &source_location)
+{
+  return java_json_exprt()(source_location);
 }
 
 java_bytecode_languaget::~java_bytecode_languaget()

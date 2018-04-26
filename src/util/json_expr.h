@@ -18,18 +18,21 @@ Author: Peter Schrammel
 class source_locationt;
 class typet;
 class exprt;
+class constant_exprt;
 class namespacet;
 
-json_objectt json(
-  const exprt &,
-  const namespacet &,
-  const irep_idt &mode);
+class json_exprt
+{
+public:
+  virtual json_objectt operator()(const exprt &, const namespacet &);
 
-json_objectt json(
-  const typet &,
-  const namespacet &,
-  const irep_idt &mode);
+  virtual json_objectt operator()(const typet &, const namespacet &);
 
-json_objectt json(const source_locationt &);
+  virtual json_objectt operator()(const source_locationt &);
+
+protected:
+  virtual std::string from_constant(const namespacet &, const constant_exprt &);
+  virtual std::string from_type(const namespacet &, const typet &);
+};
 
 #endif // CPROVER_UTIL_JSON_EXPR_H

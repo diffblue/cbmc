@@ -287,7 +287,10 @@ void ui_message_handlert::json_ui_msg(
 
   if(location.is_not_nil() &&
      !location.get_file().empty())
-    result["sourceLocation"] = json(location);
+  {
+    // Note: this output is not language-specific
+    result["sourceLocation"] = json_exprt()(location);
+  }
 
   result["messageType"] = json_stringt(type);
   result["messageText"] = json_stringt(msg1);

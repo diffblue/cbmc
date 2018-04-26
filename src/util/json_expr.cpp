@@ -21,11 +21,13 @@ Author: Peter Schrammel
 #include "config.h"
 #include "identifier.h"
 #include "invariant.h"
-
-#include <langapi/mode.h>
-#include <langapi/language.h>
+#include "format.h"
+#include "format_type.h"
+#include "format_expr.h"
+#include "format_constant.h"
 
 #include <memory>
+#include <sstream>
 
 static exprt simplify_json_expr(
   const exprt &src,
@@ -80,7 +82,7 @@ static exprt simplify_json_expr(
   return src;
 }
 
-json_objectt json(const source_locationt &location)
+json_objectt json_exprt::operator()(const source_locationt &location)
 {
   json_objectt result;
 
@@ -100,27 +102,17 @@ json_objectt json(const source_locationt &location)
   if(!location.get_function().empty())
     result["function"]=json_stringt(id2string(location.get_function()));
 
-  if(!location.get_java_bytecode_index().empty())
-    result["bytecodeIndex"]=
-      json_stringt(id2string(location.get_java_bytecode_index()));
-
   return result;
 }
 
 /// Output a CBMC type in json.
-/// The `mode` argument is used to correctly report types.
 /// \param type: a type
 /// \param ns: a namespace
-/// \param mode: language in which the code was written; for now ID_C and
-///   ID_java are supported
 /// \return a json object
-json_objectt json(
-  const typet &type,
-  const namespacet &ns,
-  const irep_idt &mode)
+json_objectt json_exprt::operator()(const typet &type, const namespacet &ns)
 {
   if(type.id()==ID_symbol)
-    return json(ns.follow(type), ns, mode);
+    return (*this)(ns.follow(type), ns);
 
   json_objectt result;
 
@@ -156,7 +148,7 @@ json_objectt json(
   else if(type.id()==ID_c_enum_tag)
   {
     // we return the base type
-    return json(ns.follow_tag(to_c_enum_tag_type(type)).subtype(), ns, mode);
+    return (*this)(ns.follow_tag(to_c_enum_tag_type(type)).subtype(), ns);
   }
   else if(type.id()==ID_fixedbv)
   {
@@ -167,7 +159,7 @@ json_objectt json(
   else if(type.id()==ID_pointer)
   {
     result["name"]=json_stringt("pointer");
-    result["subtype"]=json(type.subtype(), ns, mode);
+    result["subtype"] = (*this)(type.subtype(), ns);
   }
   else if(type.id()==ID_bool)
   {
@@ -176,13 +168,13 @@ json_objectt json(
   else if(type.id()==ID_array)
   {
     result["name"]=json_stringt("array");
-    result["subtype"]=json(type.subtype(), ns, mode);
+    result["subtype"] = (*this)(type.subtype(), ns);
   }
   else if(type.id()==ID_vector)
   {
     result["name"]=json_stringt("vector");
-    result["subtype"]=json(type.subtype(), ns, mode);
-    result["size"]=json(to_vector_type(type).size(), ns, mode);
+    result["subtype"] = (*this)(type.subtype(), ns);
+    result["size"] = (*this)(to_vector_type(type).size(), ns);
   }
   else if(type.id()==ID_struct)
   {
@@ -194,7 +186,7 @@ json_objectt json(
     {
       json_objectt &e=members.push_back().make_object();
       e["name"]=json_stringt(id2string(component.get_name()));
-      e["type"]=json(component.type(), ns, mode);
+      e["type"] = (*this)(component.type(), ns);
     }
   }
   else if(type.id()==ID_union)
@@ -207,7 +199,7 @@ json_objectt json(
     {
       json_objectt &e=members.push_back().make_object();
       e["name"]=json_stringt(id2string(component.get_name()));
-      e["type"]=json(component.type(), ns, mode);
+      e["type"] = (*this)(component.type(), ns);
     }
   }
   else
@@ -216,17 +208,24 @@ json_objectt json(
   return result;
 }
 
+std::string
+json_exprt::from_constant(const namespacet &ns, const constant_exprt &expr)
+{
+  return format_constantt()(expr);
+}
+
+std::string json_exprt::from_type(const namespacet &ns, const typet &type)
+{
+  std::stringstream ss;
+  ss << format(ns.follow(type));
+  return ss.str();
+}
+
 /// Output a CBMC expression in json.
-/// The mode is used to correctly report types.
 /// \param expr: an expression
 /// \param ns: a namespace
-/// \param mode: language in which the code was written; for now ID_C and
-///   ID_java are supported
 /// \return a json object
-json_objectt json(
-  const exprt &expr,
-  const namespacet &ns,
-  const irep_idt &mode)
+json_objectt json_exprt::operator()(const exprt &expr, const namespacet &ns)
 {
   json_objectt result;
 
@@ -234,28 +233,14 @@ json_objectt json(
 
   if(expr.id()==ID_constant)
   {
-    std::unique_ptr<languaget> lang;
-    if(mode==ID_unknown)
-      lang=std::unique_ptr<languaget>(get_default_language());
-    else
-    {
-      lang=std::unique_ptr<languaget>(get_language_from_mode(mode));
-      if(!lang)
-        lang=std::unique_ptr<languaget>(get_default_language());
-    }
-
     const typet &underlying_type=
       type.id()==ID_c_bit_field?type.subtype():
       type;
 
-    std::string type_string;
-    bool error=lang->from_type(underlying_type, type_string, ns);
-    CHECK_RETURN(!error);
-
-    std::string value_string;
-    lang->from_expr(expr, value_string, ns);
-
+    std::string type_string = from_type(ns, underlying_type);
     const constant_exprt &constant_expr=to_constant_expr(expr);
+    std::string value_string = from_constant(ns, constant_expr);
+
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv ||
        type.id()==ID_c_bit_field)
@@ -281,7 +266,7 @@ json_objectt json(
       constant_exprt tmp;
       tmp.type()=ns.follow_tag(to_c_enum_tag_type(type));
       tmp.set_value(to_constant_expr(expr).get_value());
-      return json(tmp, ns, mode);
+      result = (*this)(tmp, ns);
     }
     else if(type.id()==ID_bv)
     {
@@ -359,7 +344,7 @@ json_objectt json(
     {
       json_objectt &e=elements.push_back().make_object();
       e["index"]=json_numbert(std::to_string(index));
-      e["value"]=json(*it, ns, mode);
+      e["value"] = (*this)(*it, ns);
       index++;
     }
   }
@@ -380,7 +365,7 @@ json_objectt json(
       for(std::size_t m=0; m<expr.operands().size(); m++)
       {
         json_objectt &e=members.push_back().make_object();
-        e["value"]=json(expr.operands()[m], ns, mode);
+        e["value"] = (*this)(expr.operands()[m], ns);
         e["name"]=json_stringt(id2string(components[m].get_name()));
       }
     }
@@ -391,7 +376,7 @@ json_objectt json(
 
     const union_exprt &union_expr=to_union_expr(expr);
     json_objectt &e=result["member"].make_object();
-    e["value"]=json(union_expr.op(), ns, mode);
+    e["value"] = (*this)(union_expr.op(), ns);
     e["name"]=json_stringt(id2string(union_expr.get_component_name()));
   }
   else
