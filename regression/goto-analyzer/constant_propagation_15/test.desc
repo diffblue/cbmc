@@ -1,8 +1,8 @@
-FUTURE
+CORE
 main.c
 --constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 9 function main, assertion a\[(\(signed( long)? long int\))?0\] == 2: FAILURE$
+^\[main.assertion.1\] line 9 assertion a\[(\(signed( long)? long int\))?0\] == 2: FAILURE \(if reachable\)$
 --
 ^warning: ignoring

@@ -47,7 +47,7 @@ void constant_propagator_domaint::assign_rec(
   exprt tmp=rhs;
   partial_evaluate(dest_values, tmp, ns);
 
-  if(tmp.is_constant())
+  if(dest_values.is_constant(tmp))
   {
     DATA_INVARIANT(
       base_type_eq(ns.lookup(s).type, tmp.type(), ns),
