@@ -71,14 +71,14 @@ public:
   {
     // This cast should be safe as java_annotationt doesn't add data to irept
     return reinterpret_cast<const std::vector<java_annotationt> &>(
-      find(ID_annotations).get_sub());
+      find(ID_C_annotations).get_sub());
   }
 
   std::vector<java_annotationt> &get_annotations()
   {
     // This cast should be safe as java_annotationt doesn't add data to irept
     return reinterpret_cast<std::vector<java_annotationt> &>(
-      add(ID_annotations).get_sub());
+      add(ID_C_annotations).get_sub());
   }
 };
 
