@@ -576,8 +576,25 @@ bool constant_propagator_domaint::replace_constants_and_simplify(
   exprt &expr,
   const namespacet &ns)
 {
-  bool did_not_change_anything = known_values.replace_const.replace(expr);
-  did_not_change_anything &= simplify(expr, ns);
+  bool did_not_change_anything = true;
+
+  // iterate constant propagation and simplification until we cannot
+  // constant-propagate any further - a prime example is pointer dereferencing,
+  // where constant propagation may have a value of the pointer, the simplifier
+  // takes care of evaluating dereferencing, and we might then have the value of
+  // the resulting symbol known to constant propagation and thus replace the
+  // dereferenced expression by a constant
+  while(!known_values.replace_const.replace(expr))
+  {
+    did_not_change_anything = false;
+    simplify(expr, ns);
+  }
+
+  // even if we haven't been able to constant-propagate anything, run the
+  // simplifier on the expression
+  if(did_not_change_anything)
+    did_not_change_anything &= simplify(expr, ns);
+
   return did_not_change_anything;
 }
 

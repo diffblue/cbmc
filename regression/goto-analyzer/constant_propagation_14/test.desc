@@ -1,9 +1,9 @@
-FUTURE
+KNOWNBUG
 main.c
 --constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 11 function main, assertion tmp_if_expr: SUCCESS$
-^\[main.assertion.2\] file main.c line 12 function main, assertion tmp_if_expr\$1: FAILURE$
+^\[main.assertion.1\] line 11 assertion tmp_if_expr: SUCCESS$
+^\[main.assertion.2\] line 12 assertion tmp_if_expr\$0: FAILURE \(if reachable\)$
 --
 ^warning: ignoring
