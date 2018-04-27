@@ -208,6 +208,9 @@ void goto_symext::symex_with_state(
   // execution, so return the names generated through symbolic execution
   // through `new_symbol_table`.
   new_symbol_table = state.symbol_table;
+  // reset the namespace back to a sane state as state.symbol_table might go out
+  // of scope
+  ns = namespacet(outer_symbol_table);
 }
 
 void goto_symext::resume_symex_from_saved_state(
