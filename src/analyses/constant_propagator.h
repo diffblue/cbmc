@@ -124,8 +124,6 @@ public:
     void set_dirty_to_top(const dirtyt &dirty, const namespacet &ns);
 
     bool is_constant(const exprt &expr) const;
-    bool is_array_constant(const exprt &expr) const;
-    bool is_constant_address_of(const exprt &expr) const;
 
     bool is_empty() const
     {

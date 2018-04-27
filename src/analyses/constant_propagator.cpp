@@ -19,6 +19,7 @@ Author: Peter Schrammel
 #include <util/arith_tools.h>
 #include <util/base_type.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/ieee_float.h>
 #include <util/simplify_expr.h>
@@ -288,48 +289,31 @@ bool constant_propagator_domaint::ai_simplify(
 
 bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
 {
-  if(expr.id()==ID_side_effect &&
-     to_side_effect_expr(expr).get_statement()==ID_nondet)
-    return false;
+  class constant_propagator_is_constantt : public is_constantt
+  {
+  public:
+    explicit constant_propagator_is_constantt(
+      const replace_symbolt &replace_const)
+      : replace_const(replace_const)
+    {
+    }
 
-  if(expr.id()==ID_side_effect &&
-     to_side_effect_expr(expr).get_statement()==ID_allocate)
-    return false;
+  protected:
+    bool is_constant(const exprt &expr) const override
+    {
+      if(expr.id() == ID_symbol)
+      {
+        return replace_const.replaces_symbol(
+          to_symbol_expr(expr).get_identifier());
+      }
 
-  if(expr.id()==ID_symbol)
-    if(!replace_const.replaces_symbol(to_symbol_expr(expr).get_identifier()))
-      return false;
+      return is_constantt::is_constant(expr);
+    }
 
-  if(expr.id()==ID_index)
-    return false;
+    const replace_symbolt &replace_const;
+  };
 
-  if(expr.id()==ID_address_of)
-    return is_constant_address_of(to_address_of_expr(expr).object());
-
-  forall_operands(it, expr)
-    if(!is_constant(*it))
-      return false;
-
-  return true;
-}
-
-bool constant_propagator_domaint::valuest::is_constant_address_of(
-  const exprt &expr) const
-{
-  if(expr.id()==ID_index)
-    return is_constant_address_of(to_index_expr(expr).array()) &&
-           is_constant(to_index_expr(expr).index());
-
-  if(expr.id()==ID_member)
-    return is_constant_address_of(to_member_expr(expr).struct_op());
-
-  if(expr.id()==ID_dereference)
-    return is_constant(to_dereference_expr(expr).pointer());
-
-  if(expr.id()==ID_string_constant)
-    return true;
-
-  return true;
+  return constant_propagator_is_constantt(replace_const)(expr);
 }
 
 /// Do not call this when iterating over replace_const.expr_map!
