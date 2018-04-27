@@ -609,12 +609,18 @@ public:
   /// in the vector of generic types.
   /// \param type The type we are looking for.
   /// \return The index of the type in the vector of generic types.
-  optionalt<size_t> generic_type_index(const reference_typet &type) const
+  optionalt<size_t>
+  generic_type_index(const java_generic_parametert &type) const
   {
-    const auto &type_pointer =
-      std::find(generic_types().begin(), generic_types().end(), type);
-    if(type_pointer != generic_types().end())
-      return type_pointer - generic_types().begin();
+    const auto &type_variable = type.type_variable();
+    const auto &generics = generic_types();
+    for(std::size_t i = 0; i < generics.size(); ++i)
+    {
+      if(
+        is_java_generic_parameter(generics[i]) &&
+        to_java_generic_parameter(generics[i]).type_variable() == type_variable)
+        return i;
+    }
     return {};
   }
 };
