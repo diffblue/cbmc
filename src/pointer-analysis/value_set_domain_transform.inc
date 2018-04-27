@@ -15,9 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 template<class VST>
 void value_set_domain_templatet<VST>::transform(
-  const namespacet &ns,
   locationt from_l,
-  locationt to_l)
+  locationt to_l,
+  ai_baset &value_set_analysis,
+  const namespacet &ns)
 {
   switch(from_l->type)
   {
@@ -27,8 +28,9 @@ void value_set_domain_templatet<VST>::transform(
 
   case END_FUNCTION:
   {
-    value_set.do_end_function(
-      static_analysis_baset::get_return_lhs(to_l), ns);
+    exprt return_lhs =
+      to_code_function_call(std::prev(to_l)->code).lhs();
+    value_set.do_end_function(return_lhs, ns);
     break;
   }
 

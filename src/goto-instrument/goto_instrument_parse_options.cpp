@@ -269,9 +269,9 @@ int goto_instrument_parse_optionst::doit()
 
       status() << "Pointer Analysis" << eom;
       namespacet ns(goto_model.symbol_table);
-      value_set_analysist value_set_analysis(ns);
-      value_set_analysis(goto_model.goto_functions);
-      show_value_sets(get_ui(), goto_model, value_set_analysis);
+      value_set_analysist value_set_analysis;
+      value_set_analysis.analyze_all_functions(goto_model);
+      show_value_sets(get_ui(), goto_model, value_set_analysis, ns);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -450,8 +450,8 @@ int goto_instrument_parse_optionst::doit()
       }
 
       status() << "Pointer Analysis" << eom;
-      value_set_analysist value_set_analysis(ns);
-      value_set_analysis(goto_model.goto_functions);
+      value_set_analysist value_set_analysis;
+      value_set_analysis.analyze_all_functions(goto_model);
 
       const symbolt &symbol=ns.lookup(ID_main);
       symbol_exprt main(symbol.name, symbol.type);
@@ -1195,8 +1195,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
 
     status() << "Pointer Analysis" << eom;
-    value_set_analysist value_set_analysis(ns);
-    value_set_analysis(goto_model.goto_functions);
+    value_set_analysist value_set_analysis;
+    value_set_analysis.analyze_all_functions(goto_model);
 
     if(cmdline.isset("remove-pointers"))
     {

@@ -199,13 +199,13 @@ SCENARIO("test_value_set_analysis",
     value_set_analysist::locationt test_function_end=
       std::prev(test_function.instructions.end());
 
-    value_set_analysist normal_analysis(ns);
-    normal_analysis(goto_model.goto_functions);
+    value_set_analysist normal_analysis;
+    normal_analysis.analyze_all_functions(goto_model);
     const auto &normal_function_end_vs=
       normal_analysis[test_function_end].value_set;
 
-    test_value_set_analysist test_analysis(ns);
-    test_analysis(goto_model.goto_functions);
+    test_value_set_analysist test_analysis;
+    test_analysis.analyze_all_functions(goto_model);
     const auto &test_function_end_vs=
       test_analysis[test_function_end].value_set;
 

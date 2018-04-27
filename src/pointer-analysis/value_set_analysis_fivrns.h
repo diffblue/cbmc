@@ -83,7 +83,8 @@ public:
   virtual void get_values(
     locationt l,
     const exprt &expr,
-    std::list<exprt> &dest)
+    std::list<exprt> &dest,
+    const namespacet &ns)
   {
     state.value_set.from_function =
       state.value_set.function_numbering.number(l->function);

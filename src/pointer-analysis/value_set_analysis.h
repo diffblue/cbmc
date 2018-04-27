@@ -12,11 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_H
 
-#define USE_DEPRECATED_STATIC_ANALYSIS_H
-#include <analyses/static_analysis.h>
-
 #include "value_set_domain.h"
 #include "value_sets.h"
+
+#include <analyses/ai.h>
 
 class xmlt;
 
@@ -28,17 +27,13 @@ void value_sets_to_xml(
 
 template<class VSDT>
 class value_set_analysis_templatet:
-  public value_setst,
-  public static_analysist<VSDT>
+  public ait<VSDT>,
+  public value_setst
 {
 public:
   typedef VSDT domaint;
-  typedef static_analysist<domaint> baset;
+  typedef ait<domaint> baset;
   typedef typename baset::locationt locationt;
-
-  explicit value_set_analysis_templatet(const namespacet &ns):baset(ns)
-  {
-  }
 
   void convert(
     const goto_programt &goto_program,
@@ -52,14 +47,50 @@ public:
       dest);
   }
 
+  virtual void initialize(const goto_programt &goto_program) override
+  {
+    baset::initialize(goto_program);
+    forall_goto_program_instructions(i_it, goto_program)
+    {
+      static_cast<domaint &>(this->get_state(i_it)).value_set.location_number =
+        i_it->location_number;
+    }
+  }
+
+  void analyze_all_functions(const goto_modelt &goto_model)
+  {
+    // Unlike operator(), which starts at __CPROVER_start and only analyses
+    // reachable code, assume all functions are externally reachable.
+    namespacet ns(goto_model.symbol_table);
+
+    baset::initialize(goto_model.goto_functions);
+
+    forall_goto_functions(it, goto_model.goto_functions)
+    {
+      if(it->second.body.instructions.empty())
+        continue;
+      const auto &start_state =
+        static_cast<const domaint &>(
+          this->find_state(it->second.body.instructions.begin()));
+      if(start_state.is_bottom())
+      {
+        this->entry_state(it->second.body);
+        ai_baset::fixedpoint(it->second.body, goto_model.goto_functions, ns);
+      }
+    }
+
+    this->finalize();
+  }
+
 public:
   // interface value_sets
   virtual void get_values(
     locationt l,
     const exprt &expr,
-    value_setst::valuest &dest)
+    value_setst::valuest &dest,
+    const namespacet &ns) override
   {
-    (*this)[l].value_set.get_value_set(expr, dest, baset::ns);
+    (*this)[l].value_set.get_value_set(expr, dest, ns);
   }
 };
 
