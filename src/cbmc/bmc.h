@@ -100,9 +100,6 @@ public:
   safety_checkert::resultt execute(abstract_goto_modelt &);
   virtual ~bmct() { }
 
-  // additional stuff
-  std::list<exprt> bmc_constraints;
-
   void set_ui(ui_message_handlert::uit _ui) { ui=_ui; }
 
   // the safety_checkert interface
