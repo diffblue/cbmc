@@ -47,8 +47,6 @@ smt2_dect::solvert cbmc_solverst::get_smt2_solver_type() const
     s=smt2_dect::solvert::CVC3;
   else if(options.get_bool_option("cvc4"))
     s=smt2_dect::solvert::CVC4;
-  else if(options.get_bool_option("opensmt"))
-    s=smt2_dect::solvert::OPENSMT;
   else if(options.get_bool_option("yices"))
     s=smt2_dect::solvert::YICES;
   else if(options.get_bool_option("z3"))

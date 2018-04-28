@@ -37,7 +37,6 @@ std::string smt2_dect::decision_procedure_text() const
      solver==solvert::CVC3?"CVC3":
      solver==solvert::CVC4?"CVC4":
      solver==solvert::MATHSAT?"MathSAT":
-     solver==solvert::OPENSMT?"OpenSMT":
      solver==solvert::YICES?"Yices":
      solver==solvert::Z3?"Z3":
      "(unknown)");
@@ -125,14 +124,6 @@ decision_proceduret::resultt smt2_dect::dec_solve()
               " < "+smt2_temp_file.temp_out_filename
             + " > "+smt2_temp_file.temp_result_filename;
     break;
-
-  case solvert::OPENSMT:
-    command = "opensmt "
-            + smt2_temp_file.temp_out_filename
-            + " > "
-            + smt2_temp_file.temp_result_filename;
-    break;
-
 
   case solvert::YICES:
     //    command = "yices -smt -e "   // Calling convention for older versions
