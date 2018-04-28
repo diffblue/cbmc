@@ -902,10 +902,11 @@ void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   // Although we should not reach this code if rhs is null, the association
   // `pointer -> length` is added to the solver anyway, so we have to make sure
   // the length is set to something reasonable.
-  const auto rhs_length = if_exprt(
+  auto rhs_length = if_exprt(
     equal_exprt(rhs, null_pointer_exprt(to_pointer_type(rhs.type()))),
     from_integer(0, lhs.length().type()),
     get_length(deref, symbol_table));
+  rhs_length.set(ID_mode, ID_java);
 
   // Assignments
   code.add(code_assignt(lhs.length(), rhs_length), loc);

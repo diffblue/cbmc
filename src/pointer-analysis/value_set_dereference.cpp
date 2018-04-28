@@ -153,6 +153,7 @@ exprt value_set_dereferencet::dereference(
       symbol.name="symex::invalid_object"+std::to_string(invalid_counter++);
       symbol.base_name="invalid_object";
       symbol.type=type;
+      symbol.mode = language_mode;
 
       // make it a lvalue, so we can assign to it
       symbol.is_lvalue=true;
