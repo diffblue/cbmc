@@ -312,100 +312,64 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("aig", true);
 
   // SMT Options
-  bool version_set=false;
 
   if(cmdline.isset("smt1"))
   {
-    options.set_option("smt1", true);
-    options.set_option("smt2", false);
-    version_set=true;
+    error() << "--smt1 is no longer supported" << eom;
+    exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
   if(cmdline.isset("smt2"))
-  {
-    // If both are given, smt2 takes precedence
-    options.set_option("smt1", false);
     options.set_option("smt2", true);
-    version_set=true;
-  }
 
   if(cmdline.isset("fpa"))
     options.set_option("fpa", true);
-
 
   bool solver_set=false;
 
   if(cmdline.isset("boolector"))
   {
     options.set_option("boolector", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set=true;
+    options.set_option("smt2", true);
   }
 
   if(cmdline.isset("mathsat"))
   {
     options.set_option("mathsat", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set=true;
-  }
-
-  if(cmdline.isset("cvc3"))
-  {
-    options.set_option("cvc3", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt1", true), version_set=true;
+    options.set_option("smt2", true);
   }
 
   if(cmdline.isset("cvc4"))
   {
     options.set_option("cvc4", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set=true;
+    options.set_option("smt2", true);
   }
 
   if(cmdline.isset("yices"))
   {
     options.set_option("yices", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set=true;
+    options.set_option("smt2", true);
   }
 
   if(cmdline.isset("z3"))
   {
     options.set_option("z3", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set=true;
+    options.set_option("smt2", true);
   }
 
-  if(cmdline.isset("opensmt"))
-  {
-    options.set_option("opensmt", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt1", true), version_set=true;
-  }
-
-  if(version_set && !solver_set)
+  if(cmdline.isset("smt2") && !solver_set)
   {
     if(cmdline.isset("outfile"))
     {
       // outfile and no solver should give standard compliant SMT-LIB
-      options.set_option("generic", true), solver_set=true;
+      options.set_option("generic", true);
     }
     else
     {
-      if(options.get_bool_option("smt1"))
-      {
-        options.set_option("boolector", true), solver_set=true;
-      }
-      else
-      {
-        PRECONDITION(options.get_bool_option("smt2"));
-        options.set_option("z3", true), solver_set=true;
-      }
+      // the default smt2 solver
+      options.set_option("z3", true);
     }
   }
-  // Either have solver and standard version set, or neither.
-  PRECONDITION(version_set == solver_set);
 
   if(cmdline.isset("beautify"))
     options.set_option("beautify", true);

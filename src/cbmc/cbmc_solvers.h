@@ -24,7 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/sat/cnf.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/prop/aig_prop.h>
-#include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <goto-symex/symex_target_equation.h>
 
@@ -112,8 +111,6 @@ public:
       return get_bv_refinement();
     else if(options.get_bool_option("refine-strings"))
       return get_string_refinement();
-    if(options.get_bool_option("smt1"))
-      return get_smt1(get_smt1_solver_type());
     if(options.get_bool_option("smt2"))
       return get_smt2(get_smt2_solver_type());
     return get_default();
@@ -137,10 +134,8 @@ protected:
   std::unique_ptr<solvert> get_dimacs();
   std::unique_ptr<solvert> get_bv_refinement();
   std::unique_ptr<solvert> get_string_refinement();
-  std::unique_ptr<solvert> get_smt1(smt1_dect::solvert solver);
   std::unique_ptr<solvert> get_smt2(smt2_dect::solvert solver);
 
-  smt1_dect::solvert get_smt1_solver_type() const;
   smt2_dect::solvert get_smt2_solver_type() const;
 
   // consistency checks during solver creation
