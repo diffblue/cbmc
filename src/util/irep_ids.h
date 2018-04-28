@@ -36,8 +36,38 @@ Author: Reuben Thomas, reuben.thomas@me.com
 
 #ifdef USE_DSTRING
 
-#define IREP_ID_ONE(the_id) extern const dstringt ID_##the_id;
-#define IREP_ID_TWO(the_id, str) extern const dstringt ID_##the_id;
+enum class idt : unsigned
+{
+#define IREP_ID_ONE(the_id) id_##the_id,
+#define IREP_ID_TWO(the_id, str) id_##the_id,
+
+#include "irep_ids.def" // NOLINT(build/include)
+};
+
+#ifdef __GNUC__
+#define IREP_ID_ONE(the_id)                                         \
+  constexpr dstringt ID_##the_id=dstringt::make_from_table_index(   \
+      static_cast<unsigned>(idt::id_##the_id));
+#define IREP_ID_TWO(the_id, str)                                    \
+  constexpr dstringt ID_##the_id=dstringt::make_from_table_index(   \
+      static_cast<unsigned>(idt::id_##the_id));
+#else
+#define IREP_ID_ONE(the_id)                                         \
+  const dstringt ID_##the_id=dstringt::make_from_table_index(       \
+      static_cast<unsigned>(idt::id_##the_id));
+#define IREP_ID_TWO(the_id, str)                                    \
+  const const dstringt ID_##the_id=dstringt::make_from_table_index( \
+      static_cast<unsigned>(idt::id_##the_id));
+#endif
+
+template <>
+struct diagnostics_helpert<irep_idt>
+{
+  static std::string diagnostics_as_string(const irep_idt &irep_id)
+  {
+    return as_string(irep_id);
+  }
+};
 
 #else
 
