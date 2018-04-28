@@ -24,6 +24,8 @@ void __CPROVER_precondition(__CPROVER_bool assertion, const char *description);
 __CPROVER_bool __CPROVER_is_zero_string(const void *);
 __CPROVER_size_t __CPROVER_zero_string_length(const void *);
 __CPROVER_size_t __CPROVER_buffer_size(const void *);
+__CPROVER_bool __CPROVER_r_ok(const void *, __CPROVER_size_t);
+__CPROVER_bool __CPROVER_w_ok(const void *, __CPROVER_size_t);
 
 #if 0
 __CPROVER_bool __CPROVER_equal();

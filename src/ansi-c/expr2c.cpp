@@ -3515,6 +3515,12 @@ std::string expr2ct::convert_with_precedence(
       return convert_function(src, "__builtin_popcount", precedence=16);
   }
 
+  else if(src.id() == ID_r_ok)
+    return convert_function(src, "R_OK", precedence = 16);
+
+  else if(src.id() == ID_w_ok)
+    return convert_function(src, "W_OK", precedence = 16);
+
   else if(src.id()==ID_invalid_pointer)
     return convert_function(src, "INVALID-POINTER", precedence=16);
 
