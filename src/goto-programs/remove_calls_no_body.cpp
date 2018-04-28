@@ -9,8 +9,11 @@ Author: Daniel Poetzl
 /// \file
 /// Remove calls to functions without a body
 
-#include <util/invariant.h>
 #include "remove_calls_no_body.h"
+
+#include <util/invariant.h>
+
+#include "goto_functions.h"
 
 /// Remove a single call
 /// \param goto_program: goto program to modify

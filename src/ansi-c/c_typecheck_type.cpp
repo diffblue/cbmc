@@ -13,19 +13,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/invariant.h>
-#include <util/simplify_expr.h>
-#include <util/arith_tools.h>
-#include <util/std_types.h>
 #include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
 
+#include "ansi_c_convert_type.h"
 #include "c_qualifiers.h"
-#include "ansi_c_declaration.h"
 #include "padding.h"
 #include "type2name.h"
-#include "ansi_c_convert_type.h"
 
 void c_typecheck_baset::typecheck_type(typet &type)
 {

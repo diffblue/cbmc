@@ -8,21 +8,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_entry_point.h"
 
-#include <cassert>
-#include <cstdlib>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/cprover_prefix.h>
-#include <util/namespace.h>
-#include <util/prefix.h>
-#include <util/std_code.h>
-#include <util/std_expr.h>
 #include <util/string_constant.h>
-#include <util/symbol.h>
 
 #include <goto-programs/goto_functions.h>
+
 #include <linking/static_lifetime_init.h>
 
 #include "c_nondet_symbol_factory.h"
@@ -217,7 +209,7 @@ bool generate_ansi_c_start_function(
     if(init_it==symbol_table.symbols.end())
     {
       messaget message(message_handler);
-      message.error() << "failed to find " CPROVER_PREFIX "initialize symbol"
+      message.error() << "failed to find " INITIALIZE_FUNCTION " symbol"
                       << messaget::eom;
       return true;
     }

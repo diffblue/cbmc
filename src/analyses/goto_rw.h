@@ -12,9 +12,9 @@ Date: April 2010
 #ifndef CPROVER_ANALYSES_GOTO_RW_H
 #define CPROVER_ANALYSES_GOTO_RW_H
 
-#include <map>
-#include <ostream>
+#include <iosfwd>
 #include <limits>
+#include <map>
 #include <memory> // unique_ptr
 
 #include <util/guard.h>

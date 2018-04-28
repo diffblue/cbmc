@@ -13,13 +13,14 @@ Date: February 2016
 
 #include "code_contracts.h"
 
-#include <util/cprover_prefix.h>
 #include <util/fresh_symbol.h>
 #include <util/replace_symbol.h>
 
 #include <goto-programs/remove_skip.h>
 
 #include <analyses/local_may_alias.h>
+
+#include <linking/static_lifetime_init.h>
 
 #include "loop_utils.h"
 
@@ -385,7 +386,7 @@ void code_contractst::operator()()
     code_contracts(it->second);
 
   goto_functionst::function_mapt::iterator i_it=
-    goto_functions.function_map.find(CPROVER_PREFIX "initialize");
+    goto_functions.function_map.find(INITIALIZE_FUNCTION);
   assert(i_it!=goto_functions.function_map.end());
 
   for(const auto &contract : summarized)

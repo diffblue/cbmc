@@ -14,13 +14,9 @@ Date: November 2011
 
 #include "nondet_static.h"
 
-#include <util/namespace.h>
-#include <util/std_expr.h>
-#include <util/cprover_prefix.h>
-#include <util/prefix.h>
-
 #include <goto-programs/goto_model.h>
-#include <goto-programs/goto_functions.h>
+
+#include <linking/static_lifetime_init.h>
 
 void nondet_static(
   const namespacet &ns,
@@ -75,7 +71,7 @@ void nondet_static(
   const namespacet &ns,
   goto_functionst &goto_functions)
 {
-  nondet_static(ns, goto_functions, CPROVER_PREFIX "initialize");
+  nondet_static(ns, goto_functions, INITIALIZE_FUNCTION);
 
   // update counters etc.
   goto_functions.update();

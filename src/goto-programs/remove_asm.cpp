@@ -14,13 +14,12 @@ Date:   December 2014
 
 #include "remove_asm.h"
 
-#include <sstream>
-
 #include <util/c_types.h>
-#include <util/std_expr.h>
 #include <util/string_constant.h>
 
 #include <assembler/assembler_parser.h>
+
+#include "goto_model.h"
 
 class remove_asmt
 {

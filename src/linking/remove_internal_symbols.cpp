@@ -11,12 +11,13 @@ Author: Daniel Kroening
 
 #include "remove_internal_symbols.h"
 
-#include <util/symbol_table.h>
-#include <util/namespace.h>
-#include <util/find_symbols.h>
-#include <util/std_types.h>
-#include <util/cprover_prefix.h>
 #include <util/config.h>
+#include <util/find_symbols.h>
+#include <util/namespace.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
+
+#include "static_lifetime_init.h"
 
 void get_symbols_rec(
   const namespacet &ns,
@@ -84,7 +85,7 @@ void remove_internal_symbols(
   special.insert("envp'");
   special.insert("envp_size'");
   special.insert(CPROVER_PREFIX "memory");
-  special.insert(CPROVER_PREFIX "initialize");
+  special.insert(INITIALIZE_FUNCTION);
   special.insert(CPROVER_PREFIX "malloc_size");
   special.insert(CPROVER_PREFIX "deallocated");
   special.insert(CPROVER_PREFIX "dead_object");

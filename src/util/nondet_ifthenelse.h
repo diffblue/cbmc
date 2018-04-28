@@ -12,7 +12,7 @@ Author: Chris Smowton, chris@smowton.net
 #ifndef CPROVER_UTIL_NONDET_IFTHENELSE_H
 #define CPROVER_UTIL_NONDET_IFTHENELSE_H
 
-#include <util/std_code.h>
+#include "std_code.h"
 
 class symbol_tablet;
 class source_locationt;

@@ -11,6 +11,8 @@ Author: Peter Schrammel
 
 #include "syntactic_diff.h"
 
+#include <goto-programs/goto_model.h>
+
 bool syntactic_difft::operator()()
 {
   forall_goto_functions(it, goto_model1.goto_functions)

@@ -11,13 +11,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "type2name.h"
 
-#include <util/std_types.h>
 #include <util/arith_tools.h>
-#include <util/namespace.h>
-#include <util/symbol.h>
-#include <util/symbol_table.h>
-#include <util/pointer_offset_size.h>
 #include <util/invariant.h>
+#include <util/namespace.h>
+#include <util/pointer_offset_size.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
 
 typedef std::unordered_map<irep_idt, std::pair<size_t, bool>> symbol_numbert;
 

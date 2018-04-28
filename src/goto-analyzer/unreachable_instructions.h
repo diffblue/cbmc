@@ -14,14 +14,12 @@ Date: April 2016
 #ifndef CPROVER_GOTO_ANALYZER_UNREACHABLE_INSTRUCTIONS_H
 #define CPROVER_GOTO_ANALYZER_UNREACHABLE_INSTRUCTIONS_H
 
-#include <ostream>
+#include <iosfwd>
 
-#include <analyses/ai.h>
-
-#include <util/options.h>
-#include <util/message.h>
-
+class ai_baset;
 class goto_modelt;
+class message_handlert;
+class optionst;
 
 void unreachable_instructions(
   const goto_modelt &,

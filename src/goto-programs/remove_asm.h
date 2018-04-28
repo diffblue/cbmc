@@ -15,7 +15,10 @@ Date:   December 2014
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_ASM_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_ASM_H
 
-#include <goto-programs/goto_model.h>
+#include <goto-programs/goto_functions.h>
+
+class goto_modelt;
+class symbol_tablet;
 
 void remove_asm(
   goto_functionst::goto_functiont &goto_function,

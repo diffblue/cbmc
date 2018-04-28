@@ -6,30 +6,24 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 
 \*******************************************************************/
 
-#include <json/json_parser.h>
+#include "linker_script_merge.h"
 
 #include <algorithm>
-#include <cstdio>
-#include <iostream>
-#include <iterator>
 #include <fstream>
+#include <iterator>
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/expr.h>
-#include <util/get_base_name.h>
 #include <util/magic.h>
-#include <util/prefix.h>
 #include <util/run.h>
-#include <util/string2int.h>
 #include <util/tempfile.h>
 
+#include <json/json_parser.h>
+
+#include <linking/static_lifetime_init.h>
 #include <linking/zero_initializer.h>
 
 #include <goto-programs/read_goto_binary.h>
-
-#include "compile.h"
-#include "linker_script_merge.h"
 
 int linker_script_merget::add_linker_script_definitions()
 {
@@ -78,10 +72,10 @@ int linker_script_merget::add_linker_script_definitions()
 
   fail=1;
   linker_valuest linker_values;
-  const auto &pair=original_gf.function_map.find(CPROVER_PREFIX "initialize");
+  const auto &pair=original_gf.function_map.find(INITIALIZE_FUNCTION);
   if(pair==original_gf.function_map.end())
   {
-    error() << "No " << CPROVER_PREFIX "initialize found in goto_functions"
+    error() << "No " << INITIALIZE_FUNCTION << " found in goto_functions"
             << eom;
     return fail;
   }
@@ -93,7 +87,7 @@ int linker_script_merget::add_linker_script_definitions()
       linker_values);
   if(fail!=0)
   {
-    error() << "Could not add linkerscript defs to __CPROVER_initialize" << eom;
+    error() << "Could not add linkerscript defs to " INITIALIZE_FUNCTION << eom;
     return fail;
   }
 

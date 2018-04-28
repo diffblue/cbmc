@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "base_type.h"
 #include "bv_arithmetic.h"
 #include "config.h"
-#include "expr.h"
 #include "expr_util.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
@@ -24,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational.h"
 #include "rational_tools.h"
 #include "std_expr.h"
-#include "string2int.h"
 
 bool simplify_exprt::simplify_bswap(bswap_exprt &expr)
 {

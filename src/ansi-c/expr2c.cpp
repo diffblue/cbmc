@@ -10,33 +10,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 #include <cassert>
-#include <cctype>
-#include <cstdio>
-
-#ifdef _WIN32
-#ifndef __MINGW32__
-#define snprintf sprintf_s
-#endif
-#endif
+#include <sstream>
 
 #include <map>
-#include <set>
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/std_types.h>
-#include <util/std_code.h>
-#include <util/ieee_float.h>
-#include <util/fixedbv.h>
-#include <util/prefix.h>
-#include <util/lispirep.h>
-#include <util/lispexpr.h>
-#include <util/namespace.h>
-#include <util/symbol.h>
-#include <util/suffix.h>
 #include <util/find_symbols.h>
+#include <util/fixedbv.h>
+#include <util/lispexpr.h>
+#include <util/lispirep.h>
+#include <util/namespace.h>
 #include <util/pointer_offset_size.h>
+#include <util/suffix.h>
+#include <util/symbol.h>
 
 #include "c_misc.h"
 #include "c_qualifiers.h"
@@ -2258,9 +2246,9 @@ std::string expr2ct::convert_array(
           dest+=static_cast<char>(ch);
         else
         {
-          char hexbuf[10];
-          snprintf(hexbuf, sizeof(hexbuf), "\\x%x", ch);
-          dest+=hexbuf;
+          std::ostringstream oss;
+          oss << "\\x" << std::hex << ch;
+          dest += oss.str();
           last_was_hex=true;
         }
       }

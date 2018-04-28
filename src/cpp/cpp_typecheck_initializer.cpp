@@ -14,11 +14,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
-#include <util/std_expr.h>
 
 #include <linking/zero_initializer.h>
-
-#include "cpp_util.h"
 
 /// Initialize an object with a value
 void cpp_typecheckt::convert_initializer(symbolt &symbol)

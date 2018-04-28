@@ -8,14 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_pointers.h"
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/arith_tools.h>
-#include <util/invariant.h>
-#include <util/prefix.h>
-#include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
-#include <util/threeval.h>
 
 literalt bv_pointerst::convert_rest(const exprt &expr)
 {

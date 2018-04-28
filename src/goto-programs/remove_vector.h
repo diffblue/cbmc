@@ -14,7 +14,9 @@ Date:   September 2014
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_VECTOR_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_VECTOR_H
 
-#include <goto-programs/goto_model.h>
+class goto_functionst;
+class goto_modelt;
+class symbol_tablet;
 
 void remove_vector(symbol_tablet &, goto_functionst &);
 

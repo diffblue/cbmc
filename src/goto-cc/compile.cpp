@@ -15,31 +15,27 @@ Date: June 2006
 
 #include <cstring>
 #include <fstream>
-#include <sstream>
 #include <iostream>
-#include <cstdlib>
-#include <algorithm>
 
-#include <util/config.h>
-#include <util/tempdir.h>
-#include <util/base_type.h>
 #include <util/cmdline.h>
+#include <util/config.h>
 #include <util/file_util.h>
-#include <util/unicode.h>
-#include <util/irep_serialization.h>
-#include <util/suffix.h>
 #include <util/get_base_name.h>
+#include <util/suffix.h>
+#include <util/tempdir.h>
+#include <util/unicode.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/ansi_c_entry_point.h>
 
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/goto_inline.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
 
 #include <langapi/mode.h>
+
+#include <linking/static_lifetime_init.h>
 
 #include <cbmc/version.h>
 
@@ -372,7 +368,7 @@ bool compilet::link()
     // new symbols may have been added to a previously linked file
     // make sure a new entry point is created that contains all
     // static initializers
-    compiled_functions.function_map.erase("__CPROVER_initialize");
+    compiled_functions.function_map.erase(INITIALIZE_FUNCTION);
 
     symbol_table.remove(goto_functionst::entry_point());
     compiled_functions.function_map.erase(goto_functionst::entry_point());

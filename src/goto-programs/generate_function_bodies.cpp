@@ -8,17 +8,10 @@ Author: Diffblue Ltd.
 
 #include "generate_function_bodies.h"
 
-#include <memory>
-#include <sstream>
-#include <utility>
-#include <functional>
-
+#include <util/arith_tools.h>
 #include <util/format_expr.h>
 #include <util/make_unique.h>
-#include <util/message.h>
 #include <util/string_utils.h>
-#include <util/pointer_offset_size.h>
-#include <util/arith_tools.h>
 
 void generate_function_bodiest::generate_function_body(
   goto_functiont &function,

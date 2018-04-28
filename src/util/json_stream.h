@@ -9,8 +9,8 @@ Author: Peter Schrammel
 #ifndef CPROVER_UTIL_JSON_STREAM_H
 #define CPROVER_UTIL_JSON_STREAM_H
 
+#include <iosfwd>
 #include <memory>
-#include <ostream>
 
 #include "json.h"
 #include "invariant.h"

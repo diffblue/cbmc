@@ -12,9 +12,14 @@ Author: CM Wintersteiger
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_UNUSED_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_UNUSED_FUNCTIONS_H
 
-#include <util/message.h>
+#include <set>
 
-#include <goto-programs/goto_model.h>
+#include <util/irep.h>
+
+class goto_functionst;
+class goto_modelt;
+class message_handlert;
+class symbol_tablet;
 
 void remove_unused_functions(
   goto_functionst &,

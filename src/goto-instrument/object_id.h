@@ -12,8 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_OBJECT_ID_H
 #define CPROVER_GOTO_INSTRUMENT_OBJECT_ID_H
 
+#include <iosfwd>
 #include <set>
-#include <ostream>
 
 #include <util/std_expr.h>
 #include <util/std_code.h>

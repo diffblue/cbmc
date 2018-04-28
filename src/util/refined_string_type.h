@@ -19,11 +19,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_UTIL_REFINED_STRING_TYPE_H
 #define CPROVER_UTIL_REFINED_STRING_TYPE_H
 
-#include <util/std_types.h>
-#include <util/std_expr.h>
-#include <util/arith_tools.h>
-#include <util/cprover_prefix.h>
-#include <util/expr_util.h>
+#include "cprover_prefix.h"
+#include "std_types.h"
 
 // Internal type used for string refinement
 class refined_string_typet: public struct_typet

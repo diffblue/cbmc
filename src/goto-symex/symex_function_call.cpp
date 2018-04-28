@@ -11,19 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-#include <sstream>
-
-#include <util/cprover_prefix.h>
-#include <util/invariant.h>
-#include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/base_type.h>
-#include <util/std_expr.h>
-#include <util/symbol_table.h>
-
+#include <util/byte_operators.h>
 #include <util/c_types.h>
-
-#include <analyses/dirty.h>
+#include <util/invariant.h>
 
 bool goto_symext::get_unwind_recursion(
   const irep_idt &identifier,

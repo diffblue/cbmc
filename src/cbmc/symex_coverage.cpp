@@ -13,21 +13,20 @@ Date: March 2016
 
 #include "symex_coverage.h"
 
-#include <ctime>
 #include <chrono>
-#include <iostream>
+#include <ctime>
 #include <fstream>
-#include <sstream>
+#include <iostream>
 
-#include <util/xml.h>
 #include <util/string2int.h>
-#include <util/cprover_prefix.h>
-#include <util/prefix.h>
+#include <util/xml.h>
 
 #include <langapi/language_util.h>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_returns.h>
+
+#include <linking/static_lifetime_init.h>
 
 class coverage_recordt
 {
@@ -313,7 +312,7 @@ void symex_coveraget::compute_overall_coverage(
   {
     if(!gf_it->second.body_available() ||
        gf_it->first==goto_functions.entry_point() ||
-       gf_it->first==CPROVER_PREFIX "initialize")
+       gf_it->first == INITIALIZE_FUNCTION)
       continue;
 
     goto_program_coverage_recordt func_cov(ns, gf_it, coverage);

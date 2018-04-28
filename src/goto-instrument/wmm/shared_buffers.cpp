@@ -7,10 +7,13 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "shared_buffers.h"
-#include "fence.h"
-#include "../rw_set.h"
 
 #include <util/c_types.h>
+
+#include <linking/static_lifetime_init.h>
+
+#include "../rw_set.h"
+#include "fence.h"
 
 /// returns a unique id (for fresh variables)
 std::string shared_bufferst::unique(void)
@@ -1054,7 +1057,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
 {
   shared_buffers.message.debug() << "visit function "<< function
                                  << messaget::eom;
-  if(function==CPROVER_PREFIX "initialize")
+  if(function == INITIALIZE_FUNCTION)
     return;
 
   namespacet ns(symbol_table);

@@ -12,7 +12,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #ifndef CPROVER_UTIL_JSON_IREP_H
 #define CPROVER_UTIL_JSON_IREP_H
 
-#include <util/irep.h>
+#include "irep.h"
 
 class jsont;
 class json_objectt;

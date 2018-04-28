@@ -13,9 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "byte_operators.h"
 #include "c_types.h"
-#include "namespace.h"
 #include "pointer_offset_size.h"
-#include "std_types.h"
 
 bool constant_exprt::value_is_zero_string() const
 {

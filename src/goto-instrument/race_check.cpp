@@ -13,17 +13,9 @@ Date: February 2006
 
 #include "race_check.h"
 
-#include <util/std_expr.h>
-#include <util/guard.h>
-#include <util/symbol_table.h>
-#include <util/prefix.h>
-#include <util/cprover_prefix.h>
-
-#include <goto-programs/goto_program.h>
-#include <goto-programs/goto_functions.h>
-
-#include <pointer-analysis/value_sets.h>
 #include <goto-programs/remove_skip.h>
+
+#include <linking/static_lifetime_init.h>
 
 #include "rw_set.h"
 
@@ -300,7 +292,7 @@ void race_check(
 
   Forall_goto_functions(f_it, goto_model.goto_functions)
     if(f_it->first!=goto_functionst::entry_point() &&
-       f_it->first!=CPROVER_PREFIX "initialize")
+       f_it->first != INITIALIZE_FUNCTION)
       race_check(
         value_sets,
         goto_model.symbol_table,

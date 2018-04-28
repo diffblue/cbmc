@@ -12,7 +12,9 @@ Author: Daniel Poetzl
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_CALLS_NO_BODY_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_CALLS_NO_BODY_H
 
-#include "goto_functions.h"
+#include "goto_program.h"
+
+class goto_functionst;
 
 class remove_calls_no_bodyt
 {

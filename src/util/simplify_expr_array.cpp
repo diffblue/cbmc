@@ -8,14 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "simplify_expr_class.h"
 
-#include <cassert>
-
-#include "expr.h"
-#include "namespace.h"
-#include "std_expr.h"
-#include "replace_expr.h"
 #include "arith_tools.h"
+#include "namespace.h"
 #include "pointer_offset_size.h"
+#include "replace_expr.h"
+#include "std_expr.h"
 
 bool simplify_exprt::simplify_index(exprt &expr)
 {

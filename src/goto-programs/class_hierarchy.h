@@ -19,7 +19,9 @@ Date: April 2016
 #include <unordered_map>
 
 #include <util/graph.h>
-#include <util/namespace.h>
+#include <util/irep.h>
+
+class symbol_tablet;
 
 class class_hierarchyt
 {

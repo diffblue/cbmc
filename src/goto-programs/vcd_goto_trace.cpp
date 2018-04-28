@@ -13,13 +13,11 @@ Date: June 2011
 
 #include "vcd_goto_trace.h"
 
-#include <ctime>
-#include <ostream>
 #include <cassert>
+#include <ctime>
 
-#include <util/arith_tools.h>
-#include <util/pointer_offset_size.h>
 #include <util/numbering.h>
+#include <util/pointer_offset_size.h>
 
 std::string as_vcd_binary(
   const exprt &expr,
@@ -63,17 +61,7 @@ std::string as_vcd_binary(
 
   // build "xxx"
 
-  mp_integer width;
-
-  if(type.id()==ID_unsignedbv ||
-     type.id()==ID_signedbv ||
-     type.id()==ID_floatbv ||
-     type.id()==ID_fixedbv ||
-     type.id()==ID_pointer ||
-     type.id()==ID_bv)
-    width=string2integer(type.get_string(ID_width));
-  else
-    width=pointer_offset_size(type, ns)*8;
+  const mp_integer width = pointer_offset_bits(type, ns);
 
   if(width>=0)
     return std::string(integer2size_t(width), 'x');
@@ -106,12 +94,7 @@ void output_vcd(
 
       const auto number=n.number(identifier);
 
-      mp_integer width;
-
-      if(type.id()==ID_bool)
-        width=1;
-      else
-        width=pointer_offset_bits(type, ns);
+      const mp_integer width = pointer_offset_bits(type, ns);
 
       if(width>=1)
         out << "$var reg " << width << " V" << number << " "
