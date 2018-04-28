@@ -118,14 +118,6 @@ void bmct::do_conversion()
   // convert SSA
   equation.convert(prop_conv);
 
-  // the 'extra constraints'
-  if(!bmc_constraints.empty())
-  {
-    status() << "converting constraints" << eom;
-
-    for(const auto &constraint : bmc_constraints)
-      prop_conv.set_to_true(constraint);
-  }
   // hook for cegis to freeze synthesis program vars
   freeze_program_variables();
 }
