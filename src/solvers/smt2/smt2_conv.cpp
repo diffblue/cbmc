@@ -78,7 +78,6 @@ void smt2_convt::write_header()
   case solvert::CVC3: out << "; Generated for CVC 3\n"; break;
   case solvert::CVC4: out << "; Generated for CVC 4\n"; break;
   case solvert::MATHSAT: out << "; Generated for MathSAT\n"; break;
-  case solvert::OPENSMT: out << "; Generated for OPENSMT\n"; break;
   case solvert::YICES: out << "; Generated for Yices\n"; break;
   case solvert::Z3: out << "; Generated for Z3\n"; break;
   }
