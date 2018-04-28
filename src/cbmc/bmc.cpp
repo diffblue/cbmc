@@ -374,9 +374,9 @@ safety_checkert::resultt bmct::execute(
       (*memory_model)(equation);
     }
 
-  statistics() << "size of program expression: "
-               << equation.SSA_steps.size()
-               << " steps" << eom;
+    statistics() << "size of program expression: "
+                 << equation.SSA_steps.size()
+                 << " steps" << eom;
 
     slice();
 
