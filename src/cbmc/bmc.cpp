@@ -35,11 +35,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "counterexample_beautification.h"
 #include "fault_localization.h"
 
-void bmct::do_unwind_module()
-{
-  // this is a hook for hw-cbmc
-}
-
 /// Hook used by CEGIS to selectively freeze variables
 /// in the SAT solver after the SSA formula is added to the solver.
 /// Freezing variables is necessary to make use of incremental
@@ -118,9 +113,6 @@ void bmct::output_graphml(resultt result)
 
 void bmct::do_conversion()
 {
-  // convert HDL (hook for hw-cbmc)
-  do_unwind_module();
-
   status() << "converting SSA" << eom;
 
   // convert SSA

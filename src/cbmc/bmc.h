@@ -191,7 +191,6 @@ protected:
 
   // unwinding
   virtual void setup_unwind();
-  virtual void do_unwind_module();
   void do_conversion();
 
   virtual void freeze_program_variables();
