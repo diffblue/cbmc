@@ -18,13 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/options.h>
 #include <util/ui_message.h>
-
-#include <solvers/prop/prop.h>
-#include <solvers/prop/prop_conv.h>
-#include <solvers/sat/cnf.h>
-#include <solvers/sat/satcheck.h>
-#include <solvers/smt1/smt1_dec.h>
-#include <solvers/smt2/smt2_dec.h>
+#include <util/decision_procedure.h>
 
 #include <goto-programs/goto_trace.h>
 
