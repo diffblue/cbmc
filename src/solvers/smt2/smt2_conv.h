@@ -35,7 +35,6 @@ public:
     CVC3,
     CVC4,
     MATHSAT,
-    OPENSMT,
     YICES,
     Z3
   };
@@ -80,9 +79,6 @@ public:
       break;
 
     case solvert::MATHSAT:
-      break;
-
-    case solvert::OPENSMT:
       break;
 
     case solvert::YICES:
