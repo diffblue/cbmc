@@ -82,7 +82,10 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
     int index=0;
     for(const exprt &entry : expr.operands())
     {
-      map[mp_integer(index)]=environment.eval(entry, ns);
+      map.insert(
+        mp_integer(index),
+        environment.eval(entry, ns),
+        tvt(false));
       ++index;
     }
     clear_top();
@@ -329,20 +332,21 @@ sharing_ptrt<array_abstract_objectt>
     {
       // We were able to evaluate the index to a value, which we
       // assume is in bounds...
-      abstract_object_pointert starting_value;
       shared_array_mapt::const_find_type old_value = map.find(index_value);
 
       if(!old_value.second)
       {
-        starting_value=get_top_entry(environment, ns);
+        result->map.insert(
+          index_value,
+          environment.write(
+            get_top_entry(environment, ns), value, stack, ns, merging_write),
+          tvt(false));
       }
       else
       {
-        starting_value=old_value.first;
+        result->map.find(index_value, tvt(true)).first =
+          environment.write(old_value.first, value, stack, ns, merging_write);
       }
-
-      result->map[index_value] =
-        environment.write(starting_value, value, stack, ns, merging_write);
 
       result->clear_top();
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
@@ -357,9 +361,9 @@ sharing_ptrt<array_abstract_objectt>
       for(const auto &starting_value : view)
       {
         // Merging write since we don't know which index we are writing to
-        result->map[starting_value.first]=
-          environment.write(
-            starting_value.second, value, stack, ns, true);
+        result->map.find(starting_value.first, tvt(true)).first =
+          environment.write(starting_value.second, value, stack, ns, true);
+
         result->clear_top();
       }
 
@@ -383,7 +387,7 @@ sharing_ptrt<array_abstract_objectt>
         }
 
         INVARIANT(!result->map.empty(), "If not top, map cannot be empty");
-     
+
         shared_array_mapt::const_find_type old_value=
           result->map.find(index_value);
 
@@ -395,7 +399,7 @@ sharing_ptrt<array_abstract_objectt>
 
         bool dummy;
 
-        result->map[index_value] = 
+        result->map.find(index_value, tvt(true)).first =
           abstract_objectt::merge(old_value.first, value, dummy);
 
         DATA_INVARIANT(result->verify(), "Structural invariants maintained");
@@ -403,7 +407,19 @@ sharing_ptrt<array_abstract_objectt>
       }
       else
       {
-        result->map[index_value] = value;
+        shared_array_mapt::find_type old_value=
+          result->map.find(index_value);
+        if(old_value.second)
+        {
+          if(value != old_value.first)
+          {
+            old_value.first = value;
+          }
+        }
+        else
+        {
+          result->map.insert(index_value, value, tvt(false));
+        }
         result->clear_top();
         DATA_INVARIANT(result->verify(), "Structural invariants maintained");
         return result;
@@ -502,9 +518,9 @@ constant_array_abstract_objectt::visit_sub_elements(
     auto newval = visitor.visit(item.second);
     if(newval != item.second)
     {
-      result->map[item.first]=newval; 
+      result->map.find(item.first, tvt(true)).first = newval;
       modified = true;
-    } 
+    }
   }
 
   if(modified)
