@@ -67,7 +67,7 @@ public:
 
     forall_goto_functions(it, goto_model.goto_functions)
     {
-      if(it->second.body.instructions.empty())
+      if(!it->second.body_available())
         continue;
       const auto &start_state =
         static_cast<const domaint &>(

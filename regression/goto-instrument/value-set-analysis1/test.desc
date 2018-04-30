@@ -1,0 +1,9 @@
+CORE
+main.c
+--show-value-sets
+^EXIT=0$
+^SIGNAL=0$
+f::1::w = \{ <z, 0, signed int> \}
+g::1::w = \{ <x, 0, signed int>, <z, 0, signed int> \}
+--
+^warning: ignoring
