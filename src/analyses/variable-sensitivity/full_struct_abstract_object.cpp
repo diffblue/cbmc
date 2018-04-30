@@ -228,14 +228,16 @@ sharing_ptrt<struct_abstract_objectt>
       starting_value=
         environment.abstract_object_factory(
           member_expr.type(), ns, true, false);
+      result->map.insert(
+        c,
+        environment.write(starting_value, value, stack, ns, merging_write),
+        tvt(false));
     }
     else
     {
-      starting_value=old_value.first;
+      result->map.find(c, tvt(true)).first =
+        environment.write(old_value.first, value, stack, ns, merging_write);
     }
-
-    result->map[c] =
-      environment.write(starting_value, value, stack, ns, merging_write);
 
     result->clear_top();
     DATA_INVARIANT(result->verify(), "Structural invariants maintained");
@@ -249,6 +251,7 @@ sharing_ptrt<struct_abstract_objectt>
 #endif
 
     const irep_idt c=member_expr.get_component_name();
+    shared_struct_mapt::const_find_type old_value=result->map.find(c);
 
     if(merging_write)
     {
@@ -260,8 +263,6 @@ sharing_ptrt<struct_abstract_objectt>
 
       INVARIANT(!result->map.empty(), "If not top, map cannot be empty");
 
-      shared_struct_mapt::const_find_type old_value=result->map.find(c);
-
       if(!old_value.second) // component is top
       {
         DATA_INVARIANT(result->verify(), "Structural invariants maintained");
@@ -270,11 +271,19 @@ sharing_ptrt<struct_abstract_objectt>
 
       bool dummy;
 
-      result->map[c] = abstract_objectt::merge(old_value.first, value, dummy);
+      result->map.find(c, tvt(true)).first =
+        abstract_objectt::merge(old_value.first, value, dummy);
     }
     else
     {
-      result->map[c] = value;
+      if(old_value.second)
+      {
+        result->map.find(c, tvt(true)).first = value;
+      }
+      else
+      {
+        result->map.insert(c, value, tvt(false));
+      }
       result->clear_top();
       INVARIANT(!result->is_bottom(), "top != bottom");
     }
@@ -456,7 +465,7 @@ abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
     auto newval = visitor.visit(item.second);
     if(newval != item.second)
     {
-      result->map[item.first] = newval;
+      result->map.find(item.first, tvt(true)).first = newval;
       modified = true;
     }
   }
