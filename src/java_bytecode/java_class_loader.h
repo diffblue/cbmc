@@ -55,7 +55,7 @@ public:
     java_class_loader_limitt &class_loader_limit,
     const irep_idt &class_name);
 
-  void set_java_cp_include_files(std::string &java_cp_include_files)
+  void set_java_cp_include_files(const std::string &java_cp_include_files)
   {
     this->java_cp_include_files = java_cp_include_files;
   }
