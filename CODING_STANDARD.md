@@ -191,8 +191,14 @@ Formatting is enforced using clang-format. For more information about this, see
   - The type is explicitly repeated on the RHS (e.g. a constructor call)
   - Adding the type will increase confusion (e.g. iterators, function pointers)
 - Avoid `assert`. If the condition is an actual invariant, use INVARIANT,
-  PRECONDITION, POSTCONDITION, CHECK_RETURN, UNREACHABLE or DATA_INVARIANT. If
-  there are possible reasons why it might fail, throw an exception.
+  PRECONDITION, POSTCONDITION, CHECK_RETURN, UNREACHABLE or DATA_INVARIANT (also
+  see the documentation of the macros in `src/util/invariant.h`). If there are
+  possible reasons why it might fail, throw an exception.
+    - Use "should" style statements for messages in invariants (e.g. "array
+      should have a non-zero size") to make both the violation and the expected
+      behavior clear. (As opposed to "no zero size arrays" where it isn't clear
+      if the zero-size array is the problem, or the lack of it).
+    - The statements should start with a lower case letter.
 - All raw pointers (such as those returned by `symbol_tablet::lookup`) are
   assumed to be non-owning, and should not be `delete`d. Raw pointers that
   point to heap-allocated memory should be private data members of an object
