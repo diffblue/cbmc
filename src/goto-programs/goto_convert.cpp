@@ -2070,6 +2070,7 @@ symbolt &goto_convertt::new_tmp_symbol(
   const source_locationt &source_location,
   const irep_idt &mode)
 {
+  PRECONDITION(!mode.empty());
   symbolt &new_symbol = get_fresh_aux_symbol(
     type,
     tmp_symbol_prefix,

@@ -952,6 +952,14 @@ static unsigned get_bytecode_type_width(const typet &ty)
   return ty.get_unsigned_int(ID_width);
 }
 
+/// Create an if-expression with mode set to Java
+static if_exprt java_if_expr(const exprt &cond, const exprt &t, const exprt &f)
+{
+  auto result = if_exprt(cond, t, f);
+  result.set(ID_mode, ID_java);
+  return result;
+}
+
 codet java_bytecode_convert_methodt::convert_instructions(
   const methodt &method,
   const code_typet &method_type,
@@ -1893,13 +1901,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
       exprt one=from_integer(1, t);
       exprt minus_one=from_integer(-1, t);
 
-      if_exprt greater=if_exprt(
+      auto greater = java_if_expr(
         binary_relation_exprt(op[0], ID_gt, op[1]),
         one,
         minus_one);
 
-      results[0]=
-        if_exprt(
+      results[0] = java_if_expr(
           binary_relation_exprt(op[0], ID_equal, op[1]),
           from_integer(0, t),
           greater);
@@ -1921,13 +1928,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
       exprt one=from_integer(1, result_type);
       exprt minus_one=from_integer(-1, result_type);
       results[0]=
-        if_exprt(
+        java_if_expr(
           or_exprt(nan_op0, nan_op1),
           nan_result,
-          if_exprt(
+          java_if_expr(
             ieee_float_equal_exprt(op[0], op[1]),
             from_integer(0, result_type),
-            if_exprt(
+            java_if_expr(
               binary_relation_exprt(op[0], ID_lt, op[1]),
               minus_one,
               one)));
