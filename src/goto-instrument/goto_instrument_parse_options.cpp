@@ -97,6 +97,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "model_argc_argv.h"
 #include "undefined_functions.h"
 #include "remove_function.h"
+#include "make_function_assume_false.h"
 #include "splice_call.h"
 
 void goto_instrument_parse_optionst::eval_verbosity()
@@ -974,6 +975,14 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       get_message_handler());
   }
 
+  if(cmdline.isset("make-function-assume-false"))
+  {
+    make_functions_assume_false(
+      goto_model,
+      cmdline.get_values("make-function-assume-false"),
+      get_message_handler());
+  }
+
   // we add the library in some cases, as some analyses benefit
 
   if(cmdline.isset("add-library") ||
@@ -1574,6 +1583,8 @@ void goto_instrument_parse_optionst::help()
     " --model-argc-argv <n>        model up to <n> command line arguments\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
+    " --make-function-assume-false <f>\n"
+    "                              replace calls to function <f> with assume(false) (may be repeated)\n" // NOLINT(*)
     "\n"
     "Other options:\n"
     " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)
