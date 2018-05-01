@@ -9,13 +9,14 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_STATIC_INITIALIZERS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_STATIC_INITIALIZERS_H
 
+#include "object_factory_parameters.h"
+#include "select_pointer_type.h"
+#include "synthetic_methods_map.h"
+
 #include <unordered_set>
 
 #include <util/symbol_table.h>
 #include <util/std_code.h>
-#include <java_bytecode/object_factory_parameters.h>
-#include <java_bytecode/select_pointer_type.h>
-#include <java_bytecode/synthetic_methods_map.h>
 
 irep_idt clinit_wrapper_name(const irep_idt &class_name);
 

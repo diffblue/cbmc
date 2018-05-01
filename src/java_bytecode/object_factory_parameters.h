@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdint>
 #include <limits>
 
+#include <util/irep.h>
+
 #define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
 #define MAX_NONDET_STRING_LENGTH std::numeric_limits<std::int32_t>::max()
 #define MAX_NONDET_TREE_DEPTH 5
