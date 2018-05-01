@@ -12,14 +12,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_CLASS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_CLASS_H
 
+#include "ci_lazy_methods_needed.h"
+#include "java_bytecode_parse_tree.h"
+#include "java_bytecode_convert_class.h"
+
 #include <util/expanding_vector.h>
 #include <util/message.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
+
 #include <analyses/cfg_dominators.h>
-#include "java_bytecode_parse_tree.h"
-#include "java_bytecode_convert_class.h"
-#include <java_bytecode/ci_lazy_methods_needed.h>
 
 #include <vector>
 #include <list>

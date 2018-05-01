@@ -68,12 +68,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 #define CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 
+#include "java_bytecode_language.h"
+#include "select_pointer_type.h"
+
 #include <util/message.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
-
-#include <java_bytecode/select_pointer_type.h>
-#include <java_bytecode/java_bytecode_language.h>
 
 /// Selects the kind of allocation used by java_object_factory et al.
 enum class allocation_typet

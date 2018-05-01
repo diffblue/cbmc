@@ -12,18 +12,20 @@
 #ifndef CPROVER_JAVA_BYTECODE_GATHER_METHODS_LAZILY_H
 #define CPROVER_JAVA_BYTECODE_GATHER_METHODS_LAZILY_H
 
+#include "ci_lazy_methods_needed.h"
+#include "java_bytecode_parse_tree.h"
+#include "java_class_loader.h"
+#include "select_pointer_type.h"
+#include "synthetic_methods_map.h"
+
 #include <map>
 #include <functional>
 
 #include <util/irep.h>
 #include <util/symbol_table.h>
 #include <util/message.h>
+
 #include <goto-programs/class_hierarchy.h>
-#include <java_bytecode/java_bytecode_parse_tree.h>
-#include <java_bytecode/java_class_loader.h>
-#include <java_bytecode/ci_lazy_methods_needed.h>
-#include <java_bytecode/select_pointer_type.h>
-#include <java_bytecode/synthetic_methods_map.h>
 
 class java_string_library_preprocesst;
 
