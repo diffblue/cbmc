@@ -23,20 +23,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void goto_convertt::convert_function_call(
   const code_function_callt &function_call,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   do_function_call(
     function_call.lhs(),
     function_call.function(),
     function_call.arguments(),
-    dest);
+    dest,
+    mode);
 }
 
 void goto_convertt::do_function_call(
   const exprt &lhs,
   const exprt &function,
   const exprt::operandst &arguments,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   // make it all side effect free
 
@@ -46,9 +49,9 @@ void goto_convertt::do_function_call(
   exprt::operandst new_arguments=arguments;
 
   if(!new_lhs.is_nil())
-    clean_expr(new_lhs, dest);
+    clean_expr(new_lhs, dest, mode);
 
-  clean_expr(new_function, dest);
+  clean_expr(new_function, dest, mode);
 
   // the arguments of __noop do not get evaluated
   if(new_function.id()==ID_symbol &&
@@ -58,13 +61,14 @@ void goto_convertt::do_function_call(
   }
 
   Forall_expr(it, new_arguments)
-    clean_expr(*it, dest);
+    clean_expr(*it, dest, mode);
 
   // split on the function
 
   if(new_function.id()==ID_if)
   {
-    do_function_call_if(new_lhs, to_if_expr(new_function), new_arguments, dest);
+    do_function_call_if(
+      new_lhs, to_if_expr(new_function), new_arguments, dest, mode);
   }
   else if(new_function.id()==ID_symbol)
   {
@@ -92,7 +96,8 @@ void goto_convertt::do_function_call_if(
   const exprt &lhs,
   const if_exprt &function,
   const exprt::operandst &arguments,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   // case split
 
@@ -121,7 +126,7 @@ void goto_convertt::do_function_call_if(
   goto_programt tmp_y;
   goto_programt::targett y;
 
-  do_function_call(lhs, function.false_case(), arguments, tmp_y);
+  do_function_call(lhs, function.false_case(), arguments, tmp_y, mode);
 
   if(tmp_y.instructions.empty())
     y=tmp_y.add_instruction(SKIP);
@@ -137,7 +142,7 @@ void goto_convertt::do_function_call_if(
   // w: f();
   goto_programt tmp_w;
 
-  do_function_call(lhs, function.true_case(), arguments, tmp_w);
+  do_function_call(lhs, function.true_case(), arguments, tmp_w, mode);
 
   if(tmp_w.instructions.empty())
     tmp_w.add_instruction(SKIP);

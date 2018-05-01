@@ -756,10 +756,7 @@ void jbmc_parse_optionst::process_goto_function(
         ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
         : MAX_NONDET_TREE_DEPTH;
 
-    convert_nondet(
-      function,
-      get_message_handler(),
-      factory_params);
+    convert_nondet(function, get_message_handler(), factory_params, ID_java);
 
     // add generic checks
     goto_check(ns, options, ID_java, function.get_goto_function());

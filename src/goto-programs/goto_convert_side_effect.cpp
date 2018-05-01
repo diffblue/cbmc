@@ -36,7 +36,8 @@ bool goto_convertt::has_function_call(const exprt &expr)
 void goto_convertt::remove_assignment(
   side_effect_exprt &expr,
   goto_programt &dest,
-  bool result_is_used)
+  bool result_is_used,
+  const irep_idt &mode)
 {
   const irep_idt statement=expr.get_statement();
 
@@ -45,7 +46,7 @@ void goto_convertt::remove_assignment(
     exprt tmp=expr;
     tmp.id(ID_code);
     // just interpret as code
-    convert_assign(to_code_assign(to_code(tmp)), dest);
+    convert_assign(to_code_assign(to_code(tmp)), dest, mode);
   }
   else if(statement==ID_assign_plus ||
           statement==ID_assign_minus ||
@@ -120,7 +121,7 @@ void goto_convertt::remove_assignment(
     code_assignt assignment(expr.op0(), rhs);
     assignment.add_source_location()=expr.source_location();
 
-    convert(assignment, dest);
+    convert(assignment, dest, mode);
   }
   else
     UNREACHABLE;
@@ -139,7 +140,8 @@ void goto_convertt::remove_assignment(
 void goto_convertt::remove_pre(
   side_effect_exprt &expr,
   goto_programt &dest,
-  bool result_is_used)
+  bool result_is_used,
+  const irep_idt &mode)
 {
   if(expr.operands().size()!=1)
   {
@@ -211,7 +213,7 @@ void goto_convertt::remove_pre(
   code_assignt assignment(expr.op0(), rhs);
   assignment.add_source_location()=expr.find_source_location();
 
-  convert(assignment, dest);
+  convert(assignment, dest, mode);
 
   if(result_is_used)
   {
@@ -226,6 +228,7 @@ void goto_convertt::remove_pre(
 void goto_convertt::remove_post(
   side_effect_exprt &expr,
   goto_programt &dest,
+  const irep_idt &mode,
   bool result_is_used)
 {
   goto_programt tmp1, tmp2;
@@ -312,14 +315,14 @@ void goto_convertt::remove_post(
   code_assignt assignment(expr.op0(), rhs);
   assignment.add_source_location()=expr.find_source_location();
 
-  convert(assignment, tmp2);
+  convert(assignment, tmp2, mode);
 
   // fix up the expression, if needed
 
   if(result_is_used)
   {
     exprt tmp=expr.op0();
-    make_temp_symbol(tmp, "post", dest);
+    make_temp_symbol(tmp, "post", dest, mode);
     expr.swap(tmp);
   }
   else
@@ -332,6 +335,7 @@ void goto_convertt::remove_post(
 void goto_convertt::remove_function_call(
   side_effect_exprt &expr,
   goto_programt &dest,
+  const irep_idt &mode,
   bool result_is_used)
 {
   if(!result_is_used)
@@ -342,7 +346,7 @@ void goto_convertt::remove_function_call(
     call.arguments()=expr.op1().operands();
     call.add_source_location()=expr.source_location();
     call.lhs().make_nil();
-    convert_function_call(call, dest);
+    convert_function_call(call, dest, mode);
     expr.make_nil();
     return;
   }
@@ -394,7 +398,7 @@ void goto_convertt::remove_function_call(
     code_declt decl;
     decl.symbol()=new_symbol.symbol_expr();
     decl.add_source_location()=new_symbol.location;
-    convert_decl(decl, dest);
+    convert_decl(decl, dest, mode);
   }
 
   {
@@ -404,7 +408,7 @@ void goto_convertt::remove_function_call(
     call.function()=expr.op0();
     call.arguments()=expr.op1().operands();
     call.add_source_location()=new_symbol.location;
-    convert_function_call(call, dest);
+    convert_function_call(call, dest, mode);
   }
 
   static_cast<exprt &>(expr)=new_symbol.symbol_expr();
@@ -440,7 +444,7 @@ void goto_convertt::remove_cpp_new(
   code_declt decl;
   decl.symbol()=new_symbol.symbol_expr();
   decl.add_source_location()=new_symbol.location;
-  convert_decl(decl, dest);
+  convert_decl(decl, dest, ID_cpp);
 
   call=code_assignt(new_symbol.symbol_expr(), expr);
 
@@ -449,7 +453,7 @@ void goto_convertt::remove_cpp_new(
   else
     expr.make_nil();
 
-  convert(call, dest);
+  convert(call, dest, ID_cpp);
 }
 
 void goto_convertt::remove_cpp_delete(
@@ -474,6 +478,7 @@ void goto_convertt::remove_cpp_delete(
 void goto_convertt::remove_malloc(
   side_effect_exprt &expr,
   goto_programt &dest,
+  const irep_idt &mode,
   bool result_is_used)
 {
   codet call;
@@ -493,7 +498,7 @@ void goto_convertt::remove_malloc(
     code_declt decl;
     decl.symbol()=new_symbol.symbol_expr();
     decl.add_source_location()=new_symbol.location;
-    convert_decl(decl, dest);
+    convert_decl(decl, dest, mode);
 
     call=code_assignt(new_symbol.symbol_expr(), expr);
     call.add_source_location()=expr.source_location();
@@ -506,7 +511,7 @@ void goto_convertt::remove_malloc(
     call.move_to_operands(expr);
   }
 
-  convert(call, dest);
+  convert(call, dest, mode);
 }
 
 void goto_convertt::remove_temporary_object(
@@ -514,6 +519,7 @@ void goto_convertt::remove_temporary_object(
   goto_programt &dest,
   bool result_is_used)
 {
+  const irep_idt &mode = expr.get(ID_mode);
   if(expr.operands().size()!=1 &&
      !expr.operands().empty())
   {
@@ -523,13 +529,13 @@ void goto_convertt::remove_temporary_object(
   }
 
   symbolt &new_symbol = new_tmp_symbol(
-    expr.type(), "obj", dest, expr.find_source_location(), expr.get(ID_mode));
+    expr.type(), "obj", dest, expr.find_source_location(), mode);
 
   if(expr.operands().size()==1)
   {
     const code_assignt assignment(new_symbol.symbol_expr(), expr.op0());
 
-    convert(assignment, dest);
+    convert(assignment, dest, mode);
   }
 
   if(expr.find(ID_initializer).is_not_nil())
@@ -538,7 +544,7 @@ void goto_convertt::remove_temporary_object(
     exprt initializer=static_cast<const exprt &>(expr.find(ID_initializer));
     replace_new_object(new_symbol.symbol_expr(), initializer);
 
-    convert(to_code(initializer), dest);
+    convert(to_code(initializer), dest, mode);
   }
 
   static_cast<exprt &>(expr)=new_symbol.symbol_expr();
@@ -547,6 +553,7 @@ void goto_convertt::remove_temporary_object(
 void goto_convertt::remove_statement_expression(
   side_effect_exprt &expr,
   goto_programt &dest,
+  const irep_idt &mode,
   bool result_is_used)
 {
   // This is a gcc extension of the form ({ ....; expr; })
@@ -572,7 +579,7 @@ void goto_convertt::remove_statement_expression(
 
   if(!result_is_used)
   {
-    convert(code, dest);
+    convert(code, dest, mode);
     expr.make_nil();
     return;
   }
@@ -598,11 +605,7 @@ void goto_convertt::remove_statement_expression(
   source_locationt source_location=last.find_source_location();
 
   symbolt &new_symbol = new_tmp_symbol(
-    expr.type(),
-    "statement_expression",
-    dest,
-    source_location,
-    expr.get(ID_mode));
+    expr.type(), "statement_expression", dest, source_location, mode);
 
   symbol_exprt tmp_symbol_expr(new_symbol.name, new_symbol.type);
   tmp_symbol_expr.add_source_location()=source_location;
@@ -631,7 +634,7 @@ void goto_convertt::remove_statement_expression(
 
   {
     goto_programt tmp;
-    convert(code, tmp);
+    convert(code, tmp, mode);
     dest.destructive_append(tmp);
   }
 
@@ -641,12 +644,13 @@ void goto_convertt::remove_statement_expression(
 void goto_convertt::remove_side_effect(
   side_effect_exprt &expr,
   goto_programt &dest,
+  const irep_idt &mode,
   bool result_is_used)
 {
   const irep_idt &statement=expr.get_statement();
 
   if(statement==ID_function_call)
-    remove_function_call(expr, dest, result_is_used);
+    remove_function_call(expr, dest, mode, result_is_used);
   else if(statement==ID_assign ||
           statement==ID_assign_plus ||
           statement==ID_assign_minus ||
@@ -659,13 +663,13 @@ void goto_convertt::remove_side_effect(
           statement==ID_assign_ashr ||
           statement==ID_assign_shl ||
           statement==ID_assign_mod)
-    remove_assignment(expr, dest, result_is_used);
+    remove_assignment(expr, dest, result_is_used, mode);
   else if(statement==ID_postincrement ||
           statement==ID_postdecrement)
-    remove_post(expr, dest, result_is_used);
+    remove_post(expr, dest, mode, result_is_used);
   else if(statement==ID_preincrement ||
           statement==ID_predecrement)
-    remove_pre(expr, dest, result_is_used);
+    remove_pre(expr, dest, result_is_used, mode);
   else if(statement==ID_cpp_new ||
           statement==ID_cpp_new_array)
     remove_cpp_new(expr, dest, result_is_used);
@@ -673,11 +677,11 @@ void goto_convertt::remove_side_effect(
           statement==ID_cpp_delete_array)
     remove_cpp_delete(expr, dest, result_is_used);
   else if(statement==ID_allocate)
-    remove_malloc(expr, dest, result_is_used);
+    remove_malloc(expr, dest, mode, result_is_used);
   else if(statement==ID_temporary_object)
     remove_temporary_object(expr, dest, result_is_used);
   else if(statement==ID_statement_expression)
-    remove_statement_expression(expr, dest, result_is_used);
+    remove_statement_expression(expr, dest, mode, result_is_used);
   else if(statement==ID_nondet)
   {
     // these are fine

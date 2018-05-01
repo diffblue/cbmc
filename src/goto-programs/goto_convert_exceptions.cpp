@@ -15,7 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void goto_convertt::convert_msc_try_finally(
   const codet &code,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   if(code.operands().size()!=2)
   {
@@ -36,7 +37,7 @@ void goto_convertt::convert_msc_try_finally(
     targets.destructor_stack.push_back(to_code(code.op1()));
 
     // do 'try' code
-    convert(to_code(code.op0()), dest);
+    convert(to_code(code.op0()), dest, mode);
 
     // pop 'finally' from destructor stack
     targets.destructor_stack.pop_back();
@@ -45,7 +46,7 @@ void goto_convertt::convert_msc_try_finally(
   }
 
   // now add 'finally' code
-  convert(to_code(code.op1()), dest);
+  convert(to_code(code.op1()), dest, mode);
 
   // this is the target for 'leave'
   dest.destructive_append(tmp);
@@ -53,7 +54,8 @@ void goto_convertt::convert_msc_try_finally(
 
 void goto_convertt::convert_msc_try_except(
   const codet &code,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   if(code.operands().size()!=3)
   {
@@ -62,14 +64,15 @@ void goto_convertt::convert_msc_try_except(
     throw 0;
   }
 
-  convert(to_code(code.op0()), dest);
+  convert(to_code(code.op0()), dest, mode);
 
   // todo: generate exception tracking
 }
 
 void goto_convertt::convert_msc_leave(
   const codet &code,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   if(!targets.leave_set)
   {
@@ -85,7 +88,7 @@ void goto_convertt::convert_msc_leave(
   {
     codet d_code=targets.destructor_stack[d-1];
     d_code.add_source_location()=code.source_location();
-    convert(d_code, dest);
+    convert(d_code, dest, mode);
   }
 
   goto_programt::targett t=dest.add_instruction();
@@ -95,7 +98,8 @@ void goto_convertt::convert_msc_leave(
 
 void goto_convertt::convert_try_catch(
   const codet &code,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   assert(code.operands().size()>=2);
 
@@ -117,7 +121,7 @@ void goto_convertt::convert_try_catch(
   end_target->make_skip();
 
   // the first operand is the 'try' block
-  convert(to_code(code.op0()), dest);
+  convert(to_code(code.op0()), dest, mode);
 
   // add the CATCH-pop to the end of the 'try' block
   goto_programt::targett catch_pop_instruction=dest.add_instruction();
@@ -136,7 +140,7 @@ void goto_convertt::convert_try_catch(
       code_push_catcht::exception_list_entryt(block.get(ID_exception_id)));
 
     goto_programt tmp;
-    convert(block, tmp);
+    convert(block, tmp, mode);
     catch_push_instruction->targets.push_back(tmp.instructions.begin());
     dest.destructive_append(tmp);
 
@@ -152,7 +156,8 @@ void goto_convertt::convert_try_catch(
 
 void goto_convertt::convert_CPROVER_try_catch(
   const codet &code,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   if(code.operands().size()!=2)
   {
@@ -178,7 +183,7 @@ void goto_convertt::convert_CPROVER_try_catch(
   targets.destructor_stack.push_back(catch_code);
 
   // now convert 'try' code
-  convert(to_code(code.op0()), dest);
+  convert(to_code(code.op0()), dest, mode);
 
   // pop 'catch' code off stack
   targets.destructor_stack.pop_back();
@@ -189,7 +194,8 @@ void goto_convertt::convert_CPROVER_try_catch(
 
 void goto_convertt::convert_CPROVER_throw(
   const codet &code,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   // set the 'exception' flag
   {
@@ -205,7 +211,7 @@ void goto_convertt::convert_CPROVER_throw(
   {
     // need to process destructor stack
     unwind_destructor_stack(
-      code.source_location(), targets.throw_stack_size, dest);
+      code.source_location(), targets.throw_stack_size, dest, mode);
 
     // add goto
     goto_programt::targett t=dest.add_instruction();
@@ -215,7 +221,7 @@ void goto_convertt::convert_CPROVER_throw(
   else // otherwise, we do a return
   {
     // need to process destructor stack
-    unwind_destructor_stack(code.source_location(), 0, dest);
+    unwind_destructor_stack(code.source_location(), 0, dest, mode);
 
     // add goto
     goto_programt::targett t=dest.add_instruction();
@@ -226,7 +232,8 @@ void goto_convertt::convert_CPROVER_throw(
 
 void goto_convertt::convert_CPROVER_try_finally(
   const codet &code,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   if(code.operands().size()!=2)
   {
@@ -239,13 +246,13 @@ void goto_convertt::convert_CPROVER_try_finally(
   targets.destructor_stack.push_back(to_code(code.op1()));
 
   // do 'try' code
-  convert(to_code(code.op0()), dest);
+  convert(to_code(code.op0()), dest, mode);
 
   // pop 'finally' from destructor stack
   targets.destructor_stack.pop_back();
 
   // now add 'finally' code
-  convert(to_code(code.op1()), dest);
+  convert(to_code(code.op1()), dest, mode);
 }
 
 symbol_exprt goto_convertt::exception_flag()
@@ -273,20 +280,19 @@ symbol_exprt goto_convertt::exception_flag()
 void goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,
   std::size_t final_stack_size,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   unwind_destructor_stack(
-    source_location,
-    final_stack_size,
-    dest,
-    targets.destructor_stack);
+    source_location, final_stack_size, dest, targets.destructor_stack, mode);
 }
 
 void goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,
   std::size_t final_stack_size,
   goto_programt &dest,
-  destructor_stackt &destructor_stack)
+  destructor_stackt &destructor_stack,
+  const irep_idt &mode)
 {
   // There might be exceptions happening in the exception
   // handler. We thus pop off the stack, and then later
@@ -301,7 +307,7 @@ void goto_convertt::unwind_destructor_stack(
     // pop now to avoid doing this again
     destructor_stack.pop_back();
 
-    convert(d_code, dest);
+    convert(d_code, dest, mode);
   }
 
   // Now restore old stack.
