@@ -1,14 +1,8 @@
-/* FUNCTION: kill */
-
-#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
+#ifdef LIBRARY_CHECK
 #include <sys/types.h>
-#define __CPROVER_SYS_TYPES_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_SIGNAL_H_INCLUDED
-#include <signal.h>
-#define __CPROVER_SIGNAL_H_INCLUDED
-#endif
+/* FUNCTION: kill */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 

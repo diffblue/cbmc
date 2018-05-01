@@ -29,9 +29,11 @@ class ansi_c_identifiert
 {
 public:
   ansi_c_id_classt id_class;
+  bool from_symbol_table;
   irep_idt base_name, prefixed_name;
 
-  ansi_c_identifiert():id_class(ansi_c_id_classt::ANSI_C_UNKNOWN)
+  ansi_c_identifiert()
+    : id_class(ansi_c_id_classt::ANSI_C_UNKNOWN), from_symbol_table(false)
   {
   }
 };

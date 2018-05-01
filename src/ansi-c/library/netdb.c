@@ -1,6 +1,8 @@
-/* FUNCTION: gethostbyname */
-
+#ifdef LIBRARY_CHECK
 #include <netdb.h>
+#endif
+
+/* FUNCTION: gethostbyname */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 

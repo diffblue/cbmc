@@ -1,6 +1,8 @@
-/* FUNCTION: sem_init */
-
+#ifdef LIBRARY_CHECK
 #include <semaphore.h>
+#endif
+
+/* FUNCTION: sem_init */
 
 inline int sem_init(sem_t *sem, int pshared, unsigned int value)
 {
@@ -19,8 +21,6 @@ inline int sem_init(sem_t *sem, int pshared, unsigned int value)
 
 /* FUNCTION: sem_wait */
 
-#include <semaphore.h>
-
 inline int sem_wait(sem_t *sem)
 {
   __CPROVER_HIDE:;
@@ -37,8 +37,6 @@ inline int sem_wait(sem_t *sem)
 }
 
 /* FUNCTION: sem_timedwait */
-
-#include <semaphore.h>
 
 inline int sem_timedwait(sem_t *sem, const struct timespec *abstime)
 {
@@ -58,8 +56,6 @@ inline int sem_timedwait(sem_t *sem, const struct timespec *abstime)
 
 /* FUNCTION: sem_trywait */
 
-#include <semaphore.h>
-
 inline int sem_trywait(sem_t *sem)
 {
   __CPROVER_HIDE:;
@@ -77,8 +73,6 @@ inline int sem_trywait(sem_t *sem)
 
 /* FUNCTION: sem_post */
 
-#include <semaphore.h>
-
 inline int sem_post(sem_t *sem)
 {
   __CPROVER_HIDE:;
@@ -95,8 +89,6 @@ inline int sem_post(sem_t *sem)
 }
 
 /* FUNCTION: sem_post_multiple */
-
-#include <semaphore.h>
 
 inline int sem_post_multiple(sem_t *sem, int number)
 {
@@ -116,8 +108,6 @@ inline int sem_post_multiple(sem_t *sem, int number)
 
 /* FUNCTION: sem_getvalue */
 
-#include <semaphore.h>
-
 inline int sem_getvalue(sem_t *sem, int *sval)
 {
   __CPROVER_HIDE:;
@@ -135,8 +125,6 @@ inline int sem_getvalue(sem_t *sem, int *sval)
 }
 
 /* FUNCTION: sem_destroy */
-
-#include <semaphore.h>
 
 inline int sem_destroy(sem_t *sem)
 {

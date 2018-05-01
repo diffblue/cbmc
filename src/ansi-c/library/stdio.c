@@ -1,10 +1,9 @@
+#ifdef LIBRARY_CHECK
+#include <stdio.h>
+#include <stdarg.h>
+#endif
 
 /* FUNCTION: putchar */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
@@ -12,16 +11,11 @@ inline int putchar(int c)
 {
   __CPROVER_HIDE:;
   __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
-  printf("%c", c);
+  __CPROVER_printf("%c", c);
   return (error?-1:c);
 }
 
 /* FUNCTION: puts */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 int __VERIFIER_nondet_int();
@@ -31,22 +25,12 @@ inline int puts(const char *s)
   __CPROVER_HIDE:;
   __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
   int ret=__VERIFIER_nondet_int();
-  printf("%s\n", s);
+  __CPROVER_printf("%s\n", s);
   if(error) ret=-1; else __CPROVER_assume(ret>=0);
   return ret;
 }
 
 /* FUNCTION: fopen */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
 
 #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
 inline void fclose_cleanup(void *stream)
@@ -59,6 +43,7 @@ inline void fclose_cleanup(void *stream)
 #endif
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+void *malloc(__CPROVER_size_t malloc_size);
 
 inline FILE *fopen(const char *filename, const char *mode)
 {
@@ -75,11 +60,11 @@ inline FILE *fopen(const char *filename, const char *mode)
   __CPROVER_bool fopen_error=__VERIFIER_nondet___CPROVER_bool();
 
   #if !defined(__linux__) || defined(__GLIBC__)
-  fopen_result=fopen_error?NULL:malloc(sizeof(FILE));
+  fopen_result = fopen_error ? 0 : malloc(sizeof(FILE));
   #else
   // libraries need to expose the definition of FILE; this is the
   // case for musl
-  fopen_result=fopen_error?NULL:malloc(sizeof(int));
+  fopen_result = fopen_error ? 0 : malloc(sizeof(int));
   #endif
 
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
@@ -91,11 +76,6 @@ inline FILE *fopen(const char *filename, const char *mode)
 }
 
 /* FUNCTION: freopen */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
 
 inline FILE* freopen(const char *filename, const char *mode, FILE *f)
 {
@@ -113,17 +93,8 @@ inline FILE* freopen(const char *filename, const char *mode, FILE *f)
 
 /* FUNCTION: fclose */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
-
 int __VERIFIER_nondet_int();
+void free(void *ptr);
 
 inline int fclose(FILE *stream)
 {
@@ -141,15 +112,7 @@ inline int fclose(FILE *stream)
 
 /* FUNCTION: fdopen */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
+void *malloc(__CPROVER_size_t malloc_size);
 
 inline FILE *fdopen(int handle, const char *mode)
 {
@@ -179,17 +142,9 @@ inline FILE *fdopen(int handle, const char *mode)
 // header files rename fdopen to _fdopen and would thus yield
 // unbounded recursion.
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
-
 #ifdef __APPLE__
+void *malloc(__CPROVER_size_t malloc_size);
+
 inline FILE *_fdopen(int handle, const char *mode)
 {
   __CPROVER_HIDE:;
@@ -207,11 +162,6 @@ inline FILE *_fdopen(int handle, const char *mode)
 #endif
 
 /* FUNCTION: fgets */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 int __VERIFIER_nondet_int();
@@ -262,22 +212,14 @@ char *fgets(char *str, int size, FILE *stream)
 
 /* FUNCTION: fread */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
+__CPROVER_size_t __VERIFIER_nondet_size_t();
 
-size_t __VERIFIER_nondet_size_t();
-
-inline size_t fread(
-  void *ptr,
-  size_t size,
-  size_t nitems,
-  FILE *stream)
+inline __CPROVER_size_t
+fread(void *ptr, __CPROVER_size_t size, __CPROVER_size_t nitems, FILE *stream)
 {
   __CPROVER_HIDE:;
-  size_t nread=__VERIFIER_nondet_size_t();
-  size_t bytes=nread*size;
+  __CPROVER_size_t nread = __VERIFIER_nondet_size_t();
+  __CPROVER_size_t bytes = nread * size;
   __CPROVER_assume(nread<=nitems);
 
   #if !defined(__linux__) || defined(__GLIBC__)
@@ -291,7 +233,7 @@ inline size_t fread(
                    "fread file must be open");
   #endif
 
-  for(size_t i=0; i<bytes; i++)
+  for(__CPROVER_size_t i = 0; i < bytes; i++)
   {
     char nondet_char;
     ((char *)ptr)[i]=nondet_char;
@@ -301,11 +243,6 @@ inline size_t fread(
 }
 
 /* FUNCTION: feof */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 
@@ -331,11 +268,6 @@ inline int feof(FILE *stream)
 
 /* FUNCTION: ferror */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
 int __VERIFIER_nondet_int();
 
 inline int ferror(FILE *stream)
@@ -360,11 +292,6 @@ inline int ferror(FILE *stream)
 
 /* FUNCTION: fileno */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
 int __VERIFIER_nondet_int();
 
 inline int fileno(FILE *stream)
@@ -388,11 +315,6 @@ inline int fileno(FILE *stream)
 }
 
 /* FUNCTION: fputs */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 
@@ -422,11 +344,6 @@ inline int fputs(const char *s, FILE *stream)
 
 /* FUNCTION: fflush */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
 int __VERIFIER_nondet_int();
 
 inline int fflush(FILE *stream)
@@ -446,11 +363,6 @@ inline int fflush(FILE *stream)
 }
 
 /* FUNCTION: fpurge */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 
@@ -475,11 +387,6 @@ inline int fpurge(FILE *stream)
 }
 
 /* FUNCTION: fgetc */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 
@@ -506,11 +413,6 @@ inline int fgetc(FILE *stream)
 }
 
 /* FUNCTION: getc */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 
@@ -540,11 +442,6 @@ inline int getc(FILE *stream)
 
 /* FUNCTION: getchar */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
 int __VERIFIER_nondet_int();
 
 inline int getchar()
@@ -558,11 +455,6 @@ inline int getchar()
 }
 
 /* FUNCTION: getw */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 
@@ -590,11 +482,6 @@ inline int getw(FILE *stream)
 
 /* FUNCTION: fseek */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
 int __VERIFIER_nondet_int();
 
 inline int fseek(FILE *stream, long offset, int whence)
@@ -620,11 +507,6 @@ inline int fseek(FILE *stream, long offset, int whence)
 
 /* FUNCTION: ftell */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
 long __VERIFIER_nondet_long();
 
 inline long ftell(FILE *stream)
@@ -648,11 +530,6 @@ inline long ftell(FILE *stream)
 
 /* FUNCTION: rewind */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
 void rewind(FILE *stream)
 {
   __CPROVER_HIDE:
@@ -671,17 +548,12 @@ void rewind(FILE *stream)
 
 /* FUNCTION: fwrite */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
+__CPROVER_size_t __VERIFIER_nondet_size_t();
 
-size_t __VERIFIER_nondet_size_t();
-
-size_t fwrite(
+__CPROVER_size_t fwrite(
   const void *ptr,
-  size_t size,
-  size_t nitems,
+  __CPROVER_size_t size,
+  __CPROVER_size_t nitems,
   FILE *stream)
 {
   __CPROVER_HIDE:;
@@ -699,17 +571,12 @@ size_t fwrite(
                    "fwrite file must be open");
   #endif
 
-  size_t nwrite=__VERIFIER_nondet_size_t();
+  __CPROVER_size_t nwrite = __VERIFIER_nondet_size_t();
   __CPROVER_assume(nwrite<=nitems);
   return nwrite;
 }
 
 /* FUNCTION: perror */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
 
 void perror(const char *s)
 {
@@ -721,7 +588,7 @@ void perror(const char *s)
     #endif
     // should go to stderr
     if(s[0]!=0)
-      printf("%s: ", s);
+      __CPROVER_printf("%s: ", s);
   }
 
   // TODO: print errno error
@@ -729,15 +596,7 @@ void perror(const char *s)
 
 /* FUNCTION: fscanf */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDARG_H_INCLUDED
-#include <stdarg.h>
-#define __CPROVER_STDARG_H_INCLUDED
-#endif
+int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg);
 
 inline int fscanf(FILE *restrict stream, const char *restrict format, ...)
 {
@@ -751,15 +610,7 @@ inline int fscanf(FILE *restrict stream, const char *restrict format, ...)
 
 /* FUNCTION: scanf */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDARG_H_INCLUDED
-#include <stdarg.h>
-#define __CPROVER_STDARG_H_INCLUDED
-#endif
+int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg);
 
 inline int scanf(const char *restrict format, ...)
 {
@@ -773,15 +624,7 @@ inline int scanf(const char *restrict format, ...)
 
 /* FUNCTION: sscanf */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDARG_H_INCLUDED
-#include <stdarg.h>
-#define __CPROVER_STDARG_H_INCLUDED
-#endif
+int vsscanf(const char *restrict s, const char *restrict format, va_list arg);
 
 inline int sscanf(const char *restrict s, const char *restrict format, ...)
 {
@@ -794,16 +637,6 @@ inline int sscanf(const char *restrict s, const char *restrict format, ...)
 }
 
 /* FUNCTION: vfscanf */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDARG_H_INCLUDED
-#include <stdarg.h>
-#define __CPROVER_STDARG_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 
@@ -829,15 +662,7 @@ inline int vfscanf(FILE *restrict stream, const char *restrict format, va_list a
 
 /* FUNCTION: vscanf */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDARG_H_INCLUDED
-#include <stdarg.h>
-#define __CPROVER_STDARG_H_INCLUDED
-#endif
+int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg);
 
 inline int vscanf(const char *restrict format, va_list arg)
 {
@@ -846,16 +671,6 @@ inline int vscanf(const char *restrict format, va_list arg)
 }
 
 /* FUNCTION: vsscanf */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDARG_H_INCLUDED
-#include <stdarg.h>
-#define __CPROVER_STDARG_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 
@@ -871,15 +686,7 @@ inline int vsscanf(const char *restrict s, const char *restrict format, va_list 
 
 /* FUNCTION: fprintf */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDARG_H_INCLUDED
-#include <stdarg.h>
-#define __CPROVER_STDARG_H_INCLUDED
-#endif
+int vfprintf(FILE *stream, const char *restrict format, va_list arg);
 
 inline int fprintf(FILE *stream, const char *restrict format, ...)
 {
@@ -892,16 +699,6 @@ inline int fprintf(FILE *stream, const char *restrict format, ...)
 }
 
 /* FUNCTION: vfprintf */
-
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDARG_H_INCLUDED
-#include <stdarg.h>
-#define __CPROVER_STDARG_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 
@@ -929,23 +726,9 @@ inline int vfprintf(FILE *stream, const char *restrict format, va_list arg)
 
 /* FUNCTION: vasprintf */
 
-#ifndef __CPROVER_STDIO_H_INCLUDED
-#include <stdio.h>
-#define __CPROVER_STDIO_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDARG_H_INCLUDED
-#include <stdarg.h>
-#define __CPROVER_STDARG_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
-
 char __VERIFIER_nondet_char();
 int __VERIFIER_nondet_int();
+void *malloc(__CPROVER_size_t malloc_size);
 
 inline int vasprintf(char **ptr, const char *fmt, va_list ap)
 {

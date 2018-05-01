@@ -1,10 +1,8 @@
+#ifdef LIBRARY_CHECK
+#include <locale.h>
+#endif
 
 /* FUNCTION: setlocale */
-
-#ifndef __CPROVER_LOCALE_H_INCLUDED
-#include <locale.h>
-#define __CPROVER_LOCALE_H_INCLUDED
-#endif
 
 inline char *setlocale(int category, const char *locale)
 {
@@ -23,11 +21,6 @@ inline char *setlocale(int category, const char *locale)
 }
 
 /* FUNCTION: localeconv */
-
-#ifndef __CPROVER_LOCALE_H_INCLUDED
-#include <locale.h>
-#define __CPROVER_LOCALE_H_INCLUDED
-#endif
 
 inline struct lconv *localeconv(void)
 {

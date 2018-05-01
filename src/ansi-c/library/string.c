@@ -47,7 +47,7 @@ __inline char *__builtin___strcat_chk(char *dst, const char *src, __CPROVER_size
   __CPROVER_assert(__CPROVER_buffer_size(dst)>new_size,
                    "strcat buffer overflow");
   __CPROVER_size_t old_size=__CPROVER_zero_string_length(dst);
-  //"  for(size_t i=0; i<__CPROVER_zero_string_length(src); i++)
+  //"  for(__CPROVER_size_t i=0; i<__CPROVER_zero_string_length(src); i++)
   //"    dst[old_size+i];
   dst[new_size]=0;
   __CPROVER_is_zero_string(dst)=1;
@@ -120,13 +120,6 @@ __inline char *__builtin___strncat_chk(
 
 /* FUNCTION: strcpy */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef strcpy
-
 inline char *strcpy(char *dst, const char *src)
 {
   __CPROVER_HIDE:;
@@ -158,14 +151,7 @@ inline char *strcpy(char *dst, const char *src)
 
 /* FUNCTION: strncpy */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef strncpy
-
-inline char *strncpy(char *dst, const char *src, size_t n)
+inline char *strncpy(char *dst, const char *src, __CPROVER_size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -197,12 +183,11 @@ inline char *strncpy(char *dst, const char *src, size_t n)
 
 /* FUNCTION: __builtin___strncpy_chk */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-inline char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_t object_size)
+inline char *__builtin___strncpy_chk(
+  char *dst,
+  const char *src,
+  __CPROVER_size_t n,
+  __CPROVER_size_t object_size)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -237,13 +222,6 @@ inline char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_
 
 /* FUNCTION: strcat */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef strcat
-
 inline char *strcat(char *dst, const char *src)
 {
   __CPROVER_HIDE:;
@@ -257,7 +235,7 @@ inline char *strcat(char *dst, const char *src)
   __CPROVER_assert(__CPROVER_buffer_size(dst)>new_size,
                    "strcat buffer overflow");
   __CPROVER_size_t old_size=__CPROVER_zero_string_length(dst);
-  //"  for(size_t i=0; i<__CPROVER_zero_string_length(src); i++)
+  //"  for(__CPROVER_size_t i=0; i<__CPROVER_zero_string_length(src); i++)
   //"    dst[old_size+i];
   dst[new_size]=0;
   __CPROVER_is_zero_string(dst)=1;
@@ -283,14 +261,7 @@ inline char *strcat(char *dst, const char *src)
 
 /* FUNCTION: strncat */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef strncat
-
-inline char *strncat(char *dst, const char *src, size_t n)
+inline char *strncat(char *dst, const char *src, __CPROVER_size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -334,13 +305,6 @@ inline char *strncat(char *dst, const char *src, size_t n)
 
 /* FUNCTION: strcmp */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef strcmp
-
 inline int strcmp(const char *s1, const char *s2)
 {
   __CPROVER_HIDE:;
@@ -379,13 +343,6 @@ inline int strcmp(const char *s1, const char *s2)
 }
 
 /* FUNCTION: strcasecmp */
-
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef strcasecmp
 
 inline int strcasecmp(const char *s1, const char *s2)
 {
@@ -429,14 +386,7 @@ inline int strcasecmp(const char *s1, const char *s2)
 
 /* FUNCTION: strncmp */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef strncmp
-
-inline int strncmp(const char *s1, const char *s2, size_t n)
+inline int strncmp(const char *s1, const char *s2, __CPROVER_size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -471,14 +421,7 @@ inline int strncmp(const char *s1, const char *s2, size_t n)
 
 /* FUNCTION: strncasecmp */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef strncasecmp
-
-inline int strncasecmp(const char *s1, const char *s2, size_t n)
+inline int strncasecmp(const char *s1, const char *s2, __CPROVER_size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -516,14 +459,7 @@ inline int strncasecmp(const char *s1, const char *s2, size_t n)
 
 /* FUNCTION: strlen */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef strlen
-
-inline size_t strlen(const char *s)
+inline __CPROVER_size_t strlen(const char *s)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -539,18 +475,8 @@ inline size_t strlen(const char *s)
 
 /* FUNCTION: strdup */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
-
-#undef strdup
-#undef strcpy
+void *malloc(__CPROVER_size_t malloc_size);
+char *strcpy(char *dst, const char *src);
 
 inline char *strdup(const char *str)
 {
@@ -568,14 +494,7 @@ inline char *strdup(const char *str)
 
 /* FUNCTION: memcpy */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef memcpy
-
-void *memcpy(void *dst, const void *src, size_t n)
+void *memcpy(void *dst, const void *src, __CPROVER_size_t n)
 {
   __CPROVER_HIDE:
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -583,7 +502,7 @@ void *memcpy(void *dst, const void *src, size_t n)
                          "memcpy buffer overflow");
   __CPROVER_precondition(__CPROVER_buffer_size(dst)>=n,
                          "memcpy buffer overflow");
-  //  for(size_t i=0; i<n ; i++) dst[i]=src[i];
+  //  for(__CPROVER_size_t i=0; i<n ; i++) dst[i]=src[i];
   if(__CPROVER_is_zero_string(src) &&
      n > __CPROVER_zero_string_length(src))
   {
@@ -625,7 +544,7 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
                          "memcpy buffer overflow");
   __CPROVER_precondition(__CPROVER_buffer_size(dst)==s,
                          "builtin object size");
-  //  for(size_t i=0; i<n ; i++) dst[i]=src[i];
+  //  for(__CPROVER_size_t i=0; i<n ; i++) dst[i]=src[i];
   if(__CPROVER_is_zero_string(src) &&
      n > __CPROVER_zero_string_length(src))
   {
@@ -658,20 +577,13 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
 
 /* FUNCTION: memset */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef memset
-
-void *memset(void *s, int c, size_t n)
+void *memset(void *s, int c, __CPROVER_size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_precondition(__CPROVER_buffer_size(s)>=n,
                          "memset buffer overflow");
-  //  for(size_t i=0; i<n ; i++) s[i]=c;
+  //  for(__CPROVER_size_t i=0; i<n ; i++) s[i]=c;
   if(__CPROVER_is_zero_string(s) &&
      n > __CPROVER_zero_string_length(s))
   {
@@ -708,7 +620,7 @@ void *__builtin_memset(void *s, int c, __CPROVER_size_t n)
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_precondition(__CPROVER_buffer_size(s)>=n,
                          "memset buffer overflow");
-  //  for(size_t i=0; i<n ; i++) s[i]=c;
+  //  for(__CPROVER_size_t i=0; i<n ; i++) s[i]=c;
   if(__CPROVER_is_zero_string(s) &&
      n > __CPROVER_zero_string_length(s))
   {
@@ -749,7 +661,7 @@ void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_
                          "memset buffer overflow");
   __CPROVER_precondition(__CPROVER_buffer_size(s)==size,
                          "builtin object size");
-  //  for(size_t i=0; i<n ; i++) s[i]=c;
+  //  for(__CPROVER_size_t i=0; i<n ; i++) s[i]=c;
   if(__CPROVER_is_zero_string(s) &&
      n > __CPROVER_zero_string_length(s))
   {
@@ -781,14 +693,7 @@ void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_
 
 /* FUNCTION: memmove */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef memmove
-
-void *memmove(void *dest, const void *src, size_t n)
+void *memmove(void *dest, const void *src, __CPROVER_size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -821,14 +726,11 @@ void *memmove(void *dest, const void *src, size_t n)
 
 /* FUNCTION: __builtin___memmove_chk */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef memmove
-
-void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_size_t size)
+void *__builtin___memmove_chk(
+  void *dest,
+  const void *src,
+  __CPROVER_size_t n,
+  __CPROVER_size_t size)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -866,14 +768,7 @@ void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_s
 
 /* FUNCTION: memcmp */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef memcmp
-
-inline int memcmp(const void *s1, const void *s2, size_t n)
+inline int memcmp(const void *s1, const void *s2, __CPROVER_size_t n)
 {
   __CPROVER_HIDE:;
   int res=0;
@@ -895,13 +790,6 @@ inline int memcmp(const void *s1, const void *s2, size_t n)
 }
 
 /* FUNCTION: strchr */
-
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef strchr
 
 inline char *strchr(const char *src, int c)
 {
@@ -925,13 +813,6 @@ inline char *strchr(const char *src, int c)
 
 /* FUNCTION: strrchr */
 
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef strchr
-
 inline char *strrchr(const char *src, int c)
 {
   __CPROVER_HIDE:;
@@ -953,11 +834,6 @@ inline char *strrchr(const char *src, int c)
 }
 
 /* FUNCTION: strerror */
-
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
 
 char *strerror(int errnum)
 {

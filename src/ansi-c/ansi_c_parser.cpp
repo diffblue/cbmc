@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_parser.h"
 
-#include <iostream>
+#include <util/symbol_table.h>
 
 #include "c_storage_spec.h"
 
@@ -39,6 +39,24 @@ ansi_c_id_classt ansi_c_parsert::lookup(
              it->prefix+id2string(scope_name));
       identifier=n_it->second.prefixed_name;
       return n_it->second.id_class;
+    }
+  }
+
+  // if a symbol table has been provided, try to resolve global-scoped symbols
+  if(!tag && !label && symbol_table)
+  {
+    const symbolt *symbol = symbol_table->lookup(scope_name);
+    if(symbol)
+    {
+      ansi_c_identifiert &i = root_scope().name_map[scope_name];
+      i.from_symbol_table = true;
+      i.id_class = symbol->is_type && symbol->is_macro
+                     ? ansi_c_id_classt::ANSI_C_TYPEDEF
+                     : ansi_c_id_classt::ANSI_C_SYMBOL;
+      i.prefixed_name = symbol->name;
+      i.base_name = symbol->base_name;
+      identifier = i.prefixed_name;
+      return i.id_class;
     }
   }
 
@@ -150,6 +168,10 @@ void ansi_c_parsert::add_declarator(
     ansi_c_identifiert &identifier=scope.name_map[base_name];
     identifier.id_class=id_class;
     identifier.prefixed_name=prefixed_name;
+    // it may already have been put in the scope from an existing symbol table
+    // via lookup; now that we know it's being declared here we don't need or
+    // want the entry from the symbol table
+    identifier.from_symbol_table = false;
   }
 
   ansi_c_declaration.declarators().push_back(new_declarator);

@@ -126,12 +126,8 @@ inline int _close(int fildes)
 #define ret_type int
 #define size_type unsigned
 #else
-#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
-#include <sys/types.h>
-#define __CPROVER_SYS_TYPES_H_INCLUDED
-#endif
-#define ret_type ssize_t
-#define size_type size_t
+#define ret_type long int
+#define size_type __CPROVER_size_t
 #endif
 
 extern struct __CPROVER_pipet __CPROVER_pipes[];
@@ -175,12 +171,8 @@ ret_type write(int fildes, const void *buf, size_type nbyte)
 #define ret_type int
 #define size_type unsigned
 #else
-#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
-#include <sys/types.h>
-#define __CPROVER_SYS_TYPES_H_INCLUDED
-#endif
-#define ret_type ssize_t
-#define size_type size_t
+#define ret_type long int
+#define size_type __CPROVER_size_t
 #endif
 
 ret_type write(int fildes, const void *buf, size_type nbyte);
@@ -200,12 +192,8 @@ inline ret_type _write(int fildes, const void *buf, size_type nbyte)
 #define ret_type int
 #define size_type unsigned
 #else
-#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
-#include <sys/types.h>
-#define __CPROVER_SYS_TYPES_H_INCLUDED
-#endif
-#define ret_type ssize_t
-#define size_type size_t
+#define ret_type long int
+#define size_type __CPROVER_size_t
 #endif
 
 extern struct __CPROVER_pipet __CPROVER_pipes[];
@@ -279,12 +267,8 @@ ret_type read(int fildes, void *buf, size_type nbyte)
 #define ret_type int
 #define size_type unsigned
 #else
-#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
-#include <sys/types.h>
-#define __CPROVER_SYS_TYPES_H_INCLUDED
-#endif
-#define ret_type ssize_t
-#define size_type size_t
+#define ret_type long int
+#define size_type __CPROVER_size_t
 #endif
 
 ret_type read(int fildes, void *buf, size_type nbyte);

@@ -14,6 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_language.h"
 
+static void
+add_library(const std::string &src, symbol_tablet &, message_handlert &);
+
 struct cprover_library_entryt
 {
   const char *function;
@@ -78,7 +81,7 @@ void add_cprover_library(
   add_library(library_text, symbol_table, message_handler);
 }
 
-void add_library(
+static void add_library(
   const std::string &src,
   symbol_tablet &symbol_table,
   message_handlert &message_handler)
@@ -90,7 +93,7 @@ void add_library(
 
   ansi_c_languaget ansi_c_language;
   ansi_c_language.set_message_handler(message_handler);
-  ansi_c_language.parse(in, "");
+  ansi_c_language.parse(in, "", symbol_table);
 
   ansi_c_language.typecheck(symbol_table, "<built-in-library>");
 }

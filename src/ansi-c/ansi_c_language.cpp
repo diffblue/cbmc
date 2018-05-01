@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/get_base_name.h>
+#include <util/find_symbols.h>
 
 #include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
@@ -53,6 +54,15 @@ bool ansi_c_languaget::parse(
   std::istream &instream,
   const std::string &path)
 {
+  symbol_tablet st;
+  return parse(instream, path, st);
+}
+
+bool ansi_c_languaget::parse(
+  std::istream &instream,
+  const std::string &path,
+  const symbol_tablet &symbol_table)
+{
   // store the path
   parse_path=path;
 
@@ -78,6 +88,7 @@ bool ansi_c_languaget::parse(
   ansi_c_parser.cpp98=false; // it's not C++
   ansi_c_parser.cpp11=false; // it's not C++
   ansi_c_parser.mode=config.ansi_c.mode;
+  ansi_c_parser.set_symbol_table(symbol_table);
 
   ansi_c_scanner_init();
 
@@ -95,6 +106,27 @@ bool ansi_c_languaget::parse(
   // save result
   parse_tree.swap(ansi_c_parser.parse_tree);
 
+  // copy depended-on symbols from the existing symbol table
+  std::list<irep_idt> needed_syms;
+  for(const auto &scope_syms : ansi_c_parser.root_scope().name_map)
+  {
+    if(scope_syms.second.from_symbol_table)
+      needed_syms.push_back(scope_syms.second.prefixed_name);
+  }
+  while(!needed_syms.empty())
+  {
+    const irep_idt id = needed_syms.front();
+    needed_syms.pop_front();
+    const symbolt &symbol = symbol_table.lookup_ref(id);
+
+    if(symbol.is_type && !new_symbol_table.add(symbol))
+    {
+      find_symbols_sett deps;
+      find_type_symbols(symbol.type, deps);
+      needed_syms.insert(needed_syms.end(), deps.begin(), deps.end());
+    }
+  }
+
   // save some memory
   ansi_c_parser.clear();
 
@@ -105,8 +137,6 @@ bool ansi_c_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
-  symbol_tablet new_symbol_table;
-
   if(ansi_c_typecheck(
     parse_tree,
     new_symbol_table,
@@ -118,10 +148,10 @@ bool ansi_c_languaget::typecheck(
 
   remove_internal_symbols(new_symbol_table);
 
-  if(linking(symbol_table, new_symbol_table, get_message_handler()))
-    return true;
+  bool retval = linking(symbol_table, new_symbol_table, get_message_handler());
+  new_symbol_table.clear();
 
-  return false;
+  return retval;
 }
 
 bool ansi_c_languaget::generate_support_functions(
@@ -196,6 +226,7 @@ bool ansi_c_languaget::to_expr(
   ansi_c_parser.in=&i_preprocessed;
   ansi_c_parser.set_message_handler(get_message_handler());
   ansi_c_parser.mode=config.ansi_c.mode;
+  ansi_c_parser.set_symbol_table(ns.get_symbol_table());
   ansi_c_scanner_init();
 
   bool result=ansi_c_parser.parse();

@@ -1,9 +1,8 @@
-/* FUNCTION: pthread_mutexattr_settype */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#ifdef LIBRARY_CHECK
 #include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
 #endif
+
+/* FUNCTION: pthread_mutexattr_settype */
 
 int __VERIFIER_nondet_int();
 
@@ -25,11 +24,6 @@ inline int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
 
 /* FUNCTION: pthread_cancel */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 int __VERIFIER_nondet_int();
 
 inline int pthread_cancel(pthread_t thread)
@@ -47,11 +41,6 @@ inline int pthread_cancel(pthread_t thread)
 }
 
 /* FUNCTION: pthread_mutex_init */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_mutex_t_defined
 #define __CPROVER_mutex_t_defined
@@ -92,11 +81,6 @@ inline int pthread_mutex_init(
 }
 
 /* FUNCTION: pthread_mutex_lock */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_mutex_t_defined
 #define __CPROVER_mutex_t_defined
@@ -141,11 +125,6 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
 }
 
 /* FUNCTION: pthread_mutex_trylock */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_mutex_t_defined
 #define __CPROVER_mutex_t_defined
@@ -193,11 +172,6 @@ inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
 
 /* FUNCTION: pthread_mutex_unlock */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_mutex_t_defined
 #define __CPROVER_mutex_t_defined
 #if defined __CYGWIN__ || defined __MINGW32__ || defined _WIN32
@@ -241,11 +215,6 @@ inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
 
 /* FUNCTION: pthread_mutex_destroy */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_mutex_t_defined
 #define __CPROVER_mutex_t_defined
 #if defined __CYGWIN__ || defined __MINGW32__ || defined _WIN32
@@ -285,11 +254,6 @@ inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
 
 /* FUNCTION: pthread_exit */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 extern __CPROVER_bool __CPROVER_threads_exited[];
 extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
 
@@ -302,11 +266,6 @@ inline void pthread_exit(void *value_ptr)
 }
 
 /* FUNCTION: pthread_join */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_ERRNO_H_INCLUDED
 #include <errno.h>
@@ -338,11 +297,6 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
 
 // This is for Apple
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 #ifndef __CPROVER_ERRNO_H_INCLUDED
 #include <errno.h>
 #define __CPROVER_ERRNO_H_INCLUDED
@@ -373,11 +327,6 @@ inline int _pthread_join(pthread_t thread, void **value_ptr)
 
 /* FUNCTION: pthread_rwlock_destroy */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 inline int pthread_rwlock_destroy(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
@@ -393,11 +342,6 @@ inline int pthread_rwlock_destroy(pthread_rwlock_t *lock)
 }
 
 /* FUNCTION: pthread_rwlock_init */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
 inline void pthread_rwlock_cleanup(void *p)
@@ -424,11 +368,6 @@ inline int pthread_rwlock_init(pthread_rwlock_t *lock,
 
 /* FUNCTION: pthread_rwlock_rdlock */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 inline int pthread_rwlock_rdlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
@@ -443,11 +382,6 @@ inline int pthread_rwlock_rdlock(pthread_rwlock_t *lock)
 
 /* FUNCTION: pthread_rwlock_tryrdlock */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 inline int pthread_rwlock_tryrdlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
@@ -459,11 +393,6 @@ inline int pthread_rwlock_tryrdlock(pthread_rwlock_t *lock)
 }
 
 /* FUNCTION: pthread_rwlock_trywrlock */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 inline int pthread_rwlock_trywrlock(pthread_rwlock_t *lock)
 {
@@ -477,11 +406,6 @@ inline int pthread_rwlock_trywrlock(pthread_rwlock_t *lock)
 
 /* FUNCTION: pthread_rwlock_unlock */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 inline int pthread_rwlock_unlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
@@ -493,11 +417,6 @@ inline int pthread_rwlock_unlock(pthread_rwlock_t *lock)
 }
 
 /* FUNCTION: pthread_rwlock_wrlock */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 inline int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 {
@@ -512,11 +431,6 @@ inline int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 }
 
 /* FUNCTION: pthread_create */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 extern __CPROVER_bool __CPROVER_threads_exited[];
 extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
@@ -560,11 +474,6 @@ inline int pthread_create(
 
 /* FUNCTION: pthread_cond_init */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 inline int pthread_cond_init(
     pthread_cond_t *cond,
     const pthread_condattr_t *attr)
@@ -575,11 +484,6 @@ inline int pthread_cond_init(
 }
 
 /* FUNCTION: pthread_cond_signal */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 inline int pthread_cond_signal(
   pthread_cond_t *cond)
@@ -592,11 +496,6 @@ inline int pthread_cond_signal(
 
 /* FUNCTION: pthread_cond_broadcast */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 inline int pthread_cond_broadcast(
     pthread_cond_t *cond)
 { __CPROVER_HIDE:
@@ -607,11 +506,6 @@ inline int pthread_cond_broadcast(
 }
 
 /* FUNCTION: pthread_cond_wait */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 inline int pthread_cond_wait(
     pthread_cond_t *cond,
@@ -643,11 +537,6 @@ inline int pthread_cond_wait(
 
 /* FUNCTION: pthread_spin_lock */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 // no pthread_spinlock_t on the Mac
 #ifndef __APPLE__
 int pthread_spin_lock(pthread_spinlock_t *lock)
@@ -666,11 +555,6 @@ int pthread_spin_lock(pthread_spinlock_t *lock)
 
 /* FUNCTION: pthread_spin_unlock */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 // no pthread_spinlock_t on the Mac
 #ifndef __APPLE__
 int pthread_spin_unlock(pthread_spinlock_t *lock)
@@ -686,11 +570,6 @@ int pthread_spin_unlock(pthread_spinlock_t *lock)
 #endif
 
 /* FUNCTION: pthread_spin_trylock */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 #ifndef __CPROVER_ERRNO_H_INCLUDED
 #include <errno.h>
@@ -721,11 +600,6 @@ int pthread_spin_trylock(pthread_spinlock_t *lock)
 
 /* FUNCTION: pthread_barrier_init */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 int __VERIFIER_nondet_int();
 
 // no pthread_barrier_t on the Mac
@@ -751,11 +625,6 @@ inline int pthread_barrier_init(
 
 /* FUNCTION: pthread_barrier_destroy */
 
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
-
 int __VERIFIER_nondet_int();
 
 // no pthread_barrier_t on the Mac
@@ -780,11 +649,6 @@ inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
 #endif
 
 /* FUNCTION: pthread_barrier_wait */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
 
 int __VERIFIER_nondet_int();
 
