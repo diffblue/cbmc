@@ -863,18 +863,18 @@ java_generic_symbol_typet::java_generic_symbol_typet(
 
 /// Check if this symbol has the given generic type. If yes, return its index
 /// in the vector of generic types.
-/// \param type The type we are looking for.
+/// \param type The parameter type we are looking for.
 /// \return The index of the type in the vector of generic types.
 optionalt<size_t> java_generic_symbol_typet::generic_type_index(
   const java_generic_parametert &type) const
 {
-  const auto &type_variable = type.type_variable();
+  const auto &type_variable = type.get_name();
   const auto &generics = generic_types();
   for(std::size_t i = 0; i < generics.size(); ++i)
   {
     if(
       is_java_generic_parameter(generics[i]) &&
-      to_java_generic_parameter(generics[i]).type_variable() == type_variable)
+      to_java_generic_parameter(generics[i]).get_name() == type_variable)
       return i;
   }
   return {};
