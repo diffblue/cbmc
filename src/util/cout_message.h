@@ -35,6 +35,18 @@ public:
     const std::string &message) override;
 
   virtual void flush(unsigned level) override;
+
+  console_message_handlert() : always_flush(false)
+  {
+  }
+
+  explicit console_message_handlert(bool always_flush)
+    : always_flush(always_flush)
+  {
+  }
+
+protected:
+  const bool always_flush;
 };
 
 class gcc_message_handlert:public ui_message_handlert

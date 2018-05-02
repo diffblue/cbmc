@@ -71,6 +71,7 @@ class optionst;
   "(arrays-uf-always)(arrays-uf-never)" \
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
+  OPT_FLUSH \
   "(localize-faults)(localize-faults-method):" \
   OPT_GOTO_TRACE \
   "(claim):(show-claims)(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)

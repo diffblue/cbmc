@@ -139,6 +139,7 @@ class optionst;
   "(show-local-may-alias)" \
   "(json):(xml):" \
   "(text):(dot):" \
+  OPT_FLUSH \
   OPT_TIMESTAMP \
   "(unreachable-instructions)(unreachable-functions)" \
   "(reachable-functions)" \
