@@ -7,9 +7,13 @@ Author: Diffblue Ltd
 \*******************************************************************/
 
 #include "jar_file.h"
+
+#include <algorithm>
 #include <cctype>
-#include <util/suffix.h>
+
 #include <util/invariant.h>
+#include <util/suffix.h>
+
 #include "java_class_loader_limit.h"
 
 void jar_filet::initialize_file_index(java_class_loader_limitt &limit)
