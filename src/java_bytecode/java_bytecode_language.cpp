@@ -69,6 +69,11 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   else
     lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
 
+  if(cmd.isset("java-threading"))
+    threading_support = true;
+  else
+    threading_support = false;
+
   if(cmd.isset("java-throw-runtime-exceptions"))
   {
     throw_runtime_exceptions = true;
@@ -701,7 +706,8 @@ bool java_bytecode_languaget::typecheck(
   // For each class that will require a static initializer wrapper, create a
   // function named package.classname::clinit_wrapper, and a corresponding
   // global tracking whether it has run or not:
-  create_static_initializer_wrappers(symbol_table, synthetic_methods);
+  create_static_initializer_wrappers(
+    symbol_table, synthetic_methods, threading_support);
 
   // Now incrementally elaborate methods
   // that are reachable from this entry point.
@@ -961,7 +967,11 @@ bool java_bytecode_languaget::convert_single_method(
     switch(synthetic_method_it->second)
     {
     case synthetic_method_typet::STATIC_INITIALIZER_WRAPPER:
-      symbol.value = get_clinit_wrapper_body(function_id, symbol_table);
+      if(threading_support)
+        symbol.value = get_thread_safe_clinit_wrapper_body(
+          function_id, symbol_table);
+      else
+        symbol.value = get_clinit_wrapper_body(function_id, symbol_table);
       break;
     case synthetic_method_typet::STUB_CLASS_STATIC_INITIALIZER:
       symbol.value =

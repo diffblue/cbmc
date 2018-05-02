@@ -75,6 +75,7 @@ class optionst;
   JAVA_BYTECODE_LANGUAGE_OPTIONS \
   "(java-unwind-enum-static)" \
   "(localize-faults)(localize-faults-method):" \
+  "(java-threading)" \
   OPT_GOTO_TRACE \
   "(symex-driven-lazy-loading)"
 // clang-format on
