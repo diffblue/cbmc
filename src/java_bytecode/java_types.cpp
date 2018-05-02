@@ -416,8 +416,10 @@ size_t find_closing_semi_colon_for_reference_type(
 /// representation thereof.
 ///
 /// Example use are object types like "Ljava/lang/Integer;", type
-/// variables/parameters like "TE;" which require a non-empty \p class_name
-/// or generic types like "Ljava/util/List<T>;" or "Ljava/util/List<Integer>;"
+/// variables/parameters like "TE;" which require a non-empty
+/// \p class_name_prefix or generic types like "Ljava/util/List<TE;>;"
+/// or "Ljava/util/List<Ljava/lang/Integer;>;" also requiring
+/// \p class_name_prefix.
 ///
 /// \param src: the string representation as used in the class file
 /// \param class_name_prefix: name of class to append to generic type
