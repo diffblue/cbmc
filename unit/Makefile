@@ -24,6 +24,10 @@ SRC += unit_tests.cpp \
        java_bytecode/java_bytecode_parse_lambdas/java_bytecode_convert_class_lambda_method_handles.cpp \
        miniBDD_new.cpp \
        java_bytecode/java_string_library_preprocess/convert_exprt_to_string_exprt.cpp \
+       java_bytecode/java_types/erase_type_arguments.cpp \
+       java_bytecode/java_types/generic_type_index.cpp \
+       java_bytecode/java_types/java_generic_symbol_type.cpp \
+       java_bytecode/java_types/java_type_from_string.cpp \
        java_bytecode/java_utils_test.cpp \
        java_bytecode/inherited_static_fields/inherited_static_fields.cpp \
        pointer-analysis/custom_value_set_analysis.cpp \
