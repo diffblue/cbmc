@@ -37,6 +37,7 @@ SRC = bytecode_info.cpp \
       remove_java_new.cpp \
       replace_java_nondet.cpp \
       select_pointer_type.cpp \
+      simple_method_stubbing.cpp \
       # Empty last line
 
 INCLUDES= -I ..
