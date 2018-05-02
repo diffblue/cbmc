@@ -1050,6 +1050,7 @@ void jbmc_parse_optionst::help()
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     // This one is handled by jbmc_parse_options not by the Java frontend,
     // hence its presence here:
+    " --java-threading             enable experimental support for java multi-threading\n"// NOLINT(*)
     " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n" // NOLINT(*)
     // Currently only supported in the JBMC frontend:
     " --symex-driven-lazy-loading  only load functions when first entered by symbolic execution\n" // NOLINT(*)

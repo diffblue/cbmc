@@ -159,6 +159,7 @@ protected:
   irep_idt main_class;
   std::vector<irep_idt> main_jar_classes;
   java_class_loadert java_class_loader;
+  bool threading_support;
   bool assume_inputs_non_null;      // assume inputs variables to be non-null
   object_factory_parameterst object_factory_parameters;
   size_t max_user_array_length;     // max size for user code created arrays
