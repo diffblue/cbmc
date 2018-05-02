@@ -438,7 +438,7 @@ void goto_convertt::do_cpp_new(
       count.make_typecast(object_size.type());
 
     // might have side-effect
-    clean_expr(count, dest);
+    clean_expr(count, dest, ID_cpp);
   }
 
   exprt tmp_symbol_expr;
@@ -473,7 +473,7 @@ void goto_convertt::do_cpp_new(
     new_call.lhs()=tmp_symbol_expr;
     new_call.add_source_location()=rhs.source_location();
 
-    convert(new_call, dest);
+    convert(new_call, dest, ID_cpp);
   }
   else if(rhs.operands().size()==1)
   {
@@ -509,7 +509,7 @@ void goto_convertt::do_cpp_new(
       if(new_call.arguments()[i].type()!=code_type.parameters()[i].type())
         new_call.arguments()[i].make_typecast(code_type.parameters()[i].type());
 
-    convert(new_call, dest);
+    convert(new_call, dest, ID_cpp);
   }
   else
   {
@@ -551,7 +551,7 @@ void goto_convertt::cpp_new_initializer(
       const dereference_exprt deref_lhs(lhs, rhs.type().subtype());
 
       replace_new_object(deref_lhs, initializer);
-      convert(to_code(initializer), dest);
+      convert(to_code(initializer), dest, ID_cpp);
     }
     else
       UNREACHABLE;

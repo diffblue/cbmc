@@ -143,7 +143,8 @@ bool model_argc_argv(
     to_code(value),
     goto_model.symbol_table,
     init_instructions,
-    message_handler);
+    message_handler,
+    main_symbol.mode);
 
   Forall_goto_program_instructions(it, init_instructions)
   {

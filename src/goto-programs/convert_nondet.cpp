@@ -35,7 +35,8 @@ static goto_programt::targett insert_nondet_init_code(
   const goto_programt::targett &target,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  const object_factory_parameterst &object_factory_parameters)
+  const object_factory_parameterst &object_factory_parameters,
+  const irep_idt &mode)
 {
   // Return if the instruction isn't an assignment
   const auto next_instr=std::next(target);
@@ -96,7 +97,8 @@ static goto_programt::targett insert_nondet_init_code(
 
   // Convert this code into goto instructions
   goto_programt new_instructions;
-  goto_convert(init_code, symbol_table, new_instructions, message_handler);
+  goto_convert(
+    init_code, symbol_table, new_instructions, message_handler, mode);
 
   // Insert the new instructions into the instruction list
   goto_program.destructive_insert(next_instr, new_instructions);
@@ -116,25 +118,28 @@ void convert_nondet(
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  const object_factory_parameterst &object_factory_parameters)
+  const object_factory_parameterst &object_factory_parameters,
+  const irep_idt &mode)
 {
   for(auto instruction_iterator=goto_program.instructions.begin(),
         end=goto_program.instructions.end();
       instruction_iterator!=end;)
   {
-    instruction_iterator=insert_nondet_init_code(
+    instruction_iterator = insert_nondet_init_code(
       goto_program,
       instruction_iterator,
       symbol_table,
       message_handler,
-      object_factory_parameters);
+      object_factory_parameters,
+      mode);
   }
 }
 
 void convert_nondet(
   goto_model_functiont &function,
   message_handlert &message_handler,
-  const object_factory_parameterst &object_factory_parameters)
+  const object_factory_parameterst &object_factory_parameters,
+  const irep_idt &mode)
 {
   object_factory_parameterst parameters = object_factory_parameters;
   parameters.function_id = function.get_function_id();
@@ -142,7 +147,8 @@ void convert_nondet(
     function.get_goto_function().body,
     function.get_symbol_table(),
     message_handler,
-    parameters);
+    parameters,
+    mode);
 
   function.compute_location_numbers();
 }
@@ -167,7 +173,8 @@ void convert_nondet(
         f_it.second.body,
         symbol_table,
         message_handler,
-        object_factory_parameters);
+        object_factory_parameters,
+        symbol.mode);
     }
   }
 

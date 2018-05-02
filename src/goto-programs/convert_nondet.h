@@ -13,6 +13,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #define CPROVER_GOTO_PROGRAMS_CONVERT_NONDET_H
 
 #include <cstddef> // size_t
+#include <util/irep.h>
 
 class goto_functionst;
 class symbol_table_baset;
@@ -48,6 +49,7 @@ void convert_nondet(
 void convert_nondet(
   goto_model_functiont &function,
   message_handlert &message_handler,
-  const object_factory_parameterst &object_factory_parameters);
+  const object_factory_parameterst &object_factory_parameters,
+  const irep_idt &mode);
 
 #endif

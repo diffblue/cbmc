@@ -141,6 +141,7 @@ void goto_convert_functionst::convert_function(
   goto_functionst::goto_functiont &f)
 {
   const symbolt &symbol=ns.lookup(identifier);
+  const irep_idt mode = symbol.mode;
 
   if(f.body_available())
     return; // already converted
@@ -184,7 +185,7 @@ void goto_convert_functionst::convert_function(
     f.type.return_type().id()!=ID_constructor &&
     f.type.return_type().id()!=ID_destructor;
 
-  goto_convert_rec(code, f.body);
+  goto_convert_rec(code, f.body, mode);
 
   // add non-det return value, if needed
   if(targets.has_return_value)

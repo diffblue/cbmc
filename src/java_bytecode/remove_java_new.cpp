@@ -309,7 +309,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     for_loop.iter() = inc;
     for_loop.body() = for_body;
 
-    goto_convert(for_loop, symbol_table, tmp, get_message_handler());
+    goto_convert(for_loop, symbol_table, tmp, get_message_handler(), ID_java);
 
     // lower new side effects recursively
     lower_java_new(tmp);

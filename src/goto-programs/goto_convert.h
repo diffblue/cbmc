@@ -22,7 +22,8 @@ void goto_convert(
   const codet &code,
   symbol_table_baset &symbol_table,
   goto_programt &dest,
-  message_handlert &message_handler);
+  message_handlert &message_handler,
+  const irep_idt &mode);
 
 // start from "main"
 void goto_convert(
