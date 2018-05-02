@@ -854,7 +854,12 @@ java_generic_symbol_typet::java_generic_symbol_typet(
   set(ID_C_java_generic_symbol, true);
   const typet &base_type = java_type_from_string(base_ref, class_name_prefix);
   PRECONDITION(is_java_generic_type(base_type));
-  const java_generic_typet gen_base_type = to_java_generic_type(base_type);
+  const java_generic_typet &gen_base_type = to_java_generic_type(base_type);
+  INVARIANT(
+    type.get_identifier() == to_symbol_type(gen_base_type.subtype()).get_identifier(),
+    "identifier of "+type.pretty()+"\n and identifier of type "+
+    gen_base_type.subtype().pretty()+"\ncreated by java_type_from_string for "+
+    base_ref+" should be equal");
   generic_types().insert(
     generic_types().end(),
     gen_base_type.generic_type_arguments().begin(),
