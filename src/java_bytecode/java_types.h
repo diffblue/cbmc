@@ -582,18 +582,7 @@ public:
   java_generic_symbol_typet(
     const symbol_typet &type,
     const std::string &base_ref,
-    const std::string &class_name_prefix)
-    : symbol_typet(type)
-  {
-    set(ID_C_java_generic_symbol, true);
-    const typet &base_type = java_type_from_string(base_ref, class_name_prefix);
-    PRECONDITION(is_java_generic_type(base_type));
-    const java_generic_typet gen_base_type = to_java_generic_type(base_type);
-    generic_types().insert(
-      generic_types().end(),
-      gen_base_type.generic_type_arguments().begin(),
-      gen_base_type.generic_type_arguments().end());
-  }
+    const std::string &class_name_prefix);
 
   const generic_typest &generic_types() const
   {
@@ -605,24 +594,8 @@ public:
     return (generic_typest &)(add(ID_generic_types).get_sub());
   }
 
-  /// Check if this symbol has the given generic type. If yes, return its index
-  /// in the vector of generic types.
-  /// \param type The type we are looking for.
-  /// \return The index of the type in the vector of generic types.
   optionalt<size_t>
-  generic_type_index(const java_generic_parametert &type) const
-  {
-    const auto &type_variable = type.type_variable();
-    const auto &generics = generic_types();
-    for(std::size_t i = 0; i < generics.size(); ++i)
-    {
-      if(
-        is_java_generic_parameter(generics[i]) &&
-        to_java_generic_parameter(generics[i]).type_variable() == type_variable)
-        return i;
-    }
-    return {};
-  }
+  generic_type_index(const java_generic_parametert &type) const;
 };
 
 /// \param type: the type to check
