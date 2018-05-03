@@ -184,6 +184,12 @@ void goto_symext::symex_allocate(
     else
       throw "failed to zero initialize dynamic object";
   }
+  else
+  {
+    exprt nondet = build_symex_nondet(object_type);
+    code_assignt assignment(value_symbol.symbol_expr(), nondet);
+    symex_assign(state, assignment);
+  }
 
   exprt rhs;
 

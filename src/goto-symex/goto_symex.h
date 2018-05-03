@@ -376,6 +376,8 @@ protected:
     exprt &code,
     const irep_idt &identifier);
 
+  nondet_symbol_exprt build_symex_nondet(typet &type);
+
   // exceptions
   void symex_throw(statet &);
   void symex_catch(statet &);
