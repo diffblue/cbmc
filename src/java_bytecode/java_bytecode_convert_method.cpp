@@ -354,6 +354,7 @@ void java_bytecode_convert_method_lazy(
   method_symbol.mode=ID_java;
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
+
   if(m.is_public)
     member_type.set_access(ID_public);
   else if(m.is_protected)
@@ -363,7 +364,7 @@ void java_bytecode_convert_method_lazy(
   else
     member_type.set_access(ID_default);
 
-  if(is_constructor(method_symbol.base_name))
+  if(m.is_constructor())
   {
     method_symbol.pretty_name=
       id2string(class_symbol.pretty_name)+"."+
@@ -563,7 +564,7 @@ void java_bytecode_convert_methodt::convert(
   // The pretty name of a constructor includes the base name of the class
   // instead of the internal method name "<init>". For regular methods, it's
   // just the base name of the method.
-  if(is_constructor(method_symbol.base_name))
+  if(m.is_constructor())
   {
     method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
                                 id2string(class_symbol.base_name) + "()";
