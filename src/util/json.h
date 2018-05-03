@@ -169,6 +169,8 @@ public:
     array.push_back(jsont());
     return array.back();
   }
+
+  typedef jsont value_type; // NOLINT(readability/identifiers)
 };
 
 class json_stringt:public jsont
