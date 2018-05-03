@@ -13,7 +13,7 @@ Author: Michael Tautschnig
 
 #ifdef HAVE_CADICAL
 
-#include <cadical.hpp>
+#include <src/cadical.hpp>
 
 tvt satcheck_cadicalt::l_get(literalt a) const
 {
