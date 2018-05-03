@@ -71,6 +71,7 @@ protected:
       auto instruction = function.body.add_instruction();
       instruction->function = function_name;
       instruction->source_location = function_symbol.location;
+      instruction->source_location.set_function(function_symbol.display_name());
       return instruction;
     };
     auto assume_instruction = add_instruction();
@@ -125,7 +126,7 @@ protected:
       auto instruction = function.body.add_instruction();
       instruction->function = function_name;
       instruction->source_location = function_symbol.location;
-      instruction->source_location.set_function(function_name);
+      instruction->source_location.set_function(function_symbol.display_name());
       return instruction;
     };
     auto assert_instruction = add_instruction();
@@ -260,6 +261,7 @@ protected:
       auto instruction = function.body.add_instruction();
       instruction->function = function_name;
       instruction->source_location = function_symbol.location;
+      instruction->source_location.set_function(function_symbol.display_name());
       return instruction;
     };
     const namespacet ns(symbol_table);
