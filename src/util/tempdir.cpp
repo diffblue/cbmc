@@ -15,7 +15,7 @@ Author: CM Wintersteiger
 #endif
 
 #include <cstdlib>
-#include <cstring>
+#include <vector>
 
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
@@ -34,17 +34,18 @@ std::string get_temporary_directory(const std::string &name_template)
   std::string result;
 
   #ifdef _WIN32
-    DWORD dwBufSize = MAX_PATH;
-    char lpPathBuffer[MAX_PATH];
+    DWORD dwBufSize = MAX_PATH+1;
+    char lpPathBuffer[MAX_PATH+1];
     DWORD dwRetVal = GetTempPathA(dwBufSize, lpPathBuffer);
 
     if(dwRetVal > dwBufSize || (dwRetVal == 0))
       throw "GetTempPath failed"; // NOLINT(readability/throw)
 
+    // GetTempFileNameA produces <path>\<pre><uuuu>.TMP
+    // where <pre> = "TLO"
+    // Thus, we must make the buffer 1+3+4+1+3=12 characters longer.
+
     char t[MAX_PATH];
-
-    strncpy(t, name_template.c_str(), MAX_PATH);
-
     UINT uRetVal=GetTempFileNameA(lpPathBuffer, "TLO", 0, t);
     if(uRetVal == 0)
       throw "GetTempFileName failed"; // NOLINT(readability/throw)
@@ -64,9 +65,9 @@ std::string get_temporary_directory(const std::string &name_template)
       prefixed_name_template+='/';
     prefixed_name_template+=name_template;
 
-    char t[1000];
-    strncpy(t, prefixed_name_template.c_str(), 1000);
-    const char *td = mkdtemp(t);
+    std::vector<char> t(prefixed_name_template.begin(), prefixed_name_template.end());
+    t.push_back('\0'); // add the zero
+    const char *td = mkdtemp(t.data());
     if(!td)
       throw "mkdtemp failed";
     result=std::string(td);
