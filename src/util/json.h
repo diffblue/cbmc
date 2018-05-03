@@ -117,7 +117,7 @@ protected:
   {
   }
 
-  jsont(kindt _kind, const std::string &_value):kind(_kind), value(_value)
+  jsont(kindt _kind, std::string _value):kind(_kind), value(std::move(_value))
   {
   }
 
