@@ -41,7 +41,6 @@ public:
 
     // various language options
     bool char_is_unsigned, wchar_t_is_unsigned;
-    bool use_fixed_for_float;
     bool for_has_scope;
     bool single_precision_constant;
     enum class c_standardt { C89, C99, C11 } c_standard;

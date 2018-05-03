@@ -243,7 +243,6 @@ void ansi_c_architecture_strings(std::string &code)
   code+=architecture_string(config.ansi_c.wchar_t_width, "wchar_t_width");
   code+=architecture_string(config.ansi_c.char_is_unsigned, "char_is_unsigned");
   code+=architecture_string(config.ansi_c.wchar_t_is_unsigned, "wchar_t_is_unsigned"); // NOLINT(whitespace/line_length)
-  code+=architecture_string(config.ansi_c.use_fixed_for_float, "fixed_for_float"); // NOLINT(whitespace/line_length)
   code+=architecture_string(config.ansi_c.alignment, "alignment");
   code+=architecture_string(config.ansi_c.memory_operand_size, "memory_operand_size"); // NOLINT(whitespace/line_length)
   code+=architecture_string(static_cast<int>(config.ansi_c.endianness), "endianness"); // NOLINT(whitespace/line_length)

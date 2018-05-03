@@ -4,6 +4,9 @@
   generate bodies for functions that don't have a body
   in the goto code. This supercedes the functionality
   of --undefined-function-is-assume-false
+* The --fixedbv command-line option has been removed
+  (it was marked deprecated in January 2017)
+
 
 5.8
 ===

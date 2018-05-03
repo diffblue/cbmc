@@ -1,27 +1,29 @@
+typedef __CPROVER_fixedbv[32][16] fbvt;
+
 int main()
 {
   // constants
-  assert(1.0!=2.0);
-  assert(1.0==1.0);
-  assert(1.0<2.0);
-  assert(!(-1.0<-2.0));
-  assert(2.0>1.0);
-  assert(!(-2.0>-1.0));
-  assert(!(2.0<2.0));
-  assert(!(-2.0<-2.0));
-  assert(!(2.0>2.0));
-  assert(!(-2.0>-2.0));
-  assert(2.0<=2.0);
-  assert(-2.0<=-2.0);
-  assert(2.0>=2.0);
-  assert(-2.0>=-2.0);
-  assert(1.0<=2.0);
-  assert(!(-1.0<=-2.0));
-  assert(2.0>=1.0);
-  assert(!(-2.0>=-1.0));
+  assert((fbvt)1.0!=(fbvt)2.0);
+  assert((fbvt)1.0==(fbvt)1.0);
+  assert((fbvt)1.0<(fbvt)2.0);
+  assert(!((fbvt)-1.0<(fbvt)-2.0));
+  assert((fbvt)2.0>(fbvt)1.0);
+  assert(!((fbvt)-2.0>(fbvt)-1.0));
+  assert(!((fbvt)2.0<(fbvt)2.0));
+  assert(!((fbvt)-2.0<(fbvt)-2.0));
+  assert(!((fbvt)2.0>(fbvt)2.0));
+  assert(!((fbvt)-2.0>(fbvt)-2.0));
+  assert((fbvt)2.0<=(fbvt)2.0);
+  assert((fbvt)-2.0<=(fbvt)-2.0);
+  assert((fbvt)2.0>=(fbvt)2.0);
+  assert((fbvt)-2.0>=(fbvt)-2.0);
+  assert((fbvt)1.0<=(fbvt)2.0);
+  assert(!((fbvt)-1.0<=(fbvt)-2.0));
+  assert((fbvt)2.0>=(fbvt)1.0);
+  assert(!((fbvt)-2.0>=(fbvt)-1.0));
 
   // variables
-  float a, b, _a=a, _b=b;
+  fbvt a, b, _a=a, _b=b;
   __CPROVER_assume(a==1 && b==2);
 
   assert(a!=b);

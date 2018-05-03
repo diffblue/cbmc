@@ -739,7 +739,6 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=true; // C99 or later
   ansi_c.c_standard=ansi_ct::default_c_standard();
-  ansi_c.use_fixed_for_float=false;
   ansi_c.endianness=ansi_ct::endiannesst::NO_ENDIANNESS;
   ansi_c.os=ansi_ct::ost::NO_OS;
   ansi_c.arch="none";
@@ -790,12 +789,6 @@ bool configt::set(const cmdlinet &cmdline)
 
   if(cmdline.isset("include"))
     ansi_c.include_files=cmdline.get_values("include");
-
-  if(cmdline.isset("floatbv"))
-    ansi_c.use_fixed_for_float=false;
-
-  if(cmdline.isset("fixedbv"))
-    ansi_c.use_fixed_for_float=true;
 
   // the default architecture is the one we run on
   irep_idt this_arch=this_architecture();
@@ -1142,7 +1135,6 @@ void configt::set_from_symbol_table(
 
   ansi_c.char_is_unsigned=unsigned_from_ns(ns, "char_is_unsigned")!=0;
   ansi_c.wchar_t_is_unsigned=unsigned_from_ns(ns, "wchar_t_is_unsigned")!=0;
-  ansi_c.use_fixed_for_float=unsigned_from_ns(ns, "fixed_for_float")!=0;
   // for_has_scope, single_precision_constant, rounding_mode not
   // stored in namespace
 

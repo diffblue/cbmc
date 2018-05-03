@@ -74,60 +74,18 @@ exprt convert_float_literal(const std::string &src)
     // but these aren't handled anywhere
   }
 
-  if(config.ansi_c.use_fixed_for_float)
-  {
-    unsigned width=result.type().get_int(ID_width);
-    unsigned fraction_bits;
-    const irep_idt integer_bits=result.type().get(ID_integer_bits);
+  ieee_floatt a(to_floatbv_type(result.type()));
 
-    assert(width!=0);
-
-    if(integer_bits==irep_idt())
-      fraction_bits=width/2; // default
-    else
-      fraction_bits=width-std::stoi(id2string(integer_bits));
-
-    mp_integer factor=mp_integer(1)<<fraction_bits;
-    mp_integer value=parsed_float.significand*factor;
-
-    if(value!=0)
-    {
-      if(parsed_float.exponent<0)
-        value/=power(parsed_float.exponent_base, -parsed_float.exponent);
-      else
-      {
-        value*=power(parsed_float.exponent_base, parsed_float.exponent);
-
-        if(value>=power(2, width-1))
-        {
-          // saturate: use "biggest value"
-          value=power(2, width-1)-1;
-        }
-        else if(value<=-power(2, width-1)-1)
-        {
-          // saturate: use "smallest value"
-          value=-power(2, width-1);
-        }
-      }
-    }
-
-    result.set(ID_value, integer2binary(value, width));
-  }
+  if(parsed_float.exponent_base==10)
+    a.from_base10(parsed_float.significand, parsed_float.exponent);
+  else if(parsed_float.exponent_base==2) // hex
+    a.build(parsed_float.significand, parsed_float.exponent);
   else
-  {
-    ieee_floatt a(to_floatbv_type(result.type()));
+    UNREACHABLE;
 
-    if(parsed_float.exponent_base==10)
-      a.from_base10(parsed_float.significand, parsed_float.exponent);
-    else if(parsed_float.exponent_base==2) // hex
-      a.build(parsed_float.significand, parsed_float.exponent);
-    else
-      assert(false);
-
-    result.set(
-      ID_value,
-      integer2binary(a.pack(), a.spec.width()));
-  }
+  result.set(
+    ID_value,
+    integer2binary(a.pack(), a.spec.width()));
 
   if(parsed_float.is_imaginary)
   {
