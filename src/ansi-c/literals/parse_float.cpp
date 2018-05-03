@@ -11,15 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "parse_float.h"
 
+#include <algorithm>
 #include <cctype>
+#include <cstring>
 
-void parse_float(
-  const std::string &src,
-  mp_integer &significand,
-  mp_integer &exponent,
-  unsigned &exponent_base,
-  bool &is_float, bool &is_long, bool &is_imaginary,
-  bool &is_decimal, bool &is_float80, bool &is_float128)
+parse_floatt::parse_floatt(const std::string &src)
 {
   // {digits}{dot}{digits}{exponent}?{floatsuffix}?
   // {digits}{dot}{exponent}?{floatsuffix}?
@@ -30,7 +26,14 @@ void parse_float(
   // 0x{hexdigits}{dot}{hexdigits}[pP]{exponent}{floatsuffix}?
   // 0x{hexdigits}{dot}[pP]{exponent}{floatsuffix}?
 
-  const char *p=src.c_str();
+  // These are case-insensitive, and we handle this
+  // by first converting to lower case.
+
+  std::string src_lower=src;
+  std::transform(src_lower.begin(), src_lower.end(),
+                 src_lower.begin(), ::tolower);
+
+  const char *p=src_lower.c_str();
 
   std::string str_whole_number,
               str_fraction_part,
@@ -40,7 +43,7 @@ void parse_float(
 
   // is this hex?
 
-  if(src.size()>=2 && src[0]=='0' && tolower(src[1])=='x')
+  if(src_lower.size()>=2 && src_lower[0]=='0' && src_lower[1]=='x')
   {
     // skip the 0x
     p+=2;
@@ -48,7 +51,7 @@ void parse_float(
     exponent_base=2;
 
     // get whole number part
-    while(*p!='.' && *p!=0 && *p!='p' && *p!='P')
+    while(*p!='.' && *p!=0 && *p!='p')
     {
       str_whole_number+=*p;
       p++;
@@ -59,14 +62,14 @@ void parse_float(
       p++;
 
     // get fraction part
-    while(*p!=0 && *p!='p' && *p!='P')
+    while(*p!=0 && *p!='p')
     {
       str_fraction_part+=*p;
       p++;
     }
 
-    // skip P
-    if(*p=='p' || *p=='P')
+    // skip p
+    if(*p=='p')
       p++;
 
     // skip +
@@ -74,8 +77,8 @@ void parse_float(
       p++;
 
     // get exponent
-    while(*p!=0 && *p!='f' && *p!='F' && *p!='l' && *p!='L' &&
-          *p!='w' && *p!='W' && *p!='q' && *p!='Q' && *p!='d' && *p!='D')
+    while(*p!=0 && *p!='f' && *p!='l' &&
+          *p!='w' && *p!='q' && *p!='d')
     {
       str_exponent+=*p;
       p++;
@@ -104,10 +107,10 @@ void parse_float(
   else
   {
     // get whole number part
-    while(*p!='.' && *p!=0 && *p!='e' && *p!='E' &&
-          *p!='f' && *p!='F' && *p!='l' && *p!='L' &&
-          *p!='w' && *p!='W' && *p!='q' && *p!='Q' && *p!='d' && *p!='D' &&
-          *p!='i' && *p!='I' && *p!='j' && *p!='J')
+    while(*p!='.' && *p!=0 && *p!='e' &&
+          *p!='f' && *p!='l' &&
+          *p!='w' && *p!='q' && *p!='d' &&
+          *p!='i' && *p!='j')
     {
       str_whole_number+=*p;
       p++;
@@ -118,17 +121,17 @@ void parse_float(
       p++;
 
     // get fraction part
-    while(*p!=0 && *p!='e' && *p!='E' &&
-          *p!='f' && *p!='F' && *p!='l' && *p!='L' &&
-          *p!='w' && *p!='W' && *p!='q' && *p!='Q' && *p!='d' && *p!='D' &&
-          *p!='i' && *p!='I' && *p!='j' && *p!='J')
+    while(*p!=0 && *p!='e' &&
+          *p!='f' && *p!='l' &&
+          *p!='w' && *p!='q' && *p!='d' &&
+          *p!='i' && *p!='j')
     {
       str_fraction_part+=*p;
       p++;
     }
 
-    // skip E
-    if(*p=='e' || *p=='E')
+    // skip e
+    if(*p=='e')
       p++;
 
     // skip +
@@ -136,9 +139,9 @@ void parse_float(
       p++;
 
     // get exponent
-    while(*p!=0 && *p!='f' && *p!='F' && *p!='l' && *p!='L' &&
-          *p!='w' && *p!='W' && *p!='q' && *p!='Q' && *p!='d' && *p!='D' &&
-          *p!='i' && *p!='I' && *p!='j' && *p!='J')
+    while(*p!=0 && *p!='f' && *p!='l' &&
+          *p!='w' && *p!='q' && *p!='d' &&
+          *p!='i' && *p!='j')
     {
       str_exponent+=*p;
       p++;
@@ -162,27 +165,50 @@ void parse_float(
   }
 
   // get flags
-  is_float=is_long=is_imaginary=is_decimal=is_float80=is_float128=false;
+  is_float=is_long=false;
+  is_imaginary=is_decimal=false;
+  is_float16=false;
+  is_float32=is_float32x=false;
+  is_float64=is_float64x=false;
+  is_float80=false;
+  is_float128=is_float128x=false;
 
-  while(*p!=0)
+  if(strcmp(p, "f16")==0)
+    is_float16=true;
+  else if(strcmp(p, "f32")==0)
+    is_float32=true;
+  else if(strcmp(p, "f32x")==0)
+    is_float32x=true;
+  else if(strcmp(p, "f64")==0)
+    is_float64=true;
+  else if(strcmp(p, "f64x")==0)
+    is_float64x=true;
+  else if(strcmp(p, "f128")==0)
+    is_float128=true;
+  else if(strcmp(p, "f128x")==0)
+    is_float128x=true;
+  else
   {
-    if(*p=='f' || *p=='F')
-      is_float=true;
-    else if(*p=='l' || *p=='L')
-      is_long=true;
-    else if(*p=='i' || *p=='I' || *p=='j' || *p=='J')
-      is_imaginary=true;
-    // http://gcc.gnu.org/onlinedocs/gcc/Decimal-Float.html
-    else if(*p=='d' || *p=='D')
-      // a suffix with just d or D but nothing else is a GCC extension with no
-      // particular effect -- and forbidden by Clang
-      is_decimal=is_decimal || *(p+1)!=0;
-    // http://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
-    else if(*p=='w' || *p=='W')
-      is_float80=true;
-    else if(*p=='q' || *p=='Q')
-      is_float128=true;
+    while(*p!=0)
+    {
+      if(*p=='f')
+        is_float=true;
+      else if(*p=='l')
+        is_long=true;
+      else if(*p=='i' || *p=='j')
+        is_imaginary=true;
+      // http://gcc.gnu.org/onlinedocs/gcc/Decimal-Float.html
+      else if(*p=='d')
+        // a suffix with just d or D but nothing else is a GCC extension with no
+        // particular effect -- and forbidden by Clang
+        is_decimal=is_decimal || *(p+1)!=0;
+      // http://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+      else if(*p=='w')
+        is_float80=true;
+      else if(*p=='q')
+        is_float128=true;
 
-    p++;
+      p++;
+    }
   }
 }

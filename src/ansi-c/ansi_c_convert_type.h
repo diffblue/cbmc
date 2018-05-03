@@ -28,7 +28,12 @@ public:
   // extensions
   unsigned int8_cnt, int16_cnt, int32_cnt, int64_cnt,
            ptr32_cnt, ptr64_cnt,
-           gcc_float128_cnt, gcc_int128_cnt, bv_cnt,
+           gcc_float16_cnt,
+           gcc_float32_cnt, gcc_float32x_cnt,
+           gcc_float64_cnt, gcc_float64x_cnt,
+           gcc_float128_cnt, gcc_float128x_cnt,
+           gcc_int128_cnt,
+           bv_cnt,
            floatbv_cnt, fixedbv_cnt;
 
   typet gcc_attribute_mode;
@@ -63,7 +68,11 @@ public:
     long_cnt=double_cnt=float_cnt=c_bool_cnt=proper_bool_cnt=complex_cnt=
     int8_cnt=int16_cnt=int32_cnt=int64_cnt=
     ptr32_cnt=ptr64_cnt=
-    gcc_float128_cnt=gcc_int128_cnt=bv_cnt=floatbv_cnt=fixedbv_cnt=0;
+    gcc_float16_cnt=
+    gcc_float32_cnt=gcc_float32x_cnt=
+    gcc_float64_cnt=gcc_float64x_cnt=
+    gcc_float128_cnt=gcc_float128x_cnt=
+    gcc_int128_cnt=bv_cnt=floatbv_cnt=fixedbv_cnt=0;
     vector_size.make_nil();
     alignment.make_nil();
     bv_width.make_nil();

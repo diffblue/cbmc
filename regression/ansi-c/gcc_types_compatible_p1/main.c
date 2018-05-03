@@ -97,6 +97,10 @@ STATIC_ASSERT(!__builtin_types_compatible_p(unsigned, signed));
 
 #ifndef __clang__
 // clang doesn't have these
+STATIC_ASSERT(!__builtin_types_compatible_p(_Float32, float));
+STATIC_ASSERT(!__builtin_types_compatible_p(_Float64, double));
+STATIC_ASSERT(!__builtin_types_compatible_p(_Float32x, float));
+STATIC_ASSERT(!__builtin_types_compatible_p(_Float64x, double));
 STATIC_ASSERT(!__builtin_types_compatible_p(__float80, double));
 STATIC_ASSERT(!__builtin_types_compatible_p(__float128, long double));
 STATIC_ASSERT(!__builtin_types_compatible_p(__float128, double));

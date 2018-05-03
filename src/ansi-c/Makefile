@@ -27,6 +27,7 @@ SRC = anonymous_member.cpp \
       cprover_library.cpp \
       designator.cpp \
       expr2c.cpp \
+      gcc_types.cpp \
       literals/convert_character_literal.cpp \
       literals/convert_float_literal.cpp \
       literals/convert_integer_literal.cpp \

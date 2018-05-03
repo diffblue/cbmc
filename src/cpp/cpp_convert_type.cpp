@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/invariant.h>
 #include <util/std_types.h>
 
+#include <ansi-c/gcc_types.h>
+
 #include "cpp_declaration.h"
 #include "cpp_name.h"
 
