@@ -416,8 +416,10 @@ size_t find_closing_semi_colon_for_reference_type(
 /// representation thereof.
 ///
 /// Example use are object types like "Ljava/lang/Integer;", type
-/// variables/parameters like "TE;" which require a non-empty \p class_name
-/// or generic types like "Ljava/util/List<T>;" or "Ljava/util/List<Integer>;"
+/// variables/parameters like "TE;" which require a non-empty
+/// \p class_name_prefix or generic types like "Ljava/util/List<TE;>;"
+/// or "Ljava/util/List<Ljava/lang/Integer;>;" also requiring
+/// \p class_name_prefix.
 ///
 /// \param src: the string representation as used in the class file
 /// \param class_name_prefix: name of class to append to generic type
@@ -832,4 +834,53 @@ void get_dependencies_from_generic_parameters(
   std::set<irep_idt> &refs)
 {
   get_dependencies_from_generic_parameters_rec(t, refs);
+}
+
+/// Construct a generic symbol type by extending the symbol type \p type with
+/// generic types extracted from the reference \p base_ref.
+/// This assumes that the class named \p class_name_prefix extends or implements
+/// the class \p type, and that \p base_ref corresponds to a generic class.
+/// For instance since HashMap<K,V> extends Map<K,V> we would call
+/// `java_generic_symbol_typet(symbol_typet("Map"), "Ljava/util/Map<TK;TV;>;",
+/// "java.util.HashMap")` which generates a symbol type with identifier "Map",
+/// and two generic types with identifier "java.util.HashMap::K" and
+/// "java.util.HashMap::V" respectively.
+java_generic_symbol_typet::java_generic_symbol_typet(
+  const symbol_typet &type,
+  const std::string &base_ref,
+  const std::string &class_name_prefix)
+  : symbol_typet(type)
+{
+  set(ID_C_java_generic_symbol, true);
+  const typet &base_type = java_type_from_string(base_ref, class_name_prefix);
+  PRECONDITION(is_java_generic_type(base_type));
+  const java_generic_typet &gen_base_type = to_java_generic_type(base_type);
+  INVARIANT(
+    type.get_identifier() == to_symbol_type(gen_base_type.subtype()).get_identifier(),
+    "identifier of "+type.pretty()+"\n and identifier of type "+
+    gen_base_type.subtype().pretty()+"\ncreated by java_type_from_string for "+
+    base_ref+" should be equal");
+  generic_types().insert(
+    generic_types().end(),
+    gen_base_type.generic_type_arguments().begin(),
+    gen_base_type.generic_type_arguments().end());
+}
+
+/// Check if this symbol has the given generic type. If yes, return its index
+/// in the vector of generic types.
+/// \param type The parameter type we are looking for.
+/// \return The index of the type in the vector of generic types.
+optionalt<size_t> java_generic_symbol_typet::generic_type_index(
+  const java_generic_parametert &type) const
+{
+  const auto &type_variable = type.get_name();
+  const auto &generics = generic_types();
+  for(std::size_t i = 0; i < generics.size(); ++i)
+  {
+    if(
+      is_java_generic_parameter(generics[i]) &&
+      to_java_generic_parameter(generics[i]).get_name() == type_variable)
+      return i;
+  }
+  return {};
 }

@@ -7,7 +7,7 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
-#include <java_types.h>
+#include <java_bytecode/java_types.h>
 
 SCENARIO("erase_type_arguments", "[core][java_types]")
 {
