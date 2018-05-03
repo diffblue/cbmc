@@ -226,12 +226,6 @@ bool compilet::add_files_from_archive(
   const std::string &file_name,
   bool thin_archive)
 {
-#ifdef _WIN32
-  char td[MAX_PATH + 1];
-#else
-  char td[] = "goto-cc.XXXXXX";
-#endif
-
   std::stringstream cmd;
   FILE *stream;
 
@@ -239,7 +233,7 @@ bool compilet::add_files_from_archive(
 
   if(!thin_archive)
   {
-    tstr = get_temporary_directory(td);
+    tstr = get_temporary_directory("goto-cc.XXXXXX");
 
     if(tstr=="")
     {
