@@ -170,6 +170,12 @@ public:
     return array.back();
   }
 
+  template <typename... argumentst>
+  void emplace_back(argumentst &&... arguments)
+  {
+    array.emplace_back(std::forward<argumentst>(arguments)...);
+  }
+
   typedef jsont value_type; // NOLINT(readability/identifiers)
 };
 
