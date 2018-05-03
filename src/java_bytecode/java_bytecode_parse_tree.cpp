@@ -63,22 +63,16 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
     out << " extends " << extends;
   out << " {" << '\n';
 
-  for(fieldst::const_iterator
-      it=fields.begin();
-      it!=fields.end();
-      it++)
+  for(const auto &f : fields)
   {
-    it->output(out);
+    f.output(name, out);
   }
 
   out << '\n';
 
-  for(methodst::const_iterator
-      it=methods.begin();
-      it!=methods.end();
-      it++)
+  for(const auto &m : methods)
   {
-    it->output(out);
+    m.output(name, out);
   }
 
   out << '}' << '\n';
@@ -139,7 +133,9 @@ bool java_bytecode_parse_treet::does_annotation_exist(
       }) != annotations.end();
 }
 
-void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
+void java_bytecode_parse_treet::methodt::output(
+  const irep_idt &class_name,
+  std::ostream &out) const
 {
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
@@ -174,7 +170,11 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
   if(is_synchronized)
     out << "synchronized ";
 
-  out << name;
+  if(is_constructor())
+    out << class_name;
+  else
+    out << name;
+
   out << " : " << descriptor;
 
   out << '\n';
@@ -218,7 +218,9 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
   out << '\n';
 }
 
-void java_bytecode_parse_treet::fieldt::output(std::ostream &out) const
+void java_bytecode_parse_treet::fieldt::output(
+  const irep_idt &class_name,
+  std::ostream &out) const
 {
   for(const auto &annotation : annotations)
   {

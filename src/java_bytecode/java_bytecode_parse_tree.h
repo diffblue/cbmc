@@ -67,7 +67,9 @@ public:
     bool is_public, is_protected, is_private, is_static, is_final;
     annotationst annotations;
 
-    virtual void output(std::ostream &out) const = 0;
+    virtual void output(
+      const irep_idt &class_name,
+      std::ostream &out) const = 0;
 
     membert():
       is_public(false), is_protected(false),
@@ -80,6 +82,12 @@ public:
   {
   public:
     irep_idt base_name;
+
+    bool is_constructor() const
+    {
+      return base_name=="<init>";
+    }
+
     bool is_native, is_abstract, is_synchronized;
     source_locationt source_location;
 
@@ -155,7 +163,9 @@ public:
     typedef std::vector<stack_map_table_entryt> stack_map_tablet;
     stack_map_tablet stack_map_table;
 
-    virtual void output(std::ostream &out) const;
+    void output(
+      const irep_idt &class_name,
+      std::ostream &out) const override;
 
     methodt():
       is_native(false),
@@ -171,7 +181,11 @@ public:
   {
   public:
     virtual ~fieldt() = default;
-    virtual void output(std::ostream &out) const;
+
+    void output(
+      const irep_idt &class_name,
+      std::ostream &out) const override;
+
     bool is_enum;
   };
 
