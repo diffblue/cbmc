@@ -79,6 +79,11 @@ void fixedbvt::round(const fixedbv_spect &dest_spec)
 
     result=div;
   }
+  else // new_faction_bits==old_fraction_vits
+  {
+    // no change!
+    result=v;
+  }
 
   v=result;
   spec=dest_spec;
