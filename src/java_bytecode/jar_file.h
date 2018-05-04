@@ -13,6 +13,9 @@ Author: Diffblue Ltd
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <util/optional.h>
+
 #include "mz_zip_archive.h"
 
 class java_class_loader_limitt;
@@ -41,19 +44,23 @@ public:
   ~jar_filet()=default;
 
   /// Get contents of a file in the jar archive.
-  /// Terminates the program if file doesn't exist
+  /// Returns nullopt if file doesn't exist.
   /// \param filename Name of the file in the archive
-  std::string get_entry(const std::string &filename);
+  optionalt<std::string> get_entry(const std::string &filename);
+
   /// Get contents of the Manifest file in the jar archive
   std::unordered_map<std::string, std::string> get_manifest();
+
   /// Get list of filenames in the archive
   std::vector<std::string> filenames() const;
+
 private:
   /// Loads the fileindex (m_name_to_index) with a map of loaded files to
   /// indices.
   void initialize_file_index(java_class_loader_limitt &limit);
 
   mz_zip_archivet m_zip_archive;
+
   /// Map of filename to the file index in the zip archive.
   std::unordered_map<std::string, size_t> m_name_to_index;
 };

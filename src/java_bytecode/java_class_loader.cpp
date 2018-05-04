@@ -91,11 +91,14 @@ optionalt<java_bytecode_parse_treet> java_class_loadert::get_class_from_jar(
   debug()
     << "Getting class `" << class_name << "' from JAR " << jar_file << eom;
 
-  std::string data =
+  auto data =
     jar_pool(class_loader_limit, jar_file).get_entry(jar_index_it->second);
 
+  if(!data.has_value())
+    return {};
+
   java_bytecode_parse_treet parse_tree;
-  std::istringstream istream(data);
+  std::istringstream istream(*data);
   if(java_bytecode_parse(istream, parse_tree, get_message_handler()))
     return {};
   return parse_tree;
