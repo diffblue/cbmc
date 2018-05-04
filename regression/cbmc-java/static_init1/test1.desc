@@ -1,0 +1,8 @@
+CORE
+static_init.class
+--function static_init.main --java-threading
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
