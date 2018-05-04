@@ -14,14 +14,14 @@ SRC += analyses/ai/ai.cpp \
        analyses/does_remove_const/does_expr_lose_const.cpp \
        analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
-       analyses/interval/multiply.cpp \
-       analyses/interval/add.cpp \
-       analyses/interval/get_extreme.cpp \
-       analyses/interval/subtract.cpp \
-       analyses/interval/modulo.cpp \
-       analyses/interval/shift.cpp \
-       analyses/interval/comparisons.cpp \
-       analyses/interval/bitwise.cpp \
+       util/interval/multiply.cpp \
+       util/interval/add.cpp \
+       util/interval/get_extreme.cpp \
+       util/interval/subtract.cpp \
+       util/interval/modulo.cpp \
+       util/interval/shift.cpp \
+       util/interval/comparisons.cpp \
+       util/interval/bitwise.cpp \
        analyses/variable-sensitivity/abstract_object/merge.cpp \
        analyses/variable-sensitivity/constant_abstract_value/merge.cpp \
        analyses/variable-sensitivity/constant_array_abstract_object/merge.cpp \

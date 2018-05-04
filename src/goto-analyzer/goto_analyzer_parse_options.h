@@ -155,6 +155,7 @@ class optionst;
   "(location-sensitive)(concurrent)" \
   "(no-simplify-slicing)" \
   OPT_VALIDATE \
+  "(interval-values)"
 // clang-format on
 
 class goto_analyzer_parse_optionst: public parse_options_baset

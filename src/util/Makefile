@@ -106,6 +106,7 @@ SRC = allocate_objects.cpp \
       version.cpp \
       xml.cpp \
       xml_irep.cpp \
+      interval.cpp \
       # Empty last line
 
 INCLUDES= -I ..

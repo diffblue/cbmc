@@ -35,10 +35,10 @@ SCENARIO("add interval domain",
 
     WHEN("Both are positive [2,4]+[6,8]")
     {
-      intervalt left(values[2], values[4]);
-      intervalt right(values[6], values[8]);
+      interval_exprt left(values[2], values[4]);
+      interval_exprt right(values[6], values[8]);
 
-      intervalt result = left.plus(right);
+      interval_exprt result = left.plus(right);
 
       THEN("Domain is consistent")
       {
@@ -58,10 +58,10 @@ SCENARIO("add interval domain",
 
     WHEN("One contains infinite [2,4]+[6,INF]")
     {
-      intervalt left(values[2], values[4]);
-      intervalt right(values[6], max_exprt(type));
+      interval_exprt left(values[2], values[4]);
+      interval_exprt right(values[6], max_exprt(type));
 
-      intervalt result = left.plus(right);
+      interval_exprt result = left.plus(right);
 
       THEN("Domain is consistent")
       {
@@ -82,10 +82,10 @@ SCENARIO("add interval domain",
 
     WHEN("Both contain infinite [2,INF]+[6,INF]")
     {
-      intervalt left(values[2],  max_exprt(type));
-      intervalt right(values[6], max_exprt(type));
+      interval_exprt left(values[2],  max_exprt(type));
+      interval_exprt right(values[6], max_exprt(type));
 
-      intervalt result = left.plus(right);
+      interval_exprt result = left.plus(right);
 
       THEN("Domain is consistent")
       {

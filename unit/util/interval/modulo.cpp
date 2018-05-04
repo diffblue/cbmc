@@ -38,20 +38,20 @@ SCENARIO("modulo interval domain",
 
       THEN("Ensure result is consistent.")
       {
-        REQUIRE(intervalt(v[10], v[20]).modulo(intervalt(v[5], v[5])) == intervalt(v[0], v[4]));
-        REQUIRE(intervalt(v[10], v[20]).modulo(intervalt(v[4], v[5])) == intervalt(v[0], v[4]));
-        REQUIRE(intervalt(v[10], v[20]).modulo(intervalt(v[0], v[5])) == intervalt::top(type));
-        REQUIRE(intervalt(v[10], v[20]).modulo(intervalt(v[-5], v[5])) == intervalt::top(type));
+        REQUIRE(interval_exprt(v[10], v[20]).modulo(interval_exprt(v[5], v[5])) == interval_exprt(v[0], v[4]));
+        REQUIRE(interval_exprt(v[10], v[20]).modulo(interval_exprt(v[4], v[5])) == interval_exprt(v[0], v[4]));
+        REQUIRE(interval_exprt(v[10], v[20]).modulo(interval_exprt(v[0], v[5])) == interval_exprt::top(type));
+        REQUIRE(interval_exprt(v[10], v[20]).modulo(interval_exprt(v[-5], v[5])) == interval_exprt::top(type));
 
-        REQUIRE(intervalt(v[-10], v[20]).modulo(intervalt(v[0], v[5])) == intervalt::top(type));
-        REQUIRE(intervalt(v[-20], v[-10]).modulo(intervalt(v[0], v[5])) == intervalt::top(type));
+        REQUIRE(interval_exprt(v[-10], v[20]).modulo(interval_exprt(v[0], v[5])) == interval_exprt::top(type));
+        REQUIRE(interval_exprt(v[-20], v[-10]).modulo(interval_exprt(v[0], v[5])) == interval_exprt::top(type));
 
-        REQUIRE(intervalt(v[-20], v[-10]).modulo(intervalt(v[1], v[1])) == intervalt(v[0]));
+        REQUIRE(interval_exprt(v[-20], v[-10]).modulo(interval_exprt(v[1], v[1])) == interval_exprt(v[0]));
 
-        REQUIRE(intervalt(v[30], v[50]).modulo(intervalt(v[2], v[2])) == intervalt(v[0], v[1]));
+        REQUIRE(interval_exprt(v[30], v[50]).modulo(interval_exprt(v[2], v[2])) == interval_exprt(v[0], v[1]));
 
         // Problems
-        REQUIRE(intervalt(v[30], max_exprt(type)).modulo(intervalt(v[2], v[2])) == intervalt(v[0], v[1]));
+        REQUIRE(interval_exprt(v[30], max_exprt(type)).modulo(interval_exprt(v[2], v[2])) == interval_exprt(v[0], v[1]));
 
       }
     }

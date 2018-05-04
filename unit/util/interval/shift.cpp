@@ -37,7 +37,7 @@ SCENARIO("shift interval domain",
     {
       THEN("Something else")
       {
-        REQUIRE(intervalt(v[4], v[8]).left_shift(intervalt(v[1])) == intervalt(v[8], v[16]));
+        REQUIRE(interval_exprt(v[4], v[8]).left_shift(interval_exprt(v[1])) == interval_exprt(v[8], v[16]));
       }
     }
   }
