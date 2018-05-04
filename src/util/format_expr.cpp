@@ -165,6 +165,8 @@ std::ostream &format_rec(
               << to_member_expr(expr).get_component_name();
   else if(id == ID_symbol)
     return os << to_symbol_expr(expr).get_identifier();
+  else if(id == ID_type)
+    return format_rec(os, expr.type());
   else if(id == ID_forall || id == ID_exists)
     return os << id << ' ' << format(to_quantifier_expr(expr).symbol()) << " : "
               << format(to_quantifier_expr(expr).symbol().type()) << " . "
@@ -199,22 +201,30 @@ std::ostream &format_rec(
   }
   else
   {
-    if(!expr.has_operands())
-      return os << id;
+    os << id;
 
-    os << id << '(';
-    bool first = true;
+    for(const auto &s : expr.get_named_sub())
+      if(s.first!=ID_type)
+        os << ' ' << s.first << "=\"" << s.second.id() << '"';
 
-    for(const auto &op : expr.operands())
+    if(expr.has_operands())
     {
-      if(first)
-        first = false;
-      else
-        os << ", ";
+      os << id << '(';
+      bool first = true;
 
-      os << format(op);
+      for(const auto &op : expr.operands())
+      {
+        if(first)
+          first = false;
+        else
+          os << ", ";
+
+        os << format(op);
+      }
+
+      os << ')';
     }
 
-    return os << ')';
+    return os;
   }
 }
