@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_convert_type.h"
 #include "c_qualifiers.h"
+#include "gcc_types.h"
 #include "padding.h"
 #include "type2name.h"
 

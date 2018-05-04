@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/std_types.h>
 
+#include "gcc_types.h"
+
 void ansi_c_convert_typet::read(const typet &type)
 {
   clear();
@@ -80,8 +82,20 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     int32_cnt++;
   else if(type.id()==ID_int64)
     int64_cnt++;
+  else if(type.id()==ID_gcc_float16)
+    gcc_float16_cnt++;
+  else if(type.id()==ID_gcc_float32)
+    gcc_float32_cnt++;
+  else if(type.id()==ID_gcc_float32x)
+    gcc_float32x_cnt++;
+  else if(type.id()==ID_gcc_float64)
+    gcc_float64_cnt++;
+  else if(type.id()==ID_gcc_float64x)
+    gcc_float64x_cnt++;
   else if(type.id()==ID_gcc_float128)
     gcc_float128_cnt++;
+  else if(type.id()==ID_gcc_float128x)
+    gcc_float128x_cnt++;
   else if(type.id()==ID_gcc_int128)
     gcc_int128_cnt++;
   else if(type.id()==ID_gcc_attribute_mode)
@@ -248,7 +262,11 @@ void ansi_c_convert_typet::write(typet &type)
        unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
        short_cnt || char_cnt || complex_cnt || long_cnt ||
        int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
-       gcc_float128_cnt || gcc_int128_cnt || bv_cnt)
+       gcc_float16_cnt ||
+       gcc_float32_cnt || gcc_float32x_cnt ||
+       gcc_float64_cnt || gcc_float64x_cnt ||
+       gcc_float128_cnt || gcc_float128x_cnt ||
+       gcc_int128_cnt || bv_cnt)
     {
       error().source_location=source_location;
       error() << "illegal type modifier for defined type" << eom;
@@ -305,7 +323,10 @@ void ansi_c_convert_typet::write(typet &type)
             << "found " << type.pretty() << eom;
     throw 0;
   }
-  else if(gcc_float128_cnt)
+  else if(gcc_float16_cnt ||
+          gcc_float32_cnt || gcc_float32x_cnt ||
+          gcc_float64_cnt || gcc_float64x_cnt ||
+          gcc_float128_cnt || gcc_float128x_cnt)
   {
     if(signed_cnt || unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
        int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
@@ -313,19 +334,38 @@ void ansi_c_convert_typet::write(typet &type)
        short_cnt || char_cnt)
     {
       error().source_location=source_location;
-      error() << "cannot combine integer type with float" << eom;
+      error() << "cannot combine integer type with floating-point type" << eom;
       throw 0;
     }
 
-    if(long_cnt || double_cnt || float_cnt)
+    if(long_cnt+double_cnt+
+       float_cnt+gcc_float16_cnt+
+       gcc_float32_cnt+gcc_float32x_cnt+
+       gcc_float64_cnt+gcc_float64x_cnt+
+       gcc_float128_cnt+gcc_float128x_cnt>=2)
     {
       error().source_location=source_location;
       error() << "conflicting type modifiers" << eom;
       throw 0;
     }
 
-    // _not_ the same as long double
-    type=gcc_float128_type();
+    // _not_ the same as float, double, long double
+    if(gcc_float16_cnt)
+      type=gcc_float16_type();
+    else if(gcc_float32_cnt)
+      type=gcc_float32_type();
+    else if(gcc_float32x_cnt)
+      type=gcc_float32x_type();
+    else if(gcc_float64_cnt)
+      type=gcc_float64_type();
+    else if(gcc_float64x_cnt)
+      type=gcc_float64x_type();
+    else if(gcc_float128_cnt)
+      type=gcc_float128_type();
+    else if(gcc_float128x_cnt)
+      type=gcc_float128x_type();
+    else
+      UNREACHABLE;
   }
   else if(double_cnt || float_cnt)
   {
@@ -335,7 +375,7 @@ void ansi_c_convert_typet::write(typet &type)
        short_cnt || char_cnt)
     {
       error().source_location=source_location;
-      error() << "cannot combine integer type with float" << eom;
+      error() << "cannot combine integer type with floating-point type" << eom;
       throw 0;
     }
 

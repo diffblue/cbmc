@@ -202,7 +202,7 @@ hexfloat1       "0"[xX]{hexdigit}*"."{hexdigit}+[pP][+-]?{integer}
 hexfloat2       "0"[xX]{hexdigit}*"."[pP][+-]?{integer}
 hexfloat3       "0"[xX]{hexdigit}*[pP][+-]?{integer}
 float_suffix    [fFlLiIjJ]*
-gcc_ext_float_suffix    [wWqQ]|[dD][fFdDlL]?
+gcc_ext_float_suffix    [wWqQ]|[dD][fFdDlL]?|"f16"|"f32"|"f64"|"f128"|"f32x"|"f64x"|"f128x"
 float           {float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
 float_s         {float}{float_suffix}|{integer}[fF]
 gcc_ext_float_s {float}{gcc_ext_float_suffix}
@@ -459,6 +459,41 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
+"_Float16"      { // clang doesn't have it
+                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+                  { loc(); return TOK_GCC_FLOAT16; }
+                  else
+                    return make_identifier();
+                }
+
+"_Float32"      { // clang doesn't have it
+                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+                  { loc(); return TOK_GCC_FLOAT32; }
+                  else
+                    return make_identifier();
+                }
+
+"_Float32x"     { // clang doesn't have it
+                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+                  { loc(); return TOK_GCC_FLOAT32X; }
+                  else
+                    return make_identifier();
+                }
+
+"_Float64"      { // clang doesn't have it
+                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+                  { loc(); return TOK_GCC_FLOAT64; }
+                  else
+                    return make_identifier();
+                }
+
+"_Float64x"     { // clang doesn't have it
+                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+                  { loc(); return TOK_GCC_FLOAT64X; }
+                  else
+                    return make_identifier();
+                }
+
 "__float80"     { // clang doesn't have it
                   if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                   { loc(); return TOK_GCC_FLOAT80; }
@@ -470,6 +505,13 @@ void ansi_c_scanner_init()
 "_Float128"     { // clang doesn't have it
                   if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                   { loc(); return TOK_GCC_FLOAT128; }
+                  else
+                    return make_identifier();
+                }
+
+"_Float128x"    { // clang doesn't have it
+                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+                  { loc(); return TOK_GCC_FLOAT128X; }
                   else
                     return make_identifier();
                 }

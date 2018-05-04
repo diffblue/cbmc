@@ -16,16 +16,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/mp_arith.h>
 
-void parse_float(
-  const std::string &src,
-  mp_integer &significand,
-  mp_integer &exponent,
-  unsigned &exponent_base, // 2 (hex) or 10
-  bool &is_float,
-  bool &is_long,
-  bool &is_imaginary, // a gcc extension
-  bool &is_decimal, // a gcc extension
-  bool &is_float80, // a gcc extension
-  bool &is_float128); // a gcc extension
+class parse_floatt
+{
+public:
+  mp_integer significand, exponent;
+  unsigned exponent_base; // 2 (hex) or 10
+
+  bool is_float, is_long;
+
+  // gcc extensions
+  bool is_imaginary, is_decimal, is_float16,
+       is_float32, is_float32x,
+       is_float64, is_float64x,
+       is_float80,
+       is_float128, is_float128x;
+
+  // parse!
+  explicit parse_floatt(const std::string &);
+};
 
 #endif // CPROVER_ANSI_C_LITERALS_PARSE_FLOAT_H

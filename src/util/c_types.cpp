@@ -258,27 +258,6 @@ bitvector_typet long_double_type()
   }
 }
 
-bitvector_typet gcc_float128_type()
-{
-  // not same as long double!
-
-  if(config.ansi_c.use_fixed_for_float)
-  {
-    fixedbv_typet result;
-    result.set_width(128);
-    result.set_integer_bits(128/2);
-    result.set(ID_C_c_type, ID_gcc_float128);
-    return result;
-  }
-  else
-  {
-    floatbv_typet result=
-      ieee_float_spect::quadruple_precision().to_type();
-    result.set(ID_C_c_type, ID_gcc_float128);
-    return result;
-  }
-}
-
 signedbv_typet pointer_diff_type()
 {
   // The pointer-diff type varies. This is signed int on some systems,
@@ -307,20 +286,6 @@ reference_typet reference_type(const typet &subtype)
 typet void_type()
 {
   return empty_typet();
-}
-
-unsignedbv_typet gcc_unsigned_int128_type()
-{
-  unsignedbv_typet result(128);
-  result.set(ID_C_c_type, ID_unsigned_int128);
-  return result;
-}
-
-signedbv_typet gcc_signed_int128_type()
-{
-  signedbv_typet result(128);
-  result.set(ID_C_c_type, ID_signed_int128);
-  return result;
 }
 
 std::string c_type_as_string(const irep_idt &c_type)

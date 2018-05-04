@@ -121,8 +121,14 @@ extern char *yyansi_ctext;
 %token TOK_PTR64       "__ptr64"
 %token TOK_TYPEOF      "typeof"
 %token TOK_GCC_AUTO_TYPE "__auto_type"
+%token TOK_GCC_FLOAT16 "_Float16"
+%token TOK_GCC_FLOAT32 "_Float32"
+%token TOK_GCC_FLOAT32X "_Float32x"
 %token TOK_GCC_FLOAT80 "__float80"
-%token TOK_GCC_FLOAT128 "__float128"
+%token TOK_GCC_FLOAT64 "_Float64"
+%token TOK_GCC_FLOAT64X "_Float64x"
+%token TOK_GCC_FLOAT128 "_Float128"
+%token TOK_GCC_FLOAT128X "_Float128x"
 %token TOK_GCC_INT128 "__int128"
 %token TOK_GCC_DECIMAL32 "_Decimal32"
 %token TOK_GCC_DECIMAL64 "_Decimal64"
@@ -1388,9 +1394,15 @@ basic_type_name:
         | TOK_SHORT    { $$=$1; set($$, ID_short); }
         | TOK_LONG     { $$=$1; set($$, ID_long); }
         | TOK_FLOAT    { $$=$1; set($$, ID_float); }
-        | TOK_GCC_FLOAT80 { $$=$1; set($$, ID_gcc_float80); }
-        | TOK_GCC_FLOAT128 { $$=$1; set($$, ID_gcc_float128); }
-        | TOK_GCC_INT128 { $$=$1; set($$, ID_gcc_int128); }
+        | TOK_GCC_FLOAT16   { $$=$1; set($$, ID_gcc_float16); }
+        | TOK_GCC_FLOAT32   { $$=$1; set($$, ID_gcc_float32); }
+        | TOK_GCC_FLOAT32X  { $$=$1; set($$, ID_gcc_float32x); }
+        | TOK_GCC_FLOAT64   { $$=$1; set($$, ID_gcc_float64); }
+        | TOK_GCC_FLOAT64X  { $$=$1; set($$, ID_gcc_float64x); }
+        | TOK_GCC_FLOAT80   { $$=$1; set($$, ID_gcc_float80); }
+        | TOK_GCC_FLOAT128  { $$=$1; set($$, ID_gcc_float128); }
+        | TOK_GCC_FLOAT128X { $$=$1; set($$, ID_gcc_float128x); }
+        | TOK_GCC_INT128    { $$=$1; set($$, ID_gcc_int128); }
         | TOK_GCC_DECIMAL32 { $$=$1; set($$, ID_gcc_decimal32); }
         | TOK_GCC_DECIMAL64 { $$=$1; set($$, ID_gcc_decimal64); }
         | TOK_GCC_DECIMAL128 { $$=$1; set($$, ID_gcc_decimal128); }
