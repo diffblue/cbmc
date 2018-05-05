@@ -83,7 +83,7 @@ std::string floating_point_to_java_string(float_type value)
     {
       return std::stod(decimal) == value;
     }
-    catch(std::out_of_range)
+    catch(std::out_of_range &)
     {
       return false;
     }
