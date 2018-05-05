@@ -437,6 +437,7 @@ void goto_convertt::remove_cpp_new(
   new_symbol.base_name = "new_ptr$0";
   new_symbol.type=expr.type();
   new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
+  new_symbol.mode = ID_cpp;
 
   // ensure that the name is unique
   new_name(new_symbol);
@@ -491,6 +492,7 @@ void goto_convertt::remove_malloc(
     new_symbol.type=expr.type();
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
     new_symbol.location=expr.source_location();
+    new_symbol.mode = mode;
 
     // ensure that the name is unique
     new_name(new_symbol);
