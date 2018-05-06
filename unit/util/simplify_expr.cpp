@@ -9,7 +9,9 @@
 #include <testing-utils/catch.hpp>
 
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/namespace.h>
 #include <util/pointer_predicates.h>
@@ -58,4 +60,25 @@ TEST_CASE("Simplify const pointer offset")
   mp_integer offset_value;
   REQUIRE(!to_integer(simp, offset_value));
   REQUIRE(offset_value==1234);
+}
+
+TEST_CASE("Simplify byte extract")
+{
+  // this test does require a proper architecture to be set so that byte extract
+  // uses adequate endianness
+  cmdlinet cmdline;
+  config.set(cmdline);
+
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  // byte-extracting type T at offset 0 from an object of type T yields the
+  // object
+  symbol_exprt s("foo", size_type());
+  byte_extract_exprt be(
+    byte_extract_id(), s, from_integer(0, index_type()), size_type());
+
+  exprt simp = simplify_expr(be, ns);
+
+  REQUIRE(simp == s);
 }
