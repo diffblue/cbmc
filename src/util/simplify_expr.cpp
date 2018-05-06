@@ -1679,17 +1679,26 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
   if(to_integer(expr.offset(), offset) || offset<0)
     return true;
 
-  // byte extract of full object is object
   // don't do any of the following if endianness doesn't match, as
   // bytes need to be swapped
-  if(
-    offset == 0 && base_type_eq(expr.type(), expr.op().type(), ns) &&
-    byte_extract_id() == expr.id())
+  if(offset == 0 && byte_extract_id() == expr.id())
   {
-    exprt tmp=expr.op();
-    expr.swap(tmp);
+    // byte extract of full object is object
+    if(base_type_eq(expr.type(), expr.op().type(), ns))
+    {
+      exprt tmp = expr.op();
+      expr.swap(tmp);
 
-    return false;
+      return false;
+    }
+    else if(
+      expr.type().id() == ID_pointer && expr.op().type().id() == ID_pointer)
+    {
+      typecast_exprt tc(expr.op(), expr.type());
+      expr.swap(tc);
+
+      return false;
+    }
   }
 
   // no proper simplification for expr.type()==void

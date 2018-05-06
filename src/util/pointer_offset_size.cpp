@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 
 #include "arith_tools.h"
+#include "base_type.h"
+#include "byte_operators.h"
 #include "c_types.h"
 #include "invariant.h"
 #include "namespace.h"
@@ -676,67 +678,82 @@ exprt build_sizeof_expr(
 
 exprt get_subexpression_at_offset(
   const exprt &expr,
-  mp_integer offset,
+  const mp_integer &offset_bytes,
   const typet &target_type_raw,
   const namespacet &ns)
 {
-  exprt result = expr;
-  const typet &source_type=ns.follow(result.type());
-  const typet &target_type=ns.follow(target_type_raw);
+  if(offset_bytes == 0 && base_type_eq(expr.type(), target_type_raw, ns))
+  {
+    exprt result = expr;
 
-  if(offset==0 && source_type==target_type)
+    if(expr.type() != target_type_raw)
+      result.type() = target_type_raw;
+
     return result;
+  }
+
+  const typet &source_type = ns.follow(expr.type());
+  const auto target_size_bits = pointer_offset_bits(target_type_raw, ns);
+  if(!target_size_bits.has_value())
+    return nil_exprt();
 
   if(source_type.id()==ID_struct)
   {
-    const auto &st=to_struct_type(source_type);
-    const struct_typet::componentst &components=st.components();
-    member_offset_iterator offsets(st, ns);
-    while(offsets->first<components.size() &&
-          offsets->second!=-1 &&
-          offsets->second<=offset)
+    const struct_typet &struct_type = to_struct_type(source_type);
+
+    mp_integer m_offset_bits = 0;
+    for(const auto &component : struct_type.components())
     {
-      auto nextit=offsets;
-      ++nextit;
-      if((offsets->first+1)==components.size() || offset<nextit->second)
+      const auto m_size_bits = pointer_offset_bits(component.type(), ns);
+      if(!m_size_bits.has_value())
+        return nil_exprt();
+
+      // if this member completely contains the target, and this member is
+      // byte-aligned, recurse into it
+      if(
+        offset_bytes * 8 >= m_offset_bits && m_offset_bits % 8 == 0 &&
+        offset_bytes * 8 + *target_size_bits <= m_offset_bits + *m_size_bits)
       {
-        // This field might be, or might contain, the answer.
-        result=
-          member_exprt(
-            result,
-            components[offsets->first].get_name(),
-            components[offsets->first].type());
-        return
-          get_subexpression_at_offset(
-            result, offset-offsets->second, target_type, ns);
+        const member_exprt member(expr, component.get_name(), component.type());
+        return get_subexpression_at_offset(
+          member, offset_bytes - m_offset_bits / 8, target_type_raw, ns);
       }
-      ++offsets;
+
+      m_offset_bits += *m_size_bits;
     }
-    return nil_exprt();
   }
   else if(source_type.id()==ID_array)
   {
-    // A cell of the array might be, or contain, the subexpression
-    // we're looking for.
-    const auto &at=to_array_type(source_type);
+    const array_typet &array_type = to_array_type(source_type);
 
-    auto elem_size = pointer_offset_size(at.subtype(), ns);
+    const auto elem_size_bits = pointer_offset_bits(array_type.subtype(), ns);
 
-    if(!elem_size.has_value())
+    // no arrays of non-byte-aligned, zero-, or unknown-sized objects
+    if(
+      !elem_size_bits.has_value() || *elem_size_bits == 0 ||
+      *elem_size_bits % 8 != 0)
+    {
       return nil_exprt();
+    }
 
-    mp_integer cellidx = offset / (*elem_size);
-
-    if(cellidx < 0 || !cellidx.is_long())
-      return nil_exprt();
-
-    offset = offset % (*elem_size);
-
-    result=index_exprt(result, from_integer(cellidx, unsignedbv_typet(64)));
-    return get_subexpression_at_offset(result, offset, target_type, ns);
+    if(*target_size_bits <= *elem_size_bits)
+    {
+      const mp_integer elem_size_bytes = *elem_size_bits / 8;
+      return get_subexpression_at_offset(
+        index_exprt(
+          expr, from_integer(offset_bytes / elem_size_bytes, index_type())),
+        offset_bytes % elem_size_bytes,
+        target_type_raw,
+        ns);
+    }
   }
-  else
-    return nil_exprt();
+
+  const byte_extract_exprt be(
+    byte_extract_id(),
+    expr,
+    from_integer(offset_bytes, index_type()),
+    target_type_raw);
+  return simplify_expr(be, ns);
 }
 
 exprt get_subexpression_at_offset(

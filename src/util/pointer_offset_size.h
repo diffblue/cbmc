@@ -81,7 +81,7 @@ exprt build_sizeof_expr(
 
 exprt get_subexpression_at_offset(
   const exprt &expr,
-  mp_integer offset,
+  const mp_integer &offset,
   const typet &target_type,
   const namespacet &ns);
 
