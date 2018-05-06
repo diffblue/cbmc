@@ -722,12 +722,11 @@ exprt get_subexpression_at_offset(
     }
   }
 
-  const byte_extract_exprt be(
+  return byte_extract_exprt(
     byte_extract_id(),
     expr,
     from_integer(offset_bytes, index_type()),
     target_type_raw);
-  return simplify_expr(be, ns);
 }
 
 exprt get_subexpression_at_offset(

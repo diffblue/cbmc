@@ -1781,112 +1781,15 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
     }
   }
 
-  // rethink the remaining code to correctly handle big endian
-  if(expr.id()!=ID_byte_extract_little_endian)
+  // try to refine it down to extracting from a member or an index in an array
+  exprt subexpr =
+    get_subexpression_at_offset(expr.op(), offset, expr.type(), ns);
+  if(subexpr.is_nil() || subexpr == expr)
     return true;
 
-  // get type of object
-  const typet &op_type=ns.follow(expr.op().type());
-
-  if(op_type.id()==ID_array)
-  {
-    exprt result=expr.op();
-
-    // try proper array or string constant
-    for(const typet *op_type_ptr=&op_type;
-        op_type_ptr->id()==ID_array;
-        op_type_ptr=&(ns.follow(*op_type_ptr).subtype()))
-    {
-      DATA_INVARIANT(*el_size > 0, "arrays must not have zero-sized objects");
-      DATA_INVARIANT(
-        (*el_size) % 8 == 0,
-        "array elements have a size in bits which is a multiple of bytes");
-
-      mp_integer el_bytes = (*el_size) / 8;
-
-      if(base_type_eq(expr.type(), op_type_ptr->subtype(), ns) ||
-         (expr.type().id()==ID_pointer &&
-          op_type_ptr->subtype().id()==ID_pointer))
-      {
-        if(offset%el_bytes==0)
-        {
-          offset/=el_bytes;
-
-          result=
-            index_exprt(
-              result,
-              from_integer(offset, expr.offset().type()));
-          result.make_typecast(expr.type());
-
-          if(!base_type_eq(expr.type(), op_type_ptr->subtype(), ns))
-             result.make_typecast(expr.type());
-
-          expr.swap(result);
-          simplify_rec(expr);
-          return false;
-        }
-      }
-      else
-      {
-        auto sub_size = pointer_offset_size(op_type_ptr->subtype(), ns);
-
-        if(sub_size.has_value() && *sub_size > 0)
-        {
-          mp_integer index = offset / (*sub_size);
-          offset %= (*sub_size);
-
-          result=
-            index_exprt(
-              result,
-              from_integer(index, expr.offset().type()));
-        }
-      }
-    }
-  }
-  else if(op_type.id()==ID_struct)
-  {
-    const struct_typet &struct_type=
-      to_struct_type(op_type);
-    const struct_typet::componentst &components=
-      struct_type.components();
-
-    mp_integer m_offset_bits=0;
-    for(const auto &component : components)
-    {
-      auto m_size = pointer_offset_bits(component.type(), ns);
-      if(!m_size.has_value() || *m_size <= 0)
-        break;
-
-      if(
-        offset * 8 == m_offset_bits && *el_size == *m_size &&
-        base_type_eq(expr.type(), component.type(), ns))
-      {
-        member_exprt member(expr.op(), component.get_name(), component.type());
-        simplify_member(member);
-        expr.swap(member);
-
-        return false;
-      }
-      else if(
-        offset * 8 >= m_offset_bits &&
-        offset * 8 + *el_size <= m_offset_bits + *m_size &&
-        m_offset_bits % 8 == 0)
-      {
-        expr.op()=
-          member_exprt(expr.op(), component.get_name(), component.type());
-        simplify_member(expr.op());
-        expr.offset()=
-          from_integer(offset-m_offset_bits/8, expr.offset().type());
-        simplify_rec(expr);
-
-        return false;
-      }
-
-      m_offset_bits += *m_size;
-    }
-  }
-
-  return true;
+  simplify_rec(subexpr);
+  expr.swap(subexpr);
+  return false;
 }
 
 bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
