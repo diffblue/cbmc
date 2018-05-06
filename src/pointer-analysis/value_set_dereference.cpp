@@ -466,18 +466,18 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       if(ns.follow(result.value.type())!=ns.follow(dereference_type))
         result.value.make_typecast(dereference_type);
     }
-    else if(get_subexpression_at_offset(
-        root_object_subexpression,
-        o.offset(),
-        dereference_type,
-        ns))
-    {
-      // Successfully found a member, array index, or combination thereof
-      // that matches the desired type and offset:
-      result.value=root_object_subexpression;
-    }
     else
     {
+      exprt subexpr = get_subexpression_at_offset(
+        root_object_subexpression, o.offset(), dereference_type, ns);
+      if(subexpr.is_not_nil())
+      {
+        // Successfully found a member, array index, or combination thereof
+        // that matches the desired type and offset:
+        result.value = subexpr;
+        return result;
+      }
+
       // we extract something from the root object
       result.value=o.root_object();
 

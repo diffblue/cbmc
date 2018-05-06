@@ -79,14 +79,14 @@ exprt build_sizeof_expr(
   const constant_exprt &expr,
   const namespacet &ns);
 
-bool get_subexpression_at_offset(
-  exprt &result,
+exprt get_subexpression_at_offset(
+  const exprt &expr,
   mp_integer offset,
   const typet &target_type,
   const namespacet &ns);
 
-bool get_subexpression_at_offset(
-  exprt &result,
+exprt get_subexpression_at_offset(
+  const exprt &expr,
   const exprt &offset,
   const typet &target_type,
   const namespacet &ns);

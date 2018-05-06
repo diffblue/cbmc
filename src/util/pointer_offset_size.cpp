@@ -630,17 +630,18 @@ exprt build_sizeof_expr(
   return result;
 }
 
-bool get_subexpression_at_offset(
-  exprt &result,
+exprt get_subexpression_at_offset(
+  const exprt &expr,
   mp_integer offset,
   const typet &target_type_raw,
   const namespacet &ns)
 {
+  exprt result = expr;
   const typet &source_type=ns.follow(result.type());
   const typet &target_type=ns.follow(target_type_raw);
 
   if(offset==0 && source_type==target_type)
-    return true;
+    return result;
 
   if(source_type.id()==ID_struct)
   {
@@ -667,7 +668,7 @@ bool get_subexpression_at_offset(
       }
       ++offsets;
     }
-    return false;
+    return nil_exprt();
   }
   else if(source_type.id()==ID_array)
   {
@@ -678,12 +679,12 @@ bool get_subexpression_at_offset(
     auto elem_size = pointer_offset_size(at.subtype(), ns);
 
     if(!elem_size.has_value())
-      return false;
+      return nil_exprt();
 
     mp_integer cellidx = offset / (*elem_size);
 
     if(cellidx < 0 || !cellidx.is_long())
-      return false;
+      return nil_exprt();
 
     offset = offset % (*elem_size);
 
@@ -691,11 +692,11 @@ bool get_subexpression_at_offset(
     return get_subexpression_at_offset(result, offset, target_type, ns);
   }
   else
-    return false;
+    return nil_exprt();
 }
 
-bool get_subexpression_at_offset(
-  exprt &result,
+exprt get_subexpression_at_offset(
+  const exprt &expr,
   const exprt &offset,
   const typet &target_type,
   const namespacet &ns)
@@ -703,7 +704,7 @@ bool get_subexpression_at_offset(
   mp_integer offset_const;
 
   if(to_integer(offset, offset_const))
-    return false;
+    return nil_exprt();
   else
-    return get_subexpression_at_offset(result, offset_const, target_type, ns);
+    return get_subexpression_at_offset(expr, offset_const, target_type, ns);
 }
