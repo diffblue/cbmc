@@ -69,8 +69,6 @@ void testTwo (void) {
    f2.f = returnsField(1);
 
    assert(f1.ieee.negative != f2.ieee.negative);
-
-   return 1;
 }
 
 
