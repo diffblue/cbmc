@@ -884,3 +884,64 @@ optionalt<size_t> java_generic_symbol_typet::generic_type_index(
   }
   return {};
 }
+
+std::string pretty_java_type(const typet &type)
+{
+  if(type == java_int_type())
+    return "int";
+  else if(type == java_long_type())
+    return "long";
+  else if(type == java_short_type())
+    return "short";
+  else if(type == java_byte_type())
+    return "byte";
+  else if(type == java_char_type())
+    return "char";
+  else if(type == java_float_type())
+    return "float";
+  else if(type == java_double_type())
+    return "double";
+  else if(type == java_boolean_type())
+    return "boolean";
+  else if(type == java_byte_type())
+    return "byte";
+  else if(is_reference(type))
+  {
+    if(type.subtype().id() == ID_symbol)
+    {
+      const auto &symbol_type = to_symbol_type(type.subtype());
+      const irep_idt &id = symbol_type.get_identifier();
+      if(is_java_array_tag(id))
+        return pretty_java_type(java_array_element_type(symbol_type)) + "[]";
+      else
+        return id2string(strip_java_namespace_prefix(id));
+    }
+    else
+      return "?";
+  }
+  else
+    return "?";
+}
+
+std::string pretty_signature(const code_typet &code_type)
+{
+  std::ostringstream result;
+  result << '(';
+
+  bool first = true;
+  for(const auto p : code_type.parameters())
+  {
+    if(p.get_this())
+      continue;
+
+    if(first)
+      first = false;
+    else
+      result << ", ";
+
+    result << pretty_java_type(p.type());
+  }
+
+  result << ')';
+  return result.str();
+}
