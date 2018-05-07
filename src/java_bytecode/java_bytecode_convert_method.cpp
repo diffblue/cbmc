@@ -380,11 +380,12 @@ void java_bytecode_convert_method_lazy(
 
   if(is_constructor(method_symbol.base_name))
   {
-    // we use full.class_name.class_name(...) as pretty name
-    // for constructors
+    // we use full.class_name(...) as pretty name
+    // for constructors -- the idea is that they have
+    // an empty declarator.
     method_symbol.pretty_name=
-      id2string(class_symbol.pretty_name) + "." +
-      id2string(class_symbol.base_name) + signature_string;
+      id2string(class_symbol.pretty_name) + signature_string;
+
     member_type.set_is_constructor();
   }
   else
