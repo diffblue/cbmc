@@ -133,19 +133,14 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 
   if(index.has_value())
   {
-    if(*index < 0)
-      throw "byte_extract flatting with negative offset: "+expr.pretty();
-
     const mp_integer offset = *index * byte_width;
-
-    std::size_t offset_i=integer2unsigned(offset);
 
     for(std::size_t i=0; i<width; i++)
       // out of bounds?
-      if(offset<0 || offset_i+i>=op_bv.size())
+      if(offset + i < 0 || offset + i >= op_bv.size())
         bv[i]=prop.new_variable();
       else
-        bv[i]=op_bv[offset_i+i];
+        bv[i] = op_bv[numeric_cast_v<std::size_t>(offset) + i];
   }
   else
   {
