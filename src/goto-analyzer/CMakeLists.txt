@@ -23,7 +23,6 @@ target_link_libraries(goto-analyzer-lib
 
 add_if_library(goto-analyzer-lib java_bytecode)
 add_if_library(goto-analyzer-lib jsil)
-add_if_library(goto-analyzer-lib specc)
 add_if_library(goto-analyzer-lib php)
 
 # Executable
