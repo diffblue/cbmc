@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module:
+Module: Java Bytecode Language
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -132,11 +132,6 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
     java_cp_include_files=".*";
 
   language_options_initialized=true;
-}
-
-std::set<std::string> java_bytecode_languaget::extensions() const
-{
-  return { "class", "jar" };
 }
 
 void java_bytecode_languaget::modules_provided(std::set<std::string> &modules)
@@ -1031,27 +1026,11 @@ void java_bytecode_languaget::show_parse(std::ostream &out)
   }
 }
 
-std::unique_ptr<languaget> new_java_bytecode_language()
+std::unique_ptr<languaget>
+new_java_bytecode_language(const language_infot &info)
 {
-  return util_make_unique<java_bytecode_languaget>();
-}
-
-bool java_bytecode_languaget::from_expr(
-  const exprt &expr,
-  std::string &code,
-  const namespacet &ns)
-{
-  code=expr2java(expr, ns);
-  return false;
-}
-
-bool java_bytecode_languaget::from_type(
-  const typet &type,
-  std::string &code,
-  const namespacet &ns)
-{
-  code=type2java(type, ns);
-  return false;
+  return std::unique_ptr<java_bytecode_languaget>(
+    new java_bytecode_languaget(info));
 }
 
 bool java_bytecode_languaget::to_expr(

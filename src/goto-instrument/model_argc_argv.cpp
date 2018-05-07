@@ -30,6 +30,8 @@ Date: April 2016
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
+#include <langapi/mode.h>
+
 /// Set up argv with up to max_argc pointers into an array of 4096 bytes.
 /// \param symbol_table: Input program's symbol table
 /// \param goto_functions: Input program's intermediate representation
@@ -99,15 +101,15 @@ bool model_argc_argv(
       << "}";
   std::istringstream iss(oss.str());
 
-  ansi_c_languaget ansi_c_language;
-  ansi_c_language.set_message_handler(message_handler);
+  auto ansi_c_language = get_language_from_mode(ID_C);
+  ansi_c_language->set_message_handler(message_handler);
   configt::ansi_ct::preprocessort pp=config.ansi_c.preprocessor;
   config.ansi_c.preprocessor=configt::ansi_ct::preprocessort::NONE;
-  ansi_c_language.parse(iss, "");
+  ansi_c_language->parse(iss, "");
   config.ansi_c.preprocessor=pp;
 
   symbol_tablet tmp_symbol_table;
-  ansi_c_language.typecheck(tmp_symbol_table, "<built-in-library>");
+  ansi_c_language->typecheck(tmp_symbol_table, "<built-in-library>");
 
   goto_programt init_instructions;
   exprt value=nil_exprt();

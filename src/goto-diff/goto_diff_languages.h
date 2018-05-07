@@ -20,10 +20,12 @@ class goto_diff_languagest:public language_uit
 public:
   explicit goto_diff_languagest(
     const cmdlinet &cmdline,
-    ui_message_handlert &ui_message_handler) :
-  language_uit(cmdline, ui_message_handler)
+    ui_message_handlert &ui_message_handler,
+    bool do_register = true)
+    : language_uit(cmdline, ui_message_handler)
   {
-    register_languages();
+    if(do_register)
+      register_languages();
   }
 
 protected:

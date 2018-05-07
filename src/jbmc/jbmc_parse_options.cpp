@@ -22,9 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 #include <util/invariant.h>
 
-#include <langapi/language.h>
-
-#include <ansi-c/ansi_c_language.h>
+#include <langapi/language_info.h>
+#include <langapi/mode.h>
 
 #include <goto-programs/convert_nondet.h>
 #include <goto-programs/lazy_goto_model.h>
@@ -50,9 +49,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/add_failed_symbols.h>
 
-#include <langapi/mode.h>
+#include <ansi-c/ansi_c_language_info.h>
 
-#include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/java_bytecode_language_info.h>
 #include <java_bytecode/java_enum_static_init_unwind_handler.h>
 #include <java_bytecode/remove_exceptions.h>
 #include <java_bytecode/remove_instanceof.h>
@@ -451,8 +450,10 @@ int jbmc_parse_optionst::doit()
            << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
-  register_language(new_ansi_c_language);
-  register_language(new_java_bytecode_language);
+  // still required for __CPROVER_initialize
+  register_language(new_ansi_c_language_info);
+
+  register_language(new_java_bytecode_language_info);
 
   if(cmdline.isset("show-parse-tree"))
   {

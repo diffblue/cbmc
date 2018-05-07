@@ -527,9 +527,9 @@ bool compilet::parse(const std::string &file_name)
 /// \return true on error, false otherwise
 bool compilet::parse_stdin()
 {
-  ansi_c_languaget language;
+  auto language = get_language_from_mode(ID_C);
 
-  language.set_message_handler(get_message_handler());
+  language->set_message_handler(get_message_handler());
 
   statistics() << "Parsing: (stdin)" << eom;
 
@@ -551,11 +551,11 @@ bool compilet::parse_stdin()
       }
     }
 
-    language.preprocess(std::cin, "", *os);
+    language->preprocess(std::cin, "", *os);
   }
   else
   {
-    if(language.parse(std::cin, ""))
+    if(language->parse(std::cin, ""))
     {
       if(get_ui()==ui_message_handlert::uit::PLAIN)
         error() << "PARSING ERROR" << eom;

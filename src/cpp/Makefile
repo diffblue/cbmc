@@ -11,6 +11,7 @@ SRC = cpp_constructor.cpp \
       cpp_internal_additions.cpp \
       cpp_is_pod.cpp \
       cpp_language.cpp \
+      cpp_language_info.cpp \
       cpp_name.cpp \
       cpp_namespace_spec.cpp \
       cpp_parse_tree.cpp \

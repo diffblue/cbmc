@@ -39,36 +39,16 @@ public:
 
   void show_parse(std::ostream &out) override;
 
+  explicit ansi_c_languaget(const language_infot &info) : languaget(info)
+  {
+  }
   ~ansi_c_languaget() override;
-  ansi_c_languaget() { }
-
-  bool from_expr(
-    const exprt &expr,
-    std::string &code,
-    const namespacet &ns) override;
-
-  bool from_type(
-    const typet &type,
-    std::string &code,
-    const namespacet &ns) override;
-
-  bool type_to_name(
-    const typet &type,
-    std::string &name,
-    const namespacet &ns) override;
 
   bool to_expr(
     const std::string &code,
     const std::string &module,
     exprt &expr,
     const namespacet &ns) override;
-
-  std::unique_ptr<languaget> new_language() override
-  { return util_make_unique<ansi_c_languaget>(); }
-
-  std::string id() const override { return "C"; }
-  std::string description() const override { return "ANSI-C 99"; }
-  std::set<std::string> extensions() const override;
 
   void modules_provided(std::set<std::string> &modules) override;
 
@@ -77,6 +57,6 @@ protected:
   std::string parse_path;
 };
 
-std::unique_ptr<languaget> new_ansi_c_language();
+std::unique_ptr<languaget> new_ansi_c_language(const language_infot &info);
 
 #endif // CPROVER_ANSI_C_ANSI_C_LANGUAGE_H

@@ -3,6 +3,7 @@ SRC = expr2jsil.cpp \
       jsil_entry_point.cpp \
       jsil_internal_additions.cpp \
       jsil_language.cpp \
+      jsil_language_info.cpp \
       jsil_lex.yy.cpp \
       jsil_parse_tree.cpp \
       jsil_parser.cpp \

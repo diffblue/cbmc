@@ -166,27 +166,15 @@ void language_uit::show_symbol_table_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode=="")
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
+    const auto &language_info = get_language_info_from_mode(symbol.mode);
 
     std::string type_str, value_str;
 
     if(symbol.type.is_not_nil())
-      ptr->from_type(symbol.type, type_str, ns);
+      language_info.from_type(symbol.type, type_str, ns);
 
     if(symbol.value.is_not_nil())
-      ptr->from_expr(symbol.value, value_str, ns);
+      language_info.from_expr(symbol.value, value_str, ns);
 
     if(brief)
     {

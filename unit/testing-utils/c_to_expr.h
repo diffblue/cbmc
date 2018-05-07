@@ -15,11 +15,11 @@
 
 #include <memory>
 
+#include <langapi/mode.h>
 #include <util/expr.h>
 #include <util/message.h>
-#include <util/ui_message.h>
 #include <util/namespace.h>
-#include <ansi-c/ansi_c_language.h>
+#include <util/ui_message.h>
 
 class c_to_exprt
 {
@@ -29,7 +29,7 @@ public:
 
 private:
   std::unique_ptr<message_handlert> message_handler;
-  ansi_c_languaget language;
+  std::unique_ptr<languaget> language;
 };
 
 #endif // CPROVER_TESTING_UTILS_C_TO_EXPR_H

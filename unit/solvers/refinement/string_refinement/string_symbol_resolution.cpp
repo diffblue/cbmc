@@ -9,20 +9,21 @@
 
 #include <testing-utils/catch.hpp>
 
+#include <iostream>
+#include <java_bytecode/java_bytecode_language_info.h>
+#include <langapi/mode.h>
+#include <solvers/refinement/string_refinement.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/std_expr.h>
-#include <solvers/refinement/string_refinement.h>
 #include <util/symbol_table.h>
-#include <langapi/mode.h>
-#include <java_bytecode/java_bytecode_language.h>
-#include <iostream>
 
 SCENARIO("string_identifiers_resolution_from_equations",
 "[core][solvers][refinement][string_refinement]")
 {
   // For printing expression
-  register_language(new_java_bytecode_language);
+  clear_languages();
+  register_language(new_java_bytecode_language_info);
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
   messaget::mstreamt &stream = messaget().debug();

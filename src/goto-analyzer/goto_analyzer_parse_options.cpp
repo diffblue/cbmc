@@ -16,10 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <memory>
 
-#include <ansi-c/ansi_c_language.h>
-#include <cpp/cpp_language.h>
-#include <java_bytecode/java_bytecode_language.h>
-#include <jsil/jsil_language.h>
+#include <ansi-c/ansi_c_language_info.h>
+#include <cpp/cpp_language_info.h>
+#include <java_bytecode/java_bytecode_language_info.h>
+#include <jsil/jsil_language_info.h>
 
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/set_properties.h>
@@ -74,10 +74,10 @@ goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
 
 void goto_analyzer_parse_optionst::register_languages()
 {
-  register_language(new_ansi_c_language);
-  register_language(new_cpp_language);
-  register_language(new_java_bytecode_language);
-  register_language(new_jsil_language);
+  register_language(new_ansi_c_language_info);
+  register_language(new_cpp_language_info);
+  register_language(new_java_bytecode_language_info);
+  register_language(new_jsil_language_info);
 }
 
 void goto_analyzer_parse_optionst::eval_verbosity()

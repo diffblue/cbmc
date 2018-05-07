@@ -8,9 +8,9 @@
 
 #include <testing-utils/catch.hpp>
 
-#include <numeric>
-#include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/java_bytecode_language_info.h>
 #include <java_bytecode/java_types.h>
+#include <numeric>
 
 #include <langapi/mode.h>
 #include <langapi/language_util.h>
@@ -18,8 +18,9 @@
 #include <solvers/refinement/string_constraint_instantiation.h>
 #include <solvers/sat/satcheck.h>
 
-#include <util/simplify_expr.h>
 #include <util/config.h>
+#include <util/simplify_expr.h>
+#include <util/symbol_table.h>
 
 /// \class Types used throughout the test. Currently it is impossible to
 /// statically initialize this value, there is a PR to allow this
@@ -136,7 +137,7 @@ std::string create_info(std::vector<exprt> &lemmas, const namespacet &ns)
   {
     simplify(lemma, ns);
     std::string lemma_string;
-    get_language_from_mode(ID_java)->from_expr(lemma, lemma_string, ns);
+    get_language_info_from_mode(ID_java).from_expr(lemma, lemma_string, ns);
     new_lemmas += lemma_string + "\n\n";
   }
   return "Instantiated lemmas:\n"+new_lemmas;
@@ -164,8 +165,9 @@ SCENARIO("instantiate_not_contains",
   "[!mayfail][core][solvers][refinement][string_constraint_instantiation]")
 {
   // For printing expression
-  register_language(new_java_bytecode_language);
-  std::unique_ptr<languaget> java_lang = get_language_from_mode(ID_java);
+  clear_languages();
+  register_language(new_java_bytecode_language_info);
+  const auto &java_lang_info = get_language_info_from_mode(ID_java);
   symbol_tablet symtbl;
   const namespacet ns(symtbl);
 
@@ -208,7 +210,7 @@ SCENARIO("instantiate_not_contains",
       [&](const std::string &accu, string_constraintt sc) {
         simplify(sc, ns);
         std::string s;
-        java_lang->from_expr(sc, s, ns);
+        java_lang_info.from_expr(sc, s, ns);
         return accu + s + "\n\n";
       });
 
@@ -222,7 +224,7 @@ SCENARIO("instantiate_not_contains",
         generator.witness[sc] = generator.fresh_symbol("w", t.witness_type());
         nc_axioms.push_back(sc);
         std::string s;
-        java_lang->from_expr(sc, s, ns);
+        java_lang_info.from_expr(sc, s, ns);
         return accu + s + "\n\n";
       });
 
@@ -234,7 +236,7 @@ SCENARIO("instantiate_not_contains",
       [&](const std::string &accu, exprt axiom) {
         simplify(axiom, ns);
         std::string s;
-        java_lang->from_expr(axiom, s, ns);
+        java_lang_info.from_expr(axiom, s, ns);
         return accu + s + "\n\n";
       });
 
@@ -301,7 +303,7 @@ SCENARIO("instantiate_not_contains",
 
     INFO("Original axiom:\n");
     std::string s;
-    java_lang->from_expr(vacuous, s, ns);
+    java_lang_info.from_expr(vacuous, s, ns);
     INFO(s + "\n\n");
 
     WHEN("we instantiate and simplify")
@@ -356,7 +358,7 @@ SCENARIO("instantiate_not_contains",
 
     INFO("Original axiom:\n");
     std::string s;
-    java_lang->from_expr(trivial, s, ns);
+    java_lang_info.from_expr(trivial, s, ns);
     INFO(s + "\n\n");
 
     WHEN("we instantiate and simplify")
@@ -412,7 +414,7 @@ SCENARIO("instantiate_not_contains",
 
     INFO("Original axiom:\n");
     std::string s;
-    java_lang->from_expr(trivial, s, ns);
+    java_lang_info.from_expr(trivial, s, ns);
     INFO(s + "\n\n");
 
     WHEN("we instantiate and simplify")
@@ -471,7 +473,7 @@ SCENARIO("instantiate_not_contains",
 
     INFO("Original axiom:\n");
     std::string s;
-    java_lang->from_expr(trivial, s, ns);
+    java_lang_info.from_expr(trivial, s, ns);
     INFO(s + "\n\n");
 
     WHEN("we instantiate and simplify")
@@ -527,7 +529,7 @@ SCENARIO("instantiate_not_contains",
 
     INFO("Original axiom:\n");
     std::string s;
-    java_lang->from_expr(trivial, s, ns);
+    java_lang_info.from_expr(trivial, s, ns);
     INFO(s + "\n\n");
 
     WHEN("we instantiate and simplify")

@@ -17,31 +17,35 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #endif
 
 #include "language.h"
+#include "language_info.h"
 
 #include <util/invariant.h>
 #include <util/namespace.h>
 
-struct language_entryt
-{
-  language_factoryt factory;
-  std::set<std::string> extensions;
-  irep_idt mode;
-};
-
-typedef std::list<language_entryt> languagest;
+typedef std::list<std::unique_ptr<language_infot>> languagest;
 languagest languages;
 
 /// Register a language
 /// Note: registering a language is required for using the functions
 ///   in language_util.h
-/// \param factory: a language factory, e.g. `new_ansi_c_language`
-void register_language(language_factoryt factory)
+/// \param factory: a language info factory, e.g. `new_ansi_c_language_info`
+void register_language(language_info_factoryt factory)
 {
-  languages.push_back(language_entryt());
-  std::unique_ptr<languaget> l(factory());
-  languages.back().factory=factory;
-  languages.back().extensions=l->extensions();
-  languages.back().mode=l->id();
+  auto language_info = factory();
+
+  // check whether we attempt to register the same language twice
+  for(const auto &info : languages)
+  {
+    PRECONDITION(language_info->id() != info->id());
+  }
+
+  languages.push_back(std::move(language_info));
+}
+
+/// Unregister all registered languages
+void clear_languages()
+{
+  languages.clear();
 }
 
 /// Get the language corresponding to the given mode
@@ -49,11 +53,27 @@ void register_language(language_factoryt factory)
 /// \return the language or `nullptr` if the language has not been registered
 std::unique_ptr<languaget> get_language_from_mode(const irep_idt &mode)
 {
-  for(const auto &language : languages)
-    if(mode == language.mode)
-      return language.factory();
+  for(const auto &language_info : languages)
+  {
+    if(mode == language_info->id())
+      return language_info->new_language();
+  }
 
   return nullptr;
+}
+
+/// Get the language info corresponding to the given mode
+/// \param mode: the mode, e.g. `ID_C`
+/// \return the language info (assumes that the language has been registered)
+const language_infot &get_language_info_from_mode(const irep_idt &mode)
+{
+  for(const auto &language_info : languages)
+  {
+    if(mode == language_info->id())
+      return *language_info;
+  }
+
+  INVARIANT(false, "unregistered language `" + id2string(mode) + "'");
 }
 
 /// Get the mode of the given identifier's symbol
@@ -72,10 +92,30 @@ get_mode_from_identifier(const namespacet &ns, const irep_idt &identifier)
   return symbol->mode;
 }
 
-/// Get the language corresponding to the mode of the given identifier's symbol
+/// Get the language info corresponding to the mode of
+/// the given identifier's symbol
 /// \param ns: a namespace
 /// \param identifier: an identifier
-/// \return the corresponding language if the mode is not `ID_unknown`, or
+/// \return the corresponding language info if the mode is not `ID_unknown`, or
+///    the default language otherwise;
+/// Note: It is assumed as an invariant that languages of symbols in the symbol
+///   table have been registered.
+const language_infot &get_language_info_from_identifier(
+  const namespacet &ns,
+  const irep_idt &identifier)
+{
+  const irep_idt &mode = get_mode_from_identifier(ns, identifier);
+  if(mode == ID_unknown)
+    return get_default_language_info();
+
+  return get_language_info_from_mode(mode);
+}
+
+/// Get the language corresponding to the mode of
+/// the given identifier's symbol
+/// \param ns: a namespace
+/// \param identifier: an identifier
+/// \return the corresponding language info if the mode is not `ID_unknown`, or
 ///    the default language otherwise;
 /// Note: It is assumed as an invariant that languages of symbols in the symbol
 ///   table have been registered.
@@ -86,12 +126,7 @@ get_language_from_identifier(const namespacet &ns, const irep_idt &identifier)
   if(mode == ID_unknown)
     return get_default_language();
 
-  std::unique_ptr<languaget> language = get_language_from_mode(mode);
-  INVARIANT(
-    language,
-    "symbol `" + id2string(identifier) + "' has unknown mode '" +
-      id2string(mode) + "'");
-  return language;
+  return get_language_from_mode(mode);
 }
 
 /// Get the language corresponding to the registered file name extensions
@@ -103,30 +138,27 @@ std::unique_ptr<languaget> get_language_from_filename(
 {
   std::size_t ext_pos=filename.rfind('.');
 
-  if(ext_pos==std::string::npos)
+  if(ext_pos == std::string::npos)
     return nullptr;
 
-  std::string extension=
-    std::string(filename, ext_pos+1, std::string::npos);
+  std::string file_extension =
+    std::string(filename, ext_pos + 1, std::string::npos);
 
-  if(extension=="")
+  if(file_extension.empty())
     return nullptr;
 
-  for(languagest::const_iterator
-      l_it=languages.begin();
-      l_it!=languages.end();
-      l_it++)
+  for(const auto &language_info : languages)
   {
+    const auto &extensions = language_info->extensions();
     #ifdef _WIN32
-    for(std::set<std::string>::const_iterator
-        e_it=l_it->extensions.begin();
-        e_it!=l_it->extensions.end();
-        e_it++)
-      if(_stricmp(extension.c_str(), e_it->c_str())==0)
-        return l_it->factory();
+    for(const auto &language_extension : extensions)
+    {
+      if(_stricmp(file_extension.c_str(), language_extension.c_str()) == 0)
+        return language_info->new_language();
+    }
     #else
-    if(l_it->extensions.find(extension)!=l_it->extensions.end())
-      return l_it->factory();
+    if(extensions.find(file_extension) != extensions.end())
+      return language_info->new_language();
     #endif
   }
 
@@ -138,5 +170,14 @@ std::unique_ptr<languaget> get_language_from_filename(
 std::unique_ptr<languaget> get_default_language()
 {
   PRECONDITION(!languages.empty());
-  return languages.front().factory();
+  const auto &language_info = languages.front();
+  return language_info->new_language();
+}
+
+/// Returns the default language info
+/// \return the info of the first registered language
+const language_infot &get_default_language_info()
+{
+  PRECONDITION(!languages.empty());
+  return *languages.front();
 }

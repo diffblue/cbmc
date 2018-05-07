@@ -34,35 +34,6 @@ void languaget::dependencies(
 {
 }
 
-bool languaget::from_expr(
-  const exprt &expr,
-  std::string &code,
-  const namespacet &ns)
-{
-  code=expr.pretty();
-  return false;
-}
-
-bool languaget::from_type(
-  const typet &type,
-  std::string &code,
-  const namespacet &ns)
-{
-  code=type.pretty();
-  return false;
-}
-
-bool languaget::type_to_name(
-  const typet &type,
-  std::string &name,
-  const namespacet &ns)
-{
-  // probably ansi-c/type2name could be used as better fallback if moved to
-  // util/
-  name=type.pretty();
-  return false;
-}
-
 /// Turn on or off stub generation.
 /// \param should_generate_stubs: Should stub generation be enabled
 void languaget::set_should_generate_opaque_method_stubs(
@@ -131,7 +102,7 @@ parameter_symbolt languaget::build_stub_parameter_symbol(
   size_t parameter_index,
   const code_typet::parametert &parameter)
 {
-  error() << "language " << id()
+  error() << "language " << info.id()
           << " doesn't implement build_stub_parameter_symbol. "
           << "This means cannot use opaque functions." << eom;
 

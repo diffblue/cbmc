@@ -21,15 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_entry_point.h"
 #include "ansi_c_typecheck.h"
 #include "ansi_c_parser.h"
-#include "expr2c.h"
 #include "c_preprocess.h"
 #include "ansi_c_internal_additions.h"
-#include "type2name.h"
-
-std::set<std::string> ansi_c_languaget::extensions() const
-{
-  return { "c", "i" };
-}
 
 void ansi_c_languaget::modules_provided(std::set<std::string> &modules)
 {
@@ -144,36 +137,9 @@ void ansi_c_languaget::show_parse(std::ostream &out)
   parse_tree.output(out);
 }
 
-std::unique_ptr<languaget> new_ansi_c_language()
+std::unique_ptr<languaget> new_ansi_c_language(const language_infot &info)
 {
-  return util_make_unique<ansi_c_languaget>();
-}
-
-bool ansi_c_languaget::from_expr(
-  const exprt &expr,
-  std::string &code,
-  const namespacet &ns)
-{
-  code=expr2c(expr, ns);
-  return false;
-}
-
-bool ansi_c_languaget::from_type(
-  const typet &type,
-  std::string &code,
-  const namespacet &ns)
-{
-  code=type2c(type, ns);
-  return false;
-}
-
-bool ansi_c_languaget::type_to_name(
-  const typet &type,
-  std::string &name,
-  const namespacet &ns)
-{
-  name=type2name(type, ns);
-  return false;
+  return std::unique_ptr<ansi_c_languaget>(new ansi_c_languaget(info));
 }
 
 bool ansi_c_languaget::to_expr(

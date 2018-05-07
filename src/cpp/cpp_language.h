@@ -49,24 +49,9 @@ public:
 
   // constructor, destructor
   ~cpp_languaget() override;
-  cpp_languaget() { }
-
-  // conversion from expression into string
-  bool from_expr(
-    const exprt &expr,
-    std::string &code,
-    const namespacet &ns) override;
-
-  // conversion from type into string
-  bool from_type(
-    const typet &type,
-    std::string &code,
-    const namespacet &ns) override;
-
-  bool type_to_name(
-    const typet &type,
-    std::string &name,
-    const namespacet &ns) override;
+  explicit cpp_languaget(const language_infot &info) : languaget(info)
+  {
+  }
 
   // conversion from string into expression
   bool to_expr(
@@ -74,13 +59,6 @@ public:
     const std::string &module,
     exprt &expr,
     const namespacet &ns) override;
-
-  std::unique_ptr<languaget> new_language() override
-  { return util_make_unique<cpp_languaget>(); }
-
-  std::string id() const override { return "cpp"; }
-  std::string description() const override { return "C++"; }
-  std::set<std::string> extensions() const override;
 
   void modules_provided(std::set<std::string> &modules) override;
 
@@ -96,6 +74,6 @@ protected:
   }
 };
 
-std::unique_ptr<languaget> new_cpp_language();
+std::unique_ptr<languaget> new_cpp_language(const language_infot &);
 
 #endif // CPROVER_CPP_CPP_LANGUAGE_H

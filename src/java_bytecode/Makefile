@@ -10,6 +10,7 @@ SRC = bytecode_info.cpp \
       java_bytecode_instrument.cpp \
       java_bytecode_internal_additions.cpp \
       java_bytecode_language.cpp \
+      java_bytecode_language_info.cpp \
       java_bytecode_parse_tree.cpp \
       java_bytecode_parser.cpp \
       java_bytecode_typecheck.cpp \

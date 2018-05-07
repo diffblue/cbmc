@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <sstream>
 
+#include <langapi/mode.h>
+
 #include <util/config.h>
 
 #include "ansi_c_language.h"
@@ -88,9 +90,9 @@ void add_library(
 
   std::istringstream in(src);
 
-  ansi_c_languaget ansi_c_language;
-  ansi_c_language.set_message_handler(message_handler);
-  ansi_c_language.parse(in, "");
+  auto ansi_c_language = get_language_from_mode(ID_C);
+  ansi_c_language->set_message_handler(message_handler);
+  ansi_c_language->parse(in, "");
 
-  ansi_c_language.typecheck(symbol_table, "<built-in-library>");
+  ansi_c_language->typecheck(symbol_table, "<built-in-library>");
 }

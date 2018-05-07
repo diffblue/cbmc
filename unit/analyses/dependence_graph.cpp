@@ -9,14 +9,19 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <iostream>
 
 #include <testing-utils/catch.hpp>
+
 #include <analyses/dependence_graph.h>
-#include <util/symbol_table.h>
-#include <util/std_code.h>
-#include <util/c_types.h>
+
 #include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/std_code.h>
+#include <util/symbol_table.h>
+
 #include <goto-programs/goto_convert_functions.h>
+
 #include <langapi/mode.h>
-#include <java_bytecode/java_bytecode_language.h>
+
+#include <java_bytecode/java_bytecode_language_info.h>
 
 static symbolt create_void_function_symbol(
   const irep_idt &name,
@@ -57,7 +62,8 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
     // }
     // void b() { }
 
-    register_language(new_java_bytecode_language);
+    clear_languages();
+    register_language(new_java_bytecode_language_info);
 
     goto_modelt goto_model;
     namespacet ns(goto_model.symbol_table);

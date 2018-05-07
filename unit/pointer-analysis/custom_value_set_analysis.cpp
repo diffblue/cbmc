@@ -10,7 +10,7 @@ Author: Chris Smowton, chris@smowton.net
 
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
-#include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/java_bytecode_language_info.h>
 #include <java_bytecode/java_types.h>
 #include <java_bytecode/remove_java_new.h>
 #include <langapi/mode.h>
@@ -179,7 +179,8 @@ SCENARIO("test_value_set_analysis",
     config.java.classpath={"."};
     command_line.args.push_back("pointer-analysis/CustomVSATest.jar");
 
-    register_language(new_java_bytecode_language);
+    clear_languages();
+    register_language(new_java_bytecode_language_info);
 
     goto_modelt goto_model=
       initialize_goto_model(command_line, null_output);

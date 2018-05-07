@@ -12,13 +12,16 @@
 ///
 #include "c_to_expr.h"
 
+#include <ansi-c/ansi_c_language_info.h>
+#include <langapi/language.h>
 #include <testing-utils/catch.hpp>
 
 c_to_exprt::c_to_exprt():
   message_handler(
     std::unique_ptr<message_handlert>(new ui_message_handlert()))
 {
-  language.set_message_handler(*message_handler);
+  language = get_language_from_mode(ID_C);
+  language->set_message_handler(*message_handler);
 }
 
 /// Take an input string that should be a valid C rhs expression
@@ -29,7 +32,7 @@ exprt c_to_exprt::operator()(
   const std::string &input_string, const namespacet &ns)
 {
   exprt expr;
-  bool result=language.to_expr(input_string, "",  expr, ns);
+  bool result = language->to_expr(input_string, "", expr, ns);
   REQUIRE(!result);
   return expr;
 }

@@ -102,6 +102,7 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
 
 #ifdef DEBUG // useful output for visualizing the graph
       {
+        clear_languages();
         register_language(new_java_bytecode_language);
         symbol_tablet symbol_table;
         namespacet ns(symbol_table);

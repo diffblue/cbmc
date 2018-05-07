@@ -4,6 +4,7 @@ SRC = anonymous_member.cpp \
       ansi_c_entry_point.cpp \
       ansi_c_internal_additions.cpp \
       ansi_c_language.cpp \
+      ansi_c_language_info.cpp \
       ansi_c_lex.yy.cpp \
       ansi_c_parse_tree.cpp \
       ansi_c_parser.cpp \

@@ -20,8 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/memory_info.h>
 
-#include <ansi-c/ansi_c_language.h>
-#include <cpp/cpp_language.h>
+#include <ansi-c/ansi_c_language_info.h>
+#include <cpp/cpp_language_info.h>
 
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/show_properties.h>
@@ -105,8 +105,8 @@ int clobber_parse_optionst::doit()
     return 0;
   }
 
-  register_language(new_ansi_c_language);
-  register_language(new_cpp_language);
+  register_language(new_ansi_c_language_info);
+  register_language(new_cpp_language_info);
 
   //
   // command line options

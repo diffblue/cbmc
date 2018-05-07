@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <memory> // unique_ptr
 
-#include <langapi/language.h>
+#include <langapi/language_info.h>
 #include <langapi/mode.h>
 
 #include <goto-programs/system_library_symbols.h>
@@ -30,13 +30,13 @@ public:
     const bool use_all_headers,
     const bool include_harness,
     const namespacet &_ns,
-    language_factoryt factory):
-    goto_functions(_goto_functions),
-    copied_symbol_table(_ns.get_symbol_table()),
-    ns(copied_symbol_table),
-    language(factory()),
-    harness(include_harness),
-    system_symbols(use_system_headers)
+    const irep_idt &mode)
+    : goto_functions(_goto_functions),
+      copied_symbol_table(_ns.get_symbol_table()),
+      ns(copied_symbol_table),
+      language_info(get_language_info_from_mode(mode)),
+      harness(include_harness),
+      system_symbols(use_system_headers)
   {
     system_symbols.set_use_all_headers(use_all_headers);
   }
@@ -49,7 +49,7 @@ protected:
   const goto_functionst &goto_functions;
   symbol_tablet copied_symbol_table;
   const namespacet ns;
-  std::unique_ptr<languaget> language;
+  const language_infot &language_info;
   const bool harness;
 
   typedef std::unordered_set<irep_idt> convertedt;

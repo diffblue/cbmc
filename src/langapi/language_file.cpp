@@ -12,10 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "language.h"
 
-language_filet::language_filet(const language_filet &rhs):
-  modules(rhs.modules),
-  language(rhs.language==nullptr?nullptr:rhs.language->new_language()),
-  filename(rhs.filename)
+language_filet::language_filet(const language_filet &rhs)
+  : modules(rhs.modules),
+    language(
+      rhs.language == nullptr ? nullptr : rhs.language->info.new_language()),
+    filename(rhs.filename)
 {
 }
 
@@ -165,11 +166,11 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
 bool language_filest::generate_support_functions(
   symbol_tablet &symbol_table)
 {
-  std::set<std::string> languages;
+  std::set<irep_idt> languages;
 
   for(auto &file : file_map)
   {
-    if(languages.insert(file.second.language->id()).second)
+    if(languages.insert(file.second.language->info.id()).second)
       if(file.second.language->generate_support_functions(symbol_table))
         return true;
   }
@@ -179,11 +180,11 @@ bool language_filest::generate_support_functions(
 
 bool language_filest::final(symbol_table_baset &symbol_table)
 {
-  std::set<std::string> languages;
+  std::set<irep_idt> languages;
 
   for(auto &file : file_map)
   {
-    if(languages.insert(file.second.language->id()).second)
+    if(languages.insert(file.second.language->info.id()).second)
       if(file.second.language->final(symbol_table))
         return true;
   }

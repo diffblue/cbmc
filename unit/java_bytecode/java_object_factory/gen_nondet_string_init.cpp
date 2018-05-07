@@ -7,16 +7,20 @@
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <testing-utils/catch.hpp>
+
 #include <util/expr.h>
-#include <util/std_code.h>
 #include <util/namespace.h>
+#include <util/std_code.h>
+
+#include <java_bytecode/java_bytecode_language_info.h>
 #include <java_bytecode/java_object_factory.h>
-#include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_root_class.h>
+
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
-#include <iostream>
 
 SCENARIO(
   "Generate string object",
@@ -26,7 +30,8 @@ SCENARIO(
   {
     source_locationt loc;
     symbol_tablet symbol_table;
-    register_language(new_java_bytecode_language);
+    clear_languages();
+    register_language(new_java_bytecode_language_info);
 
     // Add java.lang.Object to symbol table
     symbolt jlo_sym;

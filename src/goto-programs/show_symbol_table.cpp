@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <memory>
 
-#include <langapi/language.h>
 #include <langapi/mode.h>
 
 #include "goto_model.h"
@@ -41,22 +40,11 @@ void show_symbol_table_brief_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode=="")
-      ptr=get_default_language();
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-      if(ptr==nullptr)
-        throw "symbol "+id2string(symbol.name)+" has unknown mode";
-    }
-
     std::string type_str;
 
-    if(symbol.type.is_not_nil())
-      ptr->from_type(symbol.type, type_str, ns);
-
+    const language_infot &language_info =
+      get_language_info_from_mode(symbol.mode);
+    language_info.from_type(symbol.type, type_str, ns);
     out << symbol.name << " " << type_str << '\n';
   }
 }
@@ -81,27 +69,15 @@ void show_symbol_table_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode=="")
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
-
     std::string type_str, value_str;
 
+    const language_infot &language_info =
+      get_language_info_from_mode(symbol.mode);
     if(symbol.type.is_not_nil())
-      ptr->from_type(symbol.type, type_str, ns);
+      language_info.from_type(symbol.type, type_str, ns);
 
     if(symbol.value.is_not_nil())
-      ptr->from_expr(symbol.value, value_str, ns);
+      language_info.from_expr(symbol.value, value_str, ns);
 
     out << "Symbol......: " << symbol.name << '\n' << std::flush;
     out << "Pretty name.: " << symbol.pretty_name << '\n';

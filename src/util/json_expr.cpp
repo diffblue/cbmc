@@ -249,11 +249,11 @@ json_objectt json(
       type;
 
     std::string type_string;
-    bool error=lang->from_type(underlying_type, type_string, ns);
+    bool error = lang->info.from_type(underlying_type, type_string, ns);
     CHECK_RETURN(!error);
 
     std::string value_string;
-    lang->from_expr(expr, value_string, ns);
+    lang->info.from_expr(expr, value_string, ns);
 
     const constant_exprt &constant_expr=to_constant_expr(expr);
     if(type.id()==ID_unsignedbv ||

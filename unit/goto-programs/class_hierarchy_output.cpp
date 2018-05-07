@@ -11,6 +11,10 @@
 
 #include <goto-programs/class_hierarchy.h>
 
+#include <java_bytecode/java_bytecode_language_info.h>
+
+#include <langapi/mode.h>
+
 #include <iostream>
 #include <sstream>
 
@@ -39,6 +43,9 @@ SCENARIO(
   "Output a simple class hierarchy"
   "[core][goto-programs][class_hierarchy]")
 {
+  clear_languages();
+  register_language(new_java_bytecode_language_info);
+
   symbol_tablet symbol_table =
     load_java_class("HierarchyTest", "goto-programs/");
   class_hierarchyt hierarchy;

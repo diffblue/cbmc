@@ -469,7 +469,7 @@ void dump_ct::convert_compound(
       if(t.get_width()<=config.ansi_c.long_long_int_width)
         struct_body << "long long int " << comp_name
           << " : " << t.get_width();
-      else if(language->id()=="cpp")
+      else if(language_info.id() == ID_cpp)
         struct_body << "__signedbv<" << t.get_width() << "> "
           << comp_name;
       else
@@ -481,7 +481,7 @@ void dump_ct::convert_compound(
       if(t.get_width()<=config.ansi_c.long_long_int_width)
         struct_body << "unsigned long long " << comp_name
           << " : " << t.get_width();
-      else if(language->id()=="cpp")
+      else if(language_info.id() == ID_cpp)
         struct_body << "__unsignedbv<" << t.get_width() << "> "
           << comp_name;
       else
@@ -512,7 +512,7 @@ void dump_ct::convert_compound(
   os << type_to_string(unresolved_clean);
   if(!base_decls.str().empty())
   {
-    PRECONDITION(language->id()=="cpp");
+    PRECONDITION(language_info.id() == ID_cpp);
     os << ": " << base_decls.str();
   }
   os << '\n';
@@ -1384,7 +1384,7 @@ std::string dump_ct::type_to_string(const typet &type)
   std::string ret;
   typet t=type;
   cleanup_type(t);
-  language->from_type(t, ret, ns);
+  language_info.from_type(t, ret, ns);
   return ret;
 }
 
@@ -1393,7 +1393,7 @@ std::string dump_ct::expr_to_string(const exprt &expr)
   std::string ret;
   exprt e=expr;
   cleanup_expr(e);
-  language->from_expr(e, ret, ns);
+  language_info.from_expr(e, ret, ns);
   return ret;
 }
 
@@ -1406,12 +1406,7 @@ void dump_c(
   std::ostream &out)
 {
   dump_ct goto2c(
-    src,
-    use_system_headers,
-    use_all_headers,
-    include_harness,
-    ns,
-    new_ansi_c_language);
+    src, use_system_headers, use_all_headers, include_harness, ns, ID_C);
   out << goto2c;
 }
 
@@ -1424,11 +1419,6 @@ void dump_cpp(
   std::ostream &out)
 {
   dump_ct goto2cpp(
-    src,
-    use_system_headers,
-    use_all_headers,
-    include_harness,
-    ns,
-    new_cpp_language);
+    src, use_system_headers, use_all_headers, include_harness, ns, ID_cpp);
   out << goto2cpp;
 }

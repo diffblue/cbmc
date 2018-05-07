@@ -30,24 +30,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_type2name.h"
 
-std::set<std::string> cpp_languaget::extensions() const
-{
-  std::set<std::string> s;
-
-  s.insert("cpp");
-  s.insert("CPP");
-  s.insert("cc");
-  s.insert("c++");
-  s.insert("ii");
-  s.insert("cxx");
-
-  #ifndef _WIN32
-  s.insert("C");
-  #endif
-
-  return s;
-}
-
 void cpp_languaget::modules_provided(std::set<std::string> &modules)
 {
   modules.insert(get_base_name(parse_path, true));
@@ -203,36 +185,9 @@ void cpp_languaget::show_parse(
     out << "UNKNOWN: " << item.pretty() << '\n';
 }
 
-std::unique_ptr<languaget> new_cpp_language()
+std::unique_ptr<languaget> new_cpp_language(const language_infot &info)
 {
-  return util_make_unique<cpp_languaget>();
-}
-
-bool cpp_languaget::from_expr(
-  const exprt &expr,
-  std::string &code,
-  const namespacet &ns)
-{
-  code=expr2cpp(expr, ns);
-  return false;
-}
-
-bool cpp_languaget::from_type(
-  const typet &type,
-  std::string &code,
-  const namespacet &ns)
-{
-  code=type2cpp(type, ns);
-  return false;
-}
-
-bool cpp_languaget::type_to_name(
-  const typet &type,
-  std::string &name,
-  const namespacet &ns)
-{
-  name=cpp_type2name(type);
-  return false;
+  return std::unique_ptr<cpp_languaget>(new cpp_languaget(info));
 }
 
 bool cpp_languaget::to_expr(

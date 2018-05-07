@@ -7,15 +7,17 @@
 
 \*******************************************************************/
 
+#include <regex>
+
+#include <java_bytecode/java_bytecode_language_info.h>
+#include <java_bytecode/java_string_library_preprocess.h>
+#include <langapi/language_util.h>
+#include <langapi/mode.h>
 #include <testing-utils/catch.hpp>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
-#include <util/std_code.h>
-#include <java_bytecode/java_string_library_preprocess.h>
-#include <langapi/language_util.h>
-#include <java_bytecode/java_bytecode_language.h>
 #include <util/namespace.h>
-#include <langapi/mode.h>
+#include <util/std_code.h>
 
 refined_string_exprt convert_exprt_to_string_exprt_unit_test(
   java_string_library_preprocesst &preprocess,
@@ -55,7 +57,8 @@ TEST_CASE("Convert exprt to string exprt")
 
       THEN("Code is produced")
       {
-        register_language(new_java_bytecode_language);
+        clear_languages();
+        register_language(new_java_bytecode_language_info);
 
         std::vector<std::string> code_string;
         const std::regex spaces("\\s+");

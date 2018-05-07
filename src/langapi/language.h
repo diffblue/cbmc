@@ -23,6 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/system_library_symbols.h>
 
+#include "language_info.h"
+
 class symbol_tablet;
 class symbol_table_baset;
 class exprt;
@@ -101,48 +103,11 @@ public:
     symbol_tablet &symbol_table,
     const std::string &module)=0;
 
-  // language id / description
-
-  virtual std::string id() const { return ""; }
-  virtual std::string description() const { return ""; }
-  virtual std::set<std::string> extensions() const
-  { return std::set<std::string>(); }
-
   // show parse tree
 
   virtual void show_parse(std::ostream &out)=0;
 
   // conversion of expressions
-
-  /// Formats the given expression in a language-specific way
-  /// \param expr: the expression to format
-  /// \param code: the formatted expression
-  /// \param ns: a namespace
-  /// \return false if conversion succeeds
-  virtual bool from_expr(
-    const exprt &expr,
-    std::string &code,
-    const namespacet &ns);
-
-  /// Formats the given type in a language-specific way
-  /// \param type: the type to format
-  /// \param code: the formatted type
-  /// \param ns: a namespace
-  /// \return false if conversion succeeds
-  virtual bool from_type(
-    const typet &type,
-    std::string &code,
-    const namespacet &ns);
-
-  /// Encodes the given type in a language-specific way
-  /// \param type: the type to encode
-  /// \param name: the encoded type
-  /// \param ns: a namespace
-  /// \return false if the conversion succeeds
-  virtual bool type_to_name(
-    const typet &type,
-    std::string &name,
-    const namespacet &ns);
 
   /// Parses the given string into an expression
   /// \param code: the string to parse
@@ -156,16 +121,17 @@ public:
     exprt &expr,
     const namespacet &ns)=0;
 
-  virtual std::unique_ptr<languaget> new_language()=0;
-
   void set_should_generate_opaque_method_stubs(bool should_generate_stubs);
 
-  // constructor / destructor
+  const language_infot &info;
 
-  languaget() { }
   virtual ~languaget() { }
 
 protected:
+  explicit languaget(const language_infot &_info) : info(_info)
+  {
+  }
+
   void generate_opaque_method_stubs(symbol_tablet &symbol_table);
   virtual irep_idt generate_opaque_stub_body(
     symbolt &symbol,

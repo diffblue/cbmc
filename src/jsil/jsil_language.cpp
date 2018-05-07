@@ -21,11 +21,6 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include "jsil_parser.h"
 #include "jsil_typecheck.h"
 
-std::set<std::string> jsil_languaget::extensions() const
-{
-  return { "jsil" };
-}
-
 void jsil_languaget::modules_provided(std::set<std::string> &modules)
 {
   modules.insert(get_base_name(parse_path, true));
@@ -99,27 +94,9 @@ void jsil_languaget::show_parse(std::ostream &out)
   parse_tree.output(out);
 }
 
-std::unique_ptr<languaget> new_jsil_language()
+std::unique_ptr<languaget> new_jsil_language(const language_infot &info)
 {
-  return util_make_unique<jsil_languaget>();
-}
-
-bool jsil_languaget::from_expr(
-  const exprt &expr,
-  std::string &code,
-  const namespacet &ns)
-{
-  code=expr2jsil(expr, ns);
-  return false;
-}
-
-bool jsil_languaget::from_type(
-  const typet &type,
-  std::string &code,
-  const namespacet &ns)
-{
-  code=type2jsil(type, ns);
-  return false;
+  return std::unique_ptr<jsil_languaget>(new jsil_languaget(info));
 }
 
 bool jsil_languaget::to_expr(

@@ -1275,7 +1275,8 @@ void goto_checkt::add_guarded_claim(
     goto_programt::targett t=new_code.add_instruction(type);
 
     std::string source_expr_string;
-    get_language_from_mode(mode)->from_expr(src_expr, source_expr_string, ns);
+    get_language_from_mode(mode)->info.from_expr(
+      src_expr, source_expr_string, ns);
 
     t->guard.swap(new_expr);
     t->source_location=source_location;

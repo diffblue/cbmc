@@ -1,6 +1,7 @@
 SRC = language_ui.cpp \
       language_util.cpp \
       language_file.cpp \
+      language_info.cpp \
       language.cpp \
       mode.cpp \
       # Empty last line
