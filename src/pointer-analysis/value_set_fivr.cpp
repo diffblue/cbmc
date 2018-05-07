@@ -1597,11 +1597,6 @@ void value_set_fivrt::apply_code(
 
     assign(lhs, exprt(ID_invalid, lhs.type()), ns);
   }
-  else if(statement==ID_specc_notify ||
-          statement==ID_specc_wait)
-  {
-    // ignore, does not change variables
-  }
   else if(statement==ID_expression)
   {
     // can be ignored, we don't expect side effects here

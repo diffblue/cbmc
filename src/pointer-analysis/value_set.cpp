@@ -1541,11 +1541,6 @@ void value_sett::apply_code_rec(
         assign(lhs, exprt(ID_invalid), ns, false, false);
     }
   }
-  else if(statement=="specc_notify" ||
-          statement=="specc_wait")
-  {
-    // ignore, does not change variables
-  }
   else if(statement==ID_expression)
   {
     // can be ignored, we don't expect side effects here

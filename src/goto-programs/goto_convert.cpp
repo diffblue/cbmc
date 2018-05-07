@@ -506,12 +506,6 @@ void goto_convertt::convert(
     convert_non_deterministic_goto(code, dest);
   else if(statement==ID_ifthenelse)
     convert_ifthenelse(to_code_ifthenelse(code), dest, mode);
-  else if(statement==ID_specc_notify)
-    convert_specc_notify(code, dest);
-  else if(statement==ID_specc_wait)
-    convert_specc_wait(code, dest);
-  else if(statement==ID_specc_par)
-    convert_specc_par(code, dest);
   else if(statement==ID_start_thread)
     convert_start_thread(code, dest);
   else if(statement==ID_end_thread)
@@ -1497,84 +1491,6 @@ void goto_convertt::convert_non_deterministic_goto(
   goto_programt &dest)
 {
   convert_goto(code, dest);
-}
-
-void goto_convertt::convert_specc_notify(
-  const codet &code,
-  goto_programt &dest)
-{
-  #if 0
-  goto_programt::targett t=dest.add_instruction(EVENT);
-
-  forall_operands(it, code)
-    convert_specc_event(*it, t->events);
-
-  t->code.swap(code);
-  t->source_location=code.source_location();
-  #endif
-
-  copy(code, OTHER, dest);
-}
-
-void goto_convertt::convert_specc_event(
-  const exprt &op,
-  std::set<irep_idt> &events)
-{
-  if(op.id()==ID_or || op.id()==ID_and)
-  {
-    forall_operands(it, op)
-      convert_specc_event(*it, events);
-  }
-  else if(op.id()==ID_specc_event)
-  {
-    irep_idt event=op.get(ID_identifier);
-
-    if(has_prefix(id2string(event), "specc::"))
-      event=std::string(id2string(event), 7, std::string::npos);
-
-    events.insert(event);
-  }
-  else
-  {
-    error().source_location=op.find_source_location();
-    error() << "convert_convert_event got " << op.id() << eom;
-    throw 0;
-  }
-}
-
-void goto_convertt::convert_specc_wait(
-  const codet &code,
-  goto_programt &dest)
-{
-  #if 0
-  goto_programt::targett t=dest.add_instruction(WAIT);
-
-  if(code.operands().size()!=1)
-  {
-    error().source_location=code.find_source_location();
-    error() << "specc_wait expects one operand" << eom;
-    throw 0;
-  }
-
-  const exprt &op=code.op0();
-
-  if(op.id()=="or")
-    t->or_semantics=true;
-
-  convert_specc_event(op, t->events);
-
-  t->code.swap(code);
-  t->source_location=code.source_location();
-  #endif
-
-  copy(code, OTHER, dest);
-}
-
-void goto_convertt::convert_specc_par(
-  const codet &code,
-  goto_programt &dest)
-{
-  copy(code, OTHER, dest);
 }
 
 void goto_convertt::convert_start_thread(
