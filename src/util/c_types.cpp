@@ -184,78 +184,45 @@ unsignedbv_typet char32_t_type()
 
 bitvector_typet float_type()
 {
-  if(config.ansi_c.use_fixed_for_float)
-  {
-    fixedbv_typet result;
-    result.set_width(config.ansi_c.single_width);
-    result.set_integer_bits(config.ansi_c.single_width/2);
-    result.set(ID_C_c_type, ID_float);
-    return result;
-  }
-  else
-  {
-    floatbv_typet result=
-      ieee_float_spect::single_precision().to_type();
-    result.set(ID_C_c_type, ID_float);
-    return result;
-  }
+  floatbv_typet result=
+    ieee_float_spect::single_precision().to_type();
+  result.set(ID_C_c_type, ID_float);
+  return result;
 }
 
 bitvector_typet double_type()
 {
-  if(config.ansi_c.use_fixed_for_float)
-  {
-    fixedbv_typet result;
-    result.set_width(config.ansi_c.double_width);
-    result.set_integer_bits(config.ansi_c.double_width/2);
-    result.set(ID_C_c_type, ID_double);
-    return result;
-  }
-  else
-  {
-    floatbv_typet result=
-      ieee_float_spect::double_precision().to_type();
-    result.set(ID_C_c_type, ID_double);
-    return result;
-  }
+  floatbv_typet result=
+    ieee_float_spect::double_precision().to_type();
+  result.set(ID_C_c_type, ID_double);
+  return result;
 }
 
 bitvector_typet long_double_type()
 {
-  if(config.ansi_c.use_fixed_for_float)
+  floatbv_typet result;
+  if(config.ansi_c.long_double_width==128)
+    result=ieee_float_spect::quadruple_precision().to_type();
+  else if(config.ansi_c.long_double_width==64)
+    result=ieee_float_spect::double_precision().to_type();
+  else if(config.ansi_c.long_double_width==80)
   {
-    fixedbv_typet result;
-    result.set_width(config.ansi_c.long_double_width);
-    result.set_integer_bits(config.ansi_c.long_double_width/2);
-    result.set(ID_C_c_type, ID_long_double);
-    return result;
+    // x86 extended precision has 80 bits in total, and
+    // deviating from IEEE, does not use a hidden bit.
+    // We use the closest we have got, but the below isn't accurate.
+    result=ieee_float_spect(63, 15).to_type();
+  }
+  else if(config.ansi_c.long_double_width==96)
+  {
+    result=ieee_float_spect(80, 15).to_type();
+    // not quite right. The extra bits beyond 80 are usually padded.
   }
   else
-  {
-    floatbv_typet result;
-    if(config.ansi_c.long_double_width==128)
-      result=ieee_float_spect::quadruple_precision().to_type();
-    else if(config.ansi_c.long_double_width==64)
-      result=ieee_float_spect::double_precision().to_type();
-    else if(config.ansi_c.long_double_width==80)
-    {
-      // x86 extended precision has 80 bits in total, and
-      // deviating from IEEE, does not use a hidden bit.
-      // We use the closest we have got, but the below isn't accurate.
-      result=ieee_float_spect(63, 15).to_type();
-    }
-    else if(config.ansi_c.long_double_width==96)
-    {
-      result=ieee_float_spect(80, 15).to_type();
-      // not quite right. The extra bits beyond 80 are usually padded.
-    }
-    else
-      INVARIANT(false, "width of long double");
+    INVARIANT(false, "width of long double");
 
-    result.set(ID_C_c_type, ID_long_double);
+  result.set(ID_C_c_type, ID_long_double);
 
-    return result;
-  }
+  return result;
 }
 
 signedbv_typet pointer_diff_type()

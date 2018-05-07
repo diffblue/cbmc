@@ -219,15 +219,6 @@ std::string expr2ct::convert_rec(
   {
     const std::size_t width=to_fixedbv_type(src).get_width();
 
-    if(config.ansi_c.use_fixed_for_float)
-    {
-      if(width==config.ansi_c.single_width)
-        return q+"float"+d;
-      if(width==config.ansi_c.double_width)
-        return q+"double"+d;
-      if(width==config.ansi_c.long_double_width)
-        return q+"long double"+d;
-    }
     const std::size_t fraction_bits=to_fixedbv_type(src).get_fraction_bits();
     return
       q+"__CPROVER_fixedbv["+std::to_string(width)+"]["+

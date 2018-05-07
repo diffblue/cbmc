@@ -74,7 +74,7 @@ class optionst;
   OPT_FLUSH \
   "(localize-faults)(localize-faults-method):" \
   OPT_GOTO_TRACE \
-  "(claim):(show-claims)(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
+  "(claim):(show-claims)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 // clang-format on
 
 class cbmc_parse_optionst:
