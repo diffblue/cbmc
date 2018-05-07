@@ -46,11 +46,6 @@ CLEANFILES = goto-diff$(EXEEXT)
 
 all: goto-diff$(EXEEXT)
 
-ifneq ($(wildcard ../php/Makefile),)
-  OBJ += ../php/php$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_PHP
-endif
-
 ###############################################################################
 
 goto-diff$(EXEEXT): $(OBJ)
