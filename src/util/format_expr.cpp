@@ -209,7 +209,7 @@ std::ostream &format_rec(
 
     if(expr.has_operands())
     {
-      os << id << '(';
+      os << '(';
       bool first = true;
 
       for(const auto &op : expr.operands())
