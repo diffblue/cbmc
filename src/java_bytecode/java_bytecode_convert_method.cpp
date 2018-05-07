@@ -365,6 +365,8 @@ void java_bytecode_convert_method_lazy(
 
   if(is_constructor(method_symbol.base_name))
   {
+    // we use full.class_name.class_name(...) as pretty name
+    // for constructors
     method_symbol.pretty_name=
       id2string(class_symbol.pretty_name)+"."+
       id2string(class_symbol.base_name)+"()";
