@@ -64,6 +64,4 @@ std::size_t integer2size_t(const mp_integer &);
 DEPRECATED("Use numeric_cast_v<unsigned> instead")
 unsigned integer2unsigned(const mp_integer &);
 
-const mp_integer mp_zero=string2integer("0");
-
 #endif // CPROVER_UTIL_MP_ARITH_H
