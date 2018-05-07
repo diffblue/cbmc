@@ -80,7 +80,7 @@ protected:
   symbol_tablet symex_symbol_table;
   namespacet ns;
   symex_target_equationt equation;
-  path_fifot path_storage;
+  degenerate_path_storaget path_storage;
   optionst options;
   goto_symext symex;
 

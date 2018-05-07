@@ -125,6 +125,38 @@ private:
   void private_pop() override;
 };
 
+/// \brief Dummy class for clients who will not use path exploration
+class degenerate_path_storaget : public path_storaget
+{
+public:
+  explicit degenerate_path_storaget() : path_storaget()
+  {
+  }
+
+  void push(const patht &, const patht &) override
+  {
+    INVARIANT(false, "Cannot push to a degenerate_path_storaget");
+  }
+  std::size_t size() const override
+  {
+    INVARIANT(false, "Cannot take the size of a degenerate_path_storaget");
+  }
+  void clear() override
+  {
+    INVARIANT(false, "Cannot clear a degenerate_path_storaget");
+  }
+
+private:
+  patht &private_peek() override
+  {
+    INVARIANT(false, "Cannot peek at a degenerate_path_storaget");
+  }
+  void private_pop() override
+  {
+    INVARIANT(false, "Cannot pop a degenerate_path_storaget");
+  }
+};
+
 /// \brief Factory and information for path_storaget
 class path_strategy_choosert
 {
