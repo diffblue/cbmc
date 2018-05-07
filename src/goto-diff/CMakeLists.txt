@@ -24,7 +24,6 @@ target_link_libraries(goto-diff-lib
 )
 
 add_if_library(goto-diff-lib java_bytecode)
-add_if_library(goto-diff-lib jsil)
 
 # Executable
 add_executable(goto-diff goto_diff_main.cpp)

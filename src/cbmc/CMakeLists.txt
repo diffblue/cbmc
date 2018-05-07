@@ -16,6 +16,7 @@ target_link_libraries(cbmc-lib
     goto-instrument-lib
     goto-programs
     goto-symex
+    jsil
     json
     langapi
     linking
@@ -26,7 +27,6 @@ target_link_libraries(cbmc-lib
 )
 
 add_if_library(cbmc-lib bv_refinement)
-add_if_library(cbmc-lib jsil)
 
 # Executable
 add_executable(cbmc cbmc_main.cpp)

@@ -49,7 +49,9 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
       ../util/util$(LIBEXT) \
-      ../json/json$(LIBEXT)
+      ../json/json$(LIBEXT) \
+      ../jsil/jsil$(LIBEXT) \
+      # Empty last line
 
 INCLUDES= -I ..
 
@@ -65,11 +67,6 @@ all: cbmc$(EXEEXT)
 ifneq ($(wildcard ../bv_refinement/Makefile),)
   OBJ += ../bv_refinement/bv_refinement$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_BV_REFINEMENT
-endif
-
-ifneq ($(wildcard ../jsil/Makefile),)
-  OBJ += ../jsil/jsil$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JSIL
 endif
 
 ###############################################################################

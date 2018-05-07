@@ -16,13 +16,13 @@ target_link_libraries(goto-analyzer-lib
     analyses
     pointer-analysis
     langapi
+    jsil
     json
     assembler
     util
 )
 
 add_if_library(goto-analyzer-lib java_bytecode)
-add_if_library(goto-analyzer-lib jsil)
 
 # Executable
 add_executable(goto-analyzer goto_analyzer_main.cpp)

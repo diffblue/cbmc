@@ -28,7 +28,9 @@ OBJ += ../big-int/big-int$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../miniz/miniz$(OBJEXT) \
-      ../json/json$(LIBEXT)
+      ../json/json$(LIBEXT) \
+      ../jsil/jsil$(LIBEXT) \
+      # Empty last line
 
 INCLUDES= -I ..
 
@@ -43,11 +45,6 @@ ifeq ($(BUILD_ENV_),MSVC)
 all: goto-cl$(EXEEXT)
 endif
 all: goto-cc$(EXEEXT)
-
-ifneq ($(wildcard ../jsil/Makefile),)
-  OBJ += ../jsil/jsil$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JSIL
-endif
 
 ###############################################################################
 

@@ -20,7 +20,9 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../json/json$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../util/util$(LIBEXT) \
-      ../miniz/miniz$(OBJEXT)
+      ../miniz/miniz$(OBJEXT) \
+      ../jsil/jsil$(LIBEXT) \
+      # Empty last line
 
 INCLUDES= -I ..
 
@@ -32,11 +34,6 @@ include ../common
 CLEANFILES = goto-analyzer$(EXEEXT)
 
 all: goto-analyzer$(EXEEXT)
-
-ifneq ($(wildcard ../jsil/Makefile),)
-  OBJ += ../jsil/jsil$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JSIL
-endif
 
 ###############################################################################
 
