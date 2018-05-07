@@ -45,18 +45,18 @@ public:
 void _check_with_strategy(
   const std::string &strategy,
   const std::string &program,
-  const unsigned unwind_limit,
+  std::function<void(optionst &)>,
   symex_eventt::listt &events);
 
 /// Call this one, not the underscore version
 void check_with_strategy(
   const std::string &strategy,
+  std::function<void(optionst &)> opts_callback,
   const std::string &program,
-  symex_eventt::listt events,
-  const unsigned unwind_limit)
+  symex_eventt::listt events)
 {
   WHEN("strategy is '" + strategy + "'")
-  _check_with_strategy(strategy, program, unwind_limit, events);
+  _check_with_strategy(strategy, program, opts_callback, events);
 }
 
 #endif // CPROVER_PATH_STRATEGIES_H

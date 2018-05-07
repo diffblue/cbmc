@@ -65,6 +65,8 @@ SCENARIO("path strategies")
   std::string c;
   GIVEN("a simple conditional program")
   {
+    std::function<void(optionst &)> opts_callback = [](optionst &opts) {};
+
     c =
       "/*  1 */  int main()      \n"
       "/*  2 */  {               \n"
@@ -75,28 +77,28 @@ SCENARIO("path strategies")
       "/*  7 */      x = 0;      \n"
       "/*  8 */  }               \n";
 
-    const unsigned unwind_limit = 0U;
-
     check_with_strategy(
       "lifo",
+      opts_callback,
       c,
       {symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
        symex_eventt::result(symex_eventt::enumt::SUCCESS),
        symex_eventt::resume(symex_eventt::enumt::NEXT, 5),
-       symex_eventt::result(symex_eventt::enumt::SUCCESS)},
-      unwind_limit);
+       symex_eventt::result(symex_eventt::enumt::SUCCESS)});
     check_with_strategy(
       "fifo",
+      opts_callback,
       c,
       {symex_eventt::resume(symex_eventt::enumt::NEXT, 5),
        symex_eventt::result(symex_eventt::enumt::SUCCESS),
        symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
-       symex_eventt::result(symex_eventt::enumt::SUCCESS)},
-      unwind_limit);
+       symex_eventt::result(symex_eventt::enumt::SUCCESS)});
   }
 
   GIVEN("a program with nested conditionals")
   {
+    std::function<void(optionst &)> opts_callback = [](optionst &opts) {};
+
     c =
       "/*  1 */  int main()            \n"
       "/*  2 */  {                     \n"
@@ -117,10 +119,9 @@ SCENARIO("path strategies")
       "/* 17 */    }                   \n"
       "/* 18 */  }                     \n";
 
-    const unsigned unwind_limit = 0U;
-
     check_with_strategy(
       "lifo",
+      opts_callback,
       c,
       {// Outer else, inner else
        symex_eventt::resume(symex_eventt::enumt::JUMP, 13),
@@ -135,11 +136,11 @@ SCENARIO("path strategies")
        symex_eventt::result(symex_eventt::enumt::SUCCESS),
        // Outer if, inner if
        symex_eventt::resume(symex_eventt::enumt::NEXT, 7),
-       symex_eventt::result(symex_eventt::enumt::SUCCESS)},
-      unwind_limit);
+       symex_eventt::result(symex_eventt::enumt::SUCCESS)});
 
     check_with_strategy(
       "fifo",
+      opts_callback,
       c,
       {// Expand outer if, but don't continue depth-first
        symex_eventt::resume(symex_eventt::enumt::NEXT, 6),
@@ -155,12 +156,15 @@ SCENARIO("path strategies")
        symex_eventt::resume(symex_eventt::enumt::NEXT, 14),
        symex_eventt::result(symex_eventt::enumt::SUCCESS),
        symex_eventt::resume(symex_eventt::enumt::JUMP, 16),
-       symex_eventt::result(symex_eventt::enumt::SUCCESS)},
-      unwind_limit);
+       symex_eventt::result(symex_eventt::enumt::SUCCESS)});
   }
 
   GIVEN("a loop program to test functional correctness")
   {
+    std::function<void(optionst &)> opts_callback = [](optionst &opts) {
+      opts.set_option("unwind", 2U);
+    };
+
     c =
       "/*  1 */   int main()                       \n"
       "/*  2 */   {                                \n"
@@ -173,10 +177,9 @@ SCENARIO("path strategies")
       "/*  9 */     assert(x);                     \n"
       "/* 10 */   }                                \n";
 
-    const unsigned unwind_limit = 2U;
-
     check_with_strategy(
       "lifo",
+      opts_callback,
       c,
       {
         // The path where we skip the loop body. Successful because the path is
@@ -194,11 +197,11 @@ SCENARIO("path strategies")
         // infeasible.
         symex_eventt::resume(symex_eventt::enumt::NEXT, 7),
         symex_eventt::result(symex_eventt::enumt::SUCCESS),
-      },
-      unwind_limit);
+      });
 
     check_with_strategy(
       "fifo",
+      opts_callback,
       c,
       {
         // The path where we skip the loop body. Successful because the path is
@@ -219,8 +222,7 @@ SCENARIO("path strategies")
         // executing the loop once, decrementing x to 0; assert(x) should fail.
         symex_eventt::resume(symex_eventt::enumt::JUMP, 9),
         symex_eventt::result(symex_eventt::enumt::FAILURE),
-      },
-      unwind_limit);
+      });
   }
 }
 
@@ -286,7 +288,7 @@ void symex_eventt::validate_resume(
 void _check_with_strategy(
   const std::string &strategy,
   const std::string &program,
-  const unsigned unwind_limit,
+  std::function<void(optionst &)> opts_callback,
   symex_eventt::listt &events)
 {
   temporary_filet tmp("path-explore_", ".c");
@@ -307,11 +309,7 @@ void _check_with_strategy(
   opts.set_option("paths", true);
   opts.set_option("exploration-strategy", strategy);
 
-  if(unwind_limit)
-  {
-    opts.set_option("unwind", unwind_limit);
-    cmdline.set("unwind", std::to_string(unwind_limit));
-  }
+  opts_callback(opts);
 
   ui_message_handlert mh(cmdline, "path-explore");
   mh.set_verbosity(0);
