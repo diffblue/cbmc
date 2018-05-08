@@ -12,7 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/nondet_bool.h>
 #include <util/pointer_offset_size.h>
 
+#include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_functions.h>
+
+#include <linking/zero_initializer.h>
 
 #include "generic_parameter_specialization_map_keys.h"
 #include "java_root_class.h"
@@ -1027,8 +1030,35 @@ void java_object_factoryt::gen_nondet_struct_init(
 
   const componentst &components=struct_type.components();
 
-  if(!is_sub)
-    class_identifier=struct_tag;
+  // Should we write the whole object?
+  // * Not if this is a sub-structure (a superclass object), as our caller will
+  //   have done this already
+  // * Not if the object has already been initialised by our caller, in whic
+  //   case they will set `skip_classid`
+  // * Not if we're re-initializing an existing object (i.e. update_in_place)
+
+  if(!is_sub &&
+     !skip_classid &&
+     update_in_place != update_in_placet::MUST_UPDATE_IN_PLACE)
+  {
+    class_identifier = struct_tag;
+
+    // Add an initial all-zero write. Most of the fields of this will be
+    // overwritten, but it helps to have a whole-structure write that analysis
+    // passes can easily recognise leaves no uninitialised state behind.
+
+    // This code mirrors the `remove_java_new` pass:
+    null_message_handlert nullout;
+    exprt zero_object=
+      zero_initializer(
+        struct_type, source_locationt(), ns, nullout);
+    irep_idt qualified_clsid = "java::" + id2string(class_identifier);
+    set_class_identifier(
+      to_struct_expr(zero_object), ns, symbol_typet(qualified_clsid));
+
+    assignments.copy_to_operands(
+      code_assignt(expr, zero_object));
+  }
 
   for(const auto &component : components)
   {
@@ -1039,25 +1069,11 @@ void java_object_factoryt::gen_nondet_struct_init(
 
     if(name=="@class_identifier")
     {
-      if(update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE)
-        continue;
-
-      if(skip_classid)
-        continue;
-
-      irep_idt qualified_clsid = "java::" + id2string(class_identifier);
-      constant_exprt ci(qualified_clsid, string_typet());
-      code_assignt code(me, ci);
-      code.add_source_location()=loc;
-      assignments.copy_to_operands(code);
+      continue;
     }
     else if(name=="@lock")
     {
-      if(update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE)
-        continue;
-      code_assignt code(me, from_integer(0, me.type()));
-      code.add_source_location()=loc;
-      assignments.copy_to_operands(code);
+      continue;
     }
     else
     {
