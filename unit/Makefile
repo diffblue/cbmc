@@ -30,6 +30,7 @@ SRC += unit_tests.cpp \
        java_bytecode/java_types/java_type_from_string.cpp \
        java_bytecode/java_utils_test.cpp \
        java_bytecode/inherited_static_fields/inherited_static_fields.cpp \
+       path_strategies.cpp \
        pointer-analysis/custom_value_set_analysis.cpp \
        sharing_node.cpp \
        solvers/refinement/string_constraint_generator_valueof/calculate_max_string_length.cpp \
@@ -71,6 +72,34 @@ cprover.dir:
 testing-utils.dir:
 	$(MAKE) $(MAKEARGS) -C testing-utils
 
+# We need to link bmc.o to the unit test, so here's everything it depends on...
+BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
+          ../src/cbmc/bmc$(OBJEXT) \
+          ../src/cbmc/bmc_cover$(OBJEXT) \
+          ../src/cbmc/bv_cbmc$(OBJEXT) \
+          ../src/cbmc/cbmc_dimacs$(OBJEXT) \
+          ../src/cbmc/cbmc_languages$(OBJEXT) \
+          ../src/cbmc/cbmc_parse_options$(OBJEXT) \
+          ../src/cbmc/cbmc_solvers$(OBJEXT) \
+          ../src/cbmc/counterexample_beautification$(OBJEXT) \
+          ../src/cbmc/fault_localization$(OBJEXT) \
+          ../src/cbmc/show_vcc$(OBJEXT) \
+          ../src/cbmc/symex_bmc$(OBJEXT) \
+          ../src/cbmc/symex_coverage$(OBJEXT) \
+          ../src/cbmc/xml_interface$(OBJEXT) \
+          ../src/jsil/expr2jsil$(OBJEXT) \
+          ../src/jsil/jsil_convert$(OBJEXT) \
+          ../src/jsil/jsil_entry_point$(OBJEXT) \
+          ../src/jsil/jsil_internal_additions$(OBJEXT) \
+          ../src/jsil/jsil_language$(OBJEXT) \
+          ../src/jsil/jsil_lex.yy$(OBJEXT) \
+          ../src/jsil/jsil_parser$(OBJEXT) \
+          ../src/jsil/jsil_parse_tree$(OBJEXT) \
+          ../src/jsil/jsil_typecheck$(OBJEXT) \
+          ../src/jsil/jsil_types$(OBJEXT) \
+          ../src/jsil/jsil_y.tab$(OBJEXT) \
+          # Empty last line
+#
 CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               ../src/miniz/miniz$(OBJEXT) \
               ../src/ansi-c/ansi-c$(LIBEXT) \
@@ -86,6 +115,7 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               ../src/assembler/assembler$(LIBEXT) \
               ../src/analyses/analyses$(LIBEXT) \
               ../src/solvers/solvers$(LIBEXT) \
+              $(BMC_DEPS)
               # Empty last line
 
 OBJ += $(CPROVER_LIBS) testing-utils/testing-utils$(LIBEXT)

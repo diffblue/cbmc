@@ -43,6 +43,7 @@ target_link_libraries(
         java_bytecode
         goto-programs
         goto-instrument-lib
+        cbmc-lib
 )
 
 add_test(

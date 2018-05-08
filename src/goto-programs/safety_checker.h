@@ -30,7 +30,23 @@ public:
     const namespacet &_ns,
     message_handlert &_message_handler);
 
-  enum class resultt { SAFE, UNSAFE, ERROR };
+  enum class resultt
+  {
+    /// No safety properties were violated
+    SAFE,
+    /// Some safety properties were violated
+    UNSAFE,
+    /// Safety is unknown due to an error during safety checking
+    ERROR,
+    /// Symbolic execution has been suspended due to encountering a GOTO while
+    /// doing path exploration; the symex state has been saved, and symex should
+    /// be resumed by the caller.
+    PAUSED,
+    /// We haven't yet assigned a safety check result to this object. A value of
+    /// UNKNOWN can be used to initialize a resultt object, and that object may
+    /// then safely be used with the |= and &= operators.
+    UNKNOWN
+  };
 
   // check whether all assertions in goto_functions are safe
   // if UNSAFE, then a trace is returned
@@ -47,11 +63,22 @@ protected:
 };
 
 /// \brief The worst of two results
+///
+/// A result of PAUSED means that the safety check has not yet completed,
+/// thus it makes no sense to compare it to the result of a completed safety
+/// check. Therefore do not pass safety_checkert::resultt:PAUSED as an
+/// argument to this function.
 inline safety_checkert::resultt &
 operator&=(safety_checkert::resultt &a, safety_checkert::resultt const &b)
 {
+  PRECONDITION(
+    a != safety_checkert::resultt::PAUSED &&
+    b != safety_checkert::resultt::PAUSED);
   switch(a)
   {
+  case safety_checkert::resultt::UNKNOWN:
+    a = b;
+    return a;
   case safety_checkert::resultt::ERROR:
     return a;
   case safety_checkert::resultt::SAFE:
@@ -60,16 +87,29 @@ operator&=(safety_checkert::resultt &a, safety_checkert::resultt const &b)
   case safety_checkert::resultt::UNSAFE:
     a = b == safety_checkert::resultt::ERROR ? b : a;
     return a;
+  case safety_checkert::resultt::PAUSED:
+    UNREACHABLE;
   }
   UNREACHABLE;
 }
 
 /// \brief The best of two results
+///
+/// A result of PAUSED means that the safety check has not yet completed,
+/// thus it makes no sense to compare it to the result of a completed safety
+/// check. Therefore do not pass safety_checkert::resultt:PAUSED as an
+/// argument to this function.
 inline safety_checkert::resultt &
 operator|=(safety_checkert::resultt &a, safety_checkert::resultt const &b)
 {
+  PRECONDITION(
+    a != safety_checkert::resultt::PAUSED &&
+    b != safety_checkert::resultt::PAUSED);
   switch(a)
   {
+  case safety_checkert::resultt::UNKNOWN:
+    a = b;
+    return a;
   case safety_checkert::resultt::SAFE:
     return a;
   case safety_checkert::resultt::ERROR:
@@ -78,6 +118,8 @@ operator|=(safety_checkert::resultt &a, safety_checkert::resultt const &b)
   case safety_checkert::resultt::UNSAFE:
     a = b == safety_checkert::resultt::SAFE ? b : a;
     return a;
+  case safety_checkert::resultt::PAUSED:
+    UNREACHABLE;
   }
   UNREACHABLE;
 }

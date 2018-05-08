@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <memory>
 
+#include <util/exit_codes.h>
 #include <util/string2int.h>
 #include <util/config.h>
 #include <util/unicode.h>
@@ -63,7 +64,8 @@ Author: Daniel Kroening, kroening@kroening.com
 jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv):
   parse_options_baset(JBMC_OPTIONS, argc, argv),
   messaget(ui_message_handler),
-  ui_message_handler(cmdline, "JBMC " CBMC_VERSION)
+  ui_message_handler(cmdline, "JBMC " CBMC_VERSION),
+  path_strategy_chooser()
 {
 }
 
@@ -73,7 +75,8 @@ jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv):
   const std::string &extra_options):
   parse_options_baset(JBMC_OPTIONS+extra_options, argc, argv),
   messaget(ui_message_handler),
-  ui_message_handler(cmdline, "JBMC " CBMC_VERSION)
+  ui_message_handler(cmdline, "JBMC " CBMC_VERSION),
+  path_strategy_chooser()
 {
 }
 
@@ -99,6 +102,14 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     usage_error();
     exit(1); // should contemplate EX_USAGE from sysexits.h
   }
+
+  if(cmdline.isset("show-symex-strategies"))
+  {
+    std::cout << path_strategy_chooser.show_strategies();
+    exit(CPROVER_EXIT_SUCCESS);
+  }
+
+  path_strategy_chooser.set_path_strategy_options(cmdline, options, *this);
 
   if(cmdline.isset("program-only"))
     options.set_option("program-only", true);
@@ -533,7 +544,12 @@ int jbmc_parse_optionst::doit()
     // The `configure_bmc` callback passed will enable enum-unwind-static if
     // applicable.
     return bmct::do_language_agnostic_bmc(
-      options, goto_model, ui_message_handler.get_ui(), *this, configure_bmc);
+      path_strategy_chooser,
+      options,
+      goto_model,
+      ui_message_handler.get_ui(),
+      *this,
+      configure_bmc);
   }
   else
   {
@@ -573,6 +589,7 @@ int jbmc_parse_optionst::doit()
     // applicable.
     return
       bmct::do_language_agnostic_bmc(
+        path_strategy_chooser,
         options,
         lazy_goto_model,
         ui_message_handler.get_ui(),

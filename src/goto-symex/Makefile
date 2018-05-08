@@ -8,6 +8,7 @@ SRC = adjust_float_expressions.cpp \
       memory_model_sc.cpp \
       memory_model_tso.cpp \
       partial_order_concurrency.cpp \
+      path_storage.cpp \
       postcondition.cpp \
       precondition.cpp \
       rewrite_union.cpp \

@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 
 #include "goto_symex_state.h"
+#include "path_storage.h"
 #include "symex_target_equation.h"
 
 class byte_extract_exprt;
@@ -47,31 +48,13 @@ class goto_symext
 public:
   typedef goto_symex_statet statet;
 
-  /// \brief Information saved at a conditional goto to resume execution
-  struct branch_pointt
-  {
-    symex_target_equationt equation;
-    statet state;
-
-    explicit branch_pointt(const symex_target_equationt &e, const statet &s)
-      : equation(e), state(s, &equation)
-    {
-    }
-
-    explicit branch_pointt(const branch_pointt &other)
-      : equation(other.equation), state(other.state, &equation)
-    {
-    }
-  };
-
-  typedef std::list<branch_pointt> branch_worklistt;
-
   goto_symext(
     message_handlert &mh,
     const symbol_tablet &outer_symbol_table,
     symex_target_equationt &_target,
-    branch_worklistt &branch_worklist)
-    : total_vccs(0),
+    path_storaget &path_storage)
+    : should_pause_symex(false),
+      total_vccs(0),
       remaining_vccs(0),
       constant_propagation(true),
       language_mode(),
@@ -81,7 +64,7 @@ public:
       atomic_section_counter(0),
       log(mh),
       guard_identifier("goto_symex::\\guard"),
-      branch_worklist(branch_worklist)
+      path_storage(path_storage)
   {
     options.set_option("simplify", true);
     options.set_option("assertions", true);
@@ -176,6 +159,15 @@ public:
     const get_goto_functiont &get_goto_function,
     goto_programt::const_targett first,
     goto_programt::const_targett limit);
+
+  /// \brief Have states been pushed onto the workqueue?
+  ///
+  /// If this flag is set at the end of a symbolic execution run, it means that
+  /// symex has been paused because we encountered a GOTO instruction while
+  /// doing path exploration, and thus pushed the successor states of the GOTO
+  /// onto path_storage. The symbolic execution caller should now choose which
+  /// successor state to continue executing, and resume symex from that state.
+  bool should_pause_symex;
 
 protected:
   /// Initialise the symbolic execution and the given state with <code>pc</code>
@@ -462,7 +454,7 @@ protected:
   void replace_nondet(exprt &);
   void rewrite_quantifiers(exprt &, statet &);
 
-  branch_worklistt &branch_worklist;
+  path_storaget &path_storage;
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_H

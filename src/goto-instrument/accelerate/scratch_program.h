@@ -23,6 +23,7 @@ Author: Matt Lewis
 #include <goto-programs/goto_functions.h>
 
 #include <goto-symex/goto_symex.h>
+#include <goto-symex/path_storage.h>
 #include <goto-symex/symex_target_equation.h>
 
 #include <solvers/smt2/smt2_dec.h>
@@ -41,8 +42,8 @@ public:
       symex_symbol_table(),
       ns(symbol_table, symex_symbol_table),
       equation(),
-      branch_worklist(),
-      symex(mh, symbol_table, equation, branch_worklist),
+      path_storage(),
+      symex(mh, symbol_table, equation, path_storage),
       satcheck(util_make_unique<satcheckt>()),
       satchecker(ns, *satcheck),
       z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
@@ -78,7 +79,7 @@ protected:
   symbol_tablet symex_symbol_table;
   namespacet ns;
   symex_target_equationt equation;
-  goto_symext::branch_worklistt branch_worklist;
+  path_fifot path_storage;
   goto_symext symex;
 
   std::unique_ptr<propt> satcheck;

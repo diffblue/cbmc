@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/threeval.h>
 
+#include <goto-symex/path_storage.h>
 #include <goto-symex/goto_symex.h>
 
 #include "symex_coverage.h"
@@ -26,7 +27,7 @@ public:
     message_handlert &mh,
     const symbol_tablet &outer_symbol_table,
     symex_target_equationt &_target,
-    goto_symext::branch_worklistt &branch_worklist);
+    path_storaget &path_storage);
 
   // To show progress
   source_locationt last_source_location;

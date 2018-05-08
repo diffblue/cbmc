@@ -1,0 +1,364 @@
+/*******************************************************************\
+
+Module: Path Strategy Tests
+
+Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
+
+\*******************************************************************/
+
+#include <testing-utils/catch.hpp>
+
+#include <path_strategies.h>
+
+#include <fstream>
+#include <functional>
+#include <string>
+
+#include <ansi-c/ansi_c_language.h>
+
+#include <cbmc/bmc.h>
+#include <cbmc/cbmc_parse_options.h>
+#include <cbmc/cbmc_solvers.h>
+
+#include <langapi/language_ui.h>
+#include <langapi/mode.h>
+
+#include <util/cmdline.h>
+#include <util/config.h>
+#include <util/cout_message.h>
+#include <util/tempfile.h>
+
+// The actual test suite.
+//
+// Whenever you add a new path exploration strategy 'my-cool-strategy', for each
+// of the test programs (under the GIVEN macros), add a new test using a call to
+// `check_with_strategy("my-cool-strategy", c, event_list)` where `event_list`
+// is a list of the events that you expect to see during symbolic execution.
+// Events are either resumes or results.
+//
+// Whenever symbolic execution pauses and picks a path to resume from, you
+// should note the line number of the path you expect that path strategy to
+// resume from. A resume is either a JUMP, meaning that it's the target of a
+// `goto` instruction, or a NEXT, meaning that it's the instruction following a
+// `goto` instruction.
+//
+// Whenever symbolic execution reaches the end of a path, you should expect a
+// result. Results are either SUCCESS, meaning that verification of that path
+// succeeded, or FAILURE, meaning that there was an assertion failure on that
+// path.
+//
+// To figure out what the events should be, run CBMC on the test program with
+// your strategy with `--verbosity 10` and look out for lines like
+//
+//  Resuming from jump target 'file nested-if/main.c line 13 function main'
+//
+//  Resuming from next instruction 'file nested-if/main.c line 14 function main'
+//
+//  VERIFICATION SUCCESSFUL
+//
+//  VERIFICATION FAILED
+//
+// And note the order in which they occur.
+
+SCENARIO("path strategies")
+{
+  std::string c;
+  GIVEN("a simple conditional program")
+  {
+    c =
+      "/*  1 */  int main()      \n"
+      "/*  2 */  {               \n"
+      "/*  3 */    int x;        \n"
+      "/*  4 */    if(x)         \n"
+      "/*  5 */      x = 1;      \n"
+      "/*  6 */    else          \n"
+      "/*  7 */      x = 0;      \n"
+      "/*  8 */  }               \n";
+
+    const unsigned unwind_limit = 0U;
+
+    check_with_strategy(
+      "lifo",
+      c,
+      {symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
+       symex_eventt::result(symex_eventt::enumt::SUCCESS),
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 5),
+       symex_eventt::result(symex_eventt::enumt::SUCCESS)},
+      unwind_limit);
+    check_with_strategy(
+      "fifo",
+      c,
+      {symex_eventt::resume(symex_eventt::enumt::NEXT, 5),
+       symex_eventt::result(symex_eventt::enumt::SUCCESS),
+       symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
+       symex_eventt::result(symex_eventt::enumt::SUCCESS)},
+      unwind_limit);
+  }
+
+  GIVEN("a program with nested conditionals")
+  {
+    c =
+      "/*  1 */  int main()            \n"
+      "/*  2 */  {                     \n"
+      "/*  3 */    int x, y;           \n"
+      "/*  4 */    if(x)               \n"
+      "/*  5 */    {                   \n"
+      "/*  6 */      if(y)             \n"
+      "/*  7 */        y = 1;          \n"
+      "/*  8 */      else              \n"
+      "/*  9 */        y = 0;          \n"
+      "/* 10 */    }                   \n"
+      "/* 11 */    else                \n"
+      "/* 12 */    {                   \n"
+      "/* 13 */      if(y)             \n"
+      "/* 14 */        y = 1;          \n"
+      "/* 15 */      else              \n"
+      "/* 16 */        y = 0;          \n"
+      "/* 17 */    }                   \n"
+      "/* 18 */  }                     \n";
+
+    const unsigned unwind_limit = 0U;
+
+    check_with_strategy(
+      "lifo",
+      c,
+      {// Outer else, inner else
+       symex_eventt::resume(symex_eventt::enumt::JUMP, 13),
+       symex_eventt::resume(symex_eventt::enumt::JUMP, 16),
+       symex_eventt::result(symex_eventt::enumt::SUCCESS),
+       // Outer else, inner if
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 14),
+       symex_eventt::result(symex_eventt::enumt::SUCCESS),
+       // Outer if, inner else
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 6),
+       symex_eventt::resume(symex_eventt::enumt::JUMP, 9),
+       symex_eventt::result(symex_eventt::enumt::SUCCESS),
+       // Outer if, inner if
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 7),
+       symex_eventt::result(symex_eventt::enumt::SUCCESS)},
+      unwind_limit);
+
+    check_with_strategy(
+      "fifo",
+      c,
+      {// Expand outer if, but don't continue depth-first
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 6),
+       // Jump to outer else, but again don't continue depth-first
+       symex_eventt::resume(symex_eventt::enumt::JUMP, 13),
+       // Expand inner if of the outer if
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 7),
+       // No more branch points, so complete the path
+       symex_eventt::result(symex_eventt::enumt::SUCCESS),
+       // Continue BFSing
+       symex_eventt::resume(symex_eventt::enumt::JUMP, 9),
+       symex_eventt::result(symex_eventt::enumt::SUCCESS),
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 14),
+       symex_eventt::result(symex_eventt::enumt::SUCCESS),
+       symex_eventt::resume(symex_eventt::enumt::JUMP, 16),
+       symex_eventt::result(symex_eventt::enumt::SUCCESS)},
+      unwind_limit);
+  }
+
+  GIVEN("a loop program to test functional correctness")
+  {
+    c =
+      "/*  1 */   int main()                       \n"
+      "/*  2 */   {                                \n"
+      "/*  3 */     int x;                         \n"
+      "/*  4 */     __CPROVER_assume(x == 1);      \n"
+      "/*  5 */                                    \n"
+      "/*  6 */     while(x)                       \n"
+      "/*  7 */       --x;                         \n"
+      "/*  8 */                                    \n"
+      "/*  9 */     assert(x);                     \n"
+      "/* 10 */   }                                \n";
+
+    const unsigned unwind_limit = 2U;
+
+    check_with_strategy(
+      "lifo",
+      c,
+      {
+        // The path where we skip the loop body. Successful because the path is
+        // implausible, we cannot have skipped the body if x == 1.
+        symex_eventt::resume(symex_eventt::enumt::JUMP, 9),
+        symex_eventt::result(symex_eventt::enumt::SUCCESS),
+
+        // Enter the loop body once. Since we decrement x, the assertion should
+        // fail.
+        symex_eventt::resume(symex_eventt::enumt::NEXT, 7),
+        symex_eventt::resume(symex_eventt::enumt::JUMP, 9),
+        symex_eventt::result(symex_eventt::enumt::FAILURE),
+
+        // The path where we enter the loop body twice. Successful because
+        // infeasible.
+        symex_eventt::resume(symex_eventt::enumt::NEXT, 7),
+        symex_eventt::result(symex_eventt::enumt::SUCCESS),
+      },
+      unwind_limit);
+
+    check_with_strategy(
+      "fifo",
+      c,
+      {
+        // The path where we skip the loop body. Successful because the path is
+        // implausible, we cannot have skipped the body if x == 1.
+        //
+        // In this case, although we resume from line 7, we don't proceed until
+        // the end of the path after executing line 7.
+        symex_eventt::resume(symex_eventt::enumt::NEXT, 7),
+        symex_eventt::resume(symex_eventt::enumt::JUMP, 9),
+        symex_eventt::result(symex_eventt::enumt::SUCCESS),
+
+        // Pop line 7 that we saved from above, and execute the loop a second
+        // time. Successful, since this path is infeasible.
+        symex_eventt::resume(symex_eventt::enumt::NEXT, 7),
+        symex_eventt::result(symex_eventt::enumt::SUCCESS),
+
+        // Pop line 7 that we saved from above and bail out. That corresponds to
+        // executing the loop once, decrementing x to 0; assert(x) should fail.
+        symex_eventt::resume(symex_eventt::enumt::JUMP, 9),
+        symex_eventt::result(symex_eventt::enumt::FAILURE),
+      },
+      unwind_limit);
+  }
+}
+
+// In theory, there should be no need to change the code below when adding new
+// test cases...
+
+void symex_eventt::validate_result(
+  listt &events,
+  const safety_checkert::resultt result)
+{
+  INFO(
+    "Expecting result to be '"
+    << (result == safety_checkert::resultt::SAFE ? "success" : "failure")
+    << "'");
+
+  REQUIRE(result != safety_checkert::resultt::ERROR);
+
+  if(result == safety_checkert::resultt::SAFE)
+  {
+    REQUIRE(!events.empty());
+    REQUIRE(events.front().first == symex_eventt::enumt::SUCCESS);
+    events.pop_front();
+  }
+  else if(result == safety_checkert::resultt::UNSAFE)
+  {
+    REQUIRE(!events.empty());
+    REQUIRE(events.front().first == symex_eventt::enumt::FAILURE);
+    events.pop_front();
+  }
+}
+
+void symex_eventt::validate_resume(
+  listt &events,
+  const goto_symex_statet &state)
+{
+  REQUIRE(!events.empty());
+
+  int dst = std::stoi(state.saved_target->source_location.get_line().c_str());
+
+  if(state.has_saved_jump_target)
+  {
+    INFO("Expecting resume to be 'jump' to line " << dst);
+    REQUIRE(events.front().first == symex_eventt::enumt::JUMP);
+  }
+  else if(state.has_saved_next_instruction)
+  {
+    INFO("Expecting resume to be 'next' to line " << dst);
+    REQUIRE(events.front().first == symex_eventt::enumt::NEXT);
+  }
+  else
+    REQUIRE(false);
+
+  REQUIRE(events.front().second == dst);
+
+  events.pop_front();
+}
+
+// This is a simplified version of bmct::do_language_agnostic_bmc, without all
+// the edge cases to deal with java programs, bytecode loaded on demand, etc. We
+// need to replicate some of this stuff because the worklist is a local variable
+// of do_language_agnostic_bmc, and we need to check the worklist every time
+// symex returns.
+void _check_with_strategy(
+  const std::string &strategy,
+  const std::string &program,
+  const unsigned unwind_limit,
+  symex_eventt::listt &events)
+{
+  temporary_filet tmp("path-explore_", ".c");
+  std::ofstream of(tmp().c_str());
+  REQUIRE(of.is_open());
+
+  of << program << std::endl;
+  of.close();
+
+  register_language(new_ansi_c_language);
+  cmdlinet cmdline;
+  cmdline.args.push_back(tmp());
+  config.main = "main";
+  config.set(cmdline);
+
+  optionst opts;
+  cbmc_parse_optionst::set_default_options(opts);
+  opts.set_option("paths", true);
+  opts.set_option("exploration-strategy", strategy);
+
+  if(unwind_limit)
+  {
+    opts.set_option("unwind", unwind_limit);
+    cmdline.set("unwind", std::to_string(unwind_limit));
+  }
+
+  ui_message_handlert mh(cmdline, "path-explore");
+  messaget log(mh);
+
+  path_strategy_choosert chooser;
+  REQUIRE(chooser.is_valid_strategy(strategy));
+  std::unique_ptr<path_storaget> worklist = chooser.get(strategy);
+
+  goto_modelt gm;
+  int ret;
+  ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, log, mh);
+  REQUIRE(ret == -1);
+
+  cbmc_solverst solvers(opts, gm.get_symbol_table(), mh);
+  solvers.set_ui(mh.get_ui());
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver = solvers.get_solver();
+  prop_convt &pc = cbmc_solver->prop_conv();
+  std::function<bool(void)> callback = []() { return false; };
+
+  bmct bmc(opts, gm.get_symbol_table(), mh, pc, *worklist, callback);
+  bmc.set_ui(mh.get_ui());
+  safety_checkert::resultt result = bmc.run(gm);
+  symex_eventt::validate_result(events, result);
+
+  while(!worklist->empty())
+  {
+    cbmc_solverst solvers(opts, gm.get_symbol_table(), mh);
+    solvers.set_ui(mh.get_ui());
+    cbmc_solver = solvers.get_solver();
+    prop_convt &pc = cbmc_solver->prop_conv();
+    path_storaget::patht &resume = worklist->peek();
+
+    symex_eventt::validate_resume(events, resume.state);
+
+    path_explorert pe(
+      opts,
+      gm.get_symbol_table(),
+      mh,
+      pc,
+      resume.equation,
+      resume.state,
+      *worklist,
+      callback);
+    result = pe.run(gm);
+
+    symex_eventt::validate_result(events, result);
+    worklist->pop();
+  }
+  REQUIRE(events.empty());
+}

@@ -23,6 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_trace.h>
 
 #include <goto-symex/symex_target_equation.h>
+#include <goto-symex/path_storage.h>
+
 #include <goto-programs/goto_model.h>
 #include <goto-programs/safety_checker.h>
 #include <goto-symex/memory_model.h>
@@ -49,32 +51,32 @@ public:
   ///   constructor is `false` (unset), an instance of this class will
   ///   symbolically execute the entire program, performing path merging
   ///   to build a formula corresponding to all executions of the program
-  ///   up to the unwinding limit. In this case, the `branch_worklist`
+  ///   up to the unwinding limit. In this case, the `path_storage`
   ///   member shall not be touched; this is enforced by the assertion in
   ///   this class' implementation of bmct::perform_symbolic_execution().
   ///
   /// - If the `--paths` flag is `true`, this `bmct` object will explore a
   ///   single path through the codebase without doing any path merging.
   ///   If some paths were not taken, the state at those branch points
-  ///   will be appended to `branch_worklist`. After the single path that
+  ///   will be appended to `path_storage`. After the single path that
   ///   this `bmct` object executed has been model-checked, you can resume
   ///   exploring further paths by popping an element from
-  ///   `branch_worklist` and using it to construct a path_explorert
+  ///   `path_storage` and using it to construct a path_explorert
   ///   object.
   bmct(
     const optionst &_options,
     const symbol_tablet &outer_symbol_table,
     message_handlert &_message_handler,
     prop_convt &_prop_conv,
-    goto_symext::branch_worklistt &_branch_worklist,
+    path_storaget &_path_storage,
     std::function<bool(void)> callback_after_symex)
     : safety_checkert(ns, _message_handler),
       options(_options),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table, symex_symbol_table),
       equation(),
-      branch_worklist(_branch_worklist),
-      symex(_message_handler, outer_symbol_table, equation, branch_worklist),
+      path_storage(_path_storage),
+      symex(_message_handler, outer_symbol_table, equation, path_storage),
       prop_conv(_prop_conv),
       ui(ui_message_handlert::uit::PLAIN),
       driver_callback_after_symex(callback_after_symex)
@@ -115,6 +117,7 @@ public:
   }
 
   static int do_language_agnostic_bmc(
+    const path_strategy_choosert &path_strategy_chooser,
     const optionst &opts,
     abstract_goto_modelt &goto_model,
     const ui_message_handlert::uit &ui,
@@ -128,7 +131,7 @@ protected:
   ///
   /// This constructor exists as a delegate for the path_explorert class.
   /// It differs from \ref bmct's public constructor in that it actually
-  /// does something with the branch_worklistt argument, and also takes a
+  /// does something with the path_storaget argument, and also takes a
   /// symex_target_equationt. See the documentation for path_explorert for
   /// details.
   bmct(
@@ -137,15 +140,15 @@ protected:
     message_handlert &_message_handler,
     prop_convt &_prop_conv,
     symex_target_equationt &_equation,
-    goto_symext::branch_worklistt &_branch_worklist,
+    path_storaget &_path_storage,
     std::function<bool(void)> callback_after_symex)
     : safety_checkert(ns, _message_handler),
       options(_options),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table),
       equation(_equation),
-      branch_worklist(_branch_worklist),
-      symex(_message_handler, outer_symbol_table, equation, branch_worklist),
+      path_storage(_path_storage),
+      symex(_message_handler, outer_symbol_table, equation, path_storage),
       prop_conv(_prop_conv),
       ui(ui_message_handlert::uit::PLAIN),
       driver_callback_after_symex(callback_after_symex)
@@ -166,7 +169,7 @@ protected:
   symbol_tablet symex_symbol_table;
   namespacet ns;
   symex_target_equationt equation;
-  goto_symext::branch_worklistt &branch_worklist;
+  path_storaget &path_storage;
   symex_bmct symex;
   prop_convt &prop_conv;
   std::unique_ptr<memory_model_baset> memory_model;
@@ -257,7 +260,7 @@ public:
     prop_convt &_prop_conv,
     symex_target_equationt &saved_equation,
     const goto_symex_statet &saved_state,
-    goto_symext::branch_worklistt &branch_worklist,
+    path_storaget &path_storage,
     std::function<bool(void)> callback_after_symex)
     : bmct(
         _options,
@@ -265,7 +268,7 @@ public:
         _message_handler,
         _prop_conv,
         saved_equation,
-        branch_worklist,
+        path_storage,
         callback_after_symex),
       saved_state(saved_state)
   {
@@ -292,7 +295,8 @@ private:
   "(no-unwinding-assertions)"                                                  \
   "(no-pretty-names)"                                                          \
   "(partial-loops)"                                                            \
-  "(paths)"                                                                    \
+  "(paths):"                                                                   \
+  "(show-symex-strategies)"                                                    \
   "(depth):"                                                                   \
   "(unwind):"                                                                  \
   "(unwindset):"                                                               \
@@ -300,7 +304,8 @@ private:
   "(unwindset):"
 
 #define HELP_BMC                                                               \
-  " --paths                      explore paths one at a time\n"                \
+  " --paths [strategy]           explore paths one at a time\n"                \
+  " --show-symex-strategies      list strategies for use with --paths\n"       \
   " --program-only               only show program expression\n"               \
   " --show-loops                 show the loops in the program\n"              \
   " --depth nr                   limit search depth\n"                         \
