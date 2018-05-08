@@ -62,17 +62,19 @@ jar_filet &jar_filet::operator=(jar_filet &&other)
   return *this;
 }
 
-std::string jar_filet::get_entry(const std::string &name)
+optionalt<std::string> jar_filet::get_entry(const std::string &name)
 {
   const auto entry=m_name_to_index.find(name);
-  INVARIANT(entry!=m_name_to_index.end(), "File doesn't exist");
+  if(entry==m_name_to_index.end())
+    return {};
+
   try
   {
     return m_zip_archive.extract(entry->second);
   }
   catch(const std::runtime_error &)
   {
-    return "";
+    return {};
   }
 }
 
@@ -96,21 +98,25 @@ static std::string trim(
 
 std::unordered_map<std::string, std::string> jar_filet::get_manifest()
 {
+  const auto entry=get_entry("META-INF/MANIFEST.MF");
+
+  if(!entry.has_value())
+    return {};
+
   std::unordered_map<std::string, std::string> out;
-  const auto entry=m_name_to_index.find("META-INF/MANIFEST.MF");
-  if(entry!=m_name_to_index.end())
+  std::istringstream in(*entry);
+  std::string line;
+  while(std::getline(in, line))
   {
-    std::istringstream in(this->get_entry(entry->first));
-    std::string line;
-    while(std::getline(in, line))
+    const auto key_end=std::find(line.cbegin(), line.cend(), ':');
+    if(key_end!=line.cend())
     {
-      const auto key_end=std::find(line.cbegin(), line.cend(), ':');
-      if(key_end!=line.cend())
-        out.emplace(
-          trim(line.cbegin(), key_end),
-          trim(std::next(key_end), line.cend()));
+      out.emplace(
+        trim(line.cbegin(), key_end),
+        trim(std::next(key_end), line.cend()));
     }
   }
+
   return out;
 }
 
