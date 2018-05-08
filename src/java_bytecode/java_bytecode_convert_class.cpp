@@ -377,9 +377,17 @@ void java_bytecode_convert_classt::convert(
   if(!c.annotations.empty())
     convert_annotations(c.annotations, class_type.get_annotations());
 
+  // the base name is the name of the class without the package
+  const irep_idt base_name = [](const std::string &full_name) {
+    const size_t last_dot = full_name.find_last_of('.');
+    return last_dot == std::string::npos
+             ? full_name
+             : std::string(full_name, last_dot + 1, std::string::npos);
+  }(id2string(c.name));
+
   // produce class symbol
   symbolt new_symbol;
-  new_symbol.base_name=c.name;
+  new_symbol.base_name = base_name;
   new_symbol.pretty_name=c.name;
   new_symbol.name=qualified_classname;
   class_type.set(ID_name, new_symbol.name);

@@ -354,6 +354,7 @@ void java_bytecode_convert_method_lazy(
   method_symbol.mode=ID_java;
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
+
   if(m.is_public)
     member_type.set_access(ID_public);
   else if(m.is_protected)
@@ -362,18 +363,6 @@ void java_bytecode_convert_method_lazy(
     member_type.set_access(ID_private);
   else
     member_type.set_access(ID_default);
-
-  if(is_constructor(method_symbol.base_name))
-  {
-    method_symbol.pretty_name=
-      id2string(class_symbol.pretty_name)+"."+
-      id2string(class_symbol.base_name)+"()";
-    member_type.set_is_constructor();
-  }
-  else
-    method_symbol.pretty_name=
-      id2string(class_symbol.pretty_name)+"."+
-      id2string(m.base_name)+"()";
 
   // do we need to add 'this' as a parameter?
   if(!m.is_static)
@@ -385,6 +374,24 @@ void java_bytecode_convert_method_lazy(
     this_p.type()=object_ref_type;
     this_p.set_this();
     parameters.insert(parameters.begin(), this_p);
+  }
+
+  const std::string signature_string = pretty_signature(member_type);
+
+  if(is_constructor(method_symbol.base_name))
+  {
+    // we use full.class_name(...) as pretty name
+    // for constructors -- the idea is that they have
+    // an empty declarator.
+    method_symbol.pretty_name=
+      id2string(class_symbol.pretty_name) + signature_string;
+
+    member_type.set_is_constructor();
+  }
+  else
+  {
+    method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
+                                id2string(m.base_name) + signature_string;
   }
 
   // Load annotations
@@ -559,14 +566,19 @@ void java_bytecode_convert_methodt::convert(
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
 
+  const std::string signature_string = pretty_signature(code_type);
+
   // Set up the pretty name for the method entry in the symbol table.
   // The pretty name of a constructor includes the base name of the class
   // instead of the internal method name "<init>". For regular methods, it's
   // just the base name of the method.
   if(is_constructor(method_symbol.base_name))
   {
-    method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
-                                id2string(class_symbol.base_name) + "()";
+    // we use full.class_name(...) as pretty name
+    // for constructors -- the idea is that they have
+    // an empty declarator.
+    method_symbol.pretty_name =
+      id2string(class_symbol.pretty_name) + signature_string;
     INVARIANT(
       code_type.get_is_constructor(),
       "Member type should have already been marked as a constructor");
@@ -574,7 +586,7 @@ void java_bytecode_convert_methodt::convert(
   else
   {
     method_symbol.pretty_name = id2string(class_symbol.pretty_name) + "." +
-                                id2string(method_symbol.base_name) + "()";
+                                id2string(m.base_name) + signature_string;
   }
 
   method_symbol.type = code_type;

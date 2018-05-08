@@ -626,12 +626,18 @@ inline java_generic_symbol_typet &to_java_generic_symbol_type(typet &type)
 /// the type to be parsed normally, for example
 /// `java.util.HashSet<java.lang.Integer>` will be turned into
 /// `java.util.HashSet`
-std::string erase_type_arguments(const std::string &src);
+std::string erase_type_arguments(const std::string &);
 /// Returns the full class name, skipping over the generics. This turns any of
 /// these:
 ///   1. Signature: Lcom/package/OuterClass<TT;>.Inner;
 ///   2. Descriptor: Lcom.pacakge.OuterClass$Inner;
 /// into `com.package.OuterClass.Inner`
-std::string gather_full_class_name(const std::string &src);
+std::string gather_full_class_name(const std::string &);
+
+// turn java type into string
+std::string pretty_java_type(const typet &);
+
+// pretty signature for methods
+std::string pretty_signature(const code_typet &);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
