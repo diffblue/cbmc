@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/path_storage.h>
 #include <goto-symex/goto_symex.h>
 
+#include <goto-instrument/unwindset.h>
+
 #include "symex_coverage.h"
 
 class symex_bmct: public goto_symext
@@ -31,29 +33,6 @@ public:
 
   // To show progress
   source_locationt last_source_location;
-
-  // Control unwinding.
-
-  void set_unwind_limit(unsigned limit)
-  {
-    max_unwind=limit;
-    max_unwind_is_set=true;
-  }
-
-  void set_unwind_thread_loop_limit(
-    unsigned thread_nr,
-    const irep_idt &id,
-    unsigned limit)
-  {
-    thread_loop_limits[thread_nr][id]=limit;
-  }
-
-  void set_unwind_loop_limit(
-    const irep_idt &id,
-    unsigned limit)
-  {
-    loop_limits[id]=limit;
-  }
 
   /// Loop unwind handlers take the function ID and loop number, the unwind
   /// count so far, and an out-parameter specifying an advisory maximum, which
@@ -101,26 +80,12 @@ public:
 
   bool record_coverage;
 
+  unwindsett unwindset;
+
 protected:
-  // We have
-  // 1) a global limit (max_unwind)
-  // 2) a limit per loop, all threads
-  // 3) a limit for a particular thread.
-  // 4) zero or more handler functions that can special-case particular
-  //    functions or loops
-  // We use the most specific of the above.
-
-  unsigned max_unwind;
-  bool max_unwind_is_set;
-
-  typedef std::unordered_map<irep_idt, unsigned> loop_limitst;
-  loop_limitst loop_limits;
-
-  typedef std::map<unsigned, loop_limitst> thread_loop_limitst;
-  thread_loop_limitst thread_loop_limits;
-
   /// Callbacks that may provide an unwind/do-not-unwind decision for a loop
   std::vector<loop_unwind_handlert> loop_unwind_handlers;
+
   /// Callbacks that may provide an unwind/do-not-unwind decision for a
   /// recursive call
   std::vector<recursion_unwind_handlert> recursion_unwind_handlers;
