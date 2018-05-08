@@ -31,16 +31,6 @@ CLEANFILES = clobber$(EXEEXT)
 
 all: clobber$(EXEEXT)
 
-ifneq ($(wildcard ../specc/Makefile),)
-  OBJ += ../specc/specc$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_SPECC
-endif
-
-ifneq ($(wildcard ../php/Makefile),)
-  OBJ += ../php/php$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_PHP
-endif
-
 ###############################################################################
 
 clobber$(EXEEXT): $(OBJ)

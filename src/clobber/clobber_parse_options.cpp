@@ -38,8 +38,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
-// #include "clobber_instrumenter.h"
-
 clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
   parse_options_baset(CLOBBER_OPTIONS, argc, argv),
   language_uit(cmdline, ui_message_handler),
