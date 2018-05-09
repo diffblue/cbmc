@@ -2,6 +2,7 @@ SRC = anonymous_member.cpp \
       ansi_c_convert_type.cpp \
       ansi_c_declaration.cpp \
       ansi_c_entry_point.cpp \
+      ansi_c_frontend.cpp \
       ansi_c_internal_additions.cpp \
       ansi_c_language.cpp \
       ansi_c_lex.yy.cpp \
