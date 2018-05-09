@@ -362,6 +362,14 @@ void goto_symext::merge_value_sets(
   dest.value_set.make_union(src.value_set);
 }
 
+bool goto_symext::may_assume_unreachable_if_uninitialised(
+  const symbolt &object_symbol) const
+{
+  return
+    language_mode == ID_java &&
+    ns.follow(object_symbol.type).id() == ID_struct;
+}
+
 void goto_symext::phi_function(
   const statet::goto_statet &goto_state,
   statet &dest_state)
@@ -442,11 +450,23 @@ void goto_symext::phi_function(
     }
 
     exprt rhs;
+    bool object_unreachable_if_uninitialised =
+      may_assume_unreachable_if_uninitialised(symbol);
 
     if(dest_state.guard.is_false())
       rhs=goto_state_rhs;
     else if(goto_state.guard.is_false())
       rhs=dest_state_rhs;
+    else if(object_unreachable_if_uninitialised &&
+            goto_state.level2_current_count(l1_identifier) == 0)
+    {
+      rhs = dest_state_rhs;
+    }
+    else if(object_unreachable_if_uninitialised &&
+            dest_state.level2.current_count(l1_identifier) == 0)
+    {
+      rhs = goto_state_rhs;
+    }
     else
     {
       rhs=if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);

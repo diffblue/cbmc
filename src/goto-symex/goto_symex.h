@@ -310,6 +310,9 @@ protected:
     const statet::goto_statet &goto_state,
     statet &dest);
 
+  bool may_assume_unreachable_if_uninitialised(const symbolt &object_symbol)
+    const;
+
   void phi_function(
     const statet::goto_statet &goto_state,
     statet &);
