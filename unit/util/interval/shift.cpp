@@ -3,10 +3,10 @@
  Author: DiffBlue Limited. All rights reserved.
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
-#include <analyses/interval.h>
 #include <util/arith_tools.h>
+#include <util/interval.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
@@ -36,8 +36,9 @@ SCENARIO("shift interval domain", "[core][analyses][interval][shift]")
       THEN("Something else")
       {
         REQUIRE(
-          interval_exprt(v[4], v[8]).left_shift(interval_exprt(v[1])) ==
-          interval_exprt(v[8], v[16]));
+          constant_interval_exprt(v[4], v[8])
+            .left_shift(constant_interval_exprt(v[1])) ==
+          constant_interval_exprt(v[8], v[16]));
       }
     }
   }

@@ -3,10 +3,10 @@
  Author: DiffBlue Limited. All rights reserved.
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
-#include <analyses/interval.h>
 #include <util/arith_tools.h>
+#include <util/interval.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
@@ -36,37 +36,46 @@ SCENARIO("modulo interval domain", "[core][analyses][interval][modulo]")
       THEN("Ensure result is consistent.")
       {
         REQUIRE(
-          interval_exprt(v[10], v[20]).modulo(interval_exprt(v[5], v[5])) ==
-          interval_exprt(v[0], v[4]));
+          constant_interval_exprt(v[10], v[20])
+            .modulo(constant_interval_exprt(v[5], v[5])) ==
+          constant_interval_exprt(v[0], v[4]));
         REQUIRE(
-          interval_exprt(v[10], v[20]).modulo(interval_exprt(v[4], v[5])) ==
-          interval_exprt(v[0], v[4]));
+          constant_interval_exprt(v[10], v[20])
+            .modulo(constant_interval_exprt(v[4], v[5])) ==
+          constant_interval_exprt(v[0], v[4]));
         REQUIRE(
-          interval_exprt(v[10], v[20]).modulo(interval_exprt(v[0], v[5])) ==
-          interval_exprt::top(type));
+          constant_interval_exprt(v[10], v[20])
+            .modulo(constant_interval_exprt(v[0], v[5])) ==
+          constant_interval_exprt::top(type));
         REQUIRE(
-          interval_exprt(v[10], v[20]).modulo(interval_exprt(v[-5], v[5])) ==
-          interval_exprt::top(type));
+          constant_interval_exprt(v[10], v[20])
+            .modulo(constant_interval_exprt(v[-5], v[5])) ==
+          constant_interval_exprt::top(type));
 
         REQUIRE(
-          interval_exprt(v[-10], v[20]).modulo(interval_exprt(v[0], v[5])) ==
-          interval_exprt::top(type));
+          constant_interval_exprt(v[-10], v[20])
+            .modulo(constant_interval_exprt(v[0], v[5])) ==
+          constant_interval_exprt::top(type));
         REQUIRE(
-          interval_exprt(v[-20], v[-10]).modulo(interval_exprt(v[0], v[5])) ==
-          interval_exprt::top(type));
+          constant_interval_exprt(v[-20], v[-10])
+            .modulo(constant_interval_exprt(v[0], v[5])) ==
+          constant_interval_exprt::top(type));
 
         REQUIRE(
-          interval_exprt(v[-20], v[-10]).modulo(interval_exprt(v[1], v[1])) ==
-          interval_exprt(v[0]));
+          constant_interval_exprt(v[-20], v[-10])
+            .modulo(constant_interval_exprt(v[1], v[1])) ==
+          constant_interval_exprt(v[0]));
 
         REQUIRE(
-          interval_exprt(v[30], v[50]).modulo(interval_exprt(v[2], v[2])) ==
-          interval_exprt(v[0], v[1]));
+          constant_interval_exprt(v[30], v[50])
+            .modulo(constant_interval_exprt(v[2], v[2])) ==
+          constant_interval_exprt(v[0], v[1]));
 
         // Problems
         REQUIRE(
-          interval_exprt(v[30], max_exprt(type))
-            .modulo(interval_exprt(v[2], v[2])) == interval_exprt(v[0], v[1]));
+          constant_interval_exprt(v[30], max_exprt(type))
+            .modulo(constant_interval_exprt(v[2], v[2])) ==
+          constant_interval_exprt(v[0], v[1]));
       }
     }
   }

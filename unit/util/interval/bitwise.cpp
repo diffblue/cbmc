@@ -3,10 +3,10 @@
  Author: DiffBlue Limited. All rights reserved.
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
-#include <analyses/interval.h>
 #include <util/arith_tools.h>
+#include <util/interval.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>

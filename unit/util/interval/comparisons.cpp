@@ -3,10 +3,10 @@
  Author: DiffBlue Limited. All rights reserved.
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
-#include <analyses/interval.h>
 #include <util/arith_tools.h>
+#include <util/interval.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
@@ -37,60 +37,70 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
     {
       THEN("Require correctness")
       {
-        REQUIRE(interval_exprt::less_than(v[0], v[1]));
-        REQUIRE(interval_exprt::less_than(v[1], v[2]));
-        REQUIRE(interval_exprt::less_than(v[1], v[100]));
+        REQUIRE(constant_interval_exprt::less_than(v[0], v[1]));
+        REQUIRE(constant_interval_exprt::less_than(v[1], v[2]));
+        REQUIRE(constant_interval_exprt::less_than(v[1], v[100]));
 
-        REQUIRE(interval_exprt::less_than(v[-10], v[1]));
-        REQUIRE_FALSE(interval_exprt::less_than(v[-10], v[-100]));
-        REQUIRE(interval_exprt::less_than(v[-10], v[-5]));
-        REQUIRE(interval_exprt::less_than(v[-10], max_exprt(t)));
-        REQUIRE(interval_exprt::less_than(v[10], max_exprt(t)));
-        REQUIRE(interval_exprt::less_than(v[0], max_exprt(t)));
+        REQUIRE(constant_interval_exprt::less_than(v[-10], v[1]));
+        REQUIRE_FALSE(constant_interval_exprt::less_than(v[-10], v[-100]));
+        REQUIRE(constant_interval_exprt::less_than(v[-10], v[-5]));
+        REQUIRE(constant_interval_exprt::less_than(v[-10], max_exprt(t)));
+        REQUIRE(constant_interval_exprt::less_than(v[10], max_exprt(t)));
+        REQUIRE(constant_interval_exprt::less_than(v[0], max_exprt(t)));
 
-        REQUIRE_FALSE(interval_exprt::less_than(v[-10], min_exprt(t)));
-        REQUIRE_FALSE(interval_exprt::less_than(v[10], min_exprt(t)));
-        REQUIRE_FALSE(interval_exprt::less_than(v[0], min_exprt(t)));
+        REQUIRE_FALSE(constant_interval_exprt::less_than(v[-10], min_exprt(t)));
+        REQUIRE_FALSE(constant_interval_exprt::less_than(v[10], min_exprt(t)));
+        REQUIRE_FALSE(constant_interval_exprt::less_than(v[0], min_exprt(t)));
 
-        REQUIRE_FALSE(interval_exprt::less_than(min_exprt(t), min_exprt(t)));
-        REQUIRE_FALSE(interval_exprt::less_than(max_exprt(t), min_exprt(t)));
-        REQUIRE_FALSE(interval_exprt::less_than(max_exprt(t), max_exprt(t)));
-        REQUIRE(interval_exprt::less_than(min_exprt(t), max_exprt(t)));
+        REQUIRE_FALSE(
+          constant_interval_exprt::less_than(min_exprt(t), min_exprt(t)));
+        REQUIRE_FALSE(
+          constant_interval_exprt::less_than(max_exprt(t), min_exprt(t)));
+        REQUIRE_FALSE(
+          constant_interval_exprt::less_than(max_exprt(t), max_exprt(t)));
+        REQUIRE(constant_interval_exprt::less_than(min_exprt(t), max_exprt(t)));
 
-        REQUIRE(interval_exprt::equal(min_exprt(t), min_exprt(t)));
-        REQUIRE(interval_exprt::not_equal(max_exprt(t), min_exprt(t)));
-        REQUIRE(interval_exprt::equal(max_exprt(t), max_exprt(t)));
-        REQUIRE(interval_exprt::not_equal(min_exprt(t), max_exprt(t)));
+        REQUIRE(constant_interval_exprt::equal(min_exprt(t), min_exprt(t)));
+        REQUIRE(constant_interval_exprt::not_equal(max_exprt(t), min_exprt(t)));
+        REQUIRE(constant_interval_exprt::equal(max_exprt(t), max_exprt(t)));
+        REQUIRE(constant_interval_exprt::not_equal(min_exprt(t), max_exprt(t)));
       }
 
       THEN("")
       {
-        REQUIRE_FALSE(interval_exprt::greater_than(v[0], v[1]));
-        REQUIRE_FALSE(interval_exprt::greater_than(v[1], v[2]));
-        REQUIRE_FALSE(interval_exprt::greater_than(v[1], v[100]));
+        REQUIRE_FALSE(constant_interval_exprt::greater_than(v[0], v[1]));
+        REQUIRE_FALSE(constant_interval_exprt::greater_than(v[1], v[2]));
+        REQUIRE_FALSE(constant_interval_exprt::greater_than(v[1], v[100]));
 
-        REQUIRE_FALSE(interval_exprt::greater_than(v[-10], v[1]));
-        REQUIRE(interval_exprt::greater_than(v[-10], v[-100]));
-        REQUIRE_FALSE(interval_exprt::greater_than(v[-10], v[-5]));
-        REQUIRE_FALSE(interval_exprt::greater_than(v[-10], max_exprt(t)));
-        REQUIRE_FALSE(interval_exprt::greater_than(v[10], max_exprt(t)));
-        REQUIRE_FALSE(interval_exprt::greater_than(v[0], max_exprt(t)));
+        REQUIRE_FALSE(constant_interval_exprt::greater_than(v[-10], v[1]));
+        REQUIRE(constant_interval_exprt::greater_than(v[-10], v[-100]));
+        REQUIRE_FALSE(constant_interval_exprt::greater_than(v[-10], v[-5]));
+        REQUIRE_FALSE(
+          constant_interval_exprt::greater_than(v[-10], max_exprt(t)));
+        REQUIRE_FALSE(
+          constant_interval_exprt::greater_than(v[10], max_exprt(t)));
+        REQUIRE_FALSE(
+          constant_interval_exprt::greater_than(v[0], max_exprt(t)));
 
-        REQUIRE(interval_exprt::greater_than(v[-10], min_exprt(t)));
-        REQUIRE(interval_exprt::greater_than(v[10], min_exprt(t)));
-        REQUIRE(interval_exprt::greater_than(v[0], min_exprt(t)));
+        REQUIRE(constant_interval_exprt::greater_than(v[-10], min_exprt(t)));
+        REQUIRE(constant_interval_exprt::greater_than(v[10], min_exprt(t)));
+        REQUIRE(constant_interval_exprt::greater_than(v[0], min_exprt(t)));
 
-        REQUIRE_FALSE(interval_exprt::greater_than(min_exprt(t), min_exprt(t)));
+        REQUIRE_FALSE(
+          constant_interval_exprt::greater_than(min_exprt(t), min_exprt(t)));
+        REQUIRE(constant_interval_exprt::greater_than_or_equal(
+          min_exprt(t), min_exprt(t)));
+
         REQUIRE(
-          interval_exprt::greater_than_or_equal(min_exprt(t), min_exprt(t)));
+          constant_interval_exprt::greater_than(max_exprt(t), min_exprt(t)));
+        REQUIRE(constant_interval_exprt::greater_than_or_equal(
+          max_exprt(t), min_exprt(t)));
 
-        REQUIRE(interval_exprt::greater_than(max_exprt(t), min_exprt(t)));
-        REQUIRE(
-          interval_exprt::greater_than_or_equal(max_exprt(t), min_exprt(t)));
+        REQUIRE_FALSE(
+          constant_interval_exprt::greater_than(max_exprt(t), max_exprt(t)));
 
-        REQUIRE_FALSE(interval_exprt::greater_than(max_exprt(t), max_exprt(t)));
-
-        REQUIRE_FALSE(interval_exprt::greater_than(min_exprt(t), max_exprt(t)));
+        REQUIRE_FALSE(
+          constant_interval_exprt::greater_than(min_exprt(t), max_exprt(t)));
       }
     }
 
@@ -98,11 +108,15 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
     {
       THEN("Require correctness")
       {
-        CHECK(interval_exprt(v[10], v[20]) < interval_exprt(v[30], v[40]));
+        CHECK(
+          constant_interval_exprt(v[10], v[20]) <
+          constant_interval_exprt(v[30], v[40]));
         REQUIRE_FALSE(
-          interval_exprt(v[10], v[30]) < interval_exprt(v[30], v[40]));
+          constant_interval_exprt(v[10], v[30]) <
+          constant_interval_exprt(v[30], v[40]));
         REQUIRE_FALSE(
-          interval_exprt(v[10], v[20]) > interval_exprt(v[30], v[40]));
+          constant_interval_exprt(v[10], v[20]) >
+          constant_interval_exprt(v[30], v[40]));
       }
 
       THEN(
@@ -110,18 +124,20 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
         "< [30, 40] == unknown")
       {
         CHECK(
-          interval_exprt(v[10], v[29])
-            .less_than(interval_exprt(v[30], v[40])) == tvt(true));
+          constant_interval_exprt(v[10], v[29])
+            .less_than(constant_interval_exprt(v[30], v[40])) == tvt(true));
         CHECK(
-          interval_exprt(v[10], v[30])
-            .less_than(interval_exprt(v[30], v[40])) == tvt::unknown());
+          constant_interval_exprt(v[10], v[30])
+            .less_than(constant_interval_exprt(v[30], v[40])) ==
+          tvt::unknown());
         CHECK(
-          interval_exprt(v[10], v[31])
-            .less_than(interval_exprt(v[30], v[40])) == tvt::unknown());
+          constant_interval_exprt(v[10], v[31])
+            .less_than(constant_interval_exprt(v[30], v[40])) ==
+          tvt::unknown());
 
         CHECK(
-          interval_exprt(v[30], v[40])
-            .less_than(interval_exprt(v[10], v[29])) == tvt(false));
+          constant_interval_exprt(v[30], v[40])
+            .less_than(constant_interval_exprt(v[10], v[29])) == tvt(false));
       }
 
       THEN(
@@ -129,19 +145,22 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
         "31] > [30, 40] == unknown")
       {
         CHECK(
-          interval_exprt(v[10], v[29])
-            .greater_than(interval_exprt(v[30], v[40])) == tvt(false));
+          constant_interval_exprt(v[10], v[29])
+            .greater_than(constant_interval_exprt(v[30], v[40])) == tvt(false));
         CHECK(
-          interval_exprt(v[10], v[29])
-            .greater_than(interval_exprt(v[30], v[40])) ==
-          interval_exprt(v[30], v[40]).less_than(interval_exprt(v[10], v[29])));
+          constant_interval_exprt(v[10], v[29])
+            .greater_than(constant_interval_exprt(v[30], v[40])) ==
+          constant_interval_exprt(v[30], v[40])
+            .less_than(constant_interval_exprt(v[10], v[29])));
 
         CHECK(
-          interval_exprt(v[10], v[30])
-            .greater_than(interval_exprt(v[30], v[40])) == tvt::unknown());
+          constant_interval_exprt(v[10], v[30])
+            .greater_than(constant_interval_exprt(v[30], v[40])) ==
+          tvt::unknown());
         CHECK(
-          interval_exprt(v[10], v[31])
-            .greater_than(interval_exprt(v[30], v[40])) == tvt::unknown());
+          constant_interval_exprt(v[10], v[31])
+            .greater_than(constant_interval_exprt(v[30], v[40])) ==
+          tvt::unknown());
       }
 
       THEN(
@@ -149,14 +168,16 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
         "<- [30, 40] == unknown")
       {
         CHECK(
-          interval_exprt(v[10], v[29])
-            .less_than_or_equal(interval_exprt(v[30], v[40])) == tvt(true));
+          constant_interval_exprt(v[10], v[29])
+            .less_than_or_equal(constant_interval_exprt(v[30], v[40])) ==
+          tvt(true));
         CHECK(
-          interval_exprt(v[10], v[30])
-            .less_than_or_equal(interval_exprt(v[30], v[40])) == tvt(true));
+          constant_interval_exprt(v[10], v[30])
+            .less_than_or_equal(constant_interval_exprt(v[30], v[40])) ==
+          tvt(true));
         CHECK(
-          interval_exprt(v[10], v[31])
-            .less_than_or_equal(interval_exprt(v[30], v[40])) ==
+          constant_interval_exprt(v[10], v[31])
+            .less_than_or_equal(constant_interval_exprt(v[30], v[40])) ==
           tvt::unknown());
       }
 
@@ -165,15 +186,16 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
         "31] >= [30, 40] == unknown")
       {
         CHECK(
-          interval_exprt(v[10], v[29])
-            .greater_than_or_equal(interval_exprt(v[30], v[40])) == tvt(false));
+          constant_interval_exprt(v[10], v[29])
+            .greater_than_or_equal(constant_interval_exprt(v[30], v[40])) ==
+          tvt(false));
         CHECK(
-          interval_exprt(v[10], v[30])
-            .greater_than_or_equal(interval_exprt(v[30], v[40])) ==
+          constant_interval_exprt(v[10], v[30])
+            .greater_than_or_equal(constant_interval_exprt(v[30], v[40])) ==
           tvt::unknown());
         CHECK(
-          interval_exprt(v[10], v[31])
-            .greater_than_or_equal(interval_exprt(v[30], v[40])) ==
+          constant_interval_exprt(v[10], v[31])
+            .greater_than_or_equal(constant_interval_exprt(v[30], v[40])) ==
           tvt::unknown());
       }
     }
