@@ -119,7 +119,7 @@ protected:
   {
   }
 
-  jsont(kindt _kind, std::string _value):kind(_kind), value(std::move(_value))
+  jsont(kindt _kind, std::string _value) : kind(_kind), value(std::move(_value))
   {
   }
 
@@ -184,8 +184,8 @@ public:
 class json_stringt:public jsont
 {
 public:
-  explicit json_stringt(std::string _value):
-    jsont(kindt::J_STRING, std::move(_value))
+  explicit json_stringt(std::string _value)
+    : jsont(kindt::J_STRING, std::move(_value))
   {
   }
 
