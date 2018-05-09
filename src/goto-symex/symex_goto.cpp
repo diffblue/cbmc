@@ -18,6 +18,68 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/dirty.h>
 
+bool goto_symext::try_resolve_classid_operations(exprt &guard)
+{
+  if(guard.id() == ID_or || guard.id() == ID_and || guard.id() == ID_not)
+  {
+    bool anything_changed = false;
+    for(exprt &op : guard.operands())
+      anything_changed |= try_resolve_classid_operations(op);
+    return anything_changed;
+  }
+  else if(guard.id() == ID_equal || guard.id() == ID_notequal)
+  {
+    exprt lhs = guard.op0();
+    exprt rhs = guard.op1();
+
+    if(lhs.id() == ID_constant)
+      std::swap(lhs, rhs);
+
+    if(rhs.id() == ID_constant &&
+       rhs.type() == string_typet() &&
+       lhs.id() == ID_member &&
+       to_member_expr(lhs).get_component_name() == "@class_identifier")
+    {
+      exprt underlying = lhs;
+      while(underlying.id() == ID_typecast || underlying.id() == ID_member)
+        underlying = underlying.op0();
+
+      if(underlying.id() == ID_symbol)
+      {
+        // The test is of the form some_symbol[.@baseclass].@class_identifier
+        // Supply the (necessarily constant) class identifier and simplify
+        // again.
+        irep_idt underlying_id =
+          is_ssa_expr(underlying) ?
+          to_ssa_expr(underlying).get_original_name() :
+          to_symbol_expr(underlying).get_identifier();
+
+        const symbolt &underlying_symbol = ns.lookup(underlying_id);
+
+        irep_idt underlying_classid;
+
+        if(underlying_symbol.type.id() == ID_symbol)
+        {
+          underlying_classid =
+            to_symbol_type(underlying_symbol.type).get_identifier();
+        }
+        else if(underlying_symbol.type.id() == ID_struct)
+        {
+          underlying_classid = underlying_symbol.type.get(ID_name);
+        }
+
+        if(!underlying_classid.empty())
+        {
+          guard.op0() = constant_exprt(underlying_classid, string_typet());
+          guard.op1() = rhs;
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
 void goto_symext::symex_goto(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
@@ -29,6 +91,12 @@ void goto_symext::symex_goto(statet &state)
   exprt new_guard=old_guard;
   state.rename(new_guard, ns);
   do_simplify(new_guard);
+
+  // The do_simplify above can adjust class-id comparisons into an easier form
+  // (e.g. folding over if_exprt), hence it is useful to simplify both before
+  // and after calling try_resolve_classid_operations
+  if(try_resolve_classid_operations(new_guard))
+    do_simplify(new_guard);
 
   if(new_guard.is_false() ||
      state.guard.is_false())
