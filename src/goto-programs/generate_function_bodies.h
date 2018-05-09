@@ -12,7 +12,7 @@ Author: Diffblue Ltd.
 #include <memory>
 #include <regex>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_function.h>
 #include <goto-programs/goto_model.h>
 #include <util/cmdline.h>
 #include <util/message.h>

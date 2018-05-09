@@ -12,7 +12,11 @@ Author:
 #include "alignment_checks.h"
 
 #include <util/config.h>
+#include <util/namespace.h>
 #include <util/pointer_offset_size.h>
+#include <util/std_types.h>
+
+#include <ostream>
 
 void print_struct_alignment_problems(
   const symbol_tablet &symbol_table,
