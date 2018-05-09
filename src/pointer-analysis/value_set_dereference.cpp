@@ -201,8 +201,26 @@ bool value_set_dereferencet::dereference_type_compare(
   const typet &object_type,
   const typet &dereference_type) const
 {
-  if(dereference_type.id()==ID_empty)
-    return true; // always ok
+  // check if the two types have matching number of ID_pointer levels, with
+  // the dereference type eventually pointing to void; then this is ok
+  // for example:
+  // - dereference_type=void is ok (no matter what object_type is);
+  // - object_type=(int *), dereference_type=(void *) is ok;
+  // - object_type=(int **), dereference_type=(void **) is ok;
+  // - object_type=(int **), dereference_type=(void *) is ok;
+  // - object_type=(int *), dereference_type=(void **) is not ok;
+  const typet *object_unwrapped = &object_type;
+  const typet *dereference_unwrapped = &dereference_type;
+  while(object_unwrapped->id() == ID_pointer &&
+        dereference_unwrapped->id() == ID_pointer)
+  {
+    object_unwrapped = &object_unwrapped->subtype();
+    dereference_unwrapped = &dereference_unwrapped->subtype();
+  }
+  if(dereference_unwrapped->id() == ID_empty)
+  {
+    return true;
+  }
 
   if(base_type_eq(object_type, dereference_type, ns))
     return true; // ok, they just match
