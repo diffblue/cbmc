@@ -3,9 +3,9 @@
  Author: DiffBlue Limited. All rights reserved.
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
-#include <analyses/interval.h>
+#include <util/interval.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -35,10 +35,10 @@ SCENARIO("multiply interval domain",
 
     WHEN("Both are positive [2,5]*[7,11]")
     {
-      interval_exprt a(values[2], values[5]);
-      interval_exprt b(values[7], values[11]);
+      constant_interval_exprt a(values[2], values[5]);
+      constant_interval_exprt b(values[7], values[11]);
 
-      interval_exprt result = a.multiply(b);
+      constant_interval_exprt result = a.multiply(b);
 
       THEN("Domain is consistent")
       {
@@ -59,10 +59,10 @@ SCENARIO("multiply interval domain",
 
     WHEN("One is entirely negative [-2,-5]*[7,11]")
      {
-       interval_exprt a(values[-2], values[-5]);
-       interval_exprt b(values[7], values[11]);
+       constant_interval_exprt a(values[-2], values[-5]);
+       constant_interval_exprt b(values[7], values[11]);
 
-       interval_exprt result = a.multiply(b);
+       constant_interval_exprt result = a.multiply(b);
 
        THEN("Domain is consistent")
        {
@@ -84,10 +84,10 @@ SCENARIO("multiply interval domain",
 
     WHEN("Range contains and extends from zero [-2,5]*[7,11]")
      {
-       interval_exprt a(values[-2], values[5]);
-       interval_exprt b(values[7], values[11]);
+       constant_interval_exprt a(values[-2], values[5]);
+       constant_interval_exprt b(values[7], values[11]);
 
-       interval_exprt result = a.multiply(b);
+       constant_interval_exprt result = a.multiply(b);
 
        THEN("Domain is consistent")
        {
@@ -110,34 +110,34 @@ SCENARIO("multiply interval domain",
 
     WHEN("One domain is infinite and other crosses zero [-2,5]*[7,INF]")
        {
-         interval_exprt a(values[-2], values[5]);
-         interval_exprt b(values[7], max_exprt(type));
+         constant_interval_exprt a(values[-2], values[5]);
+         constant_interval_exprt b(values[7], max_exprt(type));
 
-         interval_exprt result = a.multiply(b);
+         constant_interval_exprt result = a.multiply(b);
 
          THEN("Domain is consistent")
          {
            CHECK(V(a.get_lower()) == -2);
            CHECK(V(a.get_upper()) == 5);
            CHECK(V(b.get_lower()) == 7);
-           CHECK(interval_exprt::is_max(b.get_upper()));
+           CHECK(constant_interval_exprt::is_max(b.get_upper()));
          }
 
          CAPTURE(result);
 
          THEN("The result is [-INF, INF]")
          {
-           CHECK(interval_exprt::is_max(result.get_upper()));
-           CHECK(interval_exprt::is_min(result.get_lower()));
+           CHECK(constant_interval_exprt::is_max(result.get_upper()));
+           CHECK(constant_interval_exprt::is_min(result.get_lower()));
          }
        }
 
 
     WHEN("One domain is infinite and other is positive [2,5]*[7,INF]")
        {
-         interval_exprt a(values[2], values[5]);
-         interval_exprt b(values[7], max_exprt(type));
-         interval_exprt result = a.multiply(b);
+         constant_interval_exprt a(values[2], values[5]);
+         constant_interval_exprt b(values[7], max_exprt(type));
+         constant_interval_exprt result = a.multiply(b);
 
          THEN("Domain is consistent")
          {
