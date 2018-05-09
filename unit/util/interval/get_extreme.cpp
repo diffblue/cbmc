@@ -3,9 +3,9 @@
  Author: DiffBlue Limited. All rights reserved.
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
-#include <analyses/interval.h>
+#include <util/interval.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -39,7 +39,7 @@ SCENARIO("get extreme exprt value",
       WHEN("-20 <= 20 is tested")
       {
         binary_predicate_exprt op1(values[-20], ID_le, values[20]);
-        bool interval_eval = interval_exprt::less_than_or_equal(values[-20], values[20]);
+        bool interval_eval = constant_interval_exprt::less_than_or_equal(values[-20], values[20]);
         simplify(op1, ns);
 
         THEN("Require it is TRUE")
@@ -53,7 +53,7 @@ SCENARIO("get extreme exprt value",
       WHEN("20 <= -20 is tested")
       {
         binary_predicate_exprt op1(values[20], ID_le, values[-20]);
-        bool interval_eval = interval_exprt::less_than_or_equal(values[20], values[-20]);
+        bool interval_eval = constant_interval_exprt::less_than_or_equal(values[20], values[-20]);
         simplify(op1, ns);
 
         THEN("Require it is FALSE")
@@ -66,7 +66,7 @@ SCENARIO("get extreme exprt value",
       WHEN("-20 <= -20 is tested")
       {
         binary_predicate_exprt op1(values[-20], ID_le, values[-20]);
-        bool interval_eval = interval_exprt::less_than_or_equal(values[-20], values[-20]);
+        bool interval_eval = constant_interval_exprt::less_than_or_equal(values[-20], values[-20]);
 
         simplify(op1, ns);
 
@@ -74,7 +74,7 @@ SCENARIO("get extreme exprt value",
         {
           REQUIRE(op1.is_true());
           REQUIRE(interval_eval);
-          REQUIRE(interval_exprt::equal(values[1], values[1]));
+          REQUIRE(constant_interval_exprt::equal(values[1], values[1]));
         }
       }
 
@@ -82,8 +82,8 @@ SCENARIO("get extreme exprt value",
       {
         std::vector<exprt> selected = { values[20], values[-20] };
 
-        exprt min = interval_exprt::get_extreme(selected, true);
-        exprt max = interval_exprt::get_extreme(selected, false);
+        exprt min = constant_interval_exprt::get_extreme(selected, true);
+        exprt max = constant_interval_exprt::get_extreme(selected, false);
 
         THEN("Min (-20) and max (20) are verified")
         {
@@ -98,8 +98,8 @@ SCENARIO("get extreme exprt value",
     {
       std::vector<exprt> selected = { values[-20], values[0], values[50], values[20] };
 
-      exprt min = interval_exprt::get_extreme(selected, true);
-      exprt max = interval_exprt::get_extreme(selected, false);
+      exprt min = constant_interval_exprt::get_extreme(selected, true);
+      exprt max = constant_interval_exprt::get_extreme(selected, false);
 
 
       THEN("Min (-20) and max (50) are verified")
@@ -113,8 +113,8 @@ SCENARIO("get extreme exprt value",
     {
       std::vector<exprt> selected = { values[-100] };
 
-      exprt min = interval_exprt::get_extreme(selected, true);
-      exprt max = interval_exprt::get_extreme(selected, false);
+      exprt min = constant_interval_exprt::get_extreme(selected, true);
+      exprt max = constant_interval_exprt::get_extreme(selected, false);
 
       THEN("Max (-100) and min (-100) are verified")
       {
@@ -128,8 +128,8 @@ SCENARIO("get extreme exprt value",
       std::vector<exprt> selected = { values[20], values[30], values[15], values[0], values[-100] };
 
 
-      exprt min = interval_exprt::get_extreme(selected, true);
-      exprt max = interval_exprt::get_extreme(selected, false);
+      exprt min = constant_interval_exprt::get_extreme(selected, true);
+      exprt max = constant_interval_exprt::get_extreme(selected, false);
 
       THEN("Max (30) and min (-100) are verified")
       {
@@ -140,8 +140,8 @@ SCENARIO("get extreme exprt value",
 
     WHEN("All from [-100:100] are selected")
     {
-      exprt min = interval_exprt::get_extreme(ve, true);
-      exprt max = interval_exprt::get_extreme(ve, false);
+      exprt min = constant_interval_exprt::get_extreme(ve, true);
+      exprt max = constant_interval_exprt::get_extreme(ve, false);
 
       THEN("Max (100) and min (-100) are verified")
       {
@@ -154,8 +154,8 @@ SCENARIO("get extreme exprt value",
     {
       std::random_shuffle(ve.begin(), ve.end());
 
-      exprt min = interval_exprt::get_extreme(ve, true);
-      exprt max = interval_exprt::get_extreme(ve, false);
+      exprt min = constant_interval_exprt::get_extreme(ve, true);
+      exprt max = constant_interval_exprt::get_extreme(ve, false);
 
       THEN("Max (100) and min (-100) are verified")
       {
