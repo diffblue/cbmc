@@ -2834,6 +2834,11 @@ void java_bytecode_convert_method(
     "nondetWithNull",
     "nondetWithoutNull",
     "notModelled",
+    "atomicBegin",
+    "atomicEnd",
+    "startThread",
+    "endThread",
+    "getCurrentThreadID"
   };
 
   if(std::regex_match(

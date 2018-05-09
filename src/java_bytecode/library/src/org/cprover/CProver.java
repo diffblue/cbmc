@@ -4,6 +4,7 @@ public final class CProver
 {
   public static boolean enableAssume=true;
   public static boolean enableNondet=true;
+  public static boolean enableConcurrency=true;
 
   public static boolean nondetBoolean()
   {
@@ -113,6 +114,52 @@ public final class CProver
     }
 
     return null;
+  }
+
+  public static void startThread(int id)
+  {
+    if(enableConcurrency)
+    {
+      throw new RuntimeException(
+          "Cannot execute program with CProver.startThread()");
+    }
+  }
+
+  public static void endThread(int id)
+  {
+    if(enableConcurrency)
+    {
+      throw new RuntimeException(
+          "Cannot execute program with CProver.endThread()");
+    }
+  }
+
+  public static void atomicBegin()
+  {
+    if(enableConcurrency)
+    {
+      throw new RuntimeException(
+          "Cannot execute program with CProver.atomicBegin()");
+    }
+  }
+
+  public static void atomicEnd()
+  {
+    if(enableConcurrency)
+    {
+      throw new RuntimeException(
+          "Cannot execute program with CProver.atomicEnd()");
+    }
+  }
+
+  public static int getCurrentThreadID()
+  {
+    if(enableConcurrency)
+    {
+      throw new RuntimeException(
+          "Cannot execute program with CProver.getCurrentThreadID()");
+    }
+    return 0;
   }
 
   public static void assume(boolean condition)
