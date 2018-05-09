@@ -1,0 +1,8 @@
+CORE
+FloatMultidim2.class
+--function FloatMultidim2.f --cover location --unwind 3
+^EXIT=0$
+^SIGNAL=0$
+y=1$
+y=[2-4]$
+y=([05-9]|[1-9][0-9]+|-[1-9][0-9]*)$
