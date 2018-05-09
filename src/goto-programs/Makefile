@@ -15,6 +15,7 @@ SRC = basic_blocks.cpp \
       goto_convert_function_call.cpp \
       goto_convert_functions.cpp \
       goto_convert_side_effect.cpp \
+      goto_function.cpp \
       goto_functions.cpp \
       goto_inline.cpp \
       goto_inline_class.cpp \
