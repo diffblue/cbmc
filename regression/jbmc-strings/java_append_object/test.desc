@@ -5,3 +5,5 @@ test_append_object.class
 ^SIGNAL=0$
 ^\[.*assertion\.1\].* line 15.* FAILURE$
 --
+--
+Issue: diffblue/test-gen#82
