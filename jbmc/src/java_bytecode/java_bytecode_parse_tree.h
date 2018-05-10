@@ -261,17 +261,10 @@ public:
 
     void output(std::ostream &out) const;
 
-    void swap(classt &other);
   };
 
   classt parsed_class;
 
-  void swap(java_bytecode_parse_treet &other)
-  {
-    other.parsed_class.swap(parsed_class);
-    other.class_refs.swap(class_refs);
-    std::swap(loading_successful, other.loading_successful);
-  }
 
   void output(std::ostream &out) const;
 

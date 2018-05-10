@@ -97,11 +97,8 @@ optionalt<java_bytecode_parse_treet> java_class_loadert::get_class_from_jar(
   if(!data.has_value())
     return {};
 
-  java_bytecode_parse_treet parse_tree;
   std::istringstream istream(*data);
-  if(java_bytecode_parse(istream, parse_tree, get_message_handler()))
-    return {};
-  return parse_tree;
+  return java_bytecode_parse(istream, get_message_handler());
 }
 
 static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
@@ -192,9 +189,10 @@ java_class_loadert::get_parse_tree(
         debug()
           << "Getting class `" << class_name << "' from file " << full_path
           << eom;
-        java_bytecode_parse_treet parse_tree;
-        if(!java_bytecode_parse(full_path, parse_tree, get_message_handler()))
-          parse_trees.push_back(std::move(parse_tree));
+        optionalt<java_bytecode_parse_treet> parse_tree =
+          java_bytecode_parse(full_path, get_message_handler());
+        if(parse_tree)
+          parse_trees.push_back(std::move(*parse_tree));
       }
     }
   }

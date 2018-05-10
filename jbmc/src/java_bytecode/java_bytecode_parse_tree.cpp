@@ -18,28 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr2java.h"
 
-void java_bytecode_parse_treet::classt::swap(
-  classt &other)
-{
-  other.name.swap(name);
-  other.extends.swap(extends);
-  std::swap(other.is_enum, is_enum);
-  std::swap(other.enum_elements, enum_elements);
-  std::swap(other.is_abstract, is_abstract);
-  std::swap(other.is_public, is_public);
-  std::swap(other.is_protected, is_protected);
-  std::swap(other.is_private, is_private);
-  std::swap(other.is_final, is_final);
-  std::swap(other.signature, signature);
-  other.implements.swap(implements);
-  other.fields.swap(fields);
-  other.methods.swap(methods);
-  other.annotations.swap(annotations);
-  std::swap(
-    other.attribute_bootstrapmethods_read, attribute_bootstrapmethods_read);
-  std::swap(other.lambda_method_handle_map, lambda_method_handle_map);
-}
-
 void java_bytecode_parse_treet::output(std::ostream &out) const
 {
   parsed_class.output(out);
