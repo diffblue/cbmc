@@ -127,7 +127,7 @@ static void add_to_json(
   DATA_INVARIANT(end_function->is_end_function(),
                  "The last instruction in a goto-program must be END_FUNCTION");
 
-  entry["function"]=json_stringt(id2string(end_function->function));
+  entry["function"] = json_stringt(end_function->function);
   entry["fileName"]=
     json_stringt(concat_dir_file(
         id2string(end_function->source_location.get_working_directory()),
@@ -261,7 +261,7 @@ static void json_output_function(
 {
   json_objectt &entry=dest.push_back().make_object();
 
-  entry["function"]=json_stringt(id2string(function));
+  entry["function"] = json_stringt(function);
   entry["file name"]=
     json_stringt(concat_dir_file(
         id2string(first_location.get_working_directory()),

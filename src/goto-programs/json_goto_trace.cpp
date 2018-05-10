@@ -52,8 +52,8 @@ void convert_assert(
   json_failure["hidden"] = jsont::json_boolean(step.hidden);
   json_failure["internal"] = jsont::json_boolean(step.internal);
   json_failure["thread"] = json_numbert(std::to_string(step.thread_nr));
-  json_failure["reason"] = json_stringt(id2string(step.comment));
-  json_failure["property"] = json_stringt(id2string(property_id));
+  json_failure["reason"] = json_stringt(step.comment);
+  json_failure["property"] = json_stringt(property_id);
 
   if(!location.is_null())
     json_failure["sourceLocation"] = location;
@@ -133,7 +133,7 @@ void convert_decl(
     if(type_string == "")
       type_string = from_type(ns, identifier, symbol->type);
 
-    json_assignment["mode"] = json_stringt(id2string(symbol->mode));
+    json_assignment["mode"] = json_stringt(symbol->mode);
     exprt simplified = simplify_expr(step.full_lhs_value, ns);
 
     full_lhs_value = json(simplified, ns, symbol->mode);
@@ -183,7 +183,7 @@ void convert_output(
   json_output["hidden"] = jsont::json_boolean(step.hidden);
   json_output["internal"] = jsont::json_boolean(step.internal);
   json_output["thread"] = json_numbert(std::to_string(step.thread_nr));
-  json_output["outputID"] = json_stringt(id2string(step.io_id));
+  json_output["outputID"] = json_stringt(step.io_id);
 
   // Recovering the mode from the function
   irep_idt mode;
@@ -193,7 +193,7 @@ void convert_output(
     mode = ID_unknown;
   else
     mode = function_name->mode;
-  json_output["mode"] = json_stringt(id2string(mode));
+  json_output["mode"] = json_stringt(mode);
   json_arrayt &json_values = json_output["values"].make_array();
 
   for(const auto &arg : step.io_args)
@@ -226,7 +226,7 @@ void convert_input(
   json_input["hidden"] = jsont::json_boolean(step.hidden);
   json_input["internal"] = jsont::json_boolean(step.internal);
   json_input["thread"] = json_numbert(std::to_string(step.thread_nr));
-  json_input["inputID"] = json_stringt(id2string(step.io_id));
+  json_input["inputID"] = json_stringt(step.io_id);
 
   // Recovering the mode from the function
   irep_idt mode;
@@ -236,7 +236,7 @@ void convert_input(
     mode = ID_unknown;
   else
     mode = function_name->mode;
-  json_input["mode"] = json_stringt(id2string(mode));
+  json_input["mode"] = json_stringt(mode);
   json_arrayt &json_values = json_input["values"].make_array();
 
   for(const auto &arg : step.io_args)
@@ -275,8 +275,8 @@ void convert_return(
 
   const symbolt &symbol = ns.lookup(step.identifier);
   json_objectt &json_function = json_call_return["function"].make_object();
-  json_function["displayName"] = json_stringt(id2string(symbol.display_name()));
-  json_function["identifier"] = json_stringt(id2string(step.identifier));
+  json_function["displayName"] = json_stringt(symbol.display_name());
+  json_function["identifier"] = json_stringt(step.identifier);
   json_function["sourceLocation"] = json(symbol.location);
 
   if(!location.is_null())

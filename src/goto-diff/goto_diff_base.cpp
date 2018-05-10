@@ -136,7 +136,7 @@ void goto_difft::convert_function_json(
   namespacet ns(goto_model.symbol_table);
   const symbolt &symbol = ns.lookup(function_name);
 
-  result["name"] = json_stringt(id2string(function_name));
+  result["name"] = json_stringt(function_name);
   result["sourceLocation"] = json(symbol.location);
 
   if(options.get_bool_option("show-properties"))

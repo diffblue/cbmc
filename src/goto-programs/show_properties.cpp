@@ -131,14 +131,13 @@ void convert_properties_json(
 
     json_objectt &json_property=
       json_properties.push_back(jsont()).make_object();
-    json_property["name"]=json_stringt(id2string(property_id));
-    json_property["class"]=json_stringt(id2string(property_class));
+    json_property["name"] = json_stringt(property_id);
+    json_property["class"] = json_stringt(property_class);
     if(!source_location.get_basic_block_covered_lines().empty())
-      json_property["coveredLines"]=
-        json_stringt(
-          id2string(source_location.get_basic_block_covered_lines()));
+      json_property["coveredLines"] =
+        json_stringt(source_location.get_basic_block_covered_lines());
     json_property["sourceLocation"]=json(source_location);
-    json_property["description"]=json_stringt(id2string(description));
+    json_property["description"] = json_stringt(description);
     json_property["expression"]=
       json_stringt(from_expr(ns, identifier, ins.guard));
   }

@@ -214,8 +214,8 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
       for(const auto &g : goal_map)
       {
         json_stream_objectt &result = result_array.push_back_stream_object();
-        result["property"]=json_stringt(id2string(g.first));
-        result["description"]=json_stringt(id2string(g.second.description));
+        result["property"] = json_stringt(g.first);
+        result["description"] = json_stringt(g.second.description);
         result["status"]=json_stringt(g.second.status_string());
 
         if(g.second.status==goalt::statust::FAILURE)

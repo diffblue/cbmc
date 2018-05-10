@@ -48,7 +48,7 @@ json_objectt show_goto_functions_jsont::convert(
 
     json_objectt &json_function=
       json_functions.push_back(jsont()).make_object();
-    json_function["name"]=json_stringt(id2string(function_name));
+    json_function["name"] = json_stringt(function_name);
     json_function["isBodyAvailable"]=
       jsont::json_boolean(function.body_available());
     bool is_internal=
