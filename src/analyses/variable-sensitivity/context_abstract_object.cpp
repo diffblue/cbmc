@@ -145,4 +145,4 @@ bool context_abstract_objectt::has_been_modified(
 
   return this->child_abstract_object.get() !=
          before_context->child_abstract_object.get();
-};
+}
