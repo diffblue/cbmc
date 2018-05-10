@@ -178,6 +178,36 @@ public:
     array.emplace_back(std::forward<argumentst>(arguments)...);
   }
 
+  std::vector<jsont>::iterator begin()
+  {
+    return array.begin();
+  }
+
+  std::vector<jsont>::const_iterator begin() const
+  {
+    return array.begin();
+  }
+
+  std::vector<jsont>::const_iterator cbegin() const
+  {
+    return array.cbegin();
+  }
+
+  std::vector<jsont>::iterator end()
+  {
+    return array.end();
+  }
+
+  std::vector<jsont>::const_iterator end() const
+  {
+    return array.end();
+  }
+
+  std::vector<jsont>::const_iterator cend() const
+  {
+    return array.cend();
+  }
+
   typedef jsont value_type; // NOLINT(readability/identifiers)
 };
 
