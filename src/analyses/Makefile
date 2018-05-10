@@ -50,6 +50,8 @@ SRC = ai.cpp \
       variable-sensitivity/union_abstract_object.cpp \
       variable-sensitivity/write_stack.cpp \
       variable-sensitivity/write_stack_entry.cpp \
+      variable-sensitivity/data_dependency_context.cpp \
+      variable-sensitivity/variable_sensitivity_dependence_graph.cpp \
       # Empty last line
 
 INCLUDES= -I ..
