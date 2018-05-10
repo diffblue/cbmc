@@ -10,16 +10,16 @@ public class Test {
 }
 
 class A {
-  void f() { }
+  int f() { return 0; }
 }
 
 
 class B extends A {
-  void f() { }
+  int f() { return 0; }
 }
 
 class C extends A {
-  void f() { }
+  int f() { return 0; }
 }
 
 class D extends C {
