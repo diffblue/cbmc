@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <string>
 
+#include "irep.h"
+
 class json_objectt;
 class json_arrayt;
 
@@ -117,7 +119,7 @@ protected:
   {
   }
 
-  jsont(kindt _kind, const std::string &_value):kind(_kind), value(_value)
+  jsont(kindt _kind, std::string _value) : kind(_kind), value(std::move(_value))
   {
   }
 
@@ -169,13 +171,63 @@ public:
     array.push_back(jsont());
     return array.back();
   }
+
+  template <typename... argumentst>
+  void emplace_back(argumentst &&... arguments)
+  {
+    array.emplace_back(std::forward<argumentst>(arguments)...);
+  }
+
+  std::vector<jsont>::iterator begin()
+  {
+    return array.begin();
+  }
+
+  std::vector<jsont>::const_iterator begin() const
+  {
+    return array.begin();
+  }
+
+  std::vector<jsont>::const_iterator cbegin() const
+  {
+    return array.cbegin();
+  }
+
+  std::vector<jsont>::iterator end()
+  {
+    return array.end();
+  }
+
+  std::vector<jsont>::const_iterator end() const
+  {
+    return array.end();
+  }
+
+  std::vector<jsont>::const_iterator cend() const
+  {
+    return array.cend();
+  }
+
+  typedef jsont value_type; // NOLINT(readability/identifiers)
 };
 
 class json_stringt:public jsont
 {
 public:
-  explicit json_stringt(const std::string &_value):
-    jsont(kindt::J_STRING, _value)
+  explicit json_stringt(std::string _value)
+    : jsont(kindt::J_STRING, std::move(_value))
+  {
+  }
+
+#ifndef USE_STD_STRING
+  explicit json_stringt(const irep_idt &_value)
+    : jsont(kindt::J_STRING, id2string(_value))
+  {
+  }
+#endif
+
+  /// Constructon from string literal.
+  explicit json_stringt(const char *_value) : jsont(kindt::J_STRING, _value)
   {
   }
 };
