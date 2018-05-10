@@ -43,6 +43,36 @@ diff -rupNw glucose-syrup/core/SolverTypes.h glucose-syrup-patched/core/SolverTy
  
      friend class ClauseAllocator;
  
+diff -rupNw glucose-syrup/mtl/Clone.h glucose-syrup-patched/mtl/Clone.h
+--- glucose-syrup/mtl/Clone.h	2014-10-03 11:10:22.000000000 +0200
++++ glucose-syrup-patched/mtl/Clone.h	2018-05-10 12:35:25.150491249 +0200
+@@ -8,6 +8,6 @@ namespace Glucose {
+         public:
+           virtual Clone* clone() const = 0;
+     };
+-};
++}
+ 
+ #endif
+\ No newline at end of file
+diff -rupNw glucose-syrup/mtl/Clone.h~ glucose-syrup-patched/mtl/Clone.h~
+--- glucose-syrup/mtl/Clone.h~	1970-01-01 01:00:00.000000000 +0100
++++ glucose-syrup-patched/mtl/Clone.h~	2018-04-21 16:58:22.950005391 +0200
+@@ -0,0 +1,13 @@
++#ifndef Glucose_Clone_h
++#define Glucose_Clone_h
++
++
++namespace Glucose {
++
++    class Clone {
++        public:
++          virtual Clone* clone() const = 0;
++    };
++};
++
++#endif
+\ No newline at end of file
 diff -rupNw glucose-syrup/mtl/IntTypes.h glucose-syrup-patched/mtl/IntTypes.h
 --- glucose-syrup/mtl/IntTypes.h	2014-10-03 11:10:22.000000000 +0200
 +++ glucose-syrup-patched/mtl/IntTypes.h	2018-04-21 16:58:22.950005391 +0200
