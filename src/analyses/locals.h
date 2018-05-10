@@ -14,13 +14,11 @@ Date: March 2013
 #ifndef CPROVER_ANALYSES_LOCALS_H
 #define CPROVER_ANALYSES_LOCALS_H
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_function.h>
 
 class localst
 {
 public:
-  typedef goto_functionst::goto_functiont goto_functiont;
-
   explicit localst(const goto_functiont &goto_function)
   {
     build(goto_function);

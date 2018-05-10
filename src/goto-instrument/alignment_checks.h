@@ -14,7 +14,7 @@ Author:
 
 #include <iosfwd>
 
-#include <goto-programs/goto_functions.h>
+#include <util/symbol_table.h>
 
 void print_struct_alignment_problems(
   const symbol_tablet &symbol_table,

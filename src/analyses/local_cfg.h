@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/numbering.h>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_program.h>
 
 class local_cfgt
 {
