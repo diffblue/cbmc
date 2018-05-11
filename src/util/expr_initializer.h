@@ -24,10 +24,21 @@ exprt zero_initializer(
   const namespacet &,
   message_handlert &);
 
+exprt nondet_initializer(
+  const typet &,
+  const source_locationt &,
+  const namespacet &,
+  message_handlert &);
+
 // throws a char* in case of failure
 exprt zero_initializer(
   const typet &,
   const source_locationt &,
   const namespacet &);
+
+exprt nondet_initializer(
+  const typet &type,
+  const source_locationt &source_location,
+  const namespacet &ns);
 
 #endif // CPROVER_UTIL_EXPR_INITIALIZER_H
