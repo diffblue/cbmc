@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_convert_class.h"
 #include "java_bytecode_convert_method.h"
+#include "java_bytecode_convert_threadblock.h"
 #include "java_bytecode_internal_additions.h"
 #include "java_bytecode_instrument.h"
 #include "java_bytecode_typecheck.h"
@@ -749,8 +750,14 @@ bool java_bytecode_languaget::typecheck(
     get_message_handler());
 
   // now typecheck all
-  return java_bytecode_typecheck(
+  bool res = java_bytecode_typecheck(
     symbol_table, get_message_handler(), string_refinement_enabled);
+
+  // now instrument thread-blocks
+  if(threading_support)
+    convert_threadblock(symbol_table);
+
+  return res;
 }
 
 bool java_bytecode_languaget::generate_support_functions(

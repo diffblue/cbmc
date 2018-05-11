@@ -1,0 +1,7 @@
+CORE
+A.class
+--function "A.me:()V" --lazy-methods --java-threading
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL
