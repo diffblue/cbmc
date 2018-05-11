@@ -20,6 +20,7 @@ Date: December 2012
 #include <util/file_util.h>
 
 #include <goto-programs/cfg.h>
+#include <goto-programs/goto_model.h>
 
 typedef std::unordered_set<irep_idt> linest;
 typedef std::unordered_map<irep_idt, linest> filest;
