@@ -483,6 +483,12 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
+    if(cmdline.isset("print-global-state-size"))
+    {
+      print_global_state_size(goto_model);
+      return CPROVER_EXIT_SUCCESS;
+    }
+
     if(cmdline.isset("list-symbols"))
     {
       show_symbol_table_brief(goto_model, get_ui());
