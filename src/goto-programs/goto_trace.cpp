@@ -122,7 +122,18 @@ std::string trace_value_binary(
        type.id()==ID_c_enum ||
        type.id()==ID_c_enum_tag)
     {
-      return expr.get_string(ID_value);
+      const std::string & str = expr.get_string(ID_value);
+
+      std::ostringstream oss;
+      std::string::size_type i = 0;
+      for(const auto c : str)
+      {
+        oss << c;
+        if(++i % 8 == 0 && str.size() != i)
+          oss << ' ';
+      }
+
+      return oss.str();
     }
     else if(type.id()==ID_bool)
     {
