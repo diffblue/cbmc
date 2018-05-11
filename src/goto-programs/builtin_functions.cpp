@@ -19,8 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
-
-#include <linking/zero_initializer.h>
+#include <util/zero_initializer.h>
 
 #include <langapi/language_util.h>
 

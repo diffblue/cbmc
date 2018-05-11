@@ -98,6 +98,7 @@ SRC = arith_tools.cpp \
       xml.cpp \
       xml_expr.cpp \
       xml_irep.cpp \
+      zero_initializer.cpp \
       # Empty last line
 
 INCLUDES= -I ..

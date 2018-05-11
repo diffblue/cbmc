@@ -16,8 +16,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/source_location.h>
 #include <util/symbol.h>
+#include <util/zero_initializer.h>
 
-#include <linking/zero_initializer.h>
 #include <ansi-c/c_typecast.h>
 
 #include "expr2cpp.h"

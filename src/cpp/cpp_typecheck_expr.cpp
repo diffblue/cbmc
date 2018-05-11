@@ -20,10 +20,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/pointer_offset_size.h>
+#include <util/zero_initializer.h>
 
 #include <ansi-c/c_qualifiers.h>
-
-#include <linking/zero_initializer.h>
 
 #include "cpp_exception_id.h"
 #include "cpp_type2name.h"

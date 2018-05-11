@@ -31,8 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
-
-#include <linking/zero_initializer.h>
+#include <util/zero_initializer.h>
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/class_hierarchy.h>

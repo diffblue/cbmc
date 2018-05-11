@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-#include <linking/zero_initializer.h>
+#include <util/zero_initializer.h>
 
 void goto_symext::symex_start_thread(statet &state)
 {

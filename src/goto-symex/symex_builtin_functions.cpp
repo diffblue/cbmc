@@ -17,8 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/string2int.h>
-
-#include <linking/zero_initializer.h>
+#include <util/zero_initializer.h>
 
 inline static typet c_sizeof_type_rec(const exprt &expr)
 {

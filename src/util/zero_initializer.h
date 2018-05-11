@@ -1,18 +1,18 @@
 /*******************************************************************\
 
-Module: Linking: Zero Initialization
+Module: Zero Initialization
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
 /// \file
-/// Linking: Zero Initialization
+/// Zero Initialization
 
-#ifndef CPROVER_LINKING_ZERO_INITIALIZER_H
-#define CPROVER_LINKING_ZERO_INITIALIZER_H
+#ifndef CPROVER_UTIL_ZERO_INITIALIZER_H
+#define CPROVER_UTIL_ZERO_INITIALIZER_H
 
-#include <util/expr.h>
+#include "expr.h"
 
 class message_handlert;
 class namespacet;
@@ -30,4 +30,4 @@ exprt zero_initializer(
   const source_locationt &,
   const namespacet &);
 
-#endif // CPROVER_LINKING_ZERO_INITIALIZER_H
+#endif // CPROVER_UTIL_ZERO_INITIALIZER_H

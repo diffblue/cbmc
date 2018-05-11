@@ -19,8 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/string_constant.h>
 #include <util/type_eq.h>
-
-#include <linking/zero_initializer.h>
+#include <util/zero_initializer.h>
 
 #include "anonymous_member.h"
 

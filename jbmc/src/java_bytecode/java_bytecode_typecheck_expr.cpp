@@ -13,8 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/unicode.h>
-
-#include <linking/zero_initializer.h>
+#include <util/zero_initializer.h>
 
 #include "java_pointer_casts.h"
 #include "java_types.h"

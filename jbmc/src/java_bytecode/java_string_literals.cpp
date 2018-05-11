@@ -11,11 +11,10 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "java_types.h"
 #include "java_utils.h"
 
-#include <linking/zero_initializer.h>
-
 #include <util/arith_tools.h>
 #include <util/namespace.h>
 #include <util/unicode.h>
+#include <util/zero_initializer.h>
 
 #include <iomanip>
 #include <sstream>

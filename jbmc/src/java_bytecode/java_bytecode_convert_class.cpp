@@ -21,13 +21,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_language.h"
 #include "java_utils.h"
 
-#include <util/c_types.h>
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
-
-#include <linking/zero_initializer.h>
 #include <util/suffix.h>
+#include <util/zero_initializer.h>
 
 class java_bytecode_convert_classt:public messaget
 {
