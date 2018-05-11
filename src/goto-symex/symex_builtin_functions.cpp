@@ -178,9 +178,23 @@ void goto_symext::symex_allocate(
   }
   else
   {
+<<<<<<< HEAD
     const exprt nondet = build_symex_nondet(object_type);
     const code_assignt assignment(value_symbol.symbol_expr(), nondet);
     symex_assign(state, assignment);
+=======
+    side_effect_expr_nondett init(object_type);
+    replace_nondet(init);
+
+    guardt guard;
+    symex_assign_symbol(
+      state,
+      ssa_exprt(value_symbol.symbol_expr()),
+      nil_exprt(),
+      init,
+      guard,
+      symex_targett::assignment_typet::HIDDEN);
+>>>>>>> 2846e8c... Explicitly initialise non-static objects with non-deterministic values
   }
 
   exprt rhs;

@@ -145,13 +145,15 @@ static bool filter_out(
   const goto_tracet::stepst::const_iterator &prev_it,
   goto_tracet::stepst::const_iterator &it)
 {
+  // use the goto program's assignment type as declarations may be
+  // recorded as (non-deterministic) assignments in the trace
   if(it->hidden &&
      (!it->pc->is_assign() ||
       to_code_assign(it->pc->code).rhs().id()!=ID_side_effect ||
       to_code_assign(it->pc->code).rhs().get(ID_statement)!=ID_nondet))
     return true;
 
-  if(!it->is_assignment() && !it->is_goto() && !it->is_assert())
+  if(!it->pc->is_assign() && !it->is_goto() && !it->is_assert())
     return true;
 
   // we filter out steps with the same source location

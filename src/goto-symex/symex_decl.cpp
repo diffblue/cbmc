@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 
-#include <pointer-analysis/add_failed_symbols.h>
-
 #include <analyses/dirty.h>
 
 void goto_symext::symex_decl(statet &state)
@@ -45,6 +43,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   state.rename(ssa.type(), l1_identifier, ns);
   ssa.update_type();
 
+<<<<<<< HEAD
   // in case of pointers, put something into the value set
   if(ns.follow(expr.type()).id()==ID_pointer)
   {
@@ -76,6 +75,25 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   state.record_events=false;
   state.rename(ssa, ns);
   state.record_events=record_events;
+=======
+  // L2 renaming
+  // inlining may yield multiple declarations of the same identifier
+  // within the same L1 context
+  if(state.level2.current_names.find(l1_identifier)==
+     state.level2.current_names.end())
+    state.level2.current_names[l1_identifier]=std::make_pair(ssa, 0);
+  init_l1 = l1_identifier;
+
+  // optimisation: skip non-deterministic initialisation if the next instruction
+  // will take care of initialisation (but ensure int x=x; is handled properly)
+  goto_programt::const_targett next = std::next(state.source.pc);
+  if(
+    next->is_assign() && to_code_assign(next->code).lhs() == expr &&
+    to_code_assign(next->code).rhs().is_constant())
+  {
+    return;
+  }
+>>>>>>> 2846e8c... Explicitly initialise non-static objects with non-deterministic values
 
   // we hide the declaration of auxiliary variables
   // and if the statement itself is hidden
@@ -84,10 +102,16 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
     state.top().hidden_function ||
     state.source.pc->source_location.get_hide();
 
-  target.decl(
-    state.guard.as_expr(),
+  side_effect_expr_nondett init(ssa.type());
+  replace_nondet(init);
+
+  guardt guard;
+  symex_assign_symbol(
+    state,
     ssa,
-    state.source,
+    nil_exprt(),
+    init,
+    guard,
     hidden?
       symex_targett::assignment_typet::HIDDEN:
       symex_targett::assignment_typet::STATE);

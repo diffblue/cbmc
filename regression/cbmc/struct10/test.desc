@@ -1,8 +1,24 @@
 CORE
 main.c
+<<<<<<< HEAD
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+=======
+--trace
+test.a\[1ll?\]=1 \(00000000000000000000000000000001\)$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+\(\?\)
+--
+Earlier versions of non-deterministic initialisation would cause trace output
+including
+
+test.a[1l]={ .a={ 0, 1 }, .b=0 }.a[1l] (?)
+>>>>>>> 2846e8c... Explicitly initialise non-static objects with non-deterministic values

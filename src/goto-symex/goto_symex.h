@@ -250,7 +250,26 @@ protected:
 
   // guards
 
+<<<<<<< HEAD
   const irep_idt guard_identifier;
+=======
+  irep_idt guard_identifier;
+
+  // symex
+  irep_idt init_l1;
+
+  virtual void symex_transition(
+    statet &,
+    goto_programt::const_targett to,
+    bool is_backwards_goto=false);
+
+  virtual void symex_transition(statet &state)
+  {
+    goto_programt::const_targett next=state.source.pc;
+    ++next;
+    symex_transition(state, next);
+  }
+>>>>>>> 2846e8c... Explicitly initialise non-static objects with non-deterministic values
 
   virtual void symex_goto(statet &);
   virtual void symex_start_thread(statet &);
