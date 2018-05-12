@@ -174,7 +174,7 @@ sub test($$$$$$$$$) {
             binmode $fh;
             my $whole_file = <$fh>;
             $whole_file =~ s/\r\n/\n/g;
-            my $is_match = $whole_file =~ /$result/;
+            my $is_match = $whole_file =~ /$result/m;
             $r = ($included ? !$is_match : $is_match);
           }
           else
