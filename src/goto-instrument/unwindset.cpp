@@ -10,6 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/string2int.h>
 #include <util/string_utils.h>
+#include <util/unicode.h>
+
+#include <fstream>
+#include <sstream>
 
 void unwindsett::parse_unwind(const std::string &unwind)
 {
@@ -76,4 +80,20 @@ unwindsett::get_limit(const irep_idt &loop_id, unsigned thread_nr) const
 
   // global, if any
   return global_limit;
+}
+
+void unwindsett::parse_unwindset_file(const std::string &file_name)
+{
+  #ifdef _MSC_VER
+  std::ifstream file(widen(file_name));
+  #else
+  std::ifstream file(file_name);
+  #endif
+
+  if(!file)
+    throw "cannot open file "+file_name;
+
+  std::stringstream buffer;
+  buffer << file.rdbuf();
+  parse_unwindset(buffer.str());
 }

@@ -139,43 +139,26 @@ int goto_instrument_parse_optionst::doit()
     instrument_goto_program();
 
     {
-      bool unwind=cmdline.isset("unwind");
-      bool unwindset=cmdline.isset("unwindset");
-      bool unwindset_file=cmdline.isset("unwindset-file");
+      bool unwind_given=cmdline.isset("unwind");
+      bool unwindset_given=cmdline.isset("unwindset");
+      bool unwindset_file_given=cmdline.isset("unwindset-file");
 
-      if(unwindset && unwindset_file)
+      if(unwindset_given && unwindset_file_given)
         throw "only one of --unwindset and --unwindset-file supported at a "
               "time";
 
-      if(unwind || unwindset || unwindset_file)
+      if(unwind_given || unwindset_given || unwindset_file_given)
       {
-        int k=-1;
+        unwindsett unwindset;
 
-        if(unwind)
-          k=std::stoi(cmdline.get_value("unwind"));
+        if(unwind_given)
+          unwindset.parse_unwind(cmdline.get_value("unwind"));
 
-        unwind_sett unwind_set;
+        if(unwindset_file_given)
+          unwindset.parse_unwindset_file(cmdline.get_value("unwindset-file"));
 
-        if(unwindset_file)
-        {
-          std::string us;
-          std::string fn=cmdline.get_value("unwindset-file");
-
-#ifdef _MSC_VER
-          std::ifstream file(widen(fn));
-#else
-          std::ifstream file(fn);
-#endif
-          if(!file)
-            throw "cannot open file "+fn;
-
-          std::stringstream buffer;
-          buffer << file.rdbuf();
-          us=buffer.str();
-          parse_unwindset(us, unwind_set);
-        }
-        else if(unwindset)
-          parse_unwindset(cmdline.get_value("unwindset"), unwind_set);
+        if(unwindset_given)
+          unwindset.parse_unwindset(cmdline.get_value("unwindset"));
 
         bool unwinding_assertions=cmdline.isset("unwinding-assertions");
         bool partial_loops=cmdline.isset("partial-loops");
@@ -202,7 +185,7 @@ int goto_instrument_parse_optionst::doit()
         }
 
         goto_unwindt goto_unwind;
-        goto_unwind(goto_model, unwind_set, k, unwind_strategy);
+        goto_unwind(goto_model, unwindset, unwind_strategy);
 
         goto_model.goto_functions.update();
         goto_model.goto_functions.compute_loop_numbers();

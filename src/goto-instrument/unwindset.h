@@ -36,6 +36,9 @@ public:
   // queries
   optionalt<unsigned> get_limit(const irep_idt &loop, unsigned thread_id) const;
 
+  // read unwindset directives from a file
+  void parse_unwindset_file(const std::string &file_name);
+
 protected:
   optionalt<unsigned> global_limit;
 
