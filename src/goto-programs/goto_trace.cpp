@@ -17,6 +17,7 @@ Author: Daniel Kroening
 #include <ostream>
 
 #include <util/arith_tools.h>
+#include <util/format_expr.h>
 #include <util/symbol.h>
 
 #include <ansi-c/printf_formatter.h>
@@ -61,61 +62,45 @@ void goto_trace_stept::output(
     UNREACHABLE;
   }
 
-  if(type==typet::ASSERT || type==typet::ASSUME || type==typet::GOTO)
+  if(is_assert() || is_assume() || is_goto())
     out << " (" << cond_value << ")";
+  else if(is_function_call() || is_function_return())
+    out << ' ' << identifier;
 
   if(hidden)
     out << " hidden";
 
-  out << "\n";
+  out << '\n';
+
+  if(is_assignment())
+  {
+    out << "  " << format(full_lhs)
+        << " = " << format(full_lhs_value)
+        << '\n';
+  }
 
   if(!pc->source_location.is_nil())
-    out << pc->source_location << "\n";
+    out << pc->source_location << '\n';
 
-  if(pc->is_goto())
-    out << "GOTO   ";
-  else if(pc->is_assume())
-    out << "ASSUME ";
-  else if(pc->is_assert())
-    out << "ASSERT ";
-  else if(pc->is_dead())
-    out << "DEAD   ";
-  else if(pc->is_other())
-    out << "OTHER  ";
-  else if(pc->is_assign())
-    out << "ASSIGN ";
-  else if(pc->is_decl())
-    out << "DECL   ";
-  else if(pc->is_function_call())
-    out << "CALL   ";
-  else
-    out << "(?)    ";
+  out << pc->type << '\n';
 
-  out << "\n";
-
-  if((pc->is_other() && lhs_object.is_not_nil()) || pc->is_assign())
-  {
-    irep_idt identifier=lhs_object.get_object_name();
-    out << "  " << from_expr(ns, identifier, lhs_object.get_original_expr())
-        << " = " << from_expr(ns, identifier, lhs_object_value)
-        << "\n";
-  }
-  else if(pc->is_assert())
+  if(pc->is_assert())
   {
     if(!cond_value)
     {
-      out << "Violated property:" << "\n";
+      out << "Violated property:" << '\n';
       if(pc->source_location.is_nil())
-        out << "  " << pc->source_location << "\n";
+        out << "  " << pc->source_location << '\n';
 
-      if(comment!="")
-        out << "  " << comment << "\n";
-      out << "  " << from_expr(ns, pc->function, pc->guard) << "\n";
-      out << "\n";
+      if(!comment.empty())
+        out << "  " << comment << '\n';
+
+      out << "  " << format(pc->guard) << '\n';
+      out << '\n';
     }
   }
 
-  out << "\n";
+  out << '\n';
 }
 
 std::string trace_value_binary(
