@@ -160,7 +160,7 @@ bool remove_const_function_pointerst::try_resolve_function_call(
   {
     if(simplified_expr.type().id()==ID_code)
     {
-      resolved_functions.insert(simplified_expr);
+      resolved_functions.insert(to_symbol_expr(simplified_expr));
       resolved=true;
     }
     else
