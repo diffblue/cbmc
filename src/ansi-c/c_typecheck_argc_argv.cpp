@@ -42,6 +42,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     argc_symbol.type=op0.type();
     argc_symbol.is_static_lifetime=true;
     argc_symbol.is_lvalue=true;
+    argc_symbol.value = side_effect_expr_nondett(op0.type());
 
     if(argc_symbol.type.id()!=ID_signedbv &&
        argc_symbol.type.id()!=ID_unsignedbv)
@@ -81,6 +82,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     argv_symbol.type=argv_type;
     argv_symbol.is_static_lifetime=true;
     argv_symbol.is_lvalue=true;
+    argv_symbol.value = side_effect_expr_nondett(argv_type);
 
     symbolt *argv_new_symbol;
     move_symbol(argv_symbol, argv_new_symbol);
@@ -99,6 +101,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     envp_size_symbol.name="envp_size'";
     envp_size_symbol.type=op0.type(); // same type as argc!
     envp_size_symbol.is_static_lifetime=true;
+    envp_size_symbol.value = side_effect_expr_nondett(op0.type());
     move_symbol(envp_size_symbol, envp_new_size_symbol);
 
     if(envp_symbol.type.id()!=ID_pointer)
@@ -113,6 +116,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
 
     envp_symbol.type.id(ID_array);
     envp_symbol.type.add(ID_size).swap(size_expr);
+    envp_symbol.value = side_effect_expr_nondett(envp_symbol.type);
 
     symbolt *envp_new_symbol;
     move_symbol(envp_symbol, envp_new_symbol);

@@ -67,11 +67,7 @@ void static_lifetime_init(
        identifier==CPROVER_PREFIX "memory" ||
        identifier=="__func__" ||
        identifier=="__FUNCTION__" ||
-       identifier=="__PRETTY_FUNCTION__" ||
-       identifier=="argc'" ||
-       identifier=="argv'" ||
-       identifier=="envp'" ||
-       identifier=="envp_size'")
+       identifier=="__PRETTY_FUNCTION__")
       continue;
 
     // just for linking
