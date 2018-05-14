@@ -18,6 +18,9 @@ set(minisat2_source
 set(glucose_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_glucose.cpp
 )
+set(cadical_source
+    ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_cadical.cpp
+)
 set(squolem2_source
     ${CMAKE_CURRENT_SOURCE_DIR}/qbf/qbf_squolem.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qbf/qbf_squolem_core.cpp
@@ -45,6 +48,7 @@ list(REMOVE_ITEM sources
     ${minisat_source}
     ${minisat2_source}
     ${glucose_source}
+    ${cadical_source}
     ${squolem2_source}
     ${cudd_source}
     ${picosat_source}
@@ -93,6 +97,24 @@ elseif("${sat_impl}" STREQUAL "glucose")
     target_sources(solvers PRIVATE ${glucose_source})
 
     target_link_libraries(solvers glucose-condensed)
+
+elseif("${sat_impl}" STREQUAL "cadical")
+    message(STATUS "Building solvers with cadical")
+    download_project(PROJ cadical
+        URL https://github.com/arminbiere/cadical/archive/rel-06w.tar.gz
+        PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/../scripts/cadical-patch
+        COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/../scripts/cadical_CMakeLists.txt CMakeLists.txt
+    )
+
+    add_subdirectory(${cadical_SOURCE_DIR} ${cadical_BINARY_DIR})
+
+    target_compile_definitions(solvers PUBLIC
+        SATCHECK_CADICAL HAVE_CADICAL __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS
+    )
+
+    target_sources(solvers PRIVATE ${cadical_source})
+
+    target_link_libraries(solvers cadical-lib)
 endif()
 
 target_link_libraries(solvers util)

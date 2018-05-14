@@ -1,8 +1,1138 @@
---- a/src/cadical.hpp	2018-03-10 14:22:11.000000000 +0000
-+++ b/src/cadical.hpp	2018-03-31 16:18:32.000000000 +0100
-@@ -141,6 +141,6 @@
+diff --git a/src/analyze.cpp b/src/analyze.cpp
+index ef182e6..1fe50ca 100644
+--- a/src/analyze.cpp
++++ b/src/analyze.cpp
+@@ -291,4 +291,4 @@ void Internal::analyze () {
+ 
+ void Internal::iterate () { iterating = false; report ('i'); }
+ 
+-};
++}
+diff --git a/src/app.cpp b/src/app.cpp
+index b6eae92..cbe417b 100644
+--- a/src/app.cpp
++++ b/src/app.cpp
+@@ -11,7 +11,7 @@
+ 
+ // Need this for the 'banner' information (version etc).
+ 
+-#include <config.hpp>
++#include "config.hpp"
+ 
+ /*------------------------------------------------------------------------*/
+ 
+@@ -25,7 +25,7 @@
+ 
+ extern "C" {
+ #include "unistd.h"     // for 'isatty'
+-};
++}
+ 
+ /*------------------------------------------------------------------------*/
+ 
+@@ -120,8 +120,8 @@ bool App::set (const char * arg) { return solver->set (arg); }
+ 
+ // Short-cut for errors to avoid a hard 'exit'.
+ 
+-#define ERROR(FMT,ARGS...) \
+-do { solver->error (FMT,##ARGS); res = 1; goto DONE; } while (0)
++#define ERROR(...) \
++do { solver->error (__VA_ARGS__); res = 1; goto DONE; } while (0)
+ 
+ /*------------------------------------------------------------------------*/
+ 
+@@ -232,4 +232,4 @@ DONE:
+   return res;
+ }
+ 
+-};
++}
+diff --git a/src/app.hpp b/src/app.hpp
+index 6d41aac..fbd7517 100644
+--- a/src/app.hpp
++++ b/src/app.hpp
+@@ -35,6 +35,6 @@ public:
+   static int main (int arg, char ** argv);
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/arena.cpp b/src/arena.cpp
+index 68f0174..6515b3c 100644
+--- a/src/arena.cpp
++++ b/src/arena.cpp
+@@ -29,4 +29,4 @@ void Arena::swap () {
+   to.start = to.top = to.end = 0;
+ }
+ 
+-};
++}
+diff --git a/src/arena.hpp b/src/arena.hpp
+index eafbfa3..9a994c1 100644
+--- a/src/arena.hpp
++++ b/src/arena.hpp
+@@ -98,6 +98,6 @@ public:
+   void swap ();
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/backtrack.cpp b/src/backtrack.cpp
+index 53d8e74..a77c4cc 100644
+--- a/src/backtrack.cpp
++++ b/src/backtrack.cpp
+@@ -32,4 +32,4 @@ void Internal::backtrack (int target_level) {
+   level = target_level;
+ }
+ 
+-};
++}
+diff --git a/src/bins.cpp b/src/bins.cpp
+index ea0b977..ddfd1e6 100644
+--- a/src/bins.cpp
++++ b/src/bins.cpp
+@@ -17,4 +17,4 @@ void Internal::reset_bins () {
+   big = 0;
+ }
+ 
+-};
++}
+diff --git a/src/bins.hpp b/src/bins.hpp
+index e4e4ec4..18781a0 100644
+--- a/src/bins.hpp
++++ b/src/bins.hpp
+@@ -23,6 +23,6 @@ inline void erase_bins (Bins & bs) { erase_vector (bs); }
+ typedef Bins::iterator bins_iterator;
+ typedef Bins::const_iterator const_bins_iterator;
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/cadical.cpp b/src/cadical.cpp
+index bbe624b..cfaf6f5 100644
+--- a/src/cadical.cpp
++++ b/src/cadical.cpp
+@@ -2,7 +2,7 @@
+ 
+ /*------------------------------------------------------------------------*/
+ 
+-#include <config.hpp>
++#include "config.hpp"
+ 
+ namespace CaDiCaL {
+ 
+@@ -209,4 +209,4 @@ void Solver::error (const char * fmt, ...) {
+   va_end (ap);
+ }
+ 
+-};
++}
+diff --git a/src/cadical.hpp b/src/cadical.hpp
+index cf07399..d0147f0 100644
+--- a/src/cadical.hpp
++++ b/src/cadical.hpp
+@@ -141,6 +141,6 @@ private:
    File * output ();             // get access to internal 'output' file
  };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/ccadical.cpp b/src/ccadical.cpp
+index 4779d77..fe6a93c 100644
+--- a/src/ccadical.cpp
++++ b/src/ccadical.cpp
+@@ -39,5 +39,4 @@ void ccadical_print_statistics (CCaDiCaL * solver) {
+   ((Solver*) solver)->statistics ();
+ }
+ 
+-};
+-
++}
+diff --git a/src/clause.cpp b/src/clause.cpp
+index a2c4bdd..f788e4e 100644
+--- a/src/clause.cpp
++++ b/src/clause.cpp
+@@ -361,4 +361,4 @@ Clause * Internal::new_resolved_irredundant_clause () {
+   return res;
+ }
+ 
+-};
++}
+diff --git a/src/clause.hpp b/src/clause.hpp
+index 1130077..698c5a7 100644
+--- a/src/clause.hpp
++++ b/src/clause.hpp
+@@ -176,6 +176,6 @@ struct lit_less_than {
+   }
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/collect.cpp b/src/collect.cpp
+index 7a555f4..f653dba 100644
+--- a/src/collect.cpp
++++ b/src/collect.cpp
+@@ -359,4 +359,4 @@ void Internal::garbage_collection () {
+   STOP (collect);
+ }
+ 
+-};
++}
+diff --git a/src/compact.cpp b/src/compact.cpp
+index 4354f21..0accea0 100644
+--- a/src/compact.cpp
++++ b/src/compact.cpp
+@@ -363,4 +363,4 @@ void Internal::compact () {
+   PRINT ("AFTER");
+ }
+ 
+-};
++}
+diff --git a/src/config.hpp b/src/config.hpp
+new file mode 100644
+index 0000000..6d68939
+--- /dev/null
++++ b/src/config.hpp
+@@ -0,0 +1,7 @@
++#define CADICAL_VERSION "06w"
++#define CADICAL_GITID "N/A"
++#define CADICAL_CXX "N/A"
++#define CADICAL_CXXFLAGS "N/A"
++#define CADICAL_CXXVERSION "N/A"
++#define CADICAL_COMPILED "N/A"
++#define CADICAL_OS "N/A"
+diff --git a/src/contract.hpp b/src/contract.hpp
+index ce13243..801c30e 100644
+--- a/src/contract.hpp
++++ b/src/contract.hpp
+@@ -1,22 +1,22 @@
+ #ifndef _contract_hpp_INCLUDED
+ #define _contract_hpp_INCLUDED
+ 
+-#define CONTRACT_VIOLATED(FMT,ARGS...) \
++#define CONTRACT_VIOLATED(...) \
+ do { \
+   fflush (stdout); \
+   fprintf (stderr, \
+     "*** 'CaDiCaL' invalid API usage of '%s' in '%s': ", \
+     __PRETTY_FUNCTION__, __FILE__); \
+-  fprintf (stderr, FMT, ##ARGS); \
++  fprintf (stderr, __VA_ARGS__); \
+   fputc ('\n', stderr); \
+   raise (CaDiCaL::Solver::contract_violation_signal); \
+   abort (); \
+ } while (0)
+ 
+-#define REQUIRE(COND,FMT,ARGS...) \
++#define REQUIRE(COND,...) \
+ do { \
+   if ((COND)) break; \
+-  CONTRACT_VIOLATED (FMT, ##ARGS); \
++  CONTRACT_VIOLATED (__VA_ARGS__); \
+ } while (0)
+ 
+ #define REQUIRE_INITIALIZED() \
+diff --git a/src/decide.cpp b/src/decide.cpp
+index acd5ca9..f7e5008 100644
+--- a/src/decide.cpp
++++ b/src/decide.cpp
+@@ -45,4 +45,4 @@ void Internal::decide () {
+   STOP (decide);
+ }
+ 
+-};
++}
+diff --git a/src/duplicated.cpp b/src/duplicated.cpp
+index 2ee1dc4..affe2bd 100644
+--- a/src/duplicated.cpp
++++ b/src/duplicated.cpp
+@@ -82,4 +82,4 @@ void Internal::mark_duplicated_binary_clauses_as_garbage () {
+   STOP (deduplicate);
+ }
+ 
+-};
++}
+diff --git a/src/elim.cpp b/src/elim.cpp
+index 20096b0..6a2237c 100644
+--- a/src/elim.cpp
++++ b/src/elim.cpp
+@@ -672,4 +672,4 @@ void Internal::elim () {
+   lim.fixed_at_last_elim = stats.all.fixed;
+ }
+ 
+-};
++}
+diff --git a/src/elim.hpp b/src/elim.hpp
+index da3d6b2..639d9c4 100644
+--- a/src/elim.hpp
++++ b/src/elim.hpp
+@@ -23,6 +23,6 @@ struct more_noccs2 {
+ 
+ typedef heap<more_noccs2> ElimSchedule;
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/ema.cpp b/src/ema.cpp
+index d97a2d0..ec46e07 100644
+--- a/src/ema.cpp
++++ b/src/ema.cpp
+@@ -37,4 +37,4 @@ void EMA::update (Internal * internal, double y, const char * name) {
+   LOG ("new %s EMA wait = period = %ld, beta = %g", name, wait, beta);
+ }
+ 
+-};
++}
+diff --git a/src/ema.hpp b/src/ema.hpp
+index f8b8e99..9837832 100644
+--- a/src/ema.hpp
++++ b/src/ema.hpp
+@@ -28,7 +28,7 @@ struct EMA {
+   void update (Internal *, double y, const char * name);
+ };
+ 
+-};
++}
+ 
+ /*------------------------------------------------------------------------*/
+ 
+diff --git a/src/error.hpp b/src/error.hpp
+index 07fb00e..dfd56c5 100644
+--- a/src/error.hpp
++++ b/src/error.hpp
+@@ -1,11 +1,11 @@
+ #ifndef _error_hpp_INCLUDED
+ #define _error_hpp_INCLUDED
+ 
+-#define ERROR_START(FMT,ARGS...) \
++#define ERROR_START(...) \
+ do { \
+   fflush (stdout); \
+   fputs ("*** 'CaDiCaL' error: ", stderr); \
+-  fprintf (stderr, FMT, ##ARGS); \
++  fprintf (stderr, __VA_ARGS__); \
+ } while (0)
+ 
+ #define ERROR_END() \
+@@ -15,9 +15,9 @@ do { \
+   abort (); \
+ } while (0)
+ 
+-#define ERROR(FMT,ARGS...) \
++#define ERROR(...) \
+ do { \
+-  ERROR_START (FMT,##ARGS); \
++  ERROR_START (__VA_ARGS__);  \
+   ERROR_END (fmt); \
+ } while (0)
+ 
+diff --git a/src/extend.cpp b/src/extend.cpp
+index 455b170..9784e25 100644
+--- a/src/extend.cpp
++++ b/src/extend.cpp
+@@ -85,4 +85,4 @@ void External::extend () {
+   STOP (extend);
+ }
+ 
+-};
++}
+diff --git a/src/external.cpp b/src/external.cpp
+index f9fbf69..4272d76 100644
+--- a/src/external.cpp
++++ b/src/external.cpp
+@@ -70,4 +70,4 @@ int External::solve () {
+ 
+ void External::terminate () { internal->terminate (); }
+ 
+-};
++}
+diff --git a/src/external.hpp b/src/external.hpp
+index 65346d9..3d58ed6 100644
+--- a/src/external.hpp
++++ b/src/external.hpp
+@@ -135,6 +135,6 @@ class External {
+   void check (int (External::*assignment) (int) const);
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/file.cpp b/src/file.cpp
+index e93d377..bbcd297 100644
+--- a/src/file.cpp
++++ b/src/file.cpp
+@@ -10,7 +10,7 @@ extern "C" {
+ #include <sys/types.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+-};
++}
+ 
+ /*------------------------------------------------------------------------*/
+ 
+@@ -189,4 +189,4 @@ File::~File () {
+ #endif
+ }
+ 
+-};
++}
+diff --git a/src/file.hpp b/src/file.hpp
+index b2194f3..8cc45bb 100644
+--- a/src/file.hpp
++++ b/src/file.hpp
+@@ -130,6 +130,6 @@ public:
+   long bytes () const { return _bytes; }
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/flags.hpp b/src/flags.hpp
+index 7c4bc72..4e3a3d8 100644
+--- a/src/flags.hpp
++++ b/src/flags.hpp
+@@ -36,6 +36,6 @@ struct Flags {        // Variable flags.
+   bool substituted () const { return status == SUBSTITUTED; }
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/format.cpp b/src/format.cpp
+index 7dcd3cf..d50f8b4 100644
+--- a/src/format.cpp
++++ b/src/format.cpp
+@@ -57,4 +57,4 @@ const char * Format::append (const char * fmt, ...) {
+   return res;
+ }
+ 
+-};
++}
+diff --git a/src/format.hpp b/src/format.hpp
+index eca4b0c..8d91d3b 100644
+--- a/src/format.hpp
++++ b/src/format.hpp
+@@ -25,6 +25,6 @@ public:
+   operator const char * () const { return count ? buffer : 0; }
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/heap.hpp b/src/heap.hpp
+index d6d1cdf..01fbd44 100644
+--- a/src/heap.hpp
++++ b/src/heap.hpp
+@@ -181,6 +181,6 @@ public:
+   const_iterator end () const { return array.end (); }
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/internal.cpp b/src/internal.cpp
+index 972cada..e221a62 100644
+--- a/src/internal.cpp
++++ b/src/internal.cpp
+@@ -307,4 +307,4 @@ void Internal::dump () {
+   fflush (stdout);
+ }
+ 
+-};
++}
+diff --git a/src/internal.hpp b/src/internal.hpp
+index 6829e99..5a769d6 100644
+--- a/src/internal.hpp
++++ b/src/internal.hpp
+@@ -596,6 +596,6 @@ inline int Proof::externalize (int lit) {
+   return res;
+ }
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/level.hpp b/src/level.hpp
+index 0cbc2aa..532a789 100644
+--- a/src/level.hpp
++++ b/src/level.hpp
+@@ -20,6 +20,6 @@ struct Level {
+   Level () { }
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/limit.cpp b/src/limit.cpp
+index 49ae7cf..156e56d 100644
+--- a/src/limit.cpp
++++ b/src/limit.cpp
+@@ -22,4 +22,4 @@ bool Internal::terminating () {
+ 
+ Inc::Inc () { memset (this, 0, sizeof *this); }
+ 
+-};
++}
+diff --git a/src/limit.hpp b/src/limit.hpp
+index 48bde71..3b6b07e 100644
+--- a/src/limit.hpp
++++ b/src/limit.hpp
+@@ -57,6 +57,6 @@ struct Inc {
+   Inc ();
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/logging.cpp b/src/logging.cpp
+index 5ca0382..884f7b7 100644
+--- a/src/logging.cpp
++++ b/src/logging.cpp
+@@ -71,6 +71,6 @@ void Logger::log (Internal * internal,
+   fflush (stdout);
+ }
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/logging.hpp b/src/logging.hpp
+index c0732cb..31d7335 100644
+--- a/src/logging.hpp
++++ b/src/logging.hpp
+@@ -37,21 +37,21 @@ static void log (Internal *, const vector<int> &, const char *fmt, ...);
+ 
+ };
+ 
+-};
++}
+ 
+ /*------------------------------------------------------------------------*/
+ 
+ // Make sure that 'logging' code is really not included (second case of the
+ // '#ifdef') if logging code is not included.
+ 
+-#define LOG(ARGS...) \
++#define LOG(...) \
+ do { \
+   if (!internal->opts.log) break; \
+-  Logger::log (internal, ##ARGS); \
++  Logger::log (internal, __VA_ARGS__); \
+ } while (0)
+ 
+ #else
+-#define LOG(ARGS...) do { } while (0)
++#define LOG(...) do { } while (0)
+ #endif
+ 
+ /*------------------------------------------------------------------------*/
+diff --git a/src/message.cpp b/src/message.cpp
+index 2d492b3..0f9077f 100644
+--- a/src/message.cpp
++++ b/src/message.cpp
+@@ -97,4 +97,4 @@ void Message::error (Internal * internal, const char *fmt, ...) {
+   va_end (ap);                          // unreachable
+ }
+ 
+-};
++}
+diff --git a/src/message.hpp b/src/message.hpp
+index 98018d1..2977727 100644
+--- a/src/message.hpp
++++ b/src/message.hpp
+@@ -49,7 +49,7 @@ struct Message {
+   static void error (Internal *, const char *, ...);
+ };
+ 
+-};
++}
+ 
+ /*------------------------------------------------------------------------*/
+ 
+@@ -57,26 +57,26 @@ struct Message {
+ 
+ #ifndef QUIET
+ 
+-#define MSG(ARGS...) Message::message (internal, ##ARGS)
+-#define VRB(ARGS...) Message::verbose (internal, ##ARGS)
+-#define SECTION(ARGS...) Message::section (internal, ##ARGS)
++#define MSG(...) Message::message (internal, __VA_ARGS__)
++#define VRB(...) Message::verbose (internal, __VA_ARGS__)
++#define SECTION(...) Message::section (internal, __VA_ARGS__)
+ 
+ #else
+ 
+-#define MSG(ARGS...) do { } while (0)
+-#define VRB(ARGS...) do { } while (0)
+-#define SECTION(ARGS...) do { } while (0)
++#define MSG(...) do { } while (0)
++#define VRB(...) do { } while (0)
++#define SECTION(...) do { } while (0)
+ 
+ #endif
+ 
+ // Parse error.
+ 
+-#define PER(FMT,ARGS...) \
++#define PER(...) \
+ do { \
+   internal->error.init (\
+     "%s:%d: parse error: ", \
+     file->name (), (int) file->lineno ()); \
+-  return internal->error.append (FMT, ##ARGS); \
++  return internal->error.append (__VA_ARGS__); \
+ } while (0)
+ 
+ /*------------------------------------------------------------------------*/
+diff --git a/src/minimize.cpp b/src/minimize.cpp
+index 4e3f8b0..0e68e37 100644
+--- a/src/minimize.cpp
++++ b/src/minimize.cpp
+@@ -79,4 +79,4 @@ void Internal::clear_minimized () {
+   minimized.clear ();
+ }
+ 
+-};
++}
+diff --git a/src/occs.cpp b/src/occs.cpp
+index 82ad4ba..c5ba5bd 100644
+--- a/src/occs.cpp
++++ b/src/occs.cpp
+@@ -47,4 +47,4 @@ void Internal::reset_noccs2 () {
+   ntab2 = 0;
+ }
+ 
+-};
++}
+diff --git a/src/occs.hpp b/src/occs.hpp
+index b456f11..32445ee 100644
+--- a/src/occs.hpp
++++ b/src/occs.hpp
+@@ -20,6 +20,6 @@ inline void erase_occs (Occs & os) { erase_vector (os); }
+ typedef Occs::iterator occs_iterator;
+ typedef Occs::const_iterator const_occs_iterator;
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/options.cpp b/src/options.cpp
+index 501978d..eeb0859 100644
+--- a/src/options.cpp
++++ b/src/options.cpp
+@@ -149,4 +149,4 @@ void Options::usage () {
+ 
+ /*------------------------------------------------------------------------*/
+ 
+-};
++}
+diff --git a/src/options.hpp b/src/options.hpp
+index f198bfa..9d5641b 100644
+--- a/src/options.hpp
++++ b/src/options.hpp
+@@ -24,11 +24,11 @@
+ #ifdef LOGGING
+ #define LOGOPT OPTION
+ #else
+-#define LOGOPT(ARGS...) /**/
++#define LOGOPT(...) /**/
+ #endif
+ 
+ #ifdef QUIET
+-#define QUTOPT(ARGS...) /**/
++#define QUTOPT(...) /**/
+ #else
+ #define QUTOPT OPTION
+ #endif
+@@ -183,6 +183,6 @@ public:
+   static void usage ();      // print usage message for all options
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/packtrack.cpp b/src/packtrack.cpp
+index 3cede34..b45eb0a 100644
+--- a/src/packtrack.cpp
++++ b/src/packtrack.cpp
+@@ -29,4 +29,4 @@ void Internal::packtrack (int probe) {
+   level = 0;
+ }
+ 
+-};
++}
+diff --git a/src/parse.cpp b/src/parse.cpp
+index a861daf..a7a417b 100644
+--- a/src/parse.cpp
++++ b/src/parse.cpp
+@@ -186,4 +186,4 @@ const char * Parser::parse_solution () {
+   return err;
+ }
+ 
+-};
++}
+diff --git a/src/parse.hpp b/src/parse.hpp
+index 437e4b3..df07357 100644
+--- a/src/parse.hpp
++++ b/src/parse.hpp
+@@ -46,6 +46,6 @@ public:
+   const char * parse_solution ();
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/probagate.cpp b/src/probagate.cpp
+index 5bb47e1..98c37d8 100644
+--- a/src/probagate.cpp
++++ b/src/probagate.cpp
+@@ -279,4 +279,4 @@ bool Internal::probagate () {
+   return !conflict;
+ }
+ 
+-};
++}
+diff --git a/src/probe.cpp b/src/probe.cpp
+index 4f86b9b..8c6262c 100644
+--- a/src/probe.cpp
++++ b/src/probe.cpp
+@@ -241,4 +241,4 @@ void CaDiCaL::Internal::probe () {
+   STOP_AND_SWITCH (probe, simplify, search);
+ }
+ 
+-};
++}
+diff --git a/src/profile.cpp b/src/profile.cpp
+index 5ed22af..7bfca82 100644
+--- a/src/profile.cpp
++++ b/src/profile.cpp
+@@ -63,6 +63,6 @@ void Internal::print_profile (double now) {
+   MSG ("%12.2f %7.2f%% all", now, 100.0);
+ }
+ 
+-};
++}
+ 
+ #endif // ifndef QUIET
+diff --git a/src/profile.hpp b/src/profile.hpp
+index 8d57581..9a00dc7 100644
+--- a/src/profile.hpp
++++ b/src/profile.hpp
+@@ -96,7 +96,7 @@ struct Profiles {
+   Profiles (Internal *);
+ };
+ 
+-};
++}
+ 
+ /*------------------------------------------------------------------------*/
+ 
+@@ -104,21 +104,16 @@ struct Profiles {
+ 
+ #ifndef QUIET //...........................................................
+ 
+-#define START(P,ARGS...) \
+-do { \
+-  if (internal->profiles.P.level > internal->opts.profile) break; \
+-  internal->start_profiling (&internal->profiles.P, ##ARGS); \
+-} while (0)
++#define START(...) \
++do { } while (0)
+ 
+-#define STOP(P,ARGS...) \
+-do { \
+-  if (internal->profiles.P.level > internal->opts.profile) break; \
+-  internal->stop_profiling (&internal->profiles.P, ##ARGS); \
+-} while (0)
++#define STOP(...) \
++do { } while (0)
+ 
+ #define SWITCH_AND_START(F,T,P) \
+ do { \
+   const double N = process_time (); \
++  (void) N;\
+   const int L = internal->opts.profile; \
+   if (internal->profiles.F.level <= L)  STOP (F, N); \
+   if (internal->profiles.T.level <= L) START (T, N); \
+@@ -128,6 +123,7 @@ do { \
+ #define STOP_AND_SWITCH(P,F,T) \
+ do { \
+   const double N = process_time (); \
++  (void) N;\
+   const int L = internal->opts.profile; \
+   if (internal->profiles.P.level <= L)  STOP (P, N); \
+   if (internal->profiles.F.level <= L)  STOP (F, N); \
+@@ -136,11 +132,11 @@ do { \
+ 
+ #else // ifndef QUIET //...................................................
+ 
+-#define START(ARGS...) do { } while (0)
+-#define STOP(ARGS...) do { } while (0)
++#define START(...) do { } while (0)
++#define STOP(...) do { } while (0)
+ 
+-#define SWITCH_AND_START(ARGS...) do { } while (0)
+-#define STOP_AND_SWITCH(ARGS...) do { } while (0)
++#define SWITCH_AND_START(...) do { } while (0)
++#define STOP_AND_SWITCH(...) do { } while (0)
+ 
+ #endif
+ /*------------------------------------------------------------------------*/
+diff --git a/src/proof.cpp b/src/proof.cpp
+index 4d16d3a..2374516 100644
+--- a/src/proof.cpp
++++ b/src/proof.cpp
+@@ -156,4 +156,4 @@ void Proof::trace_strengthen_clause (Clause * c, int remove) {
+   trace_clause (c, false);
+ }
+ 
+-};
++}
+diff --git a/src/proof.hpp b/src/proof.hpp
+index bff5c70..24132f9 100644
+--- a/src/proof.hpp
++++ b/src/proof.hpp
+@@ -38,6 +38,6 @@ public:
+   void trace_strengthen_clause (Clause *, int);
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/propagate.cpp b/src/propagate.cpp
+index 2fd7434..9cd5d48 100644
+--- a/src/propagate.cpp
++++ b/src/propagate.cpp
+@@ -278,4 +278,4 @@ bool Internal::propagate () {
+   return !conflict;
+ }
+ 
+-};
++}
+diff --git a/src/queue.hpp b/src/queue.hpp
+index 46378dc..87e033e 100644
+--- a/src/queue.hpp
++++ b/src/queue.hpp
+@@ -44,6 +44,6 @@ struct Queue {
+   }
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/reduce.cpp b/src/reduce.cpp
+index 1931788..78463c6 100644
+--- a/src/reduce.cpp
++++ b/src/reduce.cpp
+@@ -147,4 +147,4 @@ void Internal::reduce () {
+   STOP (reduce);
+ }
+ 
+-};
++}
+diff --git a/src/rephase.cpp b/src/rephase.cpp
+index 135274e..246bedd 100644
+--- a/src/rephase.cpp
++++ b/src/rephase.cpp
+@@ -20,4 +20,4 @@ void Internal::rephase () {
+   report ('~');
+ }
+ 
+-};
++}
+diff --git a/src/report.cpp b/src/report.cpp
+index 52adc10..02766b6 100644
+--- a/src/report.cpp
++++ b/src/report.cpp
+@@ -107,7 +107,7 @@ void Internal::report (char type, int verbose) {
+       pos += len + 1;
+     }
+     const int max_line = pos + 20, nrows = 3;
+-    char line[max_line];
++    char *line = new char[max_line];
+     for (int start = 0; start < nrows; start++) {
+       int i;
+       for (i = 0; i < max_line; i++) line[i] = ' ';
+@@ -118,6 +118,7 @@ void Internal::report (char type, int verbose) {
+       output->put (line);
+       output->put ('\n');
+     }
++    delete[] line;
+     output->put ("c\n");
+   }
+   output->put ("c "), output->put (type);
+@@ -133,5 +134,5 @@ void Internal::report (char type, int verbose) { }
+ 
+ #endif
+ 
+-};
+ 
++}
+diff --git a/src/resources.cpp b/src/resources.cpp
+index 6b02019..d0861c5 100644
+--- a/src/resources.cpp
++++ b/src/resources.cpp
+@@ -13,7 +13,7 @@ extern "C" {
+ #include <sys/types.h>
+ #include <unistd.h>
+ #include <string.h>
+-};
++}
+ 
+ namespace CaDiCaL {
+ 
+@@ -58,6 +58,6 @@ size_t current_resident_set_size () {
+   return scanned == 2 ? rss * sysconf (_SC_PAGESIZE) : 0;
+ }
+ 
+-};
++}
+ 
+ #endif // ifndef QUIET
+diff --git a/src/resources.hpp b/src/resources.hpp
+index 382c95a..381b4b2 100644
+--- a/src/resources.hpp
++++ b/src/resources.hpp
+@@ -10,7 +10,7 @@ double process_time ();
+ size_t maximum_resident_set_size ();
+ size_t current_resident_set_size ();
+ 
+-};
++}
+ 
+ #endif // ifndef _resources_hpp_INCLUDED
+ #endif // ifndef QUIET
+diff --git a/src/restart.cpp b/src/restart.cpp
+index 2b796dd..ea09283 100644
+--- a/src/restart.cpp
++++ b/src/restart.cpp
+@@ -45,5 +45,4 @@ void Internal::restart () {
+   STOP (restart);
+ }
+ 
+-};
+-
++}
+diff --git a/src/signal.cpp b/src/signal.cpp
+index a38e577..d4c6810 100644
+--- a/src/signal.cpp
++++ b/src/signal.cpp
+@@ -12,7 +12,7 @@ int CaDiCaL::Solver::contract_violation_signal = SIGUSR1;
+ 
+ extern "C" {
+ #include <unistd.h>
+-};
++}
+ 
+ /*------------------------------------------------------------------------*/
+ 
+@@ -95,4 +95,4 @@ void Signal::alarm (int seconds) {
+   ::alarm (seconds);
+ }
+ 
+-};
++}
+diff --git a/src/signal.hpp b/src/signal.hpp
+index b652ee0..4631c81 100644
+--- a/src/signal.hpp
++++ b/src/signal.hpp
+@@ -23,6 +23,6 @@ public:
+   static void alarm (int seconds);
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/solution.cpp b/src/solution.cpp
+index d9298d5..dfc904d 100644
+--- a/src/solution.cpp
++++ b/src/solution.cpp
+@@ -46,4 +46,4 @@ void External::check_solution_on_shrunken_clause (Clause * c) {
+   abort ();
+ }
+ 
+-};
++}
+diff --git a/src/stats.cpp b/src/stats.cpp
+index ee96a73..1a2c980 100644
+--- a/src/stats.cpp
++++ b/src/stats.cpp
+@@ -8,16 +8,14 @@ Stats::Stats () { memset (this, 0, sizeof *this); }
+ 
+ /*------------------------------------------------------------------------*/
+ 
+-#define PRT(FMT,ARGS...) \
++#define PRT(...) \
+ do { \
+-  if (FMT[0] == ' ' && !verbose) break; \
+-  MSG (FMT, ##ARGS); \
+ } while (0)
+ 
+ #ifdef STATS
+ #define SSG PRT
+ #else
+-#define SSG(ARGS...) do { } while (0)
++#define SSG(...) do { } while (0)
+ #endif
+ 
+ /*------------------------------------------------------------------------*/
+@@ -30,6 +28,7 @@ void Stats::print (Internal * internal) {
+   int verbose = 1;
+ #else
+   int verbose = internal->opts.verbose;
++  (void) verbose;
+ #ifdef LOGGING
+   if (internal->opts.log) verbose = 1;
+ #endif // ifdef LOGGING
+@@ -39,13 +38,17 @@ void Stats::print (Internal * internal) {
+   if (internal->opts.profile) internal->print_profile (t);
+   Stats & stats = internal->stats;
+   size_t m = maximum_resident_set_size ();
++  (void) m;
+   int max_var = internal->external->max_var;
++  (void) max_var;
+   long propagations = stats.propagations.search;
+   propagations += stats.propagations.transred;
+   propagations += stats.propagations.probe;
+   propagations += stats.propagations.vivify;
+   long vivified = stats.vivifysubs + stats.vivifystrs;
++  (void) vivified;
+   long learned = stats.learned - stats.minimized;
++  (void) learned;
+   size_t extendbytes = internal->external->extension.capacity ();
+   extendbytes *= sizeof (int);
+ 
+@@ -119,4 +122,4 @@ void Stats::print (Internal * internal) {
+ 
+ }
+ 
+-};
++}
+diff --git a/src/stats.hpp b/src/stats.hpp
+index 2531764..9e27eb4 100644
+--- a/src/stats.hpp
++++ b/src/stats.hpp
+@@ -106,6 +106,6 @@ do { \
+ 
+ /*------------------------------------------------------------------------*/
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/subsume.cpp b/src/subsume.cpp
+index db78fe9..f3bcf92 100644
+--- a/src/subsume.cpp
++++ b/src/subsume.cpp
+@@ -498,4 +498,4 @@ void Internal::subsume () {
+   lim.subsume = stats.conflicts + inc.subsume;
+ }
+ 
+-};
++}
+diff --git a/src/transred.cpp b/src/transred.cpp
+index c9cad63..e3fd47a 100644
+--- a/src/transred.cpp
++++ b/src/transred.cpp
+@@ -177,4 +177,4 @@ void Internal::transred () {
+   STOP_AND_SWITCH (transred, simplify, search);
+ }
+ 
+-};
++}
+diff --git a/src/util.cpp b/src/util.cpp
+index 04a0feb..d10f0f3 100644
+--- a/src/util.cpp
++++ b/src/util.cpp
+@@ -31,4 +31,4 @@ bool has_suffix (const char * str, const char * suffix) {
+   return k > l && !strcmp (str + k - l, suffix);
+ }
+ 
+-};
++}
+diff --git a/src/util.hpp b/src/util.hpp
+index f5710c1..706199d 100644
+--- a/src/util.hpp
++++ b/src/util.hpp
+@@ -70,6 +70,6 @@ template<class T> void shrink_vector (vector<T> & v) {
+ 
+ /*------------------------------------------------------------------------*/
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/var.cpp b/src/var.cpp
+index e4e643e..f17c0b0 100644
+--- a/src/var.cpp
++++ b/src/var.cpp
+@@ -30,4 +30,4 @@ void Internal::check_var_stats () {
+ #endif
+ }
+ 
+-};
++}
+diff --git a/src/var.hpp b/src/var.hpp
+index 739a728..fcd61c3 100644
+--- a/src/var.hpp
++++ b/src/var.hpp
+@@ -23,6 +23,6 @@ struct Var {
+   };
+ };
+ 
+-};
++}
+ 
+ #endif
+diff --git a/src/vivify.cpp b/src/vivify.cpp
+index e4a0115..b9be2ce 100644
+--- a/src/vivify.cpp
++++ b/src/vivify.cpp
+@@ -544,4 +544,4 @@ void Internal::vivify () {
+   STOP_AND_SWITCH (vivify, simplify, search);
+ }
+ 
+-};
++}
+diff --git a/src/watch.cpp b/src/watch.cpp
+index 33135ca..7887934 100644
+--- a/src/watch.cpp
++++ b/src/watch.cpp
+@@ -79,4 +79,4 @@ void Internal::disconnect_watches () {
+       watches (sign * idx).clear ();
+ }
+ 
+-};
++}
+diff --git a/src/watch.hpp b/src/watch.hpp
+index c020baa..90c6814 100644
+--- a/src/watch.hpp
++++ b/src/watch.hpp
+@@ -39,6 +39,6 @@ inline void shrink_watches (Watches & ws) { shrink_vector (ws); }
+ typedef Watches::iterator watch_iterator;
+ typedef Watches::const_iterator const_watch_iterator;
  
 -};
 +}

@@ -69,7 +69,7 @@ endif
 
 ifneq ($(CADICAL),)
   CADICAL_SRC=sat/satcheck_cadical.cpp
-  CADICAL_INCLUDE=-I $(CADICAL)/src
+  CADICAL_INCLUDE=-I $(CADICAL)
   CADICAL_LIB=$(CADICAL)/build/libcadical$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_CADICAL
 endif

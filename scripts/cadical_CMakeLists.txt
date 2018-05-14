@@ -1,0 +1,65 @@
+add_library(cadical-lib
+    src/analyze.cpp
+    src/app.cpp
+    src/arena.cpp
+    src/backtrack.cpp
+    src/bins.cpp
+    src/cadical.cpp
+    src/ccadical.cpp
+    src/clause.cpp
+    src/collect.cpp
+    src/compact.cpp
+    src/decide.cpp
+    src/decompose.cpp
+    src/duplicated.cpp
+    src/elim.cpp
+    src/ema.cpp
+    src/extend.cpp
+    src/external.cpp
+    src/file.cpp
+    src/format.cpp
+    src/internal.cpp
+    src/limit.cpp
+    src/logging.cpp
+    src/main.cpp
+    src/message.cpp
+    src/minimize.cpp
+    src/occs.cpp
+    src/options.cpp
+    src/packtrack.cpp
+    src/parse.cpp
+    src/probagate.cpp
+    src/probe.cpp
+    src/profile.cpp
+    src/proof.cpp
+    src/propagate.cpp
+    src/reduce.cpp
+    src/rephase.cpp
+    src/report.cpp
+    src/resources.cpp
+    src/restart.cpp
+    src/signal.cpp
+    src/solution.cpp
+    src/stats.cpp
+    src/subsume.cpp
+    src/transred.cpp
+    src/util.cpp
+    src/var.cpp
+    src/vivify.cpp
+    src/watch.cpp
+)
+
+set_target_properties(
+    cadical-lib
+    PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED true
+    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Developer ID Application: Daniel Kroening"
+)
+
+target_include_directories(cadical-lib
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(cadical-lib util)
