@@ -221,6 +221,18 @@ bool value_set_dereferencet::dereference_type_compare(
   {
     return true;
   }
+  else if(dereference_unwrapped->id() == ID_pointer &&
+          object_unwrapped->id() != ID_pointer)
+  {
+#ifdef DEBUG
+    std::cout << "value_set_dereference: the dereference type has "
+                 "too many ID_pointer levels"
+              << std::endl;
+    std::cout << " object_type: " << object_type.pretty() << std::endl;
+    std::cout << " dereference_type: " << dereference_type.pretty()
+              << std::endl;
+#endif
+  }
 
   if(base_type_eq(object_type, dereference_type, ns))
     return true; // ok, they just match
