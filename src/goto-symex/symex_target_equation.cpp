@@ -403,7 +403,17 @@ void symex_target_equationt::convert_assignments(
   for(const auto &step : SSA_steps)
   {
     if(step.is_assignment() && !step.ignore)
+    {
+      decision_procedure.conditional_output(
+        decision_procedure.debug(),
+        [&step](messaget::mstreamt &mstream) {
+          std::ostringstream oss;
+          step.output(oss);
+          mstream << oss.str() << messaget::eom;
+        });
+
       decision_procedure.set_to_true(step.cond_expr);
+    }
   }
 }
 
@@ -443,6 +453,14 @@ void symex_target_equationt::convert_guards(
       step.guard_literal=const_literal(false);
     else
     {
+      prop_conv.conditional_output(
+        prop_conv.debug(),
+        [&step](messaget::mstreamt &mstream) {
+          std::ostringstream oss;
+          step.output(oss);
+          mstream << oss.str() << messaget::eom;
+        });
+
       try
       {
         step.guard_literal = prop_conv.convert(step.guard);
@@ -470,6 +488,14 @@ void symex_target_equationt::convert_assumptions(
         step.cond_literal=const_literal(true);
       else
       {
+        prop_conv.conditional_output(
+          prop_conv.debug(),
+          [&step](messaget::mstreamt &mstream) {
+            std::ostringstream oss;
+            step.output(oss);
+            mstream << oss.str() << messaget::eom;
+          });
+
         try
         {
           step.cond_literal = prop_conv.convert(step.cond_expr);
@@ -498,6 +524,14 @@ void symex_target_equationt::convert_goto_instructions(
         step.cond_literal=const_literal(true);
       else
       {
+        prop_conv.conditional_output(
+          prop_conv.debug(),
+          [&step](messaget::mstreamt &mstream) {
+            std::ostringstream oss;
+            step.output(oss);
+            mstream << oss.str() << messaget::eom;
+          });
+
         try
         {
           step.cond_literal = prop_conv.convert(step.cond_expr);
@@ -525,6 +559,14 @@ void symex_target_equationt::convert_constraints(
     {
       if(!step.ignore)
       {
+        decision_procedure.conditional_output(
+          decision_procedure.debug(),
+          [&step](messaget::mstreamt &mstream) {
+            std::ostringstream oss;
+            step.output(oss);
+            mstream << oss.str() << messaget::eom;
+          });
+
         try
         {
           decision_procedure.set_to_true(step.cond_expr);
