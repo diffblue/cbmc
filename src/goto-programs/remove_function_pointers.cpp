@@ -430,6 +430,25 @@ void remove_function_pointerst::remove_function_pointer(
   statistics().source_location=target->source_location;
   statistics() << "replacing function pointer by "
                << functions.size() << " possible targets" << eom;
+
+  // list the names of functions when verbosity is at debug level
+  conditional_output(
+    debug(),
+    [this, &functions](mstreamt &mstream) {
+      mstream << "targets: ";
+
+      bool first = true;
+      for(const auto &function : functions)
+      {
+        if(!first)
+          mstream << ", ";
+
+        mstream << function.get_identifier();
+        first = false;
+      }
+
+      mstream << eom;
+    });
 }
 
 bool remove_function_pointerst::remove_function_pointers(
