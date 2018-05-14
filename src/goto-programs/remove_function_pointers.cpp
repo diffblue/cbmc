@@ -61,7 +61,7 @@ protected:
     goto_programt &goto_program,
     goto_programt::targett target);
 
-  std::set<irep_idt> address_taken;
+  std::unordered_set<irep_idt> address_taken;
 
   typedef std::map<irep_idt, code_typet> type_mapt;
   type_mapt type_map;
@@ -80,8 +80,8 @@ protected:
     code_function_callt &function_call,
     goto_programt &dest);
 
-  void compute_address_taken_in_symbols(
-    std::set<irep_idt> &address_taken)
+  void
+  compute_address_taken_in_symbols(std::unordered_set<irep_idt> &address_taken)
   {
     const symbol_tablet &symbol_table=ns.get_symbol_table();
 
