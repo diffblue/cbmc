@@ -343,10 +343,8 @@ void remove_function_pointerst::remove_function_pointer(
       if(t.first=="pthread_mutex_cleanup")
         continue;
 
-      symbol_exprt expr;
-      expr.type()=t.second;
-      expr.set_identifier(t.first);
-        functions.insert(expr);
+      symbol_exprt expr(t.first, t.second);
+      functions.insert(expr);
     }
   }
 
