@@ -12,9 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 
 #include <util/byte_operators.h>
-#include <util/cprover_prefix.h>
-
 #include <util/c_types.h>
+#include <util/cprover_prefix.h>
+#include <util/pointer_offset_size.h>
 
 #include "goto_symex_state.h"
 
@@ -250,6 +250,14 @@ void goto_symext::symex_assign_symbol(
 
   if(symbol.is_auxiliary)
     assignment_type=symex_targett::assignment_typet::HIDDEN;
+
+  log.conditional_output(
+    log.debug(),
+    [this, &ssa_lhs](messaget::mstreamt &mstream) {
+      mstream << "Assignment to " << ssa_lhs.get_identifier()
+              << " [" << pointer_offset_bits(ssa_lhs.type(), ns) << " bits]"
+              << messaget::eom;
+    });
 
   target.assignment(
     tmp_guard.as_expr(),
