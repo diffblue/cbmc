@@ -218,17 +218,6 @@ void goto_symext::symex_assign_symbol(
   guardt &guard,
   assignment_typet assignment_type)
 {
-  // do not assign to L1 objects that have gone out of scope --
-  // pointer dereferencing may yield such objects; parameters do not
-  // have an L2 entry set up beforehand either, so exempt them from
-  // this check (all other L1 objects should have seen a declaration)
-  const symbolt *s;
-  if(!ns.lookup(lhs.get_object_name(), s) &&
-     !s->is_parameter &&
-     !lhs.get_level_1().empty() &&
-     state.level2.current_count(lhs.get_identifier())==0)
-    return;
-
   exprt ssa_rhs=rhs;
 
   // put assignment guard into the rhs

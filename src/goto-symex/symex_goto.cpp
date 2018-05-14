@@ -452,17 +452,23 @@ void goto_symext::phi_function(
     //  1. Either guard is false, so we can't follow that branch.
     //  2. Either identifier is of generation zero, and so hasn't been
     //     initialized and therefor an invalid target.
-    if(dest_state.guard.is_false())
-      rhs=goto_state_rhs;
-    else if(goto_state.guard.is_false())
-      rhs=dest_state_rhs;
-    else if(goto_state.level2_current_count(l1_identifier) == 0)
+    if(
+      dest_state.guard.is_false() ||
+      dest_state.level2.current_count(l1_identifier) == 0)
     {
-      rhs = dest_state_rhs;
-    }
-    else if(dest_state.level2.current_count(l1_identifier) == 0)
-    {
+      if(goto_state.level2_current_count(l1_identifier) == 0)
+        continue;
+
       rhs = goto_state_rhs;
+    }
+    else if(
+      goto_state.guard.is_false() ||
+      goto_state.level2_current_count(l1_identifier) == 0)
+    {
+      if(dest_state.level2.current_count(l1_identifier) == 0)
+        continue;
+
+      rhs = dest_state_rhs;
     }
     else
     {
