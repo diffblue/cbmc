@@ -31,7 +31,7 @@ does_remove_constt::does_remove_constt(
 
 /// A naive analysis to look for casts that remove const-ness from pointers.
 /// \return Returns true if the program contains a const-removing cast
-bool does_remove_constt::operator()() const
+std::pair<bool, source_locationt> does_remove_constt::operator()() const
 {
   for(const goto_programt::instructiont &instruction :
     goto_program.instructions)
@@ -49,16 +49,16 @@ bool does_remove_constt::operator()() const
     // const that the lhs
     if(!does_type_preserve_const_correctness(&lhs_type, &rhs_type))
     {
-      return true;
+      return {true, assign.find_source_location()};
     }
 
     if(does_expr_lose_const(assign.rhs()))
     {
-      return true;
+      return {true, assign.rhs().find_source_location()};
     }
   }
 
-  return false;
+  return {false, source_locationt()};
 }
 
 /// Search the expression tree to look for any children that have the same base

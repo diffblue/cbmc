@@ -285,9 +285,11 @@ void remove_function_pointerst::remove_function_pointer(
   const exprt &pointer=function.op0();
   remove_const_function_pointerst::functionst functions;
   does_remove_constt const_removal_check(goto_program, ns);
-  if(const_removal_check())
+  const auto does_remove_const = const_removal_check();
+  if(does_remove_const.first)
   {
-    warning() << "Cast from const to non-const pointer found, only worst case"
+    warning().source_location = does_remove_const.second;
+    warning() << "cast from const to non-const pointer found, only worst case"
               << " function pointer removal will be done." << eom;
     found_functions=false;
   }
