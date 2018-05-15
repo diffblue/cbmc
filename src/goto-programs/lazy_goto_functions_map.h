@@ -54,6 +54,15 @@ public:
       goto_functionst::goto_functiont &function,
       journalling_symbol_tablet &function_symbols)>
     post_process_functiont;
+  typedef std::function<bool(const irep_idt &name)>
+    can_generate_function_bodyt;
+  typedef std::function<
+    bool(
+      const irep_idt &function_name,
+      symbol_table_baset &symbol_table,
+      goto_functiont &function,
+      bool body_available)>
+    generate_function_bodyt;
 
 private:
   typedef std::map<key_type, goto_functiont> underlying_mapt;
@@ -66,6 +75,8 @@ private:
   language_filest &language_files;
   symbol_tablet &symbol_table;
   const post_process_functiont post_process_function;
+  const can_generate_function_bodyt driver_program_can_generate_function_body;
+  const generate_function_bodyt driver_program_generate_function_body;
   message_handlert &message_handler;
 
 public:
@@ -75,11 +86,17 @@ public:
     language_filest &language_files,
     symbol_tablet &symbol_table,
     post_process_functiont post_process_function,
+    can_generate_function_bodyt driver_program_can_generate_function_body,
+    generate_function_bodyt driver_program_generate_function_body,
     message_handlert &message_handler)
   : goto_functions(goto_functions),
     language_files(language_files),
     symbol_table(symbol_table),
-    post_process_function(std::move(post_process_function)),
+    post_process_function(post_process_function),
+    driver_program_can_generate_function_body(
+      driver_program_can_generate_function_body),
+    driver_program_generate_function_body(
+      driver_program_generate_function_body),
     message_handler(message_handler)
   {
   }
@@ -107,7 +124,9 @@ public:
   ///   it a bodyless stub.
   bool can_produce_function(const key_type &name) const
   {
-    return language_files.can_convert_lazy_method(name);
+    return
+      language_files.can_convert_lazy_method(name) ||
+      driver_program_can_generate_function_body(name);
   }
 
   void unload(const key_type &name) const { goto_functions.erase(name); }
@@ -153,14 +172,30 @@ private:
     underlying_mapt::iterator it=goto_functions.find(name);
     if(it!=goto_functions.end())
       return *it;
-    // Fill in symbol table entry body if not already done
-    // If this returns false then it's a stub
-    language_files.convert_lazy_method(name, function_symbol_table);
-    // Create goto_functiont
-    goto_functionst::goto_functiont function;
-    goto_convert_functionst convert_functions(
-      function_symbol_table, message_handler);
-    convert_functions.convert_function(name, function);
+
+    goto_functiont function;
+
+    // First chance: see if the driver program wants to provide a replacement:
+    bool body_provided =
+      driver_program_generate_function_body(
+        name,
+        function_symbol_table,
+        function,
+        language_files.can_convert_lazy_method(name));
+
+    // Second chance: see if language_filest can provide a body:
+    if(!body_provided)
+    {
+      // Fill in symbol table entry body if not already done
+      language_files.convert_lazy_method(name, function_symbol_table);
+      body_provided = function_symbol_table.lookup_ref(name).value.is_not_nil();
+
+      // Create goto_functiont
+      goto_convert_functionst convert_functions(
+        function_symbol_table, message_handler);
+      convert_functions.convert_function(name, function);
+    }
+
     // Add to map
     return *goto_functions.emplace(name, std::move(function)).first;
   }

@@ -48,6 +48,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-instrument/reachability_slicer.h>
 #include <goto-instrument/nondet_static.h>
 
+#include <linking/static_lifetime_init.h>
+
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <langapi/mode.h>
@@ -58,6 +60,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/remove_instanceof.h>
 #include <java_bytecode/remove_java_new.h>
 #include <java_bytecode/replace_java_nondet.h>
+#include <java_bytecode/simple_method_stubbing.h>
 
 #include <cbmc/version.h>
 
@@ -522,6 +525,21 @@ int jbmc_parse_optionst::doit()
     };
   }
 
+  object_factory_params.max_nondet_array_length =
+    cmdline.isset("java-max-input-array-length")
+      ? std::stoul(cmdline.get_value("java-max-input-array-length"))
+      : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
+  object_factory_params.max_nondet_string_length =
+    cmdline.isset("string-max-input-length")
+      ? std::stoul(cmdline.get_value("string-max-input-length"))
+      : MAX_NONDET_STRING_LENGTH;
+  object_factory_params.max_nondet_tree_depth =
+    cmdline.isset("java-max-input-tree-depth")
+      ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
+      : MAX_NONDET_TREE_DEPTH;
+
+  stub_objects_are_not_null = cmdline.isset("java-assume-inputs-non-null");
+
   if(!cmdline.isset("symex-driven-lazy-loading"))
   {
     std::unique_ptr<goto_modelt> goto_model_ptr;
@@ -757,23 +775,11 @@ void jbmc_parse_optionst::process_goto_function(
     replace_java_nondet(function);
 
     // Similar removal of java nondet statements:
-    // TODO Should really get this from java_bytecode_language somehow, but we
-    // don't have an instance of that here.
-    object_factory_parameterst factory_params;
-    factory_params.max_nondet_array_length=
-      cmdline.isset("java-max-input-array-length")
-        ? std::stoul(cmdline.get_value("java-max-input-array-length"))
-        : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
-    factory_params.max_nondet_string_length=
-      cmdline.isset("string-max-input-length")
-        ? std::stoul(cmdline.get_value("string-max-input-length"))
-        : MAX_NONDET_STRING_LENGTH;
-    factory_params.max_nondet_tree_depth=
-      cmdline.isset("java-max-input-tree-depth")
-        ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
-        : MAX_NONDET_TREE_DEPTH;
-
-    convert_nondet(function, get_message_handler(), factory_params, ID_java);
+    convert_nondet(
+      function,
+      get_message_handler(),
+      object_factory_params,
+      ID_java);
 
     // add generic checks
     goto_check(ns, options, ID_java, function.get_goto_function());
@@ -1010,6 +1016,48 @@ bool jbmc_parse_optionst::process_goto_functions(
   }
 
   return false;
+}
+
+bool jbmc_parse_optionst::can_generate_function_body(const irep_idt &name)
+{
+  static const irep_idt initialize_id = INITIALIZE_FUNCTION;
+
+  return name != goto_functionst::entry_point() && name != initialize_id;
+}
+
+bool jbmc_parse_optionst::generate_function_body(
+  const irep_idt &function_name,
+  symbol_table_baset &symbol_table,
+  goto_functiont &function,
+  bool body_available)
+{
+  // Provide a simple stub implementation for any function we don't have a
+  // bytecode implementation for:
+
+  if(body_available)
+    return false;
+
+  if(!can_generate_function_body(function_name))
+    return false;
+
+  if(symbol_table.lookup_ref(function_name).mode == ID_java)
+  {
+    java_generate_simple_method_stub(
+      function_name,
+      symbol_table,
+      stub_objects_are_not_null,
+      object_factory_params,
+      get_message_handler());
+
+    goto_convert_functionst converter(symbol_table, get_message_handler());
+    converter.convert_function(function_name, function);
+
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 /// display command line help

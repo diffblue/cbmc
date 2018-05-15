@@ -97,6 +97,8 @@ symbol_tablet load_java_class(
   lazy_goto_modelt lazy_goto_model(
     [] (goto_model_functiont &function, const abstract_goto_modelt &model) { }, // NOLINT (*)
     [] (goto_modelt &goto_model) { return false; }, // NOLINT (*)
+    [] (const irep_idt &name) { return false; },
+    [] (const irep_idt &function_name, symbol_table_baset &symbol_table, goto_functiont &function, bool body_available) { return false; }, // NOLINT (*)
     message_handler);
 
   // Configure the path loading

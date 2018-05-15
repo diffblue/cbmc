@@ -102,10 +102,20 @@ public:
     const optionst &);
   bool process_goto_functions(goto_modelt &goto_model, const optionst &options);
 
+  bool can_generate_function_body(const irep_idt &name);
+
+  bool generate_function_body(
+    const irep_idt &function_name,
+    symbol_table_baset &symbol_table,
+    goto_functiont &function,
+    bool body_available);
+
 protected:
   ui_message_handlert ui_message_handler;
   std::unique_ptr<cover_configt> cover_config;
   path_strategy_choosert path_strategy_chooser;
+  object_factory_parameterst object_factory_params;
+  bool stub_objects_are_not_null;
 
   void eval_verbosity();
   void get_command_line_options(optionst &);

@@ -24,10 +24,16 @@ public:
     void(goto_model_functiont &function, const abstract_goto_modelt &)>
     post_process_functiont;
   typedef std::function<bool(goto_modelt &goto_model)> post_process_functionst;
+  typedef lazy_goto_functions_mapt::can_generate_function_bodyt
+    can_generate_function_bodyt;
+  typedef lazy_goto_functions_mapt::generate_function_bodyt
+    generate_function_bodyt;
 
   explicit lazy_goto_modelt(
     post_process_functiont post_process_function,
     post_process_functionst post_process_functions,
+    can_generate_function_bodyt driver_program_can_generate_function_body,
+    generate_function_bodyt driver_program_generate_function_body,
     message_handlert &message_handler);
 
   lazy_goto_modelt(lazy_goto_modelt &&other);
@@ -59,6 +65,19 @@ public:
       },
       [&handler, &options](goto_modelt &goto_model) -> bool {
         return handler.process_goto_functions(goto_model, options);
+      },
+      [&handler](const irep_idt &name) -> bool {
+        return handler.can_generate_function_body(name);
+      },
+      [&handler]
+      (const irep_idt &function_name,
+       symbol_table_baset &symbol_table,
+       goto_functiont &function,
+       bool is_first_chance)
+      {
+        return
+          handler.generate_function_body(
+            function_name, symbol_table, function, is_first_chance);
       },
       message_handler);
   }
@@ -127,6 +146,8 @@ private:
   // Function/module processing functions
   const post_process_functiont post_process_function;
   const post_process_functionst post_process_functions;
+  const can_generate_function_bodyt driver_program_can_generate_function_body;
+  const generate_function_bodyt driver_program_generate_function_body;
 
   /// Logging helper field
   message_handlert &message_handler;
