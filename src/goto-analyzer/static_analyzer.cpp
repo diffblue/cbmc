@@ -153,10 +153,9 @@ void static_analyzert::json_report(const std::string &file_name)
       else
         j["status"]=json_stringt("UNKNOWN");
 
-      j["file"]=json_stringt(id2string(i_it->source_location.get_file()));
+      j["file"] = json_stringt(i_it->source_location.get_file());
       j["line"]=json_numbert(id2string(i_it->source_location.get_line()));
-      j["description"]=json_stringt(id2string(
-        i_it->source_location.get_comment()));
+      j["description"] = json_stringt(i_it->source_location.get_comment());
     }
   }
 

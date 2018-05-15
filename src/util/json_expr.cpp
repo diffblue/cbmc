@@ -85,24 +85,22 @@ json_objectt json(const source_locationt &location)
   json_objectt result;
 
   if(!location.get_working_directory().empty())
-    result["workingDirectory"]=
-      json_stringt(id2string(location.get_working_directory()));
+    result["workingDirectory"] = json_stringt(location.get_working_directory());
 
   if(!location.get_file().empty())
-    result["file"]=json_stringt(id2string(location.get_file()));
+    result["file"] = json_stringt(location.get_file());
 
   if(!location.get_line().empty())
-    result["line"]=json_stringt(id2string(location.get_line()));
+    result["line"] = json_stringt(location.get_line());
 
   if(!location.get_column().empty())
-    result["column"]=json_stringt(id2string(location.get_column()));
+    result["column"] = json_stringt(location.get_column());
 
   if(!location.get_function().empty())
-    result["function"]=json_stringt(id2string(location.get_function()));
+    result["function"] = json_stringt(location.get_function());
 
   if(!location.get_java_bytecode_index().empty())
-    result["bytecodeIndex"]=
-      json_stringt(id2string(location.get_java_bytecode_index()));
+    result["bytecodeIndex"] = json_stringt(location.get_java_bytecode_index());
 
   return result;
 }
@@ -193,7 +191,7 @@ json_objectt json(
     for(const auto &component : components)
     {
       json_objectt &e=members.push_back().make_object();
-      e["name"]=json_stringt(id2string(component.get_name()));
+      e["name"] = json_stringt(component.get_name());
       e["type"]=json(component.type(), ns, mode);
     }
   }
@@ -206,7 +204,7 @@ json_objectt json(
     for(const auto &component : components)
     {
       json_objectt &e=members.push_back().make_object();
-      e["name"]=json_stringt(id2string(component.get_name()));
+      e["name"] = json_stringt(component.get_name());
       e["type"]=json(component.type(), ns, mode);
     }
   }
@@ -263,7 +261,7 @@ json_objectt json(
       std::size_t width=to_bitvector_type(type).get_width();
 
       result["name"]=json_stringt("integer");
-      result["binary"]=json_stringt(id2string(constant_expr.get_value()));
+      result["binary"] = json_stringt(constant_expr.get_value());
       result["width"]=json_numbert(std::to_string(width));
       result["type"]=json_stringt(type_string);
       result["data"]=json_stringt(value_string);
@@ -271,7 +269,7 @@ json_objectt json(
     else if(type.id()==ID_c_enum)
     {
       result["name"]=json_stringt("integer");
-      result["binary"]=json_stringt(id2string(constant_expr.get_value()));
+      result["binary"] = json_stringt(constant_expr.get_value());
       result["width"]=json_numbert(type.subtype().get_string(ID_width));
       result["type"]=json_stringt("enum");
       result["data"]=json_stringt(value_string);
@@ -286,13 +284,13 @@ json_objectt json(
     else if(type.id()==ID_bv)
     {
       result["name"]=json_stringt("bitvector");
-      result["binary"]=json_stringt(id2string(constant_expr.get_value()));
+      result["binary"] = json_stringt(constant_expr.get_value());
     }
     else if(type.id()==ID_fixedbv)
     {
       result["name"]=json_stringt("fixed");
       result["width"]=json_numbert(type.get_string(ID_width));
-      result["binary"]=json_stringt(id2string(constant_expr.get_value()));
+      result["binary"] = json_stringt(constant_expr.get_value());
       result["data"]=
         json_stringt(fixedbvt(to_constant_expr(expr)).to_ansi_c_string());
     }
@@ -300,7 +298,7 @@ json_objectt json(
     {
       result["name"]=json_stringt("float");
       result["width"]=json_numbert(type.get_string(ID_width));
-      result["binary"]=json_stringt(id2string(constant_expr.get_value()));
+      result["binary"] = json_stringt(constant_expr.get_value());
       result["data"]=
         json_stringt(ieee_floatt(to_constant_expr(expr)).to_ansi_c_string());
     }
@@ -341,7 +339,7 @@ json_objectt json(
     else if(type.id()==ID_string)
     {
       result["name"]=json_stringt("string");
-      result["data"]=json_stringt(id2string(constant_expr.get_value()));
+      result["data"] = json_stringt(constant_expr.get_value());
     }
     else
     {
@@ -381,7 +379,7 @@ json_objectt json(
       {
         json_objectt &e=members.push_back().make_object();
         e["value"]=json(expr.operands()[m], ns, mode);
-        e["name"]=json_stringt(id2string(components[m].get_name()));
+        e["name"] = json_stringt(components[m].get_name());
       }
     }
   }
@@ -392,7 +390,7 @@ json_objectt json(
     const union_exprt &union_expr=to_union_expr(expr);
     json_objectt &e=result["member"].make_object();
     e["value"]=json(union_expr.op(), ns, mode);
-    e["name"]=json_stringt(id2string(union_expr.get_component_name()));
+    e["name"] = json_stringt(union_expr.get_component_name());
   }
   else
     result["name"]=json_stringt("unknown");

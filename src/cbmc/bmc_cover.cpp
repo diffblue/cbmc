@@ -355,7 +355,7 @@ bool bmc_covert::operator()()
 
         json_result["status"] =
           json_stringt(goal.satisfied ? "satisfied" : "failed");
-        json_result["goal"] = json_stringt(id2string(goal_pair.first));
+        json_result["goal"] = json_stringt(goal_pair.first);
         json_result["description"] = json_stringt(goal.description);
 
         if(goal.source_location.is_not_nil())
@@ -382,7 +382,7 @@ bool bmc_covert::operator()()
             if(step.is_input())
             {
               json_objectt json_input;
-              json_input["id"]=json_stringt(id2string(step.io_id));
+              json_input["id"] = json_stringt(step.io_id);
               if(step.io_args.size()==1)
                 json_input["value"]=
                   json(step.io_args.front(), bmc.ns, ID_unknown);
@@ -393,7 +393,7 @@ bool bmc_covert::operator()()
         json_arrayt &goal_refs=result["coveredGoals"].make_array();
         for(const auto &goal_id : test.covered_goals)
         {
-          goal_refs.push_back(json_stringt(id2string(goal_id)));
+          goal_refs.push_back(json_stringt(goal_id));
         }
       }
 
