@@ -52,6 +52,7 @@ SRC += unit_tests.cpp \
        util/optional.cpp \
        util/parameter_indices.cpp \
        util/simplify_expr.cpp \
+       util/small_map.cpp \
        util/small_shared_two_way_ptr.cpp \
        util/string_utils/split_string.cpp \
        util/string_utils/strip_string.cpp \
