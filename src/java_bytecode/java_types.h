@@ -111,6 +111,16 @@ class java_class_typet:public class_typet
     return set(ID_access, access);
   }
 
+  bool get_final()
+  {
+    return get_bool(ID_final);
+  }
+
+  void set_final(bool is_final)
+  {
+    set(ID_final, is_final);
+  }
+
   typedef std::vector<symbol_exprt> java_lambda_method_handlest;
 
   const java_lambda_method_handlest &lambda_method_handles() const

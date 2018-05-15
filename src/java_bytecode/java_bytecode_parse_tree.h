@@ -182,6 +182,7 @@ public:
     bool is_abstract=false;
     bool is_enum=false;
     bool is_public=false, is_protected=false, is_private=false;
+    bool is_final = false;
     bool attribute_bootstrapmethods_read = false;
     size_t enum_elements=0;
 
