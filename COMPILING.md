@@ -28,6 +28,17 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    yum install gcc gcc-c++ flex bison perl-libwww-perl patch devtoolset-6 java-1.7.0-openjdk-devel
    ```
    Note that you need g++ version 4.9 or newer.
+
+   To compile JBMC, you additionally need the JDK:
+   On Debian-like distributions, do
+   ```
+   apt-get install openjdk-7-jdk
+   ```
+   On Red Hat/Fedora or derivates, do
+   ```
+   yum install java-1.7.0-openjdk-devel
+   ```
+
 2. As a user, get the CBMC source via
    ```
    git clone https://github.com/diffblue/cbmc cbmc-git
@@ -93,7 +104,11 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
    pkg install bash gmake git www/p5-libwww patch flex bison openjdk
    ```
-2. As a user, get the CBMC source via
+   To compile JBMC, additionally install
+   ```
+   pkg install openjdk
+   ```
+ 2. As a user, get the CBMC source via
    ```
    git clone https://github.com/diffblue/cbmc cbmc-git
    ```
@@ -183,14 +198,14 @@ require manual modification of build files.
 1. Ensure you have all the build dependencies installed. Build dependencies are
    the same as for the makefile build, but with the addition of CMake version
    3.2 or higher. The installed CMake version can be queried with `cmake
-   --version`. To install all build dependencies:
+   --version`. To install cmake:
    - On Debian-like distributions, do
      ```
-     apt-get install cmake g++ gcc flex bison make git libwww-perl patch openjdk-7-jdk
+     apt-get install cmake
      ```
    - On Red Hat/Fedora or derivates, do
      ```
-     yum install cmake gcc gcc-c++ flex bison perl-libwww-perl patch devtoolset-6 java-1.7.0-openjdk-devel
+     yum install cmake
      ```
    - On macOS, do
      ```
