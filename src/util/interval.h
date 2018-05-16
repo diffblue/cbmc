@@ -21,12 +21,7 @@
 #include <ostream>
 #include <sstream>
 
-/*
- *
- * Upper set = Specific max (otherwise INF)
- * Lower set = Specific min (otherwise INF)
- */
-
+/// +∞ upper bound for intervals
 class max_exprt : public exprt
 {
 public:
@@ -39,6 +34,7 @@ public:
   }
 };
 
+/// -∞ upper bound for intervals
 class min_exprt : public exprt
 {
 public:
@@ -51,13 +47,19 @@ public:
   }
 };
 
+/// Represents an interval of values.
+/// Bounds should be constant expressions
+/// or min_exprt for the lower bound
+/// or max_exprt for the upper bound
+/// Also, lower bound should always be <= upper bound
 class constant_interval_exprt : public binary_exprt
 {
 public:
-  constant_interval_exprt(exprt lower, exprt upper, typet type)
+  constant_interval_exprt(const exprt &lower, const exprt &upper, typet type)
     : binary_exprt(lower, ID_constant_interval, upper, type)
   {
-    PRECONDITION(lower.type() == upper.type() && type == lower.type());
+    PRECONDITION(type == upper.type());
+    PRECONDITION(type == lower.type());
   }
 
   constant_interval_exprt()
@@ -73,7 +75,7 @@ public:
   {
   }
 
-  constant_interval_exprt(const typet type)
+  explicit constant_interval_exprt(const typet &type)
     : constant_interval_exprt(min_exprt(type), max_exprt(type), type)
   {
   }
