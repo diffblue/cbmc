@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/json.h>
 
 int yyjsonparse();
+void yyjsonrestart(FILE *input_file);
 
 class json_parsert:public parsert
 {
@@ -46,6 +47,7 @@ public:
   virtual void clear() override
   {
     stack=stackt();
+    yyjsonrestart(nullptr);
   }
 };
 
