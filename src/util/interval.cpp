@@ -43,7 +43,7 @@ constant_interval_exprt constant_interval_exprt::unary_minus() const
 {
   if(is_single_value_interval())
   {
-    handle_constants(unary_minus_exprt());
+    handle_constant_unary_expression(ID_unary_minus);
   }
 
   exprt lower;
@@ -75,7 +75,7 @@ constant_interval_exprt::plus(const constant_interval_exprt &o) const
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constants(o, plus_exprt());
+    handle_constant_binary_expression(o, ID_plus);
   }
 
   exprt lower = min();
@@ -121,7 +121,7 @@ constant_interval_exprt::multiply(const constant_interval_exprt &o) const
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constants(o, mult_exprt());
+    handle_constant_binary_expression(o, ID_mult);
   }
 
   return get_extremes(*this, o, ID_mult);
@@ -132,7 +132,7 @@ constant_interval_exprt::divide(const constant_interval_exprt &o) const
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constants(o, div_exprt());
+    handle_constant_binary_expression(o, ID_div);
   }
 
   // If other might be division by zero, set everything to top.
@@ -151,7 +151,7 @@ constant_interval_exprt::modulo(const constant_interval_exprt &o) const
 
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constants(o, mod_exprt());
+    handle_constant_binary_expression(o, ID_mod);
   }
 
   if(o.is_bottom())
@@ -270,7 +270,7 @@ constant_interval_exprt::left_shift(const constant_interval_exprt &o) const
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constants(o, shl_exprt());
+    handle_constant_binary_expression(o, ID_shl);
   }
 
   if(is_negative(o.get_lower()))
@@ -287,7 +287,7 @@ constant_interval_exprt::right_shift(const constant_interval_exprt &o) const
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constants(o, ashr_exprt());
+    handle_constant_binary_expression(o, ID_ashr);
   }
 
   if(is_negative(o.get_lower()))
@@ -303,7 +303,7 @@ constant_interval_exprt::bitwise_xor(const constant_interval_exprt &o) const
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constants(o, bitxor_exprt());
+    handle_constant_binary_expression(o, ID_bitxor);
   }
 
   return top();
@@ -314,7 +314,7 @@ constant_interval_exprt::bitwise_or(const constant_interval_exprt &o) const
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constants(o, bitor_exprt());
+    handle_constant_binary_expression(o, ID_bitor);
   }
 
   return top();
@@ -325,7 +325,7 @@ constant_interval_exprt::bitwise_and(const constant_interval_exprt &o) const
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constants(o, bitand_exprt());
+    handle_constant_binary_expression(o, ID_bitand);
   }
 
   return top();
@@ -335,7 +335,7 @@ constant_interval_exprt constant_interval_exprt::bitwise_not() const
 {
   if(is_single_value_interval())
   {
-    handle_constants(bitnot_exprt());
+    handle_constant_unary_expression(ID_bitnot);
   }
 
   return top();
@@ -961,31 +961,25 @@ exprt constant_interval_exprt::generate_shift_expression(
 }
 
 constant_interval_exprt
-constant_interval_exprt::handle_constants(exprt expr) const
+constant_interval_exprt::handle_constant_unary_expression(
+  const irep_idt &op) const
 {
   if(is_single_value_interval())
   {
-    expr.type() = type();
-    expr.copy_to_operands(get_lower());
-
+    auto expr = unary_exprt(op, get_lower());
     return constant_interval_exprt(simplified_expr(expr));
   }
-
   return top();
 }
 
-constant_interval_exprt constant_interval_exprt::handle_constants(
-  const constant_interval_exprt &o,
-  exprt expr) const
+constant_interval_exprt
+constant_interval_exprt::handle_constant_binary_expression(
+  const constant_interval_exprt &other,
+  const irep_idt &op) const
 {
-  if(is_single_value_interval() && o.is_single_value_interval())
-  {
-    expr.type() = type();
-    expr.copy_to_operands(get_lower(), o.get_lower());
-    return constant_interval_exprt(simplified_expr(expr));
-  }
-
-  return top();
+  PRECONDITION(is_single_value_interval() && other.is_single_value_interval());
+  auto expr = binary_exprt(get_lower(), op, other.get_lower());
+  return constant_interval_exprt(simplified_expr(expr));
 }
 
 exprt constant_interval_exprt::get_max(const exprt &a, const exprt &b)

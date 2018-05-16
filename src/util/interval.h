@@ -97,9 +97,11 @@ public:
   const exprt &get_upper() const;
 
   /** SET OF ARITHMETIC OPERATORS */
-  constant_interval_exprt handle_constants(exprt expr) const;
   constant_interval_exprt
-  handle_constants(const constant_interval_exprt &o, exprt expr) const;
+  handle_constant_unary_expression(const irep_idt &op) const;
+  constant_interval_exprt handle_constant_binary_expression(
+    const constant_interval_exprt &other,
+    const irep_idt &) const;
 
   constant_interval_exprt eval(const irep_idt &unary_operator);
   constant_interval_exprt
@@ -122,7 +124,7 @@ public:
 
   /* Binary */
   constant_interval_exprt plus(const constant_interval_exprt &o) const;
-  constant_interval_exprt minus(const constant_interval_exprt &o) const;
+  constant_interval_exprt minus(const constant_interval_exprt &other) const;
   constant_interval_exprt multiply(const constant_interval_exprt &o) const;
   constant_interval_exprt divide(const constant_interval_exprt &o) const;
   constant_interval_exprt modulo(const constant_interval_exprt &o) const;
