@@ -105,15 +105,16 @@ constant_interval_exprt constant_interval_exprt::plus(const constant_interval_ex
   return simplified_interval(lower, upper);
 }
 
-constant_interval_exprt constant_interval_exprt::minus(const constant_interval_exprt &o) const
+constant_interval_exprt constant_interval_exprt::minus(const constant_interval_exprt &other) const
 {
-  if(o.is_single_value_interval() && is_single_value_interval())
+  if(other.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constants(o, minus_exprt());
+    handle_constant_binary_expression(other, ID_minus);
   }
 
-  // e.g. [t.u - o.l, t.l - o.u]
-  return plus(o.unary_minus().swap());
+  // FIXME This is nonsense if the interval type is unsigned int
+  // [this.lower - other.upper, this.upper - other.lower]
+  return plus(other.unary_minus());
 }
 
 constant_interval_exprt constant_interval_exprt::multiply(const constant_interval_exprt &o) const
@@ -1051,16 +1052,6 @@ constant_interval_exprt constant_interval_exprt::top() const
 constant_interval_exprt constant_interval_exprt::bottom() const
 {
   return bottom(type());
-}
-
-constant_interval_exprt constant_interval_exprt::swap(constant_interval_exprt &i)
-{
-  return constant_interval_exprt(i.get_upper(), i.get_lower());
-}
-
-const constant_interval_exprt constant_interval_exprt::swap() const
-{
-  return constant_interval_exprt(get_lower(), get_upper());
 }
 
 /* Helpers */
