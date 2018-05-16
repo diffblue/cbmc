@@ -9,8 +9,8 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 /// \file
 /// Convert side_effect_expr_nondett expressions
 
-#ifndef CPROVER_GOTO_PROGRAMS_CONVERT_NONDET_H
-#define CPROVER_GOTO_PROGRAMS_CONVERT_NONDET_H
+#ifndef CPROVER_JAVA_BYTECODE_CONVERT_NONDET_H
+#define CPROVER_JAVA_BYTECODE_CONVERT_NONDET_H
 
 #include <cstddef> // size_t
 #include <util/irep.h>
@@ -52,4 +52,4 @@ void convert_nondet(
   const object_factory_parameterst &object_factory_parameters,
   const irep_idt &mode);
 
-#endif
+#endif // CPROVER_JAVA_BYTECODE_CONVERT_NONDET_H
