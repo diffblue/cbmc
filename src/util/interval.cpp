@@ -207,7 +207,6 @@ const constant_interval_exprt constant_interval_exprt::modulo(const constant_int
   return constant_interval_exprt(lower, upper);
 }
 
-
 const tvt constant_interval_exprt::is_definitely_true() const
 {
   // tvt not
@@ -246,9 +245,8 @@ const tvt constant_interval_exprt::logical_and(const constant_interval_exprt& o)
 const tvt constant_interval_exprt::logical_xor(const constant_interval_exprt& o) const
 {
   return (
-      (is_definitely_true() && !o.is_definitely_true()) ||
-      (!is_definitely_true() && o.is_definitely_true())
-  );
+    (is_definitely_true() && !o.is_definitely_true()) ||
+    (!is_definitely_true() && o.is_definitely_true()));
 }
 
 const tvt constant_interval_exprt::logical_not() const
@@ -806,8 +804,9 @@ const constant_interval_exprt constant_interval_exprt::eval(const irep_idt &id)
   return top();
 }
 
-const constant_interval_exprt constant_interval_exprt::eval(const irep_idt &binary_operator,
-                                                            const constant_interval_exprt &other)
+const constant_interval_exprt constant_interval_exprt::eval(
+  const irep_idt &binary_operator,
+  const constant_interval_exprt &other)
 {
   if(binary_operator == ID_plus)
   {
@@ -1721,7 +1720,8 @@ bool constant_interval_exprt::is_empty(const constant_interval_exprt &a)
   return a.is_empty();
 }
 
-bool constant_interval_exprt::is_single_value_interval(const constant_interval_exprt &a)
+bool constant_interval_exprt::is_single_value_interval(
+  const constant_interval_exprt &a)
 {
   return a.is_single_value_interval();
 }
