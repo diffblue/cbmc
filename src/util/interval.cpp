@@ -1493,56 +1493,62 @@ bool constant_interval_exprt::contains(
 std::string constant_interval_exprt::to_string() const
 {
   std::stringstream out;
-
-  out << dstringt("[");
-
-  if(!is_min())
-  {
-    if(is_bitvector(get_lower()))
-    {
-      out << binary2integer(get_lower().get(ID_value).c_str(), 2);
-    }
-    else
-    {
-      out << get_lower().get(ID_value);
-    }
-  }
-  else
-  {
-    if(is_signed(get_lower()))
-    {
-      out << dstringt("MIN");
-    }
-    else
-    {
-      out << dstringt("0");
-    }
-  }
-
-  out << dstringt(",");
-
-  if(!is_max())
-  {
-    if(is_bitvector(get_upper()))
-    {
-      out << binary2integer(get_upper().get(ID_value).c_str(), 2);
-    }
-    else
-    {
-      out << get_upper().get(ID_value);
-    }
-  }
-  else
-    out << dstringt("MAX");
-
-  out << dstringt("]");
-
+  out << *this;
   return out.str();
 }
 
 std::ostream &operator<<(std::ostream &out, const constant_interval_exprt &i)
 {
-  out << i.to_string();
+  out << "[";
+
+  if(!i.is_min())
+  {
+    // FIXME Not everything that's a bitvector is also an integer
+    if(i.is_bitvector(i.get_lower()))
+    {
+      out << binary2integer(
+        id2string(i.get_lower().get(ID_value)), i.is_signed());
+    }
+    else
+    {
+      // TODO handle floating point numbers?
+      out << i.get_lower().get(ID_value);
+    }
+  }
+  else
+  {
+    if(i.is_signed(i.get_lower()))
+    {
+      out << "MIN";
+    }
+    else
+    {
+      // FIXME Extremely sketchy, the opposite of
+      // FIXME "signed" isn't "unsigned" but
+      // FIXME "literally anything else"
+      out << "0";
+    }
+  }
+
+  out << ",";
+
+  // FIXME See comments on is_min
+  if(!i.is_max())
+  {
+    if(i.is_bitvector(i.get_upper()))
+    {
+      out << binary2integer(
+        id2string(i.get_upper().get(ID_value)), i.is_signed());
+    }
+    else
+    {
+      out << i.get_upper().get(ID_value);
+    }
+  }
+  else
+    out << "MAX";
+
+  out << "]";
 
   return out;
 }
