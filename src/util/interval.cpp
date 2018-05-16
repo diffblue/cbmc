@@ -807,10 +807,8 @@ exprt constant_interval_exprt::generate_modulo_expression(
   return simplified_expr(operation);
 }
 
-const constant_interval_exprt constant_interval_exprt::eval(const exprt &expr)
+const constant_interval_exprt constant_interval_exprt::eval(const irep_idt &id)
 {
-  const irep_idt &id = expr.id();
-
   if(id == ID_unary_plus)
   {
     return unary_plus();
@@ -833,86 +831,84 @@ const constant_interval_exprt constant_interval_exprt::eval(const exprt &expr)
 }
 
 const constant_interval_exprt constant_interval_exprt::eval(
-  const exprt &expr,
-  const constant_interval_exprt &o)
+  const irep_idt &binary_operator,
+  const constant_interval_exprt &other)
 {
-  const irep_idt &id = expr.id();
-
-  if(id == ID_plus)
+  if(binary_operator == ID_plus)
   {
-    return plus(o);
+    return plus(other);
   }
-  if(id == ID_minus)
+  if(binary_operator == ID_minus)
   {
-    return unary_minus(o);
+    return unary_minus(other);
   }
-  if(id == ID_mult)
+  if(binary_operator == ID_mult)
   {
-    return multiply(o);
+    return multiply(other);
   }
-  if(id == ID_div)
+  if(binary_operator == ID_div)
   {
-    return divide(o);
+    return divide(other);
   }
-  if(id == ID_mod)
+  if(binary_operator == ID_mod)
   {
-    return modulo(o);
+    return modulo(other);
   }
-  if(id == ID_shl)
+  if(binary_operator == ID_shl)
   {
-    return left_shift(o);
+    return left_shift(other);
   }
-  if(id == ID_ashr)
+  if(binary_operator == ID_ashr)
   {
-    return right_shift(o);
+    return right_shift(other);
   }
-  if(id == ID_bitor)
+  if(binary_operator == ID_bitor)
   {
-    return bitwise_or(o);
+    return bitwise_or(other);
   }
-  if(id == ID_bitand)
+  if(binary_operator == ID_bitand)
   {
-    return bitwise_and(o);
+    return bitwise_and(other);
   }
-  if(id == ID_bitxor)
+  if(binary_operator == ID_bitxor)
   {
-    return bitwise_xor(o);
+    return bitwise_xor(other);
   }
-  if(id == ID_lt)
+  if(binary_operator == ID_lt)
   {
-    return tv_to_interval(less_than(o));
+    return tv_to_interval(less_than(other));
   }
-  if(id == ID_le)
+  if(binary_operator == ID_le)
   {
-    return tv_to_interval(less_than_or_equal(o));
+    return tv_to_interval(less_than_or_equal(other));
   }
-  if(id == ID_gt)
+  if(binary_operator == ID_gt)
   {
-    return tv_to_interval(greater_than(o));
+    return tv_to_interval(greater_than(other));
   }
-  if(id == ID_ge)
+  if(binary_operator == ID_ge)
   {
-    return tv_to_interval(greater_than_or_equal(o));
+    return tv_to_interval(greater_than_or_equal(other));
   }
-  if(id == ID_equal)
+  if(binary_operator == ID_equal)
   {
-    return tv_to_interval(equal(o));
+    return tv_to_interval(equal(other));
   }
-  if(id == ID_notequal)
+  if(binary_operator == ID_notequal)
   {
-    return tv_to_interval(not_equal(o));
+    return tv_to_interval(not_equal(other));
   }
-  if(id == ID_and)
+  if(binary_operator == ID_and)
   {
-    return tv_to_interval(logical_and(o));
+    return tv_to_interval(logical_and(other));
   }
-  if(id == ID_or)
+  if(binary_operator == ID_or)
   {
-    return tv_to_interval(logical_or(o));
+    return tv_to_interval(logical_or(other));
   }
-  if(id == ID_xor)
+  if(binary_operator == ID_xor)
   {
-    return tv_to_interval(logical_xor(o));
+    return tv_to_interval(logical_xor(other));
   }
 
   return top();
