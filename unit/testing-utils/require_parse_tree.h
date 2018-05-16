@@ -9,8 +9,8 @@
 /// \file
 /// Utilties for inspecting java_parse_treet
 
-#ifndef CPROVER_TESTING_UTILS_REQUIRE_PARSE_TREE_H
-#define CPROVER_TESTING_UTILS_REQUIRE_PARSE_TREE_H
+#ifndef CPROVER_JAVA_TESTING_UTILS_REQUIRE_PARSE_TREE_H
+#define CPROVER_JAVA_TESTING_UTILS_REQUIRE_PARSE_TREE_H
 
 #include <java_bytecode/java_bytecode_parse_tree.h>
 #include "catch.hpp"
@@ -57,4 +57,4 @@ void require_instructions_match_expectation(
   const java_bytecode_parse_treet::methodt::instructionst instructions);
 }
 
-#endif //CPROVER_TESTING_UTILS_REQUIRE_PARSE_TREE_H
+#endif // CPROVER_JAVA_TESTING_UTILS_REQUIRE_PARSE_TREE_H

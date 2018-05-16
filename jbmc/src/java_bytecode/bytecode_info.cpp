@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bytecode_info.h"
 
+// clang-format off
 struct bytecode_infot const bytecode_info[]=
 {
 { "aaload",         0x32, ' ', 2, 1, ' ' }, // arrayref, index → value; load onto the stack a reference from an array  NOLINT(*)
@@ -221,3 +222,4 @@ struct bytecode_infot const bytecode_info[]=
 { "wide",           0xc4, ' ', 0, 0, ' ' }, // modifier for others  NOLINT(*)
 { nullptr,          0x00, '\0',0, 0, '\0'}, // zero-initialized NOLINT (*)
 };
+// clang-format on

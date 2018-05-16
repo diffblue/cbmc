@@ -5,7 +5,8 @@
 SRC = converter.cpp
 
 include ../../config.inc
-include ../../common
+include ../../$(CPROVER_DIR)/src/config.inc
+include ../../$(CPROVER_DIR)/src/common
 
 SOURCE_DIR := src
 BINARY_DIR := classes

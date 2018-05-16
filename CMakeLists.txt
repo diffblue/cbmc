@@ -35,6 +35,7 @@ set(sat_impl "minisat2" CACHE STRING
 )
 
 add_subdirectory(src)
+add_subdirectory(jbmc)
 
 if(${enable_cbmc_tests})
     enable_testing()
@@ -80,6 +81,13 @@ set_target_properties(
     unit
     util
     xml
+
+    java_bytecode
+    jbmc
+    jbmc-lib
+    java-testing-utils
+    java-unit
+    miniz
 
     PROPERTIES
     CXX_STANDARD 11

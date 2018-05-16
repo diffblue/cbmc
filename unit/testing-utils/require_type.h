@@ -12,8 +12,8 @@
 /// Also checks associated properties and returns a casted version of the
 /// expression.
 
-#ifndef CPROVER_TESTING_UTILS_REQUIRE_TYPE_H
-#define CPROVER_TESTING_UTILS_REQUIRE_TYPE_H
+#ifndef CPROVER_JAVA_TESTING_UTILS_REQUIRE_TYPE_H
+#define CPROVER_JAVA_TESTING_UTILS_REQUIRE_TYPE_H
 
 #include <util/optional.h>
 #include <util/std_types.h>
@@ -124,4 +124,4 @@ java_lambda_method_handlest require_lambda_method_handles(
   const std::vector<std::string> &expected_identifiers);
 }
 
-#endif // CPROVER_TESTING_UTILS_REQUIRE_TYPE_H
+#endif // CPROVER_JAVA_TESTING_UTILS_REQUIRE_TYPE_H

@@ -27,7 +27,6 @@ OBJ += ../big-int/big-int$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
-      ../miniz/miniz$(OBJEXT) \
       ../json/json$(LIBEXT)
 
 INCLUDES= -I ..

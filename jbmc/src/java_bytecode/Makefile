@@ -41,10 +41,11 @@ SRC = bytecode_info.cpp \
       simple_method_stubbing.cpp \
       # Empty last line
 
-INCLUDES= -I ..
+INCLUDES= -I .. -I ../$(CPROVER_DIR)/src
 
 include ../config.inc
-include ../common
+include ../$(CPROVER_DIR)/src/config.inc
+include ../$(CPROVER_DIR)/src/common
 
 CLEANFILES = java_bytecode$(LIBEXT)
 

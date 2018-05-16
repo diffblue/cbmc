@@ -9,7 +9,6 @@ SRC = change_impact.cpp \
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
-      ../java_bytecode/java_bytecode$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
@@ -31,8 +30,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../util/util$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
-      ../miniz/miniz$(OBJEXT) \
-      ../json/json$(LIBEXT)
+      ../json/json$(LIBEXT) \
+      # Empty last line
 
 INCLUDES= -I ..
 

@@ -51,10 +51,6 @@ Author: Peter Schrammel
 
 #include <pointer-analysis/add_failed_symbols.h>
 
-#include <java_bytecode/java_bytecode_language.h>
-#include <java_bytecode/remove_instanceof.h>
-#include <java_bytecode/remove_exceptions.h>
-
 #include <langapi/mode.h>
 
 #include <cbmc/version.h>
@@ -420,13 +416,6 @@ bool goto_diff_parse_optionst::process_goto_program(
     remove_function_pointers(
       get_message_handler(), goto_model, cmdline.isset("pointer-check"));
 
-    // Java virtual functions -> explicit dispatch tables:
-    remove_virtual_functions(goto_model);
-    // remove catch and throw
-    remove_exceptions(goto_model);
-    // Java instanceof -> clsid comparison:
-    remove_instanceof(goto_model);
-
     mm_io(goto_model);
 
     // instrument library preconditions
@@ -532,8 +521,6 @@ void goto_diff_parse_optionst::help()
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
     " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
-    "Java Bytecode frontend options:\n"
-    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     "Other options:\n"
     " --version                    show version and exit\n"
     " --json-ui                    use JSON-formatted output\n"

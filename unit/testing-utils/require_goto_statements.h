@@ -18,8 +18,8 @@
 
 #include <regex>
 
-#ifndef CPROVER_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H
-#define CPROVER_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H
+#ifndef CPROVER_JAVA_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H
+#define CPROVER_JAVA_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H
 
 // NOLINTNEXTLINE(readability/namespace)
 namespace require_goto_statements
@@ -101,4 +101,4 @@ std::vector<code_function_callt> find_function_calls(
   const irep_idt &function_call_identifier);
 }
 
-#endif // CPROVER_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H
+#endif // CPROVER_JAVA_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H

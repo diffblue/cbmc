@@ -11,6 +11,7 @@ target_link_libraries(goto-cc-lib
     big-int
     goto-programs
     util
+    json
     linking
     ansi-c
     cpp

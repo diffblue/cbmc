@@ -103,7 +103,6 @@ BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
           # Empty last line
 #
 CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
-              ../src/miniz/miniz$(OBJEXT) \
               ../src/ansi-c/ansi-c$(LIBEXT) \
               ../src/cpp/cpp$(LIBEXT) \
               ../src/json/json$(LIBEXT) \

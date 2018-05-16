@@ -34,7 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_literals.h"
 #include "java_static_initializers.h"
 #include "java_utils.h"
-#include <java_bytecode/ci_lazy_methods.h>
+#include "ci_lazy_methods.h"
 
 #include "expr2java.h"
 
@@ -124,7 +124,10 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
       // add jars from JSON config file to classpath
       for(const jsont &file_entry : include_files.array)
       {
-        assert(file_entry.is_string() && has_suffix(file_entry.value, ".jar"));
+        DATA_INVARIANT(
+          file_entry.is_string() && has_suffix(file_entry.value, ".jar"),
+          "classpath entry must be jar filename, but '" + file_entry.value +
+          "' found");
         config.java.classpath.push_back(file_entry.value);
       }
     }

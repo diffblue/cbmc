@@ -10,10 +10,8 @@ generic_includes(jbmc-lib)
 target_link_libraries(jbmc-lib
     analyses
     ansi-c
-    assembler
     big-int
     cbmc-lib
-    cpp
     goto-instrument-lib
     goto-programs
     goto-symex
@@ -21,14 +19,12 @@ target_link_libraries(jbmc-lib
     json
     langapi
     linking
+    miniz
     pointer-analysis
     solvers
     util
     xml
 )
-
-add_if_library(jbmc-lib bv_refinement)
-add_if_library(jbmc-lib jsil)
 
 # Executable
 add_executable(jbmc jbmc_main.cpp)
