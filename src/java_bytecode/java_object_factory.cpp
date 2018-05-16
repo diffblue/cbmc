@@ -841,20 +841,27 @@ void java_object_factoryt::gen_nondet_pointer_init(
   // and asign to `expr` the address of such object
   code_blockt non_null_inst;
 
-  if(
-    java_string_library_preprocesst::implements_java_char_sequence_pointer(
-      expr.type()))
+  // Note string-type-specific initialization might fail, e.g. if java.lang.CharSequence does not
+  // have the expected fields (typically this happens if --refine-strings was not passed). In this
+  // case we fall back to normal pointer target init.
+
+  bool string_init_succeeded = false;
+
+  if(java_string_library_preprocesst::implements_java_char_sequence_pointer(
+       expr.type()))
   {
-    add_nondet_string_pointer_initialization(
-      expr,
-      object_factory_parameters.max_nondet_string_length,
-      object_factory_parameters.string_printable,
-      symbol_table,
-      loc,
-      object_factory_parameters.function_id,
-      assignments);
+    string_init_succeeded =
+      !add_nondet_string_pointer_initialization(
+        expr,
+        object_factory_parameters.max_nondet_string_length,
+        object_factory_parameters.string_printable,
+        symbol_table,
+        loc,
+        object_factory_parameters.function_id,
+        assignments);
   }
-  else
+
+  if(!string_init_succeeded)
   {
     gen_pointer_target_init(
       non_null_inst,
