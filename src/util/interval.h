@@ -104,8 +104,8 @@ public:
   const constant_interval_exprt handle_constants(exprt expr) const;
   const constant_interval_exprt handle_constants(const constant_interval_exprt &o, exprt expr) const;
 
-  const constant_interval_exprt eval(const exprt &expr);
-  const constant_interval_exprt eval(const exprt &expr, const constant_interval_exprt &o);
+  const constant_interval_exprt eval(const irep_idt &unary_operator);
+  const constant_interval_exprt eval(const irep_idt &binary_operator, const constant_interval_exprt &o);
 
   /* Unary arithmetic */
   const constant_interval_exprt unary_plus() const;
