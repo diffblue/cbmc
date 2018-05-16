@@ -344,9 +344,22 @@ void ansi_c_convert_typet::write(typet &type)
        gcc_float64_cnt+gcc_float64x_cnt+
        gcc_float128_cnt+gcc_float128x_cnt>=2)
     {
-      error().source_location=source_location;
-      error() << "conflicting type modifiers" << eom;
-      throw 0;
+      // Temporary workaround for our glibc versions that try to define TS 18661
+      // types (for example, typedef float _Float32). This can be removed once
+      // upgrade cbmc's GCC support to at least 7.0 (when glibc will expect us
+      // to provide these types natively), or disable parsing them ourselves
+      // when our preprocessor stage claims support <7.0.
+      if(c_storage_spec.is_typedef)
+      {
+        warning().source_location = source_location;
+        warning() << "ignoring typedef for TS 18661 (_FloatNNx) type. If you need these, try using goto-cc instead." << eom;
+      }
+      else
+      {
+        error().source_location=source_location;
+        error() << "conflicting type modifiers" << eom;
+        throw 0;
+      }
     }
 
     // _not_ the same as float, double, long double
