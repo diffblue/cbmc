@@ -1,0 +1,10 @@
+CORE
+Test.class
+--function Test.testDivByZero
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+integer-divide-by-zero\.1.*: FAILURE$
+integer-divide-by-zero\.2.*: SUCCESS$
+--
+^warning: ignoring

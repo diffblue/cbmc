@@ -1,0 +1,10 @@
+CORE
+Test.class
+--function Test.testNullDeref
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+testNullDeref:\(LA;\)V\.null-pointer-exception\.1.*: FAILURE$
+testNullDeref:\(LA;\)V\.null-pointer-exception\.2.*: SUCCESS$
+--
+^warning: ignoring

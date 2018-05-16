@@ -1,0 +1,10 @@
+CORE
+Test.class
+--function Test.testClassCast
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+bad-dynamic-cast\.1.*: FAILURE$
+bad-dynamic-cast\.2.*: SUCCESS$
+--
+^warning: ignoring
