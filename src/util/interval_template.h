@@ -231,21 +231,21 @@ std::ostream &operator << (std::ostream &out, const interval_templatet<T> &i)
 {
   if(i.lower_set)
   {
-    out << dstringt("[");
+    out << "[";
     out << i.lower;
   }
   else
-    out << dstringt(")-INF");
+    out << "(-INF";
 
-  out << dstringt(",");
+  out << ",";
 
   if(i.upper_set)
   {
     out << i.upper;
-    out << dstringt("]");
+    out << "]";
   }
   else
-    out << dstringt("+INF(");
+    out << "+INF)";
 
   return out;
 }
