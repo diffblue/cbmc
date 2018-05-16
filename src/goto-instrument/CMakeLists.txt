@@ -27,7 +27,6 @@ target_link_libraries(goto-instrument-lib
     solvers
 )
 
-add_if_library(goto-instrument-lib java_bytecode)
 add_if_library(goto-instrument-lib glpk)
 
 # Executable

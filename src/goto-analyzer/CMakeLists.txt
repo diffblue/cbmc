@@ -21,7 +21,6 @@ target_link_libraries(goto-analyzer-lib
     util
 )
 
-add_if_library(goto-analyzer-lib java_bytecode)
 add_if_library(goto-analyzer-lib jsil)
 
 # Executable

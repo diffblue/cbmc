@@ -1,10 +1,12 @@
 default: tests.log
 
-test:
-	@../test.pl -p -c ../../../src/jbmc/jbmc
+include ../../src/config.inc
 
-tests.log: ../test.pl
-	@../test.pl -p -c ../../../src/jbmc/jbmc
+test:
+	@../$(CPROVER_DIR)/regression/test.pl -p -c ../../../src/jbmc/jbmc
+
+tests.log: ../$(CPROVER_DIR)/regression/test.pl
+	@../$(CPROVER_DIR)/regression/test.pl -p -c ../../../src/jbmc/jbmc
 
 show:
 	@for dir in *; do \

@@ -1,12 +1,14 @@
 default: tests.log
 
-test:
-	@../test.pl -p -c ../../../src/jbmc/jbmc
-	@../test.pl -p -c "../../../src/jbmc/jbmc --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure
+include ../../src/config.inc
 
-tests.log: ../test.pl
-	@../test.pl -p -c ../../../src/jbmc/jbmc
-	@../test.pl -p -c "../../../src/jbmc/jbmc --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure
+test:
+	@../$(CPROVER_DIR)/regression/test.pl -p -c ../../../src/jbmc/jbmc
+	@../$(CPROVER_DIR)/regression/test.pl -p -c "../../../src/jbmc/jbmc --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure
+
+tests.log: ../$(CPROVER_DIR)/regression/test.pl
+	@../$(CPROVER_DIR)/regression/test.pl -p -c ../../../src/jbmc/jbmc
+	@../$(CPROVER_DIR)/regression/test.pl -p -c "../../../src/jbmc/jbmc --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure
 
 show:
 	@for dir in *; do \

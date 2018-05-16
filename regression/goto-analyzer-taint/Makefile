@@ -9,7 +9,7 @@ tests.log: ../test.pl
 show:
 	@for dir in *; do \
 		if [ -d "$$dir" ]; then \
-			vim -o "$$dir/*.java" "$$dir/*.out"; \
+			vim -o "$$dir/*.c" "$$dir/*.out"; \
 		fi; \
 	done;
 
