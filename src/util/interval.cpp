@@ -123,9 +123,7 @@ constant_interval_exprt constant_interval_exprt::multiply(const constant_interva
     handle_constants(o, mult_exprt());
   }
 
-  mult_exprt operation;
-  operation.type()=type();
-  return get_extremes(*this, o, operation);
+  return get_extremes(*this, o, ID_mult);
 }
 
 constant_interval_exprt constant_interval_exprt::divide(const constant_interval_exprt &o) const
@@ -141,8 +139,7 @@ constant_interval_exprt constant_interval_exprt::divide(const constant_interval_
     return top();
   }
 
-  div_exprt operation;
-  return get_extremes(*this, o, operation);
+  return get_extremes(*this, o, ID_div);
 }
 
 constant_interval_exprt constant_interval_exprt::modulo(const constant_interval_exprt &o) const
@@ -277,9 +274,7 @@ constant_interval_exprt constant_interval_exprt::left_shift(const constant_inter
     return top();
   }
 
-  shl_exprt operation;
-  operation.type()=type();
-  return get_extremes(*this, o, operation);
+  return get_extremes(*this, o, ID_shl);
 }
 
 // Arithmetic
@@ -295,9 +290,7 @@ constant_interval_exprt constant_interval_exprt::right_shift(const constant_inte
     return top();
   }
 
-  ashr_exprt operation;
-  operation.type()=type();
-  return get_extremes(*this, o, operation);
+  return get_extremes(*this, o, ID_ashr);
 }
 
 constant_interval_exprt constant_interval_exprt::bitwise_xor(const constant_interval_exprt &o) const
@@ -432,7 +425,7 @@ constant_interval_exprt constant_interval_exprt::decrement() const
 constant_interval_exprt constant_interval_exprt::get_extremes(
   const constant_interval_exprt &a,
   const constant_interval_exprt &b,
-  const exprt operation)
+  const irep_idt &operation)
 {
   constant_interval_exprt result;
 
@@ -535,61 +528,60 @@ exprt constant_interval_exprt::get_extreme(std::vector<exprt> values, bool min_v
 
 
 
-exprt constant_interval_exprt::generate_expression(const exprt& a, const exprt& b, const exprt &operation)
+exprt constant_interval_exprt::generate_expression(const exprt &lhs, const exprt &rhs, const irep_idt &operation)
 {
-  if(operation.id() == ID_mult)
+  if(operation == ID_mult)
   {
-    return generate_multiply_expression(a, b, operation);
+    return generate_multiply_expression(lhs, rhs);
   }
 
-  if(operation.id() == ID_div)
+  if(operation == ID_div)
   {
-    return generate_division_expression(a, b, operation);
+    return generate_division_expression(lhs, rhs);
   }
 
-  if(operation.id() == ID_mod)
+  if(operation == ID_mod)
   {
-    return generate_modulo_expression(a, b, operation);
+    return generate_modulo_expression(lhs, rhs);
   }
 
-  if(operation.id() == ID_shl || operation.id() == ID_ashr)
+  if(operation == ID_shl || operation == ID_ashr)
   {
-    return generate_shift_expression(a, b, operation);
+    return generate_shift_expression(lhs, rhs, operation);
   }
 
-  assert(0 && "Not yet implemented!");
+  UNREACHABLE;
 }
 
-exprt constant_interval_exprt::generate_multiply_expression(const exprt& a, const exprt& b,
-    exprt operation)
+exprt constant_interval_exprt::generate_multiply_expression(const exprt &lower, const exprt &upper)
 {
-  assert(operation.id() == ID_mult);
-  assert(operation.type().is_not_nil() && is_numeric(operation.type()));
+  PRECONDITION(lower.type().is_not_nil() && is_numeric(lower.type()));
 
-  if(is_max(a))
+  if(is_max(lower))
   {
-    return generate_multiply_expression_max(b);
+    return generate_multiply_expression_max(upper);
   }
 
-  if(is_max(b))
+  if(is_max(upper))
   {
-    return generate_multiply_expression_max(a);
+    return generate_multiply_expression_max(lower);
   }
 
-  if(is_min(a))
+  if(is_min(lower))
   {
-    return generate_multiply_expression_min(a, b);
+    return generate_multiply_expression_min(lower, upper);
   }
 
-  if(is_min(b))
+  if(is_min(upper))
   {
-    return generate_multiply_expression_min(b, a);
+    return generate_multiply_expression_min(upper, lower);
   }
 
-  assert(!is_extreme(a) && !is_extreme(b));
+  INVARIANT(!is_extreme(lower) && !is_extreme(upper),
+    "We ruled out extreme cases beforehand");
 
-  operation.copy_to_operands(a, b);
-  return simplified_expr(operation);
+  auto result = mult_exprt(lower, upper);
+  return simplified_expr(result);
 }
 
 
@@ -608,14 +600,15 @@ exprt constant_interval_exprt::generate_multiply_expression_max(const exprt &exp
     }
     else
     {
-      assert(!is_positive(expr) && "Min value cannot be >0.");
-      assert(is_zero(expr) && "Non-negative MIN must be zero.");
+      INVARIANT(!is_positive(expr),  "Min value cannot be >0.");
+      INVARIANT(is_zero(expr), "Non-negative MIN must be zero.");
 
       return expr;
     }
   }
 
-  assert(!is_extreme(expr));
+  INVARIANT(!is_extreme(expr),
+    "We ruled out extreme cases");
 
   if(is_negative (expr))
   {
@@ -632,13 +625,13 @@ exprt constant_interval_exprt::generate_multiply_expression_max(const exprt &exp
     return max_exprt(expr);
   }
 
-  assert(0 && "Unreachable.");
+  UNREACHABLE;
   return nil_exprt();
 }
 
 exprt constant_interval_exprt::generate_multiply_expression_min(const exprt &min, const exprt &other)
 {
-  assert(is_min(min));
+  PRECONDITION(is_min(min));
 
   if(is_max(other))
   {
@@ -648,8 +641,8 @@ exprt constant_interval_exprt::generate_multiply_expression_min(const exprt &min
     }
     else
     {
-      assert(!is_positive(min) && "Min value cannot be >0.");
-      assert(is_zero(min) && "Non-negative MIN must be zero.");
+      INVARIANT(!is_positive(min), "Min value cannot be >0.");
+      INVARIANT(is_zero(min), "Non-negative MIN must be zero.");
 
       return min;
     }
@@ -657,128 +650,130 @@ exprt constant_interval_exprt::generate_multiply_expression_min(const exprt &min
 
   if(is_min(other))
   {
-    assert(!is_positive(min) && !is_positive(other)  && "Min value cannot be >0.");
-    assert(is_negative(other) || is_zero(other));
+    INVARIANT(!is_positive(min) && !is_positive(other), "Min value cannot be >0.");
+    INVARIANT(is_negative(other) || is_zero(other),
+      "Other was established to be min value, which must be <= 0");
 
     if(is_negative(min) && is_negative(other))
     {
       return max_exprt(min);
     }
 
-    assert(is_zero(min) || is_zero(other));
+    INVARIANT(is_zero(min) || is_zero(other),
+      "Min value must be <= 0");
     return (is_zero(min) ? min : other);
   }
 
-  assert(0 && "Unreachable.");
+  UNREACHABLE;
   return nil_exprt();
 }
 
 
 
-exprt constant_interval_exprt::generate_division_expression(const exprt& a, const exprt& b,
-    exprt operation)
+exprt constant_interval_exprt::generate_division_expression(const exprt &lhs, const exprt &rhs)
 {
-  assert(operation.id() == ID_div);
-  assert(operation.type().is_not_nil() && is_numeric(operation.type()));
+  PRECONDITION(lhs.type().is_not_nil() && is_numeric(lhs.type()));
 
-  assert(!is_zero(b));
+  PRECONDITION(!is_zero(rhs));
 
-  if(b.is_one())
+  if(rhs.is_one())
   {
-    return a;
+    return lhs;
   }
 
-  if(is_max(a))
+  if(is_max(lhs))
   {
-    if(is_negative(b))
+    if(is_negative(rhs))
     {
-      return min_exprt(a);
+      return min_exprt(lhs);
     }
 
-    return a;
+    return lhs;
   }
 
-  if(is_min(a))
+  if(is_min(lhs))
   {
-    if(is_negative(b))
+    if(is_negative(rhs))
     {
-      return max_exprt(a);
+      return max_exprt(lhs);
     }
 
-    return a;
+    return lhs;
   }
 
-  assert(!is_extreme(a));
+  INVARIANT(!is_extreme(lhs),
+    "We ruled out extreme cases beforehand");
 
-  if(is_max(b))
+  if(is_max(rhs))
   {
-    return zero(b);
+    return zero(rhs);
   }
 
-  if(is_min(b))
+  if(is_min(rhs))
   {
-    assert(is_signed(b));
-    return zero(b);
+    INVARIANT(is_signed(rhs),
+      "We think this is a signed integer for some reason?");
+    return zero(rhs);
   }
 
-  assert(!is_extreme(a) && !is_extreme(b));
+  INVARIANT(!is_extreme(lhs) && !is_extreme(rhs),
+    "We ruled out extreme cases beforehand");
 
-  assert(!operation.has_operands());
-  operation.copy_to_operands(a, b);
-  return simplified_expr(operation);
+  auto div_expr = div_exprt(lhs, rhs);
+  return simplified_expr(div_expr);
 }
 
-exprt constant_interval_exprt::generate_modulo_expression(const exprt& a, const exprt& b,
-    exprt operation)
+exprt constant_interval_exprt::generate_modulo_expression(const exprt &lhs, const exprt &rhs)
 {
-  assert(operation.id() == ID_mod);
-  assert(operation.type().is_not_nil() && is_numeric(operation.type()));
+  PRECONDITION(lhs.type().is_not_nil() && is_numeric(lhs.type()));
 
-  assert(!is_zero(b));
+  PRECONDITION(!is_zero(rhs));
 
-  if(b.is_one())
+  if(rhs.is_one())
   {
-    return a;
+    return lhs;
   }
 
-  if(is_max(a))
+  if(is_max(lhs))
   {
-    if(is_negative(b))
+    if(is_negative(rhs))
     {
-      return min_exprt(a);
+      return min_exprt(lhs);
     }
 
-    return a;
+    return lhs;
   }
 
-  if(is_min(a))
+  if(is_min(lhs))
   {
-    if(is_negative(b))
+    if(is_negative(rhs))
     {
-      return max_exprt(a);
+      return max_exprt(lhs);
     }
 
-    return a;
+    return lhs;
   }
 
-  assert(!is_extreme(a));
+  INVARIANT(!is_extreme(lhs),
+    "We rule out this case beforehand");
 
-  if(is_max(b))
+  if(is_max(rhs))
   {
-    return zero(b);
+    return zero(rhs);
   }
 
-  if(is_min(b))
+  if(is_min(rhs))
   {
-    assert(is_signed(b));
-    return zero(b);
+    INVARIANT(is_signed(rhs),
+      "We assume this is signed for some reason?");
+    return zero(rhs);
   }
 
-  assert(!is_extreme(a) && !is_extreme(b));
+  INVARIANT(!is_extreme(lhs) && !is_extreme(rhs),
+    "We ruled out extreme values beforehand");
 
-  assert(!operation.has_operands());
-  operation.copy_to_operands(a, b);
-  return simplified_expr(operation);
+  auto modulo_expr = mod_exprt(lhs,rhs);
+  return simplified_expr(modulo_expr);
 }
 
 constant_interval_exprt constant_interval_exprt::eval(const irep_idt &id)
@@ -903,41 +898,41 @@ constant_interval_exprt constant_interval_exprt::tv_to_interval(const tvt &tv) c
   return top();
 }
 
-exprt constant_interval_exprt::generate_shift_expression(const exprt& a, const exprt& b,
-    exprt operation)
+exprt constant_interval_exprt::generate_shift_expression(const exprt &lhs, const exprt &rhs,
+                                                         const irep_idt &operation)
 {
-  assert(operation.id() == ID_shl || operation.id() == ID_ashr);
+  PRECONDITION(operation == ID_shl || operation == ID_ashr);
 
-  if(is_zero(a) || is_zero(b))
+  if(is_zero(lhs) || is_zero(rhs))
   {
     // Shifting zero does nothing.
     // Shifting BY zero also does nothing.
-    return a;
+    return lhs;
   }
 
-  // Should be caught at an earlier stage.
-  assert(!is_negative(b));
+  INVARIANT(!is_negative(rhs),
+    "Should be caught at an earlier stage.");
 
-  if(is_max(a))
+  if(is_max(lhs))
   {
-    return a;
+    return lhs;
   }
 
-  if(is_min(a))
+  if(is_min(lhs))
   {
-    return a;
+    return lhs;
   }
 
-  if(is_max(b))
+  if(is_max(rhs))
   {
-    return min_exprt(b);
+    return min_exprt(rhs);
   }
 
-  assert(!is_extreme(a) && !is_extreme(b));
+  INVARIANT(!is_extreme(lhs) && !is_extreme(rhs),
+    "We ruled out extreme cases beforehand");
 
-  operation.op0()=a;
-  operation.op1()=b;
-  return simplified_expr(operation);
+  auto shift_expr = shift_exprt(lhs, operation, rhs);
+  return simplified_expr(shift_expr);
 }
 
 constant_interval_exprt constant_interval_exprt::handle_constants(exprt expr) const
