@@ -211,13 +211,13 @@ constant_interval_exprt::modulo(const constant_interval_exprt &o) const
   return constant_interval_exprt(lower, upper);
 }
 
-const tvt constant_interval_exprt::is_true() const
+const tvt constant_interval_exprt::is_definitely_true() const
 {
   // tvt not
-  return !is_false();
+  return !is_definitely_false();
 }
 
-const tvt constant_interval_exprt::is_false() const
+const tvt constant_interval_exprt::is_definitely_false() const
 {
   if(equal(constant_interval_exprt(zero())).is_true())
   {
@@ -236,8 +236,8 @@ const tvt constant_interval_exprt::is_false() const
 const tvt
 constant_interval_exprt::logical_or(const constant_interval_exprt &o) const
 {
-  tvt a = is_true();
-  tvt b = o.is_true();
+  tvt a = is_definitely_true();
+  tvt b = o.is_definitely_true();
 
   return (a || b);
 }
@@ -245,23 +245,25 @@ constant_interval_exprt::logical_or(const constant_interval_exprt &o) const
 const tvt
 constant_interval_exprt::logical_and(const constant_interval_exprt &o) const
 {
-  return (is_true() && o.is_true());
+  return (is_definitely_true() && o.is_definitely_true());
 }
 
 const tvt
 constant_interval_exprt::logical_xor(const constant_interval_exprt &o) const
 {
-  return ((is_true() && !o.is_true()) || (!is_true() && o.is_true()));
+  return (
+    (is_definitely_true() && !o.is_definitely_true()) ||
+    (!is_definitely_true() && o.is_definitely_true()));
 }
 
 const tvt constant_interval_exprt::logical_not() const
 {
-  if(is_true().is_true())
+  if(is_definitely_true().is_true())
   {
     return tvt(false);
   }
 
-  if(is_false().is_true())
+  if(is_definitely_false().is_true())
   {
     return tvt(true);
   }
@@ -1960,12 +1962,12 @@ tv_to_interval(const constant_interval_exprt &interval, const tvt &tv)
 
 const tvt constant_interval_exprt::is_true(const constant_interval_exprt &a)
 {
-  return a.is_true();
+  return a.is_definitely_true();
 }
 
 const tvt constant_interval_exprt::is_false(const constant_interval_exprt &a)
 {
-  return a.is_false();
+  return a.is_definitely_false();
 }
 
 const tvt constant_interval_exprt::logical_and(

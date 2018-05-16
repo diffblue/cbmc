@@ -108,8 +108,8 @@ public:
   const constant_interval_exprt unary_minus() const;
 
   /* Logical */
-  const tvt is_true() const;
-  const tvt is_false() const;
+  const tvt is_definitely_true() const;
+  const tvt is_definitely_false() const;
 
   const tvt logical_and(const constant_interval_exprt &o) const;
   const tvt logical_or(const constant_interval_exprt &o) const;
