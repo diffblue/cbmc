@@ -1083,17 +1083,6 @@ constant_interval_exprt constant_interval_exprt::bottom() const
   return bottom(type());
 }
 
-constant_interval_exprt
-constant_interval_exprt::swap(constant_interval_exprt &i)
-{
-  return constant_interval_exprt(i.get_upper(), i.get_lower());
-}
-
-const constant_interval_exprt constant_interval_exprt::swap() const
-{
-  return constant_interval_exprt(get_lower(), get_upper());
-}
-
 /* Helpers */
 
 bool constant_interval_exprt::is_int() const

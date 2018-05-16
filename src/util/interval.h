@@ -346,9 +346,6 @@ public:
   static constant_interval_exprt simplified_interval(exprt &l, exprt &r);
   static exprt simplified_expr(exprt expr);
 
-  /* Swap lower and upper! */
-  const constant_interval_exprt swap() const;
-  static constant_interval_exprt swap(constant_interval_exprt &i);
   /* Helpers */
   /* Four common params: self, static: type, expr, interval */
 
