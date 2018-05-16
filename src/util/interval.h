@@ -154,7 +154,7 @@ public:
   const constant_interval_exprt decrement() const;
 
   bool is_empty() const;
-  bool is_constant() const;
+  bool is_single_value_interval() const;
   /** END SET OF ARITHMETIC OPERATORS */
 
   //  tvt contains(constant_interval_exprt &o) const;
@@ -308,7 +308,7 @@ public:
   decrement(const constant_interval_exprt &a);
 
   static bool is_empty(const constant_interval_exprt &a);
-  static bool is_constant(const constant_interval_exprt &a);
+  static bool is_single_value_interval(const constant_interval_exprt &a);
 
   static bool is_top(const constant_interval_exprt &a);
   static bool is_bottom(const constant_interval_exprt &a);

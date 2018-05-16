@@ -41,7 +41,7 @@ const constant_interval_exprt constant_interval_exprt::unary_plus() const
 
 const constant_interval_exprt constant_interval_exprt::unary_minus() const
 {
-  if(is_constant())
+  if(is_single_value_interval())
   {
     handle_constants(unary_minus_exprt());
   }
@@ -73,7 +73,7 @@ const constant_interval_exprt constant_interval_exprt::unary_minus() const
 const constant_interval_exprt
 constant_interval_exprt::plus(const constant_interval_exprt &o) const
 {
-  if(o.is_constant() && is_constant())
+  if(o.is_single_value_interval() && is_single_value_interval())
   {
     handle_constants(o, plus_exprt());
   }
@@ -107,7 +107,7 @@ constant_interval_exprt::plus(const constant_interval_exprt &o) const
 const constant_interval_exprt
 constant_interval_exprt::minus(const constant_interval_exprt &o) const
 {
-  if(o.is_constant() && is_constant())
+  if(o.is_single_value_interval() && is_single_value_interval())
   {
     handle_constants(o, minus_exprt());
   }
@@ -119,7 +119,7 @@ constant_interval_exprt::minus(const constant_interval_exprt &o) const
 const constant_interval_exprt
 constant_interval_exprt::multiply(const constant_interval_exprt &o) const
 {
-  if(o.is_constant() && is_constant())
+  if(o.is_single_value_interval() && is_single_value_interval())
   {
     handle_constants(o, mult_exprt());
   }
@@ -132,7 +132,7 @@ constant_interval_exprt::multiply(const constant_interval_exprt &o) const
 const constant_interval_exprt
 constant_interval_exprt::divide(const constant_interval_exprt &o) const
 {
-  if(o.is_constant() && is_constant())
+  if(o.is_single_value_interval() && is_single_value_interval())
   {
     handle_constants(o, div_exprt());
   }
@@ -152,7 +152,7 @@ constant_interval_exprt::modulo(const constant_interval_exprt &o) const
 {
   // SEE https://stackoverflow.com/questions/11720656/modulo-operation-with-negative-numbers
 
-  if(o.is_constant() && is_constant())
+  if(o.is_single_value_interval() && is_single_value_interval())
   {
     handle_constants(o, mod_exprt());
   }
@@ -272,7 +272,7 @@ const tvt constant_interval_exprt::logical_not() const
 const constant_interval_exprt
 constant_interval_exprt::left_shift(const constant_interval_exprt &o) const
 {
-  if(o.is_constant() && is_constant())
+  if(o.is_single_value_interval() && is_single_value_interval())
   {
     handle_constants(o, shl_exprt());
   }
@@ -291,7 +291,7 @@ constant_interval_exprt::left_shift(const constant_interval_exprt &o) const
 const constant_interval_exprt
 constant_interval_exprt::right_shift(const constant_interval_exprt &o) const
 {
-  if(o.is_constant() && is_constant())
+  if(o.is_single_value_interval() && is_single_value_interval())
   {
     handle_constants(o, ashr_exprt());
   }
@@ -309,7 +309,7 @@ constant_interval_exprt::right_shift(const constant_interval_exprt &o) const
 const constant_interval_exprt
 constant_interval_exprt::bitwise_xor(const constant_interval_exprt &o) const
 {
-  if(o.is_constant() && is_constant())
+  if(o.is_single_value_interval() && is_single_value_interval())
   {
     handle_constants(o, bitxor_exprt());
   }
@@ -320,7 +320,7 @@ constant_interval_exprt::bitwise_xor(const constant_interval_exprt &o) const
 const constant_interval_exprt
 constant_interval_exprt::bitwise_or(const constant_interval_exprt &o) const
 {
-  if(o.is_constant() && is_constant())
+  if(o.is_single_value_interval() && is_single_value_interval())
   {
     handle_constants(o, bitor_exprt());
   }
@@ -331,7 +331,7 @@ constant_interval_exprt::bitwise_or(const constant_interval_exprt &o) const
 const constant_interval_exprt
 constant_interval_exprt::bitwise_and(const constant_interval_exprt &o) const
 {
-  if(o.is_constant() && is_constant())
+  if(o.is_single_value_interval() && is_single_value_interval())
   {
     handle_constants(o, bitand_exprt());
   }
@@ -341,7 +341,7 @@ constant_interval_exprt::bitwise_and(const constant_interval_exprt &o) const
 
 const constant_interval_exprt constant_interval_exprt::bitwise_not() const
 {
-  if(is_constant())
+  if(is_single_value_interval())
   {
     handle_constants(bitnot_exprt());
   }
@@ -352,7 +352,7 @@ const constant_interval_exprt constant_interval_exprt::bitwise_not() const
 tvt constant_interval_exprt::less_than(const constant_interval_exprt &o) const
 {
   // [get_lower, get_upper] < [o.get_lower(), o.get_upper()]
-  if(is_constant() && o.is_constant())
+  if(is_single_value_interval() && o.is_single_value_interval())
   {
     return tvt(less_than(get_lower(), o.get_lower()));
   }
@@ -379,7 +379,7 @@ tvt constant_interval_exprt::greater_than(
 tvt constant_interval_exprt::less_than_or_equal(
   const constant_interval_exprt &o) const
 {
-  if(is_constant() && o.is_constant())
+  if(is_single_value_interval() && o.is_single_value_interval())
   {
     return tvt(less_than_or_equal(get_lower(), o.get_lower()));
   }
@@ -406,7 +406,7 @@ tvt constant_interval_exprt::greater_than_or_equal(
 
 tvt constant_interval_exprt::equal(const constant_interval_exprt &o) const
 {
-  if(is_constant() && o.is_constant())
+  if(is_single_value_interval() && o.is_single_value_interval())
   {
     return tvt(equal(get_lower(), o.get_lower()));
   }
@@ -974,7 +974,7 @@ exprt constant_interval_exprt::generate_shift_expression(
 const constant_interval_exprt
 constant_interval_exprt::handle_constants(exprt expr) const
 {
-  if(is_constant())
+  if(is_single_value_interval())
   {
     expr.type() = type();
     expr.copy_to_operands(get_lower());
@@ -989,7 +989,7 @@ const constant_interval_exprt constant_interval_exprt::handle_constants(
   const constant_interval_exprt &o,
   exprt expr) const
 {
-  if(is_constant() && o.is_constant())
+  if(is_single_value_interval() && o.is_single_value_interval())
   {
     expr.type() = type();
     expr.copy_to_operands(get_lower(), o.get_lower());
@@ -1826,9 +1826,10 @@ bool constant_interval_exprt::is_empty(const constant_interval_exprt &a)
   return a.is_empty();
 }
 
-bool constant_interval_exprt::is_constant(const constant_interval_exprt &a)
+bool constant_interval_exprt::is_single_value_interval(
+  const constant_interval_exprt &a)
 {
-  return a.is_constant();
+  return a.is_single_value_interval();
 }
 
 bool constant_interval_exprt::is_top(const constant_interval_exprt &a)
@@ -1886,7 +1887,7 @@ bool constant_interval_exprt::is_empty() const
   return true;
 }
 
-bool constant_interval_exprt::is_constant() const
+bool constant_interval_exprt::is_single_value_interval() const
 {
   return !is_extreme(get_lower()) && !is_extreme(get_upper()) &&
          equal(get_lower(), get_upper());
