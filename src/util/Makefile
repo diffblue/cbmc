@@ -18,6 +18,7 @@ SRC = arith_tools.cpp \
       fixedbv.cpp \
       format_constant.cpp \
       format_expr.cpp \
+      formatter.cpp \
       format_number_range.cpp \
       format_type.cpp \
       fresh_symbol.cpp \
