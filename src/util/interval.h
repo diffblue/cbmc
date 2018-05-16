@@ -101,46 +101,46 @@ public:
   const exprt &get_upper() const;
 
   /** SET OF ARITHMETIC OPERATORS */
-  const constant_interval_exprt handle_constants(exprt expr) const;
-  const constant_interval_exprt handle_constants(const constant_interval_exprt &o, exprt expr) const;
+  constant_interval_exprt handle_constants(exprt expr) const;
+  constant_interval_exprt handle_constants(const constant_interval_exprt &o, exprt expr) const;
 
-  const constant_interval_exprt eval(const irep_idt &unary_operator);
-  const constant_interval_exprt
+  constant_interval_exprt eval(const irep_idt &unary_operator);
+  constant_interval_exprt
   eval(const irep_idt &binary_operator, const constant_interval_exprt &o);
 
   /* Unary arithmetic */
-  const constant_interval_exprt unary_plus() const;
-  const constant_interval_exprt unary_minus() const;
+  constant_interval_exprt unary_plus() const;
+  constant_interval_exprt unary_minus() const;
 
   /* Logical */
-  const tvt is_definitely_true() const;
-  const tvt is_definitely_false() const;
+  tvt is_definitely_true() const;
+  tvt is_definitely_false() const;
 
-  const tvt logical_and(const constant_interval_exprt& o) const;
-  const tvt logical_or(const constant_interval_exprt &o) const;
-  const tvt logical_xor(const constant_interval_exprt &o) const;
-  const tvt logical_not() const;
+  tvt logical_and(const constant_interval_exprt &o) const;
+  tvt logical_or(const constant_interval_exprt &o) const;
+  tvt logical_xor(const constant_interval_exprt &o) const;
+  tvt logical_not() const;
 
-  const constant_interval_exprt tv_to_interval(const tvt &tv) const;
+  constant_interval_exprt tv_to_interval(const tvt &tv) const;
 
   /* Binary */
-  const constant_interval_exprt plus(const constant_interval_exprt &o) const;
-  const constant_interval_exprt minus(const constant_interval_exprt &o) const;
-  const constant_interval_exprt multiply(const constant_interval_exprt &o) const;
-  const constant_interval_exprt divide(const constant_interval_exprt &o) const;
-  const constant_interval_exprt modulo(const constant_interval_exprt &o) const;
+  constant_interval_exprt plus(const constant_interval_exprt &o) const;
+  constant_interval_exprt minus(const constant_interval_exprt &o) const;
+  constant_interval_exprt multiply(const constant_interval_exprt &o) const;
+  constant_interval_exprt divide(const constant_interval_exprt &o) const;
+  constant_interval_exprt modulo(const constant_interval_exprt &o) const;
 
   /* Binary shifts */
-  const constant_interval_exprt left_shift(const constant_interval_exprt &o) const;
-  const constant_interval_exprt right_shift(const constant_interval_exprt &o) const;
+  constant_interval_exprt left_shift(const constant_interval_exprt &o) const;
+  constant_interval_exprt right_shift(const constant_interval_exprt &o) const;
 
   /* Unary bitwise */
-  const constant_interval_exprt bitwise_not() const;
+  constant_interval_exprt bitwise_not() const;
 
   /* Binary bitwise */
-  const constant_interval_exprt bitwise_xor(const constant_interval_exprt &o) const;
-  const constant_interval_exprt bitwise_or(const constant_interval_exprt &o) const;
-  const constant_interval_exprt bitwise_and(const constant_interval_exprt &o) const;
+  constant_interval_exprt bitwise_xor(const constant_interval_exprt &o) const;
+  constant_interval_exprt bitwise_or(const constant_interval_exprt &o) const;
+  constant_interval_exprt bitwise_and(const constant_interval_exprt &o) const;
 
   tvt less_than(const constant_interval_exprt &o) const;
   tvt greater_than(const constant_interval_exprt &o) const;
@@ -149,8 +149,8 @@ public:
   tvt equal(const constant_interval_exprt &o) const;
   tvt not_equal(const constant_interval_exprt &o) const;
 
-  const constant_interval_exprt increment() const;
-  const constant_interval_exprt decrement() const;
+  constant_interval_exprt increment() const;
+  constant_interval_exprt decrement() const;
 
   bool is_empty() const;
   bool is_single_value_interval() const;
@@ -195,37 +195,37 @@ public:
 
 
   /* Now static equivalents! */
-  static const tvt is_true(const constant_interval_exprt &a);
-  static const tvt is_false(const constant_interval_exprt &a);
+  static tvt is_true(const constant_interval_exprt &a);
+  static tvt is_false(const constant_interval_exprt &a);
 
-  static const tvt logical_and(const constant_interval_exprt &a, const constant_interval_exprt &b);
-  static const tvt logical_or(const constant_interval_exprt &a, const constant_interval_exprt &b);
-  static const tvt logical_xor(const constant_interval_exprt &a, const constant_interval_exprt &b);
-  static const tvt logical_not(const constant_interval_exprt &a);
+  static tvt logical_and(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static tvt logical_or(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static tvt logical_xor(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static tvt logical_not(const constant_interval_exprt &a);
 
-  static const constant_interval_exprt tv_to_interval(const constant_interval_exprt &interval, const tvt &tv);
+  static constant_interval_exprt tv_to_interval(const constant_interval_exprt &interval, const tvt &tv);
 
-  static const constant_interval_exprt unary_plus(const constant_interval_exprt &a);
-  static const constant_interval_exprt unary_minus(const constant_interval_exprt &a);
+  static constant_interval_exprt unary_plus(const constant_interval_exprt &a);
+  static constant_interval_exprt unary_minus(const constant_interval_exprt &a);
 
   /* Binary */
-  static const constant_interval_exprt plus(const constant_interval_exprt &a, const constant_interval_exprt &b);
-  static const constant_interval_exprt minus(const constant_interval_exprt &a, const constant_interval_exprt &b);
-  static const constant_interval_exprt multiply(const constant_interval_exprt &a, const constant_interval_exprt &b);
-  static const constant_interval_exprt divide(const constant_interval_exprt &a, const constant_interval_exprt &b);
-  static const constant_interval_exprt modulo(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static constant_interval_exprt plus(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static constant_interval_exprt minus(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static constant_interval_exprt multiply(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static constant_interval_exprt divide(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static constant_interval_exprt modulo(const constant_interval_exprt &a, const constant_interval_exprt &b);
 
   /* Binary shifts */
-  static const constant_interval_exprt left_shift(const constant_interval_exprt &a, const constant_interval_exprt &b);
-  static const constant_interval_exprt right_shift(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static constant_interval_exprt left_shift(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static constant_interval_exprt right_shift(const constant_interval_exprt &a, const constant_interval_exprt &b);
 
   /* Unary bitwise */
-  static const constant_interval_exprt bitwise_not(const constant_interval_exprt &a);
+  static constant_interval_exprt bitwise_not(const constant_interval_exprt &a);
 
   /* Binary bitwise */
-  static const constant_interval_exprt bitwise_xor(const constant_interval_exprt &a, const constant_interval_exprt &b);
-  static const constant_interval_exprt bitwise_or(const constant_interval_exprt &a, const constant_interval_exprt &b);
-  static const constant_interval_exprt bitwise_and(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static constant_interval_exprt bitwise_xor(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static constant_interval_exprt bitwise_or(const constant_interval_exprt &a, const constant_interval_exprt &b);
+  static constant_interval_exprt bitwise_and(const constant_interval_exprt &a, const constant_interval_exprt &b);
 
   static tvt less_than(const constant_interval_exprt &a, const constant_interval_exprt &b);
   static tvt greater_than(const constant_interval_exprt &a, const constant_interval_exprt &b);
@@ -234,8 +234,8 @@ public:
   static tvt equal(const constant_interval_exprt &a, const constant_interval_exprt &b);
   static tvt not_equal(const constant_interval_exprt &a, const constant_interval_exprt &b);
 
-  static const constant_interval_exprt increment(const constant_interval_exprt &a);
-  static const constant_interval_exprt decrement(const constant_interval_exprt &a);
+  static constant_interval_exprt increment(const constant_interval_exprt &a);
+  static constant_interval_exprt decrement(const constant_interval_exprt &a);
 
   static bool is_empty(const constant_interval_exprt &a);
   static bool is_single_value_interval(const constant_interval_exprt &a);
@@ -247,16 +247,12 @@ public:
   static bool is_max(const constant_interval_exprt &a);
   /* End static equivalents */
 
-
-
-
-
   bool is_top() const;
   bool is_bottom() const;
-  static const constant_interval_exprt top(const typet &type);
-  static const constant_interval_exprt bottom(const typet &type);
-  const constant_interval_exprt top() const;
-  const constant_interval_exprt bottom() const;
+  static constant_interval_exprt top(const typet &type);
+  static constant_interval_exprt bottom(const typet &type);
+  constant_interval_exprt top() const;
+  constant_interval_exprt bottom() const;
 
   bool is_min() const;
   bool is_max() const;
@@ -273,7 +269,8 @@ public:
   static constant_exprt zero(const constant_interval_exprt &interval);
 
   /* Private? */
-  static const constant_interval_exprt get_extremes(const constant_interval_exprt &lhs, const constant_interval_exprt &rhs, const exprt operation);
+  static constant_interval_exprt get_extremes(const constant_interval_exprt &lhs, const constant_interval_exprt &rhs,
+                                              const exprt operation);
   static exprt get_extreme(std::vector<exprt> values, bool min = true);
   static exprt get_max(const exprt &a, const exprt &b);
   static exprt get_min(const exprt &a, const exprt &b);
@@ -281,12 +278,12 @@ public:
   static exprt get_max(std::vector<exprt> &values);
 
   /* we don't simplify in the constructor otherwise */
-  static const constant_interval_exprt simplified_interval(exprt &l, exprt &r);
+  static constant_interval_exprt simplified_interval(exprt &l, exprt &r);
   static exprt simplified_expr(exprt expr);
 
   /* Swap lower and upper! */
   const constant_interval_exprt swap() const;
-  static const constant_interval_exprt swap(constant_interval_exprt &i);
+  static constant_interval_exprt swap(constant_interval_exprt &i);
   /* Helpers */
   /* Four common params: self, static: type, expr, interval */
 
