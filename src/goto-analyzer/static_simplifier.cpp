@@ -19,43 +19,56 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include <analyses/ai.h>
 
+struct counterst
+{
+  counterst() : asserts(0), assumes(0), gotos(0), assigns(0), function_calls(0)
+  {
+  }
+
+  std::size_t asserts;
+  std::size_t assumes;
+  std::size_t gotos;
+  std::size_t assigns;
+  std::size_t function_calls;
+
+  counterst &operator+=(const counterst &other)
+  {
+    asserts += other.asserts;
+    assumes += other.assumes;
+    gotos += other.gotos;
+    assigns += other.assigns;
+    function_calls += other.function_calls;
+
+    return *this;
+  }
+};
+
+struct statst
+{
+  counterst simplified;
+  counterst unmodified;
+};
+
 /// Simplifies the program using the information in the abstract domain.
 /// \param goto_model: the program analyzed
 /// \param ai: the abstract interpreter after it has been run to fix point
 /// \param options: the parsed user options
 /// \param message_handler: the system message handler
-/// \param out: output stream for the simplified program
-/// \return: false on success with the domain printed to out
-bool static_simplifier(
+/// \return statistics on how many simplifications have been performed
+static statst simplify_once(
   goto_modelt &goto_model,
   const ai_baset &ai,
   const optionst &options,
-  message_handlert &message_handler,
-  std::ostream &out)
+  message_handlert &message_handler)
 {
-  struct counterst
-  {
-    counterst() :
-      asserts(0),
-      assumes(0),
-      gotos(0),
-      assigns(0),
-      function_calls(0) {}
+  statst result;
 
-    std::size_t asserts;
-    std::size_t assumes;
-    std::size_t gotos;
-    std::size_t assigns;
-    std::size_t function_calls;
-  };
-
-  counterst simplified;
-  counterst unmodified;
+  counterst &simplified = result.simplified;
+  counterst &unmodified = result.unmodified;
 
   namespacet ns(goto_model.symbol_table);
 
   messaget m(message_handler);
-  m.status() << "Simplifying program" << messaget::eom;
 
   Forall_goto_functions(f_it, goto_model.goto_functions)
   {
@@ -136,22 +149,6 @@ bool static_simplifier(
   // Make sure the references are correct.
   goto_model.goto_functions.update();
 
-  m.status() << "Simplified: "
-             << " assert: " << simplified.asserts
-             << ", assume: " << simplified.assumes
-             << ", goto: " << simplified.gotos
-             << ", assigns: " << simplified.assigns
-             << ", function calls: " << simplified.function_calls
-             << "\n"
-             << "Unmodified: "
-             << " assert: " << unmodified.asserts
-             << ", assume: " << unmodified.assumes
-             << ", goto: " << unmodified.gotos
-             << ", assigns: " << unmodified.assigns
-             << ", function calls: " << unmodified.function_calls
-             << messaget::eom;
-
-
   // Remove obviously unreachable things and (now) unconditional branches
   if(options.get_bool_option("simplify-slicing"))
   {
@@ -167,12 +164,61 @@ bool static_simplifier(
     remove_skip(goto_model);
   }
 
+  return result;
+}
+
+/// Simplifies the program using the information in the abstract domain.
+/// \param goto_model: the program analyzed
+/// \param ai: the abstract interpreter after it has been run to fix point
+/// \param options: the parsed user options
+/// \param message_handler: the system message handler
+/// \param out: output stream for the simplified program
+/// \return: false on success with the domain printed to out
+bool static_simplifier(
+  goto_modelt &goto_model,
+  ai_baset &ai,
+  const optionst &options,
+  message_handlert &message_handler,
+  std::ostream &out)
+{
+  messaget m(message_handler);
+  m.status() << "Simplifying program" << messaget::eom;
+
+  statst result = simplify_once(goto_model, ai, options, message_handler);
+  while(result.simplified.assigns)
+  {
+    ai.clear();
+    ai(goto_model);
+    statst stats = simplify_once(goto_model, ai, options, message_handler);
+    // don't add (possibly repeatedly) unmodified ones
+    result.simplified += stats.simplified;
+
+    if(stats.simplified.assigns == 0)
+      break;
+  }
+
+  const counterst &simplified = result.simplified;
+  const counterst &unmodified = result.unmodified;
+
+  m.status() << "Simplified: "
+             << " assert: " << simplified.asserts
+             << ", assume: " << simplified.assumes
+             << ", goto: " << simplified.gotos
+             << ", assigns: " << simplified.assigns
+             << ", function calls: " << simplified.function_calls << "\n"
+             << "Unmodified: "
+             << " assert: " << unmodified.asserts
+             << ", assume: " << unmodified.assumes
+             << ", goto: " << unmodified.gotos
+             << ", assigns: " << unmodified.assigns
+             << ", function calls: " << unmodified.function_calls
+             << messaget::eom;
+
   // restore return types before writing the binary
   restore_returns(goto_model);
   goto_model.goto_functions.update();
 
   m.status() << "Writing goto binary" << messaget::eom;
-  return write_goto_binary(out,
-                           ns.get_symbol_table(),
-                           goto_model.goto_functions);
+  return write_goto_binary(
+    out, goto_model.get_symbol_table(), goto_model.goto_functions);
 }

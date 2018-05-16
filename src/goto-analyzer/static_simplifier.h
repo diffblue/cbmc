@@ -18,7 +18,7 @@ class optionst;
 
 bool static_simplifier(
   goto_modelt &,
-  const ai_baset &,
+  ai_baset &,
   const optionst &,
   message_handlert &,
   std::ostream &);
