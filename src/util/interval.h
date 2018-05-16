@@ -333,7 +333,7 @@ public:
   static constant_interval_exprt get_extremes(
     const constant_interval_exprt &lhs,
     const constant_interval_exprt &rhs,
-    const exprt operation);
+    const irep_idt &operation);
   static exprt get_extreme(std::vector<exprt> values, bool min = true);
   static exprt get_max(const exprt &a, const exprt &b);
   static exprt get_min(const exprt &a, const exprt &b);
@@ -404,19 +404,21 @@ public:
   static exprt abs(const exprt &expr);
 
 private:
+  static exprt generate_expression(
+    const exprt &lhs,
+    const exprt &rhs,
+    const irep_idt &operation);
   static exprt
-  generate_expression(const exprt &a, const exprt &b, const exprt &operation);
-  static exprt
-  generate_multiply_expression(const exprt &a, const exprt &b, exprt operation);
+  generate_multiply_expression(const exprt &lower, const exprt &upper);
   static exprt generate_multiply_expression_max(const exprt &expr);
   static exprt
   generate_multiply_expression_min(const exprt &min, const exprt &other);
-  static exprt
-  generate_division_expression(const exprt &a, const exprt &b, exprt operation);
-  static exprt
-  generate_modulo_expression(const exprt &a, const exprt &b, exprt operation);
-  static exprt
-  generate_shift_expression(const exprt &a, const exprt &b, exprt operation);
+  static exprt generate_division_expression(const exprt &lhs, const exprt &rhs);
+  static exprt generate_modulo_expression(const exprt &lhs, const exprt &rhs);
+  static exprt generate_shift_expression(
+    const exprt &lhs,
+    const exprt &rhs,
+    const irep_idt &operation);
 };
 
 inline const constant_interval_exprt &
