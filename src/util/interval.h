@@ -51,7 +51,6 @@ public:
   }
 };
 
-
 /// Represents an interval of values.
 /// Bounds should be constant expressions
 /// or min_exprt for the lower bound
@@ -73,14 +72,14 @@ public:
 
   }
 
-  explicit constant_interval_exprt(const exprt &x):
-    constant_interval_exprt(x, x, x.type())
+  explicit constant_interval_exprt(const exprt &x)
+    : constant_interval_exprt(x, x, x.type())
   {
 
   }
 
-  explicit constant_interval_exprt(const typet &type):
-    constant_interval_exprt(min_exprt(type), max_exprt(type), type)
+  explicit constant_interval_exprt(const typet &type)
+    : constant_interval_exprt(min_exprt(type), max_exprt(type), type)
   {
   }
 
@@ -106,7 +105,8 @@ public:
   const constant_interval_exprt handle_constants(const constant_interval_exprt &o, exprt expr) const;
 
   const constant_interval_exprt eval(const irep_idt &unary_operator);
-  const constant_interval_exprt eval(const irep_idt &binary_operator, const constant_interval_exprt &o);
+  const constant_interval_exprt
+  eval(const irep_idt &binary_operator, const constant_interval_exprt &o);
 
   /* Unary arithmetic */
   const constant_interval_exprt unary_plus() const;
