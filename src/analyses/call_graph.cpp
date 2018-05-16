@@ -74,7 +74,8 @@ static void forall_callsites(
 call_grapht::call_grapht(
   const goto_functionst &goto_functions,
   const irep_idt &root,
-  bool collect_callsites)
+  bool collect_callsites):
+  collect_callsites(collect_callsites)
 {
   std::stack<irep_idt, std::vector<irep_idt>> pending_stack;
   pending_stack.push(root);

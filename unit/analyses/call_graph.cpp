@@ -164,6 +164,28 @@ SCENARIO("call_graph",
       }
     }
 
+    WHEN("A call graph is constructed from a root and callsite tracking is on")
+    {
+      call_grapht call_graph_with_specific_root =
+        call_grapht::create_from_root_function(goto_model, "B", true);
+
+      THEN("The graph should contain nodes for only B, C and D")
+      {
+        call_grapht::nodest correct_value {"B", "C", "D"};
+        REQUIRE(call_graph_with_specific_root.nodes == correct_value);
+      }
+      THEN("Only B -> C and B -> D edges should exist, each with one callsite")
+      {
+        const auto &check_callsites=call_graph_with_specific_root.callsites;
+        call_grapht::edgest correct_value { {"B", "C"}, {"B", "D"} };
+        REQUIRE(call_graph_with_specific_root.edges == correct_value);
+        for(const auto &edge : call_graph_with_specific_root.edges)
+        {
+          REQUIRE(check_callsites.at(edge).size()==1);
+        }
+      }
+    }
+
     WHEN("A call-graph is constructed rooted at B")
     {
       call_grapht call_graph_from_b =
