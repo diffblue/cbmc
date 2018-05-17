@@ -5,5 +5,5 @@ test.c
 ^SIGNAL=0$
 ^\[main.assertion.1\] assertion firstSlash == 3: SUCCESS$
 ^\[main.assertion.2\] assertion lastSlash == 7: SUCCESS$
-^\[main.assertion.3\] assertion firstSlash != 3 || lastSlash != 7: FAILURE$
+^\[main.assertion.3\] assertion firstSlash != 3 \|\| lastSlash != 7: FAILURE$
 --
