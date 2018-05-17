@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/std_expr.h>
 
-#include "../flattening/bv_utils.h"
+#include <solvers/flattening/bv_utils.h>
 
 class float_bvt
 {

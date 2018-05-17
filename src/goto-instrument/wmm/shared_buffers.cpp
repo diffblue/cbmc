@@ -12,7 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/static_lifetime_init.h>
 
-#include "../rw_set.h"
+#include <goto-instrument/rw_set.h>
+
 #include "fence.h"
 
 /// returns a unique id (for fresh variables)

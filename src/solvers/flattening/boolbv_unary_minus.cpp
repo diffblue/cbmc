@@ -10,9 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 
-#include "boolbv_type.h"
+#include <solvers/floatbv/float_utils.h>
 
-#include "../floatbv/float_utils.h"
+#include "boolbv_type.h"
 
 bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
 {

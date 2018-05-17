@@ -21,8 +21,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/string2int.h>
 
+#include <ansi-c/gcc_types.h>
+
 #include "parse_float.h"
-#include "../gcc_types.h"
 
 exprt convert_float_literal(const std::string &src)
 {

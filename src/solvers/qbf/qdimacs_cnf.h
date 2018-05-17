@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <iosfwd>
 
-#include "../sat/dimacs_cnf.h"
+#include <solvers/sat/dimacs_cnf.h>
 
 class qdimacs_cnft:public dimacs_cnft
 {
