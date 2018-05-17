@@ -12,16 +12,20 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/invariant.h>
 
+#include "bv_conversion_exceptions.h"
 #include "flatten_byte_operators.h"
 
 literalt boolbvt::convert_equality(const equal_exprt &expr)
 {
   const bool is_base_type_eq =
     base_type_eq(expr.lhs().type(), expr.rhs().type(), ns);
-  DATA_INVARIANT(
-    is_base_type_eq,
-    std::string("equality without matching types:\n") + "######### lhs: " +
-      expr.lhs().pretty() + '\n' + "######### rhs: " + expr.rhs().pretty());
+  if(!is_base_type_eq)
+  {
+    const std::string error_msg =
+      std::string("equality without matching types:\n") + "######### lhs: " +
+      expr.lhs().pretty() + '\n' + "######### rhs: " + expr.rhs().pretty();
+    throw bitvector_conversion_exceptiont(error_msg, expr);
+  }
 
   // see if it is an unbounded array
   if(is_unbounded_array(expr.lhs().type()))
