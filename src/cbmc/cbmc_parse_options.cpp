@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language.h>
 
 #include <ansi-c/c_preprocess.h>
+#include <ansi-c/ansi_c_formatter.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/initialize_goto_model.h>
@@ -595,7 +596,9 @@ int cbmc_parse_optionst::get_goto_program(
 
     if(cmdline.isset("show-symbol-table"))
     {
-      show_symbol_table(goto_model, ui_message_handler.get_ui());
+      namespacet ns(goto_model.symbol_table);
+      ansi_c_formattert formatter(ns);
+      show_symbol_table(goto_model, ui_message_handler.get_ui(), formatter);
       return CPROVER_EXIT_SUCCESS;
     }
 

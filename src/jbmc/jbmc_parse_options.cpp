@@ -55,6 +55,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/convert_java_nondet.h>
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_enum_static_init_unwind_handler.h>
+#include <java_bytecode/java_formatter.h>
 #include <java_bytecode/remove_exceptions.h>
 #include <java_bytecode/remove_instanceof.h>
 #include <java_bytecode/remove_java_new.h>
@@ -671,8 +672,10 @@ int jbmc_parse_optionst::get_goto_program(
     // values, etc
     if(cmdline.isset("show-symbol-table"))
     {
+      const namespacet ns(lazy_goto_model.symbol_table);
+      java_formattert formatter(ns);
       show_symbol_table(
-        lazy_goto_model.symbol_table, ui_message_handler.get_ui());
+        lazy_goto_model.symbol_table, ui_message_handler.get_ui(), formatter);
       return 0;
     }
 
@@ -850,8 +853,10 @@ bool jbmc_parse_optionst::show_loaded_functions(
 {
   if(cmdline.isset("show-symbol-table"))
   {
+    namespacet ns(goto_model.get_symbol_table());
+    java_formattert formatter(ns);
     show_symbol_table(
-      goto_model.get_symbol_table(), ui_message_handler.get_ui());
+      goto_model.get_symbol_table(), ui_message_handler.get_ui(), formatter);
     return true;
   }
 

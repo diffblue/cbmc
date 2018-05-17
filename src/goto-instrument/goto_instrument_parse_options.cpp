@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/json.h>
 #include <util/exit_codes.h>
 
+#include <ansi-c/ansi_c_formatter.h>
+
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_calls_no_body.h>
@@ -463,7 +465,9 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-symbol-table"))
     {
-      ::show_symbol_table(goto_model, get_ui());
+      namespacet ns(goto_model.symbol_table);
+      ansi_c_formattert formatter(ns);
+      ::show_symbol_table(goto_model, get_ui(), formatter);
       return CPROVER_EXIT_SUCCESS;
     }
 

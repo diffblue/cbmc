@@ -19,13 +19,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_model.h"
 
-void show_symbol_table_xml_ui()
+void show_symbol_table_xml_ui(formattert &)
 {
 }
 
 void show_symbol_table_brief_plain(
   const symbol_tablet &symbol_table,
-  std::ostream &out)
+  std::ostream &out,
+  formattert &formatter)
 {
   // we want to sort alphabetically
   std::set<std::string> symbols;
@@ -41,29 +42,17 @@ void show_symbol_table_brief_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode=="")
-      ptr=get_default_language();
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-      if(ptr==nullptr)
-        throw "symbol "+id2string(symbol.name)+" has unknown mode";
-    }
-
-    std::string type_str;
-
     if(symbol.type.is_not_nil())
-      ptr->from_type(symbol.type, type_str, ns);
-
-    out << symbol.name << " " << type_str << '\n';
+      out << symbol.name << " " << formatter(symbol.type) << '\n';
+    else
+      out << symbol.name << '\n';
   }
 }
 
 void show_symbol_table_plain(
   const symbol_tablet &symbol_table,
-  std::ostream &out)
+  std::ostream &out,
+  formattert &formatter)
 {
   out << '\n' << "Symbols:" << '\n' << '\n';
 
@@ -81,35 +70,24 @@ void show_symbol_table_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode=="")
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
-
     std::string type_str, value_str;
-
-    if(symbol.type.is_not_nil())
-      ptr->from_type(symbol.type, type_str, ns);
-
-    if(symbol.value.is_not_nil())
-      ptr->from_expr(symbol.value, value_str, ns);
 
     out << "Symbol......: " << symbol.name << '\n' << std::flush;
     out << "Pretty name.: " << symbol.pretty_name << '\n';
     out << "Module......: " << symbol.module << '\n';
     out << "Base name...: " << symbol.base_name << '\n';
     out << "Mode........: " << symbol.mode << '\n';
-    out << "Type........: " << type_str << '\n';
-    out << "Value.......: " << value_str << '\n';
+
+    out << "Type........: ";
+    if(symbol.type.is_not_nil())
+      out << formatter(symbol.type);
+    out << '\n';
+
+    out << "Value.......: ";
+    if(symbol.value.is_not_nil())
+      out << formatter(symbol.value);
+    out << '\n';
+
     out << "Flags.......:";
 
     if(symbol.is_lvalue)
@@ -146,7 +124,7 @@ void show_symbol_table_plain(
       out << " volatile";
 
     out << '\n';
-    out << "Location....: " << symbol.location << '\n';
+    out << "Location....: " << formatter(symbol.location) << '\n';
 
     out << '\n' << std::flush;
   }
@@ -154,16 +132,17 @@ void show_symbol_table_plain(
 
 void show_symbol_table(
   const symbol_tablet &symbol_table,
-  ui_message_handlert::uit ui)
+  ui_message_handlert::uit ui,
+  formattert &formatter)
 {
   switch(ui)
   {
   case ui_message_handlert::uit::PLAIN:
-    show_symbol_table_plain(symbol_table, std::cout);
+    show_symbol_table_plain(symbol_table, std::cout, formatter);
     break;
 
   case ui_message_handlert::uit::XML_UI:
-    show_symbol_table_xml_ui();
+    show_symbol_table_xml_ui(formatter);
     break;
 
   default:
@@ -173,23 +152,25 @@ void show_symbol_table(
 
 void show_symbol_table(
   const goto_modelt &goto_model,
-  ui_message_handlert::uit ui)
+  ui_message_handlert::uit ui,
+  formattert &formatter)
 {
-  show_symbol_table(goto_model.symbol_table, ui);
+  show_symbol_table(goto_model.symbol_table, ui, formatter);
 }
 
 void show_symbol_table_brief(
   const symbol_tablet &symbol_table,
-  ui_message_handlert::uit ui)
+  ui_message_handlert::uit ui,
+  formattert &formatter)
 {
   switch(ui)
   {
   case ui_message_handlert::uit::PLAIN:
-    show_symbol_table_brief_plain(symbol_table, std::cout);
+    show_symbol_table_brief_plain(symbol_table, std::cout, formatter);
     break;
 
   case ui_message_handlert::uit::XML_UI:
-    show_symbol_table_xml_ui();
+    show_symbol_table_xml_ui(formatter);
     break;
 
   default:
@@ -199,7 +180,8 @@ void show_symbol_table_brief(
 
 void show_symbol_table_brief(
   const goto_modelt &goto_model,
-  ui_message_handlert::uit ui)
+  ui_message_handlert::uit ui,
+  formattert &formatter)
 {
-  show_symbol_table_brief(goto_model.symbol_table, ui);
+  show_symbol_table_brief(goto_model.symbol_table, ui, formatter);
 }
