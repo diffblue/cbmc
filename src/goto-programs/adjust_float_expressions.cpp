@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/arith_tools.h>
 
-#include <goto-programs/goto_model.h>
+#include "goto_model.h"
 
 static bool have_to_adjust_float_expressions(
   const exprt &expr,

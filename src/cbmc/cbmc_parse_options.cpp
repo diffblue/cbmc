@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_preprocess.h>
 
+#include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/goto_convert_functions.h>
@@ -49,7 +50,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_instrumentation.h>
 
 #include <goto-symex/rewrite_union.h>
-#include <goto-symex/adjust_float_expressions.h>
 
 #include <goto-instrument/reachability_slicer.h>
 #include <goto-instrument/full_slicer.h>

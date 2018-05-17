@@ -138,6 +138,8 @@ public:
 
   valuest values;
 
+  bool partial_evaluate(exprt &expr, const namespacet &ns) const;
+
 protected:
   void assign_rec(
     valuest &values,
@@ -147,6 +149,12 @@ protected:
   bool two_way_propagate_rec(
     const exprt &expr,
     const namespacet &ns);
+
+  bool partial_evaluate_with_all_rounding_modes(
+    exprt &expr,
+    const namespacet &ns) const;
+
+  bool replace_constants_and_simplify(exprt &expr, const namespacet &ns) const;
 };
 
 class constant_propagator_ait:public ait<constant_propagator_domaint>

@@ -14,9 +14,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "mp_arith.h"
 #include "format_spec.h"
+#include "irep.h"
+#include "cprover_prefix.h"
 
 class constant_exprt;
 class floatbv_typet;
+
+const char ID_cprover_rounding_mode_str[] = CPROVER_PREFIX "rounding_mode";
 
 class ieee_float_spect
 {

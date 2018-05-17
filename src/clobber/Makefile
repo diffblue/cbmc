@@ -13,7 +13,6 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../assembler/assembler$(LIBEXT) \
        ../solvers/solvers$(LIBEXT) \
        ../util/util$(LIBEXT) \
-       ../goto-symex/adjust_float_expressions$(OBJEXT) \
        ../goto-symex/rewrite_union$(OBJEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
        ../goto-instrument/dump_c$(OBJEXT) \
