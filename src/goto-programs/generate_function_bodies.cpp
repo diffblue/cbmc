@@ -9,7 +9,7 @@ Author: Diffblue Ltd.
 #include "generate_function_bodies.h"
 
 #include <util/arith_tools.h>
-#include <util/format_expr.h>
+#include <util/formatter.h>
 #include <util/make_unique.h>
 #include <util/string_utils.h>
 
@@ -102,7 +102,7 @@ protected:
     const namespacet ns(symbol_table);
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
-                   << format(assert_instruction->guard);
+                   << debug_formatter(assert_instruction->guard);
     assert_instruction->source_location.set_comment(comment_stream.str());
     assert_instruction->source_location.set_property_class(ID_assertion);
     auto end_instruction = add_instruction();
@@ -134,7 +134,7 @@ protected:
     const namespacet ns(symbol_table);
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
-                   << format(assert_instruction->guard);
+                   << debug_formatter(assert_instruction->guard);
     assert_instruction->source_location.set_comment(comment_stream.str());
     assert_instruction->source_location.set_property_class(ID_assertion);
     auto assume_instruction = add_instruction();
@@ -203,7 +203,7 @@ private:
           bool constant_known_array_size = lhs_array_type.size().is_constant();
           if(!constant_known_array_size)
           {
-            warning() << "Cannot havoc non-const array " << format(lhs)
+            warning() << "Cannot havoc non-const array " << debug_formatter(lhs)
                       << " in function " << function_name
                       << ": Unknown array size" << eom;
           }
@@ -219,7 +219,7 @@ private:
               // Pretty much the same thing as a unknown size array
               // Technically not allowed by the C standard, but we model
               // unknown size arrays in structs this way
-              warning() << "Cannot havoc non-const array " << format(lhs)
+              warning() << "Cannot havoc non-const array " << debug_formatter(lhs)
                         << " in function " << function_name << ": Array size 0"
                         << eom;
             }

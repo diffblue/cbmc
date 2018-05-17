@@ -6,19 +6,22 @@
 
 \*******************************************************************/
 
+#include <util/arith_tools.h>
+#include <util/expr_util.h>
+#include <util/expr_iterator.h>
+#include <util/formatter.h>
+#include <util/graph.h>
+#include <util/magic.h>
+#include <util/make_unique.h>
+#include <util/ssa_expr.h>
+#include <util/std_expr.h>
+
 #include <algorithm>
 #include <numeric>
 #include <functional>
 #include <iostream>
-#include <util/arith_tools.h>
-#include <util/expr_util.h>
-#include <util/ssa_expr.h>
-#include <util/std_expr.h>
-#include <util/expr_iterator.h>
-#include <util/graph.h>
-#include <util/magic.h>
-#include <util/make_unique.h>
 #include <unordered_set>
+
 #include "string_refinement_util.h"
 
 /// Applies `f` on all strings contained in `e` that are not if-expressions.
@@ -474,7 +477,7 @@ void string_dependenciest::output_dot(std::ostream &stream) const
       ostream << '"' << builtin_function_nodes[n.index].data->name() << '_'
               << n.index << '"';
     else
-      ostream << '"' << format(string_nodes[n.index].expr) << '"';
+      ostream << '"' << debug_formatter(string_nodes[n.index].expr) << '"';
     return ostream.str();
   };
   stream << "digraph dependencies {\n";

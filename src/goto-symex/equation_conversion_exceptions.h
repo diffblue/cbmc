@@ -14,7 +14,7 @@ Author: Diffblue Ltd.
 
 #include <sstream>
 
-#include <util/format_expr.h>
+#include <util/formatter.h>
 
 #include "symex_target_equation.h"
 
@@ -28,7 +28,7 @@ public:
   {
     std::ostringstream error_msg;
     error_msg << runtime_error::what();
-    error_msg << "\nSource GOTO statement: " << format(step.source.pc->code);
+    error_msg << "\nSource GOTO statement: " << debug_formatter(step.source.pc->code);
     error_msg << "\nStep:\n";
     step.output(error_msg);
     error_message = error_msg.str();

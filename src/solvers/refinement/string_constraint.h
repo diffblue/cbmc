@@ -23,8 +23,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include "bv_refinement.h"
 #include "string_refinement_invariant.h"
 
-#include <util/format_expr.h>
-#include <util/format_type.h>
+#include <util/formatter.h>
 #include <util/refined_string_type.h>
 #include <util/string_expr.h>
 
@@ -140,9 +139,9 @@ extern inline string_constraintt &to_string_constraint(exprt &expr)
 inline std::string to_string(const string_constraintt &expr)
 {
   std::ostringstream out;
-  out << "forall " << format(expr.univ_var()) << " in ["
-      << format(expr.lower_bound()) << ", " << format(expr.upper_bound())
-      << "). " << format(expr.premise()) << " => " << format(expr.body());
+  out << "forall " << debug_formatter(expr.univ_var()) << " in ["
+      << debug_formatter(expr.lower_bound()) << ", " << debug_formatter(expr.upper_bound())
+      << "). " << debug_formatter(expr.premise()) << " => " << debug_formatter(expr.body());
   return out.str();
 }
 
@@ -212,12 +211,12 @@ public:
 inline std::string to_string(const string_not_contains_constraintt &expr)
 {
   std::ostringstream out;
-  out << "forall x in [" << format(expr.univ_lower_bound()) << ", "
-      << format(expr.univ_upper_bound()) << "). " << format(expr.premise())
+  out << "forall x in [" << debug_formatter(expr.univ_lower_bound()) << ", "
+      << debug_formatter(expr.univ_upper_bound()) << "). " << debug_formatter(expr.premise())
       << " => ("
-      << "exists y in [" << format(expr.exists_lower_bound()) << ", "
-      << format(expr.exists_upper_bound()) << "). " << format(expr.s0())
-      << "[x+y] != " << format(expr.s1()) << "[y])";
+      << "exists y in [" << debug_formatter(expr.exists_lower_bound()) << ", "
+      << debug_formatter(expr.exists_upper_bound()) << "). " << debug_formatter(expr.s0())
+      << "[x+y] != " << debug_formatter(expr.s1()) << "[y])";
   return out.str();
 }
 

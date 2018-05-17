@@ -19,16 +19,19 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #include <solvers/refinement/string_refinement.h>
 
+#include <util/expr_iterator.h>
+#include <util/expr_util.h>
+#include <util/formatter.h>
+#include <util/magic.h>
+#include <util/simplify_expr.h>
+
+#include <solvers/sat/satcheck.h>
+#include <solvers/refinement/string_constraint_instantiation.h>
+
 #include <iomanip>
 #include <numeric>
 #include <stack>
-#include <util/expr_iterator.h>
-#include <util/expr_util.h>
-#include <util/simplify_expr.h>
-#include <solvers/sat/satcheck.h>
-#include <solvers/refinement/string_constraint_instantiation.h>
 #include <unordered_set>
-#include <util/magic.h>
 
 static bool is_valid_string_constraint(
   messaget::mstreamt &stream,
@@ -190,7 +193,7 @@ static void display_index_set(
   for(const auto &i : index_set.cumulative)
   {
     const exprt &s=i.first;
-    stream << "IS(" << format(s) << ")=={" << eom;
+    stream << "IS(" << debug_formatter(s) << ")=={" << eom;
 
     for(const auto &j : i.second)
     {
@@ -200,7 +203,7 @@ static void display_index_set(
         count_current++;
         stream << "**";
       }
-      stream << "  " << format(j) << ";" << eom;
+      stream << "  " << debug_formatter(j) << ";" << eom;
       count++;
     }
     stream << "}"  << eom;
@@ -324,15 +327,15 @@ static union_find_replacet generate_symbol_resolution_from_equations(
     const exprt &rhs = eq.rhs();
     if(lhs.id()!=ID_symbol)
     {
-      stream << log_message << "non symbol lhs: " << format(lhs)
-             << " with rhs: " << format(rhs) << eom;
+      stream << log_message << "non symbol lhs: " << debug_formatter(lhs)
+             << " with rhs: " << debug_formatter(rhs) << eom;
       continue;
     }
 
     if(lhs.type()!=rhs.type())
     {
-      stream << log_message << "non equal types lhs: " << format(lhs)
-             << "\n####################### rhs: " << format(rhs) << eom;
+      stream << log_message << "non equal types lhs: " << debug_formatter(lhs)
+             << "\n####################### rhs: " << debug_formatter(rhs) << eom;
       continue;
     }
 
@@ -365,7 +368,7 @@ static union_find_replacet generate_symbol_resolution_from_equations(
       else
       {
         stream << log_message << "non struct with char pointer subexpr "
-               << format(rhs) << "\n  * of type " << format(rhs.type()) << eom;
+               << debug_formatter(rhs) << "\n  * of type " << debug_formatter(rhs.type()) << eom;
       }
     }
   }
@@ -501,8 +504,8 @@ union_find_replacet string_identifiers_resolution_from_equations(
       if(lhs_strings.empty())
       {
         stream << log_message << "non struct with string subtype "
-               << format(eq.lhs()) << "\n  * of type "
-               << format(eq.lhs().type()) << eom;
+               << debug_formatter(eq.lhs()) << "\n  * of type "
+               << debug_formatter(eq.lhs().type()) << eom;
       }
 
       for(const exprt &expr : extract_strings(eq.rhs()))
@@ -539,8 +542,8 @@ void output_equations(
   const namespacet &ns)
 {
   for(std::size_t i = 0; i < equations.size(); ++i)
-    output << "  [" << i << "] " << format(equations[i].lhs())
-           << " == " << format(equations[i].rhs()) << std::endl;
+    output << "  [" << i << "] " << debug_formatter(equations[i].lhs())
+           << " == " << debug_formatter(equations[i].rhs()) << std::endl;
 }
 
 /// Main decision procedure of the solver. Looks for a valuation of variables
@@ -621,7 +624,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 #ifdef DEBUG
   debug() << "symbol resolve:" << eom;
   for(const auto &pair : symbol_resolve.to_vector())
-    debug() << format(pair.first) << " --> " << format(pair.second) << eom;
+    debug() << debug_formatter(pair.first) << " --> " << debug_formatter(pair.second) << eom;
 #endif
 
   const union_find_replacet string_id_symbol_resolve =
@@ -630,7 +633,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   debug() << "symbol resolve string:" << eom;
   for(const auto &pair : string_id_symbol_resolve.to_vector())
   {
-    debug() << format(pair.first) << " --> " << format(pair.second) << eom;
+    debug() << debug_formatter(pair.first) << " --> " << debug_formatter(pair.second) << eom;
   }
 #endif
 
@@ -678,15 +681,15 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   debug() << "dec_solve: arrays_of_pointers:" << eom;
   for(auto pair : generator.array_pool.get_arrays_of_pointers())
   {
-    debug() << "  * " << format(pair.first) << "\t--> " << format(pair.second)
-            << " : " << format(pair.second.type()) << eom;
+    debug() << "  * " << debug_formatter(pair.first) << "\t--> " << debug_formatter(pair.second)
+            << " : " << debug_formatter(pair.second.type()) << eom;
   }
 #endif
 
   for(const auto &eq : local_equations)
   {
 #ifdef DEBUG
-    debug() << "dec_solve: set_to " << format(eq) << eom;
+    debug() << "dec_solve: set_to " << debug_formatter(eq) << eom;
 #endif
     supert::set_to(eq, true);
   }
@@ -889,7 +892,7 @@ void string_refinementt::add_lemma(
       ++it;
   }
 
-  debug() << "adding lemma " << format(simple_lemma) << eom;
+  debug() << "adding lemma " << debug_formatter(simple_lemma) << eom;
 
   prop.l_set_to_true(convert(simple_lemma));
 }
@@ -922,7 +925,7 @@ static optionalt<exprt> get_array(
 
   if(size_val.id()!=ID_constant)
   {
-    stream << "(sr::get_array) string of unknown size: " << format(size_val)
+    stream << "(sr::get_array) string of unknown size: " << debug_formatter(size_val)
            << eom;
     return {};
   }
@@ -937,8 +940,8 @@ static optionalt<exprt> get_array(
 
   if(n > MAX_CONCRETE_STRING_SIZE)
   {
-    stream << "(sr::get_array) long string (size " << format(arr.length())
-           << " = " << n << ") " << format(arr) << eom;
+    stream << "(sr::get_array) long string (size " << debug_formatter(arr.length())
+           << " = " << n << ") " << debug_formatter(arr) << eom;
     stream << "(sr::get_array) consider reducing string-max-input-length so "
               "that no string exceeds "
            << MAX_CONCRETE_STRING_SIZE
@@ -988,25 +991,25 @@ static exprt get_char_array_and_concretize(
 {
   const auto &eom = messaget::eom;
   static const std::string indent("  ");
-  stream << "- " << format(arr) << ":\n";
-  stream << indent << indent << "- type: " << format(arr.type()) << eom;
+  stream << "- " << debug_formatter(arr) << ":\n";
+  stream << indent << indent << "- type: " << debug_formatter(arr.type()) << eom;
   const auto arr_model_opt =
     get_array(super_get, ns, max_string_length, stream, arr);
   if(arr_model_opt)
   {
-    stream << indent << indent << "- char_array: " << format(*arr_model_opt)
+    stream << indent << indent << "- char_array: " << debug_formatter(*arr_model_opt)
            << '\n';
-    stream << indent << indent << "- type : " << format(arr_model_opt->type())
+    stream << indent << indent << "- type : " << debug_formatter(arr_model_opt->type())
            << eom;
     const exprt simple = simplify_expr(*arr_model_opt, ns);
-    stream << indent << indent << "- simplified_char_array: " << format(simple)
+    stream << indent << indent << "- simplified_char_array: " << debug_formatter(simple)
            << eom;
     if(
       const auto concretized_array = get_array(
         super_get, ns, max_string_length, stream, to_array_string_expr(simple)))
     {
       stream << indent << indent
-             << "- concretized_char_array: " << format(*concretized_array)
+             << "- concretized_char_array: " << debug_formatter(*concretized_array)
              << eom;
 
       if(
@@ -1046,21 +1049,21 @@ void debug_model(
     const exprt model = get_char_array_and_concretize(
       super_get, ns, max_string_length, stream, arr);
 
-    stream << "- " << format(arr) << ":\n"
-           << indent << "- pointer: " << format(pointer_array.first) << "\n"
-           << indent << "- model: " << format(model) << messaget::eom;
+    stream << "- " << debug_formatter(arr) << ":\n"
+           << indent << "- pointer: " << debug_formatter(pointer_array.first) << "\n"
+           << indent << "- model: " << debug_formatter(model) << messaget::eom;
   }
 
   for(const auto &symbol : boolean_symbols)
   {
     stream << " - " << symbol.get_identifier() << ": "
-           << format(super_get(symbol)) << '\n';
+           << debug_formatter(super_get(symbol)) << '\n';
   }
 
   for(const auto &symbol : index_symbols)
   {
     stream << " - " << symbol.get_identifier() << ": "
-           << format(super_get(symbol)) << '\n';
+           << debug_formatter(super_get(symbol)) << '\n';
   }
   stream << messaget::eom;
 }
@@ -1300,7 +1303,7 @@ static void debug_check_axioms_step(
   else if(axiom.id() == ID_string_not_contains_constraint)
     stream << to_string(to_string_not_contains_constraint(axiom));
   else
-    stream << format(axiom);
+    stream << debug_formatter(axiom);
   stream << '\n' << indent2 << "- axiom_in_model:\n" << indent2 << indent;
 
   if(axiom_in_model.id() == ID_string_constraint)
@@ -1308,13 +1311,13 @@ static void debug_check_axioms_step(
   else if(axiom_in_model.id() == ID_string_not_contains_constraint)
     stream << to_string(to_string_not_contains_constraint(axiom_in_model));
   else
-    stream << format(axiom_in_model);
+    stream << debug_formatter(axiom_in_model);
 
   stream << '\n'
          << indent2 << "- negated_axiom:\n"
-         << indent2 << indent << format(negaxiom) << '\n';
+         << indent2 << indent << debug_formatter(negaxiom) << '\n';
   stream << indent2 << "- negated_axiom_with_concretized_arrays:\n"
-         << indent2 << indent << format(with_concretized_arrays) << '\n';
+         << indent2 << indent << debug_formatter(with_concretized_arrays) << '\n';
 }
 
 /// \return true if the current model satisfies all the axioms
@@ -1345,7 +1348,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   stream << "symbol_resolve:" << eom;
   auto pairs = symbol_resolve.to_vector();
   for(const auto &pair : pairs)
-    stream << "  - " << format(pair.first) << " --> " << format(pair.second)
+    stream << "  - " << debug_formatter(pair.first) << " --> " << debug_formatter(pair.second)
            << eom;
 
 #ifdef DEBUG
@@ -1391,7 +1394,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
        find_counter_example(ns, ui, with_concretized_arrays, univ_var))
     {
       stream << indent2 << "- violated_for: " << univ_var.get_identifier()
-             << "=" << format(*witness) << eom;
+             << "=" << debug_formatter(*witness) << eom;
       violated[i]=*witness;
     }
     else
@@ -1444,7 +1447,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     if(const auto witness = find_counter_example(ns, ui, negaxiom, univ_var))
     {
       stream << indent2 << "- violated_for: " << univ_var.get_identifier()
-             << "=" << format(*witness) << eom;
+             << "=" << debug_formatter(*witness) << eom;
       violated_not_contains[i]=*witness;
     }
   }
@@ -2273,12 +2276,12 @@ static bool is_valid_string_constraint(
   const array_index_mapt premise_indices=gather_indices(expr.premise());
   if(!premise_indices.empty())
   {
-    stream << "Premise has indices: " << format(expr) << ", map: {";
+    stream << "Premise has indices: " << debug_formatter(expr) << ", map: {";
     for(const auto &pair : premise_indices)
     {
-      stream << format(pair.first) << ": {";
+      stream << debug_formatter(pair.first) << ": {";
       for(const auto &i : pair.second)
-        stream << format(i) << ", ";
+        stream << debug_formatter(i) << ", ";
     }
     stream << "}}" << eom;
     return false;
@@ -2298,8 +2301,8 @@ static bool is_valid_string_constraint(
       const exprt result=simplify_expr(equals, ns);
       if(result.is_false())
       {
-        stream << "Indices not equal: " << format(expr)
-               << ", str: " << format(pair.first) << eom;
+        stream << "Indices not equal: " << debug_formatter(expr)
+               << ", str: " << debug_formatter(pair.first) << eom;
         return false;
       }
     }
@@ -2307,8 +2310,8 @@ static bool is_valid_string_constraint(
     // Condition 3: f must be linear in the quantified variable
     if(!is_linear_arithmetic_expr(rep, expr.univ_var()))
     {
-      stream << "f is not linear: " << format(expr)
-             << ", str: " << format(pair.first) << eom;
+      stream << "f is not linear: " << debug_formatter(expr)
+             << ", str: " << debug_formatter(pair.first) << eom;
       return false;
     }
 
@@ -2316,7 +2319,7 @@ static bool is_valid_string_constraint(
     // body
     if(!universal_only_in_index(expr))
     {
-      stream << "Universal variable outside of index:" << format(expr) << eom;
+      stream << "Universal variable outside of index:" << debug_formatter(expr) << eom;
       return false;
     }
   }

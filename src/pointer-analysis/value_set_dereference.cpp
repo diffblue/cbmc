@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef DEBUG
 #include <iostream>
-#include <util/format_expr.h>
 #endif
 
 #include <util/arith_tools.h>
@@ -23,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
-#include <util/format_type.h>
+#include <util/formatter.h>
 #include <util/guard.h>
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
@@ -77,7 +76,7 @@ exprt value_set_dereferencet::dereference(
   const typet &type=pointer.type().subtype();
 
   #if 0
-  std::cout << "DEREF: " << format(pointer) << '\n';
+  std::cout << "DEREF: " << debug_formatter(pointer) << '\n';
   #endif
 
   // collect objects the pointer may point to
@@ -90,7 +89,7 @@ exprt value_set_dereferencet::dereference(
       it=points_to_set.begin();
       it!=points_to_set.end();
       it++)
-    std::cout << "P: " << format(*it) << '\n';
+    std::cout << "P: " << debug_formatter(*it) << '\n';
   #endif
 
   // get the values of these
@@ -105,8 +104,8 @@ exprt value_set_dereferencet::dereference(
     valuet value=build_reference_to(*it, mode, pointer, guard);
 
     #if 0
-    std::cout << "V: " << format(value.pointer_guard) << " --> ";
-    std::cout << format(value.value) << '\n';
+    std::cout << "V: " << debug_formatter(value.pointer_guard) << " --> ";
+    std::cout << debug_formatter(value.value) << '\n';
     #endif
 
     values.push_back(value);
@@ -191,7 +190,7 @@ exprt value_set_dereferencet::dereference(
   }
 
   #if 0
-  std::cout << "R: " << format(value) << "\n\n";
+  std::cout << "R: " << debug_formatter(value) << "\n\n";
   #endif
 
   return value;
@@ -281,7 +280,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &object=o.object();
 
   #if 0
-  std::cout << "O: " << format(root_object) << '\n';
+  std::cout << "O: " << debug_formatter(root_object) << '\n';
   #endif
 
   valuet result;
@@ -561,8 +560,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         {
           std::ostringstream msg;
           msg << "memory model not applicable (got `"
-              << format(result.value.type()) << "', expected `"
-              << format(dereference_type) << "')";
+              << debug_formatter(result.value.type()) << "', expected `"
+              << debug_formatter(dereference_type) << "')";
 
           dereference_callback.dereference_failure(
             "pointer dereference", msg.str(), tmp_guard);

@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_target_equation.h"
 
-#include <util/format_expr.h>
+#include <util/formatter.h>
 #include <util/std_expr.h>
 #include <util/throw_with_nested.h>
 #include <util/unwrap_nested_exception.h>
@@ -795,10 +795,10 @@ void symex_target_equationt::SSA_stept::output(std::ostream &out) const
   switch(type)
   {
   case goto_trace_stept::typet::ASSERT:
-    out << "ASSERT " << format(cond_expr) << '\n';
+    out << "ASSERT " << debug_formatter(cond_expr) << '\n';
     break;
   case goto_trace_stept::typet::ASSUME:
-    out << "ASSUME " << format(cond_expr) << '\n';
+    out << "ASSUME " << debug_formatter(cond_expr) << '\n';
     break;
   case goto_trace_stept::typet::LOCATION:
     out << "LOCATION" << '\n';
@@ -812,7 +812,7 @@ void symex_target_equationt::SSA_stept::output(std::ostream &out) const
 
   case goto_trace_stept::typet::DECL:
     out << "DECL" << '\n';
-    out << format(ssa_lhs) << '\n';
+    out << debug_formatter(ssa_lhs) << '\n';
     break;
 
   case goto_trace_stept::typet::ASSIGNMENT:
@@ -876,7 +876,7 @@ void symex_target_equationt::SSA_stept::output(std::ostream &out) const
     out << "MEMORY_BARRIER\n";
     break;
   case goto_trace_stept::typet::GOTO:
-    out << "IF " << format(cond_expr) << " GOTO\n";
+    out << "IF " << debug_formatter(cond_expr) << " GOTO\n";
     break;
 
   default:
@@ -884,13 +884,13 @@ void symex_target_equationt::SSA_stept::output(std::ostream &out) const
   }
 
   if(is_assert() || is_assume() || is_assignment() || is_constraint())
-    out << format(cond_expr) << '\n';
+    out << debug_formatter(cond_expr) << '\n';
 
   if(is_assert() || is_constraint())
     out << comment << '\n';
 
   if(is_shared_read() || is_shared_write())
-    out << format(ssa_lhs) << '\n';
+    out << debug_formatter(ssa_lhs) << '\n';
 
-  out << "Guard: " << format(guard) << '\n';
+  out << "Guard: " << debug_formatter(guard) << '\n';
 }

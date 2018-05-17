@@ -24,8 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef DEBUG
 #include <iostream>
-#include <util/format_expr.h>
-#include <util/format_type.h>
+#include <util/formatter.h>
 #endif
 
 #include "add_failed_symbols.h"
@@ -327,7 +326,7 @@ void value_sett::get_value_set(
   #if 0
   for(value_setst::valuest::const_iterator it=dest.begin();
       it!=dest.end(); it++)
-    std::cout << "GET_VALUE_SET: " << format(*it) << '\n';
+    std::cout << "GET_VALUE_SET: " << debug_formatter(*it) << '\n';
   #endif
 }
 
@@ -352,7 +351,7 @@ void value_sett::get_value_set_rec(
   const namespacet &ns) const
 {
   #if 0
-  std::cout << "GET_VALUE_SET_REC EXPR: " << format(expr) << "\n";
+  std::cout << "GET_VALUE_SET_REC EXPR: " << debug_formatter(expr) << "\n";
   std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << '\n';
   #endif
 
@@ -884,7 +883,7 @@ void value_sett::get_value_set_rec(
   for(const auto &obj : dest.read())
   {
     const exprt &e=to_expr(obj);
-    std::cout << "  " << format(e) << "\n";
+    std::cout << "  " << debug_formatter(e) << "\n";
   }
   std::cout << "\n";
   #endif
@@ -929,7 +928,7 @@ void value_sett::get_reference_set_rec(
   const namespacet &ns) const
 {
   #if 0
-  std::cout << "GET_REFERENCE_SET_REC EXPR: " << format(expr)
+  std::cout << "GET_REFERENCE_SET_REC EXPR: " << debug_formatter(expr)
             << '\n';
   #endif
 
@@ -956,7 +955,7 @@ void value_sett::get_reference_set_rec(
     #if 0
     for(expr_sett::const_iterator it=value_set.begin();
         it!=value_set.end(); it++)
-      std::cout << "VALUE_SET: " << format(*it) << '\n';
+      std::cout << "VALUE_SET: " << debug_formatter(*it) << '\n';
     #endif
 
     return;
@@ -1093,10 +1092,10 @@ void value_sett::assign(
   bool add_to_sets)
 {
 #if 0
-  std::cout << "ASSIGN LHS: " << format(lhs) << " : "
-            << format(lhs.type()) << '\n';
-  std::cout << "ASSIGN RHS: " << format(rhs) << " : "
-            << format(rhs.type()) << '\n';
+  std::cout << "ASSIGN LHS: " << debug_formatter(lhs) << " : "
+            << debug_formatter(lhs.type()) << '\n';
+  std::cout << "ASSIGN RHS: " << debug_formatter(rhs) << " : "
+            << debug_formatter(rhs.type()) << '\n';
   std::cout << "--------------------------------------------\n";
   output(ns, std::cout);
 #endif
@@ -1301,7 +1300,7 @@ void value_sett::assign_rec(
   bool add_to_sets)
 {
   #if 0
-  std::cout << "ASSIGN_REC LHS: " << format(lhs) << '\n';
+  std::cout << "ASSIGN_REC LHS: " << debug_formatter(lhs) << '\n';
   std::cout << "ASSIGN_REC LHS ID: " << lhs.id() << '\n';
   std::cout << "ASSIGN_REC SUFFIX: " << suffix << '\n';
 
@@ -1309,7 +1308,7 @@ void value_sett::assign_rec(
       it!=values_rhs.read().end();
       it++)
     std::cout << "ASSIGN_REC RHS: " <<
-      format(object_numbering[it->first]) << '\n';
+      debug_formatter(object_numbering[it->first]) << '\n';
   std::cout << '\n';
   #endif
 

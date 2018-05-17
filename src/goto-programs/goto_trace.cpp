@@ -17,7 +17,7 @@ Author: Daniel Kroening
 #include <ostream>
 
 #include <util/arith_tools.h>
-#include <util/format_expr.h>
+#include <util/formatter.h>
 #include <util/symbol.h>
 
 #include <ansi-c/printf_formatter.h>
@@ -74,8 +74,8 @@ void goto_trace_stept::output(
 
   if(is_assignment())
   {
-    out << "  " << format(full_lhs)
-        << " = " << format(full_lhs_value)
+    out << "  " << debug_formatter(full_lhs)
+        << " = " << debug_formatter(full_lhs_value)
         << '\n';
   }
 
@@ -95,7 +95,7 @@ void goto_trace_stept::output(
       if(!comment.empty())
         out << "  " << comment << '\n';
 
-      out << "  " << format(pc->guard) << '\n';
+      out << "  " << debug_formatter(pc->guard) << '\n';
       out << '\n';
     }
   }

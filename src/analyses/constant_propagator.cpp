@@ -13,7 +13,7 @@ Author: Peter Schrammel
 
 #ifdef DEBUG
 #include <iostream>
-#include <util/format_expr.h>
+#include <util/formatter.h>
 #endif
 
 #include <util/ieee_float.h>
@@ -223,7 +223,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
   const namespacet &ns)
 {
 #ifdef DEBUG
-  std::cout << "two_way_propagate_rec: " << format(expr) << '\n';
+  std::cout << "two_way_propagate_rec: " << debug_formatter(expr) << '\n';
 #endif
 
   bool change=false;
