@@ -3,7 +3,6 @@ SRC = basic_blocks.cpp \
       class_hierarchy.cpp \
       class_identifier.cpp \
       compute_called_functions.cpp \
-      convert_nondet.cpp \
       destructor.cpp \
       elf_reader.cpp \
       format_strings.cpp \

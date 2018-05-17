@@ -2,6 +2,7 @@ SRC = bytecode_info.cpp \
       character_refine_preprocess.cpp \
       ci_lazy_methods.cpp \
       ci_lazy_methods_needed.cpp \
+      convert_java_nondet.cpp \
       expr2java.cpp \
       generic_parameter_specialization_map_keys.cpp \
       jar_file.cpp \

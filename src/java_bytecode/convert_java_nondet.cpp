@@ -9,17 +9,18 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 /// \file
 /// Convert side_effect_expr_nondett expressions
 
-#include "convert_nondet.h"
-#include "goto_convert.h"
-#include "goto_model.h"
-#include "remove_skip.h"
+#include "convert_java_nondet.h"
 
-#include <java_bytecode/java_object_factory.h> // gen_nondet_init
+#include <goto-programs/goto_convert.h>
+#include <goto-programs/goto_model.h>
+#include <goto-programs/remove_skip.h>
 
-#include <util/irep_ids.h>
 #include <util/fresh_symbol.h>
+#include <util/irep_ids.h>
 
 #include <memory>
+
+#include "java_object_factory.h" // gen_nondet_init
 
 /// Checks an instruction to see whether it contains an assignment from
 /// side_effect_expr_nondet.  If so, replaces the instruction with a range of
