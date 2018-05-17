@@ -248,7 +248,7 @@ jobs:
             description: "Travis build of ${TRAVIS_COMMIT}"
           notification_email: "coverity-scan@diffblue.com"
           build_command_prepend: "make -C src minisat2-download"
-          build_command: "make -C src -j2"
+          build_command: "make -C src -j2; make -C jbmc/src -j2"
           branch_pattern: "develop"
       before_install:
         - |
@@ -277,12 +277,16 @@ install:
   - make -C src/ansi-c library_check
   - make -C src "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j3
   - make -C src "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j3 clobber.dir memory-models.dir
+  - make -C jbmc/src "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j3
 
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
   - env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test-parallel "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2 JOBS=2
   - make -C unit "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2
   - make -C unit test
+  - env UBSAN_OPTIONS=print_stacktrace=1 make -C jbmc/regression test-parallel "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2 JOBS=2
+  - make -C jbmc/unit "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2
+  - make -C jbmc/unit test
 
 before_cache:
   - ccache -s
