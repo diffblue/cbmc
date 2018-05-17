@@ -352,38 +352,9 @@ bool remove_returnst::restore_returns(
         continue;
 
       // replace "fkt#return_value=x;" by "return x;"
-      code_returnt return_code(assign.rhs());
-
-      // the assignment might be a goto target
-      i_it->make_skip();
-      i_it++;
-
-      while(!i_it->is_goto() && !i_it->is_end_function())
-      {
-        INVARIANT(
-          i_it->is_dead(),
-          "only dead statements should appear between "
-          "a return and the next goto or function end");
-        i_it++;
-      }
-
-      if(i_it->is_goto())
-      {
-        INVARIANT(
-          i_it->get_target()->is_end_function(),
-          "GOTO following return should target end of function");
-      }
-      else
-      {
-        INVARIANT(
-          i_it->is_end_function(),
-          "control-flow after assigning return value should lead directly "
-          "to end of function");
-        i_it=goto_program.instructions.insert(i_it, *i_it);
-      }
-
+      const exprt rhs = assign.rhs();
       i_it->make_return();
-      i_it->code=return_code;
+      i_it->code = code_returnt(rhs);
     }
   }
 

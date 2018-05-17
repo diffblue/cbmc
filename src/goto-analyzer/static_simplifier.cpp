@@ -12,6 +12,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <util/options.h>
 
 #include <goto-programs/goto_model.h>
+#include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unreachable.h>
 #include <goto-programs/write_goto_binary.h>
@@ -168,6 +169,10 @@ bool static_simplifier(
     remove_skip(goto_model.goto_functions);
     goto_model.goto_functions.update();
   }
+
+  // restore return types before writing the binary
+  restore_returns(goto_model);
+  goto_model.goto_functions.update();
 
   m.status() << "Writing goto binary" << messaget::eom;
   return write_goto_binary(out,
