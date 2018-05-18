@@ -6,6 +6,7 @@ SRC = cpp_constructor.cpp \
       cpp_destructor.cpp \
       cpp_enum_type.cpp \
       cpp_exception_id.cpp \
+      cpp_formatter.cpp \
       cpp_id.cpp \
       cpp_instantiate_template.cpp \
       cpp_internal_additions.cpp \
