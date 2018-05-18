@@ -1597,10 +1597,6 @@ inline const range_typet &to_range_type(const typet &type)
 class vector_typet:public type_with_subtypet
 {
 public:
-  vector_typet():type_with_subtypet(ID_vector)
-  {
-  }
-
   vector_typet(
     const typet &_subtype,
     const exprt &_size):type_with_subtypet(ID_vector, _subtype)
