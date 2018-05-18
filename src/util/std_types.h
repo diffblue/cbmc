@@ -1563,10 +1563,6 @@ inline const string_typet &to_string_type(const typet &type)
 class range_typet:public typet
 {
 public:
-  range_typet():typet(ID_range)
-  {
-  }
-
   range_typet(const mp_integer &_from, const mp_integer &_to)
   {
     set_from(_from);
