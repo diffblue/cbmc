@@ -68,17 +68,21 @@ void generate_function_bodies(
   goto_modelt &model,
   message_handlert &message_handler);
 
-#define OPT_REPLACE_FUNCTION_BODY                                              \
-  "(generate-function-body):"                                                  \
+// clang-format off
+#define OPT_REPLACE_FUNCTION_BODY \
+  "(generate-function-body):" \
   "(generate-function-body-options):"
 
-#define HELP_REPLACE_FUNCTION_BODY                                             \
-  " --generate-function-body <regex>\n"                                        \
-  "                              Generate bodies for functions matching regex" \
-  " --generate-function-body-options <option>\n"                               \
-  "                              One of assert-false, assume-false,\n"         \
-  "                              nondet-return, assert-false-assume-false and" \
-  "                              \nhavoc[,params:<regex>][,globals:<regex>]\n" \
+#define HELP_REPLACE_FUNCTION_BODY \
+  " --generate-function-body <regex>\n" \
+  /* NOLINTNEXTLINE(whitespace/line_length) */ \
+  "                              Generate bodies for functions matching regex\n" \
+  " --generate-function-body-options <option>\n" \
+  "                              One of assert-false, assume-false,\n" \
+  /* NOLINTNEXTLINE(whitespace/line_length) */ \
+  "                              nondet-return, assert-false-assume-false and\n" \
+  "                              havoc[,params:<regex>][,globals:<regex>]\n" \
   "                              (default: nondet-return)"
+// clang-format on
 
 #endif // CPROVER_GOTO_PROGRAMS_GENERATE_FUNCTION_BODIES_H
