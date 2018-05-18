@@ -71,6 +71,13 @@ TEST_CASE("Lvalue only", "[core][util][replace_symbol]")
     to_index_expr(to_address_of_expr(binary.op1()).object());
   REQUIRE(to_array_type(index_expr.array().type()).size() == c);
   REQUIRE(index_expr.index() == c);
+
+  address_of_exprt address_of(s1);
+  r.erase("a");
+  r.insert(s1, address_of);
+
+  REQUIRE(r.replace(binary) == true);
+  REQUIRE(binary.op0() == address_of_exprt(s1));
 }
 
 TEST_CASE("Replace always", "[core][util][replace_symbol]")
