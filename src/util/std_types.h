@@ -488,10 +488,6 @@ inline union_typet &to_union_type(typet &type)
 class tag_typet:public typet
 {
 public:
-  explicit tag_typet(const irep_idt &_id):typet(_id)
-  {
-  }
-
   explicit tag_typet(
     const irep_idt &_id,
     const irep_idt &identifier):typet(_id)
