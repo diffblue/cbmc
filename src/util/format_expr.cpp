@@ -18,13 +18,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "format_type.h"
 #include "ieee_float.h"
 #include "invariant.h"
-#include "lispexpr.h"
 #include "mp_arith.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "std_code.h"
 #include "std_expr.h"
 #include "string2int.h"
+#include "string_utils.h"
 
 #include <ostream>
 #include <stack>

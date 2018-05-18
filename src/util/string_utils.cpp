@@ -133,3 +133,18 @@ std::string trim_from_last_delimiter(
     result=s.substr(0, index);
   return result;
 }
+
+std::string escape(const std::string &s)
+{
+  std::string result;
+
+  for(std::size_t i=0; i<s.size(); i++)
+  {
+    if(s[i]=='\\' || s[i]=='"')
+      result+='\\';
+
+    result+=s[i];
+  }
+
+  return result;
+}

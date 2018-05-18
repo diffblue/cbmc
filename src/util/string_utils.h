@@ -63,4 +63,8 @@ Stream &join_strings(
   return os;
 }
 
+/// Generic escaping of strings; this is not meant to be a particular
+/// programming language.
+std::string escape(const std::string &);
+
 #endif
