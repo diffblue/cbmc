@@ -1,9 +1,9 @@
-DIRS = jbmc jdiff java_bytecode miniz
+DIRS = janalyzer jbmc jdiff java_bytecode miniz
 
 include config.inc
 
 .PHONY: all
-all: jbmc.dir jdiff.dir
+all: janalyzer.dir jbmc.dir jdiff.dir
 
 # building cbmc proper
 .PHONY: cprover.dir
@@ -12,6 +12,9 @@ cprover.dir:
 
 .PHONY: java_bytecode.dir
 java_bytecode.dir: miniz.dir
+
+.PHONY: janalyzer.dir
+janalyzer.dir: java_bytecode.dir cprover.dir
 
 .PHONY: jbmc.dir
 jbmc.dir: java_bytecode.dir cprover.dir

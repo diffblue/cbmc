@@ -81,6 +81,8 @@ set_target_properties(
     java_bytecode
     jbmc
     jbmc-lib
+    janalyzer
+    janalyzer-lib
     jdiff
     jdiff-lib
     java-testing-utils
