@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <util/exit_codes.h>
-#include <util/string2int.h>
-#include <util/string_utils.h>
 
 #include <langapi/language_util.h>
 
@@ -319,7 +317,8 @@ void bmct::setup()
 
   symex.last_source_location.make_nil();
 
-    setup_unwind();
+  symex.unwindset.parse_unwind(options.get_option("unwind"));
+  symex.unwindset.parse_unwindset(options.get_option("unwindset"));
 }
 
 safety_checkert::resultt bmct::execute(
@@ -547,43 +546,6 @@ safety_checkert::resultt bmct::stop_on_fail(prop_convt &prop_conv)
 
     return resultt::ERROR;
   }
-}
-
-void bmct::setup_unwind()
-{
-  const std::string &set=options.get_option("unwindset");
-  std::vector<std::string> unwindset_loops;
-  split_string(set, ',', unwindset_loops, true, true);
-
-  for(auto &val : unwindset_loops)
-  {
-    unsigned thread_nr=0;
-    bool thread_nr_set=false;
-
-    if(!val.empty() &&
-       isdigit(val[0]) &&
-       val.find(":")!=std::string::npos)
-    {
-      std::string nr=val.substr(0, val.find(":"));
-      thread_nr=unsafe_string2unsigned(nr);
-      thread_nr_set=true;
-      val.erase(0, nr.size()+1);
-    }
-
-    if(val.rfind(":")!=std::string::npos)
-    {
-      std::string id=val.substr(0, val.rfind(":"));
-      long uw=unsafe_string2int(val.substr(val.rfind(":")+1));
-
-      if(thread_nr_set)
-        symex.set_unwind_thread_loop_limit(thread_nr, id, uw);
-      else
-        symex.set_unwind_loop_limit(id, uw);
-    }
-  }
-
-  if(options.get_option("unwind")!="")
-    symex.set_unwind_limit(options.get_unsigned_int_option("unwind"));
 }
 
 /// Perform core BMC, using an abstract model to supply GOTO function bodies

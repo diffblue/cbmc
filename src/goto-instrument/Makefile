@@ -61,6 +61,7 @@ SRC = accelerate/accelerate.cpp \
       undefined_functions.cpp \
       uninitialized.cpp \
       unwind.cpp \
+      unwindset.cpp \
       wmm/abstract_event.cpp \
       wmm/cycle_collection.cpp \
       wmm/data_dp.cpp \

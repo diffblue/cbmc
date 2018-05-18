@@ -22,40 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "loop_utils.h"
 
-void parse_unwindset(const std::string &us, unwind_sett &unwind_set)
-{
-  assert(unwind_set.empty());
-
-  std::vector<std::string> result;
-  split_string(us, ',', result, true, true);
-  assert(!result.empty());
-
-  if(result.front().empty()) // allow empty string as unwindset
-    return;
-
-  for(std::vector<std::string>::const_iterator it=result.begin();
-      it!=result.end(); it++)
-  {
-    std::string loop;
-    std::string bound;
-
-    split_string(*it, ':', loop, bound, true);
-
-    std::string func;
-    std::string id;
-
-    split_string(loop, '.', func, id, true);
-
-    unsigned loop_id=std::stoi(id);
-    int loop_bound=std::stoi(bound);
-
-    if(loop_bound<-1)
-      throw "given unwind bound < -1";
-
-    unwind_set[func][loop_id]=loop_bound;
-  }
-}
-
 void goto_unwindt::copy_segment(
   const goto_programt::const_targett start,
   const goto_programt::const_targett end, // exclusive
@@ -290,37 +256,11 @@ void goto_unwindt::unwind(
   goto_program.destructive_insert(loop_exit, copies);
 }
 
-int goto_unwindt::get_k(
-  const irep_idt func,
-  const unsigned loop_id,
-  const int global_k,
-  const unwind_sett &unwind_set) const
-{
-  assert(global_k>=-1);
-
-  unwind_sett::const_iterator f_it=unwind_set.find(func);
-  if(f_it==unwind_set.end())
-    return global_k;
-
-  const std::map<unsigned, int> &m=f_it->second;
-  std::map<unsigned, int>::const_iterator l_it=m.find(loop_id);
-  if(l_it==m.end())
-    return global_k;
-
-  int k=l_it->second;
-  assert(k>=-1);
-
-  return k;
-}
-
 void goto_unwindt::unwind(
   goto_programt &goto_program,
-  const unwind_sett &unwind_set,
-  const int k,
+  const unwindsett &unwindset,
   const unwind_strategyt unwind_strategy)
 {
-  assert(k>=-1);
-
   for(goto_programt::const_targett i_it=goto_program.instructions.begin();
       i_it!=goto_program.instructions.end();)
   {
@@ -340,12 +280,14 @@ void goto_unwindt::unwind(
     const irep_idt func=i_it->function;
     assert(!func.empty());
 
-    unsigned loop_number=i_it->loop_number;
+    const irep_idt loop_id=
+      id2string(func) + "." + std::to_string(i_it->loop_number);
 
-    int final_k=get_k(func, loop_number, k, unwind_set);
+    auto limit=unwindset.get_limit(loop_id, 0);
 
-    if(final_k==-1)
+    if(!limit.has_value())
     {
+      // no unwinding given
       i_it++;
       continue;
     }
@@ -355,7 +297,7 @@ void goto_unwindt::unwind(
     loop_exit++;
     assert(loop_exit!=goto_program.instructions.end());
 
-    unwind(goto_program, loop_head, loop_exit, final_k, unwind_strategy);
+    unwind(goto_program, loop_head, loop_exit, *limit, unwind_strategy);
 
     // necessary as we change the goto program in the previous line
     i_it=loop_exit;
@@ -364,12 +306,9 @@ void goto_unwindt::unwind(
 
 void goto_unwindt::operator()(
   goto_functionst &goto_functions,
-  const unwind_sett &unwind_set,
-  const int k,
+  const unwindsett &unwindset,
   const unwind_strategyt unwind_strategy)
 {
-  assert(k>=-1);
-
   Forall_goto_functions(it, goto_functions)
   {
     goto_functionst::goto_functiont &goto_function=it->second;
@@ -383,7 +322,7 @@ void goto_unwindt::operator()(
 
     goto_programt &goto_program=goto_function.body;
 
-    unwind(goto_program, unwind_set, k, unwind_strategy);
+    unwind(goto_program, unwindset, unwind_strategy);
   }
 }
 

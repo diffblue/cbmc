@@ -25,8 +25,6 @@ symex_bmct::symex_bmct(
   path_storaget &path_storage)
   : goto_symext(mh, outer_symbol_table, _target, path_storage),
     record_coverage(false),
-    max_unwind(0),
-    max_unwind_is_set(false),
     symex_coverage(ns)
 {
 }
@@ -131,25 +129,12 @@ bool symex_bmct::get_unwind(
   // / --unwind options to decide:
   if(abort_unwind_decision.is_unknown())
   {
-    // We use the most specific limit we have,
-    // and 'infinity' when we have none.
+    auto limit=unwindset.get_limit(id, source.thread_nr);
 
-    loop_limitst &this_thread_limits=
-      thread_loop_limits[source.thread_nr];
-
-    loop_limitst::const_iterator l_it=this_thread_limits.find(id);
-    if(l_it!=this_thread_limits.end())
-      this_loop_limit=l_it->second;
+    if(!limit.has_value())
+      abort_unwind_decision = tvt(false);
     else
-    {
-      l_it=loop_limits.find(id);
-      if(l_it!=loop_limits.end())
-        this_loop_limit=l_it->second;
-      else if(max_unwind_is_set)
-        this_loop_limit=max_unwind;
-    }
-
-    abort_unwind_decision = tvt(unwind >= this_loop_limit);
+      abort_unwind_decision = tvt(unwind >= *limit);
   }
 
   INVARIANT(
@@ -187,25 +172,12 @@ bool symex_bmct::get_unwind_recursion(
   // / --unwind options to decide:
   if(abort_unwind_decision.is_unknown())
   {
-    // We use the most specific limit we have,
-    // and 'infinity' when we have none.
+    auto limit=unwindset.get_limit(id, thread_nr);
 
-    loop_limitst &this_thread_limits=
-      thread_loop_limits[thread_nr];
-
-    loop_limitst::const_iterator l_it=this_thread_limits.find(id);
-    if(l_it!=this_thread_limits.end())
-      this_loop_limit=l_it->second;
+    if(!limit.has_value())
+      abort_unwind_decision = tvt(false);
     else
-    {
-      l_it=loop_limits.find(id);
-      if(l_it!=loop_limits.end())
-        this_loop_limit=l_it->second;
-      else if(max_unwind_is_set)
-        this_loop_limit=max_unwind;
-    }
-
-    abort_unwind_decision = tvt(unwind>this_loop_limit);
+      abort_unwind_decision = tvt(unwind > *limit);
   }
 
   INVARIANT(
