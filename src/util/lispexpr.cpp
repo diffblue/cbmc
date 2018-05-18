@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "lispexpr.h"
 
+#include "string_utils.h"
+
 #include <iostream>
 
 std::string lispexprt::expr2string() const
@@ -145,21 +147,6 @@ bool lispexprt::parse(
   ptr=s.find_first_not_of(" \t", ptr);
 
   return false;
-}
-
-std::string escape(const std::string &s)
-{
-  std::string result;
-
-  for(std::size_t i=0; i<s.size(); i++)
-  {
-    if(s[i]=='\\' || s[i]=='"')
-      result+='\\';
-
-    result+=s[i];
-  }
-
-  return result;
 }
 
 int test_lispexpr()

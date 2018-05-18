@@ -99,8 +99,6 @@ inline std::ostream &operator<<(
   return out << expr.expr2string();
 }
 
-std::string escape(const std::string &s);
-
 int test_lispexpr();
 
 #endif // CPROVER_UTIL_LISPEXPR_H

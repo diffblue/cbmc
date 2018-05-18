@@ -9,29 +9,30 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Expression Pretty Printing
 
+#include "format_expr.h"
+
 #include "arith_tools.h"
 #include "expr.h"
 #include "expr_iterator.h"
 #include "fixedbv.h"
-#include "format_expr.h"
 #include "format_type.h"
 #include "ieee_float.h"
 #include "invariant.h"
 #include "mp_arith.h"
 #include "rational.h"
 #include "rational_tools.h"
+#include "std_code.h"
 #include "std_expr.h"
 #include "string2int.h"
+#include "string_utils.h"
 
-#include <stack>
 #include <ostream>
+#include <stack>
 
 /// We use the precendences that most readers expect
 /// (i.e., the ones you learn in primary school),
 /// and stay clear of the surprising ones that C has.
-static bool bracket_subexpression(
-  const exprt &sub_expr,
-  const exprt &expr)
+static bool bracket_subexpression(const exprt &sub_expr, const exprt &expr)
 {
   // no need for parentheses whenever the subexpression
   // doesn't have operands
@@ -57,9 +58,7 @@ static bool bracket_subexpression(
 
 /// This formats a multi-ary expression,
 /// adding parentheses where indicated by \ref bracket_subexpression
-static std::ostream &format_rec(
-  std::ostream &os,
-  const multi_ary_exprt &src)
+static std::ostream &format_rec(std::ostream &os, const multi_ary_exprt &src)
 {
   bool first = true;
 
@@ -86,18 +85,14 @@ static std::ostream &format_rec(
 
 /// This formats a binary expression,
 /// which we do as for multi-ary expressions
-static std::ostream &format_rec(
-  std::ostream &os,
-  const binary_exprt &src)
+static std::ostream &format_rec(std::ostream &os, const binary_exprt &src)
 {
   return format_rec(os, to_multi_ary_expr(src));
 }
 
 /// This formats a unary expression,
 /// adding parentheses very aggressively.
-static std::ostream &format_rec(
-  std::ostream &os,
-  const unary_exprt &src)
+static std::ostream &format_rec(std::ostream &os, const unary_exprt &src)
 {
   if(src.id() == ID_not)
     os << '!';
@@ -113,9 +108,7 @@ static std::ostream &format_rec(
 }
 
 /// This formats a constant
-static std::ostream &format_rec(
-  std::ostream &os,
-  const constant_exprt &src)
+static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
 {
   auto type = src.type().id();
 
@@ -128,22 +121,53 @@ static std::ostream &format_rec(
     else
       return os << src.pretty();
   }
-  else if(type == ID_unsignedbv || type == ID_signedbv)
+  else if(type == ID_unsignedbv || type == ID_signedbv || type == ID_c_bool)
     return os << *numeric_cast<mp_integer>(src);
   else if(type == ID_integer)
     return os << src.get_value();
+  else if(type == ID_string)
+    return os << '"' << escape(id2string(src.get_value())) << '"';
   else if(type == ID_floatbv)
     return os << ieee_floatt(src);
+  else if(type == ID_pointer && src.is_zero())
+    return os << src.get_value();
   else
     return os << src.pretty();
+}
+
+std::ostream &fallback_format_rec(std::ostream &os, const exprt &expr)
+{
+  os << expr.id();
+
+  for(const auto &s : expr.get_named_sub())
+    if(s.first != ID_type)
+      os << ' ' << s.first << "=\"" << s.second.id() << '"';
+
+  if(expr.has_operands())
+  {
+    os << '(';
+    bool first = true;
+
+    for(const auto &op : expr.operands())
+    {
+      if(first)
+        first = false;
+      else
+        os << ", ";
+
+      os << format(op);
+    }
+
+    os << ')';
+  }
+
+  return os;
 }
 
 // The below generates a string in a generic syntax
 // that is inspired by C/C++/Java, and is meant for debugging
 // purposes.
-std::ostream &format_rec(
-  std::ostream &os,
-  const exprt &expr)
+std::ostream &format_rec(std::ostream &os, const exprt &expr)
 {
   const auto &id = expr.id();
 
@@ -165,6 +189,12 @@ std::ostream &format_rec(
               << to_member_expr(expr).get_component_name();
   else if(id == ID_symbol)
     return os << to_symbol_expr(expr).get_identifier();
+  else if(id == ID_index)
+  {
+    const auto &index_expr = to_index_expr(expr);
+    return os << format(index_expr.array()) << '[' << format(index_expr.index())
+              << ']';
+  }
   else if(id == ID_type)
     return format_rec(os, expr.type());
   else if(id == ID_forall || id == ID_exists)
@@ -199,32 +229,24 @@ std::ostream &format_rec(
     return os << format(if_expr.cond()) << '?' << format(if_expr.true_case())
               << ':' << format(if_expr.false_case());
   }
-  else
+  else if(id == ID_code)
   {
-    os << id;
+    const auto &code = to_code(expr);
+    const irep_idt &statement = code.get_statement();
 
-    for(const auto &s : expr.get_named_sub())
-      if(s.first!=ID_type)
-        os << ' ' << s.first << "=\"" << s.second.id() << '"';
-
-    if(expr.has_operands())
+    if(statement == ID_assign)
+      return os << format(to_code_assign(code).lhs()) << " = "
+                << format(to_code_assign(code).rhs()) << ';';
+    else if(statement == ID_block)
     {
-      os << '(';
-      bool first = true;
-
-      for(const auto &op : expr.operands())
-      {
-        if(first)
-          first = false;
-        else
-          os << ", ";
-
-        os << format(op);
-      }
-
-      os << ')';
+      os << '{';
+      for(const auto &s : to_code_block(code).operands())
+        os << ' ' << format(s);
+      return os << " }";
     }
-
-    return os;
+    else
+      return fallback_format_rec(os, expr);
   }
+  else
+    return fallback_format_rec(os, expr);
 }

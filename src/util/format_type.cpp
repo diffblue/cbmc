@@ -6,16 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "format_expr.h"
 #include "format_type.h"
+#include "format_expr.h"
 #include "std_types.h"
 
 #include <ostream>
 
 /// format a \ref struct_typet
-static std::ostream &format_rec(
-  std::ostream &os,
-  const struct_typet &src)
+static std::ostream &format_rec(std::ostream &os, const struct_typet &src)
 {
   os << "struct"
      << " {";
