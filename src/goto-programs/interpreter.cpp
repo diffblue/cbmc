@@ -1043,10 +1043,11 @@ mp_integer interpretert::get_size(const typet &type)
     }
     return subtype_size;
   }
-  else if(type.id()==ID_symbol)
+  else if(type.id() == ID_symbol_type)
   {
     return get_size(ns.follow(type));
   }
+
   return 1;
 }
 

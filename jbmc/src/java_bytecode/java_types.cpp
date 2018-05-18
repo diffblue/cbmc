@@ -777,7 +777,8 @@ bool equal_java_types(const typet &type1, const typet &type2)
   bool arrays_with_same_element_type = true;
   if(
     type1.id() == ID_pointer && type2.id() == ID_pointer &&
-    type1.subtype().id() == ID_symbol && type2.subtype().id() == ID_symbol)
+    type1.subtype().id() == ID_symbol_type &&
+    type2.subtype().id() == ID_symbol_type)
   {
     const symbol_typet &subtype_symbol1 = to_symbol_type(type1.subtype());
     const symbol_typet &subtype_symbol2 = to_symbol_type(type2.subtype());
@@ -824,7 +825,7 @@ void get_dependencies_from_generic_parameters_rec(
   }
 
   // symbol type
-  else if(t.id() == ID_symbol)
+  else if(t.id() == ID_symbol_type)
   {
     const symbol_typet &symbol_type = to_symbol_type(t);
     const irep_idt class_name(symbol_type.get_identifier());
@@ -958,7 +959,7 @@ std::string pretty_java_type(const typet &type)
     return "byte";
   else if(is_reference(type))
   {
-    if(type.subtype().id() == ID_symbol)
+    if(type.subtype().id() == ID_symbol_type)
     {
       const auto &symbol_type = to_symbol_type(type.subtype());
       const irep_idt &id = symbol_type.get_identifier();

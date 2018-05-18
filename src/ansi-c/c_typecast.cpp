@@ -253,7 +253,8 @@ bool check_c_implicit_typecast(
 typet c_typecastt::follow_with_qualifiers(const typet &src_type)
 {
   if(
-    src_type.id() != ID_symbol && src_type.id() != ID_struct_tag &&
+    src_type.id() != ID_symbol_type &&
+    src_type.id() != ID_struct_tag &&
     src_type.id() != ID_union_tag)
   {
     return src_type;
@@ -264,7 +265,8 @@ typet c_typecastt::follow_with_qualifiers(const typet &src_type)
   // collect qualifiers
   c_qualifierst qualifiers(src_type);
 
-  while(result_type.id() == ID_symbol || result_type.id() == ID_struct_tag ||
+  while(result_type.id() == ID_symbol_type ||
+        result_type.id() == ID_struct_tag ||
         result_type.id() == ID_union_tag)
   {
     const typet &followed_type = ns.follow(result_type);
@@ -348,7 +350,7 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   {
     return INT;
   }
-  else if(type.id()==ID_symbol)
+  else if(type.id() == ID_symbol_type)
     return get_c_type(ns.follow(type));
   else if(type.id()==ID_rational)
     return RATIONAL;

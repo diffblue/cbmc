@@ -234,7 +234,7 @@ mp_integer pointer_offset_bits(
 
     return to_bitvector_type(type).get_width();
   }
-  else if(type.id()==ID_symbol)
+  else if(type.id() == ID_symbol_type)
   {
     return pointer_offset_bits(ns.follow(type), ns);
   }
@@ -510,7 +510,7 @@ exprt size_of_expr(
       bytes++;
     return from_integer(bytes, size_type());
   }
-  else if(type.id()==ID_symbol)
+  else if(type.id() == ID_symbol_type)
   {
     return size_of_expr(ns.follow(type), ns);
   }

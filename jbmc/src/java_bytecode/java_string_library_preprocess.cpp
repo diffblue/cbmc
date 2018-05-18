@@ -36,7 +36,7 @@ Date:   April 2017
 irep_idt get_tag(const typet &type)
 {
   /// \todo Use follow instead of assuming tag to symbol relationship.
-  if(type.id() == ID_symbol)
+  if(type.id() == ID_symbol_type)
     return to_symbol_type(type).get_identifier();
   else if(type.id() == ID_struct)
     return irep_idt("java::" + id2string(to_struct_type(type).get_tag()));
@@ -394,11 +394,11 @@ java_string_library_preprocesst::process_equals_function_operands(
 /// \return type of the "data" component
 static typet get_data_type(const typet &type, const symbol_tablet &symbol_table)
 {
-  PRECONDITION(type.id()==ID_struct || type.id()==ID_symbol);
-  if(type.id()==ID_symbol)
+  PRECONDITION(type.id() == ID_struct || type.id() == ID_symbol_type);
+  if(type.id() == ID_symbol_type)
   {
     symbolt sym=*symbol_table.lookup(to_symbol_type(type).get_identifier());
-    CHECK_RETURN(sym.type.id()!=ID_symbol);
+    CHECK_RETURN(sym.type.id() != ID_symbol_type);
     return get_data_type(sym.type, symbol_table);
   }
   // else type id is ID_struct
@@ -413,11 +413,11 @@ static typet get_data_type(const typet &type, const symbol_tablet &symbol_table)
 static typet
 get_length_type(const typet &type, const symbol_tablet &symbol_table)
 {
-  PRECONDITION(type.id()==ID_struct || type.id()==ID_symbol);
-  if(type.id()==ID_symbol)
+  PRECONDITION(type.id() == ID_struct || type.id() == ID_symbol_type);
+  if(type.id() == ID_symbol_type)
   {
     symbolt sym=*symbol_table.lookup(to_symbol_type(type).get_identifier());
-    CHECK_RETURN(sym.type.id()!=ID_symbol);
+    CHECK_RETURN(sym.type.id() != ID_symbol_type);
     return get_length_type(sym.type, symbol_table);
   }
   // else type id is ID_struct
@@ -892,7 +892,7 @@ void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   PRECONDITION(implements_java_char_sequence_pointer(rhs.type()));
 
   typet deref_type;
-  if(rhs.type().subtype().id()==ID_symbol)
+  if(rhs.type().subtype().id() == ID_symbol_type)
     deref_type=symbol_table.lookup_ref(
       to_symbol_type(rhs.type().subtype()).get_identifier()).type;
   else

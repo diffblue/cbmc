@@ -85,7 +85,7 @@ bool remove_instanceoft::lower_instanceof(
 
   // Find all types we know about that satisfy the given requirement:
   INVARIANT(
-    target_type.id()==ID_symbol,
+    target_type.id() == ID_symbol_type,
     "instanceof second operand should have a simple type");
   const irep_idt &target_name=
     to_symbol_type(target_type).get_identifier();

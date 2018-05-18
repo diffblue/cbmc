@@ -110,7 +110,7 @@ public:
 class symbol_typet:public typet
 {
 public:
-  explicit symbol_typet(const irep_idt &identifier):typet(ID_symbol)
+  explicit symbol_typet(const irep_idt &identifier) : typet(ID_symbol_type)
   {
     set_identifier(identifier);
   }
@@ -138,7 +138,7 @@ public:
 */
 inline const symbol_typet &to_symbol_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_symbol);
+  PRECONDITION(type.id() == ID_symbol_type);
   return static_cast<const symbol_typet &>(type);
 }
 
@@ -147,14 +147,14 @@ inline const symbol_typet &to_symbol_type(const typet &type)
 */
 inline symbol_typet &to_symbol_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_symbol);
+  PRECONDITION(type.id() == ID_symbol_type);
   return static_cast<symbol_typet &>(type);
 }
 
 template <>
 inline bool can_cast_type<symbol_typet>(const typet &type)
 {
-  return type.id() == ID_symbol;
+  return type.id() == ID_symbol_type;
 }
 
 /*! \brief Base type of C structs and unions, and C++ classes

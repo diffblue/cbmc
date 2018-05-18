@@ -160,7 +160,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
       bit++)
   {
     assert(bit->id()==ID_base);
-    assert(bit->find(ID_type).id()==ID_symbol);
+    assert(bit->find(ID_type).id() == ID_symbol_type);
     const symbolt &psymb = lookup(bit->find(ID_type).get(ID_identifier));
 
     symbol_exprt this_ptr(ID_this, pointer_type(symbol.type));

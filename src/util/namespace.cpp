@@ -60,7 +60,7 @@ const typet &namespace_baset::follow(const typet &src) const
   if(src.id() == ID_struct_tag)
     return follow_tag(to_struct_tag_type(src));
 
-  if(src.id()!=ID_symbol)
+  if(src.id() != ID_symbol_type)
     return src;
 
   const symbolt *symbol = &lookup(to_symbol_type(src));
@@ -70,7 +70,7 @@ const typet &namespace_baset::follow(const typet &src) const
   {
     DATA_INVARIANT(symbol->is_type, "symbol type points to type");
 
-    if(symbol->type.id() == ID_symbol)
+    if(symbol->type.id() == ID_symbol_type)
       symbol = &lookup(to_symbol_type(symbol->type));
     else
       return symbol->type;

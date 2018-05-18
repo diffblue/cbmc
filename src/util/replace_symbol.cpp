@@ -185,7 +185,7 @@ bool replace_symbolt::replace(typet &dest) const
       if(!replace(*it))
         result=false;
   }
-  else if(dest.id()==ID_symbol)
+  else if(dest.id() == ID_symbol_type)
   {
     type_mapt::const_iterator it =
       type_map.find(to_symbol_type(dest).get_identifier());
@@ -250,7 +250,7 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
       if(have_to_replace(*it))
         return true;
   }
-  else if(dest.id()==ID_symbol)
+  else if(dest.id() == ID_symbol_type)
   {
     const irep_idt &identifier = to_symbol_type(dest).get_identifier();
     return type_map.find(identifier) != type_map.end();

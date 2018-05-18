@@ -108,7 +108,7 @@ pointer_typet select_pointer_typet::specialize_generics(
     visited_nodes.erase(parameter_name);
     return returned_type;
   }
-  else if(pointer_type.subtype().id() == ID_symbol)
+  else if(pointer_type.subtype().id() == ID_symbol_type)
   {
     // if the pointer is an array, recursively specialize its element type
     const symbol_typet &array_subtype = to_symbol_type(pointer_type.subtype());

@@ -786,8 +786,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     // is it a type or not?
     if(declaration.get_bool(ID_is_type))
     {
-      parameter=exprt(ID_type, typet(ID_symbol));
-      parameter.type().set(ID_identifier, identifier);
+      parameter = exprt(ID_type, symbol_typet(identifier));
       parameter.type().add_source_location()=declaration.find_source_location();
     }
     else
@@ -822,8 +821,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
 
     if(cpp_declarator_converter.is_typedef)
     {
-      parameter=exprt(ID_type, typet(ID_symbol));
-      parameter.type().set(ID_identifier, symbol.name);
+      parameter = exprt(ID_type, symbol_typet(symbol.name));
       parameter.type().add_source_location()=declaration.find_location();
     }
     else

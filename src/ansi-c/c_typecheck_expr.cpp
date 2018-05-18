@@ -91,9 +91,9 @@ bool c_typecheck_baset::gcc_types_compatible_p(
   // read
   // http://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Other-Builtins.html
 
-  if(type1.id()==ID_symbol)
+  if(type1.id() == ID_symbol_type)
     return gcc_types_compatible_p(follow(type1), type2);
-  else if(type2.id()==ID_symbol)
+  else if(type2.id() == ID_symbol_type)
     return gcc_types_compatible_p(type1, follow(type2));
 
   // check qualifiers first
@@ -3067,8 +3067,8 @@ void c_typecheck_baset::typecheck_arithmetic_pointer(const exprt &expr)
 
   typet subtype=type.subtype();
 
-  if(subtype.id()==ID_symbol)
-    subtype=follow(subtype);
+  if(subtype.id() == ID_symbol_type)
+    subtype = follow(to_symbol_type(subtype));
 
   if(subtype.id()==ID_incomplete_struct)
   {

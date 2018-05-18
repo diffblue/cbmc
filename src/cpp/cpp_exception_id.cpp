@@ -20,7 +20,7 @@ void cpp_exception_list_rec(
   const std::string &suffix,
   std::vector<irep_idt> &dest)
 {
-  if(src.id()==ID_symbol)
+  if(src.id() == ID_symbol_type)
   {
     cpp_exception_list_rec(ns.follow(src), ns, suffix, dest);
   }

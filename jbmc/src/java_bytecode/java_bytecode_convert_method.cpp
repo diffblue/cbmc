@@ -1633,7 +1633,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const typecast_exprt pointer(op[0], java_array_type(statement[0]));
 
       dereference_exprt array(pointer, pointer.type().subtype());
-      assert(pointer.type().subtype().id()==ID_symbol);
+      assert(pointer.type().subtype().id() == ID_symbol_type);
       array.set(ID_java_member_access, true);
 
       const member_exprt length(array, "length", java_int_type());
@@ -2562,7 +2562,7 @@ codet java_bytecode_convert_methodt::convert_putstatic(
   const exprt::operandst &op,
   const symbol_exprt &symbol_expr)
 {
-  if(needed_lazy_methods && arg0.type().id() == ID_symbol)
+  if(needed_lazy_methods && arg0.type().id() == ID_symbol_type)
   {
     needed_lazy_methods->add_needed_class(
       to_symbol_type(arg0.type()).get_identifier());
@@ -2612,7 +2612,7 @@ void java_bytecode_convert_methodt::convert_getstatic(
 {
   if(needed_lazy_methods)
   {
-    if(arg0.type().id() == ID_symbol)
+    if(arg0.type().id() == ID_symbol_type)
     {
       needed_lazy_methods->add_needed_class(
         to_symbol_type(arg0.type()).get_identifier());
@@ -2620,7 +2620,7 @@ void java_bytecode_convert_methodt::convert_getstatic(
     else if(arg0.type().id() == ID_pointer)
     {
       const auto &pointer_type = to_pointer_type(arg0.type());
-      if(pointer_type.subtype().id() == ID_symbol)
+      if(pointer_type.subtype().id() == ID_symbol_type)
       {
         needed_lazy_methods->add_needed_class(
           to_symbol_type(pointer_type.subtype()).get_identifier());

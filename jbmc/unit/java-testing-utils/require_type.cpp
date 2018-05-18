@@ -427,7 +427,7 @@ require_type::require_complete_java_non_generic_class(const typet &class_type)
 const symbol_typet &
 require_type::require_symbol(const typet &type, const irep_idt &identifier)
 {
-  REQUIRE(type.id() == ID_symbol);
+  REQUIRE(type.id() == ID_symbol_type);
   const symbol_typet &result = to_symbol_type(type);
   if(identifier != "")
   {

@@ -616,7 +616,7 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
     for(const auto &p : ct.parameters())
       get_class_refs_rec(p.type());
   }
-  else if(src.id()==ID_symbol)
+  else if(src.id()==ID_symbol_type)
   {
     irep_idt name=src.get(ID_C_base_name);
     if(has_prefix(id2string(name), "array["))

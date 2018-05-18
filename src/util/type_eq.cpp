@@ -20,7 +20,7 @@ bool type_eq(const typet &type1, const typet &type2, const namespacet &ns)
   if(type1==type2)
     return true;
 
-  if(type1.id()==ID_symbol)
+  if(type1.id() == ID_symbol_type)
   {
     const symbolt &symbol = ns.lookup(to_symbol_type(type1));
     if(!symbol.is_type)
@@ -29,7 +29,7 @@ bool type_eq(const typet &type1, const typet &type2, const namespacet &ns)
     return type_eq(symbol.type, type2, ns);
   }
 
-  if(type2.id()==ID_symbol)
+  if(type2.id() == ID_symbol_type)
   {
     const symbolt &symbol = ns.lookup(to_symbol_type(type2));
     if(!symbol.is_type)

@@ -63,7 +63,7 @@ SCENARIO(
         next.type(),
         {{require_type::type_argument_kindt::Var, "java::KeyValue::K"},
          {require_type::type_argument_kindt::Var, "java::KeyValue::V"}});
-    REQUIRE(next_type.subtype().id() == ID_symbol);
+    REQUIRE(next_type.subtype().id() == ID_symbol_type);
     const symbol_typet &next_symbol = to_symbol_type(next_type.subtype());
     REQUIRE(
       symbol_table.lookup_ref(next_symbol.get_identifier()).name ==
@@ -75,7 +75,7 @@ SCENARIO(
         reverse.type(),
         {{require_type::type_argument_kindt::Var, "java::KeyValue::V"},
          {require_type::type_argument_kindt::Var, "java::KeyValue::K"}});
-    REQUIRE(next_type.subtype().id() == ID_symbol);
+    REQUIRE(next_type.subtype().id() == ID_symbol_type);
     const symbol_typet &reverse_symbol = to_symbol_type(reverse_type.subtype());
     REQUIRE(
       symbol_table.lookup_ref(next_symbol.get_identifier()).name ==

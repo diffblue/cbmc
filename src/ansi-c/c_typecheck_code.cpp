@@ -383,7 +383,7 @@ bool c_typecheck_baset::is_complete_type(const typet &type) const
   }
   else if(type.id()==ID_vector)
     return is_complete_type(type.subtype());
-  else if(type.id()==ID_symbol)
+  else if(type.id() == ID_symbol_type)
     return is_complete_type(follow(type));
 
   return true;

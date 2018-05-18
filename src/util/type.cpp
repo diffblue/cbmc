@@ -87,7 +87,7 @@ bool is_constant_or_has_constant_components(
   // we have to use the namespace to resolve to its definition:
   // struct t { const int a; };
   // struct t t1;
-  if(type.id() == ID_symbol)
+  if(type.id() == ID_symbol_type)
   {
     const auto &resolved_type = ns.follow(type);
     return has_constant_components(resolved_type);

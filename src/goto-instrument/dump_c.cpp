@@ -61,8 +61,7 @@ void dump_ct::operator()(std::ostream &os)
     {
       typet &type=it2->type();
 
-      if(type.id()==ID_symbol &&
-         type.get_bool(ID_C_transparent_union))
+      if(type.id() == ID_symbol_type && type.get_bool(ID_C_transparent_union))
       {
         symbolt new_type_sym=
           ns.lookup(to_symbol_type(type).get_identifier());
@@ -314,7 +313,7 @@ void dump_ct::convert_compound(
   bool recursive,
   std::ostream &os)
 {
-  if(type.id()==ID_symbol)
+  if(type.id() == ID_symbol_type)
   {
     const symbolt &symbol=
       ns.lookup(to_symbol_type(type).get_identifier());
@@ -382,7 +381,7 @@ void dump_ct::convert_compound(
     UNREACHABLE;
     /*
     assert(parent_it->id() == ID_base);
-    assert(parent_it->get(ID_type) == ID_symbol);
+    assert(parent_it->get(ID_type) == ID_symbol_type);
 
     const irep_idt &base_id=
       parent_it->find(ID_type).get(ID_identifier);
@@ -669,7 +668,7 @@ void dump_ct::collect_typedefs_rec(
   {
     collect_typedefs_rec(type.subtype(), early, local_deps);
   }
-  else if(type.id()==ID_symbol)
+  else if(type.id() == ID_symbol_type)
   {
     const symbolt &symbol=
       ns.lookup(to_symbol_type(type).get_identifier());

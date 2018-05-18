@@ -80,7 +80,7 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
     // but pointers are PODs!
     return true;
   }
-  else if(type.id()==ID_symbol)
+  else if(type.id() == ID_symbol_type)
   {
     const symbolt &symb = lookup(to_symbol_type(type));
     DATA_INVARIANT(symb.is_type, "type symbol is a type");
