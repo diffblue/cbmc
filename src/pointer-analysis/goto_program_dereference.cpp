@@ -28,7 +28,7 @@ bool goto_program_dereferencet::has_failed_symbol(
     if(expr.get_bool("#invalid_object"))
       return false;
 
-    const symbolt &ptr_symbol=ns.lookup(expr);
+    const symbolt &ptr_symbol = ns.lookup(to_symbol_expr(expr));
 
     const irep_idt &failed_symbol=
       ptr_symbol.type.get("#failed_symbol");

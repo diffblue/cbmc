@@ -1347,8 +1347,8 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
      (expr.id()==ID_equal || expr.id()==ID_notequal))
     return simplify_inequality_pointer_object(expr);
 
-  ns.follow_symbol(tmp0.type());
-  ns.follow_symbol(tmp1.type());
+  tmp0.type() = ns.follow(tmp0.type());
+  tmp1.type() = ns.follow(tmp1.type());
 
   if(tmp0.type().id()==ID_c_enum_tag)
     tmp0.type()=ns.follow_tag(to_c_enum_tag_type(tmp0.type()));

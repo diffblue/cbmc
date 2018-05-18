@@ -100,8 +100,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_type(base);
     typecheck_type(deriv);
 
-    follow_symbol(base);
-    follow_symbol(deriv);
+    base = follow(base);
+    deriv = follow(deriv);
 
     if(base.id()!=ID_struct || deriv.id()!=ID_struct)
       expr=false_exprt();
@@ -1991,7 +1991,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
   // look at type of function
 
-  follow_symbol(expr.function().type());
+  expr.function().type() = follow(expr.function().type());
 
   if(expr.function().type().id()==ID_pointer)
   {

@@ -15,10 +15,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include "prefix.h"
+#include "std_expr.h"
+#include "std_types.h"
 #include "string2int.h"
 #include "symbol_table.h"
-#include "prefix.h"
-#include "std_types.h"
 
 unsigned get_max(
   const std::string &prefix,
@@ -44,27 +45,19 @@ namespace_baset::~namespace_baset()
 {
 }
 
-void namespace_baset::follow_symbol(irept &irep) const
+const symbolt &namespace_baset::lookup(const symbol_exprt &expr) const
 {
-  while(irep.id()==ID_symbol)
-  {
-    const symbolt &symbol=lookup(irep);
+  return lookup(expr.get_identifier());
+}
 
-    if(symbol.is_type)
-    {
-      if(symbol.type.is_nil())
-        return;
-      else
-        irep=symbol.type;
-    }
-    else
-    {
-      if(symbol.value.is_nil())
-        return;
-      else
-        irep=symbol.value;
-    }
-  }
+const symbolt &namespace_baset::lookup(const symbol_typet &type) const
+{
+  return lookup(type.get_identifier());
+}
+
+const symbolt &namespace_baset::lookup(const tag_typet &type) const
+{
+  return lookup(type.get_identifier());
 }
 
 const typet &namespace_baset::follow(const typet &src) const
@@ -72,15 +65,17 @@ const typet &namespace_baset::follow(const typet &src) const
   if(src.id()!=ID_symbol)
     return src;
 
-  const symbolt *symbol=&lookup(src);
+  const symbolt *symbol = &lookup(to_symbol_type(src));
 
   // let's hope it's not cyclic...
   while(true)
   {
-    assert(symbol->is_type);
-    if(symbol->type.id()!=ID_symbol)
+    DATA_INVARIANT(symbol->is_type, "symbol type points to type");
+
+    if(symbol->type.id() == ID_symbol)
+      symbol = &lookup(to_symbol_type(symbol->type));
+    else
       return symbol->type;
-    symbol=&lookup(symbol->type);
   }
 }
 
@@ -112,7 +107,7 @@ void namespace_baset::follow_macros(exprt &expr) const
 {
   if(expr.id()==ID_symbol)
   {
-    const symbolt &symbol=lookup(expr);
+    const symbolt &symbol = lookup(to_symbol_expr(expr));
 
     if(symbol.is_macro && !symbol.value.is_nil())
     {

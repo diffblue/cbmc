@@ -245,7 +245,9 @@ void goto_symext::symex_assign_symbol(
   tmp_guard.append(guard);
 
   // do the assignment
-  const symbolt &symbol=ns.lookup(ssa_lhs.get_original_expr());
+  const symbolt &symbol =
+    ns.lookup(to_symbol_expr(ssa_lhs.get_original_expr()));
+
   if(symbol.is_auxiliary)
     assignment_type=symex_targett::assignment_typet::HIDDEN;
 

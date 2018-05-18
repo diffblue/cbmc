@@ -33,8 +33,7 @@ codet cpp_typecheckt::cpp_constructor(
 
   elaborate_class_template(object_tc.type());
 
-  typet tmp_type(object_tc.type());
-  follow_symbol(tmp_type);
+  typet tmp_type(follow(object_tc.type()));
 
   assert(!is_reference(tmp_type));
 

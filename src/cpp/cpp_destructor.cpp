@@ -26,8 +26,7 @@ codet cpp_typecheckt::cpp_destructor(
 
   elaborate_class_template(object.type());
 
-  typet tmp_type(object.type());
-  follow_symbol(tmp_type);
+  typet tmp_type(follow(object.type()));
 
   assert(!is_reference(tmp_type));
 
