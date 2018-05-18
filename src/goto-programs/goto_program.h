@@ -134,8 +134,9 @@ public:
   ///     Assume does not "retro-actively" affect the thread or any ASSERTs.
   /// - ASSERT:
   ///     Using ASSERT instructions is the one and only way to express
-  ///     properties to be verified. Execution paths abort if `guard` evaluates
-  ///     to false.
+  ///     properties to be verified.  An assertion is true / safe if `guard`
+  ///     is true in all possible executions, otherwise it is false / unsafe.
+  ///     The status of the assertion does not affect execution in any way.
   /// - SKIP, LOCATION:
   ///     No-op.
   /// - ATOMIC_BEGIN, ATOMIC_END:
