@@ -94,11 +94,6 @@ static void java_static_lifetime_init(
         if(allow_null)
         {
           irep_idt nameid=sym.symbol_expr().get_identifier();
-          std::string namestr=id2string(nameid);
-          const std::string suffix="@class_model";
-          // Static '.class' fields are always non-null.
-          if(has_suffix(namestr, suffix))
-            allow_null=false;
           if(allow_null && is_java_string_literal_id(nameid))
             allow_null=false;
           if(allow_null && is_non_null_library_global(nameid))

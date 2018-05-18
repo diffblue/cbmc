@@ -874,10 +874,6 @@ void java_object_factoryt::gen_nondet_pointer_init(
 
   auto set_null_inst=get_null_assignment(expr, pointer_type);
 
-  // Determine whether the pointer can be null. In particular the pointers
-  // inside the java.lang.Class class shall not be null
-  const bool not_null = !allow_null || class_identifier == "java.lang.Class";
-
   // Alternatively, if this is a void* we *must* initialise with null:
   // (This can currently happen for some cases of #exception_value)
   bool must_be_null=
@@ -889,7 +885,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     // <expr> = nullptr;
     new_object_assignments.add(set_null_inst);
   }
-  else if(not_null)
+  else if(!allow_null)
   {
     // Add the following code to assignments:
     // <expr> = <aoe>;
