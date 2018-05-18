@@ -69,19 +69,19 @@ void generate_function_bodies(
   message_handlert &message_handler);
 
 // clang-format off
-#define OPT_REPLACE_FUNCTION_BODY                                              \
-  "(generate-function-body):"                                                  \
+#define OPT_REPLACE_FUNCTION_BODY \
+  "(generate-function-body):" \
   "(generate-function-body-options):"
 
-#define HELP_REPLACE_FUNCTION_BODY                                             \
-  " --generate-function-body <regex>\n"                                        \
+#define HELP_REPLACE_FUNCTION_BODY \
+  " --generate-function-body <regex>\n" \
   /* NOLINTNEXTLINE(whitespace/line_length) */ \
   "                              Generate bodies for functions matching regex\n" \
-  " --generate-function-body-options <option>\n"                               \
-  "                              One of assert-false, assume-false,\n"         \
+  " --generate-function-body-options <option>\n" \
+  "                              One of assert-false, assume-false,\n" \
   /* NOLINTNEXTLINE(whitespace/line_length) */ \
   "                              nondet-return, assert-false-assume-false and\n" \
-  "                              havoc[,params:<regex>][,globals:<regex>]\n"   \
+  "                              havoc[,params:<regex>][,globals:<regex>]\n" \
   "                              (default: nondet-return)"
 // clang-format on
 
