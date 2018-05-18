@@ -64,15 +64,11 @@ set_target_properties(
     goto-instrument-lib
     goto-programs
     goto-symex
-    java_bytecode
-    jbmc
-    jbmc-lib
     jsil
     json
     langapi
     linking
     miniBDD
-    miniz
     mmcc
     pointer-analysis
     solvers
@@ -85,6 +81,8 @@ set_target_properties(
     java_bytecode
     jbmc
     jbmc-lib
+    jdiff
+    jdiff-lib
     java-testing-utils
     java-unit
     miniz
