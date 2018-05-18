@@ -32,7 +32,12 @@ public class Test {
         // Filter out
         // 67_108_864 corresponds to the maximum length for which the solver
         // will concretize the string.
-        if(u.length() <= 67_108_864)
+        if(s.length() <= 67_108_864 && t.length() <= 67_108_864)
+            return;
+        // Check at least one of them is short-ish, so we don't end up trying
+        // to concretise a very long but *just* allowable string and memout the
+        // test infrastructure:
+        if(s.length() > 1024 && t.length() > 1024)
             return;
         if(CProverString.charAt(u, 2_000_000) != 'b')
             return;
