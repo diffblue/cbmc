@@ -1686,11 +1686,6 @@ inline complex_typet &to_complex_type(typet &type)
 class mathematical_function_typet:public typet
 {
 public:
-  mathematical_function_typet():typet(ID_mathematical_function)
-  {
-    subtypes().resize(2);
-  }
-
   // the domain of the function is composed of zero, one, or
   // many variables
   class variablet:public irept
@@ -1719,6 +1714,14 @@ public:
   };
 
   using domaint=std::vector<variablet>;
+
+  mathematical_function_typet(const domaint &_domain, const typet &_codomain)
+    : typet(ID_mathematical_function)
+  {
+    subtypes().resize(2);
+    domain() = _domain;
+    codomain() = _codomain;
+  }
 
   domaint &domain()
   {
