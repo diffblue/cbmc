@@ -972,10 +972,6 @@ inline code_typet &to_code_type(typet &type)
 class array_typet:public type_with_subtypet
 {
 public:
-  array_typet():type_with_subtypet(ID_array)
-  {
-  }
-
   array_typet(
     const typet &_subtype,
     const exprt &_size):type_with_subtypet(ID_array, _subtype)

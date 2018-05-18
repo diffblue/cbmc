@@ -791,9 +791,7 @@ void string_instrumentationt::do_strerror(
     new_symbol_size.is_lvalue=true;
     new_symbol_size.is_static_lifetime=true;
 
-    array_typet type;
-    type.subtype()=char_type();
-    type.size()=new_symbol_size.symbol_expr();
+    array_typet type(char_type(), new_symbol_size.symbol_expr());
     symbolt new_symbol_buf;
     new_symbol_buf.mode=ID_C;
     new_symbol_buf.type=type;

@@ -5987,9 +5987,7 @@ bool Parser::rNewDeclarator(typet &decl)
     if(lex.get_token(cb)!=']')
       return false;
 
-    array_typet array_type;
-    array_type.size().swap(expr);
-    array_type.subtype().swap(decl);
+    array_typet array_type(decl, expr);
     set_location(array_type, ob);
 
     decl.swap(array_type);
