@@ -110,10 +110,6 @@ public:
 class symbol_typet:public typet
 {
 public:
-  symbol_typet():typet(ID_symbol)
-  {
-  }
-
   explicit symbol_typet(const irep_idt &identifier):typet(ID_symbol)
   {
     set_identifier(identifier);

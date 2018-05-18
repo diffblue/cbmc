@@ -105,6 +105,11 @@ public:
     struct exceptiont
     {
     public:
+      exceptiont()
+        : start_pc(0), end_pc(0), handler_pc(0), catch_type(irep_idt())
+      {
+      }
+
       std::size_t start_pc;
       std::size_t end_pc;
       std::size_t handler_pc;

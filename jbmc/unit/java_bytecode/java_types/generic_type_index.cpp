@@ -17,9 +17,12 @@ SCENARIO("generic_type_index", "[core][java_types]")
     const auto symbol_type = symbol_typet("java::GenericClass");
     const auto generic_symbol_type = java_generic_symbol_typet(
       symbol_type, "LGenericClass<TX;Tvalue;>;", "PrefixClassName");
-    java_generic_parametert paramX("PrefixClassName::X", symbol_typet());
-    java_generic_parametert value("PrefixClassName::value", symbol_typet());
-    java_generic_parametert paramZ("PrefixClassName::Z", symbol_typet());
+    java_generic_parametert paramX(
+      "PrefixClassName::X", symbol_typet(irep_idt()));
+    java_generic_parametert value(
+      "PrefixClassName::value", symbol_typet(irep_idt()));
+    java_generic_parametert paramZ(
+      "PrefixClassName::Z", symbol_typet(irep_idt()));
 
     WHEN("Looking for parameter indexes")
     {
@@ -43,9 +46,12 @@ SCENARIO("generic_type_index", "[core][java_types]")
     const auto symbol_type = symbol_typet("java::java.util.Map");
     const auto generic_symbol_type = java_generic_symbol_typet(
       symbol_type, "Ljava/util/Map<TK;TV;>;", "java.util.HashMap");
-    java_generic_parametert param0("java.util.HashMap::K", symbol_typet());
-    java_generic_parametert param1("java.util.HashMap::V", symbol_typet());
-    java_generic_parametert param2("java.util.HashMap::T", symbol_typet());
+    java_generic_parametert param0(
+      "java.util.HashMap::K", symbol_typet(irep_idt()));
+    java_generic_parametert param1(
+      "java.util.HashMap::V", symbol_typet(irep_idt()));
+    java_generic_parametert param2(
+      "java.util.HashMap::T", symbol_typet(irep_idt()));
 
     WHEN("Looking for parameter indexes")
     {

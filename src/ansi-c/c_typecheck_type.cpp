@@ -792,9 +792,8 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     }
   }
 
-  symbol_typet symbol_type;
+  symbol_typet symbol_type(identifier);
   symbol_type.add_source_location()=type.source_location();
-  symbol_type.set_identifier(identifier);
 
   c_qualifierst original_qualifiers(type);
   type.swap(symbol_type);
