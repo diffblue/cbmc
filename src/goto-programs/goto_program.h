@@ -106,14 +106,20 @@ public:
   /// respective fields in this class:
   ///
   /// - GOTO:
-  ///     if `guard` then goto `targets`
+  ///     goto `targets` if and only if `guard` is true.
+  ///     More than one target is deprecated.  Its semantics was a
+  ///     non-deterministic choice.
   /// - RETURN:
   ///     Set the value returned by `code` (which shall be either nil or an
   ///     instance of code_returnt) and then jump to the end of the function.
+  ///     Many analysis tools remove these instructions before they start.
   /// - DECL:
   ///     Introduces a symbol denoted by the field `code` (an instance of
   ///     code_declt), the life-time of which is bounded by a corresponding DEAD
-  ///     instruction.
+  ///     instruction.  Non-static symbols must be DECL'd before they are used.
+  /// - DEAD:
+  ///     Ends the life of the symbol denoted by the field `code`.
+  ///     After a DEAD instruction the symbol must be DECL'd again before use.
   /// - FUNCTION_CALL:
   ///     Invoke the function denoted by field `code` (an instance of
   ///     code_function_callt).
@@ -124,27 +130,33 @@ public:
   ///     Execute the `code` (an instance of codet of kind ID_fence, ID_printf,
   ///     ID_array_copy, ID_array_set, ID_input, ID_output, ...).
   /// - ASSUME:
-  ///     Wait for `guard` to evaluate to true.
+  ///     This thread of execution waits for `guard` to evaluate to true.
+  ///     Assume does not "retro-actively" affect the thread or any ASSERTs.
   /// - ASSERT:
   ///     Using ASSERT instructions is the one and only way to express
-  ///     properties to be verified. Execution paths abort if `guard` evaluates
-  ///     to false.
+  ///     properties to be verified.  An assertion is true / safe if `guard`
+  ///     is true in all possible executions, otherwise it is false / unsafe.
+  ///     The status of the assertion does not affect execution in any way.
   /// - SKIP, LOCATION:
   ///     No-op.
   /// - ATOMIC_BEGIN, ATOMIC_END:
   ///     When a thread executes ATOMIC_BEGIN, no thread other will be able to
   ///     execute any instruction until the same thread executes ATOMIC_END.
+  ///     Concurrency is not supported by all analysis tools.
   /// - END_FUNCTION:
-  ///     Can only occur as the last instruction of the list.
+  ///     Must occur as the last instruction of the list and nowhere else.
   /// - START_THREAD:
   ///     Create a new thread and run the code of this function starting from
   ///     targets[0]. Quite often the instruction pointed by targets[0] will be
   ///     just a FUNCTION_CALL, followed by an END_THREAD.
+  ///     Concurrency is not supported by all analysis tools.
   /// - END_THREAD:
   ///     Terminate the calling thread.
+  ///     Concurrency is not supported by all analysis tools.
   /// - THROW:
   ///     throw `exception1`, ..., `exceptionN`
   ///     where the list of exceptions is extracted from the `code` field
+  ///     Many analysis tools remove these instructions before they start.
   /// - CATCH, when code.find(ID_exception_list) is non-empty:
   ///     Establishes that from here to the next occurrence of CATCH with an
   ///     empty list (see below) if
@@ -156,6 +168,7 @@ public:
   /// - CATCH, when empty code.find(ID_exception_list) is empty:
   ///     clears all the catch clauses established as per the above in this
   ///     function?
+  ///     Many analysis tools remove these instructions before they start.
   class instructiont final
   {
   public:
