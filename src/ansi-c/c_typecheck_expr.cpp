@@ -1469,7 +1469,7 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
   exprt &op0=expr.op0();
   typet type=op0.type();
 
-  follow_symbol(type);
+  type = follow(type);
 
   if(type.id()==ID_incomplete_struct)
   {

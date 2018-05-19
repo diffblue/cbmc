@@ -16,11 +16,14 @@ class symbol_tablet;
 class exprt;
 class symbolt;
 class typet;
-class union_tag_typet;
+class symbol_exprt;
+class symbol_typet;
+class tag_typet;
 class union_typet;
-class struct_tag_typet;
 class struct_typet;
 class c_enum_typet;
+class union_tag_typet;
+class struct_tag_typet;
 class c_enum_tag_typet;
 
 class namespace_baset
@@ -35,22 +38,20 @@ public:
     return *symbol;
   }
 
-  const symbolt &lookup(const irept &irep) const
-  {
-    return lookup(irep.get(ID_identifier));
-  }
+  const symbolt &lookup(const symbol_exprt &) const;
+  const symbolt &lookup(const symbol_typet &) const;
+  const symbolt &lookup(const tag_typet &) const;
 
   virtual ~namespace_baset();
 
-  void follow_symbol(irept &irep) const;
-  void follow_macros(exprt &expr) const;
-  const typet &follow(const typet &src) const;
+  void follow_macros(exprt &) const;
+  const typet &follow(const typet &) const;
 
   // These produce union_typet, struct_typet, c_enum_typet or
   // the incomplete version.
-  const typet &follow_tag(const union_tag_typet &src) const;
-  const typet &follow_tag(const struct_tag_typet &src) const;
-  const typet &follow_tag(const c_enum_tag_typet &src) const;
+  const typet &follow_tag(const union_tag_typet &) const;
+  const typet &follow_tag(const struct_tag_typet &) const;
+  const typet &follow_tag(const c_enum_tag_typet &) const;
 
   /// Returns the maximum integer n such that there is a symbol (in some of the
   /// symbol tables) whose name is of the form "AB" where A is \p prefix and B

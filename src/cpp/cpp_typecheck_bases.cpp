@@ -51,8 +51,8 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       throw 0;
     }
 
-    const symbolt &base_symbol=
-      lookup(base_symbol_expr.type());
+    const symbolt &base_symbol =
+      lookup(to_symbol_type(base_symbol_expr.type()));
 
     if(base_symbol.type.id()==ID_incomplete_struct)
     {

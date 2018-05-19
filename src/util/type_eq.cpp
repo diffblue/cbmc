@@ -11,11 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "type_eq.h"
 
-#include <cassert>
-
-#include "type.h"
-#include "symbol.h"
 #include "namespace.h"
+#include "std_types.h"
+#include "symbol.h"
 
 bool type_eq(const typet &type1, const typet &type2, const namespacet &ns)
 {
@@ -24,7 +22,7 @@ bool type_eq(const typet &type1, const typet &type2, const namespacet &ns)
 
   if(type1.id()==ID_symbol)
   {
-    const symbolt &symbol=ns.lookup(type1);
+    const symbolt &symbol = ns.lookup(to_symbol_type(type1));
     if(!symbol.is_type)
       throw "symbol "+id2string(symbol.name)+" is not a type";
 
@@ -33,7 +31,7 @@ bool type_eq(const typet &type1, const typet &type2, const namespacet &ns)
 
   if(type2.id()==ID_symbol)
   {
-    const symbolt &symbol=ns.lookup(type2);
+    const symbolt &symbol = ns.lookup(to_symbol_type(type2));
     if(!symbol.is_type)
       throw "symbol "+id2string(symbol.name)+" is not a type";
 

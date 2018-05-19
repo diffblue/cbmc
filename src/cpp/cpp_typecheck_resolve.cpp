@@ -352,8 +352,8 @@ exprt cpp_typecheck_resolvet::convert_identifier(
 
       while(followed_type.id()==ID_symbol)
       {
-        typet tmp=cpp_typecheck.lookup(followed_type).type;
-        followed_type=tmp;
+        followed_type =
+          cpp_typecheck.follow(to_symbol_type(followed_type));
         constant |= followed_type.get_bool(ID_C_constant);
       }
 
@@ -1899,8 +1899,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   const exprt &expr,
   const cpp_typecheck_fargst &fargs)
 {
-  typet tmp=expr.type();
-  cpp_typecheck.follow_symbol(tmp);
+  typet tmp = cpp_typecheck.follow(expr.type());
 
   if(!tmp.get_bool(ID_is_template))
     return nil_exprt(); // not a template

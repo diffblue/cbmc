@@ -189,7 +189,7 @@ void cpp_typecheckt::elaborate_class_template(
   if(type.id()!=ID_symbol)
     return;
 
-  const symbolt &symbol=lookup(type);
+  const symbolt &symbol = lookup(to_symbol_type(type));
 
   // Make a copy, as instantiate will destroy the symbol type!
   const typet t_type=symbol.type;
