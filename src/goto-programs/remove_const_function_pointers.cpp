@@ -72,8 +72,8 @@ exprt remove_const_function_pointerst::replace_const_symbols(
   {
     if(is_const_expression(expression))
     {
-      const symbolt &symbol=
-        *symbol_table.lookup(expression.get(ID_identifier));
+      const symbolt &symbol =
+        *symbol_table.lookup(to_symbol_expr(expression).get_identifier());
       if(symbol.type.id()!=ID_code)
       {
         const exprt &symbol_value=symbol.value;

@@ -375,8 +375,8 @@ void goto_symex_statet::propagationt::operator()(exprt &expr)
 {
   if(expr.id()==ID_symbol)
   {
-    valuest::const_iterator it=
-      values.find(expr.get(ID_identifier));
+    valuest::const_iterator it =
+      values.find(to_symbol_expr(expr).get_identifier());
     if(it!=values.end())
       expr=it->second;
   }

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 
 #include <util/std_code.h>
+#include <util/std_expr.h>
 
 class mm2cppt
 {
@@ -53,7 +54,7 @@ void mm2cppt::check_acyclic(const exprt &expr, unsigned indent)
 {
   if(expr.id()==ID_symbol)
   {
-    const irep_idt &identifier=expr.get(ID_identifier);
+    const irep_idt &identifier = to_symbol_expr(expr).get_identifier();
     let_valuest::const_iterator v_it=let_values.find(identifier);
     if(v_it!=let_values.end())
       check_acyclic(v_it->second, indent);
@@ -152,7 +153,7 @@ void mm2cppt::instruction2cpp(const codet &code, unsigned indent)
         assert(it->operands().size()==2);
         if(it->op0().id()==ID_symbol)
         {
-          irep_idt identifier=it->op0().get(ID_identifier);
+          irep_idt identifier = to_symbol_expr(it->op0()).get_identifier();
           let_values[identifier]=it->op1();
         }
         else

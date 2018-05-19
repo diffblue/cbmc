@@ -121,7 +121,10 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
   // now do expression itself
 
   if(dest.id()==ID_symbol)
-    return expr_map.find(dest.get(ID_identifier))!=expr_map.end();
+  {
+    const irep_idt &identifier = to_symbol_expr(dest).get_identifier();
+    return expr_map.find(identifier) != expr_map.end();
+  }
 
   forall_operands(it, dest)
     if(have_to_replace(*it))
@@ -184,8 +187,8 @@ bool replace_symbolt::replace(typet &dest) const
   }
   else if(dest.id()==ID_symbol)
   {
-    type_mapt::const_iterator it=
-      type_map.find(dest.get(ID_identifier));
+    type_mapt::const_iterator it =
+      type_map.find(to_symbol_type(dest).get_identifier());
 
     if(it!=type_map.end())
     {
@@ -248,7 +251,10 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
         return true;
   }
   else if(dest.id()==ID_symbol)
-    return type_map.find(dest.get(ID_identifier))!=type_map.end();
+  {
+    const irep_idt &identifier = to_symbol_type(dest).get_identifier();
+    return type_map.find(identifier) != type_map.end();
+  }
   else if(dest.id()==ID_array)
     return have_to_replace(to_array_type(dest).size());
 

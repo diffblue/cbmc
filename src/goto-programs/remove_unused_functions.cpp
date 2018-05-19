@@ -81,9 +81,10 @@ void find_used_functions(
           // check that this is actually a simple call
           assert(call.function().id()==ID_symbol);
 
-          find_used_functions(call.function().get(ID_identifier),
-                              functions,
-                              seen);
+          const irep_idt &identifier =
+            to_symbol_expr(call.function()).get_identifier();
+
+          find_used_functions(identifier, functions, seen);
         }
       }
     }

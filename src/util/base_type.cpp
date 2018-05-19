@@ -53,16 +53,28 @@ protected:
 void base_type_rec(
   typet &type, const namespacet &ns, std::set<irep_idt> &symb)
 {
-  if(type.id()==ID_symbol ||
-     type.id()==ID_c_enum_tag ||
-     type.id()==ID_struct_tag ||
-     type.id()==ID_union_tag)
+  if(type.id() == ID_symbol)
   {
     const symbolt *symbol;
 
-    if(!ns.lookup(type.get(ID_identifier), symbol) &&
-       symbol->is_type &&
-       !symbol->type.is_nil())
+    if(
+      !ns.lookup(to_symbol_type(type).get_identifier(), symbol) &&
+      symbol->is_type && !symbol->type.is_nil())
+    {
+      type = symbol->type;
+      base_type_rec(type, ns, symb); // recursive call
+      return;
+    }
+  }
+  else if(
+    type.id() == ID_c_enum_tag || type.id() == ID_struct_tag ||
+    type.id() == ID_union_tag)
+  {
+    const symbolt *symbol;
+
+    if(
+      !ns.lookup(to_tag_type(type).get_identifier(), symbol) &&
+      symbol->is_type && !symbol->type.is_nil())
     {
       type=symbol->type;
       base_type_rec(type, ns, symb); // recursive call
@@ -87,12 +99,24 @@ void base_type_rec(
     typet &subtype=to_pointer_type(type).subtype();
 
     // we need to avoid running into an infinite loop
-    if(subtype.id()==ID_symbol ||
-       subtype.id()==ID_c_enum_tag ||
-       subtype.id()==ID_struct_tag ||
-       subtype.id()==ID_union_tag)
+    if(subtype.id() == ID_symbol)
     {
-      const irep_idt &id=subtype.get(ID_identifier);
+      const irep_idt &id = to_symbol_type(subtype).get_identifier();
+
+      if(symb.find(id) != symb.end())
+        return;
+
+      symb.insert(id);
+
+      base_type_rec(subtype, ns, symb);
+
+      symb.erase(id);
+    }
+    else if(
+      subtype.id() == ID_c_enum_tag || subtype.id() == ID_struct_tag ||
+      subtype.id() == ID_union_tag)
+    {
+      const irep_idt &id = to_tag_type(subtype).get_identifier();
 
       if(symb.find(id)!=symb.end())
         return;

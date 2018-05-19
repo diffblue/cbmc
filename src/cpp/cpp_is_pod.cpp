@@ -82,8 +82,8 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
   }
   else if(type.id()==ID_symbol)
   {
-    const symbolt &symb=lookup(type.get(ID_identifier));
-    assert(symb.is_type);
+    const symbolt &symb = lookup(to_symbol_type(type));
+    DATA_INVARIANT(symb.is_type, "type symbol is a type");
     return cpp_is_pod(symb.type);
   }
 

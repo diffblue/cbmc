@@ -143,7 +143,7 @@ std::string inv_object_storet::build_string(const exprt &expr) const
   }
 
   if(expr.id()==ID_symbol)
-    return expr.get_string(ID_identifier);
+    return id2string(to_symbol_expr(expr).get_identifier());
 
   return "";
 }
