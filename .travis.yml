@@ -90,17 +90,6 @@ jobs:
         - COMPILER="ccache /usr/bin/g++-5"
         - EXTRA_CXXFLAGS="-D_GLIBCXX_DEBUG"
 
-    # OS X using g++
-    - stage: Test different OS/CXX/Flags
-      os: osx
-      sudo: false
-      compiler: gcc
-      cache: ccache
-      before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel
-        - export PATH=$PATH:/usr/local/opt/ccache/libexec
-      env: COMPILER="ccache g++"
-
     # OS X using clang++
     - stage: Test different OS/CXX/Flags
       os: osx
