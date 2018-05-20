@@ -107,3 +107,15 @@ void code_blockt::append(const code_blockt &extra_block)
     add(to_code(operand));
   }
 }
+
+code_blockt create_fatal_assertion(
+  const exprt &condition, const source_locationt &loc)
+{
+  code_blockt result;
+  result.copy_to_operands(code_assertt(condition));
+  result.copy_to_operands(code_assumet(condition));
+  for(auto &op : result.operands())
+    op.add_source_location() = loc;
+  result.add_source_location() = loc;
+  return result;
+}

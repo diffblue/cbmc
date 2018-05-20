@@ -350,8 +350,7 @@ inline code_deadt &to_code_dead(codet &code)
   return static_cast<code_deadt &>(code);
 }
 
-/*! \brief An assumption
-*/
+/// An assumption, which must hold in subsequent code.
 class code_assumet:public codet
 {
 public:
@@ -396,8 +395,8 @@ inline code_assumet &to_code_assume(codet &code)
   return static_cast<code_assumet &>(code);
 }
 
-/*! \brief An assertion
-*/
+/// A non-fatal assertion, which checks a condition then permits execution to
+/// continue.
 class code_assertt:public codet
 {
 public:
@@ -441,6 +440,21 @@ inline code_assertt &to_code_assert(codet &code)
   assert(code.get_statement()==ID_assert);
   return static_cast<code_assertt &>(code);
 }
+
+/// Create a fatal assertion, which checks a condition and then halts if it does
+/// not hold. Equivalent to `ASSERT(condition); ASSUME(condition)`.
+///
+/// Source level assertions should probably use this, whilst checks that are
+/// normally non-fatal at runtime, such as integer overflows, should use
+/// code_assertt by itself.
+/// \param condition: condition to assert
+/// \param source_location: source location to attach to the generated code;
+///   conventionally this should have `comment` and `property_class` fields set
+///   to indicate the nature of the assertion.
+/// \return A code block that asserts a condition then aborts if it does not
+///    hold.
+code_blockt create_fatal_assertion(
+  const exprt &condition, const source_locationt &source_location);
 
 /*! \brief An if-then-else
 */

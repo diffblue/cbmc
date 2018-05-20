@@ -261,8 +261,18 @@ static void instrument_cover_goals(
   {
     Forall_goto_program_instructions(i_it, function.body)
     {
+      // Simplify the common case where we have ASSERT(x); ASSUME(x):
       if(i_it->is_assert())
-        i_it->type=goto_program_instruction_typet::ASSUME;
+      {
+        auto successor = std::next(i_it);
+        if(successor != function.body.instructions.end() &&
+           successor->is_assume() &&
+           successor->guard == i_it->guard)
+        {
+          successor->make_skip();
+        }
+        i_it->type = goto_program_instruction_typet::ASSUME;
+      }
     }
   }
 

@@ -160,11 +160,12 @@ codet java_bytecode_instrumentt::check_arithmetic_exception(
       original_loc,
       "java.lang.ArithmeticException");
 
-  code_assertt ret(binary_relation_exprt(denominator, ID_notequal, zero));
-  ret.add_source_location()=original_loc;
-  ret.add_source_location().set_comment("Denominator should be nonzero");
-  ret.add_source_location().set_property_class("integer-divide-by-zero");
-  return ret;
+  source_locationt assertion_loc = original_loc;
+  assertion_loc.set_comment("Denominator should be nonzero");
+  assertion_loc.set_property_class("integer-divide-by-zero");
+
+  return create_fatal_assertion(
+    binary_relation_exprt(denominator, ID_notequal, zero), assertion_loc);
 }
 
 /// Checks whether the array access array_struct[idx] is out-of-bounds,
@@ -195,19 +196,17 @@ codet java_bytecode_instrumentt::check_array_access(
       "java.lang.ArrayIndexOutOfBoundsException");
 
   code_blockt bounds_checks;
-  bounds_checks.add(code_assertt(ge_zero));
-  bounds_checks.operands().back().add_source_location()=original_loc;
-  bounds_checks.operands().back().add_source_location()
-    .set_comment("Array index should be >= 0");
-  bounds_checks.operands().back().add_source_location()
-    .set_property_class("array-index-out-of-bounds-low");
 
-  bounds_checks.add(code_assertt(lt_length));
-  bounds_checks.operands().back().add_source_location()=original_loc;
-  bounds_checks.operands().back().add_source_location()
-    .set_comment("Array index should be < length");
-  bounds_checks.operands().back().add_source_location()
-    .set_property_class("array-index-out-of-bounds-high");
+  source_locationt low_check_loc = original_loc;
+  low_check_loc.set_comment("Array index should be >= 0");
+  low_check_loc.set_property_class("array-index-out-of-bounds-low");
+
+  source_locationt high_check_loc = original_loc;
+  high_check_loc.set_comment("Array index should be < length");
+  high_check_loc.set_property_class("array-index-out-of-bounds-high");
+
+  bounds_checks.add(create_fatal_assertion(ge_zero, low_check_loc));
+  bounds_checks.add(create_fatal_assertion(lt_length, high_check_loc));
 
   return bounds_checks;
 }
@@ -246,11 +245,12 @@ codet java_bytecode_instrumentt::check_class_cast(
   }
   else
   {
-    code_assertt assert_class(class_cast_check);
-    assert_class.add_source_location().
-      set_comment("Dynamic cast check");
-    assert_class.add_source_location().
-      set_property_class("bad-dynamic-cast");
+    source_locationt check_loc = original_loc;
+    check_loc.set_comment("Dynamic cast check");
+    check_loc.set_property_class("bad-dynamic-cast");
+
+    codet assert_class = create_fatal_assertion(class_cast_check, check_loc);
+
     check_code=std::move(assert_class);
   }
 
@@ -283,12 +283,11 @@ codet java_bytecode_instrumentt::check_null_dereference(
       equal_expr,
       original_loc, "java.lang.NullPointerException");
 
-  code_assertt check((not_exprt(equal_expr)));
-  check.add_source_location()
-    .set_comment("Throw null");
-  check.add_source_location()
-    .set_property_class("null-pointer-exception");
-  return check;
+  source_locationt check_loc = original_loc;
+  check_loc.set_comment("Null pointer check");
+  check_loc.set_property_class("null-pointer-exception");
+
+  return create_fatal_assertion(not_exprt(equal_expr), check_loc);
 }
 
 /// Checks whether `length`>=0 and throws NegativeArraySizeException/
@@ -313,11 +312,11 @@ codet java_bytecode_instrumentt::check_array_length(
       original_loc,
       "java.lang.NegativeArraySizeException");
 
-  code_assertt check(ge_zero);
-  check.add_source_location().set_comment("Array size should be >= 0");
-  check.add_source_location()
-    .set_property_class("array-create-negative-size");
-  return check;
+  source_locationt check_loc;
+  check_loc.set_comment("Array size should be >= 0");
+  check_loc.set_property_class("array-create-negative-size");
+
+  return create_fatal_assertion(ge_zero, check_loc);
 }
 
 /// Checks whether `expr` requires instrumentation, and if so adds it

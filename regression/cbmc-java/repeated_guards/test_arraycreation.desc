@@ -1,0 +1,10 @@
+CORE
+Test.class
+--function Test.testArrayCreation
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+array-create-negative-size\.1.*: FAILURE$
+array-create-negative-size\.2.*: SUCCESS$
+--
+^warning: ignoring

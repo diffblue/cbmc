@@ -1,0 +1,10 @@
+CORE
+Test.class
+--function Test.testAssertion
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+assertion at file Test\.java line 10.*: FAILURE$
+assertion at file Test\.java line 11.*: SUCCESS$
+--
+^warning: ignoring
