@@ -13,7 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
-#include <util/endianness_map.h>
+
+#include "bv_endianness_map.h"
 
 bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
 {
@@ -63,8 +64,8 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
       }
       else
       {
-        endianness_mapt map_op(op.type(), false, ns);
-        endianness_mapt map_value(value.type(), false, ns);
+        bv_endianness_mapt map_op(op.type(), false, ns, boolbv_width);
+        bv_endianness_mapt map_value(value.type(), false, ns, boolbv_width);
 
         std::size_t offset_i=integer2unsigned(offset);
 
@@ -93,8 +94,8 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
     equality.rhs()=from_integer(offset/byte_width, offset_expr.type());
     literalt equal=convert(equality);
 
-    endianness_mapt map_op(op.type(), little_endian, ns);
-    endianness_mapt map_value(value.type(), little_endian, ns);
+    bv_endianness_mapt map_op(op.type(), little_endian, ns, boolbv_width);
+    bv_endianness_mapt map_value(value.type(), little_endian, ns, boolbv_width);
 
     for(std::size_t bit=0; bit<update_width; bit++)
       if(offset+bit<bv.size())
