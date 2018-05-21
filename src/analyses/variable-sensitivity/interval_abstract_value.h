@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: analyses variable-sensitivity
+ Module: analyses variable-sensitivity intervals
 
- Author: Thomas Kiley, thomas.kiley@diffblue.com
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ABSTRACT_VALUE_H
@@ -64,11 +64,10 @@ protected:
     abstract_object_pointert other) const override;
 
 private :
-  abstract_object_pointert merge_interval_interval(
+  abstract_object_pointert merge_intervals(
     interval_abstract_value_pointert other) const;
 
   constant_interval_exprt interval;
-  //exprt value;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ABSTRACT_VALUE_H
