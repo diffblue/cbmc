@@ -87,18 +87,73 @@ SCENARIO("subtract interval domain", "[core][analyses][interval][subtract]")
       THEN("Domain is consistent")
       {
         REQUIRE(V(left.get_lower()) == 2);
-        REQUIRE(left.is_max());
+        REQUIRE(left.has_no_upper_bound());
         REQUIRE(V(right.get_lower()) == 6);
-        REQUIRE(right.is_max());
+        REQUIRE(right.has_no_upper_bound());
       }
 
       CAPTURE(result);
 
       THEN("The result is [MIN, MAX]")
       {
-        REQUIRE(result.is_max());
-        REQUIRE(result.is_min());
+        REQUIRE(result.has_no_upper_bound());
+        REQUIRE(result.has_no_lower_bound());
       }
+    }
+  }
+}
+
+SCENARIO("Subtracting unsigned integers")
+{
+  WHEN("Subtracting two constant intervals")
+  {
+    auto lhs =
+      constant_interval_exprt(constant_exprt("1010", unsignedbv_typet(32)));
+    auto rhs =
+      constant_interval_exprt(constant_exprt("0011", unsignedbv_typet(32)));
+    THEN("it should work")
+    {
+      auto result = lhs.minus(rhs);
+      REQUIRE(result.is_single_value_interval());
+      auto maybe_lower = numeric_cast<mp_integer>(result.get_lower());
+      REQUIRE(maybe_lower.has_value());
+      REQUIRE(maybe_lower.value() == 7);
+    }
+  }
+
+  WHEN("Subtracting zero from something")
+  {
+    auto lhs =
+      constant_interval_exprt(constant_exprt("1010", unsignedbv_typet(32)));
+    auto rhs =
+      constant_interval_exprt(constant_exprt("0", unsignedbv_typet(32)));
+
+    THEN("it should not give a completely crazy result")
+    {
+      auto result = lhs.minus(rhs);
+      REQUIRE(result.is_single_value_interval());
+      auto maybe_lower = numeric_cast<mp_integer>(result.get_lower());
+      REQUIRE(maybe_lower.has_value());
+      REQUIRE(maybe_lower.value() == 10);
+    }
+  }
+
+  WHEN("Subtracting an non-constant interval containing zero")
+  {
+    auto lhs =
+      constant_interval_exprt(constant_exprt("1010", unsignedbv_typet(32)));
+    auto rhs = constant_interval_exprt(
+      constant_exprt("0", unsignedbv_typet(32)),
+      constant_exprt("1", unsignedbv_typet(32)));
+    THEN("it should not give a completely crazy result")
+    {
+      auto result = lhs.minus(rhs);
+      auto maybe_lower = numeric_cast<mp_integer>(result.get_lower());
+      REQUIRE(maybe_lower.has_value());
+      REQUIRE(maybe_lower.value() == 9);
+      auto maybe_upper = numeric_cast<mp_integer>(result.get_upper());
+      REQUIRE(maybe_upper.has_value());
+      REQUIRE(maybe_upper.value() == 10);
     }
   }
 }
