@@ -51,6 +51,29 @@ protected:
 
   typedef std::stack<cfgt::entryt> queuet;
 
+  /// A search stack entry, used in tracking nodes to mark reachable when
+  /// walking over the CFG in `fixedpoint_to_assertions` and
+  /// `fixedpoint_from_assertions`.
+  struct search_stack_entryt
+  {
+    /// CFG node to mark reachable
+    cfgt::node_indext node_index;
+
+    /// If true, this function's caller is known and has already been queued to
+    /// mark reachable, so there is no need to queue anything when walking out
+    /// of the function, whether forwards (via END_FUNCTION) or backwards (via a
+    /// callsite).
+    /// If false, this function's caller is not known, so when walking forwards
+    /// from the end or backwards from the beginning we should queue all
+    /// possible callers.
+    bool caller_is_known;
+
+    search_stack_entryt(cfgt::node_indext node_index, bool caller_is_known) :
+      node_index(node_index), caller_is_known(caller_is_known)
+    {
+    }
+  };
+
   void fixedpoint_to_assertions(
     const is_threadedt &is_threaded,
     slicing_criteriont &criterion);

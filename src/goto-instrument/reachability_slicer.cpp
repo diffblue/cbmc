@@ -44,6 +44,15 @@ reachability_slicert::get_sources(
   return sources;
 }
 
+static bool is_same_target(
+  goto_programt::const_targett it1,
+  goto_programt::const_targett it2)
+{
+  // Avoid comparing iterators belonging to different functions, and therefore
+  // different std::lists.
+  return it1->function == it2->function && it1 == it2;
+}
+
 /// Perform backwards depth-first search of the control-flow graph of the
 /// goto program, starting from the nodes corresponding to the criterion and
 /// the instructions that might be executed concurrently. Set reaches_assertion
@@ -54,11 +63,50 @@ void reachability_slicert::fixedpoint_to_assertions(
   const is_threadedt &is_threaded,
   slicing_criteriont &criterion)
 {
-  std::vector<cfgt::node_indext> src = get_sources(is_threaded, criterion);
+  std::vector<search_stack_entryt> stack;
+  std::vector<cfgt::node_indext> sources = get_sources(is_threaded, criterion);
+  for(const auto source : sources)
+    stack.emplace_back(source, false);
 
-  std::vector<cfgt::node_indext> reachable = cfg.get_reachable(src, false);
-  for(const auto index : reachable)
-    cfg[index].reaches_assertion = true;
+  while(!stack.empty())
+  {
+    auto &node = cfg[stack.back().node_index];
+    const auto caller_is_known = stack.back().caller_is_known;
+    stack.pop_back();
+
+    if(node.reaches_assertion)
+      continue;
+    node.reaches_assertion = true;
+
+    for(const auto &edge : node.in)
+    {
+      const auto &pred_node = cfg[edge.first];
+
+      if(pred_node.PC->is_end_function())
+      {
+        // This is an end-of-function -> successor-of-callsite edge.
+        // Queue both the caller and the end of the callee.
+        INVARIANT(
+          std::prev(node.PC)->is_function_call(),
+          "all function return edges should point to the successor of a "
+          "FUNCTION_CALL instruction");
+        stack.emplace_back(edge.first, true);
+        stack.emplace_back(
+          cfg.entry_map[std::prev(node.PC)], caller_is_known);
+      }
+      else if(pred_node.PC->is_function_call())
+      {
+        // Skip this predecessor, unless this is a bodyless function, or we
+        // don't know who our callee was:
+        if(!caller_is_known || is_same_target(std::next(pred_node.PC), node.PC))
+          stack.emplace_back(edge.first, caller_is_known);
+      }
+      else
+      {
+        stack.emplace_back(edge.first, caller_is_known);
+      }
+    }
+  }
 }
 
 /// Perform forwards depth-first search of the control-flow graph of the
@@ -71,11 +119,66 @@ void reachability_slicert::fixedpoint_from_assertions(
   const is_threadedt &is_threaded,
   slicing_criteriont &criterion)
 {
-  std::vector<cfgt::node_indext> src = get_sources(is_threaded, criterion);
+  std::vector<search_stack_entryt> stack;
+  std::vector<cfgt::node_indext> sources = get_sources(is_threaded, criterion);
+  for(const auto source : sources)
+    stack.emplace_back(source, false);
 
-  const std::vector<cfgt::node_indext> reachable = cfg.get_reachable(src, true);
-  for(const auto index : reachable)
-    cfg[index].reachable_from_assertion = true;
+  while(!stack.empty())
+  {
+    auto &node = cfg[stack.back().node_index];
+    const auto caller_is_known = stack.back().caller_is_known;
+    stack.pop_back();
+
+    if(node.reachable_from_assertion)
+      continue;
+    node.reachable_from_assertion = true;
+
+    if(node.PC->is_function_call())
+    {
+      // Queue the instruction's natural successor (function head, or next
+      // instruction if the function is bodyless)
+      INVARIANT(node.out.size() == 1, "Call sites should have one successor");
+      const auto successor_index = node.out.begin()->first;
+
+      // If the function has a body, mark the function head, but note that we
+      // have already taken care of the return site.
+      const auto &callee_head_node = cfg[successor_index];
+      auto callee_it = callee_head_node.PC;
+      if(!is_same_target(callee_it, std::next(node.PC)))
+      {
+        stack.emplace_back(successor_index, true);
+
+        // Check if it can return, and if so mark the callsite's successor:
+        while(!callee_it->is_end_function())
+          ++callee_it;
+
+        if(!cfg[cfg.entry_map[callee_it]].out.empty())
+        {
+          stack.emplace_back(
+            cfg.entry_map[std::next(node.PC)], caller_is_known);
+        }
+      }
+      else
+      {
+        // Bodyless function -- mark the successor instruction only.
+        stack.emplace_back(successor_index, caller_is_known);
+      }
+    }
+    else if(node.PC->is_end_function() && caller_is_known)
+    {
+      // Special case -- the callsite successor was already queued when entering
+      // this function, more precisely than we can see from the function return
+      // edges (which lead to all possible callers), so nothing to do here.
+    }
+    else
+    {
+      // General case, including end-of-function where we don't know our caller.
+      // Queue all successors.
+      for(const auto &edge : node.out)
+        stack.emplace_back(edge.first, caller_is_known);
+    }
+  }
 }
 
 /// This function removes all instructions that have the flag
