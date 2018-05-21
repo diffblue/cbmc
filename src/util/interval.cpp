@@ -1,9 +1,10 @@
-/*
- * interval.cpp
- *
- *  Created on: 16 Jun 2017
- *      Author: dan
- */
+/*******************************************************************\
+
+ Module: intervals
+
+ Author: Daniel Neville (2017), Diffblue Ltd
+
+\*******************************************************************/
 
 /*
  *
@@ -32,8 +33,6 @@ const exprt &constant_interval_exprt::get_upper() const
   return op1();
 }
 
-//make clean -s && make -j 7 CXX="/usr/local/bin/ccache g++" -s && ./unit_tests
-
 constant_interval_exprt constant_interval_exprt::unary_plus() const
 {
   return *this;
@@ -49,7 +48,7 @@ constant_interval_exprt constant_interval_exprt::unary_minus() const
   exprt lower;
   exprt upper;
 
-  if(is_max())
+  if(has_no_upper_bound())
   {
     lower = min();
   }
@@ -58,7 +57,7 @@ constant_interval_exprt constant_interval_exprt::unary_minus() const
     lower = simplified_expr(unary_minus_exprt(get_upper()));
   }
 
-  if(is_min())
+  if(has_no_lower_bound())
   {
     upper = max();
   }
@@ -87,7 +86,9 @@ constant_interval_exprt::plus(const constant_interval_exprt &o) const
   }
   else
   {
-    assert(!is_max(get_upper()) && !is_max(o.get_upper()));
+    INVARIANT(
+      !is_max(get_upper()) && !is_max(o.get_upper()),
+      "We just excluded this case");
     upper = simplified_expr(plus_exprt(get_upper(), o.get_upper()));
   }
 
@@ -97,7 +98,9 @@ constant_interval_exprt::plus(const constant_interval_exprt &o) const
   }
   else
   {
-    assert(!is_min(get_lower()) && !is_min(o.get_lower()));
+    INVARIANT(
+      !is_min(get_lower()) && !is_min(o.get_lower()),
+      "We just excluded that case");
     lower = simplified_expr(plus_exprt(get_lower(), o.get_lower()));
   }
 
@@ -112,7 +115,6 @@ constant_interval_exprt::minus(const constant_interval_exprt &other) const
     handle_constant_binary_expression(other, ID_minus);
   }
 
-  // FIXME This is nonsense if the interval type is unsigned int
   // [this.lower - other.upper, this.upper - other.lower]
   return plus(other.unary_minus());
 }
@@ -193,8 +195,9 @@ constant_interval_exprt::modulo(const constant_interval_exprt &o) const
   // [-5, 5] % [3]
   if(is_negative(get_lower()) && is_positive(get_upper()))
   {
-    assert(contains_zero());
-
+    INVARIANT(
+      contains_zero(),
+      "Zero should be between a negative and a positive value");
     // This can be done more accurately.
     lower = get_min(o.get_lower(), get_lower());
     upper = get_max(o.get_upper(), get_upper());
@@ -224,7 +227,10 @@ tvt constant_interval_exprt::is_definitely_false() const
 
   if(contains(constant_interval_exprt(zero())))
   {
-    assert(is_positive(get_upper()) || is_negative(get_lower()));
+    INVARIANT(
+      is_positive(get_upper()) || is_negative(get_lower()),
+      "If an interval contains zero its lower bound can't be positive"
+      " and its upper bound can't be negative");
     return tvt::unknown();
   }
 
@@ -539,7 +545,7 @@ exprt constant_interval_exprt::get_extreme(
     return max_exprt(type);
   }
 
-  assert(0);
+  UNREACHABLE;
 }
 
 exprt constant_interval_exprt::generate_expression(
@@ -918,7 +924,7 @@ constant_interval_exprt::tv_to_interval(const tvt &tv) const
     return constant_interval_exprt(zero());
   }
 
-  assert(tv.is_unknown());
+  INVARIANT(tv.is_unknown(), "We excluded the other cases");
   return top();
 }
 
@@ -1015,7 +1021,7 @@ exprt constant_interval_exprt::simplified_expr(exprt expr)
   symbol_tablet symbol_table;
   const namespacet ns(symbol_table);
 
-  assert(!contains_extreme(expr));
+  PRECONDITION(!contains_extreme(expr));
 
   return simplify_expr(expr, ns);
 }
@@ -1023,7 +1029,9 @@ exprt constant_interval_exprt::simplified_expr(exprt expr)
 constant_exprt constant_interval_exprt::zero(const typet &type)
 {
   constant_exprt zero = from_integer(mp_integer(0), type);
-  assert(zero.is_zero()); // NOT is_zero(zero) (inf. recursion
+  INVARIANT(
+    zero.is_zero(), // NOT is_zero(zero) (inf. recursion)
+    "The value created from 0 should be zero");
   return zero;
 }
 
@@ -1055,7 +1063,7 @@ max_exprt constant_interval_exprt::max() const
 
 bool constant_interval_exprt::is_top() const
 {
-  return (is_min() && is_max());
+  return (has_no_lower_bound() && has_no_upper_bound());
 }
 
 bool constant_interval_exprt::is_bottom() const
@@ -1221,12 +1229,12 @@ bool constant_interval_exprt::is_extreme(const exprt &expr1, const exprt &expr2)
   return is_extreme(expr1) || is_extreme(expr2);
 }
 
-bool constant_interval_exprt::is_max() const
+bool constant_interval_exprt::has_no_upper_bound() const
 {
   return is_max(get_upper());
 }
 
-bool constant_interval_exprt::is_min() const
+bool constant_interval_exprt::has_no_lower_bound() const
 {
   return is_min(get_lower());
 }
@@ -1255,7 +1263,7 @@ bool constant_interval_exprt::is_positive(const exprt &expr)
     return true;
   }
 
-  assert(is_signed(expr));
+  INVARIANT(is_signed(expr), "Not implemented for floats");
   // Floats later
 
   if(is_min(expr))
@@ -1285,7 +1293,7 @@ bool constant_interval_exprt::is_zero(const exprt &expr)
     return false;
   }
 
-  assert(!is_max(expr) && !is_min(expr));
+  INVARIANT(!is_max(expr) && !is_min(expr), "We excluded those cases");
 
   if(expr.is_zero())
   {
@@ -1302,14 +1310,15 @@ bool constant_interval_exprt::is_negative(const exprt &expr)
     return false;
   }
 
-  assert(is_signed(expr));
+  INVARIANT(
+    is_signed(expr), "We don't support anything other than integers yet");
 
   if(is_min(expr))
   {
     return true;
   }
 
-  assert(!is_extreme(expr));
+  INVARIANT(!is_extreme(expr), "We excluded these cases before");
 
   return less_than(expr, zero(expr));
 }
@@ -1338,8 +1347,10 @@ bool constant_interval_exprt::equal(const exprt &a, const exprt &b)
 
   if(!is_numeric(a) || !is_numeric(b))
   {
-    // Best we can do now is a==b?, but this is covered by the above, so always false.
-    assert(!(a == b));
+    INVARIANT(
+      !(a == b),
+      "Best we can do now is a==b?, but this is covered by the above, so "
+      "always false");
     return false;
   }
 
@@ -1364,7 +1375,7 @@ bool constant_interval_exprt::equal(const exprt &a, const exprt &b)
     return false;
   }
 
-  assert(!is_extreme(l, r));
+  INVARIANT(!is_extreme(l, r), "We've excluded this before");
 
   return simplified_expr(equal_exprt(l, r)).is_true();
 }
@@ -1385,7 +1396,7 @@ bool constant_interval_exprt::less_than(const exprt &a, const exprt &b)
     return false;
   }
 
-  assert(!is_max(l));
+  INVARIANT(!is_max(l), "We've just excluded this case");
 
   if(is_min(r))
   {
@@ -1393,15 +1404,16 @@ bool constant_interval_exprt::less_than(const exprt &a, const exprt &b)
     return false;
   }
 
-  assert(!is_max(l) && !is_min(r));
+  INVARIANT(!is_max(l) && !is_min(r), "We've excluded these cases");
 
   if(is_min(l))
   {
-    assert(!is_min(r));
     return true;
   }
 
-  assert(!is_max(l) && !is_min(r) && !is_min(l));
+  INVARIANT(
+    !is_max(l) && !is_min(r) && !is_min(l),
+    "These cases should have all been handled before this point");
 
   if(is_max(r))
   {
@@ -1409,9 +1421,9 @@ bool constant_interval_exprt::less_than(const exprt &a, const exprt &b)
     return !is_max(l);
   }
 
-  assert(!is_max(l) && !is_min(r) && !is_min(l) && !is_max(r));
-
-  assert(!is_extreme(l, r));
+  INVARIANT(
+    !is_extreme(l) && !is_extreme(r),
+    "We have excluded all of these cases in the code above");
 
   return simplified_expr(binary_relation_exprt(l, ID_lt, r)).is_true();
 }
@@ -1419,33 +1431,6 @@ bool constant_interval_exprt::less_than(const exprt &a, const exprt &b)
 bool constant_interval_exprt::greater_than(const exprt &a, const exprt &b)
 {
   return less_than(b, a);
-
-  //  if(!is_numeric(a) || !is_numeric(b))
-  //  {
-  //    return false;
-  //  }
-  //
-  //  exprt l=(is_min(a) && is_unsigned(a)) ? zero(a) : a;
-  //  exprt r=(is_min(b) && is_unsigned(b)) ? zero(b) : b;
-  //
-  //  if(is_max(l) && !is_max(r))
-  //  {
-  //    return true;
-  //  }
-  //
-  //  if((is_max(l) && is_max(r)) || (is_min(l) && is_min(r)))
-  //  {
-  //    return false;
-  //  }
-  //
-  //  if(is_min(l) && is_max(r))
-  //  {
-  //    return false;
-  //  }
-  //
-  //  assert(!is_extreme(l) && !is_extreme(r));
-  //
-  //  return simplified_expr(binary_relation_exprt(l, ID_gt, r)).is_true();
 }
 
 bool constant_interval_exprt::less_than_or_equal(const exprt &a, const exprt &b)
@@ -1485,7 +1470,7 @@ std::ostream &operator<<(std::ostream &out, const constant_interval_exprt &i)
 {
   out << "[";
 
-  if(!i.is_min())
+  if(!i.has_no_lower_bound())
   {
     // FIXME Not everything that's a bitvector is also an integer
     if(i.is_bitvector(i.get_lower()))
@@ -1517,7 +1502,7 @@ std::ostream &operator<<(std::ostream &out, const constant_interval_exprt &i)
   out << ",";
 
   // FIXME See comments on is_min
-  if(!i.is_max())
+  if(!i.has_no_upper_bound())
   {
     if(i.is_bitvector(i.get_upper()))
     {
@@ -1823,12 +1808,12 @@ bool constant_interval_exprt::is_bottom(const constant_interval_exprt &a)
 
 bool constant_interval_exprt::is_min(const constant_interval_exprt &a)
 {
-  return a.is_min();
+  return a.has_no_lower_bound();
 }
 
 bool constant_interval_exprt::is_max(const constant_interval_exprt &a)
 {
-  return a.is_max();
+  return a.has_no_upper_bound();
 }
 
 bool constant_interval_exprt::contains_extreme(const exprt expr)

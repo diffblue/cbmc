@@ -1,6 +1,6 @@
 /*******************************************************************\
  Module: Unit tests for variable/sensitivity/abstract_object::merge
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Limited
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
@@ -65,7 +65,7 @@ SCENARIO("add interval domain", "[core][analyses][interval][add]")
         REQUIRE(V(left.get_lower()) == 2);
         REQUIRE(V(left.get_upper()) == 4);
         REQUIRE(V(right.get_lower()) == 6);
-        REQUIRE(right.is_max());
+        REQUIRE(right.has_no_upper_bound());
       }
 
       CAPTURE(result);
@@ -73,7 +73,7 @@ SCENARIO("add interval domain", "[core][analyses][interval][add]")
       THEN("The result is [8, MAX]")
       {
         REQUIRE(V(result.get_lower()) == 8);
-        REQUIRE(result.is_max());
+        REQUIRE(result.has_no_upper_bound());
       }
     }
 
@@ -87,9 +87,9 @@ SCENARIO("add interval domain", "[core][analyses][interval][add]")
       THEN("Domain is consistent")
       {
         REQUIRE(V(left.get_lower()) == 2);
-        REQUIRE(left.is_max());
+        REQUIRE(left.has_no_upper_bound());
         REQUIRE(V(right.get_lower()) == 6);
-        REQUIRE(right.is_max());
+        REQUIRE(right.has_no_upper_bound());
       }
 
       CAPTURE(result);
@@ -97,7 +97,7 @@ SCENARIO("add interval domain", "[core][analyses][interval][add]")
       THEN("The result is [8, MAX]")
       {
         REQUIRE(V(result.get_lower()) == 8);
-        REQUIRE(result.is_max());
+        REQUIRE(result.has_no_upper_bound());
       }
     }
   }

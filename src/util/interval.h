@@ -1,10 +1,10 @@
-/*
- * interval.h
- *
- *  Created on: 16 Jun 2017
- *      Author: dan
- */
+/*******************************************************************\
 
+ Module: intervals
+
+ Author: Daniel Neville (2017)
+
+\*******************************************************************/
 #ifndef SRC_ANALYSES_INTERVAL_H_
 #define SRC_ANALYSES_INTERVAL_H_
 
@@ -317,8 +317,8 @@ public:
   constant_interval_exprt top() const;
   constant_interval_exprt bottom() const;
 
-  bool is_min() const;
-  bool is_max() const;
+  bool has_no_lower_bound() const;
+  bool has_no_upper_bound() const;
   static bool is_min(const exprt &expr);
   static bool is_max(const exprt &expr);
 

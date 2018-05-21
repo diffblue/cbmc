@@ -1,6 +1,6 @@
 /*******************************************************************\
  Module: Unit tests for variable/sensitivity/abstract_object::merge
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Limited
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
@@ -65,7 +65,7 @@ SCENARIO("subtract interval domain", "[core][analyses][interval][subtract]")
         REQUIRE(V(left.get_lower()) == 2);
         REQUIRE(V(left.get_upper()) == 4);
         REQUIRE(V(right.get_lower()) == 6);
-        REQUIRE(right.is_max());
+        REQUIRE(right.has_no_upper_bound());
       }
 
       CAPTURE(result);
@@ -73,7 +73,7 @@ SCENARIO("subtract interval domain", "[core][analyses][interval][subtract]")
       THEN("The result is [MIN, -2]")
       {
         REQUIRE(V(result.get_upper()) == -2);
-        REQUIRE(result.is_min());
+        REQUIRE(result.has_no_lower_bound());
       }
     }
 

@@ -1,6 +1,6 @@
 /*******************************************************************\
  Module: Unit tests for variable/sensitivity/abstract_object::merge
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Limited
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
@@ -138,14 +138,14 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
         CHECK(V(a.get_lower()) == 2);
         CHECK(V(a.get_upper()) == 5);
         CHECK(V(b.get_lower()) == 7);
-        CHECK(b.is_max());
+        CHECK(b.has_no_upper_bound());
       }
 
       THEN("The result is [14, INF]")
       {
         CAPTURE(result);
 
-        CHECK(result.is_max());
+        CHECK(result.has_no_upper_bound());
         CHECK(V(result.get_lower()) == 14);
       }
     }
