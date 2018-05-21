@@ -87,7 +87,16 @@ unsigned messaget::eval_verbosity(
     v = unsafe_string2unsigned(user_input);
 
     if(v > messaget::M_DEBUG)
+    {
+      dest.print(
+        messaget::M_WARNING,
+        "verbosity value " + user_input + " out of range, using debug-level (" +
+          std::to_string(messaget::M_DEBUG) + ") verbosity",
+        -1,
+        source_locationt());
+
       v = messaget::M_DEBUG;
+    }
   }
 
   dest.set_verbosity(v);
