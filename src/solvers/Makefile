@@ -85,8 +85,6 @@ SRC = $(BOOLEFORCE_SRC) \
       $(PICOSAT_SRC) \
       $(SQUOLEM2_SRC) \
       $(CADICAL_SRC) \
-      cvc/cvc_conv.cpp \
-      cvc/cvc_dec.cpp \
       flattening/arrays.cpp \
       flattening/boolbv.cpp \
       flattening/boolbv_abs.cpp \
