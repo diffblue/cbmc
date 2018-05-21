@@ -8,9 +8,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_preprocess.h"
 
-#include <cstdio>
-#include <cstdlib>
+#include <util/c_types.h>
+#include <util/config.h>
+#include <util/suffix.h>
+#include <util/tempfile.h>
+#include <util/unicode.h>
+
 #include <cstring>
+#include <fstream>
 
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
@@ -20,95 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
     defined(__MACH__)
 #include <unistd.h>
 #endif
-
-#include <fstream>
-
-#include <util/c_types.h>
-#include <util/config.h>
-#include <util/invariant.h>
-#include <util/message.h>
-#include <util/tempfile.h>
-#include <util/unicode.h>
-#include <util/arith_tools.h>
-#include <util/std_types.h>
-#include <util/prefix.h>
-
-#define GCC_DEFINES_16 \
-  " -D__INT_MAX__=32767"\
-  " -D__CHAR_BIT__=8"\
-  " -D__SCHAR_MAX__=127"\
-  " -D__SHRT_MAX__=32767"\
-  " -D__INT32_TYPE__=long"\
-  " -D__LONG_LONG_MAX__=2147483647L"\
-  " -D__LONG_MAX__=2147483647" \
-  " -D__SIZE_TYPE__=\"unsigned int\""\
-  " -D__PTRDIFF_TYPE__=int"\
-  " -D__WINT_TYPE__=\"unsigned int\""\
-  " -D__INTMAX_TYPE__=\"long long int\""\
-  " -D__UINTMAX_TYPE__=\"long long unsigned int\""\
-  " -D__INTPTR_TYPE__=\"int\""\
-  " -D__UINTPTR_TYPE__=\"unsigned int\""
-
-#define GCC_DEFINES_32 \
-  " -D__INT_MAX__=2147483647"\
-  " -D__CHAR_BIT__=8"\
-  " -D__SCHAR_MAX__=127"\
-  " -D__SHRT_MAX__=32767"\
-  " -D__INT32_TYPE__=int"\
-  " -D__LONG_LONG_MAX__=9223372036854775807LL"\
-  " -D__LONG_MAX__=2147483647L" \
-  " -D__SIZE_TYPE__=\"long unsigned int\""\
-  " -D__PTRDIFF_TYPE__=int"\
-  " -D__WINT_TYPE__=\"unsigned int\""\
-  " -D__INTMAX_TYPE__=\"long long int\""\
-  " -D__UINTMAX_TYPE__=\"long long unsigned int\""\
-  " -D__INTPTR_TYPE__=\"long int\""\
-  " -D__UINTPTR_TYPE__=\"long unsigned int\""
-
-#define GCC_DEFINES_LP64 \
-  " -D__INT_MAX__=2147483647"\
-  " -D__CHAR_BIT__=8"\
-  " -D__SCHAR_MAX__=127"\
-  " -D__SHRT_MAX__=32767"\
-  " -D__INT32_TYPE__=int"\
-  " -D__LONG_LONG_MAX__=9223372036854775807LL"\
-  " -D__LONG_MAX__=9223372036854775807L"\
-  " -D__SIZE_TYPE__=\"long unsigned int\""\
-  " -D__PTRDIFF_TYPE__=long"\
-  " -D__WINT_TYPE__=\"unsigned int\""\
-  " -D__INTMAX_TYPE__=\"long int\""\
-  " -D__UINTMAX_TYPE__=\"long unsigned int\""\
-  " -D__INTPTR_TYPE__=\"long int\""\
-  " -D__UINTPTR_TYPE__=\"long unsigned int\""
-
-#define GCC_DEFINES_LLP64 \
-  " -D__INT_MAX__=2147483647"\
-  " -D__CHAR_BIT__=8"\
-  " -D__SCHAR_MAX__=127"\
-  " -D__SHRT_MAX__=32767"\
-  " -D__INT32_TYPE__=int"\
-  " -D__LONG_LONG_MAX__=9223372036854775807LL"\
-  " -D__LONG_MAX__=2147483647"\
-  " -D__SIZE_TYPE__=\"long long unsigned int\""\
-  " -D__PTRDIFF_TYPE__=\"long long\""\
-  " -D__WINT_TYPE__=\"unsigned int\""\
-  " -D__INTMAX_TYPE__=\"long long int\""\
-  " -D__UINTMAX_TYPE__=\"long long unsigned int\""\
-  " -D__INTPTR_TYPE__=\"long long int\""\
-  " -D__UINTPTR_TYPE__=\"long long unsigned int\""
-
-/// produce a string with the maximum value of a given type
-static std::string type_max(const typet &src)
-{
-  if(src.id()==ID_signedbv)
-    return integer2string(
-      power(2, to_signedbv_type(src).get_width()-1)-1);
-  else if(src.id()==ID_unsignedbv)
-    return integer2string(
-      power(2, to_unsignedbv_type(src).get_width()-1)-1);
-  else
-    UNREACHABLE;
-}
 
 /// quote a string for bash and CMD
 static std::string shell_quote(const std::string &src)
@@ -344,13 +260,7 @@ bool c_preprocess(
 /// ANSI-C preprocessing
 static bool is_dot_i_file(const std::string &path)
 {
-  const char *ext=strrchr(path.c_str(), '.');
-  if(ext==nullptr)
-    return false;
-  if(std::string(ext)==".i" ||
-     std::string(ext)==".ii")
-    return true;
-  return false;
+  return has_suffix(path, ".i") || has_suffix(path, ".ii");
 }
 
 /// ANSI-C preprocessing
@@ -422,7 +332,7 @@ bool c_preprocess_visual_studio(
   {
     std::ofstream command_file(command_file_name);
 
-    // This marks the file as UTF-8, which Visual Studio
+    // This marks the command file as UTF-8, which Visual Studio
     // understands.
     command_file << char(0xef) << char(0xbb) << char(0xbf);
 
@@ -455,12 +365,6 @@ bool c_preprocess_visual_studio(
 
     if(config.ansi_c.char_is_unsigned)
       command_file << "/J" << "\n"; // This causes _CHAR_UNSIGNED to be defined
-
-    // Standard Defines, ANSI9899 6.10.8
-    command_file << "/D__STDC_VERSION__=199901L" << "\n";
-    command_file << "/D__STDC_IEC_559__=1" << "\n";
-    command_file << "/D__STDC_IEC_559_COMPLEX__=1" << "\n";
-    command_file << "/D__STDC_ISO_10646__=1" << "\n";
 
     for(const auto &define : config.ansi_c.defines)
       command_file << "/D" << shell_quote(define) << "\n";
@@ -651,191 +555,69 @@ bool c_preprocess_gcc_clang(
   else
     command="gcc";
 
-  command +=" -E -undef -D__CPROVER__";
+  command += " -E -D__CPROVER__";
 
-  command+=" -D__WORDSIZE="+std::to_string(config.ansi_c.pointer_width);
-
-  command+=" -D__DBL_MIN_EXP__=\"(-1021)\"";
-  command+=" -D__FLT_MIN__=1.17549435e-38F";
-  command+=" -D__DEC64_SUBNORMAL_MIN__=0.000000000000001E-383DD";
-  command+=" -D__CHAR_BIT__=8";
-  command+=" -D__DBL_DENORM_MIN__=4.9406564584124654e-324";
-  command+=" -D__FLT_EVAL_METHOD__=0";
-  command+=" -D__DBL_MIN_10_EXP__=\"(-307)\"";
-  command+=" -D__FINITE_MATH_ONLY__=0";
-  command+=" -D__DEC64_MAX_EXP__=384";
-  command+=" -D__SHRT_MAX__=32767";
-  command+=" -D__LDBL_MAX__=1.18973149535723176502e+4932L";
-  command+=" -D__DEC32_EPSILON__=1E-6DF";
-  command+=" -D__SCHAR_MAX__=127";
-  command+=" -D__USER_LABEL_PREFIX__=_";
-  command+=" -D__DEC64_MIN_EXP__=\"(-383)\"";
-  command+=" -D__DBL_DIG__=15";
-  command+=" -D__FLT_EPSILON__=1.19209290e-7F";
-  command+=" -D__LDBL_MIN__=3.36210314311209350626e-4932L";
-  command+=" -D__DEC32_MAX__=9.999999E96DF";
-  command+=" -D__DECIMAL_DIG__=21";
-  command+=" -D__LDBL_HAS_QUIET_NAN__=1";
-  command+=" -D__DYNAMIC__=1";
-  command+=" -D__GNUC__=4";
-  command+=" -D__FLT_HAS_DENORM__=1";
-  command+=" -D__DBL_MAX__=1.7976931348623157e+308";
-  command+=" -D__DBL_HAS_INFINITY__=1";
-  command+=" -D__DEC32_MIN_EXP__=\"(-95)\"";
-  command+=" -D__LDBL_HAS_DENORM__=1";
-  command+=" -D__DEC32_MIN__=1E-95DF";
-  command+=" -D__DBL_MAX_EXP__=1024";
-  command+=" -D__DEC128_EPSILON__=1E-33DL";
-  command+=" -D__SSE2_MATH__=1";
-  command+=" -D__GXX_ABI_VERSION=1002";
-  command+=" -D__FLT_MIN_EXP__=\"(-125)\"";
-  command+=" -D__DBL_MIN__=2.2250738585072014e-308";
-  command+=" -D__DBL_HAS_QUIET_NAN__=1";
-  command+=" -D__DEC128_MIN__=1E-6143DL";
-  command+=" -D__REGISTER_PREFIX__=";
-  command+=" -D__DBL_HAS_DENORM__=1";
-  command+=" -D__DEC_EVAL_METHOD__=2";
-  command+=" -D__DEC128_MAX__=9.999999999999999999999999999999999E6144DL";
-  command+=" -D__FLT_MANT_DIG__=24";
-  command+=" -D__DEC64_EPSILON__=1E-15DD";
-  command+=" -D__DEC128_MIN_EXP__=\"(-6143)\"";
-  command+=" -D__DEC32_SUBNORMAL_MIN__=0.000001E-95DF";
-  command+=" -D__FLT_RADIX__=2";
-  command+=" -D__LDBL_EPSILON__=1.08420217248550443401e-19L";
-  command+=" -D__k8=1";
-  command+=" -D__LDBL_DIG__=18";
-  command+=" -D__FLT_HAS_QUIET_NAN__=1";
-  command+=" -D__FLT_MAX_10_EXP__=38";
-  command+=" -D__FLT_HAS_INFINITY__=1";
-  command+=" -D__DEC64_MAX__=9.999999999999999E384DD";
-  command+=" -D__DEC64_MANT_DIG__=16";
-  command+=" -D__DEC32_MAX_EXP__=96";
-  // NOLINTNEXTLINE(whitespace/line_length)
-  command+=" -D__DEC128_SUBNORMAL_MIN__=0.000000000000000000000000000000001E-6143DL";
-  command+=" -D__LDBL_MANT_DIG__=64";
-  command+=" -D__CONSTANT_CFSTRINGS__=1";
-  command+=" -D__DEC32_MANT_DIG__=7";
-  command+=" -D__k8__=1";
-  command+=" -D__pic__=2";
-  command+=" -D__FLT_DIG__=6";
-  command+=" -D__FLT_MAX_EXP__=128";
-  // command+=" -D__BLOCKS__=1";
-  command+=" -D__DBL_MANT_DIG__=53";
-  command+=" -D__DEC64_MIN__=1E-383DD";
-  command+=" -D__LDBL_MIN_EXP__=\"(-16381)\"";
-  command+=" -D__LDBL_MAX_EXP__=16384";
-  command+=" -D__LDBL_MAX_10_EXP__=4932";
-  command+=" -D__DBL_EPSILON__=2.2204460492503131e-16";
-  command+=" -D__GNUC_PATCHLEVEL__=1";
-  command+=" -D__LDBL_HAS_INFINITY__=1";
-  command+=" -D__INTMAX_MAX__=9223372036854775807L";
-  command+=" -D__FLT_DENORM_MIN__=1.40129846e-45F";
-  command+=" -D__PIC__=2";
-  command+=" -D__FLT_MAX__=3.40282347e+38F";
-  command+=" -D__FLT_MIN_10_EXP__=\"(-37)\"";
-  command+=" -D__DEC128_MAX_EXP__=6144";
-  command+=" -D__GNUC_MINOR__=2";
-  command+=" -D__DBL_MAX_10_EXP__=308";
-  command+=" -D__LDBL_DENORM_MIN__=3.64519953188247460253e-4951L";
-  command+=" -D__DEC128_MANT_DIG__=34";
-  command+=" -D__LDBL_MIN_10_EXP__=\"(-4931)\"";
-
-  if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
-  {
-    command+=" -D_Noreturn=\"__attribute__((__noreturn__))\"";
-    command+=" -D__llvm__";
-    command+=" -D__clang__";
-  }
-
-  if(config.ansi_c.int_width==16)
-    command+=GCC_DEFINES_16;
-  else if(config.ansi_c.int_width==32)
-  {
-    if(config.ansi_c.pointer_width==64)
-    {
-      if(config.ansi_c.long_int_width==32)
-        command+=GCC_DEFINES_LLP64; // Windows, for instance
-      else
-        command+=GCC_DEFINES_LP64;
-    }
-    else
-      command+=GCC_DEFINES_32;
-  }
+  if(config.ansi_c.pointer_width == 16)
+    command += " -m16";
+  else if(config.ansi_c.pointer_width == 32)
+    command += " -m32";
+  else if(config.ansi_c.pointer_width == 64)
+    command += " -m64";
 
   // The width of wchar_t depends on the OS!
-  {
-    command+=" -D__WCHAR_MAX__="+type_max(wchar_t_type());
-
-    std::string sig=config.ansi_c.wchar_t_is_unsigned?"unsigned":"signed";
-
-    if(config.ansi_c.wchar_t_width==config.ansi_c.short_int_width)
-      command+=" -D__WCHAR_TYPE__=\""+sig+" short int\"";
-    else if(config.ansi_c.wchar_t_width==config.ansi_c.int_width)
-      command+=" -D__WCHAR_TYPE__=\""+sig+" int\"";
-    else if(config.ansi_c.wchar_t_width==config.ansi_c.long_int_width)
-      command+=" -D__WCHAR_TYPE__=\""+sig+" long int\"";
-    else if(config.ansi_c.wchar_t_width==config.ansi_c.char_width)
-      command+=" -D__WCHAR_TYPE__=\""+sig+" char\"";
-    else
-      UNREACHABLE;
-  }
+  if(config.ansi_c.wchar_t_width == config.ansi_c.short_int_width)
+    command += " -fshort-wchar";
 
   if(config.ansi_c.char_is_unsigned)
-    command+=" -D __CHAR_UNSIGNED__"; // gcc
+    command += " -funsigned-char";
 
-  switch(config.ansi_c.os)
+  if(config.ansi_c.os == configt::ansi_ct::ost::NO_OS)
+    command += " -nostdinc";
+
+  // Set the standard
+  if(has_suffix(file, ".cpp") || has_suffix(file, ".CPP") ||
+#ifndef _WIN32
+     has_suffix(file, ".C") ||
+#endif
+     has_suffix(file, ".c++") || has_suffix(file, ".C++") ||
+     has_suffix(file, ".cp") || has_suffix(file, ".CP"))
   {
-  case configt::ansi_ct::ost::OS_LINUX:
-    command+=" -Dlinux -D__linux -D__linux__ -D__gnu_linux__";
-    command+=" -Dunix -D__unix -D__unix__";
-    command+=" -D__USE_UNIX98";
-    break;
+    switch(config.cpp.cpp_standard)
+    {
+    case configt::cppt::cpp_standardt::CPP98:
+      command += " -std=gnu++98";
+      break;
 
-  case configt::ansi_ct::ost::OS_MACOS:
-    command+=" -D__APPLE__ -D__MACH__";
-    // needs to be __APPLE_CPP__ for C++
-    command+=" -D__APPLE_CC__";
-    break;
+    case configt::cppt::cpp_standardt::CPP03:
+      command += " -std=gnu++03";
+      break;
 
-  case configt::ansi_ct::ost::OS_WIN:
-    command+=" -D _WIN32";
+    case configt::cppt::cpp_standardt::CPP11:
+      command += " -std=gnu++11";
+      break;
 
-    if(config.ansi_c.mode!=configt::ansi_ct::flavourt::VISUAL_STUDIO)
-      command+=" -D _M_IX86=Blend";
-
-    if(config.ansi_c.arch=="x86_64")
-      command+=" -D _WIN64"; // yes, both _WIN32 and _WIN64 get defined
-
-    if(config.ansi_c.char_is_unsigned)
-      command+=" -D _CHAR_UNSIGNED"; // This is Visual Studio
-    break;
-
-  case configt::ansi_ct::ost::NO_OS:
-    command+=" -nostdinc"; // make sure we don't mess with the system library
-    break;
-
-  default:
-    UNREACHABLE;
+    case configt::cppt::cpp_standardt::CPP14:
+      command += " -std=gnu++14";
+      break;
+    }
   }
-
-  // Standard Defines, ANSI9899 6.10.8
-  switch(config.ansi_c.c_standard)
+  else
   {
-  case configt::ansi_ct::c_standardt::C89:
-    break; // __STDC_VERSION__ is not defined
+    switch(config.ansi_c.c_standard)
+    {
+    case configt::ansi_ct::c_standardt::C89:
+      command += " -std=gnu++89";
+      break;
 
-  case configt::ansi_ct::c_standardt::C99:
-    command += " -D __STDC_VERSION__=199901L";
-    break;
+    case configt::ansi_ct::c_standardt::C99:
+      command += " -std=gnu99";
+      break;
 
-  case configt::ansi_ct::c_standardt::C11:
-    command += " -D __STDC_VERSION__=201112L";
-    break;
+    case configt::ansi_ct::c_standardt::C11:
+      command += " -std=gnu11";
+      break;
+    }
   }
-
-  command += " -D __STDC_IEC_559__=1";
-  command += " -D __STDC_IEC_559_COMPLEX__=1";
-  command += " -D __STDC_ISO_10646__=1";
 
   for(const auto &define : config.ansi_c.defines)
     command+=" -D"+shell_quote(define);
@@ -951,36 +733,28 @@ bool c_preprocess_arm(
 
   command="armcc -E -D__CPROVER__";
 
-//  command+=" -D__sizeof_int="+std::to_string(config.ansi_c.int_width/8);
-//  command+=" -D__sizeof_long="+std::to_string(config.ansi_c.long_int_width/8);
-//  command+=" -D__sizeof_ptr="+std::to_string(config.ansi_c.pointer_width/8);
-  // command+=" -D__EDG_VERSION__=308";
-  // command+=" -D__EDG__";
-//  command+=" -D__CC_ARM=1";
-  // command+=" -D__ARMCC_VERSION=410000";
-//  command+=" -D__arm__";
+  if(config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_BIG_ENDIAN)
+    command += " --bigend";
+  else
+    command += " --littleend";
 
-//  if(config.ansi_c.endianness==configt::ansi_ct::IS_BIG_ENDIAN)
-//    command+=" -D__BIG_ENDIAN";
+  if(config.ansi_c.char_is_unsigned)
+    command += " --unsigned_chars";
+  else
+    command += " --signed_chars";
 
-//  if(config.ansi_c.char_is_unsigned)
-//    command+=" -D__CHAR_UNSIGNED__";
-
-  if(config.ansi_c.os!=configt::ansi_ct::ost::OS_WIN)
+  // Set the standard
+  switch(config.ansi_c.c_standard)
   {
-    command+=" -D__WORDSIZE="+std::to_string(config.ansi_c.pointer_width);
+  case configt::ansi_ct::c_standardt::C89:
+    command += " --c90";
+    break;
 
-    if(config.ansi_c.int_width==16)
-      command+=GCC_DEFINES_16;
-    else if(config.ansi_c.int_width==32)
-      command+=GCC_DEFINES_32;
-    else if(config.ansi_c.int_width==64)
-      command+=GCC_DEFINES_LP64;
+  case configt::ansi_ct::c_standardt::C99:
+  case configt::ansi_ct::c_standardt::C11:
+    command += " --c99";
+    break;
   }
-
-  // Standard Defines, ANSI9899 6.10.8
-  command+=" -D__STDC__";
-  // command+=" -D__STDC_VERSION__=199901L";
 
   for(const auto &define : config.ansi_c.defines)
     command+=" "+shell_quote("-D"+define);
