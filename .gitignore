@@ -49,13 +49,14 @@ src/ansi-c/gcc_builtin_headers_mips.inc
 src/ansi-c/gcc_builtin_headers_power.inc
 src/ansi-c/gcc_builtin_headers_ubsan.inc
 src/ansi-c/windows_builtin_headers.inc
-src/java_bytecode/java_core_models.inc
+jbmc/src/java_bytecode/java_core_models.inc
 
 # regression/test files
 *.out
 regression/**/tests.log
 regression/**/*.gb
 regression/**/*.smt2
+jbmc/regression/**/tests.log
 
 # regression/coverage file
 /regression/coverage_**
@@ -64,8 +65,6 @@ regression/**/*.smt2
 *~
 
 # libs downloaded by make [name]-download
-libzip/
-zlib/
 minisat*/
 glucose-syrup/
 
@@ -95,8 +94,6 @@ src/memory-models/mm_y.tab.h
 # binaries
 src/cbmc/cbmc
 src/cbmc/cbmc.exe
-src/cegis/cegis
-src/cegis/cegis.exe
 src/goto-analyzer/goto-analyzer
 src/goto-analyzer/goto-analyzer.exe
 src/goto-cc/goto-cc
@@ -104,29 +101,28 @@ src/goto-cc/goto-cc.exe
 src/goto-cc/goto-cl.exe
 src/goto-instrument/goto-instrument
 src/goto-instrument/goto-instrument.exe
-src/jbmc/jbmc
-src/musketeer/musketeer
-src/musketeer/musketeer.exe
 src/solvers/smt2_solver
 src/solvers/smt2_solver.exe
-src/symex/symex
-src/symex/symex.exe
 src/goto-diff/goto-diff
 src/goto-diff/goto-diff.exe
 src/clobber/clobber
 src/clobber/clobber.exe
 src/big-int/test-bigint
 src/big-int/test-bigint.exe
+jbmc/src/jbmc/janalyzer
+jbmc/src/jbmc/janalyzer.exe
+jbmc/src/jbmc/jdiff
+jbmc/src/jbmc/jdiff.exe
+jbmc/src/jbmc/jbmc
+jbmc/src/jbmc/jbmc.exe
 
 # build tools
 src/ansi-c/file_converter
 src/ansi-c/file_converter.exe
 src/ansi-c/library/converter
 src/ansi-c/library/converter.exe
-src/java_bytecode/converter
-src/java_bytecode/converter.exe
-src/util/irep_ids_convert
-src/util/irep_ids_convert.exe
+jbmc/src/java_bytecode/converter
+jbmc/src/java_bytecode/converter.exe
 build/
 
 *.pyc
