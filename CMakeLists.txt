@@ -35,6 +35,7 @@ set(sat_impl "minisat2" CACHE STRING
 )
 
 add_subdirectory(src)
+add_subdirectory(jbmc)
 
 if(${enable_cbmc_tests})
     enable_testing()
@@ -63,15 +64,11 @@ set_target_properties(
     goto-instrument-lib
     goto-programs
     goto-symex
-    java_bytecode
-    jbmc
-    jbmc-lib
     jsil
     json
     langapi
     linking
     miniBDD
-    miniz
     mmcc
     pointer-analysis
     solvers
@@ -80,6 +77,17 @@ set_target_properties(
     unit
     util
     xml
+
+    java_bytecode
+    jbmc
+    jbmc-lib
+    janalyzer
+    janalyzer-lib
+    jdiff
+    jdiff-lib
+    java-testing-utils
+    java-unit
+    miniz
 
     PROPERTIES
     CXX_STANDARD 11

@@ -21,8 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
-#include <java_bytecode/java_bytecode_language.h>
-
 class goto_functionst;
 class optionst;
 
@@ -38,7 +36,6 @@ class optionst;
   "(string-abstraction)" \
   "(show-locs)(show-vcc)(show-trace)" \
   "(property):" \
-  JAVA_BYTECODE_LANGUAGE_OPTIONS
 // clang-format on
 
 class clobber_parse_optionst:

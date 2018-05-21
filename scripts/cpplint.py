@@ -1971,8 +1971,13 @@ def GetHeaderGuardCPPVariable(filename):
 
   fileinfo = FileInfo(filename)
   file_path_from_root = fileinfo.RepositoryName()
-  # Remove first path component
-  offset=len(file_path_from_root.split(os.path.sep)[0])+1
+  # Remove up to including `src` component
+  path_components = file_path_from_root.split(os.path.sep)
+  offset = 0
+  for component in path_components:
+      offset += len(component) + 1
+      if component == 'src' or  component == 'unit':
+        break
   file_path_from_root = 'CPROVER_' + file_path_from_root[offset:]
   if _root:
     suffix = os.sep

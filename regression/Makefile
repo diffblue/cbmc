@@ -2,13 +2,10 @@
 # running tests in parallel, it is important that these directories are
 # listed with decreasing runtimes (i.e. longest running at the top)
 DIRS = cbmc \
-       cbmc-java \
        goto-analyzer \
        ansi-c \
-       jbmc-strings \
        goto-instrument \
        cpp \
-       strings-smoke-tests \
        cbmc-cover \
        goto-instrument-typedef \
        smt2_solver \
@@ -17,7 +14,6 @@ DIRS = cbmc \
        goto-diff \
        test-script \
        goto-analyzer-taint \
-       cbmc-java-inheritance \
        goto-gcc \
        goto-cc-cbmc \
        cbmc-cpp \

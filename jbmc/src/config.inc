@@ -1,0 +1,1 @@
+CPROVER_DIR ?= ../..

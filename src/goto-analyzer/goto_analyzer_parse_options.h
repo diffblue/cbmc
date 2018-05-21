@@ -114,8 +114,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/ai.h>
 #include <analyses/goto_check.h>
 
-#include <java_bytecode/java_bytecode_language.h>
-
 class bmct;
 class goto_functionst;
 class optionst;
@@ -150,7 +148,6 @@ class optionst;
   "(show)(verify)(simplify):" \
   "(location-sensitive)(concurrent)" \
   "(no-simplify-slicing)" \
-  JAVA_BYTECODE_LANGUAGE_OPTIONS
 // clang-format on
 
 class goto_analyzer_parse_optionst:

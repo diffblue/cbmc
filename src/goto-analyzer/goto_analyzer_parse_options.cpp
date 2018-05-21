@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
-#include <java_bytecode/java_bytecode_language.h>
 #include <jsil/jsil_language.h>
 
 #include <goto-programs/initialize_goto_model.h>
@@ -42,9 +41,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/constant_propagator.h>
 #include <analyses/dependence_graph.h>
 #include <analyses/interval_domain.h>
-
-#include <java_bytecode/remove_exceptions.h>
-#include <java_bytecode/remove_instanceof.h>
 
 #include <langapi/mode.h>
 #include <langapi/language.h>
@@ -77,7 +73,6 @@ void goto_analyzer_parse_optionst::register_languages()
 {
   register_language(new_ansi_c_language);
   register_language(new_cpp_language);
-  register_language(new_java_bytecode_language);
   register_language(new_jsil_language);
 }
 
@@ -751,13 +746,6 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     status() << "Removing function pointers and virtual functions" << eom;
     remove_function_pointers(
       get_message_handler(), goto_model, cmdline.isset("pointer-check"));
-    // Java virtual functions -> explicit dispatch tables:
-    remove_virtual_functions(goto_model);
-    // remove Java throw and catch
-    // This introduces instanceof, so order is important:
-    remove_exceptions(goto_model);
-    // remove rtti
-    remove_instanceof(goto_model);
 
     // do partial inlining
     status() << "Partial Inlining" << eom;
@@ -891,10 +879,6 @@ void goto_analyzer_parse_optionst::help()
     #endif
     " --no-library                 disable built-in abstract C library\n"
     "\n"
-    "Java Bytecode frontend options:\n"
-    " --classpath dir/jar          set the classpath\n"
-    " --main-class class-name      set the name of the main class\n"
-    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     HELP_FUNCTIONS
     "\n"
     "Program representations:\n"

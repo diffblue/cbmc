@@ -4,4 +4,4 @@ add_library(goto-programs ${sources})
 generic_includes(goto-programs)
 
 target_link_libraries(
-        goto-programs util assembler langapi analyses ansi-c java_bytecode)
+        goto-programs util assembler langapi analyses ansi-c)

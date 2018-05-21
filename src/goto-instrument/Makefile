@@ -87,8 +87,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../util/util$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
-      ../miniz/miniz$(OBJEXT) \
-      ../json/json$(LIBEXT)
+      ../json/json$(LIBEXT) \
+      # Empty last line
 
 INCLUDES= -I ..
 

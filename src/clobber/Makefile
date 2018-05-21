@@ -17,7 +17,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
        ../goto-instrument/dump_c$(OBJEXT) \
        ../goto-instrument/goto_program2code$(OBJEXT) \
-       ../miniz/miniz$(OBJEXT)
+       # Empty last line
 
 INCLUDES= -I ..
 

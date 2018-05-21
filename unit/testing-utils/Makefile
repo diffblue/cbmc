@@ -1,12 +1,8 @@
 SRC = \
   c_to_expr.cpp \
   free_form_cmdline.cpp \
-  load_java_class.cpp \
   require_expr.cpp \
-  require_goto_statements.cpp \
-  require_parse_tree.cpp \
   require_symbol.cpp \
-  require_type.cpp \
   run_test_with_compilers.cpp \
   # Empty last line (please keep above list sorted!)
 

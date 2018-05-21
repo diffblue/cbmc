@@ -23,7 +23,6 @@ target_link_libraries(goto-diff-lib
     solvers
 )
 
-add_if_library(goto-diff-lib java_bytecode)
 add_if_library(goto-diff-lib jsil)
 
 # Executable

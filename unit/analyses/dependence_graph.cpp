@@ -16,7 +16,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/arith_tools.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <langapi/mode.h>
-#include <java_bytecode/java_bytecode_language.h>
+#include <ansi-c/ansi_c_language.h>
 
 static symbolt create_void_function_symbol(
   const irep_idt &name,
@@ -57,7 +57,7 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
     // }
     // void b() { }
 
-    register_language(new_java_bytecode_language);
+    register_language(new_ansi_c_language);
 
     goto_modelt goto_model;
     namespacet ns(goto_model.symbol_table);

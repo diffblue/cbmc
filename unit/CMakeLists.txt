@@ -40,7 +40,6 @@ target_link_libraries(
         testing-utils
         ansi-c
         solvers
-        java_bytecode
         goto-programs
         goto-instrument-lib
         cbmc-lib

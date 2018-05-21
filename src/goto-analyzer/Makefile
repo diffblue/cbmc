@@ -10,7 +10,6 @@ SRC = goto_analyzer_main.cpp \
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
-      ../java_bytecode/java_bytecode$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
@@ -20,7 +19,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../json/json$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../util/util$(LIBEXT) \
-      ../miniz/miniz$(OBJEXT)
+      # Empty last line
 
 INCLUDES= -I ..
 
