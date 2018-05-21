@@ -119,8 +119,6 @@ protected:
   void get_goto_program();
   void instrument_goto_program();
 
-  void eval_verbosity();
-
   void do_indirect_call_and_rtti_removal(bool force=false);
   void do_remove_const_function_pointers_only();
   void do_partial_inlining();

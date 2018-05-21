@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/exit_codes.h>
-#include <util/string2int.h>
 #include <util/config.h>
 #include <util/unicode.h>
 #include <util/invariant.h>
@@ -80,21 +79,6 @@ jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv):
   ui_message_handler(cmdline, "JBMC " CBMC_VERSION),
   path_strategy_chooser()
 {
-}
-
-void jbmc_parse_optionst::eval_verbosity()
-{
-  // this is our default verbosity
-  unsigned int v=messaget::M_STATISTICS;
-
-  if(cmdline.isset("verbosity"))
-  {
-    v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-    if(v>10)
-      v=10;
-  }
-
-  ui_message_handler.set_verbosity(v);
 }
 
 void jbmc_parse_optionst::get_command_line_options(optionst &options)
@@ -443,7 +427,8 @@ int jbmc_parse_optionst::doit()
     return 6; // should contemplate EX_SOFTWARE from sysexits.h
   }
 
-  eval_verbosity();
+  eval_verbosity(
+    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
   //
   // Print a banner

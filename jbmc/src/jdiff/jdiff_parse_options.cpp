@@ -20,7 +20,6 @@ Author: Peter Schrammel
 #include <util/exit_codes.h>
 #include <util/make_unique.h>
 #include <util/options.h>
-#include <util/string2int.h>
 
 #include <langapi/language.h>
 
@@ -80,21 +79,6 @@ jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
     ui_message_handler(cmdline, "JDIFF " CBMC_VERSION),
     languages2(cmdline, ui_message_handler)
 {
-}
-
-void jdiff_parse_optionst::eval_verbosity()
-{
-  // this is our default verbosity
-  unsigned int v = messaget::M_STATISTICS;
-
-  if(cmdline.isset("verbosity"))
-  {
-    v = unsafe_string2unsigned(cmdline.get_value("verbosity"));
-    if(v > 10)
-      v = 10;
-  }
-
-  ui_message_handler.set_verbosity(v);
 }
 
 void jdiff_parse_optionst::get_command_line_options(optionst &options)
@@ -211,7 +195,8 @@ int jdiff_parse_optionst::doit()
 
   optionst options;
   get_command_line_options(options);
-  eval_verbosity();
+  eval_verbosity(
+    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
   //
   // Print a banner

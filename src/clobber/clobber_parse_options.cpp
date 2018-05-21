@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <cstdlib>
 
-#include <util/string2int.h>
 #include <util/config.h>
 #include <util/options.h>
 #include <util/memory_info.h>
@@ -43,23 +42,6 @@ clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
   language_uit(cmdline, ui_message_handler),
   ui_message_handler(cmdline, "CLOBBER " CBMC_VERSION)
 {
-}
-
-void clobber_parse_optionst::eval_verbosity()
-{
-  // this is our default verbosity
-  int v=messaget::M_STATISTICS;
-
-  if(cmdline.isset("verbosity"))
-  {
-    v=unsafe_string2int(cmdline.get_value("verbosity"));
-    if(v<0)
-      v=0;
-    else if(v>10)
-      v=10;
-  }
-
-  ui_message_handler.set_verbosity(v);
 }
 
 void clobber_parse_optionst::get_command_line_options(optionst &options)
@@ -115,7 +97,8 @@ int clobber_parse_optionst::doit()
   optionst options;
   get_command_line_options(options);
 
-  eval_verbosity();
+  eval_verbosity(
+    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
   goto_modelt goto_model;
 

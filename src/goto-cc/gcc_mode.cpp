@@ -34,7 +34,6 @@ Author: CM Wintersteiger, 2006
 #include <util/expr.h>
 #include <util/c_types.h>
 #include <util/arith_tools.h>
-#include <util/string2int.h>
 #include <util/invariant.h>
 #include <util/tempdir.h>
 #include <util/tempfile.h>
@@ -331,15 +330,10 @@ int gcc_modet::doit()
     linker_name(cmdline, base_name) :
     compiler_name(cmdline, base_name);
 
-  unsigned int verbosity=1;
-
-  if(cmdline.isset("Wall") || cmdline.isset("Wextra"))
-    verbosity=2;
-
-  if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-
-  gcc_message_handler.set_verbosity(verbosity);
+  auto default_verbosity = (cmdline.isset("Wall") || cmdline.isset("Wextra")) ?
+    messaget::M_WARNING : messaget::M_ERROR;
+  eval_verbosity(
+    cmdline.get_value("verbosity"), default_verbosity, gcc_message_handler);
 
   bool act_as_bcc=
     base_name=="bcc" ||

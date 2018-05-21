@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "message.h"
 
+#include "string2int.h"
+
 void message_handlert::print(
   unsigned level,
   const std::string &message,
@@ -65,4 +67,30 @@ void message_handlert::print(
 
 messaget::~messaget()
 {
+}
+
+/// Parse a (user-)provided string as a verbosity level and set it as the
+/// verbosity of dest.
+/// \param user_input  Input string; if empty, the default verbosity is used.
+/// \param default_verbosity  Verbosity to use if no value is provided.
+/// \param dest  message handler the verbosity of which is to be set.
+/// \return Computed verbosity
+unsigned messaget::eval_verbosity(
+  const std::string &user_input,
+  const message_levelt default_verbosity,
+  message_handlert &dest)
+{
+  unsigned v = default_verbosity;
+
+  if(!user_input.empty())
+  {
+    v = unsafe_string2unsigned(user_input);
+
+    if(v > messaget::M_DEBUG)
+      v = messaget::M_DEBUG;
+  }
+
+  dest.set_verbosity(v);
+
+  return v;
 }

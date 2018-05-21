@@ -21,7 +21,6 @@ Author: CM Wintersteiger, 2006
 
 #include <iostream>
 
-#include <util/string2int.h>
 #include <util/message.h>
 #include <util/prefix.h>
 #include <util/config.h>
@@ -50,8 +49,6 @@ int ms_cl_modet::doit()
     return EX_OK;
   }
 
-  unsigned int verbosity=1;
-
   compilet compiler(cmdline, message_handler, cmdline.isset("WX"));
 
   #if 0
@@ -60,10 +57,8 @@ int ms_cl_modet::doit()
     has_prefix(base_name, "goto-link");
   #endif
 
-  if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-
-  message_handler.set_verbosity(verbosity);
+  const auto verbosity = eval_verbosity(
+    cmdline.get_value("verbosity"), messaget::M_ERROR, message_handler);
 
   debug() << "Visual Studio mode" << eom;
 

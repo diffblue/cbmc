@@ -47,7 +47,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/options.h>
 #include <util/config.h>
-#include <util/string2int.h>
 #include <util/unicode.h>
 #include <util/exit_codes.h>
 
@@ -74,21 +73,6 @@ void goto_analyzer_parse_optionst::register_languages()
   register_language(new_ansi_c_language);
   register_language(new_cpp_language);
   register_language(new_jsil_language);
-}
-
-void goto_analyzer_parse_optionst::eval_verbosity()
-{
-  // this is our default verbosity
-  unsigned int v=messaget::M_STATISTICS;
-
-  if(cmdline.isset("verbosity"))
-  {
-    v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-    if(v>10)
-      v=10;
-  }
-
-  ui_message_handler.set_verbosity(v);
 }
 
 void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
@@ -381,7 +365,8 @@ int goto_analyzer_parse_optionst::doit()
 
   optionst options;
   get_command_line_options(options);
-  eval_verbosity();
+  eval_verbosity(
+    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
   //
   // Print a banner

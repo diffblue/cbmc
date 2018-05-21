@@ -66,8 +66,6 @@ protected:
   void report_success();
   void report_failure();
   void show_counterexample(const class goto_tracet &);
-
-  void eval_verbosity();
 };
 
 #endif // CPROVER_CLOBBER_CLOBBER_PARSE_OPTIONS_H
