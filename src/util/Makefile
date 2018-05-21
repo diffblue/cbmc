@@ -17,7 +17,6 @@ SRC = allocate_objects.cpp \
       expr_util.cpp \
       exception_utils.cpp \
       file_util.cpp \
-      find_macros.cpp \
       find_symbols.cpp \
       fixedbv.cpp \
       format_constant.cpp \
@@ -26,7 +25,6 @@ SRC = allocate_objects.cpp \
       format_type.cpp \
       fresh_symbol.cpp \
       get_base_name.cpp \
-      get_module.cpp \
       identifier.cpp \
       ieee_float.cpp \
       interval_union.cpp \
