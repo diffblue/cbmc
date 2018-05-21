@@ -1,12 +1,9 @@
-KNOWNBUG
+CORE
 RefMultidim1.class
 --function RefMultidim1.f --cover location --unwind 3
 \d+ of \d+ covered
 ^EXIT=0$
 ^SIGNAL=0$
---
---
-This crashes during symex, with error 'cannot unpack array of nonconst size'
-when trying to access the element of the array. Symex uses byte_extract_little
-_endian to access the element which does not get simplified (it seems the
-problem is that the types in the instruction do not match). TG-1121
+y=1$
+y=[2-4]$
+y=([05-9]|[1-9][0-9]+|-[1-9][0-9]*)$

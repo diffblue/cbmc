@@ -1,10 +1,5 @@
 CORE
 TestClass.class
 --function TestClass.f --cover location --unwind 2
-Source GOTO statement: .*
-(^ exception: Can't convert byte_extraction|Nested exception printing not supported on Windows)
-^EXIT=6$
---
---
-The exception thrown in this test is the symptom of a bug; the purpose of this
-test is the validate the output of that exception
+^EXIT=0$
+^SIGNAL=0$
