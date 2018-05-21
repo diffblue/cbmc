@@ -1,5 +1,4 @@
 SRC = adjust_float_expressions.cpp \
-      basic_blocks.cpp \
       builtin_functions.cpp \
       class_hierarchy.cpp \
       class_identifier.cpp \
@@ -20,7 +19,6 @@ SRC = adjust_float_expressions.cpp \
       goto_inline.cpp \
       goto_inline_class.cpp \
       goto_program.cpp \
-      goto_program_irep.cpp \
       goto_program_template.cpp \
       goto_trace.cpp \
       graphml_witness.cpp \
