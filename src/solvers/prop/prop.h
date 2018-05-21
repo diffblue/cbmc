@@ -17,11 +17,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/threeval.h>
 
-#include "prop_assignment.h"
+#include "literal.h"
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class propt:public messaget, public prop_assignmentt
+class propt:public messaget
 {
 public:
   propt() { }
@@ -96,7 +96,7 @@ public:
   enum class resultt { P_SATISFIABLE, P_UNSATISFIABLE, P_ERROR };
   virtual resultt prop_solve()=0;
 
-  // satisfying assignment, from prop_assignmentt
+  // satisfying assignment
   virtual tvt l_get(literalt a) const=0;
   virtual void set_assignment(literalt a, bool value);
   virtual void copy_assignment_from(const propt &prop);
