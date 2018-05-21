@@ -119,7 +119,7 @@ int cw_modet::doit()
       config.ansi_c.preprocessor_options.push_back("-isystem "+*it);
   }
 
-  if(verbosity>8)
+  if(verbosity > messaget::M_STATISTICS)
   {
     std::list<std::string>::iterator it;
 

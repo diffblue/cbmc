@@ -112,7 +112,7 @@ int ms_cl_modet::doit()
   if(cmdline.isset('J'))
     config.ansi_c.char_is_unsigned=true;
 
-  if(verbosity>8)
+  if(verbosity > messaget::M_STATISTICS)
   {
     std::list<std::string>::iterator it;
 

@@ -130,7 +130,7 @@ int armcc_modet::doit()
     compiler.output_file_executable="a.out";
   }
 
-  if(verbosity>8)
+  if(verbosity > messaget::M_STATISTICS)
   {
     std::list<std::string>::iterator it;
 
