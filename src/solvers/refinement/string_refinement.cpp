@@ -1202,51 +1202,38 @@ exprt substitute_array_access(
 /// have been replaced by their valuation in the current model.
 /// \pre Symbols other than the universal variable should have been replaced by
 ///   their valuation in the current model.
-/// \param axiom: the not_contains constraint to add the negation of
+/// \param constraint: the not_contains constraint to add the negation of
 /// \param univ_var: the universal variable for the negation of the axiom
+/// \param get: valuation function, the result should have been simplified
 /// \return: the negation of the axiom under the current evaluation
 static exprt negation_of_not_contains_constraint(
-  const string_not_contains_constraintt &axiom,
-  const symbol_exprt &univ_var)
+  const string_not_contains_constraintt &constraint,
+  const symbol_exprt &univ_var,
+  const std::function<exprt(const exprt &)> &get)
 {
   // If the for all is vacuously true, the negation is false.
-  const exprt &lbu=axiom.univ_lower_bound();
-  const exprt &ubu=axiom.univ_upper_bound();
-  if(lbu.id()==ID_constant && ubu.id()==ID_constant)
-  {
-    const auto lb_int = numeric_cast<mp_integer>(lbu);
-    const auto ub_int = numeric_cast<mp_integer>(ubu);
-    if(!lb_int || !ub_int || *ub_int<=*lb_int)
-      return false_exprt();
-  }
-
-  const auto lbe = numeric_cast_v<mp_integer>(axiom.exists_lower_bound());
-  const auto ube = numeric_cast_v<mp_integer>(axiom.exists_upper_bound());
-
-  // If the premise is false, the implication is trivially true, so the
-  // negation is false.
-  if(axiom.premise()==false_exprt())
-    return false_exprt();
-
-  and_exprt univ_bounds(
-    binary_relation_exprt(lbu, ID_le, univ_var),
-    binary_relation_exprt(ubu, ID_gt, univ_var));
+  const auto lbe =
+    numeric_cast_v<mp_integer>(get(constraint.exists_lower_bound()));
+  const auto ube =
+    numeric_cast_v<mp_integer>(get(constraint.exists_upper_bound()));
+  const auto univ_bounds = and_exprt(
+    binary_relation_exprt(get(constraint.univ_lower_bound()), ID_le, univ_var),
+    binary_relation_exprt(get(constraint.univ_upper_bound()), ID_gt, univ_var));
 
   // The negated existential becomes an universal, and this is the unrolling of
   // that universal quantifier.
   std::vector<exprt> conjuncts;
+  conjuncts.reserve(numeric_cast_v<std::size_t>(ube - lbe));
   for(mp_integer i=lbe; i<ube; ++i)
   {
-    const constant_exprt i_exprt=from_integer(i, univ_var.type());
-    const equal_exprt equal_chars(
-      axiom.s0()[plus_exprt(univ_var, i_exprt)],
-      axiom.s1()[i_exprt]);
-    conjuncts.push_back(equal_chars);
+    const constant_exprt i_expr = from_integer(i, univ_var.type());
+    const exprt s0_char =
+      get(index_exprt(constraint.s0(), plus_exprt(univ_var, i_expr)));
+    const exprt s1_char = get(index_exprt(constraint.s1(), i_expr));
+    conjuncts.push_back(equal_exprt(s0_char, s1_char));
   }
-  exprt equal_strings=conjunction(conjuncts);
-  and_exprt negaxiom(univ_bounds, axiom.premise(), equal_strings);
-
-  return negaxiom;
+  const exprt equal_strings = conjunction(conjuncts);
+  return and_exprt(univ_bounds, get(constraint.premise()), equal_strings);
 }
 
 /// Negates the constraint to be fed to a solver. The intended usage is to find
@@ -1406,42 +1393,19 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   for(std::size_t i = 0; i < axioms.not_contains.size(); i++)
   {
     const string_not_contains_constraintt &nc_axiom=axioms.not_contains[i];
-    const exprt &univ_bound_inf=nc_axiom.univ_lower_bound();
-    const exprt &univ_bound_sup=nc_axiom.univ_upper_bound();
-    const exprt &prem=nc_axiom.premise();
-    const exprt &exists_bound_inf=nc_axiom.exists_lower_bound();
-    const exprt &exists_bound_sup=nc_axiom.exists_upper_bound();
-    const array_string_exprt &s0 = nc_axiom.s0();
-    const array_string_exprt &s1 = nc_axiom.s1();
-
-    symbol_exprt univ_var=generator.fresh_univ_index(
+    const symbol_exprt univ_var = generator.fresh_univ_index(
       "not_contains_univ_var", nc_axiom.s0().length().type());
-    string_not_contains_constraintt nc_axiom_in_model(
-      get(univ_bound_inf),
-      get(univ_bound_sup),
-      get(prem),
-      get(exists_bound_inf),
-      get(exists_bound_sup),
-      to_array_string_expr(get(s0)),
-      to_array_string_expr(get(s1)));
-
-    // necessary so that expressions such as `1 + (3 - (TRUE ? 0 : 0))` do not
-    // appear in bounds
-    nc_axiom_in_model =
-      to_string_not_contains_constraint(simplify_expr(nc_axiom_in_model, ns));
-
-    exprt negaxiom =
-      negation_of_not_contains_constraint(nc_axiom_in_model, univ_var);
-
-    negaxiom = simplify_expr(negaxiom, ns);
-    const exprt with_concrete_arrays =
-      substitute_array_access(negaxiom, gen_symbol, true);
+    const exprt negated_axiom = negation_of_not_contains_constraint(
+      nc_axiom, univ_var, [&](const exprt &expr) {
+        return simplify_expr(get(expr), ns); });
 
     stream << indent << i << ".\n";
     debug_check_axioms_step(
-      stream, ns, nc_axiom, nc_axiom_in_model, negaxiom, with_concrete_arrays);
+      stream, ns, nc_axiom, nc_axiom, negated_axiom, negated_axiom);
 
-    if(const auto witness = find_counter_example(ns, ui, negaxiom, univ_var))
+    if(
+      const auto witness =
+        find_counter_example(ns, ui, negated_axiom, univ_var))
     {
       stream << indent2 << "- violated_for: " << univ_var.get_identifier()
              << "=" << format(*witness) << eom;
