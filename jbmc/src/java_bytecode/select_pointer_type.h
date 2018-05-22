@@ -12,11 +12,12 @@
 /// Handle selection of correct pointer type (for example changing abstract
 /// classes to concrete versions).
 
+#include <util/optional.h>
 #include <util/std_types.h>
-#include <stack>
+#include <vector>
 #include "java_types.h"
 
-typedef std::unordered_map<irep_idt, std::stack<reference_typet>>
+typedef std::unordered_map<irep_idt, std::vector<reference_typet>>
   generic_parameter_specialization_mapt;
 
 class namespacet;

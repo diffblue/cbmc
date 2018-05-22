@@ -72,9 +72,9 @@ const void generic_parameter_specialization_map_keyst::insert_pairs(
       const irep_idt &key = pair.first.get_name();
       if(generic_parameter_specialization_map.count(key) == 0)
         generic_parameter_specialization_map.emplace(
-          key, std::stack<reference_typet>());
+          key, std::vector<reference_typet>());
       (*generic_parameter_specialization_map.find(key))
-        .second.push(pair.second);
+        .second.push_back(pair.second);
 
       // We added something, so pop it when this is destroyed:
       erase_keys.push_back(key);

@@ -78,7 +78,7 @@ pointer_typet select_pointer_typet::specialize_generics(
       return pointer_type;
     }
     const pointer_typet &type =
-      generic_parameter_specialization_map.find(parameter_name)->second.top();
+      generic_parameter_specialization_map.find(parameter_name)->second.back();
 
     // generic parameters can be adopted from outer classes or superclasses so
     // we may need to search for the concrete type recursively
