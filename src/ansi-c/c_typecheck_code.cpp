@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_typecheck_base.h"
 
 #include <util/config.h>
-#include <util/zero_initializer.h>
+#include <util/expr_initializer.h>
 
 #include "ansi_c_declaration.h"
 

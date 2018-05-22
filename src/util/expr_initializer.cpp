@@ -1,15 +1,15 @@
 /*******************************************************************\
 
-Module: Zero Initialization
+Module: Expression Initialization
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
 /// \file
-/// Zero Initialization
+/// Expression Initialization
 
-#include "zero_initializer.h"
+#include "expr_initializer.h"
 
 #include "arith_tools.h"
 #include "c_types.h"
@@ -20,10 +20,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 #include "std_expr.h"
 
-class zero_initializert:public messaget
+class expr_initializert : public messaget
 {
 public:
-  zero_initializert(
+  expr_initializert(
     const namespacet &_ns,
     message_handlert &_message_handler):
     messaget(_message_handler),
@@ -35,18 +35,18 @@ public:
     const typet &type,
     const source_locationt &source_location)
   {
-    return zero_initializer_rec(type, source_location);
+    return expr_initializer_rec(type, source_location);
   }
 
 protected:
   const namespacet &ns;
 
-  exprt zero_initializer_rec(
+  exprt expr_initializer_rec(
     const typet &type,
     const source_locationt &source_location);
 };
 
-exprt zero_initializert::zero_initializer_rec(
+exprt expr_initializert::expr_initializer_rec(
   const typet &type,
   const source_locationt &source_location)
 {
@@ -86,7 +86,7 @@ exprt zero_initializert::zero_initializer_rec(
   }
   else if(type_id==ID_complex)
   {
-    exprt sub_zero=zero_initializer_rec(type.subtype(), source_location);
+    exprt sub_zero = expr_initializer_rec(type.subtype(), source_location);
     complex_exprt result(sub_zero, sub_zero, to_complex_type(type));
     result.add_source_location()=source_location;
     return result;
@@ -113,7 +113,8 @@ exprt zero_initializert::zero_initializer_rec(
     }
     else
     {
-      exprt tmpval=zero_initializer_rec(array_type.subtype(), source_location);
+      exprt tmpval =
+        expr_initializer_rec(array_type.subtype(), source_location);
 
       mp_integer array_size;
 
@@ -148,7 +149,7 @@ exprt zero_initializert::zero_initializer_rec(
   {
     const vector_typet &vector_type=to_vector_type(type);
 
-    exprt tmpval=zero_initializer_rec(vector_type.subtype(), source_location);
+    exprt tmpval = expr_initializer_rec(vector_type.subtype(), source_location);
 
     mp_integer vector_size;
 
@@ -195,7 +196,7 @@ exprt zero_initializert::zero_initializer_rec(
       }
       else
         value.copy_to_operands(
-          zero_initializer_rec(it->type(), source_location));
+          expr_initializer_rec(it->type(), source_location));
     }
 
     value.add_source_location()=source_location;
@@ -245,14 +246,14 @@ exprt zero_initializert::zero_initializer_rec(
     {
       value.set_component_name(component.get_name());
       value.op()=
-        zero_initializer_rec(component.type(), source_location);
+        expr_initializer_rec(component.type(), source_location);
     }
 
     return value;
   }
   else if(type_id==ID_symbol)
   {
-    exprt result=zero_initializer_rec(ns.follow(type), source_location);
+    exprt result = expr_initializer_rec(ns.follow(type), source_location);
     // we might have mangled the type for arrays, so keep that
     if(ns.follow(type).id()!=ID_array)
       result.type()=type;
@@ -262,21 +263,21 @@ exprt zero_initializert::zero_initializer_rec(
   else if(type_id==ID_c_enum_tag)
   {
     return
-      zero_initializer_rec(
+      expr_initializer_rec(
         ns.follow_tag(to_c_enum_tag_type(type)),
         source_location);
   }
   else if(type_id==ID_struct_tag)
   {
     return
-      zero_initializer_rec(
+      expr_initializer_rec(
         ns.follow_tag(to_struct_tag_type(type)),
         source_location);
   }
   else if(type_id==ID_union_tag)
   {
     return
-      zero_initializer_rec(
+      expr_initializer_rec(
         ns.follow_tag(to_union_tag_type(type)),
         source_location);
   }
@@ -298,7 +299,7 @@ exprt zero_initializer(
   const namespacet &ns,
   message_handlert &message_handler)
 {
-  zero_initializert z_i(ns, message_handler);
+  expr_initializert z_i(ns, message_handler);
   return z_i(type, source_location);
 }
 
@@ -312,7 +313,7 @@ exprt zero_initializer(
 
   try
   {
-    zero_initializert z_i(ns, mh);
+    expr_initializert z_i(ns, mh);
     return z_i(type, source_location);
   }
   catch(int)

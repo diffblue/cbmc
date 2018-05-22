@@ -17,10 +17,10 @@ Author: Peter Schrammel
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_cast.h>
+#include <util/expr_initializer.h>
 #include <util/fresh_symbol.h>
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
-#include <util/zero_initializer.h>
 
 class remove_java_newt : public messaget
 {

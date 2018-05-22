@@ -23,10 +23,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/suffix.h>
-#include <util/zero_initializer.h>
 
 class java_bytecode_convert_classt:public messaget
 {

@@ -14,10 +14,10 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/expr_initializer.h>
 #include <util/magic.h>
 #include <util/run.h>
 #include <util/tempfile.h>
-#include <util/zero_initializer.h>
 
 #include <json/json_parser.h>
 

@@ -1,16 +1,16 @@
 /*******************************************************************\
 
-Module: Zero Initialization
+Module: Expression Initialization
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
 /// \file
-/// Zero Initialization
+/// Expression Initialization
 
-#ifndef CPROVER_UTIL_ZERO_INITIALIZER_H
-#define CPROVER_UTIL_ZERO_INITIALIZER_H
+#ifndef CPROVER_UTIL_EXPR_INITIALIZER_H
+#define CPROVER_UTIL_EXPR_INITIALIZER_H
 
 #include "expr.h"
 
@@ -30,4 +30,4 @@ exprt zero_initializer(
   const source_locationt &,
   const namespacet &);
 
-#endif // CPROVER_UTIL_ZERO_INITIALIZER_H
+#endif // CPROVER_UTIL_EXPR_INITIALIZER_H

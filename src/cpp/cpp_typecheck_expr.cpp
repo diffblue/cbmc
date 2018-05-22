@@ -19,8 +19,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_initializer.h>
 #include <util/pointer_offset_size.h>
-#include <util/zero_initializer.h>
 
 #include <ansi-c/c_qualifiers.h>
 

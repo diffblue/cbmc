@@ -11,6 +11,7 @@ SRC = arith_tools.cpp \
       dstring.cpp \
       endianness_map.cpp \
       expr.cpp \
+      expr_initializer.cpp \
       expr_util.cpp \
       file_util.cpp \
       find_macros.cpp \
@@ -98,7 +99,6 @@ SRC = arith_tools.cpp \
       xml.cpp \
       xml_expr.cpp \
       xml_irep.cpp \
-      zero_initializer.cpp \
       # Empty last line
 
 INCLUDES= -I ..

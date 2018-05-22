@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_object_factory.h"
 
+#include <util/expr_initializer.h>
 #include <util/fresh_symbol.h>
 #include <util/nondet_bool.h>
 #include <util/pointer_offset_size.h>
-#include <util/zero_initializer.h>
 
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_functions.h>

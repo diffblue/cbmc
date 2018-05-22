@@ -12,9 +12,9 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "java_utils.h"
 
 #include <util/arith_tools.h>
+#include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/unicode.h>
-#include <util/zero_initializer.h>
 
 #include <iomanip>
 #include <sstream>

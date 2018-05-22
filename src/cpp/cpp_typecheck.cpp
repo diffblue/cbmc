@@ -14,9 +14,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <algorithm>
 
 #include <util/arith_tools.h>
+#include <util/expr_initializer.h>
 #include <util/source_location.h>
 #include <util/symbol.h>
-#include <util/zero_initializer.h>
 
 #include <ansi-c/c_typecast.h>
 

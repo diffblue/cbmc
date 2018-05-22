@@ -14,11 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/zero_initializer.h>
 
 #include <goto-programs/goto_functions.h>
 

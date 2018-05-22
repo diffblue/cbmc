@@ -16,10 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_initializer.h>
 #include <util/pointer_offset_size.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
-#include <util/zero_initializer.h>
 
 #include <langapi/language_util.h>
 

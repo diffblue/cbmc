@@ -12,8 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_typecheck.h"
 
 #include <util/arith_tools.h>
+#include <util/expr_initializer.h>
 #include <util/unicode.h>
-#include <util/zero_initializer.h>
 
 #include "java_pointer_casts.h"
 #include "java_types.h"
