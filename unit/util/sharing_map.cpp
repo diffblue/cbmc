@@ -365,32 +365,6 @@ void sharing_map_view_test()
   }
 }
 
-void sharing_map_memory_test()
-{
-  int n;
-
-  n = 1000;
-  //n = 5000000;
-
-  //sharing_mapt<int, int> m;
-  std::map<int, int> m;
-  //std::unordered_map<int, int> m;
-
-  std::random_device r;
-  std::default_random_engine e(r());
-  std::uniform_int_distribution<int> uniform_dist(0, INT_MAX);
-
-  for(int i = 0; i < n; i++)
-  {
-    int v;
-
-    //v = i;
-    v = uniform_dist(e);
-
-    m.insert(std::make_pair(v, v));
-  }
-}
-
 TEST_CASE("Sharing map interface")
 {
   sharing_map_interface_test();
@@ -409,9 +383,4 @@ TEST_CASE("Sharing map collisions")
 TEST_CASE("Sharing map views")
 {
   sharing_map_view_test();
-}
-
-TEST_CASE("Sharing map memory")
-{
-  sharing_map_memory_test();
 }
