@@ -163,3 +163,8 @@ bool context_abstract_objectt::has_been_modified(
   return this->child_abstract_object.get() !=
          before_context->child_abstract_object.get();
 }
+
+abstract_object_pointert context_abstract_objectt::unwrap_context() const
+{
+  return child_abstract_object->unwrap_context();
+}

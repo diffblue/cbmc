@@ -15,31 +15,39 @@
 
 #include "interval_abstract_value.h"
 
-static inline exprt look_through_casts(exprt e) {
-  while(e.id() == ID_typecast) {
+static inline exprt look_through_casts(exprt e)
+{
+  while(e.id() == ID_typecast)
+  {
     e = e.op0();
   }
   return e;
 }
 
-static inline constant_interval_exprt make_interval_expr(exprt e) {
+static inline constant_interval_exprt make_interval_expr(exprt e)
+{
   e = look_through_casts(e);
-  if(e.id() == ID_constant_interval) {
+  if(e.id() == ID_constant_interval)
+  {
     return to_constant_interval_expr(e);
-  } else if(e.id() == ID_constant) {
+  }
+  else if(e.id() == ID_constant)
+  {
     return constant_interval_exprt(e, e);
-  } else {
+  }
+  else
+  {
     // not directly representable, so just return TOP
     return constant_interval_exprt(e.type());
   }
 }
 
-interval_abstract_valuet::interval_abstract_valuet(typet t):
-  abstract_valuet(t), interval(t)
+interval_abstract_valuet::interval_abstract_valuet(typet t)
+  : abstract_valuet(t), interval(t)
 {}
 
-interval_abstract_valuet::interval_abstract_valuet(typet t, bool tp, bool bttm):
-  abstract_valuet(t, tp, bttm), interval(t)
+interval_abstract_valuet::interval_abstract_valuet(typet t, bool tp, bool bttm)
+  : abstract_valuet(t, tp, bttm), interval(t)
 {}
 
 interval_abstract_valuet::interval_abstract_valuet(
@@ -52,7 +60,6 @@ interval_abstract_valuet::interval_abstract_valuet(
 exprt interval_abstract_valuet::to_constant() const
 {
   return abstract_objectt::to_constant();
-
 #if 0
   if(!is_top() && !is_bottom())
   {
@@ -225,8 +232,10 @@ abstract_object_pointert interval_abstract_valuet::merge_intervals(
   }
 }
 
-interval_abstract_valuet::interval_abstract_valuet(const exprt e, const abstract_environmentt &environment,
-                                                   const namespacet &ns)
+interval_abstract_valuet::interval_abstract_valuet(
+  const exprt e,
+  const abstract_environmentt &environment,
+  const namespacet &ns)
   : interval_abstract_valuet(make_interval_expr(e))
 {}
 
@@ -237,4 +246,9 @@ interval_abstract_valuet::interval_abstract_valuet(
     interval(e),
     merge_count(merge_count)
 {
+}
+
+const constant_interval_exprt &interval_abstract_valuet::get_interval() const
+{
+  return interval;
 }

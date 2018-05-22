@@ -457,3 +457,8 @@ void abstract_objectt::dump_map_diff(
   }
   out << "}";
 }
+
+abstract_object_pointert abstract_objectt::unwrap_context() const
+{
+  return shared_from_this();
+}

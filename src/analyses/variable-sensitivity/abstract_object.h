@@ -176,6 +176,8 @@ public:
     return clone;
   }
 
+  virtual abstract_object_pointert unwrap_context() const;
+
   /**
    * Pure virtual interface required of a client that can apply a copy-on-write
    * operation to a given abstract_object_pointert.

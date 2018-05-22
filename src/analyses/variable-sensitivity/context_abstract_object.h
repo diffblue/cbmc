@@ -82,6 +82,8 @@ public:
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const
   override;
 
+  abstract_object_pointert unwrap_context() const override;
+
 protected:
   CLONE
 
