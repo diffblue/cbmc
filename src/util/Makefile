@@ -41,7 +41,6 @@ SRC = arith_tools.cpp \
       lispexpr.cpp \
       lispirep.cpp \
       memory_info.cpp \
-      memory_limit.cpp \
       merge_irep.cpp \
       message.cpp \
       mp_arith.cpp \
@@ -81,7 +80,6 @@ SRC = arith_tools.cpp \
       string_container.cpp \
       string_hash.cpp \
       string_utils.cpp \
-      substitute.cpp \
       symbol.cpp \
       symbol_table_base.cpp \
       symbol_table.cpp \
