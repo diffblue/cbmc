@@ -2255,7 +2255,7 @@ exprt c_typecheck_baset::do_special_functions(
     isnan_exprt isnan_expr(expr.arguments().front());
     isnan_expr.add_source_location()=source_location;
 
-    return isnan_expr;
+    return typecast_exprt::conditional_cast(isnan_expr, expr.type());
   }
   else if(identifier==CPROVER_PREFIX "isfinitef" ||
           identifier==CPROVER_PREFIX "isfinited" ||
@@ -2271,7 +2271,7 @@ exprt c_typecheck_baset::do_special_functions(
     isfinite_exprt isfinite_expr(expr.arguments().front());
     isfinite_expr.add_source_location()=source_location;
 
-    return isfinite_expr;
+    return typecast_exprt::conditional_cast(isfinite_expr, expr.type());
   }
   else if(identifier==CPROVER_PREFIX "inf" ||
           identifier=="__builtin_inf")
@@ -2343,14 +2343,14 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      error() << "isinf expects one operand" << eom;
+      error() << identifier << " expects one operand" << eom;
       throw 0;
     }
 
     isinf_exprt isinf_expr(expr.arguments().front());
     isinf_expr.add_source_location()=source_location;
 
-    return isinf_expr;
+    return typecast_exprt::conditional_cast(isinf_expr, expr.type());
   }
   else if(identifier==CPROVER_PREFIX "isnormalf" ||
           identifier==CPROVER_PREFIX "isnormald" ||
@@ -2359,14 +2359,23 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      error() << "isnormal expects one operand" << eom;
+      error() << identifier << " expects one operand" << eom;
+      throw 0;
+    }
+
+    const exprt &fp_value = expr.arguments()[0];
+
+    if(fp_value.type().id() != ID_floatbv)
+    {
+      err_location(fp_value);
+      error() << "non-floating-point argument for " << identifier << eom;
       throw 0;
     }
 
     isnormal_exprt isnormal_expr(expr.arguments().front());
     isnormal_expr.add_source_location()=source_location;
 
-    return isnormal_expr;
+    return typecast_exprt::conditional_cast(isnormal_expr, expr.type());
   }
   else if(identifier==CPROVER_PREFIX "signf" ||
           identifier==CPROVER_PREFIX "signd" ||
@@ -2378,14 +2387,14 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size()!=1)
     {
       err_location(f_op);
-      error() << "sign expects one operand" << eom;
+      error() << identifier << " expects one operand" << eom;
       throw 0;
     }
 
     sign_exprt sign_expr(expr.arguments().front());
     sign_expr.add_source_location()=source_location;
 
-    return sign_expr;
+    return typecast_exprt::conditional_cast(sign_expr, expr.type());
   }
   else if(identifier=="__builtin_popcount" ||
           identifier=="__builtin_popcountl" ||
