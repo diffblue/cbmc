@@ -59,6 +59,12 @@ protected:
 
   bool verify() const;
 
+  virtual bool eval_index(
+    const index_exprt &index,
+    const abstract_environmentt &env,
+    const namespacet &ns,
+    mp_integer &out_index) const;
+
 private:
   // Since we don't store for any index where the value is top
   // we don't use a regular array but instead a map of array indices
@@ -72,12 +78,6 @@ private:
     shared_array_mapt;
 
   shared_array_mapt map;
-
-  bool eval_index(
-    const index_exprt &index,
-    const abstract_environmentt &env,
-    const namespacet &ns,
-    mp_integer &out_index) const;
 
   abstract_object_pointert get_top_entry(
     const abstract_environmentt &env, const namespacet &ns) const;
