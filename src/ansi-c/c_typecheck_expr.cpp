@@ -2352,6 +2352,30 @@ exprt c_typecheck_baset::do_special_functions(
 
     return typecast_exprt::conditional_cast(isinf_expr, expr.type());
   }
+  else if(identifier == "__builtin_isinf_sign")
+  {
+    if(expr.arguments().size() != 1)
+    {
+      err_location(f_op);
+      error() << identifier << " expects one operand" << eom;
+      throw 0;
+    }
+
+    // returns 1 for +inf and -1 for -inf, and 0 otherwise
+
+    const exprt &fp_value = expr.arguments().front();
+
+    isinf_exprt isinf_expr(fp_value);
+    isinf_expr.add_source_location() = source_location;
+
+    return if_exprt(
+      isinf_exprt(fp_value),
+      if_exprt(
+        sign_exprt(fp_value),
+        from_integer(-1, expr.type()),
+        from_integer(1, expr.type())),
+      from_integer(0, expr.type()));
+  }
   else if(identifier==CPROVER_PREFIX "isnormalf" ||
           identifier==CPROVER_PREFIX "isnormald" ||
           identifier==CPROVER_PREFIX "isnormalld")
