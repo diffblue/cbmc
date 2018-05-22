@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_internal_additions.h"
 
+#include <util/c_types.h>
 #include <util/config.h>
 
 #include <linking/static_lifetime_init.h>
@@ -126,6 +127,8 @@ void ansi_c_internal_additions(std::string &code)
   code+=
     "# 1 \"<built-in-additions>\"\n"
     "typedef __typeof__(sizeof(int)) __CPROVER_size_t;\n"
+    "typedef "+c_type_as_string(signed_size_type().get(ID_C_c_type))+
+      " __CPROVER_ssize_t;\n"
     "const unsigned __CPROVER_constant_infinity_uint;\n"
     "typedef void __CPROVER_integer;\n"
     "typedef void __CPROVER_rational;\n"

@@ -2193,8 +2193,8 @@ section on [Assumptions and Assertions](modeling-assertions.shtml).
 #### \_\_CPROVER\_same\_object, \_\_CPROVER\_POINTER\_OBJECT, \_\_CPROVER\_POINTER\_OFFSET, \_\_CPROVER\_DYNAMIC\_OBJECT
 
     _Bool __CPROVER_same_object(const void *, const void *);
-    unsigned __CPROVER_POINTER_OBJECT(const void *p);
-    signed __CPROVER_POINTER_OFFSET(const void *p);
+    __CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *p);
+    __CPROVER_ssize_t __CPROVER_POINTER_OFFSET(const void *p);
     _Bool __CPROVER_DYNAMIC_OBJECT(const void *p);
 
 The function **\_\_CPROVER\_same\_object** returns true if the two

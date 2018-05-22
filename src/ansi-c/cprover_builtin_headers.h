@@ -33,9 +33,9 @@ void __CPROVER_fence(const char *kind, ...);
 void CBMC_trace(int lvl, const char *event, ...);
 
 // pointers
-unsigned __CPROVER_POINTER_OBJECT(const void *p);
-signed __CPROVER_POINTER_OFFSET(const void *p);
-__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);
+__CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *);
+__CPROVER_ssize_t __CPROVER_POINTER_OFFSET(const void *);
+__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *);
 void __CPROVER_allocated_memory(__CPROVER_size_t address, __CPROVER_size_t extent);
 
 // float stuff
