@@ -244,9 +244,7 @@ void remove_function_pointerst::fix_return_type(
     function_symbol.mode,
     symbol_table);
 
-  symbol_exprt tmp_symbol_expr;
-  tmp_symbol_expr.type()=tmp_symbol.type;
-  tmp_symbol_expr.set_identifier(tmp_symbol.name);
+  const symbol_exprt tmp_symbol_expr = tmp_symbol.symbol_expr();
 
   exprt old_lhs=function_call.lhs();
   function_call.lhs()=tmp_symbol_expr;
