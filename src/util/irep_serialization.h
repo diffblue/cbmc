@@ -31,17 +31,20 @@ public:
   class ireps_containert
   {
   public:
-    typedef std::vector<std::pair<bool, irept> > ireps_on_readt;
+    using ireps_on_readt = std::vector<std::pair<bool, irept> >;
     ireps_on_readt ireps_on_read;
 
+    // number the ireps we have
     irep_full_hash_containert irep_full_hash_container;
-    typedef std::map<unsigned, size_t> ireps_on_writet;
+
+    // this maps an irep number to a file offset
+    using ireps_on_writet = std::map<std::size_t, std::streampos>;
     ireps_on_writet ireps_on_write;
 
-    typedef std::vector<bool> string_mapt;
+    using string_mapt = std::vector<bool>;
     string_mapt string_map;
 
-    typedef std::vector<std::pair<bool, irep_idt> > string_rev_mapt;
+    using string_rev_mapt = std::vector<std::pair<bool, irep_idt> >;
     string_rev_mapt string_rev_map;
 
     void clear()
@@ -61,10 +64,7 @@ public:
     clear();
   };
 
-  std::size_t insert_on_write(std::size_t h);
-  std::size_t insert_on_read(std::size_t id, const irept &);
-
-  void reference_convert(std::istream &, irept &irep);
+  const irept &reference_convert(std::istream &);
   void reference_convert(const irept &irep, std::ostream &);
 
   irep_idt read_string_ref(std::istream &);

@@ -47,22 +47,19 @@ void irep_serializationt::write_irep(
   out.put(0); // terminator
 }
 
-void irep_serializationt::reference_convert(
-  std::istream &in,
-  irept &irep)
+const irept &irep_serializationt::reference_convert(std::istream &in)
 {
-  std::size_t id=read_gb_word(in);
+  std::size_t offset=read_gb_word(in);
 
-  if(id<ireps_container.ireps_on_read.size() &&
-     ireps_container.ireps_on_read[id].first)
+  auto &entry=ireps_container.ireps_on_read[offset];
+
+  if(!entry.first)
   {
-    irep=ireps_container.ireps_on_read[id].second;
+    read_irep(in, entry.second);
+    entry.first=true;
   }
-  else
-  {
-    read_irep(in, irep);
-    insert_on_read(id, irep);
-  }
+
+  return entry.second;
 }
 
 void irep_serializationt::read_irep(
@@ -76,21 +73,21 @@ void irep_serializationt::read_irep(
   {
     in.get();
     irep.get_sub().push_back(irept());
-    reference_convert(in, irep.get_sub().back());
+    irep.get_sub().back()=reference_convert(in);
   }
 
   while(in.peek()=='N')
   {
     in.get();
     irept &r=irep.add(read_string_ref(in));
-    reference_convert(in, r);
+    r=reference_convert(in);
   }
 
   while(in.peek()=='C')
   {
     in.get();
     irept &r=irep.add(read_string_ref(in));
-    reference_convert(in, r);
+    r=reference_convert(in);
   }
 
   if(in.get()!=0)
@@ -104,60 +101,27 @@ void irep_serializationt::reference_convert(
   const irept &irep,
   std::ostream &out)
 {
-  std::size_t h=ireps_container.irep_full_hash_container.number(irep);
+  std::size_t irep_number=
+    ireps_container.irep_full_hash_container.number(irep);
 
   // should be merged with insert
   ireps_containert::ireps_on_writet::const_iterator fi=
-    ireps_container.ireps_on_write.find(h);
+    ireps_container.ireps_on_write.find(irep_number);
 
   if(fi==ireps_container.ireps_on_write.end())
   {
-    size_t id=insert_on_write(h);
-    write_gb_word(out, id);
+    std::streampos offset=out.tellp();
+
+    ireps_container.ireps_on_write.insert(
+      std::make_pair(irep_number, offset));
+
+    write_gb_word(out, offset);
     write_irep(out, irep);
   }
   else
   {
     write_gb_word(out, fi->second);
   }
-}
-
-/// inserts an irep into the hashtable
-/// \par parameters: a size_t and an irep
-/// \return true on success, false otherwise
-std::size_t irep_serializationt::insert_on_write(std::size_t h)
-{
-  std::pair<ireps_containert::ireps_on_writet::const_iterator, bool> res=
-    ireps_container.ireps_on_write.insert(
-      std::make_pair(h, ireps_container.ireps_on_write.size()));
-
-  if(!res.second)
-    return ireps_container.ireps_on_write.size();
-  else
-    return res.first->second;
-}
-
-/// inserts an irep into the hashtable, but only the id-hashtable (only to be
-/// used upon reading ireps from a file)
-/// \par parameters: a size_t and an irep
-/// \return true on success, false otherwise
-std::size_t irep_serializationt::insert_on_read(
-  std::size_t id,
-  const irept &i)
-{
-  if(id>=ireps_container.ireps_on_read.size())
-    ireps_container.ireps_on_read.resize(1+id*2,
-      std::pair<bool, irept>(false, get_nil_irep()));
-
-  if(ireps_container.ireps_on_read[id].first)
-    throw "irep id read twice.";
-  else
-  {
-    ireps_container.ireps_on_read[id]=
-      std::pair<bool, irept>(true, i);
-  }
-
-  return id;
 }
 
 /// outputs 4 characters for a long, most-significant byte first
