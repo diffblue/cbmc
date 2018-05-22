@@ -27,7 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language.h>
 
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/                              \
-  "(no-core-models)"                                                           \
   "(java-assume-inputs-non-null)"                                              \
   "(java-throw-runtime-exceptions)"                                            \
   "(java-max-input-array-length):"                                             \
@@ -40,8 +39,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "(java-no-load-class):"
 
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP /*NOLINT*/                                          \
-  " --no-core-models                 don't load internally provided models for core classes in\n"/* NOLINT(*) */ \
-  "                                  the Java Class Library\n"                                   /* NOLINT(*) */ \
   " --java-assume-inputs-non-null    never initialize reference-typed parameter to the\n"        /* NOLINT(*) */ \
   "                                  entry point with null\n"                                    /* NOLINT(*) */ \
   " --java-throw-runtime-exceptions  make implicit runtime exceptions explicit\n"                /* NOLINT(*) */ \

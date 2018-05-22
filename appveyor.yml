@@ -42,12 +42,17 @@ install:
      & 7z x minisat2_2.2.1.orig.tar.gz
      &7z x minisat2_2.2.1.orig.tar
     }
+    if (!(Test-Path jml)) {
+     & appveyor downloadfile https://github.com/diffblue/java-models-library/archive/master.zip -FileName jml.zip
+     & 7z x jml.zip
+    }
     cd ..
 
 cache: deps
 
 build_script:
 - cmd: |
+    cp -r deps/java-models-library-master/src jbmc/src/java_bytecode/library
     cp -r deps/minisat2-2.2.1 minisat-2.2.1
     patch -d minisat-2.2.1 -p1 < scripts/minisat-2.2.1-patch
     call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64

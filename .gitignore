@@ -49,7 +49,6 @@ src/ansi-c/gcc_builtin_headers_mips.inc
 src/ansi-c/gcc_builtin_headers_power.inc
 src/ansi-c/gcc_builtin_headers_ubsan.inc
 src/ansi-c/windows_builtin_headers.inc
-jbmc/src/java_bytecode/java_core_models.inc
 
 # regression/test files
 *.out
@@ -122,9 +121,13 @@ src/ansi-c/file_converter
 src/ansi-c/file_converter.exe
 src/ansi-c/library/converter
 src/ansi-c/library/converter.exe
-jbmc/src/java_bytecode/converter
-jbmc/src/java_bytecode/converter.exe
+jbmc/src/java_bytecode/library/converter.exe
+jbmc/src/java_bytecode/library/converter
+jbmc/src/java_bytecode/library/core-models.jar
+jbmc/src/java_bytecode/library/classes
+jbmc/src/java_bytecode/library/src
 build/
+dist/
 
 *.pyc
 

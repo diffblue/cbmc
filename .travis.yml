@@ -233,6 +233,7 @@ jobs:
             name: "diffblue/cbmc"
             description: "Travis build of ${TRAVIS_COMMIT}"
           notification_email: "coverity-scan@diffblue.com"
+          build_command_prepend: "make -C jbmc/src java-models-library-download"
           build_command_prepend: "make -C src minisat2-download"
           build_command: "make -C src -j2; make -C jbmc/src -j2"
           branch_pattern: "develop"
@@ -259,6 +260,7 @@ jobs:
 install:
   - ccache -z
   - ccache --max-size=1G
+  - make -C jbmc/src java-models-library-download
   - make -C src minisat2-download
   - make -C src/ansi-c library_check
   - make -C src "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j3
@@ -286,4 +288,3 @@ notifications:
     on_start: never
     on_cancel: never
     on_error: always
-    

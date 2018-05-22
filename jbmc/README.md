@@ -30,8 +30,10 @@ Compilation
 To compile you need to run the command:
 
 ```bash
+make -C jbmc/src java-models-library-download
 make -C jbmc/src
 ```
+
 Output
 ======
 

@@ -49,7 +49,7 @@ include ../$(CPROVER_DIR)/src/common
 
 CLEANFILES = java_bytecode$(LIBEXT)
 
-all: java_bytecode$(LIBEXT)
+all: library java_bytecode$(LIBEXT)
 
 clean: clean_library
 
@@ -57,10 +57,10 @@ clean: clean_library
 clean_library:
 	$(MAKE) clean -C library
 
-library/java_core_models.inc:
-	$(MAKE) -C library java_core_models.inc
+.PHONY: library
+library:
+	$(MAKE) -C library
 
-java_class_loader$(OBJEXT): library/java_core_models.inc
 ###############################################################################
 
 java_bytecode$(LIBEXT): $(OBJ)

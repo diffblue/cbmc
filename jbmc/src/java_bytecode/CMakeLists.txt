@@ -10,9 +10,6 @@ add_library(java_bytecode ${sources} ${headers})
 # targets wishing to depend on the target 'java_bytecode' may want to use
 generic_includes(java_bytecode)
 
-# target 'java-core-models-inc' is defined in library/
-add_dependencies(java_bytecode java-core-models-inc)
-
 # if you link java_bytecode.a in, then you also need to link other .a libraries
 # in
 target_link_libraries(java_bytecode util goto-programs miniz json)

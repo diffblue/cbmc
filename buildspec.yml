@@ -13,6 +13,7 @@ phases:
   build:
     commands:
       - echo Build started on `date`
+      - make -C jbmc/src java-models-library-download
       - (cd src ; make minisat2-download)
       - (cd src ; make CXX="ccache g++" -j2)
       - (cd regression ; make test)
