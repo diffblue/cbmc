@@ -148,6 +148,7 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_NORETURN "noreturn"
 %token TOK_GCC_ATTRIBUTE_CONSTRUCTOR "constructor"
 %token TOK_GCC_ATTRIBUTE_DESTRUCTOR "destructor"
+%token TOK_GCC_ATTRIBUTE_FALLTHROUGH "fallthrough"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
 %token TOK_MSC_BASED   "__based"
@@ -2156,6 +2157,7 @@ statement:
         | msc_asm_statement
         | msc_seh_statement
         | cprover_exception_statement
+        | statement_attribute
         ;
 
 declaration_statement:
@@ -2211,6 +2213,14 @@ labeled_statement:
           stack($$).operands().push_back(nil_exprt());
           mto($$, $3);
           stack($$).set(ID_default, true);
+        }
+        ;
+
+statement_attribute:
+          TOK_GCC_ATTRIBUTE '(' '(' TOK_GCC_ATTRIBUTE_FALLTHROUGH ')' ')' ';' labeled_statement
+        {
+          // attribute ignored
+          $$=$8;
         }
         ;
 
