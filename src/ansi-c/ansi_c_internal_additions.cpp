@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_internal_additions.h"
 
+#include <util/c_types.h>
 #include <util/config.h>
 
 const char gcc_builtin_headers_types[]=
@@ -124,6 +125,8 @@ void ansi_c_internal_additions(std::string &code)
   code+=
     "# 1 \"<built-in-additions>\"\n"
     "typedef __typeof__(sizeof(int)) __CPROVER_size_t;\n"
+    "typedef "+c_type_as_string(signed_size_type().get(ID_C_c_type))+
+      " __CPROVER_ssize_t;\n"
     "const unsigned __CPROVER_constant_infinity_uint;\n"
     "typedef void __CPROVER_integer;\n"
     "typedef void __CPROVER_rational;\n"
@@ -136,9 +139,9 @@ void ansi_c_internal_additions(std::string &code)
     "void CBMC_trace(int lvl, const char *event, ...);\n"
 
     // pointers
-    "unsigned __CPROVER_POINTER_OBJECT(const void *p);\n"
-    "signed long int __CPROVER_POINTER_OFFSET(const void *p);\n"
-    "__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);\n"
+    "__CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *);\n"
+    "__CPROVER_ssize_t __CPROVER_POINTER_OFFSET(const void *);\n"
+    "__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *);\n"
     "extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     "extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];\n"
