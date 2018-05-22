@@ -139,6 +139,11 @@ public:
     M_STATISTICS=8, M_PROGRESS=9, M_DEBUG=10
   };
 
+  static unsigned eval_verbosity(
+    const std::string &user_input,
+    const message_levelt default_verbosity,
+    message_handlert &dest);
+
   virtual void set_message_handler(message_handlert &_message_handler)
   {
     message_handler=&_message_handler;

@@ -21,7 +21,6 @@ Author: CM Wintersteiger, 2006
 
 #include <iostream>
 
-#include <util/string2int.h>
 #include <util/message.h>
 #include <util/prefix.h>
 #include <util/config.h>
@@ -37,8 +36,6 @@ int cw_modet::doit()
     return EX_OK;
   }
 
-  unsigned int verbosity=1;
-
   compilet compiler(cmdline, message_handler, cmdline.isset("Werror"));
 
   #if 0
@@ -49,11 +46,8 @@ int cw_modet::doit()
     has_prefix(base_name, "goto-link");
   #endif
 
-  if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-
-  compiler.set_message_handler(get_message_handler());
-  message_handler.set_verbosity(verbosity);
+  const auto verbosity = eval_verbosity(
+    cmdline.get_value("verbosity"), messaget::M_ERROR, message_handler);
 
   debug() << "CodeWarrior mode" << eom;
 
@@ -125,7 +119,7 @@ int cw_modet::doit()
       config.ansi_c.preprocessor_options.push_back("-isystem "+*it);
   }
 
-  if(verbosity>8)
+  if(verbosity > messaget::M_STATISTICS)
   {
     std::list<std::string>::iterator it;
 

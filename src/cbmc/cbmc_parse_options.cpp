@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <memory>
 
-#include <util/string2int.h>
 #include <util/config.h>
 #include <util/unicode.h>
 #include <util/invariant.h>
@@ -98,21 +97,6 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
 
   // Other default
   options.set_option("arrays-uf", "auto");
-}
-
-void cbmc_parse_optionst::eval_verbosity()
-{
-  // this is our default verbosity
-  unsigned int v=messaget::M_STATISTICS;
-
-  if(cmdline.isset("verbosity"))
-  {
-    v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-    if(v>10)
-      v=10;
-  }
-
-  ui_message_handler.set_verbosity(v);
 }
 
 void cbmc_parse_optionst::get_command_line_options(optionst &options)
@@ -435,7 +419,8 @@ int cbmc_parse_optionst::doit()
     return CPROVER_EXIT_EXCEPTION;
   }
 
-  eval_verbosity();
+  eval_verbosity(
+    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
   //
   // Print a banner

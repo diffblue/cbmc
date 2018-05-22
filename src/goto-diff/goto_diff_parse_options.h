@@ -70,8 +70,6 @@ protected:
     const optionst &options,
     goto_modelt &goto_model);
 
-  void eval_verbosity();
-
   void preprocessing();
 };
 

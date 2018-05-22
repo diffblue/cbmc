@@ -173,8 +173,6 @@ protected:
 
   ai_baset *build_analyzer(const optionst &, const namespacet &ns);
 
-  void eval_verbosity();
-
   ui_message_handlert::uit get_ui()
   {
     return ui_message_handler.get_ui();

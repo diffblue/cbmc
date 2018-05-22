@@ -685,9 +685,9 @@ int linker_script_merget::get_linker_script_data(
     "--out-file", def_out_file
   };
 
-  if(get_message_handler().get_verbosity()>9)
+  if(get_message_handler().get_verbosity() >= messaget::M_DEBUG)
     argv.push_back("--very-verbose");
-  else if(get_message_handler().get_verbosity()>4)
+  else if(get_message_handler().get_verbosity() > messaget::M_RESULT)
     argv.push_back("--verbose");
 
   debug() << "RUN:";

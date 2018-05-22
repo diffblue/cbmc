@@ -24,7 +24,6 @@ Author: Michael Tautschnig
 #include <cstring>
 
 #include <util/run.h>
-#include <util/string2int.h>
 #include <util/tempdir.h>
 #include <util/config.h>
 #include <util/get_base_name.h>
@@ -76,8 +75,6 @@ int as_modet::doit()
     return EX_OK;
   }
 
-  unsigned int verbosity=1;
-
   bool act_as_as86=
     base_name=="as86" ||
     base_name.find("goto-as86")!=std::string::npos;
@@ -101,13 +98,10 @@ int as_modet::doit()
     return EX_OK; // Exit!
   }
 
-  if(cmdline.isset("w-") || cmdline.isset("warn"))
-    verbosity=2;
-
-  if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-
-  message_handler.set_verbosity(verbosity);
+  auto default_verbosity = (cmdline.isset("w-") || cmdline.isset("warn")) ?
+    messaget::M_WARNING : messaget::M_ERROR;
+  eval_verbosity(
+    cmdline.get_value("verbosity"), default_verbosity, message_handler);
 
   if(act_as_as86)
   {

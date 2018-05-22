@@ -16,7 +16,6 @@ Author: Peter Schrammel
 #include <iostream>
 #include <memory>
 
-#include <util/string2int.h>
 #include <util/config.h>
 #include <util/options.h>
 #include <util/make_unique.h>
@@ -77,21 +76,6 @@ goto_diff_parse_optionst::goto_diff_parse_optionst(int argc, const char **argv):
   ui_message_handler(cmdline, "GOTO-DIFF " CBMC_VERSION),
   languages2(cmdline, ui_message_handler)
 {
-}
-
-void goto_diff_parse_optionst::eval_verbosity()
-{
-  // this is our default verbosity
-  unsigned int v=messaget::M_STATISTICS;
-
-  if(cmdline.isset("verbosity"))
-  {
-    v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-    if(v>10)
-      v=10;
-  }
-
-  ui_message_handler.set_verbosity(v);
 }
 
 void goto_diff_parse_optionst::get_command_line_options(optionst &options)
@@ -251,7 +235,8 @@ int goto_diff_parse_optionst::doit()
 
   optionst options;
   get_command_line_options(options);
-  eval_verbosity();
+  eval_verbosity(
+    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
   //
   // Print a banner
