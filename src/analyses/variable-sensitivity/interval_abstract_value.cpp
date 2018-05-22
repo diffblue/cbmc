@@ -15,12 +15,31 @@
 
 #include "interval_abstract_value.h"
 
+static inline exprt look_through_casts(exprt e) {
+  while(e.id() == ID_typecast) {
+    e = e.op0();
+  }
+  return e;
+}
+
+static inline constant_interval_exprt make_interval_expr(exprt e) {
+  e = look_through_casts(e);
+  if(e.id() == ID_constant_interval) {
+    return to_constant_interval_expr(e);
+  } else if(e.id() == ID_constant) {
+    return constant_interval_exprt(e, e);
+  } else {
+    // not directly representable, so just return TOP
+    return constant_interval_exprt(e.type());
+  }
+}
+
 interval_abstract_valuet::interval_abstract_valuet(typet t):
-  abstract_valuet(t), interval()
+  abstract_valuet(t), interval(t)
 {}
 
 interval_abstract_valuet::interval_abstract_valuet(typet t, bool tp, bool bttm):
-  abstract_valuet(t, tp, bttm), interval()
+  abstract_valuet(t, tp, bttm), interval(t)
 {}
 
 interval_abstract_valuet::interval_abstract_valuet(
@@ -133,3 +152,8 @@ abstract_object_pointert interval_abstract_valuet::merge_intervals(
         constant_interval_exprt::get_max(interval.get_upper(), other->interval.get_upper())));
   }
 }
+
+interval_abstract_valuet::interval_abstract_valuet(const exprt e, const abstract_environmentt &environment,
+                                                   const namespacet &ns)
+  : interval_abstract_valuet(make_interval_expr(e))
+{}
