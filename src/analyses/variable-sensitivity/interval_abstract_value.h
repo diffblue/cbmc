@@ -25,9 +25,9 @@ public:
   explicit interval_abstract_valuet(typet t);
   interval_abstract_valuet(typet t, bool tp, bool bttm);
 
-  explicit interval_abstract_valuet(constant_interval_exprt e, int merge_count);
+  interval_abstract_valuet(constant_interval_exprt e, int merge_count);
 
-  interval_abstract_valuet(
+  explicit interval_abstract_valuet(
     const constant_interval_exprt e);
 
   interval_abstract_valuet(
