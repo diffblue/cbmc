@@ -179,10 +179,6 @@ public:
     bool record_value,
     bool allow_pointer_unsoundness=false);
 
-  // what to propagate
-  bool constant_propagation(const exprt &expr) const;
-  bool constant_propagation_reference(const exprt &expr) const;
-
   // undoes all levels of renaming
   void get_original_name(exprt &expr) const;
   void get_original_name(typet &type) const;
