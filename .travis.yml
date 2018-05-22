@@ -99,10 +99,7 @@ jobs:
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel
         - export PATH=$PATH:/usr/local/opt/ccache/libexec
-      env:
-        - COMPILER="ccache clang++"
-        - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics"
-        - CCACHE_CPP2=yes
+      env: COMPILER="ccache clang++"
 
     # Ubuntu Linux with glibc using g++-5, debug mode
     - stage: Test different OS/CXX/Flags
