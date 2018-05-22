@@ -74,10 +74,3 @@ unsigned string_containert::get(const std::string &s)
 
   return r;
 }
-
-/// Get a reference to the global string container.
-string_containert &get_string_container()
-{
-  static string_containert ret;
-  return ret;
-}
