@@ -270,6 +270,12 @@ bool is_constantt::is_constant_address_of(const exprt &expr) const
   {
     return is_constant_address_of(to_member_expr(expr).compound());
   }
+  else if(expr.id() == ID_dereference)
+  {
+    const dereference_exprt &deref = to_dereference_expr(expr);
+
+    return is_constant(deref.pointer());
+  }
   else if(expr.id() == ID_string_constant)
     return true;
 
