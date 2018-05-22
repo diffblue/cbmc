@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANSI_C_LIBRARY_CPROVER_H
 
 typedef __typeof__(sizeof(int)) __CPROVER_size_t;
+typedef signed long long __CPROVER_size_t;
 void *__CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero);
 extern const void *__CPROVER_deallocated;
 extern const void *__CPROVER_malloc_object;
@@ -53,9 +54,9 @@ void CBMC_trace(int lvl, const char *event, ...);
 #endif
 
 // pointers
-unsigned __CPROVER_POINTER_OBJECT(const void *p);
-signed long int __CPROVER_POINTER_OFFSET(const void *p);
-__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);
+__CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *);
+__CPROVER_ssize_t __CPROVER_POINTER_OFFSET(const void *);
+__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *);
 #if 0
 extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];
 void __CPROVER_allocated_memory(
