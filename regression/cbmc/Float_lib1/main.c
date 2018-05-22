@@ -19,6 +19,19 @@ int main() {
   assert(fpclassify(-0.0)==FP_ZERO);
   #endif
 
+  #if !defined(__clang__) && defined(__GNUC__)
+  assert(__builtin_fpclassify(0, 1, 2, 3, 4, DBL_MAX+DBL_MAX)==1);
+  assert(__builtin_fpclassify(0, 1, 2, 3, 4, 0*(DBL_MAX+DBL_MAX))==0);
+  assert(__builtin_fpclassify(0, 1, 2, 3, 4, 1.0)==2);
+  assert(__builtin_fpclassify(0, 1, 2, 3, 4, DBL_MIN)==2);
+  assert(__builtin_fpclassify(0, 1, 2, 3, 4, DBL_MIN/2)==3);
+  assert(__builtin_fpclassify(0, 1, 2, 3, 4, -0.0)==4);
+
+  // these are compile-time
+  _Static_assert(__builtin_fpclassify(0, 1, 2, 3, 4, -0.0)==4,
+                 "__builtin_fpclassify is constant");
+  #endif
+
   assert(signbit(-1.0)!=0);
   assert(signbit(1.0)==0);
 }
