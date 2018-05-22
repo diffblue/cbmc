@@ -7,6 +7,7 @@
 \*******************************************************************/
 #include "variable_sensitivity_object_factory.h"
 #include "util/namespace.h"
+#include "interval_array_abstract_object.h"
 
 variable_sensitivity_object_factoryt
   variable_sensitivity_object_factoryt::s_instance;
@@ -106,7 +107,10 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
     return initialize_abstract_object<interval_abstract_valuet>(
       followed_type, top, bottom, e, environment, ns);
   case ARRAY_SENSITIVE:
-    return initialize_abstract_object<constant_array_abstract_objectt>(
+    return has_interval
+           ? initialize_abstract_object<interval_array_abstract_objectt>(
+             followed_type, top, bottom, e, environment, ns)
+           : initialize_abstract_object<constant_array_abstract_objectt>(
       followed_type, top, bottom, e, environment, ns);
   case ARRAY_INSENSITIVE:
     return initialize_abstract_object<array_abstract_objectt>(
