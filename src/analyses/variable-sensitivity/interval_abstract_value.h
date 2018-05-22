@@ -20,38 +20,28 @@ class interval_abstract_valuet:public abstract_valuet
 private:
   typedef sharing_ptrt<interval_abstract_valuet>
     interval_abstract_value_pointert;
-  static inline constant_interval_exprt make_interval_expr(exprt e) {
-    if(e.id() == ID_constant_interval) {
-      return to_constant_interval_expr(e);
-    } else {
-      return constant_interval_exprt(e, e);
-    }
-  }
+
 public:
   explicit interval_abstract_valuet(typet t);
   interval_abstract_valuet(typet t, bool tp, bool bttm);
+
   interval_abstract_valuet(
     const constant_interval_exprt e);
+
   interval_abstract_valuet(
     const exprt e,
     const abstract_environmentt &environment,
-    const namespacet &ns)
-  : interval_abstract_valuet(make_interval_expr(e))
-  {
+    const namespacet &ns);
 
-  }
-
-  virtual ~interval_abstract_valuet() {}
+  ~interval_abstract_valuet() override = default;
 
   virtual exprt to_constant() const override;
 
-#if 1
   // Interface for transforms
   abstract_object_pointert expression_transform(
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
-#endif
 
   virtual void output(
     std::ostream &out,
