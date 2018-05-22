@@ -27,9 +27,27 @@ int main() {
   assert(__builtin_fpclassify(0, 1, 2, 3, 4, DBL_MIN/2)==3);
   assert(__builtin_fpclassify(0, 1, 2, 3, 4, -0.0)==4);
 
+  assert(__builtin_isinf(DBL_MAX+DBL_MAX)==1);
+  assert(__builtin_isinf(0.0)==0);
+  assert(__builtin_isinf(-(DBL_MAX+DBL_MAX))==1);
+
+  assert(__builtin_isinf_sign(DBL_MAX+DBL_MAX)==1);
+  assert(__builtin_isinf_sign(0.0)==0);
+  assert(__builtin_isinf_sign(-(DBL_MAX+DBL_MAX))==-1);
+
   // these are compile-time
   _Static_assert(__builtin_fpclassify(0, 1, 2, 3, 4, -0.0)==4,
                  "__builtin_fpclassify is constant");
+
+  _Static_assert(__builtin_isnormal(DBL_MIN),
+                 "__builtin_isnormal is constant");
+
+  _Static_assert(!__builtin_isinf(0),
+                 "__builtin_isinf is constant");
+
+  _Static_assert(__builtin_isinf_sign(0)==0,
+                 "__builtin_isinf_sign is constant");
+
   #endif
 
   assert(signbit(-1.0)!=0);
