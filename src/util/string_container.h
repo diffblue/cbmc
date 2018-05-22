@@ -89,6 +89,11 @@ protected:
   string_vectort string_vector;
 };
 
-string_containert &get_string_container();
+/// Get a reference to the global string container.
+inline string_containert &get_string_container()
+{
+  static string_containert ret;
+  return ret;
+}
 
 #endif // CPROVER_UTIL_STRING_CONTAINER_H
