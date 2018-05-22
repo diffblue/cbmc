@@ -233,12 +233,15 @@ void remove_function_pointerst::fix_return_type(
        code_type.return_type(), ns))
     return;
 
+  const symbolt &function_symbol =
+    ns.lookup(to_symbol_expr(function_call.function()).get_identifier());
+
   symbolt &tmp_symbol = get_fresh_aux_symbol(
     code_type.return_type(),
     id2string(function_call.source_location().get_function()),
     "tmp_return_val",
     function_call.source_location(),
-    irep_idt(),
+    function_symbol.mode,
     symbol_table);
 
   symbol_exprt tmp_symbol_expr;
