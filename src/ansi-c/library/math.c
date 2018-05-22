@@ -287,11 +287,8 @@ inline short _fdclass(float f) {
 
 inline int __fpclassifyd(double d) {
   __CPROVER_HIDE:
-  return __CPROVER_isnand(d)?FP_NAN:
-         __CPROVER_isinfd(d)?FP_INFINITE:
-         d==0?FP_ZERO:
-         __CPROVER_isnormald(d)?FP_NORMAL:
-         FP_SUBNORMAL;
+    return __CPROVER_fpclassify(
+      FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, d);
 }
 
 /* FUNCTION: __fpclassifyf */
@@ -303,11 +300,8 @@ inline int __fpclassifyd(double d) {
 
 inline int __fpclassifyf(float f) {
   __CPROVER_HIDE:
-  return __CPROVER_isnanf(f)?FP_NAN:
-         __CPROVER_isinff(f)?FP_INFINITE:
-         f==0?FP_ZERO:
-         __CPROVER_isnormalf(f)?FP_NORMAL:
-         FP_SUBNORMAL;
+    return __CPROVER_fpclassify(
+      FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, f);
 }
 
 /* FUNCTION: __fpclassifyl */
@@ -319,11 +313,8 @@ inline int __fpclassifyf(float f) {
 
 inline int __fpclassifyl(long double f) {
   __CPROVER_HIDE:
-  return __CPROVER_isnanld(f)?FP_NAN:
-         __CPROVER_isinfld(f)?FP_INFINITE:
-         f==0?FP_ZERO:
-         __CPROVER_isnormalld(f)?FP_NORMAL:
-         FP_SUBNORMAL;
+    return __CPROVER_fpclassify(
+      FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, f);
 }
 
 /* FUNCTION: __fpclassify */
@@ -339,20 +330,14 @@ inline int __fpclassifyl(long double f) {
 #ifdef __APPLE__
 inline int __fpclassify(long double d) {
   __CPROVER_HIDE:
-  return __CPROVER_isnanld(d)?FP_NAN:
-         __CPROVER_isinfld(d)?FP_INFINITE:
-         d==0?FP_ZERO:
-         __CPROVER_isnormalld(d)?FP_NORMAL:
-         FP_SUBNORMAL;
+    return __CPROVER_fpclassify(
+      FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, d);
 }
 #else
 inline int __fpclassify(double d) {
   __CPROVER_HIDE:
-  return __CPROVER_isnand(d)?FP_NAN:
-         __CPROVER_isinfd(d)?FP_INFINITE:
-         d==0?FP_ZERO:
-         __CPROVER_isnormald(d)?FP_NORMAL:
-         FP_SUBNORMAL;
+    return __CPROVER_fpclassify(
+      FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, d);
 }
 #endif
 

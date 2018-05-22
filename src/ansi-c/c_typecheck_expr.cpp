@@ -2195,6 +2195,51 @@ exprt c_typecheck_baset::do_special_functions(
 
     return bswap_expr;
   }
+  else if(
+    identifier == "__builtin_fpclassify" ||
+    identifier == CPROVER_PREFIX "fpclassify")
+  {
+    if(expr.arguments().size() != 6)
+    {
+      err_location(f_op);
+      error() << identifier << " expects six arguments" << eom;
+      throw 0;
+    }
+
+    // This gets 5 integers followed by a float or double.
+    // The five integers are the return values for the cases
+    // FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL and FP_ZERO.
+    // gcc expects this to be able to produce compile-time constants.
+
+    const exprt &fp_value = expr.arguments()[5];
+
+    if(fp_value.type().id() != ID_floatbv)
+    {
+      err_location(fp_value);
+      error() << "non-floating-point argument for " << identifier << eom;
+      throw 0;
+    }
+
+    const auto &floatbv_type = to_floatbv_type(fp_value.type());
+
+    const exprt zero = ieee_floatt::zero(floatbv_type).to_expr();
+
+    const auto &arguments = expr.arguments();
+
+    return if_exprt(
+      isnan_exprt(fp_value),
+      arguments[0],
+      if_exprt(
+        isinf_exprt(fp_value),
+        arguments[1],
+        if_exprt(
+          isnormal_exprt(fp_value),
+          arguments[2],
+          if_exprt(
+            ieee_float_equal_exprt(fp_value, zero),
+            arguments[4],
+            arguments[3])))); // subnormal
+  }
   else if(identifier==CPROVER_PREFIX "isnanf" ||
           identifier==CPROVER_PREFIX "isnand" ||
           identifier==CPROVER_PREFIX "isnanld" ||

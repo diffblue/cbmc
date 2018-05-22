@@ -70,6 +70,7 @@ extern __CPROVER_thread_local const char __PRETTY_FUNCTION__[__CPROVER_constant_
 #endif
 
 // float stuff
+int __CPROVER_fpclassify(int, int, int, int, int, ...);
 __CPROVER_bool __CPROVER_isfinite(double f);
 __CPROVER_bool __CPROVER_isinf(double f);
 __CPROVER_bool __CPROVER_isnormal(double f);

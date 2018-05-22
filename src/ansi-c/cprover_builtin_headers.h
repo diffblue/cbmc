@@ -39,6 +39,7 @@ __CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);
 void __CPROVER_allocated_memory(__CPROVER_size_t address, __CPROVER_size_t extent);
 
 // float stuff
+int __CPROVER_fpclassify(int, int, int, int, int, ...);
 __CPROVER_bool __CPROVER_isnanf(float f);
 __CPROVER_bool __CPROVER_isnand(double f);
 __CPROVER_bool __CPROVER_isnanld(long double f);
