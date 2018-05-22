@@ -1580,6 +1580,8 @@ __decltype          { if(PARSER.cpp98 &&
 "destructor" |
 "__destructor__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_DESTRUCTOR; }
 
+"fallthrough"       { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_FALLTHROUGH; }
+
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }
 {identifier}        { BEGIN(GCC_ATTRIBUTE4); }

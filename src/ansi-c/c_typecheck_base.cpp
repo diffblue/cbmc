@@ -152,7 +152,7 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
         it->set_identifier(irep_idt());
     }
   }
-  else
+  else if(!symbol.is_macro)
   {
     // check the initializer
     do_initializer(symbol);
