@@ -2111,6 +2111,15 @@ public:
     unary_exprt(ID_typecast, op, _type)
   {
   }
+
+  // returns a typecast if the type doesn't already match
+  static exprt conditional_cast(const exprt &expr, const typet &type)
+  {
+    if(expr.type() == type)
+      return expr;
+    else
+      return typecast_exprt(expr, type);
+  }
 };
 
 /*! \brief Cast a generic exprt to a \ref typecast_exprt
