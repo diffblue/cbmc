@@ -2376,9 +2376,10 @@ exprt c_typecheck_baset::do_special_functions(
         from_integer(1, expr.type())),
       from_integer(0, expr.type()));
   }
-  else if(identifier==CPROVER_PREFIX "isnormalf" ||
-          identifier==CPROVER_PREFIX "isnormald" ||
-          identifier==CPROVER_PREFIX "isnormalld")
+  else if(identifier == CPROVER_PREFIX "isnormalf" ||
+          identifier == CPROVER_PREFIX "isnormald" ||
+          identifier == CPROVER_PREFIX "isnormalld" ||
+          identifier == "__builtin_isnormal")
   {
     if(expr.arguments().size()!=1)
     {
