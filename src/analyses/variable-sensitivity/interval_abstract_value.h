@@ -51,6 +51,8 @@ public:
     const class ai_baset &ai,
     const class namespacet &ns) const override;
 
+  const constant_interval_exprt &get_interval() const;
+
 protected:
   CLONE
   virtual abstract_object_pointert merge(

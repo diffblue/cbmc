@@ -1,19 +1,25 @@
 int main(void)
 {
-  int arr[] = {1,2,3};
+  int arr[] = {1, 2, 3};
   int ix;
-  if(ix) {
+  if(ix)
+  {
     ix = 0;
-  } else {
+  }
+  else
+  {
     ix = 2;
   }
   // ix is between 0 and 2
   // so this is between 1 and 3
   int arr_at_ix = arr[ix];
   int write_ix;
-  if(write_ix) {
+  if(write_ix)
+  {
     write_ix = 0;
-  } else {
+  }
+  else
+  {
     write_ix = 1;
   }
   arr[write_ix] = 4;
