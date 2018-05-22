@@ -239,7 +239,7 @@ void remove_function_pointerst::fix_return_type(
   symbolt &tmp_symbol = get_fresh_aux_symbol(
     code_type.return_type(),
     id2string(function_call.source_location().get_function()),
-    "tmp_return_val",
+    "tmp_return_val_" + id2string(function_symbol.base_name),
     function_call.source_location(),
     function_symbol.mode,
     symbol_table);
