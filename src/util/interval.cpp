@@ -279,7 +279,7 @@ constant_interval_exprt constant_interval_exprt::left_shift(const constant_inter
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constant_binary_expression(o, ID_shl);
+    return handle_constant_binary_expression(o, ID_shl);
   }
 
   if(is_negative(o.get_lower()))
@@ -295,7 +295,7 @@ constant_interval_exprt constant_interval_exprt::right_shift(const constant_inte
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constant_binary_expression(o, ID_ashr);
+    return handle_constant_binary_expression(o, ID_ashr);
   }
 
   if(is_negative(o.get_lower()))
@@ -310,7 +310,7 @@ constant_interval_exprt constant_interval_exprt::bitwise_xor(const constant_inte
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constant_binary_expression(o, ID_bitxor);
+    return handle_constant_binary_expression(o, ID_bitxor);
   }
 
   return top();
@@ -320,7 +320,7 @@ constant_interval_exprt constant_interval_exprt::bitwise_or(const constant_inter
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constant_binary_expression(o, ID_bitor);
+    return handle_constant_binary_expression(o, ID_bitor);
   }
 
   return top();
@@ -330,7 +330,7 @@ constant_interval_exprt constant_interval_exprt::bitwise_and(const constant_inte
 {
   if(o.is_single_value_interval() && is_single_value_interval())
   {
-    handle_constant_binary_expression(o, ID_bitand);
+    return handle_constant_binary_expression(o, ID_bitand);
   }
 
   return top();
@@ -340,7 +340,7 @@ constant_interval_exprt constant_interval_exprt::bitwise_not() const
 {
   if(is_single_value_interval())
   {
-    handle_constant_unary_expression(ID_bitnot);
+    return handle_constant_unary_expression(ID_bitnot);
   }
 
   return top();
