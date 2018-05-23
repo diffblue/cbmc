@@ -22,7 +22,7 @@ typedef struct
 
 int main()
 {
-  Struct3 *p = malloc (sizeof (int) + 2 * sizeof(Union));
+  Struct3 *p = malloc(sizeof(Struct3) + sizeof(Union));
   p->Count = 3;
   int po=0;
 

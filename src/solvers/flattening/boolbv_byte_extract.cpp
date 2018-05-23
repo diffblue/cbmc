@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
 #include <util/throw_with_nested.h>
 
@@ -78,6 +79,30 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   if(width==0)
     return conversion_failed(expr);
 
+  // see if the byte number is constant and within bounds, else work from the
+  // root object
+  const mp_integer op_bytes = pointer_offset_size(expr.op().type(), ns);
+  auto index = numeric_cast<mp_integer>(expr.offset());
+  if(
+    (!index.has_value() || (*index < 0 || *index >= op_bytes)) &&
+    (expr.op().id() == ID_member || expr.op().id() == ID_index ||
+     expr.op().id() == ID_byte_extract_big_endian ||
+     expr.op().id() == ID_byte_extract_little_endian))
+  {
+    object_descriptor_exprt o;
+    o.build(expr.op(), ns);
+    CHECK_RETURN(o.offset().id() != ID_unknown);
+    if(o.offset().type() != expr.offset().type())
+      o.offset().make_typecast(expr.offset().type());
+    byte_extract_exprt be(
+      expr.id(),
+      o.root_object(),
+      plus_exprt(o.offset(), expr.offset()),
+      expr.type());
+
+    return convert_bv(be);
+  }
+
   const exprt &op=expr.op();
   const exprt &offset=expr.offset();
 
@@ -106,13 +131,12 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   // see if the byte number is constant
   unsigned byte_width=8;
 
-  mp_integer index;
-  if(!to_integer(offset, index))
+  if(index.has_value())
   {
-    if(index<0)
+    if(*index < 0)
       throw "byte_extract flatting with negative offset: "+expr.pretty();
 
-    mp_integer offset=index*byte_width;
+    const mp_integer offset = *index * byte_width;
 
     std::size_t offset_i=integer2unsigned(offset);
 
