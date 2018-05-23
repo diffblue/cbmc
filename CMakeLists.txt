@@ -34,14 +34,15 @@ set(sat_impl "minisat2" CACHE STRING
     "This setting controls the SAT library which is used. Valid values are 'minisat2' and 'glucose'"
 )
 
-add_subdirectory(src)
-add_subdirectory(jbmc)
-
 if(${enable_cbmc_tests})
     enable_testing()
 endif()
-add_subdirectory(unit)
+
+add_subdirectory(src)
 add_subdirectory(regression)
+add_subdirectory(unit)
+
+add_subdirectory(jbmc)
 
 set_target_properties(
     analyses
