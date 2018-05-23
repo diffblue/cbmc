@@ -8,6 +8,7 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
+#include <testing-utils/message.h>
 #include <java-testing-utils/load_java_class.h>
 
 #include <goto-programs/goto_convert_functions.h>
@@ -84,9 +85,8 @@ TEST_CASE(
     journalling_symbol_tablet symbol_table =
       journalling_symbol_tablet::wrap(raw_symbol_table);
 
-    null_message_handlert null_output;
     goto_functionst functions;
-    goto_convert(symbol_table, functions, null_output);
+    goto_convert(symbol_table, functions, null_message_handler);
 
     const std::string function_name = "java::Main.replaceNondet:()V";
     goto_functionst::goto_functiont &goto_function =

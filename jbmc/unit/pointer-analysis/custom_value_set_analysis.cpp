@@ -7,6 +7,7 @@ Author: Chris Smowton, chris@smowton.net
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
+#include <testing-utils/message.h>
 
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
@@ -170,7 +171,6 @@ SCENARIO("test_value_set_analysis",
   {
     config.set_arch("none");
     config.main = "";
-    null_message_handlert null_output;
     cmdlinet command_line;
 
     // This classpath is the default, but the config object
@@ -181,8 +181,8 @@ SCENARIO("test_value_set_analysis",
 
     register_language(new_java_bytecode_language);
 
-    goto_modelt goto_model=
-      initialize_goto_model(command_line, null_output);
+    goto_modelt goto_model =
+      initialize_goto_model(command_line, null_message_handler);
 
     null_message_handlert message_handler;
     remove_java_new(goto_model, message_handler);
@@ -191,7 +191,7 @@ SCENARIO("test_value_set_analysis",
 
     // Fully inline the test program, to avoid VSA conflating
     // constructor callsites confusing the results we're trying to check:
-    goto_function_inline(goto_model, TEST_FUNCTION_NAME, null_output);
+    goto_function_inline(goto_model, TEST_FUNCTION_NAME, null_message_handler);
 
     const goto_programt &test_function=
       goto_model.goto_functions.function_map.at(TEST_PREFIX "test:()V").body;

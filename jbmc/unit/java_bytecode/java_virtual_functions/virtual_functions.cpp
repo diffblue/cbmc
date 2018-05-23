@@ -7,6 +7,7 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
+#include <testing-utils/message.h>
 #include <java-testing-utils/load_java_class.h>
 
 #include <goto-programs/goto_convert_functions.h>
@@ -53,9 +54,8 @@ SCENARIO(
     WHEN("The entry point function is generated")
     {
       symbol_tablet new_table(symbol_table);
-      null_message_handlert null_output;
       goto_functionst new_goto_functions;
-      goto_convert(new_table, new_goto_functions, null_output);
+      goto_convert(new_table, new_goto_functions, null_message_handler);
       remove_virtual_functions(new_table, new_goto_functions);
 
       bool found_function = false;
@@ -129,7 +129,7 @@ SCENARIO(
         options.set_option("cover", "location");
         REQUIRE_FALSE(
           instrument_cover_goals(
-            options, new_table, new_goto_functions, null_output));
+            options, new_table, new_goto_functions, null_message_handler));
 
         auto function = new_goto_functions.function_map.find(function_name);
         REQUIRE(function != new_goto_functions.function_map.end());
