@@ -16,6 +16,7 @@ Date: February 2016
 
 class goto_modelt;
 
-void code_contracts(goto_modelt &);
+void apply_code_contracts(goto_modelt &);
+void check_code_contracts(goto_modelt &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_CODE_CONTRACTS_H
