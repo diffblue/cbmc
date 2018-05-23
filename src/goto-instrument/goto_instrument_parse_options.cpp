@@ -1046,11 +1046,17 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
   }
 
-  // verify and set invariants and pre/post-condition pairs
   if(cmdline.isset("apply-code-contracts"))
   {
     status() << "Applying Code Contracts" << eom;
-    code_contracts(goto_model);
+    apply_code_contracts(goto_model);
+  }
+
+  // verify and set invariants and pre/post-condition pairs
+  if(cmdline.isset("check-code-contracts"))
+  {
+    status() << "Checking Code Contracts" << eom;
+    check_code_contracts(goto_model);
   }
 
   // replace function pointers, if explicitly requested

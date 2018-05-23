@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --apply-code-contracts
 ^EXIT=0$
@@ -6,4 +6,3 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 --
-Applying code contracts currently also checks them.
