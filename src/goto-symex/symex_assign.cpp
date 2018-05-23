@@ -13,7 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/byte_operators.h>
 #include <util/cprover_prefix.h>
-
+#include <util/expr_util.h>
+#include <util/invariant.h>
 #include <util/c_types.h>
 
 #include "goto_symex_state.h"
@@ -28,6 +29,19 @@ void goto_symext::symex_assign(
   exprt rhs=code.rhs();
 
   clean_expr(lhs, state, true);
+  // make the structure of the lhs as simple as possible to avoid,
+  // e.g., (b ? s1 : s2).member=X resulting in
+  // (b ? s1 : s2)=(b ? s1 : s2) with member:=X and then
+  // s1=b ? ((b ? s1 : s2) with member:=X) : s1
+  // when all we need is
+  // s1=s1 with member:=X [and guard b]
+  // s2=s2 with member:=X [and guard !b]
+  do_simplify(lhs);
+  // make sure simplify has not re-introduced any dereferencing that
+  // had previously been cleaned away
+  INVARIANT(
+    !has_subexpr(lhs, ID_dereference),
+    "simplify re-introduced dereferencing");
   clean_expr(rhs, state, false);
 
   if(rhs.id()==ID_side_effect)
