@@ -32,8 +32,9 @@ pointer_typet select_pointer_typet::convert_pointer_type(
   // a generic parameter, specialize it with concrete types
   if(!generic_parameter_specialization_map.empty())
   {
+    generic_parameter_recursion_trackingt visited;
     return specialize_generics(
-      pointer_type, generic_parameter_specialization_map);
+      pointer_type, generic_parameter_specialization_map, visited);
   }
   else
   {
@@ -62,7 +63,8 @@ pointer_typet select_pointer_typet::convert_pointer_type(
 pointer_typet select_pointer_typet::specialize_generics(
   const pointer_typet &pointer_type,
   const generic_parameter_specialization_mapt
-    &generic_parameter_specialization_map) const
+    &generic_parameter_specialization_map,
+  generic_parameter_recursion_trackingt &visited_nodes) const
 {
   if(is_java_generic_parameter(pointer_type))
   {
@@ -80,12 +82,21 @@ pointer_typet select_pointer_typet::specialize_generics(
     const pointer_typet &type =
       generic_parameter_specialization_map.find(parameter_name)->second.back();
 
+    // if we have already seen this before, we will not learn any additional
+    // information from further recursion, only cause a segmentation fault.
+    if(visited_nodes.find(parameter_name) != visited_nodes.end())
+    {
+      throw "no infinite recursion";
+    }
+
+    visited_nodes.insert(parameter_name);
+
     // generic parameters can be adopted from outer classes or superclasses so
     // we may need to search for the concrete type recursively
     return is_java_generic_parameter(type)
              ? specialize_generics(
                  to_java_generic_parameter(type),
-                 generic_parameter_specialization_map)
+                 generic_parameter_specialization_map, visited_nodes)
              : type;
   }
   else if(pointer_type.subtype().id() == ID_symbol)
@@ -99,7 +110,7 @@ pointer_typet select_pointer_typet::specialize_generics(
       {
         const pointer_typet &new_array_type = specialize_generics(
           to_pointer_type(array_element_type),
-          generic_parameter_specialization_map);
+          generic_parameter_specialization_map, visited_nodes);
 
         pointer_typet replacement_array_type = java_array_type('a');
         replacement_array_type.subtype().set(ID_C_element_type, new_array_type);

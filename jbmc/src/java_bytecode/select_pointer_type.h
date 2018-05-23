@@ -19,6 +19,7 @@
 
 typedef std::unordered_map<irep_idt, std::vector<reference_typet>>
   generic_parameter_specialization_mapt;
+typedef std::set<irep_idt> generic_parameter_recursion_trackingt;
 
 class namespacet;
 
@@ -35,7 +36,8 @@ public:
   pointer_typet specialize_generics(
     const pointer_typet &pointer_type,
     const generic_parameter_specialization_mapt
-      &generic_parameter_specialization_map) const;
+      &generic_parameter_specialization_map,
+    generic_parameter_recursion_trackingt &) const;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_SELECT_POINTER_TYPE_H
