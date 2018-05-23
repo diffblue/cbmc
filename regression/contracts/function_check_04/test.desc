@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --apply-code-contracts
 ^\[main.assertion.1\] assertion x == 0: SUCCESS$
