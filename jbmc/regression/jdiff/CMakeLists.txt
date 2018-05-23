@@ -1,3 +1,3 @@
 add_test_pl_tests(
-    "$<TARGET_FILE:goto-diff>"
+    "$<TARGET_FILE:jdiff>"
 )
