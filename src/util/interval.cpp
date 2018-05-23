@@ -220,6 +220,18 @@ tvt constant_interval_exprt::is_definitely_true() const
 
 tvt constant_interval_exprt::is_definitely_false() const
 {
+  if(type().id() == ID_bool)
+  {
+    if(is_single_value_interval())
+    {
+      return tvt(get_lower() == false_exprt());
+    }
+    else
+    {
+      return tvt::unknown();
+    }
+  }
+
   if(equal(constant_interval_exprt(zero())).is_true())
   {
     return tvt(true);
@@ -821,8 +833,7 @@ constant_interval_exprt constant_interval_exprt::eval(const irep_idt &id)
   }
   if(id == ID_not)
   {
-    //return logical_not();
-    return top();
+    return tvt_to_interval(logical_not());
   }
 
   return top();
@@ -1956,4 +1967,20 @@ tvt constant_interval_exprt::logical_xor(
 tvt constant_interval_exprt::logical_not(const constant_interval_exprt &a)
 {
   return a.logical_not();
+}
+
+constant_interval_exprt constant_interval_exprt::tvt_to_interval(const tvt &val)
+{
+  if(val.is_true())
+  {
+    return constant_interval_exprt(true_exprt());
+  }
+  else if(val.is_false())
+  {
+    return constant_interval_exprt(false_exprt());
+  }
+  else
+  {
+    return constant_interval_exprt(bool_typet());
+  }
 }

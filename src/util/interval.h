@@ -85,6 +85,8 @@ public:
   {
   }
 
+  static constant_interval_exprt tvt_to_interval(const tvt &val);
+
   /* Naming scheme
    *      is_[X]?  Returns bool / tvt
    *      get_[X]? Returns relevant object
