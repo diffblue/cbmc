@@ -35,4 +35,31 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
       REQUIRE(bool_top_interval.eval(ID_not) == bool_top_interval);
     }
   }
+
+  WHEN("Unary operations to an interval")
+  {
+    constant_interval_exprt five =
+      constant_interval_exprt(from_integer(5, signedbv_typet(32)));
+
+    THEN("When we apply unary addition to it, nothing should happen")
+    {
+      REQUIRE(five.eval(ID_unary_plus) == five);
+    }
+
+    THEN("When we apply unary subtraction to it, it should be negated")
+    {
+      auto negated_val =
+        numeric_cast<mp_integer>(five.eval(ID_unary_minus).get_lower());
+      REQUIRE(negated_val.has_value());
+      REQUIRE(negated_val.value() == -5);
+    }
+
+    THEN("When we apply bitwise negation to it, is should be bitwise negated")
+    {
+      auto bitwise_negated_val =
+        numeric_cast<mp_integer>(five.eval(ID_bitnot).get_lower());
+      REQUIRE(bitwise_negated_val.has_value());
+      REQUIRE(bitwise_negated_val.value() == (~5));
+    }
+  }
 }
