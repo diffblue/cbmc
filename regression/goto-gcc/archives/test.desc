@@ -3,7 +3,7 @@ CORE
 main.c -L. -lour_archive --verbosity
 ^EXIT=0$
 ^SIGNAL=0$
-^Reading: .*/foo.o$
+^Reading GOTO program from file .*/foo.o$
 --
 ^warning: ignoring
 ^CONVERSION ERROR$

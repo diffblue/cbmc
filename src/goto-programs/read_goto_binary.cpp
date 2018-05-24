@@ -271,13 +271,13 @@ bool is_goto_binary(
 /// \param dest: the goto model returned
 /// \param message_handler: for diagnostics
 /// \return true on error, false otherwise
-bool read_object_and_link(
+static bool read_object_and_link(
   const std::string &file_name,
   goto_modelt &dest,
   message_handlert &message_handler)
 {
-  messaget(message_handler).statistics() << "Reading: "
-                                         << file_name << messaget::eom;
+  messaget(message_handler).status()
+    << "Reading GOTO program from file " << file_name << messaget::eom;
 
   // we read into a temporary model
   auto temp_model = read_goto_binary(file_name, message_handler);
@@ -293,36 +293,27 @@ bool read_object_and_link(
     return true;
   }
 
+  return false;
+}
+
+bool read_objects_and_link(
+  const std::list<std::string> &file_names,
+  goto_modelt &dest,
+  message_handlert &message_handler)
+{
+  if(file_names.empty())
+    return false;
+
+  for(const auto &file_name : file_names)
+  {
+    const bool failed = read_object_and_link(file_name, dest, message_handler);
+
+    if(failed)
+      return true;
+  }
+
   // reading successful, let's update config
   config.set_from_symbol_table(dest.symbol_table);
 
   return false;
-}
-
-/// \brief reads an object file, and also updates the config
-/// \param file_name: file name of the goto binary
-/// \param dest_symbol_table: symbol table to update
-/// \param dest_functions: collection of goto functions to update
-/// \param message_handler: for diagnostics
-/// \return true on error, false otherwise
-bool read_object_and_link(
-  const std::string &file_name,
-  symbol_tablet &dest_symbol_table,
-  goto_functionst &dest_functions,
-  message_handlert &message_handler)
-{
-  goto_modelt goto_model;
-
-  goto_model.symbol_table.swap(dest_symbol_table);
-  goto_model.goto_functions.swap(dest_functions);
-
-  bool result=read_object_and_link(
-    file_name,
-    goto_model,
-    message_handler);
-
-  goto_model.symbol_table.swap(dest_symbol_table);
-  goto_model.goto_functions.swap(dest_functions);
-
-  return result;
 }
