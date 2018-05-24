@@ -41,7 +41,7 @@ SCENARIO(
       {
         REQUIRE(parse_tree);
         REQUIRE(parse_tree->loading_successful);
-        const java_bytecode_parse_treet::classt parsed_class =
+        const java_bytecode_parse_treet::classt &parsed_class =
           parse_tree->parsed_class;
         REQUIRE(parsed_class.attribute_bootstrapmethods_read);
         REQUIRE(parsed_class.lambda_method_handle_map.size() == 12);
@@ -352,7 +352,7 @@ SCENARIO(
         {
           REQUIRE(parse_tree);
           REQUIRE(parse_tree->loading_successful);
-          const java_bytecode_parse_treet::classt parsed_class =
+          const java_bytecode_parse_treet::classt &parsed_class =
             parse_tree->parsed_class;
           REQUIRE(parsed_class.attribute_bootstrapmethods_read);
           REQUIRE(parsed_class.lambda_method_handle_map.size() == 12);
@@ -661,7 +661,7 @@ SCENARIO(
         {
           REQUIRE(parse_tree);
           REQUIRE(parse_tree->loading_successful);
-          const java_bytecode_parse_treet::classt parsed_class =
+          const java_bytecode_parse_treet::classt &parsed_class =
             parse_tree->parsed_class;
           REQUIRE(parsed_class.attribute_bootstrapmethods_read);
           REQUIRE(parsed_class.lambda_method_handle_map.size() == 12);
@@ -996,7 +996,7 @@ SCENARIO(
         {
           REQUIRE(parse_tree);
           REQUIRE(parse_tree->loading_successful);
-          const java_bytecode_parse_treet::classt parsed_class =
+          const java_bytecode_parse_treet::classt &parsed_class =
             parse_tree->parsed_class;
           REQUIRE(parsed_class.attribute_bootstrapmethods_read);
           REQUIRE(parsed_class.lambda_method_handle_map.size() == 3);

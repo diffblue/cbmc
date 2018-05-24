@@ -1702,7 +1702,7 @@ java_bytecode_parse(std::istream &istream, message_handlert &message_handler)
     return {};
   }
 
-  return java_bytecode_parser.parse_tree;
+  return std::move(java_bytecode_parser.parse_tree);
 }
 
 optionalt<class java_bytecode_parse_treet>
