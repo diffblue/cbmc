@@ -43,8 +43,8 @@ interval_abstract_valuet::interval_abstract_valuet(typet t, bool tp, bool bttm):
 {}
 
 interval_abstract_valuet::interval_abstract_valuet(
-  const constant_interval_exprt e):
-    abstract_valuet(e.type(), e.is_top(), e.is_bottom()), interval(e)
+  const constant_interval_exprt e)
+  : interval_abstract_valuet(e, 0)
 {
 
 }
@@ -148,8 +148,11 @@ abstract_object_pointert interval_abstract_valuet::merge_intervals(
   {
     return std::make_shared<interval_abstract_valuet>(
       constant_interval_exprt(
-        constant_interval_exprt::get_min(interval.get_lower(), other->interval.get_lower()),
-        constant_interval_exprt::get_max(interval.get_upper(), other->interval.get_upper())));
+        constant_interval_exprt::get_min(
+          interval.get_lower(), other->interval.get_lower()),
+        constant_interval_exprt::get_max(
+          interval.get_upper(), other->interval.get_upper())),
+      std::max(merge_count, other->merge_count) + 1);
   }
 }
 
@@ -157,3 +160,12 @@ interval_abstract_valuet::interval_abstract_valuet(const exprt e, const abstract
                                                    const namespacet &ns)
   : interval_abstract_valuet(make_interval_expr(e))
 {}
+
+interval_abstract_valuet::interval_abstract_valuet(
+  constant_interval_exprt e,
+  int merge_count)
+  : abstract_valuet(e.type(), e.is_top() || merge_count > 10, e.is_bottom()),
+    interval(e),
+    merge_count(merge_count)
+{
+}

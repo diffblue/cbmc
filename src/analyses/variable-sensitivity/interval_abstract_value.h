@@ -25,6 +25,8 @@ public:
   explicit interval_abstract_valuet(typet t);
   interval_abstract_valuet(typet t, bool tp, bool bttm);
 
+  explicit interval_abstract_valuet(constant_interval_exprt e, int merge_count);
+
   interval_abstract_valuet(
     const constant_interval_exprt e);
 
@@ -58,6 +60,8 @@ private :
     interval_abstract_value_pointert other) const;
 
   constant_interval_exprt interval;
+
+  int merge_count;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ABSTRACT_VALUE_H
