@@ -29,6 +29,11 @@ public:
 
   virtual ~constant_abstract_valuet() {}
 
+  virtual abstract_object_pointert expression_transform(
+    const exprt &expr,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
+
   virtual exprt to_constant() const override;
 
   virtual void output(
@@ -40,6 +45,11 @@ protected:
   CLONE
   virtual abstract_object_pointert merge(
     abstract_object_pointert other) const override;
+
+  abstract_object_pointert try_transform_expr_with_all_rounding_modes(
+    const exprt &expr,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
 
 private :
   abstract_object_pointert merge_constant_constant(
