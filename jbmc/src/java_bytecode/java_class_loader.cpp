@@ -133,7 +133,7 @@ java_class_loadert::get_parse_tree(
     optionalt<java_bytecode_parse_treet> parse_tree =
       get_class_from_jar(class_name, jar_file, *index, class_loader_limit);
     if(parse_tree)
-      parse_trees.push_back(std::move(*parse_tree));
+      parse_trees.emplace_back(std::move(*parse_tree));
   }
 
   // Then add core models
@@ -153,7 +153,7 @@ java_class_loadert::get_parse_tree(
       optionalt<java_bytecode_parse_treet> parse_tree =
         get_class_from_jar(class_name, core_models, *index, class_loader_limit);
       if(parse_tree)
-        parse_trees.push_back(std::move(*parse_tree));
+        parse_trees.emplace_back(std::move(*parse_tree));
     }
   }
 
@@ -168,7 +168,7 @@ java_class_loadert::get_parse_tree(
       optionalt<java_bytecode_parse_treet> parse_tree =
         get_class_from_jar(class_name, cp_entry, *index, class_loader_limit);
       if(parse_tree)
-        parse_trees.push_back(std::move(*parse_tree));
+        parse_trees.emplace_back(std::move(*parse_tree));
     }
     else
     {
@@ -192,7 +192,7 @@ java_class_loadert::get_parse_tree(
         optionalt<java_bytecode_parse_treet> parse_tree =
           java_bytecode_parse(full_path, get_message_handler());
         if(parse_tree)
-          parse_trees.push_back(std::move(*parse_tree));
+          parse_trees.emplace_back(std::move(*parse_tree));
       }
     }
   }
