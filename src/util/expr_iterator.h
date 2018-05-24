@@ -9,6 +9,7 @@
 #ifndef CPROVER_UTIL_EXPR_ITERATOR_H
 #define CPROVER_UTIL_EXPR_ITERATOR_H
 
+#include <deque>
 #include <iterator>
 #include <functional>
 #include <set>
@@ -39,7 +40,7 @@ class const_unique_depth_iteratort;
 /// Helper class for depth_iterator_baset
 struct depth_iterator_expr_statet final
 {
-  typedef std::vector<exprt>::const_iterator operands_iteratort;
+  typedef exprt::operandst::const_iterator operands_iteratort;
   inline depth_iterator_expr_statet(
     const exprt &expr,
     operands_iteratort it,
@@ -213,7 +214,7 @@ protected:
   }
 
 private:
-  std::vector<depth_iterator_expr_statet> m_stack;
+  std::deque<depth_iterator_expr_statet> m_stack;
 
   depth_iterator_t &downcast()
   { return static_cast<depth_iterator_t &>(*this); }
