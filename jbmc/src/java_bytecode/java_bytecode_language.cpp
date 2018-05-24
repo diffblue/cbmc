@@ -299,7 +299,7 @@ static symbol_exprt get_or_create_class_literal_symbol(
 {
   symbol_typet java_lang_Class("java::java.lang.Class");
   symbol_exprt symbol_expr(
-    id2string(class_id)+"@class_model",
+    id2string(class_id) + JAVA_CLASS_MODEL_SUFFIX,
     java_lang_Class);
   if(!symbol_table.has_symbol(symbol_expr.get_identifier()))
   {
@@ -785,7 +785,8 @@ bool java_bytecode_languaget::generate_support_functions(
       get_message_handler(),
       assume_inputs_non_null,
       object_factory_parameters,
-      get_pointer_type_selector());
+      get_pointer_type_selector(),
+      string_refinement_enabled);
 }
 
 /// Uses a simple context-insensitive ('ci') analysis to determine which methods

@@ -265,6 +265,9 @@ void java_bytecode_convert_classt::convert(
   class_type.set_tag(c.name);
   class_type.set(ID_base_name, c.name);
   class_type.set(ID_abstract, c.is_abstract);
+  class_type.set(ID_is_annotation, c.is_annotation);
+  class_type.set(ID_interface, c.is_interface);
+  class_type.set(ID_synthetic, c.is_synthetic);
   class_type.set_final(c.is_final);
   if(c.is_enum)
   {

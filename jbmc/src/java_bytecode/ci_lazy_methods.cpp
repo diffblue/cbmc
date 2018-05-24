@@ -13,6 +13,7 @@
 #include "java_string_library_preprocess.h"
 #include "remove_exceptions.h"
 
+#include <util/expr_iterator.h>
 #include <util/suffix.h>
 
 #include <goto-programs/resolve_inherited_component.h>
@@ -50,6 +51,31 @@ ci_lazy_methodst::ci_lazy_methodst(
 {
   // build the class hierarchy
   class_hierarchy(symbol_table);
+}
+
+/// Checks if an expression refers to any class literals (e.g. MyType.class)
+/// These are expressed as ldc instructions in Java bytecode, and as symbols
+/// of the form `MyType@class_model` in GOTO programs.
+/// \param expr: expression to check
+/// \return true if the expression or any of its subexpressions refer to a
+///   class
+static bool references_class_model(const exprt &expr)
+{
+  static const symbol_typet class_type("java::java.lang.Class");
+
+  for(auto it = expr.depth_begin(); it != expr.depth_end(); ++it)
+  {
+    if(can_cast_expr<symbol_exprt>(*it) &&
+       it->type() == class_type &&
+       has_suffix(
+         id2string(to_symbol_expr(*it).get_identifier()),
+         JAVA_CLASS_MODEL_SUFFIX))
+    {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /// Uses a simple context-insensitive ('ci') analysis to determine which methods
@@ -122,6 +148,7 @@ bool ci_lazy_methodst::operator()(
 
   std::unordered_set<irep_idt> methods_already_populated;
   std::unordered_set<exprt, irep_hash> virtual_function_calls;
+  bool class_initializer_seen = false;
 
   bool any_new_classes = true;
   while(any_new_classes)
@@ -149,8 +176,19 @@ bool ci_lazy_methodst::operator()(
           // Couldn't convert this function
           continue;
         }
-        gather_virtual_callsites(
-          symbol_table.lookup_ref(mname).value, virtual_function_calls);
+        const exprt &method_body = symbol_table.lookup_ref(mname).value;
+
+        gather_virtual_callsites(method_body, virtual_function_calls);
+
+        if(!class_initializer_seen && references_class_model(method_body))
+        {
+          class_initializer_seen = true;
+          irep_idt initializer_signature =
+            get_java_class_literal_initializer_signature();
+          if(symbol_table.has_symbol(initializer_signature))
+            methods_to_convert_later.insert(initializer_signature);
+        }
+
         any_new_methods=true;
       }
     }

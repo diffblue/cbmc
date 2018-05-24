@@ -68,6 +68,8 @@ enum lazy_methods_modet
   LAZY_METHODS_MODE_EXTERNAL_DRIVER
 };
 
+#define JAVA_CLASS_MODEL_SUFFIX "@class_model"
+
 class java_bytecode_languaget:public languaget
 {
 public:
