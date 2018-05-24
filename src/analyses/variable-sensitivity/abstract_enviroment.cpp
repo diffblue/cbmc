@@ -651,9 +651,13 @@ bool abstract_environmentt::verify() const
 abstract_object_pointert abstract_environmentt::eval_expression(
   const exprt &e, const namespacet &ns) const
 {
-  // Delegate responsibility of resolving to a boolean abstract object
-  // to the abstract object being compared against
-  abstract_object_pointert eval_obj=abstract_object_factory(e.type(), e, ns);
+  // We create a temporary top abstract object (according to the
+  // type of the expression), and call expression transform on it.
+  // The value of the temporary abstract object is ignored, its
+  // purpose is just to dispatch the expression transform call to
+  // a concrete subtype of abstract_objectt.
+  abstract_object_pointert eval_obj=abstract_object_factory(
+    e.type(), ns, true);
   return eval_obj->expression_transform(e, *this, ns);
 }
 
