@@ -269,11 +269,13 @@ bool is_goto_binary(
 /// \brief reads an object file, and also updates config
 /// \param file_name: file name of the goto binary
 /// \param dest: the goto model returned
+/// \param [out] object_type_updates: collects type replacements to be applied
 /// \param message_handler: for diagnostics
 /// \return true on error, false otherwise
 static bool read_object_and_link(
   const std::string &file_name,
   goto_modelt &dest,
+  unchecked_replace_symbolt &object_type_updates,
   message_handlert &message_handler)
 {
   messaget(message_handler).status()
@@ -286,7 +288,7 @@ static bool read_object_and_link(
 
   try
   {
-    link_goto_model(dest, *temp_model, message_handler);
+    link_goto_model(dest, *temp_model, object_type_updates, message_handler);
   }
   catch(...)
   {
@@ -304,13 +306,18 @@ bool read_objects_and_link(
   if(file_names.empty())
     return false;
 
+  unchecked_replace_symbolt object_type_updates;
+
   for(const auto &file_name : file_names)
   {
-    const bool failed = read_object_and_link(file_name, dest, message_handler);
+    const bool failed = read_object_and_link(
+      file_name, dest, object_type_updates, message_handler);
 
     if(failed)
       return true;
   }
+
+  finalize_linking(dest, object_type_updates);
 
   // reading successful, let's update config
   config.set_from_symbol_table(dest.symbol_table);
