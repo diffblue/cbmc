@@ -15,6 +15,7 @@ Author:
 
 #include <util/config.h>
 #include <util/message.h>
+#include <util/replace_symbol.h>
 #include <util/tempfile.h>
 
 #ifdef _MSC_VER
@@ -270,8 +271,8 @@ bool is_goto_binary(
 /// \param file_name: file name of the goto binary
 /// \param dest: the goto model returned
 /// \param message_handler: for diagnostics
-/// \return true on error, false otherwise
-static bool read_object_and_link(
+/// \return nullopt on error, type replacements to be applied otherwise
+static optionalt<replace_symbolt::expr_mapt> read_object_and_link(
   const std::string &file_name,
   goto_modelt &dest,
   message_handlert &message_handler)
@@ -282,18 +283,9 @@ static bool read_object_and_link(
   // we read into a temporary model
   auto temp_model = read_goto_binary(file_name, message_handler);
   if(!temp_model.has_value())
-    return true;
+    return {};
 
-  try
-  {
-    link_goto_model(dest, *temp_model, message_handler);
-  }
-  catch(...)
-  {
-    return true;
-  }
-
-  return false;
+  return link_goto_model(dest, std::move(*temp_model), message_handler);
 }
 
 bool read_objects_and_link(
@@ -304,13 +296,18 @@ bool read_objects_and_link(
   if(file_names.empty())
     return false;
 
+  replace_symbolt::expr_mapt object_type_updates;
+
   for(const auto &file_name : file_names)
   {
-    const bool failed = read_object_and_link(file_name, dest, message_handler);
-
-    if(failed)
+    auto updates_opt = read_object_and_link(file_name, dest, message_handler);
+    if(!updates_opt.has_value())
       return true;
+
+    object_type_updates.insert(updates_opt->begin(), updates_opt->end());
   }
+
+  finalize_linking(dest, object_type_updates);
 
   // reading successful, let's update config
   config.set_from_symbol_table(dest.symbol_table);
