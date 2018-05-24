@@ -17,6 +17,11 @@ public class GenericFunctions
 
   }
 
+  public static <T extends java.lang.Number> void processUpperBoundClass2(T x)
+  {
+
+  }
+
   public static <T extends Interface_Implementation & Interface> void processDoubleUpperBoundClass(Generic<T> x)
   {
 

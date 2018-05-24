@@ -8,6 +8,9 @@ public class BoundedGenericInnerClasses
   class BoundedInner<NUM extends java.lang.Number>
   {
     NUM elem;
+
+    public void f(NUM x) {
+    }
   }
 
   BoundedInner<Integer> belem;

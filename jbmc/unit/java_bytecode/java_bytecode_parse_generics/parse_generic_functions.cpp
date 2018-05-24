@@ -41,12 +41,8 @@ SCENARIO(
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
-        THEN("x is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_x.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -72,18 +68,8 @@ SCENARIO(
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
-        THEN("x is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_x.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; extend tests when fixed -
-            // issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -109,18 +95,35 @@ SCENARIO(
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
-        THEN("x is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_x.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
+      }
+    }
+  }
 
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; extend tests when fixed -
-            // issue TG-1286
-          }
-        }
+  WHEN("Parsing processUpperBoundClass2")
+  {
+    THEN("There should be a symbol for the function")
+    {
+      const std::string func_name = ".processUpperBoundClass2";
+      const std::string func_descriptor = ":(Ljava/lang/Number;)V";
+      const std::string process_func_name =
+        class_prefix + func_name + func_descriptor;
+
+      REQUIRE(new_symbol_table.has_symbol(process_func_name));
+      const symbolt func_symbol =
+        new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
+      THEN("It contains parameter x pointing to java.lang.Number")
+      {
+        const code_typet::parametert &param_x =
+          require_type::require_parameter(func_code, "x");
+        require_type::require_pointer(
+          param_x.type(), symbol_typet("java::java.lang.Number"));
+
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -146,18 +149,8 @@ SCENARIO(
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
-        THEN("x is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_x.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; extend the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -183,18 +176,8 @@ SCENARIO(
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
-        THEN("x is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_x.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; extend the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -221,12 +204,8 @@ SCENARIO(
         require_type::require_pointer(
           param_t.type(), symbol_typet("java::Generic"));
 
-        THEN("t is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_t.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
       THEN("It contains parameter u pointing to Generic")
       {
@@ -235,12 +214,8 @@ SCENARIO(
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
-        THEN("u is generic with type variable U")
-        {
-          require_type::require_java_generic_type(
-            param_u.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -267,18 +242,8 @@ SCENARIO(
         require_type::require_pointer(
           param_t.type(), symbol_typet("java::Generic"));
 
-        THEN("t is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_t.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; extend the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
       THEN("It contains parameter u pointing to Generic")
       {
@@ -287,18 +252,8 @@ SCENARIO(
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
-        THEN("u is generic with type variable U")
-        {
-          require_type::require_java_generic_type(
-            param_u.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; extend the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -323,12 +278,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -353,11 +304,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::java.lang.Object"));
 
-        THEN("It is the generic parameter T")
-        {
-          require_type::require_java_generic_parameter(
-            func_code.return_type(), class_prefix + "::T");
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -380,18 +328,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -415,18 +353,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -450,18 +378,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -485,18 +403,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -524,12 +432,8 @@ SCENARIO(
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
-        THEN("x is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_x.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
 
       THEN("It has return type pointing to Generic")
@@ -537,12 +441,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -569,18 +469,8 @@ SCENARIO(
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
-        THEN("x is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_x.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
 
       THEN("It has return type pointing to Generic")
@@ -588,18 +478,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -626,18 +506,8 @@ SCENARIO(
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
-        THEN("x is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_x.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
 
       THEN("It has return type pointing to Generic")
@@ -645,18 +515,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -683,18 +543,8 @@ SCENARIO(
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
-        THEN("x is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_x.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; extend the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
 
       THEN("It has return type pointing to Generic")
@@ -702,18 +552,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -741,18 +581,8 @@ SCENARIO(
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
-        THEN("x is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            param_x.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; extend the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
 
       THEN("It has return type pointing to Generic")
@@ -760,18 +590,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -798,12 +618,8 @@ SCENARIO(
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
-        THEN("u is generic with type variable U")
-        {
-          require_type::require_java_generic_type(
-            param_u.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
 
       THEN("It has return type pointing to Generic")
@@ -811,12 +627,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -843,18 +655,8 @@ SCENARIO(
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
-        THEN("u is generic with type variable U")
-        {
-          require_type::require_java_generic_type(
-            param_u.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
 
       THEN("It has return type pointing to Generic")
@@ -862,18 +664,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -900,12 +692,8 @@ SCENARIO(
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
-        THEN("u is generic with type variable U")
-        {
-          require_type::require_java_generic_type(
-            param_u.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
 
       THEN("It contains parameter v pointing to Generic")
@@ -915,12 +703,8 @@ SCENARIO(
         require_type::require_pointer(
           param_v.type(), symbol_typet("java::Generic"));
 
-        THEN("v is generic with type variable V")
-        {
-          require_type::require_java_generic_type(
-            param_v.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::V"}});
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
 
       THEN("It has return type pointing to Generic")
@@ -928,12 +712,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
@@ -960,18 +740,8 @@ SCENARIO(
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
-        THEN("u is generic with type variable U")
-        {
-          require_type::require_java_generic_type(
-            param_u.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
 
       THEN("It contains parameter v pointing to Generic")
@@ -981,18 +751,8 @@ SCENARIO(
         require_type::require_pointer(
           param_v.type(), symbol_typet("java::Generic"));
 
-        THEN("v is generic with type variable V")
-        {
-          require_type::require_java_generic_type(
-            param_v.type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::V"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
 
       THEN("It has return type pointing to Generic")
@@ -1000,18 +760,8 @@ SCENARIO(
         require_type::require_pointer(
           func_code.return_type(), symbol_typet("java::Generic"));
 
-        THEN("It is generic with type variable T")
-        {
-          require_type::require_java_generic_type(
-            func_code.return_type(),
-            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
-
-          THEN("The bounds are set correctly")
-          {
-            // TODO: the bounds are not parsed yet; enable the tests when
-            // fixed - issue TG-1286
-          }
-        }
+        // TODO: the bounds are not parsed yet; extend tests when fixed -
+        // issue TG-1286
       }
     }
   }
