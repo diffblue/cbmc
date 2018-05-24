@@ -12,14 +12,55 @@ Author: Daniel Poetzl
 #ifndef CPROVER_UTIL_SHARING_NODE_H
 #define CPROVER_UTIL_SHARING_NODE_H
 
-#include <list>
+#ifdef SN_DEBUG
+#include <iostream>
+#endif
+
+#include <forward_list>
+#include <type_traits>
+
+#ifndef SN_SMALL_MAP
+#define SN_SMALL_MAP 1
+#endif
+
+#ifndef SN_SHARE_KEYS
+#define SN_SHARE_KEYS 0
+#endif
+
+#if SN_SMALL_MAP == 1
+#include "small_map.h"
+#else
 #include <map>
-#include <memory>
+#endif
 
 #include "invariant.h"
+#include "make_unique.h"
+#include "small_shared_ptr.h"
+#include "small_shared_two_way_ptr.h"
 
-#define _sn_assert(b) INVARIANT(b, "Sharing-node internal invariant")
-//#define _sn_assert(b)
+#ifdef SN_INTERNAL_CHECKS
+#define SN_ASSERT(b) INVARIANT(b, "Sharing node internal invariant")
+#define SN_ASSERT_USE(v, b) SN_ASSERT(b)
+#else
+#define SN_ASSERT(b)
+#define SN_ASSERT_USE(v, b) v = v;
+#endif
+
+// clang-format off
+#define SN_TYPE_PAR_DECL \
+  template <typename keyT, \
+            typename valueT, \
+            typename equalT = std::equal_to<keyT>>
+
+#define SN_TYPE_PAR_DEF \
+  template <typename keyT, typename valueT, typename equalT>
+// clang-format on
+
+#define SN_TYPE_ARGS keyT, valueT, equalT
+
+#define SN_PTR_TYPE_ARGS d_internalt<SN_TYPE_ARGS>, d_containert<SN_TYPE_ARGS>
+
+#define SN_PTR_TYPE_ARG d_leaft<SN_TYPE_ARGS>
 
 template <class T>
 const T *as_const(T *t)
@@ -27,324 +68,397 @@ const T *as_const(T *t)
   return t;
 }
 
-template <
-  class keyT,
-  class valueT,
-  class predT=std::equal_to<keyT>,
-  bool no_sharing=false>
-class sharing_nodet
+// Inner nodes (internal nodes or container nodes)
+
+typedef small_shared_two_way_pointeet<unsigned> d_baset;
+
+SN_TYPE_PAR_DECL class sharing_node_innert;
+
+SN_TYPE_PAR_DECL class d_internalt : public d_baset
 {
 public:
-  friend void sharing_node_test();
-
-  typedef keyT key_type;
-  typedef valueT mapped_type;
-
-  typedef predT key_equal;
-
-  typedef sharing_nodet<key_type, mapped_type, key_equal> self_type;
-
-  typedef std::map<std::size_t, self_type> subt;
-  typedef std::list<self_type> containert;
-
-  typedef const std::pair<const self_type &, const bool> const_find_type;
-  typedef const std::pair<self_type &, const bool> find_type;
-
-  sharing_nodet() : data(empty_data)
-  {
-    _sn_assert(data.use_count()>=2);
-  }
-
-  sharing_nodet(const key_type &k, const mapped_type &m) : data(empty_data)
-  {
-    _sn_assert(data.use_count()>=2);
-
-    dt &d=write();
-
-    _sn_assert(d.k==nullptr);
-    d.k=std::make_shared<key_type>(k);
-
-    _sn_assert(d.m==nullptr);
-    d.m=std::make_shared<mapped_type>(m);
-  }
-
-  sharing_nodet(const self_type &other)
-  {
-#ifdef SM_NO_SHARING
-    data=std::make_shared<dt>(*other.data);
+  typedef sharing_node_innert<SN_TYPE_ARGS> innert;
+#if SN_SMALL_MAP == 1
+  typedef small_mapt<innert> to_mapt;
 #else
-    if(no_sharing)
-    {
-      data=std::make_shared<dt>(*other.data);
-    }
-    else
-    {
-      data=other.data;
-    }
+  typedef std::map<std::size_t, innert> to_mapt;
 #endif
-  }
 
-  // check type of node
+  to_mapt m;
+};
 
-  bool is_empty() const
+SN_TYPE_PAR_DECL class sharing_node_leaft;
+
+SN_TYPE_PAR_DECL class d_containert : public d_baset
+{
+public:
+  typedef sharing_node_leaft<SN_TYPE_ARGS> leaft;
+  typedef std::forward_list<leaft> leaf_listt;
+
+  leaf_listt con;
+};
+
+class sharing_node_baset
+{
+};
+
+SN_TYPE_PAR_DEF class sharing_node_innert : public sharing_node_baset
+{
+public:
+  typedef d_internalt<SN_TYPE_ARGS> d_it;
+  typedef d_containert<SN_TYPE_ARGS> d_ct;
+
+  typedef typename d_it::to_mapt to_mapt;
+
+  typedef typename d_ct::leaft leaft;
+  typedef typename d_ct::leaf_listt leaf_listt;
+
+  sharing_node_innert() : data(empty_data)
   {
-    _sn_assert(is_well_formed());
-    return data==empty_data;
   }
+
+  bool empty() const
+  {
+    return data == empty_data;
+  }
+
+  void clear()
+  {
+    data = empty_data;
+  }
+
+  bool shares_with(const sharing_node_innert &other) const
+  {
+    return data == other.data;
+  }
+
+  void swap(sharing_node_innert &other)
+  {
+    data.swap(other.data);
+  }
+
+  // Types
 
   bool is_internal() const
   {
-    _sn_assert(is_well_formed());
-    _sn_assert(!is_empty());
-    return !get_sub().empty();
+    return data.is_derived_u();
   }
 
   bool is_container() const
   {
-    _sn_assert(is_well_formed());
-    _sn_assert(!is_empty());
-    return !get_container().empty();
+    return data.is_derived_v();
   }
 
-  bool is_leaf() const
+  d_it &write_internal()
   {
-    _sn_assert(is_well_formed());
-    _sn_assert(!is_empty());
-    return read().is_leaf();
+    SN_ASSERT(data.use_count() > 0);
+
+    if(data == empty_data)
+    {
+      data = make_shared_derived_u<SN_PTR_TYPE_ARGS>();
+    }
+    else if(data.use_count() > 1)
+    {
+      data = make_shared_derived_u<SN_PTR_TYPE_ARGS>(*data.get_derived_u());
+    }
+
+    SN_ASSERT(data.use_count() == 1);
+
+    return *data.get_derived_u();
   }
 
-  // accessors
-
-  const key_type &get_key() const
+  const d_it &read_internal() const
   {
-    _sn_assert(is_leaf());
-    return *read().k;
+    SN_ASSERT(!empty());
+
+    return *data.get_derived_u();
   }
 
-  const mapped_type &get_value() const
+  d_ct &write_container()
   {
-    _sn_assert(is_leaf());
-    return *read().m;
+    SN_ASSERT(data.use_count() > 0);
+
+    if(data == empty_data)
+    {
+      data = make_shared_derived_v<SN_PTR_TYPE_ARGS>();
+    }
+    else if(data.use_count() > 1)
+    {
+      data = make_shared_derived_v<SN_PTR_TYPE_ARGS>(*data.get_derived_v());
+    }
+
+    SN_ASSERT(data.use_count() == 1);
+
+    return *data.get_derived_v();
   }
 
-  mapped_type &get_value()
+  const d_ct &read_container() const
   {
-    _sn_assert(is_leaf());
-    return *write().m;
+    SN_ASSERT(!empty());
+
+    return *data.get_derived_v();
   }
 
-  subt &get_sub()
+  // Accessors
+
+  const to_mapt &get_to_map() const
   {
-    return write().sub;
+    return read_internal().m;
   }
 
-  const subt &get_sub() const
+  to_mapt &get_to_map()
   {
-    return read().sub;
+    return write_internal().m;
   }
 
-  containert &get_container()
+  const leaf_listt &get_container() const
   {
-    return write().con;
+    return read_container().con;
   }
 
-  const containert &get_container() const
+  leaf_listt &get_container()
   {
-    return read().con;
+    return write_container().con;
   }
 
-  // internal nodes
+  // Containers
 
-  const self_type *find_child(const std::size_t n) const
+  const leaft *find_leaf(const keyT &k) const
   {
-    const subt &s=get_sub();
-    typename subt::const_iterator it=s.find(n);
+    SN_ASSERT(is_container());
 
-    if(it!=s.end())
-      return &it->second;
-
-    return nullptr;
-  }
-
-  self_type *add_child(const std::size_t n)
-  {
-    subt &s=get_sub();
-    return &s[n];
-  }
-
-  void remove_child(const std::size_t n)
-  {
-    subt &s=get_sub();
-    size_t r=s.erase(n);
-
-    _sn_assert(r==1);
-  }
-
-  // container nodes
-
-  const self_type *find_leaf(const key_type &k) const
-  {
-    const containert &c=get_container();
+    const leaf_listt &c = get_container();
 
     for(const auto &n : c)
     {
-      if(key_equal()(n.get_key(), k))
+      if(equalT()(n.get_key(), k))
         return &n;
     }
 
     return nullptr;
   }
 
-  self_type *find_leaf(const key_type &k)
+  leaft *find_leaf(const keyT &k)
   {
-    containert &c=get_container();
+    SN_ASSERT(is_container());
+
+    leaf_listt &c = get_container();
 
     for(auto &n : c)
     {
-      if(key_equal()(n.get_key(), k))
+      if(equalT()(n.get_key(), k))
         return &n;
     }
 
+    // If we return nullptr the call must be followed by a call to
+    // place_leaf(k, ...)
     return nullptr;
   }
 
   // add leaf, key must not exist yet
-  self_type *place_leaf(const key_type &k, const mapped_type &m)
+  leaft *place_leaf(const keyT &k, const valueT &v)
   {
-    _sn_assert(as_const(this)->find_leaf(k)==nullptr);
+    SN_ASSERT(is_container());
 
-    containert &c=get_container();
-    c.push_back(self_type(k, m));
+    SN_ASSERT(as_const(this)->find_leaf(k) == nullptr);
 
-    return &c.back();
+    leaf_listt &c = get_container();
+    c.push_front(leaft(k, v));
+
+    return &c.front();
   }
 
   // remove leaf, key must exist
-  void remove_leaf(const key_type &k)
+  void remove_leaf(const keyT &k)
   {
-    containert &c=get_container();
+    SN_ASSERT(is_container());
 
-    for(typename containert::const_iterator it=c.begin();
-        it!=c.end(); it++)
+    leaf_listt &c = get_container();
+
+    SN_ASSERT(!c.empty());
+
+    const leaft &first = c.front();
+
+    if(equalT()(first.get_key(), k))
     {
-      const self_type &n=*it;
+      c.pop_front();
+      return;
+    }
 
-      if(key_equal()(n.get_key(), k))
+    typename leaf_listt::const_iterator last_it = c.begin();
+
+    typename leaf_listt::const_iterator it = c.begin();
+    it++;
+
+    for(; it != c.end(); it++)
+    {
+      const leaft &leaf = *it;
+
+      if(equalT()(leaf.get_key(), k))
       {
-        c.erase(it);
+        c.erase_after(last_it);
         return;
       }
+
+      last_it = it;
     }
 
     UNREACHABLE;
   }
 
-  // misc
+  // Handle children
+
+  const typename d_it::innert *find_child(const std::size_t n) const
+  {
+    SN_ASSERT(is_internal());
+
+    const to_mapt &m = get_to_map();
+    typename to_mapt::const_iterator it = m.find(n);
+
+    if(it != m.end())
+      return &it->second;
+
+    return nullptr;
+  }
+
+  typename d_it::innert *add_child(const std::size_t n)
+  {
+    SN_ASSERT(is_internal());
+
+    to_mapt &m = get_to_map();
+    return &m[n];
+  }
+
+  void remove_child(const std::size_t n)
+  {
+    SN_ASSERT(is_internal());
+
+    to_mapt &m = get_to_map();
+    std::size_t r = m.erase(n);
+
+    SN_ASSERT_USE(r, r == 1);
+  }
+
+  small_shared_two_way_ptrt<SN_PTR_TYPE_ARGS> data;
+  static small_shared_two_way_ptrt<SN_PTR_TYPE_ARGS> empty_data;
+};
+
+SN_TYPE_PAR_DEF small_shared_two_way_ptrt<SN_PTR_TYPE_ARGS>
+  sharing_node_innert<SN_TYPE_ARGS>::empty_data =
+    small_shared_two_way_ptrt<SN_PTR_TYPE_ARGS>();
+
+// Leafs
+
+SN_TYPE_PAR_DECL class d_leaft : public small_shared_pointeet<unsigned>
+{
+public:
+#if SN_SHARE_KEYS == 1
+  std::shared_ptr<keyT> k;
+#else
+  keyT k;
+#endif
+  valueT v;
+};
+
+SN_TYPE_PAR_DEF class sharing_node_leaft : public sharing_node_baset
+{
+public:
+  typedef d_leaft<SN_TYPE_ARGS> d_lt;
+
+  sharing_node_leaft(const keyT &k, const valueT &v) : data(empty_data)
+  {
+    SN_ASSERT(empty());
+
+    auto &d = write();
+
+// Copy key
+#if SN_SHARE_KEYS == 1
+    SN_ASSERT(d.k == nullptr);
+    d.k = std::make_shared<keyT>(k);
+#else
+    d.k = k;
+#endif
+
+    // Copy value
+    d.v = v;
+  }
+
+  bool empty() const
+  {
+    return data == empty_data;
+  }
 
   void clear()
   {
-    *this=self_type();
+    data = empty_data;
   }
 
-  bool shares_with(const self_type &other) const
+  bool shares_with(const sharing_node_leaft &other) const
   {
-    return data==other.data;
+    return data == other.data;
   }
 
-  void swap(self_type &other)
+  void swap(sharing_node_leaft &other)
   {
     data.swap(other.data);
   }
 
-protected:
-  class dt
+  d_lt &write()
   {
-  public:
-    dt() {}
+    SN_ASSERT(data.use_count() > 0);
 
-    dt(const dt &d) : k(d.k), sub(d.sub), con(d.con)
+    if(data == empty_data)
     {
-      if(d.is_leaf())
-      {
-        _sn_assert(m==nullptr);
-        m=std::make_shared<mapped_type>(*d.m);
-      }
+      data = make_small_shared_ptr<d_lt>();
+    }
+    else if(data.use_count() > 1)
+    {
+      data = make_small_shared_ptr<d_lt>(*data);
     }
 
-    bool is_leaf() const
-    {
-      _sn_assert(k==nullptr || m!=nullptr);
-      return k!=nullptr;
-    }
+    SN_ASSERT(data.use_count() == 1);
 
-    std::shared_ptr<key_type> k;
-    std::shared_ptr<mapped_type> m;
+    return *data;
+  }
 
-    subt sub;
-    containert con;
-  };
-
-  const dt &read() const
+  const d_lt &read() const
   {
     return *data;
   }
 
-  dt &write()
+  // Accessors
+
+  const keyT &get_key() const
   {
-    detach();
-    return *data;
+    SN_ASSERT(!empty());
+
+#if SN_SHARE_KEYS == 1
+    return *read().k;
+#else
+    return read().k;
+#endif
   }
 
-  void detach()
+  const valueT &get_value() const
   {
-    _sn_assert(data.use_count()>0);
+    SN_ASSERT(!empty());
 
-    if(data==empty_data)
-      data=std::make_shared<dt>();
-    else if(data.use_count()>1)
-      data=std::make_shared<dt>(*data);
-
-    _sn_assert(data.use_count()==1);
+    return read().v;
   }
 
-  bool is_well_formed() const
+  valueT &get_value()
   {
-    if(data==nullptr)
-      return false;
+    SN_ASSERT(!empty());
 
-    const dt &d=*data;
-
-    bool b;
-
-    // empty node
-    b=data==empty_data;
-    // internal node
-    b|=d.k==nullptr && d.m==nullptr && get_container().empty() &&
-       !get_sub().empty();
-    // container node
-    b|=d.k==nullptr && d.m==nullptr && !get_container().empty() &&
-       get_sub().empty();
-    // leaf node
-    b|=d.k!=nullptr && d.m!=nullptr && get_container().empty() &&
-       get_sub().empty();
-
-    return b;
+    return write().v;
   }
 
-  std::shared_ptr<dt> data;
-  static std::shared_ptr<dt> empty_data;
-
-  // dummy node returned when node was not found
-  static sharing_nodet dummy;
+  small_shared_ptrt<SN_PTR_TYPE_ARG> data;
+  static small_shared_ptrt<SN_PTR_TYPE_ARG> empty_data;
 };
 
-template <class keyT, class valueT, class predT, bool no_sharing>
-std::shared_ptr<typename sharing_nodet<keyT, valueT, predT, no_sharing>::dt>
-  sharing_nodet<keyT, valueT, predT, no_sharing>::empty_data=
-    std::make_shared<sharing_nodet<keyT, valueT, predT, no_sharing>::dt>();
-
-template <class keyT, class valueT, class predT, bool no_sharing>
-sharing_nodet<keyT, valueT, predT, no_sharing>
-  sharing_nodet<keyT, valueT, predT, no_sharing>::dummy;
+SN_TYPE_PAR_DEF small_shared_ptrt<SN_PTR_TYPE_ARG>
+  sharing_node_leaft<SN_TYPE_ARGS>::empty_data =
+    make_small_shared_ptr<SN_PTR_TYPE_ARG>();
 
 #endif

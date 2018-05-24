@@ -6,6 +6,12 @@ Author: Daniel Poetzl
 
 \*******************************************************************/
 
+#define SHARING_MAP_INTERNAL_CHECKS
+#define SHARING_NODE_INTERNAL_CHECKS
+
+#include <climits>
+#include <random>
+
 #include <testing-utils/catch.hpp>
 #include <util/sharing_map.h>
 
@@ -191,6 +197,10 @@ void sharing_map_copy_test()
 class some_keyt
 {
 public:
+  some_keyt() : s(0)
+  {
+  }
+
   some_keyt(size_t s) : s(s)
   {
   }
@@ -240,14 +250,43 @@ void sharing_map_view_test()
 {
   SECTION("View")
   {
+    typedef std::pair<dstringt, std::string> pt;
+
     smt sm;
+    smt::viewt view;
+    std::vector<pt> pairs;
+
+    auto sort_view = [&pairs, &view]() {
+      pairs.clear();
+      for(auto &p : view)
+      {
+        pairs.push_back({p.first, p.second});
+      }
+      std::sort(pairs.begin(), pairs.end());
+    };
 
     fill(sm);
 
-    smt::viewt view;
     sm.get_view(view);
 
     REQUIRE(view.size() == 3);
+
+    sort_view();
+
+    REQUIRE((pairs[0] == pt("i", "0")));
+    REQUIRE((pairs[1] == pt("j", "1")));
+    REQUIRE((pairs[2] == pt("k", "2")));
+
+    sm.insert("l", "3");
+
+    view.clear();
+    sm.get_view(view);
+
+    REQUIRE(view.size() == 4);
+
+    sort_view();
+
+    REQUIRE((pairs[3] == pt("l", "3")));
   }
 
   SECTION("Delta view (no sharing, same keys)")
