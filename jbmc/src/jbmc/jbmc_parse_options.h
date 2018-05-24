@@ -22,10 +22,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/bmc.h>
 
+#include <goto-instrument/cover.h>
+#include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_trace.h>
 #include <goto-programs/lazy_goto_model.h>
 #include <goto-programs/show_properties.h>
-#include <goto-instrument/cover.h>
 
 #include <goto-symex/path_storage.h>
 
@@ -60,6 +61,7 @@ class optionst;
   "(string-max-input-length):" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   OPT_SHOW_GOTO_FUNCTIONS \
+  OPT_SHOW_CLASS_HIERARCHY \
   "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)" \
   OPT_SHOW_PROPERTIES \

@@ -192,3 +192,24 @@ void class_hierarchyt::output(
       json_children.push_back(json_stringt(ch));
   }
 }
+
+void show_class_hierarchy(
+  const class_hierarchyt &hierarchy,
+  message_handlert &message_handler,
+  ui_message_handlert::uit ui,
+  bool children_only)
+{
+  messaget msg(message_handler);
+  switch(ui)
+  {
+  case ui_message_handlert::uit::PLAIN:
+    hierarchy.output(msg.result(), children_only);
+    msg.result() << messaget::eom;
+    break;
+  case ui_message_handlert::uit::JSON_UI:
+    hierarchy.output(msg.result().json_stream(), children_only);
+    break;
+  case ui_message_handlert::uit::XML_UI:
+    UNIMPLEMENTED;
+  }
+}
