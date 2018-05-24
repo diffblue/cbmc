@@ -8,10 +8,10 @@
 
 #include "load_java_class.h"
 
-#include <testing-utils/free_form_cmdline.h>
-#include <testing-utils/catch.hpp>
-#include <testing-utils/message.h>
 #include <iostream>
+#include <testing-utils/catch.hpp>
+#include <testing-utils/free_form_cmdline.h>
+#include <testing-utils/message.h>
 
 #include <util/config.h>
 #include <util/suffix.h>
