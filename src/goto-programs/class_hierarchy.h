@@ -22,6 +22,7 @@ Date: April 2016
 #include <util/irep.h>
 
 class symbol_tablet;
+class json_stream_arrayt;
 
 class class_hierarchyt
 {
@@ -58,6 +59,7 @@ public:
 
   void output(std::ostream &, bool children_only) const;
   void output_dot(std::ostream &) const;
+  void output(json_stream_arrayt &, bool children_only) const;
 
 protected:
   void get_children_trans_rec(const irep_idt &, idst &) const;

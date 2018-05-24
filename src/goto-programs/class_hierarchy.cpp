@@ -15,6 +15,7 @@ Date: April 2016
 
 #include <ostream>
 
+#include <util/json_stream.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
@@ -164,4 +165,30 @@ void class_hierarchyt::output_dot(std::ostream &ostr) const
     }
   }
   ostr << "}\n";
+}
+
+/// Output the class hierarchy in JSON format
+/// \param json_stream: the output JSON stream array
+/// \param children_only: print the children only and do not print the parents
+void class_hierarchyt::output(
+  json_stream_arrayt &json_stream,
+  bool children_only) const
+{
+  for(const auto &c : class_map)
+  {
+    json_stream_objectt &json_class = json_stream.push_back_stream_object();
+    json_class["name"] = json_stringt(c.first);
+    json_class["isAbstract"] = jsont::json_boolean(c.second.is_abstract);
+    if(!children_only)
+    {
+      json_stream_arrayt &json_parents =
+        json_class.push_back_stream_array("parents");
+      for(const auto &pa : c.second.parents)
+        json_parents.push_back(json_stringt(pa));
+    }
+    json_stream_arrayt &json_children =
+      json_class.push_back_stream_array("children");
+    for(const auto &ch : c.second.children)
+      json_children.push_back(json_stringt(ch));
+  }
 }
