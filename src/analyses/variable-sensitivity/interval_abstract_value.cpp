@@ -44,7 +44,7 @@ interval_abstract_valuet::interval_abstract_valuet(typet t, bool tp, bool bttm):
 
 interval_abstract_valuet::interval_abstract_valuet(
   const constant_interval_exprt e):
-    abstract_valuet(e.type(), false, false), interval(e)
+    abstract_valuet(e.type(), e.is_top(), e.is_bottom()), interval(e)
 {
 
 }
