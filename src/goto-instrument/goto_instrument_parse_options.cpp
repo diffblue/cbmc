@@ -659,7 +659,7 @@ int goto_instrument_parse_optionst::doit()
       if(cmdline.isset("dot"))
         hierarchy.output_dot(std::cout);
       else
-        hierarchy.output(std::cout);
+        hierarchy.output(std::cout, false);
 
       return 0;
     }

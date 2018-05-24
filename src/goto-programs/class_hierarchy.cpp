@@ -30,6 +30,9 @@ void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
     {
       const struct_typet &struct_type = to_struct_type(symbol_pair.second.type);
 
+      class_map[symbol_pair.first].is_abstract =
+        struct_type.get_bool(ID_abstract);
+
       const irept::subt &bases=
         struct_type.find(ID_bases).get_sub();
 
@@ -123,17 +126,23 @@ void class_hierarchyt::get_parents_trans_rec(
     get_parents_trans_rec(child, dest);
 }
 
-void class_hierarchyt::output(std::ostream &out) const
+/// Output the class hierarchy in plain text
+/// \param out: the output stream
+/// \param children_only: print the children only and do not print the parents
+void class_hierarchyt::output(std::ostream &out, bool children_only) const
 {
   for(const auto &c : class_map)
   {
-    for(const auto &pa : c.second.parents)
-      out << "Parent of " << c.first << ": "
-          << pa << '\n';
-
+    out << c.first << (c.second.is_abstract ? " (abstract)" : "") << ":\n";
+    if(!children_only)
+    {
+      out << "  parents:\n";
+      for(const auto &pa : c.second.parents)
+        out << "    " << pa << '\n';
+    }
+    out << "  children:\n";
     for(const auto &ch : c.second.children)
-      out << "Child of " << c.first << ": "
-          << ch << '\n';
+      out << "    " << ch << '\n';
   }
 }
 

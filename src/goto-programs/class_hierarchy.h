@@ -32,6 +32,7 @@ public:
   {
   public:
     idst parents, children;
+    bool is_abstract;
   };
 
   typedef std::map<irep_idt, entryt> class_mapt;
@@ -55,7 +56,7 @@ public:
     return result;
   }
 
-  void output(std::ostream &) const;
+  void output(std::ostream &, bool children_only) const;
   void output_dot(std::ostream &) const;
 
 protected:
