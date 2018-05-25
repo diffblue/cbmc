@@ -100,6 +100,10 @@ abstract_object_pointert abstract_environmentt::eval(
   {
     return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
   }
+  else if(simplified_id==ID_struct)
+  {
+    return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
+  }
   else if(simplified_id==ID_constant)
   {
     return abstract_object_factory(
