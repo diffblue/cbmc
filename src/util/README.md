@@ -12,17 +12,17 @@ CPROVER codebase.
 
 \subsection irept Irept Data Structure
 
-There are a large number of kind of tree structured or tree-like data in
+There are a large number of kinds of tree structured or tree-like data in
 CPROVER. `irept` provides a single, unified representation for all of
 these, allowing structure sharing and reference counting of data. As
 such `irept` is the basic unit of data in CPROVER.  Each `irept`
-contains[^2] a basic unit of data (of type `dt`) which contains four
+contains[^1] a basic unit of data (of type `dt`) which contains four
 things:
 
-* `data`:   A string[^3], which is returned when the `id()` function is
+* `data`:   A string[^2], which is returned when the `id()` function is
   used.
 
-* `named_sub`:   A map from `irep_namet` (a string) to an `irept`. This
+* `named_sub`:   A map from `irep_namet` (a string) to `irept`. This
   is used for named children, i.e.  subexpressions, parameters, etc.
 
 * `comments`:   Another map from `irep_namet` to `irept` which is used
@@ -32,7 +32,7 @@ things:
   unnamed children.
 
 The `irept::pretty` function outputs the contents of an `irept` directly
-and can be used to understand an debug problems with `irept`s.
+and can be used to understand and debug problems with `irept`s.
 
 On their own `irept`s do not “mean” anything; they are effectively
 generic tree nodes. Their interpretation depends on the contents of
@@ -67,8 +67,8 @@ class’ named `typecast_exprt`. One key descendent of `exprt` is
 These are used to represent variables; the name of which can be found
 using the `get_identifier` accessor function.
 
-`codet` inherits from `exprt` and is defined in `std_code.h`. They
-represent executable code; statements in C rather than expressions. In
+`codet` inherits from `exprt` and is defined in `std_code.h`. It
+represents executable code; statements in C rather than expressions. In
 the front-end there are versions of these that hold whole code blocks,
 but in goto-programs these have been flattened so that each `irept`
 represents one sequence point (almost one line of code / one
@@ -76,10 +76,10 @@ semi-colon). The most common descendents of `codet` are `code_assignt`
 so a common pattern is to cast the `codet` to an assignment and then
 recurse on the expression on either side.
 
-[^2]: Or references, if reference counted data sharing is enabled. It is
+[^1]: Or references, if reference counted data sharing is enabled. It is
     enabled by default; see the `SHARING` macro.
 
-[^3]: Unless `USE_STD_STRING` is set, this is actually
+[^2]: Unless `USE_STD_STRING` is set, this is actually
 a `dstring` and thus an integer which is a reference into a string table
 
 \dot
