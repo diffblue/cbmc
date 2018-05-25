@@ -1,12 +1,9 @@
-KNOWNBUG
+CORE
 main.c
---apply-code-contracts
+--check-code-contracts
 ^\[main.1\] Loop invariant violated before entry: SUCCESS$
 ^\[main.2\] Loop invariant not preserved: SUCCESS$
 ^\[main.assertion.1\] assertion r == 0: FAILURE$
 ^VERIFICATION FAILED$
 --
 --
---check-code-contracts not implemented yet.
---apply-code-contracts is the current name for the flag. This should be
-updated as the flag changes.
