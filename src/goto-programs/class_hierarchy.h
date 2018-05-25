@@ -20,8 +20,19 @@ Date: April 2016
 
 #include <util/graph.h>
 #include <util/irep.h>
+#include <util/ui_message.h>
+
+// clang-format off
+#define OPT_SHOW_CLASS_HIERARCHY \
+  "(show-class-hierarchy)"
+
+#define HELP_SHOW_CLASS_HIERARCHY \
+  " --show-class-hierarchy       show the class hierarchy\n"
+// clang-format on
 
 class symbol_tablet;
+class json_stream_arrayt;
+class message_handlert;
 
 class class_hierarchyt
 {
@@ -32,6 +43,7 @@ public:
   {
   public:
     idst parents, children;
+    bool is_abstract;
   };
 
   typedef std::map<irep_idt, entryt> class_mapt;
@@ -55,8 +67,9 @@ public:
     return result;
   }
 
-  void output(std::ostream &) const;
+  void output(std::ostream &, bool children_only) const;
   void output_dot(std::ostream &) const;
+  void output(json_stream_arrayt &, bool children_only) const;
 
 protected:
   void get_children_trans_rec(const irep_idt &, idst &) const;
@@ -92,5 +105,16 @@ private:
   /// Maps class identifiers onto node indices
   nodes_by_namet nodes_by_name;
 };
+
+/// Output the class hierarchy
+/// \param hierarchy: the class hierarchy to be printed
+/// \param message_handler: the message handler
+/// \param ui: the UI format
+/// \param children_only: print the children only and do not print the parents
+void show_class_hierarchy(
+  const class_hierarchyt &hierarchy,
+  message_handlert &message_handler,
+  ui_message_handlert::uit ui,
+  bool children_only = false);
 
 #endif // CPROVER_GOTO_PROGRAMS_CLASS_HIERARCHY_H

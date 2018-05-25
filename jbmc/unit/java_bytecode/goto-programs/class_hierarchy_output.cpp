@@ -17,21 +17,15 @@
 void require_parent_child_relationship(
   const std::string &parent_raw,
   const std::string &child_raw,
-  const std::string &output,
   const std::string &output_dot)
 {
   std::string parent = "java::" + parent_raw;
   std::string child = "java::" + child_raw;
 
-  std::stringstream
-    plain_child_expectation, plain_parent_expectation, dot_expectation;
+  std::stringstream dot_expectation;
 
-  plain_child_expectation << "Child of " << parent << ": " << child;
-  plain_parent_expectation << "Parent of " << child << ": " << parent;
   dot_expectation << "\"" << child << "\" -> \"" << parent << "\"";
 
-  REQUIRE(output.find(plain_child_expectation.str()) != std::string::npos);
-  REQUIRE(output.find(plain_parent_expectation.str()) != std::string::npos);
   REQUIRE(output_dot.find(dot_expectation.str()) != std::string::npos);
 }
 
@@ -47,20 +41,18 @@ SCENARIO(
   std::stringstream output_dot_stream;
 
   hierarchy(symbol_table);
-  hierarchy.output(output_stream);
   hierarchy.output_dot(output_dot_stream);
 
-  std::string output = output_stream.str();
   std::string output_dot = output_dot_stream.str();
 
   require_parent_child_relationship(
-    "HierarchyTest", "HierarchyTestChild1", output, output_dot);
+    "HierarchyTest", "HierarchyTestChild1", output_dot);
   require_parent_child_relationship(
-    "HierarchyTest", "HierarchyTestChild2", output, output_dot);
+    "HierarchyTest", "HierarchyTestChild2", output_dot);
   require_parent_child_relationship(
-    "HierarchyTestChild1", "HierarchyTestGrandchild", output, output_dot);
+    "HierarchyTestChild1", "HierarchyTestGrandchild", output_dot);
   require_parent_child_relationship(
-    "HierarchyTestInterface1", "HierarchyTestGrandchild", output, output_dot);
+    "HierarchyTestInterface1", "HierarchyTestGrandchild", output_dot);
   require_parent_child_relationship(
-    "HierarchyTestInterface2", "HierarchyTestGrandchild", output, output_dot);
+    "HierarchyTestInterface2", "HierarchyTestGrandchild", output_dot);
 }

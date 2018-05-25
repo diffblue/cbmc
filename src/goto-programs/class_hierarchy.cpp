@@ -15,6 +15,7 @@ Date: April 2016
 
 #include <ostream>
 
+#include <util/json_stream.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
@@ -29,6 +30,9 @@ void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
     if(symbol_pair.second.is_type && symbol_pair.second.type.id() == ID_struct)
     {
       const struct_typet &struct_type = to_struct_type(symbol_pair.second.type);
+
+      class_map[symbol_pair.first].is_abstract =
+        struct_type.get_bool(ID_abstract);
 
       const irept::subt &bases=
         struct_type.find(ID_bases).get_sub();
@@ -123,17 +127,23 @@ void class_hierarchyt::get_parents_trans_rec(
     get_parents_trans_rec(child, dest);
 }
 
-void class_hierarchyt::output(std::ostream &out) const
+/// Output the class hierarchy in plain text
+/// \param out: the output stream
+/// \param children_only: print the children only and do not print the parents
+void class_hierarchyt::output(std::ostream &out, bool children_only) const
 {
   for(const auto &c : class_map)
   {
-    for(const auto &pa : c.second.parents)
-      out << "Parent of " << c.first << ": "
-          << pa << '\n';
-
+    out << c.first << (c.second.is_abstract ? " (abstract)" : "") << ":\n";
+    if(!children_only)
+    {
+      out << "  parents:\n";
+      for(const auto &pa : c.second.parents)
+        out << "    " << pa << '\n';
+    }
+    out << "  children:\n";
     for(const auto &ch : c.second.children)
-      out << "Child of " << c.first << ": "
-          << ch << '\n';
+      out << "    " << ch << '\n';
   }
 }
 
@@ -155,4 +165,51 @@ void class_hierarchyt::output_dot(std::ostream &ostr) const
     }
   }
   ostr << "}\n";
+}
+
+/// Output the class hierarchy in JSON format
+/// \param json_stream: the output JSON stream array
+/// \param children_only: print the children only and do not print the parents
+void class_hierarchyt::output(
+  json_stream_arrayt &json_stream,
+  bool children_only) const
+{
+  for(const auto &c : class_map)
+  {
+    json_stream_objectt &json_class = json_stream.push_back_stream_object();
+    json_class["name"] = json_stringt(c.first);
+    json_class["isAbstract"] = jsont::json_boolean(c.second.is_abstract);
+    if(!children_only)
+    {
+      json_stream_arrayt &json_parents =
+        json_class.push_back_stream_array("parents");
+      for(const auto &pa : c.second.parents)
+        json_parents.push_back(json_stringt(pa));
+    }
+    json_stream_arrayt &json_children =
+      json_class.push_back_stream_array("children");
+    for(const auto &ch : c.second.children)
+      json_children.push_back(json_stringt(ch));
+  }
+}
+
+void show_class_hierarchy(
+  const class_hierarchyt &hierarchy,
+  message_handlert &message_handler,
+  ui_message_handlert::uit ui,
+  bool children_only)
+{
+  messaget msg(message_handler);
+  switch(ui)
+  {
+  case ui_message_handlert::uit::PLAIN:
+    hierarchy.output(msg.result(), children_only);
+    msg.result() << messaget::eom;
+    break;
+  case ui_message_handlert::uit::JSON_UI:
+    hierarchy.output(msg.result().json_stream(), children_only);
+    break;
+  case ui_message_handlert::uit::XML_UI:
+    UNIMPLEMENTED;
+  }
 }

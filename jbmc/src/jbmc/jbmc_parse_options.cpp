@@ -645,6 +645,16 @@ int jbmc_parse_optionst::get_goto_program(
       *this, options, get_message_handler());
     lazy_goto_model.initialize(cmdline);
 
+    // Show the class hierarchy
+    if(cmdline.isset("show-class-hierarchy"))
+    {
+      class_hierarchyt hierarchy;
+      hierarchy(lazy_goto_model.symbol_table);
+      show_class_hierarchy(
+        hierarchy, get_message_handler(), ui_message_handler.get_ui());
+      return CPROVER_EXIT_SUCCESS;
+    }
+
     // Add failed symbols for any symbol created prior to loading any
     // particular function:
     add_failed_symbols(lazy_goto_model.symbol_table);
@@ -1079,6 +1089,7 @@ void jbmc_parse_optionst::help()
     " --show-symbol-table          show loaded symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
+    HELP_SHOW_CLASS_HIERARCHY
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK

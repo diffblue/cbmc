@@ -16,11 +16,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 
+#include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_functions.h>
-#include <goto-programs/show_goto_functions.h>
-#include <goto-programs/show_properties.h>
 #include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_const_function_pointers.h>
+#include <goto-programs/show_goto_functions.h>
+#include <goto-programs/show_properties.h>
 
 #include <analyses/goto_check.h>
 
@@ -50,7 +51,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(max-var):(max-po-trans):(ignore-arrays)" \
   "(cfg-kill)(no-dependencies)(force-loop-duplication)" \
   "(call-graph)(reachable-call-graph)" \
-  "(class-hierarchy)" \
+  OPT_SHOW_CLASS_HIERARCHY \
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(nondet-volatile)(isr):" \
   "(stack-depth):(nondet-static)" \

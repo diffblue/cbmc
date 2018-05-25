@@ -652,16 +652,17 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
-    if(cmdline.isset("class-hierarchy"))
+    if(cmdline.isset("show-class-hierarchy"))
     {
       class_hierarchyt hierarchy;
       hierarchy(goto_model.symbol_table);
       if(cmdline.isset("dot"))
         hierarchy.output_dot(std::cout);
       else
-        hierarchy.output(std::cout);
+        show_class_hierarchy(
+          hierarchy, get_message_handler(), ui_message_handler.get_ui());
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("dot"))
@@ -1472,7 +1473,7 @@ void goto_instrument_parse_optionst::help()
     " --call-graph                 show graph of function calls\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --reachable-call-graph       show graph of function calls potentially reachable from main function\n"
-    " --class-hierarchy            show class hierarchy\n"
+    HELP_SHOW_CLASS_HIERARCHY
     // NOLINTNEXTLINE(whitespace/line_length)
     " --show-threaded              show instructions that may be executed by more than one thread\n"
     "\n"
