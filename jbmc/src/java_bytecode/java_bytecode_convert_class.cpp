@@ -1032,6 +1032,31 @@ void convert_annotations(
   }
 }
 
+/// Convert java annotations, e.g. as retrieved from the symbol table, back
+/// to type annotationt (inverse of convert_annotations())
+/// \param java_annotations: The java_annotationt collection to convert
+/// \param annotations: The annotationt collection to populate
+void convert_java_annotations(
+  const std::vector<java_annotationt> &java_annotations,
+  java_bytecode_parse_treet::annotationst &annotations)
+{
+  for(const auto &java_annotation : java_annotations)
+  {
+    annotations.emplace_back(java_bytecode_parse_treet::annotationt());
+    auto &annotation = annotations.back();
+    annotation.type = java_annotation.get_type();
+
+    std::transform(
+      java_annotation.get_values().begin(),
+      java_annotation.get_values().end(),
+      std::back_inserter(annotation.element_value_pairs),
+      [](const java_annotationt::valuet &value)
+        -> java_bytecode_parse_treet::annotationt::element_value_pairt {
+          return {value.get_name(), value.get_value()};
+        });
+  }
+}
+
 /// Checks if the class is implicitly generic, i.e., it is an inner class of
 /// any generic class. All uses of the implicit generic type parameters within
 /// the inner class are updated to point to the type parameters of the
