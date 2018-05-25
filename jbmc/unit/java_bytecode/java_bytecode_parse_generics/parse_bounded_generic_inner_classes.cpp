@@ -68,6 +68,24 @@ SCENARIO(
             to_struct_type(class_symbol.type), "elem");
         require_type::require_java_generic_parameter(
           elem.type(), boundedinner_name + "::NUM");
+
+        std::string method_name =
+          boundedinner_name + ".f:(Ljava/lang/Number;)V";
+        REQUIRE(new_symbol_table.has_symbol(method_name));
+        THEN("The method parameter type should respect its bound")
+        {
+          const symbolt &method_symbol =
+            new_symbol_table.lookup_ref(method_name);
+          const code_typet &method_type =
+            require_type::require_code(method_symbol.type);
+          const code_typet::parametert &param =
+            require_type::require_parameter(method_type, "x");
+          require_type::require_java_generic_parameter(
+            param.type(), boundedinner_name + "::NUM");
+
+          // TODO: the bounds are not parsed yet; extend tests when fixed -
+          // issue TG-1286
+        }
       }
     }
   }

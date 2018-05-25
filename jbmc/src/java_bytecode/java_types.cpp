@@ -462,6 +462,18 @@ typet java_type_from_string(
         throw unsupported_java_class_signature_exceptiont(
           "Failed to find generic signature closing delimiter");
       }
+
+      // If there are any bounds between '<' and '>' then we cannot currently
+      // parse them, so we give up. This only happens when parsing the
+      // signature, so we'll fall back to the result of parsing the
+      // descriptor, which will respect the bounds correctly.
+      const size_t colon_pos = src.find(':');
+      if(colon_pos != std::string::npos && colon_pos < closing_generic)
+      {
+        throw unsupported_java_class_signature_exceptiont(
+          "Cannot currently parse bounds on generic types");
+      }
+
       const typet &method_type=java_type_from_string(
         src.substr(closing_generic+1, std::string::npos), class_name_prefix);
 
