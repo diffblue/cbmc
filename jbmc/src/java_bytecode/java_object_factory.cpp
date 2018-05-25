@@ -41,7 +41,7 @@ class java_object_factoryt
 
   /// Every time the non-det generator visits a type and the type is generic
   /// (either a struct or a pointer), the following map is used to store and
-  /// look up the concrete types of the generic paramaters in the current
+  /// look up the concrete types of the generic parameters in the current
   /// scope. Note that not all generic parameters need to have a concrete
   /// type, e.g., the method under test is generic. The types are removed
   /// from the map when the scope changes. Note that in different depths
