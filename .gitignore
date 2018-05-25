@@ -19,6 +19,8 @@ src/.settings/*
 # Visual Studio
 Debug/*
 Release/*
+#vi(m)
+*.swp
 
 # compilation files
 *.lo
