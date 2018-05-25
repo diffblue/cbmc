@@ -183,6 +183,7 @@ Function: abstract_objectt::expression_transform
 
 abstract_object_pointert abstract_objectt::expression_transform(
   const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {

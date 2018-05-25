@@ -38,6 +38,7 @@ constant_abstract_valuet::constant_abstract_valuet(
 
 abstract_object_pointert constant_abstract_valuet::expression_transform(
   const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
@@ -121,7 +122,11 @@ constant_abstract_valuet::try_transform_expr_with_all_rounding_modes(
           signedbv_typet(32)),
         ns),
       ns);
-    possible_results.push_back(expression_transform(expr, child_env, ns));
+
+    // Dummy vector as the called expression_transform() ignores it
+    std::vector<abstract_object_pointert> dummy;
+    possible_results.push_back(
+      expression_transform(expr, dummy, child_env, ns));
   }
   auto first = possible_results.front()->to_constant();
   for(auto const &possible_result : possible_results)

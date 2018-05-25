@@ -105,10 +105,27 @@ abstract_object_pointert context_abstract_objectt::write(
  */
 abstract_object_pointert context_abstract_objectt::expression_transform(
     const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,
     const namespacet &ns) const
 {
-  return child_abstract_object->expression_transform(expr, environment, ns);
+  PRECONDITION(expr.operands().size() == operands.size());
+
+  std::vector<abstract_object_pointert> child_operands;
+
+  std::transform(
+    operands.begin(),
+    operands.end(),
+    std::back_inserter(child_operands),
+    [](const abstract_object_pointert &op) {
+      PRECONDITION(op != nullptr);
+      auto p = std::dynamic_pointer_cast<const context_abstract_objectt>(op);
+      INVARIANT(p, "Operand shall be of type context_abstract_objectt");
+      return p->child_abstract_object;
+  });
+
+  return child_abstract_object->expression_transform(
+    expr, child_operands, environment, ns);
 }
 
 /**
