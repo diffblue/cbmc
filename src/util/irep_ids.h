@@ -44,20 +44,97 @@ enum class idt : unsigned
 #include "irep_ids.def" // NOLINT(build/include)
 };
 
+class irep_idt final : public dstringt
+{
+public:
+// this is safe for static objects
 #ifdef __GNUC__
-#define IREP_ID_ONE(the_id)                                         \
-  constexpr dstringt ID_##the_id=dstringt::make_from_table_index(   \
-      static_cast<unsigned>(idt::id_##the_id));
-#define IREP_ID_TWO(the_id, str)                                    \
-  constexpr dstringt ID_##the_id=dstringt::make_from_table_index(   \
-      static_cast<unsigned>(idt::id_##the_id));
+  constexpr
+#endif
+    irep_idt()
+    : dstringt()
+  {
+  }
+
+// this is safe for static objects
+#ifdef __GNUC__
+  constexpr
+#endif
+    static irep_idt
+    make_from_table_index(unsigned no)
+  {
+    return irep_idt(no);
+  }
+
+#ifdef __GNUC__
+  // This conversion allows the use of irep_idts
+  // in switch ... case statements.
+  constexpr operator idt() const
+  {
+    return static_cast<idt>(no);
+  }
+#endif
+
+  // this one is safe for static objects
+#ifdef __GNUC__
+  constexpr
+#endif
+    // NOLINTNEXTLINE(runtime/explicit)
+    irep_idt(dstringt s)
+    : dstringt(s)
+  {
+  }
+
+  // this one is not safe for static objects
+  // NOLINTNEXTLINE(runtime/explicit)
+  irep_idt(const char *s) : dstringt(s)
+  {
+  }
+
+  // this one is not safe for static objects
+  // NOLINTNEXTLINE(runtime/explicit)
+  irep_idt(const std::string &s) : dstringt(s)
+  {
+  }
+
+protected:
+#ifdef __GNUC__
+  constexpr
+#endif
+    explicit irep_idt(unsigned _no)
+    : dstringt(_no)
+  {
+  }
+};
+
+// NOLINTNEXTLINE [allow specialisation within 'std']
+namespace std
+{
+/// Default hash function of `dstringt` for use with STL containers.
+template <>
+struct hash<irep_idt> // NOLINT(readability/identifiers)
+{
+  size_t operator()(const irep_idt &irep_id) const
+  {
+    return irep_id.hash();
+  }
+};
+} // namespace std
+
+#ifdef __GNUC__
+#define IREP_ID_ONE(the_id)                                                    \
+  constexpr irep_idt ID_##the_id =                                             \
+    irep_idt::make_from_table_index(static_cast<unsigned>(idt::id_##the_id));
+#define IREP_ID_TWO(the_id, str)                                               \
+  constexpr irep_idt ID_##the_id =                                             \
+    irep_idt::make_from_table_index(static_cast<unsigned>(idt::id_##the_id));
 #else
-#define IREP_ID_ONE(the_id)                                         \
-  const dstringt ID_##the_id=dstringt::make_from_table_index(       \
-      static_cast<unsigned>(idt::id_##the_id));
-#define IREP_ID_TWO(the_id, str)                                    \
-  const const dstringt ID_##the_id=dstringt::make_from_table_index( \
-      static_cast<unsigned>(idt::id_##the_id));
+#define IREP_ID_ONE(the_id)                                                    \
+  const irep_idt ID_##the_id =                                                 \
+    irep_idt::make_from_table_index(static_cast<unsigned>(idt::id_##the_id));
+#define IREP_ID_TWO(the_id, str)                                               \
+  const const irep_idt ID_##the_id =                                           \
+    irep_idt::make_from_table_index(static_cast<unsigned>(idt::id_##the_id));
 #endif
 
 template <>

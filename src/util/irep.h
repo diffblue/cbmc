@@ -29,8 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #ifdef USE_DSTRING
-typedef dstringt irep_idt;
-typedef dstringt irep_namet;
+typedef irep_idt irep_namet;
 // NOLINTNEXTLINE(readability/identifiers)
 typedef dstring_hash irep_id_hash;
 #else
