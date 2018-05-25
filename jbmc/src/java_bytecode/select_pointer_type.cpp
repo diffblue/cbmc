@@ -33,8 +33,10 @@ pointer_typet select_pointer_typet::convert_pointer_type(
   if(!generic_parameter_specialization_map.empty())
   {
     generic_parameter_recursion_trackingt visited;
-    return specialize_generics(
+    auto type = specialize_generics(
       pointer_type, generic_parameter_specialization_map, visited);
+    INVARIANT(visited.empty(), "recursion stack must be empty here");
+    return type;
   }
   else
   {
@@ -86,18 +88,31 @@ pointer_typet select_pointer_typet::specialize_generics(
     // information from further recursion, only cause a segmentation fault.
     if(visited_nodes.find(parameter_name) != visited_nodes.end())
     {
+      optionalt<pointer_typet> result = get_instantiated_type(
+        parameter_name, generic_parameter_specialization_map);
+      if(result.has_value())
+      {
+        return result.value();
+      }
       throw "no infinite recursion";
     }
 
-    visited_nodes.insert(parameter_name);
-
     // generic parameters can be adopted from outer classes or superclasses so
     // we may need to search for the concrete type recursively
-    return is_java_generic_parameter(type)
-             ? specialize_generics(
-                 to_java_generic_parameter(type),
-                 generic_parameter_specialization_map, visited_nodes)
-             : type;
+    if(is_java_generic_parameter(type))
+    {
+      visited_nodes.insert(parameter_name);
+      auto returned_type = specialize_generics(
+        to_java_generic_parameter(type),
+        generic_parameter_specialization_map,
+        visited_nodes);
+      visited_nodes.erase(parameter_name);
+      return returned_type;
+    }
+    else
+    {
+      return type;
+    }
   }
   else if(pointer_type.subtype().id() == ID_symbol)
   {
@@ -119,4 +134,89 @@ pointer_typet select_pointer_typet::specialize_generics(
     }
   }
   return pointer_type;
+}
+
+/// Return the first concrete type instantiation if any such exists.
+/// \param parameter_name The name of the generic parameter type we want to have
+///   instantiated
+/// \param generic_specialization_map Map of type names to specialization stack
+/// \param depth start depth for instantiation search
+/// \return the first instantiated type for the generic type or nothing if no
+/// such instantiation exists.
+optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
+  const irep_idt &parameter_name,
+  const generic_parameter_specialization_mapt
+    &generic_parameter_specialization_map) const
+{
+  generic_parameter_recursion_trackingt visited;
+  const auto retval = get_instantiated_type(
+    parameter_name, generic_parameter_specialization_map, visited, 0);
+  INVARIANT(visited.empty(), "recursion set must be empty here");
+  return retval;
+}
+
+/// See above, the additional parameter just tracks the recursion to prevent
+/// visiting the same depth again.
+/// \param visited tracks the visited parameter names
+optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
+  const irep_idt &parameter_name,
+  const generic_parameter_specialization_mapt
+    &generic_parameter_specialization_map,
+  generic_parameter_recursion_trackingt &visited,
+  const size_t depth) const
+{
+  // Get the pointed to instantiation type at the desired stack depth.
+  // - f this type is not a generic type, it is returned as a valid
+  //   instantiation
+  // - if another recursion at this depth level is found, the search depth is
+  //   increased
+  // - if nothing can be found an empty optional is returned
+
+  if(
+    generic_parameter_specialization_map.find(parameter_name) !=
+    generic_parameter_specialization_map.end())
+  {
+    const auto &replacements =
+      generic_parameter_specialization_map.find(parameter_name)->second;
+
+    // max depth reached and nothing found
+    if(replacements.size() <= depth)
+      return {};
+
+    // Check if there is a recursion loop, if yes increase search depth
+    if(visited.find(parameter_name) != visited.end())
+    {
+      visited.clear();
+      return get_instantiated_type(
+        parameter_name, generic_parameter_specialization_map, visited, depth+1);
+    }
+    else
+    {
+      const size_t index = (replacements.size() - depth) - 1;
+      const auto &type = replacements[index];
+      {
+        if(!is_java_generic_parameter(type))
+        {
+          return type;
+        }
+        else
+        {
+          visited.insert(parameter_name);
+          const auto &gen_type = to_java_generic_parameter(type).type_variable();
+          const auto val = get_instantiated_type(
+            gen_type.get_identifier(),
+            generic_parameter_specialization_map,
+            visited,
+            depth);
+          visited.erase(parameter_name);
+          return val;
+        }
+      }
+    }
+  }
+  // parameter_name not found in map
+  else
+  {
+    UNREACHABLE;
+  }
 }
