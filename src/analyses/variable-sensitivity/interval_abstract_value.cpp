@@ -51,6 +51,9 @@ interval_abstract_valuet::interval_abstract_valuet(
 
 exprt interval_abstract_valuet::to_constant() const
 {
+  return abstract_objectt::to_constant();
+
+#if 0
   if(!is_top() && !is_bottom())
   {
     return this->interval;
@@ -59,25 +62,118 @@ exprt interval_abstract_valuet::to_constant() const
   {
     return abstract_objectt::to_constant();
   }
+#endif
 }
 
-#if 1
-// Interface for transforms
 abstract_object_pointert interval_abstract_valuet::expression_transform(
   const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  if(expr.id() == ID_constant_interval)
+  std::size_t num_operands = expr.operands().size();
+  PRECONDITION(operands.size() == num_operands);
+
+  const typet &type = expr.type();
+
+  if(num_operands == 0)
+    return environment.abstract_object_factory(type, ns, true);
+
+  if(expr.id() == ID_plus)
   {
-    return environment.abstract_object_factory(expr.type(), expr, ns);
+    constant_exprt zero = constant_interval_exprt::zero(type);
+    constant_interval_exprt interval(zero);
+    INVARIANT(interval.is_zero(), "Starting interval must be zero");
+
+    for(const auto &op : operands)
+    {
+      const auto iav
+        = std::dynamic_pointer_cast<const interval_abstract_valuet>(op);
+      INVARIANT(iav, "");
+
+      const constant_interval_exprt &interval_next = iav->interval;
+      interval = interval.plus(interval_next);
+    }
+
+    INVARIANT(interval.type() == type, "");
+
+    return environment.abstract_object_factory(type, interval, ns);
   }
-  else
+  else if(num_operands == 1)
   {
-    return abstract_objectt::expression_transform(expr, environment, ns);
+    const auto iav =
+      std::dynamic_pointer_cast<const interval_abstract_valuet>(operands[0]);
+
+    INVARIANT(iav, "");
+
+    const constant_interval_exprt &interval = iav->interval;
+
+    // The typecast case should probably be handled by constant_interval_exprt
+    // directly as well
+    if(expr.id() == ID_typecast)
+    {
+      const typecast_exprt &tce = to_typecast_expr(expr);
+
+      exprt lower = interval.get_lower();
+      lower.type() = tce.type();
+
+      exprt upper = interval.get_upper();
+      upper.type() = tce.type();
+
+      const constant_interval_exprt new_interval(lower, upper, tce.type());
+      return environment.abstract_object_factory(tce.type(), new_interval, ns);
+    }
+    else
+    {
+      const constant_interval_exprt &interval_result = interval.eval(expr.id());
+      INVARIANT(interval_result.type() == type, "");
+      return environment.abstract_object_factory(type, interval_result, ns);
+    }
   }
-}
+  else if(num_operands == 2)
+  {
+    const auto iav0
+      = std::dynamic_pointer_cast<const interval_abstract_valuet>(operands[0]);
+
+    INVARIANT(iav0, "");
+
+    const auto iav1
+      = std::dynamic_pointer_cast<const interval_abstract_valuet>(operands[1]);
+
+    INVARIANT(iav1, "");
+
+    const constant_interval_exprt &interval0 = iav0->interval;
+    const constant_interval_exprt &interval1 = iav1->interval;
+
+    // constant_interval_exprt currently does not correctly handle the type of
+    // relational operators (it assigns to it the type of the first operand
+    // as opposed to ID_bool)
+#if 0
+      constant_interval_exprt interval
+        = interval0.eval(expr.id(), interval1);
+
+      interval.type() = type;
+
+      return environment.abstract_object_factory(type, interval, ns);
 #endif
+
+#if 1
+    if(expr.id() == ID_equal)
+    {
+
+      INVARIANT(type.id() == ID_bool, "");
+
+      tvt tv = interval0.equal(interval1);
+
+      constant_interval_exprt ie(type);
+      const constant_interval_exprt &interval = ie.tv_to_interval(tv);
+      return environment.abstract_object_factory(type, interval, ns);
+#endif
+    }
+  }
+
+  return environment.abstract_object_factory(type, ns, true);
+}
 
 void interval_abstract_valuet::output(
   std::ostream &out, const ai_baset &ai, const namespacet &ns) const

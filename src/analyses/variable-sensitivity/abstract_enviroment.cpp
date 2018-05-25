@@ -662,7 +662,15 @@ abstract_object_pointert abstract_environmentt::eval_expression(
   // a concrete subtype of abstract_objectt.
   abstract_object_pointert eval_obj=abstract_object_factory(
     e.type(), ns, true);
-  return eval_obj->expression_transform(e, *this, ns);
+
+  std::vector<abstract_object_pointert> operands;
+
+  for(const auto &op : e.operands())
+  {
+    operands.push_back(eval(op, ns));
+  }
+
+  return eval_obj->expression_transform(e, operands, *this, ns);
 }
 
 /*******************************************************************\

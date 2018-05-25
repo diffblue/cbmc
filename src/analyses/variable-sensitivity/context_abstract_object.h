@@ -74,6 +74,7 @@ public:
 
   abstract_object_pointert expression_transform(
     const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,
     const namespacet &ns) const;
 
