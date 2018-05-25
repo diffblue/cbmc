@@ -1015,19 +1015,18 @@ static void find_and_replace_parameters(
 /// \param annotations: The java_annotationt collection to populate
 void convert_annotations(
   const java_bytecode_parse_treet::annotationst &parsed_annotations,
-  std::vector<java_annotationt> &annotations)
+  std::vector<java_annotationt> &java_annotations)
 {
   for(const auto &annotation : parsed_annotations)
   {
-    annotations.emplace_back(annotation.type);
+    java_annotations.emplace_back(annotation.type);
     std::vector<java_annotationt::valuet> &values =
-      annotations.back().get_values();
+      java_annotations.back().get_values();
     std::transform(
       annotation.element_value_pairs.begin(),
       annotation.element_value_pairs.end(),
       std::back_inserter(values),
-      [](const decltype(annotation.element_value_pairs)::value_type &value)
-      {
+      [](const decltype(annotation.element_value_pairs)::value_type &value) {
         return java_annotationt::valuet(value.element_name, value.value);
       });
   }
