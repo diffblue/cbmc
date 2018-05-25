@@ -125,7 +125,8 @@ pointer_typet select_pointer_typet::specialize_generics(
       {
         const pointer_typet &new_array_type = specialize_generics(
           to_pointer_type(array_element_type),
-          generic_parameter_specialization_map, visited_nodes);
+          generic_parameter_specialization_map,
+          visited_nodes);
 
         pointer_typet replacement_array_type = java_array_type('a');
         replacement_array_type.subtype().set(ID_C_element_type, new_array_type);
@@ -149,10 +150,34 @@ optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
     &generic_parameter_specialization_map) const
 {
   generic_parameter_recursion_trackingt visited;
-  const auto retval = get_instantiated_type(
-    parameter_name, generic_parameter_specialization_map, visited, 0);
-  INVARIANT(visited.empty(), "recursion set must be empty here");
-  return retval;
+  size_t depth = 0;
+  const size_t max =
+    generic_parameter_specialization_map.find(parameter_name)->second.size();
+
+  irep_idt current_parameter = parameter_name;
+  while(depth < max)
+  {
+    const auto retval = get_instantiated_type(
+      current_parameter, generic_parameter_specialization_map, visited, depth);
+    if(retval.has_value())
+    {
+      if(is_java_generic_parameter(*retval))
+      {
+        UNREACHABLE;
+      }
+      return retval;
+    }
+    INVARIANT(visited.empty(), "recursion set must be empty here");
+
+    const auto &entry =
+      generic_parameter_specialization_map.find(current_parameter)
+        ->second.back();
+    const java_generic_parametert &gen_param = to_java_generic_parameter(entry);
+    const auto &type_var = gen_param.type_variable();
+    current_parameter = type_var.get_identifier();
+    depth++;
+  }
+  return {};
 }
 
 /// See above, the additional parameter just tracks the recursion to prevent
@@ -179,16 +204,14 @@ optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
     const auto &replacements =
       generic_parameter_specialization_map.find(parameter_name)->second;
 
-    // max depth reached and nothing found
+    // max depth reached and nothing found, TODO return bound
     if(replacements.size() <= depth)
       return {};
 
-    // Check if there is a recursion loop, if yes increase search depth
+    // Check if there is a recursion loop, if yes return with nothing found
     if(visited.find(parameter_name) != visited.end())
     {
-      visited.clear();
-      return get_instantiated_type(
-        parameter_name, generic_parameter_specialization_map, visited, depth+1);
+      return {};
     }
     else
     {
@@ -202,7 +225,8 @@ optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
         else
         {
           visited.insert(parameter_name);
-          const auto &gen_type = to_java_generic_parameter(type).type_variable();
+          const auto &gen_type =
+            to_java_generic_parameter(type).type_variable();
           const auto val = get_instantiated_type(
             gen_type.get_identifier(),
             generic_parameter_specialization_map,

@@ -11,11 +11,11 @@
 /// \file
 /// Handle selection of correct pointer type (for example changing abstract
 /// classes to concrete versions).
+#include <vector>
 
+#include "java_types.h"
 #include <util/optional.h>
 #include <util/std_types.h>
-#include <vector>
-#include "java_types.h"
 
 typedef std::unordered_map<irep_idt, std::vector<reference_typet>>
   generic_parameter_specialization_mapt;
