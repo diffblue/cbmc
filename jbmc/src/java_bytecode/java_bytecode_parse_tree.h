@@ -54,7 +54,7 @@ public:
 
   typedef std::vector<annotationt> annotationst;
 
-  static bool does_annotation_exist(
+  static optionalt<annotationt> find_annotation(
     const annotationst &annotations,
     const irep_idt &annotation_type_name);
 

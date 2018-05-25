@@ -875,8 +875,9 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
 
 bool java_bytecode_convert_classt::is_overlay_method(const methodt &method)
 {
-  return java_bytecode_parse_treet::does_annotation_exist(
-    method.annotations, ID_overlay_method);
+  return java_bytecode_parse_treet::find_annotation(
+           method.annotations, ID_overlay_method)
+    .has_value();
 }
 
 bool java_bytecode_convert_class(
