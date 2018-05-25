@@ -33,17 +33,16 @@ SCENARIO(
     GIVEN(
       "A class with a static lambda variables from " + compiler + " compiler.")
     {
-      java_bytecode_parse_treet parse_tree;
-      java_bytecode_parse(
+      optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
         "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
           compiler + "_classes/StaticLambdas.class",
-        parse_tree,
         message_handler);
       WHEN("Parsing that class")
       {
-        REQUIRE(parse_tree.loading_successful);
-        const java_bytecode_parse_treet::classt parsed_class =
-          parse_tree.parsed_class;
+        REQUIRE(parse_tree);
+        REQUIRE(parse_tree->loading_successful);
+        const java_bytecode_parse_treet::classt &parsed_class =
+          parse_tree->parsed_class;
         REQUIRE(parsed_class.attribute_bootstrapmethods_read);
         REQUIRE(parsed_class.lambda_method_handle_map.size() == 12);
 
@@ -345,17 +344,16 @@ SCENARIO(
       null_message_handlert message_handler;
       GIVEN("A method with local lambdas from " + compiler + " compiler.")
       {
-        java_bytecode_parse_treet parse_tree;
-        java_bytecode_parse(
+        optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
           "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
             compiler + "_classes/LocalLambdas.class",
-          parse_tree,
           message_handler);
         WHEN("Parsing that class")
         {
-          REQUIRE(parse_tree.loading_successful);
-          const java_bytecode_parse_treet::classt parsed_class =
-            parse_tree.parsed_class;
+          REQUIRE(parse_tree);
+          REQUIRE(parse_tree->loading_successful);
+          const java_bytecode_parse_treet::classt &parsed_class =
+            parse_tree->parsed_class;
           REQUIRE(parsed_class.attribute_bootstrapmethods_read);
           REQUIRE(parsed_class.lambda_method_handle_map.size() == 12);
 
@@ -655,17 +653,16 @@ SCENARIO(
         "A class that has lambdas as member variables from " + compiler +
         " compiler.")
       {
-        java_bytecode_parse_treet parse_tree;
-        java_bytecode_parse(
+        optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
           "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
             compiler + "_classes/MemberLambdas.class",
-          parse_tree,
           message_handler);
         WHEN("Parsing that class")
         {
-          REQUIRE(parse_tree.loading_successful);
-          const java_bytecode_parse_treet::classt parsed_class =
-            parse_tree.parsed_class;
+          REQUIRE(parse_tree);
+          REQUIRE(parse_tree->loading_successful);
+          const java_bytecode_parse_treet::classt &parsed_class =
+            parse_tree->parsed_class;
           REQUIRE(parsed_class.attribute_bootstrapmethods_read);
           REQUIRE(parsed_class.lambda_method_handle_map.size() == 12);
 
@@ -991,17 +988,16 @@ SCENARIO(
         "variables from " +
         compiler + " compiler.")
       {
-        java_bytecode_parse_treet parse_tree;
-        java_bytecode_parse(
+        optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
           "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
             compiler + "_classes/OuterMemberLambdas$Inner.class",
-          parse_tree,
           message_handler);
         WHEN("Parsing that class")
         {
-          REQUIRE(parse_tree.loading_successful);
-          const java_bytecode_parse_treet::classt parsed_class =
-            parse_tree.parsed_class;
+          REQUIRE(parse_tree);
+          REQUIRE(parse_tree->loading_successful);
+          const java_bytecode_parse_treet::classt &parsed_class =
+            parse_tree->parsed_class;
           REQUIRE(parsed_class.attribute_bootstrapmethods_read);
           REQUIRE(parsed_class.lambda_method_handle_map.size() == 3);
 

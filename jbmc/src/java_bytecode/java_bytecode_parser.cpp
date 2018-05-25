@@ -1688,10 +1688,8 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
     rmethod_attribute(method);
 }
 
-bool java_bytecode_parse(
-  std::istream &istream,
-  java_bytecode_parse_treet &parse_tree,
-  message_handlert &message_handler)
+optionalt<class java_bytecode_parse_treet>
+java_bytecode_parse(std::istream &istream, message_handlert &message_handler)
 {
   java_bytecode_parsert java_bytecode_parser;
   java_bytecode_parser.in=&istream;
@@ -1699,15 +1697,16 @@ bool java_bytecode_parse(
 
   bool parser_result=java_bytecode_parser.parse();
 
-  parse_tree.swap(java_bytecode_parser.parse_tree);
+  if(parser_result)
+  {
+    return {};
+  }
 
-  return parser_result;
+  return std::move(java_bytecode_parser.parse_tree);
 }
 
-bool java_bytecode_parse(
-  const std::string &file,
-  java_bytecode_parse_treet &parse_tree,
-  message_handlert &message_handler)
+optionalt<class java_bytecode_parse_treet>
+java_bytecode_parse(const std::string &file, message_handlert &message_handler)
 {
   std::ifstream in(file, std::ios::binary);
 
@@ -1716,10 +1715,10 @@ bool java_bytecode_parse(
     messaget message(message_handler);
     message.error() << "failed to open input file `"
                     << file << '\'' << messaget::eom;
-    return true;
+    return {};
   }
 
-  return java_bytecode_parse(in, parse_tree, message_handler);
+  return java_bytecode_parse(in, message_handler);
 }
 
 /// Parses the local variable type table of a method. The LVTT holds generic

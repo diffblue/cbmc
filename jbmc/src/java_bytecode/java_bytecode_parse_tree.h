@@ -22,6 +22,16 @@ Author: Daniel Kroening, kroening@kroening.com
 class java_bytecode_parse_treet
 {
 public:
+  // Disallow copy construction and copy assignment, but allow move construction
+  // and move assignment.
+  #ifndef _MSC_VER // Ommit this on MS VC2013 as move is not supported.
+  java_bytecode_parse_treet(const java_bytecode_parse_treet &) = delete;
+  java_bytecode_parse_treet &
+  operator=(const java_bytecode_parse_treet &) = delete;
+  java_bytecode_parse_treet(java_bytecode_parse_treet &&) = default;
+  java_bytecode_parse_treet &operator=(java_bytecode_parse_treet &&) = default;
+  #endif
+
   virtual ~java_bytecode_parse_treet() = default;
   class annotationt
   {
@@ -178,6 +188,17 @@ public:
   class classt
   {
   public:
+    classt() = default;
+
+    // Disallow copy construction and copy assignment, but allow move
+    // construction and move assignment.
+    #ifndef _MSC_VER // Ommit this on MS VC2013 as move is not supported.
+    classt(const classt &) = delete;
+    classt &operator=(const classt &) = delete;
+    classt(classt &&) = default;
+    classt &operator=(classt &&) = default;
+    #endif
+
     irep_idt name, extends;
     bool is_abstract=false;
     bool is_enum=false;
@@ -261,17 +282,10 @@ public:
 
     void output(std::ostream &out) const;
 
-    void swap(classt &other);
   };
 
   classt parsed_class;
 
-  void swap(java_bytecode_parse_treet &other)
-  {
-    other.parsed_class.swap(parsed_class);
-    other.class_refs.swap(class_refs);
-    std::swap(loading_successful, other.loading_successful);
-  }
 
   void output(std::ostream &out) const;
 
