@@ -32,6 +32,7 @@ SRC += java_bytecode/goto-programs/class_hierarchy_output.cpp \
        util/simplify_expr.cpp \
        java_bytecode/java_virtual_functions/virtual_functions.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_generic_superclasses.cpp \
+       java_bytecode/goto_program_generics/mutually_recursive_generics.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I. -I $(CPROVER_DIR)/src -I $(CPROVER_DIR)/unit
