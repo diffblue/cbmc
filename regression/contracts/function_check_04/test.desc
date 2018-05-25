@@ -1,11 +1,8 @@
-KNOWNBUG
+CORE
 main.c
---apply-code-contracts
+--check-code-contracts
 ^\[main.assertion.1\] assertion x == 0: SUCCESS$
 ^\[foo.1\] : FAILURE$
 ^VERIFICATION FAILED$
 --
 --
---check-code-contracts not implemented yet.
---apply-code-contracts is the current name for the flag. This should be
-updated as the flag changes.

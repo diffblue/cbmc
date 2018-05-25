@@ -17,12 +17,18 @@ Author: Daniel Kroening, kroening@kroening.com
 class local_may_aliast;
 
 typedef std::set<exprt> modifiest;
+typedef std::set<exprt> usest;
 typedef const natural_loops_mutablet::natural_loopt loopt;
 
 void get_modifies(
   const local_may_aliast &local_may_alias,
   const loopt &loop,
   modifiest &modifies);
+
+void get_uses(
+  const local_may_aliast &local_may_alias,
+  const loopt &loop,
+  usest &uses);
 
 void build_havoc_code(
   const goto_programt::targett loop_head,

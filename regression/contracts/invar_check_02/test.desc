@@ -1,11 +1,8 @@
-KNOWNBUG
+CORE
 main.c
---apply-code-contracts
+--check-code-contracts
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 --
---check-code-contracts not implemented yet.
---apply-code-contracts is the current name for the flag. This should be
-updated as the flag changes.
