@@ -10,8 +10,6 @@ Date: August 2012
 
 #include "run.h"
 
-#include <cassert>
-
 #ifdef _WIN32
 #include <process.h>
 #else
@@ -30,6 +28,7 @@ Date: August 2012
 
 #endif
 
+#include <util/invariant.h>
 #include <util/unicode.h>
 #include <util/signal_catcher.h>
 
@@ -39,19 +38,59 @@ int run_shell(const std::string &command)
   std::vector<std::string> argv;
   argv.push_back(shell);
   argv.push_back(command);
-  return run(shell, argv, "", "");
+  return run(shell, argv, "", "", "");
 }
+
+#ifndef _WIN32
+/// open given file to replace either stdin, stderr, stdout
+static int stdio_redirection(int fd, const std::string &file)
+{
+  int result_fd = fd;
+
+  if(file.empty())
+    return result_fd;
+
+  int flags = 0, mode = 0;
+  std::string name;
+
+  switch(fd)
+  {
+  case STDIN_FILENO:
+    flags = O_RDONLY;
+    name = "stdin";
+    break;
+
+  case STDOUT_FILENO:
+  case STDERR_FILENO:
+    flags = O_CREAT | O_WRONLY;
+    mode = S_IRUSR | S_IWUSR;
+    name = fd == STDOUT_FILENO ? "stdout" : "stderr";
+    break;
+
+  default:
+    UNREACHABLE;
+  }
+
+  result_fd = open(file.c_str(), flags, mode);
+  if(result_fd == -1)
+    perror(("Failed to open " + name + " file " + file).c_str());
+
+  return result_fd;
+}
+#endif
 
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,
   const std::string &std_input,
-  const std::string &std_output)
+  const std::string &std_output,
+  const std::string &std_error)
 {
   #ifdef _WIN32
-  // we don't support stdin/stdout redirection on Windows
-  assert(std_input.empty());
-  assert(std_output.empty());
+  // we don't support stdin/stdout/stderr redirection on Windows
+  PRECONDITION(std_input.empty());
+  PRECONDITION(std_output.empty());
+  PRECONDITION(std_error.empty());
 
   // unicode version of the arguments
   std::vector<std::wstring> wargv;
@@ -77,29 +116,12 @@ int run(
   return status;
 
   #else
-  int stdin_fd=STDIN_FILENO;
+  int stdin_fd = stdio_redirection(STDIN_FILENO, std_input);
+  int stdout_fd = stdio_redirection(STDOUT_FILENO, std_output);
+  int stderr_fd = stdio_redirection(STDERR_FILENO, std_error);
 
-  if(!std_input.empty())
-  {
-    stdin_fd=open(std_input.c_str(), O_RDONLY);
-    if(stdin_fd==-1)
-    {
-      perror("Failed to open stdin copy");
-      return 1;
-    }
-  }
-
-  int stdout_fd=STDOUT_FILENO;
-
-  if(!std_output.empty())
-  {
-    stdout_fd=open(std_output.c_str(), O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR);
-    if(stdout_fd==-1)
-    {
-      perror("Failed to open stdout copy");
-      return 1;
-    }
-  }
+  if(stdin_fd == -1 || stdout_fd == -1 || stderr_fd == -1)
+    return 1;
 
   // temporarily suspend all signals
   sigset_t new_mask, old_mask;
@@ -127,6 +149,8 @@ int run(
         dup2(stdin_fd, STDIN_FILENO);
       if(stdout_fd!=STDOUT_FILENO)
         dup2(stdout_fd, STDOUT_FILENO);
+      if(stderr_fd != STDERR_FILENO)
+        dup2(stderr_fd, STDERR_FILENO);
 
       errno=0;
       execvp(what.c_str(), _argv.data());
@@ -153,6 +177,8 @@ int run(
             close(stdin_fd);
           if(stdout_fd!=STDOUT_FILENO)
             close(stdout_fd);
+          if(stderr_fd != STDERR_FILENO)
+            close(stderr_fd);
           return 1;
         }
 
@@ -160,6 +186,8 @@ int run(
         close(stdin_fd);
       if(stdout_fd!=STDOUT_FILENO)
         close(stdout_fd);
+      if(stderr_fd != STDERR_FILENO)
+        close(stderr_fd);
 
       return WEXITSTATUS(status);
     }
@@ -173,6 +201,8 @@ int run(
       close(stdin_fd);
     if(stdout_fd!=STDOUT_FILENO)
       close(stdout_fd);
+    if(stderr_fd != STDERR_FILENO)
+      close(stderr_fd);
 
     return 1;
   }

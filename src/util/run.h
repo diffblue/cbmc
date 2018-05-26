@@ -18,8 +18,9 @@ Date: August 2012
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,
-  const std::string &std_input,
-  const std::string &std_output);
+  const std::string &std_input = "",
+  const std::string &std_output = "",
+  const std::string &std_error = "");
 
 int run_shell(const std::string &command);
 
