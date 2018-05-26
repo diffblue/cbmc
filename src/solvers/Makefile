@@ -1,5 +1,4 @@
 include ../config.inc
-include ../common
 
 ifneq ($(CHAFF),)
   CHAFF_SRC=sat/satcheck_zchaff.cpp sat/satcheck_zcore.cpp
@@ -194,6 +193,8 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2/smt2_tokenizer.cpp \
       smt2/smt2irep.cpp \
       # Empty last line
+
+include ../common
 
 INCLUDES += -I .. \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \

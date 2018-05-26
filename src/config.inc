@@ -30,6 +30,11 @@ endif
 # when linking against an IPASIR solver.
 LIBSOLVER =
 
+# select default solver to be minisat2 if no other is specified
+ifeq ($(BOOLEFORCE)$(CHAFF)$(GLUCOSE)$(IPASIR)$(LINGELING)$(MINISAT)$(MINISAT2)$(PICOSAT)$(CADICAL),)
+  MINISAT2 = ../../minisat-2.2.1
+endif
+
 ifneq ($(PICOSAT),)
   CP_CXXFLAGS += -DSATCHECK_PICOSAT
 endif
