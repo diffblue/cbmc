@@ -543,6 +543,13 @@ void c_typecastt::implicit_typecast_followed(
         // Also generous: between any to scalar types it's ok.
         // We should probably check the size.
       }
+      else if(src_sub.id()==ID_array &&
+              dest_sub.id()==ID_array &&
+              base_type_eq(src_sub.subtype(), dest_sub.subtype(), ns))
+      {
+        // we ignore the size of the top-level array
+        // in the case of pointers to arrays
+      }
       else
         warnings.push_back("incompatible pointer types");
 
