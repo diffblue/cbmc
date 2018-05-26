@@ -25,11 +25,12 @@ Date: May 2006
 #include "as_cmdline.h"
 #include "as86_cmdline.h"
 
-#include "gcc_mode.h"
-#include "cw_mode.h"
-#include "ms_cl_mode.h"
 #include "armcc_mode.h"
 #include "as_mode.h"
+#include "cw_mode.h"
+#include "gcc_mode.h"
+#include "ld_mode.h"
+#include "ms_cl_mode.h"
 
 std::string to_lower_string(const std::string &s)
 {
@@ -106,8 +107,8 @@ int main(int argc, const char **argv)
   {
     // this simulates "ld" for linking
     ld_cmdlinet cmdline;
-    gcc_modet gcc_mode(cmdline, base_name, true);
-    return gcc_mode.main(argc, argv);
+    ld_modet ld_mode(cmdline, base_name);
+    return ld_mode.main(argc, argv);
   }
   else if(base_name.find("goto-bcc")!=std::string::npos)
   {
