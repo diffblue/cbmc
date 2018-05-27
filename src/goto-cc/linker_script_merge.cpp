@@ -114,9 +114,9 @@ int linker_script_merget::add_linker_script_definitions()
 
 linker_script_merget::linker_script_merget(
       compilet &compiler,
-      std::list<std::string> &elf_binaries,
-      std::list<std::string> &goto_binaries,
-      cmdlinet &cmdline,
+      const std::list<std::string> &elf_binaries,
+      const std::list<std::string> &goto_binaries,
+      const cmdlinet &cmdline,
       message_handlert &message_handler) :
     messaget(message_handler), compiler(compiler),
     elf_binaries(elf_binaries), goto_binaries(goto_binaries),
