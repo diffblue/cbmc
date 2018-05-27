@@ -149,6 +149,7 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_CONSTRUCTOR "constructor"
 %token TOK_GCC_ATTRIBUTE_DESTRUCTOR "destructor"
 %token TOK_GCC_ATTRIBUTE_FALLTHROUGH "fallthrough"
+%token TOK_GCC_ATTRIBUTE_REGPARAM "regparam"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
 %token TOK_MSC_BASED   "__based"
@@ -1540,6 +1541,8 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_section); mto($$, $3); }
         | TOK_GCC_ATTRIBUTE_NORETURN
         { $$=$1; set($$, ID_noreturn); }
+        | TOK_GCC_ATTRIBUTE_REGPARAM '(' comma_expression ')'
+        { $$=$1; set($$, ID_regparam); stack($$).set(ID_size, stack($3)); }
         | TOK_GCC_ATTRIBUTE_CONSTRUCTOR
         { $$=$1; set($$, ID_constructor); }
         | TOK_GCC_ATTRIBUTE_DESTRUCTOR

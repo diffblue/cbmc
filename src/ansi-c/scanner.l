@@ -1566,7 +1566,7 @@ __decltype          { if(PARSER.cpp98 &&
 "__weak__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_WEAK; }
 
 "alias" |
-"__alias__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_ALIAS; }
+"__alias__"         { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_ALIAS; }
 
 "section" |
 "__section__"       { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_SECTION; }
@@ -1578,7 +1578,9 @@ __decltype          { if(PARSER.cpp98 &&
 "__constructor__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_CONSTRUCTOR; }
 
 "destructor" |
-"__destructor__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_DESTRUCTOR; }
+"__destructor__"    { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_DESTRUCTOR; }
+
+"regparam"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_REGPARAM; }
 
 "fallthrough"       { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_FALLTHROUGH; }
 
