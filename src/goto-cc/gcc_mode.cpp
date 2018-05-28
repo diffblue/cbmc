@@ -107,8 +107,6 @@ gcc_modet::gcc_modet(
   bool _produce_hybrid_binary):
   goto_cc_modet(_cmdline, _base_name, gcc_message_handler),
   produce_hybrid_binary(_produce_hybrid_binary),
-  act_as_ld(base_name=="ld" ||
-            base_name.find("goto-ld")!=std::string::npos),
   goto_binary_tmp_suffix(".goto-cc-saved"),
 
   // Keys are architectures specified in configt::set_arch().
@@ -327,8 +325,6 @@ int gcc_modet::doit()
   }
 
   native_tool_name=
-    act_as_ld ?
-    linker_name(cmdline, base_name) :
     compiler_name(cmdline, base_name);
 
   auto default_verbosity = (cmdline.isset("Wall") || cmdline.isset("Wextra")) ?
@@ -346,10 +342,7 @@ int gcc_modet::doit()
     // "-v" a) prints the version and b) increases verbosity.
     // Compilation continues, don't exit!
 
-    if(act_as_ld)
-      std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION
-                << ")\n";
-    else if(act_as_bcc)
+    if(act_as_bcc)
       std::cout << "bcc: version 0.16.17 (goto-cc " CBMC_VERSION ")\n";
     else
       std::cout << "gcc version 3.4.4 (goto-cc " CBMC_VERSION ")\n";
@@ -396,14 +389,7 @@ int gcc_modet::doit()
     return EX_OK;
   }
 
-  if(act_as_ld)
-  {
-    if(produce_hybrid_binary)
-      debug() << "LD mode (hybrid)" << eom;
-    else
-      debug() << "LD mode" << eom;
-  }
-  else if(act_as_bcc)
+  if(act_as_bcc)
   {
     if(produce_hybrid_binary)
       debug() << "BCC mode (hybrid)" << eom;
@@ -419,9 +405,7 @@ int gcc_modet::doit()
   }
 
   // determine actions to be undertaken
-  if(act_as_ld)
-    compiler.mode=compilet::LINK_LIBRARY;
-  else if(cmdline.isset('S'))
+  if(cmdline.isset('S'))
     compiler.mode=compilet::ASSEMBLE_ONLY;
   else if(cmdline.isset('c'))
     compiler.mode=compilet::COMPILE_ONLY;
@@ -438,13 +422,10 @@ int gcc_modet::doit()
   // * preprocessing (-E)
   // * no input files given
 
-  if(act_as_ld)
-  {
-  }
-  else if(cmdline.isset('M') ||
-          cmdline.isset("MM") ||
-          cmdline.isset('E') ||
-          !cmdline.have_infile_arg())
+  if(cmdline.isset('M') ||
+     cmdline.isset("MM") ||
+     cmdline.isset('E') ||
+     !cmdline.have_infile_arg())
     return run_gcc(compiler); // exit!
 
   // get configuration
@@ -820,7 +801,7 @@ int gcc_modet::run_gcc(const compilet &compiler)
   for(const auto &a : cmdline.parsed_argv)
     new_argv.push_back(a.arg);
 
-  if(!act_as_ld && compiler.wrote_object_files())
+  if(compiler.wrote_object_files())
   {
     // Undefine all __CPROVER macros for the system compiler
     std::map<irep_idt, std::size_t> arities;
@@ -953,7 +934,8 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
     std::string goto_binary=*it+goto_binary_tmp_suffix;
 
     if(result==0)
-      result = hybrid_binary(native_tool, goto_binary, *it, get_message_handler());
+      result = hybrid_binary(
+        native_tool, goto_binary, *it, get_message_handler());
   }
 
   return result;
@@ -1047,10 +1029,6 @@ int gcc_modet::asm_output(
 /// display command line help
 void gcc_modet::help_mode()
 {
-  if(act_as_ld)
-    std::cout << "goto-ld understands the options of "
-              << "ld plus the following.\n\n";
-  else
-    std::cout << "goto-cc understands the options of "
-              << "gcc plus the following.\n\n";
+  std::cout << "goto-cc understands the options of "
+            << "gcc plus the following.\n\n";
 }

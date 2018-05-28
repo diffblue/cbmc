@@ -37,7 +37,6 @@ protected:
 
   const bool produce_hybrid_binary;
 
-  const bool act_as_ld;
   std::string native_tool_name;
 
   const std::string goto_binary_tmp_suffix;
