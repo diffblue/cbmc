@@ -48,6 +48,7 @@ Author: CM Wintersteiger, 2006
 
 #include <cbmc/version.h>
 
+#include "hybrid_binary.h"
 #include "linker_script_merge.h"
 
 static std::string compiler_name(
@@ -922,19 +923,6 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
     goto_binaries.push_back(bin_name);
   }
 
-  std::string objcopy_cmd;
-  if(has_suffix(linker_name(cmdline, base_name), "-ld"))
-  {
-    objcopy_cmd=linker_name(cmdline, base_name);
-    objcopy_cmd.erase(objcopy_cmd.size()-2);
-  }
-  else if(has_suffix(compiler_name(cmdline, base_name), "-gcc"))
-  {
-    objcopy_cmd=compiler_name(cmdline, base_name);
-    objcopy_cmd.erase(objcopy_cmd.size()-3);
-  }
-  objcopy_cmd+="objcopy";
-
   int result=run_gcc(compiler);
 
   if(result==0 &&
@@ -948,6 +936,13 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
     result=ls_merge.add_linker_script_definitions();
   }
 
+  std::string native_tool;
+
+  if(has_suffix(linker_name(cmdline, base_name), "-ld"))
+    native_tool=linker_name(cmdline, base_name);
+  else if(has_suffix(compiler_name(cmdline, base_name), "-gcc"))
+    native_tool=compiler_name(cmdline, base_name);
+
   // merge output from gcc with goto-binaries
   // using objcopy, or do cleanup if an earlier call failed
   for(std::list<std::string>::const_iterator
@@ -955,74 +950,10 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
       it!=output_files.end();
       it++)
   {
-    debug() << "merging " << *it << eom;
-    std::string saved=*it+goto_binary_tmp_suffix;
-
-    #ifdef __linux__
-    if(result==0 && !cmdline.isset('c'))
-    {
-      // remove any existing goto-cc section
-      std::vector<std::string> objcopy_argv;
-
-      objcopy_argv.push_back(objcopy_cmd);
-      objcopy_argv.push_back("--remove-section=goto-cc");
-      objcopy_argv.push_back(*it);
-
-      result=run(objcopy_argv[0], objcopy_argv, "", "");
-    }
+    std::string goto_binary=*it+goto_binary_tmp_suffix;
 
     if(result==0)
-    {
-      // now add goto-binary as goto-cc section
-      std::vector<std::string> objcopy_argv;
-
-      objcopy_argv.push_back(objcopy_cmd);
-      objcopy_argv.push_back("--add-section");
-      objcopy_argv.push_back("goto-cc="+saved);
-      objcopy_argv.push_back(*it);
-
-      result=run(objcopy_argv[0], objcopy_argv, "", "");
-    }
-
-    int remove_result=remove(saved.c_str());
-    if(remove_result!=0)
-    {
-      error() << "Remove failed: " << std::strerror(errno) << eom;
-      if(result==0)
-        result=remove_result;
-    }
-
-    #elif defined(__APPLE__)
-    // Mac
-    if(result==0)
-    {
-      std::vector<std::string> lipo_argv;
-
-      // now add goto-binary as hppa7100LC section
-      lipo_argv.push_back("lipo");
-      lipo_argv.push_back(*it);
-      lipo_argv.push_back("-create");
-      lipo_argv.push_back("-arch");
-      lipo_argv.push_back("hppa7100LC");
-      lipo_argv.push_back(saved);
-      lipo_argv.push_back("-output");
-      lipo_argv.push_back(*it);
-
-      result=run(lipo_argv[0], lipo_argv, "", "");
-    }
-
-    int remove_result=remove(saved.c_str());
-    if(remove_result!=0)
-    {
-      error() << "Remove failed: " << std::strerror(errno) << eom;
-      if(result==0)
-        result=remove_result;
-    }
-
-    #else
-    error() << "binary merging not implemented for this platform" << eom;
-    return 1;
-    #endif
+      result = hybrid_binary(native_tool, goto_binary, *it, get_message_handler());
   }
 
   return result;
