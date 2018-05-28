@@ -143,6 +143,7 @@ class optionst;
   "(reachable-functions)" \
   "(intervals)(show-intervals)" \
   "(non-null)(show-non-null)" \
+  "(find-conversion):" \
   "(constants)" \
   "(dependence-graph)" \
   "(show)(verify)(simplify):" \

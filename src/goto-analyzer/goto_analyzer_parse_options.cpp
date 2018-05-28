@@ -53,6 +53,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cbmc/version.h>
 #include <goto-programs/adjust_float_expressions.h>
 
+#include "find_conversion.h"
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
 #include "static_show_domain.h"
@@ -127,6 +128,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("taint", true);
     options.set_option("specific-analysis", true);
   }
+
   // For backwards compatibility,
   // these are first recognised as specific analyses
   bool reachability_task = false;
@@ -401,6 +403,16 @@ int goto_analyzer_parse_optionst::doit()
     return CPROVER_EXIT_EXCEPTION;
   }
 
+  if(cmdline.isset("find-conversion"))
+  {
+    const auto &conversions = cmdline.get_values("find-conversion");
+    std::unordered_set<irep_idt> conversions_hashed;
+    for(const auto &c : conversions)
+      conversions_hashed.insert(c);
+    bool result = find_conversion(goto_model, conversions_hashed);
+    return result ? CPROVER_EXIT_VERIFICATION_UNSAFE : CPROVER_EXIT_SUCCESS;
+  }
+
   if(process_goto_program(options))
     return CPROVER_EXIT_INTERNAL_ERROR;
 
@@ -459,6 +471,7 @@ int goto_analyzer_parse_optionst::doit()
 int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 {
   adjust_float_expressions(goto_model);
+
   if(options.get_bool_option("taint"))
   {
     std::string taint_file=cmdline.get_value("taint");
@@ -833,6 +846,7 @@ void goto_analyzer_parse_optionst::help()
     "Specific analyses:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --taint file_name            perform taint analysis using rules in given file\n"
+    " --find-conversion id         find conversions from/to type with given id\n"
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
