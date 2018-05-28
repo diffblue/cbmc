@@ -82,16 +82,16 @@ public:
   typedef std::map<irep_idt, std::pair<symbol_exprt, exprt>> linker_valuest;
 
   linker_script_merget(
-      compilet &,
-      const std::list<std::string> &elf_binaries,
-      const std::list<std::string> &goto_binaries,
-      const cmdlinet &,
-      message_handlert &);
+    compilet &,
+    const std::string &elf_binary,
+    const std::string &goto_binary,
+    const cmdlinet &,
+    message_handlert &);
 
 protected:
   compilet &compiler;
-  const std::list<std::string> &elf_binaries;
-  const std::list<std::string> &goto_binaries;
+  const std::string &elf_binary;
+  const std::string &goto_binary;
   const cmdlinet &cmdline;
 
   /// \brief The "shapes" of expressions to be replaced by a pointer
