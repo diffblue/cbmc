@@ -106,9 +106,9 @@ public:
   constant_interval_exprt handle_constant_unary_expression(const irep_idt &op) const;
   constant_interval_exprt handle_constant_binary_expression(const constant_interval_exprt &other, const irep_idt &) const;
 
-  constant_interval_exprt eval(const irep_idt &unary_operator);
+  constant_interval_exprt eval(const irep_idt &unary_operator) const;
   constant_interval_exprt
-  eval(const irep_idt &binary_operator, const constant_interval_exprt &o);
+  eval(const irep_idt &binary_operator, const constant_interval_exprt &o) const;
 
   /* Unary arithmetic */
   constant_interval_exprt unary_plus() const;
