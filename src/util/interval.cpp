@@ -251,6 +251,9 @@ tvt constant_interval_exprt::is_definitely_false() const
 
 tvt constant_interval_exprt::logical_or(const constant_interval_exprt &o) const
 {
+  PRECONDITION(type().id() == ID_bool);
+  PRECONDITION(o.type().id() == ID_bool);
+
   tvt a = is_definitely_true();
   tvt b = o.is_definitely_true();
 
@@ -259,11 +262,17 @@ tvt constant_interval_exprt::logical_or(const constant_interval_exprt &o) const
 
 tvt constant_interval_exprt::logical_and(const constant_interval_exprt &o) const
 {
+  PRECONDITION(type().id() == ID_bool);
+  PRECONDITION(o.type().id() == ID_bool);
+
   return (is_definitely_true() && o.is_definitely_true());
 }
 
 tvt constant_interval_exprt::logical_xor(const constant_interval_exprt &o) const
 {
+  PRECONDITION(type().id() == ID_bool);
+  PRECONDITION(o.type().id() == ID_bool);
+
   return (
     (is_definitely_true() && !o.is_definitely_true()) ||
     (!is_definitely_true() && o.is_definitely_true()));
@@ -271,6 +280,8 @@ tvt constant_interval_exprt::logical_xor(const constant_interval_exprt &o) const
 
 tvt constant_interval_exprt::logical_not() const
 {
+  PRECONDITION(type().id() == ID_bool);
+
   if(is_definitely_true().is_true())
   {
     return tvt(false);
