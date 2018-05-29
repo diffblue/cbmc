@@ -4,6 +4,7 @@ use subs;
 use strict;
 use warnings;
 use File::Basename;
+use Term::ANSIColor;
 
 use Cwd;
 
@@ -373,10 +374,10 @@ sub do_test($)
       $skips++;
       print "  [SKIPPED]\n";
     } elsif(0 == $failed_skipped) {
-      print "  [OK] in $runtime seconds\n";
+      print "  [" . colored("OK", "green") . "] in $runtime seconds\n";
     } else {
       $failures++;
-      print "  [FAILED]\n";
+      print "  [" . colored("FAILED", "red") . "]\n";
     }
   }
 }
@@ -408,9 +409,9 @@ defined($pool) and $pool->join();
 print "\n";
 
 if($failures == 0) {
-  print "All tests were successful";
+  print colored("All tests were successful", "green");
 } else {
-  print "Tests failed\n";
+  print colored("Tests failed", "red") . "\n";
   print "  $failures of $count " . (1==$count?"test":"tests") . " failed";
 }
 print ", $skips " . (1==$skips?"test":"tests") . " skipped" if($skips > 0);
