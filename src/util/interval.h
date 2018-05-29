@@ -122,8 +122,6 @@ public:
   tvt logical_xor(const constant_interval_exprt &o) const;
   tvt logical_not() const;
 
-  constant_interval_exprt tv_to_interval(const tvt &tv) const;
-
   /* Binary */
   constant_interval_exprt plus(const constant_interval_exprt &o) const;
   constant_interval_exprt minus(const constant_interval_exprt &other) const;

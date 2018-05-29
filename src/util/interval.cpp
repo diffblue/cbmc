@@ -896,57 +896,41 @@ constant_interval_exprt constant_interval_exprt::eval(
   }
   if(binary_operator == ID_lt)
   {
-    return tv_to_interval(less_than(other));
+    return tvt_to_interval(less_than(other));
   }
   if(binary_operator == ID_le)
   {
-    return tv_to_interval(less_than_or_equal(other));
+    return tvt_to_interval(less_than_or_equal(other));
   }
   if(binary_operator == ID_gt)
   {
-    return tv_to_interval(greater_than(other));
+    return tvt_to_interval(greater_than(other));
   }
   if(binary_operator == ID_ge)
   {
-    return tv_to_interval(greater_than_or_equal(other));
+    return tvt_to_interval(greater_than_or_equal(other));
   }
   if(binary_operator == ID_equal)
   {
-    return tv_to_interval(equal(other));
+    return tvt_to_interval(equal(other));
   }
   if(binary_operator == ID_notequal)
   {
-    return tv_to_interval(not_equal(other));
+    return tvt_to_interval(not_equal(other));
   }
   if(binary_operator == ID_and)
   {
-    return tv_to_interval(logical_and(other));
+    return tvt_to_interval(logical_and(other));
   }
   if(binary_operator == ID_or)
   {
-    return tv_to_interval(logical_or(other));
+    return tvt_to_interval(logical_or(other));
   }
   if(binary_operator == ID_xor)
   {
-    return tv_to_interval(logical_xor(other));
+    return tvt_to_interval(logical_xor(other));
   }
 
-  return top();
-}
-
-constant_interval_exprt
-constant_interval_exprt::tv_to_interval(const tvt &tv) const
-{
-  if(tv.is_true())
-  {
-    return constant_interval_exprt(from_integer(1, type()));
-  }
-  if(tv.is_false())
-  {
-    return constant_interval_exprt(zero());
-  }
-
-  INVARIANT(tv.is_unknown(), "We excluded the other cases");
   return top();
 }
 
@@ -1936,12 +1920,6 @@ bool constant_interval_exprt::is_zero() const
 bool constant_interval_exprt::is_negative() const
 {
   return is_negative(get_lower()) && is_negative(get_upper());
-}
-
-const constant_interval_exprt
-tv_to_interval(const constant_interval_exprt &interval, const tvt &tv)
-{
-  return interval.tv_to_interval(tv);
 }
 
 tvt constant_interval_exprt::is_true(const constant_interval_exprt &a)
