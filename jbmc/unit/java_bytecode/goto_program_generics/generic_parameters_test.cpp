@@ -136,13 +136,13 @@ SCENARIO(
             {},
             entry_point_code);
 
-        THEN("Object 'field_input1' has field 'field' of type IWrapper")
+        THEN("Object 'field_input2' has field 'field' of type BWrapper")
         {
           require_goto_statements::require_struct_component_assignment(
             field_input2_name,
             {},
             "field",
-            "java::IWrapper",
+            "java::BWrapper",
             {},
             entry_point_code);
         }
