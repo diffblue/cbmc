@@ -14,21 +14,6 @@ Author: Michael Tautschnig
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
-#include <util/interval.h>
-
-TEST_CASE("Simplifying sums of intervals") {
-  auto expr = plus_exprt(
-    plus_exprt(constant_interval_exprt(from_integer(1, integer_typet())),
-    constant_interval_exprt(from_integer(2, integer_typet()))),
-    plus_exprt(constant_interval_exprt(from_integer(3, integer_typet())),
-    constant_interval_exprt(from_integer(4, integer_typet()))));
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-  auto simplified_sum = simplify_expr(expr, ns);
-  REQUIRE(simplified_sum.id() == ID_constant_interval);
-  auto sum_interval = to_constant_interval_expr(simplified_sum);
-  REQUIRE(sum_interval == constant_interval_exprt(from_integer(10, integer_typet())));
-}
 
 namespace
 {

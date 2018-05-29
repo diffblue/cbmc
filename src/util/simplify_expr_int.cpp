@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr_class.h"
 
 #include <cassert>
-#include <algorithm>
 
 #include "arith_tools.h"
 #include "byte_operators.h"
@@ -24,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational.h"
 #include "rational_tools.h"
 #include "std_expr.h"
-#include "interval.h"
 
 simplify_exprt::resultt<>
 simplify_exprt::simplify_bswap(const bswap_exprt &expr)
@@ -408,31 +406,6 @@ simplify_exprt::resultt<> simplify_exprt::simplify_plus(const plus_exprt &expr)
   bool no_change = true;
 
   exprt::operandst new_operands = expr.operands();
-
-  bool has_interval_operand = std::find_if(begin(operands), end(operands), [](const exprt& e) {
-    return e.id() == ID_constant_interval;
-  }) != end(operands);
-
-  if(has_interval_operand) {
-    auto convert_to_interval = [](const exprt& e) {
-      if(e.id() == ID_constant_interval) {
-        return to_constant_interval_expr(e);
-      } else if(e.id() == ID_constant) {
-        return constant_interval_exprt(e);
-      } else {
-        return constant_interval_exprt(e.type());
-      }
-    };
-    constant_interval_exprt sum = convert_to_interval(operands.front());
-    for(auto it = std::next(begin(operands)); it != end(operands); ++it) {
-      sum = constant_interval_exprt::plus(sum, convert_to_interval(*it));
-    }
-    if(!sum.is_top() && !sum.is_bottom()) {
-      expr = sum;
-      return false;
-    }
-    return true;
-  }
 
   // floating-point addition is _NOT_ associative; thus,
   // there is special case for float
