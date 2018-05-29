@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
+#include <util/c_types.h>
 #include <util/config.h>
 
 #include <ansi-c/ansi_c_internal_additions.h>
@@ -64,7 +65,11 @@ void cpp_internal_additions(std::ostream &out)
 
   // types
   out << "typedef __typeof__(sizeof(int)) __CPROVER::size_t;" << '\n';
-  out << "typedef __typeof__(sizeof(int)) __CPROVER_size_t;" << '\n';
+  out << "typedef __CPROVER::size_t __CPROVER_size_t;" << '\n';
+  out << "typedef "
+      << c_type_as_string(signed_size_type().get(ID_C_c_type))
+      << " __CPROVER::ssize_t;" << '\n';
+  out << "typedef __CPROVER::ssize_t __CPROVER_ssize_t;" << '\n';
 
   // assume/assert
   out << "extern \"C\" void assert(bool assertion);" << '\n';
@@ -85,8 +90,8 @@ void cpp_internal_additions(std::ostream &out)
   out << "extern \"C\" void __CPROVER::atomic_end();" << '\n';
 
   // pointers
-  out << "extern \"C\" unsigned __CPROVER_POINTER_OBJECT(const void *p);\n";
-  out << "extern \"C\" signed __CPROVER_POINTER_OFFSET(const void *p);" << '\n';
+  out << "extern \"C\" __CPROVER::size_t __CPROVER_POINTER_OBJECT(const void *);\n";
+  out << "extern \"C\" __CPROVER::ssize_t __CPROVER_POINTER_OFFSET(const void *);" << '\n';
   out << "extern \"C\" bool __CPROVER_DYNAMIC_OBJECT(const void *p);" << '\n';
   // NOLINTNEXTLINE(whitespace/line_length)
   out << "extern \"C\" extern unsigned char __CPROVER_memory[__CPROVER::constant_infinity_uint];" << '\n';

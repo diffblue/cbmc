@@ -2157,10 +2157,7 @@ exprt c_typecheck_baset::do_special_functions(
     exprt pointer_offset_expr=pointer_offset(expr.arguments().front());
     pointer_offset_expr.add_source_location()=source_location;
 
-    if(expr.type()!=pointer_offset_expr.type())
-      pointer_offset_expr.make_typecast(expr.type());
-
-    return pointer_offset_expr;
+    return typecast_exprt::conditional_cast(pointer_offset_expr, expr.type());
   }
   else if(identifier==CPROVER_PREFIX "POINTER_OBJECT")
   {
@@ -2171,11 +2168,10 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt pointer_object_expr=exprt(ID_pointer_object, expr.type());
-    pointer_object_expr.operands()=expr.arguments();
-    pointer_object_expr.add_source_location()=source_location;
+    exprt pointer_object_expr = pointer_object(expr.arguments().front());
+    pointer_object_expr.add_source_location() = source_location;
 
-    return pointer_object_expr;
+    return typecast_exprt::conditional_cast(pointer_object_expr, expr.type());
   }
   else if(identifier=="__builtin_bswap16" ||
           identifier=="__builtin_bswap32" ||
