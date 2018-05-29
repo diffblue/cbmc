@@ -1657,6 +1657,18 @@ constant_interval_exprt::unary_minus(const constant_interval_exprt &a)
   return a.unary_minus();
 }
 
+constant_interval_exprt
+constant_interval_exprt::typecast(const typet &type) const
+{
+  exprt lower = get_lower();
+  lower.type() = type;
+
+  exprt upper = get_upper();
+  upper.type() = type;
+
+  return constant_interval_exprt(lower, upper, type);
+}
+
 /* Binary */
 constant_interval_exprt constant_interval_exprt::plus(
   const constant_interval_exprt &a,
