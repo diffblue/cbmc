@@ -1,0 +1,8 @@
+CORE
+main.c
+--variable-sensitivity --interval-values --show
+^EXIT=0$
+^SIGNAL=0$
+main::1::b1 \(\) -> \[00000001, 00000001\]
+main::1::b2 \(\) -> \[00000000, 00000000\]
+--
