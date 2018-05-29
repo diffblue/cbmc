@@ -29,9 +29,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_constant.h>
 
 #include <solvers/flattening/boolbv_width.h>
-#include <solvers/flattening/flatten_byte_operators.h>
 #include <solvers/flattening/c_bit_field_replacement_type.h>
+#include <solvers/flattening/flatten_byte_operators.h>
 #include <solvers/floatbv/float_bv.h>
+#include <solvers/lowering/expr_lowering.h>
 
 // Mark different kinds of error condition
 // General
@@ -1865,6 +1866,11 @@ void smt2_convt::convert_expr(const exprt &expr)
       UNEXPECTEDCASE("bswap must get bitvector operand");
 
     out << ')'; // let bswap_op
+  }
+  else if(expr.id() == ID_popcount)
+  {
+    exprt lowered = lower_popcount(to_popcount_expr(expr), ns);
+    convert_expr(lowered);
   }
   else
     UNEXPECTEDCASE(
