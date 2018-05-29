@@ -789,7 +789,7 @@ exprt constant_interval_exprt::generate_modulo_expression(const exprt &lhs, cons
   return simplified_expr(modulo_expr);
 }
 
-constant_interval_exprt constant_interval_exprt::eval(const irep_idt &id)
+constant_interval_exprt constant_interval_exprt::eval(const irep_idt &id) const
 {
   if(id == ID_unary_plus)
   {
@@ -813,7 +813,7 @@ constant_interval_exprt constant_interval_exprt::eval(const irep_idt &id)
 
 constant_interval_exprt constant_interval_exprt::eval(
   const irep_idt &binary_operator,
-  const constant_interval_exprt &other)
+  const constant_interval_exprt &other) const
 {
   if(binary_operator == ID_plus)
   {
