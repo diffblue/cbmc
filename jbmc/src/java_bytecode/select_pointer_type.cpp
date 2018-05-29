@@ -89,15 +89,7 @@ pointer_typet select_pointer_typet::specialize_generics(
     {
       optionalt<pointer_typet> result = get_recursively_instantiated_type(
         parameter_name, generic_parameter_specialization_map);
-      if(result.has_value())
-      {
-        return result.value();
-      }
-      else
-      {
-        // return pointer type of generic parameter bound
-        return pointer_type;
-      }
+      return result.has_value() ? result.value() : pointer_type;
     }
 
     // generic parameters can be adopted from outer classes or superclasses so
