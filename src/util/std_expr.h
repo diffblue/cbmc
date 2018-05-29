@@ -506,18 +506,25 @@ inline void validate_expr(const unary_minus_exprt &value)
 class bswap_exprt: public unary_exprt
 {
 public:
-  bswap_exprt(): unary_exprt(ID_bswap)
-  {
-  }
-
-  bswap_exprt(const exprt &_op, const typet &_type)
+  bswap_exprt(const exprt &_op, std::size_t bits_per_byte, const typet &_type)
     : unary_exprt(ID_bswap, _op, _type)
   {
+    set_bits_per_byte(bits_per_byte);
   }
 
-  explicit bswap_exprt(const exprt &_op)
+  explicit bswap_exprt(const exprt &_op, std::size_t &_bits_per_byte)
     : unary_exprt(ID_bswap, _op, _op.type())
   {
+  }
+
+  std::size_t get_bits_per_byte() const
+  {
+    return get_size_t(ID_bits_per_byte);
+  }
+
+  void set_bits_per_byte(std::size_t bits_per_byte)
+  {
+    set(ID_bits_per_byte, bits_per_byte);
   }
 };
 

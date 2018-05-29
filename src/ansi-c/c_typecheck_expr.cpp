@@ -2190,7 +2190,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    bswap_exprt bswap_expr(expr.arguments().front(), expr.type());
+    // these are hard-wired to 8 bits according to the gcc manual
+    bswap_exprt bswap_expr(expr.arguments().front(), 8, expr.type());
     bswap_expr.add_source_location()=source_location;
 
     return bswap_expr;

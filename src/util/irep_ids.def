@@ -664,6 +664,7 @@ IREP_ID_TWO(overlay_class, java::com.diffblue.OverlayClassImplementation)
 IREP_ID_TWO(overlay_method, java::com.diffblue.OverlayMethodImplementation)
 IREP_ID_TWO(C_annotations, #annotations)
 IREP_ID_ONE(final)
+IREP_ID_ONE(bits_per_byte)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.h in their source tree and

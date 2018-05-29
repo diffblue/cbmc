@@ -8,7 +8,6 @@ Author: Michael Tautschnig
 
 #include "boolbv.h"
 
-#include <util/config.h>
 #include <util/invariant.h>
 
 bvt boolbvt::convert_bswap(const bswap_exprt &expr)
@@ -16,7 +15,7 @@ bvt boolbvt::convert_bswap(const bswap_exprt &expr)
   const std::size_t width = boolbv_width(expr.type());
 
   // width must be multiple of bytes
-  const std::size_t byte_bits = config.ansi_c.char_width;
+  const std::size_t byte_bits = expr.get_bits_per_byte();
   if(width % byte_bits != 0)
     return conversion_failed(expr);
 
