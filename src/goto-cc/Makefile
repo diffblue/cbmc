@@ -12,7 +12,9 @@ SRC = armcc_cmdline.cpp \
       goto_cc_languages.cpp \
       goto_cc_main.cpp \
       goto_cc_mode.cpp \
+      hybrid_binary.cpp \
       ld_cmdline.cpp \
+      ld_mode.cpp \
       linker_script_merge.cpp \
       ms_cl_cmdline.cpp \
       ms_cl_mode.cpp \

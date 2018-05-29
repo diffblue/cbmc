@@ -48,6 +48,7 @@ Author: CM Wintersteiger, 2006
 
 #include <cbmc/version.h>
 
+#include "hybrid_binary.h"
 #include "linker_script_merge.h"
 
 static std::string compiler_name(
@@ -106,8 +107,6 @@ gcc_modet::gcc_modet(
   bool _produce_hybrid_binary):
   goto_cc_modet(_cmdline, _base_name, gcc_message_handler),
   produce_hybrid_binary(_produce_hybrid_binary),
-  act_as_ld(base_name=="ld" ||
-            base_name.find("goto-ld")!=std::string::npos),
   goto_binary_tmp_suffix(".goto-cc-saved"),
 
   // Keys are architectures specified in configt::set_arch().
@@ -326,8 +325,6 @@ int gcc_modet::doit()
   }
 
   native_tool_name=
-    act_as_ld ?
-    linker_name(cmdline, base_name) :
     compiler_name(cmdline, base_name);
 
   auto default_verbosity = (cmdline.isset("Wall") || cmdline.isset("Wextra")) ?
@@ -345,10 +342,7 @@ int gcc_modet::doit()
     // "-v" a) prints the version and b) increases verbosity.
     // Compilation continues, don't exit!
 
-    if(act_as_ld)
-      std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION
-                << ")\n";
-    else if(act_as_bcc)
+    if(act_as_bcc)
       std::cout << "bcc: version 0.16.17 (goto-cc " CBMC_VERSION ")\n";
     else
       std::cout << "gcc version 3.4.4 (goto-cc " CBMC_VERSION ")\n";
@@ -395,14 +389,7 @@ int gcc_modet::doit()
     return EX_OK;
   }
 
-  if(act_as_ld)
-  {
-    if(produce_hybrid_binary)
-      debug() << "LD mode (hybrid)" << eom;
-    else
-      debug() << "LD mode" << eom;
-  }
-  else if(act_as_bcc)
+  if(act_as_bcc)
   {
     if(produce_hybrid_binary)
       debug() << "BCC mode (hybrid)" << eom;
@@ -418,9 +405,7 @@ int gcc_modet::doit()
   }
 
   // determine actions to be undertaken
-  if(act_as_ld)
-    compiler.mode=compilet::LINK_LIBRARY;
-  else if(cmdline.isset('S'))
+  if(cmdline.isset('S'))
     compiler.mode=compilet::ASSEMBLE_ONLY;
   else if(cmdline.isset('c'))
     compiler.mode=compilet::COMPILE_ONLY;
@@ -437,13 +422,10 @@ int gcc_modet::doit()
   // * preprocessing (-E)
   // * no input files given
 
-  if(act_as_ld)
-  {
-  }
-  else if(cmdline.isset('M') ||
-          cmdline.isset("MM") ||
-          cmdline.isset('E') ||
-          !cmdline.have_infile_arg())
+  if(cmdline.isset('M') ||
+     cmdline.isset("MM") ||
+     cmdline.isset('E') ||
+     !cmdline.have_infile_arg())
     return run_gcc(compiler); // exit!
 
   // get configuration
@@ -819,7 +801,7 @@ int gcc_modet::run_gcc(const compilet &compiler)
   for(const auto &a : cmdline.parsed_argv)
     new_argv.push_back(a.arg);
 
-  if(!act_as_ld && compiler.wrote_object_files())
+  if(compiler.wrote_object_files())
   {
     // Undefine all __CPROVER macros for the system compiler
     std::map<irep_idt, std::size_t> arities;
@@ -922,27 +904,25 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
     goto_binaries.push_back(bin_name);
   }
 
-  std::string objcopy_cmd;
-  if(has_suffix(linker_name(cmdline, base_name), "-ld"))
-  {
-    objcopy_cmd=linker_name(cmdline, base_name);
-    objcopy_cmd.erase(objcopy_cmd.size()-2);
-  }
-  else if(has_suffix(compiler_name(cmdline, base_name), "-gcc"))
-  {
-    objcopy_cmd=compiler_name(cmdline, base_name);
-    objcopy_cmd.erase(objcopy_cmd.size()-3);
-  }
-  objcopy_cmd+="objcopy";
-
   int result=run_gcc(compiler);
 
-  if(result==0)
+  if(result==0 &&
+     cmdline.isset('T') &&
+     goto_binaries.size()==1 &&
+     output_files.size()==1)
   {
     linker_script_merget ls_merge(
-        compiler, output_files, goto_binaries, cmdline, gcc_message_handler);
+      compiler, output_files.front(), goto_binaries.front(),
+      cmdline, gcc_message_handler);
     result=ls_merge.add_linker_script_definitions();
   }
+
+  std::string native_tool;
+
+  if(has_suffix(linker_name(cmdline, base_name), "-ld"))
+    native_tool=linker_name(cmdline, base_name);
+  else if(has_suffix(compiler_name(cmdline, base_name), "-gcc"))
+    native_tool=compiler_name(cmdline, base_name);
 
   // merge output from gcc with goto-binaries
   // using objcopy, or do cleanup if an earlier call failed
@@ -951,74 +931,11 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
       it!=output_files.end();
       it++)
   {
-    debug() << "merging " << *it << eom;
-    std::string saved=*it+goto_binary_tmp_suffix;
-
-    #ifdef __linux__
-    if(result==0 && !cmdline.isset('c'))
-    {
-      // remove any existing goto-cc section
-      std::vector<std::string> objcopy_argv;
-
-      objcopy_argv.push_back(objcopy_cmd);
-      objcopy_argv.push_back("--remove-section=goto-cc");
-      objcopy_argv.push_back(*it);
-
-      result=run(objcopy_argv[0], objcopy_argv, "", "");
-    }
+    std::string goto_binary=*it+goto_binary_tmp_suffix;
 
     if(result==0)
-    {
-      // now add goto-binary as goto-cc section
-      std::vector<std::string> objcopy_argv;
-
-      objcopy_argv.push_back(objcopy_cmd);
-      objcopy_argv.push_back("--add-section");
-      objcopy_argv.push_back("goto-cc="+saved);
-      objcopy_argv.push_back(*it);
-
-      result=run(objcopy_argv[0], objcopy_argv, "", "");
-    }
-
-    int remove_result=remove(saved.c_str());
-    if(remove_result!=0)
-    {
-      error() << "Remove failed: " << std::strerror(errno) << eom;
-      if(result==0)
-        result=remove_result;
-    }
-
-    #elif defined(__APPLE__)
-    // Mac
-    if(result==0)
-    {
-      std::vector<std::string> lipo_argv;
-
-      // now add goto-binary as hppa7100LC section
-      lipo_argv.push_back("lipo");
-      lipo_argv.push_back(*it);
-      lipo_argv.push_back("-create");
-      lipo_argv.push_back("-arch");
-      lipo_argv.push_back("hppa7100LC");
-      lipo_argv.push_back(saved);
-      lipo_argv.push_back("-output");
-      lipo_argv.push_back(*it);
-
-      result=run(lipo_argv[0], lipo_argv, "", "");
-    }
-
-    int remove_result=remove(saved.c_str());
-    if(remove_result!=0)
-    {
-      error() << "Remove failed: " << std::strerror(errno) << eom;
-      if(result==0)
-        result=remove_result;
-    }
-
-    #else
-    error() << "binary merging not implemented for this platform" << eom;
-    return 1;
-    #endif
+      result = hybrid_binary(
+        native_tool, goto_binary, *it, get_message_handler());
   }
 
   return result;
@@ -1112,10 +1029,6 @@ int gcc_modet::asm_output(
 /// display command line help
 void gcc_modet::help_mode()
 {
-  if(act_as_ld)
-    std::cout << "goto-ld understands the options of "
-              << "ld plus the following.\n\n";
-  else
-    std::cout << "goto-cc understands the options of "
-              << "gcc plus the following.\n\n";
+  std::cout << "goto-cc understands the options of "
+            << "gcc plus the following.\n\n";
 }

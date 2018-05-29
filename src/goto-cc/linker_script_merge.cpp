@@ -27,10 +27,8 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 
 int linker_script_merget::add_linker_script_definitions()
 {
-  if(!cmdline.isset('T') || elf_binaries.size()!=1)
+  if(!cmdline.isset('T'))
     return 0;
-  const std::string &elf_file=*elf_binaries.begin();
-  const std::string &goto_file=*goto_binaries.begin();
 
   temporary_filet linker_def_outfile("goto-cc-linker-info", ".json");
   std::list<irep_idt> linker_defined_symbols;
@@ -38,7 +36,7 @@ int linker_script_merget::add_linker_script_definitions()
     get_linker_script_data(
       linker_defined_symbols,
       compiler.symbol_table,
-      elf_file,
+      elf_binary,
       linker_def_outfile());
   // ignore linker script parsing failures until the code is tested more widely
   if(fail!=0)
@@ -62,8 +60,10 @@ int linker_script_merget::add_linker_script_definitions()
 
   symbol_tablet original_st;
   goto_functionst original_gf;
-  fail=read_goto_binary(goto_file, original_st, original_gf,
+
+  fail=read_goto_binary(goto_binary, original_st, original_gf,
       get_message_handler());
+
   if(fail!=0)
   {
     error() << "Unable to read goto binary for linker script merging" << eom;
@@ -100,26 +100,29 @@ int linker_script_merget::add_linker_script_definitions()
 
   fail=pointerize_linker_defined_symbols(original_gf, original_st,
       linker_values);
+
   if(fail!=0)
   {
     error() << "Could not pointerize all linker-defined expressions" << eom;
     return fail;
   }
 
-  fail=compiler.write_object_file(goto_file, original_st, original_gf);
+  fail=compiler.write_object_file(goto_binary, original_st, original_gf);
+
   if(fail!=0)
     error() << "Could not write linkerscript-augmented binary" << eom;
+
   return fail;
 }
 
 linker_script_merget::linker_script_merget(
       compilet &compiler,
-      std::list<std::string> &elf_binaries,
-      std::list<std::string> &goto_binaries,
-      cmdlinet &cmdline,
+      const std::string &elf_binary,
+      const std::string &goto_binary,
+      const cmdlinet &cmdline,
       message_handlert &message_handler) :
     messaget(message_handler), compiler(compiler),
-    elf_binaries(elf_binaries), goto_binaries(goto_binaries),
+    elf_binary(elf_binary), goto_binary(goto_binary),
     cmdline(cmdline),
     replacement_predicates(
     {

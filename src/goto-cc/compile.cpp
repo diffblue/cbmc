@@ -662,7 +662,7 @@ compilet::~compilet()
     delete_directory(*it);
 }
 
-unsigned compilet::function_body_count(const goto_functionst &functions)
+unsigned compilet::function_body_count(const goto_functionst &functions) const
 {
   int fbs=0;
 
