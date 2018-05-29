@@ -87,7 +87,7 @@ pointer_typet select_pointer_typet::specialize_generics(
     // avoid infinite recursion
     if(visited_nodes.find(parameter_name) != visited_nodes.end())
     {
-      optionalt<pointer_typet> result = get_instantiated_type(
+      optionalt<pointer_typet> result = get_recursively_instantiated_type(
         parameter_name, generic_parameter_specialization_map);
       if(result.has_value())
       {
@@ -144,7 +144,8 @@ pointer_typet select_pointer_typet::specialize_generics(
 /// \param generic_specialization_map Map of type names to specialization stack
 /// \return The first instantiated type for the generic type or nothing if no
 /// such instantiation exists.
-optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
+optionalt<pointer_typet>
+select_pointer_typet::get_recursively_instantiated_type(
   const irep_idt &parameter_name,
   const generic_parameter_specialization_mapt
     &generic_parameter_specialization_map) const
@@ -157,7 +158,7 @@ optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
   irep_idt current_parameter = parameter_name;
   while(depth < max)
   {
-    const auto retval = get_instantiated_type(
+    const auto retval = get_recursively_instantiated_type(
       current_parameter, generic_parameter_specialization_map, visited, depth);
     if(retval.has_value())
     {
@@ -177,12 +178,13 @@ optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
   return {};
 }
 
-/// See get_instantiated_type, the additional parameters just track the
-/// recursion to prevent, visiting the same depth again and specify which stack
-/// depth is analyzed.
+/// See get_recursively instantiated_type, the additional parameters just track
+/// the recursion to prevent, visiting the same depth again and specify which
+/// stack depth is analyzed.
 /// \param visited Tracks the visited parameter names
 /// \param depth Stack depth to analyze
-optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
+optionalt<pointer_typet>
+select_pointer_typet::get_recursively_instantiated_type(
   const irep_idt &parameter_name,
   const generic_parameter_specialization_mapt
     &generic_parameter_specialization_map,
@@ -220,7 +222,7 @@ optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
 
   visited.insert(parameter_name);
   const auto &gen_type = to_java_generic_parameter(type).type_variable();
-  const auto inst_val = get_instantiated_type(
+  const auto inst_val = get_recursively_instantiated_type(
     gen_type.get_identifier(),
     generic_parameter_specialization_map,
     visited,
