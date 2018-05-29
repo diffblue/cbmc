@@ -43,7 +43,7 @@ Author: Daniel Poetzl
 #define SN_ASSERT_USE(v, b) SN_ASSERT(b)
 #else
 #define SN_ASSERT(b)
-#define SN_ASSERT_USE(v, b) v = v;
+#define SN_ASSERT_USE(v, b) static_cast<void>(v);
 #endif
 
 // clang-format off
