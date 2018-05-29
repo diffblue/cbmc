@@ -94,7 +94,11 @@ pointer_typet select_pointer_typet::specialize_generics(
       {
         return result.value();
       }
-      throw "no infinite recursion";
+      else
+      {
+        // return pointer type of generic parameter bound
+        return java_reference_type(parameter.subtype());
+      }
     }
 
     // generic parameters can be adopted from outer classes or superclasses so
@@ -204,9 +208,8 @@ optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
     const auto &replacements =
       generic_parameter_specialization_map.find(parameter_name)->second;
 
-    // max depth reached and nothing found, TODO return bound
-    if(replacements.size() <= depth)
-      return {};
+    INVARIANT(
+      depth < replacements.size(), "cannot access elements outside stack");
 
     // Check if there is a recursion loop, if yes return with nothing found
     if(visited.find(parameter_name) != visited.end())
