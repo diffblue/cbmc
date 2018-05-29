@@ -50,8 +50,8 @@ SCENARIO(
         //  tmp_object_factory$1.@Wrapper.field =
         //     (struct java.lang.Object *) tmp_object_factory$2;
         //  tmp_object_factory$2 = &tmp_object_factory$3;
-        //  struct java.lang.Integer { __CPROVER_string @class_identifier;
-        //     boolean @lock; } tmp_object_factory$3;
+        //  struct java.lang.Integer { __CPROVER_string @class_identifier; }
+        //  tmp_object_factory$3;
         require_goto_statements::require_struct_component_assignment(
           this_tmp_name,
           {"Wrapper"},
@@ -455,8 +455,8 @@ SCENARIO(
       {
         //   tmp_object_factory$1.@UnsupportedWrapper1.field =
         // &tmp_object_factory$2;
-        // struct java.lang.Object { __CPROVER_string @class_identifier;
-        //   boolean @lock; } tmp_object_factory$2;
+        // struct java.lang.Object { __CPROVER_string @class_identifier; }
+        // tmp_object_factory$2;
         require_goto_statements::require_struct_component_assignment(
           this_tmp_name,
           {"UnsupportedWrapper1"},

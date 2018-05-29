@@ -21,7 +21,6 @@ void java_root_class(
 void java_root_class_init(
   struct_exprt &jlo,
   const struct_typet &root_type,
-  bool lock,
   const irep_idt &class_identifier);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_ROOT_CLASS_H

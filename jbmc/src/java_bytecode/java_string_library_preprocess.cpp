@@ -840,12 +840,12 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   PRECONDITION(implements_java_char_sequence_pointer(lhs.type()));
   dereference_exprt deref=checked_dereference(lhs, lhs.type().subtype());
 
-  // A String has a field Object with @clsid = String and @lock = false:
+  // A String has a field Object with @clsid = String
   const symbolt &jlo_symbol=*symbol_table.lookup("java::java.lang.Object");
   const struct_typet &jlo_struct=to_struct_type(jlo_symbol.type);
   struct_exprt jlo_init(jlo_struct);
   irep_idt clsid = get_tag(lhs.type().subtype());
-  java_root_class_init(jlo_init, jlo_struct, false, clsid);
+  java_root_class_init(jlo_init, jlo_struct, clsid);
 
   struct_exprt struct_rhs(deref.type());
   struct_rhs.copy_to_operands(jlo_init);
