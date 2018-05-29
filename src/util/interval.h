@@ -243,9 +243,6 @@ public:
     const constant_interval_exprt &b);
   static tvt logical_not(const constant_interval_exprt &a);
 
-  static constant_interval_exprt
-  tv_to_interval(const constant_interval_exprt &interval, const tvt &tv);
-
   static constant_interval_exprt unary_plus(const constant_interval_exprt &a);
   static constant_interval_exprt unary_minus(const constant_interval_exprt &a);
 
