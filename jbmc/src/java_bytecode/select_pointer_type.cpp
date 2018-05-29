@@ -136,12 +136,13 @@ pointer_typet select_pointer_typet::specialize_generics(
   return pointer_type;
 }
 
-/// Return the first concrete type instantiation if any such exists.
+/// Return the first concrete type instantiation if any such exists. This method
+/// is only to be called when the `specialize_generics` cannot find an
+/// instantiation due to a loop in its recursion.
 /// \param parameter_name The name of the generic parameter type we want to have
 ///   instantiated
 /// \param generic_specialization_map Map of type names to specialization stack
-/// \param depth start depth for instantiation search
-/// \return the first instantiated type for the generic type or nothing if no
+/// \return The first instantiated type for the generic type or nothing if no
 /// such instantiation exists.
 optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
   const irep_idt &parameter_name,
@@ -179,8 +180,8 @@ optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
 /// See get_instantiated_type, the additional parameters just track the
 /// recursion to prevent, visiting the same depth again and specify which stack
 /// depth is analyzed.
-/// \param visited tracks the visited parameter names
-/// \param depth stack depth to analyze
+/// \param visited Tracks the visited parameter names
+/// \param depth Stack depth to analyze
 optionalt<pointer_typet> select_pointer_typet::get_instantiated_type(
   const irep_idt &parameter_name,
   const generic_parameter_specialization_mapt
