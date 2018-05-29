@@ -80,7 +80,6 @@ std::set<irep_idt> compute_called_functions(
   const goto_functionst &goto_functions)
 {
   std::set<irep_idt> working_queue;
-  std::set<irep_idt> done;
   std::set<irep_idt> functions;
 
   // start from entry point
@@ -91,11 +90,8 @@ std::set<irep_idt> compute_called_functions(
     irep_idt id=*working_queue.begin();
     working_queue.erase(working_queue.begin());
 
-    if(done.find(id)!=done.end())
+    if(!functions.insert(id).second)
       continue;
-
-    functions.insert(id);
-    done.insert(id);
 
     const goto_functionst::function_mapt::const_iterator f_it=
       goto_functions.function_map.find(id);
