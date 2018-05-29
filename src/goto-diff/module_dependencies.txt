@@ -1,0 +1,12 @@
+analyses
+ansi-c
+cbmc # version.h
+cpp
+goto-diff
+goto-instrument
+goto-programs
+goto-symex # dubious - rewrite_union and adjust_float should be moved to goto-programs
+java_bytecode # will go away
+langapi # should go away
+pointer-analysis
+util

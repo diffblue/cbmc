@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/threeval.h>
 
-#include "../prop/prop.h"
+#include <solvers/prop/prop.h>
 
 #include "boolbv_width.h"
 

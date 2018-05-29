@@ -17,9 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <ansi-c/ansi_c_language.h>
-#include <cpp/cpp_language.h>
 #include <java_bytecode/java_bytecode_language.h>
-#include <jsil/jsil_language.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>

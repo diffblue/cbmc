@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 
-#include "../floatbv/float_utils.h"
+#include <solvers/floatbv/float_utils.h>
 
 bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 {

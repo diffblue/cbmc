@@ -21,7 +21,8 @@ Date: 2012
 
 #include <linking/static_lifetime_init.h>
 
-#include "../rw_set.h"
+#include <goto-instrument/rw_set.h>
+
 #include "fence.h"
 
 // #define PRINT_UNSAFES

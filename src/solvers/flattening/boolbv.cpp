@@ -26,8 +26,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv_type.h"
 
-#include "../floatbv/float_utils.h"
-#include "../lowering/expr_lowering.h"
+#include <solvers/floatbv/float_utils.h>
+#include <solvers/lowering/expr_lowering.h>
 
 bool boolbvt::literal(
   const exprt &expr,

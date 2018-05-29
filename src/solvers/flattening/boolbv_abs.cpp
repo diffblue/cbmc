@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv_type.h"
 
-#include "../floatbv/float_utils.h"
+#include <solvers/floatbv/float_utils.h>
 
 bvt boolbvt::convert_abs(const exprt &expr)
 {

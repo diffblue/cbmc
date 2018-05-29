@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/std_types.h>
 
-#include "../floatbv/float_utils.h"
+#include <solvers/floatbv/float_utils.h>
 
 bvt boolbvt::convert_add_sub(const exprt &expr)
 {
