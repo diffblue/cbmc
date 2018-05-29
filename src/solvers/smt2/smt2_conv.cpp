@@ -1809,6 +1809,63 @@ void smt2_convt::convert_expr(const exprt &expr)
       "smt2_convt::convert_expr: `"+expr.id_string()+
       "' is not yet supported");
   }
+  else if(expr.id() == ID_bswap)
+  {
+    if(expr.operands().size() != 1)
+      INVALIDEXPR("bswap gets one operand");
+
+    if(expr.op0().type() != expr.type())
+      INVALIDEXPR("bswap gets one operand with same type");
+
+    // first 'let' the operand
+    out << "(let ((bswap_op ";
+    convert_expr(expr.op0());
+    out << ")) ";
+
+    if(expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv)
+    {
+      const std::size_t width = to_bitvector_type(expr.type()).get_width();
+
+      // width must be multiple of bytes
+      if(width % 8 != 0)
+        INVALIDEXPR("bswap must get bytes");
+
+      const std::size_t bytes = width / 8;
+
+      if(bytes <= 1)
+        out << "bswap_op";
+      else
+      {
+        // do a parallel 'let' for each byte
+        out << "(let (";
+
+        for(std::size_t byte = 0; byte < bytes; byte++)
+        {
+          if(byte != 0)
+            out << ' ';
+          out << "(bswap_byte_" << byte << ' ';
+          out << "((_ extract " << (byte * 8 + 7) << " " << (byte * 8)
+              << ") bswap_op)";
+          out << ')';
+        }
+
+        out << ") ";
+
+        // now stitch back together with 'concat'
+        out << "(concat";
+
+        for(std::size_t byte = 0; byte < bytes; byte++)
+          out << " bswap_byte_" << byte;
+
+        out << ')'; // concat
+        out << ')'; // let bswap_byte_*
+      }
+    }
+    else
+      UNEXPECTEDCASE("bswap must get bitvector operand");
+
+    out << ')'; // let bswap_op
+  }
   else
     UNEXPECTEDCASE(
       "smt2_convt::convert_expr: `"+expr.id_string()+"' is unsupported");
