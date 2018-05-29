@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fresh_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/rename.h>
 #include <util/cprover_prefix.h>
 
 #include <util/c_types.h>

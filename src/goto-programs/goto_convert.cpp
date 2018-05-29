@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 #include <util/simplify_expr.h>
-#include <util/rename.h>
 
 #include <util/c_types.h>
 

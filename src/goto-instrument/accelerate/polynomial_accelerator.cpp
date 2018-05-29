@@ -33,7 +33,6 @@ Author: Matt Lewis
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/find_symbols.h>
-#include <util/rename.h>
 #include <util/simplify_expr.h>
 #include <util/replace_expr.h>
 #include <util/arith_tools.h>
