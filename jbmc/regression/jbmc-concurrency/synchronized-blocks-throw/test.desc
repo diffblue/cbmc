@@ -1,0 +1,10 @@
+KNOWNBUG
+Sync.class
+--cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar` --lazy-methods
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Checks all possible paths to ensure monitorexit is executed even after a throw.
+
+This is currently not working as explicit throws have been removed from the underlying model due to performance considerations.

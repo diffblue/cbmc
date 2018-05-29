@@ -1,0 +1,10 @@
+KNOWNBUG
+Sync.class
+--cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This checks that the synchronized keyword on a null object will always throw.
+
+This is currently not working as explicit throws have been removed from the underlying model due to performance considerations.
