@@ -53,12 +53,12 @@ public:
   const typet &follow_tag(const struct_tag_typet &) const;
   const typet &follow_tag(const c_enum_tag_typet &) const;
 
-  /// Returns the maximum integer n such that there is a symbol (in some of the
-  /// symbol tables) whose name is of the form "AB" where A is \p prefix and B
-  /// is n.  Symbols where B is not a number count as if B was equal to 0.
+  /// Returns the minimal integer n such that there is no symbol (in any of the
+  /// symbol tables) whose name is of the form "An" where A is \p prefix.
   /// The intended use case is finding the next available symbol name for a
   /// sequence of auto-generated symbols.
-  virtual unsigned get_max(const std::string &prefix) const=0;
+  virtual std::size_t
+  smallest_unused_suffix(const std::string &prefix) const = 0;
 
   /// Searches for a symbol named \p name. Iff found, set \p symbol to point to
   /// the symbol and return false; else \p symbol is unmodified and `true` is
@@ -100,8 +100,8 @@ public:
   /// tables.
   bool lookup(const irep_idt &name, const symbolt *&symbol) const override;
 
-  /// See documentation for namespace_baset::get_max().
-  unsigned get_max(const std::string &prefix) const override;
+  /// See documentation for namespace_baset::smallest_unused_suffix().
+  std::size_t smallest_unused_suffix(const std::string &prefix) const override;
 
   const symbol_tablet &get_symbol_table() const
   {
@@ -130,7 +130,7 @@ public:
   using namespace_baset::lookup;
 
   bool lookup(const irep_idt &name, const symbolt *&symbol) const override;
-  unsigned get_max(const std::string &prefix) const override;
+  std::size_t smallest_unused_suffix(const std::string &prefix) const override;
 
   void add(const symbol_tablet &symbol_table)
   {

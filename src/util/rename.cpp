@@ -32,5 +32,5 @@ void get_new_name(irep_idt &new_name, const namespacet &ns, char delimiter)
 
   std::string prefix = id2string(new_name) + delimiter;
 
-  new_name=prefix+std::to_string(ns.get_max(prefix)+1);
+  new_name = prefix + std::to_string(ns.smallest_unused_suffix(prefix));
 }
