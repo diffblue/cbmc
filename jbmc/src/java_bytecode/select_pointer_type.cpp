@@ -96,7 +96,7 @@ pointer_typet select_pointer_typet::specialize_generics(
       else
       {
         // return pointer type of generic parameter bound
-        return java_reference_type(parameter.subtype());
+        return pointer_type;
       }
     }
 
