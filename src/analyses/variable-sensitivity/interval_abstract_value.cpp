@@ -145,31 +145,12 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
     const constant_interval_exprt &interval0 = iav0->interval;
     const constant_interval_exprt &interval1 = iav1->interval;
 
-    // constant_interval_exprt currently does not correctly handle the type of
-    // relational operators (it assigns to it the type of the first operand
-    // as opposed to ID_bool)
-#if 0
-      constant_interval_exprt interval
-        = interval0.eval(expr.id(), interval1);
+    constant_interval_exprt interval
+      = interval0.eval(expr.id(), interval1);
 
-      interval.type() = type;
+    INVARIANT(interval.type() == type, "");
 
-      return environment.abstract_object_factory(type, interval, ns);
-#endif
-
-#if 1
-    if(expr.id() == ID_equal)
-    {
-
-      INVARIANT(type.id() == ID_bool, "");
-
-      tvt tv = interval0.equal(interval1);
-
-      constant_interval_exprt ie(type);
-      const constant_interval_exprt &interval = ie.tv_to_interval(tv);
-      return environment.abstract_object_factory(type, interval, ns);
-#endif
-    }
+    return environment.abstract_object_factory(type, interval, ns);
   }
 
   return environment.abstract_object_factory(type, ns, true);
