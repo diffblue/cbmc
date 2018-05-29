@@ -56,8 +56,6 @@ protected:
   //
   // tools for symbols
   //
-  void new_name(symbolt &symbol);
-
   symbolt &new_tmp_symbol(
     const typet &type,
     const std::string &suffix,

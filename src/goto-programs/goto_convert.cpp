@@ -2058,15 +2058,6 @@ void goto_convertt::make_temp_symbol(
   expr=new_symbol.symbol_expr();
 }
 
-void goto_convertt::new_name(symbolt &symbol)
-{
-  // rename it
-  get_new_name(symbol, ns);
-
-  // store in symbol_table
-  symbol_table.add(symbol);
-}
-
 void goto_convert(
   const codet &code,
   symbol_table_baset &symbol_table,
