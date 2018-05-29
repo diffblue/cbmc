@@ -1002,12 +1002,11 @@ exprt constant_interval_exprt::simplified_expr(exprt expr)
   return simplify_expr(expr, ns);
 }
 
-
 constant_exprt constant_interval_exprt::zero(const typet& type)
 {
   constant_exprt zero = from_integer(mp_integer(0), type);
-  INVARIANT(zero.is_zero(), // NOT is_zero(zero) (inf. recursion)
-    "The value created from 0 should be zero");
+  INVARIANT(zero.is_zero() || (type.id() == ID_bool && zero.is_false()),
+    "The value created from 0 should be zero or false");
   return zero;
 }
 
