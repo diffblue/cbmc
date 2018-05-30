@@ -19,6 +19,7 @@ Date:   June 2017
 #include <goto-programs/goto_functions.h>
 
 #include "java_bytecode_convert_class.h"
+#include "java_entry_point.h"
 #include "java_utils.h"
 
 class java_bytecode_instrumentt:public messaget
@@ -590,6 +591,27 @@ void java_bytecode_instrument_symbol(
       " " + id2string(symbol.name) + " which has a value with an id of " +
       id2string(symbol.value.id()));
   instrument(to_code(symbol.value));
+}
+
+/// Instruments the start function with an assertion that checks whether
+/// an exception has escaped the entry point
+/// \param init_code: the code block to which the assertion is appended
+/// \param exc_symbol: the top-level exception symbol
+/// \param source_location: the source location to attach to the assertion
+void java_bytecode_instrument_uncaught_exceptions(
+  codet &init_code,
+  const symbolt &exc_symbol,
+  const source_locationt &source_location)
+{
+  // check that there is no uncaught exception
+  code_assertt assert_no_exception;
+  assert_no_exception.assertion() = equal_exprt(
+    exc_symbol.symbol_expr(),
+    null_pointer_exprt(to_pointer_type(exc_symbol.type)));
+  source_locationt assert_location = source_location;
+  assert_location.set_comment("no uncaught exception");
+  assert_no_exception.add_source_location() = assert_location;
+  init_code.move_to_operands(assert_no_exception);
 }
 
 /// Instruments all the code in the symbol_table with

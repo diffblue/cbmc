@@ -46,6 +46,9 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
   string_refinement_enabled=cmd.isset("refine-strings");
   throw_runtime_exceptions=cmd.isset("java-throw-runtime-exceptions");
+  assert_uncaught_exceptions = !cmd.isset("disable-uncaught-exception-check");
+  threading_support = cmd.isset("java-threading");
+
   if(cmd.isset("java-max-input-array-length"))
     object_factory_parameters.max_nondet_array_length=
       std::stoi(cmd.get_value("java-max-input-array-length"));
@@ -69,14 +72,8 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   else
     lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
 
-  if(cmd.isset("java-threading"))
-    threading_support = true;
-  else
-    threading_support = false;
-
-  if(cmd.isset("java-throw-runtime-exceptions"))
+  if(throw_runtime_exceptions)
   {
-    throw_runtime_exceptions = true;
     java_load_classes.insert(
         java_load_classes.end(),
         exception_needed_classes.begin(),
@@ -777,15 +774,15 @@ bool java_bytecode_languaget::generate_support_functions(
   convert_lazy_method(res.main_function.name, symbol_table);
 
   // generate the test harness in __CPROVER__start and a call the entry point
-  return
-    java_entry_point(
-      symbol_table,
-      main_class,
-      get_message_handler(),
-      assume_inputs_non_null,
-      object_factory_parameters,
-      get_pointer_type_selector(),
-      string_refinement_enabled);
+  return java_entry_point(
+    symbol_table,
+    main_class,
+    get_message_handler(),
+    assume_inputs_non_null,
+    assert_uncaught_exceptions,
+    object_factory_parameters,
+    get_pointer_type_selector(),
+    string_refinement_enabled);
 }
 
 /// Uses a simple context-insensitive ('ci') analysis to determine which methods

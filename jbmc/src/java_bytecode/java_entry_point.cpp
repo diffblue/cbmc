@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/static_lifetime_init.h>
 
+#include "java_bytecode_instrument.h"
 #include "java_object_factory.h"
 #include "java_string_literals.h"
 #include "java_utils.h"
@@ -520,6 +521,7 @@ bool java_entry_point(
   const irep_idt &main_class,
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
+  bool assert_uncaught_exceptions,
   const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   bool string_refinement_enabled)
@@ -554,6 +556,7 @@ bool java_entry_point(
     symbol_table,
     message_handler,
     assume_init_pointers_not_null,
+    assert_uncaught_exceptions,
     object_factory_parameters,
     pointer_type_selector);
 }
@@ -576,7 +579,8 @@ bool generate_java_start_function(
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
-  const object_factory_parameterst& object_factory_parameters,
+  bool assert_uncaught_exceptions,
+  const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector)
 {
   messaget message(message_handler);
@@ -698,6 +702,13 @@ bool generate_java_start_function(
 
   // declare certain (which?) variables as test outputs
   java_record_outputs(symbol, main_arguments, init_code, symbol_table);
+
+  // add uncaught-exception check if requested
+  if(assert_uncaught_exceptions)
+  {
+    java_bytecode_instrument_uncaught_exceptions(
+      init_code, exc_symbol, symbol.location);
+  }
 
   // create a symbol for the __CPROVER__start function, associate the code that
   // we just built and register it in the symbol table
