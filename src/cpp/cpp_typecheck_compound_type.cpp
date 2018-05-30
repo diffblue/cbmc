@@ -733,13 +733,6 @@ void cpp_typecheckt::typecheck_compound_declarator(
       {
         new_symbol->value.swap(value);
         c_typecheck_baset::do_initializer(*new_symbol);
-
-        // these are macros if they are PODs and come with a (constant) value
-        if(new_symbol->type.get_bool(ID_C_constant))
-        {
-          simplify(new_symbol->value, *this);
-          new_symbol->is_macro=true;
-        }
       }
       else
       {
@@ -771,7 +764,18 @@ void cpp_typecheckt::check_fixed_size_array(typet &type)
     array_typet &array_type=to_array_type(type);
 
     if(array_type.size().is_not_nil())
+    {
+      if(array_type.size().id() == ID_symbol)
+      {
+        const symbol_exprt &s = to_symbol_expr(array_type.size());
+        const symbolt &symbol = lookup(s.get_identifier());
+
+        if(cpp_is_pod(symbol.type) && symbol.type.get_bool(ID_C_constant))
+          array_type.size() = symbol.value;
+      }
+
       make_constant_index(array_type.size());
+    }
 
     // recursive call for multi-dimensional arrays
     check_fixed_size_array(array_type.subtype());

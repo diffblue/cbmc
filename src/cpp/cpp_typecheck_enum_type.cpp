@@ -63,6 +63,8 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     symbol.type=enum_tag_type;
     symbol.is_type=false;
     symbol.is_macro=true;
+    symbol.is_file_local = true;
+    symbol.is_thread_local = true;
 
     symbolt *new_symbol;
     if(symbol_table.move(symbol, new_symbol))
