@@ -366,6 +366,11 @@ void java_bytecode_convert_method_lazy(
   else
     member_type.set_access(ID_default);
 
+  if(m.is_synchronized)
+    member_type.set(ID_is_synchronized, true);
+  if(m.is_static)
+    member_type.set(ID_is_static, true);
+
   // do we need to add 'this' as a parameter?
   if(!m.is_static)
   {

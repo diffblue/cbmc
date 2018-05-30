@@ -22,9 +22,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/class_hierarchy.h>
 
+#include "java_bytecode_concurrency_instrumentation.h"
 #include "java_bytecode_convert_class.h"
 #include "java_bytecode_convert_method.h"
-#include "java_bytecode_convert_threadblock.h"
 #include "java_bytecode_internal_additions.h"
 #include "java_bytecode_instrument.h"
 #include "java_bytecode_typecheck.h"
@@ -755,9 +755,12 @@ bool java_bytecode_languaget::typecheck(
   bool res = java_bytecode_typecheck(
     symbol_table, get_message_handler(), string_refinement_enabled);
 
-  // now instrument thread-blocks
+  // now instrument thread-blocks and synchronized methods.
   if(threading_support)
+  {
     convert_threadblock(symbol_table);
+    convert_synchronized_methods(symbol_table, get_message_handler());
+  }
 
   return res;
 }
