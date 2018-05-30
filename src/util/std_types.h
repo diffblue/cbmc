@@ -110,10 +110,6 @@ public:
 class symbol_typet:public typet
 {
 public:
-  symbol_typet():typet(ID_symbol)
-  {
-  }
-
   explicit symbol_typet(const irep_idt &identifier):typet(ID_symbol)
   {
     set_identifier(identifier);
@@ -492,10 +488,6 @@ inline union_typet &to_union_type(typet &type)
 class tag_typet:public typet
 {
 public:
-  explicit tag_typet(const irep_idt &_id):typet(_id)
-  {
-  }
-
   explicit tag_typet(
     const irep_idt &_id,
     const irep_idt &identifier):typet(_id)
@@ -980,10 +972,6 @@ inline code_typet &to_code_type(typet &type)
 class array_typet:public type_with_subtypet
 {
 public:
-  array_typet():type_with_subtypet(ID_array)
-  {
-  }
-
   array_typet(
     const typet &_subtype,
     const exprt &_size):type_with_subtypet(ID_array, _subtype)
@@ -1575,10 +1563,6 @@ inline const string_typet &to_string_type(const typet &type)
 class range_typet:public typet
 {
 public:
-  range_typet():typet(ID_range)
-  {
-  }
-
   range_typet(const mp_integer &_from, const mp_integer &_to)
   {
     set_from(_from);
@@ -1613,10 +1597,6 @@ inline const range_typet &to_range_type(const typet &type)
 class vector_typet:public type_with_subtypet
 {
 public:
-  vector_typet():type_with_subtypet(ID_vector)
-  {
-  }
-
   vector_typet(
     const typet &_subtype,
     const exprt &_size):type_with_subtypet(ID_vector, _subtype)
@@ -1706,11 +1686,6 @@ inline complex_typet &to_complex_type(typet &type)
 class mathematical_function_typet:public typet
 {
 public:
-  mathematical_function_typet():typet(ID_mathematical_function)
-  {
-    subtypes().resize(2);
-  }
-
   // the domain of the function is composed of zero, one, or
   // many variables
   class variablet:public irept
@@ -1739,6 +1714,14 @@ public:
   };
 
   using domaint=std::vector<variablet>;
+
+  mathematical_function_typet(const domaint &_domain, const typet &_codomain)
+    : typet(ID_mathematical_function)
+  {
+    subtypes().resize(2);
+    domain() = _domain;
+    codomain() = _codomain;
+  }
 
   domaint &domain()
   {

@@ -1249,7 +1249,8 @@ exprt java_string_library_preprocesst::get_primitive_value_of_object(
   symbol_table_baset &symbol_table,
   code_blockt &code)
 {
-  symbol_typet object_type;
+  optionalt<symbol_typet> object_type;
+
   typet value_type;
   if(type_name==ID_boolean)
   {
@@ -1296,6 +1297,8 @@ exprt java_string_library_preprocesst::get_primitive_value_of_object(
   else
     UNREACHABLE;
 
+  DATA_INVARIANT(object_type.has_value(), "must have symbol for primitive");
+
   // declare tmp_type_name to hold the value
   std::string aux_name="tmp_"+id2string(type_name);
   symbolt symbol=get_fresh_aux_symbol(
@@ -1304,7 +1307,9 @@ exprt java_string_library_preprocesst::get_primitive_value_of_object(
 
   // Check that the type of the object is in the symbol table,
   // otherwise there is no safe way of finding its value.
-  if(const auto maybe_symbol=symbol_table.lookup(object_type.get_identifier()))
+  if(
+    const auto maybe_symbol =
+      symbol_table.lookup(object_type->get_identifier()))
   {
     struct_typet struct_type=to_struct_type(maybe_symbol->type);
     // Check that the type has a value field
@@ -1321,7 +1326,7 @@ exprt java_string_library_preprocesst::get_primitive_value_of_object(
     }
   }
 
-  warning() << object_type.get_identifier()
+  warning() << object_type->get_identifier()
             << " not available to format function" << eom;
   code.add(code_declt(value), loc);
   return value;

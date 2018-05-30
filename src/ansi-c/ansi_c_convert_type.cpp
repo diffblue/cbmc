@@ -601,10 +601,8 @@ void ansi_c_convert_typet::write(typet &type)
 
   if(vector_size.is_not_nil())
   {
-    vector_typet new_type;
-    new_type.size()=vector_size;
+    vector_typet new_type(type, vector_size);
     new_type.add_source_location()=vector_size.source_location();
-    new_type.subtype().swap(type);
     type=new_type;
   }
 

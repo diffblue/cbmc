@@ -1028,26 +1028,27 @@ typet smt2_parsert::function_signature_definition()
     return sort();
   }
 
-  mathematical_function_typet result;
+  mathematical_function_typet::domaint domain;
 
   while(peek()!=CLOSE)
   {
     if(next_token()!=OPEN)
     {
       error() << "expected '(' at beginning of parameter" << eom;
-      return result;
+      return nil_typet();
     }
 
     if(next_token()!=SYMBOL)
     {
       error() << "expected symbol in parameter" << eom;
-      return result;
+      return nil_typet();
     }
 
-    auto &var=result.add_variable();
+    mathematical_function_typet::variablet var;
     std::string id=buffer;
     var.set_identifier(id);
     var.type()=sort();
+    domain.push_back(var);
 
     auto &entry=id_map[id];
     entry.type=var.type();
@@ -1056,15 +1057,15 @@ typet smt2_parsert::function_signature_definition()
     if(next_token()!=CLOSE)
     {
       error() << "expected ')' at end of parameter" << eom;
-      return result;
+      return nil_typet();
     }
   }
 
   next_token(); // eat the ')'
 
-  result.codomain()=sort();
+  typet codomain = sort();
 
-  return result;
+  return mathematical_function_typet(domain, codomain);
 }
 
 typet smt2_parsert::function_signature_declaration()
@@ -1081,37 +1082,38 @@ typet smt2_parsert::function_signature_declaration()
     return sort();
   }
 
-  mathematical_function_typet result;
+  mathematical_function_typet::domaint domain;
 
   while(peek()!=CLOSE)
   {
     if(next_token()!=OPEN)
     {
       error() << "expected '(' at beginning of parameter" << eom;
-      return result;
+      return nil_typet();
     }
 
     if(next_token()!=SYMBOL)
     {
       error() << "expected symbol in parameter" << eom;
-      return result;
+      return nil_typet();
     }
 
-    auto &var=result.add_variable();
+    mathematical_function_typet::variablet var;
     var.type()=sort();
+    domain.push_back(var);
 
     if(next_token()!=CLOSE)
     {
       error() << "expected ')' at end of parameter" << eom;
-      return result;
+      return nil_typet();
     }
   }
 
   next_token(); // eat the ')'
 
-  result.codomain()=sort();
+  typet codomain = sort();
 
-  return result;
+  return mathematical_function_typet(domain, codomain);
 }
 
 void smt2_parsert::command(const std::string &c)
