@@ -1,0 +1,10 @@
+CORE gcc-only
+main.cpp
+--show-symbol-table
+activate-multi-line-match
+Symbol\.+: bar\(\)\nPretty name\.+: bar\(\)\nModule\.+: main\nBase name\.+: bar\nMode\.+: cpp\nType\.+: auto \(\) -> const char \*\nValue\.+: \nFlags\.+: weak\n
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$

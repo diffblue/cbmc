@@ -45,6 +45,16 @@ public:
     return static_cast<const exprt &>(find(ID_value));
   }
 
+  bool get_is_parameter() const
+  {
+    return get_bool(ID_is_parameter);
+  }
+
+  void set_is_parameter(bool is_parameter)
+  {
+    set(ID_is_parameter, is_parameter);
+  }
+
   // initializers for function arguments
   exprt &init_args()
   {
