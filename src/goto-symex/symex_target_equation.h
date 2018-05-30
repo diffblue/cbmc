@@ -320,7 +320,7 @@ public:
 
 protected:
   // for enforcing sharing in the expressions stored
-  merge_irept merge_irep;
+  merge_full_irept merge_irep;
   void merge_ireps(SSA_stept &SSA_step);
 };
 
