@@ -6148,21 +6148,21 @@ def CheckRedundantVirtual(filename, clean_lines, linenum, error):
   if end_col < 0:
     return  # Couldn't find end of parameter list, give up
 
-#  # Look for "override" or "final" after the parameter list
-#  # (possibly on the next few lines).
-#  for i in xrange(end_line, min(end_line + 3, clean_lines.NumLines())):
-#    line = clean_lines.elided[i][end_col:]
-#    match = Search(r'\b(override|final)\b', line)
-#    if match:
-#      error(filename, linenum, 'readability/inheritance', 4,
-#            ('"virtual" is redundant since function is '
-#             'already declared as "%s"' % match.group(1)))
-#
-#    # Set end_col to check whole lines after we are done with the
-#    # first line.
-#    end_col = 0
-#    if Search(r'[^\w]\s*$', line):
-#      break
+  # Look for "override" or "final" after the parameter list
+  # (possibly on the next few lines).
+  for i in xrange(end_line, min(end_line + 3, clean_lines.NumLines())):
+    line = clean_lines.elided[i][end_col:]
+    match = Search(r'\b(override|final)\b', line)
+    if match:
+      error(filename, linenum, 'readability/inheritance', 4,
+            ('"virtual" is redundant since function is '
+             'already declared as "%s"' % match.group(1)))
+
+    # Set end_col to check whole lines after we are done with the
+    # first line.
+    end_col = 0
+    if Search(r'[^\w]\s*$', line):
+      break
 
 
 

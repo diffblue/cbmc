@@ -156,7 +156,7 @@ Formatting is enforced using clang-format. For more information about this, see
 - Make references `const` whenever possible
 - Make member functions `const` whenever possible
 - Do not hide base class functions
-- You are encouraged to use `override`
+- When overriding a virtual function, use `override` (without `virtual`)
 - Single argument constructors must be `explicit`
 - Avoid implicit conversions
 - Avoid `friend` declarations
