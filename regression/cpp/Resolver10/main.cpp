@@ -10,7 +10,7 @@ struct B: A
   {
     i = 1;
     A();
-    assert(i==1);
+    __CPROVER_assert(i==1, "");
   }
 };
 

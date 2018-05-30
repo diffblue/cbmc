@@ -17,7 +17,7 @@ struct A
 int main()
 {
   A a;
-  assert(a.test()==false);
+  __CPROVER_assert(a.test() == false, "");
   const A a2;
-  assert(a2.test()==true);
+  __CPROVER_assert(a2.test() == true, "");
 }
