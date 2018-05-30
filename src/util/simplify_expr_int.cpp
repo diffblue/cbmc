@@ -28,18 +28,19 @@ bool simplify_exprt::simplify_bswap(bswap_exprt &expr)
 {
   if(expr.type().id() == ID_unsignedbv && expr.op().is_constant())
   {
+    auto bits_per_byte = expr.get_bits_per_byte();
     std::size_t width=to_bitvector_type(expr.type()).get_width();
     mp_integer value;
     to_integer(expr.op(), value);
     std::vector<mp_integer> bytes;
 
     // take apart
-    for(std::size_t bit=0; bit<width; bit+=8)
-      bytes.push_back((value >> bit)%256);
+    for(std::size_t bit = 0; bit < width; bit += bits_per_byte)
+      bytes.push_back((value >> bit)%power(2, bits_per_byte));
 
     // put back together, but backwards
     mp_integer new_value=0;
-    for(std::size_t bit=0; bit<width; bit+=8)
+    for(std::size_t bit = 0; bit < width; bit += bits_per_byte)
     {
       assert(!bytes.empty());
       new_value+=bytes.back()<<bit;
