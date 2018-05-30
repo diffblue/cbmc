@@ -159,9 +159,9 @@ decision_proceduret::resultt check_sat(const exprt &expr, const namespacet &ns)
   return solver();
 }
 
-// The [!mayfail] tag allows tests to fail while reporting the failure
+// The [!shouldfail] tag checks the tests fail
 SCENARIO("instantiate_not_contains",
-  "[!mayfail][core][solvers][refinement][string_constraint_instantiation]")
+  "[!shouldfail][core][solvers][refinement][string_constraint_instantiation]")
 {
   // For printing expression
   register_language(new_java_bytecode_language);

@@ -12,7 +12,7 @@
 
 SCENARIO(
   "Lazy load lambda methods",
-  "[core][java_bytecode][ci_lazy_methods][lambdas][!mayfail]")
+  "[core][java_bytecode][ci_lazy_methods][lambdas][!shouldfail]")
 {
   GIVEN("A class with some locally declared lambdas")
   {
@@ -192,7 +192,7 @@ SCENARIO(
 
 SCENARIO(
   "Lazy load lambda methods in seperate class",
-  "[core][java_bytecode][ci_lazy_methods][lambdas][!mayfail]")
+  "[core][java_bytecode][ci_lazy_methods][lambdas][!shouldfail]")
 {
   const symbol_tablet symbol_table = load_java_class_lazy(
     "ExternalLambdaAccessor",
