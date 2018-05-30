@@ -54,6 +54,16 @@ std::string cpp_typecheckt::template_suffix(
     else // expression
     {
       exprt e=expr;
+
+      if(e.id() == ID_symbol)
+      {
+        const symbol_exprt &s = to_symbol_expr(e);
+        const symbolt &symbol = lookup(s.get_identifier());
+
+        if(cpp_is_pod(symbol.type) && symbol.type.get_bool(ID_C_constant))
+          e = symbol.value;
+      }
+
       make_constant(e);
 
       // this must be a constant, which includes true/false

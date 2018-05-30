@@ -460,11 +460,6 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.is_macro=is_typedef && !is_template_parameter;
   symbol.pretty_name=pretty_name;
 
-  // Constant? These are propagated.
-  if(symbol.type.get_bool(ID_C_constant) &&
-     symbol.value.is_not_nil())
-    symbol.is_macro=true;
-
   if(is_code && !symbol.is_type)
   {
     // it is a function
