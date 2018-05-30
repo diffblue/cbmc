@@ -24,15 +24,19 @@
 #include <goto-instrument/cover.h>
 
 #include <iostream>
+#include <java-testing-utils/load_java_class.h>
 
 void validate_method_removal(
   std::list<goto_programt::instructiont> instructions)
 {
   bool method_removed = true, replacement_nondet_exists = false;
 
-  // Quick loop to check that our method call has been replaced.
+  // Loop over our instructions to make sure the nondet java method call has
+  // been removed and that we can find an assignment/return with a nondet
+  // as it's right-hand side.
   for(const auto &inst : instructions)
   {
+    // Check that our NONDET(<type>) exists on a rhs somewhere.
     if(inst.is_assign())
     {
       const code_assignt &assignment = to_code_assign(inst.code);
@@ -46,6 +50,21 @@ void validate_method_removal(
       }
     }
 
+    if(inst.is_return())
+    {
+      const code_returnt &ret_expr = to_code_return(inst.code);
+      if(ret_expr.return_value().id() == ID_side_effect)
+      {
+        const side_effect_exprt &see =
+          to_side_effect_expr(ret_expr.return_value());
+        if(see.get_statement() == ID_nondet)
+        {
+          replacement_nondet_exists = true;
+        }
+      }
+    }
+
+    // And check to see that our nondet method call has been removed.
     if(inst.is_function_call())
     {
       const code_function_callt &function_call =
@@ -71,56 +90,146 @@ void validate_method_removal(
   REQUIRE(replacement_nondet_exists);
 }
 
-TEST_CASE(
-  "Load class with a generated java nondet method call, run remove returns "
-  "both before and after the nondet statements have been removed, check "
-  "results are as expected.",
+void load_and_test_method(
+  const std::string &method_signature,
+  goto_functionst &functions,
+  journalling_symbol_tablet &symbol_table)
+{
+  // Find the method under test.
+  const std::string function_name = "java::Main." + method_signature;
+  goto_functionst::goto_functiont &goto_function =
+    functions.function_map.at(function_name);
+
+  goto_model_functiont model_function(
+    symbol_table, functions, function_name, goto_function);
+
+  // Emulate some of the passes that we'd normally do before replace_java_nondet
+  // is called.
+  remove_instanceof(goto_function, symbol_table, null_message_handler);
+
+  remove_virtual_functions(model_function);
+
+  // Then test both situations.
+  THEN(
+    "Code should work when remove returns is called before "
+    "replace_java_nondet.")
+  {
+    remove_returns(model_function, [](const irep_idt &) { return false; });
+
+    replace_java_nondet(model_function);
+
+    validate_method_removal(goto_function.body.instructions);
+  }
+
+  THEN(
+    "Code should work when remove returns is called after "
+    "replace_java_nondet.")
+  {
+    replace_java_nondet(model_function);
+
+    remove_returns(model_function, [](const irep_idt &) { return false; });
+
+    validate_method_removal(goto_function.body.instructions);
+  }
+}
+
+SCENARIO(
+  "Testing replace_java_nondet correctly replaces CProver.nondet method calls.",
   "[core][java_bytecode][replace_nondet]")
 {
-  GIVEN("A class with a call to CProver.nondetWithoutNull()")
+  GIVEN("A class that holds nondet calls.")
   {
-    symbol_tablet raw_symbol_table = load_java_class(
-      "Main", "./java_bytecode/java_replace_nondet", "Main.replaceNondet");
+    // Load our main class.
+    symbol_tablet raw_symbol_table =
+      load_java_class("Main", "./java_bytecode/java_replace_nondet");
 
     journalling_symbol_tablet symbol_table =
       journalling_symbol_tablet::wrap(raw_symbol_table);
 
+    // Convert bytecode into goto.
     goto_functionst functions;
     goto_convert(symbol_table, functions, null_message_handler);
 
-    const std::string function_name = "java::Main.replaceNondet:()V";
-    goto_functionst::goto_functiont &goto_function =
-      functions.function_map.at(function_name);
-
-    goto_model_functiont model_function(
-      symbol_table, functions, function_name, goto_function);
-
-    remove_instanceof(goto_function, symbol_table, null_message_handler);
-
-    remove_virtual_functions(model_function);
-
-    WHEN("Remove returns is called before java nondet.")
+    WHEN("A method assigns a local Object variable with nondetWithoutNull.")
     {
-      remove_returns(model_function, [](const irep_idt &) { return false; });
-
-      replace_java_nondet(functions);
-
-      THEN("The nondet method call should have been removed.")
-      {
-        validate_method_removal(goto_function.body.instructions);
-      }
+      load_and_test_method(
+        "replaceNondetAssignment:()V", functions, symbol_table);
     }
 
-    WHEN("Remove returns is called after java nondet.")
+    WHEN(
+      "A method assigns an Integer variable with nondetWithoutNull. Causes "
+      "implicit cast.")
     {
-      replace_java_nondet(functions);
-
-      remove_returns(model_function, [](const irep_idt &) { return false; });
-
-      THEN("The nondet method call should have been removed.")
-      {
-        validate_method_removal(goto_function.body.instructions);
-      }
+      load_and_test_method(
+        "replaceNondetAssignmentImplicitCast:()V", functions, symbol_table);
     }
+
+    WHEN(
+      "A method assigns an Integer variable with nondetWithoutNull. Uses "
+      "explicit cast.")
+    {
+      load_and_test_method(
+        "replaceNondetAssignmentExplicitCast:()V", functions, symbol_table);
+    }
+
+    WHEN("A method directly returns a nonDetWithoutNull of type Object.")
+    {
+      load_and_test_method(
+        "replaceNondetReturn:()Ljava/lang/Object;", functions, symbol_table);
+    }
+
+    WHEN(
+      "A method directly returns a nonDetWithoutNull of type Integer. Causes "
+      "implicit cast.")
+    {
+      load_and_test_method(
+        "replaceNondetReturnWithImplicitCast:()Ljava/lang/Integer;",
+        functions,
+        symbol_table);
+    }
+
+    WHEN(
+      "A method directly returns a nonDetWithoutNull of type Integer. Uses "
+      "explicit cast.")
+    {
+      load_and_test_method(
+        "replaceNondetReturnWithExplicitCast:()Ljava/lang/Integer;",
+        functions,
+        symbol_table);
+    }
+
+    // These currently cause an abort, issue detailed in https://github.com/diffblue/cbmc/issues/2281.
+
+    //    WHEN(
+    //      "A method directly returns a nonDetWithoutNull +3 with explicit int cast.")
+    //    {
+    //      load_and_test_method("replaceNondetReturnAddition:()Ljava/lang/Integer;", functions, symbol_table);
+    //    }
+
+    //    WHEN(
+    //      "A method assigns an int variable with nondetWithoutNull. Causes "
+    //      "unboxing.")
+    //    {
+    //      load_and_test_method("replaceNondetAssignmentUnbox:()V", functions, symbol_table);
+    //    }
+
+    //    WHEN(
+    //      "A method assigns an int variable with nondetWithoutNull +3 with explicit cast.")
+    //    {
+    //      load_and_test_method("replaceNondetAssignmentAddition:()V", functions, symbol_table);
+    //    }
+
+    //    WHEN(
+    //      "A method that calls nondetWithoutNull() without assigning the return value.")
+    //    {
+    //      load_and_test_method("replaceNondetUnused:()V", functions, symbol_table);
+    //    }
+
+    //    WHEN(
+    //      "A method directly returns a nonDetWithoutNull of type int. Causes "
+    //      "unboxing.")
+    //    {
+    //      load_and_test_method("replaceNondetReturnUnboxed:()I", functions, symbol_table);
+    //    }
   }
 }

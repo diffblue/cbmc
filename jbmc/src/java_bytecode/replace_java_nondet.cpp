@@ -152,6 +152,25 @@ static bool is_assignment_from(
          is_typecast_with_id(rhs, identifier);
 }
 
+/// Return whether the instruction is a return, and the rhs is a symbol or
+/// typecast expression with the specified identifier.
+/// \param instr: A goto program instruction.
+/// \param identifier: Some identifier.
+/// \return True if the expression is a typecast with one operand, and the
+///   typecast's identifier matches the specified identifier.
+static bool is_return_with_variable(
+  const goto_programt::instructiont &instr,
+  const irep_idt &identifier)
+{
+  if(!instr.is_return())
+  {
+    return false;
+  }
+  const auto &rhs = to_code_return(instr.code).return_value();
+  return is_symbol_with_id(rhs, identifier) ||
+         is_typecast_with_id(rhs, identifier);
+}
+
 /// Given an iterator into a list of instructions, modify the list to replace
 /// 'nondet' library functions with CBMC-native nondet expressions, and return
 /// an iterator to the next instruction to check. It's important to note that
@@ -166,7 +185,10 @@ static bool is_assignment_from(
 ///   obj = (<type-of-obj>)return_tmp0;
 ///
 /// We're going to replace all of these lines with
-///   return_tmp0 = NONDET(<type-of-obj>)
+///   obj = NONDET(<type-of-obj>)
+///
+/// In the situation of a direct return, the end result should be:
+///   return NONDET(<type-of-obj>)
 /// \param goto_program: The goto program to modify.
 /// \param target: A single step of the goto program which may be erased and
 ///   replaced.
@@ -225,47 +247,64 @@ static goto_programt::targett check_and_replace_target(
   // Look for the assignment of the temporary return variable into our target
   // variable.
   const auto end = goto_program.instructions.end();
-  auto assignment_instruction = std::find_if(
+  auto target_instruction = std::find_if(
     next_instr,
     end,
     [&return_identifier](const goto_programt::instructiont &instr) {
       return is_assignment_from(instr, return_identifier);
     });
 
-  INVARIANT(
-    assignment_instruction != end,
-    "failed to find assignment of the temporary return variable into our "
-    "target variable");
+  // If we can't find an assign, it might be a direct return.
+  if(target_instruction == end)
+  {
+    target_instruction = std::find_if(
+      next_instr,
+      end,
+      [&return_identifier](const goto_programt::instructiont &instr) {
+        return is_return_with_variable(instr, return_identifier);
+      });
+  }
 
-  // Assume that the LHS of *this* assignment is the actual nondet variable
-  const auto &code_assign = to_code_assign(assignment_instruction->code);
-  const auto nondet_var = code_assign.lhs();
-  const auto source_loc = target->source_location;
-
-  // Erase from the nondet function call to the assignment
-  const auto after_matching_assignment = std::next(assignment_instruction);
   INVARIANT(
-    after_matching_assignment != end,
-    "goto_program missing END_FUNCTION instruction");
+    target_instruction != end,
+    "failed to find return of the temporary return variable or assignment of "
+    "the temporary return variable into a target variable");
 
   std::for_each(
-    target, after_matching_assignment, [](goto_programt::instructiont &instr) {
+    target, target_instruction, [](goto_programt::instructiont &instr) {
       instr.make_skip();
     });
 
-  const auto inserted = goto_program.insert_before(after_matching_assignment);
-  inserted->make_assignment();
-  side_effect_expr_nondett inserted_expr(nondet_var.type());
-  inserted_expr.set_nullable(
-    instr_info.get_nullable_type() ==
-    nondet_instruction_infot::is_nullablet::TRUE);
-  inserted->code = code_assignt(nondet_var, inserted_expr);
-  inserted->code.add_source_location() = source_loc;
-  inserted->source_location = source_loc;
+  if(target_instruction->is_return())
+  {
+    const auto &nondet_var =
+      to_code_return(target_instruction->code).return_value();
+
+    side_effect_expr_nondett inserted_expr(nondet_var.type());
+    inserted_expr.set_nullable(
+      instr_info.get_nullable_type() ==
+      nondet_instruction_infot::is_nullablet::TRUE);
+    target_instruction->code = code_returnt(inserted_expr);
+    target_instruction->code.add_source_location() =
+      target_instruction->source_location;
+  }
+  else if(target_instruction->is_assign())
+  {
+    // Assume that the LHS of *this* assignment is the actual nondet variable
+    const auto &nondet_var = to_code_assign(target_instruction->code).lhs();
+
+    side_effect_expr_nondett inserted_expr(nondet_var.type());
+    inserted_expr.set_nullable(
+      instr_info.get_nullable_type() ==
+      nondet_instruction_infot::is_nullablet::TRUE);
+    target_instruction->code = code_assignt(nondet_var, inserted_expr);
+    target_instruction->code.add_source_location() =
+      target_instruction->source_location;
+  }
 
   goto_program.update();
 
-  return after_matching_assignment;
+  return std::next(target_instruction);
 }
 
 /// Checks each instruction in the goto program to see whether it is a method
