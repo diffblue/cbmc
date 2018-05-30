@@ -1383,6 +1383,11 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
 
     check_rec(deref.op0(), guard, false);
 
+    // avoid building the following expressions when pointer_validity_check
+    // would return immediately anyway
+    if(!enable_pointer_check)
+      return;
+
     exprt access_ub=nil_exprt();
 
     exprt member_offset=member_offset_expr(member, ns);
