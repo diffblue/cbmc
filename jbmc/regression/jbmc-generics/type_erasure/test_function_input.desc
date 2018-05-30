@@ -1,0 +1,10 @@
+CORE
+TestClass.class
+--function TestClass.testFunctionWithInput
+EXIT=0
+SIGNAL=0
+VERIFICATION SUCCESSFUL
+--
+--
+Adding the core models causes a exception in convert_struct relating to the
+`monitorCount` component. See diffblue/cbmc#2307
