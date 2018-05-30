@@ -98,10 +98,10 @@ public:
 
   /// See namespace_baset::lookup(). Note that \ref namespacet has two symbol
   /// tables.
-  virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const;
+  bool lookup(const irep_idt &name, const symbolt *&symbol) const override;
 
   /// See documentation for namespace_baset::get_max().
-  virtual unsigned get_max(const std::string &prefix) const;
+  unsigned get_max(const std::string &prefix) const override;
 
   const symbol_tablet &get_symbol_table() const
   {
@@ -129,8 +129,8 @@ public:
   // these do the actual lookup
   using namespace_baset::lookup;
 
-  virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const;
-  virtual unsigned get_max(const std::string &prefix) const;
+  bool lookup(const irep_idt &name, const symbolt *&symbol) const override;
+  unsigned get_max(const std::string &prefix) const override;
 
   void add(const symbol_tablet &symbol_table)
   {
