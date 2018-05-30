@@ -459,36 +459,31 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"_Float16"      { // clang doesn't have it
-                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+"_Float16"      { if(PARSER.ts_18661_3_Floatn_types)
                   { loc(); return TOK_GCC_FLOAT16; }
                   else
                     return make_identifier();
                 }
 
-"_Float32"      { // clang doesn't have it
-                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+"_Float32"      { if(PARSER.ts_18661_3_Floatn_types)
                   { loc(); return TOK_GCC_FLOAT32; }
                   else
                     return make_identifier();
                 }
 
-"_Float32x"     { // clang doesn't have it
-                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+"_Float32x"     { if(PARSER.ts_18661_3_Floatn_types)
                   { loc(); return TOK_GCC_FLOAT32X; }
                   else
                     return make_identifier();
                 }
 
-"_Float64"      { // clang doesn't have it
-                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+"_Float64"      { if(PARSER.ts_18661_3_Floatn_types)
                   { loc(); return TOK_GCC_FLOAT64; }
                   else
                     return make_identifier();
                 }
 
-"_Float64x"     { // clang doesn't have it
-                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+"_Float64x"     { if(PARSER.ts_18661_3_Floatn_types)
                   { loc(); return TOK_GCC_FLOAT64X; }
                   else
                     return make_identifier();
@@ -501,16 +496,20 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__float128" |
-"_Float128"     { // clang doesn't have it
+"__float128"    { // clang doesn't have it
                   if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                   { loc(); return TOK_GCC_FLOAT128; }
                   else
                     return make_identifier();
                 }
 
-"_Float128x"    { // clang doesn't have it
-                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+"_Float128"     { if(PARSER.ts_18661_3_Floatn_types)
+                  { loc(); return TOK_GCC_FLOAT128; }
+                  else
+                    return make_identifier();
+                }
+
+"_Float128x"    { if(PARSER.ts_18661_3_Floatn_types)
                   { loc(); return TOK_GCC_FLOAT128X; }
                   else
                     return make_identifier();

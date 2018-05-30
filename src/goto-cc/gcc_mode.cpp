@@ -525,6 +525,11 @@ int gcc_modet::doit()
   if(cmdline.isset("-fsingle-precision-constant"))
     config.ansi_c.single_precision_constant=true;
 
+  // ISO/IEC TS 18661-3:2015 support was introduced with gcc 7.0
+  if(gcc_version.flavor==gcc_versiont::flavort::GCC &&
+     gcc_version.is_at_least(7))
+    config.ansi_c.ts_18661_3_Floatn_types=true;
+
   // -fshort-double makes double the same as float
   if(cmdline.isset("fshort-double"))
     config.ansi_c.double_width=config.ansi_c.single_width;

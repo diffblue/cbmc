@@ -42,6 +42,7 @@ public:
     // various language options
     bool char_is_unsigned, wchar_t_is_unsigned;
     bool for_has_scope;
+    bool ts_18661_3_Floatn_types; // ISO/IEC TS 18661-3:2015
     bool single_precision_constant;
     enum class c_standardt { C89, C99, C11 } c_standard;
     static c_standardt default_c_standard();

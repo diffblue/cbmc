@@ -12,7 +12,7 @@ STATIC_ASSERT(0X.0p+1f == 0);
 
 // 32-bit, 64-bit and 128-bit constants, GCC proper only,
 // clang doesn't have it
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 7
 STATIC_ASSERT(__builtin_types_compatible_p(_Float32, __typeof(1.0f32)));
 STATIC_ASSERT(__builtin_types_compatible_p(_Float64, __typeof(1.0f64)));
 STATIC_ASSERT(__builtin_types_compatible_p(_Float128, __typeof(1.0f128)));

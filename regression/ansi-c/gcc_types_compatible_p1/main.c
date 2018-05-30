@@ -67,8 +67,8 @@ STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot) *, int *));
 STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot), typeof (janette)));
 STATIC_ASSERT(__builtin_types_compatible_p(__int128, signed __int128));
 
-#ifndef __clang__
 // clang doesn't have these
+#if !defined(__clang__) && __GNUC__ >= 7
 #if defined(__x86_64__) || defined(__i386__)
 STATIC_ASSERT(__builtin_types_compatible_p(__float128, _Float128));
 #endif
@@ -95,16 +95,19 @@ STATIC_ASSERT(!__builtin_types_compatible_p(long int, int));
 STATIC_ASSERT(!__builtin_types_compatible_p(long long int, long int));
 STATIC_ASSERT(!__builtin_types_compatible_p(unsigned, signed));
 
-#ifndef __clang__
+STATIC_ASSERT(!__builtin_types_compatible_p(__int128, unsigned __int128));
+
 // clang doesn't have these
+#if !defined(__clang__)
+#if __GNUC__ >= 7
 STATIC_ASSERT(!__builtin_types_compatible_p(_Float32, float));
 STATIC_ASSERT(!__builtin_types_compatible_p(_Float64, double));
 STATIC_ASSERT(!__builtin_types_compatible_p(_Float32x, float));
 STATIC_ASSERT(!__builtin_types_compatible_p(_Float64x, double));
+#endif
 STATIC_ASSERT(!__builtin_types_compatible_p(__float80, double));
 STATIC_ASSERT(!__builtin_types_compatible_p(__float128, long double));
 STATIC_ASSERT(!__builtin_types_compatible_p(__float128, double));
-STATIC_ASSERT(!__builtin_types_compatible_p(__int128, unsigned __int128));
 #endif
 #endif
 
