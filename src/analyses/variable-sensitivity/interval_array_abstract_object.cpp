@@ -91,7 +91,7 @@ interval_array_abstract_objectt::write_index(
       bool dontcare;
       result =
         abstract_objectt::merge(result, array_after_write_at_index, dontcare);
-      ix = simplify_expr(plus_exprt(ix, constant_exprt("1", ix.type())), ns);
+      ix = simplify_expr(plus_exprt(ix, from_integer(1, ix.type())), ns);
     }
     return std::dynamic_pointer_cast<const array_abstract_objectt>(result);
   }
@@ -127,7 +127,7 @@ abstract_object_pointert interval_array_abstract_objectt::read_index(
       {
         value = value_at_index;
       }
-      ix = simplify_expr(plus_exprt(ix, constant_exprt("1", ix.type())), ns);
+      ix = simplify_expr(plus_exprt(ix, from_integer(1, ix.type())), ns);
     }
     return value;
   }
