@@ -77,7 +77,7 @@ interval_array_abstract_objectt::write_index(
     auto ix = index_interval.get_lower();
     auto interval_end = index_interval.get_upper();
     sharing_ptrt<abstract_objectt> result = shared_from_this();
-    while(simplify_expr(binary_predicate_exprt(ix, ID_gt, interval_end), ns)
+    while(!result->is_top() && simplify_expr(binary_predicate_exprt(ix, ID_gt, interval_end), ns)
             .is_false())
     {
       auto array_after_write_at_index =
@@ -113,7 +113,7 @@ abstract_object_pointert interval_array_abstract_objectt::read_index(
     auto ix = index_interval.get_lower();
     auto interval_end = index_interval.get_upper();
     abstract_object_pointert value;
-    while(simplify_expr(binary_relation_exprt(ix, ID_gt, interval_end), ns)
+    while((!value || !value->is_top()) && simplify_expr(binary_relation_exprt(ix, ID_gt, interval_end), ns)
             .is_false())
     {
       auto value_at_index = constant_array_abstract_objectt::read_index(
