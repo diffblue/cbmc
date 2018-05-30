@@ -56,23 +56,26 @@ interval_array_abstract_objectt::write_index(
   const abstract_object_pointert value,
   bool merging_write) const
 {
-  auto evaluated_index_interval =
+  auto index_interval =
     eval_and_get_as_interval(index_expr.index(), environment, ns);
-  if(evaluated_index_interval.is_single_value_interval())
+
+  if(index_interval.is_single_value_interval())
   {
     return constant_array_abstract_objectt::write_index(
       environment,
       ns,
       stack,
-      index_exprt(index_expr.array(), evaluated_index_interval.get_lower()),
+      index_exprt(index_expr.array(), index_interval.get_lower()),
       value,
       merging_write);
   }
   else if(
-    !evaluated_index_interval.is_top() && !evaluated_index_interval.is_bottom())
+    !index_interval.is_top() && !index_interval.is_bottom() &&
+    index_interval.get_lower().id() != ID_min &&
+    index_interval.get_upper().id() != ID_max)
   {
-    auto ix = evaluated_index_interval.get_lower();
-    auto interval_end = evaluated_index_interval.get_upper();
+    auto ix = index_interval.get_lower();
+    auto interval_end = index_interval.get_upper();
     sharing_ptrt<abstract_objectt> result = shared_from_this();
     while(simplify_expr(binary_predicate_exprt(ix, ID_gt, interval_end), ns)
             .is_false())
@@ -102,7 +105,10 @@ abstract_object_pointert interval_array_abstract_objectt::read_index(
 {
   auto evaluated_index_value = eval_and_get_as_interval(index.index(), env, ns);
   auto const &index_interval = to_constant_interval_expr(evaluated_index_value);
-  if(!index_interval.is_top() && !index_interval.is_bottom())
+  if(
+    !index_interval.is_top() && !index_interval.is_bottom() &&
+    index_interval.get_lower().id() != ID_min &&
+    index_interval.get_upper().id() != ID_max)
   {
     auto ix = index_interval.get_lower();
     auto interval_end = index_interval.get_upper();
