@@ -232,8 +232,6 @@ protected:
 
   friend class symex_dereference_statet;
 
-  void new_name(symbolt &symbol, statet &state);
-
   // this does the following:
   // a) rename non-det choices
   // b) remove pointer dereferencing

@@ -24,11 +24,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/format_type.h>
+#include <util/fresh_symbol.h>
 #include <util/guard.h>
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
-#include <util/rename.h>
 #include <util/ssa_expr.h>
 
 #include <ansi-c/c_typecast.h>
@@ -148,22 +148,19 @@ exprt value_set_dereferencet::dereference(
     else
     {
       // else: produce new symbol
-
-      symbolt symbol;
-      symbol.name="symex::invalid_object"+std::to_string(invalid_counter++);
-      symbol.base_name="invalid_object";
-      symbol.type=type;
-      symbol.mode = language_mode;
+      symbolt &symbol = get_fresh_aux_symbol(
+        type,
+        "symex",
+        "invalid_object",
+        pointer.source_location(),
+        language_mode,
+        new_symbol_table);
 
       // make it a lvalue, so we can assign to it
       symbol.is_lvalue=true;
 
-      get_new_name(symbol, ns);
-
       failure_value=symbol.symbol_expr();
       failure_value.set(ID_C_invalid_object, true);
-
-      new_symbol_table.insert(std::move(symbol));
     }
 
     valuet value;

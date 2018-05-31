@@ -12,10 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_convert_class.h"
 
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
-#include <util/std_expr.h>
-#include <util/rename.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_util.h>
+#include <util/fresh_symbol.h>
+#include <util/std_expr.h>
 #include <util/symbol.h>
 
 #include <util/c_types.h>
@@ -351,12 +351,6 @@ void goto_convertt::remove_function_call(
     return;
   }
 
-  auxiliary_symbolt new_symbol;
-
-  new_symbol.base_name="return_value";
-  new_symbol.type=expr.type();
-  new_symbol.location=expr.find_source_location();
-
   // get name of function, if available
 
   if(expr.id()!=ID_side_effect ||
@@ -374,25 +368,26 @@ void goto_convertt::remove_function_call(
     throw 0;
   }
 
+  std::string new_base_name = "return_value";
+  irep_idt new_symbol_mode = mode;
+
   if(expr.op0().id()==ID_symbol)
   {
     const irep_idt &identifier=expr.op0().get(ID_identifier);
-    const symbolt &symbol=lookup(identifier);
-
-    std::string new_base_name=id2string(new_symbol.base_name);
+    const symbolt &symbol = ns.lookup(identifier);
 
     new_base_name+='_';
     new_base_name+=id2string(symbol.base_name);
-    new_base_name += "$0";
-
-    new_symbol.base_name=new_base_name;
-    new_symbol.mode=symbol.mode;
+    new_symbol_mode = symbol.mode;
   }
 
-  new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
-
-  // ensure that the name is unique
-  new_name(new_symbol);
+  const symbolt &new_symbol = get_fresh_aux_symbol(
+    expr.type(),
+    tmp_symbol_prefix,
+    new_base_name,
+    expr.find_source_location(),
+    new_symbol_mode,
+    symbol_table);
 
   {
     code_declt decl;
@@ -432,15 +427,13 @@ void goto_convertt::remove_cpp_new(
 {
   codet call;
 
-  auxiliary_symbolt new_symbol;
-
-  new_symbol.base_name = "new_ptr$0";
-  new_symbol.type=expr.type();
-  new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
-  new_symbol.mode = ID_cpp;
-
-  // ensure that the name is unique
-  new_name(new_symbol);
+  const symbolt &new_symbol = get_fresh_aux_symbol(
+    expr.type(),
+    tmp_symbol_prefix,
+    "new_ptr",
+    expr.find_source_location(),
+    ID_cpp,
+    symbol_table);
 
   code_declt decl;
   decl.symbol()=new_symbol.symbol_expr();
@@ -486,19 +479,15 @@ void goto_convertt::remove_malloc(
 
   if(result_is_used)
   {
-    auxiliary_symbolt new_symbol;
+    const symbolt &new_symbol = get_fresh_aux_symbol(
+      expr.type(),
+      tmp_symbol_prefix,
+      "malloc_value",
+      expr.source_location(),
+      mode,
+      symbol_table);
 
-    new_symbol.base_name = "malloc_value$0";
-    new_symbol.type=expr.type();
-    new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
-    new_symbol.location=expr.source_location();
-    new_symbol.mode = mode;
-
-    // ensure that the name is unique
-    new_name(new_symbol);
-
-    code_declt decl;
-    decl.symbol()=new_symbol.symbol_expr();
+    code_declt decl(new_symbol.symbol_expr());
     decl.add_source_location()=new_symbol.location;
     convert_decl(decl, dest, mode);
 

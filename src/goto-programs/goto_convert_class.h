@@ -56,9 +56,6 @@ protected:
   //
   // tools for symbols
   //
-  void new_name(symbolt &symbol);
-  const symbolt &lookup(const irep_idt &identifier);
-
   symbolt &new_tmp_symbol(
     const typet &type,
     const std::string &suffix,

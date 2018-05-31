@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 #include <util/simplify_expr.h>
-#include <util/rename.h>
 
 #include <util/c_types.h>
 
@@ -669,7 +668,7 @@ void goto_convertt::convert_decl(
 
   const irep_idt &identifier=op0.get(ID_identifier);
 
-  const symbolt &symbol=lookup(identifier);
+  const symbolt &symbol = ns.lookup(identifier);
 
   if(symbol.is_static_lifetime ||
      symbol.type.id()==ID_code)
@@ -2057,26 +2056,6 @@ void goto_convertt::make_temp_symbol(
   convert(assignment, dest, mode);
 
   expr=new_symbol.symbol_expr();
-}
-
-void goto_convertt::new_name(symbolt &symbol)
-{
-  // rename it
-  get_new_name(symbol, ns);
-
-  // store in symbol_table
-  symbol_table.add(symbol);
-}
-
-const symbolt &goto_convertt::lookup(const irep_idt &identifier)
-{
-  const symbolt *symbol;
-  if(ns.lookup(identifier, symbol))
-  {
-    error() << "failed to find symbol " << identifier << eom;
-    throw 0;
-  }
-  return *symbol;
 }
 
 void goto_convert(

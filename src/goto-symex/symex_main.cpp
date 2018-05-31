@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/std_expr.h>
-#include <util/rename.h>
 #include <util/symbol_table.h>
 #include <util/replace_symbol.h>
 #include <util/make_unique.h>
@@ -44,12 +43,6 @@ void goto_symext::symex_transition(
   }
 
   state.source.pc=to;
-}
-
-void goto_symext::new_name(symbolt &symbol, statet &state)
-{
-  get_new_name(symbol, ns);
-  state.symbol_table.add(symbol);
 }
 
 void goto_symext::vcc(

@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/rename.h>
 #include <util/std_expr.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
