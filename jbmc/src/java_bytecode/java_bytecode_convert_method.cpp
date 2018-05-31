@@ -2824,32 +2824,13 @@ void java_bytecode_convert_method(
   java_string_library_preprocesst &string_preprocess,
   const class_hierarchyt &class_hierarchy)
 {
-  static const std::unordered_set<std::string> methods_to_ignore
-  {
-    "nondetBoolean",
-    "nondetByte",
-    "nondetChar",
-    "nondetShort",
-    "nondetInt",
-    "nondetLong",
-    "nondetFloat",
-    "nondetDouble",
-    "nondetWithNull",
-    "nondetWithoutNull",
-    "notModelled",
-    "atomicBegin",
-    "atomicEnd",
-    "startThread",
-    "endThread",
-    "getCurrentThreadID"
-  };
-
   if(std::regex_match(
        id2string(class_symbol.name),
        std::regex(".*org\\.cprover\\.CProver.*")) &&
-     methods_to_ignore.find(id2string(method.name))!=methods_to_ignore.end())
+     cprover_methods_to_ignore.count(id2string(method.name)))
   {
-    // Ignore these methods, rely on default stubbing behaviour.
+    // Ignore these methods; fall back to the driver program's
+    // stubbing behaviour.
     return;
   }
 

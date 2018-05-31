@@ -426,3 +426,25 @@ bool is_non_null_library_global(const irep_idt &symbolid)
     "java::java.lang.System.in"};
   return non_null_globals.count(symbolid);
 }
+
+/// Methods belonging to the class org.cprover.CProver that should be ignored
+/// (not converted), leaving the driver program to stub them if it wishes.
+const std::unordered_set<std::string> cprover_methods_to_ignore
+{
+  "nondetBoolean",
+  "nondetByte",
+  "nondetChar",
+  "nondetShort",
+  "nondetInt",
+  "nondetLong",
+  "nondetFloat",
+  "nondetDouble",
+  "nondetWithNull",
+  "nondetWithoutNull",
+  "notModelled",
+  "atomicBegin",
+  "atomicEnd",
+  "startThread",
+  "endThread",
+  "getCurrentThreadID"
+};
