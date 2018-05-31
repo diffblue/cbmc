@@ -103,8 +103,9 @@ optionalt<java_bytecode_parse_treet> java_class_loadert::get_class_from_jar(
 
 static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
 {
-  return java_bytecode_parse_treet::does_annotation_exist(
-    c.annotations, ID_overlay_class);
+  return java_bytecode_parse_treet::find_annotation(
+           c.annotations, ID_overlay_class)
+    .has_value();
 }
 
 /// Check through all the places class parse trees can appear and returns the

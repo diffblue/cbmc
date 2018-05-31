@@ -33,6 +33,10 @@ void convert_annotations(
   const java_bytecode_parse_treet::annotationst &parsed_annotations,
   std::vector<java_annotationt> &annotations);
 
+void convert_java_annotations(
+  const std::vector<java_annotationt> &java_annotations,
+  java_bytecode_parse_treet::annotationst &annotations);
+
 void mark_java_implicitly_generic_class_type(
   const irep_idt &class_name,
   symbol_tablet &symbol_table);

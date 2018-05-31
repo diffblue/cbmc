@@ -99,23 +99,30 @@ void java_bytecode_parse_treet::annotationt::element_value_pairt::output(
   out << expr2java(value, ns);
 }
 
-bool java_bytecode_parse_treet::does_annotation_exist(
+/// Find an annotation given its name
+/// \param annotations: A vector of annotationt
+/// \param annotation_type_name: An irep_idt representing the name of the
+///   annotation class, e.g. java::java.lang.SuppressWarnings
+/// \return The first annotation with the given name in annotations if one
+///    exists, an empty optionalt otherwise.
+optionalt<java_bytecode_parse_treet::annotationt>
+java_bytecode_parse_treet::find_annotation(
   const annotationst &annotations,
   const irep_idt &annotation_type_name)
 {
-  return
-    std::find_if(
-      annotations.begin(),
-      annotations.end(),
-      [&annotation_type_name](const annotationt &annotation)
-      {
-        if(annotation.type.id() != ID_pointer)
-          return false;
-        typet type = annotation.type.subtype();
-        return
-          type.id() == ID_symbol
-          && to_symbol_type(type).get_identifier() == annotation_type_name;
-      }) != annotations.end();
+  const auto annotation_it = std::find_if(
+    annotations.begin(),
+    annotations.end(),
+    [&annotation_type_name](const annotationt &annotation) {
+      if(annotation.type.id() != ID_pointer)
+        return false;
+      const typet &type = annotation.type.subtype();
+      return type.id() == ID_symbol &&
+             to_symbol_type(type).get_identifier() == annotation_type_name;
+    });
+  if(annotation_it == annotations.end())
+    return {};
+  return *annotation_it;
 }
 
 void java_bytecode_parse_treet::methodt::output(std::ostream &out) const

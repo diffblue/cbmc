@@ -875,8 +875,9 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
 
 bool java_bytecode_convert_classt::is_overlay_method(const methodt &method)
 {
-  return java_bytecode_parse_treet::does_annotation_exist(
-    method.annotations, ID_overlay_method);
+  return java_bytecode_parse_treet::find_annotation(
+           method.annotations, ID_overlay_method)
+    .has_value();
 }
 
 bool java_bytecode_convert_class(
@@ -1015,21 +1016,45 @@ static void find_and_replace_parameters(
 /// \param annotations: The java_annotationt collection to populate
 void convert_annotations(
   const java_bytecode_parse_treet::annotationst &parsed_annotations,
-  std::vector<java_annotationt> &annotations)
+  std::vector<java_annotationt> &java_annotations)
 {
   for(const auto &annotation : parsed_annotations)
   {
-    annotations.emplace_back(annotation.type);
+    java_annotations.emplace_back(annotation.type);
     std::vector<java_annotationt::valuet> &values =
-      annotations.back().get_values();
+      java_annotations.back().get_values();
     std::transform(
       annotation.element_value_pairs.begin(),
       annotation.element_value_pairs.end(),
       std::back_inserter(values),
-      [](const decltype(annotation.element_value_pairs)::value_type &value)
-      {
+      [](const decltype(annotation.element_value_pairs)::value_type &value) {
         return java_annotationt::valuet(value.element_name, value.value);
       });
+  }
+}
+
+/// Convert java annotations, e.g. as retrieved from the symbol table, back
+/// to type annotationt (inverse of convert_annotations())
+/// \param java_annotations: The java_annotationt collection to convert
+/// \param annotations: The annotationt collection to populate
+void convert_java_annotations(
+  const std::vector<java_annotationt> &java_annotations,
+  java_bytecode_parse_treet::annotationst &annotations)
+{
+  for(const auto &java_annotation : java_annotations)
+  {
+    annotations.emplace_back(java_bytecode_parse_treet::annotationt());
+    auto &annotation = annotations.back();
+    annotation.type = java_annotation.get_type();
+
+    std::transform(
+      java_annotation.get_values().begin(),
+      java_annotation.get_values().end(),
+      std::back_inserter(annotation.element_value_pairs),
+      [](const java_annotationt::valuet &value)
+        -> java_bytecode_parse_treet::annotationt::element_value_pairt {
+          return {value.get_name(), value.get_value()};
+        });
   }
 }
 
