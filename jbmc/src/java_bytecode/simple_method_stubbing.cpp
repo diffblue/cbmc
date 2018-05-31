@@ -39,6 +39,7 @@ public:
     const typet &expected_type,
     const exprt &ptr,
     const source_locationt &loc,
+    const irep_idt &function_id,
     code_blockt &parent_block,
     unsigned insert_before_index,
     bool is_constructor,
@@ -77,6 +78,7 @@ void java_simple_method_stubst::create_method_stub_at(
   const typet &expected_type,
   const exprt &ptr,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &parent_block,
   const unsigned insert_before_index,
   const bool is_constructor,
@@ -112,6 +114,7 @@ void java_simple_method_stubst::create_method_stub_at(
 
   // Generate new instructions.
   code_blockt new_instructions;
+  parameters.function_id = function_id;
   gen_nondet_init(
     to_init,
     new_instructions,
@@ -158,7 +161,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
     const typet &this_type = this_argument.type();
     symbolt &init_symbol = get_fresh_aux_symbol(
       this_type,
-      "to_construct",
+      id2string(symbol.name),
       "to_construct",
       synthesized_source_location,
       ID_java,
@@ -172,6 +175,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
       this_type,
       init_symbol_expression,
       synthesized_source_location,
+      symbol.name,
       new_instructions,
       1,
       true,
@@ -184,7 +188,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
     {
       symbolt &to_return_symbol = get_fresh_aux_symbol(
         required_return_type,
-        "to_return",
+        id2string(symbol.name),
         "to_return",
         synthesized_source_location,
         ID_java,
@@ -211,6 +215,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
           required_return_type,
           to_return,
           synthesized_source_location,
+          symbol.name,
           new_instructions,
           0,
           false,

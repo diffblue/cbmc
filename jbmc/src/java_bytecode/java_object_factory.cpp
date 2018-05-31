@@ -1471,7 +1471,7 @@ exprt object_factory(
   const irep_idt base_name,
   code_blockt &init_code,
   symbol_table_baset &symbol_table,
-  const object_factory_parameterst &parameters,
+  object_factory_parameterst parameters,
   allocation_typet alloc_type,
   const source_locationt &loc,
   const select_pointer_typet &pointer_type_selector)
@@ -1486,6 +1486,7 @@ exprt object_factory(
   main_symbol.base_name=base_name;
   main_symbol.type=type;
   main_symbol.location=loc;
+  parameters.function_id = goto_functionst::entry_point();
 
   exprt object=main_symbol.symbol_expr();
 

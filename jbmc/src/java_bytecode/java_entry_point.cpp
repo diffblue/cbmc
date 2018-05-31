@@ -119,13 +119,14 @@ static void java_static_lifetime_init(
   symbol_table_baset &symbol_table,
   const source_locationt &source_location,
   bool assume_init_pointers_not_null,
-  const object_factory_parameterst &object_factory_parameters,
+  object_factory_parameterst object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   bool string_refinement_enabled,
   message_handlert &message_handler)
 {
   symbolt &initialize_symbol=*symbol_table.get_writeable(INITIALIZE_FUNCTION);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
+  object_factory_parameters.function_id = initialize_symbol.name;
 
   // We need to zero out all static variables, or nondet-initialize if they're
   // external. Iterate over a copy of the symtab, as its iterators are
