@@ -3,35 +3,35 @@ main.c
 file1.c file2.c --dependence-graph-vs --structs --arrays --show
 EXIT=0
 SIGNAL=0
-^Data dependencies: 53$
-^Data dependencies: 53$
-^Data dependencies: 1, 53$
-^Data dependencies: 4, 53$
-^Data dependencies: 1, 4, 53$
-^Data dependencies: 48$
-^Data dependencies: 48$
-^Data dependencies: 10, 48$
-^Data dependencies: 13, 48$
-^Data dependencies: 10, 13, 48$
-^Data dependencies: 19$
-^Data dependencies: 18$
-^Data dependencies: 19$
-^Data dependencies: 19, 20, 22$
-^Data dependencies: 1, 53, 57$
-^Data dependencies: 4, 53, 60$
-^Data dependencies: 1, 4, 53, 57, 60$
-^Data dependencies: 10, 48, 68$
-^Data dependencies: 13, 48, 71$
-^Data dependencies: 10, 13, 48, 68, 71$
-^Data dependencies: 1, 53$
-^Data dependencies: 4, 53$
-^Data dependencies: 1, 53, 57$
-^Data dependencies: 4, 53, 60$
-^Data dependencies: 1, 4, 53, 57, 60$
-^Data dependencies: 10, 48$
-^Data dependencies: 13, 48$
-^Data dependencies: 10, 48, 68$
-^Data dependencies: 13, 48, 71$
-^Data dependencies: 10, 13, 48, 68, 71$
+^Data dependencies: 53 \[st.a\]$
+^Data dependencies: 53 \[st.b\]$
+^Data dependencies: 1 \[st.a\], 53 \[st.a\]$
+^Data dependencies: 4 \[st.b\], 53 \[st.b\]$
+^Data dependencies: 1 \[st.a\], 4 \[st.b\], 53 \[st.a, st.b\]$
+^Data dependencies: 48 \[ar\[\(signed long int\)0\]\]$
+^Data dependencies: 48 \[ar\[\(signed long int\)1\]\]$
+^Data dependencies: 10 \[ar\[\(signed long int\)0\]\], 48 \[ar\[\(signed long int\)0\]\]$
+^Data dependencies: 13 \[ar\[\(signed long int\)1\]\], 48 \[ar\[\(signed long int\)1\]\]$
+^Data dependencies: 10 \[ar\[\(signed long int\)0\]\], 13 \[ar\[\(signed long int\)1\]\], 48 \[ar\[\(signed long int\)0\], ar\[\(signed long int\)1\]\]$
+^Data dependencies: 19 \[arr\[\(signed long int\)1\]\]$
+^Data dependencies: 18 \[arr\[\(signed long int\)0\]\]$
+^Data dependencies: 19 \[arr\[\(signed long int\)1\]\]$
+^Data dependencies: 19 \[arr\[\(signed long int\)2\]\], 20 \[arr\[\(signed long int\)2\]\], 22 \[arr\[\(signed long int\)2\]\]$
+^Data dependencies: 1 \[st.a\], 53 \[st.a\], 57 \[st.a\]$
+^Data dependencies: 4 \[st.b\], 53 \[st.b\], 60 \[st.b\]$
+^Data dependencies: 1 \[st.a\], 4 \[st.b\], 53 \[st.a, st.b\], 57 \[st.a\], 60 \[st.b\]$
+^Data dependencies: 10 \[ar\[\(signed long int\)0\]\], 48 \[ar\[\(signed long int\)0\]\], 68 \[ar\[\(signed long int\)0\]\]$
+^Data dependencies: 13 \[ar\[\(signed long int\)1\]\], 48 \[ar\[\(signed long int\)1\]\], 71 \[ar\[\(signed long int\)1\]\]$
+^Data dependencies: 10 \[ar\[\(signed long int\)0\]\], 13 \[ar\[\(signed long int\)1\]\], 48 \[ar\[\(signed long int\)0\], ar\[\(signed long int\)1\]\], 68 \[ar\[\(signed long int\)0\]\], 71 \[ar\[\(signed long int\)1\]\]$
+^Data dependencies: 1 \[st.a\], 53 \[st.a\]$
+^Data dependencies: 4 \[st.b\], 53 \[st.b\]$
+^Data dependencies: 1 \[st.a\], 53 \[st.a\], 57 \[st.a\]$
+^Data dependencies: 4 \[st.b\], 53 \[st.b\], 60 \[st.b\]$
+^Data dependencies: 1 \[st.a\], 4 \[st.b\], 53 \[st.a, st.b\], 57 \[st.a\], 60 \[st.b\]$
+^Data dependencies: 10 \[ar\[\(signed long int\)0\]\], 48 \[ar\[\(signed long int\)0\]\]$
+^Data dependencies: 13 \[ar\[\(signed long int\)1\]\], 48 \[ar\[\(signed long int\)1\]\]$
+^Data dependencies: 10 \[ar\[\(signed long int\)0\]\], 48 \[ar\[\(signed long int\)0\]\], 68 \[ar\[\(signed long int\)0\]\]$
+^Data dependencies: 13 \[ar\[\(signed long int\)1\]\], 48 \[ar\[\(signed long int\)1\]\], 71 \[ar\[\(signed long int\)1\]\]$
+^Data dependencies: 10 \[ar\[\(signed long int\)0\]\], 13 \[ar\[\(signed long int\)1\]\], 48 \[ar\[\(signed long int\)0\], ar\[\(signed long int\)1\]\], 68 \[ar\[\(signed long int\)0\]\], 71 \[ar\[\(signed long int\)1\]\]$
 --
 ^warning: ignoring
