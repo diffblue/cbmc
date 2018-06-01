@@ -140,6 +140,7 @@ void goto_convert_functionst::convert_function(
   const irep_idt &identifier,
   goto_functionst::goto_functiont &f)
 {
+  // This is just a test, this comment is irrelevent
   const symbolt &symbol=ns.lookup(identifier);
   const irep_idt mode = symbol.mode;
 
