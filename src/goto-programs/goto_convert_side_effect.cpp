@@ -373,7 +373,7 @@ void goto_convertt::remove_function_call(
 
   if(expr.op0().id()==ID_symbol)
   {
-    const irep_idt &identifier=expr.op0().get(ID_identifier);
+    const irep_idt &identifier = to_symbol_expr(expr.op0()).get_identifier();
     const symbolt &symbol = ns.lookup(identifier);
 
     new_base_name+='_';

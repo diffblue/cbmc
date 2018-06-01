@@ -170,9 +170,9 @@ void cpp_typecheck_resolvet::remove_duplicates(
     irep_idt id;
 
     if(it->id()==ID_symbol)
-      id=it->get(ID_identifier);
+      id = to_symbol_expr(*it).get_identifier();
     else if(it->id()==ID_type && it->type().id()==ID_symbol)
-      id=it->type().get(ID_identifier);
+      id = to_symbol_type(it->type()).get_identifier();
 
     if(id=="")
     {
@@ -2041,8 +2041,8 @@ void cpp_typecheck_resolvet::apply_template_args(
   if(expr.id()!=ID_symbol)
     return; // templates are always symbols
 
-  const symbolt &template_symbol=
-    cpp_typecheck.lookup(expr.get(ID_identifier));
+  const symbolt &template_symbol =
+    cpp_typecheck.lookup(to_symbol_expr(expr).get_identifier());
 
   if(!template_symbol.type.get_bool(ID_is_template))
     return;
@@ -2239,7 +2239,7 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
         const typet &type=pcomp.type();
         assert(type.id()!=ID_struct);
         if(type.id()==ID_symbol)
-          identifier=type.get(ID_identifier);
+          identifier = to_symbol_type(type).get_identifier();
         else
           continue;
       }
@@ -2261,7 +2261,7 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
           break;
         }
         else if(symbol.type.id()==ID_symbol)
-          identifier=symbol.type.get(ID_identifier);
+          identifier = to_symbol_type(symbol.type).get_identifier();
         else
           break;
       }

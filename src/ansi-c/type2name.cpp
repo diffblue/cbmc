@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
+#include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
@@ -180,7 +181,7 @@ static std::string type2name(
     const array_typet &t=to_array_type(type);
     mp_integer size;
     if(t.size().id()==ID_symbol)
-      result+="ARR"+id2string(t.size().get(ID_identifier));
+      result += "ARR" + id2string(to_symbol_expr(t.size()).get_identifier());
     else if(to_integer(t.size(), size))
       result+="ARR?";
     else

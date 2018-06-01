@@ -462,7 +462,7 @@ bool ai_baset::do_function_call_rec(
 
   if(function.id()==ID_symbol)
   {
-    const irep_idt &identifier=function.get(ID_identifier);
+    const irep_idt &identifier = to_symbol_expr(function).get_identifier();
 
     goto_functionst::function_mapt::const_iterator it=
       goto_functions.function_map.find(identifier);

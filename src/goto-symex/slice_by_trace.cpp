@@ -538,8 +538,11 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
 
   if(e.id()==ID_symbol)
   { // Guard or merge
-    const std::string &id_string=id2string(e.get(ID_identifier));
+    const std::string &id_string =
+      id2string(to_symbol_expr(e).get_identifier());
+
     std::string::size_type merge_loc=id_string.find("merge#");
+
     if(merge_loc==std::string::npos)
     {
       exprt e_copy(e);

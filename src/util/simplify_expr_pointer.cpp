@@ -439,9 +439,8 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
   if(tmp0.op0().id()==ID_symbol &&
      tmp1.op0().id()==ID_symbol)
   {
-    bool equal=
-       tmp0.op0().get(ID_identifier)==
-       tmp1.op0().get(ID_identifier);
+    bool equal = to_symbol_expr(tmp0.op0()).get_identifier() ==
+                 to_symbol_expr(tmp1.op0()).get_identifier();
 
     expr.make_bool(expr.id()==ID_equal?equal:!equal);
 
@@ -627,7 +626,7 @@ tvt simplify_exprt::objects_equal_address_of(const exprt &a, const exprt &b)
 
   if(a.id()==ID_symbol && b.id()==ID_symbol)
   {
-    if(a.get(ID_identifier)==b.get(ID_identifier))
+    if(to_symbol_expr(a).get_identifier() == to_symbol_expr(b).get_identifier())
       return tvt(true);
   }
   else if(a.id()==ID_index && b.id()==ID_index)

@@ -26,8 +26,9 @@ void find_symbols(
   bool current,
   bool next)
 {
-  if((src.id()==ID_symbol && current) ||
-     (src.id()==ID_next_symbol && next))
+  if(src.id() == ID_symbol && current)
+    dest.insert(to_symbol_expr(src).get_identifier());
+  else if(src.id() == ID_next_symbol && next)
     dest.insert(src.get(ID_identifier));
   else
   {
@@ -42,8 +43,9 @@ bool has_symbol(
   bool current,
   bool next)
 {
-  if((src.id()==ID_symbol && current) ||
-     (src.id()==ID_next_symbol && next))
+  if(src.id() == ID_symbol && current)
+    return symbols.count(to_symbol_expr(src).get_identifier()) != 0;
+  else if(src.id() == ID_next_symbol && next)
     return symbols.count(src.get(ID_identifier))!=0;
   else
   {
@@ -98,9 +100,12 @@ void find_symbols(kindt kind, const exprt &src, find_symbols_sett &dest)
   find_symbols(kind, src.type(), dest);
 
   if(kind==kindt::F_BOTH || kind==kindt::F_EXPR)
-    if(src.id()==ID_symbol ||
-       src.id()==ID_next_symbol)
+  {
+    if(src.id() == ID_symbol)
+      dest.insert(to_symbol_expr(src).get_identifier());
+    else if(src.id() == ID_next_symbol)
       dest.insert(src.get(ID_identifier));
+  }
 
   const irept &c_sizeof_type=src.find(ID_C_c_sizeof_type);
 
@@ -161,7 +166,7 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
     }
   }
   else if(src.id()==ID_symbol)
-    dest.insert(src.get(ID_identifier));
+    dest.insert(to_symbol_type(src).get_identifier());
   else if(src.id()==ID_array)
   {
     // do the size -- the subtype is already done

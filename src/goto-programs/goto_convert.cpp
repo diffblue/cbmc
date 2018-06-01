@@ -657,16 +657,16 @@ void goto_convertt::convert_decl(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  const exprt &op0=code.op0();
+  const exprt &op = code.symbol();
 
-  if(op0.id()!=ID_symbol)
+  if(op.id() != ID_symbol)
   {
-    error().source_location=op0.find_source_location();
-    error() << "decl statement expects symbol as first operand" << eom;
+    error().source_location = op.find_source_location();
+    error() << "decl statement expects symbol as operand" << eom;
     throw 0;
   }
 
-  const irep_idt &identifier=op0.get(ID_identifier);
+  const irep_idt &identifier = to_symbol_expr(op).get_identifier();
 
   const symbolt &symbol = ns.lookup(identifier);
 

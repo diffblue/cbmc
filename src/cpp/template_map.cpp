@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ostream>
 
 #include <util/invariant.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 void template_mapt::apply(typet &type) const
 {
@@ -39,8 +41,8 @@ void template_mapt::apply(typet &type) const
   }
   else if(type.id()==ID_symbol)
   {
-    type_mapt::const_iterator m_it=
-      type_map.find(type.get(ID_identifier));
+    type_mapt::const_iterator m_it =
+      type_map.find(to_symbol_type(type).get_identifier());
 
     if(m_it!=type_map.end())
     {
@@ -73,8 +75,8 @@ void template_mapt::apply(exprt &expr) const
 
   if(expr.id()==ID_symbol)
   {
-    expr_mapt::const_iterator m_it=
-      expr_map.find(expr.get(ID_identifier));
+    expr_mapt::const_iterator m_it =
+      expr_map.find(to_symbol_expr(expr).get_identifier());
 
     if(m_it!=expr_map.end())
     {

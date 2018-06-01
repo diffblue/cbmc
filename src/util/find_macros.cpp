@@ -10,8 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stack>
 
-#include "expr.h"
 #include "namespace.h"
+#include "std_expr.h"
 #include "symbol.h"
 
 void find_macros(
@@ -29,8 +29,20 @@ void find_macros(
     const exprt &e=*stack.top();
     stack.pop();
 
-    if(e.id()==ID_symbol ||
-       e.id()==ID_next_symbol)
+    if(e.id() == ID_symbol)
+    {
+      const irep_idt &identifier = to_symbol_expr(e).get_identifier();
+
+      const symbolt &symbol = ns.lookup(identifier);
+
+      if(symbol.is_macro)
+      {
+        // inserted?
+        if(dest.insert(identifier).second)
+          stack.push(&symbol.value);
+      }
+    }
+    else if(e.id() == ID_next_symbol)
     {
       const irep_idt &identifier=e.get(ID_identifier);
 

@@ -351,7 +351,7 @@ void value_set_fivrnst::get_value_set_rec(
   {
     // just keep a reference to the ident in the set
     // (if it exists)
-    irep_idt ident = expr.get_string(ID_identifier)+suffix;
+    irep_idt ident = id2string(to_symbol_expr(expr).get_identifier()) + suffix;
 
     if(has_prefix(id2string(ident), alloc_adapter_prefix))
     {
@@ -1012,7 +1012,7 @@ void value_set_fivrnst::assign_rec(
 
   if(lhs.id()==ID_symbol)
   {
-    const irep_idt &identifier=lhs.get(ID_identifier);
+    const irep_idt &identifier = to_symbol_expr(lhs).get_identifier();
 
     if(has_prefix(id2string(identifier),
                   "value_set::dynamic_object") ||

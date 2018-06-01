@@ -94,7 +94,10 @@ bool rename_symbolt::have_to_rename(const exprt &dest) const
   // now do expression itself
 
   if(dest.id()==ID_symbol)
-    return expr_map.find(dest.get(ID_identifier))!=expr_map.end();
+  {
+    const irep_idt &identifier = to_symbol_expr(dest).get_identifier();
+    return expr_map.find(identifier) != expr_map.end();
+  }
 
   forall_operands(it, dest)
     if(have_to_rename(*it))
@@ -251,7 +254,10 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
     }
   }
   else if(dest.id()==ID_symbol)
-    return type_map.find(dest.get(ID_identifier))!=type_map.end();
+  {
+    const irep_idt &identifier = to_symbol_type(dest).get_identifier();
+    return type_map.find(identifier) != type_map.end();
+  }
   else if(dest.id()==ID_c_enum_tag ||
           dest.id()==ID_struct_tag ||
           dest.id()==ID_union_tag)

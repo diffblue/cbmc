@@ -837,8 +837,9 @@ void interpretert::execute_function_call()
   }
   else
   {
-    list_input_varst::iterator it=
-        function_input_vars.find(function_call.function().get(ID_identifier));
+    list_input_varst::iterator it = function_input_vars.find(
+      to_symbol_expr(function_call.function()).get_identifier());
+
     if(it!=function_input_vars.end())
     {
       mp_vectort value;
@@ -852,6 +853,7 @@ void interpretert::execute_function_call()
       it->second.pop_front();
       return;
     }
+
     if(show)
       error() << "no body for "+id2string(identifier) << eom;
   }

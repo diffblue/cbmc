@@ -262,8 +262,8 @@ typet c_typecastt::follow_with_qualifiers(const typet &src_type)
 
   while(result_type.id()==ID_symbol)
   {
-    const symbolt &followed_type_symbol=
-      ns.lookup(result_type.get(ID_identifier));
+    const symbolt &followed_type_symbol =
+      ns.lookup(to_symbol_type(result_type));
 
     result_type=followed_type_symbol.type;
     qualifiers+=c_qualifierst(followed_type_symbol.type);

@@ -606,38 +606,38 @@ protected:
   // some built-in functions
   void do_atomic_begin(
     const exprt &lhs,
-    const exprt &rhs,
+    const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
   void do_atomic_end(
     const exprt &lhs,
-    const exprt &rhs,
+    const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
   void do_create_thread(
     const exprt &lhs,
-    const exprt &rhs,
+    const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
   void do_array_equal(
     const exprt &lhs,
-    const exprt &rhs,
+    const symbol_exprt &rhs,
     const exprt::operandst &arguments,
     goto_programt &dest);
   void do_array_op(
     const irep_idt &id,
     const exprt &lhs,
-    const exprt &function,
+    const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
   void do_printf(
     const exprt &lhs,
-    const exprt &rhs,
+    const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
   void do_scanf(
     const exprt &lhs,
-    const exprt &rhs,
+    const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
   void do_input(
@@ -652,12 +652,12 @@ protected:
     goto_programt &dest);
   void do_prob_coin(
     const exprt &lhs,
-    const exprt &rhs,
+    const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
   void do_prob_uniform(
     const exprt &lhs,
-    const exprt &rhs,
+    const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
 

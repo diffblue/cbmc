@@ -107,7 +107,8 @@ void convert_decl(
       {
         if(expr.id() == ID_symbol)
         {
-          const symbolt &symbol = ns.lookup(expr.get(ID_identifier));
+          const symbolt &symbol = ns.lookup(to_symbol_expr(expr));
+
           if(expr.find(ID_C_base_name).is_not_nil())
             INVARIANT(
               expr.find(ID_C_base_name).id() == symbol.base_name,

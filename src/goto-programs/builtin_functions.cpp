@@ -29,11 +29,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void goto_convertt::do_prob_uniform(
   const exprt &lhs,
-  const exprt &function,
+  const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  const irep_idt &identifier=function.get(ID_identifier);
+  const irep_idt &identifier = function.get_identifier();
 
   // make it a side effect if there is an LHS
   if(arguments.size()!=2)
@@ -107,11 +107,11 @@ void goto_convertt::do_prob_uniform(
 
 void goto_convertt::do_prob_coin(
   const exprt &lhs,
-  const exprt &function,
+  const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  const irep_idt &identifier=function.get(ID_identifier);
+  const irep_idt &identifier = function.get_identifier();
 
   // make it a side effect if there is an LHS
   if(arguments.size()!=2)
@@ -184,11 +184,11 @@ void goto_convertt::do_prob_coin(
 
 void goto_convertt::do_printf(
   const exprt &lhs,
-  const exprt &function,
+  const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  const irep_idt &f_id=function.get(ID_identifier);
+  const irep_idt &f_id = function.get_identifier();
 
   if(f_id==CPROVER_PREFIX "printf" ||
      f_id=="printf")
@@ -219,11 +219,11 @@ void goto_convertt::do_printf(
 
 void goto_convertt::do_scanf(
   const exprt &lhs,
-  const exprt &function,
+  const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  const irep_idt &f_id=function.get(ID_identifier);
+  const irep_idt &f_id = function.get_identifier();
 
   if(f_id==CPROVER_PREFIX "scanf")
   {
@@ -364,7 +364,7 @@ void goto_convertt::do_output(
 
 void goto_convertt::do_atomic_begin(
   const exprt &lhs,
-  const exprt &function,
+  const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
@@ -388,7 +388,7 @@ void goto_convertt::do_atomic_begin(
 
 void goto_convertt::do_atomic_end(
   const exprt &lhs,
-  const exprt &function,
+  const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
@@ -597,7 +597,7 @@ exprt goto_convertt::get_array_argument(const exprt &src)
 void goto_convertt::do_array_op(
   const irep_idt &id,
   const exprt &lhs,
-  const exprt &function,
+  const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
