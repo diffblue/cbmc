@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_parser.h"
 
-#include <iostream>
-
 #include "c_storage_spec.h"
 
 ansi_c_parsert ansi_c_parser;
@@ -35,8 +33,6 @@ ansi_c_id_classt ansi_c_parsert::lookup(
 
     if(n_it!=it->name_map.end())
     {
-      assert(id2string(n_it->second.prefixed_name)==
-             it->prefix+id2string(scope_name));
       identifier=n_it->second.prefixed_name;
       return n_it->second.id_class;
     }
@@ -150,6 +146,9 @@ void ansi_c_parsert::add_declarator(
     ansi_c_identifiert &identifier=scope.name_map[base_name];
     identifier.id_class=id_class;
     identifier.prefixed_name=prefixed_name;
+
+    if(force_root_scope)
+      current_scope().name_map[base_name] = identifier;
   }
 
   ansi_c_declaration.declarators().push_back(new_declarator);

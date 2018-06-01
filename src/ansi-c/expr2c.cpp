@@ -89,7 +89,7 @@ void expr2ct::get_shorthands(const exprt &expr)
   find_symbols_sett symbols;
   find_symbols(expr, symbols);
 
-  // avoid renaming parameters
+  // avoid renaming parameters, if possible
   for(find_symbols_sett::const_iterator
       it=symbols.begin();
       it!=symbols.end();
@@ -103,7 +103,16 @@ void expr2ct::get_shorthands(const exprt &expr)
 
     irep_idt sh=id_shorthand(*it);
 
-    ns_collision[symbol->location.get_function()].insert(sh);
+    std::string func = id2string(*it);
+    func = func.substr(0, func.rfind("::"));
+
+    // if there is a global symbol of the same name as the shorthand (even if
+    // not present in this particular expression) then there is a collision
+    const symbolt *global_symbol;
+    if(!ns.lookup(sh, global_symbol))
+      sh = func + "$$" + id2string(sh);
+
+    ns_collision[func].insert(sh);
 
     if(!shorthands.insert(std::make_pair(*it, sh)).second)
       UNREACHABLE;
@@ -125,6 +134,8 @@ void expr2ct::get_shorthands(const exprt &expr)
 
     if(!has_collision)
     {
+      // if there is a global symbol of the same name as the shorthand (even if
+      // not present in this particular expression) then there is a collision
       const symbolt *symbol;
       has_collision=!ns.lookup(sh, symbol);
     }
