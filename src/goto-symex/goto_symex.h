@@ -56,6 +56,8 @@ public:
     path_storaget &path_storage)
     : should_pause_symex(false),
       options(options),
+      max_depth(options.get_unsigned_int_option("depth")),
+      doing_path_exploration(options.is_set("paths")),
       total_vccs(0),
       remaining_vccs(0),
       constant_propagation(true),
@@ -195,6 +197,9 @@ protected:
     statet &);
 
   const optionst &options;
+
+  const unsigned max_depth;
+  const bool doing_path_exploration;
 
 public:
   // these bypass the target maps

@@ -308,16 +308,13 @@ void goto_symext::symex_step(
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  if(!options.get_bool_option("paths"))
+  if(!doing_path_exploration)
     merge_gotos(state);
 
   // depth exceeded?
-  {
-    unsigned max_depth=options.get_unsigned_int_option("depth");
-    if(max_depth!=0 && state.depth>max_depth)
-      state.guard.add(false_exprt());
-    state.depth++;
-  }
+  if(max_depth != 0 && state.depth > max_depth)
+    state.guard.add(false_exprt());
+  state.depth++;
 
   // actually do instruction
   switch(instruction.type)
