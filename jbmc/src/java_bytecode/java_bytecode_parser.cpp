@@ -1514,6 +1514,9 @@ void java_bytecode_parsert::relement_value_pairs(
   }
 }
 
+/// Corresponds to the element_value structure
+/// Described in Java 8 specification 4.7.16.1
+/// https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.16.1
 void java_bytecode_parsert::relement_value_pair(
   annotationt::element_value_pairt &element_value_pair)
 {
@@ -1531,8 +1534,8 @@ void java_bytecode_parsert::relement_value_pair(
 
   case 'c':
     {
-      UNUSED u2 class_info_index=read_u2();
-      // todo: class
+      u2 class_info_index = read_u2();
+      element_value_pair.value = symbol_exprt(pool_entry(class_info_index).s);
     }
     break;
 
