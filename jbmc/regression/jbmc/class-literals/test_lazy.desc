@@ -1,0 +1,10 @@
+CORE symex-driven-lazy-loading-expected-failure
+Test.class
+--lazy-methods
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+lazy-methods is incompatible with symex-driven lazy loading

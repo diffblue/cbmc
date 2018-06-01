@@ -25,7 +25,8 @@ bool java_entry_point(
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   const object_factory_parameterst &object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector);
+  const select_pointer_typet &pointer_type_selector,
+  bool string_refinement_enabled);
 
 struct main_function_resultt
 {
@@ -59,6 +60,8 @@ struct main_function_resultt
     return status == Error;
   }
 };
+
+irep_idt get_java_class_literal_initializer_signature();
 
 /// Figures out the entry point of the code to verify
 main_function_resultt get_main_symbol(

@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/static_lifetime_init.h>
 
 #include "java_object_factory.h"
+#include "java_string_literals.h"
 #include "java_utils.h"
 
 static void create_initialize(symbol_table_baset &symbol_table)
@@ -65,12 +66,60 @@ static bool should_init_symbol(const symbolt &sym)
   return is_java_string_literal_id(sym.name);
 }
 
+/// Get the symbol name of java.lang.Class' initializer method. This method
+/// should initialize a Class instance with known properties of the type it
+/// represents, such as its name, whether it is abstract, or an enumeration,
+/// etc. The method may or may not exist in any particular symbol table; it is
+/// up to the caller to check.
+/// The method's Java signature is:
+/// void cproverInitializeClassLiteral(
+///   String name,
+///   boolean isAnnotation,
+///   boolean isArray,
+///   boolean isInterface,
+///   boolean isSynthetic,
+///   boolean isLocalClass,
+///   boolean isMemberClass,
+///   boolean isEnum);
+/// \return Class initializer method's symbol name.
+irep_idt get_java_class_literal_initializer_signature()
+{
+  static irep_idt signature =
+    "java::java.lang.Class.cproverInitializeClassLiteral:"
+    "(Ljava/lang/String;ZZZZZZZ)V";
+  return signature;
+}
+
+/// If symbol is a class literal, and an appropriate initializer method exists,
+/// return a pointer to its symbol. If not, return null.
+/// \param symbol: possible class literal symbol
+/// \param symbol_table: table to search
+/// \return pointer to the initializer method symbol or null
+static const symbolt *get_class_literal_initializer(
+  const symbolt &symbol,
+  const symbol_table_baset &symbol_table)
+{
+  if(symbol.value.is_not_nil())
+    return nullptr;
+  if(symbol.type != symbol_typet("java::java.lang.Class"))
+    return nullptr;
+  if(!has_suffix(id2string(symbol.name), JAVA_CLASS_MODEL_SUFFIX))
+    return nullptr;
+  return symbol_table.lookup(get_java_class_literal_initializer_signature());
+}
+
+static constant_exprt constant_bool(bool val)
+{
+  return from_integer(val ? 1 : 0, java_boolean_type());
+}
+
 static void java_static_lifetime_init(
   symbol_table_baset &symbol_table,
   const source_locationt &source_location,
   bool assume_init_pointers_not_null,
   const object_factory_parameterst &object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector,
+  bool string_refinement_enabled)
 {
   symbolt &initialize_symbol=*symbol_table.get_writeable(INITIALIZE_FUNCTION);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
@@ -88,7 +137,62 @@ static void java_static_lifetime_init(
     const symbolt &sym=*symbol_table.lookup(symname);
     if(should_init_symbol(sym))
     {
-      if(sym.value.is_nil() && sym.type!=empty_typet())
+      if(const symbolt *class_literal_init_method =
+         get_class_literal_initializer(sym, symbol_table))
+      {
+        const std::string &name_str = id2string(sym.name);
+        irep_idt class_name =
+          name_str.substr(0, name_str.size() - strlen(JAVA_CLASS_MODEL_SUFFIX));
+        const symbolt &class_symbol = symbol_table.lookup_ref(class_name);
+
+        bool class_is_array = is_java_array_tag(sym.name);
+
+        exprt name_literal(ID_java_string_literal);
+        name_literal.set(ID_value, to_class_type(class_symbol.type).get_tag());
+
+        symbol_exprt class_name_literal =
+          get_or_create_string_literal_symbol(
+            name_literal, symbol_table, string_refinement_enabled);
+
+        // Call the literal initializer method instead of a nondet initializer:
+
+        // For arguments we can't parse yet:
+        side_effect_expr_nondett nondet_bool(java_boolean_type());
+
+        // Argument order is: name, isAnnotation, isArray, isInterface,
+        // isSynthetic, isLocalClass, isMemberClass, isEnum
+
+        code_function_callt initializer_call;
+        initializer_call.function() = class_literal_init_method->symbol_expr();
+
+        code_function_callt::argumentst &args = initializer_call.arguments();
+
+        // this:
+        args.push_back(address_of_exprt(sym.symbol_expr()));
+        // name:
+        args.push_back(address_of_exprt(class_name_literal));
+        // isAnnotation:
+        args.push_back(
+          constant_bool(class_symbol.type.get_bool(ID_is_annotation)));
+        // isArray:
+        args.push_back(constant_bool(class_is_array));
+        // isInterface:
+        args.push_back(
+          constant_bool(class_symbol.type.get_bool(ID_interface)));
+        // isSynthetic:
+        args.push_back(
+          constant_bool(class_symbol.type.get_bool(ID_synthetic)));
+        // isLocalClass:
+        args.push_back(nondet_bool);
+        // isMemberClass:
+        args.push_back(nondet_bool);
+        // isEnum:
+        args.push_back(
+          constant_bool(class_symbol.type.get_bool(ID_enumeration)));
+
+        code_block.move_to_operands(initializer_call);
+      }
+      else if(sym.value.is_nil() && sym.type!=empty_typet())
       {
         bool allow_null=!assume_init_pointers_not_null;
         if(allow_null)
@@ -403,7 +507,8 @@ bool java_entry_point(
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   const object_factory_parameterst &object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector,
+  bool string_refinement_enabled)
 {
   // check if the entry point is already there
   if(symbol_table.symbols.find(goto_functionst::entry_point())!=
@@ -426,7 +531,8 @@ bool java_entry_point(
     symbol.location,
     assume_init_pointers_not_null,
     object_factory_parameters,
-    pointer_type_selector);
+    pointer_type_selector,
+    string_refinement_enabled);
 
   return generate_java_start_function(
     symbol,

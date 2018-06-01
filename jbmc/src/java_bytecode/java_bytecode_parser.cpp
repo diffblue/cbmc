@@ -451,9 +451,11 @@ bool java_bytecode_parsert::parse()
 #define ACC_BRIDGE       0x0040
 #define ACC_VARARGS      0x0080
 #define ACC_NATIVE       0x0100
+#define ACC_INTERFACE    0x0200
 #define ACC_ABSTRACT     0x0400
 #define ACC_STRICT       0x0800
 #define ACC_SYNTHETIC    0x1000
+#define ACC_ANNOTATION   0x2000
 #define ACC_ENUM         0x4000
 
 #ifdef _MSC_VER
@@ -496,6 +498,9 @@ void java_bytecode_parsert::rClassFile()
   parsed_class.is_protected=(access_flags&ACC_PROTECTED)!=0;
   parsed_class.is_private=(access_flags&ACC_PRIVATE)!=0;
   parsed_class.is_final = (access_flags & ACC_FINAL) != 0;
+  parsed_class.is_interface = (access_flags & ACC_INTERFACE) != 0;
+  parsed_class.is_synthetic = (access_flags & ACC_SYNTHETIC) != 0;
+  parsed_class.is_annotation = (access_flags & ACC_ANNOTATION) != 0;
   parsed_class.name=
     constant(this_class).type().get(ID_C_base_name);
 
