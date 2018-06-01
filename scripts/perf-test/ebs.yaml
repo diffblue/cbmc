@@ -36,6 +36,8 @@ Resources:
                         https://github.com/sosy-lab/cpachecker.git
                 git clone --depth 1 \
                         https://github.com/diffblue/cprover-sv-comp.git
+                git clone --depth 1 \
+                        https://github.com/tautschnig/fshell-w2t.git
                 halt
 
     BaseVolume:

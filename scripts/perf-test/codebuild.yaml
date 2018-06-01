@@ -62,9 +62,8 @@ Resources:
                     phases:
                         install:
                             commands:
-                                - apt-get update -y
-                                - apt-get install -y software-properties-common
-                                - add-apt-repository ppa:ubuntu-toolchain-r/test
+                                - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
+                                - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
                                 - apt-get update -y
                                 - apt-get install -y libwww-perl g++-5 flex bison git openjdk-7-jdk
                                 - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
@@ -74,11 +73,12 @@ Resources:
                                 - echo ${Repository} > COMMIT_INFO
                                 - git rev-parse --short HEAD >> COMMIT_INFO
                                 - git log HEAD^..HEAD >> COMMIT_INFO
-                                - make -C src minisat2-download glucose-download
+                                - make -C src minisat2-download glucose-download cadical-download
                                 - make -C src -j8
                     artifacts:
                         files:
                             - src/cbmc/cbmc
+                            - src/goto-cc/goto-cc
                             - COMMIT_INFO
                         discard-paths: yes
                 Type: !Ref RepoType
@@ -104,9 +104,8 @@ Resources:
                     phases:
                         install:
                             commands:
-                                - apt-get update -y
-                                - apt-get install -y software-properties-common
-                                - add-apt-repository ppa:ubuntu-toolchain-r/test
+                                - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
+                                - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
                                 - apt-get update -y
                                 - apt-get install -y libwww-perl g++-5 flex bison git openjdk-7-jdk
                                 - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
@@ -116,11 +115,12 @@ Resources:
                                 - echo ${Repository} > COMMIT_INFO
                                 - git rev-parse --short HEAD >> COMMIT_INFO
                                 - git log HEAD^..HEAD >> COMMIT_INFO
-                                - make -C src minisat2-download glucose-download
+                                - make -C src minisat2-download glucose-download cadical-download
                                 - make -C src -j8 CXXFLAGS="-O2 -pg -g -finline-limit=4" LINKFLAGS="-pg"
                     artifacts:
                         files:
                             - src/cbmc/cbmc
+                            - src/goto-cc/goto-cc
                             - COMMIT_INFO
                         discard-paths: yes
                 Type: !Ref RepoType

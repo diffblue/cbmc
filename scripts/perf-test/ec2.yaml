@@ -38,6 +38,9 @@ Parameters:
     SSHKeyName:
         Type: String
 
+    WitnessCheck:
+        Type: String
+
 Conditions:
     UseSpot: !Not [!Equals [!Ref MaxPrice, ""]]
 
@@ -153,6 +156,7 @@ Resources:
                     apt-get install -y git time wget binutils awscli make jq
                     apt-get install -y zip unzip
                     apt-get install -y gcc libc6-dev-i386
+                    apt-get install -y ant python3-tempita python
 
                     # cgroup set up for benchexec
                     chmod o+wt '/sys/fs/cgroup/cpuset/'
@@ -212,7 +216,7 @@ Resources:
                     cd /mnt
                     cd cprover-sv-comp
                     git pull
-                    mkdir -p src/cbmc/
+                    mkdir -p src/cbmc src/goto-cc
                     touch LICENSE
                     cd ..
                     mkdir -p run
@@ -222,6 +226,27 @@ Resources:
                     cd ..
                     mkdir -p tmp
                     export TMPDIR=/mnt/tmp
+
+                    if [ x${WitnessCheck} = xTrue ]
+                    then
+                        cd cpachecker
+                        ant
+
+                        cd ../run
+                        for def in \
+                          cpa-seq-validate-correctness-witnesses \
+                          cpa-seq-validate-violation-witnesses \
+                          fshell-witness2test-validate-violation-witnesses
+                        do
+                            wget -O $def.xml https://raw.githubusercontent.com/sosy-lab/sv-comp/master/benchmark-defs/$def.xml
+                            sed -i 's#[\./]*/results-verified/LOGDIR/sv-comp18.\${!inputfile_name}.files/witness.graphml#witnesses/sv-comp18.${!inputfile_name}-witness.graphml#' $def.xml
+                        done
+
+                        ln -s ../cpachecker/scripts/cpa.sh cpa.sh
+                        ln -s ../cpachecker/config/ config
+
+                        cp ../fshell-w2t/* .
+                    fi
 
                     # reduce the likelihood of multiple hosts processing the
                     # same message (in addition to SQS's message hiding)
@@ -292,10 +317,12 @@ Resources:
                                 --receipt-handle $msg
 
                         cd /mnt/cprover-sv-comp
-                        rm -f src/cbmc/cbmc
+                        rm -f src/cbmc/cbmc src/goto-cc/goto-cc
                         aws s3 cp s3://${S3Bucket}/${PerfTestId}/$cfg/cbmc \
                                 src/cbmc/cbmc
-                        chmod a+x src/cbmc/cbmc
+                        aws s3 cp s3://${S3Bucket}/${PerfTestId}/$cfg/goto-cc \
+                                src/goto-cc/goto-cc
+                        chmod a+x src/cbmc/cbmc src/goto-cc/goto-cc
                         make CBMC=. cbmc.zip
                         cd ../run
                         unzip ../cprover-sv-comp/cbmc.zip
@@ -332,11 +359,26 @@ Resources:
                                 tar czf witnesses.tar.gz cbmc.*.logfiles
                                 rm -rf cbmc.*.logfiles
                                 cd ..
+
+                                if [ x${WitnessCheck} = xTrue ]
+                                then
+                                    for wc in *-witnesses.xml
+                                    do
+                                        wcp=$(echo $wc | sed 's/-witnesses.xml$//')
+                                        mkdir witnesses
+                                        tar -C witnesses --strip-components=1 -xzf \
+                                          logs-$t/witnesses.tar.gz
+                                        ../benchexec/bin/benchexec --no-container \
+                                          $wc --task $t -T 90s -M 15GB \
+                                          -o $wcp-logs-$t/ -N $max_par -c 1
+                                        rm -rf witnesses
+                                    done
+                                fi
                             fi
-                            if [ -f logs-$t/*.xml.bz2 ]
-                            then
-                                start_date="$(echo ${PerfTestId} | cut -f1-3 -d-) $(echo ${PerfTestId} | cut -f4-6 -d- | sed 's/-/:/g')"
-                                cd logs-$t
+                            start_date="$(echo ${PerfTestId} | cut -f1-3 -d-) $(echo ${PerfTestId} | cut -f4-6 -d- | sed 's/-/:/g')"
+                            for l in *logs-$t/*.xml.bz2
+                            do
+                                cd $(dirname $l)
                                 bunzip2 *.xml.bz2
                                 perl -p -i -e \
                                   "s/^(<result.*version=\"[^\"]*)/\$1:${PerfTestId}/" *.xml
@@ -346,10 +388,28 @@ Resources:
                                   "s/^(<result.*date=)\"[^\"]*/\$1\"$start_date/" *.xml
                                 bzip2 *.xml
                                 cd ..
+                            done
+
+                            if [ x${WitnessCheck} = xTrue ]
+                            then
+                                ../benchexec/bin/table-generator \
+                                  logs-$t/*xml.bz2 *-logs-$t/*.xml.bz2 -o logs-$t/
+                            else
+                                ../benchexec/bin/table-generator \
+                                  logs-$t/*xml.bz2 -o logs-$t/
                             fi
                             aws s3 cp logs-$t \
                                 s3://${S3Bucket}/${PerfTestId}/$cfg/logs-$t/ \
                                 --recursive
+                            for wc in *-witnesses.xml
+                            do
+                                [ -s $wc ] || break
+                                wcp=$(echo $wc | sed 's/-witnesses.xml$//')
+                                rm -rf $wcp-logs-$t/*.logfiles
+                                aws s3 cp $wcp-logs-$t \
+                                    s3://${S3Bucket}/${PerfTestId}/$cfg/$wcp-logs-$t/ \
+                                    --recursive
+                            done
                         else
                             rm -f gmon.sum gmon.out *.gmon.out.*
                             ../benchexec/bin/benchexec cbmc.xml --no-container \
@@ -357,11 +417,16 @@ Resources:
                                 -N $max_par -c 1
                             if ls *.gmon.out.* >/dev/null 2>&1
                             then
-                                gprof --sum ./cbmc-binary *.gmon.out.*
+                                gprof --sum ./cbmc-binary cbmc*.gmon.out.*
                                 gprof ./cbmc-binary gmon.sum > sum.profile-$t
+                                rm -f gmon.sum
+                                gprof --sum ./goto-cc goto-cc*.gmon.out.*
+                                gprof ./goto-cc gmon.sum > sum.goto-cc-profile-$t
                                 rm -f gmon.sum gmon.out *.gmon.out.*
                                 aws s3 cp sum.profile-$t \
                                     s3://${S3Bucket}/${PerfTestId}/$cfg/sum.profile-$t
+                                aws s3 cp sum.goto-cc-profile-$t \
+                                    s3://${S3Bucket}/${PerfTestId}/$cfg/sum.goto-cc-profile-$t
                             fi
                         fi
                         rm -rf logs-$t sum.profile-$t
