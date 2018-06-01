@@ -182,8 +182,8 @@ protected:
   };
 
   typedef std::unordered_map<exprt, let_count_idt, irep_hash> seen_expressionst;
-  unsigned let_id_count;
-  static const unsigned LET_COUNT=2;
+  std::size_t let_id_count;
+  static const std::size_t LET_COUNT = 2;
 
   class let_visitort:public expr_visitort
   {
@@ -208,7 +208,7 @@ protected:
     exprt &expr,
     std::vector<exprt> &let_order,
     const seen_expressionst &map,
-    unsigned i);
+    std::size_t i);
 
   void collect_bindings(
     exprt &expr,
@@ -303,7 +303,7 @@ protected:
   smt2_identifierst smt2_identifiers;
 
   // Boolean part
-  unsigned no_boolean_variables;
+  std::size_t no_boolean_variables;
   std::vector<bool> boolean_assignment;
 };
 

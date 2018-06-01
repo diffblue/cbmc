@@ -287,24 +287,24 @@ constant_exprt smt2_convt::parse_literal(
           src.get_sub()[0].id()=="_" &&
           src.get_sub()[1].id()=="+oo") // (_ +oo e s)
   {
-    unsigned e=unsafe_string2unsigned(src.get_sub()[2].id_string());
-    unsigned s=unsafe_string2unsigned(src.get_sub()[3].id_string());
+    std::size_t e = unsafe_string2size_t(src.get_sub()[2].id_string());
+    std::size_t s = unsafe_string2size_t(src.get_sub()[3].id_string());
     return ieee_floatt::plus_infinity(ieee_float_spect(s, e)).to_expr();
   }
   else if(src.get_sub().size()==4 &&
           src.get_sub()[0].id()=="_" &&
           src.get_sub()[1].id()=="-oo") // (_ -oo e s)
   {
-    unsigned e=unsafe_string2unsigned(src.get_sub()[2].id_string());
-    unsigned s=unsafe_string2unsigned(src.get_sub()[3].id_string());
+    std::size_t e = unsafe_string2size_t(src.get_sub()[2].id_string());
+    std::size_t s = unsafe_string2size_t(src.get_sub()[3].id_string());
     return ieee_floatt::minus_infinity(ieee_float_spect(s, e)).to_expr();
   }
   else if(src.get_sub().size()==4 &&
           src.get_sub()[0].id()=="_" &&
           src.get_sub()[1].id()=="NaN") // (_ NaN e s)
   {
-    unsigned e=unsafe_string2unsigned(src.get_sub()[2].id_string());
-    unsigned s=unsafe_string2unsigned(src.get_sub()[3].id_string());
+    std::size_t e = unsafe_string2size_t(src.get_sub()[2].id_string());
+    std::size_t s = unsafe_string2size_t(src.get_sub()[3].id_string());
     return ieee_floatt::NaN(ieee_float_spect(s, e)).to_expr();
   }
 
@@ -4333,7 +4333,7 @@ void smt2_convt::find_symbols(const exprt &expr)
           << " -> " << type2id(expr.type()) << "\n"
           << "(define-fun " << function << " (";
 
-      for(unsigned i=0; i<expr.operands().size(); i++)
+      for(std::size_t i = 0; i < expr.operands().size(); i++)
       {
         if(i!=0)
           out << " ";
@@ -4347,7 +4347,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ' ';
 
       exprt tmp1=expr;
-      for(unsigned i=0; i<tmp1.operands().size(); i++)
+      for(std::size_t i = 0; i < tmp1.operands().size(); i++)
         tmp1.operands()[i]=
           smt2_symbolt("op"+std::to_string(i), tmp1.operands()[i].type());
 
@@ -4751,7 +4751,7 @@ exprt smt2_convt::letify_rec(
   exprt &expr,
   std::vector<exprt> &let_order,
   const seen_expressionst &map,
-  unsigned i)
+  std::size_t i)
 {
   if(i>=let_order.size())
     return substitute_let(expr, map);
