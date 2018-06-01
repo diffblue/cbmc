@@ -16,6 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/byte_operators.h>
 
+#ifndef HASH_CODE
+#include <util/irep_hash_container.h>
+#endif
+
 #include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
@@ -181,7 +185,12 @@ protected:
     symbol_exprt let_symbol;
   };
 
+#ifdef HASH_CODE
   typedef std::unordered_map<exprt, let_count_idt, irep_hash> seen_expressionst;
+#else
+  typedef irep_hash_mapt<exprt, let_count_idt> seen_expressionst;
+#endif
+
   std::size_t let_id_count;
   static const std::size_t LET_COUNT = 2;
 

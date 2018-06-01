@@ -1,0 +1,8 @@
+CORE smt-backend
+main.c
+--smt2
+^EXIT=10$
+^SIGNAL=0$
+--
+Tests a floating-point operation encoding for SMT2 without --fpa.
+Owing to heavy use of sharing, this requires sharing-aware hashing.
