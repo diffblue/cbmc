@@ -29,6 +29,7 @@ public:
     message_handlert &mh,
     const symbol_tablet &outer_symbol_table,
     symex_target_equationt &_target,
+    const optionst &options,
     path_storaget &path_storage);
 
   // To show progress

@@ -22,8 +22,9 @@ symex_bmct::symex_bmct(
   message_handlert &mh,
   const symbol_tablet &outer_symbol_table,
   symex_target_equationt &_target,
+  const optionst &options,
   path_storaget &path_storage)
-  : goto_symext(mh, outer_symbol_table, _target, path_storage),
+  : goto_symext(mh, outer_symbol_table, _target, options, path_storage),
     record_coverage(false),
     symex_coverage(ns)
 {

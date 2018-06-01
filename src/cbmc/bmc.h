@@ -76,7 +76,12 @@ public:
       ns(outer_symbol_table, symex_symbol_table),
       equation(),
       path_storage(_path_storage),
-      symex(_message_handler, outer_symbol_table, equation, path_storage),
+      symex(
+        _message_handler,
+        outer_symbol_table,
+        equation,
+        options,
+        path_storage),
       prop_conv(_prop_conv),
       ui(ui_message_handlert::uit::PLAIN),
       driver_callback_after_symex(callback_after_symex)
@@ -148,7 +153,12 @@ protected:
       ns(outer_symbol_table),
       equation(_equation),
       path_storage(_path_storage),
-      symex(_message_handler, outer_symbol_table, equation, path_storage),
+      symex(
+        _message_handler,
+        outer_symbol_table,
+        equation,
+        options,
+        path_storage),
       prop_conv(_prop_conv),
       ui(ui_message_handlert::uit::PLAIN),
       driver_callback_after_symex(callback_after_symex)
