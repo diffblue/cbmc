@@ -14,9 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <vector>
 
+#include "irep.h"
 #include "numbering.h"
-
-class irept;
 
 class irep_hash_container_baset
 {
@@ -46,7 +45,13 @@ protected:
     }
   };
 
-  typedef std::unordered_map<const void *, std::size_t, pointer_hasht>
+  struct irep_entryt
+  {
+    std::size_t number;
+    irept irep; // copy to keep addresses stable
+  };
+
+  typedef std::unordered_map<const void *, irep_entryt, pointer_hasht>
     ptr_hasht;
   ptr_hasht ptr_hash;
 
