@@ -27,6 +27,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/format_type.h>
 #include <util/refined_string_type.h>
 #include <util/string_expr.h>
+#include <util/union_find_replace.h>
 
 ///  ### Universally quantified string constraint
 ///
@@ -54,83 +55,59 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///      \f$f\f$ [explicitly stated, implied].
 ///
 /// \todo The fact that we follow this grammar is not enforced at the moment.
-class string_constraintt : public exprt
+class string_constraintt final
 {
 public:
   // String constraints are of the form
-  // forall univ_var in [lower_bound,upper_bound[. premise => body
+  // forall univ_var in [lower_bound,upper_bound[. body
+  symbol_exprt univ_var;
+  exprt lower_bound;
+  exprt upper_bound;
+  exprt body;
 
-  const exprt &premise() const
-  {
-    return op0();
-  }
+  string_constraintt() = delete;
 
-  const exprt &body() const
-  {
-    return op1();
-  }
-
-  const symbol_exprt &univ_var() const
-  {
-    return to_symbol_expr(op2());
-  }
-
-  const exprt &upper_bound() const
-  {
-    return op3();
-  }
-
-  const exprt &lower_bound() const
-  {
-    return operands()[4];
-  }
-
- private:
-  string_constraintt();
-
- public:
   string_constraintt(
-    const symbol_exprt &_univ_var,
-    const exprt &bound_inf,
-    const exprt &bound_sup,
-    const exprt &body):
-    exprt(ID_string_constraint)
+    symbol_exprt _univ_var,
+    exprt lower_bound,
+    exprt upper_bound,
+    exprt body)
+    : univ_var(_univ_var),
+      lower_bound(lower_bound),
+      upper_bound(upper_bound),
+      body(body)
   {
-    copy_to_operands(true_exprt(), body);
-    copy_to_operands(_univ_var, bound_sup, bound_inf);
   }
 
   // Default bound inferior is 0
-  string_constraintt(
-    const symbol_exprt &_univ_var,
-    const exprt &bound_sup,
-    const exprt &body):
-    string_constraintt(
-      _univ_var,
-      from_integer(0, _univ_var.type()),
-      bound_sup,
-      body)
-  {}
+  string_constraintt(symbol_exprt univ_var, exprt upper_bound, exprt body)
+    : string_constraintt(
+        univ_var,
+        from_integer(0, univ_var.type()),
+        upper_bound,
+        body)
+  {
+  }
 
   exprt univ_within_bounds() const
   {
     return and_exprt(
-      binary_relation_exprt(lower_bound(), ID_le, univ_var()),
-      binary_relation_exprt(upper_bound(), ID_gt, univ_var()));
+      binary_relation_exprt(lower_bound, ID_le, univ_var),
+      binary_relation_exprt(upper_bound, ID_gt, univ_var));
+  }
+
+  void replace_expr(union_find_replacet &replace_map)
+  {
+    replace_map.replace_expr(lower_bound);
+    replace_map.replace_expr(upper_bound);
+    replace_map.replace_expr(body);
+  }
+
+  exprt negation() const
+  {
+    return and_exprt(univ_within_bounds(), not_exprt(body));
   }
 };
-
-extern inline const string_constraintt &to_string_constraint(const exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_string_constraint && expr.operands().size()==5);
-  return static_cast<const string_constraintt &>(expr);
-}
-
-extern inline string_constraintt &to_string_constraint(exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_string_constraint && expr.operands().size()==5);
-  return static_cast<string_constraintt &>(expr);
-}
 
 /// Used for debug printing.
 /// \param [in] ns: namespace for `from_expr`
@@ -140,9 +117,9 @@ extern inline string_constraintt &to_string_constraint(exprt &expr)
 inline std::string to_string(const string_constraintt &expr)
 {
   std::ostringstream out;
-  out << "forall " << format(expr.univ_var()) << " in ["
-      << format(expr.lower_bound()) << ", " << format(expr.upper_bound())
-      << "). " << format(expr.premise()) << " => " << format(expr.body());
+  out << "forall " << format(expr.univ_var) << " in ["
+      << format(expr.lower_bound) << ", " << format(expr.upper_bound) << "). "
+      << format(expr.body);
   return out.str();
 }
 

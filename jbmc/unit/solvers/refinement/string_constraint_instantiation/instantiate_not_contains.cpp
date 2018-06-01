@@ -206,10 +206,8 @@ SCENARIO("instantiate_not_contains",
       constraints.end(),
       axioms,
       [&](const std::string &accu, string_constraintt sc) {
-        simplify(sc, ns);
-        std::string s;
-        java_lang->from_expr(sc, s, ns);
-        return accu + s + "\n\n";
+        simplify(sc.body, ns);
+        return accu + to_string(sc) + "\n\n";
       });
 
     const auto nc_contraints = generator.get_not_contains_constraints();
