@@ -170,7 +170,17 @@ protected:
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
   // letification
-  typedef std::pair<unsigned, symbol_exprt> let_count_idt;
+  struct let_count_idt
+  {
+    let_count_idt(std::size_t _count, const symbol_exprt &_let_symbol)
+      : count(_count), let_symbol(_let_symbol)
+    {
+    }
+
+    std::size_t count;
+    symbol_exprt let_symbol;
+  };
+
   typedef std::unordered_map<exprt, let_count_idt, irep_hash> seen_expressionst;
   unsigned let_id_count;
   static const unsigned LET_COUNT=2;
@@ -185,10 +195,9 @@ protected:
     void operator()(exprt &expr)
     {
       seen_expressionst::const_iterator it=let_map.find(expr);
-      if(it!=let_map.end() &&
-         it->second.first>=LET_COUNT)
+      if(it != let_map.end() && it->second.count >= LET_COUNT)
       {
-        symbol_exprt symb=it->second.second;
+        const symbol_exprt &symb = it->second.let_symbol;
         expr=symb;
       }
     }

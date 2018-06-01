@@ -4759,12 +4759,12 @@ exprt smt2_convt::letify_rec(
   exprt current=let_order[i];
   assert(map.find(current)!=map.end());
 
-  if(map.find(current)->second.first<LET_COUNT)
+  if(map.find(current)->second.count < LET_COUNT)
     return letify_rec(expr, let_order, map, i+1);
 
   let_exprt let;
 
-  let.symbol() = map.find(current)->second.second;
+  let.symbol() = map.find(current)->second.let_symbol;
   let.value() = substitute_let(current, map);
   let.where() = letify_rec(expr, let_order, map, i+1);
 
@@ -4781,7 +4781,7 @@ void smt2_convt::collect_bindings(
   if(it!=map.end())
   {
     let_count_idt &count_id=it->second;
-    ++(count_id.first);
+    ++(count_id.count);
     return;
   }
 
@@ -4797,7 +4797,7 @@ void smt2_convt::collect_bindings(
   symbol_exprt let=
     symbol_exprt("_let_"+std::to_string(++let_id_count), expr.type());
 
-  map.insert(std::make_pair(expr, std::make_pair(1, let)));
+  map.insert(std::make_pair(expr, let_count_idt(1, let)));
 
   let_order.push_back(expr);
 }
