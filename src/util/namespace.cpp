@@ -21,22 +21,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "string2int.h"
 #include "symbol_table.h"
 
-unsigned get_max(
+static std::size_t smallest_unused_suffix(
   const std::string &prefix,
   const symbol_tablet::symbolst &symbols)
 {
-  unsigned max_nr=0;
+  std::size_t max_nr = 0;
 
-  for(const auto &symbol_pair : symbols)
-  {
-    if(has_prefix(id2string(symbol_pair.first), prefix))
-    {
-      max_nr = std::max(
-        unsafe_string2unsigned(
-          id2string(symbol_pair.first).substr(prefix.size())),
-        max_nr);
-    }
-  }
+  while(symbols.find(prefix + std::to_string(max_nr)) != symbols.end())
+    ++max_nr;
 
   return max_nr;
 }
@@ -122,15 +114,15 @@ void namespace_baset::follow_macros(exprt &expr) const
     follow_macros(*it);
 }
 
-unsigned namespacet::get_max(const std::string &prefix) const
+std::size_t namespacet::smallest_unused_suffix(const std::string &prefix) const
 {
-  unsigned m=0;
+  std::size_t m = 0;
 
   if(symbol_table1!=nullptr)
-    m=std::max(m, ::get_max(prefix, symbol_table1->symbols));
+    m = std::max(m, ::smallest_unused_suffix(prefix, symbol_table1->symbols));
 
   if(symbol_table2!=nullptr)
-    m=std::max(m, ::get_max(prefix, symbol_table2->symbols));
+    m = std::max(m, ::smallest_unused_suffix(prefix, symbol_table2->symbols));
 
   return m;
 }
@@ -166,15 +158,13 @@ bool namespacet::lookup(
   return true;
 }
 
-unsigned multi_namespacet::get_max(const std::string &prefix) const
+std::size_t
+multi_namespacet::smallest_unused_suffix(const std::string &prefix) const
 {
-  unsigned m=0;
+  std::size_t m = 0;
 
-  for(symbol_table_listt::const_iterator
-      it=symbol_table_list.begin();
-      it!=symbol_table_list.end();
-      it++)
-    m=std::max(m, ::get_max(prefix, (*it)->symbols));
+  for(const auto &st : symbol_table_list)
+    m = std::max(m, ::smallest_unused_suffix(prefix, st->symbols));
 
   return m;
 }
