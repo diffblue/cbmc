@@ -295,9 +295,6 @@ static void create_clinit_wrapper_symbols(
   symbolt wrapper_method_symbol;
   code_typet wrapper_method_type;
   wrapper_method_type.return_type() = void_typet();
-  // Ensure the parameters property is there
-  // to avoid trouble in irept comparisons
-  wrapper_method_type.parameters();
   wrapper_method_symbol.name = clinit_wrapper_name(class_name);
   wrapper_method_symbol.pretty_name = wrapper_method_symbol.name;
   wrapper_method_symbol.base_name = "clinit_wrapper";
