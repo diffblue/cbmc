@@ -1,0 +1,11 @@
+KNOWNBUG
+Test.class
+--function Test.test --show-goto-functions --lazy-methods
+EXIT=0
+SIGNAL=0
+ObjectWithNondetInitialize\.cproverNondetInitialize\(\)
+--
+--
+Check if cproverNondetInitialize method is loaded in an object
+returned from an opaque method
+https://github.com/diffblue/cbmc/issues/2273
