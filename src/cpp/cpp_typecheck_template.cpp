@@ -158,8 +158,10 @@ void cpp_typecheckt::typecheck_class_template(
         previous_declaration.template_type());
     }
 
-    assert(cpp_scopes.id_map[symbol_name]->id_class ==
-           cpp_idt::id_classt::TEMPLATE_SCOPE);
+    INVARIANT(
+      cpp_scopes.id_map[symbol_name]->is_template_scope(),
+      "symbol should be in template scope");
+
     return;
   }
 
@@ -197,8 +199,10 @@ void cpp_typecheckt::typecheck_class_template(
 
   // link the template symbol with the template scope
   cpp_scopes.id_map[symbol_name]=&template_scope;
-  assert(cpp_scopes.id_map[symbol_name]->id_class ==
-         cpp_idt::id_classt::TEMPLATE_SCOPE);
+
+  INVARIANT(
+    cpp_scopes.id_map[symbol_name]->is_template_scope(),
+    "symbol should be in template scope");
 }
 
 /// typecheck function templates
@@ -300,8 +304,9 @@ void cpp_typecheckt::typecheck_function_template(
             id2string(new_symbol->base_name);
 
   // link the template symbol with the template scope
-  assert(template_scope.id_class==cpp_idt::id_classt::TEMPLATE_SCOPE);
   cpp_scopes.id_map[symbol_name] = &template_scope;
+  INVARIANT(
+    template_scope.is_template_scope(), "symbol should be in template scope");
 }
 
 /// typecheck class template members; these can be methods or static members
