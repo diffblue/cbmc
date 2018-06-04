@@ -182,8 +182,6 @@ bool model_argc_argv(
 
   // update counters etc.
   remove_skip(start);
-  start.compute_loop_numbers();
-  goto_model.goto_functions.update();
 
   return false;
 }

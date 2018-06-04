@@ -20,6 +20,8 @@ Date: May 2016
 #include <util/options.h>
 #include <util/deprecate.h>
 
+#include <goto-programs/remove_skip.h>
+
 #include "cover_basic_blocks.h"
 
 /// Applies instrumenters to given goto program
@@ -293,7 +295,7 @@ static void instrument_cover_goals(
   }
 
   if(changed)
-    function.body.update();
+    remove_skip(function.body);
 }
 
 /// Instruments a single goto program based on the given configuration

@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/format_strings.h>
 #include <goto-programs/goto_model.h>
-
+#include <goto-programs/remove_skip.h>
 
 exprt is_zero_string(
   const exprt &what,
@@ -266,7 +266,7 @@ void string_instrumentationt::do_function_call(
     else if(identifier=="fscanf")
       do_fscanf(dest, target, call);
 
-    dest.update();
+    remove_skip(dest);
   }
 }
 

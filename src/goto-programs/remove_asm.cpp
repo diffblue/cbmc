@@ -20,6 +20,7 @@ Date:   December 2014
 #include <assembler/assembler_parser.h>
 
 #include "goto_model.h"
+#include "remove_skip.h"
 
 class remove_asmt
 {
@@ -280,6 +281,8 @@ void remove_asmt::process_instruction(
 void remove_asmt::process_function(
   goto_functionst::goto_functiont &goto_function)
 {
+  bool did_something = false;
+
   Forall_goto_program_instructions(it, goto_function.body)
   {
     if(it->is_other() && it->code.get_statement()==ID_asm)
@@ -287,6 +290,7 @@ void remove_asmt::process_function(
       goto_programt tmp_dest;
       process_instruction(*it, tmp_dest);
       it->make_skip();
+      did_something = true;
 
       goto_programt::targett next=it;
       next++;
@@ -294,6 +298,9 @@ void remove_asmt::process_function(
       goto_function.body.destructive_insert(next, tmp_dest);
     }
   }
+
+  if(did_something)
+    remove_skip(goto_function.body);
 }
 
 /// removes assembler

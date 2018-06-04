@@ -26,6 +26,8 @@ Date:   December 2016
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 
+#include <goto-programs/remove_skip.h>
+
 #include <analyses/uncaught_exceptions_analysis.h>
 
 /// Lowers high-level exception descriptions into low-level operations suitable
@@ -122,13 +124,13 @@ protected:
     const stack_catcht &stack_catch,
     const std::vector<exprt> &locals);
 
-  void instrument_throw(
+  bool instrument_throw(
     goto_programt &goto_program,
     const goto_programt::targett &,
     const stack_catcht &,
     const std::vector<exprt> &);
 
-  void instrument_function_call(
+  bool instrument_function_call(
     goto_programt &goto_program,
     const goto_programt::targett &,
     const stack_catcht &,
@@ -369,7 +371,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
 
 /// instruments each throw with conditional GOTOS to the corresponding
 /// exception handlers
-void remove_exceptionst::instrument_throw(
+bool remove_exceptionst::instrument_throw(
   goto_programt &goto_program,
   const goto_programt::targett &instr_it,
   const remove_exceptionst::stack_catcht &stack_catch,
@@ -387,7 +389,7 @@ void remove_exceptionst::instrument_throw(
   // and this may reduce the instrumentation considerably if the programmer
   // used assertions)
   if(assertion_error)
-    return;
+    return false;
 
   add_exception_dispatch_sequence(
     goto_program, instr_it, stack_catch, locals);
@@ -403,11 +405,13 @@ void remove_exceptionst::instrument_throw(
   // now turn the `throw' into `assignment'
   instr_it->type=ASSIGN;
   instr_it->code=assignment;
+
+  return true;
 }
 
 /// instruments each function call that may escape exceptions with conditional
 /// GOTOS to the corresponding exception handlers
-void remove_exceptionst::instrument_function_call(
+bool remove_exceptionst::instrument_function_call(
   goto_programt &goto_program,
   const goto_programt::targett &instr_it,
   const stack_catcht &stack_catch,
@@ -441,7 +445,11 @@ void remove_exceptionst::instrument_function_call(
     t_null->source_location=instr_it->source_location;
     t_null->function=instr_it->function;
     t_null->guard=eq_null;
+
+    return true;
   }
+
+  return false;
 }
 
 /// instruments throws, function calls that may escape exceptions and exception
@@ -459,6 +467,8 @@ void remove_exceptionst::instrument_exceptions(
 
   bool program_or_callees_may_throw =
     function_or_callees_may_throw(goto_program);
+
+  bool did_something = false;
 
   Forall_goto_program_instructions(instr_it, goto_program)
   {
@@ -537,18 +547,22 @@ void remove_exceptionst::instrument_exceptions(
           "CATCH opcode should be one of push-catch, pop-catch, landingpad");
       }
       instr_it->make_skip();
+      did_something = true;
     }
     else if(instr_it->type==THROW)
     {
-      instrument_throw(
-        goto_program, instr_it, stack_catch, locals);
+      did_something |=
+        instrument_throw(goto_program, instr_it, stack_catch, locals);
     }
     else if(instr_it->type==FUNCTION_CALL)
     {
-      instrument_function_call(
-        goto_program, instr_it, stack_catch, locals);
+      did_something |=
+        instrument_function_call(goto_program, instr_it, stack_catch, locals);
     }
   }
+
+  if(did_something)
+    remove_skip(goto_program);
 }
 
 void remove_exceptionst::operator()(goto_functionst &goto_functions)

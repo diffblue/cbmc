@@ -41,13 +41,20 @@ void remove_unreachable(goto_programt &goto_program)
 
   // make all unreachable code a skip
   // unless it's an 'end_function'
+  bool did_something = false;
 
   Forall_goto_program_instructions(it, goto_program)
   {
     if(reachable.find(it)==reachable.end() &&
        !it->is_end_function())
+    {
       it->make_skip();
+      did_something = true;
+    }
   }
+
+  if(did_something)
+    goto_program.update();
 }
 
 /// Removes unreachable instructions from all functions.

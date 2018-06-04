@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "class_identifier.h"
 #include "goto_model.h"
+#include "remove_skip.h"
 #include "resolve_inherited_component.h"
 
 class remove_virtual_functionst
@@ -29,7 +30,7 @@ public:
 
   bool remove_virtual_functions(goto_programt &goto_program);
 
-  void remove_virtual_function(
+  goto_programt::targett remove_virtual_function(
     goto_programt &goto_program,
     goto_programt::targett target,
     const dispatch_table_entriest &functions,
@@ -43,7 +44,7 @@ protected:
 
   const class_hierarchyt &class_hierarchy;
 
-  void remove_virtual_function(
+  goto_programt::targett remove_virtual_function(
     goto_programt &goto_program,
     goto_programt::targett target);
   typedef std::function<
@@ -71,7 +72,7 @@ remove_virtual_functionst::remove_virtual_functionst(
 {
 }
 
-void remove_virtual_functionst::remove_virtual_function(
+goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt &goto_program,
   goto_programt::targett target)
 {
@@ -89,7 +90,7 @@ void remove_virtual_functionst::remove_virtual_function(
   dispatch_table_entriest functions;
   get_functions(function, functions);
 
-  remove_virtual_function(
+  return remove_virtual_function(
     goto_program,
     target,
     functions,
@@ -118,7 +119,7 @@ static void create_static_function_call(
     call.arguments()[0].make_typecast(need_type);
 }
 
-void remove_virtual_functionst::remove_virtual_function(
+goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt &goto_program,
   goto_programt::targett target,
   const dispatch_table_entriest &functions,
@@ -130,10 +131,13 @@ void remove_virtual_functionst::remove_virtual_function(
   const code_function_callt &code=
     to_code_function_call(target->code);
 
+  goto_programt::targett next_target = std::next(target);
+
   if(functions.empty())
   {
     target->make_skip();
-    return; // give up
+    remove_skip(goto_program, target, next_target);
+    return next_target; // give up
   }
 
   // only one option?
@@ -141,13 +145,16 @@ void remove_virtual_functionst::remove_virtual_function(
      fallback_action==virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION)
   {
     if(functions.begin()->symbol_expr==symbol_exprt())
+    {
       target->make_skip();
+      remove_skip(goto_program, target, next_target);
+    }
     else
     {
       create_static_function_call(
         to_code_function_call(target->code), functions.front().symbol_expr, ns);
     }
-    return;
+    return next_target;
   }
 
   const auto &vcall_source_loc=target->source_location;
@@ -281,13 +288,15 @@ void remove_virtual_functionst::remove_virtual_function(
       it->source_location.set_comment(comment);
   }
 
-  goto_programt::targett next_target=target;
-  next_target++;
-
   goto_program.destructive_insert(next_target, new_code);
 
   // finally, kill original invocation
   target->make_skip();
+
+  // only remove skips within the virtual-function handling block
+  remove_skip(goto_program, target, next_target);
+
+  return next_target;
 }
 
 /// Used by get_functions to track the most-derived parent that provides an
@@ -475,7 +484,11 @@ bool remove_virtual_functionst::remove_virtual_functions(
 {
   bool did_something=false;
 
-  Forall_goto_program_instructions(target, goto_program)
+  for(goto_programt::instructionst::iterator
+      target = goto_program.instructions.begin();
+      target != goto_program.instructions.end();
+      ) // remove_virtual_function returns the next instruction to process
+  {
     if(target->is_function_call())
     {
       const code_function_callt &code=
@@ -483,15 +496,17 @@ bool remove_virtual_functionst::remove_virtual_functions(
 
       if(code.function().id()==ID_virtual_function)
       {
-        remove_virtual_function(goto_program, target);
+        target = remove_virtual_function(goto_program, target);
         did_something=true;
+        continue;
       }
     }
 
-  if(did_something)
-  {
-    goto_program.update();
+    ++target;
   }
+
+  if(did_something)
+    goto_program.update();
 
   return did_something;
 }
@@ -536,14 +551,10 @@ void remove_virtual_functions(goto_model_functiont &function)
   class_hierarchyt class_hierarchy;
   class_hierarchy(function.get_symbol_table());
   remove_virtual_functionst rvf(function.get_symbol_table(), class_hierarchy);
-  bool changed = rvf.remove_virtual_functions(
-    function.get_goto_function().body);
-  // Give fresh location numbers to `function`, in case it has grown:
-  if(changed)
-    function.compute_location_numbers();
+  rvf.remove_virtual_functions(function.get_goto_function().body);
 }
 
-void remove_virtual_function(
+goto_programt::targett remove_virtual_function(
   symbol_tablet &symbol_table,
   goto_programt &goto_program,
   goto_programt::targett instruction,
@@ -554,18 +565,22 @@ void remove_virtual_function(
   class_hierarchy(symbol_table);
   remove_virtual_functionst rvf(symbol_table, class_hierarchy);
 
-  rvf.remove_virtual_function(
+  goto_programt::targett next = rvf.remove_virtual_function(
     goto_program, instruction, dispatch_table, fallback_action);
+
+  goto_program.update();
+
+  return next;
 }
 
-void remove_virtual_function(
+goto_programt::targett remove_virtual_function(
   goto_modelt &goto_model,
   goto_programt &goto_program,
   goto_programt::targett instruction,
   const dispatch_table_entriest &dispatch_table,
   virtual_dispatch_fallback_actiont fallback_action)
 {
-  remove_virtual_function(
+  return remove_virtual_function(
     goto_model.symbol_table,
     goto_program,
     instruction,

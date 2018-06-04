@@ -12,12 +12,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "remove_skip.h"
 #include "goto_model.h"
 
-bool is_skip(const goto_programt &body, goto_programt::const_targett it)
+/// Determine whether the instruction is semantically equivalent to a skip
+/// (no-op).  This includes a skip, but also if(false) goto ..., goto next;
+///  next: ..., and (void)0.
+/// \param body  goto program containing the instruction
+/// \param it  instruction iterator that is tested for being a skip (or
+/// equivalent)
+/// \param ignore_labels  If the caller takes care of moving labels, then even
+/// skip statements carrying labels can be treated as skips (even though they
+/// may carry key information such as error labels).
+/// \return True, iff it is equivalent to a skip.
+bool is_skip(
+  const goto_programt &body,
+  goto_programt::const_targett it,
+  bool ignore_labels)
 {
-  // we won't remove labelled statements
-  // (think about error labels or the like)
-
-  if(!it->labels.empty())
+  if(!ignore_labels && !it->labels.empty())
     return false;
 
   if(it->is_skip())
@@ -69,7 +79,14 @@ bool is_skip(const goto_programt &body, goto_programt::const_targett it)
 }
 
 /// remove unnecessary skip statements
-void remove_skip(goto_programt &goto_program)
+/// \param goto_program  goto program containing the instructions to be cleaned
+/// in the range [begin, end)
+/// \param begin  iterator pointing to first instruction to be considered
+/// \param end  iterator pointing beyond last instruction to be considered
+void remove_skip(
+  goto_programt &goto_program,
+  goto_programt::targett begin,
+  goto_programt::targett end)
 {
   // This needs to be a fixed-point, as
   // removing a skip can turn a goto into a skip.
@@ -86,21 +103,24 @@ void remove_skip(goto_programt &goto_program)
 
     // remove skip statements
 
-    for(goto_programt::instructionst::iterator
-        it=goto_program.instructions.begin();
-        it!=goto_program.instructions.end();)
+    for(goto_programt::instructionst::iterator it = begin; it != end;)
     {
       goto_programt::targett old_target=it;
 
       // for collecting labels
       std::list<irep_idt> labels;
 
-      while(is_skip(goto_program, it))
+      while(is_skip(goto_program, it, true))
       {
         // don't remove the last skip statement,
         // it could be a target
-        if(it==--goto_program.instructions.end())
+        if(
+          it == std::prev(end) ||
+          (std::next(it)->is_end_function() &&
+           (!labels.empty() || !it->labels.empty())))
+        {
           break;
+        }
 
         // save labels
         labels.splice(labels.end(), it->labels);
@@ -121,23 +141,23 @@ void remove_skip(goto_programt &goto_program)
         it++;
     }
 
-    // adjust gotos
-
-    Forall_goto_program_instructions(i_it, goto_program)
-      if(i_it->is_goto() || i_it->is_start_thread() || i_it->is_catch())
+    // adjust gotos across the full goto program body
+    for(auto &ins : goto_program.instructions)
+    {
+      if(ins.is_goto() || ins.is_start_thread() || ins.is_catch())
       {
-        for(goto_programt::instructiont::targetst::iterator
-            t_it=i_it->targets.begin();
-            t_it!=i_it->targets.end();
-            t_it++)
+        for(auto &target : ins.targets)
         {
-          new_targetst::const_iterator
-            result=new_targets.find(*t_it);
+          new_targetst::const_iterator result = new_targets.find(target);
 
           if(result!=new_targets.end())
-            *t_it=result->second;
+            target = result->second;
         }
       }
+    }
+
+    while(new_targets.find(begin) != new_targets.end())
+      ++begin;
 
     // now delete the skips -- we do so after adjusting the
     // gotos to avoid dangling targets
@@ -145,22 +165,40 @@ void remove_skip(goto_programt &goto_program)
       goto_program.instructions.erase(new_target.first);
 
     // remove the last skip statement unless it's a target
-    goto_program.compute_incoming_edges();
+    goto_program.compute_target_numbers();
 
-    if(
-      !goto_program.instructions.empty() &&
-      is_skip(goto_program, --goto_program.instructions.end()) &&
-      !goto_program.instructions.back().is_target())
-      goto_program.instructions.pop_back();
+    if(begin != end)
+    {
+      goto_programt::targett last = std::prev(end);
+      if(begin == last)
+        ++begin;
+
+      if(is_skip(goto_program, last) && !last->is_target())
+        goto_program.instructions.erase(last);
+    }
   }
   while(goto_program.instructions.size()<old_size);
+}
+
+/// remove unnecessary skip statements
+void remove_skip(goto_programt &goto_program)
+{
+  remove_skip(
+    goto_program,
+    goto_program.instructions.begin(),
+    goto_program.instructions.end());
+
+  goto_program.update();
 }
 
 /// remove unnecessary skip statements
 void remove_skip(goto_functionst &goto_functions)
 {
   Forall_goto_functions(f_it, goto_functions)
-    remove_skip(f_it->second.body);
+    remove_skip(
+      f_it->second.body,
+      f_it->second.body.instructions.begin(),
+      f_it->second.body.instructions.end());
 
   // we may remove targets
   goto_functions.update();
@@ -170,4 +208,3 @@ void remove_skip(goto_modelt &goto_model)
 {
   remove_skip(goto_model.goto_functions);
 }
-

@@ -21,7 +21,6 @@ Author: Matt Lewis
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/wp.h>
-#include <goto-programs/remove_skip.h>
 #include <goto-programs/goto_functions.h>
 
 #include <goto-symex/goto_symex.h>

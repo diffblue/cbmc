@@ -206,7 +206,6 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
 
   // remove the skips
   remove_skip(goto_functions);
-  goto_functions.update();
 }
 
 /// Perform reachability slicing on goto_model, with respect to the

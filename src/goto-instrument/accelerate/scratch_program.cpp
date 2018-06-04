@@ -29,7 +29,6 @@ bool scratch_programt::check_sat(bool do_slice)
   add_instruction(END_FUNCTION);
 
   remove_skip(*this);
-  update();
 
 #ifdef DEBUG
   std::cout << "Checking following program for satness:\n";

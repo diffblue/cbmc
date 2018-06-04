@@ -158,16 +158,13 @@ bool static_simplifier(
     m.status() << "Removing unreachable instructions" << messaget::eom;
 
     // Removes goto false
-    remove_skip(goto_model.goto_functions);
-    goto_model.goto_functions.update();
+    remove_skip(goto_model);
 
     // Convert unreachable to skips
     remove_unreachable(goto_model.goto_functions);
-    goto_model.goto_functions.update();
 
     // Remove all of the new skips
-    remove_skip(goto_model.goto_functions);
-    goto_model.goto_functions.update();
+    remove_skip(goto_model);
   }
 
   // restore return types before writing the binary

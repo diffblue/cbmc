@@ -425,13 +425,13 @@ bool goto_diff_parse_optionst::process_goto_program(
     // add loop ids
     goto_model.goto_functions.compute_loop_numbers();
 
-    // remove skips such that trivial GOTOs are deleted and not considered
-    // for coverage annotation:
-    remove_skip(goto_model);
-
     // instrument cover goals
     if(cmdline.isset("cover"))
     {
+      // remove skips such that trivial GOTOs are deleted and not considered
+      // for coverage annotation:
+      remove_skip(goto_model);
+
       if(instrument_cover_goals(options, goto_model, get_message_handler()))
         return true;
     }
@@ -445,7 +445,6 @@ bool goto_diff_parse_optionst::process_goto_program(
 
     // remove any skips introduced since coverage instrumentation
     remove_skip(goto_model);
-    goto_model.goto_functions.update();
   }
 
   catch(const char *e)

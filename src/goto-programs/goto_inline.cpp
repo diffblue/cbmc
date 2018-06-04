@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
-#include "remove_skip.h"
 #include "goto_inline_class.h"
 
 void goto_inline(
