@@ -1041,8 +1041,6 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
     throw 0;
   }
 
-  assert(primary_templates.size()==1);
-
   const symbolt &primary_template_symbol=
     cpp_typecheck.lookup(*primary_templates.begin());
 

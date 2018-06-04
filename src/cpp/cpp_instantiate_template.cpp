@@ -285,9 +285,6 @@ const symbolt &cpp_typecheckt::instantiate_template(
     throw 0;
   }
 
-  INVARIANT_STRUCTURED(
-    template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
-
   // produce new declaration
   cpp_declarationt new_decl=to_cpp_declaration(template_symbol.type);
 
