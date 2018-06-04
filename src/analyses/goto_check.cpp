@@ -1213,6 +1213,27 @@ void goto_checkt::bounds_check(
           expr.array().id()==ID_member)
   {
     // a variable sized struct member
+    //
+    // Excerpt from the C standard on flexible array members:
+    // However, when a . (or ->) operator has a left operand that is (a pointer
+    // to) a structure with a flexible array member and the right operand names
+    // that member, it behaves as if that member were replaced with the longest
+    // array (with the same element type) that would not make the structure
+    // larger than the object being accessed; [...]
+    const exprt type_size = size_of_expr(ode.root_object().type(), ns);
+
+    binary_relation_exprt inequality(
+      typecast_exprt::conditional_cast(ode.offset(), type_size.type()),
+      ID_lt,
+      type_size);
+
+    add_guarded_claim(
+      implies_exprt(type_matches_size, inequality),
+      name + " upper bound",
+      "array bounds",
+      expr.find_source_location(),
+      expr,
+      guard);
   }
   else
   {

@@ -11,8 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
-#include <util/std_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
+#include <util/std_expr.h>
 
 bvt boolbvt::convert_index(const index_exprt &expr)
 {
@@ -332,6 +333,27 @@ bvt boolbvt::convert_index(
 
     for(std::size_t i=0; i<width; i++)
       bv[i]=tmp[integer2size_t(offset+i)];
+  }
+  else if(
+    array.id() == ID_member || array.id() == ID_index ||
+    array.id() == ID_byte_extract_big_endian ||
+    array.id() == ID_byte_extract_little_endian)
+  {
+    object_descriptor_exprt o;
+    o.build(array, ns);
+    CHECK_RETURN(o.offset().id() != ID_unknown);
+
+    const mp_integer subtype_bytes =
+      pointer_offset_size(array_type.subtype(), ns);
+    exprt new_offset = simplify_expr(
+      plus_exprt(
+        o.offset(), from_integer(index * subtype_bytes, o.offset().type())),
+      ns);
+
+    byte_extract_exprt be(
+      byte_extract_id(), o.root_object(), new_offset, array_type.subtype());
+
+    return convert_bv(be);
   }
   else
   {
