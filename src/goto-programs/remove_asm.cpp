@@ -78,8 +78,7 @@ void remove_asmt::gcc_asm_function_call(
     }
   }
 
-  code_typet fkt_type;
-  fkt_type.return_type()=void_typet();
+  code_typet fkt_type({}, void_typet());
   fkt_type.make_ellipsis();
 
   symbol_exprt fkt(function_identifier, fkt_type);

@@ -22,7 +22,7 @@ static symbolt create_void_function_symbol(
   const irep_idt &name,
   const codet &code)
 {
-  code_typet void_function_type;
+  code_typet void_function_type({}, empty_typet());
   symbolt function;
   function.name=name;
   function.type=void_function_type;
@@ -67,7 +67,7 @@ SCENARIO("call_graph",
     // void E() { }
 
     goto_modelt goto_model;
-    code_typet void_function_type;
+    code_typet void_function_type({}, empty_typet());
 
     {
       code_blockt calls;

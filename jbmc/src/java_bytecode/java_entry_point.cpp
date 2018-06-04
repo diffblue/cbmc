@@ -31,8 +31,7 @@ static void create_initialize(symbol_table_baset &symbol_table)
   initialize.base_name=INITIALIZE_FUNCTION;
   initialize.mode=ID_java;
 
-  code_typet type;
-  type.return_type()=empty_typet();
+  code_typet type({}, empty_typet());
   initialize.type=type;
 
   code_blockt init_code;
@@ -688,8 +687,7 @@ bool generate_java_start_function(
   // we just built and register it in the symbol table
   symbolt new_symbol;
 
-  code_typet main_type;
-  main_type.return_type()=empty_typet();
+  code_typet main_type({}, empty_typet());
 
   new_symbol.name=goto_functionst::entry_point();
   new_symbol.type.swap(main_type);

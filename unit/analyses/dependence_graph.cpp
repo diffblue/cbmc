@@ -22,7 +22,7 @@ static symbolt create_void_function_symbol(
   const irep_idt &name,
   const codet &code)
 {
-  code_typet void_function_type;
+  code_typet void_function_type({}, empty_typet());
   symbolt function;
   function.name = name;
   function.type = void_function_type;
@@ -74,7 +74,7 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
     x_symbol.is_file_local = true;
     goto_model.symbol_table.add(x_symbol);
 
-    code_typet void_function_type;
+    code_typet void_function_type({}, empty_typet());
 
     code_blockt a_body;
     code_declt declare_x(x_symbol.symbol_expr());

@@ -1611,9 +1611,7 @@ codet java_string_library_preprocesst::make_object_get_class_code(
     "java::java.lang.Class.forName:(Ljava/lang/String;)Ljava/lang/Class;");
   fun_call.lhs()=class1;
   fun_call.arguments().push_back(string1);
-  code_typet fun_type;
-  fun_type.parameters().push_back(code_typet::parametert(string_ptr_type));
-  fun_type.return_type()=class_type;
+  code_typet fun_type({code_typet::parametert(string_ptr_type)}, class_type);
   fun_call.function().type()=fun_type;
   code.add(fun_call, loc);
 
