@@ -1582,6 +1582,9 @@ __decltype          { if(PARSER.cpp98 &&
 
 "fallthrough"       { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_FALLTHROUGH; }
 
+"used" |
+"__used__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_USED; }
+
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }
 {identifier}        { BEGIN(GCC_ATTRIBUTE4); }

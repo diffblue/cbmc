@@ -149,6 +149,7 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_CONSTRUCTOR "constructor"
 %token TOK_GCC_ATTRIBUTE_DESTRUCTOR "destructor"
 %token TOK_GCC_ATTRIBUTE_FALLTHROUGH "fallthrough"
+%token TOK_GCC_ATTRIBUTE_USED "used"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
 %token TOK_MSC_BASED   "__based"
@@ -1544,6 +1545,8 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_constructor); }
         | TOK_GCC_ATTRIBUTE_DESTRUCTOR
         { $$=$1; set($$, ID_destructor); }
+        | TOK_GCC_ATTRIBUTE_USED
+        { $$=$1; set($$, ID_used); }
         ;
 
 gcc_attribute:
