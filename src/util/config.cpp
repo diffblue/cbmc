@@ -653,12 +653,16 @@ configt::ansi_ct::c_standardt configt::ansi_ct::default_c_standard()
   // By default, clang on FreeBSD builds C code in GNU C99
   return c_standardt::C99;
   #else
-  return c_standardt::C99;
+  // By default, gcc 5.4 or higher use gnu11; older versions use gnu89
+  return c_standardt::C11;
   #endif
 }
 
 configt::cppt::cpp_standardt configt::cppt::default_cpp_standard()
 {
+  // g++ 6.3 uses gnu++14
+  // g++ 5.4 uses gnu++98
+  // clang 6.0 uses c++14
   return cpp_standardt::CPP98;
 }
 
