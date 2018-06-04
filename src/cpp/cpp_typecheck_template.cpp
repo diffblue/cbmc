@@ -719,11 +719,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
   std::string id_suffix="template::"+std::to_string(template_counter++);
 
   // produce a new scope for the template parameters
-  cpp_scopet &template_scope=
-    cpp_scopes.current_scope().new_scope(
-      cpp_scopes.current_scope().prefix+id_suffix);
-
-  template_scope.prefix=template_scope.get_parent().prefix+id_suffix;
+  cpp_scopet &template_scope = cpp_scopes.current_scope().new_scope(id_suffix);
   template_scope.id_class=cpp_idt::id_classt::TEMPLATE_SCOPE;
 
   cpp_scopes.go_to(template_scope);
@@ -825,9 +821,6 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     parameter.add_source_location()=declaration.find_location();
     #endif
   }
-
-  // continue without adding to the prefix
-  template_scope.prefix=template_scope.get_parent().prefix;
 
   return template_scope;
 }

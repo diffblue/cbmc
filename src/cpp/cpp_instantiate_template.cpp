@@ -165,10 +165,9 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   INVARIANT_STRUCTURED(
     template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
 
-  irep_idt identifier=
-    id2string(template_scope->prefix)+
-    "tag-"+id2string(template_symbol.base_name)+
-    id2string(suffix);
+  irep_idt identifier = id2string(template_scope->get_parent().prefix) +
+                        "tag-" + id2string(template_symbol.base_name) +
+                        id2string(suffix);
 
   // already there?
   symbol_tablet::symbolst::const_iterator s_it=
@@ -205,9 +204,8 @@ const symbolt &cpp_typecheckt::class_template_symbol(
 
   id.id_class=cpp_idt::id_classt::CLASS;
   id.is_scope=true;
-  id.prefix=template_scope->prefix+
-            id2string(s_ptr->base_name)+
-            id2string(suffix)+"::";
+  id.prefix = template_scope->get_parent().prefix +
+              id2string(s_ptr->base_name) + id2string(suffix) + "::";
   id.class_identifier=s_ptr->name;
   id.id_class=cpp_idt::id_classt::CLASS;
 
