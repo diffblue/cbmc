@@ -13,13 +13,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/prefix.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
-#include <util/simplify_expr.h>
 
 #include <util/c_types.h>
 
@@ -426,25 +427,41 @@ void goto_convertt::convert_gcc_switch_case_range(
     throw 0;
   }
 
+  const auto lb = numeric_cast<mp_integer>(code.op0());
+  const auto ub = numeric_cast<mp_integer>(code.op1());
+
+  if(!lb.has_value() || !ub.has_value())
+  {
+    error().source_location = code.find_source_location();
+    error() << "GCC's switch-case-range statement requires constant bounds"
+            << eom;
+    throw 0;
+  }
+  else if(*lb > *ub)
+  {
+    warning().source_location = code.find_source_location();
+    warning() << "GCC's switch-case-range statement with empty case range"
+              << eom;
+  }
+
   goto_programt tmp;
   convert(to_code(code.op2()), tmp, mode);
 
-  // goto_programt::targett target=tmp.instructions.begin();
+  goto_programt::targett target = tmp.instructions.begin();
   dest.destructive_append(tmp);
 
-  #if 0
-  cases_mapt::iterator cases_entry=targets.cases_map.find(target);
-  if(cases_entry==targets.cases_map.end())
+  cases_mapt::iterator cases_entry = targets.cases_map.find(target);
+  if(cases_entry == targets.cases_map.end())
   {
-    targets.cases.push_back(std::make_pair(target, caset()));
-    cases_entry=targets.cases_map.insert(std::make_pair(
-          target, --targets.cases.end())).first;
+    targets.cases.push_back({target, caset()});
+    cases_entry =
+      targets.cases_map.insert({target, --targets.cases.end()}).first;
   }
 
-  // TODO
-  exprt::operandst &case_op_dest=cases_entry->second->second;
-  case_op_dest.push_back(code.case_op());
-  #endif
+  exprt::operandst &case_op_dest = cases_entry->second->second;
+
+  for(mp_integer i = *lb; i <= *ub; ++i)
+    case_op_dest.push_back(from_integer(i, code.op0().type()));
 }
 
 /// converts 'code' and appends the result to 'dest'
