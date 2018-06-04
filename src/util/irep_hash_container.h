@@ -14,9 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <vector>
 
+#include "irep.h"
 #include "numbering.h"
-
-class irept;
 
 class irep_hash_container_baset
 {
@@ -46,7 +45,13 @@ protected:
     }
   };
 
-  typedef std::unordered_map<const void *, std::size_t, pointer_hasht>
+  struct irep_entryt
+  {
+    std::size_t number;
+    irept irep; // copy to keep addresses stable
+  };
+
+  typedef std::unordered_map<const void *, irep_entryt, pointer_hasht>
     ptr_hasht;
   ptr_hasht ptr_hash;
 
@@ -85,6 +90,93 @@ public:
   irep_full_hash_containert():irep_hash_container_baset(true)
   {
   }
+};
+
+template <typename Key, typename T>
+class irep_hash_mapt
+{
+protected:
+  using mapt = std::map<std::size_t, T>;
+
+public:
+  using key_type = Key;
+  using mapped_type = T;
+  using value_type = std::pair<const Key, T>;
+  using const_iterator = typename mapt::const_iterator;
+  using iterator = typename mapt::iterator;
+
+  const_iterator find(const Key &key) const
+  {
+    return map.find(hash_container.number(key));
+  }
+
+  iterator find(const Key &key)
+  {
+    return map.find(hash_container.number(key));
+  }
+
+  const_iterator begin() const
+  {
+    return map.begin();
+  }
+
+  iterator begin()
+  {
+    return map.begin();
+  }
+
+  const_iterator end() const
+  {
+    return map.end();
+  }
+
+  iterator end()
+  {
+    return map.end();
+  }
+
+  void clear()
+  {
+    hash_container.clear();
+    map.clear();
+  }
+
+  std::size_t size() const
+  {
+    return map.size();
+  }
+
+  bool empty() const
+  {
+    return map.empty();
+  }
+
+  T &operator[](const Key &key)
+  {
+    const std::size_t i = hash_container.number(key);
+    return map[i];
+  }
+
+  std::pair<iterator, bool> insert(const value_type &value)
+  {
+    const std::size_t i = hash_container.number(value.first);
+    return map.emplace(i, value.second);
+  }
+
+  void erase(iterator it)
+  {
+    map.erase(it);
+  }
+
+  void swap(irep_hash_mapt<Key, T> &other)
+  {
+    std::swap(hash_container, other.hash_container);
+    std::swap(map, other.map);
+  }
+
+protected:
+  mutable irep_hash_containert hash_container;
+  mapt map;
 };
 
 #endif // CPROVER_UTIL_IREP_HASH_CONTAINER_H

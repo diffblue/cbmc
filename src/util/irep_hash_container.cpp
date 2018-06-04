@@ -21,13 +21,15 @@ size_t irep_hash_container_baset::number(const irept &irep)
   ptr_hasht::const_iterator it=ptr_hash.find(&irep.read());
 
   if(it!=ptr_hash.end())
-    return it->second;
+    return it->second.number;
 
   packedt packed;
   pack(irep, packed);
   size_t id=numbering.number(packed);
 
-  ptr_hash[&irep.read()]=id;
+  auto &irep_entry = ptr_hash[&irep.read()];
+  irep_entry.number = id;
+  irep_entry.irep = irep;
 
   return id;
 }

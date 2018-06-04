@@ -16,6 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/byte_operators.h>
 
+#ifndef HASH_CODE
+#include <util/irep_hash_container.h>
+#endif
+
 #include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
@@ -170,10 +174,25 @@ protected:
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
   // letification
-  typedef std::pair<unsigned, symbol_exprt> let_count_idt;
+  struct let_count_idt
+  {
+    let_count_idt(std::size_t _count, const symbol_exprt &_let_symbol)
+      : count(_count), let_symbol(_let_symbol)
+    {
+    }
+
+    std::size_t count;
+    symbol_exprt let_symbol;
+  };
+
+#ifdef HASH_CODE
   typedef std::unordered_map<exprt, let_count_idt, irep_hash> seen_expressionst;
-  unsigned let_id_count;
-  static const unsigned LET_COUNT=2;
+#else
+  typedef irep_hash_mapt<exprt, let_count_idt> seen_expressionst;
+#endif
+
+  std::size_t let_id_count;
+  static const std::size_t LET_COUNT = 2;
 
   class let_visitort:public expr_visitort
   {
@@ -185,10 +204,9 @@ protected:
     void operator()(exprt &expr)
     {
       seen_expressionst::const_iterator it=let_map.find(expr);
-      if(it!=let_map.end() &&
-         it->second.first>=LET_COUNT)
+      if(it != let_map.end() && it->second.count >= LET_COUNT)
       {
-        symbol_exprt symb=it->second.second;
+        const symbol_exprt &symb = it->second.let_symbol;
         expr=symb;
       }
     }
@@ -199,7 +217,7 @@ protected:
     exprt &expr,
     std::vector<exprt> &let_order,
     const seen_expressionst &map,
-    unsigned i);
+    std::size_t i);
 
   void collect_bindings(
     exprt &expr,
@@ -294,7 +312,7 @@ protected:
   smt2_identifierst smt2_identifiers;
 
   // Boolean part
-  unsigned no_boolean_variables;
+  std::size_t no_boolean_variables;
   std::vector<bool> boolean_assignment;
 };
 
