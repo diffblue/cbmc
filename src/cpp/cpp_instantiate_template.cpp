@@ -238,7 +238,6 @@ const symbolt &cpp_typecheckt::instantiate_template(
   std::cout << "I: " << template_symbol.name << '\n';
   #endif
 
-  cpp_save_scopet cpp_saved_scope(cpp_scopes);
   cpp_saved_template_mapt saved_map(template_map);
 
   bool specialization_given=specialization.is_not_nil();
@@ -417,7 +416,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
     for(auto &tm : template_methods.operands())
     {
-      cpp_saved_scope.restore();
+      saved_scope.restore();
 
       cpp_declarationt method_decl=
         static_cast<const cpp_declarationt &>(
