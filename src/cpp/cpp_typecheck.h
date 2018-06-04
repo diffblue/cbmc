@@ -230,6 +230,10 @@ protected:
   std::string template_suffix(
     const cpp_template_args_tct &template_args);
 
+  cpp_scopet &sub_scope_for_instantiation(
+    cpp_scopet &template_scope,
+    const std::string &suffix);
+
   void
   convert_parameters(const irep_idt &current_mode, code_typet &function_type);
 
