@@ -10,9 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_MESSAGE_H
 #define CPROVER_UTIL_MESSAGE_H
 
-#include <string>
+#include <functional>
 #include <iosfwd>
 #include <sstream>
+#include <string>
 
 #include "invariant.h"
 #include "json.h"
@@ -332,6 +333,10 @@ public:
   {
     return get_mstream(M_DEBUG);
   }
+
+  void conditional_output(
+    mstreamt &mstream,
+    const std::function<void(mstreamt &)> &output_generator) const;
 
 protected:
   message_handlert *message_handler;
