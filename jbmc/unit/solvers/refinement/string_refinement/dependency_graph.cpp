@@ -58,7 +58,7 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
     const symbol_exprt lhs("lhs", unsignedbv_typet(32));
     const symbol_exprt lhs2("lhs2", unsignedbv_typet(32));
     const symbol_exprt lhs3("lhs3", unsignedbv_typet(32));
-    code_typet fun_type(
+    const code_typet fun_type(
       {code_typet::parametert(length_type()),
        code_typet::parametert(pointer_type(java_char_type())),
        code_typet::parametert(string_type),

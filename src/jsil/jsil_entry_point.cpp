@@ -26,8 +26,7 @@ static void create_initialize(symbol_tablet &symbol_table)
   initialize.base_name = INITIALIZE_FUNCTION;
   initialize.mode="jsil";
 
-  code_typet type({}, empty_typet());
-  initialize.type=type;
+  initialize.type = code_typet({}, empty_typet());
 
   code_blockt init_code;
 
@@ -151,10 +150,8 @@ bool jsil_entry_point(
   // add "main"
   symbolt new_symbol;
 
-  code_typet main_type({}, empty_typet());
-
   new_symbol.name=goto_functionst::entry_point();
-  new_symbol.type.swap(main_type);
+  new_symbol.type = code_typet({}, empty_typet());
   new_symbol.value.swap(init_code);
 
   if(!symbol_table.insert(std::move(new_symbol)).second)

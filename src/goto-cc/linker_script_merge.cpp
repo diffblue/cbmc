@@ -593,7 +593,7 @@ int linker_script_merget::ls_data2instructions(
   for(const auto &d : data["regions"].array)
   {
     code_function_callt f;
-    code_typet void_t({}, empty_typet());
+    const code_typet void_t({}, empty_typet());
     f.function()=symbol_exprt(CPROVER_PREFIX "allocated_memory", void_t);
     unsigned start=safe_string2unsigned(d["start"].value);
     unsigned size=safe_string2unsigned(d["size"].value);
@@ -619,7 +619,7 @@ int linker_script_merget::ls_data2instructions(
     sym.name=CPROVER_PREFIX "allocated_memory";
     sym.pretty_name=CPROVER_PREFIX "allocated_memory";
     sym.is_lvalue=sym.is_static_lifetime=true;
-    code_typet void_t({}, empty_typet());
+    const code_typet void_t({}, empty_typet());
     sym.type=void_t;
     symbol_table.add(sym);
   }

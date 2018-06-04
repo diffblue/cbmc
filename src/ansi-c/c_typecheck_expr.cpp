@@ -450,7 +450,7 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   typet arg_type=expr.type();
   typecheck_type(arg_type);
 
-  code_typet new_type(
+  const code_typet new_type(
     {code_typet::parametert(pointer_type(void_type()))}, std::move(arg_type));
 
   assert(expr.operands().size()==1);
