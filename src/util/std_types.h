@@ -760,6 +760,10 @@ class code_typet:public typet
 public:
   code_typet():typet(ID_code)
   {
+    // make sure these properties are always there to avoid problems
+    // with irept comparisons
+    add(ID_parameters);
+    add_type(ID_return_type);
   }
 
   // used to be argumentt -- now uses standard terminology
