@@ -58,9 +58,11 @@ void goto_symext::symex_goto(statet &state)
   if(!forward) // backwards?
   {
     // is it label: goto label; or while(cond); - popular in SV-COMP
-    if(goto_target==state.source.pc ||
-       (instruction.incoming_edges.size()==1 &&
-        *instruction.incoming_edges.begin()==goto_target))
+    if(
+      self_loops_to_assumptions &&
+      (goto_target == state.source.pc ||
+       (instruction.incoming_edges.size() == 1 &&
+        *instruction.incoming_edges.begin() == goto_target)))
     {
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto

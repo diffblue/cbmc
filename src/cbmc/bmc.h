@@ -84,6 +84,8 @@ public:
     symex.constant_propagation=options.get_bool_option("propagation");
     symex.record_coverage=
       !options.get_option("symex-coverage-report").empty();
+    symex.self_loops_to_assumptions =
+      options.get_bool_option("self-loops-to-assumptions");
   }
 
   virtual resultt run(const goto_functionst &goto_functions)
@@ -292,6 +294,7 @@ private:
   "(unwinding-assertions)"                                                     \
   "(no-unwinding-assertions)"                                                  \
   "(no-pretty-names)"                                                          \
+  "(no-self-loops-to-assumptions)"                                             \
   "(partial-loops)"                                                            \
   "(paths):"                                                                   \
   "(show-symex-strategies)"                                                    \
@@ -315,6 +318,8 @@ private:
   " --unwinding-assertions       generate unwinding assertions (cannot be\n"   \
   "                              used with --cover or --partial-loops)\n"      \
   " --partial-loops              permit paths with partial loops\n"            \
+  " --no-self-loops-to-assumptions\n"                                          \
+  "                              do not simplify while(1){} to assume(0)\n"    \
   " --no-pretty-names            do not simplify identifiers\n"                \
   " --graphml-witness filename   write the witness in GraphML format to "      \
   "filename\n" // NOLINT(*)

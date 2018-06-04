@@ -152,6 +152,11 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("propagation", true);
 
+  // transform self loops to assumptions
+  options.set_option(
+    "self-loops-to-assumptions",
+    !cmdline.isset("no-self-loops-to-assumptions"));
+
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
