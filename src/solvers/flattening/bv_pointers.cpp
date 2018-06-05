@@ -348,10 +348,18 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
         CHECK_RETURN(bv.size()==bits);
 
         typet pointer_sub_type=it->type().subtype();
+
         if(pointer_sub_type.id()==ID_empty)
-          pointer_sub_type=char_type();
-        size=pointer_offset_size(pointer_sub_type, ns);
-        CHECK_RETURN(size>0);
+        {
+          // This is a gcc extension.
+          // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
+          size = 1;
+        }
+        else
+        {
+          size = pointer_offset_size(pointer_sub_type, ns);
+          CHECK_RETURN(size > 0);
+        }
       }
     }
 
@@ -423,10 +431,19 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     bv=convert_bv(expr.op0());
 
     typet pointer_sub_type=expr.op0().type().subtype();
+    mp_integer element_size;
+
     if(pointer_sub_type.id()==ID_empty)
-      pointer_sub_type=char_type();
-    mp_integer element_size=pointer_offset_size(pointer_sub_type, ns);
-    DATA_INVARIANT(element_size>0, "object size expected to be positive");
+    {
+      // This is a gcc extension.
+      // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
+      element_size = 1;
+    }
+    else
+    {
+      element_size = pointer_offset_size(pointer_sub_type, ns);
+      DATA_INVARIANT(element_size > 0, "object size expected to be positive");
+    }
 
     offset_arithmetic(bv, element_size, neg_op1);
 
@@ -488,10 +505,19 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     bvt bv=bv_utils.sub(op0, op1);
 
     typet pointer_sub_type=expr.op0().type().subtype();
+    mp_integer element_size;
+
     if(pointer_sub_type.id()==ID_empty)
-      pointer_sub_type=char_type();
-    mp_integer element_size=pointer_offset_size(pointer_sub_type, ns);
-    DATA_INVARIANT(element_size>0, "object size expected to be positive");
+    {
+      // This is a gcc extension.
+      // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
+      element_size = 1;
+    }
+    else
+    {
+      element_size = pointer_offset_size(pointer_sub_type, ns);
+      DATA_INVARIANT(element_size > 0, "object size expected to be positive");
+    }
 
     if(element_size!=1)
     {
