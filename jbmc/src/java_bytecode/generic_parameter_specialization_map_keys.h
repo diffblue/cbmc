@@ -36,9 +36,7 @@ public:
       auto &val = generic_parameter_specialization_map.find(key)->second;
       val.pop_back();
       if(val.empty())
-      {
         generic_parameter_specialization_map.erase(key);
-      }
     }
   }
 

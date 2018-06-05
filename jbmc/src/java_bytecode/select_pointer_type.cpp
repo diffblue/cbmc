@@ -73,6 +73,16 @@ pointer_typet select_pointer_typet::specialize_generics(
     const java_generic_parametert &parameter =
       to_java_generic_parameter(pointer_type);
     const irep_idt &parameter_name = parameter.get_name();
+
+    // avoid infinite recursion by looking at each generic argument from
+    // previous assignments
+    if(visited_nodes.find(parameter_name) != visited_nodes.end())
+    {
+      const optionalt<pointer_typet> result = get_recursively_instantiated_type(
+        parameter_name, generic_parameter_specialization_map);
+      return result.has_value() ? result.value() : pointer_type;
+    }
+
     if(generic_parameter_specialization_map.count(parameter_name) == 0)
     {
       // this means that the generic pointer_type has not been specialized
@@ -84,21 +94,13 @@ pointer_typet select_pointer_typet::specialize_generics(
     const pointer_typet &type =
       generic_parameter_specialization_map.find(parameter_name)->second.back();
 
-    // avoid infinite recursion
-    if(visited_nodes.find(parameter_name) != visited_nodes.end())
-    {
-      optionalt<pointer_typet> result = get_recursively_instantiated_type(
-        parameter_name, generic_parameter_specialization_map);
-      return result.has_value() ? result.value() : pointer_type;
-    }
-
     // generic parameters can be adopted from outer classes or superclasses so
     // we may need to search for the concrete type recursively
     if(!is_java_generic_parameter(type))
       return type;
 
     visited_nodes.insert(parameter_name);
-    auto returned_type = specialize_generics(
+    const auto returned_type = specialize_generics(
       to_java_generic_parameter(type),
       generic_parameter_specialization_map,
       visited_nodes);
@@ -135,7 +137,7 @@ pointer_typet select_pointer_typet::specialize_generics(
 ///   instantiated
 /// \param generic_specialization_map Map of type names to specialization stack
 /// \return The first instantiated type for the generic type or nothing if no
-/// such instantiation exists.
+///   such instantiation exists.
 optionalt<pointer_typet>
 select_pointer_typet::get_recursively_instantiated_type(
   const irep_idt &parameter_name,
@@ -143,12 +145,11 @@ select_pointer_typet::get_recursively_instantiated_type(
     &generic_parameter_specialization_map) const
 {
   generic_parameter_recursion_trackingt visited;
-  size_t depth = 0;
-  const size_t max =
+  const size_t max_depth =
     generic_parameter_specialization_map.find(parameter_name)->second.size();
 
   irep_idt current_parameter = parameter_name;
-  while(depth < max)
+  for(size_t depth = 0; depth < max_depth; depth++)
   {
     const auto retval = get_recursively_instantiated_type(
       current_parameter, generic_parameter_specialization_map, visited, depth);
@@ -162,19 +163,19 @@ select_pointer_typet::get_recursively_instantiated_type(
     const auto &entry =
       generic_parameter_specialization_map.find(current_parameter)
         ->second.back();
-    const java_generic_parametert &gen_param = to_java_generic_parameter(entry);
-    const auto &type_var = gen_param.type_variable();
-    current_parameter = type_var.get_identifier();
-    depth++;
+    current_parameter = to_java_generic_parameter(entry).get_name();
   }
   return {};
 }
 
 /// See get_recursively instantiated_type, the additional parameters just track
-/// the recursion to prevent, visiting the same depth again and specify which
+/// the recursion to prevent visiting the same depth again and specify which
 /// stack depth is analyzed.
 /// \param visited Tracks the visited parameter names
 /// \param depth Stack depth to analyze
+/// \return if this type is not a generic type, it is returned as a valid
+///   instantiation, if nothing can be found at the given depth, en empty optional
+///   is returned
 optionalt<pointer_typet>
 select_pointer_typet::get_recursively_instantiated_type(
   const irep_idt &parameter_name,
@@ -183,12 +184,7 @@ select_pointer_typet::get_recursively_instantiated_type(
   generic_parameter_recursion_trackingt &visited,
   const size_t depth) const
 {
-  // Get the pointed to instantiation type at the desired stack depth.
-  // - if this type is not a generic type, it is returned as a valid
-  //   instantiation
-  // - if nothing can be found at the given depth, an empty optional is returned
-
-  auto val = generic_parameter_specialization_map.find(parameter_name);
+  const auto &val = generic_parameter_specialization_map.find(parameter_name);
   INVARIANT(
     val != generic_parameter_specialization_map.end(),
     "generic parameter must be a key in map");
@@ -204,7 +200,7 @@ select_pointer_typet::get_recursively_instantiated_type(
     return {};
   }
 
-  const size_t index = (replacements.size() - depth) - 1;
+  const size_t index = (replacements.size() - 1) - depth;
   const auto &type = replacements[index];
 
   if(!is_java_generic_parameter(type))
@@ -213,9 +209,8 @@ select_pointer_typet::get_recursively_instantiated_type(
   }
 
   visited.insert(parameter_name);
-  const auto &gen_type = to_java_generic_parameter(type).type_variable();
   const auto inst_val = get_recursively_instantiated_type(
-    gen_type.get_identifier(),
+    to_java_generic_parameter(type).get_name(),
     generic_parameter_specialization_map,
     visited,
     depth);

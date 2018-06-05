@@ -20,7 +20,7 @@ SCENARIO(
     "./java_bytecode/goto_program_generics",
     "MutuallyRecursiveGenerics.f");
 
-  std::string class_prefix = "java::MutuallyRecursiveGenerics";
+  const std::string class_prefix = "java::MutuallyRecursiveGenerics";
 
   REQUIRE(symbol_table.has_symbol(class_prefix));
 
@@ -86,7 +86,7 @@ SCENARIO(
     const std::vector<codet> &entry_point_code =
       require_goto_statements::require_entry_point_statements(symbol_table);
 
-    auto has_key_and_value_field = [&](
+    const auto has_key_and_value_field = [&](
       const irep_idt &field,
       const irep_idt &key_type,
       const irep_idt &val_type) {
@@ -150,7 +150,7 @@ SCENARIO(
         require_goto_statements::require_struct_component_assignment(
           tmp_object_name, {}, "example2", "java::Three", {}, entry_point_code);
 
-      auto has_x_u_e_fields = [&](
+      const auto has_x_e_u_fields = [&](
         const irep_idt &field,
         const irep_idt &x_type,
         const irep_idt &e_type,
@@ -167,7 +167,7 @@ SCENARIO(
         "Object 'example2' has field 'x' of type `Byte`, field `u` of type "
         "`Character` and a field `e` of type `Integer`.")
       {
-        has_x_u_e_fields(
+        has_x_e_u_fields(
           example2_field,
           "java::java.lang.Byte",
           "java::java.lang.Character",
@@ -183,7 +183,7 @@ SCENARIO(
               "java::Three",
               {},
               entry_point_code);
-          has_x_u_e_fields(
+          has_x_e_u_fields(
             rotate_field,
             "java::java.lang.Integer",
             "java::java.lang.Byte",
@@ -199,7 +199,7 @@ SCENARIO(
                 "java::Three",
                 {},
                 entry_point_code);
-            has_x_u_e_fields(
+            has_x_e_u_fields(
               rotate_rec_field,
               "java::java.lang.Character",
               "java::java.lang.Integer",
@@ -215,7 +215,7 @@ SCENARIO(
                 "java::Three",
                 {},
                 entry_point_code);
-            has_x_u_e_fields(
+            has_x_e_u_fields(
               rotate_normal_field,
               "java::java.lang.Integer",
               "java::java.lang.Byte",
@@ -232,7 +232,7 @@ SCENARIO(
               "java::Three",
               {},
               entry_point_code);
-          has_x_u_e_fields(
+          has_x_e_u_fields(
             normal_field,
             "java::java.lang.Byte",
             "java::java.lang.Character",
@@ -247,7 +247,7 @@ SCENARIO(
                 "java::Three",
                 {},
                 entry_point_code);
-            has_x_u_e_fields(
+            has_x_e_u_fields(
               normal_rec_field,
               "java::java.lang.Byte",
               "java::java.lang.Character",
@@ -263,7 +263,7 @@ SCENARIO(
                 "java::Three",
                 {},
                 entry_point_code);
-            has_x_u_e_fields(
+            has_x_e_u_fields(
               normal_rotate_field,
               "java::java.lang.Integer",
               "java::java.lang.Byte",

@@ -32,7 +32,7 @@ class select_pointer_typet
     const size_t) const;
   optionalt<pointer_typet> get_recursively_instantiated_type(
     const irep_idt &parameter_name,
-    const generic_parameter_specialization_mapt &) const;
+    const generic_parameter_specialization_mapt &visited) const;
 
 public:
   virtual ~select_pointer_typet() = default;
@@ -46,7 +46,7 @@ public:
     const pointer_typet &pointer_type,
     const generic_parameter_specialization_mapt
       &generic_parameter_specialization_map,
-    generic_parameter_recursion_trackingt &) const;
+    generic_parameter_recursion_trackingt &visited) const;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_SELECT_POINTER_TYPE_H
