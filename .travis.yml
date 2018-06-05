@@ -100,9 +100,6 @@ jobs:
             - libwww-perl
             - g++-5
             - libubsan0
-            - parallel
-      before_install:
-        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env:
         - COMPILER="ccache /usr/bin/g++-5"
@@ -122,8 +119,6 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      before_install:
-        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       install:
         - ccache -z
         - ccache --max-size=1G
@@ -159,10 +154,7 @@ jobs:
             - clang-3.7
             - libstdc++-5-dev
             - libubsan0
-            - parallel
-            - libc6-dev-i386
       before_install:
-        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
         - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
@@ -185,10 +177,6 @@ jobs:
             - libwww-perl
             - g++-5
             - libubsan0
-            - parallel
-            - libc6-dev-i386
-      before_install:
-        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env:
         - COMPILER="ccache /usr/bin/g++-5"
@@ -237,9 +225,6 @@ jobs:
             - libwww-perl
             - g++-5
             - libubsan0
-            - libc6-dev-i386
-      before_install:
-        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env:
         - NAME="DEBUG"
@@ -290,9 +275,7 @@ jobs:
             - clang-3.7
             - libstdc++-5-dev
             - libubsan0
-            - libc6-dev-i386
       before_install:
-        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
         - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
