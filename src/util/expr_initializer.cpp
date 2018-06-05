@@ -178,7 +178,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
         array_size >= 0, "array should not have negative size");
 
       array_exprt value(array_type);
-      value.operands().resize(integer2unsigned(array_size), tmpval);
+      value.operands().resize(integer2size_t(array_size), tmpval);
       value.add_source_location()=source_location;
       return value;
     }
@@ -210,7 +210,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       vector_size >= 0, "vector should not have negative size");
 
     vector_exprt value(vector_type);
-    value.operands().resize(integer2unsigned(vector_size), tmpval);
+    value.operands().resize(integer2size_t(vector_size), tmpval);
     value.add_source_location()=source_location;
 
     return value;
