@@ -285,9 +285,11 @@ void remove_function_pointerst::remove_function_pointer(
   const exprt &pointer=function.op0();
   remove_const_function_pointerst::functionst functions;
   does_remove_constt const_removal_check(goto_program, ns);
-  if(const_removal_check())
+  const auto does_remove_const = const_removal_check();
+  if(does_remove_const.first)
   {
-    warning() << "Cast from const to non-const pointer found, only worst case"
+    warning().source_location = does_remove_const.second;
+    warning() << "cast from const to non-const pointer found, only worst case"
               << " function pointer removal will be done." << eom;
     found_functions=false;
   }
@@ -341,10 +343,8 @@ void remove_function_pointerst::remove_function_pointer(
       if(t.first=="pthread_mutex_cleanup")
         continue;
 
-      symbol_exprt expr;
-      expr.type()=t.second;
-      expr.set_identifier(t.first);
-        functions.insert(expr);
+      symbol_exprt expr(t.first, t.second);
+      functions.insert(expr);
     }
   }
 
@@ -430,6 +430,25 @@ void remove_function_pointerst::remove_function_pointer(
   statistics().source_location=target->source_location;
   statistics() << "replacing function pointer by "
                << functions.size() << " possible targets" << eom;
+
+  // list the names of functions when verbosity is at debug level
+  conditional_output(
+    debug(),
+    [this, &functions](mstreamt &mstream) {
+      mstream << "targets: ";
+
+      bool first = true;
+      for(const auto &function : functions)
+      {
+        if(!first)
+          mstream << ", ";
+
+        mstream << function.get_identifier();
+        first = false;
+      }
+
+      mstream << eom;
+    });
 }
 
 bool remove_function_pointerst::remove_function_pointers(

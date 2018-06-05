@@ -103,3 +103,21 @@ unsigned messaget::eval_verbosity(
 
   return v;
 }
+
+/// Generate output to \p mstream using \p output_generator if the configured
+/// verbosity is at least as high as that of \p mstream.  Use whenever
+/// generating output involves additional computational effort that should only
+/// be spent when such output will actually be displayed.
+/// \param mstream  Output message stream
+/// \param output_generator  Function generating output
+void messaget::conditional_output(
+  mstreamt &mstream,
+  const std::function<void(mstreamt &)> &output_generator) const
+{
+  if(
+    message_handler &&
+    message_handler->get_verbosity() >= mstream.message_level)
+  {
+    output_generator(mstream);
+  }
+}

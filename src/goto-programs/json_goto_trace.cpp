@@ -84,7 +84,7 @@ void convert_decl(
   if(!json_location.is_null())
     json_assignment["sourceLocation"] = json_location;
 
-  std::string value_string, binary_string, type_string, full_lhs_string;
+  std::string value_string, type_string, full_lhs_string;
   json_objectt full_lhs_value;
 
   DATA_INVARIANT(

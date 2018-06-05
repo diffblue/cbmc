@@ -76,7 +76,7 @@ void convert(
         if(xml_location.name!="")
           xml_assignment.new_element().swap(xml_location);
 
-        std::string value_string, binary_string, type_string,
+        std::string value_string, type_string,
                     full_lhs_string, full_lhs_value_string;
 
         if(step.lhs_object_value.is_not_nil())

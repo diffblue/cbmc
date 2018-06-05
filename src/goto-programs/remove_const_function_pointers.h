@@ -32,7 +32,7 @@ class typecast_exprt;
 class remove_const_function_pointerst:public messaget
 {
 public:
-  typedef std::unordered_set<exprt, irep_hash> functionst;
+  typedef std::unordered_set<symbol_exprt, irep_hash> functionst;
   typedef std::list<exprt> expressionst;
   remove_const_function_pointerst(
     message_handlert &message_handler,

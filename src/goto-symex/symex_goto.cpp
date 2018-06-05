@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/invariant.h>
+#include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
@@ -249,6 +250,14 @@ void goto_symext::symex_goto(statet &state)
 
       guardt guard;
 
+      log.conditional_output(
+        log.debug(),
+        [this, &new_lhs](messaget::mstreamt &mstream) {
+          mstream << "Assignment to " << new_lhs.get_identifier()
+                  << " [" << pointer_offset_bits(new_lhs.type(), ns) << " bits]"
+                  << messaget::eom;
+        });
+
       target.assignment(
         guard.as_expr(),
         new_lhs, new_lhs, guard_symbol_expr,
@@ -472,6 +481,14 @@ void goto_symext::phi_function(
     dest_state.record_events=false;
     dest_state.assignment(new_lhs, rhs, ns, true, true);
     dest_state.record_events=record_events;
+
+    log.conditional_output(
+      log.debug(),
+      [this, &new_lhs](messaget::mstreamt &mstream) {
+        mstream << "Assignment to " << new_lhs.get_identifier()
+                << " [" << pointer_offset_bits(new_lhs.type(), ns) << " bits]"
+                << messaget::eom;
+      });
 
     target.assignment(
       true_exprt(),
