@@ -17,15 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_parser.h"
 
-#include "library/java_core_models.inc"
-
-/// This variable stores the data of the file core-models.jar. The macro
-/// JAVA_CORE_MODELS_SIZE is defined in the header java_core_models.inc, which
-/// gets generated at compile time by running a small utility (converter.cpp) on
-/// actual .jar file. The number of bytes in the variable is
-/// JAVA_CORE_MODELS_SIZE, another macro defined in java_core_models.inc.
-unsigned char java_core_models[] = { JAVA_CORE_MODELS_DATA };
-
 java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
   const irep_idt &class_name)
 {
@@ -135,27 +126,6 @@ java_class_loadert::get_parse_tree(
       get_class_from_jar(class_name, jar_file, *index, class_loader_limit);
     if(parse_tree)
       parse_trees.emplace_back(std::move(*parse_tree));
-  }
-
-  // Then add core models
-  if(use_core_models)
-  {
-    // Add internal jar file. The name is used to load it once only and
-    // reference it later.
-    std::string core_models = "core-models.jar";
-    jar_pool(
-      class_loader_limit, core_models, java_core_models, JAVA_CORE_MODELS_SIZE);
-
-    // This does not read from the jar file but from the jar_filet object we
-    // just created
-    jar_index_optcreft index = read_jar_file(class_loader_limit, core_models);
-    if(index)
-    {
-      optionalt<java_bytecode_parse_treet> parse_tree =
-        get_class_from_jar(class_name, core_models, *index, class_loader_limit);
-      if(parse_tree)
-        parse_trees.emplace_back(std::move(*parse_tree));
-    }
   }
 
   // Then add everything on the class path

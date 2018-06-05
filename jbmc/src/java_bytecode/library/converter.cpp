@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     printf("\n");
   }
 
-  std::cout << "\n#define " << varname <<  "_SIZE " << size << "\n\n";
+  std::cout << "\n#define " << varname << "_SIZE " << size << "\n";
   src.close();
   return 0;
 }

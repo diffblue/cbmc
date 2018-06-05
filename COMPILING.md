@@ -29,14 +29,19 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
    Note that you need g++ version 4.9 or newer.
 
-   To compile JBMC, you additionally need the JDK:
-   On Debian-like distributions, do
+   To compile JBMC, you additionally need the JDK and the java-models-library.
+
+   For the JDK, on Debian-like distributions, do
    ```
    apt-get install openjdk-7-jdk
    ```
    On Red Hat/Fedora or derivates, do
    ```
    yum install java-1.7.0-openjdk-devel
+   ```
+   For the models library, do
+   ```
+   make -C jbmc/src java-models-library-download
    ```
 
 2. As a user, get the CBMC source via

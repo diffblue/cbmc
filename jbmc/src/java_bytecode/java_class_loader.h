@@ -36,9 +36,7 @@ public:
   typedef std::function<std::vector<irep_idt>(const irep_idt &)>
     get_extra_class_refs_functiont;
 
-  // Default constructor does not use core models
-  // for backward compatibility of unit tests
-  java_class_loadert() : use_core_models(true)
+  java_class_loadert()
   {
   }
 
@@ -78,10 +76,6 @@ public:
   void add_jar_file(const std::string &f)
   {
     jar_files.push_back(f);
-  }
-  void set_use_core_models(bool use_core_models)
-  {
-    this->use_core_models = use_core_models;
   }
 
   static std::string file_to_class_name(const std::string &);
@@ -136,9 +130,6 @@ private:
   /// order, to find and load a class, provided its name (see \ref
   /// get_parse_tree).
   std::list<std::string> jar_files;
-
-  /// Indicates that the core models should be loaded
-  bool use_core_models;
 
   /// Classes to be explicitly loaded
   std::vector<irep_idt> java_load_classes;

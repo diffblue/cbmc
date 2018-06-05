@@ -2,13 +2,11 @@
 #javac compiles multiple classes for each source as it will compile dependent sources.
 #Thus we do not allow the make to run concurrently.
 
-SRC = converter.cpp
-
 include ../../config.inc
 include ../../$(CPROVER_DIR)/src/config.inc
 include ../../$(CPROVER_DIR)/src/common
 
-SOURCE_DIR := src
+SOURCE_DIR := src/main/java
 BINARY_DIR := classes
 
 FIND := find
@@ -35,17 +33,11 @@ JARFLAGS := -cf
 core-models.jar: $(ALL_CLASSES)
 	$(JAR) $(JARFLAGS) $@ -C $(BINARY_DIR) .
 
-CLEANFILES = core-models.jar converter$(EXEEXT) java_core_models.inc
+CLEANFILES = core-models.jar
 
-all: java_core_models.inc
+all: core-models.jar
 
 clean: clean_
 
 clean_:
 	$(RM) -Rf $(BINARY_DIR)
-
-converter$(EXEEXT): converter.cpp
-	$(LINKNATIVE)
-
-java_core_models.inc: converter$(EXEEXT) core-models.jar
-	./converter$(EXEEXT) JAVA_CORE_MODELS core-models.jar > $@

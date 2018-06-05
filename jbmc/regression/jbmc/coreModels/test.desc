@@ -1,6 +1,6 @@
 CORE
 test.class
---show-symbol-table
+--show-symbol-table --cp ../../../src/java_bytecode/library/core-models.jar:.
 ^EXIT=0$
 ^SIGNAL=0$
 ^Symbol\s*\.*\: java\:\:org\.cprover\.CProver\.\<clinit\>\:\(\)V$
