@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
 
+#include <unordered_set>
+
 #include <util/message.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -107,5 +109,7 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
   bool include_interfaces);
 
 bool is_non_null_library_global(const irep_idt &);
+
+extern const std::unordered_set<std::string> cprover_methods_to_ignore;
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
