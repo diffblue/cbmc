@@ -17,12 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_index(const index_exprt &expr)
 {
-  if(expr.id()!=ID_index)
-    throw "expected index expression";
-
-  if(expr.operands().size()!=2)
-    throw "index takes two operands";
-
   const exprt &array=expr.array();
   const exprt &index=expr.index();
 

@@ -163,7 +163,7 @@ protected:
   virtual bvt convert_shift(const binary_exprt &expr);
   virtual bvt convert_bitwise(const exprt &expr);
   virtual bvt convert_unary_minus(const unary_exprt &expr);
-  virtual bvt convert_abs(const exprt &expr);
+  virtual bvt convert_abs(const abs_exprt &expr);
   virtual bvt convert_concatenation(const exprt &expr);
   virtual bvt convert_replication(const replication_exprt &expr);
   virtual bvt convert_bv_literals(const exprt &expr);
@@ -250,7 +250,7 @@ protected:
   void post_process_quantifiers();
 
   typedef std::vector<std::size_t> offset_mapt;
-  void build_offset_map(const struct_typet &src, offset_mapt &dest);
+  offset_mapt build_offset_map(const struct_typet &src);
 
   // strings
   numbering<irep_idt> string_numbering;

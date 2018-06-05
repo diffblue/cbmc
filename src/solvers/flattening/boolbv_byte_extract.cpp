@@ -23,16 +23,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt map_bv(const bv_endianness_mapt &map, const bvt &src)
 {
-  assert(map.number_of_bits()==src.size());
-
+  PRECONDITION(map.number_of_bits() == src.size());
   bvt result;
-  result.resize(src.size(), const_literal(false));
+  result.reserve(src.size());
 
   for(std::size_t i=0; i<src.size(); i++)
   {
-    size_t mapped_index=map.map_bit(i);
-    assert(mapped_index<src.size());
-    result[i]=src[mapped_index];
+    const size_t mapped_index = map.map_bit(i);
+    CHECK_RETURN(mapped_index < src.size());
+    result.push_back(src[mapped_index]);
   }
 
   return result;
@@ -40,16 +39,12 @@ bvt map_bv(const bv_endianness_mapt &map, const bvt &src)
 
 bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 {
-  if(expr.operands().size()!=2)
-    throw "byte_extract takes two operands";
-
   // if we extract from an unbounded array, call the flattening code
   if(is_unbounded_array(expr.op().type()))
   {
     try
     {
-      exprt tmp = flatten_byte_extract(expr, ns);
-      return convert_bv(tmp);
+      return convert_bv(flatten_byte_extract(expr, ns));
     }
     catch(const flatten_byte_extract_exceptiont &byte_extract_flatten_exception)
     {
@@ -58,7 +53,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
     }
   }
 
-  std::size_t width=boolbv_width(expr.type());
+  const std::size_t width = boolbv_width(expr.type());
 
   // special treatment for bit-fields and big-endian:
   // we need byte granularity
@@ -105,22 +100,10 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 
   const exprt &op=expr.op();
   const exprt &offset=expr.offset();
-
-  bool little_endian;
-
-  if(expr.id()==ID_byte_extract_little_endian)
-    little_endian=true;
-  else if(expr.id()==ID_byte_extract_big_endian)
-    little_endian=false;
-  else
-  {
-    little_endian=false;
-    assert(false);
-  }
+  const bool little_endian = expr.id() == ID_byte_extract_little_endian;
 
   // first do op0
-
-  bv_endianness_mapt op_map(op.type(), little_endian, ns, boolbv_width);
+  const bv_endianness_mapt op_map(op.type(), little_endian, ns, boolbv_width);
   const bvt op_bv=map_bv(op_map, convert_bv(op));
 
   // do result
