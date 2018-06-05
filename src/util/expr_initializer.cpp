@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "format_expr.h"
 #include "format_type.h"
+#include "invariant.h"
 #include "message.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
@@ -173,12 +174,8 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
         throw 0;
       }
 
-      if(array_size<0)
-      {
-        error().source_location=source_location;
-        error() << "failed to initialize array with negative size" << eom;
-        throw 0;
-      }
+      DATA_INVARIANT(
+        array_size >= 0, "array should not have negative size");
 
       array_exprt value(array_type);
       value.operands().resize(integer2unsigned(array_size), tmpval);
@@ -209,12 +206,8 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       throw 0;
     }
 
-    if(vector_size<0)
-    {
-      error().source_location=source_location;
-      error() << "failed to initialize vector with negative size" << eom;
-      throw 0;
-    }
+    DATA_INVARIANT(
+      vector_size >= 0, "vector should not have negative size");
 
     vector_exprt value(vector_type);
     value.operands().resize(integer2unsigned(vector_size), tmpval);
