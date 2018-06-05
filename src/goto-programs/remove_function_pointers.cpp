@@ -434,7 +434,7 @@ void remove_function_pointerst::remove_function_pointer(
   // list the names of functions when verbosity is at debug level
   conditional_output(
     debug(),
-    [this, &functions](mstreamt &mstream) {
+    [&functions](mstreamt &mstream) {
       mstream << "targets: ";
 
       bool first = true;
