@@ -8,13 +8,13 @@
 
 #include <algorithm>
 #include <functional>
-#include <util/message.h>
 #include <util/config.h>
 
 #include <java-testing-utils/require_parse_tree.h>
 
-#include <testing-utils/catch.hpp>
 #include <java_bytecode/java_bytecode_parser.h>
+#include <testing-utils/catch.hpp>
+#include <testing-utils/message.h>
 
 #include <java_bytecode/java_bytecode_parse_tree.h>
 #include <java_bytecode/java_types.h>
@@ -29,14 +29,13 @@ SCENARIO(
 {
   // NOLINTNEXTLINE(whitespace/braces)
   run_test_with_compilers([](const std::string &compiler) {
-    null_message_handlert message_handler;
     GIVEN(
       "A class with a static lambda variables from " + compiler + " compiler.")
     {
       optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
         "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
           compiler + "_classes/StaticLambdas.class",
-        message_handler);
+        null_message_handler);
       WHEN("Parsing that class")
       {
         REQUIRE(parse_tree);
@@ -341,13 +340,12 @@ SCENARIO(
 {
   run_test_with_compilers(
     [](const std::string &compiler) { // NOLINT(whitespace/braces)
-      null_message_handlert message_handler;
       GIVEN("A method with local lambdas from " + compiler + " compiler.")
       {
         optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
           "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
             compiler + "_classes/LocalLambdas.class",
-          message_handler);
+          null_message_handler);
         WHEN("Parsing that class")
         {
           REQUIRE(parse_tree);
@@ -648,7 +646,6 @@ SCENARIO(
 {
   run_test_with_compilers(
     [](const std::string &compiler) { // NOLINT(whitespace/braces)
-      null_message_handlert message_handler;
       GIVEN(
         "A class that has lambdas as member variables from " + compiler +
         " compiler.")
@@ -656,7 +653,7 @@ SCENARIO(
         optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
           "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
             compiler + "_classes/MemberLambdas.class",
-          message_handler);
+          null_message_handler);
         WHEN("Parsing that class")
         {
           REQUIRE(parse_tree);
@@ -982,7 +979,6 @@ SCENARIO(
 {
   run_test_with_compilers(
     [](const std::string &compiler) { // NOLINT(whitespace/braces)
-      null_message_handlert message_handler;
       GIVEN(
         "An inner class with member variables as lambdas that capture outer "
         "variables from " +
@@ -991,7 +987,7 @@ SCENARIO(
         optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
           "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
             compiler + "_classes/OuterMemberLambdas$Inner.class",
-          message_handler);
+          null_message_handler);
         WHEN("Parsing that class")
         {
           REQUIRE(parse_tree);

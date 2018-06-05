@@ -8,10 +8,10 @@
 
 #include <json/json_parser.h>
 #include <testing-utils/catch.hpp>
+#include <testing-utils/message.h>
 
 SCENARIO("Loading JSON files")
 {
-  null_message_handlert message_handler;
   GIVEN("A invalid JSON file and a valid JSON file")
   {
     const std::string valid_json_path = "./json/valid.json";
@@ -21,7 +21,7 @@ SCENARIO("Loading JSON files")
     {
       jsont invalid_json;
       const auto invalid_parse_error =
-        parse_json(invalid_json_path, message_handler, invalid_json);
+        parse_json(invalid_json_path, null_message_handler, invalid_json);
       THEN("An error state should be returned")
       {
         REQUIRE(invalid_parse_error);
@@ -30,7 +30,7 @@ SCENARIO("Loading JSON files")
         {
           jsont valid_json;
           const auto valid_parse_error =
-            parse_json(valid_json_path, message_handler, valid_json);
+            parse_json(valid_json_path, null_message_handler, valid_json);
           THEN("The JSON file should be parsed correctly")
           {
             REQUIRE_FALSE(valid_parse_error);
@@ -45,7 +45,7 @@ SCENARIO("Loading JSON files")
     {
       jsont valid_json;
       const auto valid_parse_error =
-        parse_json(valid_json_path, message_handler, valid_json);
+        parse_json(valid_json_path, null_message_handler, valid_json);
       THEN("The JSON file should be parsed correctly")
       {
         REQUIRE_FALSE(valid_parse_error);
@@ -56,7 +56,7 @@ SCENARIO("Loading JSON files")
         {
           jsont invalid_json;
           const auto invalid_parse_error =
-            parse_json(invalid_json_path, message_handler, invalid_json);
+            parse_json(invalid_json_path, null_message_handler, invalid_json);
           THEN("An error state should be returned")
           {
             REQUIRE(invalid_parse_error);

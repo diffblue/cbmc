@@ -8,9 +8,10 @@
 
 #include "load_java_class.h"
 
-#include <testing-utils/free_form_cmdline.h>
-#include <testing-utils/catch.hpp>
 #include <iostream>
+#include <testing-utils/catch.hpp>
+#include <testing-utils/free_form_cmdline.h>
+#include <testing-utils/message.h>
 
 #include <util/config.h>
 #include <util/suffix.h>
@@ -94,13 +95,16 @@ symbol_tablet load_java_class(
   std::string filename=java_class_name + ".class";
 
   // Construct a lazy_goto_modelt
-  null_message_handlert message_handler;
   lazy_goto_modelt lazy_goto_model(
-    [] (goto_model_functiont &function, const abstract_goto_modelt &model) { }, // NOLINT (*)
-    [] (goto_modelt &goto_model) { return false; }, // NOLINT (*)
-    [] (const irep_idt &name) { return false; },
-    [] (const irep_idt &function_name, symbol_table_baset &symbol_table, goto_functiont &function, bool body_available) { return false; }, // NOLINT (*)
-    message_handler);
+    [](goto_model_functiont &function, const abstract_goto_modelt &model) {},
+    [](goto_modelt &goto_model) { return false; },
+    [](const irep_idt &name) { return false; },
+    [](
+      const irep_idt &function_name,
+      symbol_table_baset &symbol_table,
+      goto_functiont &function,
+      bool body_available) { return false; },
+    null_message_handler);
 
   // Configure the path loading
   config.java.classpath.clear();
@@ -115,7 +119,7 @@ symbol_tablet load_java_class(
   std::istringstream java_code_stream("ignored");
 
   // Configure the language, load the class files
-  language.set_message_handler(message_handler);
+  language.set_message_handler(null_message_handler);
   language.get_language_options(command_line);
   language.parse(java_code_stream, filename);
   language.typecheck(lazy_goto_model.symbol_table, "");

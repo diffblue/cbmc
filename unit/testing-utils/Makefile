@@ -1,6 +1,7 @@
 SRC = \
   c_to_expr.cpp \
   free_form_cmdline.cpp \
+  message.cpp \
   require_expr.cpp \
   require_symbol.cpp \
   run_test_with_compilers.cpp \
