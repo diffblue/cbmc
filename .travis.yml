@@ -155,7 +155,6 @@ jobs:
             - libstdc++-5-dev
             - libubsan0
       before_install:
-        - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
         - COMPILER="ccache /usr/bin/clang++-3.7"
@@ -252,7 +251,6 @@ jobs:
             - libc6-dev-i386
       before_install:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
-        - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
         - COMPILER="ccache /usr/bin/clang++-3.7"
@@ -276,7 +274,6 @@ jobs:
             - libstdc++-5-dev
             - libubsan0
       before_install:
-        - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
         - NAME="DEBUG"
