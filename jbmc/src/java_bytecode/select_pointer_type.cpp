@@ -135,7 +135,8 @@ pointer_typet select_pointer_typet::specialize_generics(
 /// instantiation due to a loop in its recursion.
 /// \param parameter_name The name of the generic parameter type we want to have
 ///   instantiated
-/// \param generic_specialization_map Map of type names to specialization stack
+/// \param generic_parameter_specialization_map Map of type names to
+///   specialization stack
 /// \return The first instantiated type for the generic type or nothing if no
 ///   such instantiation exists.
 optionalt<pointer_typet>
@@ -171,11 +172,15 @@ select_pointer_typet::get_recursively_instantiated_type(
 /// See get_recursively instantiated_type, the additional parameters just track
 /// the recursion to prevent visiting the same depth again and specify which
 /// stack depth is analyzed.
+/// \param parameter_name The name of the generic parameter type we want to have
+///   instantiated
+/// \param generic_parameter_specialization_map Map of type names to
+/// specialization stack
 /// \param visited Tracks the visited parameter names
 /// \param depth Stack depth to analyze
 /// \return if this type is not a generic type, it is returned as a valid
-///   instantiation, if nothing can be found at the given depth, en empty optional
-///   is returned
+///   instantiation, if nothing can be found at the given depth, en empty
+///   optional is returned
 optionalt<pointer_typet>
 select_pointer_typet::get_recursively_instantiated_type(
   const irep_idt &parameter_name,
