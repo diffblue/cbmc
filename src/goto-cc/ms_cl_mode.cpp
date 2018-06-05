@@ -77,6 +77,30 @@ int ms_cl_modet::doit()
   else
     compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
 
+  if(cmdline.isset("std"))
+  {
+    const std::string std_string = cmdline.get_value("std");
+
+    if(
+      std_string == ":c++14" || std_string == "=c++14" ||
+      std_string == ":c++17" || std_string == "=c++17" ||
+      std_string == ":c++latest" || std_string == "=c++latest")
+    {
+      // we don't have any newer version at the moment
+      config.cpp.set_cpp14();
+    }
+    else if(std_string == ":c++11" || std_string == "=c++11")
+    {
+      // this isn't really a Visual Studio variant, we just do this for GCC
+      // command-line compatibility
+      config.cpp.set_cpp11();
+    }
+    else
+      warning() << "unknown language standard " << std_string << eom;
+  }
+  else
+    config.cpp.set_cpp14();
+
   compiler.echo_file_name=true;
 
   if(cmdline.isset("Fo"))
