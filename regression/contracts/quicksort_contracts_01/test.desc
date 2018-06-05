@@ -1,0 +1,9 @@
+KNOWNBUG
+main.c
+--check-code-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Loop invariants are overzealous in deciding what counts as side effects.

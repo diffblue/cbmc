@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+--check-code-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+CBMC currently does not support assumptions about pointers in the general way
+that other assumptions are supported.
