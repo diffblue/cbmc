@@ -15,14 +15,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
+#include <util/optional.h>
+#include <util/parsable_string.h>
 #include <util/parser.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
-#include <util/optional.h>
 
 #include "bytecode_info.h"
 #include "java_bytecode_parse_tree.h"
+#include "java_type_signature_parser.h"
 #include "java_string_literal_expr.h"
 #include "java_types.h"
 
@@ -35,6 +37,7 @@ public:
   }
 
   bool parse() override;
+  optionalt<java_class_type_signaturet> class_sig;
 
   struct pool_entryt
   {
@@ -82,9 +85,20 @@ private:
     return pool_entry(index).expr;
   }
 
-  const typet type_entry(u2 index)
+  typet value_type_entry(u2 index)
   {
-    return *java_type_from_string(id2string(pool_entry(index).s));
+    PRECONDITION(class_sig);
+    return java_value_type_signaturet::parse_single_value_type(
+        id2string(pool_entry(index).s), class_sig->type_parameter_map)
+      ->get_type("java::" + id2string(parse_tree.parsed_class.name));
+  }
+
+  typet method_type_entry(u2 index)
+  {
+    PRECONDITION(class_sig);
+    return java_method_type_signaturet(
+        id2string(pool_entry(index).s), class_sig->type_parameter_map)
+      .get_type("java::" + id2string(parse_tree.parsed_class.name));
   }
 
   void rClassFile();
@@ -394,6 +408,12 @@ bool java_bytecode_parsert::parse()
     return true;
   }
 
+  catch(const parse_exceptiont &parse_error)
+  {
+    error() << "Parsing error: " << parse_error.what() << eom;
+    return true;
+  }
+
   catch(...)
   {
     error() << "parsing error" << eom;
@@ -474,14 +494,32 @@ void java_bytecode_parsert::rClassFile()
 
   // count elements of enum
   if(parsed_class.is_enum)
-    for(fieldt &field : parse_tree.parsed_class.fields)
+    for(fieldt &field : parsed_class.fields)
       if(field.is_enum)
-        parse_tree.parsed_class.enum_elements++;
+        parsed_class.enum_elements++;
 
   const u2 attributes_count = read<u2>();
 
   for(std::size_t j=0; j<attributes_count; j++)
     rclass_attribute();
+
+  try
+  {
+    std::string signature;
+    if(parsed_class.signature)
+      signature = *parsed_class.signature;
+    else
+    {
+      signature = "L" + id2string(parsed_class.super_class) + ";";
+      for(irep_idt implements : parsed_class.implements)
+        signature += "L" + id2string(implements) + ";";
+    }
+    // TODO: Load the parameter map of the outer class first
+    class_sig = java_class_type_signaturet(signature, {});
+  }
+  catch(unsupported_java_class_signature_exceptiont &)
+  {
+  }
 
   get_class_refs();
 
@@ -491,6 +529,9 @@ void java_bytecode_parsert::rClassFile()
 /// Get the class references for the benefit of a dependency analysis.
 void java_bytecode_parsert::get_class_refs()
 {
+  PRECONDITION(class_sig);
+  class_sig->collect_class_dependencies(parse_tree.class_refs);
+
   for(const auto &c : constant_pool)
   {
     switch(c.tag)
@@ -510,27 +551,28 @@ void java_bytecode_parsert::get_class_refs()
 
   get_annotation_class_refs(parse_tree.parsed_class.annotations);
 
+  // Add generic type args to class refs as dependencies, same below for
+  // method types and entries from the local variable type table
   for(const auto &field : parse_tree.parsed_class.fields)
   {
     get_annotation_class_refs(field.annotations);
 
+    bool gathered = false;
     if(field.signature.has_value())
     {
-      typet field_type = *java_type_from_string_with_exception(
-        field.descriptor,
-        field.signature,
-        "java::" + id2string(parse_tree.parsed_class.name));
-
-      // add generic type args to class refs as dependencies, same below for
-      // method types and entries from the local variable type table
-      get_dependencies_from_generic_parameters(
-        field_type, parse_tree.class_refs);
-      get_class_refs_rec(field_type);
+      try
+      {
+        java_value_type_signaturet::parse_single_value_type(
+            field.signature.value(), class_sig->type_parameter_map)
+          ->collect_class_dependencies(parse_tree.class_refs);
+        gathered = true;
+      }
+      catch(unsupported_java_class_signature_exceptiont &)
+      {
+      }
     }
-    else
-    {
+    if(!gathered)
       get_class_refs_rec(*java_type_from_string(field.descriptor));
-    }
   }
 
   for(const auto &method : parse_tree.parsed_class.methods)
@@ -539,37 +581,46 @@ void java_bytecode_parsert::get_class_refs()
     for(const auto &parameter_annotations : method.parameter_annotations)
       get_annotation_class_refs(parameter_annotations);
 
+    bool gathered_from_method = false;
     if(method.signature.has_value())
     {
-      typet method_type = *java_type_from_string_with_exception(
-        method.descriptor,
-        method.signature,
-        "java::" + id2string(parse_tree.parsed_class.name));
-      get_dependencies_from_generic_parameters(
-        method_type, parse_tree.class_refs);
-      get_class_refs_rec(method_type);
+      try
+      {
+        java_method_type_signaturet method_sig {
+          method.signature.value(),
+          class_sig->type_parameter_map
+        };
+        method_sig.collect_class_dependencies(parse_tree.class_refs);
+        for(const auto &var : method.local_variable_table)
+        {
+          bool gathered_from_var = false;
+          if(var.signature.has_value())
+          {
+            try
+            {
+              java_value_type_signaturet::parse_single_value_type(
+                  var.signature.value(), method_sig.type_parameter_map)
+                ->collect_class_dependencies(parse_tree.class_refs);
+              gathered_from_var = true;
+            }
+            catch(unsupported_java_class_signature_exceptiont &)
+            {
+            }
+          }
+          if(!gathered_from_var)
+            get_class_refs_rec(*java_type_from_string(var.descriptor));
+        }
+        gathered_from_method = true;
+      }
+      catch(unsupported_java_class_signature_exceptiont &)
+      {
+      }
     }
-    else
+    if(!gathered_from_method)
     {
       get_class_refs_rec(*java_type_from_string(method.descriptor));
-    }
-
-    for(const auto &var : method.local_variable_table)
-    {
-      if(var.signature.has_value())
-      {
-        typet var_type = *java_type_from_string_with_exception(
-          var.descriptor,
-          var.signature,
-          "java::" + id2string(parse_tree.parsed_class.name));
-        get_dependencies_from_generic_parameters(
-          var_type, parse_tree.class_refs);
-        get_class_refs_rec(var_type);
-      }
-      else
-      {
+      for(const auto &var : method.local_variable_table)
         get_class_refs_rec(*java_type_from_string(var.descriptor));
-      }
     }
   }
 }
@@ -733,7 +784,7 @@ void java_bytecode_parsert::rconstant_pool()
         const pool_entryt &name_entry=pool_entry(nameandtype_entry.ref1);
         const pool_entryt &class_entry = pool_entry(entry.ref1);
         const pool_entryt &class_name_entry=pool_entry(class_entry.ref1);
-        typet type=type_entry(nameandtype_entry.ref2);
+        typet type = value_type_entry(nameandtype_entry.ref2);
 
         auto class_tag = java_classname(id2string(class_name_entry.s));
 
@@ -750,7 +801,7 @@ void java_bytecode_parsert::rconstant_pool()
         const pool_entryt &name_entry=pool_entry(nameandtype_entry.ref1);
         const pool_entryt &class_entry = pool_entry(entry.ref1);
         const pool_entryt &class_name_entry=pool_entry(class_entry.ref1);
-        typet type=type_entry(nameandtype_entry.ref2);
+        typet type = method_type_entry(nameandtype_entry.ref2);
 
         auto class_tag = java_classname(id2string(class_name_entry.s));
 
@@ -826,7 +877,7 @@ void java_bytecode_parsert::rconstant_pool()
       {
         entry.expr.id("invokedynamic");
         const pool_entryt &nameandtype_entry = pool_entry(entry.ref2);
-        typet type=type_entry(nameandtype_entry.ref2);
+        typet type = method_type_entry(nameandtype_entry.ref2);
         type.set(ID_java_lambda_method_handle_index, entry.ref1);
         entry.expr.type() = type;
       }
@@ -1502,7 +1553,7 @@ void java_bytecode_parsert::rRuntimeAnnotation(
   annotationt &annotation)
 {
   const u2 type_index = read<u2>();
-  annotation.type=type_entry(type_index);
+  annotation.type = value_type_entry(type_index);
   relement_value_pairs(annotation.element_value_pairs);
 }
 
@@ -1723,10 +1774,7 @@ void java_bytecode_parsert::rclass_attribute()
   else if(attribute_name=="Signature")
   {
     const u2 signature_index = read<u2>();
-    parsed_class.signature=id2string(pool_entry(signature_index).s);
-    get_dependencies_from_generic_parameters(
-      parsed_class.signature.value(),
-      parse_tree.class_refs);
+    parsed_class.signature = id2string(pool_entry(signature_index).s);
   }
   else if(attribute_name=="RuntimeInvisibleAnnotations" ||
           attribute_name=="RuntimeVisibleAnnotations")

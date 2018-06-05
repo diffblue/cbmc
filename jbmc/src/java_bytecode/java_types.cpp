@@ -579,15 +579,11 @@ optionalt<typet> java_type_from_string(
     {
       // The method signature can optionally have a collection of formal
       // type parameters (e.g. on generic methods on non-generic classes
-      // or generic static methods). For now we skip over this part of the
-      // signature and continue parsing the rest of the signature as normal
+      // or generic static methods).
       // So for example, the following java method:
-      // static void <T, U> foo(T t, U u, int x);
+      // static void <T, U extends V> foo(T t, U u, int x);
       // Would have a signature that looks like:
-      // <T:Ljava/lang/Object;U:Ljava/lang/Object;>(TT;TU;I)V
-      // So we skip all inside the angle brackets and parse the rest of the
-      // string:
-      // (TT;TU;I)V
+      // <T:Ljava/lang/Object;U:LV;>(TT;TU;I)V
       size_t closing_generic=find_closing_delimiter(src, 0, '<', '>');
       if(closing_generic==std::string::npos)
       {
@@ -937,96 +933,6 @@ get_all_generic_parameters(const typet &type)
       generic_class.generic_types().end());
   }
   return generic_parameters;
-}
-
-void get_dependencies_from_generic_parameters_rec(
-  const typet &t,
-  std::set<irep_idt> &refs)
-{
-  // Java generic type that holds different types in its type arguments
-  if(is_java_generic_type(t))
-  {
-    for(const auto type_arg : to_java_generic_type(t).generic_type_arguments())
-      get_dependencies_from_generic_parameters_rec(type_arg, refs);
-  }
-
-  // Java reference type
-  else if(t.id() == ID_pointer)
-  {
-    get_dependencies_from_generic_parameters_rec(t.subtype(), refs);
-  }
-
-  // method type with parameters and return value
-  else if(t.id() == ID_code)
-  {
-    const java_method_typet &c = to_java_method_type(t);
-    get_dependencies_from_generic_parameters_rec(c.return_type(), refs);
-    for(const auto &param : c.parameters())
-      get_dependencies_from_generic_parameters_rec(param.type(), refs);
-  }
-
-  // struct tag
-  else if(t.id() == ID_struct_tag)
-  {
-    const auto &struct_tag_type = to_struct_tag_type(t);
-    const irep_idt class_name(struct_tag_type.get_identifier());
-    if(is_java_array_tag(class_name))
-    {
-      get_dependencies_from_generic_parameters(
-        java_array_element_type(struct_tag_type), refs);
-    }
-    else
-      refs.insert(strip_java_namespace_prefix(class_name));
-  }
-}
-
-/// Collect information about generic type parameters from a given
-/// signature. This is used to get information about class dependencies that
-/// must be loaded but only appear as generic type argument, not as a field
-/// reference.
-/// \param signature: the string representation of the signature to analyze
-/// \param [out] refs: the set to insert the names of the found dependencies
-void get_dependencies_from_generic_parameters(
-  const std::string &signature,
-  std::set<irep_idt> &refs)
-{
-  try
-  {
-    // class signature with bounds
-    if(signature[0] == '<')
-    {
-      const std::vector<typet> types = java_generic_type_from_string(
-        erase_type_arguments(signature), signature);
-
-      for(const auto &t : types)
-        get_dependencies_from_generic_parameters_rec(t, refs);
-    }
-
-    // class signature without bounds and without wildcards
-    else if(signature.find('*') == std::string::npos)
-    {
-      auto type_from_string =
-        java_type_from_string(signature, erase_type_arguments(signature));
-      get_dependencies_from_generic_parameters_rec(*type_from_string, refs);
-    }
-  }
-  catch(unsupported_java_class_signature_exceptiont &)
-  {
-    // skip for now, if we cannot parse it, we cannot detect which additional
-    // classes should be loaded as dependencies
-  }
-}
-
-/// Collect information about generic type parameters from a given type. This is
-/// used to get information about class dependencies that must be loaded but
-/// only appear as generic type argument, not as a field reference.
-/// \param t: the type to analyze
-/// \param [out] refs: the set to insert the names of the found dependencies
-void get_dependencies_from_generic_parameters(
-  const typet &t,
-  std::set<irep_idt> &refs)
-{
-  get_dependencies_from_generic_parameters_rec(t, refs);
 }
 
 /// Construct a generic symbol type by extending the symbol type \p type with
