@@ -42,7 +42,7 @@ install:
      & 7z x minisat2_2.2.1.orig.tar.gz
      &7z x minisat2_2.2.1.orig.tar
     }
-    if (!(Test-Path jml)) {
+    if (!(Test-Path java-models-library-master\.gitignore)) {
      & appveyor downloadfile https://github.com/diffblue/java-models-library/archive/master.zip -FileName jml.zip
      & 7z x jml.zip
     }
