@@ -935,26 +935,30 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
     throw 0;
   }
 
+  exprt new_expr;
+
   if(type.id()==ID_c_bit_field)
   {
     err_location(expr);
     error() << "sizeof cannot be applied to bit fields" << eom;
     throw 0;
   }
-
-  if(type.id()==ID_empty &&
-     expr.operands().size()==1 &&
-     expr.op0().id()==ID_dereference &&
-     expr.op0().op0().type()==pointer_type(void_type()))
-    type=char_type();
-
-  exprt new_expr=size_of_expr(type, *this);
-
-  if(new_expr.is_nil())
+  else if(type.id() == ID_empty)
   {
-    err_location(expr);
-    error() << "type has no size: " << to_string(type) << eom;
-    throw 0;
+    // This is a gcc extension.
+    // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
+    new_expr = size_of_expr(char_type(), *this);
+  }
+  else
+  {
+    new_expr = size_of_expr(type, *this);
+
+    if(new_expr.is_nil())
+    {
+      err_location(expr);
+      error() << "type has no size: " << to_string(type) << eom;
+      throw 0;
+    }
   }
 
   new_expr.swap(expr);
