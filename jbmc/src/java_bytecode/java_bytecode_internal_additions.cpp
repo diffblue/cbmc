@@ -15,8 +15,36 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/c_types.h>
 
+#include "java_types.h"
+
 void java_internal_additions(symbol_table_baset &dest)
 {
+  // add monitorenter
+
+  {
+    code_typet type(
+      {code_typet::parametert(java_lang_object_type())}, void_typet());
+    symbolt symbol;
+    symbol.base_name = "monitorenter";
+    symbol.name = "java::monitorenter";
+    symbol.type = type;
+    symbol.mode = ID_java;
+    dest.add(symbol);
+  }
+
+  // add monitorexit
+
+  {
+    code_typet type(
+      {code_typet::parametert(java_lang_object_type())}, void_typet());
+    symbolt symbol;
+    symbol.base_name = "monitorexit";
+    symbol.name = "java::monitorexit";
+    symbol.type = type;
+    symbol.mode = ID_java;
+    dest.add(symbol);
+  }
+
   // add __CPROVER_rounding_mode
 
   {
