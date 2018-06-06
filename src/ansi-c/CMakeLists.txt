@@ -50,7 +50,7 @@ add_custom_command(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_custom_target(library_check
+add_custom_target(c_library_check
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
 )
 

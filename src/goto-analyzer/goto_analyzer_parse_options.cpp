@@ -727,7 +727,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
 
     // add the library
     status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;
-    link_to_library(goto_model, ui_message_handler, add_cprover_library);
+    link_to_library(goto_model, ui_message_handler, add_cprover_c_library);
     #endif
 
     // remove function pointers

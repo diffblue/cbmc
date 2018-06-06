@@ -960,7 +960,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     // add the library
     status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;
-    link_to_library(goto_model, get_message_handler(), add_cprover_library);
+    link_to_library(goto_model, get_message_handler(), add_cprover_c_library);
   }
 
   // now do full inlining, if requested
