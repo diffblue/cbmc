@@ -15,16 +15,20 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/deprecate.h>
 
 /// Add axioms stating that the returned expression is true exactly when the
-/// first string is a prefix of the second one, starting at position offset.
+/// offset is greater or equal to 0 and the first string is a prefix of the
+/// second one, starting at position offset.
 ///
 /// These axioms are:
-///   1. \f$ {\tt isprefix} \Rightarrow |str| \ge |{\tt prefix}|+offset \f$
+///   1. \f$ {\tt isprefix} \Rightarrow {\tt offset_within_bounds}\f$
 ///   2. \f$ \forall 0 \le qvar<|{\tt prefix}|.\ {\tt isprefix}
 ///          \Rightarrow s0[witness+{\tt offset}]=s2[witness] \f$
-///   3. \f$ !{\tt isprefix} \Rightarrow |{\tt str}|<|{\tt prefix}|+{\tt offset}
+///   3. \f$ (\lnot {\tt isprefix} \Rightarrow
+///          \lnot {\tt offset_within_bounds}
 ///          \lor (0 \le witness<|{\tt prefix}|
-///        \land {\tt str}[witness+{\tt offset}] \ne {\tt prefix}[witness])\f$
-///
+///          \land {\tt str}[witness+{\tt offset}] \ne {\tt prefix}[witness])\f$
+/// where  \f$ {\tt offset_within_bounds} \f$ is
+///    \f$ offset \ge 0 \land offset < |str| \land
+///        |str| - |{\tt prefix}| \ge offset \f$
 /// \param prefix: an array of characters
 /// \param str: an array of characters
 /// \param offset: an integer
@@ -34,34 +38,39 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   const array_string_exprt &str,
   const exprt &offset)
 {
-  symbol_exprt isprefix=fresh_boolean("isprefix");
-  const typet &index_type=str.length().type();
+  const symbol_exprt isprefix = fresh_boolean("isprefix");
+  const typet &index_type = str.length().type();
+  const exprt offset_within_bounds = and_exprt(
+    binary_relation_exprt(offset, ID_ge, from_integer(0, offset.type())),
+    binary_relation_exprt(offset, ID_le, str.length()),
+    binary_relation_exprt(
+      minus_exprt(str.length(), offset), ID_ge, prefix.length()));
 
   // Axiom 1.
-  lemmas.push_back(
-    implies_exprt(
-      isprefix, str.axiom_for_length_ge(plus_exprt(prefix.length(), offset))));
+  lemmas.push_back(implies_exprt(isprefix, offset_within_bounds));
 
-  symbol_exprt qvar=fresh_univ_index("QA_isprefix", index_type);
-  string_constraintt a2(
-    qvar,
-    prefix.length(),
-    implies_exprt(
-      isprefix, equal_exprt(str[plus_exprt(qvar, offset)], prefix[qvar])));
-  constraints.push_back(a2);
+  // Axiom 2.
+  constraints.push_back([&] {
+    const symbol_exprt qvar = fresh_univ_index("QA_isprefix", index_type);
+    const exprt body = implies_exprt(
+      isprefix, equal_exprt(str[plus_exprt(qvar, offset)], prefix[qvar]));
+    return string_constraintt(qvar, prefix.length(), body);
+  }());
 
-  symbol_exprt witness=fresh_exist_index("witness_not_isprefix", index_type);
-  and_exprt witness_diff(
-    axiom_for_is_positive_index(witness),
-    and_exprt(
+  // Axiom 3.
+  lemmas.push_back([&] {
+    const exprt witness = fresh_exist_index("witness_not_isprefix", index_type);
+    const exprt strings_differ_at_witness = and_exprt(
+      axiom_for_is_positive_index(witness),
       prefix.axiom_for_length_gt(witness),
-      notequal_exprt(str[plus_exprt(witness, offset)], prefix[witness])));
-  or_exprt s0_notpref_s1(
-    not_exprt(str.axiom_for_length_ge(plus_exprt(prefix.length(), offset))),
-    witness_diff);
+      notequal_exprt(str[plus_exprt(witness, offset)], prefix[witness]));
+    const exprt s1_does_not_start_with_s0 = or_exprt(
+      not_exprt(offset_within_bounds),
+      not_exprt(str.axiom_for_length_ge(plus_exprt(prefix.length(), offset))),
+      strings_differ_at_witness);
+    return implies_exprt(not_exprt(isprefix), s1_does_not_start_with_s0);
+  }());
 
-  implies_exprt a3(not_exprt(isprefix), s0_notpref_s1);
-  lemmas.push_back(a3);
   return isprefix;
 }
 
