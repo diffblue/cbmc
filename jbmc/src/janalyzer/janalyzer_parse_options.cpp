@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
-#include <goto-programs/link_to_library.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>

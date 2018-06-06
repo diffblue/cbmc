@@ -27,7 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/set_properties.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/loop_ids.h>
-#include <goto-programs/link_to_library.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/xml_goto_trace.h>
 
