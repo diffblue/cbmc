@@ -36,11 +36,6 @@ void link_to_library(
   // this needs a fixedpoint, as library functions
   // may depend on other library functions
 
-  messaget message(message_handler);
-
-  message.status() << "Adding CPROVER library ("
-                   << config.ansi_c.arch << ")" << messaget::eom;
-
   std::set<irep_idt> added_functions;
 
   while(true)

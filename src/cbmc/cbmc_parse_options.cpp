@@ -711,6 +711,8 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_asm(goto_model);
 
     // add the library
+    log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+                 << eom;
     link_to_library(goto_model, log.get_message_handler());
 
     if(options.get_bool_option("string-abstraction"))

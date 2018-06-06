@@ -957,6 +957,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       config.ansi_c.defines.push_back("__CPROVER_CUSTOM_BITVECTOR_ANALYSIS");
 
     // add the library
+    status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;
     link_to_library(goto_model, get_message_handler());
   }
 
