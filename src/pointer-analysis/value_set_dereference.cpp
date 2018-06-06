@@ -31,8 +31,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/ssa_expr.h>
 
-#include <ansi-c/c_typecast.h>
-
 // global data, horrible
 unsigned int value_set_dereferencet::invalid_counter=0;
 
@@ -712,13 +710,10 @@ void value_set_dereferencet::bounds_check(
     if(size_expr.is_nil())
       throw "index array operand of wrong type";
 
-    binary_relation_exprt inequality(expr.index(), ID_ge, size_expr);
-
-    if(c_implicit_typecast(
-      inequality.op0(),
-      inequality.op1().type(),
-      ns))
-      throw "index address of wrong type";
+    binary_relation_exprt inequality(
+      typecast_exprt::conditional_cast(expr.index(), size_expr.type()),
+      ID_ge,
+      size_expr);
 
     guardt tmp_guard(guard);
     tmp_guard.add(inequality);
