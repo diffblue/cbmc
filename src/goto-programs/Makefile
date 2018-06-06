@@ -34,6 +34,7 @@ SRC = adjust_float_expressions.cpp \
       osx_fat_reader.cpp \
       parameter_assignments.cpp \
       pointer_arithmetic.cpp \
+      printf_formatter.cpp \
       property_checker.cpp \
       read_bin_goto_object.cpp \
       read_goto_binary.cpp \

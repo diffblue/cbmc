@@ -18,8 +18,9 @@ Author: Daniel Kroening
 #include <util/xml_expr.h>
 #include <util/symbol.h>
 
-#include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
+
+#include "printf_formatter.h"
 
 void convert(
   const namespacet &ns,

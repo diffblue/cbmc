@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// printf Formatting
 
-#ifndef CPROVER_ANSI_C_PRINTF_FORMATTER_H
-#define CPROVER_ANSI_C_PRINTF_FORMATTER_H
+#ifndef CPROVER_GOTO_PROGRAMS_PRINTF_FORMATTER_H
+#define CPROVER_GOTO_PROGRAMS_PRINTF_FORMATTER_H
 
 #include <util/expr.h>
 #include <util/namespace.h>
@@ -56,4 +56,4 @@ protected:
   const exprt make_type(const exprt &src, const typet &dest);
 };
 
-#endif // CPROVER_ANSI_C_PRINTF_FORMATTER_H
+#endif // CPROVER_GOTO_PROGRAMS_PRINTF_FORMATTER_H

@@ -20,8 +20,9 @@ Author: Daniel Kroening
 #include <util/format_expr.h>
 #include <util/symbol.h>
 
-#include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
+
+#include "printf_formatter.h"
 
 void goto_tracet::output(
   const class namespacet &ns,
