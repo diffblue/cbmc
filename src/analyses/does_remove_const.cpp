@@ -16,7 +16,6 @@
 #include <util/expr.h>
 #include <util/std_code.h>
 #include <util/base_type.h>
-#include <ansi-c/c_qualifiers.h>
 
 /// A naive analysis to look for casts that remove const-ness from pointers.
 /// \param goto_program: the goto program to check
@@ -163,8 +162,6 @@ bool does_remove_constt::does_type_preserve_const_correctness(
 bool does_remove_constt::is_type_at_least_as_const_as(
   const typet &type_more_const, const typet &type_compare) const
 {
-  const c_qualifierst type_compare_qualifiers(type_compare);
-  const c_qualifierst more_constant_qualifiers(type_more_const);
-  return !type_compare_qualifiers.is_constant ||
-    more_constant_qualifiers.is_constant;
+  return !type_compare.get_bool(ID_C_constant) ||
+         type_more_const.get_bool(ID_C_constant);
 }

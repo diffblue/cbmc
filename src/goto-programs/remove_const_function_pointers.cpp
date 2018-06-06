@@ -16,8 +16,6 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
-#include <ansi-c/c_qualifiers.h>
-
 #include "goto_functions.h"
 
 #define LOG(message, irep) \
@@ -786,16 +784,10 @@ bool remove_const_function_pointerst::is_const_expression(
 ///   arrays are implicitly const in C.
 bool remove_const_function_pointerst::is_const_type(const typet &type) const
 {
-  c_qualifierst qualifers(type);
-  if(type.id()==ID_array)
-  {
-    c_qualifierst array_type_qualifers(type.subtype());
-    return qualifers.is_constant || array_type_qualifers.is_constant;
-  }
-  else
-  {
-    return qualifers.is_constant;
-  }
+  if(type.id() == ID_array && type.subtype().get_bool(ID_C_constant))
+    return true;
+
+  return type.get_bool(ID_C_constant);
 }
 
 /// To extract the value of the specific component within a struct
