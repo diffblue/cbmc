@@ -336,6 +336,9 @@ int gcc_modet::doit()
     base_name=="bcc" ||
     base_name.find("goto-bcc")!=std::string::npos;
 
+  // if we are gcc or bcc, then get the version number
+  gcc_version.get(native_tool_name);
+
   if((cmdline.isset('v') && cmdline.have_infile_arg()) ||
      (cmdline.isset("version") && !produce_hybrid_binary))
   {
@@ -343,9 +346,16 @@ int gcc_modet::doit()
     // Compilation continues, don't exit!
 
     if(act_as_bcc)
-      std::cout << "bcc: version 0.16.17 (goto-cc " CBMC_VERSION ")\n";
+      std::cout << "bcc: version " << gcc_version
+                << " (goto-cc " CBMC_VERSION ")\n";
     else
-      std::cout << "gcc version 3.4.4 (goto-cc " CBMC_VERSION ")\n";
+    {
+      if(gcc_version.flavor == gcc_versiont::flavort::CLANG)
+        std::cout << "clang version " << gcc_version
+                  << " (goto-cc " CBMC_VERSION ")\n";
+      else
+        std::cout << "gcc (goto-cc " CBMC_VERSION ") " << gcc_version << '\n';
+    }
   }
 
   compilet compiler(cmdline,
@@ -359,11 +369,17 @@ int gcc_modet::doit()
     if(produce_hybrid_binary)
       return run_gcc(compiler);
 
-    std::cout << '\n' <<
-      "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n" <<
-      "CBMC version: " CBMC_VERSION << '\n' <<
-      "Architecture: " << config.this_architecture() << '\n' <<
-      "OS: " << config.this_operating_system() << '\n';
+    std::cout
+      << '\n'
+      << "Copyright (C) 2006-2018 Daniel Kroening, Christoph Wintersteiger\n"
+      << "CBMC version: " CBMC_VERSION << '\n'
+      << "Architecture: " << config.this_architecture() << '\n'
+      << "OS: " << config.this_operating_system() << '\n';
+
+    if(gcc_version.flavor == gcc_versiont::flavort::CLANG)
+      std::cout << "clang: " << gcc_version << '\n';
+    else
+      std::cout << "gcc: " << gcc_version << '\n';
 
     return EX_OK; // Exit!
   }
@@ -381,7 +397,7 @@ int gcc_modet::doit()
     if(cmdline.isset("dumpmachine"))
       std::cout << config.this_architecture() << '\n';
     else if(cmdline.isset("dumpversion"))
-      std::cout << "3.4.4\n";
+      std::cout << gcc_version << '\n';
 
     // we don't have any meaningful output for the other options, and GCC
     // doesn't necessarily produce non-empty output either
@@ -508,6 +524,11 @@ int gcc_modet::doit()
   // instead of double
   if(cmdline.isset("-fsingle-precision-constant"))
     config.ansi_c.single_precision_constant=true;
+
+  // ISO/IEC TS 18661-3:2015 support was introduced with gcc 7.0
+  if(gcc_version.flavor==gcc_versiont::flavort::GCC &&
+     gcc_version.is_at_least(7))
+    config.ansi_c.ts_18661_3_Floatn_types=true;
 
   // -fshort-double makes double the same as float
   if(cmdline.isset("fshort-double"))
@@ -831,7 +852,7 @@ int gcc_modet::run_gcc(const compilet &compiler)
     debug() << " " << new_argv[i];
   debug() << eom;
 
-  return run(new_argv[0], new_argv, cmdline.stdin_file, "");
+  return run(new_argv[0], new_argv, cmdline.stdin_file);
 }
 
 int gcc_modet::gcc_hybrid_binary(compilet &compiler)

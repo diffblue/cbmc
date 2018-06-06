@@ -1,0 +1,7 @@
+CORE
+gcc-4.c
+--native-compiler ./fake-gcc-4
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$

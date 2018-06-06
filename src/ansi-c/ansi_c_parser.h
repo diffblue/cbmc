@@ -35,7 +35,8 @@ public:
     mode(modet::NONE),
     cpp98(false),
     cpp11(false),
-    for_has_scope(false)
+    for_has_scope(false),
+    ts_18661_3_Floatn_types(false)
   {
   }
 
@@ -76,6 +77,9 @@ public:
 
   // in C99 and upwards, for(;;) has a scope
   bool for_has_scope;
+
+  // ISO/IEC TS 18661-3:2015
+  bool ts_18661_3_Floatn_types;
 
   typedef ansi_c_identifiert identifiert;
   typedef ansi_c_scopet scopet;

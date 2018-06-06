@@ -742,6 +742,7 @@ bool configt::set(const cmdlinet &cmdline)
 
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=true; // C99 or later
+  ansi_c.ts_18661_3_Floatn_types=false;
   ansi_c.c_standard=ansi_ct::default_c_standard();
   ansi_c.endianness=ansi_ct::endiannesst::NO_ENDIANNESS;
   ansi_c.os=ansi_ct::ost::NO_OS;
@@ -1139,8 +1140,9 @@ void configt::set_from_symbol_table(
 
   ansi_c.char_is_unsigned=unsigned_from_ns(ns, "char_is_unsigned")!=0;
   ansi_c.wchar_t_is_unsigned=unsigned_from_ns(ns, "wchar_t_is_unsigned")!=0;
-  // for_has_scope, single_precision_constant, rounding_mode not
-  // stored in namespace
+  // for_has_scope, single_precision_constant, rounding_mode,
+  // ts_18661_3_Floatn_types are not architectural features,
+  // and thus not stored in namespace
 
   ansi_c.alignment=unsigned_from_ns(ns, "alignment");
 

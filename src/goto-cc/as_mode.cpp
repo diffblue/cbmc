@@ -267,7 +267,7 @@ int as_modet::run_as()
   std::cout << '\n';
   #endif
 
-  return run(new_argv[0], new_argv, cmdline.stdin_file, "");
+  return run(new_argv[0], new_argv, cmdline.stdin_file);
 }
 
 int as_modet::as_hybrid_binary()
@@ -314,7 +314,7 @@ int as_modet::as_hybrid_binary()
     objcopy_argv.push_back("--remove-section=goto-cc");
     objcopy_argv.push_back(output_file);
 
-    result=run(objcopy_argv[0], objcopy_argv, "", "");
+    result = run(objcopy_argv[0], objcopy_argv);
   }
 
   if(result==0)
@@ -327,7 +327,7 @@ int as_modet::as_hybrid_binary()
     objcopy_argv.push_back("goto-cc="+saved);
     objcopy_argv.push_back(output_file);
 
-    result=run(objcopy_argv[0], objcopy_argv, "", "");
+    result = run(objcopy_argv[0], objcopy_argv);
   }
 
   int remove_result=remove(saved.c_str());
@@ -354,7 +354,7 @@ int as_modet::as_hybrid_binary()
     lipo_argv.push_back("-output");
     lipo_argv.push_back(output_file);
 
-    result=run(lipo_argv[0], lipo_argv, "", "");
+    result = run(lipo_argv[0], lipo_argv);
   }
 
   int remove_result=remove(saved.c_str());
