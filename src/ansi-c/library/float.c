@@ -83,3 +83,13 @@ inline int __builtin_flt_rounds(void)
          __CPROVER_rounding_mode==3?0: // to zero
          -1;
 }
+
+/* FUNCTION: __flt_rounds */
+
+int __builtin_flt_rounds(void);
+
+inline int __flt_rounds(void)
+{
+  // Spotted on FreeBSD
+  return __builtin_flt_rounds();
+}
