@@ -52,8 +52,12 @@ public:
     message_handlert &mh,
     const symbol_tablet &outer_symbol_table,
     symex_target_equationt &_target,
+    const optionst &options,
     path_storaget &path_storage)
     : should_pause_symex(false),
+      options(options),
+      max_depth(options.get_unsigned_int_option("depth")),
+      doing_path_exploration(options.is_set("paths")),
       total_vccs(0),
       remaining_vccs(0),
       constant_propagation(true),
@@ -67,8 +71,6 @@ public:
       guard_identifier("goto_symex::\\guard"),
       path_storage(path_storage)
   {
-    options.set_option("simplify", true);
-    options.set_option("assertions", true);
   }
 
   virtual ~goto_symext()
@@ -195,6 +197,11 @@ protected:
     const get_goto_functiont &,
     statet &);
 
+  const optionst &options;
+
+  const unsigned max_depth;
+  const bool doing_path_exploration;
+
 public:
   // these bypass the target maps
   virtual void symex_step_goto(statet &, bool taken);
@@ -204,8 +211,6 @@ public:
 
   bool constant_propagation;
   bool self_loops_to_assumptions;
-
-  optionst options;
 
   /// language_mode: ID_java, ID_C or another language identifier
   /// if we know the source language in use, irep_idt() otherwise.

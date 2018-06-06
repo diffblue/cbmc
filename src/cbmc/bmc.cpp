@@ -305,7 +305,6 @@ void bmct::get_memory_model()
 void bmct::setup()
 {
   get_memory_model();
-  symex.options=options;
 
   {
     const symbolt *init_symbol;
