@@ -611,14 +611,14 @@ void cpp_typecheck_resolvet::make_constructors(
 
       // 1. no arguments, default initialization
       {
-        code_typet t1({}, it->type());
+        const code_typet t1({}, it->type());
         exprt pod_constructor1("pod_constructor", t1);
         new_identifiers.push_back(pod_constructor1);
       }
 
       // 2. one argument, copy/conversion
       {
-        code_typet t2({code_typet::parametert(it->type())}, it->type());
+        const code_typet t2({code_typet::parametert(it->type())}, it->type());
         exprt pod_constructor2("pod_constructor", t2);
         new_identifiers.push_back(pod_constructor2);
       }
@@ -626,7 +626,7 @@ void cpp_typecheck_resolvet::make_constructors(
       // enums, in addition, can also be constructed from int
       if(symbol_type.id()==ID_c_enum_tag)
       {
-        code_typet t3({code_typet::parametert(signed_int_type())}, it->type());
+        const code_typet t3({code_typet::parametert(signed_int_type())}, it->type());
         exprt pod_constructor3("pod_constructor", t3);
         new_identifiers.push_back(pod_constructor3);
       }

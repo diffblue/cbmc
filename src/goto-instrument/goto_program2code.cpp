@@ -228,7 +228,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
     case ATOMIC_END:
       {
         code_function_callt f;
-        code_typet void_t({}, empty_typet());
+        const code_typet void_t({}, empty_typet());
         f.function()=symbol_exprt(
             target->is_atomic_begin() ?
             "__CPROVER_atomic_begin" :
@@ -1948,12 +1948,10 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
           base_name="nondet_"+std::to_string(count);
         }
 
-        code_typet code_type({}, expr.type());
-
         symbolt symbol;
         symbol.base_name=base_name;
         symbol.name=base_name;
-        symbol.type=code_type;
+        symbol.type = code_typet({}, expr.type());
         id=symbol.name;
 
         symbol_table.insert(std::move(symbol));
