@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <ansi-c/ansi_c_language.h>
+#include <ansi-c/cprover_library.h>
+
 #include <cpp/cpp_language.h>
 #include <jsil/jsil_language.h>
 
@@ -725,7 +727,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
 
     // add the library
     status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;
-    link_to_library(goto_model, ui_message_handler);
+    link_to_library(goto_model, ui_message_handler, add_cprover_library);
     #endif
 
     // remove function pointers

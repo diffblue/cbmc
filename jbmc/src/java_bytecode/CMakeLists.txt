@@ -12,4 +12,4 @@ generic_includes(java_bytecode)
 
 # if you link java_bytecode.a in, then you also need to link other .a libraries
 # in
-target_link_libraries(java_bytecode util goto-programs miniz json)
+target_link_libraries(java_bytecode util goto-programs miniz json ansi-c)

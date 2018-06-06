@@ -52,6 +52,8 @@ Author: Peter Schrammel
 
 #include <langapi/mode.h>
 
+#include <ansi-c/cprover_library.h>
+
 #include <cbmc/version.h>
 
 #include "goto_diff.h"
@@ -395,7 +397,7 @@ bool goto_diff_parse_optionst::process_goto_program(
 
     // add the library
     status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;
-    link_to_library(goto_model, get_message_handler());
+    link_to_library(goto_model, get_message_handler(), add_cprover_library);
 
     // remove function pointers
     status() << "Removal of function pointers and virtual functions" << eom;

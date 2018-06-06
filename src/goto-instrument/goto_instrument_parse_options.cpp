@@ -62,6 +62,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/constant_propagator.h>
 #include <analyses/is_threaded.h>
 
+#include <ansi-c/cprover_library.h>
+
 #include <cbmc/version.h>
 
 #include "document_properties.h"
@@ -958,7 +960,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     // add the library
     status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;
-    link_to_library(goto_model, get_message_handler());
+    link_to_library(goto_model, get_message_handler(), add_cprover_library);
   }
 
   // now do full inlining, if requested
