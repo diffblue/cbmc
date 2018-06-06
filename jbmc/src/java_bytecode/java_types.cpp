@@ -493,24 +493,21 @@ typet java_type_from_string(
       if(e_pos==std::string::npos)
         return nil_typet();
 
-      code_typet result;
-
-      result.return_type()=
-        java_type_from_string(
-          std::string(src, e_pos+1, std::string::npos),
-          class_name_prefix);
+      typet return_type = java_type_from_string(
+        std::string(src, e_pos + 1, std::string::npos), class_name_prefix);
 
       std::vector<typet> param_types =
         parse_list_types(src.substr(0, e_pos + 1), class_name_prefix, '(', ')');
 
       // create parameters for each type
+      code_typet::parameterst parameters;
       std::transform(
         param_types.begin(),
         param_types.end(),
-        std::back_inserter(result.parameters()),
+        std::back_inserter(parameters),
         [](const typet &type) { return code_typet::parametert(type); });
 
-      return result;
+      return code_typet(std::move(parameters), std::move(return_type));
     }
 
   case '[': // array type

@@ -1,0 +1,15 @@
+ansi-c
+cbmc
+cpp
+goto-programs
+goto-symex
+json
+langapi # should go away
+solvers/flattening
+solvers/floatbv
+solvers/miniBDD
+solvers/prop
+solvers/sat
+solvers/smt2
+testing-utils
+util

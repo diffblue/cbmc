@@ -290,13 +290,14 @@ void remove_returns(goto_modelt &goto_model)
 /// \param symbol_table: global symbol table
 /// \param function_id: function to get the type of
 /// \return the function's type with its `return_type()` restored to its
-///   original value if a \#return_value variable exists, or nil otherwise
+///   original value
 code_typet original_return_type(
   const symbol_table_baset &symbol_table,
   const irep_idt &function_id)
 {
-  code_typet type;
-  type.make_nil();
+  // look up the function symbol
+  const symbolt &function_symbol = symbol_table.lookup_ref(function_id);
+  code_typet type = to_code_type(function_symbol.type);
 
   // do we have X#return_value?
   std::string rv_name=id2string(function_id)+RETURN_VALUE_SUFFIX;
@@ -304,14 +305,8 @@ code_typet original_return_type(
   symbol_tablet::symbolst::const_iterator rv_it=
     symbol_table.symbols.find(rv_name);
 
-  if(rv_it!=symbol_table.symbols.end())
-  {
-    // look up the function symbol
-    const symbolt &function_symbol=symbol_table.lookup_ref(function_id);
-
-    type=to_code_type(function_symbol.type);
-    type.return_type()=rv_it->second.type;
-  }
+  if(rv_it != symbol_table.symbols.end())
+    type.return_type() = rv_it->second.type;
 
   return type;
 }

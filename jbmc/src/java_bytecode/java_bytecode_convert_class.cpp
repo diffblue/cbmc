@@ -760,15 +760,12 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
 
     const irep_idt clone_name=
       id2string(symbol_type_identifier)+".clone:()Ljava/lang/Object;";
-    code_typet clone_type;
-    clone_type.return_type()=
-      java_reference_type(symbol_typet("java::java.lang.Object"));
     code_typet::parametert this_param;
     this_param.set_identifier(id2string(clone_name)+"::this");
     this_param.set_base_name("this");
     this_param.set_this();
     this_param.type()=java_reference_type(symbol_type);
-    clone_type.parameters().push_back(this_param);
+    code_typet clone_type({this_param}, java_lang_object_type());
 
     parameter_symbolt this_symbol;
     this_symbol.name=this_param.get_identifier();

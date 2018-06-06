@@ -228,8 +228,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
     case ATOMIC_END:
       {
         code_function_callt f;
-        code_typet void_t;
-        void_t.return_type()=empty_typet();
+        code_typet void_t({}, empty_typet());
         f.function()=symbol_exprt(
             target->is_atomic_begin() ?
             "__CPROVER_atomic_begin" :
@@ -328,7 +327,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   if(r.id()==ID_constant &&
      (r.is_zero() || to_constant_expr(r).get_value()==ID_NULL))
   {
-    f.function()=symbol_exprt("va_end", code_typet());
+    f.function() = symbol_exprt("va_end", code_typet({}, empty_typet()));
     f.arguments().push_back(this_va_list_expr);
     f.arguments().back().type().id(ID_gcc_builtin_va_list);
 
@@ -336,7 +335,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   }
   else if(r.id()==ID_address_of)
   {
-    f.function()=symbol_exprt("va_start", code_typet());
+    f.function() = symbol_exprt("va_start", code_typet({}, empty_typet()));
     f.arguments().push_back(this_va_list_expr);
     f.arguments().back().type().id(ID_gcc_builtin_va_list);
     f.arguments().push_back(to_address_of_expr(r).object());
@@ -346,12 +345,13 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   else if(r.id()==ID_side_effect &&
           to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
   {
-    f.function()=symbol_exprt("va_arg", code_typet());
+    f.function() = symbol_exprt("va_arg", code_typet({}, empty_typet()));
     f.arguments().push_back(this_va_list_expr);
     f.arguments().back().type().id(ID_gcc_builtin_va_list);
 
     side_effect_expr_function_callt type_of;
-    type_of.function()=symbol_exprt("__typeof__", code_typet());
+    type_of.function() =
+      symbol_exprt("__typeof__", code_typet({}, empty_typet()));
 
     // if the return value is used, the next instruction will be assign
     goto_programt::const_targett next=target;
@@ -393,7 +393,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   }
   else
   {
-    f.function()=symbol_exprt("va_copy", code_typet());
+    f.function() = symbol_exprt("va_copy", code_typet({}, empty_typet()));
     f.arguments().push_back(this_va_list_expr);
     f.arguments().back().type().id(ID_gcc_builtin_va_list);
     f.arguments().push_back(r);
@@ -1374,7 +1374,8 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     code_function_callt f;
     // we don't bother setting the type
     f.lhs()=cf.lhs();
-    f.function()=symbol_exprt("pthread_create", code_typet());
+    f.function() =
+      symbol_exprt("pthread_create", code_typet({}, empty_typet()));
     const null_pointer_exprt n(pointer_type(empty_typet()));
     f.arguments().push_back(n);
     f.arguments().push_back(n);
@@ -1947,8 +1948,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
           base_name="nondet_"+std::to_string(count);
         }
 
-        code_typet code_type;
-        code_type.return_type()=expr.type();
+        code_typet code_type({}, expr.type());
 
         symbolt symbol;
         symbol.base_name=base_name;

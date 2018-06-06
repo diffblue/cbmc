@@ -758,8 +758,36 @@ inline c_enum_tag_typet &to_c_enum_tag_type(typet &type)
 class code_typet:public typet
 {
 public:
+  class parametert;
+  typedef std::vector<parametert> parameterst;
+
+  /// Constructs a new code type, i.e. function type
+  /// \param _parameters: the vector of function parameters
+  /// \param _return_type: the return type
+  code_typet(parameterst &&_parameters, typet &&_return_type) : typet(ID_code)
+  {
+    parameters().swap(_parameters);
+    return_type().swap(_return_type);
+  }
+
+  /// Constructs a new code type, i.e. function type
+  /// \param _parameters: the vector of function parameters
+  /// \param _return_type: the return type
+  code_typet(parameterst &&_parameters, const typet &_return_type)
+    : typet(ID_code)
+  {
+    parameters().swap(_parameters);
+    return_type() = _return_type;
+  }
+
+  /// \deprecated
+  DEPRECATED("Use the two argument constructor instead")
   code_typet():typet(ID_code)
   {
+    // make sure these properties are always there to avoid problems
+    // with irept comparisons
+    add(ID_parameters);
+    add_type(ID_return_type);
   }
 
   // used to be argumentt -- now uses standard terminology
@@ -857,8 +885,6 @@ public:
   {
     add(ID_parameters).remove(ID_ellipsis);
   }
-
-  typedef std::vector<parametert> parameterst;
 
   const typet &return_type() const
   {

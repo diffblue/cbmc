@@ -445,8 +445,7 @@ bool generate_ansi_c_start_function(
   // add the entry point symbol
   symbolt new_symbol;
 
-  code_typet main_type;
-  main_type.return_type()=empty_typet();
+  code_typet main_type({}, empty_typet());
 
   new_symbol.name=goto_functionst::entry_point();
   new_symbol.type.swap(main_type);

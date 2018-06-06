@@ -1446,10 +1446,9 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       symbol_exprt result;
       result.add_source_location()=source_location;
       result.set_identifier(identifier);
-      code_typet t;
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      code_typet t(
+        {code_typet::parametert(ptr_arg.type())}, ptr_arg.type().subtype());
       t.make_ellipsis();
-      t.return_type()=ptr_arg.type().subtype();
       result.type()=t;
       expr.swap(result);
       return;
@@ -1480,10 +1479,10 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       symbol_exprt result;
       result.add_source_location()=source_location;
       result.set_identifier(identifier);
-      code_typet t;
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
-      t.parameters().push_back(code_typet::parametert(signed_int_type()));
-      t.return_type()=ptr_arg.type().subtype();
+      code_typet t(
+        {code_typet::parametert(ptr_arg.type()),
+         code_typet::parametert(signed_int_type())},
+        ptr_arg.type().subtype());
       result.type()=t;
       expr.swap(result);
       return;
@@ -1514,12 +1513,11 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       symbol_exprt result;
       result.add_source_location()=source_location;
       result.set_identifier(identifier);
-      code_typet t;
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
-      t.parameters().push_back(
-        code_typet::parametert(ptr_arg.type().subtype()));
-      t.parameters().push_back(code_typet::parametert(signed_int_type()));
-      t.return_type()=empty_typet();
+      code_typet t(
+        {code_typet::parametert(ptr_arg.type()),
+         code_typet::parametert(ptr_arg.type().subtype()),
+         code_typet::parametert(signed_int_type())},
+        empty_typet());
       result.type()=t;
       expr.swap(result);
       return;
@@ -1550,12 +1548,11 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       symbol_exprt result;
       result.add_source_location()=source_location;
       result.set_identifier(identifier);
-      code_typet t;
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
-      t.parameters().push_back(
-        code_typet::parametert(ptr_arg.type().subtype()));
-      t.parameters().push_back(code_typet::parametert(signed_int_type()));
-      t.return_type()=ptr_arg.type().subtype();
+      code_typet t(
+        {code_typet::parametert(ptr_arg.type()),
+         code_typet::parametert(ptr_arg.type().subtype()),
+         code_typet::parametert(signed_int_type())},
+        ptr_arg.type().subtype());
       result.type()=t;
       expr.swap(result);
       return;
@@ -1594,11 +1591,11 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       symbol_exprt result;
       result.add_source_location()=source_location;
       result.set_identifier(identifier);
-      code_typet t;
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
-      t.parameters().push_back(code_typet::parametert(signed_int_type()));
-      t.return_type()=empty_typet();
+      code_typet t(
+        {code_typet::parametert(ptr_arg.type()),
+         code_typet::parametert(ptr_arg.type()),
+         code_typet::parametert(signed_int_type())},
+        empty_typet());
       result.type()=t;
       expr.swap(result);
       return;
@@ -1643,12 +1640,12 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       symbol_exprt result;
       result.add_source_location()=source_location;
       result.set_identifier(identifier);
-      code_typet t;
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
-      t.parameters().push_back(code_typet::parametert(signed_int_type()));
-      t.return_type()=empty_typet();
+      code_typet t(
+        {code_typet::parametert(ptr_arg.type()),
+         code_typet::parametert(ptr_arg.type()),
+         code_typet::parametert(ptr_arg.type()),
+         code_typet::parametert(signed_int_type())},
+        empty_typet());
       result.type()=t;
       expr.swap(result);
       return;
@@ -1698,20 +1695,19 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       symbol_exprt result;
       result.add_source_location()=source_location;
       result.set_identifier(identifier);
-      code_typet t;
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      code_typet::parameterst parameters;
+      parameters.push_back(code_typet::parametert(ptr_arg.type()));
+      parameters.push_back(code_typet::parametert(ptr_arg.type()));
 
       if(identifier=="__atomic_compare_exchange")
-        t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+        parameters.push_back(code_typet::parametert(ptr_arg.type()));
       else
-        t.parameters().push_back(
-          code_typet::parametert(ptr_arg.type().subtype()));
+        parameters.push_back(code_typet::parametert(ptr_arg.type().subtype()));
 
-      t.parameters().push_back(code_typet::parametert(c_bool_type()));
-      t.parameters().push_back(code_typet::parametert(signed_int_type()));
-      t.parameters().push_back(code_typet::parametert(signed_int_type()));
-      t.return_type()=c_bool_type();
+      parameters.push_back(code_typet::parametert(c_bool_type()));
+      parameters.push_back(code_typet::parametert(signed_int_type()));
+      parameters.push_back(code_typet::parametert(signed_int_type()));
+      code_typet t(std::move(parameters), c_bool_type());
       result.type()=t;
       expr.swap(result);
       return;
@@ -1744,10 +1740,9 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       symbol_exprt result;
       result.add_source_location()=source_location;
       result.set_identifier(identifier);
-      code_typet t;
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      code_typet t(
+        {code_typet::parametert(ptr_arg.type())}, ptr_arg.type().subtype());
       t.make_ellipsis();
-      t.return_type()=ptr_arg.type().subtype();
       result.type()=t;
       expr.swap(result);
       return;
@@ -1780,10 +1775,9 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       symbol_exprt result;
       result.add_source_location()=source_location;
       result.set_identifier(identifier);
-      code_typet t;
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
+      code_typet t(
+        {code_typet::parametert(ptr_arg.type())}, ptr_arg.type().subtype());
       t.make_ellipsis();
-      t.return_type()=ptr_arg.type().subtype();
       result.type()=t;
       expr.swap(result);
       return;

@@ -1588,7 +1588,6 @@ void goto_convertt::do_function_call_symbol(
 
     if(!symbol_table.has_symbol(name))
     {
-      code_typet();
       symbolt new_symbol;
       new_symbol.base_name=name;
       new_symbol.name=name;

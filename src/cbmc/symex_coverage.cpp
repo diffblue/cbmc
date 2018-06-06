@@ -173,8 +173,6 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
 
   code_typet sig_type=
     original_return_type(ns.get_symbol_table(), gf_it->first);
-  if(sig_type.is_nil())
-    sig_type=gf_it->second.type;
   xml.set_attribute("signature",
                     from_type(ns, gf_it->first, sig_type));
 
