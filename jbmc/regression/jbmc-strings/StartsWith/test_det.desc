@@ -1,0 +1,13 @@
+CORE
+Test.class
+--refine-strings --string-max-input-length 100 --unwind 10 --function Test.checkDet
+^EXIT=10$
+^SIGNAL=0$
+assertion at file Test.java line 41 .*: SUCCESS
+assertion at file Test.java line 43 .*: SUCCESS
+assertion at file Test.java line 45 .*: SUCCESS
+assertion at file Test.java line 47 .*: SUCCESS
+assertion at file Test.java line 49 .*: SUCCESS
+assertion at file Test.java line 51 .*: SUCCESS
+assertion at file Test.java line 52 .*: FAILURE
+--

@@ -21,14 +21,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// These axioms are:
 ///   1. \f$ {\tt isprefix} \Rightarrow {\tt offset_within_bounds}\f$
 ///   2. \f$ \forall 0 \le qvar<|{\tt prefix}|.\ {\tt isprefix}
-///          \Rightarrow s0[witness+{\tt offset}]=s2[witness] \f$
+///          \Rightarrow s0[qvar+{\tt offset}]=s2[qvar] \f$
 ///   3. \f$ (\lnot {\tt isprefix} \Rightarrow
 ///          \lnot {\tt offset_within_bounds}
 ///          \lor (0 \le witness<|{\tt prefix}|
 ///          \land {\tt str}[witness+{\tt offset}] \ne {\tt prefix}[witness])\f$
 /// where  \f$ {\tt offset_within_bounds} \f$ is
-///    \f$ offset \ge 0 \land offset < |str| \land
-///        |str| - |{\tt prefix}| \ge offset \f$
+///    \f$ offset \ge 0 \land offset \le |str| \land
+///        |str| - offset \ge |{\tt prefix}| \f$
 /// \param prefix: an array of characters
 /// \param str: an array of characters
 /// \param offset: an integer
