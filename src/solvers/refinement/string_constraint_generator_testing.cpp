@@ -135,6 +135,7 @@ exprt string_constraint_generatort::add_axioms_for_is_empty(
 /// \param swap_arguments: boolean flag telling whether the suffix is the second
 ///        argument or the first argument
 /// \return Boolean expression `issuffix`
+DEPRECATED("should use `strings_startwith(s0, s1, s1.length - s0.length)`")
 exprt string_constraint_generatort::add_axioms_for_is_suffix(
   const function_application_exprt &f, bool swap_arguments)
 {

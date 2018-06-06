@@ -231,9 +231,6 @@ allocates a new string before calling a primitive.
   * `cprover_string_is_prefix` :
   \copybrief string_constraint_generatort::add_axioms_for_is_prefix
   \link string_constraint_generatort::add_axioms_for_is_prefix More... \endlink
-  * `cprover_string_is_suffix` :
-  \copybrief string_constraint_generatort::add_axioms_for_is_suffix
-  \link string_constraint_generatort::add_axioms_for_is_suffix More... \endlink
   * `cprover_string_index_of` :
   \copybrief string_constraint_generatort::add_axioms_for_index_of(const function_application_exprt &f)
   \link string_constraint_generatort::add_axioms_for_index_of(const function_application_exprt &f) More... \endlink
@@ -319,6 +316,8 @@ allocates a new string before calling a primitive.
   * `cprover_string_intern` : Never tested.
   * `cprover_string_is_empty` :
     Should use `cprover_string_length(s) == 0` instead.
+  * `cprover_string_is_suffix` : Should use `cprover_string_is_prefix` with an
+   offset argument.
   * `cprover_string_empty_string` : Can use literal of empty string instead.
   * `cprover_string_of_long` : Should be the same as `cprover_string_of_int`.
   * `cprover_string_delete_char_at` : A call to
