@@ -1,5 +1,6 @@
 int cpp_f(int fkt_argument)
 {
+  return 0;
 }
 
 extern "C" void f(int fkt_argument)
@@ -27,4 +28,6 @@ int main()
   f(0);
   g(0);
   g(0L);
+
+  return 0;
 }

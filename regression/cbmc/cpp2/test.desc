@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^equality without matching types
+--
+This has been reported as #933.

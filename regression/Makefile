@@ -18,6 +18,7 @@ DIRS = cbmc \
        goto-cc-cbmc \
        cbmc-cpp \
        goto-cc-goto-analyzer \
+       systemc
        # Empty last line
 
 # Tests under goto-gcc cannot be run on Windows, so appveyor.yml unlinks

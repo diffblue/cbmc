@@ -5,6 +5,7 @@ int foo(int)
 
 unsigned some_function(void)
 {
+  return 0;
 }
 
 int main()

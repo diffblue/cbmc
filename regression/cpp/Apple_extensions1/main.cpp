@@ -5,3 +5,7 @@ void * _Nonnull p2;
 // block pointer
 void (^p3)(void);
 #endif
+
+int main(int argc, char* argv[])
+{
+}

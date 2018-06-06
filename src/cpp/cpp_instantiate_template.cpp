@@ -238,7 +238,6 @@ const symbolt &cpp_typecheckt::instantiate_template(
   std::cout << "I: " << template_symbol.name << '\n';
   #endif
 
-  cpp_save_scopet cpp_saved_scope(cpp_scopes);
   cpp_saved_template_mapt saved_map(template_map);
 
   bool specialization_given=specialization.is_not_nil();
@@ -285,9 +284,6 @@ const symbolt &cpp_typecheckt::instantiate_template(
             << "template instantiation error: scope not found" << eom;
     throw 0;
   }
-
-  INVARIANT_STRUCTURED(
-    template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
 
   // produce new declaration
   cpp_declarationt new_decl=to_cpp_declaration(template_symbol.type);
@@ -417,7 +413,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
     for(auto &tm : template_methods.operands())
     {
-      cpp_saved_scope.restore();
+      saved_scope.restore();
 
       cpp_declarationt method_decl=
         static_cast<const cpp_declarationt &>(
@@ -443,8 +439,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       convert(method_decl);
     }
 
-    const symbolt &new_symb=
-      lookup(new_decl.type().get(ID_identifier));
+    const symbolt &new_symb = lookup(new_decl.type().get(ID_identifier));
 
     return new_symb;
   }

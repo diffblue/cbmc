@@ -1,3 +1,5 @@
+#include <cassert>
+
 // V depends on Ty
 template<typename Ty, Ty V>
 class T
@@ -10,6 +12,6 @@ T<int, 10> some_T;
 
 int main()
 {
-  assert(some_T.value==10);
+  __CPROVER_assert(some_T.value == 10, "");
 }
 

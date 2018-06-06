@@ -44,7 +44,6 @@ symbolt &cpp_declarator_convertert::convert(
     typet type;
     type.swap(declarator.name().get_sub().back());
     declarator.type().subtype()=type;
-    std::string tmp;
     cpp_typecheck.typecheck_type(type);
     irept name(ID_name);
     name.set(ID_identifier, "("+cpp_type2name(type)+")");

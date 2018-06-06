@@ -30,11 +30,8 @@ void cpp_typecheckt::typecheck_method_bodies(
     if(body.id()=="cpp_not_typechecked")
       continue;
 
-    if(body.is_not_nil() &&
-       !body.is_zero())
-    {
+    if(body.is_not_nil() && !body.is_zero())
       convert_function(method_symbol);
-    }
   }
 
   old_instantiation_stack.swap(instantiation_stack);
