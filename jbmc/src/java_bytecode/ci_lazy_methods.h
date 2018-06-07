@@ -169,6 +169,9 @@ private:
   const std::vector<irep_idt> &extra_instantiated_classes;
   const select_pointer_typet &pointer_type_selector;
   const synthetic_methods_mapt &synthetic_methods;
+
+  std::unordered_set<irep_idt>
+  entry_point_methods(const symbol_tablet &symbol_table);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_GATHER_METHODS_LAZILY_H

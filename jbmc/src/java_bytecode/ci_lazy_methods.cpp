@@ -98,34 +98,8 @@ bool ci_lazy_methodst::operator()(
   method_bytecodet &method_bytecode,
   const method_convertert &method_converter)
 {
-  std::unordered_set<irep_idt> methods_to_convert_later;
-
-  main_function_resultt main_function =
-    get_main_symbol(symbol_table, main_class, get_message_handler());
-  if(!main_function.is_success())
-  {
-    // Failed, mark all functions in the given main class(es)
-    // reachable.
-    std::vector<irep_idt> reachable_classes;
-    if(!main_class.empty())
-      reachable_classes.push_back(main_class);
-    else
-      reachable_classes = main_jar_classes;
-    for(const irep_idt &class_name : reachable_classes)
-    {
-      const auto &methods =
-        java_class_loader.get_original_class(class_name).parsed_class.methods;
-      for(const auto &method : methods)
-      {
-        const irep_idt methodid =
-          "java::" + id2string(class_name) + "." + id2string(method.name)
-            + ":" + id2string(method.descriptor);
-        methods_to_convert_later.insert(methodid);
-      }
-    }
-  }
-  else
-    methods_to_convert_later.insert(main_function.main_function.name);
+  std::unordered_set<irep_idt> methods_to_convert_later =
+    entry_point_methods(symbol_table);
 
   // Add any extra entry points specified; we should elaborate these in the
   // same way as the main function.
@@ -295,6 +269,46 @@ bool ci_lazy_methodst::operator()(
   symbol_table.swap(keep_symbols);
 
   return false;
+}
+
+/// Entry point methods are either:
+///   * the "main" function of the `main_class` if it exists
+///   * all the methods of the main class if it is not empty
+///   * all the methods of the main jar file
+/// \return set of identifiers of entry point methods
+std::unordered_set<irep_idt>
+ci_lazy_methodst::entry_point_methods(const symbol_tablet &symbol_table)
+{
+  std::unordered_set<irep_idt> methods_to_convert_later;
+
+  const main_function_resultt main_function = get_main_symbol(
+    symbol_table, this->main_class, this->get_message_handler());
+  if(!main_function.is_success())
+  {
+    // Failed, mark all functions in the given main class(es)
+    // reachable.
+    std::vector<irep_idt> reachable_classes;
+    if(!this->main_class.empty())
+      reachable_classes.push_back(this->main_class);
+    else
+      reachable_classes = this->main_jar_classes;
+    for(const irep_idt &class_name : reachable_classes)
+    {
+      const auto &methods =
+        this->java_class_loader.get_original_class(class_name)
+          .parsed_class.methods;
+      for(const auto &method : methods)
+      {
+        const irep_idt methodid = "java::" + id2string(class_name) + "." +
+                                  id2string(method.name) + ":" +
+                                  id2string(method.descriptor);
+        methods_to_convert_later.insert(methodid);
+      }
+    }
+  }
+  else
+    methods_to_convert_later.insert(main_function.main_function.name);
+  return methods_to_convert_later;
 }
 
 /// Translates the given list of method names from human-readable to
