@@ -420,11 +420,10 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
 /// \return true if this static field is known never to be null
 bool is_non_null_library_global(const irep_idt &symbolid)
 {
-  static const std::unordered_set<irep_idt> non_null_globals = {
-    "java::java.lang.System.out",
-    "java::java.lang.System.err",
-    "java::java.lang.System.in"};
-  return non_null_globals.count(symbolid);
+  static const irep_idt in = "java::java.lang.System.in";
+  static const irep_idt out = "java::java.lang.System.out";
+  static const irep_idt err = "java::java.lang.System.err";
+  return symbolid == in || symbolid == out || symbolid == err;
 }
 
 /// Methods belonging to the class org.cprover.CProver that should be ignored
