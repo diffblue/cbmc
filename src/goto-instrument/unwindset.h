@@ -44,7 +44,7 @@ public:
 
   // queries
   std::optional<unsigned>
-  get_limit(const irep_idt &loop, unsigned thread_id) const;
+  get_limit(const irep_idt &loop, std::size_t thread_id) const;
 
   // read unwindset directives from a file
   void parse_unwindset_file(
@@ -63,7 +63,7 @@ protected:
 
   // separate limits per thread
   using thread_loop_mapt =
-    std::map<std::pair<irep_idt, unsigned>, std::optional<unsigned>>;
+    std::map<std::pair<irep_idt, std::size_t>, std::optional<unsigned>>;
   thread_loop_mapt thread_loop_map;
 
   void parse_unwindset_one_loop(

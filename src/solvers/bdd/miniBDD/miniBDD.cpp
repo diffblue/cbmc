@@ -56,7 +56,7 @@ void mini_bdd_mgrt::DumpDot(std::ostream &out, bool suppress_zero) const
   out << "  { node [shape=box,fontsize=24]; \"1\"; }\n"
       << "}\n\n";
 
-  for(unsigned v = 0; v < var_table.size(); v++)
+  for(std::size_t v = 0; v < var_table.size(); v++)
   {
     out << "{ rank=same; "
            "{ node [shape=plaintext,fontname=\"Times Italic\",fontsize=24] \" "
@@ -75,7 +75,7 @@ void mini_bdd_mgrt::DumpDot(std::ostream &out, bool suppress_zero) const
 
   out << "{ edge [style = invis];";
 
-  for(unsigned v = 0; v < var_table.size(); v++)
+  for(std::size_t v = 0; v < var_table.size(); v++)
     out << " \" " << var_table[v].label << " \" ->";
 
   out << " \"T\"; }\n";
@@ -114,7 +114,7 @@ void mini_bdd_mgrt::DumpTikZ(
   out << "  \\tikzstyle{BDDnode}=[circle,draw=black,"
          "inner sep=0pt,minimum size=5mm]\n";
 
-  for(unsigned v = 0; v < var_table.size(); v++)
+  for(std::size_t v = 0; v < var_table.size(); v++)
   {
     out << "  \\node[";
 
@@ -124,7 +124,7 @@ void mini_bdd_mgrt::DumpTikZ(
     out << "] (v" << var_table[v].label << ") {$\\mathit{" << var_table[v].label
         << "}$};\n";
 
-    unsigned previous = 0;
+    std::size_t previous = 0;
 
     for(const auto &u : nodes)
     {
@@ -198,7 +198,7 @@ protected:
   mini_bddt APP_rec(const mini_bddt &x, const mini_bddt &y);
   mini_bddt APP_non_rec(const mini_bddt &x, const mini_bddt &y);
 
-  typedef std::map<std::pair<unsigned, unsigned>, mini_bddt> Gt;
+  typedef std::map<std::pair<std::size_t, std::size_t>, mini_bddt> Gt;
   Gt G;
 };
 
@@ -212,7 +212,7 @@ mini_bddt mini_bdd_applyt::APP_rec(const mini_bddt &x, const mini_bddt &y)
     "apply can only be called on BDDs with the same manager");
 
   // dynamic programming
-  std::pair<unsigned, unsigned> key(x.node_number(), y.node_number());
+  std::pair<std::size_t, std::size_t> key(x.node_number(), y.node_number());
   Gt::const_iterator G_it = G.find(key);
   if(G_it != G.end())
     return G_it->second;
@@ -250,8 +250,8 @@ mini_bddt mini_bdd_applyt::APP_non_rec(const mini_bddt &_x, const mini_bddt &_y)
     {
     }
     mini_bddt &result, x, y, lr, hr;
-    std::pair<unsigned, unsigned> key;
-    unsigned var;
+    std::pair<std::size_t, std::size_t> key;
+    std::size_t var;
     enum class phaset
     {
       INIT,
@@ -422,7 +422,7 @@ mini_bdd_mgrt::~mini_bdd_mgrt()
 }
 
 mini_bddt
-mini_bdd_mgrt::mk(unsigned var, const mini_bddt &low, const mini_bddt &high)
+mini_bdd_mgrt::mk(std::size_t var, const mini_bddt &low, const mini_bddt &high)
 {
   PRECONDITION_WITH_DIAGNOSTICS(
     var <= var_table.size(), "cannot make a BDD for an unknown variable");
@@ -447,7 +447,7 @@ mini_bdd_mgrt::mk(unsigned var, const mini_bddt &low, const mini_bddt &high)
 
       if(free.empty())
       {
-        unsigned new_number = nodes.back().node_number + 1;
+        const std::size_t new_number = nodes.back().node_number + 1;
         nodes.push_back(mini_bdd_nodet(this, var, new_number, low, high));
         n = &nodes.back();
       }
@@ -510,7 +510,7 @@ void mini_bdd_mgrt::DumpTable(std::ostream &out) const
 class restrictt
 {
 public:
-  inline restrictt(const unsigned _var, const bool _value)
+  inline restrictt(const std::size_t _var, const bool _value)
     : var(_var), value(_value)
   {
   }
@@ -521,7 +521,7 @@ public:
   }
 
 protected:
-  const unsigned var;
+  const std::size_t var;
   const bool value;
 
   mini_bddt RES(const mini_bddt &u);
@@ -548,18 +548,18 @@ mini_bddt restrictt::RES(const mini_bddt &u)
   return t;
 }
 
-mini_bddt restrict(const mini_bddt &u, unsigned var, const bool value)
+mini_bddt restrict(const mini_bddt &u, std::size_t var, const bool value)
 {
   return restrictt(var, value)(u);
 }
 
-mini_bddt exists(const mini_bddt &u, const unsigned var)
+mini_bddt exists(const mini_bddt &u, const std::size_t var)
 {
   // u[var/0] OR u[var/1]
   return restrict(u, var, false) | restrict(u, var, true);
 }
 
-mini_bddt substitute(const mini_bddt &t, unsigned var, const mini_bddt &tp)
+mini_bddt substitute(const mini_bddt &t, std::size_t var, const mini_bddt &tp)
 {
   // t[var/tp] =
   //  ( tp &t[var/1]) |
@@ -607,7 +607,7 @@ std::string cubes(const mini_bddt &u)
   }
 }
 
-bool OneSat(const mini_bddt &v, std::map<unsigned, bool> &assignment)
+bool OneSat(const mini_bddt &v, std::map<std::size_t, bool> &assignment)
 {
   // http://www.ecs.umass.edu/ece/labs/vlsicad/ece667/reading/somenzi99bdd.pdf
   if(v.is_true())

@@ -956,15 +956,16 @@ void float_bvt::normalization_shift(
   PRECONDITION(fraction_bits != 0);
 
   std::size_t depth = address_bits(fraction_bits - 1);
+  CHECK_RETURN(depth > 0);
 
   exponent = typecast_exprt(
     exponent, signedbv_typet(std::max(depth, exponent_bits + 1)));
 
   exprt exponent_delta=from_integer(0, exponent.type());
 
-  for(int d=depth-1; d>=0; d--)
+  for(std::size_t d = depth; d > 0; --d)
   {
-    unsigned distance=(1<<d);
+    std::size_t distance = 1ull << (d - 1);
     INVARIANT(
       fraction_bits > distance,
       "distance must be within the range of fraction bits");
@@ -982,13 +983,9 @@ void float_bvt::normalization_shift(
       if_exprt(prefix_is_zero, shifted, fraction);
 
     // add corresponding weight to exponent
-    INVARIANT(
-      d < (signed int)exponent_bits,
-      "depth must be smaller than exponent bits");
-
-    exponent_delta=
-      bitor_exprt(exponent_delta,
-        shl_exprt(typecast_exprt(prefix_is_zero, exponent_delta.type()), d));
+    exponent_delta = bitor_exprt(
+      exponent_delta,
+      shl_exprt(typecast_exprt(prefix_is_zero, exponent_delta.type()), d - 1));
   }
 
   exponent=minus_exprt(exponent, exponent_delta);

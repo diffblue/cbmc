@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_token_buffer.h"
 
-int cpp_token_buffert::LookAhead(unsigned offset)
+int cpp_token_buffert::LookAhead(std::size_t offset)
 {
   PRECONDITION(current_pos <= token_vector.size());
 
@@ -51,7 +51,7 @@ int cpp_token_buffert::get_token()
   return kind;
 }
 
-int cpp_token_buffert::LookAhead(unsigned offset, cpp_tokent &token)
+int cpp_token_buffert::LookAhead(std::size_t offset, cpp_tokent &token)
 {
   PRECONDITION(current_pos <= token_vector.size());
 

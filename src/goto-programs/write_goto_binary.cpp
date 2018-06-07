@@ -144,7 +144,7 @@ static void write_goto_binary(
 bool write_goto_binary(
   std::ostream &out,
   const goto_modelt &goto_model,
-  int version)
+  std::size_t version)
 {
   return write_goto_binary(
     out,
@@ -158,7 +158,7 @@ bool write_goto_binary(
   std::ostream &out,
   const symbol_table_baset &symbol_table,
   const goto_functionst &goto_functions,
-  int version)
+  std::size_t version)
 {
   // header
   out << char(0x7f) << "GBF";

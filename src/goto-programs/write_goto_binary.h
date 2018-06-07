@@ -12,7 +12,7 @@ Author: CM Wintersteiger
 #ifndef CPROVER_GOTO_PROGRAMS_WRITE_GOTO_BINARY_H
 #define CPROVER_GOTO_PROGRAMS_WRITE_GOTO_BINARY_H
 
-#define GOTO_BINARY_VERSION 6
+#define GOTO_BINARY_VERSION 6u
 
 #include <iosfwd>
 #include <string>
@@ -25,13 +25,13 @@ class symbol_table_baset;
 bool write_goto_binary(
   std::ostream &out,
   const goto_modelt &,
-  int version=GOTO_BINARY_VERSION);
+  std::size_t version = GOTO_BINARY_VERSION);
 
 bool write_goto_binary(
   std::ostream &out,
   const symbol_table_baset &,
   const goto_functionst &,
-  int version = GOTO_BINARY_VERSION);
+  std::size_t version = GOTO_BINARY_VERSION);
 
 bool write_goto_binary(
   const std::string &filename,

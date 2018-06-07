@@ -33,14 +33,14 @@ void unwindsett::parse_unwindset_one_loop(
   if(val.empty())
     return;
 
-  std::optional<unsigned> thread_nr;
+  std::optional<std::size_t> thread_nr;
   if(isdigit(val[0]))
   {
     auto c_pos = val.find(':');
     if(c_pos != std::string::npos)
     {
       std::string nr = val.substr(0, c_pos);
-      thread_nr = unsafe_string2unsigned(nr);
+      thread_nr = unsafe_string2size_t(nr);
       val.erase(0, nr.size() + 1);
     }
   }
@@ -170,7 +170,7 @@ void unwindsett::parse_unwindset_one_loop(
 
     if(thread_nr.has_value())
     {
-      thread_loop_map[std::pair<irep_idt, unsigned>(id, *thread_nr)] = uw;
+      thread_loop_map[std::pair<irep_idt, std::size_t>(id, *thread_nr)] = uw;
     }
     else
     {
@@ -188,13 +188,13 @@ void unwindsett::parse_unwindset(
 }
 
 std::optional<unsigned>
-unwindsett::get_limit(const irep_idt &loop_id, unsigned thread_nr) const
+unwindsett::get_limit(const irep_idt &loop_id, std::size_t thread_nr) const
 {
   // We use the most specific limit we have
 
   // thread x loop
   auto tl_it =
-    thread_loop_map.find(std::pair<irep_idt, unsigned>(loop_id, thread_nr));
+    thread_loop_map.find(std::pair<irep_idt, std::size_t>(loop_id, thread_nr));
 
   if(tl_it != thread_loop_map.end())
     return tl_it->second;

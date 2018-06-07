@@ -742,8 +742,8 @@ static void merge_names(
   symex_target_equationt &target,
   const incremental_dirtyt &dirty,
   const ssa_exprt &ssa,
-  const unsigned goto_count,
-  const unsigned dest_count)
+  const std::size_t goto_count,
+  const std::size_t dest_count)
 {
   const irep_idt l1_identifier = ssa.get_identifier();
   const irep_idt &obj_identifier = ssa.get_object_name();
@@ -876,10 +876,10 @@ void goto_symext::phi_function(
   for(const auto &delta_item : delta_view)
   {
     const ssa_exprt &ssa = delta_item.m.first;
-    unsigned goto_count = delta_item.m.second;
-    unsigned dest_count = !delta_item.is_in_both_maps()
-                            ? 0
-                            : delta_item.get_other_map_value().second;
+    std::size_t goto_count = delta_item.m.second;
+    std::size_t dest_count = !delta_item.is_in_both_maps()
+                               ? 0
+                               : delta_item.get_other_map_value().second;
 
     merge_names(
       goto_state,
@@ -905,8 +905,8 @@ void goto_symext::phi_function(
       continue;
 
     const ssa_exprt &ssa = delta_item.m.first;
-    unsigned goto_count = 0;
-    unsigned dest_count = delta_item.m.second;
+    std::size_t goto_count = 0;
+    std::size_t dest_count = delta_item.m.second;
 
     merge_names(
       goto_state,
@@ -954,7 +954,7 @@ void goto_symext::loop_bound_exceeded(
 bool goto_symext::should_stop_unwind(
   const symex_targett::sourcet &,
   const call_stackt &,
-  unsigned)
+  std::size_t)
 {
   // by default, we keep going
   return false;

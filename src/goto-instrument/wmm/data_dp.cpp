@@ -123,7 +123,7 @@ void data_dpt::dp_merge()
   if(data.size()<2)
     return;
 
-  unsigned initial_size=data.size();
+  std::size_t initial_size = data.size();
 
   unsigned from=0;
   unsigned to=0;

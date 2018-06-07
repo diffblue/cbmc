@@ -57,7 +57,7 @@ protected:
     symex_target_equationt &equation);
 
   // maps thread numbers to an event list
-  typedef std::map<unsigned, event_listt> per_thread_mapt;
+  typedef std::map<std::size_t, event_listt> per_thread_mapt;
 };
 
 #endif // CPROVER_GOTO_SYMEX_MEMORY_MODEL_H

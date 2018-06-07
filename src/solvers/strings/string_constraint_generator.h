@@ -372,13 +372,13 @@ exprt is_digit_with_radix(
   const exprt &chr,
   const bool strict_formatting,
   const exprt &radix_as_char,
-  const unsigned long radix_ul);
+  const std::size_t radix_ul);
 
 exprt get_numeric_value_from_character(
   const exprt &chr,
   const typet &char_type,
   const typet &type,
   const bool strict_formatting,
-  unsigned long radix_ul);
+  std::size_t radix_ul);
 
 #endif

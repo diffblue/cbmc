@@ -19,7 +19,7 @@ class qbf_qube_coret:public qdimacs_coret
 protected:
   std::string qbf_tmp_file;
 
-  typedef std::map<unsigned, bool> assignmentt;
+  typedef std::map<std::size_t, bool> assignmentt;
   assignmentt assignment;
 
 public:

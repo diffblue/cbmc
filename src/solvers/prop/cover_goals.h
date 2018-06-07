@@ -60,7 +60,7 @@ public:
     return _number_covered;
   }
 
-  unsigned iterations() const
+  std::size_t iterations() const
   {
     return _iterations;
   }
@@ -94,7 +94,7 @@ public:
 
 protected:
   std::size_t _number_covered;
-  unsigned _iterations;
+  std::size_t _iterations;
   decision_proceduret &decision_procedure;
 
   typedef std::vector<observert *> observerst;

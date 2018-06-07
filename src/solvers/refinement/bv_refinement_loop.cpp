@@ -29,13 +29,9 @@ decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
 
   log.debug() << "Solving with " << prop.solver_text() << messaget::eom;
 
-  unsigned iteration=0;
-
   // now enter the loop
-  while(true)
+  for(std::size_t iteration = 1; true; ++iteration)
   {
-    iteration++;
-
     log.progress() << "BV-Refinement: iteration " << iteration << messaget::eom;
 
     // output the very same information in a structured fashion

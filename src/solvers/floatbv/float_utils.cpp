@@ -806,9 +806,9 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
 
   bvt exponent_delta=bv_utils.zeros(exponent.size());
 
-  for(int d=depth-1; d>=0; d--)
+  for(std::size_t d = depth; d > 0; --d)
   {
-    std::size_t distance=(1<<d);
+    const std::size_t distance = 1ull << (d - 1);
     INVARIANT(
       fraction.size() > distance, "fraction must be larger than distance");
 
@@ -825,10 +825,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
       bv_utils.select(prefix_is_zero, shifted, fraction);
 
     // add corresponding weight to exponent
-    INVARIANT(
-      d < (signed)exponent_delta.size(),
-      "depth must be smaller than exponent size");
-    exponent_delta[d]=prefix_is_zero;
+    exponent_delta[d - 1] = prefix_is_zero;
   }
 
   exponent=bv_utils.sub(exponent, exponent_delta);

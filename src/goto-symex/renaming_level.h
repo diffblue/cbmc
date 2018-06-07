@@ -74,7 +74,7 @@ struct symex_level2t
   renamedt<ssa_exprt, L2> operator()(renamedt<ssa_exprt, L1> l1_expr) const;
 
   /// Counter corresponding to an identifier
-  unsigned latest_index(const irep_idt &identifier) const;
+  std::size_t latest_index(const irep_idt &identifier) const;
 
   /// Allocates a fresh L2 name for the given L1 identifier, and makes it the
   ///  latest generation on this path.

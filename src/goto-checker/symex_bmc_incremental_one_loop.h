@@ -35,20 +35,20 @@ public:
 
 protected:
   const irep_idt incr_loop_id;
-  const unsigned incr_max_unwind;
-  const unsigned incr_min_unwind;
+  const std::size_t incr_max_unwind;
+  const std::size_t incr_min_unwind;
 
   std::unique_ptr<goto_symext::statet> state;
 
   // returns true if the symbolic execution is to be interrupted for checking
-  bool check_break(const irep_idt &loop_id, unsigned unwind) override;
+  bool check_break(const irep_idt &loop_id, std::size_t unwind) override;
 
   bool should_stop_unwind(
     const symex_targett::sourcet &source,
     const call_stackt &context,
-    unsigned unwind) override;
+    std::size_t unwind) override;
 
-  void log_unwinding(unsigned unwind);
+  void log_unwinding(std::size_t unwind);
 
   ui_message_handlert::uit output_ui;
 };

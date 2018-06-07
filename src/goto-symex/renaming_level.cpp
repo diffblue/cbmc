@@ -128,7 +128,7 @@ void symex_level1t::restore_from(const symex_level1t &other)
   }
 }
 
-unsigned symex_level2t::latest_index(const irep_idt &identifier) const
+std::size_t symex_level2t::latest_index(const irep_idt &identifier) const
 {
   const auto r_opt = current_names.find(identifier);
   return !r_opt ? 0 : r_opt->get().second;
