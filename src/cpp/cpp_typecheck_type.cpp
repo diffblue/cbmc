@@ -227,7 +227,11 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     exprt e=static_cast<const exprt &>(type.find(ID_expr_arg));
     typecheck_expr(e);
-    type=e.type();
+
+    if(e.type().id() == ID_c_bit_field)
+      type = e.type().subtype();
+    else
+      type = e.type();
   }
   else if(type.id()==ID_unassigned)
   {
