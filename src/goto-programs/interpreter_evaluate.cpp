@@ -156,32 +156,29 @@ bool interpretert::byte_offset_to_memory_offset(
   if(source_type.id()==ID_struct)
   {
     const auto &st=to_struct_type(source_type);
-    const struct_typet::componentst &components=st.components();
-    member_offset_iterator component_offsets(st, ns);
     mp_integer previous_member_offsets=0;
-    for(; component_offsets->first<components.size() &&
-          component_offsets->second!=-1 &&
-          component_offsets->second<=offset;
-          ++component_offsets)
+
+    for(const auto &comp : st.components())
     {
-      const auto &component_type=components[component_offsets->first].type();
-      mp_integer component_byte_size=pointer_offset_size(component_type, ns);
+      const mp_integer comp_offset = member_offset(st, comp.get_name(), ns);
+
+      const mp_integer component_byte_size =
+        pointer_offset_size(comp.type(), ns);
       if(component_byte_size<0)
         return true;
-      if((component_offsets->second+component_byte_size)>offset)
+
+      if(comp_offset + component_byte_size > offset)
       {
         mp_integer subtype_result;
         bool ret=byte_offset_to_memory_offset(
-          component_type,
-          offset-(component_offsets->second),
-          subtype_result);
+          comp.type(), offset - comp_offset, subtype_result);
         result=previous_member_offsets+subtype_result;
         return ret;
       }
       else
       {
         mp_integer component_count;
-        if(count_type_leaves(component_type, component_count))
+        if(count_type_leaves(comp.type(), component_count))
           return true;
         previous_member_offsets+=component_count;
       }
@@ -236,33 +233,24 @@ bool interpretert::memory_offset_to_byte_offset(
   if(source_type.id()==ID_struct)
   {
     const auto &st=to_struct_type(source_type);
-    const struct_typet::componentst &components=st.components();
-    member_offset_iterator offsets(st, ns);
-    mp_integer previous_member_sizes;
     mp_integer cell_offset=full_cell_offset;
-    for(; offsets->first<components.size() && offsets->second!=-1; ++offsets)
+
+    for(const auto &comp : st.components())
     {
-      const auto &component_type=components[offsets->first].type();
       mp_integer component_count;
-      if(count_type_leaves(component_type, component_count))
+      if(count_type_leaves(comp.type(), component_count))
         return true;
       if(component_count>cell_offset)
       {
         mp_integer subtype_result;
         bool ret=memory_offset_to_byte_offset(
-          component_type,
-          cell_offset,
-          subtype_result);
-        result=previous_member_sizes+subtype_result;
+          comp.type(), cell_offset, subtype_result);
+        result = member_offset(st, comp.get_name(), ns) + subtype_result;
         return ret;
       }
       else
       {
         cell_offset-=component_count;
-        mp_integer component_size=pointer_offset_size(component_type, ns);
-        if(component_size<0)
-          return true;
-        previous_member_sizes+=component_size;
       }
     }
     // Ran out of members, or member of indefinite size
