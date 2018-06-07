@@ -1,5 +1,3 @@
-#include <cassert>
-
 typedef decltype(nullptr) nullptr_t;
 
 static_assert(nullptr==0, "nullptr==0");
@@ -20,7 +18,7 @@ int main()
 
   char buffer[10];
   void *p=my_null, *q=buffer;
-  assert(q!=nullptr);
+  __CPROVER_assert(q != nullptr, "");
 
   something(nullptr);
 }

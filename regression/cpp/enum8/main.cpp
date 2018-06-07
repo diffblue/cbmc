@@ -1,5 +1,3 @@
-#include <cassert>
-
 enum E1 { e1 } e1_var;
 enum E2 { e2 } e2_var;
 
@@ -23,19 +21,19 @@ struct some_struct
 
 int main()
 {
-  assert(f(0)==0);
-  assert(f(e1)==1);
-  assert(f(e2)==2);
-  assert(f(e1_var)==1);
-  assert(f(e2_var)==2);
+  __CPROVER_assert(f(0) == 0, "");
+  __CPROVER_assert(f(e1) == 1, "");
+  __CPROVER_assert(f(e2) == 2, "");
+  __CPROVER_assert(f(e1_var) == 1, "");
+  __CPROVER_assert(f(e2_var) == 2, "");
 
-  assert(g(0)==0);
-  assert(g(e1)==1);
-  assert(g(e2)==0);
-  assert(g(e1_var)==1);
-  assert(g(e2_var)==0);
+  __CPROVER_assert(g(0) == 0, "");
+  __CPROVER_assert(g(e1) == 1, "");
+  __CPROVER_assert(g(e2) == 0, "");
+  __CPROVER_assert(g(e1_var) == 1, "");
+  __CPROVER_assert(g(e2_var) == 0, "");
 
-  assert(f(some_struct_var.i)==0);
-  assert(f(some_struct_var.e1)==1);
-  assert(f(some_struct_var.e2)==2);
+  __CPROVER_assert(f(some_struct_var.i) == 0, "");
+  __CPROVER_assert(f(some_struct_var.e1) == 1, "");
+  __CPROVER_assert(f(some_struct_var.e2) == 2, "");
 }

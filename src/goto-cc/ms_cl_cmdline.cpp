@@ -406,6 +406,7 @@ const char *ms_cl_prefixes[]=
   "MT", //  link with LIBCMT.LIB
   "MDd", //  link with MSVCRTD.LIB debug lib
   "MTd", //  link with LIBCMTD.LIB debug lib
+  "std", //  specify C++ language standard
   nullptr
 };
 

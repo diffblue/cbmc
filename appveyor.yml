@@ -86,19 +86,6 @@ test_script:
     rmdir /s /q cbmc\byte_update7
     rmdir /s /q cbmc\pipe1
     rmdir /s /q cbmc\unsigned___int128
-    rmdir /s /q cbmc-cpp
-    rmdir /s /q cpp\Decltype1
-    rmdir /s /q cpp\Decltype2
-    rmdir /s /q cpp\Function_Overloading1
-    rmdir /s /q cpp\Resolver10
-    rmdir /s /q cpp\Resolver11
-    rmdir /s /q cpp\Template_Parameters1
-    rmdir /s /q cpp\enum2
-    rmdir /s /q cpp\enum7
-    rmdir /s /q cpp\enum8
-    rmdir /s /q cpp\nullptr1
-    rmdir /s /q cpp\sizeof1
-    rmdir /s /q cpp\static_assert1
     rmdir /s /q goto-gcc
     rmdir /s /q goto-instrument\slice08
     cd ..

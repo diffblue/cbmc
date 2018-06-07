@@ -1,17 +1,23 @@
+#ifdef __GNUC__
+#define NOTHROW __attribute__((nothrow))
+#else
+#define NOTHROW
+#endif
+
 namespace std {
   // cmath
-  __inline float abs(float x) __attribute__((nothrow));
-  __inline double abs(double x) __attribute__((nothrow));
-  __inline long double abs(long double x) __attribute__((nothrow));
+  __inline float abs(float x) NOTHROW;
+  __inline double abs(double x) NOTHROW;
+  __inline long double abs(long double x) NOTHROW;
 }
 
 namespace std {
   extern "C" {
-    int abs(int) __attribute__((nothrow)) ;
+    int abs(int) NOTHROW ;
   }
   extern "C++" {
-    inline long abs(long n) __attribute__((nothrow));
-    inline long long abs(long long n) __attribute__((nothrow));
+    inline long abs(long n) NOTHROW;
+    inline long long abs(long long n) NOTHROW;
   }
 }
 
