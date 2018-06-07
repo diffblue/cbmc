@@ -590,7 +590,7 @@ void goto_symext::loop_bound_exceeded(
 bool goto_symext::should_stop_unwind(
   const symex_targett::sourcet &,
   const goto_symex_statet::call_stackt &,
-  unsigned)
+  std::size_t)
 {
   // by default, we keep going
   return false;

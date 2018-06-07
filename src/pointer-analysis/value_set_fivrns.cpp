@@ -1051,8 +1051,8 @@ void value_set_fivrnst::do_function_call(
   // calls
 
   // the assigned data must be valid on from!
-  unsigned old_to_function=to_function;
-  unsigned old_to_target_index=to_target_index;
+  std::size_t old_to_function=to_function;
+  std::size_t old_to_target_index=to_target_index;
 
   to_function=from_function;
   to_target_index=from_target_index;
@@ -1283,9 +1283,9 @@ bool value_set_fivrnst::insert_from(
 }
 
 bool value_set_fivrnst::object_map_dt::set_valid_at(
-  unsigned inx,
-  unsigned f,
-  unsigned line)
+  std::size_t inx,
+  std::size_t f,
+  std::size_t line)
 {
   if(is_valid_at(inx, f, line))
     return false;
@@ -1354,9 +1354,9 @@ bool value_set_fivrnst::object_map_dt::set_valid_at(
 }
 
 bool value_set_fivrnst::object_map_dt::is_valid_at(
-  unsigned inx,
-  unsigned f,
-  unsigned line) const
+  std::size_t inx,
+  std::size_t f,
+  std::size_t line) const
 {
   #if 0
     std::cout << "IS_VALID_AT: " << inx << ", " << f << ", line " << line <<

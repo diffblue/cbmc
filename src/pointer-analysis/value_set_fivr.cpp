@@ -232,7 +232,7 @@ void value_set_fivrt::flatten_rec(
   const entryt &e,
   object_mapt &dest,
   flatten_seent &seen,
-  unsigned at_function) const
+  std::size_t at_function) const
 {
   #if 0
   std::cout << "FLATTEN_REC: " << e.identifier << e.suffix << '\n';
@@ -1390,8 +1390,8 @@ void value_set_fivrt::do_function_call(
   // calls
 
   // the assigned data must be valid on from!
-  unsigned old_to_function=to_function;
-  unsigned old_to_target_index=to_target_index;
+  std::size_t old_to_function=to_function;
+  std::size_t old_to_target_index=to_target_index;
 
   to_function=from_function;
   to_target_index=from_target_index;
@@ -1617,12 +1617,12 @@ bool value_set_fivrt::insert_from(
 }
 
 bool value_set_fivrt::object_map_dt::set_valid_at(
-  unsigned inx,
+  std::size_t inx,
   const validity_ranget &vr)
 {
   bool res=false;
 
-  for(unsigned i=vr.from; i<=vr.to; i++)
+  for(std::size_t i=vr.from; i<=vr.to; i++)
     if(set_valid_at(inx, vr.function, i))
       res=true;
 
@@ -1630,9 +1630,9 @@ bool value_set_fivrt::object_map_dt::set_valid_at(
 }
 
 bool value_set_fivrt::object_map_dt::set_valid_at(
-  unsigned inx,
-  unsigned f,
-  unsigned line)
+  std::size_t inx,
+  std::size_t f,
+  std::size_t line)
 {
   if(is_valid_at(inx, f, line))
     return false;
@@ -1701,9 +1701,9 @@ bool value_set_fivrt::object_map_dt::set_valid_at(
 }
 
 bool value_set_fivrt::object_map_dt::is_valid_at(
-  unsigned inx,
-  unsigned f,
-  unsigned line) const
+  std::size_t inx,
+  std::size_t f,
+  std::size_t line) const
 {
   #if 0
     std::cout << "IS_VALID_AT: " << inx << ", " << f << ", line " << line <<

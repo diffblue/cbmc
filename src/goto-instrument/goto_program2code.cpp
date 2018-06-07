@@ -951,7 +951,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
        it->case_last->location_number > max_target->location_number)
       max_target=it->case_last;
 
-  std::map<goto_programt::const_targett, unsigned> targets_done;
+  std::map<goto_programt::const_targett, std::size_t> targets_done;
   loop_last_stack.push_back(std::make_pair(max_target, false));
 
   // iterate over all <branch conditions, branch instruction, branch target>

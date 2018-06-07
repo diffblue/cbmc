@@ -65,9 +65,9 @@ find_enum_function_on_stack(const goto_symex_statet::call_stackt &context)
 ///   otherwise.
 tvt java_enum_static_init_unwind_handler(
   const goto_symex_statet::call_stackt &context,
-  unsigned loop_number,
-  unsigned unwind_count,
-  unsigned &unwind_max,
+  std::size_t loop_number,
+  std::size_t unwind_count,
+  std::size_t &unwind_max,
   const symbol_tablet &symbol_table)
 {
   (void)loop_number; // unused parameter

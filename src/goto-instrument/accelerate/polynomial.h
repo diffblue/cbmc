@@ -23,7 +23,7 @@ public:
   struct termt
   {
     exprt var;
-    unsigned int exp;   // This means exponent, not expression.
+    std::size_t exp;   // This means exponent, not expression.
   };
 
   // Invariant: this vector is sorted lexicographically w.r.t. the variable.
@@ -32,7 +32,7 @@ public:
 
   int compare(monomialt &other);
 
-  int degree();
+  std::size_t degree();
   bool contains(const exprt &var);
 };
 
@@ -56,7 +56,7 @@ public:
   void mult(int scalar);
   void mult(polynomialt &other);
 
-  int max_degree(const exprt &var);
+  std::size_t max_degree(const exprt &var);
   int coeff(const exprt &expr);
 };
 

@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
 #include <util/range.h>
+#include <util/string2int.h>
 
 #include <numeric>
 
@@ -478,7 +479,7 @@ exprt smt2_parsert::function_application()
         if(next_token() != smt2_tokenizert::NUMERAL)
           throw error("expected numeral as bitvector literal width");
 
-        auto width = std::stoll(smt2_tokenizer.get_buffer());
+        const auto width = safe_string2size_t(smt2_tokenizer.get_buffer());
 
         if(next_token() != smt2_tokenizert::CLOSE)
           throw error("expected ')' after bitvector literal");
@@ -683,7 +684,7 @@ exprt smt2_parsert::function_application()
         });
 
         const std::size_t total_width =
-          std::accumulate(op_width.begin(), op_width.end(), 0);
+          std::accumulate(op_width.begin(), op_width.end(), 0ULL);
 
         return concatenation_exprt(
           std::move(op), unsignedbv_typet(total_width));
@@ -805,12 +806,12 @@ exprt smt2_parsert::function_application()
           if(next_token() != smt2_tokenizert::NUMERAL)
             throw error("expected numeral after extract");
 
-          auto upper = std::stoll(smt2_tokenizer.get_buffer());
+          const auto upper = safe_string2size_t(smt2_tokenizer.get_buffer());
 
           if(next_token() != smt2_tokenizert::NUMERAL)
             throw error("expected two numerals after extract");
 
-          auto lower = std::stoll(smt2_tokenizer.get_buffer());
+          const auto lower = safe_string2size_t(smt2_tokenizer.get_buffer());
 
           if(next_token() != smt2_tokenizert::CLOSE)
             throw error("expected ')' after extract");
@@ -1072,7 +1073,7 @@ typet smt2_parsert::sort()
         if(next_token() != smt2_tokenizert::NUMERAL)
           throw error("expected numeral as bit-width");
 
-        auto width = std::stoll(smt2_tokenizer.get_buffer());
+        auto width = safe_string2size_t(smt2_tokenizer.get_buffer());
 
         // eat the ')'
         if(next_token() != smt2_tokenizert::CLOSE)
@@ -1085,12 +1086,12 @@ typet smt2_parsert::sort()
         if(next_token() != smt2_tokenizert::NUMERAL)
           throw error("expected numeral as bit-width");
 
-        const auto width_e = std::stoll(smt2_tokenizer.get_buffer());
+        const auto width_e = safe_string2size_t(smt2_tokenizer.get_buffer());
 
         if(next_token() != smt2_tokenizert::NUMERAL)
           throw error("expected numeral as bit-width");
 
-        const auto width_f = std::stoll(smt2_tokenizer.get_buffer());
+        const auto width_f = safe_string2size_t(smt2_tokenizer.get_buffer());
 
         // consume the ')'
         if(next_token() != smt2_tokenizert::CLOSE)

@@ -528,9 +528,9 @@ int jbmc_parse_optionst::doit()
       bmc.add_loop_unwind_handler(
         [&symbol_table](
           const goto_symex_statet::call_stackt &context,
-          unsigned loop_number,
-          unsigned unwind,
-          unsigned &max_unwind) {
+          std::size_t loop_number,
+          std::size_t unwind,
+          std::size_t &max_unwind) {
           return java_enum_static_init_unwind_handler(
             context, loop_number, unwind, max_unwind, symbol_table);
         });

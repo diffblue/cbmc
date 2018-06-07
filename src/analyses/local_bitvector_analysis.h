@@ -178,7 +178,7 @@ public:
 protected:
   void build();
 
-  typedef std::stack<unsigned> work_queuet;
+  typedef std::stack<std::size_t> work_queuet;
 
   numbering<irep_idt> pointers;
 

@@ -93,7 +93,7 @@ bool compilet::doit()
     return true;
   }
 
-  const unsigned warnings_before=
+  const std::size_t warnings_before =
     get_message_handler().get_message_count(messaget::M_WARNING);
 
   if(!source_files.empty())

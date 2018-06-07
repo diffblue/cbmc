@@ -35,12 +35,12 @@ exprt disjunction(const exprt::operandst &op)
   }
 }
 
-void dynamic_object_exprt::set_instance(unsigned int instance)
+void dynamic_object_exprt::set_instance(std::size_t instance)
 {
   op0()=from_integer(instance, typet(ID_natural));
 }
 
-unsigned int dynamic_object_exprt::get_instance() const
+std::size_t dynamic_object_exprt::get_instance() const
 {
   return std::stoul(id2string(to_constant_expr(op0()).get_value()));
 }

@@ -1232,7 +1232,7 @@ void acceleration_utilst::extract_polynomial(
     expr_listt terms=it->first;
     exprt coefficient=it->second;
     constant_exprt concrete_term=to_constant_expr(program.eval(coefficient));
-    std::map<exprt, int> degrees;
+    std::map<exprt, std::size_t> degrees;
 
     mp_integer mp=binary2integer(concrete_term.get_value().c_str(), true);
     monomial.coeff = numeric_cast_v<int>(mp);
@@ -1254,13 +1254,11 @@ void acceleration_utilst::extract_polynomial(
       }
     }
 
-    for(std::map<exprt, int>::iterator it=degrees.begin();
-        it!=degrees.end();
-        ++it)
+    for(const auto &deg_pair : degrees)
     {
       monomialt::termt term;
-      term.var=it->first;
-      term.exp=it->second;
+      term.var = deg_pair.first;
+      term.exp = deg_pair.second;
       monomial.terms.push_back(term);
     }
 

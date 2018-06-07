@@ -99,7 +99,7 @@ bool write_goto_binary_v4(
         irepconverter.reference_convert(instruction.code, out);
         irepconverter.write_string_ref(out, instruction.function);
         irepconverter.reference_convert(instruction.source_location, out);
-        write_gb_word(out, (long)instruction.type);
+        write_gb_word(out, static_cast<std::size_t>(instruction.type));
         irepconverter.reference_convert(instruction.guard, out);
         irepconverter.write_string_ref(out, irep_idt()); // former event
         write_gb_word(out, instruction.target_number);
@@ -127,7 +127,7 @@ bool write_goto_binary_v4(
 bool write_goto_binary(
   std::ostream &out,
   const goto_modelt &goto_model,
-  int version)
+  std::size_t version)
 {
   return write_goto_binary(
     out,
@@ -141,7 +141,7 @@ bool write_goto_binary(
   std::ostream &out,
   const symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
-  int version)
+  std::size_t version)
 {
   // header
   out << char(0x7f) << "GBF";

@@ -31,7 +31,7 @@ public:
 
 protected:
   virtual void normalization_shift(bvt &fraction, bvt &exponent);
-  bvt overapproximating_left_shift(const bvt &src, unsigned dist);
+  bvt overapproximating_left_shift(const bvt &src, std::size_t dist);
 
 private:
   // NOLINTNEXTLINE(readability/identifiers)

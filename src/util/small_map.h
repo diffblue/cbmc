@@ -241,24 +241,24 @@ private:
 
   static_assert(S_BITS <= N_BITS, "");
 
-  static_assert(std::numeric_limits<unsigned>::digits >= BITS, "");
+  static_assert(std::numeric_limits<std::size_t>::digits >= BITS, "");
 
   // Internal
 
-  unsigned get_field(std::size_t field) const
+  std::size_t get_field(std::size_t field) const
   {
     PRECONDITION(field < NUM);
 
-    unsigned shift = field * BITS;
+    std::size_t shift = field * BITS;
     return (ind & (MASK << shift)) >> shift;
   }
 
-  void set_field(std::size_t field, unsigned v)
+  void set_field(std::size_t field, std::size_t v)
   {
     PRECONDITION(field < NUM);
     PRECONDITION((std::size_t)(v >> 1) < NUM);
 
-    unsigned shift = field * BITS;
+    std::size_t shift = field * BITS;
 
     ind &= ~((index_fieldt)MASK << shift);
     ind |= v << shift;
@@ -268,7 +268,7 @@ private:
   {
     for(std::size_t idx = 0; idx < S_BITS / BITS; idx++)
     {
-      unsigned v = get_field(idx);
+      std::size_t v = get_field(idx);
       if(v & 1)
       {
         v >>= 1;
@@ -284,7 +284,7 @@ private:
 public:
   // Standard const iterator
 
-  typedef std::pair<const unsigned, const T &> value_type;
+  typedef std::pair<const std::size_t, const T &> value_type;
 
   /// Const iterator
   ///
@@ -349,7 +349,7 @@ public:
     {
       while(idx < NUM)
       {
-        unsigned v = m.get_field(idx);
+        std::size_t v = m.get_field(idx);
         if(v & 1)
         {
           ii = v >> 1;
@@ -444,7 +444,7 @@ public:
   {
     PRECONDITION(idx < NUM);
 
-    unsigned v = get_field(idx);
+    std::size_t v = get_field(idx);
     if(v & 1)
     {
       std::size_t ii = v >> 1;
@@ -465,7 +465,7 @@ public:
   {
     PRECONDITION(idx < NUM);
 
-    unsigned v = get_field(idx);
+    std::size_t v = get_field(idx);
     if(v & 1)
     {
       std::size_t ii = v >> 1;
@@ -479,7 +479,7 @@ public:
   {
     PRECONDITION(idx < NUM);
 
-    unsigned v = get_field(idx);
+    std::size_t v = get_field(idx);
 
     if(v & 1)
     {
@@ -516,7 +516,7 @@ public:
   {
     PRECONDITION(idx < NUM);
 
-    unsigned v = get_field(idx);
+    std::size_t v = get_field(idx);
     INVARIANT(v & 1, "element must be in map");
 
     std::size_t ii = v >> 1;
@@ -550,7 +550,7 @@ public:
   {
     PRECONDITION(idx < NUM);
 
-    unsigned v = get_field(idx);
+    std::size_t v = get_field(idx);
     INVARIANT(!(v & 1), "element must not be in map");
 
     std::size_t n = size();

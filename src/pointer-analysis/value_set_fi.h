@@ -34,18 +34,18 @@ public:
   {
   }
 
-  unsigned to_function, from_function;
-  unsigned to_target_index, from_target_index;
+  std::size_t to_function, from_function;
+  std::size_t to_target_index, from_target_index;
   static object_numberingt object_numbering;
   static hash_numbering<irep_idt, irep_id_hash> function_numbering;
 
-  void set_from(const irep_idt &function, unsigned inx)
+  void set_from(const irep_idt &function, std::size_t inx)
   {
     from_function = function_numbering.number(function);
     from_target_index = inx;
   }
 
-  void set_to(const irep_idt &function, unsigned inx)
+  void set_to(const irep_idt &function, std::size_t inx)
   {
     to_function = function_numbering.number(function);
     to_target_index = inx;
@@ -187,7 +187,7 @@ public:
 
   typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
-  typedef std::unordered_set<unsigned int> dynamic_object_id_sett;
+  typedef std::unordered_set<std::size_t> dynamic_object_id_sett;
 
   #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;

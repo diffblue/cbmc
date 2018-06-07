@@ -82,14 +82,14 @@ protected:
     const loc_infot &loc_info_src,
     loc_infot &loc_info_dest);
 
-  typedef std::set<unsigned> object_sett;
+  typedef std::set<std::size_t> object_sett;
 
   void get_rec(
     object_sett &dest,
     const exprt &rhs,
     const loc_infot &loc_info_src) const;
 
-  unsigned unknown_object;
+  std::size_t unknown_object;
 };
 
 class local_may_alias_factoryt

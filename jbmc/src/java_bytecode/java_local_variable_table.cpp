@@ -182,18 +182,18 @@ static void gather_transitive_predecessors(
 ///   slot `slotidx`
 static bool is_store_to_slot(
   const java_bytecode_convert_methodt::instructiont &inst,
-  unsigned slotidx)
+  std::size_t slotidx)
 {
   const std::string prevstatement=id2string(inst.statement);
   if(!(prevstatement.size()>=1 && prevstatement.substr(1, 5)=="store"))
     return false;
 
-  unsigned storeslotidx;
+  std::size_t storeslotidx;
   if(inst.args.size()==1)
   {
     // Store with an argument:
     const auto &arg=inst.args[0];
-    storeslotidx = numeric_cast_v<unsigned>(to_constant_expr(arg));
+    storeslotidx = numeric_cast_v<std::size_t>(to_constant_expr(arg));
   }
   else
   {

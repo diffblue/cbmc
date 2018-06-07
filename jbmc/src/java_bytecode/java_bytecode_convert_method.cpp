@@ -2942,7 +2942,7 @@ optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
 
   const optionalt<symbolt> &lambda_method_symbol = get_lambda_method_symbol(
     lambda_method_handles,
-    method_type.get_int(ID_java_lambda_method_handle_index));
+    method_type.get_size_t(ID_java_lambda_method_handle_index));
   if(lambda_method_symbol.has_value())
     debug() << "Converting invokedynamic for lambda: "
             << lambda_method_symbol.value().name << eom;

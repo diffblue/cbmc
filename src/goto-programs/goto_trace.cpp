@@ -321,7 +321,7 @@ void show_state_header(
   messaget::mstreamt &out,
   const namespacet &ns,
   const goto_trace_stept &state,
-  unsigned step_nr,
+  std::size_t step_nr,
   const trace_optionst &options)
 {
   out << '\n';
@@ -491,7 +491,7 @@ void show_full_goto_trace(
   const goto_tracet &goto_trace,
   const trace_optionst &options)
 {
-  unsigned prev_step_nr=0;
+  std::size_t prev_step_nr = 0;
   bool first_step=true;
   std::size_t function_depth=0;
 

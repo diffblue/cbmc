@@ -49,10 +49,10 @@ public:
   bool is_true() const;
   bool is_false() const;
 
-  unsigned var() const;
+  std::size_t var() const;
   const mini_bddt &low() const;
   const mini_bddt &high() const;
-  unsigned node_number() const;
+  std::size_t node_number() const;
   void clear();
 
   bool is_initialized() const { return node!=nullptr; }
@@ -66,12 +66,12 @@ class mini_bdd_nodet
 {
 public:
   class mini_bdd_mgrt *mgr;
-  unsigned var, node_number, reference_counter;
+  std::size_t var, node_number, reference_counter;
   mini_bddt low, high;
 
   mini_bdd_nodet(
     class mini_bdd_mgrt *_mgr,
-    unsigned _var, unsigned _node_number,
+    std::size_t _var, std::size_t _node_number,
     const mini_bddt &_low, const mini_bddt &_high);
 
   void add_reference();
@@ -99,7 +99,7 @@ public:
   friend class mini_bdd_nodet;
 
   // create a node (consulting the reverse-map)
-  mini_bddt mk(unsigned var, const mini_bddt &low, const mini_bddt &high);
+  mini_bddt mk(std::size_t var, const mini_bddt &low, const mini_bddt &high);
 
   std::size_t number_of_nodes();
 
@@ -120,9 +120,9 @@ protected:
   // this is our reverse-map for nodes
   struct reverse_keyt
   {
-    unsigned var, low, high;
+    std::size_t var, low, high;
     reverse_keyt(
-      unsigned _var, const mini_bddt &_low, const mini_bddt &_high);
+      std::size_t _var, const mini_bddt &_low, const mini_bddt &_high);
 
     bool operator<(const reverse_keyt &) const;
   };
@@ -134,14 +134,14 @@ protected:
   freet free;
 };
 
-mini_bddt restrict(const mini_bddt &u, unsigned var, const bool value);
-mini_bddt exists(const mini_bddt &u, unsigned var);
+mini_bddt restrict(const mini_bddt &u, std::size_t var, const bool value);
+mini_bddt exists(const mini_bddt &u, std::size_t var);
 mini_bddt substitute(
   const mini_bddt &where,
-  unsigned var,
+  std::size_t var,
   const mini_bddt &by_what);
 std::string cubes(const mini_bddt &u);
-bool OneSat(const mini_bddt &v, std::map<unsigned, bool> &assignment);
+bool OneSat(const mini_bddt &v, std::map<std::size_t, bool> &assignment);
 
 // inline functions
 #include "miniBDD.inc"

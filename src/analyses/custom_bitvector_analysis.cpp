@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void custom_bitvector_domaint::set_bit(
   const irep_idt &identifier,
-  unsigned bit_nr,
+  std::size_t bit_nr,
   modet mode)
 {
   switch(mode)
@@ -47,7 +47,7 @@ void custom_bitvector_domaint::set_bit(
 
 void custom_bitvector_domaint::set_bit(
   const exprt &lhs,
-  unsigned bit_nr,
+  std::size_t bit_nr,
   modet mode)
 {
   irep_idt id=object2id(lhs);
@@ -173,8 +173,7 @@ custom_bitvector_domaint::vectorst
   return vectorst();
 }
 
-unsigned custom_bitvector_analysist::get_bit_nr(
-  const exprt &string_expr)
+std::size_t custom_bitvector_analysist::get_bit_nr(const exprt &string_expr)
 {
   if(string_expr.id()==ID_typecast)
     return get_bit_nr(to_typecast_expr(string_expr).op());
@@ -328,7 +327,7 @@ void custom_bitvector_domaint::transform(
         {
           if(code_function_call.arguments().size()==2)
           {
-            unsigned bit_nr=
+            const std::size_t bit_nr =
               cba.get_bit_nr(code_function_call.arguments()[1]);
 
             // initialize to make Visual Studio happy
@@ -458,7 +457,7 @@ void custom_bitvector_domaint::transform(
         DATA_INVARIANT(
           code.operands().size() == 2, "set/clear_may/must has two operands");
 
-        unsigned bit_nr = cba.get_bit_nr(code.op1());
+        const std::size_t bit_nr = cba.get_bit_nr(code.op1());
 
         // initialize to make Visual Studio happy
         modet mode = modet::SET_MUST;
@@ -574,7 +573,7 @@ void custom_bitvector_domaint::output(
     out << bit.first << " MAY:";
     bit_vectort b=bit.second;
 
-    for(unsigned i=0; b!=0; i++, b>>=1)
+    for(std::size_t i=0; b!=0; i++, b>>=1)
       if(b&1)
       {
         assert(i<cba.bits.size());
@@ -590,7 +589,7 @@ void custom_bitvector_domaint::output(
     out << bit.first << " MUST:";
     bit_vectort b=bit.second;
 
-    for(unsigned i=0; b!=0; i++, b>>=1)
+    for(std::size_t i=0; b!=0; i++, b>>=1)
       if(b&1)
       {
         assert(i<cba.bits.size());
@@ -701,7 +700,7 @@ exprt custom_bitvector_domaint::eval(
   {
     if(src.operands().size()==2)
     {
-      unsigned bit_nr=
+      const std::size_t bit_nr =
         custom_bitvector_analysis.get_bit_nr(src.op1());
 
       exprt pointer=src.op0();
@@ -767,7 +766,7 @@ void custom_bitvector_analysist::check(
   bool use_xml,
   std::ostream &out)
 {
-  unsigned pass=0, fail=0, unknown=0;
+  std::size_t pass=0, fail=0, unknown=0;
 
   forall_goto_functions(f_it, goto_model.goto_functions)
   {

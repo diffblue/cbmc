@@ -351,8 +351,8 @@ int monomialt::compare(monomialt &other)
   // are sorted according to string comparison on variable names.
   while(it!=terms.end() && jt != other.terms.end())
   {
-    unsigned int e1=it->exp;
-    unsigned int e2=it->exp;
+    const auto e1 = it->exp;
+    const auto e2 = it->exp;
     int res=it->var.compare(jt->var);
 
     if(res < 0)
@@ -405,10 +405,10 @@ int monomialt::compare(monomialt &other)
   UNREACHABLE;
 }
 
-int polynomialt::max_degree(const exprt &var)
+std::size_t polynomialt::max_degree(const exprt &var)
 {
   // We want the degree of the highest degree monomial in which `var' appears.
-  int maxd=0;
+  std::size_t maxd = 0;
 
   for(std::vector<monomialt>::iterator it=monomials.begin();
       it!=monomials.end();
@@ -453,9 +453,9 @@ int polynomialt::coeff(const exprt &var)
   return 0;
 }
 
-int monomialt::degree()
+std::size_t monomialt::degree()
 {
-  int deg=0;
+  std::size_t deg=0;
 
   for(std::vector<termt>::iterator it=terms.begin();
       it!=terms.end();

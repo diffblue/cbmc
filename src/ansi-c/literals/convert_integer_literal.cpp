@@ -110,7 +110,7 @@ exprt convert_integer_literal(const std::string &src)
     ((signed?!is_unsigned:(is_unsigned || is_hex_or_oct_or_bin)) && \
     (power(2, signed?width-1:width)>value_abs))
 
-  unsigned width;
+  std::size_t width;
   bool is_signed=false;
   irep_idt c_type;
 

@@ -309,7 +309,7 @@ public:
 
   /* critical cycles per SCC */
   std::vector<std::set<event_grapht::critical_cyclet> > set_of_cycles_per_SCC;
-  unsigned num_sccs;
+  std::size_t num_sccs;
 
   /* map from function to begin and end of the corresponding part of the
      graph */

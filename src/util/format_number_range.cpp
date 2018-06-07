@@ -20,13 +20,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// create shorter representation for output
 /// \param input_numbers: vector of numbers
 /// \return string of compressed number range representation
-std::string format_number_range(const std::vector<unsigned> &input_numbers)
+std::string format_number_range(const std::vector<std::size_t> &input_numbers)
 {
   PRECONDITION(!input_numbers.empty());
 
-  std::vector<unsigned> numbers(input_numbers);
+  std::vector<std::size_t> numbers(input_numbers);
   std::sort(numbers.begin(), numbers.end());
-  unsigned end_number=numbers.back();
+  const auto end_number = numbers.back();
   if(numbers.front()==end_number)
     return std::to_string(end_number); // only single number
 
@@ -34,7 +34,7 @@ std::string format_number_range(const std::vector<unsigned> &input_numbers)
 
   auto start_number = numbers.front();
 
-  for(std::vector<unsigned>::const_iterator it = numbers.begin();
+  for(std::vector<std::size_t>::const_iterator it = numbers.begin();
       it != numbers.end();
       ++it)
   {

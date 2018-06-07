@@ -82,7 +82,7 @@ SCENARIO("call_graph",
       THEN("We expect A -> { A, B, B }, B -> { C, D }")
       {
         const auto &check_graph=call_graph_from_goto_functions.edges;
-        REQUIRE(check_graph.size()==5);
+        REQUIRE(check_graph.size() == 5ULL);
         REQUIRE(multimap_key_matches(check_graph, "A", {"A", "B", "B"}));
         REQUIRE(multimap_key_matches(check_graph, "B", {"C", "D"}));
       }
@@ -99,7 +99,7 @@ SCENARIO("call_graph",
       THEN("We expect A -> { A }, B -> { A, A }, C -> { B }, D -> { B }")
       {
         const auto &check_graph=inverse_call_graph_from_goto_functions.edges;
-        REQUIRE(check_graph.size()==5);
+        REQUIRE(check_graph.size() == 5ULL);
         REQUIRE(multimap_key_matches(check_graph, "A", {"A"}));
         REQUIRE(multimap_key_matches(check_graph, "B", {"A", "A"}));
         REQUIRE(multimap_key_matches(check_graph, "C", {"B"}));

@@ -81,7 +81,7 @@ void local_bitvector_analysist::assign_lhs(
 
     if(is_tracked(identifier))
     {
-      unsigned dest_pointer=pointers.number(identifier);
+      const std::size_t dest_pointer = pointers.number(identifier);
       flagst rhs_flags=get_rec(rhs, loc_info_src);
       loc_info_dest[dest_pointer]=rhs_flags;
     }
@@ -136,7 +136,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
     const irep_idt &identifier=to_symbol_expr(rhs).get_identifier();
     if(is_tracked(identifier))
     {
-      unsigned src_pointer=pointers.number(identifier);
+      const std::size_t src_pointer = pointers.number(identifier);
       return loc_info_src[src_pointer];
     }
     else
@@ -260,7 +260,7 @@ void local_bitvector_analysist::build()
 
   while(!work_queue.empty())
   {
-    unsigned loc_nr=work_queue.top();
+    const std::size_t loc_nr = work_queue.top();
     const local_cfgt::nodet &node=cfg.nodes[loc_nr];
     const goto_programt::instructiont &instruction=*node.t;
     work_queue.pop();

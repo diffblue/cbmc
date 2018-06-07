@@ -165,9 +165,9 @@ void weak_memory(
   {
     instrumenter.collect_cycles_by_SCCs(model);
     message.status()<<"cycles collected: "<<messaget::eom;
-    unsigned interesting_scc = 0;
-    unsigned total_cycles = 0;
-    for(unsigned i=0; i<instrumenter.num_sccs; i++)
+    std::size_t interesting_scc = 0;
+    std::size_t total_cycles = 0;
+    for(std::size_t i = 0; i < instrumenter.num_sccs; i++)
       if(instrumenter.egraph_SCCs[i].size()>=4)
       {
         message.status()<<"SCC #"<<i<<": "

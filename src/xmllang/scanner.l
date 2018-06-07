@@ -28,7 +28,7 @@
 static char *word(char *s)
 {
   char *buf;
-  int i, k;
+  std::size_t i, k;
   for (k = 0; isspace(s[k]) || s[k] == '<'; k++) ;
   for (i = k; s[i] && ! isspace(s[i]); i++) ;
   buf = (char *)malloc((i - k + 1) * sizeof(char));

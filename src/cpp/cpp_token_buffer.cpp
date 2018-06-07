@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/ansi_c_y.tab.h>
 #include <ansi-c/ansi_c_parser.h>
 
-int cpp_token_buffert::LookAhead(unsigned offset)
+int cpp_token_buffert::LookAhead(std::size_t offset)
 {
   assert(current_pos<=token_vector.size());
 
@@ -56,7 +56,7 @@ int cpp_token_buffert::get_token()
   return kind;
 }
 
-int cpp_token_buffert::LookAhead(unsigned offset, cpp_tokent &token)
+int cpp_token_buffert::LookAhead(std::size_t offset, cpp_tokent &token)
 {
   assert(current_pos<=token_vector.size());
 

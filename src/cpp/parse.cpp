@@ -268,7 +268,7 @@ protected:
   bool rSimpleDeclaration(cpp_declarationt &);
 
   bool isConstructorDecl();
-  bool isPtrToMember(int);
+  bool isPtrToMember(std::size_t);
   bool optMemberSpec(cpp_member_spect &);
   bool optStorageSpec(cpp_storage_spect &);
   bool optCvQualify(typet &);
@@ -1867,7 +1867,7 @@ bool Parser::isConstructorDecl()
       return false;        // it's a declarator
     else if(t==TOK_STDCALL || t==TOK_FASTCALL || t==TOK_CLRCALL || t==TOK_CDECL)
       return false;        // it's a declarator
-    else if(isPtrToMember(1))
+    else if(isPtrToMember(1u))
       return false;        // declarator (::*)
     else if(t==TOK_IDENTIFIER)
     {
@@ -1886,32 +1886,32 @@ bool Parser::isConstructorDecl()
   ptr.to.member
   : {'::'} (identifier {'<' any* '>'} '::')+ '*'
 */
-bool Parser::isPtrToMember(int i)
+bool Parser::isPtrToMember(std::size_t i)
 {
-  int t0=lex.LookAhead(i++);
+  auto t0 = lex.LookAhead(i++);
 
   if(t0==TOK_SCOPE)
       t0=lex.LookAhead(i++);
 
   while(t0==TOK_IDENTIFIER)
   {
-    int t=lex.LookAhead(i++);
+    auto t = lex.LookAhead(i++);
     if(t=='<')
     {
       int n=1;
       while(n > 0)
       {
-        int u=lex.LookAhead(i++);
+        const auto u = lex.LookAhead(i++);
         if(u=='<')
           ++n;
         else if(u=='>')
           --n;
         else if(u=='(')
         {
-          int m=1;
+          std::size_t m = 1;
           while(m > 0)
           {
-            int v=lex.LookAhead(i++);
+            const auto v = lex.LookAhead(i++);
             if(v=='(')
                 ++m;
             else if(v==')')
@@ -3292,7 +3292,7 @@ bool Parser::optPtrOperator(typet &ptrs)
 
       t_list.push_back(op);
     }
-    else if(isPtrToMember(0))
+    else if(isPtrToMember(0u))
     {
       typet op;
       if(!rPtrToMember(op))
@@ -7068,8 +7068,8 @@ bool Parser::moreVarName()
 */
 bool Parser::maybeTemplateArgs()
 {
-  int i=0;
-  int t=lex.LookAhead(i++);
+  std::size_t i = 0;
+  const auto t = lex.LookAhead(i++);
 
 #ifdef DEBUG
   indenter _i;
@@ -7081,7 +7081,7 @@ bool Parser::maybeTemplateArgs()
 #if 1
     for(;;)
     {
-      int u=lex.LookAhead(i++);
+      const auto u = lex.LookAhead(i++);
       if(u=='\0' || u==';' || u=='}')
         return false;
       else if((u=='>' || u==TOK_SHIFTRIGHT) &&

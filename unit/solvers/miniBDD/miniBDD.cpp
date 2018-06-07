@@ -20,6 +20,8 @@ Author: Diffblue Ltd.
 #include <util/format_expr.h>
 #include <util/symbol_table.h>
 
+#include <limits>
+
 class bdd_propt:public propt
 {
 public:
@@ -52,8 +54,9 @@ public:
     if(bdd.is_constant())
       return const_literal(bdd.is_true());
     std::size_t index=bdd.node_number();
+    CHECK_RETURN(index <= std::numeric_limits<literalt::var_not>::max());
     bdd_map[index]=bdd;
-    return literalt(index, false);
+    return literalt(static_cast<literalt::var_not>(index), false);
   }
 
   literalt land(literalt a, literalt b) override
