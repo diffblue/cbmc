@@ -35,7 +35,7 @@ public:
     ireps_on_readt ireps_on_read;
 
     irep_full_hash_containert irep_full_hash_container;
-    typedef std::map<unsigned, size_t> ireps_on_writet;
+    typedef std::map<std::size_t, std::size_t> ireps_on_writet;
     ireps_on_writet ireps_on_write;
 
     typedef std::vector<bool> string_mapt;
