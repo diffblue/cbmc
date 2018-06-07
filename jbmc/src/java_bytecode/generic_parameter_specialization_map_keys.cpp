@@ -2,6 +2,8 @@
 
 #include "generic_parameter_specialization_map_keys.h"
 
+#include <iterator>
+
 /// \param type Source type
 /// \return The vector of implicitly generic and (explicitly) generic type
 /// parameters of the given type.

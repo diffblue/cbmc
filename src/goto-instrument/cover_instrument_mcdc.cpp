@@ -14,6 +14,7 @@ Author: Daniel Kroening
 #include <langapi/language_util.h>
 
 #include <algorithm>
+#include <iterator>
 
 #include "cover_util.h"
 
