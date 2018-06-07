@@ -432,19 +432,29 @@ bool remove_exceptionst::instrument_function_call(
 
   if(function_may_throw(callee_id))
   {
-    add_exception_dispatch_sequence(
-      goto_program, instr_it, stack_catch, locals);
-
-    // add a null check (so that instanceof can be applied)
-    equal_exprt eq_null(
+    equal_exprt no_exception_currently_in_flight(
       get_inflight_exception_global(),
       null_pointer_exprt(pointer_type(empty_typet())));
 
-    goto_programt::targett t_null=goto_program.insert_after(instr_it);
-    t_null->make_goto(next_it);
-    t_null->source_location=instr_it->source_location;
-    t_null->function=instr_it->function;
-    t_null->guard=eq_null;
+    if(symbol_table.lookup_ref(callee_id).type.get_bool(ID_C_must_not_throw))
+    {
+      // Function is annotated must-not-throw, but we can't prove that here.
+      // Insert an ASSUME(@inflight_exception == null):
+      goto_programt::targett assume_null = goto_program.insert_after(instr_it);
+      assume_null->make_assumption(no_exception_currently_in_flight);
+    }
+    else
+    {
+      add_exception_dispatch_sequence(
+        goto_program, instr_it, stack_catch, locals);
+
+      // add a null check (so that instanceof can be applied)
+      goto_programt::targett t_null=goto_program.insert_after(instr_it);
+      t_null->make_goto(next_it);
+      t_null->source_location=instr_it->source_location;
+      t_null->function=instr_it->function;
+      t_null->guard=no_exception_currently_in_flight;
+    }
 
     return true;
   }
