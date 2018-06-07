@@ -188,6 +188,12 @@ private:
     std::unordered_set<irep_idt> &methods_to_convert_later,
     std::unordered_set<irep_idt> &instantiated_classes,
     std::unordered_set<exprt, irep_hash> &virtual_function_calls);
+
+  bool handle_virtual_methods_with_no_callees(
+    std::unordered_set<irep_idt> &methods_to_convert_later,
+    std::unordered_set<irep_idt> &instantiated_classes,
+    const std::unordered_set<exprt, irep_hash> &virtual_function_calls,
+    symbol_tablet &symbol_table);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_GATHER_METHODS_LAZILY_H

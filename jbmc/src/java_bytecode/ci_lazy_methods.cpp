@@ -167,43 +167,11 @@ bool ci_lazy_methodst::operator()(
       }
     }
 
-    any_new_classes = false;
-
-    // Look for virtual callsites with no candidate targets. If we have
-    // invokevirtual A.f and we don't believe either A or any of its children
-    // may exist, we assume specifically A is somehow instantiated. Note this
-    // may result in an abstract class being classified as instantiated, which
-    // stands in for some unknown concrete subclass: in this case the called
-    // method will be a stub.
-    for(const exprt &virtual_function_call : virtual_function_calls)
-    {
-      std::unordered_set<irep_idt> candidate_target_methods;
-      get_virtual_method_targets(
-        virtual_function_call,
-        instantiated_classes,
-        candidate_target_methods,
-        symbol_table);
-
-      if(!candidate_target_methods.empty())
-        continue;
-
-      // Add the call class to instantiated_classes and assert that it
-      // didn't already exist
-      const irep_idt &call_class = virtual_function_call.get(ID_C_class);
-      auto ret_class = instantiated_classes.insert(call_class);
-      CHECK_RETURN(ret_class.second);
-      any_new_classes = true;
-
-      // Check that `get_virtual_method_target` returns a method now
-      const irep_idt &call_basename =
-        virtual_function_call.get(ID_component_name);
-      const irep_idt method_name = get_virtual_method_target(
-        instantiated_classes, call_basename, call_class, symbol_table);
-      CHECK_RETURN(!method_name.empty());
-
-      // Add what it returns to methods_to_convert_later
-      methods_to_convert_later.insert(method_name);
-    }
+    any_new_classes = handle_virtual_methods_with_no_callees(
+      methods_to_convert_later,
+      instantiated_classes,
+      virtual_function_calls,
+      symbol_table);
   }
 
   // cproverNondetInitialize has to be force-loaded for mocks to return valid
@@ -253,6 +221,52 @@ bool ci_lazy_methodst::operator()(
   symbol_table.swap(keep_symbols);
 
   return false;
+}
+
+/// Look for virtual callsites with no candidate targets. If we have
+/// invokevirtual A.f and we don't believe either A or any of its children
+/// may exist, we assume specifically A is somehow instantiated. Note this
+/// may result in an abstract class being classified as instantiated, which
+/// stands in for some unknown concrete subclass: in this case the called
+/// method will be a stub.
+/// \return whether a new class was encountered
+bool ci_lazy_methodst::handle_virtual_methods_with_no_callees(
+  std::unordered_set<irep_idt> &methods_to_convert_later,
+  std::unordered_set<irep_idt> &instantiated_classes,
+  const std::unordered_set<exprt, irep_hash> &virtual_function_calls,
+  symbol_tablet &symbol_table)
+{
+  bool any_new_classes = false;
+  for(const exprt &virtual_function_call : virtual_function_calls)
+  {
+    std::unordered_set<irep_idt> candidate_target_methods;
+    get_virtual_method_targets(
+      virtual_function_call,
+      instantiated_classes,
+      candidate_target_methods,
+      symbol_table);
+
+    if(!candidate_target_methods.empty())
+      continue;
+
+    // Add the call class to instantiated_classes and assert that it
+    // didn't already exist
+    const irep_idt &call_class = virtual_function_call.get(ID_C_class);
+    auto ret_class = instantiated_classes.insert(call_class);
+    CHECK_RETURN(ret_class.second);
+    any_new_classes = true;
+
+    // Check that `get_virtual_method_target` returns a method now
+    const irep_idt &call_basename =
+      virtual_function_call.get(ID_component_name);
+    const irep_idt method_name = get_virtual_method_target(
+      instantiated_classes, call_basename, call_class, symbol_table);
+    CHECK_RETURN(!method_name.empty());
+
+    // Add what it returns to methods_to_convert_later
+    methods_to_convert_later.insert(method_name);
+  }
+  return any_new_classes;
 }
 
 /// Convert a method, add it to the populated set, add needed methods to
