@@ -1235,7 +1235,7 @@ void acceleration_utilst::extract_polynomial(
     std::map<exprt, int> degrees;
 
     mp_integer mp=binary2integer(concrete_term.get_value().c_str(), true);
-    monomial.coeff=mp.to_long();
+    monomial.coeff = numeric_cast_v<int>(mp);
 
     if(monomial.coeff==0)
     {
