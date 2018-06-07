@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/type_eq.h>
 #include <util/message.h>
 #include <util/base_type.h>
-#include <ansi-c/c_qualifiers.h>
+
 #include <analyses/does_remove_const.h>
 #include <util/invariant.h>
 
