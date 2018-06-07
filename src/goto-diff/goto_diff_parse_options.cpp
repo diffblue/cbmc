@@ -53,6 +53,7 @@ Author: Peter Schrammel
 #include <langapi/mode.h>
 
 #include <ansi-c/cprover_library.h>
+#include <cpp/cprover_library.h>
 
 #include <cbmc/version.h>
 
@@ -397,6 +398,7 @@ bool goto_diff_parse_optionst::process_goto_program(
 
     // add the library
     status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;
+    link_to_library(goto_model, get_message_handler(), add_cprover_cpp_library);
     link_to_library(goto_model, get_message_handler(), add_cprover_c_library);
 
     // remove function pointers

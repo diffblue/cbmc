@@ -49,6 +49,7 @@ src/ansi-c/gcc_builtin_headers_mips.inc
 src/ansi-c/gcc_builtin_headers_power.inc
 src/ansi-c/gcc_builtin_headers_ubsan.inc
 src/ansi-c/windows_builtin_headers.inc
+src/cpp/cprover_library.inc
 
 # regression/test files
 *.out

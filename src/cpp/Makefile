@@ -42,6 +42,7 @@ SRC = cpp_constructor.cpp \
       cpp_typecheck_using.cpp \
       cpp_typecheck_virtual_table.cpp \
       cpp_util.cpp \
+      cprover_library.cpp \
       expr2cpp.cpp \
       parse.cpp \
       template_map.cpp \
@@ -52,9 +53,25 @@ INCLUDES= -I ..
 include ../config.inc
 include ../common
 
-CLEANFILES = cpp$(LIBEXT)
+CLEANFILES = cpp$(LIBEXT) cprover_library.inc library_check
 
 all: cpp$(LIBEXT)
+
+###############################################################################
+
+../ansi-c/library/converter$(EXEEXT): ../ansi-c/library/converter.cpp
+	$(MAKE) -C ../ansi-c library/converter$(EXEEXT)
+
+library_check: library/*.c
+	../ansi-c/library_check.sh $(CC) $^
+	touch $@
+
+cprover_library.inc: ../ansi-c/library/converter$(EXEEXT) library/*.c
+	cat library/*.c | ../ansi-c/library/converter$(EXEEXT) > $@
+
+cprover_library.cpp: cprover_library.inc
+
+generated_files: cprover_library.inc
 
 ###############################################################################
 
