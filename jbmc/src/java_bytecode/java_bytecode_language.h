@@ -138,6 +138,7 @@ public:
   virtual void convert_lazy_method(
     const irep_idt &function_id,
     symbol_table_baset &symbol_table) override;
+  const select_pointer_typet &get_pointer_type_selector() const;
 
 protected:
   void convert_single_method(
@@ -153,7 +154,6 @@ protected:
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods);
 
   bool do_ci_lazy_method_conversion(symbol_tablet &, method_bytecodet &);
-  const select_pointer_typet &get_pointer_type_selector() const;
 
   irep_idt main_class;
   std::vector<irep_idt> main_jar_classes;
