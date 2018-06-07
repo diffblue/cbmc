@@ -172,6 +172,22 @@ private:
 
   std::unordered_set<irep_idt>
   entry_point_methods(const symbol_tablet &symbol_table);
+
+  struct convert_method_resultt
+  {
+    bool class_initializer_seen = false;
+    bool new_method_seen = false;
+  };
+
+  convert_method_resultt convert_and_analyze_method(
+    const method_convertert &method_converter,
+    std::unordered_set<irep_idt> &methods_already_populated,
+    const bool class_initializer_already_seen,
+    const irep_idt &method_name,
+    symbol_tablet &symbol_table,
+    std::unordered_set<irep_idt> &methods_to_convert_later,
+    std::unordered_set<irep_idt> &instantiated_classes,
+    std::unordered_set<exprt, irep_hash> &virtual_function_calls);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_GATHER_METHODS_LAZILY_H

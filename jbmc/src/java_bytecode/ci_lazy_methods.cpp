@@ -137,34 +137,17 @@ bool ci_lazy_methodst::operator()(
         std::swap(methods_to_convert, methods_to_convert_later);
         for(const auto &mname : methods_to_convert)
         {
-          if(!methods_already_populated.insert(mname).second)
-            continue;
-          debug() << "CI lazy methods: elaborate " << mname << eom;
-          if(
-            method_converter(
-              mname,
-              // Note this wraps *references* to methods_to_convert_later &
-              // instantiated_classes
-              ci_lazy_methods_neededt(
-                methods_to_convert_later, instantiated_classes, symbol_table)))
-          {
-            // Couldn't convert this function
-            continue;
-          }
-          const exprt &method_body = symbol_table.lookup_ref(mname).value;
-
-          gather_virtual_callsites(method_body, virtual_function_calls);
-
-          if(!class_initializer_seen && references_class_model(method_body))
-          {
-            class_initializer_seen = true;
-            irep_idt initializer_signature =
-              get_java_class_literal_initializer_signature();
-            if(symbol_table.has_symbol(initializer_signature))
-              methods_to_convert_later.insert(initializer_signature);
-          }
-
-          any_new_methods = true;
+          const auto conversion_result = convert_and_analyze_method(
+            method_converter,
+            methods_already_populated,
+            class_initializer_seen,
+            mname,
+            symbol_table,
+            methods_to_convert_later,
+            instantiated_classes,
+            virtual_function_calls);
+          any_new_methods |= conversion_result.new_method_seen;
+          class_initializer_seen |= conversion_result.class_initializer_seen;
         }
       }
 
@@ -270,6 +253,57 @@ bool ci_lazy_methodst::operator()(
   symbol_table.swap(keep_symbols);
 
   return false;
+}
+
+/// Convert a method, add it to the populated set, add needed methods to
+/// methods_to_convert_later and add virtual calls from the method to
+/// virtual_function_calls
+/// \return structure containing two Booleans:
+///     * class_initializer_seen which is true if the class_initializer_seen
+///       argument was false and the class_model is referenced in
+///       the body of the method
+///     * new_method_seen if the method was not converted before and was
+///       converted successfully here
+ci_lazy_methodst::convert_method_resultt
+ci_lazy_methodst::convert_and_analyze_method(
+  const method_convertert &method_converter,
+  std::unordered_set<irep_idt> &methods_already_populated,
+  const bool class_initializer_already_seen,
+  const irep_idt &method_name,
+  symbol_tablet &symbol_table,
+  std::unordered_set<irep_idt> &methods_to_convert_later,
+  std::unordered_set<irep_idt> &instantiated_classes,
+  std::unordered_set<exprt, irep_hash> &virtual_function_calls)
+{
+  convert_method_resultt result;
+  if(!methods_already_populated.insert(method_name).second)
+    return result;
+
+  debug() << "CI lazy methods: elaborate " << method_name << eom;
+
+  // Note this wraps *references* to methods_to_convert_later &
+  // instantiated_classes
+  ci_lazy_methods_neededt needed_methods(
+    methods_to_convert_later, instantiated_classes, symbol_table);
+
+  const bool could_not_convert_function =
+    method_converter(method_name, needed_methods);
+  if(could_not_convert_function)
+    return result;
+
+  const exprt &method_body = symbol_table.lookup_ref(method_name).value;
+  gather_virtual_callsites(method_body, virtual_function_calls);
+
+  if(!class_initializer_already_seen && references_class_model(method_body))
+  {
+    result.class_initializer_seen = true;
+    const irep_idt initializer_signature =
+      get_java_class_literal_initializer_signature();
+    if(symbol_table.has_symbol(initializer_signature))
+      methods_to_convert_later.insert(initializer_signature);
+  }
+  result.new_method_seen = true;
+  return result;
 }
 
 /// Entry point methods are either:
