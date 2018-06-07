@@ -33,11 +33,10 @@ public:
     for(const auto key : erase_keys)
     {
       PRECONDITION(generic_parameter_specialization_map.count(key) != 0);
-      (*generic_parameter_specialization_map.find(key)).second.pop();
-      if((*generic_parameter_specialization_map.find(key)).second.empty())
-      {
+      auto &val = generic_parameter_specialization_map.find(key)->second;
+      val.pop_back();
+      if(val.empty())
         generic_parameter_specialization_map.erase(key);
-      }
     }
   }
 
