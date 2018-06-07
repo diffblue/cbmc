@@ -530,6 +530,12 @@ int gcc_modet::doit()
      gcc_version.is_at_least(7))
     config.ansi_c.ts_18661_3_Floatn_types=true;
 
+  int gcc_float128_minor_version = config.ansi_c.arch == "x86_64" ? 3 : 5;
+
+  config.ansi_c.Float128_type =
+    gcc_version.flavor == gcc_versiont::flavort::GCC &&
+    gcc_version.is_at_least(4, gcc_float128_minor_version);
+
   // -fshort-double makes double the same as float
   if(cmdline.isset("fshort-double"))
     config.ansi_c.double_width=config.ansi_c.single_width;

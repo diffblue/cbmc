@@ -912,6 +912,9 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
   }
 
+  if(ansi_c.preprocessor == ansi_ct::preprocessort::GCC)
+    ansi_c.Float128_type = true;
+
   set_arch(arch);
 
   if(os=="windows")

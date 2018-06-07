@@ -503,7 +503,7 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"_Float128"     { if(PARSER.ts_18661_3_Floatn_types)
+"_Float128"     { if(PARSER.Float128_type)
                   { loc(); return TOK_GCC_FLOAT128; }
                   else
                     return make_identifier();

@@ -1,0 +1,7 @@
+CORE
+gcc-5.c
+--native-compiler ./fake-gcc-5
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
