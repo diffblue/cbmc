@@ -11,15 +11,6 @@ Author:
 
 #include "read_goto_binary.h"
 
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-#include <unistd.h>
-#endif
-
 #include <fstream>
 #include <unordered_set>
 
@@ -105,41 +96,31 @@ bool read_goto_binary(
   }
   else if(is_osx_fat_magic(hdr))
   {
-    std::string tempname;
+    messaget message(message_handler);
+
     // Mach-O universal binary
     // This _may_ have a goto binary as hppa7100LC architecture
-    try
+    osx_fat_readert osx_fat_reader(in);
+
+    if(osx_fat_reader.has_gb())
     {
-      osx_fat_readert osx_fat_reader(in);
+      temporary_filet tempname("tmp.goto-binary", ".gb");
+      osx_fat_reader.extract_gb(filename, tempname());
 
-      if(osx_fat_reader.has_gb())
-      {
-        tempname=get_temporary_file("tmp.goto-binary", ".gb");
-        osx_fat_reader.extract_gb(filename, tempname);
+      std::ifstream temp_in(tempname(), std::ios::binary);
+      if(!temp_in)
+        message.error() << "failed to read temp binary" << messaget::eom;
 
-        std::ifstream temp_in(tempname, std::ios::binary);
-        if(!temp_in)
-          messaget(message_handler).error() << "failed to read temp binary"
-                                            << messaget::eom;
-        const bool read_err=read_bin_goto_object(
-          temp_in, filename, symbol_table, goto_functions, message_handler);
-        temp_in.close();
+      const bool read_err = read_bin_goto_object(
+        temp_in, filename, symbol_table, goto_functions, message_handler);
+      temp_in.close();
 
-        unlink(tempname.c_str());
-        return read_err;
-      }
-
-      // architecture not found
-      messaget(message_handler).error() <<
-        "failed to find goto binary in Mach-O file" << messaget::eom;
+      return read_err;
     }
 
-    catch(const char *s)
-    {
-      if(!tempname.empty())
-        unlink(tempname.c_str());
-      messaget(message_handler).error() << s << messaget::eom;
-    }
+    // architecture not found
+    message.error() << "failed to find goto binary in Mach-O file"
+                    << messaget::eom;
   }
   else
   {

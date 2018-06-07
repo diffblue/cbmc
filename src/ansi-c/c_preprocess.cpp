@@ -16,15 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-#include <unistd.h>
-#endif
-
 /// quote a string for bash and CMD
 static std::string shell_quote(const std::string &src)
 {
@@ -325,11 +316,11 @@ bool c_preprocess_visual_studio(
 
   // use Visual Studio's CL
 
-  std::string stderr_file=get_temporary_file("tmp.stderr", "");
-  std::string command_file_name=get_temporary_file("tmp.cl-cmd", "");
+  temporary_filet stderr_file("tmp.stderr", "");
+  temporary_filet command_file_name("tmp.cl-cmd", "");
 
   {
-    std::ofstream command_file(command_file_name);
+    std::ofstream command_file(command_file_name());
 
     // This marks the command file as UTF-8, which Visual Studio
     // understands.
@@ -385,23 +376,20 @@ bool c_preprocess_visual_studio(
     command_file << shell_quote(file) << "\n";
   }
 
-  std::string tmpi=get_temporary_file("tmp.cl", "");
+  temporary_filet tmpi("tmp.cl", "");
 
-  std::string command="CL @\""+command_file_name+"\"";
-  command+=" > \""+tmpi+"\"";
-  command+=" 2> \""+stderr_file+"\"";
+  std::string command = "CL @\"" + command_file_name() + "\"";
+  command += " > \"" + tmpi() + "\"";
+  command += " 2> \"" + stderr_file() + "\"";
 
   // _popen isn't very reliable on WIN32
   // that's why we use system()
   int result=system(command.c_str());
 
-  std::ifstream instream(tmpi);
+  std::ifstream instream(tmpi());
 
   if(!instream)
   {
-    unlink(tmpi.c_str());
-    unlink(stderr_file.c_str());
-    unlink(command_file_name.c_str());
     message.error() << "CL Preprocessing failed (open failed)"
                     << messaget::eom;
     return true;
@@ -410,14 +398,10 @@ bool c_preprocess_visual_studio(
   outstream << instream.rdbuf(); // copy
 
   instream.close();
-  unlink(tmpi.c_str());
-  unlink(command_file_name.c_str());
 
   // errors/warnings
-  std::ifstream stderr_stream(stderr_file);
+  std::ifstream stderr_stream(stderr_file());
   error_parse(stderr_stream, result==0, message);
-
-  unlink(stderr_file.c_str());
 
   if(result!=0)
   {
@@ -477,7 +461,7 @@ bool c_preprocess_codewarrior(
   // preprocessing
   messaget message(message_handler);
 
-  std::string stderr_file=get_temporary_file("tmp.stderr", "");
+  temporary_filet stderr_file("tmp.stderr", "");
 
   std::string command;
 
@@ -497,36 +481,31 @@ bool c_preprocess_codewarrior(
 
   int result;
 
-  std::string tmpi=get_temporary_file("tmp.cl", "");
+  temporary_filet tmpi("tmp.cl", "");
   command+=" \""+file+"\"";
-  command+=" -o \""+tmpi+"\"";
-  command+=" 2> \""+stderr_file+"\"";
+  command += " -o \"" + tmpi() + "\"";
+  command += " 2> \"" + stderr_file() + "\"";
 
   result=system(command.c_str());
 
-  std::ifstream stream_i(tmpi);
+  std::ifstream stream_i(tmpi());
 
   if(stream_i)
   {
     postprocess_codewarrior(stream_i, outstream);
 
     stream_i.close();
-    unlink(tmpi.c_str());
   }
   else
   {
-    unlink(tmpi.c_str());
-    unlink(stderr_file.c_str());
     message.error() << "Preprocessing failed (fopen failed)"
                     << messaget::eom;
     return true;
   }
 
   // errors/warnings
-  std::ifstream stderr_stream(stderr_file);
+  std::ifstream stderr_stream(stderr_file());
   error_parse(stderr_stream, result==0, message);
-
-  unlink(stderr_file.c_str());
 
   if(result!=0)
   {
@@ -551,7 +530,7 @@ bool c_preprocess_gcc_clang(
   // preprocessing
   messaget message(message_handler);
 
-  std::string stderr_file=get_temporary_file("tmp.stderr", "");
+  temporary_filet stderr_file("tmp.stderr", "");
 
   std::string command;
 
@@ -651,39 +630,35 @@ bool c_preprocess_gcc_clang(
   #endif
 
   #ifdef _WIN32
-  std::string tmpi=get_temporary_file("tmp.gcc", "");
+  temporary_filet tmpi("tmp.gcc", "");
   command+=" \""+file+"\"";
-  command+=" -o \""+tmpi+"\"";
-  command+=" 2> \""+stderr_file+"\"";
+  command += " -o \"" + tmpi() + "\"";
+  command += " 2> \"" + stderr_file() + "\"";
 
   // _popen isn't very reliable on WIN32
   // that's why we use system() and a temporary file
   result=system(command.c_str());
 
-  std::ifstream instream(tmpi);
+  std::ifstream instream(tmpi());
 
   // errors/warnings
-  std::ifstream stderr_stream(stderr_file);
+  std::ifstream stderr_stream(stderr_file());
   error_parse(stderr_stream, result==0, message);
-
-  unlink(stderr_file.c_str());
 
   if(instream)
   {
     outstream << instream.rdbuf();
     instream.close();
-    unlink(tmpi.c_str());
   }
   else
   {
-    unlink(tmpi.c_str());
     message.error() << "GCC preprocessing failed (open failed)"
                     << messaget::eom;
     result=1;
   }
   #else
   command+=" \""+file+"\"";
-  command+=" 2> \""+stderr_file+"\"";
+  command += " 2> \"" + stderr_file() + "\"";
 
   FILE *stream=popen(command.c_str(), "r");
 
@@ -703,10 +678,8 @@ bool c_preprocess_gcc_clang(
   }
 
   // errors/warnings
-  std::ifstream stderr_stream(stderr_file);
+  std::ifstream stderr_stream(stderr_file());
   error_parse(stderr_stream, result==0, message);
-
-  unlink(stderr_file.c_str());
 
   #endif
 
@@ -732,7 +705,7 @@ bool c_preprocess_arm(
   // preprocessing using armcc
   messaget message(message_handler);
 
-  std::string stderr_file=get_temporary_file("tmp.stderr", "");
+  temporary_filet stderr_file("tmp.stderr", "");
 
   std::string command;
 
@@ -770,34 +743,31 @@ bool c_preprocess_arm(
   int result;
 
   #ifdef _WIN32
-  std::string tmpi=get_temporary_file("tmp.cl", "");
+  temporary_filet tmpi("tmp.cl", "");
   command+=" \""+file+"\"";
-  command+=" > \""+tmpi+"\"";
-  command+=" 2> \""+stderr_file+"\"";
+  command += " > \"" + tmpi() + "\"";
+  command += " 2> \"" + stderr_file() + "\"";
 
   // _popen isn't very reliable on WIN32
   // that's why we use system() and a temporary file
   result=system(command.c_str());
 
-  std::ifstream instream(tmpi);
+  std::ifstream instream(tmpi());
 
   if(!instream)
   {
     outstream << instream.rdbuf(); // copy
     instream.close();
-    unlink(tmpi.c_str());
   }
   else
   {
-    unlink(tmpi.c_str());
-    unlink(stderr_file.c_str());
     message.error() << "ARMCC preprocessing failed (fopen failed)"
                     << messaget::eom;
     return true;
   }
   #else
   command+=" \""+file+"\"";
-  command+=" 2> \""+stderr_file+"\"";
+  command += " 2> \"" + stderr_file() + "\"";
 
   FILE *stream=popen(command.c_str(), "r");
 
@@ -811,7 +781,6 @@ bool c_preprocess_arm(
   }
   else
   {
-    unlink(stderr_file.c_str());
     message.error() << "ARMCC preprocessing failed (popen failed)"
                     << messaget::eom;
     return true;
@@ -819,10 +788,8 @@ bool c_preprocess_arm(
   #endif
 
   // errors/warnings
-  std::ifstream stderr_stream(stderr_file);
+  std::ifstream stderr_stream(stderr_file());
   error_parse(stderr_stream, result==0, message);
-
-  unlink(stderr_file.c_str());
 
   if(result!=0)
   {
