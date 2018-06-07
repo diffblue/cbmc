@@ -78,6 +78,8 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_pointer)
   {
+    c_qualifierst qualifiers(type);
+
     // the pointer/reference might have a qualifier,
     // but do subtype first
     typecheck_type(type.subtype());
@@ -114,6 +116,11 @@ void cpp_typecheckt::typecheck_type(typet &type)
         }
       }
     }
+
+    if(type.get_bool(ID_C_constant))
+      qualifiers.is_constant = true;
+
+    qualifiers.write(type);
   }
   else if(type.id()==ID_array)
   {

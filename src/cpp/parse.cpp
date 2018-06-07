@@ -5222,7 +5222,13 @@ bool Parser::rTypeName(typet &tname)
   if(!rDeclarator(declarator, kCastDeclarator, false, false))
     return false;
 
-  tname.swap(declarator.type());
+  if(!declarator.method_qualifier().id().empty())
+  {
+    tname.swap(declarator.method_qualifier());
+    merge_types(declarator.type(), tname);
+  }
+  else
+    tname.swap(declarator.type());
 
   // make type_name subtype of arg
   make_subtype(type_name, tname);
