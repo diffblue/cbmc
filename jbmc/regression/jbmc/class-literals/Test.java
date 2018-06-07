@@ -3,6 +3,22 @@ public class Test {
 
   public static void main() {
 
+    // First check that all `.class` literals are indeed java.lang.Class
+    // instances:
+    assert ExampleAnnotation.class instanceof Class;
+    assert ExampleInterface.class instanceof Class;
+    assert ExampleEnum.class instanceof Class;
+    assert ExampleSynthetic.class instanceof Class;
+    assert char[].class instanceof Class;
+    assert short[].class instanceof Class;
+    assert int[].class instanceof Class;
+    assert long[].class instanceof Class;
+    assert float[].class instanceof Class;
+    assert double[].class instanceof Class;
+    assert boolean[].class instanceof Class;
+    assert Object[].class instanceof Class;
+    assert Object[][].class instanceof Class;
+
     assert ExampleAnnotation.class.isAnnotation();
     assert ExampleInterface.class.isInterface();
     assert ExampleEnum.class.isEnum();
@@ -29,6 +45,7 @@ public class Test {
     assert ExampleAnnotation.class.getName() == "ExampleAnnotation";
     assert ExampleInterface.class.getName() == "ExampleInterface";
     assert ExampleEnum.class.getName() == "ExampleEnum";
+    assert ExampleSynthetic.class.getName() == "ExampleSynthetic";
 
   }
 
