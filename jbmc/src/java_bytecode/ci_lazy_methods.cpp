@@ -126,46 +126,47 @@ bool ci_lazy_methodst::operator()(
 
   bool any_new_classes = true;
   while(any_new_classes)
-  {bool any_new_methods = true;
-  while(any_new_methods)
   {
-    any_new_methods=false;
-    while(!methods_to_convert_later.empty())
+    bool any_new_methods = true;
+    while(any_new_methods)
     {
-      std::unordered_set<irep_idt> methods_to_convert;
-      std::swap(methods_to_convert, methods_to_convert_later);
-      for(const auto &mname : methods_to_convert)
+      any_new_methods = false;
+      while(!methods_to_convert_later.empty())
       {
-        if(!methods_already_populated.insert(mname).second)
-          continue;
-        debug() << "CI lazy methods: elaborate " << mname << eom;
-        if(
-          method_converter(
-            mname,
-            // Note this wraps *references* to methods_to_convert_later &
-            // instantiated_classes
-            ci_lazy_methods_neededt(
-              methods_to_convert_later, instantiated_classes, symbol_table)))
+        std::unordered_set<irep_idt> methods_to_convert;
+        std::swap(methods_to_convert, methods_to_convert_later);
+        for(const auto &mname : methods_to_convert)
         {
-          // Couldn't convert this function
-          continue;
+          if(!methods_already_populated.insert(mname).second)
+            continue;
+          debug() << "CI lazy methods: elaborate " << mname << eom;
+          if(
+            method_converter(
+              mname,
+              // Note this wraps *references* to methods_to_convert_later &
+              // instantiated_classes
+              ci_lazy_methods_neededt(
+                methods_to_convert_later, instantiated_classes, symbol_table)))
+          {
+            // Couldn't convert this function
+            continue;
+          }
+          const exprt &method_body = symbol_table.lookup_ref(mname).value;
+
+          gather_virtual_callsites(method_body, virtual_function_calls);
+
+          if(!class_initializer_seen && references_class_model(method_body))
+          {
+            class_initializer_seen = true;
+            irep_idt initializer_signature =
+              get_java_class_literal_initializer_signature();
+            if(symbol_table.has_symbol(initializer_signature))
+              methods_to_convert_later.insert(initializer_signature);
+          }
+
+          any_new_methods = true;
         }
-        const exprt &method_body = symbol_table.lookup_ref(mname).value;
-
-        gather_virtual_callsites(method_body, virtual_function_calls);
-
-        if(!class_initializer_seen && references_class_model(method_body))
-        {
-          class_initializer_seen = true;
-          irep_idt initializer_signature =
-            get_java_class_literal_initializer_signature();
-          if(symbol_table.has_symbol(initializer_signature))
-            methods_to_convert_later.insert(initializer_signature);
-        }
-
-        any_new_methods=true;
       }
-    }
 
       // Given the object types we now know may be created, populate more
       // possible virtual function call targets:
