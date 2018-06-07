@@ -338,9 +338,6 @@ bool jdiff_parse_optionst::process_goto_program(
 {
   try
   {
-    // add the library
-    link_to_library(goto_model, get_message_handler());
-
     // remove function pointers
     status() << "Removal of function pointers and virtual functions" << eom;
     remove_function_pointers(
