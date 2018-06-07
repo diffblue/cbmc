@@ -15,6 +15,7 @@ Date: June 2011
 
 #include <ctime>
 
+#include <util/arith_tools.h>
 #include <util/numbering.h>
 #include <util/pointer_offset_size.h>
 
@@ -62,7 +63,7 @@ std::string as_vcd_binary(
   const auto width = pointer_offset_bits(type, ns);
 
   if(width.has_value())
-    return std::string(integer2size_t(*width), 'x');
+    return std::string(numeric_cast_v<std::size_t>(*width), 'x');
   else
     return "";
 }

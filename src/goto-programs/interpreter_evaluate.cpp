@@ -50,7 +50,7 @@ void interpretert::read_unbounded(
   mp_vectort &dest) const
 {
   // copy memory region
-  std::size_t address_val=integer2size_t(address);
+  std::size_t address_val = numeric_cast_v<std::size_t>(address);
   const mp_integer offset=address_to_offset(address_val);
   const mp_integer alloc_size=
     base_address_to_actual_size(address_val-offset);
@@ -61,7 +61,8 @@ void interpretert::read_unbounded(
 
     if((address+i)<memory.size())
     {
-      const memory_cellt &cell=memory[integer2size_t(address+i)];
+      const memory_cellt &cell =
+        memory[numeric_cast_v<std::size_t>(address + i)];
       value=cell.value;
       if(cell.initialized==memory_cellt::initializedt::UNKNOWN)
         cell.initialized=memory_cellt::initializedt::READ_BEFORE_WRITTEN;
@@ -315,7 +316,7 @@ void interpretert::evaluate(
   {
     if(expr.type().id()==ID_struct)
     {
-      dest.reserve(integer2size_t(get_size(expr.type())));
+      dest.reserve(numeric_cast_v<std::size_t>(get_size(expr.type())));
       bool error=false;
 
       forall_operands(it, expr)
@@ -418,7 +419,7 @@ void interpretert::evaluate(
   else if(expr.id()==ID_struct)
   {
     if(!unbounded_size(expr.type()))
-      dest.reserve(integer2size_t(get_size(expr.type())));
+      dest.reserve(numeric_cast_v<std::size_t>(get_size(expr.type())));
 
     bool error=false;
 
@@ -959,7 +960,7 @@ void interpretert::evaluate(
     {
       if(!unbounded_size(expr.type()))
       {
-        dest.resize(integer2size_t(get_size(expr.type())));
+        dest.resize(numeric_cast_v<std::size_t>(get_size(expr.type())));
         read(address, dest);
       }
       else
@@ -1026,7 +1027,7 @@ void interpretert::evaluate(
 
     if(size.size()==1)
     {
-      std::size_t size_int=integer2size_t(size[0]);
+      std::size_t size_int = numeric_cast_v<std::size_t>(size[0]);
       for(std::size_t i=0; i<size_int; ++i)
         evaluate(expr.op0(), dest);
       return;
@@ -1052,10 +1053,11 @@ void interpretert::evaluate(
       mp_integer need_size=(where_idx+1)*subtype_size;
 
       if(dest.size()<need_size)
-        dest.resize(integer2size_t(need_size), 0);
+        dest.resize(numeric_cast_v<std::size_t>(need_size), 0);
 
       for(std::size_t i=0; i<new_value.size(); ++i)
-        dest[integer2size_t((where_idx*subtype_size)+i)]=new_value[i];
+        dest[numeric_cast_v<std::size_t>((where_idx * subtype_size) + i)] =
+          new_value[i];
 
       return;
     }

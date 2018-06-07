@@ -1378,7 +1378,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
       throw 0;
     }
 
-    type.set_width(integer2size_t(i));
+    type.set_width(numeric_cast_v<std::size_t>(i));
     type.remove(ID_size);
   }
 

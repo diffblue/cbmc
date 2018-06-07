@@ -42,7 +42,7 @@ void endianness_mapt::build_little_endian(const typet &src)
   if(!s.has_value())
     return;
 
-  std::size_t new_size = map.size() + integer2size_t(*s);
+  const std::size_t new_size = map.size() + numeric_cast_v<std::size_t>(*s);
   map.reserve(new_size);
 
   for(std::size_t i=map.size(); i<new_size; ++i)
@@ -66,7 +66,8 @@ void endianness_mapt::build_big_endian(const typet &src)
     auto bits = pointer_offset_bits(src, ns); // error is -1
     CHECK_RETURN(bits.has_value());
 
-    size_t bits_int = integer2size_t(*bits), base = map.size();
+    const std::size_t bits_int = numeric_cast_v<std::size_t>(*bits);
+    const std::size_t base = map.size();
 
     for(size_t bit=0; bit<bits_int; bit++)
     {
@@ -123,7 +124,7 @@ void endianness_mapt::build_big_endian(const typet &src)
     if(!s.has_value())
       return;
 
-    std::size_t new_size = map.size() + integer2size_t(*s);
+    const std::size_t new_size = map.size() + numeric_cast_v<std::size_t>(*s);
     map.reserve(new_size);
 
     for(std::size_t i=map.size(); i<new_size; ++i)

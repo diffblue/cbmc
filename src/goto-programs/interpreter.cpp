@@ -501,7 +501,7 @@ exprt interpretert::get_value(
     }
 
     // Retrieve the value for each member in the array
-    result.reserve_operands(integer2size_t(count));
+    result.reserve_operands(numeric_cast_v<std::size_t>(count));
     for(mp_integer i=0; i<count; ++i)
     {
       const exprt operand=get_value(
@@ -568,7 +568,7 @@ exprt interpretert::get_value(
     }
 
     // Retrieve the value for each member in the array
-    result.reserve_operands(integer2size_t(count));
+    result.reserve_operands(numeric_cast_v<std::size_t>(count));
     for(mp_integer i=0; i<count; ++i)
     {
       const exprt operand=get_value(type.subtype(), rhs,
@@ -580,35 +580,36 @@ exprt interpretert::get_value(
   else if(real_type.id()==ID_floatbv)
   {
     ieee_floatt f(to_floatbv_type(type));
-    f.unpack(rhs[integer2size_t(offset)]);
+    f.unpack(rhs[numeric_cast_v<std::size_t>(offset)]);
     return f.to_expr();
   }
   else if(real_type.id()==ID_fixedbv)
   {
     fixedbvt f;
-    f.from_integer(rhs[integer2size_t(offset)]);
+    f.from_integer(rhs[numeric_cast_v<std::size_t>(offset)]);
     return f.to_expr();
   }
   else if(real_type.id()==ID_bool)
   {
-    if(rhs[integer2size_t(offset)]!=0)
+    if(rhs[numeric_cast_v<std::size_t>(offset)] != 0)
       return true_exprt();
     else
       false_exprt();
   }
   else if(real_type.id()==ID_c_bool)
   {
-    return from_integer(rhs[integer2size_t(offset)]!=0?1:0, type);
+    return from_integer(
+      rhs[numeric_cast_v<std::size_t>(offset)] != 0 ? 1 : 0, type);
   }
   else if(real_type.id() == ID_pointer)
   {
-    if(rhs[integer2size_t(offset)]==0)
+    if(rhs[numeric_cast_v<std::size_t>(offset)] == 0)
       return null_pointer_exprt(to_pointer_type(real_type)); // NULL pointer
 
-    if(rhs[integer2size_t(offset)]<memory.size())
+    if(rhs[numeric_cast_v<std::size_t>(offset)] < memory.size())
     {
       // We want the symbol pointed to
-      mp_integer address=rhs[integer2size_t(offset)];
+      mp_integer address = rhs[numeric_cast_v<std::size_t>(offset)];
       irep_idt identifier=address_to_identifier(address);
       mp_integer offset=address_to_offset(address);
       const typet type=get_type(identifier);
@@ -631,8 +632,9 @@ exprt interpretert::get_value(
       return std::move(index_expr);
     }
 
-    error() << "interpreter: invalid pointer " << rhs[integer2size_t(offset)]
-            << " > object count " << memory.size() << eom;
+    error() << "interpreter: invalid pointer "
+            << rhs[numeric_cast_v<std::size_t>(offset)] << " > object count "
+            << memory.size() << eom;
 
     throw "interpreter: reading from invalid pointer";
   }
@@ -640,7 +642,8 @@ exprt interpretert::get_value(
   {
     // Strings are currently encoded by their irep_idt ID.
     return constant_exprt(
-      get_string_container().get_string(rhs[integer2size_t(offset)].to_long()),
+      get_string_container().get_string(
+        numeric_cast_v<std::size_t>(rhs[numeric_cast_v<std::size_t>(offset)])),
       type);
   }
 
@@ -680,8 +683,8 @@ void interpretert::execute_assign()
     side_effect_exprt side_effect=to_side_effect_expr(code_assign.rhs());
     if(side_effect.get_statement()==ID_nondet)
     {
-      mp_integer address=
-        integer2size_t(evaluate_address(code_assign.lhs()));
+      mp_integer address =
+        numeric_cast_v<std::size_t>(evaluate_address(code_assign.lhs()));
 
       mp_integer size=
         get_size(code_assign.lhs().type());
@@ -710,11 +713,11 @@ void interpretert::assign(
       {
         status() << total_steps << " ** assigning "
                  << address_to_identifier(address_val) << "["
-                 << address_to_offset(address_val) << "]:="
-                 << rhs[integer2size_t(i)]
-                 << "\n" << eom;
+                 << address_to_offset(address_val)
+                 << "]:=" << rhs[numeric_cast_v<std::size_t>(i)] << "\n"
+                 << eom;
       }
-      cell.value=rhs[integer2size_t(i)];
+      cell.value = rhs[numeric_cast_v<std::size_t>(i)];
       if(cell.initialized==memory_cellt::initializedt::UNKNOWN)
         cell.initialized=memory_cellt::initializedt::WRITTEN_BEFORE_READ;
     }

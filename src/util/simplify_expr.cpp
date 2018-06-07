@@ -1505,11 +1505,10 @@ exprt simplify_exprt::bits2expr(
       const auto m_size = pointer_offset_bits(component.type(), ns);
       CHECK_RETURN(m_size.has_value() && *m_size>=0);
 
-      std::string comp_bits=
-        std::string(
-          bits,
-          integer2size_t(m_offset_bits),
-          integer2size_t(*m_size));
+      std::string comp_bits = std::string(
+        bits,
+        numeric_cast_v<std::size_t>(m_offset_bits),
+        numeric_cast_v<std::size_t>(*m_size));
 
       exprt comp=bits2expr(comp_bits, component.type(), little_endian);
       if(comp.is_nil())
@@ -1530,7 +1529,7 @@ exprt simplify_exprt::bits2expr(
     const auto el_size_opt = pointer_offset_bits(array_type.subtype(), ns);
     CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > 0);
 
-    const std::size_t el_size = integer2size_t(*el_size_opt);
+    const std::size_t el_size = numeric_cast_v<std::size_t>(*el_size_opt);
 
     array_exprt result(array_type);
     result.reserve_operands(n_el);
@@ -1722,7 +1721,9 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
       const_bits+=const_bits;
 
     std::string el_bits = std::string(
-      const_bits, integer2size_t(*offset * 8), integer2size_t(*el_size));
+      const_bits,
+      numeric_cast_v<std::size_t>(*offset * 8),
+      numeric_cast_v<std::size_t>(*el_size));
 
     exprt tmp=
       bits2expr(
@@ -1759,8 +1760,8 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
   {
     std::string bits_cut = std::string(
       bits.value(),
-      integer2size_t(*offset * 8),
-      integer2size_t(el_size.value()));
+      numeric_cast_v<std::size_t>(*offset * 8),
+      numeric_cast_v<std::size_t>(*el_size));
 
     exprt tmp=
       bits2expr(

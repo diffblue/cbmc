@@ -556,7 +556,7 @@ exprt flatten_byte_update(
     // do a shift, mask and OR
     const auto type_width = pointer_offset_bits(t, ns);
     CHECK_RETURN(type_width.has_value() && *type_width > 0);
-    const std::size_t width = integer2size_t(*type_width);
+    const std::size_t width = numeric_cast_v<std::size_t>(*type_width);
 
     INVARIANT(
       element_size * 8 <= width,

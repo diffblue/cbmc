@@ -192,7 +192,7 @@ void boolbvt::convert_with_bv(
     next_bv=prev_bv;
 
     if(op1_value<next_bv.size())
-      next_bv[integer2size_t(op1_value)]=l;
+      next_bv[numeric_cast_v<std::size_t>(op1_value)] = l;
 
     return;
   }
