@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/tempfile.h>
 #include <util/unicode.h>
 
-#include <cstring>
 #include <fstream>
 
 #if defined(__linux__) || \
@@ -120,19 +119,19 @@ static void error_parse_line(
 
     while(*tptr!=0)
     {
-      if(strncmp(tptr, " line ", 6)==0 && state!=4)
+      if(has_prefix(tptr, " line ") && state != 4)
       {
         state=1;
         tptr+=6;
         continue;
       }
-      else if(strncmp(tptr, " column ", 8)==0 && state!=4)
+      else if(has_prefix(tptr, " column ") && state != 4)
       {
         state=2;
         tptr+=8;
         continue;
       }
-      else if(strncmp(tptr, " function ", 10)==0 && state!=4)
+      else if(has_prefix(tptr, " function ") && state != 4)
       {
         state=3;
         tptr+=10;
