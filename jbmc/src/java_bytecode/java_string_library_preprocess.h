@@ -337,7 +337,7 @@ private:
 
   exprt make_argument_for_format(
     const exprt &argv,
-    int index,
+    std::size_t index,
     const struct_typet &structured_type,
     const source_locationt &loc,
     const irep_idt &function_id,
@@ -351,7 +351,7 @@ private:
     symbol_table_baset &symbol_table,
     code_blockt &code);
 
-  exprt get_object_at_index(const exprt &argv, int index);
+  exprt get_object_at_index(const exprt &argv, std::size_t index);
 
   codet make_init_from_array_code(
     const code_typet &type,
