@@ -46,7 +46,7 @@ public:
     type.set(ID_C_hide, true);
   }
 
-  goto_functiont()
+  goto_functiont() : body(), type({}, empty_typet())
   {
   }
 

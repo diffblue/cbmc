@@ -92,7 +92,8 @@ public:
 
   bool can_produce_function(const irep_idt &id) const override
   {
-    return goto_functions.function_map.count(id);
+    return goto_functions.function_map.find(id) !=
+           goto_functions.function_map.end();
   }
 };
 
@@ -127,7 +128,8 @@ public:
 
   bool can_produce_function(const irep_idt &id) const override
   {
-    return goto_functions.function_map.count(id);
+    return goto_functions.function_map.find(id) !=
+           goto_functions.function_map.end();
   }
 
 private:

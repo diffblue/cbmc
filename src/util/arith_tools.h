@@ -10,14 +10,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_ARITH_TOOLS_H
 #define CPROVER_UTIL_ARITH_TOOLS_H
 
+#include "invariant.h"
 #include "mp_arith.h"
 #include "optional.h"
-#include "invariant.h"
+#include "std_expr.h"
 
 #include "deprecate.h"
 
-class exprt;
-class constant_exprt;
 class typet;
 
 // this one will go away
@@ -27,8 +26,6 @@ DEPRECATED("Use the constant_exprt version instead")
 bool to_integer(const exprt &expr, mp_integer &int_value);
 
 // returns 'true' on error
-/// \deprecated: use numeric_cast<mp_integer> instead
-DEPRECATED("Use numeric_cast<mp_integer> instead")
 bool to_integer(const constant_exprt &expr, mp_integer &int_value);
 
 // returns 'true' on error
@@ -49,7 +46,7 @@ struct numeric_castt<mp_integer> final
   optionalt<mp_integer> operator()(const exprt &expr) const
   {
     mp_integer out;
-    if(to_integer(expr, out))
+    if(expr.id() != ID_constant || to_integer(to_constant_expr(expr), out))
       return {};
     return out;
   }
