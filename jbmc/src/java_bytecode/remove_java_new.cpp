@@ -14,11 +14,10 @@ Author: Peter Schrammel
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_convert.h>
 
-#include <linking/zero_initializer.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_cast.h>
+#include <util/expr_initializer.h>
 #include <util/fresh_symbol.h>
 #include <util/message.h>
 #include <util/pointer_offset_size.h>

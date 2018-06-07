@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/expr_initializer.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
@@ -31,8 +32,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
-
-#include <linking/zero_initializer.h>
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/class_hierarchy.h>

@@ -1,18 +1,18 @@
 /*******************************************************************\
 
-Module: Linking: Zero Initialization
+Module: Expression Initialization
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
 /// \file
-/// Linking: Zero Initialization
+/// Expression Initialization
 
-#ifndef CPROVER_LINKING_ZERO_INITIALIZER_H
-#define CPROVER_LINKING_ZERO_INITIALIZER_H
+#ifndef CPROVER_UTIL_EXPR_INITIALIZER_H
+#define CPROVER_UTIL_EXPR_INITIALIZER_H
 
-#include <util/expr.h>
+#include "expr.h"
 
 class message_handlert;
 class namespacet;
@@ -24,10 +24,21 @@ exprt zero_initializer(
   const namespacet &,
   message_handlert &);
 
+exprt nondet_initializer(
+  const typet &,
+  const source_locationt &,
+  const namespacet &,
+  message_handlert &);
+
 // throws a char* in case of failure
 exprt zero_initializer(
   const typet &,
   const source_locationt &,
   const namespacet &);
 
-#endif // CPROVER_LINKING_ZERO_INITIALIZER_H
+exprt nondet_initializer(
+  const typet &type,
+  const source_locationt &source_location,
+  const namespacet &ns);
+
+#endif // CPROVER_UTIL_EXPR_INITIALIZER_H

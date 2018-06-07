@@ -19,11 +19,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_initializer.h>
 #include <util/pointer_offset_size.h>
 
 #include <ansi-c/c_qualifiers.h>
-
-#include <linking/zero_initializer.h>
 
 #include "cpp_exception_id.h"
 #include "cpp_type2name.h"

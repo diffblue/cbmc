@@ -3,4 +3,4 @@ add_library(linking ${sources})
 
 generic_includes(linking)
 
-target_link_libraries(linking util ansi-c)
+target_link_libraries(linking util)

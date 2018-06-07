@@ -14,13 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_initializer.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
 #include <util/type_eq.h>
-
-#include <linking/zero_initializer.h>
 
 #include "anonymous_member.h"
 

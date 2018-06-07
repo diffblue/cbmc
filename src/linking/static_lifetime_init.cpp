@@ -11,18 +11,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <cstdlib>
 
-#include <util/namespace.h>
-#include <util/std_expr.h>
 #include <util/arith_tools.h>
-#include <util/std_code.h>
-#include <util/config.h>
-#include <util/prefix.h>
-
 #include <util/c_types.h>
+#include <util/config.h>
+#include <util/expr_initializer.h>
+#include <util/namespace.h>
+#include <util/prefix.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
 
 #include <goto-programs/goto_functions.h>
-
-#include "zero_initializer.h"
 
 bool static_lifetime_init(
   symbol_tablet &symbol_table,

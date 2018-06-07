@@ -14,6 +14,7 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/expr_initializer.h>
 #include <util/magic.h>
 #include <util/run.h>
 #include <util/tempfile.h>
@@ -21,7 +22,6 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 #include <json/json_parser.h>
 
 #include <linking/static_lifetime_init.h>
-#include <linking/zero_initializer.h>
 
 #include <goto-programs/read_goto_binary.h>
 
