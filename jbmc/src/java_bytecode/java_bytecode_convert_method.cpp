@@ -714,9 +714,9 @@ void java_bytecode_convert_methodt::replace_goto_target(
 code_blockt &java_bytecode_convert_methodt::get_block_for_pcrange(
   block_tree_nodet &tree,
   code_blockt &this_block,
-  unsigned address_start,
-  unsigned address_limit,
-  unsigned next_block_start_address)
+  method_offsett address_start,
+  method_offsett address_limit,
+  method_offsett next_block_start_address)
 {
   address_mapt dummy;
   return get_or_create_block_for_pcrange(
@@ -746,9 +746,9 @@ code_blockt &java_bytecode_convert_methodt::get_block_for_pcrange(
 code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   block_tree_nodet &tree,
   code_blockt &this_block,
-  unsigned address_start,
-  unsigned address_limit,
-  unsigned next_block_start_address,
+  method_offsett address_start,
+  method_offsett address_limit,
+  method_offsett next_block_start_address,
   const address_mapt &amap,
   bool allow_merge)
 {
@@ -778,10 +778,9 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
       tree.branch_addresses.begin(),
       tree.branch_addresses.end(),
       address_limit);
-  unsigned findlim_block_start_address=
-    findlim==tree.branch_addresses.end() ?
-    next_block_start_address :
-    (*findlim);
+  const auto findlim_block_start_address =
+    findlim == tree.branch_addresses.end() ? next_block_start_address
+                                           : (*findlim);
 
   // If all children are in scope, return this.
   if(findstart==tree.branch_addresses.begin() &&
@@ -924,7 +923,7 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
 }
 
 static void gather_symbol_live_ranges(
-  unsigned pc,
+  java_bytecode_convert_methodt::method_offsett pc,
   const exprt &e,
   std::map<irep_idt, java_bytecode_convert_methodt::variablet> &result)
 {
@@ -1002,9 +1001,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
   // first pass: get targets and map addresses to instructions
 
   address_mapt address_map;
-  std::set<unsigned> targets;
+  std::set<method_offsett> targets;
 
-  std::vector<unsigned> jsr_ret_targets;
+  std::vector<method_offsett> jsr_ret_targets;
   std::vector<instructionst::const_iterator> ret_instructions;
 
   for(auto i_it = instructions.begin(); i_it != instructions.end(); i_it++)
@@ -1049,9 +1048,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
        (threading_support && (i_it->statement=="monitorenter" ||
        i_it->statement=="monitorexit")))
     {
-      const std::vector<unsigned int> handler =
+      const std::vector<method_offsett> handler =
         try_catch_handler(i_it->address, method.exception_table);
-      std::list<unsigned int> &successors = a_entry.first->second.successors;
+      std::list<method_offsett> &successors = a_entry.first->second.successors;
       successors.insert(successors.end(), handler.begin(), handler.end());
       targets.insert(handler.begin(), handler.end());
     }
@@ -1110,7 +1109,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
   for(const auto &address : address_map)
   {
-    for(unsigned s : address.second.successors)
+    for(auto s : address.second.successors)
     {
       const auto a_it = address_map.find(s);
       CHECK_RETURN(a_it != address_map.end());
@@ -1128,7 +1127,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
   // (these require the graph to determine live ranges)
   setup_local_variables(method, address_map);
 
-  std::set<unsigned> working_set;
+  std::set<method_offsett> working_set;
 
   if(!instructions.empty())
     working_set.insert(instructions.front().address);
@@ -1139,7 +1138,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     auto address_it = address_map.find(*cur);
     CHECK_RETURN(address_it != address_map.end());
     auto &instruction = address_it->second;
-    unsigned cur_pc=*cur;
+    const method_offsett cur_pc = *cur;
     working_set.erase(cur);
 
     if(instruction.done)
@@ -1698,7 +1697,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     push(results);
 
     instruction.done = true;
-    for(const unsigned address : instruction.successors)
+    for(const auto address : instruction.successors)
     {
       address_mapt::iterator a_it2=address_map.find(address);
       CHECK_RETURN(a_it2 != address_map.end());
@@ -1807,10 +1806,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
   // constructs as variable live-ranges require next.
   bool start_new_block=true;
   bool has_seen_previous_address=false;
-  unsigned previous_address=0;
+  method_offsett previous_address = 0;
   for(const auto &address_pair : address_map)
   {
-    const unsigned address=address_pair.first;
+    const method_offsett address = address_pair.first;
     assert(address_pair.first==address_pair.second.source->address);
     const codet &c=address_pair.second.code;
 
@@ -1890,8 +1889,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       root,
       root_block,
       v.start_pc,
-      v.start_pc+v.length,
-      std::numeric_limits<unsigned>::max(),
+      v.start_pc + v.length,
+      std::numeric_limits<method_offsett>::max(),
       address_map);
   }
   for(const auto vp : vars_to_process)
@@ -1902,12 +1901,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
     // Skip anonymous variables:
     if(v.symbol_expr.get_identifier().empty())
       continue;
-    auto &block=get_block_for_pcrange(
+    auto &block = get_block_for_pcrange(
       root,
       root_block,
       v.start_pc,
-      v.start_pc+v.length,
-      std::numeric_limits<unsigned>::max());
+      v.start_pc + v.length,
+      std::numeric_limits<method_offsett>::max());
     code_declt d(v.symbol_expr);
     block.operands().insert(block.operands().begin(), d);
   }
@@ -1963,7 +1962,9 @@ codet java_bytecode_convert_methodt::convert_switch(
       // to the jump target of the tableswitch/lookupswitch case at
       // hand. Therefore we consider this code to belong to the source bytecode
       // instruction and not the target instruction.
-      code_case.code() = code_gotot(label(integer2string(number)));
+      const method_offsett label_number =
+        numeric_cast_v<method_offsett>(number);
+      code_case.code() = code_gotot(label(std::to_string(label_number)));
       code_case.code().add_source_location() = location;
 
       if(a_it == args.begin())
@@ -2338,8 +2339,8 @@ void java_bytecode_convert_methodt::convert_athrow(
 
 codet &java_bytecode_convert_methodt::do_exception_handling(
   const java_bytecode_convert_methodt::methodt &method,
-  const std::set<unsigned int> &working_set,
-  unsigned int cur_pc,
+  const std::set<method_offsett> &working_set,
+  method_offsett cur_pc,
   codet &c)
 {
   std::vector<irep_idt> exception_ids;
@@ -2350,8 +2351,8 @@ codet &java_bytecode_convert_methodt::do_exception_handling(
   // together with a list of all the exception ids
 
   // be aware of different try-catch blocks with the same starting pc
-  std::size_t pos = 0;
-  std::size_t end_pc = 0;
+  method_offsett pos = 0;
+  method_offsett end_pc = 0;
   while(pos < method.exception_table.size())
   {
     // check if this is the beginning of a try block
@@ -2722,7 +2723,7 @@ codet java_bytecode_convert_methodt::convert_iinc(
   const exprt &arg0,
   const exprt &arg1,
   const source_locationt &location,
-  const unsigned address)
+  const method_offsett address)
 {
   code_blockt block;
   block.add_source_location() = location;
@@ -2756,9 +2757,10 @@ codet java_bytecode_convert_methodt::convert_ifnull(
   const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
   const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
   code_branch.cond() = binary_relation_exprt(lhs, ID_equal, rhs);
-  code_branch.then_case() = code_gotot(label(integer2string(number)));
+  const method_offsett label_number = numeric_cast_v<method_offsett>(number);
+  code_branch.then_case() = code_gotot(label(std::to_string(label_number)));
   code_branch.then_case().add_source_location() =
-    address_map.at(integer2unsigned(number)).source->source_location;
+    address_map.at(label_number).source->source_location;
   code_branch.add_source_location() = location;
   return code_branch;
 }
@@ -2773,9 +2775,10 @@ codet java_bytecode_convert_methodt::convert_ifnonull(
   const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
   const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
   code_branch.cond() = binary_relation_exprt(lhs, ID_notequal, rhs);
-  code_branch.then_case() = code_gotot(label(integer2string(number)));
+  const method_offsett label_number = numeric_cast_v<method_offsett>(number);
+  code_branch.then_case() = code_gotot(label(std::to_string(label_number)));
   code_branch.then_case().add_source_location() =
-    address_map.at(integer2unsigned(number)).source->source_location;
+    address_map.at(label_number).source->source_location;
   code_branch.add_source_location() = location;
   return code_branch;
 }
@@ -2792,9 +2795,10 @@ codet java_bytecode_convert_methodt::convert_if(
     binary_relation_exprt(op[0], id, from_integer(0, op[0].type()));
   code_branch.cond().add_source_location() = location;
   code_branch.cond().add_source_location().set_function(method_id);
-  code_branch.then_case() = code_gotot(label(integer2string(number)));
+  const method_offsett label_number = numeric_cast_v<method_offsett>(number);
+  code_branch.then_case() = code_gotot(label(std::to_string(label_number)));
   code_branch.then_case().add_source_location() =
-    address_map.at(integer2unsigned(number)).source->source_location;
+    address_map.at(label_number).source->source_location;
   code_branch.then_case().add_source_location().set_function(method_id);
   code_branch.add_source_location() = location;
   code_branch.add_source_location().set_function(method_id);
@@ -2821,19 +2825,20 @@ codet java_bytecode_convert_methodt::convert_if_cmp(
 
   code_branch.cond() = condition;
   code_branch.cond().add_source_location() = location;
-  code_branch.then_case() = code_gotot(label(integer2string(number)));
+  const method_offsett label_number = numeric_cast_v<method_offsett>(number);
+  code_branch.then_case() = code_gotot(label(std::to_string(label_number)));
   code_branch.then_case().add_source_location() =
-    address_map.at(integer2unsigned(number)).source->source_location;
+    address_map.at(label_number).source->source_location;
   code_branch.add_source_location() = location;
 
   return code_branch;
 }
 
 code_blockt java_bytecode_convert_methodt::convert_ret(
-  const std::vector<unsigned int> &jsr_ret_targets,
+  const std::vector<method_offsett> &jsr_ret_targets,
   const exprt &arg0,
   const source_locationt &location,
-  const unsigned address)
+  const method_offsett address)
 {
   code_blockt c;
   auto retvar = variable(arg0, 'a', address, NO_CAST);
@@ -2885,7 +2890,7 @@ codet java_bytecode_convert_methodt::convert_store(
   const irep_idt &statement,
   const exprt &arg0,
   const exprt::operandst &op,
-  const unsigned address,
+  const method_offsett address,
   const source_locationt &location)
 {
   const exprt var = variable(arg0, statement[0], address, NO_CAST);
@@ -2974,7 +2979,7 @@ optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
 
 void java_bytecode_convert_methodt::draw_edges_from_ret_to_jsr(
   java_bytecode_convert_methodt::address_mapt &address_map,
-  const std::vector<unsigned int> &jsr_ret_targets,
+  const std::vector<method_offsett> &jsr_ret_targets,
   const std::vector<
     std::vector<java_bytecode_parse_treet::instructiont>::const_iterator>
     &ret_instructions) const
@@ -2988,12 +2993,13 @@ void java_bytecode_convert_methodt::draw_edges_from_ret_to_jsr(
   }
 }
 
-std::vector<unsigned> java_bytecode_convert_methodt::try_catch_handler(
-  const unsigned int address,
+std::vector<java_bytecode_convert_methodt::method_offsett>
+java_bytecode_convert_methodt::try_catch_handler(
+  const method_offsett address,
   const java_bytecode_parse_treet::methodt::exception_tablet &exception_table)
   const
 {
-  std::vector<unsigned> result;
+  std::vector<method_offsett> result;
   for(const auto &exception_row : exception_table)
   {
     if(address >= exception_row.start_pc && address < exception_row.end_pc)
