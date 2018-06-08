@@ -94,6 +94,11 @@ std::size_t remove_instanceoft::lower_instanceof(
       return a.compare(b) < 0;
     });
 
+  // Make "ptr != null", which we'll need to both guard the class-identifier
+  // query and to make the actual instanceof test:
+  notequal_exprt non_null_expr(
+    check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type())));
+
   // Insert an instruction before the new check that assigns the clsid we're
   // checking for to a temporary, as GOTO program if-expressions should
   // not contain derefs.
@@ -102,7 +107,11 @@ std::size_t remove_instanceoft::lower_instanceof(
   // two will subsequently switch places. This makes sure that the inserted
   // assignement doesn't end up before any labels pointing at this instruction.
   symbol_typet jlo=to_symbol_type(java_lang_object_type().subtype());
-  exprt object_clsid=get_class_identifier_field(check_ptr, jlo, ns);
+  exprt object_clsid=
+    if_exprt(
+      non_null_expr,
+      get_class_identifier_field(check_ptr, jlo, ns),
+      constant_exprt(irep_idt(), string_typet()));
 
   symbolt &newsym = get_fresh_aux_symbol(
     object_clsid.type(),
@@ -122,8 +131,6 @@ std::size_t remove_instanceoft::lower_instanceof(
   // disjunction of all possible object types. According to the Java
   // specification, null instanceof T is false for all possible values of T.
   // (http://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.20.2)
-  notequal_exprt non_null_expr(
-    check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type())));
   exprt::operandst or_ops;
   for(const auto &clsname : children)
   {
