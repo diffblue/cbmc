@@ -30,7 +30,7 @@ $(BINARY_DIR)/%.class: $(SOURCE_DIR)/%.java $(BINARY_DIR)
 JAR := jar
 JARFLAGS := -cf
 
-core-models.jar: $(ALL_CLASSES)
+core-models.jar: $(BINARY_DIR) $(ALL_CLASSES)
 	$(JAR) $(JARFLAGS) $@ -C $(BINARY_DIR) .
 
 CLEANFILES = core-models.jar
