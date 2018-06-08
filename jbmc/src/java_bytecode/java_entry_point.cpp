@@ -9,9 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_entry_point.h"
 
 #include <util/config.h>
+#include <util/expr_initializer.h>
 #include <util/string_constant.h>
 #include <util/suffix.h>
 
+#include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_functions.h>
 
 #include <linking/static_lifetime_init.h>
@@ -117,7 +119,8 @@ static void java_static_lifetime_init(
   bool assume_init_pointers_not_null,
   const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
-  bool string_refinement_enabled)
+  bool string_refinement_enabled,
+  message_handlert &message_handler)
 {
   symbolt &initialize_symbol=*symbol_table.get_writeable(INITIALIZE_FUNCTION);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
@@ -188,6 +191,19 @@ static void java_static_lifetime_init(
         args.push_back(
           constant_bool(class_symbol.type.get_bool(ID_enumeration)));
 
+        // First initialize the object as prior to a constructor:
+        namespacet ns(symbol_table);
+
+        exprt zero_object =
+          zero_initializer(
+            sym.type, source_locationt(), ns, message_handler);
+        set_class_identifier(
+          to_struct_expr(zero_object), ns, to_symbol_type(sym.type));
+
+        code_block.copy_to_operands(
+          code_assignt(sym.symbol_expr(), zero_object));
+
+        // Then call the init function:
         code_block.move_to_operands(initializer_call);
       }
       else if(sym.value.is_nil() && sym.type!=empty_typet())
@@ -530,7 +546,8 @@ bool java_entry_point(
     assume_init_pointers_not_null,
     object_factory_parameters,
     pointer_type_selector,
-    string_refinement_enabled);
+    string_refinement_enabled,
+    message_handler);
 
   return generate_java_start_function(
     symbol,
