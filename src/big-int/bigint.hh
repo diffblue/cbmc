@@ -1,5 +1,5 @@
 // $Id: bigint.hh,v 1.12 2009-01-24 15:14:46 kroening Exp $
-
+// Author: Dirk Zoller
 // My own BigInt class, declaration.
 
 #ifndef BIGINT_HH
