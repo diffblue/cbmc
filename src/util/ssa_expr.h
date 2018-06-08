@@ -65,7 +65,7 @@ public:
 
   const irep_idt get_l1_object_identifier() const
   {
-    #if 1
+    #if 0
     return get_l1_object().get_identifier();
     #else
     // the above is the clean version, this is the fast one, using
