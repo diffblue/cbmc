@@ -24,6 +24,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language.h>
 
 #include <ansi-c/c_preprocess.h>
+#include <ansi-c/cprover_library.h>
+
+#include <cpp/cprover_library.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/initialize_goto_model.h>
@@ -711,7 +714,12 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_asm(goto_model);
 
     // add the library
-    link_to_library(goto_model, log.get_message_handler());
+    log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+                 << eom;
+    link_to_library(
+      goto_model, log.get_message_handler(), cprover_cpp_library_factory);
+    link_to_library(
+      goto_model, log.get_message_handler(), cprover_c_library_factory);
 
     if(options.get_bool_option("string-abstraction"))
       string_instrumentation(goto_model, log.get_message_handler());

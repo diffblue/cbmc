@@ -62,6 +62,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/constant_propagator.h>
 #include <analyses/is_threaded.h>
 
+#include <ansi-c/cprover_library.h>
+#include <cpp/cprover_library.h>
+
 #include <cbmc/version.h>
 
 #include "document_properties.h"
@@ -957,7 +960,11 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       config.ansi_c.defines.push_back("__CPROVER_CUSTOM_BITVECTOR_ANALYSIS");
 
     // add the library
-    link_to_library(goto_model, get_message_handler());
+    status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;
+    link_to_library(
+      goto_model, get_message_handler(), cprover_cpp_library_factory);
+    link_to_library(
+      goto_model, get_message_handler(), cprover_c_library_factory);
   }
 
   // now do full inlining, if requested

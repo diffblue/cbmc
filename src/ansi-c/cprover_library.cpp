@@ -14,15 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_language.h"
 
-struct cprover_library_entryt
-{
-  const char *function;
-  const char *model;
-} cprover_library[]=
-#include "cprover_library.inc"
-; // NOLINT(whitespace/semicolon)
-
-std::string get_cprover_library_text(
+static std::string get_cprover_library_text(
   const std::set<irep_idt> &functions,
   const symbol_tablet &symbol_table)
 {
@@ -35,10 +27,29 @@ std::string get_cprover_library_text(
   if(config.ansi_c.string_abstraction)
     library_text << "#define __CPROVER_STRING_ABSTRACTION\n";
 
+  // cprover_library.inc may not have been generated when running Doxygen, thus
+  // make Doxygen skip this part
+  /// \cond
+  const struct cprover_library_entryt cprover_library[] =
+#include "cprover_library.inc"
+    ; // NOLINT(whitespace/semicolon)
+  /// \endcond
+
+  return get_cprover_library_text(
+    functions, symbol_table, cprover_library, library_text.str());
+}
+
+std::string get_cprover_library_text(
+  const std::set<irep_idt> &functions,
+  const symbol_tablet &symbol_table,
+  const struct cprover_library_entryt cprover_library[],
+  const std::string &prologue)
+{
+  std::ostringstream library_text(prologue);
+
   std::size_t count=0;
 
-  for(cprover_library_entryt *e=cprover_library;
-      e->function!=nullptr;
+  for(const cprover_library_entryt *e = cprover_library; e->function != nullptr;
       e++)
   {
     irep_idt id=e->function;
@@ -63,7 +74,7 @@ std::string get_cprover_library_text(
     return library_text.str();
 }
 
-void add_cprover_library(
+void cprover_c_library_factory(
   const std::set<irep_idt> &functions,
   symbol_tablet &symbol_table,
   message_handlert &message_handler)

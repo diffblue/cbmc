@@ -286,6 +286,7 @@ install:
   - make -C jbmc/src java-models-library-download
   - make -C src minisat2-download
   - make -C src/ansi-c library_check
+  - make -C src/cpp library_check
   - make -C src "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j3
   - make -C src "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j3 clobber.dir memory-models.dir
   - make -C jbmc/src "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j3

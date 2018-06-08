@@ -17,7 +17,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <ansi-c/ansi_c_language.h>
+#include <ansi-c/cprover_library.h>
+
 #include <cpp/cpp_language.h>
+#include <cpp/cprover_library.h>
+
 #include <jsil/jsil_language.h>
 
 #include <goto-programs/initialize_goto_model.h>
@@ -724,7 +728,10 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     remove_asm(goto_model);
 
     // add the library
-    link_to_library(goto_model, ui_message_handler);
+    status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;
+    link_to_library(
+      goto_model, ui_message_handler, cprover_cpp_library_factory);
+    link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
     #endif
 
     // remove function pointers
