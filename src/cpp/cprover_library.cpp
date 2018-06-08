@@ -35,7 +35,7 @@ static std::string get_cprover_library_text(
     functions, symbol_table, cprover_library, library_text.str());
 }
 
-void add_cprover_cpp_library(
+void cprover_cpp_library_factory(
   const std::set<irep_idt> &functions,
   symbol_tablet &symbol_table,
   message_handlert &message_handler)

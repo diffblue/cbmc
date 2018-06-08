@@ -16,7 +16,7 @@ Author: Michael Tautschnig
 class message_handlert;
 class symbol_tablet;
 
-void add_cprover_cpp_library(
+void cprover_cpp_library_factory(
   const std::set<irep_idt> &functions,
   symbol_tablet &,
   message_handlert &);

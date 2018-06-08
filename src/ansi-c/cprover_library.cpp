@@ -74,7 +74,7 @@ std::string get_cprover_library_text(
     return library_text.str();
 }
 
-void add_cprover_c_library(
+void cprover_c_library_factory(
   const std::set<irep_idt> &functions,
   symbol_tablet &symbol_table,
   message_handlert &message_handler)

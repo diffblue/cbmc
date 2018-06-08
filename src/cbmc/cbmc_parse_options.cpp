@@ -717,9 +717,9 @@ bool cbmc_parse_optionst::process_goto_program(
     log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
                  << eom;
     link_to_library(
-      goto_model, log.get_message_handler(), add_cprover_cpp_library);
+      goto_model, log.get_message_handler(), cprover_cpp_library_factory);
     link_to_library(
-      goto_model, log.get_message_handler(), add_cprover_c_library);
+      goto_model, log.get_message_handler(), cprover_c_library_factory);
 
     if(options.get_bool_option("string-abstraction"))
       string_instrumentation(goto_model, log.get_message_handler());

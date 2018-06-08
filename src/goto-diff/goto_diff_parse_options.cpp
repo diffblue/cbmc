@@ -398,8 +398,10 @@ bool goto_diff_parse_optionst::process_goto_program(
 
     // add the library
     status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;
-    link_to_library(goto_model, get_message_handler(), add_cprover_cpp_library);
-    link_to_library(goto_model, get_message_handler(), add_cprover_c_library);
+    link_to_library(
+      goto_model, get_message_handler(), cprover_cpp_library_factory);
+    link_to_library(
+      goto_model, get_message_handler(), cprover_c_library_factory);
 
     // remove function pointers
     status() << "Removal of function pointers and virtual functions" << eom;
