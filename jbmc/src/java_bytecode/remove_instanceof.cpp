@@ -13,6 +13,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/class_identifier.h>
+#include <goto-programs/goto_convert.h>
 
 #include <util/fresh_symbol.h>
 #include <java_bytecode/java_types.h>
@@ -39,7 +40,7 @@ protected:
   namespacet ns;
   class_hierarchyt class_hierarchy;
 
-  std::size_t lower_instanceof(
+  bool lower_instanceof(
     exprt &, goto_programt &, goto_programt::targett);
 };
 
@@ -49,18 +50,18 @@ protected:
 /// \param expr: Expression to lower (the code or the guard of an instruction)
 /// \param goto_program: program the expression belongs to
 /// \param this_inst: instruction the expression is found at
-/// \return number of instanceof expressions that have been replaced
-std::size_t remove_instanceoft::lower_instanceof(
+/// \return true if any instanceof instructionw was replaced
+bool remove_instanceoft::lower_instanceof(
   exprt &expr,
   goto_programt &goto_program,
   goto_programt::targett this_inst)
 {
   if(expr.id()!=ID_java_instanceof)
   {
-    std::size_t replacements=0;
+    bool changed = false;
     Forall_operands(it, expr)
-      replacements+=lower_instanceof(*it, goto_program, this_inst);
-    return replacements;
+      changed |= lower_instanceof(*it, goto_program, this_inst);
+    return changed;
   }
 
   INVARIANT(
@@ -94,46 +95,100 @@ std::size_t remove_instanceoft::lower_instanceof(
       return a.compare(b) < 0;
     });
 
-  // Insert an instruction before the new check that assigns the clsid we're
-  // checking for to a temporary, as GOTO program if-expressions should
-  // not contain derefs.
-  // We actually insert the assignment instruction after the existing one.
-  // This will briefly be ill-formed (use before def of instanceof_tmp) but the
-  // two will subsequently switch places. This makes sure that the inserted
-  // assignement doesn't end up before any labels pointing at this instruction.
-  symbol_typet jlo=to_symbol_type(java_lang_object_type().subtype());
-  exprt object_clsid=get_class_identifier_field(check_ptr, jlo, ns);
+  // Make temporaries to store the class identifier (avoids repeated derefs) and
+  // the instanceof result:
 
-  symbolt &newsym = get_fresh_aux_symbol(
+  symbol_typet jlo=to_symbol_type(java_lang_object_type().subtype());
+  exprt object_clsid = get_class_identifier_field(check_ptr, jlo, ns);
+
+  symbolt &clsid_tmp_sym = get_fresh_aux_symbol(
     object_clsid.type(),
     id2string(this_inst->function),
-    "instanceof_tmp",
+    "class_identifier_tmp",
     source_locationt(),
     ID_java,
     symbol_table);
 
-  auto newinst=goto_program.insert_after(this_inst);
-  newinst->make_assignment();
-  newinst->code=code_assignt(newsym.symbol_expr(), object_clsid);
-  newinst->source_location=this_inst->source_location;
-  newinst->function=this_inst->function;
+  symbolt &instanceof_result_sym = get_fresh_aux_symbol(
+    bool_typet(),
+    id2string(this_inst->function),
+    "instanceof_result_tmp",
+    source_locationt(),
+    ID_java,
+    symbol_table);
 
-  // Replace the instanceof construct with a conjunction of non-null and the
-  // disjunction of all possible object types. According to the Java
-  // specification, null instanceof T is false for all possible values of T.
+  // Create
+  // if(expr == null)
+  //   instanceof_result = false;
+  // else
+  //   string clsid = expr->@class_identifier
+  //   instanceof_result = clsid == "A" || clsid == "B" || ...
+
+  // According to the Java specification, null instanceof T is false for all
+  // possible values of T.
   // (http://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.20.2)
-  notequal_exprt non_null_expr(
-    check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type())));
+
+  code_ifthenelset is_null_branch;
+  is_null_branch.cond() =
+    equal_exprt(
+      check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type())));
+  is_null_branch.then_case() =
+    code_assignt(instanceof_result_sym.symbol_expr(), false_exprt());
+
+  code_blockt else_block;
+  else_block.add(code_declt(clsid_tmp_sym.symbol_expr()));
+  else_block.add(code_assignt(clsid_tmp_sym.symbol_expr(), object_clsid));
+
   exprt::operandst or_ops;
   for(const auto &clsname : children)
   {
     constant_exprt clsexpr(clsname, string_typet());
-    equal_exprt test(newsym.symbol_expr(), clsexpr);
+    equal_exprt test(clsid_tmp_sym.symbol_expr(), clsexpr);
     or_ops.push_back(test);
   }
-  expr = and_exprt(non_null_expr, disjunction(or_ops));
+  else_block.add(
+    code_assignt(instanceof_result_sym.symbol_expr(), disjunction(or_ops)));
 
-  return 1;
+  is_null_branch.else_case() = std::move(else_block);
+
+  // Replace the instanceof construct with instanceof_result:
+  expr = instanceof_result_sym.symbol_expr();
+
+  std::ostringstream convert_output;
+  stream_message_handlert convert_message_handler(convert_output);
+  convert_message_handler.set_verbosity(messaget::message_levelt::M_WARNING);
+
+  // Insert the new test block before it:
+  goto_programt new_check_program;
+  goto_convert(
+    is_null_branch,
+    symbol_table,
+    new_check_program,
+    convert_message_handler,
+    ID_java);
+
+  INVARIANT(
+    convert_output.str().empty(),
+    "remove_instanceof generated test should be goto-converted without error, "
+    "but goto_convert reported: " + convert_output.str());
+
+  goto_program.destructive_insert(this_inst, new_check_program);
+
+  return true;
+}
+
+static bool contains_instanceof(const exprt &e)
+{
+  if(e.id() == ID_java_instanceof)
+    return true;
+
+  for(const exprt &subexpr : e.operands())
+  {
+    if(contains_instanceof(subexpr))
+      return true;
+  }
+
+  return false;
 }
 
 /// Replaces expressions like e instanceof A with e.\@class_identifier == "A"
@@ -146,15 +201,20 @@ bool remove_instanceoft::lower_instanceof(
   goto_programt &goto_program,
   goto_programt::targett target)
 {
-  std::size_t replacements=
-    lower_instanceof(target->code, goto_program, target)+
-    lower_instanceof(target->guard, goto_program, target);
+  if(target->is_target() &&
+     (contains_instanceof(target->code) || contains_instanceof(target->guard)))
+  {
+    // If this is a branch target, add a skip beforehand so we can splice new
+    // GOTO programs before the target instruction without inserting into the
+    // wrong basic block.
+    goto_program.insert_before_swap(target);
+    target->make_skip();
+    // Actually alter the now-moved instruction:
+    ++target;
+  }
 
-  if(replacements==0)
-    return false;
-  // Swap the original instruction with the last assignment added after it
-  target->swap(*std::next(target, replacements));
-  return true;
+  return lower_instanceof(target->code, goto_program, target) |
+    lower_instanceof(target->guard, goto_program, target);
 }
 
 /// Replace every instanceof in the passed function body with an explicit
