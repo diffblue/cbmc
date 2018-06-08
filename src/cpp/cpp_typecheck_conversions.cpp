@@ -1508,6 +1508,13 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 {
   exprt e=expr;
 
+  if(
+    e.id() == ID_initializer_list && cpp_is_pod(type) &&
+    e.operands().size() == 1)
+  {
+    e = expr.op0();
+  }
+
   if(!implicit_conversion_sequence(e, type, expr))
   {
     show_instantiation_stack(error());

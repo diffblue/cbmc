@@ -129,6 +129,14 @@ bool cpp_typecheck_fargst::match(
       std::cout << "OK " << rank << '\n';
       #endif
     }
+    else if(
+      operand.id() == ID_initializer_list && cpp_typecheck.cpp_is_pod(type) &&
+      operand.operands().size() == 1 &&
+      cpp_typecheck.implicit_conversion_sequence(
+        operand.op0(), type, new_expr, rank))
+    {
+      distance += rank;
+    }
     else
     {
       #if 0

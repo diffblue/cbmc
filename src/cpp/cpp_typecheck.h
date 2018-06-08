@@ -483,8 +483,6 @@ protected:
   void typecheck_method_application(
                     side_effect_expr_function_callt &expr);
 
-  void typecheck_assign(codet &code);
-
 public:
   //
   // Type Conversions
