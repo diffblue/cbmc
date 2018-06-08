@@ -182,12 +182,18 @@ public:
   bool same_set(typename numbering<T>::const_iterator it_a,
                 typename numbering<T>::const_iterator it_b) const
   {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     return uuf.same_set(it_a-numbers.begin(), it_b-numbers.begin());
+#include <util/pragma_pop.def>
   }
 
   const T &find(typename numbering<T>::const_iterator it) const
   {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     return numbers[find_number(it-numbers.begin())];
+#include <util/pragma_pop.def>
   }
 
   const T &find(const T &a)
@@ -226,7 +232,10 @@ public:
 
   bool is_root(typename numbering<T>::const_iterator it) const
   {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     return uuf.is_root(it-numbers.begin());
+#include <util/pragma_pop.def>
   }
 
   size_type number(const T &a)

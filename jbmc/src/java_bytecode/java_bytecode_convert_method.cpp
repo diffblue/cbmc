@@ -769,8 +769,11 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   assert(afterstart!=tree.branch_addresses.begin());
   auto findstart=afterstart;
   --findstart;
-  auto child_offset=
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
+  std::size_t child_offset =
     std::distance(tree.branch_addresses.begin(), findstart);
+#include <util/pragma_pop.def>
 
   // Find child block starting >= address_limit:
   auto findlim=

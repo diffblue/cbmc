@@ -81,8 +81,11 @@ bool boolbvt::type_conversion(
     {
       // recursively do both halfs
       bvt lower, upper, lower_res, upper_res;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       lower.assign(src.begin(), src.begin()+src.size()/2);
       upper.assign(src.begin()+src.size()/2, src.end());
+#include <util/pragma_pop.def>
       type_conversion(
         ns.follow(src_type.subtype()),
         lower,

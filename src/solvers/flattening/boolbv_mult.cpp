@@ -60,7 +60,10 @@ bvt boolbvt::convert_mult(const exprt &expr)
       bv=bv_utils.signed_multiplier(bv, op);
 
       // cut it down again
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       bv.erase(bv.begin(), bv.begin()+fraction_bits);
+#include <util/pragma_pop.def>
     }
 
     return bv;

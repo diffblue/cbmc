@@ -187,8 +187,11 @@ protected:
       auto &operands = expr->operands();
       // Get iterators into the operands of the new expr corresponding to the
       // ones into the operands of the old expr
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       const auto i=operands.size()-(state.end-state.it);
       const auto it=operands.begin()+i;
+#include <util/pragma_pop.def>
       state.expr = *expr;
       state.it=it;
       state.end=operands.end();

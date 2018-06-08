@@ -174,7 +174,10 @@ void write_gb_word(std::ostream &out, std::size_t u)
 
     if(u==0)
     {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       out.put(value);
+#include <util/pragma_pop.def>
       break;
     }
 

@@ -70,7 +70,10 @@ bvt boolbvt::convert_complex_imag(const complex_imag_exprt &expr)
   bvt bv = convert_bv(expr.op());
 
   assert(bv.size()==width*2);
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   bv.erase(bv.begin(), bv.begin()+width);
+#include <util/pragma_pop.def>
 
   return bv;
 }

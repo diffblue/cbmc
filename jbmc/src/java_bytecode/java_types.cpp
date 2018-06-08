@@ -566,7 +566,10 @@ typet java_type_from_string(
          subtype_letter=='[' || // Array-of-arrays
          subtype_letter=='T')   // Array of generic types
         subtype_letter='A';
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       typet tmp=java_array_type(std::tolower(subtype_letter));
+#include <util/pragma_pop.def>
       tmp.subtype().set(ID_element_type, subtype);
       return tmp;
     }

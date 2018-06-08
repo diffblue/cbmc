@@ -82,19 +82,28 @@ public:
 
   void set_level_0(unsigned i)
   {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     set(ID_L0, i);
+#include <util/pragma_pop.def>
     update_identifier();
   }
 
   void set_level_1(unsigned i)
   {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     set(ID_L1, i);
+#include <util/pragma_pop.def>
     update_identifier();
   }
 
   void set_level_2(unsigned i)
   {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     set(ID_L2, i);
+#include <util/pragma_pop.def>
     update_identifier();
   }
 

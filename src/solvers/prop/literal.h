@@ -115,7 +115,10 @@ public:
   //
   int dimacs() const
   {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     int result=var_no();
+#include <util/pragma_pop.def>
 
     if(sign())
       result=-result;
@@ -128,7 +131,10 @@ public:
     bool sign=d<0;
     if(sign)
       d=-d;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     set(d, sign);
+#include <util/pragma_pop.def>
   }
 
   void clear()

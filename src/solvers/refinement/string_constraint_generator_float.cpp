@@ -75,6 +75,8 @@ exprt get_significand(
 /// \return an expression representing this floating point
 exprt constant_float(const double f, const ieee_float_spect &float_spec)
 {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   ieee_floatt fl(float_spec);
   if(float_spec==ieee_float_spect::single_precision())
     fl.from_float(f);
@@ -83,6 +85,7 @@ exprt constant_float(const double f, const ieee_float_spect &float_spec)
   else
     UNREACHABLE;
   return fl.to_expr();
+#include <util/pragma_pop.def>
 }
 
 /// Round a float expression to an integer closer to 0

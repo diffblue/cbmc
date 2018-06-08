@@ -11,7 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "parse_float.h"
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
 #include <algorithm>
+#include <util/pragma_pop.def>
+
 #include <cctype>
 #include <cstring>
 

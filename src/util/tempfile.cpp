@@ -124,7 +124,10 @@ std::string get_temporary_file(
 
   char *t_ptr=strdup(t_template.c_str());
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   int fd=mkstemps(t_ptr, suffix.size());
+#include <util/pragma_pop.def>
 
   if(fd<0)
     throw "mkstemps failed";

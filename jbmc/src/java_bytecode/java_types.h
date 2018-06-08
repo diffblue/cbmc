@@ -705,7 +705,10 @@ inline const optionalt<size_t> java_generics_get_index_for_subtype(
     return {};
   }
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   return std::distance(gen_types.cbegin(), iter);
+#include <util/pragma_pop.def>
 }
 
 void get_dependencies_from_generic_parameters(

@@ -340,9 +340,12 @@ exprt float_bvt::conversion(
   // new format.  Note that this is rare and will only
   // happen with very non-standard formats.
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   int sourceSmallestNormalExponent = -((1 << (src_spec.e - 1)) - 1);
   int sourceSmallestDenormalExponent =
     sourceSmallestNormalExponent - src_spec.f;
+#include <util/pragma_pop.def>
 
   // Using the fact that f doesn't include the hidden bit
 

@@ -11,7 +11,11 @@ Date: May 2006
 /// \file
 /// GOTO-CC Main Module
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
 #include <algorithm>
+#include <util/pragma_pop.def>
+
 #include <iostream>
 
 #include <util/unicode.h>

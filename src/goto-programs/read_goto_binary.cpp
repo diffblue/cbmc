@@ -87,10 +87,13 @@ bool read_goto_binary(
   }
 
   char hdr[4];
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   hdr[0]=in.get();
   hdr[1]=in.get();
   hdr[2]=in.get();
   hdr[3]=in.get();
+#include <util/pragma_pop.def>
   in.seekg(0);
 
   if(hdr[0]==0x7f && hdr[1]=='G' && hdr[2]=='B' && hdr[3]=='F')
@@ -177,10 +180,13 @@ bool is_goto_binary(const std::string &filename)
   // 2. ELF binaries, marked with 0x7f ELF
 
   char hdr[4];
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   hdr[0]=in.get();
   hdr[1]=in.get();
   hdr[2]=in.get();
   hdr[3]=in.get();
+#include <util/pragma_pop.def>
 
   if(hdr[0]==0x7f && hdr[1]=='G' && hdr[2]=='B' && hdr[3]=='F')
   {

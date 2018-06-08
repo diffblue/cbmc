@@ -134,6 +134,8 @@ void interpretert::command()
     return;
   }
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   char ch=tolower(command[0]);
   if(ch=='q')
     done=true;
@@ -225,6 +227,7 @@ void interpretert::command()
     }
     return;
   }
+#include <util/pragma_pop.def>
   show_state();
 }
 

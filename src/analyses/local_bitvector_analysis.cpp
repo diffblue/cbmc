@@ -342,10 +342,13 @@ void local_bitvector_analysist::output(
         p_it!=loc_info.end();
         p_it++)
     {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       out << "  " << pointers[p_it-loc_info.begin()]
           << ": "
           << *p_it
           << "\n";
+#include <util/pragma_pop.def>
     }
 
     out << "\n";

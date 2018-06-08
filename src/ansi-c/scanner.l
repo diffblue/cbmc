@@ -44,6 +44,8 @@ extern int yyansi_cdebug;
 #define loc() \
   { newstack(yyansi_clval); PARSER.set_source_location(stack(yyansi_clval)); }
 
+#include <util/pragma_wconversion.def>
+
 int make_identifier()
 {
   loc();

@@ -913,9 +913,12 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
         const std::string new_value=
           opi.get_string(ID_value)+opn.get_string(ID_value);
         opi.set(ID_value, new_value);
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         opi.type().set(ID_width, new_value.size());
         // erase opn
         expr.operands().erase(expr.operands().begin()+i+1);
+#include <util/pragma_pop.def>
         result=true;
       }
       else
@@ -943,10 +946,13 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
         const std::string new_value=
           opi.get_string(ID_value)+opn.get_string(ID_value);
         opi.set(ID_value, new_value);
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         opi.type().set(ID_width, new_value.size());
         opi.type().id(ID_verilog_unsignedbv);
         // erase opn
         expr.operands().erase(expr.operands().begin()+i+1);
+#include <util/pragma_pop.def>
         result=true;
       }
       else

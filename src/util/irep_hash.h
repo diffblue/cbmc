@@ -82,7 +82,10 @@ inline std::size_t basic_hash_combine<32>(
   std::size_t h1,
   std::size_t h2)
 {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   return ROTL32(h1, 7)^h2;
+#include <util/pragma_pop.def>
 }
 
 template<>

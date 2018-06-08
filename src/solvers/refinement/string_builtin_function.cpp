@@ -130,10 +130,13 @@ std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
       : input2_size;
 
   std::vector<mp_integer> result(input1_value);
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   result.insert(
     result.end(),
     input2_value.begin() + numeric_cast_v<std::size_t>(start_index),
     input2_value.begin() + numeric_cast_v<std::size_t>(end_index));
+#include <util/pragma_pop.def>
   return result;
 }
 
@@ -459,10 +462,13 @@ std::vector<mp_integer> string_insertion_builtin_functiont::eval(
       : input2_size;
 
   std::vector<mp_integer> result(input1_value);
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   result.insert(
     result.begin() + numeric_cast_v<std::size_t>(offset),
     input2_value.begin() + numeric_cast_v<std::size_t>(start),
     input2_value.begin() + numeric_cast_v<std::size_t>(end));
+#include <util/pragma_pop.def>
   return result;
 }
 

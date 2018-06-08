@@ -705,7 +705,10 @@ void java_bytecode_parsert::rconstant_pool()
         std::string s;
         s.resize(bytes);
         for(std::string::iterator s_it=s.begin(); s_it!=s.end(); s_it++)
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
           *s_it=read_u1();
+#include <util/pragma_pop.def>
         it->s=s; // hashes
       }
       break;
@@ -968,7 +971,10 @@ void java_bytecode_parsert::rbytecode(
 
     case 'b': // a signed byte
       {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         s1 c=read_u1();
+#include <util/pragma_pop.def>
         instruction.args.push_back(from_integer(c, signedbv_typet(8)));
       }
       address+=1;
@@ -976,7 +982,10 @@ void java_bytecode_parsert::rbytecode(
 
     case 'o': // two byte branch offset, signed
       {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         s2 offset=read_u2();
+#include <util/pragma_pop.def>
         // By converting the signed offset into an absolute address (by adding
         // the current address) the number represented becomes unsigned.
         instruction.args.push_back(
@@ -987,7 +996,10 @@ void java_bytecode_parsert::rbytecode(
 
     case 'O': // four byte branch offset, signed
       {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         s4 offset=read_u4();
+#include <util/pragma_pop.def>
         // By converting the signed offset into an absolute address (by adding
         // the current address) the number represented becomes unsigned.
         instruction.args.push_back(
@@ -1020,7 +1032,10 @@ void java_bytecode_parsert::rbytecode(
       {
         u2 v=read_u2();
         instruction.args.push_back(from_integer(v, unsignedbv_typet(16)));
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         s2 c=read_u2();
+#include <util/pragma_pop.def>
         instruction.args.push_back(from_integer(c, signedbv_typet(16)));
         address+=4;
       }
@@ -1028,7 +1043,10 @@ void java_bytecode_parsert::rbytecode(
       {
         u1 v=read_u1();
         instruction.args.push_back(from_integer(v, unsignedbv_typet(8)));
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         s1 c=read_u1();
+#include <util/pragma_pop.def>
         instruction.args.push_back(from_integer(c, signedbv_typet(8)));
         address+=2;
       }
@@ -1054,7 +1072,10 @@ void java_bytecode_parsert::rbytecode(
         while(((address+1)&3)!=0) { read_u1(); address++; }
 
         // now default value
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         s4 default_value=read_u4();
+#include <util/pragma_pop.def>
         // By converting the signed offset into an absolute address (by adding
         // the current address) the number represented becomes unsigned.
         instruction.args.push_back(
@@ -1067,8 +1088,11 @@ void java_bytecode_parsert::rbytecode(
 
         for(std::size_t i=0; i<npairs; i++)
         {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
           s4 match=read_u4();
           s4 offset=read_u4();
+#include <util/pragma_pop.def>
           instruction.args.push_back(
             from_integer(match, signedbv_typet(32)));
           // By converting the signed offset into an absolute address (by adding
@@ -1088,23 +1112,35 @@ void java_bytecode_parsert::rbytecode(
         while(((address+1)&3)!=0) { read_u1(); address++; }
 
         // now default value
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         s4 default_value=read_u4();
+#include <util/pragma_pop.def>
         instruction.args.push_back(
           from_integer(base_offset+default_value, signedbv_typet(32)));
         address+=4;
 
         // now low value
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         s4 low_value=read_u4();
+#include <util/pragma_pop.def>
         address+=4;
 
         // now high value
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         s4 high_value=read_u4();
+#include <util/pragma_pop.def>
         address+=4;
 
         // there are high-low+1 offsets, and they are signed
         for(s4 i=low_value; i<=high_value; i++)
         {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
           s4 offset=read_u4();
+#include <util/pragma_pop.def>
           instruction.args.push_back(from_integer(i, signedbv_typet(32)));
           // By converting the signed offset into an absolute address (by adding
           // the current address) the number represented becomes unsigned.
@@ -1148,7 +1184,10 @@ void java_bytecode_parsert::rbytecode(
 
     case 's': // a signed short
       {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         s2 s=read_u2();
+#include <util/pragma_pop.def>
         instruction.args.push_back(from_integer(s, signedbv_typet(16)));
       }
       address+=2;

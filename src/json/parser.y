@@ -1,4 +1,6 @@
 %{
+#include <util/pragma_wconversion.def>
+
 // Strictly follows http://www.json.org/
 %}
 

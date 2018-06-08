@@ -124,6 +124,9 @@ void cpp_token_buffert::Insert(const cpp_tokent &token)
 
   tokens.push_back(token);
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   token_vector.insert(token_vector.begin()+current_pos,
                       --tokens.end());
+#include <util/pragma_pop.def>
 }

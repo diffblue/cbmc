@@ -218,7 +218,10 @@ static std::vector<format_elementt> parse_format_string(std::string s)
   {
     if(match.position()!=0)
     {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       std::string pre_match=s.substr(0, match.position());
+#include <util/pragma_pop.def>
       al.emplace_back(pre_match);
     }
 
@@ -329,7 +332,10 @@ add_axioms_for_format_specifier(
   case format_specifiert::HASHCODE_UPPER:
   {
     format_specifiert fs_lower = fs;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     fs_lower.conversion=tolower(fs.conversion);
+#include <util/pragma_pop.def>
     auto format_specifier_result = add_axioms_for_format_specifier(
       fresh_symbol,
       fs_lower,
@@ -417,7 +423,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
             "number of format must match specifiers");
 
           // first argument `args[0]` corresponds to index 1
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
           arg=to_struct_expr(args[fs.index-1]);
+#include <util/pragma_pop.def>
         }
       }
       auto result = add_axioms_for_format_specifier(
@@ -490,7 +499,10 @@ utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
     bool conversion_failed=to_unsigned_integer(
       to_constant_expr(arr.operands()[i]), c);
     INVARIANT(!conversion_failed, "constant should be convertible to unsigned");
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     out[i]=c;
+#include <util/pragma_pop.def>
   }
   return utf16_native_endian_to_java(out);
 }
