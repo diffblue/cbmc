@@ -240,8 +240,9 @@ jobs:
 
     # Run Coverity
     - stage: Test different OS/CXX/Flags
+      if: type = cron
       os: linux
-      sudo: required
+      sudo: false
       compiler: gcc
       cache: ccache
       addons:
@@ -261,12 +262,6 @@ jobs:
           build_command: "make -C src -j2; make -C jbmc/src -j2"
           branch_pattern: "develop"
       before_install:
-        - |
-          if [[ "${TRAVIS_EVENT_TYPE}" != "cron" ]]
-          then
-            echo "This is not a cron build and build is not needed."
-            travis_terminate 0
-          fi
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 90
         - g++ --version
