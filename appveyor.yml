@@ -70,7 +70,6 @@ test_script:
     rmdir /s /q ansi-c\arch_flags_mthumb_good
     rmdir /s /q ansi-c\Forward_Declaration2
     rmdir /s /q ansi-c\Incomplete_Type1
-    rmdir /s /q ansi-c\Union_Padding1
     rmdir /s /q ansi-c\Universal_characters1
     rmdir /s /q ansi-c\gcc_attributes7
     rmdir /s /q ansi-c\gcc_version1
