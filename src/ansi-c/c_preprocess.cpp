@@ -335,8 +335,14 @@ bool c_preprocess_visual_studio(
     // understands.
     command_file << char(0xef) << char(0xbb) << char(0xbf);
 
-    command_file << "/nologo" << "\n";
-    command_file << "/E" << "\n";
+    command_file << "/nologo" << '\n';
+    command_file << "/E" << '\n';
+
+    // This option will make CL produce utf-8 output, as
+    // opposed to 8-bit with some code page.
+    // It only works on Visual Studio 2015 or newer.
+    command_file << "/source-charset:utf-8" << '\n';
+
     command_file << "/D__CPROVER__" << "\n";
     command_file << "/D__WORDSIZE=" << config.ansi_c.pointer_width << "\n";
 
