@@ -4,7 +4,7 @@ About
 =====
 
 JBMC is a Bounded Model Checker for Java programs. It supports
-checking for runtime exceptions and user-definde assertions.
+checking for runtime exceptions and user-defined assertions.
 The verification is performed by unwinding the loops in the program
 and passing the resulting equation to a decision procedure.
 
