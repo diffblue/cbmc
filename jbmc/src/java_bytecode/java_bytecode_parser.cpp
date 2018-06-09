@@ -308,11 +308,11 @@ public:
     name_and_type_index = entry.ref2;
   }
 
-  u1 get_class_index() const
+  u2 get_class_index() const
   {
     return class_index;
   }
-  u1 get_name_and_type_index() const
+  u2 get_name_and_type_index() const
   {
     return name_and_type_index;
   }
