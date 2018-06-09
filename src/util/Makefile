@@ -24,7 +24,6 @@ SRC = arith_tools.cpp \
       fresh_symbol.cpp \
       get_base_name.cpp \
       get_module.cpp \
-      graph.cpp \
       guard.cpp \
       identifier.cpp \
       ieee_float.cpp \
