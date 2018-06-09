@@ -8,6 +8,8 @@
 
 #include "require_parse_tree.h"
 
+#include <iterator>
+
 /// Find in the parsed class a specific entry within the
 /// lambda_method_handle_map with a matching descriptor. Will fail if no
 /// matching lambda entry found.

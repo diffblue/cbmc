@@ -4,6 +4,8 @@
 #include "string_builtin_function.h"
 
 #include <algorithm>
+#include <iterator>
+
 #include "string_constraint_generator.h"
 
 /// Get the valuation of the string, given a valuation
