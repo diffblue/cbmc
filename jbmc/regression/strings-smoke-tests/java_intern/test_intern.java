@@ -1,6 +1,6 @@
 public class test_intern
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       String s1 = "abc";
       String s3 = "abc";

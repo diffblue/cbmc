@@ -1,6 +1,6 @@
 public class test_concat
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       String s = new String("pi");
       int i = s.length();

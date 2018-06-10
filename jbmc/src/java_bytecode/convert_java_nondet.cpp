@@ -36,7 +36,7 @@ static goto_programt::targett insert_nondet_init_code(
   const goto_programt::targett &target,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  const object_factory_parameterst &object_factory_parameters,
+  object_factory_parameterst object_factory_parameters,
   const irep_idt &mode)
 {
   // Return if the instruction isn't an assignment
@@ -76,7 +76,8 @@ static goto_programt::targett insert_nondet_init_code(
   }
 
   // Check whether the nondet object may be null
-  const auto nullable=to_side_effect_expr_nondet(side_effect).get_nullable();
+  if(!to_side_effect_expr_nondet(side_effect).get_nullable())
+    object_factory_parameters.max_nonnull_tree_depth = 1;
   // Get the symbol to nondet-init
   const auto source_loc=target->source_location;
 
@@ -92,7 +93,6 @@ static goto_programt::targett insert_nondet_init_code(
     source_loc,
     true,
     allocation_typet::DYNAMIC,
-    nullable,
     object_factory_parameters,
     update_in_placet::NO_UPDATE_IN_PLACE);
 

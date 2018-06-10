@@ -106,6 +106,10 @@ void java_simple_method_stubst::create_method_stub_at(
   if(is_constructor)
     to_init = dereference_exprt(to_init, expected_base);
 
+  object_factory_parameterst parameters = object_factory_parameters;
+  if(assume_non_null)
+    parameters.max_nonnull_tree_depth = 1;
+
   // Generate new instructions.
   code_blockt new_instructions;
   gen_nondet_init(
@@ -115,8 +119,7 @@ void java_simple_method_stubst::create_method_stub_at(
     loc,
     is_constructor,
     allocation_typet::DYNAMIC,
-    !assume_non_null,
-    object_factory_parameters,
+    parameters,
     update_in_place ? update_in_placet::MUST_UPDATE_IN_PLACE
                     : update_in_placet::NO_UPDATE_IN_PLACE);
 
@@ -189,6 +192,10 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
       const exprt &to_return = to_return_symbol.symbol_expr();
       if(to_return_symbol.type.id() != ID_pointer)
       {
+        object_factory_parameterst parameters = object_factory_parameters;
+        if(assume_non_null)
+          parameters.max_nonnull_tree_depth = 1;
+
         gen_nondet_init(
           to_return,
           new_instructions,
@@ -196,8 +203,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
           source_locationt(),
           false,
           allocation_typet::LOCAL, // Irrelevant as type is primitive
-          !assume_non_null,
-          object_factory_parameters,
+          parameters,
           update_in_placet::NO_UPDATE_IN_PLACE);
       }
       else

@@ -1,6 +1,6 @@
 public class test_sb_length
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       StringBuilder x = new StringBuilder("abc");
       x.append("de");

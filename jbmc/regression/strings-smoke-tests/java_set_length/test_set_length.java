@@ -1,6 +1,6 @@
 public class test_set_length
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       StringBuilder s = new StringBuilder("abc");
       s.setLength(10);

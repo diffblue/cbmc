@@ -1,6 +1,6 @@
 public class test_subsequence
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       String abcdef = "AbcDef";
       CharSequence cde = org.cprover.CProverString.subSequence(abcdef,2,5);

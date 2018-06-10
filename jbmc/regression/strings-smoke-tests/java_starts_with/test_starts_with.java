@@ -1,6 +1,6 @@
 public class test_starts_with
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       String s = new String("Abcd");
       String pref = "Ab";

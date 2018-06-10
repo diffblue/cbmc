@@ -1,0 +1,11 @@
+CORE
+Main.class
+--function Main.main
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+assertion at file Main\.java line 10 function .* bytecode-index 6: FAILURE
+assertion at file Main\.java line 14 function .* bytecode-index 26: FAILURE
+\*\* 2 of .* failed
+--
+^warning: ignoring

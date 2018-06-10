@@ -1,8 +1,0 @@
-FUTURE
-test_insert_int.class
---refine-strings --verbosity 10  --string-max-length 1000
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
---
-non equal types

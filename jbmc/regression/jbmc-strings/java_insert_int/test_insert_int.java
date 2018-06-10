@@ -1,6 +1,6 @@
 public class test_insert_int
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       StringBuilder sb = new StringBuilder("ac");
       org.cprover.CProverString.insert(sb, 1, 42);

@@ -1,0 +1,12 @@
+CORE
+Main.class
+--function Main.main --java-throw-runtime-exceptions
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+assertion at file Main\.java line 5 function .* bytecode-index 6: FAILURE
+assertion at file Main\.java line 6 function .* bytecode-index 14: FAILURE
+assertion at file Main\.java line 12 function .* bytecode-index 31: SUCCESS
+\*\* 2 of .* failed
+--
+^warning: ignoring

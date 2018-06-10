@@ -1,6 +1,6 @@
 public class classtest1
 {
-  static void main(String[] args)
+  public static void main(String[] args)
   {
     g(classtest1.class);
   }

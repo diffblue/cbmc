@@ -781,6 +781,12 @@ codet stub_global_initializer_factoryt::get_stub_initializer_body(
   {
     const symbol_exprt new_global_symbol =
       symbol_table.lookup_ref(it->second).symbol_expr();
+
+    parameters.max_nonnull_tree_depth =
+      is_non_null_library_global(it->second)
+        ? object_factory_parameters.max_nonnull_tree_depth + 1
+        : object_factory_parameters.max_nonnull_tree_depth;
+
     gen_nondet_init(
       new_global_symbol,
       static_init_body,
@@ -788,7 +794,6 @@ codet stub_global_initializer_factoryt::get_stub_initializer_body(
       source_locationt(),
       false,
       allocation_typet::DYNAMIC,
-      !is_non_null_library_global(it->second),
       parameters,
       pointer_type_selector,
       update_in_placet::NO_UPDATE_IN_PLACE);
