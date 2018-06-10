@@ -1,6 +1,6 @@
 public class test_compare
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       String s1 = "ab";
       String s2 = "aa";

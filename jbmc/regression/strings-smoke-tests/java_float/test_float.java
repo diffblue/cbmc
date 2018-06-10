@@ -1,6 +1,6 @@
 public class test_float
 {
-   public static void main(/*String[] arg*/)
+   public static void main()
    {
       float inf = 100.0f / 0.0f;
       float minus_inf = -100.0f / 0.0f;

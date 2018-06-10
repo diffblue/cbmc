@@ -1,6 +1,6 @@
 public class test_substring
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       String abcdef = "AbcDef";
       String cde = org.cprover.CProverString.substring(abcdef, 2,5);

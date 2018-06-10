@@ -1,6 +1,6 @@
 public class test_index_of
 {
-    public static void main(/*String[] argv*/)
+    public static void main()
     {
         String s = "Abc";
         String bc = "bc";

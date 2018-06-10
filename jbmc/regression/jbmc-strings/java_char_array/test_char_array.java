@@ -1,6 +1,6 @@
 public class test_char_array
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       String s = "abc";
       char [] str = s.toCharArray();

@@ -1,6 +1,6 @@
 public class test_delete_char_at
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       StringBuilder s = new StringBuilder();
       s.append("Abc");

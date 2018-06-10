@@ -1,6 +1,6 @@
 public class test_set_char_at
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       String s = new String("Abc");
       char c = org.cprover.CProverString.charAt(s, 1);

@@ -1,6 +1,6 @@
 public class test_last_index_of
 {
-    public static void main(/*String[] argv*/)
+    public static void main()
     {
         String s = "abcab";
         String ab = "ab";

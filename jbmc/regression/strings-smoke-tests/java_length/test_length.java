@@ -1,6 +1,6 @@
 public class test_length
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       String s = new String("Abc");
       int l = s.length();

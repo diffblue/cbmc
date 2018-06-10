@@ -1,6 +1,6 @@
 public class test_code_point
 {
-   public static void main(/*String[] argv*/)
+   public static void main()
    {
       String s = "!𐤇𐤄𐤋𐤋𐤅";
       StringBuilder sb = new StringBuilder();

@@ -4,7 +4,7 @@ Main.class
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-assertion at file Main\.java line 12 function .* bytecode-index 15: FAILURE
+assertion at file Main\.java line 6 function .* bytecode-index 13: FAILURE
 \*\* 1 of .* failed
 --
 ^warning: ignoring
