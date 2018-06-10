@@ -1073,8 +1073,8 @@ codet java_string_library_preprocesst::make_float_to_string_code(
   // Case of simple notation
   ieee_floatt bound_inf_float(float_spec);
   ieee_floatt bound_sup_float(float_spec);
-  bound_inf_float.from_float(1e-3);
-  bound_sup_float.from_float(1e7);
+  bound_inf_float.from_float(1e-3f);
+  bound_sup_float.from_float(1e7f);
   bound_inf_float.change_spec(float_spec);
   bound_sup_float.change_spec(float_spec);
   constant_exprt bound_inf=bound_inf_float.to_expr();
