@@ -1545,6 +1545,9 @@ exprt cpp_typecheck_resolvet::resolve(
     {
       typet instance=
         disambiguate_template_classes(base_name, id_set, template_args);
+
+      cpp_typecheck.elaborate_class_template(instance);
+
       identifiers.push_back(exprt(ID_type, instance));
     }
     else
