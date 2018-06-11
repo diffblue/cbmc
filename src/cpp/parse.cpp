@@ -4039,7 +4039,6 @@ bool Parser::rEnumSpec(typet &spec)
   #endif
 
   cpp_tokent tk;
-  // bool is_enum_class=false;
 
   if(lex.get_token(tk)!=TOK_ENUM)
     return false;
@@ -4053,7 +4052,7 @@ bool Parser::rEnumSpec(typet &spec)
   if(lex.LookAhead(0)==TOK_CLASS)
   {
     lex.get_token(tk);
-    // is_enum_class=true;
+    spec.set(ID_C_class, true);
   }
 
   if(lex.LookAhead(0)!='{' &&

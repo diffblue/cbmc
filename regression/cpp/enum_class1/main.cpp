@@ -14,4 +14,7 @@ int main()
 {
   Color1 c;
   c=Color1::red;
+
+  Color2 c2;
+  c2 = red;
 }
