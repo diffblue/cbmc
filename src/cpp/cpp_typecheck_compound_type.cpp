@@ -490,22 +490,18 @@ void cpp_typecheckt::typecheck_compound_declarator(
       component.type().set("#virtual_name", virtual_name);
 
       // Check if it is a pure virtual method
-      if(is_virtual)
+      if(value.is_not_nil() && value.id() == ID_constant)
       {
-        if(value.is_not_nil() && value.id()==ID_constant)
+        mp_integer i;
+        to_integer(value, i);
+        if(i!=0)
         {
-          mp_integer i;
-          to_integer(value, i);
-          if(i!=0)
-          {
-            error().source_location=declarator.name().source_location();
-            error() << "expected 0 to mark pure virtual method, got "
-                    << i << eom;
-            throw 0;
-          }
-          component.set("is_pure_virtual", true);
-          value.make_nil();
+          error().source_location = declarator.name().source_location();
+          error() << "expected 0 to mark pure virtual method, got " << i << eom;
+          throw 0;
         }
+        component.set("is_pure_virtual", true);
+        value.make_nil();
       }
 
       typecheck_member_function(
