@@ -91,7 +91,7 @@ exprt object_factory(
   const irep_idt base_name,
   code_blockt &init_code,
   symbol_table_baset &symbol_table,
-  const object_factory_parameterst &parameters,
+  object_factory_parameterst parameters,
   allocation_typet alloc_type,
   const source_locationt &location,
   const select_pointer_typet &pointer_type_selector);

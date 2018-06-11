@@ -1,0 +1,23 @@
+CORE symex-driven-lazy-loading-expected-failure
+Test.class
+--show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+^Symbol\.*: java::Opaque\.static_method:\(LOpaque;\)LOpaque;::malloc_site\$[0-3]?$
+^Symbol\.*: java::Opaque\.method:\(\[LOpaque;\)\[LOpaque;::malloc_site\$[0-3]?$
+--
+^Symbol\.*: malloc_site
+^Symbol\.*: to_construct
+^Symbol\.*: to_return
+^Symbol\.*: this
+^Symbol\.*: caught_exception
+^Symbol\.*: anonlocal
+^Symbol\.*: stub_ignored_arg
+^Symbol\.*: #return_value
+^Symbol\.*: return_tmp
+^Symbol\.*: new_tmp
+^Symbol\.*: tmp_new_data_array
+^Symbol\.*: newarray_tmp
+--
+Does not work with symex-driven lazy loading because we want to check the
+symbol table for the entire program.
