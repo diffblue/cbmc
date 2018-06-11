@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 preproc.i
 -mthumb -o linked-object.gb object.intel
 ^EXIT=(64|1)$
