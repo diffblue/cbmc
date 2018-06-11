@@ -72,11 +72,8 @@ test_script:
     rmdir /s /q ansi-c\Incomplete_Type1
     rmdir /s /q ansi-c\Union_Padding1
     rmdir /s /q ansi-c\Universal_characters1
-    rmdir /s /q ansi-c\function_return1
     rmdir /s /q ansi-c\gcc_attributes7
     rmdir /s /q ansi-c\gcc_version1
-    rmdir /s /q ansi-c\struct6
-    rmdir /s /q ansi-c\struct7
     rmdir /s /q cbmc\Malloc23
     rmdir /s /q cbmc\byte_update2
     rmdir /s /q cbmc\byte_update3
