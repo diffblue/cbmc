@@ -749,8 +749,18 @@ and                 { return cpp98_keyword(TOK_ANDAND); }
 and_eq              { return cpp98_keyword(TOK_ANDASSIGN); }
 bool                { return cpp98_keyword(TOK_BOOL); }
 catch               { return cpp98_keyword(TOK_CATCH); }
-char16_t            { return cpp11_keyword(TOK_CHAR16_T); } // C++11
-char32_t            { return cpp11_keyword(TOK_CHAR32_T); } // C++11
+char16_t            { // C++11, but Visual Studio uses typedefs
+                      if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+                        return make_identifier();
+                      else
+                        return cpp11_keyword(TOK_CHAR16_T);
+                    }
+char32_t            { // C++11, but Visual Studio uses typedefs
+                      if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+                        return make_identifier();
+                      else
+                        return cpp11_keyword(TOK_CHAR32_T);
+                    }
 class               { return cpp98_keyword(TOK_CLASS); }
 compl               { return cpp98_keyword('~'); }
 constexpr           { return cpp11_keyword(TOK_CONSTEXPR); } // C++11
