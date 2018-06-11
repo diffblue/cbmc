@@ -1651,8 +1651,10 @@ void goto_convertt::generate_ifthenelse(
 
   // v: if(!c) goto z/y;
   goto_programt tmp_v;
+  exprt followed_guard = guard;
+  followed_guard.type() = ns.follow(followed_guard.type());
   generate_conditional_branch(
-    boolean_negate(guard), has_else ? y : z, source_location, tmp_v, mode);
+    boolean_negate(followed_guard), has_else ? y : z, source_location, tmp_v, mode);
 
   // w: P;
   goto_programt tmp_w;
