@@ -356,8 +356,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     throw 0;
   }
 
-  if(is_constructor &&
-     base_name!=id2string(symbol.base_name))
+  if(is_constructor && base_name != symbol.base_name)
   {
     error().source_location=cpp_name.source_location();
     error() << "member function must return a value or void" << eom;
@@ -425,7 +424,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   }
 
   if(is_typedef)
-    component.set("is_type", true);
+    component.set(ID_is_type, true);
 
   if(is_mutable)
     component.set("is_mutable", true);
@@ -615,11 +614,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // do the body of the function
         typecast_exprt late_cast(
+          lookup(args[0].get(ID_C_identifier)).symbol_expr(),
           to_code_type(component.type()).parameters()[0].type());
 
-        late_cast.op0()=
-          namespacet(symbol_table).lookup(
-            args[0].get(ID_C_identifier)).symbol_expr();
 
         if(code_type.return_type().id()!=ID_empty &&
            code_type.return_type().id()!=ID_destructor)

@@ -89,12 +89,11 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
       cppname.move_to_sub(name);
 
       const symbolt &virtual_table_symbol_type =
-        namespacet(symbol_table).lookup(
-          cit->type().subtype().get(ID_identifier));
+        lookup(cit->type().subtype().get(ID_identifier));
 
-      const symbolt &virtual_table_symbol_var  =
-        namespacet(symbol_table).lookup(
-          id2string(virtual_table_symbol_type.name)+"@"+id2string(symbol.name));
+      const symbolt &virtual_table_symbol_var = lookup(
+        id2string(virtual_table_symbol_type.name) + "@" +
+        id2string(symbol.name));
 
       exprt var=virtual_table_symbol_var.symbol_expr();
       address_of_exprt address(var);
