@@ -613,42 +613,33 @@ void cpp_typecheckt::typecheck_compound_declarator(
           lookup(args[0].get(ID_C_identifier)).symbol_expr(),
           to_code_type(component.type()).parameters()[0].type());
 
+        side_effect_expr_function_callt expr_call;
+        expr_call.function() =
+          symbol_exprt(component.get_name(), component.type());
+        expr_call.arguments().reserve(args.size());
+        expr_call.arguments().push_back(late_cast);
+
+        for(const auto &arg : args)
+        {
+          expr_call.arguments().push_back(
+            lookup(arg.get(ID_C_identifier)).symbol_expr());
+        }
 
         if(code_type.return_type().id()!=ID_empty &&
            code_type.return_type().id()!=ID_destructor)
         {
-          side_effect_expr_function_callt expr_call;
-          expr_call.function()=
-            symbol_exprt(component.get_name(), component.type());
           expr_call.type()=to_code_type(component.type()).return_type();
-          expr_call.arguments().reserve(args.size());
-          expr_call.arguments().push_back(late_cast);
+          exprt already_typechecked(ID_already_typechecked);
+          already_typechecked.move_to_operands(expr_call);
 
-          for(std::size_t i=1; i < args.size(); i++)
-          {
-            expr_call.arguments().push_back(
-              namespacet(symbol_table).lookup(
-                args[i].get(ID_C_identifier)).symbol_expr());
-          }
-
-          func_symb.value=code_returnt(expr_call);
+          func_symb.value = code_returnt(already_typechecked).make_block();
         }
         else
         {
-          code_function_callt code_func;
-          code_func.function()=
-            symbol_exprt(component.get_name(), component.type());
-          code_func.arguments().reserve(args.size());
-          code_func.arguments().push_back(late_cast);
+          exprt already_typechecked(ID_already_typechecked);
+          already_typechecked.move_to_operands(expr_call);
 
-          for(std::size_t i=1; i < args.size(); i++)
-          {
-            code_func.arguments().push_back(
-              namespacet(symbol_table).lookup(
-                args[i].get(ID_C_identifier)).symbol_expr());
-          }
-
-          func_symb.value=code_func;
+          func_symb.value = code_expressiont(already_typechecked).make_block();
         }
 
         // add this new function to the list of components
@@ -663,6 +654,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
           const bool failed=!symbol_table.insert(std::move(func_symb)).second;
           CHECK_RETURN(!failed);
         }
+
+        put_compound_into_scope(new_compo);
 
         // next base
         virtual_bases.erase(virtual_bases.begin());

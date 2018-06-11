@@ -34,6 +34,11 @@ void cpp_typecheckt::convert_parameter(
 
   parameter.set_identifier(identifier);
 
+  // the parameter may already have been set up if dealing with virtual methods
+  const symbolt *check_symbol;
+  if(!lookup(identifier, check_symbol))
+    return;
+
   symbolt symbol;
 
   symbol.name=identifier;
@@ -93,7 +98,12 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     assert(symbol.value.id()==ID_code);
     assert(symbol.value.get(ID_statement)==ID_block);
 
-    symbol.value.copy_to_operands(dtor(msymb));
+    if(
+      !symbol.value.has_operands() || !symbol.value.op0().has_operands() ||
+      symbol.value.op0().op0().id() != ID_already_typechecked)
+    {
+      symbol.value.copy_to_operands(dtor(msymb));
+    }
   }
 
   // enter appropriate scope
