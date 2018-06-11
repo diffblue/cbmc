@@ -34,7 +34,7 @@ ci_lazy_methodst::ci_lazy_methodst(
   const symbol_tablet &symbol_table,
   const irep_idt &main_class,
   const std::vector<irep_idt> &main_jar_classes,
-  const std::vector<irep_idt> &lazy_methods_extra_entry_points,
+  const std::vector<load_extra_methodst> &lazy_methods_extra_entry_points,
   java_class_loadert &java_class_loader,
   const std::vector<irep_idt> &extra_instantiated_classes,
   const select_pointer_typet &pointer_type_selector,
@@ -103,8 +103,13 @@ bool ci_lazy_methodst::operator()(
 
   // Add any extra entry points specified; we should elaborate these in the
   // same way as the main function.
-  std::vector<irep_idt> extra_entry_points=lazy_methods_extra_entry_points;
-  resolve_method_names(extra_entry_points, symbol_table);
+  std::vector<irep_idt> extra_entry_points;
+  for(const auto &extra_function_generator : lazy_methods_extra_entry_points)
+  {
+    const auto &extra_methods = extra_function_generator(symbol_table);
+    extra_entry_points.insert(
+      extra_entry_points.end(), extra_methods.begin(), extra_methods.end());
+  }
   methods_to_convert_later.insert(
     extra_entry_points.begin(), extra_entry_points.end());
 
@@ -353,54 +358,6 @@ ci_lazy_methodst::entry_point_methods(const symbol_tablet &symbol_table)
   else
     methods_to_convert_later.insert(main_function.main_function.name);
   return methods_to_convert_later;
-}
-
-/// Translates the given list of method names from human-readable to
-/// internal syntax.
-/// Expands any wildcards (entries ending in '.*') in the given method
-/// list to include all non-static methods defined on the given class.
-/// \param [in, out] methods: List of methods to expand. Any wildcard entries
-///   will be deleted and the expanded entries appended to the end.
-/// \param symbol_table: global symbol table
-void ci_lazy_methodst::resolve_method_names(
-  std::vector<irep_idt> &methods,
-  const symbol_tablet &symbol_table)
-{
-  std::vector<irep_idt> new_methods;
-  for(const irep_idt &method : methods)
-  {
-    const std::string &method_str=id2string(method);
-    if(!has_suffix(method_str, ".*"))
-    {
-      std::string error_message;
-      irep_idt internal_name=
-        resolve_friendly_method_name(
-          method_str,
-          symbol_table,
-          error_message);
-      if(internal_name==irep_idt())
-        throw "entry point "+error_message;
-      new_methods.push_back(internal_name);
-    }
-    else
-    {
-      irep_idt classname="java::"+method_str.substr(0, method_str.length()-2);
-      if(!symbol_table.has_symbol(classname))
-        throw "wildcard entry point '"+method_str+"': unknown class";
-
-      for(const auto &name_symbol : symbol_table.symbols)
-      {
-        if(name_symbol.second.type.id()!=ID_code)
-          continue;
-        if(!to_code_type(name_symbol.second.type).has_this())
-          continue;
-        if(has_prefix(id2string(name_symbol.first), id2string(classname)))
-          new_methods.push_back(name_symbol.first);
-      }
-    }
-  }
-
-  methods=std::move(new_methods);
 }
 
 /// Build up a list of methods whose type may be passed around reachable

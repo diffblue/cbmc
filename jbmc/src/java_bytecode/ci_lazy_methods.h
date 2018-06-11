@@ -91,6 +91,9 @@ typedef std::function<
   bool(const irep_idt &function_id, ci_lazy_methods_neededt)>
   method_convertert;
 
+typedef std::function<std::vector<irep_idt>(const symbol_tablet &)>
+  load_extra_methodst;
+
 class ci_lazy_methodst:public messaget
 {
 public:
@@ -98,7 +101,7 @@ public:
     const symbol_tablet &symbol_table,
     const irep_idt &main_class,
     const std::vector<irep_idt> &main_jar_classes,
-    const std::vector<irep_idt> &lazy_methods_extra_entry_points,
+    const std::vector<load_extra_methodst> &lazy_methods_extra_entry_points,
     java_class_loadert &java_class_loader,
     const std::vector<irep_idt> &extra_instantiated_classes,
     const select_pointer_typet &pointer_type_selector,
@@ -112,10 +115,6 @@ public:
     const method_convertert &method_converter);
 
 private:
-  void resolve_method_names(
-    std::vector<irep_idt> &methods,
-    const symbol_tablet &symbol_table);
-
   void initialize_instantiated_classes(
     const std::unordered_set<irep_idt> &entry_points,
     const namespacet &ns,
@@ -149,7 +148,7 @@ private:
   class_hierarchyt class_hierarchy;
   irep_idt main_class;
   std::vector<irep_idt> main_jar_classes;
-  std::vector<irep_idt> lazy_methods_extra_entry_points;
+  const std::vector<load_extra_methodst> &lazy_methods_extra_entry_points;
   java_class_loadert &java_class_loader;
   const std::vector<irep_idt> &extra_instantiated_classes;
   const select_pointer_typet &pointer_type_selector;
