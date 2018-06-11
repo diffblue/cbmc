@@ -447,7 +447,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       virtual_name+="$const";
 
     if(has_volatile(method_qualifier))
-      virtual_name+="$virtual";
+      virtual_name += "$volatile";
 
     if(component.type().get(ID_return_type)==ID_destructor)
       virtual_name="@dtor";

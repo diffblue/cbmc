@@ -168,9 +168,9 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
     const typet &pointer=it->type();
     const typet &symbol =pointer.subtype();
     if(symbol.get_bool(ID_C_constant))
-      result+="const$";
+      result += "$const";
     if(symbol.get_bool(ID_C_volatile))
-      result+="volatile$";
+      result += "$volatile";
     result+="this";
     first=false;
     it++;
