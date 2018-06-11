@@ -635,13 +635,6 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   cpp_declaratort declarator=declaration.declarators().front();
   cpp_namet &cpp_name=declarator.name();
 
-  if(cpp_name.is_qualified())
-  {
-    error().source_location=cpp_name.source_location();
-    error() << "qualifiers not expected here" << eom;
-    throw 0;
-  }
-
   // There is specialization (instantiation with template arguments)
   // but also function overloading (no template arguments)
 
