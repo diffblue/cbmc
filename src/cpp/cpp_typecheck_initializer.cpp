@@ -133,6 +133,9 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
     typecheck_expr(symbol.value);
 
+    if(symbol.value.type().find("to-member").is_not_nil())
+      symbol.type.add("to-member") = symbol.value.type().find("to-member");
+
     if(symbol.value.id()==ID_initializer_list ||
        symbol.value.id()==ID_string_constant)
     {

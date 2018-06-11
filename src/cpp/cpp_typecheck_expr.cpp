@@ -748,6 +748,13 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
       }
     }
   }
+  else if(
+    expr.op0().id() == ID_ptrmember && expr.op0().op0().id() == "cpp-this")
+  {
+    expr.type() = pointer_type(expr.op0().type());
+    expr.type().add("to-member") = expr.op0().op0().type().subtype();
+    return;
+  }
 
   // the C front end does not know about references
   const bool is_ref=is_reference(expr.type());
@@ -2623,13 +2630,6 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
   {
     error().source_location=expr.source_location();
     error() << "pointer-to-member type error" << eom;
-    throw 0;
-  }
-
-  if(expr.op1().type().subtype().id()!=ID_code)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "pointers to data member are not supported" << eom;
     throw 0;
   }
 

@@ -309,11 +309,16 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       }
       else
       {
-        // this has to be a method
+        // this has to be a method or form a pointer-to-member expression
         if(identifier.is_method)
           e=cpp_symbol_expr(cpp_typecheck.lookup(identifier.identifier));
         else
-          e.make_nil();
+        {
+          e.id(ID_ptrmember);
+          e.copy_to_operands(
+            exprt("cpp-this", pointer_type(compound_symbol.type)));
+          e.type() = type;
+        }
       }
     }
   }

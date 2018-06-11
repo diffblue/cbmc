@@ -1595,9 +1595,11 @@ bool cpp_typecheckt::cast_away_constness(
 
   if(is_reference(nt1))
     nt1.remove(ID_C_reference);
+  nt1.remove("to-member");
 
   if(is_reference(nt2))
     nt2.remove(ID_C_reference);
+  nt2.remove("to-member");
 
   // substitute final subtypes
   std::vector<typet> snt1;
@@ -2020,6 +2022,21 @@ bool cpp_typecheckt::static_typecast(
         new_expr.make_typecast(type);
         return true;
       }
+    }
+    else if(
+      type.find("to-member").is_nil() &&
+      e.type().find("to-member").is_not_nil())
+    {
+      if(type.subtype() != e.type().subtype())
+        return false;
+
+      struct_typet from_struct = to_struct_type(
+        follow(static_cast<const typet &>(e.type().find("to-member"))));
+
+      new_expr = e;
+      new_expr.type().add("to-member") = from_struct;
+
+      return true;
     }
     else
       return false;
