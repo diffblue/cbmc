@@ -1,4 +1,4 @@
-#include <cassert>
+#include <assert.h>
 
 enum IMPH_STATE
 {

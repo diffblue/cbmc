@@ -433,7 +433,7 @@ bool cpp_typecheckt::overloadable(const exprt &expr)
 
     if(t.id()==ID_struct ||
        t.id()==ID_union ||
-       t.id()==ID_c_enum)
+       t.id()==ID_c_enum || t.id() == ID_c_enum_tag)
       return true;
   }
 
