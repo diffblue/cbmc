@@ -356,8 +356,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     throw 0;
   }
 
-  if(is_constructor &&
-     base_name!=id2string(symbol.base_name))
+  if(is_constructor && base_name != symbol.base_name)
   {
     error().source_location=cpp_name.source_location();
     error() << "member function must return a value or void" << eom;
@@ -425,7 +424,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   }
 
   if(is_typedef)
-    component.set("is_type", true);
+    component.set(ID_is_type, true);
 
   if(is_mutable)
     component.set("is_mutable", true);
@@ -448,7 +447,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       virtual_name+="$const";
 
     if(has_volatile(method_qualifier))
-      virtual_name+="$virtual";
+      virtual_name += "$volatile";
 
     if(component.type().get(ID_return_type)==ID_destructor)
       virtual_name="@dtor";
@@ -491,22 +490,18 @@ void cpp_typecheckt::typecheck_compound_declarator(
       component.type().set("#virtual_name", virtual_name);
 
       // Check if it is a pure virtual method
-      if(is_virtual)
+      if(value.is_not_nil() && value.id() == ID_constant)
       {
-        if(value.is_not_nil() && value.id()==ID_constant)
+        mp_integer i;
+        to_integer(value, i);
+        if(i!=0)
         {
-          mp_integer i;
-          to_integer(value, i);
-          if(i!=0)
-          {
-            error().source_location=declarator.name().source_location();
-            error() << "expected 0 to mark pure virtual method, got "
-                    << i << eom;
-            throw 0;
-          }
-          component.set("is_pure_virtual", true);
-          value.make_nil();
+          error().source_location = declarator.name().source_location();
+          error() << "expected 0 to mark pure virtual method, got " << i << eom;
+          throw 0;
         }
+        component.set("is_pure_virtual", true);
+        value.make_nil();
       }
 
       typecheck_member_function(
@@ -615,47 +610,36 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // do the body of the function
         typecast_exprt late_cast(
+          lookup(args[0].get(ID_C_identifier)).symbol_expr(),
           to_code_type(component.type()).parameters()[0].type());
 
-        late_cast.op0()=
-          namespacet(symbol_table).lookup(
-            args[0].get(ID_C_identifier)).symbol_expr();
+        side_effect_expr_function_callt expr_call;
+        expr_call.function() =
+          symbol_exprt(component.get_name(), component.type());
+        expr_call.arguments().reserve(args.size());
+        expr_call.arguments().push_back(late_cast);
+
+        for(const auto &arg : args)
+        {
+          expr_call.arguments().push_back(
+            lookup(arg.get(ID_C_identifier)).symbol_expr());
+        }
 
         if(code_type.return_type().id()!=ID_empty &&
            code_type.return_type().id()!=ID_destructor)
         {
-          side_effect_expr_function_callt expr_call;
-          expr_call.function()=
-            symbol_exprt(component.get_name(), component.type());
           expr_call.type()=to_code_type(component.type()).return_type();
-          expr_call.arguments().reserve(args.size());
-          expr_call.arguments().push_back(late_cast);
+          exprt already_typechecked(ID_already_typechecked);
+          already_typechecked.move_to_operands(expr_call);
 
-          for(std::size_t i=1; i < args.size(); i++)
-          {
-            expr_call.arguments().push_back(
-              namespacet(symbol_table).lookup(
-                args[i].get(ID_C_identifier)).symbol_expr());
-          }
-
-          func_symb.value=code_returnt(expr_call);
+          func_symb.value = code_returnt(already_typechecked).make_block();
         }
         else
         {
-          code_function_callt code_func;
-          code_func.function()=
-            symbol_exprt(component.get_name(), component.type());
-          code_func.arguments().reserve(args.size());
-          code_func.arguments().push_back(late_cast);
+          exprt already_typechecked(ID_already_typechecked);
+          already_typechecked.move_to_operands(expr_call);
 
-          for(std::size_t i=1; i < args.size(); i++)
-          {
-            code_func.arguments().push_back(
-              namespacet(symbol_table).lookup(
-                args[i].get(ID_C_identifier)).symbol_expr());
-          }
-
-          func_symb.value=code_func;
+          func_symb.value = code_expressiont(already_typechecked).make_block();
         }
 
         // add this new function to the list of components
@@ -670,6 +654,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
           const bool failed=!symbol_table.insert(std::move(func_symb)).second;
           CHECK_RETURN(!failed);
         }
+
+        put_compound_into_scope(new_compo);
 
         // next base
         virtual_bases.erase(virtual_bases.begin());
