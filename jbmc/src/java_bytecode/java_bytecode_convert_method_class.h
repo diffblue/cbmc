@@ -152,7 +152,7 @@ protected:
   symbol_exprt tmp_variable(const std::string &prefix, const typet &type);
 
   // JVM program locations
-  irep_idt label(const irep_idt &address);
+  static irep_idt label(const irep_idt &address);
 
   // JVM Stack
   typedef std::vector<exprt> stackt;
