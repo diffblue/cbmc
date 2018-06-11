@@ -2494,6 +2494,12 @@ bool Parser::rConstructorDecl(
 
     case TOK_DEFAULT: // C++0x
       {
+        if(!ansi_c_parser.cpp11)
+        {
+          SyntaxError();
+          return false;
+        }
+
         constructor.value()=codet(ID_default);
         set_location(constructor.value(), value);
       }
@@ -2501,6 +2507,12 @@ bool Parser::rConstructorDecl(
 
     case TOK_DELETE: // C++0x
       {
+        if(!ansi_c_parser.cpp11)
+        {
+          SyntaxError();
+          return false;
+        }
+
         constructor.value()=codet(ID_cpp_delete);
         set_location(constructor.value(), value);
       }
@@ -2675,12 +2687,24 @@ bool Parser::rDeclaratorWithInit(
 
       if(lex.LookAhead(0)==TOK_DEFAULT) // C++0x
       {
+        if(!ansi_c_parser.cpp11)
+        {
+          SyntaxError();
+          return false;
+        }
+
         lex.get_token(tk);
         declarator.value()=codet(ID_default);
         set_location(declarator.value(), tk);
       }
       else if(lex.LookAhead(0)==TOK_DELETE) // C++0x
       {
+        if(!ansi_c_parser.cpp11)
+        {
+          SyntaxError();
+          return false;
+        }
+
         lex.get_token(tk);
         declarator.value()=codet(ID_cpp_delete);
         set_location(declarator.value(), tk);

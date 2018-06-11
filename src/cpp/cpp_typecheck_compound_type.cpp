@@ -450,6 +450,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   if(is_method)
   {
+    if(
+      value.id() == ID_code &&
+      to_code(value).get_statement() == ID_cpp_delete)
+    {
+      value.make_nil();
+      component.set(ID_access, "noaccess");
+    }
+
     component.set(ID_is_inline, declaration.member_spec().is_inline());
 
     // the 'virtual' name of the function
