@@ -52,6 +52,12 @@ void ci_lazy_methods_neededt::add_all_needed_classes(
   const pointer_typet &pointer_type)
 {
   namespacet ns{symbol_table};
+  const java_class_typet &underlying_type =
+    to_java_class_type(ns.follow(pointer_type.subtype()));
+
+  if(underlying_type.is_abstract())
+    return;
+
   initialize_instantiated_classes_from_pointer(pointer_type, ns);
 
   // TODO we should be passing here a map that maps generic parameters
