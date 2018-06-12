@@ -406,6 +406,13 @@ void java_bytecode_convert_method_lazy(
   // Not used in jbmc at present, but other codebases that use jbmc as a library
   // use this information.
   method_symbol.type.set(ID_C_abstract, m.is_abstract);
+
+  if(java_bytecode_parse_treet::find_annotation(
+       m.annotations, "java::org.cprover.MustNotThrow"))
+  {
+    method_symbol.type.set(ID_C_must_not_throw, true);
+  }
+
   symbol_table.add(method_symbol);
 }
 
