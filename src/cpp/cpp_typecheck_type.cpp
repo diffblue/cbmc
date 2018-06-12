@@ -252,6 +252,9 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     // This is an Apple extension for lambda-like constructs.
     // http://thirdcog.eu/pwcblocks/
+    // we just treat them as references to functions
+    type.id(ID_frontend_pointer);
+    typecheck_type(type);
   }
   else if(type.id()==ID_nullptr)
   {
