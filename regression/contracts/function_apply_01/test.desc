@@ -1,0 +1,9 @@
+KNOWNBUG
+main.c
+--apply-code-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Applying code contracts currently also checks them.

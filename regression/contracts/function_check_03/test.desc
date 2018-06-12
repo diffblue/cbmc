@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+--check-code-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Loop invariants currently do not support memory reads in at least some
+circumstances.

@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+--check-code-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Ensures statements currently do not allow quantified predicates unless the
+function has void return type.
