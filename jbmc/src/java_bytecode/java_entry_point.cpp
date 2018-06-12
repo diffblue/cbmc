@@ -210,17 +210,14 @@ static void java_static_lifetime_init(
       }
       else if(sym.value.is_nil() && sym.type!=empty_typet())
       {
-        bool allow_null=!assume_init_pointers_not_null;
-        if(allow_null)
-        {
-          irep_idt nameid=sym.symbol_expr().get_identifier();
-          if(allow_null && is_java_string_literal_id(nameid))
-            allow_null=false;
-          if(allow_null && is_non_null_library_global(nameid))
-            allow_null = false;
-        }
+        const bool is_class_model =
+          has_suffix(id2string(sym.name), "@class_model");
+        const bool not_allow_null = is_java_string_literal_id(sym.name) ||
+                                    is_non_null_library_global(sym.name) ||
+                                    assume_init_pointers_not_null;
+
         object_factory_parameterst parameters = object_factory_parameters;
-        if(!allow_null)
+        if(not_allow_null && !is_class_model)
           parameters.max_nonnull_tree_depth = 1;
 
         gen_nondet_init(
