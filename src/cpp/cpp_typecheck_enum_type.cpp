@@ -12,9 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cpp_typecheck.h"
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/config.h>
 
 #include <ansi-c/c_qualifiers.h>
-#include <util/c_types.h>
 
 #include "cpp_enum_type.h"
 
@@ -140,7 +141,9 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
       throw 0;
     }
   }
-  else if(has_body)
+  else if(
+    has_body ||
+    config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
     std::string pretty_name=
       cpp_scopes.current_scope().prefix+id2string(base_name);
@@ -200,7 +203,8 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     if(new_symbol->type.get_bool(ID_C_class))
       cpp_scopes.go_to(scope_identifier);
 
-    typecheck_enum_body(*new_symbol);
+    if(has_body)
+      typecheck_enum_body(*new_symbol);
   }
   else
   {
