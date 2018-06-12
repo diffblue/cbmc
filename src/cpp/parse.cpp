@@ -1442,7 +1442,7 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
               << "\n";
     #endif
 
-    if((cv_q.is_not_nil() || storage_spec.is_auto()) &&
+    if(cv_q.is_not_nil() &&
        ((t==TOK_IDENTIFIER && lex.LookAhead(1)=='=') || t=='*'))
       return rConstDeclaration(declaration, storage_spec, member_spec, cv_q);
     else
@@ -7997,7 +7997,7 @@ bool Parser::rDeclarationStatement(codet &statement)
               << "Parser::rDeclarationStatement 3 " << t << "\n";
     #endif
 
-    if((cv_q.is_not_nil() || storage_spec.is_auto()) &&
+    if(cv_q.is_not_nil() &&
        ((t==TOK_IDENTIFIER && lex.LookAhead(1)=='=') || t=='*'))
     {
       #ifdef DEBUG
