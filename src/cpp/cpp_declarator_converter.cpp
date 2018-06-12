@@ -68,7 +68,8 @@ symbolt &cpp_declarator_convertert::convert(
     scope=&cpp_typecheck.cpp_scopes.current_scope();
 
     // check the declarator-part of the type, in that scope
-    cpp_typecheck.typecheck_type(final_type);
+    if(declarator.value().is_nil() || !cpp_typecheck.has_auto(final_type))
+      cpp_typecheck.typecheck_type(final_type);
   }
 
   is_code=is_code_type(final_type);

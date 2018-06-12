@@ -368,7 +368,9 @@ void cpp_typecheckt::typecheck_decl(codet &code)
 
   bool is_typedef=declaration.is_typedef();
 
-  typecheck_type(type);
+  if(declaration.declarators().empty() || !has_auto(type))
+    typecheck_type(type);
+
   assert(type.is_not_nil());
 
   if(declaration.declarators().empty() &&
@@ -409,7 +411,10 @@ void cpp_typecheckt::typecheck_decl(codet &code)
        symbol.value.id()!=ID_code)
     {
       decl_statement.copy_to_operands(symbol.value);
-      assert(follow(decl_statement.op1().type())==follow(symbol.type));
+      DATA_INVARIANT(
+        has_auto(symbol.type) ||
+          follow(decl_statement.op1().type()) == follow(symbol.type),
+        "declarator type should match symbol type");
     }
 
     new_code.move_to_operands(decl_statement);

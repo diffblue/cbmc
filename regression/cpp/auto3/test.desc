@@ -1,8 +1,9 @@
 CORE
 main.cpp
--std=c++11
-^EXIT=0$
+
+^EXIT=(64|1)$
 ^SIGNAL=0$
+parse error
 --
 ^warning: ignoring
 ^CONVERSION ERROR$

@@ -395,6 +395,7 @@ protected:
 
   static bool has_const(const typet &type);
   static bool has_volatile(const typet &type);
+  static bool has_auto(const typet &type);
 
   void typecheck_member_function(
     const irep_idt &compound_identifier,

@@ -16,4 +16,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 void cpp_convert_plain_type(typet &);
 
+void cpp_convert_auto(typet &dest, const typet &src);
+
 #endif // CPROVER_CPP_CPP_CONVERT_TYPE_H

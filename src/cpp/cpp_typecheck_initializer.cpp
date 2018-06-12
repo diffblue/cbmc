@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/expr_initializer.h>
 #include <util/pointer_offset_size.h>
 
+#include "cpp_convert_type.h"
+
 /// Initialize an object with a value
 void cpp_typecheckt::convert_initializer(symbolt &symbol)
 {
@@ -143,6 +145,12 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
       if(symbol.type.find(ID_size).is_nil())
         symbol.type=symbol.value.type();
+    }
+    else if(has_auto(symbol.type))
+    {
+      cpp_convert_auto(symbol.type, symbol.value.type());
+      typecheck_type(symbol.type);
+      implicit_typecast(symbol.value, symbol.type);
     }
     else
       implicit_typecast(symbol.value, symbol.type);

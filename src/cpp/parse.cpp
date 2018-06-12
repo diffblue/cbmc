@@ -1442,7 +1442,7 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
               << "\n";
     #endif
 
-    if((cv_q.is_not_nil() || storage_spec.is_auto()) &&
+    if(cv_q.is_not_nil() &&
        ((t==TOK_IDENTIFIER && lex.LookAhead(1)=='=') || t=='*'))
       return rConstDeclaration(declaration, storage_spec, member_spec, cv_q);
     else
@@ -1584,6 +1584,17 @@ bool Parser::rIntegralDeclaration(
 
     if(!rDeclarators(declaration.declarators(), true))
       return false;
+
+    // handle trailing return type
+    if(
+      declaration.type().id() == ID_auto &&
+      declaration.declarators().size() == 1 &&
+      declaration.declarators().front().type().id() == ID_function_type &&
+      declaration.declarators().front().type().subtype().is_not_nil())
+    {
+      declaration.type() = declaration.declarators().front().type().subtype();
+      declaration.declarators().front().type().subtype().make_nil();
+    }
 
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ')
@@ -1961,7 +1972,7 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
 
   if(t==TOK_STATIC ||
      t==TOK_EXTERN ||
-     t==TOK_AUTO ||
+     (t == TOK_AUTO && !ansi_c_parser.cpp11) ||
      t==TOK_REGISTER ||
      t==TOK_MUTABLE ||
      t==TOK_GCC_ASM ||
@@ -2224,6 +2235,7 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     case TOK_GCC_FLOAT128: type_id=ID_gcc_float128; break;
     case TOK_BOOL: type_id=ID_bool; break;
     case TOK_CPROVER_BOOL: type_id=ID_proper_bool; break;
+    case TOK_AUTO: type_id = ID_auto; break;
     default: type_id=irep_idt();
     }
 
@@ -2912,6 +2924,11 @@ bool Parser::rDeclarator(
         typet return_type;
         if(!rTypeSpecifier(return_type, false))
           return false;
+
+        if(d_outer.subtype().is_not_nil())
+          return false;
+
+        d_outer.subtype().swap(return_type);
       }
 
       if(lex.LookAhead(0)==':')
@@ -7997,7 +8014,7 @@ bool Parser::rDeclarationStatement(codet &statement)
               << "Parser::rDeclarationStatement 3 " << t << "\n";
     #endif
 
-    if((cv_q.is_not_nil() || storage_spec.is_auto()) &&
+    if(cv_q.is_not_nil() &&
        ((t==TOK_IDENTIFIER && lex.LookAhead(1)=='=') || t=='*'))
     {
       #ifdef DEBUG

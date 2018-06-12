@@ -591,3 +591,19 @@ void cpp_convert_plain_type(typet &type)
     cpp_convert_type.write(type);
   }
 }
+
+void cpp_convert_auto(typet &dest, const typet &src)
+{
+  if(dest.id() != ID_merged_type && dest.has_subtype())
+  {
+    cpp_convert_auto(dest.subtype(), src);
+    return;
+  }
+
+  cpp_convert_typet cpp_convert_type(dest);
+  for(auto &t : cpp_convert_type.other)
+    if(t.id() == ID_auto)
+      t = src;
+
+  cpp_convert_type.write(dest);
+}
