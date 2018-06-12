@@ -61,6 +61,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/dependence_graph.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/is_threaded.h>
+#include <analyses/local_safe_pointers.h>
 
 #include <ansi-c/cprover_library.h>
 #include <cpp/cprover_library.h>
@@ -280,6 +281,34 @@ int goto_instrument_parse_optionst::doit()
         std::cout << ">>>> " << it->first << '\n';
         std::cout << ">>>>\n";
         local_bitvector_analysis.output(std::cout, it->second, ns);
+        std::cout << '\n';
+      }
+
+      return CPROVER_EXIT_SUCCESS;
+    }
+
+    if(cmdline.isset("show-local-safe-pointers") ||
+       cmdline.isset("show-safe-dereferences"))
+    {
+      // Ensure location numbering is unique:
+      goto_model.goto_functions.update();
+
+      namespacet ns(goto_model.symbol_table);
+
+      forall_goto_functions(it, goto_model.goto_functions)
+      {
+        local_safe_pointerst local_safe_pointers;
+        local_safe_pointers(it->second.body);
+        std::cout << ">>>>\n";
+        std::cout << ">>>> " << it->first << '\n';
+        std::cout << ">>>>\n";
+        if(cmdline.isset("show-local-safe-pointers"))
+          local_safe_pointers.output(std::cout, it->second.body, ns);
+        else
+        {
+          local_safe_pointers.output_safe_dereferences(
+            std::cout, it->second.body, ns);
+        }
         std::cout << '\n';
       }
 
@@ -1480,6 +1509,9 @@ void goto_instrument_parse_optionst::help()
     HELP_SHOW_CLASS_HIERARCHY
     // NOLINTNEXTLINE(whitespace/line_length)
     " --show-threaded              show instructions that may be executed by more than one thread\n"
+    " --show-local-safe-pointers   show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
+    " --show-safe-dereferences     show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
+    "                              *and* used as a dereference operand\n" // NOLINT(*)
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"

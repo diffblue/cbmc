@@ -1,0 +1,14 @@
+CORE
+main.c
+--show-safe-dereferences
+^EXIT=0$
+^SIGNAL=0$
+Safe \(known-not-null\) dereferences: \{main::[0-9]+::ptr1\}
+Safe \(known-not-null\) dereferences: \{main::[0-9]+::ptr2\}
+Safe \(known-not-null\) dereferences: \{main::[0-9]+::ptr3\}
+--
+Safe \(known-not-null\) dereferences: \{main::[0-9]+::ptr[4-8]\}
+^warning: ignoring
+--
+See comments in main.c for details about what each ptr variable is testing, and why they
+should or shouldn't be seen as safe accesses.

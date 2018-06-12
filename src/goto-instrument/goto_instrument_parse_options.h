@@ -94,7 +94,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(splice-call):" \
   OPT_REMOVE_CALLS_NO_BODY \
   OPT_REPLACE_FUNCTION_BODY \
-  OPT_GOTO_PROGRAM_STATS
+  OPT_GOTO_PROGRAM_STATS \
+  "(show-local-safe-pointers)(show-safe-dereferences)"
 
 // clang-format on
 
