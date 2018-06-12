@@ -104,10 +104,14 @@ exprt value_set_dereferencet::dereference(
 
     #if 0
     std::cout << "V: " << format(value.pointer_guard) << " --> ";
-    std::cout << format(value.value) << '\n';
+    std::cout << format(value.value);
+    if(value.ignore)
+      std::cout << " (ignored)";
+    std::cout << '\n';
     #endif
 
-    values.push_back(value);
+    if(!value.ignore)
+      values.push_back(value);
   }
 
   // can this fail?
@@ -313,7 +317,11 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
   if(root_object.id() == ID_null_object)
   {
-    if(options.get_bool_option("pointer-check"))
+    if(exclude_null_derefs)
+    {
+      result.ignore = true;
+    }
+    else if(options.get_bool_option("pointer-check"))
     {
       guardt tmp_guard(guard);
 
@@ -408,9 +416,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     // This is stuff like *((char *)5).
     // This is turned into an access to __CPROVER_memory[...].
 
-    if(language_mode==ID_java)
+    if(language_mode == ID_java)
     {
-      result.value=nil_exprt();
+      result.ignore = true;
       return result;
     }
 

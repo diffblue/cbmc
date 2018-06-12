@@ -222,6 +222,11 @@ void goto_symext::symex_function_call_code(
 
   state.dirty.populate_dirty_for_function(identifier, goto_function);
 
+  auto emplace_safe_pointers_result =
+    safe_pointers.emplace(identifier, local_safe_pointerst{});
+  if(emplace_safe_pointers_result.second)
+    emplace_safe_pointers_result.first->second(goto_function.body);
+
   const bool stop_recursing=get_unwind_recursion(
     identifier,
     state.source.thread_nr,

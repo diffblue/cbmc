@@ -35,18 +35,24 @@ public:
    * \param _options Options, in particular whether pointer checks are
             to be performed
    * \param _dereference_callback Callback object for error reporting
+   * \param _language_mode Mode for any new symbols created to represent
+            a dereference failure
+   * \param _exclude_null_derefs Ignore value-set entries that indicate a given
+            dereference may follow a null pointer
   */
   value_set_dereferencet(
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
     const optionst &_options,
     dereference_callbackt &_dereference_callback,
-    const irep_idt _language_mode):
+    const irep_idt _language_mode,
+    bool _exclude_null_derefs):
     ns(_ns),
     new_symbol_table(_new_symbol_table),
     options(_options),
     dereference_callback(_dereference_callback),
-    language_mode(_language_mode)
+    language_mode(_language_mode),
+    exclude_null_derefs(_exclude_null_derefs)
   { }
 
   virtual ~value_set_dereferencet() { }
@@ -82,6 +88,9 @@ private:
   /// language_mode: ID_java, ID_C or another language identifier
   /// if we know the source language in use, irep_idt() otherwise.
   const irep_idt language_mode;
+  /// Flag indicating whether `value_set_dereferencet::dereference` should
+  /// disregard an apparent attempt to dereference NULL
+  const bool exclude_null_derefs;
   static unsigned invalid_counter;
 
   bool dereference_type_compare(
@@ -92,17 +101,38 @@ private:
     exprt &dest,
     const exprt &offset) const;
 
+  /// Return value for `build_reference_to`; see that method for documentation.
   class valuet
   {
   public:
     exprt value;
     exprt pointer_guard;
+    bool ignore;
 
-    valuet():value(nil_exprt()), pointer_guard(false_exprt())
+    valuet():value(nil_exprt()), pointer_guard(false_exprt()), ignore(false)
     {
     }
   };
 
+  /// Get a guard and expression to access `what` under `guard`.
+  /// \param what: value set entry to convert to an expression: either
+  ///   ID_unknown, ID_invalid, or an object_descriptor_exprt giving a referred
+  ///   object and offset.
+  /// \param mode: whether the pointer is being read or written; used to create
+  ///   pointer validity checks if need be
+  /// \param pointer: pointer expression that may point to `what`
+  /// \param guard: guard under which the pointer is dereferenced
+  /// \return
+  ///    * If we were explicitly instructed to ignore `what` as a possible
+  ///        pointer target: a `valuet` with `ignore` = true, and `value` and
+  ///        `pointer_guard` set to nil.
+  ///    * If we could build an expression corresponding to `what`:
+  ///        A `valuet` with non-nil `value`, and `pointer_guard` set to an
+  ///        appropriate check to determine if `pointer_expr` really points to
+  ///        `what` (for example, we might return
+  ///        `{.value = global, .pointer_guard = (pointer_expr == &global)}`
+  ///    * Otherwise, if we couldn't build an expression (e.g. for `what` ==
+  ///        ID_unknown), a `valuet` with nil `value` and `ignore` == false.
   valuet build_reference_to(
     const exprt &what,
     const modet mode,

@@ -1,0 +1,14 @@
+CORE
+test.class
+--function test.main
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+Null pointer check: FAILURE$
+assertion at file test\.java line 21 .*: SUCCESS$
+--
+^warning: ignoring
+--
+JBMC should reports failure, as it might dereference a null pointer, but as Java
+is a safe language we should statically determine that if we reach the assertion
+it cannot be violated.
