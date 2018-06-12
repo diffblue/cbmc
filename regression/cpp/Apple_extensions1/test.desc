@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^EXIT=0$
@@ -6,5 +6,3 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
---
-This is being tracked in #1647.
