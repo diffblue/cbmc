@@ -100,15 +100,177 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   return result;
 }
 
-void add_padding(struct_typet &type, const namespacet &ns)
+static optionalt<std::size_t>
+underlying_width(const c_bit_field_typet &type, const namespacet &ns)
+{
+  const typet &subtype = type.subtype();
+
+  if(subtype.id() == ID_bool)
+  {
+    // This is the 'proper' bool.
+    return 1;
+  }
+  else if(
+    subtype.id() == ID_signedbv || subtype.id() == ID_unsignedbv ||
+    subtype.id() == ID_c_bool)
+  {
+    return to_bitvector_type(subtype).get_width();
+  }
+  else if(subtype.id() == ID_c_enum_tag)
+  {
+    // These point to an enum, which has a sub-subtype,
+    // which may be smaller or larger than int, and we thus have
+    // to check.
+    const typet &c_enum_type = ns.follow_tag(to_c_enum_tag_type(subtype));
+
+    if(c_enum_type.id() == ID_c_enum)
+      return c_enum_type.subtype().get_int(ID_width);
+    else
+      return {};
+  }
+  else
+    return {};
+}
+
+static struct_typet::componentst::iterator pad_bit_field(
+  struct_typet::componentst &components,
+  struct_typet::componentst::iterator where,
+  std::size_t pad_bits)
+{
+  const c_bit_field_typet padding_type(
+    unsignedbv_typet(pad_bits), pad_bits);
+
+  struct_typet::componentt component(
+    "$bit_field_pad" + std::to_string(where - components.begin()),
+    padding_type);
+
+  component.set_is_padding(true);
+
+  return std::next(components.insert(where, component));
+}
+
+static struct_typet::componentst::iterator pad(
+  struct_typet::componentst &components,
+  struct_typet::componentst::iterator where,
+  std::size_t pad_bits)
+{
+  const unsignedbv_typet padding_type(pad_bits);
+
+  struct_typet::componentt component(
+    "$pad" + std::to_string(where - components.begin()),
+    padding_type);
+
+  component.set_is_padding(true);
+
+  return std::next(components.insert(where, component));
+}
+
+static void add_padding_msvc(struct_typet &type, const namespacet &ns)
 {
   struct_typet::componentst &components=type.components();
 
-  // First do padding for bit-fields to make them
-  // appear on byte boundaries.
+  std::size_t bit_field_bits = 0, underlying_bits = 0;
+  mp_integer offset = 0;
 
+  bool is_packed = type.get_bool(ID_C_packed);
+
+  for(struct_typet::componentst::iterator it = components.begin();
+      it != components.end();
+      it++)
   {
-    std::size_t padding_counter=0;
+    // there is exactly one case in which padding is not added:
+    // if we continue a bit-field with size>0 and the same underlying width
+
+    if(
+      it->type().id() == ID_c_bit_field &&
+      to_c_bit_field_type(it->type()).get_width() != 0 &&
+      underlying_width(to_c_bit_field_type(it->type()), ns).value_or(0) ==
+        underlying_bits)
+    {
+      // do not add padding, but count the bits
+      const auto width = to_c_bit_field_type(it->type()).get_width();
+      bit_field_bits += width;
+    }
+    else
+    {
+      // pad up any remaining bit field
+      if(underlying_bits != 0 && (bit_field_bits % underlying_bits) != 0)
+      {
+        const std::size_t pad_bits =
+          underlying_bits - (bit_field_bits % underlying_bits);
+        it = pad_bit_field(components, it, pad_bits);
+        offset += (bit_field_bits + pad_bits) / config.ansi_c.char_width;
+        underlying_bits = bit_field_bits = 0;
+      }
+
+      // pad up to underlying type unless the struct is packed
+      if(!is_packed)
+      {
+        const mp_integer a = alignment(it->type(), ns);
+        if(a > 1)
+        {
+          const mp_integer displacement = offset % a;
+
+          if(displacement != 0)
+          {
+            const mp_integer pad_bytes = a - displacement;
+            std::size_t pad_bits =
+              integer2size_t(pad_bytes * config.ansi_c.char_width);
+            it = pad(components, it, pad_bits);
+            offset += pad_bytes;
+          }
+        }
+      }
+
+      // do we start a new bit field?
+      if(it->type().id() == ID_c_bit_field)
+      {
+        underlying_bits =
+          underlying_width(to_c_bit_field_type(it->type()), ns).value_or(0);
+        const auto width = to_c_bit_field_type(it->type()).get_width();
+        bit_field_bits += width;
+      }
+      else
+      {
+        // keep track of offset
+        const mp_integer size = pointer_offset_size(it->type(), ns);
+        if(size >= 1)
+          offset += size;
+      }
+    }
+  }
+
+  // Add padding at the end?
+  // Bit-field
+  if(underlying_bits != 0 && (bit_field_bits % underlying_bits) != 0)
+  {
+    const std::size_t pad =
+      underlying_bits - (bit_field_bits % underlying_bits);
+    pad_bit_field(components, components.end(), pad);
+    offset += (bit_field_bits + pad) / config.ansi_c.char_width;
+  }
+
+  // alignment of the struct
+  // Note that this is done even if the struct is packed.
+  const mp_integer a = alignment(type, ns);
+  const mp_integer displacement = offset % a;
+
+  if(displacement != 0)
+  {
+    const mp_integer pad_bytes = a - displacement;
+    const std::size_t pad_bits =
+      integer2size_t(pad_bytes * config.ansi_c.char_width);
+    pad(components, components.end(), pad_bits);
+    offset += pad_bytes;
+  }
+}
+
+static void add_padding_gcc(struct_typet &type, const namespacet &ns)
+{
+  struct_typet::componentst &components = type.components();
+
+  // First make bit-fields appear on byte boundaries
+  {
     std::size_t bit_field_bits=0;
 
     for(struct_typet::componentst::iterator
@@ -120,27 +282,17 @@ void add_padding(struct_typet &type, const namespacet &ns)
          to_c_bit_field_type(it->type()).get_width()!=0)
       {
         // count the bits
-        std::size_t width=to_c_bit_field_type(it->type()).get_width();
+        const std::size_t width = to_c_bit_field_type(it->type()).get_width();
         bit_field_bits+=width;
       }
       else if(bit_field_bits!=0)
       {
         // not on a byte-boundary?
-        if((bit_field_bits%8)!=0)
+        if((bit_field_bits % config.ansi_c.char_width) != 0)
         {
-          std::size_t pad=8-bit_field_bits%8;
-          c_bit_field_typet padding_type(unsignedbv_typet(pad), pad);
-
-          struct_typet::componentt component;
-          component.type()=padding_type;
-          component.set_name(
-            "$bit_field_pad"+std::to_string(padding_counter++));
-          component.set_is_padding(true);
-
-          it=components.insert(it, component);
-          it++; // skip over
-
-          bit_field_bits+=pad;
+          const std::size_t pad = config.ansi_c.char_width -
+                                  bit_field_bits % config.ansi_c.char_width;
+          it = pad_bit_field(components, it, pad);
         }
 
         bit_field_bits=0;
@@ -148,17 +300,11 @@ void add_padding(struct_typet &type, const namespacet &ns)
     }
 
     // Add padding at the end?
-    if((bit_field_bits%8)!=0)
+    if((bit_field_bits % config.ansi_c.char_width) != 0)
     {
-      std::size_t pad=8-bit_field_bits%8;
-      c_bit_field_typet padding_type(unsignedbv_typet(pad), pad);
-
-      struct_typet::componentt component;
-      component.type()=padding_type;
-      component.set_name("$bit_field_pad"+std::to_string(padding_counter++));
-      component.set_is_padding(true);
-
-      components.push_back(component);
+      const std::size_t pad =
+        config.ansi_c.char_width - bit_field_bits % config.ansi_c.char_width;
+      pad_bit_field(components, components.end(), pad);
     }
   }
 
@@ -168,7 +314,6 @@ void add_padding(struct_typet &type, const namespacet &ns)
     return; // done
 
   mp_integer offset=0;
-  std::size_t padding_counter=0;
   mp_integer max_alignment=0;
   std::size_t bit_field_bits=0;
 
@@ -200,8 +345,8 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
         std::size_t w=to_c_bit_field_type(it_type).get_width();
         bit_field_bits += w;
-        const std::size_t bytes = bit_field_bits / 8;
-        bit_field_bits %= 8;
+        const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
+        bit_field_bits %= config.ansi_c.char_width;
         offset+=bytes;
         continue;
       }
@@ -222,24 +367,15 @@ void add_padding(struct_typet &type, const namespacet &ns)
     if(a!=1)
     {
       // we may need to align it
-      mp_integer displacement=offset%a;
+      const mp_integer displacement = offset % a;
 
       if(displacement!=0)
       {
-        mp_integer pad=a-displacement;
-
-        std::size_t width=integer2size_t(pad*8);
-        unsignedbv_typet padding_type(width);
-
-        struct_typet::componentt component;
-        component.type()=padding_type;
-        component.set_name("$pad"+std::to_string(padding_counter++));
-        component.set_is_padding(true);
-
-        it=components.insert(it, component);
-        it++; // skip over
-
-        offset+=pad;
+        const mp_integer pad_bytes = a - displacement;
+        const std::size_t pad_bits =
+          integer2size_t(pad_bytes * config.ansi_c.char_width);
+        it = pad(components, it, pad_bits);
+        offset += pad_bytes;
       }
     }
 
@@ -277,25 +413,27 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
     if(displacement!=0)
     {
-      mp_integer pad=max_alignment-displacement;
-
-      std::size_t width=integer2size_t(pad*8);
-      unsignedbv_typet padding_type(width);
-
-      // we insert after any final 'flexible member'
-      struct_typet::componentt component;
-      component.type()=padding_type;
-      component.set_name("$pad"+std::to_string(padding_counter++));
-      component.set_is_padding(true);
-
-      components.push_back(component);
+      mp_integer pad_bytes = max_alignment - displacement;
+      std::size_t pad_bits =
+        integer2size_t(pad_bytes * config.ansi_c.char_width);
+      pad(components, components.end(), pad_bits);
     }
   }
 }
 
+void add_padding(struct_typet &type, const namespacet &ns)
+{
+  // padding depends greatly on compiler
+  if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+    add_padding_msvc(type, ns);
+  else
+    add_padding_gcc(type, ns);
+}
+
 void add_padding(union_typet &type, const namespacet &ns)
 {
-  mp_integer max_alignment_bits=alignment(type, ns)*8;
+  mp_integer max_alignment_bits =
+    alignment(type, ns) * config.ansi_c.char_width;
   mp_integer size_bits=0;
 
   // check per component, and ignore those without fixed size
@@ -309,8 +447,21 @@ void add_padding(union_typet &type, const namespacet &ns)
   // Is the union packed?
   if(type.get_bool(ID_C_packed))
   {
-    // The size needs to be a multiple of 8 bits only.
-    max_alignment_bits=8;
+    // The size needs to be a multiple of 1 char only.
+    max_alignment_bits = config.ansi_c.char_width;
+  }
+
+  if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  {
+    // Visual Studio pads up to the underlying width of
+    // any bit field.
+    for(const auto &c : type.components())
+      if(c.type().id() == ID_c_bit_field)
+      {
+        auto w = underlying_width(to_c_bit_field_type(c.type()), ns);
+        if(w.has_value() && w.value() > max_alignment_bits)
+          max_alignment_bits = w.value();
+      }
   }
 
   // The size must be a multiple of the alignment, or

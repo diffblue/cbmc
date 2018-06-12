@@ -34,7 +34,6 @@ phases:
         Remove-Item ansi-c\arch_flags_mthumb_good -Force -Recurse
         Remove-Item ansi-c\Forward_Declaration2 -Force -Recurse
         Remove-Item ansi-c\Incomplete_Type1 -Force -Recurse
-        Remove-Item ansi-c\Union_Padding1 -Force -Recurse
         Remove-Item ansi-c\gcc_attributes7 -Force -Recurse
         Remove-Item ansi-c\gcc_version1 -Force -Recurse
         Remove-Item cbmc\Malloc23 -Force -Recurse

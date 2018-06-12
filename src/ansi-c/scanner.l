@@ -1271,7 +1271,8 @@ __decltype          { if(PARSER.cpp98 &&
 "_Alignof"      { if(!PARSER.cpp98 &&
                      (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::APPLE ||
-                      PARSER.mode==configt::ansi_ct::flavourt::ARM))
+                      PARSER.mode==configt::ansi_ct::flavourt::ARM ||
+                      PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO))
                     { loc(); return TOK_ALIGNOF; }
                   else
                     return make_identifier();

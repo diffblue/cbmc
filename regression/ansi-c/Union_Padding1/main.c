@@ -41,14 +41,16 @@ STATIC_ASSERT(sizeof(union some_union3)==sizeof(int));
 #ifdef _MSC_VER
 
 // bit-fields are evil
-#pragma pack(1)
+#pragma pack(push, 1)
 union some_union4
 {
   int i:23;
 };
+#pragma pack(pop)
 
 // Visual Studio ignores the 'packed'
 STATIC_ASSERT(sizeof(union some_union4)==sizeof(int));
+STATIC_ASSERT(__alignof(union some_union4) == 1);
 
 #else
 
@@ -59,34 +61,38 @@ union some_union4
 } __attribute__((__packed__));
 
 STATIC_ASSERT(sizeof(union some_union4)==3);
+STATIC_ASSERT(_Alignof(union some_union4) == 1);
 
 #endif
 
+union some_union5
+{
+  int i;
+};
+
 #ifdef _MSC_VER
-
-union some_union5
-{
-  int i;
-};
-
-STATIC_ASSERT(__alignof(union some_union5)==1);
-
+STATIC_ASSERT(__alignof(union some_union5) == 4);
 #else
+STATIC_ASSERT(_Alignof(union some_union5) == 4);
+#endif
 
-union some_union5
-{
+#ifdef _MSC_VER
+#pragma pack(push, 1)
+union some_union6 {
   int i;
 };
+#pragma pack(pop)
 
+// Packing may affect alignment
+STATIC_ASSERT(__alignof(union some_union6) == 1);
+#else
 union some_union6
 {
   int i;
 } __attribute__((__packed__));
 
 // Packing may affect alignment
-STATIC_ASSERT(_Alignof(union some_union5)==4);
 STATIC_ASSERT(_Alignof(union some_union6)==1);
-
 #endif
 
 int main()
