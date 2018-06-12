@@ -313,23 +313,25 @@ exprt smt2_parsert::function_application(
   return nil_exprt();
 }
 
-exprt smt2_parsert::cast_bv_to_signed(const exprt &expr)
+exprt::operandst smt2_parsert::cast_bv_to_signed(const exprt::operandst &op)
 {
-  if(expr.type().id()==ID_signedbv) // no need to cast
-    return expr;
+  exprt::operandst result = op;
 
-  if(expr.type().id()!=ID_unsignedbv)
+  for(auto &expr : result)
   {
-    error() << "expected unsigned bitvector" << eom;
-    return expr;
+    if(expr.type().id() == ID_signedbv) // no need to cast
+    {
+    }
+    else if(expr.type().id() != ID_unsignedbv)
+    {
+      error() << "expected unsigned bitvector" << eom;
+    }
+    else
+    {
+      const auto width = to_unsignedbv_type(expr.type()).get_width();
+      expr = typecast_exprt(expr, signedbv_typet(width));
+    }
   }
-
-  auto width=to_unsignedbv_type(expr.type()).get_width();
-  signedbv_typet signed_type(width);
-
-  typecast_exprt result(expr, signed_type);
-  result.op0()=expr;
-  result.type()=signed_type;
 
   return result;
 }
@@ -345,17 +347,11 @@ exprt smt2_parsert::cast_bv_to_unsigned(const exprt &expr)
     return expr;
   }
 
-  auto width=to_signedbv_type(expr.type()).get_width();
-  unsignedbv_typet unsigned_type(width);
-
-  typecast_exprt result(expr, unsigned_type);
-  result.op0()=expr;
-  result.type()=unsigned_type;
-
-  return result;
+  const auto width=to_signedbv_type(expr.type()).get_width();
+  return typecast_exprt(expr, unsignedbv_typet(width));
 }
 
-exprt smt2_parsert::multi_ary(irep_idt id, exprt::operandst &op)
+exprt smt2_parsert::multi_ary(irep_idt id, const exprt::operandst &op)
 {
   if(op.empty())
   {
@@ -377,12 +373,12 @@ exprt smt2_parsert::multi_ary(irep_idt id, exprt::operandst &op)
     }
 
     exprt result(id, op[0].type());
-    result.operands().swap(op);
+    result.operands() = op;
     return result;
   }
 }
 
-exprt smt2_parsert::binary_predicate(irep_idt id, exprt::operandst &op)
+exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
 {
   if(op.size()!=2)
   {
@@ -404,7 +400,7 @@ exprt smt2_parsert::binary_predicate(irep_idt id, exprt::operandst &op)
   }
 }
 
-exprt smt2_parsert::unary(irep_idt id, exprt::operandst &op)
+exprt smt2_parsert::unary(irep_idt id, const exprt::operandst &op)
 {
   if(op.size()!=1)
   {
@@ -415,7 +411,7 @@ exprt smt2_parsert::unary(irep_idt id, exprt::operandst &op)
     return unary_exprt(id, op[0], op[0].type());
 }
 
-exprt smt2_parsert::binary(irep_idt id, exprt::operandst &op)
+exprt smt2_parsert::binary(irep_idt id, const exprt::operandst &op)
 {
   if(op.size()!=2)
   {
@@ -510,9 +506,7 @@ exprt smt2_parsert::function_application()
       }
       else if(id=="bvsle")
       {
-        op[0]=cast_bv_to_signed(op[0]);
-        op[1]=cast_bv_to_signed(op[1]);
-        return binary_predicate(ID_le, op);
+        return binary_predicate(ID_le, cast_bv_to_signed(op));
       }
       else if(id=="bvuge")
       {
@@ -520,9 +514,7 @@ exprt smt2_parsert::function_application()
       }
       else if(id=="bvsge")
       {
-        op[0]=cast_bv_to_signed(op[0]);
-        op[1]=cast_bv_to_signed(op[1]);
-        return binary_predicate(ID_ge, op);
+        return binary_predicate(ID_ge, cast_bv_to_signed(op));
       }
       else if(id=="bvult")
       {
@@ -530,9 +522,7 @@ exprt smt2_parsert::function_application()
       }
       else if(id=="bvslt")
       {
-        op[0]=cast_bv_to_signed(op[0]);
-        op[1]=cast_bv_to_signed(op[1]);
-        return binary_predicate(ID_lt, op);
+        return binary_predicate(ID_lt, cast_bv_to_signed(op));
       }
       else if(id=="bvugt")
       {
@@ -540,15 +530,11 @@ exprt smt2_parsert::function_application()
       }
       else if(id=="bvsgt")
       {
-        op[0]=cast_bv_to_signed(op[0]);
-        op[1]=cast_bv_to_signed(op[1]);
-        return binary_predicate(ID_gt, op);
+        return binary_predicate(ID_gt, cast_bv_to_signed(op));
       }
       else if(id=="bvashr")
       {
-        op[0]=cast_bv_to_signed(op[0]);
-        op[1]=cast_bv_to_signed(op[1]);
-        return cast_bv_to_unsigned(binary(ID_ashr, op));
+        return cast_bv_to_unsigned(binary(ID_ashr, cast_bv_to_signed(op)));
       }
       else if(id=="bvlshr" || id=="bvshr")
       {
@@ -608,9 +594,7 @@ exprt smt2_parsert::function_application()
       }
       else if(id=="bvsdiv")
       {
-        op[0]=cast_bv_to_signed(op[0]);
-        op[1]=cast_bv_to_signed(op[1]);
-        return cast_bv_to_unsigned(binary(ID_div, op));
+        return cast_bv_to_unsigned(binary(ID_div, cast_bv_to_signed(op)));
       }
       else if(id=="bvudiv")
       {
@@ -624,17 +608,13 @@ exprt smt2_parsert::function_application()
       {
         // 2's complement signed remainder (sign follows dividend)
         // This matches our ID_mod, and what C does since C99.
-        op[0]=cast_bv_to_signed(op[0]);
-        op[1]=cast_bv_to_signed(op[1]);
-        return cast_bv_to_unsigned(binary(ID_mod, op));
+        return cast_bv_to_unsigned(binary(ID_mod, cast_bv_to_signed(op)));
       }
       else if(id=="bvsmod")
       {
         // 2's complement signed remainder (sign follows divisor)
         // We don't have that.
-        op[0]=cast_bv_to_signed(op[0]);
-        op[1]=cast_bv_to_signed(op[1]);
-        return cast_bv_to_unsigned(binary(ID_mod, op));
+        return cast_bv_to_unsigned(binary(ID_mod, cast_bv_to_signed(op)));
       }
       else if(id=="bvurem" || id=="%")
       {
