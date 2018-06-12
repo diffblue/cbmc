@@ -64,17 +64,21 @@ protected:
   exprt::operandst operands();
   typet function_signature_declaration();
   typet function_signature_definition();
-  exprt multi_ary(irep_idt, exprt::operandst &);
-  exprt binary_predicate(irep_idt, exprt::operandst &);
-  exprt binary(irep_idt, exprt::operandst &);
-  exprt unary(irep_idt, exprt::operandst &);
+  exprt multi_ary(irep_idt, const exprt::operandst &);
+  exprt binary_predicate(irep_idt, const exprt::operandst &);
+  exprt binary(irep_idt, const exprt::operandst &);
+  exprt unary(irep_idt, const exprt::operandst &);
 
   exprt let_expression();
   exprt quantifier_expression(irep_idt);
   exprt function_application(
     const irep_idt &identifier,
     const exprt::operandst &op);
-  exprt cast_bv_to_signed(const exprt &);
+
+  /// Apply typecast to signedbv to expressions in vector
+  exprt::operandst cast_bv_to_signed(const exprt::operandst &);
+
+  /// Apply typecast to unsignedbv to given expression
   exprt cast_bv_to_unsigned(const exprt &);
 };
 
