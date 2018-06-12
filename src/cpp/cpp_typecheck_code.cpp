@@ -177,7 +177,12 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
   // Let's first typecheck the operands.
   Forall_operands(it, code)
+  {
+    const bool has_array_ini = it->get_bool("#array_ini");
     typecheck_expr(*it);
+    if(has_array_ini)
+      it->set("#array_ini", true);
+  }
 
   // The initializer may be a data member (non-type)
   // or a parent class (type).
@@ -322,9 +327,6 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       {
         // it's a data member
         already_typechecked(symbol_expr);
-
-        Forall_operands(it, code)
-          already_typechecked(*it);
 
         exprt call=
           cpp_constructor(code.source_location(), symbol_expr, code.operands());
