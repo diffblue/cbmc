@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 preproc.i
 -mthumb -o linked-object.gb object.arm
 ^EXIT=0$

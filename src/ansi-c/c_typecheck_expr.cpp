@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/base_type.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/ieee_float.h>
 #include <util/pointer_offset_size.h>
@@ -2581,7 +2582,7 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier=="__builtin_classify_type")
   {
-    // This is a gcc extension that produces an integer
+    // This is a gcc/clang extension that produces an integer
     // constant for the type of the argument expression.
     if(expr.arguments().size()!=1)
     {
@@ -2594,22 +2595,34 @@ exprt c_typecheck_baset::do_special_functions(
 
     // The value doesn't matter at all, we only care about the type.
     // Need to sync with typeclass.h.
-    const typet &type=follow(object.type());
+    typet type = follow(object.type());
 
-    unsigned type_number=
-      type.id()==ID_empty?0:
-      type.id()==ID_c_enum_tag?3:
-      (type.id()==ID_bool || type.id()==ID_c_bool)?4:
-      type.id()==ID_pointer?5:
-      type.id()==ID_floatbv?8:
-      (type.id()==ID_complex && type.subtype().id()==ID_floatbv)?9:
-      type.id()==ID_struct?12:
-      type.id()==ID_union?13:
-      type.id()==ID_array?14:
-      1; // int, short
+    // use underlying type for bit fields
+    if(type.id() == ID_c_bit_field)
+      type = to_c_bit_field_type(type).subtype();
 
-    // clang returns 15 for the three 'char' types,
-    // gcc treats these as 'int'
+    unsigned type_number;
+
+    if(type.id() == ID_bool || type.id() == ID_c_bool)
+    {
+      // clang returns 4 for _Bool, gcc treats these as 'int'.
+      type_number =
+        config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG
+          ? 4
+          : 1;
+    }
+    else
+    {
+      type_number =
+          type.id() == ID_empty ? 0
+        : (type.id() == ID_bool || type.id() == ID_c_bool) ? 4
+        : (type.id() == ID_pointer || type.id() == ID_array) ? 5
+        : type.id() == ID_floatbv ? 8
+        : (type.id() == ID_complex && type.subtype().id() == ID_floatbv) ? 9
+        : type.id() == ID_struct ? 12
+        : type.id() == ID_union ? 13
+        : 1; // int, short, char, enum_tag
+    }
 
     exprt tmp=from_integer(type_number, expr.type());
     tmp.add_source_location()=source_location;
