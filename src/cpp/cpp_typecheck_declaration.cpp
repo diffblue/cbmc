@@ -122,7 +122,8 @@ void cpp_typecheckt::convert_non_template_declaration(
   declaration.name_anon_struct_union();
 
   // do the type of the declaration
-  typecheck_type(declaration_type);
+  if(declaration.declarators().empty() || !has_auto(declaration_type))
+    typecheck_type(declaration_type);
 
   // Elaborate any class template instance _unless_ we do a typedef.
   // These are only elaborated on usage!
