@@ -1487,13 +1487,11 @@ bool cpp_typecheckt::get_component(
         }
         else
         {
-          #if 0
           error().source_location=source_location;
-          str << "error: member `" << component_name
-              << "' is not accessible (" << component.get(ID_access) << ")";
-          str << "\nstruct name: " << final_type.get(ID_name);
+          error() << "error: member `" << component_name
+                  << "' is not accessible (" << component.get(ID_access) << ")"
+                  << eom;
           throw 0;
-          #endif
         }
       }
 
@@ -1523,12 +1521,10 @@ bool cpp_typecheckt::get_component(
         {
           if(check_component_access(component, final_type))
           {
-            #if 0
             error().source_location=source_location;
-            str << "error: member `" << component_name
-                << "' is not accessible";
+            error() << "error: member `" << component_name
+                    << "' is not accessible" << eom;
             throw 0;
-            #endif
           }
 
           if(object.get_bool(ID_C_lvalue))
