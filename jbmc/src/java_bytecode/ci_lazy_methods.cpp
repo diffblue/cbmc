@@ -113,7 +113,10 @@ bool ci_lazy_methodst::operator()(
   {
     std::unordered_set<irep_idt> initial_callable_methods;
     ci_lazy_methods_neededt initial_lazy_methods(
-      initial_callable_methods, instantiated_classes, symbol_table);
+      initial_callable_methods,
+      instantiated_classes,
+      symbol_table,
+      pointer_type_selector);
     initialize_instantiated_classes(
       methods_to_convert_later, namespacet(symbol_table), initial_lazy_methods);
     methods_to_convert_later.insert(
@@ -298,7 +301,10 @@ ci_lazy_methodst::convert_and_analyze_method(
   // Note this wraps *references* to methods_to_convert_later &
   // instantiated_classes
   ci_lazy_methods_neededt needed_methods(
-    methods_to_convert_later, instantiated_classes, symbol_table);
+    methods_to_convert_later,
+    instantiated_classes,
+    symbol_table,
+    pointer_type_selector);
 
   const bool could_not_convert_function =
     method_converter(method_name, needed_methods);
@@ -430,8 +436,7 @@ void ci_lazy_methodst::initialize_instantiated_classes(
       if(param.type().id()==ID_pointer)
       {
         const pointer_typet &original_pointer=to_pointer_type(param.type());
-        initialize_all_instantiated_classes_from_pointer(
-          original_pointer, ns, needed_lazy_methods);
+        needed_lazy_methods.add_all_needed_classes(original_pointer);
       }
     }
   }
@@ -448,75 +453,6 @@ void ci_lazy_methodst::initialize_instantiated_classes(
     needed_lazy_methods.add_needed_class("java::" + id2string(id));
 }
 
-/// Build up list of methods for types for a pointer and any types it
-/// might be subsituted for. See
-/// `initialize_instantiated_classes` for more details.
-/// \param pointer_type: The type to gather methods for.
-/// \param ns: global namespace
-/// \param [out] needed_lazy_methods: Populated with all Java reference types
-///   whose references may be passed, directly or indirectly, to any of the
-///   functions in `entry_points`
-void ci_lazy_methodst::initialize_all_instantiated_classes_from_pointer(
-  const pointer_typet &pointer_type,
-  const namespacet &ns,
-  ci_lazy_methods_neededt &needed_lazy_methods)
-{
-  initialize_instantiated_classes_from_pointer(
-    pointer_type,
-    ns,
-    needed_lazy_methods);
-
-  // TODO we should be passing here a map that maps generic parameters
-  // to concrete types in the current context TG-2664
-  const pointer_typet &subbed_pointer_type =
-    pointer_type_selector.convert_pointer_type(pointer_type, {}, ns);
-
-  if(subbed_pointer_type!=pointer_type)
-  {
-    initialize_instantiated_classes_from_pointer(
-      subbed_pointer_type, ns, needed_lazy_methods);
-  }
-}
-
-/// Build up list of methods for types for a specific pointer type. See
-/// `initialize_instantiated_classes` for more details.
-/// \param pointer_type: The type to gather methods for.
-/// \param ns: global namespace
-/// \param [out] needed_lazy_methods: Populated with all Java reference types
-///   whose references may be passed, directly or indirectly, to any of the
-///   functions in `entry_points`
-void ci_lazy_methodst::initialize_instantiated_classes_from_pointer(
-  const pointer_typet &pointer_type,
-  const namespacet &ns,
-  ci_lazy_methods_neededt &needed_lazy_methods)
-{
-  const symbol_typet &class_type=to_symbol_type(pointer_type.subtype());
-  const auto &param_classid=class_type.get_identifier();
-
-  // Note here: different arrays may have different element types, so we should
-  // explore again even if we've seen this classid before in the array case.
-  if(needed_lazy_methods.add_needed_class(param_classid) ||
-     is_java_array_tag(param_classid))
-  {
-    gather_field_types(pointer_type.subtype(), ns, needed_lazy_methods);
-  }
-
-  if(is_java_generic_type(pointer_type))
-  {
-    // Assume if this is a generic like X<A, B, C>, then any concrete parameters
-    // will at some point be instantiated.
-    const auto &generic_args =
-      to_java_generic_type(pointer_type).generic_type_arguments();
-    for(const auto &generic_arg : generic_args)
-    {
-      if(!is_java_generic_parameter(generic_arg))
-      {
-        initialize_instantiated_classes_from_pointer(
-          generic_arg, ns, needed_lazy_methods);
-      }
-    }
-  }
-}
 
 /// Get places where virtual functions are called.
 /// \param e: expression tree to search
@@ -609,64 +545,6 @@ void ci_lazy_methodst::gather_needed_globals(
   else
     forall_operands(opit, e)
       gather_needed_globals(*opit, symbol_table, needed);
-}
-
-/// See param needed_lazy_methods
-/// \param class_type: root of class tree to search
-/// \param ns: global namespace
-/// \param [out] needed_lazy_methods: Popualted with all Java reference types
-///   reachable starting at `class_type`. For example if `class_type` is
-///   `symbol_typet("java::A")` and A has a B field, then `B` (but not `A`) will
-///   noted as a needed class.
-void ci_lazy_methodst::gather_field_types(
-  const typet &class_type,
-  const namespacet &ns,
-  ci_lazy_methods_neededt &needed_lazy_methods)
-{
-  const auto &underlying_type=to_struct_type(ns.follow(class_type));
-  if(is_java_array_tag(underlying_type.get_tag()))
-  {
-    // If class_type is not a symbol this may be a reference array,
-    // but we can't tell what type.
-    if(class_type.id() == ID_symbol)
-    {
-      const typet &element_type =
-        java_array_element_type(to_symbol_type(class_type));
-      if(element_type.id() == ID_pointer)
-      {
-        // This is a reference array -- mark its element type available.
-        initialize_all_instantiated_classes_from_pointer(
-          to_pointer_type(element_type), ns, needed_lazy_methods);
-      }
-    }
-  }
-  else
-  {
-    for(const auto &field : underlying_type.components())
-    {
-      if(field.type().id() == ID_struct || field.type().id() == ID_symbol)
-        gather_field_types(field.type(), ns, needed_lazy_methods);
-      else if(field.type().id() == ID_pointer)
-      {
-        if(field.type().subtype().id() == ID_symbol)
-        {
-          initialize_all_instantiated_classes_from_pointer(
-            to_pointer_type(field.type()), ns, needed_lazy_methods);
-        }
-        else
-        {
-          // If raw structs were possible this would lead to missed
-          // dependencies, as both array element and specialised generic type
-          // information cannot be obtained in this case.
-          // We should therefore only be skipping pointers such as the uint16t*
-          // in our internal String representation.
-          INVARIANT(
-            field.type().subtype().id() != ID_struct,
-            "struct types should be referred to by symbol at this stage");
-        }
-      }
-    }
-  }
 }
 
 /// Find a virtual callee, if one is defined and the callee type is known to
