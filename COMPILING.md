@@ -27,7 +27,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
    yum install gcc gcc-c++ flex bison perl-libwww-perl patch devtoolset-6 java-1.7.0-openjdk-devel
    ```
-   Note that you need g++ version 4.9 or newer.
+   Note that you need g++ version 5.0 or newer.
 
    To compile JBMC, you additionally need the JDK and the java-models-library.
 
@@ -100,7 +100,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
    That should do it. To run, you will need
    ```
-   export LD_LIBRARY_PATH=/usr/gcc/4.9/lib
+   export LD_LIBRARY_PATH=/usr/gcc/5.0/lib
    ```
 
 # COMPILATION ON FREEBSD 11
