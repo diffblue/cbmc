@@ -1833,18 +1833,17 @@ static void update_index_set(
   }
 }
 
-/// Finds an index on `str` used in `expr` that contains `qvar`, for instance
-/// with arguments ``(str[k]=='a')``, `str`, and `k`, the function should
-/// return `k`.
-/// If two different such indexes exist, an invariant will fail.
+/// Find indexes of `str` used in `expr` that contains `qvar`, for instance
+/// with arguments ``(str[k+1]=='a')``, `str`, and `k`, the function should
+/// return `k+1`.
 /// \param [in] expr: the expression to search
 /// \param [in] str: the string which must be indexed
 /// \param [in] qvar: the universal variable that must be in the index
-/// \return an index expression in `expr` on `str` containing `qvar`. Returns
-///   an empty optional when `expr` does not contain `str`.
-static optionalt<exprt>
-find_index(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
+/// \return index expressions in `expr` on `str` containing `qvar`.
+static std::unordered_set<exprt, irep_hash>
+find_indexes(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 {
+  decltype(find_indexes(expr, str, qvar)) result;
   auto index_str_containing_qvar = [&](const exprt &e) {
     if(auto index_expr = expr_try_dynamic_cast<index_exprt>(e))
     {
@@ -1855,28 +1854,11 @@ find_index(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
     return false;
   };
 
-  auto it = std::find_if(
-    expr.depth_begin(), expr.depth_end(), index_str_containing_qvar);
-  if(it == expr.depth_end())
-    return {};
-  const exprt &index = to_index_expr(*it).index();
-
-  // Check that there are no two such indexes
-  it.next_sibling_or_parent();
-  while(it != expr.depth_end())
-  {
-    if(index_str_containing_qvar(*it))
-    {
-      INVARIANT(
-        to_index_expr(*it).index() == index,
-        "string should always be indexed by same value in a given formula");
-      it.next_sibling_or_parent();
-    }
-    else
-      ++it;
-  }
-
-  return index;
+  std::for_each(expr.depth_begin(), expr.depth_end(), [&](const exprt &e) {
+    if(index_str_containing_qvar(e))
+      result.insert(to_index_expr(e).index());
+  });
+  return result;
 }
 
 /// Instantiates a string constraint by substituting the quantifiers.
@@ -1897,18 +1879,24 @@ static exprt instantiate(
   const exprt &str,
   const exprt &val)
 {
-  const optionalt<exprt> idx = find_index(axiom.body, str, axiom.univ_var);
-  if(!idx.has_value())
-    return true_exprt();
-
-  const exprt r = compute_inverse_function(stream, axiom.univ_var, val, *idx);
-  implies_exprt instance(
-    and_exprt(
-      binary_relation_exprt(axiom.univ_var, ID_ge, axiom.lower_bound),
-      binary_relation_exprt(axiom.univ_var, ID_lt, axiom.upper_bound)),
-    axiom.body);
-  replace_expr(axiom.univ_var, r, instance);
-  return instance;
+  const auto indexes = find_indexes(axiom.body, str, axiom.univ_var);
+  INVARIANT(
+    str.id() == ID_array || indexes.size() <= 1,
+    "non constant array should always be accessed at the same index");
+  exprt::operandst conjuncts;
+  for(const auto &index : indexes)
+  {
+    const exprt univ_var_value =
+      compute_inverse_function(stream, axiom.univ_var, val, index);
+    implies_exprt instance(
+      and_exprt(
+        binary_relation_exprt(axiom.univ_var, ID_ge, axiom.lower_bound),
+        binary_relation_exprt(axiom.univ_var, ID_lt, axiom.upper_bound)),
+      axiom.body);
+    replace_expr(axiom.univ_var, univ_var_value, instance);
+    conjuncts.push_back(instance);
+  }
+  return conjunction(conjuncts);
 }
 
 /// Instantiates a quantified formula representing `not_contains` by
