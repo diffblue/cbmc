@@ -4,7 +4,7 @@ test.class
 ^EXIT=10$
 ^SIGNAL=0$
 VERIFICATION FAILED
-assertion at file test\.java line 9 function java::test\.main:\(\)V bytecode-index 12: FAILURE
+assertion at file test\.java line 9 function java::test\.main:\(\)V bytecode-index 13: FAILURE
 --
 ^warning: ignoring
 --
