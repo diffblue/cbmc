@@ -2,6 +2,7 @@
 unsigned x;
 
 class ct {
+public:
   void f(int i) {
     x=x+i;
   }

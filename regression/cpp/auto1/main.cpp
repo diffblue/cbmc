@@ -1,4 +1,4 @@
-#include <assert.h>
+#include <cassert>
 
 const auto i=1;
 
