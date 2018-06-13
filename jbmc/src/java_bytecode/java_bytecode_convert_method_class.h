@@ -110,7 +110,10 @@ public:
     size_t length;
     bool is_parameter;
     std::vector<holet> holes;
-    variablet() : symbol_expr(), start_pc(0), length(0), is_parameter(false) {}
+
+    variablet() : symbol_expr(), start_pc(0), length(0), is_parameter(false)
+    {
+    }
   };
 
 protected:
@@ -124,8 +127,8 @@ protected:
 
   enum instruction_sizet
   {
-    INST_INDEX=2,
-    INST_INDEX_CONST=3
+    INST_INDEX = 2,
+    INST_INDEX_CONST = 3
   };
 
   // return corresponding reference of variable
@@ -152,7 +155,7 @@ protected:
   symbol_exprt tmp_variable(const std::string &prefix, const typet &type);
 
   // JVM program locations
-  irep_idt label(const irep_idt &address);
+  static irep_idt label(const irep_idt &address);
 
   // JVM Stack
   typedef std::vector<exprt> stackt;
@@ -161,6 +164,7 @@ protected:
   exprt::operandst pop(std::size_t n);
 
   void pop_residue(std::size_t n);
+
   void push(const exprt::operandst &o);
 
   /// Returns true iff the slot index of the local variable of a method (coming
@@ -168,15 +172,17 @@ protected:
   /// `slots_for_parameters` is initialized upon call.
   bool is_parameter(const local_variablet &v)
   {
-    return v.index<slots_for_parameters;
+    return v.index < slots_for_parameters;
   }
 
   struct converted_instructiont
   {
     converted_instructiont(
       const instructionst::const_iterator &it,
-      const codet &_code):source(it), code(_code), done(false)
-      {}
+      const codet &_code)
+      : source(it), code(_code), done(false)
+    {
+    }
 
     instructionst::const_iterator source;
     std::list<unsigned> successors;
@@ -211,9 +217,19 @@ protected:
     bool leaf;
     std::vector<unsigned> branch_addresses;
     std::vector<block_tree_nodet> branch;
-    block_tree_nodet():leaf(false) {}
-    explicit block_tree_nodet(bool l):leaf(l) {}
-    static block_tree_nodet get_leaf() { return block_tree_nodet(true); }
+
+    block_tree_nodet() : leaf(false)
+    {
+    }
+
+    explicit block_tree_nodet(bool l) : leaf(l)
+    {
+    }
+
+    static block_tree_nodet get_leaf()
+    {
+      return block_tree_nodet(true);
+    }
   };
 
   static void replace_goto_target(
@@ -235,7 +251,7 @@ protected:
     unsigned address_limit,
     unsigned next_block_start_address,
     const address_mapt &amap,
-    bool allow_merge=true);
+    bool allow_merge = true);
 
   optionalt<symbolt> get_lambda_method_symbol(
     const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
@@ -261,18 +277,198 @@ protected:
   irep_idt get_static_field(
     const irep_idt &class_identifier, const irep_idt &component_name) const;
 
-  enum class bytecode_write_typet { VARIABLE, ARRAY_REF, STATIC_FIELD, FIELD};
+  enum class bytecode_write_typet
+  {
+    VARIABLE,
+    ARRAY_REF,
+    STATIC_FIELD,
+    FIELD
+  };
+
   void save_stack_entries(
     const std::string &,
     const typet &,
     code_blockt &,
     const bytecode_write_typet,
     const irep_idt &);
+
   void create_stack_tmp_var(
     const std::string &,
     const typet &,
     code_blockt &,
     exprt &);
-};
 
+  std::vector<unsigned int> try_catch_handler(
+    unsigned int address,
+    const java_bytecode_parse_treet::methodt::exception_tablet &exception_table)
+    const;
+
+  void draw_edges_from_ret_to_jsr(
+    address_mapt &address_map,
+    const std::vector<unsigned int> &jsr_ret_targets,
+    const std::vector<
+      std::vector<java_bytecode_parse_treet::instructiont>::const_iterator>
+      &ret_instructions) const;
+
+  optionalt<exprt> convert_invoke_dynamic(
+    const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
+    const source_locationt &location,
+    const exprt &arg0);
+
+  codet convert_astore(
+    const irep_idt &statement,
+    const exprt::operandst &op,
+    const source_locationt &location);
+
+  codet convert_store(
+    const irep_idt &statement,
+    const exprt &arg0,
+    const exprt::operandst &op,
+    const unsigned address,
+    const source_locationt &location);
+
+  exprt
+  convert_aload(const irep_idt &statement, const exprt::operandst &op) const;
+
+  code_blockt convert_ret(
+    const std::vector<unsigned int> &jsr_ret_targets,
+    const exprt &arg0,
+    const source_locationt &location,
+    const unsigned address);
+
+  codet convert_if_cmp(
+    const java_bytecode_convert_methodt::address_mapt &address_map,
+    const irep_idt &statement,
+    const exprt::operandst &op,
+    const mp_integer &number,
+    const source_locationt &location) const;
+
+  codet convert_if(
+    const java_bytecode_convert_methodt::address_mapt &address_map,
+    const exprt::operandst &op,
+    const irep_idt &id,
+    const mp_integer &number,
+    const source_locationt &location) const;
+
+  codet convert_ifnonull(
+    const java_bytecode_convert_methodt::address_mapt &address_map,
+    const exprt::operandst &op,
+    const mp_integer &number,
+    const source_locationt &location) const;
+
+  codet convert_ifnull(
+    const java_bytecode_convert_methodt::address_mapt &address_map,
+    const exprt::operandst &op,
+    const mp_integer &number,
+    const source_locationt &location) const;
+
+  codet convert_iinc(
+    const exprt &arg0,
+    const exprt &arg1,
+    const source_locationt &location,
+    unsigned address);
+
+  exprt::operandst &convert_ushr(
+    const irep_idt &statement,
+    const exprt::operandst &op,
+    exprt::operandst &results) const;
+
+  exprt::operandst &
+  convert_cmp(const exprt::operandst &op, exprt::operandst &results) const;
+
+  exprt::operandst &convert_cmp2(
+    const irep_idt &statement,
+    const exprt::operandst &op,
+    exprt::operandst &results) const;
+
+  void convert_getstatic(
+    const exprt &arg0,
+    const symbol_exprt &symbol_expr,
+    bool is_assertions_disabled_field,
+    codet &c,
+    exprt::operandst &results);
+
+  codet convert_putfield(const exprt &arg0, const exprt::operandst &op);
+
+  codet convert_putstatic(
+    const source_locationt &location,
+    const exprt &arg0,
+    const exprt::operandst &op,
+    const symbol_exprt &symbol_expr);
+
+  void convert_new(
+    const source_locationt &location,
+    const exprt &arg0,
+    codet &c,
+    exprt::operandst &results);
+
+  void convert_newarray(
+    const source_locationt &location,
+    const irep_idt &statement,
+    const exprt &arg0,
+    const exprt::operandst &op,
+    codet &c,
+    exprt::operandst &results);
+
+  void convert_multianewarray(
+    const source_locationt &location,
+    const exprt &arg0,
+    const exprt::operandst &op,
+    codet &c,
+    exprt::operandst &results);
+
+  codet convert_monitorenter(
+    const source_locationt &location,
+    const exprt::operandst &op) const;
+
+  codet convert_monitorexit(
+    const source_locationt &location,
+    const exprt::operandst &op) const;
+
+  codet &do_exception_handling(
+    const methodt &method,
+    const std::set<unsigned int> &working_set,
+    unsigned int cur_pc,
+    codet &c);
+
+  void convert_athrow(
+    const source_locationt &location,
+    const exprt::operandst &op,
+    codet &c,
+    exprt::operandst &results) const;
+
+  void convert_checkcast(
+    const exprt &arg0,
+    const exprt::operandst &op,
+    codet &c,
+    exprt::operandst &results) const;
+
+  codet &replace_call_to_cprover_assume(source_locationt location, codet &c);
+
+  void convert_invoke(
+    source_locationt location,
+    const irep_idt &statement,
+    exprt &arg0,
+    codet &c,
+    exprt::operandst &results);
+
+  exprt::operandst &convert_const(
+    const irep_idt &statement,
+    const exprt &arg0,
+    exprt::operandst &results) const;
+
+  void convert_dup2_x2(exprt::operandst &op, exprt::operandst &results);
+
+  void convert_dup2_x1(exprt::operandst &op, exprt::operandst &results);
+
+  void convert_dup2(exprt::operandst &op, exprt::operandst &results);
+
+  codet convert_switch(
+    java_bytecode_convert_methodt::address_mapt &address_map,
+    const exprt::operandst &op,
+    const java_bytecode_parse_treet::instructiont::argst &args,
+    const source_locationt &location);
+
+  codet convert_pop(const irep_idt &statement, const exprt::operandst &op);
+};
 #endif
