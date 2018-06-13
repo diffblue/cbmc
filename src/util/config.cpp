@@ -663,7 +663,11 @@ configt::cppt::cpp_standardt configt::cppt::default_cpp_standard()
   // g++ 6.3 uses gnu++14
   // g++ 5.4 uses gnu++98
   // clang 6.0 uses c++14
+  #if defined _WIN32
+  return cpp_standardt::CPP14;
+  #else
   return cpp_standardt::CPP98;
+  #endif
 }
 
 void configt::set_arch(const irep_idt &arch)
