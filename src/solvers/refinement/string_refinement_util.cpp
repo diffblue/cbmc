@@ -413,10 +413,15 @@ void string_dependenciest::for_each_dependency(
         stack.emplace_back(if_expr->true_case());
         stack.emplace_back(if_expr->false_case());
       }
-      else if(const auto string_node = node_at(to_array_string_expr(current)))
-        f(*string_node);
       else
-        UNREACHABLE;
+      {
+        const auto string_node = node_at(to_array_string_expr(current));
+        INVARIANT(
+          string_node,
+          "dependencies of the node should have been added to the graph at node creation "
+          + current.get().pretty());
+        f(*string_node);
+      }
     }
   }
 }
