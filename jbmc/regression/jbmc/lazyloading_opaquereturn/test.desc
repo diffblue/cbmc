@@ -1,4 +1,4 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 TestClass.class
 --function TestClass.testFunction --lazy-methods --verbosity 10
 CI lazy methods: elaborate java::Foo\.cproverNondetInitialize:\(\)V
@@ -10,3 +10,4 @@ CI lazy methods: elaborate java::GenFiller\.cproverNondetInitialize:\(\)V
 Testing that the return type of an opaque method is correctly elaborated. The
 cproverNondetInitialize should be loaded for all classes where an instance might
 be seen.
+This doesn't work under symex-driven lazy loading because it is incompatible with --lazy-methods
