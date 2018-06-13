@@ -1627,21 +1627,16 @@ void goto_checkt::goto_check(
 
         exprt pointer=i.code.op0().op0();
 
-        if(pointer.type().subtype().get(ID_identifier)!=
-           "java::java.lang.AssertionError")
-        {
-          notequal_exprt not_eq_null(
-            pointer,
-            null_pointer_exprt(to_pointer_type(pointer.type())));
+        const notequal_exprt not_eq_null(
+          pointer, null_pointer_exprt(to_pointer_type(pointer.type())));
 
-          add_guarded_claim(
-            not_eq_null,
-            "throwing null",
-            "pointer dereference",
-            i.source_location,
-            pointer,
-            guardt());
-        }
+        add_guarded_claim(
+          not_eq_null,
+          "throwing null",
+          "pointer dereference",
+          i.source_location,
+          pointer,
+          guardt());
       }
 
       // this has no successor
