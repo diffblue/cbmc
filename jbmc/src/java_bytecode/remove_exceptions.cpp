@@ -306,9 +306,6 @@ void remove_exceptionst::add_exception_dispatch_sequence(
   // Jump to the universal handler or function end, as appropriate.
   // This will appear after the GOTO-based dynamic dispatch below
   goto_programt::targett default_dispatch=goto_program.insert_after(instr_it);
-  default_dispatch->make_goto();
-  default_dispatch->source_location=instr_it->source_location;
-  default_dispatch->function=instr_it->function;
 
   // find the symbol corresponding to the caught exceptions
   symbol_exprt exc_thrown =
@@ -356,7 +353,9 @@ void remove_exceptionst::add_exception_dispatch_sequence(
     }
   }
 
-  default_dispatch->set_target(default_target);
+  default_dispatch->make_goto(default_target);
+  default_dispatch->source_location=instr_it->source_location;
+  default_dispatch->function=instr_it->function;
 
   // add dead instructions
   for(const auto &local : locals)

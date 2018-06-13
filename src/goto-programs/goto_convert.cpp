@@ -138,6 +138,7 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
         throw 0;
       }
 
+      i.type=GOTO;
       i.targets.clear();
       i.targets.push_back(l_it->second.first);
 
@@ -1459,12 +1460,12 @@ void goto_convertt::convert_goto(
   const codet &code,
   goto_programt &dest)
 {
-  goto_programt::targett t=dest.add_instruction();
-  t->make_goto();
+  // this instruction will turn into a goto during post-processing
+  goto_programt::targett t=dest.add_instruction(NO_INSTRUCTION_TYPE);
   t->source_location=code.source_location();
   t->code=code;
 
-  // remember it to do target later
+  // remember it to do the target later
   targets.gotos.push_back(std::make_pair(t, targets.destructor_stack));
 }
 
@@ -1472,8 +1473,8 @@ void goto_convertt::convert_gcc_computed_goto(
   const codet &code,
   goto_programt &dest)
 {
-  goto_programt::targett t=dest.add_instruction();
-  t->make_skip();
+  // this instruction will turn into OTHER during post-processing
+  goto_programt::targett t=dest.add_instruction(NO_INSTRUCTION_TYPE);
   t->source_location=code.source_location();
   t->code=code;
 

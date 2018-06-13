@@ -237,7 +237,6 @@ public:
       code.make_nil();
     }
 
-    void make_goto() { clear(GOTO); }
     void make_return() { clear(RETURN); }
     void make_skip() { clear(SKIP); }
     void make_location(const source_locationt &l)
@@ -256,7 +255,7 @@ public:
 
     void make_goto(targett _target)
     {
-      make_goto();
+      clear(GOTO);
       targets.push_back(_target);
     }
 
