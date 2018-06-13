@@ -220,14 +220,7 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
   else if(
     char_pointer.id() == ID_constant &&
     to_constant_expr(char_pointer).get_value() == ID_NULL)
-  {
-    /// \todo Check if the case char_array_null occurs.
-    array_typet array_type(
-      char_array_type.subtype(),
-      from_integer(0, to_array_type(char_array_type).size().type()));
-    symbol_exprt array_sym = fresh_symbol("char_array_null", array_type);
-    return to_array_string_expr(array_sym);
-  }
+    symbol_name = "char_array_null";
   else
     symbol_name = "unknown_char_array";
 
