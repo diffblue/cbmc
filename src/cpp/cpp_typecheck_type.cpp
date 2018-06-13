@@ -140,6 +140,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
     if(type.subtype().get_bool(ID_C_volatile))
       type.set(ID_C_volatile, true);
   }
+  else if(type.id()==ID_vector)
+  {
+    typecheck_vector_type(to_vector_type(type));
+  }
   else if(type.id()==ID_code)
   {
     code_typet &code_type=to_code_type(type);
@@ -258,6 +262,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_nullptr)
   {
+  }
+  else if(type.id()==ID_already_typechecked)
+  {
+    c_typecheck_baset::typecheck_type(type);
   }
   else
   {

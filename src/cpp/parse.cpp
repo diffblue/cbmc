@@ -276,7 +276,7 @@ protected:
   bool optStorageSpec(cpp_storage_spect &);
   bool optCvQualify(typet &);
   bool optAlignas(typet &);
-  bool rAttribute();
+  bool rAttribute(typet &);
   bool optAttribute(cpp_declarationt &);
   bool optIntegralTypeOrClassSpec(typet &);
   bool rConstructorDecl(
@@ -473,12 +473,19 @@ void Parser::merge_types(const typet &src, typet &dest)
   {
     if(dest.id()!=ID_merged_type)
     {
+      source_locationt location=dest.source_location();
       typet tmp(ID_merged_type);
       tmp.move_to_subtypes(dest);
+      tmp.add_source_location()=location;
       dest=tmp;
     }
 
-    dest.copy_to_subtypes(src);
+    // the end of the subtypes container needs to stay the same,
+    // since several analysis functions traverse via the end for
+    // merged_types
+    typet::subtypest &sub=dest.subtypes();
+    sub.emplace(sub.begin(), src);
+    POSTCONDITION(!dest.subtypes().empty());
   }
 }
 
@@ -2010,7 +2017,7 @@ bool Parser::optCvQualify(typet &cv)
     if(t==TOK_CONSTEXPR ||
        t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT ||
        t==TOK_PTR32 || t==TOK_PTR64 ||
-       t==TOK_GCC_ATTRIBUTE)
+       t==TOK_GCC_ATTRIBUTE || t==TOK_GCC_ASM)
     {
       cpp_tokent tk;
       lex.get_token(tk);
@@ -2055,7 +2062,19 @@ bool Parser::optCvQualify(typet &cv)
         break;
 
       case TOK_GCC_ATTRIBUTE:
-        if(!rAttribute())
+        if(!rAttribute(cv))
+          return false;
+        break;
+
+      case TOK_GCC_ASM:
+        // asm post-declarator
+        // this is stuff like
+        // int x __asm("asd")=1, y;
+        if(lex.get_token(tk)!='(')
+          return false;
+        if(!rString(tk))
+          return false;
+        if(lex.get_token(tk)!=')')
           return false;
         break;
 
@@ -2114,28 +2133,204 @@ bool Parser::optAlignas(typet &cv)
   return true;
 }
 
-bool Parser::rAttribute()
+bool Parser::rAttribute(typet &t)
 {
+  #ifdef DEBUG
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::rAttribute "
+            << lex.LookAhead(0);
+  #endif
   cpp_tokent tk;
   lex.get_token(tk);
 
   switch(tk.kind)
   {
   case '(':
-    rAttribute();
+    if(lex.LookAhead(0)!=')')
+      rAttribute(t);
+
     if(lex.LookAhead(0)!=')')
       return false;
     lex.get_token(tk);
-    break;
+    return true;
 
-  case TOK_IDENTIFIER:
+  case TOK_GCC_ATTRIBUTE_PACKED:
+    {
+      typet attr(ID_packed);
+      set_location(attr, tk);
+      merge_types(attr, t);
+      break;
+    }
+
+  case TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION:
+    {
+      typet attr(ID_transparent_union);
+      set_location(attr, tk);
+      merge_types(attr, t);
+      break;
+    }
+
+  case TOK_GCC_ATTRIBUTE_VECTOR_SIZE:
+    {
+      cpp_tokent tk2, tk3;
+
+      if(lex.get_token(tk2)!='(')
+        return false;
+
+      exprt exp;
+      if(!rCommaExpression(exp))
+        return false;
+
+      if(lex.get_token(tk3)!=')')
+        return false;
+
+      vector_typet attr(nil_typet(), exp);
+      attr.add_source_location()=exp.source_location();
+      merge_types(attr, t);
+      break;
+    }
+
+  case TOK_GCC_ATTRIBUTE_ALIGNED:
+    {
+      typet attr(ID_aligned);
+      set_location(attr, tk);
+
+      if(lex.LookAhead(0)=='(')
+      {
+        cpp_tokent tk2, tk3;
+
+        if(lex.get_token(tk2)!='(')
+          return false;
+
+        exprt exp;
+        if(!rCommaExpression(exp))
+          return false;
+
+        if(lex.get_token(tk3)!=')')
+          return false;
+
+        attr.add(ID_size, exp);
+      }
+
+      merge_types(attr, t);
+      break;
+    }
+
+  case TOK_GCC_ATTRIBUTE_MODE:
+    {
+      cpp_tokent tk2, tk3;
+
+      if(lex.get_token(tk2)!='(')
+        return false;
+
+      irept name;
+      if(!rName(name))
+        return false;
+
+      if(lex.get_token(tk3)!=')')
+        return false;
+
+      typet attr(ID_gcc_attribute_mode);
+      set_location(attr, tk);
+      attr.set(ID_size, name.get(ID_identifier));
+      merge_types(attr, t);
+      break;
+    }
+
+  case TOK_GCC_ATTRIBUTE_GNU_INLINE:
+    {
+      typet attr(ID_static);
+      set_location(attr, tk);
+      merge_types(attr, t);
+      break;
+    }
+
+  case TOK_GCC_ATTRIBUTE_WEAK:
+    {
+      typet attr(ID_weak);
+      set_location(attr, tk);
+      merge_types(attr, t);
+      break;
+    }
+
+  case TOK_GCC_ATTRIBUTE_ALIAS:
+    {
+      cpp_tokent tk2, tk3, tk4;
+
+      if(lex.get_token(tk2)!='(')
+        return false;
+
+      if(!rString(tk3))
+        return false;
+
+      if(lex.get_token(tk4)!=')')
+        return false;
+
+      typet attr(ID_alias);
+      set_location(attr, tk);
+      attr.move_to_sub(tk3.data);
+      merge_types(attr, t);
+      break;
+    }
+
+  case TOK_GCC_ATTRIBUTE_SECTION:
+    {
+      cpp_tokent tk2, tk3, tk4;
+
+      if(lex.get_token(tk2)!='(')
+        return false;
+
+      if(!rString(tk3))
+        return false;
+
+      if(lex.get_token(tk4)!=')')
+        return false;
+
+      typet attr(ID_section);
+      set_location(attr, tk);
+      attr.move_to_sub(tk3.data);
+      merge_types(attr, t);
+      break;
+    }
+
+  case TOK_GCC_ATTRIBUTE_NORETURN:
+    {
+      typet attr(ID_noreturn);
+      set_location(attr, tk);
+      merge_types(attr, t);
+      break;
+    }
+
+  case TOK_GCC_ATTRIBUTE_CONSTRUCTOR:
+    {
+      typet attr(ID_constructor);
+      set_location(attr, tk);
+      merge_types(attr, t);
+      break;
+    }
+
+  case TOK_GCC_ATTRIBUTE_DESTRUCTOR:
+    {
+      typet attr(ID_destructor);
+      set_location(attr, tk);
+      merge_types(attr, t);
+      break;
+    }
+
+  case ',':
+    if(lex.LookAhead(0)==')')
+      // the scanner ignored an attribute
+      return true;
     break;
 
   default:
     return false;
   }
 
-  return true;
+  if(lex.LookAhead(0)==')')
+    return true;
+
+  return rAttribute(t);
 }
 
 bool Parser::optAttribute(cpp_declarationt &declaration)
@@ -2662,22 +2857,6 @@ bool Parser::rDeclaratorWithInit(
                     should_be_declarator, is_statement))
       return false;
 
-    // asm post-declarator
-    if(lex.LookAhead(0)==TOK_GCC_ASM)
-    {
-      // this is stuff like
-      // int x __asm("asd")=1, y;
-      cpp_tokent tk;
-      lex.get_token(tk); // TOK_GCC_ASM
-
-      if(lex.get_token(tk)!='(')
-        return false;
-      if(!rString(tk))
-        return false;
-      if(lex.get_token(tk)!=')')
-        return false;
-    }
-
     int t=lex.LookAhead(0);
     if(t=='=')
     {
@@ -3012,6 +3191,8 @@ bool Parser::rDeclarator(
       break;
   }
 
+  optCvQualify(d_outer);
+
   #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rDeclarator2 13\n";
   #endif
@@ -3064,12 +3245,9 @@ bool Parser::optPtrOperator(typet &ptrs)
       cv.make_nil();
       optCvQualify(cv); // the qualifier is for the pointer
       if(cv.is_not_nil())
-      {
-        merge_types(op, cv);
-        t_list.push_back(cv);
-      }
-      else
-        t_list.push_back(op);
+        merge_types(cv, op);
+
+      t_list.push_back(op);
     }
     else if(t=='^')
     {
@@ -3083,12 +3261,9 @@ bool Parser::optPtrOperator(typet &ptrs)
       cv.make_nil();
       optCvQualify(cv); // the qualifier is for the pointer
       if(cv.is_not_nil())
-      {
-        merge_types(op, cv);
-        t_list.push_back(cv);
-      }
-      else
-        t_list.push_back(op);
+        merge_types(cv, op);
+
+      t_list.push_back(op);
     }
     else if(isPtrToMember(0))
     {
@@ -4263,6 +4438,16 @@ bool Parser::rClassSpec(typet &spec)
   {
     if(!optAlignas(spec))
       return false;
+
+    if(lex.LookAhead(0)==TOK_GCC_ATTRIBUTE)
+    {
+      cpp_tokent tk;
+      lex.get_token(tk);
+
+      if(!rAttribute(spec))
+        return false;
+    }
+
     irept name;
 
     if(!rName(name))

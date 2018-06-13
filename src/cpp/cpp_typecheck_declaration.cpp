@@ -130,6 +130,10 @@ void cpp_typecheckt::convert_non_template_declaration(
   if(!is_typedef)
     elaborate_class_template(declaration_type);
 
+  // mark as 'already typechecked'
+  if(!declaration.declarators().empty())
+    make_already_typechecked(declaration_type);
+
   // Special treatment for anonymous unions
   if(declaration.declarators().empty() &&
      follow(declaration.type()).get_bool(ID_C_is_anonymous))

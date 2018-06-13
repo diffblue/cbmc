@@ -388,6 +388,9 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     return;
   }
 
+  // mark as 'already typechecked'
+  make_already_typechecked(type);
+
   codet new_code(ID_decl_block);
   new_code.reserve_operands(declaration.declarators().size());
 
@@ -452,26 +455,4 @@ void cpp_typecheckt::typecheck_block(codet &code)
   cpp_scopes.new_block_scope();
 
   c_typecheck_baset::typecheck_block(code);
-}
-
-void cpp_typecheckt::typecheck_assign(codet &code)
-{
-  if(code.operands().size()!=2)
-  {
-    error().source_location=code.find_source_location();
-    error() << "assignment statement expected to have two operands"
-            << eom;
-    throw 0;
-  }
-
-  // turn into a side effect
-  side_effect_exprt expr(code.get(ID_statement));
-  expr.operands() = code.operands();
-  typecheck_expr(expr);
-
-  code_expressiont code_expr;
-  code_expr.expression()=expr;
-  code_expr.add_source_location() = code.source_location();
-
-  code.swap(code_expr);
 }

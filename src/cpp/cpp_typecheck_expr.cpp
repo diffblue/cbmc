@@ -939,6 +939,25 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     else
       typecheck_type(expr.type());
 
+    // We allow (TYPE){ initializer_list }
+    // This is called "compound literal", and is syntactic
+    // sugar for a (possibly local) declaration.
+    if(expr.op0().id()==ID_initializer_list)
+    {
+      // just do a normal initialization
+      do_initializer(expr.op0(), expr.type(), false);
+
+      // This produces a struct-expression,
+      // union-expression, array-expression,
+      // or an expression for a pointer or scalar.
+      // We produce a compound_literal expression.
+      exprt tmp(ID_compound_literal, expr.type());
+      tmp.move_to_operands(expr.op0());
+      expr=tmp;
+      expr.set(ID_C_lvalue, true); // these are l-values
+      return;
+    }
+
     exprt new_expr;
 
     if(const_typecast(expr.op0(), expr.type(), new_expr) ||

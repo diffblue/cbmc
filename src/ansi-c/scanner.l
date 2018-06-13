@@ -948,14 +948,9 @@ __decltype          { if(PARSER.cpp98 &&
                      PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
-                    if(PARSER.cpp98)
-                      BEGIN(IGNORE_PARENS);
-                    else
-                    {
-                      BEGIN(GCC_ATTRIBUTE1);
-                      loc();
-                      return TOK_GCC_ATTRIBUTE;
-                    }
+                    BEGIN(GCC_ATTRIBUTE1);
+                    loc();
+                    return TOK_GCC_ATTRIBUTE;
                   }
                   else
                     return make_identifier();
