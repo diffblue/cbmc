@@ -61,7 +61,9 @@ bool cpp_typecheckt::has_auto(const typet &type)
 {
   if(type.id() == ID_auto)
     return true;
-  else if(type.id() == ID_merged_type || type.id() == ID_frontend_pointer)
+  else if(
+    type.id() == ID_merged_type || type.id() == ID_frontend_pointer ||
+    type.id() == ID_pointer)
   {
     forall_subtypes(it, type)
       if(has_auto(*it))
