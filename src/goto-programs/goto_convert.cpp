@@ -109,28 +109,7 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
   {
     goto_programt::instructiont &i=*(g_it.first);
 
-    if(i.code.get_statement()=="non-deterministic-goto")
-    {
-      const irept &destinations=i.code.find("destinations");
-
-      i.make_goto();
-
-      forall_irep(it, destinations.get_sub())
-      {
-        labelst::const_iterator l_it=
-          targets.labels.find(it->id_string());
-
-        if(l_it==targets.labels.end())
-        {
-          error().source_location=i.code.find_source_location();
-          error() << "goto label `" << it->id() << "' not found" << eom;
-          throw 0;
-        }
-
-        i.targets.push_back(l_it->second.first);
-      }
-    }
-    else if(i.is_start_thread())
+    if(i.is_start_thread())
     {
       const irep_idt &goto_label=i.code.get(ID_destination);
 
