@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // clang-format off
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/ \
   "(disable-uncaught-exception-check)" \
+  "(throw-assertion-error)" \
   "(java-assume-inputs-non-null)" \
   "(java-throw-runtime-exceptions)" \
   "(java-max-input-array-length):" \
@@ -43,6 +44,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP /*NOLINT*/                                          \
   " --disable-uncaught-exception-check" \
   "                                  ignore uncaught exceptions and errors\n" \
+  " --throw-assertion-error          throw java.lang.AssertionError on violated\n"               /* NOLINT(*) */ \
+  "                                  assert statements instead of failing\n" \
+  "                                  at the location of the assert statement\n"                  /* NOLINT(*) */ \
   " --java-assume-inputs-non-null    never initialize reference-typed parameter to the\n"        /* NOLINT(*) */ \
   "                                  entry point with null\n"                                    /* NOLINT(*) */ \
   " --java-throw-runtime-exceptions  make implicit runtime exceptions explicit\n"                /* NOLINT(*) */ \
@@ -173,6 +177,7 @@ protected:
   bool string_refinement_enabled;
   bool throw_runtime_exceptions;
   bool assert_uncaught_exceptions;
+  bool throw_assertion_error;
   java_string_library_preprocesst string_preprocess;
   std::string java_cp_include_files;
 

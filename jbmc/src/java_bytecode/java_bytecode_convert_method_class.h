@@ -36,12 +36,14 @@ public:
     symbol_table_baset &symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
+    bool throw_assertion_error,
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
     java_string_library_preprocesst &_string_preprocess,
     const class_hierarchyt &class_hierarchy)
     : messaget(_message_handler),
       symbol_table(symbol_table),
       max_array_length(_max_array_length),
+      throw_assertion_error(throw_assertion_error),
       needed_lazy_methods(std::move(needed_lazy_methods)),
       string_preprocess(_string_preprocess),
       slots_for_parameters(0),
@@ -64,6 +66,7 @@ public:
 protected:
   symbol_table_baset &symbol_table;
   const size_t max_array_length;
+  const bool throw_assertion_error;
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods;
 
   /// Fully qualified name of the method under translation.

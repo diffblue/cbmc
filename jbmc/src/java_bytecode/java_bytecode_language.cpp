@@ -47,6 +47,7 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   string_refinement_enabled=cmd.isset("refine-strings");
   throw_runtime_exceptions=cmd.isset("java-throw-runtime-exceptions");
   assert_uncaught_exceptions = !cmd.isset("disable-uncaught-exception-check");
+  throw_assertion_error = cmd.isset("throw-assertion-error");
   threading_support = cmd.isset("java-threading");
 
   if(cmd.isset("java-max-input-array-length"))
@@ -1030,6 +1031,7 @@ bool java_bytecode_languaget::convert_single_method(
       symbol_table,
       get_message_handler(),
       max_user_array_length,
+      throw_assertion_error,
       std::move(needed_lazy_methods),
       string_preprocess,
       class_hierarchy);

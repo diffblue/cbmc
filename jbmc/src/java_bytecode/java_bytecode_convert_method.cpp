@@ -2252,6 +2252,7 @@ void java_bytecode_convert_methodt::convert_athrow(
   exprt::operandst &results) const
 {
   if(
+    !throw_assertion_error &&
     uncaught_exceptions_domaint::get_exception_type(op[0].type()) ==
       "java::java.lang.AssertionError")
   {
@@ -3087,6 +3088,7 @@ void java_bytecode_convert_method(
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
+  bool throw_assertion_error,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess,
   const class_hierarchyt &class_hierarchy)
@@ -3105,6 +3107,7 @@ void java_bytecode_convert_method(
     symbol_table,
     message_handler,
     max_array_length,
+    throw_assertion_error,
     needed_lazy_methods,
     string_preprocess,
     class_hierarchy);

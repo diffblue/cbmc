@@ -33,6 +33,7 @@ void java_bytecode_convert_method(
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
+  bool throw_assertion_error,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess,
   const class_hierarchyt &class_hierarchy);
