@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 -D_ENABLE_CHAIN_ -D_SANITY_CHECK_ --unwind 2
 ^EXIT=10$
