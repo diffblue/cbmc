@@ -1045,7 +1045,17 @@ bool java_bytecode_languaget::convert_single_method(
     const pointer_typet *pointer_return_type =
       type_try_dynamic_cast<pointer_typet>(function_type.return_type()))
   {
-    needed_lazy_methods->add_all_needed_classes(*pointer_return_type);
+    // If the return type is abstract, we won't forcibly instantiate it here
+    // otherwise this can cause abstract methods to be explictly called
+    // TODO(tkiley): Arguably no abstract class should ever be added to
+    // TODO(tkiley): ci_lazy_methods_neededt, but this needs further
+    // TODO(tkiley): investigation
+    namespacet ns{symbol_table};
+    const java_class_typet &underlying_type =
+      to_java_class_type(ns.follow(pointer_return_type->subtype()));
+
+    if(!underlying_type.is_abstract())
+      needed_lazy_methods->add_all_needed_classes(*pointer_return_type);
   }
 
   return true;
