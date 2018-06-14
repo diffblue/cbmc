@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 A.class
---reachability-slice-fb --show-goto-functions --property 'java::A.foo:(I)V.coverage.3' --cover location
+--reachability-slice-fb --show-goto-functions --property 'java::A.foo:(I)V.coverage.4' --cover location
 1001
 1002
 1003

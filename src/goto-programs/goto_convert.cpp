@@ -109,28 +109,7 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
   {
     goto_programt::instructiont &i=*(g_it.first);
 
-    if(i.code.get_statement()=="non-deterministic-goto")
-    {
-      const irept &destinations=i.code.find("destinations");
-
-      i.make_goto();
-
-      forall_irep(it, destinations.get_sub())
-      {
-        labelst::const_iterator l_it=
-          targets.labels.find(it->id_string());
-
-        if(l_it==targets.labels.end())
-        {
-          error().source_location=i.code.find_source_location();
-          error() << "goto label `" << it->id() << "' not found" << eom;
-          throw 0;
-        }
-
-        i.targets.push_back(l_it->second.first);
-      }
-    }
-    else if(i.is_start_thread())
+    if(i.is_start_thread())
     {
       const irep_idt &goto_label=i.code.get(ID_destination);
 
@@ -159,6 +138,7 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
         throw 0;
       }
 
+      i.type=GOTO;
       i.targets.clear();
       i.targets.push_back(l_it->second.first);
 
@@ -1480,12 +1460,12 @@ void goto_convertt::convert_goto(
   const codet &code,
   goto_programt &dest)
 {
-  goto_programt::targett t=dest.add_instruction();
-  t->make_goto();
+  // this instruction will turn into a goto during post-processing
+  goto_programt::targett t=dest.add_instruction(NO_INSTRUCTION_TYPE);
   t->source_location=code.source_location();
   t->code=code;
 
-  // remember it to do target later
+  // remember it to do the target later
   targets.gotos.push_back(std::make_pair(t, targets.destructor_stack));
 }
 
@@ -1493,8 +1473,8 @@ void goto_convertt::convert_gcc_computed_goto(
   const codet &code,
   goto_programt &dest)
 {
-  goto_programt::targett t=dest.add_instruction();
-  t->make_skip();
+  // this instruction will turn into OTHER during post-processing
+  goto_programt::targett t=dest.add_instruction(NO_INSTRUCTION_TYPE);
   t->source_location=code.source_location();
   t->code=code;
 

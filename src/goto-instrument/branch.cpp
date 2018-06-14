@@ -56,8 +56,7 @@ void branch(
         t1->function=f_it->first;
 
         goto_programt::targett t2=body.insert_after(t1);
-        t2->make_goto();
-        t2->targets=i_it->targets;
+        t2->make_goto(i_it->get_target());
 
         goto_programt::targett t3=body.insert_after(t2);
         t3->make_function_call(
