@@ -175,7 +175,8 @@ public:
     const exprt &rhs,  // L2
     const namespacet &ns,
     bool rhs_is_simplified,
-    bool record_value);
+    bool record_value,
+    bool allow_pointer_unsoundness=false);
 
   // what to propagate
   bool constant_propagation(const exprt &expr) const;

@@ -399,6 +399,14 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
       }
     }
   }
+
+  // The 'allow-pointer-unsoundness' option prevents symex from throwing an
+  // exception when it encounters pointers that are shared across threads.
+  // This is unsound but given that pointers are ubiquitous in java this check
+  // must be disabled in order to support the analysis of multithreaded java
+  // code.
+  if(cmdline.isset("java-threading"))
+    options.set_option("allow-pointer-unsoundness", true);
 }
 
 /// invoke main modules

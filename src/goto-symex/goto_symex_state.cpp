@@ -311,7 +311,8 @@ void goto_symex_statet::assignment(
   const exprt &rhs,  // L2
   const namespacet &ns,
   bool rhs_is_simplified,
-  bool record_value)
+  bool record_value,
+  bool allow_pointer_unsoundness)
 {
   // identifier should be l0 or l1, make sure it's l1
   rename(lhs, ns, L1);
@@ -343,7 +344,7 @@ void goto_symex_statet::assignment(
   assert_l2_renaming(rhs);
 
   // see #305 on GitHub for a simple example and possible discussion
-  if(is_shared && lhs.type().id() == ID_pointer)
+  if(is_shared && lhs.type().id() == ID_pointer && !allow_pointer_unsoundness)
     throw "pointer handling for concurrency is unsound";
 
   // for value propagation -- the RHS is L2
