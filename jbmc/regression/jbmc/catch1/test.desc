@@ -1,8 +1,9 @@
 CORE
 catch1.class
 
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
+^\[.*\] no uncaught exception: FAILURE$
 --
 ^warning: ignoring

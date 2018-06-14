@@ -4,9 +4,9 @@ Main.class
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-assertion at file Main\.java line 5 function .* bytecode-index 6: FAILURE
-assertion at file Main\.java line 6 function .* bytecode-index 14: FAILURE
-assertion at file Main\.java line 12 function .* bytecode-index 31: SUCCESS
+assertion at file Main\.java line 5 function .* bytecode-index 7: FAILURE
+assertion at file Main\.java line 6 function .* bytecode-index 15: FAILURE
+assertion at file Main\.java line 12 function .* bytecode-index 32: SUCCESS
 \*\* 2 of .* failed
 --
 ^warning: ignoring

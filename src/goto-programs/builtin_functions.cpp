@@ -736,34 +736,6 @@ void goto_convertt::do_function_call_symbol(
     a->source_location=function.source_location();
     a->source_location.set("user-provided", true);
   }
-  else if(has_prefix(
-      id2string(identifier), "java::java.lang.AssertionError.<init>:"))
-  {
-    // insert function call anyway
-    code_function_callt function_call;
-    function_call.lhs()=lhs;
-    function_call.function()=function;
-    function_call.arguments()=arguments;
-    function_call.add_source_location()=function.source_location();
-
-    copy(function_call, FUNCTION_CALL, dest);
-
-    if(arguments.size() != 1 && arguments.size() != 2 && arguments.size() != 3)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier
-              << "' expected to have one, two or three arguments" << eom;
-      throw 0;
-    }
-
-    goto_programt::targett t=dest.add_instruction(ASSERT);
-    t->guard=false_exprt();
-    t->source_location=function.source_location();
-    t->source_location.set("user-provided", true);
-    t->source_location.set_property_class(ID_assertion);
-    t->source_location.set_comment(
-      "assertion at "+function.source_location().as_string());
-  }
   else if(identifier=="assert" &&
           !ns.lookup(identifier).location.get_function().empty())
   {

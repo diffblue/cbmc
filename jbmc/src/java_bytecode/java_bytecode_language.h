@@ -26,19 +26,27 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language.h>
 
-#define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/                              \
-  "(java-assume-inputs-non-null)"                                              \
-  "(java-throw-runtime-exceptions)"                                            \
-  "(java-max-input-array-length):"                                             \
-  "(java-max-input-tree-depth):"                                               \
-  "(java-max-vla-length):"                                                     \
-  "(java-cp-include-files):"                                                   \
-  "(lazy-methods)"                                                             \
-  "(lazy-methods-extra-entry-point):"                                          \
-  "(java-load-class):"                                                         \
+// clang-format off
+#define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/ \
+  "(disable-uncaught-exception-check)" \
+  "(throw-assertion-error)" \
+  "(java-assume-inputs-non-null)" \
+  "(java-throw-runtime-exceptions)" \
+  "(java-max-input-array-length):" \
+  "(java-max-input-tree-depth):" \
+  "(java-max-vla-length):" \
+  "(java-cp-include-files):" \
+  "(lazy-methods)" \
+  "(lazy-methods-extra-entry-point):" \
+  "(java-load-class):" \
   "(java-no-load-class):"
 
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP /*NOLINT*/                                          \
+  " --disable-uncaught-exception-check" \
+  "                                  ignore uncaught exceptions and errors\n" \
+  " --throw-assertion-error          throw java.lang.AssertionError on violated\n"               /* NOLINT(*) */ \
+  "                                  assert statements instead of failing\n" \
+  "                                  at the location of the assert statement\n"                  /* NOLINT(*) */ \
   " --java-assume-inputs-non-null    never initialize reference-typed parameter to the\n"        /* NOLINT(*) */ \
   "                                  entry point with null\n"                                    /* NOLINT(*) */ \
   " --java-throw-runtime-exceptions  make implicit runtime exceptions explicit\n"                /* NOLINT(*) */ \
@@ -55,6 +63,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "                                  treat METHODNAME as a possible program entry point for\n"   /* NOLINT(*) */ \
   "                                  the purpose of lazy method loading\n"                       /* NOLINT(*) */ \
   "                                  A '.*' wildcard is allowed to specify all class members\n"
+// clang-format on
 
 class symbolt;
 
@@ -167,6 +176,8 @@ protected:
   std::vector<irep_idt> lazy_methods_extra_entry_points;
   bool string_refinement_enabled;
   bool throw_runtime_exceptions;
+  bool assert_uncaught_exceptions;
+  bool throw_assertion_error;
   java_string_library_preprocesst string_preprocess;
   std::string java_cp_include_files;
 

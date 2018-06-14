@@ -32,11 +32,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
+#include <util/string_constant.h>
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/resolve_inherited_component.h>
+
 #include <analyses/cfg_dominators.h>
+#include <analyses/uncaught_exceptions_analysis.h>
 
 #include <limits>
 #include <algorithm>
@@ -2248,10 +2251,40 @@ void java_bytecode_convert_methodt::convert_athrow(
   codet &c,
   exprt::operandst &results) const
 {
-  side_effect_expr_throwt throw_expr;
-  throw_expr.add_source_location() = location;
-  throw_expr.copy_to_operands(op[0]);
-  c = code_expressiont(throw_expr);
+  if(
+    !throw_assertion_error &&
+    uncaught_exceptions_domaint::get_exception_type(op[0].type()) ==
+      "java::java.lang.AssertionError")
+  {
+    // we translate athrow into
+    // ASSERT false;
+    // ASSUME false:
+    code_assertt assert_code;
+    assert_code.assertion() = false_exprt();
+    source_locationt assert_location = location; // copy
+    assert_location.set_comment("assertion at " + location.as_string());
+    assert_location.set("user-provided", true);
+    assert_location.set_property_class(ID_assertion);
+    assert_code.add_source_location() = assert_location;
+
+    code_assumet assume_code;
+    assume_code.assumption() = false_exprt();
+    source_locationt assume_location = location; // copy
+    assume_location.set("user-provided", true);
+    assume_code.add_source_location() = assume_location;
+
+    code_blockt ret_block;
+    ret_block.move_to_operands(assert_code);
+    ret_block.move_to_operands(assume_code);
+    c = ret_block;
+  }
+  else
+  {
+    side_effect_expr_throwt throw_expr;
+    throw_expr.add_source_location() = location;
+    throw_expr.copy_to_operands(op[0]);
+    c = code_expressiont(throw_expr);
+  }
   results[0] = op[0];
 }
 
@@ -3055,6 +3088,7 @@ void java_bytecode_convert_method(
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
+  bool throw_assertion_error,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess,
   const class_hierarchyt &class_hierarchy)
@@ -3073,6 +3107,7 @@ void java_bytecode_convert_method(
     symbol_table,
     message_handler,
     max_array_length,
+    throw_assertion_error,
     needed_lazy_methods,
     string_preprocess,
     class_hierarchy);

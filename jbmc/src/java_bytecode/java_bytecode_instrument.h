@@ -15,6 +15,8 @@ Date:   June 2017
 #include <util/message.h>
 #include <util/irep.h>
 
+class codet;
+
 void java_bytecode_instrument_symbol(
   symbol_table_baset &symbol_table,
   symbolt &symbol,
@@ -25,6 +27,11 @@ void java_bytecode_instrument(
   symbol_tablet &symbol_table,
   const bool throw_runtime_exceptions,
   message_handlert &_message_handler);
+
+void java_bytecode_instrument_uncaught_exceptions(
+  codet &init_code,
+  const symbolt &exc_symbol,
+  const source_locationt &source_location);
 
 extern const std::vector<std::string> exception_needed_classes;
 

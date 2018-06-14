@@ -3,8 +3,8 @@ test.class
 --function test.main
 ^EXIT=10$
 ^SIGNAL=0$
-assertion at file test\.java line 7 function java::test\.main:\(\)V bytecode-index 9: SUCCESS
-assertion at file test\.java line 10 function java::test\.main:\(\)V bytecode-index 22: FAILURE
+assertion at file test\.java line 7 function java::test\.main:\(\)V bytecode-index 10: SUCCESS
+assertion at file test\.java line 10 function java::test\.main:\(\)V bytecode-index 23: FAILURE
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

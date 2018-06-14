@@ -164,13 +164,7 @@ bool remove_exceptionst::function_or_callees_may_throw(
   {
     if(instr_it->is_throw())
     {
-      const exprt &exc =
-        uncaught_exceptions_domaint::get_exception_symbol(instr_it->code);
-      bool is_assertion_error =
-        id2string(uncaught_exceptions_domaint::get_exception_type(exc.type())).
-        find("java.lang.AssertionError")!=std::string::npos;
-      if(!is_assertion_error)
-        return true;
+      return true;
     }
 
     if(instr_it->is_function_call())
@@ -380,15 +374,6 @@ bool remove_exceptionst::instrument_throw(
 
   const exprt &exc_expr=
     uncaught_exceptions_domaint::get_exception_symbol(instr_it->code);
-  bool assertion_error=id2string(
-    uncaught_exceptions_domaint::get_exception_type(exc_expr.type())).
-    find("java.lang.AssertionError")!=std::string::npos;
-
-  // we don't count AssertionError (we couldn't catch it anyway
-  // and this may reduce the instrumentation considerably if the programmer
-  // used assertions)
-  if(assertion_error)
-    return false;
 
   add_exception_dispatch_sequence(
     goto_program, instr_it, stack_catch, locals);

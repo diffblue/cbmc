@@ -81,7 +81,9 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
 
   if(s_it==symbol_table.symbols.end())
   {
-    PRECONDITION(has_prefix(id2string(identifier), "java::"));
+    PRECONDITION(
+      has_prefix(id2string(identifier), "java::") ||
+      has_prefix(id2string(identifier), CPROVER_PREFIX));
 
     // no, create the symbol
     symbolt new_symbol;
