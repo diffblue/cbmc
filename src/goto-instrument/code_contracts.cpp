@@ -18,15 +18,17 @@ Date: February 2016
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
+#include <util/make_unique.h>
 #include <util/replace_symbol.h>
 
 #include <goto-programs/remove_skip.h>
 
-#include <analyses/local_may_alias.h>
+#include <analyses/goto_rw.h>
 
 #include <linking/static_lifetime_init.h>
 
-#include "function_modifies.h"
+#include <pointer-analysis/value_set_analysis_fi.h>
+
 #include "loop_utils.h"
 
 enum class contract_opst
@@ -61,12 +63,12 @@ protected:
 
   void apply_contract(
     goto_programt &goto_program,
-    const local_may_aliast &local_may_alias,
+    value_setst &value_sets,
     goto_programt::targett target);
 
   void apply_invariant(
     goto_functionst::goto_functiont &goto_function,
-    const local_may_aliast &local_may_alias,
+    value_setst &value_sets,
     const goto_programt::targett loop_head,
     const loopt &loop);
 
@@ -77,7 +79,7 @@ protected:
 
   void check_apply_invariant(
     goto_functionst::goto_functiont &goto_function,
-    const local_may_aliast &local_may_alias,
+    value_setst &value_sets,
     const goto_programt::targett loop_head,
     const loopt &loop);
 
@@ -88,7 +90,7 @@ protected:
 
 void code_contractst::apply_contract(
   goto_programt &goto_program,
-  const local_may_aliast &local_may_alias,
+  value_setst &value_sets,
   goto_programt::targett target)
 {
   const code_function_callt &call=to_code_function_call(target->code);
@@ -119,17 +121,27 @@ void code_contractst::apply_contract(
   }
 
   // find out what can be written by the function
-  // TODO Use a better write-set analysis.
   modifiest modifies;
-  function_modifiest function_modifies(goto_functions);
 
-  // Handle return value of the function
-  if(call.lhs().is_not_nil())
+  rw_range_set_value_sett rw_set(ns, value_sets);
+  goto_rw(goto_functions, function, rw_set);
+  forall_rw_range_set_w_objects(it, rw_set)
   {
-    function_modifies.get_modifies_lhs(
-      local_may_alias, target, call.lhs(), modifies);
+    // Skip over local variables of the function being called, as well as
+    // variables not in the namespace (e.g. symex::invalid_object)
+    const symbolt *symbol_ptr;
+    if(!ns.lookup(it->first, symbol_ptr))
+    {
+      const std::string &name_string = id2string(symbol_ptr->name);
+      std::string scope_prefix(id2string(ns.lookup(function).name));
+      scope_prefix += "::";
+
+      if(name_string.find(scope_prefix) == std::string::npos)
+      {
+        modifies.insert(ns.lookup(it->first).symbol_expr());
+      }
+    }
   }
-  function_modifies(call.function(), modifies);
 
   // build the havocking code
   goto_programt havoc_code;
@@ -162,6 +174,18 @@ void code_contractst::apply_contract(
   replace(requires);
   replace(ensures);
 
+  // Havoc the return value of the function call.
+  if(type.return_type() != empty_typet())
+  {
+    const exprt &lhs = call.lhs();
+    const exprt &rhs = side_effect_expr_nondett(call.lhs().type());
+    target->make_assignment(code_assignt(lhs, rhs));
+  }
+  else
+  {
+    target->make_skip();
+  }
+
   if(requires.is_not_nil())
   {
     goto_programt::instructiont a(ASSERT);
@@ -173,15 +197,19 @@ void code_contractst::apply_contract(
     ++target;
   }
 
-  // TODO some sort of replacement on havoc code
   goto_program.destructive_insert(target, havoc_code);
 
-  target->make_assumption(ensures);
+  {
+    goto_programt::targett a = goto_program.insert_after(target);
+    a->make_assumption(ensures);
+    a->function = target->function;
+    a->source_location = target->source_location;
+  }
 }
 
 void code_contractst::apply_invariant(
   goto_functionst::goto_functiont &goto_function,
-  const local_may_aliast &local_may_alias,
+  value_setst &value_sets,
   const goto_programt::targett loop_head,
   const loopt &loop)
 {
@@ -216,7 +244,20 @@ void code_contractst::apply_invariant(
 
   // find out what can get changed in the loop
   modifiest modifies;
-  get_modifies(local_may_alias, loop, modifies);
+
+  rw_range_set_value_sett rw_set(ns, value_sets);
+  for(const goto_programt::targett &inst : loop)
+  {
+    goto_rw(inst, rw_set);
+  }
+  forall_rw_range_set_w_objects(it, rw_set)
+  {
+    const symbolt *symbol_ptr;
+    if(!ns.lookup(it->first, symbol_ptr))
+    {
+      modifies.insert(ns.lookup(it->first).symbol_expr());
+    }
+  }
 
   // build the havocking code
   goto_programt havoc_code;
@@ -388,7 +429,7 @@ void code_contractst::check_contract(
 
 void code_contractst::check_apply_invariant(
   goto_functionst::goto_functiont &goto_function,
-  const local_may_aliast &local_may_alias,
+  value_setst &value_sets,
   const goto_programt::targett loop_head,
   const loopt &loop)
 {
@@ -406,7 +447,9 @@ void code_contractst::check_apply_invariant(
   exprt invariant =
     static_cast<const exprt &>(loop_end->guard.find(ID_C_spec_loop_invariant));
   if(invariant.is_nil())
+  {
     return;
+  }
 
   // change H: loop; E: ...
   // to
@@ -421,7 +464,20 @@ void code_contractst::check_apply_invariant(
 
   // find out what can get changed in the loop
   modifiest modifies;
-  get_modifies(local_may_alias, loop, modifies);
+
+  rw_range_set_value_sett rw_set(ns, value_sets);
+  for(const goto_programt::targett &inst : loop)
+  {
+    goto_rw(inst, rw_set);
+  }
+  forall_rw_range_set_w_objects(it, rw_set)
+  {
+    const symbolt *symbol_ptr;
+    if(!ns.lookup(it->first, symbol_ptr))
+    {
+      modifies.insert(ns.lookup(it->first).symbol_expr());
+    }
+  }
 
   // build the havocking code
   goto_programt havoc_code;
@@ -490,24 +546,26 @@ const symbolt &code_contractst::new_tmp_symbol(
 
 void code_contractst::apply_code_contracts()
 {
+  auto vs = util_make_unique<value_set_analysis_fit>(ns);
+  (*vs)(goto_functions);
+  std::unique_ptr<value_setst> value_sets = std::move(vs);
+
   Forall_goto_functions(it, goto_functions)
   {
     goto_functionst::goto_functiont &goto_function = it->second;
 
-    // TODO: This aliasing check is insufficiently strong, in general.
-    local_may_aliast local_may_alias(goto_function);
     natural_loops_mutablet natural_loops(goto_function.body);
 
     for(const auto &l_it : natural_loops.loop_map)
     {
-      apply_invariant(goto_function, local_may_alias, l_it.first, l_it.second);
+      apply_invariant(goto_function, *value_sets, l_it.first, l_it.second);
     }
 
     Forall_goto_program_instructions(it, goto_function.body)
     {
       if(it->is_function_call())
       {
-        apply_contract(goto_function.body, local_may_alias, it);
+        apply_contract(goto_function.body, *value_sets, it);
       }
     }
   }
@@ -517,6 +575,10 @@ void code_contractst::apply_code_contracts()
 
 void code_contractst::check_code_contracts()
 {
+  auto vs = util_make_unique<value_set_analysis_fit>(ns);
+  (*vs)(goto_functions);
+  std::unique_ptr<value_setst> value_sets = std::move(vs);
+
   goto_functionst::function_mapt::iterator i_it=
     goto_functions.function_map.find(INITIALIZE_FUNCTION);
   assert(i_it!=goto_functions.function_map.end());
@@ -526,21 +588,19 @@ void code_contractst::check_code_contracts()
   {
     goto_functionst::goto_functiont &goto_function = it->second;
 
-    // TODO: This aliasing check is insufficiently strong, in general.
-    local_may_aliast local_may_alias(goto_function);
     natural_loops_mutablet natural_loops(goto_function.body);
 
     for(const auto &l_it : natural_loops.loop_map)
     {
       check_apply_invariant(
-        goto_function, local_may_alias, l_it.first, l_it.second);
+        goto_function, *value_sets, l_it.first, l_it.second);
     }
 
     Forall_goto_program_instructions(it, goto_function.body)
     {
       if(it->is_function_call())
       {
-        apply_contract(goto_function.body, local_may_alias, it);
+        apply_contract(goto_function.body, *value_sets, it);
       }
     }
   }
