@@ -63,6 +63,14 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
   if(is_reference(symbol.type))
   {
     typecheck_expr(symbol.value);
+
+    if(has_auto(symbol.type))
+    {
+      cpp_convert_auto(symbol.type, symbol.value.type());
+      typecheck_type(symbol.type);
+      implicit_typecast(symbol.value, symbol.type);
+    }
+
     reference_initializer(symbol.value, symbol.type);
   }
   else if(cpp_is_pod(symbol.type))
