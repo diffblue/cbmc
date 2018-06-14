@@ -1,10 +1,9 @@
-KNOWNBUG
+CORE
 main.c
 --check-code-contracts
 ^\[main.assertion.1\] assertion y == 0: FAILURE$
 ^\[main.assertion.2\] assertion z == 1: SUCCESS$
 ^\[foo.1\] : SUCCESS$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
 --
 --
-Contract checking does not properly havoc function calls.
