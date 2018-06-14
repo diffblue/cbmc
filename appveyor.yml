@@ -91,7 +91,6 @@ test_script:
     rmdir /s /q jbmc\classpath1
     rmdir /s /q jbmc\jar-file3
     rmdir /s /q jbmc\tableswitch2
-    rmdir /s /q jbmc-concurrency\explicit_thread_blocks
     cd ../..
 
     make -C jbmc/regression test
