@@ -14,6 +14,7 @@ SRC += unit_tests.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
        goto-programs/goto_trace_output.cpp \
        path_strategies.cpp \
+       solvers/refinement/array_pool/array_pool.cpp \
        solvers/refinement/string_constraint_generator_valueof/calculate_max_string_length.cpp \
        solvers/refinement/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
        solvers/refinement/string_constraint_generator_valueof/is_digit_with_radix.cpp \
