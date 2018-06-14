@@ -45,11 +45,9 @@ SRC = arith_tools.cpp \
       message.cpp \
       mp_arith.cpp \
       namespace.cpp \
-      nondet_ifthenelse.cpp \
       options.cpp \
       parse_options.cpp \
       parser.cpp \
-      pipe_stream.cpp \
       pointer_offset_size.cpp \
       pointer_predicates.cpp \
       rational.cpp \
