@@ -1460,8 +1460,10 @@ void goto_convertt::convert_goto(
   const codet &code,
   goto_programt &dest)
 {
-  // this instruction will turn into a goto during post-processing
-  goto_programt::targett t=dest.add_instruction(NO_INSTRUCTION_TYPE);
+  // this instruction will be completed during post-processing
+  // it is required to mark this as GOTO in order to enable
+  // simplifications in generate_ifthenelse
+  goto_programt::targett t = dest.add_instruction(GOTO);
   t->source_location=code.source_location();
   t->code=code;
 
