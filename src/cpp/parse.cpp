@@ -856,6 +856,20 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
   namespace_spec.set_namespace(name);
   namespace_spec.set_is_inline(is_inline);
 
+  // Tolerate constructs such as:
+  // inline namespace __cxx11 __attribute__((__abi_tag__ ("cxx11"))) { }
+  // which occurs in glibc. Obviously we need to better than just throw attribs
+  // away like this in the future.
+  if(lex.LookAhead(0)==TOK_GCC_ATTRIBUTE)
+  {
+    cpp_tokent tk;
+    lex.get_token(tk);
+
+    typet discard;
+    if(!rAttribute(discard))
+      return false;
+  }
+
   switch(lex.LookAhead(0))
   {
   case '{':
