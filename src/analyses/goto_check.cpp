@@ -1422,7 +1422,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
   }
   else if(expr.id()==ID_and || expr.id()==ID_or)
   {
-    if(!expr.is_boolean())
+    if(ns.follow(expr.type()).id() != ID_bool)
       throw "`"+expr.id_string()+"' must be Boolean, but got "+
             expr.pretty();
 
@@ -1430,16 +1430,18 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
 
     for(const auto &op : expr.operands())
     {
-      if(!op.is_boolean())
+      auto op_followed = op;
+      op_followed.type() = ns.follow(op_followed.type());
+      if(op_followed.type().id() != ID_bool)
         throw "`"+expr.id_string()+"' takes Boolean operands only, but got "+
-              op.pretty();
+              op_followed.pretty();
 
-      check_rec(op, guard, false);
+      check_rec(op_followed, guard, false);
 
       if(expr.id()==ID_or)
-        guard.add(not_exprt(op));
+        guard.add(not_exprt(op_followed));
       else
-        guard.add(op);
+        guard.add(op_followed);
     }
 
     guard.swap(old_guard);
