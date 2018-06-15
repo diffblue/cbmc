@@ -720,6 +720,11 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     // we have the base class, java.lang.Object, length and data
     // of appropriate type
     class_type.set_tag(symbol_type_identifier);
+    // Note that non-array types don't have "java::" at the beginning of their
+    // tag, and their name is "java::" + their tag. Since arrays do have
+    // "java::" at the beginning of their tag we set the name to be the same as
+    // the tag.
+    class_type.set(ID_name, symbol_type_identifier);
 
     class_type.components().reserve(3);
     class_typet::componentt base_class_component(
