@@ -268,10 +268,9 @@ protected:
     const irep_idt &mode);
   void
   convert_init(const codet &code, goto_programt &dest, const irep_idt &mode);
-  void convert_goto(const codet &code, goto_programt &dest);
+  void convert_goto(const code_gotot &code, goto_programt &dest);
   void convert_gcc_computed_goto(const codet &code, goto_programt &dest);
   void convert_skip(const codet &code, goto_programt &dest);
-  void convert_non_deterministic_goto(const codet &code, goto_programt &dest);
   void convert_label(
     const code_labelt &code,
     goto_programt &dest,
@@ -355,7 +354,7 @@ protected:
 
   void finish_gotos(goto_programt &dest, const irep_idt &mode);
   void finish_computed_gotos(goto_programt &dest);
-  void finish_guarded_gotos(goto_programt &dest);
+  void optimize_guarded_gotos(goto_programt &dest);
 
   typedef std::map<irep_idt,
                    std::pair<goto_programt::targett, destructor_stackt>>
@@ -544,15 +543,6 @@ protected:
     bool leave_set;
     std::size_t leave_stack_size;
   };
-
-  struct guarded_gotot
-  {
-    goto_programt::targett ifiter;
-    goto_programt::targett gotoiter;
-    exprt guard;
-  };
-  typedef std::list<guarded_gotot> guarded_gotost;
-  guarded_gotost guarded_gotos;
 
   exprt case_guard(
     const exprt &value,

@@ -490,6 +490,8 @@ goto_programt::targett string_abstractiont::abstract(
   case OTHER:
   case LOCATION:
     break;
+
+  case INCOMPLETE_GOTO:
   case NO_INSTRUCTION_TYPE:
     UNREACHABLE;
     break;

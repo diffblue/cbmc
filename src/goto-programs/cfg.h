@@ -418,6 +418,7 @@ void cfg_baset<T, P, I>::compute_edges(
     break;
 
   case NO_INSTRUCTION_TYPE:
+  case INCOMPLETE_GOTO:
     UNREACHABLE;
     break;
   }
