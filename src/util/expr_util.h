@@ -30,6 +30,18 @@ class symbolt;
 class typet;
 class namespacet;
 
+/// Creates a type with size (in bytes) equal to the size argument.
+/// Makes use of sizeof() in the argument to avoid unnecessary use of byte
+/// arrays.
+/// \param size: An expression describing the size (in bytes) of the desired
+///              type.
+/// \param ns : A namespace for symbol type lookups.
+/// \return A type with size given by the argument \a size.
+///         If \a size is of the form n*sizeof(T) (or sizeof(T)*n), then this
+///         type will be T[n]. If \a size is of the form sizeof(T), then this
+///         type will be T. Otherwise, the type will be unsigned char[size].
+typet type_from_size(const exprt &size, const namespacet &ns);
+
 /// Returns true iff the argument is (syntactically) an lvalue.
 bool is_lvalue(const exprt &expr);
 
