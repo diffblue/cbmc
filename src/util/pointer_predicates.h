@@ -31,6 +31,11 @@ exprt null_object(const exprt &pointer);
 exprt null_pointer(const exprt &pointer);
 exprt integer_address(const exprt &pointer);
 exprt invalid_pointer(const exprt &pointer);
+exprt points_to_valid_memory(const exprt &pointer, const exprt &size);
+exprt points_to_valid_memory_def(
+  const exprt &pointer,
+  const exprt &size,
+  const namespacet &);
 exprt dynamic_object_lower_bound(
   const exprt &pointer,
   const namespacet &,

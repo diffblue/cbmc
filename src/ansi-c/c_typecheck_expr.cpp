@@ -33,6 +33,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "anonymous_member.h"
 #include "padding.h"
 
+bool is_lvalue(const exprt &expr);
+
 void c_typecheck_baset::typecheck_expr(exprt &expr)
 {
   if(expr.id()==ID_already_typechecked)
@@ -2125,6 +2127,47 @@ exprt c_typecheck_baset::do_special_functions(
 
     exprt same_object_expr = invalid_pointer(expr.arguments().front());
     same_object_expr.add_source_location()=source_location;
+
+    return same_object_expr;
+  }
+  else if(identifier == CPROVER_PREFIX "points_to_valid_memory")
+  {
+    if(expr.arguments().size() != 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << "points_to_valid_memory expects two operands" << eom;
+      throw 0;
+    }
+    if(!is_lvalue(expr.arguments().front()))
+    {
+      error().source_location = f_op.source_location();
+      error() << "ptr argument to points_to_valid_memory"
+              << " must be an lvalue" << eom;
+      throw 0;
+    }
+
+    exprt same_object_expr;
+    if(expr.arguments().size() == 2)
+    {
+// TODO: We should add some way to enforce that the second argument
+// has a reasonable type (coercible to __CPROVER_size_t).
+#if 0
+      if(expr.arguments()[1].type() <[cannot be coerced to size_t]>)
+      {
+        err_location(f_op);
+        error() << "size argument to points_to_valid_memory"
+                << " must be coercible to size_t" << eom;
+        throw 0;
+      }
+#endif
+      same_object_expr =
+        points_to_valid_memory(expr.arguments()[0], expr.arguments()[1]);
+    }
+    else
+    {
+      UNREACHABLE;
+    }
+    same_object_expr.add_source_location() = source_location;
 
     return same_object_expr;
   }
