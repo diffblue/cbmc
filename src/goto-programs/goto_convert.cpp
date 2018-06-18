@@ -138,9 +138,7 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
         throw 0;
       }
 
-      i.type=GOTO;
-      i.targets.clear();
-      i.targets.push_back(l_it->second.first);
+      i.complete_goto(l_it->second.first);
 
       // If the goto recorded a destructor stack, execute as much as is
       // appropriate for however many automatic variables leave scope.
@@ -234,45 +232,49 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
   targets.computed_gotos.clear();
 }
 
-/// For each if(x) goto z; goto y; z: emitted, see if any destructor statements
-/// were inserted between goto z and z, and if not, simplify into if(!x) goto y;
+/// Rewrite "if(x) goto z; goto y; z:" into "if(!x) goto y;"
+/// This only works if the "goto y" is not a branch target.
 /// \par parameters: Destination goto program
-void goto_convertt::finish_guarded_gotos(goto_programt &dest)
+void goto_convertt::optimize_guarded_gotos(goto_programt &dest)
 {
-  for(auto &gg : guarded_gotos)
-  {
-    // Check if any destructor code has been inserted:
-    bool destructor_present=false;
-    for(auto it=gg.ifiter;
-        it!=gg.gotoiter && !destructor_present;
-        ++it)
-    {
-      if(!(it->is_goto() || it->is_skip()))
-        destructor_present=true;
-    }
+  // We cannot use a set of targets, as target iterators
+  // cannot be compared at this stage.
 
-    // If so, can't simplify.
-    if(destructor_present)
+  // collect targets: reset marking
+  for(auto &i : dest.instructions)
+    i.target_number = goto_programt::instructiont::nil_target;
+
+  // mark the goto targets
+  unsigned cnt = 0;
+  for(const auto &i : dest.instructions)
+    if(i.is_goto())
+      i.get_target()->target_number = (++cnt);
+
+  for(auto it = dest.instructions.begin(); it != dest.instructions.end(); it++)
+  {
+    if(!it->is_goto())
       continue;
 
-    // Simplify: remove whatever code was generated for the condition
-    // and attach the original guard to the goto instruction.
-    gg.gotoiter->guard=gg.guard;
-    // inherit the source location (otherwise the guarded goto will
-    // have the source location of the else branch)
-    gg.gotoiter->source_location=gg.ifiter->source_location;
-    // goto_programt doesn't provide an erase operation,
-    // perhaps for a good reason, so let's be cautious and just
-    // flatten the unneeded instructions into skips.
-    for(auto it=gg.ifiter, itend=gg.gotoiter; it!=itend; ++it)
-      it->make_skip();
+    auto it_goto_y = std::next(it);
+
+    if(
+      it_goto_y == dest.instructions.end() || !it_goto_y->is_goto() ||
+      !it_goto_y->guard.is_true() || it_goto_y->is_target())
+      continue;
+
+    auto it_z = std::next(it_goto_y);
+
+    if(it_z == dest.instructions.end())
+      continue;
+
+    // cannot compare iterators, so compare target number instead
+    if(it->get_target()->target_number == it_z->target_number)
+    {
+      it->set_target(it_goto_y->get_target());
+      it->guard = boolean_negate(it->guard);
+      it_goto_y->make_skip();
+    }
   }
-
-  // Must clear this, as future functions may be converted
-  // using the same instance of goto_convertt, typically via
-  // goto_convert_functions.
-
-  guarded_gotos.clear();
 }
 
 void goto_convertt::goto_convert(
@@ -288,14 +290,11 @@ void goto_convertt::goto_convert_rec(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  // Check that guarded_gotos was cleared after any previous use of this
-  // converter instance:
-  PRECONDITION(guarded_gotos.empty());
   convert(code, dest, mode);
 
   finish_gotos(dest, mode);
   finish_computed_gotos(dest);
-  finish_guarded_gotos(dest);
+  optimize_guarded_gotos(dest);
   finish_catch_push_targets(dest);
 }
 
@@ -493,13 +492,11 @@ void goto_convertt::convert(
   else if(statement==ID_continue)
     convert_continue(to_code_continue(code), dest, mode);
   else if(statement==ID_goto)
-    convert_goto(code, dest);
+    convert_goto(to_code_goto(code), dest);
   else if(statement==ID_gcc_computed_goto)
     convert_gcc_computed_goto(code, dest);
   else if(statement==ID_skip)
     convert_skip(code, dest);
-  else if(statement=="non-deterministic-goto")
-    convert_non_deterministic_goto(code, dest);
   else if(statement==ID_ifthenelse)
     convert_ifthenelse(to_code_ifthenelse(code), dest, mode);
   else if(statement==ID_start_thread)
@@ -1456,16 +1453,12 @@ void goto_convertt::convert_continue(
   t->source_location=code.source_location();
 }
 
-void goto_convertt::convert_goto(
-  const codet &code,
-  goto_programt &dest)
+void goto_convertt::convert_goto(const code_gotot &code, goto_programt &dest)
 {
   // this instruction will be completed during post-processing
-  // it is required to mark this as GOTO in order to enable
-  // simplifications in generate_ifthenelse
-  goto_programt::targett t = dest.add_instruction(GOTO);
+  goto_programt::targett t = dest.add_instruction();
+  t->make_incomplete_goto(code);
   t->source_location=code.source_location();
-  t->code=code;
 
   // remember it to do the target later
   targets.gotos.push_back(std::make_pair(t, targets.destructor_stack));
@@ -1482,13 +1475,6 @@ void goto_convertt::convert_gcc_computed_goto(
 
   // remember it to do this later
   targets.computed_gotos.push_back(t);
-}
-
-void goto_convertt::convert_non_deterministic_goto(
-  const codet &code,
-  goto_programt &dest)
-{
-  convert_goto(code, dest);
 }
 
 void goto_convertt::convert_start_thread(
@@ -1649,24 +1635,7 @@ void goto_convertt::generate_ifthenelse(
     return;
   }
 
-  bool is_guarded_goto=false;
-
-  // do guarded gotos directly
-  if(is_empty(false_case) &&
-     is_size_one(true_case) &&
-     true_case.instructions.back().is_goto() &&
-     true_case.instructions.back().guard.is_true() &&
-     true_case.instructions.back().labels.empty())
-  {
-    // The above conjunction deliberately excludes the instance
-    // if(some) { label: goto somewhere; }
-    // Don't perform the transformation here, as code might get inserted into
-    // the true case to perform destructors.
-    // This will be attempted in finish_guarded_gotos.
-    is_guarded_goto=true;
-  }
-
-  // similarly, do guarded assertions directly
+  // do guarded assertions directly
   if(is_size_one(true_case) &&
      true_case.instructions.back().is_assert() &&
      true_case.instructions.back().guard.is_false() &&
@@ -1778,13 +1747,6 @@ void goto_convertt::generate_ifthenelse(
   x->make_goto(z);
   assert(!tmp_w.instructions.empty());
   x->source_location=tmp_w.instructions.back().source_location;
-
-  // See if we can simplify this guarded goto later.
-  // Note this depends on the fact that `instructions` is a std::list
-  // and so goto-program-destructive-append preserves iterator validity.
-  if(is_guarded_goto)
-    guarded_gotos.push_back(
-      {tmp_v.instructions.begin(), tmp_w.instructions.begin(), guard});
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);

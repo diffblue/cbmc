@@ -245,6 +245,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       return convert_catch(target, upper_bound, dest);
 
     case NO_INSTRUCTION_TYPE:
+    case INCOMPLETE_GOTO:
       UNREACHABLE;
   }
 
