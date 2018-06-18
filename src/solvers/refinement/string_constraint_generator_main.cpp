@@ -184,28 +184,15 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
   PRECONDITION(
     char_array_type.subtype().id() == ID_unsignedbv ||
     char_array_type.subtype().id() == ID_signedbv);
-  std::string symbol_name;
-  if(
-    char_pointer.id() == ID_address_of &&
-    (to_address_of_expr(char_pointer).object().id() == ID_index) &&
-    char_pointer.op0().op0().id() == ID_array)
-  {
-    // Do not replace constant arrays
-    return to_array_string_expr(
-      to_index_expr(to_address_of_expr(char_pointer).object()).array());
-  }
-  else if(char_pointer.id() == ID_address_of)
-  {
-    symbol_name = "char_array_of_address";
-  }
-  else if(char_pointer.id() == ID_if)
+
+  if(char_pointer.id() == ID_if)
   {
     const if_exprt &if_expr = to_if_expr(char_pointer);
     const array_string_exprt t =
       make_char_array_for_char_pointer(if_expr.true_case(), char_array_type);
     const array_string_exprt f =
       make_char_array_for_char_pointer(if_expr.false_case(), char_array_type);
-    array_typet array_type(
+    const array_typet array_type(
       char_array_type.subtype(),
       if_exprt(
         if_expr.cond(),
@@ -213,30 +200,21 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
         to_array_type(f.type()).size()));
     return to_array_string_expr(if_exprt(if_expr.cond(), t, f, array_type));
   }
-  else if(char_pointer.id() == ID_symbol)
-    symbol_name = "char_array_symbol";
-  else if(char_pointer.id() == ID_member)
-    symbol_name = "char_array_member";
-  else if(
-    char_pointer.id() == ID_constant &&
-    to_constant_expr(char_pointer).get_value() == ID_NULL)
+  const bool is_constant_array =
+    char_pointer.id() == ID_address_of &&
+    (to_address_of_expr(char_pointer).object().id() == ID_index) &&
+    char_pointer.op0().op0().id() == ID_array;
+  if(is_constant_array)
   {
-    /// \todo Check if the case char_array_null occurs.
-    array_typet array_type(
-      char_array_type.subtype(),
-      from_integer(0, to_array_type(char_array_type).size().type()));
-    symbol_exprt array_sym = fresh_symbol("char_array_null", array_type);
-    return to_array_string_expr(array_sym);
+    return to_array_string_expr(
+      to_index_expr(to_address_of_expr(char_pointer).object()).array());
   }
-  else
-    symbol_name = "unknown_char_array";
-
-  array_string_exprt array_sym =
+  const std::string symbol_name = "char_array_" + id2string(char_pointer.id());
+  const auto array_sym =
     to_array_string_expr(fresh_symbol(symbol_name, char_array_type));
-  auto insert_result =
-    arrays_of_pointers.insert(std::make_pair(char_pointer, array_sym));
-  array_string_exprt result = to_array_string_expr(insert_result.first->second);
-  return result;
+  const auto insert_result =
+    arrays_of_pointers.insert({char_pointer, array_sym});
+  return  to_array_string_expr(insert_result.first->second);
 }
 
 void array_poolt::insert(
