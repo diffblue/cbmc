@@ -37,8 +37,8 @@ protected:
 public:
   virtual ~generate_function_bodiest() = default;
 
-  /// Replace the function body with one based on the implementation
-  /// This will work the same whether or not the function already has a body
+  /// Replace the function body with one based on the replace_function_body
+  /// class being used.
   /// \param function whose body to replace
   /// \param symbol_table of the current goto program
   /// \param function_name Identifier of function
