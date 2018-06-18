@@ -1038,6 +1038,16 @@ bool java_bytecode_languaget::convert_single_method(
     return false;
   }
 
+  // The return of an opaque function is a source of an otherwise invisible
+  // instantiation, so here we ensure we've loaded the appropriate classes.
+  const code_typet function_type = to_code_type(symbol.type);
+  if(
+    const pointer_typet *pointer_return_type =
+      type_try_dynamic_cast<pointer_typet>(function_type.return_type()))
+  {
+    needed_lazy_methods->add_all_needed_classes(*pointer_return_type);
+  }
+
   return true;
 }
 

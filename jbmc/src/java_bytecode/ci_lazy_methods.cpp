@@ -177,17 +177,6 @@ bool ci_lazy_methodst::operator()(
       symbol_table);
   }
 
-  // cproverNondetInitialize has to be force-loaded for mocks to return valid
-  // objects (objects which satisfy invariants specified in the
-  // cproverNondetInitialize method)
-  for(const auto &class_name : instantiated_classes)
-  {
-    const irep_idt cprover_validate =
-      id2string(class_name) + ".cproverNondetInitialize:()V";
-    if(symbol_table.symbols.count(cprover_validate))
-      methods_already_populated.insert(cprover_validate);
-  }
-
   // Remove symbols for methods that were declared but never used:
   symbol_tablet keep_symbols;
   // Manually keep @inflight_exception, as it is unused at this stage
