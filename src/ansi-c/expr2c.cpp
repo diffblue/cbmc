@@ -3521,6 +3521,9 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()==ID_good_pointer)
     return convert_function(src, "GOOD_POINTER", precedence=16);
 
+  else if(src.id()==ID_points_to_valid_memory)
+    return convert_function(src, "POINTS_TO_VALID_MEMORY", precedence=16);
+
   else if(src.id()==ID_object_size)
     return convert_function(src, "OBJECT_SIZE", precedence=16);
 

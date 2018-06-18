@@ -6,6 +6,7 @@ void __CPROVER_havoc_object(void *);
 __CPROVER_bool __CPROVER_equal();
 __CPROVER_bool __CPROVER_same_object(const void *, const void *);
 __CPROVER_bool __CPROVER_invalid_pointer(const void *);
+__CPROVER_bool __CPROVER_points_to_valid_memory(const void *, __CPROVER_size_t);
 __CPROVER_bool __CPROVER_is_zero_string(const void *);
 __CPROVER_size_t __CPROVER_zero_string_length(const void *);
 __CPROVER_size_t __CPROVER_buffer_size(const void *);

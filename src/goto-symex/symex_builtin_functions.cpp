@@ -14,31 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
+#include <util/expr_util.h>
 #include <util/invariant_utils.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/string2int.h>
-
-inline static typet c_sizeof_type_rec(const exprt &expr)
-{
-  const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
-
-  if(!sizeof_type.is_nil())
-  {
-    return static_cast<const typet &>(sizeof_type);
-  }
-  else if(expr.id()==ID_mult)
-  {
-    forall_operands(it, expr)
-    {
-      typet t=c_sizeof_type_rec(*it);
-      if(t.is_not_nil())
-        return t;
-    }
-  }
-
-  return nil_typet();
-}
 
 void goto_symext::symex_allocate(
   statet &state,
@@ -66,62 +46,12 @@ void goto_symext::symex_allocate(
   }
   else
   {
-    exprt tmp_size=size;
+    exprt tmp_size = size;
     state.rename(tmp_size, ns); // to allow constant propagation
-    simplify(tmp_size, ns);
-
-    // special treatment for sizeof(T)*x
-    {
-      typet tmp_type=c_sizeof_type_rec(tmp_size);
-
-      if(tmp_type.is_not_nil())
-      {
-        // Did the size get multiplied?
-        mp_integer elem_size=pointer_offset_size(tmp_type, ns);
-        mp_integer alloc_size;
-
-        if(elem_size<0)
-        {
-        }
-        else if(to_integer(tmp_size, alloc_size) &&
-                tmp_size.id()==ID_mult &&
-                tmp_size.operands().size()==2 &&
-                (tmp_size.op0().is_constant() ||
-                 tmp_size.op1().is_constant()))
-        {
-          exprt s=tmp_size.op0();
-          if(s.is_constant())
-          {
-            s=tmp_size.op1();
-            PRECONDITION(c_sizeof_type_rec(tmp_size.op0()) == tmp_type);
-          }
-          else
-            PRECONDITION(c_sizeof_type_rec(tmp_size.op1()) == tmp_type);
-
-          object_type=array_typet(tmp_type, s);
-        }
-        else
-        {
-          if(alloc_size==elem_size)
-            object_type=tmp_type;
-          else
-          {
-            mp_integer elements=alloc_size/elem_size;
-
-            if(elements*elem_size==alloc_size)
-              object_type=array_typet(
-                tmp_type, from_integer(elements, tmp_size.type()));
-          }
-        }
-      }
-    }
-
-    if(object_type.is_nil())
-      object_type=array_typet(unsigned_char_type(), tmp_size);
+    object_type = type_from_size(tmp_size, ns);
 
     // we introduce a fresh symbol for the size
     // to prevent any issues of the size getting ever changed
-
     if(object_type.id()==ID_array &&
        !to_array_type(object_type).size().is_constant())
     {
