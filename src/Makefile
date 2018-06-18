@@ -87,11 +87,12 @@ $(patsubst %, %_clean, $(DIRS)):
 # minisat2 and glucose download, for your convenience
 
 DOWNLOADER = lwp-download
+TAR = tar
 
 minisat2-download:
 	@echo "Downloading Minisat 2.2.1"
 	@$(DOWNLOADER) http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
-	@tar xfz minisat2_2.2.1.orig.tar.gz
+	@$(TAR) xfz minisat2_2.2.1.orig.tar.gz
 	@rm -Rf ../minisat-2.2.1
 	@mv minisat2-2.2.1 ../minisat-2.2.1
 	@(cd ../minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch)
@@ -100,7 +101,7 @@ minisat2-download:
 glucose-download:
 	@echo "Downloading glucose-syrup"
 	@$(DOWNLOADER) http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
-	@tar xfz glucose-syrup.tgz
+	@$(TAR) xfz glucose-syrup.tgz
 	@rm -Rf ../glucose-syrup
 	@mv glucose-syrup ../
 	@(cd ../glucose-syrup; patch -p1 < ../scripts/glucose-syrup-patch)

@@ -88,11 +88,8 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
 3. Get MiniSat2 by entering
    ```
-   cd cbmc-git
-   wget http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
-   gtar xfz minisat_2.2.1.orig.tar.gz
-   mv minisat2-2.2.1 minisat-2.2.1
-   (cd minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch)
+   cd cbmc-git/src
+   gmake minisat2-download DOWNLOADER=wget
    ```
 4. Type
    ```
