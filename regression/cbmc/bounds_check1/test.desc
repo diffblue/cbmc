@@ -3,12 +3,12 @@ main.c
 --bounds-check --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
-\[\(signed long( long)? int\)i2\]: FAILURE
-dest\[\(signed long( long)? int\)j2\]: FAILURE
-payload\[\(signed long( long)? int\)[kl]2\]: FAILURE
+\[\(.*\)i2\]: FAILURE
+dest\[\(.*\)j2\]: FAILURE
+payload\[\(.*\)[kl]2\]: FAILURE
 \*\* 10 of 72 failed
 --
 ^warning: ignoring
-\[\(signed long( long)? int\)i\]: FAILURE
-dest\[\(signed long( long)? int\)j\]: FAILURE
-payload\[\(signed long( long)? int\)[kl]\]: FAILURE
+\[\(.*\)i\]: FAILURE
+dest\[\(.*\)j\]: FAILURE
+payload\[\(.*\)[kl]\]: FAILURE
