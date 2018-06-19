@@ -1,5 +1,5 @@
 CORE
-main.c
+main.i
 --no-propagation --64
 ^EXIT=0$
 ^SIGNAL=0$
