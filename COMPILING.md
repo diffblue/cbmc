@@ -79,24 +79,23 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
 1. As root, get the necessary development tools:
    ```
-   pkg install system/header developer/lexer/flex developer/parser/bison developer/versioning/git
-   pkg install --accept developer/gcc/gcc-c++-5
+   pkgadd -d http://get.opencsw.org/now
+   /opt/csw/bin/pkgutil -U
+   /opt/csw/bin/pkgutil -i gcc5g++ bison flex git
    ```
 2. As a user, get the CBMC source via
    ```
+   export PATH=/opt/csw/bin:$PATH
    git clone https://github.com/diffblue/cbmc cbmc-git
    ```
 3. Get MiniSat2 by entering
    ```
-   cd cbmc-git
-   wget http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
-   gtar xfz minisat_2.2.1.orig.tar.gz
-   mv minisat2-2.2.1 minisat-2.2.1
-   (cd minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch)
+   cd cbmc-git/src
+   gmake minisat2-download DOWNLOADER=wget TAR=gtar
    ```
-4. Type
+4. To compile, type
    ```
-   cd src; gmake
+   gmake
    ```
    That should do it. To run, you will need
    ```
