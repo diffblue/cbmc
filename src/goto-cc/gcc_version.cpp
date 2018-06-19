@@ -31,7 +31,8 @@ void gcc_versiont::get(const std::string &executable)
            "bcc 0 0 0\n"
            "#else\n"
            "gcc __GNUC__ __GNUC_MINOR__ __GNUC_PATCHLEVEL__\n"
-           "#endif\n";
+           "#endif\n"
+           "default_c_standard __STDC_VERSION__\n";
   }
 
   // some variants output stuff on stderr, say Apple LLVM,
@@ -52,23 +53,78 @@ void gcc_versiont::get(const std::string &executable)
     std::string line;
 
     while(!in.fail() && std::getline(in, line))
-      if(!line.empty() && line[0] != '#')
-        break;
-
-    auto split = split_string(line, ' ');
-
-    if(split.size() >= 4)
     {
-      if(split[0] == "gcc")
-        flavor = flavort::GCC;
-      else if(split[0] == "bcc")
-        flavor = flavort::BCC;
-      else if(split[0] == "clang")
-        flavor = flavort::CLANG;
+      if(line.empty() || line[0] == '#')
+        continue;
 
-      v_major = unsafe_string2unsigned(split[1]);
-      v_minor = unsafe_string2unsigned(split[2]);
-      v_patchlevel = unsafe_string2unsigned(split[3]);
+      auto split = split_string(line, ' ');
+
+      if(split.size() >= 4)
+      {
+        if(split[0] == "gcc")
+          flavor = flavort::GCC;
+        else if(split[0] == "bcc")
+          flavor = flavort::BCC;
+        else if(split[0] == "clang")
+          flavor = flavort::CLANG;
+
+        v_major = unsafe_string2unsigned(split[1]);
+        v_minor = unsafe_string2unsigned(split[2]);
+        v_patchlevel = unsafe_string2unsigned(split[3]);
+      }
+      else if(split.size() == 2 && split[0] == "default_c_standard")
+      {
+        if(split[1] == "199901L")
+          default_c_standard = configt::ansi_ct::c_standardt::C99;
+        else if(split[1] == "201112L")
+          default_c_standard = configt::ansi_ct::c_standardt::C11;
+      }
+    }
+
+    if(flavor == flavort::GCC || flavor == flavort::CLANG)
+    {
+      // Grab the default C++ standard. Unfortunately this requires another
+      // run, as the compiler can't preprocess two files in one go.
+
+      temporary_filet cpp_in("goto-gcc.", ".cpp");
+      temporary_filet cpp_out("goto-gcc.", ".out");
+      temporary_filet cpp_err("goto-gcc.", ".err");
+
+      {
+        std::ofstream out(cpp_in());
+        out << "default_cxx_standard __cplusplus\n";
+      }
+
+      int result = run(
+        executable,
+        {executable, "-E", "-x", "c++", "-", "-o", "-"},
+        cpp_in(),
+        cpp_out(),
+        cpp_err());
+
+      if(result >= 0)
+      {
+        std::ifstream in(cpp_out());
+        std::string line;
+
+        while(!in.fail() && std::getline(in, line))
+        {
+          if(line.empty() || line[0] == '#')
+            continue;
+
+          auto split = split_string(line, ' ');
+
+          if(split.size() == 2 && split[0] == "default_cxx_standard")
+          {
+            if(split[1] == "199711L")
+              default_cxx_standard = configt::cppt::cpp_standardt::CPP98;
+            else if(split[1] == "201103L")
+              default_cxx_standard = configt::cppt::cpp_standardt::CPP11;
+            else if(split[1] == "201402L")
+              default_cxx_standard = configt::cppt::cpp_standardt::CPP14;
+          }
+        }
+      }
     }
   }
 }

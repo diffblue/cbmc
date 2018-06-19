@@ -597,6 +597,11 @@ int gcc_modet::doit()
     if(std_string=="gnu++14" || std_string=="c++14")
       config.cpp.set_cpp14();
   }
+  else
+  {
+    config.ansi_c.c_standard = gcc_version.default_c_standard;
+    config.cpp.cpp_standard = gcc_version.default_cxx_standard;
+  }
 
   // gcc's default is 32 bits for wchar_t
   if(cmdline.isset("short-wchar"))
