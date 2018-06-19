@@ -44,3 +44,14 @@ extern int *__errno(void)
 {
   return &__CPROVER_errno;
 }
+
+/* FUNCTION: ___errno */
+
+// This has been spotted on Solaris
+
+__CPROVER_thread_local int __CPROVER_errno;
+
+extern int *___errno(void)
+{
+  return &__CPROVER_errno;
+}
