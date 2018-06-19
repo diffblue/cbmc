@@ -1,0 +1,10 @@
+CORE
+main.c
+--full-slice --add-library
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+This is a simplified version of end-to-end regression test 'taint_crossing_substr_and_concatenation' of the security-scanner.
