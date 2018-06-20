@@ -8,20 +8,19 @@ phases:
 
   build:
     commands:
-      - 'C:\tools\cygwin\bin\sed -i "s/BUILD_ENV[ ]*=.*/BUILD_ENV = MSVC/" src/config.inc'
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
         C:\tools\cygwin\bin\bash -c "make -C src minisat2-download DOWNLOADER=wget"
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C src" '
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C unit all" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C src BUILD_ENV=MSVC" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C unit all BUILD_ENV=MSVC" '
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C jbmc/src" '
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C jbmc/unit all ; exit 0" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C jbmc/src BUILD_ENV=MSVC" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C jbmc/unit all BUILD_ENV=MSVC ; exit 0" '
 
   post_build:
     commands:
@@ -49,19 +48,19 @@ phases:
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C regression test" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C regression test BUILD_ENV=MSVC" '
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C unit test" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C unit test BUILD_ENV=MSVC" '
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C jbmc/regression test ; exit 0" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C jbmc/regression test BUILD_ENV=MSVC ; exit 0" '
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C jbmc/unit test ; exit 0" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C jbmc/unit test BUILD_ENV=MSVC ; exit 0" '
 
 artifacts:
   files:

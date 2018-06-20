@@ -2,7 +2,6 @@ version: 1.0.{build}
 image: Visual Studio 2013
 clone_depth: 50
 environment:
-  BUILD_ENV: MSVC
   PATH: C:\projects\cbmc\deps\bin;%PATH%
   INCLUDE: C:\projects\cbmc\deps\include
 install:
@@ -56,9 +55,8 @@ build_script:
     cp -r deps/minisat2-2.2.1 minisat-2.2.1
     patch -d minisat-2.2.1 -p1 < scripts/minisat-2.2.1-patch
     call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
-    sed -i "s/BUILD_ENV[ ]*=.*/BUILD_ENV = MSVC/" src/config.inc
-    make -C src -j2
-    make -C jbmc/src -j2
+    make -C src -j2 BUILD_ENV=MSVC
+    make -C jbmc/src -j2 BUILD_ENV=MSVC
 
 test_script:
 - cmd: |
@@ -80,10 +78,10 @@ test_script:
     rmdir /s /q goto-instrument\slice08
     cd ..
 
-    make -C regression test
+    make -C regression test BUILD_ENV=MSVC
 
-    make -C unit all -j2
-    make -C unit test
+    make -C unit all -j2 BUILD_ENV=MSVC
+    make -C unit test BUILD_ENV=MSVC
 
     cd jbmc/regression
     rmdir /s /q jbmc\VarLengthArrayTrace1
@@ -93,7 +91,7 @@ test_script:
     rmdir /s /q jbmc-concurrency\explicit_thread_blocks
     cd ../..
 
-    make -C jbmc/regression test
+    make -C jbmc/regression test BUILD_ENV=MSVC
 
-    make -C jbmc/unit all -j2
-    make -C jbmc/unit test
+    make -C jbmc/unit all -j2 BUILD_ENV=MSVC
+    make -C jbmc/unit test BUILD_ENV=MSVC
