@@ -168,18 +168,6 @@ bool java_string_library_preprocesst::is_java_char_array_pointer_type(
   return false;
 }
 
-/// \param symbol_table: a symbol_table containing an entry for java Strings
-/// \return the type of data fields in java Strings.
-typet string_data_type(const symbol_tablet &symbol_table)
-{
-  symbolt sym=*symbol_table.lookup("java::java.lang.String");
-  typet concrete_type=sym.type;
-  struct_typet struct_type=to_struct_type(concrete_type);
-  std::size_t index=struct_type.component_number("data");
-  typet data_type=struct_type.components()[index].type();
-  return data_type;
-}
-
 /// \return the type of the length field in java Strings.
 typet string_length_type()
 {
@@ -587,26 +575,6 @@ exprt java_string_library_preprocesst::allocate_fresh_string(
   exprt str=fresh_string(type, loc, symbol_table);
   allocate_dynamic_object_with_decl(str, symbol_table, loc, function_id, code);
   return str;
-}
-
-/// declare a new character array and allocate it
-/// \param type: a type for string
-/// \param loc: a location in the program
-/// \param symbol_table: symbol table
-/// \param code: code block to which allocation instruction will be added
-/// \return a new array
-exprt java_string_library_preprocesst::allocate_fresh_array(
-  const typet &type,
-  const source_locationt &loc,
-  const irep_idt &function_id,
-  symbol_tablet &symbol_table,
-  code_blockt &code)
-{
-  exprt array=fresh_array(type, loc, symbol_table);
-  code.add(code_declt(array), loc);
-  allocate_dynamic_object_with_decl(
-    array, symbol_table, loc, function_id, code);
-  return array;
 }
 
 /// assign the result of a function call
@@ -1709,55 +1677,6 @@ codet java_string_library_preprocesst::make_copy_constructor_code(
   symbol_exprt arg1(params[1].get_identifier(), params[1].type());
   code_assign_java_string_to_string_expr(
     string_expr, arg1, loc, symbol_table, code);
-
-  // Assign string_expr to `this` object
-  symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
-  code.add(
-    code_assign_string_expr_to_java_string(arg_this, string_expr, symbol_table),
-    loc);
-
-  return code;
-}
-
-/// Used to provide code for constructor from a char array.
-/// The implementation is similar to substring except the 3rd argument is a
-/// count instead of end index
-/// \param type: type of the function call
-/// \param loc: location in the program_invocation_name
-/// \param function_id: unused
-/// \param symbol_table: symbol table
-/// \return code implementing String intitialization from a char array and
-///         arguments offset and end.
-codet java_string_library_preprocesst::make_init_from_array_code(
-  const java_method_typet &type,
-  const source_locationt &loc,
-  const irep_idt &function_id,
-  symbol_table_baset &symbol_table)
-{
-  (void)function_id;
-
-  // Code for the output
-  code_blockt code;
-
-  java_method_typet::parameterst params = type.parameters();
-  PRECONDITION(params.size() == 4);
-  exprt::operandst args =
-    process_parameters(type.parameters(), loc, symbol_table, code);
-  INVARIANT(
-    args.size() == 4, "process_parameters preserves number of arguments");
-
-  /// \todo this assumes the array to be constant between all calls to
-  /// string primitives, which may not be true in general.
-  refined_string_exprt string_arg = to_string_expr(args[1]);
-
-  // The third argument is `count`, whereas the third argument of substring
-  // is `end` which corresponds to `offset+count`
-  refined_string_exprt string_expr = string_expr_of_function(
-    ID_cprover_string_substring_func,
-    {args[1], args[2], plus_exprt(args[2], args[3])},
-    loc,
-    symbol_table,
-    code);
 
   // Assign string_expr to `this` object
   symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
