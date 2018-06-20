@@ -146,15 +146,12 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
       // for C++ non-pod types and impossible in Java in any case.
       auto goto_stack=g_it.second;
       const auto &label_stack=l_it->second.second;
-      bool stack_is_prefix=true;
-      if(label_stack.size()>goto_stack.size())
-        stack_is_prefix=false;
-      for(std::size_t i=0, ilim=label_stack.size();
-          i!=ilim && stack_is_prefix;
-          ++i)
+      bool stack_is_prefix = label_stack.size() <= goto_stack.size();
+      for(
+        std::size_t idx = 0, ilim = label_stack.size();
+        idx != ilim && stack_is_prefix; ++idx)
       {
-        if(goto_stack[i]!=label_stack[i])
-          stack_is_prefix=false;
+        stack_is_prefix &= goto_stack[idx] == label_stack[idx];
       }
 
       if(!stack_is_prefix)
