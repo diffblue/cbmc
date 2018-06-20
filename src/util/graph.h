@@ -252,6 +252,9 @@ public:
   std::vector<node_indext>
   get_reachable(const std::vector<node_indext> &src, bool forwards) const;
 
+  void disconnect_unreachable(node_indext src);
+  void disconnect_unreachable(const std::vector<node_indext> &src);
+
   void make_chordal();
 
   // return value: number of connected subgraphs
@@ -459,6 +462,43 @@ void grapht<N>::visit_reachable(node_indext src)
   std::vector<node_indext> reachable = get_reachable(src, true);
   for(const auto index : reachable)
     nodes[index].visited = true;
+}
+
+/// Removes any edges between nodes in a graph that are unreachable from
+/// a given start node. Used for computing cone of influence,
+/// by disconnecting unreachable nodes and then performing backwards
+/// reachability.
+/// Note nodes are not actually removed from the vector nodes, because
+/// this requires renumbering node indices. This copies the way nodes
+/// are "removed" in make_chordal.
+/// \param src: start node
+template <class N>
+void grapht<N>::disconnect_unreachable(node_indext src)
+{
+  const std::vector<node_indext> source_nodes(1, src);
+  disconnect_unreachable(source_nodes);
+}
+
+/// Removes any edges between nodes in a graph that are unreachable
+/// from a vector of start nodes.
+/// \param src: vector of indices of start nodes
+template <class N>
+void grapht<N>::disconnect_unreachable(const std::vector<node_indext> &src)
+{
+  std::vector<node_indext> reachable = get_reachable(src, true);
+  std::sort(reachable.begin(), reachable.end());
+  std::size_t reachable_idx = 0;
+  for(std::size_t i = 0; i < nodes.size(); i++)
+  {
+    if(reachable_idx >= reachable.size())
+      remove_edges(i);
+    else if(i == reachable[reachable_idx])
+      reachable_idx++;
+    else if(i > reachable[reachable_idx])
+      throw "error disconnecting unreachable nodes";
+    else
+      remove_edges(i);
+  }
 }
 
 /// Add to `set`, nodes that are reachable from `set`.
