@@ -91,7 +91,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "wmm/weak_memory.h"
 #include "call_sequences.h"
 #include "accelerate/accelerate.h"
-#include "count_eloc.h"
 #include "horn_encoding.h"
 #include "thread_instrumentation.h"
 #include "skip_loops.h"
@@ -481,6 +480,12 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("print-path-lengths"))
     {
       print_path_lengths(goto_model);
+      return CPROVER_EXIT_SUCCESS;
+    }
+
+    if(cmdline.isset("print-global-state-size"))
+    {
+      print_global_state_size(goto_model);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -1454,8 +1459,6 @@ void goto_instrument_parse_optionst::help()
     " --dump-cpp                   generate C++ source\n"
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
-    " --count-eloc                 count effective lines of code\n"
-    " --list-eloc                  list full path names of lines containing code\n" // NOLINT(*)
     "\n"
     "Diagnosis:\n"
     " --show-loops                 show the loops in the program\n"
@@ -1463,6 +1466,7 @@ void goto_instrument_parse_optionst::help()
     " --show-symbol-table          show loaded symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    HELP_GOTO_PROGRAM_STATS
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     " --print-internal-representation\n" // NOLINTNEXTLINE(*)
     "                              show verbose internal representation of the program\n"
@@ -1471,8 +1475,6 @@ void goto_instrument_parse_optionst::help()
     " --show-natural-loops         show natural loop heads\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --list-calls-args            list all function calls with their arguments\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --print-path-lengths         print statistics about control-flow graph paths\n"
     " --call-graph                 show graph of function calls\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --reachable-call-graph       show graph of function calls potentially reachable from main function\n"

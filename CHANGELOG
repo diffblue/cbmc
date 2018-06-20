@@ -6,6 +6,7 @@
   of --undefined-function-is-assume-false
 * The --fixedbv command-line option has been removed
   (it was marked deprecated in January 2017)
+* GOTO-INSTRUMENT: New option --print-global-state-size
 
 
 5.8

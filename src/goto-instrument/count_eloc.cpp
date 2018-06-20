@@ -16,10 +16,14 @@ Date: December 2012
 #include <iostream>
 #include <unordered_set>
 
-#include <util/prefix.h>
 #include <util/file_util.h>
+#include <util/pointer_offset_size.h>
+#include <util/prefix.h>
 
 #include <goto-programs/cfg.h>
+#include <goto-programs/goto_model.h>
+
+#include <linking/static_lifetime_init.h>
 
 typedef std::unordered_set<irep_idt> linest;
 typedef std::unordered_map<irep_idt, linest> filest;
@@ -140,4 +144,57 @@ void print_path_lengths(const goto_modelt &goto_model)
     if(cfg[i].visited)
       ++n_reachable;
   std::cout << "Reachable instructions: " << n_reachable << "\n";
+}
+
+void print_global_state_size(const goto_modelt &goto_model)
+{
+  const namespacet ns(goto_model.symbol_table);
+
+  // if we have a linked object, only account for those that are used
+  // (slice-global-inits may have been used to avoid unnecessary initialization)
+  goto_functionst::function_mapt::const_iterator f_it =
+    goto_model.goto_functions.function_map.find(INITIALIZE_FUNCTION);
+  const bool has_initialize =
+    f_it != goto_model.goto_functions.function_map.end();
+  std::unordered_set<irep_idt> initialized;
+
+  if(has_initialize)
+  {
+    for(const auto &ins : f_it->second.body.instructions)
+    {
+      if(ins.is_assign())
+      {
+        const code_assignt &code_assign = to_code_assign(ins.code);
+        object_descriptor_exprt ode;
+        ode.build(code_assign.lhs(), ns);
+
+        if(ode.root_object().id() == ID_symbol)
+        {
+          const symbol_exprt &symbol_expr = to_symbol_expr(ode.root_object());
+          initialized.insert(symbol_expr.get_identifier());
+        }
+      }
+    }
+  }
+
+  mp_integer total_size = 0;
+
+  for(const auto &symbol_entry : goto_model.symbol_table.symbols)
+  {
+    const symbolt &symbol = symbol_entry.second;
+    if(
+      symbol.is_type || symbol.is_macro || symbol.type.id() == ID_code ||
+      symbol.type.get_bool(ID_C_constant) ||
+      has_prefix(id2string(symbol.name), CPROVER_PREFIX) ||
+      (has_initialize && initialized.find(symbol.name) == initialized.end()))
+    {
+      continue;
+    }
+
+    const mp_integer bits = pointer_offset_bits(symbol.type, ns);
+    if(bits > 0)
+      total_size += bits;
+  }
+
+  std::cout << "Total size of global objects: " << total_size << " bits\n";
 }
