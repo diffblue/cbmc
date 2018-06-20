@@ -184,9 +184,9 @@ void symex_target_equationt::decl(
 
 /// declare a fresh variable
 void symex_target_equationt::dead(
-  const exprt &guard,
-  const ssa_exprt &ssa_lhs,
-  const sourcet &source)
+  const exprt &,
+  const ssa_exprt &,
+  const sourcet &)
 {
   // we currently don't record these
 }

@@ -16,9 +16,9 @@ Author: Daniel Kroening
 #include "cover_util.h"
 
 void cover_path_instrumentert::instrument(
-  goto_programt &goto_program,
+  goto_programt &,
   goto_programt::targett &i_it,
-  const cover_blocks_baset &basic_blocks) const
+  const cover_blocks_baset &) const
 {
   if(is_non_cover_assertion(i_it))
     i_it->make_skip();
@@ -27,9 +27,9 @@ void cover_path_instrumentert::instrument(
 }
 
 void cover_assertion_instrumentert::instrument(
-  goto_programt &goto_program,
+  goto_programt &,
   goto_programt::targett &i_it,
-  const cover_blocks_baset &basic_blocks) const
+  const cover_blocks_baset &) const
 {
   // turn into 'assert(false)' to avoid simplification
   if(is_non_cover_assertion(i_it))
@@ -41,9 +41,9 @@ void cover_assertion_instrumentert::instrument(
 }
 
 void cover_cover_instrumentert::instrument(
-  goto_programt &goto_program,
+  goto_programt &,
   goto_programt::targett &i_it,
-  const cover_blocks_baset &basic_blocks) const
+  const cover_blocks_baset &) const
 {
   // turn __CPROVER_cover(x) into 'assert(!x)'
   if(i_it->is_function_call())

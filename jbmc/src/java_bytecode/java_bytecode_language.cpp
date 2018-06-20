@@ -165,23 +165,23 @@ std::set<std::string> java_bytecode_languaget::extensions() const
   return { "class", "jar" };
 }
 
-void java_bytecode_languaget::modules_provided(std::set<std::string> &modules)
+void java_bytecode_languaget::modules_provided(std::set<std::string> &)
 {
   // modules.insert(translation_unit(parse_path));
 }
 
 /// ANSI-C preprocessing
 bool java_bytecode_languaget::preprocess(
-  std::istream &instream,
-  const std::string &path,
-  std::ostream &outstream)
+  std::istream &,
+  const std::string &,
+  std::ostream &)
 {
   // there is no preprocessing!
   return true;
 }
 
 bool java_bytecode_languaget::parse(
-  std::istream &instream,
+  std::istream &,
   const std::string &path)
 {
   PRECONDITION(language_options_initialized);
@@ -601,7 +601,7 @@ static void create_stub_global_symbols(
 
 bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
-  const std::string &module)
+  const std::string &)
 {
   PRECONDITION(language_options_initialized);
 
@@ -1089,7 +1089,7 @@ bool java_bytecode_languaget::convert_single_method(
   return true;
 }
 
-bool java_bytecode_languaget::final(symbol_table_baset &symbol_table)
+bool java_bytecode_languaget::final(symbol_table_baset &)
 {
   PRECONDITION(language_options_initialized);
   return false;

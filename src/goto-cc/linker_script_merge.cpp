@@ -129,7 +129,7 @@ linker_script_merget::linker_script_merget(
       replacement_predicatet("address of array's first member",
         [](const exprt &expr) -> const symbol_exprt&
         { return to_symbol_expr(expr.op0().op0()); },
-        [](const exprt &expr, const namespacet &ns)
+        [](const exprt &expr, const namespacet &)
         {
           return expr.id()==ID_address_of &&
                  expr.type().id()==ID_pointer &&
@@ -146,7 +146,7 @@ linker_script_merget::linker_script_merget(
       replacement_predicatet("address of array",
         [](const exprt &expr) -> const symbol_exprt&
         { return to_symbol_expr(expr.op0()); },
-        [](const exprt &expr, const namespacet &ns)
+        [](const exprt &expr, const namespacet &)
         {
           return expr.id()==ID_address_of &&
                  expr.type().id()==ID_pointer &&
@@ -168,7 +168,7 @@ linker_script_merget::linker_script_merget(
       replacement_predicatet("array variable",
         [](const exprt &expr) -> const symbol_exprt&
         { return to_symbol_expr(expr); },
-        [](const exprt &expr, const namespacet &ns)
+        [](const exprt &expr, const namespacet &)
         {
           return expr.id()==ID_symbol &&
                  expr.type().id()==ID_array;
@@ -176,7 +176,7 @@ linker_script_merget::linker_script_merget(
       replacement_predicatet("pointer (does not need pointerizing)",
         [](const exprt &expr) -> const symbol_exprt&
         { return to_symbol_expr(expr); },
-        [](const exprt &expr, const namespacet &ns)
+        [](const exprt &expr, const namespacet &)
         {
           return expr.id()==ID_symbol &&
                  expr.type().id()==ID_pointer;

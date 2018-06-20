@@ -159,14 +159,14 @@ void inline instrumentert::instrument_one_event_per_cycle_inserter(
 }
 
 void inline instrumentert::instrument_one_read_per_cycle_inserter(
-  const std::set<event_grapht::critical_cyclet> &set_of_cycles)
+  const std::set<event_grapht::critical_cyclet> &)
 {
   /* TODO */
   throw "read first strategy not implemented yet";
 }
 
 void inline instrumentert::instrument_one_write_per_cycle_inserter(
-  const std::set<event_grapht::critical_cyclet> &set_of_cycles)
+  const std::set<event_grapht::critical_cyclet> &)
 {
   /* TODO */
   throw "write first strategy not implemented yet";

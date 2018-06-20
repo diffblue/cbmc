@@ -77,8 +77,8 @@ void flow_insensitive_analysis_baset::output(
 }
 
 void flow_insensitive_analysis_baset::output(
-  const goto_programt &goto_program,
-  const irep_idt &identifier,
+  const goto_programt &,
+  const irep_idt &,
   std::ostream &out) const
 {
   get_state().output(ns, out);
@@ -199,7 +199,7 @@ bool flow_insensitive_analysis_baset::do_function_call(
   locationt l_call,
   const goto_functionst &goto_functions,
   const goto_functionst::function_mapt::const_iterator f_it,
-  const exprt::operandst &arguments,
+  const exprt::operandst &,
   statet &state)
 {
   const goto_functionst::goto_functiont &goto_function=f_it->second;
@@ -405,14 +405,12 @@ bool flow_insensitive_analysis_baset::fixedpoint(
   return fixedpoint(it->second.body, goto_functions);
 }
 
-void flow_insensitive_analysis_baset::update(
-  const goto_functionst &goto_functions)
+void flow_insensitive_analysis_baset::update(const goto_functionst &)
 {
   // no need to copy value sets around
 }
 
-void flow_insensitive_analysis_baset::update(
-  const goto_programt &goto_program)
+void flow_insensitive_analysis_baset::update(const goto_programt &)
 {
   // no need to copy value sets around
 }

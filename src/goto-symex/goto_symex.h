@@ -338,7 +338,7 @@ protected:
   void pop_frame(statet &);
   void return_assignment(statet &);
 
-  virtual void no_body(const irep_idt &identifier)
+  virtual void no_body(const irep_idt &)
   {
   }
 

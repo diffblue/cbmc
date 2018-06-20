@@ -385,10 +385,10 @@ private:
 
   // not implemented in sequential analyses
   bool merge_shared(
-    const statet &src,
-    goto_programt::const_targett from,
-    goto_programt::const_targett to,
-    const namespacet &ns) override
+    const statet &,
+    goto_programt::const_targett,
+    goto_programt::const_targett,
+    const namespacet &) override
   {
     throw "not implemented";
   }

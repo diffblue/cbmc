@@ -245,10 +245,10 @@ void cfg_baset<T, P, I>::compute_edges_catch(
 
 template<class T, typename P, typename I>
 void cfg_baset<T, P, I>::compute_edges_throw(
-  const goto_programt &goto_program,
-  const goto_programt::instructiont &instruction,
-  goto_programt::const_targett next_PC,
-  entryt &entry)
+  const goto_programt &,
+  const goto_programt::instructiont &,
+  goto_programt::const_targett,
+  entryt &)
 {
   // no (trivial) successors
 }
@@ -256,7 +256,7 @@ void cfg_baset<T, P, I>::compute_edges_throw(
 template<class T, typename P, typename I>
 void cfg_baset<T, P, I>::compute_edges_start_thread(
   const goto_programt &goto_program,
-  const goto_programt::instructiont &instruction,
+  const goto_programt::instructiont &,
   goto_programt::const_targett next_PC,
   entryt &entry)
 {
@@ -333,7 +333,7 @@ void cfg_baset<T, P, I>::compute_edges_function_call(
 
 template<class T, typename P, typename I>
 void procedure_local_cfg_baset<T, P, I>::compute_edges_function_call(
-  const goto_functionst &goto_functions,
+  const goto_functionst &,
   const goto_programt &goto_program,
   const goto_programt::instructiont &instruction,
   goto_programt::const_targett next_PC,

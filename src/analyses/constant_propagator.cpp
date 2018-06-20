@@ -224,7 +224,7 @@ void constant_propagator_domaint::transform(
 /// handles equalities and conjunctions containing equalities
 bool constant_propagator_domaint::two_way_propagate_rec(
   const exprt &expr,
-  const namespacet &ns,
+  const namespacet &,
   const constant_propagator_ait *cp)
 {
 #ifdef DEBUG
@@ -391,7 +391,7 @@ void constant_propagator_domaint::valuest::output(
 
 void constant_propagator_domaint::output(
   std::ostream &out,
-  const ai_baset &ai,
+  const ai_baset &,
   const namespacet &ns) const
 {
   values.output(out, ns);
@@ -503,8 +503,8 @@ bool constant_propagator_domaint::valuest::meet(const valuest &src)
 /// \return Return true if "this" has changed.
 bool constant_propagator_domaint::merge(
   const constant_propagator_domaint &other,
-  locationt from,
-  locationt to)
+  locationt,
+  locationt)
 {
   return values.merge(other.values);
 }

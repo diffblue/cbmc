@@ -352,8 +352,8 @@ void goto_convertt::convert_label(
 }
 
 void goto_convertt::convert_gcc_local_label(
-  const codet &code,
-  goto_programt &dest)
+  const codet &,
+  goto_programt &)
 {
   // ignore for now
 }
@@ -712,8 +712,8 @@ void goto_convertt::convert_decl(
 }
 
 void goto_convertt::convert_decl_type(
-  const codet &code,
-  goto_programt &dest)
+  const codet &,
+  goto_programt &)
 {
   // we remove these
 }

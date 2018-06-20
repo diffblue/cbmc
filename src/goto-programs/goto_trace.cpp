@@ -33,7 +33,7 @@ void goto_tracet::output(
 }
 
 void goto_trace_stept::output(
-  const namespacet &ns,
+  const namespacet &,
   std::ostream &out) const
 {
   out << "*** ";

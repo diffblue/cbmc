@@ -1251,7 +1251,7 @@ bool simplify_exprt::get_values(
   return true;
 }
 
-bool simplify_exprt::simplify_lambda(exprt &expr)
+bool simplify_exprt::simplify_lambda(exprt &)
 {
   bool result=true;
 

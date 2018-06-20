@@ -533,7 +533,7 @@ protected:
   /// originated in a particular place, vs. those that have been copied.
   virtual void adjust_assign_rhs_values(
     const exprt &rhs,
-    const namespacet &ns,
+    const namespacet &,
     object_mapt &rhs_values) const
   {
   }
@@ -545,7 +545,7 @@ protected:
   virtual void apply_assign_side_effects(
     const exprt &lhs,
     const exprt &rhs,
-    const namespacet &ns)
+    const namespacet &)
   {
   }
 };

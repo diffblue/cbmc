@@ -267,7 +267,7 @@ protected:
     std::map<unsigned, unsigned char> events_per_thread;
 
     /* for thread and filtering in backtrack */
-    virtual inline bool filtering(event_idt u)
+    virtual inline bool filtering(event_idt)
     {
       return false;
     }

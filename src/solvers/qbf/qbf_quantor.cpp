@@ -20,7 +20,7 @@ qbf_quantort::~qbf_quantort()
 {
 }
 
-tvt qbf_quantort::l_get(literalt a) const
+tvt qbf_quantort::l_get(literalt) const
 {
   assert(false);
   return tvt::unknown();

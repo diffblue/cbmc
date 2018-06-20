@@ -42,9 +42,9 @@ bool jsil_languaget::interfaces(symbol_tablet &symbol_table)
 }
 
 bool jsil_languaget::preprocess(
-  std::istream &instream,
-  const std::string &path,
-  std::ostream &outstream)
+  std::istream &,
+  const std::string &,
+  std::ostream &)
 {
   // there is no preprocessing!
   return true;
@@ -78,7 +78,7 @@ bool jsil_languaget::parse(
 /// Converting from parse tree and type checking.
 bool jsil_languaget::typecheck(
   symbol_tablet &symbol_table,
-  const std::string &module)
+  const std::string &)
 {
   if(jsil_typecheck(symbol_table, get_message_handler()))
     return true;
@@ -124,7 +124,7 @@ bool jsil_languaget::from_type(
 
 bool jsil_languaget::to_expr(
   const std::string &code,
-  const std::string &module,
+  const std::string &,
   exprt &expr,
   const namespacet &ns)
 {

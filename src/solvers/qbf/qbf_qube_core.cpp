@@ -129,12 +129,12 @@ propt::resultt qbf_qube_coret::prop_solve()
   }
 }
 
-bool qbf_qube_coret::is_in_core(literalt l) const
+bool qbf_qube_coret::is_in_core(literalt) const
 {
   throw "not supported";
 }
 
-qdimacs_coret::modeltypet qbf_qube_coret::m_get(literalt a) const
+qdimacs_coret::modeltypet qbf_qube_coret::m_get(literalt) const
 {
   throw "not supported";
 }

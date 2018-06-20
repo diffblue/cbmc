@@ -33,7 +33,7 @@ public:
   }
 
   virtual void initialize(
-    const namespacet &ns)
+    const namespacet &)
   {
     value_set.clear();
   }

@@ -229,7 +229,7 @@ bool cpp_languaget::from_type(
 bool cpp_languaget::type_to_name(
   const typet &type,
   std::string &name,
-  const namespacet &ns)
+  const namespacet &)
 {
   name=cpp_type2name(type);
   return false;
@@ -237,7 +237,7 @@ bool cpp_languaget::type_to_name(
 
 bool cpp_languaget::to_expr(
   const std::string &code,
-  const std::string &module,
+  const std::string &,
   exprt &expr,
   const namespacet &ns)
 {

@@ -457,7 +457,7 @@ symbolt acceleratet::make_symbol(std::string name, typet type)
   return ret;
 }
 
-void acceleratet::decl(symbol_exprt &sym, goto_programt::targett t)
+void acceleratet::decl(symbol_exprt &, goto_programt::targett)
 {
 #if 0
   goto_programt::targett decl=program.insert_before(t);

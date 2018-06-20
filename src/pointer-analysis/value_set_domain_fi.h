@@ -36,8 +36,7 @@ public:
     value_set.output(ns, out);
   }
 
-  virtual void initialize(
-    const namespacet &ns)
+  virtual void initialize(const namespacet &)
   {
     value_set.clear();
   }

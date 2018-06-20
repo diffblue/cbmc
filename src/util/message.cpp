@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void message_handlert::print(
   unsigned level,
   const std::string &message,
-  int sequence_number,
+  int,
   const source_locationt &location)
 {
   std::string dest;
@@ -58,7 +58,7 @@ void message_handlert::print(
 
 void message_handlert::print(
   unsigned level,
-  const std::string &message)
+  const std::string &)
 {
   if(level>=message_count.size())
     message_count.resize(level+1, 0);

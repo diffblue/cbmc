@@ -573,8 +573,8 @@ void arrayst::add_array_constraints_with(
 }
 
 void arrayst::add_array_constraints_update(
-  const index_sett &index_set,
-  const update_exprt &expr)
+  const index_sett &,
+  const update_exprt &)
 {
   // we got x=UPDATE(y, [i], v)
   // add constaint x[i]=v

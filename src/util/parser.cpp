@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "parser.h"
 
 #ifdef _WIN32
-int isatty(int f)
+int isatty(int)
 {
   return 0;
 }

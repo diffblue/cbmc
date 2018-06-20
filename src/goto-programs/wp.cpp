@@ -218,7 +218,7 @@ exprt wp_assign(
 exprt wp_assume(
   const code_assumet &code,
   const exprt &post,
-  const namespacet &ns)
+  const namespacet &)
 {
   return implies_exprt(code.assumption(), post);
 }

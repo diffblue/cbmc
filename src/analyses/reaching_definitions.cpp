@@ -125,7 +125,7 @@ void rd_range_domaint::transform(
 }
 
 void rd_range_domaint::transform_dead(
-  const namespacet &ns,
+  const namespacet &,
   locationt from)
 {
   const irep_idt &identifier=
@@ -430,7 +430,7 @@ void rd_range_domaint::kill(
 }
 
 void rd_range_domaint::kill_inf(
-  const irep_idt &identifier,
+  const irep_idt &,
   const range_spect &range_start)
 {
   assert(range_start>=0);
@@ -628,8 +628,8 @@ bool rd_range_domaint::merge_inner(
 /// \return returns true iff there is something new
 bool rd_range_domaint::merge(
   const rd_range_domaint &other,
-  locationt from,
-  locationt to)
+  locationt,
+  locationt)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();
@@ -664,8 +664,8 @@ bool rd_range_domaint::merge(
 /// \return returns true iff there is something new
 bool rd_range_domaint::merge_shared(
   const rd_range_domaint &other,
-  goto_programt::const_targett from,
-  goto_programt::const_targett to,
+  goto_programt::const_targett,
+  goto_programt::const_targett,
   const namespacet &ns)
 {
   // TODO: dirty vars

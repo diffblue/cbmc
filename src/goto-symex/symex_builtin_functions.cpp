@@ -453,8 +453,8 @@ void goto_symext::symex_cpp_new(
 }
 
 void goto_symext::symex_cpp_delete(
-  statet &state,
-  const codet &code)
+  statet &,
+  const codet &)
 {
   // TODO
   #if 0
@@ -502,9 +502,10 @@ void goto_symext::symex_trace(
 }
 
 void goto_symext::symex_fkt(
-  statet &state,
-  const code_function_callt &code)
+  statet &,
+  const code_function_callt &)
 {
+  UNREACHABLE;
   #if 0
   exprt new_fc(ID_function, fc.type());
 
@@ -525,7 +526,7 @@ void goto_symext::symex_fkt(
 }
 
 void goto_symext::symex_macro(
-  statet &state,
+  statet &,
   const code_function_callt &code)
 {
   const irep_idt &identifier=code.op0().get(ID_identifier);

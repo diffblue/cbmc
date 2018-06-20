@@ -11,8 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-void goto_symext::symex_catch(statet &state)
+void goto_symext::symex_catch(statet &)
 {
+  UNREACHABLE;
   // there are two variants: 'push' and 'pop'
 
   #if 0

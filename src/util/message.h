@@ -89,8 +89,8 @@ public:
   virtual void print(
     unsigned level,
     const std::string &message,
-    int sequence_number,
-    const source_locationt &location)
+    int,
+    const source_locationt &)
   {
     print(level, message);
   }

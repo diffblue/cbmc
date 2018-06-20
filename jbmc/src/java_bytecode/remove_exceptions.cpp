@@ -616,7 +616,7 @@ void remove_exceptions(
   remove_exceptions_typest type)
 {
   remove_exceptionst::function_may_throwt any_function_may_throw =
-    [](const irep_idt &id) { return true; };
+    [](const irep_idt &) { return true; };
 
   remove_exceptionst remove_exceptions(
     symbol_table,

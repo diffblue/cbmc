@@ -59,7 +59,7 @@ void uncaught_exceptions_domaint::join(
 void uncaught_exceptions_domaint::transform(
   const goto_programt::const_targett from,
   uncaught_exceptions_analysist &uea,
-  const namespacet &ns)
+  const namespacet &)
 {
   const goto_programt::instructiont &instruction=*from;
 

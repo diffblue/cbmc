@@ -112,7 +112,7 @@ public:
   void instrument(goto_modelt &);
 
 protected:
-  virtual void initialize(const goto_functionst &_goto_functions)
+  virtual void initialize(const goto_functionst &)
   {
   }
 

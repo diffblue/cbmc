@@ -18,26 +18,26 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/std_types.h>
 
-bool languaget::final(symbol_table_baset &symbol_table)
+bool languaget::final(symbol_table_baset &)
 {
   return false;
 }
 
-bool languaget::interfaces(symbol_tablet &symbol_table)
+bool languaget::interfaces(symbol_tablet &)
 {
   return false;
 }
 
 void languaget::dependencies(
-  const std::string &module,
-  std::set<std::string> &modules)
+  const std::string &,
+  std::set<std::string> &)
 {
 }
 
 bool languaget::from_expr(
   const exprt &expr,
   std::string &code,
-  const namespacet &ns)
+  const namespacet &)
 {
   code=expr.pretty();
   return false;
@@ -46,7 +46,7 @@ bool languaget::from_expr(
 bool languaget::from_type(
   const typet &type,
   std::string &code,
-  const namespacet &ns)
+  const namespacet &)
 {
   code=type.pretty();
   return false;
@@ -55,7 +55,7 @@ bool languaget::from_type(
 bool languaget::type_to_name(
   const typet &type,
   std::string &name,
-  const namespacet &ns)
+  const namespacet &)
 {
   // probably ansi-c/type2name could be used as better fallback if moved to
   // util/

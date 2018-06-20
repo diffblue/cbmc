@@ -34,8 +34,7 @@ range_domain_baset::~range_domain_baset()
 {
 }
 
-void range_domaint::output(
-  const namespacet &ns, std::ostream &out) const
+void range_domaint::output(const namespacet &, std::ostream &out) const
 {
   out << "[";
   for(const_iterator itr=begin();
@@ -123,8 +122,8 @@ void rw_range_sett::get_objects_if(
 void rw_range_sett::get_objects_dereference(
   get_modet mode,
   const dereference_exprt &deref,
-  const range_spect &range_start,
-  const range_spect &size)
+  const range_spect &,
+  const range_spect &)
 {
   const exprt &pointer=deref.pointer();
   get_objects_rec(get_modet::READ, pointer);

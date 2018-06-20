@@ -162,14 +162,14 @@ class expr_visitort
 {
 public:
   virtual ~expr_visitort() { }
-  virtual void operator()(exprt &expr) { }
+  virtual void operator()(exprt &) { }
 };
 
 class const_expr_visitort
 {
 public:
   virtual ~const_expr_visitort() { }
-  virtual void operator()(const exprt &expr) { }
+  virtual void operator()(const exprt &) { }
 };
 
 #endif // CPROVER_UTIL_EXPR_H
