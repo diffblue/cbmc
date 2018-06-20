@@ -57,11 +57,11 @@ adjust_size (unsigned size)
 inline int
 digit_cmp (onedig_t const *a, onedig_t const *b, unsigned n)
 {
-  for (int i = n; --i >= 0; )
+  for (unsigned i = n; i > 0; --i)
     {
-      if (a[i] < b[i])
+      if (a[i - 1] < b[i - 1])
 	return -1;
-      else if (a[i] > b[i])
+      else if (a[i - 1] > b[i - 1])
 	return 1;
     }
   return 0;
@@ -135,7 +135,7 @@ static _fast onedig_t
 digit_mul (onedig_t *b, unsigned l, onedig_t d)
 {
   twodig_t p = 0;
-  for (int i = l; --i >= 0; )
+  for (unsigned i = l; i > 0; --i)
     {
       p += twodig_t (d) * twodig_t (*b);
       *b++ = onedig_t (p);
@@ -176,11 +176,11 @@ static _fast onedig_t
 digit_div (onedig_t *b, unsigned l, onedig_t d)
 {
   twodig_t r = 0;
-  for (int i = l; --i >= 0; )
+  for (unsigned i = l; i > 0; --i)
     {
       r <<= single_bits;
-      r |= b[i];
-      b[i] = onedig_t (r / d);
+      r |= b[i - 1];
+      b[i - 1] = onedig_t (r / d);
       r %= d;
     }
   return onedig_t (r);
@@ -258,7 +258,8 @@ static _fast void
 digit_div (onedig_t *r, const onedig_t *y, unsigned yl, onedig_t *q, unsigned ql)
 {
   r += ql;
-  for (int i = ql; --r, --i >= 0; )
+  --r;
+  for (unsigned i = ql; i > 0; --r, --i)
     {
       onedig_t qh = guess_q (r + yl, y + yl - 1);
       if (multiply_and_subtract (r, y, yl, qh) == 0)
@@ -267,7 +268,7 @@ digit_div (onedig_t *r, const onedig_t *y, unsigned yl, onedig_t *q, unsigned ql
 	  add_back (r, y, yl);
 	}
       if (q != 0)
-	q[i] = qh;
+	q[i - 1] = qh;
     }
 }
 
@@ -501,16 +502,16 @@ BigInt::scan_on (char const *s, onedig_t b)
   for (char c = *s; c; c = *++s)
     {
       // Convert digit. Use 0..9A..Z for singles up to 36. Ignoring case.
-      c = toupper (c);
+      c = (char)toupper (c);
       onedig_t dig;
       if (c < '0')
 	return s;
       else if (c <= '9')
-	dig = c - '0';
+	dig = (onedig_t)(c - '0');
       else if (c < 'A')
 	return s;
       else if (c <= 'Z')
-	dig = c - 'A' + 10;
+	dig = (onedig_t)(c - 'A' + 10);
       else
 	return s;
       if (dig >= b)
@@ -584,7 +585,7 @@ BigInt::as_string (char *p, unsigned l, onedig_t b) const
       if (l == 0)
 	return 0;
       onedig_t r = digit_div (dig, len, b);
-      p[--l] = r < 10 ? r + '0' : 'A' + r - 10;
+      p[--l] = (char)(r < 10 ? r + '0' : 'A' + r - 10);
       if (dig[len-1] == 0)
 	--len;
     }
@@ -631,7 +632,7 @@ BigInt::dump (unsigned char *p, unsigned n)
   for (;;)
     {
       while (i--)
-	*p++ = d >> i * CHAR_BIT;
+	*p++ = (unsigned char)(d >> i * CHAR_BIT);
       if (t <= digit)
 	break;
       d = *--t;
@@ -682,8 +683,8 @@ BigInt::is_long() const
     return false;
   // There is exactly one good signed number n with abs (n) having the
   // topmost bit set: The most negative number.
-  for (int l = length - 1; --l >= 0; )
-    if (digit[l] != 0)
+  for (unsigned l = length - 1; l > 0; --l)
+    if (digit[l - 1] != 0)
       return false;
   return true;
 }
@@ -691,18 +692,18 @@ BigInt::is_long() const
 ullong_t BigInt::to_ulong() const
 {
   ullong_t ul = 0;
-  for (int i = length; --i >= 0; )
+  for (unsigned i = length; i > 0; --i)
     {
       ul <<= single_bits;
-      ul |= digit[i];
+      ul |= digit[i - 1];
     }
   return ul;
 }
 
 llong_t BigInt::to_long() const
 {
-  ullong_t ul = to_ulong();
-  return positive ? ul : -llong_t (ul);
+  llong_t l = llong_t(to_ulong());
+  return positive ? l : -l;
 }
 
 
@@ -752,7 +753,7 @@ BigInt::compare (llong_t b) const
 
   onedig_t dig[small];
   unsigned len;
-  digit_set (-b, dig, len);
+  digit_set (ullong_t(-b), dig, len);
   if (length < len)
     return 1;
   if (length > len)
@@ -904,7 +905,7 @@ BigInt &
 BigInt::operator+= (llong_t y)
 {
   bool pos = y > 0;
-  ullong_t uy = pos ? y : -y;
+  ullong_t uy = pos ? ullong_t(y) : ullong_t(-y);
   onedig_t yb[small];
   unsigned yl;
   digit_set (uy, yb, yl);
@@ -916,7 +917,7 @@ BigInt &
 BigInt::operator-= (llong_t y)
 {
   bool pos = y > 0;
-  ullong_t uy = pos ? y : -y;
+  ullong_t uy = pos ? ullong_t(y) : ullong_t(-y);
   onedig_t yb[small];
   unsigned yl;
   digit_set (uy, yb, yl);
@@ -928,7 +929,7 @@ BigInt &
 BigInt::operator*= (llong_t y)
 {
   bool pos = y > 0;
-  ullong_t uy = pos ? y : -y;
+  ullong_t uy = pos ? ullong_t(y) : ullong_t(-y);
   onedig_t yb[small];
   unsigned yl;
   digit_set (uy, yb, yl);
@@ -940,7 +941,7 @@ BigInt &
 BigInt::operator/= (llong_t y)
 {
   bool pos = y > 0;
-  ullong_t uy = pos ? y : -y;
+  ullong_t uy = pos ? ullong_t(y) : ullong_t(-y);
   onedig_t yb[small];
   unsigned yl;
   digit_set (uy, yb, yl);
@@ -951,7 +952,7 @@ BigInt &
 BigInt::operator%= (llong_t y)
 {
   bool pos = y > 0;
-  ullong_t uy = pos ? y : -y;
+  ullong_t uy = pos ? ullong_t(y) : ullong_t(-y);
   onedig_t yb[small];
   unsigned yl;
   digit_set (uy, yb, yl);
@@ -1077,7 +1078,7 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       // This digit_div() transforms the dividend into the quotient.
       q = y;
       r.digit[0] = digit_div (q.digit, q.length, y.digit[0]);
-      r.length = r.digit[0] ? 1 : 0;
+      r.length = r.digit[0] ? 1u : 0u;
     }
   else
     {
@@ -1268,22 +1269,22 @@ BigInt::operator%= (BigInt const &y)
 unsigned
 BigInt::floorPow2 () const
 {
-  int i = length - 1;    // Start on the last value
-  while (i >= 0 && digit[i] == 0) {
+  unsigned i = length;    // Start on the last value
+  while (i > 0 && digit[i - 1] == 0) {
     --i;               // Skip zeros
   }
-  if (i < 0) {
+  if (i == 0) {
     return 0;          // Special case
   }
 
   twodig_t power = 1;
-  int count = 0;
+  unsigned count = 0;
 
-  while ((power << 1) <= (twodig_t)digit[i]) {
+  while ((power << 1) <= (twodig_t)digit[i - 1]) {
     ++count, power <<= 1;
   }
 
-  return (single_bits * i) + count;
+  return (single_bits * (i - 1)) + count;
 }
 
 // Not part of original BigInt.
