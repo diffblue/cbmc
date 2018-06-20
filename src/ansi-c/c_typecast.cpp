@@ -277,7 +277,7 @@ typet c_typecastt::follow_with_qualifiers(const typet &src_type)
 c_typecastt::c_typet c_typecastt::get_c_type(
   const typet &type) const
 {
-  unsigned width=type.get_int(ID_width);
+  const std::size_t width = type.get_size_t(ID_width);
 
   if(type.id()==ID_signedbv)
   {

@@ -974,11 +974,11 @@ codet java_bytecode_convert_methodt::get_clinit_call(
   }
 }
 
-static unsigned get_bytecode_type_width(const typet &ty)
+static std::size_t get_bytecode_type_width(const typet &ty)
 {
   if(ty.id()==ID_pointer)
     return 32;
-  return ty.get_unsigned_int(ID_width);
+  return ty.get_size_t(ID_width);
 }
 
 codet java_bytecode_convert_methodt::convert_instructions(

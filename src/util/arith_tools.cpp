@@ -152,7 +152,8 @@ constant_exprt from_integer(
   }
   else if(type_id==ID_c_enum)
   {
-    std::size_t width=to_c_enum_type(type).subtype().get_unsigned_int(ID_width);
+    const std::size_t width =
+      to_c_enum_type(type).subtype().get_size_t(ID_width);
     constant_exprt result(type);
     result.set_value(integer2binary(int_value, width));
     return result;

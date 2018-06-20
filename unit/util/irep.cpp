@@ -185,7 +185,6 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       // variants in the API
       REQUIRE(!irep.get_bool("no_such_id"));
       REQUIRE(irep.get_int("no_such_id") == 0);
-      REQUIRE(irep.get_unsigned_int("no_such_id") == 0u);
       REQUIRE(irep.get_size_t("no_such_id") == 0u);
       REQUIRE(irep.get_long_long("no_such_id") == 0);
 
@@ -199,7 +198,6 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       irep.set("numeric_id", 42);
       REQUIRE(!irep.get_bool("numeric_id"));
       REQUIRE(irep.get_int("numeric_id") == 42);
-      REQUIRE(irep.get_unsigned_int("numeric_id") == 42u);
       REQUIRE(irep.get_size_t("numeric_id") == 42u);
       REQUIRE(irep.get_long_long("numeric_id") == 42);
 
