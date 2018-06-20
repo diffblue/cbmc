@@ -19,7 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 void value_sets_to_xml(
-  std::function<const value_sett &(goto_programt::const_targett)> get_value_set,
+  const std::function<const value_sett &(goto_programt::const_targett)>
+    &get_value_set,
   const goto_programt &goto_program,
   xmlt &dest)
 {
