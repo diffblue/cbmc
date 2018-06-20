@@ -34,10 +34,7 @@ code_function_callt function_to_call(
     typet p=pointer_type(char_type());
     p.subtype().set(ID_C_constant, true);
 
-    code_typet function_type;
-    function_type.return_type()=empty_typet();
-    function_type.parameters().push_back(
-      code_typet::parametert(p));
+    const code_typet function_type({code_typet::parametert(p)}, empty_typet());
 
     symbolt new_symbol;
     new_symbol.name=id;
