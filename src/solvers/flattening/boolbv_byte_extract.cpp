@@ -46,7 +46,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
     {
       return convert_bv(flatten_byte_extract(expr, ns));
     }
-    catch(const flatten_byte_extract_exceptiont &byte_extract_flatten_exception)
+    catch(const flatten_byte_extract_exceptiont &)
     {
       util_throw_with_nested(
         bitvector_conversion_exceptiont("Can't convert byte_extraction", expr));
