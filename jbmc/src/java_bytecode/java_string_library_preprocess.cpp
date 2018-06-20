@@ -1922,13 +1922,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_2,
       std::placeholders::_3,
       std::placeholders::_4);
-  conversion_table["java::java.lang.String.<init>:([CII)V"] = std::bind(
-    &java_string_library_preprocesst::make_init_from_array_code,
-    this,
-    std::placeholders::_1,
-    std::placeholders::_2,
-    std::placeholders::_3,
-    std::placeholders::_4);
   cprover_equivalent_to_java_constructor
     ["java::java.lang.String.<init>:()V"]=
       ID_cprover_string_empty_string_func;
@@ -1956,12 +1949,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_function
     ["java::java.lang.String.contains:(Ljava/lang/CharSequence;)Z"]=
     ID_cprover_string_contains_func;
-  cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.String.copyValueOf:([CII)Ljava/lang/String;"]=
-    ID_cprover_string_copy_func;
-  cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.String.copyValueOf:([C)Ljava/lang/String;"]=
-    ID_cprover_string_copy_func;
   cprover_equivalent_to_java_function
     ["java::java.lang.String.endsWith:(Ljava/lang/String;)Z"]=
       ID_cprover_string_endswith_func;
@@ -2108,9 +2095,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.append:(C)Ljava/lang/StringBuilder;"]=
       ID_cprover_string_concat_char_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuilder.append:([C)Ljava/lang/StringBuilder;"] =
-      ID_cprover_string_concat_func;
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.append:(D)Ljava/lang/StringBuilder;"] =
       ID_cprover_string_concat_double_func;
