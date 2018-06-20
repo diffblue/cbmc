@@ -71,7 +71,12 @@ void smt2_parsert::command_sequence()
       // what we expect
       break;
 
-    default:
+    case smt2_tokenizert::OPEN:
+    case smt2_tokenizert::SYMBOL:
+    case smt2_tokenizert::NUMERAL:
+    case smt2_tokenizert::STRING_LITERAL:
+    case smt2_tokenizert::NONE:
+    case smt2_tokenizert::KEYWORD:
       throw error("expected ')' at end of command");
     }
   }
@@ -100,7 +105,11 @@ void smt2_parsert::ignore_command()
     case smt2_tokenizert::END_OF_FILE:
       throw error("unexpected EOF in command");
 
-    default:
+    case smt2_tokenizert::SYMBOL:
+    case smt2_tokenizert::NUMERAL:
+    case smt2_tokenizert::STRING_LITERAL:
+    case smt2_tokenizert::NONE:
+    case smt2_tokenizert::KEYWORD:
       next_token();
     }
   }
@@ -915,7 +924,12 @@ exprt smt2_parsert::function_application()
     }
     break;
 
-  default:
+  case smt2_tokenizert::CLOSE:
+  case smt2_tokenizert::NUMERAL:
+  case smt2_tokenizert::STRING_LITERAL:
+  case smt2_tokenizert::END_OF_FILE:
+  case smt2_tokenizert::NONE:
+  case smt2_tokenizert::KEYWORD:
     // just parentheses
     exprt tmp=expression();
     if(next_token() != smt2_tokenizert::CLOSE)
@@ -1015,7 +1029,10 @@ exprt smt2_parsert::expression()
   case smt2_tokenizert::END_OF_FILE:
     throw error("EOF in an expression");
 
-  default:
+  case smt2_tokenizert::CLOSE:
+  case smt2_tokenizert::STRING_LITERAL:
+  case smt2_tokenizert::NONE:
+  case smt2_tokenizert::KEYWORD:
     throw error("unexpected token in an expression");
   }
 
@@ -1106,7 +1123,12 @@ typet smt2_parsert::sort()
       throw error() << "unexpected sort: `" << smt2_tokenizer.get_buffer()
                     << '\'';
 
-  default:
+  case smt2_tokenizert::CLOSE:
+  case smt2_tokenizert::NUMERAL:
+  case smt2_tokenizert::STRING_LITERAL:
+  case smt2_tokenizert::END_OF_FILE:
+  case smt2_tokenizert::NONE:
+  case smt2_tokenizert::KEYWORD:
     throw error() << "unexpected token in a sort: `"
                   << smt2_tokenizer.get_buffer() << '\'';
   }

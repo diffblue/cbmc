@@ -310,9 +310,23 @@ void local_bitvector_analysist::build()
       }
       break;
 
-    default:
-      {
-      }
+    case CATCH:
+    case THROW:
+    case RETURN:
+    case ATOMIC_BEGIN:
+    case ATOMIC_END:
+    case LOCATION:
+    case START_THREAD:
+    case END_THREAD:
+    case SKIP:
+    case OTHER:
+    case ASSERT:
+    case ASSUME:
+    case GOTO:
+    case END_FUNCTION:
+    case INCOMPLETE_GOTO:
+    case NO_INSTRUCTION_TYPE:
+      break;
     }
 
     for(const auto &succ : node.successors)

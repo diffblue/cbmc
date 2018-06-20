@@ -69,9 +69,7 @@ void taint_analysist::instrument(
 
     goto_programt insert_before, insert_after;
 
-    switch(instruction.type)
-    {
-    case FUNCTION_CALL:
+    if(instruction.is_function_call())
       {
         const code_function_callt &function_call=
           to_code_function_call(instruction.code);
@@ -204,12 +202,6 @@ void taint_analysist::instrument(
           }
         }
       }
-      break;
-
-    default:
-      {
-      }
-    }
 
     if(!insert_before.empty())
     {

@@ -215,7 +215,7 @@ std::ostream &goto_programt::output_instruction(
     out << "END THREAD" << '\n';
     break;
 
-  default:
+  case INCOMPLETE_GOTO:
     UNREACHABLE;
   }
 
@@ -303,9 +303,21 @@ std::list<exprt> expressions_read(
     }
     break;
 
-  default:
-    {
-    }
+  case CATCH:
+  case THROW:
+  case DEAD:
+  case DECL:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case END_FUNCTION:
+  case LOCATION:
+  case SKIP:
+  case OTHER:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 
   return dest;
@@ -331,9 +343,25 @@ std::list<exprt> expressions_written(
     dest.push_back(instruction.get_assign().lhs());
     break;
 
-  default:
-    {
-    }
+  case CATCH:
+  case THROW:
+  case GOTO:
+  case RETURN:
+  case DEAD:
+  case DECL:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case END_FUNCTION:
+  case ASSERT:
+  case ASSUME:
+  case LOCATION:
+  case SKIP:
+  case OTHER:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 
   return dest;
@@ -489,9 +517,11 @@ std::string as_string(
   case END_THREAD:
     return "END THREAD";
 
-  default:
+  case INCOMPLETE_GOTO:
     UNREACHABLE;
   }
+
+  UNREACHABLE;
 }
 
 /// Assign each loop in the goto program a unique index. Every backwards goto is
@@ -980,8 +1010,15 @@ std::ostream &operator<<(std::ostream &out, goto_program_instruction_typet t)
   case FUNCTION_CALL:
     out << "FUNCTION_CALL";
     break;
-  default:
-    out << "?";
+  case THROW:
+    out << "THROW";
+    break;
+  case CATCH:
+    out << "CATCH";
+    break;
+  case INCOMPLETE_GOTO:
+    out << "INCOMPLETE_GOTO";
+    break;
   }
 
   return out;

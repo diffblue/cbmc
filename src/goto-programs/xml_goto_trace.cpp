@@ -198,7 +198,18 @@ void convert(
       }
       break;
 
-    default:
+    case goto_trace_stept::typet::ATOMIC_BEGIN:
+    case goto_trace_stept::typet::ATOMIC_END:
+    case goto_trace_stept::typet::MEMORY_BARRIER:
+    case goto_trace_stept::typet::SPAWN:
+    case goto_trace_stept::typet::SHARED_WRITE:
+    case goto_trace_stept::typet::SHARED_READ:
+    case goto_trace_stept::typet::CONSTRAINT:
+    case goto_trace_stept::typet::DEAD:
+    case goto_trace_stept::typet::LOCATION:
+    case goto_trace_stept::typet::GOTO:
+    case goto_trace_stept::typet::ASSUME:
+    case goto_trace_stept::typet::NONE:
       if(source_location!=previous_source_location)
       {
         // just the source location

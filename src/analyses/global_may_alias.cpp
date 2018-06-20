@@ -129,9 +129,24 @@ void global_may_alias_domaint::transform(
     }
     break;
 
-  default:
-    {
-    }
+  case FUNCTION_CALL:
+  case GOTO:
+  case CATCH:
+  case THROW:
+  case RETURN:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case LOCATION:
+  case START_THREAD:
+  case END_THREAD:
+  case ASSERT:
+  case ASSUME:
+  case SKIP:
+  case END_FUNCTION:
+  case OTHER:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 }
 

@@ -49,9 +49,22 @@ bool value_set_domain_fivrnst::transform(
       break;
     }
 
-  default:
-    {
-    }
+  case CATCH:
+  case THROW:
+  case GOTO:
+  case DECL:
+  case DEAD:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case LOCATION:
+  case SKIP:
+  case ASSERT:
+  case ASSUME:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 
   return value_set.handover();

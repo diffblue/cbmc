@@ -136,7 +136,7 @@ void prop_minimizet::operator()()
           fix_objectives(); // fix the ones we got
           break;
 
-        default:
+        case decision_proceduret::resultt::D_ERROR:
           error() << "decision procedure failed" << eom;
           last_was_SAT=false;
           return;

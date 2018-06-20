@@ -58,9 +58,23 @@ std::set<exprt> collect_conditions(const goto_programt::const_targett t)
   case FUNCTION_CALL:
     return collect_conditions(t->code);
 
-  default:
-  {
-  }
+  case CATCH:
+  case THROW:
+  case DEAD:
+  case DECL:
+  case RETURN:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case END_FUNCTION:
+  case LOCATION:
+  case OTHER:
+  case SKIP:
+  case ASSUME:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 
   return std::set<exprt>();
@@ -125,9 +139,23 @@ std::set<exprt> collect_decisions(const goto_programt::const_targett t)
   case FUNCTION_CALL:
     return collect_decisions(t->code);
 
-  default:
-  {
-  }
+  case CATCH:
+  case THROW:
+  case DEAD:
+  case DECL:
+  case RETURN:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case END_FUNCTION:
+  case LOCATION:
+  case OTHER:
+  case SKIP:
+  case ASSUME:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 
   return std::set<exprt>();

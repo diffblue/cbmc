@@ -1100,7 +1100,7 @@ std::string configt::ansi_ct::os_to_string(ost os)
   case ost::OS_LINUX: return "linux";
   case ost::OS_MACOS: return "macos";
   case ost::OS_WIN: return "win";
-  default: return "none";
+  case ost::NO_OS: return "none";
   }
 
   UNREACHABLE;

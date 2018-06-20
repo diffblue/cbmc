@@ -359,7 +359,8 @@ void interpretert::step()
     break;
   case CATCH:
     break;
-  default:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
     throw "encountered instruction with undefined instruction type";
   }
   pc=next_pc;

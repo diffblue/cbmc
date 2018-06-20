@@ -111,7 +111,7 @@ std::ostream &operator<<(std::ostream &out, const cpp_idt::id_classt &id_class)
   case cpp_idt::id_classt::BLOCK_SCOPE:       return out<<"BLOCK_SCOPE";
   case cpp_idt::id_classt::TEMPLATE_SCOPE:    return out<<"TEMPLATE_SCOPE";
   case cpp_idt::id_classt::NAMESPACE:         return out<<"NAMESPACE";
-  default: return out << "(OTHER)";
+  case cpp_idt::id_classt::ENUM:              return out<<"ENUM";
   }
 
   UNREACHABLE;

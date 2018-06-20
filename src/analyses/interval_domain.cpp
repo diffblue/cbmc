@@ -108,9 +108,21 @@ void interval_domaint::transform(
     }
     break;
 
-  default:
-    {
-    }
+  case CATCH:
+  case THROW:
+  case RETURN:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case END_FUNCTION:
+  case START_THREAD:
+  case END_THREAD:
+  case ASSERT:
+  case LOCATION:
+  case SKIP:
+  case OTHER:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 }
 
