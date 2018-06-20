@@ -11,4 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "decision_procedure.h"
 
-
+decision_proceduret::~decision_proceduret()
+{
+}

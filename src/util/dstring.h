@@ -123,10 +123,7 @@ public:
 
   // output
 
-  std::ostream &operator<<(std::ostream &out) const
-  {
-    return out << as_string();
-  }
+  std::ostream &operator<<(std::ostream &out) const;
 
   // non-standard
 
