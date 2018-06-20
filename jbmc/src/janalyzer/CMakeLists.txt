@@ -24,3 +24,6 @@ target_link_libraries(janalyzer-lib
 # Executable
 add_executable(janalyzer janalyzer_main.cpp)
 target_link_libraries(janalyzer janalyzer-lib)
+
+set(cbmc_version_files janalyzer_parse_options.cpp)
+git_revision(janalyzer-lib cbmc_version_files)

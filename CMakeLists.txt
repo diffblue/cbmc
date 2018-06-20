@@ -38,6 +38,48 @@ if(${enable_cbmc_tests})
     enable_testing()
 endif()
 
+find_package(Git)
+
+macro(git_revision target files_var)
+  if(GIT_FOUND)
+    add_custom_command(
+      OUTPUT .release_info
+      COMMAND ${CMAKE_COMMAND} -E echo_append "#define __CBMC_VERSION " > .release_info
+      COMMAND "${GIT_EXECUTABLE}" "describe" "--tags" "--always" "--long" >> .release_info
+      COMMAND ${CMAKE_COMMAND} -E echo "#define __CBMC_VERSION_str(v) \"${CBMC_RELEASE} (\" # v \")\"" >> .release_info
+      COMMAND ${CMAKE_COMMAND} -E echo "#define __CBMC_VERSION_xstr(v) __CBMC_VERSION_str(v)" >> .release_info
+      COMMAND ${CMAKE_COMMAND} -E echo "#define CBMC_VERSION __CBMC_VERSION_xstr(__CBMC_VERSION)" >> .release_info
+      VERBATIM
+      )
+    add_custom_command(
+      TARGET ${target}
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E remove -f .release_info
+      )
+  else()
+    add_custom_command(
+      OUTPUT .release_info
+      COMMAND ${CMAKE_COMMAND} -E echo "#define CBMC_VERSION \"${CBMC_RELEASE} (n/a)\"" >> .release_info
+      VERBATIM
+      )
+  endif()
+
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
+     "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
+  )
+    set_source_files_properties(
+      ${${files_var}}
+      PROPERTIES
+        OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/.release_info
+        COMPILE_FLAGS "-include .release_info")
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    set_source_files_properties(
+      ${${files_var}}
+      PROPERTIES
+        COMPILE_FLAGS "/DCBMC_VERSION=\"${CBMC_RELEASE} (n/a)\"")
+  endif()
+endmacro()
+
 add_subdirectory(src)
 add_subdirectory(regression)
 add_subdirectory(unit)

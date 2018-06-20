@@ -32,3 +32,6 @@ add_if_library(goto-instrument-lib glpk)
 # Executable
 add_executable(goto-instrument goto_instrument_main.cpp)
 target_link_libraries(goto-instrument goto-instrument-lib)
+
+set(cbmc_version_files "goto_instrument_parse_options.cpp")
+git_revision(goto-instrument-lib cbmc_version_files)
