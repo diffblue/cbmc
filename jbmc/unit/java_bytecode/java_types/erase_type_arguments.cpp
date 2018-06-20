@@ -63,6 +63,6 @@ SCENARIO("erase_type_arguments", "[core][java_types]")
     REQUIRE_THROWS_AS(
       erase_type_arguments(
         "testClassName<testTypeArgument1<testTypeArgument2>"),
-      unsupported_java_class_signature_exceptiont &);
+      unsupported_java_class_signature_exceptiont);
   }
 }
