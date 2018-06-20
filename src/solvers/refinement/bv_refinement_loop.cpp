@@ -78,7 +78,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
           << messaget::eom;
       break;
 
-    default:
+    case resultt::D_ERROR:
       return resultt::D_ERROR;
     }
   }
@@ -109,7 +109,7 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
   {
     case propt::resultt::P_SATISFIABLE: return resultt::D_SATISFIABLE;
     case propt::resultt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
-    default: return resultt::D_ERROR;
+    case propt::resultt::P_ERROR: return resultt::D_ERROR;
   }
 
   UNREACHABLE;

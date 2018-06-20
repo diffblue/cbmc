@@ -104,7 +104,7 @@ void symex_slicet::slice(SSA_stept &SSA_step)
     // ignore for now
     break;
 
-  default:
+  case goto_trace_stept::typet::NONE:
     UNREACHABLE;
   }
 }
@@ -192,7 +192,7 @@ void symex_slicet::collect_open_variables(
       // ignore for now
       break;
 
-    default:
+    case goto_trace_stept::typet::GOTO:
       UNREACHABLE;
     }
   }

@@ -825,7 +825,7 @@ bool java_bytecode_languaget::typecheck(
         }
       }
       break;
-    default:
+    case LAZY_METHODS_MODE_EXTERNAL_DRIVER:
       // Our caller is in charge of elaborating methods on demand.
       break;
   }

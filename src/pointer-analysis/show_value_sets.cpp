@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_model.h>
 
+#include <util/invariant.h>
 #include <util/xml.h>
 
 #include <iostream>
@@ -37,9 +38,8 @@ void show_value_sets(
     value_set_analysis.output(goto_model.goto_functions, std::cout);
     break;
 
-  default:
-    {
-    }
+  case ui_message_handlert::uit::JSON_UI:
+    UNIMPLEMENTED;
   }
 }
 
@@ -62,8 +62,7 @@ void show_value_sets(
     value_set_analysis.output(goto_program, std::cout);
     break;
 
-  default:
-    {
-    }
+  case ui_message_handlert::uit::JSON_UI:
+    UNIMPLEMENTED;
   }
 }

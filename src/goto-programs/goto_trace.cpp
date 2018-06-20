@@ -85,9 +85,10 @@ void goto_trace_stept::output(
   case goto_trace_stept::typet::FUNCTION_CALL: out << "FUNCTION CALL"; break;
   case goto_trace_stept::typet::FUNCTION_RETURN:
     out << "FUNCTION RETURN"; break;
-  default:
-    out << "unknown type: " << static_cast<int>(type) << std::endl;
-    UNREACHABLE;
+  case goto_trace_stept::typet::MEMORY_BARRIER: out << "MEMORY_BARRIER"; break;
+  case goto_trace_stept::typet::SPAWN: out << "SPAWN"; break;
+  case goto_trace_stept::typet::CONSTRAINT: out << "CONSTRAINT"; break;
+  case goto_trace_stept::typet::NONE: out << "NONE"; break;
   }
 
   if(is_assert() || is_assume() || is_goto())
@@ -479,9 +480,12 @@ void show_compact_goto_trace(
     case goto_trace_stept::typet::ATOMIC_BEGIN:
     case goto_trace_stept::typet::ATOMIC_END:
     case goto_trace_stept::typet::DEAD:
+    case goto_trace_stept::typet::CONSTRAINT:
+    case goto_trace_stept::typet::SHARED_READ:
+    case goto_trace_stept::typet::SHARED_WRITE:
       break;
 
-    default:
+    case goto_trace_stept::typet::NONE:
       UNREACHABLE;
     }
   }
@@ -678,7 +682,7 @@ void show_full_goto_trace(
     case goto_trace_stept::typet::CONSTRAINT:
     case goto_trace_stept::typet::SHARED_READ:
     case goto_trace_stept::typet::SHARED_WRITE:
-    default:
+    case goto_trace_stept::typet::NONE:
       UNREACHABLE;
     }
   }

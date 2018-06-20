@@ -29,9 +29,7 @@ void uninitialized_domaint::transform(
   if(has_values.is_false())
     return;
 
-  switch(from->type)
-  {
-  case DECL:
+  if(from->is_decl())
     {
       const irep_idt &identifier=
         to_code_decl(from->code).get_identifier();
@@ -40,9 +38,7 @@ void uninitialized_domaint::transform(
       if(!symbol.is_static_lifetime)
         uninitialized.insert(identifier);
     }
-    break;
-
-  default:
+  else
     {
       std::list<exprt> read=expressions_read(*from);
       std::list<exprt> written=expressions_written(*from);
@@ -54,7 +50,6 @@ void uninitialized_domaint::transform(
       for(const auto &expr : read)
         assign(expr);
     }
-  }
 }
 
 void uninitialized_domaint::assign(const exprt &lhs)

@@ -484,7 +484,7 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
     return resultt::D_SATISFIABLE;
   case propt::resultt::P_UNSATISFIABLE:
     return resultt::D_UNSATISFIABLE;
-  default:
+  case propt::resultt::P_ERROR:
     return resultt::D_ERROR;
   }
 

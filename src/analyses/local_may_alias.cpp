@@ -419,9 +419,23 @@ void local_may_aliast::build(const goto_functiont &goto_function)
       }
       break;
 
-    default:
-      {
-      }
+    case CATCH:
+    case THROW:
+    case RETURN:
+    case GOTO:
+    case START_THREAD:
+    case END_THREAD:
+    case ATOMIC_BEGIN:
+    case ATOMIC_END:
+    case LOCATION:
+    case SKIP:
+    case END_FUNCTION:
+    case OTHER:
+    case ASSERT:
+    case ASSUME:
+    case INCOMPLETE_GOTO:
+    case NO_INSTRUCTION_TYPE:
+      break;
     }
 
     for(local_cfgt::successorst::const_iterator

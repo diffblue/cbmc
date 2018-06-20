@@ -1680,9 +1680,8 @@ exprt cpp_typecheck_resolvet::resolve(
     }
     break;
 
-  default:
-    {
-    }
+  case wantt::BOTH:
+    break;
   }
 
   return result;

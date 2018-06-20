@@ -106,7 +106,7 @@ void SSA_stept::output(std::ostream &out) const
     out << "IF " << format(cond_expr) << " GOTO\n";
     break;
 
-  default:
+  case goto_trace_stept::typet::NONE:
     UNREACHABLE;
   }
 

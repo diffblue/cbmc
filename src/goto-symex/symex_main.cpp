@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-#include <cassert>
 #include <memory>
 
 #include <pointer-analysis/value_set_dereference.h>
@@ -19,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
+#include <util/invariant.h>
 #include <util/make_unique.h>
 #include <util/mathematical_expr.h>
 #include <util/replace_symbol.h>
@@ -549,8 +549,8 @@ void goto_symext::symex_step(
   case NO_INSTRUCTION_TYPE:
     throw unsupported_operation_exceptiont("symex got NO_INSTRUCTION");
 
-  default:
-    UNREACHABLE;
+  case INCOMPLETE_GOTO:
+    DATA_INVARIANT(false, "symex got unexpected instruction type");
   }
 }
 

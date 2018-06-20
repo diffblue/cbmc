@@ -74,7 +74,8 @@ optionalt<irept> smt2irept::operator()()
           break;
         }
 
-      default:
+      case NONE:
+      case KEYWORD:
         throw error("unexpected token");
       }
     }

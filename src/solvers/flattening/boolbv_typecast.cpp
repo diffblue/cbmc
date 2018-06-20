@@ -191,7 +191,12 @@ bool boolbvt::type_conversion(
         dest=src;
         return false;
 
-      default:
+      case bvtypet::IS_C_BIT_FIELD:
+      case bvtypet::IS_UNKNOWN:
+      case bvtypet::IS_RANGE:
+      case bvtypet::IS_VERILOG_UNSIGNED:
+      case bvtypet::IS_VERILOG_SIGNED:
+      case bvtypet::IS_FIXED:
         if(src_type.id()==ID_bool)
         {
           // bool to float
@@ -422,7 +427,9 @@ bool boolbvt::type_conversion(
         dest = src;
         return false;
 
-      default:
+      case bvtypet::IS_RANGE:
+      case bvtypet::IS_C_BIT_FIELD:
+      case bvtypet::IS_UNKNOWN:
         if(src_type.id() == ID_bool)
         {
           // bool to integer
@@ -516,7 +523,9 @@ bool boolbvt::type_conversion(
 
     return false;
 
-  default:
+  case bvtypet::IS_C_BIT_FIELD:
+  case bvtypet::IS_UNKNOWN:
+  case bvtypet::IS_VERILOG_SIGNED:
     if(dest_type.id()==ID_array)
     {
       if(src_width==dest_width)

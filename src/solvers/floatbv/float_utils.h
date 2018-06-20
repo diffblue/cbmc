@@ -57,7 +57,8 @@ public:
         round_to_zero=const_literal(true);
         break;
 
-      default:
+      case ieee_floatt::NONDETERMINISTIC:
+      case ieee_floatt::UNKNOWN:
         UNREACHABLE;
       }
     }

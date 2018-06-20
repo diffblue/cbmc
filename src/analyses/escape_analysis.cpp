@@ -253,9 +253,22 @@ void escape_domaint::transform(
     // This is the edge to the call site.
     break;
 
-  default:
-    {
-    }
+  case GOTO:
+  case CATCH:
+  case THROW:
+  case RETURN:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case LOCATION:
+  case START_THREAD:
+  case END_THREAD:
+  case ASSERT:
+  case ASSUME:
+  case SKIP:
+  case OTHER:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 }
 
@@ -444,9 +457,7 @@ void escape_analysist::instrument(
 
       const goto_programt::instructiont &instruction=*i_it;
 
-      switch(instruction.type)
-      {
-      case ASSIGN:
+      if(instruction.type == ASSIGN)
         {
           const code_assignt &code_assign=to_code_assign(instruction.code);
 
@@ -460,9 +471,7 @@ void escape_analysist::instrument(
             false,
             ns);
         }
-        break;
-
-      case DEAD:
+      else if(instruction.type == DEAD)
         {
           const code_deadt &code_dead=to_code_dead(instruction.code);
 
@@ -512,12 +521,6 @@ void escape_analysist::instrument(
             i_it++;
           }
         }
-        break;
-
-      default:
-        {
-        }
-      }
     }
 
     Forall_goto_program_instructions(i_it, f_it->second.body)

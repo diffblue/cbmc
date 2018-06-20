@@ -536,9 +536,21 @@ void custom_bitvector_domaint::transform(
     }
     break;
 
-  default:
-    {
-    }
+  case CATCH:
+  case THROW:
+  case RETURN:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case END_FUNCTION:
+  case LOCATION:
+  case START_THREAD:
+  case END_THREAD:
+  case SKIP:
+  case ASSERT:
+  case ASSUME:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 }
 
