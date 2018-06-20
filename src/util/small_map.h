@@ -146,7 +146,10 @@ private:
     if(n == 0)
       return nullptr;
 
-    T *mem = (T *)realloc(ptr, sizeof(T) * n);
+    // explicitly cast to char * as GCC 8 warns about not using new/delete for
+    // class sharing_node_innert<dstringt, std::basic_string<char>,
+    // std::equal_to<dstringt> >
+    T *mem = (T *)realloc((char *)ptr, sizeof(T) * n);
 
     if(!mem)
       throw std::bad_alloc();
@@ -486,7 +489,11 @@ public:
       std::size_t n = size();
       if(ii < n - 1)
       {
-        memmove(p + ii, p + ii + 1, sizeof(T) * (n - ii - 1));
+        // explicitly cast to char * as GCC 8 warns about not using new/delete
+        // for
+        // class sharing_node_innert<dstringt, std::basic_string<char>,
+        // std::equal_to<dstringt> >
+        memmove((char *)(p + ii), p + ii + 1, sizeof(T) * (n - ii - 1));
       }
 
       p = allocate(p, n - 1);
