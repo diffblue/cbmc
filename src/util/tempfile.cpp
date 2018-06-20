@@ -22,6 +22,7 @@ Author: Daniel Kroening
 #include <fcntl.h>
 
 #include <cstdlib>
+#include <cstdio>
 #include <cstring>
 
 #if defined(__linux__) || \
@@ -31,7 +32,6 @@ Author: Daniel Kroening
     defined(__CYGWIN__) || \
     defined(__MACH__)
 #include <unistd.h>
-#include <sys/time.h>
 #endif
 
 /// Substitute for mkstemps (OpenBSD standard) for Windows, where it is
@@ -133,5 +133,5 @@ std::string get_temporary_file(
 temporary_filet::~temporary_filet()
 {
   if(!name.empty())
-    unlink(name.c_str());
+    std::remove(name.c_str());
 }
