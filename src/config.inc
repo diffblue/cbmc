@@ -3,7 +3,53 @@ BUILD_ENV = AUTO
 
 # Enable all warnings and treat them as errors
 ifeq ($(BUILD_ENV),MSVC)
-  #CXXFLAGS += /Wall /WX
+  CXXFLAGS += /Wall /WX
+  # disable warning "decorated name length exceeded"
+  CXXFLAGS += /wd4503
+  # disable deprecation warnings
+  CXXFLAGS += /wd4996
+  # disable warning "unreferenced inline function has been removed"
+  CXXFLAGS += /wd4514
+  # disable warning "padding added after data member"
+  CXXFLAGS += /wd4820
+  # disable warning "function not inlined"
+  CXXFLAGS += /wd4710
+  # disable warning "layout of class may have changed from a previous version of
+  # the compiler due to better packing of member"
+  CXXFLAGS += /wd4371 /wd4435
+  # disable warning "conditional expression is constant"
+  CXXFLAGS += /wd4127
+  # disable warning "behavior change ... called instead of ..."
+  CXXFLAGS += /wd4350
+  # disable warning "assignment operator could not be generated"
+  CXXFLAGS += /wd4512 /wd4626
+  # disable warning "default/copy constructor could not be generated"
+  CXXFLAGS += /wd4623 /wd4510 /wd4625 /wd4610
+  # disable warning "no override available, function is hidden"
+  CXXFLAGS += /wd4266
+  # disable warning "unreferenced local function has been removed"
+  CXXFLAGS += /wd4505
+  # disable warning "'this' used in base member initializer list" - which would
+  # be useful to have, but it's not always clear where to put a silencing pragma
+  CXXFLAGS += /wd4355
+  # disable warning "#pragma warning(pop): likely mismatch, popping warning
+  # state pushed in different file"
+  CXXFLAGS += /wd5031 /wd5032
+  # disable warning "move constructor/assignment operator was implicitly defined
+  # as deleted"
+  CXXFLAGS += /wd5026 /wd5027
+  # disable warning "Informational: catch(...) semantics changed since Visual
+  # C++ 7.1; structured exceptions (SEH) are no longer caught"
+  CXXFLAGS += /wd4571
+  # disable warning "Compiler will insert Spectre mitigation with /Qspectre"
+  CXXFLAGS += /wd5045
+  # disable warning "signed/unsigned mismatch" as VS2017 STL headers yield it
+  # CXXFLAGS += /wd4365
+  # disable warning "format string expected is not a string literal" as VS2017 STL headers yield it
+  CXXFLAGS += /wd4774
+  # disable warning "#pragma warning: there is no warning number '...'" to
+  # support multiple Visual Studio versions
+  CXXFLAGS += /wd4619
 else
   CXXFLAGS += -Wall -pedantic -Werror -Wno-deprecated-declarations -Wswitch-enum
 endif
