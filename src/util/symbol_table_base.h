@@ -178,13 +178,6 @@ public:
     {
       return &**this;
     }
-
-    symbolt &get_writeable_symbol(const irep_idt &identifier)
-    {
-      if(on_get_writeable)
-        on_get_writeable((*this)->first);
-      return it->second;
-    }
   };
 
   virtual iteratort begin() = 0;
