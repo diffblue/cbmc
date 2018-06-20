@@ -195,14 +195,16 @@ mp_integer::ullong_t integer2ulong(const mp_integer &n)
 std::size_t integer2size_t(const mp_integer &n)
 {
   PRECONDITION(n>=0 && n<=std::numeric_limits<std::size_t>::max());
-  mp_integer::ullong_t ull=integer2ulong(n);
+  PRECONDITION(n.is_ulong());
+  mp_integer::ullong_t ull = n.to_ulong();
   return (std::size_t) ull;
 }
 
 unsigned integer2unsigned(const mp_integer &n)
 {
   PRECONDITION(n>=0 && n<=std::numeric_limits<unsigned>::max());
-  mp_integer::ullong_t ull=integer2ulong(n);
+  PRECONDITION(n.is_ulong());
+  mp_integer::ullong_t ull = n.to_ulong();
   return (unsigned)ull;
 }
 
