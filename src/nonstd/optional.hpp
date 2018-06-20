@@ -75,11 +75,18 @@
 # define optional_HAVE_AUTO  1
 # define optional_HAVE_NULLPTR  1
 # define optional_HAVE_STATIC_ASSERT  1
+#else
+# define optional_HAVE_AUTO  0
+# define optional_HAVE_NULLPTR  0
+# define optional_HAVE_STATIC_ASSERT  0
 #endif
 
 #if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 12
 # define optional_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  1
 # define optional_HAVE_INITIALIZER_LIST  1
+#else
+# define optional_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  0
+# define optional_HAVE_INITIALIZER_LIST  0
 #endif
 
 #if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 14
@@ -91,18 +98,31 @@
 # define optional_HAVE_IS_DELETE  1
 # define optional_HAVE_NOEXCEPT  1
 # define optional_HAVE_REF_QUALIFIER  1
+#else
+# define optional_HAVE_ALIAS_TEMPLATE  0
+# define optional_HAVE_CONSTEXPR_11  0
+# define optional_HAVE_ENUM_CLASS  0
+# define optional_HAVE_EXPLICIT_CONVERSION  0
+# define optional_HAVE_IS_DEFAULT  0
+# define optional_HAVE_IS_DELETE  0
+# define optional_HAVE_NOEXCEPT  0
+# define optional_HAVE_REF_QUALIFIER  0
 #endif
 
 // Presence of C++14 language features:
 
 #if optional_CPP14_OR_GREATER
 # define optional_HAVE_CONSTEXPR_14  1
+#else
+# define optional_HAVE_CONSTEXPR_14  0
 #endif
 
 // Presence of C++17 language features:
 
 #if optional_CPP17_OR_GREATER
 # define optional_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  1
+#else
+# define optional_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  0
 #endif
 
 // Presence of C++ library features:
@@ -110,31 +130,47 @@
 #if optional_COMPILER_GNUC_VERSION
 # define optional_HAVE_TR1_TYPE_TRAITS  1
 # define optional_HAVE_TR1_ADD_POINTER  1
+#else
+# define optional_HAVE_TR1_TYPE_TRAITS  0
+# define optional_HAVE_TR1_ADD_POINTER  0
 #endif
 
 #if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 9
 # define optional_HAVE_TYPE_TRAITS  1
 # define optional_HAVE_STD_ADD_POINTER  1
+#else
+# define optional_HAVE_TYPE_TRAITS  0
+# define optional_HAVE_STD_ADD_POINTER  0
 #endif
 
 #if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 11
 # define optional_HAVE_ARRAY  1
+#else
+# define optional_HAVE_ARRAY  0
 #endif
 
 #if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 12
 # define optional_HAVE_CONDITIONAL  1
+#else
+# define optional_HAVE_CONDITIONAL  0
 #endif
 
 #if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 14 || (optional_COMPILER_MSVC_VERSION >= 9 && _HAS_CPP0X)
 # define optional_HAVE_CONTAINER_DATA_METHOD  1
+#else
+# define optional_HAVE_CONTAINER_DATA_METHOD  0
 #endif
 
 #if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 12
 # define optional_HAVE_REMOVE_CV  1
+#else
+# define optional_HAVE_REMOVE_CV  0
 #endif
 
 #if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 14
 # define optional_HAVE_SIZED_TYPES  1
+#else
+# define optional_HAVE_SIZED_TYPES  0
 #endif
 
 // For the rest, consider VC14 as C++11 for variant-lite:
@@ -198,7 +234,7 @@
 // in_place: code duplicated in any-lite, optional-lite, variant-lite:
 //
 
-#if ! nonstd_lite_HAVE_IN_PLACE_TYPES
+#if !defined(nonstd_lite_HAVE_IN_PLACE_TYPES) || !nonstd_lite_HAVE_IN_PLACE_TYPES
 
 namespace nonstd {
 
@@ -252,7 +288,7 @@ namespace detail {
 
 // C++11 emulation:
 
-#if variant_HAVE_CONDITIONAL
+#if defined(variant_HAVE_CONDITIONAL) && variant_HAVE_CONDITIONAL
 
 using std::conditional;
 
