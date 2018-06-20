@@ -709,12 +709,11 @@ std::size_t grapht<N>::connected_subgraphs(
 
       const nodet &node=nodes[n];
 
-      for(typename edgest::const_iterator
-          it=node.out.begin();
-          it!=node.out.end();
-          it++)
-        if(!visited[*it])
-          s.push(*it);
+      for(const auto &o : node.out)
+      {
+        if(!visited[o.first])
+          s.push(o.first);
+      }
     }
 
     nr++;
@@ -805,20 +804,13 @@ void grapht<N>::make_chordal()
     const nodet &n=tmp[i];
 
     // connect all the nodes in n.out with each other
-
-    for(typename edgest::const_iterator
-        it1=n.out.begin();
-        it1!=n.out.end();
-        it1++)
-      for(typename edgest::const_iterator
-          it2=n.out.begin();
-          it2!=n.out.end();
-          it2++)
+    for(const auto &o1 : n.out)
+      for(const auto &o2 : n.out)
       {
-        if(*it1!=*it2)
+        if(o1.first!=o2.first)
         {
-          tmp.add_undirected_edge(*it1, *it2);
-          this->add_undirected_edge(*it1, *it2);
+          tmp.add_undirected_edge(o1.first, o2.first);
+          this->add_undirected_edge(o1.first, o2.first);
         }
       }
 
