@@ -3,7 +3,7 @@
 make
 strip cbmc.exe
 
-VERSION=`./cbmc.exe --version`
+VERSION=`./cbmc.exe --version | cut -d " " -f 1`
 VERSION_FILE=`echo $VERSION | sed "y/./-/"`
 
 echo $VERSION_FILE
