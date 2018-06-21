@@ -56,6 +56,8 @@ INCLUDES= -I ..
 
 LIBS =
 
+CBMC_VERSION_FILES = cbmc_solvers$(OBJEXT)
+
 include ../config.inc
 include ../common
 

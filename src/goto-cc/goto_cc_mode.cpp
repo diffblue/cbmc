@@ -22,7 +22,7 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
-#include <cbmc/version.h>
+#include <util/parse_options.h>
 
 /// constructor
 goto_cc_modet::goto_cc_modet(
@@ -44,10 +44,10 @@ goto_cc_modet::~goto_cc_modet()
 /// display command line help
 void goto_cc_modet::help()
 {
-  std::cout <<
-  "\n"
-  // NOLINTNEXTLINE(whitespace/line_length)
-  "* *         goto-cc " CBMC_VERSION " - Copyright (C) 2006-2018           * *\n"
+  // clang-format off
+  std::cout << '\n' << banner_string("goto-cc", CBMC_VERSION) << '\n'
+            <<
+  "* *               Copyright (C) 2006-2018                   * *\n"
   "* *          Daniel Kroening, Michael Tautschnig,           * *\n"
   "* *               Christoph Wintersteiger                   * *\n"
   "\n";
@@ -65,6 +65,7 @@ void goto_cc_modet::help()
   " --print-rejected-preprocessed-source file\n"
   "                             copy failing (preprocessed) source to file\n"
   "\n";
+  // clang-format on
 }
 
 /// starts the compiler

@@ -16,8 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/cout_message.h>
 
-#include <cbmc/version.h>
-
 #include "mm_parser.h"
 #include "mm2cpp.h"
 
@@ -97,11 +95,10 @@ int mmcc_parse_optionst::convert(
 /// display command line help
 void mmcc_parse_optionst::help()
 {
-  std::cout <<
-    "\n"
-    "* *   MMCC " CBMC_VERSION " - Copyright (C) 2015-2015    * *\n";
-
-  std::cout <<
+  // clang-format off
+  std::cout << '\n' << banner_string("MMCC", CBMC_VERSION) << '\n'
+            <<
+    "                  Copyright (C) 2015-2015\n"
     "\n"
     "Usage:                       Purpose:\n"
     "\n"
@@ -109,4 +106,5 @@ void mmcc_parse_optionst::help()
     " mmcc file.cat                convert given source file\n"
     " mmcc                         convert from stdin\n"
     "\n";
+  // clang-format on
 }

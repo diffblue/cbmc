@@ -60,8 +60,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/replace_java_nondet.h>
 #include <java_bytecode/simple_method_stubbing.h>
 
-#include <cbmc/version.h>
-
 jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv):
   parse_options_baset(JBMC_OPTIONS, argc, argv),
   messaget(ui_message_handler),
@@ -1069,15 +1067,10 @@ bool jbmc_parse_optionst::generate_function_body(
 /// display command line help
 void jbmc_parse_optionst::help()
 {
-  std::cout << "\n"
-               "* *   JBMC " CBMC_VERSION " - Copyright (C) 2001-2018 ";
-
-  std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
-
-  std::cout << "   * *\n";
-
   // clang-format off
-  std::cout <<
+  std::cout << '\n' << banner_string("JBMC", CBMC_VERSION) << '\n'
+            <<
+    "* *                 Copyright (C) 2001-2018                 * *\n"
     "* *              Daniel Kroening, Edmund Clarke             * *\n"
     "* * Carnegie Mellon University, Computer Science Department * *\n"
     "* *                 kroening@kroening.com                   * *\n"

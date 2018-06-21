@@ -38,6 +38,11 @@ LIBS =
 
 CLEANFILES = goto-cc$(EXEEXT) goto-cl$(EXEEXT)
 
+CBMC_VERSION_FILES = as_mode$(OBJEXT) \
+                     compile$(OBJEXT) \
+                     gcc_mode$(OBJEXT) \
+                     goto_cc_mode$(OBJEXT)
+
 include ../config.inc
 include ../common
 

@@ -55,8 +55,6 @@ Author: Peter Schrammel
 
 #include <langapi/mode.h>
 
-#include <cbmc/version.h>
-
 #include "java_syntactic_diff.h"
 #include <goto-diff/change_impact.h>
 #include <goto-diff/goto_diff.h>
@@ -429,10 +427,9 @@ bool jdiff_parse_optionst::process_goto_program(
 void jdiff_parse_optionst::help()
 {
   // clang-format off
-  std::cout <<
-    "\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "* *           JDIFF " CBMC_VERSION " - Copyright (C) 2016-2018       * *\n"
+  std::cout << '\n' << banner_string("JDIFF", CBMC_VERSION) << '\n'
+            <<
+    "* *                Copyright (C) 2016-2018                  * *\n"
     "* *            Daniel Kroening, Peter Schrammel             * *\n"
     "* *                 kroening@kroening.com                   * *\n"
     "\n"

@@ -70,3 +70,6 @@ endif
 # Signing identity for MacOS Gatekeeper
 
 OSX_IDENTITY="Developer ID Application: Daniel Kroening"
+
+# Detailed version information
+CBMC_VERSION = 5.8
