@@ -14,6 +14,8 @@ Date: May 2018
 #include <iosfwd>
 #include <string>
 
+#include <util/config.h>
+
 class gcc_versiont
 {
 public:
@@ -34,8 +36,17 @@ public:
     BCC
   } flavor;
 
+  configt::ansi_ct::c_standardt default_c_standard;
+  configt::cppt::cpp_standardt default_cxx_standard;
+
   gcc_versiont()
-    : v_major(0), v_minor(0), v_patchlevel(0), flavor(flavort::UNKNOWN)
+    :
+    v_major(0),
+    v_minor(0),
+    v_patchlevel(0),
+    flavor(flavort::UNKNOWN),
+    default_c_standard(configt::ansi_ct::c_standardt::C89),
+    default_cxx_standard(configt::cppt::cpp_standardt::CPP98)
   {
   }
 };

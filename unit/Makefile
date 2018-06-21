@@ -63,17 +63,9 @@ BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
           ../src/cbmc/symex_bmc$(OBJEXT) \
           ../src/cbmc/symex_coverage$(OBJEXT) \
           ../src/cbmc/xml_interface$(OBJEXT) \
-          ../src/jsil/expr2jsil$(OBJEXT) \
-          ../src/jsil/jsil_convert$(OBJEXT) \
-          ../src/jsil/jsil_entry_point$(OBJEXT) \
-          ../src/jsil/jsil_internal_additions$(OBJEXT) \
-          ../src/jsil/jsil_language$(OBJEXT) \
-          ../src/jsil/jsil_lex.yy$(OBJEXT) \
-          ../src/jsil/jsil_parser$(OBJEXT) \
-          ../src/jsil/jsil_parse_tree$(OBJEXT) \
-          ../src/jsil/jsil_typecheck$(OBJEXT) \
-          ../src/jsil/jsil_types$(OBJEXT) \
-          ../src/jsil/jsil_y.tab$(OBJEXT) \
+          ../src/xmllang/xmllang$(LIBEXT) \
+          ../src/goto-symex/goto-symex$(LIBEXT) \
+          ../src/jsil/jsil$(LIBEXT) \
           # Empty last line
 #
 CPROVER_LIBS =../src/ansi-c/ansi-c$(LIBEXT) \

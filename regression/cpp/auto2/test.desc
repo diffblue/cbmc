@@ -1,6 +1,6 @@
 CORE
 main.cpp
-
+-std=c++98
 ^EXIT=0$
 ^SIGNAL=0$
 --

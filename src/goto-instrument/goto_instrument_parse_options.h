@@ -27,6 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/generate_function_bodies.h>
 
+#include "count_eloc.h"
+
 // clang-format off
 #define GOTO_INSTRUMENT_OPTIONS \
   "(all)" \
@@ -81,17 +83,18 @@ Author: Daniel Kroening, kroening@kroening.com
   "(accelerate)(constant-propagator)" \
   "(k-induction):(step-case)(base-case)" \
   "(show-call-sequences)(check-call-sequence)" \
-  "(interpreter)(show-reaching-definitions)(count-eloc)(list-eloc)" \
+  "(interpreter)(show-reaching-definitions)" \
   "(list-symbols)(list-undefined-functions)" \
   "(z3)(add-library)(show-dependence-graph)" \
   "(horn)(skip-loops):(apply-code-contracts)(model-argc-argv):" \
-  "(show-threaded)(list-calls-args)(print-path-lengths)" \
+  "(show-threaded)(list-calls-args)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\
   OPT_FLUSH \
   "(splice-call):" \
   OPT_REMOVE_CALLS_NO_BODY \
-  OPT_REPLACE_FUNCTION_BODY
+  OPT_REPLACE_FUNCTION_BODY \
+  OPT_GOTO_PROGRAM_STATS
 
 // clang-format on
 
