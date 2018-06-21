@@ -42,6 +42,8 @@ public:
   symbol_table_baset(const symbol_table_baset &other) = delete;
   symbol_table_baset &operator=(const symbol_table_baset &other) = delete;
 
+  virtual ~symbol_table_baset();
+
 public:
   /// Permits implicit cast to const symbol_tablet &
   operator const symbol_tablet &() const
