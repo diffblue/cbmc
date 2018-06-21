@@ -31,7 +31,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(disable-uncaught-exception-check)" \
   "(throw-assertion-error)" \
   "(java-assume-inputs-non-null)" \
-  "(java-throw-runtime-exceptions)" \
+  "(java-throw-runtime-exceptions)" /* will go away */ \
+  "(throw-runtime-exceptions)" \
   "(java-max-input-array-length):" /* will go away */ \
   "(max-nondet-array-length):" \
   "(java-max-input-tree-depth):"   /* will go away */ \
@@ -52,7 +53,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "                                  at the location of the assert statement\n"                  /* NOLINT(*) */ \
   " --java-assume-inputs-non-null    never initialize reference-typed parameter to the\n"        /* NOLINT(*) */ \
   "                                  entry point with null\n"                                    /* NOLINT(*) */ \
-  " --java-throw-runtime-exceptions  make implicit runtime exceptions explicit\n"                /* NOLINT(*) */ \
+  " --throw-runtime-exceptions       make implicit runtime exceptions explicit\n"                /* NOLINT(*) */ \
   " --max-nondet-array-length N      limit nondet (e.g. input) array size to <= N\n"                           /* NOLINT(*) */ \
   " --max-nondet-tree-depth N        limit size of nondet (e.g. input) object tree;\n" /* NOLINT(*) */ \
   "                                  at level N references are set to null\n" /* NOLINT(*) */ \

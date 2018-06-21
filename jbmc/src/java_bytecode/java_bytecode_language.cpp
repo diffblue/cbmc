@@ -46,7 +46,9 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
   string_refinement_enabled = !cmd.isset("no-refine-strings");
-  throw_runtime_exceptions=cmd.isset("java-throw-runtime-exceptions");
+  throw_runtime_exceptions =
+    cmd.isset("java-throw-runtime-exceptions") || // will go away
+    cmd.isset("throw-runtime-exceptions");
   assert_uncaught_exceptions = !cmd.isset("disable-uncaught-exception-check");
   throw_assertion_error = cmd.isset("throw-assertion-error");
   threading_support = cmd.isset("java-threading");

@@ -1,6 +1,6 @@
 CORE
 test.class
---function test.f --java-throw-runtime-exceptions
+--function test.f --throw-runtime-exceptions
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL
