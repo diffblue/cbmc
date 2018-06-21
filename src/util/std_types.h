@@ -151,6 +151,12 @@ inline symbol_typet &to_symbol_type(typet &type)
   return static_cast<symbol_typet &>(type);
 }
 
+template <>
+inline bool can_cast_type<symbol_typet>(const typet &type)
+{
+  return type.id() == ID_symbol;
+}
+
 /*! \brief Base type of C structs and unions, and C++ classes
 */
 class struct_union_typet:public typet

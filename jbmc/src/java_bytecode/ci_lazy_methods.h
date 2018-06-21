@@ -121,16 +121,6 @@ private:
     const namespacet &ns,
     ci_lazy_methods_neededt &needed_lazy_methods);
 
-  void initialize_all_instantiated_classes_from_pointer(
-    const pointer_typet &pointer_type,
-    const namespacet &ns,
-    ci_lazy_methods_neededt &needed_lazy_methods);
-
-  void initialize_instantiated_classes_from_pointer(
-    const pointer_typet &pointer_type,
-    const namespacet &ns,
-    ci_lazy_methods_neededt &needed_lazy_methods);
-
   void gather_virtual_callsites(
     const exprt &e,
     std::unordered_set<exprt, irep_hash> &result);
@@ -145,11 +135,6 @@ private:
     const exprt &e,
     const symbol_tablet &symbol_table,
     symbol_tablet &needed);
-
-  void gather_field_types(
-    const typet &class_type,
-    const namespacet &ns,
-    ci_lazy_methods_neededt &needed_lazy_methods);
 
   irep_idt get_virtual_method_target(
     const std::unordered_set<irep_idt> &instantiated_classes,
