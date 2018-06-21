@@ -152,7 +152,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
 void bmc_all_propertiest::report(const cover_goalst &cover_goals)
 {
-  switch(bmc.ui)
+  switch(bmc.ui_message_handler.get_ui())
   {
   case ui_message_handlert::uit::PLAIN:
     {

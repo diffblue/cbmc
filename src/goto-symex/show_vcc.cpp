@@ -149,12 +149,11 @@ void show_vcc_json(
 
 void show_vcc(
   const optionst &options,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui,
+  ui_message_handlert &ui_message_handler,
   const namespacet &ns,
   const symex_target_equationt &equation)
 {
-  messaget msg(message_handler);
+  messaget msg(ui_message_handler);
 
   const std::string &filename = options.get_option("outfile");
   bool have_file = !filename.empty() && filename != "-";
@@ -170,7 +169,7 @@ void show_vcc(
 
   std::ostream &out = have_file ? of : std::cout;
 
-  switch(ui)
+  switch(ui_message_handler.get_ui())
   {
   case ui_message_handlert::uit::XML_UI:
     msg.error() << "XML UI not supported" << messaget::eom;

@@ -157,7 +157,7 @@ void show_symbol_table_plain(
 
 static void show_symbol_table_json_ui(
   const symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  ui_message_handlert &message_handler)
 {
   json_stream_arrayt &out = message_handler.get_json_stream();
 
@@ -232,7 +232,7 @@ static void show_symbol_table_json_ui(
 
 static void show_symbol_table_brief_json_ui(
   const symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  ui_message_handlert &message_handler)
 {
   json_stream_arrayt &out = message_handler.get_json_stream();
 

@@ -362,14 +362,12 @@ void _check_with_strategy(
   ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, log, mh);
   REQUIRE(ret == -1);
 
-  cbmc_solverst solvers(opts, gm.get_symbol_table(), mh);
-  solvers.set_ui(mh.get_ui());
+  cbmc_solverst solvers(opts, gm.get_symbol_table(), mh, false);
   std::unique_ptr<cbmc_solverst::solvert> cbmc_solver = solvers.get_solver();
   prop_convt &pc = cbmc_solver->prop_conv();
   std::function<bool(void)> callback = []() { return false; };
 
   bmct bmc(opts, gm.get_symbol_table(), mh, pc, *worklist, callback);
-  bmc.set_ui(mh.get_ui());
   safety_checkert::resultt result = bmc.run(gm);
   symex_eventt::validate_result(events, result);
 
@@ -382,8 +380,7 @@ void _check_with_strategy(
 
   while(!worklist->empty())
   {
-    cbmc_solverst solvers(opts, gm.get_symbol_table(), mh);
-    solvers.set_ui(mh.get_ui());
+    cbmc_solverst solvers(opts, gm.get_symbol_table(), mh, false);
     cbmc_solver = solvers.get_solver();
     prop_convt &pc = cbmc_solver->prop_conv();
     path_storaget::patht &resume = worklist->peek();

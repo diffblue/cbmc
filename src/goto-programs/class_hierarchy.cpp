@@ -262,12 +262,11 @@ void class_hierarchyt::output(
 
 void show_class_hierarchy(
   const class_hierarchyt &hierarchy,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui,
+  ui_message_handlert &message_handler,
   bool children_only)
 {
   messaget msg(message_handler);
-  switch(ui)
+  switch(message_handler.get_ui())
   {
   case ui_message_handlert::uit::PLAIN:
     hierarchy.output(msg.result(), children_only);

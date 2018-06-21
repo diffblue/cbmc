@@ -39,16 +39,6 @@ public:
     return _ui;
   }
 
-  void set_ui(uit __ui)
-  {
-    _ui=__ui;
-    if(_ui == uit::JSON_UI && !json_stream)
-    {
-      json_stream =
-        std::unique_ptr<json_stream_arrayt>(new json_stream_arrayt(out));
-    }
-  }
-
   virtual void flush(unsigned level) override;
 
   json_stream_arrayt &get_json_stream() override

@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/options.h>
-#include <util/ui_message.h>
 
 #include <solvers/prop/prop.h>
 #include <solvers/prop/prop_conv.h>
@@ -26,18 +25,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt2/smt2_dec.h>
 #include <goto-symex/symex_target_equation.h>
 
-class cbmc_solverst:public messaget
+class cbmc_solverst
 {
 public:
   cbmc_solverst(
     const optionst &_options,
     const symbol_tablet &_symbol_table,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    options(_options),
-    symbol_table(_symbol_table),
-    ns(_symbol_table),
-    ui(ui_message_handlert::uit::PLAIN)
+    message_handlert &_message_handler,
+    bool _output_xml_in_refinement)
+    : options(_options),
+      symbol_table(_symbol_table),
+      ns(_symbol_table),
+      message_handler(_message_handler),
+      output_xml_in_refinement(_output_xml_in_refinement)
   {
   }
 
@@ -117,15 +117,12 @@ public:
   {
   }
 
-  void set_ui(ui_message_handlert::uit _ui) { ui=_ui; }
-
 protected:
   const optionst &options;
   const symbol_tablet &symbol_table;
   namespacet ns;
-
-  // use gui format
-  ui_message_handlert::uit ui;
+  message_handlert &message_handler;
+  const bool output_xml_in_refinement;
 
   std::unique_ptr<solvert> get_default();
   std::unique_ptr<solvert> get_dimacs();

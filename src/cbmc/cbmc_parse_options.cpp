@@ -527,11 +527,7 @@ int cbmc_parse_optionst::doit()
     return CPROVER_EXIT_SET_PROPERTIES_FAILED;
 
   return bmct::do_language_agnostic_bmc(
-    path_strategy_chooser,
-    options,
-    goto_model,
-    ui_message_handler.get_ui(),
-    *this);
+    path_strategy_chooser, options, goto_model, ui_message_handler);
 }
 
 bool cbmc_parse_optionst::set_properties()
