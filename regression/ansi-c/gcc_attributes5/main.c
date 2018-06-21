@@ -3,21 +3,29 @@
 
 #ifdef __GNUC__
 
-char __attribute__((aligned(8))) var1;
-__attribute__((aligned(8))) char var2;
-char var3 __attribute__((aligned(8)));
-int (__attribute__((aligned(8))) var4);
-int (__attribute__((aligned(8))) (var5));
-int (__attribute__((aligned(8))) *var6);
-int __attribute__((aligned(8))) *var7;
+char __attribute__((aligned(16))) var1;
+__attribute__((aligned(16))) char var2;
+char var3 __attribute__((aligned(16)));
+int (__attribute__((aligned(16))) var4);
+int (__attribute__((aligned(16))) (var5));
+int (__attribute__((aligned(16))) *var6);
+int __attribute__((aligned(16))) *var7;
+__attribute__((aligned(16))) int *var8;
 
-STATIC_ASSERT(__alignof(var1)==8);
-STATIC_ASSERT(__alignof(var2)==8);
-STATIC_ASSERT(__alignof(var3)==8);
-STATIC_ASSERT(__alignof(var4)==8);
-STATIC_ASSERT(__alignof(var5)==8);
+STATIC_ASSERT(__alignof(var1)==16);
+STATIC_ASSERT(__alignof(var2)==16);
+STATIC_ASSERT(__alignof(var3)==16);
+STATIC_ASSERT(__alignof(var4)==16);
+STATIC_ASSERT(__alignof(var5)==16);
+#ifdef __clang__
+STATIC_ASSERT(__alignof(var6)==16);
+STATIC_ASSERT(__alignof(*var6)==__alignof(int));
+#else
 STATIC_ASSERT(__alignof(var6)==__alignof(void *));
-STATIC_ASSERT(__alignof(var7)==8);
+STATIC_ASSERT(__alignof(*var6)==16);
+#endif
+STATIC_ASSERT(__alignof(var7)==16);
+STATIC_ASSERT(__alignof(var8)==16);
 
 void (__attribute__((aligned)) *****f1)(void);
 void (__attribute__((aligned)) f2)(void);
