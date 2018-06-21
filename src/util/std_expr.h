@@ -512,9 +512,10 @@ public:
     set_bits_per_byte(bits_per_byte);
   }
 
-  explicit bswap_exprt(const exprt &_op, std::size_t &_bits_per_byte)
+  bswap_exprt(const exprt &_op, std::size_t bits_per_byte)
     : unary_exprt(ID_bswap, _op, _op.type())
   {
+    set_bits_per_byte(bits_per_byte);
   }
 
   std::size_t get_bits_per_byte() const
