@@ -30,25 +30,16 @@ public:
 
   virtual void print(unsigned level, const std::string &message)=0;
 
-  virtual void print(unsigned level, const xmlt &xml)
-  {
-    // no-op by default
-  }
+  virtual void print(unsigned level, const xmlt &xml) = 0;
 
-  virtual void print(unsigned level, const jsont &json)
-  {
-    // no-op by default
-  }
+  virtual void print(unsigned level, const jsont &json) = 0;
 
   virtual void print(
     unsigned level,
     const std::string &message,
     const source_locationt &location);
 
-  virtual void flush(unsigned level)
-  {
-    // no-op by default
-  }
+  virtual void flush(unsigned) = 0;
 
   virtual ~message_handlert()
   {
@@ -80,17 +71,29 @@ protected:
 class null_message_handlert:public message_handlert
 {
 public:
-  virtual void print(unsigned level, const std::string &message)
+  void print(unsigned level, const std::string &message) override
   {
     message_handlert::print(level, message);
   }
 
-  virtual void print(
+  void print(unsigned, const xmlt &) override
+  {
+  }
+
+  void print(unsigned, const jsont &) override
+  {
+  }
+
+  void print(
     unsigned level,
     const std::string &message,
-    const source_locationt &)
+    const source_locationt &) override
   {
     print(level, message);
+  }
+
+  void flush(unsigned) override
+  {
   }
 };
 
@@ -101,7 +104,7 @@ public:
   {
   }
 
-  virtual void print(unsigned level, const std::string &message)
+  void print(unsigned level, const std::string &message) override
   {
     message_handlert::print(level, message);
 
@@ -109,7 +112,15 @@ public:
       out << message << '\n';
   }
 
-  virtual void flush(unsigned level)
+  void print(unsigned, const xmlt &) override
+  {
+  }
+
+  void print(unsigned, const jsont &) override
+  {
+  }
+
+  void flush(unsigned) override
   {
     out << std::flush;
   }

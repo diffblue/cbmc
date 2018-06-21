@@ -29,6 +29,14 @@ public:
 class console_message_handlert : public message_handlert
 {
 public:
+  void print(unsigned, const xmlt &) override
+  {
+  }
+
+  void print(unsigned, const jsont &) override
+  {
+  }
+
   // level 4 and upwards go to cout, level 1-3 to cerr
   virtual void print(
     unsigned level,
@@ -57,6 +65,14 @@ protected:
 class gcc_message_handlert : public console_message_handlert
 {
 public:
+  void print(unsigned, const xmlt &) override
+  {
+  }
+
+  void print(unsigned, const jsont &) override
+  {
+  }
+
   // aims to imitate the messages gcc prints
   virtual void print(
     unsigned level,
