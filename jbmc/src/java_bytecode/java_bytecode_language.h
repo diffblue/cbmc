@@ -62,7 +62,10 @@ Author: Daniel Kroening, kroening@kroening.com
   " --lazy-methods-extra-entry-point METHODNAME\n"                                               /* NOLINT(*) */ \
   "                                  treat METHODNAME as a possible program entry point for\n"   /* NOLINT(*) */ \
   "                                  the purpose of lazy method loading\n"                       /* NOLINT(*) */ \
-  "                                  A '.*' wildcard is allowed to specify all class members\n"
+  "                                  METHODNAME can be a regex that will be matched against\n"   /* NOLINT(*) */ \
+  "                                  all symbols. If missing a java:: prefix will be added\n"    /* NOLINT(*) */ \
+  "                                  If no descriptor is found, all overloads of a method will\n"/* NOLINT(*) */ \
+  "                                  also be added."                                             /* NOLINT(*) */
 // clang-format on
 
 class symbolt;
@@ -173,7 +176,6 @@ protected:
   size_t max_user_array_length;     // max size for user code created arrays
   method_bytecodet method_bytecode;
   lazy_methods_modet lazy_methods_mode;
-  std::vector<irep_idt> lazy_methods_extra_entry_points;
   bool string_refinement_enabled;
   bool throw_runtime_exceptions;
   bool assert_uncaught_exceptions;
@@ -195,6 +197,8 @@ private:
   class_hierarchyt class_hierarchy;
   // List of classes to never load
   std::unordered_set<std::string> no_load_classes;
+
+  std::vector<load_extra_methodst> extra_methods;
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();

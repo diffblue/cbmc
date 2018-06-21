@@ -21,6 +21,7 @@ SRC += java_bytecode/goto-programs/class_hierarchy_output.cpp \
        java_bytecode/java_types/java_generic_symbol_type.cpp \
        java_bytecode/java_types/java_type_from_string.cpp \
        java_bytecode/java_utils_test.cpp \
+       java_bytecode/load_method_by_regex.cpp \
        java_bytecode/inherited_static_fields/inherited_static_fields.cpp \
        pointer-analysis/custom_value_set_analysis.cpp \
        solvers/refinement/string_constraint_instantiation/instantiate_not_contains.cpp \
