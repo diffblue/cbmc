@@ -239,13 +239,7 @@ else
 $(CBMC_VERSION_FILES): CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
 endif
 
-# Use make >= 4.0's `file` function, if available - it should be faster than
-# `shell cat`
-ifeq ($(firstword $(subst ., , $(MAKE_VERSION))), 3)
 KNOWN_RELEASE_INFO = $(shell cat $(GIT_INFO_FILE) 2>/dev/null)
-else
-KNOWN_RELEASE_INFO = $(file < $(GIT_INFO_FILE))
-endif
 ifneq ($(GIT_INFO), $(KNOWN_RELEASE_INFO))
 $(CBMC_VERSION_FILES): $(GIT_INFO_FILE)
 
