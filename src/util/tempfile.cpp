@@ -62,7 +62,7 @@ int my_mkstemps(char *template_str, int suffix_len)
   static long long unsigned int random_state;
   random_state+=getpid()+123;
 
-  for(unsigned attempt=0; ; ++attempt)
+  for(unsigned attempt = 0; attempt < 1000; ++attempt)
   {
     unsigned long long number=random_state;
 
