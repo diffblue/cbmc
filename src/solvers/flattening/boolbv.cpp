@@ -380,7 +380,7 @@ bvt boolbvt::convert_bv_literals(const exprt &expr)
     throw "bv_literals with wrong size";
 
   for(std::size_t i=0; i<width; i++)
-    bv[i].set(unsafe_string2int(id2string(bv_sub[i].id())));
+    bv[i].set(unsafe_string2unsigned(id2string(bv_sub[i].id())));
 
   return bv;
 }
