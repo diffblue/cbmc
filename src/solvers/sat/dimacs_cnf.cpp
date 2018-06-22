@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dimacs_cnf.h"
 
+#include <util/invariant.h>
 #include <util/magic.h>
 
 #include <iostream>
@@ -16,6 +17,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 dimacs_cnft::dimacs_cnft():break_lines(false)
 {
+}
+
+void dimacs_cnft::set_assignment(literalt a, bool value)
+{
+  UNIMPLEMENTED;
+}
+
+bool dimacs_cnft::is_in_conflict(literalt l) const
+{
+  UNREACHABLE;
+  return false;
 }
 
 dimacs_cnf_dumpt::dimacs_cnf_dumpt(std::ostream &_out):out(_out)
