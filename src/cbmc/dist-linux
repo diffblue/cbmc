@@ -4,7 +4,7 @@ umask u=rwx,g=rx,o=rx
 make
 strip cbmc
 
-VERSION=`./cbmc --version`
+VERSION=`./cbmc --version | cut -d " " -f 1`
 VERSION_FILE=`echo $VERSION | sed "y/./-/"`
 BITS=`getconf LONG_BIT`
 # UNAME_M=`uname -m`

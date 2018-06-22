@@ -8,7 +8,7 @@ make cbmc-mac-signed
 (cd ../goto-cc; make goto-cc-mac-signed)
 (cd ../goto-instrument; make goto-instrument-mac-signed)
 
-VERSION=`./cbmc --version`
+VERSION=`./cbmc --version | cut -d " " -f 1`
 VERSION_FILE=`echo $VERSION | sed "y/./-/"`
 BITS=`getconf LONG_BIT`
 
