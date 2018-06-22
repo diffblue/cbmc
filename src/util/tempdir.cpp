@@ -40,6 +40,7 @@ std::string get_temporary_directory(const std::string &name_template)
   std::string result;
 
   #ifdef _WIN32
+    (void)name_template; // unused parameter
     DWORD dwBufSize = MAX_PATH+1;
     char lpPathBuffer[MAX_PATH+1];
     DWORD dwRetVal = GetTempPathA(dwBufSize, lpPathBuffer);

@@ -185,6 +185,7 @@ void scratch_programt::append_loop(
   append(program);
 
   // Update any back jumps to the loop header.
+  (void)loop_header; // unused parameter
   assume(false_exprt());
 
   goto_programt::targett end=add_instruction(SKIP);

@@ -32,6 +32,8 @@ bool is_osx_fat_magic(char hdr[4])
     case FAT_CIGAM:
       return true;
   }
+#else
+  (void)hdr; // unused parameter
 #endif
 
   return false;
@@ -75,6 +77,8 @@ osx_fat_readert::osx_fat_readert(std::ifstream &in) :
                 cpusubtype==CPU_SUBTYPE_HPPA_7100LC &&
                 size > 0;
   }
+#else
+  (void)in;  // unused parameter
 #endif
 }
 

@@ -17,14 +17,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <memory> // unique_ptr
 
-#include <util/symbol.h>
-#include <util/std_types.h>
 #include <util/message.h>
+#include <util/std_types.h>
+#include <util/symbol.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/system_library_symbols.h>
 
 class symbol_tablet;
-class symbol_table_baset;
 class exprt;
 class namespacet;
 class optionst;
@@ -49,7 +49,14 @@ public:
   virtual bool preprocess(
     std::istream &instream,
     const std::string &path,
-    std::ostream &outstream) { return false; }
+    std::ostream &outstream)
+  {
+    // unused parameters
+    (void)instream;
+    (void)path;
+    (void)outstream;
+    return false;
+  }
 
   virtual bool parse(
     std::istream &instream,
@@ -75,18 +82,26 @@ public:
   // add modules provided by currently parsed file to set
 
   virtual void modules_provided(std::set<std::string> &modules)
-  { }
+  {
+    (void)modules; // unused parameter
+  }
 
   // add lazy functions provided to set
 
   virtual void methods_provided(std::unordered_set<irep_idt> &methods) const
-  { }
+  {
+    (void)methods; // unused parameter
+  }
 
   // populate a lazy method
   virtual void
   convert_lazy_method(
     const irep_idt &function_id, symbol_table_baset &symbol_table)
-  { }
+  {
+    // unused parameters
+    (void)function_id;
+    (void)symbol_table;
+  }
 
   /// Final adjustments, e.g. initializing stub functions and globals that
   /// were discovered during function loading

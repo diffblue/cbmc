@@ -119,6 +119,11 @@ bool java_bytecode_typecheck(
   }
 
   return java_bytecode_typecheck.get_error_found();
+  #else
+  // unused parameters
+  (void)expr;
+  (void)message_handler;
+  (void)ns;
   #endif
 
   // fail for now

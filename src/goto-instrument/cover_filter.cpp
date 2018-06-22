@@ -51,6 +51,7 @@ bool include_pattern_filtert::operator()(
   const irep_idt &identifier,
   const goto_functionst::goto_functiont &goto_function) const
 {
+  (void)goto_function; // unused parameter
   std::smatch string_matcher;
   return std::regex_match(id2string(identifier), string_matcher, regex_matcher);
 }
@@ -67,6 +68,7 @@ bool trivial_functions_filtert::operator()(
   const irep_idt &identifier,
   const goto_functionst::goto_functiont &goto_function) const
 {
+  (void)identifier; // unused parameter
   unsigned long count_assignments = 0, count_goto = 0;
   forall_goto_program_instructions(i_it, goto_function.body)
   {

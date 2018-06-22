@@ -532,6 +532,9 @@ protected:
     const namespacet &,
     object_mapt &rhs_values) const
   {
+    // unused parameters
+    (void)rhs;
+    (void)rhs_values;
   }
 
   /// Subclass customisation point to apply global side-effects to this domain,
@@ -543,6 +546,9 @@ protected:
     const exprt &rhs,
     const namespacet &)
   {
+    // unused parameters
+    (void)lhs;
+    (void)rhs;
   }
 };
 

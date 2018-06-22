@@ -266,6 +266,13 @@ void shared_bufferst::flush_read(
 
   assignment(goto_program, target, source_location, vars.read_delayed,
              false_exprt());
+#else
+  // unused parameters
+  (void)goto_program;
+  (void)target;
+  (void)target;
+  (void)source_location;
+  (void)write_object;
 #endif
 
 /* option 2 */

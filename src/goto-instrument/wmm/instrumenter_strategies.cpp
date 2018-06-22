@@ -344,6 +344,7 @@ void inline instrumentert::instrument_minimum_interference_inserter(
 
   glp_delete_prob(lp);
 #else
+  (void)set_of_cycles; // unused parameter
   throw "sorry, minimum interference option requires glpk; "
         "please recompile goto-instrument with glpk";
 #endif

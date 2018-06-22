@@ -19,6 +19,7 @@ std::unique_ptr<const timestampert>
 timestampert::make(timestampert::clockt clock_type)
 {
 #ifdef _WIN32
+  (void)clock_type; // unused parameter
   return std::unique_ptr<const timestampert>(new timestampert());
 #else
   switch(clock_type)

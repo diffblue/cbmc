@@ -185,5 +185,7 @@ void data_dpt::print(messaget &message)
     for(l_it=m_it->second.begin(); l_it!=m_it->second.end(); ++l_it)
       message.debug()<< "loc: "<<*l_it << messaget::eom;
   }
+#else
+  (void)message; // unused parameter
 #endif
 }

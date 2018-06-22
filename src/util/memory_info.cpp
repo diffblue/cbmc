@@ -48,6 +48,7 @@ void memory_info(std::ostream &out)
   #endif
 
   #ifdef _WIN32
+  (void)out; // unused parameter
   #if 0
   PROCESS_MEMORY_COUNTERS pmc;
   if(GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)))

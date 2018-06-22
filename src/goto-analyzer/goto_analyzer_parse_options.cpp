@@ -754,6 +754,8 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(options, goto_model);
+    #else
+    (void)options; // unused parameter
     #endif
 
     // recalculate numbers, etc.

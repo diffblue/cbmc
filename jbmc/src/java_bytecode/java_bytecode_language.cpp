@@ -1234,6 +1234,12 @@ bool java_bytecode_languaget::to_expr(
   java_bytecode_parser.clear();
 
   return result;
+  #else
+  // unused parameters
+  (void)code;
+  (void)module;
+  (void)expr;
+  (void)ns;
   #endif
 
   return true; // fail for now
@@ -1249,5 +1255,6 @@ java_bytecode_languaget::~java_bytecode_languaget()
 std::vector<load_extra_methodst>
 java_bytecode_languaget::build_extra_entry_points(const optionst &options) const
 {
+  (void)options; // unused parameter
   return {};
 }

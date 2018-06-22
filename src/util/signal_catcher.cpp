@@ -73,6 +73,7 @@ void remove_signal_catcher()
 void signal_catcher(int sig)
 {
 #if defined(_WIN32)
+  (void)sig; // unused parameter
 #else
 
 #if 0

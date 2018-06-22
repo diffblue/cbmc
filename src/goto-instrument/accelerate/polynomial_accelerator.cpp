@@ -450,6 +450,10 @@ bool polynomial_acceleratort::fit_const(
   exprt &target,
   polynomialt &poly)
 {
+  // unused parameters
+  (void)body;
+  (void)target;
+  (void)poly;
   return false;
 
 #if 0

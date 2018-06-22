@@ -115,6 +115,9 @@ irep_idt languaget::generate_opaque_stub_body(
   symbolt &symbol,
   symbol_tablet &symbol_table)
 {
+  // unused parameters
+  (void)symbol;
+  (void)symbol_table;
   return ID_nil;
 }
 
@@ -131,6 +134,10 @@ parameter_symbolt languaget::build_stub_parameter_symbol(
   size_t parameter_index,
   const code_typet::parametert &parameter)
 {
+  // unused parameters
+  (void)function_symbol;
+  (void)parameter_index;
+  (void)parameter;
   error() << "language " << id()
           << " doesn't implement build_stub_parameter_symbol. "
           << "This means cannot use opaque functions." << eom;

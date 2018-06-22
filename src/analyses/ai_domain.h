@@ -104,6 +104,7 @@ public:
   /// return true if unchanged
   virtual bool ai_simplify(exprt &condition, const namespacet &ns) const
   {
+    (void)condition; // unused parameter
     return true;
   }
 

@@ -338,6 +338,7 @@ codet character_refine_preprocesst::convert_high_surrogate(
 exprt character_refine_preprocesst::expr_of_is_ascii_lower_case(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   return in_interval_expr(chr, 'a', 'z');
 }
 
@@ -348,6 +349,7 @@ exprt character_refine_preprocesst::expr_of_is_ascii_lower_case(
 exprt character_refine_preprocesst::expr_of_is_ascii_upper_case(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   return in_interval_expr(chr, 'A', 'Z');
 }
 
@@ -402,6 +404,7 @@ codet character_refine_preprocesst::convert_is_alphabetic(
 exprt character_refine_preprocesst::expr_of_is_bmp_code_point(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   return and_exprt(
     binary_relation_exprt(chr, ID_le, from_integer(0xFFFF, chr.type())),
     binary_relation_exprt(chr, ID_ge, from_integer(0, chr.type())));
@@ -424,6 +427,7 @@ codet character_refine_preprocesst::convert_is_bmp_code_point(
 exprt character_refine_preprocesst::expr_of_is_defined(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   // The following intervals are undefined in unicode, according to
   // the Unicode Character Database: http://www.unicode.org/Public/UCD/latest/
   exprt::operandst intervals;
@@ -488,6 +492,7 @@ codet character_refine_preprocesst::convert_is_defined_int(
 exprt character_refine_preprocesst::expr_of_is_digit(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   exprt latin_digit=in_interval_expr(chr, '0', '9');
   exprt arabic_indic_digit=in_interval_expr(chr, 0x660, 0x669);
   exprt extended_digit=in_interval_expr(chr, 0x6F0, 0x6F9);
@@ -526,6 +531,7 @@ codet character_refine_preprocesst::convert_is_digit_int(
 exprt character_refine_preprocesst::expr_of_is_high_surrogate(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   return in_interval_expr(chr, 0xD800, 0xDBFF);
 }
 
@@ -550,6 +556,7 @@ codet character_refine_preprocesst::convert_is_high_surrogate(
 exprt character_refine_preprocesst::expr_of_is_identifier_ignorable(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   or_exprt ignorable(
     in_interval_expr(chr, 0x0000, 0x0008),
      or_exprt(
@@ -777,6 +784,7 @@ codet character_refine_preprocesst::convert_is_low_surrogate(
 exprt character_refine_preprocesst::expr_of_is_mirrored(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   return in_list_expr(chr, {0x28, 0x29, 0x3C, 0x3E, 0x5B, 0x5D, 0x7B, 0x7D});
 }
 
@@ -819,6 +827,7 @@ codet character_refine_preprocesst::convert_is_space(conversion_inputt &target)
 exprt character_refine_preprocesst::expr_of_is_space_char(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   std::list<mp_integer> space_characters=
     {0x20, 0x00A0, 0x1680, 0x202F, 0x205F, 0x3000, 0x2028, 0x2029};
   exprt condition0=in_list_expr(chr, space_characters);
@@ -853,6 +862,7 @@ codet character_refine_preprocesst::convert_is_space_char_int(
 exprt character_refine_preprocesst::expr_of_is_supplementary_code_point(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   return binary_relation_exprt(chr, ID_gt, from_integer(0xFFFF, chr.type()));
 }
 
@@ -873,6 +883,7 @@ codet character_refine_preprocesst::convert_is_supplementary_code_point(
 exprt character_refine_preprocesst::expr_of_is_surrogate(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   return in_interval_expr(chr, 0xD800, 0xDFFF);
 }
 
@@ -909,6 +920,7 @@ codet character_refine_preprocesst::convert_is_surrogate_pair(
 exprt character_refine_preprocesst::expr_of_is_title_case(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   std::list<mp_integer>title_case_chars=
     {0x01C5, 0x01C8, 0x01CB, 0x01F2, 0x1FBC, 0x1FCC, 0x1FFC};
   exprt::operandst conditions;
@@ -946,6 +958,7 @@ codet character_refine_preprocesst::convert_is_title_case_int(
 exprt character_refine_preprocesst::expr_of_is_letter_number(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   // The following set of characters is the general category "Nl" in the
   // Unicode specification.
   exprt cond0=in_interval_expr(chr, 0x16EE, 0x16F0);
@@ -1059,6 +1072,7 @@ codet character_refine_preprocesst::convert_is_upper_case_int(
 exprt character_refine_preprocesst::expr_of_is_valid_code_point(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   return binary_relation_exprt(chr, ID_le, from_integer(0x10FFFF, chr.type()));
 }
 
@@ -1083,6 +1097,7 @@ codet character_refine_preprocesst::convert_is_valid_code_point(
 exprt character_refine_preprocesst::expr_of_is_whitespace(
   const exprt &chr, const typet &type)
 {
+  (void)type; // unused parameter
   exprt::operandst conditions;
   std::list<mp_integer> space_characters=
     {0x20, 0x1680, 0x205F, 0x3000, 0x2028, 0x2029};

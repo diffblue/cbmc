@@ -237,6 +237,8 @@ bool constant_propagator_domaint::two_way_propagate_rec(
 {
 #ifdef DEBUG
   std::cout << "two_way_propagate_rec: " << format(expr) << '\n';
+#else
+  (void)expr; // unused parameter
 #endif
 
   bool change=false;
@@ -268,6 +270,8 @@ bool constant_propagator_domaint::two_way_propagate_rec(
        assign_rec(values, rhs, lhs, ns);
     change = values.meet(copy_values, ns);
   }
+#else
+  (void)cp;   // unused parameter
 #endif
 
 #ifdef DEBUG

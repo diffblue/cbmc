@@ -328,6 +328,7 @@ void local_may_aliast::build(const goto_functiont &goto_function)
 
   loc_infos.resize(cfg.nodes.size());
 
+  (void)goto_function; // unused parameter
   #if 0
   // feed in sufficiently bad defaults
   for(code_typet::parameterst::const_iterator
