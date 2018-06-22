@@ -171,9 +171,9 @@ std::vector<std::string> narrow_argv(int argc, const wchar_t **argv_wide)
 /// \return A 16-bit integer with bytes swapped
 uint16_t do_swap_bytes(uint16_t x)
 {
-  uint16_t b1=x & 0xFF;
-  uint16_t b2=x & 0xFF00;
-  return (b1 << 8) | (b2 >> 8);
+  const uint16_t b1 = x & 0xFFu;
+  const uint16_t b2 = x & 0xFF00u;
+  return static_cast<uint16_t>((b1 << 8) | (b2 >> 8));
 }
 
 
@@ -185,7 +185,8 @@ void utf16_append_code(unsigned int code, bool swap_bytes, std::wstring &result)
   if(code<0xFFFF)
   { // code is encoded as one UTF16 character
     // we just take the code and possibly swap the bytes
-    unsigned int a=(swap_bytes)?do_swap_bytes(code):code;
+    const unsigned int a =
+      swap_bytes ? do_swap_bytes(static_cast<uint16_t>(code)) : code;
     result+=static_cast<wchar_t>(a);
   }
   else // code is encoded as two UTF16 characters
@@ -196,11 +197,11 @@ void utf16_append_code(unsigned int code, bool swap_bytes, std::wstring &result)
 
     // encode the code in UTF16, possibly swapping bytes.
     code=code-0x10000;
-    unsigned int i1=((code>>10) & 0x3ff) | 0xD800;
-    unsigned int a1=(swap_bytes)?do_swap_bytes(static_cast<uint16_t>(i1)):i1;
+    const uint16_t i1 = static_cast<uint16_t>(((code >> 10) & 0x3ff) | 0xD800);
+    const uint16_t a1 = swap_bytes ? do_swap_bytes(i1) : i1;
     result+=static_cast<wchar_t>(a1);
-    unsigned int i2=(code & 0x3ff) | 0xDC00;
-    unsigned int a2=(swap_bytes)?do_swap_bytes(static_cast<uint16_t>(i2)):i2;
+    const uint16_t i2 = static_cast<uint16_t>((code & 0x3ff) | 0xDC00);
+    const uint16_t a2 = swap_bytes ? do_swap_bytes(i2) : i2;
     result+=static_cast<wchar_t>(a2);
   }
 }
