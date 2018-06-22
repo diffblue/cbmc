@@ -32,5 +32,4 @@ add_if_library(cbmc-lib jsil)
 add_executable(cbmc cbmc_main.cpp)
 target_link_libraries(cbmc cbmc-lib)
 
-set(cbmc_version_files cbmc_parse_options.cpp cbmc_solvers.cpp)
-git_revision(cbmc-lib cbmc_version_files)
+git_revision(cbmc-lib)

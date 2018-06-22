@@ -229,23 +229,18 @@ OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))
 
 # get version from git
 GIT_INFO = $(shell git describe --tags --always --dirty || echo "n/a")
-GIT_INFO_FILE = .release_info
-
-CBMC_VERSION_FILES += $(filter %_parse_options$(OBJEXT), $(OBJ))
-
-ifeq ($(BUILD_ENV_),MSVC)
-$(CBMC_VERSION_FILES): CP_CXXFLAGS += /DCBMC_VERSION='"""$(CBMC_VERSION) ($(GIT_INFO))"""'
-else
-$(CBMC_VERSION_FILES): CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
-endif
-
-KNOWN_RELEASE_INFO = $(shell cat $(GIT_INFO_FILE) 2>/dev/null)
-ifneq ($(GIT_INFO), $(KNOWN_RELEASE_INFO))
-$(CBMC_VERSION_FILES): $(GIT_INFO_FILE)
+RELEASE_INFO = \#define CBMC_VERSION "$(CBMC_VERSION) ($(GIT_INFO))"
+GIT_INFO_FILE = version.h
 
 $(GIT_INFO_FILE):
-	echo $(GIT_INFO) > $@
+	echo '$(RELEASE_INFO)' > $@
 
+$(filter %_parse_options$(OBJEXT), $(OBJ)): $(GIT_INFO_FILE)
+
+# mark the actually generated file as a phony target to enforce a rebuild - but
+# only of the version information has changed!
+KNOWN_RELEASE_INFO = $(shell cat $(GIT_INFO_FILE) 2>/dev/null)
+ifneq ($(RELEASE_INFO), $(KNOWN_RELEASE_INFO))
 .PHONY: $(GIT_INFO_FILE)
 endif
 

@@ -35,5 +35,4 @@ else()
       goto-cc $<TARGET_FILE_DIR:goto-cc>/goto-gcc)
 endif()
 
-set(cbmc_version_files as_mode.cpp compile.cpp gcc_mode.cpp goto_cc_mode.cpp)
-git_revision(goto-cc-lib cbmc_version_files)
+git_revision(goto-cc-lib)

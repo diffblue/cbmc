@@ -48,6 +48,7 @@ Author: CM Wintersteiger, 2006
 
 #include "hybrid_binary.h"
 #include "linker_script_merge.h"
+#include "version.h"
 
 static std::string compiler_name(
   const cmdlinet &cmdline,

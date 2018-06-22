@@ -56,6 +56,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-analyzer/taint_analysis.h>
 #include <goto-analyzer/unreachable_instructions.h>
 
+#include "version.h"
+
 janalyzer_parse_optionst::janalyzer_parse_optionst(int argc, const char **argv)
   : parse_options_baset(JANALYZER_OPTIONS, argc, argv),
     messaget(ui_message_handler),

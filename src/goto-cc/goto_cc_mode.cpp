@@ -24,6 +24,8 @@ Author: CM Wintersteiger, 2006
 
 #include <util/parse_options.h>
 
+#include "version.h"
+
 /// constructor
 goto_cc_modet::goto_cc_modet(
   goto_cc_cmdlinet &_cmdline,

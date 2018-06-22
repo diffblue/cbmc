@@ -27,5 +27,4 @@ target_link_libraries(jdiff-lib
 add_executable(jdiff jdiff_main.cpp)
 target_link_libraries(jdiff jdiff-lib)
 
-set(cbmc_version_files jdiff_parse_options.cpp)
-git_revision(jdiff-lib cbmc_version_files)
+git_revision(jdiff-lib)

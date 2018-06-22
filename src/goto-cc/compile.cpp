@@ -63,6 +63,8 @@ Date: June 2006
 #define pclose _pclose
 #endif
 
+#include "version.h"
+
 /// reads and source and object files, compiles and links them into goto program
 /// objects.
 /// \return true on error, false otherwise

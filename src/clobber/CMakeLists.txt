@@ -30,5 +30,4 @@ add_if_library(clobber-lib bv_refinement)
 add_executable(clobber clobber_main.cpp)
 target_link_libraries(clobber clobber-lib)
 
-set(cbmc_version_files clobber_parse_options.cpp)
-git_revision(clobber-lib cbmc_version_files)
+git_revision(clobber-lib)
