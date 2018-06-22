@@ -529,7 +529,8 @@ int gcc_modet::doit()
      gcc_version.is_at_least(7))
     config.ansi_c.ts_18661_3_Floatn_types=true;
 
-  int gcc_float128_minor_version = config.ansi_c.arch == "x86_64" ? 3 : 5;
+  const auto gcc_float128_minor_version =
+    config.ansi_c.arch == "x86_64" ? 3u : 5u;
 
   config.ansi_c.Float128_type =
     gcc_version.flavor == gcc_versiont::flavort::GCC &&

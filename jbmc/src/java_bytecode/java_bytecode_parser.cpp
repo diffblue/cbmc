@@ -890,7 +890,7 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
     field.is_public=(access_flags&ACC_PUBLIC)!=0;
     field.is_protected=(access_flags&ACC_PROTECTED)!=0;
     field.is_private=(access_flags&ACC_PRIVATE)!=0;
-    size_t flags=(field.is_public?1:0)+
+    const auto flags = (field.is_public ? 1 : 0) +
       (field.is_protected?1:0)+
       (field.is_private?1:0);
     DATA_INVARIANT(flags<=1, "at most one of public, protected, private");
@@ -1686,7 +1686,7 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   method.base_name=pool_entry(name_index).s;
   method.descriptor=id2string(pool_entry(descriptor_index).s);
 
-  size_t flags=(method.is_public?1:0)+
+  const auto flags = (method.is_public ? 1 : 0) +
     (method.is_protected?1:0)+
     (method.is_private?1:0);
   DATA_INVARIANT(flags<=1, "at most one of public, protected, private");

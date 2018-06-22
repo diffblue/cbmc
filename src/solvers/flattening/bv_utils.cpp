@@ -234,7 +234,7 @@ literalt bv_utilst::carry(literalt a, literalt b, literalt c)
   if(prop.has_set_to() && prop.cnf_handled_well())
   {
     // propagation possible?
-    unsigned const_count=
+    const auto const_count =
       a.is_constant() + b.is_constant() + c.is_constant();
 
     // propagation is possible if two or three inputs are constant

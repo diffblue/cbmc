@@ -33,7 +33,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
 
   if(elf_class==ELF32)
   {
-    char ei_data=elf32_header.e_ident[5];
+    const auto ei_data = elf32_header.e_ident[5];
 
     if(ei_data==1)
       little_endian=true;
@@ -80,7 +80,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
       reinterpret_cast<char*>(&elf64_header),
       sizeof(elf64_header));
 
-    char ei_data=elf64_header.e_ident[5];
+    const auto ei_data = elf64_header.e_ident[5];
 
     if(ei_data==1)
       little_endian=true;
