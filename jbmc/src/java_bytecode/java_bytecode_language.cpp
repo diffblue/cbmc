@@ -37,6 +37,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ci_lazy_methods.h"
 
 #include "expr2java.h"
+#include "load_method_by_regex.h"
 
 /// Consume options that are java bytecode specific.
 /// \param Command:line options
@@ -94,10 +95,11 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 
   const std::list<std::string> &extra_entry_points=
     cmd.get_values("lazy-methods-extra-entry-point");
-  lazy_methods_extra_entry_points.insert(
-    lazy_methods_extra_entry_points.end(),
+  std::transform(
     extra_entry_points.begin(),
-    extra_entry_points.end());
+    extra_entry_points.end(),
+    std::back_inserter(extra_methods),
+    build_load_method_by_regex);
 
   if(cmd.isset("java-cp-include-files"))
   {
@@ -815,7 +817,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     symbol_table,
     main_class,
     main_jar_classes,
-    lazy_methods_extra_entry_points,
+    extra_methods,
     java_class_loader,
     java_load_classes,
     get_pointer_type_selector(),
