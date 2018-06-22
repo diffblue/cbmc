@@ -37,7 +37,6 @@ cpp_typecheck_resolvet::cpp_typecheck_resolvet(cpp_typecheckt &_cpp_typecheck):
 
 void cpp_typecheck_resolvet::convert_identifiers(
   const cpp_scopest::id_sett &id_set,
-  const wantt want,
   const cpp_typecheck_fargst &fargs,
   resolve_identifierst &identifiers)
 {
@@ -47,7 +46,7 @@ void cpp_typecheck_resolvet::convert_identifiers(
       it++)
   {
     const cpp_idt &identifier=**it;
-    exprt e=convert_identifier(identifier, want, fargs);
+    exprt e=convert_identifier(identifier, fargs);
 
     if(e.is_not_nil())
     {
@@ -210,7 +209,6 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
 
 exprt cpp_typecheck_resolvet::convert_identifier(
   const cpp_idt &identifier,
-  const wantt want,
   const cpp_typecheck_fargst &fargs)
 {
   if(identifier.id_class==cpp_scopet::id_classt::TEMPLATE_PARAMETER)
@@ -1516,7 +1514,7 @@ exprt cpp_typecheck_resolvet::resolve(
     {
       // methods and functions
       convert_identifiers(
-        id_set, want, fargs, identifiers);
+        id_set, fargs, identifiers);
 
       apply_template_args(
         identifiers, template_args, fargs);
@@ -1525,7 +1523,7 @@ exprt cpp_typecheck_resolvet::resolve(
   else
   {
     convert_identifiers(
-      id_set, want, fargs, identifiers);
+      id_set, fargs, identifiers);
   }
 
   // change types into constructors if we want a constructor

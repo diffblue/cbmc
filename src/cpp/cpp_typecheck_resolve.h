@@ -49,7 +49,6 @@ protected:
 
   void convert_identifiers(
     const cpp_scopest::id_sett &id_set,
-    const wantt want,
     const cpp_typecheck_fargst &fargs,
     resolve_identifierst &identifiers);
 
@@ -58,7 +57,6 @@ protected:
 
   exprt convert_identifier(
     const cpp_idt &id,
-    const wantt want,
     const cpp_typecheck_fargst &fargs);
 
   void disambiguate_functions(
