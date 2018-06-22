@@ -2922,8 +2922,6 @@ public:
   {
   }
 
-  replication_exprt(const unsigned _times, const exprt &_src);
-
   exprt &times()
   {
     return op0();
