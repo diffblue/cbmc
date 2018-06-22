@@ -31,7 +31,7 @@ public:
     locals(_goto_function),
     cfg(_goto_function.body)
   {
-    build(_goto_function);
+    build();
   }
 
   void output(
@@ -176,7 +176,7 @@ public:
     const exprt &src);
 
 protected:
-  void build(const goto_functiont &goto_function);
+  void build();
 
   typedef std::stack<unsigned> work_queuet;
 

@@ -241,7 +241,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
     return flagst::mk_unknown();
 }
 
-void local_bitvector_analysist::build(const goto_functiont &goto_function)
+void local_bitvector_analysist::build()
 {
   if(cfg.nodes.empty())
     return;
