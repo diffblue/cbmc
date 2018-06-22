@@ -6,6 +6,14 @@ class IWrapper {
   }
 }
 
+// boolean wrapper
+class BWrapper {
+  public boolean b;
+  public BWrapper(boolean bb) {
+    b = bb;
+  }
+}
+
 // simple generic class
 class Wrapper<T> {
   public T field;

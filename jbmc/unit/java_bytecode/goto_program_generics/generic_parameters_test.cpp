@@ -102,6 +102,21 @@ SCENARIO(
         require_goto_statements::require_entry_point_argument_assignment(
           "this", entry_point_code);
 
+      THEN("Type of multiple generic fields should be right")
+      {
+        const typet &class_type =
+          symbol_table.lookup_ref("java::GenericFields$MultipleGenericFields")
+            .type;
+
+        const auto &component = require_type::require_component(
+          to_java_class_type(class_type), "field_input2");
+
+        const java_generic_typet &type =
+          require_type::require_java_generic_type(component.type());
+        require_type::require_pointer(
+          type.generic_type_arguments()[0], symbol_typet{"java::BWrapper"});
+      }
+
       THEN("Object 'this' has field 'field_input1' of type Wrapper")
       {
         const auto &field_input1_name =
@@ -136,13 +151,13 @@ SCENARIO(
             {},
             entry_point_code);
 
-        THEN("Object 'field_input1' has field 'field' of type IWrapper")
+        THEN("Object 'field_input2' has field 'field' of type BWrapper")
         {
           require_goto_statements::require_struct_component_assignment(
             field_input2_name,
             {},
             "field",
-            "java::IWrapper",
+            "java::BWrapper",
             {},
             entry_point_code);
         }

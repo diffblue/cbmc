@@ -11,10 +11,10 @@ public class GenericFields
 
   class MultipleGenericFields {
     Wrapper<IWrapper> field_input1;
-    Wrapper<IWrapper> field_input2;
+    Wrapper<BWrapper> field_input2;
     public void foo() {
         field_input1.field.i = 10;
-        field_input2.field.i = 20;
+        field_input2.field.b = true;
     }
   }
 

@@ -9,6 +9,7 @@ DIRS = janalzyer-taint \
        jbmc-strings \
        jdiff \
        string-smoke-tests \
+       jbmc-generics \
        # Empty last line
 
 # Tests under goto-gcc cannot be run on Windows, so appveyor.yml unlinks
