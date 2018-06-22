@@ -68,11 +68,6 @@ exprt dynamic_size(const namespacet &ns)
   return ns.lookup(CPROVER_PREFIX "malloc_size").symbol_expr();
 }
 
-exprt pointer_object_has_type(const exprt &pointer, const typet &type)
-{
-  return false_exprt();
-}
-
 exprt dynamic_object(const exprt &pointer)
 {
   exprt dynamic_expr(ID_dynamic_object, bool_typet());

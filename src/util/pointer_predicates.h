@@ -24,8 +24,6 @@ exprt pointer_offset(const exprt &pointer);
 exprt pointer_object(const exprt &pointer);
 exprt malloc_object(const exprt &pointer, const namespacet &);
 exprt object_size(const exprt &pointer);
-exprt pointer_object_has_type(
-  const exprt &pointer, const typet &type, const namespacet &);
 exprt dynamic_object(const exprt &pointer);
 exprt good_pointer(const exprt &pointer);
 exprt good_pointer_def(const exprt &pointer, const namespacet &);
