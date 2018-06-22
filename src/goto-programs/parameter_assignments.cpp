@@ -31,13 +31,11 @@ protected:
   symbol_tablet &symbol_table;
 
   void do_function_calls(
-    goto_functionst &goto_functions,
     goto_programt &goto_program);
 };
 
 /// turns x=f(...) into f(...); lhs=f#return_value;
 void parameter_assignmentst::do_function_calls(
-  goto_functionst &goto_functions,
   goto_programt &goto_program)
 {
   Forall_goto_program_instructions(i_it, goto_program)
@@ -93,7 +91,7 @@ void parameter_assignmentst::do_function_calls(
 void parameter_assignmentst::operator()(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
-    do_function_calls(goto_functions, it->second.body);
+    do_function_calls(it->second.body);
 }
 
 /// removes returns

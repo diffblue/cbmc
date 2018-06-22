@@ -320,7 +320,6 @@ void goto_convertt::do_scanf(
 }
 
 void goto_convertt::do_input(
-  const exprt &lhs,
   const exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
@@ -341,7 +340,6 @@ void goto_convertt::do_input(
 }
 
 void goto_convertt::do_output(
-  const exprt &lhs,
   const exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest)
@@ -846,12 +844,26 @@ void goto_convertt::do_function_call_symbol(
   else if(identifier==CPROVER_PREFIX "input" ||
           identifier=="__CPROVER::input")
   {
-    do_input(lhs, function, arguments, dest);
+    if(lhs.is_not_nil())
+    {
+      error().source_location=function.find_source_location();
+      error() << identifier << " expected not to have LHS" << eom;
+      throw 0;
+    }
+
+    do_input(function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "output" ||
           identifier=="__CPROVER::output")
   {
-    do_output(lhs, function, arguments, dest);
+    if(lhs.is_not_nil())
+    {
+      error().source_location=function.find_source_location();
+      error() << identifier << " expected not to have LHS" << eom;
+      throw 0;
+    }
+
+    do_output(function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "atomic_begin" ||
           identifier=="__CPROVER::atomic_begin" ||
