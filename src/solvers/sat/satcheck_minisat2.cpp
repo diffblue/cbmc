@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unistd.h>
 #endif
 
+#include <limits>
 #include <stack>
 
 #include <util/invariant.h>
@@ -28,7 +29,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
 {
-  dest.capacity(bv.size());
+  PRECONDITION(
+    bv.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()));
+  dest.capacity(static_cast<int>(bv.size()));
 
   forall_literals(it, bv)
     if(!it->is_false())

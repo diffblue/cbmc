@@ -15,7 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/irep.h>
 
 #define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
-#define MAX_NONDET_STRING_LENGTH std::numeric_limits<std::int32_t>::max()
+#define MAX_NONDET_STRING_LENGTH \
+  static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())
 #define MAX_NONDET_TREE_DEPTH 5
 #define MAX_NONNULL_TREE_DEPTH 0
 
