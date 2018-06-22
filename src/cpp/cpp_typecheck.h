@@ -432,7 +432,6 @@ protected:
 
   codet cpp_destructor(
       const source_locationt &source_location,
-      const typet &type,
       const exprt &object);
 
   // expressions

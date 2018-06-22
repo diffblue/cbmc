@@ -1073,7 +1073,6 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
 
   codet destructor_code=cpp_destructor(
     expr.source_location(),
-    pointer_type.subtype(),
     new_object);
 
   // this isn't typechecked yet

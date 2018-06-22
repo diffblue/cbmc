@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \return typechecked code
 codet cpp_typecheckt::cpp_destructor(
   const source_locationt &source_location,
-  const typet &type,
   const exprt &object)
 {
   codet new_code;
@@ -74,8 +73,7 @@ codet cpp_typecheckt::cpp_destructor(
       index_exprt index(object, constant);
       index.add_source_location()=source_location;
 
-      exprt i_code =
-        cpp_destructor(source_location, tmp_type.subtype(), index);
+      exprt i_code = cpp_destructor(source_location, index);
 
       new_code.move_to_operands(i_code);
     }
@@ -119,29 +117,19 @@ codet cpp_typecheckt::cpp_destructor(
     cpp_name.get_sub().back().set(ID_identifier, dtor_name);
     cpp_name.get_sub().back().set(ID_C_source_location, source_location);
 
+    exprt member(ID_member);
+    member.add(ID_component_cpp_name) = cpp_name;
+    member.copy_to_operands(object);
+
     side_effect_expr_function_callt function_call;
     function_call.add_source_location()=source_location;
-    function_call.function().swap(static_cast<exprt&>(cpp_name));
+    function_call.function().swap(member);
 
     typecheck_side_effect_function_call(function_call);
-    assert(function_call.get(ID_statement)==ID_temporary_object);
+    already_typechecked(function_call);
 
-    exprt &initializer =
-      static_cast<exprt &>(function_call.add(ID_initializer));
-
-    assert(initializer.id()==ID_code
-           && initializer.get(ID_statement)==ID_expression);
-
-    side_effect_expr_function_callt &func_ini=
-      to_side_effect_expr_function_call(initializer.op0());
-
-    exprt &tmp_this=func_ini.arguments().front();
-    assert(tmp_this.id()==ID_address_of
-           && tmp_this.op0().id()=="new_object");
-
-    tmp_this=address_of_exprt(object, pointer_type(object.type()));
-
-    new_code.swap(initializer);
+    new_code = code_expressiont(function_call);
+    new_code.add_source_location() = source_location;
   }
 
   return new_code;

@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <util/c_types.h>
+
 bool cpp_typecheckt::find_dtor(const symbolt &symbol) const
 {
   const irept &components=
@@ -134,13 +136,16 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
     cpp_namet cppname;
     cppname.get_sub().push_back(name);
 
-    exprt member(ID_ptrmember);
+    exprt member(ID_ptrmember, type);
     member.set(ID_component_cpp_name, cppname);
-    member.operands().push_back(exprt("cpp-this"));
+    member.operands().push_back(
+      symbol_exprt(ID_this, pointer_type(symbol.type)));
     member.add_source_location() = source_location;
 
-    codet dtor_code=
-      cpp_destructor(source_location, cit->type(), member);
+    const bool disabled_access_control = disable_access_control;
+    disable_access_control = true;
+    codet dtor_code = cpp_destructor(source_location, member);
+    disable_access_control = disabled_access_control;
 
     if(dtor_code.is_not_nil())
       block.move_to_operands(dtor_code);
@@ -158,14 +163,14 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
     assert(bit->find(ID_type).id()==ID_symbol);
     const symbolt &psymb = lookup(bit->find(ID_type).get(ID_identifier));
 
-    // TODO(tautschnig): object is not type checked before passing it to
-    // cpp_destructor even though cpp_destructor makes heavy use of the .type()
-    // member
-    dereference_exprt object(exprt("cpp-this"), nil_typet());
+    symbol_exprt this_ptr(ID_this, pointer_type(symbol.type));
+    dereference_exprt object(this_ptr, psymb.type);
     object.add_source_location() = source_location;
 
-    exprt dtor_code =
-      cpp_destructor(source_location, psymb.type, object);
+    const bool disabled_access_control = disable_access_control;
+    disable_access_control = true;
+    exprt dtor_code = cpp_destructor(source_location, object);
+    disable_access_control = disabled_access_control;
 
     if(dtor_code.is_not_nil())
       block.move_to_operands(dtor_code);
