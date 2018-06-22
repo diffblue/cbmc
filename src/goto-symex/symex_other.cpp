@@ -101,7 +101,7 @@ void goto_symext::symex_other(
   {
     codet clean_code=code;
     clean_expr(clean_code, state, false);
-    symex_printf(state, nil_exprt(), clean_code);
+    symex_printf(state, clean_code);
   }
   else if(statement==ID_input)
   {

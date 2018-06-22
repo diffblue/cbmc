@@ -311,7 +311,6 @@ irep_idt get_string_argument(const exprt &src, const namespacet &ns)
 
 void goto_symext::symex_printf(
   statet &state,
-  const exprt &lhs,
   const exprt &rhs)
 {
   if(rhs.operands().empty())
