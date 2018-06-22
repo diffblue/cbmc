@@ -101,14 +101,6 @@ exprt build_full_lhs_rec(
   return src_original;
 }
 
-exprt adjust_lhs_object(
-  const prop_convt &prop_conv,
-  const namespacet &ns,
-  const exprt &src)
-{
-  return nil_exprt();
-}
-
 /// set internal field for variable assignment related to dynamic_object[0-9]
 /// and dynamic_[0-9]_array.
 void set_internal_dynamic_object(
