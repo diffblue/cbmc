@@ -987,25 +987,24 @@ static exprt get_char_array_and_concretize(
   const array_string_exprt &arr)
 {
   const auto &eom = messaget::eom;
-  static const std::string indent("  ");
   stream << "- " << format(arr) << ":\n";
-  stream << indent << indent << "- type: " << format(arr.type()) << eom;
+  stream << std::string(4, ' ') << "- type: " << format(arr.type()) << eom;
   const auto arr_model_opt =
     get_array(super_get, ns, max_string_length, stream, arr);
   if(arr_model_opt)
   {
-    stream << indent << indent << "- char_array: " << format(*arr_model_opt)
+    stream << std::string(4, ' ') << "- char_array: " << format(*arr_model_opt)
            << '\n';
-    stream << indent << indent << "- type : " << format(arr_model_opt->type())
+    stream << std::string(4, ' ') << "- type : " << format(arr_model_opt->type())
            << eom;
     const exprt simple = simplify_expr(*arr_model_opt, ns);
-    stream << indent << indent << "- simplified_char_array: " << format(simple)
+    stream << std::string(4, ' ') << "- simplified_char_array: " << format(simple)
            << eom;
     if(
       const auto concretized_array = get_array(
         super_get, ns, max_string_length, stream, to_array_string_expr(simple)))
     {
-      stream << indent << indent
+      stream << std::string(4, ' ')
              << "- concretized_char_array: " << format(*concretized_array)
              << eom;
 
@@ -1013,16 +1012,16 @@ static exprt get_char_array_and_concretize(
         const auto array_expr =
           expr_try_dynamic_cast<array_exprt>(*concretized_array))
       {
-        stream << indent << indent << "- as_string: \""
+        stream << std::string(4, ' ') << "- as_string: \""
                << string_of_array(*array_expr) << "\"\n";
       }
       else
-        stream << indent << "- warning: not an array" << eom;
+        stream << std::string(2, ' ') << "- warning: not an array" << eom;
       return *concretized_array;
     }
     return simple;
   }
-  stream << indent << indent << "- incomplete model" << eom;
+  stream << std::string(4, ' ') << "- incomplete model" << eom;
   return arr;
 }
 
@@ -1037,8 +1036,6 @@ void debug_model(
   const std::vector<symbol_exprt> &boolean_symbols,
   const std::vector<symbol_exprt> &index_symbols)
 {
-  static const std::string indent("  ");
-
   stream << "debug_model:" << '\n';
   for(const auto &pointer_array : generator.array_pool.get_arrays_of_pointers())
   {
@@ -1047,8 +1044,8 @@ void debug_model(
       super_get, ns, max_string_length, stream, arr);
 
     stream << "- " << format(arr) << ":\n"
-           << indent << "- pointer: " << format(pointer_array.first) << "\n"
-           << indent << "- model: " << format(model) << messaget::eom;
+           << "  - pointer: " << format(pointer_array.first) << "\n"
+           << "  - model: " << format(model) << messaget::eom;
   }
 
   for(const auto &symbol : boolean_symbols)
@@ -1249,16 +1246,15 @@ static void debug_check_axioms_step(
   const exprt &negaxiom,
   const exprt &with_concretized_arrays)
 {
-  static const std::string indent = "  ";
-  static const std::string indent2 = "    ";
-  stream << indent2 << "- axiom:\n" << indent2 << indent;
+  stream << std::string(4, ' ') << "- axiom:\n" << std::string(6, ' ');
   stream << to_string(axiom);
-  stream << '\n' << indent2 << "- axiom_in_model:\n" << indent2 << indent;
+  stream << '\n' << std::string(4, ' ') << "- axiom_in_model:\n"
+         << std::string(6, ' ');
   stream << to_string(axiom_in_model) << '\n'
-         << indent2 << "- negated_axiom:\n"
-         << indent2 << indent << format(negaxiom) << '\n';
-  stream << indent2 << "- negated_axiom_with_concretized_arrays:\n"
-         << indent2 << indent << format(with_concretized_arrays) << '\n';
+         << std::string(4, ' ') << "- negated_axiom:\n"
+         << std::string(6, ' ') << format(negaxiom) << '\n';
+  stream << std::string(4, ' ') << "- negated_axiom_with_concretized_arrays:\n"
+         << std::string(6, ' ') << format(with_concretized_arrays) << '\n';
 }
 
 /// \return true if the current model satisfies all the axioms
@@ -1275,8 +1271,6 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   const union_find_replacet &symbol_resolve)
 {
   const auto eom=messaget::eom;
-  static const std::string indent = "  ";
-  static const std::string indent2 = "    ";
   // clang-format off
   const auto gen_symbol = [&](const irep_idt &id, const typet &type)
   {
@@ -1320,7 +1314,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     exprt negaxiom = axiom_in_model.negation();
     negaxiom = simplify_expr(negaxiom, ns);
 
-    stream << indent << i << ".\n";
+    stream << std::string(2, ' ') << i << ".\n";
     const exprt with_concretized_arrays =
       substitute_array_access(negaxiom, gen_symbol, true);
     debug_check_axioms_step(
@@ -1330,12 +1324,12 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
       const auto &witness =
         find_counter_example(ns, ui, with_concretized_arrays, axiom.univ_var))
     {
-      stream << indent2 << "- violated_for: " << format(axiom.univ_var) << "="
-             << format(*witness) << eom;
+      stream << std::string(4, ' ') << "- violated_for: "
+             << format(axiom.univ_var) << "=" << format(*witness) << eom;
       violated[i]=*witness;
     }
     else
-      stream << indent2 << "- correct" << eom;
+      stream << std::string(4, ' ') << "- correct" << eom;
   }
 
   // Maps from indexes of violated not_contains axiom to a witness of violation
@@ -1352,7 +1346,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
       nc_axiom, univ_var, [&](const exprt &expr) {
         return simplify_expr(get(expr), ns); });
 
-    stream << indent << i << ".\n";
+    stream << std::string(2, ' ') << i << ".\n";
     debug_check_axioms_step(
       stream, ns, nc_axiom, nc_axiom, negated_axiom, negated_axiom);
 
@@ -1360,8 +1354,8 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
       const auto witness =
         find_counter_example(ns, ui, negated_axiom, univ_var))
     {
-      stream << indent2 << "- violated_for: " << univ_var.get_identifier()
-             << "=" << format(*witness) << eom;
+      stream << std::string(4, ' ') << "- violated_for: "
+             << univ_var.get_identifier() << "=" << format(*witness) << eom;
       violated_not_contains[i]=*witness;
     }
   }
