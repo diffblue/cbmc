@@ -311,16 +311,12 @@ std::string expr2javat::convert_rec(
     return expr2ct::convert_rec(src, qualifiers, declarator);
 }
 
-std::string expr2javat::convert_java_this(
-  const exprt &src,
-  unsigned precedence)
+std::string expr2javat::convert_java_this()
 {
   return id2string(ID_this);
 }
 
-std::string expr2javat::convert_java_instanceof(
-  const exprt &src,
-  unsigned precedence)
+std::string expr2javat::convert_java_instanceof(const exprt &src)
 {
   if(src.operands().size()!=2)
   {
@@ -331,9 +327,12 @@ std::string expr2javat::convert_java_instanceof(
   return convert(src.op0())+" instanceof "+convert(src.op1().type());
 }
 
-std::string expr2javat::convert_java_new(
-  const exprt &src,
-  unsigned precedence)
+std::string expr2javat::convert_code_java_new(const exprt &src, unsigned indent)
+{
+  return indent_str(indent) + convert_java_new(src) + ";\n";
+}
+
+std::string expr2javat::convert_java_new(const exprt &src)
 {
   std::string dest;
 
@@ -381,17 +380,29 @@ std::string expr2javat::convert_with_precedence(
   unsigned &precedence)
 {
   if(src.id()=="java-this")
-    return convert_java_this(src, precedence=15);
+  {
+    precedence = 15;
+    return convert_java_this();
+  }
   if(src.id()==ID_java_instanceof)
-    return convert_java_instanceof(src, precedence=15);
+  {
+    precedence = 15;
+    return convert_java_instanceof(src);
+  }
   else if(src.id()==ID_side_effect &&
           (src.get(ID_statement)==ID_java_new ||
            src.get(ID_statement)==ID_java_new_array ||
            src.get(ID_statement)==ID_java_new_array_data))
-    return convert_java_new(src, precedence=15);
+  {
+    precedence = 15;
+    return convert_java_new(src);
+  }
   else if(src.id()==ID_side_effect &&
           src.get(ID_statement)==ID_throw)
-    return convert_function(src, "throw", precedence=16);
+  {
+    precedence = 16;
+    return convert_function(src, "throw");
+  }
   else if(src.id()==ID_code &&
           to_code(src).get_statement()==ID_exception_landingpad)
   {
@@ -434,7 +445,7 @@ std::string expr2javat::convert_code(
 
   if(statement==ID_java_new ||
      statement==ID_java_new_array)
-    return convert_java_new(src, indent);
+    return convert_code_java_new(src, indent);
 
   if(statement==ID_function_call)
     return convert_code_function_call(to_code_function_call(src), indent);
