@@ -161,8 +161,7 @@ symbol_exprt partial_order_concurrencyt::clock(
   return symbol_exprt(identifier, clock_type);
 }
 
-void partial_order_concurrencyt::build_clock_type(
-  const symex_target_equationt &equation)
+void partial_order_concurrencyt::build_clock_type()
 {
   assert(!numbering.empty());
 

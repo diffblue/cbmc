@@ -18,7 +18,7 @@ void memory_model_sct::operator()(symex_target_equationt &equation)
   statistics() << "Adding SC constraints" << eom;
 
   build_event_lists(equation);
-  build_clock_type(equation);
+  build_clock_type();
 
   read_from(equation);
   write_serialization_external(equation);

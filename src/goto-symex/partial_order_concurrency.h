@@ -77,7 +77,7 @@ protected:
   // produce a clock symbol for some event
   typet clock_type;
   symbol_exprt clock(event_it e, axiomt axiom);
-  void build_clock_type(const symex_target_equationt &);
+  void build_clock_type();
 
   // preprocess and add a constraint to equation
   void add_constraint(
