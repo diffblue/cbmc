@@ -16,6 +16,8 @@ Date:   December 2016
 
 #include <goto-programs/goto_model.h>
 
+#include <util/message.h>
+
 #define INFLIGHT_EXCEPTION_VARIABLE_BASENAME "@inflight_exception"
 #define INFLIGHT_EXCEPTION_VARIABLE_NAME \
   "java::" INFLIGHT_EXCEPTION_VARIABLE_BASENAME
@@ -32,11 +34,13 @@ enum class remove_exceptions_typest
 void remove_exceptions(
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
+  message_handlert &message_handler,
   remove_exceptions_typest type =
     remove_exceptions_typest::DONT_REMOVE_INSTANCEOF);
 
 void remove_exceptions(
   goto_modelt &goto_model,
+  message_handlert &message_handler,
   remove_exceptions_typest type =
     remove_exceptions_typest::DONT_REMOVE_INSTANCEOF);
 

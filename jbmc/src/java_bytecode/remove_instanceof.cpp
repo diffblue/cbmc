@@ -23,8 +23,11 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 class remove_instanceoft
 {
 public:
-  explicit remove_instanceoft(symbol_table_baset &symbol_table)
-  : symbol_table(symbol_table), ns(symbol_table)
+  remove_instanceoft(
+    symbol_table_baset &symbol_table, message_handlert &message_handler)
+    : symbol_table(symbol_table)
+    , ns(symbol_table)
+    , message_handler(message_handler)
   {
     class_hierarchy(symbol_table);
   }
@@ -39,6 +42,7 @@ protected:
   symbol_table_baset &symbol_table;
   namespacet ns;
   class_hierarchyt class_hierarchy;
+  message_handlert &message_handler;
 
   bool lower_instanceof(
     exprt &, goto_programt &, goto_programt::targett);
@@ -154,23 +158,14 @@ bool remove_instanceoft::lower_instanceof(
   // Replace the instanceof construct with instanceof_result:
   expr = instanceof_result_sym.symbol_expr();
 
-  std::ostringstream convert_output;
-  stream_message_handlert convert_message_handler(convert_output);
-  convert_message_handler.set_verbosity(messaget::message_levelt::M_WARNING);
-
   // Insert the new test block before it:
   goto_programt new_check_program;
   goto_convert(
     is_null_branch,
     symbol_table,
     new_check_program,
-    convert_message_handler,
+    message_handler,
     ID_java);
-
-  INVARIANT(
-    convert_output.str().empty(),
-    "remove_instanceof generated test should be goto-converted without error, "
-    "but goto_convert reported: " + convert_output.str());
 
   goto_program.destructive_insert(this_inst, new_check_program);
 
@@ -245,12 +240,14 @@ bool remove_instanceoft::lower_instanceof(goto_programt &goto_program)
 /// \param target: The instruction to work on.
 /// \param goto_program: The function body containing the instruction.
 /// \param symbol_table: The symbol table to add symbols to.
+/// \param message_handler: logging output
 void remove_instanceof(
   goto_programt::targett target,
   goto_programt &goto_program,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
-  remove_instanceoft rem(symbol_table);
+  remove_instanceoft rem(symbol_table, message_handler);
   rem.lower_instanceof(goto_program, target);
 }
 
@@ -259,11 +256,13 @@ void remove_instanceof(
 /// \remarks Extra auxiliary variables may be introduced into symbol_table.
 /// \param function: The function to work on.
 /// \param symbol_table: The symbol table to add symbols to.
+/// \param message_handler: logging output
 void remove_instanceof(
   goto_functionst::goto_functiont &function,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
-  remove_instanceoft rem(symbol_table);
+  remove_instanceoft rem(symbol_table, message_handler);
   rem.lower_instanceof(function.body);
 }
 
@@ -272,11 +271,13 @@ void remove_instanceof(
 /// \remarks Extra auxiliary variables may be introduced into symbol_table.
 /// \param goto_functions: The functions to work on.
 /// \param symbol_table: The symbol table to add symbols to.
+/// \param message_handler: logging output
 void remove_instanceof(
   goto_functionst &goto_functions,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
-  remove_instanceoft rem(symbol_table);
+  remove_instanceoft rem(symbol_table, message_handler);
   bool changed=false;
   for(auto &f : goto_functions.function_map)
     changed=rem.lower_instanceof(f.second.body) || changed;
@@ -288,8 +289,12 @@ void remove_instanceof(
 /// class-identifier test.
 /// \remarks Extra auxiliary variables may be introduced into symbol_table.
 /// \param goto_model: The functions to work on and the symbol table to add
+/// \param message_handler: logging output
 /// symbols to.
-void remove_instanceof(goto_modelt &goto_model)
+void remove_instanceof(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
 {
-  remove_instanceof(goto_model.goto_functions, goto_model.symbol_table);
+  remove_instanceof(
+    goto_model.goto_functions, goto_model.symbol_table, message_handler);
 }
