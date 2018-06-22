@@ -15,7 +15,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdint>
 
 #ifdef _WIN32
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable:4668)
+  // using #if/#elif on undefined macro
+#endif
 #include <windows.h>
+#include <util/pragma_pop.def>
 #endif
 
 std::string narrow(const wchar_t *s)
