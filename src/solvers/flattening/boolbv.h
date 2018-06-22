@@ -187,7 +187,6 @@ protected:
     bvt &next_bv);
 
   void convert_with_bv(
-    const typet &type,
     const exprt &op1,
     const exprt &op2,
     const bvt &prev_bv,
@@ -202,7 +201,6 @@ protected:
 
   void convert_with_union(
     const union_typet &type,
-    const exprt &op1,
     const exprt &op2,
     const bvt &prev_bv,
     bvt &next_bv);
