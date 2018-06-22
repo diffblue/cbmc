@@ -64,7 +64,7 @@ exprt float_bvt::convert(const exprt &expr)
   else if(expr.id()==ID_typecast &&
           expr.type().id()==ID_bool &&
           expr.op0().type().id()==ID_floatbv)  // float -> bool
-    return not_exprt(is_zero(expr.op0(), get_spec(expr.op0())));
+    return not_exprt(is_zero(expr.op0()));
   else if(expr.id()==ID_floatbv_plus)
     return add_sub(false, expr.op0(), expr.op1(), expr.op2(), get_spec(expr));
   else if(expr.id()==ID_floatbv_minus)
@@ -129,8 +129,8 @@ exprt float_bvt::is_equal(
   const ieee_float_spect &spec)
 {
   // special cases: -0 and 0 are equal
-  exprt is_zero0=is_zero(src0, spec);
-  exprt is_zero1=is_zero(src1, spec);
+  const exprt is_zero0 = is_zero(src0);
+  const exprt is_zero1 = is_zero(src1);
   const and_exprt both_zero(is_zero0, is_zero1);
 
   // NaN compares to nothing
@@ -145,9 +145,7 @@ exprt float_bvt::is_equal(
     not_exprt(nan));
 }
 
-exprt float_bvt::is_zero(
-  const exprt &src,
-  const ieee_float_spect &spec)
+exprt float_bvt::is_zero(const exprt &src)
 {
   // we mask away the sign bit, which is the most significant bit
   const floatbv_typet &type=to_floatbv_type(src.type());
@@ -743,8 +741,8 @@ exprt float_bvt::relation(
   assert(rel==relt::EQ || rel==relt::LT || rel==relt::LE);
 
   // special cases: -0 and 0 are equal
-  exprt is_zero1=is_zero(src1, spec);
-  exprt is_zero2=is_zero(src2, spec);
+  const exprt is_zero1 = is_zero(src1);
+  const exprt is_zero2 = is_zero(src2);
   const and_exprt both_zero(is_zero1, is_zero2);
 
   // NaN compares to nothing
@@ -1346,7 +1344,7 @@ float_bvt::unbiased_floatt float_bvt::unpack(
       sub_bias(result.exponent, spec));
 
   result.infinity=isinf(src, spec);
-  result.zero=is_zero(src, spec);
+  result.zero = is_zero(src);
   result.NaN=isnan(src, spec);
 
   return result;
