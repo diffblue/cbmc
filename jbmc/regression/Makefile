@@ -1,14 +1,14 @@
 # For the best possible utilisation of multiple cores when
 # running tests in parallel, it is important that these directories are
 # listed with decreasing runtimes (i.e. longest running at the top)
-DIRS = janalzyer-taint \
+DIRS = janalyzer-taint \
        jbmc \
        jbmc-concurrency \
        jbmc-cover \
        jbmc-inheritance \
        jbmc-strings \
        jdiff \
-       string-smoke-tests \
+       strings-smoke-tests \
        jbmc-generics \
        # Empty last line
 
