@@ -23,7 +23,6 @@ class xmlt;
 void value_sets_to_xml(
   std::function<const value_sett &(goto_programt::const_targett)> get_value_set,
   const goto_programt &goto_program,
-  const irep_idt &identifier,
   xmlt &dest);
 
 template<class VSDT>
@@ -42,13 +41,11 @@ public:
 
   void convert(
     const goto_programt &goto_program,
-    const irep_idt &identifier,
     xmlt &dest) const
   {
     value_sets_to_xml(
       [this](locationt l) { return (*this)[l].value_set; },
       goto_program,
-      identifier,
       dest);
   }
 
