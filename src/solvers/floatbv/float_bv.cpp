@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 
-exprt float_bvt::convert(const exprt &expr)
+exprt float_bvt::convert(const exprt &expr) const
 {
   if(expr.id()==ID_abs)
     return abs(to_abs_expr(expr).op(), get_spec(expr));
@@ -215,7 +215,7 @@ exprt float_bvt::sign_bit(const exprt &op)
 exprt float_bvt::from_signed_integer(
   const exprt &src,
   const exprt &rm,
-  const ieee_float_spect &spec)
+  const ieee_float_spect &spec) const
 {
   std::size_t src_width=to_signedbv_type(src.type()).get_width();
 
@@ -239,7 +239,7 @@ exprt float_bvt::from_signed_integer(
 exprt float_bvt::from_unsigned_integer(
   const exprt &src,
   const exprt &rm,
-  const ieee_float_spect &spec)
+  const ieee_float_spect &spec) const
 {
   unbiased_floatt result;
 
@@ -328,7 +328,7 @@ exprt float_bvt::conversion(
   const exprt &src,
   const exprt &rm,
   const ieee_float_spect &src_spec,
-  const ieee_float_spect &dest_spec)
+  const ieee_float_spect &dest_spec) const
 {
   // Catch the special case in which we extend,
   // e.g. single to double.
@@ -424,7 +424,7 @@ exprt float_bvt::add_sub(
   const exprt &op0,
   const exprt &op1,
   const exprt &rm,
-  const ieee_float_spect &spec)
+  const ieee_float_spect &spec) const
 {
   unbiased_floatt unpacked1=unpack(op0, spec);
   unbiased_floatt unpacked2=unpack(op1, spec);
@@ -593,7 +593,7 @@ exprt float_bvt::mul(
   const exprt &src1,
   const exprt &src2,
   const exprt &rm,
-  const ieee_float_spect &spec)
+  const ieee_float_spect &spec) const
 {
   // unpack
   const unbiased_floatt unpacked1=unpack(src1, spec);
@@ -642,7 +642,7 @@ exprt float_bvt::div(
   const exprt &src1,
   const exprt &src2,
   const exprt &rm,
-  const ieee_float_spect &spec)
+  const ieee_float_spect &spec) const
 {
   // unpack
   const unbiased_floatt unpacked1=unpack(src1, spec);
@@ -992,7 +992,7 @@ void float_bvt::denormalization_shift(
 exprt float_bvt::rounder(
   const unbiased_floatt &src,
   const exprt &rm,
-  const ieee_float_spect &spec)
+  const ieee_float_spect &spec) const
 {
   // incoming: some fraction (with explicit 1),
   //           some exponent without bias
