@@ -700,7 +700,7 @@ bool goto_inlinet::check_inline_map(
   if(call_list.empty())
     return true;
 
-  int ln=-1;
+  unsigned ln = goto_programt::instructiont::nil_target;
 
   for(const auto &call : call_list)
   {
@@ -713,8 +713,12 @@ bool goto_inlinet::check_inline_map(
     #endif
 
     // location numbers increasing
-    if(static_cast<int>(target->location_number)<=ln)
+    if(
+      ln != goto_programt::instructiont::nil_target &&
+      target->location_number <= ln)
+    {
       return false;
+    }
 
     if(!target->is_function_call())
       return false;
