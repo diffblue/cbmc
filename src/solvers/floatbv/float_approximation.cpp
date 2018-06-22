@@ -48,7 +48,8 @@ void float_approximationt::normalization_shift(bvt &fraction, bvt &exponent)
     bv_utils.cond_implies_equal(shift, shifted_fraction, new_fraction);
 
     // build new exponent
-    bvt adjustment=bv_utils.build_constant(-i, exponent.size());
+    bvt adjustment =
+      bv_utils.build_constant(-static_cast<int>(i), exponent.size());
     bvt added_exponent=bv_utils.add(exponent, adjustment);
     bv_utils.cond_implies_equal(shift, added_exponent, new_exponent);
   }
