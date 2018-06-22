@@ -10,107 +10,62 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Format vector of numbers into a compressed range
 
 #include <algorithm>
-#include <cassert>
+#include <sstream>
 #include <string>
+
+#include "invariant.h"
 
 #include "format_number_range.h"
 
 /// create shorter representation for output
-/// \param parameters: vector of numbers
+/// \param input_numbers: vector of numbers
 /// \return string of compressed number range representation
-std::string format_number_range(std::vector<unsigned> &numbers)
+std::string format_number_range(const std::vector<unsigned> &input_numbers)
 {
-  std::string number_range;
+  PRECONDITION(!input_numbers.empty());
+
+  std::vector<unsigned> numbers(input_numbers);
   std::sort(numbers.begin(), numbers.end());
   unsigned end_number=numbers.back();
   if(numbers.front()==end_number)
-    number_range=std::to_string(end_number); // only single number
-  else
-  {
-    bool next=true;
-    bool first=true;
-    bool range=false;
-    unsigned start_number=numbers.front();
-    unsigned last_number=start_number;
+    return std::to_string(end_number); // only single number
 
-    for(const auto &number : numbers)
+  std::stringstream number_range;
+
+  auto start_number = numbers.front();
+
+  for(std::vector<unsigned>::const_iterator it = numbers.begin();
+      it != numbers.end();
+      ++it)
+  {
+    const auto number = *it;
+    const auto next = std::next(it);
+
+    // advance one forward
+    if(next != numbers.end() && *next <= number + 1)
+      continue;
+
+    // end this block range
+    if(start_number != numbers.front())
+      number_range << ',';
+
+    if(number == start_number)
     {
-      if(next)
-      {
-        next=false;
-        start_number=number;
-        last_number=number;
-      }
-      // advance one forward
-      else
-      {
-        if(number==last_number+1 && !(number==end_number))
-        {
-          last_number++;
-          if(last_number>start_number+1)
-            range=true;
-        }
-        // end this block range
-        else
-        {
-          if(first)
-            first=false;
-          else
-            number_range+=",";
-          if(last_number>start_number)
-          {
-            if(range)
-            {
-              if(number==end_number && number==last_number+1)
-                number_range+=
-                  std::to_string(start_number)+"-"+std::to_string(end_number);
-              else if(number==end_number)
-                number_range+=
-                  std::to_string(start_number)+"-"+std::to_string(last_number)+
-                  ","+std::to_string(end_number);
-              else
-                number_range+=
-                  std::to_string(start_number)+"-"+std::to_string(last_number);
-            }
-            else
-            {
-              if(number!=end_number)
-                number_range+=
-                  std::to_string(start_number)+","+std::to_string(last_number);
-              else
-              {
-                if(start_number+1==last_number && last_number+1==number)
-                  number_range+=
-                    std::to_string(start_number)+"-"+std::to_string(end_number);
-                else
-                  number_range+=
-                    std::to_string(start_number)+
-                    ","+std::to_string(last_number)+
-                    ","+std::to_string(end_number);
-              }
-            }
-            start_number=number;
-            last_number=number;
-            range=false;
-            continue;
-          }
-          else
-          {
-            if(number!=end_number)
-              number_range+=std::to_string(start_number);
-            else
-              number_range+=std::to_string(start_number)+","+
-                std::to_string(end_number);
-            start_number=number;
-            last_number=number;
-            range=false;
-            continue; // already set next start number
-          }
-          next=true;
-        }
-      }
+      number_range << number;
     }
+    else if(number == start_number + 1)
+    {
+      number_range << start_number << ',' << number;
+    }
+    else
+    {
+      number_range << start_number << '-' << number;
+    }
+
+    if(next != numbers.end())
+      start_number = *next;
   }
-  assert(!number_range.empty());
-  return number_range;
+
+  CHECK_RETURN(!number_range.str().empty());
+  return number_range.str();
 }
