@@ -39,7 +39,6 @@ exprt dynamic_object_lower_bound(
   const exprt &offset);
 exprt dynamic_object_upper_bound(
   const exprt &pointer,
-  const typet &dereference_type,
   const namespacet &,
   const exprt &access_size);
 exprt object_lower_bound(
@@ -48,7 +47,6 @@ exprt object_lower_bound(
   const exprt &offset);
 exprt object_upper_bound(
   const exprt &pointer,
-  const typet &dereference_type,
   const namespacet &,
   const exprt &access_size);
 

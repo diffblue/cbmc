@@ -934,8 +934,6 @@ void goto_checkt::pointer_validity_check(
   local_bitvector_analysist::flagst flags=
     local_bitvector_analysis->get(t, pointer);
 
-  const typet &dereference_type=pointer_type.subtype();
-
   // For Java, we only need to check for null
   if(mode==ID_java)
   {
@@ -1044,7 +1042,7 @@ void goto_checkt::pointer_validity_check(
     {
       const or_exprt dynamic_bounds(
         dynamic_object_lower_bound(pointer, ns, access_lb),
-        dynamic_object_upper_bound(pointer, dereference_type, ns, access_ub));
+        dynamic_object_upper_bound(pointer, ns, access_ub));
 
       add_guarded_claim(
         or_exprt(
@@ -1065,7 +1063,7 @@ void goto_checkt::pointer_validity_check(
     {
       const or_exprt object_bounds(
         object_lower_bound(pointer, ns, access_lb),
-        object_upper_bound(pointer, dereference_type, ns, access_ub));
+        object_upper_bound(pointer, ns, access_ub));
 
       add_guarded_claim(
         or_exprt(allocs, dynamic_object(pointer), not_exprt(object_bounds)),

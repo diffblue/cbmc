@@ -394,7 +394,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
           tmp_guard.add(
             dynamic_object_upper_bound(
               pointer_expr,
-              dereference_type,
               ns,
               size_of_expr(dereference_type, ns)));
           dereference_callback.dereference_failure(
