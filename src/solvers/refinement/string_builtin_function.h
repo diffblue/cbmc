@@ -195,7 +195,7 @@ public:
   exprt length_constraint() const override
   {
     if(args.size() == 1)
-      return length_constraint_for_insert(result, input1, input2, args[0]);
+      return length_constraint_for_insert(result, input1, input2);
     if(args.size() == 3)
       UNIMPLEMENTED;
     UNREACHABLE;
