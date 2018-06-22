@@ -31,11 +31,12 @@ public:
 protected:
   std::string convert_with_precedence(
     const exprt &src, unsigned &precedence) override;
-  std::string convert_cpp_this(const exprt &src, unsigned precedence);
-  std::string convert_cpp_new(const exprt &src, unsigned precedence);
-  std::string convert_extractbit(const exprt &src, unsigned precedence);
-  std::string convert_extractbits(const exprt &src, unsigned precedence);
-  std::string convert_code_cpp_delete(const exprt &src, unsigned precedence);
+  std::string convert_cpp_this();
+  std::string convert_cpp_new(const exprt &src);
+  std::string convert_extractbit(const exprt &src);
+  std::string convert_extractbits(const exprt &src);
+  std::string convert_code_cpp_delete(const exprt &src, unsigned indent);
+  std::string convert_code_cpp_new(const exprt &src, unsigned indent);
   std::string convert_struct(const exprt &src, unsigned &precedence) override;
   std::string convert_code(const codet &src, unsigned indent) override;
   // NOLINTNEXTLINE(whitespace/line_length)
@@ -359,16 +360,12 @@ std::string expr2cppt::convert_rec(
     return expr2ct::convert_rec(src, qualifiers, declarator);
 }
 
-std::string expr2cppt::convert_cpp_this(
-  const exprt &src,
-  unsigned precedence)
+std::string expr2cppt::convert_cpp_this()
 {
   return id2string(ID_this);
 }
 
-std::string expr2cppt::convert_cpp_new(
-  const exprt &src,
-  unsigned precedence)
+std::string expr2cppt::convert_cpp_new(const exprt &src)
 {
   std::string dest;
 
@@ -389,6 +386,11 @@ std::string expr2cppt::convert_cpp_new(
     dest="new "+convert(src.type().subtype());
 
   return dest;
+}
+
+std::string expr2cppt::convert_code_cpp_new(const exprt &src, unsigned indent)
+{
+  return indent_str(indent) + convert_cpp_new(src) + ";\n";
 }
 
 std::string expr2cppt::convert_code_cpp_delete(
@@ -415,18 +417,33 @@ std::string expr2cppt::convert_with_precedence(
   unsigned &precedence)
 {
   if(src.id()=="cpp-this")
-    return convert_cpp_this(src, precedence=15);
+  {
+    precedence = 15;
+    return convert_cpp_this();
+  }
   if(src.id()==ID_extractbit)
-    return convert_extractbit(src, precedence=15);
+  {
+    precedence = 15;
+    return convert_extractbit(src);
+  }
   else if(src.id()==ID_extractbits)
-    return convert_extractbits(src, precedence=15);
+  {
+    precedence = 15;
+    return convert_extractbits(src);
+  }
   else if(src.id()==ID_side_effect &&
           (src.get(ID_statement)==ID_cpp_new ||
            src.get(ID_statement)==ID_cpp_new_array))
-    return convert_cpp_new(src, precedence=15);
+  {
+    precedence = 15;
+    return convert_cpp_new(src);
+  }
   else if(src.id()==ID_side_effect &&
           src.get(ID_statement)==ID_throw)
-    return convert_function(src, "throw", precedence=16);
+  {
+    precedence = 16;
+    return convert_function(src, "throw");
+  }
   else if(src.is_constant() && src.type().id()==ID_verilog_signedbv)
     return "'"+id2string(src.get(ID_value))+"'";
   else if(src.is_constant() && src.type().id()==ID_verilog_unsignedbv)
@@ -453,22 +470,18 @@ std::string expr2cppt::convert_code(
 
   if(statement==ID_cpp_new ||
      statement==ID_cpp_new_array)
-    return convert_cpp_new(src, indent);
+    return convert_code_cpp_new(src, indent);
 
   return expr2ct::convert_code(src, indent);
 }
 
-std::string expr2cppt::convert_extractbit(
-  const exprt &src,
-  unsigned precedence)
+std::string expr2cppt::convert_extractbit(const exprt &src)
 {
   assert(src.operands().size()==2);
   return convert(src.op0())+"["+convert(src.op1())+"]";
 }
 
-std::string expr2cppt::convert_extractbits(
-  const exprt &src,
-  unsigned precedence)
+std::string expr2cppt::convert_extractbits(const exprt &src)
 {
   assert(src.operands().size()==3);
   return

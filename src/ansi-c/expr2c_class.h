@@ -168,9 +168,7 @@ protected:
     const exprt &src, const std::string &symbol,
     unsigned precedence);
 
-  std::string convert_function(
-    const exprt &src, const std::string &symbol,
-    unsigned precedence);
+  std::string convert_function(const exprt &src, const std::string &symbol);
 
   std::string convert_complex(
     const exprt &src,
@@ -200,9 +198,9 @@ protected:
   std::string convert_code_goto(const codet &src, unsigned indent);
   std::string convert_code_assume(const codet &src, unsigned indent);
   std::string convert_code_assert(const codet &src, unsigned indent);
-  std::string convert_code_break(const codet &src, unsigned indent);
+  std::string convert_code_break(unsigned indent);
   std::string convert_code_switch(const codet &src, unsigned indent);
-  std::string convert_code_continue(const codet &src, unsigned indent);
+  std::string convert_code_continue(unsigned indent);
   std::string convert_code_decl(const codet &src, unsigned indent);
   std::string convert_code_decl_block(const codet &src, unsigned indent);
   std::string convert_code_dead(const codet &src, unsigned indent);
@@ -221,10 +219,10 @@ protected:
   virtual std::string convert_with_precedence(
     const exprt &src, unsigned &precedence);
 
-  // NOLINTNEXTLINE(whitespace/line_length)
-  std::string convert_function_application(const function_application_exprt &src, unsigned &precedence);
-  // NOLINTNEXTLINE(whitespace/line_length)
-  std::string convert_side_effect_expr_function_call(const side_effect_expr_function_callt &src, unsigned &precedence);
+  std::string
+  convert_function_application(const function_application_exprt &src);
+  std::string convert_side_effect_expr_function_call(
+    const side_effect_expr_function_callt &src);
   std::string convert_allocate(const exprt &src, unsigned &precedence);
   std::string convert_nondet(const exprt &src, unsigned &precedence);
   std::string convert_prob_coin(const exprt &src, unsigned &precedence);
@@ -232,18 +230,15 @@ protected:
   // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_statement_expression(const exprt &src, unsigned &precendence);
 
-  virtual std::string convert_symbol(const exprt &src, unsigned &precedence);
-  std::string convert_predicate_symbol(const exprt &src, unsigned &precedence);
-  // NOLINTNEXTLINE(whitespace/line_length)
-  std::string convert_predicate_next_symbol(const exprt &src, unsigned &precedence);
-  // NOLINTNEXTLINE(whitespace/line_length)
-  std::string convert_predicate_passive_symbol(const exprt &src, unsigned &precedence);
-  // NOLINTNEXTLINE(whitespace/line_length)
-  std::string convert_nondet_symbol(const nondet_symbol_exprt &, unsigned &precedence);
-  std::string convert_quantified_symbol(const exprt &src, unsigned &precedence);
-  std::string convert_nondet_bool(const exprt &src, unsigned &precedence);
+  virtual std::string convert_symbol(const exprt &src);
+  std::string convert_predicate_symbol(const exprt &src);
+  std::string convert_predicate_next_symbol(const exprt &src);
+  std::string convert_predicate_passive_symbol(const exprt &src);
+  std::string convert_nondet_symbol(const nondet_symbol_exprt &);
+  std::string convert_quantified_symbol(const exprt &src);
+  std::string convert_nondet_bool();
   std::string convert_object_descriptor(const exprt &src, unsigned &precedence);
-  std::string convert_literal(const exprt &src, unsigned &precedence);
+  std::string convert_literal(const exprt &src);
   // NOLINTNEXTLINE(whitespace/line_length)
   virtual std::string convert_constant(const constant_exprt &src, unsigned &precedence);
   virtual std::string convert_constant_bool(bool boolean_value);
@@ -253,11 +248,10 @@ protected:
   virtual std::string convert_struct(const exprt &src, unsigned &precedence);
   std::string convert_union(const exprt &src, unsigned &precedence);
   std::string convert_vector(const exprt &src, unsigned &precedence);
-  std::string convert_array(const exprt &src, unsigned &precedence);
+  std::string convert_array(const exprt &src);
   std::string convert_array_list(const exprt &src, unsigned &precedence);
-  std::string convert_initializer_list(const exprt &src, unsigned &precedence);
-  // NOLINTNEXTLINE(whitespace/line_length)
-  std::string convert_designated_initializer(const exprt &src, unsigned &precedence);
+  std::string convert_initializer_list(const exprt &src);
+  std::string convert_designated_initializer(const exprt &src);
   std::string convert_concatenation(const exprt &src, unsigned &precedence);
   std::string convert_sizeof(const exprt &src, unsigned &precedence);
   std::string convert_let(const let_exprt &, unsigned precedence);

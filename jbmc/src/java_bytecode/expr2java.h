@@ -28,9 +28,10 @@ public:
 protected:
   virtual std::string convert_with_precedence(
     const exprt &src, unsigned &precedence) override;
-  std::string convert_java_this(const exprt &src, unsigned precedence);
-  std::string convert_java_instanceof(const exprt &src, unsigned precedence);
-  std::string convert_java_new(const exprt &src, unsigned precedence);
+  std::string convert_java_this();
+  std::string convert_java_instanceof(const exprt &src);
+  std::string convert_java_new(const exprt &src);
+  std::string convert_code_java_new(const exprt &src, unsigned precedence);
   std::string convert_code_java_delete(const exprt &src, unsigned precedence);
   virtual std::string convert_struct(
     const exprt &src, unsigned &precedence) override;
