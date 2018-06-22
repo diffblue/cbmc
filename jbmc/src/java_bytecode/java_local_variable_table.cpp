@@ -92,7 +92,7 @@ struct procedure_local_cfg_baset<
     return (--args.second.end())->first;
   }
 
-  unsigned nodes_empty(const method_with_amapt &args) const
+  bool nodes_empty(const method_with_amapt &args) const
   {
     return args.second.empty();
   }
