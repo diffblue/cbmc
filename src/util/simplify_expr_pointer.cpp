@@ -403,8 +403,6 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
       return false;
     }
-
-    return true;
   }
 
   return true;

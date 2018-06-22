@@ -366,7 +366,7 @@ int as_modet::as_hybrid_binary()
 
   #else
   error() << "binary merging not implemented for this platform" << eom;
-  return 1;
+  result = 1;
   #endif
 
   return result;
