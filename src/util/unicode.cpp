@@ -232,27 +232,27 @@ std::wstring utf8_to_utf16(const std::string& in, bool swap_bytes)
         // note: if we wanted to make sure that we capture incorrect strings,
         // we should check that whatever follows first character starts with
         // bits 10.
-        code=(c & 0x1F) << 6;
+        code = (c & 0x1Fu) << 6;
         c=in[i++];
-        code+=c  & 0x3F;
+        code += c & 0x3Fu;
       }
       else if(c<=0xEF && i+1<in.size())
       {
-        code=(c & 0xF) << 12;
+        code = (c & 0xFu) << 12;
         c=in[i++];
-        code+=(c & 0x3F) << 6;
+        code += (c & 0x3Fu) << 6;
         c=in[i++];
-        code+=c & 0x3F;
+        code += c & 0x3Fu;
       }
       else if(c<=0xF7 && i+2<in.size())
       {
-        code=(c & 0x7) << 18;
+        code = (c & 0x7u) << 18;
         c=in[i++];
-        code+=(c & 0x3F) << 12;
+        code += (c & 0x3Fu) << 12;
         c=in[i++];
-        code+=(c & 0x3F) << 6;
+        code += (c & 0x3Fu) << 6;
         c=in[i++];
-        code+=c & 0x3F;
+        code += c & 0x3Fu;
       }
       else
       {

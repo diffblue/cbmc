@@ -2694,20 +2694,27 @@ exprt c_typecheck_baset::do_special_functions(
       // clang returns 4 for _Bool, gcc treats these as 'int'.
       type_number =
         config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG
-          ? 4
-          : 1;
+          ? 4u
+          : 1u;
     }
     else
     {
       type_number =
-          type.id() == ID_empty ? 0
-        : (type.id() == ID_bool || type.id() == ID_c_bool) ? 4
-        : (type.id() == ID_pointer || type.id() == ID_array) ? 5
-        : type.id() == ID_floatbv ? 8
-        : (type.id() == ID_complex && type.subtype().id() == ID_floatbv) ? 9
-        : type.id() == ID_struct ? 12
-        : type.id() == ID_union ? 13
-        : 1; // int, short, char, enum_tag
+          type.id() == ID_empty
+          ? 0u
+          : (type.id() == ID_bool || type.id() == ID_c_bool)
+            ? 4u
+            : (type.id() == ID_pointer || type.id() == ID_array)
+              ? 5u
+              : type.id() == ID_floatbv
+                ? 8u
+                : (type.id() == ID_complex && type.subtype().id() == ID_floatbv)
+                  ? 9u
+                  : type.id() == ID_struct
+                    ? 12u
+                    : type.id() == ID_union
+                      ? 13u
+                      : 1u; // int, short, char, enum_tag
     }
 
     exprt tmp=from_integer(type_number, expr.type());

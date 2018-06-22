@@ -534,7 +534,7 @@ int gcc_modet::doit()
 
   config.ansi_c.Float128_type =
     gcc_version.flavor == gcc_versiont::flavort::GCC &&
-    gcc_version.is_at_least(4, gcc_float128_minor_version);
+    gcc_version.is_at_least(4u, gcc_float128_minor_version);
 
   // -fshort-double makes double the same as float
   if(cmdline.isset("fshort-double"))
