@@ -330,7 +330,8 @@ void custom_bitvector_domaint::transform(
             unsigned bit_nr=
               cba.get_bit_nr(code_function_call.arguments()[1]);
 
-            modet mode;
+            // initialize to make Visual Studio happy
+            modet mode = modet::SET_MUST;
 
             if(identifier=="__CPROVER_set_must")
               mode=modet::SET_MUST;
@@ -458,7 +459,8 @@ void custom_bitvector_domaint::transform(
         unsigned bit_nr=
           cba.get_bit_nr(instruction.code.op1());
 
-        modet mode;
+        // initialize to make Visual Studio happy
+        modet mode = modet::SET_MUST;
 
         if(statement=="set_must")
           mode=modet::SET_MUST;

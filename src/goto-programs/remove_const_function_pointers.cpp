@@ -398,7 +398,7 @@ bool remove_const_function_pointerst::try_resolve_expression(
   exprt simplified_expr=simplify_expr(expr, ns);
   bool resolved;
   expressionst resolved_expressions;
-  bool is_resolved_expression_const;
+  bool is_resolved_expression_const = false;
   if(simplified_expr.id()==ID_index)
   {
     const index_exprt &index_expr=to_index_expr(simplified_expr);
