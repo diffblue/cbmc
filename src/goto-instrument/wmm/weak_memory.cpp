@@ -155,7 +155,7 @@ void weak_memory(
     instrumenter.set_parameters_collection(input_max_var,
       input_max_po_trans, ignore_arrays);
   else
-    instrumenter.set_parameters_collection(max_thds, ignore_arrays);
+    instrumenter.set_parameters_collection(max_thds, 0, ignore_arrays);
 
   if(SCC)
   {
