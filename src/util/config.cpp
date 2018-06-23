@@ -1217,17 +1217,17 @@ irep_idt configt::this_architecture()
 
   #ifdef __alpha__
   this_arch="alpha";
-  #elif __armel__
+  #elif defined(__armel__)
   this_arch="armel";
-  #elif __aarch64__
+  #elif defined(__aarch64__)
   this_arch="arm64";
-  #elif __arm__
+  #elif defined(__arm__)
     #ifdef __ARM_PCS_VFP
     this_arch="armhf"; // variant of arm with hard float
     #else
     this_arch="arm";
     #endif
-  #elif __mipsel__
+  #elif defined(__mipsel__)
     #if _MIPS_SIM==_ABIO32
     this_arch="mipsel";
     #elif _MIPS_SIM==_ABIN32
@@ -1235,7 +1235,7 @@ irep_idt configt::this_architecture()
     #else
     this_arch="mips64el";
     #endif
-  #elif __mips__
+  #elif defined(__mips__)
     #if _MIPS_SIM==_ABIO32
     this_arch="mips";
     #elif _MIPS_SIM==_ABIN32
@@ -1243,7 +1243,7 @@ irep_idt configt::this_architecture()
     #else
     this_arch="mips64";
     #endif
-  #elif __powerpc__
+  #elif defined(__powerpc__)
     #if defined(__ppc64__) || defined(__PPC64__) || \
         defined(__powerpc64__) || defined(__POWERPC64__)
       #ifdef __LITTLE_ENDIAN__
@@ -1254,33 +1254,33 @@ irep_idt configt::this_architecture()
     #else
     this_arch="powerpc";
     #endif
-  #elif __sparc__
+  #elif defined(__sparc__)
     #ifdef __arch64__
     this_arch="sparc64";
     #else
     this_arch="sparc";
     #endif
-  #elif __ia64__
+  #elif defined(__ia64__)
   this_arch="ia64";
-  #elif __s390x__
+  #elif defined(__s390x__)
   this_arch="s390x";
-  #elif __s390__
+  #elif defined(__s390__)
   this_arch="s390";
-  #elif __x86_64__
+  #elif defined(__x86_64__)
     #ifdef __ILP32__
     this_arch="x32"; // variant of x86_64 with 32-bit pointers
     #else
     this_arch="x86_64";
     #endif
-  #elif __i386__
+  #elif defined(__i386__)
   this_arch="i386";
-  #elif _WIN64
+  #elif defined(_WIN64)
   this_arch="x86_64";
-  #elif _WIN32
+  #elif defined(_WIN32)
   this_arch="i386";
-  #elif __hppa__
+  #elif defined(__hppa__)
   this_arch="hppa";
-  #elif __sh__
+  #elif defined(__sh__)
   this_arch="sh4";
   #else
   // something new and unknown!
