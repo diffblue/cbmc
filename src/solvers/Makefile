@@ -193,6 +193,32 @@ SRC = $(BOOLEFORCE_SRC) \
 
 include ../common
 
+ifneq ($(MINISAT2),)
+ifeq ($(BUILD_ENV_),MSVC)
+sat/satcheck_minisat2$(OBJEXT): sat/satcheck_minisat2.cpp
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MINISAT2)/minisat/simp/SimpSolver$(OBJEXT): $(MINISAT2)/minisat/simp/SimpSolver.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MINISAT2)/minisat/core/Solver$(OBJEXT): $(MINISAT2)/minisat/core/Solver.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+endif
+endif
+
+ifneq ($(GLUCOSE),)
+ifeq ($(BUILD_ENV_),MSVC)
+sat/satcheck_glucose$(OBJEXT): sat/satcheck_glucose.cpp
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(GLUCOSE)/simp/SimpSolver$(OBJEXT): $(GLUCOSE)/simp/SimpSolver.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(GLUCOSE)/core/Solver$(OBJEXT): $(GLUCOSE)/core/Solver.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+endif
+endif
+
 INCLUDES += -I .. \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \
   $(IPASIR_INCLUDE) \
