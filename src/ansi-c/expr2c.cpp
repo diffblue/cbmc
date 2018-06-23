@@ -2786,7 +2786,7 @@ std::string expr2ct::convert_code_dead(
     return convert_norep(src, precedence);
   }
 
-  return "dead "+convert(src.op0())+";";
+  return indent_str(indent)  + "dead " + convert(src.op0()) + ";";
 }
 
 std::string expr2ct::convert_code_for(
