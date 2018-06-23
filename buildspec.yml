@@ -3,22 +3,29 @@ version: 0.2
 phases:
   install:
     commands:
-      - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
+      - add-apt-repository ppa:ubuntu-toolchain-r/test -y
       - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
+      - add-apt-repository ppa:openjdk-r/ppa -y
       - apt-get update -y
       - apt-get install -y g++-5 flex bison make git libwww-perl patch ccache libc6-dev-i386
-      - apt-get install -y openjdk-7-jdk
+      - apt-get install -y openjdk-8-jdk
       - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
       - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
   build:
     commands:
       - echo Build started on `date`
+      - make -C src minisat2-download
       - make -C jbmc/src java-models-library-download
-      - (cd src ; make minisat2-download)
-      - (cd src ; make CXX="ccache g++" -j2)
-      - (cd regression ; make test)
+      - make -C src CXX="ccache g++" -j2
+      - make -C unit CXX="ccache g++" -j2
+      - make -C jbmc/src CXX="ccache g++" -j2
+      - make -C jbmc/unit CXX="ccache g++" -j2
   post_build:
     commands:
+      - make -C unit test
+      - make -C regression test
+      - make -C jbmc/unit test
+      - make -C jbmc/regression test
       - echo Build completed on `date`
 artifacts:
   files:
