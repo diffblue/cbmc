@@ -81,6 +81,7 @@ set_target_properties(
     xml
 
     java_bytecode
+    java-models-library
     jbmc
     jbmc-lib
     janalyzer

@@ -19,7 +19,7 @@ phases:
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C jbmc/src BUILD_ENV=MSVC" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C jbmc/src setup-submodules" && bash -c "make -j4 -C jbmc/src BUILD_ENV=MSVC" '
         cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C jbmc/unit all BUILD_ENV=MSVC ; exit 0" '
 
   post_build:
