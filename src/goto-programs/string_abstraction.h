@@ -87,7 +87,7 @@ protected:
     const exprt &lhs,
     const exprt &rhs);
 
-  void abstract_function_call(goto_programt &dest, goto_programt::targett it);
+  void abstract_function_call(goto_programt::targett it);
 
   goto_programt::targett value_assignments(goto_programt &dest,
       goto_programt::targett it,
