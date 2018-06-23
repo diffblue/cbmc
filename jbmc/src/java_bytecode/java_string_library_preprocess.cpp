@@ -1342,7 +1342,7 @@ exprt java_string_library_preprocesst::get_primitive_value_of_object(
 /// \return An expression representing the object at position `index` of `argv`.
 exprt java_string_library_preprocesst::get_object_at_index(
   const exprt &argv,
-  int index)
+  std::size_t index)
 {
   dereference_exprt deref_objs(argv, argv.type().subtype());
   pointer_typet empty_pointer=pointer_type(empty_typet());
@@ -1390,7 +1390,7 @@ exprt java_string_library_preprocesst::get_object_at_index(
 ///         values of the argument at position `index` of `argv`.
 exprt java_string_library_preprocesst::make_argument_for_format(
   const exprt &argv,
-  int index,
+  std::size_t index,
   const struct_typet &structured_type,
   const source_locationt &loc,
   const irep_idt &function_id,
