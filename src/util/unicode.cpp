@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 bool is_little_endian_arch()
 {
   uint32_t i=1;
-  return reinterpret_cast<uint8_t &>(i);
+  return reinterpret_cast<uint8_t &>(i) != 0;
 }
 
 #define BUFSIZE 100

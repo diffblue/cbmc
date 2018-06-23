@@ -80,7 +80,7 @@ optionalt<std::string> jar_filet::get_entry(const std::string &name)
 
 static bool is_space(const char ch)
 {
-  return std::isspace(ch);
+  return std::isspace(ch) != 0;
 }
 
 /// Remove leading and trailing whitespace characters from string
