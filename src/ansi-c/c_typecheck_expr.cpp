@@ -3451,7 +3451,6 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
 
 void c_typecheck_baset::make_constant(exprt &expr)
 {
-  make_constant_rec(expr);
   simplify(expr, *this);
 
   if(!expr.is_constant() &&
@@ -3477,8 +3476,4 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
     error() << "conversion to integer constant failed" << eom;
     throw 0;
   }
-}
-
-void c_typecheck_baset::make_constant_rec(exprt &expr)
-{
 }

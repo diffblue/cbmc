@@ -199,7 +199,6 @@ protected:
   virtual void make_index_type(exprt &expr);
   virtual void make_constant(exprt &expr);
   virtual void make_constant_index(exprt &expr);
-  virtual void make_constant_rec(exprt &expr);
 
   virtual bool gcc_types_compatible_p(const typet &, const typet &);
 
