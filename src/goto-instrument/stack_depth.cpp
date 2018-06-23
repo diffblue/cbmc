@@ -22,7 +22,7 @@ Date: November 2011
 symbol_exprt add_stack_depth_symbol(symbol_tablet &symbol_table)
 {
   const irep_idt identifier="$stack_depth";
-  signedbv_typet type(sizeof(int)*8);
+  unsignedbv_typet type(sizeof(std::size_t)*8);
 
   symbolt new_symbol;
   new_symbol.name=identifier;
@@ -43,7 +43,7 @@ symbol_exprt add_stack_depth_symbol(symbol_tablet &symbol_table)
 void stack_depth(
   goto_programt &goto_program,
   const symbol_exprt &symbol,
-  const int i_depth,
+  const std::size_t i_depth,
   const exprt &max_depth)
 {
   assert(!goto_program.instructions.empty());
@@ -82,7 +82,7 @@ void stack_depth(
 
 void stack_depth(
   goto_modelt &goto_model,
-  const int depth)
+  const std::size_t depth)
 {
   const symbol_exprt sym=
     add_stack_depth_symbol(goto_model.symbol_table);

@@ -14,10 +14,12 @@ Date: November 2011
 #ifndef CPROVER_GOTO_INSTRUMENT_STACK_DEPTH_H
 #define CPROVER_GOTO_INSTRUMENT_STACK_DEPTH_H
 
+#include <cstddef>
+
 class goto_modelt;
 
 void stack_depth(
   goto_modelt &,
-  const int depth);
+  const std::size_t depth);
 
 #endif // CPROVER_GOTO_INSTRUMENT_STACK_DEPTH_H
