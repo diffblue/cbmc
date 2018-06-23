@@ -138,15 +138,8 @@ void polynomialt::from_expr(const exprt &expr)
   }
   else if(expr.id()==ID_constant)
   {
-    mp_integer mp;
-    unsigned int l;
-    constant_exprt const_expr=to_constant_expr(expr);
-
-    mp=binary2integer(const_expr.get_value().c_str(), true);
-    l=mp.to_long();
-
     monomialt monomial;
-    monomial.coeff=l;
+    monomial.coeff = numeric_cast_v<int>(expr);
 
     monomials.push_back(monomial);
   }
