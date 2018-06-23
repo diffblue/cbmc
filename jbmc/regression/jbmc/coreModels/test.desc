@@ -3,7 +3,7 @@ test.class
 --show-symbol-table --cp ../../../src/java_bytecode/library/core-models.jar:.
 ^EXIT=0$
 ^SIGNAL=0$
-^Symbol\s*\.*\: java\:\:org\.cprover\.CProver\.\<clinit\>\:\(\)V$
+^Symbol\s*\.*\: java\:\:org\.cprover\.CProver\.\<init\>\:\(\)V$
 --
 --
-tests that the core models are  being loaded by checking if the static initializer for the CProver class was
+tests that the core models are being loaded by checking if the constructor for the CProver class was
