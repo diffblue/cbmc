@@ -58,7 +58,7 @@ class overflow_instrumentert
   const exprt &overflow_var;
 
   namespacet ns;
-  std::set<int> checked;
+  std::set<unsigned> checked;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_OVERFLOW_INSTRUMENTER_H
