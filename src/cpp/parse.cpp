@@ -248,7 +248,7 @@ protected:
   bool rTemplateDecl2(typet &, TemplateDeclKind &kind);
   bool rTempArgList(irept &);
   bool rTempArgDeclaration(cpp_declarationt &);
-  bool rExternTemplateDecl(irept &);
+  bool rExternTemplateDecl(cpp_declarationt &);
 
   bool rDeclaration(cpp_declarationt &);
   bool rIntegralDeclaration(
@@ -257,11 +257,7 @@ protected:
     cpp_member_spect &,
     typet &,
     typet &);
-  bool rConstDeclaration(
-    cpp_declarationt &,
-    cpp_storage_spect &,
-    cpp_member_spect &,
-    typet &);
+  bool rConstDeclaration(cpp_declarationt &);
   bool rOtherDeclaration(
     cpp_declarationt &,
     cpp_storage_spect &,
@@ -277,7 +273,7 @@ protected:
   bool optCvQualify(typet &);
   bool optAlignas(typet &);
   bool rAttribute(typet &);
-  bool optAttribute(cpp_declarationt &);
+  bool optAttribute(typet &);
   bool optIntegralTypeOrClassSpec(typet &);
   bool rConstructorDecl(
     cpp_declaratort &,
@@ -312,7 +308,7 @@ protected:
   bool rBaseSpecifiers(irept &);
   bool rClassBody(exprt &);
   bool rClassMember(cpp_itemt &);
-  bool rAccessDecl(irept &);
+  bool rAccessDecl(cpp_declarationt &);
 
   bool rCommaExpression(exprt &);
 
@@ -1336,7 +1332,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
    extern.template.decl
    : EXTERN TEMPLATE declaration
 */
-bool Parser::rExternTemplateDecl(irept &decl)
+bool Parser::rExternTemplateDecl(cpp_declarationt &decl)
 {
   cpp_tokent tk1, tk2;
 
@@ -1346,8 +1342,7 @@ bool Parser::rExternTemplateDecl(irept &decl)
   if(lex.get_token(tk2)!=TOK_TEMPLATE)
     return false;
 
-  cpp_declarationt body;
-  if(!rDeclaration(body))
+  if(!rDeclaration(decl))
     return false;
 
   // decl=new PtreeExternTemplate(new Leaf(tk1),
@@ -1393,7 +1388,7 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
             << lex.LookAhead(0) << '\n';
   #endif
 
-  if(!optAttribute(declaration))
+  if(!optAttribute(declaration.type()))
     return false;
 
   cpp_member_spect member_spec;
@@ -1465,7 +1460,7 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
 
     if(cv_q.is_not_nil() &&
        ((t==TOK_IDENTIFIER && lex.LookAhead(1)=='=') || t=='*'))
-      return rConstDeclaration(declaration, storage_spec, member_spec, cv_q);
+      return rConstDeclaration(declaration);
     else
       return rOtherDeclaration(declaration, storage_spec, member_spec, cv_q);
   }
@@ -1655,20 +1650,14 @@ bool Parser::rIntegralDeclaration(
   }
 }
 
-bool Parser::rConstDeclaration(
-  cpp_declarationt &declaration,
-  cpp_storage_spect &storage_spec,
-  cpp_member_spect &member_spec,
-  typet &cv_q)
+bool Parser::rConstDeclaration(cpp_declarationt &declaration)
 {
   #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rConstDeclaration\n";
   #endif
 
-  cpp_declarationt::declaratorst declarators;
-
-  if(!rDeclarators(declarators, false))
+  if(!rDeclarators(declaration.declarators(), false))
     return false;
 
   if(lex.LookAhead(0)!=';')
@@ -2130,21 +2119,39 @@ bool Parser::optAlignas(typet &cv)
   {
     if(lex.get_token(cp)==')')
     {
-      // TODO
+      exprt exp(ID_alignof);
+      exp.add(ID_type_arg).swap(tname);
+      set_location(exp, tk);
+
+      typet attr(ID_aligned);
+      set_location(attr, tk);
+      attr.add(ID_size, exp);
+
+      merge_types(attr, cv);
+
       return true;
     }
   }
 
   lex.Restore(pos);
 
-  exprt unary;
+  exprt exp;
 
-  if(!rUnaryExpr(unary))
+  if(!rCommaExpression(exp))
     return false;
 
-  // TODO
+  if(lex.get_token(cp)==')')
+  {
+    typet attr(ID_aligned);
+    set_location(attr, tk);
+    attr.add(ID_size, exp);
 
-  return true;
+    merge_types(attr, cv);
+
+    return true;
+  }
+
+  return false;
 }
 
 bool Parser::rAttribute(typet &t)
@@ -2347,7 +2354,7 @@ bool Parser::rAttribute(typet &t)
   return rAttribute(t);
 }
 
-bool Parser::optAttribute(cpp_declarationt &declaration)
+bool Parser::optAttribute(typet &t)
 {
   if(lex.LookAhead(0)!='[' ||
      lex.LookAhead(1)!='[')
@@ -2368,8 +2375,12 @@ bool Parser::optAttribute(cpp_declarationt &declaration)
       return true;
 
     case TOK_NORETURN:
-      // TODO
-      break;
+      {
+        typet attr(ID_noreturn);
+        set_location(attr, tk);
+        merge_types(attr, t);
+        break;
+      }
 
     default:
       return false;
@@ -4709,7 +4720,7 @@ bool Parser::rClassMember(cpp_itemt &member)
       return true;
 
     lex.Restore(pos);
-    return rAccessDecl(member);
+    return rAccessDecl(member.make_declaration());
   }
 }
 
@@ -4717,9 +4728,9 @@ bool Parser::rClassMember(cpp_itemt &member)
   access.decl
   : name ';'                e.g. <qualified class>::<member name>;
 */
-bool Parser::rAccessDecl(irept &mem)
+bool Parser::rAccessDecl(cpp_declarationt &mem)
 {
-  irept name;
+  cpp_namet name;
   cpp_tokent tk;
 
   if(!rName(name))
@@ -4727,6 +4738,10 @@ bool Parser::rAccessDecl(irept &mem)
 
   if(lex.get_token(tk)!=';')
     return false;
+
+  cpp_declaratort name_decl;
+  name_decl.name() = name;
+  mem.declarators().push_back(name_decl);
 
   // mem=new PtreeAccessDecl(new PtreeName(name, encode),
   //                           Ptree::List(new Leaf(tk)));
@@ -8250,7 +8265,7 @@ bool Parser::rDeclarationStatement(codet &statement)
       statement=codet(ID_decl);
       statement.operands().resize(1);
       cpp_declarationt &declaration=(cpp_declarationt &)(statement.op0());
-      return rConstDeclaration(declaration, storage_spec, member_spec, cv_q);
+      return rConstDeclaration(declaration);
     }
     else
       return rOtherDeclStatement(statement, storage_spec, cv_q);
