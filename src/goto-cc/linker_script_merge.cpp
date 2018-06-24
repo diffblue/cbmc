@@ -415,7 +415,7 @@ int linker_script_merget::ls_data2instructions(
 
 
     // Array symbol_exprt
-    std::size_t array_size=integer2size_t(string2integer(d["size"].value));
+    mp_integer array_size = string2integer(d["size"].value);
     if(array_size > MAX_FLATTENED_ARRAY_SIZE)
     {
       warning() << "Object section '" << d["section"].value << "' of size "
@@ -434,7 +434,7 @@ int linker_script_merget::ls_data2instructions(
     array_loc.set_file(linker_script);
     std::ostringstream array_comment;
     array_comment << "Object section '" << d["section"].value << "' of size "
-            << integer2unsigned(array_size) << " bytes";
+                  << array_size << " bytes";
     array_loc.set_comment(array_comment.str());
     array_expr.add_source_location()=array_loc;
 
