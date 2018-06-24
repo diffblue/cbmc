@@ -372,11 +372,6 @@ void symex_slice_by_tracet::compute_ts_back(
   }
 }
 
-void symex_slice_by_tracet::compute_ts_fd(
-  symex_target_equationt &equation)
-{
-}
-
 void symex_slice_by_tracet::slice_SSA_steps(
   symex_target_equationt &equation,
   std::set<exprt> implications)
