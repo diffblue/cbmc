@@ -98,7 +98,7 @@ exprt good_pointer_def(
       not_exprt(dynamic_object_lower_bound(pointer, ns, nil_exprt())),
       not_exprt(
         dynamic_object_upper_bound(
-          pointer, dereference_type, ns, size_of_expr(dereference_type, ns)))));
+          pointer, ns, size_of_expr(dereference_type, ns)))));
 
   const and_exprt good_dynamic_tmp2(
     not_exprt(deallocated(pointer, ns)), good_dynamic_tmp1);
@@ -113,7 +113,7 @@ exprt good_pointer_def(
   const or_exprt bad_other(
     object_lower_bound(pointer, ns, nil_exprt()),
     object_upper_bound(
-      pointer, dereference_type, ns, size_of_expr(dereference_type, ns)));
+      pointer, ns, size_of_expr(dereference_type, ns)));
 
   const or_exprt good_other(dynamic_object(pointer), not_exprt(bad_other));
 
@@ -158,7 +158,6 @@ exprt dynamic_object_lower_bound(
 
 exprt dynamic_object_upper_bound(
   const exprt &pointer,
-  const typet &dereference_type,
   const namespacet &ns,
   const exprt &access_size)
 {
@@ -192,7 +191,6 @@ exprt dynamic_object_upper_bound(
 
 exprt object_upper_bound(
   const exprt &pointer,
-  const typet &dereference_type,
   const namespacet &ns,
   const exprt &access_size)
 {
