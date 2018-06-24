@@ -301,9 +301,9 @@ class base_ref_infot : public structured_pool_entryt
 public:
   explicit base_ref_infot(pool_entryt entry) : structured_pool_entryt(entry)
   {
-    static std::set<u1> info_tags = {
-      CONSTANT_Fieldref, CONSTANT_Methodref, CONSTANT_InterfaceMethodref};
-    PRECONDITION(info_tags.find(entry.tag) != info_tags.end());
+    PRECONDITION(
+      entry.tag == CONSTANT_Fieldref || entry.tag == CONSTANT_Methodref ||
+      entry.tag == CONSTANT_InterfaceMethodref);
     class_index = entry.ref1;
     name_and_type_index = entry.ref2;
   }

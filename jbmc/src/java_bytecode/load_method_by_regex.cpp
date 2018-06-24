@@ -41,7 +41,7 @@ bool does_pattern_miss_descriptor(const std::string &pattern)
   if(descriptor_index == std::string::npos)
     return true;
 
-  static const std::string java_prefix = "java::";
+  const std::string java_prefix = "java::";
   return descriptor_index == java_prefix.length() - 1 &&
          has_prefix(pattern, java_prefix);
 }
