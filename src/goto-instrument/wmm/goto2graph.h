@@ -245,10 +245,9 @@ protected:
       {
         /* forbids recursive function */
         enter_function(function);
-        const std::set<nodet> empty_in;
         std::set<nodet> end_out;
         visit_cfg_function(value_sets, model, no_dependencies, duplicate_body,
-          function, empty_in, end_out);
+          function, end_out);
         leave_function(function);
       }
       catch(const std::string &s)
@@ -266,8 +265,6 @@ protected:
       loop_strategyt duplicate_body,
       /// function to analyse
       const irep_idt &function,
-      /// incoming edges
-      const std::set<nodet> &initial_vertex,
       /// outcoming edges
       std::set<nodet> &ending_vertex);
 

@@ -107,7 +107,6 @@ void weak_memory(
   goto_modelt &goto_model,
   bool SCC,
   instrumentation_strategyt event_strategy,
-  unsigned unwinding_bound,
   bool no_cfg_kill,
   bool no_dependencies,
   loop_strategyt duplicate_body,

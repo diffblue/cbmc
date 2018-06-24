@@ -48,8 +48,7 @@ public:
 
     std::string print_detail(const critical_cyclet &reduced,
       std::map<std::string, std::string> &map_id2var,
-      std::map<std::string, std::string> &map_var2id,
-      memory_modelt model) const;
+      std::map<std::string, std::string> &map_var2id) const;
     std::string print_name(const critical_cyclet &redyced,
       memory_modelt model) const;
 
@@ -377,7 +376,7 @@ protected:
     {}
 
     void set_naive() {naive=true;}
-    void collect_pairs(namespacet &ns);
+    void collect_pairs();
   };
 
 public:
@@ -577,17 +576,17 @@ public:
 
   /* collects all the pairs of events with respectively at least one cmp,
      regardless of the architecture (Pensieve'05 strategy) */
-  void collect_pairs(namespacet &ns)
+  void collect_pairs()
   {
     graph_pensieve_explorert exploration(*this, max_var, max_po_trans);
-    exploration.collect_pairs(ns);
+    exploration.collect_pairs();
   }
 
-  void collect_pairs_naive(namespacet &ns)
+  void collect_pairs_naive()
   {
     graph_pensieve_explorert exploration(*this, max_var, max_po_trans);
     exploration.set_naive();
-    exploration.collect_pairs(ns);
+    exploration.collect_pairs();
   }
 };
 #endif // CPROVER_GOTO_INSTRUMENT_WMM_EVENT_GRAPH_H
