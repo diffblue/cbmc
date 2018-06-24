@@ -36,7 +36,7 @@ public:
   exprt negation(const exprt &, const ieee_float_spect &);
   exprt abs(const exprt &, const ieee_float_spect &);
   exprt is_equal(const exprt &, const exprt &, const ieee_float_spect &);
-  exprt is_zero(const exprt &, const ieee_float_spect &);
+  exprt is_zero(const exprt &);
   exprt isnan(const exprt &, const ieee_float_spect &);
   exprt isinf(const exprt &, const ieee_float_spect &);
   exprt isnormal(const exprt &, const ieee_float_spect &);
