@@ -80,8 +80,7 @@ counterexample_beautificationt::get_failed_property(
 
 void counterexample_beautificationt::operator()(
   bv_cbmct &bv_cbmc,
-  const symex_target_equationt &equation,
-  const namespacet &ns)
+  const symex_target_equationt &equation)
 {
   // find failed property
 
