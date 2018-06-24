@@ -88,12 +88,12 @@ void boolbvt::convert_with(
   else if(type.id()==ID_bv ||
           type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv)
-    return convert_with_bv(type, op1, op2, prev_bv, next_bv);
+    return convert_with_bv(op1, op2, prev_bv, next_bv);
   else if(type.id()==ID_struct)
     return
       convert_with_struct(to_struct_type(type), op1, op2, prev_bv, next_bv);
   else if(type.id()==ID_union)
-    return convert_with_union(to_union_type(type), op1, op2, prev_bv, next_bv);
+    return convert_with_union(to_union_type(type), op2, prev_bv, next_bv);
   else if(type.id()==ID_symbol)
     return convert_with(ns.follow(type), op1, op2, prev_bv, next_bv);
 
@@ -172,7 +172,6 @@ void boolbvt::convert_with_array(
 }
 
 void boolbvt::convert_with_bv(
-  const typet &type,
   const exprt &op1,
   const exprt &op2,
   const bvt &prev_bv,
@@ -261,7 +260,6 @@ void boolbvt::convert_with_struct(
 
 void boolbvt::convert_with_union(
   const union_typet &type,
-  const exprt &op1,
   const exprt &op2,
   const bvt &prev_bv,
   bvt &next_bv)
