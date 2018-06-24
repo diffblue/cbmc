@@ -8,7 +8,7 @@ SRC = bytecode_info.cpp \
       jar_file.cpp \
       java_bytecode_convert_class.cpp \
       java_bytecode_convert_method.cpp \
-      java_bytecode_convert_threadblock.cpp \
+      java_bytecode_concurrency_instrumentation.cpp \
       java_bytecode_instrument.cpp \
       java_bytecode_internal_additions.cpp \
       java_bytecode_language.cpp \

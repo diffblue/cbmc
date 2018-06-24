@@ -559,8 +559,8 @@ SCENARIO(
         THEN("Object 'f' has unspecialized field 'field'")
         {
           // tmp_object_factory$2.field = &tmp_object_factory$3;
-          // struct java.lang.Object { __CPROVER_string @class_identifier;
-          //   boolean @lock; } tmp_object_factory$3;
+          // struct java.lang.Object { __CPROVER_string @class_identifier; }
+          // tmp_object_factory$3;
           require_goto_statements::require_struct_component_assignment(
             field_input_name,
             {},

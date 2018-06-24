@@ -233,10 +233,17 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
 void java_simple_method_stubst::check_method_stub(const irep_idt &symname)
 {
   const symbolt &sym = *symbol_table.lookup(symname);
-  if(
-    !sym.is_type && sym.value.id() == ID_nil && sym.type.id() == ID_code &&
-    // Don't stub internal locking primitives:
-    sym.name != "java::monitorenter" && sym.name != "java::monitorexit")
+  if(!sym.is_type && sym.value.id() == ID_nil &&
+    sym.type.id() == ID_code &&
+    // do not stub internal locking calls as 'create_method_stub' does not
+    // automatically create the appropriate symbols for the formal parameters.
+    // This means that symex will (rightfully) crash  when it encounters the
+    // function call as it will not be able to find symbols for the fromal
+    // parameters.
+    sym.name !=
+      "java::java.lang.Object.monitorenter:(Ljava/lang/Object;)V" &&
+    sym.name !=
+      "java::java.lang.Object.monitorexit:(Ljava/lang/Object;)V")
   {
     create_method_stub(*symbol_table.get_writeable(symname));
   }

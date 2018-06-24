@@ -1,0 +1,9 @@
+CORE
+A.class
+--function 'A.me0:()V' --lazy-methods
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Tests that synchronization blocks do not cause issues when the java core models library is not loaded

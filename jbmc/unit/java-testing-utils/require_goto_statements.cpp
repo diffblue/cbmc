@@ -355,8 +355,8 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
   // After we have found the declaration of the final assignment's
   // right hand side, then we want to identify that the type
   // is the one we expect, e.g.:
-  // struct java.lang.Integer { __CPROVER_string @class_identifier;
-  // boolean @lock; } tmp_object_factory$2;
+  // struct java.lang.Integer { __CPROVER_string @class_identifier; }
+  // tmp_object_factory$2;
   const auto &component_declaration =
     require_goto_statements::require_declaration_of_name(
       component_tmp_name, entry_point_instructions);

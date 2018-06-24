@@ -1,0 +1,8 @@
+CORE
+A.class
+--function 'A.me3:()V' --java-threading --lazy-methods --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--

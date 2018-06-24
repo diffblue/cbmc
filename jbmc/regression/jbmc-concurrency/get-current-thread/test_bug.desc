@@ -1,0 +1,18 @@
+KNOWNBUG
+A.class
+--function 'A.me_bug:()V' --java-threading --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL
+--
+--
+For some reason symex assigns 'g' to zero, even though
+the only viable assignment should be one.
+This issue seems to only occur when a variable is
+assigned inside the local scope of a thread-block.
+
+If instead, we call a function from inside the thread-block and
+then assign  'g' to 1 then as expected the only viable
+assignment to 'g' is 1 (see test4.desc)
+
+Seems related to: https://github.com/diffblue/cbmc/issues/1630/

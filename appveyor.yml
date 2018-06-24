@@ -18,6 +18,7 @@ install:
     Move-Item win_flex.exe bin\flex.exe -force
     Move-Item FlexLexer.h include\FlexLexer.h -force
     Remove-Item bin\data -Force -Recurse -ErrorAction SilentlyContinue
+    Remove-Item java-models-library-master -Force -Recurse -ErrorAction SilentlyContinue
     Move-Item data bin\data -force
     bison -V
     flex -V
@@ -90,7 +91,6 @@ test_script:
     rmdir /s /q jbmc\classpath1
     rmdir /s /q jbmc\jar-file3
     rmdir /s /q jbmc\tableswitch2
-    rmdir /s /q jbmc-concurrency\explicit_thread_blocks
     cd ../..
 
     make -C jbmc/regression test

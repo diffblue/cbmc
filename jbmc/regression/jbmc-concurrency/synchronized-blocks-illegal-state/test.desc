@@ -1,0 +1,13 @@
+KNOWNBUG
+Sync.class
+--lazy-methods --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Note: requires jasmin to compile the bytecode instructions
+This checks that an extra monitorexit will always trigger an IllegalMonitorException.
+
+This is currently not working as explicit throws have been removed from the underlying model due to performance considerations.
