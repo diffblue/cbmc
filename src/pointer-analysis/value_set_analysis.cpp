@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 void value_sets_to_xml(
   std::function<const value_sett &(goto_programt::const_targett)> get_value_set,
   const goto_programt &goto_program,
-  const irep_idt &identifier,
   xmlt &dest)
 {
   source_locationt previous_location;
@@ -85,7 +84,7 @@ void convert(
   {
     xmlt &f=dest.new_element("function");
     f.new_element("identifier").data=id2string(f_it->first);
-    value_set_analysis.convert(f_it->second.body, f_it->first, f);
+    value_set_analysis.convert(f_it->second.body, f);
   }
 }
 
@@ -98,6 +97,5 @@ void convert(
 
   value_set_analysis.convert(
     goto_program,
-    "",
     dest.new_element("program"));
 }
