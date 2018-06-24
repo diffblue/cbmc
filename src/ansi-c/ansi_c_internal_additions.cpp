@@ -114,7 +114,8 @@ static std::string architecture_string(const std::string &value, const char *s)
          "=\""+value+"\";\n";
 }
 
-static std::string architecture_string(int value, const char *s)
+template <typename T>
+static std::string architecture_string(T value, const char *s)
 {
   return std::string("const int __CPROVER_architecture_")+
          std::string(s)+
