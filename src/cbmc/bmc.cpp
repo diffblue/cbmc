@@ -382,9 +382,7 @@ safety_checkert::resultt bmct::execute(
 
     if(!options.get_list_option("cover").empty())
     {
-      const optionst::value_listt criteria=
-        options.get_list_option("cover");
-      return cover(goto_functions, criteria)?
+      return cover(goto_functions)?
         safety_checkert::resultt::ERROR:safety_checkert::resultt::SAFE;
     }
 

@@ -223,9 +223,7 @@ protected:
   void slice();
   void show();
 
-  bool cover(
-    const goto_functionst &goto_functions,
-    const optionst::value_listt &criteria);
+  bool cover(const goto_functionst &goto_functions);
 
   friend class bmc_all_propertiest;
   friend class bmc_covert;

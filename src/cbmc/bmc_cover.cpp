@@ -426,9 +426,7 @@ bool bmc_covert::operator()()
 }
 
 /// Try to cover all goals
-bool bmct::cover(
-  const goto_functionst &goto_functions,
-  const optionst::value_listt &criteria)
+bool bmct::cover(const goto_functionst &goto_functions)
 {
   bmc_covert bmc_cover(goto_functions, *this);
   bmc_cover.set_message_handler(get_message_handler());
