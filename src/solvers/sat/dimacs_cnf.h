@@ -24,10 +24,13 @@ public:
 
   // dummy functions
 
-  virtual const std::string solver_text()
+  const std::string solver_text() override
   {
     return "DIMACS CNF";
   }
+
+  void set_assignment(literalt a, bool value) override;
+  bool is_in_conflict(literalt l) const override;
 
 protected:
   void write_problem_line(std::ostream &out);

@@ -163,6 +163,17 @@ public:
 
   bool has_set_to() const override { return false; }
   bool cnf_handled_well() const override { return false; }
+
+  void set_assignment(literalt, bool) override
+  {
+    UNIMPLEMENTED;
+  }
+
+  bool is_in_conflict(literalt) const override
+  {
+    UNREACHABLE;
+    return false;
+  }
 };
 
 SCENARIO("miniBDD", "[core][solver][miniBDD]")

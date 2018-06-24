@@ -98,13 +98,13 @@ public:
 
   // satisfying assignment
   virtual tvt l_get(literalt a) const=0;
-  virtual void set_assignment(literalt a, bool value);
-  virtual void copy_assignment_from(const propt &prop);
+  virtual void set_assignment(literalt a, bool value) = 0;
 
-  // Returns true if an assumption is in the final conflict.
-  // Note that only literals that are assumptions (see set_assumptions)
-  // may be queried.
-  virtual bool is_in_conflict(literalt l) const;
+  /// Returns true if an assumption is in the final conflict.
+  /// Note that only literals that are assumptions (see set_assumptions)
+  /// may be queried.
+  /// \return true iff the given literal is part of the final conflict
+  virtual bool is_in_conflict(literalt l) const = 0;
   virtual bool has_is_in_conflict() const { return false; }
 
   // an incremental solver may remove any variables that aren't frozen
