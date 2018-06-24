@@ -22,8 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 exprt::operandst build_function_environment(
   const code_typet::parameterst &parameters,
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  symbol_tablet &symbol_table)
 {
   exprt::operandst main_arguments;
   main_arguments.resize(parameters.size());
@@ -432,8 +431,7 @@ bool generate_ansi_c_start_function(
       build_function_environment(
         parameters,
         init_code,
-        symbol_table,
-        message_handler);
+        symbol_table);
   }
 
   init_code.move_to_operands(call_main);
