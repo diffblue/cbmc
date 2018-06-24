@@ -222,10 +222,8 @@ exprt boolbvt::bv_get_rec(
 
   for(std::size_t bit_nr=offset; bit_nr<offset+width; bit_nr++)
   {
-    char ch;
-    if(unknown[bit_nr])
-      ch='0';
-    else
+    char ch = '0';
+    if(!unknown[bit_nr])
     {
       switch(prop.l_get(bv[bit_nr]).get_value())
       {
@@ -249,7 +247,7 @@ exprt boolbvt::bv_get_rec(
       if(int_value>=string_numbering.size())
         s=irep_idt();
       else
-        s=string_numbering[int_value.to_long()];
+        s = string_numbering[numeric_cast_v<std::size_t>(int_value)];
 
       return constant_exprt(s, type);
     }
