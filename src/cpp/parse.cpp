@@ -4020,7 +4020,9 @@ bool Parser::rArgDeclListOrInit(
   }
   else
   {
-    if((is_args=rArgDeclList(arglist)))
+    is_args = rArgDeclList(arglist);
+
+    if(is_args)
       return true;
     else
     {
