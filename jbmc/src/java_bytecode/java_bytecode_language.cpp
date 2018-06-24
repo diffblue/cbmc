@@ -549,7 +549,6 @@ static void create_stub_global_symbols(
           get_inherited_component(
             class_id,
             component,
-            "java::" + id2string(parse_tree.parsed_class.name),
             symbol_table,
             class_hierarchy,
             true);
