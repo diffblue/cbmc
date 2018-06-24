@@ -236,6 +236,22 @@ void goto_symext::dereference_rec(
     if(expr.operands().size()!=1)
       throw "dereference takes one operand";
 
+    bool expr_is_not_null = false;
+
+    if(state.threads.size() == 1)
+    {
+      const irep_idt &expr_function = state.source.pc->function;
+      if(!expr_function.empty())
+      {
+        dereference_exprt to_check = to_dereference_expr(expr);
+        state.get_original_name(to_check);
+
+        expr_is_not_null =
+          safe_pointers.at(expr_function).is_safe_dereference(
+            to_check, state.source.pc);
+      }
+    }
+
     exprt tmp1;
     tmp1.swap(expr.op0());
 
@@ -246,7 +262,12 @@ void goto_symext::dereference_rec(
     symex_dereference_statet symex_dereference_state(*this, state);
 
     value_set_dereferencet dereference(
-      ns, state.symbol_table, options, symex_dereference_state, language_mode);
+      ns,
+      state.symbol_table,
+      options,
+      symex_dereference_state,
+      language_mode,
+      expr_is_not_null);
 
     // std::cout << "**** " << format(tmp1) << '\n';
     exprt tmp2=

@@ -132,8 +132,15 @@ void goto_symext::initialize_entry_point(
 
   INVARIANT(
     !pc->function.empty(), "all symexed instructions should have a function");
-  state.dirty.populate_dirty_for_function(
-    pc->function, get_goto_function(pc->function));
+
+  const goto_functiont &entry_point_function = get_goto_function(pc->function);
+
+  auto emplace_safe_pointers_result =
+    safe_pointers.emplace(pc->function, local_safe_pointerst{});
+  if(emplace_safe_pointers_result.second)
+    emplace_safe_pointers_result.first->second(entry_point_function.body);
+
+  state.dirty.populate_dirty_for_function(pc->function, entry_point_function);
 
   symex_transition(state, state.source.pc);
 }

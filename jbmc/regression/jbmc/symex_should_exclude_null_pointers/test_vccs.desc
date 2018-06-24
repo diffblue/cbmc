@@ -1,0 +1,11 @@
+CORE
+test.class
+--show-vcc --function test.main
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+assertion at file test\.java line 22
+--
+Because symex should statically determine the assertion can't be violated there should not be a goal for it
+by the time --show-vccs prints the equation.

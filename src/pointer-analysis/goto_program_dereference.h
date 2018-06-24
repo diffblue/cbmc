@@ -34,7 +34,9 @@ public:
     options(_options),
     ns(_ns),
     value_sets(_value_sets),
-    dereference(_ns, _new_symbol_table, _options, *this, ID_nil) { }
+    dereference(_ns, _new_symbol_table, _options, *this, ID_nil, false)
+    {
+    }
 
   void dereference_program(
     goto_programt &goto_program,
