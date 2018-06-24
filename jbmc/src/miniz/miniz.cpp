@@ -24,6 +24,13 @@
  *
  **************************************************************************/
 
+#ifdef _MSC_VER
+#pragma warning(disable:4548)
+  // expression before comma has no effect
+#pragma warning(disable:4061)
+  // enum case is not handled in switch
+#endif
+
 #include  "miniz.h"
 
 typedef unsigned char mz_validate_uint16[sizeof(mz_uint16) == 2 ? 1 : -1];
