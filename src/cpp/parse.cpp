@@ -287,7 +287,7 @@ protected:
 
   bool rDeclarators(cpp_declarationt::declaratorst &, bool, bool=false);
   bool rDeclaratorWithInit(cpp_declaratort &, bool, bool);
-  bool rDeclarator(cpp_declaratort &, DeclKind, bool, bool, bool=false);
+  bool rDeclarator(cpp_declaratort &, DeclKind, bool, bool);
   bool rDeclaratorQualifier();
   bool optPtrOperator(typet &);
   bool rMemberInitializers(irept &);
@@ -1297,7 +1297,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
     declaration.declarators().resize(1);
     cpp_declaratort &declarator=declaration.declarators().front();
 
-    if(!rDeclarator(declarator, kArgDeclarator, false, true))
+    if(!rDeclarator(declarator, kArgDeclarator, true, false))
       return false;
 
     #ifdef DEBUG
@@ -1512,7 +1512,7 @@ bool Parser::rSimpleDeclaration(cpp_declarationt &declaration)
   declaration.type().swap(integral);
 
   cpp_declaratort declarator;
-  if(!rDeclarator(declarator, kDeclarator, false, true, true))
+  if(!rDeclarator(declarator, kDeclarator, true, true))
     return false;
 
   // there really _has_ to be an initializer!
@@ -2867,8 +2867,8 @@ bool Parser::rDeclaratorWithInit(
   {
     cpp_declaratort declarator;
 
-    if(!rDeclarator(declarator, kDeclarator, false,
-                    should_be_declarator, is_statement))
+    if(!rDeclarator(
+        declarator, kDeclarator, should_be_declarator, is_statement))
       return false;
 
     int t=lex.LookAhead(0);
@@ -2984,7 +2984,6 @@ bool Parser::rDeclaratorQualifier()
 bool Parser::rDeclarator(
   cpp_declaratort &declarator,
   DeclKind kind,
-  bool recursive,
   bool should_be_declarator,
   bool is_statement)
 {
@@ -3029,7 +3028,7 @@ bool Parser::rDeclarator(
     lex.get_token(op);
 
     cpp_declaratort declarator2;
-    if(!rDeclarator(declarator2, kind, true, true, false))
+    if(!rDeclarator(declarator2, kind, true, false))
       return false;
 
     #ifdef DEBUG
@@ -4111,7 +4110,7 @@ bool Parser::rArgDeclaration(cpp_declarationt &declaration)
 
   cpp_declaratort arg_declarator;
 
-  if(!rDeclarator(arg_declarator, kArgDeclarator, false, true))
+  if(!rDeclarator(arg_declarator, kArgDeclarator, true, false))
     return false;
 
   declaration.declarators().push_back(arg_declarator);
