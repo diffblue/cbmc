@@ -460,18 +460,14 @@ bool java_bytecode_parsert::parse()
 #define ACC_ANNOTATION   0x2000
 #define ACC_ENUM         0x4000
 
-#ifdef _MSC_VER
-#define UNUSED
-#else
-#define UNUSED __attribute__((unused))
-#endif
+#define UNUSED_u2(x) { const u2 x = read_u2(); (void)x; } (void)0
 
 void java_bytecode_parsert::rClassFile()
 {
   parse_tree.loading_successful=false;
 
   u4 magic=read_u4();
-  u2 UNUSED minor_version=read_u2();
+  UNUSED_u2(minor_version);
   u2 major_version=read_u2();
 
   if(magic!=0xCAFEBABE)
@@ -1180,8 +1176,8 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
 
   if(attribute_name=="Code")
   {
-    u2 UNUSED max_stack=read_u2();
-    u2 UNUSED max_locals=read_u2();
+    UNUSED_u2(max_stack);
+    UNUSED_u2(max_locals);
 
     rbytecode(method.instructions);
 
@@ -1528,8 +1524,8 @@ void java_bytecode_parsert::relement_value_pair(
   {
   case 'e':
     {
-      UNUSED u2 type_name_index=read_u2();
-      UNUSED u2 const_name_index=read_u2();
+      UNUSED_u2(type_name_index);
+      UNUSED_u2(const_name_index);
       // todo: enum
     }
     break;
