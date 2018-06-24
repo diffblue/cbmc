@@ -23,12 +23,10 @@ Date: June 2006
 /// read goto binary format v3
 /// \par parameters: input stream, symbol_table, functions
 /// \return true on error, false otherwise
-bool read_bin_goto_object_v3(
+static bool read_bin_goto_object_v3(
   std::istream &in,
-  const std::string &filename,
   symbol_tablet &symbol_table,
   goto_functionst &functions,
-  message_handlert &message_handler,
   irep_serializationt &irepconverter)
 {
   std::size_t count = irepconverter.read_gb_word(in); // # of symbols
@@ -229,10 +227,8 @@ bool read_bin_goto_object(
       return true;
 
     case 3:
-      return read_bin_goto_object_v3(in, filename,
-                                     symbol_table, functions,
-                                     message_handler,
-                                     irepconverter);
+      return read_bin_goto_object_v3(
+        in, symbol_table, functions, irepconverter);
       break;
 
     default:
