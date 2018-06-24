@@ -64,6 +64,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "xml_interface.h"
 
+#include "version.h"
+
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):
   parse_options_baset(CBMC_OPTIONS, argc, argv),
   xml_interfacet(cmdline),

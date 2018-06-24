@@ -27,5 +27,4 @@ add_if_library(goto-analyzer-lib jsil)
 add_executable(goto-analyzer goto_analyzer_main.cpp)
 target_link_libraries(goto-analyzer goto-analyzer-lib)
 
-set(cbmc_version_files goto_analyzer_parse_options.cpp)
-git_revision(goto-analyzer-lib cbmc_version_files)
+git_revision(goto-analyzer-lib)

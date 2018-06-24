@@ -60,6 +60,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/replace_java_nondet.h>
 #include <java_bytecode/simple_method_stubbing.h>
 
+#include "version.h"
+
 jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv):
   parse_options_baset(JBMC_OPTIONS, argc, argv),
   messaget(ui_message_handler),

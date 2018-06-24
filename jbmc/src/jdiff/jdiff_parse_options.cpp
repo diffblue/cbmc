@@ -60,6 +60,8 @@ Author: Peter Schrammel
 #include <goto-diff/goto_diff.h>
 #include <goto-diff/unified_diff.h>
 
+#include "version.h"
+
 jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
   : parse_options_baset(JDIFF_OPTIONS, argc, argv),
     jdiff_languagest(cmdline, ui_message_handler),

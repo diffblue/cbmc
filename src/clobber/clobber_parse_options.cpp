@@ -34,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
+#include "version.h"
 
 clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
   parse_options_baset(CLOBBER_OPTIONS, argc, argv),

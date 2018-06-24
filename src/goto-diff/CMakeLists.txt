@@ -29,5 +29,4 @@ add_if_library(goto-diff-lib jsil)
 add_executable(goto-diff goto_diff_main.cpp)
 target_link_libraries(goto-diff goto-diff-lib)
 
-set(cbmc_version_files goto_diff_parse_options.cpp)
-git_revision(goto-diff-lib cbmc_version_files)
+git_revision(goto-diff-lib)

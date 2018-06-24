@@ -30,6 +30,7 @@ Author: Michael Tautschnig
 #include <util/cout_message.h>
 
 #include "compile.h"
+#include "version.h"
 
 static std::string assembler_name(
   const cmdlinet &cmdline,

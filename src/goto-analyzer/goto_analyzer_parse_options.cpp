@@ -61,6 +61,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "static_show_domain.h"
 #include "static_simplifier.h"
 #include "static_verifier.h"
+#include "version.h"
 
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,

@@ -59,6 +59,7 @@ Author: Peter Schrammel
 #include "syntactic_diff.h"
 #include "unified_diff.h"
 #include "change_impact.h"
+#include "version.h"
 
 goto_diff_parse_optionst::goto_diff_parse_optionst(int argc, const char **argv):
   parse_options_baset(GOTO_DIFF_OPTIONS, argc, argv),

@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "mm_parser.h"
 #include "mm2cpp.h"
+#include "version.h"
 
 mmcc_parse_optionst::mmcc_parse_optionst(int argc, const char **argv):
   parse_options_baset(MMCC_OPTIONS, argc, argv)

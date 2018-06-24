@@ -98,6 +98,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "undefined_functions.h"
 #include "remove_function.h"
 #include "splice_call.h"
+#include "version.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()
