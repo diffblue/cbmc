@@ -8,40 +8,17 @@ Author:
 
 #include <iostream>
 
+#include <testing-utils/call_graph_test_utils.h>
 #include <testing-utils/catch.hpp>
 
 #include <analyses/call_graph.h>
 #include <analyses/call_graph_helpers.h>
 
 #include <util/symbol_table.h>
-#include <util/std_code.h>
 
 #include <goto-programs/goto_convert_functions.h>
 
-static symbolt create_void_function_symbol(
-  const irep_idt &name,
-  const codet &code)
-{
-  const code_typet void_function_type({}, empty_typet());
-  symbolt function;
-  function.name=name;
-  function.type=void_function_type;
-  function.mode=ID_java;
-  function.value=code;
-  return function;
-}
 
-static bool multimap_key_matches(
-  const std::multimap<irep_idt, irep_idt> &map,
-  const irep_idt &key,
-  const std::set<irep_idt> &values)
-{
-  auto matching_values=map.equal_range(key);
-  std::set<irep_idt> matching_set;
-  for(auto it=matching_values.first; it!=matching_values.second; ++it)
-    matching_set.insert(it->second);
-  return matching_set==values;
-}
 
 SCENARIO("call_graph",
   "[core][util][call_graph]")

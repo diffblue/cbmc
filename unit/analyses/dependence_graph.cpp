@@ -8,6 +8,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <iostream>
 
+#include <testing-utils/call_graph_test_utils.h>
 #include <testing-utils/catch.hpp>
 #include <analyses/dependence_graph.h>
 #include <util/symbol_table.h>
@@ -18,18 +19,6 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <langapi/mode.h>
 #include <ansi-c/ansi_c_language.h>
 
-static symbolt create_void_function_symbol(
-  const irep_idt &name,
-  const codet &code)
-{
-  const code_typet void_function_type({}, empty_typet());
-  symbolt function;
-  function.name = name;
-  function.type = void_function_type;
-  function.mode = ID_java;
-  function.value = code;
-  return function;
-}
 
 const std::set<goto_programt::const_targett>&
     dependence_graph_test_get_control_deps(const dep_graph_domaint &domain)
