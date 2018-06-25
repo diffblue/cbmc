@@ -21,7 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class xmlt;
 
 void value_sets_to_xml(
-  std::function<const value_sett &(goto_programt::const_targett)> get_value_set,
+  const std::function<const value_sett &(goto_programt::const_targett)>
+    &get_value_set,
   const goto_programt &goto_program,
   xmlt &dest);
 
@@ -39,12 +40,18 @@ public:
   {
   }
 
+  const value_sett &get_value_set(goto_programt::const_targett t)
+  {
+    return (*this)[t].value_set;
+  }
+
   void convert(
     const goto_programt &goto_program,
     xmlt &dest) const
   {
+    using std::placeholders::_1;
     value_sets_to_xml(
-      [this](locationt l) { return (*this)[l].value_set; },
+      std::bind(&value_set_analysis_templatet::get_value_set, *this, _1),
       goto_program,
       dest);
   }
