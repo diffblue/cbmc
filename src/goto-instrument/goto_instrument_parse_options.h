@@ -90,6 +90,11 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-threaded)(list-calls-args)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\
+  "(aggressive-slice)" \
+  "(aggressive-slice-call-depth):" \
+  "(aggressive-slice-preserve-function):" \
+  "(aggressive-slice-preserve-functions-containing):" \
+  "(aggressive-slice-preserve-all-direct-paths)" \
   OPT_FLUSH \
   "(splice-call):" \
   OPT_REMOVE_CALLS_NO_BODY \

@@ -100,6 +100,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "undefined_functions.h"
 #include "remove_function.h"
 #include "splice_call.h"
+#include "aggressive_slicer.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()
@@ -1457,6 +1458,46 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       *message_handler);
   }
 
+  // aggressive slicer
+  if(cmdline.isset("aggressive-slice"))
+  {
+    do_indirect_call_and_rtti_removal();
+
+    status() << "Slicing away initializations of unused global variables"
+             << eom;
+    slice_global_inits(goto_model);
+
+    status() << "Performing an aggressive slice" << eom;
+    aggressive_slicert aggressive_slicer(goto_model, get_message_handler());
+
+    if(cmdline.isset("aggressive-slice-call-depth"))
+      aggressive_slicer.call_depth =
+        safe_string2unsigned(cmdline.get_value("aggressive-slice-call-depth"));
+
+    if(cmdline.isset("aggressive-slice-preserve-function"))
+      aggressive_slicer.preserve_functions(
+        cmdline.get_values("aggressive-slice-preserve-function"));
+
+    if(cmdline.isset("property"))
+      aggressive_slicer.user_specified_properties =
+        cmdline.get_values("property");
+
+    if(cmdline.isset("aggressive-slice-preserve-functions-containing"))
+      aggressive_slicer.name_snippets =
+        cmdline.get_values("aggressive-slice-preserve-functions-containing");
+
+    aggressive_slicer.preserve_all_direct_paths =
+      cmdline.isset("aggressive-slice-preserve-all-direct-paths");
+
+    aggressive_slicer.doit();
+
+    status() << "Performing a reachability slice" << eom;
+    if(cmdline.isset("property"))
+      reachability_slicer(goto_model, cmdline.get_values("property"));
+    else
+      reachability_slicer(goto_model);
+  }
+
   // recalculate numbers, etc.
   goto_model.goto_functions.update();
 }
@@ -1562,6 +1603,17 @@ void goto_instrument_parse_optionst::help()
     " --full-slice                 slice away instructions that don't affect assertions\n" // NOLINT(*)
     " --property id                slice with respect to specific property only\n" // NOLINT(*)
     " --slice-global-inits         slice away initializations of unused global variables\n" // NOLINT(*)
+    " --aggressive-slice           remove bodies of any functions not on the shortest path between\n" // NOLINT(*)
+    "                              the start function and the function containing the property(s)\n" // NOLINT(*)
+    " --aggressive-slice-call-depth <n>\n"
+    "                              used with aggressive-slice, preserves all functions within <n> function calls\n" // NOLINT(*)
+    "                              of the functions on the shortest path\n"
+    " --aggressive-slice-preserve-function <f>\n"
+    "                             force the aggressive slicer to preserve function <f>\n" // NOLINT(*)
+    " --aggressive-slice-preserve-function containing <f>\n"
+    "                              force the aggressive slicer to preserve all functions with names containing <f>\n" // NOLINT(*)
+    "--aggressive-slice-preserve-all-direct-paths \n"
+    "                             force aggressive slicer to preserve all direct paths\n" // NOLINT(*)
     "\n"
     "Further transformations:\n"
     " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)
