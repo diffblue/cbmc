@@ -157,10 +157,11 @@ std::vector<std::string> narrow_argv(int argc, const wchar_t **argv_wide)
   if(argv_wide==nullptr)
     return std::vector<std::string>();
 
-  std::vector<std::string> argv_narrow(argc);
+  std::vector<std::string> argv_narrow;
+  argv_narrow.reserve(argc);
 
   for(int i=0; i!=argc; ++i)
-    argv_narrow[i]=narrow(argv_wide[i]);
+    argv_narrow.push_back(narrow(argv_wide[i]));
 
   return argv_narrow;
 }
