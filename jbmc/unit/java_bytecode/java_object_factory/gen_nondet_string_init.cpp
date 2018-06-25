@@ -46,10 +46,22 @@ SCENARIO(
     symbol_typet java_string_type("java::java.lang.String");
     symbol_exprt expr("arg", java_string_type);
 
+    object_factory_parameterst object_factory_parameters;
+    object_factory_parameters.max_nondet_string_length = 20;
+    object_factory_parameters.function_id = "test";
+
     WHEN("Initialisation code for a string is generated")
     {
-      const codet code = initialize_nondet_string_struct(
-        expr, 20, loc, "test", symbol_table, false);
+      code_blockt code;
+      gen_nondet_init(
+        expr,
+        code,
+        symbol_table,
+        loc,
+        false,
+        allocation_typet::DYNAMIC,
+        object_factory_parameters,
+        update_in_placet::NO_UPDATE_IN_PLACE);
 
       THEN("Code is produced")
       {
