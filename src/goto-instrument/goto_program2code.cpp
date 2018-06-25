@@ -775,7 +775,7 @@ bool goto_program2codet::set_block_end_points(
   cases_listt &cases,
   std::set<unsigned> &processed_locations)
 {
-  std::map<goto_programt::const_targett, std::size_t> targets_done;
+  std::set<goto_programt::const_targett> targets_done;
 
   for(cases_listt::iterator it=cases.begin();
       it!=cases.end();
@@ -783,7 +783,7 @@ bool goto_program2codet::set_block_end_points(
   {
     // some branch targets may be shared by multiple branch instructions,
     // as in case 1: case 2: code; we build a nested code_switch_caset
-    if(targets_done.find(it->case_start)!=targets_done.end())
+    if(!targets_done.insert(it->case_start).second)
       continue;
 
     // compute the block that belongs to this case
@@ -819,8 +819,6 @@ bool goto_program2codet::set_block_end_points(
 
       it->case_last=case_end;
     }
-
-    targets_done[it->case_start]=1;
   }
 
   return false;
