@@ -588,10 +588,14 @@ int cbmc_parse_optionst::get_goto_program(
   {
     goto_model = initialize_goto_model(cmdline, ui_message_handler);
 
-    if(cmdline.isset("show-symbol-table"))
+    int commandline_check_return_value;
+    if(!check_commandline_for_show_symbol_flags(
+         commandline_check_return_value,
+         cmdline,
+         goto_model,
+         ui_message_handler.get_ui()))
     {
-      show_symbol_table(goto_model, ui_message_handler.get_ui());
-      return CPROVER_EXIT_SUCCESS;
+      return commandline_check_return_value;
     }
 
     if(cbmc_parse_optionst::process_goto_program(goto_model, options, log))
@@ -931,7 +935,7 @@ void cbmc_parse_optionst::help()
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
-    " --show-symbol-table          show loaded symbol table\n"
+    HELP_SHOW_SYMBOL_TABLE
     HELP_SHOW_GOTO_FUNCTIONS
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
