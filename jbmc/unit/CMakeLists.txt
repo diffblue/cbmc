@@ -4,24 +4,8 @@ list(APPEND sources  ${CBMC_SOURCE_DIR}/../unit/unit_tests.cpp)
 file(GLOB_RECURSE java-testing_utils "java-testing-utils/*.cpp" "java-testing-utils/*.h")
 
 list(REMOVE_ITEM sources
-    # Don't build
-    ${CMAKE_CURRENT_SOURCE_DIR}/sharing_map.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/elf_reader.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/smt2_parser.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/json.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp_parser.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/osx_fat_reader.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/unicode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wp.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp_scanner.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/float_utils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ieee_float.cpp
-
     # Will be built into a separate library and linked
     ${java-testing_utils}
-
-    # Intended to fail to compile
-    ${CMAKE_CURRENT_SOURCE_DIR}/util/expr_cast/expr_undefined_casts.cpp
 )
 
 add_subdirectory(java-testing-utils)
