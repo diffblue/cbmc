@@ -52,7 +52,6 @@ protected:
     goto_functionst::function_mapt::iterator f_it);
 
   void undo_function_calls(
-    goto_functionst &goto_functions,
     goto_programt &goto_program);
 
   symbol_exprt get_or_create_return_value_symbol(const irep_idt &function_id);
@@ -366,7 +365,6 @@ bool remove_returnst::restore_returns(
 
 /// turns f(...); lhs=f#return_value; into lhs=f(...)
 void remove_returnst::undo_function_calls(
-  goto_functionst &goto_functions,
   goto_programt &goto_program)
 {
   namespacet ns(symbol_table);
@@ -436,7 +434,7 @@ void remove_returnst::restore(goto_functionst &goto_functions)
   if(!unmodified)
   {
     Forall_goto_functions(it, goto_functions)
-      undo_function_calls(goto_functions, it->second.body);
+      undo_function_calls(it->second.body);
   }
 }
 

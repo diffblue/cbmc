@@ -452,8 +452,7 @@ void goto_convertt::remove_cpp_new(
 
 void goto_convertt::remove_cpp_delete(
   side_effect_exprt &expr,
-  goto_programt &dest,
-  bool result_is_used)
+  goto_programt &dest)
 {
   assert(expr.operands().size()==1);
 
@@ -507,8 +506,7 @@ void goto_convertt::remove_malloc(
 
 void goto_convertt::remove_temporary_object(
   side_effect_exprt &expr,
-  goto_programt &dest,
-  bool result_is_used)
+  goto_programt &dest)
 {
   const irep_idt &mode = expr.get(ID_mode);
   if(expr.operands().size()!=1 &&
@@ -666,11 +664,11 @@ void goto_convertt::remove_side_effect(
     remove_cpp_new(expr, dest, result_is_used);
   else if(statement==ID_cpp_delete ||
           statement==ID_cpp_delete_array)
-    remove_cpp_delete(expr, dest, result_is_used);
+    remove_cpp_delete(expr, dest);
   else if(statement==ID_allocate)
     remove_malloc(expr, dest, mode, result_is_used);
   else if(statement==ID_temporary_object)
-    remove_temporary_object(expr, dest, result_is_used);
+    remove_temporary_object(expr, dest);
   else if(statement==ID_statement_expression)
     remove_statement_expression(expr, dest, mode, result_is_used);
   else if(statement==ID_nondet)
