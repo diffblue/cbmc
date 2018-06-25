@@ -262,7 +262,7 @@ mp_integer arith_left_shift(
   llong_t result=a.to_long()<<shift;
   llong_t mask=
     true_size<(sizeof(llong_t)*8) ?
-    (1L<<true_size)-1 :
+    (1LL << true_size) - 1 :
     -1;
   return result&mask;
 }
@@ -281,8 +281,8 @@ mp_integer arith_right_shift(
   if(shift>true_size)
     throw "shift value out of range";
 
-  llong_t sign=(1<<(true_size-1))&number;
-  llong_t pad=(sign==0) ? 0 : ~((1<<(true_size-shift))-1);
+  const llong_t sign = (1LL << (true_size - 1)) & number;
+  const llong_t pad = (sign == 0) ? 0 : ~((1LL << (true_size - shift)) - 1);
   llong_t result=(number >> shift)|pad;
   return result;
 }
@@ -302,8 +302,8 @@ mp_integer logic_left_shift(
   llong_t result=a.to_long()<<shift;
   if(true_size<(sizeof(llong_t)*8))
   {
-    llong_t sign=(1L<<(true_size-1))&result;
-    llong_t mask=(1L<<true_size)-1;
+    const llong_t sign = (1LL << (true_size - 1)) & result;
+    const llong_t mask = (1LL << true_size) - 1;
     // Sign-fill out-of-range bits:
     if(sign==0)
       result&=mask;
@@ -345,7 +345,7 @@ mp_integer rotate_right(
     throw "shift value out of range";
 
   ullong_t revShift=true_size-shift;
-  ullong_t filter=1<<(true_size-1);
+  const ullong_t filter = 1ULL << (true_size - 1);
   ullong_t result=(number >> shift)|((number<<revShift)&filter);
   return result;
 }
@@ -365,7 +365,7 @@ mp_integer rotate_left(
     throw "shift value out of range";
 
   ullong_t revShift=true_size-shift;
-  ullong_t filter=1<<(true_size-1);
+  const ullong_t filter = 1ULL << (true_size - 1);
   ullong_t result=((number<<shift)&filter)|((number&filter) >> revShift);
   return result;
 }
