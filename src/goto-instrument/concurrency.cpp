@@ -41,9 +41,7 @@ protected:
 
   void instrument(goto_functionst &goto_functions);
 
-  void instrument(
-    goto_programt &goto_program,
-    const is_threadedt &is_threaded);
+  void instrument(goto_programt &goto_program);
 
   void instrument(exprt &expr);
 
@@ -110,8 +108,7 @@ void concurrency_instrumentationt::instrument(exprt &expr)
 }
 
 void concurrency_instrumentationt::instrument(
-  goto_programt &goto_program,
-  const is_threadedt &is_threaded)
+  goto_programt &goto_program)
 {
   for(goto_programt::instructionst::iterator
       it=goto_program.instructions.begin();
@@ -217,7 +214,7 @@ void concurrency_instrumentationt::instrument(
 
   // now instrument
   Forall_goto_functions(f_it, goto_functions)
-    instrument(f_it->second.body, is_threaded);
+    instrument(f_it->second.body);
 }
 
 void concurrency(
