@@ -1,0 +1,10 @@
+CORE
+A.class
+--function 'A.aStatic' --lazy-methods
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Tests that throwing an exception from a synchronization blocks does not cause reachability issues when the java-threading flag is not specified.
+

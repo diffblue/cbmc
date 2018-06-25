@@ -36,7 +36,8 @@ void java_bytecode_convert_method(
   bool throw_assertion_error,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess,
-  const class_hierarchyt &class_hierarchy);
+  const class_hierarchyt &class_hierarchy,
+  bool threading_support);
 
 void java_bytecode_convert_method_lazy(
   const symbolt &class_symbol,
