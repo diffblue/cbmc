@@ -435,7 +435,7 @@ void cpp_typecheckt::default_assignop_value(
   declarator.value().add_source_location()=source_location;
   declarator.value().id(ID_code);
   declarator.value().set(ID_statement, ID_block);
-  declarator.value().type()=code_typet();
+  declarator.value().type() = code_typet({}, empty_typet());
 
   exprt &block=declarator.value();
 
@@ -501,7 +501,7 @@ void cpp_typecheckt::default_assignop_value(
   ret_code.operands().push_back(exprt(ID_dereference));
   ret_code.op0().operands().push_back(exprt("cpp-this"));
   ret_code.set(ID_statement, ID_return);
-  ret_code.type()=code_typet();
+  ret_code.type() = code_typet({}, empty_typet());
 }
 
 /// Check a constructor initialization-list. An initializer has to be a data

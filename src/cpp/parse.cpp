@@ -5516,9 +5516,8 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
             << "Parser::rTypeNameOrFunctionType 2\n";
   #endif
 
-  code_typet type;
-
-  if(!rCastOperatorName(type.return_type()))
+  typet return_type;
+  if(!rCastOperatorName(return_type))
     return false;
 
   #ifdef DEBUG
@@ -5528,7 +5527,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
 
   if(lex.LookAhead(0)!='(')
   {
-    tname.swap(type.return_type());
+    tname.swap(return_type);
 
     if(!optPtrOperator(tname))
       return false;
@@ -5541,6 +5540,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
             << "Parser::rTypeNameOrFunctionType 4\n";
   #endif
 
+  code_typet type({}, return_type);
   cpp_tokent op;
   lex.get_token(op);
 
