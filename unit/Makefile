@@ -24,6 +24,7 @@ SRC += unit_tests.cpp \
        solvers/refinement/string_refinement/sparse_array.cpp \
        solvers/refinement/string_refinement/union_find_replace.cpp \
        util/expr_cast/expr_cast.cpp \
+       util/graph.cpp \
        util/irep.cpp \
        util/irep_sharing.cpp \
        util/message.cpp \

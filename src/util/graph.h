@@ -678,6 +678,11 @@ std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
   return src;
 }
 
+/// Find connected subgraphs in an undirected graph.
+/// \param [out] subgraph_nr: will be resized to graph.size() and populated
+///   to map node indices onto subgraph numbers. The subgraph numbers are dense,
+///   in the range 0 - (number of subgraphs - 1)
+/// \return Number of subgraphs found.
 template<class N>
 std::size_t grapht<N>::connected_subgraphs(
   std::vector<node_indext> &subgraph_nr)
@@ -790,6 +795,10 @@ std::size_t grapht<N>::SCCs(std::vector<node_indext> &subgraph_nr) const
   return t.scc_count;
 }
 
+/// Ensure a graph is chordal (contains no 4+-cycles without an edge crossing
+/// the cycle) by adding extra edges. Note this adds more edges than are
+/// required, including to acyclic graphs or acyclic subgraphs of cyclic graphs,
+/// but does at least ensure the graph is not chordal.
 template<class N>
 void grapht<N>::make_chordal()
 {
