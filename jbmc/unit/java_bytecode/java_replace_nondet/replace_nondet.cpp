@@ -95,7 +95,7 @@ TEST_CASE(
     goto_model_functiont model_function(
       symbol_table, functions, function_name, goto_function);
 
-    remove_instanceof(goto_function, symbol_table);
+    remove_instanceof(goto_function, symbol_table, null_message_handler);
 
     remove_virtual_functions(model_function);
 

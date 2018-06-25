@@ -346,9 +346,9 @@ bool jdiff_parse_optionst::process_goto_program(
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // remove catch and throw
-    remove_exceptions(goto_model);
+    remove_exceptions(goto_model, get_message_handler());
     // Java instanceof -> clsid comparison:
-    remove_instanceof(goto_model);
+    remove_instanceof(goto_model, get_message_handler());
 
     mm_io(goto_model);
 

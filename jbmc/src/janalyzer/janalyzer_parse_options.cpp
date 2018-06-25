@@ -670,9 +670,9 @@ bool janalyzer_parse_optionst::process_goto_program(const optionst &options)
     remove_virtual_functions(goto_model);
     // remove Java throw and catch
     // This introduces instanceof, so order is important:
-    remove_exceptions(goto_model);
+    remove_exceptions(goto_model, get_message_handler());
     // remove rtti
-    remove_instanceof(goto_model);
+    remove_instanceof(goto_model, get_message_handler());
 
     // do partial inlining
     status() << "Partial Inlining" << eom;
