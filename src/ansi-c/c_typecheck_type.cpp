@@ -1368,7 +1368,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
       throw 0;
     }
 
-    sub_width=c_enum_type.subtype().get_int(ID_width);
+    sub_width = c_enum_type.subtype().get_size_t(ID_width);
   }
   else
   {

@@ -76,7 +76,7 @@ bvt boolbvt::convert_bv_reduction(const unary_exprt &expr)
   {
     if((expr.type().id()==ID_verilog_signedbv ||
         expr.type().id()==ID_verilog_unsignedbv) &&
-        expr.type().get_int(ID_width)==1)
+        expr.type().get_size_t(ID_width) == 1)
     {
       bvt bv;
       bv.resize(2);

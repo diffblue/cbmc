@@ -124,7 +124,7 @@ underlying_width(const c_bit_field_typet &type, const namespacet &ns)
     const typet &c_enum_type = ns.follow_tag(to_c_enum_tag_type(subtype));
 
     if(c_enum_type.id() == ID_c_enum)
-      return c_enum_type.subtype().get_int(ID_width);
+      return c_enum_type.subtype().get_size_t(ID_width);
     else
       return {};
   }
