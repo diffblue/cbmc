@@ -34,6 +34,12 @@ class symbol_tablet;
 class json_stream_arrayt;
 class message_handlert;
 
+/// Non-graph-based representation of the class hierarchy.
+/// \deprecated `class_hierarchy_grapht` is a more advanced graph-based
+///   representation of the class hierarchy and its use is preferred over
+///   `class_hierarchy_classt`.
+/// \todo Implement missing functions from `class_hierarchyt` in
+///   `class_hierarchy_grapht` so that `class_hierarchyt` can be fully replaced.
 class class_hierarchyt
 {
 public:
