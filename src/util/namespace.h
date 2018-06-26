@@ -46,9 +46,11 @@ public:
   const symbolt &lookup(const symbol_exprt &) const;
   const symbolt &lookup(const symbol_typet &) const;
   const symbolt &lookup(const tag_typet &) const;
+  const symbolt &lookup(const irept &) const;
 
   virtual ~namespace_baset();
 
+  void follow_type_symbol(irept &irep) const;
   void follow_macros(exprt &) const;
   const typet &follow(const typet &) const;
 
