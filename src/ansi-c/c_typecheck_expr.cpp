@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
+#include <util/fresh_symbol.h>
 #include <util/ieee_float.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
@@ -1935,6 +1936,98 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
   }
 }
 
+static void replace_returns_rec(
+  codet &code,
+  const exprt &single_return,
+  const irep_idt &out_label)
+{
+  for(auto &op : code.operands())
+    if(op.id() == ID_code)
+      replace_returns_rec(to_code(op), single_return, out_label);
+
+  if(code.get_statement() == ID_return)
+  {
+    code_gotot g(out_label);
+    g.add_source_location() = code.find_source_location();
+
+    if(single_return.is_not_nil())
+    {
+      // re-use the operand as the rhs of the assignment, insert a new lhs
+      code_assignt assign(single_return, code.op0());
+      assign.add_source_location() = code.find_source_location();
+
+      code_blockt block;
+      block.add(assign);
+      block.add(g);
+
+      code.swap(block);
+    }
+    else
+    {
+      code_gotot g(out_label);
+      g.add_source_location() = code.find_source_location();
+
+      code.swap(g);
+    }
+  }
+}
+
+static void make_single_return(
+  const symbolt &func_sym,
+  code_blockt &code,
+  symbol_tablet &symbol_table)
+{
+  codet &last = code.find_last_statement();
+  const bool last_is_return = last.get_statement() == ID_return;
+
+  // temporarily replace the final return statement by an expression statement
+  // to conveniently search for other return statements
+  if(last_is_return)
+    last.set_statement(ID_expression);
+
+  // NOLINTNEXTLINE(whitespace/braces)
+  const bool has_returns = has_subexpr(code, [&](const exprt &e) {
+    return e.id() == ID_code && to_code(e).get_statement() == ID_return;
+  });
+
+  // reset the last return (if any)
+  if(last_is_return)
+    last.set_statement(ID_return);
+
+  if(has_returns)
+  {
+    // multiple return statements (or the last statement isn't a return
+    // statement) -- rewrite each "return x;" to
+    // single_return = x; goto out;
+    // and append to the block:
+    // out: ; return single_return;
+    // omit the assignments if the function is void typed
+    exprt ret_expr = nil_exprt();
+    if(to_code_type(func_sym.type).return_type().id() != ID_empty)
+    {
+      symbolt &ret_value_symbol =
+        get_fresh_aux_symbol(
+          to_code_type(func_sym.type).return_type(),
+          id2string(func_sym.name),
+          "single_return",
+          last.find_source_location(),
+          func_sym.mode,
+          symbol_table);
+      ret_expr = ret_value_symbol.symbol_expr();
+    }
+
+    // the :: in the label name would not be valid C, which makes this label
+    // unique
+    const std::string out_label = id2string(func_sym.name) + "::out";
+    replace_returns_rec(code, ret_expr, out_label);
+
+    code_labelt label_stmt(out_label);
+    label_stmt.code() = code_skipt();
+    code.add(label_stmt);
+    code.add(code_returnt(ret_expr));
+  }
+}
+
 void c_typecheck_baset::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
@@ -2053,6 +2146,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       typet cur_return_type = return_type;
       return_type = func_type.return_type();
       typecheck_code(body);
+      make_single_return(func_sym, to_code_block(body), symbol_table);
       return_type.swap(cur_return_type);
 
       // replace final return by an ID_expression
@@ -2064,19 +2158,6 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         if(last.op0().is_nil())
           last.op0() =
             typecast_exprt(from_integer(0, signed_int_type()), empty_typet());
-      }
-
-      // NOLINTNEXTLINE(whitespace/braces)
-      const bool has_returns = has_subexpr(body, [&](const exprt &e) {
-        return e.id() == ID_code && to_code(e).get_statement() == ID_return;
-      });
-      if(has_returns)
-      {
-        // we don't support multiple return statements with always_inline
-        err_location(last);
-        error() << "function has multiple return statements, "
-                << "cannot apply always_inline" << eom;
-        throw 0;
       }
 
       side_effect_expr.copy_to_operands(body);
