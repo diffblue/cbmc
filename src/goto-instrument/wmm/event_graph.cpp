@@ -1098,8 +1098,7 @@ std::string event_grapht::critical_cyclet::print_output() const
 std::string event_grapht::critical_cyclet::print_detail(
   const critical_cyclet &reduced,
   std::map<std::string, std::string> &map_id2var,
-  std::map<std::string, std::string> &map_var2id,
-  memory_modelt model) const
+  std::map<std::string, std::string> &map_var2id) const
 {
   std::string cycle;
   for(const_iterator it=reduced.begin(); it!=reduced.end(); ++it)
@@ -1140,13 +1139,13 @@ std::string event_grapht::critical_cyclet::print_all(
     critical_cyclet reduced(egraph, id);
     this->hide_internals(reduced);
     assert(reduced.size() > 0);
-    cycle+=print_detail(reduced, map_id2var, map_var2id, model);
+    cycle+=print_detail(reduced, map_id2var, map_var2id);
     cycle+=": ";
     cycle+=print_name(reduced, model);
   }
   else
   {
-    cycle+=print_detail(*this, map_id2var, map_var2id, model);
+    cycle+=print_detail(*this, map_id2var, map_var2id);
     cycle+=": ";
     cycle+=print_name(*this, model);
   }

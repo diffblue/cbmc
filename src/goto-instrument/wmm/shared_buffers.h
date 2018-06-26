@@ -173,7 +173,6 @@ public:
     bool is_write);
 
   bool is_buffered_in_general(
-    const namespacet&,
     const symbol_exprt&,
     bool is_write);
 

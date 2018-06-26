@@ -1245,9 +1245,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         /* default: instruments all unsafe pairs */
         inst_strategy=all;
 
-      const unsigned unwind_loops=
-        cmdline.isset("unwind")?
-        unsafe_string2unsigned(cmdline.get_value("unwind")):0;
       const unsigned max_var=
         cmdline.isset("max-var")?
         unsafe_string2unsigned(cmdline.get_value("max-var")):0;
@@ -1295,7 +1292,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
           goto_model,
           cmdline.isset("scc"),
           inst_strategy,
-          unwind_loops,
           !cmdline.isset("cfg-kill"),
           cmdline.isset("no-dependencies"),
           loops,

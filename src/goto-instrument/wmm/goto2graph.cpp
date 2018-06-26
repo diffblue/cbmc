@@ -152,8 +152,6 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     loop_strategyt replicate_body,
     /* function to analyse */
     const irep_idt &function,
-    /* incoming edges */
-    const std::set<instrumentert::cfg_visitort::nodet> &initial_vertex,
     /* outcoming edges */
     std::set<instrumentert::cfg_visitort::nodet> &ending_vertex)
 {
@@ -657,11 +655,6 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
   loop_strategyt replicate_body)
 {
   const goto_programt::instructiont &instruction=*i_it;
-  std::set<nodet> s;
-  for(const auto &in : instruction.incoming_edges)
-    if(in_pos.find(in)!=in_pos.end())
-      for(const auto &node : in_pos[in])
-        s.insert(node);
 
   const exprt &fun=to_code_function_call(instruction.code).function();
   const irep_idt &fun_id=to_symbol_expr(fun).get_identifier();
@@ -689,7 +682,7 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
       {
         /* just inlines */
         /* TODO */
-        visit_cfg_function(value_sets, model, no_dependencies, fun_id, s,
+        visit_cfg_function(value_sets, model, no_dependencies, fun_id,
           in_pos[i_it]);
         updated.insert(i_it);
       }
@@ -699,7 +692,7 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
     {
       /* normal inlining strategy */
       visit_cfg_function(value_sets, model, no_dependencies, replicate_body,
-        fun_id, s, in_pos[i_it]);
+        fun_id, in_pos[i_it]);
       updated.insert(i_it);
     }
 

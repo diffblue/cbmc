@@ -22,7 +22,7 @@ Date: 2013
 #define OUTPUT(s, fence, file, line, id, type)  \
   s<<fence<<"|"<<file<<"|"<<line<<"|"<<id<<"|"<<type<<'\n'
 
-void event_grapht::graph_pensieve_explorert::collect_pairs(namespacet &ns)
+void event_grapht::graph_pensieve_explorert::collect_pairs()
 {
   std::ofstream res;
   res.open("results.txt");

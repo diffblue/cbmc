@@ -970,11 +970,10 @@ bool shared_bufferst::is_buffered(
   if(instrumentations.find(identifier)!=instrumentations.end())
     return false; // these are instrumentations
 
-  return is_buffered_in_general(ns, symbol_expr, is_write);
+  return is_buffered_in_general(symbol_expr, is_write);
 }
 
 bool shared_bufferst::is_buffered_in_general(
-  const namespacet &ns,
   const symbol_exprt &symbol_expr,
   bool is_write
   // are we asking for the variable (false), or for the variable and the
@@ -1042,7 +1041,7 @@ void shared_bufferst::affected_by_delay(
             message.debug() <<"debug: "<<id2string(w_it->second.object)
               <<" reads from "<<id2string(r_it->second.object)
               <<messaget::eom;
-            if(is_buffered_in_general(ns, r_it->second.symbol_expr, true))
+            if(is_buffered_in_general(r_it->second.symbol_expr, true))
               // shouldn't it be true? false => overapprox
               affected_by_delay_set.insert(w_it->second.object);
           }

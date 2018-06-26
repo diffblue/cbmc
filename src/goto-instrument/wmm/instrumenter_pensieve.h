@@ -26,15 +26,15 @@ public:
   {
   }
 
-  void collect_pairs_naive(namespacet &ns)
+  void collect_pairs_naive()
   {
-    egraph.collect_pairs_naive(ns);
+    egraph.collect_pairs_naive();
   }
 
   /* collects directly all the pairs in the graph */
-  void collect_pairs(namespacet &ns)
+  void collect_pairs()
   {
-    egraph.collect_pairs(ns);
+    egraph.collect_pairs();
   }
 };
 
