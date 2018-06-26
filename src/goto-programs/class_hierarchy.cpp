@@ -20,37 +20,6 @@ Date: April 2016
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
-/// Looks for all the struct types in the symbol table and construct a map from
-/// class names to a data structure that contains lists of parent and child
-/// classes for each struct type (ie class).
-/// \param symbol_table: The symbol table to analyze
-void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
-{
-  for(const auto &symbol_pair : symbol_table.symbols)
-  {
-    if(symbol_pair.second.is_type && symbol_pair.second.type.id() == ID_struct)
-    {
-      const struct_typet &struct_type = to_struct_type(symbol_pair.second.type);
-
-      class_map[symbol_pair.first].is_abstract =
-        struct_type.get_bool(ID_abstract);
-
-      const irept::subt &bases=
-        struct_type.find(ID_bases).get_sub();
-
-      for(const auto &base : bases)
-      {
-        irep_idt parent=base.find(ID_type).get(ID_identifier);
-        if(parent.empty())
-          continue;
-
-        class_map[parent].children.push_back(symbol_pair.first);
-        class_map[symbol_pair.first].parents.push_back(parent);
-      }
-    }
-  }
-}
-
 /// Populate the class hierarchy graph, such that there is a node for every
 /// struct type in the symbol table and an edge representing each superclass
 /// <-> subclass relationship, pointing from parent to child.
@@ -168,6 +137,36 @@ void class_hierarchyt::get_children_trans_rec(
   // recursive calls
   for(const auto &child : entry.children)
     get_children_trans_rec(child, dest);
+}
+
+/// Looks for all the struct types in the symbol table and construct a map from
+/// class names to a data structure that contains lists of parent and child
+/// classes for each struct type (ie class).
+/// \param symbol_table: The symbol table to analyze
+void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
+{
+  for(const auto &symbol_pair : symbol_table.symbols)
+  {
+    if(symbol_pair.second.is_type && symbol_pair.second.type.id() == ID_struct)
+    {
+      const struct_typet &struct_type = to_struct_type(symbol_pair.second.type);
+
+      class_map[symbol_pair.first].is_abstract =
+        struct_type.get_bool(ID_abstract);
+
+      const irept::subt &bases = struct_type.find(ID_bases).get_sub();
+
+      for(const auto &base : bases)
+      {
+        irep_idt parent = base.find(ID_type).get(ID_identifier);
+        if(parent.empty())
+          continue;
+
+        class_map[parent].children.push_back(symbol_pair.first);
+        class_map[symbol_pair.first].parents.push_back(parent);
+      }
+    }
+  }
 }
 
 /// Get all the classes that class c inherits from (directly or indirectly). The
