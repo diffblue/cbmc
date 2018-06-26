@@ -2000,6 +2000,92 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         warning() << "function `" << identifier << "' is not declared" << eom;
       }
     }
+    else if(
+      sym_entry->second.type.get_bool(ID_C_inlined) &&
+      sym_entry->second.is_macro && sym_entry->second.value.is_not_nil())
+    {
+      // calling a function marked as always_inline
+      const symbolt &func_sym = sym_entry->second;
+      const code_typet &func_type = to_code_type(func_sym.type);
+
+      replace_symbolt replace;
+
+      const code_typet::parameterst &parameters = func_type.parameters();
+      auto p_it = parameters.begin();
+      for(const auto &arg : expr.arguments())
+      {
+        if(p_it == parameters.end())
+        {
+          // we don't support varargs with always_inline
+          err_location(f_op);
+          error() << "function call has additional arguments, "
+                  << "cannot apply always_inline" << eom;
+          throw 0;
+        }
+
+        irep_idt p_id = p_it->get_identifier();
+        if(p_id.empty())
+        {
+          p_id = id2string(func_sym.base_name) + "::" +
+                 id2string(p_it->get_base_name());
+        }
+        replace.insert(p_id, arg);
+
+        ++p_it;
+      }
+
+      if(p_it != parameters.end())
+      {
+        err_location(f_op);
+        error() << "function call has missing arguments, "
+                << "cannot apply always_inline" << eom;
+        throw 0;
+      }
+
+      codet body = to_code(func_sym.value);
+      replace(body);
+
+      side_effect_exprt side_effect_expr(
+        ID_statement_expression, func_type.return_type());
+      body.make_block();
+
+      // simulates parts of typecheck_function_body
+      typet cur_return_type = return_type;
+      return_type = func_type.return_type();
+      typecheck_code(body);
+      return_type.swap(cur_return_type);
+
+      // replace final return by an ID_expression
+      codet &last = to_code_block(body).find_last_statement();
+
+      if(last.get_statement() == ID_return)
+      {
+        last.set_statement(ID_expression);
+        if(last.op0().is_nil())
+          last.op0() =
+            typecast_exprt(from_integer(0, signed_int_type()), empty_typet());
+      }
+
+      // NOLINTNEXTLINE(whitespace/braces)
+      const bool has_returns = has_subexpr(body, [&](const exprt &e) {
+        return e.id() == ID_code && to_code(e).get_statement() == ID_return;
+      });
+      if(has_returns)
+      {
+        // we don't support multiple return statements with always_inline
+        err_location(last);
+        error() << "function has multiple return statements, "
+                << "cannot apply always_inline" << eom;
+        throw 0;
+      }
+
+      side_effect_expr.copy_to_operands(body);
+      typecheck_side_effect_statement_expression(side_effect_expr);
+
+      expr.swap(side_effect_expr);
+
+      return;
+    }
   }
 
   // typecheck it now

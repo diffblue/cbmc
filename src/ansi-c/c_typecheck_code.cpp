@@ -675,6 +675,11 @@ void c_typecheck_baset::typecheck_return(codet &code)
       code.copy_to_operands(
         side_effect_expr_nondett(return_type, code.source_location()));
     }
+    else
+    {
+      // a code_returnt always has one operand
+      code.copy_to_operands(nil_exprt());
+    }
   }
   else if(code.operands().size()==1)
   {
