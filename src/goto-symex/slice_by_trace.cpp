@@ -547,7 +547,7 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
     }
     else
     {
-      int i=unsafe_string2int(id_string.substr(merge_loc+6));
+      const std::size_t i = unsafe_string2size_t(id_string.substr(merge_loc+6));
       if(merge_impl_cache_back[i].first)
       {
         return merge_impl_cache_back[i].second;

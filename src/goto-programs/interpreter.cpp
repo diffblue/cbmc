@@ -18,14 +18,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <cstring>
 
+#include <util/fixedbv.h>
+#include <util/ieee_float.h>
 #include <util/invariant.h>
+#include <util/message.h>
+#include <util/std_expr.h>
 #include <util/std_types.h>
+#include <util/string2int.h>
 #include <util/string_container.h>
 #include <util/symbol_table.h>
-#include <util/ieee_float.h>
-#include <util/fixedbv.h>
-#include <util/std_expr.h>
-#include <util/message.h>
+
 #include <json/json_parser.h>
 
 #include "interpreter_class.h"
@@ -207,7 +209,7 @@ void interpretert::command()
       stack_depth=call_stack.size()+1;
     else
     {
-      num_steps=atoi(command+1);
+      num_steps=safe_string2size_t(command+1);
       if(num_steps==0)
         num_steps=1;
     }
