@@ -469,7 +469,7 @@ goto_programt::targett string_abstractiont::abstract(
     break;
 
   case FUNCTION_CALL:
-    abstract_function_call(dest, it);
+    abstract_function_call(it);
     break;
 
   case RETURN:
@@ -528,7 +528,6 @@ goto_programt::targett string_abstractiont::abstract_assign(
 }
 
 void string_abstractiont::abstract_function_call(
-  goto_programt &dest,
   goto_programt::targett target)
 {
   code_function_callt &call=to_code_function_call(target->code);
