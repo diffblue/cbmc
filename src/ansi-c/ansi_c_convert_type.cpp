@@ -246,7 +246,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   }
   else if(type.id()==ID_pointer)
   {
-    UNREACHABLE;
+    PRECONDITION(to_pointer_type(type).get_width() > 0);
+    other.push_back(type);
   }
   else
     other.push_back(type);
