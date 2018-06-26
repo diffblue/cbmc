@@ -89,6 +89,8 @@ public:
 class class_hierarchy_grapht : public grapht<class_hierarchy_graph_nodet>
 {
 public:
+  typedef std::vector<irep_idt> idst;
+
   /// Maps class identifiers onto node indices
   typedef std::unordered_map<irep_idt, node_indext> nodes_by_namet;
 
@@ -101,9 +103,19 @@ public:
     return nodes_by_name;
   }
 
+  idst get_direct_children(const irep_idt &c) const;
+
+  idst get_children_trans(const irep_idt &c) const;
+
+  idst get_parents_trans(const irep_idt &c) const;
+
 private:
   /// Maps class identifiers onto node indices
   nodes_by_namet nodes_by_name;
+
+  idst ids_from_indices(const std::vector<node_indext> &nodes) const;
+
+  idst get_other_reachable_ids(const irep_idt &c, bool forwards) const;
 };
 
 /// Output the class hierarchy
