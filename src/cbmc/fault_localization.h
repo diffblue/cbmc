@@ -72,8 +72,7 @@ protected:
   // specify an lpoint combination to check
   typedef std::vector<tvt> lpoints_valuet;
   bool check(const lpointst &lpoints, const lpoints_valuet &value);
-  void update_scores(lpointst &lpoints,
-                     const lpoints_valuet &value);
+  void update_scores(lpointst &lpoints);
 
   // localization method: flip each point
   void localize_linear(lpointst &lpoints);

@@ -104,8 +104,7 @@ bool fault_localizationt::check(const lpointst &lpoints,
   return true;
 }
 
-void fault_localizationt::update_scores(lpointst &lpoints,
-                                        const lpoints_valuet &value)
+void fault_localizationt::update_scores(lpointst &lpoints)
 {
   for(auto &l : lpoints)
   {
@@ -131,10 +130,10 @@ void fault_localizationt::localize_linear(lpointst &lpoints)
   {
     v[i]=tvt(tvt::tv_enumt::TV_TRUE);
     if(!check(lpoints, v))
-      update_scores(lpoints, v);
+      update_scores(lpoints);
     v[i]=tvt(tvt::tv_enumt::TV_FALSE);
     if(!check(lpoints, v))
-      update_scores(lpoints, v);
+      update_scores(lpoints);
     v[i]=tvt(tvt::tv_enumt::TV_UNKNOWN);
   }
 }
