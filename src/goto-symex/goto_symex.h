@@ -455,7 +455,7 @@ protected:
   virtual void symex_fkt(statet &, const code_function_callt &);
   virtual void symex_macro(statet &, const code_function_callt &);
   virtual void symex_trace(statet &, const code_function_callt &);
-  virtual void symex_printf(statet &, const exprt &lhs, const exprt &rhs);
+  virtual void symex_printf(statet &, const exprt &rhs);
   virtual void symex_input(statet &, const codet &);
   virtual void symex_output(statet &, const codet &);
 
