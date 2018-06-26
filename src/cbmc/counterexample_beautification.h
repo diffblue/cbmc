@@ -29,8 +29,7 @@ public:
 
   void operator()(
     bv_cbmct &bv_cbmc,
-    const symex_target_equationt &equation,
-    const namespacet &ns);
+    const symex_target_equationt &equation);
 
 protected:
   void get_minimization_list(
