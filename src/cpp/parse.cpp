@@ -2386,8 +2386,6 @@ bool Parser::optAttribute(typet &t)
       return false;
     }
   }
-
-  return true;
 }
 
 /*

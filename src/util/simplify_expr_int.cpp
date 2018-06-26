@@ -1483,9 +1483,6 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     // both are not constant
     return simplify_inequality_not_constant(expr);
   }
-
-  UNREACHABLE;
-  return false;
 }
 
 bool simplify_exprt::eliminate_common_addends(

@@ -54,14 +54,11 @@ bool goto_program_dereferencet::is_valid_object(
     return true; // global/static
 
   #if 0
-  if(valid_local_variables->find(symbol.name)!=
-     valid_local_variables->end())
-    return true; // valid local
+  return valid_local_variables->find(symbol.name)!=
+     valid_local_variables->end(); // valid local
   #else
   return true;
   #endif
-
-  return false;
 }
 
 void goto_program_dereferencet::dereference_failure(
