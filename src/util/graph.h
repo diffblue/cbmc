@@ -678,6 +678,11 @@ std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
   return src;
 }
 
+/// Find connected subgraphs in an undirected graph.
+/// \param [out] subgraph_nr: will be resized to graph.size() and populated
+///   to map node indices onto subgraph numbers. The subgraph numbers are dense,
+///   in the range 0 - (number of subgraphs - 1)
+/// \return Number of subgraphs found.
 template<class N>
 std::size_t grapht<N>::connected_subgraphs(
   std::vector<node_indext> &subgraph_nr)
@@ -709,12 +714,11 @@ std::size_t grapht<N>::connected_subgraphs(
 
       const nodet &node=nodes[n];
 
-      for(typename edgest::const_iterator
-          it=node.out.begin();
-          it!=node.out.end();
-          it++)
-        if(!visited[*it])
-          s.push(*it);
+      for(const auto &o : node.out)
+      {
+        if(!visited[o.first])
+          s.push(o.first);
+      }
     }
 
     nr++;
@@ -791,6 +795,10 @@ std::size_t grapht<N>::SCCs(std::vector<node_indext> &subgraph_nr) const
   return t.scc_count;
 }
 
+/// Ensure a graph is chordal (contains no 4+-cycles without an edge crossing
+/// the cycle) by adding extra edges. Note this adds more edges than are
+/// required, including to acyclic graphs or acyclic subgraphs of cyclic graphs,
+/// but does at least ensure the graph is not chordal.
 template<class N>
 void grapht<N>::make_chordal()
 {
@@ -805,20 +813,13 @@ void grapht<N>::make_chordal()
     const nodet &n=tmp[i];
 
     // connect all the nodes in n.out with each other
-
-    for(typename edgest::const_iterator
-        it1=n.out.begin();
-        it1!=n.out.end();
-        it1++)
-      for(typename edgest::const_iterator
-          it2=n.out.begin();
-          it2!=n.out.end();
-          it2++)
+    for(const auto &o1 : n.out)
+      for(const auto &o2 : n.out)
       {
-        if(*it1!=*it2)
+        if(o1.first!=o2.first)
         {
-          tmp.add_undirected_edge(*it1, *it2);
-          this->add_undirected_edge(*it1, *it2);
+          tmp.add_undirected_edge(o1.first, o2.first);
+          this->add_undirected_edge(o1.first, o2.first);
         }
       }
 
