@@ -535,6 +535,7 @@ void c_typecheck_baset::typecheck_switch_case(code_switch_caset &code)
     exprt &case_expr=code.case_op();
     typecheck_expr(case_expr);
     implicit_typecast(case_expr, switch_op_type);
+    make_constant(case_expr);
   }
 }
 
@@ -561,6 +562,8 @@ void c_typecheck_baset::typecheck_gcc_switch_case_range(codet &code)
   typecheck_expr(code.op1());
   implicit_typecast(code.op0(), switch_op_type);
   implicit_typecast(code.op1(), switch_op_type);
+  make_constant(code.op0());
+  make_constant(code.op1());
 }
 
 void c_typecheck_baset::typecheck_gcc_local_label(codet &code)
