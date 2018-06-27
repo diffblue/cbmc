@@ -223,6 +223,48 @@ SCENARIO("call_graph",
         REQUIRE(exported.has_edge(nodes_by_name["B"], nodes_by_name["D"]));
       }
 
+      THEN("We expect {A,B} to be reachable from {A} in 1 step")
+      {
+        irep_idt function_name = "A";
+        std::size_t depth = 1;
+        std::set<irep_idt> reachable = get_functions_reachable_within_n_steps(
+          exported, function_name, depth);
+        REQUIRE(reachable.size() == 2);
+        REQUIRE(reachable.count("A"));
+        REQUIRE(reachable.count("B"));
+      }
+      THEN("We expect {A,B,C,D} to be reachable from {A} in 2 and 3 steps")
+      {
+        irep_idt function_name = "A";
+        std::size_t depth = 2;
+        std::set<irep_idt> reachable = get_functions_reachable_within_n_steps(
+          exported, function_name, depth);
+        REQUIRE(reachable.size() == 4);
+        REQUIRE(reachable.count("A"));
+        REQUIRE(reachable.count("B"));
+        REQUIRE(reachable.count("C"));
+        REQUIRE(reachable.count("D"));
+
+        depth = 3;
+        reachable = get_functions_reachable_within_n_steps(
+          exported, function_name, depth);
+        REQUIRE(reachable.size() == 4);
+        REQUIRE(reachable.count("A"));
+        REQUIRE(reachable.count("B"));
+        REQUIRE(reachable.count("C"));
+        REQUIRE(reachable.count("D"));
+      }
+
+      THEN("We expect only {A} to be reachable from {A} in 0 steps")
+      {
+        irep_idt function_name = "A";
+        std::size_t depth = 0;
+        std::set<irep_idt> reachable = get_functions_reachable_within_n_steps(
+          exported, function_name, depth);
+        REQUIRE(reachable.size() == 1);
+        REQUIRE(reachable.count("A"));
+      }
+
       THEN("We expect A to have successors {A, B}")
       {
         std::set<irep_idt> successors = get_callees(exported, "A");

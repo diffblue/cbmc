@@ -70,3 +70,29 @@ std::set<irep_idt> get_reaching_functions(
 {
   return get_connected_functions(graph, function, false);
 }
+
+std::set<irep_idt> get_functions_reachable_within_n_steps(
+  const call_grapht::directed_grapht &graph,
+  const std::set<irep_idt> &start_functions,
+  std::size_t &n)
+{
+  std::vector<std::size_t> start_indices;
+  std::set<irep_idt> result;
+
+  for(const auto &func : start_functions)
+    start_indices.push_back(*(graph.get_node_index(func)));
+
+  for(const auto &index : graph.depth_limited_search(start_indices, n))
+    result.insert(graph[index].function);
+
+  return result;
+}
+
+std::set<irep_idt> get_functions_reachable_within_n_steps(
+  const call_grapht::directed_grapht &graph,
+  const irep_idt &start_function,
+  std::size_t &n)
+{
+  std::set<irep_idt> start_functions({ start_function });
+  return get_functions_reachable_within_n_steps(graph, start_functions, n);
+}

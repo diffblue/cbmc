@@ -255,6 +255,18 @@ public:
   void disconnect_unreachable(node_indext src);
   void disconnect_unreachable(const std::vector<node_indext> &src);
 
+  std::vector<node_indext> depth_limited_search(
+    const node_indext &src,
+    std::size_t &limit,
+    bool forwards) const;
+
+  std::vector<typename N::node_indext>
+  depth_limited_search(typename N::node_indext src, std::size_t limit) const;
+
+  std::vector<typename N::node_indext> depth_limited_search(
+    std::vector<typename N::node_indext> &src,
+    std::size_t limit) const;
+
   void make_chordal();
 
   // return value: number of connected subgraphs
@@ -278,6 +290,11 @@ public:
     std::function<void(const node_indext &)> f) const;
 
 protected:
+  std::vector<typename N::node_indext> depth_limited_search(
+    std::vector<typename N::node_indext> &src,
+    std::size_t limit,
+    std::vector<bool> &visited) const;
+
   class tarjant
   {
   public:
@@ -582,6 +599,83 @@ std::vector<typename N::node_indext> grapht<N>::get_reachable(
   }
 
   return result;
+}
+
+/// Run recursive depth-limited search on the graph, starting
+/// from multiple source nodes, to find the nodes reachable within n steps.
+/// This function initialises the search.
+/// \param src The node to start the search from.
+/// \param limit  limit on steps
+/// \return a vector of reachable node indices
+template <class N>
+std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
+  const typename N::node_indext src,
+  std::size_t limit) const
+{
+  std::vector<node_indext> start_vector(1, src);
+  return depth_limited_search(start_vector, limit);
+}
+
+/// Run recursive depth-limited search on the graph, starting
+/// from multiple source nodes, to find the nodes reachable within n steps.
+/// This function initialises the search.
+/// \param src The nodes to start the search from.
+/// \param limit  limit on steps
+/// \return a vector of reachable node indices
+template <class N>
+std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
+  std::vector<typename N::node_indext> &src,
+  std::size_t limit) const
+{
+  std::vector<bool> visited(nodes.size(), false);
+
+  for(const auto &node : src)
+  {
+    PRECONDITION(node < nodes.size());
+    visited[node] = true;
+  }
+
+  return depth_limited_search(src, limit, visited);
+}
+
+/// Run recursive depth-limited search on the graph, starting
+// from multiple source nodes, to find the nodes reachable within n steps
+/// \param src The nodes to start the search from.
+/// \param limit  limit on steps
+/// \param visited vector of booleans indicating whether a node has been visited
+/// \return a vector of reachable node indices
+template <class N>
+std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
+  std::vector<typename N::node_indext> &src,
+  std::size_t limit,
+  std::vector<bool> &visited) const
+{
+  if(limit == 0)
+    return src;
+
+  std::vector<node_indext> next_ring;
+
+  for(const auto &n : src)
+  {
+    for(const auto &o : nodes[n].out)
+    {
+      if(!visited[o.first])
+      {
+        next_ring.push_back(o.first);
+        visited[o.first] = true;
+      }
+    }
+  }
+
+  if(next_ring.empty())
+    return src;
+
+  limit--;
+
+  for(const auto &succ : depth_limited_search(next_ring, limit, visited))
+    src.push_back(succ);
+
+  return src;
 }
 
 template<class N>
