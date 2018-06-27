@@ -27,7 +27,7 @@ void require_parent_child_relationship(
 }
 
 SCENARIO(
-  "Output a simple class hierarchy"
+  "Output a simple class hierarchy graph",
   "[core][goto-programs][class_hierarchy_graph]")
 {
   symbol_tablet symbol_table =
