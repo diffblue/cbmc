@@ -197,6 +197,12 @@ bool replace_symbolt::replace(typet &dest) const
     if(!replace(array_type.size()))
       result=false;
   }
+  else if(dest.id() == ID_typeof)
+  {
+    exprt &expr = reinterpret_cast<exprt &>(dest.subtype());
+    if(!replace(expr))
+      result = false;
+  }
 
   return result;
 }
@@ -236,6 +242,11 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
   }
   else if(dest.id()==ID_array)
     return have_to_replace(to_array_type(dest).size());
+  else if(dest.id() == ID_typeof)
+  {
+    return have_to_replace(
+      reinterpret_cast<const exprt &>(dest.subtype()));
+  }
 
   return false;
 }
