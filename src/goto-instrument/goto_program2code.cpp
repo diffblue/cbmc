@@ -13,21 +13,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <sstream>
 
-#include <util/c_types.h>
+#include <util/arith_tools.h>
 #include <util/config.h>
+#include <util/c_types.h>
+#include <util/expr_util.h>
+#include <util/find_symbols.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
-#include <util/find_symbols.h>
-#include <util/arith_tools.h>
 #include <util/type_eq.h>
-
-static const exprt &skip_typecast(const exprt &expr)
-{
-  if(expr.id()!=ID_typecast)
-    return expr;
-
-  return skip_typecast(to_typecast_expr(expr).op());
-}
 
 void goto_program2codet::operator()()
 {

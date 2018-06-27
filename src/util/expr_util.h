@@ -72,4 +72,7 @@ bool has_subtype(const typet &, const irep_idt &id, const namespacet &);
 /// lift up an if_exprt one level
 if_exprt lift_if(const exprt &, std::size_t operand_number);
 
+/// find the expression nested inside typecasts, if any
+const exprt &skip_typecast(const exprt &expr);
+
 #endif // CPROVER_UTIL_EXPR_UTIL_H

@@ -201,3 +201,11 @@ if_exprt lift_if(const exprt &src, std::size_t operand_number)
 
   return result;
 }
+
+const exprt &skip_typecast(const exprt &expr)
+{
+  if(expr.id()!=ID_typecast)
+    return expr;
+
+  return skip_typecast(to_typecast_expr(expr).op());
+}
