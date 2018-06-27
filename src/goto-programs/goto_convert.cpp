@@ -386,8 +386,8 @@ void goto_convertt::convert_gcc_switch_case_range(
     "GCC's switch-case-range statement expected to have three operands",
     code.find_source_location());
 
-  const auto lb = numeric_cast<mp_integer>(code.op0());
-  const auto ub = numeric_cast<mp_integer>(code.op1());
+  const auto lb = numeric_cast<mp_integer>(simplify_expr(code.op0(), ns));
+  const auto ub = numeric_cast<mp_integer>(simplify_expr(code.op1(), ns));
 
   INVARIANT_WITH_DIAGNOSTICS(
     lb.has_value() && ub.has_value(),
