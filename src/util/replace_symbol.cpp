@@ -107,6 +107,10 @@ bool replace_symbolt::replace(exprt &dest) const
   if(va_arg_type.is_not_nil() && have_to_replace(va_arg_type))
     result &= replace(static_cast<typet&>(dest.add(ID_C_va_arg_type)));
 
+  const exprt &decl_value = static_cast<const exprt &>(dest.find(ID_value));
+  if(decl_value.is_not_nil() && have_to_replace(decl_value))
+    result &= replace(static_cast<exprt &>(dest.add(ID_value)));
+
   return result;
 }
 
@@ -142,6 +146,12 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
 
   if(va_arg_type.is_not_nil())
     if(have_to_replace(static_cast<const typet &>(va_arg_type)))
+      return true;
+
+  const irept &decl_value = dest.find(ID_value);
+
+  if(decl_value.is_not_nil())
+    if(have_to_replace(static_cast<const exprt &>(decl_value)))
       return true;
 
   return false;
