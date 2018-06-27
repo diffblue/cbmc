@@ -1040,7 +1040,8 @@ bool java_bytecode_languaget::convert_single_method(
       throw_assertion_error,
       std::move(needed_lazy_methods),
       string_preprocess,
-      class_hierarchy);
+      class_hierarchy,
+      threading_support);
     return false;
   }
 

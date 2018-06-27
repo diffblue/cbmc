@@ -15,6 +15,25 @@ public class A
   }
 
   // expected verification success
+  public static void aStatic() throws java.io.IOException
+  {
+    Object _lock = new Object();
+    try
+    {
+      synchronized (_lock)
+      {
+        if(true)
+          throw new java.io.IOException();
+      }
+    }
+    catch (java.io.IOException e)
+    {
+      return;
+    }
+    assert false; // unreachable
+  }
+
+  // expected verification success
   // --
   // base-case, no synchronization
   public void me1()

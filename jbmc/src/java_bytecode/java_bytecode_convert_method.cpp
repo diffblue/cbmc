@@ -1026,8 +1026,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
 
     if(i_it->statement=="athrow" ||
-       i_it->statement=="monitorenter" ||
-       i_it->statement=="monitorexit" ||
        i_it->statement=="putfield" ||
        i_it->statement=="getfield" ||
        i_it->statement=="checkcast" ||
@@ -1042,7 +1040,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
        i_it->statement=="invokestatic" ||
        i_it->statement=="invokevirtual" ||
        i_it->statement=="invokespecial" ||
-       i_it->statement=="invokeinterface")
+       i_it->statement=="invokeinterface" ||
+       (threading_support && (i_it->statement=="monitorenter" ||
+       i_it->statement=="monitorexit")))
     {
       const std::vector<unsigned int> handler =
         try_catch_handler(i_it->address, method.exception_table);
@@ -1985,6 +1985,9 @@ codet java_bytecode_convert_methodt::convert_monitorenterexit(
   const irep_idt descriptor = (statement == "monitorenter") ?
     "java::java.lang.Object.monitorenter:(Ljava/lang/Object;)V" :
     "java::java.lang.Object.monitorexit:(Ljava/lang/Object;)V";
+
+  if(!threading_support || !symbol_table.has_symbol(descriptor))
+    return code_skipt();
 
   // becomes a function call
   code_typet type(
@@ -3099,7 +3102,9 @@ void java_bytecode_convert_method(
   bool throw_assertion_error,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess,
-  const class_hierarchyt &class_hierarchy)
+  const class_hierarchyt &class_hierarchy,
+  bool threading_support)
+
 {
   if(std::regex_match(
        id2string(class_symbol.name),
@@ -3118,7 +3123,8 @@ void java_bytecode_convert_method(
     throw_assertion_error,
     needed_lazy_methods,
     string_preprocess,
-    class_hierarchy);
+    class_hierarchy,
+    threading_support);
 
   java_bytecode_convert_method(class_symbol, method);
 }
