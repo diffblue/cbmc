@@ -829,7 +829,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
   // save the source location
   source_locationt source_location=expr.source_location();
 
-  if(symbol.is_macro)
+  if(symbol.is_macro && symbol.value.id() != ID_code)
   {
     // preserve enum key
     #if 0
@@ -2047,10 +2047,14 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   {
     irep_idt identifier=to_symbol_expr(f_op).get_identifier();
 
+    bool is_asm_alias = false;
     asm_label_mapt::const_iterator entry=
       asm_label_map.find(identifier);
     if(entry!=asm_label_map.end())
+    {
+      is_asm_alias = identifier != entry->second;
       identifier=entry->second;
+    }
 
     if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
     {
@@ -2095,7 +2099,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     }
     else if(
       sym_entry->second.type.get_bool(ID_C_inlined) &&
-      sym_entry->second.is_macro && sym_entry->second.value.is_not_nil())
+      sym_entry->second.is_macro && sym_entry->second.value.is_not_nil() &&
+      inlining_set.find(sym_entry->first) == inlining_set.end())
     {
       // calling a function marked as always_inline
       const symbolt &func_sym = sym_entry->second;
@@ -2145,6 +2150,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       // simulates parts of typecheck_function_body
       typet cur_return_type = return_type;
       return_type = func_type.return_type();
+      inlining_sett cur_inlining_set = inlining_set;
+      inlining_set.insert(func_sym.name);
       typecheck_code(body);
       make_single_return(func_sym, to_code_block(body), symbol_table);
       return_type.swap(cur_return_type);
@@ -2162,10 +2169,24 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 
       side_effect_expr.copy_to_operands(body);
       typecheck_side_effect_statement_expression(side_effect_expr);
+      cur_inlining_set.swap(inlining_set);
 
       expr.swap(side_effect_expr);
 
       return;
+    }
+    else if(
+      !is_asm_alias && sym_entry->second.type.get_bool(ID_C_inlined) &&
+      sym_entry->second.is_macro && sym_entry->second.value.is_not_nil() &&
+      inlining_set.find(sym_entry->first) != inlining_set.end() &&
+      sym_entry->second.value.id() == ID_code)
+    {
+      // genunine (i.e., not one resulting from asm renaming) recursive call to
+      // a function marked always_inline - effectively ignore the
+      // "always_inline" from now on and type check it as a non-inline function
+      symbolt &symbol = symbol_table.get_writeable_ref(sym_entry->first);
+      symbol.is_macro = false;
+      typecheck_function_body(symbol);
     }
   }
 

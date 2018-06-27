@@ -775,3 +775,18 @@ void c_typecheck_baset::typecheck_declaration(
     }
   }
 }
+
+c_typecheck_baset::~c_typecheck_baset()
+{
+  for(const auto &asm_label_pair : asm_label_map)
+  {
+    symbolt &symbol = symbol_table.get_writeable_ref(asm_label_pair.second);
+    if(
+      symbol.is_macro && symbol.value.is_not_nil() &&
+      symbol.value.id() == ID_code && symbol.type.get_bool(ID_C_inlined))
+    {
+      symbol.is_macro = false;
+      symbol.value.make_nil();
+    }
+  }
+}
