@@ -27,7 +27,7 @@ void require_parent_child_relationship(
 }
 
 SCENARIO(
-  "Output a simple class hierarchy"
+  "Output a simple class hierarchy graph",
   "[core][goto-programs][class_hierarchy_graph]")
 {
   symbol_tablet symbol_table =
@@ -45,4 +45,92 @@ SCENARIO(
     "HierarchyTestInterface1", "HierarchyTestGrandchild", hierarchy);
   require_parent_child_relationship(
     "HierarchyTestInterface2", "HierarchyTestGrandchild", hierarchy);
+}
+
+SCENARIO(
+  "class_hierarchy_graph",
+  "[core][goto-programs][class_hierarchy_graph]")
+{
+  symbol_tablet symbol_table =
+    load_java_class("HierarchyTest", "./java_bytecode/goto-programs/");
+  class_hierarchy_grapht hierarchy;
+  hierarchy.populate(symbol_table);
+
+  WHEN("Retrieving direct children of a given class")
+  {
+    const class_hierarchy_grapht::idst ht_direct_children =
+      hierarchy.get_direct_children("java::HierarchyTest");
+    THEN("The correct list of direct children should be returned")
+    {
+      REQUIRE(ht_direct_children.size() == 2);
+      REQUIRE(
+        find(
+          ht_direct_children.begin(),
+          ht_direct_children.end(),
+          "java::HierarchyTestChild1") != ht_direct_children.end());
+      REQUIRE(
+        find(
+          ht_direct_children.begin(),
+          ht_direct_children.end(),
+          "java::HierarchyTestChild2") != ht_direct_children.end());
+    }
+  }
+  WHEN("Retrieving all children of a given class")
+  {
+    const class_hierarchy_grapht::idst ht_all_children =
+      hierarchy.get_children_trans("java::HierarchyTest");
+    THEN("The correct list of children should be returned")
+    {
+      REQUIRE(ht_all_children.size() == 3);
+      REQUIRE(
+        find(
+          ht_all_children.begin(),
+          ht_all_children.end(),
+          "java::HierarchyTestChild1") != ht_all_children.end());
+      REQUIRE(
+        find(
+          ht_all_children.begin(),
+          ht_all_children.end(),
+          "java::HierarchyTestChild2") != ht_all_children.end());
+      REQUIRE(
+        find(
+          ht_all_children.begin(),
+          ht_all_children.end(),
+          "java::HierarchyTestGrandchild") != ht_all_children.end());
+    }
+  }
+  WHEN("Retrieving all parents of a given class")
+  {
+    const class_hierarchy_grapht::idst htg_all_parents =
+      hierarchy.get_parents_trans("java::HierarchyTestGrandchild");
+    THEN("The correct list of parents should be returned")
+    {
+      REQUIRE(htg_all_parents.size() == 5);
+      REQUIRE(
+        find(
+          htg_all_parents.begin(),
+          htg_all_parents.end(),
+          "java::HierarchyTestChild1") != htg_all_parents.end());
+      REQUIRE(
+        find(
+          htg_all_parents.begin(),
+          htg_all_parents.end(),
+          "java::HierarchyTest") != htg_all_parents.end());
+      REQUIRE(
+        find(
+          htg_all_parents.begin(),
+          htg_all_parents.end(),
+          "java::HierarchyTestInterface1") != htg_all_parents.end());
+      REQUIRE(
+        find(
+          htg_all_parents.begin(),
+          htg_all_parents.end(),
+          "java::HierarchyTestInterface2") != htg_all_parents.end());
+      REQUIRE(
+        find(
+          htg_all_parents.begin(),
+          htg_all_parents.end(),
+          "java::java.lang.Object") != htg_all_parents.end());
+    }
+  }
 }

@@ -13,42 +13,12 @@ Date: April 2016
 
 #include "class_hierarchy.h"
 
+#include <iterator>
 #include <ostream>
 
 #include <util/json_stream.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
-
-/// Looks for all the struct types in the symbol table and construct a map from
-/// class names to a data structure that contains lists of parent and child
-/// classes for each struct type (ie class).
-/// \param symbol_table: The symbol table to analyze
-void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
-{
-  for(const auto &symbol_pair : symbol_table.symbols)
-  {
-    if(symbol_pair.second.is_type && symbol_pair.second.type.id() == ID_struct)
-    {
-      const struct_typet &struct_type = to_struct_type(symbol_pair.second.type);
-
-      class_map[symbol_pair.first].is_abstract =
-        struct_type.get_bool(ID_abstract);
-
-      const irept::subt &bases=
-        struct_type.find(ID_bases).get_sub();
-
-      for(const auto &base : bases)
-      {
-        irep_idt parent=base.find(ID_type).get(ID_identifier);
-        if(parent.empty())
-          continue;
-
-        class_map[parent].children.push_back(symbol_pair.first);
-        class_map[symbol_pair.first].parents.push_back(parent);
-      }
-    }
-  }
-}
 
 /// Populate the class hierarchy graph, such that there is a node for every
 /// struct type in the symbol table and an edge representing each superclass
@@ -88,6 +58,70 @@ void class_hierarchy_grapht::populate(const symbol_tablet &symbol_table)
   }
 }
 
+/// Helper function that converts a vector of node_indext to a vector of ids
+/// that are stored in the corresponding nodes in the graph.
+class_hierarchy_grapht::idst class_hierarchy_grapht::ids_from_indices(
+  const std::vector<node_indext> &node_indices) const
+{
+  idst result;
+  std::transform(
+    node_indices.begin(),
+    node_indices.end(),
+    back_inserter(result),
+    [&](const node_indext &node_index) {
+      return (*this)[node_index].class_identifier;
+    });
+  return result;
+}
+
+/// Get all the classes that directly (i.e. in one step) inherit from class c.
+/// \param c: The class to consider
+/// \return A list containing ids of all direct children of c.
+class_hierarchy_grapht::idst
+class_hierarchy_grapht::get_direct_children(const irep_idt &c) const
+{
+  const node_indext &node_index = nodes_by_name.at(c);
+  const auto &child_indices = get_successors(node_index);
+  return ids_from_indices(child_indices);
+}
+
+/// Helper function for `get_children_trans` and `get_parents_trans`
+class_hierarchy_grapht::idst class_hierarchy_grapht::get_other_reachable_ids(
+  const irep_idt &c,
+  bool forwards) const
+{
+  idst direct_child_ids;
+  const node_indext &node_index = nodes_by_name.at(c);
+  const auto &reachable_indices = get_reachable(node_index, forwards);
+  auto reachable_ids = ids_from_indices(reachable_indices);
+  // Remove c itself from the list
+  // TODO Adding it first and then removing it is not ideal. It would be
+  // better to define a function grapht::get_other_reachable and directly use
+  // that here.
+  reachable_ids.erase(
+    std::remove(reachable_ids.begin(), reachable_ids.end(), c),
+    reachable_ids.end());
+  return reachable_ids;
+}
+
+/// Get all the classes that inherit (directly or indirectly) from class c.
+/// \param c: The class to consider
+/// \return A list containing ids of all classes that eventually inherit from c.
+class_hierarchy_grapht::idst
+class_hierarchy_grapht::get_children_trans(const irep_idt &c) const
+{
+  return get_other_reachable_ids(c, true);
+}
+
+/// Get all the classes that class c inherits from (directly or indirectly).
+/// \param c: The class to consider
+/// \return A list of class ids that c eventually inherits from.
+class_hierarchy_grapht::idst
+class_hierarchy_grapht::get_parents_trans(const irep_idt &c) const
+{
+  return get_other_reachable_ids(c, false);
+}
+
 void class_hierarchyt::get_children_trans_rec(
   const irep_idt &c,
   idst &dest) const
@@ -105,7 +139,37 @@ void class_hierarchyt::get_children_trans_rec(
     get_children_trans_rec(child, dest);
 }
 
-/// Get all the classes that inherit (directly or indirectly) from class c. The
+/// Looks for all the struct types in the symbol table and construct a map from
+/// class names to a data structure that contains lists of parent and child
+/// classes for each struct type (ie class).
+/// \param symbol_table: The symbol table to analyze
+void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
+{
+  for(const auto &symbol_pair : symbol_table.symbols)
+  {
+    if(symbol_pair.second.is_type && symbol_pair.second.type.id() == ID_struct)
+    {
+      const struct_typet &struct_type = to_struct_type(symbol_pair.second.type);
+
+      class_map[symbol_pair.first].is_abstract =
+        struct_type.get_bool(ID_abstract);
+
+      const irept::subt &bases = struct_type.find(ID_bases).get_sub();
+
+      for(const auto &base : bases)
+      {
+        irep_idt parent = base.find(ID_type).get(ID_identifier);
+        if(parent.empty())
+          continue;
+
+        class_map[parent].children.push_back(symbol_pair.first);
+        class_map[symbol_pair.first].parents.push_back(parent);
+      }
+    }
+  }
+}
+
+/// Get all the classes that class c inherits from (directly or indirectly). The
 /// first element(s) will be the immediate parents of c, though after this
 /// the order is all the parents of the first immediate parent
 /// \param c: The class to consider

@@ -34,6 +34,12 @@ class symbol_tablet;
 class json_stream_arrayt;
 class message_handlert;
 
+/// Non-graph-based representation of the class hierarchy.
+/// \deprecated `class_hierarchy_grapht` is a more advanced graph-based
+///   representation of the class hierarchy and its use is preferred over
+///   `class_hierarchy_classt`.
+/// \todo Implement missing functions from `class_hierarchyt` in
+///   `class_hierarchy_grapht` so that `class_hierarchyt` can be fully replaced.
 class class_hierarchyt
 {
 public:
@@ -89,6 +95,8 @@ public:
 class class_hierarchy_grapht : public grapht<class_hierarchy_graph_nodet>
 {
 public:
+  typedef std::vector<irep_idt> idst;
+
   /// Maps class identifiers onto node indices
   typedef std::unordered_map<irep_idt, node_indext> nodes_by_namet;
 
@@ -101,9 +109,19 @@ public:
     return nodes_by_name;
   }
 
+  idst get_direct_children(const irep_idt &c) const;
+
+  idst get_children_trans(const irep_idt &c) const;
+
+  idst get_parents_trans(const irep_idt &c) const;
+
 private:
   /// Maps class identifiers onto node indices
   nodes_by_namet nodes_by_name;
+
+  idst ids_from_indices(const std::vector<node_indext> &nodes) const;
+
+  idst get_other_reachable_ids(const irep_idt &c, bool forwards) const;
 };
 
 /// Output the class hierarchy
