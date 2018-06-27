@@ -255,11 +255,6 @@ public:
   void disconnect_unreachable(node_indext src);
   void disconnect_unreachable(const std::vector<node_indext> &src);
 
-  std::vector<node_indext> depth_limited_search(
-    const node_indext &src,
-    std::size_t &limit,
-    bool forwards) const;
-
   std::vector<typename N::node_indext>
   depth_limited_search(typename N::node_indext src, std::size_t limit) const;
 
