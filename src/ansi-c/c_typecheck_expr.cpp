@@ -2045,7 +2045,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 
   if(f_op.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(f_op).get_identifier();
+    const irep_idt &orig_identifier = to_symbol_expr(f_op).get_identifier();
+    irep_idt identifier = orig_identifier;
 
     bool is_asm_alias = false;
     asm_label_mapt::const_iterator entry=
@@ -2124,8 +2125,11 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         irep_idt p_id = p_it->get_identifier();
         if(p_id.empty())
         {
-          p_id = id2string(func_sym.base_name) + "::" +
-                 id2string(p_it->get_base_name());
+          const std::string base_name = id2string(p_it->get_base_name());
+          p_id = id2string(func_sym.base_name) + "::" + base_name;
+
+          if(is_asm_alias)
+            replace.insert(id2string(orig_identifier) + "::" + base_name, arg);
         }
         replace.insert(p_id, arg);
 
