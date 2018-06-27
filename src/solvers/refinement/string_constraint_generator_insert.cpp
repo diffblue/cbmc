@@ -53,7 +53,9 @@ exprt string_constraint_generatort::add_axioms_for_insert(
   constraints.push_back([&] { // NOLINT
     const symbol_exprt i = fresh_symbol("QA_insert2", index_type);
     return string_constraintt(
-      i, s2.length(), equal_exprt(res[plus_exprt(i, offset1)], s2[i]));
+      i,
+      zero_if_negative(s2.length()),
+      equal_exprt(res[plus_exprt(i, offset1)], s2[i]));
   }());
 
   // Axiom 4.
@@ -62,7 +64,7 @@ exprt string_constraint_generatort::add_axioms_for_insert(
     return string_constraintt(
       i,
       offset1,
-      s1.length(),
+      zero_if_negative(s1.length()),
       equal_exprt(res[plus_exprt(i, s2.length())], s1[i]));
   }());
 

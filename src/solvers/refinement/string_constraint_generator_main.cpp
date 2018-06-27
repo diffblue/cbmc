@@ -324,7 +324,8 @@ void string_constraint_generatort::add_constraint_on_characters(
   const and_exprt char_in_set(
     binary_relation_exprt(chr, ID_ge, from_integer(low_char, chr.type())),
     binary_relation_exprt(chr, ID_le, from_integer(high_char, chr.type())));
-  const string_constraintt sc(qvar, start, end, char_in_set);
+  const string_constraintt sc(
+    qvar, zero_if_negative(start), zero_if_negative(end), char_in_set);
   constraints.push_back(sc);
 }
 
@@ -626,4 +627,12 @@ exprt minimum(const exprt &a, const exprt &b)
 exprt maximum(const exprt &a, const exprt &b)
 {
   return if_exprt(binary_relation_exprt(a, ID_le, b), b, a);
+}
+
+/// Returns a non-negative version of the argument.
+/// \param  expr: expression of which we want a non-negative version
+/// \return `max(0, expr)`
+exprt zero_if_negative(const exprt &expr)
+{
+  return maximum(from_integer(0, expr.type()), expr);
 }
