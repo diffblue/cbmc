@@ -1,4 +1,5 @@
 SRC = \
+  call_graph_test_utils.cpp \
   free_form_cmdline.cpp \
   message.cpp \
   require_expr.cpp \

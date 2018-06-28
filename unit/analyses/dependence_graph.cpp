@@ -8,28 +8,16 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <iostream>
 
-#include <testing-utils/catch.hpp>
 #include <analyses/dependence_graph.h>
-#include <util/symbol_table.h>
-#include <util/std_code.h>
-#include <util/c_types.h>
-#include <util/arith_tools.h>
+#include <ansi-c/ansi_c_language.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <langapi/mode.h>
-#include <ansi-c/ansi_c_language.h>
-
-static symbolt create_void_function_symbol(
-  const irep_idt &name,
-  const codet &code)
-{
-  const code_typet void_function_type({}, empty_typet());
-  symbolt function;
-  function.name = name;
-  function.type = void_function_type;
-  function.mode = ID_java;
-  function.value = code;
-  return function;
-}
+#include <testing-utils/call_graph_test_utils.h>
+#include <testing-utils/catch.hpp>
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/std_code.h>
+#include <util/symbol_table.h>
 
 const std::set<goto_programt::const_targett>&
     dependence_graph_test_get_control_deps(const dep_graph_domaint &domain)
