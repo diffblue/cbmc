@@ -604,13 +604,14 @@ void java_bytecode_instrument_uncaught_exceptions(
   const source_locationt &source_location)
 {
   // check that there is no uncaught exception
-  code_assertt assert_no_exception;
-  assert_no_exception.assertion() = equal_exprt(
+  code_assertt assert_no_exception(equal_exprt(
     exc_symbol.symbol_expr(),
-    null_pointer_exprt(to_pointer_type(exc_symbol.type)));
+    null_pointer_exprt(to_pointer_type(exc_symbol.type))));
+
   source_locationt assert_location = source_location;
   assert_location.set_comment("no uncaught exception");
   assert_no_exception.add_source_location() = assert_location;
+
   init_code.move_to_operands(assert_no_exception);
 }
 
