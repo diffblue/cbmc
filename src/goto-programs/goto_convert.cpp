@@ -1990,8 +1990,7 @@ symbolt &goto_convertt::new_tmp_symbol(
     mode,
     symbol_table);
 
-  code_declt decl;
-  decl.symbol()=new_symbol.symbol_expr();
+  code_declt decl(new_symbol.symbol_expr());
   decl.add_source_location()=source_location;
   convert_decl(decl, dest, mode);
 

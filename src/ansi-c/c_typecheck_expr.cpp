@@ -724,9 +724,8 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
       throw 0;
     }
 
-    code_declt decl;
+    code_declt decl(symbol.symbol_expr());
     decl.add_source_location()=declaration.source_location();
-    decl.symbol()=symbol.symbol_expr();
 
     expr.op0()=decl;
 

@@ -390,8 +390,7 @@ void goto_convertt::remove_function_call(
     symbol_table);
 
   {
-    code_declt decl;
-    decl.symbol()=new_symbol.symbol_expr();
+    code_declt decl(new_symbol.symbol_expr());
     decl.add_source_location()=new_symbol.location;
     convert_decl(decl, dest, mode);
   }
@@ -433,8 +432,7 @@ void goto_convertt::remove_cpp_new(
     ID_cpp,
     symbol_table);
 
-  code_declt decl;
-  decl.symbol()=new_symbol.symbol_expr();
+  code_declt decl(new_symbol.symbol_expr());
   decl.add_source_location()=new_symbol.location;
   convert_decl(decl, dest, ID_cpp);
 
