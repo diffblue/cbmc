@@ -461,14 +461,14 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
 
   implicit_typecast(arg, pointer_type(void_type()));
 
+  symbol_exprt function(ID_gcc_builtin_va_arg, new_type);
+  function.add_source_location() = expr.source_location();
+
   // turn into function call
-  side_effect_expr_function_callt result;
+  side_effect_expr_function_callt result(
+    function, {arg}, new_type.return_type());
+
   result.add_source_location()=expr.source_location();
-  result.function()=symbol_exprt(ID_gcc_builtin_va_arg);
-  result.function().add_source_location()=expr.source_location();
-  result.function().type()=new_type;
-  result.arguments().push_back(arg);
-  result.type()=new_type.return_type();
 
   expr.swap(result);
 
@@ -881,14 +881,12 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
 
     code_function_callt &fc=to_code_function_call(last);
 
-    side_effect_expr_function_callt sideeffect;
-
-    sideeffect.function()=fc.function();
-    sideeffect.arguments()=fc.arguments();
-    sideeffect.add_source_location()=fc.source_location();
-
-    sideeffect.type()=
+    auto return_type =
       static_cast<const typet &>(fc.function().type().find(ID_return_type));
+
+    side_effect_expr_function_callt sideeffect(
+      fc.function(), fc.arguments(), return_type);
+    sideeffect.add_source_location()=fc.source_location();
 
     expr.type()=sideeffect.type();
 
