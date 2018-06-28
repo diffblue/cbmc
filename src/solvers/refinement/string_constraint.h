@@ -68,10 +68,10 @@ public:
   string_constraintt() = delete;
 
   string_constraintt(
-    symbol_exprt _univ_var,
-    exprt lower_bound,
-    exprt upper_bound,
-    exprt body);
+    const symbol_exprt &_univ_var,
+    const exprt &lower_bound,
+    const exprt &upper_bound,
+    const exprt &body);
 
   // Default bound inferior is 0
   string_constraintt(symbol_exprt univ_var, exprt upper_bound, exprt body)

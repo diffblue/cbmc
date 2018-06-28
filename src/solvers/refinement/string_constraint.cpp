@@ -28,10 +28,10 @@ static bool cannot_be_neg(const exprt &expr)
 }
 
 string_constraintt::string_constraintt(
-  symbol_exprt _univ_var,
-  exprt lower_bound,
-  exprt upper_bound,
-  exprt body)
+  const symbol_exprt &_univ_var,
+  const exprt &lower_bound,
+  const exprt &upper_bound,
+  const exprt &body)
   : univ_var(_univ_var),
     lower_bound(lower_bound),
     upper_bound(upper_bound),
