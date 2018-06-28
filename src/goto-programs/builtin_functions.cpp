@@ -324,8 +324,7 @@ void goto_convertt::do_input(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  codet input_code;
-  input_code.set_statement(ID_input);
+  codet input_code(ID_input);
   input_code.operands()=arguments;
   input_code.add_source_location()=function.source_location();
 
@@ -344,8 +343,7 @@ void goto_convertt::do_output(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  codet output_code;
-  output_code.set_statement(ID_output);
+  codet output_code(ID_output);
   output_code.operands()=arguments;
   output_code.add_source_location()=function.source_location();
 
@@ -605,8 +603,7 @@ void goto_convertt::do_array_op(
     throw 0;
   }
 
-  codet array_op_statement;
-  array_op_statement.set_statement(id);
+  codet array_op_statement(id);
   array_op_statement.operands()=arguments;
   array_op_statement.add_source_location()=function.source_location();
 
