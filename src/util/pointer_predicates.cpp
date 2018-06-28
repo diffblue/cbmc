@@ -70,7 +70,7 @@ exprt dynamic_size(const namespacet &ns)
 
 exprt dynamic_object(const exprt &pointer)
 {
-  exprt dynamic_expr(ID_dynamic_object, bool_typet());
+  exprt dynamic_expr(ID_is_dynamic_object, bool_typet());
   dynamic_expr.copy_to_operands(pointer);
   return dynamic_expr;
 }

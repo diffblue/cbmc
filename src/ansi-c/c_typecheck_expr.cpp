@@ -2165,11 +2165,10 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt dynamic_object_expr=exprt(ID_dynamic_object, expr.type());
-    dynamic_object_expr.operands()=expr.arguments();
-    dynamic_object_expr.add_source_location()=source_location;
+    exprt is_dynamic_object_expr = is_dynamic_object_exprt(expr.arguments()[0]);
+    is_dynamic_object_expr.add_source_location() = source_location;
 
-    return dynamic_object_expr;
+    return is_dynamic_object_expr;
   }
   else if(identifier==CPROVER_PREFIX "POINTER_OFFSET")
   {
