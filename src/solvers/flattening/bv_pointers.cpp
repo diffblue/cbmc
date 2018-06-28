@@ -45,7 +45,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       }
     }
   }
-  else if(expr.id()==ID_dynamic_object)
+  else if(expr.id()==ID_is_dynamic_object)
   {
     if(operands.size()==1 &&
        operands[0].type().id()==ID_pointer)
@@ -735,7 +735,7 @@ void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
 void bv_pointerst::do_postponed(
   const postponedt &postponed)
 {
-  if(postponed.expr.id()==ID_dynamic_object)
+  if(postponed.expr.id()==ID_is_dynamic_object)
   {
     const pointer_logict::objectst &objects=
       pointer_logic.objects;
