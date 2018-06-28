@@ -50,7 +50,7 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
     length_constraint_for_concat_substr(res, s1, s2, start_index, end_index));
 
   // Axiom 2.
-  constraints.push_back([&] { // NOLINT
+  constraints.push_back([&] {
     const symbol_exprt idx =
       fresh_univ_index("QA_index_concat", res.length().type());
     return string_constraintt(
@@ -58,7 +58,7 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
   }());
 
   // Axiom 3.
-  constraints.push_back([&] { // NOLINT
+  constraints.push_back([&] {
     const symbol_exprt idx2 =
       fresh_univ_index("QA_index_concat2", res.length().type());
     const equal_exprt res_eq(
