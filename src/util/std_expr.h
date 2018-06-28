@@ -2106,6 +2106,54 @@ inline void validate_expr(const dynamic_object_exprt &value)
 }
 
 
+/*! \brief Evaluates to true if the operand is a pointer to a dynamic object.
+*/
+class is_dynamic_object_exprt:public unary_predicate_exprt
+{
+public:
+  is_dynamic_object_exprt():unary_predicate_exprt(ID_is_dynamic_object)
+  {
+  }
+
+  explicit is_dynamic_object_exprt(const exprt &op):
+    unary_predicate_exprt(ID_is_dynamic_object, op)
+  {
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref is_dynamic_object_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * is_dynamic_object_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref is_dynamic_object_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const is_dynamic_object_exprt &to_is_dynamic_object_expr(
+  const exprt &expr)
+{
+  PRECONDITION(expr.id()==ID_is_dynamic_object);
+  DATA_INVARIANT(
+    expr.operands().size()==1,
+    "is_dynamic_object must have one operand");
+  return static_cast<const is_dynamic_object_exprt &>(expr);
+}
+
+/*! \copydoc to_is_dynamic_object_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline is_dynamic_object_exprt &to_is_dynamic_object_expr(exprt &expr)
+{
+  PRECONDITION(expr.id()==ID_is_dynamic_object);
+  DATA_INVARIANT(
+    expr.operands().size()==1,
+    "is_dynamic_object must have one operand");
+  return static_cast<is_dynamic_object_exprt &>(expr);
+}
+
+
 /*! \brief semantic type conversion
 */
 class typecast_exprt:public unary_exprt

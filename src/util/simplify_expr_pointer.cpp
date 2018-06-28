@@ -464,7 +464,7 @@ bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
     {
       if(op.operands().size()!=1 ||
          (op.op0().id()!=ID_symbol &&
-          op.op0().id()!=ID_dynamic_object &&
+          op.op0().id()!=ID_is_dynamic_object &&
           op.op0().id()!=ID_string_constant))
         return true;
     }
@@ -508,18 +508,18 @@ bool simplify_exprt::simplify_pointer_object(exprt &expr)
   return result;
 }
 
-bool simplify_exprt::simplify_dynamic_object(exprt &expr)
+bool simplify_exprt::simplify_is_dynamic_object(exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return true;
+  // This should hold as a result of the expr ID being is_dynamic_object.
+  PRECONDITION(expr.operands().size() == 1);
 
   exprt &op=expr.op0();
 
   if(op.id()==ID_if && op.operands().size()==3)
   {
     if_exprt if_expr=lift_if(expr, 0);
-    simplify_dynamic_object(if_expr.true_case());
-    simplify_dynamic_object(if_expr.false_case());
+    simplify_is_dynamic_object(if_expr.true_case());
+    simplify_is_dynamic_object(if_expr.false_case());
     simplify_if(if_expr);
     expr.swap(if_expr);
 
