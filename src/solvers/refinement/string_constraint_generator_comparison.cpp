@@ -39,28 +39,33 @@ exprt string_constraint_generatort::add_axioms_for_equals(
 
   typet index_type=s1.length().type();
 
+  // Axiom 1.
+  lemmas.push_back(implies_exprt(eq, equal_exprt(s1.length(), s2.length())));
 
-  implies_exprt a1(eq, equal_exprt(s1.length(), s2.length()));
-  lemmas.push_back(a1);
+  // Axiom 2.
+  constraints.push_back([&] {
+    const symbol_exprt qvar = fresh_univ_index("QA_equal", index_type);
+    return string_constraintt(
+      qvar,
+      zero_if_negative(s1.length()),
+      implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])));
+  }());
 
-  symbol_exprt qvar=fresh_univ_index("QA_equal", index_type);
-  string_constraintt a2(
-    qvar,
-    zero_if_negative(s1.length()),
-    implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])));
-  constraints.push_back(a2);
-
-  symbol_exprt witness=fresh_exist_index("witness_unequal", index_type);
-  exprt zero=from_integer(0, index_type);
-  and_exprt bound_witness(
-    binary_relation_exprt(witness, ID_lt, s1.length()),
-    binary_relation_exprt(witness, ID_ge, zero));
-  and_exprt witnessing(bound_witness, notequal_exprt(s1[witness], s2[witness]));
-  and_exprt diff_length(
-    notequal_exprt(s1.length(), s2.length()),
-    equal_exprt(witness, from_integer(-1, index_type)));
-  implies_exprt a3(not_exprt(eq), or_exprt(diff_length, witnessing));
-  lemmas.push_back(a3);
+  // Axiom 3.
+  lemmas.push_back([&] {
+    const symbol_exprt witness =
+      fresh_exist_index("witness_unequal", index_type);
+    const exprt zero = from_integer(0, index_type);
+    const and_exprt bound_witness(
+      binary_relation_exprt(witness, ID_lt, s1.length()),
+      binary_relation_exprt(witness, ID_ge, zero));
+    const and_exprt witnessing(
+      bound_witness, notequal_exprt(s1[witness], s2[witness]));
+    const and_exprt diff_length(
+      notequal_exprt(s1.length(), s2.length()),
+      equal_exprt(witness, from_integer(-1, index_type)));
+    return implies_exprt(not_exprt(eq), or_exprt(diff_length, witnessing));
+  }());
 
   return tc_eq;
 }
