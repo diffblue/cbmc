@@ -1669,16 +1669,23 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
         std::string inner_class_info_name =
           class_infot(pool_entry(inner_class_info_index))
             .get_name(pool_entry_lambda);
-        UNUSED bool is_private = inner_class_access_flags & ACC_PRIVATE;
-        UNUSED bool is_public = inner_class_access_flags & ACC_PUBLIC;
-        UNUSED bool is_protected = inner_class_access_flags & ACC_PROTECTED;
+        bool is_private = inner_class_access_flags & ACC_PRIVATE;
+        bool is_public = inner_class_access_flags & ACC_PUBLIC;
+        bool is_protected = inner_class_access_flags & ACC_PROTECTED;
 
         // If the original parsed class name matches the inner class name
         // the parsed class is an inner class, so overwrite the parsed class'
         // access information and mark it as an inner class
-        UNUSED bool is_inner_class =
+        bool is_inner_class =
           remove_separator_char(id2string(parsed_class.name), '.') ==
           remove_separator_char(inner_class_info_name, '/');
+        if(is_inner_class)
+        {
+          parsed_class.is_inner_class = is_inner_class;
+          parsed_class.is_private = is_private;
+          parsed_class.is_protected = is_protected;
+          parsed_class.is_public = is_public;
+        }
       }
     }
   }

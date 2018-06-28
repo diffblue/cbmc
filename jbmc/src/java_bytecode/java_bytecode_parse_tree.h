@@ -212,6 +212,7 @@ public:
     bool is_interface = false;
     bool is_synthetic = false;
     bool is_annotation = false;
+    bool is_inner_class = false;
     bool attribute_bootstrapmethods_read = false;
     size_t enum_elements=0;
 

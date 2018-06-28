@@ -674,6 +674,7 @@ IREP_ID_ONE(interface)
 IREP_ID_TWO(C_must_not_throw, #must_not_throw)
 IREP_ID_ONE(always_inline)
 IREP_ID_ONE(is_always_inline)
+IREP_ID_ONE(is_inner_class)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.h in their source tree and
