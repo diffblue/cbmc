@@ -32,7 +32,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \return An smt2_dect::solvert giving the solver to use.
 smt2_dect::solvert cbmc_solverst::get_smt2_solver_type() const
 {
-  assert(options.get_bool_option("smt2"));
+  // we shouldn't get here if this option isn't set
+  PRECONDITION(options.get_bool_option("smt2"));
 
   smt2_dect::solvert s=smt2_dect::solvert::GENERIC;
 
