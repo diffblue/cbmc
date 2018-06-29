@@ -67,7 +67,7 @@ void generate_class_stub(
   message_handlert &message_handler,
   const struct_union_typet::componentst &componentst)
 {
-  class_typet class_type;
+  java_class_typet class_type;
 
   class_type.set_tag(class_name);
   class_type.set(ID_base_name, class_name);
@@ -79,7 +79,7 @@ void generate_class_stub(
   new_symbol.base_name=class_name;
   new_symbol.pretty_name=class_name;
   new_symbol.name="java::"+id2string(class_name);
-  class_type.set(ID_name, new_symbol.name);
+  class_type.set_name(new_symbol.name);
   new_symbol.type=class_type;
   new_symbol.mode=ID_java;
   new_symbol.is_type=true;
