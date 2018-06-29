@@ -158,6 +158,20 @@ class java_class_typet:public class_typet
     return type_checked_cast<annotated_typet>(
       static_cast<typet &>(*this)).get_annotations();
   }
+
+  /// Get the name of the struct, which can be used to look up its symbol
+  /// in the symbol table.
+  const irep_idt &get_name() const
+  {
+    return get(ID_name);
+  }
+
+  /// Set the name of the struct, which can be used to look up its symbol
+  /// in the symbol table.
+  void set_name(const irep_idt &name)
+  {
+    set(ID_name, name);
+  }
 };
 
 inline const java_class_typet &to_java_class_type(const typet &type)
