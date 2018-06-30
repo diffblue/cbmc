@@ -32,11 +32,11 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    To compile JBMC, you additionally need the JDK and the java-models-library.
    For the JDK, on Debian-like distributions, do as root:
    ```
-   apt-get install openjdk-8-jdk
+   apt-get install unzip openjdk-8-jdk
    ```
    On Red Hat/Fedora or derivates, do as root:
    ```
-   dnf install java-1.8.0-openjdk-devel
+   dnf install unzip java-1.8.0-openjdk-devel
    ```
 
 2. As a user, get the CBMC source via
@@ -180,10 +180,15 @@ Follow these instructions:
       have to adjust the section in `src/common` that defines `CC` and `CXX`
       for BUILD_ENV = Cygwin.
       Then start the Cygwin shell.
-4. In the Cygwin shell, type
+4. To compile CMBC, open the Cygwin shell and type
    ```
    make -C src DOWNLOADER=wget minisat2-download
    make -C src
+   ```
+5. To compile JMBC, open the Cygwin shell and type
+   ```
+   make -C jbmc/src java-models-library-download
+   make -C jbmc/src
    ```
 
 (Optional) A Visual Studio project file can be generated with the script
