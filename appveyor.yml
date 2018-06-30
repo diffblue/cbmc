@@ -84,7 +84,6 @@ test_script:
     rmdir /s /q jbmc\VarLengthArrayTrace1
     rmdir /s /q jbmc\classpath1
     rmdir /s /q jbmc\jar-file3
-    rmdir /s /q jbmc\tableswitch2
     cd ../..
 
     make -C jbmc/regression test BUILD_ENV=MSVC

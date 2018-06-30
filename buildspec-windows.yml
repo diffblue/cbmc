@@ -20,7 +20,7 @@ phases:
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
         cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C jbmc/src setup-submodules" && bash -c "make -j4 -C jbmc/src BUILD_ENV=MSVC" '
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C jbmc/unit all BUILD_ENV=MSVC ; exit 0" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C jbmc/unit all BUILD_ENV=MSVC" '
 
   post_build:
     commands:
@@ -45,6 +45,11 @@ phases:
         Remove-Item goto-instrument\slice08 -Force -Recurse
         Remove-Item goto-analyzer/constant_propagation_nondet_rounding_mode -Force -Recurse
         cd ..
+        cd jbmc/regression
+        Remove-Item jbmc\VarLengthArrayTrace1 -Force -Recurse
+        Remove-Item jbmc\classpath1 -Force -Recurse
+        Remove-Item jbmc\jar-file3 -Force -Recurse
+        cd ../..
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
@@ -56,11 +61,11 @@ phases:
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C jbmc/regression test BUILD_ENV=MSVC ; exit 0" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C jbmc/regression test BUILD_ENV=MSVC" '
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C jbmc/unit test BUILD_ENV=MSVC ; exit 0" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C jbmc/unit test BUILD_ENV=MSVC" '
 
 artifacts:
   files:
