@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
-#include <util/throw_with_nested.h>
 
 #include <solvers/lowering/expr_lowering.h>
 #include <solvers/lowering/flatten_byte_extract_exceptions.h>
@@ -47,10 +46,10 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
     {
       return convert_bv(flatten_byte_extract(expr, ns));
     }
-    catch(const flatten_byte_extract_exceptiont &)
+    catch(const flatten_byte_extract_exceptiont &e)
     {
-      util_throw_with_nested(
-        bitvector_conversion_exceptiont("Can't convert byte_extraction", expr));
+      warning() << e.what() << eom;
+      return conversion_failed(expr);
     }
   }
 
