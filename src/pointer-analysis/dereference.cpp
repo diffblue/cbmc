@@ -256,9 +256,10 @@ exprt dereferencet::dereference_plus(
   if(size.is_nil())
     throw "dereference failed to get object size for pointer arithmetic";
 
-  // make types of offset and size match
-  if(size.type()!=integer.type())
-    integer.make_typecast(size.type());
+  // we use the type of 'offset' as common ground,
+  // which is usually index_type()
+  size = typecast_exprt::conditional_cast(size, offset.type());
+  integer = typecast_exprt::conditional_cast(integer, offset.type());
 
   const plus_exprt new_offset(offset, mult_exprt(size, integer));
 
