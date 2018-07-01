@@ -36,10 +36,11 @@ class dstringt final
 {
 public:
   // this is safe for static objects
-  #ifdef __GNUC__
+#ifdef __GNUC__
   constexpr
-  #endif
-  dstringt():no(0)
+#endif
+    dstringt() noexcept
+    : no(0)
   {
   }
 

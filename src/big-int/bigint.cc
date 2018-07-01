@@ -464,8 +464,7 @@ BigInt::BigInt (BigInt const &y)
   memcpy (digit, y.digit, length * sizeof (onedig_t));
 }
 
-BigInt::BigInt (BigInt &&y)
-  : BigInt()
+BigInt::BigInt(BigInt &&y) noexcept : BigInt()
 {
   swap(y);
 }
