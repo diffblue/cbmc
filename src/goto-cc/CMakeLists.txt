@@ -34,5 +34,3 @@ else()
     COMMAND "${CMAKE_COMMAND}" -E create_symlink
       goto-cc $<TARGET_FILE_DIR:goto-cc>/goto-gcc)
 endif()
-
-git_revision(goto-cc-lib)

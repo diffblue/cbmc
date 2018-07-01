@@ -23,14 +23,14 @@ Author: Michael Tautschnig
 #include <iostream>
 #include <cstring>
 
+#include <util/config.h>
+#include <util/cout_message.h>
+#include <util/get_base_name.h>
 #include <util/run.h>
 #include <util/tempdir.h>
-#include <util/config.h>
-#include <util/get_base_name.h>
-#include <util/cout_message.h>
+#include <util/version.h>
 
 #include "compile.h"
-#include "version.h"
 
 static std::string assembler_name(
   const cmdlinet &cmdline,

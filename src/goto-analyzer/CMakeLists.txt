@@ -26,5 +26,3 @@ add_if_library(goto-analyzer-lib jsil)
 # Executable
 add_executable(goto-analyzer goto_analyzer_main.cpp)
 target_link_libraries(goto-analyzer goto-analyzer-lib)
-
-git_revision(goto-analyzer-lib)

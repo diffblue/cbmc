@@ -63,8 +63,6 @@ CLEANFILES = cbmc$(EXEEXT)
 
 all: cbmc$(EXEEXT)
 
-cbmc_solvers$(OBJEXT): $(GIT_INFO_FILE)
-
 ifneq ($(wildcard ../bv_refinement/Makefile),)
   OBJ += ../bv_refinement/bv_refinement$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_BV_REFINEMENT

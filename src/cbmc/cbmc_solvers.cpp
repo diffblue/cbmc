@@ -15,8 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <memory>
 
-#include <util/unicode.h>
 #include <util/make_unique.h>
+#include <util/unicode.h>
+#include <util/version.h>
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/bv_refinement.h>
@@ -28,7 +29,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bv_cbmc.h"
 #include "cbmc_dimacs.h"
 #include "counterexample_beautification.h"
-#include "version.h"
 
 /// Uses the options to pick an SMT 2.0 solver
 /// \return An smt2_dect::solvert giving the solver to use.

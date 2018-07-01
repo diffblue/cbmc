@@ -49,14 +49,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exit_codes.h>
 #include <util/options.h>
 #include <util/unicode.h>
+#include <util/version.h>
 
 #include <goto-analyzer/static_show_domain.h>
 #include <goto-analyzer/static_simplifier.h>
 #include <goto-analyzer/static_verifier.h>
 #include <goto-analyzer/taint_analysis.h>
 #include <goto-analyzer/unreachable_instructions.h>
-
-#include "version.h"
 
 janalyzer_parse_optionst::janalyzer_parse_optionst(int argc, const char **argv)
   : parse_options_baset(JANALYZER_OPTIONS, argc, argv),

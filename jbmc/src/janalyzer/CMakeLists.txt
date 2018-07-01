@@ -24,5 +24,3 @@ target_link_libraries(janalyzer-lib
 # Executable
 add_executable(janalyzer janalyzer_main.cpp)
 target_link_libraries(janalyzer janalyzer-lib)
-
-git_revision(janalyzer-lib)

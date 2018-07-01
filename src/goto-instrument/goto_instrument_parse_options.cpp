@@ -16,10 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/config.h>
+#include <util/exit_codes.h>
+#include <util/json.h>
 #include <util/string2int.h>
 #include <util/unicode.h>
-#include <util/json.h>
-#include <util/exit_codes.h>
+#include <util/version.h>
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_convert_functions.h>
@@ -99,7 +100,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "undefined_functions.h"
 #include "remove_function.h"
 #include "splice_call.h"
-#include "version.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()

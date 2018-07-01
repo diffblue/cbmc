@@ -227,29 +227,12 @@ OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))
 %.obj:%.c
 	$(CC) $(CP_CFLAGS) /nologo /c /EHsc $< /Fo$@
 
-# get version from git
-GIT_INFO = $(shell git describe --tags --always --dirty || echo "n/a")
-RELEASE_INFO = \#define CBMC_VERSION "$(CBMC_VERSION) ($(GIT_INFO))"
-GIT_INFO_FILE = version.h
-
-$(GIT_INFO_FILE):
-	echo '$(RELEASE_INFO)' > $@
-
-$(filter %_parse_options$(OBJEXT), $(OBJ)): $(GIT_INFO_FILE)
-
-# mark the actually generated file as a phony target to enforce a rebuild - but
-# only of the version information has changed!
-KNOWN_RELEASE_INFO = $(shell cat $(GIT_INFO_FILE) 2>/dev/null)
-ifneq ($(RELEASE_INFO), $(KNOWN_RELEASE_INFO))
-.PHONY: $(GIT_INFO_FILE)
-endif
-
 clean:
 	$(RM) $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC))) \
 		$(patsubst %.cpp, %$(DEPEXT), $(filter %.cpp, $(SRC))) \
 		$(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC))) \
 		$(patsubst %.cc, %$(DEPEXT), $(filter %.cc, $(SRC))) \
-		$(CLEANFILES) $(GIT_INFO_FILE)
+		$(CLEANFILES)
 
 .PHONY: first_target clean all
 .PHONY: sources generated_files
