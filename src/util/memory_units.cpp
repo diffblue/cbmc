@@ -80,7 +80,7 @@ std::string memory_sizet::to_string() const
     {
       out << ' ';
     }
-    out << kib << si_kibitye_symbol;
+    out << kib << si_kibibyte_symbol;
   }
   if(gib > 0 || mib > 0 || kib > 0)
   {
@@ -91,7 +91,7 @@ std::string memory_sizet::to_string() const
 }
 
 const char *memory_sizet::si_byte_symbol = "B";
-const char *memory_sizet::si_kibitye_symbol = "KiB";
+const char *memory_sizet::si_kibibyte_symbol = "KiB";
 const char *memory_sizet::si_mebibyte_symbol = "MiB";
 const char *memory_sizet::si_gibibyte_symbol = "GiB";
 

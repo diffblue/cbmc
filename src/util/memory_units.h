@@ -25,7 +25,7 @@ struct memory_sizet
   std::string to_string() const;
 
   static const char *si_byte_symbol;
-  static const char *si_kibitye_symbol;
+  static const char *si_kibibyte_symbol;
   static const char *si_mebibyte_symbol;
   static const char *si_gibibyte_symbol;
 
