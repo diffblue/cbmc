@@ -1588,7 +1588,8 @@ void java_bytecode_parsert::relement_value_pair(
 /// in its inner class array. If the parsed class is not an inner class, then it
 /// is ignored. When a parsed class is an inner class, the accessibility
 /// information for the parsed class is overwritten, and the parsed class is
-/// marked as an inner class.
+/// marked as an inner class. Note that is outer_class_info_index == 0, the
+/// inner class is an anonymous or local class, and is treated as private.
 void java_bytecode_parsert::rinner_classes_attribute(
   classt &parsed_class,
   const u4 &attribute_length)
@@ -1631,7 +1632,17 @@ void java_bytecode_parsert::rinner_classes_attribute(
     parsed_class.is_inner_class =
       remove_separator_char(id2string(parsed_class.name), '.') ==
       remove_separator_char(inner_class_info_name, '/');
-    if(parsed_class.is_inner_class)
+    if(!parsed_class.is_inner_class)
+      continue;
+    if(outer_class_info_index == 0)
+    {
+      // This is a marker for an anonymous or local class
+      // which are treated as private
+      parsed_class.is_private = true;
+      parsed_class.is_protected = false;
+      parsed_class.is_public = false;
+    }
+    else
     {
       parsed_class.is_private = is_private;
       parsed_class.is_protected = is_protected;
