@@ -393,7 +393,7 @@ void java_bytecode_convert_classt::convert(
   new_symbol.base_name = base_name;
   new_symbol.pretty_name=c.name;
   new_symbol.name=qualified_classname;
-  class_type.set(ID_name, new_symbol.name);
+  class_type.set_name(new_symbol.name);
   new_symbol.type=class_type;
   new_symbol.mode=ID_java;
   new_symbol.is_type=true;
@@ -716,7 +716,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     if(symbol_table.has_symbol(symbol_type_identifier))
       return;
 
-    class_typet class_type;
+    java_class_typet class_type;
     // we have the base class, java.lang.Object, length and data
     // of appropriate type
     class_type.set_tag(symbol_type_identifier);
@@ -724,7 +724,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     // tag, and their name is "java::" + their tag. Since arrays do have
     // "java::" at the beginning of their tag we set the name to be the same as
     // the tag.
-    class_type.set(ID_name, symbol_type_identifier);
+    class_type.set_name(symbol_type_identifier);
 
     class_type.components().reserve(3);
     class_typet::componentt base_class_component(

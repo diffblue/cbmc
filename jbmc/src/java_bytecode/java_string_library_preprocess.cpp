@@ -222,6 +222,7 @@ void java_string_library_preprocesst::add_string_type(
 {
   java_class_typet string_type;
   string_type.set_tag(class_name);
+  string_type.set_name("java::" + id2string(class_name));
   string_type.components().resize(3);
   string_type.components()[0].set_name("@java.lang.Object");
   string_type.components()[0].set_pretty_name("@java.lang.Object");
