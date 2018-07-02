@@ -68,13 +68,13 @@ public:
 
     prop_convt &prop_conv() const
     {
-      PRECONDITION(prop_conv_ptr!=nullptr);
+      PRECONDITION(prop_conv_ptr != nullptr);
       return *prop_conv_ptr;
     }
 
     propt &prop() const
     {
-      PRECONDITION(prop_ptr!=nullptr);
+      PRECONDITION(prop_ptr != nullptr);
       return *prop_ptr;
     }
 

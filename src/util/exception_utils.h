@@ -13,8 +13,12 @@ Author: Fotis Koutoulakis, fotis.koutoulakis@diffblue.com
 
 class invalid_user_input_exceptiont
 {
+  /// The reason this exception was generated.
   std::string reason;
+  /// The full command line option (not the argument) that got
+  /// erroneous input.
   std::string option;
+  /// In case we have samples of correct input to the option.
   std::string correct_input;
 
 public:
