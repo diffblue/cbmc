@@ -257,8 +257,9 @@ public:
   leaft *place_leaf(const keyT &k, const valueT &v)
   {
     SN_ASSERT(is_container());
-
-    SN_ASSERT(as_const(this)->find_leaf(k) == nullptr);
+    // we need to check empty() first as the const version of find_leaf() must
+    // not be called on an empty node
+    SN_ASSERT(empty() || as_const(this)->find_leaf(k) == nullptr);
 
     leaf_listt &c = get_container();
     c.push_front(leaft(k, v));
