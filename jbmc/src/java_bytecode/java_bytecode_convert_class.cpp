@@ -118,7 +118,15 @@ private:
   // see definition below for more info
   static void add_array_types(symbol_tablet &symbol_table);
 
-  static bool is_overlay_method(const methodt &method);
+  static bool is_overlay_method(const methodt &method)
+  {
+    return method.has_annotation(ID_overlay_method);
+  }
+
+  static bool is_ignored_method(const methodt &method)
+  {
+    return method.has_annotation(ID_ignored_method);
+  }
 
   bool check_field_exists(
     const fieldt &field,
@@ -455,6 +463,8 @@ void java_bytecode_convert_classt::convert(
   {
     for(const methodt &method : overlay_class.get().methods)
     {
+      if(is_ignored_method(method))
+        continue;
       const irep_idt method_identifier =
         qualified_classname + "." + id2string(method.name)
           + ":" + method.descriptor;
@@ -496,6 +506,8 @@ void java_bytecode_convert_classt::convert(
   }
   for(const methodt &method : c.methods)
   {
+    if(is_ignored_method(method))
+      continue;
     const irep_idt method_identifier=
       qualified_classname + "." + id2string(method.name)
         + ":" + method.descriptor;
@@ -875,13 +887,6 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     clone_symbol.mode=ID_java;
     symbol_table.add(clone_symbol);
   }
-}
-
-bool java_bytecode_convert_classt::is_overlay_method(const methodt &method)
-{
-  return java_bytecode_parse_treet::find_annotation(
-           method.annotations, ID_overlay_method)
-    .has_value();
 }
 
 bool java_bytecode_convert_class(
