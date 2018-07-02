@@ -46,6 +46,7 @@ SRC = allocate_objects.cpp \
       mathematical_expr.cpp \
       mathematical_types.cpp \
       memory_info.cpp \
+      memory_units.cpp \
       merge_irep.cpp \
       message.cpp \
       mp_arith.cpp \
