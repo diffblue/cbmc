@@ -181,7 +181,15 @@ public:
       return &**this;
     }
 
-    symbolt &get_writeable_symbol(const irep_idt &identifier)
+    /// Whereas the dereference operator gives a constant reference to the
+    /// current symbol, this method allows users to get a writeable reference
+    /// to the symbol
+    /// \remarks
+    /// This method calls the on_get_writeable method first to give derived
+    /// symbol table classes the opportunity to note that this symbol is being
+    /// written to before it is accessed.
+    /// \returns a non-const reference to the current symbol
+    symbolt &get_writeable_symbol()
     {
       if(on_get_writeable)
         on_get_writeable((*this)->first);
