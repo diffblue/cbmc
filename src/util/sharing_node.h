@@ -129,6 +129,8 @@ public:
 
   bool shares_with(const sharing_node_innert &other) const
   {
+    SN_ASSERT(data && other.data);
+
     return data == other.data;
   }
 
@@ -151,8 +153,6 @@ public:
 
   d_it &write_internal()
   {
-    SN_ASSERT(data.use_count() > 0);
-
     if(data == empty_data)
     {
       data = make_shared_derived_u<SN_PTR_TYPE_ARGS>();
@@ -176,8 +176,6 @@ public:
 
   d_ct &write_container()
   {
-    SN_ASSERT(data.use_count() > 0);
-
     if(data == empty_data)
     {
       data = make_shared_derived_v<SN_PTR_TYPE_ARGS>();
