@@ -6,11 +6,12 @@ Author: Daniel Poetzl
 
 \*******************************************************************/
 
-#define SHARING_MAP_INTERNAL_CHECKS
-#define SHARING_NODE_INTERNAL_CHECKS
+#define SM_INTERNAL_CHECKS
+#define SN_INTERNAL_CHECKS
 
 #include <climits>
 #include <random>
+#include <set>
 
 #include <testing-utils/catch.hpp>
 #include <util/sharing_map.h>
