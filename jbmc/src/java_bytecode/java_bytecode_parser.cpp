@@ -119,6 +119,8 @@ protected:
   void rfields(classt &parsed_class);
   void rmethods(classt &parsed_class);
   void rmethod(classt &parsed_class);
+  void
+  rinner_classes_attribute(classt &parsed_class, const u4 &attribute_length);
   void rclass_attribute(classt &parsed_class);
   void rRuntimeAnnotation_attribute(annotationst &);
   void rRuntimeAnnotation(annotationt &);
@@ -1576,6 +1578,68 @@ void java_bytecode_parsert::relement_value_pair(
   }
 }
 
+/// Corresponds to the element_value structure
+/// Described in Java 8 specification 4.7.6
+/// https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.6
+/// Parses the bytes of the InnerClasses attribute for the current parsed class,
+/// which contains any array of information about inner classes. We are
+/// interested in getting information only for inner classes, which is
+/// determined by checking if the parsed class matches any of the inner classes
+/// in its inner class array. If the parsed class is not an inner class, then it
+/// is ignored. When a parsed class is an inner class, the accessibility
+/// information for the parsed class is overwritten, and the parsed class is
+/// marked as an inner class.
+void java_bytecode_parsert::rinner_classes_attribute(
+  classt &parsed_class,
+  const u4 &attribute_length)
+{
+  u2 number_of_classes = read_u2();
+  u4 number_of_bytes_to_be_read = number_of_classes * 8 + 2;
+  INVARIANT(
+    number_of_bytes_to_be_read == attribute_length,
+    "The number of bytes to be read for the InnerClasses attribute does not "
+    "match the attribute length.");
+
+  const auto pool_entry_lambda = [this](u2 index) -> pool_entryt & {
+    return pool_entry(index);
+  };
+  const auto remove_separator_char = [](std::string str, char ch) {
+    str.erase(std::remove(str.begin(), str.end(), ch), str.end());
+    return str;
+  };
+
+  for(int i = 0; i < number_of_classes; i++)
+  {
+    u2 inner_class_info_index = read_u2();
+    UNUSED u2 outer_class_info_index = read_u2();
+    UNUSED u2 inner_name_index = read_u2();
+    u2 inner_class_access_flags = read_u2();
+
+    if(inner_class_info_index == 0)
+      continue;
+
+    std::string inner_class_info_name =
+      class_infot(pool_entry(inner_class_info_index))
+        .get_name(pool_entry_lambda);
+    bool is_private = inner_class_access_flags & ACC_PRIVATE;
+    bool is_public = inner_class_access_flags & ACC_PUBLIC;
+    bool is_protected = inner_class_access_flags & ACC_PROTECTED;
+
+    // If the original parsed class name matches the inner class name,
+    // the parsed class is an inner class, so overwrite the parsed class'
+    // access information and mark it as an inner class
+    parsed_class.is_inner_class =
+      remove_separator_char(id2string(parsed_class.name), '.') ==
+      remove_separator_char(inner_class_info_name, '/');
+    if(parsed_class.is_inner_class)
+    {
+      parsed_class.is_private = is_private;
+      parsed_class.is_protected = is_protected;
+      parsed_class.is_public = is_public;
+    }
+  }
+}
+
 void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
 {
   u2 attribute_name_index=read_u2();
@@ -1642,52 +1706,8 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
   }
   else if(attribute_name == "InnerClasses")
   {
-    u2 number_of_classes = read_u2();
-    u4 number_of_bytes_to_be_read = number_of_classes * 8 + 2;
-    INVARIANT(
-      number_of_bytes_to_be_read == attribute_length,
-      "The number of bytes to be read for the InnerClasses attribute does not "
-      "match the attribute length.");
-
-    const std::function<pool_entryt &(u2)> pool_entry_lambda =
-      [this](u2 index) -> pool_entryt & { return pool_entry(index); };
-    std::function<std::string(std::string, char)> remove_separator_char =
-      [](std::string str, char ch) {
-        str.erase(std::remove(str.begin(), str.end(), ch), str.end());
-        return str;
-      };
-
-    for(int i = 0; i < number_of_classes; i++)
-    {
-      u2 inner_class_info_index = read_u2();
-      UNUSED u2 outer_class_info_index = read_u2();
-      UNUSED u2 inner_name_index = read_u2();
-      u2 inner_class_access_flags = read_u2();
-
-      if(inner_class_info_index != 0)
-      {
-        std::string inner_class_info_name =
-          class_infot(pool_entry(inner_class_info_index))
-            .get_name(pool_entry_lambda);
-        bool is_private = inner_class_access_flags & ACC_PRIVATE;
-        bool is_public = inner_class_access_flags & ACC_PUBLIC;
-        bool is_protected = inner_class_access_flags & ACC_PROTECTED;
-
-        // If the original parsed class name matches the inner class name
-        // the parsed class is an inner class, so overwrite the parsed class'
-        // access information and mark it as an inner class
-        bool is_inner_class =
-          remove_separator_char(id2string(parsed_class.name), '.') ==
-          remove_separator_char(inner_class_info_name, '/');
-        if(is_inner_class)
-        {
-          parsed_class.is_inner_class = is_inner_class;
-          parsed_class.is_private = is_private;
-          parsed_class.is_protected = is_protected;
-          parsed_class.is_public = is_public;
-        }
-      }
-    }
+    java_bytecode_parsert::rinner_classes_attribute(
+      parsed_class, attribute_length);
   }
   else
     skip_bytes(attribute_length);
