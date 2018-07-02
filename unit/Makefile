@@ -9,6 +9,7 @@ SRC = unit_tests.cpp \
 SRC += unit_tests.cpp \
        analyses/ai/ai_simplify_lhs.cpp \
        analyses/call_graph.cpp \
+       analyses/constant_propagator.cpp \
        analyses/disconnect_unreachable_nodes_in_graph.cpp \
        analyses/does_remove_const/does_expr_lose_const.cpp \
        analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
