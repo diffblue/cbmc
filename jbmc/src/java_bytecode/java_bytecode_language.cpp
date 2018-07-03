@@ -846,7 +846,7 @@ const select_pointer_typet &
 void java_bytecode_languaget::methods_provided(
   std::unordered_set<irep_idt> &methods) const
 {
-  static std::string cprover_class_prefix = "java::org.cprover.CProver.";
+  const std::string cprover_class_prefix = "java::org.cprover.CProver.";
 
   // Add all string solver methods to map
   string_preprocess.get_all_function_names(methods);

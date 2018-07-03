@@ -58,8 +58,8 @@ std::string type2java(const typet &type, const namespacet &ns);
 template <typename float_type>
 std::string floating_point_to_java_string(float_type value)
 {
-  static const bool is_float = std::is_same<float_type, float>::value;
-  static const std::string class_name = is_float ? "Float" : "Double";
+  const bool is_float = std::is_same<float_type, float>::value;
+  const std::string class_name = is_float ? "Float" : "Double";
   if(std::isnan(value))
     return class_name + ".NaN";
   if(std::isinf(value) && value >= 0.)
