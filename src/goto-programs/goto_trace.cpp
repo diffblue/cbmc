@@ -524,8 +524,9 @@ void show_full_goto_trace(
     case goto_trace_stept::typet::ASSUME:
       if(!step.cond_value)
       {
-        out << '\n';
-        out << "Violated assumption:" << '\n';
+        out << "\n";
+        out << "Assumption:\n";
+
         if(!step.pc->source_location.is_nil())
           out << "  " << step.pc->source_location << '\n';
 
