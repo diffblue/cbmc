@@ -103,10 +103,50 @@ void goto_trace_stept::output(
 
   out << '\n';
 }
+/// Returns the numeric representation of an expression, based on
+/// options. The default is binary without a base-prefix. Setting
+/// options.hex_representation to be true outputs hex format. Setting
+/// options.base_prefix to be true appends either 0b or 0x to the number
+/// to indicate the base
+/// \param expr: expression to get numeric representation from
+/// \param options: configuration options
+/// \return a string with the numeric representation
+static std::string
+numeric_representation(const exprt &expr, const trace_optionst &options)
+{
+  std::string result;
+  std::string prefix;
+  if(options.hex_representation)
+  {
+    mp_integer value_int =
+      binary2integer(id2string(to_constant_expr(expr).get_value()), false);
+    result = integer2string(value_int, 16);
+    prefix = "0x";
+  }
+  else
+  {
+    prefix = "0b";
+    result = expr.get_string(ID_value);
+  }
 
-std::string trace_value_binary(
+  std::ostringstream oss;
+  std::string::size_type i = 0;
+  for(const auto c : result)
+  {
+    oss << c;
+    if(++i % 8 == 0 && result.size() != i)
+      oss << ' ';
+  }
+  if(options.base_prefix)
+    return prefix + oss.str();
+  else
+    return oss.str();
+}
+
+std::string trace_numeric_value(
   const exprt &expr,
-  const namespacet &ns)
+  const namespacet &ns,
+  const trace_optionst &options)
 {
   const typet &type=ns.follow(expr.type());
 
@@ -123,18 +163,8 @@ std::string trace_value_binary(
        type.id()==ID_c_enum ||
        type.id()==ID_c_enum_tag)
     {
-      const std::string & str = expr.get_string(ID_value);
-
-      std::ostringstream oss;
-      std::string::size_type i = 0;
-      for(const auto c : str)
-      {
-        oss << c;
-        if(++i % 8 == 0 && str.size() != i)
-          oss << ' ';
-      }
-
-      return oss.str();
+      const std::string &str = numeric_representation(expr, options);
+      return str;
     }
     else if(type.id()==ID_bool)
     {
@@ -157,7 +187,7 @@ std::string trace_value_binary(
         result="{ ";
       else
         result+=", ";
-      result+=trace_value_binary(*it, ns);
+      result+=trace_numeric_value(*it, ns, options);
     }
 
     return result+" }";
@@ -170,15 +200,15 @@ std::string trace_value_binary(
     {
       if(it!=expr.operands().begin())
         result+=", ";
-      result+=trace_value_binary(*it, ns);
+      result+=trace_numeric_value(*it, ns, options);
     }
 
     return result+" }";
   }
   else if(expr.id()==ID_union)
   {
-    assert(expr.operands().size()==1);
-    return trace_value_binary(expr.op0(), ns);
+    PRECONDITION(expr.operands().size()==1);
+    return trace_numeric_value(expr.op0(), ns, options);
   }
 
   return "?";
@@ -189,7 +219,8 @@ void trace_value(
   const namespacet &ns,
   const ssa_exprt &lhs_object,
   const exprt &full_lhs,
-  const exprt &value)
+  const exprt &value,
+  const trace_optionst &options)
 {
   irep_idt identifier;
 
@@ -205,7 +236,7 @@ void trace_value(
     value_string=from_expr(ns, identifier, value);
 
     // the binary representation
-    value_string+=" ("+trace_value_binary(value, ns)+")";
+    value_string += " (" + trace_numeric_value(value, ns, options) + ")";
   }
 
   out << "  "
@@ -247,7 +278,8 @@ bool is_index_member_symbol(const exprt &src)
 void show_goto_trace(
   std::ostream &out,
   const namespacet &ns,
-  const goto_tracet &goto_trace)
+  const goto_tracet &goto_trace,
+  const trace_optionst &options)
 {
   unsigned prev_step_nr=0;
   bool first_step=true;
@@ -315,10 +347,20 @@ void show_goto_trace(
         // see if the full lhs is something clean
         if(is_index_member_symbol(step.full_lhs))
           trace_value(
-            out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
+            out,
+            ns,
+            step.lhs_object,
+            step.full_lhs,
+            step.full_lhs_value,
+            options);
         else
           trace_value(
-            out, ns, step.lhs_object, step.lhs_object, step.lhs_object_value);
+            out,
+            ns,
+            step.lhs_object,
+            step.lhs_object,
+            step.lhs_object_value,
+            options);
       }
       break;
 
@@ -330,7 +372,8 @@ void show_goto_trace(
         show_state_header(out, step, step.pc->source_location, step.step_nr);
       }
 
-      trace_value(out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
+      trace_value(
+        out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value, options);
       break;
 
     case goto_trace_stept::typet::OUTPUT:
@@ -356,7 +399,7 @@ void show_goto_trace(
           out << " " << from_expr(ns, step.pc->function, *l_it);
 
           // the binary representation
-          out << " (" << trace_value_binary(*l_it, ns) << ")";
+          out << " (" << trace_numeric_value(*l_it, ns, options) << ")";
         }
 
         out << "\n";
@@ -377,7 +420,7 @@ void show_goto_trace(
         out << " " << from_expr(ns, step.pc->function, *l_it);
 
         // the binary representation
-        out << " (" << trace_value_binary(*l_it, ns) << ")";
+        out << " (" << trace_numeric_value(*l_it, ns, options) << ")";
       }
 
       out << "\n";
@@ -401,5 +444,12 @@ void show_goto_trace(
   }
 }
 
+void show_goto_trace(
+  std::ostream &out,
+  const namespacet &ns,
+  const goto_tracet &goto_trace)
+{
+  show_goto_trace(out, ns, goto_trace, trace_optionst::default_options);
+}
 
 const trace_optionst trace_optionst::default_options = trace_optionst();
