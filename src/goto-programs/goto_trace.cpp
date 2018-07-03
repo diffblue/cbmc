@@ -247,20 +247,30 @@ void trace_value(
 
 void show_state_header(
   std::ostream &out,
+  const namespacet &ns,
   const goto_trace_stept &state,
   const source_locationt &source_location,
-  unsigned step_nr)
+  unsigned step_nr,
+  const trace_optionst &options)
 {
   out << "\n";
 
-  if(step_nr==0)
+  if(step_nr == 0)
     out << "Initial State";
   else
     out << "State " << step_nr;
 
-  out << " " << source_location
-      << " thread " << state.thread_nr << "\n";
-  out << "----------------------------------------------------" << "\n";
+  out << " " << source_location << " thread " << state.thread_nr << "\n";
+  out << "----------------------------------------------------"
+      << "\n";
+
+  if(options.show_code)
+  {
+    out << as_string(ns, *state.pc)
+        << "\n";
+    out << "----------------------------------------------------"
+        << "\n";
+  }
 }
 
 bool is_index_member_symbol(const exprt &src)
@@ -342,7 +352,8 @@ void show_goto_trace(
         {
           first_step=false;
           prev_step_nr=step.step_nr;
-          show_state_header(out, step, step.pc->source_location, step.step_nr);
+          show_state_header(
+            out, ns, step, step.pc->source_location, step.step_nr, options);
         }
 
         // see if the full lhs is something clean
@@ -370,7 +381,8 @@ void show_goto_trace(
       {
         first_step=false;
         prev_step_nr=step.step_nr;
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
+        show_state_header(
+          out, ns, step, step.pc->source_location, step.step_nr, options);
       }
 
       trace_value(
@@ -387,7 +399,8 @@ void show_goto_trace(
       }
       else
       {
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
+        show_state_header(
+          out, ns, step, step.pc->source_location, step.step_nr, options);
         out << "  OUTPUT " << step.io_id << ":";
 
         for(std::list<exprt>::const_iterator
@@ -408,7 +421,8 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::INPUT:
-      show_state_header(out, step, step.pc->source_location, step.step_nr);
+      show_state_header(
+        out, ns, step, step.pc->source_location, step.step_nr, options);
       out << "  INPUT " << step.io_id << ":";
 
       for(std::list<exprt>::const_iterator
