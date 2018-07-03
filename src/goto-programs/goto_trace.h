@@ -195,10 +195,40 @@ public:
   }
 };
 
+struct trace_optionst
+{
+  bool json_full_lhs;
+  bool hex_representation;
+  bool base_prefix;
+
+  static const trace_optionst default_options;
+
+  explicit trace_optionst(const optionst &options)
+  {
+    json_full_lhs = options.get_bool_option("trace-json-extended");
+    hex_representation = options.get_bool_option("trace-hex");
+    base_prefix = hex_representation;
+  };
+
+private:
+  trace_optionst()
+  {
+    json_full_lhs = false;
+    hex_representation = false;
+    base_prefix = false;
+  };
+};
+
 void show_goto_trace(
   std::ostream &out,
   const namespacet &,
   const goto_tracet &);
+
+void show_goto_trace(
+  std::ostream &out,
+  const namespacet &,
+  const goto_tracet &,
+  const trace_optionst &);
 
 void trace_value(
   std::ostream &out,
@@ -208,32 +238,18 @@ void trace_value(
   const exprt &value);
 
 
-struct trace_optionst
-{
-  bool json_full_lhs;
-
-  static const trace_optionst default_options;
-
-  explicit trace_optionst(const optionst &options)
-  {
-    json_full_lhs = options.get_bool_option("trace-json-extended");
-  };
-
-private:
-  trace_optionst()
-  {
-    json_full_lhs = false;
-  };
-};
-
-#define OPT_GOTO_TRACE "(trace-json-extended)"
+#define OPT_GOTO_TRACE "(trace-json-extended)" \
+                       "(trace-hex)"
 
 #define HELP_GOTO_TRACE                                                        \
-  " --trace-json-extended        add rawLhs property to trace\n"
+  " --trace-json-extended        add rawLhs property to trace\n"              \
+  " --trace-hex                  represent plain trace values in hex\n"
 
 #define PARSE_OPTIONS_GOTO_TRACE(cmdline, options)                             \
   if(cmdline.isset("trace-json-extended"))                                     \
-    options.set_option("trace-json-extended", true);
+    options.set_option("trace-json-extended", true);                           \
+  if(cmdline.isset("trace-hex"))                                               \
+    options.set_option("trace-hex", true);
 
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H
