@@ -46,7 +46,7 @@ bool splice_call(
   std::vector<std::string> caller_callee;
   if(parse_caller_callee(callercallee, caller_callee))
   {
-    message.error() << "Expecting two function names seperated by a comma"
+    message.error() << "Expecting two function names separated by a comma"
                     << messaget::eom;
     return true;
   }
