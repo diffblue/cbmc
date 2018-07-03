@@ -168,50 +168,48 @@ java_class_loadert::get_parse_tree(
     }
   }
 
-  if(!parse_trees.empty())
+  auto parse_tree_it = parse_trees.begin();
+  // If the first class implementation is an overlay emit a warning and
+  // skip over it until we find a non-overlay class
+  while(parse_tree_it != parse_trees.end())
   {
-    auto parse_tree_it = parse_trees.begin();
-    // If the first class implementation is an overlay emit a warning and
-    // skip over it until we find a non-overlay class
-    while(parse_tree_it != parse_trees.end())
+    // Skip parse trees that failed to load - though these shouldn't exist yet
+    if(parse_tree_it->loading_successful)
     {
-      // Skip parse trees that failed to load - though these shouldn't exist yet
-      if(parse_tree_it->loading_successful)
-      {
-        if(!is_overlay_class(parse_tree_it->parsed_class))
-        {
-          // Keep the non-overlay class
-          ++parse_tree_it;
-          break;
-        }
-        warning()
-          << "Skipping class " << class_name
-          << " marked with OverlayClassImplementation but found before"
-            " original definition"
-          << eom;
-      }
-      auto unloaded_or_overlay_out_of_order_it = parse_tree_it;
-      ++parse_tree_it;
-      parse_trees.erase(unloaded_or_overlay_out_of_order_it);
-    }
-    // Collect overlay classes
-    while(parse_tree_it != parse_trees.end())
-    {
-      // Remove non-initial classes that aren't overlays
       if(!is_overlay_class(parse_tree_it->parsed_class))
       {
-        warning()
-          << "Skipping duplicate definition of class " << class_name
-          << " not marked with OverlayClassImplementation" << eom;
-        auto duplicate_non_overlay_it = parse_tree_it;
+        // Keep the non-overlay class
         ++parse_tree_it;
-        parse_trees.erase(duplicate_non_overlay_it);
+        break;
       }
-      else
-        ++parse_tree_it;
+      warning()
+        << "Skipping class " << class_name
+        << " marked with OverlayClassImplementation but found before"
+          " original definition"
+        << eom;
     }
-    return parse_trees;
+    auto unloaded_or_overlay_out_of_order_it = parse_tree_it;
+    ++parse_tree_it;
+    parse_trees.erase(unloaded_or_overlay_out_of_order_it);
   }
+  // Collect overlay classes
+  while(parse_tree_it != parse_trees.end())
+  {
+    // Remove non-initial classes that aren't overlays
+    if(!is_overlay_class(parse_tree_it->parsed_class))
+    {
+      warning()
+        << "Skipping duplicate definition of class " << class_name
+        << " not marked with OverlayClassImplementation" << eom;
+      auto duplicate_non_overlay_it = parse_tree_it;
+      ++parse_tree_it;
+      parse_trees.erase(duplicate_non_overlay_it);
+    }
+    else
+      ++parse_tree_it;
+  }
+  if(!parse_trees.empty())
+    return parse_trees;
 
   // Not found or failed to load
   warning() << "failed to load class `" << class_name << '\'' << eom;
