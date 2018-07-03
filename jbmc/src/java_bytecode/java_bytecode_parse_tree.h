@@ -84,6 +84,11 @@ public:
       is_private(false), is_static(false), is_final(false)
     {
     }
+
+    bool has_annotation(const irep_idt &annotation_id) const
+    {
+      return find_annotation(annotations, annotation_id).has_value();
+    }
   };
 
   class methodt:public membert
