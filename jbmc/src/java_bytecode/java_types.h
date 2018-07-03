@@ -131,6 +131,15 @@ class java_class_typet:public class_typet
     return set(ID_is_static, is_static_class);
   }
 
+  const bool get_is_anonymous_class() const
+  {
+    return get_bool(ID_is_anonymous);
+  }
+
+  void set_is_anonymous_class(const bool &is_anonymous_class)
+  {
+    return set(ID_is_anonymous, is_anonymous_class);
+  }
 
   bool get_final()
   {

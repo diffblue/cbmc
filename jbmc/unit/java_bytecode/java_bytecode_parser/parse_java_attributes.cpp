@@ -28,6 +28,7 @@ SCENARIO(
           new_symbol_table.lookup_ref("java::InnerClasses$PublicInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_public);
       }
@@ -40,6 +41,7 @@ SCENARIO(
           new_symbol_table.lookup_ref("java::InnerClasses$DefaultInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_default);
       }
@@ -52,6 +54,7 @@ SCENARIO(
           new_symbol_table.lookup_ref("java::InnerClasses$ProtectedInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_protected);
       }
@@ -64,6 +67,7 @@ SCENARIO(
           new_symbol_table.lookup_ref("java::InnerClasses$PrivateInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
       }
@@ -81,6 +85,7 @@ SCENARIO(
           "java::InnerClassesDefault$PublicInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_public);
       }
@@ -93,6 +98,7 @@ SCENARIO(
           "java::InnerClassesDefault$DefaultInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_default);
       }
@@ -105,6 +111,7 @@ SCENARIO(
           "java::InnerClassesDefault$ProtectedInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_protected);
       }
@@ -117,6 +124,7 @@ SCENARIO(
           "java::InnerClassesDefault$PrivateInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
       }
@@ -140,6 +148,7 @@ SCENARIO(
           "PublicDoublyNestedInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_public);
       }
@@ -155,6 +164,7 @@ SCENARIO(
           "DefaultDoublyNestedInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_default);
       }
@@ -170,6 +180,7 @@ SCENARIO(
           "ProtectedDoublyNestedInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_protected);
       }
@@ -185,6 +196,7 @@ SCENARIO(
           "PrivateDoublyNestedInnerClass");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
       }
@@ -198,13 +210,14 @@ SCENARIO(
       "ContainsAnonymousClass", "./java_bytecode/java_bytecode_parser");
     WHEN("Parsing the InnerClasses attribute for a public anonymous class")
     {
-      THEN("The class should be marked as public")
+      THEN("The class should be marked as private and anonymous")
       {
         const symbolt &class_symbol =
           new_symbol_table.lookup_ref("java::ContainsAnonymousClass$1");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
         REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_access() == ID_private);
       }
     }
@@ -212,37 +225,40 @@ SCENARIO(
       "Parsing the InnerClasses attribute for a package-private anonymous "
       "class")
     {
-      THEN("The class should be marked as default")
+      THEN("The class should be marked as private and anonymous")
       {
         const symbolt &class_symbol =
           new_symbol_table.lookup_ref("java::ContainsAnonymousClass$2");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
         REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_access() == ID_private);
       }
     }
     WHEN("Parsing the InnerClasses attribute for a protected anonymous class")
     {
-      THEN("The class should be marked as protected")
+      THEN("The class should be marked as private and anonymous")
       {
         const symbolt &class_symbol =
           new_symbol_table.lookup_ref("java::ContainsAnonymousClass$3");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
         REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_access() == ID_private);
       }
     }
     WHEN("Parsing the InnerClasses attribute for a private anonymous class")
     {
-      THEN("The class should be marked as private")
+      THEN("The class should be marked as private and anonymous")
       {
         const symbolt &class_symbol =
           new_symbol_table.lookup_ref("java::ContainsAnonymousClass$4");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
         REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_access() == ID_private);
       }
     }
@@ -263,6 +279,7 @@ SCENARIO(
           to_java_class_type(class_symbol.type);
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
       }
     }
   }
@@ -281,6 +298,7 @@ SCENARIO(
           to_java_class_type(class_symbol.type);
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_is_static_class());
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
       }
     }
     WHEN("Parsing the InnerClasses attribute for a non-static inner class ")
@@ -293,6 +311,7 @@ SCENARIO(
           to_java_class_type(class_symbol.type);
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE_FALSE(java_class.get_is_static_class());
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
       }
     }
   }
@@ -300,25 +319,27 @@ SCENARIO(
   {
     WHEN("Parsing the InnerClasses attribute for a static anonymous class ")
     {
-      THEN("The class should be marked as static")
+      THEN("The class should be marked as static and anonymous")
       {
         const symbolt &class_symbol =
           new_symbol_table.lookup_ref("java::StaticInnerClass$1");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
         REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_static_class());
       }
     }
     WHEN("Parsing the InnerClasses attribute for a non-static anonymous class ")
     {
-      THEN("The class should not be marked as static")
+      THEN("The class should be marked as anonymous and not static")
       {
         const symbolt &class_symbol =
           new_symbol_table.lookup_ref("java::StaticInnerClass$2");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
         REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE_FALSE(java_class.get_is_static_class());
       }
     }
@@ -337,6 +358,7 @@ SCENARIO(
           to_java_class_type(class_symbol.type);
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE_FALSE(java_class.get_is_static_class());
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
       }
     }
     WHEN(
@@ -351,6 +373,7 @@ SCENARIO(
           to_java_class_type(class_symbol.type);
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE_FALSE(java_class.get_is_static_class());
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
       }
     }
   }

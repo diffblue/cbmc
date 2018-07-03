@@ -219,6 +219,7 @@ public:
     bool is_annotation = false;
     bool is_inner_class = false;
     bool is_static_class = false;
+    bool is_anonymous_class = false;
     bool attribute_bootstrapmethods_read = false;
     size_t enum_elements=0;
 

@@ -1613,7 +1613,7 @@ void java_bytecode_parsert::rinner_classes_attribute(
   {
     u2 inner_class_info_index = read_u2();
     u2 outer_class_info_index = read_u2();
-    UNUSED u2 inner_name_index = read_u2();
+    u2 inner_name_index = read_u2();
     u2 inner_class_access_flags = read_u2();
 
     std::string inner_class_info_name =
@@ -1634,6 +1634,9 @@ void java_bytecode_parsert::rinner_classes_attribute(
     if(!is_inner_class)
       continue;
     parsed_class.is_static_class = is_static;
+    // This is a marker that a class is anonymous.
+    if(inner_name_index == 0)
+      parsed_class.is_anonymous_class = true;
     // Note that if outer_class_info_index == 0, the inner class is an anonymous
     // or local class, and is treated as private.
     if(outer_class_info_index == 0)
