@@ -20,7 +20,7 @@ show:
 clean:
 	find -name '*.out' -execdir $(RM) '{}' \;
 	find -name '*.gb' -execdir $(RM) '{}' \;
-	$(RM) tests.log
+	$(RM) tests.log tests-symex-driven-loading.log
 
 %.class: %.java ../../src/org.cprover.jar
 	javac -g -cp ../../src/org.cprover.jar:. $<
