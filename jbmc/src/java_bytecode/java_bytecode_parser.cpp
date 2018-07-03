@@ -1581,19 +1581,19 @@ void java_bytecode_parsert::relement_value_pair(
 /// Corresponds to the element_value structure
 /// Described in Java 8 specification 4.7.6
 /// https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.6
-/// Parses the bytes of the InnerClasses attribute for the current parsed class,
-/// which contains any array of information about inner classes. We are
+/// Parses the InnerClasses attribute for the current parsed class,
+/// which contains an array of information about its inner classes. We are
 /// interested in getting information only for inner classes, which is
 /// determined by checking if the parsed class matches any of the inner classes
 /// in its inner class array. If the parsed class is not an inner class, then it
 /// is ignored. When a parsed class is an inner class, the accessibility
 /// information for the parsed class is overwritten, and the parsed class is
-/// marked as an inner class. Note that is outer_class_info_index == 0, the
-/// inner class is an anonymous or local class, and is treated as private.
+/// marked as an inner class.
 void java_bytecode_parsert::rinner_classes_attribute(
   classt &parsed_class,
   const u4 &attribute_length)
 {
+  std::string name = parsed_class.name.c_str();
   u2 number_of_classes = read_u2();
   u4 number_of_bytes_to_be_read = number_of_classes * 8 + 2;
   INVARIANT(
@@ -1634,6 +1634,8 @@ void java_bytecode_parsert::rinner_classes_attribute(
       remove_separator_char(inner_class_info_name, '/');
     if(!parsed_class.is_inner_class)
       continue;
+    // Note that if outer_class_info_index == 0, the inner class is an anonymous
+    // or local class, and is treated as private.
     if(outer_class_info_index == 0)
     {
       // This is a marker for an anonymous or local class
