@@ -266,4 +266,92 @@ SCENARIO(
       }
     }
   }
+
+  const symbol_tablet &new_symbol_table =
+    load_java_class("StaticInnerClass", "./java_bytecode/java_bytecode_parser");
+  GIVEN("Some class with a static inner class")
+  {
+    WHEN("Parsing the InnerClasses attribute for a static inner class ")
+    {
+      THEN("The class should be marked as static")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::StaticInnerClass$PublicStaticInnerClass");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_static_class());
+      }
+    }
+    WHEN("Parsing the InnerClasses attribute for a non-static inner class ")
+    {
+      THEN("The class should not be marked as static")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::StaticInnerClass$PublicNonStaticInnerClass");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE_FALSE(java_class.get_is_static_class());
+      }
+    }
+  }
+  GIVEN("Some class with a static anonymous class")
+  {
+    WHEN("Parsing the InnerClasses attribute for a static anonymous class ")
+    {
+      THEN("The class should be marked as static")
+      {
+        const symbolt &class_symbol =
+          new_symbol_table.lookup_ref("java::StaticInnerClass$1");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_static_class());
+      }
+    }
+    WHEN("Parsing the InnerClasses attribute for a non-static anonymous class ")
+    {
+      THEN("The class should not be marked as static")
+      {
+        const symbolt &class_symbol =
+          new_symbol_table.lookup_ref("java::StaticInnerClass$2");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE_FALSE(java_class.get_is_static_class());
+      }
+    }
+  }
+  GIVEN("Some method containing a local class")
+  {
+    WHEN(
+      "Parsing the InnerClasses attribute for a local class in a static "
+      "method ")
+    {
+      THEN("The local class should be marked as static")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::StaticInnerClass$1LocalClassInStatic");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE_FALSE(java_class.get_is_static_class());
+      }
+    }
+    WHEN(
+      "Parsing the InnerClasses attribute for a local class in a non-static "
+      "method ")
+    {
+      THEN("The local class should not be marked as static")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::StaticInnerClass$1LocalClassInNonStatic");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE_FALSE(java_class.get_is_static_class());
+      }
+    }
+  }
 }

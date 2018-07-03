@@ -1622,6 +1622,7 @@ void java_bytecode_parsert::rinner_classes_attribute(
     bool is_private = (inner_class_access_flags & ACC_PRIVATE) != 0;
     bool is_public = (inner_class_access_flags & ACC_PUBLIC) != 0;
     bool is_protected = (inner_class_access_flags & ACC_PROTECTED) != 0;
+    bool is_static = (inner_class_access_flags & ACC_STATIC) != 0;
 
     // If the original parsed class name matches the inner class name,
     // the parsed class is an inner class, so overwrite the parsed class'
@@ -1632,6 +1633,7 @@ void java_bytecode_parsert::rinner_classes_attribute(
       parsed_class.is_inner_class = is_inner_class;
     if(!is_inner_class)
       continue;
+    parsed_class.is_static_class = is_static;
     // Note that if outer_class_info_index == 0, the inner class is an anonymous
     // or local class, and is treated as private.
     if(outer_class_info_index == 0)
