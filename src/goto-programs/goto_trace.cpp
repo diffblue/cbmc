@@ -283,6 +283,7 @@ void show_goto_trace(
 {
   unsigned prev_step_nr=0;
   bool first_step=true;
+  std::size_t function_depth=0;
 
   for(const auto &step : goto_trace.steps)
   {
@@ -427,7 +428,17 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::FUNCTION_CALL:
+      function_depth++;
+      if(options.show_function_calls)
+        out << "\n#### Function call: " << step.identifier << " (depth "
+            << function_depth << ") ####\n";
+      break;
     case goto_trace_stept::typet::FUNCTION_RETURN:
+      function_depth--;
+      if(options.show_function_calls)
+        out << "\n#### Function return: " << step.identifier << " (depth "
+            << function_depth << ") ####\n";
+      break;
     case goto_trace_stept::typet::SPAWN:
     case goto_trace_stept::typet::MEMORY_BARRIER:
     case goto_trace_stept::typet::ATOMIC_BEGIN:

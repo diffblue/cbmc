@@ -200,6 +200,7 @@ struct trace_optionst
   bool json_full_lhs;
   bool hex_representation;
   bool base_prefix;
+  bool show_function_calls;
 
   static const trace_optionst default_options;
 
@@ -208,6 +209,7 @@ struct trace_optionst
     json_full_lhs = options.get_bool_option("trace-json-extended");
     hex_representation = options.get_bool_option("trace-hex");
     base_prefix = hex_representation;
+    show_function_calls = options.get_bool_option("trace-show-function-calls");
   };
 
 private:
@@ -216,6 +218,7 @@ private:
     json_full_lhs = false;
     hex_representation = false;
     base_prefix = false;
+    show_function_calls = false;
   };
 };
 
@@ -239,15 +242,19 @@ void trace_value(
 
 
 #define OPT_GOTO_TRACE "(trace-json-extended)" \
+                       "(trace-show-function-calls)" \
                        "(trace-hex)"
 
 #define HELP_GOTO_TRACE                                                        \
-  " --trace-json-extended        add rawLhs property to trace\n"              \
+  " --trace-json-extended        add rawLhs property to trace\n"               \
+  " --trace-show-function-calls  show function calls in plain trace\n"         \
   " --trace-hex                  represent plain trace values in hex\n"
 
 #define PARSE_OPTIONS_GOTO_TRACE(cmdline, options)                             \
   if(cmdline.isset("trace-json-extended"))                                     \
     options.set_option("trace-json-extended", true);                           \
+  if(cmdline.isset("trace-show-function-calls"))                               \
+    options.set_option("trace-show-function-calls", true);                     \
   if(cmdline.isset("trace-hex"))                                               \
     options.set_option("trace-hex", true);
 
