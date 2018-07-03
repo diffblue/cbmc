@@ -421,7 +421,7 @@ print "\n";
 close LOG;
 
 if($opt_p && $failures != 0) {
-  open LOG,"<tests.log" or die "Failed to open tests.log\n";
+  open LOG,"<$logfile_name" or die "Failed to open $logfile_name\n";
 
   my $printed_this_test = 1;
   my $current_test = "";
