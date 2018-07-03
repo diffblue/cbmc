@@ -1628,18 +1628,17 @@ void java_bytecode_parsert::rinner_classes_attribute(
 
     // If the original parsed class name matches the inner class name,
     // the parsed class is an inner class, so overwrite the parsed class'
-    // access information and mark it as an inner class
-    parsed_class.is_inner_class =
-      remove_separator_char(id2string(parsed_class.name), '.') ==
+    // access information and mark it as an inner class.
+    bool is_inner_class = remove_separator_char(id2string(parsed_class.name), '.') ==
       remove_separator_char(inner_class_info_name, '/');
-    if(!parsed_class.is_inner_class)
+    if(is_inner_class)
+      parsed_class.is_inner_class = is_inner_class;
+    if(!is_inner_class)
       continue;
     // Note that if outer_class_info_index == 0, the inner class is an anonymous
     // or local class, and is treated as private.
     if(outer_class_info_index == 0)
     {
-      // This is a marker for an anonymous or local class
-      // which are treated as private
       parsed_class.is_private = true;
       parsed_class.is_protected = false;
       parsed_class.is_public = false;

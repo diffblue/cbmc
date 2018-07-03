@@ -204,7 +204,7 @@ SCENARIO(
           new_symbol_table.lookup_ref("java::ContainsAnonymousClass$1");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
-        REQUIRE_FALSE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
       }
     }
@@ -218,7 +218,7 @@ SCENARIO(
           new_symbol_table.lookup_ref("java::ContainsAnonymousClass$2");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
-        REQUIRE_FALSE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
       }
     }
@@ -230,7 +230,7 @@ SCENARIO(
           new_symbol_table.lookup_ref("java::ContainsAnonymousClass$3");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
-        REQUIRE_FALSE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
       }
     }
@@ -242,7 +242,7 @@ SCENARIO(
           new_symbol_table.lookup_ref("java::ContainsAnonymousClass$4");
         const java_class_typet java_class =
           to_java_class_type(class_symbol.type);
-        REQUIRE_FALSE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
       }
     }
