@@ -12,8 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_AI_H
 #define CPROVER_ANALYSES_AI_H
 
-#include <iosfwd>
+#include <chrono>
+#include <iostream>
+#include <iomanip>
 #include <map>
+#include <set>
+#include <list>
 #include <memory>
 
 #include <util/json.h>
@@ -35,7 +39,11 @@ public:
   typedef ai_domain_baset statet;
   typedef goto_programt::const_targett locationt;
 
-  ai_baset()
+  ai_baset(
+    const bool print_progress,
+    const float min_progress_interval) :
+      progress_output_stream(print_progress ? std::cout : null_output_stream),
+      min_progress_interval(min_progress_interval)
   {
   }
 
@@ -218,7 +226,59 @@ public:
     return output_xml(ns, irep_idt(), goto_function.body);
   }
 
+private:
+  class null_streamt : public std::streambuf {};
+
+  static null_streamt null_stream;
+  static std::ostream null_output_stream;
+
+  std::ostream &progress_output_stream;
+
 protected:
+  // we do not use the existing error(), progress(), etc. streams as we want to
+  // be able to print progress output just for the ai framework
+  std::ostream &progress() const
+  {
+    return progress_output_stream;
+  }
+
+  // we collect progress data irrespective of whether printing progress data is
+  // enabled or not as it is cheap compared to the actual analysis
+  struct progresst
+  {
+    // number of functions in the program
+    std::size_t num_functions = 0;
+
+    // unique functions entered during the analysis
+    std::set<irep_idt> functions_entered;
+
+    // unique functions returned from during the analysis
+    std::set<irep_idt> functions_returned;
+
+    // num of times a function was entered during the analysis
+    std::size_t num_functions_entered = 0;
+
+    // num of times a function was returned from during the analysis
+    std::size_t num_functions_returned = 0;
+
+    // maximum depth of the analysis stack seen so far
+    std::size_t max_stack_depth = 0;
+
+    // analysis stack
+    std::list<irep_idt> stack;
+  };
+
+  progresst progress_data;
+
+  void print_progress() const;
+
+  const std::chrono::duration<float> min_progress_interval;
+
+  // default-constructed time points have the epoch as value
+  mutable std::chrono::system_clock::time_point last_progress_output;
+
+  void print_progress_interval() const;
+
   /// Initialize all the abstract states for a single function. Override this to
   /// do custom per-domain initialization.
   virtual void
@@ -411,7 +471,10 @@ class ait:public ai_baset
 {
 public:
   // constructor
-  ait():ai_baset()
+  ait(
+    const bool print_progress = false,
+    const float min_progress_interval = 0) :
+      ai_baset(print_progress, min_progress_interval)
   {
   }
 

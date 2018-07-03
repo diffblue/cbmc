@@ -192,6 +192,8 @@ void ai_baset::initialize(const irep_idt &, const goto_programt &goto_program)
 
 void ai_baset::initialize(const goto_functionst &goto_functions)
 {
+  progress_data.num_functions = goto_functions.function_map.size();
+
   forall_goto_functions(it, goto_functions)
     initialize(it->first, it->second);
 }
@@ -382,7 +384,30 @@ bool ai_baset::do_function_call(
 
     // do we need to do/re-do the fixedpoint of the body?
     if(new_data)
+    {
+      const code_function_callt &code=
+        to_code_function_call(l_call->code);
+
+      const symbol_exprt symbol_expr = to_symbol_expr(code.function());
+
+      const irep_idt id = symbol_expr.get_identifier();
+
+      progress_data.functions_entered.insert(id);
+      progress_data.num_functions_entered++;
+      progress_data.stack.push_front(id);
+
+      progress_data.max_stack_depth
+        = std::max(progress_data.max_stack_depth, progress_data.stack.size());
+
+      print_progress_interval();
+
       fixedpoint(f_it->first, goto_function.body, goto_functions, ns);
+
+      progress_data.functions_returned.insert(id);
+      progress_data.num_functions_returned++;
+      progress_data.stack.pop_front();
+
+      print_progress_interval();
   }
 
 
@@ -546,3 +571,69 @@ void ai_baset::concurrent_fixedpoint(
     }
   }
 }
+
+void ai_baset::print_progress() const
+{
+  static const std::size_t num_width = 16;
+  static const std::size_t frame_width = 4;
+
+  progress() << "Progress:"
+
+    << "\nNumber of functions in program:           "
+    << std::setw(num_width)
+    << progress_data.num_functions
+
+    << "\nNumber of unique functions entered:       "
+    << std::setw(num_width)
+    << progress_data.functions_entered.size()
+
+    << "\nNumber of unique functions returned from: "
+    << std::setw(num_width)
+    << progress_data.functions_returned.size()
+
+    << "\nNumber of functions entered:              "
+    << std::setw(num_width)
+    << progress_data.num_functions_entered
+
+    << "\nNumber of functions returned from:        "
+    << std::setw(num_width)
+    << progress_data.num_functions_returned
+
+    << "\nCurrent stack depth:                      "
+    << std::setw(num_width)
+    << progress_data.stack.size()
+
+    << "\nMaximum stack depth:                      "
+    << std::setw(num_width)
+    << progress_data.max_stack_depth;
+
+  // Print stack, most recent frame first
+  progress() << "\nAnalysis stack:\n";
+  std::size_t frame_idx = 0;
+
+  for(const irep_idt &id : progress_data.stack)
+  {
+    progress() << "[" << std::setw(frame_width) << frame_idx << "] " << id <<
+      "\n";
+    frame_idx++;
+  }
+
+  progress() << std::flush;
+}
+
+void ai_baset::print_progress_interval() const
+{
+  using namespace std::chrono;
+
+  system_clock::time_point now = system_clock::now();
+  auto diff = now - last_progress_output;
+
+  if(diff >= min_progress_interval)
+  {
+    print_progress();
+    last_progress_output = now;
+  }
+}
+
+ai_baset::null_streamt ai_baset::null_stream;
+std::ostream ai_baset::null_output_stream(&ai_baset::null_stream);

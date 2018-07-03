@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <string>
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/cprover_library.h>
@@ -254,6 +255,30 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 
   if(options.get_bool_option("general-analysis") || reachability_task)
   {
+    options.set_option("vs-progress", cmdline.isset("vs-progress"));
+    const char *vs_progress_interval = "vs-progress-interval";
+
+    if(cmdline.isset(vs_progress_interval))
+    {
+      std::string v(cmdline.get_value(vs_progress_interval));
+
+      try
+      {
+        // check if valid float
+        std::stof(v);
+      }
+      catch(std::out_of_range)
+      {
+        throw "argument to --vs-progress-interval out of range";
+      }
+      catch(std::invalid_argument)
+      {
+        throw "argument to --vs-progress-interval is invalid";
+      }
+
+      options.set_option(vs_progress_interval, v);
+    }
+
     // Abstract interpreter choice
     if(cmdline.isset("location-sensitive"))
       options.set_option("location-sensitive", true);
@@ -373,11 +398,17 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
 #endif
     else if(options.get_bool_option("variable-sensitivity"))
     {
-      domain=new ait<variable_sensitivity_domaint>();
+      domain=new ait<variable_sensitivity_domaint>(
+        options.get_bool_option("vs-progress"),
+        options.is_set("vs-progress-interval") ?
+          std::stof(options.get_option("vs-progress-interval")) : 0);
     }
     else if(options.get_bool_option("dependence-graph-vs"))
     {
-      domain=new ait<variable_sensitivity_dependence_grapht>;
+      domain=new ait<variable_sensitivity_dependence_grapht>(
+        options.get_bool_option("vs-progress"),
+        options.is_set("vs-progress-interval") ?
+          std::stof(options.get_option("vs-progress-interval")) : 0);
     }
   }
   else if(options.get_bool_option("concurrent"))
@@ -788,7 +819,9 @@ void goto_analyzer_parse_optionst::help()
     " --non-null                   non-null domain\n"
     " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
     " --dependence-graph-vs        data dependencies between instructions using variable sensitivity\n" // NOLINT(*)
-    " --variable-sensitivity       a highly configurable non-relational domain"
+    " --variable-sensitivity       a highly configurable non-relational domain\n" // NOLINT(*)
+    " --vs-progress                print variable sensitivity progress data\n"
+    " --vs-progress-interval       minimum interval (in s) between progress reports\n" // NOLINT(*)
     "\n"
     "Output options:\n"
     " --text file_name             output results in plain text to given file\n"
