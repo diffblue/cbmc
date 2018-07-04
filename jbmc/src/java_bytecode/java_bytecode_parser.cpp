@@ -1612,19 +1612,16 @@ void java_bytecode_parsert::rinner_classes_attribute(
   for(int i = 0; i < number_of_classes; i++)
   {
     u2 inner_class_info_index = read_u2();
-    UNUSED u2 outer_class_info_index = read_u2();
+    u2 outer_class_info_index = read_u2();
     UNUSED u2 inner_name_index = read_u2();
     u2 inner_class_access_flags = read_u2();
-
-    if(inner_class_info_index == 0)
-      continue;
 
     std::string inner_class_info_name =
       class_infot(pool_entry(inner_class_info_index))
         .get_name(pool_entry_lambda);
-    bool is_private = inner_class_access_flags & ACC_PRIVATE;
-    bool is_public = inner_class_access_flags & ACC_PUBLIC;
-    bool is_protected = inner_class_access_flags & ACC_PROTECTED;
+    bool is_private = (inner_class_access_flags & ACC_PRIVATE) != 0;
+    bool is_public = (inner_class_access_flags & ACC_PUBLIC) != 0;
+    bool is_protected = (inner_class_access_flags & ACC_PROTECTED) != 0;
 
     // If the original parsed class name matches the inner class name,
     // the parsed class is an inner class, so overwrite the parsed class'
