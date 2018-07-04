@@ -116,6 +116,16 @@ java_class_loadert::get_parse_tree(
   parse_tree_with_overlayst &parse_trees = class_map[class_name];
   PRECONDITION(parse_trees.empty());
 
+  // do we refuse to load?
+  if(!class_loader_limit.load_class_file(class_name_to_file(class_name)))
+  {
+    debug() << "not loading " << class_name << " because of limit" << eom;
+    java_bytecode_parse_treet parse_tree;
+    parse_tree.parsed_class.name = class_name;
+    parse_trees.push_back(std::move(parse_tree));
+    return parse_trees;
+  }
+
   // First add all given JAR files
   for(const auto &jar_file : jar_files)
   {
@@ -328,7 +338,7 @@ jar_filet &java_class_loadert::jar_pool(
   if(it==m_archives.end())
   {
     // VS: Can't construct in place
-    auto file=jar_filet(class_loader_limit, file_name);
+    auto file = jar_filet(file_name);
     return m_archives.emplace(file_name, std::move(file)).first->second;
   }
   else
@@ -345,7 +355,7 @@ jar_filet &java_class_loadert::jar_pool(
   if(it==m_archives.end())
   {
     // VS: Can't construct in place
-    auto file=jar_filet(class_loader_limit, pmem, size);
+    auto file = jar_filet(pmem, size);
     return m_archives.emplace(buffer_name, std::move(file)).first->second;
   }
   else
