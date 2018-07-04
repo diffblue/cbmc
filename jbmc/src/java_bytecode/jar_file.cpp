@@ -22,7 +22,7 @@ void jar_filet::initialize_file_index()
   for(size_t index=0; index<file_count; index++)
   {
     const auto filename=m_zip_archive.get_filename(index);
-    if(!has_suffix(filename, ".class"))
+    if(has_suffix(filename, ".class"))
       m_name_to_index.emplace(filename, index);
   }
 }
