@@ -328,7 +328,7 @@ jar_filet &java_class_loadert::jar_pool(
   if(it==m_archives.end())
   {
     // VS: Can't construct in place
-    auto file=jar_filet(class_loader_limit, file_name);
+    auto file=jar_filet(file_name);
     return m_archives.emplace(file_name, std::move(file)).first->second;
   }
   else
@@ -345,7 +345,7 @@ jar_filet &java_class_loadert::jar_pool(
   if(it==m_archives.end())
   {
     // VS: Can't construct in place
-    auto file=jar_filet(class_loader_limit, pmem, size);
+    auto file=jar_filet(pmem, size);
     return m_archives.emplace(buffer_name, std::move(file)).first->second;
   }
   else

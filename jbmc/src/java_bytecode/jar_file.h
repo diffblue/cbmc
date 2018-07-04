@@ -18,24 +18,20 @@ Author: Diffblue Ltd
 
 #include "mz_zip_archive.h"
 
-class java_class_loader_limitt;
-
 /// Class representing a .jar archive
 class jar_filet final
 {
 public:
   /// Open java file for reading.
-  /// \param limit Object limiting number of loaded .class files
   /// \param filename Name of the file
   /// \throw Throws std::runtime_error if file cannot be opened
-  jar_filet(java_class_loader_limitt &limit, const std::string &filename);
+  jar_filet(const std::string &filename);
 
   /// Open a JAR file of size \p size loaded in memory at address \p data.
-  /// \param limit Object limiting number of loaded .class files
   /// \param data memory buffer with the contents of the jar file
   /// \param size size  of the memory buffer
   /// \throw Throws std::runtime_error if file cannot be opened
-  jar_filet(java_class_loader_limitt &limit, const void *data, size_t size);
+  jar_filet(const void *data, size_t size);
 
   jar_filet(const jar_filet &)=delete;
   jar_filet &operator=(const jar_filet &)=delete;
@@ -57,7 +53,7 @@ public:
 private:
   /// Loads the fileindex (m_name_to_index) with a map of loaded files to
   /// indices.
-  void initialize_file_index(java_class_loader_limitt &limit);
+  void initialize_file_index();
 
   mz_zip_archivet m_zip_archive;
 
