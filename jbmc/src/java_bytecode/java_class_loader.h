@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fixed_keys_map_wrapper.h>
 
 #include "java_bytecode_parse_tree.h"
-#include "java_class_loader_limit.h"
 #include "jar_file.h"
 
 class java_class_loadert:public messaget
@@ -46,11 +45,7 @@ public:
   /// corresponding .class file by first scanning all .jar files whose
   /// pathname is stored in \ref jar_files, and if that doesn't work, then scan
   /// the actual filesystem using `config.java.classpath` as class path. Uses
-  /// \p limit to limit the class files that it might (directly or indirectly)
-  /// load and returns a default-constructed parse tree when unable to find the
-  /// .class file.
   parse_tree_with_overlayst &get_parse_tree(
-    java_class_loader_limitt &class_loader_limit,
     const irep_idt &class_name);
 
   void set_java_cp_include_files(const std::string &java_cp_include_files)
@@ -81,7 +76,7 @@ public:
   static std::string file_to_class_name(const std::string &);
   static std::string class_name_to_file(const irep_idt &);
 
-  void load_entire_jar(java_class_loader_limitt &, const std::string &jar_path);
+  void load_entire_jar(const std::string &jar_path);
 
   const jar_indext &get_jar_index(const std::string &jar_path)
   {
@@ -100,20 +95,16 @@ public:
   }
 
   /// Load jar archive or retrieve from cache if already loaded
-  /// \param limit
   /// \param filename name of the file
-  jar_filet &jar_pool(
-    java_class_loader_limitt &limit, const std::string &filename);
+  jar_filet &jar_pool(const std::string &filename);
 
   /// Load jar archive or retrieve from cache if already loaded
-  /// \param limit
   /// \param buffer_name name of the original file
   /// \param pmem memory pointer to the contents of the file
   /// \param size size of the memory buffer
   /// Note that this mocks the existence of a file which may
   /// or may not exist since  the actual data bis retrieved from memory.
   jar_filet &jar_pool(
-    java_class_loader_limitt &limit,
     const std::string &buffer_name,
     const void *pmem,
     size_t size);
@@ -121,9 +112,7 @@ public:
 private:
   /// Either a regular expression matching files that will be allowed to be
   /// loaded or a string of the form `@PATH` where PATH is the file path of a
-  /// json file storing an explicit list of files allowed to be loaded. See
-  /// java_class_loader_limitt::setup_class_load_limit() for further
-  /// information.
+  /// json file storing an explicit list of files allowed to be loaded.
   std::string java_cp_include_files;
 
   /// List of filesystem paths to .jar files that will be used, in the given
@@ -146,13 +135,11 @@ private:
   typedef optionalt<std::reference_wrapper<const jar_indext>>
     jar_index_optcreft;
   jar_index_optcreft read_jar_file(
-    java_class_loader_limitt &class_loader_limit,
     const std::string &jar_path);
   optionalt<java_bytecode_parse_treet> get_class_from_jar(
     const irep_idt &class_name,
     const std::string &jar_file,
-    const jar_indext &jar_index,
-    java_class_loader_limitt &class_loader_limit);
+    const jar_indext &jar_index);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H

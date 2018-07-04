@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
+#include "java_class_loader_limit.h"
 #include "java_string_literals.h"
 #include "java_static_initializers.h"
 #include "java_utils.h"
@@ -214,7 +215,7 @@ bool java_bytecode_languaget::parse(
     if(config.java.main_class.empty())
     {
       auto manifest=
-        java_class_loader.jar_pool(class_loader_limit, path).get_manifest();
+        java_class_loader.jar_pool(path).get_manifest();
       std::string manifest_main_class=manifest["Main-Class"];
 
       // if the manifest declares a Main-Class line, we got a main class
@@ -228,7 +229,7 @@ bool java_bytecode_languaget::parse(
     if(main_class.empty())
     {
       status() << "JAR file without entry point: loading class files" << eom;
-      java_class_loader.load_entire_jar(class_loader_limit, path);
+      java_class_loader.load_entire_jar(path);
       for(const auto &kv : java_class_loader.get_jar_index(path))
         main_jar_classes.push_back(kv.first);
     }

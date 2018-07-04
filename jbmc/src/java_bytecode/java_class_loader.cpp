@@ -37,9 +37,6 @@ java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
   for(const auto &id : java_load_classes)
     queue.push(id);
 
-  java_class_loader_limitt class_loader_limit(
-    get_message_handler(), java_cp_include_files);
-
   while(!queue.empty())
   {
     irep_idt c=queue.top();
@@ -51,7 +48,7 @@ java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
     debug() << "Reading class " << c << eom;
 
     parse_tree_with_overlayst &parse_trees =
-      get_parse_tree(class_loader_limit, c);
+      get_parse_tree(c);
 
     // Add any dependencies to queue
     for(const java_bytecode_parse_treet &parse_tree : parse_trees)
@@ -72,8 +69,7 @@ java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
 optionalt<java_bytecode_parse_treet> java_class_loadert::get_class_from_jar(
   const irep_idt &class_name,
   const std::string &jar_file,
-  const jar_indext &jar_index,
-  java_class_loader_limitt &class_loader_limit)
+  const jar_indext &jar_index)
 {
   auto jar_index_it = jar_index.find(class_name);
   if(jar_index_it == jar_index.end())
@@ -83,7 +79,7 @@ optionalt<java_bytecode_parse_treet> java_class_loadert::get_class_from_jar(
     << "Getting class `" << class_name << "' from JAR " << jar_file << eom;
 
   auto data =
-    jar_pool(class_loader_limit, jar_file).get_entry(jar_index_it->second);
+    jar_pool(jar_file).get_entry(jar_index_it->second);
 
   if(!data.has_value())
     return {};
@@ -101,7 +97,6 @@ static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
 
 /// Check through all the places class parse trees can appear and returns the
 /// first implementation it finds plus any overlay class implementations
-/// \param class_loader_limit: Filter to decide whether to load classes
 /// \param class_name: Name of class to load
 /// \returns The list of valid implementations, including overlays
 /// \remarks
@@ -109,9 +104,7 @@ static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
 ///   classpath, so long as all but the first definition are marked with the
 ///   attribute `\@java::com.diffblue.OverlayClassImplementation`.
 java_class_loadert::parse_tree_with_overlayst &
-java_class_loadert::get_parse_tree(
-  java_class_loader_limitt &class_loader_limit,
-  const irep_idt &class_name)
+java_class_loadert::get_parse_tree(const irep_idt &class_name)
 {
   parse_tree_with_overlayst &parse_trees = class_map[class_name];
   PRECONDITION(parse_trees.empty());
@@ -119,11 +112,11 @@ java_class_loadert::get_parse_tree(
   // First add all given JAR files
   for(const auto &jar_file : jar_files)
   {
-    jar_index_optcreft index = read_jar_file(class_loader_limit, jar_file);
+    jar_index_optcreft index = read_jar_file(jar_file);
     if(!index)
       continue;
     optionalt<java_bytecode_parse_treet> parse_tree =
-      get_class_from_jar(class_name, jar_file, *index, class_loader_limit);
+      get_class_from_jar(class_name, jar_file, *index);
     if(parse_tree)
       parse_trees.emplace_back(std::move(*parse_tree));
   }
@@ -133,11 +126,11 @@ java_class_loadert::get_parse_tree(
   {
     if(has_suffix(cp_entry, ".jar"))
     {
-      jar_index_optcreft index = read_jar_file(class_loader_limit, cp_entry);
+      jar_index_optcreft index = read_jar_file(cp_entry);
       if(!index)
         continue;
       optionalt<java_bytecode_parse_treet> parse_tree =
-        get_class_from_jar(class_name, cp_entry, *index, class_loader_limit);
+        get_class_from_jar(class_name, cp_entry, *index);
       if(parse_tree)
         parse_trees.emplace_back(std::move(*parse_tree));
     }
@@ -151,9 +144,6 @@ java_class_loadert::get_parse_tree(
         #else
         cp_entry + '/' + class_file;
         #endif
-
-      if(!class_loader_limit.load_class_file(class_file))
-        continue;
 
       if(std::ifstream(full_path))
       {
@@ -219,11 +209,9 @@ java_class_loadert::get_parse_tree(
   return parse_trees;
 }
 
-void java_class_loadert::load_entire_jar(
-  java_class_loader_limitt &class_loader_limit,
-  const std::string &jar_path)
+void java_class_loadert::load_entire_jar(const std::string &jar_path)
 {
-  jar_index_optcreft jar_index = read_jar_file(class_loader_limit, jar_path);
+  jar_index_optcreft jar_index = read_jar_file(jar_path);
   if(!jar_index)
     return;
 
@@ -236,7 +224,6 @@ void java_class_loadert::load_entire_jar(
 }
 
 java_class_loadert::jar_index_optcreft java_class_loadert::read_jar_file(
-  java_class_loader_limitt &class_loader_limit,
   const std::string &jar_path)
 {
   auto existing_it = jars_by_path.find(jar_path);
@@ -246,7 +233,7 @@ java_class_loadert::jar_index_optcreft java_class_loadert::read_jar_file(
   std::vector<std::string> filenames;
   try
   {
-    filenames = this->jar_pool(class_loader_limit, jar_path).filenames();
+    filenames = this->jar_pool(jar_path).filenames();
   }
   catch(const std::runtime_error &)
   {
@@ -256,7 +243,6 @@ java_class_loadert::jar_index_optcreft java_class_loadert::read_jar_file(
   debug() << "Adding JAR file `" << jar_path << "'" << eom;
 
   // Create a new entry in the map and initialize using the list of file names
-  // that were retained in the jar_filet by the class_loader_limit filter
   jar_indext &jar_index = jars_by_path[jar_path];
   for(auto &file_name : filenames)
   {
@@ -320,9 +306,7 @@ std::string java_class_loadert::class_name_to_file(const irep_idt &class_name)
   return result;
 }
 
-jar_filet &java_class_loadert::jar_pool(
-  java_class_loader_limitt &class_loader_limit,
-  const std::string &file_name)
+jar_filet &java_class_loadert::jar_pool(const std::string &file_name)
 {
   const auto it=m_archives.find(file_name);
   if(it==m_archives.end())
@@ -336,7 +320,6 @@ jar_filet &java_class_loadert::jar_pool(
 }
 
 jar_filet &java_class_loadert::jar_pool(
-  java_class_loader_limitt &class_loader_limit,
   const std::string &buffer_name,
   const void *pmem,
   size_t size)
