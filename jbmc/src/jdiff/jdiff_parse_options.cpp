@@ -20,6 +20,7 @@ Author: Peter Schrammel
 #include <util/exit_codes.h>
 #include <util/make_unique.h>
 #include <util/options.h>
+#include <util/version.h>
 
 #include <langapi/language.h>
 
@@ -59,8 +60,6 @@ Author: Peter Schrammel
 #include <goto-diff/change_impact.h>
 #include <goto-diff/goto_diff.h>
 #include <goto-diff/unified_diff.h>
-
-#include "version.h"
 
 jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
   : parse_options_baset(JDIFF_OPTIONS, argc, argv),

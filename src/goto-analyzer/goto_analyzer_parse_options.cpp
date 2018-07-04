@@ -24,20 +24,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <jsil/jsil_language.h>
 
+#include <goto-programs/adjust_float_expressions.h>
+#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
-#include <goto-programs/set_properties.h>
+#include <goto-programs/link_to_library.h>
+#include <goto-programs/read_goto_binary.h>
+#include <goto-programs/remove_asm.h>
+#include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
-#include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
-#include <goto-programs/remove_complex.h>
-#include <goto-programs/remove_asm.h>
-#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
-#include <goto-programs/read_goto_binary.h>
-#include <goto-programs/goto_inline.h>
-#include <goto-programs/link_to_library.h>
 
 #include <analyses/is_threaded.h>
 #include <analyses/goto_check.h>
@@ -49,19 +50,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 #include <langapi/language.h>
 
-#include <util/options.h>
 #include <util/config.h>
-#include <util/unicode.h>
 #include <util/exit_codes.h>
-
-#include <goto-programs/adjust_float_expressions.h>
+#include <util/options.h>
+#include <util/unicode.h>
+#include <util/version.h>
 
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
 #include "static_show_domain.h"
 #include "static_simplifier.h"
 #include "static_verifier.h"
-#include "version.h"
 
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,

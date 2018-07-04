@@ -17,9 +17,10 @@ Author: Peter Schrammel
 #include <memory>
 
 #include <util/config.h>
-#include <util/options.h>
-#include <util/make_unique.h>
 #include <util/exit_codes.h>
+#include <util/make_unique.h>
+#include <util/options.h>
+#include <util/version.h>
 
 #include <langapi/language.h>
 
@@ -59,7 +60,6 @@ Author: Peter Schrammel
 #include "syntactic_diff.h"
 #include "unified_diff.h"
 #include "change_impact.h"
-#include "version.h"
 
 goto_diff_parse_optionst::goto_diff_parse_optionst(int argc, const char **argv):
   parse_options_baset(GOTO_DIFF_OPTIONS, argc, argv),

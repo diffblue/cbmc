@@ -26,5 +26,3 @@ target_link_libraries(jdiff-lib
 # Executable
 add_executable(jdiff jdiff_main.cpp)
 target_link_libraries(jdiff jdiff-lib)
-
-git_revision(jdiff-lib)

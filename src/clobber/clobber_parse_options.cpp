@@ -16,8 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 
 #include <util/config.h>
-#include <util/options.h>
 #include <util/memory_info.h>
+#include <util/options.h>
+#include <util/version.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
@@ -33,8 +34,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-instrument/dump_c.h>
 
 #include <langapi/mode.h>
-
-#include "version.h"
 
 clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
   parse_options_baset(CLOBBER_OPTIONS, argc, argv),

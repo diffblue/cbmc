@@ -11,5 +11,3 @@ add_library(mmcc
 generic_includes(mmcc)
 
 target_link_libraries(mmcc util)
-
-git_revision(mmcc)

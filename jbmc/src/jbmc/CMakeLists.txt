@@ -29,5 +29,3 @@ target_link_libraries(jbmc-lib
 # Executable
 add_executable(jbmc jbmc_main.cpp)
 target_link_libraries(jbmc jbmc-lib)
-
-git_revision(jbmc-lib)

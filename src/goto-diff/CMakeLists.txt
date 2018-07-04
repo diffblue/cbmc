@@ -28,5 +28,3 @@ add_if_library(goto-diff-lib jsil)
 # Executable
 add_executable(goto-diff goto_diff_main.cpp)
 target_link_libraries(goto-diff goto-diff-lib)
-
-git_revision(goto-diff-lib)

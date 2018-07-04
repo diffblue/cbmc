@@ -23,8 +23,7 @@ Author: CM Wintersteiger, 2006
 #endif
 
 #include <util/parse_options.h>
-
-#include "version.h"
+#include <util/version.h>
 
 /// constructor
 goto_cc_modet::goto_cc_modet(

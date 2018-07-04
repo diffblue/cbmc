@@ -29,5 +29,3 @@ add_if_library(clobber-lib bv_refinement)
 # Executable
 add_executable(clobber clobber_main.cpp)
 target_link_libraries(clobber clobber-lib)
-
-git_revision(clobber-lib)

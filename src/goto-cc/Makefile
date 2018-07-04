@@ -46,8 +46,6 @@ all: goto-cl$(EXEEXT)
 endif
 all: goto-cc$(EXEEXT)
 
-as_mode$(OBJEXT) compile$(OBJEXT) gcc_mode$(OBJEXT) goto_cc_mode$(OBJEXT): $(GIT_INFO_FILE)
-
 ifneq ($(wildcard ../jsil/Makefile),)
   OBJ += ../jsil/jsil$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JSIL

@@ -24,6 +24,7 @@ Date: June 2006
 #include <util/suffix.h>
 #include <util/tempdir.h>
 #include <util/unicode.h>
+#include <util/version.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/ansi_c_entry_point.h>
@@ -62,8 +63,6 @@ Date: June 2006
 #define popen _popen
 #define pclose _pclose
 #endif
-
-#include "version.h"
 
 /// reads and source and object files, compiles and links them into goto program
 /// objects.

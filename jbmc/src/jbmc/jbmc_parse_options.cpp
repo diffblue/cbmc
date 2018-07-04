@@ -16,10 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <memory>
 
-#include <util/exit_codes.h>
 #include <util/config.h>
-#include <util/unicode.h>
+#include <util/exit_codes.h>
 #include <util/invariant.h>
+#include <util/unicode.h>
+#include <util/version.h>
 
 #include <langapi/language.h>
 
@@ -59,8 +60,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/remove_java_new.h>
 #include <java_bytecode/replace_java_nondet.h>
 #include <java_bytecode/simple_method_stubbing.h>
-
-#include "version.h"
 
 jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv):
   parse_options_baset(JBMC_OPTIONS, argc, argv),

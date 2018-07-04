@@ -29,5 +29,3 @@ add_if_library(goto-instrument-lib glpk)
 # Executable
 add_executable(goto-instrument goto_instrument_main.cpp)
 target_link_libraries(goto-instrument goto-instrument-lib)
-
-git_revision(goto-instrument-lib)

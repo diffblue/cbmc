@@ -17,9 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/config.h>
-#include <util/unicode.h>
-#include <util/invariant.h>
 #include <util/exit_codes.h>
+#include <util/invariant.h>
+#include <util/unicode.h>
+#include <util/version.h>
 
 #include <langapi/language.h>
 
@@ -63,8 +64,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 
 #include "xml_interface.h"
-
-#include "version.h"
 
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):
   parse_options_baset(CBMC_OPTIONS, argc, argv),
