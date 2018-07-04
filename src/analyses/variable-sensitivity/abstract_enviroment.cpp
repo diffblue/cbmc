@@ -20,6 +20,7 @@
 #include <util/simplify_expr.h>
 
 #include "abstract_enviroment.h"
+#include "abstract_object_statistics.h"
 
 #ifdef DEBUG
 #include <iostream>
@@ -736,4 +737,21 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
     }
   }
   return symbols_diff;
+}
+
+abstract_object_statisticst
+abstract_environmentt::gather_statistics(const namespacet &ns) const
+{
+  abstract_object_statisticst statistics = {};
+  decltype(map)::viewt view;
+  map.get_view(view);
+  abstract_object_visitedt visited;
+  for(auto const &object : view)
+  {
+    if(visited.find(object.second) == visited.end())
+    {
+      object.second->get_statistics(statistics, visited, *this, ns);
+    }
+  }
+  return statistics;
 }

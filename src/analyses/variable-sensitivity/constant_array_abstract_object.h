@@ -38,6 +38,12 @@ public:
   virtual abstract_object_pointert visit_sub_elements(
     const abstract_object_visitort &visitor) const override;
 
+  void get_statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) const override;
+
 protected:
   CLONE
 
