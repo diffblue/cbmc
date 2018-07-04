@@ -36,12 +36,12 @@
 #include <goto-programs/goto_program.h>
 #include <util/expr.h>
 #include <util/sharing_map.h>
+#include "abstract_object_statistics.h"
 
 class typet;
 class constant_exprt;
 class abstract_environmentt;
 class namespacet;
-
 
 #define CLONE \
   virtual internal_abstract_object_pointert mutable_clone() const override \
@@ -75,6 +75,7 @@ template<class T>
 using sharing_ptrt=std::shared_ptr<const T>; // NOLINT(*)
 
 typedef sharing_ptrt<class abstract_objectt> abstract_object_pointert;
+using abstract_object_visitedt = std::set<abstract_object_pointert>;
 
 class abstract_objectt:public std::enable_shared_from_this<abstract_objectt>
 {
@@ -91,6 +92,12 @@ public:
   const typet &type() const;
   virtual bool is_top() const;
   virtual bool is_bottom() const;
+
+  virtual void get_statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) const;
 
   // Interface for transforms
   virtual abstract_object_pointert expression_transform(

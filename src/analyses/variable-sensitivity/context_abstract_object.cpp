@@ -168,3 +168,16 @@ abstract_object_pointert context_abstract_objectt::unwrap_context() const
 {
   return child_abstract_object->unwrap_context();
 }
+
+void context_abstract_objectt::get_statistics(
+  abstract_object_statisticst &statistics,
+  abstract_object_visitedt &visited,
+  const abstract_environmentt &env,
+  const namespacet &ns) const
+{
+  abstract_objectt::get_statistics(statistics, visited, env, ns);
+  if(visited.find(child_abstract_object) == visited.end())
+  {
+    child_abstract_object->get_statistics(statistics, visited, env, ns);
+  }
+}

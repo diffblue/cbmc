@@ -252,3 +252,17 @@ const constant_interval_exprt &interval_abstract_valuet::get_interval() const
 {
   return interval;
 }
+
+void interval_abstract_valuet::get_statistics(
+  abstract_object_statisticst &statistics,
+  abstract_object_visitedt &visited,
+  const abstract_environmentt &env,
+  const namespacet &ns) const
+{
+  abstract_valuet::get_statistics(statistics, visited, env, ns);
+  ++statistics.number_of_interval_abstract_objects;
+  if(interval.is_single_value_interval())
+  {
+    ++statistics.number_of_single_value_intervals;
+  }
+}

@@ -84,6 +84,12 @@ public:
 
   abstract_object_pointert unwrap_context() const override;
 
+  void get_statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) const override;
+
 protected:
   CLONE
 

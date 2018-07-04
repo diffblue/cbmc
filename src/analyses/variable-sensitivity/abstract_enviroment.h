@@ -15,10 +15,10 @@
 #include <iosfwd>
 #include <vector>
 
-#include <util/std_expr.h>
-#include <util/message.h>
+#include "abstract_object_statistics.h"
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <util/sharing_map.h>
+#include <util/std_expr.h>
 
 class abstract_environmentt
 {
@@ -72,6 +72,8 @@ public:
   static std::vector<symbol_exprt> modified_symbols(
     const abstract_environmentt &first,
     const abstract_environmentt &second);
+
+  abstract_object_statisticst gather_statistics(const namespacet &ns) const;
 
 protected:
   bool bottom;

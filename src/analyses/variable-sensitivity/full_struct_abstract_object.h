@@ -43,6 +43,12 @@ public:
   virtual abstract_object_pointert visit_sub_elements(
     const abstract_object_visitort &visitor) const override;
 
+  void get_statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) const override;
+
 private:
   // no entry means component is top
   typedef sharing_mapt<irep_idt, abstract_object_pointert, irep_id_hash>

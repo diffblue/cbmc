@@ -532,3 +532,21 @@ constant_array_abstract_objectt::visit_sub_elements(
     return shared_from_this();
   }
 }
+
+void constant_array_abstract_objectt::get_statistics(
+  abstract_object_statisticst &statistics,
+  abstract_object_visitedt &visited,
+  const abstract_environmentt &env,
+  const namespacet &ns) const
+{
+  array_abstract_objectt::get_statistics(statistics, visited, env, ns);
+  shared_array_mapt::viewt view;
+  map.get_view(view);
+  for(auto const &object : view)
+  {
+    if(visited.find(object.second) == visited.end())
+    {
+      object.second->get_statistics(statistics, visited, env, ns);
+    }
+  }
+}

@@ -360,3 +360,17 @@ sharing_ptrt<pointer_abstract_objectt>
     return std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(shared_from_this());
   }
 }
+
+void constant_pointer_abstract_objectt::get_statistics(
+  abstract_object_statisticst &statistics,
+  abstract_object_visitedt &visited,
+  const abstract_environmentt &env,
+  const namespacet &ns) const
+{
+  pointer_abstract_objectt::get_statistics(statistics, visited, env, ns);
+  // don't bother following nullptr
+  if(!is_top() && !is_bottom() && !value_stack.is_top_value())
+  {
+    read_dereference(env, ns)->get_statistics(statistics, visited, env, ns);
+  }
+}

@@ -462,3 +462,14 @@ abstract_object_pointert abstract_objectt::unwrap_context() const
 {
   return shared_from_this();
 }
+
+void abstract_objectt::get_statistics(
+  abstract_object_statisticst &statistics,
+  abstract_object_visitedt &visited,
+  const abstract_environmentt &env,
+  const namespacet &ns) const
+{
+  const auto &this_ptr = shared_from_this();
+  PRECONDITION(visited.find(this_ptr) == visited.end());
+  visited.insert(this_ptr);
+}

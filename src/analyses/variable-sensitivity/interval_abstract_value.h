@@ -12,6 +12,7 @@
 
 #include <util/interval.h>
 
+#include "abstract_object_statistics.h"
 #include <analyses/variable-sensitivity/abstract_value.h>
 #include <util/std_expr.h>
 
@@ -52,6 +53,12 @@ public:
     const class namespacet &ns) const override;
 
   const constant_interval_exprt &get_interval() const;
+
+  void get_statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) const override;
 
 protected:
   CLONE
