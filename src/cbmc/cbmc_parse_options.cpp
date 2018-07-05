@@ -134,6 +134,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
+  if(cmdline.isset("full-slice"))
+    options.set_option("full-slice", true);
+
   if(cmdline.isset("show-symex-strategies"))
   {
     std::cout << path_strategy_chooser.show_strategies();
