@@ -448,7 +448,26 @@ void value_sett::get_value_set_rec(
     if(expr.operands().size()!=1)
       throw expr.id_string()+" expected to have one operand";
 
-    get_reference_set(expr.op0(), dest, ns);
+    object_mapt references;
+    get_reference_set(expr.op0(), references, ns);
+
+    for(auto &value : references.read())
+    {
+      const exprt &expr = object_numbering[value.first];
+      if(expr.id() == ID_unknown)
+      {
+        // Translate Unknown(type) -> Unknown(Type *)
+        // Note this is only needed for unknowns as object descriptors are
+        // expected to have the dereferenced type.
+        exprt new_expr = expr;
+        new_expr.type() = original_type;
+        insert(dest, new_expr, value.second);
+      }
+      else
+      {
+        insert(dest, value);
+      }
+    }
   }
   else if(expr.id()==ID_dereference)
   {
