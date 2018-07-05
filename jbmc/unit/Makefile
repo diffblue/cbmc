@@ -12,6 +12,7 @@ SRC += java_bytecode/goto-programs/class_hierarchy_output.cpp \
        java_bytecode/java_bytecode_convert_class/convert_java_annotations.cpp \
        java_bytecode/java_bytecode_convert_method/convert_invoke_dynamic.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_generic_class.cpp \
+       java_bytecode/java_bytecode_parser/parse_java_attributes.cpp \
        java_bytecode/java_object_factory/gen_nondet_string_init.cpp \
        java_bytecode/java_bytecode_parse_lambdas/java_bytecode_parse_lambda_method_table.cpp \
        java_bytecode/java_bytecode_parse_lambdas/java_bytecode_convert_class_lambda_method_handles.cpp \
