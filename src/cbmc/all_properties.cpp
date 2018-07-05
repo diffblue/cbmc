@@ -175,7 +175,8 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
           if(g.second.status==goalt::statust::FAILURE)
           {
             result() << "\n" << "Trace for " << g.first << ":" << "\n";
-            show_goto_trace(result(), bmc.ns, g.second.goto_trace);
+            show_goto_trace(
+              result(), bmc.ns, g.second.goto_trace, bmc.trace_options());
           }
       }
       result() << eom;
