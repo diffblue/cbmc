@@ -590,6 +590,8 @@ public:
     exprt &new_expr,
     bool check_constantness=true);
 
+  bool contains_cpp_name(const exprt &expr);
+
 private:
   typedef std::list<irep_idt> dynamic_initializationst;
   dynamic_initializationst dynamic_initializations;
