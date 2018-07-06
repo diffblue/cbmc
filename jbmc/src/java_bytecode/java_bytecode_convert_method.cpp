@@ -1957,9 +1957,12 @@ codet java_bytecode_convert_methodt::convert_switch(
       mp_integer number;
       bool ret = to_integer(to_constant_expr(*a_it), number);
       DATA_INVARIANT(!ret, "case label expected to be integer");
+      // The switch case does not contain any code, it just branches via a GOTO
+      // to the jump target of the tableswitch/lookupswitch case at
+      // hand. Therefore we consider this code to belong to the source bytecode
+      // instruction and not the target instruction.
       code_case.code() = code_gotot(label(integer2string(number)));
-      code_case.code().add_source_location() =
-        address_map.at(integer2unsigned(number)).source->source_location;
+      code_case.code().add_source_location() = location;
 
       if(a_it == args.begin())
         code_case.set_default();
