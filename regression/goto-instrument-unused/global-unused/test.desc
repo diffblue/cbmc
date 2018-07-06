@@ -1,0 +1,21 @@
+CORE
+main.c
+0
+^SIGNAL=0$
+main.c:35 variable p_c is never read
+main.c:4 variable b is never read
+main.c:3 variable a is never read
+main.c:11 variable s_writeonly is never read
+main.c:33 variable p_a is never read
+main.c:11 variable s_unused is never read
+--
+main.c:9 variable usedi is never read
+main.c:34 variable p_b is never read
+main.c:11 variable s_used is never read
+main.c:39 variable p_g is never read
+main.c:15 variable p_f is never read
+main.c:6 variable d is never read
+main.c:38 variable p_f is never read
+main.c:50 variable return_value_h$1 is never read
+main.c:36 variable p_d is never read
+^warning: ignoring

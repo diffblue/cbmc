@@ -100,6 +100,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "undefined_functions.h"
 #include "remove_function.h"
 #include "splice_call.h"
+#include "show_unused.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()
@@ -435,6 +436,13 @@ int goto_instrument_parse_optionst::doit()
 
       list_calls_and_arguments(goto_model);
 
+      return CPROVER_EXIT_SUCCESS;
+    }
+
+    if(cmdline.isset("show-unused"))
+    {
+      do_indirect_call_and_rtti_removal();
+      show_unused(get_ui(), goto_model);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -1494,6 +1502,8 @@ void goto_instrument_parse_optionst::help()
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     " --print-internal-representation\n" // NOLINTNEXTLINE(*)
     "                              show verbose internal representation of the program\n"
+    " --show-unused                list variables that are never read\n"
+    " --show-goto-functions        show goto program\n"
     " --list-undefined-functions   list functions without body\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
     " --show-natural-loops         show natural loop heads\n"

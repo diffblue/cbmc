@@ -54,6 +54,7 @@ SRC = accelerate/accelerate.cpp \
       remove_function.cpp \
       rw_set.cpp \
       show_locations.cpp \
+      show_unused.cpp \
       skip_loops.cpp \
       splice_call.cpp \
       stack_depth.cpp \

@@ -1,0 +1,16 @@
+CORE
+main.c
+0
+^SIGNAL=0$
+--
+mmap/main.c:12 variable mem is never read
+mmap/main.c:33 variable mem is never read
+mmap/main.c:21 variable return_value_mmap$1 is never rea
+mmap/main.c:34 variable return_value_mapmem$1 is never read
+mmap/main.c:9 variable offset is never read
+mmap/main.c:9 variable length is never read
+mmap/main.c:32 variable target is never read
+mmap/main.c:11 variable fd is never read
+mmap/main.c:14 variable flags is never read
+mmap/main.c:13 variable prot is never read
+mmap/main.c:12 variable tmp is never read

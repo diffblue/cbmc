@@ -74,7 +74,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(print-internal-representation)" \
   "(remove-function-pointers)" \
   "(show-claims)(property):" \
-  "(show-symbol-table)(show-points-to)(show-rw-set)" \
+  "(show-symbol-table)(show-points-to)(show-rw-set)(show-unused)" \
   "(cav11)" \
   OPT_TIMESTAMP \
   "(show-natural-loops)(accelerate)(havoc-loops)" \
