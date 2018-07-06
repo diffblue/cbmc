@@ -1,0 +1,17 @@
+KNOWNBUG
+main.c
+--bounds-check --pointer-check --abstract-loops --abstractset main.0
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+main\.0
+--
+ASSUME i < 10
+ASSUME i >= 0
+^warning: ignoring
+--
+This test ensures that the loops with loop variable i are not shrunk (so they
+appear in unwinding), even when the instruction that makes the loop unshrinkable
+is in another function.
+
+Requires #2646, #2694 to work.

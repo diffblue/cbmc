@@ -1387,6 +1387,19 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     havoc_loops(goto_model);
   }
 
+  if(cmdline.isset("abstract-loops"))
+  {
+    // make sure location numbers are set
+    goto_model.goto_functions.update();
+
+    status() << "Abstracting loops" << eom;
+    loop_mapt target_loop_map;
+    if(cmdline.isset("abstractset"))
+      if(parse_absloopset(cmdline.get_value("abstractset"), target_loop_map))
+        throw "failed to parse input loop";
+    abstract_loops(goto_model, target_loop_map);
+  }
+
   if(cmdline.isset("k-induction"))
   {
     bool base_case=cmdline.isset("base-case");
@@ -1638,6 +1651,7 @@ void goto_instrument_parse_optionst::help()
     " --havoc-loops                over-approximate all loops\n"
     " --accelerate                 add loop accelerators\n"
     " --skip-loops <loop-ids>      add gotos to skip selected loops during execution\n" // NOLINT(*)
+    HELP_ABSTRACT_LOOPS
     "\n"
     "Memory model instrumentations:\n"
     " --mm <tso,pso,rmo,power>     instruments a weak memory model\n"

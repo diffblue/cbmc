@@ -117,6 +117,7 @@ BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
           ../src/goto-instrument/reachability_slicer$(OBJEXT) \
           ../src/goto-instrument/nondet_static$(OBJEXT) \
           ../src/goto-instrument/full_slicer$(OBJEXT) \
+          ../src/goto-instrument/abstract_loops$(OBJEXT) \
           ../src/goto-instrument/unwindset$(OBJEXT) \
           ../src/xmllang/xmllang$(LIBEXT) \
           ../src/goto-symex/goto-symex$(LIBEXT) \

@@ -1,0 +1,15 @@
+CORE
+main.c
+--bounds-check --pointer-check --abstract-loops --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+ASSUME j < 10
+ASSUME j >= 0
+--
+ASSUME i < 10
+ASSUME i >= 0
+^warning: ignoring
+--
+This test ensures that the loop with loop variable i is not shrunk (so it
+appears in unwinding). Loops with loop variable j are shrunk. The test also
+checks the constraints to the loop variable are correctly applied.

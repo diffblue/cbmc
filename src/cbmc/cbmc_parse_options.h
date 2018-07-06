@@ -29,6 +29,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_trace.h>
 
+#include <goto-instrument/abstract_loops.h>
+
 #include <solvers/strings/string_refinement.h>
 
 #include "bmc.h"
@@ -44,6 +46,7 @@ class optionst;
   OPT_FUNCTIONS \
   "(no-simplify)(full-slice)" \
   OPT_REACHABILITY_SLICER \
+  OPT_ABSTRACT_LOOPS \
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \
   "D:I:(c89)(c99)(c11)(cpp98)(cpp03)(cpp11)" \

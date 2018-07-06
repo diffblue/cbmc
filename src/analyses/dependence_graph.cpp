@@ -238,6 +238,16 @@ void dep_graph_domaint::transform(
   data_dependencies(from, function_to, to, *dep_graph, ns);
 }
 
+dep_graph_domaint::depst dep_graph_domaint::get_data_deps() const
+{
+  return data_deps;
+}
+
+dep_graph_domaint::depst dep_graph_domaint::get_control_deps() const
+{
+  return control_deps;
+}
+
 void dep_graph_domaint::output(
   std::ostream &out,
   const ai_baset &,
