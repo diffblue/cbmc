@@ -232,8 +232,68 @@ public:
     }
   };
 
+  class const_iteratort
+  {
+  public:
+    using difference_type = symbolst::difference_type;
+    using value_type = symbolst::value_type;
+    using pointer = const value_type*;
+    using reference = const value_type &;
+    using iterator_category = std::forward_iterator_tag;
+
+    explicit const_iteratort(const symbolst::const_iterator &it) : it(it) {}
+    const_iteratort(const const_iteratort& other) : it(other.it) {}
+    const_iteratort(const_iteratort&& other) noexcept : it(std::move(other.it)) {}
+
+    const_iteratort& operator=(const const_iteratort& other) {
+      it = other.it;
+      return *this;
+    }
+
+    const_iteratort& operator=(const_iteratort&& other) {
+      it = std::move(other.it);
+      return *this;
+    }
+
+    bool operator==(const const_iteratort& other) const {
+      return it == other.it;
+    }
+    bool operator!=(const const_iteratort& other) const {
+      return it != other.it;
+    }
+
+    const_iteratort& operator++() {
+      ++it;
+      return *this;
+    }
+
+    const const_iteratort operator++(int) {
+      return ++const_iteratort(*this);
+    }
+
+    reference operator*() {
+      return *it;
+    }
+    pointer operator->() {
+      return it.operator->();
+    }
+
+  private:
+    symbolst::const_iterator it;
+  };
+
   virtual iteratort begin() = 0;
   virtual iteratort end() = 0;
+
+
+  virtual const_iteratort begin() const {
+    return const_iteratort {symbols.begin()};
+  }
+
+  virtual const_iteratort end() const {
+    return const_iteratort {symbols.end()};
+  }
+
 };
 
 std::ostream &
