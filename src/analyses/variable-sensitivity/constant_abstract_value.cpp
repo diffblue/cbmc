@@ -231,3 +231,12 @@ abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
     }
   }
 }
+
+void constant_abstract_valuet::get_statistics(abstract_object_statisticst &statistics,
+                                              abstract_object_visitedt &visited,
+                                              const abstract_environmentt &env,
+                                              const namespacet& ns) const
+{
+  abstract_valuet::get_statistics(statistics, visited, env, ns);
+  ++statistics.number_of_constants;
+}

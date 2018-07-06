@@ -42,6 +42,11 @@ public:
     const class ai_baset &ai,
     const class namespacet &ns) const override;
 
+  void get_statistics(abstract_object_statisticst &statistics,
+                      abstract_object_visitedt &visited,
+                      const abstract_environmentt &env,
+                      const namespacet& ns) const override;
+
 protected:
   CLONE
   virtual abstract_object_pointert merge(
