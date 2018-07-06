@@ -33,7 +33,7 @@ public:
     const exprt &expr,
     const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,
-    const namespacet &ns) const;
+    const namespacet &ns) const override;
 
   virtual exprt to_constant() const override;
 

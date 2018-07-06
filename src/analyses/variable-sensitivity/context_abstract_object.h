@@ -76,7 +76,7 @@ public:
     const exprt &expr,
     const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,
-    const namespacet &ns) const;
+    const namespacet &ns) const override;
 
   virtual void output(
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const
