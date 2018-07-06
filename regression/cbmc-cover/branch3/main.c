@@ -4,7 +4,7 @@ int main()
 {
   char ch;
   unsigned state=0;
-  while((ch=getc(stdin))!=-1)
+  while((ch = getc(stdin)) != (char)-1)
   {
     switch(state)
     {
