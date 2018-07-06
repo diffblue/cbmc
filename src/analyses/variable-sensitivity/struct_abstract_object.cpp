@@ -193,3 +193,9 @@ sharing_ptrt<struct_abstract_objectt> struct_abstract_objectt::write_component(
       new struct_abstract_objectt(type(), true, false));
   }
 }
+
+void struct_abstract_objectt::get_statistics(abstract_object_statisticst &statistics, abstract_object_visitedt &visited,
+                                             const abstract_environmentt &env, const namespacet &ns) const {
+  abstract_objectt::get_statistics(statistics, visited, env, ns);
+  ++statistics.number_of_structs;
+}

@@ -9,6 +9,7 @@
 #include <stack>
 #include <map>
 #include <ostream>
+#include <algorithm>
 
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
@@ -739,10 +740,21 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
   return symbols_diff;
 }
 
+static std::size_t count_globals(const namespacet &ns)
+{
+  auto const& symtab = ns.get_symbol_table();
+  auto val = std::count_if(symtab.begin(), symtab.end(),
+                       [](const symbol_table_baset::const_iteratort::value_type& sym) {
+                         return sym.second.is_lvalue && sym.second.is_static_lifetime;
+                       });
+  return val;
+}
+
 abstract_object_statisticst
 abstract_environmentt::gather_statistics(const namespacet &ns) const
 {
   abstract_object_statisticst statistics = {};
+  statistics.number_of_globals = count_globals(ns);
   decltype(map)::viewt view;
   map.get_view(view);
   abstract_object_visitedt visited;
