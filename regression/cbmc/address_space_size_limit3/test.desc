@@ -1,5 +1,5 @@
 CORE
-main.c
+main.i
 --32 --little-endian --object-bits 25 --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$

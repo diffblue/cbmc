@@ -1,5 +1,5 @@
 KNOWNBUG
-main.c
+main.i
 --bounds-check --32 --no-simplify
 ^EXIT=0$
 ^SIGNAL=0$

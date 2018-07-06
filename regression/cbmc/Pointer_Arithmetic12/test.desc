@@ -1,5 +1,5 @@
 CORE
-main.c
+main.i
 --32 --little-endian
 ^EXIT=0$
 ^SIGNAL=0$
