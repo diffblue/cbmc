@@ -121,6 +121,17 @@ class java_class_typet:public class_typet
     return set(ID_is_inner_class, is_inner_class);
   }
 
+  const bool get_is_static_class() const
+  {
+    return get_bool(ID_is_static);
+  }
+
+  void set_is_static_class(const bool &is_static_class)
+  {
+    return set(ID_is_static, is_static_class);
+  }
+
+
   bool get_final()
   {
     return get_bool(ID_final);
