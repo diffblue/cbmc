@@ -503,7 +503,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         const typet &c_enum_type=ns.follow_tag(to_c_enum_tag_type(expr_type));
         if(c_enum_type.id()==ID_c_enum) // possibly incomplete
         {
-          unsigned int_value=operand.is_true();
+          unsigned int_value = operand.is_true() ? 1u : 0u;
           exprt tmp=from_integer(int_value, c_enum_type);
           tmp.type()=expr_type; // we maintain the tag type
           expr=tmp;

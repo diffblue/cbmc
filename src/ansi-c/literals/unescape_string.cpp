@@ -73,7 +73,7 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
         {
           std::string hex;
 
-          const unsigned digits=(ch=='u')?4:8;
+          const unsigned digits = (ch == 'u') ? 4u : 8u;
           hex.reserve(digits);
 
           for(unsigned count=digits;

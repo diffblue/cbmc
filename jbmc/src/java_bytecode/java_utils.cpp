@@ -43,7 +43,7 @@ unsigned java_local_variable_slots(const typet &t)
     "all types constructed in java_types.cpp encode JVM types "
     "with these bit widths");
 
-  return bitwidth==64 ? 2 : 1;
+  return bitwidth == 64 ? 2u : 1u;
 }
 
 unsigned java_method_parameter_slots(const code_typet &t)
