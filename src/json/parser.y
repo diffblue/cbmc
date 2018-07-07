@@ -1,4 +1,17 @@
 %{
+#ifdef _MSC_VER
+// possible loss of data
+#pragma warning(disable:4242)
+// possible loss of data
+#pragma warning(disable:4244)
+// signed/unsigned mismatch
+#pragma warning(disable:4365)
+// switch with default but no case labels
+#pragma warning(disable:4065)
+// unreachable code
+#pragma warning(disable:4702)
+#endif
+
 // Strictly follows http://www.json.org/
 %}
 
