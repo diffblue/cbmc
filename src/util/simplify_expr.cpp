@@ -1232,7 +1232,7 @@ bool simplify_exprt::get_values(
   if(expr.is_constant())
   {
     mp_integer int_value;
-    if(to_integer(expr, int_value))
+    if(to_integer(to_constant_expr(expr), int_value))
       return true;
 
     value_list.insert(int_value);
