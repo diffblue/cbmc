@@ -26,7 +26,7 @@ int hybrid_binary(
 
   int result;
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD_kernel__)
   std::string objcopy_cmd;
 
   if(has_suffix(compiler_or_linker, "-ld"))
