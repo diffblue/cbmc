@@ -1164,26 +1164,6 @@ std::string expr2ct::convert_unary(
   return dest;
 }
 
-std::string expr2ct::convert_pointer_object_has_type(
-  const exprt &src,
-  unsigned precedence)
-{
-  if(src.operands().size()!=1)
-    return convert_norep(src, precedence);
-
-  unsigned p0;
-  std::string op0=convert_with_precedence(src.op0(), p0);
-
-  std::string dest="POINTER_OBJECT_HAS_TYPE";
-  dest+='(';
-  dest+=op0;
-  dest+=", ";
-  dest+=convert(static_cast<const typet &>(src.find("object_type")));
-  dest+=')';
-
-  return dest;
-}
-
 std::string expr2ct::convert_allocate(const exprt &src, unsigned &precedence)
 {
   if(src.operands().size() != 2)
@@ -3578,9 +3558,6 @@ std::string expr2ct::convert_with_precedence(
 
   else if(src.id()=="object_value")
     return convert_function(src, "OBJECT_VALUE", precedence=16);
-
-  else if(src.id()=="pointer_object_has_type")
-    return convert_pointer_object_has_type(src, precedence=16);
 
   else if(src.id()==ID_array_of)
     return convert_array_of(src, precedence=16);

@@ -1383,13 +1383,6 @@ void smt2_convt::convert_expr(const exprt &expr)
     out << ") (_ bv" << pointer_logic.get_invalid_object()
         << " " << config.bv_encoding.object_bits << "))";
   }
-  else if(expr.id()=="pointer_object_has_type")
-  {
-    assert(expr.operands().size()==1);
-
-    out << "false"; // TODO
-    SMT2_TODO("pointer_object_has_type not implemented");
-  }
   else if(expr.id()==ID_string_constant)
   {
     defined_expressionst::const_iterator it=defined_expressions.find(expr);

@@ -102,9 +102,6 @@ protected:
   std::string convert_member(
     const member_exprt &src, unsigned precedence);
 
-  std::string convert_pointer_object_has_type(
-    const exprt &src, unsigned precedence);
-
   std::string convert_array_of(const exprt &src, unsigned precedence);
 
   std::string convert_trinary(
