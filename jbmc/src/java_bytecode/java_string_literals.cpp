@@ -106,7 +106,7 @@ symbol_exprt get_or_create_string_literal_symbol(
   if(string_refinement_enabled)
   {
     const array_exprt data =
-      utf16_to_array(utf8_to_utf16_little_endian(id2string(value)));
+      utf16_to_array(utf8_to_utf16(id2string(value), false));
 
     struct_exprt literal_init(new_symbol.type);
     literal_init.operands().resize(jls_struct.components().size());
