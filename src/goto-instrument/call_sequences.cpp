@@ -270,7 +270,6 @@ void check_call_sequence(const goto_modelt &goto_model)
 
 static void list_calls_and_arguments(
   const namespacet &ns,
-  const irep_idt &function,
   const goto_programt &goto_program)
 {
   forall_goto_program_instructions(i_it, goto_program)
@@ -321,5 +320,5 @@ void list_calls_and_arguments(const goto_modelt &goto_model)
   const namespacet ns(goto_model.symbol_table);
 
   forall_goto_functions(f_it, goto_model.goto_functions)
-    list_calls_and_arguments(ns, f_it->first, f_it->second.body);
+    list_calls_and_arguments(ns, f_it->second.body);
 }
