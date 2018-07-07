@@ -1120,10 +1120,16 @@ bool configt::set(const cmdlinet &cmdline)
     INVARIANT(
       ansi_c.double_width == sizeof(double) * CHAR_BIT,
       "double width shall be equal to the system double width");
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable : 4309)
+// truncation of constant value
+#endif
     INVARIANT(
       ansi_c.char_is_unsigned ==
         (static_cast<char>((1 << CHAR_BIT) - 1) == (1 << CHAR_BIT) - 1),
       "char_is_unsigned flag shall indicate system char unsignedness");
+#include <util/pragma_pop.def>
 
 #ifndef _WIN32
     // On Windows, long double width varies by compiler
