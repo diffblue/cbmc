@@ -113,7 +113,7 @@ uint16_t htons(uint16_t hostshort)
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   return __builtin_bswap16(hostshort);
 #else
-  return hostlong;
+  return hostshort;
 #endif
 }
 
