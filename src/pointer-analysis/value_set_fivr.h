@@ -395,8 +395,7 @@ protected:
     const entryt&,
     object_mapt&,
     flatten_seent&,
-    unsigned from_function,
-    unsigned from_index) const;
+    unsigned from_function) const;
 
   bool recursive_find(
     const irep_idt &ident,
