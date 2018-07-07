@@ -374,7 +374,7 @@ exprt string_constraint_generatort::add_axioms_for_format(
         }
         else
         {
-          INVARIANT(fs.index>=0, "index in format should be positive");
+          INVARIANT(fs.index > 0, "index in format should be positive");
           INVARIANT(
             static_cast<std::size_t>(fs.index)<=args.size(),
             "number of format must match specifiers");
