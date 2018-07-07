@@ -56,7 +56,7 @@ jobs:
           ln -s goto-cc src/goto-cc/goto-g++
 
       - name: Compile Xen with CBMC via one-line-scan, and check for goto-cc section
-        run: one-line-scan/one-line-scan --add-to-path $(pwd)/src/cbmc --add-to-path $(pwd)/src/goto-diff  --add-to-path $(pwd)/src/goto-cc --no-analysis --trunc-existing --extra-cflags -Wno-error -o CPROVER -j 3 -- make -C xen_4_13 xen -j $(nproc) -k || true
+        run: one-line-scan/one-line-scan --add-to-path $(pwd)/src/cbmc --add-to-path $(pwd)/src/goto-diff  --add-to-path $(pwd)/src/goto-cc --no-analysis --trunc-existing --extra-cflags -Wno-error -o CPROVER -j 3 -- make -C xen_4_13 xen -j $(nproc)
         
       - name: Check for goto-cc section in xen-syms binary
         run: objdump -h xen_4_13/xen/xen-syms | grep "goto-cc"

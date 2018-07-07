@@ -145,7 +145,8 @@ int ld_modet::doit()
 
   // We can generate hybrid ELF and Mach-O binaries
   // containing both executable machine code and the goto-binary.
-  return ld_hybrid_binary(compiler.mode == compilet::COMPILE_LINK_EXECUTABLE);
+  return ld_hybrid_binary(
+    compiler.mode == compilet::COMPILE_LINK_EXECUTABLE, compiler.object_files);
 }
 
 int ld_modet::run_ld()
@@ -170,7 +171,9 @@ int ld_modet::run_ld()
   return run(new_argv[0], new_argv, cmdline.stdin_file, "", "");
 }
 
-int ld_modet::ld_hybrid_binary(bool building_executable)
+int ld_modet::ld_hybrid_binary(
+  bool building_executable,
+  const std::list<std::string> &object_files)
 {
   std::string output_file;
 
@@ -201,6 +204,42 @@ int ld_modet::ld_hybrid_binary(bool building_executable)
     return 1;
   }
 
+  const bool linking_efi = cmdline.get_value('m') == "i386pep";
+
+#ifdef __linux__
+  if(linking_efi)
+  {
+    const std::string objcopy_cmd = objcopy_command(native_tool_name);
+
+    for(const auto &object_file : object_files)
+    {
+      log.debug() << "stripping goto-cc sections before building EFI binary"
+                  << messaget::eom;
+      // create a backup copy
+      const std::string bin_name = object_file + goto_binary_tmp_suffix;
+
+      std::ifstream in(object_file, std::ios::binary);
+      std::ofstream out(bin_name, std::ios::binary);
+      out << in.rdbuf();
+
+      // remove any existing goto-cc section
+      std::vector<std::string> objcopy_argv;
+
+      objcopy_argv.push_back(objcopy_cmd);
+      objcopy_argv.push_back("--remove-section=goto-cc");
+      objcopy_argv.push_back(object_file);
+
+      if(run(objcopy_argv[0], objcopy_argv) != 0)
+      {
+        log.debug() << "EFI binary preparation: removing goto-cc section failed"
+                    << messaget::eom;
+      }
+    }
+  }
+#else
+  (void)object_files; // unused parameter
+#endif
+
   int result = run_ld();
 
   if(result == 0 && cmdline.isset('T'))
@@ -209,6 +248,25 @@ int ld_modet::ld_hybrid_binary(bool building_executable)
       output_file, goto_binary, cmdline, message_handler);
     result = ls_merge.add_linker_script_definitions();
   }
+
+#ifdef __linux__
+  if(linking_efi)
+  {
+    log.debug() << "arch set with " << object_files.size() << messaget::eom;
+    for(const auto &object_file : object_files)
+    {
+      log.debug() << "EFI binary preparation: restoring object files"
+                  << messaget::eom;
+      const std::string bin_name = object_file + goto_binary_tmp_suffix;
+      const int mv_result = rename(bin_name.c_str(), object_file.c_str());
+      if(mv_result != 0)
+      {
+        log.debug() << "Rename failed: " << std::strerror(errno)
+                    << messaget::eom;
+      }
+    }
+  }
+#endif
 
   if(result == 0)
   {
@@ -219,7 +277,8 @@ int ld_modet::ld_hybrid_binary(bool building_executable)
       goto_binary,
       output_file,
       building_executable,
-      message_handler);
+      message_handler,
+      linking_efi);
   }
 
   return result;
