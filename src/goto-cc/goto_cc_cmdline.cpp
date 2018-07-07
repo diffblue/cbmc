@@ -103,7 +103,7 @@ std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
   else
   {
     UNREACHABLE;
-    return -1;
+    return 0;
   }
 
   // new?
