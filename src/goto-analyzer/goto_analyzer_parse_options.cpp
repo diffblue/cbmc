@@ -628,7 +628,6 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       result = static_show_domain(goto_model,
                                   *analyzer,
                                   options,
-                                  get_message_handler(),
                                   out);
     }
     else if(options.get_bool_option("verify"))
@@ -652,7 +651,6 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       result = static_unreachable_instructions(goto_model,
                                                *analyzer,
                                                options,
-                                               get_message_handler(),
                                                out);
     }
     else if(options.get_bool_option("unreachable-functions"))
@@ -660,7 +658,6 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       result = static_unreachable_functions(goto_model,
                                             *analyzer,
                                             options,
-                                            get_message_handler(),
                                             out);
     }
     else if(options.get_bool_option("reachable-functions"))
@@ -668,7 +665,6 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       result = static_reachable_functions(goto_model,
                                           *analyzer,
                                           options,
-                                          get_message_handler(),
                                           out);
     }
     else

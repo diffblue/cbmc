@@ -16,14 +16,12 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 /// \param goto_model: the program analyzed
 /// \param ai: the abstract interpreter after it has been run to fix point
 /// \param options: the parsed user options
-/// \param message_handler: the system message handler
 /// \param out: output stream for the printing
 /// \return: false on success with the domain printed to out
 bool static_show_domain(
   const goto_modelt &goto_model,
   const ai_baset &ai,
   const optionst &options,
-  message_handlert &message_handler,
   std::ostream &out)
 {
   if(options.get_bool_option("json"))
