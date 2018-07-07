@@ -1779,7 +1779,7 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
     rmethod_attribute(method);
 }
 
-optionalt<class java_bytecode_parse_treet>
+optionalt<java_bytecode_parse_treet>
 java_bytecode_parse(std::istream &istream, message_handlert &message_handler)
 {
   java_bytecode_parsert java_bytecode_parser;
@@ -1796,7 +1796,7 @@ java_bytecode_parse(std::istream &istream, message_handlert &message_handler)
   return std::move(java_bytecode_parser.parse_tree);
 }
 
-optionalt<class java_bytecode_parse_treet>
+optionalt<java_bytecode_parse_treet>
 java_bytecode_parse(const std::string &file, message_handlert &message_handler)
 {
   std::ifstream in(file, std::ios::binary);
