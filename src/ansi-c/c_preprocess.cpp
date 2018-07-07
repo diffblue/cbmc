@@ -541,12 +541,43 @@ bool c_preprocess_gcc_clang(
 
   command += " -E -D__CPROVER__";
 
+  const irep_idt &arch = config.ansi_c.arch;
+
   if(config.ansi_c.pointer_width == 16)
-    command += " -m16";
+  {
+    if(arch == "i386" || arch == "x86_64" || arch == "x32")
+      command += " -m16";
+    else if(has_prefix(id2string(arch), "mips"))
+      command += " -mips16";
+  }
   else if(config.ansi_c.pointer_width == 32)
-    command += " -m32";
+  {
+    if(arch == "i386" || arch == "x86_64")
+      command += " -m32";
+    else if(arch == "x32")
+      command += " -mx32";
+    else if(has_prefix(id2string(arch), "mips"))
+      command += " -mabi=32";
+    else if(arch == "powerpc" || arch == "ppc64" || arch == "ppc64le")
+      command += " -m32";
+    else if(arch == "s390" || arch == "s390x")
+      command += " -m31"; // yes, 31, not 32!
+    else if(arch == "sparc" || arch == "sparc64")
+      command += " -m32";
+  }
   else if(config.ansi_c.pointer_width == 64)
-    command += " -m64";
+  {
+    if(arch == "i386" || arch == "x86_64" || arch == "x32")
+      command += " -m64";
+    else if(has_prefix(id2string(arch), "mips"))
+      command += " -mabi=64";
+    else if(arch == "powerpc" || arch == "ppc64" || arch == "ppc64le")
+      command += " -m64";
+    else if(arch == "s390" || arch == "s390x")
+      command += " -m64";
+    else if(arch == "sparc" || arch == "sparc64")
+      command += " -m64";
+  }
 
   // The width of wchar_t depends on the OS!
   if(config.ansi_c.wchar_t_width == config.ansi_c.short_int_width)
