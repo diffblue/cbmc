@@ -1,10 +1,16 @@
+#ifdef __GNUC__
+#define NOTHROW __attribute__((nothrow))
+#else
+#define NOTHROW
+#endif
+
 namespace std {
   extern "C" {
-    double fabs(double) __attribute__((nothrow)) ;
+    double fabs(double) NOTHROW ;
   }
 
-  __inline float fabs(float x) __attribute__((nothrow));
-  __inline long double fabs(long double x) __attribute__((nothrow));
+  __inline float fabs(float x) NOTHROW;
+  __inline long double fabs(long double x) NOTHROW;
 
   /* original code from CodeWarrior */
   template <class _T>
