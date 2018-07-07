@@ -180,9 +180,9 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
   // these may be Unicode -- which is indicated by 0xff 0xfe
   std::string line;
   getline(infile, line);
-  if(line.size()>=2 &&
-     line[0]==static_cast<char>(0xff) &&
-     line[1]==static_cast<char>(0xfe))
+  if(
+    line.size() >= 2 && static_cast<unsigned char>(line[0]) == 0xffu &&
+    static_cast<unsigned char>(line[1]) == 0xfeu)
   {
     // Unicode, UTF-16 little endian
 
@@ -206,10 +206,10 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
 
     #endif
   }
-  else if(line.size()>=3 &&
-          line[0]==static_cast<char>(0xef) &&
-          line[1]==static_cast<char>(0xbb) &&
-          line[2]==static_cast<char>(0xbf))
+  else if(
+    line.size() >= 3 && static_cast<unsigned char>(line[0]) == 0xefu &&
+    static_cast<unsigned char>(line[1]) == 0xbbu &&
+    static_cast<unsigned char>(line[2]) == 0xbfu)
   {
     // This is the UTF-8 BOM. We can proceed as usual, since
     // we use UTF-8 internally.

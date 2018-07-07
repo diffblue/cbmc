@@ -225,7 +225,13 @@ void smt2_tokenizert::get_token_from_stream()
     case ' ':
     case '\r':
     case '\t':
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable : 4309)
+      // truncation of constant value
+#endif
     case static_cast<char>(160): // non-breaking space
+#include <util/pragma_pop.def>
       // skip any whitespace
       break;
 

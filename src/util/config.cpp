@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "config.h"
 
 #include <cstdlib>
+#include <limits>
 
 #include "arith_tools.h"
 #include "cmdline.h"
@@ -1001,16 +1002,22 @@ bool configt::set(const cmdlinet &cmdline)
     INVARIANT(
       ansi_c.double_width == sizeof(double) * 8,
       "double width shall be equal to the system double width");
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable : 4309)
+// truncation of constant value
+#endif
     INVARIANT(
       ansi_c.char_is_unsigned == (static_cast<char>(255) == 255),
       "char_is_unsigned flag shall indicate system char unsignedness");
+#include <util/pragma_pop.def>
 
-    #ifndef _WIN32
+#ifndef _WIN32
     // On Windows, long double width varies by compiler
     INVARIANT(
       ansi_c.long_double_width == sizeof(long double) * 8,
       "long double width shall be equal to the system long double width");
-    #endif
+#endif
   }
 
   // the following allows overriding the defaults
