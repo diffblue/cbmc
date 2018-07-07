@@ -92,7 +92,15 @@ protected:
 /// Get a reference to the global string container.
 inline string_containert &get_string_container()
 {
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4640)
+  // construction of local static object is not thread-safe
+#endif
   static string_containert ret;
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
   return ret;
 }
 

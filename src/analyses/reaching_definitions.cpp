@@ -734,7 +734,15 @@ const rd_range_domaint::ranges_at_loct &rd_range_domaint::get(
 {
   populate_cache(identifier);
 
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4640)
+  // construction of local static object is not thread-safe
+#endif
   static ranges_at_loct empty;
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
 
   export_cachet::const_iterator entry=export_cache.find(identifier);
 

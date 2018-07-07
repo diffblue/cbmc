@@ -20,8 +20,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/threeval.h>
 
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable:4640)
+  // construction of local static object is not thread-safe
+#endif
 #include <minisat/core/Solver.h>
 #include <minisat/simp/SimpSolver.h>
+#include <util/pragma_pop.def>
 
 #ifndef HAVE_MINISAT2
 #error "Expected HAVE_MINISAT2"

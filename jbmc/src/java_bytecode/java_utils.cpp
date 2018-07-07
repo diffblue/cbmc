@@ -407,9 +407,17 @@ get_inherited_component(
 /// \return true if this static field is known never to be null
 bool is_non_null_library_global(const irep_idt &symbolid)
 {
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4640)
+  // construction of local static object is not thread-safe
+#endif
   static const irep_idt in = "java::java.lang.System.in";
   static const irep_idt out = "java::java.lang.System.out";
   static const irep_idt err = "java::java.lang.System.err";
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
   return symbolid == in || symbolid == out || symbolid == err;
 }
 
