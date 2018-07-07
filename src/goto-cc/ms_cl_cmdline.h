@@ -32,6 +32,8 @@ protected:
   void process_cl_option(const std::string &s);
   void process_response_file(const std::string &file);
   void process_response_file_line(const std::string &line);
+  // avoid spurious warning about overloading
+  using cmdlinet::parse;
   bool parse(const std::vector<std::string> &);
 };
 

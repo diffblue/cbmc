@@ -402,11 +402,19 @@ bool taint_analysist::operator()(
     error() << error_msg << eom;
     return true;
   }
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4571)
+  // catch(...) semantics changed since Visual C++ 7.1
+#endif
   catch(...)
   {
     error() << "Caught unexpected error in taint_analysist::operator()" << eom;
     return true;
   }
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
 }
 
 bool taint_analysis(

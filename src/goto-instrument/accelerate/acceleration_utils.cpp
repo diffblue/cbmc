@@ -870,10 +870,18 @@ bool acceleration_utilst::expr2poly(
   {
     poly.from_expr(subbed_expr);
   }
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4571)
+  // catch(...) semantics changed since Visual C++ 7.1
+#endif
   catch(...)
   {
     return false;
   }
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
 
   return true;
 }
@@ -1094,6 +1102,11 @@ bool acceleration_utilst::assign_array(
       poly.from_expr(idx);
     }
   }
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4571)
+  // catch(...) semantics changed since Visual C++ 7.1
+#endif
   catch(...)
   {
     // idx is probably nonlinear... bail out.
@@ -1102,6 +1115,9 @@ bool acceleration_utilst::assign_array(
 #endif
     return false;
   }
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
 
   if(poly.max_degree(loop_counter) > 1)
   {

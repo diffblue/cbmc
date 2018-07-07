@@ -46,6 +46,12 @@ bool sort_operands(exprt::operandst &operands)
 // aren't associative. Addition to pointers isn't really
 // associative.
 
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable:4510)
+#pragma warning(disable:4610)
+  // default constructor could not be generated
+#endif
 struct saj_tablet
 {
   const irep_idt id;
@@ -93,6 +99,7 @@ struct saj_tablet
                irep_idt()  }},
   { irep_idt(), { irep_idt() }}
 };
+#include <util/pragma_pop.def>
 
 static bool sort_and_join(
   const struct saj_tablet &saj_entry,

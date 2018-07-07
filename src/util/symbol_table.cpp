@@ -20,6 +20,11 @@ std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
   symbolt &new_symbol=result.first->second;
   if(result.second)
   {
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable:4571)
+  // catch(...) semantics changed since Visual C++ 7.1
+#endif
     try
     {
       symbol_base_mapt::iterator base_result=
@@ -39,6 +44,7 @@ std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
       internal_symbols.erase(result.first);
       throw;
     }
+#include <util/pragma_pop.def>
   }
   return std::make_pair(std::ref(new_symbol), result.second);
 }

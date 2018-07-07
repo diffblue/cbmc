@@ -1249,11 +1249,19 @@ void shared_bufferst::cfg_visitort::weak_memory(
 
         i_it--; // the for loop already counts us up
       }
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4571)
+  // catch(...) semantics changed since Visual C++ 7.1
+#endif
       catch (...)
       {
         shared_buffers.message.warning() << "Identifier not found"
           << messaget::eom;
       }
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
     }
     else if(is_fence(instruction, ns) ||
             (instruction.is_other() &&

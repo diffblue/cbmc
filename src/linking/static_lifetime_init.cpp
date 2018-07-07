@@ -123,10 +123,18 @@ bool static_lifetime_init(
         rhs=zero_initializer(symbol.type, symbol.location, ns, message_handler);
         assert(rhs.is_not_nil());
       }
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4571)
+  // catch(...) semantics changed since Visual C++ 7.1
+#endif
       catch(...)
       {
         return true;
       }
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
     }
     else
       rhs=symbol.value;

@@ -46,9 +46,17 @@ std::string unwrap_exception(const std::exception &e, int level)
     }
     message_stream << nested_message;
   }
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4571)
+  // catch(...) semantics changed since Visual C++ 7.1
+#endif
   catch(...)
   {
     UNREACHABLE;
   }
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
   return message_stream.str();
 }

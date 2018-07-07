@@ -436,11 +436,19 @@ bool java_bytecode_parsert::parse()
     return true;
   }
 
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4571)
+  // catch(...) semantics changed since Visual C++ 7.1
+#endif
   catch(...)
   {
     error() << "parsing error" << eom;
     return true;
   }
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
 
   return false;
 }

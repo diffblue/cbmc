@@ -188,6 +188,11 @@ protected:
     typename cfg_baset<T, P, I>::entryt &entry);
 };
 
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable:4435)
+  // object layout under /vd2 will change due to virtual base class
+#endif
 template<class T,
          typename P=const goto_programt,
          typename I=goto_programt::const_targett>
@@ -201,6 +206,7 @@ protected:
     goto_programt::const_targett next_PC,
     typename cfg_baset<T, P, I>::entryt &entry);
 };
+#include <util/pragma_pop.def>
 
 template<class T,
          typename P=const goto_programt,

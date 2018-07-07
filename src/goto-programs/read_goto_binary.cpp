@@ -167,10 +167,18 @@ bool is_goto_binary(const std::string &filename)
         return true;
     }
 
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4571)
+  // catch(...) semantics changed since Visual C++ 7.1
+#endif
     catch(...)
     {
       // ignore any errors
     }
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
   }
   else if(is_osx_fat_magic(hdr))
   {
@@ -183,10 +191,18 @@ bool is_goto_binary(const std::string &filename)
         return true;
     }
 
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4571)
+  // catch(...) semantics changed since Visual C++ 7.1
+#endif
     catch(...)
     {
       // ignore any errors
     }
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
   }
 
   return false;
@@ -216,10 +232,18 @@ bool read_object_and_link(
   {
     link_goto_model(dest, temp_model, message_handler);
   }
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4571)
+  // catch(...) semantics changed since Visual C++ 7.1
+#endif
   catch(...)
   {
     return true;
   }
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
 
   // reading successful, let's update config
   config.set_from_symbol_table(dest.symbol_table);
