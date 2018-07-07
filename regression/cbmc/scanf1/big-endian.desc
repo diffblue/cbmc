@@ -1,6 +1,6 @@
-CORE
+KNOWNBUG
 main.i
---little-endian
+--big-endian
 ^EXIT=10$
 ^SIGNAL=0$
 ^\*\* 8 of 8 failed
