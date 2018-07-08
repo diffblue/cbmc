@@ -100,6 +100,9 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 
   const exprt &op=expr.op();
   const exprt &offset=expr.offset();
+  PRECONDITION(
+    expr.id() == ID_byte_extract_little_endian ||
+    expr.id() == ID_byte_extract_big_endian);
   const bool little_endian = expr.id() == ID_byte_extract_little_endian;
 
   // first do op0
