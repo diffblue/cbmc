@@ -354,7 +354,7 @@ static void instrument_start_thread(
 static void instrument_endThread(
   const code_function_callt &f_code,
   codet &code,
-  symbol_tablet symbol_table)
+  const symbol_tablet &symbol_table)
 {
   PRECONDITION(f_code.arguments().size() == 1);
 
@@ -391,7 +391,7 @@ static void instrument_endThread(
 static void instrument_getCurrentThreadID(
   const code_function_callt &f_code,
   codet &code,
-  symbol_tablet symbol_table)
+  symbol_tablet &symbol_table)
 {
   PRECONDITION(f_code.arguments().size() == 0);
 
