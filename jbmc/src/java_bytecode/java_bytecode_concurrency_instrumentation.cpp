@@ -351,7 +351,7 @@ static void instrument_start_thread(
 /// \param f_code: function call to CProver.endThread:(I)V
 /// \param [out] code: resulting transformation
 /// \param symbol_table: a symbol table
-static void instrument_endThread(
+static void instrument_end_thread(
   const code_function_callt &f_code,
   codet &code,
   const symbol_tablet &symbol_table)
@@ -388,7 +388,7 @@ static void instrument_endThread(
 /// \param f_code: function call to CProver.getCurrentThreadID:()I
 /// \param [out] code: resulting transformation
 /// \param symbol_table: a symbol table
-static void instrument_getCurrentThreadID(
+static void instrument_get_current_thread_id(
   const code_function_callt &f_code,
   codet &code,
   symbol_tablet &symbol_table)
@@ -502,14 +502,23 @@ void convert_threadblock(symbol_tablet &symbol_table)
       const code_function_callt &f_code = to_code_function_call(code);
       const std::string &f_name = expr2java(f_code.function(), ns);
       if(f_name == "org.cprover.CProver.startThread:(I)V")
-        cb = std::bind(instrument_start_thread, std::placeholders::_1,
-          std::placeholders::_2, std::placeholders::_3);
+        cb = std::bind(
+          instrument_start_thread,
+          std::placeholders::_1,
+          std::placeholders::_2,
+          std::placeholders::_3);
       else if(f_name == "org.cprover.CProver.endThread:(I)V")
-        cb = std::bind(&instrument_endThread, std::placeholders::_1,
-          std::placeholders::_2, std::placeholders::_3);
+        cb = std::bind(
+          &instrument_end_thread,
+          std::placeholders::_1,
+          std::placeholders::_2,
+          std::placeholders::_3);
       else if(f_name == "org.cprover.CProver.getCurrentThreadID:()I")
-        cb = std::bind(&instrument_getCurrentThreadID, std::placeholders::_1,
-          std::placeholders::_2, std::placeholders::_3);
+        cb = std::bind(
+          &instrument_get_current_thread_id,
+          std::placeholders::_1,
+          std::placeholders::_2,
+          std::placeholders::_3);
 
       if(cb)
         expr_replacement_map.insert({expr, cb});
