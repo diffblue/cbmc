@@ -45,6 +45,8 @@ public:
   {
   }
 
+  virtual ~value_sett() = default;
+
   static bool field_sensitive(
     const irep_idt &id,
     const typet &type,

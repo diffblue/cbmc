@@ -40,7 +40,7 @@ public:
   {
   }
 
-  ~rw_set_baset() {}
+  virtual ~rw_set_baset() = default;
 
   struct entryt
   {
@@ -136,8 +136,6 @@ public:
   {
   }
 
-  ~_rw_set_loct() {}
-
 protected:
   value_setst &value_sets;
   const goto_programt::const_targett target;
@@ -192,8 +190,6 @@ public:
   {
     compute();
   }
-
-  ~rw_set_loct() {}
 };
 
 // another producer, this time for entire functions
@@ -212,8 +208,6 @@ public:
   {
     compute_rec(function);
   }
-
-  ~rw_set_functiont() {}
 
 protected:
   const namespacet ns;
@@ -257,8 +251,6 @@ public:
   {
     compute();
   }
-
-  ~rw_set_with_trackt() {}
 
 protected:
   /* flag and variable in the expression, from which we dereference */
