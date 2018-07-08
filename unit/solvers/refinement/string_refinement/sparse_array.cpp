@@ -45,7 +45,6 @@ SCENARIO("sparse_array", "[core][solvers][refinement][string_refinement]")
 
     WHEN("It is converted to a sparse array")
     {
-      const sparse_arrayt sparse_array(input_expr);
       THEN("The resulting if expression is index=100?z:index=4?x:index=1?y:0")
       {
         const symbol_exprt index("index", int_type);
@@ -57,7 +56,7 @@ SCENARIO("sparse_array", "[core][solvers][refinement][string_refinement]")
             charx,
             if_exprt(
               equal_exprt(index, index1), chary, from_integer(0, char_type))));
-        REQUIRE(sparse_array.to_if_expression(index) == expected);
+        REQUIRE(sparse_arrayt::to_if_expression(input_expr, index) == expected);
       }
     }
 
