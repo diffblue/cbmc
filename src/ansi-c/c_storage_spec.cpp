@@ -34,8 +34,6 @@ void c_storage_spect::read(const typet &type)
     is_weak=true;
   else if(type.id() == ID_used)
     is_used = true;
-  else if(type.id() == ID_always_inline)
-    is_always_inline = true;
   else if(type.id()==ID_auto)
   {
     // ignore

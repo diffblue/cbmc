@@ -689,7 +689,6 @@ void c_typecheck_baset::typecheck_declaration(
       declaration.set_is_typedef(full_spec.is_typedef);
       declaration.set_is_weak(full_spec.is_weak);
       declaration.set_is_used(full_spec.is_used);
-      declaration.set_is_always_inline(full_spec.is_always_inline);
 
       symbolt symbol;
       declaration.to_symbol(*d_it, symbol);

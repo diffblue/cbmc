@@ -81,8 +81,6 @@ void ansi_c_declarationt::output(std::ostream &out) const
     out << " is_extern";
   if(get_is_static_assert())
     out << " is_static_assert";
-  if(get_is_always_inline())
-    out << " is_always_inline";
   out << "\n";
 
   out << "Type: " << type().pretty() << "\n";
@@ -166,9 +164,6 @@ void ansi_c_declarationt::to_symbol(
           symbol.is_extern=false;
         else  if(get_is_extern()) // traditional GCC
           symbol.is_file_local=true;
-
-        if(get_is_always_inline())
-          symbol.is_macro = true;
       }
 
       // GCC __attribute__((__used__)) - do not treat those as file-local
