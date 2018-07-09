@@ -34,7 +34,7 @@ std::basic_string<unsigned int> convert_one_string_literal(
       unescape_wide_string(std::string(src, 3, src.size()-4));
 
     // turn into utf-8
-    std::string utf8_value=utf32_to_utf8(value);
+    const std::string utf8_value = utf32_native_endian_to_utf8(value);
 
     // pad into wide string
     value.resize(utf8_value.size());

@@ -67,7 +67,7 @@ int make_identifier()
       utf32+=letter;
       
       // turn into utf-8
-      std::string utf8_value=utf32_to_utf8(utf32);
+      const std::string utf8_value = utf32_native_endian_to_utf8(utf32);
       final_base_name+=utf8_value;
     }
     else

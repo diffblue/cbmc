@@ -444,7 +444,7 @@ utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
     INVARIANT(!conversion_failed, "constant should be convertible to unsigned");
     out[i]=c;
   }
-  return utf16_little_endian_to_java(out);
+  return utf16_native_endian_to_java(out);
 }
 
 /// Formatted string using a format string and list of arguments

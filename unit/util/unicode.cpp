@@ -56,28 +56,11 @@ static void wstr_print(const std::wstring &a, const std::wstring &b)
 }
 #endif
 
-#if 0
-// big-endian test is broken, will be fixed in subsequent commit
-static bool compare_utf8_to_utf16_big_endian(const std::string &in)
+static bool compare_utf8_to_utf16(const std::string &in)
 {
-  std::wstring s1=utf8_to_utf16_big_endian(in);
+  const std::wstring s1 = utf8_to_utf16_native_endian(in);
 
   typedef std::codecvt_utf8_utf16<wchar_t> codecvt_utf8_utf16t;
-  std::wstring_convert<codecvt_utf8_utf16t> converter;
-  std::wstring s2=converter.from_bytes(in);
-
-  return paranoid_wstr_equals(s1, s2);
-}
-#endif
-
-static bool compare_utf8_to_utf16_little_endian(const std::string &in)
-{
-  std::wstring s1=utf8_to_utf16_little_endian(in);
-
-  const std::codecvt_mode mode=std::codecvt_mode::little_endian;
-  const unsigned long maxcode=0x10ffff;
-
-  typedef std::codecvt_utf8_utf16<wchar_t, maxcode, mode> codecvt_utf8_utf16t;
   std::wstring_convert<codecvt_utf8_utf16t> converter;
   std::wstring s2=converter.from_bytes(in);
 
@@ -87,35 +70,30 @@ static bool compare_utf8_to_utf16_little_endian(const std::string &in)
 TEST_CASE("unicode0", "[core][util][unicode]")
 {
   const std::string s = u8"abc";
-  // REQUIRE(compare_utf8_to_utf16_big_endian(s));
-  REQUIRE(compare_utf8_to_utf16_little_endian(s));
+  REQUIRE(compare_utf8_to_utf16(s));
 }
 
 TEST_CASE("unicode1", "[core][util][unicode]")
 {
   const std::string s = u8"\u0070\u00DF\u00E0\u00EF\u00F0\u00F7\u00F8";
-  // REQUIRE(compare_utf8_to_utf16_big_endian(s));
-  REQUIRE(compare_utf8_to_utf16_little_endian(s));
+  REQUIRE(compare_utf8_to_utf16(s));
 }
 
 TEST_CASE("unicode2", "[core][util][unicode]")
 {
   const std::string s = u8"$¢€𐍈";
-  // REQUIRE(compare_utf8_to_utf16_big_endian(s));
-  REQUIRE(compare_utf8_to_utf16_little_endian(s));
+  REQUIRE(compare_utf8_to_utf16(s));
 }
 
 TEST_CASE("unicode3", "[core][util][unicode]")
 {
   const std::string s = u8"𐐏𤭢";
-  // REQUIRE(compare_utf8_to_utf16_big_endian(s));
-  REQUIRE(compare_utf8_to_utf16_little_endian(s));
+  REQUIRE(compare_utf8_to_utf16(s));
 }
 
 TEST_CASE("unicode4", "[core][util][unicode]")
 {
   const std::string s = u8"дȚȨɌṡʒʸͼἨѶݔݺ→⅒⅀▤▞╢◍⛳⻥龍ンㄗㄸ";
-  // REQUIRE(compare_utf8_to_utf16_big_endian(s));
-  REQUIRE(compare_utf8_to_utf16_little_endian(s));
+  REQUIRE(compare_utf8_to_utf16(s));
 }
 #endif
