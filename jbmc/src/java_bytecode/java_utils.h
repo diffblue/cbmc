@@ -112,6 +112,14 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
 bool is_non_null_library_global(const irep_idt &);
 
 void add_array_types(symbol_tablet &symbol_table);
+void add_array_type_enum(
+  const std::string &enum_type_name,
+  symbol_tablet &symbol_table);
+
+typedef std::unordered_map<irep_idt, size_t> java_enum_elements_mapt;
+java_enum_elements_mapt
+get_java_enum_elements_map(const symbol_tablet &symbol_table);
+void add_java_enum_arrays(symbol_tablet &symbol_table);
 
 extern const std::unordered_set<std::string> cprover_methods_to_ignore;
 
