@@ -679,7 +679,6 @@ void cover_mcdc_instrumentert::instrument(
       std::string comment_t = description + " `" + p_string + "' true";
       const irep_idt function = i_it->function;
       goto_program.insert_before_swap(i_it);
-      // i_it->make_assertion(p);
       i_it->make_assertion(not_exprt(p));
       i_it->source_location = source_location;
       i_it->source_location.set_comment(comment_t);
@@ -690,7 +689,6 @@ void cover_mcdc_instrumentert::instrument(
 
       std::string comment_f = description + " `" + p_string + "' false";
       goto_program.insert_before_swap(i_it);
-      // i_it->make_assertion(not_exprt(p));
       i_it->make_assertion(p);
       i_it->source_location = source_location;
       i_it->source_location.set_comment(comment_f);
@@ -701,7 +699,6 @@ void cover_mcdc_instrumentert::instrument(
     }
 
     std::set<exprt> controlling;
-    // controlling=collect_mcdc_controlling(decisions);
     controlling = collect_mcdc_controlling_nested(decisions);
     remove_repetition(controlling);
     // for now, we restrict to the case of a single ''decision'';
@@ -721,7 +718,6 @@ void cover_mcdc_instrumentert::instrument(
       const irep_idt function = i_it->function;
       goto_program.insert_before_swap(i_it);
       i_it->make_assertion(not_exprt(p));
-      // i_it->make_assertion(p);
       i_it->source_location = source_location;
       i_it->source_location.set_comment(description);
       i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
