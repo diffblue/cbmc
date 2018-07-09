@@ -1,43 +1,34 @@
-.NOTPARALLEL:
-#javac compiles multiple classes for each source as it will compile dependent sources.
-#Thus we do not allow the make to run concurrently.
+SRC = converter.cpp \
+      # Empty last line
+
+OBJ +=
+
+INCLUDES=
+
+LIBS =
+
+LIBRARY_DIR = ../../../lib/java-models-library
 
 include ../../config.inc
 include ../../$(CPROVER_DIR)/src/config.inc
 include ../../$(CPROVER_DIR)/src/common
 
-SOURCE_DIR := src/main/java
-BINARY_DIR := classes
+CLEANFILES = converter$(EXEEXT)
 
-FIND := find
+all: library converter$(EXEEXT)
 
-JAVAC := javac
-JFLAGS := -sourcepath $(SOURCE_DIR) -d $(BINARY_DIR) -XDignore.symbol.file
+clean: clean_library
 
-CLASSPATH := SOURCE_DIR
+.PHONY: clean_library
+clean_library:
+	rm -rf core-models.jar
+	if [ -d $(LIBRARY_DIR) ]; then cd $(LIBRARY_DIR); mvn clean; fi
 
-ALL_JAVAS := $(wildcard $(SOURCE_DIR)/*/*.java $(SOURCE_DIR)/*/*/*.java $(SOURCE_DIR)/*/*/*/*.java)
-ALL_CLASSES := $(patsubst $(SOURCE_DIR)/%.java,$(BINARY_DIR)/%.class,$(ALL_JAVAS))
+.PHONY: library
+library:
+	if [ -d $(LIBRARY_DIR) ]; then (cd $(LIBRARY_DIR); mvn package); cp $(LIBRARY_DIR)/target/core-models.jar .; fi
 
-$(BINARY_DIR):
-	mkdir -p $(BINARY_DIR)
+###############################################################################
 
-.SUFFIXES: .java .class
-
-$(BINARY_DIR)/%.class: $(SOURCE_DIR)/%.java $(BINARY_DIR)
-	$(JAVAC) $(JFLAGS) $(patsubst $(BINARY_DIR)/%.class,$(SOURCE_DIR)/%.java,$@)
-
-JAR := jar
-JARFLAGS := -cf
-
-core-models.jar: $(BINARY_DIR) $(ALL_CLASSES)
-	$(JAR) $(JARFLAGS) $@ -C $(BINARY_DIR) .
-
-CLEANFILES = core-models.jar
-
-all: core-models.jar
-
-clean: clean_
-
-clean_:
-	$(RM) -Rf $(BINARY_DIR)
+converter$(EXEEXT): $(OBJ)
+	$(LINKBIN)
