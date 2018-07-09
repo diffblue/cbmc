@@ -169,7 +169,7 @@ exprt string_constraint_generatort::add_axioms_from_int_with_radix(
   const bool strict_formatting=true;
 
   add_axioms_for_correct_number_format(
-    input_int, res, radix_as_char, radix_ul, max_size, strict_formatting);
+    res, radix_as_char, radix_ul, max_size, strict_formatting);
 
   add_axioms_for_characters_in_integer_string(
     input_int,
@@ -306,7 +306,6 @@ exprt string_constraint_generatort::add_axioms_from_char(
 
 /// Add axioms making the return value true if the given string is a correct
 /// number in the given radix
-/// \param input_int: the number being represented as a string
 /// \param str: string expression
 /// \param radix_as_char: the radix as an expression of the same type as the
 ///   characters in str
@@ -316,7 +315,6 @@ exprt string_constraint_generatort::add_axioms_from_char(
 /// \param strict_formatting: if true, don't allow a leading plus, redundant
 ///   zeros or upper case letters
 void string_constraint_generatort::add_axioms_for_correct_number_format(
-  const exprt &input_int,
   const array_string_exprt &str,
   const exprt &radix_as_char,
   const unsigned long radix_ul,
@@ -515,7 +513,6 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
   /// \note the only thing stopping us from taking longer strings with many
   /// leading zeros is the axioms for correct number format
   add_axioms_for_correct_number_format(
-    input_int,
     str,
     radix_as_char,
     radix_ul,
