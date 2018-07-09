@@ -51,7 +51,7 @@ ifeq ($(BUILD_ENV),MSVC)
   # support multiple Visual Studio versions
   CXXFLAGS += /wd4619
 else
-  CXXFLAGS += -Wall -pedantic -Werror -Wno-deprecated-declarations -Wswitch-enum
+  CXXFLAGS += -Wall -pedantic -Werror -Wno-deprecated-declarations -Wswitch-enum -Wextra
 endif
 
 # Select optimisation or debug info
