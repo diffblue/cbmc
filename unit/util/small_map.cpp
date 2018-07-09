@@ -5,6 +5,7 @@
 #include <testing-utils/catch.hpp>
 #include <util/small_map.h>
 
+// This method is a friend of small_map
 void small_map_test()
 {
   SECTION("Basic")
