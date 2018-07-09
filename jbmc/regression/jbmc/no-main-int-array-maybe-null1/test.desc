@@ -1,6 +1,6 @@
 CORE
 Main.class
---function Main.main --java-throw-runtime-exceptions
+--function Main.main --throw-runtime-exceptions
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

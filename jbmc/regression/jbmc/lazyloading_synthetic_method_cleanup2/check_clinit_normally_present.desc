@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 Test.class
---show-goto-functions --function Test.main
+--no-lazy-methods --show-goto-functions --function Test.main
 java::Unused1::clinit_wrapper
 java::Unused2::clinit_wrapper
 Unused2\.<clinit>\(\)

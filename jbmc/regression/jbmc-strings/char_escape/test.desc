@@ -3,4 +3,4 @@ Test.class
 --refine-strings --function Test.test --cover location --trace --json-ui
 ^EXIT=0$
 ^SIGNAL=0$
-20 of 23 covered \(87.0%\)|30 of 44 covered \(68.2%\)
+20 of 22 covered \(90.9%\)|30 of 44 covered \(68.2%\)

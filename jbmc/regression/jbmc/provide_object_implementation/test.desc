@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 java/lang/Object.class
-
+--no-lazy-methods
 ^EXIT=6$
 ^SIGNAL=0$
 ^the program has no entry point$

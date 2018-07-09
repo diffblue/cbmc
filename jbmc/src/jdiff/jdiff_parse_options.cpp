@@ -88,6 +88,12 @@ void jdiff_parse_optionst::get_command_line_options(optionst &options)
     exit(1);
   }
 
+  // TODO: improve this when language front ends have been
+  //   disentangled from command line parsing
+  // we always require these options
+  cmdline.set("no-lazy-methods");
+  cmdline.set("no-refine-strings");
+
   if(cmdline.isset("cover"))
     parse_cover_options(cmdline, options);
 

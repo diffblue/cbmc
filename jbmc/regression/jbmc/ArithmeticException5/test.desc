@@ -1,6 +1,6 @@
 CORE
 ArithmeticExceptionTest.class
---java-throw-runtime-exceptions
+--throw-runtime-exceptions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL
