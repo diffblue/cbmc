@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <windows.h>
 #endif
 
-#define BUFSIZE 100
-
 std::string narrow(const wchar_t *s)
 {
   #ifdef _WIN32
