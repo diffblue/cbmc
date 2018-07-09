@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
+#include <util/arith_tools.h>
 #include <util/message.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -109,6 +110,8 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
   bool include_interfaces);
 
 bool is_non_null_library_global(const irep_idt &);
+
+void add_array_types(symbol_tablet &symbol_table);
 
 extern const std::unordered_set<std::string> cprover_methods_to_ignore;
 
