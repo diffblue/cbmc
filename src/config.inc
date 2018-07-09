@@ -52,7 +52,7 @@ ifeq ($(BUILD_ENV),MSVC)
   CXXFLAGS += /wd4619
 else
   CXXFLAGS += -Wall -pedantic -Werror -Wswitch-enum
-  CXXFLAGS += -Wno-deprecated-declarations
+  CXXFLAGS += -Wno-deprecated-declarations -Wextra -Wconversion
   # GCC only, silence clang warning
   CXXFLAGS += -Wno-maybe-uninitialized -Wno-unknown-warning-option
 endif
