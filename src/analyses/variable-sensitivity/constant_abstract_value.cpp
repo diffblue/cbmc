@@ -239,4 +239,5 @@ void constant_abstract_valuet::get_statistics(abstract_object_statisticst &stati
 {
   abstract_valuet::get_statistics(statistics, visited, env, ns);
   ++statistics.number_of_constants;
+  statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
 }

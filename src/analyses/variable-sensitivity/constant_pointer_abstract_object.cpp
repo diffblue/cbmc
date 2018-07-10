@@ -373,4 +373,5 @@ void constant_pointer_abstract_objectt::get_statistics(
   {
     read_dereference(env, ns)->get_statistics(statistics, visited, env, ns);
   }
+  statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
 }

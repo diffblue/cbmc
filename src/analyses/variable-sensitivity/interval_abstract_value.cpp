@@ -265,4 +265,5 @@ void interval_abstract_valuet::get_statistics(
   {
     ++statistics.number_of_single_value_intervals;
   }
+  statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
 }

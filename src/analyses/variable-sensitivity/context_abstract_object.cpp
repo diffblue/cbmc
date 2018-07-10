@@ -180,4 +180,5 @@ void context_abstract_objectt::get_statistics(
   {
     child_abstract_object->get_statistics(statistics, visited, env, ns);
   }
+  statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
 }
