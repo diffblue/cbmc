@@ -27,10 +27,15 @@ JBMC compiles CBMC as part of its build process and as such has all the pre-requ
 Compilation
 ===========
 
-To compile you need to run the command:
+Before compilation, update git submodules using the command:
 
 ```bash
-make -C jbmc/src java-models-library-download
+make -C jbmc/src setup-submodules
+```
+
+Then compile using:
+
+```bash
 make -C jbmc/src
 ```
 
