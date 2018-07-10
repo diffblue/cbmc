@@ -334,15 +334,33 @@ bool ai_baset::visit(
 
   statet &current=get_state(l);
 
-  for(const auto &to_l : goto_program.get_successors(l))
+  // Check if our user wants to be able to inspect this state after the
+  // fixpoint algorithm terminates.
+  // Default if the instantiating code hasn't supplied any specific advice is
+  // to retain all states.
+  bool must_retain_current_state = must_retain_state(l, goto_program);
+
+  std::list<locationt> successors = goto_program.get_successors(l);
+  for(const auto &to_l : successors)
   {
     if(to_l==goto_program.instructions.end())
       continue;
 
-    std::unique_ptr<statet> tmp_state(
-      make_temporary_state(current));
+    // If permissible, alter the existing instruction's state in place;
+    // otherwise use a temporary copy:
+    std::unique_ptr<statet> tmp_state;
 
-    statet &new_values=*tmp_state;
+    // Note this condition is stricter than `!must_retain_current_state` because
+    // when we have multiple successors `transform` may do something different
+    // for different successors, in which case we must use a clean copy of the
+    // pre-existing state each time.
+    bool may_work_in_place =
+      successors.size() == 1 && !must_retain_current_state;
+
+    if(!may_work_in_place)
+      tmp_state = make_temporary_state(current);
+
+    statet &new_values = may_work_in_place ? current : *tmp_state;
 
     bool have_new_values=false;
 
@@ -367,8 +385,7 @@ bool ai_baset::visit(
 
       new_values.transform(l, to_l, *this, ns);
 
-      if(merge(new_values, l, to_l))
-        have_new_values=true;
+      have_new_values |= merge(std::move(new_values), l, to_l);
     }
 
     if(have_new_values)
@@ -376,6 +393,12 @@ bool ai_baset::visit(
       new_data=true;
       put_in_working_set(working_set, to_l);
     }
+  }
+
+  if(!must_retain_current_state)
+  {
+    // If this state isn't needed any longer, destroy it now:
+    current.make_bottom();
   }
 
   return new_data;
@@ -400,7 +423,7 @@ bool ai_baset::do_function_call(
     std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
     tmp_state->transform(l_call, l_return, *this, ns);
 
-    return merge(*tmp_state, l_call, l_return);
+    return merge(std::move(*tmp_state), l_call, l_return);
   }
 
   assert(!goto_function.body.instructions.empty());
@@ -420,7 +443,7 @@ bool ai_baset::do_function_call(
     bool new_data=false;
 
     // merge the new stuff
-    if(merge(*tmp_state, l_call, l_begin))
+    if(merge(std::move(*tmp_state), l_call, l_begin))
       new_data=true;
 
     // do we need to do/re-do the fixedpoint of the body?
@@ -445,7 +468,7 @@ bool ai_baset::do_function_call(
     tmp_state->transform(l_end, l_return, *this, ns);
 
     // Propagate those
-    return merge(*tmp_state, l_end, l_return);
+    return merge(std::move(*tmp_state), l_end, l_return);
   }
 }
 
@@ -521,6 +544,42 @@ bool ai_baset::do_function_call_rec(
   }
 
   return new_data;
+}
+
+/// Determine whether we must retain the state for program point `l` even after
+/// fixpoint analysis completes (e.g. for our user to inspect), or if it solely
+/// for internal use and can be thrown away as and when suits us.
+/// \param l: program point
+/// \param l_program: program that l belongs to
+/// \return true if we must retain the state for that program point
+bool ai_baset::must_retain_state(
+  locationt l, const goto_programt &l_program) const
+{
+  // If the derived class doesn't specify otherwise, assume the old default
+  // behaviour: always retain state.
+  if(!must_retain_state_callback)
+    return true;
+
+  // Regardless, always keep states with multiple predecessors, which is
+  // required for termination when loops are present, and saves redundant
+  // re-investigation of successors for other kinds of convergence.
+  if(l->incoming_edges.size() > 1)
+    return true;
+
+  // Similarly retain function head instructions, which may have multiple
+  // incoming call-graph edges:
+  if(l == l_program.instructions.begin())
+    return true;
+
+  // ...and retain function end states, as they will be propagated to many
+  // different callers (they have multiple successors, even though they appear
+  // to have none intraprocedurally).
+  if(l->is_end_function())
+    return true;
+
+  // Finally, retain states where the particular subclass specifies they
+  // should be kept:
+  return must_retain_state_callback(l);
 }
 
 void ai_baset::sequential_fixedpoint(

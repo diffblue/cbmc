@@ -96,14 +96,19 @@ public:
   // also add
   //
   //   bool merge(const T &b, locationt from, locationt to);
+  // and optionally
+  //   bool merge(T &&b, location from, locationt to);
   //
-  // This computes the join between "this" and "b".
+  // These compute the join between "this" and "b".
   // Return true if "this" has changed.
   // In the usual case, "b" is the updated state after "from"
   // and "this" is the state before "to".
   //
   // PRECONDITION(from.is_dereferenceable(), "Must not be _::end()")
   // PRECONDITION(to.is_dereferenceable(), "Must not be _::end()")
+  //
+  // The T &&b overload, if any, must leave `b` in such a state that
+  // `b.make_bottom()` or destruction of `b` could happen next without error.
 
   // This method allows an expression to be simplified / evaluated using the
   // current state.  It is used to evaluate assertions and in program
@@ -131,7 +136,9 @@ public:
   typedef ai_domain_baset statet;
   typedef goto_programt::const_targett locationt;
 
-  ai_baset()
+  explicit ai_baset(
+    std::function<bool(locationt)> must_retain_state_callback) :
+    must_retain_state_callback(must_retain_state_callback)
   {
   }
 
@@ -308,6 +315,11 @@ protected:
   // the work-queue is sorted by location number
   typedef std::map<unsigned, locationt> working_sett;
 
+  // Callback that indicates if the user of this instance wants a particular
+  // state (program point) to be retained for inspection once the fixpoint is
+  // found. If no callback is supplied we by default retain all states.
+  std::function<bool(locationt)> must_retain_state_callback;
+
   locationt get_next(working_sett &working_set);
 
   void put_in_working_set(
@@ -358,8 +370,11 @@ protected:
     const exprt::operandst &arguments,
     const namespacet &ns);
 
+  bool must_retain_state(locationt, const goto_programt &) const;
+
   // abstract methods
 
+  virtual bool merge(statet &&src, locationt from, locationt to)=0;
   virtual bool merge(const statet &src, locationt from, locationt to)=0;
   // for concurrent fixedpoint
   virtual bool merge_shared(
@@ -378,7 +393,8 @@ class ait:public ai_baset
 {
 public:
   // constructor
-  ait():ai_baset()
+  ait(std::function<bool(locationt)> must_retain_state_callback = nullptr) :
+    ai_baset(must_retain_state_callback)
   {
   }
 
@@ -434,6 +450,13 @@ protected:
       throw "failed to find state";
 
     return it->second;
+  }
+
+  bool merge(statet &&src, locationt from, locationt to) override
+  {
+    statet &dest=get_state(to);
+    return static_cast<domainT &>(dest).merge(
+      static_cast<domainT &&>(src), from, to);
   }
 
   bool merge(const statet &src, locationt from, locationt to) override
