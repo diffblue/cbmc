@@ -27,11 +27,10 @@ Author: Matt Lewis
 #include "polynomial.h"
 #include "path.h"
 #include "accelerator.h"
-#include "loop_acceleration.h"
 #include "cone_of_influence.h"
 #include "acceleration_utils.h"
 
-class disjunctive_polynomial_accelerationt:public loop_accelerationt
+class disjunctive_polynomial_accelerationt
 {
 public:
   disjunctive_polynomial_accelerationt(
@@ -56,7 +55,7 @@ public:
     utils.find_modified(loop, modified);
   }
 
-  virtual bool accelerate(path_acceleratort &accelerator);
+  bool accelerate(path_acceleratort &accelerator);
 
   bool fit_polynomial(
     exprt &target,

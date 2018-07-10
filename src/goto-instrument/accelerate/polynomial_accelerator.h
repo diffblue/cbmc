@@ -58,7 +58,7 @@ public:
   {
   }
 
-  virtual bool accelerate(patht &loop, path_acceleratort &accelerator);
+  bool accelerate(patht &loop, path_acceleratort &accelerator);
 
   bool fit_polynomial(
     goto_programt::instructionst &loop_body,

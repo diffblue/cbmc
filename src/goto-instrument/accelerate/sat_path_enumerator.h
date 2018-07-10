@@ -27,7 +27,6 @@ Author: Matt Lewis
 #include "polynomial.h"
 #include "path.h"
 #include "accelerator.h"
-#include "loop_acceleration.h"
 #include "cone_of_influence.h"
 #include "acceleration_utils.h"
 
