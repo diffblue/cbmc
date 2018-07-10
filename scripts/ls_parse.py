@@ -15,6 +15,7 @@ import re
 import subprocess
 import sys
 import textwrap
+import traceback
 
 
 def epilog():
@@ -282,6 +283,7 @@ def close_brace_fun(state, _, buf):
         state["UNKNOWN"] = False
     else:
         error("Not in block\n%s", buf)
+        traceback.print_stack()
         exit(1)
 
 
