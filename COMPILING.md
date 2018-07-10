@@ -185,7 +185,7 @@ Follow these instructions:
    make -C src DOWNLOADER=wget minisat2-download
    make -C src
    ```
-5. To compile JMBC, open the Cygwin shell and type
+5. To compile JBMC, open the Cygwin shell and type
    ```
    make -C jbmc/src setup-submodules
    make -C jbmc/src
