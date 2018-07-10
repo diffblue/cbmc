@@ -95,6 +95,9 @@ Formatting is enforced using clang-format. For more information about this, see
 # Naming
 - Identifiers may use the characters `[a-z0-9_]` and should start with a
   lower-case letter (parameters in constructors may start with `_`).
+- Omit names of parameters or exception objects when they are not used. If
+  parameter names help documenting an interface, keep the name and use
+  `(void)parameter_name;` in the body of the method.
 - Use American spelling for identifiers.
 - Separate basic words by `_`
 - Avoid abbreviations (e.g. prefer `symbol_table` to `st`).
