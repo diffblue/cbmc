@@ -120,11 +120,9 @@ void collect_mcdc_controlling_rec(
   }
   else
   {
-    /**
-     * It may happen that ''is_condition(src)'' is valid,
-     * but we ignore this case here as it can be handled
-     * by the routine decision/condition detection.
-     **/
+    // It may happen that ''is_condition(src)'' is valid,
+    // but we ignore this case here as it can be handled
+    // by the routine decision/condition detection.
   }
 }
 
@@ -174,11 +172,10 @@ collect_mcdc_controlling_nested(const std::set<exprt> &decisions)
   for(auto &src : controlling)
   {
     std::set<exprt> s1, s2;
-    /**
-     * The final controlling conditions resulted from ''src''
-     * will be stored in ''s1''; ''s2'' is usd to hold the
-     * temporary expansion.
-     **/
+
+    // The final controlling conditions resulted from ''src''
+    // will be stored in ''s1''; ''s2'' is usd to hold the
+    // temporary expansion.
     s1.insert(src);
 
     // dual-loop structure to eliminate complex
@@ -204,11 +201,9 @@ collect_mcdc_controlling_nested(const std::set<exprt> &decisions)
         for(std::size_t i = 0; i < operands.size(); i++)
         {
           std::set<exprt> res;
-          /**
-           * To expand an operand if it is not atomic,
-           * and label the ''changed'' flag; the resulted
-           * expansion of such an operand is stored in ''res''.
-           **/
+          // To expand an operand if it is not atomic,
+          // and label the ''changed'' flag; the resulted
+          // expansion of such an operand is stored in ''res''.
           if(operands[i].id() == ID_not)
           {
             exprt no = operands[i].op0();
@@ -281,9 +276,7 @@ std::set<signed> sign_of_expr(const exprt &e, const exprt &E)
     }
   }
 
-  /**
-   * In the general case, we analyze each operand of ''E''.
-   **/
+  // In the general case, we analyze each operand of ''E''.
   std::vector<exprt> ops;
   collect_operands(E, ops);
   for(auto &x : ops)
@@ -348,12 +341,10 @@ void remove_repetition(std::set<exprt> &exprs)
   for(auto &x : exprs)
   {
     bool red = false;
-    /**
-     * To check if ''x'' is identical with some
-     * expr in ''new_exprs''. Two exprs ''x''
-     * and ''y'' are identical iff they have the
-     * same sign for every atomic condition ''c''.
-     **/
+    // To check if ''x'' is identical with some
+    // expr in ''new_exprs''. Two exprs ''x''
+    // and ''y'' are identical iff they have the
+    // same sign for every atomic condition ''c''.
     for(auto &y : new_exprs)
     {
       bool iden = true;
@@ -380,11 +371,9 @@ void remove_repetition(std::set<exprt> &exprs)
           }
         }
       }
-      /**
-       * If ''x'' is found identical w.r.t some
-       * expr in ''new_conditions, we label it
-       * and break.
-       **/
+      // If ''x'' is found identical w.r.t some
+      // expr in ''new_conditions, we label it
+      // and break.
       if(iden)
       {
         red = true;
@@ -509,12 +498,10 @@ bool is_mcdc_pair(
     eval_expr(atomic_exprs_e2, decision))
     return false;
 
-  /**
-   *  A mcdc pair of controlling exprs regarding ''c''
-   *  can have different values for only one atomic
-   *  expr, i.e., ''c''. Otherwise, they are not
-   *  a mcdc pair.
-   **/
+  // A mcdc pair of controlling exprs regarding ''c''
+  // can have different values for only one atomic
+  // expr, i.e., ''c''. Otherwise, they are not
+  // a mcdc pair.
   int diff_count = 0;
   auto e1_it = atomic_exprs_e1.begin();
   auto e2_it = atomic_exprs_e2.begin();
@@ -577,22 +564,20 @@ void minimize_mcdc_controlling(
   {
     std::set<exprt> new_controlling;
     bool ctrl_update = false;
-    /**
-     * Iteratively, we test that after removing an item ''x''
-     * from the ''controlling'', can a complete mcdc coverage
-     * over ''decision'' still be reserved?
-     *
-     * If yes, we update ''controlling'' with the
-     * ''new_controlling'' without ''x''; otherwise, we should
-     * keep ''x'' within ''controlling''.
-     *
-     * If in the end all elements ''x'' in ''controlling'' are
-     * reserved, this means that current ''controlling'' set is
-     * minimum and the ''while'' loop should be broken out of.
-     *
-     * Note:  implementation here for the above procedure is
-     *        not (meant to be) optimal.
-     **/
+    // Iteratively, we test that after removing an item ''x''
+    // from the ''controlling'', can a complete mcdc coverage
+    // over ''decision'' still be reserved?
+    //
+    // If yes, we update ''controlling'' with the
+    // ''new_controlling'' without ''x''; otherwise, we should
+    // keep ''x'' within ''controlling''.
+    //
+    // If in the end all elements ''x'' in ''controlling'' are
+    // reserved, this means that current ''controlling'' set is
+    // minimum and the ''while'' loop should be broken out of.
+    //
+    // Note:  implementation here for the above procedure is
+    //        not (meant to be) optimal.
     for(auto &x : controlling)
     {
       // To create a new ''controlling'' set without ''x''
@@ -607,11 +592,9 @@ void minimize_mcdc_controlling(
       for(auto &c : conditions)
       {
         bool cOK = has_mcdc_pair(c, new_controlling, conditions, decision);
-        /**
-         *  If there is no mcdc pair for an atomic condition ''c'',
-         *  then ''x'' should not be removed from the original
-         *  ''controlling'' set
-         **/
+        // If there is no mcdc pair for an atomic condition ''c'',
+        // then ''x'' should not be removed from the original
+        // ''controlling'' set
         if(!cOK)
         {
           removing_x = false;
@@ -679,7 +662,6 @@ void cover_mcdc_instrumentert::instrument(
       std::string comment_t = description + " `" + p_string + "' true";
       const irep_idt function = i_it->function;
       goto_program.insert_before_swap(i_it);
-      // i_it->make_assertion(p);
       i_it->make_assertion(not_exprt(p));
       i_it->source_location = source_location;
       i_it->source_location.set_comment(comment_t);
@@ -690,7 +672,6 @@ void cover_mcdc_instrumentert::instrument(
 
       std::string comment_f = description + " `" + p_string + "' false";
       goto_program.insert_before_swap(i_it);
-      // i_it->make_assertion(not_exprt(p));
       i_it->make_assertion(p);
       i_it->source_location = source_location;
       i_it->source_location.set_comment(comment_f);
@@ -701,13 +682,14 @@ void cover_mcdc_instrumentert::instrument(
     }
 
     std::set<exprt> controlling;
-    // controlling=collect_mcdc_controlling(decisions);
     controlling = collect_mcdc_controlling_nested(decisions);
     remove_repetition(controlling);
     // for now, we restrict to the case of a single ''decision'';
     // however, this is not true, e.g., ''? :'' operator.
-    INVARIANT(!decisions.empty(), "There must be at least one decision");
-    minimize_mcdc_controlling(controlling, *decisions.begin());
+    if(!decisions.empty())
+    {
+      minimize_mcdc_controlling(controlling, *decisions.begin());
+    }
 
     for(const auto &p : controlling)
     {
@@ -719,7 +701,6 @@ void cover_mcdc_instrumentert::instrument(
       const irep_idt function = i_it->function;
       goto_program.insert_before_swap(i_it);
       i_it->make_assertion(not_exprt(p));
-      // i_it->make_assertion(p);
       i_it->source_location = source_location;
       i_it->source_location.set_comment(description);
       i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
