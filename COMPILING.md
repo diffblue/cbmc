@@ -66,7 +66,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
 5. To compile JBMC, do
    ```
-   make -C jbmc/src java-models-library-download
+   make -C jbmc/src setup-submodules
    make -C jbmc/src
    ```
 
@@ -92,7 +92,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
 4. To compile JBMC, type
    ```
-   gmake -C jbmc/src java-models-library-download
+   gmake -C jbmc/src setup-submodules
    gmake -C jbmc/src
    ```
 
@@ -118,7 +118,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
 4. To compile JBMC, do
    ```
-   gmake -C jbmc/src java-models-library-download
+   gmake -C jbmc/src setup-submodules
    gmake -C jbmc/src
    ```
 
@@ -144,7 +144,7 @@ Follow these instructions:
    ```
 4. To compile JBMC, do
    ```
-   make -C jbmc/src java-models-library-download
+   make -C jbmc/src setup-submodules
    make -C jbmc/src
    ```
 
@@ -187,7 +187,7 @@ Follow these instructions:
    ```
 5. To compile JMBC, open the Cygwin shell and type
    ```
-   make -C jbmc/src java-models-library-download
+   make -C jbmc/src setup-submodules
    make -C jbmc/src
    ```
 
@@ -240,7 +240,11 @@ require manual modification of build files.
 2. Navigate to the *top level* folder of the project. This is different from
    the Makefile build, which requires you to navigate to the `src` directory
    first.
-3. Generate build files with CMake:
+3. Update git submodules:
+   ```
+   git submodule update --init --recursive
+   ```
+4. Generate build files with CMake:
    ```
    cmake -H. -Bbuild
    ```
@@ -264,7 +268,7 @@ require manual modification of build files.
    Finally, to enable building universal binaries on macOS, you can pass the
    flag `-DCMAKE_OSX_ARCHITECTURES=i386;x86_64`. If you don't supply this flag,
    the build will just be for the architecture of your machine.
-4. Run the build:
+5. Run the build:
    ```
    cmake --build build
    ```
