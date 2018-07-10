@@ -187,8 +187,8 @@ bool goto_symex_statet::constant_propagation_reference(const exprt &expr) const
   }
   else if(expr.id()==ID_member)
   {
-    if(expr.operands().size()!=1)
-      throw "member expects one operand";
+    DATA_INVARIANT(
+      expr.operands().size() == 1, "member_exprt takes one operand.");
 
     return constant_propagation_reference(expr.op0());
   }

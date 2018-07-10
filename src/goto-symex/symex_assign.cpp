@@ -91,7 +91,7 @@ exprt goto_symext::add_to_lhs(
   const exprt &lhs,
   const exprt &what)
 {
-  assert(lhs.id()!=ID_symbol);
+  PRECONDITION(lhs.id() != ID_symbol);
   exprt tmp_what=what;
 
   if(tmp_what.id()!=ID_symbol)
@@ -170,8 +170,8 @@ void goto_symext::symex_assign_rec(
   }
   else if(lhs.id() == ID_complex_real)
   {
+    // this is stuff like __real__ x = 1;
     const complex_real_exprt &complex_real_expr = to_complex_real_expr(lhs);
-
     const complex_imag_exprt complex_imag_expr(complex_real_expr.op());
 
     complex_exprt new_rhs(
@@ -284,7 +284,7 @@ void goto_symext::symex_assign_typecast(
 {
   // these may come from dereferencing on the lhs
 
-  assert(lhs.operands().size()==1);
+  PRECONDITION(lhs.operands().size() == 1);
 
   exprt rhs_typecasted=rhs;
   rhs_typecasted.make_typecast(lhs.op0().type());
@@ -306,9 +306,7 @@ void goto_symext::symex_assign_array(
   // lhs must be index operand
   // that takes two operands: the first must be an array
   // the second is the index
-
-  if(lhs.operands().size()!=2)
-    throw "index must have two operands";
+  DATA_INVARIANT(lhs.operands().size() == 2, "index_exprt takes two operands");
 
   const exprt &lhs_array=lhs.array();
   const exprt &lhs_index=lhs.index();
@@ -369,7 +367,8 @@ void goto_symext::symex_assign_struct_member(
   // typecasts involved? C++ does that for inheritance.
   if(lhs_struct.id()==ID_typecast)
   {
-    assert(lhs_struct.operands().size()==1);
+    DATA_INVARIANT(
+      lhs_struct.operands().size() == 1, "typecast_exprt takes one operand.");
 
     if(lhs_struct.op0().id() == ID_null_object)
     {

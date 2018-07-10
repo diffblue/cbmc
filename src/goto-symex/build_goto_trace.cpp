@@ -92,7 +92,9 @@ exprt build_full_lhs_rec(
           id==ID_byte_extract_big_endian)
   {
     exprt tmp=src_original;
-    assert(tmp.operands().size()==2);
+    DATA_INVARIANT(
+      tmp.operands().size() == 2,
+      "byte_extract_exprt should have two operands.");
     tmp.op0()=build_full_lhs_rec(prop_conv, ns, tmp.op0(), src_ssa.op0());
 
     // re-write into big case-split

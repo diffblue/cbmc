@@ -143,7 +143,7 @@ symbol_exprt partial_order_concurrencyt::clock(
   axiomt axiom)
 {
   irep_idt identifier;
-  assert(!numbering.empty());
+  PRECONDITION(!numbering.empty());
 
   if(event->is_shared_write())
     identifier=rw_clock_id(event, axiom);
@@ -163,7 +163,7 @@ symbol_exprt partial_order_concurrencyt::clock(
 
 void partial_order_concurrencyt::build_clock_type()
 {
-  assert(!numbering.empty());
+  PRECONDITION(!numbering.empty());
 
   std::size_t width = address_bits(numbering.size());
   clock_type = unsignedbv_typet(width);

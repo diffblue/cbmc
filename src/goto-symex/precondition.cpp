@@ -78,18 +78,21 @@ void preconditiont::compute_address_of(exprt &dest)
   }
   else if(dest.id()==ID_index)
   {
-    assert(dest.operands().size()==2);
+    DATA_INVARIANT(
+      dest.operands().size() == 2, "index_exprt takes two operands.");
     compute_address_of(dest.op0());
     compute(dest.op1());
   }
   else if(dest.id()==ID_member)
   {
-    assert(dest.operands().size()==1);
+    DATA_INVARIANT(
+      dest.operands().size() == 1, "member_exprt takes one operand.");
     compute_address_of(dest.op0());
   }
   else if(dest.id()==ID_dereference)
   {
-    assert(dest.operands().size()==1);
+    DATA_INVARIANT(
+      dest.operands().size() == 1, "dereference_exprt takes one operand.");
     compute(dest.op0());
   }
 }
@@ -104,12 +107,14 @@ void preconditiont::compute_rec(exprt &dest)
   if(dest.id()==ID_address_of)
   {
     // only do index!
-    assert(dest.operands().size()==1);
+    DATA_INVARIANT(
+      dest.operands().size() == 1, "address_of_exprt takes one operand.");
     compute_address_of(dest.op0());
   }
   else if(dest.id()==ID_dereference)
   {
-    assert(dest.operands().size()==1);
+    DATA_INVARIANT(
+      dest.operands().size() == 1, "dereference_exprt takes one operand.");
 
     const irep_idt &lhs_identifier=SSA_step.ssa_lhs.get_object_name();
 

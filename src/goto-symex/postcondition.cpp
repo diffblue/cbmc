@@ -76,7 +76,8 @@ bool postconditiont::is_used_address_of(
   }
   else if(expr.id()==ID_index)
   {
-    assert(expr.operands().size()==2);
+    DATA_INVARIANT(
+      expr.operands().size() == 2, "index_exprt takes two operands.");
 
     return
       is_used_address_of(expr.op0(), identifier) ||
@@ -84,12 +85,14 @@ bool postconditiont::is_used_address_of(
   }
   else if(expr.id()==ID_member)
   {
-    assert(expr.operands().size()==1);
+    DATA_INVARIANT(
+      expr.operands().size() == 1, "member_exprt takes one operand.");
     return is_used_address_of(expr.op0(), identifier);
   }
   else if(expr.id()==ID_dereference)
   {
-    assert(expr.operands().size()==1);
+    DATA_INVARIANT(
+      expr.operands().size() == 1, "dereference_exprt takes one operand.");
     return is_used(expr.op0(), identifier);
   }
 
@@ -155,7 +158,8 @@ bool postconditiont::is_used(
   if(expr.id()==ID_address_of)
   {
     // only do index!
-    assert(expr.operands().size()==1);
+    DATA_INVARIANT(
+      expr.operands().size() == 1, "address_of_exprt takes one operand.");
     return is_used_address_of(expr.op0(), identifier);
   }
   else if(expr.id()==ID_symbol &&
@@ -169,7 +173,8 @@ bool postconditiont::is_used(
   }
   else if(expr.id()==ID_dereference)
   {
-    assert(expr.operands().size()==1);
+    DATA_INVARIANT(
+      expr.operands().size() == 1, "dereference_exprt takes one operand.");
 
     // aliasing may happen here
 
