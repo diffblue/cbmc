@@ -55,14 +55,14 @@ bool c_implicit_typecast_arithmetic(
   return !c_typecast.errors.empty();
 }
 
-bool is_void_pointer(const typet &type)
+bool has_a_void_pointer(const typet &type)
 {
   if(type.id()==ID_pointer)
   {
     if(type.subtype().id()==ID_empty)
       return true;
 
-    return is_void_pointer(type.subtype());
+    return has_a_void_pointer(type.subtype());
   }
   else
     return false;
@@ -212,10 +212,11 @@ bool check_c_implicit_typecast(
       const irept &dest_subtype=dest_type.subtype();
       const irept &src_subtype =src_type.subtype();
 
-      if(src_subtype==dest_subtype)
+      if(src_subtype == dest_subtype)
         return false;
-      else if(is_void_pointer(src_type) || // from void to anything
-              is_void_pointer(dest_type))  // to void from anything
+      else if(
+        has_a_void_pointer(src_type) || // from void to anything
+        has_a_void_pointer(dest_type))  // to void from anything
         return false;
     }
 
@@ -544,8 +545,7 @@ void c_typecastt::implicit_typecast_followed(
       const typet &src_sub = src_type.subtype();
       const typet &dest_sub = dest_type.subtype();
 
-      if(is_void_pointer(src_type) ||
-         is_void_pointer(dest_type))
+      if(has_a_void_pointer(src_type) || has_a_void_pointer(dest_type))
       {
         // from/to void is always good
       }

@@ -25,6 +25,13 @@ Author: Daniel Kroening, kroening@kroening.com
 class constant_exprt;
 class namespacet;
 
+/// This method tests,
+/// if the given typet is a constant
+inline bool is_constant(const typet &type)
+{
+  return type.id() == ID_constant;
+}
+
 /// The Boolean type
 class bool_typet:public typet
 {
@@ -281,6 +288,13 @@ public:
 /// \return True if \p type is a \ref struct_typet.
 template <>
 inline bool can_cast_type<struct_typet>(const typet &type)
+{
+  return type.id() == ID_struct;
+}
+
+/// This method tests,
+/// if the given typet is a struct
+inline bool is_struct(const typet &type)
 {
   return type.id() == ID_struct;
 }
@@ -983,6 +997,12 @@ public:
     return size().is_nil();
   }
 };
+/// This method tests,
+/// if the given typet is an array_typet
+inline bool is_array(const typet &type)
+{
+  return type.id() == ID_array;
+}
 
 /// Check whether a reference to a typet is a \ref array_typet.
 /// \param type: Source type.
@@ -1062,6 +1082,13 @@ inline bool can_cast_type<bitvector_typet>(const typet &type)
          type.id() == ID_verilog_unsignedbv || type.id() == ID_bv ||
          type.id() == ID_pointer || type.id() == ID_c_bit_field ||
          type.id() == ID_c_bool;
+}
+
+/// This method tests,
+/// if the given typet is a signed or unsigned bitvector.
+inline bool is_signed_or_unsigned_bitvector(const typet &type)
+{
+  return type.id() == ID_signedbv || type.id() == ID_unsignedbv;
 }
 
 /// \brief Cast a typet to a \ref bitvector_typet
@@ -1522,6 +1549,20 @@ inline pointer_typet &to_pointer_type(typet &type)
   PRECONDITION(can_cast_type<pointer_typet>(type));
   pointer_typet::check(type);
   return static_cast<pointer_typet &>(type);
+}
+
+/// This method tests,
+/// if the given typet is a pointer.
+inline bool is_pointer(const typet &type)
+{
+  return type.id() == ID_pointer;
+}
+
+/// This method tests,
+/// if the given typet is a pointer of type void.
+inline bool is_void_pointer(const typet &type)
+{
+  return is_pointer(type) && type.subtype().id() == ID_empty;
 }
 
 /// The reference type
