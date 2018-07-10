@@ -242,7 +242,7 @@ require manual modification of build files.
    first.
 3. Update git submodules:
    ```
-   git submodule update --init --recursive
+   git submodule update --init
    ```
 4. Generate build files with CMake:
    ```

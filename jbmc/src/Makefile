@@ -55,7 +55,7 @@ dist_clean:
 	rm -rf $(ROOT)dist
 
 setup-submodules:
-	git submodule update --init --recursive
+	git submodule update --init
 
 .PHONY: dist
 dist: setup-submodules all
