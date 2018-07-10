@@ -43,6 +43,13 @@ protected:
     const abstract_environmentt &env,
     const namespacet &ns,
     mp_integer &out_index) const override;
+
+public:
+  void get_statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) const override;
 };
 
 #endif //PROJECT_INTERVAL_ARRAY_ABSTRACT_OBJECTT_H

@@ -496,4 +496,5 @@ void full_struct_abstract_objectt::get_statistics(
       object.second->get_statistics(statistics, visited, env, ns);
     }
   }
+  statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
 }

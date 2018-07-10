@@ -148,3 +148,15 @@ bool interval_array_abstract_objectt::eval_index(
   }
   return false;
 }
+
+void interval_array_abstract_objectt::get_statistics(
+  abstract_object_statisticst &statistics,
+  abstract_object_visitedt &visited,
+  const abstract_environmentt &env,
+  const namespacet &ns) const
+{
+  constant_array_abstract_objectt::get_statistics(statistics, visited, env, ns);
+  statistics.objects_memory_usage += memory_sizet::from_bytes(
+    // the size we add by inheriting
+    sizeof(*this) - sizeof(constant_array_abstract_objectt));
+}
