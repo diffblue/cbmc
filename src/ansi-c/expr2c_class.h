@@ -256,4 +256,19 @@ protected:
     bool include_padding_components);
 };
 
+class expr2c_pretty_structt : public expr2ct
+{
+public:
+  explicit expr2c_pretty_structt(const namespacet &_ns) : expr2ct(_ns)
+  {
+  }
+
+protected:
+  std::string convert_struct(const exprt &src, unsigned &precedence) override;
+  std::string convert_struct_type(
+    const typet &src,
+    const std::string &qualifiers_str,
+    const std::string &declarator_str) override;
+};
+
 #endif // CPROVER_ANSI_C_EXPR2C_CLASS_H

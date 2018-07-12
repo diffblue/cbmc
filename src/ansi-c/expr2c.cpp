@@ -3961,3 +3961,18 @@ std::string type2c(const typet &type, const namespacet &ns)
   // expr2c.get_shorthands(expr);
   return expr2c.convert(type);
 }
+
+std::string expr2c_pretty_structt::convert_struct_type(
+  const typet &src,
+  const std::string &qualifiers_str,
+  const std::string &declarator_str)
+{
+  return expr2ct::convert_struct_type(
+    src, qualifiers_str, declarator_str, false, false);
+}
+
+std::string
+expr2c_pretty_structt::convert_struct(const exprt &src, unsigned &precedence)
+{
+  return expr2ct::convert_struct(src, precedence, false);
+}
