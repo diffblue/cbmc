@@ -27,9 +27,10 @@ JBMC compiles CBMC as part of its build process and as such has all the pre-requ
 Compilation
 ===========
 
-Before compilation, update git submodules using the command:
+Before compilation, run the commands:
 
 ```bash
+make -C src DOWNLOADER=wget minisat2-download
 make -C jbmc/src setup-submodules
 ```
 
