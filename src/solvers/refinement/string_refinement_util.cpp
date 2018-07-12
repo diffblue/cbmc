@@ -73,12 +73,16 @@ sparse_arrayt::sparse_arrayt(const with_exprt &expr)
   default_value = expr_dynamic_cast<array_of_exprt>(ref.get()).what();
 }
 
-exprt sparse_arrayt::to_if_expression(const exprt &index) const
+exprt sparse_arrayt::to_if_expression(
+  const with_exprt &expr,
+  const exprt &index)
 {
+  sparse_arrayt sparse_array(expr);
+
   return std::accumulate(
-    entries.begin(),
-    entries.end(),
-    default_value,
+    sparse_array.entries.begin(),
+    sparse_array.entries.end(),
+    sparse_array.default_value,
     [&](
       const exprt if_expr,
       const std::pair<std::size_t, exprt> &entry) { // NOLINT
@@ -88,12 +92,6 @@ exprt sparse_arrayt::to_if_expression(const exprt &index) const
       const equal_exprt index_equal(index, entry_index);
       return if_exprt(index_equal, then_expr, if_expr, if_expr.type());
     });
-}
-
-exprt sparse_arrayt::at(const std::size_t index) const
-{
-  const auto it = entries.find(index);
-  return it != entries.end() ? it->second : default_value;
 }
 
 exprt interval_sparse_arrayt::to_if_expression(const exprt &index) const

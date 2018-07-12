@@ -1064,7 +1064,7 @@ static exprt substitute_array_access(
   const bool left_propagate)
 {
   return left_propagate ? interval_sparse_arrayt(expr).to_if_expression(index)
-                        : sparse_arrayt(expr).to_if_expression(index);
+                        : sparse_arrayt::to_if_expression(expr, index);
 }
 
 /// Create an equivalent expression where array accesses are replaced by 'if'
