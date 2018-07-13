@@ -92,8 +92,28 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
 
   for(const auto &op : operands)
   {
-    const auto iav
+    auto iav
       = std::dynamic_pointer_cast<const interval_abstract_valuet>(op);
+    if (!iav)
+    {
+      // The operand isn't an interval - if it's an integral constant we can
+      // convert it into an interval.
+
+      if(constant_interval_exprt::is_int(op->type()))
+      {
+        const auto ivop = environment.abstract_object_factory(op->type(), op->to_constant(), ns);
+        iav = std::dynamic_pointer_cast<const interval_abstract_valuet>(ivop);
+      }
+
+      if(!iav)
+      {
+        // If we could not convert the operand into an interval,
+        // e.g. if its type is not something we can represent as an interval,
+        // try dispatching the expression_transform under that type instead.
+        return op->expression_transform(expr, operands, environment, ns);
+      }
+    }
+
     INVARIANT(iav, "Should be an interval abstract value");
     interval_operands.push_back(iav);
   }
