@@ -1,0 +1,8 @@
+CORE
+main.c
+--variable-sensitivity --interval-values --verify
+\[main.assertion.*\] .* function main, x > y, z == 1: Success
+\[main.assertion.*\] .* function main, x < y, z == 1: Success
+^EXIT=0$
+^SIGNAL=0$
+--
