@@ -3212,6 +3212,9 @@ void java_bytecode_convert_methodt::save_stack_entries(
       }
     };
 
+  // Function that checks whether the expression accesses a member with the
+  // given identifier name. These accesses are created in the case of `iinc`, or
+  // non-array `?store` instructions.
   const std::function<tvt(const exprt &expr)> has_member_entry = [&identifier](
     const exprt &expr) {
     const auto member_expr = expr_try_dynamic_cast<member_exprt>(expr);
@@ -3219,6 +3222,9 @@ void java_bytecode_convert_methodt::save_stack_entries(
                         : tvt(member_expr->get_component_name() == identifier);
   };
 
+  // Function that checks whether the expression is a symbol with the given
+  // identifier name. These accesses are created in the case of `putstatic` or
+  // `putfield` instructions.
   const std::function<tvt(const exprt &expr)> is_symbol_entry =
     [&identifier](const exprt &expr) {
       const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(expr);
@@ -3226,6 +3232,9 @@ void java_bytecode_convert_methodt::save_stack_entries(
                           : tvt(symbol_expr->get_identifier() == identifier);
     };
 
+  // Function that checks whether the expression is a dereference
+  // expression. These accesses are created in `?astore` array write
+  // instructions.
   const std::function<tvt(const exprt &expr)> is_dereference_entry =
     [](const exprt &expr) {
       const auto dereference_expr =
@@ -3235,27 +3244,21 @@ void java_bytecode_convert_methodt::save_stack_entries(
 
   for(auto &stack_entry : stack)
   {
-    // variables or static fields and symbol -> save symbols with same id
-    if(
-      (write_type == bytecode_write_typet::VARIABLE ||
-       write_type == bytecode_write_typet::STATIC_FIELD) &&
-      entry_matches(is_symbol_entry, stack_entry))
+    bool replace = false;
+    switch(write_type)
     {
-      create_stack_tmp_var(tmp_var_prefix, tmp_var_type, block, stack_entry);
+    case bytecode_write_typet::VARIABLE:
+    case bytecode_write_typet::STATIC_FIELD:
+      replace = entry_matches(is_symbol_entry, stack_entry);
+      break;
+    case bytecode_write_typet::ARRAY_REF:
+      replace = entry_matches(is_dereference_entry, stack_entry);
+      break;
+    case bytecode_write_typet::FIELD:
+      replace = entry_matches(has_member_entry, stack_entry);
+      break;
     }
-
-    // array reference and dereference -> save all references on the stack
-    else if(
-      write_type == bytecode_write_typet::ARRAY_REF &&
-      entry_matches(is_dereference_entry, stack_entry))
-    {
-      create_stack_tmp_var(tmp_var_prefix, tmp_var_type, block, stack_entry);
-    }
-
-    // field and member access -> compare component name
-    else if(
-      write_type == bytecode_write_typet::FIELD &&
-      entry_matches(has_member_entry, stack_entry))
+    if(replace)
     {
       create_stack_tmp_var(tmp_var_prefix, tmp_var_type, block, stack_entry);
     }
