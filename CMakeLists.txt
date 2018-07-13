@@ -139,6 +139,8 @@ set_target_properties(
     json-symtab-language
     langapi
     linking
+    memory-analyzer
+    memory-analyzer-lib
     pointer-analysis
     solvers
     symtab2gb

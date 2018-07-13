@@ -1,3 +1,14 @@
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
+   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang" OR
+   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
+)
+    #  private is overwritten in the gdb_api test cases
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-keyword-macro")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    #   This would be the place to enable warnings for Windows builds, although
+    #   config.inc doesn't seem to do that currently
+endif()
+
 file(GLOB_RECURSE sources "*.cpp" "*.h")
 
 file(GLOB_RECURSE testing_utils "testing-utils/*.cpp" "testing-utils/*.h")
