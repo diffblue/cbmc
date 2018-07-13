@@ -23,7 +23,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include "java_object_factory.h" // gen_nondet_init
 
 /// Returns true if `expr` is a nondet pointer that isn't a function pointer or
-/// a void* pointer as these can be meaningfully non-det initalized. 
+/// a void* pointer as these can be meaningfully non-det initialized.
 static bool is_nondet_pointer(exprt expr)
 {
   // If the expression type doesn't have a subtype then I guess it's primitive
@@ -97,7 +97,7 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
       continue;
     }
 
-   const auto &nondet_expr = to_side_effect_expr_nondet(op);
+    const auto &nondet_expr = to_side_effect_expr_nondet(op);
 
     if(!nondet_expr.get_nullable())
       object_factory_parameters.max_nonnull_tree_depth = 1;
