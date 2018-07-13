@@ -1,0 +1,20 @@
+CORE
+cycles.exe
+--breakpoint process_buffer --symbols buffer
+analyzing symbol: buffer
+GENERATED CODE: 
+\{
+  char _buffer_start_data_1\[\]="snow";
+  char __buffer_start_next_data_3\[\]="sun";
+  char ___buffer_start_next_next_data_5\[\]="rain";
+  char ____buffer_start_next_next_next_data_7\[\]="thunder storm";
+  struct cycle_buffer_entry ___buffer_start_next_next_next_6=\{ .data=\(char \*\)&____buffer_start_next_next_next_data_7, .next=\(\(struct cycle_buffer_entry \*\)NULL\) \};
+  struct cycle_buffer_entry __buffer_start_next_next_4=\{ .data=\(char \*\)&___buffer_start_next_next_data_5, .next=&___buffer_start_next_next_next_6 \};
+  struct cycle_buffer_entry _buffer_start_next_2=\{ .data=\(char \*\)&__buffer_start_next_data_3, .next=&__buffer_start_next_next_4 \};
+  struct cycle_buffer_entry buffer_start_0=\{ .data=\(char \*\)&_buffer_start_data_1, .next=&_buffer_start_next_2 \};
+  buffer.start = &buffer_start_0;
+  buffer.end = &___buffer_start_next_next_next_6;
+  \(\*\(\*\(\*\(\*buffer.start\).next\).next\).next\).next = &buffer_start_0;
+\}
+--
+--
