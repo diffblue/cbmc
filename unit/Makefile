@@ -17,6 +17,7 @@ SRC += unit_tests.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
        goto-programs/goto_trace_output.cpp \
        path_strategies.cpp \
+       memory-analyzer/gdb_api.cpp \
        solvers/floatbv/float_utils.cpp \
        solvers/refinement/array_pool/array_pool.cpp \
        solvers/refinement/string_constraint_generator_valueof/calculate_max_string_length.cpp \
@@ -97,7 +98,8 @@ TESTS = unit_tests$(EXEEXT) \
         miniBDD$(EXEEXT) \
         # Empty last line
 
-CLEANFILES = $(TESTS)
+CLEANFILES = $(TESTS)\
+        #Empty last line
 
 all: cprover.dir testing-utils.dir
 	$(MAKE) $(MAKEARGS) $(TESTS)
