@@ -124,6 +124,15 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
 
     eval_data_deps(inst.rhs(), ns, domain_data_deps);
   }
+  else if (to->is_function_call())
+  {
+    const code_function_callt &call = to_code_function_call(to->code);
+    const code_function_callt::argumentst &args= call.arguments();
+    for(const auto arg : args)
+    {
+      eval_data_deps(arg, ns, domain_data_deps);
+    }
+  }
 }
 
 void variable_sensitivity_dependence_domaint::control_dependencies(
