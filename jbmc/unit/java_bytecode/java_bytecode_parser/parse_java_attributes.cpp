@@ -22,7 +22,7 @@ SCENARIO(
       load_java_class("InnerClasses", "./java_bytecode/java_bytecode_parser");
     WHEN("Parsing the InnerClasses attribute for a public inner class")
     {
-      THEN("The class should be marked as public")
+      THEN("The inner class should be marked as public")
       {
         const symbolt &class_symbol =
           new_symbol_table.lookup_ref("java::InnerClasses$PublicInnerClass");
@@ -31,11 +31,12 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_public);
+        REQUIRE(id2string(java_class.get_outer_class()) == "InnerClasses");
       }
     }
     WHEN("Parsing the InnerClasses attribute for a package private inner class")
     {
-      THEN("The class should be marked as default")
+      THEN("The inner class should be marked as default")
       {
         const symbolt &class_symbol =
           new_symbol_table.lookup_ref("java::InnerClasses$DefaultInnerClass");
@@ -44,11 +45,12 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_default);
+        REQUIRE(id2string(java_class.get_outer_class()) == "InnerClasses");
       }
     }
     WHEN("Parsing the InnerClasses attribute for a protected inner class")
     {
-      THEN("The class should be marked as protected")
+      THEN("The inner class should be marked as protected")
       {
         const symbolt &class_symbol =
           new_symbol_table.lookup_ref("java::InnerClasses$ProtectedInnerClass");
@@ -57,11 +59,12 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_protected);
+        REQUIRE(id2string(java_class.get_outer_class()) == "InnerClasses");
       }
     }
     WHEN("Parsing the InnerClasses attribute for a private inner class")
     {
-      THEN("The class should be marked as private")
+      THEN("The inner class should be marked as private")
       {
         const symbolt &class_symbol =
           new_symbol_table.lookup_ref("java::InnerClasses$PrivateInnerClass");
@@ -70,10 +73,13 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
+        REQUIRE(id2string(java_class.get_outer_class()) == "InnerClasses");
       }
     }
   }
-  GIVEN("Some package-private class files in the class path with inner classes")
+  GIVEN(
+    "Some package-private (default) class files in the class path with inner "
+    "classes")
   {
     const symbol_tablet &new_symbol_table = load_java_class(
       "InnerClassesDefault", "./java_bytecode/java_bytecode_parser");
@@ -88,11 +94,15 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_public);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) == "InnerClassesDefault");
       }
     }
-    WHEN("Parsing the InnerClasses attribute for a package private inner class")
+    WHEN(
+      "Parsing the InnerClasses attribute for a package private (default) "
+      "inner class")
     {
-      THEN("The class should be marked as default")
+      THEN("The inner class should be marked as package-private (default)")
       {
         const symbolt &class_symbol = new_symbol_table.lookup_ref(
           "java::InnerClassesDefault$DefaultInnerClass");
@@ -101,6 +111,8 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_default);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) == "InnerClassesDefault");
       }
     }
     WHEN("Parsing the InnerClasses attribute for a protected inner class")
@@ -114,11 +126,13 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_protected);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) == "InnerClassesDefault");
       }
     }
     WHEN("Parsing the InnerClasses attribute for a private inner class")
     {
-      THEN("The class should be marked as private")
+      THEN("The inner class should be marked as private")
       {
         const symbolt &class_symbol = new_symbol_table.lookup_ref(
           "java::InnerClassesDefault$PrivateInnerClass");
@@ -127,6 +141,8 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) == "InnerClassesDefault");
       }
     }
   }
@@ -151,13 +167,16 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_public);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "InnerClassesDeeplyNested$SinglyNestedClass");
       }
     }
     WHEN(
-      "Parsing the InnerClasses attribute for a package private doubly-nested "
-      "inner class")
+      "Parsing the InnerClasses attribute for a package private (default) "
+      "doubly-nested inner class")
     {
-      THEN("The class should be marked as default")
+      THEN("The inner class should be marked as package-private (default)")
       {
         const symbolt &class_symbol = new_symbol_table.lookup_ref(
           "java::InnerClassesDeeplyNested$SinglyNestedClass$"
@@ -167,13 +186,16 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_default);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "InnerClassesDeeplyNested$SinglyNestedClass");
       }
     }
     WHEN(
-      "Parsing the InnerClasses attribute for a protected doubly-nested inner "
-      "class")
+      "Parsing the InnerClasses attribute for a package private (default) "
+      "doubly-nested inner class ")
     {
-      THEN("The class should be marked as protected")
+      THEN("The inner class should be marked as protected")
       {
         const symbolt &class_symbol = new_symbol_table.lookup_ref(
           "java::InnerClassesDeeplyNested$SinglyNestedClass$"
@@ -183,13 +205,16 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_protected);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "InnerClassesDeeplyNested$SinglyNestedClass");
       }
     }
     WHEN(
       "Parsing the InnerClasses attribute for a private doubly-nested inner "
       "class")
     {
-      THEN("The class should be marked as private")
+      THEN("The inner class should be marked as private ")
       {
         const symbolt &class_symbol = new_symbol_table.lookup_ref(
           "java::InnerClassesDeeplyNested$SinglyNestedClass$"
@@ -199,6 +224,189 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "InnerClassesDeeplyNested$SinglyNestedClass");
+      }
+    }
+  }
+
+  GIVEN(
+    "Some package-private class files in the class path with private deeply"
+    "nested inner classes")
+  {
+    const symbol_tablet &new_symbol_table = load_java_class(
+      "InnerPrivateClassesDeeplyNested",
+      "./java_bytecode/java_bytecode_parser");
+    WHEN(
+      "Parsing the InnerClasses attribute for a public doubly-nested inner "
+      "class")
+    {
+      THEN(
+        "The inner class should be marked as private because its containing "
+        "class has stricter access ")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::InnerPrivateClassesDeeplyNested$SinglyNestedPrivateClass$"
+          "PublicDoublyNestedInnerClass");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_access() == ID_public);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "InnerPrivateClassesDeeplyNested$SinglyNestedPrivateClass");
+      }
+    }
+    WHEN(
+      "Parsing the InnerClasses attribute for a package private doubly-nested "
+      "inner class")
+    {
+      THEN(
+        "The inner class should be marked as private because its containing "
+        "class has stricter access ")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::InnerPrivateClassesDeeplyNested$SinglyNestedPrivateClass$"
+          "DefaultDoublyNestedInnerClass");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_access() == ID_default);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "InnerPrivateClassesDeeplyNested$SinglyNestedPrivateClass");
+      }
+    }
+    WHEN(
+      "Parsing the InnerClasses attribute for a protected doubly-nested inner "
+      "class")
+    {
+      THEN(
+        "The inner class should be marked as private because its containing "
+        "class has stricter access ")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::InnerPrivateClassesDeeplyNested$SinglyNestedPrivateClass$"
+          "ProtectedDoublyNestedInnerClass");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_access() == ID_protected);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "InnerPrivateClassesDeeplyNested$SinglyNestedPrivateClass");
+      }
+    }
+    WHEN(
+      "Parsing the InnerClasses attribute for a private doubly-nested inner "
+      "class")
+    {
+      THEN("The inner class should be marked as private ")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::InnerPrivateClassesDeeplyNested$SinglyNestedPrivateClass$"
+          "PrivateDoublyNestedInnerClass");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_access() == ID_private);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "InnerPrivateClassesDeeplyNested$SinglyNestedPrivateClass");
+      }
+    }
+  }
+
+  GIVEN(
+    "Some class files where the outer class is more restrictive than the first "
+    "inner class")
+  {
+    const symbol_tablet &new_symbol_table = load_java_class(
+      "OuterClassMostRestrictiveDeeplyNested",
+      "./java_bytecode/java_bytecode_parser");
+    WHEN(
+      "Parsing the InnerClasses attribute for a public doubly-nested inner "
+      "class")
+    {
+      THEN(
+        "The inner class should be marked as default (package-private) because "
+        "one of its containing classes has stricter access ")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::OuterClassMostRestrictiveDeeplyNested$SinglyNestedPublicClass$"
+          "PublicDoublyNestedInnerClass");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_access() == ID_public);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "OuterClassMostRestrictiveDeeplyNested$SinglyNestedPublicClass");
+      }
+    }
+    WHEN(
+      "Parsing the InnerClasses attribute for a package private doubly-nested "
+      "inner class")
+    {
+      THEN(
+        "The inner class should be marked as default (package-private) because "
+        "one of its containing classes has stricter access ")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::OuterClassMostRestrictiveDeeplyNested$SinglyNestedPublicClass$"
+          "DefaultDoublyNestedInnerClass");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_access() == ID_default);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "OuterClassMostRestrictiveDeeplyNested$SinglyNestedPublicClass");
+      }
+    }
+    WHEN(
+      "Parsing the InnerClasses attribute for a protected doubly-nested inner "
+      "class")
+    {
+      THEN("The inner class should be marked as default (package-private)")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::OuterClassMostRestrictiveDeeplyNested$SinglyNestedPublicClass$"
+          "ProtectedDoublyNestedInnerClass");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_access() == ID_protected);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "OuterClassMostRestrictiveDeeplyNested$SinglyNestedPublicClass");
+      }
+    }
+    WHEN(
+      "Parsing the InnerClasses attribute for a private doubly-nested inner "
+      "class")
+    {
+      THEN("The inner class should be marked as private")
+      {
+        const symbolt &class_symbol = new_symbol_table.lookup_ref(
+          "java::OuterClassMostRestrictiveDeeplyNested$SinglyNestedPublicClass$"
+          "PrivateDoublyNestedInnerClass");
+        const java_class_typet java_class =
+          to_java_class_type(class_symbol.type);
+        REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(java_class.get_is_inner_class());
+        REQUIRE(java_class.get_access() == ID_private);
+        REQUIRE(
+          id2string(java_class.get_outer_class()) ==
+          "OuterClassMostRestrictiveDeeplyNested$SinglyNestedPublicClass");
       }
     }
   }
@@ -219,6 +427,7 @@ SCENARIO(
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_access() == ID_private);
+        REQUIRE(java_class.get_outer_class().empty());
       }
     }
     WHEN(
@@ -234,6 +443,7 @@ SCENARIO(
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_access() == ID_private);
+        REQUIRE(java_class.get_outer_class().empty());
       }
     }
     WHEN("Parsing the InnerClasses attribute for a protected anonymous class")
@@ -247,6 +457,7 @@ SCENARIO(
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_access() == ID_private);
+        REQUIRE(java_class.get_outer_class().empty());
       }
     }
     WHEN("Parsing the InnerClasses attribute for a private anonymous class")
@@ -260,6 +471,7 @@ SCENARIO(
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_access() == ID_private);
+        REQUIRE(java_class.get_outer_class().empty());
       }
     }
   }
@@ -280,6 +492,7 @@ SCENARIO(
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_access() == ID_private);
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(java_class.get_outer_class().empty());
       }
     }
   }
@@ -299,6 +512,7 @@ SCENARIO(
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_is_static_class());
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(id2string(java_class.get_outer_class()) == "StaticInnerClass");
       }
     }
     WHEN("Parsing the InnerClasses attribute for a non-static inner class ")
@@ -312,6 +526,7 @@ SCENARIO(
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE_FALSE(java_class.get_is_static_class());
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(id2string(java_class.get_outer_class()) == "StaticInnerClass");
       }
     }
   }
@@ -328,6 +543,7 @@ SCENARIO(
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_is_static_class());
+        REQUIRE(java_class.get_outer_class().empty());
       }
     }
     WHEN("Parsing the InnerClasses attribute for a non-static anonymous class ")
@@ -341,6 +557,7 @@ SCENARIO(
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE(java_class.get_is_anonymous_class());
         REQUIRE_FALSE(java_class.get_is_static_class());
+        REQUIRE(java_class.get_outer_class().empty());
       }
     }
   }
@@ -359,6 +576,7 @@ SCENARIO(
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE_FALSE(java_class.get_is_static_class());
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(java_class.get_outer_class().empty());
       }
     }
     WHEN(
@@ -374,6 +592,7 @@ SCENARIO(
         REQUIRE(java_class.get_is_inner_class());
         REQUIRE_FALSE(java_class.get_is_static_class());
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
+        REQUIRE(java_class.get_outer_class().empty());
       }
     }
   }
