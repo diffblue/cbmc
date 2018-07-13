@@ -1,0 +1,20 @@
+CORE
+arrays.exe
+--breakpoint manipulate_data --symbols test_struct
+analyzing symbol: test_struct
+GENERATED CODE: 
+\{
+  char id_1\[7l\]="accept";
+  char id_2\[8l\]="unique0";
+  char id_3\[8l\]="unique1";
+  char id_4\[8l\]="unique2";
+  char id_5\[8l\]="unique3";
+  struct a_typet id_0=\{ .config=\{ 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 \}, .initalized=false,
+    .values=\{ 243, 243, 243, 243, 243, 243, 243, 243, 243, 243, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 171, 171, 171, 171, 171, 171, 171, 171, 171, 171 \}, .childs=\{ \{ .id=12, .options=\{ \{ .text=\(char \*\)&id_1 \}, \{ .text=\(char \*\)&id_2 \} \} \}, 
+    \{ .id=13, .options=\{ \{ .text=\(char \*\)&id_1 \}, \{ .text=\(char \*\)&id_3 \} \} \}, 
+    \{ .id=14, .options=\{ \{ .text=\(char \*\)&id_1 \}, \{ .text=\(char \*\)&id_4 \} \} \}, 
+    \{ .id=15, .options=\{ \{ .text=\(char \*\)&id_1 \}, \{ .text=\(char \*\)&id_5 \} \} \} \} \};
+  test_struct = &id_0;
+\}
+--
+--
