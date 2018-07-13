@@ -405,7 +405,9 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     }
     else if(options.get_bool_option("dependence-graph-vs"))
     {
-      domain=new ait<variable_sensitivity_dependence_grapht>(
+      domain=new variable_sensitivity_dependence_grapht(
+        goto_model.goto_functions,
+        ns,
         options.get_bool_option("vs-progress"),
         options.is_set("vs-progress-interval") ?
           std::stof(options.get_option("vs-progress-interval")) : 0);
