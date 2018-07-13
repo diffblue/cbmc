@@ -28,9 +28,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 full_struct_abstract_objectt::full_struct_abstract_objectt(
   const full_struct_abstract_objectt &ao):
     struct_abstract_objectt(ao), map(ao.map)
-{
-  DATA_INVARIANT(verify(), "Structural invariants maintained");
-}
+{ }
 
 /*******************************************************************\
 
