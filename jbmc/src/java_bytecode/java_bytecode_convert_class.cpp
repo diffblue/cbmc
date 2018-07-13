@@ -279,6 +279,7 @@ void java_bytecode_convert_classt::convert(
   class_type.set_is_inner_class(c.is_inner_class);
   class_type.set_is_static_class(c.is_static_class);
   class_type.set_is_anonymous_class(c.is_anonymous_class);
+  class_type.set_outer_class(c.outer_class);
   if(c.is_enum)
   {
     if(max_array_length != 0 && c.enum_elements > max_array_length)
