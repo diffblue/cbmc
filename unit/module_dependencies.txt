@@ -5,6 +5,7 @@ goto-programs
 goto-symex
 json
 langapi # should go away
+memory-analyzer
 solvers/flattening
 solvers/floatbv
 solvers/miniBDD

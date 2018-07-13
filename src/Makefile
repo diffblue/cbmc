@@ -14,6 +14,8 @@ DIRS = analyses \
        json \
        langapi \
        linking \
+       memory-analyzer \
+       memory-models \
        pointer-analysis \
        solvers \
        util \
@@ -25,6 +27,7 @@ all: cbmc.dir \
      goto-cc.dir \
      goto-diff.dir \
      goto-instrument.dir \
+     memory-analyzer.dir \
      # Empty last line
 
 ###############################################################################
@@ -61,6 +64,8 @@ goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
                solvers.dir json.dir goto-symex.dir
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
+
+memory-analyzer.dir: util.dir goto-programs.dir
 
 # building for a particular directory
 
