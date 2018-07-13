@@ -46,8 +46,11 @@ offset_entryt::offset_entryt(abstract_object_pointert offset_value):
 }
 
 /// Get the expression part needed to read this stack entry. For offset entries
-/// this is an index expression with the index() part the offset
-/// \return The expression to read this part of the stack
+/// this is an index expression with the index() part the offset.
+/// It is important to note that the returned index_exprt does not have a type,
+/// so it will be necessary for the caller to update the type whenever the index
+/// expression is completed.
+/// \return The untyped expression to read this part of the stack
 exprt offset_entryt::get_access_expr() const
 {
   return index_exprt(exprt(), offset->to_constant());
