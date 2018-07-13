@@ -32,11 +32,15 @@ variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
   ABSTRACT_OBJECT_TYPET abstract_object_type=TWO_VALUE;
 
   if(type.id()==ID_signedbv || type.id()==ID_unsignedbv ||
-    type.id()==ID_floatbv || type.id()==ID_fixedbv ||
+    type.id()==ID_fixedbv ||
     type.id()==ID_c_bool || type.id()==ID_bool ||
     type.id()==ID_integer || type.id()==ID_c_bit_field)
   {
     abstract_object_type=has_interval?INTERVAL:CONSTANT;
+  }
+  else if(type.id()==ID_floatbv)
+  {
+    abstract_object_type=CONSTANT;
   }
   else if(type.id()==ID_array)
   {
