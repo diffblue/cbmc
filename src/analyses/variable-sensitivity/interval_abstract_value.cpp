@@ -59,6 +59,12 @@ interval_abstract_valuet::interval_abstract_valuet(
 
 exprt interval_abstract_valuet::to_constant() const
 {
+  // Attempt to reduce this interval to a constant expression
+  if(interval.is_single_value_interval())
+  {
+    // Interval is the equivalent of a constant, so reduce it to a constant
+    return to_constant_expr(interval.get_lower());
+  }
   return abstract_objectt::to_constant();
 #if 0
   if(!is_top() && !is_bottom())
