@@ -1761,6 +1761,7 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   method.is_private=(access_flags&ACC_PRIVATE)!=0;
   method.is_synchronized=(access_flags&ACC_SYNCHRONIZED)!=0;
   method.is_native=(access_flags&ACC_NATIVE)!=0;
+  method.is_bridge = (access_flags & ACC_BRIDGE) != 0;
   method.name=pool_entry(name_index).s;
   method.base_name=pool_entry(name_index).s;
   method.descriptor=id2string(pool_entry(descriptor_index).s);

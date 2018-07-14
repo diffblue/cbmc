@@ -86,7 +86,7 @@ struct java_bytecode_parse_treet
   struct methodt : public membert
   {
     irep_idt base_name;
-    bool is_native, is_abstract, is_synchronized;
+    bool is_native, is_abstract, is_synchronized, is_bridge;
     source_locationt source_location;
 
     typedef std::vector<instructiont> instructionst;
@@ -164,10 +164,11 @@ struct java_bytecode_parse_treet
 
     void output(std::ostream &out) const;
 
-    methodt():
-      is_native(false),
-      is_abstract(false),
-      is_synchronized(false)
+    methodt()
+      : is_native(false),
+        is_abstract(false),
+        is_synchronized(false),
+        is_bridge(false)
     {
     }
   };
