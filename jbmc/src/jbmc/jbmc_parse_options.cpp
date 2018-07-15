@@ -175,10 +175,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("assumptions", true);
 
-  // magic error label
-  if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.get_values("error-label"));
-
   // generate unwinding assertions
   if(cmdline.isset("cover"))
     options.set_option("unwinding-assertions", false);
