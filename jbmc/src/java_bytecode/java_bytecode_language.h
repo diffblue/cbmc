@@ -35,43 +35,47 @@ Author: Daniel Kroening, kroening@kroening.com
   "(throw-runtime-exceptions)" \
   "(java-max-input-array-length):" /* will go away */ \
   "(max-nondet-array-length):" \
-  "(java-max-input-tree-depth):"   /* will go away */ \
+  "(java-max-input-tree-depth):" /* will go away */ \
   "(max-nondet-tree-depth):" \
   "(java-max-vla-length):" \
   "(java-cp-include-files):" \
-  "(lazy-methods)"                 /* will go away */ \
+  "(lazy-methods)" /* will go away */ \
   "(no-lazy-methods)" \
   "(lazy-methods-extra-entry-point):" \
   "(java-load-class):" \
   "(java-no-load-class):"
 
-#define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP /*NOLINT*/                                          \
-  " --disable-uncaught-exception-check" \
-  "                                  ignore uncaught exceptions and errors\n" \
-  " --throw-assertion-error          throw java.lang.AssertionError on violated\n"               /* NOLINT(*) */ \
-  "                                  assert statements instead of failing\n" \
-  "                                  at the location of the assert statement\n"                  /* NOLINT(*) */ \
-  " --java-assume-inputs-non-null    never initialize reference-typed parameter to the\n"        /* NOLINT(*) */ \
-  "                                  entry point with null\n"                                    /* NOLINT(*) */ \
-  " --throw-runtime-exceptions       make implicit runtime exceptions explicit\n"                /* NOLINT(*) */ \
-  " --max-nondet-array-length N      limit nondet (e.g. input) array size to <= N\n"                           /* NOLINT(*) */ \
-  " --max-nondet-tree-depth N        limit size of nondet (e.g. input) object tree;\n" /* NOLINT(*) */ \
-  "                                  at level N references are set to null\n" /* NOLINT(*) */ \
-  " --java-max-vla-length            limit the length of user-code-created arrays\n"             /* NOLINT(*) */ \
-  " --java-cp-include-files          regexp or JSON list of files to load (with '@' prefix)\n"   /* NOLINT(*) */ \
-  " --no-lazy-methods                load and translate all methods given on the command line\n" /* NOLINT(*) */ \
-  "                                  and in --classpath\n"                                       /* NOLINT(*) */ \
-  "                                  Default is to load methods that appear to be\n"  /* NOLINT(*) */ \
-  "                                  reachable from the --function entry point or main class\n"       /* NOLINT(*) */ \
-  "                                  Note --show-symbol-table/goto-functions/properties output\n"/* NOLINT(*) */ \
-  "                                  are restricted to loaded methods by default\n"        /* NOLINT(*) */ \
-  " --lazy-methods-extra-entry-point METHODNAME\n"                                               /* NOLINT(*) */ \
-  "                                  treat METHODNAME as a possible program entry point for\n"   /* NOLINT(*) */ \
-  "                                  the purpose of lazy method loading\n"                       /* NOLINT(*) */ \
-  "                                  METHODNAME can be a regex that will be matched against\n"   /* NOLINT(*) */ \
-  "                                  all symbols. If missing a java:: prefix will be added\n"    /* NOLINT(*) */ \
-  "                                  If no descriptor is found, all overloads of a method will\n"/* NOLINT(*) */ \
-  "                                  also be added."                                             /* NOLINT(*) */
+#define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP /*NOLINT*/ \
+  " --disable-uncaught-exception-check\n" \
+  "                              ignore uncaught exceptions and errors\n" \
+  " --throw-assertion-error      throw java.lang.AssertionError on violated\n" \
+  "                              assert statements instead of failing\n" \
+  "                              at the location of the assert statement\n" \
+  " --throw-runtime-exceptions   make implicit runtime exceptions explicit\n" \
+  " --max-nondet-array-length N  limit nondet (e.g. input) array size to <= N\n" /* NOLINT(*) */ \
+  " --max-nondet-tree-depth N    limit size of nondet (e.g. input) object tree;\n" /* NOLINT(*) */ \
+  "                              at level N references are set to null\n" /* NOLINT(*) */ \
+  " --java-assume-inputs-non-null\n" \
+  "                              never initialize reference-typed parameter to the\n" /* NOLINT(*) */ \
+  "                              entry point with null\n" /* NOLINT(*) */ \
+  " --java-max-vla-length N      limit the length of user-code-created arrays\n" /* NOLINT(*) */ \
+  " --java-cp-include-files r    regexp or JSON list of files to load\n" \
+  "                              (with '@' prefix)\n" \
+  " --no-lazy-methods            load and translate all methods given on\n" \
+  "                              the command line and in --classpath\n" \
+  "                              Default is to load methods that appear to be\n" /* NOLINT(*) */ \
+  "                              reachable from the --function entry point\n" \
+  "                              or main class\n" \
+  "                              Note that --show-symbol-table, --show-goto-functions\n" /* NOLINT(*) */ \
+  "                              and --show-properties output are restricted to\n" /* NOLINT(*) */ \
+  "                              loaded methods by default.\n" \
+  " --lazy-methods-extra-entry-point METHODNAME\n" \
+  "                              treat METHODNAME as a possible program entry\n" /* NOLINT(*) */ \
+  "                              point for the purpose of lazy method loading\n" /* NOLINT(*) */ \
+  "                              METHODNAME can be a regex that will be matched\n" /* NOLINT(*) */ \
+  "                              against all symbols. If missing a java:: prefix\n"    /* NOLINT(*) */ \
+  "                              will be added. If no descriptor is found, all\n"/* NOLINT(*) */ \
+  "                              overloads of a method will also be added.\n"
 // clang-format on
 
 class symbolt;

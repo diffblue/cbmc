@@ -1070,7 +1070,8 @@ void jbmc_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show loaded symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
-    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
+    " --drop-unused-functions      drop functions trivially unreachable\n"
+    "                              from main function\n"
     HELP_SHOW_CLASS_HIERARCHY
     "\n"
     "Program instrumentation options:\n"
@@ -1088,13 +1089,14 @@ void jbmc_parse_optionst::help()
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     // This one is handled by jbmc_parse_options not by the Java frontend,
     // hence its presence here:
-    " --java-threading             enable experimental support for java multi-threading\n"// NOLINT(*)
-    " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n" // NOLINT(*)
+    " --java-threading             enable java multi-threading support (experimental)\n" // NOLINT(*)
+    " --java-unwind-enum-static    unwind loops in static initialization of enums\n" // NOLINT(*)
     // Currently only supported in the JBMC frontend:
-    " --symex-driven-lazy-loading  only load functions when first entered by symbolic execution\n" // NOLINT(*)
-    "                              Note --show-symbol-table/goto-functions/properties output\n" // NOLINT(*)
-    "                              will be restricted to loaded methods in this case, and only\n" // NOLINT(*)
-    "                              output after the symex phase\n"
+    " --symex-driven-lazy-loading  only load functions when first entered by symbolic\n" // NOLINT(*)
+    "                              execution. Note that --show-symbol-table,\n"
+    "                              --show-goto-functions/properties output\n"
+    "                              will be restricted to loaded methods in this case,\n" // NOLINT(*)
+    "                              and only output after the symex phase.\n"
     "\n"
     "BMC options:\n"
     HELP_BMC
@@ -1113,7 +1115,7 @@ void jbmc_parse_optionst::help()
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
     " --no-refine-strings          turn off string refinement\n"
-    " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
+    " --string-printable           restrict to printable strings (experimental)\n" // NOLINT(*)
     " --max-nondet-string-length   bound the length of nondet (e.g. input) strings\n" // NOLINT(*)
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
