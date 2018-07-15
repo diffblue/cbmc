@@ -8,5 +8,5 @@ assertion.* line 10 .* FAILURE$
 --
 non equal types
 --
-When string-max-length is not set, the solver can run out of memory in
+When max-nondet-string-length is not set, the solver can run out of memory in
 an unpredictable way.

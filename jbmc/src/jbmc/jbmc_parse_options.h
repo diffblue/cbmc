@@ -58,7 +58,6 @@ class optionst;
   "(refine-strings)" /* will go away */ \
   "(no-refine-strings)" \
   "(string-printable)" \
-  "(string-max-length):" \
   "(string-max-input-length):" /* will go away */ \
   "(max-nondet-string-length):" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \

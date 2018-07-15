@@ -1,6 +1,6 @@
 CORE
 StringValueOfBool.class
---refine-strings --string-max-length 1000 --function StringValueOfBool.main
+--refine-strings --max-nondet-string-length 1000 --function StringValueOfBool.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
