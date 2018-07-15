@@ -32,13 +32,14 @@ void reachability_slicer(
   const std::list<std::string> &properties,
   const bool include_forward_reachability);
 
-#define OPT_REACHABILITY_SLICER                                                \
+// clang-format off
+#define OPT_REACHABILITY_SLICER \
   "(reachability-slice)(reachability-slice-fb)" // NOLINT(*)
 
-#define HELP_REACHABILITY_SLICER                                               \
-  " --reachability-slice         remove instructions that cannot appear on a " \
-  "trace from entry point to a property\n"                                     \
-  " --reachability-slice-fb      remove instructions that cannot appear on a " \
-  "trace from entry point through a property\n" // NOLINT(*)
-
+#define HELP_REACHABILITY_SLICER \
+  " --reachability-slice         remove instructions that cannot appear on\n" \
+  "                              a trace from entry point to a property\n" \
+  " --reachability-slice-fb      remove instructions that cannot appear on\n" \
+  "                              a trace from entry point through a property\n" // NOLINT(*)
+// clang-format on
 #endif // CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_H
