@@ -80,6 +80,23 @@ jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv):
 {
 }
 
+void jbmc_parse_optionst::set_default_options(optionst &options)
+{
+  // Default true
+  options.set_option("assertions", true);
+  options.set_option("assumptions", true);
+  options.set_option("built-in-assertions", true);
+  options.set_option("pretty-names", true);
+  options.set_option("propagation", true);
+  options.set_option("refine-strings", true);
+  options.set_option("sat-preprocessor", true);
+  options.set_option("simplify", true);
+  options.set_option("simplify-if", true);
+
+  // Other default
+  options.set_option("arrays-uf", "auto");
+}
+
 void jbmc_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
@@ -87,6 +104,8 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     usage_error();
     exit(1); // should contemplate EX_USAGE from sysexits.h
   }
+
+  jbmc_parse_optionst::set_default_options(options);
 
   if(cmdline.isset("show-symex-strategies"))
   {
@@ -107,15 +126,11 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
-  else
-    options.set_option("simplify", true);
 
   if(cmdline.isset("stop-on-fail") ||
      cmdline.isset("dimacs") ||
      cmdline.isset("outfile"))
     options.set_option("stop-on-fail", true);
-  else
-    options.set_option("stop-on-fail", false);
 
   if(cmdline.isset("trace") ||
      cmdline.isset("stop-on-fail"))
@@ -148,8 +163,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   // constant propagation
   if(cmdline.isset("no-propagation"))
     options.set_option("propagation", false);
-  else
-    options.set_option("propagation", true);
 
   // transform self loops to assumptions
   options.set_option(
@@ -166,14 +179,10 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   // check assertions
   if(cmdline.isset("no-assertions"))
     options.set_option("assertions", false);
-  else
-    options.set_option("assertions", true);
 
   // use assumptions
   if(cmdline.isset("no-assumptions"))
     options.set_option("assumptions", false);
-  else
-    options.set_option("assumptions", true);
 
   // generate unwinding assertions
   if(cmdline.isset("cover"))
@@ -206,15 +215,11 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   // simplify if conditions and branches
   if(cmdline.isset("no-simplify-if"))
     options.set_option("simplify-if", false);
-  else
-    options.set_option("simplify-if", true);
 
   if(cmdline.isset("arrays-uf-always"))
     options.set_option("arrays-uf", "always");
   else if(cmdline.isset("arrays-uf-never"))
     options.set_option("arrays-uf", "never");
-  else
-    options.set_option("arrays-uf", "auto");
 
   if(cmdline.isset("dimacs"))
     options.set_option("dimacs", true);
@@ -238,8 +243,8 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
-  if(!cmdline.isset("no-refine-strings"))
-    options.set_option("refine-strings", true);
+  if(cmdline.isset("no-refine-strings"))
+    options.set_option("refine-strings", false);
 
   if(cmdline.isset("string-printable"))
     options.set_option("string-printable", true);
@@ -350,8 +355,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("no-sat-preprocessor"))
     options.set_option("sat-preprocessor", false);
-  else
-    options.set_option("sat-preprocessor", true);
 
   options.set_option(
     "pretty-names",

@@ -97,6 +97,12 @@ public:
     const char **argv,
     const std::string &extra_options);
 
+  /// \brief Set the options that have default values
+  ///
+  /// This function can be called from clients that wish to emulate JBMC's
+  /// default behaviour, for example unit tests.
+  static void set_default_options(optionst &);
+
   void process_goto_function(
     goto_model_functiont &function,
     const abstract_goto_modelt &,
