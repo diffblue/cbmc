@@ -48,7 +48,6 @@ class optionst;
   "(object-bits):" \
   "(classpath):(cp):(main-class):" \
   "(no-assertions)(no-assumptions)" \
-  "(no-built-in-assertions)" \
   "(xml-ui)(json-ui)" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \
   "(no-sat-preprocessor)" \
