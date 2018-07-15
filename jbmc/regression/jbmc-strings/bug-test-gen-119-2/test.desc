@@ -1,6 +1,6 @@
 CORE
 StringValueOfLong.class
---refine-strings --max-nondet-string-length 1000 --function StringValueOfLong.main
+--max-nondet-string-length 1000 --function StringValueOfLong.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

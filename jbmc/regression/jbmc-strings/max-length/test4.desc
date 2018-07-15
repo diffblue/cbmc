@@ -1,6 +1,6 @@
 CORE
 Test.class
---refine-strings --verbosity 10 --max-nondet-string-length 4000 --function Test.checkMaxLength
+--verbosity 10 --max-nondet-string-length 4000 --function Test.checkMaxLength
 ^SIGNAL=0$
 --
 ^EXIT=0$

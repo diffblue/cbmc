@@ -1,6 +1,6 @@
 CORE
 Test.class
---function Test.testme
+--no-refine-strings --function Test.testme
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -8,5 +8,5 @@ Test.class
 type mismatch
 --
 Before cbmc#2472 this would assume that StringBuilder's direct parent was
-java.lang.Object, causing a type mismatch when --refine-strings was not in use
+java.lang.Object, causing a type mismatch when --no-refine-strings was in use
 (which at the time would assume that parent-child relationship)

@@ -1,6 +1,6 @@
 CORE
 Test.class
---refine-strings --function Test.checkAbort --trace
+--function Test.checkAbort --trace
 ^EXIT=10$
 ^SIGNAL=0$
 dynamic_object[0-9]*=\(assignment removed\)
