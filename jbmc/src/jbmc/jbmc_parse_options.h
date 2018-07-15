@@ -47,7 +47,6 @@ class optionst;
   "(document-subgoals)(outfile):" \
   "(object-bits):" \
   "(classpath):(cp):(main-class):" \
-  OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
   "(no-built-in-assertions)" \
   "(xml-ui)(json-ui)" \

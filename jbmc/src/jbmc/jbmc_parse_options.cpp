@@ -1098,7 +1098,6 @@ void jbmc_parse_optionst::help()
     HELP_SHOW_CLASS_HIERARCHY
     "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
