@@ -26,8 +26,23 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/make_unique.h>
 
 #include <goto-programs/goto_model.h>
+#include <util/options.h>
 
 #include "ai_domain.h"
+
+
+struct ai_configt
+{
+  using secondst = std::chrono::duration<float>;
+  bool print_progress = false;
+  secondst progress_interval = secondst(0.0f);
+  bool periodic_task = false;
+
+  ai_configt &with_print_progress(bool print_progress);
+  ai_configt &with_progress_interval(secondst progress_interval);
+  ai_configt &with_periodic_task(bool periodic_task);
+  static ai_configt from_options(const optionst &);
+};
 
 /// The basic interface of an abstract interpreter. This should be enough
 /// to create, run and query an abstract interpreter.
@@ -39,12 +54,9 @@ public:
   typedef ai_domain_baset statet;
   typedef goto_programt::const_targett locationt;
 
-  ai_baset(
-    const bool print_progress,
-    const float min_progress_interval) :
-      progress_output_stream(print_progress ? std::cout : null_output_stream),
-      min_progress_interval(min_progress_interval)
+  ai_baset(ai_configt config) : config(config)
   {
+    last_progress_output = std::chrono::system_clock::now();
   }
 
   virtual ~ai_baset()
@@ -226,20 +238,12 @@ public:
     return output_xml(ns, irep_idt(), goto_function.body);
   }
 
-private:
-  class null_streamt : public std::streambuf {};
-
-  static null_streamt null_stream;
-  static std::ostream null_output_stream;
-
-  std::ostream &progress_output_stream;
-
 protected:
   // we do not use the existing error(), progress(), etc. streams as we want to
   // be able to print progress output just for the ai framework
   std::ostream &progress() const
   {
-    return progress_output_stream;
+    return std::clog;
   }
 
   // we collect progress data irrespective of whether printing progress data is
@@ -272,12 +276,11 @@ protected:
 
   void print_progress() const;
 
-  const std::chrono::duration<float> min_progress_interval;
-
-  // default-constructed time points have the epoch as value
   mutable std::chrono::system_clock::time_point last_progress_output;
 
   void print_progress_interval() const;
+
+  const ai_configt config;
 
   /// Initialize all the abstract states for a single function. Override this to
   /// do custom per-domain initialization.
@@ -471,10 +474,11 @@ class ait:public ai_baset
 {
 public:
   // constructor
-  ait(
-    const bool print_progress = false,
-    const float min_progress_interval = 0) :
-      ai_baset(print_progress, min_progress_interval)
+  ait(ai_configt config) : ai_baset(config)
+  {
+  }
+
+  ait() : ai_baset(ai_configt{})
   {
   }
 
@@ -608,7 +612,7 @@ public:
   using locationt = typename statet::locationt;
 
   // constructor
-  concurrency_aware_ait():ait<domainT>()
+  concurrency_aware_ait(const ai_configt &config) : ait<domainT>(config)
   {
   }
 

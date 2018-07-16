@@ -628,12 +628,40 @@ void ai_baset::print_progress_interval() const
   system_clock::time_point now = system_clock::now();
   auto diff = now - last_progress_output;
 
-  if(diff >= min_progress_interval)
+  if(config.print_progress && diff >= config.progress_interval)
   {
     print_progress();
     last_progress_output = now;
   }
 }
 
-ai_baset::null_streamt ai_baset::null_stream;
-std::ostream ai_baset::null_output_stream(&ai_baset::null_stream);
+ai_configt ai_configt::from_options(const optionst &options)
+{
+  ai_configt result = {};
+  result.print_progress = options.get_bool_option("vs-progress");
+  if(options.is_set("vs-progress-interval"))
+  {
+    result.progress_interval = ai_configt::secondst(
+      std::stof(options.get_option("vs-progress-interval")));
+  }
+  return result;
+}
+
+ai_configt &ai_configt::with_print_progress(bool print_progress)
+{
+  this->print_progress = print_progress;
+  return *this;
+}
+
+ai_configt &
+ai_configt::with_progress_interval(ai_configt::secondst progress_interval)
+{
+  this->progress_interval = progress_interval;
+  return *this;
+}
+
+ai_configt &ai_configt::with_periodic_task(bool periodic_task)
+{
+  this->periodic_task = periodic_task;
+  return *this;
+}

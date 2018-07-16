@@ -238,6 +238,7 @@ public:
   typedef std::map<irep_idt, cfg_post_dominatorst> post_dominators_mapt;
 
   explicit dependence_grapht(const namespacet &_ns):
+    ait(ai_configt{}),
     ns(_ns),
     rd(ns)
   {

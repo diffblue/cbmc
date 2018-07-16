@@ -28,7 +28,7 @@ Date: February 2013
 
 reaching_definitions_analysist::reaching_definitions_analysist(
   const namespacet &_ns):
-    concurrency_aware_ait<rd_range_domaint>(),
+    concurrency_aware_ait<rd_range_domaint>(ai_configt{}),
     ns(_ns)
 {
 }
