@@ -249,6 +249,19 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("string-printable"))
     options.set_option("string-printable", true);
 
+  if(cmdline.isset("no-refine-strings") && cmdline.isset("string-printable"))
+  {
+    warning() << "--string-printable ignored due to --no-refine-strings" << eom;
+  }
+
+  if(
+    cmdline.isset("no-refine-strings") &&
+    cmdline.isset("max-nondet-string-length"))
+  {
+    warning() << "--max-nondet-string-length ignored due to "
+              << "--no-refine-strings" << eom;
+  }
+
   if(cmdline.isset("max-node-refinement"))
     options.set_option(
       "max-node-refinement",
