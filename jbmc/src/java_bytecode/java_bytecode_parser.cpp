@@ -1643,6 +1643,11 @@ void java_bytecode_parsert::rinner_classes_attribute(
     }
     else
     {
+      std::string outer_class_info_name =
+        class_infot(pool_entry(outer_class_info_index))
+          .get_name(pool_entry_lambda);
+      parsed_class.outer_class =
+        constant(outer_class_info_index).type().get(ID_C_base_name);
       parsed_class.is_private = is_private;
       parsed_class.is_protected = is_protected;
       parsed_class.is_public = is_public;

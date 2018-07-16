@@ -208,6 +208,7 @@ struct java_bytecode_parse_treet
     bool is_static_class = false;
     bool is_anonymous_class = false;
     bool attribute_bootstrapmethods_read = false;
+    irep_idt outer_class; // when no outer class is set, there is no outer class
     size_t enum_elements=0;
 
     enum class method_handle_typet
