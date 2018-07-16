@@ -137,6 +137,49 @@ private:
     const namespacet &ns);
 
   abstract_environmentt abstract_state;
+
+public:
+  abstract_object_statisticst gather_statistics(const namespacet &ns) const;
+};
+
+template <>
+struct get_domain_statisticst<variable_sensitivity_domaint>
+{
+  abstract_object_statisticst total_statistics = {};
+  void
+  add_entry(const variable_sensitivity_domaint &domain, const namespacet &ns)
+  {
+    auto statistics = domain.gather_statistics(ns);
+    total_statistics.number_of_interval_abstract_objects +=
+      statistics.number_of_interval_abstract_objects;
+    total_statistics.number_of_globals += statistics.number_of_globals;
+    total_statistics.number_of_single_value_intervals +=
+      statistics.number_of_single_value_intervals;
+    total_statistics.number_of_constants += statistics.number_of_constants;
+    total_statistics.number_of_pointers += statistics.number_of_constants;
+    total_statistics.number_of_arrays += statistics.number_of_arrays;
+    total_statistics.number_of_structs += statistics.number_of_arrays;
+    total_statistics.objects_memory_usage += statistics.objects_memory_usage;
+  }
+
+  void print(std::ostream &out) const
+  {
+    out << "<< Begin Variable Sensitivity Domain Statistics >>\n"
+        << "  Memory Usage: "
+        << total_statistics.objects_memory_usage.to_string() << '\n'
+        << "  Number of structs: " << total_statistics.number_of_structs << '\n'
+        << "  Number of arrays: " << total_statistics.number_of_arrays << '\n'
+        << "  Number of pointers: " << total_statistics.number_of_pointers
+        << '\n'
+        << "  Number of constants: " << total_statistics.number_of_constants
+        << '\n'
+        << "  Number of intervals: "
+        << total_statistics.number_of_interval_abstract_objects << '\n'
+        << "  Number of single value intervals: "
+        << total_statistics.number_of_single_value_intervals << '\n'
+        << "  Number of globals: " << total_statistics.number_of_globals << '\n'
+        << "<< End Variable Sensitivity Domain Statistics >>\n";
+  }
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H

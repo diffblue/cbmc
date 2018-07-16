@@ -592,3 +592,8 @@ void variable_sensitivity_domaint::apply_domain(
     abstract_state.assign(symbol, value, ns);
   }
 }
+abstract_object_statisticst
+variable_sensitivity_domaint::gather_statistics(const namespacet &ns) const
+{
+  return abstract_state.gather_statistics(ns);
+}

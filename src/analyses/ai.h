@@ -35,6 +35,8 @@ struct ai_configt
 {
   using secondst = std::chrono::duration<float>;
   bool print_progress = false;
+  bool print_memory_usage = false;
+
   secondst progress_interval = secondst(0.0f);
   bool periodic_task = false;
 
@@ -278,7 +280,7 @@ protected:
 
   mutable std::chrono::system_clock::time_point last_progress_output;
 
-  void print_progress_interval() const;
+  void print_progress_interval(const namespacet &ns) const;
 
   const ai_configt config;
 
@@ -425,6 +427,19 @@ protected:
 
   /// Make a copy of a state
   virtual std::unique_ptr<statet> make_temporary_state(const statet &s)=0;
+
+  virtual void print_memory_usage(const namespacet &ns) const;
+};
+
+template <typename domainT>
+struct get_domain_statisticst
+{
+  void add_entry(const domainT &domain, const namespacet &ns)
+  {
+  }
+  void print(std::ostream &out) const
+  {
+  }
 };
 
 /// Base class for abstract interpretation. An actual analysis
@@ -575,6 +590,16 @@ protected:
     const namespacet &ns) override
   {
     sequential_fixedpoint(goto_functions, ns);
+  }
+
+  void print_memory_usage(const namespacet &ns) const override
+  {
+    get_domain_statisticst<domainT> statistics;
+    for(auto const &state_entry : state_map)
+    {
+      statistics.add_entry(state_entry.second, ns);
+    }
+    statistics.print(progress());
   }
 
 private:

@@ -399,7 +399,7 @@ bool ai_baset::do_function_call(
       progress_data.max_stack_depth
         = std::max(progress_data.max_stack_depth, progress_data.stack.size());
 
-      print_progress_interval();
+      print_progress_interval(ns);
 
       fixedpoint(f_it->first, goto_function.body, goto_functions, ns);
 
@@ -407,7 +407,7 @@ bool ai_baset::do_function_call(
       progress_data.num_functions_returned++;
       progress_data.stack.pop_front();
 
-      print_progress_interval();
+      print_progress_interval(ns);
   }
 
 
@@ -621,18 +621,28 @@ void ai_baset::print_progress() const
   progress() << std::flush;
 }
 
-void ai_baset::print_progress_interval() const
+void ai_baset::print_progress_interval(const namespacet &ns) const
 {
   using namespace std::chrono;
 
   system_clock::time_point now = system_clock::now();
   auto diff = now - last_progress_output;
-
-  if(config.print_progress && diff >= config.progress_interval)
+  if(diff >= config.progress_interval)
   {
-    print_progress();
     last_progress_output = now;
+    if(config.print_progress)
+    {
+      print_progress();
+    }
+    if(config.print_memory_usage)
+    {
+      print_memory_usage(ns);
+    }
   }
+}
+
+void ai_baset::print_memory_usage(const namespacet &ns) const
+{
 }
 
 ai_configt ai_configt::from_options(const optionst &options)
@@ -644,6 +654,8 @@ ai_configt ai_configt::from_options(const optionst &options)
     result.progress_interval = ai_configt::secondst(
       std::stof(options.get_option("vs-progress-interval")));
   }
+  result.print_memory_usage =
+    options.get_bool_option("vs-progress-memory-usage");
   return result;
 }
 

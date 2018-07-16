@@ -256,16 +256,18 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(options.get_bool_option("general-analysis") || reachability_task)
   {
     options.set_option("vs-progress", cmdline.isset("vs-progress"));
+    options.set_option(
+      "vs-progress-memory-usage", cmdline.isset("vs-progress-memory-usage"));
     const char *vs_progress_interval = "vs-progress-interval";
 
     if(cmdline.isset(vs_progress_interval))
     {
-      std::string v(cmdline.get_value(vs_progress_interval));
+      std::string interval_value = cmdline.get_value(vs_progress_interval);
 
       try
       {
         // check if valid float
-        std::stof(v);
+        std::stof(interval_value);
       }
       catch(std::out_of_range)
       {
@@ -276,7 +278,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
         throw "argument to --vs-progress-interval is invalid";
       }
 
-      options.set_option(vs_progress_interval, v);
+      options.set_option(vs_progress_interval, interval_value);
     }
 
     // Abstract interpreter choice
@@ -818,6 +820,7 @@ void goto_analyzer_parse_optionst::help()
     " --variable-sensitivity       a highly configurable non-relational domain\n" // NOLINT(*)
     " --vs-progress                print variable sensitivity progress data\n"
     " --vs-progress-interval       minimum interval (in s) between progress reports\n" // NOLINT(*)
+    " --vs-progress-memory-usage   display variable sensitivity memory usage along progress\n" // NOLINT(*)
     "\n"
     "Output options:\n"
     " --text file_name             output results in plain text to given file\n"

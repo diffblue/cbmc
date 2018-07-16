@@ -157,7 +157,8 @@ class optionst;
   OPT_VALIDATE \
   "(interval-values)" \
   "(vs-progress)" \
-  "(vs-progress-interval):"
+  "(vs-progress-interval):" \
+  "(vs-progress-memory-usage)" \
 // clang-format on
 
 class goto_analyzer_parse_optionst: public parse_options_baset
