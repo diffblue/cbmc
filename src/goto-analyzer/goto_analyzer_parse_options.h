@@ -159,6 +159,7 @@ class optionst;
   "(vs-progress)" \
   "(vs-progress-interval):" \
   "(vs-progress-memory-usage)" \
+  "(vs-progress-string-statistics)"
 // clang-format on
 
 class goto_analyzer_parse_optionst: public parse_options_baset

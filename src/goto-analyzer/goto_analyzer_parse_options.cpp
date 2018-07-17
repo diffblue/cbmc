@@ -258,6 +258,8 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("vs-progress", cmdline.isset("vs-progress"));
     options.set_option(
       "vs-progress-memory-usage", cmdline.isset("vs-progress-memory-usage"));
+    options.set_option(
+      "vs-progress-string-statistics", cmdline.isset("vs-progress-string-statistics"));
     const char *vs_progress_interval = "vs-progress-interval";
 
     if(cmdline.isset(vs_progress_interval))
@@ -821,6 +823,7 @@ void goto_analyzer_parse_optionst::help()
     " --vs-progress                print variable sensitivity progress data\n"
     " --vs-progress-interval       minimum interval (in s) between progress reports\n" // NOLINT(*)
     " --vs-progress-memory-usage   display variable sensitivity memory usage along progress\n" // NOLINT(*)
+    " --vs-progress-string-statistics  display string container statistics along progress\n" // NOLINT(*)
     "\n"
     "Output options:\n"
     " --text file_name             output results in plain text to given file\n"

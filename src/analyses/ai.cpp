@@ -638,6 +638,10 @@ void ai_baset::print_progress_interval(const namespacet &ns) const
     {
       print_memory_usage(ns);
     }
+    if(config.print_string_container_statistics)
+    {
+      get_string_container().compute_statistics().dump_on_stream(progress());
+    }
   }
 }
 
@@ -656,6 +660,8 @@ ai_configt ai_configt::from_options(const optionst &options)
   }
   result.print_memory_usage =
     options.get_bool_option("vs-progress-memory-usage");
+  result.print_string_container_statistics =
+    options.get_bool_option("vs-progress-string-statistics");
   return result;
 }
 
@@ -675,5 +681,13 @@ ai_configt::with_progress_interval(ai_configt::secondst progress_interval)
 ai_configt &ai_configt::with_periodic_task(bool periodic_task)
 {
   this->periodic_task = periodic_task;
+  return *this;
+}
+
+ai_configt &
+ai_configt::with_print_string_container_statistics(
+  bool print_string_container_statistics)
+{
+  this->print_string_container_statistics = print_string_container_statistics;
   return *this;
 }

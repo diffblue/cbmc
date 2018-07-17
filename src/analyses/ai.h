@@ -40,9 +40,13 @@ struct ai_configt
   secondst progress_interval = secondst(0.0f);
   bool periodic_task = false;
 
+  bool print_string_container_statistics = false;
+
   ai_configt &with_print_progress(bool print_progress);
   ai_configt &with_progress_interval(secondst progress_interval);
   ai_configt &with_periodic_task(bool periodic_task);
+  ai_configt &with_print_string_container_statistics(
+    bool print_string_container_statistics);
   static ai_configt from_options(const optionst &);
 };
 
