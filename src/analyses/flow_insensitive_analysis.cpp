@@ -49,8 +49,7 @@ exprt flow_insensitive_abstract_domain_baset::get_return_lhs(locationt to) const
   // must be the function call
   assert(to->is_function_call());
 
-  const code_function_callt &code=
-    to_code_function_call(to_code(to->code));
+  const code_function_callt &code = to_code_function_call(to->code);
 
   return code.lhs();
 }
@@ -164,8 +163,7 @@ bool flow_insensitive_analysis_baset::visit(
     if(l->is_function_call())
     {
       // this is a big special case
-      const code_function_callt &code=
-        to_code_function_call(to_code(l->code));
+      const code_function_callt &code = to_code_function_call(l->code);
 
       changed=
         do_function_call_rec(
@@ -213,8 +211,7 @@ bool flow_insensitive_analysis_baset::do_function_call(
 
   if(!goto_function.body_available())
   {
-    const code_function_callt &code =
-      to_code_function_call(to_code(l_call->code));
+    const code_function_callt &code = to_code_function_call(l_call->code);
 
     goto_programt temp;
 

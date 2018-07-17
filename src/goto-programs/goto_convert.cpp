@@ -1569,12 +1569,12 @@ void goto_convertt::convert_ifthenelse(
 
   // convert 'then'-branch
   goto_programt tmp_then;
-  convert(to_code(code.then_case()), tmp_then, mode);
+  convert(code.then_case(), tmp_then, mode);
 
   goto_programt tmp_else;
 
   if(has_else)
-    convert(to_code(code.else_case()), tmp_else, mode);
+    convert(code.else_case(), tmp_else, mode);
 
   exprt tmp_guard=code.cond();
   clean_expr(tmp_guard, dest, mode);

@@ -92,7 +92,7 @@ get_nondet_instruction_info(const goto_programt::const_targett &instr)
   {
     return nondet_instruction_infot();
   }
-  const auto &code = to_code(instr->code);
+  const auto &code = instr->code;
   if(code.get_statement() != ID_function_call)
   {
     return nondet_instruction_infot();
