@@ -914,7 +914,7 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
   if(output_files.empty() ||
      (output_files.size()==1 &&
       output_files.front()=="/dev/null"))
-    return EX_OK;
+    return run_gcc(compiler);
 
   debug() << "Running " << native_tool_name
           << " to generate hybrid binary" << eom;
