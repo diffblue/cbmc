@@ -19,6 +19,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "arith_tools.h"
 
+bool is_lvalue(const exprt &expr)
+{
+  if(expr.id()==ID_index)
+    return is_lvalue(to_index_expr(expr).op0());
+  else if(expr.id()==ID_member)
+    return is_lvalue(to_member_expr(expr).op0());
+  else if(expr.id()==ID_dereference)
+    return true;
+  else if(expr.id()==ID_symbol)
+    return true;
+  else
+    return false;
+}
 exprt make_binary(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
