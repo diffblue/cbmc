@@ -120,15 +120,24 @@ reference_typet java_array_type(const char subtype)
   return java_reference_type(symbol_type);
 }
 
-/// Return the type of the elements of a given java array type
-/// \param array_type The java array type
-/// \return The type of the elements of the array
-typet java_array_element_type(const symbol_typet &array_type)
+/// Return a const reference to the element type of a given java array type
+/// \param array_symbol The java array type
+const typet &java_array_element_type(const symbol_typet &array_symbol)
 {
-  INVARIANT(
-    is_java_array_tag(array_type.get_identifier()),
+  DATA_INVARIANT(
+    is_java_array_tag(array_symbol.get_identifier()),
     "Symbol should have array tag");
-  return array_type.find_type(ID_C_element_type);
+  return array_symbol.find_type(ID_C_element_type);
+}
+
+/// Return a non-const reference to the element type of a given java array type
+/// \param array_symbol The java array type
+typet &java_array_element_type(symbol_typet &array_symbol)
+{
+  DATA_INVARIANT(
+    is_java_array_tag(array_symbol.get_identifier()),
+    "Symbol should have array tag");
+  return array_symbol.add_type(ID_C_element_type);
 }
 
 /// See above
