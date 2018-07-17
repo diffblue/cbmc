@@ -43,7 +43,6 @@ class optionst;
   "(object-bits):" \
   OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
-  "(no-built-in-assertions)" \
   "(xml-ui)(xml-interface)(json-ui)" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \
   "(no-sat-preprocessor)" \
