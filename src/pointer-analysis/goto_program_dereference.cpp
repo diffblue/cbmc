@@ -307,7 +307,7 @@ void goto_program_dereferencet::dereference_instruction(
   }
   else if(i.is_function_call())
   {
-    code_function_callt &function_call=to_code_function_call(to_code(i.code));
+    code_function_callt &function_call = to_code_function_call(i.code);
 
     if(function_call.lhs().is_not_nil())
       dereference_expr(

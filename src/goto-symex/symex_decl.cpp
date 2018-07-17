@@ -23,7 +23,7 @@ void goto_symext::symex_decl(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  const codet &code=to_code(instruction.code);
+  const codet &code = instruction.code;
 
   if(code.operands().size()==2)
     throw "two-operand decl not supported here";

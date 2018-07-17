@@ -626,7 +626,7 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
 
   implicit_typecast_bool(cond);
 
-  if(to_code(code.then_case()).get_statement()==ID_decl_block)
+  if(code.then_case().get_statement() == ID_decl_block)
   {
     code_blockt code_block;
     code_block.add_source_location()=code.then_case().source_location();
@@ -635,11 +635,11 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
     code.then_case().swap(code_block);
   }
 
-  typecheck_code(to_code(code.then_case()));
+  typecheck_code(code.then_case());
 
   if(!code.else_case().is_nil())
   {
-    if(to_code(code.else_case()).get_statement()==ID_decl_block)
+    if(code.else_case().get_statement() == ID_decl_block)
     {
       code_blockt code_block;
       code_block.add_source_location()=code.else_case().source_location();
@@ -648,7 +648,7 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
       code.else_case().swap(code_block);
     }
 
-    typecheck_code(to_code(code.else_case()));
+    typecheck_code(code.else_case());
   }
 }
 

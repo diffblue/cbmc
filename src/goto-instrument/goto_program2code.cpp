@@ -1117,17 +1117,17 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   if(has_else)
   {
     for(++target; target!=before_else; ++target)
-      target=convert_instruction(target, before_else, to_code(i.then_case()));
+      target = convert_instruction(target, before_else, i.then_case());
 
-    convert_labels(before_else, to_code(i.then_case()));
+    convert_labels(before_else, i.then_case());
 
     for(++target; target!=end_if; ++target)
-      target=convert_instruction(target, end_if, to_code(i.else_case()));
+      target = convert_instruction(target, end_if, i.else_case());
   }
   else
   {
     for(++target; target!=end_if; ++target)
-      target=convert_instruction(target, end_if, to_code(i.then_case()));
+      target = convert_instruction(target, end_if, i.then_case());
   }
 
   dest.move_to_operands(i);
@@ -1354,12 +1354,12 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
 
   // use pthreads if "code in new thread" is a function call to a function with
   // suitable signature
-  if(thread_start->is_function_call() &&
-     to_code_function_call(to_code(thread_start->code)).arguments().size()==1 &&
-     after_thread_start==thread_end)
+  if(
+    thread_start->is_function_call() &&
+    to_code_function_call(thread_start->code).arguments().size() == 1 &&
+    after_thread_start == thread_end)
   {
-    const code_function_callt &cf=
-      to_code_function_call(to_code(thread_start->code));
+    const code_function_callt &cf = to_code_function_call(thread_start->code);
 
     system_headers.insert("pthread.h");
 
@@ -1730,14 +1730,15 @@ void goto_program2codet::cleanup_code_ifthenelse(
 
   // assert(false) expands to if(true) assert(false), simplify again (and also
   // simplify other cases)
-  if(cond.is_true() &&
-      (i_t_e.else_case().is_nil() || !has_labels(to_code(i_t_e.else_case()))))
+  if(
+    cond.is_true() &&
+    (i_t_e.else_case().is_nil() || !has_labels(i_t_e.else_case())))
   {
     codet tmp;
     tmp.swap(i_t_e.then_case());
     code.swap(tmp);
   }
-  else if(cond.is_false() && !has_labels(to_code(i_t_e.then_case())))
+  else if(cond.is_false() && !has_labels(i_t_e.then_case()))
   {
     if(i_t_e.else_case().is_nil())
       code=code_skipt();
@@ -1750,8 +1751,9 @@ void goto_program2codet::cleanup_code_ifthenelse(
   }
   else
   {
-    if(i_t_e.then_case().is_not_nil() &&
-       to_code(i_t_e.then_case()).get_statement()==ID_ifthenelse)
+    if(
+      i_t_e.then_case().is_not_nil() &&
+      i_t_e.then_case().get_statement() == ID_ifthenelse)
     {
       // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
       // ambiguity
@@ -1760,9 +1762,10 @@ void goto_program2codet::cleanup_code_ifthenelse(
       i_t_e.then_case().swap(b);
     }
 
-    if(i_t_e.else_case().is_not_nil() &&
-       to_code(i_t_e.then_case()).get_statement()==ID_skip &&
-       to_code(i_t_e.else_case()).get_statement()==ID_ifthenelse)
+    if(
+      i_t_e.else_case().is_not_nil() &&
+      i_t_e.then_case().get_statement() == ID_skip &&
+      i_t_e.else_case().get_statement() == ID_ifthenelse)
     {
       // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
       // ambiguity
@@ -1795,8 +1798,9 @@ void goto_program2codet::cleanup_code_ifthenelse(
   }
 
   // remove empty then/else
-  if(code.get_statement()==ID_ifthenelse &&
-      to_code(i_t_e.then_case()).get_statement()==ID_skip)
+  if(
+    code.get_statement() == ID_ifthenelse &&
+    i_t_e.then_case().get_statement() == ID_skip)
   {
     not_exprt tmp(i_t_e.cond());
     simplify(tmp, ns);
@@ -1805,15 +1809,15 @@ void goto_program2codet::cleanup_code_ifthenelse(
     i_t_e.cond().swap(tmp);
     i_t_e.then_case().swap(i_t_e.else_case());
   }
-  if(code.get_statement()==ID_ifthenelse &&
-      i_t_e.else_case().is_not_nil() &&
-      to_code(i_t_e.else_case()).get_statement()==ID_skip)
+  if(
+    code.get_statement() == ID_ifthenelse && i_t_e.else_case().is_not_nil() &&
+    i_t_e.else_case().get_statement() == ID_skip)
     i_t_e.else_case().make_nil();
   // or even remove the if altogether if the then case is now empty
-  if(code.get_statement()==ID_ifthenelse &&
-      i_t_e.else_case().is_nil() &&
-      (i_t_e.then_case().is_nil() ||
-       to_code(i_t_e.then_case()).get_statement()==ID_skip))
+  if(
+    code.get_statement() == ID_ifthenelse && i_t_e.else_case().is_nil() &&
+    (i_t_e.then_case().is_nil() ||
+     i_t_e.then_case().get_statement() == ID_skip))
     code=code_skipt();
 }
 

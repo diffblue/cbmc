@@ -2593,9 +2593,9 @@ std::string expr2ct::convert_code_ifthenelse(
     dest+=';';
   }
   else
-    dest+=convert_code(
-        to_code(src.then_case()),
-        to_code(src.then_case()).get_statement()==ID_block ? indent : indent+2);
+    dest += convert_code(
+      src.then_case(),
+      src.then_case().get_statement() == ID_block ? indent : indent + 2);
   dest+="\n";
 
   if(!src.else_case().is_nil())
@@ -2603,9 +2603,9 @@ std::string expr2ct::convert_code_ifthenelse(
     dest+="\n";
     dest+=indent_str(indent);
     dest+="else\n";
-    dest+=convert_code(
-        to_code(src.else_case()),
-        to_code(src.else_case()).get_statement()==ID_block ? indent : indent+2);
+    dest += convert_code(
+      src.else_case(),
+      src.else_case().get_statement() == ID_block ? indent : indent + 2);
   }
 
   return dest;
