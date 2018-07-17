@@ -1952,14 +1952,19 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
 
   int t=lex.LookAhead(0);
 
-  while(t==TOK_FRIEND || t==TOK_INLINE || t==TOK_VIRTUAL || t==TOK_EXPLICIT)
+  while(
+    t == TOK_FRIEND || t == TOK_INLINE || t == TOK_VIRTUAL ||
+    t == TOK_EXPLICIT || t == TOK_MSC_FORCEINLINE)
   {
     cpp_tokent tk;
     lex.get_token(tk);
 
     switch(t)
     {
-    case TOK_INLINE:   member_spec.set_inline(true); break;
+    case TOK_INLINE:
+    case TOK_MSC_FORCEINLINE:
+      member_spec.set_inline(true);
+      break;
     case TOK_VIRTUAL:  member_spec.set_virtual(true); break;
     case TOK_FRIEND:   member_spec.set_friend(true); break;
     case TOK_EXPLICIT: member_spec.set_explicit(true); break;

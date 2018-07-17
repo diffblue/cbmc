@@ -1138,7 +1138,7 @@ __decltype          { if(PARSER.cpp98 &&
 
 "__forceinline" { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_INLINE; }
+                    { loc(); return TOK_MSC_FORCEINLINE; }
                   else
                     return make_identifier();
                 }
