@@ -1,4 +1,4 @@
-[![Build Status][travis_img]][travis] [![Build Status][appveyor_img]][appveyor]
+[![Build Status][travis_img]][travis]
 
 About
 =====
@@ -56,5 +56,3 @@ License
 
 [travis]: https://travis-ci.org/diffblue/cbmc
 [travis_img]: https://travis-ci.org/diffblue/cbmc.svg?branch=develop
-[appveyor]: https://ci.appveyor.com/project/diffblue/cbmc/
-[appveyor_img]: https://ci.appveyor.com/api/projects/status/github/diffblue/cbmc?svg=true&branch=develop
