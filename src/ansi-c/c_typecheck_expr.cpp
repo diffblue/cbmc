@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
 
+#include <goto-programs/adjust_float_expressions.h>
+
 #include "builtin_factory.h"
 #include "c_typecast.h"
 #include "c_qualifiers.h"
@@ -3372,6 +3374,13 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
 
 void c_typecheck_baset::make_constant(exprt &expr)
 {
+  // Floating-point expressions may require a rounding mode.
+  // ISO 9899:1999 F.7.2 says that the default is "round to nearest".
+  // Some compilers have command-line options to override.
+  const auto rounding_mode =
+    from_integer(ieee_floatt::ROUND_TO_EVEN, signed_int_type());
+  adjust_float_expressions(expr, rounding_mode);
+
   simplify(expr, *this);
 
   if(!expr.is_constant() &&
