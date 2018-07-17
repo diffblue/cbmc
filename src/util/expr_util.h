@@ -30,6 +30,9 @@ class symbolt;
 class typet;
 class namespacet;
 
+/// Returns true iff the argument is (syntactically) an lvalue.
+bool is_lvalue(const exprt &expr);
+
 /// splits an expression with >=3 operands into nested binary expressions
 exprt make_binary(const exprt &);
 

@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
+#include <util/expr_util.h>
 #include <util/pointer_offset_size.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
@@ -613,20 +614,6 @@ void goto_convertt::do_array_op(
     array_op_statement.copy_to_operands(lhs);
 
   copy(array_op_statement, OTHER, dest);
-}
-
-bool is_lvalue(const exprt &expr)
-{
-  if(expr.id()==ID_index)
-    return is_lvalue(to_index_expr(expr).op0());
-  else if(expr.id()==ID_member)
-    return is_lvalue(to_member_expr(expr).op0());
-  else if(expr.id()==ID_dereference)
-    return true;
-  else if(expr.id()==ID_symbol)
-    return true;
-  else
-    return false;
 }
 
 exprt make_va_list(const exprt &expr)
