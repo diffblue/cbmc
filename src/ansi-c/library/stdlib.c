@@ -406,6 +406,51 @@ inline void *valloc(__CPROVER_size_t malloc_size)
   return malloc(malloc_size);
 }
 
+/* FUNCTION: posix_memalign */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#include <errno.h>
+#define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#undef posix_memalign
+
+inline void *malloc(__CPROVER_size_t malloc_size);
+inline int
+posix_memalign(void **ptr, __CPROVER_size_t alignment, __CPROVER_size_t size)
+{
+__CPROVER_HIDE:;
+
+  __CPROVER_size_t multiplier = alignment / sizeof(void *);
+  // Modeling the posix_memalign checks on alignment.
+  if(
+    alignment % sizeof(void *) != 0 || ((multiplier) & (multiplier - 1)) != 0 ||
+    alignment == 0)
+  {
+    return EINVAL;
+  }
+  // The address of the allocated memory is supposed to be aligned with
+  // alignment. As cbmc doesn't model address alignment,
+  // assuming MALLOC_ALIGNMENT = MAX_INT_VALUE seems fair.
+  // As _mid_memalign simplifies for alignment <= MALLOC_ALIGNMENT
+  // to a malloc call, it should be sound, if we do it too.
+
+  // The originial posix_memalign check on the pointer is:
+
+  // void *tmp = malloc(size);
+  // if(tmp != NULL){
+  //   *ptr = tmp;
+  //   return 0;
+  // }
+  // return ENOMEM;
+
+  // As _CPROVER_allocate used in malloc never returns null,
+  // this check is not applicable and can be simplified:
+
+  *ptr = malloc(size);
+  return 0;
+}
+
 /* FUNCTION: random */
 
 long __VERIFIER_nondet_long();
