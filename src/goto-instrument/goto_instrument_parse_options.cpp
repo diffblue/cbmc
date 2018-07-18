@@ -1580,6 +1580,8 @@ void goto_instrument_parse_optionst::help()
     " --undefined-function-is-assume-false\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
+    HELP_APPLY_CODE_CONTRACTS
+    HELP_CHECK_CODE_CONTRACTS
     HELP_REPLACE_FUNCTION_BODY
     "\n"
     "Loop transformations:\n"
