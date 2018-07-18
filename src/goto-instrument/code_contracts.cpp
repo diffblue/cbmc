@@ -56,23 +56,56 @@ protected:
 
   void code_contracts(goto_functionst::goto_functiont &goto_function);
 
+  /// Applies (but does not check) a function contract.
+  /// This will assume that the contract holds, and then use that assumption
+  /// to remove the function call located at target.
+  /// \param goto_program The goto program containing the target callsite.
+  /// \param value_sets A value_setst object containing information about
+  ///   aliasing in the goto program being analyzed
+  /// \param target An iterator pointing to the function call to be removed.
   void apply_contract(
     goto_programt &goto_program,
     value_setst &value_sets,
     goto_programt::targett target);
 
+  /// Applies (but does not check) a loop invariant.
+  /// This will assume that the loop invariant is indeed an invariant, and then
+  /// use that assumption to remove the loop.
+  /// \param goto_function The goto function containing the target loop.
+  /// \param value_sets A value_setst object containing information about
+  ///   aliasing in the goto program being analyzed
+  /// \param loop_head An iterator pointing to the first instruction of the
+  ///   target loop.
+  /// \param loop The loop being removed.
   void apply_invariant(
     goto_functionst::goto_functiont &goto_function,
     value_setst &value_sets,
     const goto_programt::targett loop_head,
     const loopt &loop);
 
+  /// Checks (but does not apply) a function contract.
+  /// This will build a code snippet to be inserted at dest which will check
+  //    that the function contract is satisfied.
+  /// \param function_id The id of the function being checked.
+  /// \param goto_function The goto_function object for the function
+  ///   being checked.
+  /// \param dest An iterator pointing to the place to insert checking code.
   void check_contract(
     const irep_idt &function_id,
     goto_functionst::goto_functiont &goto_function,
     goto_programt &dest);
 
-  void check_apply_invariant(
+  /// Checks and applies a loop invariant
+  /// This will replace the loop with a code snippet (based on the loop) which
+  ///   will check that the loop invariant is indeed ian invariant, and then
+  ///   use that invariant in what follows.
+  /// \param goto_function The goto function containing the target loop.
+  /// \param value_sets A value_setst object containing information about
+  ///   aliasing in the goto program being analyzed
+  /// \param loop_head An iterator pointing to the first instruction of the
+  ///   target loop.
+  /// \param loop The loop being removed.
+ void check_apply_invariant(
     goto_functionst::goto_functiont &goto_function,
     value_setst &value_sets,
     const goto_programt::targett loop_head,
@@ -297,7 +330,7 @@ void code_contractst::apply_invariant(
     inst->make_skip();
   }
 
-  // Now havoc at the loop head. Use insert_swap to
+  // Now havoc at the loop head. Use insert_before_swap to
   // preserve jumps to loop head.
   goto_function.body.insert_before_swap(loop_head, havoc_code);
 
@@ -323,13 +356,15 @@ void code_contractst::check_contract(
     return;
   }
 
-  // build:
-  // if(nondet)
+  // We build the following checking code:
+  // if(nondet) goto end
   //   decl ret
   //   decl parameter1 ...
   //   assume(requires)  [optional]
   //   ret = function(parameter1, ...)
   //   assert(ensures)
+  // end:
+  //   skip
 
   // build skip so that if(nondet) can refer to it
   goto_programt tmp_skip;
@@ -481,7 +516,7 @@ void code_contractst::check_apply_invariant(
     a->source_location.set_comment("Loop invariant violated before entry");
   }
 
-  // havoc variables being written to
+  // havoc variables that can be modified by the loop
   build_havoc_code(loop_head, modifies, havoc_code);
 
   // assume the invariant
@@ -516,7 +551,7 @@ void code_contractst::check_apply_invariant(
     loop_end->guard.make_not();
   }
 
-  // Now havoc at the loop head. Use insert_swap to
+  // Now havoc at the loop head. Use insert_before_swap to
   // preserve jumps to loop head.
   goto_function.body.insert_before_swap(loop_head, havoc_code);
 }
