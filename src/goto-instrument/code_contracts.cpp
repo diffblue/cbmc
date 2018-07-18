@@ -61,22 +61,54 @@ protected:
 
   void code_contracts(goto_functionst::goto_functiont &goto_function);
 
+  /// Applies (but does not check) a function contract.  This will assume that
+  /// the contract holds, and then use that assumption to remove the function
+  /// call located at target.
+  /// \param goto_program The goto program containing the target call site.
+  /// \param value_sets A value_setst object containing information about
+  ///   aliasing in the goto program being analyzed
+  /// \param target An iterator pointing to the function call to be removed.
   void apply_contract(
     goto_programt &goto_program,
     value_setst &value_sets,
     goto_programt::targett target);
 
+  /// Applies (but does not check) a loop invariant. This will assume that the
+  /// loop invariant is indeed an invariant, and then use that assumption to
+  /// remove the loop.
+  /// \param goto_function The goto function containing the target loop.
+  /// \param value_sets A value_setst object containing information about
+  ///   aliasing in the goto program being analyzed
+  /// \param loop_head An iterator pointing to the first instruction of the
+  ///   target loop.
+  /// \param loop The loop being removed.
   void apply_invariant(
     goto_functionst::goto_functiont &goto_function,
     value_setst &value_sets,
     const goto_programt::targett loop_head,
     const loopt &loop);
 
+  /// Checks (but does not apply) a function contract.  This will build a code
+  /// snippet to be inserted at dest which will check that the function contract
+  /// is satisfied.
+  /// \param function_id The id of the function being checked.
+  /// \param goto_function The goto_function object for the function
+  ///   being checked.
+  /// \param dest An iterator pointing to the place to insert checking code.
   void check_contract(
     const irep_idt &function_id,
     goto_functionst::goto_functiont &goto_function,
     goto_programt &dest);
 
+  /// Checks and applies a loop invariant This will replace the loop with a code
+  /// snippet (based on the loop) which will check that the loop invariant is
+  /// indeed an invariant, and then use that invariant in what follows.
+  /// \param goto_function The goto function containing the target loop.
+  /// \param value_sets A value_setst object containing information about
+  ///   aliasing in the goto program being analyzed
+  /// \param loop_head An iterator pointing to the first instruction of the
+  ///   target loop.
+  /// \param loop The loop being removed.
   void check_apply_invariant(
     goto_functionst::goto_functiont &goto_function,
     value_setst &value_sets,
