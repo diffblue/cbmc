@@ -57,15 +57,15 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
 
     WHEN("One is entirely negative [-2,-5]*[7,11]")
     {
-      constant_interval_exprt a(values[-2], values[-5]);
+      constant_interval_exprt a(values[-5], values[-2]);
       constant_interval_exprt b(values[7], values[11]);
 
       constant_interval_exprt result = a.multiply(b);
 
       THEN("Domain is consistent")
       {
-        CHECK(V(a.get_lower()) == -2);
-        CHECK(V(a.get_upper()) == -5);
+        CHECK(V(a.get_lower()) == -5);
+        CHECK(V(a.get_upper()) == -2);
         CHECK(V(b.get_lower()) == 7);
         CHECK(V(b.get_upper()) == 11);
       }
