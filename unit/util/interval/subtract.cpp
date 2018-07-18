@@ -107,9 +107,13 @@ SCENARIO("subtract interval domain",
 
 SCENARIO("Subtracting unsigned integers")
 {
+  auto get_value = [](int x) {
+    return from_integer(x, signedbv_typet(32));
+  };
+
   WHEN("Subtracting two constant intervals") {
-    auto lhs = constant_interval_exprt(constant_exprt("1010", unsignedbv_typet(32)));
-    auto rhs = constant_interval_exprt(constant_exprt("0011", unsignedbv_typet(32)));
+    auto lhs = constant_interval_exprt(get_value(10));
+    auto rhs = constant_interval_exprt(get_value(3));
     THEN("it should work") {
       auto result = lhs.minus(rhs);
       REQUIRE(result.is_single_value_interval());
@@ -121,8 +125,8 @@ SCENARIO("Subtracting unsigned integers")
 
   WHEN("Subtracting zero from something")
   {
-    auto lhs = constant_interval_exprt(constant_exprt("1010", unsignedbv_typet(32)));
-    auto rhs = constant_interval_exprt(constant_exprt("0", unsignedbv_typet(32)));
+    auto lhs = constant_interval_exprt(get_value(10));
+    auto rhs = constant_interval_exprt(get_value(0));
 
     THEN("it should not give a completely crazy result")
     {
@@ -136,9 +140,8 @@ SCENARIO("Subtracting unsigned integers")
 
   WHEN("Subtracting an non-constant interval containing zero")
   {
-    auto lhs = constant_interval_exprt(constant_exprt("1010", unsignedbv_typet(32)));
-    auto rhs = constant_interval_exprt(constant_exprt("0", unsignedbv_typet(32)),
-      constant_exprt("1", unsignedbv_typet(32)));
+    auto lhs = constant_interval_exprt(get_value(10));
+    auto rhs = constant_interval_exprt(get_value(0), get_value(1));
     THEN("it should not give a completely crazy result")
     {
       auto result = lhs.minus(rhs);
