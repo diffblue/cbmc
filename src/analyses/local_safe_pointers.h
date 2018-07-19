@@ -23,9 +23,45 @@ Author: Diffblue Ltd
 /// possibly-aliasing operations are handled pessimistically.
 class local_safe_pointerst
 {
-  std::map<unsigned, std::set<exprt>> non_null_expressions;
+  /// Comparator that regards base_type_eq expressions as equal, and otherwise
+  /// uses the natural (operator<) ordering on irept.
+  /// An expression is base_type_eq another one if their types, and types of
+  /// their subexpressions, are identical except that one may use a symbol_typet
+  /// while the other uses that type's expanded (namespacet::follow'd) form.
+  class base_type_comparet
+  {
+    const namespacet &ns;
 
- public:
+  public:
+    explicit base_type_comparet(const namespacet &ns)
+      : ns(ns)
+    {
+    }
+
+    base_type_comparet(const base_type_comparet &other)
+      : ns(other.ns)
+    {
+    }
+
+    base_type_comparet &operator=(const base_type_comparet &other)
+    {
+      INVARIANT(&ns == &other.ns, "base_type_comparet: clashing namespaces");
+      return *this;
+    }
+
+    bool operator()(const exprt &e1, const exprt &e2) const;
+  };
+
+  std::map<unsigned, std::set<exprt, base_type_comparet>> non_null_expressions;
+
+  const namespacet &ns;
+
+public:
+  local_safe_pointerst(const namespacet &ns)
+    : ns(ns)
+  {
+  }
+
   void operator()(const goto_programt &goto_program);
 
   bool is_non_null_at_program_point(
@@ -38,11 +74,10 @@ class local_safe_pointerst
     return is_non_null_at_program_point(deref.op0(), program_point);
   }
 
-  void output(
-    std::ostream &stream, const goto_programt &program, const namespacet &ns);
+  void output(std::ostream &stream, const goto_programt &program);
 
   void output_safe_dereferences(
-    std::ostream &stream, const goto_programt &program, const namespacet &ns);
+    std::ostream &stream, const goto_programt &program);
 };
 
 #endif // CPROVER_ANALYSES_LOCAL_SAFE_POINTERS_H
