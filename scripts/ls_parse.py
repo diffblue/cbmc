@@ -15,6 +15,7 @@ import re
 import subprocess
 import sys
 import textwrap
+import traceback
 
 
 def epilog():
@@ -81,6 +82,7 @@ def get_linker_script_data(script):
     text = re.sub(r"/\*.*?\*/", " ", text)
 
     close_brace     = re.compile(r"\s}(\s*>\s*\w+)?")
+    uwnknown_cmd    = re.compile(r"\sPHDRS\s*{")  # only this pattern for now, more might follow!
     memory_cmd      = re.compile(r"\sMEMORY\s*{")
     sections_cmd    = re.compile(r"\sSECTIONS\s*{")
     assign_current  = re.compile(r"\s(?P<sym>\w+)\s*=\s*\.\s*;")
@@ -102,6 +104,7 @@ def get_linker_script_data(script):
     # with the info gleaned from the matched string.
     jump_table = {
         close_brace     : close_brace_fun,
+        uwnknown_cmd    : unknown_cmd_fun,
         memory_cmd      : memory_cmd_fun,
         sections_cmd    : sections_cmd_fun,
         assign_current  : assign_current_fun,
@@ -146,6 +149,7 @@ def get_linker_script_data(script):
     state["MEM"] = False
     state["SEC"] = False
     state["DEF"] = False
+    state["UNKNOWN"] = False
 
     i = 0
     while i < len(text):
@@ -274,8 +278,12 @@ def close_brace_fun(state, _, buf):
     elif state["MEM"]:
         info("Closing memory command")
         state["MEM"] = False
+    elif state["UNKNOWN"]:
+        info("Closing unknown command")
+        state["UNKNOWN"] = False
     else:
         error("Not in block\n%s", buf)
+        traceback.print_stack()
         exit(1)
 
 
@@ -306,6 +314,9 @@ def memory_cmd_fun(state, _, buf):
     asrt(not state["MEM"], "encountered MEMORY twice", buf)
     state["MEM"] = True
 
+def unknown_cmd_fun(state, _, buf):
+    asrt(not state["MEM"], "encountered UNKNOWN twice", buf)
+    state["UNKNOWN"] = True
 
 def match_up_expr_assigns(state):
     blocks = set([data["origin"] for data in state["expr-assigns"]])
