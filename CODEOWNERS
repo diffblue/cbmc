@@ -43,6 +43,5 @@
 /src/cpp/ @kroening @tautschnig @peterschrammel
 
 
-/scripts/ @diffblue/devops @thk123 @forejtv @peterschrammel
-/.travis.yml @diffblue/devops @thk123 @forejtv @peterschrammel
-/appveyor.yml @diffblue/devops @thk123 @forejtv @peterschrammel
+# All remaining files are assumed to be low-risk
+# Any two reviewers can be assigned
