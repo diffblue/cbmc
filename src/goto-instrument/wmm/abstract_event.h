@@ -183,9 +183,15 @@ public:
 
   unsigned char fence_value() const
   {
-    unsigned char value = WRfence + 2*WWfence + 4*RRfence + 8*RWfence
-      + 16*WWcumul + 32*RWcumul + 64*RRcumul;
-    return value;
+    return uc(WRfence) + 2u * uc(WWfence) + 4u * uc(RRfence) +
+           8u * uc(RWfence) + 16u * uc(WWcumul) + 32u * uc(RWcumul) +
+           64u * uc(RRcumul);
+  }
+
+private:
+  static unsigned char uc(bool truth_value)
+  {
+    return truth_value ? 1u : 0u;
   }
 };
 
