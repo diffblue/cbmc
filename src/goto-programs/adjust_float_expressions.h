@@ -22,6 +22,8 @@ void adjust_float_expressions(
   exprt &expr,
   const namespacet &ns);
 
+void adjust_float_expressions(exprt &expr, const exprt &rounding_mode);
+
 void adjust_float_expressions(
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns);
