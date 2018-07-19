@@ -43,15 +43,6 @@ jbmc/src/jdiff/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschr
 src/cpp/ @kroening @tautschnig @peterschrammel
 
 
-# These files change frequently and changes are low-risk
-
-src/util/irep_ids.def @diffblue/cbmc-developers
-
-unit/ @diffblue/cbmc-developers
-regression/ @diffblue/cbmc-developers
-jbmc/unit/ @diffblue/cbmc-developers
-jbmc/regression/ @diffblue/cbmc-developers
-
 scripts/ @diffblue/devops @thk123 @forejtv @peterschrammel
 .travis.yml @diffblue/devops @thk123 @forejtv @peterschrammel
 appveyor.yml @diffblue/devops @thk123 @forejtv @peterschrammel
