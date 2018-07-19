@@ -1,6 +1,6 @@
 FUTURE
 test_append_int.class
---refine-strings --verbosity 10 --string-max-length 1000
+--verbosity 10 --max-nondet-string-length 1000
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

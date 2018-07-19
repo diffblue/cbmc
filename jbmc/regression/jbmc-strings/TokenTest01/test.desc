@@ -1,6 +1,6 @@
 FUTURE
 TokenTest01.class
---refine-strings --string-max-length 1000 --unwind 30
+--max-nondet-string-length 1000 --unwind 30
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 KNOWNBUG
 StringBuilderConstructors01.class
---refine-strings --string-max-length 1000
+--max-nondet-string-length 1000
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE
 Test.class
---refine-strings  --function Test.check
+ --function Test.check
 assertion at file Test.java line 6 .* SUCCESS
 assertion at file Test.java line 8 .* FAILURE
 ^EXIT=10$

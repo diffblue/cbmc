@@ -80,6 +80,23 @@ jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv):
 {
 }
 
+void jbmc_parse_optionst::set_default_options(optionst &options)
+{
+  // Default true
+  options.set_option("assertions", true);
+  options.set_option("assumptions", true);
+  options.set_option("built-in-assertions", true);
+  options.set_option("pretty-names", true);
+  options.set_option("propagation", true);
+  options.set_option("refine-strings", true);
+  options.set_option("sat-preprocessor", true);
+  options.set_option("simplify", true);
+  options.set_option("simplify-if", true);
+
+  // Other default
+  options.set_option("arrays-uf", "auto");
+}
+
 void jbmc_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
@@ -87,6 +104,8 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     usage_error();
     exit(1); // should contemplate EX_USAGE from sysexits.h
   }
+
+  jbmc_parse_optionst::set_default_options(options);
 
   if(cmdline.isset("show-symex-strategies"))
   {
@@ -107,15 +126,11 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
-  else
-    options.set_option("simplify", true);
 
   if(cmdline.isset("stop-on-fail") ||
      cmdline.isset("dimacs") ||
      cmdline.isset("outfile"))
     options.set_option("stop-on-fail", true);
-  else
-    options.set_option("stop-on-fail", false);
 
   if(cmdline.isset("trace") ||
      cmdline.isset("stop-on-fail"))
@@ -148,8 +163,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   // constant propagation
   if(cmdline.isset("no-propagation"))
     options.set_option("propagation", false);
-  else
-    options.set_option("propagation", true);
 
   // transform self loops to assumptions
   options.set_option(
@@ -166,18 +179,10 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   // check assertions
   if(cmdline.isset("no-assertions"))
     options.set_option("assertions", false);
-  else
-    options.set_option("assertions", true);
 
   // use assumptions
   if(cmdline.isset("no-assumptions"))
     options.set_option("assumptions", false);
-  else
-    options.set_option("assumptions", true);
-
-  // magic error label
-  if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.get_values("error-label"));
 
   // generate unwinding assertions
   if(cmdline.isset("cover"))
@@ -210,15 +215,11 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   // simplify if conditions and branches
   if(cmdline.isset("no-simplify-if"))
     options.set_option("simplify-if", false);
-  else
-    options.set_option("simplify-if", true);
 
   if(cmdline.isset("arrays-uf-always"))
     options.set_option("arrays-uf", "always");
   else if(cmdline.isset("arrays-uf-never"))
     options.set_option("arrays-uf", "never");
-  else
-    options.set_option("arrays-uf", "auto");
 
   if(cmdline.isset("dimacs"))
     options.set_option("dimacs", true);
@@ -242,13 +243,23 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
-  if(!cmdline.isset("no-refine-strings"))
+  if(cmdline.isset("no-refine-strings"))
+    options.set_option("refine-strings", false);
+
+  if(cmdline.isset("string-printable"))
+    options.set_option("string-printable", true);
+
+  if(cmdline.isset("no-refine-strings") && cmdline.isset("string-printable"))
   {
-    options.set_option("refine-strings", true);
-    options.set_option("string-printable", cmdline.isset("string-printable"));
-    if(cmdline.isset("string-max-length"))
-      options.set_option(
-        "string-max-length", cmdline.get_value("string-max-length"));
+    warning() << "--string-printable ignored due to --no-refine-strings" << eom;
+  }
+
+  if(
+    cmdline.isset("no-refine-strings") &&
+    cmdline.isset("max-nondet-string-length"))
+  {
+    warning() << "--max-nondet-string-length ignored due to "
+              << "--no-refine-strings" << eom;
   }
 
   if(cmdline.isset("max-node-refinement"))
@@ -257,22 +268,15 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
       cmdline.get_value("max-node-refinement"));
 
   // SMT Options
-  bool version_set=false;
 
   if(cmdline.isset("smt1"))
   {
-    options.set_option("smt1", true);
-    options.set_option("smt2", false);
-    version_set=true;
+    error() << "--smt1 is no longer supported" << eom;
+    exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
   if(cmdline.isset("smt2"))
-  {
-    // If both are given, smt2 takes precedence
-    options.set_option("smt1", false);
     options.set_option("smt2", true);
-    version_set=true;
-  }
 
   if(cmdline.isset("fpa"))
     options.set_option("fpa", true);
@@ -282,83 +286,52 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("boolector"))
   {
     options.set_option("boolector", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set=true;
+    options.set_option("smt2", true);
   }
 
   if(cmdline.isset("mathsat"))
   {
     options.set_option("mathsat", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set=true;
-  }
-
-  if(cmdline.isset("cvc3"))
-  {
-    options.set_option("cvc3", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt1", true), version_set=true;
+    options.set_option("smt2", true);
   }
 
   if(cmdline.isset("cvc4"))
   {
     options.set_option("cvc4", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set=true;
+    options.set_option("smt2", true);
   }
 
   if(cmdline.isset("yices"))
   {
     options.set_option("yices", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set=true;
+    options.set_option("smt2", true);
   }
 
   if(cmdline.isset("z3"))
   {
     options.set_option("z3", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt2", true), version_set=true;
+    options.set_option("smt2", true);
   }
 
-  if(cmdline.isset("opensmt"))
-  {
-    options.set_option("opensmt", true), solver_set=true;
-    if(!version_set)
-      options.set_option("smt1", true), version_set=true;
-  }
-
-  if(version_set && !solver_set)
+  if(cmdline.isset("smt2") && !solver_set)
   {
     if(cmdline.isset("outfile"))
     {
       // outfile and no solver should give standard compliant SMT-LIB
-      options.set_option("generic", true), solver_set=true;
+      options.set_option("generic", true);
     }
     else
     {
-      if(options.get_bool_option("smt1"))
-      {
-        options.set_option("boolector", true), solver_set=true;
-      }
-      else
-      {
-        INVARIANT(options.get_bool_option("smt2"), "smt2 set");
-        options.set_option("z3", true), solver_set=true;
-      }
+      // the default smt2 solver
+      options.set_option("z3", true);
     }
   }
-
-  // Either have solver and standard version set, or neither.
-  INVARIANT(version_set==solver_set, "solver and version set");
 
   if(cmdline.isset("beautify"))
     options.set_option("beautify", true);
 
   if(cmdline.isset("no-sat-preprocessor"))
     options.set_option("sat-preprocessor", false);
-  else
-    options.set_option("sat-preprocessor", true);
 
   options.set_option(
     "pretty-names",
@@ -1097,11 +1070,11 @@ void jbmc_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show loaded symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
-    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
+    " --drop-unused-functions      drop functions trivially unreachable\n"
+    "                              from main function\n"
     HELP_SHOW_CLASS_HIERARCHY
     "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
@@ -1116,13 +1089,14 @@ void jbmc_parse_optionst::help()
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     // This one is handled by jbmc_parse_options not by the Java frontend,
     // hence its presence here:
-    " --java-threading             enable experimental support for java multi-threading\n"// NOLINT(*)
-    " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n" // NOLINT(*)
+    " --java-threading             enable java multi-threading support (experimental)\n" // NOLINT(*)
+    " --java-unwind-enum-static    unwind loops in static initialization of enums\n" // NOLINT(*)
     // Currently only supported in the JBMC frontend:
-    " --symex-driven-lazy-loading  only load functions when first entered by symbolic execution\n" // NOLINT(*)
-    "                              Note --show-symbol-table/goto-functions/properties output\n" // NOLINT(*)
-    "                              will be restricted to loaded methods in this case, and only\n" // NOLINT(*)
-    "                              output after the symex phase\n"
+    " --symex-driven-lazy-loading  only load functions when first entered by symbolic\n" // NOLINT(*)
+    "                              execution. Note that --show-symbol-table,\n"
+    "                              --show-goto-functions/properties output\n"
+    "                              will be restricted to loaded methods in this case,\n" // NOLINT(*)
+    "                              and only output after the symex phase.\n"
     "\n"
     "BMC options:\n"
     HELP_BMC
@@ -1141,8 +1115,7 @@ void jbmc_parse_optionst::help()
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
     " --no-refine-strings          turn off string refinement\n"
-    " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
-    " --string-max-length          add constraint on the length of strings\n" // NOLINT(*)
+    " --string-printable           restrict to printable strings (experimental)\n" // NOLINT(*)
     " --max-nondet-string-length   bound the length of nondet (e.g. input) strings\n" // NOLINT(*)
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)

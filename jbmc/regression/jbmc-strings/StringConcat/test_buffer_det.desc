@@ -1,6 +1,6 @@
 CORE
 Test.class
---refine-strings --string-max-length 1000 --string-max-input-length 100 --function Test.bufferDet --depth 10000  --verbosity 10
+--max-nondet-string-length 100 --function Test.bufferDet --depth 10000  --verbosity 10
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
