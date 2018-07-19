@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
 
+#include <util/exception_utils.h>
 #include <util/json.h>
 #include <util/json_expr.h>
 #include <util/ui_message.h>
@@ -165,7 +166,8 @@ void show_vcc(
   {
     of.open(filename);
     if(!of)
-      throw "failed to open file " + filename;
+      throw invalid_user_input_exceptiont(
+        "invalid file to read trace from: " + filename, "--outfile");
   }
 
   std::ostream &out = have_file ? of : std::cout;

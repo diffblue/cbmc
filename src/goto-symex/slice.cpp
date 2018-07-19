@@ -127,8 +127,7 @@ void symex_slicet::slice_assignment(
 void symex_slicet::slice_decl(
   symex_target_equationt::SSA_stept &SSA_step)
 {
-  PRECONDITION(SSA_step.ssa_lhs.id() == ID_symbol);
-  const irep_idt &id=SSA_step.ssa_lhs.get_identifier();
+  const irep_idt &id = to_symbol_expr(SSA_step.ssa_lhs).get_identifier();
 
   if(depends.find(id)==depends.end())
   {

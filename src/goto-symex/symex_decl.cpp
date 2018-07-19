@@ -25,14 +25,10 @@ void goto_symext::symex_decl(statet &state)
 
   const codet &code = instruction.code;
 
-  if(code.operands().size()==2)
-    throw "two-operand decl not supported here";
-
-  if(code.operands().size()!=1)
-    throw "decl expects one operand";
-
-  if(code.op0().id()!=ID_symbol)
-    throw "decl expects symbol as first operand";
+  // two-operand decl not supported here
+  // we handle the decl with only one operand
+  PRECONDITION(code.operands().size() == 1);
+  PRECONDITION(code.op0().id() == ID_symbol);
 
   symex_decl(state, to_symbol_expr(code.op0()));
 }

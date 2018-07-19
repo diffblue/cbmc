@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
+#include <util/exception_utils.h>
 #include <util/expr_initializer.h>
 
 void goto_symext::symex_start_thread(statet &state)
@@ -18,18 +19,18 @@ void goto_symext::symex_start_thread(statet &state)
   if(state.guard.is_false())
     return;
 
-  // we don't allow spawning threads out of atomic sections
-  // this would require amendments to ordering constraints
-  if(state.atomic_section_id!=0)
-    throw "start_thread in atomic section detected";
+  if(state.atomic_section_id != 0)
+    throw incorrect_goto_program_exceptiont(
+      "spawning threads out of atomic sections is not allowed; "
+      "this would require amendments to ordering constraints",
+      state.source.pc->source_location);
 
   // record this
   target.spawn(state.guard.as_expr(), state.source);
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  if(instruction.targets.size()!=1)
-    throw "start_thread expects one target";
+  INVARIANT(instruction.targets.size() == 1, "start_thread expects one target");
 
   goto_programt::const_targett thread_target=
     instruction.get_target();

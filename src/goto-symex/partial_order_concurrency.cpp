@@ -142,8 +142,8 @@ symbol_exprt partial_order_concurrencyt::clock(
   event_it event,
   axiomt axiom)
 {
-  irep_idt identifier;
   PRECONDITION(!numbering.empty());
+  irep_idt identifier;
 
   if(event->is_shared_write())
     identifier=rw_clock_id(event, axiom);
@@ -198,7 +198,7 @@ exprt partial_order_concurrencyt::before(
         binary_relation_exprt(clock(e1, ax), ID_lt, clock(e2, ax)));
   }
 
-  assert(!ops.empty());
+  POSTCONDITION(!ops.empty());
 
   return conjunction(ops);
 }

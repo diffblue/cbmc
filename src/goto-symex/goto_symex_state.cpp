@@ -14,10 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 #include <iostream>
 
-#include <util/invariant.h>
 #include <util/base_exceptions.h>
-#include <util/std_expr.h>
+#include <util/exception_utils.h>
+#include <util/invariant.h>
 #include <util/prefix.h>
+#include <util/std_expr.h>
 
 #include <analyses/dirty.h>
 
@@ -51,8 +52,7 @@ void goto_symex_statet::level0t::operator()(
 
   const symbolt *s;
   const bool found_l0 = !ns.lookup(obj_identifier, s);
-  DATA_INVARIANT(
-    found_l0, "level0: failed to find " + id2string(obj_identifier));
+  INVARIANT(found_l0, "level0: failed to find " + id2string(obj_identifier));
 
   // don't rename shared variables or functions
   if(s->type.id()==ID_code ||
@@ -187,10 +187,7 @@ bool goto_symex_statet::constant_propagation_reference(const exprt &expr) const
   }
   else if(expr.id()==ID_member)
   {
-    DATA_INVARIANT(
-      expr.operands().size() == 1, "member_exprt takes one operand.");
-
-    return constant_propagation_reference(expr.op0());
+    return constant_propagation_reference(to_member_expr(expr).compound());
   }
   else if(expr.id()==ID_string_constant)
     return true;
@@ -345,7 +342,8 @@ void goto_symex_statet::assignment(
 
   // see #305 on GitHub for a simple example and possible discussion
   if(is_shared && lhs.type().id() == ID_pointer && !allow_pointer_unsoundness)
-    throw "pointer handling for concurrency is unsound";
+    throw unsupported_operation_exceptiont(
+      "pointer handling for concurrency is unsound");
 
   // for value propagation -- the RHS is L2
 
@@ -495,13 +493,9 @@ void goto_symex_statet::rename(
   }
   else if(expr.id()==ID_address_of)
   {
-    DATA_INVARIANT(
-      expr.operands().size() == 1, "address_of should have a single operand");
-    rename_address(expr.op0(), ns, level);
-    DATA_INVARIANT(
-      expr.type().id() == ID_pointer,
-      "type of address_of should be ID_pointer");
-    expr.type().subtype()=expr.op0().type();
+    auto &address_of_expr = to_address_of_expr(expr);
+    rename_address(address_of_expr.object(), ns, level);
+    expr.type().subtype() = address_of_expr.object().type();
   }
   else
   {

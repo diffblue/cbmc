@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
 
@@ -215,7 +216,8 @@ exprt goto_symext::address_arithmetic(
       result=address_of_exprt(result);
   }
   else
-    throw "goto_symext::address_arithmetic does not handle "+expr.id_string();
+    throw unsupported_operation_exceptiont(
+      "goto_symext::address_arithmetic does not handle " + expr.id_string());
 
   const typet &expr_type=ns.follow(expr.type());
   INVARIANT((expr_type.id()==ID_array && !keep_array) ||
@@ -233,9 +235,7 @@ void goto_symext::dereference_rec(
 {
   if(expr.id()==ID_dereference)
   {
-    if(expr.operands().size()!=1)
-      throw "dereference takes one operand";
-
+    dereference_exprt to_check = to_dereference_expr(expr);
     bool expr_is_not_null = false;
 
     if(state.threads.size() == 1)
@@ -243,7 +243,6 @@ void goto_symext::dereference_rec(
       const irep_idt &expr_function = state.source.pc->function;
       if(!expr_function.empty())
       {
-        dereference_exprt to_check = to_dereference_expr(expr);
         state.get_original_name(to_check);
 
         expr_is_not_null =
