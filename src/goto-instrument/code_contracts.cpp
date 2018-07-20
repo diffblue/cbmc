@@ -20,6 +20,7 @@ Date: February 2016
 #include <util/make_unique.h>
 #include <util/replace_symbol.h>
 
+#include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
 
 #include <analyses/goto_rw.h>
@@ -122,9 +123,9 @@ void code_contractst::apply_contract(
   goto_programt::targett target)
 {
   const code_function_callt &call=to_code_function_call(target->code);
-  // we don't handle function pointers
-  if(call.function().id()!=ID_symbol)
-    return;
+  // we don't handle function pointers. remove_function_pointers should have
+  // been invoked by this point.
+  PRECONDITION(call.function().id() == ID_symbol);
 
   const irep_idt &function=
     to_symbol_expr(call.function()).get_identifier();
@@ -180,10 +181,12 @@ void code_contractst::apply_contract(
   // replace formal parameters by arguments, replace return
   replace_symbolt replace;
 
+  const irep_idt symbol_name = id2string(function) + RETURN_VALUE_SUFFIX;
+  const symbolt *existing_symbol = symbol_table.lookup(symbol_name);
   // TODO: return value could be nil
-  if(type.return_type()!=empty_typet())
+  if(existing_symbol != nullptr)
   {
-    replace.insert("__CPROVER_return_value", call.lhs());
+    replace.insert("__CPROVER_return_value", existing_symbol->symbol_expr());
   }
 
   // formal parameters
@@ -358,10 +361,9 @@ void code_contractst::check_contract(
 
   // We build the following checking code:
   // if(nondet) goto end
-  //   decl ret
   //   decl parameter1 ...
   //   assume(requires)  [optional]
-  //   ret = function(parameter1, ...)
+  //   function(parameter1, ...)
   //   assert(ensures)
   // end:
   //   skip
@@ -385,23 +387,12 @@ void code_contractst::check_contract(
   call.function()=ns.lookup(function_id).symbol_expr();
   replace_symbolt replace;
 
-  // decl ret
+  const irep_idt symbol_name = id2string(function_id) + RETURN_VALUE_SUFFIX;
+  const symbolt *existing_symbol = symbol_table.lookup(symbol_name);
   // TODO: Handle void functions
-  // void functions seem to be handled by goto-cc
-  if(goto_function.type.return_type()!=empty_typet())
+  if(existing_symbol != nullptr)
   {
-    goto_programt::targett d=check.add_instruction(DECL);
-    d->function=skip->function;
-    d->source_location=skip->source_location;
-
-    symbol_exprt r=
-      new_tmp_symbol(goto_function.type.return_type(),
-                     d->source_location).symbol_expr();
-    d->code=code_declt(r);
-
-    call.lhs()=r;
-
-    replace.insert("__CPROVER_return_value", r);
+    replace.insert("__CPROVER_return_value", existing_symbol->symbol_expr());
   }
 
   // decl parameter1 ...
