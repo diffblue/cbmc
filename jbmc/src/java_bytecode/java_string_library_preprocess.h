@@ -145,12 +145,6 @@ private:
   // A set tells us what java types should be considered as string objects
   std::unordered_set<irep_idt> string_types;
 
-  codet make_equals_function_code(
-    const java_method_typet &type,
-    const source_locationt &loc,
-    const irep_idt &function_id,
-    symbol_table_baset &symbol_table);
-
   codet make_float_to_string_code(
     const java_method_typet &type,
     const source_locationt &loc,
