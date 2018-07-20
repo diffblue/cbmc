@@ -1,5 +1,18 @@
-# These owners will be the default owners for everything in the repo.
-*       @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+# These folders were previously covered by the default owners
+
+/* @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/jbmc/* @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/jbmc/src/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/jbmc/lib/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/src/* @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/src/clobber/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/src/jsil/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/src/solvers/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/.githooks/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/cmake/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/doc/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/pkg/arch/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+
 
 # These files should rarely change
 
