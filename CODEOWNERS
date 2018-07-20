@@ -41,7 +41,7 @@
 
 /src/cbmc/ @smowton @kroening @tautschnig @peterschrammel
 /src/goto-programs/ @smowton @kroening @tautschnig @peterschrammel @pkesseli
-/src/util/ @smowton @kroening @tautschnig @peterschrammel @pkesseli
+/src/util/* @smowton @kroening @tautschnig @peterschrammel @pkesseli
 /src/solvers/refinement @martin-cs @romainbrenguier @peterschrammel
 /jbmc/src/java_bytecode/ @smowton @mgudemann @thk123 @cristina-david @cesaro @pkesseli @NathanJPhillips @peterschrammel
 /src/analyses/ @martin-cs @peterschrammel @chrisr-diffblue @thk123 @smowton
@@ -59,15 +59,15 @@
 /src/cpp/ @kroening @tautschnig @peterschrammel
 
 
-# These files change frequently and changes are low-risk
-
-/src/util/ids/irep_ids.def @diffblue/cbmc-developers
-
-/unit/ @diffblue/cbmc-developers
-/regression/ @diffblue/cbmc-developers
-/jbmc/unit/ @diffblue/cbmc-developers
-/jbmc/regression/ @diffblue/cbmc-developers
-
 /scripts/ @diffblue/devops @thk123 @forejtv @peterschrammel
 /.travis.yml @diffblue/devops @thk123 @forejtv @peterschrammel
 /appveyor.yml @diffblue/devops @thk123 @forejtv @peterschrammel
+
+
+# The files change frequently, are low-risk and have no owners
+#
+# /src/util/ids/
+# /unit/
+# /regression/
+# /jbmc/unit/
+# /jbmc/regression/
