@@ -45,6 +45,6 @@ Author: Reuben Thomas, reuben.thomas@me.com
 
 #endif
 
-#include "irep_ids.def"
+#include "ids/irep_ids.def"
 
 #endif
