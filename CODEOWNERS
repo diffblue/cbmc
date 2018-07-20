@@ -61,7 +61,7 @@
 
 # These files change frequently and changes are low-risk
 
-/src/util/irep_ids.def @diffblue/cbmc-developers
+/src/util/ids/irep_ids.def @diffblue/cbmc-developers
 
 /unit/ @diffblue/cbmc-developers
 /regression/ @diffblue/cbmc-developers

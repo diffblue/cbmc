@@ -20,7 +20,7 @@ const char *irep_ids_table[]=
 #define IREP_ID_ONE(id) #id,
 #define IREP_ID_TWO(id, str) #str,
 
-#include "irep_ids.def"
+#include "ids/irep_ids.def"
 
   nullptr,
 };
@@ -32,7 +32,7 @@ enum class idt:unsigned
 #define IREP_ID_ONE(the_id) id_##the_id,
 #define IREP_ID_TWO(the_id, str) id_##the_id,
 
-#include "irep_ids.def" // NOLINT(build/include)
+#include "ids/irep_ids.def" // NOLINT(build/include)
 };
 
 #define IREP_ID_ONE(the_id)                                                    \
@@ -49,7 +49,7 @@ enum class idt:unsigned
 
 #endif
 
-#include "irep_ids.def" // NOLINT(build/include)
+#include "ids/irep_ids.def" // NOLINT(build/include)
 
 string_containert::string_containert()
 {

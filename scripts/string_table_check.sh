@@ -12,7 +12,7 @@ ids_file=$(mktemp)
 
 trap cleanup EXIT
 
-gcc -E -P -x c src/util/irep_ids.def \
+gcc -E -P -x c src/util/ids/irep_ids.def \
   -D'IREP_ID_ONE(x)=ID_ ## x' -D'IREP_ID_TWO(x,y)=ID_ ## x' > $ids_file
 
 for w in $whitelist

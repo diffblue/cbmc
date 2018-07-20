@@ -224,7 +224,7 @@ numbered, starting from 0.  They can be accessed through the `op0()`,
 `op1()` and `op2()` methods in the `exprt` class.
 
 Every node in the pretty representation has an identifier, accessed
-through the `id()` function.  The file `util/irep_ids.def` lists the
+through the `id()` function.  The file `util/ids/irep_ids.def` lists the
 possible values of these identifiers; have a quick scan through that
 file.  In the pretty representation above, the following facts are true
 of that particular node:
