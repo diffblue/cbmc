@@ -458,4 +458,5 @@ exprt length_constraint_for_insert(
   const array_string_exprt &s1,
   const array_string_exprt &s2);
 
+exprt zero_if_negative(const exprt &expr);
 #endif

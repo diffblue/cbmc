@@ -39,26 +39,33 @@ exprt string_constraint_generatort::add_axioms_for_equals(
 
   typet index_type=s1.length().type();
 
+  // Axiom 1.
+  lemmas.push_back(implies_exprt(eq, equal_exprt(s1.length(), s2.length())));
 
-  implies_exprt a1(eq, equal_exprt(s1.length(), s2.length()));
-  lemmas.push_back(a1);
+  // Axiom 2.
+  constraints.push_back([&] {
+    const symbol_exprt qvar = fresh_univ_index("QA_equal", index_type);
+    return string_constraintt(
+      qvar,
+      zero_if_negative(s1.length()),
+      implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])));
+  }());
 
-  symbol_exprt qvar=fresh_univ_index("QA_equal", index_type);
-  string_constraintt a2(
-    qvar, s1.length(), implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])));
-  constraints.push_back(a2);
-
-  symbol_exprt witness=fresh_exist_index("witness_unequal", index_type);
-  exprt zero=from_integer(0, index_type);
-  and_exprt bound_witness(
-    binary_relation_exprt(witness, ID_lt, s1.length()),
-    binary_relation_exprt(witness, ID_ge, zero));
-  and_exprt witnessing(bound_witness, notequal_exprt(s1[witness], s2[witness]));
-  and_exprt diff_length(
-    notequal_exprt(s1.length(), s2.length()),
-    equal_exprt(witness, from_integer(-1, index_type)));
-  implies_exprt a3(not_exprt(eq), or_exprt(diff_length, witnessing));
-  lemmas.push_back(a3);
+  // Axiom 3.
+  lemmas.push_back([&] {
+    const symbol_exprt witness =
+      fresh_exist_index("witness_unequal", index_type);
+    const exprt zero = from_integer(0, index_type);
+    const and_exprt bound_witness(
+      binary_relation_exprt(witness, ID_lt, s1.length()),
+      binary_relation_exprt(witness, ID_ge, zero));
+    const and_exprt witnessing(
+      bound_witness, notequal_exprt(s1[witness], s2[witness]));
+    const and_exprt diff_length(
+      notequal_exprt(s1.length(), s2.length()),
+      equal_exprt(witness, from_integer(-1, index_type)));
+    return implies_exprt(not_exprt(eq), or_exprt(diff_length, witnessing));
+  }());
 
   return tc_eq;
 }
@@ -132,7 +139,8 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
     fresh_univ_index("QA_equal_ignore_case", index_type);
   const exprt constr2 =
     character_equals_ignore_case(s1[qvar], s2[qvar], char_a, char_A, char_Z);
-  const string_constraintt a2(qvar, s1.length(), implies_exprt(eq, constr2));
+  const string_constraintt a2(
+    qvar, zero_if_negative(s1.length()), implies_exprt(eq, constr2));
   constraints.push_back(a2);
 
   const symbol_exprt witness =
@@ -226,7 +234,9 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
 
   const symbol_exprt i = fresh_univ_index("QA_compare_to", index_type);
   const string_constraintt a2(
-    i, s1.length(), implies_exprt(res_null, equal_exprt(s1[i], s2[i])));
+    i,
+    zero_if_negative(s1.length()),
+    implies_exprt(res_null, equal_exprt(s1[i], s2[i])));
   constraints.push_back(a2);
 
   const symbol_exprt x = fresh_exist_index("index_compare_to", index_type);
@@ -257,7 +267,9 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
 
   const symbol_exprt i2 = fresh_univ_index("QA_compare_to", index_type);
   const string_constraintt a4(
-    i2, x, implies_exprt(not_exprt(res_null), equal_exprt(s1[i2], s2[i2])));
+    i2,
+    zero_if_negative(x),
+    implies_exprt(not_exprt(res_null), equal_exprt(s1[i2], s2[i2])));
   constraints.push_back(a4);
 
   return res;
