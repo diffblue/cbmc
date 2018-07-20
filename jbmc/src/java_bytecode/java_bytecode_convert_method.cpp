@@ -3187,10 +3187,6 @@ void java_bytecode_convert_methodt::save_stack_entries(
 {
   for(auto &stack_entry : stack)
   {
-    // remove typecasts if existing
-    while(stack_entry.id()==ID_typecast)
-      stack_entry=to_typecast_expr(stack_entry).op();
-
     // variables or static fields and symbol -> save symbols with same id
     if((write_type==bytecode_write_typet::VARIABLE ||
         write_type==bytecode_write_typet::STATIC_FIELD) &&
