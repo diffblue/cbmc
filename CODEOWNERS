@@ -1,21 +1,9 @@
-# These folders were previously covered by the default owners
-
-/* @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-/jbmc/* @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-/jbmc/src/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-/jbmc/lib/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-/src/* @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-/src/clobber/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-/src/jsil/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-/src/solvers/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-/.githooks/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-/cmake/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-/doc/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-/pkg/arch/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
-
-
 # These files should rarely change
 
+/* @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/cmake/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/pkg/arch/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/src/* @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
 /src/big-int/ @kroening
 /src/ansi-c/ @kroening @tautschnig
 /src/assembler/ @kroening @tautschnig
@@ -23,10 +11,12 @@
 /src/linking/ @kroening @tautschnig
 /src/memory-models/ @kroening @tautschnig
 /src/goto-symex/ @kroening @tautschnig @peterschrammel
+/src/jsil/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
 /src/json/ @kroening @tautschnig @peterschrammel
 /src/langapi/ @kroening @tautschnig @peterschrammel
 /src/xmllang/ @kroening @tautschnig @peterschrammel
 /src/nonstd/ @smowton @peterschrammel
+/src/solvers/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
 /src/solvers/cvc @martin-cs @kroening
 /src/solvers/flattening @martin-cs @kroening @tautschnig @peterschrammel
 /src/solvers/floatbv @martin-cs @kroening
@@ -34,6 +24,9 @@
 /src/solvers/prop @martin-cs @kroening @tautschnig @peterschrammel
 /src/solvers/sat @martin-cs @kroening @tautschnig @peterschrammel
 /src/solvers/smt2 @martin-cs @tautschnig @peterschrammel
+/jbmc/* @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/jbmc/lib/ @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+/jbmc/src/* @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
 /jbmc/src/miniz/ @smowton @mgudemann @peterschrammel
 
 
