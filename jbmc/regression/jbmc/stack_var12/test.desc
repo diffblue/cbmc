@@ -1,0 +1,17 @@
+CORE
+stack_typecast.class
+--cover location --function stack_typecast.f
+^EXIT=0$
+^SIGNAL=0$
+covered \(100.0%\)
+--
+--
+This tests that there is no invariant violation when modifying the values on the
+stack. in this case the `position` variable is used as index in an array via the
+Java equivalent of
+
+ buffer[position++];
+
+The code pushes position, duplicates it and the modifies the stack
+entry. Before, the stack entry generation removed typecasts which gave a typing
+problem with the `iand` operator
