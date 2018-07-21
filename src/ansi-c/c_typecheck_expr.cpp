@@ -836,7 +836,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     if(expr.type().id()==ID_code) // function designator
     { // special case: this is sugar for &f
       address_of_exprt tmp(expr, pointer_type(expr.type()));
-      tmp.set("#implicit", true);
+      tmp.set(ID_C_implicit, true);
       tmp.add_source_location()=expr.source_location();
       expr=tmp;
     }

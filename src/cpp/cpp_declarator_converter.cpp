@@ -200,7 +200,7 @@ symbolt &cpp_declarator_convertert::convert(
     if(!storage_spec.is_extern())
       symbol.is_extern = false;
 
-    if(declarator.get_bool("#template_case"))
+    if(declarator.get_bool(ID_C_template_case))
       return symbol;
 
     combine_types(declarator.name().source_location(), final_type, symbol);
@@ -258,7 +258,7 @@ void cpp_declarator_convertert::combine_types(
         if(decl_parameter.type()!=symbol_parameter.type())
         {
           // The 'this' parameter of virtual functions mismatches
-          if(i!=0 || !symbol_code_type.get_bool("#is_virtual"))
+          if(i != 0 || !symbol_code_type.get_bool(ID_C_is_virtual))
           {
             cpp_typecheck.error().source_location=source_location;
             cpp_typecheck.error() << "symbol `" << symbol.display_name()

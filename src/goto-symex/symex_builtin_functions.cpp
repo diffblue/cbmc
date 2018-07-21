@@ -153,7 +153,7 @@ void goto_symext::symex_allocate(
   value_symbol.name="symex_dynamic::"+id2string(value_symbol.base_name);
   value_symbol.is_lvalue=true;
   value_symbol.type=object_type;
-  value_symbol.type.set("#dynamic", true);
+  value_symbol.type.set(ID_C_dynamic, true);
   value_symbol.mode = mode;
 
   state.symbol_table.add(value_symbol);
@@ -432,7 +432,7 @@ void goto_symext::symex_cpp_new(
   else
     symbol.type=code.type().subtype();
 
-  symbol.type.set("#dynamic", true);
+  symbol.type.set(ID_C_dynamic, true);
 
   state.symbol_table.add(symbol);
 

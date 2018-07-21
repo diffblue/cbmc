@@ -178,10 +178,10 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   // Let's first typecheck the operands.
   Forall_operands(it, code)
   {
-    const bool has_array_ini = it->get_bool("#array_ini");
+    const bool has_array_ini = it->get_bool(ID_C_array_ini);
     typecheck_expr(*it);
     if(has_array_ini)
-      it->set("#array_ini", true);
+      it->set(ID_C_array_ini, true);
   }
 
   // The initializer may be a data member (non-type)
@@ -228,7 +228,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     // done building the expression, check the argument types
     typecheck_function_call_arguments(function_call);
 
-    if(symbol_expr.get_bool("#not_accessible"))
+    if(symbol_expr.get_bool(ID_C_not_accessible))
     {
       irep_idt access = symbol_expr.get(ID_C_access);
 
@@ -312,9 +312,9 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         reference_initializer(code.op0(), symbol_expr.type());
 
         // assign the pointers
-        symbol_expr.type().remove("#reference");
-        symbol_expr.set("#lvalue", true);
-        code.op0().type().remove("#reference");
+        symbol_expr.type().remove(ID_C_reference);
+        symbol_expr.set(ID_C_lvalue, true);
+        code.op0().type().remove(ID_C_reference);
 
         side_effect_exprt assign(ID_assign);
         assign.add_source_location() = code.source_location();

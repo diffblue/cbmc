@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool pointer_logict::is_dynamic_object(const exprt &expr) const
 {
-  if(expr.type().get_bool("#dynamic"))
+  if(expr.type().get_bool(ID_C_dynamic))
     return true;
 
   if(expr.id()==ID_symbol)

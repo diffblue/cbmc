@@ -344,7 +344,7 @@ void cpp_typecheckt::default_cpctor(
     memberexpr.add_source_location()=source_location;
 
     if(mem_it->type().id()==ID_array)
-      memberexpr.set("#array_ini", true);
+      memberexpr.set(ID_C_array_ini, true);
 
     mem_init.move_to_operands(memberexpr);
     initializers.move_to_sub(mem_init);
@@ -386,7 +386,7 @@ void cpp_typecheckt::default_assignop(
 
   declarator_type.id(ID_function_type);
   declarator_type.subtype()=reference_type(nil_typet());
-  declarator_type.subtype().add("#qualifier").make_nil();
+  declarator_type.subtype().add(ID_C_qualifier).make_nil();
 
   exprt &args=static_cast<exprt&>(declarator.type().add(ID_parameters));
   args.add_source_location()=source_location;

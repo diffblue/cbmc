@@ -1258,9 +1258,9 @@ bool cpp_typecheckt::reference_binding(
       expr.set(ID_C_lvalue, true);
     else if(expr.get(ID_statement)==ID_function_call)
       expr.set(ID_C_lvalue, true);
-    else if(expr.get_bool("#temporary_avoided"))
+    else if(expr.get_bool(ID_C_temporary_avoided))
     {
-      expr.remove("#temporary_avoided");
+      expr.remove(ID_C_temporary_avoided);
       exprt temporary;
       new_temporary(expr.source_location(), expr.type(), expr, temporary);
       expr.swap(temporary);
@@ -1965,7 +1965,7 @@ bool cpp_typecheckt::static_typecast(
     else
     {
       // try to avoid temporary
-      new_expr.set("#temporary_avoided", true);
+      new_expr.set(ID_C_temporary_avoided, true);
       if(new_expr.get_bool(ID_C_lvalue))
         new_expr.remove(ID_C_lvalue);
     }

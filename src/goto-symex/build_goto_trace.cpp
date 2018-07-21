@@ -114,7 +114,7 @@ void set_internal_dynamic_object(
     const symbolt *symbol;
     if(!ns.lookup(id, symbol))
     {
-      bool result=symbol->type.get_bool("#dynamic");
+      bool result = symbol->type.get_bool(ID_C_dynamic);
       if(result)
         goto_trace_step.internal=true;
     }

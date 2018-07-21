@@ -2017,8 +2017,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   {
     if(expr.function().type().find("to-member").is_not_nil())
     {
-      const exprt &bound=
-        static_cast<const exprt &>(expr.function().type().find("#bound"));
+      const exprt &bound =
+        static_cast<const exprt &>(expr.function().type().find(ID_C_bound));
 
       if(bound.is_nil())
       {
@@ -2032,7 +2032,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       expr.arguments().insert(expr.arguments().begin(), bound);
 
       // we don't need the object any more
-      expr.function().type().remove("#bound");
+      expr.function().type().remove(ID_C_bound);
     }
 
     // do implicit dereference
@@ -2060,8 +2060,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   }
   else if(expr.function().type().id()==ID_code)
   {
-    if(expr.function().type().get_bool("#is_virtual") &&
-       !is_qualified)
+    if(expr.function().type().get_bool(ID_C_is_virtual) && !is_qualified)
     {
       exprt vtptr_member;
       if(op0.id()==ID_member || op0.id()==ID_ptrmember)
@@ -2093,9 +2092,9 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       vtptr_member.set(ID_component_name, vtable_name);
 
       // look for the right entry
-      irep_idt vtentry_component_name=
-        vt_compo.type().subtype().get_string(ID_identifier)+"::"+
-        expr.function().type().get_string("#virtual_name");
+      irep_idt vtentry_component_name =
+        vt_compo.type().subtype().get_string(ID_identifier) +
+        "::" + expr.function().type().get_string(ID_C_virtual_name);
 
       exprt vtentry_member(ID_ptrmember);
       vtentry_member.copy_to_operands(vtptr_member);
@@ -2190,10 +2189,10 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                   member);
 
     // special case for the initialization of parents
-    if(member.get_bool("#not_accessible"))
+    if(member.get_bool(ID_C_not_accessible))
     {
       assert(member.get(ID_C_access)!="");
-      tmp_object_expr.set("#not_accessible", true);
+      tmp_object_expr.set(ID_C_not_accessible, true);
       tmp_object_expr.set(ID_C_access, member.get(ID_C_access));
     }
 
@@ -2307,7 +2306,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
   exprt::operandst::iterator arg_it=expr.arguments().begin();
   for(const auto &parameter : parameters)
   {
-    if(parameter.get_bool("#call_by_value"))
+    if(parameter.get_bool(ID_C_call_by_value))
     {
       assert(is_reference(parameter.type()));
 
@@ -2383,7 +2382,7 @@ void cpp_typecheckt::typecheck_method_application(
 
   const symbolt &symbol=lookup(member_expr.get(ID_component_name));
   symbolt &method_symbol=symbol_table.get_writeable_ref(symbol.name);
-  const symbolt &tag_symbol=lookup(symbol.type.get("#member_name"));
+  const symbolt &tag_symbol = lookup(symbol.type.get(ID_C_member_name));
 
   // build the right template map
   // if this is an instantiated template class method
@@ -2409,7 +2408,7 @@ void cpp_typecheckt::typecheck_method_application(
   new_function.add_source_location()=member_expr.source_location();
   expr.function().swap(new_function);
 
-  if(!expr.function().type().get_bool("#is_static"))
+  if(!expr.function().type().get_bool(ID_C_is_static))
   {
     const code_typet &func_type=to_code_type(symbol.type);
     typet this_type=func_type.parameters().front().type();
@@ -2417,7 +2416,7 @@ void cpp_typecheckt::typecheck_method_application(
     // Special case. Make it a reference.
     assert(this_type.id()==ID_pointer);
     this_type.set(ID_C_reference, true);
-    this_type.set("#this", true);
+    this_type.set(ID_C_this, true);
 
     if(expr.arguments().size()==func_type.parameters().size())
     {
@@ -2690,7 +2689,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
   }
 
   exprt tmp(expr.op1());
-  tmp.type().set("#bound", expr.op0());
+  tmp.type().set(ID_C_bound, expr.op0());
   expr.swap(tmp);
   return;
 }
@@ -2714,8 +2713,7 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr(exprt &expr)
 {
-  bool override_constantness=
-    expr.get_bool("#override_constantness");
+  bool override_constantness = expr.get_bool(ID_C_override_constantness);
 
   // We take care of an ambiguity in the C++ grammar.
   // Needs to be done before the operands!
