@@ -119,6 +119,16 @@ public:
   virtual bool ai_simplify_lhs(
     exprt &condition,
     const namespacet &ns) const;
+
+  // Gives a Boolean condition that is true for all values represented by the
+  // domain.  This allows domains to be converted into program invariants.
+  virtual exprt to_predicate(void) const
+  {
+    if(is_bottom())
+      return false_exprt();
+    else
+      return true_exprt();
+  }
 };
 
 #endif
