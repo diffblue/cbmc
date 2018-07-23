@@ -77,7 +77,7 @@ exprt get_class_identifier_field(
 /// \remarks Follows through base class members until it gets to the object
 /// type that contains the `@class_identifier` member
 /// \param expr: An expression that represents a struct
-/// \param ns: The namespace used to resolve symbol referencess in the type of
+/// \param ns: The namespace used to resolve symbol references in the type of
 /// the struct
 /// \param class_type: A symbol whose identifier is the name of the class
 void set_class_identifier(
