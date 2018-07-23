@@ -15,6 +15,8 @@
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_returns.h>
 
+#include <java_bytecode/convert_java_nondet.h>
+#include <java_bytecode/object_factory_parameters.h>
 #include <java_bytecode/remove_instanceof.h>
 #include <java_bytecode/replace_java_nondet.h>
 
@@ -26,7 +28,7 @@
 #include <iostream>
 #include <java-testing-utils/load_java_class.h>
 
-void validate_method_removal(
+void validate_nondet_method_removed(
   std::list<goto_programt::instructiont> instructions)
 {
   bool method_removed = true, replacement_nondet_exists = false;
@@ -90,6 +92,40 @@ void validate_method_removal(
   REQUIRE(replacement_nondet_exists);
 }
 
+void validate_nondets_converted(
+  std::list<goto_programt::instructiont> instructions)
+{
+  bool nondet_exists = false;
+  bool allocate_exists = false;
+  for(const auto &inst : instructions)
+  {
+    // Check that our NONDET(<type>) exists on a rhs somewhere.
+    exprt target_expression =
+      (inst.is_assign()
+         ? to_code_assign(inst.code).rhs()
+         : inst.is_return() ? to_code_return(inst.code).return_value()
+                            : inst.code);
+
+    if(
+      const auto side_effect =
+        expr_try_dynamic_cast<side_effect_exprt>(target_expression))
+    {
+      if(side_effect->get_statement() == ID_nondet)
+      {
+        nondet_exists = true;
+      }
+
+      if(side_effect->get_statement() == ID_allocate)
+      {
+        allocate_exists = true;
+      }
+    }
+  }
+
+  REQUIRE_FALSE(nondet_exists);
+  REQUIRE(allocate_exists);
+}
+
 void load_and_test_method(
   const std::string &method_signature,
   goto_functionst &functions,
@@ -110,26 +146,50 @@ void load_and_test_method(
   remove_virtual_functions(model_function);
 
   // Then test both situations.
-  THEN(
-    "Code should work when remove returns is called before "
-    "replace_java_nondet.")
+  THEN("Replace nondet should work after remove returns has been called.")
   {
     remove_returns(model_function, [](const irep_idt &) { return false; });
 
     replace_java_nondet(model_function);
 
-    validate_method_removal(goto_function.body.instructions);
+    validate_nondet_method_removed(goto_function.body.instructions);
+  }
+
+  THEN("Replace nondet should work before remove returns has been called.")
+  {
+    replace_java_nondet(model_function);
+
+    remove_returns(model_function, [](const irep_idt &) { return false; });
+
+    validate_nondet_method_removed(goto_function.body.instructions);
+  }
+
+  object_factory_parameterst params{};
+
+  THEN(
+    "Replace and convert nondet should work after remove returns has been "
+    "called.")
+  {
+    remove_returns(model_function, [](const irep_idt &) { return false; });
+
+    replace_java_nondet(model_function);
+
+    convert_nondet(model_function, null_message_handler, params, ID_java);
+
+    validate_nondets_converted(goto_function.body.instructions);
   }
 
   THEN(
-    "Code should work when remove returns is called after "
-    "replace_java_nondet.")
+    "Replace and convert nondet should work before remove returns has been "
+    "called.")
   {
     replace_java_nondet(model_function);
 
+    convert_nondet(model_function, null_message_handler, params, ID_java);
+
     remove_returns(model_function, [](const irep_idt &) { return false; });
 
-    validate_method_removal(goto_function.body.instructions);
+    validate_nondets_converted(goto_function.body.instructions);
   }
 }
 

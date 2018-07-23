@@ -67,7 +67,6 @@ private:
 
   const configt config_;
   std::size_t loop_bound_;
-  std::size_t max_string_length;
   string_constraint_generatort generator;
 
   // Simple constraints that have been given to the solver

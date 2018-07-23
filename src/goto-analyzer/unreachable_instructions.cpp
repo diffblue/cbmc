@@ -84,7 +84,6 @@ static void output_dead_plain(
 }
 
 static void add_to_xml(
-  const namespacet &ns,
   const goto_programt &goto_program,
   const dead_mapt &dead_map,
   xmlt &dest)
@@ -206,7 +205,6 @@ bool static_unreachable_instructions(
   const goto_modelt &goto_model,
   const ai_baset &ai,
   const optionst &options,
-  message_handlert &message_handler,
   std::ostream &out)
 {
   json_arrayt json_result;
@@ -231,7 +229,7 @@ bool static_unreachable_instructions(
       }
       else if(options.get_bool_option("xml"))
       {
-        add_to_xml(ns, f_it->second.body, dead_map, xml_result);
+        add_to_xml(f_it->second.body, dead_map, xml_result);
       }
       else
       {
@@ -431,7 +429,6 @@ bool static_unreachable_functions(
   const goto_modelt &goto_model,
   const ai_baset &ai,
   const optionst &options,
-  message_handlert &message_handler,
   std::ostream &out)
 {
   std::unordered_set<irep_idt> called =
@@ -446,7 +443,6 @@ bool static_reachable_functions(
   const goto_modelt &goto_model,
   const ai_baset &ai,
   const optionst &options,
-  message_handlert &message_handler,
   std::ostream &out)
 {
   std::unordered_set<irep_idt> called =

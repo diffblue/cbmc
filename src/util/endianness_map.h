@@ -41,6 +41,8 @@ public:
   {
   }
 
+  virtual ~endianness_mapt() = default;
+
   size_t map_bit(size_t bit) const
   {
     assert(bit<map.size());

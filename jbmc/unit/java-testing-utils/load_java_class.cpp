@@ -38,17 +38,10 @@ symbol_tablet load_java_class_lazy(
   const std::string &class_path,
   const std::string &main)
 {
-  free_form_cmdlinet lazy_command_line;
-  lazy_command_line.add_flag("lazy-methods");
-
   register_language(new_java_bytecode_language);
 
   return load_java_class(
-    java_class_name,
-    class_path,
-    main,
-    get_language_from_mode(ID_java),
-    lazy_command_line);
+    java_class_name, class_path, main, get_language_from_mode(ID_java));
 }
 
 /// Go through the process of loading, type-checking and finalising loading a
@@ -65,10 +58,18 @@ symbol_tablet load_java_class(
   const std::string &class_path,
   const std::string &main)
 {
+  free_form_cmdlinet command_line;
+  command_line.add_flag("no-lazy-methods");
+  command_line.add_flag("no-refine-strings");
+
   register_language(new_java_bytecode_language);
 
   return load_java_class(
-    java_class_name, class_path, main, get_language_from_mode(ID_java));
+    java_class_name,
+    class_path,
+    main,
+    get_language_from_mode(ID_java),
+    command_line);
 }
 
 /// Go through the process of loading, type-checking and finalising loading a
@@ -161,7 +162,9 @@ symbol_tablet load_java_class(
   const std::string &main,
   std::unique_ptr<languaget> &&java_lang)
 {
-  cmdlinet command_line;
+  free_form_cmdlinet command_line;
+  command_line.add_flag("no-lazy-methods");
+  command_line.add_flag("no-refine-strings");
   // TODO(tkiley): This doesn't do anything as "java-cp-include-files" is an
   // TODO(tkiley): unknown argument. This could be changed by using the
   // TODO(tkiley): free_form_cmdlinet however this causes some tests to fail.

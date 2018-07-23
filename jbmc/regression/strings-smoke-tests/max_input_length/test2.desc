@@ -1,6 +1,6 @@
 CORE
 Test.class
---refine-strings --verbosity 10 --string-max-length 45 --string-max-input-length 20 --function Test.main
+--verbosity 10 --max-nondet-string-length 20 --function Test.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 THOROUGH
 Test.class
---refine-strings --function Test.check --unwind 10 --string-max-length 10 --java-assume-inputs-non-null
+--function Test.check --unwind 10 --max-nondet-string-length 10 --java-assume-inputs-non-null
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

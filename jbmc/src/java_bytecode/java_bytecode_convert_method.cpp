@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/string2int.h>
 #include <util/string_constant.h>
+#include <util/threeval.h>
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/class_hierarchy.h>
@@ -370,6 +371,9 @@ void java_bytecode_convert_method_lazy(
     member_type.set(ID_is_synchronized, true);
   if(m.is_static)
     member_type.set(ID_is_static, true);
+
+  if(m.is_bridge)
+    member_type.set(ID_is_bridge_method, m.is_bridge);
 
   // do we need to add 'this' as a parameter?
   if(!m.is_static)
@@ -3173,8 +3177,13 @@ irep_idt java_bytecode_convert_methodt::get_static_field(
   return inherited_method.get_full_component_identifier();
 }
 
-/// create temporary variables if a write instruction can have undesired side-
-/// effects
+/// Create temporary variables if a write instruction can have undesired side-
+/// effects.
+/// \param tmp_var_prefix: The prefix string to use for new temporary variables
+/// \param tmp_var_type: The type of the temporary variable.
+/// \param[out] block: The code block the assignment is added to if required.
+/// \param write_type: The enumeration type of the write instruction.
+/// \param identifier: The identifier of the symbol in the write instruction.
 void java_bytecode_convert_methodt::save_stack_entries(
   const std::string &tmp_var_prefix,
   const typet &tmp_var_type,
@@ -3182,35 +3191,76 @@ void java_bytecode_convert_methodt::save_stack_entries(
   const bytecode_write_typet write_type,
   const irep_idt &identifier)
 {
+  const std::function<bool(
+    const std::function<tvt(const exprt &expr)>, const exprt &expr)>
+    entry_matches = [&entry_matches](
+      const std::function<tvt(const exprt &expr)> predicate,
+      const exprt &expr) {
+      const tvt &tvres = predicate(expr);
+      if(tvres.is_unknown())
+      {
+        return std::any_of(
+          expr.operands().begin(),
+          expr.operands().end(),
+          [&predicate, &entry_matches](const exprt &expr) {
+            return entry_matches(predicate, expr);
+          });
+      }
+      else
+      {
+        return tvres.is_true();
+      }
+    };
+
+  // Function that checks whether the expression accesses a member with the
+  // given identifier name. These accesses are created in the case of `iinc`, or
+  // non-array `?store` instructions.
+  const std::function<tvt(const exprt &expr)> has_member_entry = [&identifier](
+    const exprt &expr) {
+    const auto member_expr = expr_try_dynamic_cast<member_exprt>(expr);
+    return !member_expr ? tvt::unknown()
+                        : tvt(member_expr->get_component_name() == identifier);
+  };
+
+  // Function that checks whether the expression is a symbol with the given
+  // identifier name. These accesses are created in the case of `putstatic` or
+  // `putfield` instructions.
+  const std::function<tvt(const exprt &expr)> is_symbol_entry =
+    [&identifier](const exprt &expr) {
+      const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(expr);
+      return !symbol_expr ? tvt::unknown()
+                          : tvt(symbol_expr->get_identifier() == identifier);
+    };
+
+  // Function that checks whether the expression is a dereference
+  // expression. These accesses are created in `?astore` array write
+  // instructions.
+  const std::function<tvt(const exprt &expr)> is_dereference_entry =
+    [](const exprt &expr) {
+      const auto dereference_expr =
+        expr_try_dynamic_cast<dereference_exprt>(expr);
+      return !dereference_expr ? tvt::unknown() : tvt(true);
+    };
+
   for(auto &stack_entry : stack)
   {
-    // remove typecasts if existing
-    while(stack_entry.id()==ID_typecast)
-      stack_entry=to_typecast_expr(stack_entry).op();
-
-    // variables or static fields and symbol -> save symbols with same id
-    if((write_type==bytecode_write_typet::VARIABLE ||
-        write_type==bytecode_write_typet::STATIC_FIELD) &&
-       stack_entry.id()==ID_symbol)
+    bool replace = false;
+    switch(write_type)
     {
-      const symbol_exprt &var=to_symbol_expr(stack_entry);
-      if(var.get_identifier()==identifier)
-        create_stack_tmp_var(tmp_var_prefix, tmp_var_type, block, stack_entry);
+    case bytecode_write_typet::VARIABLE:
+    case bytecode_write_typet::STATIC_FIELD:
+      replace = entry_matches(is_symbol_entry, stack_entry);
+      break;
+    case bytecode_write_typet::ARRAY_REF:
+      replace = entry_matches(is_dereference_entry, stack_entry);
+      break;
+    case bytecode_write_typet::FIELD:
+      replace = entry_matches(has_member_entry, stack_entry);
+      break;
     }
-
-    // array reference and dereference -> save all references on the stack
-    else if(write_type==bytecode_write_typet::ARRAY_REF &&
-            stack_entry.id()==ID_dereference)
-      create_stack_tmp_var(tmp_var_prefix, tmp_var_type, block, stack_entry);
-
-    // field and member access -> compare component name
-    else if(write_type==bytecode_write_typet::FIELD &&
-            stack_entry.id()==ID_member)
+    if(replace)
     {
-      const irep_idt &entry_id=
-        to_member_expr(stack_entry).get_component_name();
-      if(entry_id==identifier)
-        create_stack_tmp_var(tmp_var_prefix, tmp_var_type, block, stack_entry);
+      create_stack_tmp_var(tmp_var_prefix, tmp_var_type, block, stack_entry);
     }
   }
 }

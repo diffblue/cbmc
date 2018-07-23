@@ -73,11 +73,7 @@ public:
 
   /// Creates an if_expr corresponding to the result of accessing the array
   /// at the given index
-  virtual exprt to_if_expression(const exprt &index) const;
-
-  /// Get the value at the specified index.
-  /// Complexity is linear in the number of entries.
-  virtual exprt at(std::size_t index) const;
+  static exprt to_if_expression(const with_exprt &expr, const exprt &index);
 
 protected:
   exprt default_value;
@@ -114,7 +110,7 @@ public:
     const array_list_exprt &expr,
     const exprt &extra_value);
 
-  exprt to_if_expression(const exprt &index) const override;
+  exprt to_if_expression(const exprt &index) const;
 
   /// If the expression is an array_exprt or a with_exprt uses the appropriate
   /// constructor, otherwise returns empty optional.
@@ -125,8 +121,8 @@ public:
   array_exprt concretize(std::size_t size, const typet &index_type) const;
 
   /// Get the value at the specified index.
-  /// Complexity is linear in the number of entries.
-  exprt at(std::size_t index) const override;
+  /// Complexity is logarithmic in the number of entries.
+  exprt at(std::size_t index) const;
 
   /// Array containing the same value at each index.
   explicit interval_sparse_arrayt(exprt default_value)

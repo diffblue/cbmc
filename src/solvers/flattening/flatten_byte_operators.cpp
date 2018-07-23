@@ -201,14 +201,10 @@ exprt flatten_byte_extract(
 
   assert(src.operands().size()==2);
 
-  bool little_endian;
-
-  if(src.id()==ID_byte_extract_little_endian)
-    little_endian=true;
-  else if(src.id()==ID_byte_extract_big_endian)
-    little_endian=false;
-  else
-    UNREACHABLE;
+  PRECONDITION(
+    src.id() == ID_byte_extract_little_endian ||
+    src.id() == ID_byte_extract_big_endian);
+  const bool little_endian = src.id() == ID_byte_extract_little_endian;
 
   // determine an upper bound of the number of bytes we might need
   exprt upper_bound=size_of_expr(src.type(), ns);

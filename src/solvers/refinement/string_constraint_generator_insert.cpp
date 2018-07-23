@@ -41,7 +41,7 @@ exprt string_constraint_generatort::add_axioms_for_insert(
     maximum(from_integer(0, index_type), minimum(s1.length(), offset));
 
   // Axiom 1.
-  lemmas.push_back(length_constraint_for_insert(res, s1, s2, offset));
+  lemmas.push_back(length_constraint_for_insert(res, s1, s2));
 
   // Axiom 2.
   constraints.push_back([&] { // NOLINT
@@ -53,7 +53,9 @@ exprt string_constraint_generatort::add_axioms_for_insert(
   constraints.push_back([&] { // NOLINT
     const symbol_exprt i = fresh_symbol("QA_insert2", index_type);
     return string_constraintt(
-      i, s2.length(), equal_exprt(res[plus_exprt(i, offset1)], s2[i]));
+      i,
+      zero_if_negative(s2.length()),
+      equal_exprt(res[plus_exprt(i, offset1)], s2[i]));
   }());
 
   // Axiom 4.
@@ -62,20 +64,19 @@ exprt string_constraint_generatort::add_axioms_for_insert(
     return string_constraintt(
       i,
       offset1,
-      s1.length(),
+      zero_if_negative(s1.length()),
       equal_exprt(res[plus_exprt(i, s2.length())], s1[i]));
   }());
 
   return from_integer(0, get_return_code_type());
 }
 
-/// Add axioms ensuring the length of `res` corresponds that of `s1` where we
-/// inserted `s2` at position `offset`.
+/// Add axioms ensuring the length of `res` corresponds to that of `s1` where we
+/// inserted `s2`.
 exprt length_constraint_for_insert(
   const array_string_exprt &res,
   const array_string_exprt &s1,
-  const array_string_exprt &s2,
-  const exprt &offset)
+  const array_string_exprt &s2)
 {
   return equal_exprt(res.length(), plus_exprt(s1.length(), s2.length()));
 }

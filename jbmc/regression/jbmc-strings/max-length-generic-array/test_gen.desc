@@ -1,6 +1,6 @@
 CORE
 IntegerTests.class
--refine-strings --string-max-length 100 --function IntegerTests.testMyGenSet --cover location
+--max-nondet-string-length 100 --function IntegerTests.testMyGenSet --cover location
 ^EXIT=0$
 ^SIGNAL=0$
 coverage.* line 4 function java::IntegerTests.testMyGenSet.* bytecode-index 1 .* SATISFIED

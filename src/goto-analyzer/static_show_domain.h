@@ -20,7 +20,6 @@ bool static_show_domain(
   const goto_modelt &,
   const ai_baset &,
   const optionst &,
-  message_handlert &,
   std::ostream &);
 
 #endif // CPROVER_GOTO_ANALYZER_STATIC_SHOW_DOMAIN_H

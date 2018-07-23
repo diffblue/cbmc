@@ -25,14 +25,10 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
   const exprt &offset_expr=expr.offset();
   const exprt &value=expr.value();
 
-  bool little_endian;
-
-  if(expr.id()==ID_byte_update_little_endian)
-    little_endian=true;
-  else if(expr.id()==ID_byte_update_big_endian)
-    little_endian=false;
-  else
-    UNREACHABLE;
+  PRECONDITION(
+    expr.id() == ID_byte_update_little_endian ||
+    expr.id() == ID_byte_update_big_endian);
+  const bool little_endian = expr.id() == ID_byte_update_little_endian;
 
   bvt bv=convert_bv(op);
 

@@ -1138,7 +1138,7 @@ __decltype          { if(PARSER.cpp98 &&
 
 "__forceinline" { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_INLINE; }
+                    { loc(); return TOK_MSC_FORCEINLINE; }
                   else
                     return make_identifier();
                 }
@@ -1589,9 +1589,6 @@ __decltype          { if(PARSER.cpp98 &&
 
 "used" |
 "__used__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_USED; }
-
-"always_inline" |
-"__always_inline__" { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_ALWAYS_INLINE; }
 
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }

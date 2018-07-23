@@ -1,6 +1,6 @@
 FUTURE
 StringBuilderChars01.class
---refine-strings --string-max-length 1000 --unwind 100
+--max-nondet-string-length 1000 --unwind 100
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <assert.h>
-
 int main(void)
 {
   char c=0;
@@ -23,14 +20,14 @@ int main(void)
   __CPROVER_scanf("%p", &p);
   __CPROVER_scanf("%s", buffer);
 
-  assert(c==0); // may fail
-  assert(si==0); // may fail
-  assert(i==0); // may fail
-  assert(f==0); // may fail
-  assert(d==0); // may fail
-  assert(li==0); // may fail
-  assert(p==0); // may fail
-  assert(buffer[0]==0); // may fail
+  __CPROVER_assert(c == 0, "may fail");
+  __CPROVER_assert(si == 0, "may fail");
+  __CPROVER_assert(i == 0, "may fail");
+  __CPROVER_assert(f == 0, "may fail");
+  __CPROVER_assert(d == 0, "may fail");
+  __CPROVER_assert(li == 0, "may fail");
+  __CPROVER_assert(p == 0, "may fail");
+  __CPROVER_assert(buffer[0] == 0, "may fail");
 
   return 0;
 }

@@ -2,7 +2,6 @@ version: 1.0.{build}
 image: Visual Studio 2013
 clone_depth: 50
 environment:
-  BUILD_ENV: MSVC
   PATH: C:\projects\cbmc\deps\bin;%PATH%
   INCLUDE: C:\projects\cbmc\deps\include
 install:
@@ -43,23 +42,18 @@ install:
      & 7z x minisat2_2.2.1.orig.tar.gz
      &7z x minisat2_2.2.1.orig.tar
     }
-    if (!(Test-Path java-models-library-master\.gitignore)) {
-     & appveyor downloadfile https://github.com/diffblue/java-models-library/archive/master.zip -FileName jml.zip
-     & 7z x jml.zip
-    }
     cd ..
 
 cache: deps
 
 build_script:
 - cmd: |
-    cp -r deps/java-models-library-master/src jbmc/src/java_bytecode/library
+    make -C jbmc/src setup-submodules
     cp -r deps/minisat2-2.2.1 minisat-2.2.1
     patch -d minisat-2.2.1 -p1 < scripts/minisat-2.2.1-patch
     call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
-    sed -i "s/BUILD_ENV[ ]*=.*/BUILD_ENV = MSVC/" src/config.inc
-    make -C src -j2
-    make -C jbmc/src -j2
+    make -C src -j2 BUILD_ENV=MSVC
+    make -C jbmc/src -j2 BUILD_ENV=MSVC
 
 test_script:
 - cmd: |
@@ -81,19 +75,18 @@ test_script:
     rmdir /s /q goto-instrument\slice08
     cd ..
 
-    make -C regression test
+    make -C regression test BUILD_ENV=MSVC
 
-    make -C unit all -j2
-    make -C unit test
+    make -C unit all -j2 BUILD_ENV=MSVC
+    make -C unit test BUILD_ENV=MSVC
 
     cd jbmc/regression
     rmdir /s /q jbmc\VarLengthArrayTrace1
     rmdir /s /q jbmc\classpath1
     rmdir /s /q jbmc\jar-file3
-    rmdir /s /q jbmc\tableswitch2
     cd ../..
 
-    make -C jbmc/regression test
+    make -C jbmc/regression test BUILD_ENV=MSVC
 
-    make -C jbmc/unit all -j2
-    make -C jbmc/unit test
+    make -C jbmc/unit all -j2 BUILD_ENV=MSVC
+    make -C jbmc/unit test BUILD_ENV=MSVC

@@ -303,7 +303,7 @@ int as_modet::as_hybrid_binary()
   debug() << "merging " << output_file << eom;
   std::string saved=output_file+".goto-cc-saved";
 
-  #ifdef __linux__
+  #if defined(__linux__) || defined(__FreeBSD_kernel__)
   if(result==0)
   {
     // remove any existing goto-cc section

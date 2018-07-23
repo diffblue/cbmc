@@ -21,7 +21,7 @@ void goto_symext::symex_dead(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  const codet &code=to_code(instruction.code);
+  const codet &code = instruction.code;
 
   if(code.operands().size()!=1)
     throw "dead expects one operand";

@@ -1164,26 +1164,6 @@ std::string expr2ct::convert_unary(
   return dest;
 }
 
-std::string expr2ct::convert_pointer_object_has_type(
-  const exprt &src,
-  unsigned precedence)
-{
-  if(src.operands().size()!=1)
-    return convert_norep(src, precedence);
-
-  unsigned p0;
-  std::string op0=convert_with_precedence(src.op0(), p0);
-
-  std::string dest="POINTER_OBJECT_HAS_TYPE";
-  dest+='(';
-  dest+=op0;
-  dest+=", ";
-  dest+=convert(static_cast<const typet &>(src.find("object_type")));
-  dest+=')';
-
-  return dest;
-}
-
 std::string expr2ct::convert_allocate(const exprt &src, unsigned &precedence)
 {
   if(src.operands().size() != 2)
@@ -2613,9 +2593,9 @@ std::string expr2ct::convert_code_ifthenelse(
     dest+=';';
   }
   else
-    dest+=convert_code(
-        to_code(src.then_case()),
-        to_code(src.then_case()).get_statement()==ID_block ? indent : indent+2);
+    dest += convert_code(
+      src.then_case(),
+      src.then_case().get_statement() == ID_block ? indent : indent + 2);
   dest+="\n";
 
   if(!src.else_case().is_nil())
@@ -2623,9 +2603,9 @@ std::string expr2ct::convert_code_ifthenelse(
     dest+="\n";
     dest+=indent_str(indent);
     dest+="else\n";
-    dest+=convert_code(
-        to_code(src.else_case()),
-        to_code(src.else_case()).get_statement()==ID_block ? indent : indent+2);
+    dest += convert_code(
+      src.else_case(),
+      src.else_case().get_statement() == ID_block ? indent : indent + 2);
   }
 
   return dest;
@@ -3578,9 +3558,6 @@ std::string expr2ct::convert_with_precedence(
 
   else if(src.id()=="object_value")
     return convert_function(src, "OBJECT_VALUE", precedence=16);
-
-  else if(src.id()=="pointer_object_has_type")
-    return convert_pointer_object_has_type(src, precedence=16);
 
   else if(src.id()==ID_array_of)
     return convert_array_of(src, precedence=16);

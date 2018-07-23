@@ -1,6 +1,6 @@
 CORE
 test_insert_int.class
---refine-strings --string-max-length 1000 --function test_insert_int.main
+--max-nondet-string-length 1000 --function test_insert_int.main
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion\.1\].* line 8.* FAILURE$

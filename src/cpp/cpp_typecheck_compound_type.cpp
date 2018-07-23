@@ -11,6 +11,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include <algorithm>
 
 #include <util/arith_tools.h>
@@ -395,7 +399,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   irep_idt identifier;
 
   // the below is a temporary hack
-  // if(is_method || is_static)d
+  // if(is_method || is_static)
   if(id2string(cpp_scopes.current_scope().prefix).find("#anon")==
      std::string::npos ||
      is_method || is_static)

@@ -1,6 +1,6 @@
 CORE
 test_insert_string.class
---refine-strings --verbosity 10 --string-max-length 1000 --function test_insert_string.main
+--verbosity 10 --max-nondet-string-length 1000 --function test_insert_string.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

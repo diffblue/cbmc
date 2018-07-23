@@ -13,18 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/base_type.h>
+#include <util/c_types.h>
 #include <util/fresh_symbol.h>
+#include <util/invariant.h>
+#include <util/message.h>
+#include <util/pointer_offset_size.h>
 #include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
 #include <util/type_eq.h>
-#include <util/message.h>
-#include <util/base_type.h>
 
 #include <analyses/does_remove_const.h>
-#include <util/invariant.h>
-
-#include <util/c_types.h>
 
 #include "remove_skip.h"
 #include "compute_called_functions.h"
@@ -135,8 +135,8 @@ bool remove_function_pointerst::arg_is_type_compatible(
     return false;
   }
 
-  // structs/unions need to match,
-  // which could be made more generous
+  return pointer_offset_bits(call_type, ns) ==
+         pointer_offset_bits(function_type, ns);
 
   return false;
 }

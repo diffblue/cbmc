@@ -18,13 +18,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
-#include <util/expr_util.h>
 #include <util/ieee_float.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
-#include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
+
+#include <goto-programs/adjust_float_expressions.h>
 
 #include "builtin_factory.h"
 #include "c_typecast.h"
@@ -1920,10 +1920,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     if(entry!=asm_label_map.end())
       identifier=entry->second;
 
-    symbol_tablet::symbolst::const_iterator sym_entry =
-      symbol_table.symbols.find(identifier);
-
-    if(sym_entry == symbol_table.symbols.end())
+    if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
     {
       // This is an undeclared function.
       // Is this a builtin?
@@ -1964,87 +1961,6 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         warning().source_location=f_op.find_source_location();
         warning() << "function `" << identifier << "' is not declared" << eom;
       }
-    }
-    else if(
-      sym_entry->second.type.get_bool(ID_C_inlined) &&
-      sym_entry->second.is_macro && sym_entry->second.value.is_not_nil())
-    {
-      // calling a function marked as always_inline
-      const symbolt &func_sym = sym_entry->second;
-      const code_typet &func_type = to_code_type(func_sym.type);
-
-      replace_symbolt replace;
-
-      const code_typet::parameterst &parameters = func_type.parameters();
-      auto p_it = parameters.begin();
-      for(const auto &arg : expr.arguments())
-      {
-        if(p_it == parameters.end())
-        {
-          // we don't support varargs with always_inline
-          err_location(f_op);
-          error() << "function call has additional arguments, "
-                  << "cannot apply always_inline" << eom;
-          throw 0;
-        }
-
-        irep_idt p_id = p_it->get_identifier();
-        if(p_id.empty())
-        {
-          p_id = id2string(func_sym.base_name) + "::" +
-                 id2string(p_it->get_base_name());
-        }
-        replace.insert(p_id, arg);
-
-        ++p_it;
-      }
-
-      if(p_it != parameters.end())
-      {
-        err_location(f_op);
-        error() << "function call has missing arguments, "
-                << "cannot apply always_inline" << eom;
-        throw 0;
-      }
-
-      codet body = to_code(func_sym.value);
-      replace(body);
-
-      side_effect_exprt side_effect_expr(
-        ID_statement_expression, func_type.return_type());
-      body.make_block();
-
-      // simulates parts of typecheck_function_body
-      typet cur_return_type = return_type;
-      return_type = func_type.return_type();
-      typecheck_code(body);
-      return_type.swap(cur_return_type);
-
-      // replace final return by an ID_expression
-      codet &last = to_code_block(body).find_last_statement();
-
-      if(last.get_statement() == ID_return)
-        last.set_statement(ID_expression);
-
-      // NOLINTNEXTLINE(whitespace/braces)
-      const bool has_returns = has_subexpr(body, [&](const exprt &e) {
-        return e.id() == ID_code && to_code(e).get_statement() == ID_return;
-      });
-      if(has_returns)
-      {
-        // we don't support multiple return statements with always_inline
-        err_location(last);
-        error() << "function has multiple return statements, "
-                << "cannot apply always_inline" << eom;
-        throw 0;
-      }
-
-      side_effect_expr.copy_to_operands(body);
-      typecheck_side_effect_statement_expression(side_effect_expr);
-
-      expr.swap(side_effect_expr);
-
-      return;
     }
   }
 
@@ -2694,20 +2610,27 @@ exprt c_typecheck_baset::do_special_functions(
       // clang returns 4 for _Bool, gcc treats these as 'int'.
       type_number =
         config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG
-          ? 4
-          : 1;
+          ? 4u
+          : 1u;
     }
     else
     {
       type_number =
-          type.id() == ID_empty ? 0
-        : (type.id() == ID_bool || type.id() == ID_c_bool) ? 4
-        : (type.id() == ID_pointer || type.id() == ID_array) ? 5
-        : type.id() == ID_floatbv ? 8
-        : (type.id() == ID_complex && type.subtype().id() == ID_floatbv) ? 9
-        : type.id() == ID_struct ? 12
-        : type.id() == ID_union ? 13
-        : 1; // int, short, char, enum_tag
+          type.id() == ID_empty
+          ? 0u
+          : (type.id() == ID_bool || type.id() == ID_c_bool)
+            ? 4u
+            : (type.id() == ID_pointer || type.id() == ID_array)
+              ? 5u
+              : type.id() == ID_floatbv
+                ? 8u
+                : (type.id() == ID_complex && type.subtype().id() == ID_floatbv)
+                  ? 9u
+                  : type.id() == ID_struct
+                    ? 12u
+                    : type.id() == ID_union
+                      ? 13u
+                      : 1u; // int, short, char, enum_tag
     }
 
     exprt tmp=from_integer(type_number, expr.type());
@@ -3451,6 +3374,13 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
 
 void c_typecheck_baset::make_constant(exprt &expr)
 {
+  // Floating-point expressions may require a rounding mode.
+  // ISO 9899:1999 F.7.2 says that the default is "round to nearest".
+  // Some compilers have command-line options to override.
+  const auto rounding_mode =
+    from_integer(ieee_floatt::ROUND_TO_EVEN, signed_int_type());
+  adjust_float_expressions(expr, rounding_mode);
+
   simplify(expr, *this);
 
   if(!expr.is_constant() &&

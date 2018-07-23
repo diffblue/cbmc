@@ -40,21 +40,18 @@ bool static_unreachable_instructions(
   const goto_modelt &,
   const ai_baset &,
   const optionst &,
-  message_handlert &,
   std::ostream &);
 
 bool static_unreachable_functions(
   const goto_modelt &,
   const ai_baset &,
   const optionst &,
-  message_handlert &,
   std::ostream &);
 
 bool static_reachable_functions(
   const goto_modelt &,
   const ai_baset &,
   const optionst &,
-  message_handlert &,
   std::ostream &);
 
 #endif // CPROVER_GOTO_ANALYZER_UNREACHABLE_INSTRUCTIONS_H

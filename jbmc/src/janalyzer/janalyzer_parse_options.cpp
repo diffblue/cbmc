@@ -587,7 +587,7 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
     if(options.get_bool_option("show"))
     {
       result = static_show_domain(
-        goto_model, *analyzer, options, get_message_handler(), out);
+        goto_model, *analyzer, options, out);
     }
     else if(options.get_bool_option("verify"))
     {
@@ -602,17 +602,17 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
     else if(options.get_bool_option("unreachable-instructions"))
     {
       result = static_unreachable_instructions(
-        goto_model, *analyzer, options, get_message_handler(), out);
+        goto_model, *analyzer, options, out);
     }
     else if(options.get_bool_option("unreachable-functions"))
     {
       result = static_unreachable_functions(
-        goto_model, *analyzer, options, get_message_handler(), out);
+        goto_model, *analyzer, options, out);
     }
     else if(options.get_bool_option("reachable-functions"))
     {
       result = static_reachable_functions(
-        goto_model, *analyzer, options, get_message_handler(), out);
+        goto_model, *analyzer, options, out);
     }
     else
     {

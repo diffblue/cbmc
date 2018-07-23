@@ -460,18 +460,14 @@ bool java_bytecode_parsert::parse()
 #define ACC_ANNOTATION   0x2000
 #define ACC_ENUM         0x4000
 
-#ifdef _MSC_VER
-#define UNUSED
-#else
-#define UNUSED __attribute__((unused))
-#endif
+#define UNUSED_u2(x) { const u2 x = read_u2(); (void)x; } (void)0
 
 void java_bytecode_parsert::rClassFile()
 {
   parse_tree.loading_successful=false;
 
   u4 magic=read_u4();
-  u2 UNUSED minor_version=read_u2();
+  UNUSED_u2(minor_version);
   u2 major_version=read_u2();
 
   if(magic!=0xCAFEBABE)
@@ -1180,8 +1176,8 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
 
   if(attribute_name=="Code")
   {
-    u2 UNUSED max_stack=read_u2();
-    u2 UNUSED max_locals=read_u2();
+    UNUSED_u2(max_stack);
+    UNUSED_u2(max_locals);
 
     rbytecode(method.instructions);
 
@@ -1528,8 +1524,8 @@ void java_bytecode_parsert::relement_value_pair(
   {
   case 'e':
     {
-      UNUSED u2 type_name_index=read_u2();
-      UNUSED u2 const_name_index=read_u2();
+      UNUSED_u2(type_name_index);
+      UNUSED_u2(const_name_index);
       // todo: enum
     }
     break;
@@ -1613,7 +1609,7 @@ void java_bytecode_parsert::rinner_classes_attribute(
   {
     u2 inner_class_info_index = read_u2();
     u2 outer_class_info_index = read_u2();
-    UNUSED u2 inner_name_index = read_u2();
+    u2 inner_name_index = read_u2();
     u2 inner_class_access_flags = read_u2();
 
     std::string inner_class_info_name =
@@ -1622,6 +1618,7 @@ void java_bytecode_parsert::rinner_classes_attribute(
     bool is_private = (inner_class_access_flags & ACC_PRIVATE) != 0;
     bool is_public = (inner_class_access_flags & ACC_PUBLIC) != 0;
     bool is_protected = (inner_class_access_flags & ACC_PROTECTED) != 0;
+    bool is_static = (inner_class_access_flags & ACC_STATIC) != 0;
 
     // If the original parsed class name matches the inner class name,
     // the parsed class is an inner class, so overwrite the parsed class'
@@ -1632,6 +1629,10 @@ void java_bytecode_parsert::rinner_classes_attribute(
       parsed_class.is_inner_class = is_inner_class;
     if(!is_inner_class)
       continue;
+    parsed_class.is_static_class = is_static;
+    // This is a marker that a class is anonymous.
+    if(inner_name_index == 0)
+      parsed_class.is_anonymous_class = true;
     // Note that if outer_class_info_index == 0, the inner class is an anonymous
     // or local class, and is treated as private.
     if(outer_class_info_index == 0)
@@ -1642,6 +1643,11 @@ void java_bytecode_parsert::rinner_classes_attribute(
     }
     else
     {
+      std::string outer_class_info_name =
+        class_infot(pool_entry(outer_class_info_index))
+          .get_name(pool_entry_lambda);
+      parsed_class.outer_class =
+        constant(outer_class_info_index).type().get(ID_C_base_name);
       parsed_class.is_private = is_private;
       parsed_class.is_protected = is_protected;
       parsed_class.is_public = is_public;
@@ -1760,6 +1766,7 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   method.is_private=(access_flags&ACC_PRIVATE)!=0;
   method.is_synchronized=(access_flags&ACC_SYNCHRONIZED)!=0;
   method.is_native=(access_flags&ACC_NATIVE)!=0;
+  method.is_bridge = (access_flags & ACC_BRIDGE) != 0;
   method.name=pool_entry(name_index).s;
   method.base_name=pool_entry(name_index).s;
   method.descriptor=id2string(pool_entry(descriptor_index).s);
@@ -1774,7 +1781,7 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
     rmethod_attribute(method);
 }
 
-optionalt<class java_bytecode_parse_treet>
+optionalt<java_bytecode_parse_treet>
 java_bytecode_parse(std::istream &istream, message_handlert &message_handler)
 {
   java_bytecode_parsert java_bytecode_parser;
@@ -1791,7 +1798,7 @@ java_bytecode_parse(std::istream &istream, message_handlert &message_handler)
   return std::move(java_bytecode_parser.parse_tree);
 }
 
-optionalt<class java_bytecode_parse_treet>
+optionalt<java_bytecode_parse_treet>
 java_bytecode_parse(const std::string &file, message_handlert &message_handler)
 {
   std::ifstream in(file, std::ios::binary);

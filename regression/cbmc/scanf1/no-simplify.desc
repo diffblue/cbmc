@@ -1,0 +1,8 @@
+KNOWNBUG
+main.i
+--little-endian --no-simplify
+^EXIT=10$
+^SIGNAL=0$
+^\*\* 8 of 8 failed
+--
+^warning: ignoring

@@ -832,10 +832,10 @@ void jsil_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
   typecheck_expr(cond);
   make_type_compatible(cond, bool_typet(), true);
 
-  typecheck_code(to_code(code.then_case()));
+  typecheck_code(code.then_case());
 
   if(!code.else_case().is_nil())
-    typecheck_code(to_code(code.else_case()));
+    typecheck_code(code.else_case());
 }
 
 void jsil_typecheckt::typecheck_assign(code_assignt &code)

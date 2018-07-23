@@ -1,6 +1,6 @@
 CORE
 test_code_point.class
---refine-strings --verbosity 10 --string-max-length 1000 --function test_code_point.main
+--verbosity 10 --max-nondet-string-length 1000 --function test_code_point.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

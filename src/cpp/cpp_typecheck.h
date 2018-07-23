@@ -338,13 +338,10 @@ protected:
   };
 
   typedef std::list<method_bodyt> method_bodiest;
+  std::set<irep_idt> methods_seen;
   method_bodiest method_bodies;
 
-  void add_method_body(symbolt *_method_symbol)
-  {
-    method_bodies.push_back(method_bodyt(
-      _method_symbol, template_map, instantiation_stack));
-  }
+  void add_method_body(symbolt *_method_symbol);
 
   bool builtin_factory(const irep_idt &);
 
@@ -384,7 +381,7 @@ protected:
   void typecheck_compound_body(symbolt &symbol);
   void typecheck_compound_body(struct_union_typet &type) { UNREACHABLE; }
   void typecheck_enum_body(symbolt &symbol);
-  void typecheck_method_bodies(method_bodiest &);
+  void typecheck_method_bodies();
   void typecheck_compound_bases(struct_typet &type);
   void add_anonymous_members_to_scope(const symbolt &struct_union_symbol);
 
@@ -589,6 +586,8 @@ public:
     const typet &type,
     exprt &new_expr,
     bool check_constantness=true);
+
+  bool contains_cpp_name(const exprt &expr);
 
 private:
   typedef std::list<irep_idt> dynamic_initializationst;

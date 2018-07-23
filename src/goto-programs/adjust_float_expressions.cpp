@@ -20,9 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_model.h"
 
-static bool have_to_adjust_float_expressions(
-  const exprt &expr,
-  const namespacet &ns)
+static bool have_to_adjust_float_expressions(const exprt &expr)
 {
   if(expr.id()==ID_floatbv_plus ||
      expr.id()==ID_floatbv_minus ||
@@ -33,11 +31,11 @@ static bool have_to_adjust_float_expressions(
      expr.id()==ID_floatbv_typecast)
     return false;
 
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
-  if(type.id()==ID_floatbv ||
-     (type.id()==ID_complex &&
-      ns.follow(type.subtype()).id()==ID_floatbv))
+  if(
+    type.id() == ID_floatbv ||
+    (type.id() == ID_complex && type.subtype().id() == ID_floatbv))
   {
     if(expr.id()==ID_plus || expr.id()==ID_minus ||
        expr.id()==ID_mult || expr.id()==ID_div ||
@@ -69,7 +67,7 @@ static bool have_to_adjust_float_expressions(
   }
 
   forall_operands(it, expr)
-    if(have_to_adjust_float_expressions(*it, ns))
+    if(have_to_adjust_float_expressions(*it))
       return true;
 
   return false;
@@ -77,27 +75,21 @@ static bool have_to_adjust_float_expressions(
 
 /// This adds the rounding mode to floating-point operations, including those in
 /// vectors and complex numbers.
-void adjust_float_expressions(
-  exprt &expr,
-  const namespacet &ns)
+void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
 {
-  if(!have_to_adjust_float_expressions(expr, ns))
+  if(!have_to_adjust_float_expressions(expr))
     return;
 
-  Forall_operands(it, expr)
-    adjust_float_expressions(*it, ns);
+  // recursive call
+  for(auto &op : expr.operands())
+    adjust_float_expressions(op, rounding_mode);
 
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
-  if(type.id()==ID_floatbv ||
-     (type.id()==ID_complex &&
-      ns.follow(type.subtype()).id()==ID_floatbv))
+  if(
+    type.id() == ID_floatbv ||
+    (type.id() == ID_complex && type.subtype().id() == ID_floatbv))
   {
-    symbol_exprt rounding_mode=
-      ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
-
-    rounding_mode.add_source_location()=expr.source_location();
-
     if(expr.id()==ID_plus || expr.id()==ID_minus ||
        expr.id()==ID_mult || expr.id()==ID_div ||
        expr.id()==ID_rem)
@@ -127,11 +119,6 @@ void adjust_float_expressions(
 
     const typet &src_type=typecast_expr.op().type();
     const typet &dest_type=typecast_expr.type();
-
-    symbol_exprt rounding_mode=
-      ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
-
-    rounding_mode.add_source_location()=expr.source_location();
 
     if(dest_type.id()==ID_floatbv &&
        src_type.id()==ID_floatbv)
@@ -177,6 +164,21 @@ void adjust_float_expressions(
         from_integer(ieee_floatt::ROUND_TO_ZERO, rounding_mode.type());
     }
   }
+}
+
+/// This adds the rounding mode to floating-point operations, including those in
+/// vectors and complex numbers.
+void adjust_float_expressions(exprt &expr, const namespacet &ns)
+{
+  if(!have_to_adjust_float_expressions(expr))
+    return;
+
+  symbol_exprt rounding_mode =
+    ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
+
+  rounding_mode.add_source_location() = expr.source_location();
+
+  adjust_float_expressions(expr, rounding_mode);
 }
 
 void adjust_float_expressions(

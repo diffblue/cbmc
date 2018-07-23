@@ -121,6 +121,36 @@ class java_class_typet:public class_typet
     return set(ID_is_inner_class, is_inner_class);
   }
 
+  const irep_idt get_outer_class() const
+  {
+    return get(ID_outer_class);
+  }
+
+  void set_outer_class(irep_idt outer_class)
+  {
+    return set(ID_outer_class, outer_class);
+  }
+
+  const bool get_is_static_class() const
+  {
+    return get_bool(ID_is_static);
+  }
+
+  void set_is_static_class(const bool &is_static_class)
+  {
+    return set(ID_is_static, is_static_class);
+  }
+
+  const bool get_is_anonymous_class() const
+  {
+    return get_bool(ID_is_anonymous);
+  }
+
+  void set_is_anonymous_class(const bool &is_anonymous_class)
+  {
+    return set(ID_is_anonymous, is_anonymous_class);
+  }
+
   bool get_final()
   {
     return get_bool(ID_final);
@@ -215,7 +245,8 @@ reference_typet java_lang_object_type();
 symbol_typet java_classname(const std::string &);
 
 reference_typet java_array_type(const char subtype);
-typet java_array_element_type(const symbol_typet &array_type);
+const typet &java_array_element_type(const symbol_typet &array_symbol);
+typet &java_array_element_type(symbol_typet &array_symbol);
 
 bool is_reference_type(char t);
 

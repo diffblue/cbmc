@@ -54,19 +54,13 @@ cprover_clean:
 dist_clean:
 	rm -rf $(ROOT)dist
 
-# extended JBMC models download, for your convenience
-java-models-library-download:
-	@echo "Downloading java models library"
-	@wget https://github.com/diffblue/java-models-library/archive/master.zip -O java-models-library.zip
-	@unzip java-models-library.zip
-	@rm java-models-library.zip
-	@cp -r java-models-library-master/src java_bytecode/library
-	@rm -r java-models-library-master
+setup-submodules:
+	git submodule update --init
 
 .PHONY: dist
-dist: java-models-library-download all
+dist: setup-submodules all
 	mkdir -p $(ROOT)dist/lib
-	cp java_bytecode/library/core-models.jar $(ROOT)dist/lib
+	cp ../lib/java-models-library/target/core-models.jar $(ROOT)dist/lib
 	mkdir -p $(ROOT)dist/bin
 	cp jbmc/jbmc $(ROOT)dist/bin
 	cp janalyzer/janalyzer $(ROOT)dist/bin

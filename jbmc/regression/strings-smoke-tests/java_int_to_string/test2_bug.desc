@@ -1,6 +1,6 @@
 KNOWNBUG
 Test2.class
---refine-strings --verbosity 10 --function Test2.main
+--verbosity 10 --function Test2.main
 ^EXIT=10$
 ^SIGNAL=0$
 assertion.* line 7 .* SUCCESS$
@@ -8,5 +8,5 @@ assertion.* line 10 .* FAILURE$
 --
 non equal types
 --
-When string-max-length is not set, the solver can run out of memory in
+When max-nondet-string-length is not set, the solver can run out of memory in
 an unpredictable way.

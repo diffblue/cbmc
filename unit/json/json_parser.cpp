@@ -6,16 +6,30 @@
 
 \*******************************************************************/
 
+#include <fstream>
 #include <json/json_parser.h>
 #include <testing-utils/catch.hpp>
 #include <testing-utils/message.h>
+#include <util/tempfile.h>
 
 SCENARIO("Loading JSON files")
 {
   GIVEN("A invalid JSON file and a valid JSON file")
   {
-    const std::string valid_json_path = "./json/valid.json";
-    const std::string invalid_json_path = "./json/invalid.json";
+    temporary_filet valid_json_file("cbmc_unit_json_parser_valid", ".json");
+    temporary_filet invalid_json_file("cbmc_unit_json_parser_invalid", ".json");
+    const std::string valid_json_path = valid_json_file();
+    const std::string invalid_json_path = invalid_json_file();
+    {
+      std::ofstream valid_json_out(valid_json_path);
+      valid_json_out << "{\n"
+                     << "  \"hello\": \"world\"\n"
+                     << "}\n";
+    }
+    {
+      std::ofstream invalid_json_out(invalid_json_path);
+      invalid_json_out << "foo\n";
+    }
 
     WHEN("Loading the invalid JSON file")
     {

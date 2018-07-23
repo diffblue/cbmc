@@ -150,7 +150,6 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_DESTRUCTOR "destructor"
 %token TOK_GCC_ATTRIBUTE_FALLTHROUGH "fallthrough"
 %token TOK_GCC_ATTRIBUTE_USED "used"
-%token TOK_GCC_ATTRIBUTE_ALWAYS_INLINE "always_inline"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
 %token TOK_MSC_BASED   "__based"
@@ -165,6 +164,7 @@ extern char *yyansi_ctext;
 %token TOK_MSC_EXCEPT  "__except"
 %token TOK_MSC_LEAVE   "__leave"
 %token TOK_MSC_DECLSPEC "__declspec"
+%token TOK_MSC_FORCEINLINE "__forceinline"
 %token TOK_INTERFACE   "__interface"
 %token TOK_CDECL       "__cdecl"
 %token TOK_STDCALL     "__stdcall"
@@ -1385,6 +1385,25 @@ storage_class:
         | TOK_THREAD_LOCAL { $$=$1; set($$, ID_thread_local); }
         | TOK_GCC_ASM      { $$=$1; set($$, ID_asm); }
         | msc_declspec     { $$=$1; }
+        | TOK_MSC_FORCEINLINE
+        {
+          // equivalent to always_inline, and seemingly also has the semantics
+          // of extern inline in that multiple definitions can be provided in
+          // the same translation unit
+          init($$);
+          set($$, ID_static);
+          set($1, ID_inline);
+          #if 0
+          // enable once always_inline support is reinstantiated
+          $1=merge($1, $$);
+
+          init($$);
+          set($$, ID_always_inline);
+          $$=merge($1, $$);
+          #else
+          $$=merge($1, $$);
+          #endif
+        }
         ;
 
 basic_type_name:
@@ -1548,8 +1567,6 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_destructor); }
         | TOK_GCC_ATTRIBUTE_USED
         { $$=$1; set($$, ID_used); }
-        | TOK_GCC_ATTRIBUTE_ALWAYS_INLINE
-        { $$=$1; set($$, ID_always_inline); }
         ;
 
 gcc_attribute:

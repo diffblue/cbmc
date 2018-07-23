@@ -15,7 +15,7 @@ phases:
     commands:
       - echo Build started on `date`
       - make -C src minisat2-download
-      - make -C jbmc/src java-models-library-download
+      - make -C jbmc/src setup-submodules
       - make -C src CXX="ccache g++" -j2
       - make -C unit CXX="ccache g++" -j2
       - make -C jbmc/src CXX="ccache g++" -j2

@@ -54,7 +54,8 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
     const symbol_exprt qvar = fresh_univ_index("QA_isprefix", index_type);
     const exprt body = implies_exprt(
       isprefix, equal_exprt(str[plus_exprt(qvar, offset)], prefix[qvar]));
-    return string_constraintt(qvar, prefix.length(), body);
+    return string_constraintt(
+      qvar, maximum(from_integer(0, index_type), prefix.length()), body);
   }());
 
   // Axiom 3.
@@ -95,8 +96,10 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   PRECONDITION(args.size() == 2 || args.size() == 3);
-  const array_string_exprt &s0 = get_string_expr(args[swap_arguments ? 1 : 0]);
-  const array_string_exprt &s1 = get_string_expr(args[swap_arguments ? 0 : 1]);
+  const array_string_exprt &s0 =
+    get_string_expr(args[swap_arguments ? 1u : 0u]);
+  const array_string_exprt &s1 =
+    get_string_expr(args[swap_arguments ? 0u : 1u]);
   const exprt offset =
     args.size() == 2 ? from_integer(0, s0.length().type()) : args[2];
   return typecast_exprt(add_axioms_for_is_prefix(s0, s1, offset), f.type());
@@ -154,8 +157,10 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
 
   symbol_exprt issuffix=fresh_boolean("issuffix");
   typecast_exprt tc_issuffix(issuffix, f.type());
-  const array_string_exprt &s0 = get_string_expr(args[swap_arguments ? 1 : 0]);
-  const array_string_exprt &s1 = get_string_expr(args[swap_arguments ? 0 : 1]);
+  const array_string_exprt &s0 =
+    get_string_expr(args[swap_arguments ? 1u : 0u]);
+  const array_string_exprt &s1 =
+    get_string_expr(args[swap_arguments ? 0u : 1u]);
   const typet &index_type=s0.length().type();
 
   implies_exprt a1(issuffix, s1.axiom_for_length_ge(s0.length()));
@@ -165,7 +170,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   const plus_exprt qvar_shifted(qvar, minus_exprt(s1.length(), s0.length()));
   string_constraintt a2(
     qvar,
-    s0.length(),
+    zero_if_negative(s0.length()),
     implies_exprt(issuffix, equal_exprt(s0[qvar], s1[qvar_shifted])));
   constraints.push_back(a2);
 
@@ -235,7 +240,7 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   const plus_exprt qvar_shifted(qvar, startpos);
   string_constraintt a4(
     qvar,
-    s1.length(),
+    zero_if_negative(s1.length()),
     implies_exprt(contains, equal_exprt(s1[qvar], s0[qvar_shifted])));
   constraints.push_back(a4);
 

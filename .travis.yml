@@ -229,6 +229,7 @@ jobs:
         - ccache -z
         - ccache --max-size=1G
         - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++-5'
+        - git submodule update --init --recursive
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE -j2)
 
@@ -254,6 +255,7 @@ jobs:
         - ccache -z
         - ccache --max-size=1G
         - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++-7'
+        - git submodule update --init --recursive
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE -j2)
 
@@ -287,6 +289,7 @@ jobs:
         - ccache -z
         - ccache --max-size=1G
         - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/clang++-6.0' '-DCMAKE_CXX_FLAGS=-Qunused-arguments'
+        - git submodule update --init --recursive
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE -j2)
 
@@ -305,6 +308,7 @@ jobs:
         - ccache -z
         - ccache --max-size=1G
         - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_OSX_ARCHITECTURES=x86_64'
+        - git submodule update --init --recursive
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE -j2)
 
@@ -328,7 +332,7 @@ jobs:
             name: "diffblue/cbmc"
             description: "Travis build of ${TRAVIS_COMMIT}"
           notification_email: "coverity-scan@diffblue.com"
-          build_command_prepend: "make -C jbmc/src java-models-library-download"
+          build_command_prepend: "make -C jbmc/src setup-submodules"
           build_command_prepend: "make -C src minisat2-download"
           build_command: "make -C src -j2; make -C jbmc/src -j2"
           branch_pattern: "develop"
@@ -349,7 +353,7 @@ jobs:
 install:
   - ccache -z
   - ccache --max-size=1G
-  - make -C jbmc/src java-models-library-download
+  - make -C jbmc/src setup-submodules
   - make -C src minisat2-download
   - make -C src/ansi-c library_check
   - make -C src/cpp library_check

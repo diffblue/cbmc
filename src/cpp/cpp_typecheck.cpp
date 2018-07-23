@@ -54,6 +54,8 @@ void cpp_typecheckt::typecheck()
   for(auto &item : cpp_parse_tree.items)
     convert(item);
 
+  typecheck_method_bodies();
+
   static_and_dynamic_initialization();
 
   do_not_typechecked();
@@ -277,7 +279,12 @@ void cpp_typecheckt::clean_up()
     const symbolt &symbol=cur_it->second;
 
     // erase templates
-    if(symbol.type.get_bool(ID_is_template))
+    if(symbol.type.get_bool(ID_is_template) ||
+       // Remove all symbols that have not been converted.
+       //   In particular this includes symbols created for functions
+       //   during template instantiation that are never called,
+       //   and hence, their bodies have not been converted.
+       contains_cpp_name(symbol.value))
     {
       symbol_table.erase(cur_it);
       continue;
@@ -326,4 +333,14 @@ void cpp_typecheckt::clean_up()
 bool cpp_typecheckt::builtin_factory(const irep_idt &identifier)
 {
   return ::builtin_factory(identifier, symbol_table, get_message_handler());
+}
+
+bool cpp_typecheckt::contains_cpp_name(const exprt &expr)
+{
+  if(expr.id() == ID_cpp_name || expr.id() == ID_cpp_declaration)
+    return true;
+  forall_operands(it, expr)
+    if(contains_cpp_name(*it))
+      return true;
+  return false;
 }

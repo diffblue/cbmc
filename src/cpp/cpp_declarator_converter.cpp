@@ -346,9 +346,6 @@ void cpp_declarator_convertert::handle_initializer(
     // no initial value yet
     symbol.value.swap(value);
 
-    if(is_code && declarator.type().id()!=ID_template)
-      cpp_typecheck.add_method_body(&symbol);
-
     if(!is_code)
       cpp_typecheck.convert_initializer(symbol);
   }

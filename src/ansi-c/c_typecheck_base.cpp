@@ -333,10 +333,12 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         // gcc allows re-definition if the first
         // definition is marked as "extern inline"
 
-        if(old_symbol.type.get_bool(ID_C_inlined) &&
-           (config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
-            config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE ||
-            config.ansi_c.mode==configt::ansi_ct::flavourt::ARM))
+        if(
+          old_symbol.type.get_bool(ID_C_inlined) &&
+          (config.ansi_c.mode == configt::ansi_ct::flavourt::GCC ||
+           config.ansi_c.mode == configt::ansi_ct::flavourt::APPLE ||
+           config.ansi_c.mode == configt::ansi_ct::flavourt::ARM ||
+           config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO))
         {
           // overwrite "extern inline" properties
           old_symbol.is_extern=new_symbol.is_extern;
@@ -689,7 +691,6 @@ void c_typecheck_baset::typecheck_declaration(
       declaration.set_is_typedef(full_spec.is_typedef);
       declaration.set_is_weak(full_spec.is_weak);
       declaration.set_is_used(full_spec.is_used);
-      declaration.set_is_always_inline(full_spec.is_always_inline);
 
       symbolt symbol;
       declaration.to_symbol(*d_it, symbol);

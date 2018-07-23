@@ -31,9 +31,13 @@ void constant_propagator_domaint::assign_rec(
   valuest &values,
   const exprt &lhs,
   const exprt &rhs,
-  const namespacet &ns)
+  const namespacet &ns,
+  const constant_propagator_ait *cp)
 {
   if(lhs.id()!=ID_symbol)
+    return;
+
+  if(cp && !cp->should_track_value(lhs, ns))
     return;
 
   const symbol_exprt &s=to_symbol_expr(lhs);
@@ -89,11 +93,11 @@ void constant_propagator_domaint::transform(
     const code_assignt &assignment=to_code_assign(from->code);
     const exprt &lhs=assignment.lhs();
     const exprt &rhs=assignment.rhs();
-    assign_rec(values, lhs, rhs, ns);
+    assign_rec(values, lhs, rhs, ns, cp);
   }
   else if(from->is_assume())
   {
-    two_way_propagate_rec(from->guard, ns);
+    two_way_propagate_rec(from->guard, ns, cp);
   }
   else if(from->is_goto())
   {
@@ -110,7 +114,7 @@ void constant_propagator_domaint::transform(
      values.set_to_bottom();
     else
     {
-      two_way_propagate_rec(g, ns);
+      two_way_propagate_rec(g, ns, cp);
       // If two way propagate is enabled then it may be possible to detect
       // that the branch condition is infeasible and thus the domain should
       // be set to bottom.  Without it the domain will only be set to bottom
@@ -175,7 +179,7 @@ void constant_propagator_domaint::transform(
             break;
 
           const symbol_exprt parameter_expr(p_it->get_identifier(), arg.type());
-          assign_rec(values, parameter_expr, arg, ns);
+          assign_rec(values, parameter_expr, arg, ns, cp);
 
           ++p_it;
         }
@@ -220,7 +224,8 @@ void constant_propagator_domaint::transform(
 /// handles equalities and conjunctions containing equalities
 bool constant_propagator_domaint::two_way_propagate_rec(
   const exprt &expr,
-  const namespacet &ns)
+  const namespacet &ns,
+  const constant_propagator_ait *cp)
 {
 #ifdef DEBUG
   std::cout << "two_way_propagate_rec: " << format(expr) << '\n';
@@ -238,7 +243,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
       change = false;
 
       forall_operands(it, expr)
-        if(two_way_propagate_rec(*it, ns))
+        if(two_way_propagate_rec(*it, ns, cp))
           change=true;
     }
     while(change);

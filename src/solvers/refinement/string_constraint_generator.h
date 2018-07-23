@@ -365,7 +365,6 @@ private:
     const exprt &radix,
     const unsigned long radix_ul);
   void add_axioms_for_correct_number_format(
-    const exprt &input_int,
     const array_string_exprt &str,
     const exprt &radix_as_char,
     const unsigned long radix_ul,
@@ -457,7 +456,7 @@ exprt length_constraint_for_concat_substr(
 exprt length_constraint_for_insert(
   const array_string_exprt &res,
   const array_string_exprt &s1,
-  const array_string_exprt &s2,
-  const exprt &offset);
+  const array_string_exprt &s2);
 
+exprt zero_if_negative(const exprt &expr);
 #endif

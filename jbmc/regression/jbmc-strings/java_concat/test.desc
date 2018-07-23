@@ -1,6 +1,6 @@
 CORE
 test_concat.class
---refine-strings --string-max-length 1000 --function test_concat.main
+--max-nondet-string-length 1000 --function test_concat.main
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 10.* SUCCESS$

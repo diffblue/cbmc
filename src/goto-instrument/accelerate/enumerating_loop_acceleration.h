@@ -20,14 +20,13 @@ Author: Matt Lewis
 
 #include <analyses/natural_loops.h>
 
-#include "loop_acceleration.h"
 #include "polynomial_accelerator.h"
 #include "path_enumerator.h"
 #include "all_paths_enumerator.h"
 #include "sat_path_enumerator.h"
 
 
-class enumerating_loop_accelerationt:public loop_accelerationt
+class enumerating_loop_accelerationt
 {
 public:
   enumerating_loop_accelerationt(
@@ -56,7 +55,7 @@ public:
   {
   }
 
-  virtual bool accelerate(path_acceleratort &accelerator);
+  bool accelerate(path_acceleratort &accelerator);
 
 protected:
   symbol_tablet &symbol_table;

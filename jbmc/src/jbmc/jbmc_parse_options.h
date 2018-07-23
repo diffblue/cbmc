@@ -47,18 +47,17 @@ class optionst;
   "(document-subgoals)(outfile):" \
   "(object-bits):" \
   "(classpath):(cp):(main-class):" \
-  OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
-  "(no-built-in-assertions)" \
   "(xml-ui)(json-ui)" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \
   "(no-sat-preprocessor)" \
   "(beautify)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
-  "(refine-strings)" \
+  "(refine-strings)" /* will go away */ \
+  "(no-refine-strings)" \
   "(string-printable)" \
-  "(string-max-length):" \
-  "(string-max-input-length):" \
+  "(string-max-input-length):" /* will go away */ \
+  "(max-nondet-string-length):" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_CLASS_HIERARCHY \
@@ -97,6 +96,12 @@ public:
     int argc,
     const char **argv,
     const std::string &extra_options);
+
+  /// \brief Set the options that have default values
+  ///
+  /// This function can be called from clients that wish to emulate JBMC's
+  /// default behaviour, for example unit tests.
+  static void set_default_options(optionst &);
 
   void process_goto_function(
     goto_model_functiont &function,
