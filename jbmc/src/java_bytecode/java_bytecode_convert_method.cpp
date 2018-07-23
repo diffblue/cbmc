@@ -587,6 +587,10 @@ void java_bytecode_convert_methodt::convert(
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
 
+  std::vector<irept> &exceptions_list = code_type.throws_exceptions();
+  for(const auto &exception_name : m.throws_exception_table)
+    exceptions_list.push_back(irept(exception_name));
+
   const std::string signature_string = pretty_signature(code_type);
 
   // Set up the pretty name for the method entry in the symbol table.
