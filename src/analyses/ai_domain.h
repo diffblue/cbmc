@@ -19,16 +19,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_model.h>
 
-// forward reference
+// forward reference the abstract interpreter interface
 class ai_baset;
 
+/// The interface offered by a domain, allows code to manipulate domains without
+/// knowing their exact type.
 // don't use me -- I am just a base class
 // please derive from me
 class ai_domain_baset
 {
 public:
-  // The constructor is expected to produce 'false'
-  // or 'bottom'
+  // The constructor is expected to produce 'false' or 'bottom'
   ai_domain_baset()
   {
   }
@@ -100,6 +101,7 @@ public:
   //
   // PRECONDITION(from.is_dereferenceable(), "Must not be _::end()")
   // PRECONDITION(to.is_dereferenceable(), "Must not be _::end()")
+
 
   // This method allows an expression to be simplified / evaluated using the
   // current state.  It is used to evaluate assertions and in program
