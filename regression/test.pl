@@ -392,7 +392,13 @@ if($opt_j>1 && $has_thread_pool && $count>1)
   );
 }
 
-print "Running tests\n";
+if ($log_suffix) {
+  print "Running tests with log suffix: $log_suffix\n";
+}
+else
+{
+  print "Running tests\n";
+}
 foreach my $test (@tests) {
   if(defined($pool))
   {
