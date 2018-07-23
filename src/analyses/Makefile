@@ -1,5 +1,6 @@
 SRC = ai.cpp \
       ai_domain.cpp \
+      ai_history.cpp \
       call_graph.cpp \
       call_graph_helpers.cpp \
       constant_propagator.cpp \
