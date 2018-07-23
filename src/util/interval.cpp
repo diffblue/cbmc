@@ -1637,11 +1637,23 @@ constant_interval_exprt::typecast(const typet &type) const
   }
   else
   {
-    exprt lower = get_lower();
-    lower.type() = type;
+    auto do_typecast = [&type](exprt e) {
+      if(e.id() == ID_min || e.id() == ID_max)
+      {
+        e.type() = type;
+      }
+      else
+      {
+        e = simplified_expr(typecast_exprt(e, type));
+      }
+      return e;
+    };
 
-    exprt upper = get_upper();
-    upper.type() = type;
+    exprt lower = do_typecast(get_lower());
+    POSTCONDITION(lower.id() == get_lower().id());
+
+    exprt upper = do_typecast(get_upper());
+    POSTCONDITION(upper.id() == get_upper().id());
 
     return constant_interval_exprt(lower, upper, type);
   }
