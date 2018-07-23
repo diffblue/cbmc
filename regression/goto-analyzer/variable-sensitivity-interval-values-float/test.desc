@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --variable-sensitivity --interval-values --show
 main::1::zero \(\) -> \[00000000000000000000000000000000, 00000000000000000000000000000000\]
