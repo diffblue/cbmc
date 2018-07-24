@@ -260,6 +260,13 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
+  // The most basic step, computing one edge / transformer application.
+  bool visit_edge(
+    locationt l,
+    working_sett &working_set,
+    const locationt &to_l,
+    const namespacet &ns);
+
   // function calls
   bool do_function_call_rec(
     locationt l_call, locationt l_return,
