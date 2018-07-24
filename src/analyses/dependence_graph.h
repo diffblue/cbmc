@@ -242,6 +242,10 @@ public:
   {
     ait<dep_graph_domaint>::initialize(function, goto_program);
 
+    // The dependency graph requires that all nodes are explicitly created
+    forall_goto_program_instructions(i_it, goto_program)
+      get_state(i_it).make_bottom();
+
     if(!goto_program.empty())
     {
       cfg_post_dominatorst &pd = post_dominators[function];
