@@ -610,7 +610,8 @@ SCENARIO(
           new_symbol_table.lookup_ref("java::ThrowsExceptions");
         const symbolt &method_symbol =
           new_symbol_table.lookup_ref("java::ThrowsExceptions.test:()V");
-        const code_typet method = to_code_type(method_symbol.type);
+        const java_method_typet method =
+          to_java_method_type(method_symbol.type);
         const std::vector<irept> exceptions = method.throws_exceptions();
         REQUIRE(exceptions.size() == 2);
         REQUIRE(

@@ -242,6 +242,32 @@ inline bool can_cast_type<java_class_typet>(const typet &type)
   return can_cast_type<class_typet>(type);
 }
 
+class java_method_typet : public code_typet
+{
+public:
+  const std::vector<irept> &throws_exceptions() const
+  {
+    return find(ID_exceptions_thrown_list).get_sub();
+  }
+
+  std::vector<irept> &throws_exceptions()
+  {
+    return add(ID_exceptions_thrown_list).get_sub();
+  }
+};
+
+inline const java_method_typet &to_java_method_type(const typet &type)
+{
+  PRECONDITION(type.id() == ID_code);
+  return static_cast<const java_method_typet &>(type);
+}
+
+inline java_method_typet &to_java_method_type(typet &type)
+{
+  PRECONDITION(type.id() == ID_code);
+  return static_cast<java_method_typet &>(type);
+}
+
 typet java_int_type();
 typet java_long_type();
 typet java_short_type();
