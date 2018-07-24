@@ -247,20 +247,30 @@ void trace_value(
 
 void show_state_header(
   std::ostream &out,
+  const namespacet &ns,
   const goto_trace_stept &state,
   const source_locationt &source_location,
-  unsigned step_nr)
+  unsigned step_nr,
+  const trace_optionst &options)
 {
   out << "\n";
 
-  if(step_nr==0)
+  if(step_nr == 0)
     out << "Initial State";
   else
     out << "State " << step_nr;
 
-  out << " " << source_location
-      << " thread " << state.thread_nr << "\n";
-  out << "----------------------------------------------------" << "\n";
+  out << " " << source_location << " thread " << state.thread_nr << "\n";
+  out << "----------------------------------------------------"
+      << "\n";
+
+  if(options.show_code)
+  {
+    out << as_string(ns, *state.pc)
+        << "\n";
+    out << "----------------------------------------------------"
+        << "\n";
+  }
 }
 
 bool is_index_member_symbol(const exprt &src)
@@ -283,6 +293,7 @@ void show_goto_trace(
 {
   unsigned prev_step_nr=0;
   bool first_step=true;
+  std::size_t function_depth=0;
 
   for(const auto &step : goto_trace.steps)
   {
@@ -341,7 +352,8 @@ void show_goto_trace(
         {
           first_step=false;
           prev_step_nr=step.step_nr;
-          show_state_header(out, step, step.pc->source_location, step.step_nr);
+          show_state_header(
+            out, ns, step, step.pc->source_location, step.step_nr, options);
         }
 
         // see if the full lhs is something clean
@@ -369,7 +381,8 @@ void show_goto_trace(
       {
         first_step=false;
         prev_step_nr=step.step_nr;
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
+        show_state_header(
+          out, ns, step, step.pc->source_location, step.step_nr, options);
       }
 
       trace_value(
@@ -386,7 +399,8 @@ void show_goto_trace(
       }
       else
       {
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
+        show_state_header(
+          out, ns, step, step.pc->source_location, step.step_nr, options);
         out << "  OUTPUT " << step.io_id << ":";
 
         for(std::list<exprt>::const_iterator
@@ -407,7 +421,8 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::INPUT:
-      show_state_header(out, step, step.pc->source_location, step.step_nr);
+      show_state_header(
+        out, ns, step, step.pc->source_location, step.step_nr, options);
       out << "  INPUT " << step.io_id << ":";
 
       for(std::list<exprt>::const_iterator
@@ -427,7 +442,17 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::FUNCTION_CALL:
+      function_depth++;
+      if(options.show_function_calls)
+        out << "\n#### Function call: " << step.identifier << " (depth "
+            << function_depth << ") ####\n";
+      break;
     case goto_trace_stept::typet::FUNCTION_RETURN:
+      function_depth--;
+      if(options.show_function_calls)
+        out << "\n#### Function return: " << step.identifier << " (depth "
+            << function_depth << ") ####\n";
+      break;
     case goto_trace_stept::typet::SPAWN:
     case goto_trace_stept::typet::MEMORY_BARRIER:
     case goto_trace_stept::typet::ATOMIC_BEGIN:

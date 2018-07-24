@@ -1,0 +1,19 @@
+CORE
+main.c
+--trace --trace-show-code
+^EXIT=10$
+^SIGNAL=0$
+local = 1
+int a
+int c
+unsigned int b
+a = 0;
+c = -100;
+function_to_call\(a\)
+function_to_call\(c\)
+a = return_value_function_to_call \+ return_value_function_to_call
+function_to_call\(\(signed int\)b\)
+b = \(unsigned int\)return_value_function_to_call
+^VERIFICATION FAILED$
+--
+^warning: ignoring
