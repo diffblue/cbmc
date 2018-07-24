@@ -23,17 +23,16 @@ Author: Daniel Kroening, kroening@kroening.com
 class ai_baset;
 
 /// The interface offered by a domain, allows code to manipulate domains without
-/// knowing their exact type.
-// don't use me -- I am just a base class
-// please derive from me
+/// knowing their exact type.  Derive from this to implement domains.
 class ai_domain_baset
 {
-public:
+protected:
   // The constructor is expected to produce 'false' or 'bottom'
   ai_domain_baset()
   {
   }
 
+public:
   virtual ~ai_domain_baset()
   {
   }
