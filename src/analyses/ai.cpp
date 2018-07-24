@@ -303,6 +303,35 @@ bool ai_baset::visit(
   return new_data;
 }
 
+bool ai_baset::visit_edge(
+  const irep_idt &function_id,
+  locationt l,
+  const irep_idt &to_function_id,
+  const locationt &to_l,
+  const namespacet &ns,
+  working_sett &working_set)
+{
+  // Abstract domains are mutable so we must copy before we transform
+  statet &current = get_state(l);
+
+  std::unique_ptr<statet> tmp_state(make_temporary_state(current));
+  statet &new_values = *tmp_state;
+
+  // Apply transformer
+  new_values.transform(function_id, l, to_function_id, to_l, *this, ns);
+
+  // Initialize state(s), if necessary
+  get_state(to_l);
+
+  if(merge(new_values, l, to_l))
+  {
+    put_in_working_set(working_set, to_l);
+    return true;
+  }
+
+  return false;
+}
+
 bool ai_baset::do_function_call(
   const irep_idt &calling_function_id,
   locationt l_call,

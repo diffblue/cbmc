@@ -313,6 +313,15 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
+  // The most basic step, computing one edge / transformer application.
+  bool visit_edge(
+    const irep_idt &function_id,
+    locationt l,
+    const irep_idt &to_function_id,
+    const locationt &to_l,
+    const namespacet &ns,
+    working_sett &working_set);
+
   // function calls
   bool do_function_call_rec(
     const irep_idt &calling_function_id,
