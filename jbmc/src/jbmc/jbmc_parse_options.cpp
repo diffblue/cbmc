@@ -499,9 +499,11 @@ int jbmc_parse_optionst::doit()
       ? std::stoul(cmdline.get_value("java-max-input-array-length"))
       : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
   object_factory_params.max_nondet_string_length =
-    cmdline.isset("string-max-input-length")
-      ? std::stoul(cmdline.get_value("string-max-input-length"))
-      : MAX_NONDET_STRING_LENGTH;
+    cmdline.isset("max-nondet-string-length")
+      ? std::stoul(cmdline.get_value("max-nondet-string-length"))
+      : cmdline.isset("string-max-input-length") // obsolete; will go away
+        ? std::stoul(cmdline.get_value("string-max-input-length"))
+        : MAX_NONDET_STRING_LENGTH;
   object_factory_params.max_nondet_tree_depth =
     cmdline.isset("java-max-input-tree-depth")
       ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))

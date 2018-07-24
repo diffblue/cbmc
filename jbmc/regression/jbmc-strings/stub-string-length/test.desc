@@ -1,0 +1,6 @@
+CORE
+Test.class
+--function Test.main --max-nondet-string-length 10
+VERIFICATION SUCCESSFUL
+EXIT=0
+SIGNAL=0
