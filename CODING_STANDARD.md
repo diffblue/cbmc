@@ -194,6 +194,12 @@ Formatting is enforced using clang-format. For more information about this, see
   which safely manages the pointer. As such, `new` should only be used in
   constructors, and `delete` in destructors. Never use `malloc` or `free`.
 
+# CProver conventions
+- Avoid if at all possible using irept methods like `get(ID_name)`, instead cast
+  to a derived type (e.g. `class_typet`) and use the wrapper method `get_name`
+- Use `can_cast_type`/`can_cast_expr` instead of directly checking the `id()`
+  of an `irept`.
+
 # Architecture-specific code
 - Avoid if possible.
 - Use `__LINUX__`, `__MACH__`, and `_WIN32` to distinguish the architectures.
