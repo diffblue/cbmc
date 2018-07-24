@@ -8,7 +8,6 @@ Date:
 
 \*******************************************************************/
 
-
 #include "get_base_name.h"
 
 /// cleans a filename from path and extension
@@ -16,23 +15,24 @@ Date:
 /// \return a new string
 std::string get_base_name(const std::string &in, bool strip_suffix)
 {
-  size_t r=std::string::npos;
+#ifdef _WIN32
+  // Windows now allows both '/' and '\\'
+  const std::size_t slash_pos = in.find_last_of("\\/");
+#else
+  const std::size_t slash_pos = in.rfind('/');
+#endif
+
+  std::size_t start_pos =
+    (slash_pos == std::string::npos) ? 0 : slash_pos + 1;
+
+  std::size_t char_count = std::string::npos;
+
   if(strip_suffix)
-    r=in.rfind('.', in.length()-1);
-  if(r==std::string::npos)
-    r=in.length();
+  {
+    std::size_t dot_pos = in.rfind('.');
+    if(dot_pos != std::string::npos && dot_pos >= start_pos)
+      char_count = dot_pos - start_pos;
+  }
 
-  size_t f=in.rfind('/', in.length()-1);
-  if(f==std::string::npos)
-    f=0;
-
-  size_t fw=in.rfind('\\', in.length()-1);
-  if(fw==std::string::npos)
-    fw=0;
-
-  f = (fw>f)?fw:f;
-
-  if(in[f]=='/' || in[f]=='\\')
-    f++;
-  return in.substr(f, r-f);
+  return std::string(in, start_pos, char_count);
 }
