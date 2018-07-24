@@ -503,7 +503,7 @@ void java_bytecode_parsert::rClassFile()
     constant(this_class).type().get(ID_C_base_name);
 
   if(super_class!=0)
-    parsed_class.extends=
+    parsed_class.super_class=
       constant(super_class).type().get(ID_C_base_name);
 
   rinterfaces(parsed_class);

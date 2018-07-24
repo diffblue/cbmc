@@ -38,8 +38,8 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
   }
 
   out << "class " << name;
-  if(!extends.empty())
-    out << " extends " << extends;
+  if(!super_class.empty())
+    out << " extends " << super_class;
   out << " {" << '\n';
 
   for(fieldst::const_iterator

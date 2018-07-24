@@ -197,7 +197,7 @@ struct java_bytecode_parse_treet
     classt &operator=(classt &&) = default;
     #endif
 
-    irep_idt name, extends;
+    irep_idt name, super_class;
     bool is_abstract=false;
     bool is_enum=false;
     bool is_public=false, is_protected=false, is_private=false;

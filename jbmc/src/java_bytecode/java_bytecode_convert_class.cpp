@@ -303,9 +303,9 @@ void java_bytecode_convert_classt::convert(
   else
     class_type.set_access(ID_default);
 
-  if(!c.extends.empty())
+  if(!c.super_class.empty())
   {
-    const symbol_typet base("java::" + id2string(c.extends));
+    const symbol_typet base("java::" + id2string(c.super_class));
 
     // if the superclass is generic then the class has the superclass reference
     // including the generic info in its signature
@@ -323,7 +323,7 @@ void java_bytecode_convert_classt::convert(
       }
       catch(const unsupported_java_class_signature_exceptiont &e)
       {
-        warning() << "Superclass: " << c.extends << " of class: " << c.name
+        warning() << "Superclass: " << c.super_class << " of class: " << c.name
                   << "\n could not parse signature: " << superclass_ref.value()
                   << "\n " << e.what()
                   << "\n ignoring that the superclass is generic" << eom;
@@ -336,9 +336,9 @@ void java_bytecode_convert_classt::convert(
     }
     class_typet::componentt base_class_field;
     base_class_field.type() = class_type.bases().at(0).type();
-    base_class_field.set_name("@"+id2string(c.extends));
-    base_class_field.set_base_name("@"+id2string(c.extends));
-    base_class_field.set_pretty_name("@"+id2string(c.extends));
+    base_class_field.set_name("@" + id2string(c.super_class));
+    base_class_field.set_base_name("@" + id2string(c.super_class));
+    base_class_field.set_pretty_name("@" + id2string(c.super_class));
     class_type.components().push_back(base_class_field);
   }
 
@@ -561,7 +561,7 @@ void java_bytecode_convert_classt::convert(
   }
 
   // is this a root class?
-  if(c.extends.empty())
+  if(c.super_class.empty())
     java_root_class(*class_symbol);
 }
 
