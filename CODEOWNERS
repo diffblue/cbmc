@@ -48,12 +48,12 @@
 
 # These files change frequently and changes are low-risk
 
-/src/util/irep_ids.def @diffblue/cbmc-developers
+/src/util/irep_ids.def
 
-/unit/ @diffblue/cbmc-developers
-/regression/ @diffblue/cbmc-developers
-/jbmc/unit/ @diffblue/cbmc-developers
-/jbmc/regression/ @diffblue/cbmc-developers
+/unit/
+/regression/
+/jbmc/unit/
+/jbmc/regression/
 
 /scripts/ @diffblue/devops @thk123 @forejtv @peterschrammel
 /.travis.yml @diffblue/devops @thk123 @forejtv @peterschrammel
