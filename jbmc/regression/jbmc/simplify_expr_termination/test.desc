@@ -1,0 +1,10 @@
+CORE
+test.class
+--function test.check
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Checks that a non-termination bug no longer occurs in simplify_byte_extract

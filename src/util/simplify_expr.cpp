@@ -1593,7 +1593,7 @@ exprt simplify_exprt::bits2expr(
   return nil_exprt();
 }
 
-std::string simplify_exprt::expr2bits(
+optionalt<std::string> simplify_exprt::expr2bits(
   const exprt &expr,
   bool little_endian)
 {
@@ -1630,11 +1630,12 @@ std::string simplify_exprt::expr2bits(
     std::string result;
     forall_operands(it, expr)
     {
-      std::string tmp=expr2bits(*it, little_endian);
-      if(tmp.empty())
-        return tmp; // failed
-      result+=tmp;
+      auto tmp=expr2bits(*it, little_endian);
+      if(!tmp.has_value())
+        return {}; // failed
+      result+=tmp.value();
     }
+
     return result;
   }
   else if(expr.id()==ID_array)
@@ -1642,15 +1643,16 @@ std::string simplify_exprt::expr2bits(
     std::string result;
     forall_operands(it, expr)
     {
-      std::string tmp=expr2bits(*it, little_endian);
-      if(tmp.empty())
-        return tmp; // failed
-      result+=tmp;
+      auto tmp=expr2bits(*it, little_endian);
+      if(!tmp.has_value())
+        return {}; // failed
+      result+=tmp.value();
     }
+
     return result;
   }
 
-  return "";
+  return {};
 }
 
 bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
@@ -1734,11 +1736,18 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
     return true;
 
   if(expr.op().id()==ID_array_of &&
-     expr.op().op0().id()==ID_constant)
+     to_array_of_expr(expr.op()).op().id()==ID_constant)
   {
-    std::string const_bits=
-      expr2bits(expr.op().op0(),
+    const auto const_bits_opt=
+      expr2bits(to_array_of_expr(expr.op()).op(),
                 byte_extract_id()==ID_byte_extract_little_endian);
+
+    if(!const_bits_opt.has_value())
+      return true;
+
+    std::string const_bits=const_bits_opt.value();
+
+    DATA_INVARIANT(!const_bits.empty(), "bit representation must be non-empty");
 
     // double the string until we have sufficiently many bits
     while(mp_integer(const_bits.size())<offset*8+el_size)
@@ -1776,15 +1785,17 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
   }
 
   // extract bits of a constant
-  std::string bits=
+  const auto bits=
     expr2bits(expr.op(), expr.id()==ID_byte_extract_little_endian);
+
   // exact match of length only - otherwise we might lose bits of
   // flexible array members at the end of a struct
-  if(mp_integer(bits.size())==el_size+offset*8)
+  if(bits.has_value() &&
+     mp_integer(bits->size())==el_size+offset*8)
   {
     std::string bits_cut=
       std::string(
-        bits,
+        bits.value(),
         integer2size_t(offset*8),
         integer2size_t(el_size));
 
