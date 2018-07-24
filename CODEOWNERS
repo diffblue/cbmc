@@ -3,58 +3,58 @@
 
 # These files should rarely change
 
-src/big-int/ @kroening
-src/ansi-c/ @kroening @tautschnig
-src/assembler/ @kroening @tautschnig
-src/goto-cc/ @kroening @tautschnig
-src/linking/ @kroening @tautschnig
-src/memory-models/ @kroening @tautschnig
-src/goto-symex/ @kroening @tautschnig @peterschrammel
-src/json/ @kroening @tautschnig @peterschrammel
-src/langapi/ @kroening @tautschnig @peterschrammel
-src/xmllang/ @kroening @tautschnig @peterschrammel
-src/nonstd/ @smowton @peterschrammel
-src/solvers/cvc @martin-cs @kroening
-src/solvers/flattening @martin-cs @kroening @tautschnig @peterschrammel
-src/solvers/floatbv @martin-cs @kroening
-src/solvers/miniBDD @tautschnig @kroening
-src/solvers/prop @martin-cs @kroening @tautschnig @peterschrammel
-src/solvers/sat @martin-cs @kroening @tautschnig @peterschrammel
-src/solvers/smt2 @martin-cs @tautschnig @peterschrammel
-jbmc/src/miniz/ @smowton @mgudemann @peterschrammel
+/src/big-int/ @kroening
+/src/ansi-c/ @kroening @tautschnig
+/src/assembler/ @kroening @tautschnig
+/src/goto-cc/ @kroening @tautschnig
+/src/linking/ @kroening @tautschnig
+/src/memory-models/ @kroening @tautschnig
+/src/goto-symex/ @kroening @tautschnig @peterschrammel
+/src/json/ @kroening @tautschnig @peterschrammel
+/src/langapi/ @kroening @tautschnig @peterschrammel
+/src/xmllang/ @kroening @tautschnig @peterschrammel
+/src/nonstd/ @smowton @peterschrammel
+/src/solvers/cvc @martin-cs @kroening
+/src/solvers/flattening @martin-cs @kroening @tautschnig @peterschrammel
+/src/solvers/floatbv @martin-cs @kroening
+/src/solvers/miniBDD @tautschnig @kroening
+/src/solvers/prop @martin-cs @kroening @tautschnig @peterschrammel
+/src/solvers/sat @martin-cs @kroening @tautschnig @peterschrammel
+/src/solvers/smt2 @martin-cs @tautschnig @peterschrammel
+/jbmc/src/miniz/ @smowton @mgudemann @peterschrammel
 
 
 # These files change frequently and changes are high-risk
 
-src/cbmc/ @smowton @kroening @tautschnig @peterschrammel
-src/goto-programs/ @smowton @kroening @tautschnig @peterschrammel @pkesseli
-src/util/ @smowton @kroening @tautschnig @peterschrammel @pkesseli
-src/solvers/refinement @martin-cs @romainbrenguier @peterschrammel
-jbmc/src/java_bytecode/ @smowton @mgudemann @thk123 @cristina-david @cesaro @pkesseli @NathanJPhillips @peterschrammel
-src/analyses/ @martin-cs @peterschrammel @chrisr-diffblue @thk123 @smowton
-src/pointer-analysis/ @martin-cs @peterschrammel @chrisr-diffblue @smowton
+/src/cbmc/ @smowton @kroening @tautschnig @peterschrammel
+/src/goto-programs/ @smowton @kroening @tautschnig @peterschrammel @pkesseli
+/src/util/ @smowton @kroening @tautschnig @peterschrammel @pkesseli
+/src/solvers/refinement @martin-cs @romainbrenguier @peterschrammel
+/jbmc/src/java_bytecode/ @smowton @mgudemann @thk123 @cristina-david @cesaro @pkesseli @NathanJPhillips @peterschrammel
+/src/analyses/ @martin-cs @peterschrammel @chrisr-diffblue @thk123 @smowton
+/src/pointer-analysis/ @martin-cs @peterschrammel @chrisr-diffblue @smowton
 
 
 # These files change frequently and changes are medium-risk
 
-src/goto-analyzer/ @martin-cs @chrisr-diffblue @peterschrammel
-src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel
-src/goto-diff/ @tautschnig @peterschrammel
-jbmc/src/jbmc/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
-jbmc/src/janalyzer/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
-jbmc/src/jdiff/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
-src/cpp/ @kroening @tautschnig @peterschrammel
+/src/goto-analyzer/ @martin-cs @chrisr-diffblue @peterschrammel
+/src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel
+/src/goto-diff/ @tautschnig @peterschrammel
+/jbmc/src/jbmc/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
+/jbmc/src/janalyzer/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
+/jbmc/src/jdiff/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
+/src/cpp/ @kroening @tautschnig @peterschrammel
 
 
 # These files change frequently and changes are low-risk
 
-src/util/irep_ids.def @diffblue/cbmc-developers
+/src/util/irep_ids.def
 
-unit/ @diffblue/cbmc-developers
-regression/ @diffblue/cbmc-developers
-jbmc/unit/ @diffblue/cbmc-developers
-jbmc/regression/ @diffblue/cbmc-developers
+/unit/
+/regression/
+/jbmc/unit/
+/jbmc/regression/
 
-scripts/ @diffblue/devops @thk123 @forejtv @peterschrammel
-.travis.yml @diffblue/devops @thk123 @forejtv @peterschrammel
-appveyor.yml @diffblue/devops @thk123 @forejtv @peterschrammel
+/scripts/ @diffblue/devops @thk123 @forejtv @peterschrammel
+/.travis.yml @diffblue/devops @thk123 @forejtv @peterschrammel
+/appveyor.yml @diffblue/devops @thk123 @forejtv @peterschrammel
