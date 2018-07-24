@@ -37,6 +37,7 @@ SRC += unit_tests.cpp \
        util/string_utils/split_string.cpp \
        util/string_utils/strip_string.cpp \
        util/symbol_table.cpp \
+       util/unicode.cpp \
        catch_example.cpp \
        # Empty last line
 

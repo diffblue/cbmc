@@ -202,7 +202,7 @@ std::string expr2javat::convert_constant(
     if(to_integer(src, int_value))
       UNREACHABLE;
 
-    dest += "(char)'" + utf16_little_endian_to_java(int_value.to_long()) + '\'';
+    dest += "(char)'" + utf16_native_endian_to_java(int_value.to_long()) + '\'';
     return dest;
   }
   else if(src.type()==java_byte_type())

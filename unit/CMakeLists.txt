@@ -13,7 +13,6 @@ list(REMOVE_ITEM sources
     ${CMAKE_CURRENT_SOURCE_DIR}/json.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cpp_parser.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/osx_fat_reader.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/unicode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cpp_scanner.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/float_utils.cpp

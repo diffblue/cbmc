@@ -18,16 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <windows.h>
 #endif
 
-/// Determine endianness of the architecture
-/// \return True if the architecture is little_endian
-bool is_little_endian_arch()
-{
-  uint32_t i=1;
-  return reinterpret_cast<uint8_t &>(i) != 0;
-}
-
-#define BUFSIZE 100
-
 std::string narrow(const wchar_t *s)
 {
   #ifdef _WIN32
@@ -138,9 +128,10 @@ static void utf8_append_code(unsigned int c, std::string &result)
   }
 }
 
-/// \param utf32:encoded wide string
+/// \param s UTF-32 encoded wide string
 /// \return utf8-encoded string with the same unicode characters as the input.
-std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
+std::string
+utf32_native_endian_to_utf8(const std::basic_string<unsigned int> &s)
 {
   std::string result;
 
@@ -166,27 +157,15 @@ std::vector<std::string> narrow_argv(int argc, const wchar_t **argv_wide)
   return argv_narrow;
 }
 
-/// A helper function for dealing with different UTF16 endians
-/// \par parameters: A 16-bit integer
-/// \return A 16-bit integer with bytes swapped
-uint16_t do_swap_bytes(uint16_t x)
-{
-  uint16_t b1=x & 0xFF;
-  uint16_t b2=x & 0xFF00;
-  return (b1 << 8) | (b2 >> 8);
-}
-
-
-void utf16_append_code(unsigned int code, bool swap_bytes, std::wstring &result)
+static void utf16_append_code(unsigned int code, std::wstring &result)
 {
   // we do not treat 0xD800 to 0xDFFF, although
   // they are not valid unicode symbols
 
   if(code<0xFFFF)
-  { // code is encoded as one UTF16 character
-    // we just take the code and possibly swap the bytes
-    unsigned int a=(swap_bytes)?do_swap_bytes(code):code;
-    result+=static_cast<wchar_t>(a);
+  {
+    // code is encoded as one UTF16 character
+    result += static_cast<wchar_t>(code);
   }
   else // code is encoded as two UTF16 characters
   {
@@ -194,23 +173,21 @@ void utf16_append_code(unsigned int code, bool swap_bytes, std::wstring &result)
     // code<0x10FFFF
     // but let's not check it programmatically
 
-    // encode the code in UTF16, possibly swapping bytes.
+    // encode the code in UTF16
     code=code-0x10000;
-    unsigned int i1=((code>>10) & 0x3ff) | 0xD800;
-    unsigned int a1=(swap_bytes)?do_swap_bytes(static_cast<uint16_t>(i1)):i1;
-    result+=static_cast<wchar_t>(a1);
-    unsigned int i2=(code & 0x3ff) | 0xDC00;
-    unsigned int a2=(swap_bytes)?do_swap_bytes(static_cast<uint16_t>(i2)):i2;
-    result+=static_cast<wchar_t>(a2);
+    const uint16_t i1 = static_cast<uint16_t>(((code >> 10) & 0x3ff) | 0xD800);
+    result += static_cast<wchar_t>(i1);
+    const uint16_t i2 = static_cast<uint16_t>((code & 0x3ff) | 0xDC00);
+    result += static_cast<wchar_t>(i2);
   }
 }
 
 
-/// \par parameters: String in UTF-8 format, bool value indicating whether the
-/// endianness should be different from the architecture one.
+/// Convert UTF8-encoded string to UTF-16 with architecture-native endianness.
+/// \par parameters: String in UTF-8 format
 /// \return String in UTF-16 format. The encoding follows the endianness of the
 ///   architecture iff swap_bytes is true.
-std::wstring utf8_to_utf16(const std::string& in, bool swap_bytes)
+std::wstring utf8_to_utf16_native_endian(const std::string &in)
 {
     std::wstring result;
     result.reserve(in.size());
@@ -263,33 +240,17 @@ std::wstring utf8_to_utf16(const std::string& in, bool swap_bytes)
         code=32;
       }
 
-      utf16_append_code(code, swap_bytes, result);
+      utf16_append_code(code, result);
     }
 
     return result;
 }
 
-/// \par parameters: String in UTF-8 format
-/// \return String in UTF-16BE format
-std::wstring utf8_to_utf16_big_endian(const std::string &in)
-{
-  bool swap_bytes=is_little_endian_arch();
-  return utf8_to_utf16(in, swap_bytes);
-}
-
-/// \par parameters: String in UTF-8 format
-/// \return String in UTF-16LE format
-std::wstring utf8_to_utf16_little_endian(const std::string &in)
-{
-  bool swap_bytes=!is_little_endian_arch();
-  return utf8_to_utf16(in, swap_bytes);
-}
-
-/// \param ch: UTF-16LE character
+/// \param ch: UTF-16 character in architecture-native endianness encoding
 /// \param result: stream to receive string in US-ASCII format, with \\uxxxx
 ///                escapes for other characters
 /// \param loc: locale to check for printable characters
-static void utf16_little_endian_to_java(
+static void utf16_native_endian_to_java(
   const wchar_t ch,
   std::ostringstream &result,
   const std::locale &loc)
@@ -326,23 +287,23 @@ static void utf16_little_endian_to_java(
   }
 }
 
-/// \param ch: UTF-16LE character
+/// \param ch: UTF-16 character in architecture-native endianness encoding
 /// \return String in US-ASCII format, with \\uxxxx escapes for other characters
-std::string utf16_little_endian_to_java(const wchar_t ch)
+std::string utf16_native_endian_to_java(const wchar_t ch)
 {
   std::ostringstream result;
   const std::locale loc;
-  utf16_little_endian_to_java(ch, result, loc);
+  utf16_native_endian_to_java(ch, result, loc);
   return result.str();
 }
 
-/// \param in: String in UTF-16LE format
+/// \param in: String in UTF-16 (native endianness) format
 /// \return String in US-ASCII format, with \\uxxxx escapes for other characters
-std::string utf16_little_endian_to_java(const std::wstring &in)
+std::string utf16_native_endian_to_java(const std::wstring &in)
 {
   std::ostringstream result;
   const std::locale loc;
   for(const auto ch : in)
-    utf16_little_endian_to_java(ch, result, loc);
+    utf16_native_endian_to_java(ch, result, loc);
   return result.str();
 }

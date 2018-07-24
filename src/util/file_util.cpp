@@ -95,7 +95,7 @@ void delete_directory_utf16(const std::wstring &path)
 void delete_directory(const std::string &path)
 {
 #ifdef _WIN32
-  delete_directory_utf16(utf8_to_utf16_little_endian(path));
+  delete_directory_utf16(utf8_to_utf16_native_endian(path));
 #else
   DIR *dir=opendir(path.c_str());
   if(dir!=nullptr)
