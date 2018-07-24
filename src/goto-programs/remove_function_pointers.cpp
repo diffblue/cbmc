@@ -30,6 +30,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "compute_called_functions.h"
 #include "remove_const_function_pointers.h"
 
+#define UNKNOWN_ASSIGN "##unknown##"
+
 class remove_function_pointerst
 {
 public:
@@ -67,6 +69,11 @@ protected:
   const namespacet ns;
   symbol_tablet &symbol_table;
   bool add_safety_assertion;
+  std::map<irep_idt, std::unordered_set<irep_idt>> function_pointer_map;
+  // counters to provide detailed statistics
+  std::size_t number_of_function_pointers_replaced = 0;
+  std::size_t max_size_of_case_split = 0;
+  std::size_t total_number_of_replacement_candidates = 0;
 
   // We can optionally halt the FP removal if we aren't able to use
   // remove_const_function_pointerst to successfully narrow to a small
@@ -106,7 +113,21 @@ protected:
     const irep_idt &in_function_id,
     code_function_callt &function_call,
     goto_programt &dest);
+
+  /// Scans through goto functions and builds a map of function
+  /// pointers to a set of functions that have been written to each pointer,
+  /// stored as irep_idts.
+  /// The map is stored as variable in remove_function_pointerst
+  /// \param goto_functions: goto functions to scan through
+  void gather_all_writes_to_function_pointers(goto_functionst &goto_functions);
 };
+
+static irep_idt get_member_identifier(const member_exprt &member)
+{
+  // we only expect member expressions that have a symbol as compound operand
+  return id2string(to_symbol_expr(member.compound()).get_identifier()) + "." +
+         id2string(member.get_component_name());
+}
 
 remove_function_pointerst::remove_function_pointerst(
   message_handlert &_message_handler,
@@ -361,19 +382,43 @@ void remove_function_pointerst::remove_function_pointer(
     }
   }
 
-  remove_function_pointer(goto_program, function_id, target, functions);
-}
+  // we only handle cases where the LHS is a symbol or a member of a struct
+  if(pointer.id() == ID_symbol || pointer.id() == ID_member)
+  {
+    irep_idt identifier;
+    if(pointer.id() == ID_symbol)
+    {
+      identifier =
+        to_symbol_expr(to_dereference_expr(code.function()).pointer())
+          .get_identifier();
+    }
+    else
+    {
+      identifier = get_member_identifier(to_member_expr(pointer));
+    }
 
-void remove_function_pointerst::remove_function_pointer(
-  goto_programt &goto_program,
-  const irep_idt &function_id,
-  goto_programt::targett target,
-  const functionst &functions)
-{
-  const code_function_callt &code = target->get_function_call();
+    auto entry = function_pointer_map.find(identifier);
+    if(entry != function_pointer_map.end())
+    {
+      log.status() << "Replacing function pointer from map of possible assigns"
+                   << messaget::eom;
 
-  const exprt &function = code.function();
-  const exprt &pointer = to_dereference_expr(function).pointer();
+      if(entry->second.find(UNKNOWN_ASSIGN) == entry->second.end())
+      {
+        for(auto func_itr = functions.begin(); func_itr != functions.end();)
+        {
+          if(
+            entry->second.find(func_itr->get_identifier()) ==
+            entry->second.end())
+          {
+            func_itr = functions.erase(func_itr);
+          }
+          else
+            func_itr++;
+        }
+      }
+    }
+  }
 
   // the final target is a skip
   goto_programt final_skip;
@@ -457,6 +502,10 @@ void remove_function_pointerst::remove_function_pointer(
   log.statistics().source_location = target->source_location;
   log.statistics() << "replacing function pointer by " << functions.size()
                    << " possible targets" << messaget::eom;
+  number_of_function_pointers_replaced++;
+  total_number_of_replacement_candidates += functions.size();
+  if(functions.size() > max_size_of_case_split)
+    max_size_of_case_split = functions.size();
 
   // list the names of functions when verbosity is at debug level
   log.conditional_output(
@@ -503,6 +552,7 @@ bool remove_function_pointerst::remove_function_pointers(
 
 void remove_function_pointerst::operator()(goto_functionst &functions)
 {
+  gather_all_writes_to_function_pointers(functions);
   bool did_something=false;
 
   for(goto_functionst::function_mapt::iterator f_it=
@@ -517,7 +567,21 @@ void remove_function_pointerst::operator()(goto_functionst &functions)
   }
 
   if(did_something)
+  {
     functions.compute_location_numbers();
+
+    log.statistics() << "Statistics:\n"
+                     << "Replaced " << number_of_function_pointers_replaced
+                     << " function pointers "
+                     << " with " << total_number_of_replacement_candidates
+                     << " possible candidate functions. \n"
+                     << "Max number of candidates in a single replacement: "
+                     << max_size_of_case_split << "\n"
+                     << "Mean number of candidates in a single replacement: "
+                     << total_number_of_replacement_candidates /
+                          number_of_function_pointers_replaced
+                     << messaget::eom;
+  }
 }
 
 bool remove_function_pointers(
@@ -569,4 +633,45 @@ void remove_function_pointers(message_handlert &_message_handler,
     goto_model.goto_functions,
     add_safety_assertion,
     only_remove_const_fps);
+}
+
+void remove_function_pointerst::gather_all_writes_to_function_pointers(
+  goto_functionst &goto_functions)
+{
+  for(auto &gf_entry : goto_functions.function_map)
+  {
+    goto_programt &goto_program = gf_entry.second.body;
+    Forall_goto_program_instructions(target, goto_program)
+    {
+      if(!target->is_assign())
+        continue;
+
+      const code_assignt &code_assign = to_code_assign(target->code);
+      const auto &lhs = code_assign.lhs();
+      const auto &rhs = code_assign.rhs();
+
+      if(lhs.type().id() == ID_pointer && lhs.type().subtype().id() == ID_code)
+      {
+        irep_idt lhs_identifier;
+        if(lhs.id() == ID_symbol)
+          lhs_identifier = to_symbol_expr(lhs).get_identifier();
+        else if(lhs.id() == ID_member)
+        {
+          lhs_identifier = get_member_identifier(to_member_expr(lhs));
+        }
+        else
+          continue;
+
+        if(rhs.id() == ID_address_of && rhs.type().subtype().id() == ID_code)
+        {
+          irep_idt rhs_identifier =
+            to_symbol_expr(to_address_of_expr(rhs).object()).get_identifier();
+
+          function_pointer_map[lhs_identifier].insert(rhs_identifier);
+        }
+        else
+          function_pointer_map[lhs_identifier] = {{UNKNOWN_ASSIGN}};
+      }
+    }
+  }
 }
