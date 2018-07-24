@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ai_domain.h"
 
+/// The basic interface of an abstract interpreter.  This should be enough
+/// to create, run and query an abstract interpreter.
 // don't use me -- I am just a base class
 // use ait instead
 class ai_baset
@@ -41,6 +43,7 @@ public:
   {
   }
 
+  /// Running the interpreter
   void operator()(
     const goto_programt &goto_program,
     const namespacet &ns)
@@ -101,6 +104,7 @@ public:
     return abstract_state_before(std::next(l));
   }
 
+  /// Resets the domain
   virtual void clear()
   {
   }
@@ -245,6 +249,9 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
+  // Visit performs one step of abstract interpretation from location l
+  // Depending on the instruction type it may compute a number of "edges"
+  // or applications of the abstract transformer
   // true = found something new
   bool visit(
     locationt l,
