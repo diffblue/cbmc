@@ -13,9 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/simplify_expr.h>
 
-jsont ai_domain_baset::output_json(
-  const ai_baset &ai,
-  const namespacet &ns) const
+jsont ai_domain_baset::output_json(const ai_baset &ai, const namespacet &ns)
+  const
 {
   std::ostringstream out;
   output(out, ai, ns);
@@ -23,14 +22,12 @@ jsont ai_domain_baset::output_json(
   return json;
 }
 
-xmlt ai_domain_baset::output_xml(
-  const ai_baset &ai,
-  const namespacet &ns) const
+xmlt ai_domain_baset::output_xml(const ai_baset &ai, const namespacet &ns) const
 {
   std::ostringstream out;
   output(out, ai, ns);
   xmlt xml("abstract_state");
-  xml.data=out.str();
+  xml.data = out.str();
   return xml;
 }
 
@@ -42,38 +39,38 @@ xmlt ai_domain_baset::output_xml(
 /// \param ns: the namespace
 /// \return True if condition did not change. False otherwise. condition will be
 ///   updated with the simplified condition if it has worked
-bool ai_domain_baset::ai_simplify_lhs(
-  exprt &condition, const namespacet &ns) const
+bool ai_domain_baset::ai_simplify_lhs(exprt &condition, const namespacet &ns)
+  const
 {
   // Care must be taken here to give something that is still writable
-  if(condition.id()==ID_index)
+  if(condition.id() == ID_index)
   {
-    index_exprt ie=to_index_expr(condition);
-    bool no_simplification=ai_simplify(ie.index(), ns);
+    index_exprt ie = to_index_expr(condition);
+    bool no_simplification = ai_simplify(ie.index(), ns);
     if(!no_simplification)
-      condition=simplify_expr(ie, ns);
+      condition = simplify_expr(ie, ns);
 
     return no_simplification;
   }
-  else if(condition.id()==ID_dereference)
+  else if(condition.id() == ID_dereference)
   {
-    dereference_exprt de=to_dereference_expr(condition);
-    bool no_simplification=ai_simplify(de.pointer(), ns);
+    dereference_exprt de = to_dereference_expr(condition);
+    bool no_simplification = ai_simplify(de.pointer(), ns);
     if(!no_simplification)
-      condition=simplify_expr(de, ns);  // So *(&x) -> x
+      condition = simplify_expr(de, ns); // So *(&x) -> x
 
     return no_simplification;
   }
-  else if(condition.id()==ID_member)
+  else if(condition.id() == ID_member)
   {
-    member_exprt me=to_member_expr(condition);
+    member_exprt me = to_member_expr(condition);
     // Since simplify_ai_lhs is required to return an addressable object
     // (so remains a valid left hand side), to simplify
     // `(something_simplifiable).b` we require that `something_simplifiable`
     // must also be addressable
-    bool no_simplification=ai_simplify_lhs(me.compound(), ns);
+    bool no_simplification = ai_simplify_lhs(me.compound(), ns);
     if(!no_simplification)
-      condition=simplify_expr(me, ns);
+      condition = simplify_expr(me, ns);
 
     return no_simplification;
   }

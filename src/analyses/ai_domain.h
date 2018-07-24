@@ -12,10 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_AI_DOMAIN_H
 #define CPROVER_ANALYSES_AI_DOMAIN_H
 
-#include <util/json.h>
-#include <util/xml.h>
 #include <util/expr.h>
+#include <util/json.h>
 #include <util/make_unique.h>
+#include <util/xml.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -61,34 +61,28 @@ public:
     ai_baset &ai,
     const namespacet &ns) = 0;
 
-  virtual void output(
-    std::ostream &out,
-    const ai_baset &ai,
-    const namespacet &ns) const
+  virtual void
+  output(std::ostream &out, const ai_baset &ai, const namespacet &ns) const
   {
   }
 
-  virtual jsont output_json(
-    const ai_baset &ai,
-    const namespacet &ns) const;
+  virtual jsont output_json(const ai_baset &ai, const namespacet &ns) const;
 
-  virtual xmlt output_xml(
-    const ai_baset &ai,
-    const namespacet &ns) const;
+  virtual xmlt output_xml(const ai_baset &ai, const namespacet &ns) const;
 
   // no states
-  virtual void make_bottom()=0;
+  virtual void make_bottom() = 0;
 
   // all states -- the analysis doesn't use this,
   // and domains may refuse to implement it.
-  virtual void make_top()=0;
+  virtual void make_top() = 0;
 
   // a reasonable entry-point state
-  virtual void make_entry()=0;
+  virtual void make_entry() = 0;
 
-  virtual bool is_bottom() const=0;
+  virtual bool is_bottom() const = 0;
 
-  virtual bool is_top() const=0;
+  virtual bool is_top() const = 0;
 
   // also add
   //
@@ -102,23 +96,18 @@ public:
   // PRECONDITION(from.is_dereferenceable(), "Must not be _::end()")
   // PRECONDITION(to.is_dereferenceable(), "Must not be _::end()")
 
-
   // This method allows an expression to be simplified / evaluated using the
   // current state.  It is used to evaluate assertions and in program
   // simplification
 
   // return true if unchanged
-  virtual bool ai_simplify(
-    exprt &condition,
-    const namespacet &ns) const
+  virtual bool ai_simplify(exprt &condition, const namespacet &ns) const
   {
     return true;
   }
 
   // Simplifies the expression but keeps it as an l-value
-  virtual bool ai_simplify_lhs(
-    exprt &condition,
-    const namespacet &ns) const;
+  virtual bool ai_simplify_lhs(exprt &condition, const namespacet &ns) const;
 
   // Gives a Boolean condition that is true for all values represented by the
   // domain.  This allows domains to be converted into program invariants.
