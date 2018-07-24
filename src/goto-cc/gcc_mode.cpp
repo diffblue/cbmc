@@ -653,6 +653,14 @@ int gcc_modet::doit()
     compiler.output_file_executable="a.out";
   }
 
+  if(
+    cmdline.isset('o') && cmdline.isset('c') &&
+    compiler.source_files.size() >= 2)
+  {
+    error() << "cannot specify -o with -c with multiple files" << eom;
+    return 1; // to match gcc's behaviour
+  }
+
   // We now iterate over any input files
 
   temp_dirt temp_dir("goto-cc-XXXXXX");
