@@ -15,8 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 #include <sstream>
 
-#include <util/std_expr.h>
+#include <util/invariant.h>
 #include <util/std_code.h>
+#include <util/std_expr.h>
 
 #include "is_threaded.h"
 
@@ -220,7 +221,7 @@ void ai_baset::finalize()
 ai_baset::locationt ai_baset::get_next(
   working_sett &working_set)
 {
-  assert(!working_set.empty());
+  PRECONDITION(!working_set.empty());
 
   working_sett::iterator i=working_set.begin();
   locationt l=i->second;
@@ -248,6 +249,7 @@ bool ai_baset::fixedpoint(
   {
     locationt l=get_next(working_set);
 
+    // goto_program is really only needed for iterator manipulation
     if(visit(l, working_set, goto_program, goto_functions, ns))
       new_data=true;
   }
@@ -323,6 +325,8 @@ bool ai_baset::do_function_call(
   // initialize state, if necessary
   get_state(l_return);
 
+  PRECONDITION(l_call->is_function_call());
+
   const goto_functionst::goto_functiont &goto_function=
     f_it->second;
 
@@ -388,7 +392,17 @@ bool ai_baset::do_function_call_rec(
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
-  assert(!goto_functions.function_map.empty());
+  PRECONDITION(!goto_functions.function_map.empty());
+
+  // We can't really do this here -- we rely on
+  // these being removed by some previous analysis.
+  PRECONDITION(function.id() != ID_dereference);
+
+  // Can't be a function
+  DATA_INVARIANT(
+    function.id() != "NULL-object", "Function cannot be null object");
+  DATA_INVARIANT(function.id() != ID_member, "Function cannot be struct field");
+  DATA_INVARIANT(function.id() != ID_index, "Function cannot be array element");
 
   bool new_data=false;
 
@@ -411,8 +425,7 @@ bool ai_baset::do_function_call_rec(
   }
   else if(function.id()==ID_if)
   {
-    if(function.operands().size()!=3)
-      throw "if has three operands";
+    DATA_INVARIANT(function.operands().size() != 3, "if has three operands");
 
     bool new_data1=
       do_function_call_rec(
@@ -432,19 +445,6 @@ bool ai_baset::do_function_call_rec(
 
     if(new_data1 || new_data2)
       new_data=true;
-  }
-  else if(function.id()==ID_dereference)
-  {
-    // We can't really do this here -- we rely on
-    // these being removed by some previous analysis.
-  }
-  else if(function.id() == ID_null_object)
-  {
-    // ignore, can't be a function
-  }
-  else if(function.id()==ID_member || function.id()==ID_index)
-  {
-    // ignore, can't be a function
   }
   else
   {
