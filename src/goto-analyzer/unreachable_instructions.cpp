@@ -59,7 +59,7 @@ static void build_dead_map_from_ai(
   dead_mapt &dest)
 {
   forall_goto_program_instructions(it, goto_program)
-    if(ai.abstract_state_before(it).is_bottom())
+    if(ai.abstract_state_before(it)->is_bottom())
       dest.insert(std::make_pair(it->location_number, it));
 }
 
@@ -418,7 +418,7 @@ std::unordered_set<irep_idt> compute_called_functions_from_ai(
 
     const goto_programt &p = f_it->second.body;
 
-    if(!ai.abstract_state_before(p.instructions.begin()).is_bottom())
+    if(!ai.abstract_state_before(p.instructions.begin())->is_bottom())
       called.insert(f_it->first);
   }
 

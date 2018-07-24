@@ -50,7 +50,7 @@ void ai_baset::output(
     out << "**** " << i_it->location_number << " "
         << i_it->source_location << "\n";
 
-    find_state(i_it).output(out, *this, ns);
+    abstract_state_before(i_it)->output(out, *this, ns);
     out << "\n";
     #if 1
     goto_program.output_instruction(ns, identifier, out, *i_it);
@@ -101,7 +101,8 @@ jsont ai_baset::output_json(
       json_numbert(std::to_string(i_it->location_number));
     location["sourceLocation"]=
       json_stringt(i_it->source_location.as_string());
-    location["abstractState"]=find_state(i_it).output_json(*this, ns);
+    location["abstractState"] =
+      abstract_state_before(i_it)->output_json(*this, ns);
 
     // Ideally we need output_instruction_json
     std::ostringstream out;
@@ -162,7 +163,7 @@ xmlt ai_baset::output_xml(
       "source_location",
       i_it->source_location.as_string());
 
-    location.new_element(find_state(i_it).output_xml(*this, ns));
+    location.new_element(abstract_state_before(i_it)->output_xml(*this, ns));
 
     // Ideally we need output_instruction_xml
     std::ostringstream out;

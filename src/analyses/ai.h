@@ -82,15 +82,23 @@ public:
     finalize();
   }
 
+  /// Accessing individual domains at particular locations
+  /// (without needing to know what kind of domain or history is used)
+  /// A pointer to a copy as the method should be const and
+  /// there are some non-trivial cases including merging domains, etc.
+  /// Intended for users of the abstract interpreter; don't use internally.
+
   /// Returns the abstract state before the given instruction
-  virtual const ai_domain_baset & abstract_state_before(
-    goto_programt::const_targett t) const = 0;
+  /// PRECONDITION(l is dereferenceable)
+  virtual std::unique_ptr<statet> abstract_state_before(locationt l) const = 0;
 
   /// Returns the abstract state after the given instruction
-  virtual const ai_domain_baset & abstract_state_after(
-    goto_programt::const_targett t) const
+  virtual std::unique_ptr<statet> abstract_state_after(locationt l) const
   {
-    return abstract_state_before(std::next(t));
+    /// PRECONDITION(l is dereferenceable && std::next(l) is dereferenceable)
+    /// Check relies on a DATA_INVARIANT of goto_programs
+    INVARIANT(!l->is_end_function(), "No state after the last instruction");
+    return abstract_state_before(std::next(l));
   }
 
   virtual void clear()
@@ -304,10 +312,17 @@ public:
     return it->second;
   }
 
-  const ai_domain_baset & abstract_state_before(
-    goto_programt::const_targett t) const override
+  std::unique_ptr<statet> abstract_state_before(locationt t) const override
   {
-    return (*this)[t];
+    typename state_mapt::const_iterator it = state_map.find(t);
+    if(it == state_map.end())
+    {
+      std::unique_ptr<statet> d = util_make_unique<domainT>();
+      CHECK_RETURN(d->is_bottom());
+      return d;
+    }
+
+    return util_make_unique<domainT>(it->second);
   }
 
   void clear() override
