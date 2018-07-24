@@ -126,7 +126,7 @@ protected:
   void rRuntimeAnnotation_attribute(annotationst &);
   void rRuntimeAnnotation(annotationt &);
   void relement_value_pairs(annotationt::element_value_pairst &);
-  void relement_value_pair(annotationt::element_value_pairt &);
+  exprt get_relement_value();
   void rmethod_attribute(methodt &method);
   void rfield_attribute(fieldt &);
   void rcode_attribute(methodt &method);
@@ -1511,16 +1511,17 @@ void java_bytecode_parsert::relement_value_pairs(
   {
     u2 element_name_index=read_u2();
     element_value_pair.element_name=pool_entry(element_name_index).s;
-
-    relement_value_pair(element_value_pair);
+    element_value_pair.value = get_relement_value();
   }
 }
 
 /// Corresponds to the element_value structure
 /// Described in Java 8 specification 4.7.16.1
 /// https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.16.1
-void java_bytecode_parsert::relement_value_pair(
-  annotationt::element_value_pairt &element_value_pair)
+/// \returns An exprt that represents the particular value of annotations field.
+///   This is usually one of: a byte, number of some sort, string, character,
+///   enum, Class type, array or another annotation.
+exprt java_bytecode_parsert::get_relement_value()
 {
   u1 tag=read_u1();
 
@@ -1531,50 +1532,46 @@ void java_bytecode_parsert::relement_value_pair(
       UNUSED_u2(type_name_index);
       UNUSED_u2(const_name_index);
       // todo: enum
+      return exprt();
     }
-    break;
 
   case 'c':
     {
       u2 class_info_index = read_u2();
-      element_value_pair.value = symbol_exprt(pool_entry(class_info_index).s);
+      return symbol_exprt(pool_entry(class_info_index).s);
     }
-    break;
 
   case '@':
     {
+      // TODO: return this wrapped in an exprt
       // another annotation, recursively
       annotationt annotation;
       rRuntimeAnnotation(annotation);
+      return exprt();
     }
-    break;
 
   case '[':
     {
+      array_exprt values;
       u2 num_values=read_u2();
       for(std::size_t i=0; i<num_values; i++)
       {
-        annotationt::element_value_pairt element_value;
-        relement_value_pair(element_value); // recursive call
+        values.operands().push_back(get_relement_value());
       }
+      return values;
     }
-    break;
 
   case 's':
     {
       u2 const_value_index=read_u2();
-      element_value_pair.value=string_constantt(
-        pool_entry(const_value_index).s);
+      return string_constantt(pool_entry(const_value_index).s);
     }
-    break;
 
   default:
     {
       u2 const_value_index=read_u2();
-      element_value_pair.value=constant(const_value_index);
+      return constant(const_value_index);
     }
-
-  break;
   }
 }
 

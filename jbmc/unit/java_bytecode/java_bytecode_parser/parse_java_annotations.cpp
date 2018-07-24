@@ -91,5 +91,30 @@ SCENARIO(
         REQUIRE(java_type == void_type());
       }
     }
+    WHEN("Parsing an annotation with an array field.")
+    {
+      const symbol_tablet &new_symbol_table = load_java_class(
+        "ClassWithArrayAnnotation", "./java_bytecode/java_bytecode_parser");
+
+      THEN("The annotation should store an array of type string.")
+      {
+        const symbolt &class_symbol =
+          *new_symbol_table.lookup("java::ClassWithArrayAnnotation");
+        const std::vector<java_annotationt> &java_annotations =
+          to_annotated_type(class_symbol.type).get_annotations();
+        java_bytecode_parse_treet::annotationst annotations;
+        convert_java_annotations(java_annotations, annotations);
+        REQUIRE(annotations.size() == 1);
+        const auto &annotation = annotations.front();
+        const auto &element_value_pair = annotation.element_value_pairs.front();
+        const auto &array = to_array_expr(element_value_pair.value);
+
+        REQUIRE(array.operands().size() == 2);
+        const auto &dave = array.op0().get(ID_value);
+        const auto &another_dave = array.op1().get(ID_value);
+        REQUIRE(id2string(dave) == "Dave");
+        REQUIRE(id2string(another_dave) == "Another Dave");
+      }
+    }
   }
 }
