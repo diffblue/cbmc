@@ -131,6 +131,16 @@ class java_class_typet:public class_typet
     return set(ID_outer_class, outer_class);
   }
 
+  const irep_idt &get_super_class() const
+  {
+    return get(ID_super_class);
+  }
+
+  void set_super_class(const irep_idt &super_class)
+  {
+    return set(ID_super_class, super_class);
+  }
+
   const bool get_is_static_class() const
   {
     return get_bool(ID_is_static);
