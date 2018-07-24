@@ -67,39 +67,39 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/cprover_library.h>
 #include <cpp/cprover_library.h>
 
-#include "document_properties.h"
-#include "uninitialized.h"
-#include "full_slicer.h"
-#include "reachability_slicer.h"
-#include "show_locations.h"
-#include "points_to.h"
-#include "alignment_checks.h"
-#include "race_check.h"
-#include "nondet_volatile.h"
-#include "interrupt.h"
-#include "mmio.h"
-#include "stack_depth.h"
-#include "nondet_static.h"
-#include "rw_set.h"
-#include "concurrency.h"
-#include "dump_c.h"
-#include "dot.h"
-#include "havoc_loops.h"
-#include "k_induction.h"
-#include "function.h"
-#include "branch.h"
-#include "wmm/weak_memory.h"
-#include "call_sequences.h"
 #include "accelerate/accelerate.h"
-#include "horn_encoding.h"
-#include "thread_instrumentation.h"
-#include "skip_loops.h"
+#include "alignment_checks.h"
+#include "branch.h"
+#include "call_sequences.h"
 #include "code_contracts.h"
-#include "unwind.h"
+#include "concurrency.h"
+#include "document_properties.h"
+#include "dot.h"
+#include "dump_c.h"
+#include "full_slicer.h"
+#include "function.h"
+#include "havoc_loops.h"
+#include "horn_encoding.h"
+#include "interrupt.h"
+#include "k_induction.h"
+#include "mmio.h"
 #include "model_argc_argv.h"
-#include "undefined_functions.h"
+#include "nondet_static.h"
+#include "nondet_volatile.h"
+#include "points_to.h"
+#include "race_check.h"
+#include "reachability_slicer.h"
 #include "remove_function.h"
+#include "rw_set.h"
+#include "show_locations.h"
+#include "skip_loops.h"
 #include "splice_call.h"
+#include "stack_depth.h"
+#include "thread_instrumentation.h"
+#include "undefined_functions.h"
+#include "uninitialized.h"
+#include "unwind.h"
+#include "wmm/weak_memory.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()
@@ -1457,6 +1457,46 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       *message_handler);
   }
 
+  // aggressive slicer
+  if(cmdline.isset("aggressive-slice"))
+  {
+    do_indirect_call_and_rtti_removal();
+
+    status() << "Slicing away initializations of unused global variables"
+             << eom;
+    slice_global_inits(goto_model);
+
+    status() << "Performing an aggressive slice" << eom;
+    aggressive_slicert aggressive_slicer(goto_model, get_message_handler());
+
+    if(cmdline.isset("aggressive-slice-call-depth"))
+      aggressive_slicer.call_depth =
+        safe_string2unsigned(cmdline.get_value("aggressive-slice-call-depth"));
+
+    if(cmdline.isset("aggressive-slice-preserve-function"))
+      aggressive_slicer.preserve_functions(
+        cmdline.get_values("aggressive-slice-preserve-function"));
+
+    if(cmdline.isset("property"))
+      aggressive_slicer.user_specified_properties =
+        cmdline.get_values("property");
+
+    if(cmdline.isset("aggressive-slice-preserve-functions-containing"))
+      aggressive_slicer.name_snippets =
+        cmdline.get_values("aggressive-slice-preserve-functions-containing");
+
+    aggressive_slicer.preserve_all_direct_paths =
+      cmdline.isset("aggressive-slice-preserve-all-direct-paths");
+
+    aggressive_slicer.doit();
+
+    status() << "Performing a reachability slice" << eom;
+    if(cmdline.isset("property"))
+      reachability_slicer(goto_model, cmdline.get_values("property"));
+    else
+      reachability_slicer(goto_model);
+  }
+
   // recalculate numbers, etc.
   goto_model.goto_functions.update();
 }
@@ -1562,6 +1602,17 @@ void goto_instrument_parse_optionst::help()
     " --full-slice                 slice away instructions that don't affect assertions\n" // NOLINT(*)
     " --property id                slice with respect to specific property only\n" // NOLINT(*)
     " --slice-global-inits         slice away initializations of unused global variables\n" // NOLINT(*)
+    " --aggressive-slice           remove bodies of any functions not on the shortest path between\n" // NOLINT(*)
+    "                              the start function and the function containing the property(s)\n" // NOLINT(*)
+    " --aggressive-slice-call-depth <n>\n"
+    "                              used with aggressive-slice, preserves all functions within <n> function calls\n" // NOLINT(*)
+    "                              of the functions on the shortest path\n"
+    " --aggressive-slice-preserve-function <f>\n"
+    "                             force the aggressive slicer to preserve function <f>\n" // NOLINT(*)
+    " --aggressive-slice-preserve-function containing <f>\n"
+    "                              force the aggressive slicer to preserve all functions with names containing <f>\n" // NOLINT(*)
+    "--aggressive-slice-preserve-all-direct-paths \n"
+    "                             force aggressive slicer to preserve all direct paths\n" // NOLINT(*)
     "\n"
     "Further transformations:\n"
     " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)

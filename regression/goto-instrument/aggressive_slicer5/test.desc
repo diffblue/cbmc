@@ -1,0 +1,8 @@
+CORE
+main.c
+--aggressive-slice --property D.assertion.1 --aggressive-slice-preserve-all-direct-paths
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

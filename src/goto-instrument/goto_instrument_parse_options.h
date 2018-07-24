@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/goto_check.h>
 
 #include <goto-programs/generate_function_bodies.h>
+#include "aggressive_slicer.h"
 
 #include "count_eloc.h"
 
@@ -90,6 +91,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-threaded)(list-calls-args)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\
+  OPT_AGGRESSIVE_SLICER \
   OPT_FLUSH \
   "(splice-call):" \
   OPT_REMOVE_CALLS_NO_BODY \
