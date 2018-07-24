@@ -103,13 +103,13 @@ int ms_cl_modet::doit()
 
   if(cmdline.isset("Fo"))
   {
-    compiler.output_file_object=cmdline.get_value("Fo");
+    std::string Fo_value = cmdline.get_value("Fo");
 
-    // this could be a directory
-    if(is_directory(compiler.output_file_object) &&
-       cmdline.args.size()>=1)
-      compiler.output_file_object+=
-        get_base_name(cmdline.args[0], true)+".obj";
+    // this could be a directory or a file name
+    if(is_directory(Fo_value))
+      compiler.output_directory_object = Fo_value;
+    else
+      compiler.output_file_object = Fo_value;
   }
 
   if(cmdline.isset("Fe"))

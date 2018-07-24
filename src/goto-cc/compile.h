@@ -45,7 +45,10 @@ public:
   std::list<irep_idt> seen_modes;
 
   std::string object_file_extension;
-  std::string output_file_object, output_file_executable;
+  std::string output_file_executable;
+
+  // the two options below are mutually exclusive -- use either or
+  std::string output_file_object, output_directory_object;
 
   compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror);
 
