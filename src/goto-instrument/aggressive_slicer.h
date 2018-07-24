@@ -97,4 +97,14 @@ private:
   void get_all_functions_containing_properties();
 };
 
+// clang-format off
+#define OPT_AGGRESSIVE_SLICER \
+    "(aggressive-slice)" \
+    "(aggressive-slice-call-depth):" \
+    "(aggressive-slice-preserve-function):" \
+    "(aggressive-slice-preserve-functions-containing):" \
+    "(aggressive-slice-preserve-all-direct-paths)"
+
+// clang-format on
+
 #endif /* CPROVER_GOTO_INSTRUMENT_AGGRESSIVE_SLICER_H  */

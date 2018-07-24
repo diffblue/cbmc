@@ -68,7 +68,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cpp/cprover_library.h>
 
 #include "accelerate/accelerate.h"
-#include "aggressive_slicer.h"
 #include "alignment_checks.h"
 #include "branch.h"
 #include "call_sequences.h"
