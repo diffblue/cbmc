@@ -46,7 +46,7 @@ codet cpp_typecheckt::cpp_constructor(
     // The purpose of the tag #array_ini is to rule out ill-formed
     // programs.
 
-    if(!operands.empty() && !operands.front().get_bool("#array_ini"))
+    if(!operands.empty() && !operands.front().get_bool(ID_C_array_ini))
     {
       error().source_location=source_location;
       error() << "bad array initializer" << eom;
@@ -65,7 +65,7 @@ codet cpp_typecheckt::cpp_constructor(
     const exprt &size_expr=
       to_array_type(tmp_type).size();
 
-    if(size_expr.id()=="infinity")
+    if(size_expr.id() == ID_infinity)
     {
       // don't initialize
       codet nil;
@@ -91,8 +91,8 @@ codet cpp_typecheckt::cpp_constructor(
       exprt op_tc=operands.front();
       typecheck_expr(op_tc);
        // Override constantness
-      object_tc.type().set("#constant", false);
-      object_tc.set("#lvalue", true);
+      object_tc.type().set("ID_C_constant", false);
+      object_tc.set("ID_C_lvalue", true);
       side_effect_exprt assign("assign");
       assign.add_source_location()=source_location;
       assign.copy_to_operands(object_tc, op_tc);

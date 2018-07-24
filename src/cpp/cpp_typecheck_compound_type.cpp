@@ -426,7 +426,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   if(cpp_name.is_operator())
   {
     component.set("is_operator", true);
-    component.type().set("#is_operator", true);
+    component.type().set(ID_C_is_operator, true);
   }
 
   if(is_cast_operator)
@@ -442,7 +442,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   if(is_static)
   {
     component.set(ID_is_static, true);
-    component.type().set("#is_static", true);
+    component.type().set(ID_C_is_static, true);
   }
 
   if(is_typedef)
@@ -517,7 +517,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     else // virtual
     {
       component.type().set(ID_C_is_virtual, true);
-      component.type().set("#virtual_name", virtual_name);
+      component.type().set(ID_C_virtual_name, virtual_name);
 
       // Check if it is a pure virtual method
       if(value.is_not_nil() && value.id() == ID_constant)
@@ -888,9 +888,9 @@ void cpp_typecheckt::typecheck_friend_declaration(
     // typecheck ftype
 
     // TODO
-//    typecheck_type(ftype);
-//    assert(ftype.id()==ID_symbol);
-//    symbol.type.add("#friends").move_to_sub(ftype);
+    //    typecheck_type(ftype);
+    //    assert(ftype.id()==ID_symbol);
+    //    symbol.type.add("ID_C_friends").move_to_sub(ftype);
 
     return;
   }
@@ -914,7 +914,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
           declaration.type(), declaration.storage_spec(),
           declaration.member_spec(), sub_it);
       exprt symb_expr=cpp_symbol_expr(conv_symb);
-      symbol.type.add("#friends").move_to_sub(symb_expr);
+      symbol.type.add(ID_C_friends).move_to_sub(symb_expr);
     }
     else
     {
@@ -929,7 +929,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
       exprt symb_expr=cpp_symbol_expr(conv_symb);
 
-      symbol.type.add("#friends").move_to_sub(symb_expr);
+      symbol.type.add(ID_C_friends).move_to_sub(symb_expr);
     }
   }
 }
@@ -1462,7 +1462,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
 
   put_compound_into_scope(component);
 
-  struct_union_symbol.type.set("#unnamed_object", base_name);
+  struct_union_symbol.type.set(ID_C_unnamed_object, base_name);
 }
 
 bool cpp_typecheckt::get_component(
@@ -1496,7 +1496,7 @@ bool cpp_typecheckt::get_component(
       {
         if(disable_access_control)
         {
-          member.set("#not_accessible", true);
+          member.set(ID_C_not_accessible, true);
           member.set(ID_C_access, component.get(ID_access));
         }
         else
@@ -1520,8 +1520,7 @@ bool cpp_typecheckt::get_component(
 
       return true; // component found
     }
-    else if(
-      follow(component.type()).find("#unnamed_object").is_not_nil())
+    else if(follow(component.type()).find(ID_C_unnamed_object).is_not_nil())
     {
       // could be anonymous union or struct
 
@@ -1597,8 +1596,7 @@ bool cpp_typecheckt::check_component_access(
   }
 
   // check friendship
-  const irept::subt &friends=
-    struct_union_type.find("#friends").get_sub();
+  const irept::subt &friends = struct_union_type.find(ID_C_friends).get_sub();
 
   forall_irep(f_it, friends)
   {

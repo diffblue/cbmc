@@ -654,7 +654,7 @@ void goto_convertt::do_function_call_symbol(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  if(function.get_bool("#invalid_object"))
+  if(function.get_bool(ID_C_invalid_object))
     return; // ignore
 
   // lookup symbol

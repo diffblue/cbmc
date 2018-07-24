@@ -36,8 +36,7 @@ bool symex_dereference_statet::has_failed_symbol(
     const symbolt &ptr_symbol=
       ns.lookup(to_ssa_expr(expr).get_object_name());
 
-    const irep_idt &failed_symbol=
-      ptr_symbol.type.get("#failed_symbol");
+    const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
     if(failed_symbol!="" &&
         !ns.lookup(failed_symbol, symbol))
@@ -57,8 +56,7 @@ bool symex_dereference_statet::has_failed_symbol(
     const symbolt &ptr_symbol=
       ns.lookup(to_symbol_expr(expr).get_identifier());
 
-    const irep_idt &failed_symbol=
-      ptr_symbol.type.get("#failed_symbol");
+    const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
     if(failed_symbol!="" &&
         !ns.lookup(failed_symbol, symbol))

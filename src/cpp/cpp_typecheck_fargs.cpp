@@ -107,7 +107,7 @@ bool cpp_typecheck_fargst::match(
     if(it==ops.begin() && parameter.get(ID_C_base_name)==ID_this)
     {
       type.set(ID_C_reference, true);
-      type.set("#this", true);
+      type.set(ID_C_this, true);
     }
 
     unsigned rank=0;

@@ -1697,7 +1697,7 @@ exprt cpp_typecheck_resolvet::resolve(
   }
 
   // we do some checks before we return
-  if(result.get_bool("#not_accessible"))
+  if(result.get_bool(ID_C_not_accessible))
   {
     #if 0
     if(!fail_with_exception)
@@ -2223,8 +2223,9 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
       }
       else
       {
-        if(expr.type().get_bool("#is_operator") &&
-           fargs.operands.size() == parameters.size())
+        if(
+          expr.type().get_bool(ID_C_is_operator) &&
+          fargs.operands.size() == parameters.size())
         {
           return fargs.match(type, args_distance, cpp_typecheck);
         }
