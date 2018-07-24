@@ -29,8 +29,7 @@ code_blockt &codet::make_block()
   exprt tmp;
   tmp.swap(*this);
 
-  *this=codet();
-  set_statement(ID_block);
+  *this = codet(ID_block);
   move_to_operands(tmp);
 
   return static_cast<code_blockt &>(*this);

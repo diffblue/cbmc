@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class codet:public exprt
 {
 public:
+  DEPRECATED("Use codet(statement) instead")
   codet():exprt(ID_code, typet(ID_code))
   {
   }
@@ -253,6 +254,7 @@ inline code_assignt &to_code_assign(codet &code)
 class code_declt:public codet
 {
 public:
+  DEPRECATED("Use code_declt(symbol) instead")
   code_declt():codet(ID_decl)
   {
     operands().resize(1);
@@ -305,6 +307,7 @@ inline code_declt &to_code_decl(codet &code)
 class code_deadt:public codet
 {
 public:
+  DEPRECATED("Use code_deadt(symbol) instead")
   code_deadt():codet(ID_dead)
   {
     operands().resize(1);
@@ -354,6 +357,7 @@ inline code_deadt &to_code_dead(codet &code)
 class code_assumet:public codet
 {
 public:
+  DEPRECATED("Use code_assumet(expr) instead")
   code_assumet():codet(ID_assume)
   {
     operands().resize(1);
@@ -400,6 +404,7 @@ inline code_assumet &to_code_assume(codet &code)
 class code_assertt:public codet
 {
 public:
+  DEPRECATED("Use code_assertt(expr) instead")
   code_assertt():codet(ID_assert)
   {
     operands().resize(1);
@@ -533,9 +538,17 @@ inline code_ifthenelset &to_code_ifthenelse(codet &code)
 class code_switcht:public codet
 {
 public:
+  DEPRECATED("Use code_switcht(value, body) instead")
   code_switcht():codet(ID_switch)
   {
     operands().resize(2);
+  }
+
+  code_switcht(const exprt &_value, const codet &_body) : codet(ID_switch)
+  {
+    operands().resize(2);
+    value() = _value;
+    body() = _body;
   }
 
   const exprt &value() const
@@ -588,9 +601,17 @@ inline code_switcht &to_code_switch(codet &code)
 class code_whilet:public codet
 {
 public:
+  DEPRECATED("Use code_whilet(cond, body) instead")
   code_whilet():codet(ID_while)
   {
     operands().resize(2);
+  }
+
+  code_whilet(const exprt &_cond, const codet &_body) : codet(ID_while)
+  {
+    operands().resize(2);
+    cond() = _cond;
+    body() = _body;
   }
 
   const exprt &cond() const
@@ -643,9 +664,17 @@ inline code_whilet &to_code_while(codet &code)
 class code_dowhilet:public codet
 {
 public:
+  DEPRECATED("Use code_dowhilet(cond, body) instead")
   code_dowhilet():codet(ID_dowhile)
   {
     operands().resize(2);
+  }
+
+  code_dowhilet(const exprt &_cond, const codet &_body) : codet(ID_dowhile)
+  {
+    operands().resize(2);
+    cond() = _cond;
+    body() = _body;
   }
 
   const exprt &cond() const
@@ -774,6 +803,7 @@ inline code_fort &to_code_for(codet &code)
 class code_gotot:public codet
 {
 public:
+  DEPRECATED("Use code_gotot(label) instead")
   code_gotot():codet(ID_goto)
   {
   }
@@ -947,6 +977,7 @@ inline code_returnt &to_code_return(codet &code)
 class code_labelt:public codet
 {
 public:
+  DEPRECATED("Use code_labelt(label) instead")
   code_labelt():codet(ID_label)
   {
     operands().resize(1);
@@ -1014,6 +1045,7 @@ inline code_labelt &to_code_label(codet &code)
 class code_switch_caset:public codet
 {
 public:
+  DEPRECATED("Use code_switch_caset(case_op, code) instead")
   code_switch_caset():codet(ID_switch_case)
   {
     operands().resize(2);
@@ -1188,6 +1220,7 @@ inline const code_asmt &to_code_asm(const codet &code)
 class code_expressiont:public codet
 {
 public:
+  DEPRECATED("Use code_expressiont(expr) instead")
   code_expressiont():codet(ID_expression)
   {
     operands().resize(1);
@@ -1238,6 +1271,7 @@ inline const code_expressiont &to_code_expression(const codet &code)
 class side_effect_exprt:public exprt
 {
 public:
+  DEPRECATED("Use side_effect_exprt(statement, type) instead")
   explicit side_effect_exprt(const irep_idt &statement):
     exprt(ID_side_effect)
   {
@@ -1301,6 +1335,7 @@ inline const side_effect_exprt &to_side_effect_expr(const exprt &expr)
 class side_effect_expr_nondett:public side_effect_exprt
 {
 public:
+  DEPRECATED("Use side_effect_expr_nondett(statement, type) instead")
   side_effect_expr_nondett():side_effect_exprt(ID_nondet)
   {
     set_nullable(true);
@@ -1352,10 +1387,34 @@ inline const side_effect_expr_nondett &to_side_effect_expr_nondet(
 class side_effect_expr_function_callt:public side_effect_exprt
 {
 public:
+  DEPRECATED("Use side_effect_expr_function_callt(...) instead")
   side_effect_expr_function_callt():side_effect_exprt(ID_function_call)
   {
     operands().resize(2);
     op1().id(ID_arguments);
+  }
+
+  side_effect_expr_function_callt(
+    const exprt &_function,
+    const exprt::operandst &_arguments)
+    : side_effect_exprt(ID_function_call)
+  {
+    operands().resize(2);
+    op1().id(ID_arguments);
+    function() = _function;
+    arguments() = _arguments;
+  }
+
+  side_effect_expr_function_callt(
+    const exprt &_function,
+    const exprt::operandst &_arguments,
+    const typet &_type)
+    : side_effect_exprt(ID_function_call, _type)
+  {
+    operands().resize(2);
+    op1().id(ID_arguments);
+    function() = _function;
+    arguments() = _arguments;
   }
 
   exprt &function()
@@ -1409,6 +1468,7 @@ inline const side_effect_expr_function_callt
 class side_effect_expr_throwt:public side_effect_exprt
 {
 public:
+  DEPRECATED("Use side_effect_expr_throwt(exception_list) instead")
   side_effect_expr_throwt():side_effect_exprt(ID_throw)
   {
   }

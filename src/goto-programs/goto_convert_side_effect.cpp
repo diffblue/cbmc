@@ -390,8 +390,7 @@ void goto_convertt::remove_function_call(
     symbol_table);
 
   {
-    code_declt decl;
-    decl.symbol()=new_symbol.symbol_expr();
+    code_declt decl(new_symbol.symbol_expr());
     decl.add_source_location()=new_symbol.location;
     convert_decl(decl, dest, mode);
   }
@@ -425,8 +424,6 @@ void goto_convertt::remove_cpp_new(
   goto_programt &dest,
   bool result_is_used)
 {
-  codet call;
-
   const symbolt &new_symbol = get_fresh_aux_symbol(
     expr.type(),
     tmp_symbol_prefix,
@@ -435,12 +432,11 @@ void goto_convertt::remove_cpp_new(
     ID_cpp,
     symbol_table);
 
-  code_declt decl;
-  decl.symbol()=new_symbol.symbol_expr();
+  code_declt decl(new_symbol.symbol_expr());
   decl.add_source_location()=new_symbol.location;
   convert_decl(decl, dest, ID_cpp);
 
-  call=code_assignt(new_symbol.symbol_expr(), expr);
+  const code_assignt call(new_symbol.symbol_expr(), expr);
 
   if(result_is_used)
     static_cast<exprt &>(expr)=new_symbol.symbol_expr();
@@ -456,9 +452,7 @@ void goto_convertt::remove_cpp_delete(
 {
   assert(expr.operands().size()==1);
 
-  codet tmp;
-
-  tmp.set_statement(expr.get_statement());
+  codet tmp(expr.get_statement());
   tmp.add_source_location()=expr.source_location();
   tmp.copy_to_operands(expr.op0());
   tmp.set(ID_destructor, expr.find(ID_destructor));

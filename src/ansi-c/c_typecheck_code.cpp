@@ -322,9 +322,8 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     }
     else
     {
-      code_declt code;
+      code_declt code(symbol.symbol_expr());
       code.add_source_location()=symbol.location;
-      code.symbol()=symbol.symbol_expr();
       code.symbol().add_source_location()=symbol.location;
 
       // add initializer, if any
