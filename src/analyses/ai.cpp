@@ -264,49 +264,45 @@ bool ai_baset::visit(
 {
   bool new_data=false;
 
-  statet &current=get_state(l);
-
-  for(const auto &to_l : goto_program.get_successors(l))
+  // Function call and return are special cases
+  if(l->is_function_call() && !goto_functions.function_map.empty())
   {
-    if(to_l==goto_program.instructions.end())
-      continue;
+    DATA_INVARIANT(
+      goto_program.get_successors(l).size() == 1,
+      "function calls only have one successor...");
+    DATA_INVARIANT(
+      *(goto_program.get_successors(l).begin()) == std::next(l),
+      "... and it is the next instruction / return location");
 
-    std::unique_ptr<statet> tmp_state(
-      make_temporary_state(current));
+    const code_function_callt &code = to_code_function_call(l->code);
 
-    statet &new_values=*tmp_state;
-
-    bool have_new_values=false;
-
-    if(l->is_function_call() &&
-       !goto_functions.function_map.empty())
+    locationt to_l = std::next(l);
+    if(
+      do_function_call_rec(
+        l, to_l, code.function(), code.arguments(), goto_functions, ns))
     {
-      // this is a big special case
-      const code_function_callt &code=
-        to_code_function_call(l->code);
-
-      if(do_function_call_rec(
-          l, to_l,
-          code.function(),
-          code.arguments(),
-          goto_functions, ns))
-        have_new_values=true;
-    }
-    else
-    {
-      // initialize state, if necessary
-      get_state(to_l);
-
-      new_values.transform(l, to_l, *this, ns);
-
-      if(merge(new_values, l, to_l))
-        have_new_values=true;
-    }
-
-    if(have_new_values)
-    {
-      new_data=true;
+      new_data = true;
       put_in_working_set(working_set, to_l);
+    }
+  }
+  else if(l->is_end_function())
+  {
+    DATA_INVARIANT(
+      goto_program.get_successors(l).empty(),
+      "The end function instruction should have no successors.");
+
+    // Do nothing
+  }
+  else
+  {
+    // Successors can be empty, for example assume(0).
+    // Successors can contain duplicates, for example GOTO next;
+    for(const auto &to_l : goto_program.get_successors(l))
+    {
+      if(to_l == goto_program.instructions.end())
+        continue;
+
+      new_data |= compute_edge(l, working_set, to_l, ns);
     }
   }
 
@@ -347,9 +343,6 @@ bool ai_baset::do_function_call(
   const exprt::operandst &arguments,
   const namespacet &ns)
 {
-  // initialize state, if necessary
-  get_state(l_return);
-
   PRECONDITION(l_call->is_function_call());
 
   const goto_functionst::goto_functiont &goto_function=
@@ -357,11 +350,10 @@ bool ai_baset::do_function_call(
 
   if(!goto_function.body_available())
   {
-    // if we don't have a body, we just do an edige call -> return
-    std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
-    tmp_state->transform(l_call, l_return, *this, ns);
+    working_sett working_set; // Redundant; visit will add l_return
 
-    return merge(*tmp_state, l_call, l_return);
+    // If we don't have a body, we just do an edge call -> return
+    return compute_edge(l_call, working_set, l_return, ns);
   }
 
   assert(!goto_function.body.instructions.empty());
@@ -371,18 +363,11 @@ bool ai_baset::do_function_call(
   {
     // get the state at the beginning of the function
     locationt l_begin=goto_function.body.instructions.begin();
-    // initialize state, if necessary
-    get_state(l_begin);
 
-    // do the edge from the call site to the beginning of the function
-    std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
-    tmp_state->transform(l_call, l_begin, *this, ns);
+    working_sett working_set; // Redundant; fixpoint will add l_begin
 
-    bool new_data=false;
-
-    // merge the new stuff
-    if(merge(*tmp_state, l_call, l_begin))
-      new_data=true;
+    // Do the edge from the call site to the beginning of the function
+    bool new_data = compute_edge(l_call, working_set, l_begin, ns);
 
     // do we need to do/re-do the fixedpoint of the body?
     if(new_data)
@@ -402,11 +387,9 @@ bool ai_baset::do_function_call(
     if(end_state.is_bottom())
       return false; // function exit point not reachable
 
-    std::unique_ptr<statet> tmp_state(make_temporary_state(end_state));
-    tmp_state->transform(l_end, l_return, *this, ns);
+    working_sett working_set; // Redundant; visit will add l_return
 
-    // Propagate those
-    return merge(*tmp_state, l_end, l_return);
+    return compute_edge(l_end, working_set, l_return, ns);
   }
 }
 
