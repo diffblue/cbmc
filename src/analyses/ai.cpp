@@ -201,10 +201,8 @@ void ai_baset::initialize(const goto_functionst::goto_functiont &goto_function)
 
 void ai_baset::initialize(const goto_programt &goto_program)
 {
-  // we mark everything as unreachable as starting point
-
-  forall_goto_program_instructions(i_it, goto_program)
-    get_state(i_it).make_bottom();
+  // Domains are created and set to bottom on access.
+  // So we do not need to set them to be bottom before hand.
 }
 
 void ai_baset::initialize(const goto_functionst &goto_functions)
