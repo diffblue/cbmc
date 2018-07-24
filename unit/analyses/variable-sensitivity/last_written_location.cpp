@@ -24,6 +24,7 @@
 #include <util/type.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include <util/arith_tools.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 
 //#include <src/ansi-c/c_to_expr.h>
 
@@ -49,6 +50,8 @@ SCENARIO("Constructing two environments to make sure we correctly identify modif
     symbol_table.add(first_sym);
     symbol_table.add(second_sym);
     namespacet ns(symbol_table);
+
+    variable_sensitivity_object_factoryt::instance().set_options(optionst{});
 
     WHEN("The identifiers get inserted into two environments")
     {
