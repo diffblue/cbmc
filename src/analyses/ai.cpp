@@ -691,3 +691,11 @@ ai_configt::with_print_string_container_statistics(
   this->print_string_container_statistics = print_string_container_statistics;
   return *this;
 }
+
+bool is_same_code_location(
+  const goto_programt::const_targett &x,
+  const goto_programt::const_targett &y)
+{
+  // if either x or y are end iterators this won't work
+  return &(*x) == &(*y);
+}

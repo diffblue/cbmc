@@ -31,6 +31,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ai_domain.h"
 
 
+/// Helper to compare code locations from different functions
+/// Old variable sensitivity code used == to compare list iterators
+/// however, this is undefined behaviour for iterators from different
+/// collections. This provides a way around that.
+///
+/// @param x A valid goto location, NOT an end iterator
+/// @param y A valid goto location, NOT an end iterator
+bool is_same_code_location(
+  const goto_programt::const_targett &x,
+  const goto_programt::const_targett &y);
+
 struct ai_configt
 {
   using secondst = std::chrono::duration<float>;
