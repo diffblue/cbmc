@@ -250,16 +250,6 @@ typet &java_array_element_type(symbol_typet &array_symbol);
 bool is_java_array_type(const typet &type);
 bool is_multidim_java_array_type(const typet &type);
 
-// i  integer
-// l  long
-// s  short
-// b  byte
-// c  character
-// f  float
-// d  double
-// z  boolean
-// a  reference
-
 typet java_type_from_char(char t);
 typet java_type_from_string(
   const std::string &,
