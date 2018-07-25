@@ -167,11 +167,6 @@ bool is_java_array_tag(const irep_idt& tag)
   return has_prefix(id2string(tag), "java::array[");
 }
 
-bool is_reference_type(const char t)
-{
-  return 'a'==t;
-}
-
 typet java_type_from_char(char t)
 {
   switch(t)

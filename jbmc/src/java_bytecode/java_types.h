@@ -250,8 +250,6 @@ typet &java_array_element_type(symbol_typet &array_symbol);
 bool is_java_array_type(const typet &type);
 bool is_multidim_java_array_type(const typet &type);
 
-bool is_reference_type(char t);
-
 // i  integer
 // l  long
 // s  short
