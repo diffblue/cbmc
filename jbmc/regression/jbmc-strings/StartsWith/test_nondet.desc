@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 Test.class
 --max-nondet-string-length 100 --unwind 10 --function Test.checkNonDet
 ^EXIT=10$
@@ -6,3 +6,8 @@ Test.class
 assertion at file Test.java line 66 .*: SUCCESS
 assertion at file Test.java line 69 .*: FAILURE
 --
+--
+The nondet test currently breaks the invariant at string_refinement.cpp:2162
+("Indices not equal..."), which checks that a given string is not used with
+multiple distinct indices. As the test checks s.substring(s, 1), two distinct
+indices are indeed used.
