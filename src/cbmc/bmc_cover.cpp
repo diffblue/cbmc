@@ -144,6 +144,13 @@ protected:
   bmct &bmc;
 };
 
+static bool is_failed_assumption_step(
+  symex_target_equationt::SSA_stepst::const_iterator step,
+  const prop_convt &prop_conv)
+{
+  return step->is_assume() && prop_conv.l_get(step->cond_literal).is_false();
+}
+
 void bmc_covert::satisfying_assignment()
 {
   tests.push_back(testt());
@@ -173,21 +180,8 @@ void bmc_covert::satisfying_assignment()
     }
   }
 
-  build_goto_trace(bmc.equation, bmc.equation.SSA_steps.end(),
-                   solver, bmc.ns, test.goto_trace);
-
-  goto_tracet &goto_trace=test.goto_trace;
-
-  // Now delete anything after first failed assumption
-  for(goto_tracet::stepst::iterator
-      s_it1=goto_trace.steps.begin();
-      s_it1!=goto_trace.steps.end();
-      s_it1++)
-    if(s_it1->is_assume() && !s_it1->cond_value)
-    {
-      goto_trace.steps.erase(++s_it1, goto_trace.steps.end());
-      break;
-    }
+  build_goto_trace(
+    bmc.equation, is_failed_assumption_step, solver, bmc.ns, test.goto_trace);
 }
 
 bool bmc_covert::operator()()

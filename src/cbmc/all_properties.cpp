@@ -41,10 +41,7 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
       if(solver.l_get(cond).is_false())
       {
         g.second.status=goalt::statust::FAILURE;
-        symex_target_equationt::SSA_stepst::iterator next=c;
-        next++; // include the assertion
-        build_goto_trace(bmc.equation, next, solver, bmc.ns,
-                         g.second.goto_trace);
+        build_goto_trace(bmc.equation, c, solver, bmc.ns, g.second.goto_trace);
         break;
       }
     }
