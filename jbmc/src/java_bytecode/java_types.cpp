@@ -140,6 +140,25 @@ typet &java_array_element_type(symbol_typet &array_symbol)
   return array_symbol.add_type(ID_C_element_type);
 }
 
+/// Checks whether the given type is an array pointer type
+bool is_java_array_type(const typet &type)
+{
+  if(!(type.id() == ID_pointer && type.subtype().id() == ID_symbol))
+    return false;
+  const auto &subtype_symbol = to_symbol_type(type.subtype());
+  return is_java_array_tag(subtype_symbol.get_identifier());
+}
+
+/// Checks whether the given type is a multi-dimensional array pointer type,
+// i.e., a pointer to an array type with element type also being a pointer to an
+/// array type.
+bool is_multidim_java_array_type(const typet &type)
+{
+  return is_java_array_type(type) &&
+         is_java_array_type(
+           java_array_element_type(to_symbol_type(type.subtype())));
+}
+
 /// See above
 /// \par parameters: Struct tag 'tag'
 /// \return True if the given struct is a Java array

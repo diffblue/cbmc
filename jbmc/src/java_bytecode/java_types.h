@@ -247,6 +247,8 @@ symbol_typet java_classname(const std::string &);
 reference_typet java_array_type(const char subtype);
 const typet &java_array_element_type(const symbol_typet &array_symbol);
 typet &java_array_element_type(symbol_typet &array_symbol);
+bool is_java_array_type(const typet &type);
+bool is_multidim_java_array_type(const typet &type);
 
 bool is_reference_type(char t);
 
