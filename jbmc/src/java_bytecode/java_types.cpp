@@ -147,8 +147,12 @@ typet &java_array_element_type(symbol_typet &array_symbol)
 /// Checks whether the given type is an array pointer type
 bool is_java_array_type(const typet &type)
 {
-  if(!(type.id() == ID_pointer && type.subtype().id() == ID_symbol))
+  if(
+    !can_cast_type<pointer_typet>(type) ||
+    !can_cast_type<symbol_typet>(type.subtype()))
+  {
     return false;
+  }
   const auto &subtype_symbol = to_symbol_type(type.subtype());
   return is_java_array_tag(subtype_symbol.get_identifier());
 }
