@@ -391,8 +391,9 @@ bool compilet::compile()
     source_files.pop_front();
 
     // Visual Studio always prints the name of the file it's doing
+    // onto stdout. The name of the directory is stripped.
     if(echo_file_name)
-      status() << file_name << eom;
+      std::cout << get_base_name(file_name, false) << '\n' << std::flush;
 
     bool r=parse_source(file_name); // don't break the program!
 
