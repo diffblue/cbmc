@@ -57,6 +57,7 @@ jobs:
           packages:
             - cmake
             - google-cloud-sdk
+            - graphviz
       cache:
         directories:
           - ${TRAVIS_BUILD_DIR}/doxygen/build/bin
