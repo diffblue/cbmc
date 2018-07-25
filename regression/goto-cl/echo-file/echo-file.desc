@@ -1,0 +1,9 @@
+CORE
+some_funny_file.c
+
+^EXIT=0$
+^SIGNAL=0$
+^some_funny_file.c$
+--
+^warning: ignoring
+^CONVERSION ERROR$
