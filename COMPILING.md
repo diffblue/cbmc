@@ -29,6 +29,11 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
    Note that you need g++ version 5.0 or newer.
 
+   On Amazon Linux and similar distributions, do as root:
+   ```
+   yum install gcc72-c++ flex bison perl-libwww-perl patch
+   ```
+
    To compile JBMC, you additionally need the JDK and the java-models-library.
    For the JDK, on Debian-like distributions, do as root:
    ```
