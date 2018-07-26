@@ -176,9 +176,9 @@ bool exprt::is_zero() const
         CHECK_RETURN(false);
       return rat_value.is_zero();
     }
-    else if(type_id==ID_unsignedbv ||
-            type_id==ID_signedbv ||
-            type_id==ID_c_bool)
+    else if(
+      type_id == ID_unsignedbv || type_id == ID_signedbv ||
+      type_id == ID_c_bool || type_id == ID_c_bit_field)
     {
       return constant.value_is_zero_string();
     }
