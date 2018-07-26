@@ -1,8 +1,9 @@
 \ingroup module_hidden 
-\ingroup module_hidden 
 \page cbmc-developer-guide CBMC Developer Guide
 
-\author César Rodríguez, Owen Jones
+\author Martin Brain, Peter Schrammel, César Rodríguez, Owen Jones
+
+\tableofcontents
 
 \section section-compilation-and-development Compilation and Development
 
@@ -14,11 +15,11 @@ internals of the system and how to get started on development.
 
 ## CMake files ##
 
-FIXME
+To be documented.
 
 ## Personal configuration: config.inc, macro DEBUG ##
 
-FIXME
+To be documented.
 
 ## Generating doxygen documentation ##
 
@@ -64,27 +65,27 @@ rather than `UI_message_handlert` or `UIMessageHandler` and
 
 ## AST: types, globals, variables, functions, code blocks, language primitives, assignments, expressions, variables ##
 
-FIXME
+To be documented.
 
 ## CFG ##
 
-FIXME
+To be documented.
 
 ## Bounded model checking (from the CBMC manual) ##
 
-FIXME
+To be documented.
 
 ### SSA ###
 
-FIXME
+To be documented.
 
 ## SAT and SMT ##
 
-FIXME
+To be documented.
 
 ## Static analysis ##
 
-FIXME
+To be documented.
 
 
 \section section-cprover-architecture CPROVER Architecture
@@ -141,49 +142,45 @@ it’s saved output. These include a wide range of analysis and
 transformation tools (see \ref section-other-tools).
 
 # Concepts #
-## {C, java bytecode} -> Parse tree -> Symbol table -> GOTO programs → GOTO program transformations → BMC → counterexample (goto_tracet) → printing ##
-
-FIXME
-
-## Instrumentation (for test gen & CBMC & …): Goto functions -> goto functions ##
-
-FIXME
-
-## Goto functions -> BMC -> Counterexample (trace) ##
-
-FIXME
-
-## Trace -> interpreter -> memory map ##
-
-FIXME
-
-## Goto functions -> abstract interpretation ##
-
-FIXME
-
-## Executables (flow of transformations): ##
-
-FIXME
-
-### goto-cc ###
-
-FIXME
-
-### goto-instrument ###
-
-FIXME
-
-### Cbmc ###
+## {C, java bytecode} → Parse tree → Symbol table → GOTO programs → GOTO program transformations → BMC → counterexample (goto_tracet) → printing ##
 
 To be documented.
 
-### Goto-analyzer ###
+## Instrumentation (for test gen & CBMC & ...): Goto functions -> goto functions ##
 
-FIXME
+To be documented.
 
-#### Martin ####
+## Goto functions -> BMC -> Counterexample (trace) ##
 
-FIXME
+To be documented.
+
+## Trace -> interpreter -> memory map ##
+
+To be documented.
+
+## Goto functions -> abstract interpretation ##
+
+To be documented.
+
+## Executables (flow of transformations): ##
+
+To be documented.
+
+### goto-cc ###
+
+To be documented.
+
+### goto-instrument ###
+
+To be documented.
+
+### cbmc ###
+
+To be documented.
+
+### goto-analyzer ###
+
+To be documented.
 
 
 \section section-folder-walkthrough Folder walkthrough
@@ -278,101 +275,105 @@ format of the description files.
 \section section-data-structures-core-structures-and-ast Data structures: core structures and AST
 
 ## Strings: dstringt, the string_container and the ID_* ##
-Within cbmc, strings are represented using irep_idt. By default this is
-typedefed to dstringt, which stores a string as an index into a large
-static table of strings. This makes it easy to compare if two irep_idts
+Within cbmc, strings are represented using `irep_idt`. By default this is
+typedefed to \ref dstringt, which stores a string as an index into a large
+static table of strings. This makes it easy to compare if two `irep_idt`s
 are equal (just compare the index) and it makes it efficient to store
-many copies of the same string. The static list of strings is populated
-from irep_ids.def, so for example the fourth entry in irep_ids.def is
+many copies of the same string. The static list of strings is initially populated
+from `irep_ids.def`, so for example the fourth entry in `irep_ids.def` is
 “IREP_ID_ONE(type)”, so the string “type” has index 3. You can refer to
-this irep_idt as ID_type. The other kind of line you see is
+this `irep_idt` as `ID_type`. The other kind of line you see is
 “IREP_ID_TWO(C_source_location, #source_location)”, which means the
-irep_idt for the string “#source_location” can be referred to as
-ID_C_source_location. The “C” is for comment, which will be explained
-in the next section.
+`irep_idt` for the string “#source_location” can be referred to as
+`ID_C_source_location`. The “C” is for comment, which will be explained
+in the next section. Any strings that need to be stored as `irep_id`s which
+aren't in `irep_ids.def` are added to the end of the table when they are
+first encountered, and the same index is used for all instances. 
 
-See documentation at \ref irep_idt.
+See documentation at \ref dstringt.
 
-## Irept: a 4-triple (data, named-sub, comments-sub, sub) ##
+## irept: a 4-triple (data, named-sub, comments, sub) ##
 See documentation at \ref irept.
 
-As that documentation says, irepts are generic tree nodes. You should
-think of them as having lots of child nodes, some of which are numbered
-(sub) and some of which are labelled, and the label can either start
-with a “#” (comments-sub) or without one (named-sub). The meaning of
-the “#” is that this child should not be considered important, for
-example it shouldn’t be counted when comparing two irepts for equality.
+As that documentation says, `irept`s are generic tree nodes. You should
+think of them as having a single string (data, actually an `irep_idt`) and
+lots of child nodes, some of which are numbered (sub) and some of which are
+labelled, and the label can either start with a “#” (comments-sub) or without
+one (named-sub). The meaning of the “#” is that this child should not be
+considered important, for example it shouldn’t be counted when comparing two
+`irept`s for equality.
 
-## Typet ##
+## typet ##
 
-FIXME
+To be documented.
 
 ### symbol_typet ###
 
-FIXME
+To be documented.
 
-## Exprt ##
-Exprt is the class to represent an expression. It inherits from irept,
-and the only things it adds to it are that every exprt has a named sub
-containing its type and everything in the sub of an exprt is again an
-exprt, not just an irept. You can think of exprt as a node in the
+## exprt ##
+\ref exprt is the class to represent an expression. It inherits from \ref irept,
+and the only things it adds to it are that every \ref exprt has a named sub
+containing its type and everything in the sub of an \ref exprt is again an
+\ref exprt, not just an \ref irept. You can think of \ref exprt as a node in the
 abstract syntax tree for an expression. There are many classes that
-inherit from exprt and which represent more specific things. For
-example, there is minus_exprt, which has a sub of size 2 (for the two
+inherit from \ref exprt and which represent more specific things. For
+example, there is \ref minus_exprt, which has a sub of size 2 (for the two
 argument of minus).
 
-Recall that every irept has one piece of data of its own, i.e. its
-id(), and all other information is in its named_sub, comments_sub or
-sub. For exprts, the id() is used to specify why kind of exprt this is,
-so a minus_exprt has ID_minus as its id(). This means that a
-minus_exprt can be passed wherever an exprt is expected, and if you
+Recall that every \ref irept has one piece of data of its own, i.e. its
+`id()`, and all other information is in its `named_sub`, `comments` or
+`sub`. For `exprt`s, the `id()` is used to specify why kind of \ref exprt this is,
+so a \ref minus_exprt has `ID_minus` as its `id()`. This means that a
+\ref minus_exprt can be passed wherever an \ref exprt is expected, and if you
 want to check if the expression you are looking at is a minus
-expression then you have to check its id().
+expression then you have to check its `id()` (or use
+`can_cast_expr<minus_exprt>`).
 
-## Codet
-Exprts represent expressions and codets represent statements. Codet
-inherits from exprt, so all codets are exprts, with id() ID_code.
-Many different kinds of statements inherit from codet, and they are
-distinguished by their statement(). For example, a while loop would be
-represented by a code_whilet, which has statement() ID_while.
-Code_whilet has two operands in its sub, and helper functions to make
-it easier to use: cond() returns the first entry in its sub(), which
-is the condition for the while loop, and body() returns the second
-entry in its sub, which is the body of the while loop - this has to be
-a codet, because the body of a while loop is a statement.
+## codet ##
+\ref exprt represents expressions and \ref codet represents statements. \ref codet
+inherits from \ref exprt, so all `codet`s are `exprt`s, with `id()` `ID_code`.
+Many different kinds of statements inherit from \ref codet, and they are
+distinguished by their `statement()`. For example, a while loop would be
+represented by a \ref code_whilet, which has `statement()` `ID_while`.
+\ref code_whilet has two operands in its sub, and helper functions to make
+it easier to use: `cond()` returns the first subexpression, which
+is the condition for the while loop, and `body()` returns the second
+subexpression, which is the body of the while loop - this has to be
+a \ref codet, because the body of a while loop is a statement.
 
-## Symbolt, symbol_table, and namespacet ##
+## symbolt, symbol_table, and namespacet ##
 
-FIXME
+To be documented.
 
 ### Symbol lifetimes, symbol modes, name, base-name, pretty-name; semantic of lifetimes for symex? ###
 
-FIXME
+To be documented.
 
 ### Storing symbols and hiding symbols (namespacet) ###
 
-FIXME
+To be documented.
 
 ### ns.follow ##
 
-FIXME
+To be documented.
 
 
 ## Examples: how to represent the AST of statements, focus on java ##
 
-FIXME
+To be documented.
 
 ### struct Array { int length, int *data }; ###
 
-FIXME
+To be documented.
 
 ### x = y + 123 ###
 
-FIXME
+To be documented.
 
 ### if (x > 10) { y = 2 } else { v[3] = 4 } ###
 
-FIXME
+To be documented.
 
 
 
@@ -380,51 +381,51 @@ FIXME
 
 ## goto_programt ##
 
-FIXME
+To be documented.
 
 ### The CFG of a function ###
 
-FIXME
+To be documented.
 
-### Instructiont ###
+### instructiont ###
 
-FIXME
+See documentation at \ref instructiont.
 
 #### Types, motivation of each type (dead?) #####
 
-FIXME
+To be documented.
 
 #### Accepted code (codet) values ####
 
-FIXME
+To be documented.
 
 #### Accepted guard (exprt) values ####
 
-FIXME
+To be documented.
 
 ## goto_functionst ##
 
-FIXME
+To be documented.
 
 ### A map from function names to function bodies (CFGs) ###
 
-FIXME
+To be documented.
 
-## Goto_modelt ##
+## goto_modelt ##
 
-FIXME
+To be documented.
 
 ### A compilation unit ###
 
-FIXME
+To be documented.
 
 ## Example: ##
 
-FIXME
+To be documented.
 
 ### Unsigned mult (unsigned a, unsigned b) { int acc, i; for (i = 0; i < b; i++) acc += a; return acc; } ###
 
-FIXME
+To be documented.
 
 
 
@@ -433,39 +434,39 @@ FIXME
 
 ## Front-end languages: generating codet from multiple languages ##
 
-FIXME
+To be documented.
 
-### Language_uit, language_filest, languaget classes: ###
+### language_uit, language_filest, languaget classes: ###
 
-FIXME
+To be documented.
 
 ### Purpose ###
 
-FIXME
+To be documented.
 
 ### Parse ###
 
-FIXME
+To be documented.
 
 ### Typecheck ###
 
-FIXME
+To be documented.
 
 ### Final ###
 
-FIXME
+To be documented.
 
 ## Java bytecode: ##
 
-FIXME
+To be documented.
 
 ### Explain how a java program / class is represented in a .class ###
 
-FIXME
+To be documented.
 
 ### Explain the 2 step conversion from bytecode to codet; give an example with a class? ###
 
-FIXME
+To be documented.
 
 
 
@@ -473,7 +474,7 @@ FIXME
 
 ## equation ##
 
-FIXME
+To be documented.
 
 
 
@@ -481,7 +482,7 @@ FIXME
 
 ## Symex class ##
 
-FIXME
+To be documented.
 
 
 
@@ -489,28 +490,28 @@ FIXME
 
 ## Flattening ##
 
-FIXME
+To be documented.
 
 ## SMT solving API ##
 
-FIXME
+To be documented.
 
 ## SAT solving API ##
 
-FIXME
+To be documented.
 
 
 
 \section section-static-analysis-apis Static analysis APIs
 
 
-FIXME
+To be documented.
 
 
 
 \section section-other-tools Other Tools
 
-FIXME: The text in this section is a bit outdated.
+To be documented.: The text in this section is a bit outdated.
 
 The CPROVER subversion archive contains a number of separate programs.
 Others are developed separately as patches or separate
