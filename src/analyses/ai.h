@@ -413,6 +413,105 @@ private:
 /// There are several different options of what kind of storage is used for
 /// the domains and how historys map to domains.
 
+/// location_insensitive_ait stores one domain per function
+template <typename historyT, typename domainT>
+class location_insensitive_ait : public ai_storaget<historyT, domainT>
+{
+public:
+  typedef ai_storaget<historyT, domainT> parent;
+  using typename parent::tracet; // Base interface
+  using typename parent::statet; // Base interface
+  using typename parent::locationt;
+  using typename parent::historyt; // Specific instance
+  using typename parent::domaint;  // Specific instance
+
+  typedef std::map<irep_idt, domaint> state_mapt;
+
+  location_insensitive_ait() : ai_storaget<historyT, domainT>()
+  {
+  }
+
+  void clear() override
+  {
+    state_map.clear();
+    parent::clear();
+  }
+
+  std::unique_ptr<statet> abstract_state_before(locationt t) const override
+  {
+    typename state_mapt::const_iterator it = state_map.find(t->function);
+    if(it == state_map.end())
+    {
+      std::unique_ptr<statet> d = util_make_unique<domainT>();
+      CHECK_RETURN(d->is_bottom());
+      return d;
+    }
+
+    return util_make_unique<domainT>(it->second);
+  }
+
+  // Additional direct access operators
+  using parent::operator[];
+  domainT &operator[](const locationt &l)
+  {
+    return static_cast<domainT &>(get_state(l->function));
+  }
+
+  const domainT &operator[](const locationt &l) const
+  {
+    return static_cast<const domainT &>(find_state(l->function));
+  }
+
+  domainT &operator[](const irep_idt &f)
+  {
+    return static_cast<domainT &>(get_state(f));
+  }
+
+  const domainT &operator[](const irep_idt &f) const
+  {
+    return static_cast<const domainT &>(find_state(f));
+  }
+
+protected:
+  // this one creates states, if need be
+  virtual statet &get_state(const irep_idt f)
+  {
+    typename state_mapt::iterator it = state_map.find(f);
+    if(it == state_map.end())
+    {
+      auto insert_result = state_map.insert(std::make_pair(f, domaint()));
+      CHECK_RETURN(insert_result.second);
+      it = insert_result.first;
+      CHECK_RETURN(it->second.is_bottom());
+    }
+
+    return it->second;
+  }
+
+  statet &get_state(const tracet &h) override
+  {
+    return get_state(h.current_location()->function);
+  }
+
+  // this one just finds states and can be used with a const ai_storage
+  virtual const statet &find_state(const irep_idt f) const
+  {
+    typename state_mapt::const_iterator it = state_map.find(f);
+    if(it==state_map.end())
+      throw "failed to find state";
+
+    return it->second;
+  }
+
+  const statet &find_state(const tracet &h) const override
+  {
+    return find_state(h.current_location()->function);
+  }
+
+private:
+  state_mapt state_map;
+};
+
 /// location_sensitive_ait stores one domain per location
 template <typename historyT, typename domainT>
 class location_sensitive_ait : public ai_storaget<historyT, domainT>
