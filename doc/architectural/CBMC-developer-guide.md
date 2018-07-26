@@ -185,7 +185,7 @@ To be documented.
 
 \section section-folder-walkthrough Folder walkthrough
 
-See [the folder walkthrough](folder-walkthrough.md).
+See [the folder walkthrough](\ref folder-walkthrough).
 
 
 

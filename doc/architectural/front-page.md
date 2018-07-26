@@ -68,10 +68,13 @@ you can access it <a href=
 
 ### For contributors:
 
-* The \subpage cprover-architecture-overview "CProver Architecture Overview"
-is a single document describing the layout of the codebase and many of the
-important data structures. It probably contains more information than the
-module pages at the moment, but may be somewhat out-of-date.
+* The \subpage cbmc-developer-guide "CBMC Developer Guide"
+  is a single document describing the layout of the codebase and many of the
+  important data structures. It probably contains more information than the
+  module pages at the moment, but may be somewhat out-of-date.
+
+* The \subpage folder-walkthrough "Folder walkthrough" gives an overview of the
+  folders
 
 * For higher-level architectural information, each of the pages under
   the <a href="modules.html">Modules</a>
