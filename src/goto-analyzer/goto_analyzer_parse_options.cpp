@@ -219,7 +219,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("intervals", true);
     options.set_option("domain set", true);
   }
-  else if(cmdline.isset("(show-non-null)"))
+  else if(cmdline.isset("show-non-null"))
   {
     // For backwards compatibility
     options.set_option("show", true);
