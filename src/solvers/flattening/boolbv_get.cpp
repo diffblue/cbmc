@@ -333,8 +333,9 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
       return nil_exprt();
     }
 
-    // get root
-    const auto number = arrays.find_number(*opt_num);
+    std::size_t number = arrays.get_number(expr).value();
+    if(!number)
+      return nil_exprt();
 
     assert(number<index_map.size());
     index_mapt::const_iterator it=index_map.find(number);
