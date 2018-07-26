@@ -147,6 +147,7 @@ class optionst;
   "(dependence-graph)" \
   "(show)(verify)(simplify):" \
   "(location-sensitive)(concurrent)" \
+  "(location-insensitive)" \
   "(no-simplify-slicing)" \
 // clang-format on
 

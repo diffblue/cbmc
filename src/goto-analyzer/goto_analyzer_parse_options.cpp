@@ -239,6 +239,8 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     // Abstract interpreter choice
     if(cmdline.isset("location-sensitive"))
       options.set_option("location-sensitive", true);
+    else if(cmdline.isset("location-insensitive"))
+      options.set_option("location-insensitive", true);
     else if(cmdline.isset("concurrent"))
       options.set_option("concurrent", true);
     else
@@ -323,6 +325,18 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
       domain=new ait<non_null_domaint>();
     }
 #endif
+  }
+  else if(options.get_bool_option("location-insensitive"))
+  {
+    if(options.get_bool_option("constants"))
+    {
+      domain = new location_insensitive_ait<ahistoricalt,
+                                            constant_propagator_domaint>();
+    }
+    else if(options.get_bool_option("intervals"))
+    {
+      domain = new location_insensitive_ait<ahistoricalt, interval_domaint>();
+    }
   }
   else if(options.get_bool_option("concurrent"))
   {
@@ -810,8 +824,10 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     "Abstract interpreter options:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    " --location-sensitive         use location-sensitive abstract interpreter\n"
-    " --concurrent                 use concurrency-aware abstract interpreter\n"
+    " --location-sensitive         one domain per location\n"
+    " --location-insensitive       one domain per function\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --concurrent                 one domain per location and concurrency analysis\n"
     "\n"
     "Domain options:\n"
     " --constants                  constant domain\n"
