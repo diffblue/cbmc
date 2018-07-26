@@ -394,63 +394,25 @@ bool ai_baset::do_function_call_rec(
 {
   PRECONDITION(!goto_functions.function_map.empty());
 
-  // We can't really do this here -- we rely on
-  // these being removed by some previous analysis.
-  PRECONDITION(function.id() != ID_dereference);
-
-  // Can't be a function
+  // This is quite a strong assumption on the well-formedness of the program.
+  // It means function pointers must be removed before use.
   DATA_INVARIANT(
-    function.id() != "NULL-object", "Function cannot be null object");
-  DATA_INVARIANT(function.id() != ID_member, "Function cannot be struct field");
-  DATA_INVARIANT(function.id() != ID_index, "Function cannot be array element");
+    function.id() == ID_symbol,
+    "Function pointers and indirect calls must be removed before analysis.");
 
   bool new_data=false;
 
-  if(function.id()==ID_symbol)
-  {
-    const irep_idt &identifier = to_symbol_expr(function).get_identifier();
+  const irep_idt &identifier = to_symbol_expr(function).get_identifier();
 
-    goto_functionst::function_mapt::const_iterator it=
-      goto_functions.function_map.find(identifier);
+  goto_functionst::function_mapt::const_iterator it =
+    goto_functions.function_map.find(identifier);
 
-    if(it==goto_functions.function_map.end())
-      throw "failed to find function "+id2string(identifier);
+  DATA_INVARIANT(
+    it != goto_functions.function_map.end(),
+    "Function " + id2string(identifier) + "not in function map");
 
-    new_data=do_function_call(
-      l_call, l_return,
-      goto_functions,
-      it,
-      arguments,
-      ns);
-  }
-  else if(function.id()==ID_if)
-  {
-    DATA_INVARIANT(function.operands().size() != 3, "if has three operands");
-
-    bool new_data1=
-      do_function_call_rec(
-        l_call, l_return,
-        function.op1(),
-        arguments,
-        goto_functions,
-        ns);
-
-    bool new_data2=
-      do_function_call_rec(
-        l_call, l_return,
-        function.op2(),
-        arguments,
-        goto_functions,
-        ns);
-
-    if(new_data1 || new_data2)
-      new_data=true;
-  }
-  else
-  {
-    throw "unexpected function_call argument: "+
-      function.id_string();
-  }
+  new_data =
+    do_function_call(l_call, l_return, goto_functions, it, arguments, ns);
 
   return new_data;
 }
