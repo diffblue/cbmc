@@ -1602,7 +1602,7 @@ std::string expr2ct::convert_symbol(const exprt &src, unsigned &precedence)
       get_shorthands(src);
 
       entry = shorthands.find(id);
-      assert(entry != shorthands.end());
+      CHECK_RETURN(entry != shorthands.end());
     }
 
     dest = id2string(entry->second);
