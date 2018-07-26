@@ -121,12 +121,12 @@ class java_class_typet:public class_typet
     return set(ID_is_inner_class, is_inner_class);
   }
 
-  const irep_idt get_outer_class() const
+  const irep_idt &get_outer_class() const
   {
     return get(ID_outer_class);
   }
 
-  void set_outer_class(irep_idt outer_class)
+  void set_outer_class(const irep_idt &outer_class)
   {
     return set(ID_outer_class, outer_class);
   }
