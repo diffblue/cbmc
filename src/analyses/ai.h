@@ -386,8 +386,8 @@ private:
   // not implemented in sequential analyses
   bool merge_shared(
     const statet &src,
-    goto_programt::const_targett from,
-    goto_programt::const_targett to,
+    locationt from,
+    locationt to,
     const namespacet &ns) override
   {
     throw "not implemented";
@@ -407,13 +407,13 @@ public:
 
   bool merge_shared(
     const statet &src,
-    goto_programt::const_targett from,
-    goto_programt::const_targett to,
+    locationt from,
+    locationt to,
     const namespacet &ns) override
   {
     statet &dest=this->get_state(to);
-    return static_cast<domainT &>(dest).merge_shared(
-      static_cast<const domainT &>(src), from, to, ns);
+    return static_cast<domaint &>(dest).merge_shared(
+      static_cast<const domaint &>(src), from, to, ns);
   }
 
 protected:
