@@ -114,6 +114,8 @@ struct java_bytecode_parse_treet
     typedef std::vector<exceptiont> exception_tablet;
     exception_tablet exception_table;
 
+    std::vector<irep_idt> throws_exception_table;
+
     struct local_variablet
     {
       irep_idt name;

@@ -912,6 +912,16 @@ public:
     return (parameterst &)add(ID_parameters).get_sub();
   }
 
+  const std::vector<irept> &throws_exceptions() const
+  {
+    return find(ID_exceptions_thrown_list).get_sub();
+  }
+
+  std::vector<irept> &throws_exceptions()
+  {
+    return add(ID_exceptions_thrown_list).get_sub();
+  }
+
   bool get_inlined() const
   {
     return get_bool(ID_C_inlined);

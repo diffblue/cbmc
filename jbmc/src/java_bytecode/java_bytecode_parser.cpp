@@ -121,6 +121,7 @@ protected:
   void rmethod(classt &parsed_class);
   void
   rinner_classes_attribute(classt &parsed_class, const u4 &attribute_length);
+  std::vector<irep_idt> rexceptions_attribute();
   void rclass_attribute(classt &parsed_class);
   void rRuntimeAnnotation_attribute(annotationst &);
   void rRuntimeAnnotation(annotationt &);
@@ -1242,6 +1243,10 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
   {
     rRuntimeAnnotation_attribute(method.annotations);
   }
+  else if(attribute_name == "Exceptions")
+  {
+    method.throws_exception_table = rexceptions_attribute();
+  }
   else
     skip_bytes(attribute_length);
 }
@@ -1652,6 +1657,26 @@ void java_bytecode_parsert::rinner_classes_attribute(
       parsed_class.is_public = is_public;
     }
   }
+}
+
+/// Corresponds to the element_value structure
+/// Described in Java 8 specification 4.7.5
+/// https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.7.5
+/// Parses the Exceptions attribute for the current method,
+/// and returns a vector of exceptions.
+std::vector<irep_idt> java_bytecode_parsert::rexceptions_attribute()
+{
+  u2 number_of_exceptions = read_u2();
+
+  std::vector<irep_idt> exceptions;
+  for(size_t i = 0; i < number_of_exceptions; i++)
+  {
+    u2 exception_index_table = read_u2();
+    const irep_idt exception_name =
+      constant(exception_index_table).type().get(ID_C_base_name);
+    exceptions.push_back(exception_name);
+  }
+  return exceptions;
 }
 
 void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
