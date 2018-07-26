@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// saves space.
 ///
 /// `irep_idt` and `irep_namet` are typedef-ed to `dstringt` in irep.h unless
+/// `USE_STD_STRING` is set.
 ///
 ///
 /// Note: Marked final to disable inheritance. No virtual destructor, so

@@ -88,31 +88,36 @@ const irept &get_nil_irep();
 /// CPROVER. `irept` provides a single, unified representation for all of
 /// these, allowing structure sharing and reference counting of data. As
 /// such `irept` is the basic unit of data in CPROVER.  Each `irept`
-/// contains[^1] a basic unit of data (of type `dt`) which contains four
-/// things:
+/// contains (or references, if reference counted data sharing is enabled, as
+/// it is by default - see the `SHARING` macro) a basic unit of data (of type
+/// `dt`) which contains four things:
 ///
-/// * `data`:   A string[^2], which is returned when the `id()` function is
-///   used.
+/// * `data`:   A string, which is returned when the `id()` function is used.
+///   (Unless `USE_STD_STRING` is set, this is actually a `dstring` and thus
+///   an integer which is a reference into a string table.)
 ///
 /// * `named_sub`:   A map from `irep_namet` (a string) to `irept`. This
 ///   is used for named children, i.e.  subexpressions, parameters, etc.
 ///
 /// * `comments`:   Another map from `irep_namet` to `irept` which is used
-///   for annotations and other ‘non-semantic’ information
+///   for annotations and other ‘non-semantic’ information. Note that this
+///   map is ignored by the default `operator==`.
 ///
 /// * `sub`:   A vector of `irept` which is used to store ordered but
 ///   unnamed children.
 ///
-/// The `irept::pretty` function outputs the contents of an `irept` directly
-/// and can be used to understand and debug problems with `irept`s.
+/// The `irept::pretty` function outputs the explicit tree structure of
+/// an `irept` and can be used to understand and debug problems with
+/// `irept`s.
 ///
-/// On their own `irept`s do not “mean” anything; they are effectively
+/// On their own `irept`s do not "mean" anything; they are effectively
 /// generic tree nodes. Their interpretation depends on the contents of
-/// result of the `id` function (the `data`) field. `util/irep_ids.txt`
-/// contains the complete list of `id` values. During the build process it
-/// is used to generate `util/irep_ids.h` which gives constants for each id
-/// (named `ID_`). These can then be used to identify what kind of data
-/// `irept` stores and thus what can be done with it.
+/// result of the `id` function (the `data`) field. `util/irep_ids.def`
+/// contains a list of `id` values. During the build process it is used
+/// to generate `util/irep_ids.h` which gives constants for each id
+/// (named `ID_`). You can also make `irep_idt`s which do not come from
+/// `util/irep_ids.def`. An `irep_id`can then be used to identify what
+/// kind of data `irept` stores and thus what can be done with it.
 ///
 /// To simplify this process, there are a variety of classes that inherit
 /// from `irept`, roughly corresponding to the ids listed (i.e.  `ID_or`
@@ -130,29 +135,23 @@ const irept &get_nil_irep();
 /// with the architecture of the code.
 ///
 /// Many of the key descendant of `exprt` are declared in `std_expr.h`. All
-/// expressions have a named subfield / annotation which gives the type of
-/// the expression (slightly simplified from C/C++ as `unsignedbv_typet`,
-/// `signedbv_typet`, `floatbv_typet`, etc.). All type conversions are
-/// explicit with an expression with `id() == ID_typecast` and an ‘interface
-/// class’ named `typecast_exprt`. One key descendant of `exprt` is
-/// `symbol_exprt` which creates `irept` instances with the id of “symbol”.
-/// These are used to represent variables; the name of which can be found
-/// using the `get_identifier` accessor function.
+/// expressions have a named subexpresion with ID `type`, which gives the
+/// type of the expression (slightly simplified from C/C++ as
+/// `unsignedbv_typet`, `signedbv_typet`, `floatbv_typet`, etc.). All type
+/// conversions are explicit with an expression with `id() == ID_typecast`
+/// and a `typecast_exprt`. One key descendant of `exprt` is `symbol_exprt`
+/// which creates `irept` instances with the id of “symbol”. These are used
+/// to represent variables; the name of which can be found using the
+/// `get_identifier` accessor function.
 ///
 /// `codet` inherits from `exprt` and is defined in `std_code.h`. It
-/// represents executable code; statements in C rather than expressions. In
-/// the front-end there are versions of these that hold whole code blocks,
-/// but in goto-programs these have been flattened so that each `irept`
-/// represents one sequence point (almost one line of code / one
-/// semi-colon). The most common descendants of `codet` are `code_assignt`
-/// so a common pattern is to cast the `codet` to an assignment and then
-/// recurse on the expression on either side.
-///
-/// [^1]: Or references, if reference counted data sharing is enabled. It is
-///     enabled by default; see the `SHARING` macro.
-///
-/// [^2]: Unless `USE_STD_STRING` is set, this is actually
-/// a `dstring` and thus an integer which is a reference into a string table
+/// represents executable code; statements in a C-like language rather than
+/// expressions. In the front-end there are versions of these that hold
+/// whole code blocks, but in goto-programs these have been flattened so
+/// that each `irept` represents one sequence point (almost one line of
+/// code / one semi-colon). The most common descendant of `codet` is
+/// `code_assignt` so a common pattern is to cast the `codet` to an
+/// assignment and then recurse on the expression on either side.
 class irept
 {
 public:
