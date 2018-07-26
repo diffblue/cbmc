@@ -508,6 +508,36 @@ protected:
     return find_state(h.current_location()->function);
   }
 
+  void output(
+    const namespacet &ns,
+    const goto_programt &goto_program,
+    const irep_idt &identifier,
+    std::ostream &out) const override
+  {
+    auto it = goto_program.instructions.begin();
+    abstract_state_before(it)->output(out, *this, ns);
+    out << "\n";
+    return;
+  }
+
+  jsont output_json(
+    const namespacet &ns,
+    const goto_programt &goto_program,
+    const irep_idt &identifier) const override
+  {
+    auto it = goto_program.instructions.begin();
+    return abstract_state_before(it)->output_json(*this, ns);
+  }
+
+  xmlt output_xml(
+    const namespacet &ns,
+    const goto_programt &goto_program,
+    const irep_idt &identifier) const override
+  {
+    auto it = goto_program.instructions.begin();
+    return abstract_state_before(it)->output_xml(*this, ns);
+  }
+
 private:
   state_mapt state_map;
 };
