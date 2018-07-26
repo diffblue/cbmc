@@ -7,6 +7,7 @@ SRC = unit_tests.cpp \
 
 # Test source files
 SRC += unit_tests.cpp \
+       analyses/ai/ai.cpp \
        analyses/ai/ai_simplify_lhs.cpp \
        analyses/call_graph.cpp \
        analyses/constant_propagator.cpp \
