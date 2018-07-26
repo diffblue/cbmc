@@ -87,6 +87,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "nondet_static.h"
 #include "nondet_volatile.h"
 #include "points_to.h"
+#include "print_ids.h"
 #include "race_check.h"
 #include "reachability_slicer.h"
 #include "remove_function.h"
@@ -231,6 +232,30 @@ int goto_instrument_parse_optionst::doit()
       }
 
       return CPROVER_EXIT_SUCCESS;
+    }
+
+    if(cmdline.isset("print-ids"))
+    {
+      print_ids(goto_model);
+      #if 0
+      show_goto_functions(
+        goto_model,
+        get_message_handler(),
+        ui_message_handler.get_ui(),
+        false);
+      #endif
+      if(cmdline.args.size()==2)
+      {
+        status() << "Writing GOTO program to `" << cmdline.args[1] << "'" << eom;
+
+        if(write_goto_binary(
+          cmdline.args[1], goto_model, get_message_handler()))
+          return CPROVER_EXIT_CONVERSION_FAILED;
+        else
+          return CPROVER_EXIT_SUCCESS;
+      }
+      else
+        return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-value-sets"))
