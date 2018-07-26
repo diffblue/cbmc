@@ -136,7 +136,7 @@ void goto_symext::initialize_entry_point(
   const goto_functiont &entry_point_function = get_goto_function(pc->function);
 
   auto emplace_safe_pointers_result =
-    safe_pointers.emplace(pc->function, local_safe_pointerst{});
+    safe_pointers.emplace(pc->function, local_safe_pointerst{ns});
   if(emplace_safe_pointers_result.second)
     emplace_safe_pointers_result.first->second(entry_point_function.body);
 

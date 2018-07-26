@@ -11,68 +11,68 @@ Author: Diffblue Ltd
 
 #include "local_safe_pointers.h"
 
+#include <util/base_type.h>
 #include <util/expr_iterator.h>
+#include <util/expr_util.h>
 #include <util/format_expr.h>
 
-/// If `expr` is of the form `x != nullptr`, return x. Otherwise return null
-static const exprt *get_null_checked_expr(const exprt &expr)
-{
-  if(expr.id() == ID_notequal)
-  {
-    const exprt *op0 = &expr.op0(), *op1 = &expr.op1();
-    if(op0->type().id() == ID_pointer &&
-       *op0 == null_pointer_exprt(to_pointer_type(op0->type())))
-    {
-      std::swap(op0, op1);
-    }
-
-    if(op1->type().id() == ID_pointer &&
-       *op1 == null_pointer_exprt(to_pointer_type(op1->type())))
-    {
-      while(op0->id() == ID_typecast)
-        op0 = &op0->op0();
-      return op0;
-    }
-  }
-
-  return nullptr;
-}
-
-/// Return structure for `get_conditional_checked_expr`
+/// Return structure for `get_null_checked_expr` and
+/// `get_conditional_checked_expr`
 struct goto_null_checkt
 {
-  /// If true, the given GOTO tests that a pointer expression is non-null on the
-  /// taken branch; otherwise, on the not-taken branch.
+  /// If true, the given GOTO/ASSUME tests that a pointer expression is non-null
+  /// on the taken branch or passing case; otherwise, on the not-taken branch
+  /// or on failure.
   bool checked_when_taken;
 
   /// Null-tested pointer expression
   exprt checked_expr;
 };
 
-/// Check if a GOTO guard expression tests if a pointer is null
-/// \param goto_guard: expression to check
+/// Check if `expr` tests if a pointer is null
+/// \param expr: expression to check
 /// \return a `goto_null_checkt` indicating what expression is tested and
 ///   whether the check applies on the taken or not-taken branch, or an empty
 ///   optionalt if this isn't a null check.
-static optionalt<goto_null_checkt>
-get_conditional_checked_expr(const exprt &goto_guard)
+static optionalt<goto_null_checkt> get_null_checked_expr(const exprt &expr)
 {
-  exprt normalized_guard = goto_guard;
+  exprt normalized_expr = expr;
+  // If true, then a null check is made when test `expr` passes; if false,
+  // one is made when it fails.
   bool checked_when_taken = true;
-  while(normalized_guard.id() == ID_not || normalized_guard.id() == ID_equal)
+
+  // Reduce some roundabout ways of saying "x != null", e.g. "!(x == null)".
+  while(normalized_expr.id() == ID_not)
   {
-    if(normalized_guard.id() == ID_not)
-      normalized_guard = normalized_guard.op0();
-    else
-      normalized_guard.id(ID_notequal);
+    normalized_expr = normalized_expr.op0();
     checked_when_taken = !checked_when_taken;
   }
 
-  const exprt *checked_expr = get_null_checked_expr(normalized_guard);
-  if(!checked_expr)
-    return {};
-  else
-    return goto_null_checkt { checked_when_taken, *checked_expr };
+  if(normalized_expr.id() == ID_equal)
+  {
+    normalized_expr.id(ID_notequal);
+    checked_when_taken = !checked_when_taken;
+  }
+
+  if(normalized_expr.id() == ID_notequal)
+  {
+    const exprt &op0 = skip_typecast(normalized_expr.op0());
+    const exprt &op1 = skip_typecast(normalized_expr.op1());
+
+    if(op0.type().id() == ID_pointer &&
+       op0 == null_pointer_exprt(to_pointer_type(op0.type())))
+    {
+      return { { checked_when_taken, op1 } };
+    }
+
+    if(op1.type().id() == ID_pointer &&
+       op1 == null_pointer_exprt(to_pointer_type(op1.type())))
+    {
+      return { { checked_when_taken, op0 } };
+    }
+  }
+
+  return {};
 }
 
 /// Compute safe dereference expressions for a given GOTO program. This
@@ -82,7 +82,8 @@ get_conditional_checked_expr(const exprt &goto_guard)
 /// \param goto_program: program to analyse
 void local_safe_pointerst::operator()(const goto_programt &goto_program)
 {
-  std::set<exprt> checked_expressions;
+  std::set<exprt, base_type_comparet> checked_expressions(
+    base_type_comparet{ns});
 
   for(const auto &instruction : goto_program.instructions)
   {
@@ -91,11 +92,23 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
       checked_expressions.clear();
     // Retrieve working set for forward GOTOs:
     else if(instruction.is_target())
-      checked_expressions = non_null_expressions[instruction.location_number];
+    {
+      auto findit = non_null_expressions.find(instruction.location_number);
+      if(findit != non_null_expressions.end())
+        checked_expressions = findit->second;
+      else
+      {
+        checked_expressions =
+          std::set<exprt, base_type_comparet>(base_type_comparet{ns});
+      }
+    }
 
     // Save the working set at this program point:
     if(!checked_expressions.empty())
-      non_null_expressions[instruction.location_number] = checked_expressions;
+    {
+      non_null_expressions.emplace(
+        instruction.location_number, checked_expressions);
+    }
 
     switch(instruction.type)
     {
@@ -113,34 +126,43 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
 
     // Possible checks:
     case ASSUME:
+      if(auto assume_check = get_null_checked_expr(instruction.guard))
       {
-        const exprt *checked_expr;
-        if((checked_expr = get_null_checked_expr(instruction.guard)) != nullptr)
-        {
-          checked_expressions.insert(*checked_expr);
-        }
-        break;
+        if(assume_check->checked_when_taken)
+          checked_expressions.insert(assume_check->checked_expr);
       }
+
+      break;
 
     case GOTO:
       if(!instruction.is_backwards_goto())
       {
-        if(auto conditional_check =
-           get_conditional_checked_expr(instruction.guard))
+        // Copy current state to GOTO target:
+
+        auto target_emplace_result =
+          non_null_expressions.emplace(
+            instruction.get_target()->location_number, checked_expressions);
+
+        // If the target already has a state entry then it is a control-flow
+        // merge point and everything will be assumed maybe-null in any case.
+        if(target_emplace_result.second)
         {
-          auto &taken_checked_expressions =
-            non_null_expressions[instruction.get_target()->location_number];
-          taken_checked_expressions = checked_expressions;
-
-          if(conditional_check->checked_when_taken)
-            taken_checked_expressions.insert(conditional_check->checked_expr);
-          else
-            checked_expressions.insert(conditional_check->checked_expr);
-
-          break;
+          if(auto conditional_check = get_null_checked_expr(instruction.guard))
+          {
+            // Add the GOTO condition to either the target or current state,
+            // as appropriate:
+            if(conditional_check->checked_when_taken)
+            {
+              target_emplace_result.first->second.insert(
+                conditional_check->checked_expr);
+            }
+            else
+              checked_expressions.insert(conditional_check->checked_expr);
+          }
         }
-        // Otherwise fall through to...
       }
+
+      break;
 
     default:
       // Pessimistically assume all other instructions might overwrite any
@@ -157,7 +179,7 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
 ///   operator())
 /// \param ns: global namespace
 void local_safe_pointerst::output(
-  std::ostream &out, const goto_programt &goto_program, const namespacet &ns)
+  std::ostream &out, const goto_programt &goto_program)
 {
   forall_goto_program_instructions(i_it, goto_program)
   {
@@ -199,7 +221,7 @@ void local_safe_pointerst::output(
 ///   operator())
 /// \param ns: global namespace
 void local_safe_pointerst::output_safe_dereferences(
-  std::ostream &out, const goto_programt &goto_program, const namespacet &ns)
+  std::ostream &out, const goto_programt &goto_program)
 {
   forall_goto_program_instructions(i_it, goto_program)
   {
@@ -250,4 +272,13 @@ bool local_safe_pointerst::is_non_null_at_program_point(
   while(tocheck->id() == ID_typecast)
     tocheck = &tocheck->op0();
   return findit->second.count(*tocheck) != 0;
+}
+
+bool local_safe_pointerst::base_type_comparet::operator()(
+  const exprt &e1, const exprt &e2) const
+{
+  if(base_type_eq(e1, e2, ns))
+    return false;
+  else
+    return e1 < e2;
 }
