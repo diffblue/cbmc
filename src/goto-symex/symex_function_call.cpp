@@ -148,6 +148,7 @@ void goto_symext::parameter_assignments(
       symbolt symbol;
       symbol.name=id;
       symbol.base_name="va_arg"+std::to_string(va_count);
+      symbol.mode=ID_C;
       symbol.type=it1->type();
 
       state.symbol_table.insert(std::move(symbol));
