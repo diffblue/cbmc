@@ -188,6 +188,9 @@ exprt write_stackt::to_expression() const
       }
       new_expr.op0()=access_expr;
 
+      // If neccesary, complete the type of the new access expression
+      entry->adjust_access_type(new_expr);
+
       access_expr=new_expr;
     }
   }
