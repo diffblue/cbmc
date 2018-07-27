@@ -18,6 +18,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "optional.h"
 #include "deprecate.h"
 
+const int DECIMAL_SYSTEM = 10;
+const int OCTAL_SYSTEM = 8;
+const int BINARY_SYSTEM = 2;
+const int HEXADECIMAL_SYSTEM = 16;
+
 // NOLINTNEXTLINE(readability/identifiers)
 typedef BigInt mp_integer;
 
@@ -47,8 +52,11 @@ mp_integer rotate_right(
 mp_integer rotate_left(
   const mp_integer &, const mp_integer &, std::size_t true_size);
 
-const std::string integer2string(const mp_integer &, unsigned base=10);
-const mp_integer string2integer(const std::string &, unsigned base=10);
+const std::string
+integer2string(const mp_integer &, unsigned base = DECIMAL_SYSTEM);
+const mp_integer
+string2integer(const std::string &, unsigned base = DECIMAL_SYSTEM);
+
 const std::string integer2binary(const mp_integer &, std::size_t width);
 const mp_integer binary2integer(const std::string &, bool is_signed);
 
