@@ -177,9 +177,9 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
             result() << "\n" << "Trace for " << g.first << ":" << "\n";
             show_goto_trace(
               result(), bmc.ns, g.second.goto_trace, bmc.trace_options());
+            result() << eom;
           }
       }
-      result() << eom;
 
       status() << "\n** " << cover_goals.number_covered()
                << " of " << cover_goals.size() << " failed ("
