@@ -87,6 +87,10 @@ reference_typet java_lang_object_type()
   return java_reference_type(symbol_typet("java::java.lang.Object"));
 }
 
+/// Construct an array pointer type. It is a pointer to a symbol with identifier
+/// java::array[]. Its ID_C_element_type is set to the corresponding primitive
+/// type, or void* for arrays of references.
+/// \param subtype Character indicating the type of array
 reference_typet java_array_type(const char subtype)
 {
   std::string subtype_str;
@@ -140,19 +144,48 @@ typet &java_array_element_type(symbol_typet &array_symbol)
   return array_symbol.add_type(ID_C_element_type);
 }
 
+/// Checks whether the given type is an array pointer type
+bool is_java_array_type(const typet &type)
+{
+  if(
+    !can_cast_type<pointer_typet>(type) ||
+    !can_cast_type<symbol_typet>(type.subtype()))
+  {
+    return false;
+  }
+  const auto &subtype_symbol = to_symbol_type(type.subtype());
+  return is_java_array_tag(subtype_symbol.get_identifier());
+}
+
+/// Checks whether the given type is a multi-dimensional array pointer type,
+// i.e., a pointer to an array type with element type also being a pointer to an
+/// array type.
+bool is_multidim_java_array_type(const typet &type)
+{
+  return is_java_array_type(type) &&
+         is_java_array_type(
+           java_array_element_type(to_symbol_type(type.subtype())));
+}
+
 /// See above
-/// \par parameters: Struct tag 'tag'
-/// \return True if the given struct is a Java array
+/// \param tag Tag of a struct
+/// \return True if the given string is a Java array tag, i.e., has a prefix
+/// of java::array[
 bool is_java_array_tag(const irep_idt& tag)
 {
   return has_prefix(id2string(tag), "java::array[");
 }
 
-bool is_reference_type(const char t)
-{
-  return 'a'==t;
-}
-
+/// Constructs a type indicated by the given character:
+/// - i  integer
+/// - l  long
+/// - s  short
+/// - b  byte
+/// - c  character
+/// - f  float
+/// - d  double
+/// - z  boolean
+/// - a  reference
 typet java_type_from_char(char t)
 {
   switch(t)
