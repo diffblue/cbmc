@@ -187,10 +187,6 @@ exprt write_stackt::to_expression() const
         new_expr.operands().resize(1);
       }
       new_expr.op0()=access_expr;
-      // also need to update the type of new_expr because the index_exprt
-      // will have been constructed with a nil op0 and therefore will not
-      // have had its type constructed properly.
-      new_expr.type()=access_expr.type().subtype();
 
       access_expr=new_expr;
     }
