@@ -1,0 +1,13 @@
+CORE
+Cart.class
+--cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar` --trace --cover location --java-max-vla-length 96 --refine-strings --java-unwind-enum-static --max-nondet-string-length 200 --unwind 4 Cart.class --function Cart.checkTax4 --string-printable
+^EXIT=0$
+^SIGNAL=0$
+checkTax4:.*: SATISFIED
+--
+checkTax4:.*bytecode-index 8.*: FAILED
+dec_solve: current index set is empty, this should not happen
+--
+This checks that assigning to a field of an object (which generates a WITH expression in this case) doesn't result
+in conflating the String-typed and non-String-typed fields of the Cart class. When they are conflated we get
+warnings from the string solver and missing coverage.
