@@ -62,7 +62,7 @@ bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
 {
   localst::locals_mapt::const_iterator it=locals.locals_map.find(identifier);
   if(it==locals.locals_map.end() ||
-     it->second.id()!=ID_pointer ||
+     it->second.type().id()!=ID_pointer ||
      dirty(identifier))
     return false;
 
