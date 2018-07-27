@@ -228,7 +228,13 @@ abstract_object_pointert data_dependency_contextt::merge(
       std::inserter(result->data_dominators, result->data_dominators.end()),
       location_ordert());
 
-    return result;
+    // It is critically important that we only return a newly constructed result
+    // abstract object *iff* the data has actually changed, otherwise AI may
+    // never reach a fixpoint
+    if(has_been_modified(result))
+      return result;
+    else
+      return shared_from_this();
   }
 
   return abstract_objectt::merge(other);
