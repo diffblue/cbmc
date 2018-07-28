@@ -1389,6 +1389,14 @@ __decltype          { if(PARSER.cpp98 &&
                 return make_identifier();
             }
 
+  /* This is a clang extension */
+
+"_Null_unspecified" { if(PARSER.mode==configt::ansi_ct::flavourt::CLANG)
+                { /* ignore */ }
+              else
+                return make_identifier();
+            }
+
 }
 
   /* operators following */
