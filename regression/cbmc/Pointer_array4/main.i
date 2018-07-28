@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int main()
 {
   int arrayOfIntegers[] = {1, 2, 3};
@@ -8,6 +6,6 @@ int main()
   int iFirst=(int)pointer2FirstElem;
   int iThird=(int)pointer2ThirdElem;
   int addrDiff = iThird-iFirst;
-  assert(addrDiff == 2* sizeof(int));
+  __CPROVER_assert(addrDiff == 2* sizeof(int), "");
   return 0;
 }

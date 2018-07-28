@@ -102,7 +102,6 @@ jobs:
             - g++-5
             - libubsan0
             - parallel
-            - libc6-dev-i386
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
@@ -137,7 +136,6 @@ jobs:
             - libwww-perl
             - g++-5
             - libubsan0
-            - libc6-dev-i386
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
@@ -166,7 +164,6 @@ jobs:
             - libstdc++-5-dev
             - libubsan0
             - parallel
-            - libc6-dev-i386
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
@@ -195,7 +192,6 @@ jobs:
             - g++-5
             - libstdc++-5-dev
             - libubsan0
-            - libc6-dev-i386
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
@@ -221,7 +217,6 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-            - libc6-dev-i386
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
@@ -247,7 +242,6 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-            - libc6-dev-i386
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-7 bin/gcc
@@ -279,7 +273,6 @@ jobs:
             - libstdc++-5-dev
             - libubsan0
             - parallel
-            - libc6-dev-i386
       before_install:
         - mkdir bin
         # Use gcc/g++ 5 for tests, as Clang doesn't work yet

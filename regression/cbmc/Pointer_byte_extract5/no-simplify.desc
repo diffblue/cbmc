@@ -1,5 +1,5 @@
 CORE
-main.c
+main.i
 --bounds-check --32 --no-simplify
 ^EXIT=10$
 ^SIGNAL=0$

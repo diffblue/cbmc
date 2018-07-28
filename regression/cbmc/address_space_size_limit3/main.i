@@ -1,8 +1,6 @@
 // copy of Pointer_Arithmetic12
 
-#include <stdint.h>
-
-#include <assert.h>
+typedef unsigned int uint32_t;
 
 uint32_t __stack[32];
 
@@ -100,35 +98,25 @@ int main()
   L_0x401_0: esp-=0x14;
   L_0x404_0: var15=ebp;
   L_0x404_1: var15-=0x4;
-#ifdef NONDET
-  L_0x404_2: *(uint32_t*)(var15)=nondet_uint();
-#else
   L_0x404_2: *(uint32_t*)(var15)=0xffffffff;
-#endif
   L_0x40b_0: var16=ebp;
   L_0x40b_1: var16-=0x4;
   L_0x40b_2: eax=*(uint32_t*)(var16);
   L_0x40e_0: *(uint32_t*)(esp)=eax;
   L_0x411_0: esp-=4; f__L_0x3c6_0(); esp+=4;
-#if 1
              uint32_t eax1=eax;
   C_0x3ff_0: ebp=esp;
   C_0x401_0: esp-=0x14;
   C_0x404_0: var15=ebp;
   C_0x404_1: var15-=0x4;
-#ifdef NONDET
-  C_0x404_2: *(uint32_t*)(var15)=nondet_uint();
-#else
   C_0x404_2: *(uint32_t*)(var15)=0xffffffff;
-#endif
   C_0x40b_0: var16=ebp;
   C_0x40b_1: var16-=0x4;
   C_0x40b_2: eax=*(uint32_t*)(var16);
   C_0x40e_0: *(uint32_t*)(esp)=eax;
   C_0x411_0: esp-=4; f__L_0x3c6_0(); esp+=4;
              uint32_t eax2=eax;
-             assert(eax2==eax1);
-#endif
+             __CPROVER_assert(eax2 == eax1, "");
   L_0x416_0: esp=ebp;
   L_0x416_1: ebp=*(uint32_t*)(esp);
   L_0x416_2: esp+=0x4;

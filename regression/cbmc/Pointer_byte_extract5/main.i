@@ -6,19 +6,14 @@ typedef union
   int b;
 } Union;
 
-#ifdef __GNUC__
-typedef struct
-{
-  int Count;
-  Union List[1];
-} __attribute__((packed)) Struct3;
-#else
+#pragma pack(push)
+#pragma pack(1)
 typedef struct
 {
   int Count;
   Union List[1];
 } Struct3;
-#endif
+#pragma pack(pop)
 
 int main()
 {
