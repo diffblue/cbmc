@@ -115,9 +115,10 @@ void cpp_internal_additions(std::ostream &out)
   out << "void " INITIALIZE_FUNCTION "();" << '\n';
 
   // GCC junk stuff, also for CLANG and ARM
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
+  if(
+    config.ansi_c.mode == configt::ansi_ct::flavourt::GCC ||
+    config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG ||
+    config.ansi_c.mode == configt::ansi_ct::flavourt::ARM)
   {
     out << c2cpp(gcc_builtin_headers_types);
 
@@ -126,7 +127,7 @@ void cpp_internal_additions(std::ostream &out)
       config.ansi_c.arch == "x32")
     {
       // clang doesn't do __float128
-      if(config.ansi_c.mode == configt::ansi_ct::flavourt::APPLE)
+      if(config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
         out << "typedef double __float128;" << '\n';
     }
 

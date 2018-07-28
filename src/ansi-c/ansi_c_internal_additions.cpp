@@ -182,9 +182,10 @@ void ansi_c_internal_additions(std::string &code)
     "\n";
 
   // GCC junk stuff, also for CLANG and ARM
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
+  if(
+    config.ansi_c.mode == configt::ansi_ct::flavourt::GCC ||
+    config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG ||
+    config.ansi_c.mode == configt::ansi_ct::flavourt::ARM)
   {
     code+=gcc_builtin_headers_types;
 
@@ -195,11 +196,11 @@ void ansi_c_internal_additions(std::string &code)
        config.ansi_c.arch=="x86_64" ||
        config.ansi_c.arch=="x32")
     {
-      if(config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE)
+      if(config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
         code+="typedef double __float128;\n"; // clang doesn't do __float128
     }
 
-    // On 64-bit systems, gcc has typedefs
+    // On 64-bit systems, both gcc and clang have typedefs
     // __int128_t und __uint128_t -- but not on 32 bit!
     if(config.ansi_c.long_int_width>=64)
     {
