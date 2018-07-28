@@ -195,8 +195,18 @@ void ansi_c_internal_additions(std::string &code)
        config.ansi_c.arch=="x86_64" ||
        config.ansi_c.arch=="x32")
     {
-      if(config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE)
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
         code+="typedef double __float128;\n"; // clang doesn't do __float128
+    }
+
+    if(
+      config.ansi_c.arch == "i386" || config.ansi_c.arch == "x86_64" ||
+      config.ansi_c.arch == "x32" || config.ansi_c.arch == "ia64")
+    {
+      // clang doesn't do __float80
+      // Note that __float80 is a typedef, and not a keyword.
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+        code += "typedef __CPROVER_Float64x __float80;\n";
     }
 
     // On 64-bit systems, gcc has typedefs
