@@ -496,8 +496,9 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__float128"    { // clang doesn't have it
-                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
+"__float128"    { // This is a keyword for CLANG,
+                  // but a typedef for GCC
+                  if(PARSER.mode==configt::ansi_ct::flavourt::CLANG)
                   { loc(); return TOK_GCC_FLOAT128; }
                   else
                     return make_identifier();
@@ -507,6 +508,10 @@ void ansi_c_scanner_init()
                   { loc(); return TOK_GCC_FLOAT128; }
                   else
                     return make_identifier();
+                }
+
+"__CPROVER_Float128" {
+                  loc(); return TOK_GCC_FLOAT128;
                 }
 
 "_Float128x"    { if(PARSER.ts_18661_3_Floatn_types)

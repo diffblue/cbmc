@@ -124,11 +124,25 @@ void cpp_internal_additions(std::ostream &out)
 
     if(
       config.ansi_c.arch == "i386" || config.ansi_c.arch == "x86_64" ||
-      config.ansi_c.arch == "x32")
+      config.ansi_c.arch == "x32" || config.ansi_c.arch == "powerpc" ||
+      config.ansi_c.arch == "ppc64" || config.ansi_c.arch == "ppc64le" ||
+      config.ansi_c.arch == "ia64")
     {
-      // clang doesn't do __float128
-      if(config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
-        out << "typedef double __float128;" << '\n';
+      // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+      // For clang, __float128 is a keyword.
+      // For gcc, this is a typedef and not a keyword.
+      // C++ doesn't have _Float128.
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+        out << "typedef __CPROVER_Float128 __float128;" << '\n';
+    }
+    else if(config.ansi_c.arch == "hppa")
+    {
+      // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+      // For clang, __float128 is a keyword.
+      // For gcc, this is a typedef and not a keyword.
+      // C++ doesn't have _Float128.
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+        out << "typedef long double __float128;" << '\n';
     }
 
     // On 64-bit systems, gcc has typedefs

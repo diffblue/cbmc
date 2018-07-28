@@ -102,7 +102,7 @@ cat > builtins.h <<EOF
 // some newer versions of GCC apparently support __floatXYZ
 #define dfloat32_type_node __float32
 #define dfloat64_type_node __float64
-#define dfloat128_type_node __float128
+#define dfloat128_type_node __CPROVER_Float128
 
 #define build_qualified_type(t, q) q t
 #define build_pointer_type(t) t*
