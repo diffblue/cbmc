@@ -489,11 +489,12 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__float80"     { // clang doesn't have it
-                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
-                  { loc(); return TOK_GCC_FLOAT80; }
-                  else
-                    return make_identifier();
+"__CPROVER_Float64x" {
+                  loc(); return TOK_GCC_FLOAT64X;
+                }
+
+"__CPROVER_Float80" {
+                  loc(); return TOK_GCC_FLOAT80;
                 }
 
 "__float128"    { // This is a keyword for CLANG,

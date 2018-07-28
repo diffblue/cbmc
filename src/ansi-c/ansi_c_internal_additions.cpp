@@ -213,7 +213,17 @@ void ansi_c_internal_additions(std::string &code)
         code+="typedef long double __float128;\n";
     }
 
-    // On 64-bit systems, both gcc and clang have typedefs
+    if(
+      config.ansi_c.arch == "i386" || config.ansi_c.arch == "x86_64" ||
+      config.ansi_c.arch == "x32" || config.ansi_c.arch == "ia64")
+    {
+      // clang doesn't do __float80
+      // Note that __float80 is a typedef, and not a keyword.
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+        code += "typedef __CPROVER_Float64x __float80;\n";
+    }
+
+    // On 64-bit systems, gcc has typedefs
     // __int128_t und __uint128_t -- but not on 32 bit!
     if(config.ansi_c.long_int_width>=64)
     {
