@@ -206,8 +206,6 @@ gcc_ext_float_suffix    [wWqQ]|[dD][fFdDlL]?|"f16"|"f32"|"f64"|"f128"|"f32x"|"f6
 float           {float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
 float_s         {float}{float_suffix}|{integer}[fF]
 gcc_ext_float_s {float}{gcc_ext_float_suffix}
-bitvector       {binary}[bB]
-bitvector_u     {binary}([uU][bB]|[bB][uU])
 cppstart        {ws}"#"{ws}
 cpplineno       {cppstart}"line"*{ws}{integer}{ws}.*{newline}
 cppdirective    {cppstart}.*
