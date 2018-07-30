@@ -1003,8 +1003,7 @@ void goto_checkt::pointer_validity_check(
         guard);
     }
 
-    if(flags.is_unknown() ||
-       flags.is_integer_address())
+    if(flags.is_unknown())
       add_guarded_claim(
         or_exprt(allocs, not_exprt(invalid_pointer(pointer))),
         "dereference failure: pointer invalid",
@@ -1023,8 +1022,7 @@ void goto_checkt::pointer_validity_check(
         guard);
 
     if(flags.is_unknown() ||
-       flags.is_dynamic_heap() ||
-       flags.is_integer_address())
+       flags.is_dynamic_heap())
       add_guarded_claim(
         or_exprt(allocs, not_exprt(deallocated(pointer, ns))),
         "dereference failure: deallocated dynamic object",
@@ -1034,8 +1032,7 @@ void goto_checkt::pointer_validity_check(
         guard);
 
     if(flags.is_unknown() ||
-       flags.is_dynamic_local() ||
-       flags.is_integer_address())
+       flags.is_dynamic_local())
       add_guarded_claim(
         or_exprt(allocs, not_exprt(dead_object(pointer, ns))),
         "dereference failure: dead object",
@@ -1045,8 +1042,7 @@ void goto_checkt::pointer_validity_check(
         guard);
 
     if(flags.is_unknown() ||
-       flags.is_dynamic_heap() ||
-       flags.is_integer_address())
+       flags.is_dynamic_heap())
     {
       const or_exprt dynamic_bounds(
         dynamic_object_lower_bound(pointer, ns, access_lb),
@@ -1067,8 +1063,7 @@ void goto_checkt::pointer_validity_check(
 
     if(flags.is_unknown() ||
        flags.is_dynamic_local() ||
-       flags.is_static_lifetime() ||
-       flags.is_integer_address())
+       flags.is_static_lifetime())
     {
       const or_exprt object_bounds(
         object_lower_bound(pointer, ns, access_lb),
@@ -1077,6 +1072,18 @@ void goto_checkt::pointer_validity_check(
       add_guarded_claim(
         or_exprt(allocs, dynamic_object(pointer), not_exprt(object_bounds)),
         "dereference failure: pointer outside object bounds",
+        "pointer dereference",
+        expr.find_source_location(),
+        expr,
+        guard);
+    }
+
+    if(flags.is_unknown() ||
+       flags.is_integer_address())
+    {
+      add_guarded_claim(
+        implies_exprt(integer_address(pointer), allocs),
+        "dereference failure: invalid integer address",
         "pointer dereference",
         expr.find_source_location(),
         expr,
