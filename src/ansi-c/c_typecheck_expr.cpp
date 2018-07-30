@@ -2113,10 +2113,10 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier == CPROVER_PREFIX "points_to_valid_memory")
   {
-    if(expr.arguments().size() != 2)
+    if(expr.arguments().size() != 2 && expr.arguments().size() != 1)
     {
       error().source_location = f_op.source_location();
-      error() << "points_to_valid_memory expects two operands" << eom;
+      error() << "points_to_valid_memory expects one or two operands" << eom;
       throw 0;
     }
     if(!is_lvalue(expr.arguments().front()))
@@ -2141,6 +2141,24 @@ exprt c_typecheck_baset::do_special_functions(
       }
       same_object_expr =
         points_to_valid_memory(expr.arguments()[0], expr.arguments()[1]);
+    }
+    else if(expr.arguments().size() == 1)
+    {
+      PRECONDITION(expr.arguments()[0].type().id() == ID_pointer);
+
+      const typet &base_type = expr.arguments()[0].type().subtype();
+      auto expr_size = size_of_expr(base_type, *this);
+      if(!expr_size)
+      {
+        error().source_location = expr.source_location();
+        error() << "cannot determine size of pointed-to memory region" << eom;
+        throw 0;
+      }
+
+      expr_size->add(ID_C_c_sizeof_type) = base_type;
+
+      same_object_expr =
+        points_to_valid_memory(expr.arguments()[0], *expr_size);
     }
     else
     {
