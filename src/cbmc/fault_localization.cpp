@@ -336,10 +336,8 @@ void fault_localizationt::goal_covered(
       if(solver.l_get(cond).is_false())
       {
         goal_pair.second.status=goalt::statust::FAILURE;
-        symex_target_equationt::SSA_stepst::iterator next=inst;
-        next++; // include the assertion
         build_goto_trace(
-          bmc.equation, next, solver, bmc.ns, goal_pair.second.goto_trace);
+          bmc.equation, inst, solver, bmc.ns, goal_pair.second.goto_trace);
 
         // localize faults
         run(goal_pair.first);
