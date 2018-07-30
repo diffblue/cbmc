@@ -54,6 +54,8 @@ __int16 i16;
 
 __int32 i32;
 
+_int64 i64_with_just_one_underscore;
+
 __int64 i64;
 
 __int8 i8;

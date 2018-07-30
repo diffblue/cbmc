@@ -552,6 +552,11 @@ void ansi_c_scanner_init()
                   else
                     return make_identifier();
                 }
+"_int64"        { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
+                    { loc(); return TOK_INT64; }
+                  else
+                    return make_identifier();
+                }
 "__ptr32"       { return MSC_Keyword(TOK_PTR32); }
 "__ptr64"       { return MSC_Keyword(TOK_PTR64); }
 
