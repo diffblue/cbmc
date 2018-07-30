@@ -1,0 +1,16 @@
+CORE
+main.c
+--pointer-check --expand-pointer-predicates
+^\[main.pointer_dereference.[0-9]+\] dereference failure: dead object in x\[\(signed long( long)? int\)0\]: SUCCESS$
+^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside object bounds in x\[\(signed long( long)? int\)0\]: SUCCESS$
+^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside object bounds in x\[\(signed long( long)? int\)1\]: SUCCESS$
+^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside object bounds in x\[\(signed long( long)? int\)2\]: FAILURE$
+^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside object bounds in x\[\(signed long( long)? int\)-1\]: FAILURE$
+^\[main.pointer_dereference.[0-9]+\] dereference failure: dead object in y\[\(signed long( long)? int\)0\]: SUCCESS$
+^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside object bounds in y\[\(signed long( long)? int\)0\]: SUCCESS$
+^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside object bounds in y\[\(signed long( long)? int\)1\]: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
