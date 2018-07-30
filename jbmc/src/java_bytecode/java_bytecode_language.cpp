@@ -10,15 +10,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-#include <util/symbol_table.h>
-#include <util/suffix.h>
-#include <util/config.h>
+#include <json/json_parser.h>
 #include <util/cmdline.h>
+#include <util/config.h>
 #include <util/expr_iterator.h>
+#include <util/invariant.h>
 #include <util/journalling_symbol_table.h>
 #include <util/string2int.h>
-#include <util/invariant.h>
-#include <json/json_parser.h>
+#include <util/string_utils.h>
+#include <util/suffix.h>
+#include <util/symbol_table.h>
 
 #include <goto-programs/class_hierarchy.h>
 
@@ -124,7 +125,32 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
     std::back_inserter(extra_methods),
     build_load_method_by_regex);
 
-  if(cmd.isset("java-cp-include-files"))
+  if(cmd.isset("load-containing-class-only"))
+  {
+    const std::string function_to_analyse = cmd.get_value("function");
+    const std::size_t first_dollar_index =
+      function_to_analyse.find_first_of('$');
+    const std::size_t last_dot_index = function_to_analyse.find_last_of('.');
+    std::string class_name = function_to_analyse;
+    if(first_dollar_index != std::string::npos)
+      class_name = class_name.substr(0, first_dollar_index);
+    else
+      class_name = class_name.substr(0, last_dot_index);
+    replace_all(class_name, ".", "\\/");
+    java_cp_include_files = class_name +
+                            "(\\$.*)?\\.class|"
+                            "java\\/.*|"
+                            "javax\\/.*|"
+                            "sun\\/.*|"
+                            "org\\/cprover\\/.*|"
+                            "com\\/diffblue\\/annotation\\/.*";
+
+    if(cmd.isset("java-cp-include-files"))
+      warning() << "--java-cp-include-files ignored due to "
+                   "--load-containing-class-only"
+                << eom;
+  }
+  else if(cmd.isset("java-cp-include-files"))
   {
     java_cp_include_files=cmd.get_value("java-cp-include-files");
     // load file list from JSON file

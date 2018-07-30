@@ -1,0 +1,10 @@
+CORE
+Test.class
+--function Test.test --load-containing-class-only
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Check that External.class is not loaded when using --load-containing-class-only
