@@ -7,6 +7,6 @@ pointer outside dynamic object bounds in \*p: FAILURE
 pointer outside dynamic object bounds in \*p: FAILURE
 pointer outside dynamic object bounds in p2\[.*1\]: FAILURE
 pointer outside dynamic object bounds in p2\[.*0\]: FAILURE
-\*\* 4 of 36 failed 
+\*\* 4 of [0-9]+ failed
 --
 ^warning: ignoring
