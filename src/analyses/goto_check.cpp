@@ -991,7 +991,8 @@ void goto_checkt::pointer_validity_check(
       allocs=disjunction(disjuncts);
     }
 
-    if(flags.is_unknown() || flags.is_null())
+    if(flags.is_unknown() ||
+       flags.is_null())
     {
       add_guarded_claim(
         or_exprt(allocs, not_exprt(null_pointer(pointer))),
@@ -1002,7 +1003,8 @@ void goto_checkt::pointer_validity_check(
         guard);
     }
 
-    if(flags.is_unknown())
+    if(flags.is_unknown() ||
+       flags.is_integer_address())
       add_guarded_claim(
         or_exprt(allocs, not_exprt(invalid_pointer(pointer))),
         "dereference failure: pointer invalid",
@@ -1020,7 +1022,9 @@ void goto_checkt::pointer_validity_check(
         expr,
         guard);
 
-    if(flags.is_unknown() || flags.is_dynamic_heap())
+    if(flags.is_unknown() ||
+       flags.is_dynamic_heap() ||
+       flags.is_integer_address())
       add_guarded_claim(
         or_exprt(allocs, not_exprt(deallocated(pointer, ns))),
         "dereference failure: deallocated dynamic object",
@@ -1029,7 +1033,9 @@ void goto_checkt::pointer_validity_check(
         expr,
         guard);
 
-    if(flags.is_unknown() || flags.is_dynamic_local())
+    if(flags.is_unknown() ||
+       flags.is_dynamic_local() ||
+       flags.is_integer_address())
       add_guarded_claim(
         or_exprt(allocs, not_exprt(dead_object(pointer, ns))),
         "dereference failure: dead object",
@@ -1038,7 +1044,9 @@ void goto_checkt::pointer_validity_check(
         expr,
         guard);
 
-    if(flags.is_unknown() || flags.is_dynamic_heap())
+    if(flags.is_unknown() ||
+       flags.is_dynamic_heap() ||
+       flags.is_integer_address())
     {
       const or_exprt dynamic_bounds(
         dynamic_object_lower_bound(pointer, ns, access_lb),
@@ -1059,7 +1067,8 @@ void goto_checkt::pointer_validity_check(
 
     if(flags.is_unknown() ||
        flags.is_dynamic_local() ||
-       flags.is_static_lifetime())
+       flags.is_static_lifetime() ||
+       flags.is_integer_address())
     {
       const or_exprt object_bounds(
         object_lower_bound(pointer, ns, access_lb),
