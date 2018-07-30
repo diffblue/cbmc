@@ -148,3 +148,24 @@ std::string escape(const std::string &s)
 
   return result;
 }
+
+/// Replace all occurrences of a string inside a string
+/// \param [out] str: string to search
+/// \param from: string to replace
+/// \param to: string to replace with
+/// Copyright notice:
+/// Attributed to Gauthier Boaglio
+/// Source: https://stackoverflow.com/a/24315631/7501486
+/// Used under MIT license
+void replace_all(
+  std::string &str,
+  const std::string &from,
+  const std::string &to)
+{
+  size_t start_pos = 0;
+  while((start_pos = str.find(from, start_pos)) != std::string::npos)
+  {
+    str.replace(start_pos, from.length(), to);
+    start_pos += to.length();
+  }
+}
