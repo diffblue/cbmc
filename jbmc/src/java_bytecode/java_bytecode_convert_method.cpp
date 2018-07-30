@@ -1633,7 +1633,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const typecast_exprt pointer(op[0], java_array_type(statement[0]));
 
       dereference_exprt array(pointer, pointer.type().subtype());
-      assert(pointer.type().subtype().id() == ID_symbol_type);
+      PRECONDITION(pointer.type().subtype().id() == ID_symbol_type);
       array.set(ID_java_member_access, true);
 
       const member_exprt length(array, "length", java_int_type());

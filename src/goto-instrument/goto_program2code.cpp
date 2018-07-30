@@ -1861,7 +1861,8 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     if(no_typecast)
       return;
 
-    assert(expr.type().id() == ID_symbol_type);
+    DATA_INVARIANT(expr.type().id() == ID_symbol_type,
+                   "type of union/struct expressions");
 
     const typet &t=expr.type();
 
