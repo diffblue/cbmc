@@ -92,19 +92,21 @@ const irept &get_nil_irep();
 /// it is by default - see the `SHARING` macro) a basic unit of data (of type
 /// \ref dt) which contains four things:
 ///
-/// * \ref irept::dt::data : A string, which is returned when the \ref id() function is used.
-///   (Unless `USE_STD_STRING` is set, this is actually a \ref dstringt and thus
-///   an integer which is a reference into a string table.)
+/// * \ref irept::dt::data : A string, which is returned when the \ref id()
+///   function is used. (Unless `USE_STD_STRING` is set, this is actually a
+///   \ref dstringt and thus an integer which is a reference into a string
+///   table.)
 ///
-/// * \ref irept::dt::named_sub : A map from `irep_namet` (a string) to \ref irept. This
-///   is used for named children, i.e.  subexpressions, parameters, etc.
+/// * \ref irept::dt::named_sub : A map from `irep_namet` (a string) to \ref
+///   irept. This is used for named children, i.e.  subexpressions, parameters,
+///   etc.
 ///
-/// * \ref irept::dt::comments : Another map from `irep_namet` to \ref irept which is used
-///   for annotations and other ‘non-semantic’ information. Note that this
-///   map is ignored by the default \ref operator==.
+/// * \ref irept::dt::comments : Another map from `irep_namet` to \ref irept
+///   which is used for annotations and other ‘non-semantic’ information. Note
+///   that this map is ignored by the default \ref operator==.
 ///
-/// * \ref irept::dt::sub : A vector of \ref irept which is used to store ordered but
-///   unnamed children.
+/// * \ref irept::dt::sub : A vector of \ref irept which is used to store
+///   ordered but unnamed children.
 ///
 /// The \ref irept::pretty function outputs the explicit tree structure of
 /// an \ref irept and can be used to understand and debug problems with
@@ -129,19 +131,19 @@ const irept &get_nil_irep();
 /// point for working out how to manipulate data.
 ///
 /// There are three main groups of classes (or APIs); those derived from
-/// \ref typet, \ref codet and \ref exprt respectively. Although all of these inherit
-/// from \ref irept, these are the most abstract level that code should handle
-/// data. If code is manipulating plain `irept`s then something is wrong
+/// \ref typet, \ref codet and \ref exprt respectively. Although all of these
+/// inherit from \ref irept, these are the most abstract level that code should
+/// handle data. If code is manipulating plain `irept`s then something is wrong
 /// with the architecture of the code.
 ///
-/// Many of the key descendants of \ref exprt are declared in \ref std_expr.h. All
-/// expressions have a named subexpression with ID "type", which gives the
-/// type of the expression (slightly simplified from C/C++ as
-/// \ref unsignedbv_typet, \ref signedbv_typet, \ref floatbv_typet, etc.). All type
+/// Many of the key descendants of \ref exprt are declared in \ref std_expr.h.
+/// All expressions have a named subexpression with ID "type", which gives the
+/// type of the expression (slightly simplified from C/C++ as \ref
+/// unsignedbv_typet, \ref signedbv_typet, \ref floatbv_typet, etc.). All type
 /// conversions are explicit with an expression with `id() == ID_typecast`
-/// and a \ref typecast_exprt. One key descendant of \ref exprt is \ref symbol_exprt
-/// which creates \ref irept instances with ID “symbol”. These are used
-/// to represent variables; the name of which can be found using the
+/// and a \ref typecast_exprt. One key descendant of \ref exprt is \ref
+/// symbol_exprt which creates \ref irept instances with ID “symbol”. These are
+/// used to represent variables; the name of which can be found using the
 /// `get_identifier` accessor function.
 ///
 /// \ref codet inherits from \ref exprt and is defined in `std_code.h`. It
