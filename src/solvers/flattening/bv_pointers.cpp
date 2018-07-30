@@ -29,26 +29,19 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
 
       if(!bv.empty())
       {
-        bvt invalid_bv, null_bv;
+        bvt invalid_bv;
         encode(pointer_logic.get_invalid_object(), invalid_bv);
-        encode(pointer_logic.get_null_object(),    null_bv);
 
-        bvt equal_invalid_bv, equal_null_bv;
+        bvt equal_invalid_bv;
         equal_invalid_bv.resize(object_bits);
-        equal_null_bv.resize(object_bits);
 
         for(std::size_t i=0; i<object_bits; i++)
         {
           equal_invalid_bv[i]=prop.lequal(bv[offset_bits+i],
                                           invalid_bv[offset_bits+i]);
-          equal_null_bv[i]   =prop.lequal(bv[offset_bits+i],
-                                          null_bv[offset_bits+i]);
         }
 
-        literalt equal_invalid=prop.land(equal_invalid_bv);
-        literalt equal_null=prop.land(equal_null_bv);
-
-        return prop.lor(equal_invalid, equal_null);
+        return prop.land(equal_invalid_bv);
       }
     }
   }
