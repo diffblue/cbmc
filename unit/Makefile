@@ -101,7 +101,8 @@ TESTS = unit_tests$(EXEEXT) \
         miniBDD$(EXEEXT) \
         # Empty last line
 
-CLEANFILES = $(TESTS)\
+CLEANFILES = $(TESTS) \
+        miniBDD$(OBJEXT) \
         #Empty last line
 
 all: cprover.dir testing-utils.dir
