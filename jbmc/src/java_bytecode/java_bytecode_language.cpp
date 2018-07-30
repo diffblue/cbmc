@@ -1031,9 +1031,18 @@ bool java_bytecode_languaget::convert_single_method(
     case synthetic_method_typet::STATIC_INITIALIZER_WRAPPER:
       if(threading_support)
         symbol.value = get_thread_safe_clinit_wrapper_body(
-          function_id, symbol_table);
+          function_id,
+          symbol_table,
+          nondet_static,
+          object_factory_parameters,
+          get_pointer_type_selector());
       else
-        symbol.value = get_clinit_wrapper_body(function_id, symbol_table);
+        symbol.value = get_clinit_wrapper_body(
+          function_id,
+          symbol_table,
+          nondet_static,
+          object_factory_parameters,
+          get_pointer_type_selector());
       break;
     case synthetic_method_typet::STUB_CLASS_STATIC_INITIALIZER:
       symbol.value =
