@@ -1,0 +1,10 @@
+CORE
+main.c
+--pointer-check --expand-pointer-predicates
+^\[main.assertion.1\] Variable length assert: SUCCESS$
+^\[main.assertion.2\] assertion x_pointer\[\(signed long( long)? int\)2\] == 5: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
