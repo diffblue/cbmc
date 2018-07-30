@@ -397,16 +397,18 @@ const char *ms_cl_prefixes[]=
   "Y", // - disable all PCH options
   "Zm", // <n> max memory alloc (% of default)
   "Wp64", // enable 64 bit porting warnings
-  "LD", //  Create .DLL
-  "LDd", //  Create .DLL debug library
-  "LN", //  Create a .netmodule
+  "LD", // Create .DLL
+  "LDd", // Create .DLL debug library
+  "LN", // Create a .netmodule
   "F", // <num> set stack size
-  "link", //  [linker options and libraries]
-  "MD", //  link with MSVCRT.LIB
-  "MT", //  link with LIBCMT.LIB
-  "MDd", //  link with MSVCRTD.LIB debug lib
-  "MTd", //  link with LIBCMTD.LIB debug lib
-  "std", //  specify C++ language standard
+  "link", // [linker options and libraries]
+  "MD", // link with MSVCRT.LIB
+  "MT", // link with LIBCMT.LIB
+  "MDd", // link with MSVCRTD.LIB debug lib
+  "MTd", // link with LIBCMTD.LIB debug lib
+  "std", // specify C++ language standard
+  "sdl", // Enable Additional Security Checks
+  "diagnostics", // unknown
   nullptr
 };
 
