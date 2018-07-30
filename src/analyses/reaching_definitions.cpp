@@ -211,22 +211,33 @@ void rd_range_domaint::transform_function_call(
         ++it;
     }
 
-    const symbol_exprt &fn_symbol_expr=to_symbol_expr(code.function());
-    const code_typet &code_type=
-      to_code_type(ns.lookup(fn_symbol_expr.get_identifier()).type);
+    rw_range_set_value_sett rw_set(ns, rd.get_value_sets());
 
-    for(const auto &param : code_type.parameters())
+    const code_typet &code_type = to_code_type(ns.lookup(function_to).type);
+    PRECONDITION(code_type.parameters().size() == code.arguments().size());
+    auto arg_it = code.arguments().begin();
+    for(const auto &parameter : code_type.parameters())
     {
-      const irep_idt &identifier=param.get_identifier();
+      const irep_idt &identifier = parameter.get_identifier();
 
-      if(identifier.empty())
-        continue;
+      // get read set of the argument
+      rw_set.enable_expr_read_set();
+      rw_set.get_objects_rec(
+        function_from, from, rw_range_sett::get_modet::READ, *arg_it);
 
-      auto param_bits = pointer_offset_bits(param.type(), ns);
-      if(param_bits.has_value())
-        gen(from, identifier, 0, to_range_spect(*param_bits));
-      else
-        gen(from, identifier, 0, -1);
+      for(const auto &r_set_pair : rw_set.fetch_expr_read_set())
+      {
+        const rd_range_domaint::ranges_at_loct &w_ranges =
+          rd[from].get(r_set_pair.first);
+        for(const auto &w_range : w_ranges)
+        {
+          for(const auto &wr : w_range.second)
+            gen(w_range.first, identifier, wr.first, wr.second);
+        }
+      }
+
+      // next argument/parameter pair
+      ++arg_it;
     }
   }
   else

@@ -493,6 +493,23 @@ void rw_range_sett::add(
 
   static_cast<range_domaint&>(*entry->second).push_back(
     {range_start, range_end});
+
+  // add to the single expression read set
+  if(mode == get_modet::READ && expr_r_range_set.has_value())
+  {
+    objectst::iterator expr_entry =
+      expr_r_range_set
+        ->insert(
+          std::pair<const irep_idt &, std::unique_ptr<range_domain_baset>>(
+            identifier, nullptr))
+        .first;
+
+    if(expr_entry->second == nullptr)
+      expr_entry->second = util_make_unique<range_domaint>();
+
+    static_cast<range_domaint &>(*expr_entry->second)
+      .push_back({range_start, range_end});
+  }
 }
 
 void rw_range_sett::get_objects_rec(
