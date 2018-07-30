@@ -64,10 +64,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
-  const char **argv):
-  parse_options_baset(GOTO_ANALYSER_OPTIONS, argc, argv),
-  messaget(ui_message_handler),
-  ui_message_handler(cmdline, "GOTO-ANALYZER " CBMC_VERSION)
+  const char **argv)
+  : parse_options_baset(GOTO_ANALYSER_OPTIONS, argc, argv),
+    messaget(ui_message_handler),
+    ui_message_handler(cmdline, std::string("GOTO-ANALYZER ") + CBMC_VERSION)
 {
 }
 
@@ -374,9 +374,8 @@ int goto_analyzer_parse_optionst::doit()
   //
   // Print a banner
   //
-  status() << "GOTO-ANALYSER version " CBMC_VERSION " "
-           << sizeof(void *)*8 << "-bit "
-           << config.this_architecture() << " "
+  status() << "GOTO-ANALYSER version " << CBMC_VERSION << " "
+           << sizeof(void *) * 8 << "-bit " << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
   register_languages();

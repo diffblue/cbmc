@@ -677,7 +677,8 @@ unsigned compilet::function_body_count(const goto_functionst &functions) const
 
 void compilet::add_compiler_specific_defines(configt &config) const
 {
-  config.ansi_c.defines.push_back("__GOTO_CC_VERSION__=" CBMC_VERSION);
+  config.ansi_c.defines.push_back(
+    std::string("__GOTO_CC_VERSION__=") + CBMC_VERSION);
 }
 
 void compilet::convert_symbols(goto_functionst &dest)

@@ -61,22 +61,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/replace_java_nondet.h>
 #include <java_bytecode/simple_method_stubbing.h>
 
-jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv):
-  parse_options_baset(JBMC_OPTIONS, argc, argv),
-  messaget(ui_message_handler),
-  ui_message_handler(cmdline, "JBMC " CBMC_VERSION),
-  path_strategy_chooser()
+jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv)
+  : parse_options_baset(JBMC_OPTIONS, argc, argv),
+    messaget(ui_message_handler),
+    ui_message_handler(cmdline, std::string("JBMC ") + CBMC_VERSION),
+    path_strategy_chooser()
 {
 }
 
 ::jbmc_parse_optionst::jbmc_parse_optionst(
   int argc,
   const char **argv,
-  const std::string &extra_options):
-  parse_options_baset(JBMC_OPTIONS+extra_options, argc, argv),
-  messaget(ui_message_handler),
-  ui_message_handler(cmdline, "JBMC " CBMC_VERSION),
-  path_strategy_chooser()
+  const std::string &extra_options)
+  : parse_options_baset(JBMC_OPTIONS + extra_options, argc, argv),
+    messaget(ui_message_handler),
+    ui_message_handler(cmdline, std::string("JBMC ") + CBMC_VERSION),
+    path_strategy_chooser()
 {
 }
 
@@ -418,9 +418,8 @@ int jbmc_parse_optionst::doit()
   //
   // Print a banner
   //
-  status() << "JBMC version " CBMC_VERSION " "
-           << sizeof(void *)*8 << "-bit "
-           << config.this_architecture() << " "
+  status() << "JBMC version " << CBMC_VERSION << " " << sizeof(void *) * 8
+           << "-bit " << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
   register_language(new_ansi_c_language);
