@@ -13,20 +13,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
-#include <util/simplify_expr.h>
-#include <util/array_name.h>
-#include <util/ieee_float.h>
 #include <util/arith_tools.h>
+#include <util/array_name.h>
+#include <util/base_type.h>
+#include <util/cprover_prefix.h>
+#include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
-#include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/guard.h>
-#include <util/base_type.h>
+#include <util/ieee_float.h>
+#include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
-#include <util/cprover_prefix.h>
-#include <util/options.h>
+#include <util/simplify_expr.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 #include <langapi/language.h>
 #include <langapi/mode.h>
@@ -99,25 +100,21 @@ protected:
 
   using conditionst = std::list<conditiont>;
 
-  void bounds_check(const index_exprt &expr, const guardt &guard);
-  void div_by_zero_check(const div_exprt &expr, const guardt &guard);
-  void mod_by_zero_check(const mod_exprt &expr, const guardt &guard);
-  void undefined_shift_check(const shift_exprt &expr, const guardt &guard);
-  void pointer_rel_check(const exprt &expr, const guardt &guard);
-  void pointer_overflow_check(const exprt &expr, const guardt &guard);
-  void pointer_validity_check(
-    const dereference_exprt &expr,
-    const guardt &guard,
-    const exprt &access_lb,
-    const exprt &access_ub);
+  void bounds_check(const index_exprt &, const guardt &);
+  void div_by_zero_check(const div_exprt &, const guardt &);
+  void mod_by_zero_check(const mod_exprt &, const guardt &);
+  void undefined_shift_check(const shift_exprt &, const guardt &);
+  void pointer_rel_check(const exprt &, const guardt &);
+  void pointer_overflow_check(const exprt &, const guardt &);
+  void pointer_validity_check(const dereference_exprt &, const guardt &);
   conditionst address_check(const exprt &address, const exprt &size);
-  void integer_overflow_check(const exprt &expr, const guardt &guard);
-  void conversion_check(const exprt &expr, const guardt &guard);
-  void float_overflow_check(const exprt &expr, const guardt &guard);
-  void nan_check(const exprt &expr, const guardt &guard);
-  void rw_ok_check(exprt &expr);
+  void integer_overflow_check(const exprt &, const guardt &);
+  void conversion_check(const exprt &, const guardt &);
+  void float_overflow_check(const exprt &, const guardt &);
+  void nan_check(const exprt &, const guardt &);
+  void rw_ok_check(exprt &);
 
-  std::string array_name(const exprt &expr);
+  std::string array_name(const exprt &);
 
   void add_guarded_claim(
     const exprt &expr,
@@ -935,177 +932,25 @@ void goto_checkt::pointer_overflow_check(
 
 void goto_checkt::pointer_validity_check(
   const dereference_exprt &expr,
-  const guardt &guard,
-  const exprt &access_lb,
-  const exprt &access_ub)
+  const guardt &guard)
 {
   if(!enable_pointer_check)
     return;
 
-  const exprt &pointer=expr.op0();
-  const pointer_typet &pointer_type=
-    to_pointer_type(ns.follow(pointer.type()));
+  const exprt &pointer=expr.pointer();
 
-  assert(base_type_eq(pointer_type.subtype(), expr.type(), ns));
+  auto conditions =
+    address_check(pointer, size_of_expr(expr.type(), ns));
 
-  local_bitvector_analysist::flagst flags=
-    local_bitvector_analysis->get(t, pointer);
-
-  // For Java, we only need to check for null
-  if(mode==ID_java)
+  for(const auto &c : conditions)
   {
-    if(flags.is_unknown() || flags.is_null())
-    {
-      notequal_exprt not_eq_null(pointer, null_pointer_exprt(pointer_type));
-
-      add_guarded_claim(
-        not_eq_null,
-        "reference is null",
-        "pointer dereference",
-        expr.find_source_location(),
-        expr,
-        guard);
-    }
-  }
-  else
-  {
-    exprt allocs=false_exprt();
-
-    if(!allocations.empty())
-    {
-      exprt::operandst disjuncts;
-
-      for(const auto &a : allocations)
-      {
-        typecast_exprt int_ptr(pointer, a.first.type());
-
-        exprt lb(int_ptr);
-        if(access_lb.is_not_nil())
-        {
-          if(!base_type_eq(lb.type(), access_lb.type(), ns))
-            lb=plus_exprt(lb, typecast_exprt(access_lb, lb.type()));
-          else
-            lb=plus_exprt(lb, access_lb);
-        }
-
-        binary_relation_exprt lb_check(a.first, ID_le, lb);
-
-        exprt ub(int_ptr);
-        if(access_ub.is_not_nil())
-        {
-          if(!base_type_eq(ub.type(), access_ub.type(), ns))
-            ub=plus_exprt(ub, typecast_exprt(access_ub, ub.type()));
-          else
-            ub=plus_exprt(ub, access_ub);
-        }
-
-        binary_relation_exprt ub_check(
-          ub, ID_le, plus_exprt(a.first, a.second));
-
-        disjuncts.push_back(and_exprt(lb_check, ub_check));
-      }
-
-      allocs=disjunction(disjuncts);
-    }
-
-    if(flags.is_unknown() ||
-       flags.is_null())
-    {
-      add_guarded_claim(
-        or_exprt(allocs, not_exprt(null_pointer(pointer))),
-        "dereference failure: pointer NULL",
-        "pointer dereference",
-        expr.find_source_location(),
-        expr,
-        guard);
-    }
-
-    if(flags.is_unknown())
-      add_guarded_claim(
-        or_exprt(allocs, not_exprt(invalid_pointer(pointer))),
-        "dereference failure: pointer invalid",
-        "pointer dereference",
-        expr.find_source_location(),
-        expr,
-        guard);
-
-    if(flags.is_uninitialized())
-      add_guarded_claim(
-        or_exprt(allocs, not_exprt(invalid_pointer(pointer))),
-        "dereference failure: pointer uninitialized",
-        "pointer dereference",
-        expr.find_source_location(),
-        expr,
-        guard);
-
-    if(flags.is_unknown() ||
-       flags.is_dynamic_heap())
-      add_guarded_claim(
-        or_exprt(allocs, not_exprt(deallocated(pointer, ns))),
-        "dereference failure: deallocated dynamic object",
-        "pointer dereference",
-        expr.find_source_location(),
-        expr,
-        guard);
-
-    if(flags.is_unknown() ||
-       flags.is_dynamic_local())
-      add_guarded_claim(
-        or_exprt(allocs, not_exprt(dead_object(pointer, ns))),
-        "dereference failure: dead object",
-        "pointer dereference",
-        expr.find_source_location(),
-        expr,
-        guard);
-
-    if(flags.is_unknown() ||
-       flags.is_dynamic_heap())
-    {
-      const or_exprt dynamic_bounds(
-        dynamic_object_lower_bound(pointer, ns, access_lb),
-        dynamic_object_upper_bound(pointer, ns, access_ub));
-
-      add_guarded_claim(
-        or_exprt(
-          allocs,
-          implies_exprt(
-            malloc_object(pointer, ns),
-            not_exprt(dynamic_bounds))),
-        "dereference failure: pointer outside dynamic object bounds",
-        "pointer dereference",
-        expr.find_source_location(),
-        expr,
-        guard);
-    }
-
-    if(flags.is_unknown() ||
-       flags.is_dynamic_local() ||
-       flags.is_static_lifetime())
-    {
-      const or_exprt object_bounds(
-        object_lower_bound(pointer, ns, access_lb),
-        object_upper_bound(pointer, ns, access_ub));
-
-      add_guarded_claim(
-        or_exprt(allocs, dynamic_object(pointer), not_exprt(object_bounds)),
-        "dereference failure: pointer outside object bounds",
-        "pointer dereference",
-        expr.find_source_location(),
-        expr,
-        guard);
-    }
-
-    if(flags.is_unknown() ||
-       flags.is_integer_address())
-    {
-      add_guarded_claim(
-        implies_exprt(integer_address(pointer), allocs),
-        "dereference failure: invalid integer address",
-        "pointer dereference",
-        expr.find_source_location(),
-        expr,
-        guard);
-    }
+    add_guarded_claim(
+      c.assertion,
+      "dereference failure: "+c.description,
+      "pointer dereference",
+      expr.find_source_location(),
+      expr,
+      guard);
   }
 }
 
@@ -1207,7 +1052,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
 
       conditions.push_back(conditiont(
         implies_exprt(not_exprt(dynamic_object(address)), not_exprt(object_bounds_violation)),
-        "dereference failure: pointer outside object bounds"));
+        "pointer outside object bounds"));
     }
 
     if(flags.is_unknown() || flags.is_integer_address())
@@ -1547,24 +1392,39 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
     const dereference_exprt &deref=
       to_dereference_expr(member.struct_op());
 
-    check_rec(deref.op0(), guard, false);
+    check_rec(deref.pointer(), guard, false);
 
     // avoid building the following expressions when pointer_validity_check
     // would return immediately anyway
     if(!enable_pointer_check)
       return;
 
-    exprt access_ub=nil_exprt();
+    // we rewrite s->member into *(s+member_offset)
+    // to avoid requiring memory safety of the entire struct
 
     exprt member_offset=member_offset_expr(member, ns);
-    exprt size=size_of_expr(expr.type(), ns);
 
-    if(member_offset.is_not_nil() && size.is_not_nil())
-      access_ub=plus_exprt(member_offset, size);
+    if(member_offset.is_not_nil())
+    {
+      pointer_typet new_pointer_type = to_pointer_type(deref.pointer().type());
+      new_pointer_type.subtype() = expr.type();
 
-    pointer_validity_check(deref, guard, member_offset, access_ub);
+      const exprt char_pointer =
+        typecast_exprt::conditional_cast(
+          deref.pointer(), pointer_type(char_type()));
 
-    return;
+      const exprt new_address = typecast_exprt(
+        plus_exprt(char_pointer, member_offset), char_pointer.type());
+
+      const exprt new_address_casted =
+        typecast_exprt::conditional_cast(new_address, new_pointer_type);
+
+      dereference_exprt new_deref(new_address_casted, expr.type());
+      new_deref.add_source_location() = deref.source_location();
+      pointer_validity_check(new_deref, guard);
+
+      return;
+    }
   }
 
   forall_operands(it, expr)
@@ -1626,11 +1486,9 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
           expr.id()==ID_ge || expr.id()==ID_gt)
     pointer_rel_check(expr, guard);
   else if(expr.id()==ID_dereference)
-    pointer_validity_check(
-      to_dereference_expr(expr),
-      guard,
-      nil_exprt(),
-      size_of_expr(expr.type(), ns));
+  {
+    pointer_validity_check(to_dereference_expr(expr), guard);
+  }
 }
 
 void goto_checkt::check(const exprt &expr)
