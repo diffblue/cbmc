@@ -2090,10 +2090,11 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier == CPROVER_PREFIX "points_to_valid_memory")
   {
-    if(expr.arguments().size()!=2)
+    if(expr.arguments().size() != 2 &&
+       expr.arguments().size() != 1)
     {
       err_location(f_op);
-      error() << "points_to_valid_memory expects two operands" << eom;
+      error() << "points_to_valid_memory expects one or two operands" << eom;
       throw 0;
     }
     if(!is_lvalue(expr.arguments().front()))
@@ -2120,6 +2121,18 @@ exprt c_typecheck_baset::do_special_functions(
 #endif
       same_object_expr =
         points_to_valid_memory(expr.arguments()[0], expr.arguments()[1]);
+    }
+    else if(expr.arguments().size() == 1)
+    {
+      PRECONDITION(expr.arguments()[0].type().id() == ID_pointer);
+
+      const typet &base_type = expr.arguments()[0].type().subtype();
+      exprt sizeof_expr = size_of_expr(base_type, *this);
+      sizeof_expr.add(ID_C_c_sizeof_type)=base_type;
+
+      same_object_expr = points_to_valid_memory(
+        expr.arguments()[0],
+        sizeof_expr);
     }
     else
     {
