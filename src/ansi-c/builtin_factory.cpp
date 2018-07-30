@@ -134,9 +134,10 @@ bool builtin_factory(
   }
 
   // GCC junk stuff, also for CLANG and ARM
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
+  if(
+    config.ansi_c.mode == configt::ansi_ct::flavourt::GCC ||
+    config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG ||
+    config.ansi_c.mode == configt::ansi_ct::flavourt::ARM)
   {
     if(find_pattern(pattern, gcc_builtin_headers_generic, s))
       return convert(identifier, s, symbol_table, mh);

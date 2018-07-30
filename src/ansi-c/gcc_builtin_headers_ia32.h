@@ -1,11 +1,11 @@
 // from
 // http://gcc.gnu.org/onlinedocs/gcc-4.7.0/gcc/X86-Built_002din-Functions.html
 
-__float128 __builtin_fabsq(__float128);
-__float128 __builtin_copysignq(__float128, __float128);
+__CPROVER_Float128 __builtin_fabsq(__CPROVER_Float128);
+__CPROVER_Float128 __builtin_copysignq(__CPROVER_Float128, __CPROVER_Float128);
 void __builtin_ia32_pause();
-__float128 __builtin_infq(void);
-__float128 __builtin_huge_valq(void);
+__CPROVER_Float128 __builtin_infq(void);
+__CPROVER_Float128 __builtin_huge_valq(void);
 __gcc_v8qi __builtin_ia32_paddb(__gcc_v8qi, __gcc_v8qi);
 __gcc_v4hi __builtin_ia32_paddw(__gcc_v4hi, __gcc_v4hi);
 __gcc_v2si __builtin_ia32_paddd(__gcc_v2si, __gcc_v2si);

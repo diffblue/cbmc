@@ -182,21 +182,45 @@ void ansi_c_internal_additions(std::string &code)
     "\n";
 
   // GCC junk stuff, also for CLANG and ARM
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
+  if(
+    config.ansi_c.mode == configt::ansi_ct::flavourt::GCC ||
+    config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG ||
+    config.ansi_c.mode == configt::ansi_ct::flavourt::ARM)
   {
     code+=gcc_builtin_headers_types;
 
     // there are many more, e.g., look at
     // https://developer.apple.com/library/mac/#documentation/developertools/gcc-4.0.1/gcc/Target-Builtins.html
 
-    if(config.ansi_c.arch=="i386" ||
-       config.ansi_c.arch=="x86_64" ||
-       config.ansi_c.arch=="x32")
+    if(
+      config.ansi_c.arch == "i386" || config.ansi_c.arch == "x86_64" ||
+      config.ansi_c.arch == "x32" || config.ansi_c.arch == "powerpc" ||
+      config.ansi_c.arch == "ppc64" || config.ansi_c.arch == "ppc64le" ||
+      config.ansi_c.arch == "ia64")
     {
-      if(config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE)
-        code+="typedef double __float128;\n"; // clang doesn't do __float128
+      // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+      // For clang, __float128 is a keyword.
+      // For gcc, this is a typedef and not a keyword.
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+        code += "typedef __CPROVER_Float128 __float128;\n";
+    }
+    else if(config.ansi_c.arch == "hppa")
+    {
+      // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+      // For clang, __float128 is a keyword.
+      // For gcc, this is a typedef and not a keyword.
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+        code+="typedef long double __float128;\n";
+    }
+
+    if(
+      config.ansi_c.arch == "i386" || config.ansi_c.arch == "x86_64" ||
+      config.ansi_c.arch == "x32" || config.ansi_c.arch == "ia64")
+    {
+      // clang doesn't do __float80
+      // Note that __float80 is a typedef, and not a keyword.
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+        code += "typedef __CPROVER_Float64x __float80;\n";
     }
 
     // On 64-bit systems, gcc has typedefs

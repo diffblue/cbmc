@@ -150,9 +150,10 @@ void ansi_c_declarationt::to_symbol(
     if(get_is_inline())
       symbol.type.set(ID_C_inlined, true);
 
-    if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
-       config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE ||
-       config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
+    if(
+      config.ansi_c.mode == configt::ansi_ct::flavourt::GCC ||
+      config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG ||
+      config.ansi_c.mode == configt::ansi_ct::flavourt::ARM)
     {
       // GCC extern inline cleanup, to enable remove_internal_symbols
       // do its full job

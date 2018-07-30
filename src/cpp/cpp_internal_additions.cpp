@@ -115,19 +115,45 @@ void cpp_internal_additions(std::ostream &out)
   out << "void " INITIALIZE_FUNCTION "();" << '\n';
 
   // GCC junk stuff, also for CLANG and ARM
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE ||
-     config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
+  if(
+    config.ansi_c.mode == configt::ansi_ct::flavourt::GCC ||
+    config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG ||
+    config.ansi_c.mode == configt::ansi_ct::flavourt::ARM)
   {
     out << c2cpp(gcc_builtin_headers_types);
 
     if(
       config.ansi_c.arch == "i386" || config.ansi_c.arch == "x86_64" ||
-      config.ansi_c.arch == "x32")
+      config.ansi_c.arch == "x32" || config.ansi_c.arch == "powerpc" ||
+      config.ansi_c.arch == "ppc64" || config.ansi_c.arch == "ppc64le" ||
+      config.ansi_c.arch == "ia64")
     {
-      // clang doesn't do __float128
-      if(config.ansi_c.mode == configt::ansi_ct::flavourt::APPLE)
-        out << "typedef double __float128;" << '\n';
+      // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+      // For clang, __float128 is a keyword.
+      // For gcc, this is a typedef and not a keyword.
+      // C++ doesn't have _Float128.
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+        out << "typedef __CPROVER_Float128 __float128;" << '\n';
+    }
+    else if(config.ansi_c.arch == "hppa")
+    {
+      // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+      // For clang, __float128 is a keyword.
+      // For gcc, this is a typedef and not a keyword.
+      // C++ doesn't have _Float128.
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+        out << "typedef long double __float128;" << '\n';
+    }
+
+    if(
+      config.ansi_c.arch == "i386" || config.ansi_c.arch == "x86_64" ||
+      config.ansi_c.arch == "x32" || config.ansi_c.arch == "ia64")
+    {
+      // clang doesn't do __float80
+      // Note that __float80 is a typedef, and not a keyword,
+      // and that C++ doesn't have _Float64x.
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+        out << "typedef __CPROVER_Float80 __float80;" << '\n';
     }
 
     // On 64-bit systems, gcc has typedefs

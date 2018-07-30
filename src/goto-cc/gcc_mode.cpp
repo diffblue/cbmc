@@ -564,7 +564,7 @@ int gcc_modet::doit()
     debug() << "Enabling Visual Studio syntax" << eom;
   }
   else if(config.this_operating_system()=="macos")
-    config.ansi_c.mode=configt::ansi_ct::flavourt::APPLE;
+    config.ansi_c.mode = configt::ansi_ct::flavourt::CLANG;
   else
     config.ansi_c.mode=configt::ansi_ct::flavourt::GCC;
 
