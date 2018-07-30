@@ -192,6 +192,7 @@ protected:
   bool throw_assertion_error;
   java_string_library_preprocesst string_preprocess;
   std::string java_cp_include_files;
+  bool nondet_static;
 
   // list of classes to force load even without reference from the entry point
   std::vector<irep_idt> java_load_classes;

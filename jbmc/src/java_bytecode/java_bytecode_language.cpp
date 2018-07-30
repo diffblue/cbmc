@@ -157,6 +157,8 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   else
     java_cp_include_files=".*";
 
+  nondet_static = cmd.isset("nondet-static");
+
   language_options_initialized=true;
 }
 
