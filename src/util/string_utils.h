@@ -67,4 +67,6 @@ Stream &join_strings(
 /// programming language.
 std::string escape(const std::string &);
 
+void replace_all(std::string &, const std::string &, const std::string &);
+
 #endif
