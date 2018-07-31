@@ -612,17 +612,18 @@ SCENARIO(
           new_symbol_table.lookup_ref("java::ThrowsExceptions.test:()V");
         const java_method_typet method =
           to_java_method_type(method_symbol.type);
-        const std::vector<irept> exceptions = method.throws_exceptions();
+        const std::vector<irep_idt> exceptions = method.throws_exceptions();
         REQUIRE(exceptions.size() == 2);
-        REQUIRE(
-          std::find(
-            exceptions.begin(), exceptions.end(), irept("CustomException")) !=
-          exceptions.end());
         REQUIRE(
           std::find(
             exceptions.begin(),
             exceptions.end(),
-            irept("java.io.IOException")) != exceptions.end());
+            irept("CustomException").id()) != exceptions.end());
+        REQUIRE(
+          std::find(
+            exceptions.begin(),
+            exceptions.end(),
+            irept("java.io.IOException").id()) != exceptions.end());
       }
     }
   }

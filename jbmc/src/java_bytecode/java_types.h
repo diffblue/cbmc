@@ -245,14 +245,17 @@ inline bool can_cast_type<java_class_typet>(const typet &type)
 class java_method_typet : public code_typet
 {
 public:
-  const std::vector<irept> &throws_exceptions() const
+  const std::vector<irep_idt> throws_exceptions() const
   {
-    return find(ID_exceptions_thrown_list).get_sub();
+    std::vector<irep_idt> exceptions;
+    for(const auto &e : find(ID_exceptions_thrown_list).get_sub())
+      exceptions.push_back(e.id());
+    return exceptions;
   }
 
-  std::vector<irept> &throws_exceptions()
+  void add_throws_exceptions(irep_idt exception)
   {
-    return add(ID_exceptions_thrown_list).get_sub();
+    add(ID_exceptions_thrown_list).get_sub().push_back(irept(exception));
   }
 };
 
