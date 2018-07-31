@@ -6,16 +6,24 @@ Author: Daniel Poetzl
 
 \*******************************************************************/
 
-#define SHARING_MAP_INTERNAL_CHECKS
-#define SHARING_NODE_INTERNAL_CHECKS
+#define SM_INTERNAL_CHECKS
+#define SN_INTERNAL_CHECKS
 
 #include <climits>
 #include <random>
+#include <set>
 
 #include <testing-utils/catch.hpp>
 #include <util/sharing_map.h>
 
-typedef sharing_mapt<irep_idt, std::string, irep_id_hash> smt;
+class smt : public sharing_mapt<irep_idt, std::string, irep_id_hash>
+{
+  friend void sharing_map_interface_test();
+  friend void sharing_map_copy_test();
+  friend void sharing_map_collision_test();
+  friend void sharing_map_view_test();
+  friend void sharing_map_sharing_stats_test();
+};
 
 // helpers
 void fill(smt &sm)
@@ -248,6 +256,14 @@ void sharing_map_collision_test()
 
 void sharing_map_view_test()
 {
+  SECTION("View of empty map")
+  {
+    smt sm;
+    smt::viewt view;
+
+    sm.get_view(view);
+  }
+
   SECTION("View")
   {
     typedef std::pair<dstringt, std::string> pt;
@@ -365,6 +381,143 @@ void sharing_map_view_test()
   }
 }
 
+void sharing_map_sharing_stats_test()
+{
+  SECTION("count nodes")
+  {
+    std::set<void *> marked;
+    smt sm;
+    int count = 0;
+
+    count = sm.count_unmarked_nodes(false, marked, false);
+    REQUIRE(count == 0);
+
+    count = sm.count_unmarked_nodes(true, marked, false);
+    REQUIRE(count == 0);
+
+    sm.insert("i", "1");
+    count = sm.count_unmarked_nodes(false, marked, false);
+    REQUIRE(count == 8);
+
+    count = sm.count_unmarked_nodes(true, marked, false);
+    REQUIRE(count == 1);
+
+    sm.clear();
+    fill(sm);
+    count = sm.count_unmarked_nodes(true, marked, false);
+    REQUIRE(count == 3);
+  }
+
+  SECTION("marking")
+  {
+    std::set<void *> marked;
+    smt sm;
+
+    fill(sm);
+
+    sm.count_unmarked_nodes(false, marked, true);
+    REQUIRE(marked.empty());
+
+    smt sm2(sm);
+    sm.count_unmarked_nodes(false, marked, true);
+    REQUIRE(marked.size() == 1);
+
+    marked.clear();
+    smt sm3(sm);
+    sm3["x"];
+    sm.count_unmarked_nodes(false, marked, true);
+    REQUIRE(marked.size() >= 2);
+  }
+
+  SECTION("sharing stats")
+  {
+    std::vector<smt> v;
+    smt::sharing_map_statst sms;
+
+    SECTION("sharing stats no sharing")
+    {
+      v.emplace_back();
+      v.emplace_back();
+
+      REQUIRE(v.size() == 2);
+
+      // Empty maps
+      sms = smt::get_sharing_stats(v.begin(), v.end());
+      REQUIRE(sms.num_nodes == 0);
+      REQUIRE(sms.num_unique_nodes == 0);
+      REQUIRE(sms.num_leafs == 0);
+      REQUIRE(sms.num_unique_leafs == 0);
+
+      smt &sm1 = v.at(0);
+      smt &sm2 = v.at(1);
+
+      fill(sm1);
+      fill(sm2);
+
+      // Non-empty maps
+      sms = smt::get_sharing_stats(v.begin(), v.end());
+      REQUIRE(sms.num_leafs == 6);
+      REQUIRE(sms.num_unique_leafs == 6);
+    }
+
+    SECTION("sharing stats sharing 1")
+    {
+      smt sm1;
+      fill(sm1);
+      v.push_back(sm1);
+
+      smt sm2(sm1);
+      v.push_back(sm2);
+
+      sms = smt::get_sharing_stats(v.begin(), v.end());
+      REQUIRE(sms.num_leafs == 6);
+      REQUIRE(sms.num_unique_leafs == 3);
+    }
+
+    SECTION("sharing stats sharing 2")
+    {
+      smt sm1;
+      fill(sm1);
+      v.push_back(sm1);
+
+      smt sm2(sm1);
+      v.push_back(sm2);
+
+      smt sm3(sm1);
+      // new
+      sm3["x"];
+      v.push_back(sm3);
+
+      smt sm4(sm1);
+      // existing
+      sm4["i"];
+      v.push_back(sm4);
+
+      sms = smt::get_sharing_stats(v.begin(), v.end());
+      REQUIRE(sms.num_leafs == 13);
+      REQUIRE(sms.num_unique_leafs == 5);
+    }
+  }
+
+  SECTION("sharing stats map")
+  {
+    std::map<irep_idt, smt> m;
+
+    smt sm1;
+    fill(sm1);
+
+    smt sm2(sm1);
+
+    m["a"] = sm1;
+    m["b"] = sm2;
+
+    smt::sharing_map_statst sms;
+    sms = smt::get_sharing_stats_map(m.begin(), m.end());
+    REQUIRE(sms.num_leafs == 6);
+    REQUIRE(sms.num_unique_leafs == 3);
+  }
+}
+
 TEST_CASE("Sharing map interface")
 {
   sharing_map_interface_test();
@@ -383,4 +536,9 @@ TEST_CASE("Sharing map collisions")
 TEST_CASE("Sharing map views")
 {
   sharing_map_view_test();
+}
+
+TEST_CASE("Sharing map sharing stats")
+{
+  sharing_map_sharing_stats_test();
 }

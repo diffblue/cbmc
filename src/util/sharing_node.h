@@ -129,6 +129,8 @@ public:
 
   bool shares_with(const sharing_node_innert &other) const
   {
+    SN_ASSERT(data && other.data);
+
     return data == other.data;
   }
 
@@ -151,8 +153,6 @@ public:
 
   d_it &write_internal()
   {
-    SN_ASSERT(data.use_count() > 0);
-
     if(data == empty_data)
     {
       data = make_shared_derived_u<SN_PTR_TYPE_ARGS>();
@@ -176,8 +176,6 @@ public:
 
   d_ct &write_container()
   {
-    SN_ASSERT(data.use_count() > 0);
-
     if(data == empty_data)
     {
       data = make_shared_derived_v<SN_PTR_TYPE_ARGS>();
@@ -259,8 +257,9 @@ public:
   leaft *place_leaf(const keyT &k, const valueT &v)
   {
     SN_ASSERT(is_container());
-
-    SN_ASSERT(as_const(this)->find_leaf(k) == nullptr);
+    // we need to check empty() first as the const version of find_leaf() must
+    // not be called on an empty node
+    SN_ASSERT(empty() || as_const(this)->find_leaf(k) == nullptr);
 
     leaf_listt &c = get_container();
     c.push_front(leaft(k, v));

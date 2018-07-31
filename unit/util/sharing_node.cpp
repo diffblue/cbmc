@@ -2,7 +2,7 @@
 
 /// \file Tests for sharing-node utility
 
-#define SHARING_NODE_INTERNAL_CHECKS
+#define SN_INTERNAL_CHECKS
 
 #include <testing-utils/catch.hpp>
 #include <util/sharing_node.h>

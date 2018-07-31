@@ -44,6 +44,12 @@ Author: Daniel Poetzl
   template <class keyT, class valueT, class hashT, class equalT> \
   CV typename sharing_mapt<keyT, valueT, hashT, equalT>::ST \
     sharing_mapt<keyT, valueT, hashT, equalT>
+
+#define SHARING_MAPT3(T, CV, ST) \
+  template <class keyT, class valueT, class hashT, class equalT> \
+  template <class T> \
+  CV typename sharing_mapt<keyT, valueT, hashT, equalT>::ST \
+    sharing_mapt<keyT, valueT, hashT, equalT>
 // clang-format on
 
 // Note: Due to a bug in Visual Studio we need to add an additional "const"
@@ -124,11 +130,6 @@ template <class keyT,
 class sharing_mapt
 {
 public:
-  friend void sharing_map_interface_test();
-  friend void sharing_map_copy_test();
-  friend void sharing_map_collision_test();
-  friend void sharing_map_view_test();
-
   ~sharing_mapt()
   {
   }
@@ -291,6 +292,35 @@ public:
     delta_viewt &delta_view,
     const bool only_common = true) const;
 
+  /// Stats about sharing between several sharing map instances. An instance of
+  /// this class is returned by the get_sharing_map_stats_* functions.
+  ///
+  /// The num_nodes field gives the total number of nodes in the given maps.
+  /// Nodes that are part of n of the maps are counted n times.
+  ///
+  /// The num_unique_nodes field gives the number of unique nodes in the given
+  /// maps. A node that is part of several of the maps is only counted once.
+  ///
+  /// The num_leafs and num_unique_leafs fields are similar to the above but
+  /// only leafs are counted.
+  struct sharing_map_statst
+  {
+    std::size_t num_nodes = 0;
+    std::size_t num_unique_nodes = 0;
+    std::size_t num_leafs = 0;
+    std::size_t num_unique_leafs = 0;
+  };
+
+  template <class Iterator>
+  static sharing_map_statst get_sharing_stats(
+    Iterator begin,
+    Iterator end,
+    std::function<sharing_mapt &(const Iterator)> f =
+      [](const Iterator it) -> sharing_mapt & { return *it; });
+
+  template <class Iterator>
+  static sharing_map_statst get_sharing_stats_map(Iterator begin, Iterator end);
+
 protected:
   // helpers
 
@@ -316,6 +346,11 @@ protected:
 
   void gather_all(const baset &n, const unsigned depth, delta_viewt &delta_view)
     const;
+
+  std::size_t count_unmarked_nodes(
+    bool leafs_only,
+    std::set<void *> &marked,
+    bool mark = true) const;
 
   // dummy element returned when no element was found
   static mapped_type dummy;
@@ -384,6 +419,167 @@ SHARING_MAPT(void)
     }
   }
   while(!stack.empty());
+}
+
+SHARING_MAPT(std::size_t)
+::count_unmarked_nodes(bool leafs_only, std::set<void *> &marked, bool mark)
+  const
+{
+  if(empty())
+    return 0;
+
+  unsigned count = 0;
+
+  typedef std::pair<unsigned, const baset *> stack_itemt;
+
+  std::stack<stack_itemt> stack;
+  stack.push({0, &map});
+
+  do
+  {
+    const stack_itemt &si = stack.top();
+
+    const unsigned depth = si.first;
+    const baset *bp = si.second;
+
+    stack.pop();
+
+    // internal node or container node
+    const innert *ip = static_cast<const innert *>(bp);
+    const unsigned use_count = ip->data.use_count();
+    void *raw_ptr = ip->data.get();
+
+    if(use_count >= 2)
+    {
+      if(marked.find(raw_ptr) != marked.end())
+      {
+        continue;
+      }
+
+      if(mark)
+      {
+        marked.insert(raw_ptr);
+      }
+    }
+
+    if(!leafs_only)
+    {
+      count++;
+    }
+
+    if(depth < steps) // internal
+    {
+      const to_mapt &m = ip->get_to_map();
+      SM_ASSERT(!m.empty());
+
+      for(const auto &item : m)
+      {
+        const innert *i = &item.second;
+        stack.push({depth + 1, i});
+      }
+    }
+    else // container
+    {
+      SM_ASSERT(depth == steps);
+
+      const leaf_listt &ll = ip->get_container();
+      SM_ASSERT(!ll.empty());
+
+      for(const auto &l : ll)
+      {
+        const unsigned use_count = l.data.use_count();
+        void *raw_ptr = l.data.get();
+
+        if(use_count >= 2)
+        {
+          if(marked.find(raw_ptr) != marked.end())
+          {
+            continue;
+          }
+
+          if(mark)
+          {
+            marked.insert(raw_ptr);
+          }
+        }
+
+        count++;
+      }
+    }
+  } while(!stack.empty());
+
+  return count;
+}
+
+/// Get sharing stats
+///
+/// Complexity:
+/// - Worst case: O(N * H * log(S))
+/// - Best case: O(N + H)
+///
+/// \param begin: begin iterator
+/// \param end: end iterator
+/// \param f: function applied to the iterator to get a sharing map
+/// \return: sharing stats
+SHARING_MAPT3(Iterator, , sharing_map_statst)
+::get_sharing_stats(
+  Iterator begin,
+  Iterator end,
+  std::function<sharing_mapt &(const Iterator)> f)
+{
+  std::set<void *> marked;
+  sharing_map_statst sms;
+
+  // We do a separate pass over the tree for each statistic. This is not very
+  // efficient but the function is intended only for diagnosis purposes anyways.
+
+  // number of nodes
+  for(Iterator it = begin; it != end; it++)
+  {
+    sms.num_nodes += f(it).count_unmarked_nodes(false, marked, false);
+  }
+
+  SM_ASSERT(marked.empty());
+
+  // number of unique nodes
+  for(Iterator it = begin; it != end; it++)
+  {
+    sms.num_unique_nodes += f(it).count_unmarked_nodes(false, marked, true);
+  }
+
+  marked.clear();
+
+  // number of leafs
+  for(Iterator it = begin; it != end; it++)
+  {
+    sms.num_leafs += f(it).count_unmarked_nodes(true, marked, false);
+  }
+
+  SM_ASSERT(marked.empty());
+
+  // number of unique leafs
+  for(Iterator it = begin; it != end; it++)
+  {
+    sms.num_unique_leafs += f(it).count_unmarked_nodes(true, marked, true);
+  }
+
+  return sms;
+}
+
+/// Get sharing stats
+///
+/// Complexity:
+/// - Worst case: O(N * H * log(S))
+/// - Best case: O(N + H)
+///
+/// \param begin: begin iterator of a map
+/// \param end: end iterator of a map
+/// \return: sharing stats
+SHARING_MAPT3(Iterator, , sharing_map_statst)
+::get_sharing_stats_map(Iterator begin, Iterator end)
+{
+  return get_sharing_stats<Iterator>(
+    begin, end, [](const Iterator it) -> sharing_mapt & { return it->second; });
 }
 
 /// Get a view of the elements in the map
