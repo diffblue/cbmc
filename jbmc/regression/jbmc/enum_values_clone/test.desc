@@ -1,4 +1,4 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 com/diffblue/regression/EnumIter.class
 --trace  --cover location --depth 1024  --java-max-vla-length 16 --refine-strings --max-nondet-string-length 20 --string-printable --unwind 2 --function "com.diffblue.regression.EnumIter.f" --java-unwind-enum-static
 \d+ of \d+ covered \(100\.0%\)
