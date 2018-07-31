@@ -24,7 +24,11 @@ void java_class_loader_limitt::setup_class_load_limit(
   // '@' signals file reading with list of class files to load
   use_regex_match = java_cp_include_files[0] != '@';
   if(use_regex_match)
+  {
     regex_matcher=std::regex(java_cp_include_files);
+    debug() << "Limit loading to classes matching : " << java_cp_include_files
+            << eom;
+  }
   else
   {
     assert(java_cp_include_files.length()>1);
@@ -54,7 +58,10 @@ bool java_class_loader_limitt::load_class_file(const std::string &file_name)
   if(use_regex_match)
   {
     std::smatch string_matches;
-    return std::regex_match(file_name, string_matches, regex_matcher);
+    if(std::regex_match(file_name, string_matches, regex_matcher))
+      return true;
+    debug() << file_name + " discarded since not matching loader regexp" << eom;
+    return false;
   }
   else
     // load .class file only if it is in the match set

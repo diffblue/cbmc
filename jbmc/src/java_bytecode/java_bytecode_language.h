@@ -38,6 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(java-max-input-tree-depth):" /* will go away */ \
   "(max-nondet-tree-depth):" \
   "(java-max-vla-length):" \
+  "(load-containing-class-only)" \
   "(java-cp-include-files):" \
   "(lazy-methods)" /* will go away */ \
   "(no-lazy-methods)" \
@@ -59,6 +60,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              never initialize reference-typed parameter to the\n" /* NOLINT(*) */ \
   "                              entry point with null\n" /* NOLINT(*) */ \
   " --java-max-vla-length N      limit the length of user-code-created arrays\n" /* NOLINT(*) */ \
+  " --load-containing-class-only only load the class containing the " \
+  "                              method under test and the library classes" \
   " --java-cp-include-files r    regexp or JSON list of files to load\n" \
   "                              (with '@' prefix)\n" \
   " --no-lazy-methods            load and translate all methods given on\n" \
