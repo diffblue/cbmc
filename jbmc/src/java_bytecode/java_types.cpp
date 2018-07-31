@@ -88,7 +88,7 @@ reference_typet java_lang_object_type()
 }
 
 /// Construct an array pointer type. It is a pointer to a symbol with identifier
-/// java::array[]. Its ID_C_element_type is set to the corresponding primitive
+/// java::array[]. Its ID_element_type is set to the corresponding primitive
 /// type, or void* for arrays of references.
 /// \param subtype Character indicating the type of array
 reference_typet java_array_type(const char subtype)
@@ -119,7 +119,7 @@ reference_typet java_array_type(const char subtype)
 
   symbol_typet symbol_type("java::"+id2string(class_name));
   symbol_type.set(ID_C_base_name, class_name);
-  symbol_type.set(ID_C_element_type, java_type_from_char(subtype));
+  symbol_type.set(ID_element_type, java_type_from_char(subtype));
 
   return java_reference_type(symbol_type);
 }
@@ -131,7 +131,7 @@ const typet &java_array_element_type(const symbol_typet &array_symbol)
   DATA_INVARIANT(
     is_java_array_tag(array_symbol.get_identifier()),
     "Symbol should have array tag");
-  return array_symbol.find_type(ID_C_element_type);
+  return array_symbol.find_type(ID_element_type);
 }
 
 /// Return a non-const reference to the element type of a given java array type
@@ -141,7 +141,7 @@ typet &java_array_element_type(symbol_typet &array_symbol)
   DATA_INVARIANT(
     is_java_array_tag(array_symbol.get_identifier()),
     "Symbol should have array tag");
-  return array_symbol.add_type(ID_C_element_type);
+  return array_symbol.add_type(ID_element_type);
 }
 
 /// Checks whether the given type is an array pointer type
@@ -555,7 +555,7 @@ typet java_type_from_string(
   case '[': // array type
     {
       // If this is a reference array, we generate a plain array[reference]
-      // with void* members, but note the real type in ID_C_element_type.
+      // with void* members, but note the real type in ID_element_type.
       if(src.size()<=1)
         return nil_typet();
       char subtype_letter=src[1];
@@ -567,7 +567,7 @@ typet java_type_from_string(
          subtype_letter=='T')   // Array of generic types
         subtype_letter='A';
       typet tmp=java_array_type(std::tolower(subtype_letter));
-      tmp.subtype().set(ID_C_element_type, subtype);
+      tmp.subtype().set(ID_element_type, subtype);
       return tmp;
     }
 

@@ -177,7 +177,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     struct_type.components()[2].type());
 
   // Allocate a (struct realtype**) instead of a (void**) if possible.
-  const irept &given_element_type = object_type.find(ID_C_element_type);
+  const irept &given_element_type = object_type.find(ID_element_type);
   typet allocate_data_type;
   if(given_element_type.is_not_nil())
   {
@@ -272,7 +272,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
 
     // we already know that rhs has pointer type
     typet sub_type =
-      static_cast<const typet &>(rhs.type().subtype().find("#element_type"));
+      static_cast<const typet &>(rhs.type().subtype().find(ID_element_type));
     CHECK_RETURN(sub_type.id() == ID_pointer);
     sub_java_new.type() = sub_type;
 
