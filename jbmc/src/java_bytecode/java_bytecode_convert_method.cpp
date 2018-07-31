@@ -444,14 +444,14 @@ void java_bytecode_convert_methodt::convert(
 
   // Obtain a std::vector of code_typet::parametert objects from the
   // (function) type of the symbol
-  code_typet code_type = to_code_type(method_symbol.type);
-  code_type.set(ID_C_class, class_symbol.name);
-  method_return_type=code_type.return_type();
-  code_typet::parameterst &parameters=code_type.parameters();
+  java_method_typet method_type = to_java_method_type(method_symbol.type);
+  method_type.set(ID_C_class, class_symbol.name);
+  method_return_type = method_type.return_type();
+  code_typet::parameterst &parameters = method_type.parameters();
 
-  // Determine the number of local variable slots used by the JVM to maintan the
-  // formal parameters
-  slots_for_parameters=java_method_parameter_slots(code_type);
+  // Determine the number of local variable slots used by the JVM to maintain
+  // the formal parameters
+  slots_for_parameters = java_method_parameter_slots(method_type);
 
   debug() << "Generating codet: class "
              << class_symbol.name << ", method "
@@ -587,7 +587,10 @@ void java_bytecode_convert_methodt::convert(
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
 
-  const std::string signature_string = pretty_signature(code_type);
+  for(const auto &exception_name : m.throws_exception_table)
+    method_type.add_throws_exceptions(exception_name);
+
+  const std::string signature_string = pretty_signature(method_type);
 
   // Set up the pretty name for the method entry in the symbol table.
   // The pretty name of a constructor includes the base name of the class
@@ -601,7 +604,7 @@ void java_bytecode_convert_methodt::convert(
     method_symbol.pretty_name =
       id2string(class_symbol.pretty_name) + signature_string;
     INVARIANT(
-      code_type.get_is_constructor(),
+      method_type.get_is_constructor(),
       "Member type should have already been marked as a constructor");
   }
   else
@@ -610,14 +613,13 @@ void java_bytecode_convert_methodt::convert(
                                 id2string(m.base_name) + signature_string;
   }
 
-  method_symbol.type = code_type;
-
-  current_method=method_symbol.name;
-  method_has_this=code_type.has_this();
+  method_symbol.type = method_type;
+  current_method = method_symbol.name;
+  method_has_this = method_type.has_this();
   if((!m.is_abstract) && (!m.is_native))
     method_symbol.value = convert_instructions(
       m,
-      code_type,
+      method_type,
       method_symbol.name,
       to_java_class_type(class_symbol.type).lambda_method_handles());
 }

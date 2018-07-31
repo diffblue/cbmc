@@ -8,6 +8,7 @@
 
 #include <java-testing-utils/load_java_class.h>
 #include <java_bytecode/java_bytecode_convert_class.h>
+#include <java_bytecode/java_bytecode_convert_method.h>
 #include <java_bytecode/java_bytecode_parse_tree.h>
 #include <java_bytecode/java_types.h>
 #include <testing-utils/catch.hpp>
@@ -593,6 +594,47 @@ SCENARIO(
         REQUIRE_FALSE(java_class.get_is_static_class());
         REQUIRE_FALSE(java_class.get_is_anonymous_class());
         REQUIRE(java_class.get_outer_class().empty());
+      }
+    }
+  }
+
+  GIVEN("A method that may or may not throw exceptions")
+  {
+    const symbol_tablet &new_symbol_table = load_java_class(
+      "ThrowsExceptions", "./java_bytecode/java_bytecode_parser");
+    WHEN("Parsing the exceptions attribute for a method that throws exceptions")
+    {
+      THEN("We should be able to get the list of exceptions it throws")
+      {
+        const symbolt &method_symbol =
+          new_symbol_table.lookup_ref("java::ThrowsExceptions.test:()V");
+        const java_method_typet method =
+          to_java_method_type(method_symbol.type);
+        const std::vector<irep_idt> exceptions = method.throws_exceptions();
+        REQUIRE(exceptions.size() == 2);
+        REQUIRE(
+          std::find(
+            exceptions.begin(),
+            exceptions.end(),
+            irept("CustomException").id()) != exceptions.end());
+        REQUIRE(
+          std::find(
+            exceptions.begin(),
+            exceptions.end(),
+            irept("java.io.IOException").id()) != exceptions.end());
+      }
+    }
+    WHEN(
+      "Parsing the exceptions attribute for a method that throws no exceptions")
+    {
+      THEN("We should be able to get the list of exceptions it throws")
+      {
+        const symbolt &method_symbol = new_symbol_table.lookup_ref(
+          "java::ThrowsExceptions.testNoExceptions:()V");
+        const java_method_typet method =
+          to_java_method_type(method_symbol.type);
+        const std::vector<irep_idt> exceptions = method.throws_exceptions();
+        REQUIRE(exceptions.size() == 0);
       }
     }
   }

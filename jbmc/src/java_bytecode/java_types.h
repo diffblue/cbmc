@@ -121,14 +121,24 @@ class java_class_typet:public class_typet
     return set(ID_is_inner_class, is_inner_class);
   }
 
-  const irep_idt get_outer_class() const
+  const irep_idt &get_outer_class() const
   {
     return get(ID_outer_class);
   }
 
-  void set_outer_class(irep_idt outer_class)
+  void set_outer_class(const irep_idt &outer_class)
   {
     return set(ID_outer_class, outer_class);
+  }
+
+  const irep_idt &get_super_class() const
+  {
+    return get(ID_super_class);
+  }
+
+  void set_super_class(const irep_idt &super_class)
+  {
+    return set(ID_super_class, super_class);
   }
 
   const bool get_is_static_class() const
@@ -230,6 +240,35 @@ template <>
 inline bool can_cast_type<java_class_typet>(const typet &type)
 {
   return can_cast_type<class_typet>(type);
+}
+
+class java_method_typet : public code_typet
+{
+public:
+  const std::vector<irep_idt> throws_exceptions() const
+  {
+    std::vector<irep_idt> exceptions;
+    for(const auto &e : find(ID_exceptions_thrown_list).get_sub())
+      exceptions.push_back(e.id());
+    return exceptions;
+  }
+
+  void add_throws_exceptions(irep_idt exception)
+  {
+    add(ID_exceptions_thrown_list).get_sub().push_back(irept(exception));
+  }
+};
+
+inline const java_method_typet &to_java_method_type(const typet &type)
+{
+  PRECONDITION(type.id() == ID_code);
+  return static_cast<const java_method_typet &>(type);
+}
+
+inline java_method_typet &to_java_method_type(typet &type)
+{
+  PRECONDITION(type.id() == ID_code);
+  return static_cast<java_method_typet &>(type);
 }
 
 typet java_int_type();
