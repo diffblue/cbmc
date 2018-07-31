@@ -130,12 +130,6 @@ template <class keyT,
 class sharing_mapt
 {
 public:
-  friend void sharing_map_interface_test();
-  friend void sharing_map_copy_test();
-  friend void sharing_map_collision_test();
-  friend void sharing_map_view_test();
-  friend void sharing_map_sharing_stats_test();
-
   ~sharing_mapt()
   {
   }

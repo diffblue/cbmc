@@ -16,7 +16,14 @@ Author: Daniel Poetzl
 #include <testing-utils/catch.hpp>
 #include <util/sharing_map.h>
 
-typedef sharing_mapt<irep_idt, std::string, irep_id_hash> smt;
+class smt : public sharing_mapt<irep_idt, std::string, irep_id_hash>
+{
+  friend void sharing_map_interface_test();
+  friend void sharing_map_copy_test();
+  friend void sharing_map_collision_test();
+  friend void sharing_map_view_test();
+  friend void sharing_map_sharing_stats_test();
+};
 
 // helpers
 void fill(smt &sm)
