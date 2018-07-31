@@ -1,0 +1,16 @@
+CORE
+void_pointer.exe
+--breakpoint void_pointer.c:17 --symbols a_void_pointer,a_second_void_pointer,a_third_void_pointer,blob
+analyzing symbol: blob
+GENERATED CODE: 
+\{
+  a_void_pointer = NULL;
+  char id_0\[12l\]="test_string";
+  a_second_void_pointer = \(char \*\)&id_0;
+  char id_1\[7ul\]=\{ -13, -13, 'H', -1, '\\\\', '\\\\', -1 \};
+  a_third_void_pointer = \(char \*\)&id_1;
+  blob.size = 7;
+  blob.data = \(char \*\)&id_1;
+\}
+--
+--
