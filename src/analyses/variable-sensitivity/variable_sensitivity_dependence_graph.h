@@ -63,7 +63,9 @@ public:
   typedef grapht<vs_dep_nodet>::node_indext node_indext;
 
   explicit variable_sensitivity_dependence_domaint():
-    node_id(std::numeric_limits<node_indext>::max())
+    node_id(std::numeric_limits<node_indext>::max()),
+    has_values(false),
+    has_changed(false)
   {}
 
   void transform(
@@ -71,6 +73,41 @@ public:
     locationt to,
     ai_baset &ai,
     const namespacet &ns) override;
+
+  virtual void make_bottom() override
+  {
+    variable_sensitivity_domaint::make_bottom();
+    has_values = tvt(false);
+    has_changed = false;
+    domain_data_deps.clear();
+    control_deps.clear();
+    control_dep_candidates.clear();
+  }
+
+  virtual void make_top() override
+  {
+    variable_sensitivity_domaint::make_top();
+    has_values = tvt(true);
+    has_changed = false;
+    domain_data_deps.clear();
+    control_deps.clear();
+    control_dep_candidates.clear();
+  }
+
+  virtual void make_entry() override
+  {
+    make_top();
+  }
+
+  bool is_bottom() const override
+  {
+    return variable_sensitivity_domaint::is_bottom() && has_values.is_false();
+  }
+
+  bool is_top() const override
+  {
+    return variable_sensitivity_domaint::is_top() && has_values.is_true();
+  }
 
   virtual bool merge(
     const variable_sensitivity_domaint &b,
