@@ -8,6 +8,10 @@ public class ThrowsExceptions {
      throw new CustomException();
   }
 
+  public static void testNoExceptions() {
+    StringReader sr = new StringReader("");
+  }
+
 }
 
 class CustomException extends Exception {

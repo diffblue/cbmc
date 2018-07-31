@@ -606,8 +606,6 @@ SCENARIO(
     {
       THEN("We should be able to get the list of exceptions it throws")
       {
-        const symbolt &class_symbol =
-          new_symbol_table.lookup_ref("java::ThrowsExceptions");
         const symbolt &method_symbol =
           new_symbol_table.lookup_ref("java::ThrowsExceptions.test:()V");
         const java_method_typet method =
@@ -626,23 +624,18 @@ SCENARIO(
             irept("java.io.IOException").id()) != exceptions.end());
       }
     }
-  }
-
-  const symbol_tablet &new_symbol_table2 = load_java_class(
-      "ThrowsExceptions", "./java_bytecode/java_bytecode_parser");
-  WHEN(
-    "Parsing the exceptions attribute for a method that throws no exceptions")
-  {
-    THEN("We should be able to get the list of exceptions it throws")
+    WHEN(
+      "Parsing the exceptions attribute for a method that throws no exceptions")
     {
-      const symbolt &class_symbol =
-        new_symbol_table2.lookup_ref("java::ThrowsExceptions");
-      const symbolt &method_symbol =
-        new_symbol_table2.lookup_ref("java::ThrowsExceptions.test:()V");
-      const java_method_typet method = to_java_method_type(method_symbol.type);
-      const std::vector<irept> exceptions = method.throws_exceptions();
-      REQUIRE(exceptions.size() == 0);
-    }
+      THEN("We should be able to get the list of exceptions it throws")
+      {
+        const symbolt &method_symbol = new_symbol_table.lookup_ref(
+          "java::ThrowsExceptions.testNoExceptions:()V");
+        const java_method_typet method =
+          to_java_method_type(method_symbol.type);
+        const std::vector<irep_idt> exceptions = method.throws_exceptions();
+        REQUIRE(exceptions.size() == 0);
+      }
     }
   }
 }
