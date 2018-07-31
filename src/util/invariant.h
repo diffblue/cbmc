@@ -225,8 +225,13 @@ inline void invariant_violated_string(
 // for INVARIANT.
 
 // The condition should only contain (unmodified) arguments to the method.
+// Inputs include arguments passed to the function, as well as member
+// variables that the function may read.
 // "The design of the system means that the arguments to this method
 //  will always meet this condition".
+//
+// The PRECONDITION documents / checks assumptions about the inputs
+// that is the caller's responsibility to make happen before the call.
 #define PRECONDITION(CONDITION) INVARIANT(CONDITION, "Precondition")
 #define PRECONDITION_STRUCTURED(CONDITION, TYPENAME, ...) \
   INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__)
@@ -234,6 +239,11 @@ inline void invariant_violated_string(
 // The condition should only contain variables that will be returned /
 // output without further modification.
 // "The implementation of this method means that the condition will hold".
+//
+// A POSTCONDITION documents what the function can guarantee about its
+// output when it returns, given that it was called with valid inputs.
+// Outputs include the return value of the function, as well as member
+// variables that the function may write.
 #define POSTCONDITION(CONDITION) INVARIANT(CONDITION, "Postcondition")
 #define POSTCONDITION_STRUCTURED(CONDITION, TYPENAME, ...) \
   INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__)
@@ -242,6 +252,10 @@ inline void invariant_violated_string(
 // changed by a previous method call.
 // "The contract of the previous method call means the following
 //  condition holds".
+//
+// A difference between CHECK_RETURN and POSTCONDITION is that CHECK_RETURN is
+// a statement about what the caller expects from a function, whereas a
+// POSTCONDITION is a statement about guarantees made by the function itself.
 #define CHECK_RETURN(CONDITION) INVARIANT(CONDITION, "Check return value")
 #define CHECK_RETURN_STRUCTURED(CONDITION, TYPENAME, ...)  \
   INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__)
@@ -261,7 +275,7 @@ inline void invariant_violated_string(
 // Legacy annotations
 
 // The following should not be used in new code and are only intended
-// to migrate documentation and "error handling" in older code
+// to migrate documentation and "error handling" in older code.
 #define TODO           INVARIANT(false, "Todo")
 #define UNIMPLEMENTED  INVARIANT(false, "Unimplemented")
 #define UNHANDLED_CASE INVARIANT(false, "Unhandled case")
