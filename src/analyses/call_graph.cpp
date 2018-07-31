@@ -84,10 +84,15 @@ call_grapht::call_grapht(
   {
     irep_idt function=pending_stack.top();
     pending_stack.pop();
-    const goto_programt &goto_program=
-      goto_functions.function_map.at(function).body;
 
     nodes.insert(function);
+
+    // if function is not in function_map, assume function has no body
+    const auto &it = goto_functions.function_map.find(function);
+    if(it == goto_functions.function_map.end())
+      continue;
+
+    const goto_programt &goto_program = it->second.body;
 
     forall_callsites(
       goto_program,
