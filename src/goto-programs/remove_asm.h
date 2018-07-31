@@ -20,12 +20,8 @@ Date:   December 2014
 class goto_modelt;
 class symbol_tablet;
 
-void remove_asm(
-  goto_functionst::goto_functiont &goto_function,
-  symbol_tablet &symbol_table);
+void remove_asm(goto_functionst &, symbol_tablet &);
 
-void remove_asm(goto_functionst &goto_functions, symbol_tablet &symbol_table);
-
-void remove_asm(goto_modelt &goto_model);
+void remove_asm(goto_modelt &);
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_ASM_H

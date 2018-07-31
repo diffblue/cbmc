@@ -25,15 +25,22 @@ Date:   December 2014
 class remove_asmt
 {
 public:
-  explicit remove_asmt(symbol_tablet &_symbol_table)
-    : symbol_table(_symbol_table)
+  remove_asmt(symbol_tablet &_symbol_table, goto_functionst &_goto_functions)
+    : symbol_table(_symbol_table), goto_functions(_goto_functions)
   {
   }
 
-  void process_function(goto_functionst::goto_functiont &);
+  void operator()()
+  {
+    for(auto &f : goto_functions.function_map)
+      process_function(f.second);
+  }
 
 protected:
   symbol_tablet &symbol_table;
+  goto_functionst &goto_functions;
+
+  void process_function(goto_functionst::goto_functiont &);
 
   void process_instruction(
     goto_programt::instructiont &instruction,
@@ -101,6 +108,14 @@ void remove_asmt::gcc_asm_function_call(
     symbol.mode = ID_C;
 
     symbol_table.add(symbol);
+  }
+
+  if(
+    goto_functions.function_map.find(function_identifier) ==
+    goto_functions.function_map.end())
+  {
+    auto &f = goto_functions.function_map[function_identifier];
+    f.type = fkt_type;
   }
 }
 
@@ -304,20 +319,10 @@ void remove_asmt::process_function(
 }
 
 /// removes assembler
-void remove_asm(
-  goto_functionst::goto_functiont &goto_function,
-  symbol_tablet &symbol_table)
-{
-  remove_asmt rem(symbol_table);
-  rem.process_function(goto_function);
-}
-
-/// removes assembler
 void remove_asm(goto_functionst &goto_functions, symbol_tablet &symbol_table)
 {
-  remove_asmt rem(symbol_table);
-  for(auto &f : goto_functions.function_map)
-    rem.process_function(f.second);
+  remove_asmt rem(symbol_table, goto_functions);
+  rem();
 }
 
 /// removes assembler
