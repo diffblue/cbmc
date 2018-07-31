@@ -2190,6 +2190,15 @@ to the program. If the expression evaluates to false, the execution
 aborts without failure. More detail on the use of assumptions is in the
 section on [Assumptions and Assertions](modeling-assertions.shtml).
 
+#### \_\_CPROVER\_r_ok, \_\_CPROVER\_w_ok
+
+    void __CPROVER_r_ok(const void *, size_t size);
+    void __CPROVER_w_ok(cosnt void *, size_t size);
+
+The function **\_\_CPROVER\_r_ok** returns true if reading the piece of
+memory starting at the given pointer with the given size is safe.
+**\_\_CPROVER\_w_ok** does the same with writing.
+
 #### \_\_CPROVER\_same\_object, \_\_CPROVER\_POINTER\_OBJECT, \_\_CPROVER\_POINTER\_OFFSET, \_\_CPROVER\_DYNAMIC\_OBJECT
 
     _Bool __CPROVER_same_object(const void *, const void *);

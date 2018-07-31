@@ -9,6 +9,8 @@ __CPROVER_bool __CPROVER_invalid_pointer(const void *);
 __CPROVER_bool __CPROVER_is_zero_string(const void *);
 __CPROVER_size_t __CPROVER_zero_string_length(const void *);
 __CPROVER_size_t __CPROVER_buffer_size(const void *);
+__CPROVER_bool __CPROVER_r_ok(const void *, __CPROVER_size_t);
+__CPROVER_bool __CPROVER_w_ok(const void *, __CPROVER_size_t);
 
 // bitvector analysis
 __CPROVER_bool __CPROVER_get_flag(const void *, const char *);

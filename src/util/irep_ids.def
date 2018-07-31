@@ -691,6 +691,8 @@ IREP_ID_TWO(C_unnamed_object, #unnamed_object)
 IREP_ID_TWO(C_temporary_avoided, #temporary_avoided)
 IREP_ID_TWO(C_qualifier, #qualifier)
 IREP_ID_TWO(C_array_ini, #array_ini)
+IREP_ID_ONE(r_ok)
+IREP_ID_ONE(w_ok)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree
