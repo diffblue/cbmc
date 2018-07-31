@@ -10,6 +10,8 @@
 
 #include <testing-utils/catch.hpp>
 #include <util/base_type.h>
+#include <util/namespace.h>
+#include <util/symbol_table.h>
 
 /// Checks a type is a pointer type optionally with a specific subtype
 /// \param type: The type to check
@@ -25,8 +27,8 @@ pointer_typet require_type::require_pointer(
 
   if(subtype)
   {
-    // TODO: use base_type_eq
-    REQUIRE(pointer.subtype() == subtype.value());
+    namespacet ns{symbol_tablet{}};
+    base_type_eq(pointer.subtype(), subtype.value(), ns);
   }
   return pointer;
 }
