@@ -897,11 +897,29 @@ void interpretert::evaluate(
       true); // fail quietly
     if(address.is_zero())
     {
-      // Try reading from a constant -- simplify_expr has all the relevant cases
-      // (index-of-constant-array, member-of-constant-struct and so on)
-      // Note we complain of a problem even if simplify did *something* but
-      // still left us with an unresolved index, member, etc.
-      exprt simplified = simplify_expr(expr, ns);
+      exprt simplified;
+      // In case of being an indexed access, try to evaluate the index, then
+      // simplify.
+      if(expr.id() == ID_index)
+      {
+        exprt evaluated_index = expr;
+        mp_vectort idx;
+        evaluate(expr.op1(), idx);
+        if(idx.size() == 1)
+        {
+          evaluated_index.op1() =
+            constant_exprt(integer2string(idx[0]), expr.op1().type());
+        }
+        simplified = simplify_expr(evaluated_index, ns);
+      }
+      else
+      {
+        // Try reading from a constant -- simplify_expr has all the relevant
+        // cases (index-of-constant-array, member-of-constant-struct and so on)
+        // Note we complain of a problem even if simplify did *something* but
+        // still left us with an unresolved index, member, etc.
+        simplified = simplify_expr(expr, ns);
+      }
       if(simplified.id() == expr.id())
         evaluate_address(expr); // Evaluate again to print error message.
       else
