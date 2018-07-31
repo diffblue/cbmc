@@ -122,7 +122,7 @@ pointer_typet select_pointer_typet::specialize_generics(
           visited_nodes);
 
         pointer_typet replacement_array_type = java_array_type('a');
-        replacement_array_type.subtype().set(ID_C_element_type, new_array_type);
+        replacement_array_type.subtype().set(ID_element_type, new_array_type);
         return replacement_array_type;
       }
     }

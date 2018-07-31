@@ -621,8 +621,8 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
     irep_idt name=src.get(ID_C_base_name);
     if(has_prefix(id2string(name), "array["))
     {
-      const typet &element_type=
-        static_cast<const typet &>(src.find(ID_C_element_type));
+      const typet &element_type =
+        static_cast<const typet &>(src.find(ID_element_type));
       get_class_refs_rec(element_type);
     }
     else
