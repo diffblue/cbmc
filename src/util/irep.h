@@ -140,11 +140,10 @@ const irept &get_nil_irep();
 /// All expressions have a named subexpression with ID "type", which gives the
 /// type of the expression (slightly simplified from C/C++ as \ref
 /// unsignedbv_typet, \ref signedbv_typet, \ref floatbv_typet, etc.). All type
-/// conversions are explicit with an expression with `id() == ID_typecast`
-/// and a \ref typecast_exprt. One key descendant of \ref exprt is \ref
-/// symbol_exprt which creates \ref irept instances with ID “symbol”. These are
-/// used to represent variables; the name of which can be found using the
-/// `get_identifier` accessor function.
+/// conversions are explicit with a \ref typecast_exprt. One key descendant of
+/// \ref exprt is \ref symbol_exprt which creates \ref irept instances with ID
+/// “symbol”. These are used to represent variables; the name of which can be
+/// found using the `get_identifier` accessor function.
 ///
 /// \ref codet inherits from \ref exprt and is defined in `std_code.h`. It
 /// represents executable code; statements in a C-like language rather than
