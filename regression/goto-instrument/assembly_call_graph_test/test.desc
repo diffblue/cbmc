@@ -1,0 +1,11 @@
+CORE
+main.c
+--reachable-call-graph
+main -> thr
+__CPROVER__start -> __CPROVER_initialize
+__CPROVER__start -> main
+thr -> __asm_mfence
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

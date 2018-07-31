@@ -52,13 +52,17 @@ void slice_global_inits(goto_modelt &goto_model)
     const irep_idt &id = directed_graph[node_idx].function;
     if(id == INITIALIZE_FUNCTION)
       continue;
-    const goto_functionst::goto_functiont &goto_function
-      =goto_functions.function_map.at(id);
-    const goto_programt &goto_program=goto_function.body;
+
+    // assume function has no body if it is not in the function map
+    const auto &it = goto_functions.function_map.find(id);
+    if(it == goto_functions.function_map.end())
+      continue;
+
+    const goto_programt &goto_program = it->second.body;
 
     forall_goto_program_instructions(i_it, goto_program)
     {
-      const codet &code=i_it->code;
+      const codet &code = i_it->code;
       find_symbols(code, symbols, true, false);
       const exprt &expr = i_it->guard;
       find_symbols(expr, symbols, true, false);
