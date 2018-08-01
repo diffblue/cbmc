@@ -72,15 +72,15 @@ Author: Martin Brain, martin.brain@diffblue.com
 /// family of macros, allowing constructs like
 /// `INVARIANT(x==y, my_invariantt, (T1)actual1, (T2)actual2, ...)`
 ///
-class invariant_failedt: public std::logic_error
+class invariant_failedt
 {
  private:
-  std::string get_invariant_failed_message(
-    const std::string &file,
-    const std::string &function,
-    int line,
-    const std::string &backtrace,
-    const std::string &reason);
+   std::string get_invariant_failed_message(
+     const std::string &file,
+     const std::string &function,
+     int line,
+     const std::string &backtrace,
+     const std::string &reason) const;
 
  public:
   const std::string file;
@@ -88,25 +88,27 @@ class invariant_failedt: public std::logic_error
   const int line;
   const std::string backtrace;
   const std::string reason;
+  const std::string condition;
+
+  std::string what() const noexcept
+  {
+    return get_invariant_failed_message(
+      file, function, line, backtrace, reason);
+  };
 
   invariant_failedt(
     const std::string &_file,
     const std::string &_function,
     int _line,
     const std::string &_backtrace,
-    const std::string &_reason):
-    logic_error(
-      get_invariant_failed_message(
-        _file,
-        _function,
-        _line,
-        _backtrace,
-        _reason)),
-    file(_file),
-    function(_function),
-    line(_line),
-    backtrace(_backtrace),
-    reason(_reason)
+    const std::string &_reason,
+    const std::string &_condition)
+    : file(_file),
+      function(_function),
+      line(_line),
+      backtrace(_backtrace),
+      reason(_reason),
+      condition(_condition)
   {
   }
 };
@@ -149,9 +151,10 @@ void report_exception_to_stderr(const invariant_failedt &);
 /// \param file : C string giving the name of the file.
 /// \param function : C string giving the name of the function.
 /// \param line : The line number of the invariant
+/// \param condition : the condition this invariant is checking.
 /// \param params : (variadic) parameters to forward to ET's constructor
 ///  its backtrace member will be set before it is used.
-template<class ET, typename ...Params>
+template <class ET, typename... Params>
 #ifdef __GNUC__
 __attribute__((noreturn))
 #endif
@@ -160,10 +163,17 @@ invariant_violated_structured(
   const std::string &file,
   const std::string &function,
   const int line,
+  const std::string &condition,
   Params &&... params)
 {
   std::string backtrace=get_backtrace();
-  ET to_throw(file, function, line, backtrace, std::forward<Params>(params)...);
+  ET to_throw(
+    file,
+    function,
+    line,
+    backtrace,
+    std::forward<Params>(params)...,
+    condition);
   // We now have a structured exception ready to use;
   // in future this is the place to put a 'throw'.
   report_exception_to_stderr(to_throw);
@@ -177,20 +187,20 @@ invariant_violated_structured(
 /// \param function : C string giving the name of the function.
 /// \param line : The line number of the invariant
 /// \param reason : brief description of the invariant violation.
+/// \param condition : the condition this invariant is checking.
 #ifdef __GNUC__
 __attribute__((noreturn))
 #endif
-inline void invariant_violated_string(
+inline void
+invariant_violated_string(
   const std::string &file,
   const std::string &function,
   const int line,
-  const std::string &reason)
+  const std::string &reason,
+  const std::string &condition)
 {
   invariant_violated_structured<invariant_failedt>(
-    file,
-    function,
-    line,
-    reason);
+    file, function, line, condition, reason);
 }
 
 // These require a trailing semicolon by the user, such that INVARIANT
@@ -207,7 +217,11 @@ inline void invariant_violated_string(
   {                                                                            \
     if(!(CONDITION))                                                           \
       invariant_violated_string(                                               \
-        __FILE__, __this_function__, __LINE__, (REASON)); /* NOLINT */         \
+        __FILE__,                                                              \
+        __this_function__,                                                     \
+        __LINE__,                                                              \
+        (REASON),                                                              \
+        #CONDITION); /* NOLINT */                                              \
   } while(false)
 
 #define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...)                         \
@@ -215,7 +229,11 @@ inline void invariant_violated_string(
   {                                                                            \
     if(!(CONDITION))                                                           \
       invariant_violated_structured<TYPENAME>(                                 \
-        __FILE__, __this_function__, __LINE__, __VA_ARGS__); /* NOLINT */      \
+        __FILE__,                                                              \
+        __this_function__,                                                     \
+        __LINE__,                                                              \
+        __VA_ARGS__,                                                           \
+        #CONDITION); /* NOLINT */                                              \
   } while(false)
 
 #endif // End CPROVER_DO_NOT_CHECK / CPROVER_ASSERT / ... if block

@@ -8,7 +8,7 @@ Author: Martin Brain, martin.brain@diffblue.com
 
 #include "invariant.h"
 
-#include "util/freer.h"
+#include "freer.h"
 
 #include <memory>
 #include <string>
@@ -121,13 +121,14 @@ std::string invariant_failedt::get_invariant_failed_message(
   const std::string &function,
   int line,
   const std::string &backtrace,
-  const std::string &reason)
+  const std::string &reason) const
 {
   std::ostringstream out;
   out << "Invariant check failed\n"
       << "File " << file
       << " function " << function
       << " line " << line << '\n'
+      << "Condition: " << condition << '\n'
       << "Reason: " << reason
       << "\nBacktrace:\n"
       << backtrace << '\n';
