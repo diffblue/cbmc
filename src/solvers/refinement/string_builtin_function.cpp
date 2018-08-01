@@ -156,6 +156,37 @@ optionalt<exprt> string_concat_char_builtin_functiont::eval(
   return make_string(input_opt.value(), type);
 }
 
+optionalt<exprt> string_set_char_builtin_functiont::eval(
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  auto input_opt = eval_string(input, get_value);
+  const auto char_opt = numeric_cast<mp_integer>(get_value(character));
+  const auto position_opt = numeric_cast<mp_integer>(get_value(position));
+  if(!input_opt || !char_opt || !position_opt)
+    return {};
+  if(0 <= *position_opt && *position_opt < input_opt.value().size())
+    input_opt.value()[numeric_cast_v<std::size_t>(*position_opt)] = *char_opt;
+  const auto length =
+    from_integer(input_opt.value().size(), result.length().type());
+  const array_typet type(result.type().subtype(), length);
+  return make_string(input_opt.value(), type);
+}
+
+exprt string_set_char_builtin_functiont::length_constraint() const
+{
+  const exprt out_of_bounds = or_exprt(
+    binary_relation_exprt(position, ID_ge, input.length()),
+    binary_relation_exprt(
+      position, ID_le, from_integer(0, input.length().type())));
+  const exprt return_value = if_exprt(
+    out_of_bounds,
+    from_integer(1, return_code.type()),
+    from_integer(0, return_code.type()));
+  return and_exprt(
+    equal_exprt(result.length(), input.length()),
+    equal_exprt(return_code, return_value));
+}
+
 std::vector<mp_integer> string_insertion_builtin_functiont::eval(
   const std::vector<mp_integer> &input1_value,
   const std::vector<mp_integer> &input2_value,
