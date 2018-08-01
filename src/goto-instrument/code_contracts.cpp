@@ -23,6 +23,7 @@ Date: February 2016
 #include <linking/static_lifetime_init.h>
 
 #include "loop_utils.h"
+#include "function_modifies.h"
 
 enum class contract_opst { APPLY, CHECK };
 
@@ -52,6 +53,7 @@ protected:
 
   void apply_contract(
     goto_programt &goto_program,
+    const local_may_aliast &local_may_alias,
     goto_programt::targett target);
 
   void apply_invariant(
@@ -78,6 +80,7 @@ protected:
 
 void code_contractst::apply_contract(
   goto_programt &goto_program,
+  const local_may_aliast &local_may_alias,
   goto_programt::targett target)
 {
   const code_function_callt &call=to_code_function_call(target->code);
@@ -108,6 +111,23 @@ void code_contractst::apply_contract(
       ensures = true_exprt();
     }
   }
+
+  // find out what can be written by the function
+  // TODO Use a better write-set analysis.
+  modifiest modifies;
+  function_modifiest function_modifies(goto_functions);
+
+  // Handle return value of the function
+  if(call.lhs().is_not_nil())
+  {
+    function_modifies.get_modifies_lhs(local_may_alias, target,
+                                       call.lhs(), modifies);
+  }
+  function_modifies(call.function(), modifies);
+
+  // build the havocking code
+  goto_programt havoc_code;
+  build_havoc_code(target, modifies, havoc_code);
 
   // replace formal parameters by arguments, replace return
   replace_symbolt replace;
@@ -140,7 +160,9 @@ void code_contractst::apply_contract(
     goto_program.insert_before_swap(target, a);
     ++target;
   }
-  // TODO: Havoc write set of the function between assert and ensure.
+
+  // TODO some sort of replacement on havoc code
+  goto_program.destructive_insert(target, havoc_code);
 
   target->make_assumption(ensures);
 }
@@ -171,8 +193,6 @@ void code_contractst::apply_invariant(
   {
     return;
   }
-
-  // TODO: Allow for not havocking in the for/while case
 
   // change H: loop; E: ...
   // to
@@ -210,8 +230,6 @@ void code_contractst::apply_invariant(
   }
 
   // assume !guard
-  // TODO: consider breaks and how they're implemented.
-  // TODO: Also consider continues and whether they jump to loop end or head
   {
     goto_programt::targett assume = havoc_code.add_instruction(ASSUME);
     if(loop_head->is_goto())
@@ -321,6 +339,10 @@ void code_contractst::check_contract(
       replace.insert(p_it.get_identifier(), p);
   }
 
+  // rewrite any use of parameters
+  replace(requires);
+  replace(ensures);
+
   // assume(requires)
   if(requires.is_not_nil())
   {
@@ -328,9 +350,6 @@ void code_contractst::check_contract(
     a->make_assumption(requires);
     a->function=skip->function;
     a->source_location=requires.source_location();
-
-    // rewrite any use of parameters
-    replace(a->guard);
   }
 
   // ret=function(parameter1, ...)
@@ -344,9 +363,6 @@ void code_contractst::check_contract(
   a->make_assertion(ensures);
   a->function=skip->function;
   a->source_location=ensures.source_location();
-
-  // rewrite any use of __CPROVER_return_value
-  replace(a->guard);
 
   // prepend the new code to dest
   check.destructive_append(tmp_skip);
@@ -477,7 +493,7 @@ const symbolt &code_contractst::new_tmp_symbol(
     {
       if(it->is_function_call())
       {
-        apply_contract(goto_function.body, it);
+        apply_contract(goto_function.body, local_may_alias, it);
       }
     }
   }
@@ -511,7 +527,7 @@ void code_contractst::check_code_contracts()
     {
       if(it->is_function_call())
       {
-        apply_contract(goto_function.body, it);
+        apply_contract(goto_function.body, local_may_alias, it);
       }
     }
   }
@@ -521,7 +537,6 @@ void code_contractst::check_code_contracts()
     check_contract(it->first, it->second, i_it->second.body);
   }
 
-  // remove skips
   remove_skip(i_it->second.body);
 
   goto_functions.update();
