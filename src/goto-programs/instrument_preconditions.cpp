@@ -146,3 +146,14 @@ void instrument_preconditions(goto_modelt &goto_model)
   for(auto &f_it : goto_model.goto_functions.function_map)
     remove_preconditions(f_it.second.body);
 }
+
+void remove_preconditions(goto_functiont &goto_function)
+{
+  remove_preconditions(goto_function.body);
+}
+
+void remove_preconditions(goto_modelt &goto_model)
+{
+  for(auto &f_it : goto_model.goto_functions.function_map)
+    remove_preconditions(f_it.second);
+}
