@@ -245,9 +245,35 @@ inline bool can_cast_type<java_class_typet>(const typet &type)
 class java_method_typet : public code_typet
 {
 public:
-  using code_typet::code_typet;
   using code_typet::parameterst;
   using code_typet::parametert;
+
+  /// Constructs a new code type, i.e. function type
+  /// \param _parameters: the vector of function parameters
+  /// \param _return_type: the return type
+  java_method_typet(parameterst &&_parameters, typet &&_return_type)
+  {
+    set(ID_C_java_method_type, true);
+    parameters().swap(_parameters);
+    return_type().swap(_return_type);
+  }
+
+  /// Constructs a new code type, i.e. function type
+  /// \param _parameters: the vector of function parameters
+  /// \param _return_type: the return type
+  java_method_typet(parameterst &&_parameters, const typet &_return_type)
+  {
+    set(ID_C_java_method_type, true);
+    parameters().swap(_parameters);
+    return_type() = _return_type;
+  }
+
+  /// \deprecated
+  DEPRECATED("Use the two argument constructor instead")
+  java_method_typet()
+  {
+    set(ID_C_java_method_type, true);
+  }
 
   const std::vector<irep_idt> throws_exceptions() const
   {
