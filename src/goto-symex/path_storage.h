@@ -8,10 +8,11 @@
 #include "goto_symex_state.h"
 #include "symex_target_equation.h"
 
-#include <util/options.h>
 #include <util/cmdline.h>
-#include <util/ui_message.h>
 #include <util/invariant.h>
+#include <util/optional.h>
+#include <util/options.h>
+#include <util/ui_message.h>
 
 #include <memory>
 
@@ -40,6 +41,34 @@ public:
     {
     }
   };
+
+  /// \brief Data needed for path_storaget objects to make strategy decisions
+  ///
+  /// Different path exploration strategies need different information passed to
+  /// them when they are constructed in order to decide which paths to resume
+  /// next. Simple strategies (LIFO, FIFO etc.) don't need additional
+  /// information, while more sophisticated strategies may require arguments
+  /// from the command line, a reference to the goto-program, etc.
+  ///
+  /// This struct collects all this information in one place, so that when a new
+  /// strategy needs a new parameter, it can simply be added to this struct. The
+  /// alternative is to change the constructor for path_storaget and all of its
+  /// subclasses every time we add a new strategy, which obfuscates the git
+  /// history.
+  struct strategy_contextt
+  {
+    const goto_functionst &goto_functions;
+    messaget &log;
+
+    strategy_contextt(const goto_functionst &gf, messaget &log)
+      : goto_functions(gf), log(log)
+    {
+    }
+  };
+
+  path_storaget()
+  {
+  }
 
   virtual ~path_storaget() = default;
 
@@ -96,6 +125,10 @@ private:
 class path_lifot : public path_storaget
 {
 public:
+  explicit path_lifot() : path_storaget()
+  {
+  }
+
   void push(const patht &, const patht &) override;
   std::size_t size() const override;
   void clear() override;
@@ -113,6 +146,10 @@ private:
 class path_fifot : public path_storaget
 {
 public:
+  explicit path_fifot() : path_storaget()
+  {
+  }
+
   void push(const patht &, const patht &) override;
   std::size_t size() const override;
   void clear() override;
@@ -176,12 +213,14 @@ public:
   ///
   /// Ensure that path_strategy_choosert::is_valid_strategy() returns true for a
   /// particular string before calling this function on that string.
-  std::unique_ptr<path_storaget> get(const std::string strategy) const
+  std::unique_ptr<path_storaget> get(
+    const std::string strategy,
+    const path_storaget::strategy_contextt &ctx) const
   {
     auto found = strategies.find(strategy);
     INVARIANT(
       found != strategies.end(), "Unknown strategy '" + strategy + "'.");
-    return found->second.second();
+    return found->second.second(ctx);
   }
 
   /// \brief add `paths` and `exploration-strategy` option, suitable to be
@@ -198,9 +237,12 @@ protected:
   /// Map from the name of a strategy (to be supplied on the command line), to
   /// the help text for that strategy and a factory thunk returning a pointer to
   /// a derived class of path_storaget that implements that strategy.
-  std::map<const std::string,
-           std::pair<const std::string,
-                     const std::function<std::unique_ptr<path_storaget>()>>>
+  std::map<
+    const std::string,
+    std::pair<
+      const std::string,
+      const std::function<std::unique_ptr<path_storaget>(
+        const path_storaget::strategy_contextt &ctx)>>>
     strategies;
 };
 
