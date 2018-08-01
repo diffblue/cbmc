@@ -358,8 +358,12 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     // this is also our guard
     result.pointer_guard = dynamic_object(pointer_expr);
 
-    // can't remove here, turn into *p
-    result.value=dereference_exprt(pointer_expr, dereference_type);
+    // TODO should this be object or root_object?
+    // TODO It's unclear whether this is a good approach to take --- it
+    // successfully ensures that every (non-null) dereference points to
+    // something, making the write set computation work correctly, but dynamic
+    // objects do not seem to be intended to be used in this way.
+    result.value = object;
 
     if(options.get_bool_option("pointer-check"))
     {
