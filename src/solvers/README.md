@@ -281,7 +281,7 @@ allocates a new string before calling a primitive.
     \link string_constraint_generatort::add_axioms_from_literal(const function_application_exprt &f) More... \endlink
   * `cprover_string_of_int` :
     \copybrief string_constraint_generatort::add_axioms_from_int(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_from_int(const function_application_exprt &f) More... \endlink
+    \link string_constraint_generatort::add_axioms_for_string_of_int(const function_application_exprt &f) More... \endlink
   * `cprover_string_of_float` :
     \copybrief string_constraint_generatort::add_axioms_for_string_of_float(const function_application_exprt &f)
     \link string_constraint_generatort::add_axioms_for_string_of_float(const function_application_exprt &f) More... \endlink

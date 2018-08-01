@@ -31,17 +31,17 @@ exprt string_constraint_generatort::add_axioms_from_int(
   const array_string_exprt res =
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   if(f.arguments().size() == 4)
-    return add_axioms_from_int_with_radix(
+    return add_axioms_for_string_of_int_with_radix(
       res, f.arguments()[2], f.arguments()[3]);
   else // f.arguments.size()==3
-    return add_axioms_from_int(res, f.arguments()[2]);
+    return add_axioms_for_string_of_int(res, f.arguments()[2]);
 }
 
 /// Add axioms corresponding to the String.valueOf(J) java function.
 /// \deprecated should use add_axioms_from_int instead
 /// \param f: function application with one long argument
 /// \return a new string expression
-DEPRECATED("should use add_axioms_from_int instead")
+DEPRECATED("should use add_axioms_for_string_of_int instead")
 exprt string_constraint_generatort::add_axioms_from_long(
   const function_application_exprt &f)
 {
@@ -49,10 +49,10 @@ exprt string_constraint_generatort::add_axioms_from_long(
   const array_string_exprt res =
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   if(f.arguments().size() == 4)
-    return add_axioms_from_int_with_radix(
+    return add_axioms_for_string_of_int_with_radix(
       res, f.arguments()[2], f.arguments()[3]);
   else
-    return add_axioms_from_int(res, f.arguments()[2]);
+    return add_axioms_for_string_of_int(res, f.arguments()[2]);
 }
 
 /// Add axioms corresponding to the String.valueOf(Z) java function.
@@ -124,13 +124,14 @@ exprt string_constraint_generatort::add_axioms_from_bool(
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
 /// \return code 0 on success
-exprt string_constraint_generatort::add_axioms_from_int(
+exprt string_constraint_generatort::add_axioms_for_string_of_int(
   const array_string_exprt &res,
   const exprt &input_int,
   size_t max_size)
 {
   const constant_exprt radix=from_integer(10, input_int.type());
-  return add_axioms_from_int_with_radix(res, input_int, radix, max_size);
+  return add_axioms_for_string_of_int_with_radix(
+    res, input_int, radix, max_size);
 }
 
 /// Add axioms enforcing that the string corresponds to the result
@@ -142,7 +143,7 @@ exprt string_constraint_generatort::add_axioms_from_int(
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
 /// \return code 0 on success
-exprt string_constraint_generatort::add_axioms_from_int_with_radix(
+exprt string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
   const array_string_exprt &res,
   const exprt &input_int,
   const exprt &radix,
@@ -204,7 +205,8 @@ exprt string_constraint_generatort::int_of_hex_char(const exprt &chr)
 /// \param res: string expression for the result
 /// \param i: an integer argument
 /// \return code 0 on success
-DEPRECATED("use add_axioms_from_int which takes a radix argument instead")
+DEPRECATED(
+  "use add_axioms_for_string_of_int which takes a radix argument instead")
 exprt string_constraint_generatort::add_axioms_from_int_hex(
   const array_string_exprt &res,
   const exprt &i)

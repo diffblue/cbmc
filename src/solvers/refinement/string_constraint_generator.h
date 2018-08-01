@@ -165,6 +165,11 @@ public:
     const array_string_exprt &s1,
     const array_string_exprt &s2,
     const exprt &offset);
+  exprt add_axioms_for_string_of_int_with_radix(
+    const array_string_exprt &res,
+    const exprt &input_int,
+    const exprt &radix,
+    size_t max_size = 0);
 
 private:
   symbol_exprt fresh_boolean(const irep_idt &prefix);
@@ -258,14 +263,9 @@ private:
     const exprt &guard);
   exprt add_axioms_from_literal(const function_application_exprt &f);
   exprt add_axioms_from_int(const function_application_exprt &f);
-  exprt add_axioms_from_int(
+  exprt add_axioms_for_string_of_int(
     const array_string_exprt &res,
     const exprt &input_int,
-    size_t max_size = 0);
-  exprt add_axioms_from_int_with_radix(
-    const array_string_exprt &res,
-    const exprt &input_int,
-    const exprt &radix,
     size_t max_size = 0);
   exprt add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i);
   exprt add_axioms_from_int_hex(const function_application_exprt &f);
