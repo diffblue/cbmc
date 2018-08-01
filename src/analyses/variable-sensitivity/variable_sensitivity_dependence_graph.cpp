@@ -137,6 +137,10 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
       eval_data_deps(arg, ns, domain_data_deps);
     }
   }
+  else if (to->is_goto())
+  {
+    eval_data_deps(to->guard, ns, domain_data_deps);
+  }
 }
 
 void variable_sensitivity_dependence_domaint::control_dependencies(
