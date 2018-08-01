@@ -42,6 +42,14 @@ void nondet_static(
       if(has_prefix(id2string(sym.get_identifier()), CPROVER_PREFIX))
         continue;
 
+      // any other internal variable such as Java specific?
+      if(
+        ns.lookup(sym.get_identifier())
+          .type.get_bool(ID_C_no_nondet_initialization))
+      {
+        continue;
+      }
+
       // static lifetime?
       if(!ns.lookup(sym.get_identifier()).is_static_lifetime)
         continue;
