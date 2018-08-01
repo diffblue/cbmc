@@ -367,14 +367,17 @@ void _check_with_strategy(
   mh.set_verbosity(0);
   messaget log(mh);
 
-  path_strategy_choosert chooser;
-  REQUIRE(chooser.is_valid_strategy(strategy));
-  std::unique_ptr<path_storaget> worklist = chooser.get(strategy);
-
   goto_modelt gm;
   int ret;
   ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, log, mh);
   REQUIRE(ret == -1);
+
+  path_strategy_choosert chooser;
+  REQUIRE(chooser.is_valid_strategy(strategy));
+  const path_storaget::strategy_contextt strategy_context(
+    gm.goto_functions, log);
+  std::unique_ptr<path_storaget> worklist =
+    chooser.get(strategy, strategy_context);
 
   cbmc_solverst solvers(opts, gm.get_symbol_table(), mh, false);
   std::unique_ptr<cbmc_solverst::solvert> cbmc_solver = solvers.get_solver();
