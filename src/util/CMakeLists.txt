@@ -30,17 +30,19 @@ endif()
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.in
   "const char *CBMC_VERSION=\"@CBMC_RELEASE@ (@GIT_INFO@)\";\n")
-add_custom_command(
-  OUTPUT version.cpp
+add_custom_target(
+  generate_version_cpp
   COMMAND ${CMAKE_COMMAND}
     -D CBMC_SOURCE_DIR=${CBMC_SOURCE_DIR}
     -D CUR=${CMAKE_CURRENT_BINARY_DIR}
     -P ${CMAKE_BINARY_DIR}/version.cmake
-)
+    )
 
 add_library(util
   ${sources}
   version.cpp)
+
+add_dependencies(util generate_version_cpp)
 
 generic_includes(util)
 
