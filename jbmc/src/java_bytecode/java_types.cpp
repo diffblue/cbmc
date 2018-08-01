@@ -974,13 +974,13 @@ std::string pretty_java_type(const typet &type)
     return "?";
 }
 
-std::string pretty_signature(const java_method_typet &code_type)
+std::string pretty_signature(const java_method_typet &method_type)
 {
   std::ostringstream result;
   result << '(';
 
   bool first = true;
-  for(const auto p : code_type.parameters())
+  for(const auto p : method_type.parameters())
   {
     if(p.get_this())
       continue;

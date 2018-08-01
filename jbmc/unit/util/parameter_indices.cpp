@@ -12,9 +12,9 @@
 
 void check_consistency(const symbolt &symbol)
 {
-  const auto &code_type = to_java_method_type(symbol.type);
-  auto parameter_ids = code_type.parameter_identifiers();
-  auto parameter_indices = code_type.parameter_indices();
+  const auto &method_type = to_java_method_type(symbol.type);
+  auto parameter_ids = method_type.parameter_identifiers();
+  auto parameter_indices = method_type.parameter_indices();
 
   REQUIRE(parameter_ids.size() == parameter_indices.size());
   for(std::size_t i = 0; i < parameter_ids.size(); ++i)

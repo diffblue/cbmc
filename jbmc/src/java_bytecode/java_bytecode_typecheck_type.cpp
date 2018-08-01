@@ -38,10 +38,10 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_code)
   {
-    java_method_typet &code_type = to_java_method_type(type);
-    typecheck_type(code_type.return_type());
+    java_method_typet &method_type = to_java_method_type(type);
+    typecheck_type(method_type.return_type());
 
-    java_method_typet::parameterst &parameters = code_type.parameters();
+    java_method_typet::parameterst &parameters = method_type.parameters();
 
     for(java_method_typet::parameterst::iterator it = parameters.begin();
         it != parameters.end();

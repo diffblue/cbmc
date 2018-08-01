@@ -54,7 +54,7 @@ struct_union_typet::componentt require_type::require_component(
 
 /// Checks a type is a code_type (i.e. a function)
 /// \param type: The type to check
-/// \return The cast version of the type code_type
+/// \return The cast version of the type method_type
 java_method_typet require_type::require_code(const typet &type)
 {
   REQUIRE(type.id() == ID_code);
@@ -70,9 +70,9 @@ java_method_typet require_type::require_code(const typet &type)
 java_method_typet
 require_type::require_code(const typet &type, const size_t num_params)
 {
-  java_method_typet code_type = require_code(type);
-  REQUIRE(code_type.parameters().size() == num_params);
-  return code_type;
+  java_method_typet method_type = require_code(type);
+  REQUIRE(method_type.parameters().size() == num_params);
+  return method_type;
 }
 
 /// Verify that a function has a parameter of a specific name.
