@@ -1,4 +1,4 @@
-FUTURE
+CORE
 main.c
 file1.c file2.c --dependence-graph-vs --structs --arrays --show
 EXIT=0
@@ -9,6 +9,7 @@ SIGNAL=0
 ^Data dependencies: 4 \[st.b\], 53 \[st.b\]$
 ^Data dependencies: 1 \[st.a\], 4 \[st.b\], 53 \[st.a, st.b\]$
 ^Data dependencies: 48 \[ar\[\(signed long int\)0\]\]$
+^Data dependencies: 1 \[out1\], 6 \[out1\], 53 \[out1\]$
 ^Data dependencies: 48 \[ar\[\(signed long int\)1\]\]$
 ^Data dependencies: 10 \[ar\[\(signed long int\)0\]\], 48 \[ar\[\(signed long int\)0\]\]$
 ^Data dependencies: 13 \[ar\[\(signed long int\)1\]\], 48 \[ar\[\(signed long int\)1\]\]$

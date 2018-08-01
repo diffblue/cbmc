@@ -28,7 +28,7 @@ void main(void)
   if (in == 1)
     ar[0]++;
 
-  if (in == 2)
+  if (out1 == 2)
     ar[1]++;
 
   out1 = ar[0];
