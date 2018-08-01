@@ -122,17 +122,23 @@ optionalt<std::vector<mp_integer>> eval_string(
   return result;
 }
 
-array_string_exprt
-make_string(const std::vector<mp_integer> &array, const array_typet &array_type)
+template <typename Iter>
+static array_string_exprt
+make_string(Iter begin, Iter end, const array_typet &array_type)
 {
   const typet &char_type = array_type.subtype();
   array_exprt array_expr(array_type);
   const auto &insert = std::back_inserter(array_expr.operands());
-  std::transform(
-    array.begin(), array.end(), insert, [&](const mp_integer &i) { // NOLINT
-      return from_integer(i, char_type);
-    });
+  std::transform(begin, end, insert, [&](const mp_integer &i) {
+    return from_integer(i, char_type);
+  });
   return to_array_string_expr(array_expr);
+}
+
+static array_string_exprt
+make_string(const std::vector<mp_integer> &array, const array_typet &array_type)
+{
+  return make_string(array.begin(), array.end(), array_type);
 }
 
 std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
