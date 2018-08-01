@@ -380,19 +380,10 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
 }
 
 /// Set a character to a specific value at an index of the string
-///
-/// Add axioms ensuring that the result `res` is similar to input string `str`
-/// where the character at index `pos` is set to `char`.
-/// These axioms are:
-///   1. \f$ |{\tt res}| = |{\tt str}|\f$
-///   2. \f$ {\tt res}[{\tt pos}]={\tt char}\f$
-///   3. \f$ \forall i < min(|{\tt res}|, pos). {\tt res}[i] = {\tt str}[i]\f$
-///   4. \f$ \forall pos+1 <= i < |{\tt res}|.\ {\tt res}[i] = {\tt str}[i]\f$
+/// \copydoc string_constraint_generatort::add_axioms_for_set_char
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]`, refined_string `str`, integer `pos`,
 ///           and character `char`
-/// \return an integer expression which is `1` when `pos` is out of bounds and
-///         `0` otherwise
 exprt string_constraint_generatort::add_axioms_for_char_set(
   const function_application_exprt &f)
 {
@@ -402,28 +393,45 @@ exprt string_constraint_generatort::add_axioms_for_char_set(
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   const exprt &position = f.arguments()[3];
   const exprt &character = f.arguments()[4];
+  return add_axioms_for_set_char(res, str, position, character);
+}
 
+/// Add axioms ensuring that the result `res` is similar to input string `str`
+/// where the character at index `pos` is set to `char`.
+///
+/// These axioms are:
+///   1. \f$ |{\tt res}| = |{\tt str}|\f$
+///   2. \f$ {\tt res}[{\tt pos}]={\tt char}\f$
+///   3. \f$ \forall i < min(|{\tt res}|, pos). {\tt res}[i] = {\tt str}[i]\f$
+///   4. \f$ \forall pos+1 <= i < |{\tt res}|.\ {\tt res}[i] = {\tt str}[i]\f$
+/// \return an integer expression which is `1` when `pos` is out of bounds and
+///         `0` otherwise
+exprt string_constraint_generatort::add_axioms_for_set_char(
+  const array_string_exprt &res,
+  const array_string_exprt &str,
+  const exprt &position,
+  const exprt &character)
+{
   const binary_relation_exprt out_of_bounds(position, ID_ge, str.length());
-  const equal_exprt a1(res.length(), str.length());
-  lemmas.push_back(a1);
-  const equal_exprt a2(res[position], character);
-  lemmas.push_back(a2);
-
-  const symbol_exprt q = fresh_univ_index("QA_char_set", position.type());
-  const equal_exprt a3_body(res[q], str[q]);
-  const string_constraintt a3(
-    q, minimum(zero_if_negative(res.length()), position), a3_body);
-  constraints.push_back(a3);
-
-  const symbol_exprt q2 = fresh_univ_index("QA_char_set2", position.type());
-  const plus_exprt lower_bound(position, from_integer(1, position.type()));
-  const equal_exprt a4_body(res[q2], str[q2]);
-  const string_constraintt a4(
-    q2, lower_bound, zero_if_negative(res.length()), a4_body);
-  constraints.push_back(a4);
-
+  lemmas.push_back(equal_exprt(res.length(), str.length()));
+  lemmas.push_back(equal_exprt(res[position], character));
+  constraints.push_back([&] {
+    const symbol_exprt q = fresh_univ_index("QA_char_set", position.type());
+    const equal_exprt a3_body(res[q], str[q]);
+    return string_constraintt(
+      q, minimum(zero_if_negative(res.length()), position), a3_body);
+  }());
+  constraints.push_back([&] {
+    const symbol_exprt q2 = fresh_univ_index("QA_char_set2", position.type());
+    const plus_exprt lower_bound(position, from_integer(1, position.type()));
+    const equal_exprt a4_body(res[q2], str[q2]);
+    return string_constraintt(
+      q2, lower_bound, zero_if_negative(res.length()), a4_body);
+  }());
   return if_exprt(
-    out_of_bounds, from_integer(1, f.type()), from_integer(0, f.type()));
+    out_of_bounds,
+    from_integer(1, get_return_code_type()),
+    from_integer(0, get_return_code_type()));
 }
 
 /// Convert two expressions to pair of chars

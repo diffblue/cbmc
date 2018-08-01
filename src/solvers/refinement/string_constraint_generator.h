@@ -170,6 +170,11 @@ public:
     const exprt &input_int,
     const exprt &radix,
     size_t max_size = 0);
+  exprt add_axioms_for_set_char(
+    const array_string_exprt &res,
+    const array_string_exprt &str,
+    const exprt &position,
+    const exprt &character);
 
 private:
   symbol_exprt fresh_boolean(const irep_idt &prefix);
