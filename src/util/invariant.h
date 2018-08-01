@@ -75,40 +75,29 @@ Author: Martin Brain, martin.brain@diffblue.com
 class invariant_failedt
 {
  private:
-   std::string get_invariant_failed_message(
-     const std::string &file,
-     const std::string &function,
-     int line,
-     const std::string &backtrace,
-     const std::string &reason) const;
-
- public:
   const std::string file;
   const std::string function;
   const int line;
   const std::string backtrace;
-  const std::string reason;
   const std::string condition;
+  const std::string reason;
 
-  std::string what() const noexcept
-  {
-    return get_invariant_failed_message(
-      file, function, line, backtrace, reason);
-  };
+public:
+  std::string what() const noexcept;
 
   invariant_failedt(
     const std::string &_file,
     const std::string &_function,
     int _line,
     const std::string &_backtrace,
-    const std::string &_reason,
-    const std::string &_condition)
+    const std::string &_condition,
+    const std::string &_reason)
     : file(_file),
       function(_function),
       line(_line),
       backtrace(_backtrace),
-      reason(_reason),
-      condition(_condition)
+      condition(_condition),
+      reason(_reason)
   {
   }
 };
@@ -172,8 +161,8 @@ invariant_violated_structured(
     function,
     line,
     backtrace,
-    std::forward<Params>(params)...,
-    condition);
+    condition,
+    std::forward<Params>(params)...);
   // We now have a structured exception ready to use;
   // in future this is the place to put a 'throw'.
   report_exception_to_stderr(to_throw);
@@ -232,8 +221,8 @@ invariant_violated_string(
         __FILE__,                                                              \
         __this_function__,                                                     \
         __LINE__,                                                              \
-        __VA_ARGS__,                                                           \
-        #CONDITION); /* NOLINT */                                              \
+        #CONDITION,                                                            \
+        __VA_ARGS__); /* NOLINT */                                             \
   } while(false)
 
 #endif // End CPROVER_DO_NOT_CHECK / CPROVER_ASSERT / ... if block
