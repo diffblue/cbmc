@@ -484,11 +484,7 @@ int jbmc_parse_optionst::doit()
           unsigned unwind,
           unsigned &max_unwind) {
           return java_enum_static_init_unwind_handler(
-            context,
-            loop_number,
-            unwind,
-            max_unwind,
-            symbol_table);
+            context, loop_number, unwind, max_unwind, symbol_table);
         });
     };
   }
