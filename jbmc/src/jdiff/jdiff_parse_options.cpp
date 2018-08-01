@@ -64,7 +64,7 @@ Author: Peter Schrammel
 jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
   : parse_options_baset(JDIFF_OPTIONS, argc, argv),
     jdiff_languagest(cmdline, ui_message_handler),
-    ui_message_handler(cmdline, "JDIFF " CBMC_VERSION),
+    ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION),
     languages2(cmdline, ui_message_handler)
 {
 }
@@ -75,7 +75,7 @@ jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
   const std::string &extra_options)
   : parse_options_baset(JDIFF_OPTIONS + extra_options, argc, argv),
     jdiff_languagest(cmdline, ui_message_handler),
-    ui_message_handler(cmdline, "JDIFF " CBMC_VERSION),
+    ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION),
     languages2(cmdline, ui_message_handler)
 {
 }
@@ -206,8 +206,8 @@ int jdiff_parse_optionst::doit()
   //
   // Print a banner
   //
-  status() << "JDIFF version " CBMC_VERSION " " << sizeof(void *) * 8 << "-bit "
-           << config.this_architecture() << " "
+  status() << "JDIFF version " << CBMC_VERSION << " " << sizeof(void *) * 8
+           << "-bit " << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
   if(cmdline.args.size() != 2)

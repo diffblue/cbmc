@@ -345,15 +345,16 @@ int gcc_modet::doit()
     // Compilation continues, don't exit!
 
     if(act_as_bcc)
-      std::cout << "bcc: version " << gcc_version
-                << " (goto-cc " CBMC_VERSION ")\n";
+      std::cout << "bcc: version " << gcc_version << " (goto-cc "
+                << CBMC_VERSION << ")\n";
     else
     {
       if(gcc_version.flavor == gcc_versiont::flavort::CLANG)
-        std::cout << "clang version " << gcc_version
-                  << " (goto-cc " CBMC_VERSION ")\n";
+        std::cout << "clang version " << gcc_version << " (goto-cc "
+                  << CBMC_VERSION << ")\n";
       else
-        std::cout << "gcc (goto-cc " CBMC_VERSION ") " << gcc_version << '\n';
+        std::cout << "gcc (goto-cc " << CBMC_VERSION << ") " << gcc_version
+                  << '\n';
     }
   }
 
@@ -371,7 +372,7 @@ int gcc_modet::doit()
     std::cout
       << '\n'
       << "Copyright (C) 2006-2018 Daniel Kroening, Christoph Wintersteiger\n"
-      << "CBMC version: " CBMC_VERSION << '\n'
+      << "CBMC version: " << CBMC_VERSION << '\n'
       << "Architecture: " << config.this_architecture() << '\n'
       << "OS: " << config.this_operating_system() << '\n';
 

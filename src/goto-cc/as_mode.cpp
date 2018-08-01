@@ -82,17 +82,18 @@ int as_modet::doit()
      cmdline.isset("version"))
   {
     if(act_as_as86)
-      status() << "as86 version: 0.16.17 (goto-cc " CBMC_VERSION ")"
+      status() << "as86 version: 0.16.17 (goto-cc " << CBMC_VERSION << ")"
                << eom;
     else
       status() << "GNU assembler version 2.20.51.0.7 20100318"
-               << " (goto-cc " CBMC_VERSION ")" << eom;
+               << " (goto-cc " << CBMC_VERSION << ")" << eom;
 
-    status() << '\n' <<
-      "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n" <<
-      "CBMC version: " CBMC_VERSION << '\n' <<
-      "Architecture: " << config.this_architecture() << '\n' <<
-      "OS: " << config.this_operating_system() << eom;
+    status()
+      << '\n'
+      << "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n"
+      << "CBMC version: " << CBMC_VERSION << '\n'
+      << "Architecture: " << config.this_architecture() << '\n'
+      << "OS: " << config.this_operating_system() << eom;
 
     return EX_OK; // Exit!
   }

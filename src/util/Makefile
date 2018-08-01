@@ -93,6 +93,7 @@ SRC = arith_tools.cpp \
       union_find.cpp \
       union_find_replace.cpp \
       unwrap_nested_exception.cpp \
+      version.cpp \
       xml.cpp \
       xml_expr.cpp \
       xml_irep.cpp \
@@ -105,8 +106,8 @@ include ../common
 
 # get version from git
 GIT_INFO = $(shell git describe --tags --always --dirty || echo "n/a")
-RELEASE_INFO = \#define CBMC_VERSION "$(CBMC_VERSION) ($(GIT_INFO))"
-GIT_INFO_FILE = version.h
+RELEASE_INFO = const char *CBMC_VERSION="$(CBMC_VERSION) ($(GIT_INFO))";
+GIT_INFO_FILE = version.cpp
 
 $(GIT_INFO_FILE):
 	echo '$(RELEASE_INFO)' > $@

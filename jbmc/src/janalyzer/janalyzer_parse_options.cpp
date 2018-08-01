@@ -60,7 +60,7 @@ Author: Daniel Kroening, kroening@kroening.com
 janalyzer_parse_optionst::janalyzer_parse_optionst(int argc, const char **argv)
   : parse_options_baset(JANALYZER_OPTIONS, argc, argv),
     messaget(ui_message_handler),
-    ui_message_handler(cmdline, "JANALYZER " CBMC_VERSION)
+    ui_message_handler(cmdline, std::string("JANALYZER ") + CBMC_VERSION)
 {
 }
 
@@ -342,7 +342,7 @@ int janalyzer_parse_optionst::doit()
   //
   // Print a banner
   //
-  status() << "JANALYZER version " CBMC_VERSION " " << sizeof(void *) * 8
+  status() << "JANALYZER version " << CBMC_VERSION << " " << sizeof(void *) * 8
            << "-bit " << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 

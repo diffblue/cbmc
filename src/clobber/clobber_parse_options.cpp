@@ -35,10 +35,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
-clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
-  parse_options_baset(CLOBBER_OPTIONS, argc, argv),
-  language_uit(cmdline, ui_message_handler),
-  ui_message_handler(cmdline, "CLOBBER " CBMC_VERSION)
+clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv)
+  : parse_options_baset(CLOBBER_OPTIONS, argc, argv),
+    language_uit(cmdline, ui_message_handler),
+    ui_message_handler(cmdline, std::string("CLOBBER ") + CBMC_VERSION)
 {
 }
 

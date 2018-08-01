@@ -65,24 +65,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "xml_interface.h"
 
-cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):
-  parse_options_baset(CBMC_OPTIONS, argc, argv),
-  xml_interfacet(cmdline),
-  messaget(ui_message_handler),
-  ui_message_handler(cmdline, "CBMC " CBMC_VERSION),
-  path_strategy_chooser()
+cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
+  : parse_options_baset(CBMC_OPTIONS, argc, argv),
+    xml_interfacet(cmdline),
+    messaget(ui_message_handler),
+    ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION),
+    path_strategy_chooser()
 {
 }
 
 ::cbmc_parse_optionst::cbmc_parse_optionst(
   int argc,
   const char **argv,
-  const std::string &extra_options):
-  parse_options_baset(CBMC_OPTIONS+extra_options, argc, argv),
-  xml_interfacet(cmdline),
-  messaget(ui_message_handler),
-  ui_message_handler(cmdline, "CBMC " CBMC_VERSION),
-  path_strategy_chooser()
+  const std::string &extra_options)
+  : parse_options_baset(CBMC_OPTIONS + extra_options, argc, argv),
+    xml_interfacet(cmdline),
+    messaget(ui_message_handler),
+    ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION),
+    path_strategy_chooser()
 {
 }
 
@@ -436,9 +436,8 @@ int cbmc_parse_optionst::doit()
   //
   // Print a banner
   //
-  status() << "CBMC version " CBMC_VERSION " "
-           << sizeof(void *)*8 << "-bit "
-           << config.this_architecture() << " "
+  status() << "CBMC version " << CBMC_VERSION << " " << sizeof(void *) * 8
+           << "-bit " << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
   //
