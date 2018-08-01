@@ -175,7 +175,9 @@ void dep_graph_domaint::data_dependencies(
     {
       bool found=false;
       for(const auto &wr : w_range.second)
+      {
         for(const auto &r_range : r_ranges)
+        {
           if(!found &&
              may_be_def_use_pair(wr.first, wr.second,
                                  r_range.first, r_range.second))
@@ -184,6 +186,8 @@ void dep_graph_domaint::data_dependencies(
             data_deps.insert(w_range.first);
             found=true;
           }
+        }
+      }
     }
 
     dep_graph.reaching_definitions()[to].clear_cache(it->first);
