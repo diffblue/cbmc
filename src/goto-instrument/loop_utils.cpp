@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "loop_utils.h"
 
 #include <util/std_expr.h>
-#include <util/expr_iterator.h>
 
 #include <analyses/natural_loops.h>
 #include <analyses/local_may_alias.h>
@@ -105,44 +104,6 @@ void get_modifies(
     {
       const exprt &lhs=to_code_function_call(instruction.code).lhs();
       get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
-    }
-  }
-}
-
-// TODO handle aliasing at all
-void get_uses(
-  const local_may_aliast &local_may_alias,
-  const loopt &loop,
-  usest &uses)
-{
-  for(loopt::const_iterator
-      i_it=loop.begin(); i_it!=loop.end(); i_it++)
-  {
-    const goto_programt::instructiont &instruction=**i_it;
-    if(instruction.code.is_not_nil())
-    {
-      for(const_depth_iteratort it=instruction.code.depth_begin();
-          it!=instruction.code.depth_end();
-          ++it)
-      {
-        if((*it).id()==ID_symbol)
-        {
-          uses.insert(*it);
-        }
-      }
-    }
-
-    if(instruction.guard.is_not_nil())
-    {
-      for(const_depth_iteratort it=instruction.guard.depth_begin();
-          it!=instruction.guard.depth_end();
-          ++it)
-      {
-        if((*it).id()==ID_symbol)
-        {
-          uses.insert(*it);
-        }
-      }
     }
   }
 }
