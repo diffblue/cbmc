@@ -417,7 +417,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs are of correct type")
@@ -455,7 +455,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs are of oorrect type")
@@ -493,7 +493,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs are of correct type")
@@ -538,7 +538,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs are of correct type")
@@ -583,7 +583,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs are of correct type")
@@ -624,7 +624,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs have correct type")
@@ -665,7 +665,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs have correct type")
@@ -706,7 +706,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs have correct type")
@@ -751,7 +751,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs have correct type")
@@ -796,7 +796,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs have correct type")
@@ -841,7 +841,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs have correct type")
@@ -882,7 +882,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs have correct type")
@@ -929,7 +929,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 2);
 
     THEN("The inputs have correct type")
@@ -976,7 +976,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1012,7 +1012,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1048,7 +1048,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1090,7 +1090,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1132,7 +1132,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1171,7 +1171,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1210,7 +1210,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1249,7 +1249,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1292,7 +1292,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1335,7 +1335,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1378,7 +1378,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1417,7 +1417,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")
@@ -1462,7 +1462,7 @@ SCENARIO(
     const symbolt &function_symbol =
       new_symbol_table.lookup_ref(process_func_name);
 
-    const code_typet &function_call =
+    const java_method_typet &function_call =
       require_type::require_code(function_symbol.type, 1);
 
     THEN("The return type is correct")

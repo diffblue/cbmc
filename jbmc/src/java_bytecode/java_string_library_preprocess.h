@@ -99,7 +99,7 @@ private:
   const refined_string_typet refined_string_type;
 
   typedef std::function<codet(
-    const code_typet &,
+    const java_method_typet &,
     const source_locationt &,
     const irep_idt &,
     symbol_table_baset &)>
@@ -146,56 +146,56 @@ private:
   std::unordered_set<irep_idt> string_types;
 
   codet make_equals_function_code(
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_float_to_string_code(
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_string_to_char_array_code(
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_tablet &symbol_table);
 
   codet make_string_format_code(
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_copy_string_code(
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_copy_constructor_code(
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_string_length_code(
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   codet make_object_get_class_code(
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   // Helper functions
   exprt::operandst process_parameters(
-    const code_typet::parameterst &params,
+    const java_method_typet::parameterst &params,
     const source_locationt &loc,
     symbol_table_baset &symbol_table,
     code_blockt &init_code);
@@ -306,32 +306,32 @@ private:
 
   codet make_function_from_call(
     const irep_idt &function_name,
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
   codet make_init_function_from_call(
     const irep_idt &function_name,
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table,
     bool ignore_first_arg = true);
 
   codet make_assign_and_return_function_from_call(
     const irep_idt &function_name,
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
   codet make_assign_function_from_call(
     const irep_idt &function_name,
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
   codet make_string_returning_function_from_call(
     const irep_idt &function_name,
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
@@ -354,7 +354,7 @@ private:
   exprt get_object_at_index(const exprt &argv, std::size_t index);
 
   codet make_init_from_array_code(
-    const code_typet &type,
+    const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);

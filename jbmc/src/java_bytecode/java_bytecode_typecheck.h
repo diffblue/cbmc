@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_TYPECHECK_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_TYPECHECK_H
 
+#include "java_types.h"
+
 #include <set>
 #include <map>
 

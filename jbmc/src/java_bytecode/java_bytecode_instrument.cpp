@@ -446,8 +446,8 @@ void java_bytecode_instrumentt::instrument_code(codet &code)
     add_expr_instrumentation(block, code_function_call.lhs());
     add_expr_instrumentation(block, code_function_call.function());
 
-    const code_typet &function_type=
-      to_code_type(code_function_call.function().type());
+    const java_method_typet &function_type =
+      to_java_method_type(code_function_call.function().type());
 
     // Check for a null this-argument of a virtual call:
     if(function_type.has_this())

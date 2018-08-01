@@ -56,11 +56,10 @@ std::string expr2javat::convert_code_function_call(
     dest+='=';
   }
 
-  const code_typet &code_type=
-    to_code_type(src.function().type());
+  const java_method_typet &code_type =
+    to_java_method_type(src.function().type());
 
-  bool has_this=code_type.has_this() &&
-                !src.arguments().empty();
+  bool has_this = code_type.has_this() && !src.arguments().empty();
 
   if(has_this)
   {
@@ -284,7 +283,7 @@ std::string expr2javat::convert_rec(
     return q+"byte"+d;
   else if(src.id()==ID_code)
   {
-    const code_typet &code_type=to_code_type(src);
+    const java_method_typet &code_type = to_java_method_type(src);
 
     // Java doesn't really have syntax for function types,
     // so we make one up, loosely inspired by the syntax
@@ -293,11 +292,10 @@ std::string expr2javat::convert_rec(
     std::string dest="";
 
     dest+='(';
-    const code_typet::parameterst &parameters=code_type.parameters();
+    const java_method_typet::parameterst &parameters = code_type.parameters();
 
-    for(code_typet::parameterst::const_iterator
-        it=parameters.begin();
-        it!=parameters.end();
+    for(java_method_typet::parameterst::const_iterator it = parameters.begin();
+        it != parameters.end();
         it++)
     {
       if(it!=parameters.begin())
@@ -315,7 +313,7 @@ std::string expr2javat::convert_rec(
 
     dest+=')';
 
-    const typet &return_type=code_type.return_type();
+    const typet &return_type = code_type.return_type();
     dest+=" -> "+convert(return_type);
 
     return q + dest;

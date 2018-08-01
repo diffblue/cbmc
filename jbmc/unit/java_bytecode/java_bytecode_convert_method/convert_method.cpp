@@ -29,7 +29,7 @@ SCENARIO(
       const symbolt function_symbol =
         symbol_table.lookup_ref(method_name + ":(Ljava/lang/Object;)I");
 
-      const code_typet &function_type =
+      const java_method_typet &function_type =
         require_type::require_code(function_symbol.type);
       THEN("The method should be marked as a bridge method")
       {
@@ -43,7 +43,7 @@ SCENARIO(
         const symbolt function_symbol =
           symbol_table.lookup_ref(method_name + ":(LClassWithBridgeMethod;)I");
 
-        const code_typet &function_type =
+        const java_method_typet &function_type =
           require_type::require_code(function_symbol.type);
         THEN("The method should be marked as a bridge method")
         {

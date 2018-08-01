@@ -64,7 +64,7 @@ SCENARIO("string_identifiers_resolution_from_equations",
 
     WHEN("There is a function call")
     {
-      symbol_exprt fun_sym("f", code_typet());
+      symbol_exprt fun_sym("f", java_method_typet());
       function_application_exprt fun(fun_sym, bool_typet());
       fun.operands().push_back(c);
       symbol_exprt bool_sym("bool_b", bool_typet());

@@ -542,14 +542,14 @@ typet java_type_from_string(
         parse_list_types(src.substr(0, e_pos + 1), class_name_prefix, '(', ')');
 
       // create parameters for each type
-      code_typet::parameterst parameters;
+      java_method_typet::parameterst parameters;
       std::transform(
         param_types.begin(),
         param_types.end(),
         std::back_inserter(parameters),
-        [](const typet &type) { return code_typet::parametert(type); });
+        [](const typet &type) { return java_method_typet::parametert(type); });
 
-      return code_typet(std::move(parameters), std::move(return_type));
+      return java_method_typet(std::move(parameters), std::move(return_type));
     }
 
   case '[': // array type
@@ -817,7 +817,7 @@ void get_dependencies_from_generic_parameters_rec(
   // method type with parameters and return value
   else if(t.id() == ID_code)
   {
-    const code_typet &c = to_code_type(t);
+    const java_method_typet &c = to_java_method_type(t);
     get_dependencies_from_generic_parameters_rec(c.return_type(), refs);
     for(const auto &param : c.parameters())
       get_dependencies_from_generic_parameters_rec(param.type(), refs);
@@ -974,7 +974,7 @@ std::string pretty_java_type(const typet &type)
     return "?";
 }
 
-std::string pretty_signature(const code_typet &code_type)
+std::string pretty_signature(const java_method_typet &code_type)
 {
   std::ostringstream result;
   result << '(';

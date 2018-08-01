@@ -376,7 +376,7 @@ void ci_lazy_methodst::initialize_instantiated_classes(
   for(const auto &mname : entry_points)
   {
     const auto &symbol=ns.lookup(mname);
-    const auto &mtype=to_code_type(symbol.type);
+    const auto &mtype = to_java_method_type(symbol.type);
     for(const auto &param : mtype.parameters())
     {
       if(param.type().id()==ID_pointer)

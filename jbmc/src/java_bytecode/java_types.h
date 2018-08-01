@@ -245,6 +245,10 @@ inline bool can_cast_type<java_class_typet>(const typet &type)
 class java_method_typet : public code_typet
 {
 public:
+  using code_typet::code_typet;
+  using code_typet::parameterst;
+  using code_typet::parametert;
+
   const std::vector<irep_idt> throws_exceptions() const
   {
     std::vector<irep_idt> exceptions;
@@ -732,6 +736,6 @@ std::string gather_full_class_name(const std::string &);
 std::string pretty_java_type(const typet &);
 
 // pretty signature for methods
-std::string pretty_signature(const code_typet &);
+std::string pretty_signature(const java_method_typet &);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H

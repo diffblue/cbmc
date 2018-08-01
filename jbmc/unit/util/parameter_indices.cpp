@@ -6,13 +6,13 @@
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
 #include <java-testing-utils/load_java_class.h>
+#include <testing-utils/catch.hpp>
 #include <util/std_types.h>
 
 void check_consistency(const symbolt &symbol)
 {
-  const auto &code_type = to_code_type(symbol.type);
+  const auto &code_type = to_java_method_type(symbol.type);
   auto parameter_ids = code_type.parameter_identifiers();
   auto parameter_indices = code_type.parameter_indices();
 
