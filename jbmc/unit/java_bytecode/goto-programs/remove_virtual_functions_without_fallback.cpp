@@ -7,6 +7,8 @@
 
 \*******************************************************************/
 
+#include <java_bytecode/java_types.h>
+
 #include <testing-utils/catch.hpp>
 #include <java-testing-utils/load_java_class.h>
 

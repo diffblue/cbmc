@@ -6,9 +6,10 @@
 
 \*******************************************************************/
 
-#include <java-testing-utils/load_java_class.h>
+#include <java_bytecode/java_types.h>
+
 #include <testing-utils/catch.hpp>
-#include <util/std_types.h>
+#include <java-testing-utils/load_java_class.h>
 
 void check_consistency(const symbolt &symbol)
 {
