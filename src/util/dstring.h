@@ -16,8 +16,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "string_container.h"
 
-// Marked final to disable inheritance.
-// No virtual destructor, so runtime-polymorphic use would be unsafe.
+/// \ref dstringt has one field, an unsigned integer \ref no which is an index
+/// into a static table of strings. This makes it expensive to create a new
+/// string(because you have to look through the whole table to see if it is
+/// already there, and add it if it isn't) but very cheap to compare strings
+/// (just compare the two integers). It also means that when you have lots of
+/// copies of the same string you only have to store the whole string once,
+/// which saves space.
+///
+/// `irep_idt` and `irep_namet` are typedef-ed to \ref dstringt in irep.h unless
+/// `USE_STD_STRING` is set.
+///
+///
+/// Note: Marked final to disable inheritance. No virtual destructor, so
+/// runtime-polymorphic use would be unsafe.
 class dstringt final
 {
 public:
