@@ -82,6 +82,7 @@ public:
     domain_data_deps.clear();
     control_deps.clear();
     control_dep_candidates.clear();
+    control_dep_calls.clear();
   }
 
   virtual void make_top() override
@@ -92,6 +93,7 @@ public:
     domain_data_deps.clear();
     control_deps.clear();
     control_dep_candidates.clear();
+    control_dep_calls.clear();
   }
 
   virtual void make_entry() override
@@ -171,6 +173,9 @@ private:
   typedef std::set<goto_programt::const_targett> control_dep_candidatest;
   control_dep_candidatest control_dep_candidates;
 
+  typedef std::set<goto_programt::const_targett> control_dep_callst;
+  control_dep_callst control_dep_calls;
+
   void eval_data_deps(
     const exprt &expr, const namespacet &ns, data_depst &deps) const;
 
@@ -187,7 +192,8 @@ private:
 
   bool merge_control_dependencies(
     const control_depst &other_control_deps,
-    const control_dep_candidatest &other_control_dep_candidates);
+    const control_dep_candidatest &other_control_dep_candidates,
+    const control_dep_callst &other_control_dep_calls);
 };
 
 class variable_sensitivity_dependence_grapht:

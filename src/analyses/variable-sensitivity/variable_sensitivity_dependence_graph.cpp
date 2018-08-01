@@ -70,25 +70,6 @@ void variable_sensitivity_dependence_domaint::transform(
     dynamic_cast<variable_sensitivity_dependence_grapht*>(&ai);
   assert(dep_graph!=nullptr);
 
-  // We do not propagate control dependencies on function calls, i.e., only the
-  // entry point of a function should have a control dependency on the call
-  if(!control_deps.empty())
-  {
-    const goto_programt::const_targett &dep = control_deps.begin()->first;
-    if(dep->is_function_call())
-    {
-      INVARIANT(
-        std::all_of(
-          std::next(control_deps.begin()),
-          control_deps.end(),
-          [](const std::pair<const goto_programt::const_targett, tvt> &d)
-            { return d.first->is_function_call(); }),
-        "All entries must be function calls");
-
-      control_deps.clear();
-    }
-  }
-
   // propagate control dependencies across function calls
   if(from->is_function_call())
   {
@@ -115,13 +96,15 @@ void variable_sensitivity_dependence_domaint::transform(
       // modify abstract state of return location
       if(s->merge_control_dependencies(
            control_deps,
-           control_dep_candidates))
+           control_dep_candidates,
+           control_dep_calls))
         s->has_changed=true;
 
       control_deps.clear();
-      control_deps.insert(std::make_pair(from, tvt::unknown()));
-
       control_dep_candidates.clear();
+
+      control_dep_calls.clear();
+      control_dep_calls.insert(from);
     }
   }
   else
@@ -178,7 +161,9 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
     control_dep_candidates.insert(from);
   else if(from->is_end_function())
   {
+    control_deps.clear();
     control_dep_candidates.clear();
+    control_dep_calls.clear();
     return;
   }
 
@@ -253,6 +238,7 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
       }
 
       control_deps.insert(std::make_pair(cd, branch));
+      control_dep_calls.clear();
     }
   }
 
@@ -263,7 +249,8 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
 
 bool variable_sensitivity_dependence_domaint::merge_control_dependencies(
   const control_depst &other_control_deps,
-  const control_dep_candidatest &other_control_dep_candidates)
+  const control_dep_candidatest &other_control_dep_candidates,
+  const control_dep_callst &other_control_dep_calls)
 {
   bool changed=false;
 
@@ -312,6 +299,16 @@ bool variable_sensitivity_dependence_domaint::merge_control_dependencies(
 
   changed|=n!=control_dep_candidates.size();
 
+  // Merge call control dependencies
+
+  n=control_dep_calls.size();
+
+  control_dep_calls.insert(
+      other_control_dep_calls.begin(),
+      other_control_dep_calls.end());
+
+  changed|=n!=control_dep_calls.size();
+
   return changed;
 }
 
@@ -349,7 +346,8 @@ bool variable_sensitivity_dependence_domaint::merge(
 
   changed |= merge_control_dependencies(
     cast_b.control_deps,
-    cast_b.control_dep_candidates);
+    cast_b.control_dep_candidates,
+    cast_b.control_dep_calls);
 
   has_changed=false;
   has_values=tvt::unknown();
@@ -398,7 +396,7 @@ void variable_sensitivity_dependence_domaint::output(
    const ai_baset &ai,
    const namespacet &ns) const
 {
-  if(!control_deps.empty())
+  if(!control_deps.empty() || !control_dep_calls.empty())
   {
     out << "Control dependencies: ";
     for(control_depst::const_iterator
@@ -414,6 +412,18 @@ void variable_sensitivity_dependence_domaint::output(
 
       out << cd->location_number << " [" << branch << "]";
     }
+
+    for(control_dep_callst::const_iterator
+        it=control_dep_calls.begin();
+        it!=control_dep_calls.end();
+        ++it)
+    {
+      if(!control_deps.empty() || it!=control_dep_calls.begin())
+        out << ",";
+
+      out << (*it)->location_number << " [UNCONDITIONAL]";
+    }
+
     out << "\n";
   }
 
@@ -473,6 +483,16 @@ jsont variable_sensitivity_dependence_domaint::output_json(
     link["branch"]=json_stringt(branch.to_string());
   }
 
+  for(const auto &target : control_dep_calls)
+  {
+    json_objectt &link=graph.push_back().make_object();
+    link["locationNumber"]=
+      json_numbert(std::to_string(target->location_number));
+    link["sourceLocation"]=json(target->source_location);
+    link["type"]=json_stringt("control");
+    link["branch"]=json_stringt("UNCONDITIONAL");
+  }
+
   for(const auto &dep : domain_data_deps)
   {
     json_objectt &link=graph.push_back().make_object();
@@ -502,6 +522,9 @@ void variable_sensitivity_dependence_domaint::populate_dep_graph(
 {
   for(const auto &c_dep : control_deps)
     dep_graph.add_dep(vs_dep_edget::kindt::CTRL, c_dep.first, this_loc);
+
+  for(const auto &c_dep : control_dep_calls)
+    dep_graph.add_dep(vs_dep_edget::kindt::CTRL, c_dep, this_loc);
 
   for(const auto &d_dep : domain_data_deps)
     dep_graph.add_dep(vs_dep_edget::kindt::DATA, d_dep.first, this_loc);
