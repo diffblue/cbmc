@@ -479,12 +479,12 @@ int jbmc_parse_optionst::doit()
     configure_bmc = [](bmct &bmc, const symbol_tablet &symbol_table) {
       bmc.add_loop_unwind_handler(
         [&symbol_table](
-          const irep_idt &function_id,
+          const goto_symex_statet::call_stackt &context,
           unsigned loop_number,
           unsigned unwind,
           unsigned &max_unwind) {
           return java_enum_static_init_unwind_handler(
-            function_id,
+            context,
             loop_number,
             unwind,
             max_unwind,

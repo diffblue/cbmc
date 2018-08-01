@@ -328,6 +328,7 @@ protected:
   // with false we continue.
   virtual bool get_unwind(
     const symex_targett::sourcet &source,
+    const goto_symex_statet::call_stackt &context,
     unsigned unwind);
 
   virtual void loop_bound_exceeded(statet &, const exprt &guard);

@@ -86,7 +86,7 @@ void goto_symext::symex_goto(statet &state)
     unwind++;
 
     // continue unwinding?
-    if(get_unwind(state.source, unwind))
+    if(get_unwind(state.source, state.call_stack(), unwind))
     {
       // no!
       loop_bound_exceeded(state, new_guard);
@@ -540,6 +540,7 @@ void goto_symext::loop_bound_exceeded(
 
 bool goto_symext::get_unwind(
   const symex_targett::sourcet &source,
+  const goto_symex_statet::call_stackt &context,
   unsigned unwind)
 {
   // by default, we keep going
