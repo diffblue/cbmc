@@ -1367,7 +1367,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     if(ext>0)
       out << ")"; // zero_extend
   }
-  else if(expr.id()==ID_dynamic_object)
+  else if(expr.id()==ID_is_dynamic_object)
   {
     convert_is_dynamic_object(expr);
   }

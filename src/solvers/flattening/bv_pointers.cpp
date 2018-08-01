@@ -45,21 +45,21 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       }
     }
   }
-  else if(expr.id()==ID_dynamic_object)
+  else if(expr.id()==ID_is_dynamic_object)
   {
-    if(operands.size()==1 &&
-       operands[0].type().id()==ID_pointer)
-    {
-      // we postpone
-      literalt l=prop.new_variable();
+    DATA_INVARIANT(operands.size() == 1 &&
+                   operands[0].type().id() == ID_pointer,
+                   std::string("is_dynamic_object_exprt should have one") +
+                   "operand, which should have pointer type.");
+    // we postpone
+    literalt l=prop.new_variable();
 
-      postponed_list.push_back(postponedt());
-      postponed_list.back().op=convert_bv(operands[0]);
-      postponed_list.back().bv.push_back(l);
-      postponed_list.back().expr=expr;
+    postponed_list.push_back(postponedt());
+    postponed_list.back().op=convert_bv(operands[0]);
+    postponed_list.back().bv.push_back(l);
+    postponed_list.back().expr=expr;
 
-      return l;
-    }
+    return l;
   }
   else if(expr.id()==ID_lt || expr.id()==ID_le ||
           expr.id()==ID_gt || expr.id()==ID_ge)
@@ -735,7 +735,7 @@ void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
 void bv_pointerst::do_postponed(
   const postponedt &postponed)
 {
-  if(postponed.expr.id()==ID_dynamic_object)
+  if(postponed.expr.id()==ID_is_dynamic_object)
   {
     const pointer_logict::objectst &objects=
       pointer_logic.objects;

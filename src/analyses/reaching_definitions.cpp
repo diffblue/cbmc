@@ -307,19 +307,19 @@ void rd_range_domaint::transform_assign(
   {
     const irep_idt &identifier=it->first;
     // ignore symex::invalid_object
-    const symbolt *symbol_ptr;
-    if(ns.lookup(identifier, symbol_ptr))
+    const symbolt *symbol_ptr = nullptr;
+    bool not_found = ns.lookup(identifier, symbol_ptr);
+    if(not_found && has_prefix(id2string(identifier), "symex::invalid_object"))
+    {
       continue;
-    INVARIANT_STRUCTURED(
-      symbol_ptr!=nullptr,
-      nullptr_exceptiont,
-      "Symbol is in symbol table");
+    }
 
     const range_domaint &ranges=rw_set.get_ranges(it);
 
     if(is_must_alias &&
        (!rd.get_is_threaded()(from) ||
-        (!symbol_ptr->is_shared() &&
+        (symbol_ptr != nullptr &&
+         symbol_ptr->is_shared() &&
          !rd.get_is_dirty()(identifier))))
       for(const auto &range : ranges)
         kill(identifier, range.first, range.second);
