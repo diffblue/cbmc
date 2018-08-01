@@ -58,11 +58,11 @@ void nondet_static(
       if(is_constant_or_has_constant_components(sym.type(), ns))
         continue;
 
-      i_it=init.insert_before(++i_it);
+      const goto_programt::instructiont original_instruction = instruction;
       i_it->make_assignment();
       i_it->code=code_assignt(sym, side_effect_expr_nondett(sym.type()));
-      i_it->source_location=instruction.source_location;
-      i_it->function=instruction.function;
+      i_it->source_location = original_instruction.source_location;
+      i_it->function = original_instruction.function;
     }
     else if(instruction.is_function_call())
     {
