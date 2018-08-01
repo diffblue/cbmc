@@ -542,8 +542,8 @@ bool ccover_parse_optionst::process_goto_program(
 
     mm_io(goto_model);
 
-    // instrument library preconditions
-    instrument_preconditions(goto_model);
+    // remove library preconditions
+    remove_preconditions(goto_model);
 
     // remove returns, gcc vectors, complex
     remove_returns(goto_model);
