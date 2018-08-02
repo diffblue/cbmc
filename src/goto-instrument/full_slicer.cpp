@@ -14,8 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/find_symbols.h>
 #include <util/cprover_prefix.h>
-#ifdef DEBUG_FULL_SLICERT
-#endif
 
 #include <goto-programs/remove_skip.h>
 
