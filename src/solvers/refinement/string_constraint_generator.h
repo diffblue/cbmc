@@ -175,6 +175,9 @@ public:
     const array_string_exprt &str,
     const exprt &position,
     const exprt &character);
+  exprt add_axioms_for_to_lower_case(
+    const array_string_exprt &res,
+    const array_string_exprt &str);
 
 private:
   symbol_exprt fresh_boolean(const irep_idt &prefix);
