@@ -248,8 +248,8 @@ public:
   using code_typet::parameterst;
   using code_typet::parametert;
 
-  /// Constructs a new code type, i.e. function type
-  /// \param _parameters: the vector of function parameters
+  /// Constructs a new code type, i.e. method type
+  /// \param _parameters: the vector of method parameters
   /// \param _return_type: the return type
   java_method_typet(parameterst &&_parameters, typet &&_return_type)
   {
@@ -258,8 +258,8 @@ public:
     return_type().swap(_return_type);
   }
 
-  /// Constructs a new code type, i.e. function type
-  /// \param _parameters: the vector of function parameters
+  /// Constructs a new code type, i.e. method type
+  /// \param _parameters: the vector of method parameters
   /// \param _return_type: the return type
   java_method_typet(parameterst &&_parameters, const typet &_return_type)
   {
