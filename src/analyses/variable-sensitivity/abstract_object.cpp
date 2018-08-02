@@ -294,6 +294,14 @@ bool abstract_objectt::is_bottom() const
   return bottom;
 }
 
+/// \brief Verify the internal structure of an abstract_object is correct
+/// \return true if the abstract_object is correctly constructed, or false
+/// otherwise
+bool abstract_objectt::verify() const
+{
+  return !(top && bottom);
+}
+
 /*******************************************************************\
 
 Function: abstract_objectt::to_constant

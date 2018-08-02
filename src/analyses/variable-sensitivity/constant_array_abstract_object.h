@@ -63,7 +63,8 @@ protected:
   virtual abstract_object_pointert merge(
     abstract_object_pointert other) const override;
 
-  bool verify() const;
+  virtual bool verify() const override;
+  virtual void make_top_internal() override;
 
   virtual bool eval_index(
     const index_exprt &index,

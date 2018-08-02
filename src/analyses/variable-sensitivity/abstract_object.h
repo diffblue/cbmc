@@ -92,6 +92,7 @@ public:
   const typet &type() const;
   virtual bool is_top() const;
   virtual bool is_bottom() const;
+  virtual bool verify() const;
 
   virtual void get_statistics(
     abstract_object_statisticst &statistics,

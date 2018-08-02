@@ -1,0 +1,9 @@
+CORE
+main.c
+--variable --arrays --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* array\[0\] == 5: Unknown$
+^\[main.assertion.2\] .* array\[1\] == 5: Unknown$
+--
+^warning: ignoring
