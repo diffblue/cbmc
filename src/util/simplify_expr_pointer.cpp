@@ -510,8 +510,10 @@ bool simplify_exprt::simplify_pointer_object(exprt &expr)
 
 bool simplify_exprt::simplify_is_dynamic_object(exprt &expr)
 {
-  // This should hold as a result of the expr ID being is_dynamic_object.
-  PRECONDITION(expr.operands().size() == 1);
+  DATA_INVARIANT(expr.operands().size() == 1 &&
+                 expr.op0().type().id() == ID_pointer,
+                 std::string("is_dynamic_object_exprt should have one") +
+                 "operand, which should have pointer type.");
 
   exprt &op=expr.op0();
 
