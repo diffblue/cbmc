@@ -187,6 +187,12 @@ exprt string_set_char_builtin_functiont::length_constraint() const
     equal_exprt(return_code, return_value));
 }
 
+static bool eval_is_upper_case(const mp_integer &c)
+{
+  return ('A' <= c && c <= 'Z') || (0xc0 <= c && c <= 0xd6) ||
+         (0xd8 <= c && c <= 0xde);
+}
+
 optionalt<exprt> string_to_lower_case_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
@@ -195,10 +201,25 @@ optionalt<exprt> string_to_lower_case_builtin_functiont::eval(
     return {};
   for(mp_integer &c : input_opt.value())
   {
-    if(
-      ('A' <= c && c <= 'Z') || (0xc0 <= c && c <= 0xd6) ||
-      (0xd8 <= c && c <= 0xde))
+    if(eval_is_upper_case(c))
       c += 0x20;
+  }
+  const auto length =
+    from_integer(input_opt.value().size(), result.length().type());
+  const array_typet type(result.type().subtype(), length);
+  return make_string(input_opt.value(), type);
+}
+
+optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  auto input_opt = eval_string(input, get_value);
+  if(!input_opt)
+    return {};
+  for(mp_integer &c : input_opt.value())
+  {
+    if(eval_is_upper_case(c - 0x20))
+      c -= 0x20;
   }
   const auto length =
     from_integer(input_opt.value().size(), result.length().type());
