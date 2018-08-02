@@ -13,6 +13,9 @@ Date: February 2016
 
 #include "code_contracts.h"
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/expr_iterator.h>
 #include <util/fresh_symbol.h>
 #include <util/replace_symbol.h>
 
@@ -507,6 +510,7 @@ void code_contractst::check_code_contracts()
   goto_functionst::function_mapt::iterator i_it=
     goto_functions.function_map.find(INITIALIZE_FUNCTION);
   assert(i_it!=goto_functions.function_map.end());
+  goto_programt &init_function = i_it->second.body;
 
   Forall_goto_functions(it, goto_functions)
   {
@@ -535,10 +539,52 @@ void code_contractst::check_code_contracts()
 
   Forall_goto_functions(it, goto_functions)
   {
-    check_contract(it->first, it->second, i_it->second.body);
+    check_contract(it->first, it->second, init_function);
   }
 
-  remove_skip(i_it->second.body);
+  // Partially initialize state
+  goto_programt init_code;
+
+  goto_programt::targett d = init_code.add_instruction(DECL);
+  d->function = i_it->first;
+  // TODO add source location
+  // d->source_location =
+
+  symbol_exprt tmp_var =
+    new_tmp_symbol(void_typet(), d->source_location).symbol_expr();
+  d->code = code_declt(tmp_var);
+  d->code.add_source_location() = d->source_location;
+
+  {
+    const symbol_exprt &deallocated_expr =
+      ns.lookup(CPROVER_PREFIX "deallocated").symbol_expr();
+
+    goto_programt::targett a = init_code.add_instruction(ASSIGN);
+    a->function = i_it->first;
+    // TODO add source location
+    // a->source_location =
+    address_of_exprt rhs(tmp_var, to_pointer_type(deallocated_expr.type()));
+    a->code = code_assignt(deallocated_expr, rhs);
+    a->code.add_source_location() = a->source_location;
+  }
+
+  {
+    const symbol_exprt &dead_expr =
+      ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
+
+    goto_programt::targett a = init_code.add_instruction(ASSIGN);
+    a->function = i_it->first;
+    // TODO add source location
+    // a->source_location =
+    address_of_exprt rhs(tmp_var, to_pointer_type(dead_expr.type()));
+    a->code = code_assignt(dead_expr, rhs);
+    a->code.add_source_location() = a->source_location;
+  }
+
+  init_function.destructive_insert(init_function.instructions.begin(),
+                                   init_code);
+
+  remove_skip(init_function);
 
   goto_functions.update();
 }
