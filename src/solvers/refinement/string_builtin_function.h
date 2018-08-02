@@ -264,8 +264,12 @@ class string_creation_builtin_functiont : public string_builtin_functiont
 {
 public:
   array_string_exprt result;
-  std::vector<exprt> args;
-  exprt return_code;
+  exprt arg;
+
+  string_creation_builtin_functiont(
+    const exprt &return_code,
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool);
 
   optionalt<array_string_exprt> string_result() const override
   {
@@ -276,6 +280,43 @@ public:
   {
     return false;
   }
+};
+
+/// String creation from integer types
+class string_of_int_builtin_functiont : public string_creation_builtin_functiont
+{
+public:
+  string_of_int_builtin_functiont(
+    const exprt &return_code,
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool)
+    : string_creation_builtin_functiont(return_code, fun_args, array_pool)
+  {
+    PRECONDITION(fun_args.size() <= 4);
+    if(fun_args.size() == 4)
+      radix = fun_args[3];
+    else
+      radix = from_integer(10, arg.type());
+  };
+
+  optionalt<exprt>
+  eval(const std::function<exprt(const exprt &)> &get_value) const override;
+
+  std::string name() const override
+  {
+    return "string_of_int";
+  }
+
+  exprt add_constraints(string_constraint_generatort &generator) const override
+  {
+    return generator.add_axioms_for_string_of_int_with_radix(
+      result, arg, radix);
+  }
+
+  exprt length_constraint() const override;
+
+private:
+  exprt radix;
 };
 
 /// String test

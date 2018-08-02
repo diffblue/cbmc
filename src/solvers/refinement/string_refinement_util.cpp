@@ -224,6 +224,10 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
     return util_make_unique<string_concat_char_builtin_functiont>(
       return_code, fun_app.arguments(), array_pool);
 
+  if(id == ID_cprover_string_of_int_func)
+    return util_make_unique<string_of_int_builtin_functiont>(
+      return_code, fun_app.arguments(), array_pool);
+
   return util_make_unique<string_builtin_function_with_no_evalt>(
     return_code, fun_app, array_pool);
 }

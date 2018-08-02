@@ -214,7 +214,7 @@ exprt string_constraint_generatort::add_axioms_for_string_of_float(
   const array_string_exprt integer_part_str =
     fresh_string(index_type, char_type);
   const exprt return_code2 =
-    add_axioms_from_int(integer_part_str, integer_part, 8);
+    add_axioms_for_string_of_int(integer_part_str, integer_part, 8);
 
   return add_axioms_for_concat(res, integer_part_str, fractional_part_str);
 }
@@ -423,8 +423,8 @@ exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
 
   array_string_exprt string_expr_integer_part =
     fresh_string(index_type, char_type);
-  exprt return_code1 =
-    add_axioms_from_int(string_expr_integer_part, dec_significand_int, 3);
+  exprt return_code1 = add_axioms_for_string_of_int(
+    string_expr_integer_part, dec_significand_int, 3);
   minus_exprt fractional_part(
     dec_significand, floatbv_of_int_expr(dec_significand_int, float_spec));
 
@@ -467,7 +467,7 @@ exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
   const array_string_exprt exponent_string =
     fresh_string(index_type, char_type);
   const exprt return_code6 =
-    add_axioms_from_int(exponent_string, decimal_exponent, 3);
+    add_axioms_for_string_of_int(exponent_string, decimal_exponent, 3);
 
   // string_expr = concat(string_expr_with_E, exponent_string)
   return add_axioms_for_concat(res, string_expr_with_E, exponent_string);

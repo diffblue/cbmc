@@ -144,7 +144,7 @@ exprt string_constraint_generatort::add_axioms_for_insert_int(
   const typet &index_type = s1.length().type();
   const typet &char_type = s1.content().type().subtype();
   array_string_exprt s2 = fresh_string(index_type, char_type);
-  exprt return_code = add_axioms_from_int(s2, f.arguments()[4]);
+  exprt return_code = add_axioms_for_string_of_int(s2, f.arguments()[4]);
   return add_axioms_for_insert(res, s1, s2, offset);
 }
 

@@ -122,17 +122,23 @@ optionalt<std::vector<mp_integer>> eval_string(
   return result;
 }
 
-array_string_exprt
-make_string(const std::vector<mp_integer> &array, const array_typet &array_type)
+template <typename Iter>
+static array_string_exprt
+make_string(Iter begin, Iter end, const array_typet &array_type)
 {
   const typet &char_type = array_type.subtype();
   array_exprt array_expr(array_type);
   const auto &insert = std::back_inserter(array_expr.operands());
-  std::transform(
-    array.begin(), array.end(), insert, [&](const mp_integer &i) { // NOLINT
-      return from_integer(i, char_type);
-    });
+  std::transform(begin, end, insert, [&](const mp_integer &i) {
+    return from_integer(i, char_type);
+  });
   return to_array_string_expr(array_expr);
+}
+
+static array_string_exprt
+make_string(const std::vector<mp_integer> &array, const array_typet &array_type)
+{
+  return make_string(array.begin(), array.end(), array_type);
 }
 
 std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
@@ -214,6 +220,84 @@ optionalt<exprt> string_insertion_builtin_functiont::eval(
   const auto length = from_integer(result_value.size(), result.length().type());
   const array_typet type(result.type().subtype(), length);
   return make_string(result_value, type);
+}
+
+/// Constructor from arguments of a function application.
+/// The arguments in `fun_args` should be in order:
+/// an integer `result.length`, a character pointer `&result[0]`,
+/// an expression `arg` which is to be converted to a string.
+/// Other arguments are ignored by this constructor.
+string_creation_builtin_functiont::string_creation_builtin_functiont(
+  const exprt &return_code,
+  const std::vector<exprt> &fun_args,
+  array_poolt &array_pool)
+  : string_builtin_functiont(return_code)
+{
+  PRECONDITION(fun_args.size() >= 3);
+  result = array_pool.find(fun_args[1], fun_args[0]);
+  arg = fun_args[2];
+}
+
+optionalt<exprt> string_of_int_builtin_functiont::eval(
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  const auto arg_value = numeric_cast<mp_integer>(get_value(arg));
+  if(!arg_value)
+    return {};
+  static std::string digits = "0123456789abcdefghijklmnopqrstuvwxyz";
+  const auto radix_value = numeric_cast<mp_integer>(get_value(radix));
+  if(!radix_value || *radix_value > digits.length())
+    return {};
+
+  mp_integer current_value = *arg_value;
+  std::vector<mp_integer> right_to_left_characters;
+  if(current_value < 0)
+    current_value = -current_value;
+  if(current_value == 0)
+    right_to_left_characters.emplace_back('0');
+  while(current_value > 0)
+  {
+    const auto digit_value = (current_value % *radix_value).to_ulong();
+    right_to_left_characters.emplace_back(digits.at(digit_value));
+    current_value /= *radix_value;
+  }
+  if(*arg_value < 0)
+    right_to_left_characters.emplace_back('-');
+
+  const auto length = right_to_left_characters.size();
+  const auto length_expr = from_integer(length, result.length().type());
+  const array_typet type(result.type().subtype(), length_expr);
+  return make_string(
+    right_to_left_characters.rbegin(), right_to_left_characters.rend(), type);
+}
+
+exprt string_of_int_builtin_functiont::length_constraint() const
+{
+  const typet &type = result.length().type();
+  const auto radix_opt = numeric_cast<std::size_t>(radix);
+  const auto radix_value = radix_opt.has_value() ? radix_opt.value() : 2;
+  const std::size_t upper_bound =
+    max_printed_string_length(arg.type(), radix_value);
+  const exprt negative_arg =
+    binary_relation_exprt(arg, ID_le, from_integer(0, type));
+  const exprt absolute_arg =
+    if_exprt(negative_arg, unary_minus_exprt(arg), arg);
+
+  exprt size_expr = from_integer(1, type);
+  exprt min_int_with_current_size = from_integer(1, radix.type());
+  for(std::size_t current_size = 2; current_size <= upper_bound + 1;
+      ++current_size)
+  {
+    min_int_with_current_size = mult_exprt(radix, min_int_with_current_size);
+    const exprt at_least_current_size =
+      binary_relation_exprt(absolute_arg, ID_ge, min_int_with_current_size);
+    size_expr = if_exprt(
+      at_least_current_size, from_integer(current_size, type), size_expr);
+  }
+
+  const exprt size_expr_with_sign = if_exprt(
+    negative_arg, plus_exprt(size_expr, from_integer(1, type)), size_expr);
+  return equal_exprt(result.length(), size_expr_with_sign);
 }
 
 string_builtin_function_with_no_evalt::string_builtin_function_with_no_evalt(
