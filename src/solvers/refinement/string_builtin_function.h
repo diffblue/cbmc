@@ -11,6 +11,8 @@
 
 class array_poolt;
 
+#define CHARACTER_FOR_UNKNOWN '?'
+
 /// Base class for string functions that are built in the solver
 class string_builtin_functiont
 {
@@ -68,7 +70,6 @@ class string_transformation_builtin_functiont : public string_builtin_functiont
 public:
   array_string_exprt result;
   array_string_exprt input;
-  std::vector<exprt> args;
 
   /// Constructor from arguments of a function application.
   /// The arguments in `fun_args` should be in order:
@@ -88,15 +89,6 @@ public:
   {
     return {input};
   }
-
-  /// Evaluate the result from a concrete valuation of the arguments
-  virtual std::vector<mp_integer> eval(
-    const std::vector<mp_integer> &input_value,
-    const std::vector<mp_integer> &args_value) const = 0;
-
-  optionalt<exprt>
-  eval(const std::function<exprt(const exprt &)> &get_value) const override;
-
   bool maybe_testing_function() const override
   {
     return false;
@@ -108,6 +100,8 @@ class string_concat_char_builtin_functiont
   : public string_transformation_builtin_functiont
 {
 public:
+  exprt character;
+
   /// Constructor from arguments of a function application.
   /// The arguments in `fun_args` should be in order:
   /// an integer `result.length`, a character pointer `&result[0]`,
@@ -118,11 +112,12 @@ public:
     array_poolt &array_pool)
     : string_transformation_builtin_functiont(return_code, fun_args, array_pool)
   {
+    PRECONDITION(fun_args.size() == 4);
+    character = fun_args[3];
   }
 
-  std::vector<mp_integer> eval(
-    const std::vector<mp_integer> &input_value,
-    const std::vector<mp_integer> &args_value) const override;
+  optionalt<exprt>
+  eval(const std::function<exprt(const exprt &)> &get_value) const override;
 
   std::string name() const override
   {
@@ -131,7 +126,7 @@ public:
 
   exprt add_constraints(string_constraint_generatort &generator) const override
   {
-    return generator.add_axioms_for_concat_char(result, input, args[0]);
+    return generator.add_axioms_for_concat_char(result, input, character);
   }
 
   exprt length_constraint() const override
