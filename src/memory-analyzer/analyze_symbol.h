@@ -70,7 +70,7 @@ private:
     const typet &type,
     const source_locationt &location);
 
-  code_declt declare_instance(const typet &type);
+  code_declt declare_instance(const std::string &prefix, const typet &type);
   exprt declare_and_initalize_char_ptr(
     const symbol_exprt &symbol,
     const std::string &memory_location,

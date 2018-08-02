@@ -5,6 +5,7 @@
 #include "gdb_api.h"
 
 #include <regex>
+#include <algorithm>
 
 #include <ansi-c/expr2c_class.h>
 #include <goto-programs/goto_model.h>
@@ -181,6 +182,26 @@ array_exprt create_char_array_from_string(
   return result_array;
 }
 
+code_declt symbol_analyzert::declare_instance(const std::string &prefix, const typet &type)
+{
+  std::string safe_prefix = prefix;
+  std::replace(safe_prefix.begin(), safe_prefix.end(), '.', '_');
+  std::replace(safe_prefix.begin(), safe_prefix.end(), '-', '_');
+  std::replace(safe_prefix.begin(), safe_prefix.end(), '>', '_');
+  std::replace(safe_prefix.begin(), safe_prefix.end(), '&', '_');
+  std::replace(safe_prefix.begin(), safe_prefix.end(), '*', '_');
+  safe_prefix.erase(std::remove(safe_prefix.begin(), safe_prefix.end(), '('), safe_prefix.end());
+  safe_prefix.erase(std::remove(safe_prefix.begin(), safe_prefix.end(), ')'), safe_prefix.end());
+  safe_prefix.erase(std::remove(safe_prefix.begin(), safe_prefix.end(), '['), safe_prefix.end());
+  safe_prefix.erase(std::remove(safe_prefix.begin(), safe_prefix.end(), ']'), safe_prefix.end());
+  safe_prefix.erase(std::remove(safe_prefix.begin(), safe_prefix.end(), ' '), safe_prefix.end());
+
+  const std::string var_id = safe_prefix + "_" + std::to_string(id_counter);
+  ++id_counter;
+  const code_declt declaration(symbol_exprt(var_id, type));
+  return declaration;
+}
+
 exprt symbol_analyzert::declare_and_initalize_char_ptr(
   const symbol_exprt &symbol,
   const std::string &memory_location,
@@ -201,7 +222,7 @@ exprt symbol_analyzert::declare_and_initalize_char_ptr(
       init = create_char_array_from_string(value, bv_type, location, ns);
     }
 
-    code_declt target_object = declare_instance(init.type());
+    code_declt target_object = declare_instance(id2string(symbol.get_identifier()), init.type());
     target_object.operands().resize(2);
     target_object.op1() = init;
     generated_code.add(target_object);
@@ -215,14 +236,6 @@ exprt symbol_analyzert::declare_and_initalize_char_ptr(
   {
     return it->second;
   }
-}
-
-code_declt symbol_analyzert::declare_instance(const typet &type)
-{
-  const std::string var_id = "id_" + std::to_string(id_counter);
-  ++id_counter;
-  const code_declt declaration(symbol_exprt(var_id, type));
-  return declaration;
 }
 
 exprt symbol_analyzert::process_any_pointer_target(
@@ -254,7 +267,7 @@ code_declt symbol_analyzert::get_pointer_target(
   const typet &type,
   const source_locationt &location)
 {
-  code_declt declaration = declare_instance(type);
+  code_declt declaration = declare_instance(pointer_name, type);
 
   const std::string deref_pointer = "(*" + pointer_name + ")";
   const exprt target_expr = fill_expr_with_values(
@@ -373,7 +386,7 @@ exprt symbol_analyzert::fill_struct_with_values(
       }
       else if(is_struct(resolved_type))
       {
-        code_declt declaration = declare_instance(resolved_type);
+        code_declt declaration = declare_instance(field_access, resolved_type);
 
         const exprt target_expr = fill_expr_with_values(
           field_access,

@@ -12,14 +12,14 @@ GENERATED CODE:
   e = 17;
   f = &e;
   f_1 = &e;
-  char id_0\[6l\]="test2";
+  char d_b_0\[6l\]="test2";
   d.a = 4;
-  d.b = \(char \*\)&id_0;
+  d.b = \(char \*\)&d_b_0;
   d.c = -32;
-  struct mapping_things id_1=\{ .a=0, .b=\(\(char \*\)NULL\), .c=0 \};
-  g = &id_1;
-  char id_2\[5l\]="test";
-  h = \(char \*\)&id_2;
+  struct mapping_things g_1=\{ .a=0, .b=\(\(char \*\)NULL\), .c=0 \};
+  g = &g_1;
+  char h_2\[5l\]="test";
+  h = \(char \*\)&h_2;
 }
 ^EXIT=0
 ^SIGNAL=0
