@@ -3,7 +3,7 @@ add_test_pl_tests(
 )
 
 add_test_pl_profile(
-    "jbmc-symex-driven-lazy-loading"
+    "jbmc-generics-symex-driven-lazy-loading"
     "$<TARGET_FILE:jbmc> --symex-driven-lazy-loading"
     "-C;-X;symex-driven-lazy-loading-expected-failure;-s;symex-driven-loading"
     "CORE"
