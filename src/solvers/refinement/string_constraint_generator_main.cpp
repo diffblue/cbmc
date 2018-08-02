@@ -456,10 +456,6 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     res=add_axioms_for_compare_to(expr);
   else if(id==ID_cprover_string_literal_func)
     res=add_axioms_from_literal(expr);
-  else if(id==ID_cprover_string_concat_func)
-    res=add_axioms_for_concat(expr);
-  else if(id==ID_cprover_string_concat_char_func)
-    res=add_axioms_for_concat_char(expr);
   else if(id==ID_cprover_string_concat_code_point_func)
     res=add_axioms_for_concat_code_point(expr);
   else if(id==ID_cprover_string_insert_func)
@@ -480,18 +476,10 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     res=add_axioms_for_substring(expr);
   else if(id==ID_cprover_string_trim_func)
     res=add_axioms_for_trim(expr);
-  else if(id==ID_cprover_string_to_lower_case_func)
-    res=add_axioms_for_to_lower_case(expr);
-  else if(id==ID_cprover_string_to_upper_case_func)
-    res=add_axioms_for_to_upper_case(expr);
-  else if(id==ID_cprover_string_char_set_func)
-    res=add_axioms_for_char_set(expr);
   else if(id==ID_cprover_string_empty_string_func)
     res=add_axioms_for_empty_string(expr);
   else if(id==ID_cprover_string_copy_func)
     res=add_axioms_for_copy(expr);
-  else if(id==ID_cprover_string_of_int_func)
-    res=add_axioms_from_int(expr);
   else if(id==ID_cprover_string_of_int_hex_func)
     res=add_axioms_from_int_hex(expr);
   else if(id==ID_cprover_string_of_float_func)
