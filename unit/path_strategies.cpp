@@ -224,6 +224,45 @@ SCENARIO("path strategies")
         symex_eventt::result(symex_eventt::enumt::FAILURE),
       });
   }
+
+  GIVEN("program to check for stop-on-fail with path exploration")
+  {
+    std::function<void(optionst &)> halt_callback = [](optionst &opts) {
+      opts.set_option("stop-on-fail", true);
+    };
+    std::function<void(optionst &)> no_halt_callback = [](optionst &opts) {};
+
+    c =
+      "/*  1 */  int main()      \n"
+      "/*  2 */  {               \n"
+      "/*  3 */    int x, y;     \n"
+      "/*  4 */    if(x)         \n"
+      "/*  5 */      assert(0);  \n"
+      "/*  6 */    else          \n"
+      "/*  7 */      assert(0);  \n"
+      "/*  8 */  }               \n";
+
+    GIVEN("no stopping on failure")
+    {
+      check_with_strategy(
+        "lifo",
+        no_halt_callback,
+        c,
+        {symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
+         symex_eventt::result(symex_eventt::enumt::FAILURE),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 5),
+         symex_eventt::result(symex_eventt::enumt::FAILURE)});
+    }
+    GIVEN("stopping on failure")
+    {
+      check_with_strategy(
+        "lifo",
+        halt_callback,
+        c,
+        {symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
+         symex_eventt::result(symex_eventt::enumt::FAILURE)});
+    }
+  }
 }
 
 // In theory, there should be no need to change the code below when adding new
@@ -335,6 +374,13 @@ void _check_with_strategy(
   safety_checkert::resultt result = bmc.run(gm);
   symex_eventt::validate_result(events, result);
 
+  if(
+    result == safety_checkert::resultt::UNSAFE &&
+    opts.get_bool_option("stop-on-fail") && opts.is_set("paths"))
+  {
+    worklist->clear();
+  }
+
   while(!worklist->empty())
   {
     cbmc_solverst solvers(opts, gm.get_symbol_table(), mh);
@@ -358,6 +404,13 @@ void _check_with_strategy(
 
     symex_eventt::validate_result(events, result);
     worklist->pop();
+
+    if(
+      result == safety_checkert::resultt::UNSAFE &&
+      opts.get_bool_option("stop-on-fail"))
+    {
+      worklist->clear();
+    }
   }
   REQUIRE(events.empty());
 }

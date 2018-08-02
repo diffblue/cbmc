@@ -588,6 +588,15 @@ int bmct::do_language_agnostic_bmc(
       if(driver_configure_bmc)
         driver_configure_bmc(bmc, symbol_table);
       tmp_result = bmc.run(model);
+
+      if(
+        tmp_result == safety_checkert::resultt::UNSAFE &&
+        opts.get_bool_option("stop-on-fail") && opts.is_set("paths"))
+      {
+        worklist->clear();
+        return CPROVER_EXIT_VERIFICATION_UNSAFE;
+      }
+
       if(tmp_result != safety_checkert::resultt::PAUSED)
         final_result = tmp_result;
     }
@@ -637,6 +646,15 @@ int bmct::do_language_agnostic_bmc(
       if(driver_configure_bmc)
         driver_configure_bmc(pe, symbol_table);
       tmp_result = pe.run(model);
+
+      if(
+        tmp_result == safety_checkert::resultt::UNSAFE &&
+        opts.get_bool_option("stop-on-fail") && opts.is_set("paths"))
+      {
+        worklist->clear();
+        return CPROVER_EXIT_VERIFICATION_UNSAFE;
+      }
+
       if(tmp_result != safety_checkert::resultt::PAUSED)
         final_result &= tmp_result;
       worklist->pop();
