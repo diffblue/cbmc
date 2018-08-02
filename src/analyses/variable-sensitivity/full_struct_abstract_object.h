@@ -75,7 +75,7 @@ protected:
     const abstract_object_pointert value,
     bool merging_write) const override;
 
-  bool verify() const;
+  virtual bool verify() const override;
   // Set the state of this to the merge result of op1 and op2 and
   // return if the result is different from op1
   virtual abstract_object_pointert merge(

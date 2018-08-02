@@ -112,7 +112,17 @@ bool constant_array_abstract_objectt::verify() const
 {
   // Either the object is top or bottom (=> map empty)
   // or the map is not empty => neither top nor bottom
-  return (is_top() || is_bottom()) == map.empty();
+  return array_abstract_objectt::verify() &&
+    (is_top() || is_bottom()) == map.empty();
+}
+
+/// \brief Perform any additional structural modifications when setting this
+/// object to TOP
+void constant_array_abstract_objectt::make_top_internal()
+{
+  // A structural invariant of constant_array_abstract_objectt is that
+  // (is_top() || is_bottom()) => map.empty()
+  map.clear();
 }
 
 /*******************************************************************\
