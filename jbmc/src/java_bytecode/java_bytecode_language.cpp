@@ -653,6 +653,9 @@ bool java_bytecode_languaget::typecheck(
     }
   }
 
+  // Add array type clone specializations for enumerations
+  add_java_enum_arrays(symbol_table);
+
   // Now that all classes have been created in the symbol table we can populate
   // the class hierarchy:
   class_hierarchy(symbol_table);

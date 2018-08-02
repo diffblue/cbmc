@@ -54,6 +54,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <java_bytecode/convert_java_nondet.h>
 #include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/java_enum_array_clone_unwind_handler.h>
 #include <java_bytecode/java_enum_static_init_unwind_handler.h>
 #include <java_bytecode/remove_exceptions.h>
 #include <java_bytecode/remove_instanceof.h>
@@ -485,6 +486,16 @@ int jbmc_parse_optionst::doit()
           unsigned &max_unwind) {
           return java_enum_static_init_unwind_handler(
             context, loop_number, unwind, max_unwind, symbol_table);
+        });
+      // unwind Enum.values() loop to correctly enable enum array cloning
+      bmc.add_loop_unwind_handler(
+        [&symbol_table](
+          const irep_idt &function_id,
+          unsigned loop_num,
+          unsigned unwind_count,
+          unsigned &max_unwind) {
+          return java_enum_array_clone_unwind_handler(
+            function_id, loop_num, unwind_count, max_unwind, symbol_table);
         });
     };
   }

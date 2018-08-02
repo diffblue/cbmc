@@ -445,3 +445,223 @@ const std::unordered_set<std::string> cprover_methods_to_ignore
   "endThread",
   "getCurrentThreadID"
 };
+
+/// Register in the \p symbol_table a new symbol type
+/// java::array[X] where X is byte, float, int, char...
+void add_array_type(
+  const char l,
+  symbol_tablet &symbol_table,
+  const optionalt<std::string> enum_name)
+{
+  symbol_typet symbol_type = to_symbol_type(java_array_type(l).subtype());
+
+  const irep_idt identifier = enum_name
+                                ? "java::array[" + *enum_name + "]"
+                                : id2string(symbol_type.get_identifier());
+  const irep_idt &symbol_type_identifier = identifier;
+  if(symbol_table.has_symbol(symbol_type_identifier))
+    return;
+
+  java_class_typet class_type;
+  // we have the base class, java.lang.Object, length and data
+  // of appropriate type
+  class_type.set_tag(symbol_type.get_identifier());
+  // Note that non-array types don't have "java::" at the beginning of their
+  // tag, and their name is "java::" + their tag. Since arrays do have
+  // "java::" at the beginning of their tag we set the name to be the same as
+  // the tag.
+  class_type.set_name(symbol_type.get_identifier());
+
+  class_type.components().reserve(3);
+  class_typet::componentt base_class_component(
+    "@java.lang.Object", symbol_typet("java::java.lang.Object"));
+  base_class_component.set_pretty_name("@java.lang.Object");
+  base_class_component.set_base_name("@java.lang.Object");
+  class_type.components().push_back(base_class_component);
+
+  class_typet::componentt length_component("length", java_int_type());
+  length_component.set_pretty_name("length");
+  length_component.set_base_name("length");
+  class_type.components().push_back(length_component);
+
+  class_typet::componentt data_component(
+    "data", java_reference_type(java_type_from_char(l)));
+  data_component.set_pretty_name("data");
+  data_component.set_base_name("data");
+  class_type.components().push_back(data_component);
+
+  class_type.add_base(symbol_typet("java::java.lang.Object"));
+
+  INVARIANT(
+    is_valid_java_array(class_type),
+    "Constructed a new type representing a Java Array "
+    "object that doesn't match expectations");
+
+  symbolt symbol;
+  symbol.name = symbol_type_identifier;
+  symbol.base_name = symbol_type.get(ID_C_base_name);
+  symbol.is_type = true;
+  symbol.type = class_type;
+  symbol.mode = ID_java;
+  symbol_table.add(symbol);
+
+  // Also provide a clone method:
+  // ----------------------------
+
+  const irep_idt clone_name =
+    id2string(identifier) + ".clone:()Ljava/lang/Object;";
+  code_typet::parametert this_param;
+  this_param.set_identifier(id2string(clone_name) + "::this");
+  this_param.set_base_name("this");
+  this_param.set_this();
+  this_param.type() = java_reference_type(symbol_type);
+  const code_typet clone_type({this_param}, java_lang_object_type());
+
+  parameter_symbolt this_symbol;
+  this_symbol.name = this_param.get_identifier();
+  this_symbol.base_name = this_param.get_base_name();
+  this_symbol.pretty_name = this_symbol.base_name;
+  this_symbol.type = this_param.type();
+  this_symbol.mode = ID_java;
+  symbol_table.add(this_symbol);
+
+  const irep_idt local_name = id2string(clone_name) + "::cloned_array";
+  auxiliary_symbolt local_symbol;
+  local_symbol.name = local_name;
+  local_symbol.base_name = "cloned_array";
+  local_symbol.pretty_name = local_symbol.base_name;
+  local_symbol.type = java_reference_type(symbol_type);
+  local_symbol.mode = ID_java;
+  symbol_table.add(local_symbol);
+  const auto &local_symexpr = local_symbol.symbol_expr();
+
+  code_blockt clone_body;
+
+  code_declt declare_cloned(local_symexpr);
+  clone_body.move(declare_cloned);
+
+  side_effect_exprt java_new_array(
+    ID_java_new_array, java_reference_type(symbol_type));
+  dereference_exprt old_array(this_symbol.symbol_expr(), symbol_type);
+  dereference_exprt new_array(local_symexpr, symbol_type);
+  member_exprt old_length(
+    old_array, length_component.get_name(), length_component.type());
+  java_new_array.copy_to_operands(old_length);
+  code_assignt create_blank(local_symexpr, java_new_array);
+  clone_body.move_to_operands(create_blank);
+
+  member_exprt old_data(
+    old_array, data_component.get_name(), data_component.type());
+  member_exprt new_data(
+    new_array, data_component.get_name(), data_component.type());
+
+  // Begin for-loop to replace:
+
+  const irep_idt index_name = id2string(clone_name) + "::index";
+  auxiliary_symbolt index_symbol;
+  index_symbol.name = index_name;
+  index_symbol.base_name = "index";
+  index_symbol.pretty_name = index_symbol.base_name;
+  index_symbol.type = length_component.type();
+  index_symbol.mode = ID_java;
+  symbol_table.add(index_symbol);
+  const auto &index_symexpr = index_symbol.symbol_expr();
+
+  clone_body.add(code_declt(index_symexpr));
+
+  code_fort copy_loop;
+
+  copy_loop.init() =
+    code_assignt(index_symexpr, from_integer(0, index_symexpr.type()));
+  copy_loop.cond() = binary_relation_exprt(index_symexpr, ID_lt, old_length);
+
+  side_effect_exprt inc(ID_assign);
+  inc.operands().resize(2);
+  inc.op0() = index_symexpr;
+  inc.op1() = plus_exprt(index_symexpr, from_integer(1, index_symexpr.type()));
+  copy_loop.iter() = inc;
+
+  const dereference_exprt old_cell(
+    plus_exprt(old_data, index_symexpr), old_data.type().subtype());
+  const dereference_exprt new_cell(
+    plus_exprt(new_data, index_symexpr), new_data.type().subtype());
+  const code_assignt copy_cell(new_cell, old_cell);
+  copy_loop.body() = copy_cell;
+
+  // End for-loop
+  clone_body.move_to_operands(copy_loop);
+
+  member_exprt new_base_class(
+    new_array, base_class_component.get_name(), base_class_component.type());
+  const address_of_exprt retval(new_base_class);
+  code_returnt return_inst(retval);
+  clone_body.move_to_operands(return_inst);
+
+  symbolt clone_symbol;
+  clone_symbol.name = clone_name;
+  clone_symbol.pretty_name = id2string(identifier) + ".clone:()";
+  clone_symbol.base_name = "clone";
+  clone_symbol.type = clone_type;
+  clone_symbol.value = clone_body;
+  clone_symbol.mode = ID_java;
+  symbol_table.add(clone_symbol);
+}
+
+/// Register in the \p symbol_table a new symbol for an enum type
+/// \param enum_type_name: Name of the enum type, including the "java::" prefix.
+/// \param symbol_table: The symbol table the new symbol is added to.
+void add_array_type_enum(
+  const std::string &enum_type_name,
+  symbol_tablet &symbol_table)
+{
+  std::string enum_type = enum_type_name.substr(6);
+  std::replace(enum_type.begin(), enum_type.end(), '.', '/');
+
+  add_array_type('a', symbol_table, enum_type);
+}
+
+/// Register in the \p symbol_table new symbols for the objects
+/// java::array[X] where X is byte, float, int, char...
+void add_array_types(symbol_tablet &symbol_table)
+{
+  const std::string letters = "ijsbcfdza";
+
+  for(const char l : letters)
+  {
+    add_array_type(l, symbol_table, {});
+  }
+}
+
+java_enum_elements_mapt
+get_java_enum_elements_map(const symbol_tablet &symbol_table)
+{
+  java_enum_elements_mapt enum_types;
+  size_t max_enum_size = 0;
+  for(const auto &entry : symbol_table.symbols)
+  {
+    if(
+      const auto java_class_type =
+        type_try_dynamic_cast<java_class_typet>(entry.second.type))
+    {
+      const size_t enum_size =
+        java_class_type->get_size_t(ID_java_enum_static_unwind);
+      if(enum_size > 0)
+      {
+        if(enum_size > max_enum_size)
+          max_enum_size = enum_size;
+        enum_types[entry.first] = enum_size;
+      }
+    }
+  }
+  return enum_types;
+}
+
+void add_java_enum_arrays(symbol_tablet &symbol_table)
+{
+  const java_enum_elements_mapt java_enum_elements =
+    get_java_enum_elements_map(symbol_table);
+  for(const auto &entry : java_enum_elements)
+  {
+    add_array_type_enum(id2string(entry.first), symbol_table);
+  }
+}

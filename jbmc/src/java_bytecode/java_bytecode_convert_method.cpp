@@ -2101,7 +2101,7 @@ exprt::operandst &java_bytecode_convert_methodt::convert_const(
 void java_bytecode_convert_methodt::convert_invoke(
   source_locationt location,
   const irep_idt &statement,
-  exprt &arg0,
+  exprt &invoke_statement,
   codet &c,
   exprt::operandst &results)
 {
@@ -2109,20 +2109,31 @@ void java_bytecode_convert_methodt::convert_invoke(
   const bool is_virtual(
     statement == "invokevirtual" || statement == "invokeinterface");
 
-  code_typet &code_type = to_code_type(arg0.type());
+  code_typet &code_type = to_code_type(invoke_statement.type());
   code_typet::parameterst &parameters(code_type.parameters());
+
+  const std::string full_method_name = id2string(method_id);
+  const size_t method_separator = id2string(method_id).rfind(':');
+  const std::string method_name = full_method_name.substr(0, method_separator);
+
+  const size_t class_separator = method_name.rfind('.');
+  const std::string calling_class_name = method_name.substr(0, class_separator);
+
+  std::string class_type_name = calling_class_name.substr(6);
+  std::replace(class_type_name.begin(), class_type_name.end(), '.', '/');
+  const auto &enum_clone_symbol = symbol_table.lookup_ref(calling_class_name);
 
   if(use_this)
   {
     if(parameters.empty() || !parameters[0].get_this())
     {
-      irep_idt classname = arg0.get(ID_C_class);
+      irep_idt classname = invoke_statement.get(ID_C_class);
       typet thistype = symbol_typet(classname);
       // Note invokespecial is used for super-method calls as well as
       // constructors.
       if(statement == "invokespecial")
       {
-        if(is_constructor(arg0.get(ID_identifier)))
+        if(is_constructor(invoke_statement.get(ID_identifier)))
         {
           if(needed_lazy_methods)
             needed_lazy_methods->add_needed_class(classname);
@@ -2185,7 +2196,9 @@ void java_bytecode_convert_methodt::convert_invoke(
     results[0] = promoted;
   }
 
-  assert(arg0.id() == ID_virtual_function);
+  DATA_INVARIANT(
+    invoke_statement.id() == ID_virtual_function,
+    "argument to invoke bytecode must be virtual function here");
 
   // If we don't have a definition for the called symbol, and we won't
   // inherit a definition from a super-class, we create a new symbol and
@@ -2203,18 +2216,19 @@ void java_bytecode_convert_methodt::convert_invoke(
   //   generate code that may wrongly assume that such a method is
   //   accessible if we assume that its access attribute is "more
   //   accessible" than it actually is.
-  irep_idt id = arg0.get(ID_identifier);
+  const irep_idt &id = invoke_statement.get(ID_identifier);
   if(
     symbol_table.symbols.find(id) == symbol_table.symbols.end() &&
-    !(is_virtual &&
-      is_method_inherited(arg0.get(ID_C_class), arg0.get(ID_component_name))))
+    !(is_virtual && is_method_inherited(
+                      invoke_statement.get(ID_C_class),
+                      invoke_statement.get(ID_component_name))))
   {
     symbolt symbol;
     symbol.name = id;
-    symbol.base_name = arg0.get(ID_C_base_name);
-    symbol.pretty_name = id2string(arg0.get(ID_C_class)).substr(6) + "." +
-                         id2string(symbol.base_name) + "()";
-    symbol.type = arg0.type();
+    symbol.base_name = invoke_statement.get(ID_C_base_name);
+    symbol.pretty_name = id2string(invoke_statement.get(ID_C_class)).substr(6) +
+                         "." + id2string(symbol.base_name) + "()";
+    symbol.type = invoke_statement.type();
     symbol.type.set(ID_access, ID_public);
     symbol.value.make_nil();
     symbol.mode = ID_java;
@@ -2226,24 +2240,37 @@ void java_bytecode_convert_methodt::convert_invoke(
     symbol_table.add(symbol);
   }
 
-  if(is_virtual)
+  const bool is_enum_values_clone_call =
+    enum_clone_symbol.type.get_bool(ID_enumeration) &&
+    (full_method_name ==
+     (calling_class_name + ".values:()[L" + class_type_name + ";"));
+
+  if(is_enum_values_clone_call)
+  {
+    const irep_idt clone_name =
+      "java::array[" + class_type_name + "].clone:()Ljava/lang/Object;";
+    call.function() = symbol_exprt(clone_name, invoke_statement.type());
+  }
+  else if(is_virtual)
   {
     // dynamic binding
     assert(use_this);
     assert(!call.arguments().empty());
-    call.function() = arg0;
+    call.function() = invoke_statement;
     // Populate needed methods later,
     // once we know what object types can exist.
   }
   else
   {
     // static binding
-    call.function() = symbol_exprt(arg0.get(ID_identifier), arg0.type());
+    call.function() = symbol_exprt(
+      invoke_statement.get(ID_identifier), invoke_statement.type());
     if(needed_lazy_methods)
     {
-      needed_lazy_methods->add_needed_method(arg0.get(ID_identifier));
+      needed_lazy_methods->add_needed_method(
+        invoke_statement.get(ID_identifier));
       // Calling a static method causes static initialization:
-      needed_lazy_methods->add_needed_class(arg0.get(ID_C_class));
+      needed_lazy_methods->add_needed_class(invoke_statement.get(ID_C_class));
     }
   }
 
@@ -2255,7 +2282,7 @@ void java_bytecode_convert_methodt::convert_invoke(
 
   if(!use_this)
   {
-    codet clinit_call = get_clinit_call(arg0.get(ID_C_class));
+    codet clinit_call = get_clinit_call(invoke_statement.get(ID_C_class));
     if(clinit_call.get_statement() != ID_skip)
     {
       code_blockt ret_block;
