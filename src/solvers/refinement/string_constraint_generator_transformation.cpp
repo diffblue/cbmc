@@ -353,29 +353,31 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   // \todo Add support for locales using case mapping information
   // from the UnicodeData file.
 
-  equal_exprt a1(res.length(), str.length());
-  lemmas.push_back(a1);
+  lemmas.push_back(equal_exprt(res.length(), str.length()));
 
-  symbol_exprt idx1=fresh_univ_index("QA_upper_case1", index_type);
-  const and_exprt is_lower_case(
-    binary_relation_exprt(char_a, ID_le, str[idx1]),
-    binary_relation_exprt(str[idx1], ID_le, char_z));
-  minus_exprt diff(char_A, char_a);
-  equal_exprt convert(res[idx1], plus_exprt(str[idx1], diff));
-  implies_exprt body1(is_lower_case, convert);
-  string_constraintt a2(idx1, zero_if_negative(res.length()), body1);
-  constraints.push_back(a2);
+  constraints.push_back([&] {
+    const symbol_exprt idx1 = fresh_univ_index("QA_upper_case1", index_type);
+    const exprt is_lower_case = and_exprt(
+      binary_relation_exprt(char_a, ID_le, str[idx1]),
+      binary_relation_exprt(str[idx1], ID_le, char_z));
+    const exprt diff = minus_exprt(char_A, char_a);
+    const exprt convert = equal_exprt(res[idx1], plus_exprt(str[idx1], diff));
+    const exprt body = implies_exprt(is_lower_case, convert);
+    return string_constraintt(idx1, zero_if_negative(res.length()), body);
+  }());
 
-  symbol_exprt idx2=fresh_univ_index("QA_upper_case2", index_type);
-  const not_exprt is_not_lower_case(
-    and_exprt(
-      binary_relation_exprt(char_a, ID_le, str[idx2]),
-      binary_relation_exprt(str[idx2], ID_le, char_z)));
-  equal_exprt eq(res[idx2], str[idx2]);
-  implies_exprt body2(is_not_lower_case, eq);
-  string_constraintt a3(idx2, zero_if_negative(res.length()), body2);
-  constraints.push_back(a3);
-  return from_integer(0, signedbv_typet(32));
+  constraints.push_back([&] {
+    const symbol_exprt idx2 = fresh_univ_index("QA_upper_case2", index_type);
+    const exprt is_not_lower_case = not_exprt(
+      and_exprt(
+        binary_relation_exprt(char_a, ID_le, str[idx2]),
+        binary_relation_exprt(str[idx2], ID_le, char_z)));
+    const exprt eq = equal_exprt(res[idx2], str[idx2]);
+    const exprt body2 = implies_exprt(is_not_lower_case, eq);
+    return string_constraintt(idx2, zero_if_negative(res.length()), body2);
+  }());
+
+  return from_integer(0, get_return_code_type());
 }
 
 /// Conversion of a string to upper case
