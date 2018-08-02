@@ -187,6 +187,25 @@ exprt string_set_char_builtin_functiont::length_constraint() const
     equal_exprt(return_code, return_value));
 }
 
+optionalt<exprt> string_to_lower_case_builtin_functiont::eval(
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  auto input_opt = eval_string(input, get_value);
+  if(!input_opt)
+    return {};
+  for(mp_integer &c : input_opt.value())
+  {
+    if(
+      ('A' <= c && c <= 'Z') || (0xc0 <= c && c <= 0xd6) ||
+      (0xd8 <= c && c <= 0xde))
+      c += 0x20;
+  }
+  const auto length =
+    from_integer(input_opt.value().size(), result.length().type());
+  const array_typet type(result.type().subtype(), length);
+  return make_string(input_opt.value(), type);
+}
+
 std::vector<mp_integer> string_insertion_builtin_functiont::eval(
   const std::vector<mp_integer> &input1_value,
   const std::vector<mp_integer> &input2_value,

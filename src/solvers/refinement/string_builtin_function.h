@@ -177,6 +177,39 @@ public:
   exprt length_constraint() const override;
 };
 
+/// Converting each uppercase character of Basic Latin and Latin-1 supplement
+/// to the corresponding lowercase character.
+class string_to_lower_case_builtin_functiont
+  : public string_transformation_builtin_functiont
+{
+public:
+  string_to_lower_case_builtin_functiont(
+    const exprt &return_code,
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool)
+    : string_transformation_builtin_functiont(return_code, fun_args, array_pool)
+  {
+  }
+
+  optionalt<exprt>
+  eval(const std::function<exprt(const exprt &)> &get_value) const override;
+
+  std::string name() const override
+  {
+    return "to_lower_case";
+  }
+
+  exprt add_constraints(string_constraint_generatort &generator) const override
+  {
+    return generator.add_axioms_for_to_lower_case(result, input);
+  };
+
+  exprt length_constraint() const override
+  {
+    return equal_exprt(result.length(), input.length());
+  };
+};
+
 /// String inserting a string into another one
 class string_insertion_builtin_functiont : public string_builtin_functiont
 {
