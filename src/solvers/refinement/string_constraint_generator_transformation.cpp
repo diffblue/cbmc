@@ -398,12 +398,13 @@ exprt string_constraint_generatort::add_axioms_for_char_set(
 
 /// Add axioms ensuring that the result `res` is similar to input string `str`
 /// where the character at index `pos` is set to `char`.
+/// If `pos` is out of bounds the string returned unchanged.
 ///
 /// These axioms are:
-///   1. \f$ |{\tt res}| = |{\tt str}|\f$
-///   2. \f$ {\tt res}[{\tt pos}]={\tt char}\f$
-///   3. \f$ \forall i < min(|{\tt res}|, pos). {\tt res}[i] = {\tt str}[i]\f$
-///   4. \f$ \forall pos+1 <= i < |{\tt res}|.\ {\tt res}[i] = {\tt str}[i]\f$
+///   1. res.length = str.length
+///   2. 0 <= pos < res.length ==> res[pos]=char
+///   3. forall i < min(res.length, pos). res[i] = str[i]
+///   4. forall pos+1 <= i < res.length. res[i] = str[i]
 /// \return an integer expression which is `1` when `pos` is out of bounds and
 ///         `0` otherwise
 exprt string_constraint_generatort::add_axioms_for_set_char(
@@ -414,7 +415,13 @@ exprt string_constraint_generatort::add_axioms_for_set_char(
 {
   const binary_relation_exprt out_of_bounds(position, ID_ge, str.length());
   lemmas.push_back(equal_exprt(res.length(), str.length()));
-  lemmas.push_back(equal_exprt(res[position], character));
+  lemmas.push_back(
+    implies_exprt(
+      and_exprt(
+        binary_relation_exprt(
+          from_integer(0, position.type()), ID_le, position),
+        binary_relation_exprt(position, ID_lt, res.length())),
+      equal_exprt(res[position], character)));
   constraints.push_back([&] {
     const symbol_exprt q = fresh_univ_index("QA_char_set", position.type());
     const equal_exprt a3_body(res[q], str[q]);
