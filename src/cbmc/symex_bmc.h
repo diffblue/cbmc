@@ -35,14 +35,15 @@ public:
   // To show progress
   source_locationt last_source_location;
 
-  /// Loop unwind handlers take the function ID and loop number, the unwind
-  /// count so far, and an out-parameter specifying an advisory maximum, which
-  /// they may set. If set the advisory maximum is set it is *only* used to
-  /// print useful information for the user (e.g. "unwinding iteration N, max
-  /// M"), and is not enforced. They return true to halt unwinding, false to
-  /// authorise unwinding, or Unknown to indicate they have no opinion.
+  /// Loop unwind handlers take the call stack, loop number, the unwind count so
+  /// far, and an out-parameter specifying an advisory maximum, which they may
+  /// set. If set the advisory maximum is set it is *only* used to print useful
+  /// information for the user (e.g. "unwinding iteration N, max M"), and is not
+  /// enforced. They return true to halt unwinding, false to authorise
+  /// unwinding, or Unknown to indicate they have no opinion.
   typedef
-    std::function<tvt(const irep_idt &, unsigned, unsigned, unsigned &)>
+    std::function<tvt(
+      const goto_symex_statet::call_stackt &, unsigned, unsigned, unsigned &)>
     loop_unwind_handlert;
 
   /// Recursion unwind handlers take the function ID, the unwind count so far,
@@ -105,6 +106,7 @@ protected:
   // for loop unwinding
   virtual bool get_unwind(
     const symex_targett::sourcet &source,
+    const goto_symex_statet::call_stackt &context,
     unsigned unwind);
 
   virtual bool get_unwind_recursion(

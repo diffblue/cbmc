@@ -1,0 +1,10 @@
+CORE symex-driven-lazy-loading-expected-failure
+com/diffblue/regression/Foo.class
+--trace --cover location --depth 1024 --java-max-vla-length 16 --refine-strings --max-nondet-string-length 20 --string-printable --unwind 10 --function "com.diffblue.regression.Foo.foo" --java-unwind-enum-static
+line 8.*SATISFIED
+line 10.*SATISFIED
+line 12.*SATISFIED
+line 14.*SATISFIED
+^EXIT=0$
+^SIGNAL=0$
+--

@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fixedbv.h>
 #include <util/ieee_float.h>
 #include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
 #include <util/string_container.h>
 
 #include <langapi/language_util.h>
@@ -894,52 +895,38 @@ void interpretert::evaluate(
     mp_integer address=evaluate_address(
       expr,
       true); // fail quietly
-    if(address.is_zero() && expr.id()==ID_index)
+    if(address.is_zero())
     {
-      // Try reading from a constant array:
-      mp_vectort idx;
-      evaluate(expr.op1(), idx);
-      if(idx.size()==1)
+      exprt simplified;
+      // In case of being an indexed access, try to evaluate the index, then
+      // simplify.
+      if(expr.id() == ID_index)
       {
-        mp_integer read_from_index=idx[0];
-        if(expr.op0().id()==ID_array)
+        exprt evaluated_index = expr;
+        mp_vectort idx;
+        evaluate(expr.op1(), idx);
+        if(idx.size() == 1)
         {
-          const auto &ops=expr.op0().operands();
-          DATA_INVARIANT(read_from_index.is_long(), "index is too large");
-          if(read_from_index>=0 && read_from_index<ops.size())
-          {
-            evaluate(ops[read_from_index.to_long()], dest);
-            if(dest.size()!=0)
-              return;
-          }
+          evaluated_index.op1() =
+            constant_exprt(integer2string(idx[0]), expr.op1().type());
         }
-        else if(expr.op0().id() == ID_array_list)
-        {
-          // This sort of construct comes from boolbv_get, but doesn't seem
-          // to have an exprt yet. Its operands are a list of key-value pairs.
-          const auto &ops=expr.op0().operands();
-          DATA_INVARIANT(
-            ops.size()%2==0,
-            "array-list has odd number of operands");
-          for(size_t listidx=0; listidx!=ops.size(); listidx+=2)
-          {
-            mp_vectort elem_idx;
-            evaluate(ops[listidx], elem_idx);
-            CHECK_RETURN(elem_idx.size()==1);
-            if(elem_idx[0]==read_from_index)
-            {
-              evaluate(ops[listidx+1], dest);
-              if(dest.size()!=0)
-                return;
-              else
-                break;
-            }
-          }
-          // If we fall out the end of this loop then the constant array-list
-          // didn't define an element matching the index we're looking for.
-        }
+        simplified = simplify_expr(evaluated_index, ns);
       }
-      evaluate_address(expr); // Evaluate again to print error message.
+      else
+      {
+        // Try reading from a constant -- simplify_expr has all the relevant
+        // cases (index-of-constant-array, member-of-constant-struct and so on)
+        // Note we complain of a problem even if simplify did *something* but
+        // still left us with an unresolved index, member, etc.
+        simplified = simplify_expr(expr, ns);
+      }
+      if(simplified.id() == expr.id())
+        evaluate_address(expr); // Evaluate again to print error message.
+      else
+      {
+        evaluate(simplified, dest);
+        return;
+      }
     }
     else if(!address.is_zero())
     {
