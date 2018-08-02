@@ -3,5 +3,5 @@ main.c
 --dependence-graph-vs --structs --arrays --verify
 EXIT=0
 SIGNAL=0
-^\[main.assertion.1\] file .* function main, idx==1: Unknown$
+^\[main.assertion.1\] file .* function main, s_str.idx > 1: Unknown$
 --
