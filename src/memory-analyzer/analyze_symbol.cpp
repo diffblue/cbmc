@@ -4,8 +4,8 @@
 #include "analyze_symbol.h"
 #include "gdb_api.h"
 
-#include <regex>
 #include <algorithm>
+#include <regex>
 
 #include <ansi-c/expr2c_class.h>
 #include <goto-programs/goto_model.h>
@@ -182,7 +182,8 @@ array_exprt create_char_array_from_string(
   return result_array;
 }
 
-code_declt symbol_analyzert::declare_instance(const std::string &prefix, const typet &type)
+code_declt
+symbol_analyzert::declare_instance(const std::string &prefix, const typet &type)
 {
   std::string safe_prefix = prefix;
   std::replace(safe_prefix.begin(), safe_prefix.end(), '.', '_');
@@ -190,11 +191,21 @@ code_declt symbol_analyzert::declare_instance(const std::string &prefix, const t
   std::replace(safe_prefix.begin(), safe_prefix.end(), '>', '_');
   std::replace(safe_prefix.begin(), safe_prefix.end(), '&', '_');
   std::replace(safe_prefix.begin(), safe_prefix.end(), '*', '_');
-  safe_prefix.erase(std::remove(safe_prefix.begin(), safe_prefix.end(), '('), safe_prefix.end());
-  safe_prefix.erase(std::remove(safe_prefix.begin(), safe_prefix.end(), ')'), safe_prefix.end());
-  safe_prefix.erase(std::remove(safe_prefix.begin(), safe_prefix.end(), '['), safe_prefix.end());
-  safe_prefix.erase(std::remove(safe_prefix.begin(), safe_prefix.end(), ']'), safe_prefix.end());
-  safe_prefix.erase(std::remove(safe_prefix.begin(), safe_prefix.end(), ' '), safe_prefix.end());
+  safe_prefix.erase(
+    std::remove(safe_prefix.begin(), safe_prefix.end(), '('),
+    safe_prefix.end());
+  safe_prefix.erase(
+    std::remove(safe_prefix.begin(), safe_prefix.end(), ')'),
+    safe_prefix.end());
+  safe_prefix.erase(
+    std::remove(safe_prefix.begin(), safe_prefix.end(), '['),
+    safe_prefix.end());
+  safe_prefix.erase(
+    std::remove(safe_prefix.begin(), safe_prefix.end(), ']'),
+    safe_prefix.end());
+  safe_prefix.erase(
+    std::remove(safe_prefix.begin(), safe_prefix.end(), ' '),
+    safe_prefix.end());
 
   const std::string var_id = safe_prefix + "_" + std::to_string(id_counter);
   ++id_counter;
@@ -222,7 +233,9 @@ exprt symbol_analyzert::declare_and_initalize_char_ptr(
       init = create_char_array_from_string(value, bv_type, location, ns);
     }
 
-    code_declt target_object = declare_instance(id2string(symbol.get_identifier()), init.type());
+    code_declt target_object =
+      declare_instance(id2string(symbol.get_identifier()), init.type());
+
     target_object.operands().resize(2);
     target_object.op1() = init;
     generated_code.add(target_object);
