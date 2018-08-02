@@ -206,7 +206,7 @@ void invariant_propagationt::initialize(const goto_programt &goto_program)
 
   forall_goto_program_instructions(it, goto_program)
   {
-    invariant_sett &s=state_map[it].invariant_set;
+    invariant_sett &s = (*this)[it].invariant_set;
 
     if(it==goto_program.instructions.begin())
       s.make_true();
@@ -243,11 +243,11 @@ void invariant_propagationt::simplify(goto_programt &goto_program)
       continue;
 
     // find invariant set
-    state_mapt::const_iterator s_it=state_map.find(i_it);
-    if(s_it==state_map.end())
+    const auto &d = (*this)[i_it];
+    if(d.is_bottom())
       continue;
 
-    const invariant_sett &invariant_set=s_it->second.invariant_set;
+    const invariant_sett &invariant_set = d.invariant_set;
 
     exprt simplified_guard(i_it->guard);
 

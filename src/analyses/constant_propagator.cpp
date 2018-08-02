@@ -592,43 +592,45 @@ void constant_propagator_ait::replace(
 {
   Forall_goto_program_instructions(it, goto_function.body)
   {
-    state_mapt::iterator s_it=state_map.find(it);
+    // Works because this is a location (but not history) sensitive domain
+    const constant_propagator_domaint &d = (*this)[it];
 
-    if(s_it==state_map.end())
+    if(d.is_bottom())
       continue;
 
-    replace_types_rec(s_it->second.values.replace_const, it->code);
-    replace_types_rec(s_it->second.values.replace_const, it->guard);
+    replace_types_rec(d.values.replace_const, it->code);
+    replace_types_rec(d.values.replace_const, it->guard);
 
     if(it->is_goto() || it->is_assume() || it->is_assert())
     {
-      s_it->second.partial_evaluate(it->guard, ns);
+      d.partial_evaluate(it->guard, ns);
     }
     else if(it->is_assign())
     {
       exprt &rhs=to_code_assign(it->code).rhs();
-      s_it->second.partial_evaluate(rhs, ns);
+      d.partial_evaluate(rhs, ns);
+
       if(rhs.id()==ID_constant)
         rhs.add_source_location()=it->code.op0().source_location();
     }
     else if(it->is_function_call())
     {
       exprt &function = to_code_function_call(it->code).function();
-      s_it->second.partial_evaluate(function, ns);
+      d.partial_evaluate(function, ns);
 
       exprt::operandst &args=
         to_code_function_call(it->code).arguments();
 
       for(auto &arg : args)
       {
-        s_it->second.partial_evaluate(arg, ns);
+        d.partial_evaluate(arg, ns);
       }
     }
     else if(it->is_other())
     {
       if(it->code.get_statement()==ID_expression)
       {
-        s_it->second.partial_evaluate(it->code, ns);
+        d.partial_evaluate(it->code, ns);
       }
     }
   }
