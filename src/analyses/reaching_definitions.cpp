@@ -186,7 +186,8 @@ void rd_range_domaint::transform_function_call(
       const symbolt *sym;
       if((ns.lookup(identifier, sym) ||
           !sym->is_shared()) &&
-         !rd.get_is_dirty()(identifier))
+         !rd.get_is_dirty()(identifier) &&
+         !has_prefix(id2string(identifier), "goto_rw::dynamic_object"))
       {
         export_cache.erase(identifier);
 
