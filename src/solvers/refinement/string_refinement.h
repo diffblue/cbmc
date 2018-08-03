@@ -30,7 +30,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/refinement/string_refinement_util.h>
 
 #define DEFAULT_MAX_NB_REFINEMENT std::numeric_limits<size_t>::max()
-#define CHARACTER_FOR_UNKNOWN '?'
 
 class string_refinementt final: public bv_refinementt
 {
