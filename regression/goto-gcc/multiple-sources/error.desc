@@ -1,0 +1,7 @@
+CORE
+
+-c main1.c main2.c -o outfile
+^EXIT=1$
+^SIGNAL=0$
+^cannot specify -o with -c with multiple files$
+--

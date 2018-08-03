@@ -723,6 +723,14 @@ int gcc_modet::doit()
     }
   }
 
+  if(
+    cmdline.isset('o') && cmdline.isset('c') &&
+    compiler.source_files.size() >= 2)
+  {
+    error() << "cannot specify -o with -c with multiple files" << eom;
+    return 1; // to match gcc's behaviour
+  }
+
   // Revert to gcc in case there is no source to compile
   // and no binary to link.
 
