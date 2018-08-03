@@ -3,8 +3,6 @@
 
 \author Martin Brain, Peter Schrammel
 
-# Compilation and Development
-
 ## Makefiles ##
 
 First off, read the \ref cbmc-user-manual "CBMC User Manual". It describes
@@ -19,10 +17,7 @@ To be documented.
 
 To be documented.
 
-## Generating doxygen documentation ##
-
-Run `doxygen` in `/src`. HTML output will be created in `/doc/html`. The
-index page is `/doc/html/index.html`.
+## Documentation
 
 Apart from the (user-orientated) CBMC user manual and this document, most
 of the rest of the documentation is inline in the code as `doxygen` and
@@ -30,6 +25,12 @@ some comments. A man page for CBMC, goto-cc and goto-instrument is
 contained in the `doc/` directory and gives some options for these
 tools. All of these could be improved and patches are very welcome. In
 some cases the algorithms used are described in the relevant papers.
+
+## Accessing doxygen documentation ##
+
+The doxygen documentation can be [accessed online](http://cprover.diffblue.com).
+To build it locally, run `doxygen` in `/src`. HTML output will be created in
+`/doc/html`. The index page is `/doc/html/index.html`.
 
 ## Coding standards ##
 

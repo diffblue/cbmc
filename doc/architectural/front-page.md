@@ -72,7 +72,7 @@ you can access it <a href=
 
 * \subpage background-concepts
 
-* \subpage cprover-architecture
+* \subpage cbmc-architecture
 
 * \subpage folder-walkthrough
 

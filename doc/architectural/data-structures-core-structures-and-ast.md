@@ -88,7 +88,7 @@ To be documented.
 To be documented.
 
 
-## Examples: how to represent the AST of statements, focus on java ##
+## Examples: how to represent the AST of statements, in C and in java ##
 
 To be documented.
 

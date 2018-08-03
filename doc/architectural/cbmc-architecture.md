@@ -1,5 +1,5 @@
 \ingroup module_hidden 
-\page cprover-architecture CPROVER Architecture
+\page cbmc-architecture CBMC Architecture
 
 \author Martin Brain, Peter Schrammel
 

@@ -3,6 +3,8 @@
 
 \author Martin Brain, Peter Schrammel
 
+# Representations #
+
 ## AST: types, globals, variables, functions, code blocks, language primitives, assignments, expressions, variables ##
 
 To be documented.
@@ -11,11 +13,13 @@ To be documented.
 
 To be documented.
 
-## Bounded model checking (from the CBMC manual) ##
+### SSA ###
 
 To be documented.
 
-### SSA ###
+# Analysis techniques #
+
+## Bounded model checking (from the CBMC manual) ##
 
 To be documented.
 
