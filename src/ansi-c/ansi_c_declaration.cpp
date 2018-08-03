@@ -22,12 +22,12 @@ void ansi_c_declaratort::build(irept &src)
 {
   typet *p=static_cast<typet *>(&src);
 
-  // walk down subtype until we hit symbol or "abstract"
+  // walk down subtype until we hit typedef_type, symbol or "abstract"
   while(true)
   {
     typet &t=*p;
 
-    if(t.id()==ID_symbol)
+    if(t.id() == ID_typedef_type || t.id() == ID_symbol)
     {
       set_base_name(t.get(ID_C_base_name));
       add_source_location()=t.source_location();

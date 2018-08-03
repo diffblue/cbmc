@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "gcc_types.h"
 #include "padding.h"
 #include "type2name.h"
+#include "typedef_type.h"
 
 void c_typecheck_baset::typecheck_type(typet &type)
 {
@@ -89,7 +90,9 @@ void c_typecheck_baset::typecheck_type(typet &type)
   else if(type.id()==ID_typeof)
     typecheck_typeof_type(type);
   else if(type.id()==ID_symbol)
-    typecheck_symbol_type(type);
+    typecheck_symbol_type(to_symbol_type(type));
+  else if(type.id() == ID_typedef_type)
+    typecheck_typedef_type(type);
   else if(type.id()==ID_vector)
     typecheck_vector_type(to_vector_type(type));
   else if(type.id()==ID_custom_unsignedbv ||
@@ -1425,10 +1428,10 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
   c_qualifiers.write(type);
 }
 
-void c_typecheck_baset::typecheck_symbol_type(typet &type)
+void c_typecheck_baset::typecheck_symbol_type(symbol_typet &type)
 {
-  const irep_idt &identifier=
-    to_symbol_type(type).get_identifier();
+  // we do some consistency checking only
+  const irep_idt &identifier = type.get_identifier();
 
   symbol_tablet::symbolst::const_iterator s_it=
     symbol_table.symbols.find(identifier);
@@ -1449,24 +1452,45 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
     error() << "expected type symbol" << eom;
     throw 0;
   }
+}
 
-  if(symbol.is_macro)
+void c_typecheck_baset::typecheck_typedef_type(typet &type)
+{
+  const irep_idt &identifier = to_typedef_type(type).get_identifier();
+
+  symbol_tablet::symbolst::const_iterator s_it =
+    symbol_table.symbols.find(identifier);
+
+  if(s_it == symbol_table.symbols.end())
   {
-    // overwrite, but preserve (add) any qualifiers and other flags
-
-    c_qualifierst c_qualifiers(type);
-    bool is_packed=type.get_bool(ID_C_packed);
-    irept alignment=type.find(ID_C_alignment);
-
-    c_qualifiers+=c_qualifierst(symbol.type);
-    type=symbol.type;
-    c_qualifiers.write(type);
-
-    if(is_packed)
-      type.set(ID_C_packed, true);
-    if(alignment.is_not_nil())
-      type.set(ID_C_alignment, alignment);
+    error().source_location = type.source_location();
+    error() << "typedef symbol `" << identifier << "' not found" << eom;
+    throw 0;
   }
+
+  const symbolt &symbol = s_it->second;
+
+  if(!symbol.is_type)
+  {
+    error().source_location = type.source_location();
+    error() << "expected type symbol for typedef" << eom;
+    throw 0;
+  }
+
+  // overwrite, but preserve (add) any qualifiers and other flags
+
+  c_qualifierst c_qualifiers(type);
+  bool is_packed = type.get_bool(ID_C_packed);
+  irept alignment = type.find(ID_C_alignment);
+
+  c_qualifiers += c_qualifierst(symbol.type);
+  type = symbol.type;
+  c_qualifiers.write(type);
+
+  if(is_packed)
+    type.set(ID_C_packed, true);
+  if(alignment.is_not_nil())
+    type.set(ID_C_alignment, alignment);
 
   // CPROVER extensions
   if(symbol.base_name=="__CPROVER_rational")

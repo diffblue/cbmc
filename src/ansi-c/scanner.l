@@ -92,15 +92,20 @@ int make_identifier()
 
     PARSER.tag_following=false;
 
-    stack(yyansi_clval).id(ID_symbol);
     stack(yyansi_clval).set(ID_C_base_name, base_name);
     stack(yyansi_clval).set(ID_identifier, identifier);
     stack(yyansi_clval).set(ID_C_id_class, static_cast<int>(result));
 
     if(result==ansi_c_id_classt::ANSI_C_TYPEDEF)
+    {
+      stack(yyansi_clval).id(ID_typedef_type);
       return TOK_TYPEDEFNAME;
+    }
     else
+    {
+      stack(yyansi_clval).id(ID_symbol);
       return TOK_IDENTIFIER;
+    }
   }
 }
 
