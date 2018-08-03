@@ -391,8 +391,9 @@ bool compilet::compile()
     source_files.pop_front();
 
     // Visual Studio always prints the name of the file it's doing
+    // onto stdout. The name of the directory is stripped.
     if(echo_file_name)
-      status() << file_name << eom;
+      std::cout << get_base_name(file_name, false) << '\n' << std::flush;
 
     bool r=parse_source(file_name); // don't break the program!
 
@@ -421,9 +422,17 @@ bool compilet::compile()
       std::string cfn;
 
       if(output_file_object=="")
-        cfn=get_base_name(file_name, true)+"."+object_file_extension;
+      {
+        std::string file_name =
+          get_base_name(file_name, true) + "." + object_file_extension;
+
+        if(!output_directory_object.empty())
+          cfn = concat_dir_file(output_directory_object, file_name);
+        else
+          cfn = file_name;
+      }
       else
-        cfn=output_file_object;
+        cfn = output_file_object;
 
       if(write_object_file(cfn, symbol_table, compiled_functions))
         return true;
