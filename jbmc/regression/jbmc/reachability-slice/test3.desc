@@ -1,11 +1,11 @@
 CORE symex-driven-lazy-loading-expected-failure
 A.class
 --reachability-slice --show-goto-functions --cover location
-1001
-1002
-1003
-1004
-1005
+= \(int\)\(short\)1001
+= \(int\)\(short\)1002
+= \(int\)\(short\)1003
+= \(int\)\(short\)1004
+= \(int\)\(short\)1005
 --
 --
 Doesn't work with symex-driven lazy loading because the reachability slicer is a whole-program pass.
