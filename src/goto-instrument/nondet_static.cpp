@@ -42,6 +42,14 @@ void nondet_static(
       if(has_prefix(id2string(sym.get_identifier()), CPROVER_PREFIX))
         continue;
 
+      // any other internal variable such as Java specific?
+      if(
+        ns.lookup(sym.get_identifier())
+          .type.get_bool(ID_C_no_nondet_initialization))
+      {
+        continue;
+      }
+
       // static lifetime?
       if(!ns.lookup(sym.get_identifier()).is_static_lifetime)
         continue;
@@ -50,11 +58,11 @@ void nondet_static(
       if(is_constant_or_has_constant_components(sym.type(), ns))
         continue;
 
-      i_it=init.insert_before(++i_it);
+      const goto_programt::instructiont original_instruction = instruction;
       i_it->make_assignment();
       i_it->code=code_assignt(sym, side_effect_expr_nondett(sym.type()));
-      i_it->source_location=instruction.source_location;
-      i_it->function=instruction.function;
+      i_it->source_location = original_instruction.source_location;
+      i_it->function = original_instruction.function;
     }
     else if(instruction.is_function_call())
     {

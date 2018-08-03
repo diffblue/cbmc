@@ -84,6 +84,7 @@ symbol_exprt get_or_create_string_literal_symbol(
   symbolt new_symbol;
   new_symbol.name = escaped_symbol_name_with_prefix;
   new_symbol.type = string_type;
+  new_symbol.type.set(ID_C_constant, true);
   new_symbol.base_name = escaped_symbol_name;
   new_symbol.pretty_name = value;
   new_symbol.mode = ID_java;
@@ -131,6 +132,7 @@ symbol_exprt get_or_create_string_literal_symbol(
     array_symbol.is_state_var = true;
     array_symbol.value = data;
     array_symbol.type = array_symbol.value.type();
+    array_symbol.type.set(ID_C_constant, true);
 
     if(symbol_table.add(array_symbol))
       throw "failed to add constarray symbol to symbol table";
@@ -161,6 +163,7 @@ symbol_exprt get_or_create_string_literal_symbol(
       java_int_type(),
       symbol_table);
     return_symbol.type = return_symbol.value.type();
+    return_symbol.type.set(ID_C_constant, true);
     if(symbol_table.add(return_symbol))
       throw "failed to add return symbol to symbol table";
 

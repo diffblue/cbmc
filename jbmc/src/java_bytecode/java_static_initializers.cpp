@@ -91,6 +91,7 @@ static symbolt add_new_variable_symbol(
   new_symbol.pretty_name = name;
   new_symbol.base_name = name;
   new_symbol.type = type;
+  new_symbol.type.set(ID_C_no_nondet_initialization, true);
   new_symbol.value = value;
   new_symbol.is_lvalue = true;
   new_symbol.is_state_var = true;
