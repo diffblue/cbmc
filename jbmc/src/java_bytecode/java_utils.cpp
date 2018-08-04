@@ -331,9 +331,6 @@ std::string pretty_print_java_type(const std::string &fqn_java_type)
 ///   trying to resolve a reference to A.b, component_class_id is "A".
 /// \param component_name: component basename to search for. If searching for
 ///   A.b, this is "b".
-/// \param user_class_id: class identifier making reference to the sought
-///   component. The user class is relevant when determining whether package-
-///   scoped components are visible from a particular use site.
 /// \param symbol_table: global symbol table.
 /// \param class_hierarchy: global class hierarchy.
 /// \param include_interfaces: if true, search for the given component in all
@@ -343,7 +340,6 @@ std::string pretty_print_java_type(const std::string &fqn_java_type)
 resolve_inherited_componentt::inherited_componentt get_inherited_component(
   const irep_idt &component_class_id,
   const irep_idt &component_name,
-  const irep_idt &user_class_id,
   const symbol_tablet &symbol_table,
   const class_hierarchyt &class_hierarchy,
   bool include_interfaces)

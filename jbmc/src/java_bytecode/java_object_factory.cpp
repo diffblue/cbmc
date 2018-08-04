@@ -120,7 +120,6 @@ private:
   void gen_nondet_pointer_init(
     code_blockt &assignments,
     const exprt &expr,
-    const irep_idt &class_identifier,
     allocation_typet alloc_type,
     const pointer_typet &pointer_type,
     size_t depth,
@@ -670,9 +669,6 @@ bool initialize_nondet_string_fields(
 ///   The code block we are building with initialization code.
 /// \param expr:
 ///   Pointer-typed lvalue expression to initialize.
-/// \param class_identifier:
-///   Name of the parent class. Used to initialize the `@class_identifier` among
-///   others.
 /// \param alloc_type:
 ///   Allocation type (global, local or dynamic)
 /// \param depth:
@@ -688,7 +684,6 @@ bool initialize_nondet_string_fields(
 void java_object_factoryt::gen_nondet_pointer_init(
   code_blockt &assignments,
   const exprt &expr,
-  const irep_idt &class_identifier,
   allocation_typet alloc_type,
   const pointer_typet &pointer_type,
   size_t depth,
@@ -1149,7 +1144,6 @@ void java_object_factoryt::gen_nondet_init(
     gen_nondet_pointer_init(
       assignments,
       expr,
-      class_identifier,
       alloc_type,
       pointer_type,
       depth,

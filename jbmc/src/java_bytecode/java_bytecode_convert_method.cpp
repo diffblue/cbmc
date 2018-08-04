@@ -619,8 +619,6 @@ void java_bytecode_convert_methodt::convert(
   if((!m.is_abstract) && (!m.is_native))
     method_symbol.value = convert_instructions(
       m,
-      method_type,
-      method_symbol.name,
       to_java_class_type(class_symbol.type).lambda_method_handles());
 }
 
@@ -989,8 +987,6 @@ static std::size_t get_bytecode_type_width(const typet &ty)
 
 codet java_bytecode_convert_methodt::convert_instructions(
   const methodt &method,
-  const code_typet &method_type,
-  const irep_idt &method_name,
   const java_class_typet::java_lambda_method_handlest &lambda_method_handles)
 {
   const instructionst &instructions=method.instructions;
@@ -3151,7 +3147,6 @@ bool java_bytecode_convert_methodt::is_method_inherited(
     get_inherited_component(
       classname,
       methodid,
-      classname,
       symbol_table,
       class_hierarchy,
       false);
@@ -3171,7 +3166,6 @@ irep_idt java_bytecode_convert_methodt::get_static_field(
     get_inherited_component(
       class_identifier,
       component_name,
-      symbol_table.lookup_ref(current_method).type.get(ID_C_class),
       symbol_table,
       class_hierarchy,
       true);
