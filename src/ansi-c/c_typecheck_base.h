@@ -209,7 +209,8 @@ protected:
   virtual void typecheck_c_enum_type(typet &type);
   virtual void typecheck_c_enum_tag_type(c_enum_tag_typet &type);
   virtual void typecheck_code_type(code_typet &type);
-  virtual void typecheck_symbol_type(typet &type);
+  virtual void typecheck_symbol_type(symbol_typet &type);
+  virtual void typecheck_typedef_type(typet &type);
   virtual void typecheck_c_bit_field_type(c_bit_field_typet &type);
   virtual void typecheck_typeof_type(typet &type);
   virtual void typecheck_array_type(array_typet &type);
