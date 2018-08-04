@@ -145,3 +145,28 @@ std::string concat_dir_file(
           file_name : directory+"/"+file_name;
   #endif
 }
+
+bool is_directory(const std::string &path)
+{
+  if(path.empty())
+    return false;
+
+#ifdef _WIN32
+
+  auto attributes = ::GetFileAttributesW(widen(path).c_str());
+  if (attributes == INVALID_FILE_ATTRIBUTES)
+    return false;
+  else
+    return (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+
+#else
+
+  struct stat buf;
+
+  if(stat(path.c_str(), &buf)!=0)
+    return false;
+  else
+    return (buf.st_mode & S_IFDIR) != 0;
+
+#endif
+}
