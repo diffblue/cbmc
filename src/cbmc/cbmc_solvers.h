@@ -23,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/prop_conv.h>
 #include <solvers/sat/cnf.h>
 #include <solvers/sat/satcheck.h>
-#include <solvers/prop/aig_prop.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <goto-symex/symex_target_equation.h>
 

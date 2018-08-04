@@ -23,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/string_refinement.h>
 #include <solvers/smt2/smt2_dec.h>
-#include <solvers/prop/aig_prop.h>
 #include <solvers/sat/dimacs_cnf.h>
 
 #include "bv_cbmc.h"
