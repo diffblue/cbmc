@@ -81,4 +81,4 @@ artifacts:
 
 cache:
   paths:
-    - 'c:\clcache'
+    - 'c:\clcache\**\*'
