@@ -1,8 +1,8 @@
 CORE
 TestGenTest.class
---function TestGenTest.f --trace --cover location --json-ui
+--function TestGenTest.f --trace --json-ui
 "data": "java::TestGenTest",$
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring

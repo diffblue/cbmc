@@ -1,8 +1,10 @@
 CORE
 iterator2.class
---cover location --unwind 3 --function iterator2.f
-^EXIT=0$
+--unwind 3 --function iterator2.f
+^EXIT=10$
 ^SIGNAL=0$
-^.*SATISFIED$
+^.*FAILURE
 --
 ^warning: ignoring
+--
+Tests that end of function is reachable.

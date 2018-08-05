@@ -1,12 +1,10 @@
 CORE symex-driven-lazy-loading-expected-failure
 Gn.class
---cover location --no-lazy-methods --no-refine-strings
-^EXIT=0$
+--no-lazy-methods --no-refine-strings
+^EXIT=10$
 ^SIGNAL=0$
-.*file Gn.java line 6 function java::Gn.\<init\>:\(\)V bytecode-index 1 block .: FAILED
-.*file Gn.java line 9 function java::Gn.foo1:\(LGn;\)V bytecode-index 1 block .: FAILED
-.*file Gn.java line 10 function java::Gn.foo1:\(LGn;\)V bytecode-index 4 block .: FAILED
-.*file Gn.java line 13 function java::Gn.main:\(\[Ljava/lang/String;\)V bytecode-index 2 block .: SATISFIED
+.*file Gn.java line 11 function java::Gn.foo1:\(LGn;\)V.*SUCCESS
+.*file Gn.java line 15 function java::Gn.main:\(\[Ljava/lang/String;\)V.*FAILURE
 --
 --
 This fails under symex-driven lazy loading because the FAILED blocks occur in functions that are unreachable

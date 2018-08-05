@@ -11,6 +11,8 @@ public class Cart {
 
     public boolean checkTax4(Product product, String s) {
         product.size="abc";
-        return s.startsWith(product.cat.name);
+        boolean result = s.startsWith(product.cat.name);
+	assert !result;
+	return result;
     }
 }

@@ -1,11 +1,11 @@
 CORE symex-driven-lazy-loading-expected-failure
 A.class
---reachability-slice-fb --show-goto-functions --property 'java::A.foo:(I)V.coverage.4' --cover location
+--reachability-slice --function A.foo --show-goto-functions --property 'java::A.foo:(I)V.assertion.2'
 = \(int\)\(short\)1001
+= \(int\)\(short\)1004
+--
 = \(int\)\(short\)1002
 = \(int\)\(short\)1003
 = \(int\)\(short\)1005
---
-= \(int\)\(short\)1004
 --
 Doesn't work with symex-driven lazy loading because the reachability slicer is a whole-program pass.

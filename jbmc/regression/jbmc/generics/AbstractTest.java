@@ -13,10 +13,15 @@ public class AbstractTest {
         int getId() { return id; }
     }
 
-    public int getFromAbstract(AbstractInt<ClassA, ClassB> arg) {
+    public int getFromAbstract(AbstractImpl<ClassA, ClassB> arg) {
+        if (arg == null)
+            return -1;
         AbstractImpl<Dummy, Dummy> dummy = new AbstractImpl<>();
         ClassB b = arg.get();
+        if (b == null)
+            return -1;
         int i = b.getId();
+        assert(i > 0);
         return i;
     }
 }

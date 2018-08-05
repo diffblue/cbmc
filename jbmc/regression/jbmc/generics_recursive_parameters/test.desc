@@ -1,6 +1,6 @@
 CORE
 MutuallyRecursiveGenerics.class
---cover location --function MutuallyRecursiveGenerics.f
+--function MutuallyRecursiveGenerics.f
 ^EXIT=0$
 ^SIGNAL=0$
 --

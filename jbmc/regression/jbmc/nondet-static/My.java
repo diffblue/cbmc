@@ -96,143 +96,143 @@ public class My {
     private static final Integer prf4 = new Integer(4);
   }
 
-  public int field;
   public My(int i) {
+
     String s = "bla";
-    field = i;
+
     if (p1 != 0)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 0; // this line can only be covered with nondet-static
     if (p2 != 1)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 1; // this line can only be covered with nondet-static
     if (p3 != 2)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 2; // this line can only be covered with nondet-static
     if (p4 != 3)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 3; // this line can only be covered with nondet-static
     if (!p5.equals(5))
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 4; // this line can only be covered with nondet-static
 
     if (pf1 != 1)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 5; // this line cannot be covered even with nondet-static
     if (pf2 != 2)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 6; // this line cannot be covered even with nondet-static
     if (pf3 != 3)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 7; // this line cannot be covered even with nondet-static
     if (!pf4.equals(4))
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 8; // this line cannot be covered even with nondet-static
 
     if (pr1 != 0)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 9; // this line can only be covered with nondet-static
     if (pr2 != 1)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 10; // this line can only be covered with nondet-static
     if (pr3 != 2)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 11; // this line can only be covered with nondet-static
     if (pr4 != 3)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 12; // this line can only be covered with nondet-static
     if (!pr5.equals(5))
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 13; // this line can only be covered with nondet-static
 
     if (prf1 != 1)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 14; // this line cannot be covered even with nondet-static
     if (prf2 != 2)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 15; // this line cannot be covered even with nondet-static
     if (prf3 != 3)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 16; // this line cannot be covered even with nondet-static
     if (!prf4.equals(4))
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 17; // this line cannot be covered even with nondet-static
 
     if (PInner.pf1 != 1)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 19; // this line cannot be covered even with nondet-static
 
     if (PInner.prf1 != 1)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 20; // this line cannot be covered even with nondet-static
 
     if (PSInner.p1 != 0)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 21; // this line can only be covered with nondet-static
     if (PSInner.p2 != 1)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 22; // this line can only be covered with nondet-static
     if (PSInner.p3 != 2)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 23; // this line can only be covered with nondet-static
     if (PSInner.p4 != 3)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 24; // this line can only be covered with nondet-static
     if (!PSInner.p5.equals(5))
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 25; // this line can only be covered with nondet-static
 
     if (PSInner.pf1 != 1)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 26; // this line cannot be covered even with nondet-static
     if (PSInner.pf2 != 2)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 27; // this line cannot be covered even with nondet-static
     if (PSInner.pf3 != 3)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 28; // this line cannot be covered even with nondet-static
     if (!PSInner.pf4.equals(4))
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 29; // this line cannot be covered even with nondet-static
 
     if (PSInner.pr1 != 0)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 30; // this line can only be covered with nondet-static
     if (PSInner.pr2 != 1)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 31; // this line can only be covered with nondet-static
     if (PSInner.pr3 != 2)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 32; // this line can only be covered with nondet-static
     if (PSInner.pr4 != 3)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 33; // this line can only be covered with nondet-static
     if (!PSInner.pr5.equals(5))
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 34; // this line can only be covered with nondet-static
 
     if (PSInner.prf1 != 1)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 35; // this line cannot be covered even with nondet-static
     if (PSInner.prf2 != 2)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 36; // this line cannot be covered even with nondet-static
     if (PSInner.prf3 != 3)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 37; // this line cannot be covered even with nondet-static
     if (!PSInner.prf4.equals(4))
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 38; // this line cannot be covered even with nondet-static
 
     if (PrInner.pf1 != 1)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 39; // this line cannot be covered even with nondet-static
 
     if (PrInner.prf1 != 1)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 40; // this line cannot be covered even with nondet-static
 
     if (PrSInner.p1 != 0)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 41; // this line can only be covered with nondet-static
     if (PrSInner.p2 != 1)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 42; // this line can only be covered with nondet-static
     if (PrSInner.p3 != 2)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 43; // this line can only be covered with nondet-static
     if (PrSInner.p4 != 3)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 44; // this line can only be covered with nondet-static
     if (!PrSInner.p5.equals(5))
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 45; // this line can only be covered with nondet-static
 
     if (PrSInner.pf1 != 1)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 46; // this line cannot be covered even with nondet-static
     if (PrSInner.pf2 != 2)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 47; // this line cannot be covered even with nondet-static
     if (PrSInner.pf3 != 3)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 48; // this line cannot be covered even with nondet-static
     if (!PrSInner.pf4.equals(4))
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 49; // this line cannot be covered even with nondet-static
 
     if (PrSInner.pr1 != 0)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 50; // this line can only be covered with nondet-static
     if (PrSInner.pr2 != 1)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 51; // this line can only be covered with nondet-static
     if (PrSInner.pr3 != 2)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 52; // this line can only be covered with nondet-static
     if (PrSInner.pr4 != 3)
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 53; // this line can only be covered with nondet-static
     if (!PrSInner.pr5.equals(5))
-      field = 108; // this line can only be covered with nondet-static
+      assert i == 54; // this line can only be covered with nondet-static
 
     if (PrSInner.prf1 != 1)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 55; // this line cannot be covered even with nondet-static
     if (PrSInner.prf2 != 2)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 56; // this line cannot be covered even with nondet-static
     if (PrSInner.prf3 != 3)
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 57; // this line cannot be covered even with nondet-static
     if (!PSInner.prf4.equals(4))
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 58; // this line cannot be covered even with nondet-static
 
     if (s != "bla")
-      field = 108; // this line cannot be covered even with nondet-static
+      assert i == 59; // this line cannot be covered even with nondet-static
   }
 }

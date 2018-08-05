@@ -7,7 +7,9 @@ public class Test {
         builder.append("abcdeghijlmnopqrstvwxyzABCDEFGHIJuKLMNOPQRSfkTUVWXYZ".toLowerCase());
         builder.append("acdefghijklmnopqrsuvwxyzABCDEFbGHIJKLMNOPtQRSTUVWXYZ".toLowerCase());
         builder.append("abcdfghijklmnopqrstuvwxyzABCDEFGHIJeKLMNOPQRSTUVWXYZ".toLowerCase());
-        return builder.toString();
+        String result = builder.toString();
+        assert result.length() < 5;
+        return result;
     }
 
     public String nonDet(String s)
@@ -25,7 +27,9 @@ public class Test {
         builder.append(":");
         builder.append(s.toLowerCase());
         builder.append(s.toLowerCase());
-        return builder.toString();
+        String result = builder.toString();
+        assert result.length() < 5;
+        return result;
     }
 
     public String withDependency(String s, boolean b)

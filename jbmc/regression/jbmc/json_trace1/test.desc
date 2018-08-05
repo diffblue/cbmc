@@ -1,7 +1,9 @@
 CORE
 Test.class
---cover location --trace --json-ui --function Test.main
-^EXIT=0$
+--trace --json-ui --function Test.main
+^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring
+--
+Tests that it doesn't crash.

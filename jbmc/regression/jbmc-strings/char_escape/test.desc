@@ -1,6 +1,9 @@
 CORE
 Test.class
---function Test.test --cover location --trace --json-ui
-^EXIT=0$
+--function Test.test --trace --json-ui
+^EXIT=10$
 ^SIGNAL=0$
-20 of 22 covered \(90.9%\)|30 of 44 covered \(68.2%\)
+"reason": "assertion at file Test.java line 14
+"reason": "assertion at file Test.java line 18
+--
+"reason": "assertion at file Test.java line 21

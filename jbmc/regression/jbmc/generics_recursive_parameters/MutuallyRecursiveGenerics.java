@@ -6,6 +6,7 @@ class KeyValue<K, V> {
 }
 class MutuallyRecursiveGenerics {
   void f() {
-    KeyValue<String, Integer> example1;
+    KeyValue<String, Integer> example1 = new KeyValue<>();
+    assert example1 != null;
   }
 }

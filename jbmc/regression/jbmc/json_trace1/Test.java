@@ -16,6 +16,7 @@ public class Test {
       }
     }
 
+    assert a[0] == 0;
     return -1;
   }
 }
