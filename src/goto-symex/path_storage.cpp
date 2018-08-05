@@ -43,6 +43,11 @@ std::size_t path_lifot::size() const
   return paths.size();
 }
 
+void path_lifot::clear()
+{
+  paths.clear();
+}
+
 // _____________________________________________________________________________
 // path_fifot
 
@@ -67,6 +72,11 @@ void path_fifot::private_pop()
 std::size_t path_fifot::size() const
 {
   return paths.size();
+}
+
+void path_fifot::clear()
+{
+  paths.clear();
 }
 
 // _____________________________________________________________________________
