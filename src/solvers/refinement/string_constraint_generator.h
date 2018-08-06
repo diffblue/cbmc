@@ -90,6 +90,18 @@ private:
 /// are given as a struct containing a length and pointer to an array.
 array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg);
 
+/// Collection of constraints of different types: existential formulas,
+/// universal formulas, and "not contains" (universal with one alternation).
+struct string_constraintst final
+{
+  std::vector<exprt> existential;
+  std::vector<string_constraintt> universal;
+  std::vector<string_not_contains_constraintt> not_contains;
+
+  /// Clear all constraints
+  void clear();
+};
+
 class string_constraint_generatort final
 {
 public:
@@ -102,23 +114,14 @@ public:
 
   explicit string_constraint_generatort(const namespacet &ns);
 
-  /// Axioms are of three kinds: universally quantified string constraint,
-  /// not contains string constraints and simple formulas.
-  const std::vector<exprt> &get_lemmas() const;
-  void add_lemma(const exprt &);
-  const std::vector<string_constraintt> &get_constraints() const;
-  const std::vector<string_not_contains_constraintt> &
-  get_not_contains_constraints() const;
-
-  /// Clear all constraints and lemmas
-  void clear_constraints();
-
   exprt add_axioms_for_function_application(
     const function_application_exprt &expr);
 
   symbol_generatort fresh_symbol;
 
   array_poolt array_pool;
+
+  string_constraintst constraints;
 
   /// Associate array to pointer, and array to length
   /// \return an expression if the given function application is one of
@@ -374,9 +377,6 @@ private:
 private:
   const messaget message;
 
-  std::vector<exprt> lemmas;
-  std::vector<string_constraintt> constraints;
-  std::vector<string_not_contains_constraintt> not_contains_constraints;
   const namespacet ns;
   // To each string on which hash_code was called we associate a symbol
   // representing the return value of the hash_code function.

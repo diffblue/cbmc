@@ -400,7 +400,8 @@ exprt string_constraint_generatort::add_axioms_for_format(
 
   if(intermediary_strings.empty())
   {
-    lemmas.push_back(equal_exprt(res.length(), from_integer(0, index_type)));
+    constraints.existential.push_back(
+      equal_exprt(res.length(), from_integer(0, index_type)));
     return return_code;
   }
 

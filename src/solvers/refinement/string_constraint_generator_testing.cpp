@@ -47,10 +47,11 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
       minus_exprt(str.length(), offset), ID_ge, prefix.length()));
 
   // Axiom 1.
-  lemmas.push_back(implies_exprt(isprefix, offset_within_bounds));
+  constraints.existential.push_back(
+    implies_exprt(isprefix, offset_within_bounds));
 
   // Axiom 2.
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt qvar = fresh_symbol("QA_isprefix", index_type);
     const exprt body = implies_exprt(
       isprefix, equal_exprt(str[plus_exprt(qvar, offset)], prefix[qvar]));
@@ -59,7 +60,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   }());
 
   // Axiom 3.
-  lemmas.push_back([&] {
+  constraints.existential.push_back([&] {
     const exprt witness = fresh_symbol("witness_not_isprefix", index_type);
     const exprt strings_differ_at_witness = and_exprt(
       is_positive(witness),
@@ -122,8 +123,10 @@ exprt string_constraint_generatort::add_axioms_for_is_empty(
 
   symbol_exprt is_empty = fresh_symbol("is_empty");
   array_string_exprt s0 = get_string_expr(f.arguments()[0]);
-  lemmas.push_back(implies_exprt(is_empty, s0.axiom_for_has_length(0)));
-  lemmas.push_back(implies_exprt(s0.axiom_for_has_length(0), is_empty));
+  constraints.existential.push_back(
+    implies_exprt(is_empty, s0.axiom_for_has_length(0)));
+  constraints.existential.push_back(
+    implies_exprt(s0.axiom_for_has_length(0), is_empty));
   return typecast_exprt(is_empty, f.type());
 }
 
@@ -164,7 +167,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   const typet &index_type=s0.length().type();
 
   implies_exprt a1(issuffix, s1.axiom_for_length_ge(s0.length()));
-  lemmas.push_back(a1);
+  constraints.existential.push_back(a1);
 
   symbol_exprt qvar = fresh_symbol("QA_suffix", index_type);
   const plus_exprt qvar_shifted(qvar, minus_exprt(s1.length(), s0.length()));
@@ -172,7 +175,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
     qvar,
     zero_if_negative(s0.length()),
     implies_exprt(issuffix, equal_exprt(s0[qvar], s1[qvar_shifted])));
-  constraints.push_back(a2);
+  constraints.universal.push_back(a2);
 
   symbol_exprt witness = fresh_symbol("witness_not_suffix", index_type);
   const plus_exprt shifted(witness, minus_exprt(s1.length(), s0.length()));
@@ -185,7 +188,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
       and_exprt(s0.axiom_for_length_gt(witness), is_positive(witness))));
   implies_exprt a3(not_exprt(issuffix), constr3);
 
-  lemmas.push_back(a3);
+  constraints.existential.push_back(a3);
   return tc_issuffix;
 }
 
@@ -219,18 +222,18 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   const symbol_exprt startpos = fresh_symbol("startpos_contains", index_type);
 
   const implies_exprt a1(contains, s0.axiom_for_length_ge(s1.length()));
-  lemmas.push_back(a1);
+  constraints.existential.push_back(a1);
 
   minus_exprt length_diff(s0.length(), s1.length());
   and_exprt bounds(
     is_positive(startpos), binary_relation_exprt(startpos, ID_le, length_diff));
   implies_exprt a2(contains, bounds);
-  lemmas.push_back(a2);
+  constraints.existential.push_back(a2);
 
   implies_exprt a3(
     not_exprt(contains),
     equal_exprt(startpos, from_integer(-1, index_type)));
-  lemmas.push_back(a3);
+  constraints.existential.push_back(a3);
 
   symbol_exprt qvar = fresh_symbol("QA_contains", index_type);
   const plus_exprt qvar_shifted(qvar, startpos);
@@ -238,7 +241,7 @@ exprt string_constraint_generatort::add_axioms_for_contains(
     qvar,
     zero_if_negative(s1.length()),
     implies_exprt(contains, equal_exprt(s1[qvar], s0[qvar_shifted])));
-  constraints.push_back(a4);
+  constraints.universal.push_back(a4);
 
   string_not_contains_constraintt a5(
     from_integer(0, index_type),
@@ -248,7 +251,7 @@ exprt string_constraint_generatort::add_axioms_for_contains(
     s1.length(),
     s0,
     s1);
-  not_contains_constraints.push_back(a5);
+  constraints.not_contains.push_back(a5);
 
   return typecast_exprt(contains, f.type());
 }

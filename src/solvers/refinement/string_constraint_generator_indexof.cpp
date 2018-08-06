@@ -47,17 +47,17 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   and_exprt a1(
     binary_relation_exprt(index, ID_ge, minus1),
     binary_relation_exprt(index, ID_lt, str.length()));
-  lemmas.push_back(a1);
+  constraints.existential.push_back(a1);
 
   equal_exprt a2(not_exprt(contains), equal_exprt(index, minus1));
-  lemmas.push_back(a2);
+  constraints.existential.push_back(a2);
 
   implies_exprt a3(
     contains,
     and_exprt(
       binary_relation_exprt(from_index, ID_le, index),
       equal_exprt(str[index], c)));
-  lemmas.push_back(a3);
+  constraints.existential.push_back(a3);
 
   const exprt lower_bound(zero_if_negative(from_index));
 
@@ -67,7 +67,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
     lower_bound,
     zero_if_negative(index),
     implies_exprt(contains, notequal_exprt(str[n], c)));
-  constraints.push_back(a4);
+  constraints.universal.push_back(a4);
 
   symbol_exprt m = fresh_symbol("QA_index_of", index_type);
   string_constraintt a5(
@@ -75,7 +75,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
     lower_bound,
     zero_if_negative(str.length()),
     implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
-  constraints.push_back(a5);
+  constraints.universal.push_back(a5);
 
   return index;
 }
@@ -119,12 +119,12 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
       binary_relation_exprt(from_index, ID_le, offset),
       binary_relation_exprt(
         offset, ID_le, minus_exprt(haystack.length(), needle.length()))));
-  lemmas.push_back(a1);
+  constraints.existential.push_back(a1);
 
   equal_exprt a2(
     not_exprt(contains),
     equal_exprt(offset, from_integer(-1, index_type)));
-  lemmas.push_back(a2);
+  constraints.existential.push_back(a2);
 
   symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
   string_constraintt a3(
@@ -132,7 +132,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     zero_if_negative(needle.length()),
     implies_exprt(
       contains, equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar])));
-  constraints.push_back(a3);
+  constraints.universal.push_back(a3);
 
   // string_not contains_constraintt are formulas of the form:
   // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
@@ -144,7 +144,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     needle.length(),
     haystack,
     needle);
-  not_contains_constraints.push_back(a4);
+  constraints.not_contains.push_back(a4);
 
   string_not_contains_constraintt a5(
     from_index,
@@ -156,12 +156,12 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     needle.length(),
     haystack,
     needle);
-  not_contains_constraints.push_back(a5);
+  constraints.not_contains.push_back(a5);
 
   const implies_exprt a6(
     equal_exprt(needle.length(), from_integer(0, index_type)),
     equal_exprt(offset, from_index));
-  lemmas.push_back(a6);
+  constraints.existential.push_back(a6);
 
   return offset;
 }
@@ -212,18 +212,18 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
       binary_relation_exprt(
         offset, ID_le, minus_exprt(haystack.length(), needle.length())),
       binary_relation_exprt(offset, ID_le, from_index)));
-  lemmas.push_back(a1);
+  constraints.existential.push_back(a1);
 
   equal_exprt a2(
     not_exprt(contains),
     equal_exprt(offset, from_integer(-1, index_type)));
-  lemmas.push_back(a2);
+  constraints.existential.push_back(a2);
 
   symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
   equal_exprt constr3(haystack[plus_exprt(qvar, offset)], needle[qvar]);
   const string_constraintt a3(
     qvar, zero_if_negative(needle.length()), implies_exprt(contains, constr3));
-  constraints.push_back(a3);
+  constraints.universal.push_back(a3);
 
   // end_index is min(from_index, |str| - |substring|)
   minus_exprt length_diff(haystack.length(), needle.length());
@@ -240,7 +240,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     needle.length(),
     haystack,
     needle);
-  not_contains_constraints.push_back(a4);
+  constraints.not_contains.push_back(a4);
 
   string_not_contains_constraintt a5(
     from_integer(0, index_type),
@@ -250,12 +250,12 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     needle.length(),
     haystack,
     needle);
-  not_contains_constraints.push_back(a5);
+  constraints.not_contains.push_back(a5);
 
   const implies_exprt a6(
     equal_exprt(needle.length(), from_integer(0, index_type)),
     equal_exprt(offset, from_index));
-  lemmas.push_back(a6);
+  constraints.existential.push_back(a6);
 
   return offset;
 }
@@ -344,13 +344,13 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
     binary_relation_exprt(index, ID_ge, minus1),
     binary_relation_exprt(index, ID_le, from_index),
     binary_relation_exprt(index, ID_lt, str.length()));
-  lemmas.push_back(a1);
+  constraints.existential.push_back(a1);
 
   const notequal_exprt a2(contains, equal_exprt(index, minus1));
-  lemmas.push_back(a2);
+  constraints.existential.push_back(a2);
 
   const implies_exprt a3(contains, equal_exprt(str[index], c));
-  lemmas.push_back(a3);
+  constraints.existential.push_back(a3);
 
   const exprt index1 = from_integer(1, index_type);
   const plus_exprt from_index_plus_one(from_index, index1);
@@ -365,14 +365,14 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
     zero_if_negative(plus_exprt(index, index1)),
     zero_if_negative(end_index),
     implies_exprt(contains, notequal_exprt(str[n], c)));
-  constraints.push_back(a4);
+  constraints.universal.push_back(a4);
 
   const symbol_exprt m = fresh_symbol("QA_last_index_of2", index_type);
   const string_constraintt a5(
     m,
     zero_if_negative(end_index),
     implies_exprt(not_exprt(contains), notequal_exprt(str[m], c)));
-  constraints.push_back(a5);
+  constraints.universal.push_back(a5);
 
   return index;
 }

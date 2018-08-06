@@ -41,16 +41,16 @@ exprt string_constraint_generatort::add_axioms_for_insert(
     maximum(from_integer(0, index_type), minimum(s1.length(), offset));
 
   // Axiom 1.
-  lemmas.push_back(length_constraint_for_insert(res, s1, s2));
+  constraints.existential.push_back(length_constraint_for_insert(res, s1, s2));
 
   // Axiom 2.
-  constraints.push_back([&] { // NOLINT
+  constraints.universal.push_back([&] { // NOLINT
     const symbol_exprt i = fresh_symbol("QA_insert1", index_type);
     return string_constraintt(i, offset1, equal_exprt(res[i], s1[i]));
   }());
 
   // Axiom 3.
-  constraints.push_back([&] { // NOLINT
+  constraints.universal.push_back([&] { // NOLINT
     const symbol_exprt i = fresh_symbol("QA_insert2", index_type);
     return string_constraintt(
       i,
@@ -59,7 +59,7 @@ exprt string_constraint_generatort::add_axioms_for_insert(
   }());
 
   // Axiom 4.
-  constraints.push_back([&] { // NOLINT
+  constraints.universal.push_back([&] { // NOLINT
     const symbol_exprt i = fresh_symbol("QA_insert3", index_type);
     return string_constraintt(
       i,

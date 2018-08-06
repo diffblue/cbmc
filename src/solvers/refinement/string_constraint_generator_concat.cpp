@@ -46,11 +46,11 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
   const exprt end1 = maximum(minimum(end_index, s2.length()), start1);
 
   // Axiom 1.
-  lemmas.push_back(
+  constraints.existential.push_back(
     length_constraint_for_concat_substr(res, s1, s2, start_index, end_index));
 
   // Axiom 2.
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt idx =
       fresh_symbol("QA_index_concat", res.length().type());
     return string_constraintt(
@@ -58,7 +58,7 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
   }());
 
   // Axiom 3.
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt idx2 =
       fresh_symbol("QA_index_concat2", res.length().type());
     const equal_exprt res_eq(
@@ -118,15 +118,15 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
   const exprt &c)
 {
   const typet &index_type = res.length().type();
-  lemmas.push_back(length_constraint_for_concat_char(res, s1));
+  constraints.existential.push_back(length_constraint_for_concat_char(res, s1));
 
   symbol_exprt idx = fresh_symbol("QA_index_concat_char", index_type);
   string_constraintt a2(
     idx, zero_if_negative(s1.length()), equal_exprt(s1[idx], res[idx]));
-  constraints.push_back(a2);
+  constraints.universal.push_back(a2);
 
   equal_exprt a3(res[s1.length()], c);
-  lemmas.push_back(a3);
+  constraints.existential.push_back(a3);
 
   // We should have a enum type for the possible error codes
   return from_integer(0, get_return_code_type());

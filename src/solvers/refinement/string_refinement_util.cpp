@@ -525,9 +525,11 @@ void string_dependenciest::add_constraints(
     {
       const auto &builtin = builtin_function_nodes[node.index];
       const exprt return_value = builtin.data->add_constraints(generator);
-      generator.add_lemma(equal_exprt(return_value, builtin.data->return_code));
+      generator.constraints.existential.push_back(
+        equal_exprt(return_value, builtin.data->return_code));
     }
     else
-      generator.add_lemma(node.data->length_constraint());
+      generator.constraints.existential.push_back(
+        node.data->length_constraint());
   }
 }

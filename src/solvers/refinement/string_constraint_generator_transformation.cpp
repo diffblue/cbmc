@@ -48,14 +48,14 @@ exprt string_constraint_generatort::add_axioms_for_set_length(
   // a2 : forall i< min(|s1|, k) .res[i] = s1[i]
   // a3 : forall |s1| <= i < |res|. res[i] = 0
 
-  lemmas.push_back(res.axiom_for_has_length(k));
+  constraints.existential.push_back(res.axiom_for_has_length(k));
 
   const symbol_exprt idx = fresh_symbol("QA_index_set_length", index_type);
   const string_constraintt a2(
     idx,
     zero_if_negative(minimum(s1.length(), k)),
     equal_exprt(s1[idx], res[idx]));
-  constraints.push_back(a2);
+  constraints.universal.push_back(a2);
 
   symbol_exprt idx2 = fresh_symbol("QA_index_set_length2", index_type);
   string_constraintt a3(
@@ -63,7 +63,7 @@ exprt string_constraint_generatort::add_axioms_for_set_length(
     zero_if_negative(s1.length()),
     zero_if_negative(res.length()),
     equal_exprt(res[idx2], from_integer(0, char_type)));
-  constraints.push_back(a3);
+  constraints.universal.push_back(a3);
 
   return from_integer(0, signedbv_typet(32));
 }
@@ -127,10 +127,11 @@ exprt string_constraint_generatort::add_axioms_for_substring(
   const exprt end1 = maximum(minimum(end, str.length()), start1);
 
   // Axiom 1.
-  lemmas.push_back(equal_exprt(res.length(), minus_exprt(end1, start1)));
+  constraints.existential.push_back(
+    equal_exprt(res.length(), minus_exprt(end1, start1)));
 
   // Axiom 2.
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt idx = fresh_symbol("QA_index_substring", index_type);
     return string_constraintt(
       idx,
@@ -180,28 +181,29 @@ exprt string_constraint_generatort::add_axioms_for_trim(
   const exprt space_char = from_integer(' ', char_type);
 
   // Axiom 1.
-  lemmas.push_back(str.axiom_for_length_ge(plus_exprt(idx, res.length())));
+  constraints.existential.push_back(
+    str.axiom_for_length_ge(plus_exprt(idx, res.length())));
 
   binary_relation_exprt a2(idx, ID_ge, from_integer(0, index_type));
-  lemmas.push_back(a2);
+  constraints.existential.push_back(a2);
 
   exprt a3=str.axiom_for_length_ge(idx);
-  lemmas.push_back(a3);
+  constraints.existential.push_back(a3);
 
   exprt a4=res.axiom_for_length_ge(
     from_integer(0, index_type));
-  lemmas.push_back(a4);
+  constraints.existential.push_back(a4);
 
   exprt a5 = res.axiom_for_length_le(str.length());
-  lemmas.push_back(a5);
+  constraints.existential.push_back(a5);
 
   symbol_exprt n = fresh_symbol("QA_index_trim", index_type);
   binary_relation_exprt non_print(str[n], ID_le, space_char);
   string_constraintt a6(n, zero_if_negative(idx), non_print);
-  constraints.push_back(a6);
+  constraints.universal.push_back(a6);
 
   // Axiom 7.
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt n2 = fresh_symbol("QA_index_trim2", index_type);
     const minus_exprt bound(minus_exprt(str.length(), idx), res.length());
     const binary_relation_exprt eqn2(
@@ -212,10 +214,10 @@ exprt string_constraint_generatort::add_axioms_for_trim(
   symbol_exprt n3 = fresh_symbol("QA_index_trim3", index_type);
   equal_exprt eqn3(res[n3], str[plus_exprt(n3, idx)]);
   string_constraintt a8(n3, zero_if_negative(res.length()), eqn3);
-  constraints.push_back(a8);
+  constraints.universal.push_back(a8);
 
   // Axiom 9.
-  lemmas.push_back([&] {
+  constraints.existential.push_back([&] {
     const plus_exprt index_before(
       idx, minus_exprt(res.length(), from_integer(1, index_type)));
     const binary_relation_exprt no_space_before(
@@ -310,9 +312,9 @@ exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   // are supported (up to 0x100), we should add others using case mapping
   // information from the UnicodeData file.
 
-  lemmas.push_back(equal_exprt(res.length(), str.length()));
+  constraints.existential.push_back(equal_exprt(res.length(), str.length()));
 
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt idx = fresh_symbol("QA_lower_case", index_type);
     const exprt conditional_convert = [&] {
       // The difference between upper-case and lower-case for the basic latin and
@@ -353,9 +355,9 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   exprt char_A = from_integer('A', char_type);
   exprt char_z = from_integer('z', char_type);
 
-  lemmas.push_back(equal_exprt(res.length(), str.length()));
+  constraints.existential.push_back(equal_exprt(res.length(), str.length()));
 
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt idx = fresh_symbol("QA_upper_case", index_type);
     const exprt converted =
       minus_exprt(str[idx], from_integer(0x20, char_type));
@@ -425,21 +427,21 @@ exprt string_constraint_generatort::add_axioms_for_set_char(
   const exprt &character)
 {
   const binary_relation_exprt out_of_bounds(position, ID_ge, str.length());
-  lemmas.push_back(equal_exprt(res.length(), str.length()));
-  lemmas.push_back(
+  constraints.existential.push_back(equal_exprt(res.length(), str.length()));
+  constraints.existential.push_back(
     implies_exprt(
       and_exprt(
         binary_relation_exprt(
           from_integer(0, position.type()), ID_le, position),
         binary_relation_exprt(position, ID_lt, res.length())),
       equal_exprt(res[position], character)));
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt q = fresh_symbol("QA_char_set", position.type());
     const equal_exprt a3_body(res[q], str[q]);
     return string_constraintt(
       q, minimum(zero_if_negative(res.length()), position), a3_body);
   }());
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt q2 = fresh_symbol("QA_char_set2", position.type());
     const plus_exprt lower_bound(position, from_integer(1, position.type()));
     const equal_exprt a4_body(res[q2], str[q2]);
@@ -513,7 +515,7 @@ exprt string_constraint_generatort::add_axioms_for_replace(
     const auto old_char=maybe_chars->first;
     const auto new_char=maybe_chars->second;
 
-    lemmas.push_back(equal_exprt(res.length(), str.length()));
+    constraints.existential.push_back(equal_exprt(res.length(), str.length()));
 
     symbol_exprt qvar = fresh_symbol("QA_replace", str.length().type());
     implies_exprt case1(
@@ -524,7 +526,7 @@ exprt string_constraint_generatort::add_axioms_for_replace(
       equal_exprt(res[qvar], str[qvar]));
     string_constraintt a2(
       qvar, zero_if_negative(res.length()), and_exprt(case1, case2));
-    constraints.push_back(a2);
+    constraints.universal.push_back(a2);
     return from_integer(0, f.type());
   }
   return from_integer(1, f.type());

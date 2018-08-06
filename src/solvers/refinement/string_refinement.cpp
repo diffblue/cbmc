@@ -646,7 +646,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   // Generator is also used by get, so we have to use it as a class member
   // but we make sure it is cleared at each `dec_solve` call.
-  generator.clear_constraints();
+  generator.constraints.clear();
   make_char_array_pointer_associations(generator, equations);
 
 #ifdef DEBUG
@@ -691,10 +691,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     supert::set_to(eq, true);
   }
 
-  const auto constraints = generator.get_constraints();
   std::transform(
-    constraints.begin(),
-    constraints.end(),
+    generator.constraints.universal.begin(),
+    generator.constraints.universal.end(),
     std::back_inserter(axioms.universal),
     [&](string_constraintt constraint) {
       constraint.replace_expr(symbol_resolve);
@@ -705,11 +704,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       return constraint;
     });
 
-  const auto not_contains_constraints =
-    generator.get_not_contains_constraints();
   std::transform(
-    not_contains_constraints.begin(),
-    not_contains_constraints.end(),
+    generator.constraints.not_contains.begin(),
+    generator.constraints.not_contains.end(),
     std::back_inserter(axioms.not_contains),
     [&](string_not_contains_constraintt axiom) {
       symbol_resolve.replace_expr(axiom);
@@ -729,7 +726,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       generator.fresh_symbol("not_contains_witness", witness_type);
   }
 
-  for(const exprt &lemma : generator.get_lemmas())
+  for(const exprt &lemma : generator.constraints.existential)
     add_lemma(lemma);
 
   // Initial try without index set

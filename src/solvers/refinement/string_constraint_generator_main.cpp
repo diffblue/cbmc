@@ -33,28 +33,6 @@ string_constraint_generatort::string_constraint_generatort(const namespacet &ns)
 {
 }
 
-const std::vector<exprt> &string_constraint_generatort::get_lemmas() const
-{
-  return lemmas;
-}
-
-void string_constraint_generatort::add_lemma(const exprt &expr)
-{
-  lemmas.push_back(expr);
-}
-
-const std::vector<string_constraintt> &
-string_constraint_generatort::get_constraints() const
-{
-  return constraints;
-}
-
-const std::vector<string_not_contains_constraintt> &
-string_constraint_generatort::get_not_contains_constraints() const
-{
-  return not_contains_constraints;
-}
-
 /// generate a new symbol expression of the given type with some prefix
 /// \par parameters: a prefix and a type
 /// \return a symbol of type tp whose name starts with "string_refinement#"
@@ -215,7 +193,7 @@ exprt string_constraint_generatort::associate_length_to_array(
   const exprt &new_length = f.arguments()[1];
 
   const auto &length = array_pool.get_length(array_expr);
-  lemmas.push_back(equal_exprt(length, new_length));
+  constraints.existential.push_back(equal_exprt(length, new_length));
   return from_integer(0, f.type());
 }
 
@@ -231,11 +209,11 @@ string_constraint_generatort::get_string_expr(const exprt &expr)
   return char_array_of_pointer(str.content(), str.length());
 }
 
-void string_constraint_generatort::clear_constraints()
+void string_constraintst::clear()
 {
-  lemmas.clear();
-  constraints.clear();
-  not_contains_constraints.clear();
+  existential.clear();
+  universal.clear();
+  not_contains.clear();
 }
 
 /// Add constraint on characters of a string.
@@ -270,7 +248,7 @@ void string_constraint_generatort::add_constraint_on_characters(
     binary_relation_exprt(chr, ID_le, from_integer(high_char, chr.type())));
   const string_constraintt sc(
     qvar, zero_if_negative(start), zero_if_negative(end), char_in_set);
-  constraints.push_back(sc);
+  constraints.universal.push_back(sc);
 }
 
 /// Add axioms to ensure all characters of a string belong to a given set.
@@ -544,7 +522,8 @@ exprt string_constraint_generatort::add_axioms_for_char_at(
   PRECONDITION(f.arguments().size() == 2);
   array_string_exprt str = get_string_expr(f.arguments()[0]);
   symbol_exprt char_sym = fresh_symbol("char", str.type().subtype());
-  lemmas.push_back(equal_exprt(char_sym, str[f.arguments()[1]]));
+  constraints.existential.push_back(
+    equal_exprt(char_sym, str[f.arguments()[1]]));
   return char_sym;
 }
 

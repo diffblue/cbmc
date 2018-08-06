@@ -40,10 +40,11 @@ exprt string_constraint_generatort::add_axioms_for_equals(
   typet index_type=s1.length().type();
 
   // Axiom 1.
-  lemmas.push_back(implies_exprt(eq, equal_exprt(s1.length(), s2.length())));
+  constraints.existential.push_back(
+    implies_exprt(eq, equal_exprt(s1.length(), s2.length())));
 
   // Axiom 2.
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt qvar = fresh_symbol("QA_equal", index_type);
     return string_constraintt(
       qvar,
@@ -52,7 +53,7 @@ exprt string_constraint_generatort::add_axioms_for_equals(
   }());
 
   // Axiom 3.
-  lemmas.push_back([&] {
+  constraints.existential.push_back([&] {
     const symbol_exprt witness = fresh_symbol("witness_unequal", index_type);
     const exprt zero = from_integer(0, index_type);
     const and_exprt bound_witness(
@@ -136,14 +137,14 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
   const typet index_type = s1.length().type();
 
   const implies_exprt a1(eq, equal_exprt(s1.length(), s2.length()));
-  lemmas.push_back(a1);
+  constraints.existential.push_back(a1);
 
   const symbol_exprt qvar = fresh_symbol("QA_equal_ignore_case", index_type);
   const exprt constr2 =
     character_equals_ignore_case(s1[qvar], s2[qvar], char_a, char_A, char_Z);
   const string_constraintt a2(
     qvar, zero_if_negative(s1.length()), implies_exprt(eq, constr2));
-  constraints.push_back(a2);
+  constraints.universal.push_back(a2);
 
   const symbol_exprt witness =
     fresh_symbol("witness_unequal_ignore_case", index_type);
@@ -159,7 +160,7 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
     or_exprt(
       notequal_exprt(s1.length(), s2.length()),
       and_exprt(bound_witness, witness_diff)));
-  lemmas.push_back(a3);
+  constraints.existential.push_back(a3);
 
   return typecast_exprt(eq, f.type());
 }
@@ -195,7 +196,7 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
       and_exprt(
         notequal_exprt(str[i], it.first[i]),
         and_exprt(str.axiom_for_length_gt(i), is_positive(i))));
-    lemmas.push_back(or_exprt(c1, or_exprt(c2, c3)));
+    constraints.existential.push_back(or_exprt(c1, or_exprt(c2, c3)));
   }
   return hash;
 }
@@ -232,14 +233,14 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
 
   const equal_exprt res_null(res, from_integer(0, return_type));
   const implies_exprt a1(res_null, equal_exprt(s1.length(), s2.length()));
-  lemmas.push_back(a1);
+  constraints.existential.push_back(a1);
 
   const symbol_exprt i = fresh_symbol("QA_compare_to", index_type);
   const string_constraintt a2(
     i,
     zero_if_negative(s1.length()),
     implies_exprt(res_null, equal_exprt(s1[i], s2[i])));
-  constraints.push_back(a2);
+  constraints.universal.push_back(a2);
 
   const symbol_exprt x = fresh_symbol("index_compare_to", index_type);
   const equal_exprt ret_char_diff(
@@ -265,14 +266,14 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
     and_exprt(
       binary_relation_exprt(x, ID_ge, from_integer(0, return_type)),
       or_exprt(cond1, cond2)));
-  lemmas.push_back(a3);
+  constraints.existential.push_back(a3);
 
   const symbol_exprt i2 = fresh_symbol("QA_compare_to", index_type);
   const string_constraintt a4(
     i2,
     zero_if_negative(x),
     implies_exprt(not_exprt(res_null), equal_exprt(s1[i2], s2[i2])));
-  constraints.push_back(a4);
+  constraints.universal.push_back(a4);
 
   return res;
 }
@@ -304,14 +305,14 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
   exprt::operandst disj;
   for(auto it : intern_of_string)
     disj.push_back(equal_exprt(intern, it.second));
-  lemmas.push_back(disjunction(disj));
+  constraints.existential.push_back(disjunction(disj));
 
   // WARNING: the specification may be incomplete or incorrect
   for(auto it : intern_of_string)
     if(it.second!=str)
     {
       symbol_exprt i = fresh_symbol("index_intern", index_type);
-      lemmas.push_back(
+      constraints.existential.push_back(
         or_exprt(
           equal_exprt(it.second, intern),
           or_exprt(
