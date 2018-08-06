@@ -11,17 +11,19 @@ phases:
     commands:
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
-        C:\tools\cygwin\bin\bash -c "make -C src minisat2-download DOWNLOADER=wget"
+        bash -c "make -C src minisat2-download DOWNLOADER=wget"
 
       - |
         $env:Path = "C:\tools\cygwin\bin;c:\tools\clcache\clcache-4.1.0;$env:Path"
         $env:CLCACHE_DIR = "C:\clcache"
+        $env:CLCACHE_BASEDIR = (Get-Item -Path ".\").FullName
         cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make CXX=clcache.exe -j4 -C src BUILD_ENV=MSVC" '
         cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make CXX=clcache.exe -j4 -C unit all BUILD_ENV=MSVC" '
 
       - |
         $env:Path = "C:\tools\cygwin\bin;c:\tools\clcache\clcache-4.1.0;$env:Path"
         $env:CLCACHE_DIR = "C:\clcache"
+        $env:CLCACHE_BASEDIR = (Get-Item -Path ".\").FullName
         cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -j4 -C jbmc/src setup-submodules" && bash -c "make CXX=clcache.exe -j4 -C jbmc/src BUILD_ENV=MSVC" '
         cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make CXX=clcache.exe -j4 -C jbmc/unit all BUILD_ENV=MSVC" '
 
@@ -29,6 +31,7 @@ phases:
         # display cache stats
         $env:Path = "C:\tools\cygwin\bin;c:\tools\clcache\clcache-4.1.0;$env:Path"
         $env:CLCACHE_DIR = "C:\clcache"
+        $env:CLCACHE_BASEDIR = (Get-Item -Path ".\").FullName
         cmd /c 'clcache -s'
 
   post_build:
