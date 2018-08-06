@@ -327,12 +327,6 @@ const array_string_exprt &string_constraint_generatort::char_array_of_pointer(
   return *created_strings.insert(array_pool.find(pointer, length)).first;
 }
 
-array_string_exprt
-find(array_poolt &array_pool, const refined_string_exprt &str)
-{
-  return array_pool.find(str.content(), str.length());
-}
-
 array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg)
 {
   const auto string_argument = expr_checked_cast<struct_exprt>(arg);

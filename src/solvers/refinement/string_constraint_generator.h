@@ -76,9 +76,6 @@ private:
     const typet &char_array_type);
 };
 
-array_string_exprt
-find(array_poolt &array_pool, const refined_string_exprt &str);
-
 /// Converts a struct containing a length and pointer to an array.
 /// This allows to get a string expression from arguments of a string
 /// builtion function, because string arguments in these function calls
