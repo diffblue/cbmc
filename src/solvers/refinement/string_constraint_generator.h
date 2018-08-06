@@ -371,8 +371,6 @@ private:
   exprt associate_length_to_array(const function_application_exprt &f);
 
   // Helper functions
-  static exprt is_high_surrogate(const exprt &chr);
-  static exprt is_low_surrogate(const exprt &chr);
   static exprt character_equals_ignore_case(
     exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z);
   unsigned long to_integer_or_default(const exprt &expr, unsigned long def);

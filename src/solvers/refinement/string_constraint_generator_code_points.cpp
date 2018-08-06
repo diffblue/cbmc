@@ -72,7 +72,7 @@ exprt string_constraint_generatort::add_axioms_for_code_point(
 /// 0xD800..0xDBFF
 /// \param chr: a character expression
 /// \return a Boolean expression
-exprt string_constraint_generatort::is_high_surrogate(const exprt &chr)
+static exprt is_high_surrogate(const exprt &chr)
 {
   return and_exprt(
     binary_relation_exprt(chr, ID_ge, from_integer(0xD800, chr.type())),
@@ -85,7 +85,7 @@ exprt string_constraint_generatort::is_high_surrogate(const exprt &chr)
 /// 0xDC00..0xDFFF
 /// \param chr: a character expression
 /// \return a Boolean expression
-exprt string_constraint_generatort::is_low_surrogate(const exprt &chr)
+static exprt is_low_surrogate(const exprt &chr)
 {
   return and_exprt(
     binary_relation_exprt(chr, ID_ge, from_integer(0xDC00, chr.type())),
