@@ -285,7 +285,6 @@ static exprt is_upper_case(const exprt &character)
 ///   1. res.length = str.length
 ///   2. forall i < str.length.
 ///        res[i] = is_upper_case(str[i]) ? str[i] + diff : str[i]
-///        && str[i] < 0x100
 ///
 /// Where `diff` is the difference between lower case and upper case
 /// characters: `diff = 'a'-'A' = 0x20` and `is_upper_case` is true for the
@@ -312,9 +311,7 @@ exprt string_constraint_generatort::add_axioms_for_to_lower_case(
       // latin-1 supplement is 0x20.
       const exprt diff = from_integer(0x20, char_type);
       const exprt converted = equal_exprt(res[idx], plus_exprt(str[idx], diff));
-      const exprt non_converted = and_exprt(
-        equal_exprt(res[idx], str[idx]),
-        binary_relation_exprt(str[idx], ID_lt, from_integer(0x100, char_type)));
+      const exprt non_converted = equal_exprt(res[idx], str[idx]);
       return if_exprt(is_upper_case(str[idx]), converted, non_converted);
     }();
 
