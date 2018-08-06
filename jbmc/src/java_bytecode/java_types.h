@@ -252,25 +252,16 @@ public:
   /// \param _parameters: the vector of method parameters
   /// \param _return_type: the return type
   java_method_typet(parameterst &&_parameters, typet &&_return_type)
+    : code_typet(std::move(_parameters), std::move(_return_type))
   {
     set(ID_C_java_method_type, true);
-    parameters().swap(_parameters);
-    return_type().swap(_return_type);
   }
 
   /// Constructs a new code type, i.e. method type
   /// \param _parameters: the vector of method parameters
   /// \param _return_type: the return type
   java_method_typet(parameterst &&_parameters, const typet &_return_type)
-  {
-    set(ID_C_java_method_type, true);
-    parameters().swap(_parameters);
-    return_type() = _return_type;
-  }
-
-  /// \deprecated
-  DEPRECATED("Use the two argument constructor instead")
-  java_method_typet()
+    : code_typet(std::move(_parameters), _return_type)
   {
     set(ID_C_java_method_type, true);
   }
