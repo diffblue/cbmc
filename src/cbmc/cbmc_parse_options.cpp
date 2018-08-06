@@ -309,9 +309,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       "max-node-refinement",
       cmdline.get_value("max-node-refinement"));
 
-  if(cmdline.isset("aig"))
-    options.set_option("aig", true);
-
   // SMT Options
 
   if(cmdline.isset("smt1"))
