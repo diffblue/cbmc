@@ -62,7 +62,6 @@ public:
     const goto_programt &new_goto_program);
 
   static differencest lcss(
-    const irep_idt &identifier,
     const goto_programt &old_goto_program,
     const goto_programt &new_goto_program);
 

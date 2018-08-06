@@ -145,7 +145,6 @@ void unified_difft::output_diff(
 }
 
 unified_difft::differencest unified_difft::lcss(
-  const irep_idt &identifier,
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program)
 {
@@ -323,7 +322,7 @@ void unified_difft::unified_diff(
         new_goto_program.instructions.size(), differencet::NEW);
   }
   else
-    differences=lcss(identifier, old_goto_program, new_goto_program);
+    differences=lcss(old_goto_program, new_goto_program);
 }
 
 bool unified_difft::operator()()
