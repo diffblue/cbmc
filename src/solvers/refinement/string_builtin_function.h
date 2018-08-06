@@ -30,6 +30,10 @@ public:
     return {};
   }
 
+  /// Given a function `get_value` which gives a valuation to expressions,
+  /// attempt to find the result of the builtin function.
+  /// If not enough information can be gathered from `get_value`, return an
+  /// empty optional.
   virtual optionalt<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const = 0;
 
