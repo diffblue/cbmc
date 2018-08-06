@@ -171,8 +171,6 @@ private:
   fresh_string(const typet &index_type, const typet &char_type);
   array_string_exprt get_string_expr(const exprt &expr);
 
-  static constant_exprt constant_char(int i, const typet &char_type);
-
   const array_string_exprt &
   char_array_of_pointer(const exprt &pointer, const exprt &length);
 

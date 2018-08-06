@@ -75,8 +75,8 @@ exprt string_constraint_generatort::add_axioms_for_code_point(
 exprt string_constraint_generatort::is_high_surrogate(const exprt &chr)
 {
   return and_exprt(
-    binary_relation_exprt(chr, ID_ge, constant_char(0xD800, chr.type())),
-    binary_relation_exprt(chr, ID_le, constant_char(0xDBFF, chr.type())));
+    binary_relation_exprt(chr, ID_ge, from_integer(0xD800, chr.type())),
+    binary_relation_exprt(chr, ID_le, from_integer(0xDBFF, chr.type())));
 }
 
 /// the output is true when the character is a low surrogate for UTF-16
@@ -88,8 +88,8 @@ exprt string_constraint_generatort::is_high_surrogate(const exprt &chr)
 exprt string_constraint_generatort::is_low_surrogate(const exprt &chr)
 {
   return and_exprt(
-    binary_relation_exprt(chr, ID_ge, constant_char(0xDC00, chr.type())),
-    binary_relation_exprt(chr, ID_le, constant_char(0xDFFF, chr.type())));
+    binary_relation_exprt(chr, ID_ge, from_integer(0xDC00, chr.type())),
+    binary_relation_exprt(chr, ID_le, from_integer(0xDFFF, chr.type())));
 }
 
 /// the output corresponds to the unicode character given by the pair of

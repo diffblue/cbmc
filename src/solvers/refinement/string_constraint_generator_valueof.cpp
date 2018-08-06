@@ -190,12 +190,12 @@ exprt string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
 /// \return an integer expression
 exprt string_constraint_generatort::int_of_hex_char(const exprt &chr)
 {
-  exprt zero_char=constant_char('0', chr.type());
-  exprt nine_char=constant_char('9', chr.type());
-  exprt a_char=constant_char('a', chr.type());
+  exprt zero_char = from_integer('0', chr.type());
+  exprt nine_char = from_integer('9', chr.type());
+  exprt a_char = from_integer('a', chr.type());
   return if_exprt(
     binary_relation_exprt(chr, ID_gt, nine_char),
-    plus_exprt(constant_char(10, chr.type()), minus_exprt(chr, a_char)),
+    plus_exprt(from_integer(10, chr.type()), minus_exprt(chr, a_char)),
     minus_exprt(chr, zero_char));
 }
 
@@ -216,11 +216,11 @@ exprt string_constraint_generatort::add_axioms_from_int_hex(
   const typet &index_type = res.length().type();
   const typet &char_type = res.content().type().subtype();
   exprt sixteen=from_integer(16, index_type);
-  exprt minus_char=constant_char('-', char_type);
-  exprt zero_char=constant_char('0', char_type);
-  exprt nine_char=constant_char('9', char_type);
-  exprt a_char=constant_char('a', char_type);
-  exprt f_char=constant_char('f', char_type);
+  exprt minus_char = from_integer('-', char_type);
+  exprt zero_char = from_integer('0', char_type);
+  exprt nine_char = from_integer('9', char_type);
+  exprt a_char = from_integer('a', char_type);
+  exprt f_char = from_integer('f', char_type);
 
   size_t max_size=8;
   lemmas.push_back(
@@ -327,8 +327,8 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
   const typet &index_type = str.length().type();
 
   const exprt &chr=str[0];
-  const equal_exprt starts_with_minus(chr, constant_char('-', char_type));
-  const equal_exprt starts_with_plus(chr, constant_char('+', char_type));
+  const equal_exprt starts_with_minus(chr, from_integer('-', char_type));
+  const equal_exprt starts_with_plus(chr, from_integer('+', char_type));
   const exprt starts_with_digit=
     is_digit_with_radix(chr, strict_formatting, radix_as_char, radix_ul);
 
@@ -374,7 +374,7 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
 
   if(strict_formatting)
   {
-    const exprt zero_char=constant_char('0', char_type);
+    const exprt zero_char = from_integer('0', char_type);
 
     // no_leading_zero : str[0] = '0' => |str| = 1
     const implies_exprt no_leading_zero(
@@ -412,7 +412,7 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
 {
   const typet &char_type = str.content().type().subtype();
 
-  const equal_exprt starts_with_minus(str[0], constant_char('-', char_type));
+  const equal_exprt starts_with_minus(str[0], from_integer('-', char_type));
   const constant_exprt zero_expr=from_integer(0, type);
   exprt::operandst digit_constraints;
 

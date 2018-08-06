@@ -61,18 +61,6 @@ string_constraint_generatort::get_created_strings() const
   return created_strings;
 }
 
-/// generate constant character expression with character type.
-/// \par parameters: integer representing a character, and a type for
-///   characters;
-/// we do not use char type here because in some languages
-/// (for instance java) characters use more than 8 bits.
-/// \return constant expression corresponding to the character.
-constant_exprt string_constraint_generatort::constant_char(
-  int i, const typet &char_type)
-{
-  return from_integer(i, char_type);
-}
-
 /// generate a new symbol expression of the given type with some prefix
 /// \par parameters: a prefix and a type
 /// \return a symbol of type tp whose name starts with "string_refinement#"

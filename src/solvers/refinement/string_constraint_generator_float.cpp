@@ -237,8 +237,8 @@ exprt string_constraint_generatort::add_axioms_for_fractional_part(
   const typet &char_type = res.content().type().subtype();
   const typet &index_type = res.length().type();
   const exprt ten = from_integer(10, type);
-  const exprt zero_char = constant_char('0', char_type);
-  const exprt nine_char = constant_char('9', char_type);
+  const exprt zero_char = from_integer('0', char_type);
+  const exprt nine_char = from_integer('9', char_type);
   const exprt max = from_integer(max_size, index_type);
 
   // We add axioms:

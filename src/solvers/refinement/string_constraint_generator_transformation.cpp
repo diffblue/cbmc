@@ -62,7 +62,7 @@ exprt string_constraint_generatort::add_axioms_for_set_length(
     idx2,
     zero_if_negative(s1.length()),
     zero_if_negative(res.length()),
-    equal_exprt(res[idx2], constant_char(0, char_type)));
+    equal_exprt(res[idx2], from_integer(0, char_type)));
   constraints.push_back(a3);
 
   return from_integer(0, signedbv_typet(32));
@@ -349,9 +349,9 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
 {
   const typet &char_type = str.content().type().subtype();
   const typet &index_type = str.length().type();
-  exprt char_a=constant_char('a', char_type);
-  exprt char_A=constant_char('A', char_type);
-  exprt char_z=constant_char('z', char_type);
+  exprt char_a = from_integer('a', char_type);
+  exprt char_A = from_integer('A', char_type);
+  exprt char_z = from_integer('z', char_type);
 
   lemmas.push_back(equal_exprt(res.length(), str.length()));
 
