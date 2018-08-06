@@ -31,4 +31,6 @@ artifacts:
   files:
 cache:
   paths:
+    - '/var/cache/apt/**/*'
+    - '/var/lib/apt/lists/**/*'
     - '/root/.ccache/**/*'
