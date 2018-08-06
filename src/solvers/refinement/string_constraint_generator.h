@@ -113,9 +113,6 @@ public:
   /// Clear all constraints and lemmas
   void clear_constraints();
 
-  /// Set of strings that have been created by the generator
-  const std::set<array_string_exprt> &get_created_strings() const;
-
   exprt add_axioms_for_function_application(
     const function_application_exprt &expr);
 

@@ -2032,7 +2032,7 @@ exprt string_refinementt::get(const exprt &expr) const
         get_array(super_get, ns, debug(), arr))
       return *arr_model_opt;
 
-    if(generator.get_created_strings().count(arr))
+    if(generator.array_pool.created_strings().count(arr))
     {
       const exprt length = super_get(arr.length());
       if(const auto n = numeric_cast<std::size_t>(length))

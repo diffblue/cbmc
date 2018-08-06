@@ -55,12 +55,6 @@ string_constraint_generatort::get_not_contains_constraints() const
   return not_contains_constraints;
 }
 
-const std::set<array_string_exprt> &
-string_constraint_generatort::get_created_strings() const
-{
-  return array_pool.created_strings();
-}
-
 /// generate a new symbol expression of the given type with some prefix
 /// \par parameters: a prefix and a type
 /// \return a symbol of type tp whose name starts with "string_refinement#"
