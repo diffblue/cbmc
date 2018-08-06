@@ -1,6 +1,6 @@
 CORE
 Test.class
---max-nondet-string-length 4 --verbosity 10 --unwind 5 --function Test.testSuccess
+--max-nondet-string-length 4 --verbosity 10 --unwind 5 --function Test.testSuccess --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=0$
 ^SIGNAL=0$
 assertion at file Test.java line 23 .*: SUCCESS

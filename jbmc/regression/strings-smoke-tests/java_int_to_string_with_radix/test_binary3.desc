@@ -1,6 +1,6 @@
 CORE
 Test_binary3.class
---verbosity 10 --max-nondet-string-length 1000 --function Test_binary3.main
+--verbosity 10 --max-nondet-string-length 1000 --function Test_binary3.main --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 assertion.* line 7 .* SUCCESS$

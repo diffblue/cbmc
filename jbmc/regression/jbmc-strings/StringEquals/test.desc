@@ -1,6 +1,6 @@
 CORE
 Test.class
---max-nondet-string-length 40 --function Test.check
+--max-nondet-string-length 40 --function Test.check --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 assertion at file Test.java line 9 .* SUCCESS

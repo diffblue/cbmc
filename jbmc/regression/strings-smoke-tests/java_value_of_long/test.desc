@@ -1,6 +1,6 @@
 CORE
 test.class
---verbosity 10 --max-nondet-string-length 1000 --function test.main
+--verbosity 10 --max-nondet-string-length 1000 --function test.main --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 assertion.* file test.java line 9 .* SUCCESS$

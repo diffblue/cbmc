@@ -1,6 +1,6 @@
 CORE
 test_append_string.class
---verbosity 10 --max-nondet-string-length 1000 --function test_append_string.main
+--verbosity 10 --max-nondet-string-length 1000 --function test_append_string.main --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
