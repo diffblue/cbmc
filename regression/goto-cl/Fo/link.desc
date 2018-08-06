@@ -1,0 +1,8 @@
+CORE goto-link
+
+/ERRORREPORT:QUEUE /OUT:linked.exe /INCREMENTAL /NOLOGO /LIBPATH:..\foo\bar x.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"bla.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"bla.lib" /MACHINE:X86 /SAFESEH:NO dir/main1.obj dir/main2.obj
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
