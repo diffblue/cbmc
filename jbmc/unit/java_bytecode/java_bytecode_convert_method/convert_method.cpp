@@ -44,7 +44,7 @@ SCENARIO(
           symbol_table.lookup_ref(method_name + ":(LClassWithBridgeMethod;)I");
 
         const java_method_typet &function_type =
-          require_type::require_code(function_symbol.type);
+          require_type::require_java_method(function_symbol.type);
         THEN("The method should be marked as a bridge method")
         {
           REQUIRE_FALSE(function_type.get_bool(ID_is_bridge_method));

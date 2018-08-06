@@ -33,7 +33,7 @@ SCENARIO(
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
       const java_method_typet &func_code =
-        require_type::require_code(func_symbol.type);
+        require_type::require_java_method(func_symbol.type);
 
       THEN("It has parameter x pointing to Generic")
       {
@@ -82,7 +82,7 @@ SCENARIO(
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
       const java_method_typet func_code =
-        require_type::require_code(func_symbol.type);
+        require_type::require_java_method(func_symbol.type);
 
       THEN("It has parameter s pointing to Generic")
       {
@@ -131,7 +131,7 @@ SCENARIO(
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
       const java_method_typet func_code =
-        require_type::require_code(func_symbol.type);
+        require_type::require_java_method(func_symbol.type);
 
       THEN("It has parameter x pointing to Generic")
       {
@@ -196,7 +196,7 @@ SCENARIO(
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
       const java_method_typet func_code =
-        require_type::require_code(func_symbol.type);
+        require_type::require_java_method(func_symbol.type);
 
       THEN("It has parameter s pointing to Generic")
       {
@@ -262,7 +262,7 @@ SCENARIO(
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
       const java_method_typet func_code =
-        require_type::require_code(func_symbol.type);
+        require_type::require_java_method(func_symbol.type);
 
       THEN("It has parameter inner pointing to Inner")
       {

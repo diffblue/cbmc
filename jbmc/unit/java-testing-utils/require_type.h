@@ -32,13 +32,15 @@ struct_typet::componentt require_component(
   const struct_typet &struct_type,
   const irep_idt &component_name);
 
-java_method_typet require_code(const typet &type);
+code_typet require_code(const typet &type);
+java_method_typet require_java_method(const typet &type);
 
-java_method_typet::parametert require_parameter(
-  const java_method_typet &function_type,
-  const irep_idt &param_name);
+code_typet::parametert
+require_parameter(const code_typet &function_type, const irep_idt &param_name);
 
-java_method_typet require_code(const typet &type, const size_t num_params);
+code_typet require_code(const typet &type, const size_t num_params);
+java_method_typet
+require_java_method(const typet &type, const size_t num_params);
 
 // A mini DSL for describing an expected set of type arguments for a
 // java_generic_typet

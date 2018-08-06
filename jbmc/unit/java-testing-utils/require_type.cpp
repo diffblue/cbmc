@@ -54,10 +54,33 @@ struct_union_typet::componentt require_type::require_component(
 
 /// Checks a type is a code_type (i.e. a function)
 /// \param type: The type to check
-/// \return The cast version of the type method_type
-java_method_typet require_type::require_code(const typet &type)
+/// \return The cast version of the type code_type
+code_typet require_type::require_code(const typet &type)
 {
   REQUIRE(type.id() == ID_code);
+  return to_code_type(type);
+}
+
+/// Verify a given type is an code_typet, and that the code it represents
+/// accepts a given number of parameters
+/// \param type The type to check
+/// \param num_params check the the given code_typet expects this
+/// number of parameters
+/// \return The type cast to a code_typet
+code_typet
+require_type::require_code(const typet &type, const size_t num_params)
+{
+  code_typet code_type = require_code(type);
+  REQUIRE(code_type.parameters().size() == num_params);
+  return code_type;
+}
+
+/// Checks a type is a java_method_typet (i.e. a function)
+/// \param type: The type to check
+/// \return The cast version of the type method_type
+java_method_typet require_type::require_java_method(const typet &type)
+{
+  REQUIRE(can_cast_type<java_method_typet>(type));
   return to_java_method_type(type);
 }
 
@@ -68,9 +91,9 @@ java_method_typet require_type::require_code(const typet &type)
 /// number of parameters
 /// \return The type cast to a java_method_typet
 java_method_typet
-require_type::require_code(const typet &type, const size_t num_params)
+require_type::require_java_method(const typet &type, const size_t num_params)
 {
-  java_method_typet method_type = require_code(type);
+  java_method_typet method_type = require_java_method(type);
   REQUIRE(method_type.parameters().size() == num_params);
   return method_type;
 }
@@ -80,14 +103,14 @@ require_type::require_code(const typet &type, const size_t num_params)
 /// \param param_name: The name of the parameter
 /// \return: A reference to the parameter structure corresponding to this
 /// parameter name.
-java_method_typet::parametert require_type::require_parameter(
-  const java_method_typet &function_type,
+code_typet::parametert require_type::require_parameter(
+  const code_typet &function_type,
   const irep_idt &param_name)
 {
   const auto param = std::find_if(
     function_type.parameters().begin(),
     function_type.parameters().end(),
-    [&param_name](const java_method_typet::parametert param) {
+    [&param_name](const code_typet::parametert param) {
       return param.get_base_name() == param_name;
     });
 
