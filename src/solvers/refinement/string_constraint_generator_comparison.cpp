@@ -78,13 +78,17 @@ exprt string_constraint_generatort::add_axioms_for_equals(
 /// \param char_A: constant character 'A'
 /// \param char_Z: constant character 'Z'
 /// \return a expression of Boolean type
-exprt string_constraint_generatort::character_equals_ignore_case(
-  exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z)
+static exprt character_equals_ignore_case(
+  const exprt &char1,
+  const exprt &char2,
+  const exprt &char_a,
+  const exprt &char_A,
+  const exprt &char_Z)
 {
-  and_exprt is_upper_case_1(
+  const and_exprt is_upper_case_1(
     binary_relation_exprt(char_A, ID_le, char1),
     binary_relation_exprt(char1, ID_le, char_Z));
-  and_exprt is_upper_case_2(
+  const and_exprt is_upper_case_2(
     binary_relation_exprt(char_A, ID_le, char2),
     binary_relation_exprt(char2, ID_le, char_Z));
 
@@ -92,16 +96,16 @@ exprt string_constraint_generatort::character_equals_ignore_case(
   // p1 : char1=char2
   // p2 : (is_up1&&'a'-'A'+char1=char2)
   // p3 : (is_up2&&'a'-'A'+char2=char1)
-  equal_exprt p1(char1, char2);
-  minus_exprt diff(char_a, char_A);
+  const equal_exprt p1(char1, char2);
+  const minus_exprt diff(char_a, char_A);
 
   // Overflow is not a problem here because is_upper_case conditions
   // ensure that we are within a safe range.
-  and_exprt p2(is_upper_case_1,
-               equal_exprt(plus_exprt(diff, char1), char2));
-  and_exprt p3(is_upper_case_2,
-               equal_exprt(plus_exprt(diff, char2), char1));
-  return or_exprt(or_exprt(p1, p2), p3);
+  const exprt p2 =
+    and_exprt(is_upper_case_1, equal_exprt(plus_exprt(diff, char1), char2));
+  const exprt p3 =
+    and_exprt(is_upper_case_2, equal_exprt(plus_exprt(diff, char2), char1));
+  return or_exprt(p1, p2, p3);
 }
 
 /// Equality of the content ignoring case of characters

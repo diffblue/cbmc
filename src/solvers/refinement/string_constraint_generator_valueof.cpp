@@ -19,6 +19,22 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <cmath>
 #include <solvers/floatbv/float_bv.h>
 
+/// If the expression is a constant expression then we get the value of it as
+/// an unsigned long. If not we return a default value.
+/// \param expr: input expression
+/// \param def: default value to return if we cannot evaluate expr
+/// \param ns: namespace used to simplify the expression
+/// \return the output as an unsigned long
+static unsigned long to_integer_or_default(
+  const exprt &expr,
+  unsigned long def,
+  const namespacet &ns)
+{
+  if(const auto i = numeric_cast<unsigned long>(simplify_expr(expr, ns)))
+    return *i;
+  return def;
+}
+
 /// Convert an integer to a string
 ///
 /// Add axioms corresponding to the String.valueOf(I) java function.
@@ -155,7 +171,7 @@ exprt string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
 
   /// Most of the time we can evaluate radix as an integer. The value 0 is used
   /// to indicate when we can't tell what the radix is.
-  const unsigned long radix_ul=to_integer_or_default(radix, 0);
+  const unsigned long radix_ul = to_integer_or_default(radix, 0, ns);
   CHECK_RETURN((radix_ul>=2 && radix_ul<=36) || radix_ul==0);
 
   if(max_size==0)
@@ -500,7 +516,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
     static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
   // Most of the time we can evaluate radix as an integer. The value 0 is used
   // to indicate when we can't tell what the radix is.
-  const unsigned long radix_ul=to_integer_or_default(radix, 0);
+  const unsigned long radix_ul = to_integer_or_default(radix, 0, ns);
   PRECONDITION((radix_ul>=2 && radix_ul<=36) || radix_ul==0);
 
   const symbol_exprt input_int=fresh_symbol("parsed_int", type);
@@ -531,19 +547,6 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
     radix_ul);
 
   return input_int;
-}
-
-/// If the expression is a constant expression then we get the value of it as
-/// an unsigned long. If not we return a default value.
-/// \param expr: input expression
-/// \param def: default value to return if we cannot evaluate expr
-/// \return the output as an unsigned long
-unsigned long string_constraint_generatort::to_integer_or_default(
-  const exprt &expr, unsigned long def)
-{
-  mp_integer mp_radix;
-  bool to_integer_failed=to_integer(simplify_expr(expr, ns), mp_radix);
-  return to_integer_failed?def:integer2ulong(mp_radix);
 }
 
 /// Check if a character is a digit with respect to the given radix, e.g. if the
