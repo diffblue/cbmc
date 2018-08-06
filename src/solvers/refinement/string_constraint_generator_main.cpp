@@ -327,15 +327,16 @@ const array_string_exprt &string_constraint_generatort::char_array_of_pointer(
   return *created_strings.insert(array_pool.find(pointer, length)).first;
 }
 
-array_string_exprt array_poolt::find(const refined_string_exprt &str)
+array_string_exprt
+find(array_poolt &array_pool, const refined_string_exprt &str)
 {
-  return find(str.content(), str.length());
+  return array_pool.find(str.content(), str.length());
 }
 
-array_string_exprt array_poolt::of_argument(const exprt &arg)
+array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg)
 {
   const auto string_argument = expr_checked_cast<struct_exprt>(arg);
-  return find(string_argument.op1(), string_argument.op0());
+  return array_pool.find(string_argument.op1(), string_argument.op0());
 }
 
 static irep_idt get_function_name(const function_application_exprt &expr)

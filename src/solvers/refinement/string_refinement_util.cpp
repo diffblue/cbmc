@@ -334,7 +334,7 @@ static void add_dependency_to_string_subexprs(
         if(is_refined_string_type(e.type()))
         {
           const auto string_struct = expr_checked_cast<struct_exprt>(e);
-          const auto string = array_pool.of_argument(string_struct);
+          const auto string = of_argument(array_pool, string_struct);
           dependencies.add_dependency(string, builtin_function_node);
         }
       });

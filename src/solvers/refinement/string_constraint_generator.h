@@ -60,14 +60,6 @@ public:
 
   array_string_exprt find(const exprt &pointer, const exprt &length);
 
-  array_string_exprt find(const refined_string_exprt &str);
-
-  /// Converts a struct containing a length and pointer to an array.
-  /// This allows to get a string expression from arguments of a string
-  /// builtion function, because string arguments in these function calls
-  /// are given as a struct containing a length and pointer to an array.
-  array_string_exprt of_argument(const exprt &arg);
-
 private:
   // associate arrays to char pointers
   std::unordered_map<exprt, array_string_exprt, irep_hash> arrays_of_pointers;
@@ -83,6 +75,15 @@ private:
     const exprt &char_pointer,
     const typet &char_array_type);
 };
+
+array_string_exprt
+find(array_poolt &array_pool, const refined_string_exprt &str);
+
+/// Converts a struct containing a length and pointer to an array.
+/// This allows to get a string expression from arguments of a string
+/// builtion function, because string arguments in these function calls
+/// are given as a struct containing a length and pointer to an array.
+array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg);
 
 class string_constraint_generatort final
 {
