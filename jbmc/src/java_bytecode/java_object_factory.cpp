@@ -148,6 +148,11 @@ private:
     const pointer_typet &substitute_pointer_type,
     size_t depth,
     const source_locationt &location);
+
+  void gen_method_call_if_present(
+    code_blockt &assignments,
+    const exprt &instance_expr,
+    const irep_idt &method_name);
 };
 
 /// Generates code for allocating a dynamic object. This is used in
@@ -764,6 +769,24 @@ void java_object_factoryt::gen_nondet_pointer_init(
     }
   }
 
+  // If this is a void* we *must* initialise with null:
+  // (This can currently happen for some cases of #exception_value)
+  bool must_be_null = subtype == empty_typet();
+
+  // If we may be about to initialize a non-null object, always run the
+  // clinit_wrapper of its class first.
+  // Note that it would be more consistent with the behaviour of the JVM to only
+  // run clinit_wrapper if we are about to initialize an object of which we know
+  // for sure that it is not null on any following branch. However, adding this
+  // case in gen_nondet_struct_init would slow symex down too much.
+  if(!must_be_null)
+  {
+    const java_class_typet &class_type = to_java_class_type(subtype);
+    const irep_idt &class_name = class_type.get_name();
+    const irep_idt class_clinit = clinit_wrapper_name(class_name);
+    gen_method_call_if_present(assignments, expr, class_clinit);
+  }
+
   code_blockt new_object_assignments;
   code_blockt update_in_place_assignments;
 
@@ -809,10 +832,6 @@ void java_object_factoryt::gen_nondet_pointer_init(
 
   const bool allow_null =
     depth > object_factory_parameters.max_nonnull_tree_depth;
-
-  // Alternatively, if this is a void* we *must* initialise with null:
-  // (This can currently happen for some cases of #exception_value)
-  bool must_be_null = subtype == empty_typet();
 
   if(must_be_null)
   {
@@ -1081,17 +1100,7 @@ void java_object_factoryt::gen_nondet_struct_init(
 
   const irep_idt init_method_name =
     "java::" + id2string(struct_tag) + ".cproverNondetInitialize:()V";
-
-  if(const auto func = symbol_table.lookup(init_method_name))
-  {
-    const java_method_typet &type = to_java_method_type(func->type);
-    code_function_callt fun_call;
-    fun_call.function() = func->symbol_expr();
-    if(type.has_this())
-      fun_call.arguments().push_back(address_of_exprt(expr));
-
-    assignments.add(fun_call);
-  }
+  gen_method_call_if_present(assignments, expr, init_method_name);
 }
 
 /// Initializes a primitive-typed or reference-typed object tree rooted at
@@ -1618,4 +1627,26 @@ void gen_nondet_init(
     object_factory_parameters,
     pointer_type_selector,
     update_in_place);
+}
+
+/// Adds a call for the given method to the end of `assignments` if the method
+/// exists in the symbol table. Does nothing if the method does not exist.
+/// \param assignments: A code block that the method call will be appended to.
+/// \param instance_expr: The instance to call the method on. This argument is
+///   ignored if the method is static.
+/// \param method_name: The name of the method to be called.
+void java_object_factoryt::gen_method_call_if_present(
+  code_blockt &assignments,
+  const exprt &instance_expr,
+  const irep_idt &method_name)
+{
+  if(const auto func = symbol_table.lookup(method_name))
+  {
+    const java_method_typet &type = to_java_method_type(func->type);
+    code_function_callt fun_call;
+    fun_call.function() = func->symbol_expr();
+    if(type.has_this())
+      fun_call.arguments().push_back(address_of_exprt(instance_expr));
+    assignments.add(fun_call);
+  }
 }
