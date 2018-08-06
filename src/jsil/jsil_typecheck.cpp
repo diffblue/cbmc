@@ -938,7 +938,7 @@ bool jsil_typecheck(
     jsil_typecheck.typecheck_expr(expr);
   }
 
-  catch(int e)
+  catch(int)
   {
     jsil_typecheck.error();
   }

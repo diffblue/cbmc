@@ -281,7 +281,7 @@ void goto_symext::symex_from_entry_point_of(
   {
     start_function = &get_goto_function(goto_functionst::entry_point());
   }
-  catch(const std::out_of_range &error)
+  catch(const std::out_of_range &)
   {
     throw "the program has no entry point";
   }

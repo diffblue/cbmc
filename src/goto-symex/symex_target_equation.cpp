@@ -432,7 +432,7 @@ void symex_target_equationt::convert_decls(
       {
         prop_conv.convert(step.cond_expr);
       }
-      catch(const bitvector_conversion_exceptiont &conversion_exception)
+      catch(const bitvector_conversion_exceptiont &)
       {
         util_throw_with_nested(
           equation_conversion_exceptiont(
@@ -465,7 +465,7 @@ void symex_target_equationt::convert_guards(
       {
         step.guard_literal = prop_conv.convert(step.guard);
       }
-      catch(const bitvector_conversion_exceptiont &conversion_exception)
+      catch(const bitvector_conversion_exceptiont &)
       {
         util_throw_with_nested(
           equation_conversion_exceptiont(
@@ -500,7 +500,7 @@ void symex_target_equationt::convert_assumptions(
         {
           step.cond_literal = prop_conv.convert(step.cond_expr);
         }
-        catch(const bitvector_conversion_exceptiont &conversion_exception)
+        catch(const bitvector_conversion_exceptiont &)
         {
           util_throw_with_nested(
             equation_conversion_exceptiont(
@@ -536,7 +536,7 @@ void symex_target_equationt::convert_goto_instructions(
         {
           step.cond_literal = prop_conv.convert(step.cond_expr);
         }
-        catch(const bitvector_conversion_exceptiont &conversion_exception)
+        catch(const bitvector_conversion_exceptiont &)
         {
           util_throw_with_nested(
             equation_conversion_exceptiont(
@@ -571,7 +571,7 @@ void symex_target_equationt::convert_constraints(
         {
           decision_procedure.set_to_true(step.cond_expr);
         }
-        catch(const bitvector_conversion_exceptiont &conversion_exception)
+        catch(const bitvector_conversion_exceptiont &)
         {
           util_throw_with_nested(
             equation_conversion_exceptiont(
@@ -632,7 +632,7 @@ void symex_target_equationt::convert_assertions(
       {
         step.cond_literal = prop_conv.convert(implication);
       }
-      catch(const bitvector_conversion_exceptiont &conversion_exception)
+      catch(const bitvector_conversion_exceptiont &)
       {
         util_throw_with_nested(
           equation_conversion_exceptiont(
