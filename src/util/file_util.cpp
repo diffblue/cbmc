@@ -136,10 +136,8 @@ std::string concat_dir_file(
   const std::string &file_name)
 {
   #ifdef _WIN32
-  return  (file_name.size()>1 &&
-           file_name[0]!='/' &&
-           file_name[1]!=':') ?
-           file_name : directory+"\\"+file_name;
+  return (file_name.size() > 1 && file_name[0] != '/' && file_name[1] == ':') ?
+          file_name : directory + "\\" + file_name;
   #else
   return (!file_name.empty() && file_name[0]=='/') ?
           file_name : directory+"/"+file_name;
