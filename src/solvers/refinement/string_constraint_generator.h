@@ -116,13 +116,6 @@ public:
   /// Set of strings that have been created by the generator
   const std::set<array_string_exprt> &get_created_strings() const;
 
-  exprt get_witness_of(
-    const string_not_contains_constraintt &c,
-    const exprt &univ_val) const
-  {
-    return index_exprt(witness.at(c), univ_val);
-  }
-
   exprt add_axioms_for_function_application(
     const function_application_exprt &expr);
 
@@ -400,9 +393,6 @@ private:
   unsigned long to_integer_or_default(const exprt &expr, unsigned long def);
 
   // MEMBERS
-public:
-  // Used to store information about witnesses for not_contains constraints
-  std::map<string_not_contains_constraintt, symbol_exprt> witness;
 private:
   std::set<array_string_exprt> created_strings;
   const messaget message;
