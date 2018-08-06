@@ -279,6 +279,14 @@ static exprt is_upper_case(const exprt &character)
   return disjunction(upper_case);
 }
 
+/// Expression which is true for lower_case characters of the Basic Latin and
+/// Latin-1 supplement of unicode.
+static exprt is_lower_case(const exprt &character)
+{
+  return is_upper_case(
+    minus_exprt(character, from_integer(0x20, character.type())));
+}
+
 /// Add axioms ensuring `res` corresponds to `str` in which uppercase characters
 /// have been converted to lowercase.
 /// These axioms are:
@@ -323,19 +331,14 @@ exprt string_constraint_generatort::add_axioms_for_to_lower_case(
 }
 
 /// Add axioms ensuring `res` corresponds to `str` in which lowercase characters
-/// have been converted to uppercase.
+/// of Basic Latin and Latin-1 supplement of unicode have been converted to
+/// uppercase.
 ///
 /// These axioms are:
-///   1. \f$ |{\tt res}| = |{\tt str}| \f$
-///   2. \f$ \forall i<|{\tt str}|.\ 'a'\le {\tt str}[i]\le 'z'
-///          \Rightarrow {\tt res}[i]={\tt str}[i]+'A'-'a' \f$
-///   3. \f$ \forall i<|{\tt str}|.\ \lnot ('a'\le {\tt str}[i] \le 'z')
-///          \Rightarrow {\tt res}[i]={\tt str}[i] \f$
-/// Note that index expressions are only allowed in the body of universal
-/// axioms, so we use a trivial premise and push our premise into the body.
+///   1. res.length = str.length
+///   2. forall i < str.length.
+///        is_lower_case(str[i]) ? res[i] = str[i] - 0x20 : res[i] = str[i]
 ///
-/// \todo We can reduce the number of constraints by merging
-///       constraints 2 and 3.
 /// \param res: array of characters expression
 /// \param str: array of characters expression
 /// \return integer expression which is different from `0` when there is an
@@ -350,31 +353,17 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   exprt char_A=constant_char('A', char_type);
   exprt char_z=constant_char('z', char_type);
 
-  // \todo Add support for locales using case mapping information
-  // from the UnicodeData file.
-
   lemmas.push_back(equal_exprt(res.length(), str.length()));
 
   constraints.push_back([&] {
-    const symbol_exprt idx1 = fresh_univ_index("QA_upper_case1", index_type);
-    const exprt is_lower_case = and_exprt(
-      binary_relation_exprt(char_a, ID_le, str[idx1]),
-      binary_relation_exprt(str[idx1], ID_le, char_z));
-    const exprt diff = minus_exprt(char_A, char_a);
-    const exprt convert = equal_exprt(res[idx1], plus_exprt(str[idx1], diff));
-    const exprt body = implies_exprt(is_lower_case, convert);
-    return string_constraintt(idx1, zero_if_negative(res.length()), body);
-  }());
-
-  constraints.push_back([&] {
-    const symbol_exprt idx2 = fresh_univ_index("QA_upper_case2", index_type);
-    const exprt is_not_lower_case = not_exprt(
-      and_exprt(
-        binary_relation_exprt(char_a, ID_le, str[idx2]),
-        binary_relation_exprt(str[idx2], ID_le, char_z)));
-    const exprt eq = equal_exprt(res[idx2], str[idx2]);
-    const exprt body2 = implies_exprt(is_not_lower_case, eq);
-    return string_constraintt(idx2, zero_if_negative(res.length()), body2);
+    const symbol_exprt idx = fresh_univ_index("QA_upper_case", index_type);
+    const exprt converted =
+      minus_exprt(str[idx], from_integer(0x20, char_type));
+    return string_constraintt(
+      idx,
+      zero_if_negative(res.length()),
+      equal_exprt(
+        res[idx], if_exprt(is_lower_case(str[idx]), converted, str[idx])));
   }());
 
   return from_integer(0, get_return_code_type());
