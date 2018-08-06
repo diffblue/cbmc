@@ -974,7 +974,7 @@ void java_object_factoryt::gen_nondet_struct_init(
   // Should we write the whole object?
   // * Not if this is a sub-structure (a superclass object), as our caller will
   //   have done this already
-  // * Not if the object has already been initialised by our caller, in whic
+  // * Not if the object has already been initialised by our caller, in which
   //   case they will set `skip_classid`
   // * Not if we're re-initializing an existing object (i.e. update_in_place)
 
@@ -1094,7 +1094,7 @@ void java_object_factoryt::gen_nondet_struct_init(
   }
 }
 
-/// Initializes a primitive-typed or referece-typed object tree rooted at
+/// Initializes a primitive-typed or reference-typed object tree rooted at
 /// `expr`, allocating child objects as necessary and nondet-initializing their
 /// members, or if MUST_UPDATE_IN_PLACE is set, re-initializing
 /// already-allocated objects.
