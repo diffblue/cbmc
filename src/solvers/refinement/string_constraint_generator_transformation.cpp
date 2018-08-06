@@ -230,15 +230,7 @@ exprt string_constraint_generatort::add_axioms_for_trim(
 
 /// Conversion of a string to lower case
 ///
-/// Add axioms ensuring `res` corresponds to `str` in which uppercase characters
-/// have been converted to lowercase.
-/// These axioms are:
-///   1. \f$ |{\tt res}| = |{\tt str}| \f$
-///   2. \f$ \forall i<|{\tt str}|.\ {\tt is\_upper\_case}({\tt str}[i])?
-///      {\tt res}[i]={\tt str}[i]+diff : {\tt res}[i]={\tt str}[i]
-///      \land {\tt str}[i]<{\tt 0x100} \f$
-///      where `diff` is the difference between lower case and upper case
-///      characters: `diff = 'a'-'A' = 0x20`.
+/// \copydoc add_axioms_for_to_lower_case(const array_string_exprt &, array_string_exprt &)
 ///
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]`, refined_string `str`
@@ -254,6 +246,17 @@ exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   return add_axioms_for_to_lower_case(res, str);
 }
 
+/// Add axioms ensuring `res` corresponds to `str` in which uppercase characters
+/// have been converted to lowercase.
+/// These axioms are:
+///   1. res.length = str.length
+///   2. forall i < str.length.
+///        res[i] = is_upper_case(str[i]) ? str[i] + diff : str[i]
+///        && str[i] < 0x100
+///
+/// Where `diff` is the difference between lower case and upper case
+/// characters: `diff = 'a'-'A' = 0x20` and `is_upper_case` is true for the
+/// upper case characters of Basic Latin and Latin-1 supplement of unicode.
 exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   const array_string_exprt &res,
   const array_string_exprt &str)
