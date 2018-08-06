@@ -55,18 +55,6 @@ string_constraint_generatort::get_not_contains_constraints() const
   return not_contains_constraints;
 }
 
-const std::vector<symbol_exprt> &
-string_constraint_generatort::get_index_symbols() const
-{
-  return index_symbols;
-}
-
-const std::vector<symbol_exprt> &
-string_constraint_generatort::get_boolean_symbols() const
-{
-  return boolean_symbols;
-}
-
 const std::set<array_string_exprt> &
 string_constraint_generatort::get_created_strings() const
 {
@@ -113,9 +101,7 @@ symbol_exprt string_constraint_generatort::fresh_univ_index(
 symbol_exprt string_constraint_generatort::fresh_exist_index(
   const irep_idt &prefix, const typet &type)
 {
-  symbol_exprt s=fresh_symbol(prefix, type);
-  index_symbols.push_back(s);
-  return s;
+  return fresh_symbol(prefix, type);
 }
 
 /// generate a Boolean symbol which is existentially quantified
@@ -124,9 +110,7 @@ symbol_exprt string_constraint_generatort::fresh_exist_index(
 symbol_exprt string_constraint_generatort::fresh_boolean(
   const irep_idt &prefix)
 {
-  symbol_exprt b=fresh_symbol(prefix, bool_typet());
-  boolean_symbols.push_back(b);
-  return b;
+  return fresh_symbol(prefix, bool_typet());
 }
 
 exprt sum_overflows(const plus_exprt &sum)
