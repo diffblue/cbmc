@@ -115,10 +115,6 @@ public:
 
   symbol_generatort fresh_symbol;
 
-  symbol_exprt fresh_univ_index(const irep_idt &prefix, const typet &type);
-
-  symbol_exprt fresh_exist_index(const irep_idt &prefix, const typet &type);
-
   array_poolt array_pool;
 
   /// Associate array to pointer, and array to length

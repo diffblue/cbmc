@@ -50,14 +50,14 @@ exprt string_constraint_generatort::add_axioms_for_set_length(
 
   lemmas.push_back(res.axiom_for_has_length(k));
 
-  const symbol_exprt idx = fresh_univ_index("QA_index_set_length", index_type);
+  const symbol_exprt idx = fresh_symbol("QA_index_set_length", index_type);
   const string_constraintt a2(
     idx,
     zero_if_negative(minimum(s1.length(), k)),
     equal_exprt(s1[idx], res[idx]));
   constraints.push_back(a2);
 
-  symbol_exprt idx2 = fresh_univ_index("QA_index_set_length2", index_type);
+  symbol_exprt idx2 = fresh_symbol("QA_index_set_length2", index_type);
   string_constraintt a3(
     idx2,
     zero_if_negative(s1.length()),
@@ -131,7 +131,7 @@ exprt string_constraint_generatort::add_axioms_for_substring(
 
   // Axiom 2.
   constraints.push_back([&] {
-    const symbol_exprt idx = fresh_univ_index("QA_index_substring", index_type);
+    const symbol_exprt idx = fresh_symbol("QA_index_substring", index_type);
     return string_constraintt(
       idx,
       zero_if_negative(res.length()),
@@ -176,7 +176,7 @@ exprt string_constraint_generatort::add_axioms_for_trim(
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   const typet &index_type = str.length().type();
   const typet &char_type = str.content().type().subtype();
-  const symbol_exprt idx = fresh_exist_index("index_trim", index_type);
+  const symbol_exprt idx = fresh_symbol("index_trim", index_type);
   const exprt space_char = from_integer(' ', char_type);
 
   // Axiom 1.
@@ -195,21 +195,21 @@ exprt string_constraint_generatort::add_axioms_for_trim(
   exprt a5 = res.axiom_for_length_le(str.length());
   lemmas.push_back(a5);
 
-  symbol_exprt n=fresh_univ_index("QA_index_trim", index_type);
+  symbol_exprt n = fresh_symbol("QA_index_trim", index_type);
   binary_relation_exprt non_print(str[n], ID_le, space_char);
   string_constraintt a6(n, zero_if_negative(idx), non_print);
   constraints.push_back(a6);
 
   // Axiom 7.
   constraints.push_back([&] {
-    const symbol_exprt n2 = fresh_univ_index("QA_index_trim2", index_type);
+    const symbol_exprt n2 = fresh_symbol("QA_index_trim2", index_type);
     const minus_exprt bound(minus_exprt(str.length(), idx), res.length());
     const binary_relation_exprt eqn2(
       str[plus_exprt(idx, plus_exprt(res.length(), n2))], ID_le, space_char);
     return string_constraintt(n2, zero_if_negative(bound), eqn2);
   }());
 
-  symbol_exprt n3=fresh_univ_index("QA_index_trim3", index_type);
+  symbol_exprt n3 = fresh_symbol("QA_index_trim3", index_type);
   equal_exprt eqn3(res[n3], str[plus_exprt(n3, idx)]);
   string_constraintt a8(n3, zero_if_negative(res.length()), eqn3);
   constraints.push_back(a8);
@@ -313,7 +313,7 @@ exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   lemmas.push_back(equal_exprt(res.length(), str.length()));
 
   constraints.push_back([&] {
-    const symbol_exprt idx = fresh_univ_index("QA_lower_case", index_type);
+    const symbol_exprt idx = fresh_symbol("QA_lower_case", index_type);
     const exprt conditional_convert = [&] {
       // The difference between upper-case and lower-case for the basic latin and
       // latin-1 supplement is 0x20.
@@ -356,7 +356,7 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   lemmas.push_back(equal_exprt(res.length(), str.length()));
 
   constraints.push_back([&] {
-    const symbol_exprt idx = fresh_univ_index("QA_upper_case", index_type);
+    const symbol_exprt idx = fresh_symbol("QA_upper_case", index_type);
     const exprt converted =
       minus_exprt(str[idx], from_integer(0x20, char_type));
     return string_constraintt(
@@ -434,13 +434,13 @@ exprt string_constraint_generatort::add_axioms_for_set_char(
         binary_relation_exprt(position, ID_lt, res.length())),
       equal_exprt(res[position], character)));
   constraints.push_back([&] {
-    const symbol_exprt q = fresh_univ_index("QA_char_set", position.type());
+    const symbol_exprt q = fresh_symbol("QA_char_set", position.type());
     const equal_exprt a3_body(res[q], str[q]);
     return string_constraintt(
       q, minimum(zero_if_negative(res.length()), position), a3_body);
   }());
   constraints.push_back([&] {
-    const symbol_exprt q2 = fresh_univ_index("QA_char_set2", position.type());
+    const symbol_exprt q2 = fresh_symbol("QA_char_set2", position.type());
     const plus_exprt lower_bound(position, from_integer(1, position.type()));
     const equal_exprt a4_body(res[q2], str[q2]);
     return string_constraintt(
@@ -515,7 +515,7 @@ exprt string_constraint_generatort::add_axioms_for_replace(
 
     lemmas.push_back(equal_exprt(res.length(), str.length()));
 
-    symbol_exprt qvar = fresh_univ_index("QA_replace", str.length().type());
+    symbol_exprt qvar = fresh_symbol("QA_replace", str.length().type());
     implies_exprt case1(
       equal_exprt(str[qvar], old_char),
       equal_exprt(res[qvar], new_char));

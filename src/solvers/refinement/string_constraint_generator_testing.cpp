@@ -51,7 +51,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
 
   // Axiom 2.
   constraints.push_back([&] {
-    const symbol_exprt qvar = fresh_univ_index("QA_isprefix", index_type);
+    const symbol_exprt qvar = fresh_symbol("QA_isprefix", index_type);
     const exprt body = implies_exprt(
       isprefix, equal_exprt(str[plus_exprt(qvar, offset)], prefix[qvar]));
     return string_constraintt(
@@ -60,7 +60,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
 
   // Axiom 3.
   lemmas.push_back([&] {
-    const exprt witness = fresh_exist_index("witness_not_isprefix", index_type);
+    const exprt witness = fresh_symbol("witness_not_isprefix", index_type);
     const exprt strings_differ_at_witness = and_exprt(
       axiom_for_is_positive_index(witness),
       prefix.axiom_for_length_gt(witness),
@@ -166,7 +166,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   implies_exprt a1(issuffix, s1.axiom_for_length_ge(s0.length()));
   lemmas.push_back(a1);
 
-  symbol_exprt qvar=fresh_univ_index("QA_suffix", index_type);
+  symbol_exprt qvar = fresh_symbol("QA_suffix", index_type);
   const plus_exprt qvar_shifted(qvar, minus_exprt(s1.length(), s0.length()));
   string_constraintt a2(
     qvar,
@@ -174,7 +174,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
     implies_exprt(issuffix, equal_exprt(s0[qvar], s1[qvar_shifted])));
   constraints.push_back(a2);
 
-  symbol_exprt witness=fresh_exist_index("witness_not_suffix", index_type);
+  symbol_exprt witness = fresh_symbol("witness_not_suffix", index_type);
   const plus_exprt shifted(witness, minus_exprt(s1.length(), s0.length()));
   or_exprt constr3(
     and_exprt(
@@ -218,8 +218,7 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   const array_string_exprt s1 = get_string_expr(f.arguments()[1]);
   const typet &index_type = s0.length().type();
   const symbol_exprt contains = fresh_boolean("contains");
-  const symbol_exprt startpos =
-    fresh_exist_index("startpos_contains", index_type);
+  const symbol_exprt startpos = fresh_symbol("startpos_contains", index_type);
 
   const implies_exprt a1(contains, s0.axiom_for_length_ge(s1.length()));
   lemmas.push_back(a1);
@@ -236,7 +235,7 @@ exprt string_constraint_generatort::add_axioms_for_contains(
     equal_exprt(startpos, from_integer(-1, index_type)));
   lemmas.push_back(a3);
 
-  symbol_exprt qvar=fresh_univ_index("QA_contains", index_type);
+  symbol_exprt qvar = fresh_symbol("QA_contains", index_type);
   const plus_exprt qvar_shifted(qvar, startpos);
   string_constraintt a4(
     qvar,

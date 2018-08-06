@@ -417,8 +417,8 @@ SCENARIO("instantiate_not_contains",
     {
       // Making index sets
       const std::set<exprt> index_set_a = full_index_set(a_array);
-      const std::set<exprt> index_set_empty=
-        {generator.fresh_exist_index("z", t.length_type())};
+      const std::set<exprt> index_set_empty = {
+        generator.fresh_symbol("z", t.length_type())};
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas=instantiate_not_contains(

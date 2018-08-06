@@ -40,7 +40,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   const exprt &from_index)
 {
   const typet &index_type=str.length().type();
-  symbol_exprt index=fresh_exist_index("index_of", index_type);
+  symbol_exprt index = fresh_symbol("index_of", index_type);
   symbol_exprt contains=fresh_boolean("contains_in_index_of");
 
   exprt minus1=from_integer(-1, index_type);
@@ -61,7 +61,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 
   const exprt lower_bound(zero_if_negative(from_index));
 
-  symbol_exprt n=fresh_univ_index("QA_index_of", index_type);
+  symbol_exprt n = fresh_symbol("QA_index_of", index_type);
   string_constraintt a4(
     n,
     lower_bound,
@@ -69,7 +69,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
     implies_exprt(contains, notequal_exprt(str[n], c)));
   constraints.push_back(a4);
 
-  symbol_exprt m=fresh_univ_index("QA_index_of", index_type);
+  symbol_exprt m = fresh_symbol("QA_index_of", index_type);
   string_constraintt a5(
     m,
     lower_bound,
@@ -110,7 +110,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   const exprt &from_index)
 {
   const typet &index_type=haystack.length().type();
-  symbol_exprt offset=fresh_exist_index("index_of", index_type);
+  symbol_exprt offset = fresh_symbol("index_of", index_type);
   symbol_exprt contains=fresh_boolean("contains_substring");
 
   implies_exprt a1(
@@ -126,7 +126,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     equal_exprt(offset, from_integer(-1, index_type)));
   lemmas.push_back(a2);
 
-  symbol_exprt qvar=fresh_univ_index("QA_index_of_string", index_type);
+  symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
   string_constraintt a3(
     qvar,
     zero_if_negative(needle.length()),
@@ -202,7 +202,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   const exprt &from_index)
 {
   const typet &index_type=haystack.length().type();
-  symbol_exprt offset=fresh_exist_index("index_of", index_type);
+  symbol_exprt offset = fresh_symbol("index_of", index_type);
   symbol_exprt contains=fresh_boolean("contains_substring");
 
   implies_exprt a1(
@@ -219,7 +219,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     equal_exprt(offset, from_integer(-1, index_type)));
   lemmas.push_back(a2);
 
-  symbol_exprt qvar=fresh_univ_index("QA_index_of_string", index_type);
+  symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
   equal_exprt constr3(haystack[plus_exprt(qvar, offset)], needle[qvar]);
   const string_constraintt a3(
     qvar, zero_if_negative(needle.length()), implies_exprt(contains, constr3));
@@ -336,7 +336,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const exprt &from_index)
 {
   const typet &index_type = str.length().type();
-  const symbol_exprt index = fresh_exist_index("last_index_of", index_type);
+  const symbol_exprt index = fresh_symbol("last_index_of", index_type);
   const symbol_exprt contains = fresh_boolean("contains_in_last_index_of");
 
   const exprt minus1 = from_integer(-1, index_type);
@@ -359,7 +359,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
     from_index_plus_one,
     str.length());
 
-  const symbol_exprt n = fresh_univ_index("QA_last_index_of1", index_type);
+  const symbol_exprt n = fresh_symbol("QA_last_index_of1", index_type);
   const string_constraintt a4(
     n,
     zero_if_negative(plus_exprt(index, index1)),
@@ -367,7 +367,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
     implies_exprt(contains, notequal_exprt(str[n], c)));
   constraints.push_back(a4);
 
-  const symbol_exprt m = fresh_univ_index("QA_last_index_of2", index_type);
+  const symbol_exprt m = fresh_symbol("QA_last_index_of2", index_type);
   const string_constraintt a5(
     m,
     zero_if_negative(end_index),

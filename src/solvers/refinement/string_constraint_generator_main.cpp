@@ -86,24 +86,6 @@ operator()(const irep_idt &prefix, const typet &type)
   return symbol_exprt(name, type);
 }
 
-/// generate an index symbol to be used as an universaly quantified variable
-/// \par parameters: a prefix
-/// \return a symbol of index type whose name starts with the prefix
-symbol_exprt string_constraint_generatort::fresh_univ_index(
-  const irep_idt &prefix, const typet &type)
-{
-  return fresh_symbol(prefix, type);
-}
-
-/// generate an index symbol which is existentially quantified
-/// \par parameters: a prefix
-/// \return a symbol of index type whose name starts with the prefix
-symbol_exprt string_constraint_generatort::fresh_exist_index(
-  const irep_idt &prefix, const typet &type)
-{
-  return fresh_symbol(prefix, type);
-}
-
 /// generate a Boolean symbol which is existentially quantified
 /// \par parameters: a prefix
 /// \return a symbol of index type whose name starts with the prefix
@@ -303,7 +285,7 @@ void string_constraint_generatort::add_constraint_on_characters(
   const char &high_char = char_set[2];
 
   // Add constraint
-  const symbol_exprt qvar = fresh_univ_index("char_constr", s.length().type());
+  const symbol_exprt qvar = fresh_symbol("char_constr", s.length().type());
   const exprt chr = s[qvar];
   const and_exprt char_in_set(
     binary_relation_exprt(chr, ID_ge, from_integer(low_char, chr.type())),
