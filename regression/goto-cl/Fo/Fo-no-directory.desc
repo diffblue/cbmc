@@ -1,0 +1,12 @@
+CORE
+
+--verbosity 10 /c main1.c main2.c /Fodir
+^EXIT=64$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Visual Studio expects a / or \ at the end of a directory name to be treating it
+as a directory. Using multiple translation units without a target directory is
+not permitted.

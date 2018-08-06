@@ -1,6 +1,6 @@
 CORE
 
---verbosity 10 /c main1.c main2.c /Fo dir
+--verbosity 10 /c main1.c main2.c /Fodir/
 ^EXIT=0$
 ^SIGNAL=0$
 --
