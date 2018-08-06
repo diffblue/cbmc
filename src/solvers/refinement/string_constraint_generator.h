@@ -58,7 +58,12 @@ public:
 
   void insert(const exprt &pointer_expr, array_string_exprt &array);
 
-  array_string_exprt find(const exprt &pointer, const exprt &length);
+  const array_string_exprt &find(const exprt &pointer, const exprt &length);
+
+  const std::set<array_string_exprt> &created_strings() const;
+
+  array_string_exprt
+  fresh_string(const typet &index_type, const typet &char_type);
 
 private:
   // associate arrays to char pointers
@@ -70,6 +75,9 @@ private:
 
   // generates fresh symbols
   symbol_generatort &fresh_symbol;
+
+  // Strings created in the pool
+  std::set<array_string_exprt> created_strings_value;
 
   array_string_exprt make_char_array_for_char_pointer(
     const exprt &char_pointer,
@@ -165,8 +173,6 @@ public:
 
 private:
   symbol_exprt fresh_boolean(const irep_idt &prefix);
-  array_string_exprt
-  fresh_string(const typet &index_type, const typet &char_type);
   array_string_exprt get_string_expr(const exprt &expr);
 
   const array_string_exprt &
@@ -370,7 +376,6 @@ private:
 
   // MEMBERS
 private:
-  std::set<array_string_exprt> created_strings;
   const messaget message;
 
   std::vector<exprt> lemmas;

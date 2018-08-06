@@ -263,7 +263,7 @@ string_constraint_generatort::add_axioms_for_format_specifier(
   const typet &index_type,
   const typet &char_type)
 {
-  const array_string_exprt res = fresh_string(index_type, char_type);
+  const array_string_exprt res = array_pool.fresh_string(index_type, char_type);
   exprt return_code;
   switch(fs.conversion)
   {
@@ -330,7 +330,7 @@ string_constraint_generatort::add_axioms_for_format_specifier(
     // For all these unimplemented cases we return a non-deterministic string
     message.warning() << "unimplemented format specifier: " << fs.conversion
                         << message.eom;
-    return fresh_string(index_type, char_type);
+    return array_pool.fresh_string(index_type, char_type);
   default:
     message.error() << "invalid format specifier: " << fs.conversion
                       << message.eom;
@@ -388,7 +388,8 @@ exprt string_constraint_generatort::add_axioms_for_format(
     }
     else
     {
-      const array_string_exprt str = fresh_string(index_type, char_type);
+      const array_string_exprt str =
+        array_pool.fresh_string(index_type, char_type);
       const exprt return_code =
         add_axioms_for_constant(str, fe.get_format_text().get_content());
       intermediary_strings.push_back(str);
@@ -416,7 +417,8 @@ exprt string_constraint_generatort::add_axioms_for_format(
   for(std::size_t i = 1; i < intermediary_strings.size() - 1; ++i)
   {
     const array_string_exprt &intermediary = intermediary_strings[i];
-    const array_string_exprt fresh = fresh_string(index_type, char_type);
+    const array_string_exprt fresh =
+      array_pool.fresh_string(index_type, char_type);
     return_code =
       bitor_exprt(return_code, add_axioms_for_concat(fresh, str, intermediary));
     str = fresh;

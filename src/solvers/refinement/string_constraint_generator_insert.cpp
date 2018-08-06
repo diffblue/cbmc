@@ -113,7 +113,8 @@ exprt string_constraint_generatort::add_axioms_for_insert(
     const exprt &end = f.arguments()[6];
     const typet &char_type = s1.content().type().subtype();
     const typet &index_type = s1.length().type();
-    array_string_exprt substring = fresh_string(index_type, char_type);
+    const array_string_exprt substring =
+      array_pool.fresh_string(index_type, char_type);
     exprt return_code1 = add_axioms_for_substring(substring, s2, start, end);
     exprt return_code2 = add_axioms_for_insert(res, s1, substring, offset);
     return if_exprt(
@@ -143,7 +144,7 @@ exprt string_constraint_generatort::add_axioms_for_insert_int(
   const exprt &offset = f.arguments()[3];
   const typet &index_type = s1.length().type();
   const typet &char_type = s1.content().type().subtype();
-  array_string_exprt s2 = fresh_string(index_type, char_type);
+  const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   exprt return_code = add_axioms_for_string_of_int(s2, f.arguments()[4]);
   return add_axioms_for_insert(res, s1, s2, offset);
 }
@@ -164,7 +165,7 @@ exprt string_constraint_generatort::add_axioms_for_insert_bool(
   const exprt &offset = f.arguments()[3];
   const typet &index_type = s1.length().type();
   const typet &char_type = s1.content().type().subtype();
-  array_string_exprt s2 = fresh_string(index_type, char_type);
+  const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   exprt return_code = add_axioms_from_bool(s2, f.arguments()[4]);
   return add_axioms_for_insert(res, s1, s2, offset);
 }
@@ -184,7 +185,7 @@ exprt string_constraint_generatort::add_axioms_for_insert_char(
   const exprt &offset = f.arguments()[3];
   const typet &index_type = s1.length().type();
   const typet &char_type = s1.content().type().subtype();
-  array_string_exprt s2 = fresh_string(index_type, char_type);
+  const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   exprt return_code = add_axioms_from_char(s2, f.arguments()[4]);
   return add_axioms_for_insert(res, s1, s2, offset);
 }
@@ -205,7 +206,7 @@ exprt string_constraint_generatort::add_axioms_for_insert_double(
   const exprt &offset = f.arguments()[3];
   const typet &index_type = s1.length().type();
   const typet &char_type = s1.content().type().subtype();
-  const array_string_exprt s2 = fresh_string(index_type, char_type);
+  const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   const exprt return_code =
     add_axioms_for_string_of_float(s2, f.arguments()[4]);
   return add_axioms_for_insert(res, s1, s2, offset);

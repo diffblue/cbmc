@@ -58,7 +58,7 @@ string_constraint_generatort::get_not_contains_constraints() const
 const std::set<array_string_exprt> &
 string_constraint_generatort::get_created_strings() const
 {
-  return created_strings;
+  return array_pool.created_strings();
 }
 
 /// generate a new symbol expression of the given type with some prefix
@@ -115,15 +115,14 @@ exprt array_poolt::get_length(const array_string_exprt &s) const
 /// construct a string expression whose length and content are new variables
 /// \par parameters: a type for string
 /// \return a string expression
-array_string_exprt string_constraint_generatort::fresh_string(
-  const typet &index_type,
-  const typet &char_type)
+array_string_exprt
+array_poolt::fresh_string(const typet &index_type, const typet &char_type)
 {
   symbol_exprt length = fresh_symbol("string_length", index_type);
   array_typet array_type(char_type, length);
   symbol_exprt content = fresh_symbol("string_content", array_type);
   array_string_exprt str = to_array_string_expr(content);
-  created_strings.insert(str);
+  created_strings_value.insert(str);
   return str;
 }
 
@@ -185,8 +184,14 @@ void array_poolt::insert(
 
   const auto it_bool =
     arrays_of_pointers.insert(std::make_pair(pointer_expr, array_expr));
+  created_strings_value.insert(array_expr);
   INVARIANT(
     it_bool.second, "should not associate two arrays to the same pointer");
+}
+
+const std::set<array_string_exprt> &array_poolt::created_strings() const
+{
+  return created_strings_value;
 }
 
 /// Associate a char array to a char pointer.
@@ -208,7 +213,7 @@ exprt string_constraint_generatort::associate_array_to_pointer(
 
   const exprt &pointer_expr = f.arguments()[1];
   array_pool.insert(pointer_expr, array_expr);
-  created_strings.emplace(to_array_string_expr(array_expr));
+  // created_strings.emplace(to_array_string_expr(array_expr));
   return from_integer(0, f.type());
 }
 
@@ -311,10 +316,13 @@ exprt string_constraint_generatort::add_axioms_for_constrain_characters(
 
 /// Creates a new array if the pointer is not pointing to an array
 /// \todo This should be replaced by make_char_array_for_char_pointer
-array_string_exprt array_poolt::find(const exprt &pointer, const exprt &length)
+const array_string_exprt &
+array_poolt::find(const exprt &pointer, const exprt &length)
 {
   const array_typet array_type(pointer.type().subtype(), length);
-  return make_char_array_for_char_pointer(pointer, array_type);
+  const array_string_exprt array =
+    make_char_array_for_char_pointer(pointer, array_type);
+  return *created_strings_value.insert(array).first;
 }
 
 /// Adds creates a new array if it does not already exists
@@ -324,7 +332,7 @@ const array_string_exprt &string_constraint_generatort::char_array_of_pointer(
   const exprt &pointer,
   const exprt &length)
 {
-  return *created_strings.insert(array_pool.find(pointer, length)).first;
+  return array_pool.find(pointer, length);
 }
 
 array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg)

@@ -570,8 +570,10 @@ exprt string_constraint_generatort::add_axioms_for_delete(
   PRECONDITION(end.type()==str.length().type());
   const typet &index_type = str.length().type();
   const typet &char_type = str.content().type().subtype();
-  const array_string_exprt sub1 = fresh_string(index_type, char_type);
-  const array_string_exprt sub2 = fresh_string(index_type, char_type);
+  const array_string_exprt sub1 =
+    array_pool.fresh_string(index_type, char_type);
+  const array_string_exprt sub2 =
+    array_pool.fresh_string(index_type, char_type);
   const exprt return_code1 = add_axioms_for_substring(
     sub1, str, from_integer(0, str.length().type()), start);
   const exprt return_code2 =

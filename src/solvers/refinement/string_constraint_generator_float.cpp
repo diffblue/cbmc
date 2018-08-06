@@ -201,7 +201,7 @@ exprt string_constraint_generatort::add_axioms_for_string_of_float(
   // fractional_part is floor(f * 100000) % 100000
   const mod_exprt fractional_part(shifted, max_non_exponent_notation);
   const array_string_exprt fractional_part_str =
-    fresh_string(index_type, char_type);
+    array_pool.fresh_string(index_type, char_type);
   const exprt return_code1 =
     add_axioms_for_fractional_part(fractional_part_str, fractional_part, 6);
 
@@ -212,7 +212,7 @@ exprt string_constraint_generatort::add_axioms_for_string_of_float(
   // We should not need more than 8 characters to represent the integer
   // part of the float.
   const array_string_exprt integer_part_str =
-    fresh_string(index_type, char_type);
+    array_pool.fresh_string(index_type, char_type);
   const exprt return_code2 =
     add_axioms_for_string_of_int(integer_part_str, integer_part, 8);
 
@@ -422,7 +422,7 @@ exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
   dec_significand_int=round_expr_to_zero(dec_significand);
 
   array_string_exprt string_expr_integer_part =
-    fresh_string(index_type, char_type);
+    array_pool.fresh_string(index_type, char_type);
   exprt return_code1 = add_axioms_for_string_of_int(
     string_expr_integer_part, dec_significand_int, 3);
   minus_exprt fractional_part(
@@ -442,30 +442,31 @@ exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
     shifted_float, max_non_exponent_notation);
 
   array_string_exprt string_fractional_part =
-    fresh_string(index_type, char_type);
+    array_pool.fresh_string(index_type, char_type);
   const exprt return_code2 = add_axioms_for_fractional_part(
     string_fractional_part, fractional_part_shifted, 6);
 
   // string_expr_with_fractional_part =
   //   concat(string_with_do, string_fractional_part)
   const array_string_exprt string_expr_with_fractional_part =
-    fresh_string(index_type, char_type);
+    array_pool.fresh_string(index_type, char_type);
   const exprt return_code3 = add_axioms_for_concat(
     string_expr_with_fractional_part,
     string_expr_integer_part,
     string_fractional_part);
 
   // string_expr_with_E = concat(string_fraction, string_lit_E)
-  const array_string_exprt stringE = fresh_string(index_type, char_type);
+  const array_string_exprt stringE =
+    array_pool.fresh_string(index_type, char_type);
   const exprt return_code4 = add_axioms_for_constant(stringE, "E");
   const array_string_exprt string_expr_with_E =
-    fresh_string(index_type, char_type);
+    array_pool.fresh_string(index_type, char_type);
   const exprt return_code5 = add_axioms_for_concat(
     string_expr_with_E, string_expr_with_fractional_part, stringE);
 
   // exponent_string = string_of_int(decimal_exponent)
   const array_string_exprt exponent_string =
-    fresh_string(index_type, char_type);
+    array_pool.fresh_string(index_type, char_type);
   const exprt return_code6 =
     add_axioms_for_string_of_int(exponent_string, decimal_exponent, 3);
 
