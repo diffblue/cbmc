@@ -246,6 +246,39 @@ exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   return add_axioms_for_to_lower_case(res, str);
 }
 
+/// Expression which is true for uppercase characters of the Basic Latin and
+/// Latin-1 supplement of unicode.
+static exprt is_upper_case(const exprt &character)
+{
+  const exprt char_A = from_integer('A', character.type());
+  const exprt char_Z = from_integer('Z', character.type());
+  exprt::operandst upper_case;
+  // Characters between 'A' and 'Z' are upper-case
+  upper_case.push_back(
+    and_exprt(
+      binary_relation_exprt(char_A, ID_le, character),
+      binary_relation_exprt(character, ID_le, char_Z)));
+
+  // Characters between 0xc0 (latin capital A with grave)
+  // and 0xd6 (latin capital O with diaeresis) are upper-case
+  upper_case.push_back(
+    and_exprt(
+      binary_relation_exprt(
+        from_integer(0xc0, character.type()), ID_le, character),
+      binary_relation_exprt(
+        character, ID_le, from_integer(0xd6, character.type()))));
+
+  // Characters between 0xd8 (latin capital O with stroke)
+  // and 0xde (latin capital thorn) are upper-case
+  upper_case.push_back(
+    and_exprt(
+      binary_relation_exprt(
+        from_integer(0xd8, character.type()), ID_le, character),
+      binary_relation_exprt(
+        character, ID_le, from_integer(0xde, character.type()))));
+  return disjunction(upper_case);
+}
+
 /// Add axioms ensuring `res` corresponds to `str` in which uppercase characters
 /// have been converted to lowercase.
 /// These axioms are:
@@ -274,33 +307,6 @@ exprt string_constraint_generatort::add_axioms_for_to_lower_case(
 
   constraints.push_back([&] {
     const symbol_exprt idx = fresh_univ_index("QA_lower_case", index_type);
-
-    const exprt is_upper_case = disjunction([&] {
-      exprt::operandst upper_case;
-      // Characters between 'A' and 'Z' are upper-case
-      upper_case.push_back(
-        and_exprt(
-          binary_relation_exprt(char_A, ID_le, str[idx]),
-          binary_relation_exprt(str[idx], ID_le, char_Z)));
-
-      // Characters between 0xc0 (latin capital A with grave)
-      // and 0xd6 (latin capital O with diaeresis) are upper-case
-      upper_case.push_back(
-        and_exprt(
-          binary_relation_exprt(from_integer(0xc0, char_type), ID_le, str[idx]),
-          binary_relation_exprt(
-            str[idx], ID_le, from_integer(0xd6, char_type))));
-
-      // Characters between 0xd8 (latin capital O with stroke)
-      // and 0xde (latin capital thorn) are upper-case
-      upper_case.push_back(
-        and_exprt(
-          binary_relation_exprt(from_integer(0xd8, char_type), ID_le, str[idx]),
-          binary_relation_exprt(
-            str[idx], ID_le, from_integer(0xde, char_type))));
-      return upper_case;
-    }());
-
     const exprt conditional_convert = [&] {
       // The difference between upper-case and lower-case for the basic latin and
       // latin-1 supplement is 0x20.
@@ -309,7 +315,7 @@ exprt string_constraint_generatort::add_axioms_for_to_lower_case(
       const exprt non_converted = and_exprt(
         equal_exprt(res[idx], str[idx]),
         binary_relation_exprt(str[idx], ID_lt, from_integer(0x100, char_type)));
-      return if_exprt(is_upper_case, converted, non_converted);
+      return if_exprt(is_upper_case(str[idx]), converted, non_converted);
     }();
 
     return string_constraintt(
