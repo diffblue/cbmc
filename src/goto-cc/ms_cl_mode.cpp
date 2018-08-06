@@ -118,6 +118,16 @@ int ms_cl_modet::doit()
       compiler.output_file_object = Fo_value;
   }
 
+  if(
+    compiler.mode == compilet::COMPILE_ONLY &&
+    cmdline.args.size() > 1 &&
+    compiler.output_directory_object.empty())
+  {
+    error() << "output directory required for /c with multiple input files"
+            << eom;
+    return EX_USAGE;
+  }
+
   if(cmdline.isset("Fe"))
   {
     compiler.output_file_executable=cmdline.get_value("Fe");
