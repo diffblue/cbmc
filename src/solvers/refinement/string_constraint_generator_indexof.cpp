@@ -41,7 +41,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 {
   const typet &index_type=str.length().type();
   symbol_exprt index = fresh_symbol("index_of", index_type);
-  symbol_exprt contains=fresh_boolean("contains_in_index_of");
+  symbol_exprt contains = fresh_symbol("contains_in_index_of");
 
   exprt minus1=from_integer(-1, index_type);
   and_exprt a1(
@@ -111,7 +111,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
 {
   const typet &index_type=haystack.length().type();
   symbol_exprt offset = fresh_symbol("index_of", index_type);
-  symbol_exprt contains=fresh_boolean("contains_substring");
+  symbol_exprt contains = fresh_symbol("contains_substring");
 
   implies_exprt a1(
     contains,
@@ -203,7 +203,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
 {
   const typet &index_type=haystack.length().type();
   symbol_exprt offset = fresh_symbol("index_of", index_type);
-  symbol_exprt contains=fresh_boolean("contains_substring");
+  symbol_exprt contains = fresh_symbol("contains_substring");
 
   implies_exprt a1(
     contains,
@@ -337,7 +337,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
 {
   const typet &index_type = str.length().type();
   const symbol_exprt index = fresh_symbol("last_index_of", index_type);
-  const symbol_exprt contains = fresh_boolean("contains_in_last_index_of");
+  const symbol_exprt contains = fresh_symbol("contains_in_last_index_of");
 
   const exprt minus1 = from_integer(-1, index_type);
   const and_exprt a1(

@@ -34,7 +34,7 @@ exprt string_constraint_generatort::add_axioms_for_equals(
 
   array_string_exprt s1 = get_string_expr(f.arguments()[0]);
   array_string_exprt s2 = get_string_expr(f.arguments()[1]);
-  symbol_exprt eq=fresh_boolean("equal");
+  symbol_exprt eq = fresh_symbol("equal");
   typecast_exprt tc_eq(eq, f.type());
 
   typet index_type=s1.length().type();
@@ -126,7 +126,7 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
 {
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
-  const symbol_exprt eq = fresh_boolean("equal_ignore_case");
+  const symbol_exprt eq = fresh_symbol("equal_ignore_case");
   const array_string_exprt s1 = get_string_expr(f.arguments()[0]);
   const array_string_exprt s2 = get_string_expr(f.arguments()[1]);
   const typet char_type = s1.content().type().subtype();

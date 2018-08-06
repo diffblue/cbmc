@@ -68,15 +68,6 @@ operator()(const irep_idt &prefix, const typet &type)
   return symbol_exprt(name, type);
 }
 
-/// generate a Boolean symbol which is existentially quantified
-/// \par parameters: a prefix
-/// \return a symbol of index type whose name starts with the prefix
-symbol_exprt string_constraint_generatort::fresh_boolean(
-  const irep_idt &prefix)
-{
-  return fresh_symbol(prefix, bool_typet());
-}
-
 exprt sum_overflows(const plus_exprt &sum)
 {
   PRECONDITION(sum.operands().size() == 2);

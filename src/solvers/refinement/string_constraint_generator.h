@@ -169,7 +169,6 @@ public:
     const array_string_exprt &expr);
 
 private:
-  symbol_exprt fresh_boolean(const irep_idt &prefix);
   array_string_exprt get_string_expr(const exprt &expr);
 
   const array_string_exprt &
