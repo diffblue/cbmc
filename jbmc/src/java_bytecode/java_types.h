@@ -280,16 +280,21 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_type<java_method_typet>(const typet &type)
+{
+  return type.id() == ID_code && type.get_bool(ID_C_java_method_type);
+}
+
 inline const java_method_typet &to_java_method_type(const typet &type)
 {
-  PRECONDITION(type.id() == ID_code);
+  PRECONDITION(can_cast_type<java_method_typet>(type));
   return static_cast<const java_method_typet &>(type);
 }
 
 inline java_method_typet &to_java_method_type(typet &type)
 {
-  PRECONDITION(type.id() == ID_code);
-  type.set(ID_C_java_method_type, true);
+  PRECONDITION(can_cast_type<java_method_typet>(type));
   return static_cast<java_method_typet &>(type);
 }
 
