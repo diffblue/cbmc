@@ -371,7 +371,6 @@ private:
   exprt associate_length_to_array(const function_application_exprt &f);
 
   // Helper functions
-  static exprt int_of_hex_char(const exprt &chr);
   static exprt is_high_surrogate(const exprt &chr);
   static exprt is_low_surrogate(const exprt &chr);
   static exprt character_equals_ignore_case(
