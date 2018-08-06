@@ -505,10 +505,9 @@ exprt string_constraint_generatort::add_axioms_for_length(
   return str.length();
 }
 
-/// expression true exactly when the index is positive
-/// \param x: an index expression
-/// \return a Boolean expression
-exprt string_constraint_generatort::axiom_for_is_positive_index(const exprt &x)
+/// \param x: an expression
+/// \return a Boolean expression true exactly when `x` is positive
+exprt is_positive(const exprt &x)
 {
   return binary_relation_exprt(x, ID_ge, from_integer(0, x.type()));
 }

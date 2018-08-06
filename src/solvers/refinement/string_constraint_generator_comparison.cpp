@@ -190,7 +190,7 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
       equal_exprt(it.first.length(), str.length()),
       and_exprt(
         notequal_exprt(str[i], it.first[i]),
-        and_exprt(str.axiom_for_length_gt(i), axiom_for_is_positive_index(i))));
+        and_exprt(str.axiom_for_length_gt(i), is_positive(i))));
     lemmas.push_back(or_exprt(c1, or_exprt(c2, c3)));
   }
   return hash;
@@ -316,9 +316,7 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
               equal_exprt(str.length(), it.first.length()),
               and_exprt(
                 notequal_exprt(str[i], it.first[i]),
-                and_exprt(
-                  str.axiom_for_length_gt(i),
-                  axiom_for_is_positive_index(i)))))));
+                and_exprt(str.axiom_for_length_gt(i), is_positive(i)))))));
     }
 
   return intern;

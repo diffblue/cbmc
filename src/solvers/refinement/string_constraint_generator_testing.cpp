@@ -62,7 +62,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   lemmas.push_back([&] {
     const exprt witness = fresh_symbol("witness_not_isprefix", index_type);
     const exprt strings_differ_at_witness = and_exprt(
-      axiom_for_is_positive_index(witness),
+      is_positive(witness),
       prefix.axiom_for_length_gt(witness),
       notequal_exprt(str[plus_exprt(witness, offset)], prefix[witness]));
     const exprt s1_does_not_start_with_s0 = or_exprt(
@@ -182,9 +182,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
       equal_exprt(witness, from_integer(-1, index_type))),
     and_exprt(
       notequal_exprt(s0[witness], s1[shifted]),
-      and_exprt(
-        s0.axiom_for_length_gt(witness),
-        axiom_for_is_positive_index(witness))));
+      and_exprt(s0.axiom_for_length_gt(witness), is_positive(witness))));
   implies_exprt a3(not_exprt(issuffix), constr3);
 
   lemmas.push_back(a3);
@@ -225,8 +223,7 @@ exprt string_constraint_generatort::add_axioms_for_contains(
 
   minus_exprt length_diff(s0.length(), s1.length());
   and_exprt bounds(
-    axiom_for_is_positive_index(startpos),
-    binary_relation_exprt(startpos, ID_le, length_diff));
+    is_positive(startpos), binary_relation_exprt(startpos, ID_le, length_diff));
   implies_exprt a2(contains, bounds);
   lemmas.push_back(a2);
 

@@ -174,8 +174,6 @@ private:
   const array_string_exprt &
   char_array_of_pointer(const exprt &pointer, const exprt &length);
 
-  exprt axiom_for_is_positive_index(const exprt &x);
-
   void add_constraint_on_characters(
     const array_string_exprt &s,
     const exprt &start,
@@ -414,6 +412,8 @@ size_t max_printed_string_length(const typet &type, unsigned long ul_radix);
 
 std::string
 utf16_constant_array_to_java(const array_exprt &arr, std::size_t length);
+
+exprt is_positive(const exprt &x);
 
 /// \return expression representing the minimum of two expressions
 exprt minimum(const exprt &a, const exprt &b);
