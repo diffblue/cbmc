@@ -542,7 +542,7 @@ void rw_range_sett::get_objects_rec(
     {
       range_spect range_end=size==-1 ? -1 : range_start+size;
       if(size!=-1 && full_size!=-1)
-        range_end=std::max(range_end, full_size);
+        range_end=std::min(range_end, full_size);
 
       add(mode, identifier, range_start, range_end);
     }
