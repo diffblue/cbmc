@@ -191,6 +191,11 @@ exprt string_set_char_builtin_functiont::length_constraint() const
 
 static bool eval_is_upper_case(const mp_integer &c)
 {
+  // Characters between 'A' and 'Z' are upper-case
+  // Characters between 0xc0 (latin capital A with grave)
+  // and 0xd6 (latin capital O with diaeresis) are upper-case
+  // Characters between 0xd8 (latin capital O with stroke)
+  // and 0xde (latin capital thorn) are upper-case
   return ('A' <= c && c <= 'Z') || (0xc0 <= c && c <= 0xd6) ||
          (0xd8 <= c && c <= 0xde);
 }
