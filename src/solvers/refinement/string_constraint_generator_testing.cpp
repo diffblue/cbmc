@@ -104,9 +104,9 @@ string_constraint_generatort::add_axioms_for_is_prefix(
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   PRECONDITION(args.size() == 2 || args.size() == 3);
   const array_string_exprt &s0 =
-    get_string_expr(args[swap_arguments ? 1u : 0u]);
+    get_string_expr(array_pool, args[swap_arguments ? 1u : 0u]);
   const array_string_exprt &s1 =
-    get_string_expr(args[swap_arguments ? 0u : 1u]);
+    get_string_expr(array_pool, args[swap_arguments ? 0u : 1u]);
   const exprt offset =
     args.size() == 2 ? from_integer(0, s0.length().type()) : args[2];
   auto pair = add_axioms_for_is_prefix(fresh_symbol, s0, s1, offset);
@@ -131,7 +131,7 @@ string_constraint_generatort::add_axioms_for_is_empty(
   // a2 : s0 => is_empty
 
   symbol_exprt is_empty = fresh_symbol("is_empty");
-  array_string_exprt s0 = get_string_expr(f.arguments()[0]);
+  array_string_exprt s0 = get_string_expr(array_pool, f.arguments()[0]);
   std::vector<exprt> constraints;
   constraints.push_back(implies_exprt(is_empty, s0.axiom_for_has_length(0)));
   constraints.push_back(implies_exprt(s0.axiom_for_has_length(0), is_empty));
@@ -173,9 +173,9 @@ string_constraint_generatort::add_axioms_for_is_suffix(
   symbol_exprt issuffix = fresh_symbol("issuffix");
   typecast_exprt tc_issuffix(issuffix, f.type());
   const array_string_exprt &s0 =
-    get_string_expr(args[swap_arguments ? 1u : 0u]);
+    get_string_expr(array_pool, args[swap_arguments ? 1u : 0u]);
   const array_string_exprt &s1 =
-    get_string_expr(args[swap_arguments ? 0u : 1u]);
+    get_string_expr(array_pool, args[swap_arguments ? 0u : 1u]);
   const typet &index_type=s0.length().type();
 
   implies_exprt a1(issuffix, s1.axiom_for_length_ge(s0.length()));
@@ -230,8 +230,8 @@ string_constraint_generatort::add_axioms_for_contains(
   PRECONDITION(f.arguments().size() == 2);
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   string_constraintst constraints;
-  const array_string_exprt s0 = get_string_expr(f.arguments()[0]);
-  const array_string_exprt s1 = get_string_expr(f.arguments()[1]);
+  const array_string_exprt s0 = get_string_expr(array_pool, f.arguments()[0]);
+  const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[1]);
   const typet &index_type = s0.length().type();
   const symbol_exprt contains = fresh_symbol("contains");
   const symbol_exprt startpos = fresh_symbol("startpos_contains", index_type);

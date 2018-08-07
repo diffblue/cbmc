@@ -202,12 +202,11 @@ exprt string_constraint_generatort::associate_length_to_array(
 /// string_exprt in the case of a symbol.
 /// \param expr: an expression of refined string type
 /// \return a string expression
-array_string_exprt
-string_constraint_generatort::get_string_expr(const exprt &expr)
+array_string_exprt get_string_expr(array_poolt &pool, const exprt &expr)
 {
   PRECONDITION(is_refined_string_type(expr.type()));
   const refined_string_exprt &str = to_string_expr(expr);
-  return char_array_of_pointer(array_pool, str.content(), str.length());
+  return char_array_of_pointer(pool, str.content(), str.length());
 }
 
 void string_constraintst::clear()
@@ -479,7 +478,7 @@ string_constraint_generatort::add_axioms_for_copy(
   PRECONDITION(args.size() == 3 || args.size() == 5);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, args[1], args[0]);
-  const array_string_exprt str = get_string_expr(args[2]);
+  const array_string_exprt str = get_string_expr(array_pool, args[2]);
   const typet &index_type = str.length().type();
   const exprt offset = args.size() == 3 ? from_integer(0, index_type) : args[3];
   const exprt count = args.size() == 3 ? str.length() : args[4];
@@ -498,7 +497,7 @@ string_constraint_generatort::add_axioms_for_length(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 1);
-  const array_string_exprt str = get_string_expr(f.arguments()[0]);
+  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   return {str.length(), {}};
 }
 
@@ -555,7 +554,7 @@ string_constraint_generatort::add_axioms_for_char_at(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
-  array_string_exprt str = get_string_expr(f.arguments()[0]);
+  array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   symbol_exprt char_sym = fresh_symbol("char", str.type().subtype());
   const exprt constraint = equal_exprt(char_sym, str[f.arguments()[1]]);
   return {char_sym, {{constraint}}};

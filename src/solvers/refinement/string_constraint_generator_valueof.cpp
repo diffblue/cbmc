@@ -535,7 +535,7 @@ string_constraint_generatort::add_axioms_for_parse_int(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size()==1 || f.arguments().size()==2);
-  const array_string_exprt str = get_string_expr(f.arguments()[0]);
+  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   const typet &type=f.type();
   PRECONDITION(type.id()==ID_signedbv);
   const exprt radix=f.arguments().size()==1?

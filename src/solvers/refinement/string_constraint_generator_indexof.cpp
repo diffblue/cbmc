@@ -294,7 +294,7 @@ string_constraint_generatort::add_axioms_for_index_of(
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);
-  const array_string_exprt str = get_string_expr(args[0]);
+  const array_string_exprt str = get_string_expr(array_pool, args[0]);
   const exprt &c=args[1];
   const typet &index_type = str.length().type();
   const typet &char_type = str.content().type().subtype();
@@ -313,7 +313,7 @@ string_constraint_generatort::add_axioms_for_index_of(
       is_refined_string_type(c.type()),
       string_refinement_invariantt("c can only be a (un)signedbv or a refined "
         "string and the (un)signedbv case is already handled"));
-    array_string_exprt sub = get_string_expr(c);
+    array_string_exprt sub = get_string_expr(array_pool, c);
     return add_axioms_for_index_of_string(fresh_symbol, str, sub, from_index);
   }
 }
@@ -416,7 +416,7 @@ string_constraint_generatort::add_axioms_for_last_index_of(
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);
-  const array_string_exprt str = get_string_expr(args[0]);
+  const array_string_exprt str = get_string_expr(array_pool, args[0]);
   const exprt c = args[1];
   const typet &index_type = str.length().type();
   const typet &char_type = str.content().type().subtype();
@@ -431,7 +431,7 @@ string_constraint_generatort::add_axioms_for_last_index_of(
   }
   else
   {
-    const array_string_exprt sub = get_string_expr(c);
+    const array_string_exprt sub = get_string_expr(array_pool, c);
     return add_axioms_for_last_index_of_string(
       fresh_symbol, str, sub, from_index);
   }

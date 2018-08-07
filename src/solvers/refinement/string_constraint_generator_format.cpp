@@ -294,7 +294,9 @@ string_constraint_generatort::add_axioms_for_format_specifier(
       fresh_symbol, res, get_component_in_struct(arg, ID_boolean));
     return {res, std::move(return_code.second)};
   case format_specifiert::STRING:
-    return {get_string_expr(get_component_in_struct(arg, "string_expr")), {}};
+    return {
+      get_string_expr(array_pool, get_component_in_struct(arg, "string_expr")),
+      {}};
   case format_specifiert::HASHCODE:
     return_code = add_axioms_for_string_of_int(
       fresh_symbol, res, get_component_in_struct(arg, "hashcode"));
@@ -484,7 +486,7 @@ string_constraint_generatort::add_axioms_for_format(
   PRECONDITION(f.arguments().size() >= 3);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  const array_string_exprt s1 = get_string_expr(f.arguments()[2]);
+  const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   unsigned int length;
 
   if(s1.length().id()==ID_constant &&

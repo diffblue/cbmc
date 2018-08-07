@@ -95,6 +95,8 @@ const array_string_exprt &char_array_of_pointer(
   const exprt &pointer,
   const exprt &length);
 
+array_string_exprt get_string_expr(array_poolt &pool, const exprt &expr);
+
 /// Collection of constraints of different types: existential formulas,
 /// universal formulas, and "not contains" (universal with one alternation).
 struct string_constraintst final
@@ -187,8 +189,6 @@ public:
     const array_string_exprt &expr);
 
 private:
-  array_string_exprt get_string_expr(const exprt &expr);
-
   string_constraintst add_constraint_on_characters(
     const array_string_exprt &s,
     const exprt &start,

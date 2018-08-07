@@ -41,7 +41,7 @@ string_constraint_generatort::add_axioms_for_set_length(
   string_constraintst constraints;
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  const array_string_exprt s1 = get_string_expr(f.arguments()[2]);
+  const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   const exprt &k = f.arguments()[3];
   const typet &index_type = s1.length().type();
   const typet &char_type = s1.content().type().subtype();
@@ -97,7 +97,7 @@ string_constraint_generatort::add_axioms_for_substring(
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(args.size() == 4 || args.size() == 5);
-  const array_string_exprt str = get_string_expr(args[2]);
+  const array_string_exprt str = get_string_expr(array_pool, args[2]);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, args[1], args[0]);
   const exprt &i = args[3];
@@ -184,7 +184,7 @@ string_constraint_generatort::add_axioms_for_trim(
 {
   PRECONDITION(f.arguments().size() == 3);
   string_constraintst constraints;
-  const array_string_exprt &str = get_string_expr(f.arguments()[2]);
+  const array_string_exprt &str = get_string_expr(array_pool, f.arguments()[2]);
   const array_string_exprt &res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   const typet &index_type = str.length().type();
@@ -259,7 +259,7 @@ string_constraint_generatort::add_axioms_for_to_lower_case(
   string_constraintst constraints;
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  const array_string_exprt str = get_string_expr(f.arguments()[2]);
+  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
   return add_axioms_for_to_lower_case(res, str);
 }
 
@@ -410,7 +410,7 @@ string_constraint_generatort::add_axioms_for_to_upper_case(
   PRECONDITION(f.arguments().size() == 3);
   array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  array_string_exprt str = get_string_expr(f.arguments()[2]);
+  array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
   return add_axioms_for_to_upper_case(fresh_symbol, res, str);
 }
 
@@ -425,7 +425,7 @@ string_constraint_generatort::add_axioms_for_char_set(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 5);
-  const array_string_exprt str = get_string_expr(f.arguments()[2]);
+  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   const exprt &position = f.arguments()[3];
@@ -534,13 +534,13 @@ string_constraint_generatort::add_axioms_for_replace(
 {
   PRECONDITION(f.arguments().size() == 5);
   string_constraintst constraints;
-  array_string_exprt str = get_string_expr(f.arguments()[2]);
+  array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
   array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   if(
     const auto maybe_chars =
       to_char_pair(f.arguments()[3], f.arguments()[4], [this](const exprt &e) {
-        return get_string_expr(e);
+        return get_string_expr(array_pool, e);
       }))
   {
     const auto old_char=maybe_chars->first;
@@ -575,7 +575,7 @@ string_constraint_generatort::add_axioms_for_delete_char_at(
   PRECONDITION(f.arguments().size() == 4);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  const array_string_exprt str = get_string_expr(f.arguments()[2]);
+  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
   exprt index_one=from_integer(1, str.length().type());
   return add_axioms_for_delete(
     fresh_symbol,
@@ -643,7 +643,7 @@ string_constraint_generatort::add_axioms_for_delete(
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  const array_string_exprt arg = get_string_expr(f.arguments()[2]);
+  const array_string_exprt arg = get_string_expr(array_pool, f.arguments()[2]);
   return add_axioms_for_delete(
     fresh_symbol, res, arg, f.arguments()[3], f.arguments()[4]);
 }
