@@ -524,9 +524,8 @@ void string_dependenciest::add_constraints(
     if(test_dependencies.count(nodet(node)))
     {
       const auto &builtin = builtin_function_nodes[node.index];
-      const exprt return_value = builtin.data->add_constraints(generator);
-      generator.constraints.existential.push_back(
-        equal_exprt(return_value, builtin.data->return_code));
+      string_constraintst constraints = builtin.data->constraints(generator);
+      merge(generator.constraints, std::move(constraints));
     }
     else
       generator.constraints.existential.push_back(

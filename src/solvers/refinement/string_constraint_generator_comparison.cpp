@@ -26,12 +26,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param f: function application with arguments refined_string `s1` and
 ///           refined_string `s2`
 /// \return Boolean expression `eq`
-exprt string_constraint_generatort::add_axioms_for_equals(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_equals(
   const function_application_exprt &f)
 {
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
 
+  string_constraintst constraints;
   array_string_exprt s1 = get_string_expr(f.arguments()[0]);
   array_string_exprt s2 = get_string_expr(f.arguments()[1]);
   symbol_exprt eq = fresh_symbol("equal");
@@ -67,7 +69,7 @@ exprt string_constraint_generatort::add_axioms_for_equals(
     return implies_exprt(not_exprt(eq), or_exprt(diff_length, witnessing));
   }());
 
-  return tc_eq;
+  return {tc_eq, std::move(constraints)};
 }
 
 /// Returns an expression which is true when the two given characters are equal
@@ -122,11 +124,13 @@ static exprt character_equals_ignore_case(
 /// \param f: function application with arguments refined_string `s1` and
 ///           refined_string `s2`
 /// \return Boolean expression `eq`
-exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_equals_ignore_case(
   const function_application_exprt &f)
 {
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
+  string_constraintst constraints;
   const symbol_exprt eq = fresh_symbol("equal_ignore_case");
   const array_string_exprt s1 = get_string_expr(f.arguments()[0]);
   const array_string_exprt s2 = get_string_expr(f.arguments()[1]);
@@ -162,7 +166,7 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
       and_exprt(bound_witness, witness_diff)));
   constraints.existential.push_back(a3);
 
-  return typecast_exprt(eq, f.type());
+  return {typecast_exprt(eq, f.type()), std::move(constraints)};
 }
 
 /// Value that is identical for strings with the same content
@@ -174,10 +178,12 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
 ///       \lor (|str|=|s| \land \exists i<|s|.\ s[i]\ne str[i]) \f$
 /// \param f: function application with argument refined_string `str`
 /// \return integer expression `hash(str)`
-exprt string_constraint_generatort::add_axioms_for_hash_code(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_hash_code(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 1);
+  string_constraintst constraints;
   const array_string_exprt str = get_string_expr(f.arguments()[0]);
   const typet &return_type = f.type();
   const typet &index_type = str.length().type();
@@ -198,7 +204,7 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
         and_exprt(str.axiom_for_length_gt(i), is_positive(i))));
     constraints.existential.push_back(or_exprt(c1, or_exprt(c2, c3)));
   }
-  return hash;
+  return {hash, std::move(constraints)};
 }
 
 /// Lexicographic comparison of two strings
@@ -220,12 +226,14 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
 /// \param f: function application with arguments refined_string `s1`
 ///           and refined_string `s2`
 /// \return integer expression `res`
-exprt string_constraint_generatort::add_axioms_for_compare_to(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_compare_to(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
   const typet &return_type=f.type();
   PRECONDITION(return_type.id() == ID_signedbv);
+  string_constraintst constraints;
   const array_string_exprt &s1 = get_string_expr(f.arguments()[0]);
   const array_string_exprt &s2 = get_string_expr(f.arguments()[1]);
   const symbol_exprt res = fresh_symbol("compare_to", return_type);
@@ -275,7 +283,7 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
     implies_exprt(not_exprt(res_null), equal_exprt(s1[i2], s2[i2])));
   constraints.universal.push_back(a4);
 
-  return res;
+  return {res, std::move(constraints)};
 }
 
 /// Add axioms stating that the return value for two equal string should be the
@@ -284,10 +292,12 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
 /// \param f: function application with one string argument
 /// \return a string expression
 DEPRECATED("never tested")
-symbol_exprt string_constraint_generatort::add_axioms_for_intern(
+std::pair<symbol_exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_intern(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 1);
+  string_constraintst constraints;
   const array_string_exprt str = get_string_expr(f.arguments()[0]);
   // For now we only enforce content equality and not pointer equality
   const typet &return_type=f.type();
@@ -324,5 +334,5 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
                 and_exprt(str.axiom_for_length_gt(i), is_positive(i)))))));
     }
 
-  return intern;
+  return {intern, std::move(constraints)};
 }

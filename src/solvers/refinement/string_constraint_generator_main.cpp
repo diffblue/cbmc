@@ -246,7 +246,7 @@ void merge(string_constraintst &result, string_constraintst other)
 ///        the set of characters that are between `low_char` and `high_char`.
 /// \return a string expression that is linked to the argument through axioms
 ///   that are added to the list
-void string_constraint_generatort::add_constraint_on_characters(
+string_constraintst string_constraint_generatort::add_constraint_on_characters(
   const array_string_exprt &s,
   const exprt &start,
   const exprt &end,
@@ -266,7 +266,7 @@ void string_constraint_generatort::add_constraint_on_characters(
     binary_relation_exprt(chr, ID_le, from_integer(high_char, chr.type())));
   const string_constraintt sc(
     qvar, zero_if_negative(start), zero_if_negative(end), char_in_set);
-  constraints.universal.push_back(sc);
+  return {{}, {sc}, {}};
 }
 
 /// Add axioms to ensure all characters of a string belong to a given set.
@@ -279,20 +279,23 @@ void string_constraint_generatort::add_constraint_on_characters(
 ///           pointer `&s[0]`, string `char_set_string`,
 ///           optional integers `start` and `end`
 /// \return integer expression whose value is zero
-exprt string_constraint_generatort::add_axioms_for_constrain_characters(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_constrain_characters(
   const function_application_exprt &f)
 {
   const auto &args = f.arguments();
   PRECONDITION(3 <= args.size() && args.size() <= 5);
   PRECONDITION(args[2].type().id() == ID_string);
   PRECONDITION(args[2].id() == ID_constant);
+
   const array_string_exprt s = char_array_of_pointer(args[1], args[0]);
   const irep_idt &char_set_string = to_constant_expr(args[2]).get_value();
   const exprt &start =
     args.size() >= 4 ? args[3] : from_integer(0, s.length().type());
   const exprt &end = args.size() >= 5 ? args[4] : s.length();
-  add_constraint_on_characters(s, start, end, char_set_string.c_str());
-  return from_integer(0, get_return_code_type());
+  auto constraints =
+    add_constraint_on_characters(s, start, end, char_set_string.c_str());
+  return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
 /// Creates a new array if the pointer is not pointing to an array
@@ -346,106 +349,106 @@ optionalt<exprt> string_constraint_generatort::make_array_pointer_association(
 /// the result corresponds to the function application.
 /// \par parameters: an expression containing a function application
 /// \return expression corresponding to the result of the function application
-exprt string_constraint_generatort::add_axioms_for_function_application(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_function_application(
   const function_application_exprt &expr)
 {
   const irep_idt &id = get_function_name(expr);
-  exprt res;
 
   if(id==ID_cprover_char_literal_func)
-    res=add_axioms_for_char_literal(expr);
+    return add_axioms_for_char_literal(expr);
   else if(id==ID_cprover_string_length_func)
-    res=add_axioms_for_length(expr);
+    return add_axioms_for_length(expr);
   else if(id==ID_cprover_string_equal_func)
-    res=add_axioms_for_equals(expr);
+    return add_axioms_for_equals(expr);
   else if(id==ID_cprover_string_equals_ignore_case_func)
-    res=add_axioms_for_equals_ignore_case(expr);
+    return add_axioms_for_equals_ignore_case(expr);
   else if(id==ID_cprover_string_is_empty_func)
-    res=add_axioms_for_is_empty(expr);
+    return add_axioms_for_is_empty(expr);
   else if(id==ID_cprover_string_char_at_func)
-    res=add_axioms_for_char_at(expr);
+    return add_axioms_for_char_at(expr);
   else if(id==ID_cprover_string_is_prefix_func)
-    res=add_axioms_for_is_prefix(expr);
+    return add_axioms_for_is_prefix(expr);
   else if(id==ID_cprover_string_is_suffix_func)
-    res=add_axioms_for_is_suffix(expr);
+    return add_axioms_for_is_suffix(expr);
   else if(id==ID_cprover_string_startswith_func)
-    res=add_axioms_for_is_prefix(expr, true);
+    return add_axioms_for_is_prefix(expr, true);
   else if(id==ID_cprover_string_endswith_func)
-    res=add_axioms_for_is_suffix(expr, true);
+    return add_axioms_for_is_suffix(expr, true);
   else if(id==ID_cprover_string_contains_func)
-    res=add_axioms_for_contains(expr);
+    return add_axioms_for_contains(expr);
   else if(id==ID_cprover_string_hash_code_func)
-    res=add_axioms_for_hash_code(expr);
+    return add_axioms_for_hash_code(expr);
   else if(id==ID_cprover_string_index_of_func)
-    res=add_axioms_for_index_of(expr);
+    return add_axioms_for_index_of(expr);
   else if(id==ID_cprover_string_last_index_of_func)
-    res=add_axioms_for_last_index_of(expr);
+    return add_axioms_for_last_index_of(expr);
   else if(id==ID_cprover_string_parse_int_func)
-    res=add_axioms_for_parse_int(expr);
+    return add_axioms_for_parse_int(expr);
   else if(id==ID_cprover_string_code_point_at_func)
-    res=add_axioms_for_code_point_at(expr);
+    return add_axioms_for_code_point_at(expr);
   else if(id==ID_cprover_string_code_point_before_func)
-    res=add_axioms_for_code_point_before(expr);
+    return add_axioms_for_code_point_before(expr);
   else if(id==ID_cprover_string_code_point_count_func)
-    res=add_axioms_for_code_point_count(expr);
+    return add_axioms_for_code_point_count(expr);
   else if(id==ID_cprover_string_offset_by_code_point_func)
-    res=add_axioms_for_offset_by_code_point(expr);
+    return add_axioms_for_offset_by_code_point(expr);
   else if(id==ID_cprover_string_compare_to_func)
-    res=add_axioms_for_compare_to(expr);
+    return add_axioms_for_compare_to(expr);
   else if(id==ID_cprover_string_literal_func)
-    res=add_axioms_from_literal(expr);
+    return add_axioms_from_literal(expr);
   else if(id==ID_cprover_string_concat_code_point_func)
-    res=add_axioms_for_concat_code_point(expr);
+    return add_axioms_for_concat_code_point(expr);
   else if(id==ID_cprover_string_insert_func)
-    res=add_axioms_for_insert(expr);
+    return add_axioms_for_insert(expr);
   else if(id==ID_cprover_string_insert_int_func)
-    res=add_axioms_for_insert_int(expr);
+    return add_axioms_for_insert_int(expr);
   else if(id==ID_cprover_string_insert_long_func)
-    res = add_axioms_for_insert_int(expr);
+    return add_axioms_for_insert_int(expr);
   else if(id==ID_cprover_string_insert_bool_func)
-    res=add_axioms_for_insert_bool(expr);
+    return add_axioms_for_insert_bool(expr);
   else if(id==ID_cprover_string_insert_char_func)
-    res=add_axioms_for_insert_char(expr);
+    return add_axioms_for_insert_char(expr);
   else if(id==ID_cprover_string_insert_double_func)
-    res=add_axioms_for_insert_double(expr);
+    return add_axioms_for_insert_double(expr);
   else if(id==ID_cprover_string_insert_float_func)
-    res=add_axioms_for_insert_float(expr);
+    return add_axioms_for_insert_float(expr);
   else if(id==ID_cprover_string_substring_func)
-    res=add_axioms_for_substring(expr);
+    return add_axioms_for_substring(expr);
   else if(id==ID_cprover_string_trim_func)
-    res=add_axioms_for_trim(expr);
+    return add_axioms_for_trim(expr);
   else if(id==ID_cprover_string_empty_string_func)
-    res=add_axioms_for_empty_string(expr);
+    return add_axioms_for_empty_string(expr);
   else if(id==ID_cprover_string_copy_func)
-    res=add_axioms_for_copy(expr);
+    return add_axioms_for_copy(expr);
   else if(id==ID_cprover_string_of_int_hex_func)
-    res=add_axioms_from_int_hex(expr);
+    return add_axioms_from_int_hex(expr);
   else if(id==ID_cprover_string_of_float_func)
-    res=add_axioms_for_string_of_float(expr);
+    return add_axioms_for_string_of_float(expr);
   else if(id==ID_cprover_string_of_float_scientific_notation_func)
-    res=add_axioms_from_float_scientific_notation(expr);
+    return add_axioms_from_float_scientific_notation(expr);
   else if(id==ID_cprover_string_of_double_func)
-    res=add_axioms_from_double(expr);
+    return add_axioms_from_double(expr);
   else if(id==ID_cprover_string_of_long_func)
-    res=add_axioms_from_long(expr);
+    return add_axioms_from_long(expr);
   else if(id==ID_cprover_string_of_bool_func)
-    res=add_axioms_from_bool(expr);
+    return add_axioms_from_bool(expr);
   else if(id==ID_cprover_string_of_char_func)
-    res=add_axioms_from_char(expr);
+    return add_axioms_from_char(expr);
   else if(id==ID_cprover_string_set_length_func)
-    res=add_axioms_for_set_length(expr);
+    return add_axioms_for_set_length(expr);
   else if(id==ID_cprover_string_delete_func)
-    res=add_axioms_for_delete(expr);
+    return add_axioms_for_delete(expr);
   else if(id==ID_cprover_string_delete_char_at_func)
-    res=add_axioms_for_delete_char_at(expr);
+    return add_axioms_for_delete_char_at(expr);
   else if(id==ID_cprover_string_replace_func)
-    res=add_axioms_for_replace(expr);
+    return add_axioms_for_replace(expr);
   else if(id==ID_cprover_string_intern_func)
-    res=add_axioms_for_intern(expr);
+    return add_axioms_for_intern(expr);
   else if(id==ID_cprover_string_format_func)
-    res=add_axioms_for_format(expr);
+    return add_axioms_for_format(expr);
   else if(id == ID_cprover_string_constrain_characters_func)
-    res = add_axioms_for_constrain_characters(expr);
+    return add_axioms_for_constrain_characters(expr);
   else
   {
     std::string msg(
@@ -453,7 +456,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     msg+=id2string(id);
     DATA_INVARIANT(false, string_refinement_invariantt(msg));
   }
-  return res;
+  UNREACHABLE;
 }
 
 /// add axioms to say that the returned string expression is equal to the
@@ -463,7 +466,8 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
 /// or three arguments: string, integer offset and count
 /// \return a new string expression
 DEPRECATED("should use substring instead")
-exprt string_constraint_generatort::add_axioms_for_copy(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_copy(
   const function_application_exprt &f)
 {
   const auto &args=f.arguments();
@@ -481,12 +485,13 @@ exprt string_constraint_generatort::add_axioms_for_copy(
 /// Returns the length of the string argument of the given function application
 /// \param f: function application with argument string `str`
 /// \return expression `|str|`
-exprt string_constraint_generatort::add_axioms_for_length(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_length(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 1);
   const array_string_exprt str = get_string_expr(f.arguments()[0]);
-  return str.length();
+  return {str.length(), {}};
 }
 
 /// \param x: an expression
@@ -499,7 +504,8 @@ exprt is_positive(const exprt &x)
 /// add axioms stating that the returned value is equal to the argument
 /// \param f: function application with one character argument
 /// \return a new character expression
-exprt string_constraint_generatort::add_axioms_for_char_literal(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_char_literal(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
@@ -516,7 +522,7 @@ exprt string_constraint_generatort::add_axioms_for_char_literal(
     const string_constantt s=to_string_constant(arg.op0().op0().op0());
     irep_idt sval=s.get_value();
     CHECK_RETURN(sval.size()==1);
-    return from_integer(unsigned(sval[0]), arg.type());
+    return {from_integer(unsigned(sval[0]), arg.type()), {}};
   }
   else
   {
@@ -534,15 +540,15 @@ exprt string_constraint_generatort::add_axioms_for_char_literal(
 /// This axiom is \f$ char = str[i] \f$.
 /// \param f: function application with arguments string `str` and integer `i`
 /// \return character expression `char`
-exprt string_constraint_generatort::add_axioms_for_char_at(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_char_at(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
   array_string_exprt str = get_string_expr(f.arguments()[0]);
   symbol_exprt char_sym = fresh_symbol("char", str.type().subtype());
-  constraints.existential.push_back(
-    equal_exprt(char_sym, str[f.arguments()[1]]));
-  return char_sym;
+  const exprt constraint = equal_exprt(char_sym, str[f.arguments()[1]]);
+  return {char_sym, {{constraint}}};
 }
 
 exprt minimum(const exprt &a, const exprt &b)
@@ -561,4 +567,15 @@ exprt maximum(const exprt &a, const exprt &b)
 exprt zero_if_negative(const exprt &expr)
 {
   return maximum(from_integer(0, expr.type()), expr);
+}
+
+/// Combine the results of two `add_axioms` function by taking the maximum of
+/// the return codes and merging the constraints.
+std::pair<exprt, string_constraintst> combine_results(
+  std::pair<exprt, string_constraintst> result1,
+  std::pair<exprt, string_constraintst> result2)
+{
+  const exprt return_code = maximum(result1.first, result2.first);
+  merge(result2.second, std::move(result1.second));
+  return {return_code, std::move(result2.second)};
 }

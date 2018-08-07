@@ -17,10 +17,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param res: array of characters corresponding to the result fo the function
 /// \param code_point: an expression representing a java code point
 /// \return integer expression equal to zero
-exprt string_constraint_generatort::add_axioms_for_code_point(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_code_point(
   const array_string_exprt &res,
   const exprt &code_point)
 {
+  string_constraintst constraints;
   const typet &char_type = res.content().type().subtype();
   const typet &type=code_point.type();
   PRECONDITION(type.id()==ID_signedbv);
@@ -63,7 +65,7 @@ exprt string_constraint_generatort::add_axioms_for_code_point(
     equal_exprt(res[1], typecast_exprt(second_char, char_type)));
   constraints.existential.push_back(a5);
 
-  return from_integer(0, get_return_code_type());
+  return {from_integer(0, get_return_code_type()), constraints};
 }
 
 /// the output is true when the character is a high surrogate for UTF-16
@@ -116,9 +118,11 @@ exprt pair_value(exprt char1, exprt char2, typet return_type)
 /// \param f: function application with arguments a string and an
 ///   index
 /// \return a integer expression corresponding to a code point
-exprt string_constraint_generatort::add_axioms_for_code_point_at(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_code_point_at(
   const function_application_exprt &f)
 {
+  string_constraintst constraints;
   const typet &return_type = f.type();
   PRECONDITION(return_type.id()==ID_signedbv);
   PRECONDITION(f.arguments().size() == 2);
@@ -139,14 +143,15 @@ exprt string_constraint_generatort::add_axioms_for_code_point_at(
     implies_exprt(return_pair, equal_exprt(result, pair)));
   constraints.existential.push_back(
     implies_exprt(not_exprt(return_pair), equal_exprt(result, char1_as_int)));
-  return result;
+  return {result, constraints};
 }
 
 /// add axioms corresponding to the String.codePointBefore java function
 /// \par parameters: function application with two arguments: a string and an
 ///   index
 /// \return a integer expression corresponding to a code point
-exprt string_constraint_generatort::add_axioms_for_code_point_before(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_code_point_before(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
@@ -155,6 +160,7 @@ exprt string_constraint_generatort::add_axioms_for_code_point_before(
   PRECONDITION(return_type.id()==ID_signedbv);
   symbol_exprt result=fresh_symbol("char", return_type);
   array_string_exprt str = get_string_expr(args[0]);
+  string_constraintst constraints;
 
   const exprt &char1=
     str[minus_exprt(args[1], from_integer(2, str.length().type()))];
@@ -171,7 +177,7 @@ exprt string_constraint_generatort::add_axioms_for_code_point_before(
     implies_exprt(return_pair, equal_exprt(result, pair)));
   constraints.existential.push_back(
     implies_exprt(not_exprt(return_pair), equal_exprt(result, char2_as_int)));
-  return result;
+  return {result, constraints};
 }
 
 /// add axioms giving approximate bounds on the result of the
@@ -179,10 +185,12 @@ exprt string_constraint_generatort::add_axioms_for_code_point_before(
 /// \param f: function application with three arguments string `str`, integer
 ///           `begin` and integer `end`.
 /// \return an integer expression
-exprt string_constraint_generatort::add_axioms_for_code_point_count(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_code_point_count(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
+  string_constraintst constraints;
   const array_string_exprt str = get_string_expr(f.arguments()[0]);
   const exprt &begin = f.arguments()[1];
   const exprt &end = f.arguments()[2];
@@ -195,7 +203,7 @@ exprt string_constraint_generatort::add_axioms_for_code_point_count(
   constraints.existential.push_back(
     binary_relation_exprt(result, ID_ge, minimum));
 
-  return result;
+  return {result, constraints};
 }
 
 /// add axioms giving approximate bounds on the result of the
@@ -204,10 +212,12 @@ exprt string_constraint_generatort::add_axioms_for_code_point_count(
 /// \param f: function application with arguments string `str`, integer `index`
 ///           and integer `offset`.
 /// \return a new string expression
-exprt string_constraint_generatort::add_axioms_for_offset_by_code_point(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_offset_by_code_point(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
+  string_constraintst constraints;
   const exprt &index = f.arguments()[1];
   const exprt &offset = f.arguments()[2];
   const typet &return_type=f.type();
@@ -220,6 +230,6 @@ exprt string_constraint_generatort::add_axioms_for_offset_by_code_point(
   constraints.existential.push_back(
     binary_relation_exprt(result, ID_ge, minimum));
 
-  return result;
+  return {result, constraints};
 }
 

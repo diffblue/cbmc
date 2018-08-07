@@ -34,13 +34,15 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param start_index: integer expression
 /// \param end_index: integer expression
 /// \return integer expression `0`
-exprt string_constraint_generatort::add_axioms_for_concat_substr(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_concat_substr(
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const array_string_exprt &s2,
   const exprt &start_index,
   const exprt &end_index)
 {
+  string_constraintst constraints;
   const typet &index_type = start_index.type();
   const exprt start1 = maximum(start_index, from_integer(0, index_type));
   const exprt end1 = maximum(minimum(end_index, s2.length()), start1);
@@ -67,7 +69,7 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
     return string_constraintt(idx2, zero_if_negative(upper_bound), res_eq);
   }());
 
-  return from_integer(0, get_return_code_type());
+  return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
 /// Add axioms enforcing that the length of `res` is that of the concatenation
@@ -112,11 +114,13 @@ exprt length_constraint_for_concat(
 /// \param s1: string expression
 /// \param c: character expression
 /// \return code 0 on success
-exprt string_constraint_generatort::add_axioms_for_concat_char(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_concat_char(
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const exprt &c)
 {
+  string_constraintst constraints;
   const typet &index_type = res.length().type();
   constraints.existential.push_back(length_constraint_for_concat_char(res, s1));
 
@@ -129,7 +133,7 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
   constraints.existential.push_back(a3);
 
   // We should have a enum type for the possible error codes
-  return from_integer(0, get_return_code_type());
+  return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
 /// Add axioms enforcing that the length of `res` is that of the concatenation
@@ -150,7 +154,8 @@ exprt length_constraint_for_concat_char(
 /// \param s1: the string expression to append to
 /// \param s2: the string expression to append to the first one
 /// \return an integer expression
-exprt string_constraint_generatort::add_axioms_for_concat(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_concat(
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const array_string_exprt &s2)
@@ -170,7 +175,8 @@ exprt string_constraint_generatort::add_axioms_for_concat(
 ///           pointer `&res[0]`, refined_string `s1`, refined_string `s2`,
 ///           optional integer `start_index`, optional integer `end_index`
 /// \return an integer expression
-exprt string_constraint_generatort::add_axioms_for_concat(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_concat(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
@@ -191,7 +197,8 @@ exprt string_constraint_generatort::add_axioms_for_concat(
 /// \param f: function application with a length, pointer, string and character
 ///           argument.
 /// \return code 0 on success
-exprt string_constraint_generatort::add_axioms_for_concat_char(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_concat_char(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
@@ -206,7 +213,8 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
 /// \deprecated java specific
 /// \param f: function application with two arguments: a string and a code point
 /// \return an expression
-exprt string_constraint_generatort::add_axioms_for_concat_code_point(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_concat_code_point(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 4);
@@ -217,7 +225,7 @@ exprt string_constraint_generatort::add_axioms_for_concat_code_point(
   const typet &index_type = s1.length().type();
   const array_string_exprt code_point =
     array_pool.fresh_string(index_type, char_type);
-  const exprt return_code1 =
-    add_axioms_for_code_point(code_point, f.arguments()[3]);
-  return add_axioms_for_concat(res, s1, code_point);
+  return combine_results(
+    add_axioms_for_code_point(code_point, f.arguments()[3]),
+    add_axioms_for_concat(res, s1, code_point));
 }

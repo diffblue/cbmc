@@ -34,11 +34,13 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param c: a character expression
 /// \param from_index: an integer expression
 /// \return integer expression `index`
-exprt string_constraint_generatort::add_axioms_for_index_of(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_index_of(
   const array_string_exprt &str,
   const exprt &c,
   const exprt &from_index)
 {
+  string_constraintst constraints;
   const typet &index_type=str.length().type();
   symbol_exprt index = fresh_symbol("index_of", index_type);
   symbol_exprt contains = fresh_symbol("contains_in_index_of");
@@ -77,7 +79,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
     implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
   constraints.universal.push_back(a5);
 
-  return index;
+  return {index, std::move(constraints)};
 }
 
 /// Add axioms stating that the returned value `index` is the index within
@@ -104,11 +106,13 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 /// \param from_index: an integer expression
 /// \return integer expression `index` representing the first index of `needle`
 ///   in `haystack`
-exprt string_constraint_generatort::add_axioms_for_index_of_string(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_index_of_string(
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
   const exprt &from_index)
 {
+  string_constraintst constraints;
   const typet &index_type=haystack.length().type();
   symbol_exprt offset = fresh_symbol("index_of", index_type);
   symbol_exprt contains = fresh_symbol("contains_substring");
@@ -163,7 +167,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     equal_exprt(offset, from_index));
   constraints.existential.push_back(a6);
 
-  return offset;
+  return {offset, std::move(constraints)};
 }
 
 /// Add axioms stating that the returned value is the index within haystack of
@@ -196,11 +200,13 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
 /// \param from_index: integer expression
 /// \return integer expression `index` representing the last index of `needle`
 ///         in `haystack` before or at `from_index`, or -1 if there is none
-exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_last_index_of_string(
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
   const exprt &from_index)
 {
+  string_constraintst constraints;
   const typet &index_type=haystack.length().type();
   symbol_exprt offset = fresh_symbol("index_of", index_type);
   symbol_exprt contains = fresh_symbol("contains_substring");
@@ -257,7 +263,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     equal_exprt(offset, from_index));
   constraints.existential.push_back(a6);
 
-  return offset;
+  return {offset, std::move(constraints)};
 }
 
 /// Index of the first occurence of a target inside the string
@@ -278,7 +284,8 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
 ///           refined_string or character `needle`, and optional integer
 ///           `from_index` with default value `0`
 /// \return integer expression
-exprt string_constraint_generatort::add_axioms_for_index_of(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_index_of(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
@@ -330,11 +337,13 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 /// \param from_index: an integer expression
 /// \return integer expression `index` representing the last index of `needle`
 ///         in `haystack` before or at `from_index`, or `-1` if there is none
-exprt string_constraint_generatort::add_axioms_for_last_index_of(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_last_index_of(
   const array_string_exprt &str,
   const exprt &c,
   const exprt &from_index)
 {
+  string_constraintst constraints;
   const typet &index_type = str.length().type();
   const symbol_exprt index = fresh_symbol("last_index_of", index_type);
   const symbol_exprt contains = fresh_symbol("contains_in_last_index_of");
@@ -374,7 +383,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
     implies_exprt(not_exprt(contains), notequal_exprt(str[m], c)));
   constraints.universal.push_back(a5);
 
-  return index;
+  return {index, std::move(constraints)};
 }
 
 /// Index of the last occurence of a target inside the string
@@ -395,7 +404,8 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
 ///           refined_string or character `needle`, and optional integer
 ///           `from_index` with default value `|haystack|-1`
 /// \return an integer expression
-exprt string_constraint_generatort::add_axioms_for_last_index_of(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_last_index_of(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
