@@ -238,6 +238,14 @@ mp_integer pointer_offset_bits(
   {
     return pointer_offset_bits(ns.follow(type), ns);
   }
+  else if(type.id() == ID_union_tag)
+  {
+    return pointer_offset_bits(ns.follow_tag(to_union_tag_type(type)), ns);
+  }
+  else if(type.id() == ID_struct_tag)
+  {
+    return pointer_offset_bits(ns.follow_tag(to_struct_tag_type(type)), ns);
+  }
   else if(type.id()==ID_code)
   {
     return 0;
@@ -505,6 +513,14 @@ exprt size_of_expr(
   else if(type.id()==ID_symbol)
   {
     return size_of_expr(ns.follow(type), ns);
+  }
+  else if(type.id() == ID_union_tag)
+  {
+    return size_of_expr(ns.follow_tag(to_union_tag_type(type)), ns);
+  }
+  else if(type.id() == ID_struct_tag)
+  {
+    return size_of_expr(ns.follow_tag(to_struct_tag_type(type)), ns);
   }
   else if(type.id()==ID_code)
   {

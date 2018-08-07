@@ -54,6 +54,12 @@ const symbolt &namespace_baset::lookup(const tag_typet &type) const
 
 const typet &namespace_baset::follow(const typet &src) const
 {
+  if(src.id() == ID_union_tag)
+    return follow_tag(to_union_tag_type(src));
+
+  if(src.id() == ID_struct_tag)
+    return follow_tag(to_struct_tag_type(src));
+
   if(src.id()!=ID_symbol)
     return src;
 
