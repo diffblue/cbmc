@@ -69,12 +69,12 @@ protected:
     queuet &queue,
     jumpst &jumps,
     decl_deadt &decl_dead,
-    const dependence_grapht &dep_graph);
+    dependence_grapht &dep_graph);
 
   void add_dependencies(
     const cfgt::nodet &node,
     queuet &queue,
-    const dependence_grapht &dep_graph,
+    dependence_grapht &dep_graph,
     const dep_node_to_cfgt &dep_node_to_cfg);
 
   void add_function_calls(

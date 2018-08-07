@@ -20,9 +20,11 @@ Author: Daniel Kroening, kroening@kroening.com
 void full_slicert::add_dependencies(
   const cfgt::nodet &node,
   queuet &queue,
-  const dependence_grapht &dep_graph,
+  dependence_grapht &dep_graph,
   const dep_node_to_cfgt &dep_node_to_cfg)
 {
+  // node.PC may not have been previously explored
+  // so dep_graph cannot be const as this may create new domains
   const dependence_grapht::nodet &d_node=
     dep_graph[dep_graph[node.PC].get_node_id()];
 
@@ -217,7 +219,7 @@ void full_slicert::fixedpoint(
   queuet &queue,
   jumpst &jumps,
   decl_deadt &decl_dead,
-  const dependence_grapht &dep_graph)
+  dependence_grapht &dep_graph)
 {
   std::vector<cfgt::entryt> dep_node_to_cfg;
   dep_node_to_cfg.reserve(dep_graph.size());
