@@ -23,6 +23,7 @@
 class abstract_environmentt
 {
 public:
+  abstract_environmentt();
   // These three are really the heart of the method
   virtual abstract_object_pointert eval(
     const exprt &expr, const namespacet &ns) const;
