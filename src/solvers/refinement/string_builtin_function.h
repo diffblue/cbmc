@@ -7,9 +7,10 @@
 #include <vector>
 #include <util/optional.h>
 #include <util/string_expr.h>
-#include "string_constraint_generator.h"
 
 class array_poolt;
+struct string_constraintst;
+class string_constraint_generatort;
 
 #define CHARACTER_FOR_UNKNOWN '?'
 
@@ -129,18 +130,9 @@ public:
   }
 
   string_constraintst
-  constraints(string_constraint_generatort &generator) const override
-  {
-    auto pair = add_axioms_for_concat_char(
-      generator.fresh_symbol, result, input, character);
-    pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-    return pair.second;
-  }
+  constraints(string_constraint_generatort &generator) const override;
 
-  exprt length_constraint() const override
-  {
-    return length_constraint_for_concat_char(result, input);
-  }
+  exprt length_constraint() const override;
 };
 
 /// Setting a character at a particular position of a string
@@ -175,13 +167,7 @@ public:
   }
 
   string_constraintst
-  constraints(string_constraint_generatort &generator) const override
-  {
-    auto pair = add_axioms_for_set_char(
-      generator.fresh_symbol, result, input, position, character);
-    pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-    return pair.second;
-  }
+  constraints(string_constraint_generatort &generator) const override;
 
   // \todo: length_constraint is not the best possible name because we also
   // \todo: add constraint about the return code
@@ -211,12 +197,7 @@ public:
   }
 
   string_constraintst
-  constraints(string_constraint_generatort &generator) const override
-  {
-    auto pair = generator.add_axioms_for_to_lower_case(result, input);
-    pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-    return pair.second;
-  }
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override
   {
@@ -247,13 +228,7 @@ public:
   }
 
   string_constraintst
-  constraints(string_constraint_generatort &generator) const override
-  {
-    auto pair = generator.add_axioms_for_to_upper_case(
-      generator.fresh_symbol, result, input);
-    pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-    return pair.second;
-  }
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override
   {
@@ -305,28 +280,9 @@ public:
   }
 
   string_constraintst
-  constraints(string_constraint_generatort &generator) const override
-  {
-    if(args.size() == 1)
-    {
-      auto pair = add_axioms_for_insert(
-        generator.fresh_symbol, result, input1, input2, args[0]);
-      pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-      return pair.second;
-    }
-    if(args.size() == 3)
-      UNIMPLEMENTED;
-    UNREACHABLE;
-  };
+  constraints(string_constraint_generatort &generator) const override;
 
-  exprt length_constraint() const override
-  {
-    if(args.size() == 1)
-      return length_constraint_for_insert(result, input1, input2);
-    if(args.size() == 3)
-      UNIMPLEMENTED;
-    UNREACHABLE;
-  };
+  exprt length_constraint() const override;
 
   bool maybe_testing_function() const override
   {
@@ -366,32 +322,9 @@ public:
   }
 
   string_constraintst
-  constraints(string_constraint_generatort &generator) const override
-  {
-    auto pair = [&]() -> std::pair<exprt, string_constraintst> {
-      if(args.size() == 0)
-        return add_axioms_for_concat(
-          generator.fresh_symbol, result, input1, input2);
-      if(args.size() == 2)
-      {
-        return add_axioms_for_concat_substr(
-          generator.fresh_symbol, result, input1, input2, args[0], args[1]);
-      }
-      UNREACHABLE;
-    }();
-    pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-    return pair.second;
-  };
+  constraints(string_constraint_generatort &generator) const override;
 
-  exprt length_constraint() const override
-  {
-    if(args.size() == 0)
-      return length_constraint_for_concat(result, input1, input2);
-    if(args.size() == 2)
-      return length_constraint_for_concat_substr(
-        result, input1, input2, args[0], args[1]);
-    UNREACHABLE;
-  }
+  exprt length_constraint() const override;
 };
 
 /// String creation from other types
@@ -443,13 +376,7 @@ public:
   }
 
   string_constraintst
-  constraints(string_constraint_generatort &generator) const override
-  {
-    auto pair = add_axioms_for_string_of_int_with_radix(
-      generator.fresh_symbol, result, arg, radix, 0, generator.ns);
-    pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-    return pair.second;
-  }
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override;
 
@@ -507,13 +434,7 @@ public:
   }
 
   string_constraintst
-  constraints(string_constraint_generatort &generator) const override
-  {
-    auto pair = generator.add_axioms_for_function_application(
-      generator.fresh_symbol, function_application);
-    pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-    return pair.second;
-  };
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override
   {

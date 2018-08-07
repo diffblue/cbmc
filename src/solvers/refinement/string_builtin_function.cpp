@@ -137,6 +137,35 @@ std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
   return result;
 }
 
+string_constraintst string_concatenation_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+
+{
+  auto pair = [&]() -> std::pair<exprt, string_constraintst> {
+    if(args.size() == 0)
+      return add_axioms_for_concat(
+        generator.fresh_symbol, result, input1, input2);
+    if(args.size() == 2)
+    {
+      return add_axioms_for_concat_substr(
+        generator.fresh_symbol, result, input1, input2, args[0], args[1]);
+    }
+    UNREACHABLE;
+  }();
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
+}
+
+exprt string_concatenation_builtin_functiont::length_constraint() const
+{
+  if(args.size() == 0)
+    return length_constraint_for_concat(result, input1, input2);
+  if(args.size() == 2)
+    return length_constraint_for_concat_substr(
+      result, input1, input2, args[0], args[1]);
+  UNREACHABLE;
+}
+
 optionalt<exprt> string_concat_char_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
@@ -158,6 +187,20 @@ optionalt<exprt> string_concat_char_builtin_functiont::eval(
   return make_string(input_opt.value(), type);
 }
 
+string_constraintst string_concat_char_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+{
+  auto pair = add_axioms_for_concat_char(
+    generator.fresh_symbol, result, input, character);
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
+}
+
+exprt string_concat_char_builtin_functiont::length_constraint() const
+{
+  return length_constraint_for_concat_char(result, input);
+}
+
 optionalt<exprt> string_set_char_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
@@ -172,6 +215,15 @@ optionalt<exprt> string_set_char_builtin_functiont::eval(
     from_integer(input_opt.value().size(), result.length().type());
   const array_typet type(result.type().subtype(), length);
   return make_string(input_opt.value(), type);
+}
+
+string_constraintst string_set_char_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+{
+  auto pair = add_axioms_for_set_char(
+    generator.fresh_symbol, result, input, position, character);
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
 }
 
 exprt string_set_char_builtin_functiont::length_constraint() const
@@ -217,6 +269,15 @@ optionalt<exprt> string_to_lower_case_builtin_functiont::eval(
   return make_string(input_opt.value(), type);
 }
 
+string_constraintst string_to_lower_case_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+{
+  auto pair =
+    add_axioms_for_to_lower_case(generator.fresh_symbol, result, input);
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
+}
+
 optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
@@ -232,6 +293,15 @@ optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
     from_integer(input_opt.value().size(), result.length().type());
   const array_typet type(result.type().subtype(), length);
   return make_string(input_opt.value(), type);
+}
+
+string_constraintst string_to_upper_case_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+{
+  auto pair =
+    add_axioms_for_to_upper_case(generator.fresh_symbol, result, input);
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
 }
 
 std::vector<mp_integer> string_insertion_builtin_functiont::eval(
@@ -284,6 +354,30 @@ optionalt<exprt> string_insertion_builtin_functiont::eval(
   return make_string(result_value, type);
 }
 
+string_constraintst string_insertion_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+{
+  if(args.size() == 1)
+  {
+    auto pair = add_axioms_for_insert(
+      generator.fresh_symbol, result, input1, input2, args[0]);
+    pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+    return pair.second;
+  }
+  if(args.size() == 3)
+    UNIMPLEMENTED;
+  UNREACHABLE;
+}
+
+exprt string_insertion_builtin_functiont::length_constraint() const
+{
+  if(args.size() == 1)
+    return length_constraint_for_insert(result, input1, input2);
+  if(args.size() == 3)
+    UNIMPLEMENTED;
+  UNREACHABLE;
+}
+
 /// Constructor from arguments of a function application.
 /// The arguments in `fun_args` should be in order:
 /// an integer `result.length`, a character pointer `&result[0]`,
@@ -331,6 +425,15 @@ optionalt<exprt> string_of_int_builtin_functiont::eval(
   const array_typet type(result.type().subtype(), length_expr);
   return make_string(
     right_to_left_characters.rbegin(), right_to_left_characters.rend(), type);
+}
+
+string_constraintst string_of_int_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+{
+  auto pair = add_axioms_for_string_of_int_with_radix(
+    generator.fresh_symbol, result, arg, radix, 0, generator.ns);
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
 }
 
 exprt string_of_int_builtin_functiont::length_constraint() const
@@ -390,4 +493,13 @@ string_builtin_function_with_no_evalt::string_builtin_function_with_no_evalt(
     else
       args.push_back(fun_args[i]);
   }
+}
+
+string_constraintst string_builtin_function_with_no_evalt::constraints(
+  string_constraint_generatort &generator) const
+{
+  auto pair = generator.add_axioms_for_function_application(
+    generator.fresh_symbol, function_application);
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
 }
