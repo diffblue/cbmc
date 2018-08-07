@@ -159,7 +159,7 @@ string_constraint_generatort::add_axioms_for_string_of_float(
 {
   PRECONDITION(f.arguments().size() == 3);
   array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   return add_axioms_for_string_of_float(fresh_symbol, res, f.arguments()[2]);
 }
 
@@ -528,7 +528,7 @@ string_constraint_generatort::add_axioms_from_float_scientific_notation(
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   const exprt &arg = f.arguments()[2];
   return add_axioms_from_float_scientific_notation(fresh_symbol, res, arg);
 }

@@ -188,7 +188,8 @@ string_constraint_generatort::add_axioms_for_concat(
   PRECONDITION(args.size() == 4 || args.size() == 6);
   const array_string_exprt s1 = get_string_expr(args[2]);
   const array_string_exprt s2 = get_string_expr(args[3]);
-  const array_string_exprt res = char_array_of_pointer(args[1], args[0]);
+  const array_string_exprt res =
+    char_array_of_pointer(array_pool, args[1], args[0]);
   if(args.size() == 6)
     return add_axioms_for_concat_substr(
       fresh_symbol, res, s1, s2, args[4], args[5]);
@@ -212,7 +213,8 @@ string_constraint_generatort::add_axioms_for_concat_char(
   PRECONDITION(args.size() == 4);
   const array_string_exprt s1 = get_string_expr(args[2]);
   const exprt &c = args[3];
-  const array_string_exprt res = char_array_of_pointer(args[1], args[0]);
+  const array_string_exprt res =
+    char_array_of_pointer(array_pool, args[1], args[0]);
   return add_axioms_for_concat_char(fresh_symbol, res, s1, c);
 }
 
@@ -227,7 +229,7 @@ string_constraint_generatort::add_axioms_for_concat_code_point(
 {
   PRECONDITION(f.arguments().size() == 4);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(f.arguments()[2]);
   const typet &char_type = s1.content().type().subtype();
   const typet &index_type = s1.length().type();

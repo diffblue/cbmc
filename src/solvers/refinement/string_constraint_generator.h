@@ -90,6 +90,11 @@ private:
 /// are given as a struct containing a length and pointer to an array.
 array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg);
 
+const array_string_exprt &char_array_of_pointer(
+  array_poolt &pool,
+  const exprt &pointer,
+  const exprt &length);
+
 /// Collection of constraints of different types: existential formulas,
 /// universal formulas, and "not contains" (universal with one alternation).
 struct string_constraintst final
@@ -183,9 +188,6 @@ public:
 
 private:
   array_string_exprt get_string_expr(const exprt &expr);
-
-  const array_string_exprt &
-  char_array_of_pointer(const exprt &pointer, const exprt &length);
 
   string_constraintst add_constraint_on_characters(
     const array_string_exprt &s,

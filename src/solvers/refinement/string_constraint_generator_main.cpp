@@ -207,7 +207,7 @@ string_constraint_generatort::get_string_expr(const exprt &expr)
 {
   PRECONDITION(is_refined_string_type(expr.type()));
   const refined_string_exprt &str = to_string_expr(expr);
-  return char_array_of_pointer(str.content(), str.length());
+  return char_array_of_pointer(array_pool, str.content(), str.length());
 }
 
 void string_constraintst::clear()
@@ -289,7 +289,8 @@ string_constraint_generatort::add_axioms_for_constrain_characters(
   PRECONDITION(args[2].type().id() == ID_string);
   PRECONDITION(args[2].id() == ID_constant);
 
-  const array_string_exprt s = char_array_of_pointer(args[1], args[0]);
+  const array_string_exprt s =
+    char_array_of_pointer(array_pool, args[1], args[0]);
   const irep_idt &char_set_string = to_constant_expr(args[2]).get_value();
   const exprt &start =
     args.size() >= 4 ? args[3] : from_integer(0, s.length().type());
@@ -313,11 +314,12 @@ array_poolt::find(const exprt &pointer, const exprt &length)
 /// Adds creates a new array if it does not already exists
 /// \todo This should be replaced
 /// by array_poolt.make_char_array_for_char_pointer
-const array_string_exprt &string_constraint_generatort::char_array_of_pointer(
+const array_string_exprt &char_array_of_pointer(
+  array_poolt &pool,
   const exprt &pointer,
   const exprt &length)
 {
-  return array_pool.find(pointer, length);
+  return pool.find(pointer, length);
 }
 
 array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg)
@@ -475,7 +477,8 @@ string_constraint_generatort::add_axioms_for_copy(
 {
   const auto &args=f.arguments();
   PRECONDITION(args.size() == 3 || args.size() == 5);
-  const array_string_exprt res = char_array_of_pointer(args[1], args[0]);
+  const array_string_exprt res =
+    char_array_of_pointer(array_pool, args[1], args[0]);
   const array_string_exprt str = get_string_expr(args[2]);
   const typet &index_type = str.length().type();
   const exprt offset = args.size() == 3 ? from_integer(0, index_type) : args[3];

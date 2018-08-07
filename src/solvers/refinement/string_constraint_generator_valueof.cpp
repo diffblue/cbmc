@@ -47,7 +47,7 @@ string_constraint_generatort::add_axioms_from_int(
 {
   PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   if(f.arguments().size() == 4)
     return add_axioms_for_string_of_int_with_radix(
       fresh_symbol, res, f.arguments()[2], f.arguments()[3]);
@@ -67,7 +67,7 @@ string_constraint_generatort::add_axioms_from_long(
 {
   PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   if(f.arguments().size() == 4)
     return add_axioms_for_string_of_int_with_radix(
       fresh_symbol, res, f.arguments()[2], f.arguments()[3]);
@@ -87,7 +87,7 @@ string_constraint_generatort::add_axioms_from_bool(
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   return add_axioms_from_bool(fresh_symbol, res, f.arguments()[2]);
 }
 
@@ -299,7 +299,7 @@ string_constraint_generatort::add_axioms_from_int_hex(
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   return add_axioms_from_int_hex(fresh_symbol, res, f.arguments()[2]);
 }
 
@@ -320,7 +320,7 @@ string_constraint_generatort::add_axioms_from_char(
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   return add_axioms_from_char(fresh_symbol, res, f.arguments()[2]);
 }
 

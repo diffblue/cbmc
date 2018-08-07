@@ -483,7 +483,7 @@ string_constraint_generatort::add_axioms_for_format(
 {
   PRECONDITION(f.arguments().size() >= 3);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(f.arguments()[2]);
   unsigned int length;
 
