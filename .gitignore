@@ -19,6 +19,8 @@ src/.settings/*
 # Visual Studio
 Debug/*
 Release/*
+#vi(m)
+*.swp
 
 # compilation files
 *.lo
@@ -65,6 +67,8 @@ jbmc/regression/**/tests-symex-driven-loading.log
 
 # files stored by editors
 *~
+.*.swp
+.*.swo
 
 # libs downloaded by make [name]-download
 minisat*/

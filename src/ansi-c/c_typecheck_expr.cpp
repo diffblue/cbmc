@@ -2141,7 +2141,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt dynamic_object_expr=exprt(ID_dynamic_object, expr.type());
+    exprt dynamic_object_expr=exprt(ID_is_dynamic_object, expr.type());
     dynamic_object_expr.operands()=expr.arguments();
     dynamic_object_expr.add_source_location()=source_location;
 
