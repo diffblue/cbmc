@@ -33,8 +33,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param str: an array of characters
 /// \param offset: an integer
 /// \return Boolean expression `isprefix`
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_is_prefix(
+std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &prefix,
   const array_string_exprt &str,
@@ -94,11 +93,11 @@ string_constraint_generatort::add_axioms_for_is_prefix(
 /// \param swap_arguments: a Boolean telling whether the prefix is the second
 ///        argument or the first argument
 /// \return boolean expression `isprefix`
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_is_prefix(
+std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  bool swap_arguments)
+  bool swap_arguments,
+  array_poolt &array_pool)
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
@@ -119,10 +118,10 @@ string_constraint_generatort::add_axioms_for_is_prefix(
 /// \param f: function application with a string argument
 /// \return a Boolean expression
 DEPRECATED("should use `string_length(s)==0` instead")
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_is_empty(
+std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   PRECONDITION(f.arguments().size() == 1);
@@ -159,11 +158,11 @@ string_constraint_generatort::add_axioms_for_is_empty(
 ///        argument or the first argument
 /// \return Boolean expression `issuffix`
 DEPRECATED("should use `strings_startwith(s0, s1, s1.length - s0.length)`")
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_is_suffix(
+std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  bool swap_arguments)
+  bool swap_arguments,
+  array_poolt &array_pool)
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(args.size()==2); // bad args to string issuffix?
@@ -222,10 +221,10 @@ string_constraint_generatort::add_axioms_for_is_suffix(
 /// \param f: function application with arguments refined_string `s0`
 ///           refined_string `s1`
 /// \return Boolean expression `contains`
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_contains(
+std::pair<exprt, string_constraintst> add_axioms_for_contains(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 2);
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);

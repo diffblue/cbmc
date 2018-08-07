@@ -21,8 +21,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param sval: a string constant
 /// \param guard: condition under which the axiom should apply, true by default
 /// \return integer expression equal to zero
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_constant(
+std::pair<exprt, string_constraintst> add_axioms_for_constant(
   const array_string_exprt &res,
   irep_idt sval,
   const exprt &guard)
@@ -61,8 +60,7 @@ string_constraint_generatort::add_axioms_for_constant(
 /// \param f: function application with arguments integer `length` and character
 ///           pointer `ptr`.
 /// \return integer expression equal to zero
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_empty_string(
+std::pair<exprt, string_constraintst> add_axioms_for_empty_string(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
@@ -81,8 +79,7 @@ string_constraint_generatort::add_axioms_for_empty_string(
 /// \return 0 if constraints were added, 1 if expression could not be handled
 ///         and no constraint was added. Expression we can handle are of the
 ///         form \f$ e := "<string constant>" | (expr)? e : e \f$
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_cprover_string(
+std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &arg,
@@ -112,10 +109,10 @@ string_constraint_generatort::add_axioms_for_cprover_string(
 /// \param f: function application with an argument which is a string literal
 /// that is a constant with a string value.
 /// \return string expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_from_literal(
+std::pair<exprt, string_constraintst> add_axioms_from_literal(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(args.size() == 3); // Bad args to string literal?

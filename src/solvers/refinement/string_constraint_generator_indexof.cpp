@@ -34,8 +34,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param c: a character expression
 /// \param from_index: an integer expression
 /// \return integer expression `index`
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_index_of(
+std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
   const exprt &c,
@@ -107,8 +106,7 @@ string_constraint_generatort::add_axioms_for_index_of(
 /// \param from_index: an integer expression
 /// \return integer expression `index` representing the first index of `needle`
 ///   in `haystack`
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_index_of_string(
+std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
@@ -202,8 +200,7 @@ string_constraint_generatort::add_axioms_for_index_of_string(
 /// \param from_index: integer expression
 /// \return integer expression `index` representing the last index of `needle`
 ///         in `haystack` before or at `from_index`, or -1 if there is none
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_last_index_of_string(
+std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
@@ -287,10 +284,10 @@ string_constraint_generatort::add_axioms_for_last_index_of_string(
 ///           refined_string or character `needle`, and optional integer
 ///           `from_index` with default value `0`
 /// \return integer expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_index_of(
+std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);
@@ -341,8 +338,7 @@ string_constraint_generatort::add_axioms_for_index_of(
 /// \param from_index: an integer expression
 /// \return integer expression `index` representing the last index of `needle`
 ///         in `haystack` before or at `from_index`, or `-1` if there is none
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_last_index_of(
+std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
   const exprt &c,
@@ -409,10 +405,10 @@ string_constraint_generatort::add_axioms_for_last_index_of(
 ///           refined_string or character `needle`, and optional integer
 ///           `from_index` with default value `|haystack|-1`
 /// \return an integer expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_last_index_of(
+std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);

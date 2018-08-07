@@ -34,8 +34,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param start_index: integer expression
 /// \param end_index: integer expression
 /// \return integer expression `0`
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_concat_substr(
+std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
@@ -115,8 +114,7 @@ exprt length_constraint_for_concat(
 /// \param s1: string expression
 /// \param c: character expression
 /// \return code 0 on success
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_concat_char(
+std::pair<exprt, string_constraintst> add_axioms_for_concat_char(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
@@ -156,8 +154,7 @@ exprt length_constraint_for_concat_char(
 /// \param s1: the string expression to append to
 /// \param s2: the string expression to append to the first one
 /// \return an integer expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_concat(
+std::pair<exprt, string_constraintst> add_axioms_for_concat(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
@@ -179,10 +176,10 @@ string_constraint_generatort::add_axioms_for_concat(
 ///           pointer `&res[0]`, refined_string `s1`, refined_string `s2`,
 ///           optional integer `start_index`, optional integer `end_index`
 /// \return an integer expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_concat(
+std::pair<exprt, string_constraintst> add_axioms_for_concat(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(args.size() == 4 || args.size() == 6);
@@ -204,10 +201,10 @@ string_constraint_generatort::add_axioms_for_concat(
 /// \param f: function application with a length, pointer, string and character
 ///           argument.
 /// \return code 0 on success
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_concat_char(
+std::pair<exprt, string_constraintst> add_axioms_for_concat_char(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 4);
@@ -222,10 +219,10 @@ string_constraint_generatort::add_axioms_for_concat_char(
 /// \deprecated java specific
 /// \param f: function application with two arguments: a string and a code point
 /// \return an expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_concat_code_point(
+std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 4);
   const array_string_exprt res =

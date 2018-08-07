@@ -29,8 +29,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param offset: integer expression
 /// \return an expression expression which is different from zero if there is
 ///         an exception to signal
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_insert(
+std::pair<exprt, string_constraintst> add_axioms_for_insert(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
@@ -102,16 +101,16 @@ exprt length_constraint_for_insert(
 ///           `end`
 /// \return an integer expression which is different from zero if there is
 ///         an exception to signal
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_insert(
+std::pair<exprt, string_constraintst> add_axioms_for_insert(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &pool)
 {
   PRECONDITION(f.arguments().size() == 5 || f.arguments().size() == 7);
-  array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
-  array_string_exprt s2 = get_string_expr(array_pool, f.arguments()[4]);
+  array_string_exprt s1 = get_string_expr(pool, f.arguments()[2]);
+  array_string_exprt s2 = get_string_expr(pool, f.arguments()[4]);
   array_string_exprt res =
-    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+    char_array_of_pointer(pool, f.arguments()[1], f.arguments()[0]);
   const exprt &offset = f.arguments()[3];
   if(f.arguments().size() == 7)
   {
@@ -120,7 +119,7 @@ string_constraint_generatort::add_axioms_for_insert(
     const typet &char_type = s1.content().type().subtype();
     const typet &index_type = s1.length().type();
     const array_string_exprt substring =
-      array_pool.fresh_string(index_type, char_type);
+      pool.fresh_string(index_type, char_type);
     return combine_results(
       add_axioms_for_substring(fresh_symbol, substring, s2, start, end),
       add_axioms_for_insert(fresh_symbol, res, s1, substring, offset));
@@ -137,10 +136,11 @@ string_constraint_generatort::add_axioms_for_insert(
 ///   integer offset, and an integer
 /// \return an expression
 DEPRECATED("should convert the value to string and call insert")
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_insert_int(
+std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
@@ -151,7 +151,7 @@ string_constraint_generatort::add_axioms_for_insert_int(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_for_string_of_int(fresh_symbol, s2, f.arguments()[4]),
+    add_axioms_for_string_of_int(fresh_symbol, s2, f.arguments()[4], 0, ns),
     add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
@@ -161,10 +161,10 @@ string_constraint_generatort::add_axioms_for_insert_int(
 ///   integer offset, and a Boolean
 /// \return a new string expression
 DEPRECATED("should convert the value to string and call insert")
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_insert_bool(
+std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[0]);
@@ -184,10 +184,10 @@ string_constraint_generatort::add_axioms_for_insert_bool(
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a character
 /// \return an expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_insert_char(
+std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt res =
@@ -208,10 +208,11 @@ string_constraint_generatort::add_axioms_for_insert_char(
 ///   integer offset, and a double
 /// \return a string expression
 DEPRECATED("should convert the value to string and call insert")
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_insert_double(
+std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt res =
@@ -222,7 +223,8 @@ string_constraint_generatort::add_axioms_for_insert_double(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_for_string_of_float(fresh_symbol, s2, f.arguments()[4]),
+    add_axioms_for_string_of_float(
+      fresh_symbol, s2, f.arguments()[4], array_pool, ns),
     add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
@@ -232,10 +234,11 @@ string_constraint_generatort::add_axioms_for_insert_double(
 ///   integer offset, and a float
 /// \return a new string expression
 DEPRECATED("should convert the value to string and call insert")
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_insert_float(
+std::pair<exprt, string_constraintst> add_axioms_for_insert_float(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
-  return add_axioms_for_insert_double(fresh_symbol, f);
+  return add_axioms_for_insert_double(fresh_symbol, f, array_pool, ns);
 }

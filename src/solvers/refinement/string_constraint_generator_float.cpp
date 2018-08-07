@@ -152,26 +152,29 @@ exprt estimate_decimal_exponent(const exprt &f, const ieee_float_spect &spec)
 /// Add axioms corresponding to the String.valueOf(F) java function
 /// \param f: function application with one float argument
 /// \return an integer expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_string_of_float(
+std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
   PRECONDITION(f.arguments().size() == 3);
   array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  return add_axioms_for_string_of_float(fresh_symbol, res, f.arguments()[2]);
+  return add_axioms_for_string_of_float(
+    fresh_symbol, res, f.arguments()[2], array_pool, ns);
 }
 
 /// Add axioms corresponding to the String.valueOf(D) java function
 /// \param f: function application with one double argument
 /// \return an integer expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_from_double(
+std::pair<exprt, string_constraintst> add_axioms_from_double(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
-  return add_axioms_for_string_of_float(fresh_symbol, f);
+  return add_axioms_for_string_of_float(fresh_symbol, f, array_pool, ns);
 }
 
 /// Add axioms corresponding to the integer part of m, in decimal form with no
@@ -186,11 +189,12 @@ string_constraint_generatort::add_axioms_from_double(
 /// \param f: expression representing a float
 /// \return an integer expression, different from zero if an error should be
 ///   raised
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_string_of_float(
+std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
-  const exprt &f)
+  const exprt &f,
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
   const floatbv_typet &type=to_floatbv_type(f.type());
   const ieee_float_spect float_spec(type);
@@ -220,7 +224,7 @@ string_constraint_generatort::add_axioms_for_string_of_float(
   const array_string_exprt integer_part_str =
     array_pool.fresh_string(index_type, char_type);
   auto result2 = add_axioms_for_string_of_int(
-    fresh_symbol, integer_part_str, integer_part, 8);
+    fresh_symbol, integer_part_str, integer_part, 8, ns);
 
   auto result3 = add_axioms_for_concat(
     fresh_symbol, res, integer_part_str, fractional_part_str);
@@ -239,8 +243,7 @@ string_constraint_generatort::add_axioms_for_string_of_float(
 /// \param max_size: a maximal size for the string, this includes the
 ///   potential minus sign and therefore should be greater than 2
 /// \return code 0 on success
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_fractional_part(
+std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &int_expr,
@@ -328,11 +331,12 @@ string_constraint_generatort::add_axioms_for_fractional_part(
 /// \param res: string expression representing the float in scientific notation
 /// \param f: a float expression, which is positive
 /// \return a integer expression different from 0 to signal an exception
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_from_float_scientific_notation(
+std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
-  const exprt &f)
+  const exprt &f,
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
   string_constraintst constraints;
   const ieee_float_spect float_spec = ieee_float_spect::single_precision();
@@ -439,11 +443,10 @@ string_constraint_generatort::add_axioms_from_float_scientific_notation(
     floatbv_mult(dec_significand, constant_float(0.1, float_spec)),
     dec_significand);
   dec_significand_int=round_expr_to_zero(dec_significand);
-
   array_string_exprt string_expr_integer_part =
     array_pool.fresh_string(index_type, char_type);
   auto result1 = add_axioms_for_string_of_int(
-    fresh_symbol, string_expr_integer_part, dec_significand_int, 3);
+    fresh_symbol, string_expr_integer_part, dec_significand_int, 3, ns);
   minus_exprt fractional_part(
     dec_significand, floatbv_of_int_expr(dec_significand_int, float_spec));
 
@@ -491,7 +494,7 @@ string_constraint_generatort::add_axioms_from_float_scientific_notation(
   const array_string_exprt exponent_string =
     array_pool.fresh_string(index_type, char_type);
   auto result6 = add_axioms_for_string_of_int(
-    fresh_symbol, exponent_string, decimal_exponent, 3);
+    fresh_symbol, exponent_string, decimal_exponent, 3, ns);
 
   // string_expr = concat(string_expr_with_E, exponent_string)
   auto result7 = add_axioms_for_concat(
@@ -521,14 +524,16 @@ string_constraint_generatort::add_axioms_from_float_scientific_notation(
 /// values
 /// \param f: a function application expression
 /// \return code 0 on success
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_from_float_scientific_notation(
+std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   const exprt &arg = f.arguments()[2];
-  return add_axioms_from_float_scientific_notation(fresh_symbol, res, arg);
+  return add_axioms_from_float_scientific_notation(
+    fresh_symbol, res, arg, array_pool, ns);
 }

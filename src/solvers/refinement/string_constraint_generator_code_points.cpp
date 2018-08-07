@@ -17,8 +17,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param res: array of characters corresponding to the result fo the function
 /// \param code_point: an expression representing a java code point
 /// \return integer expression equal to zero
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_code_point(
+std::pair<exprt, string_constraintst> add_axioms_for_code_point(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &code_point)
@@ -119,10 +118,10 @@ exprt pair_value(exprt char1, exprt char2, typet return_type)
 /// \param f: function application with arguments a string and an
 ///   index
 /// \return a integer expression corresponding to a code point
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_code_point_at(
+std::pair<exprt, string_constraintst> add_axioms_for_code_point_at(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   string_constraintst constraints;
   const typet &return_type = f.type();
@@ -152,10 +151,10 @@ string_constraint_generatort::add_axioms_for_code_point_at(
 /// \par parameters: function application with two arguments: a string and an
 ///   index
 /// \return a integer expression corresponding to a code point
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_code_point_before(
+std::pair<exprt, string_constraintst> add_axioms_for_code_point_before(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(args.size()==2);
@@ -188,10 +187,10 @@ string_constraint_generatort::add_axioms_for_code_point_before(
 /// \param f: function application with three arguments string `str`, integer
 ///           `begin` and integer `end`.
 /// \return an integer expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_code_point_count(
+std::pair<exprt, string_constraintst> add_axioms_for_code_point_count(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f)
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 3);
   string_constraintst constraints;
@@ -216,8 +215,7 @@ string_constraint_generatort::add_axioms_for_code_point_count(
 /// \param f: function application with arguments string `str`, integer `index`
 ///           and integer `offset`.
 /// \return a new string expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_offset_by_code_point(
+std::pair<exprt, string_constraintst> add_axioms_for_offset_by_code_point(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {

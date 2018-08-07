@@ -131,7 +131,7 @@ public:
   string_constraintst
   constraints(string_constraint_generatort &generator) const override
   {
-    auto pair = generator.add_axioms_for_concat_char(
+    auto pair = add_axioms_for_concat_char(
       generator.fresh_symbol, result, input, character);
     pair.second.existential.push_back(equal_exprt(pair.first, return_code));
     return pair.second;
@@ -177,7 +177,7 @@ public:
   string_constraintst
   constraints(string_constraint_generatort &generator) const override
   {
-    auto pair = generator.add_axioms_for_set_char(
+    auto pair = add_axioms_for_set_char(
       generator.fresh_symbol, result, input, position, character);
     pair.second.existential.push_back(equal_exprt(pair.first, return_code));
     return pair.second;
@@ -309,7 +309,7 @@ public:
   {
     if(args.size() == 1)
     {
-      auto pair = generator.add_axioms_for_insert(
+      auto pair = add_axioms_for_insert(
         generator.fresh_symbol, result, input1, input2, args[0]);
       pair.second.existential.push_back(equal_exprt(pair.first, return_code));
       return pair.second;
@@ -370,11 +370,11 @@ public:
   {
     auto pair = [&]() -> std::pair<exprt, string_constraintst> {
       if(args.size() == 0)
-        return generator.add_axioms_for_concat(
+        return add_axioms_for_concat(
           generator.fresh_symbol, result, input1, input2);
       if(args.size() == 2)
       {
-        return generator.add_axioms_for_concat_substr(
+        return add_axioms_for_concat_substr(
           generator.fresh_symbol, result, input1, input2, args[0], args[1]);
       }
       UNREACHABLE;
@@ -445,8 +445,8 @@ public:
   string_constraintst
   constraints(string_constraint_generatort &generator) const override
   {
-    auto pair = generator.add_axioms_for_string_of_int_with_radix(
-      generator.fresh_symbol, result, arg, radix);
+    auto pair = add_axioms_for_string_of_int_with_radix(
+      generator.fresh_symbol, result, arg, radix, 0, generator.ns);
     pair.second.existential.push_back(equal_exprt(pair.first, return_code));
     return pair.second;
   }
