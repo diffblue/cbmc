@@ -102,6 +102,8 @@ struct string_constraintst final
   void clear();
 };
 
+void merge(string_constraintst &result, string_constraintst other);
+
 class string_constraint_generatort final
 {
 public:

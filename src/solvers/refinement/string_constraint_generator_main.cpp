@@ -19,6 +19,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_constraint_generator.h>
 
+#include <iterator>
 #include <limits>
 #include <solvers/refinement/string_refinement_invariant.h>
 
@@ -214,6 +215,23 @@ void string_constraintst::clear()
   existential.clear();
   universal.clear();
   not_contains.clear();
+}
+
+/// Merge two sets of constraints by appending to the first one
+void merge(string_constraintst &result, string_constraintst other)
+{
+  std::move(
+    other.existential.begin(),
+    other.existential.end(),
+    std::back_inserter(result.existential));
+  std::move(
+    other.universal.begin(),
+    other.universal.end(),
+    std::back_inserter(result.universal));
+  std::move(
+    other.not_contains.begin(),
+    other.not_contains.end(),
+    std::back_inserter(result.not_contains));
 }
 
 /// Add constraint on characters of a string.
