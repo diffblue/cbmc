@@ -154,12 +154,13 @@ exprt estimate_decimal_exponent(const exprt &f, const ieee_float_spect &spec)
 /// \return an integer expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_string_of_float(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
   array_string_exprt res =
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_for_string_of_float(res, f.arguments()[2]);
+  return add_axioms_for_string_of_float(fresh_symbol, res, f.arguments()[2]);
 }
 
 /// Add axioms corresponding to the String.valueOf(D) java function
@@ -167,9 +168,10 @@ string_constraint_generatort::add_axioms_for_string_of_float(
 /// \return an integer expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_double(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
-  return add_axioms_for_string_of_float(f);
+  return add_axioms_for_string_of_float(fresh_symbol, f);
 }
 
 /// Add axioms corresponding to the integer part of m, in decimal form with no
@@ -186,6 +188,7 @@ string_constraint_generatort::add_axioms_from_double(
 ///   raised
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_string_of_float(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &f)
 {
@@ -205,8 +208,8 @@ string_constraint_generatort::add_axioms_for_string_of_float(
   const mod_exprt fractional_part(shifted, max_non_exponent_notation);
   const array_string_exprt fractional_part_str =
     array_pool.fresh_string(index_type, char_type);
-  auto result1 =
-    add_axioms_for_fractional_part(fractional_part_str, fractional_part, 6);
+  auto result1 = add_axioms_for_fractional_part(
+    fresh_symbol, fractional_part_str, fractional_part, 6);
 
   // The axiom added to convert to integer should always be satisfiable even
   // when the preconditions are not satisfied.
@@ -216,11 +219,11 @@ string_constraint_generatort::add_axioms_for_string_of_float(
   // part of the float.
   const array_string_exprt integer_part_str =
     array_pool.fresh_string(index_type, char_type);
-  auto result2 =
-    add_axioms_for_string_of_int(integer_part_str, integer_part, 8);
+  auto result2 = add_axioms_for_string_of_int(
+    fresh_symbol, integer_part_str, integer_part, 8);
 
-  auto result3 =
-    add_axioms_for_concat(res, integer_part_str, fractional_part_str);
+  auto result3 = add_axioms_for_concat(
+    fresh_symbol, res, integer_part_str, fractional_part_str);
   merge(result3.second, std::move(result1.second));
   merge(result3.second, std::move(result2.second));
 
@@ -238,6 +241,7 @@ string_constraint_generatort::add_axioms_for_string_of_float(
 /// \return code 0 on success
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_fractional_part(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &int_expr,
   size_t max_size)
@@ -326,6 +330,7 @@ string_constraint_generatort::add_axioms_for_fractional_part(
 /// \return a integer expression different from 0 to signal an exception
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_float_scientific_notation(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &f)
 {
@@ -438,7 +443,7 @@ string_constraint_generatort::add_axioms_from_float_scientific_notation(
   array_string_exprt string_expr_integer_part =
     array_pool.fresh_string(index_type, char_type);
   auto result1 = add_axioms_for_string_of_int(
-    string_expr_integer_part, dec_significand_int, 3);
+    fresh_symbol, string_expr_integer_part, dec_significand_int, 3);
   minus_exprt fractional_part(
     dec_significand, floatbv_of_int_expr(dec_significand_int, float_spec));
 
@@ -458,13 +463,14 @@ string_constraint_generatort::add_axioms_from_float_scientific_notation(
   array_string_exprt string_fractional_part =
     array_pool.fresh_string(index_type, char_type);
   auto result2 = add_axioms_for_fractional_part(
-    string_fractional_part, fractional_part_shifted, 6);
+    fresh_symbol, string_fractional_part, fractional_part_shifted, 6);
 
   // string_expr_with_fractional_part =
   //   concat(string_with_do, string_fractional_part)
   const array_string_exprt string_expr_with_fractional_part =
     array_pool.fresh_string(index_type, char_type);
   auto result3 = add_axioms_for_concat(
+    fresh_symbol,
     string_expr_with_fractional_part,
     string_expr_integer_part,
     string_fractional_part);
@@ -476,17 +482,20 @@ string_constraint_generatort::add_axioms_from_float_scientific_notation(
   const array_string_exprt string_expr_with_E =
     array_pool.fresh_string(index_type, char_type);
   auto result5 = add_axioms_for_concat(
-    string_expr_with_E, string_expr_with_fractional_part, stringE);
+    fresh_symbol,
+    string_expr_with_E,
+    string_expr_with_fractional_part,
+    stringE);
 
   // exponent_string = string_of_int(decimal_exponent)
   const array_string_exprt exponent_string =
     array_pool.fresh_string(index_type, char_type);
-  auto result6 =
-    add_axioms_for_string_of_int(exponent_string, decimal_exponent, 3);
+  auto result6 = add_axioms_for_string_of_int(
+    fresh_symbol, exponent_string, decimal_exponent, 3);
 
   // string_expr = concat(string_expr_with_E, exponent_string)
-  auto result7 =
-    add_axioms_for_concat(res, string_expr_with_E, exponent_string);
+  auto result7 = add_axioms_for_concat(
+    fresh_symbol, res, string_expr_with_E, exponent_string);
 
   const exprt return_code = maximum(
     result1.first,
@@ -514,11 +523,12 @@ string_constraint_generatort::add_axioms_from_float_scientific_notation(
 /// \return code 0 on success
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_float_scientific_notation(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   const exprt &arg = f.arguments()[2];
-  return add_axioms_from_float_scientific_notation(res, arg);
+  return add_axioms_from_float_scientific_notation(fresh_symbol, res, arg);
 }

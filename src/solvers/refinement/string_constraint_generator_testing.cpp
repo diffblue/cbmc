@@ -35,6 +35,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \return Boolean expression `isprefix`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_is_prefix(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &prefix,
   const array_string_exprt &str,
   const exprt &offset)
@@ -95,6 +96,7 @@ string_constraint_generatort::add_axioms_for_is_prefix(
 /// \return boolean expression `isprefix`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_is_prefix(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   bool swap_arguments)
 {
@@ -107,7 +109,7 @@ string_constraint_generatort::add_axioms_for_is_prefix(
     get_string_expr(args[swap_arguments ? 0u : 1u]);
   const exprt offset =
     args.size() == 2 ? from_integer(0, s0.length().type()) : args[2];
-  auto pair = add_axioms_for_is_prefix(s0, s1, offset);
+  auto pair = add_axioms_for_is_prefix(fresh_symbol, s0, s1, offset);
   return {typecast_exprt(pair.first, f.type()), std::move(pair.second)};
 }
 
@@ -119,6 +121,7 @@ string_constraint_generatort::add_axioms_for_is_prefix(
 DEPRECATED("should use `string_length(s)==0` instead")
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_is_empty(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
@@ -158,6 +161,7 @@ string_constraint_generatort::add_axioms_for_is_empty(
 DEPRECATED("should use `strings_startwith(s0, s1, s1.length - s0.length)`")
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_is_suffix(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   bool swap_arguments)
 {
@@ -220,6 +224,7 @@ string_constraint_generatort::add_axioms_for_is_suffix(
 /// \return Boolean expression `contains`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_contains(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);

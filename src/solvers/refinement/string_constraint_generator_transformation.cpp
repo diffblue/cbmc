@@ -34,6 +34,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \return integer expressino equal to `0`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_set_length(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 4);
@@ -91,6 +92,7 @@ string_constraint_generatort::add_axioms_for_set_length(
 ///         exception to signal
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_substring(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
@@ -99,7 +101,7 @@ string_constraint_generatort::add_axioms_for_substring(
   const array_string_exprt res = char_array_of_pointer(args[1], args[0]);
   const exprt &i = args[3];
   const exprt j = args.size() == 5 ? args[4] : str.length();
-  return add_axioms_for_substring(res, str, i, j);
+  return add_axioms_for_substring(fresh_symbol, res, str, i, j);
 }
 
 /// Add axioms ensuring that `res` corresponds to the substring of `str`
@@ -118,6 +120,7 @@ string_constraint_generatort::add_axioms_for_substring(
 /// \return integer expression equal to zero
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_substring(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &str,
   const exprt &start,
@@ -175,6 +178,7 @@ string_constraint_generatort::add_axioms_for_substring(
 ///         exception to signal
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_trim(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
@@ -247,6 +251,7 @@ string_constraint_generatort::add_axioms_for_trim(
 ///         exception to signal
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_to_lower_case(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
@@ -358,6 +363,7 @@ string_constraint_generatort::add_axioms_for_to_lower_case(
 ///         exception to signal
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_to_upper_case(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &str)
 {
@@ -397,13 +403,14 @@ string_constraint_generatort::add_axioms_for_to_upper_case(
 ///         exception to signal
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_to_upper_case(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
   array_string_exprt res =
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   array_string_exprt str = get_string_expr(f.arguments()[2]);
-  return add_axioms_for_to_upper_case(res, str);
+  return add_axioms_for_to_upper_case(fresh_symbol, res, str);
 }
 
 /// Set a character to a specific value at an index of the string
@@ -413,6 +420,7 @@ string_constraint_generatort::add_axioms_for_to_upper_case(
 ///           and character `char`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_char_set(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 5);
@@ -421,7 +429,7 @@ string_constraint_generatort::add_axioms_for_char_set(
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   const exprt &position = f.arguments()[3];
   const exprt &character = f.arguments()[4];
-  return add_axioms_for_set_char(res, str, position, character);
+  return add_axioms_for_set_char(fresh_symbol, res, str, position, character);
 }
 
 /// Add axioms ensuring that the result `res` is similar to input string `str`
@@ -437,6 +445,7 @@ string_constraint_generatort::add_axioms_for_char_set(
 ///         `0` otherwise
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_set_char(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &str,
   const exprt &position,
@@ -519,6 +528,7 @@ static optionalt<std::pair<exprt, exprt>> to_char_pair(
 /// \return an integer expression equal to 0
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_replace(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 5);
@@ -558,6 +568,7 @@ string_constraint_generatort::add_axioms_for_replace(
 /// \return an expression whose value is non null to signal an exception
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_delete_char_at(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 4);
@@ -566,7 +577,11 @@ string_constraint_generatort::add_axioms_for_delete_char_at(
   const array_string_exprt str = get_string_expr(f.arguments()[2]);
   exprt index_one=from_integer(1, str.length().type());
   return add_axioms_for_delete(
-    res, str, f.arguments()[3], plus_exprt(f.arguments()[3], index_one));
+    fresh_symbol,
+    res,
+    str,
+    f.arguments()[3],
+    plus_exprt(f.arguments()[3], index_one));
 }
 
 /// Add axioms stating that `res` corresponds to the input `str`
@@ -585,6 +600,7 @@ string_constraint_generatort::add_axioms_for_delete_char_at(
 /// \return integer expression different from zero to signal an exception
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_delete(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &str,
   const exprt &start,
@@ -600,10 +616,10 @@ string_constraint_generatort::add_axioms_for_delete(
     array_pool.fresh_string(index_type, char_type);
   return combine_results(
     add_axioms_for_substring(
-      sub1, str, from_integer(0, str.length().type()), start),
+      fresh_symbol, sub1, str, from_integer(0, str.length().type()), start),
     combine_results(
-      add_axioms_for_substring(sub2, str, end, str.length()),
-      add_axioms_for_concat(res, sub1, sub2)));
+      add_axioms_for_substring(fresh_symbol, sub2, str, end, str.length()),
+      add_axioms_for_concat(fresh_symbol, res, sub1, sub2)));
 }
 
 /// Remove a portion of a string
@@ -620,11 +636,13 @@ string_constraint_generatort::add_axioms_for_delete(
 ///   an exception
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_delete(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt res =
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt arg = get_string_expr(f.arguments()[2]);
-  return add_axioms_for_delete(res, arg, f.arguments()[3], f.arguments()[4]);
+  return add_axioms_for_delete(
+    fresh_symbol, res, arg, f.arguments()[3], f.arguments()[4]);
 }

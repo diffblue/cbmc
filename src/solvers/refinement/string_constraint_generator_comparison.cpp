@@ -28,6 +28,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_equals(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
@@ -126,6 +127,7 @@ static exprt character_equals_ignore_case(
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_equals_ignore_case(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
@@ -180,6 +182,7 @@ string_constraint_generatort::add_axioms_for_equals_ignore_case(
 /// \return integer expression `hash(str)`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_hash_code(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 1);
@@ -228,6 +231,7 @@ string_constraint_generatort::add_axioms_for_hash_code(
 /// \return integer expression `res`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_compare_to(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
@@ -294,6 +298,7 @@ string_constraint_generatort::add_axioms_for_compare_to(
 DEPRECATED("never tested")
 std::pair<symbol_exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_intern(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 1);

@@ -42,6 +42,7 @@ static unsigned long to_integer_or_default(
 /// \return a new string expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_int(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
@@ -49,9 +50,9 @@ string_constraint_generatort::add_axioms_from_int(
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   if(f.arguments().size() == 4)
     return add_axioms_for_string_of_int_with_radix(
-      res, f.arguments()[2], f.arguments()[3]);
+      fresh_symbol, res, f.arguments()[2], f.arguments()[3]);
   else // f.arguments.size()==3
-    return add_axioms_for_string_of_int(res, f.arguments()[2]);
+    return add_axioms_for_string_of_int(fresh_symbol, res, f.arguments()[2]);
 }
 
 /// Add axioms corresponding to the String.valueOf(J) java function.
@@ -61,6 +62,7 @@ string_constraint_generatort::add_axioms_from_int(
 DEPRECATED("should use add_axioms_for_string_of_int instead")
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_long(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
@@ -68,9 +70,9 @@ string_constraint_generatort::add_axioms_from_long(
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   if(f.arguments().size() == 4)
     return add_axioms_for_string_of_int_with_radix(
-      res, f.arguments()[2], f.arguments()[3]);
+      fresh_symbol, res, f.arguments()[2], f.arguments()[3]);
   else
-    return add_axioms_for_string_of_int(res, f.arguments()[2]);
+    return add_axioms_for_string_of_int(fresh_symbol, res, f.arguments()[2]);
 }
 
 /// Add axioms corresponding to the String.valueOf(Z) java function.
@@ -80,12 +82,13 @@ string_constraint_generatort::add_axioms_from_long(
 DEPRECATED("This is Java specific and should be implemented in Java instead")
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_bool(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_bool(res, f.arguments()[2]);
+  return add_axioms_from_bool(fresh_symbol, res, f.arguments()[2]);
 }
 
 /// Add axioms stating that the returned string equals "true" when the Boolean
@@ -97,6 +100,7 @@ string_constraint_generatort::add_axioms_from_bool(
 DEPRECATED("This is Java specific and should be implemented in Java instead")
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_bool(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &b)
 {
@@ -146,13 +150,14 @@ string_constraint_generatort::add_axioms_from_bool(
 /// \return code 0 on success
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_string_of_int(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &input_int,
   size_t max_size)
 {
   const constant_exprt radix=from_integer(10, input_int.type());
   return add_axioms_for_string_of_int_with_radix(
-    res, input_int, radix, max_size);
+    fresh_symbol, res, input_int, radix, max_size);
 }
 
 /// Add axioms enforcing that the string corresponds to the result
@@ -166,6 +171,7 @@ string_constraint_generatort::add_axioms_for_string_of_int(
 /// \return code 0 on success
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &input_int,
   const exprt &radix,
@@ -230,6 +236,7 @@ DEPRECATED(
   "use add_axioms_for_string_of_int which takes a radix argument instead")
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_int_hex(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &i)
 {
@@ -287,12 +294,13 @@ string_constraint_generatort::add_axioms_from_int_hex(
 /// \return code 0 on success
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_int_hex(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_int_hex(res, f.arguments()[2]);
+  return add_axioms_from_int_hex(fresh_symbol, res, f.arguments()[2]);
 }
 
 /// Conversion from char to string
@@ -307,12 +315,13 @@ string_constraint_generatort::add_axioms_from_int_hex(
 /// \return code 0 on success
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_char(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_char(res, f.arguments()[2]);
+  return add_axioms_from_char(fresh_symbol, res, f.arguments()[2]);
 }
 
 /// Add axiom stating that string `res` has length 1 and the character
@@ -324,6 +333,7 @@ string_constraint_generatort::add_axioms_from_char(
 /// \return code 0 on success
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_char(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &c)
 {
@@ -521,6 +531,7 @@ string_constraint_generatort::add_axioms_for_characters_in_integer_string(
 /// \return integer expression equal to the value represented by `str`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_parse_int(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size()==1 || f.arguments().size()==2);

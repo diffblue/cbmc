@@ -63,6 +63,7 @@ string_constraint_generatort::add_axioms_for_constant(
 /// \return integer expression equal to zero
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_empty_string(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
@@ -82,6 +83,7 @@ string_constraint_generatort::add_axioms_for_empty_string(
 ///         form \f$ e := "<string constant>" | (expr)? e : e \f$
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_cprover_string(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &arg,
   const exprt &guard)
@@ -91,8 +93,10 @@ string_constraint_generatort::add_axioms_for_cprover_string(
     const and_exprt guard_true(guard, if_expr->cond());
     const and_exprt guard_false(guard, not_exprt(if_expr->cond()));
     return combine_results(
-      add_axioms_for_cprover_string(res, if_expr->true_case(), guard_true),
-      add_axioms_for_cprover_string(res, if_expr->false_case(), guard_false));
+      add_axioms_for_cprover_string(
+        fresh_symbol, res, if_expr->true_case(), guard_true),
+      add_axioms_for_cprover_string(
+        fresh_symbol, res, if_expr->false_case(), guard_false));
   }
   else if(const auto constant_expr = expr_try_dynamic_cast<constant_exprt>(arg))
     return add_axioms_for_constant(res, constant_expr->get_value(), guard);
@@ -110,10 +114,12 @@ string_constraint_generatort::add_axioms_for_cprover_string(
 /// \return string expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_from_literal(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(args.size() == 3); // Bad args to string literal?
   const array_string_exprt res = char_array_of_pointer(args[1], args[0]);
-  return add_axioms_for_cprover_string(res, args[2], true_exprt());
+  return add_axioms_for_cprover_string(
+    fresh_symbol, res, args[2], true_exprt());
 }

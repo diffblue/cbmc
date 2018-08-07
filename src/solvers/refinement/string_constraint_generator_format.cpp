@@ -258,6 +258,7 @@ static exprt get_component_in_struct(
 /// \return String expression representing the output of String.format.
 std::pair<array_string_exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_format_specifier(
+  symbol_generatort &fresh_symbol,
   const format_specifiert &fs,
   const struct_exprt &arg,
   const typet &index_type,
@@ -269,34 +270,34 @@ string_constraint_generatort::add_axioms_for_format_specifier(
   switch(fs.conversion)
   {
   case format_specifiert::DECIMAL_INTEGER:
-    return_code =
-      add_axioms_for_string_of_int(res, get_component_in_struct(arg, ID_int));
+    return_code = add_axioms_for_string_of_int(
+      fresh_symbol, res, get_component_in_struct(arg, ID_int));
     return {res, std::move(return_code.second)};
   case format_specifiert::HEXADECIMAL_INTEGER:
-    return_code =
-      add_axioms_from_int_hex(res, get_component_in_struct(arg, ID_int));
+    return_code = add_axioms_from_int_hex(
+      fresh_symbol, res, get_component_in_struct(arg, ID_int));
     return {res, std::move(return_code.second)};
   case format_specifiert::SCIENTIFIC:
     return_code = add_axioms_from_float_scientific_notation(
-      res, get_component_in_struct(arg, ID_float));
+      fresh_symbol, res, get_component_in_struct(arg, ID_float));
     return {res, std::move(return_code.second)};
   case format_specifiert::DECIMAL_FLOAT:
     return_code = add_axioms_for_string_of_float(
-      res, get_component_in_struct(arg, ID_float));
+      fresh_symbol, res, get_component_in_struct(arg, ID_float));
     return {res, std::move(return_code.second)};
   case format_specifiert::CHARACTER:
-    return_code =
-      add_axioms_from_char(res, get_component_in_struct(arg, ID_char));
+    return_code = add_axioms_from_char(
+      fresh_symbol, res, get_component_in_struct(arg, ID_char));
     return {res, std::move(return_code.second)};
   case format_specifiert::BOOLEAN:
-    return_code =
-      add_axioms_from_bool(res, get_component_in_struct(arg, ID_boolean));
+    return_code = add_axioms_from_bool(
+      fresh_symbol, res, get_component_in_struct(arg, ID_boolean));
     return {res, std::move(return_code.second)};
   case format_specifiert::STRING:
     return {get_string_expr(get_component_in_struct(arg, "string_expr")), {}};
   case format_specifiert::HASHCODE:
     return_code = add_axioms_for_string_of_int(
-      res, get_component_in_struct(arg, "hashcode"));
+      fresh_symbol, res, get_component_in_struct(arg, "hashcode"));
     return {res, std::move(return_code.second)};
   case format_specifiert::LINE_SEPARATOR:
     // TODO: the constant should depend on the system: System.lineSeparator()
@@ -316,10 +317,10 @@ string_constraint_generatort::add_axioms_for_format_specifier(
   {
     string_constraint_generatort::format_specifiert fs_lower=fs;
     fs_lower.conversion=tolower(fs.conversion);
-    auto format_specifier_result =
-      add_axioms_for_format_specifier(fs_lower, arg, index_type, char_type);
-    auto upper_case_result =
-      add_axioms_for_to_upper_case(res, format_specifier_result.first);
+    auto format_specifier_result = add_axioms_for_format_specifier(
+      fresh_symbol, fs_lower, arg, index_type, char_type);
+    auto upper_case_result = add_axioms_for_to_upper_case(
+      fresh_symbol, res, format_specifier_result.first);
     merge(upper_case_result.second, std::move(format_specifier_result.second));
     return {res, std::move(upper_case_result.second)};
   }
@@ -352,6 +353,7 @@ string_constraint_generatort::add_axioms_for_format_specifier(
 /// \return code, 0 on success
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_format(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const std::string &s,
   const exprt::operandst &args)
@@ -389,8 +391,8 @@ string_constraint_generatort::add_axioms_for_format(
           arg=to_struct_expr(args[fs.index-1]);
         }
       }
-      auto result =
-        add_axioms_for_format_specifier(fs, arg, index_type, char_type);
+      auto result = add_axioms_for_format_specifier(
+        fresh_symbol, fs, arg, index_type, char_type);
       merge(constraints, std::move(result.second));
       intermediary_strings.push_back(result.first);
     }
@@ -420,7 +422,7 @@ string_constraint_generatort::add_axioms_for_format(
   {
     // Copy the first string
     auto result = add_axioms_for_substring(
-      res, str, from_integer(0, index_type), str.length());
+      fresh_symbol, res, str, from_integer(0, index_type), str.length());
     merge(constraints, std::move(result.second));
     return {result.first, std::move(constraints)};
   }
@@ -431,13 +433,14 @@ string_constraint_generatort::add_axioms_for_format(
     const array_string_exprt &intermediary = intermediary_strings[i];
     const array_string_exprt fresh =
       array_pool.fresh_string(index_type, char_type);
-    auto result = add_axioms_for_concat(fresh, str, intermediary);
+    auto result = add_axioms_for_concat(fresh_symbol, fresh, str, intermediary);
     return_code = maximum(return_code, result.first);
     merge(constraints, std::move(result.second));
     str = fresh;
   }
 
-  auto result = add_axioms_for_concat(res, str, intermediary_strings.back());
+  auto result =
+    add_axioms_for_concat(fresh_symbol, res, str, intermediary_strings.back());
   merge(constraints, std::move(result.second));
   return {maximum(result.first, return_code), std::move(constraints)};
 }
@@ -475,6 +478,7 @@ utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
 ///   returned.
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_format(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() >= 3);
@@ -491,7 +495,7 @@ string_constraint_generatort::add_axioms_for_format(
       to_array_expr(s1.content()), length);
     // List of arguments after s
     std::vector<exprt> args(f.arguments().begin() + 3, f.arguments().end());
-    return add_axioms_for_format(res, s, args);
+    return add_axioms_for_format(fresh_symbol, res, s, args);
   }
   else
   {

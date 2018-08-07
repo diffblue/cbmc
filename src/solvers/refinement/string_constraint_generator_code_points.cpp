@@ -19,6 +19,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \return integer expression equal to zero
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_code_point(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &code_point)
 {
@@ -120,6 +121,7 @@ exprt pair_value(exprt char1, exprt char2, typet return_type)
 /// \return a integer expression corresponding to a code point
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_code_point_at(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   string_constraintst constraints;
@@ -152,6 +154,7 @@ string_constraint_generatort::add_axioms_for_code_point_at(
 /// \return a integer expression corresponding to a code point
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_code_point_before(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
@@ -187,6 +190,7 @@ string_constraint_generatort::add_axioms_for_code_point_before(
 /// \return an integer expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_code_point_count(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
@@ -214,6 +218,7 @@ string_constraint_generatort::add_axioms_for_code_point_count(
 /// \return a new string expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_offset_by_code_point(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);

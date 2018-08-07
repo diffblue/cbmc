@@ -31,6 +31,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///         an exception to signal
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_insert(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const array_string_exprt &s2,
@@ -103,6 +104,7 @@ exprt length_constraint_for_insert(
 ///         an exception to signal
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_insert(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 5 || f.arguments().size() == 7);
@@ -120,12 +122,12 @@ string_constraint_generatort::add_axioms_for_insert(
     const array_string_exprt substring =
       array_pool.fresh_string(index_type, char_type);
     return combine_results(
-      add_axioms_for_substring(substring, s2, start, end),
-      add_axioms_for_insert(res, s1, substring, offset));
+      add_axioms_for_substring(fresh_symbol, substring, s2, start, end),
+      add_axioms_for_insert(fresh_symbol, res, s1, substring, offset));
   }
   else // 5 arguments
   {
-    return add_axioms_for_insert(res, s1, s2, offset);
+    return add_axioms_for_insert(fresh_symbol, res, s1, s2, offset);
   }
 }
 
@@ -137,6 +139,7 @@ string_constraint_generatort::add_axioms_for_insert(
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_insert_int(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 5);
@@ -148,8 +151,8 @@ string_constraint_generatort::add_axioms_for_insert_int(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_for_string_of_int(s2, f.arguments()[4]),
-    add_axioms_for_insert(res, s1, s2, offset));
+    add_axioms_for_string_of_int(fresh_symbol, s2, f.arguments()[4]),
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
 /// add axioms corresponding to the StringBuilder.insert(Z) java function
@@ -160,6 +163,7 @@ string_constraint_generatort::add_axioms_for_insert_int(
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_insert_bool(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 5);
@@ -171,8 +175,8 @@ string_constraint_generatort::add_axioms_for_insert_bool(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_from_bool(s2, f.arguments()[4]),
-    add_axioms_for_insert(res, s1, s2, offset));
+    add_axioms_from_bool(fresh_symbol, s2, f.arguments()[4]),
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
 /// Add axioms corresponding to the StringBuilder.insert(C) java function
@@ -182,6 +186,7 @@ string_constraint_generatort::add_axioms_for_insert_bool(
 /// \return an expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_insert_char(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 5);
@@ -193,8 +198,8 @@ string_constraint_generatort::add_axioms_for_insert_char(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_from_char(s2, f.arguments()[4]),
-    add_axioms_for_insert(res, s1, s2, offset));
+    add_axioms_from_char(fresh_symbol, s2, f.arguments()[4]),
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
 /// add axioms corresponding to the StringBuilder.insert(D) java function
@@ -205,6 +210,7 @@ string_constraint_generatort::add_axioms_for_insert_char(
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_insert_double(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 5);
@@ -216,8 +222,8 @@ string_constraint_generatort::add_axioms_for_insert_double(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_for_string_of_float(s2, f.arguments()[4]),
-    add_axioms_for_insert(res, s1, s2, offset));
+    add_axioms_for_string_of_float(fresh_symbol, s2, f.arguments()[4]),
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
 /// Add axioms corresponding to the StringBuilder.insert(F) java function
@@ -228,7 +234,8 @@ string_constraint_generatort::add_axioms_for_insert_double(
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_insert_float(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
-  return add_axioms_for_insert_double(f);
+  return add_axioms_for_insert_double(fresh_symbol, f);
 }

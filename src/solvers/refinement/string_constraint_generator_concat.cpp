@@ -36,6 +36,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \return integer expression `0`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_concat_substr(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const array_string_exprt &s2,
@@ -116,6 +117,7 @@ exprt length_constraint_for_concat(
 /// \return code 0 on success
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_concat_char(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const exprt &c)
@@ -156,12 +158,14 @@ exprt length_constraint_for_concat_char(
 /// \return an integer expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_concat(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const array_string_exprt &s2)
 {
   exprt index_zero=from_integer(0, s2.length().type());
-  return add_axioms_for_concat_substr(res, s1, s2, index_zero, s2.length());
+  return add_axioms_for_concat_substr(
+    fresh_symbol, res, s1, s2, index_zero, s2.length());
 }
 
 /// String concatenation
@@ -177,6 +181,7 @@ string_constraint_generatort::add_axioms_for_concat(
 /// \return an integer expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_concat(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
@@ -185,9 +190,10 @@ string_constraint_generatort::add_axioms_for_concat(
   const array_string_exprt s2 = get_string_expr(args[3]);
   const array_string_exprt res = char_array_of_pointer(args[1], args[0]);
   if(args.size() == 6)
-    return add_axioms_for_concat_substr(res, s1, s2, args[4], args[5]);
+    return add_axioms_for_concat_substr(
+      fresh_symbol, res, s1, s2, args[4], args[5]);
   else // args.size()==4
-    return add_axioms_for_concat(res, s1, s2);
+    return add_axioms_for_concat(fresh_symbol, res, s1, s2);
 }
 
 /// Add axioms enforcing that the string represented by the two first
@@ -199,6 +205,7 @@ string_constraint_generatort::add_axioms_for_concat(
 /// \return code 0 on success
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_concat_char(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
@@ -206,7 +213,7 @@ string_constraint_generatort::add_axioms_for_concat_char(
   const array_string_exprt s1 = get_string_expr(args[2]);
   const exprt &c = args[3];
   const array_string_exprt res = char_array_of_pointer(args[1], args[0]);
-  return add_axioms_for_concat_char(res, s1, c);
+  return add_axioms_for_concat_char(fresh_symbol, res, s1, c);
 }
 
 /// Add axioms corresponding to the StringBuilder.appendCodePoint(I) function
@@ -215,6 +222,7 @@ string_constraint_generatort::add_axioms_for_concat_char(
 /// \return an expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_concat_code_point(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 4);
@@ -226,6 +234,6 @@ string_constraint_generatort::add_axioms_for_concat_code_point(
   const array_string_exprt code_point =
     array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_for_code_point(code_point, f.arguments()[3]),
-    add_axioms_for_concat(res, s1, code_point));
+    add_axioms_for_code_point(fresh_symbol, code_point, f.arguments()[3]),
+    add_axioms_for_concat(fresh_symbol, res, s1, code_point));
 }

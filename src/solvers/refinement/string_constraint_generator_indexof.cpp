@@ -36,6 +36,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \return integer expression `index`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_index_of(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
   const exprt &c,
   const exprt &from_index)
@@ -108,6 +109,7 @@ string_constraint_generatort::add_axioms_for_index_of(
 ///   in `haystack`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_index_of_string(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
   const exprt &from_index)
@@ -202,6 +204,7 @@ string_constraint_generatort::add_axioms_for_index_of_string(
 ///         in `haystack` before or at `from_index`, or -1 if there is none
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_last_index_of_string(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
   const exprt &from_index)
@@ -286,6 +289,7 @@ string_constraint_generatort::add_axioms_for_last_index_of_string(
 /// \return integer expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_index_of(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
@@ -301,7 +305,7 @@ string_constraint_generatort::add_axioms_for_index_of(
   if(c.type().id()==ID_unsignedbv || c.type().id()==ID_signedbv)
   {
     return add_axioms_for_index_of(
-      str, typecast_exprt(c, char_type), from_index);
+      fresh_symbol, str, typecast_exprt(c, char_type), from_index);
   }
   else
   {
@@ -310,7 +314,7 @@ string_constraint_generatort::add_axioms_for_index_of(
       string_refinement_invariantt("c can only be a (un)signedbv or a refined "
         "string and the (un)signedbv case is already handled"));
     array_string_exprt sub = get_string_expr(c);
-    return add_axioms_for_index_of_string(str, sub, from_index);
+    return add_axioms_for_index_of_string(fresh_symbol, str, sub, from_index);
   }
 }
 
@@ -339,6 +343,7 @@ string_constraint_generatort::add_axioms_for_index_of(
 ///         in `haystack` before or at `from_index`, or `-1` if there is none
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_last_index_of(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
   const exprt &c,
   const exprt &from_index)
@@ -406,6 +411,7 @@ string_constraint_generatort::add_axioms_for_last_index_of(
 /// \return an integer expression
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_last_index_of(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
@@ -421,11 +427,12 @@ string_constraint_generatort::add_axioms_for_last_index_of(
   if(c.type().id()==ID_unsignedbv || c.type().id()==ID_signedbv)
   {
     return add_axioms_for_last_index_of(
-      str, typecast_exprt(c, char_type), from_index);
+      fresh_symbol, str, typecast_exprt(c, char_type), from_index);
   }
   else
   {
     const array_string_exprt sub = get_string_expr(c);
-    return add_axioms_for_last_index_of_string(str, sub, from_index);
+    return add_axioms_for_last_index_of_string(
+      fresh_symbol, str, sub, from_index);
   }
 }

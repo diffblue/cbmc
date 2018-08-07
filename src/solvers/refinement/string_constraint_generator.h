@@ -116,8 +116,9 @@ public:
 
   explicit string_constraint_generatort(const namespacet &ns);
 
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_function_application(const function_application_exprt &expr);
+  std::pair<exprt, string_constraintst> add_axioms_for_function_application(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &expr);
 
   symbol_generatort fresh_symbol;
 
@@ -138,30 +139,36 @@ public:
   }
 
   std::pair<exprt, string_constraintst> add_axioms_for_concat_char(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const array_string_exprt &s1,
     const exprt &c);
   std::pair<exprt, string_constraintst> add_axioms_for_concat(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const array_string_exprt &s1,
     const array_string_exprt &s2);
   std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const array_string_exprt &s1,
     const array_string_exprt &s2,
     const exprt &start_index,
     const exprt &end_index);
   std::pair<exprt, string_constraintst> add_axioms_for_insert(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const array_string_exprt &s1,
     const array_string_exprt &s2,
     const exprt &offset);
   std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const exprt &input_int,
     const exprt &radix,
     size_t max_size = 0);
   std::pair<exprt, string_constraintst> add_axioms_for_set_char(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const array_string_exprt &str,
     const exprt &position,
@@ -170,6 +177,7 @@ public:
     const array_string_exprt &res,
     const array_string_exprt &str);
   std::pair<exprt, string_constraintst> add_axioms_for_to_upper_case(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const array_string_exprt &expr);
 
@@ -184,8 +192,9 @@ private:
     const exprt &start,
     const exprt &end,
     const std::string &char_set);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_constrain_characters(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
   // The following functions add axioms for the returned value
   // to be equal to the result of the function given as argument.
@@ -193,201 +202,268 @@ private:
   // `add_axioms_for_function_application` which determines which of
   // these methods should be called.
 
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_char_at(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_code_point_at(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_code_point_before(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_contains(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_equals(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_equals_ignore_case(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_char_at(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_code_point_at(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_code_point_before(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_contains(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_equals(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
   // Add axioms corresponding to the String.hashCode java function
   // The specification is partial: the actual value is not actually computed
   // but we ensure that hash codes of equal strings are equal.
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_hash_code(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_hash_code(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_is_empty(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
   std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &prefix,
     const array_string_exprt &str,
     const exprt &offset);
   std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
+    symbol_generatort &fresh_symbol,
     const function_application_exprt &f,
     bool swap_arguments = false);
   std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
+    symbol_generatort &fresh_symbol,
     const function_application_exprt &f,
     bool swap_arguments = false);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_length(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_empty_string(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_char_set(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_copy(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_concat_char(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_concat(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_concat_code_point(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_length(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_empty_string(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_char_set(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_copy(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_concat_char(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_concat(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
   std::pair<exprt, string_constraintst> add_axioms_for_constant(
     const array_string_exprt &res,
     irep_idt sval,
     const exprt &guard = true_exprt());
 
   std::pair<exprt, string_constraintst> add_axioms_for_delete(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const array_string_exprt &str,
     const exprt &start,
     const exprt &end);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_delete(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_delete_char_at(const function_application_exprt &expr);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_format(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_delete(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_delete_char_at(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &expr);
   std::pair<exprt, string_constraintst> add_axioms_for_format(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_format(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const std::string &s,
     const exprt::operandst &args);
 
   std::pair<array_string_exprt, string_constraintst>
   add_axioms_for_format_specifier(
+    symbol_generatort &fresh_symbol,
     const format_specifiert &fs,
     const struct_exprt &arg,
     const typet &index_type,
     const typet &char_type);
 
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_insert(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_insert_int(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_insert_bool(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_insert_char(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_insert_float(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_insert_double(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_insert(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_insert_float(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
   std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const exprt &arg,
     const exprt &guard);
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_literal(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_int(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_from_literal(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_from_int(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
   std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const exprt &input_int,
     size_t max_size = 0);
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i);
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_int_hex(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_long(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_bool(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_bool(const array_string_exprt &res, const exprt &i);
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_char(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_char(const array_string_exprt &res, const exprt &i);
+  std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
+    symbol_generatort &fresh_symbol,
+    const array_string_exprt &res,
+    const exprt &i);
+  std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_from_long(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_from_bool(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_from_bool(
+    symbol_generatort &fresh_symbol,
+    const array_string_exprt &res,
+    const exprt &i);
+  std::pair<exprt, string_constraintst> add_axioms_from_char(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_from_char(
+    symbol_generatort &fresh_symbol,
+    const array_string_exprt &res,
+    const exprt &i);
   std::pair<exprt, string_constraintst> add_axioms_for_index_of(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &str,
     const exprt &c,
     const exprt &from_index);
   std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &haystack,
     const array_string_exprt &needle,
     const exprt &from_index);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_index_of(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_index_of(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
   std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &haystack,
     const array_string_exprt &needle,
     const exprt &from_index);
   std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &str,
     const exprt &c,
     const exprt &from_index);
 
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_last_index_of(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
   /// \todo The specifications of these functions is only partial.
   /// We currently only specify that the string for NaN is "NaN", for infinity
   /// and minus infinity the string are "Infinity" and "-Infinity respectively
   /// otherwise the string contains only characters in [0123456789.] and '-' at
   /// the start for negative number
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_string_of_float(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_string_of_float(const array_string_exprt &res, const exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
+    symbol_generatort &fresh_symbol,
+    const array_string_exprt &res,
+    const exprt &f);
   std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const exprt &i,
     size_t max_size);
   std::pair<exprt, string_constraintst>
   add_axioms_from_float_scientific_notation(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const exprt &f);
   std::pair<exprt, string_constraintst>
   add_axioms_from_float_scientific_notation(
+    symbol_generatort &fresh_symbol,
     const function_application_exprt &f);
 
   /// Add axioms corresponding to the String.valueOf(D) java function
   /// \todo The specifications is only partial.
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_double(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_from_double(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_replace(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_set_length(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_replace(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_set_length(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
   /// \todo The specification may not be correct for the case where the
   /// string is shorter than end. An actual java program should throw an
   /// exception in that case.
   std::pair<exprt, string_constraintst> add_axioms_for_substring(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const array_string_exprt &str,
     const exprt &start,
     const exprt &end);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_substring(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_to_lower_case(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_to_upper_case(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_trim(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_substring(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_to_lower_case(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_to_upper_case(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_trim(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
   std::pair<exprt, string_constraintst> add_axioms_for_code_point(
+    symbol_generatort &fresh_symbol,
     const array_string_exprt &res,
     const exprt &code_point);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_char_literal(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_char_literal(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
   /// Add axioms corresponding the String.codePointCount java function
   /// \todo This function is underspecified, we do not compute the exact value
   /// but over approximate it.
   /// \deprecated This is Java specific and should be implemented in Java.
   DEPRECATED("This is Java specific and should be implemented in Java")
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_code_point_count(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_code_point_count(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
   /// Add axioms corresponding the String.offsetByCodePointCount java function
   /// \todo This function is underspecified, it should return the index within
@@ -395,8 +471,9 @@ private:
   /// argument code points and we approximate this by saying the result is
   /// between index + offset and index + 2 * offset.
   /// \deprecated This is Java specific and should be implemented in Java.
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_offset_by_code_point(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_offset_by_code_point(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
   string_constraintst add_axioms_for_characters_in_integer_string(
     const exprt &input_int,
@@ -412,17 +489,20 @@ private:
     const unsigned long radix_ul,
     const std::size_t max_size,
     const bool strict_formatting);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_parse_int(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_compare_to(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_parse_int(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
+  std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
   /// Add axioms corresponding to the String.intern java function
   /// \todo This does not work at the moment because of the way we treat
   /// string pointers.
   /// \deprecated Not tested.
-  std::pair<symbol_exprt, string_constraintst>
-  add_axioms_for_intern(const function_application_exprt &f);
+  std::pair<symbol_exprt, string_constraintst> add_axioms_for_intern(
+    symbol_generatort &fresh_symbol,
+    const function_application_exprt &f);
 
   exprt associate_array_to_pointer(const function_application_exprt &f);
 
