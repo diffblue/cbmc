@@ -553,13 +553,13 @@ public:
   }
 };
 
-/*! \brief Cast a generic typet to a \ref union_tag_typet
+/*! \brief Cast a generic typet to a \ref struct_tag_typet
  *
  * This is an unchecked conversion. \a type must be known to be \ref
- * union_tag_typet.
+ * struct_tag_typet.
  *
  * \param type Source type
- * \return Object of type \ref union_tag_typet
+ * \return Object of type \ref struct_tag_typet
  *
  * \ingroup gr_std_types
 */
