@@ -1,0 +1,10 @@
+CORE
+main.c
+--verify --location-insensitive --constants
+^EXIT=0$
+^SIGNAL=0$
+assertion x == 0: Success$
+assertion z == 0: Unknown$
+assertion y == 23 || y == 42: Unknown$
+--
+^warning: ignoring
