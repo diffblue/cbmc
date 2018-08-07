@@ -8,7 +8,9 @@
 
 #include "string_constraint_generator.h"
 
-/// Get the valuation of the string, given a valuation
+/// Given a function `get_value` which gives a valuation to expressions, attempt
+/// to find the current value of the array `a`. If the valuation of some
+/// characters are missing, then return an empty optional.
 static optionalt<std::vector<mp_integer>> eval_string(
   const array_string_exprt &a,
   const std::function<exprt(const exprt &)> &get_value);
@@ -185,6 +187,51 @@ exprt string_set_char_builtin_functiont::length_constraint() const
   return and_exprt(
     equal_exprt(result.length(), input.length()),
     equal_exprt(return_code, return_value));
+}
+
+static bool eval_is_upper_case(const mp_integer &c)
+{
+  // Characters between 'A' and 'Z' are upper-case
+  // Characters between 0xc0 (latin capital A with grave)
+  // and 0xd6 (latin capital O with diaeresis) are upper-case
+  // Characters between 0xd8 (latin capital O with stroke)
+  // and 0xde (latin capital thorn) are upper-case
+  return ('A' <= c && c <= 'Z') || (0xc0 <= c && c <= 0xd6) ||
+         (0xd8 <= c && c <= 0xde);
+}
+
+optionalt<exprt> string_to_lower_case_builtin_functiont::eval(
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  auto input_opt = eval_string(input, get_value);
+  if(!input_opt)
+    return {};
+  for(mp_integer &c : input_opt.value())
+  {
+    if(eval_is_upper_case(c))
+      c += 0x20;
+  }
+  const auto length =
+    from_integer(input_opt.value().size(), result.length().type());
+  const array_typet type(result.type().subtype(), length);
+  return make_string(input_opt.value(), type);
+}
+
+optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  auto input_opt = eval_string(input, get_value);
+  if(!input_opt)
+    return {};
+  for(mp_integer &c : input_opt.value())
+  {
+    if(eval_is_upper_case(c - 0x20))
+      c -= 0x20;
+  }
+  const auto length =
+    from_integer(input_opt.value().size(), result.length().type());
+  const array_typet type(result.type().subtype(), length);
+  return make_string(input_opt.value(), type);
 }
 
 std::vector<mp_integer> string_insertion_builtin_functiont::eval(

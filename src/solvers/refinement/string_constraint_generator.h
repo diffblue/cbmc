@@ -175,6 +175,12 @@ public:
     const array_string_exprt &str,
     const exprt &position,
     const exprt &character);
+  exprt add_axioms_for_to_lower_case(
+    const array_string_exprt &res,
+    const array_string_exprt &str);
+  exprt add_axioms_for_to_upper_case(
+    const array_string_exprt &res,
+    const array_string_exprt &expr);
 
 private:
   symbol_exprt fresh_boolean(const irep_idt &prefix);
@@ -335,9 +341,6 @@ private:
   exprt add_axioms_for_substring(const function_application_exprt &f);
   exprt add_axioms_for_to_lower_case(const function_application_exprt &f);
   exprt add_axioms_for_to_upper_case(const function_application_exprt &f);
-  exprt add_axioms_for_to_upper_case(
-    const array_string_exprt &res,
-    const array_string_exprt &expr);
   exprt add_axioms_for_trim(const function_application_exprt &f);
 
   exprt add_axioms_for_code_point(

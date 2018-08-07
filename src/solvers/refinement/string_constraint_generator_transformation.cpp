@@ -230,15 +230,7 @@ exprt string_constraint_generatort::add_axioms_for_trim(
 
 /// Conversion of a string to lower case
 ///
-/// Add axioms ensuring `res` corresponds to `str` in which uppercase characters
-/// have been converted to lowercase.
-/// These axioms are:
-///   1. \f$ |{\tt res}| = |{\tt str}| \f$
-///   2. \f$ \forall i<|{\tt str}|.\ {\tt is\_upper\_case}({\tt str}[i])?
-///      {\tt res}[i]={\tt str}[i]+diff : {\tt res}[i]={\tt str}[i]
-///      \land {\tt str}[i]<{\tt 0x100} \f$
-///      where `diff` is the difference between lower case and upper case
-///      characters: `diff = 'a'-'A' = 0x20`.
+/// \copydoc add_axioms_for_to_lower_case(const array_string_exprt &, array_string_exprt &)
 ///
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]`, refined_string `str`
@@ -251,71 +243,102 @@ exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   const array_string_exprt res =
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt str = get_string_expr(f.arguments()[2]);
-  const refined_string_typet &ref_type =
-    to_refined_string_type(f.arguments()[2].type());
-  const typet &char_type=ref_type.get_char_type();
-  const typet &index_type=ref_type.get_index_type();
-  const exprt char_A=constant_char('A', char_type);
-  const exprt char_Z=constant_char('Z', char_type);
+  return add_axioms_for_to_lower_case(res, str);
+}
+
+/// Expression which is true for uppercase characters of the Basic Latin and
+/// Latin-1 supplement of unicode.
+static exprt is_upper_case(const exprt &character)
+{
+  const exprt char_A = from_integer('A', character.type());
+  const exprt char_Z = from_integer('Z', character.type());
+  exprt::operandst upper_case;
+  // Characters between 'A' and 'Z' are upper-case
+  upper_case.push_back(
+    and_exprt(
+      binary_relation_exprt(char_A, ID_le, character),
+      binary_relation_exprt(character, ID_le, char_Z)));
+
+  // Characters between 0xc0 (latin capital A with grave)
+  // and 0xd6 (latin capital O with diaeresis) are upper-case
+  upper_case.push_back(
+    and_exprt(
+      binary_relation_exprt(
+        from_integer(0xc0, character.type()), ID_le, character),
+      binary_relation_exprt(
+        character, ID_le, from_integer(0xd6, character.type()))));
+
+  // Characters between 0xd8 (latin capital O with stroke)
+  // and 0xde (latin capital thorn) are upper-case
+  upper_case.push_back(
+    and_exprt(
+      binary_relation_exprt(
+        from_integer(0xd8, character.type()), ID_le, character),
+      binary_relation_exprt(
+        character, ID_le, from_integer(0xde, character.type()))));
+  return disjunction(upper_case);
+}
+
+/// Expression which is true for lower_case characters of the Basic Latin and
+/// Latin-1 supplement of unicode.
+static exprt is_lower_case(const exprt &character)
+{
+  return is_upper_case(
+    minus_exprt(character, from_integer(0x20, character.type())));
+}
+
+/// Add axioms ensuring `res` corresponds to `str` in which uppercase characters
+/// have been converted to lowercase.
+/// These axioms are:
+///   1. res.length = str.length
+///   2. forall i < str.length.
+///        res[i] = is_upper_case(str[i]) ? str[i] + diff : str[i]
+///
+/// Where `diff` is the difference between lower case and upper case
+/// characters: `diff = 'a'-'A' = 0x20` and `is_upper_case` is true for the
+/// upper case characters of Basic Latin and Latin-1 supplement of unicode.
+exprt string_constraint_generatort::add_axioms_for_to_lower_case(
+  const array_string_exprt &res,
+  const array_string_exprt &str)
+{
+  const typet &char_type = res.type().subtype();
+  const typet &index_type = res.length().type();
+  const exprt char_A = from_integer('A', char_type);
+  const exprt char_Z = from_integer('Z', char_type);
 
   // \todo for now, only characters in Basic Latin and Latin-1 supplement
   // are supported (up to 0x100), we should add others using case mapping
   // information from the UnicodeData file.
 
-  equal_exprt a1(res.length(), str.length());
-  lemmas.push_back(a1);
+  lemmas.push_back(equal_exprt(res.length(), str.length()));
 
-  symbol_exprt idx=fresh_univ_index("QA_lower_case", index_type);
-  exprt::operandst upper_case;
-  // Characters between 'A' and 'Z' are upper-case
-  upper_case.push_back(and_exprt(
-    binary_relation_exprt(char_A, ID_le, str[idx]),
-    binary_relation_exprt(str[idx], ID_le, char_Z)));
+  constraints.push_back([&] {
+    const symbol_exprt idx = fresh_univ_index("QA_lower_case", index_type);
+    const exprt conditional_convert = [&] {
+      // The difference between upper-case and lower-case for the basic latin and
+      // latin-1 supplement is 0x20.
+      const exprt diff = from_integer(0x20, char_type);
+      const exprt converted = equal_exprt(res[idx], plus_exprt(str[idx], diff));
+      const exprt non_converted = equal_exprt(res[idx], str[idx]);
+      return if_exprt(is_upper_case(str[idx]), converted, non_converted);
+    }();
 
-  // Characters between 0xc0 (latin capital A with grave)
-  // and 0xd6 (latin capital O with diaeresis) are upper-case
-  upper_case.push_back(and_exprt(
-    binary_relation_exprt(from_integer(0xc0, char_type), ID_le, str[idx]),
-    binary_relation_exprt(str[idx], ID_le, from_integer(0xd6, char_type))));
+    return string_constraintt(
+      idx, zero_if_negative(res.length()), conditional_convert);
+  }());
 
-  // Characters between 0xd8 (latin capital O with stroke)
-  // and 0xde (latin capital thorn) are upper-case
-  upper_case.push_back(and_exprt(
-    binary_relation_exprt(from_integer(0xd8, char_type), ID_le, str[idx]),
-    binary_relation_exprt(str[idx], ID_le, from_integer(0xde, char_type))));
-
-  exprt is_upper_case=disjunction(upper_case);
-
-  // The difference between upper-case and lower-case for the basic latin and
-  // latin-1 supplement is 0x20.
-  exprt diff=from_integer(0x20, char_type);
-  equal_exprt converted(res[idx], plus_exprt(str[idx], diff));
-  and_exprt non_converted(
-    equal_exprt(res[idx], str[idx]),
-    binary_relation_exprt(str[idx], ID_lt, from_integer(0x100, char_type)));
-  if_exprt conditional_convert(is_upper_case, converted, non_converted);
-
-  string_constraintt a2(
-    idx, zero_if_negative(res.length()), conditional_convert);
-  constraints.push_back(a2);
-
-  return from_integer(0, f.type());
+  return from_integer(0, get_return_code_type());
 }
 
 /// Add axioms ensuring `res` corresponds to `str` in which lowercase characters
-/// have been converted to uppercase.
+/// of Basic Latin and Latin-1 supplement of unicode have been converted to
+/// uppercase.
 ///
 /// These axioms are:
-///   1. \f$ |{\tt res}| = |{\tt str}| \f$
-///   2. \f$ \forall i<|{\tt str}|.\ 'a'\le {\tt str}[i]\le 'z'
-///          \Rightarrow {\tt res}[i]={\tt str}[i]+'A'-'a' \f$
-///   3. \f$ \forall i<|{\tt str}|.\ \lnot ('a'\le {\tt str}[i] \le 'z')
-///          \Rightarrow {\tt res}[i]={\tt str}[i] \f$
-/// Note that index expressions are only allowed in the body of universal
-/// axioms, so we use a trivial premise and push our premise into the body.
+///   1. res.length = str.length
+///   2. forall i < str.length.
+///        is_lower_case(str[i]) ? res[i] = str[i] - 0x20 : res[i] = str[i]
 ///
-/// \todo We can reduce the number of constraints by merging
-///       constraints 2 and 3.
 /// \param res: array of characters expression
 /// \param str: array of characters expression
 /// \return integer expression which is different from `0` when there is an
@@ -330,32 +353,20 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   exprt char_A=constant_char('A', char_type);
   exprt char_z=constant_char('z', char_type);
 
-  // \todo Add support for locales using case mapping information
-  // from the UnicodeData file.
+  lemmas.push_back(equal_exprt(res.length(), str.length()));
 
-  equal_exprt a1(res.length(), str.length());
-  lemmas.push_back(a1);
+  constraints.push_back([&] {
+    const symbol_exprt idx = fresh_univ_index("QA_upper_case", index_type);
+    const exprt converted =
+      minus_exprt(str[idx], from_integer(0x20, char_type));
+    return string_constraintt(
+      idx,
+      zero_if_negative(res.length()),
+      equal_exprt(
+        res[idx], if_exprt(is_lower_case(str[idx]), converted, str[idx])));
+  }());
 
-  symbol_exprt idx1=fresh_univ_index("QA_upper_case1", index_type);
-  const and_exprt is_lower_case(
-    binary_relation_exprt(char_a, ID_le, str[idx1]),
-    binary_relation_exprt(str[idx1], ID_le, char_z));
-  minus_exprt diff(char_A, char_a);
-  equal_exprt convert(res[idx1], plus_exprt(str[idx1], diff));
-  implies_exprt body1(is_lower_case, convert);
-  string_constraintt a2(idx1, zero_if_negative(res.length()), body1);
-  constraints.push_back(a2);
-
-  symbol_exprt idx2=fresh_univ_index("QA_upper_case2", index_type);
-  const not_exprt is_not_lower_case(
-    and_exprt(
-      binary_relation_exprt(char_a, ID_le, str[idx2]),
-      binary_relation_exprt(str[idx2], ID_le, char_z)));
-  equal_exprt eq(res[idx2], str[idx2]);
-  implies_exprt body2(is_not_lower_case, eq);
-  string_constraintt a3(idx2, zero_if_negative(res.length()), body2);
-  constraints.push_back(a3);
-  return from_integer(0, signedbv_typet(32));
+  return from_integer(0, get_return_code_type());
 }
 
 /// Conversion of a string to upper case
