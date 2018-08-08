@@ -252,21 +252,24 @@ bool check_c_implicit_typecast(
 
 typet c_typecastt::follow_with_qualifiers(const typet &src_type)
 {
-  if(src_type.id()!=ID_symbol)
+  if(
+    src_type.id() != ID_symbol && src_type.id() != ID_struct_tag &&
+    src_type.id() != ID_union_tag)
+  {
     return src_type;
+  }
 
   typet result_type=src_type;
 
   // collect qualifiers
   c_qualifierst qualifiers(src_type);
 
-  while(result_type.id()==ID_symbol)
+  while(result_type.id() == ID_symbol || result_type.id() == ID_struct_tag ||
+        result_type.id() == ID_union_tag)
   {
-    const symbolt &followed_type_symbol =
-      ns.lookup(to_symbol_type(result_type));
-
-    result_type=followed_type_symbol.type;
-    qualifiers+=c_qualifierst(followed_type_symbol.type);
+    const typet &followed_type = ns.follow(result_type);
+    result_type = followed_type;
+    qualifiers += c_qualifierst(followed_type);
   }
 
   qualifiers.write(result_type);

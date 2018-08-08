@@ -524,8 +524,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
   forall_operands(m_it, member)
   {
-    if(type.id()==ID_symbol)
-      type=follow(type);
+    type = follow(type);
 
     if(m_it->id()==ID_member)
     {
