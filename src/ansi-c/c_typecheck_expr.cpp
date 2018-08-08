@@ -252,7 +252,12 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id()==ID_clang_builtin_convertvector)
   {
+    // This has one operand and a type, and acts like a typecast
+    DATA_INVARIANT(expr.operands().size()==1, "clang_builtin_convertvector has one operand");
     typecheck_type(expr.type());
+    typecast_exprt tmp(expr.op0(), expr.type());
+    tmp.add_source_location()=expr.source_location();
+    expr.swap(tmp);
   }
   else if(expr.id()==ID_builtin_offsetof)
     typecheck_expr_builtin_offsetof(expr);
