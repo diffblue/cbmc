@@ -150,7 +150,10 @@ exprt estimate_decimal_exponent(const exprt &f, const ieee_float_spect &spec)
 /// String representation of a float value
 ///
 /// Add axioms corresponding to the String.valueOf(F) java function
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one float argument
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return an integer expression
 std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
   symbol_generatort &fresh_symbol,
@@ -166,7 +169,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
 }
 
 /// Add axioms corresponding to the String.valueOf(D) java function
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one double argument
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return an integer expression
 std::pair<exprt, string_constraintst> add_axioms_from_double(
   symbol_generatort &fresh_symbol,
@@ -185,8 +191,11 @@ std::pair<exprt, string_constraintst> add_axioms_from_double(
 ///
 /// \todo This specification is not correct for negative numbers and
 /// double precision.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression corresponding to the result
-/// \param f: expression representing a float
+/// \param f: a float expression, which is positive
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return an integer expression, different from zero if an error should be
 ///   raised
 std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
@@ -238,6 +247,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
 
 /// Add axioms for representing the fractional part of a floating point starting
 /// with a dot
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param int_expr: an integer expression
 /// \param max_size: a maximal size for the string, this includes the
@@ -328,8 +338,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
 /// \f$log_10(n) = log_10(m) + log_10(2) * e - d\f$
 /// \f$n = f / 10^d = m * 2^e / 10^d = m * 2^e / 10^(floor(log_10(2) * e))\f$
 /// \todo For now we only consider single precision.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression representing the float in scientific notation
 /// \param f: a float expression, which is positive
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return a integer expression different from 0 to signal an exception
 std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   symbol_generatort &fresh_symbol,
@@ -522,7 +535,10 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
 ///
 /// Add axioms corresponding to the scientific representation of floating point
 /// values
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application expression
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   symbol_generatort &fresh_symbol,

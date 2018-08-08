@@ -29,6 +29,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// where offset_within_bounds is:
 ///     offset >= 0 && offset <= |str| && |str| - offset >= |prefix|
 ///
+/// \param fresh_symbol: generator of fresh symbols
 /// \param prefix: an array of characters
 /// \param str: an array of characters
 /// \param offset: an integer
@@ -87,11 +88,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
 /// string_constraint_generatort::add_axioms_for_is_prefix(const array_string_exprt &prefix, const array_string_exprt &str, const exprt &offset)
 /// \todo The primitive should be renamed to `starts_with`.
 /// \todo Get rid of the boolean flag.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments refined_string `s0`,
 ///           refined string `s1` and optional integer argument `offset`
 ///           whose default value is 0
 /// \param swap_arguments: a Boolean telling whether the prefix is the second
 ///        argument or the first argument
+/// \param array_pool: pool of arrays representing strings
 /// \return boolean expression `isprefix`
 std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
   symbol_generatort &fresh_symbol,
@@ -115,7 +118,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
 /// Add axioms stating that the returned value is true exactly when the argument
 /// string is empty.
 /// \deprecated should use `string_length(s)==0` instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with a string argument
+/// \param array_pool: pool of arrays representing strings
 /// \return a Boolean expression
 DEPRECATED("should use `string_length(s)==0` instead")
 std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
@@ -152,10 +157,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
 ///       \land s_1[{witness}] \ne s_0[{witness} + |s_0| - |s_1|] \f$
 ///
 /// \todo The primitive should be renamed `ends_with`.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments refined_string `s0`
 ///           and refined_string  `s1`
 /// \param swap_arguments: boolean flag telling whether the suffix is the second
 ///        argument or the first argument
+/// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `issuffix`
 DEPRECATED("should use `strings_startwith(s0, s1, s1.length - s0.length)`")
 std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
@@ -218,8 +225,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
 ///          \Rightarrow \exists witness < |s_1|.
 ///          \ s_1[witness] \ne s_0[startpos+witness] \f$
 /// \warning slow for target longer than one character
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s0`
 ///           refined_string `s1`
+/// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `contains`
 std::pair<exprt, string_constraintst> add_axioms_for_contains(
   symbol_generatort &fresh_symbol,

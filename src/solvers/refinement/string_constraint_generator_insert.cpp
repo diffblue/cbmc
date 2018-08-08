@@ -23,6 +23,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// 4. forall i in [offset', s1.length). res[i + s2.length] = s1[i]
 /// This is equivalent to
 /// `res=concat(substring(s1, 0, offset'), concat(s2, substring(s1, offset')))`.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: array of characters expression
 /// \param s1: array of characters expression
 /// \param s2: array of characters expression
@@ -86,19 +87,20 @@ exprt length_constraint_for_insert(
 
 /// Insertion of a string in another at a specific index
 ///
-/// \copybrief string_constraint_generatort::add_axioms_for_insert(
-/// const array_string_exprt &, const array_string_exprt &,
-/// const array_string_exprt &, const exprt &)
 // NOLINTNEXTLINE
-/// \link add_axioms_for_insert(const array_string_exprt&,const array_string_exprt&,const array_string_exprt&,const exprt&)
+/// \copybrief add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt &, const array_string_exprt &, const array_string_exprt &, const exprt &)
+// NOLINTNEXTLINE
+/// \link add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt&,const array_string_exprt&,const array_string_exprt&,const exprt&)
 ///   (More...) \endlink
 ///
 /// If `start` and `end` arguments are given then `substring(s2, start, end)`
 /// is considered instead of `s2`.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]`, refined_string `s1`, refined_string`s2`,
 ///           integer `offset`, optional integer `start` and optional integer
 ///           `end`
+/// \param pool: pool of arrays representing strings
 /// \return an integer expression which is different from zero if there is
 ///         an exception to signal
 std::pair<exprt, string_constraintst> add_axioms_for_insert(
@@ -132,8 +134,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
 
 /// add axioms corresponding to the StringBuilder.insert(I) java function
 /// \deprecated should convert the value to string and call insert
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and an integer
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return an expression
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
@@ -157,8 +162,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
 
 /// add axioms corresponding to the StringBuilder.insert(Z) java function
 /// \deprecated should convert the value to string and call insert
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a Boolean
+/// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
@@ -181,8 +188,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
 
 /// Add axioms corresponding to the StringBuilder.insert(C) java function
 /// \todo This should be merged with add_axioms_for_insert.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a character
+/// \param array_pool: pool of arrays representing strings
 /// \return an expression
 std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
   symbol_generatort &fresh_symbol,
@@ -204,8 +213,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
 
 /// add axioms corresponding to the StringBuilder.insert(D) java function
 /// \deprecated should convert the value to string and call insert
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a double
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return a string expression
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
@@ -230,8 +242,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
 
 /// Add axioms corresponding to the StringBuilder.insert(F) java function
 /// \deprecated should convert the value to string and call insert
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a float
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return a new string expression
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst> add_axioms_for_insert_float(

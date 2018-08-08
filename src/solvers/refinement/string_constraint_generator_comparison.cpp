@@ -23,8 +23,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   2. \f$ \forall i<|s_1|.\ eq \Rightarrow s_1[i]=s_2[i] \f$
 ///   3. \f$ \lnot eq \Rightarrow (|s_1| \ne |s_2| \land witness=-1)
 ///          \lor (0 \le witness<|s_1| \land s_1[witness] \ne s_2[witness]) \f$
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s1` and
 ///           refined_string `s2`
+/// \param pool: pool of arrays representing strings
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst> add_axioms_for_equals(
   symbol_generatort &fresh_symbol,
@@ -122,8 +124,10 @@ static exprt character_equals_ignore_case(
 ///          \ eq \Rightarrow {\tt equal\_ignore\_case}(s_1[i],s_2[i]) \f$
 ///   3. \f$ \lnot eq \Rightarrow |s_1| \ne |s_2| \lor (0 \le witness<|s_1|
 ///          \land\lnot {\tt equal\_ignore\_case}(s_1[witness],s_2[witness]) \f$
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s1` and
 ///           refined_string `s2`
+/// \param pool: pool of arrays representing strings
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
   symbol_generatort &fresh_symbol,
@@ -178,7 +182,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
 /// These axioms are, for each string `s` on which hash was called:
 ///   * \f$ hash(str)=hash(s) \lor |str| \ne |s|
 ///       \lor (|str|=|s| \land \exists i<|s|.\ s[i]\ne str[i]) \f$
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with argument refined_string `str`
+/// \param pool: pool of arrays representing strings
 /// \return integer expression `hash(str)`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_hash_code(
@@ -227,8 +233,10 @@ string_constraint_generatort::add_axioms_for_hash_code(
 ///         (|s1|<|s2| \land x=|s1|) \lor (|s1| > |s2| \land x=|s2|)
 ///         \land res=|s1|-|s2|) \f$
 ///   * \f$ \forall i'<x. res\ne 0 \Rightarrow s1[i]=s2[i] \f$
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s1`
 ///           and refined_string `s2`
+/// \param pool: pool of arrays representing strings
 /// \return integer expression `res`
 std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
   symbol_generatort &fresh_symbol,
@@ -294,6 +302,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
 /// Add axioms stating that the return value for two equal string should be the
 /// same
 /// \deprecated never tested
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one string argument
 /// \return a string expression
 DEPRECATED("never tested")

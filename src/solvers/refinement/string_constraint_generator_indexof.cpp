@@ -30,6 +30,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   5. \f$ \forall m, n \in [{\tt from\_index}, |{\tt haystack}|)
 ///          .\ \lnot contains \Rightarrow {\tt haystack}[m] \ne {\tt needle}
 ///      \f$
+/// \param fresh_symbol: generator of fresh symbols
 /// \param str: an array of characters expression
 /// \param c: a character expression
 /// \param from_index: an integer expression
@@ -101,6 +102,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
 ///          .\ \lnot contains \Rightarrow (\exists m \in [0,|{\tt needle}|)
 ///          .\ {\tt haystack}[m+n] \ne {\tt needle}[m]) \f$
 ///   6. \f$ |{\tt needle}| = 0 \Rightarrow \tt{index} = from_index \f$
+/// \param fresh_symbol: generator of fresh symbols
 /// \param haystack: an array of character expression
 /// \param needle: an array of character expression
 /// \param from_index: an integer expression
@@ -195,6 +197,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
 ///          (\exists m \in [0,|{\tt needle}|)
 ///          .\ {\tt haystack}[m+n] \ne {\tt needle}[m]) \f$
 ///   6. \f$ |{\tt needle}| = 0 \Rightarrow index = from_index \f$
+/// \param fresh_symbol: generator of fresh symbols
 /// \param haystack: an array of characters expression
 /// \param needle: an array of characters expression
 /// \param from_index: integer expression
@@ -270,19 +273,21 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
 ///
 /// If the target is a character:
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
-/// \link
-/// add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
+/// \copybrief add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+// NOLINTNEXTLINE
+/// \link add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
 /// (More...) \endlink
 ///
 /// If the target is a refined_string:
-/// \copybrief string_constraint_generatort::add_axioms_for_index_of_string
-/// \link string_constraint_generatort::add_axioms_for_index_of_string (More...)
+/// \copybrief add_axioms_for_index_of_string
+/// \link add_axioms_for_index_of_string (More...)
 /// \endlink
 /// \warning slow for string targets
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `haystack`,
 ///           refined_string or character `needle`, and optional integer
 ///           `from_index` with default value `0`
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression
 std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   symbol_generatort &fresh_symbol,
@@ -333,6 +338,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
 ///   5. \f$ \forall m \in [0,
 ///          min({\tt from\_index}+1, |{\tt haystack}|))
 ///          .\ \lnot contains \Rightarrow {\tt haystack}[m] \ne {\tt needle}\f$
+/// \param fresh_symbol: generator of fresh symbols
 /// \param str: an array of characters expression
 /// \param c: a character expression
 /// \param from_index: an integer expression
@@ -391,19 +397,21 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
 ///
 /// If the target is a character:
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_for_last_index_of(const array_string_exprt&,const exprt&,const exprt&)
+/// \copybrief add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
 // NOLINTNEXTLINE
-/// \link add_axioms_for_last_index_of(const array_string_exprt&,const exprt&,const exprt&)
+/// \link add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
 ///   (More...) \endlink
 ///
 /// If the target is a refined_string:
-/// \copybrief string_constraint_generatort::add_axioms_for_last_index_of_string
-/// \link string_constraint_generatort::add_axioms_for_last_index_of_string
+/// \copybrief add_axioms_for_last_index_of_string
+/// \link add_axioms_for_last_index_of_string
 ///   (More...) \endlink
 /// \warning slow for string targets
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `haystack`,
 ///           refined_string or character `needle`, and optional integer
 ///           `from_index` with default value `|haystack|-1`
+/// \param array_pool: pool of arrays representing strings
 /// \return an integer expression
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   symbol_generatort &fresh_symbol,

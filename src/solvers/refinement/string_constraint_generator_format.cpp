@@ -246,10 +246,14 @@ static exprt get_component_in_struct(
 /// contains the fields: string expr, int, float, char, boolean, hashcode,
 /// date_time. The correct component will be fetched depending on the format
 /// specifier.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param fs: a format specifier
 /// \param arg: a struct containing the possible value of the argument to format
 /// \param index_type: type for indexes in strings
 /// \param char_type: type of characters
+/// \param array_pool: pool of arrays representing strings
+/// \param message: message handler for warnings
+/// \param ns: namespace
 /// \return String expression representing the output of String.format.
 static std::pair<array_string_exprt, string_constraintst>
 add_axioms_for_format_specifier(
@@ -362,9 +366,13 @@ add_axioms_for_format_specifier(
 
 /// Parse `s` and add axioms ensuring the output corresponds to the output of
 /// String.format.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result of the format function
 /// \param s: a format string
 /// \param args: a vector of arguments
+/// \param array_pool: pool of arrays representing strings
+/// \param message: message handler for warnings
+/// \param ns: namespace
 /// \return code, 0 on success
 std::pair<exprt, string_constraintst> add_axioms_for_format(
   symbol_generatort &fresh_symbol,
@@ -488,7 +496,11 @@ utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
 /// Add axioms to specify the Java String.format function.
 /// \todo This is correct only if the first argument (ie the format string) is
 /// constant or does not contain format specifiers.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application
+/// \param array_pool: pool of arrays representing strings
+/// \param message: message handler for warnings
+/// \param ns: namespace
 /// \return A string expression representing the return value of the
 ///   String.format function on the given arguments, assuming the first argument
 ///   in the function application is a constant. Otherwise the first argument is

@@ -14,6 +14,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 /// add axioms for the conversion of an integer representing a java
 /// code point to a utf-16 string
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: array of characters corresponding to the result fo the function
 /// \param code_point: an expression representing a java code point
 /// \return integer expression equal to zero
@@ -115,8 +116,10 @@ exprt pair_value(exprt char1, exprt char2, typet return_type)
 }
 
 /// add axioms corresponding to the String.codePointAt java function
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments a string and an
 ///   index
+/// \param array_pool: pool of arrays representing strings
 /// \return a integer expression corresponding to a code point
 std::pair<exprt, string_constraintst> add_axioms_for_code_point_at(
   symbol_generatort &fresh_symbol,
@@ -184,8 +187,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point_before(
 
 /// add axioms giving approximate bounds on the result of the
 /// String.codePointCount java function
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with three arguments string `str`, integer
 ///           `begin` and integer `end`.
+/// \param array_pool: pool of arrays representing strings
 /// \return an integer expression
 std::pair<exprt, string_constraintst> add_axioms_for_code_point_count(
   symbol_generatort &fresh_symbol,
@@ -212,6 +217,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point_count(
 /// add axioms giving approximate bounds on the result of the
 /// String.offsetByCodePointCount java function. We approximate the result by
 /// saying the result is between index + offset and index + 2 * offset
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments string `str`, integer `index`
 ///           and integer `offset`.
 /// \return a new string expression

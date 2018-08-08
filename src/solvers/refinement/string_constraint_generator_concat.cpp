@@ -28,6 +28,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   2. \f$\forall i<|s_1|. res[i]=s_1[i] \f$
 ///   3. \f$\forall i< |res| - |s_1|.\ res[i+|s_1|] = s_2[start\_index'+i]\f$
 ///
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: an array of characters expression
 /// \param s1: an array of characters expression
 /// \param s2: an array of characters expression
@@ -110,6 +111,7 @@ exprt length_constraint_for_concat(
 ///   * \f$ \forall i<|s1|. res[i]=s1[i] \f$
 ///   * \f$ res[|s1|]=c \f$
 ///
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression
 /// \param s1: string expression
 /// \param c: character expression
@@ -150,6 +152,7 @@ exprt length_constraint_for_concat_char(
 /// `s2`.
 ///
 /// \deprecated should use concat_substr instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string_expression corresponding to the result
 /// \param s1: the string expression to append to
 /// \param s2: the string expression to append to the first one
@@ -167,7 +170,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat(
 
 /// Add axioms corresponding to the StringBuilder.appendCodePoint(I) function
 /// \deprecated java specific
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with two arguments: a string and a code point
+/// \param array_pool: pool of arrays representing strings
 /// \return an expression
 std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
   symbol_generatort &fresh_symbol,

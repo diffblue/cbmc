@@ -200,6 +200,7 @@ exprt string_constraint_generatort::associate_length_to_array(
 
 /// casts an expression to a string expression, or fetches the actual
 /// string_exprt in the case of a symbol.
+/// \param pool: pool of arrays representing strings
 /// \param expr: an expression of refined string type
 /// \return a string expression
 array_string_exprt get_string_expr(array_poolt &pool, const exprt &expr)
@@ -237,6 +238,7 @@ void merge(string_constraintst &result, string_constraintst other)
 ///
 /// This constraint is
 /// \f$ \forall i \in [start, end), low\_char \le s[i] \le high\_char \f$
+/// \param fresh_symbol: generator of fresh symbols
 /// \param s: a string expression
 /// \param start: index of the first character to constrain
 /// \param end: index at which we stop adding constraints
@@ -275,9 +277,11 @@ string_constraintst add_constraint_on_characters(
 /// `char_set` is given by the string `char_set_string` composed of three
 /// characters `low_char`, `-` and `high_char`. Character `c` belongs to
 /// `char_set` if \f$low_char \le c \le high_char\f$.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments: integer `|s|`, character
 ///           pointer `&s[0]`, string `char_set_string`,
 ///           optional integers `start` and `end`
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression whose value is zero
 std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(
   symbol_generatort &fresh_symbol,
@@ -355,7 +359,8 @@ optionalt<exprt> string_constraint_generatort::make_array_pointer_association(
 /// strings contained in this call are converted to objects of type
 /// `string_exprt`, through adding axioms. Axioms are then added to enforce that
 /// the result corresponds to the function application.
-/// \par parameters: an expression containing a function application
+/// \param fresh_symbol: generator of fresh symbols
+/// \param expr: an expression containing a function application
 /// \return expression corresponding to the result of the function application
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_function_application(
@@ -472,8 +477,10 @@ string_constraint_generatort::add_axioms_for_function_application(
 /// add axioms to say that the returned string expression is equal to the
 /// argument of the function application
 /// \deprecated should use substring instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one argument, which is a string,
 /// or three arguments: string, integer offset and count
+/// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
 DEPRECATED("should use substring instead")
 std::pair<exprt, string_constraintst> add_axioms_for_copy(
@@ -496,7 +503,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_copy(
 /// Length of a string
 ///
 /// Returns the length of the string argument of the given function application
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with argument string `str`
+/// \param array_pool: pool of arrays representing strings
 /// \return expression `|str|`
 std::pair<exprt, string_constraintst> add_axioms_for_length(
   symbol_generatort &fresh_symbol,
@@ -516,6 +525,7 @@ exprt is_positive(const exprt &x)
 }
 
 /// add axioms stating that the returned value is equal to the argument
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one character argument
 /// \return a new character expression
 std::pair<exprt, string_constraintst> add_axioms_for_char_literal(
@@ -552,7 +562,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_char_literal(
 /// Add axioms stating that the character of the string at position given by
 /// second argument is equal to the returned value.
 /// This axiom is \f$ char = str[i] \f$.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments string `str` and integer `i`
+/// \param array_pool: pool of arrays representing strings
 /// \return character expression `char`
 std::pair<exprt, string_constraintst> add_axioms_for_char_at(
   symbol_generatort &fresh_symbol,

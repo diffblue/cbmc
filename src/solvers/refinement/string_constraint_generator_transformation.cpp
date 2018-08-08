@@ -29,9 +29,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   3. \f$ \forall i<|{\tt res}|.\ i \ge |s_1|
 ///          \Rightarrow {\tt res}[i] = 0 \f$
 /// \todo We can reduce the number of constraints by merging 2 and 3.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]`, refined_string `s1`, integer `k`
-/// \return integer expressino equal to `0`
+/// \param array_pool: pool of arrays representing strings
+/// \return integer expression equal to `0`
 std::pair<exprt, string_constraintst> add_axioms_for_set_length(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
@@ -73,21 +75,20 @@ std::pair<exprt, string_constraintst> add_axioms_for_set_length(
 
 /// Substring of a string between two indices
 ///
-/// \copybrief string_constraint_generatort::add_axioms_for_substring(
-///   const array_string_exprt &res,
-///   const array_string_exprt &str,
-///   const exprt &start,
-///   const exprt &end)
 // NOLINTNEXTLINE
-/// \link string_constraint_generatort::add_axioms_for_substring(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+/// \copybrief add_axioms_for_substring(symbol_generatort &fresh_symbol, const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+// NOLINTNEXTLINE
+/// \link string_constraint_generatort::add_axioms_for_substring(symbol_generatort &fresh_symbol, const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
 ///   (More...) \endlink
 /// \warning The specification may not be correct for the case where the string
 /// is shorter than the end index
 /// \todo Should return a integer different from zero when the string is shorter
 ///   tan the end index.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]`, refined_string `str`, integer `start`,
 ///           optional integer `end` with default value `|str|`.
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression which is different from 0 when there is an
 ///         exception to signal
 std::pair<exprt, string_constraintst> add_axioms_for_substring(
@@ -114,6 +115,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
 ///   2. \f$ \forall i<|{\tt res}|.\ {\tt res}[i]={\tt str}[{\tt start'}+i] \f$
 /// \todo Should return code different from 0 if `start' != start` or
 ///       `end' != end`
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: array of characters expression
 /// \param str: array of characters expression
 /// \param start: integer expression
@@ -172,8 +174,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
 ///   9. \f$ (s[m]>{\tt \lq~\rq} \land s[m+|{\tt res}|-1]>{\tt \lq~\rq})
 ///          \lor m=|{\tt res}| \f$
 /// \note Some of the constraints among 1, 2, 3, 4 and 5 seems to be redundant
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]`, refined_string `str`.
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression which is different from 0 when there is an
 ///         exception to signal
 std::pair<exprt, string_constraintst> add_axioms_for_trim(
@@ -336,6 +340,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_to_lower_case(
 ///   2. forall i < str.length.
 ///        is_lower_case(str[i]) ? res[i] = str[i] - 0x20 : res[i] = str[i]
 ///
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: array of characters expression
 /// \param str: array of characters expression
 /// \return integer expression which is different from `0` when there is an
@@ -457,9 +462,11 @@ static optionalt<std::pair<exprt, exprt>> to_char_pair(
 /// String.replace(String, String) for single-character strings
 /// Returns original string in every other case (that behaviour is to
 /// be fixed in the future)
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]`, refined_string `str`, character `old_char` and
 ///           character `new_char`
+/// \param array_pool: pool of arrays representing strings
 /// \return an integer expression equal to 0
 std::pair<exprt, string_constraintst> add_axioms_for_replace(
   symbol_generatort &fresh_symbol,
@@ -498,8 +505,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_replace(
 }
 
 /// add axioms corresponding to the StringBuilder.deleteCharAt java function
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with two arguments, the first is a
 ///   string and the second is an index
+/// \param array_pool: pool of arrays representing strings
 /// \return an expression whose value is non null to signal an exception
 std::pair<exprt, string_constraintst> add_axioms_for_delete_char_at(
   symbol_generatort &fresh_symbol,
@@ -529,10 +538,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete_char_at(
 /// (see \ref add_axioms_for_substring and \ref add_axioms_for_concat_substr).
 /// \todo Should use add_axioms_for_concat_substr instead
 ///       of add_axioms_for_concat
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: array of characters expression
 /// \param str: array of characters expression
 /// \param start: integer expression
 /// \param end: integer expression
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression different from zero to signal an exception
 std::pair<exprt, string_constraintst> add_axioms_for_delete(
   symbol_generatort &fresh_symbol,
@@ -561,13 +572,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete(
 /// Remove a portion of a string
 ///
 // NOLINTNEXTLINE
-/// \copybrief string_constraint_generatort::add_axioms_for_delete(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+/// \copybrief add_axioms_for_delete(symbol_generatort &fresh_symbol, const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end, array_poolt &array_pool)
 // NOLINTNEXTLINE
-/// \link string_constraint_generatort::add_axioms_for_delete(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+/// \link add_axioms_for_delete(symbol_generatort &fresh_symbol,const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end, array_poolt &array_pool)
 ///   (More...) \endlink
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]`, refined_string `str`, integer `start`
 ///           and integer `end`
+/// \param array_pool: pool of arrays representing strings
 /// \return an integer expression whose value is different from 0 to signal
 ///   an exception
 std::pair<exprt, string_constraintst> add_axioms_for_delete(

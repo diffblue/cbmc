@@ -37,7 +37,10 @@ static unsigned long to_integer_or_default(
 
 /// Add axioms corresponding to the String.valueOf(J) java function.
 /// \deprecated should use add_axioms_from_int instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one long argument
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return a new string expression
 DEPRECATED("should use add_axioms_for_string_of_int instead")
 std::pair<exprt, string_constraintst> add_axioms_from_long(
@@ -59,7 +62,9 @@ std::pair<exprt, string_constraintst> add_axioms_from_long(
 
 /// Add axioms corresponding to the String.valueOf(Z) java function.
 /// \deprecated This is Java specific and should be implemented in Java instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with a Boolean argument
+/// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
 DEPRECATED("This is Java specific and should be implemented in Java instead")
 std::pair<exprt, string_constraintst> add_axioms_from_bool(
@@ -76,6 +81,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
 /// Add axioms stating that the returned string equals "true" when the Boolean
 /// expression is true and "false" when it is false.
 /// \deprecated This is Java specific and should be implemented in Java instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param b: Boolean expression
 /// \return code 0 on success
@@ -124,10 +130,12 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(I) or String.valueOf(J) Java functions applied
 /// on the integer expression.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param input_int: a signed integer expression
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
+/// \param ns: namespace
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
   symbol_generatort &fresh_symbol,
@@ -144,11 +152,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(II) or String.valueOf(JI) Java functions applied
 /// on the integer expression.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param input_int: a signed integer expression
 /// \param radix: the radix to use
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
+/// \param ns: namespace
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
   symbol_generatort &fresh_symbol,
@@ -210,6 +220,7 @@ static exprt int_of_hex_char(const exprt &chr)
 /// Add axioms stating that the string `res` corresponds to the integer
 /// argument written in hexadecimal.
 /// \deprecated use add_axioms_from_int which takes a radix argument instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param i: an integer argument
 /// \return code 0 on success
@@ -270,7 +281,9 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
 }
 
 /// Add axioms corresponding to the Integer.toHexString(I) java function
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with an integer argument
+/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
   symbol_generatort &fresh_symbol,
@@ -285,13 +298,15 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
 
 /// Conversion from char to string
 ///
-/// \copybrief  string_constraint_generatort::add_axioms_from_char(
-///   const array_string_exprt &res, const exprt &c)
 // NOLINTNEXTLINE
-/// \link string_constraint_generatort::add_axioms_from_char(const array_string_exprt &res, const exprt &c)
+/// \copybrief add_axioms_from_char(symbol_generatort &fresh_symbol, const array_string_exprt &res, const exprt &c)
+// NOLINTNEXTLINE
+/// \link add_axioms_from_char(symbol_generatort &fresh_symbol, const array_string_exprt &res, const exprt &c)
 ///    (More...) \endlink
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]` and character `c`
+/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_from_char(
   symbol_generatort &fresh_symbol,
@@ -308,6 +323,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_char(
 /// it contains equals `c`.
 ///
 /// This axiom is: \f$ |{\tt res}| = 1 \land {\tt res}[0] = {\tt c} \f$.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: array of characters expression
 /// \param c: character expression
 /// \return code 0 on success
@@ -503,8 +519,11 @@ string_constraintst add_axioms_for_characters_in_integer_string(
 ///
 /// Add axioms ensuring the value of the returned integer corresponds
 /// to the value represented by `str`
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments refined_string `str` and
 ///          an optional integer for the radix
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return integer expression equal to the value represented by `str`
 std::pair<exprt, string_constraintst> add_axioms_for_parse_int(
   symbol_generatort &fresh_symbol,

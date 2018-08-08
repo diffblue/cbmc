@@ -57,6 +57,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_constant(
 }
 
 /// Add axioms to say that the returned string expression is empty
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `length` and character
 ///           pointer `ptr`.
 /// \return integer expression equal to zero
@@ -73,6 +74,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_empty_string(
 }
 
 /// Convert an expression of type string_typet to a string_exprt
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param arg: expression of type string typet
 /// \param guard: condition under which `res` should be equal to arg
@@ -106,8 +108,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
 /// Add axioms ensuring that the returned string expression is equal to the
 /// string literal.
 /// \todo The name of the function should be changed to reflect what it does.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with an argument which is a string literal
 /// that is a constant with a string value.
+/// \param array_pool: pool of arrays representing strings
 /// \return string expression
 std::pair<exprt, string_constraintst> add_axioms_from_literal(
   symbol_generatort &fresh_symbol,
