@@ -7,8 +7,6 @@
 
 \*******************************************************************/
 
-#include <java_bytecode/java_types.h>
-
 #include <testing-utils/catch.hpp>
 #include <java-testing-utils/load_java_class.h>
 
@@ -135,8 +133,9 @@ SCENARIO(
   call.function() = callee;
   // Specific argument doesn't matter, so just pass an appropriately typed
   // null pointer:
-  call.arguments().push_back(null_pointer_exprt(to_pointer_type(
-    to_java_method_type(callee.type()).parameters()[0].type())));
+  call.arguments().push_back(
+    null_pointer_exprt(
+      to_pointer_type(to_code_type(callee.type()).parameters()[0].type())));
   virtual_call_inst->code = call;
 
   test_program.add_instruction(END_FUNCTION);
