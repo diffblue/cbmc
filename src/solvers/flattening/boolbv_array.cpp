@@ -12,10 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_array(const exprt &expr)
 {
-  std::size_t width=boolbv_width(expr.type());
+  const std::size_t width = boolbv_width(expr.type());
+  const exprt::operandst &operands = expr.operands();
 
-  if(width==0)
-    return conversion_failed(expr);
+  if(operands.empty() && width == 0)
+    return bvt();
 
   if(expr.type().id()==ID_array)
   {
@@ -24,7 +25,7 @@ bvt boolbvt::convert_array(const exprt &expr)
       "the bit width being nonzero implies that the array has a nonzero size "
       "in which case the array shall have operands");
     const exprt::operandst &operands=expr.operands();
-    std::size_t op_width=width/operands.size();
+    const std::size_t op_width = width / operands.size();
 
     bvt bv;
     bv.reserve(width);
