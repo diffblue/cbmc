@@ -61,6 +61,9 @@ static std::string compiler_name(
      base_name.find("goto-bcc")!=std::string::npos)
     return "bcc";
 
+  if(base_name=="goto-clang")
+    return "clang";
+
   std::string::size_type pos=base_name.find("goto-gcc");
 
   if(pos==std::string::npos ||
