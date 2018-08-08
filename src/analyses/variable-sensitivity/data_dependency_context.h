@@ -84,7 +84,7 @@ private:
   public:
     bool operator()(
       goto_programt::const_targett instruction,
-      goto_programt::const_targett other_instruction)
+      goto_programt::const_targett other_instruction) const
     {
       return instruction->location_number>
              other_instruction->location_number;
