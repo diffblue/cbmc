@@ -218,95 +218,95 @@ allocates a new string before calling a primitive.
   * `cprover_string_associate_length_to_array` : Link the length of the array
     with the given integer value.
   * `cprover_string_char_at` :
-  \copybrief string_constraint_generatort::add_axioms_for_char_at(const function_application_exprt &f)
-  \link  string_constraint_generatort::add_axioms_for_char_at(const function_application_exprt &f) More... \endlink
+  \copybrief add_axioms_for_char_at(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
+  \link  add_axioms_for_char_at More... \endlink
   * `cprover_string_length` :
-  \copybrief string_constraint_generatort::add_axioms_for_length(const function_application_exprt &f)
-  \link string_constraint_generatort::add_axioms_for_length(const function_application_exprt &f) More... \endlink
+  \copybrief add_axioms_for_length(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool)
+  \link add_axioms_for_length More... \endlink
 
 \subsection comparisons Comparisons:
 
   * `cprover_string_compare_to` :
-   \copybrief string_constraint_generatort::add_axioms_for_compare_to(const function_application_exprt &f)
-   \link string_constraint_generatort::add_axioms_for_compare_to(const function_application_exprt &f) More... \endlink
+   \copybrief add_axioms_for_compare_to(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool)
+   \link add_axioms_for_compare_to(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_contains` :
-  \copybrief string_constraint_generatort::add_axioms_for_contains(const function_application_exprt &f)
-  \link string_constraint_generatort::add_axioms_for_contains(const function_application_exprt &f) More... \endlink
+  \copybrief add_axioms_for_contains(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool)
+  \link add_axioms_for_contains(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_equals` :
-  \copybrief string_constraint_generatort::add_axioms_for_equals(const function_application_exprt &f)
-  \link string_constraint_generatort::add_axioms_for_equals(const function_application_exprt &f) More... \endlink
+  \copybrief add_axioms_for_equals(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool)
+  \link add_axioms_for_equals(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_equals_ignore_case` :
-  \copybrief string_constraint_generatort::add_axioms_for_equals_ignore_case(const function_application_exprt &f)
-  \link string_constraint_generatort::add_axioms_for_equals_ignore_case(const function_application_exprt &f) More... \endlink
+  \copybrief add_axioms_for_equals_ignore_case(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool)
+  \link add_axioms_for_equals_ignore_case(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_hash_code` :
   \copybrief string_constraint_generatort::add_axioms_for_hash_code
   \link string_constraint_generatort::add_axioms_for_hash_code More... \endlink
   * `cprover_string_is_prefix` :
-  \copybrief string_constraint_generatort::add_axioms_for_is_prefix
-  \link string_constraint_generatort::add_axioms_for_is_prefix More... \endlink
+  \copybrief add_axioms_for_is_prefix
+  \link add_axioms_for_is_prefix More... \endlink
   * `cprover_string_index_of` :
-  \copybrief string_constraint_generatort::add_axioms_for_index_of(const function_application_exprt &f)
-  \link string_constraint_generatort::add_axioms_for_index_of(const function_application_exprt &f) More... \endlink
+  \copybrief add_axioms_for_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
+  \link add_axioms_for_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_last_index_of` :
-  \copybrief string_constraint_generatort::add_axioms_for_last_index_of(const function_application_exprt &f)
-  \link string_constraint_generatort::add_axioms_for_last_index_of(const function_application_exprt &f)  More... \endlink
+  \copybrief add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
+  \link add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)  More... \endlink
 
 \subsection transformations Transformations:
 
   * `cprover_string_char_set` :
-    \copybrief string_constraint_generatort::add_axioms_for_char_set(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_char_set(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_set_char
+    \link add_axioms_for_set_char More... \endlink
   * `cprover_string_concat` :
-    \copybrief string_constraint_generatort::add_axioms_for_concat(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_concat(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_concat
+    \link add_axioms_for_concat More... \endlink
   * `cprover_string_delete` :
-    \copybrief string_constraint_generatort::add_axioms_for_delete(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_delete(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_delete(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
+    \link add_axioms_for_delete(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_insert` :
-    \copybrief string_constraint_generatort::add_axioms_for_insert(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_insert(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_insert(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
+    \link add_axioms_for_insert(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_replace` :
-    \copybrief string_constraint_generatort::add_axioms_for_replace(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_replace(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_replace(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
+    \link add_axioms_for_replace(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_set_length` :
-    \copybrief string_constraint_generatort::add_axioms_for_set_length(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_set_length(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_set_length(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
+    \link add_axioms_for_set_length(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_substring` :
-    \copybrief string_constraint_generatort::add_axioms_for_substring(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_substring(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_substring(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
+    \link add_axioms_for_substring(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_to_lower_case` :
-    \copybrief string_constraint_generatort::add_axioms_for_to_lower_case(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_to_lower_case(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_to_lower_case
+    \link add_axioms_for_to_lower_case More... \endlink
   * `cprover_string_to_upper_case` :
-    \copybrief string_constraint_generatort::add_axioms_for_to_upper_case(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_to_upper_case(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_to_upper_case
+    \link add_axioms_for_to_upper_case More... \endlink
   * `cprover_string_trim` :
-    \copybrief string_constraint_generatort::add_axioms_for_trim(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_trim(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_trim(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
+    \link add_axioms_for_trim(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
 
 \subsection conversions Conversions:
 
   * `cprover_string_format` :
-    \copybrief string_constraint_generatort::add_axioms_for_format(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_format(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_format
+    \link add_axioms_for_format More... \endlink
   * `cprover_string_from_literal` :
-    \copybrief string_constraint_generatort::add_axioms_from_literal(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_from_literal(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_from_literal(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
+    \link add_axioms_from_literal(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_of_int` :
-    \copybrief string_constraint_generatort::add_axioms_from_int(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_string_of_int(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_string_of_int
+    \link add_axioms_for_string_of_int More... \endlink
   * `cprover_string_of_float` :
-    \copybrief string_constraint_generatort::add_axioms_for_string_of_float(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_string_of_float(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_string_of_float
+    \link add_axioms_for_string_of_float More... \endlink
   * `cprover_string_of_float_scientific_notation` :
-    \copybrief string_constraint_generatort::add_axioms_from_float_scientific_notation(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_from_float_scientific_notation(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_from_float_scientific_notation
+    \link add_axioms_from_float_scientific_notation More... \endlink
   * `cprover_string_of_char` :
-    \copybrief string_constraint_generatort::add_axioms_from_char(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_from_char(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_from_char(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
+    \link add_axioms_from_char(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_parse_int` :
-    \copybrief string_constraint_generatort::add_axioms_for_parse_int(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_for_parse_int(const function_application_exprt &f) More... \endlink
+    \copybrief add_axioms_for_parse_int
+    \link add_axioms_for_parse_int More... \endlink
 
 \subsection deprecated Deprecated primitives:
 
@@ -348,13 +348,13 @@ allocates a new string before calling a primitive.
 
 \subsection instantiation Instantiation
 
-This is done by generate_instantiations(messaget::mstreamt &stream, const namespacet &ns, const string_constraint_generatort &generator, const index_set_pairt &index_set, const string_axiomst &axioms).
-\copydetails generate_instantiations(messaget::mstreamt &stream, const namespacet &ns, const string_constraint_generatort &generator, const index_set_pairt &index_set, const string_axiomst &axioms)
+This is done by generate_instantiations(messaget::mstreamt &stream, const string_constraint_generatort &generator, const index_set_pairt &index_set, const string_axiomst &axioms, const std::map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses).
+\copydetails generate_instantiations(messaget::mstreamt &stream, const string_constraint_generatort &generator, const index_set_pairt &index_set, const string_axiomst &axioms, const std::map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses).
 
 \subsection axiom-check Axiom check
 
-\copydetails check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, std::size_t max_string_length, bool use_counter_example, ui_message_handlert::uit ui, const union_find_replacet &symbol_resolve)
-\link check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, std::size_t max_string_length, bool use_counter_example, ui_message_handlert::uit ui, const union_find_replacet &symbol_resolve)
+\copydetails check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, bool use_counter_example, const union_find_replacet &symbol_resolve, const std::map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses)
+\link check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, bool use_counter_example, const union_find_replacet &symbol_resolve, const std::map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses)
   (See function documentation...) \endlink
 
 \section floatbv Floatbv Directory
