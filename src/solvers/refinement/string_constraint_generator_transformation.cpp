@@ -241,27 +241,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
   return {from_integer(0, f.type()), constraints};
 }
 
-/// Conversion of a string to lower case
-///
-/// \copydoc add_axioms_for_to_lower_case(const array_string_exprt &, array_string_exprt &)
-///
-/// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]`, refined_string `str`
-/// \return integer expression which is different from `0` when there is an
-///         exception to signal
-std::pair<exprt, string_constraintst> add_axioms_for_to_lower_case(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
-{
-  PRECONDITION(f.arguments().size() == 3);
-  string_constraintst constraints;
-  const array_string_exprt res =
-    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
-  return add_axioms_for_to_lower_case(fresh_symbol, res, str);
-}
-
 /// Expression which is true for uppercase characters of the Basic Latin and
 /// Latin-1 supplement of unicode.
 static exprt is_upper_case(const exprt &character)
@@ -387,48 +366,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_to_upper_case(
   }());
 
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
-}
-
-/// Conversion of a string to upper case
-///
-// NOLINTNEXTLINE
-/// \copybrief string_constraint_generatort::add_axioms_for_to_upper_case(const array_string_exprt&, const array_string_exprt&)
-// NOLINTNEXTLINE
-/// \link string_constraint_generatort::add_axioms_for_to_upper_case(const array_string_exprt &res, const array_string_exprt &str)
-///   (More...) \endlink
-/// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]`, refined_string `str`
-/// \return integer expression which is different from `0` when there is an
-///         exception to signal
-std::pair<exprt, string_constraintst> add_axioms_for_to_upper_case(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
-{
-  PRECONDITION(f.arguments().size() == 3);
-  array_string_exprt res =
-    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
-  return add_axioms_for_to_upper_case(fresh_symbol, res, str);
-}
-
-/// Set a character to a specific value at an index of the string
-/// \copydoc string_constraint_generatort::add_axioms_for_set_char
-/// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]`, refined_string `str`, integer `pos`,
-///           and character `char`
-std::pair<exprt, string_constraintst> add_axioms_for_char_set(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
-{
-  PRECONDITION(f.arguments().size() == 5);
-  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
-  const array_string_exprt res =
-    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  const exprt &position = f.arguments()[3];
-  const exprt &character = f.arguments()[4];
-  return add_axioms_for_set_char(fresh_symbol, res, str, position, character);
 }
 
 /// Add axioms ensuring that the result `res` is similar to input string `str`

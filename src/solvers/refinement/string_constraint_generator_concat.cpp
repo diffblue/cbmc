@@ -165,56 +165,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat(
     fresh_symbol, res, s1, s2, index_zero, s2.length());
 }
 
-/// String concatenation
-///
-/// This primitive accepts 4 or 6 arguments.
-/// \copybrief string_constraint_generatort::add_axioms_for_concat_substr
-/// \link string_constraint_generatort::add_axioms_for_concat_substr
-///   (More...) \endlink
-///
-/// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]`, refined_string `s1`, refined_string `s2`,
-///           optional integer `start_index`, optional integer `end_index`
-/// \return an integer expression
-std::pair<exprt, string_constraintst> add_axioms_for_concat(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
-{
-  const function_application_exprt::argumentst &args=f.arguments();
-  PRECONDITION(args.size() == 4 || args.size() == 6);
-  const array_string_exprt s1 = get_string_expr(array_pool, args[2]);
-  const array_string_exprt s2 = get_string_expr(array_pool, args[3]);
-  const array_string_exprt res =
-    char_array_of_pointer(array_pool, args[1], args[0]);
-  if(args.size() == 6)
-    return add_axioms_for_concat_substr(
-      fresh_symbol, res, s1, s2, args[4], args[5]);
-  else // args.size()==4
-    return add_axioms_for_concat(fresh_symbol, res, s1, s2);
-}
-
-/// Add axioms enforcing that the string represented by the two first
-/// expressions is equal to the concatenation of the string argument and
-/// the character argument of the function application.
-/// \todo This should be merged with add_axioms_for_concat.
-/// \param f: function application with a length, pointer, string and character
-///           argument.
-/// \return code 0 on success
-std::pair<exprt, string_constraintst> add_axioms_for_concat_char(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
-{
-  const function_application_exprt::argumentst &args = f.arguments();
-  PRECONDITION(args.size() == 4);
-  const array_string_exprt s1 = get_string_expr(array_pool, args[2]);
-  const exprt &c = args[3];
-  const array_string_exprt res =
-    char_array_of_pointer(array_pool, args[1], args[0]);
-  return add_axioms_for_concat_char(fresh_symbol, res, s1, c);
-}
-
 /// Add axioms corresponding to the StringBuilder.appendCodePoint(I) function
 /// \deprecated java specific
 /// \param f: function application with two arguments: a string and a code point

@@ -278,22 +278,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_length(
 std::pair<exprt, string_constraintst> add_axioms_for_empty_string(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f);
-std::pair<exprt, string_constraintst> add_axioms_for_char_set(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool);
+
 std::pair<exprt, string_constraintst> add_axioms_for_copy(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool);
-std::pair<exprt, string_constraintst> add_axioms_for_concat_char(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool);
-std::pair<exprt, string_constraintst> add_axioms_for_concat(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool);
+
 std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
@@ -370,11 +360,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_literal(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool);
-std::pair<exprt, string_constraintst> add_axioms_from_int(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool,
-  const namespacet &ns);
+
 std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
@@ -503,18 +489,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool);
-std::pair<exprt, string_constraintst> add_axioms_for_to_lower_case(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool);
+
 std::pair<exprt, string_constraintst> add_axioms_for_to_lower_case(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &str);
-std::pair<exprt, string_constraintst> add_axioms_for_to_upper_case(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool);
+
 std::pair<exprt, string_constraintst> add_axioms_for_to_upper_case(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,

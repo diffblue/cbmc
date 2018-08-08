@@ -35,23 +35,6 @@ static unsigned long to_integer_or_default(
   return def;
 }
 
-std::pair<exprt, string_constraintst> add_axioms_from_int(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool,
-  const namespacet &ns)
-{
-  PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
-  const array_string_exprt res =
-    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  if(f.arguments().size() == 4)
-    return add_axioms_for_string_of_int_with_radix(
-      fresh_symbol, res, f.arguments()[2], f.arguments()[3], 0, ns);
-  else // f.arguments.size()==3
-    return add_axioms_for_string_of_int(
-      fresh_symbol, res, f.arguments()[2], 0, ns);
-}
-
 /// Add axioms corresponding to the String.valueOf(J) java function.
 /// \deprecated should use add_axioms_from_int instead
 /// \param f: function application with one long argument
