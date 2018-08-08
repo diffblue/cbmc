@@ -220,51 +220,51 @@ static void clinit_wrapper_do_recursive_calls(
     code_function_callt call_real_init;
     call_real_init.function() = find_sym_it->second.symbol_expr();
     init_body.move_to_operands(call_real_init);
+  }
 
-    // Add a standard nondet initialization for each non-final static field
-    // of this class. Note this is the same invocation used in
-    // get_stub_initializer_body and java_static_lifetime_init.
-    if(nondet_static)
+  // If nondet-static option is given, add a standard nondet initialization for
+  // each non-final static field of this class. Note this is the same invocation
+  // used in get_stub_initializer_body and java_static_lifetime_init.
+  if(nondet_static)
+  {
+    object_factory_parameterst parameters = object_factory_parameters;
+    parameters.function_id = clinit_wrapper_name(class_name);
+
+    std::vector<irep_idt> nondet_ids;
+    std::for_each(
+      symbol_table.symbols.begin(),
+      symbol_table.symbols.end(),
+      [&](const std::pair<irep_idt, symbolt> &symbol) {
+        if(
+          symbol.second.type.get(ID_C_class) == class_name &&
+          symbol.second.is_static_lifetime &&
+          !symbol.second.type.get_bool(ID_C_constant))
+        {
+          nondet_ids.push_back(symbol.first);
+        }
+      });
+
+    for(const auto &id : nondet_ids)
     {
-      object_factory_parameterst parameters = object_factory_parameters;
-      parameters.function_id = clinit_wrapper_name(class_name);
+      const symbol_exprt new_global_symbol =
+        symbol_table.lookup_ref(id).symbol_expr();
 
-      std::vector<irep_idt> nondet_ids;
-      std::for_each(
-        symbol_table.symbols.begin(),
-        symbol_table.symbols.end(),
-        [&](const std::pair<irep_idt, symbolt> &symbol) {
-          if(
-            symbol.second.type.get(ID_C_class) == class_name &&
-            symbol.second.is_static_lifetime &&
-            !symbol.second.type.get_bool(ID_C_constant))
-          {
-            nondet_ids.push_back(symbol.first);
-          }
-        });
+      parameters.max_nonnull_tree_depth =
+        is_non_null_library_global(id)
+          ? std::max(
+              size_t(1), object_factory_parameters.max_nonnull_tree_depth)
+          : object_factory_parameters.max_nonnull_tree_depth;
 
-      for(const auto &id : nondet_ids)
-      {
-        const symbol_exprt new_global_symbol =
-          symbol_table.lookup_ref(id).symbol_expr();
-
-        parameters.max_nonnull_tree_depth =
-          is_non_null_library_global(id)
-            ? std::max(
-                size_t(1), object_factory_parameters.max_nonnull_tree_depth)
-            : object_factory_parameters.max_nonnull_tree_depth;
-
-        gen_nondet_init(
-          new_global_symbol,
-          init_body,
-          symbol_table,
-          source_locationt(),
-          false,
-          allocation_typet::DYNAMIC,
-          parameters,
-          pointer_type_selector,
-          update_in_placet::NO_UPDATE_IN_PLACE);
-      }
+      gen_nondet_init(
+        new_global_symbol,
+        init_body,
+        symbol_table,
+        source_locationt(),
+        false,
+        allocation_typet::DYNAMIC,
+        parameters,
+        pointer_type_selector,
+        update_in_placet::NO_UPDATE_IN_PLACE);
     }
   }
 }
