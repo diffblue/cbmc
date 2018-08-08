@@ -97,15 +97,23 @@ private:
   abstract_object_pointert insert_data_deps(
     const dependencest &dependencies) const;
 
+  abstract_object_pointert set_data_deps(
+    const dependencest &dependencies) const;
+
   abstract_object_pointert insert_data_deps(const locationst &locations) const
   {
     // `locationst` is unsorted, so convert this to a sorted `dependenciest`
-    dependencest dependencies;
-
-    for(const auto l : locations)
-      dependencies.insert(l);
+    dependencest dependencies(locations.begin(), locations.end());
 
     return insert_data_deps(dependencies);
+  }
+
+  abstract_object_pointert set_data_deps(const locationst &locations) const
+  {
+    // `locationst` is unsorted, so convert this to a sorted `dependenciest`
+    dependencest dependencies(locations.begin(), locations.end());
+
+    return set_data_deps(dependencies);
   }
 
 };
