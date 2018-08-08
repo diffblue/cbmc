@@ -2197,6 +2197,31 @@ exprt c_typecheck_baset::do_special_functions(
 
     return bswap_expr;
   }
+  else if(identifier=="__builtin_nontemporal_load")
+  {
+    typecheck_function_call_arguments(expr);
+
+    if(expr.arguments().size()!=1)
+    {
+      err_location(f_op);
+      error() << identifier << " expects one operand" << eom;
+      throw 0;
+    }
+
+    // these return the subtype of the argument
+    exprt &ptr_arg=expr.arguments().front();
+
+    if(ptr_arg.type().id()!=ID_pointer)
+    {
+      err_location(f_op);
+      error() << "__builtin_nontemporal_load takes pointer as argument" << eom;
+      throw 0;
+    }
+
+    expr.type()=expr.arguments().front().type().subtype();
+
+    return expr;
+  }
   else if(
     identifier == "__builtin_fpclassify" ||
     identifier == CPROVER_PREFIX "fpclassify")
