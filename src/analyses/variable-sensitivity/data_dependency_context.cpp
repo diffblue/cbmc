@@ -130,6 +130,35 @@ abstract_object_pointert data_dependency_contextt::insert_data_deps(
 }
 
 /**
+ * Set the given set of data dependencies for this data_dependency_context
+ * object.
+ *
+ * \param dependencies the set of dependencies to set
+ * \return a new data_dependency_context if new dependencies were set,
+ * or 'this' if the dependencies were not changed.
+ */
+abstract_object_pointert data_dependency_contextt::set_data_deps(
+  const dependencest &dependencies) const
+{
+  // If the dependencies will not change, just return 'this'
+  if(data_deps == dependencies)
+    return shared_from_this();
+
+  const auto &result=
+    std::dynamic_pointer_cast<data_dependency_contextt>(mutable_clone());
+
+  result->data_deps = dependencies;
+
+  // If this is the first write to the context then it is also used as
+  // the initial set of data dependency dominators as well.
+  if(data_deps.empty())
+  {
+    result->data_dominators = dependencies;
+  }
+  return result;
+}
+
+/**
  * A helper function to evaluate writing to a component of an
  * abstract object. More precise abstractions may override this to
  * update what they are storing for a specific component.
@@ -161,7 +190,7 @@ abstract_object_pointert data_dependency_contextt::write(
   const auto cast_value=
     std::dynamic_pointer_cast<const data_dependency_contextt>(value);
 
-  return updated_parent->insert_data_deps(cast_value->data_deps);
+  return updated_parent->set_data_deps(cast_value->data_deps);
 }
 
 /**
@@ -185,7 +214,7 @@ data_dependency_contextt::update_location_context(
       this->write_location_contextt::update_location_context(
         locations, update_sub_elements));
 
-  return updated_parent->insert_data_deps(locations);
+  return updated_parent->set_data_deps(locations);
 }
 
 /**
