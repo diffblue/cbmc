@@ -564,10 +564,13 @@ int gcc_modet::doit()
     config.ansi_c.mode=configt::ansi_ct::flavourt::VISUAL_STUDIO;
     debug() << "Enabling Visual Studio syntax" << eom;
   }
-  else if(config.this_operating_system()=="macos")
-    config.ansi_c.mode = configt::ansi_ct::flavourt::CLANG;
   else
-    config.ansi_c.mode=configt::ansi_ct::flavourt::GCC;
+  {
+    if(gcc_version.flavor == gcc_versiont::flavort::CLANG)
+      config.ansi_c.mode = configt::ansi_ct::flavourt::CLANG;
+    else
+      config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+  }
 
   if(compiler.mode==compilet::ASSEMBLE_ONLY)
     compiler.object_file_extension="s";
