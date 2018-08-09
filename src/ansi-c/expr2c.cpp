@@ -30,6 +30,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_qualifiers.h"
 #include "expr2c_class.h"
 
+expr2c_configurationt expr2c_configurationt::default_configuration{true,
+                                                                   true,
+                                                                   true,
+                                                                   "TRUE",
+                                                                   "FALSE"};
+
 /*
 
 Precedences are as follows. Higher values mean higher precedence.
@@ -661,7 +667,12 @@ std::string expr2ct::convert_struct_type(
   const std::string &qualifiers_str,
   const std::string &declarator_str)
 {
-  return convert_struct_type(src, qualifiers_str, declarator_str, true, true);
+  return convert_struct_type(
+    src,
+    qualifiers_str,
+    declarator_str,
+    configuration.print_struct_body_in_type,
+    configuration.include_struct_padding_components);
 }
 
 /// To generate C-like string for declaring (or defining) the given struct
@@ -734,7 +745,8 @@ std::string expr2ct::convert_array_type(
   const qualifierst &qualifiers,
   const std::string &declarator_str)
 {
-  return convert_array_type(src, qualifiers, declarator_str, true);
+  return convert_array_type(
+    src, qualifiers, declarator_str, configuration.include_array_size);
 }
 
 /// To generate a C-like type declaration of an array. Optionally can include or
@@ -1996,18 +2008,18 @@ std::string expr2ct::convert_constant(
 ///   FALSE.
 std::string expr2ct::convert_constant_bool(bool boolean_value)
 {
-  // C doesn't really have these
   if(boolean_value)
-    return "TRUE";
+    return configuration.true_string;
   else
-    return "FALSE";
+    return configuration.false_string;
 }
 
 std::string expr2ct::convert_struct(
   const exprt &src,
   unsigned &precedence)
 {
-  return convert_struct(src, precedence, true);
+  return convert_struct(
+    src, precedence, configuration.include_struct_padding_components);
 }
 
 /// To generate a C-like string representing a struct. Can optionally include
@@ -3947,17 +3959,33 @@ std::string expr2ct::convert(const exprt &src)
   return convert_with_precedence(src, precedence);
 }
 
-std::string expr2c(const exprt &expr, const namespacet &ns)
+std::string expr2c(
+  const exprt &expr,
+  const namespacet &ns,
+  const expr2c_configurationt &configuration)
 {
   std::string code;
-  expr2ct expr2c(ns);
+  expr2ct expr2c(ns, configuration);
   expr2c.get_shorthands(expr);
   return expr2c.convert(expr);
 }
 
-std::string type2c(const typet &type, const namespacet &ns)
+std::string expr2c(const exprt &expr, const namespacet &ns)
 {
-  expr2ct expr2c(ns);
+  return expr2c(expr, ns, expr2c_configurationt::default_configuration);
+}
+
+std::string type2c(
+  const typet &type,
+  const namespacet &ns,
+  const expr2c_configurationt &configuration)
+{
+  expr2ct expr2c(ns, configuration);
   // expr2c.get_shorthands(expr);
   return expr2c.convert(type);
+}
+
+std::string type2c(const typet &type, const namespacet &ns)
+{
+  return type2c(type, ns, expr2c_configurationt::default_configuration);
 }
