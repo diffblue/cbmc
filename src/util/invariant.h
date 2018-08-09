@@ -72,41 +72,32 @@ Author: Martin Brain, martin.brain@diffblue.com
 /// family of macros, allowing constructs like
 /// `INVARIANT(x==y, my_invariantt, (T1)actual1, (T2)actual2, ...)`
 ///
-class invariant_failedt: public std::logic_error
+class invariant_failedt
 {
  private:
-  std::string get_invariant_failed_message(
-    const std::string &file,
-    const std::string &function,
-    int line,
-    const std::string &backtrace,
-    const std::string &reason);
-
- public:
   const std::string file;
   const std::string function;
   const int line;
   const std::string backtrace;
+  const std::string condition;
   const std::string reason;
+
+public:
+  std::string what() const noexcept;
 
   invariant_failedt(
     const std::string &_file,
     const std::string &_function,
     int _line,
     const std::string &_backtrace,
-    const std::string &_reason):
-    logic_error(
-      get_invariant_failed_message(
-        _file,
-        _function,
-        _line,
-        _backtrace,
-        _reason)),
-    file(_file),
-    function(_function),
-    line(_line),
-    backtrace(_backtrace),
-    reason(_reason)
+    const std::string &_condition,
+    const std::string &_reason)
+    : file(_file),
+      function(_function),
+      line(_line),
+      backtrace(_backtrace),
+      condition(_condition),
+      reason(_reason)
   {
   }
 };
@@ -149,9 +140,10 @@ void report_exception_to_stderr(const invariant_failedt &);
 /// \param file : C string giving the name of the file.
 /// \param function : C string giving the name of the function.
 /// \param line : The line number of the invariant
+/// \param condition : the condition this invariant is checking.
 /// \param params : (variadic) parameters to forward to ET's constructor
 ///  its backtrace member will be set before it is used.
-template<class ET, typename ...Params>
+template <class ET, typename... Params>
 #ifdef __GNUC__
 __attribute__((noreturn))
 #endif
@@ -160,10 +152,17 @@ invariant_violated_structured(
   const std::string &file,
   const std::string &function,
   const int line,
+  const std::string &condition,
   Params &&... params)
 {
   std::string backtrace=get_backtrace();
-  ET to_throw(file, function, line, backtrace, std::forward<Params>(params)...);
+  ET to_throw(
+    file,
+    function,
+    line,
+    backtrace,
+    condition,
+    std::forward<Params>(params)...);
   // We now have a structured exception ready to use;
   // in future this is the place to put a 'throw'.
   report_exception_to_stderr(to_throw);
@@ -177,20 +176,20 @@ invariant_violated_structured(
 /// \param function : C string giving the name of the function.
 /// \param line : The line number of the invariant
 /// \param reason : brief description of the invariant violation.
+/// \param condition : the condition this invariant is checking.
 #ifdef __GNUC__
 __attribute__((noreturn))
 #endif
-inline void invariant_violated_string(
+inline void
+invariant_violated_string(
   const std::string &file,
   const std::string &function,
   const int line,
-  const std::string &reason)
+  const std::string &reason,
+  const std::string &condition)
 {
   invariant_violated_structured<invariant_failedt>(
-    file,
-    function,
-    line,
-    reason);
+    file, function, line, condition, reason);
 }
 
 // These require a trailing semicolon by the user, such that INVARIANT
@@ -207,7 +206,11 @@ inline void invariant_violated_string(
   {                                                                            \
     if(!(CONDITION))                                                           \
       invariant_violated_string(                                               \
-        __FILE__, __this_function__, __LINE__, (REASON)); /* NOLINT */         \
+        __FILE__,                                                              \
+        __this_function__,                                                     \
+        __LINE__,                                                              \
+        (REASON),                                                              \
+        #CONDITION); /* NOLINT */                                              \
   } while(false)
 
 #define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...)                         \
@@ -215,7 +218,11 @@ inline void invariant_violated_string(
   {                                                                            \
     if(!(CONDITION))                                                           \
       invariant_violated_structured<TYPENAME>(                                 \
-        __FILE__, __this_function__, __LINE__, __VA_ARGS__); /* NOLINT */      \
+        __FILE__,                                                              \
+        __this_function__,                                                     \
+        __LINE__,                                                              \
+        #CONDITION,                                                            \
+        __VA_ARGS__); /* NOLINT */                                             \
   } while(false)
 
 #endif // End CPROVER_DO_NOT_CHECK / CPROVER_ASSERT / ... if block
@@ -225,8 +232,13 @@ inline void invariant_violated_string(
 // for INVARIANT.
 
 // The condition should only contain (unmodified) arguments to the method.
+// Inputs include arguments passed to the function, as well as member
+// variables that the function may read.
 // "The design of the system means that the arguments to this method
 //  will always meet this condition".
+//
+// The PRECONDITION documents / checks assumptions about the inputs
+// that is the caller's responsibility to make happen before the call.
 #define PRECONDITION(CONDITION) INVARIANT(CONDITION, "Precondition")
 #define PRECONDITION_STRUCTURED(CONDITION, TYPENAME, ...) \
   INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__)
@@ -234,6 +246,11 @@ inline void invariant_violated_string(
 // The condition should only contain variables that will be returned /
 // output without further modification.
 // "The implementation of this method means that the condition will hold".
+//
+// A POSTCONDITION documents what the function can guarantee about its
+// output when it returns, given that it was called with valid inputs.
+// Outputs include the return value of the function, as well as member
+// variables that the function may write.
 #define POSTCONDITION(CONDITION) INVARIANT(CONDITION, "Postcondition")
 #define POSTCONDITION_STRUCTURED(CONDITION, TYPENAME, ...) \
   INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__)
@@ -242,6 +259,10 @@ inline void invariant_violated_string(
 // changed by a previous method call.
 // "The contract of the previous method call means the following
 //  condition holds".
+//
+// A difference between CHECK_RETURN and POSTCONDITION is that CHECK_RETURN is
+// a statement about what the caller expects from a function, whereas a
+// POSTCONDITION is a statement about guarantees made by the function itself.
 #define CHECK_RETURN(CONDITION) INVARIANT(CONDITION, "Check return value")
 #define CHECK_RETURN_STRUCTURED(CONDITION, TYPENAME, ...)  \
   INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__)
@@ -261,7 +282,7 @@ inline void invariant_violated_string(
 // Legacy annotations
 
 // The following should not be used in new code and are only intended
-// to migrate documentation and "error handling" in older code
+// to migrate documentation and "error handling" in older code.
 #define TODO           INVARIANT(false, "Todo")
 #define UNIMPLEMENTED  INVARIANT(false, "Unimplemented")
 #define UNHANDLED_CASE INVARIANT(false, "Unhandled case")

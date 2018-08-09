@@ -8,7 +8,7 @@ Author: Martin Brain, martin.brain@diffblue.com
 
 #include "invariant.h"
 
-#include "util/freer.h"
+#include "freer.h"
 
 #include <memory>
 #include <string>
@@ -79,8 +79,6 @@ void print_backtrace(
   std::ostream &out)
 {
 #ifdef __GLIBC__
-    out << "Backtrace\n" << std::flush;
-
     void * stack[50] = {};
 
     std::size_t entries=backtrace(stack, sizeof(stack) / sizeof(void *));
@@ -116,20 +114,14 @@ void report_exception_to_stderr(const invariant_failedt &reason)
   std::cerr << "--- end invariant violation report ---\n";
 }
 
-std::string invariant_failedt::get_invariant_failed_message(
-  const std::string &file,
-  const std::string &function,
-  int line,
-  const std::string &backtrace,
-  const std::string &reason)
+std::string invariant_failedt::what() const noexcept
 {
   std::ostringstream out;
   out << "Invariant check failed\n"
-      << "File " << file
-      << " function " << function
-      << " line " << line << '\n'
-      << "Reason: " << reason
-      << "\nBacktrace:\n"
+      << "File: " << file << ":" << line << " function: " << function << '\n'
+      << "Condition: " << condition << '\n'
+      << "Reason: " << reason << '\n'
+      << "Backtrace:" << '\n'
       << backtrace << '\n';
   return out.str();
 }

@@ -40,16 +40,18 @@ public:
     const std::string &function,
     int line,
     const std::string &backtrace,
+    const std::string &condition,
     int code,
-    const std::string &_description):
-    invariant_failedt(
-      file,
-      function,
-      line,
-      backtrace,
-      pretty_print(code, _description)),
-    error_code(code),
-    description(_description)
+    const std::string &_description)
+    : invariant_failedt(
+        file,
+        function,
+        line,
+        backtrace,
+        condition,
+        pretty_print(code, _description)),
+      error_code(code),
+      description(_description)
   {
   }
 };
