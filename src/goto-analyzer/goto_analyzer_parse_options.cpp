@@ -824,19 +824,20 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     "Abstract interpreter options:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    " --location-sensitive         one domain per location\n"
+    " --location-sensitive         one domain per location (default)\n"
     " --location-insensitive       one domain per function\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --concurrent                 one domain per location and concurrency analysis\n"
     "\n"
     "Domain options:\n"
-    " --constants                  constant domain\n"
+    " --constants                  constant domain (default)\n"
     " --intervals                  interval domain\n"
     " --non-null                   non-null domain\n"
     " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
     "\n"
     "Output options:\n"
-    " --text file_name             output results in plain text to given file\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --text file_name             output results in plain text to given file (default)\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --json file_name             output results in JSON format to given file\n"
     " --xml file_name              output results in XML format to given file\n"
