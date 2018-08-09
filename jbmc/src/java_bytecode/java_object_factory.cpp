@@ -149,6 +149,13 @@ private:
     size_t depth,
     const source_locationt &location);
 
+  const symbol_exprt gen_nondet_int_init(
+    code_blockt &assignments,
+    const std::string &basename_prefix,
+    const exprt &min_length_expr,
+    const exprt &max_length_expr,
+    const source_locationt &location);
+
   void gen_method_call_if_present(
     code_blockt &assignments,
     const exprt &instance_expr,
@@ -1218,6 +1225,60 @@ void java_object_factoryt::gen_nondet_init(
   }
 }
 
+/// Nondeterministically initializes an int i in the range min <= i <= max,
+/// where min is the integer represented by `min_value_expr` and max is the
+/// integer represented by `max_value_expr`.
+/// \param [out] assignments: A code block that the initializing assignments
+///   will be appended to.
+/// \param basename_prefix: Used for naming the newly created symbol.
+/// \param min_value_expr: Represents the minimum value for the integer.
+/// \param max_value_expr: Represents the maximum value for the integer.
+/// \param location: Source location associated with nondet-initialization.
+/// \return A symbol expression for the resulting integer.
+const symbol_exprt java_object_factoryt::gen_nondet_int_init(
+  code_blockt &assignments,
+  const std::string &basename_prefix,
+  const exprt &min_value_expr,
+  const exprt &max_value_expr,
+  const source_locationt &location)
+{
+  PRECONDITION(min_value_expr.type() == max_value_expr.type());
+  // Allocate a new symbol for the int
+  const symbolt &int_symbol = get_fresh_aux_symbol(
+    min_value_expr.type(),
+    id2string(object_factory_parameters.function_id),
+    basename_prefix,
+    loc,
+    ID_java,
+    symbol_table);
+  symbols_created.push_back(&int_symbol);
+  const auto &int_symbol_expr = int_symbol.symbol_expr();
+
+  // Nondet-initialize it
+  gen_nondet_init(
+    assignments,
+    int_symbol_expr,
+    false,                   // is_sub
+    irep_idt(),
+    false,                   // skip_classid
+    allocation_typet::LOCAL, // immaterial, type is primitive
+    false,                   // override
+    typet(),                 // override type is immaterial
+    0,                       // depth is immaterial, always non-null
+    update_in_placet::NO_UPDATE_IN_PLACE,
+    location);
+
+  // Insert assumptions to bound its value
+  const auto min_assume_expr =
+    binary_relation_exprt(int_symbol_expr, ID_ge, min_value_expr);
+  const auto max_assume_expr =
+    binary_relation_exprt(int_symbol_expr, ID_le, max_value_expr);
+  assignments.add(code_assumet(min_assume_expr));
+  assignments.add(code_assumet(max_assume_expr));
+
+  return int_symbol_expr;
+}
+
 /// Allocates a fresh array and emits an assignment writing to \p lhs the
 /// address of the new array.  Single-use at the moment, but useful to keep as a
 /// separate function for downstream branches.
@@ -1238,46 +1299,19 @@ void java_object_factoryt::allocate_nondet_length_array(
   const typet &element_type,
   const source_locationt &location)
 {
-  symbolt &length_sym = get_fresh_aux_symbol(
-    java_int_type(),
-    id2string(object_factory_parameters.function_id),
-    "nondet_array_length",
-    loc,
-    ID_java,
-    symbol_table);
-  symbols_created.push_back(&length_sym);
-  const auto &length_sym_expr=length_sym.symbol_expr();
-
-  // Initialize array with some undetermined length:
-  gen_nondet_init(
+  const auto &length_sym_expr = gen_nondet_int_init(
     assignments,
-    length_sym_expr,
-    false, // is_sub
-    irep_idt(),
-    false,                   // skip_classid
-    allocation_typet::LOCAL, // immaterial, type is primitive
-    false,                   // override
-    typet(),                 // override type is immaterial
-    0,                       // depth is immaterial, always non-null
-    update_in_placet::NO_UPDATE_IN_PLACE,
+    "nondet_array_length",
+    from_integer(0, java_int_type()),
+    max_length_expr,
     location);
-
-  // Insert assumptions to bound its length:
-  binary_relation_exprt
-    assume1(length_sym_expr, ID_ge, from_integer(0, java_int_type()));
-  binary_relation_exprt
-    assume2(length_sym_expr, ID_le, max_length_expr);
-  code_assumet assume_inst1(assume1);
-  code_assumet assume_inst2(assume2);
-  assignments.move_to_operands(assume_inst1);
-  assignments.move_to_operands(assume_inst2);
 
   side_effect_exprt java_new_array(ID_java_new_array, lhs.type(), loc);
   java_new_array.copy_to_operands(length_sym_expr);
   java_new_array.set(ID_length_upper_bound, max_length_expr);
   java_new_array.type().subtype().set(ID_element_type, element_type);
   code_assignt assign(lhs, java_new_array);
-  assign.add_source_location()=loc;
+  assign.add_source_location() = loc;
   assignments.copy_to_operands(assign);
 }
 
