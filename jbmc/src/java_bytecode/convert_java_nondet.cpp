@@ -15,12 +15,12 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-#include <util/fresh_symbol.h>
 #include <util/irep_ids.h>
 
 #include <memory>
 
 #include "java_object_factory.h" // gen_nondet_init
+#include "java_utils.h"
 
 /// Returns true if `expr` is a nondet pointer that isn't a function pointer or
 /// a void* pointer as these can be meaningfully non-det initialized.
@@ -116,13 +116,8 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
     //   target2: instruction containing op, with op replaced by aux_symbol
     //            dead aux_symbol
 
-    symbolt &aux_symbol = get_fresh_aux_symbol(
-      op.type(),
-      id2string(function_identifier),
-      "nondet_tmp",
-      source_loc,
-      ID_java,
-      symbol_table);
+    symbolt &aux_symbol = fresh_java_symbol(
+      op.type(), "nondet_tmp", source_loc, function_identifier, symbol_table);
 
     const symbol_exprt aux_symbol_expr = aux_symbol.symbol_expr();
     op = aux_symbol_expr;

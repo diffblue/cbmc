@@ -9,12 +9,12 @@ Author: Kurt Degiogrio, kurt.degiorgio@diffblue.com
 #include "java_bytecode_concurrency_instrumentation.h"
 #include "expr2java.h"
 #include "java_types.h"
+#include "java_utils.h"
 
 #include <util/expr_iterator.h>
 #include <util/namespace.h>
 #include <util/cprover_prefix.h>
 #include <util/std_types.h>
-#include <util/fresh_symbol.h>
 #include <util/arith_tools.h>
 
 // Disable linter to allow an std::string constant.
@@ -229,12 +229,11 @@ static void instrument_synchronized_code(
   code_pop_catcht catch_pop;
 
   // Create the finally block with the same label targeted in the catch-push
-  const symbolt &tmp_symbol = get_fresh_aux_symbol(
+  const symbolt &tmp_symbol = fresh_java_symbol(
     java_reference_type(struct_tag_typet("java::java.lang.Throwable")),
-    id2string(symbol.name),
     "caught-synchronized-exception",
     code.source_location(),
-    ID_java,
+    id2string(symbol.name),
     symbol_table);
   symbol_exprt catch_var(tmp_symbol.name, tmp_symbol.type);
   catch_var.set(ID_C_base_name, tmp_symbol.base_name);

@@ -14,7 +14,7 @@ Author: Diffblue Ltd.
 #include <java_bytecode/java_object_factory.h>
 #include <java_bytecode/java_pointer_casts.h>
 
-#include <util/fresh_symbol.h>
+#include "java_utils.h"
 #include <util/invariant_utils.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
@@ -161,12 +161,11 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
   {
     const auto &this_argument = required_type.parameters()[0];
     const typet &this_type = this_argument.type();
-    symbolt &init_symbol = get_fresh_aux_symbol(
+    symbolt &init_symbol = fresh_java_symbol(
       this_type,
-      id2string(symbol.name),
       "to_construct",
       synthesized_source_location,
-      ID_java,
+      symbol.name,
       symbol_table);
     const symbol_exprt &init_symbol_expression = init_symbol.symbol_expr();
     code_assignt get_argument(
@@ -189,12 +188,11 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
     const typet &required_return_type = required_type.return_type();
     if(required_return_type != java_void_type())
     {
-      symbolt &to_return_symbol = get_fresh_aux_symbol(
+      symbolt &to_return_symbol = fresh_java_symbol(
         required_return_type,
-        id2string(symbol.name),
         "to_return",
         synthesized_source_location,
-        ID_java,
+        symbol.name,
         symbol_table);
       const exprt &to_return = to_return_symbol.symbol_expr();
       if(to_return_symbol.type.id() != ID_pointer)

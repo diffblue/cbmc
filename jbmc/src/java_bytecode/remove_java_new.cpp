@@ -14,11 +14,11 @@ Author: Peter Schrammel
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_convert.h>
 
+#include "java_utils.h"
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_cast.h>
 #include <util/expr_initializer.h>
-#include <util/fresh_symbol.h>
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
 
@@ -212,12 +212,11 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   // Must directly assign the new array to a temporary
   // because goto-symex will notice `x=side_effect_exprt` but not
   // `x=typecast_exprt(side_effect_exprt(...))`
-  symbol_exprt new_array_data_symbol = get_fresh_aux_symbol(
+  symbol_exprt new_array_data_symbol = fresh_java_symbol(
                                          data_java_new_expr.type(),
-                                         id2string(function_identifier),
                                          "tmp_new_data_array",
                                          location,
-                                         ID_java,
+                                         function_identifier,
                                          symbol_table)
                                          .symbol_expr();
   code_declt array_decl(new_array_data_symbol);
@@ -260,14 +259,10 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
 
     goto_programt tmp;
 
-    symbol_exprt tmp_i = get_fresh_aux_symbol(
-                           length.type(),
-                           id2string(function_identifier),
-                           "tmp_index",
-                           location,
-                           ID_java,
-                           symbol_table)
-                           .symbol_expr();
+    symbol_exprt tmp_i =
+      fresh_java_symbol(
+        length.type(), "tmp_index", location, function_identifier, symbol_table)
+        .symbol_expr();
     code_declt decl(tmp_i);
     decl.add_source_location() = location;
     goto_programt::targett t_decl = tmp.insert_before(tmp.instructions.begin());
@@ -292,14 +287,10 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
       plus_exprt(data, tmp_i), data.type().subtype());
 
     code_blockt for_body;
-    symbol_exprt init_sym = get_fresh_aux_symbol(
-                              sub_type,
-                              id2string(function_identifier),
-                              "subarray_init",
-                              location,
-                              ID_java,
-                              symbol_table)
-                              .symbol_expr();
+    symbol_exprt init_sym =
+      fresh_java_symbol(
+        sub_type, "subarray_init", location, function_identifier, symbol_table)
+        .symbol_expr();
     code_declt init_decl(init_sym);
     init_decl.add_source_location() = location;
     for_body.add(std::move(init_decl));

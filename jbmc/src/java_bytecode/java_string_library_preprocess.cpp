@@ -407,8 +407,8 @@ refined_string_exprt java_string_library_preprocesst::replace_char_array(
     checked_dereference(array_pointer, array_pointer.type().subtype());
   // array_data is array_pointer-> data
   const exprt array_data = get_data(array, symbol_table);
-  const symbolt &sym_char_array = get_fresh_aux_symbol(
-    array_data.type(), "char_array", "char_array", loc, ID_java, symbol_table);
+  const symbolt &sym_char_array = fresh_java_symbol(
+    array_data.type(), "char_array", loc, function_id, symbol_table);
   const symbol_exprt char_array = sym_char_array.symbol_expr();
   // char_array = array_pointer->data
   code.add(code_assignt(char_array, array_data), loc);
@@ -439,8 +439,8 @@ symbol_exprt java_string_library_preprocesst::fresh_string(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table)
 {
-  symbolt string_symbol=get_fresh_aux_symbol(
-    type, "cprover_string", "cprover_string", loc, ID_java, symbol_table);
+  symbolt string_symbol =
+    fresh_java_symbol(type, "cprover_string", loc, function_id, symbol_table);
   string_symbol.is_static_lifetime=true;
   return string_symbol.symbol_expr();
 }
@@ -458,22 +458,12 @@ refined_string_exprt java_string_library_preprocesst::decl_string_expr(
   symbol_table_baset &symbol_table,
   code_blockt &code)
 {
-  const symbolt &sym_length = get_fresh_aux_symbol(
-    index_type,
-    "cprover_string_length",
-    "cprover_string_length",
-    loc,
-    ID_java,
-    symbol_table);
+  const symbolt &sym_length = fresh_java_symbol(
+    index_type, "cprover_string_length", loc, function_id, symbol_table);
   const symbol_exprt length_field = sym_length.symbol_expr();
   const pointer_typet array_type = pointer_type(java_char_type());
-  const symbolt &sym_content = get_fresh_aux_symbol(
-    array_type,
-    "cprover_string_content",
-    "cprover_string_content",
-    loc,
-    ID_java,
-    symbol_table);
+  const symbolt &sym_content = fresh_java_symbol(
+    array_type, "cprover_string_content", loc, function_id, symbol_table);
   const symbol_exprt content_field = sym_content.symbol_expr();
   code.add(code_declt(content_field), loc);
   const refined_string_exprt str{
@@ -599,12 +589,11 @@ exprt make_nondet_infinite_char_array(
 {
   const array_typet array_type(
     java_char_type(), infinity_exprt(java_int_type()));
-  const symbolt data_sym = get_fresh_aux_symbol(
+  const symbolt data_sym = fresh_java_symbol(
     pointer_type(array_type),
-    id2string(function_id),
     "nondet_infinite_array_pointer",
     loc,
-    ID_java,
+    function_id,
     symbol_table);
 
   const symbol_exprt data_pointer = data_sym.symbol_expr();
@@ -634,13 +623,8 @@ void add_pointer_to_array_association(
 {
   PRECONDITION(array.type().id() == ID_array);
   PRECONDITION(pointer.type().id() == ID_pointer);
-  const symbolt &return_sym = get_fresh_aux_symbol(
-    java_int_type(),
-    "return_array",
-    "return_array",
-    loc,
-    ID_java,
-    symbol_table);
+  const symbolt &return_sym = fresh_java_symbol(
+    java_int_type(), "return_array", loc, function_id, symbol_table);
   const auto return_expr = return_sym.symbol_expr();
   code.add(code_declt(return_expr), loc);
   code.add(
@@ -668,13 +652,8 @@ void add_array_to_length_association(
   const irep_idt &function_id,
   code_blockt &code)
 {
-  const symbolt &return_sym = get_fresh_aux_symbol(
-    java_int_type(),
-    "return_array",
-    "return_array",
-    loc,
-    ID_java,
-    symbol_table);
+  const symbolt &return_sym = fresh_java_symbol(
+    java_int_type(), "return_array", loc, function_id, symbol_table);
   const auto return_expr = return_sym.symbol_expr();
   code.add(code_declt(return_expr), loc);
   code.add(
@@ -707,8 +686,8 @@ void add_character_set_constraint(
   code_blockt &code)
 {
   PRECONDITION(pointer.type().id() == ID_pointer);
-  const symbolt &return_sym = get_fresh_aux_symbol(
-    java_int_type(), "cnstr_added", "cnstr_added", loc, ID_java, symbol_table);
+  const symbolt &return_sym = fresh_java_symbol(
+    java_int_type(), "cnstr_added", loc, function_id, symbol_table);
   const auto return_expr = return_sym.symbol_expr();
   code.add(code_declt(return_expr), loc);
   const constant_exprt char_set_expr(char_set, string_typet());
@@ -745,12 +724,11 @@ refined_string_exprt java_string_library_preprocesst::string_expr_of_function(
   code_blockt &code)
 {
   // int return_code;
-  const symbolt &return_code_sym = get_fresh_aux_symbol(
+  const symbolt return_code_sym = fresh_java_symbol(
     java_int_type(),
     std::string("return_code_") + function_id.c_str(),
-    std::string("return_code_") + function_id.c_str(),
     loc,
-    ID_java,
+    function_id,
     symbol_table);
   const auto return_code = return_code_sym.symbol_expr();
   code.add(code_declt(return_code), loc);
@@ -1212,8 +1190,8 @@ java_string_library_preprocesst::get_primitive_value_of_object(
 
   // declare tmp_type_name to hold the value
   const std::string aux_name = "tmp_" + id2string(type_name);
-  const symbolt &symbol = get_fresh_aux_symbol(
-    value_type, aux_name, aux_name, loc, ID_java, symbol_table);
+  const symbolt &symbol =
+    fresh_java_symbol(value_type, aux_name, loc, function_id, symbol_table);
   const auto value = symbol.symbol_expr();
 
   // Check that the type of the object is in the symbol table,
@@ -1318,8 +1296,8 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
     if(name!="string_expr")
     {
       std::string tmp_name="tmp_"+id2string(name);
-      const symbolt &field_symbol = get_fresh_aux_symbol(
-        type, id2string(function_id), tmp_name, loc, ID_java, symbol_table);
+      const symbolt &field_symbol =
+        fresh_java_symbol(type, tmp_name, loc, function_id, symbol_table);
       auto field_symbol_expr = field_symbol.symbol_expr();
       field_expr = field_symbol_expr;
       code.add(code_declt(field_symbol_expr), loc);
@@ -1334,13 +1312,8 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
 
   // arg_i = argv[index]
   const exprt obj = get_object_at_index(argv, index);
-  const symbolt &object_symbol = get_fresh_aux_symbol(
-    obj.type(),
-    id2string(function_id),
-    "tmp_format_obj",
-    loc,
-    ID_java,
-    symbol_table);
+  const symbolt &object_symbol = fresh_java_symbol(
+    obj.type(), "tmp_format_obj", loc, function_id, symbol_table);
   const symbol_exprt arg_i = object_symbol.symbol_expr();
 
   allocate_objectst allocate_objects(ID_java, loc, function_id, symbol_table);
@@ -1485,8 +1458,8 @@ code_blockt java_string_library_preprocesst::make_object_get_class_code(
   // > Class class1;
   const pointer_typet class_type =
     java_reference_type(symbol_table.lookup_ref("java::java.lang.Class").type);
-  const symbolt &class1_sym = get_fresh_aux_symbol(
-    class_type, "class_symbol", "class_symbol", loc, ID_java, symbol_table);
+  const symbolt &class1_sym = fresh_java_symbol(
+    class_type, "class_symbol", loc, function_id, symbol_table);
   const symbol_exprt class1 = class1_sym.symbol_expr();
   code.add(code_declt(class1), loc);
 
