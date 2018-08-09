@@ -12,6 +12,7 @@
 
 #include <analyses/cfg_dominators.h>
 #include <util/graph.h>
+#include <util/container_utils.h>
 
 #include <ostream>
 
@@ -83,6 +84,7 @@ public:
     control_deps.clear();
     control_dep_candidates.clear();
     control_dep_calls.clear();
+    control_dep_call_candidates.clear();
   }
 
   virtual void make_top() override
@@ -94,6 +96,7 @@ public:
     control_deps.clear();
     control_dep_candidates.clear();
     control_dep_calls.clear();
+    control_dep_call_candidates.clear();
   }
 
   virtual void make_entry() override
@@ -175,6 +178,7 @@ private:
 
   typedef std::set<goto_programt::const_targett> control_dep_callst;
   control_dep_callst control_dep_calls;
+  control_dep_callst control_dep_call_candidates;
 
   void eval_data_deps(
     const exprt &expr, const namespacet &ns, data_depst &deps) const;
@@ -193,7 +197,8 @@ private:
   bool merge_control_dependencies(
     const control_depst &other_control_deps,
     const control_dep_candidatest &other_control_dep_candidates,
-    const control_dep_callst &other_control_dep_calls);
+    const control_dep_callst &other_control_dep_calls,
+    const control_dep_callst &other_control_dep_call_candidates);
 };
 
 class variable_sensitivity_dependence_grapht:

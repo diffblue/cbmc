@@ -97,7 +97,8 @@ void variable_sensitivity_dependence_domaint::transform(
       if(s->merge_control_dependencies(
            control_deps,
            control_dep_candidates,
-           control_dep_calls))
+           control_dep_calls,
+           control_dep_call_candidates))
         s->has_changed=true;
 
       control_deps.clear();
@@ -105,6 +106,9 @@ void variable_sensitivity_dependence_domaint::transform(
 
       control_dep_calls.clear();
       control_dep_calls.insert(from);
+
+      control_dep_call_candidates.clear();
+      control_dep_call_candidates.insert(from);
     }
   }
   else
@@ -161,6 +165,8 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
 
   // Add new candidates
 
+  PRECONDITION(!control_dep_call_candidates.empty());
+
   if(from->is_goto() || from->is_assume())
     control_dep_candidates.insert(from);
   else if(from->is_end_function())
@@ -168,11 +174,9 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
     control_deps.clear();
     control_dep_candidates.clear();
     control_dep_calls.clear();
+    control_dep_call_candidates.clear();
     return;
   }
-
-  if(control_dep_candidates.empty())
-    return;
 
   // Compute postdominators if needed
 
@@ -242,8 +246,16 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
       }
 
       control_deps.insert(std::make_pair(cd, branch));
-      control_dep_calls.clear();
     }
+  }
+
+  if(control_deps.empty())
+  {
+    util_inplace_set_union(control_dep_calls, control_dep_call_candidates);
+  }
+  else
+  {
+    control_dep_calls.clear();
   }
 
   // add edges to the graph
@@ -254,7 +266,8 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
 bool variable_sensitivity_dependence_domaint::merge_control_dependencies(
   const control_depst &other_control_deps,
   const control_dep_candidatest &other_control_dep_candidates,
-  const control_dep_callst &other_control_dep_calls)
+  const control_dep_callst &other_control_dep_calls,
+  const control_dep_callst &other_control_dep_call_candidates)
 {
   bool changed=false;
 
@@ -313,6 +326,16 @@ bool variable_sensitivity_dependence_domaint::merge_control_dependencies(
 
   changed|=n!=control_dep_calls.size();
 
+  // Merge call control dependency candidates
+
+  n=control_dep_call_candidates.size();
+
+  control_dep_call_candidates.insert(
+      other_control_dep_call_candidates.begin(),
+      other_control_dep_call_candidates.end());
+
+   changed|=n!=control_dep_call_candidates.size();
+
   return changed;
 }
 
@@ -351,7 +374,8 @@ bool variable_sensitivity_dependence_domaint::merge(
   changed |= merge_control_dependencies(
     cast_b.control_deps,
     cast_b.control_dep_candidates,
-    cast_b.control_dep_calls);
+    cast_b.control_dep_calls,
+    cast_b.control_dep_call_candidates);
 
   has_changed=false;
   has_values=tvt::unknown();
