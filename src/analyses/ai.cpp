@@ -190,8 +190,9 @@ void ai_baset::entry_state(const goto_functionst &goto_functions)
 
 void ai_baset::entry_state(const goto_programt &goto_program)
 {
-  // The first instruction of 'goto_program' is the entry point
-  get_state(goto_program.instructions.begin()).make_entry();
+  // The first instruction of 'goto_program' is the entry point with no history
+  const tracet &start = *(start_history(goto_program.instructions.begin()));
+  get_state(start).make_entry();
 }
 
 void ai_baset::initialize(const goto_functionst::goto_functiont &goto_function)
@@ -216,16 +217,18 @@ void ai_baset::finalize()
   // Nothing to do per default
 }
 
-ai_baset::locationt ai_baset::get_next(
-  working_sett &working_set)
+const ai_baset::tracet &ai_baset::get_next(working_sett &working_set)
 {
   PRECONDITION(!working_set.empty());
 
-  working_sett::iterator i=working_set.begin();
-  locationt l=i->second;
-  working_set.erase(i);
+  // STL guarantees this will be key minimal
+  auto first = working_set.begin();
 
-  return l;
+  const tracet &h = *(*first);
+
+  working_set.erase(first);
+
+  return h;
 }
 
 bool ai_baset::fixedpoint(
@@ -237,18 +240,20 @@ bool ai_baset::fixedpoint(
 
   // Put the first location in the working set
   if(!goto_program.empty())
-    put_in_working_set(
-      working_set,
-      goto_program.instructions.begin());
+  {
+    locationt first = goto_program.instructions.begin();
+    put_in_working_set(working_set, start_history(first));
+    /// TODO : should only start history once?
+  }
 
   bool new_data=false;
 
   while(!working_set.empty())
   {
-    locationt l=get_next(working_set);
+    const tracet &h = get_next(working_set);
 
     // goto_program is really only needed for iterator manipulation
-    if(visit(l, working_set, goto_program, goto_functions, ns))
+    if(visit(h, working_set, goto_program, goto_functions, ns))
       new_data=true;
   }
 
@@ -256,13 +261,15 @@ bool ai_baset::fixedpoint(
 }
 
 bool ai_baset::visit(
-  locationt l,
+  const tracet &h,
   working_sett &working_set,
   const goto_programt &goto_program,
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
   bool new_data=false;
+
+  locationt l = h.current_location();
 
   // Function call and return are special cases
   if(l->is_function_call() && !goto_functions.function_map.empty())
@@ -279,10 +286,11 @@ bool ai_baset::visit(
     locationt to_l = std::next(l);
     if(
       do_function_call_rec(
-        l, to_l, code.function(), code.arguments(), goto_functions, ns))
+        h, code.function(), code.arguments(), goto_functions, ns))
     {
       new_data = true;
-      put_in_working_set(working_set, to_l);
+      auto next = step(h, to_l);
+      put_in_working_set(working_set, next.second);
     }
   }
   else if(l->is_end_function())
@@ -302,7 +310,7 @@ bool ai_baset::visit(
       if(to_l == goto_program.instructions.end())
         continue;
 
-      new_data |= compute_edge(l, working_set, to_l, ns);
+      new_data |= visit_edge(h, working_set, to_l, ns);
     }
   }
 
@@ -310,50 +318,65 @@ bool ai_baset::visit(
 }
 
 bool ai_baset::visit_edge(
-  locationt l,
+  const tracet &h,
   working_sett &working_set,
   const locationt &to_l,
   const namespacet &ns)
 {
+  // Has history taught us not to step here...
+  auto next = step(h, to_l);
+  if(next.first == ai_history_baset::step_statust::BLOCKED)
+    return false;
+  const tracet &to_h = *(next.second);
+
   // Abstract domains are mutable so we must copy before we transform
-  statet &current = get_state(l);
+  statet &current = get_state(h);
 
   std::unique_ptr<statet> tmp_state(make_temporary_state(current));
   statet &new_values = *tmp_state;
 
   // Apply transformer
-  new_values.transform(l, to_l, *this, ns);
+  new_values.transform(
+    h.current_location(), to_h.current_location(), *this, ns);
 
   // Initialize state(s), if necessary
-  get_state(to_l);
+  get_state(to_h);
 
-  if(merge(new_values, l, to_l))
+  if(
+    merge(new_values, h, to_h) ||
+    next.first == ai_history_baset::step_statust::NEW_FORCE_CONTINUE)
   {
-    put_in_working_set(working_set, to_l);
+    put_in_working_set(working_set, next.second);
     return true;
   }
 
   return false;
 }
 
+/// Remember that h_call and h_return are both in the caller
 bool ai_baset::do_function_call(
-  locationt l_call, locationt l_return,
+  const tracet &h_call,
   const goto_functionst &goto_functions,
   const goto_functionst::function_mapt::const_iterator f_it,
   const exprt::operandst &arguments,
   const namespacet &ns)
 {
+  locationt l_call = h_call.current_location();
   PRECONDITION(l_call->is_function_call());
 
   const goto_functionst::goto_functiont &goto_function=
     f_it->second;
+
+  locationt l_return = std::next(l_call);
+  // DATA_INVARIANT(l_return.is_dereferenceable(),
+  //                "CALL cannot be last instruction");
 
   if(!goto_function.body_available())
   {
     working_sett working_set; // Redundant; visit will add l_return
 
     // If we don't have a body, we just do an edge call -> return
-    return compute_edge(l_call, working_set, l_return, ns);
+    return visit_edge(h_call, working_set, l_return, ns);
   }
 
   assert(!goto_function.body.instructions.empty());
@@ -361,14 +384,15 @@ bool ai_baset::do_function_call(
   // This is the edge from call site to function head.
 
   {
-    // get the state at the beginning of the function
+    // Get the location at the beginning of the function
     locationt l_begin=goto_function.body.instructions.begin();
-
     working_sett working_set; // Redundant; fixpoint will add l_begin
+    INVARIANT(
+      l_begin != goto_function.body.instructions.end(),
+      "Have checked body_available(), implying this should be non-empty");
 
     // Do the edge from the call site to the beginning of the function
-    bool new_data = compute_edge(l_call, working_set, l_begin, ns);
-
+    bool new_data = visit_edge(h_call, working_set, l_begin, ns);
     // do we need to do/re-do the fixedpoint of the body?
     if(new_data)
       fixedpoint(goto_function.body, goto_functions, ns);
@@ -381,20 +405,27 @@ bool ai_baset::do_function_call(
     locationt l_end=--goto_function.body.instructions.end();
     assert(l_end->is_end_function());
 
+    working_sett end_history = get_history(l_end);
+    if(end_history.size() == 0)
+      return false; // Function does not return
+
+    DATA_INVARIANT(end_history.size() == 1, "At most one history per location");
+    const tracet &h_end = get_next(end_history);
+
     // do edge from end of function to instruction after call
-    const statet &end_state=get_state(l_end);
+    const statet &end_state = get_state(h_end);
 
     if(end_state.is_bottom())
       return false; // function exit point not reachable
 
     working_sett working_set; // Redundant; visit will add l_return
 
-    return compute_edge(l_end, working_set, l_return, ns);
+    return visit_edge(h_end, working_set, l_return, ns);
   }
 }
 
 bool ai_baset::do_function_call_rec(
-  locationt l_call, locationt l_return,
+  const tracet &h_call,
   const exprt &function,
   const exprt::operandst &arguments,
   const goto_functionst &goto_functions,
@@ -419,8 +450,7 @@ bool ai_baset::do_function_call_rec(
     it != goto_functions.function_map.end(),
     "Function " + id2string(identifier) + "not in function map");
 
-  new_data =
-    do_function_call(l_call, l_return, goto_functions, it, arguments, ns);
+  new_data = do_function_call(h_call, goto_functions, it, arguments, ns);
 
   return new_data;
 }
@@ -448,11 +478,11 @@ void ai_baset::concurrent_fixedpoint(
   // functions
   goto_programt tmp;
   tmp.add_instruction();
-  goto_programt::const_targett sh_target=tmp.instructions.begin();
-  statet &shared_state=get_state(sh_target);
+  locationt sh_target = tmp.instructions.begin();
+  const tracet &shared_history = *start_history(sh_target);
+  statet &shared_state = get_state(shared_history);
 
-  typedef std::list<std::pair<goto_programt const*,
-                              goto_programt::const_targett> > thread_wlt;
+  typedef std::list<std::pair<goto_programt const *, locationt>> thread_wlt;
   thread_wlt thread_wl;
 
   forall_goto_functions(it, goto_functions)
@@ -462,8 +492,7 @@ void ai_baset::concurrent_fixedpoint(
       {
         thread_wl.push_back(std::make_pair(&(it->second.body), t_it));
 
-        goto_programt::const_targett l_end=
-          it->second.body.instructions.end();
+        locationt l_end = it->second.body.instructions.end();
         --l_end;
 
         merge_shared(shared_state, l_end, sh_target, ns);
@@ -477,25 +506,31 @@ void ai_baset::concurrent_fixedpoint(
   {
     new_shared=false;
 
-    for(const auto &wl_pair : thread_wl)
+    for(auto &wl_pair : thread_wl)
     {
-      working_sett working_set;
-      put_in_working_set(working_set, wl_pair.second);
-
-      statet &begin_state=get_state(wl_pair.second);
-      merge(begin_state, sh_target, wl_pair.second);
-
-      while(!working_set.empty())
+      for(auto &hp : get_history(wl_pair.second))
       {
-        goto_programt::const_targett l=get_next(working_set);
+        const tracet &thread_start_history = *hp;
 
-        visit(l, working_set, *(wl_pair.first), goto_functions, ns);
+        working_sett working_set;
+        put_in_working_set(working_set, hp);
 
-        // the underlying domain must make sure that the final state
-        // carries all possible values; otherwise we would need to
-        // merge over each and every state
-        if(l->is_end_function())
-          new_shared|=merge_shared(shared_state, l, sh_target, ns);
+        statet &begin_state = get_state(thread_start_history);
+        merge(begin_state, shared_history, thread_start_history);
+
+        while(!working_set.empty())
+        {
+          const tracet &h = get_next(working_set);
+          locationt l = h.current_location();
+
+          visit(h, working_set, *(wl_pair.first), goto_functions, ns);
+
+          // the underlying domain must make sure that the final state
+          // carries all possible values; otherwise we would need to
+          // merge over each and every state
+          if(l->is_end_function())
+            new_shared |= merge_shared(shared_state, l, sh_target, ns);
+        }
       }
     }
   }
