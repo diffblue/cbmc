@@ -191,10 +191,12 @@ std::string gdb_apit::extract_memory(const std::string &line)
   const std::regex pointer_pattern(
     std::string(shared_prefix) + pointer_type_info + R"(\s()" + memory_address +
     R"()(\s\S+)?)");
-  const std::regex null_pointer_pattern(std::string(shared_prefix) + R"((0x0))");
+  const std::regex null_pointer_pattern(
+    std::string(shared_prefix) + R"((0x0))");
   // Char pointer output the memory adress followed by the string in there.
   const std::regex char_pointer_pattern(
-    std::string(shared_prefix) + R"(()" + memory_address + R"()\s"[\S[:s:]]*")");
+    std::string(shared_prefix) + R"(()" + memory_address +
+    R"()\s"[\S[:s:]]*")");
 
   std::smatch result;
   if(regex_search(line, result, char_pointer_pattern))
@@ -222,13 +224,15 @@ std::string gdb_apit::get_value(const std::string &variable)
 std::string gdb_apit::extract_value(const std::string &line)
 {
   // This pattern matches primitive int values and bools.
-  const std::regex value_pattern(std::string(shared_prefix) + R"(((?:-)?\d+|true|false))");
+  const std::regex value_pattern(
+    std::string(shared_prefix) + R"(((?:-)?\d+|true|false))");
   // This pattern matches the char pointer content.
   // It is printed behind the address.
   const std::regex char_value_pattern(
     std::string(shared_prefix) + memory_address + "\\s\"([\\S ]*)\"");
   // An enum entry just prints the name of the value on the commandline.
-  const std::regex enum_value_pattern(std::string(shared_prefix) + R"(([\S]+)(?:\n|$))");
+  const std::regex enum_value_pattern(
+    std::string(shared_prefix) + R"(([\S]+)(?:\n|$))");
   // A void pointer outputs it type first, followed by the memory address it
   // is pointing to. This pattern should extract the address.
   const std::regex void_pointer_pattern(
