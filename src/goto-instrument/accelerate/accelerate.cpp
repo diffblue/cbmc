@@ -212,7 +212,9 @@ void acceleratet::insert_looping_path(
   ++loop_body;
 
   goto_programt::targett jump=program.insert_before(loop_body);
-  jump->make_goto(loop_body, side_effect_expr_nondett(bool_typet()));
+  jump->make_goto(
+    loop_body,
+    side_effect_expr_nondett(bool_typet(), loop_body->source_location));
 
   program.destructive_insert(loop_body, looping_path);
 

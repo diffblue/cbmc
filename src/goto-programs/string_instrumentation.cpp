@@ -302,8 +302,8 @@ void string_instrumentationt::do_sprintf(
     goto_programt::targett return_assignment=tmp.add_instruction(ASSIGN);
     return_assignment->source_location=target->source_location;
 
-    exprt rhs=side_effect_expr_nondett(call.lhs().type());
-    rhs.add_source_location()=target->source_location;
+    exprt rhs =
+      side_effect_expr_nondett(call.lhs().type(), target->source_location);
 
     return_assignment->code=code_assignt(call.lhs(), rhs);
   }
@@ -345,8 +345,8 @@ void string_instrumentationt::do_snprintf(
     goto_programt::targett return_assignment=tmp.add_instruction(ASSIGN);
     return_assignment->source_location=target->source_location;
 
-    exprt rhs=side_effect_expr_nondett(call.lhs().type());
-    rhs.add_source_location()=target->source_location;
+    exprt rhs =
+      side_effect_expr_nondett(call.lhs().type(), target->source_location);
 
     return_assignment->code=code_assignt(call.lhs(), rhs);
   }
@@ -378,8 +378,8 @@ void string_instrumentationt::do_fscanf(
     goto_programt::targett return_assignment=tmp.add_instruction(ASSIGN);
     return_assignment->source_location=target->source_location;
 
-    exprt rhs=side_effect_expr_nondett(call.lhs().type());
-    rhs.add_source_location()=target->source_location;
+    exprt rhs =
+      side_effect_expr_nondett(call.lhs().type(), target->source_location);
 
     return_assignment->code=code_assignt(call.lhs(), rhs);
   }
@@ -583,8 +583,7 @@ void string_instrumentationt::do_format_string_write(
 
           const dereference_exprt lhs(argument, arg_type.subtype());
 
-          side_effect_expr_nondett rhs(lhs.type());
-          rhs.add_source_location()=target->source_location;
+          side_effect_expr_nondett rhs(lhs.type(), target->source_location);
 
           assignment->code=code_assignt(lhs, rhs);
 
@@ -627,8 +626,7 @@ void string_instrumentationt::do_format_string_write(
 
         dereference_exprt lhs(arguments[i], arg_type.subtype());
 
-        side_effect_expr_nondett rhs(lhs.type());
-        rhs.add_source_location()=target->source_location;
+        side_effect_expr_nondett rhs(lhs.type(), target->source_location);
 
         assignment->code=code_assignt(lhs, rhs);
       }
@@ -813,7 +811,8 @@ void string_instrumentationt::do_strerror(
 
   {
     goto_programt::targett assignment1=tmp.add_instruction(ASSIGN);
-    exprt nondet_size=side_effect_expr_nondett(size_type());
+    exprt nondet_size =
+      side_effect_expr_nondett(size_type(), it->source_location);
 
     assignment1->code=code_assignt(symbol_size.symbol_expr(), nondet_size);
     assignment1->source_location=it->source_location;
@@ -945,6 +944,7 @@ void string_instrumentationt::invalidate_buffer(
         ID_gt,
         from_integer(limit, unsigned_int_type()));
 
-  const side_effect_expr_nondett nondet(buf_type.subtype());
+  const side_effect_expr_nondett nondet(
+    buf_type.subtype(), target->source_location);
   invalidate->code=code_assignt(deref, nondet);
 }

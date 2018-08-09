@@ -21,7 +21,8 @@ inline exprt get_nondet_bool(const typet &type)
 {
   // We force this to 0 and 1 and won't consider
   // other values.
-  return typecast_exprt(side_effect_expr_nondett(bool_typet()), type);
+  return typecast_exprt(
+    side_effect_expr_nondett(bool_typet(), source_locationt()), type);
 }
 
 #endif // CPROVER_UTIL_NONDET_BOOL_H

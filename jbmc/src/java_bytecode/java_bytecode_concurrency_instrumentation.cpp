@@ -253,7 +253,7 @@ static void instrument_synchronized_code(
   catch_block.add(monitorexit);
 
   // Re-throw exception
-  side_effect_expr_throwt throw_expr;
+  side_effect_expr_throwt throw_expr(irept(), typet(), code.source_location());
   throw_expr.copy_to_operands(catch_var);
   catch_block.add(code_expressiont(throw_expr));
 

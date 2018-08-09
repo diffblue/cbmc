@@ -514,7 +514,7 @@ exprt interpretert::get_value(
   if(use_non_det &&
      memory[integer2ulong(offset)].initialized!=
      memory_cellt::initializedt::WRITTEN_BEFORE_READ)
-    return side_effect_expr_nondett(type);
+    return side_effect_expr_nondett(type, source_locationt());
   mp_vectort rhs;
   rhs.push_back(memory[integer2ulong(offset)].value);
   return get_value(type, rhs);

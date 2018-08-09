@@ -71,7 +71,8 @@ void jsil_declarationt::to_symbol(symbolt &symbol) const
   code_returnt r(symbol_exprt(returns.get(ID_value)));
 
   irept throws(find(ID_throw));
-  side_effect_expr_throwt t(symbol_exprt(throws.get(ID_value)));
+  side_effect_expr_throwt t(
+    symbol_exprt(throws.get(ID_value)), nil_typet(), s.source_location());
   code_expressiont ct(t);
 
   if(insert_at_label(r, returns.get(ID_label), code))

@@ -302,7 +302,9 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   // assume(no overflows in previous code);
 
   program.add_instruction(ASSUME)->guard=pre_guard;
-  program.assign(loop_counter, side_effect_expr_nondett(loop_counter.type()));
+  program.assign(
+    loop_counter,
+    side_effect_expr_nondett(loop_counter.type(), source_locationt()));
 
   for(std::map<exprt, polynomialt>::iterator it=polynomials.begin();
       it!=polynomials.end();

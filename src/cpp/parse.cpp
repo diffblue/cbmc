@@ -5807,7 +5807,7 @@ bool Parser::rThrowExpr(exprt &exp)
 
   int t=lex.LookAhead(0);
 
-  exp=side_effect_expr_throwt();
+  exp = side_effect_expr_throwt(irept(), typet(), source_locationt());
   set_location(exp, tk);
 
   if(t==':' || t==';')
@@ -6399,7 +6399,7 @@ bool Parser::rPostfixExpr(exprt &exp)
       lex.get_token(op);
 
       {
-        side_effect_exprt tmp(ID_postincrement);
+        side_effect_exprt tmp(ID_postincrement, typet(), source_locationt());
         tmp.move_to_operands(exp);
         set_location(tmp, op);
         exp.swap(tmp);
@@ -6410,7 +6410,7 @@ bool Parser::rPostfixExpr(exprt &exp)
       lex.get_token(op);
 
       {
-        side_effect_exprt tmp(ID_postdecrement);
+        side_effect_exprt tmp(ID_postdecrement, typet(), source_locationt());
         tmp.move_to_operands(exp);
         set_location(tmp, op);
         exp.swap(tmp);

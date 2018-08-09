@@ -893,8 +893,8 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           const dereference_exprt deref(address);
 
           // create temporary object
-          side_effect_exprt tmp_object_expr(ID_temporary_object, type);
-          tmp_object_expr.add_source_location()=expr.source_location();
+          side_effect_exprt tmp_object_expr(
+            ID_temporary_object, type, expr.source_location());
           tmp_object_expr.copy_to_operands(deref);
           tmp_object_expr.set(ID_C_lvalue, true);
 

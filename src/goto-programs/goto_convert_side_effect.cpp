@@ -676,8 +676,9 @@ void goto_convertt::remove_side_effect(
   else if(statement==ID_throw)
   {
     goto_programt::targett t=dest.add_instruction(THROW);
-    t->code=
-      code_expressiont(side_effect_expr_throwt(expr.find(ID_exception_list)));
+    t->code = code_expressiont(
+      side_effect_expr_throwt(
+        expr.find(ID_exception_list), expr.type(), expr.source_location()));
     t->code.op0().operands().swap(expr.operands());
     t->code.add_source_location()=expr.source_location();
     t->source_location=expr.source_location();

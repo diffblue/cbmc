@@ -547,7 +547,7 @@ refined_string_exprt java_string_library_preprocesst::make_nondet_string_expr(
   /// \todo refactor with initialize_nonddet_string_struct
   const refined_string_exprt str = decl_string_expr(loc, symbol_table, code);
 
-  side_effect_expr_nondett nondet_length(str.length().type());
+  const side_effect_expr_nondett nondet_length(str.length().type(), loc);
   code.add(code_assignt(str.length(), nondet_length), loc);
 
   exprt nondet_array_expr =
@@ -667,7 +667,7 @@ exprt make_nondet_infinite_char_array(
     symbol_table);
   const symbol_exprt data_expr = data_sym.symbol_expr();
   code.add(code_declt(data_expr), loc);
-  side_effect_expr_nondett nondet_data(data_expr.type());
+  const side_effect_expr_nondett nondet_data(data_expr.type(), loc);
   code.add(code_assignt(data_expr, nondet_data), loc);
   return data_expr;
 }

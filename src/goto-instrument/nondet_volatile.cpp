@@ -48,7 +48,7 @@ void nondet_volatile_rhs(const symbol_tablet &symbol_table, exprt &expr)
       t.remove(ID_C_volatile);
 
       // replace by nondet
-      side_effect_expr_nondett nondet_expr(t);
+      side_effect_expr_nondett nondet_expr(t, expr.source_location());
       expr.swap(nondet_expr);
     }
   }

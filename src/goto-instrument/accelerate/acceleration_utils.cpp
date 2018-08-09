@@ -338,7 +338,7 @@ void acceleration_utilst::push_nondet(exprt &expr)
   if(expr.id()==ID_not &&
      expr.op0().id()==ID_nondet)
   {
-    expr=side_effect_expr_nondett(expr.type());
+    expr = side_effect_expr_nondett(expr.type(), expr.source_location());
   }
   else if(expr.id()==ID_equal ||
           expr.id()==ID_lt ||
@@ -349,7 +349,7 @@ void acceleration_utilst::push_nondet(exprt &expr)
     if(expr.op0().id()==ID_nondet ||
        expr.op1().id()==ID_nondet)
     {
-      expr=side_effect_expr_nondett(expr.type());
+      expr = side_effect_expr_nondett(expr.type(), expr.source_location());
     }
   }
 }
@@ -412,7 +412,9 @@ bool acceleration_utilst::do_assumptions(
 
   program.assume(not_exprt(condition));
 
-  program.assign(loop_counter, side_effect_expr_nondett(loop_counter.type()));
+  program.assign(
+    loop_counter,
+    side_effect_expr_nondett(loop_counter.type(), source_locationt()));
 
   for(std::map<exprt, polynomialt>::iterator p_it=polynomials.begin();
       p_it!=polynomials.end();
@@ -597,7 +599,8 @@ bool acceleration_utilst::do_arrays(
       it!=arrays_written.end();
       ++it)
   {
-    program.assign(*it, side_effect_expr_nondett(it->type()));
+    program.assign(
+      *it, side_effect_expr_nondett(it->type(), source_locationt()));
   }
 
   // Now add in all the effects of this loop on the arrays.
@@ -1051,7 +1054,8 @@ bool acceleration_utilst::assign_array(
     fresh_symbol("polynomial::array", arr.type()).symbol_expr();
 
   // First make the fresh nondet array.
-  program.assign(fresh_array, side_effect_expr_nondett(arr.type()));
+  program.assign(
+    fresh_array, side_effect_expr_nondett(arr.type(), lhs.source_location()));
 
   // Then assume that the fresh array has the appropriate values at the indices
   // the loop updated.

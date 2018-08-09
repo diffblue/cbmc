@@ -104,7 +104,7 @@ void interrupt(
 
       t_goto->make_goto(t_orig);
       t_goto->source_location=source_location;
-      t_goto->guard=side_effect_expr_nondett(bool_typet());
+      t_goto->guard = side_effect_expr_nondett(bool_typet(), source_location);
       t_goto->function=original_instruction.function;
 
       t_call->make_function_call(isr_call);
@@ -133,7 +133,7 @@ void interrupt(
 
       t_goto->make_goto(t_orig);
       t_goto->source_location=source_location;
-      t_goto->guard=side_effect_expr_nondett(bool_typet());
+      t_goto->guard = side_effect_expr_nondett(bool_typet(), source_location);
       t_goto->function=i_it->function;
 
       t_call->make_function_call(isr_call);

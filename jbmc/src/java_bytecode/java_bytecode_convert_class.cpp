@@ -813,8 +813,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     clone_body.move_to_operands(declare_cloned);
 
     side_effect_exprt java_new_array(
-      ID_java_new_array,
-      java_reference_type(symbol_type));
+      ID_java_new_array, java_reference_type(symbol_type), source_locationt());
     dereference_exprt old_array(this_symbol.symbol_expr(), symbol_type);
     dereference_exprt new_array(local_symexpr, symbol_type);
     member_exprt old_length(
@@ -860,7 +859,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     copy_loop.cond()=
       binary_relation_exprt(index_symexpr, ID_lt, old_length);
 
-    side_effect_exprt inc(ID_assign);
+    side_effect_exprt inc(ID_assign, typet(), source_locationt());
     inc.operands().resize(2);
     inc.op0()=index_symexpr;
     inc.op1()=plus_exprt(index_symexpr, from_integer(1, index_symexpr.type()));

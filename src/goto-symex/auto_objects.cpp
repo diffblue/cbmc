@@ -70,7 +70,7 @@ void goto_symext::initialize_auto_object(
         make_auto_object(type.subtype(), state), pointer_type);
 
       if_exprt rhs(
-        side_effect_expr_nondett(bool_typet()),
+        side_effect_expr_nondett(bool_typet(), expr.source_location()),
         null_pointer_exprt(pointer_type),
         address_of_expr);
 

@@ -173,7 +173,8 @@ exprt allocate_dynamic_object(
   {
     INVARIANT(!object_size.is_nil(), "Size of Java objects should be known");
     // malloc expression
-    side_effect_exprt malloc_expr(ID_allocate, pointer_type(allocate_type));
+    side_effect_exprt malloc_expr(
+      ID_allocate, pointer_type(allocate_type), loc);
     malloc_expr.copy_to_operands(object_size);
     malloc_expr.copy_to_operands(false_exprt());
     // create a symbol for the malloc expression so we can initialize
@@ -503,7 +504,7 @@ static mp_integer max_value(const typet &type)
 /// \return code allocation object and assigning `lhs`
 static codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
 {
-  side_effect_exprt alloc(ID_allocate, lhs.type());
+  side_effect_exprt alloc(ID_allocate, lhs.type(), lhs.source_location());
   alloc.copy_to_operands(size);
   alloc.copy_to_operands(false_exprt());
   return code_assignt(lhs, alloc);
@@ -599,7 +600,7 @@ bool initialize_nondet_string_fields(
     ID_java,
     symbol_table);
   const symbol_exprt length_expr = length_sym.symbol_expr();
-  const side_effect_expr_nondett nondet_length(length_expr.type());
+  const side_effect_expr_nondett nondet_length(length_expr.type(), loc);
   code.add(code_declt(length_expr));
   code.add(code_assignt(length_expr, nondet_length));
 
@@ -828,7 +829,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
     //             tmp$<temporary_counter>>
     // }
     code_ifthenelset null_check;
-    null_check.cond()=side_effect_expr_nondett(bool_typet());
+    null_check.cond() =
+      side_effect_expr_nondett(bool_typet(), expr.source_location());
     null_check.then_case()=set_null_inst;
     null_check.else_case()=non_null_inst;
 
@@ -847,7 +849,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
       "No-update and must-update should have already been resolved");
 
     code_ifthenelset update_check;
-    update_check.cond()=side_effect_expr_nondett(bool_typet());
+    update_check.cond() =
+      side_effect_expr_nondett(bool_typet(), expr.source_location());
     update_check.then_case()=update_in_place_assignments;
     update_check.else_case()=new_object_assignments;
 
@@ -1182,9 +1185,8 @@ void java_object_factoryt::gen_nondet_init(
   {
     // types different from pointer or structure:
     // bool, int, float, byte, char, ...
-    exprt rhs=type.id()==ID_c_bool?
-      get_nondet_bool(type):
-      side_effect_expr_nondett(type);
+    exprt rhs = type.id() == ID_c_bool ? get_nondet_bool(type)
+                                       : side_effect_expr_nondett(type, loc);
     code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
 
@@ -1244,7 +1246,7 @@ void java_object_factoryt::allocate_nondet_length_array(
   assignments.move_to_operands(assume_inst1);
   assignments.move_to_operands(assume_inst2);
 
-  side_effect_exprt java_new_array(ID_java_new_array, lhs.type());
+  side_effect_exprt java_new_array(ID_java_new_array, lhs.type(), loc);
   java_new_array.copy_to_operands(length_sym_expr);
   java_new_array.set(ID_length_upper_bound, max_length_expr);
   java_new_array.type().subtype().set(ID_element_type, element_type);

@@ -1969,10 +1969,10 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     if(expr.arguments().empty())
     {
       // create temporary object
-      side_effect_exprt tmp_object_expr(ID_temporary_object, pod);
+      side_effect_exprt tmp_object_expr(
+        ID_temporary_object, pod, expr.source_location());
       tmp_object_expr.set(ID_C_lvalue, true);
       tmp_object_expr.set(ID_mode, ID_cpp);
-      tmp_object_expr.add_source_location()=expr.source_location();
       expr.swap(tmp_object_expr);
     }
     else if(expr.arguments().size()==1)
@@ -2171,10 +2171,10 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     expr.type()=this_type.subtype();
 
     // create temporary object
-    side_effect_exprt tmp_object_expr(ID_temporary_object, this_type.subtype());
+    side_effect_exprt tmp_object_expr(
+      ID_temporary_object, this_type.subtype(), expr.source_location());
     tmp_object_expr.set(ID_C_lvalue, true);
     tmp_object_expr.set(ID_mode, ID_cpp);
-    tmp_object_expr.add_source_location()=expr.source_location();
 
     exprt member;
 

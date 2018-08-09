@@ -100,7 +100,7 @@ void rewrite_union(
   {
     const union_exprt &union_expr=to_union_expr(expr);
     exprt offset=from_integer(0, index_type());
-    side_effect_expr_nondett nondet(expr.type());
+    side_effect_expr_nondett nondet(expr.type(), expr.source_location());
     byte_update_exprt tmp(
       byte_update_id(), nondet, offset, union_expr.op());
     expr=tmp;

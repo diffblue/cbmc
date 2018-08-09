@@ -84,7 +84,7 @@ goto_programt::targett remove_java_newt::lower_java_new(
   CHECK_RETURN(object_size.is_not_nil());
 
   // we produce a malloc side-effect, which stays
-  side_effect_exprt malloc_expr(ID_allocate, rhs.type());
+  side_effect_exprt malloc_expr(ID_allocate, rhs.type(), location);
   malloc_expr.copy_to_operands(object_size);
   // could use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
@@ -135,7 +135,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   CHECK_RETURN(!object_size.is_nil());
 
   // we produce a malloc side-effect, which stays
-  side_effect_exprt malloc_expr(ID_allocate, rhs.type());
+  side_effect_exprt malloc_expr(ID_allocate, rhs.type(), location);
   malloc_expr.copy_to_operands(object_size);
   // code use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
@@ -188,7 +188,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     allocate_data_type = data.type();
 
   side_effect_exprt data_java_new_expr(
-    ID_java_new_array_data, allocate_data_type);
+    ID_java_new_array_data, allocate_data_type, location);
 
   // The instruction may specify a (hopefully small) upper bound on the
   // array size, in which case we allocate a fixed-length array that may
@@ -276,7 +276,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     CHECK_RETURN(sub_type.id() == ID_pointer);
     sub_java_new.type() = sub_type;
 
-    side_effect_exprt inc(ID_assign);
+    side_effect_exprt inc(ID_assign, typet(), location);
     inc.operands().resize(2);
     inc.op0() = tmp_i;
     inc.op1() = plus_exprt(tmp_i, from_integer(1, tmp_i.type()));

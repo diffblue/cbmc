@@ -72,7 +72,8 @@ void goto_symext::parameter_assignments(
                        "not enough arguments, inserting non-deterministic value"
                     << log.eom;
 
-      rhs=side_effect_expr_nondett(parameter_type);
+      rhs = side_effect_expr_nondett(
+        parameter_type, state.source.pc->source_location);
     }
     else
       rhs=*it1;
@@ -265,8 +266,8 @@ void goto_symext::symex_function_call_code(
 
     if(call.lhs().is_not_nil())
     {
-      side_effect_expr_nondett rhs(call.lhs().type());
-      rhs.add_source_location()=call.source_location();
+      const auto rhs =
+        side_effect_expr_nondett(call.lhs().type(), call.source_location());
       code_assignt code(call.lhs(), rhs);
       symex_assign(state, code);
     }

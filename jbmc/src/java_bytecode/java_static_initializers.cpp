@@ -788,11 +788,13 @@ codet stub_global_initializer_factoryt::get_stub_initializer_body(
         ? object_factory_parameters.max_nonnull_tree_depth + 1
         : object_factory_parameters.max_nonnull_tree_depth;
 
+    source_locationt location;
+    location.set_function(function_id);
     gen_nondet_init(
       new_global_symbol,
       static_init_body,
       symbol_table,
-      source_locationt(),
+      location,
       false,
       allocation_typet::DYNAMIC,
       parameters,

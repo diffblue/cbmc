@@ -50,8 +50,8 @@ void goto_convertt::do_prob_uniform(
     throw 0;
   }
 
-  side_effect_exprt rhs("prob_uniform", lhs.type());
-  rhs.add_source_location()=function.source_location();
+  auto rhs =
+    side_effect_exprt("prob_uniform", lhs.type(), function.source_location());
 
   if(lhs.type().id()!=ID_unsignedbv &&
      lhs.type().id()!=ID_signedbv)
@@ -128,8 +128,7 @@ void goto_convertt::do_prob_coin(
     throw 0;
   }
 
-  side_effect_exprt rhs("prob_coin", lhs.type());
-  rhs.add_source_location()=function.source_location();
+  side_effect_exprt rhs("prob_coin", lhs.type(), function.source_location());
 
   if(lhs.type()!=bool_typet())
   {
@@ -194,7 +193,8 @@ void goto_convertt::do_printf(
   {
     typet return_type=
       static_cast<const typet &>(function.type().find(ID_return_type));
-    side_effect_exprt printf_code(ID_printf, return_type);
+    side_effect_exprt printf_code(
+      ID_printf, return_type, function.source_location());
 
     printf_code.operands()=arguments;
     printf_code.add_source_location()=function.source_location();
@@ -284,7 +284,8 @@ void goto_convertt::do_scanf(
               #else
               const index_exprt lhs(
                 dereference_exprt(ptr, type), from_integer(0, index_type()));
-              const side_effect_expr_nondett rhs(type.subtype());
+              const side_effect_expr_nondett rhs(
+                type.subtype(), function.source_location());
               code_assignt assign(lhs, rhs);
               assign.add_source_location()=function.source_location();
               copy(assign, ASSIGN, dest);
@@ -294,7 +295,8 @@ void goto_convertt::do_scanf(
             {
               // make it nondet for now
               const dereference_exprt lhs(ptr, type);
-              const side_effect_expr_nondett rhs(type);
+              const side_effect_expr_nondett rhs(
+                type, function.source_location());
               code_assignt assign(lhs, rhs);
               assign.add_source_location()=function.source_location();
               copy(assign, ASSIGN, dest);
@@ -897,15 +899,13 @@ void goto_convertt::do_function_call_symbol(
     // can only be 0 or 1.
     if(lhs.type().id()==ID_c_bool)
     {
-      rhs=side_effect_expr_nondett(bool_typet());
-      rhs.add_source_location()=function.source_location();
+      rhs = side_effect_expr_nondett(bool_typet(), function.source_location());
       rhs.set(ID_C_identifier, identifier);
       rhs=typecast_exprt(rhs, lhs.type());
     }
     else
     {
-      rhs=side_effect_expr_nondett(lhs.type());
-      rhs.add_source_location()=function.source_location();
+      rhs = side_effect_expr_nondett(lhs.type(), function.source_location());
       rhs.set(ID_C_identifier, identifier);
     }
 
@@ -1117,7 +1117,10 @@ void goto_convertt::do_function_call_symbol(
     exprt list_arg=make_va_list(arguments[0]);
 
     {
-      side_effect_exprt rhs(ID_gcc_builtin_va_arg_next, list_arg.type());
+      side_effect_exprt rhs(
+        ID_gcc_builtin_va_arg_next,
+        list_arg.type(),
+        function.source_location());
       rhs.copy_to_operands(list_arg);
       rhs.set(ID_C_va_arg_type, to_code_type(function.type()).return_type());
       goto_programt::targett t1=dest.add_instruction(ASSIGN);
