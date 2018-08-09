@@ -59,25 +59,23 @@ transformation tools (see \ref section-other-tools).
 
 To be documented.
 
-## Instrumentation (for test gen & CBMC & ...): Goto functions -> goto functions ##
+## Instrumentation: goto functions → goto functions ##
 
 To be documented.
 
-## Goto functions -> BMC -> Counterexample (trace) ##
+## Goto functions → BMC → Counterexample (trace) ##
 
 To be documented.
 
-## Trace -> interpreter -> memory map ##
+## Trace → interpreter → memory map ##
 
 To be documented.
 
-## Goto functions -> abstract interpretation ##
+## Goto functions → abstract interpretation ##
 
 To be documented.
 
 ## Executables (flow of transformations): ##
-
-To be documented.
 
 ### goto-cc ###
 

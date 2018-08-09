@@ -3,13 +3,7 @@
 
 \author Martin Brain, Peter Schrammel
 
-## Front-end languages: generating codet from multiple languages ##
-
-To be documented.
-
-### language_uit, language_filest, languaget classes: ###
-
-To be documented.
+## language_uit, language_filest, languaget classes: ##
 
 ### Purpose ###
 
@@ -27,14 +21,16 @@ To be documented.
 
 To be documented.
 
-## Java bytecode: ##
-
-To be documented.
+## Java bytecode ##
 
 ### Explain how a java program / class is represented in a .class ###
 
 To be documented.
 
-### Explain the 2 step conversion from bytecode to codet; give an example with a class? ###
+### Explain the 2 step conversion from bytecode to codet ###
+
+To be documented.
+
+### A worked example of converting java bytecode to codet ###
 
 To be documented.
