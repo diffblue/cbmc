@@ -1013,8 +1013,7 @@ void debug_model(
   messaget::mstreamt &stream,
   const namespacet &ns,
   const std::function<exprt(const exprt &)> &super_get,
-  const std::vector<symbol_exprt> &boolean_symbols,
-  const std::vector<symbol_exprt> &index_symbols)
+  const std::vector<symbol_exprt> &symbols)
 {
   stream << "debug_model:" << '\n';
   for(const auto &pointer_array : generator.array_pool.get_arrays_of_pointers())
@@ -1028,13 +1027,7 @@ void debug_model(
            << "  - model: " << format(model) << messaget::eom;
   }
 
-  for(const auto &symbol : boolean_symbols)
-  {
-    stream << " - " << symbol.get_identifier() << ": "
-           << format(super_get(symbol)) << '\n';
-  }
-
-  for(const auto &symbol : index_symbols)
+  for(const auto &symbol : symbols)
   {
     stream << " - " << symbol.get_identifier() << ": "
            << format(super_get(symbol)) << '\n';
@@ -1266,12 +1259,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
 #ifdef DEBUG
   debug_model(
-    generator,
-    stream,
-    ns,
-    get,
-    generator.get_boolean_symbols(),
-    generator.get_index_symbols());
+    generator, stream, ns, get, generator.fresh_symbol.created_symbols);
 #endif
 
   // Maps from indexes of violated universal axiom to a witness of violation

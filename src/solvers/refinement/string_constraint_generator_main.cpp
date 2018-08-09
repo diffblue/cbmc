@@ -44,7 +44,11 @@ operator()(const irep_idt &prefix, const typet &type)
   std::ostringstream buf;
   buf << "string_refinement#" << prefix << "#" << ++symbol_count;
   irep_idt name(buf.str());
-  return symbol_exprt(name, type);
+  symbol_exprt result(name, type);
+#ifdef DEBUG
+  created_symbols.push_back(result);
+#endif
+  return result;
 }
 
 exprt sum_overflows(const plus_exprt &sum)
