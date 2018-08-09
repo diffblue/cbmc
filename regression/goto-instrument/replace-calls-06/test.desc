@@ -1,0 +1,9 @@
+CORE
+main.c
+--replace-calls f:g
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+f\(\);
+^warning: ignoring
