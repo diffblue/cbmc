@@ -94,6 +94,7 @@ Formatting is enforced using clang-format. For more information about this, see
 - Use #ifdef DEBUG to guard debug code
 
 # Naming
+- Identifiers should make clear the purpose of the thing they are naming. 
 - Identifiers may use the characters `[a-z0-9_]` and should start with a
   lower-case letter (parameters in constructors may start with `_`).
 - Omit names of parameters or exception objects when they are not used. If
