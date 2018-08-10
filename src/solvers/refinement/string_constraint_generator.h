@@ -204,12 +204,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
   const exprt &radix,
   size_t max_size,
   const namespacet &ns);
-std::pair<exprt, string_constraintst> add_axioms_for_set_char(
-  symbol_generatort &fresh_symbol,
-  const array_string_exprt &res,
-  const array_string_exprt &str,
-  const exprt &position,
-  const exprt &character);
 
 string_constraintst add_constraint_on_characters(
   symbol_generatort &fresh_symbol,

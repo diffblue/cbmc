@@ -233,13 +233,43 @@ optionalt<exprt> string_set_char_builtin_functiont::eval(
   return make_string(input_opt.value(), type);
 }
 
+/// Set of constraints ensuring that `result` is similar to `input`
+/// where the character at index `position` is set to `character`.
+/// If `position` is out of bounds, `input` and `result` are identical.
+/// These constraints are:
+///   1. res.length = str.length
+///      && return_code = (position >= res.length || position < 0) ? 1 : 0
+///   2. 0 <= pos < res.length ==> res[pos]=char
+///   3. forall i < min(res.length, pos). res[i] = str[i]
+///   4. forall pos+1 <= i < res.length. res[i] = str[i]
 string_constraintst string_set_char_builtin_functiont::constraints(
   string_constraint_generatort &generator) const
 {
-  auto pair = add_axioms_for_set_char(
-    generator.fresh_symbol, result, input, position, character);
-  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-  return pair.second;
+  string_constraintst constraints;
+  constraints.existential.push_back(length_constraint());
+  constraints.existential.push_back(
+    implies_exprt(
+      and_exprt(
+        binary_relation_exprt(
+          from_integer(0, position.type()), ID_le, position),
+        binary_relation_exprt(position, ID_lt, result.length())),
+      equal_exprt(result[position], character)));
+  constraints.universal.push_back([&] {
+    const symbol_exprt q =
+      generator.fresh_symbol("QA_char_set", position.type());
+    const equal_exprt a3_body(result[q], input[q]);
+    return string_constraintt(
+      q, minimum(zero_if_negative(result.length()), position), a3_body);
+  }());
+  constraints.universal.push_back([&] {
+    const symbol_exprt q2 =
+      generator.fresh_symbol("QA_char_set2", position.type());
+    const plus_exprt lower_bound(position, from_integer(1, position.type()));
+    const equal_exprt a4_body(result[q2], input[q2]);
+    return string_constraintt(
+      q2, lower_bound, zero_if_negative(result.length()), a4_body);
+  }());
+  return constraints;
 }
 
 exprt string_set_char_builtin_functiont::length_constraint() const
@@ -247,7 +277,7 @@ exprt string_set_char_builtin_functiont::length_constraint() const
   const exprt out_of_bounds = or_exprt(
     binary_relation_exprt(position, ID_ge, input.length()),
     binary_relation_exprt(
-      position, ID_le, from_integer(0, input.length().type())));
+      position, ID_lt, from_integer(0, input.length().type())));
   const exprt return_value = if_exprt(
     out_of_bounds,
     from_integer(1, return_code.type()),

@@ -373,54 +373,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_to_upper_case(
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
-/// Add axioms ensuring that the result `res` is similar to input string `str`
-/// where the character at index `pos` is set to `char`.
-/// If `pos` is out of bounds the string returned unchanged.
-///
-/// These axioms are:
-///   1. res.length = str.length
-///   2. 0 <= pos < res.length ==> res[pos]=char
-///   3. forall i < min(res.length, pos). res[i] = str[i]
-///   4. forall pos+1 <= i < res.length. res[i] = str[i]
-/// \return an integer expression which is `1` when `pos` is out of bounds and
-///         `0` otherwise
-std::pair<exprt, string_constraintst> add_axioms_for_set_char(
-  symbol_generatort &fresh_symbol,
-  const array_string_exprt &res,
-  const array_string_exprt &str,
-  const exprt &position,
-  const exprt &character)
-{
-  string_constraintst constraints;
-  const binary_relation_exprt out_of_bounds(position, ID_ge, str.length());
-  constraints.existential.push_back(equal_exprt(res.length(), str.length()));
-  constraints.existential.push_back(
-    implies_exprt(
-      and_exprt(
-        binary_relation_exprt(
-          from_integer(0, position.type()), ID_le, position),
-        binary_relation_exprt(position, ID_lt, res.length())),
-      equal_exprt(res[position], character)));
-  constraints.universal.push_back([&] {
-    const symbol_exprt q = fresh_symbol("QA_char_set", position.type());
-    const equal_exprt a3_body(res[q], str[q]);
-    return string_constraintt(
-      q, minimum(zero_if_negative(res.length()), position), a3_body);
-  }());
-  constraints.universal.push_back([&] {
-    const symbol_exprt q2 = fresh_symbol("QA_char_set2", position.type());
-    const plus_exprt lower_bound(position, from_integer(1, position.type()));
-    const equal_exprt a4_body(res[q2], str[q2]);
-    return string_constraintt(
-      q2, lower_bound, zero_if_negative(res.length()), a4_body);
-  }());
-  const exprt return_code = if_exprt(
-    out_of_bounds,
-    from_integer(1, get_return_code_type()),
-    from_integer(0, get_return_code_type()));
-  return {return_code, std::move(constraints)};
-}
-
 /// Convert two expressions to pair of chars
 /// If both expressions are characters, return pair of them
 /// If both expressions are 1-length strings, return first character of each

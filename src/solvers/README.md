@@ -254,8 +254,8 @@ allocates a new string before calling a primitive.
 \subsection transformations Transformations:
 
   * `cprover_string_char_set` :
-    \copybrief add_axioms_for_set_char
-    \link add_axioms_for_set_char More... \endlink
+    \copybrief string_set_char_builtin_functiont::constraints
+    \link string_set_char_builtin_functiont::constraints More... \endlink
   * `cprover_string_concat` :
     \copybrief add_axioms_for_concat
     \link add_axioms_for_concat More... \endlink
