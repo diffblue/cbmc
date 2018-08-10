@@ -98,6 +98,7 @@ void remove_asmt::gcc_asm_function_call(
     symbol.type=fkt_type;
     symbol.base_name=function_base_name;
     symbol.value=nil_exprt();
+    symbol.mode = ID_C;
 
     symbol_table.add(symbol);
   }
