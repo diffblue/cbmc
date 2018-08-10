@@ -5,19 +5,15 @@
 
 ## goto_programt ##
 
-To be documented.
-
-### The CFG of a function ###
-
-To be documented.
+See \ref goto_programt.
 
 ### instructiont ###
 
-See documentation at \ref instructiont.
+See [instructiont](\ref goto_programt::instructiont).
 
-#### Types, motivation of each type (dead?) #####
+#### Types, motivation of each type #####
 
-To be documented.
+See [instructiont](\ref goto_programt::instructiont).
 
 #### Accepted code (codet) values ####
 
@@ -29,23 +25,17 @@ To be documented.
 
 ## goto_functionst ##
 
-To be documented.
-
-### A map from function names to function bodies (CFGs) ###
+\ref goto_functionst is a map from function names to function bodies (CFGs).
 
 To be documented.
 
 ## goto_modelt ##
 
-To be documented.
-
-### A compilation unit ###
+\ref goto_modelt is a compilation unit.
 
 To be documented.
 
 ## Example: ##
-
-To be documented.
 
 ### Unsigned mult (unsigned a, unsigned b) { int acc, i; for (i = 0; i < b; i++) acc += a; return acc; } ###
 

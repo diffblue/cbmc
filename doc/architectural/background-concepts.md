@@ -13,15 +13,15 @@ To be documented.
 
 To be documented.
 
-### SSA ###
+## SSA ##
 
 To be documented.
 
 # Analysis techniques #
 
-## Bounded model checking (from the CBMC manual) ##
+## Bounded model checking ##
 
-To be documented.
+To be documented (can copy from the CBMC manual).
 
 ## SAT and SMT ##
 

@@ -87,19 +87,16 @@ To be documented.
 
 To be documented.
 
-
 ## Examples: how to represent the AST of statements, in C and in java ##
-
-To be documented.
-
-### struct Array { int length, int *data }; ###
-
-To be documented.
 
 ### x = y + 123 ###
 
-To be documented.
+To be documented..
 
 ### if (x > 10) { y = 2 } else { v[3] = 4 } ###
+
+To be documented.
+
+### Java arrays: struct Array { int length, int *data }; ###
 
 To be documented.
