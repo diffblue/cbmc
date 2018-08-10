@@ -760,11 +760,15 @@ void c_typecheck_baset::typecheck_declaration(
       typet ret_type=empty_typet();
       if(new_symbol.type.id()==ID_code)
         ret_type=to_code_type(new_symbol.type).return_type();
-      assert(parameter_map.empty());
       if(ret_type.id()!=ID_empty)
+      {
+        DATA_INVARIANT(
+          parameter_map.empty(), "parameter map should be cleared");
         parameter_map["__CPROVER_return_value"]=ret_type;
+      }
       typecheck_spec_expr(contract, ID_C_spec_ensures);
-      parameter_map.clear();
+      if(ret_type.id()!=ID_empty)
+        parameter_map.clear();
 
       if(contract.find(ID_C_spec_requires).is_not_nil())
         new_symbol.type.add(ID_C_spec_requires)=

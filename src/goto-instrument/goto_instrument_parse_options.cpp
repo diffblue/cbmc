@@ -1046,13 +1046,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
   }
 
-  // verify and set invariants and pre/post-condition pairs
-  if(cmdline.isset("apply-code-contracts"))
-  {
-    status() << "Applying Code Contracts" << eom;
-    code_contracts(goto_model);
-  }
-
   // replace function pointers, if explicitly requested
   if(cmdline.isset("remove-function-pointers"))
   {
@@ -1061,6 +1054,32 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   else if(cmdline.isset("remove-const-function-pointers"))
   {
     do_remove_const_function_pointers_only();
+  }
+
+  // Use invariants and pre/post-condition pairs without checking them.
+  if(cmdline.isset("apply-code-contracts"))
+  {
+    // Code contracts depends on these other passes.
+    remove_function_pointers(
+      get_message_handler(),
+      goto_model,
+      cmdline.isset("pointer-check"));
+    do_remove_returns();
+    status() << "Applying Code Contracts" << eom;
+    apply_code_contracts(goto_model);
+  }
+
+  // Uses invariants and pre/post-condition pairs and verifies that they hold.
+  if(cmdline.isset("check-code-contracts"))
+  {
+    // Code contracts depends on these other passes.
+    remove_function_pointers(
+      get_message_handler(),
+      goto_model,
+      cmdline.isset("pointer-check"));
+    do_remove_returns();
+    status() << "Checking Code Contracts" << eom;
+    check_code_contracts(goto_model);
   }
 
   if(cmdline.isset("function-inline"))
@@ -1574,6 +1593,8 @@ void goto_instrument_parse_optionst::help()
     " --undefined-function-is-assume-false\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
+    HELP_APPLY_CODE_CONTRACTS
+    HELP_CHECK_CODE_CONTRACTS
     HELP_REPLACE_FUNCTION_BODY
     "\n"
     "Loop transformations:\n"
