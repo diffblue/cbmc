@@ -19,6 +19,7 @@ Date:   May 2017
 #include <util/std_expr.h>
 #include <util/unicode.h>
 
+#include "string_builtin_function.h"
 #include "string_constraint_generator.h"
 
 // Format specifier describes how a value should be printed.
@@ -338,10 +339,14 @@ add_axioms_for_format_specifier(
       array_pool,
       message,
       ns);
-    auto upper_case_result = add_axioms_for_to_upper_case(
-      fresh_symbol, res, format_specifier_result.first);
-    merge(upper_case_result.second, std::move(format_specifier_result.second));
-    return {res, std::move(upper_case_result.second)};
+
+    const exprt return_code_upper_case =
+      fresh_symbol("return_code_upper_case", get_return_code_type());
+    const string_to_upper_case_builtin_functiont upper_case_function(
+      return_code_upper_case, res, format_specifier_result.first);
+    auto upper_case_constraints = upper_case_function.constraints(fresh_symbol);
+    merge(upper_case_constraints, std::move(format_specifier_result.second));
+    return {res, std::move(upper_case_constraints)};
   }
   case format_specifiert::OCTAL_INTEGER:
   /// \todo Conversion of octal is not implemented.

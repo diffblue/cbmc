@@ -485,15 +485,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
   const function_application_exprt &f,
   array_poolt &array_pool);
 
-std::pair<exprt, string_constraintst> add_axioms_for_to_lower_case(
-  symbol_generatort &fresh_symbol,
-  const array_string_exprt &res,
-  const array_string_exprt &str);
-
-std::pair<exprt, string_constraintst> add_axioms_for_to_upper_case(
-  symbol_generatort &fresh_symbol,
-  const array_string_exprt &res,
-  const array_string_exprt &expr);
 std::pair<exprt, string_constraintst> add_axioms_for_trim(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,

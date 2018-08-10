@@ -7,6 +7,7 @@
 #include <vector>
 #include <util/optional.h>
 #include <util/string_expr.h>
+#include "string_constraint_generator.h"
 
 class array_poolt;
 struct string_constraintst;
@@ -211,7 +212,9 @@ public:
 
   exprt length_constraint() const override
   {
-    return equal_exprt(result.length(), input.length());
+    return and_exprt(
+      equal_exprt(result.length(), input.length()),
+      equal_exprt(return_code, from_integer(0, return_code.type())));
   };
 };
 
@@ -229,6 +232,17 @@ public:
   {
   }
 
+  string_to_upper_case_builtin_functiont(
+    exprt return_code,
+    array_string_exprt result,
+    array_string_exprt input)
+    : string_transformation_builtin_functiont(
+        std::move(return_code),
+        std::move(result),
+        std::move(input))
+  {
+  }
+
   optionalt<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
 
@@ -237,12 +251,20 @@ public:
     return "to_upper_case";
   }
 
+  string_constraintst constraints(class symbol_generatort &fresh_symbol) const;
+
+  /// \copydoc constraints(class symbol_generatort&)
   string_constraintst
-  constraints(string_constraint_generatort &generator) const override;
+  constraints(string_constraint_generatort &generator) const override
+  {
+    return constraints(generator.fresh_symbol);
+  };
 
   exprt length_constraint() const override
   {
-    return equal_exprt(result.length(), input.length());
+    return and_exprt(
+      equal_exprt(result.length(), input.length()),
+      equal_exprt(return_code, from_integer(0, return_code.type())));
   };
 };
 

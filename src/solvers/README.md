@@ -275,11 +275,11 @@ allocates a new string before calling a primitive.
     \copybrief add_axioms_for_substring(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
     \link add_axioms_for_substring(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_to_lower_case` :
-    \copybrief add_axioms_for_to_lower_case
-    \link add_axioms_for_to_lower_case More... \endlink
+    \copybrief string_to_lower_case_builtin_functiont::constraints
+    \link string_to_lower_case_builtin_functiont::constraints More... \endlink
   * `cprover_string_to_upper_case` :
-    \copybrief add_axioms_for_to_upper_case
-    \link add_axioms_for_to_upper_case More... \endlink
+    \copybrief string_to_upper_case_builtin_functiont::constraints(symbol_generatort&)
+    \link string_to_upper_case_builtin_functiont::constraints(symbol_generatort&) More... \endlink
   * `cprover_string_trim` :
     \copybrief add_axioms_for_trim(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
     \link add_axioms_for_trim(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
