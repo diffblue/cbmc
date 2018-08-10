@@ -1,0 +1,8 @@
+CORE
+main.c
+--list-symbol-table --filter-symbol-table static_lifetime
+static_var signed int
+--
+main signed int ()
+main::1::b signed int
+return' signed int

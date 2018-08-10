@@ -462,10 +462,11 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
-    if(cmdline.isset("show-symbol-table"))
+    int commandline_check_return_value;
+    if(!check_commandline_for_show_symbol_flags(
+         commandline_check_return_value, cmdline, goto_model, get_ui()))
     {
-      ::show_symbol_table(goto_model, get_ui());
-      return CPROVER_EXIT_SUCCESS;
+      return commandline_check_return_value;
     }
 
     if(cmdline.isset("show-reaching-definitions"))
@@ -514,12 +515,6 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("print-global-state-size"))
     {
       print_global_state_size(goto_model);
-      return CPROVER_EXIT_SUCCESS;
-    }
-
-    if(cmdline.isset("list-symbols"))
-    {
-      show_symbol_table_brief(goto_model, get_ui());
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -1527,8 +1522,7 @@ void goto_instrument_parse_optionst::help()
     "Diagnosis:\n"
     " --show-loops                 show the loops in the program\n"
     HELP_SHOW_PROPERTIES
-    " --show-symbol-table          show loaded symbol table\n"
-    " --list-symbols               list symbols with type information\n"
+    HELP_SHOW_SYMBOL_TABLE
     HELP_SHOW_GOTO_FUNCTIONS
     HELP_GOTO_PROGRAM_STATS
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)

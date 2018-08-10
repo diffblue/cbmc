@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_const_function_pointers.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
+#include <goto-programs/show_symbol_table.h>
 
 #include <analyses/goto_check.h>
 
@@ -61,6 +62,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(function-enter):(function-exit):(branch):" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
+  OPT_SHOW_SYMBOL_TABLE \
   "(drop-unused-functions)" \
   "(show-value-sets)" \
   "(show-global-may-alias)" \
@@ -75,7 +77,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(print-internal-representation)" \
   "(remove-function-pointers)" \
   "(show-claims)(property):" \
-  "(show-symbol-table)(show-points-to)(show-rw-set)" \
+  "(show-points-to)(show-rw-set)" \
   "(cav11)" \
   OPT_TIMESTAMP \
   "(show-natural-loops)(accelerate)(havoc-loops)" \

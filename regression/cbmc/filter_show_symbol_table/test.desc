@@ -1,0 +1,18 @@
+CORE
+main.c
+--show-symbol-table --filter-symbol-table static_lifetime
+Symbol......: static_var
+Pretty name.: static_var
+Module......: main
+Base name...: static_var
+Mode........: C
+Type........: signed int
+Value.......: 15
+Flags.......: lvalue static_lifetime
+Location....: file main.c line 1
+^EXIT=0$
+^SIGNAL=0$
+--
+Symbol......: main
+Symbol......: main::1::b
+Symbol......: return'

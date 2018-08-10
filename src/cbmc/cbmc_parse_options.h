@@ -56,7 +56,8 @@ class optionst;
   "(little-endian)(big-endian)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
-  "(show-symbol-table)(show-parse-tree)" \
+  OPT_SHOW_SYMBOL_TABLE \
+  "(show-parse-tree)" \
   "(drop-unused-functions)" \
   "(property):(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \
