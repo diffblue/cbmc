@@ -1518,9 +1518,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
       ID_cprover_string_format_func;
 
   cprover_equivalent_to_java_function
-    ["java::java.lang.String.hashCode:()I"]=
-      ID_cprover_string_hash_code_func;
-  cprover_equivalent_to_java_function
     ["java::java.lang.String.indexOf:(I)I"]=
       ID_cprover_string_index_of_func;
   cprover_equivalent_to_java_function
