@@ -97,7 +97,8 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_REMOVE_CALLS_NO_BODY \
   OPT_REPLACE_FUNCTION_BODY \
   OPT_GOTO_PROGRAM_STATS \
-  "(show-local-safe-pointers)(show-safe-dereferences)"
+  "(show-local-safe-pointers)(show-safe-dereferences)" \
+  // empty last line
 
 // clang-format on
 
