@@ -39,6 +39,9 @@ public:
 
   void get_shorthands(const exprt &expr);
 
+  std::string
+  convert_with_identifier(const typet &src, const std::string &identifier);
+
 protected:
   const namespacet &ns;
   const expr2c_configurationt &configuration;

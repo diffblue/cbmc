@@ -73,4 +73,10 @@ std::string type2c(
   const namespacet &ns,
   const expr2c_configurationt &configuration);
 
+std::string type2c(
+  const typet &type,
+  const std::string &identifier,
+  const namespacet &ns,
+  const expr2c_configurationt &configuration);
+
 #endif // CPROVER_ANSI_C_EXPR2C_H

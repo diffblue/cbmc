@@ -3965,6 +3965,18 @@ std::string expr2ct::convert(const exprt &src)
   return convert_with_precedence(src, precedence);
 }
 
+/// Build a declaration string, which requires converting both a type and
+/// putting an identifier in the syntactically correct position.
+/// \param src: the type to convert
+/// \param identifier: the identifier to use as the type
+/// \return A C declaration of the given type with the right identifier.
+std::string expr2ct::convert_with_identifier(
+  const typet &src,
+  const std::string &identifier)
+{
+  return convert_rec(src, c_qualifierst(), identifier);
+}
+
 std::string expr2c(
   const exprt &expr,
   const namespacet &ns,
@@ -3994,4 +4006,14 @@ std::string type2c(
 std::string type2c(const typet &type, const namespacet &ns)
 {
   return type2c(type, ns, expr2c_configurationt::default_configuration);
+}
+
+std::string type2c(
+  const typet &type,
+  const std::string &identifier,
+  const namespacet &ns,
+  const expr2c_configurationt &configuration)
+{
+  expr2ct expr2c(ns, configuration);
+  return expr2c.convert_with_identifier(type, identifier);
 }
