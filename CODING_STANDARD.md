@@ -59,12 +59,13 @@ Formatting is enforced using clang-format. For more information about this, see
   ```
   Note that the `\file` tag must be immediately followed by a newline in order
   for Doxygen to relate the comment to the current file.
-- Each function should be preceded by a Doxygen comment describing that
-  function. The format should match the [LLVM
+- Each class, member variable and function should be preceded by a Doxygen
+  comment describing it when it is not immediately obvious what it does. The
+  format should match the [LLVM
   guidelines](http://llvm.org/docs/CodingStandards.html#doxygen-use-in-documentation-comments),
-  with one extension: `\param` and `\return` comments longer than a single line
-  should have subsequent lines indented by two spaces, so that the tags stand
-  out. An example:
+  with one extension: for functions, `\param` and `\return` comments longer than
+  a single line should have subsequent lines indented by two spaces, so that the
+  tags stand out. An example:
   ```c++
   /// This sentence, until the first dot followed by whitespace, becomes
   /// the brief description. More detailed text follows. Feel free to
@@ -93,6 +94,7 @@ Formatting is enforced using clang-format. For more information about this, see
 - Use #ifdef DEBUG to guard debug code
 
 # Naming
+- Identifiers should make clear the purpose of the thing they are naming. 
 - Identifiers may use the characters `[a-z0-9_]` and should start with a
   lower-case letter (parameters in constructors may start with `_`).
 - Omit names of parameters or exception objects when they are not used. If
