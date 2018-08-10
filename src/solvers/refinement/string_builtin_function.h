@@ -63,8 +63,8 @@ private:
   string_builtin_functiont() = default;
 
 protected:
-  explicit string_builtin_functiont(const exprt &return_code)
-    : return_code(return_code)
+  explicit string_builtin_functiont(exprt return_code)
+    : return_code(std::move(return_code))
   {
   }
 };
@@ -75,6 +75,16 @@ class string_transformation_builtin_functiont : public string_builtin_functiont
 public:
   array_string_exprt result;
   array_string_exprt input;
+
+  string_transformation_builtin_functiont(
+    exprt return_code,
+    array_string_exprt result,
+    array_string_exprt input)
+    : string_builtin_functiont(std::move(return_code)),
+      result(std::move(result)),
+      input(std::move(result))
+  {
+  }
 
   /// Constructor from arguments of a function application.
   /// The arguments in `fun_args` should be in order:

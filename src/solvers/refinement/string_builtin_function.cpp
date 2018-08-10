@@ -341,6 +341,14 @@ optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
   return make_string(input_opt.value(), type);
 }
 
+/// Set of constraints ensuring `result` corresponds to `input` in which
+/// lowercase characters of Basic Latin and Latin-1 supplement of unicode
+/// have been converted to uppercase. These constraints are:
+///   1. res.length = str.length && return_code = 0
+///   2. forall i < str.length.
+///        is_lower_case(str[i]) ? res[i] = str[i] - 0x20 : res[i] = str[i]
+///
+/// \param fresh_symbol: generator of fresh symbols
 string_constraintst string_to_upper_case_builtin_functiont::constraints(
   string_constraint_generatort &generator) const
 {
