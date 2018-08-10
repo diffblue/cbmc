@@ -55,23 +55,23 @@ it’s saved output. These include a wide range of analysis and
 transformation tools (see \ref section-other-tools).
 
 # Concepts #
-## {C, java bytecode} → Parse tree → Symbol table → GOTO programs → GOTO program transformations → BMC → counterexample (goto_tracet) → printing ##
+## {C, java bytecode} -> Parse tree -> Symbol table -> GOTO programs -> GOTO program transformations -> BMC -> counterexample (goto_tracet) -> printing ##
 
 To be documented.
 
-## Instrumentation: goto functions → goto functions ##
+## Instrumentation: goto functions -> goto functions ##
 
 To be documented.
 
-## Goto functions → BMC → Counterexample (trace) ##
+## Goto functions -> BMC -> Counterexample (trace) ##
 
 To be documented.
 
-## Trace → interpreter → memory map ##
+## Trace -> interpreter -> memory map ##
 
 To be documented.
 
-## Goto functions → abstract interpretation ##
+## Goto functions -> abstract interpretation ##
 
 To be documented.
 
