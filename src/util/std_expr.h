@@ -1823,6 +1823,9 @@ public:
     exprt(ID_struct, _type)
   {
   }
+
+  exprt &component(const irep_idt &name, const namespacet &ns);
+  const exprt &component(const irep_idt &name, const namespacet &ns) const;
 };
 
 /*! \brief Cast a generic exprt to a \ref struct_exprt

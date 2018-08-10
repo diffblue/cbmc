@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
+#include <util/namespace.h>
+
 #include <cassert>
 
 #include "arith_tools.h"
@@ -166,4 +168,32 @@ extractbits_exprt::extractbits_exprt(
 address_of_exprt::address_of_exprt(const exprt &_op):
   unary_exprt(ID_address_of, _op, pointer_type(_op.type()))
 {
+}
+
+// Implementation of struct_exprt::component for const / non const overloads.
+template <typename T>
+auto component(T &struct_expr, const irep_idt &name, const namespacet &ns)
+  -> decltype(struct_expr.op0())
+{
+  static_assert(
+    std::is_base_of<struct_exprt, T>::value, "T must be a struct_exprt.");
+  const auto index =
+    to_struct_type(ns.follow(struct_expr.type())).component_number(name);
+  DATA_INVARIANT(
+    index < struct_expr.operands().size(),
+    "component matching index should exist");
+  return struct_expr.operands()[index];
+}
+
+/// \return The expression for a named component of this struct.
+exprt &struct_exprt::component(const irep_idt &name, const namespacet &ns)
+{
+  return ::component(*this, name, ns);
+}
+
+/// \return The expression for a named component of this struct.
+const exprt &
+struct_exprt::component(const irep_idt &name, const namespacet &ns) const
+{
+  return ::component(*this, name, ns);
 }
