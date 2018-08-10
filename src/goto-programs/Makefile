@@ -6,7 +6,7 @@ SRC = adjust_float_expressions.cpp \
       destructor.cpp \
       elf_reader.cpp \
       format_strings.cpp \
-      initialize_goto_model.cpp \
+      generate_function_bodies.cpp \
       goto_asm.cpp \
       goto_clean_expr.cpp \
       goto_convert.cpp \
@@ -16,12 +16,13 @@ SRC = adjust_float_expressions.cpp \
       goto_convert_side_effect.cpp \
       goto_function.cpp \
       goto_functions.cpp \
-      goto_inline.cpp \
       goto_inline_class.cpp \
+      goto_inline.cpp \
       goto_program.cpp \
       goto_program_template.cpp \
       goto_trace.cpp \
       graphml_witness.cpp \
+      initialize_goto_model.cpp \
       instrument_preconditions.cpp \
       interpreter.cpp \
       interpreter_evaluate.cpp \
@@ -50,7 +51,6 @@ SRC = adjust_float_expressions.cpp \
       remove_unused_functions.cpp \
       remove_vector.cpp \
       remove_virtual_functions.cpp \
-      generate_function_bodies.cpp \
       resolve_inherited_component.cpp \
       safety_checker.cpp \
       set_properties.cpp \
