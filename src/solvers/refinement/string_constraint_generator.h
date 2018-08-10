@@ -179,11 +179,6 @@ private:
 // Type used by primitives to signal errors
 signedbv_typet get_return_code_type();
 
-std::pair<exprt, string_constraintst> add_axioms_for_concat_char(
-  symbol_generatort &fresh_symbol,
-  const array_string_exprt &res,
-  const array_string_exprt &s1,
-  const exprt &c);
 std::pair<exprt, string_constraintst> add_axioms_for_concat(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,

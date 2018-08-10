@@ -187,13 +187,29 @@ optionalt<exprt> string_concat_char_builtin_functiont::eval(
   return make_string(input_opt.value(), type);
 }
 
+/// Set of constraints enforcing that `result` is the concatenation
+/// of `input` with `character`. These constraints are :
+///   * result.length = input.length + 1
+///   * forall i < max(0, result.length). result[i] = input[i]
+///   * result[input.length] = character
+///   * return_code = 0
 string_constraintst string_concat_char_builtin_functiont::constraints(
   string_constraint_generatort &generator) const
 {
-  auto pair = add_axioms_for_concat_char(
-    generator.fresh_symbol, result, input, character);
-  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-  return pair.second;
+  string_constraintst constraints;
+  constraints.existential.push_back(length_constraint());
+  constraints.universal.push_back([&] {
+    const symbol_exprt idx =
+      generator.fresh_symbol("QA_index_concat_char", result.length().type());
+    const exprt upper_bound = zero_if_negative(input.length());
+    return string_constraintt(
+      idx, upper_bound, equal_exprt(input[idx], result[idx]));
+  }());
+  constraints.existential.push_back(
+    equal_exprt(result[input.length()], character));
+  constraints.existential.push_back(
+    equal_exprt(return_code, from_integer(0, return_code.type())));
+  return constraints;
 }
 
 exprt string_concat_char_builtin_functiont::length_constraint() const

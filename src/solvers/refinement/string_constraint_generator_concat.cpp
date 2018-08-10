@@ -104,40 +104,6 @@ exprt length_constraint_for_concat(
   return equal_exprt(res.length(), plus_exprt(s1.length(), s2.length()));
 }
 
-/// Add axioms enforcing that `res` is the concatenation of `s1` with
-/// character `c`.
-/// These axioms are :
-///   * \f$ |res|=|s1|+1 \f$
-///   * \f$ \forall i<|s1|. res[i]=s1[i] \f$
-///   * \f$ res[|s1|]=c \f$
-///
-/// \param fresh_symbol: generator of fresh symbols
-/// \param res: string expression
-/// \param s1: string expression
-/// \param c: character expression
-/// \return code 0 on success
-std::pair<exprt, string_constraintst> add_axioms_for_concat_char(
-  symbol_generatort &fresh_symbol,
-  const array_string_exprt &res,
-  const array_string_exprt &s1,
-  const exprt &c)
-{
-  string_constraintst constraints;
-  const typet &index_type = res.length().type();
-  constraints.existential.push_back(length_constraint_for_concat_char(res, s1));
-
-  symbol_exprt idx = fresh_symbol("QA_index_concat_char", index_type);
-  string_constraintt a2(
-    idx, zero_if_negative(s1.length()), equal_exprt(s1[idx], res[idx]));
-  constraints.universal.push_back(a2);
-
-  equal_exprt a3(res[s1.length()], c);
-  constraints.existential.push_back(a3);
-
-  // We should have a enum type for the possible error codes
-  return {from_integer(0, get_return_code_type()), std::move(constraints)};
-}
-
 /// Add axioms enforcing that the length of `res` is that of the concatenation
 /// of `s1` with
 exprt length_constraint_for_concat_char(
