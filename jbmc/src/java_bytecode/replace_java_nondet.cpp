@@ -279,7 +279,8 @@ static goto_programt::targett check_and_replace_target(
     const auto &nondet_var =
       to_code_return(target_instruction->code).return_value();
 
-    side_effect_expr_nondett inserted_expr(nondet_var.type());
+    side_effect_expr_nondett inserted_expr(
+      nondet_var.type(), target_instruction->source_location);
     inserted_expr.set_nullable(
       instr_info.get_nullable_type() ==
       nondet_instruction_infot::is_nullablet::TRUE);
@@ -292,7 +293,8 @@ static goto_programt::targett check_and_replace_target(
     // Assume that the LHS of *this* assignment is the actual nondet variable
     const auto &nondet_var = to_code_assign(target_instruction->code).lhs();
 
-    side_effect_expr_nondett inserted_expr(nondet_var.type());
+    side_effect_expr_nondett inserted_expr(
+      nondet_var.type(), target_instruction->source_location);
     inserted_expr.set_nullable(
       instr_info.get_nullable_type() ==
       nondet_instruction_infot::is_nullablet::TRUE);

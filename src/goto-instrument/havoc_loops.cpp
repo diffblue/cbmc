@@ -92,7 +92,8 @@ void havoc_loopst::build_havoc_code(
       m_it++)
   {
     exprt lhs=*m_it;
-    exprt rhs=side_effect_expr_nondett(lhs.type());
+    exprt rhs =
+      side_effect_expr_nondett(lhs.type(), loop_head->source_location);
 
     goto_programt::targett t=dest.add_instruction(ASSIGN);
     t->function=loop_head->function;

@@ -230,7 +230,7 @@ exprt wp_decl(
 {
   // Model decl(var) as var = nondet()
   const exprt &var = code.symbol();
-  side_effect_expr_nondett nondet(var.type());
+  side_effect_expr_nondett nondet(var.type(), source_locationt());
   code_assignt assignment(var, nondet);
 
   return wp_assign(assignment, post, ns);

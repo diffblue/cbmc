@@ -464,7 +464,8 @@ void shared_bufferst::nondet_flush(
 
   const symbol_exprt choice0_expr=symbol_exprt(choice0, bool_typet());
   const symbol_exprt delay_expr=symbol_exprt(choice2, bool_typet());
-  const exprt nondet_bool_expr=side_effect_expr_nondett(bool_typet());
+  const exprt nondet_bool_expr =
+    side_effect_expr_nondett(bool_typet(), source_location);
 
   // throw Boolean dice
   assignment(goto_program, target, source_location, choice0, nondet_bool_expr);
@@ -1184,8 +1185,8 @@ void shared_bufferst::cfg_visitort::weak_memory(
                     instruction.function, "1");
                   const symbol_exprt choice1_expr=symbol_exprt(choice1,
                     bool_typet());
-                  const exprt nondet_bool_expr=side_effect_expr_nondett(
-                    bool_typet());
+                  const exprt nondet_bool_expr =
+                    side_effect_expr_nondett(bool_typet(), source_location);
 
                   // throw Boolean dice
                   shared_buffers.assignment(

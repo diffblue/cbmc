@@ -160,8 +160,7 @@ codet cpp_typecheckt::cpp_constructor(
       // Override constantness
       object_tc.type().set(ID_C_constant, false);
       object_tc.set(ID_C_lvalue, true);
-      side_effect_exprt assign(ID_assign);
-      assign.add_source_location()=source_location;
+      side_effect_exprt assign(ID_assign, typet(), source_location);
       assign.copy_to_operands(object_tc, operands_tc.front());
       typecheck_side_effect_assignment(assign);
       new_code.expression()=assign;
@@ -213,8 +212,7 @@ codet cpp_typecheckt::cpp_constructor(
       if(!component.get_bool("from_base"))
         val=true_exprt();
 
-      side_effect_exprt assign(ID_assign);
-      assign.add_source_location()=source_location;
+      side_effect_exprt assign(ID_assign, typet(), source_location);
       assign.move_to_operands(member, val);
       typecheck_side_effect_assignment(assign);
       code_expressiont code_exp(assign);

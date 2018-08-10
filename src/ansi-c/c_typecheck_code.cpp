@@ -675,7 +675,8 @@ void c_typecheck_baset::typecheck_return(codet &code)
       warning().source_location = code.source_location();
       warning() << "non-void function should return a value" << eom;
 
-      code.copy_to_operands(side_effect_expr_nondett(return_type));
+      code.copy_to_operands(
+        side_effect_expr_nondett(return_type, code.source_location()));
     }
   }
   else if(code.operands().size()==1)

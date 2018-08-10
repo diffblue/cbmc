@@ -85,7 +85,7 @@ void goto_inlinet::parameter_assignments(
                 << "not enough arguments, "
                 << "inserting non-deterministic value" << eom;
 
-      actual=side_effect_expr_nondett(par_type);
+      actual = side_effect_expr_nondett(par_type, source_location);
     }
     else
       actual=*it1;

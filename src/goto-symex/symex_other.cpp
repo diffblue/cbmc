@@ -34,7 +34,8 @@ void goto_symext::havoc_rec(
 
     code_assignt assignment;
     assignment.lhs()=lhs;
-    assignment.rhs()=side_effect_expr_nondett(dest.type());
+    assignment.rhs() =
+      side_effect_expr_nondett(dest.type(), state.source.pc->source_location);
 
     symex_assign(state, assignment);
   }

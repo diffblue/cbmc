@@ -466,9 +466,7 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
 
   // turn into function call
   side_effect_expr_function_callt result(
-    function, {arg}, new_type.return_type());
-
-  result.add_source_location()=expr.source_location();
+    function, {arg}, new_type.return_type(), expr.source_location());
 
   expr.swap(result);
 
@@ -884,8 +882,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
       static_cast<const typet &>(fc.function().type().find(ID_return_type));
 
     side_effect_expr_function_callt sideeffect(
-      fc.function(), fc.arguments(), return_type);
-    sideeffect.add_source_location()=fc.source_location();
+      fc.function(), fc.arguments(), return_type, fc.source_location());
 
     expr.type()=sideeffect.type();
 
@@ -897,8 +894,8 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
     }
     else
     {
-      side_effect_exprt assign(ID_assign, sideeffect.type());
-      assign.add_source_location()=fc.source_location();
+      side_effect_exprt assign(
+        ID_assign, sideeffect.type(), fc.source_location());
       assign.move_to_operands(fc.lhs(), sideeffect);
 
       code_expressiont code_expr(assign);
@@ -965,7 +962,8 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
   // The type may contain side-effects.
   if(!clean_code.empty())
   {
-    side_effect_exprt side_effect_expr(ID_statement_expression, void_type());
+    side_effect_exprt side_effect_expr(
+      ID_statement_expression, void_type(), expr.source_location());
     code_blockt decl_block(clean_code);
     decl_block.set_statement(ID_decl_block);
     side_effect_expr.copy_to_operands(decl_block);
@@ -1021,7 +1019,8 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   // The type may contain side-effects.
   if(!clean_code.empty())
   {
-    side_effect_exprt side_effect_expr(ID_statement_expression, void_type());
+    side_effect_exprt side_effect_expr(
+      ID_statement_expression, void_type(), expr.source_location());
     code_blockt decl_block(clean_code);
     decl_block.set_statement(ID_decl_block);
     side_effect_expr.copy_to_operands(decl_block);
@@ -2327,8 +2326,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    side_effect_exprt malloc_expr(ID_allocate, expr.type());
-    malloc_expr.add_source_location()=source_location;
+    side_effect_exprt malloc_expr(ID_allocate, expr.type(), source_location);
     malloc_expr.operands()=expr.arguments();
 
     return malloc_expr;

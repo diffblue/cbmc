@@ -316,8 +316,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         symbol_expr.set(ID_C_lvalue, true);
         code.op0().type().remove(ID_C_reference);
 
-        side_effect_exprt assign(ID_assign);
-        assign.add_source_location() = code.source_location();
+        side_effect_exprt assign(ID_assign, typet(), code.source_location());
         assign.copy_to_operands(symbol_expr, code.op0());
         typecheck_side_effect_assignment(assign);
         code_expressiont new_code(assign);

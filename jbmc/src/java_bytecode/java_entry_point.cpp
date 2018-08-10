@@ -162,7 +162,7 @@ static void java_static_lifetime_init(
         // Call the literal initializer method instead of a nondet initializer:
 
         // For arguments we can't parse yet:
-        side_effect_expr_nondett nondet_bool(java_boolean_type());
+        side_effect_expr_nondett nondet_bool(java_boolean_type(), sym.location);
 
         // Argument order is: name, isAnnotation, isArray, isInterface,
         // isSynthetic, isLocalClass, isMemberClass, isEnum

@@ -43,11 +43,12 @@ static const symbolt &c_new_tmp_symbol(
 }
 
 /// \param type: Desired type (C_bool or plain bool)
+/// \param loc: source location
 /// \return nondet expr of that type
-static exprt c_get_nondet_bool(const typet &type)
+static exprt c_get_nondet_bool(const typet &type, const source_locationt &loc)
 {
   // We force this to 0 and 1 and won't consider other values
-  return typecast_exprt(side_effect_expr_nondett(bool_typet()), type);
+  return typecast_exprt(side_effect_expr_nondett(bool_typet(), loc), type);
 }
 
 class symbol_factoryt
@@ -173,7 +174,7 @@ void symbol_factoryt::gen_nondet_init(
       set_null_inst.add_source_location()=loc;
 
       code_ifthenelset null_check;
-      null_check.cond()=side_effect_expr_nondett(bool_typet());
+      null_check.cond() = side_effect_expr_nondett(bool_typet(), loc);
       null_check.then_case()=set_null_inst;
       null_check.else_case()=non_null_inst;
 
@@ -187,9 +188,8 @@ void symbol_factoryt::gen_nondet_init(
     //   <expr> = NONDET(_BOOL);
     // Else add the following code to assignments:
     //   <expr> = NONDET(type);
-    exprt rhs=type.id()==ID_c_bool?
-      c_get_nondet_bool(type):
-      side_effect_expr_nondett(type);
+    exprt rhs = type.id() == ID_c_bool ? c_get_nondet_bool(type, loc)
+                                       : side_effect_expr_nondett(type, loc);
     code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
 

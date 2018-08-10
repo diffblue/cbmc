@@ -69,13 +69,15 @@ class java_object_factoryt
     const typet &target_type,
     allocation_typet alloc_type,
     size_t depth,
-    update_in_placet update_in_place);
+    update_in_placet update_in_place,
+    const source_locationt &location);
 
   void allocate_nondet_length_array(
     code_blockt &assignments,
     const exprt &lhs,
     const exprt &max_length_expr,
-    const typet &element_type);
+    const typet &element_type,
+    const source_locationt &location);
 
 public:
   java_object_factoryt(
@@ -102,7 +104,8 @@ public:
     code_blockt &assignments,
     const exprt &expr,
     size_t depth,
-    update_in_placet);
+    update_in_placet,
+    const source_locationt &location);
 
   void gen_nondet_init(
     code_blockt &assignments,
@@ -114,7 +117,8 @@ public:
     bool override_,
     const typet &override_type,
     size_t depth,
-    update_in_placet);
+    update_in_placet,
+    const source_locationt &location);
 
 private:
   void gen_nondet_pointer_init(
@@ -123,7 +127,8 @@ private:
     allocation_typet alloc_type,
     const pointer_typet &pointer_type,
     size_t depth,
-    const update_in_placet &update_in_place);
+    const update_in_placet &update_in_place,
+    const source_locationt &location);
 
   void gen_nondet_struct_init(
     code_blockt &assignments,
@@ -134,13 +139,15 @@ private:
     allocation_typet alloc_type,
     const struct_typet &struct_type,
     size_t depth,
-    const update_in_placet &update_in_place);
+    const update_in_placet &update_in_place,
+    const source_locationt &location);
 
   symbol_exprt gen_nondet_subtype_pointer_init(
     code_blockt &assignments,
     allocation_typet alloc_type,
     const pointer_typet &substitute_pointer_type,
-    size_t depth);
+    size_t depth,
+    const source_locationt &location);
 };
 
 /// Generates code for allocating a dynamic object. This is used in
@@ -173,7 +180,8 @@ exprt allocate_dynamic_object(
   {
     INVARIANT(!object_size.is_nil(), "Size of Java objects should be known");
     // malloc expression
-    side_effect_exprt malloc_expr(ID_allocate, pointer_type(allocate_type));
+    side_effect_exprt malloc_expr(
+      ID_allocate, pointer_type(allocate_type), loc);
     malloc_expr.copy_to_operands(object_size);
     malloc_expr.copy_to_operands(false_exprt());
     // create a symbol for the malloc expression so we can initialize
@@ -371,7 +379,8 @@ void java_object_factoryt::gen_pointer_target_init(
   const typet &target_type,
   allocation_typet alloc_type,
   size_t depth,
-  update_in_placet update_in_place)
+  update_in_placet update_in_place,
+  const source_locationt &location)
 {
   PRECONDITION(expr.type().id()==ID_pointer);
   PRECONDITION(update_in_place!=update_in_placet::MAY_UPDATE_IN_PLACE);
@@ -382,10 +391,7 @@ void java_object_factoryt::gen_pointer_target_init(
        "java::array["))
   {
     gen_nondet_array_init(
-      assignments,
-      expr,
-      depth+1,
-      update_in_place);
+      assignments, expr, depth + 1, update_in_place, location);
   }
   else
   {
@@ -425,14 +431,15 @@ void java_object_factoryt::gen_pointer_target_init(
     gen_nondet_init(
       assignments,
       init_expr,
-      false,   // is_sub
-      "",      // class_identifier
-      false,   // skip_classid
+      false, // is_sub
+      "",    // class_identifier
+      false, // skip_classid
       alloc_type,
-      false,   // override
-      typet(), // override type immaterial
-      depth+1,
-      update_in_place);
+      false,
+      typet(),
+      depth + 1,
+      update_in_place,
+      location);
   }
 }
 
@@ -503,7 +510,7 @@ static mp_integer max_value(const typet &type)
 /// \return code allocation object and assigning `lhs`
 static codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
 {
-  side_effect_exprt alloc(ID_allocate, lhs.type());
+  side_effect_exprt alloc(ID_allocate, lhs.type(), lhs.source_location());
   alloc.copy_to_operands(size);
   alloc.copy_to_operands(false_exprt());
   return code_assignt(lhs, alloc);
@@ -599,7 +606,7 @@ bool initialize_nondet_string_fields(
     ID_java,
     symbol_table);
   const symbol_exprt length_expr = length_sym.symbol_expr();
-  const side_effect_expr_nondett nondet_length(length_expr.type());
+  const side_effect_expr_nondett nondet_length(length_expr.type(), loc);
   code.add(code_declt(length_expr));
   code.add(code_assignt(length_expr, nondet_length));
 
@@ -687,7 +694,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
   allocation_typet alloc_type,
   const pointer_typet &pointer_type,
   size_t depth,
-  const update_in_placet &update_in_place)
+  const update_in_placet &update_in_place,
+  const source_locationt &location)
 {
   PRECONDITION(expr.type().id()==ID_pointer);
   const pointer_typet &replacement_pointer_type =
@@ -709,7 +717,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
       replacement_pointer_type, ns.follow(replacement_pointer_type.subtype()));
 
     const symbol_exprt real_pointer_symbol = gen_nondet_subtype_pointer_init(
-      assignments, alloc_type, replacement_pointer_type, depth);
+      assignments, alloc_type, replacement_pointer_type, depth, location);
 
     // Having created a pointer to object of type replacement_pointer_type
     // we now assign it back to the original pointer with a cast
@@ -771,7 +779,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
       subtype,
       alloc_type,
       depth,
-      update_in_placet::MUST_UPDATE_IN_PLACE);
+      update_in_placet::MUST_UPDATE_IN_PLACE,
+      location);
   }
 
   // if we MUST_UPDATE_IN_PLACE, then the job is done, we copy the code emitted
@@ -793,7 +802,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
     subtype,
     alloc_type,
     depth,
-    update_in_placet::NO_UPDATE_IN_PLACE);
+    update_in_placet::NO_UPDATE_IN_PLACE,
+    location);
 
   auto set_null_inst=get_null_assignment(expr, pointer_type);
 
@@ -828,7 +838,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     //             tmp$<temporary_counter>>
     // }
     code_ifthenelset null_check;
-    null_check.cond()=side_effect_expr_nondett(bool_typet());
+    null_check.cond() = side_effect_expr_nondett(bool_typet(), location);
     null_check.then_case()=set_null_inst;
     null_check.else_case()=non_null_inst;
 
@@ -847,7 +857,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
       "No-update and must-update should have already been resolved");
 
     code_ifthenelset update_check;
-    update_check.cond()=side_effect_expr_nondett(bool_typet());
+    update_check.cond() =
+      side_effect_expr_nondett(bool_typet(), expr.source_location());
     update_check.then_case()=update_in_place_assignments;
     update_check.else_case()=new_object_assignments;
 
@@ -883,7 +894,8 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   code_blockt &assignments,
   allocation_typet alloc_type,
   const pointer_typet &replacement_pointer,
-  size_t depth)
+  size_t depth,
+  const source_locationt &location)
 {
   symbolt new_symbol = get_fresh_aux_symbol(
     replacement_pointer,
@@ -897,14 +909,15 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   gen_nondet_init(
     assignments,
     new_symbol.symbol_expr(),
-    false,   // is_sub
-    "",      // class_identifier
-    false,   // skip_classid
+    false, // is_sub
+    "",    // class_identifier
+    false, // skip_classid
     alloc_type,
     false,   // override
     typet(), // override_type
     depth,
-    update_in_placet::NO_UPDATE_IN_PLACE);
+    update_in_placet::NO_UPDATE_IN_PLACE,
+    location);
 
   return new_symbol.symbol_expr();
 }
@@ -947,7 +960,8 @@ void java_object_factoryt::gen_nondet_struct_init(
   allocation_typet alloc_type,
   const struct_typet &struct_type,
   size_t depth,
-  const update_in_placet &update_in_place)
+  const update_in_placet &update_in_place,
+  const source_locationt &location)
 {
   PRECONDITION(ns.follow(expr.type()).id()==ID_struct);
   PRECONDITION(struct_type.id()==ID_struct);
@@ -1049,12 +1063,13 @@ void java_object_factoryt::gen_nondet_struct_init(
         me,
         _is_sub,
         class_identifier,
-        false,   // skip_classid
+        false, // skip_classid
         alloc_type,
         false,   // override
         typet(), // override_type
         depth,
-        substruct_in_place);
+        substruct_in_place,
+        location);
     }
   }
 
@@ -1122,7 +1137,8 @@ void java_object_factoryt::gen_nondet_init(
   bool override_,
   const typet &override_type,
   size_t depth,
-  update_in_placet update_in_place)
+  update_in_placet update_in_place,
+  const source_locationt &location)
 {
   const typet &type=
     override_ ? ns.follow(override_type) : ns.follow(expr.type());
@@ -1147,7 +1163,8 @@ void java_object_factoryt::gen_nondet_init(
       alloc_type,
       pointer_type,
       depth,
-      update_in_place);
+      update_in_place,
+      location);
   }
   else if(type.id()==ID_struct)
   {
@@ -1176,15 +1193,15 @@ void java_object_factoryt::gen_nondet_init(
       alloc_type,
       struct_type,
       depth,
-      update_in_place);
+      update_in_place,
+      location);
   }
   else
   {
     // types different from pointer or structure:
     // bool, int, float, byte, char, ...
-    exprt rhs=type.id()==ID_c_bool?
-      get_nondet_bool(type):
-      side_effect_expr_nondett(type);
+    exprt rhs = type.id() == ID_c_bool ? get_nondet_bool(type)
+                                       : side_effect_expr_nondett(type, loc);
     code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
 
@@ -1209,7 +1226,8 @@ void java_object_factoryt::allocate_nondet_length_array(
   code_blockt &assignments,
   const exprt &lhs,
   const exprt &max_length_expr,
-  const typet &element_type)
+  const typet &element_type,
+  const source_locationt &location)
 {
   symbolt &length_sym = get_fresh_aux_symbol(
     java_int_type(),
@@ -1232,7 +1250,8 @@ void java_object_factoryt::allocate_nondet_length_array(
     false,                   // override
     typet(),                 // override type is immaterial
     0,                       // depth is immaterial, always non-null
-    update_in_placet::NO_UPDATE_IN_PLACE);
+    update_in_placet::NO_UPDATE_IN_PLACE,
+    location);
 
   // Insert assumptions to bound its length:
   binary_relation_exprt
@@ -1244,7 +1263,7 @@ void java_object_factoryt::allocate_nondet_length_array(
   assignments.move_to_operands(assume_inst1);
   assignments.move_to_operands(assume_inst2);
 
-  side_effect_exprt java_new_array(ID_java_new_array, lhs.type());
+  side_effect_exprt java_new_array(ID_java_new_array, lhs.type(), loc);
   java_new_array.copy_to_operands(length_sym_expr);
   java_new_array.set(ID_length_upper_bound, max_length_expr);
   java_new_array.type().subtype().set(ID_element_type, element_type);
@@ -1263,7 +1282,8 @@ void java_object_factoryt::gen_nondet_array_init(
   code_blockt &assignments,
   const exprt &expr,
   size_t depth,
-  update_in_placet update_in_place)
+  update_in_placet update_in_place,
+  const source_locationt &location)
 {
   PRECONDITION(expr.type().id()==ID_pointer);
   PRECONDITION(expr.type().subtype().id()==ID_symbol);
@@ -1282,10 +1302,7 @@ void java_object_factoryt::gen_nondet_array_init(
   if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
   {
     allocate_nondet_length_array(
-      assignments,
-      expr,
-      max_length_expr,
-      element_type);
+      assignments, expr, max_length_expr, element_type, location);
   }
 
   // Otherwise we're updating the array in place, and use the
@@ -1375,15 +1392,16 @@ void java_object_factoryt::gen_nondet_array_init(
   gen_nondet_init(
     assignments,
     arraycellref,
-    false, // is_sub
+    false,      // is_sub
     irep_idt(), // class_identifier
-    false, // skip_classid
+    false,      // skip_classid
     // These are variable in number, so use dynamic allocator:
     allocation_typet::DYNAMIC,
-    true,  // override
+    true, // override
     element_type,
     depth,
-    child_update_in_place);
+    child_update_in_place,
+    location);
 
   exprt java_one=from_integer(1, java_int_type());
   code_assignt incr(counter_expr, plus_exprt(counter_expr, java_one));
@@ -1474,7 +1492,8 @@ exprt object_factory(
     false,   // override
     typet(), // override_type is immaterial
     1,       // initial depth
-    update_in_placet::NO_UPDATE_IN_PLACE);
+    update_in_placet::NO_UPDATE_IN_PLACE,
+    loc);
 
   declare_created_symbols(symbols_created, loc, init_code);
 
@@ -1547,7 +1566,8 @@ void gen_nondet_init(
     false,   // override
     typet(), // override_type is immaterial
     1,       // initial depth
-    update_in_place);
+    update_in_place,
+    loc);
 
   declare_created_symbols(symbols_created, loc, init_code);
 

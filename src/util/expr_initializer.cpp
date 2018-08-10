@@ -69,7 +69,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
   {
     exprt result;
     if(nondet)
-      result = side_effect_expr_nondett(type);
+      result = side_effect_expr_nondett(type, source_location);
     else
       result = from_integer(0, type);
 
@@ -81,7 +81,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
   {
     exprt result;
     if(nondet)
-      result = side_effect_expr_nondett(type);
+      result = side_effect_expr_nondett(type, source_location);
     else
       result = constant_exprt(ID_0, type);
 
@@ -93,7 +93,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
   {
     exprt result;
     if(nondet)
-      result = side_effect_expr_nondett(type);
+      result = side_effect_expr_nondett(type, source_location);
     else
     {
       const std::size_t width = to_bitvector_type(type).get_width();
@@ -109,7 +109,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
   {
     exprt result;
     if(nondet)
-      result = side_effect_expr_nondett(type);
+      result = side_effect_expr_nondett(type, source_location);
     else
     {
       exprt sub_zero = expr_initializer_rec(type.subtype(), source_location);
@@ -149,11 +149,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       if(array_type.size().id()==ID_infinity)
       {
         if(nondet)
-        {
-          side_effect_expr_nondett result(type);
-          result.add_source_location() = source_location;
-          return result;
-        }
+          return side_effect_expr_nondett(type, source_location);
 
         array_of_exprt value(tmpval, array_type);
         value.add_source_location()=source_location;
@@ -162,11 +158,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       else if(to_integer(array_type.size(), array_size))
       {
         if(nondet)
-        {
-          side_effect_expr_nondett result(type);
-          result.add_source_location() = source_location;
-          return result;
-        }
+          return side_effect_expr_nondett(type, source_location);
 
         error().source_location=source_location;
         error() << "failed to zero-initialize array of non-fixed size `"
@@ -194,11 +186,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     if(to_integer(vector_type.size(), vector_size))
     {
       if(nondet)
-      {
-        side_effect_expr_nondett result(type);
-        result.add_source_location() = source_location;
-        return result;
-      }
+        return side_effect_expr_nondett(type, source_location);
 
       error().source_location=source_location;
       error() << "failed to zero-initialize vector of non-fixed size `"
@@ -326,7 +314,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
   {
     exprt result;
     if(nondet)
-      result = side_effect_expr_nondett(type);
+      result = side_effect_expr_nondett(type, source_location);
     else
       result = constant_exprt(irep_idt(), type);
 

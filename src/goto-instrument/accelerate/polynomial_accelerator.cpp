@@ -237,7 +237,10 @@ bool polynomial_acceleratort::accelerate(
 
   program.add_instruction(ASSUME)->guard=guard;
 
-  program.assign(loop_counter, side_effect_expr_nondett(loop_counter.type()));
+  program.assign(
+    loop_counter,
+    side_effect_expr_nondett(
+      loop_counter.type(), loop_counter.source_location()));
 
   for(std::map<exprt, polynomialt>::iterator it=polynomials.begin();
       it!=polynomials.end();

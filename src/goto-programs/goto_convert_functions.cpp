@@ -128,7 +128,7 @@ void goto_convert_functionst::add_return(
 
   #endif
 
-  side_effect_expr_nondett rhs(f.type.return_type());
+  const side_effect_expr_nondett rhs(f.type.return_type(), source_location);
 
   goto_programt::targett t=f.body.add_instruction();
   t->make_return();

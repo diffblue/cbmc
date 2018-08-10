@@ -1271,18 +1271,23 @@ inline const code_expressiont &to_code_expression(const codet &code)
 class side_effect_exprt:public exprt
 {
 public:
-  DEPRECATED("Use side_effect_exprt(statement, type) instead")
-  explicit side_effect_exprt(const irep_idt &statement):
-    exprt(ID_side_effect)
+  DEPRECATED("Use side_effect_exprt(statement, type, loc) instead")
+  explicit side_effect_exprt(const irep_idt &statement) : exprt(ID_side_effect)
   {
     set_statement(statement);
   }
 
+  DEPRECATED("Use side_effect_exprt(statement, type, loc) instead")
   side_effect_exprt(const irep_idt &statement, const typet &_type):
     exprt(ID_side_effect, _type)
   {
     set_statement(statement);
   }
+
+  side_effect_exprt(
+    const irep_idt &statement,
+    const typet &_type,
+    const source_locationt &loc);
 
   const irep_idt &get_statement() const
   {
@@ -1335,17 +1340,20 @@ inline const side_effect_exprt &to_side_effect_expr(const exprt &expr)
 class side_effect_expr_nondett:public side_effect_exprt
 {
 public:
-  DEPRECATED("Use side_effect_expr_nondett(statement, type) instead")
+  DEPRECATED("Use side_effect_expr_nondett(statement, type, loc) instead")
   side_effect_expr_nondett():side_effect_exprt(ID_nondet)
   {
     set_nullable(true);
   }
 
+  DEPRECATED("Use side_effect_expr_nondett(statement, type, loc) instead")
   explicit side_effect_expr_nondett(const typet &_type):
     side_effect_exprt(ID_nondet, _type)
   {
     set_nullable(true);
   }
+
+  side_effect_expr_nondett(const typet &_type, const source_locationt &loc);
 
   void set_nullable(bool nullable)
   {
@@ -1387,13 +1395,19 @@ inline const side_effect_expr_nondett &to_side_effect_expr_nondet(
 class side_effect_expr_function_callt:public side_effect_exprt
 {
 public:
-  DEPRECATED("Use side_effect_expr_function_callt(...) instead")
-  side_effect_expr_function_callt():side_effect_exprt(ID_function_call)
+  DEPRECATED(
+    "Use side_effect_expr_function_callt("
+    "function, arguments, type, loc) instead")
+  side_effect_expr_function_callt()
+    : side_effect_exprt(ID_function_call, typet(), source_locationt())
   {
     operands().resize(2);
     op1().id(ID_arguments);
   }
 
+  DEPRECATED(
+    "Use side_effect_expr_function_callt("
+    "function, arguments, type, loc) instead")
   side_effect_expr_function_callt(
     const exprt &_function,
     const exprt::operandst &_arguments)
@@ -1405,6 +1419,9 @@ public:
     arguments() = _arguments;
   }
 
+  DEPRECATED(
+    "Use side_effect_expr_function_callt("
+    "function, arguments, type, loc) instead")
   side_effect_expr_function_callt(
     const exprt &_function,
     const exprt::operandst &_arguments,
@@ -1416,6 +1433,12 @@ public:
     function() = _function;
     arguments() = _arguments;
   }
+
+  side_effect_expr_function_callt(
+    const exprt &_function,
+    const exprt::operandst &_arguments,
+    const typet &_type,
+    const source_locationt &loc);
 
   exprt &function()
   {
@@ -1473,8 +1496,11 @@ public:
   {
   }
 
-  explicit side_effect_expr_throwt(const irept &exception_list):
-    side_effect_exprt(ID_throw)
+  explicit side_effect_expr_throwt(
+    const irept &exception_list,
+    const typet &type,
+    const source_locationt &loc)
+    : side_effect_exprt(ID_throw, type, loc)
   {
     set(ID_exception_list, exception_list);
   }

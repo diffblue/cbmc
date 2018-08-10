@@ -906,7 +906,7 @@ exprt string_abstractiont::build_unknown(whatt what, bool write)
 
   case whatt::LENGTH:
   case whatt::SIZE:
-    result=side_effect_expr_nondett(type);
+    result = side_effect_expr_nondett(type, source_locationt());
     break;
   }
 

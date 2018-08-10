@@ -245,7 +245,8 @@ private:
       {
         auto assign_instruction = add_instruction();
         assign_instruction->make_assignment(
-          code_assignt(lhs, side_effect_expr_nondett(lhs_type)));
+          code_assignt(
+            lhs, side_effect_expr_nondett(lhs_type, lhs.source_location())));
       }
     }
   }
@@ -304,8 +305,9 @@ protected:
     {
       auto return_instruction = add_instruction();
       return_instruction->make_return();
-      return_instruction->code =
-        code_returnt(side_effect_expr_nondett(function.type.return_type()));
+      return_instruction->code = code_returnt(
+        side_effect_expr_nondett(
+          function.type.return_type(), function_symbol.location));
     }
     auto end_function_instruction = add_instruction();
     end_function_instruction->make_end_function();

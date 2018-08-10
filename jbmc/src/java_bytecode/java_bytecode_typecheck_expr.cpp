@@ -160,6 +160,6 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
             << component_name << "` in class hierarchy" << eom;
 
   // We replace by a non-det of same type
-  side_effect_expr_nondett nondet(expr.type());
+  side_effect_expr_nondett nondet(expr.type(), expr.source_location());
   expr.swap(nondet);
 }

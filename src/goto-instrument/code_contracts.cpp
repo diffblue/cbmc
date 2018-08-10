@@ -131,10 +131,10 @@ static void check_apply_invariants(
   if(!loop_head->is_goto())
   {
     goto_programt::targett jump=havoc_code.add_instruction(GOTO);
-    jump->guard=side_effect_expr_nondett(bool_typet());
+    jump->guard =
+      side_effect_expr_nondett(bool_typet(), loop_head->source_location);
     jump->targets.push_back(loop_end);
     jump->function=loop_head->function;
-    jump->source_location=loop_head->source_location;
   }
 
   // Now havoc at the loop head. Use insert_swap to
@@ -295,7 +295,8 @@ void code_contractst::add_contract_check(
 
   // if(nondet)
   goto_programt::targett g=check.add_instruction();
-  g->make_goto(skip, side_effect_expr_nondett(bool_typet()));
+  g->make_goto(
+    skip, side_effect_expr_nondett(bool_typet(), skip->source_location));
   g->function=skip->function;
   g->source_location=skip->source_location;
 

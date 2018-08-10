@@ -1703,7 +1703,7 @@ void goto_checkt::goto_check(
           if(!base_type_eq(lhs.type(), address_of_expr.type(), ns))
             address_of_expr.make_typecast(lhs.type());
           const if_exprt rhs(
-            side_effect_expr_nondett(bool_typet()),
+            side_effect_expr_nondett(bool_typet(), i.source_location),
             address_of_expr,
             lhs,
             lhs.type());

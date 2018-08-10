@@ -191,7 +191,8 @@ void remove_returnst::do_function_calls(
           if(!is_stub)
             rhs=return_value;
           else
-            rhs=side_effect_expr_nondett(function_call.lhs().type());
+            rhs = side_effect_expr_nondett(
+              function_call.lhs().type(), i_it->source_location);
 
           goto_programt::targett t_a=goto_program.insert_after(i_it);
           t_a->make_assignment();

@@ -122,10 +122,10 @@ codet java_bytecode_instrumentt::throw_exception(
       ID_java,
       symbol_table);
 
-  side_effect_exprt new_instance(ID_java_new, exc_ptr_type);
+  side_effect_exprt new_instance(ID_java_new, exc_ptr_type, original_loc);
   code_assignt assign_new(new_symbol.symbol_expr(), new_instance);
 
-  side_effect_expr_throwt throw_expr;
+  side_effect_expr_throwt throw_expr(irept(), typet(), original_loc);
   throw_expr.copy_to_operands(new_symbol.symbol_expr());
 
   code_blockt throw_code;

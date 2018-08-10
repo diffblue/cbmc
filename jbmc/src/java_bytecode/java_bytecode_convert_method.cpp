@@ -2328,8 +2328,7 @@ void java_bytecode_convert_methodt::convert_athrow(
   }
   else
   {
-    side_effect_expr_throwt throw_expr;
-    throw_expr.add_source_location() = location;
+    side_effect_expr_throwt throw_expr(irept(), typet(), location);
     throw_expr.copy_to_operands(op[0]);
     c = code_expressiont(throw_expr);
   }
@@ -2454,13 +2453,10 @@ void java_bytecode_convert_methodt::convert_multianewarray(
   codet &c,
   exprt::operandst &results)
 {
+  PRECONDITION(!location.get_line().empty());
   const reference_typet ref_type = java_reference_type(arg0.type());
-
-  side_effect_exprt java_new_array(ID_java_new_array, ref_type);
+  side_effect_exprt java_new_array(ID_java_new_array, ref_type, location);
   java_new_array.operands() = op;
-
-  if(!location.get_line().empty())
-    java_new_array.add_source_location() = location;
 
   code_blockt create;
 
@@ -2516,11 +2512,8 @@ void java_bytecode_convert_methodt::convert_newarray(
 
   const reference_typet ref_type = java_array_type(element_type);
 
-  side_effect_exprt java_new_array(ID_java_new_array, ref_type);
+  side_effect_exprt java_new_array(ID_java_new_array, ref_type, location);
   java_new_array.copy_to_operands(op[0]);
-
-  if(!location.get_line().empty())
-    java_new_array.add_source_location() = location;
 
   c = code_blockt();
 
@@ -2543,7 +2536,7 @@ void java_bytecode_convert_methodt::convert_new(
   exprt::operandst &results)
 {
   const reference_typet ref_type = java_reference_type(arg0.type());
-  side_effect_exprt java_new_expr(ID_java_new, ref_type);
+  side_effect_exprt java_new_expr(ID_java_new, ref_type, location);
 
   if(!location.get_line().empty())
     java_new_expr.add_source_location() = location;
