@@ -165,8 +165,6 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
 
   // Add new candidates
 
-  PRECONDITION(!control_dep_call_candidates.empty());
-
   if(from->is_goto() || from->is_assume())
     control_dep_candidates.insert(from);
   else if(from->is_end_function())
