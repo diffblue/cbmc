@@ -23,9 +23,9 @@ To be documented.
 
 The regression tests are contained in the `regression/` folder.
 They are grouped into directories for each of the tools/modules.
-Each of these contains a directory per test case, containing a C or C++
-file that triggers the bug and a `.desc` file that describes
-the tests, expected output and so on. There is a Perl script,
+Each of these contains multiple directories, each of which contains
+input files and one or more`.desc` files that describe what command
+to run, what output is expected and so on. There is a Perl script,
 `test.pl` that is used to invoke the tests as:
 
     ../test.pl -c PATH_TO_CBMC
