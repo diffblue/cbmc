@@ -36,6 +36,12 @@ expr2c_configurationt expr2c_configurationt::default_configuration{true,
                                                                    "TRUE",
                                                                    "FALSE"};
 
+expr2c_configurationt expr2c_configurationt::clean_configuration{false,
+                                                                 false,
+                                                                 false,
+                                                                 "1",
+                                                                 "0"};
+
 /*
 
 Precedences are as follows. Higher values mean higher precedence.

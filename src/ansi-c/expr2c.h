@@ -53,6 +53,10 @@ struct expr2c_configurationt final
   /// This prints a human readable C like syntax that closely mirrors the
   /// internals of the GOTO program
   static expr2c_configurationt default_configuration;
+
+  /// This prints compilable C that loses some of the internal details of the
+  /// GOTO program
+  static expr2c_configurationt clean_configuration;
 };
 
 std::string expr2c(const exprt &expr, const namespacet &ns);
