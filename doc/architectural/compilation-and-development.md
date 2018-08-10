@@ -17,7 +17,29 @@ To be documented.
 
 To be documented.
 
-## Documentation
+## Running tests ##
+
+### Regression tests ###
+
+The regression tests are contained in the `regression/` folder.
+They are grouped into directories for each of the tools/modules.
+Each of these contains a directory per test case, containing a C or C++
+file that triggers the bug and a `.desc` file that describes
+the tests, expected output and so on. There is a Perl script,
+`test.pl` that is used to invoke the tests as:
+
+    ../test.pl -c PATH_TO_CBMC
+
+The `–help` option gives instructions for use and the
+format of the description files.
+
+To be documented further.
+
+### Unit tests ###
+
+To be documented.
+
+## Documentation ##
 
 Apart from the (user-orientated) CBMC user manual and this document, most
 of the rest of the documentation is inline in the code as `doxygen` and
