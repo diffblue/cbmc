@@ -22,7 +22,7 @@ qbf_skizzot::~qbf_skizzot()
 {
 }
 
-tvt qbf_skizzot::l_get(literalt a) const
+tvt qbf_skizzot::l_get(literalt) const
 {
   assert(false);
   return tvt(false);

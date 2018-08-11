@@ -1305,14 +1305,14 @@ bvt float_utilst::sticky_right_shift(
 
 bvt float_utilst::debug1(
   const bvt &src1,
-  const bvt &src2)
+  const bvt &)
 {
   return src1;
 }
 
 bvt float_utilst::debug2(
   const bvt &op0,
-  const bvt &op1)
+  const bvt &)
 {
   return op0;
 }

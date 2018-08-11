@@ -77,9 +77,9 @@ void global_may_alias_domaint::get_rhs_aliases_address_of(
 
 void global_may_alias_domaint::transform(
   locationt from,
-  locationt to,
-  ai_baset &ai,
-  const namespacet &ns)
+  locationt,
+  ai_baset &,
+  const namespacet &)
 {
   if(has_values.is_false())
     return;
@@ -120,8 +120,8 @@ void global_may_alias_domaint::transform(
 
 void global_may_alias_domaint::output(
   std::ostream &out,
-  const ai_baset &ai,
-  const namespacet &ns) const
+  const ai_baset &,
+  const namespacet &) const
 {
   if(has_values.is_known())
   {
@@ -158,8 +158,8 @@ void global_may_alias_domaint::output(
 
 bool global_may_alias_domaint::merge(
   const global_may_alias_domaint &b,
-  locationt from,
-  locationt to)
+  locationt,
+  locationt)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();

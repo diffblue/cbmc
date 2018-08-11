@@ -14,9 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 
 void symex_dereference_statet::dereference_failure(
-  const std::string &property,
-  const std::string &msg,
-  const guardt &guard)
+  const std::string &,
+  const std::string &,
+  const guardt &)
 {
 }
 

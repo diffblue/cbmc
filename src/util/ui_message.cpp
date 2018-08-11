@@ -264,7 +264,7 @@ void ui_message_handlert::ui_msg(
 void ui_message_handlert::xml_ui_msg(
   const std::string &type,
   const std::string &msg1,
-  const std::string &msg2,
+  const std::string &,
   const source_locationt &location)
 {
   xmlt result;
@@ -287,7 +287,7 @@ void ui_message_handlert::xml_ui_msg(
 void ui_message_handlert::json_ui_msg(
   const std::string &type,
   const std::string &msg1,
-  const std::string &msg2,
+  const std::string &,
   const source_locationt &location)
 {
   INVARIANT(json_stream, "JSON stream must be initialized before use");

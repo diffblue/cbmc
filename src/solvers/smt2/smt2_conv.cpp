@@ -4069,7 +4069,7 @@ void smt2_convt::unflatten(
   }
 }
 
-void smt2_convt::convert_overflow(const exprt &expr)
+void smt2_convt::convert_overflow(const exprt &)
 {
   UNREACHABLE;
 }

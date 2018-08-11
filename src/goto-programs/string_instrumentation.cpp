@@ -635,9 +635,9 @@ void string_instrumentationt::do_format_string_write(
 }
 
 void string_instrumentationt::do_strncmp(
-  goto_programt &dest,
-  goto_programt::targett target,
-  code_function_callt &call)
+  goto_programt &,
+  goto_programt::targett,
+  code_function_callt &)
 {
 }
 

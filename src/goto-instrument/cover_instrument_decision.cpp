@@ -18,7 +18,7 @@ Author: Daniel Kroening
 void cover_decision_instrumentert::instrument(
   goto_programt &goto_program,
   goto_programt::targett &i_it,
-  const cover_blocks_baset &basic_blocks) const
+  const cover_blocks_baset &) const
 {
   if(is_non_cover_assertion(i_it))
     i_it->make_skip();

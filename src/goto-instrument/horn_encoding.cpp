@@ -17,6 +17,6 @@ Date: June 2015
 
 void horn_encoding(
   const goto_modelt &,
-  std::ostream &out)
+  std::ostream &)
 {
 }

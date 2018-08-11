@@ -180,7 +180,7 @@ bool ansi_c_languaget::type_to_name(
 
 bool ansi_c_languaget::to_expr(
   const std::string &code,
-  const std::string &module,
+  const std::string &,
   exprt &expr,
   const namespacet &ns)
 {

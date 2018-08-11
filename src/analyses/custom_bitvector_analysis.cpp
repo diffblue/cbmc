@@ -545,7 +545,7 @@ void custom_bitvector_domaint::transform(
 void custom_bitvector_domaint::output(
   std::ostream &out,
   const ai_baset &ai,
-  const namespacet &ns) const
+  const namespacet &) const
 {
   if(has_values.is_known())
   {
@@ -591,8 +591,8 @@ void custom_bitvector_domaint::output(
 
 bool custom_bitvector_domaint::merge(
   const custom_bitvector_domaint &b,
-  locationt from,
-  locationt to)
+  locationt,
+  locationt)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();

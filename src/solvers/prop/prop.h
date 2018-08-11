@@ -82,12 +82,12 @@ public:
   virtual bool cnf_handled_well() const { return true; }
 
   // assumptions
-  virtual void set_assumptions(const bvt &_assumptions) { }
+  virtual void set_assumptions(const bvt &) { }
   virtual bool has_set_assumptions() const { return false; }
 
   // variables
   virtual literalt new_variable()=0;
-  virtual void set_variable_name(literalt a, const irep_idt &name) { }
+  virtual void set_variable_name(literalt, const irep_idt &) { }
   virtual size_t no_variables() const=0;
   bvt new_variables(std::size_t width);
 
@@ -108,10 +108,10 @@ public:
   virtual bool has_is_in_conflict() const { return false; }
 
   // an incremental solver may remove any variables that aren't frozen
-  virtual void set_frozen(literalt a) { }
+  virtual void set_frozen(literalt) { }
 
   // Resource limits:
-  virtual void set_time_limit_seconds(uint32_t lim)
+  virtual void set_time_limit_seconds(uint32_t)
   {
     warning() << "CPU limit ignored (not implemented)" << eom;
   }

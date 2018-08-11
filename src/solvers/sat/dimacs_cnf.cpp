@@ -19,12 +19,12 @@ dimacs_cnft::dimacs_cnft():break_lines(false)
 {
 }
 
-void dimacs_cnft::set_assignment(literalt a, bool value)
+void dimacs_cnft::set_assignment(literalt, bool)
 {
   UNIMPLEMENTED;
 }
 
-bool dimacs_cnft::is_in_conflict(literalt l) const
+bool dimacs_cnft::is_in_conflict(literalt) const
 {
   UNREACHABLE;
   return false;

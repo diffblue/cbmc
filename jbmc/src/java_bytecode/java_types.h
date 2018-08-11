@@ -93,7 +93,7 @@ inline annotated_typet &to_annotated_type(typet &type)
 }
 
 template <>
-inline bool can_cast_type<annotated_typet>(const typet &type)
+inline bool can_cast_type<annotated_typet>(const typet &)
 {
   return true;
 }

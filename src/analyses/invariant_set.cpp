@@ -884,7 +884,7 @@ exprt invariant_sett::get_constant(const exprt &expr) const
 
 std::string inv_object_storet::to_string(
   unsigned a,
-  const irep_idt &identifier) const
+  const irep_idt &) const
 {
   return id2string(map[a]);
 }

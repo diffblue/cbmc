@@ -52,7 +52,7 @@ void bv_arithmetict::print(std::ostream &out) const
   out << to_ansi_c_string();
 }
 
-std::string bv_arithmetict::format(const format_spect &format_spec) const
+std::string bv_arithmetict::format(const format_spect &) const
 {
   std::string result;
 

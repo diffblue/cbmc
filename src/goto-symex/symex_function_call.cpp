@@ -18,9 +18,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 
 bool goto_symext::get_unwind_recursion(
-  const irep_idt &identifier,
-  const unsigned thread_nr,
-  unsigned unwind)
+  const irep_idt &,
+  const unsigned,
+  unsigned)
 {
   return false;
 }

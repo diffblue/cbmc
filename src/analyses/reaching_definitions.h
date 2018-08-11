@@ -119,8 +119,8 @@ public:
 
   void output(
     std::ostream &out,
-    const ai_baset &ai,
-    const namespacet &ns) const final override
+    const ai_baset &,
+    const namespacet &) const final override
   {
     output(out);
   }

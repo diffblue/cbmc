@@ -2797,7 +2797,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
   }
 }
 
-void c_typecheck_baset::typecheck_expr_constant(exprt &expr)
+void c_typecheck_baset::typecheck_expr_constant(exprt &)
 {
   // nothing to do
 }

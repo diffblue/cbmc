@@ -280,8 +280,8 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
 }
 
 exprt smt2_parsert::function_application(
-  const irep_idt &identifier,
-  const exprt::operandst &op)
+  const irep_idt &,
+  const exprt::operandst &)
 {
   #if 0
   const auto &f = id_map[identifier];

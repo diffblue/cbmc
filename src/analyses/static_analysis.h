@@ -43,8 +43,8 @@ public:
   // will go away,
   // to be replaced by a factory class option to static_analysist
   virtual void initialize(
-    const namespacet &ns,
-    locationt l)
+    const namespacet &,
+    locationt)
   {
   }
 
@@ -62,8 +62,8 @@ public:
     locationt to)=0;
 
   virtual void output(
-    const namespacet &ns,
-    std::ostream &out) const
+    const namespacet &,
+    std::ostream &) const
   {
   }
 
@@ -71,8 +71,8 @@ public:
 
   // will go away
   virtual void get_reference_set(
-    const namespacet &ns,
-    const exprt &expr,
+    const namespacet &,
+    const exprt &,
     std::list<exprt> &dest)
   {
     // dummy, overload me!
@@ -363,9 +363,9 @@ private:
 
   // not implemented in sequential analyses
   virtual bool merge_shared(
-    statet &a,
-    const statet &b,
-    goto_programt::const_targett to)
+    statet &,
+    const statet &,
+    goto_programt::const_targett)
   {
     throw "not implemented";
   }

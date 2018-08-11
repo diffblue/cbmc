@@ -319,7 +319,7 @@ bool ai_baset::do_function_call(
   locationt l_call, locationt l_return,
   const goto_functionst &goto_functions,
   const goto_functionst::function_mapt::const_iterator f_it,
-  const exprt::operandst &arguments,
+  const exprt::operandst &,
   const namespacet &ns)
 {
   // initialize state, if necessary

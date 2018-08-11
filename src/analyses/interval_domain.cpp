@@ -22,8 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void interval_domaint::output(
   std::ostream &out,
-  const ai_baset &ai,
-  const namespacet &ns) const
+  const ai_baset &,
+  const namespacet &) const
 {
   if(bottom)
   {
@@ -59,7 +59,7 @@ void interval_domaint::output(
 void interval_domaint::transform(
   locationt from,
   locationt to,
-  ai_baset &ai,
+  ai_baset &,
   const namespacet &ns)
 {
   const goto_programt::instructiont &instruction=*from;

@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void invariant_set_domaint::transform(
   locationt from_l,
   locationt to_l,
-  ai_baset &ai,
+  ai_baset &,
   const namespacet &ns)
 {
   switch(from_l->type)

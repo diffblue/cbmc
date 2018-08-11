@@ -30,8 +30,8 @@ public:
 
   bool merge(
     const is_threaded_domaint &src,
-    locationt from,
-    locationt to)
+    locationt,
+    locationt)
   {
     INVARIANT(src.reachable,
               "Abstract states are only merged at reachable locations");
@@ -47,7 +47,7 @@ public:
   }
 
   void
-  transform(locationt from, locationt to, ai_baset &ai, const namespacet &ns)
+  transform(locationt from, locationt, ai_baset &, const namespacet &)
     final override
   {
     INVARIANT(reachable,

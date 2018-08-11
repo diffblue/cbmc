@@ -25,7 +25,7 @@ public:
 
   // overloading
 
-  bool merge(const value_set_domain_templatet<VST> &other, locationt to)
+  bool merge(const value_set_domain_templatet<VST> &other, locationt)
   {
     return value_set.make_union(other.value_set);
   }
@@ -38,7 +38,7 @@ public:
   }
 
   virtual void initialize(
-    const namespacet &ns,
+    const namespacet &,
     locationt l)
   {
     value_set.clear();

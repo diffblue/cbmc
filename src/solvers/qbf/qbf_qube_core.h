@@ -49,7 +49,7 @@ public:
 
   virtual modeltypet m_get(literalt a) const;
 
-  virtual const exprt f_get(literalt l)
+  virtual const exprt f_get(literalt)
   {
     throw "qube does not support full certificates.";
   }

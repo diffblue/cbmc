@@ -565,7 +565,7 @@ void c_typecheck_baset::typecheck_gcc_switch_case_range(codet &code)
   make_constant(code.op1());
 }
 
-void c_typecheck_baset::typecheck_gcc_local_label(codet &code)
+void c_typecheck_baset::typecheck_gcc_local_label(codet &)
 {
   // these are just declarations, e.g.,
   // __label__ here, there;

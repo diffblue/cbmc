@@ -26,7 +26,7 @@ void symex_slicet::get_symbols(const exprt &expr)
     depends.insert(to_symbol_expr(expr).get_identifier());
 }
 
-void symex_slicet::get_symbols(const typet &type)
+void symex_slicet::get_symbols(const typet &)
 {
   // TODO
 }

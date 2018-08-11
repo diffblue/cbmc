@@ -22,7 +22,7 @@ qbf_qubet::~qbf_qubet()
 {
 }
 
-tvt qbf_qubet::l_get(literalt a) const
+tvt qbf_qubet::l_get(literalt) const
 {
   assert(false);
   return tvt(false);

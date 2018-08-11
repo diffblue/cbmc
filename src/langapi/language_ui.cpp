@@ -140,7 +140,7 @@ void language_uit::show_symbol_table(bool brief)
   }
 }
 
-void language_uit::show_symbol_table_xml_ui(bool brief)
+void language_uit::show_symbol_table_xml_ui(bool)
 {
   error() << "cannot show symbol table in this format" << eom;
 }

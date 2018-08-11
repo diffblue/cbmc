@@ -141,7 +141,7 @@ public:
   enum class get_modet { LHS_W, READ };
 
   virtual void get_objects_rec(
-    goto_programt::const_targett _target,
+    goto_programt::const_targett,
     get_modet mode,
     const exprt &expr)
   {

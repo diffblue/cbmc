@@ -44,16 +44,16 @@ public:
   }
 
   virtual void output(
-    const namespacet &ns,
-    std::ostream &out) const
+    const namespacet &,
+    std::ostream &) const
   {
   }
 
   typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
   virtual void get_reference_set(
-    const namespacet &ns,
-    const exprt &expr,
+    const namespacet &,
+    const exprt &,
     expr_sett &expr_set)
   {
     // dummy, overload me!
@@ -95,8 +95,7 @@ public:
   {
   }
 
-  virtual void initialize(
-    const goto_programt &goto_program)
+  virtual void initialize(const goto_programt &)
   {
     if(!initialized)
     {
@@ -104,8 +103,7 @@ public:
     }
   }
 
-  virtual void initialize(
-    const goto_functionst &goto_functions)
+  virtual void initialize(const goto_functionst &)
   {
     if(!initialized)
     {

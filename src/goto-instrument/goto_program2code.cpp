@@ -1403,7 +1403,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
 
 goto_programt::const_targett goto_program2codet::convert_throw(
     goto_programt::const_targett target,
-    codet &dest)
+    codet &)
 {
   // this isn't really clear as throw is not supported in expr2cpp either
   UNREACHABLE;
@@ -1412,8 +1412,8 @@ goto_programt::const_targett goto_program2codet::convert_throw(
 
 goto_programt::const_targett goto_program2codet::convert_catch(
     goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+    goto_programt::const_targett,
+    codet &)
 {
   // this isn't really clear as catch is not supported in expr2cpp either
   UNREACHABLE;

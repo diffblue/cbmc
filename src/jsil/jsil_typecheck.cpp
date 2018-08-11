@@ -922,7 +922,7 @@ bool jsil_typecheck(
 bool jsil_typecheck(
   exprt &expr,
   message_handlert &message_handler,
-  const namespacet &ns)
+  const namespacet &)
 {
   const unsigned errors_before=
     message_handler.get_message_count(messaget::M_ERROR);

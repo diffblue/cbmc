@@ -31,8 +31,8 @@ public:
 
   bool merge(
     const invariant_set_domaint &other,
-    locationt from,
-    locationt to)
+    locationt,
+    locationt)
   {
     bool changed=invariant_set.make_union(other.invariant_set) ||
                  has_values.is_false();
@@ -43,8 +43,8 @@ public:
 
   void output(
     std::ostream &out,
-    const ai_baset &ai,
-    const namespacet &ns) const final override
+    const ai_baset &,
+    const namespacet &) const final override
   {
     if(has_values.is_known())
       out << has_values.to_string() << '\n';

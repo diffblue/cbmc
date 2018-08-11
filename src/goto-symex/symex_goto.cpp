@@ -539,9 +539,9 @@ void goto_symext::loop_bound_exceeded(
 }
 
 bool goto_symext::get_unwind(
-  const symex_targett::sourcet &source,
-  const goto_symex_statet::call_stackt &context,
-  unsigned unwind)
+  const symex_targett::sourcet &,
+  const goto_symex_statet::call_stackt &,
+  unsigned)
 {
   // by default, we keep going
   return false;

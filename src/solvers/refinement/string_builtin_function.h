@@ -470,7 +470,7 @@ public:
   }
 
   optionalt<exprt>
-  eval(const std::function<exprt(const exprt &)> &get_value) const override
+  eval(const std::function<exprt(const exprt &)> &) const override
   {
     return {};
   }

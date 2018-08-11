@@ -47,8 +47,8 @@ protected:
 public:
   bool merge(
     const interval_domaint &b,
-    locationt from,
-    locationt to)
+    locationt,
+    locationt)
   {
     return join(b);
   }

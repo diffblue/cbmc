@@ -20,8 +20,8 @@ Date: January 2010
 
 void uninitialized_domaint::transform(
   locationt from,
-  locationt to,
-  ai_baset &ai,
+  locationt,
+  ai_baset &,
   const namespacet &ns)
 {
   if(has_values.is_false())
@@ -67,8 +67,8 @@ void uninitialized_domaint::assign(const exprt &lhs)
 
 void uninitialized_domaint::output(
   std::ostream &out,
-  const ai_baset &ai,
-  const namespacet &ns) const
+  const ai_baset &,
+  const namespacet &) const
 {
   if(has_values.is_known())
     out << has_values.to_string() << '\n';
@@ -82,8 +82,8 @@ void uninitialized_domaint::output(
 /// \return returns true iff there is something new
 bool uninitialized_domaint::merge(
   const uninitialized_domaint &other,
-  locationt from,
-  locationt to)
+  locationt,
+  locationt)
 {
   auto old_uninitialized=uninitialized.size();
 

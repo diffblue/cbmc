@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 /// determine whether a variable is in the final conflict
-bool prop_convt::is_in_conflict(literalt l) const
+bool prop_convt::is_in_conflict(literalt) const
 {
   UNREACHABLE;
   return false;
