@@ -80,9 +80,6 @@ phases:
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
         cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C jbmc/unit test BUILD_ENV=MSVC" '
 
-artifacts:
-  files:
-
 cache:
   paths:
     - 'c:\clcache\**\*'
