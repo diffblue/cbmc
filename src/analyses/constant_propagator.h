@@ -78,7 +78,7 @@ public:
     bool is_bottom;
 
     bool merge(const valuest &src);
-    bool meet(const valuest &src);
+    bool meet(const valuest &src, const namespacet &ns);
 
     // set whole state
 
