@@ -27,8 +27,6 @@ phases:
       - make -C jbmc/unit test
       - make -C jbmc/regression test
       - echo Build completed on `date`
-artifacts:
-  files:
 cache:
   paths:
     - '/var/cache/apt/**/*'
