@@ -75,14 +75,12 @@ into the `doc/html` directory when running `doxygen` from `src`.
 
 ## `regression/` ##
 
-The `regression/` directory contains the test suites.
-They are grouped into directories for each of the tools/modules.
-Each of these contains a directory per test case, containing a C or C++
-file that triggers the bug and a `.desc` file that describes
-the tests, expected output and so on. There is a Perl script,
-`test.pl` that is used to invoke the tests as:
+The `regression/` directory contains the regression test suites. See
+\ref compilation-and-development for information on how to run and
+develop regression tests.
 
-    ../test.pl -c PATH_TO_CBMC
+## `unit/` ##
 
-The `–help` option gives instructions for use and the
-format of the description files.
+The `unit/` directory contains the unit test suites. See
+\ref compilation-and-development for information on how to run and
+develop unit tests.
