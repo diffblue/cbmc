@@ -105,7 +105,7 @@ public:
 
     void set_to(const irep_idt &lhs, const exprt &rhs)
     {
-      replace_const.expr_map[lhs]=rhs;
+      replace_const.get_expr_map()[lhs] = rhs;
       is_bottom=false;
     }
 
@@ -129,7 +129,7 @@ public:
 
     bool is_empty() const
     {
-      return replace_const.expr_map.empty();
+      return replace_const.empty();
     }
 
     void output(std::ostream &out, const namespacet &ns) const;

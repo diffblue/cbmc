@@ -298,8 +298,7 @@ bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
     return false;
 
   if(expr.id()==ID_symbol)
-    if(replace_const.expr_map.find(to_symbol_expr(expr).get_identifier())==
-       replace_const.expr_map.end())
+    if(!replace_const.replaces_symbol(to_symbol_expr(expr).get_identifier()))
       return false;
 
   if(expr.id()==ID_index)
@@ -337,8 +336,7 @@ bool constant_propagator_domaint::valuest::is_constant_address_of(
 /// Do not call this when iterating over replace_const.expr_map!
 bool constant_propagator_domaint::valuest::set_to_top(const irep_idt &id)
 {
-  replace_symbolt::expr_mapt::size_type n_erased=
-    replace_const.expr_map.erase(id);
+  const auto n_erased = replace_const.erase(id);
 
   INVARIANT(n_erased==0 || !is_bottom, "bottom should have no elements at all");
 
@@ -351,7 +349,7 @@ void constant_propagator_domaint::valuest::set_dirty_to_top(
   const namespacet &ns)
 {
   typedef replace_symbolt::expr_mapt expr_mapt;
-  expr_mapt &expr_map=replace_const.expr_map;
+  expr_mapt &expr_map = replace_const.get_expr_map();
 
   for(expr_mapt::iterator it=expr_map.begin();
       it!=expr_map.end();)
@@ -377,19 +375,19 @@ void constant_propagator_domaint::valuest::output(
   if(is_bottom)
   {
     out << "  bottom\n";
-    DATA_INVARIANT(replace_const.expr_map.empty(),
+    DATA_INVARIANT(is_empty(),
                    "If the domain is bottom, the map must be empty");
     return;
   }
 
   INVARIANT(!is_bottom, "Have handled bottom");
-  if(replace_const.expr_map.empty())
+  if(is_empty())
   {
     out << "top\n";
     return;
   }
 
-  for(const auto &p : replace_const.expr_map)
+  for(const auto &p : replace_const.get_expr_map())
   {
     out << ' ' << p.first << "=" << from_expr(ns, p.first, p.second) << '\n';
   }
@@ -424,19 +422,20 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
 
   bool changed=false;
 
-  replace_symbolt::expr_mapt &expr_map=replace_const.expr_map;
-  const replace_symbolt::expr_mapt &src_expr_map=src.replace_const.expr_map;
-
   // handle top
-  if(src_expr_map.empty())
+  if(src.is_empty())
   {
     // change if it was not top
-    changed=!expr_map.empty();
+    changed = !is_empty();
 
     set_to_top();
 
     return changed;
   }
+
+  replace_symbolt::expr_mapt &expr_map = replace_const.get_expr_map();
+  const replace_symbolt::expr_mapt &src_expr_map =
+    src.replace_const.get_expr_map();
 
   // remove those that are
   // - different in src
@@ -484,12 +483,12 @@ bool constant_propagator_domaint::valuest::meet(
 
   bool changed=false;
 
-  for(const auto &m : src.replace_const.expr_map)
+  for(const auto &m : src.replace_const.get_expr_map())
   {
-    replace_symbolt::expr_mapt::iterator
-      c_it=replace_const.expr_map.find(m.first);
+    replace_symbolt::expr_mapt::const_iterator c_it =
+      replace_const.get_expr_map().find(m.first);
 
-    if(c_it!=replace_const.expr_map.end())
+    if(c_it != replace_const.get_expr_map().end())
     {
       if(c_it->second!=m.second)
       {

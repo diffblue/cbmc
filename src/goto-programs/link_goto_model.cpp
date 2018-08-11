@@ -140,7 +140,7 @@ static bool link_functions(
       rename_symbols_in_function(dest_it->second, final_id, macro_application);
     }
 
-  if(!object_type_updates.expr_map.empty())
+  if(!object_type_updates.empty())
   {
     Forall_goto_functions(dest_it, dest_functions)
       Forall_goto_program_instructions(iit, dest_it->second.body)
