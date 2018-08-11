@@ -9,7 +9,7 @@
 #include <testing-utils/catch.hpp>
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_trace.h>
-#include <iostream>
+#include <sstream>
 
 SCENARIO(
   "Output trace with nil lhs object",
@@ -22,5 +22,16 @@ SCENARIO(
   goto_trace_stept step;
   step.pc = instructions.begin();
   step.type = goto_trace_stept::typet::ATOMIC_BEGIN;
-  step.output(ns, std::cout);
+
+  std::ostringstream oss;
+  step.output(ns, oss);
+
+  std::istringstream iss(oss.str());
+  std::string line;
+  std::getline(iss, line);
+  REQUIRE(line == "*** ATOMIC_BEGIN");
+  std::getline(iss, line);
+  REQUIRE(line == "OTHER");
+  std::getline(iss, line);
+  REQUIRE(line.empty());
 }
