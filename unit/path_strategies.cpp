@@ -314,6 +314,7 @@ void _check_with_strategy(
   }
 
   ui_message_handlert mh(cmdline, "path-explore");
+  mh.set_verbosity(0);
   messaget log(mh);
 
   path_strategy_choosert chooser;
