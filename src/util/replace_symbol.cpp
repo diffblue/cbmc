@@ -27,9 +27,19 @@ void replace_symbolt::insert(
     old_expr.get_identifier(), new_expr));
 }
 
-bool replace_symbolt::replace(
-  exprt &dest,
-  const bool replace_with_const) const
+bool replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
+{
+  expr_mapt::const_iterator it = expr_map.find(s.get_identifier());
+
+  if(it == expr_map.end())
+    return true;
+
+  static_cast<exprt &>(s) = it->second;
+
+  return false;
+}
+
+bool replace_symbolt::replace(exprt &dest) const
 {
   bool result=true; // unchanged
 
@@ -49,14 +59,14 @@ bool replace_symbolt::replace(
   {
     member_exprt &me=to_member_expr(dest);
 
-    if(!replace(me.struct_op(), replace_with_const)) // Could give non l-value.
+    if(!replace(me.struct_op()))
       result=false;
   }
   else if(dest.id()==ID_index)
   {
     index_exprt &ie=to_index_expr(dest);
 
-    if(!replace(ie.array(), replace_with_const)) // Could give non l-value.
+    if(!replace(ie.array()))
       result=false;
 
     if(!replace(ie.index()))
@@ -66,27 +76,13 @@ bool replace_symbolt::replace(
   {
     address_of_exprt &aoe=to_address_of_expr(dest);
 
-    if(!replace(aoe.object(), false))
+    if(!replace(aoe.object()))
       result=false;
   }
   else if(dest.id()==ID_symbol)
   {
-    const symbol_exprt &s=to_symbol_expr(dest);
-
-    expr_mapt::const_iterator it=
-      expr_map.find(s.get_identifier());
-
-    if(it!=expr_map.end())
-    {
-      const exprt &e=it->second;
-
-      if(!replace_with_const && e.is_constant())  // Would give non l-value.
-        return true;
-
-      dest=e;
-
+    if(!replace_symbol_expr(to_symbol_expr(dest)))
       return false;
-    }
   }
   else
   {
@@ -251,4 +247,86 @@ void unchecked_replace_symbolt::insert(
   const exprt &new_expr)
 {
   expr_map.emplace(old_expr.get_identifier(), new_expr);
+}
+
+bool address_of_aware_replace_symbolt::replace(exprt &dest) const
+{
+  const exprt &const_dest(dest);
+  if(!require_lvalue && const_dest.id() != ID_address_of)
+    return unchecked_replace_symbolt::replace(dest);
+
+  bool result = true; // unchanged
+
+  // first look at type
+  if(have_to_replace(const_dest.type()))
+  {
+    const set_require_lvalue_and_backupt backup(require_lvalue, false);
+    if(!unchecked_replace_symbolt::replace(dest.type()))
+      result = false;
+  }
+
+  // now do expression itself
+
+  if(!have_to_replace(dest))
+    return result;
+
+  if(dest.id() == ID_index)
+  {
+    index_exprt &ie = to_index_expr(dest);
+
+    // Could yield non l-value.
+    if(!replace(ie.array()))
+      result = false;
+
+    const set_require_lvalue_and_backupt backup(require_lvalue, false);
+    if(!replace(ie.index()))
+      result = false;
+  }
+  else if(dest.id() == ID_address_of)
+  {
+    address_of_exprt &aoe = to_address_of_expr(dest);
+
+    const set_require_lvalue_and_backupt backup(require_lvalue, true);
+    if(!replace(aoe.object()))
+      result = false;
+  }
+  else
+  {
+    if(!unchecked_replace_symbolt::replace(dest))
+      return false;
+  }
+
+  const set_require_lvalue_and_backupt backup(require_lvalue, false);
+
+  const typet &c_sizeof_type =
+    static_cast<const typet &>(dest.find(ID_C_c_sizeof_type));
+  if(c_sizeof_type.is_not_nil() && have_to_replace(c_sizeof_type))
+    result &= unchecked_replace_symbolt::replace(
+      static_cast<typet &>(dest.add(ID_C_c_sizeof_type)));
+
+  const typet &va_arg_type =
+    static_cast<const typet &>(dest.find(ID_C_va_arg_type));
+  if(va_arg_type.is_not_nil() && have_to_replace(va_arg_type))
+    result &= unchecked_replace_symbolt::replace(
+      static_cast<typet &>(dest.add(ID_C_va_arg_type)));
+
+  return result;
+}
+
+bool address_of_aware_replace_symbolt::replace_symbol_expr(
+  symbol_exprt &s) const
+{
+  expr_mapt::const_iterator it = expr_map.find(s.get_identifier());
+
+  if(it == expr_map.end())
+    return true;
+
+  const exprt &e = it->second;
+
+  if(require_lvalue && e.is_constant()) // Would give non l-value.
+    return true;
+
+  static_cast<exprt &>(s) = e;
+
+  return false;
 }

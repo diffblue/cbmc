@@ -81,7 +81,7 @@ public:
   struct valuest
   {
     // maps variables to constants
-    replace_symbolt replace_const;
+    address_of_aware_replace_symbolt replace_const;
     bool is_bottom = true;
 
     bool merge(const valuest &src);
