@@ -1063,6 +1063,14 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_remove_const_function_pointers_only();
   }
 
+  if(cmdline.isset("replace-calls"))
+  {
+    do_indirect_call_and_rtti_removal();
+
+    replace_callst replace_calls;
+    replace_calls(goto_model, cmdline.get_values("replace-calls"));
+  }
+
   if(cmdline.isset("function-inline"))
   {
     std::string function=cmdline.get_value("function-inline");
@@ -1628,6 +1636,7 @@ void goto_instrument_parse_optionst::help()
     " --model-argc-argv <n>        model up to <n> command line arguments\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
+    HELP_REPLACE_CALLS
     "\n"
     "Other options:\n"
     " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)

@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_const_function_pointers.h>
+#include <goto-programs/replace_calls.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
@@ -97,7 +98,9 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_REMOVE_CALLS_NO_BODY \
   OPT_REPLACE_FUNCTION_BODY \
   OPT_GOTO_PROGRAM_STATS \
-  "(show-local-safe-pointers)(show-safe-dereferences)"
+  "(show-local-safe-pointers)(show-safe-dereferences)" \
+  OPT_REPLACE_CALLS \
+  // empty last line
 
 // clang-format on
 
