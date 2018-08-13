@@ -5,23 +5,31 @@
 
 ## language_uit, language_filest, languaget classes: ##
 
-### Purpose ###
-
-To be documented.
+See \ref langapi.
 
 ### Parse ###
 
-To be documented.
+See \ref language_uit::parse().
 
 ### Typecheck ###
 
-To be documented.
+See \ref language_uit::typecheck().
 
 ### Final ###
 
-To be documented.
+See \ref language_uit::final().
+
+## C ##
+
+See \ref ansi-c.
+
+## C++ ##
+
+See \ref cpp.
 
 ## Java bytecode ##
+
+See \ref java_bytecode.
 
 ### Explain how a java program / class is represented in a .class ###
 

@@ -5,4 +5,4 @@
 
 ## equation ##
 
-To be documented.
+See \ref symex-overview.

@@ -3,6 +3,6 @@
 
 \author 
 
-## Symex class ##
+## Symbolic execution ##
 
-To be documented.
+See \ref symex-overview.

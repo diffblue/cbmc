@@ -5,35 +5,7 @@
 
 ## goto_programt ##
 
-See \ref goto_programt.
-
-### instructiont ###
-
-See [instructiont](\ref goto_programt::instructiont).
-
-#### Types, motivation of each type #####
-
-See [instructiont](\ref goto_programt::instructiont).
-
-#### Accepted code (codet) values ####
-
-To be documented.
-
-#### Accepted guard (exprt) values ####
-
-To be documented.
-
-## goto_functionst ##
-
-\ref goto_functionst is a map from function names to function bodies (CFGs).
-
-To be documented.
-
-## goto_modelt ##
-
-\ref goto_modelt is a compilation unit.
-
-To be documented.
+See \ref goto-programs, \ref goto_programt and [instructiont](\ref goto_programt::instructiont).
 
 ## Example: ##
 

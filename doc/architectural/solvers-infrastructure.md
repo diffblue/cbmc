@@ -3,6 +3,8 @@
 
 \author
 
+See \ref solvers-overview.
+
 ## Flattening ##
 
 To be documented.
