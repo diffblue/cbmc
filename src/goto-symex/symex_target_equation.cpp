@@ -407,9 +407,8 @@ void symex_target_equationt::convert_assignments(
       decision_procedure.conditional_output(
         decision_procedure.debug(),
         [&step](messaget::mstreamt &mstream) {
-          std::ostringstream oss;
-          step.output(oss);
-          mstream << oss.str() << messaget::eom;
+          step.output(mstream);
+          mstream << messaget::eom;
         });
 
       decision_procedure.set_to_true(step.cond_expr);
@@ -456,9 +455,8 @@ void symex_target_equationt::convert_guards(
       prop_conv.conditional_output(
         prop_conv.debug(),
         [&step](messaget::mstreamt &mstream) {
-          std::ostringstream oss;
-          step.output(oss);
-          mstream << oss.str() << messaget::eom;
+          step.output(mstream);
+          mstream << messaget::eom;
         });
 
       try
@@ -491,9 +489,8 @@ void symex_target_equationt::convert_assumptions(
         prop_conv.conditional_output(
           prop_conv.debug(),
           [&step](messaget::mstreamt &mstream) {
-            std::ostringstream oss;
-            step.output(oss);
-            mstream << oss.str() << messaget::eom;
+            step.output(mstream);
+            mstream << messaget::eom;
           });
 
         try
@@ -527,9 +524,8 @@ void symex_target_equationt::convert_goto_instructions(
         prop_conv.conditional_output(
           prop_conv.debug(),
           [&step](messaget::mstreamt &mstream) {
-            std::ostringstream oss;
-            step.output(oss);
-            mstream << oss.str() << messaget::eom;
+            step.output(mstream);
+            mstream << messaget::eom;
           });
 
         try
@@ -562,9 +558,8 @@ void symex_target_equationt::convert_constraints(
         decision_procedure.conditional_output(
           decision_procedure.debug(),
           [&step](messaget::mstreamt &mstream) {
-            std::ostringstream oss;
-            step.output(oss);
-            mstream << oss.str() << messaget::eom;
+            step.output(mstream);
+            mstream << messaget::eom;
           });
 
         try
@@ -626,9 +621,8 @@ void symex_target_equationt::convert_assertions(
       prop_conv.conditional_output(
         prop_conv.debug(),
         [&step](messaget::mstreamt &mstream) {
-          std::ostringstream oss;
-          step.output(oss);
-          mstream << oss.str() << messaget::eom;
+          step.output(mstream);
+          mstream << messaget::eom;
         });
 
       implies_exprt implication(
