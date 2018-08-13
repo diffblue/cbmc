@@ -13,7 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void goto_symext::symex_catch(statet &)
 {
-  UNREACHABLE;
+  // TODO: uncomment this line when TG-4667 is done
+  // UNREACHABLE;
   // there are two variants: 'push' and 'pop'
 
   #if 0

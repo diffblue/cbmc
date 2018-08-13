@@ -505,7 +505,8 @@ void goto_symext::symex_fkt(
   statet &,
   const code_function_callt &)
 {
-  UNREACHABLE;
+  // TODO: uncomment this line when TG-4667 is done
+  // UNREACHABLE;
   #if 0
   exprt new_fc(ID_function, fc.type());
 
