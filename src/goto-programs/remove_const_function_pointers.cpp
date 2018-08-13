@@ -12,6 +12,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include "remove_const_function_pointers.h"
 
 #include <util/arith_tools.h>
+#include <util/format_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -19,8 +20,11 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include "goto_functions.h"
 
 #define LOG(message, irep) \
-  debug() << "Case " << __LINE__ << " : " << message << "\n" \
-          << irep.pretty() << eom;
+  do { \
+    debug().source_location = irep.source_location(); \
+    debug() << message << ": " << format(irep) << eom; \
+  } \
+  while(0)
 
 /// To take a function call on a function pointer, and if possible resolve it to
 /// a small collection of possible values.
