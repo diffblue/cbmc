@@ -535,6 +535,7 @@ refined_string_exprt java_string_library_preprocesst::decl_string_expr(
 /// add symbols with prefix cprover_string_length and cprover_string_data and
 /// construct a string_expr from them.
 /// \param loc: a location in the program
+/// \param function_id: name of the function containing the string
 /// \param symbol_table: symbol table
 /// \param code: code block to which allocation instruction will be added
 /// \return a new string_expr
@@ -648,6 +649,7 @@ codet java_string_library_preprocesst::code_return_function_application(
 /// Declare a fresh symbol of type array of character with infinite size.
 /// \param symbol_table: the symbol table
 /// \param loc: source location
+/// \param function_id: name of the function containing the array
 /// \param code [out] : code block where the declaration gets added
 /// \return created symbol expression
 exprt make_nondet_infinite_char_array(
@@ -660,7 +662,7 @@ exprt make_nondet_infinite_char_array(
     java_char_type(), infinity_exprt(java_int_type()));
   const symbolt data_sym = get_fresh_aux_symbol(
     array_type,
-    "nondet_infinite_array",
+    id2string(function_id),
     "nondet_infinite_array",
     loc,
     ID_java,
@@ -941,6 +943,7 @@ java_string_library_preprocesst::string_literal_to_string_expr(
 /// \param type: type of the function call
 /// \param loc: location in the program_invocation_name
 /// \param symbol_table: symbol table
+/// \param function_id: unused
 /// \return Code corresponding to:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// IF arg->@class_identifier == "java.lang.String"
@@ -981,7 +984,12 @@ codet java_string_library_preprocesst::make_equals_function_code(
     code_blockt instance_case;
     // Check content equality
     const symbolt string_equals_sym = get_fresh_aux_symbol(
-      return_type, "string_equals", "str_eq", loc, ID_java, symbol_table);
+      return_type,
+      id2string(function_id),
+      "str_eq",
+      loc,
+      ID_java,
+      symbol_table);
     const symbol_exprt string_equals = string_equals_sym.symbol_expr();
     instance_case.add(code_declt(string_equals), loc);
     const exprt::operandst args =
@@ -1736,6 +1744,7 @@ codet java_string_library_preprocesst::make_copy_string_code(
 /// object.
 /// \param type: type of the function
 /// \param loc: location in the source
+/// \param function_id: unused
 /// \param symbol_table: symbol table
 /// \return Code corresponding to:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1749,6 +1758,8 @@ codet java_string_library_preprocesst::make_copy_constructor_code(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table)
 {
+  (void)function_id;
+
   // Code for the output
   code_blockt code;
 
@@ -1775,6 +1786,7 @@ codet java_string_library_preprocesst::make_copy_constructor_code(
 /// count instead of end index
 /// \param type: type of the function call
 /// \param loc: location in the program_invocation_name
+/// \param function_id: unused
 /// \param symbol_table: symbol table
 /// \return code implementing String intitialization from a char array and
 ///         arguments offset and end.
@@ -1784,6 +1796,8 @@ codet java_string_library_preprocesst::make_init_from_array_code(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table)
 {
+  (void)function_id;
+
   // Code for the output
   code_blockt code;
 
@@ -1819,6 +1833,7 @@ codet java_string_library_preprocesst::make_init_from_array_code(
 /// Generates code for the String.length method
 /// \param type: type of the function
 /// \param loc: location in the source
+/// \param function_id: unused
 /// \param symbol_table: symbol table
 /// \return Code corresponding to:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1832,6 +1847,8 @@ codet java_string_library_preprocesst::make_string_length_code(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table)
 {
+  (void)function_id;
+
   code_typet::parameterst params=type.parameters();
   symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
   dereference_exprt deref=
