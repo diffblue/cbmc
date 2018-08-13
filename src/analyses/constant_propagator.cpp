@@ -16,11 +16,12 @@ Author: Peter Schrammel
 #include <util/format_expr.h>
 #endif
 
-#include <util/ieee_float.h>
-#include <util/find_symbols.h>
 #include <util/arith_tools.h>
-#include <util/simplify_expr.h>
+#include <util/base_type.h>
 #include <util/cprover_prefix.h>
+#include <util/find_symbols.h>
+#include <util/ieee_float.h>
+#include <util/simplify_expr.h>
 
 #include <langapi/language_util.h>
 
@@ -46,7 +47,12 @@ void constant_propagator_domaint::assign_rec(
   partial_evaluate(tmp, ns);
 
   if(tmp.is_constant())
+  {
+    DATA_INVARIANT(
+      base_type_eq(ns.lookup(s).type, tmp.type(), ns),
+      "type of constant to be replaced should match");
     values.set_to(s, tmp);
+  }
   else
     values.set_to_top(s);
 }
@@ -258,7 +264,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
     assign_rec(copy_values, lhs, rhs, ns);
     if(!values.is_constant(rhs) || values.is_constant(lhs))
        assign_rec(values, rhs, lhs, ns);
-    change=values.meet(copy_values);
+    change = values.meet(copy_values, ns);
   }
 #endif
 
@@ -469,7 +475,9 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
 
 /// meet
 /// \return Return true if "this" has changed.
-bool constant_propagator_domaint::valuest::meet(const valuest &src)
+bool constant_propagator_domaint::valuest::meet(
+  const valuest &src,
+  const namespacet &ns)
 {
   if(src.is_bottom || is_bottom)
     return false;
@@ -492,6 +500,9 @@ bool constant_propagator_domaint::valuest::meet(const valuest &src)
     }
     else
     {
+      DATA_INVARIANT(
+        base_type_eq(ns.lookup(m.first).type, m.second.type(), ns),
+        "type of constant to be stored should match");
       set_to(m.first, m.second);
       changed=true;
     }
