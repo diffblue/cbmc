@@ -96,6 +96,11 @@ class-level or module-level documentation.
 
 * \subpage other-tools
 
+* The \subpage tutorial "CBMC Developer Tutorial" helps new contributors
+  to CProver to get their feet wet through a series of programming
+  exercises - mostly modifying goto-instrument, and thus learning to
+  manipulate the main data structures used within CBMC.
+
 * For higher-level architectural information, each of the pages under
   the <a href="modules.html">Modules</a>
   link gives an overview of a directory in the CProver codebase.
@@ -104,10 +109,5 @@ class-level or module-level documentation.
   is generated from the codebase. You can search for classes and class
   members in the search bar at top-right or use one of the links in the
   sidebar.
-
-* The \subpage tutorial "CBMC Developer Tutorial" helps new contributors
-  to CProver to get their feet wet through a series of programming
-  exercises - mostly modifying goto-instrument, and thus learning to
-  manipulate the main data structures used within CBMC.
 
 \defgroup module_hidden _hidden
