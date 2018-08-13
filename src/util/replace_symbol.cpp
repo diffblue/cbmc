@@ -177,7 +177,8 @@ bool replace_symbolt::replace(typet &dest) const
   else if(dest.id()==ID_code)
   {
     code_typet &code_type=to_code_type(dest);
-    (void)replace(code_type.return_type());
+    if(!replace(code_type.return_type()))
+      result = false;
     code_typet::parameterst &parameters=code_type.parameters();
     for(code_typet::parameterst::iterator it = parameters.begin();
         it!=parameters.end();
