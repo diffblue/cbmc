@@ -68,6 +68,10 @@ you can access it <a href=
 
 ### For contributors:
 
+The following pages attempt to provide the information that a developer needs to
+work on CBMC, in a sensible order. In many cases they link to the appropriate
+class-level or module-level documentation.
+
 * \subpage compilation-and-development
 
 * \subpage background-concepts
