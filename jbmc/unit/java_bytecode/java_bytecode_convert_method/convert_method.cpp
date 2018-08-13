@@ -29,9 +29,13 @@ SCENARIO(
       const symbolt function_symbol =
         symbol_table.lookup_ref(method_name + ":(Ljava/lang/Object;)I");
 
-      const code_typet &function_type =
-        require_type::require_code(function_symbol.type);
-      THEN("The method should be marked as a bridge method")
+      const java_method_typet &function_type =
+        require_type::require_java_method(function_symbol.type);
+      THEN("The method symbol should be of java_method_typet")
+      {
+        REQUIRE(function_type.get_bool(ID_C_java_method_type));
+      }
+      THEN("And the method should be marked as a bridge method")
       {
         REQUIRE(function_type.get_bool(ID_is_bridge_method));
       }
@@ -43,8 +47,8 @@ SCENARIO(
         const symbolt function_symbol =
           symbol_table.lookup_ref(method_name + ":(LClassWithBridgeMethod;)I");
 
-        const code_typet &function_type =
-          require_type::require_code(function_symbol.type);
+        const java_method_typet &function_type =
+          require_type::require_java_method(function_symbol.type);
         THEN("The method should be marked as a bridge method")
         {
           REQUIRE_FALSE(function_type.get_bool(ID_is_bridge_method));

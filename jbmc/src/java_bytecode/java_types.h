@@ -245,6 +245,27 @@ inline bool can_cast_type<java_class_typet>(const typet &type)
 class java_method_typet : public code_typet
 {
 public:
+  using code_typet::parameterst;
+  using code_typet::parametert;
+
+  /// Constructs a new code type, i.e. method type
+  /// \param _parameters: the vector of method parameters
+  /// \param _return_type: the return type
+  java_method_typet(parameterst &&_parameters, typet &&_return_type)
+    : code_typet(std::move(_parameters), std::move(_return_type))
+  {
+    set(ID_C_java_method_type, true);
+  }
+
+  /// Constructs a new code type, i.e. method type
+  /// \param _parameters: the vector of method parameters
+  /// \param _return_type: the return type
+  java_method_typet(parameterst &&_parameters, const typet &_return_type)
+    : code_typet(std::move(_parameters), _return_type)
+  {
+    set(ID_C_java_method_type, true);
+  }
+
   const std::vector<irep_idt> throws_exceptions() const
   {
     std::vector<irep_idt> exceptions;
@@ -259,15 +280,21 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_type<java_method_typet>(const typet &type)
+{
+  return type.id() == ID_code && type.get_bool(ID_C_java_method_type);
+}
+
 inline const java_method_typet &to_java_method_type(const typet &type)
 {
-  PRECONDITION(type.id() == ID_code);
+  PRECONDITION(can_cast_type<java_method_typet>(type));
   return static_cast<const java_method_typet &>(type);
 }
 
 inline java_method_typet &to_java_method_type(typet &type)
 {
-  PRECONDITION(type.id() == ID_code);
+  PRECONDITION(can_cast_type<java_method_typet>(type));
   return static_cast<java_method_typet &>(type);
 }
 
@@ -732,6 +759,6 @@ std::string gather_full_class_name(const std::string &);
 std::string pretty_java_type(const typet &);
 
 // pretty signature for methods
-std::string pretty_signature(const code_typet &);
+std::string pretty_signature(const java_method_typet &);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H

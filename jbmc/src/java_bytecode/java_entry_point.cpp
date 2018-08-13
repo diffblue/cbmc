@@ -36,7 +36,7 @@ static void create_initialize(symbol_table_baset &symbol_table)
   initialize.base_name=INITIALIZE_FUNCTION;
   initialize.mode=ID_java;
 
-  initialize.type = code_typet({}, empty_typet());
+  initialize.type = java_method_typet({}, empty_typet());
 
   code_blockt init_code;
 
@@ -251,12 +251,12 @@ static void java_static_lifetime_init(
 bool is_java_main(const symbolt &function)
 {
   bool named_main = has_suffix(id2string(function.name), JAVA_MAIN_METHOD);
-  const code_typet &function_type = to_code_type(function.type);
+  const java_method_typet &function_type = to_java_method_type(function.type);
   const typet &string_array_type = java_type_from_string("[Ljava/lang/String;");
   // checks whether the function is static and has a single String[] parameter
   bool is_static = !function_type.has_this();
   // this should be implied by the signature
-  const code_typet::parameterst &parameters = function_type.parameters();
+  const java_method_typet::parameterst &parameters = function_type.parameters();
   bool has_correct_type = function_type.return_type().id() == ID_empty &&
                           parameters.size() == 1 &&
                           parameters[0].type().full_eq(string_array_type);
@@ -281,8 +281,8 @@ exprt::operandst java_build_arguments(
   object_factory_parameterst object_factory_parameters,
   const select_pointer_typet &pointer_type_selector)
 {
-  const code_typet::parameterst &parameters=
-    to_code_type(function.type).parameters();
+  const java_method_typet::parameterst &parameters =
+    to_java_method_type(function.type).parameters();
 
   exprt::operandst main_arguments;
   main_arguments.resize(parameters.size());
@@ -299,7 +299,7 @@ exprt::operandst java_build_arguments(
       param_number<parameters.size();
       param_number++)
   {
-    const code_typet::parametert &p=parameters[param_number];
+    const java_method_typet::parametert &p = parameters[param_number];
     const irep_idt base_name=p.get_base_name().empty()?
       ("argument#"+std::to_string(param_number)):p.get_base_name();
 
@@ -352,14 +352,14 @@ void java_record_outputs(
   code_blockt &init_code,
   symbol_table_baset &symbol_table)
 {
-  const code_typet::parameterst &parameters=
-    to_code_type(function.type).parameters();
+  const java_method_typet::parameterst &parameters =
+    to_java_method_type(function.type).parameters();
 
   exprt::operandst result;
   result.reserve(parameters.size()+1);
 
-  bool has_return_value=
-    to_code_type(function.type).return_type()!=empty_typet();
+  bool has_return_value =
+    to_java_method_type(function.type).return_type() != empty_typet();
 
   if(has_return_value)
   {
@@ -624,14 +624,14 @@ bool generate_java_start_function(
 
   // if the method return type is not void, store return value in a new variable
   // named 'return'
-  if(to_code_type(symbol.type).return_type()!=empty_typet())
+  if(to_java_method_type(symbol.type).return_type() != empty_typet())
   {
     auxiliary_symbolt return_symbol;
     return_symbol.mode=ID_java;
     return_symbol.is_static_lifetime=false;
     return_symbol.name=JAVA_ENTRY_POINT_RETURN_SYMBOL;
     return_symbol.base_name="return";
-    return_symbol.type=to_code_type(symbol.type).return_type();
+    return_symbol.type = to_java_method_type(symbol.type).return_type();
 
     symbol_table.add(return_symbol);
     call_main.lhs()=return_symbol.symbol_expr();
@@ -715,7 +715,7 @@ bool generate_java_start_function(
   symbolt new_symbol;
 
   new_symbol.name=goto_functionst::entry_point();
-  new_symbol.type = code_typet({}, empty_typet());
+  new_symbol.type = java_method_typet({}, empty_typet());
   new_symbol.value.swap(init_code);
   new_symbol.mode=ID_java;
 

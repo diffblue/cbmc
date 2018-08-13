@@ -145,7 +145,7 @@ void java_simple_method_stubst::create_method_stub_at(
 void java_simple_method_stubst::create_method_stub(symbolt &symbol)
 {
   code_blockt new_instructions;
-  const code_typet &required_type = to_code_type(symbol.type);
+  const java_method_typet &required_type = to_java_method_type(symbol.type);
 
   // synthetic source location that contains the opaque function name only
   source_locationt synthesized_source_location;

@@ -32,11 +32,11 @@ SCENARIO(
 
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet::parametert &param_x =
+        const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
@@ -59,11 +59,11 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet::parametert &param_x =
+        const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
@@ -86,11 +86,11 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet::parametert &param_x =
+        const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
@@ -113,11 +113,11 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
       THEN("It contains parameter x pointing to java.lang.Number")
       {
-        const code_typet::parametert &param_x =
+        const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::java.lang.Number"));
@@ -140,11 +140,11 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet::parametert &param_x =
+        const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
@@ -167,11 +167,11 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet::parametert &param_x =
+        const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
@@ -194,12 +194,12 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 2);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 2);
 
       THEN("It contains parameter t pointing to Generic")
       {
-        const code_typet::parametert &param_t =
+        const java_method_typet::parametert &param_t =
           require_type::require_parameter(func_code, "t");
         require_type::require_pointer(
           param_t.type(), symbol_typet("java::Generic"));
@@ -209,7 +209,7 @@ SCENARIO(
       }
       THEN("It contains parameter u pointing to Generic")
       {
-        const code_typet::parametert &param_u =
+        const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
@@ -232,12 +232,12 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 2);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 2);
 
       THEN("It contains parameter t pointing to Generic")
       {
-        const code_typet::parametert &param_t =
+        const java_method_typet::parametert &param_t =
           require_type::require_parameter(func_code, "t");
         require_type::require_pointer(
           param_t.type(), symbol_typet("java::Generic"));
@@ -247,7 +247,7 @@ SCENARIO(
       }
       THEN("It contains parameter u pointing to Generic")
       {
-        const code_typet::parametert &param_u =
+        const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
@@ -271,8 +271,8 @@ SCENARIO(
 
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 0);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 0);
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
@@ -297,8 +297,8 @@ SCENARIO(
 
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 0);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 0);
       THEN("It has return type pointing to java.lang.Object")
       {
         require_type::require_pointer(
@@ -322,7 +322,7 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code = to_code_type(func_symbol.type);
+      const java_method_typet func_code = to_java_method_type(func_symbol.type);
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
@@ -346,8 +346,8 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 0);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 0);
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
@@ -371,8 +371,8 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 0);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 0);
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
@@ -396,8 +396,8 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 0);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 0);
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
@@ -422,12 +422,12 @@ SCENARIO(
 
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
 
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet::parametert &param_x =
+        const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
@@ -459,12 +459,12 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
 
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet::parametert &param_x =
+        const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
@@ -496,12 +496,12 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
 
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet::parametert &param_x =
+        const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
@@ -533,12 +533,12 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
 
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet::parametert &param_x =
+        const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
@@ -571,12 +571,12 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
 
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet::parametert &param_x =
+        const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
@@ -608,12 +608,12 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
 
       THEN("It contains parameter u pointing to Generic")
       {
-        const code_typet::parametert &param_u =
+        const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
@@ -645,12 +645,12 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 1);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 1);
 
       THEN("It contains parameter u pointing to Generic")
       {
-        const code_typet::parametert &param_u =
+        const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
@@ -682,12 +682,12 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 2);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 2);
 
       THEN("It contains parameter u pointing to Generic")
       {
-        const code_typet::parametert &param_u =
+        const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
@@ -698,7 +698,7 @@ SCENARIO(
 
       THEN("It contains parameter v pointing to Generic")
       {
-        const code_typet::parametert &param_v =
+        const java_method_typet::parametert &param_v =
           require_type::require_parameter(func_code, "v");
         require_type::require_pointer(
           param_v.type(), symbol_typet("java::Generic"));
@@ -730,12 +730,12 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code =
-        require_type::require_code(func_symbol.type, 2);
+      const java_method_typet func_code =
+        require_type::require_java_method(func_symbol.type, 2);
 
       THEN("It contains parameter u pointing to Generic")
       {
-        const code_typet::parametert &param_u =
+        const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
@@ -746,7 +746,7 @@ SCENARIO(
 
       THEN("It contains parameter v pointing to Generic")
       {
-        const code_typet::parametert &param_v =
+        const java_method_typet::parametert &param_v =
           require_type::require_parameter(func_code, "v");
         require_type::require_pointer(
           param_v.type(), symbol_typet("java::Generic"));

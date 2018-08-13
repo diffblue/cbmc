@@ -6,15 +6,16 @@
 
 \*******************************************************************/
 
+#include <java_bytecode/java_types.h>
+
 #include <testing-utils/catch.hpp>
 #include <java-testing-utils/load_java_class.h>
-#include <util/std_types.h>
 
 void check_consistency(const symbolt &symbol)
 {
-  const auto &code_type = to_code_type(symbol.type);
-  auto parameter_ids = code_type.parameter_identifiers();
-  auto parameter_indices = code_type.parameter_indices();
+  const auto &method_type = to_java_method_type(symbol.type);
+  auto parameter_ids = method_type.parameter_identifiers();
+  auto parameter_indices = method_type.parameter_indices();
 
   REQUIRE(parameter_ids.size() == parameter_indices.size());
   for(std::size_t i = 0; i < parameter_ids.size(); ++i)

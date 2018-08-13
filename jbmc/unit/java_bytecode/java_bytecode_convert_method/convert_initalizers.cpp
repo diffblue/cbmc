@@ -33,7 +33,8 @@ void require_is_constructor(const test_datat &test_data)
     test_data.symbol_table.lookup_ref(test_data.constructor_descriptor);
   THEN("The constructor should be marked as a constructor")
   {
-    code_typet constructor_type = require_type::require_code(constructor.type);
+    java_method_typet constructor_type =
+      require_type::require_java_method(constructor.type);
     REQUIRE(constructor_type.get_is_constructor());
   }
 }
@@ -49,7 +50,8 @@ void require_is_static_initializer(const test_datat &test_data)
     test_data.symbol_table.lookup_ref(test_data.constructor_descriptor);
   THEN("The constructor should be marked as a constructor")
   {
-    code_typet constructor_type = require_type::require_code(constructor.type);
+    java_method_typet constructor_type =
+      require_type::require_java_method(constructor.type);
     REQUIRE_FALSE(constructor_type.get_is_constructor());
   }
 }

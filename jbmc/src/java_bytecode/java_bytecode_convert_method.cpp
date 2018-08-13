@@ -87,11 +87,11 @@ protected:
 ///   parameters, which are initially nameless as method conversion hasn't
 ///   happened. Also creates symbols in `symbol_table`.
 static void assign_parameter_names(
-  code_typet &ftype,
+  java_method_typet &ftype,
   const irep_idt &name_prefix,
   symbol_table_baset &symbol_table)
 {
-  code_typet::parameterst &parameters=ftype.parameters();
+  java_method_typet::parameterst &parameters = ftype.parameters();
 
   // Mostly borrowed from java_bytecode_convert.cpp; maybe factor this out.
   // assign names to parameters
@@ -255,7 +255,7 @@ const exprt java_bytecode_convert_methodt::variable(
 ///   message handler to collect warnings
 /// \return
 ///   the constructed member type
-code_typet member_type_lazy(
+java_method_typet member_type_lazy(
   const std::string &descriptor,
   const optionalt<std::string> &signature,
   const std::string &class_name,
@@ -282,10 +282,11 @@ code_typet member_type_lazy(
         signature.value(),
         class_name);
       INVARIANT(member_type_from_signature.id()==ID_code, "Must be code type");
-      if(to_code_type(member_type_from_signature).parameters().size()==
-         to_code_type(member_type_from_descriptor).parameters().size())
+      if(
+        to_java_method_type(member_type_from_signature).parameters().size() ==
+        to_java_method_type(member_type_from_descriptor).parameters().size())
       {
-        return to_code_type(member_type_from_signature);
+        return to_java_method_type(member_type_from_signature);
       }
       else
       {
@@ -306,7 +307,7 @@ code_typet member_type_lazy(
                         << message.eom;
     }
   }
-  return to_code_type(member_type_from_descriptor);
+  return to_java_method_type(member_type_from_descriptor);
 }
 
 /// Retrieves the symbol of the lambda method associated with the given
@@ -345,7 +346,7 @@ void java_bytecode_convert_method_lazy(
 {
   symbolt method_symbol;
 
-  code_typet member_type = member_type_lazy(
+  java_method_typet member_type = member_type_lazy(
     m.descriptor,
     m.signature,
     id2string(class_symbol.name),
@@ -378,8 +379,8 @@ void java_bytecode_convert_method_lazy(
   // do we need to add 'this' as a parameter?
   if(!m.is_static)
   {
-    code_typet::parameterst &parameters = member_type.parameters();
-    code_typet::parametert this_p;
+    java_method_typet::parameterst &parameters = member_type.parameters();
+    java_method_typet::parametert this_p;
     const reference_typet object_ref_type=
       java_reference_type(symbol_typet(class_symbol.name));
     this_p.type()=object_ref_type;
@@ -442,12 +443,12 @@ void java_bytecode_convert_methodt::convert(
 
   symbolt &method_symbol=*symbol_table.get_writeable(method_identifier);
 
-  // Obtain a std::vector of code_typet::parametert objects from the
+  // Obtain a std::vector of java_method_typet::parametert objects from the
   // (function) type of the symbol
   java_method_typet method_type = to_java_method_type(method_symbol.type);
   method_type.set(ID_C_class, class_symbol.name);
   method_return_type = method_type.return_type();
-  code_typet::parameterst &parameters = method_type.parameters();
+  java_method_typet::parameterst &parameters = method_type.parameters();
 
   // Determine the number of local variable slots used by the JVM to maintain
   // the formal parameters
@@ -1250,9 +1251,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
             id2string(arg0.get(ID_identifier))==
             "java::org.cprover.CProver.assume:(Z)V")
     {
-      const code_typet &code_type=to_code_type(arg0.type());
-      INVARIANT(code_type.parameters().size()==1,
-                "function expected to have exactly one parameter");
+      const java_method_typet &method_type = to_java_method_type(arg0.type());
+      INVARIANT(
+        method_type.parameters().size() == 1,
+        "function expected to have exactly one parameter");
       c = replace_call_to_cprover_assume(i_it->source_location, c);
     }
     // replace calls to CProver.atomicBegin
@@ -1995,8 +1997,8 @@ codet java_bytecode_convert_methodt::convert_monitorenterexit(
     return code_skipt();
 
   // becomes a function call
-  code_typet type(
-    {code_typet::parametert(java_reference_type(void_typet()))},
+  java_method_typet type(
+    {java_method_typet::parametert(java_reference_type(void_typet()))},
     void_typet());
   code_function_callt call;
   call.function() = symbol_exprt(descriptor, type);
@@ -2105,8 +2107,8 @@ void java_bytecode_convert_methodt::convert_invoke(
   const bool is_virtual(
     statement == "invokevirtual" || statement == "invokeinterface");
 
-  code_typet &code_type = to_code_type(arg0.type());
-  code_typet::parameterst &parameters(code_type.parameters());
+  java_method_typet &method_type = to_java_method_type(arg0.type());
+  java_method_typet::parameterst &parameters(method_type.parameters());
 
   if(use_this)
   {
@@ -2122,13 +2124,13 @@ void java_bytecode_convert_methodt::convert_invoke(
         {
           if(needed_lazy_methods)
             needed_lazy_methods->add_needed_class(classname);
-          code_type.set_is_constructor();
+          method_type.set_is_constructor();
         }
         else
-          code_type.set(ID_java_super_method_call, true);
+          method_type.set(ID_java_super_method_call, true);
       }
       reference_typet object_ref_type = java_reference_type(thistype);
-      code_typet::parametert this_p(object_ref_type);
+      java_method_typet::parametert this_p(object_ref_type);
       this_p.set_this();
       this_p.set_base_name("this");
       parameters.insert(parameters.begin(), this_p);
@@ -2170,7 +2172,7 @@ void java_bytecode_convert_methodt::convert_invoke(
 
   // do some type adjustment for return values
 
-  const typet &return_type = code_type.return_type();
+  const typet &return_type = method_type.return_type();
 
   if(return_type.id() != ID_empty)
   {
@@ -2215,7 +2217,7 @@ void java_bytecode_convert_methodt::convert_invoke(
     symbol.value.make_nil();
     symbol.mode = ID_java;
     assign_parameter_names(
-      to_code_type(symbol.type), symbol.name, symbol_table);
+      to_java_method_type(symbol.type), symbol.name, symbol_table);
 
     debug() << "Generating codet:  new opaque symbol: method '" << symbol.name
             << "'" << eom;
@@ -2945,11 +2947,11 @@ optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
   const source_locationt &location,
   const exprt &arg0)
 {
-  const code_typet &code_type = to_code_type(arg0.type());
+  const java_method_typet &method_type = to_java_method_type(arg0.type());
 
   const optionalt<symbolt> &lambda_method_symbol = get_lambda_method_symbol(
     lambda_method_handles,
-    code_type.get_int(ID_java_lambda_method_handle_index));
+    method_type.get_int(ID_java_lambda_method_handle_index));
   if(lambda_method_symbol.has_value())
     debug() << "Converting invokedynamic for lambda: "
             << lambda_method_symbol.value().name << eom;
@@ -2958,11 +2960,11 @@ optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
                "type"
             << eom;
 
-  const code_typet::parameterst &parameters(code_type.parameters());
+  const java_method_typet::parameterst &parameters(method_type.parameters());
 
   pop(parameters.size());
 
-  const typet &return_type = code_type.return_type();
+  const typet &return_type = method_type.return_type();
 
   if(return_type.id() == ID_empty)
     return {};
@@ -3019,13 +3021,13 @@ void java_bytecode_initialize_parameter_names(
     &local_variable_table,
   symbol_table_baset &symbol_table)
 {
-  // Obtain a std::vector of code_typet::parametert objects from the
+  // Obtain a std::vector of java_method_typet::parametert objects from the
   // (function) type of the symbol
-  code_typet &code_type = to_code_type(method_symbol.type);
-  code_typet::parameterst &parameters = code_type.parameters();
+  java_method_typet &method_type = to_java_method_type(method_symbol.type);
+  java_method_typet::parameterst &parameters = method_type.parameters();
 
   // Find number of parameters
-  unsigned slots_for_parameters = java_method_parameter_slots(code_type);
+  unsigned slots_for_parameters = java_method_parameter_slots(method_type);
 
   // Find parameter names in the local variable table:
   typedef std::pair<irep_idt, irep_idt> base_name_and_identifiert;

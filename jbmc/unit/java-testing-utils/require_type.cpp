@@ -75,6 +75,29 @@ require_type::require_code(const typet &type, const size_t num_params)
   return code_type;
 }
 
+/// Checks a type is a java_method_typet (i.e. a function)
+/// \param type: The type to check
+/// \return The cast version of the type method_type
+java_method_typet require_type::require_java_method(const typet &type)
+{
+  REQUIRE(can_cast_type<java_method_typet>(type));
+  return to_java_method_type(type);
+}
+
+/// Verify a given type is an java_method_typet, and that the code it represents
+/// accepts a given number of parameters
+/// \param type The type to check
+/// \param num_params check the the given java_method_typet expects this
+/// number of parameters
+/// \return The type cast to a java_method_typet
+java_method_typet
+require_type::require_java_method(const typet &type, const size_t num_params)
+{
+  java_method_typet method_type = require_java_method(type);
+  REQUIRE(method_type.parameters().size() == num_params);
+  return method_type;
+}
+
 /// Verify that a function has a parameter of a specific name.
 /// \param function_type: The type of the function
 /// \param param_name: The name of the parameter

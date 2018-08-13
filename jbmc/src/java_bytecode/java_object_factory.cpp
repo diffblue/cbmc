@@ -1084,7 +1084,7 @@ void java_object_factoryt::gen_nondet_struct_init(
 
   if(const auto func = symbol_table.lookup(init_method_name))
   {
-    const code_typet &type = to_code_type(func->type);
+    const java_method_typet &type = to_java_method_type(func->type);
     code_function_callt fun_call;
     fun_call.function() = func->symbol_expr();
     if(type.has_this())

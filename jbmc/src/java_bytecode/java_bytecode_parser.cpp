@@ -610,7 +610,7 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
 {
   if(src.id()==ID_code)
   {
-    const code_typet &ct=to_code_type(src);
+    const java_method_typet &ct = to_java_method_type(src);
     const typet &rt=ct.return_type();
     get_class_refs_rec(rt);
     for(const auto &p : ct.parameters())

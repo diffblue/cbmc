@@ -76,9 +76,9 @@ SCENARIO(
         {
           const symbolt &method_symbol =
             new_symbol_table.lookup_ref(method_name);
-          const code_typet &method_type =
-            require_type::require_code(method_symbol.type);
-          const code_typet::parametert &param =
+          const java_method_typet &method_type =
+            require_type::require_java_method(method_symbol.type);
+          const java_method_typet::parametert &param =
             require_type::require_parameter(method_type, "x");
           require_type::require_java_generic_parameter(
             param.type(), boundedinner_name + "::NUM");

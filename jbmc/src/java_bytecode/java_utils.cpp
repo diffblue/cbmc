@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_utils.h"
 
 #include "java_root_class.h"
-#include "java_types.h"
 
 #include <util/invariant.h>
 #include <util/message.h>
@@ -46,7 +45,7 @@ unsigned java_local_variable_slots(const typet &t)
   return bitwidth == 64 ? 2u : 1u;
 }
 
-unsigned java_method_parameter_slots(const code_typet &t)
+unsigned java_method_parameter_slots(const java_method_typet &t)
 {
   unsigned slots=0;
 

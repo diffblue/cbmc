@@ -43,16 +43,16 @@ SCENARIO(
       inner_prefix + func_name + func_descriptor;
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
 
-    const code_typet func_code =
-      to_code_type(new_symbol_table.lookup_ref(process_func_name).type);
+    const java_method_typet func_code =
+      to_java_method_type(new_symbol_table.lookup_ref(process_func_name).type);
     REQUIRE(func_code.parameters().size() == 3);
 
     // TODO: for now, the parameters are not generic because we fall back to
     // descriptor due to mismatch; enable tests when fixed - issue TG-1309
-    // code_typet::parametert param_parent=
+    // java_method_typet::parametert param_parent=
     //  require_type::require_parameter(func_code,"arg1a");
     // REQUIRE(is_java_generic_type(param_parent.type()));
-    // code_typet::parametert param_t=
+    // java_method_typet::parametert param_t=
     //  require_type::require_parameter(func_code,"t");
     // REQUIRE(is_java_generic_type(param_t.type()));
   }
@@ -78,16 +78,16 @@ SCENARIO(
       inner_enum_prefix + func_name + func_descriptor;
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
 
-    const code_typet func_code =
-      to_code_type(new_symbol_table.lookup_ref(process_func_name).type);
+    const java_method_typet func_code =
+      to_java_method_type(new_symbol_table.lookup_ref(process_func_name).type);
     REQUIRE(func_code.parameters().size() == 3);
 
     // TODO: for now, the parameters are not generic because we fall back to
     // descriptor due to mismatch; enable tests when fixed - issue TG-1309
-    // code_typet::parametert param_parent=
+    // java_method_typet::parametert param_parent=
     //  require_type::require_parameter(func_code,"arg1a");
     // REQUIRE(is_java_generic_type(param_parent.type()));
-    // code_typet::parametert param_t=
+    // java_method_typet::parametert param_t=
     //  require_type::require_parameter(func_code,"arg2i");
     // REQUIRE(is_java_generic_type(param_t.type()));
   }
