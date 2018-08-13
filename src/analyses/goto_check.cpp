@@ -1414,7 +1414,10 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
           deref.pointer(), pointer_type(char_type()));
 
       const exprt new_address = typecast_exprt(
-        plus_exprt(char_pointer, member_offset), char_pointer.type());
+        plus_exprt(
+          char_pointer,
+          typecast_exprt::conditional_cast(member_offset, pointer_diff_type())),
+        char_pointer.type());
 
       const exprt new_address_casted =
         typecast_exprt::conditional_cast(new_address, new_pointer_type);
