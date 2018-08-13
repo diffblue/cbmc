@@ -105,7 +105,8 @@ class-level or module-level documentation.
   the <a href="modules.html">Modules</a>
   link gives an overview of a directory in the CProver codebase.
 
-* If you already know exactly what you're looking for, the API reference
+* If you already know exactly what you're looking for, the best place
+  to look is the API reference, which
   is generated from the codebase. You can search for classes and class
   members in the search bar at top-right or use one of the links in the
   sidebar.
