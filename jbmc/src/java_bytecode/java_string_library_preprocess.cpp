@@ -1836,7 +1836,11 @@ codet java_string_library_preprocesst::make_string_length_code(
   symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
   dereference_exprt deref=
     checked_dereference(arg_this, arg_this.type().subtype());
-  return code_returnt(get_length(deref, symbol_table));
+
+  code_returnt ret(get_length(deref, symbol_table));
+  ret.add_source_location() = loc;
+
+  return ret;
 }
 
 bool java_string_library_preprocesst::implements_function(
