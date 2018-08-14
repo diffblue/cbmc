@@ -22,6 +22,10 @@ are typedefed to \ref dstringt, unless USE_STD_STRING is set, in which
 case they are typedefed to std::string (this can be used for debugging
 purposes).
 
+\subsection cmdlinet
+
+See \ref cmdlinet.
+
 \dot
 digraph G {
   node [shape=box];
