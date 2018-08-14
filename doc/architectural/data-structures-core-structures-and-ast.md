@@ -4,6 +4,7 @@
 \author Martin Brain, Peter Schrammel, Owen Jones
 
 ## Strings: dstringt, the string_container and the ID_* ##
+
 Within cbmc, strings are represented using `irep_idt`. By default this is
 typedefed to \ref dstringt, which stores a string as an index into a large
 static table of strings. This makes it easy to compare if two `irep_idt`s
@@ -22,6 +23,7 @@ first encountered, and the same index is used for all instances.
 See documentation at \ref dstringt.
 
 ## irept: a 4-triple (data, named-sub, comments, sub) ##
+
 See documentation at \ref irept.
 
 As that documentation says, `irept`s are generic tree nodes. You should
@@ -41,6 +43,7 @@ To be documented.
 To be documented.
 
 ## exprt ##
+
 \ref exprt is the class to represent an expression. It inherits from \ref irept,
 and the only things it adds to it are that every \ref exprt has a named sub
 containing its type and everything in the sub of an \ref exprt is again an
@@ -60,6 +63,7 @@ expression then you have to check its `id()` (or use
 `can_cast_expr<minus_exprt>`).
 
 ## codet ##
+
 \ref exprt represents expressions and \ref codet represents statements. \ref codet
 inherits from \ref exprt, so all `codet`s are `exprt`s, with `id()` `ID_code`.
 Many different kinds of statements inherit from \ref codet, and they are
