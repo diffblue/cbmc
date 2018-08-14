@@ -29,7 +29,7 @@ think of them as having a single string (data, actually an `irep_idt`) and
 lots of child nodes, some of which are numbered (sub) and some of which are
 labelled, and the label can either start with a “\#” (comments-sub) or without
 one (named-sub). The meaning of the “\#” is that this child should not be
-considered important, for example it shouldn’t be counted when comparing two
+considered important, for example it shouldn't be counted when comparing two
 `irept`s for equality.
 
 ## typet ##
