@@ -3,30 +3,30 @@
 
 \author Martin Brain, Peter Schrammel
 
-# Representations #
+\section representations_section Representations
 
-## AST: types, globals, variables, functions, code blocks, language primitives, assignments, expressions, variables ##
-
-To be documented.
-
-## CFG ##
+\subsection AST_section AST: types, globals, variables, functions, code blocks, language primitives, assignments, expressions, variables
 
 To be documented.
 
-## SSA ##
+\subsection CFG_section CFG
 
 To be documented.
 
-# Analysis techniques #
+\subsection SSA_section SSA
 
-## Bounded model checking ##
+To be documented.
+
+\section analysis_techniques_section Analysis techniques
+
+\subsection BMC_section Bounded model checking
 
 To be documented (can copy from the CBMC manual).
 
-## SAT and SMT ##
+\subsection SAT_section SAT and SMT
 
 To be documented.
 
-## Static analysis ##
+\subsection static_analysis_section Static analysis
 
 To be documented.
