@@ -39,11 +39,11 @@ void bv_refinementt::approximationt::add_under_assumption(literalt l)
 bvt bv_refinementt::convert_floatbv_op(const exprt &expr)
 {
   if(!config_.refine_arithmetic)
-    return SUB::convert_floatbv_op(expr);
+    return baset::convert_floatbv_op(expr);
 
   if(ns.follow(expr.type()).id()!=ID_floatbv ||
      expr.operands().size()!=3)
-    return SUB::convert_floatbv_op(expr);
+    return baset::convert_floatbv_op(expr);
 
   bvt bv;
   add_approximation(expr, bv);
@@ -53,7 +53,7 @@ bvt bv_refinementt::convert_floatbv_op(const exprt &expr)
 bvt bv_refinementt::convert_mult(const exprt &expr)
 {
   if(!config_.refine_arithmetic || expr.type().id()==ID_fixedbv)
-    return SUB::convert_mult(expr);
+    return baset::convert_mult(expr);
 
   // we catch any multiplication
   // unless it involves a constant
@@ -70,7 +70,7 @@ bvt bv_refinementt::convert_mult(const exprt &expr)
   // we keep multiplication by a constant for integers
   if(type.id()!=ID_floatbv)
     if(operands[0].is_constant() || operands[1].is_constant())
-      return SUB::convert_mult(expr);
+      return baset::convert_mult(expr);
 
   bvt bv;
   approximationt &a=add_approximation(expr, bv);
@@ -101,7 +101,7 @@ bvt bv_refinementt::convert_mult(const exprt &expr)
 bvt bv_refinementt::convert_div(const div_exprt &expr)
 {
   if(!config_.refine_arithmetic || expr.type().id()==ID_fixedbv)
-    return SUB::convert_div(expr);
+    return baset::convert_div(expr);
 
   // we catch any division
   // unless it's integer division by a constant
@@ -109,7 +109,7 @@ bvt bv_refinementt::convert_div(const div_exprt &expr)
   PRECONDITION(expr.operands().size()==2);
 
   if(expr.op1().is_constant())
-    return SUB::convert_div(expr);
+    return baset::convert_div(expr);
 
   bvt bv;
   add_approximation(expr, bv);
@@ -119,7 +119,7 @@ bvt bv_refinementt::convert_div(const div_exprt &expr)
 bvt bv_refinementt::convert_mod(const mod_exprt &expr)
 {
   if(!config_.refine_arithmetic || expr.type().id()==ID_fixedbv)
-    return SUB::convert_mod(expr);
+    return baset::convert_mod(expr);
 
   // we catch any mod
   // unless it's integer + constant
@@ -127,7 +127,7 @@ bvt bv_refinementt::convert_mod(const mod_exprt &expr)
   PRECONDITION(expr.operands().size()==2);
 
   if(expr.op1().is_constant())
-    return SUB::convert_mod(expr);
+    return baset::convert_mod(expr);
 
   bvt bv;
   add_approximation(expr, bv);

@@ -205,7 +205,7 @@ literalt boolbvt::convert_quantifier(const exprt &src)
 {
   exprt expr(src);
   if(!instantiate_quantifier(expr, ns))
-    return SUB::convert_rest(src);
+    return baset::convert_rest(src);
 
   quantifiert quantifier;
   quantifier.expr=expr;

@@ -106,7 +106,7 @@ public:
   { return prop.has_is_in_conflict(); }
 
   // get literal for expression, if available
-  virtual bool literal(const exprt &expr, literalt &literal) const;
+  virtual optionalt<literalt> literal(const exprt &expr) const;
 
   bool use_cache = true;
   bool equality_propagation = true;
@@ -131,7 +131,7 @@ protected:
   bool post_processing_done = false;
 
   // get a _boolean_ value from counterexample if not valid
-  virtual bool get_bool(const exprt &expr, tvt &value) const;
+  virtual optionalt<tvt> get_bool(const exprt &expr) const;
 
   virtual literalt convert_rest(const exprt &expr);
   virtual literalt convert_bool(const exprt &expr);

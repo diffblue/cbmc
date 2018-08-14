@@ -40,9 +40,9 @@ literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
       else if(rel==ID_ieee_float_notequal)
         return !float_utils.relation(bv0, float_utilst::relt::EQ, bv1);
       else
-        return SUB::convert_rest(expr);
+        return baset::convert_rest(expr);
     }
   }
 
-  return SUB::convert_rest(expr);
+  return baset::convert_rest(expr);
 }

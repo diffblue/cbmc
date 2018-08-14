@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class bv_refinementt:public bv_pointerst
 {
 private:
+  typedef bv_pointerst baset;
   struct configt
   {
     ui_message_handlert::uit ui=ui_message_handlert::uit::PLAIN;

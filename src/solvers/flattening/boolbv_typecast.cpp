@@ -608,5 +608,5 @@ literalt boolbvt::convert_typecast(const typecast_exprt &expr)
   if(!bv.empty())
     return prop.lor(bv);
 
-  return SUB::convert_rest(expr);
+  return baset::convert_rest(expr);
 }

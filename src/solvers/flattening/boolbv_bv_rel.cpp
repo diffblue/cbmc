@@ -46,7 +46,7 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         else if(rel==ID_gt)
           return float_utils.relation(bv0, float_utilst::relt::GT, bv1);
         else
-          return SUB::convert_rest(expr);
+          return baset::convert_rest(expr);
       }
       else if((op0.type().id()==ID_range &&
                op1.type()==op0.type()) ||
@@ -109,5 +109,5 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
     }
   }
 
-  return SUB::convert_rest(expr);
+  return baset::convert_rest(expr);
 }

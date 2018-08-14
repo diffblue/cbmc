@@ -33,24 +33,15 @@ void prop_convt::set_frozen(const bvt &bv)
       set_frozen(bit);
 }
 
-bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
+optionalt<literalt> prop_conv_solvert::literal(const exprt &expr) const
 {
-  assert(expr.type().id()==ID_bool);
-
-  if(expr.id()==ID_symbol)
-  {
-    const irep_idt &identifier=
-      to_symbol_expr(expr).get_identifier();
-
-    symbolst::const_iterator result=symbols.find(identifier);
-
-    if(result==symbols.end())
-      return true;
-    dest=result->second;
-    return false;
-  }
-
-  throw "found no literal for expression";
+  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.id() == ID_symbol);
+  const irep_idt &identifier = to_symbol_expr(expr).get_identifier();
+  auto result = symbols.find(identifier);
+  if(result == symbols.end())
+    return {};
+  return result->second;
 }
 
 literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
@@ -71,43 +62,27 @@ literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
 }
 
 /// get a boolean value from counter example if not valid
-bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
+optionalt<tvt> prop_conv_solvert::get_bool(const exprt &expr) const
 {
-  // trivial cases
-
   if(expr.is_true())
+    return tvt(true);
+  if(expr.is_false())
+    return tvt(false);
+  if(expr.id() == ID_symbol)
   {
-    value=tvt(true);
-    return false;
-  }
-  else if(expr.is_false())
-  {
-    value=tvt(false);
-    return false;
-  }
-  else if(expr.id()==ID_symbol)
-  {
-    symbolst::const_iterator result=
-      symbols.find(to_symbol_expr(expr).get_identifier());
-
+    const auto result = symbols.find(to_symbol_expr(expr).get_identifier());
     if(result==symbols.end())
-      return true;
-
-    value=prop.l_get(result->second);
-    return false;
+      return {};
+    return prop.l_get(result->second);
   }
-
-  // sub-expressions
-
   if(expr.id()==ID_not)
   {
     if(expr.type().id()==ID_bool &&
        expr.operands().size()==1)
     {
-      if(get_bool(expr.op0(), value))
-        return true;
-      value=!value;
-      return false;
+      if(auto result = get_bool(expr.op0()))
+        return !*result;
+      return {};
     }
   }
   else if(expr.id()==ID_and || expr.id()==ID_or)
@@ -115,48 +90,35 @@ bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
     if(expr.type().id()==ID_bool &&
        expr.operands().size()>=1)
     {
-      value=tvt(expr.id()==ID_and);
+      auto value = tvt(expr.id() == ID_and);
 
       forall_operands(it, expr)
       {
-        tvt tmp;
-        if(get_bool(*it, tmp))
-          return true;
-
+        auto tmp = get_bool(*it);
+        if(!tmp)
+          return {};
         if(expr.id()==ID_and)
         {
-          if(tmp.is_false())
-          {
-            value=tvt(false);
-            return false;
-          }
-
-          value=value && tmp;
+          if(tmp->is_false())
+            return tvt(false);
+          value = value && *tmp;
         }
         else // or
         {
-          if(tmp.is_true())
-          {
-            value=tvt(true);
-            return false;
-          }
-
-          value=value || tmp;
+          if(tmp->is_true())
+            return tvt(true);
+          value = value || *tmp;
         }
       }
-
-      return false;
+      return value;
     }
   }
 
   // check cache
-
-  cachet::const_iterator cache_result=cache.find(expr);
+  const auto cache_result = cache.find(expr);
   if(cache_result==cache.end())
-    return true;
-
-  value=prop.l_get(cache_result->second);
-  return false;
+    return {};
+  return prop.l_get(cache_result->second);
 }
 
 literalt prop_conv_solvert::convert(const exprt &expr)
@@ -337,29 +299,13 @@ literalt prop_conv_solvert::convert_rest(const exprt &expr)
 
 bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 {
-  if(!equality_propagation)
+  if(!equality_propagation || expr.lhs().id() != ID_symbol)
     return true;
 
-  // optimization for constraint of the form
-  // new_variable = value
-
-  if(expr.lhs().id()==ID_symbol)
-  {
-    const irep_idt &identifier=
-      to_symbol_expr(expr.lhs()).get_identifier();
-
-    literalt tmp=convert(expr.rhs());
-
-    std::pair<symbolst::iterator, bool> result=
-      symbols.insert(std::pair<irep_idt, literalt>(identifier, tmp));
-
-    if(result.second)
-      return false; // ok, inserted!
-
-    // nah, already there
-  }
-
-  return true;
+  const irep_idt &identifier = to_symbol_expr(expr.lhs()).get_identifier();
+  const literalt tmp = convert(expr.rhs());
+  const bool inserted = symbols.emplace(identifier, tmp).second;
+  return !inserted;
 }
 
 void prop_conv_solvert::set_to(const exprt &expr, bool value)
@@ -484,16 +430,19 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
 exprt prop_conv_solvert::get(const exprt &expr) const
 {
-  tvt value;
-
-  if(expr.type().id()==ID_bool &&
-     !get_bool(expr, value))
+  if(expr.type().id() == ID_bool)
   {
-    switch(value.get_value())
+    if(const auto value = get_bool(expr))
     {
-     case tvt::tv_enumt::TV_TRUE:  return true_exprt();
-     case tvt::tv_enumt::TV_FALSE: return false_exprt();
-     case tvt::tv_enumt::TV_UNKNOWN: return false_exprt(); // default
+      switch(value->get_value())
+      {
+      case tvt::tv_enumt::TV_TRUE:
+        return true_exprt();
+      case tvt::tv_enumt::TV_FALSE:
+        return false_exprt();
+      case tvt::tv_enumt::TV_UNKNOWN:
+        return false_exprt(); // default
+      }
     }
   }
 

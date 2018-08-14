@@ -29,15 +29,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/floatbv/float_utils.h>
 #include <solvers/lowering/expr_lowering.h>
 
-bool boolbvt::literal(
-  const exprt &expr,
-  const std::size_t bit,
-  literalt &dest) const
+optionalt<literalt>
+boolbvt::literal(const exprt &expr, const std::size_t bit) const
 {
   if(expr.type().id()==ID_bool)
   {
     assert(bit==0);
-    return prop_conv_solvert::literal(expr, dest);
+    return prop_conv_solvert::literal(expr);
   }
   else
   {
@@ -50,16 +48,15 @@ bool boolbvt::literal(
         map.mapping.find(identifier);
 
       if(it_m==map.mapping.end())
-        return true;
+        return {};
 
       const boolbv_mapt::map_entryt &map_entry=it_m->second;
 
       assert(bit<map_entry.literal_map.size());
       if(!map_entry.literal_map[bit].is_set)
-        return true;
+        return {};
 
-      dest=map_entry.literal_map[bit].l;
-      return false;
+      return map_entry.literal_map[bit].l;
     }
     else if(expr.id()==ID_index)
     {
@@ -76,7 +73,7 @@ bool boolbvt::literal(
 
       std::size_t offset=integer2unsigned(index*element_width);
 
-      return literal(index_expr.array(), bit+offset, dest);
+      return literal(index_expr.array(), bit + offset);
     }
     else if(expr.id()==ID_member)
     {
@@ -96,7 +93,7 @@ bool boolbvt::literal(
         const typet &subtype=it->type();
 
         if(it->get_name()==component_name)
-          return literal(expr.op0(), bit+offset, dest);
+          return literal(expr.op0(), bit + offset);
 
         std::size_t element_width=boolbv_width(subtype);
 
@@ -564,7 +561,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
       return const_literal(true);
   }
 
-  return SUB::convert_rest(expr);
+  return baset::convert_rest(expr);
 }
 
 bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
@@ -605,7 +602,7 @@ void boolbvt::set_to(const exprt &expr, bool value)
   const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr);
   if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))
     return;
-  SUB::set_to(expr, value);
+  baset::set_to(expr, value);
 }
 
 exprt boolbvt::make_bv_expr(const typet &type, const bvt &bv)
@@ -640,17 +637,9 @@ bool boolbvt::is_unbounded_array(const typet &type) const
   if(unbounded_array==unbounded_arrayt::U_ALL)
     return true;
 
-  const exprt &size=to_array_type(type).size();
-
-  mp_integer s;
-  if(to_integer(size, s))
-    return true;
-
-  if(unbounded_array==unbounded_arrayt::U_AUTO)
-    if(s>MAX_FLATTENED_ARRAY_SIZE)
-      return true;
-
-  return false;
+  const auto s = numeric_cast<mp_integer>(to_array_type(type).size());
+  return !s.has_value() || (unbounded_array == unbounded_arrayt::U_AUTO &&
+                            *s > MAX_FLATTENED_ARRAY_SIZE);
 }
 
 void boolbvt::print_assignment(std::ostream &out) const

@@ -76,7 +76,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
     }
   }
 
-  return SUB::convert_rest(expr);
+  return baset::convert_rest(expr);
 }
 
 bv_pointerst::bv_pointerst(
@@ -276,15 +276,15 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   }
   else if(expr.id()==ID_if)
   {
-    return SUB::convert_if(to_if_expr(expr));
+    return baset::convert_if(to_if_expr(expr));
   }
   else if(expr.id()==ID_index)
   {
-    return SUB::convert_index(to_index_expr(expr));
+    return baset::convert_index(to_index_expr(expr));
   }
   else if(expr.id()==ID_member)
   {
-    return SUB::convert_member(to_member_expr(expr));
+    return baset::convert_member(to_member_expr(expr));
   }
   else if(expr.id()==ID_address_of)
   {
@@ -445,7 +445,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   else if(expr.id()==ID_lshr ||
           expr.id()==ID_shl)
   {
-    return SUB::convert_shift(to_shift_expr(expr));
+    return baset::convert_shift(to_shift_expr(expr));
   }
   else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
@@ -455,12 +455,12 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   }
   else if(expr.id()==ID_concatenation)
   {
-    return SUB::convert_concatenation(expr);
+    return baset::convert_concatenation(expr);
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
   {
-    return SUB::convert_byte_extract(to_byte_extract_expr(expr));
+    return baset::convert_byte_extract(to_byte_extract_expr(expr));
   }
   else if(
     expr.id() == ID_byte_update_little_endian ||
@@ -594,7 +594,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     return bv_utils.zero_extension(op0, width);
   }
 
-  return SUB::convert_bitvector(expr);
+  return baset::convert_bitvector(expr);
 }
 
 exprt bv_pointerst::bv_get_rec(
@@ -604,7 +604,7 @@ exprt bv_pointerst::bv_get_rec(
   const typet &type) const
 {
   if(type.id()!=ID_pointer)
-    return SUB::bv_get_rec(bv, unknown, offset, type);
+    return baset::bv_get_rec(bv, unknown, offset, type);
 
   std::string value_addr, value_offset, value;
 
@@ -831,7 +831,7 @@ void bv_pointerst::do_postponed(
 void bv_pointerst::post_process()
 {
   // post-processing arrays may yield further objects, do this first
-  SUB::post_process();
+  baset::post_process();
 
   for(postponed_listt::const_iterator
       it=postponed_list.begin();
