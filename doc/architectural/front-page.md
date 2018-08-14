@@ -80,19 +80,7 @@ class-level or module-level documentation.
 
 * \subpage folder-walkthrough
 
-* \subpage data-structures-core-structures-and-ast
-
-* \subpage data-structures-from-ast-to-goto-program
-
-* \subpage front-end-languages-generating-codet-from-multiple-languages
-
-* \subpage bmct-class
-
-* \subpage symbolic-executors
-
-* \subpage solvers-infrastructure
-
-* \subpage static-analysis-apis
+* \subpage code-walkthrough
 
 * \subpage other-tools
 
