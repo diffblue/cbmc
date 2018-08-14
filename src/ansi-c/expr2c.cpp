@@ -30,18 +30,27 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_qualifiers.h"
 #include "expr2c_class.h"
 
-expr2c_configurationt expr2c_configurationt::default_configuration{true,
-                                                                   true,
-                                                                   true,
-                                                                   "TRUE",
-                                                                   "FALSE"};
+// clang-format off
 
-expr2c_configurationt expr2c_configurationt::clean_configuration{false,
-                                                                 false,
-                                                                 false,
-                                                                 "1",
-                                                                 "0"};
+expr2c_configurationt expr2c_configurationt::default_configuration
+{
+  true,
+  true,
+  true,
+  "TRUE",
+  "FALSE"
+};
 
+expr2c_configurationt expr2c_configurationt::clean_configuration
+{
+  false,
+  false,
+  false,
+  "1",
+  "0"
+};
+
+// clang-format on
 /*
 
 Precedences are as follows. Higher values mean higher precedence.
