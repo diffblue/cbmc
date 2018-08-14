@@ -381,7 +381,17 @@ void ci_lazy_methodst::initialize_instantiated_classes(
     {
       if(param.type().id()==ID_pointer)
       {
-        const pointer_typet &original_pointer=to_pointer_type(param.type());
+        const pointer_typet &original_pointer = to_pointer_type(param.type());
+        const auto &original_type = ns.follow(original_pointer.subtype());
+        // Special case for enums. We may want to generalise this, see TG-4689
+        // and the comment in java_object_factoryt::gen_nondet_pointer_init.
+        if(
+          can_cast_type<java_class_typet>(original_type) &&
+          to_java_class_type(original_type).get_base("java::java.lang.Enum"))
+        {
+          add_clinit_call_for_pointer_type(
+            original_pointer, ns.get_symbol_table(), needed_lazy_methods);
+        }
         needed_lazy_methods.add_all_needed_classes(original_pointer);
       }
     }
@@ -399,6 +409,29 @@ void ci_lazy_methodst::initialize_instantiated_classes(
     needed_lazy_methods.add_needed_class("java::" + id2string(id));
 }
 
+/// Helper function for `initialize_instantiated_classes`.
+/// For a given pointer_typet that is being noted as needed in
+/// `needed_lazy_methods`, notes that its static initializer is also needed.
+/// This applies the same logic to the class of `pointer_type` that
+/// `java_bytecode_convert_methodt::get_clinit_call` applies e.g. to classes
+/// whose constructor we call in a method body. This duplication is unavoidable
+/// due to the fact that ci_lazy_methods essentially has to go through the same
+/// logic as __CPROVER_start in its initial setup.
+/// \param pointer_type: The given pointer_typet
+/// \param symbol_table: Used to look up occurrences of static initializers
+/// \param [out] needed_lazy_methods: Gets notified of any static initializers
+///   that need to be loaded
+void ci_lazy_methodst::add_clinit_call_for_pointer_type(
+  const pointer_typet &pointer_type,
+  const symbol_tablet &symbol_table,
+  ci_lazy_methods_neededt &needed_lazy_methods)
+{
+  const irep_idt &pointer_id =
+    to_symbol_type(pointer_type.subtype()).get_identifier();
+  const irep_idt &clinit_wrapper = clinit_wrapper_name(pointer_id);
+  if(symbol_table.symbols.count(clinit_wrapper))
+    needed_lazy_methods.add_needed_method(clinit_wrapper);
+}
 
 /// Get places where virtual functions are called.
 /// \param e: expression tree to search
