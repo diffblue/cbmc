@@ -19,7 +19,7 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../$(CPROVER_DIR)/src/goto-analyzer/static_verifier$(OBJEXT) \
       ../$(CPROVER_DIR)/src/goto-analyzer/taint_analysis$(OBJEXT) \
       ../$(CPROVER_DIR)/src/goto-analyzer/taint_parser$(OBJEXT) \
-      ../$(CPROVER_DIR)/src/goto-analyzer/unreachable_instructions$(OBJEXT) \
+      ../$(CPROVER_DIR)/src/goto-analyzer/instruction_reachability$(OBJEXT) \
       # Empty last line
 
 INCLUDES= -I .. -I ../$(CPROVER_DIR)/src
