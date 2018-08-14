@@ -224,8 +224,7 @@ select_pointer_typet::get_recursively_instantiated_type(
   return inst_val;
 }
 
-optionalt<std::set<symbol_typet>>
-select_pointer_typet::get_parameter_alternative_types(
+std::set<symbol_typet> select_pointer_typet::get_parameter_alternative_types(
   const irep_idt &function_name,
   const irep_idt &parameter_name,
   const namespacet &ns) const

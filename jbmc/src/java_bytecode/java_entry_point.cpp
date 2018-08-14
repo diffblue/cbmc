@@ -327,7 +327,7 @@ exprt::operandst java_build_arguments(
     const auto alternatives =
       pointer_type_selector.get_parameter_alternative_types(
         function.name, p.get_identifier(), ns);
-    if(!alternatives.has_value())
+    if(alternatives.empty())
     {
       main_arguments[param_number] = object_factory(
         p.type(),
@@ -344,7 +344,6 @@ exprt::operandst java_build_arguments(
       INVARIANT(!is_this, "We cannot have different types for `this` here");
       // create a non-deterministic switch between all possible values for the
       // type of the parameter.
-      const auto alternative_object_types = alternatives.value();
       code_switcht code_switch;
 
       // the idea is to get a new symbol for the parameter value `tmp`
@@ -374,7 +373,7 @@ exprt::operandst java_build_arguments(
 
       std::vector<codet> cases;
       size_t alternative = 0;
-      for(const auto &type : alternative_object_types)
+      for(const auto &type : alternatives)
       {
         code_blockt init_code_for_type;
         exprt init_expr_for_parameter = object_factory(
