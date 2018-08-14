@@ -364,34 +364,38 @@ exprt::operandst java_build_arguments(
 
       const symbolt result_symbol = get_fresh_aux_symbol(
         p.type(),
-        "nondet_parameter_" + std::to_string(param_number),
+        id2string(function.name),
         "nondet_parameter_" + std::to_string(param_number),
         function.location,
         ID_java,
         symbol_table);
       main_arguments[param_number] = result_symbol.symbol_expr();
 
-      std::vector<codet> cases;
-      size_t alternative = 0;
-      for(const auto &type : alternatives)
-      {
+      std::vector<codet> cases(alternatives.size());
+      const auto initialize_parameter = [&](const symbol_typet &type) {
         code_blockt init_code_for_type;
         exprt init_expr_for_parameter = object_factory(
           java_reference_type(type),
-          id2string(base_name) + "_alt_" + std::to_string(alternative),
+          id2string(base_name) + "_alternative_" +
+            id2string(type.get_identifier()),
           init_code_for_type,
           symbol_table,
           parameters,
           allocation_typet::DYNAMIC,
           function.location,
           pointer_type_selector);
-        alternative++;
         init_code_for_type.add(
           code_assignt(
             result_symbol.symbol_expr(),
             typecast_exprt(init_expr_for_parameter, p.type())));
-        cases.push_back(init_code_for_type);
-      }
+        return init_code_for_type;
+      };
+
+      std::transform(
+        alternatives.begin(),
+        alternatives.end(),
+        cases.begin(),
+        initialize_parameter);
 
       init_code.add(
         generate_nondet_switch(
