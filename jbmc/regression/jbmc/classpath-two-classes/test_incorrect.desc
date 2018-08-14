@@ -1,0 +1,9 @@
+KNOWNBUG
+Test.class
+Test2.class
+^EXIT=6$
+--
+Invariant check failed
+--
+We don't allow two classes passed on the command line.
+Issue: 2864

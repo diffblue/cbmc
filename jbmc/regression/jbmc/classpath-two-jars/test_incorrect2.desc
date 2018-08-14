@@ -1,0 +1,8 @@
+KNOWNBUG
+Test.class
+--classpath `../../../../scripts/format_classpath.sh libs/test.jar lib/test2.jar`
+^EXIT=6$
+--
+--
+This is incorrect as it would search for a Test.class file outside the jar files.
+Issue: 2864

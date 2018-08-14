@@ -1,0 +1,8 @@
+CORE
+lib/test2.jar
+--main-class Test --classpath libs/test.jar
+^EXIT=10$
+^VERIFICATION FAILED$
+--
+--
+This is a correct way of dealing with two jars.

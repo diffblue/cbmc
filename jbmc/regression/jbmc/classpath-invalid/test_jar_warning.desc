@@ -1,0 +1,9 @@
+KNOWNBUG
+Test.class
+--classpath ./NotHere.jar
+^EXIT=0$
+^SIGNAL=0$
+^Warning: file './NotHere.jar' does not exist$
+--
+--
+Issue: 2864

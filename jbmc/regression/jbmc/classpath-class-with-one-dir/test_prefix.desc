@@ -1,0 +1,9 @@
+KNOWNBUG
+src/Test.class
+
+^EXIT=6$
+--
+Parsing src/Test.class
+--
+Test class is not in src package. Therefore, this must fail.
+Issue: 2864
