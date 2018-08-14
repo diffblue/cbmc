@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void java_bytecode_typecheckt::typecheck_type(typet &type)
 {
-  if(type.id()==ID_symbol)
+  if(type.id() == ID_symbol_type)
   {
     irep_idt identifier=to_symbol_type(type).get_identifier();
 

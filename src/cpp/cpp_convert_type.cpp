@@ -588,19 +588,13 @@ void cpp_convert_typet::write(typet &type)
 
 void cpp_convert_plain_type(typet &type)
 {
-  if(type.id()==ID_cpp_name ||
-     type.id()==ID_struct ||
-     type.id()==ID_union ||
-     type.id()==ID_array ||
-     type.id()==ID_code ||
-     type.id()==ID_unsignedbv ||
-     type.id()==ID_signedbv ||
-     type.id()==ID_bool ||
-     type.id()==ID_floatbv ||
-     type.id()==ID_empty ||
-     type.id()==ID_symbol ||
-     type.id()==ID_constructor ||
-     type.id()==ID_destructor)
+  if(
+    type.id() == ID_cpp_name || type.id() == ID_struct ||
+    type.id() == ID_union || type.id() == ID_array || type.id() == ID_code ||
+    type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
+    type.id() == ID_bool || type.id() == ID_floatbv || type.id() == ID_empty ||
+    type.id() == ID_symbol_type || type.id() == ID_constructor ||
+    type.id() == ID_destructor)
   {
   }
   else if(type.id()==ID_c_enum)

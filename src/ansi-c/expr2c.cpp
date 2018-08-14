@@ -457,7 +457,7 @@ std::string expr2ct::convert_rec(
     return convert_rec(
       src.subtype(), qualifiers, declarator+"[]");
   }
-  else if(src.id()==ID_symbol)
+  else if(src.id() == ID_symbol_type)
   {
     symbol_typet symbolic_type=to_symbol_type(src);
     const irep_idt &typedef_identifer=symbolic_type.get(ID_typedef);

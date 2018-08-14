@@ -889,7 +889,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
     // TODO
     //    typecheck_type(ftype);
-    //    assert(ftype.id()==ID_symbol);
+    //    assert(ftype.id()==ID_symbol_type);
     //    symbol.type.add("ID_C_friends").move_to_sub(ftype);
 
     return;
@@ -1631,7 +1631,7 @@ void cpp_typecheckt::get_bases(
   forall_irep(it, bases)
   {
     assert(it->id()==ID_base);
-    assert(it->get(ID_type)==ID_symbol);
+    assert(it->get(ID_type) == ID_symbol_type);
 
     const struct_typet &base=
       to_struct_type(lookup(it->find(ID_type).get(ID_identifier)).type);
@@ -1653,7 +1653,7 @@ void cpp_typecheckt::get_virtual_bases(
   forall_irep(it, bases)
   {
     assert(it->id()==ID_base);
-    assert(it->get(ID_type)==ID_symbol);
+    assert(it->get(ID_type) == ID_symbol_type);
 
     const struct_typet &base=
       to_struct_type(lookup(it->find(ID_type).get(ID_identifier)).type);

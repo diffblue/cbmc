@@ -187,10 +187,9 @@ static std::string type2name(
     else
       result+="ARR"+integer2string(size);
   }
-  else if(type.id()==ID_symbol ||
-          type.id()==ID_c_enum_tag ||
-          type.id()==ID_struct_tag ||
-          type.id()==ID_union_tag)
+  else if(
+    type.id() == ID_symbol_type || type.id() == ID_c_enum_tag ||
+    type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
     parent_is_sym_check=true;
     result+=type2name_symbol(type, ns, symbol_number);

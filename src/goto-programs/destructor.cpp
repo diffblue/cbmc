@@ -19,7 +19,7 @@ code_function_callt get_destructor(
   const namespacet &ns,
   const typet &type)
 {
-  if(type.id()==ID_symbol)
+  if(type.id() == ID_symbol_type)
   {
     return get_destructor(ns, ns.follow(type));
   }

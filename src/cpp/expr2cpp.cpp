@@ -187,7 +187,7 @@ std::string expr2cppt::convert_rec(
     else
       return expr2ct::convert_rec(src, qualifiers, declarator);
   }
-  else if(src.id()==ID_symbol)
+  else if(src.id() == ID_symbol_type)
   {
     const irep_idt &identifier=
       to_symbol_type(src).get_identifier();

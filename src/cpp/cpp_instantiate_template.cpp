@@ -50,8 +50,8 @@ std::string cpp_typecheckt::template_suffix(
     if(expr.id()==ID_type)
     {
       const typet &type=expr.type();
-      if(type.id()==ID_symbol)
-        result+=type.get_string(ID_identifier);
+      if(type.id() == ID_symbol_type)
+        result += id2string(to_symbol_type(type).get_identifier());
       else
         result+=cpp_type2name(type);
     }
@@ -190,7 +190,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
-  if(type.id()!=ID_symbol)
+  if(type.id() != ID_symbol_type)
     return;
 
   const symbolt &symbol = lookup(to_symbol_type(type));

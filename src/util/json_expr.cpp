@@ -117,7 +117,7 @@ json_objectt json(
   const namespacet &ns,
   const irep_idt &mode)
 {
-  if(type.id()==ID_symbol)
+  if(type.id() == ID_symbol_type)
     return json(ns.follow(type), ns, mode);
 
   json_objectt result;

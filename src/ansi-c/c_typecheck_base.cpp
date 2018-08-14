@@ -406,7 +406,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
        final_old.subtype()==final_new.subtype())
     {
       // we don't do symbol types for arrays anymore
-      PRECONDITION(old_symbol.type.id()!=ID_symbol);
+      PRECONDITION(old_symbol.type.id() != ID_symbol_type);
       old_symbol.type=new_symbol.type;
     }
     else if((final_old.id()==ID_incomplete_c_enum ||

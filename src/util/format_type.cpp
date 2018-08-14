@@ -51,7 +51,7 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
   }
   else if(id == ID_struct)
     return format_rec(os, to_struct_type(type));
-  else if(id == ID_symbol)
+  else if(id == ID_symbol_type)
     return os << "symbol_type " << to_symbol_type(type).get_identifier();
   else
     return os << id;

@@ -141,8 +141,9 @@ symbolt &cpp_declarator_convertert::convert(
           cpp_typecheck_resolvet::wantt::TYPE,
           cpp_typecheck_fargst());
 
-      if(symbol_expr.id()!=ID_type ||
-         symbol_expr.type().id()!=ID_symbol)
+      if(
+        symbol_expr.id() != ID_type ||
+        symbol_expr.type().id() != ID_symbol_type)
       {
         cpp_typecheck.error().source_location=name.source_location();
         cpp_typecheck.error() << "error: expected type"

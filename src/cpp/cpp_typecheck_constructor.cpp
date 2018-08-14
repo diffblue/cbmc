@@ -252,7 +252,7 @@ void cpp_typecheckt::default_cpctor(
   forall_irep(parent_it, bases.get_sub())
   {
     assert(parent_it->id()==ID_base);
-    assert(parent_it->get(ID_type)==ID_symbol);
+    assert(parent_it->get(ID_type) == ID_symbol_type);
 
     const symbolt &parsymb=
       lookup(parent_it->find(ID_type).get(ID_identifier));
@@ -367,7 +367,7 @@ void cpp_typecheckt::default_assignop(
   std::string arg_name("ref");
 
   cpctor.add(ID_storage_spec).id(ID_cpp_storage_spec);
-  cpctor.type().id(ID_symbol);
+  cpctor.type().id(ID_symbol_type);
   cpctor.type().add(ID_identifier).id(symbol.name);
   cpctor.operands().push_back(exprt(ID_cpp_declarator));
   cpctor.add_source_location()=source_location;
@@ -447,7 +447,7 @@ void cpp_typecheckt::default_assignop_value(
   forall_irep(parent_it, bases.get_sub())
   {
     assert(parent_it->id()==ID_base);
-    assert(parent_it->get(ID_type)==ID_symbol);
+    assert(parent_it->get(ID_type) == ID_symbol_type);
 
     const symbolt &symb=
       lookup(parent_it->find(ID_type).get(ID_identifier));
@@ -540,7 +540,7 @@ void cpp_typecheckt::check_member_initializers(
       bool ok=false;
       forall_irep(parent_it, bases.get_sub())
       {
-        assert(parent_it->get(ID_type)==ID_symbol);
+        assert(parent_it->get(ID_type) == ID_symbol_type);
 
         if(member_type.get(ID_identifier)
           ==parent_it->find(ID_type).get(ID_identifier))
@@ -584,7 +584,7 @@ void cpp_typecheckt::check_member_initializers(
       if(c_it->get_bool("is_type"))
       {
         typet type=static_cast<const typet&>(c_it->find(ID_type));
-        if(type.id()!=ID_symbol)
+        if(type.id() != ID_symbol_type)
           continue;
 
         const symbolt &symb=lookup(type.get(ID_identifier));
@@ -594,7 +594,7 @@ void cpp_typecheckt::check_member_initializers(
         // check for a direct parent
         forall_irep(parent_it, bases.get_sub())
         {
-          assert(parent_it->get(ID_type)==ID_symbol);
+          assert(parent_it->get(ID_type) == ID_symbol_type);
           if(symb.name==parent_it->find(ID_type).get(ID_identifier))
           {
             ok=true;
@@ -617,7 +617,7 @@ void cpp_typecheckt::check_member_initializers(
         // check for a direct parent
         forall_irep(parent_it, bases.get_sub())
         {
-          assert(parent_it->get(ID_type)==ID_symbol);
+          assert(parent_it->get(ID_type) == ID_symbol_type);
 
           if(member_type.get(ID_identifier)==
              parent_it->find(ID_type).get(ID_identifier))
@@ -711,7 +711,7 @@ void cpp_typecheckt::full_member_initialization(
     forall_irep(parent_it, bases.get_sub())
     {
       assert(parent_it->id()==ID_base);
-      assert(parent_it->get(ID_type)==ID_symbol);
+      assert(parent_it->get(ID_type) == ID_symbol_type);
 
       const symbolt &ctorsymb=
         lookup(parent_it->find(ID_type).get(ID_identifier));
@@ -764,7 +764,7 @@ void cpp_typecheckt::full_member_initialization(
 
         typecheck_type(member_type);
 
-        if(member_type.id()!=ID_symbol)
+        if(member_type.id() != ID_symbol_type)
           break;
 
         if(parent_it->find(ID_type).get(ID_identifier)==

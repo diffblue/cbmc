@@ -1179,7 +1179,7 @@ void java_object_factoryt::gen_nondet_init(
     if(is_sub)
     {
       const typet &symbol = override_ ? override_type : expr.type();
-      PRECONDITION(symbol.id() == ID_symbol);
+      PRECONDITION(symbol.id() == ID_symbol_type);
       generic_parameter_specialization_map_keys.insert_pairs_for_symbol(
         to_symbol_type(symbol), struct_type);
     }
@@ -1286,7 +1286,7 @@ void java_object_factoryt::gen_nondet_array_init(
   const source_locationt &location)
 {
   PRECONDITION(expr.type().id()==ID_pointer);
-  PRECONDITION(expr.type().subtype().id()==ID_symbol);
+  PRECONDITION(expr.type().subtype().id() == ID_symbol_type);
   PRECONDITION(update_in_place!=update_in_placet::MAY_UPDATE_IN_PLACE);
 
   const typet &type=ns.follow(expr.type().subtype());
