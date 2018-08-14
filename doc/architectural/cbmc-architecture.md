@@ -52,7 +52,7 @@ be output to files (this is what `goto-cc` does) and are (informally)
 referred to as “goto binaries” or “goto programs”. The back-end are
 tools process this format, either directly from the front-end or from
 it’s saved output. These include a wide range of analysis and
-transformation tools (see \ref section-other-tools).
+transformation tools (see \ref other-tools).
 
 # Concepts #
 ## {C, java bytecode} &rarr; Parse tree &rarr; Symbol table &rarr; GOTO programs &rarr; GOTO program transformations &rarr; BMC &rarr; counterexample (goto_tracet) &rarr; printing ##

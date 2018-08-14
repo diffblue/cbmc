@@ -4,7 +4,7 @@
 
 \authors Romain Brenguier, Kareem Khazem, Martin Brain
 
-\section overview Overview
+\section solvers-overview Overview
 
 The basic role of solvers is to answer whether the set of equations given
 is satisfiable.

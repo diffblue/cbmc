@@ -5,7 +5,7 @@
 
 \author Kareem Khazem, Martin Brain
 
-\section overview Overview
+\section goto-programs-overview Overview
 Goto programs are the intermediate representation of the CPROVER tool
 chain. They are language independent and similar to many of the compiler
 intermediate languages. Section \ref goto-programs describes the
