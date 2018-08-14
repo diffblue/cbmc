@@ -381,9 +381,17 @@ void ci_lazy_methodst::initialize_instantiated_classes(
     {
       if(param.type().id()==ID_pointer)
       {
-        const pointer_typet &original_pointer=to_pointer_type(param.type());
-        add_clinit_call_for_pointer_type(
-          original_pointer, ns.get_symbol_table(), needed_lazy_methods);
+        const pointer_typet &original_pointer = to_pointer_type(param.type());
+        const auto &original_type = ns.follow(original_pointer.subtype());
+        // Special case for enums. We may want to generalise this, see TG-4689
+        // and the comment in java_object_factoryt::gen_nondet_pointer_init.
+        if(
+          can_cast_type<java_class_typet>(original_type) &&
+          to_java_class_type(original_type).get_base("java::java.lang.Enum"))
+        {
+          add_clinit_call_for_pointer_type(
+            original_pointer, ns.get_symbol_table(), needed_lazy_methods);
+        }
         needed_lazy_methods.add_all_needed_classes(original_pointer);
       }
     }

@@ -785,18 +785,29 @@ void java_object_factoryt::gen_nondet_pointer_init(
   // (This can currently happen for some cases of #exception_value)
   bool must_be_null = subtype == empty_typet();
 
-  // If we may be about to initialize a non-null object, always run the
+  // If we may be about to initialize a non-null enum type, always run the
   // clinit_wrapper of its class first.
+  // TODO: TG-4689 we may want to do this for all types, not just enums, as
+  // described in the Java language specification:
+  // https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.7
+  // https://docs.oracle.com/javase/specs/jls/se8/html/jls-12.html#jls-12.4.1
+  // But we would have to put this behavior behind an option as it would have an
+  // impact on running times.
   // Note that it would be more consistent with the behaviour of the JVM to only
   // run clinit_wrapper if we are about to initialize an object of which we know
   // for sure that it is not null on any following branch. However, adding this
-  // case in gen_nondet_struct_init would slow symex down too much.
-  if(!must_be_null)
+  // case in gen_nondet_struct_init would slow symex down too much, so if we
+  // decide to do this for all types, we should do it here.
+  // Note also that this logic is mirrored in
+  // ci_lazy_methodst::initialize_instantiated_classes.
+  if(const auto class_type = type_try_dynamic_cast<java_class_typet>(subtype))
   {
-    const java_class_typet &class_type = to_java_class_type(subtype);
-    const irep_idt &class_name = class_type.get_name();
-    const irep_idt class_clinit = clinit_wrapper_name(class_name);
-    gen_method_call_if_present(assignments, expr, class_clinit);
+    if(class_type->get_base("java::java.lang.Enum") && !must_be_null)
+    {
+      const irep_idt &class_name = class_type->get_name();
+      const irep_idt class_clinit = clinit_wrapper_name(class_name);
+      gen_method_call_if_present(assignments, expr, class_clinit);
+    }
   }
 
   code_blockt new_object_assignments;
