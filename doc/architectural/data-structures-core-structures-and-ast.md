@@ -36,9 +36,13 @@ considered important, for example it shouldn't be counted when comparing two
 
 ## typet ##
 
+See \ref typet.
+
 To be documented.
 
 ### symbol_typet ###
+
+See \ref symbol_typet.
 
 To be documented.
 
