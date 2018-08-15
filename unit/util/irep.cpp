@@ -22,7 +22,7 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       const std::size_t ref_count_size = 0;
 #endif
 
-#ifndef USE_STRING
+#ifndef USE_STD_STRING
       const std::size_t data_size = sizeof(dstringt);
       REQUIRE(sizeof(dstringt) == sizeof(unsigned));
 #else

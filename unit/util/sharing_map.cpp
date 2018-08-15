@@ -492,7 +492,7 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
 
   SECTION("View")
   {
-    typedef std::pair<std::string, std::string> pt;
+    typedef std::pair<irep_idt, std::string> pt;
 
     sharing_map_standardt sm;
     sharing_map_standardt::viewt view;

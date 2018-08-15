@@ -119,6 +119,12 @@ class bmct;
 class goto_functionst;
 class optionst;
 
+#ifndef USE_STD_STRING
+#define OPT_VS_PROGRESS_STRING_STATISTICS "(vs-progress-string-statistics)"
+#else
+#define OPT_VS_PROGRESS_STRING_STATISTICS
+#endif
+
 // clang-format off
 #define GOTO_ANALYSER_OPTIONS \
   OPT_FUNCTIONS \
@@ -159,7 +165,7 @@ class optionst;
   "(vs-progress)" \
   "(vs-progress-interval):" \
   "(vs-progress-memory-usage)" \
-  "(vs-progress-string-statistics)"
+  OPT_VS_PROGRESS_STRING_STATISTICS
 // clang-format on
 
 class goto_analyzer_parse_optionst: public parse_options_baset

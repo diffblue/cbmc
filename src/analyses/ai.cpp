@@ -640,7 +640,9 @@ void ai_baset::print_progress_interval(const namespacet &ns) const
     }
     if(config.print_string_container_statistics)
     {
+#ifndef USE_STD_STRING
       get_string_container().compute_statistics().dump_on_stream(progress());
+#endif
     }
   }
 }
