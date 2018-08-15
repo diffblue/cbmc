@@ -3,8 +3,6 @@
 
 \author Cesar Rodriguez, Owen Jones
 
-testing
-
 \section data-structures-core-structures-and-ast-section Data structures: core structures and AST
 
 The core structures used for representing abstract syntax trees are all
