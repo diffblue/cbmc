@@ -52,8 +52,6 @@ set_target_properties(
     big-int
     cbmc
     cbmc-lib
-    clobber
-    clobber-lib
     cpp
     driver
     goto-analyzer

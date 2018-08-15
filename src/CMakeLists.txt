@@ -96,7 +96,6 @@ add_subdirectory(pointer-analysis)
 add_subdirectory(solvers)
 add_subdirectory(util)
 add_subdirectory(xmllang)
-add_subdirectory(clobber)
 
 add_subdirectory(cbmc)
 add_subdirectory(goto-cc)
