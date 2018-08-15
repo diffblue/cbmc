@@ -44,19 +44,6 @@ See \ref cpp.
 
 See \ref java_bytecode.
 
-\subsubsection java-class-section Explain how a java program / class is represented in a .class
-
-To be documented.
-
-\subsubsection java-bytecode-conversion-section Explain the 2 step conversion from bytecode to codet
-
-To be documented.
-
-\subsubsection java-bytecode-conversion-example-section A worked example of converting java bytecode to codet
-
-To be documented.
-
-
 \section bmct-class-section Bmct class
 
 \subsection equation-section equation
