@@ -62,6 +62,27 @@ static std::ostream &format_rec(std::ostream &os, const multi_ary_exprt &src)
 {
   bool first = true;
 
+  std::string operator_str;
+
+  if(src.id() == ID_and)
+    operator_str = u8"\u2227"; // wedge, U+2227
+  else if(src.id() == ID_or)
+    operator_str = u8"\u2228"; // vee, U+2228
+  else if(src.id() == ID_xor)
+    operator_str = u8"\u2295"; // + in circle, U+2295
+  else if(src.id() == ID_le)
+    operator_str = u8"\u2264"; // <=, U+2264
+  else if(src.id() == ID_ge)
+    operator_str = u8"\u2265"; // >=, U+2265
+  else if(src.id() == ID_notequal)
+    operator_str = u8"\u2260"; // /=, U+2260
+  else if(src.id() == ID_implies)
+    operator_str = u8"\u21d2"; // =>, U+21D2
+  else if(src.id() == ID_iff)
+    operator_str = u8"\u21d4"; // <=>, U+21D4
+  else
+    operator_str = id2string(src.id());
+
   for(const auto &op : src.operands())
   {
     if(first)
@@ -95,7 +116,7 @@ static std::ostream &format_rec(std::ostream &os, const binary_exprt &src)
 static std::ostream &format_rec(std::ostream &os, const unary_exprt &src)
 {
   if(src.id() == ID_not)
-    os << '!';
+    os << u8"\u00ac"; // neg, U+00AC
   else if(src.id() == ID_unary_minus)
     os << '-';
   else
@@ -197,8 +218,12 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
   }
   else if(id == ID_type)
     return format_rec(os, expr.type());
-  else if(id == ID_forall || id == ID_exists)
-    return os << id << ' ' << format(to_quantifier_expr(expr).symbol()) << " : "
+  else if(id == ID_forall)
+    return os << id << u8" \u2200 : "
+              << format(to_quantifier_expr(expr).symbol().type()) << " . "
+              << format(to_quantifier_expr(expr).where());
+  else if(id == ID_exists)
+    return os << id << u8" \u2203 : "
               << format(to_quantifier_expr(expr).symbol().type()) << " . "
               << format(to_quantifier_expr(expr).where());
   else if(id == ID_let)
