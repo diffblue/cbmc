@@ -195,7 +195,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   }
   else if(type_id==ID_pointer)
     entry.total_width = type_checked_cast<pointer_typet>(type).get_width();
-  else if(type_id==ID_symbol)
+  else if(type_id == ID_symbol_type)
     entry=get_entry(ns.follow(type));
   else if(type_id==ID_struct_tag)
     entry=get_entry(ns.follow_tag(to_struct_tag_type(type)));
@@ -209,6 +209,8 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   }
   else if(type_id==ID_string)
     entry.total_width=32;
+  else if(type_id != ID_empty)
+    UNIMPLEMENTED;
 
   return entry;
 }
