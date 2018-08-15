@@ -10,33 +10,9 @@ testing
 The core structures used for representing abstract syntax trees are all
 documented in \ref util.
 
-\subsection ast-examples-section Examples: how to represent the AST of statements, in C and in java
-
-\subsubsection ast-example-1-section x = y + 123
-
-To be documented..
-
-\subsubsection ast-example-2-section if (x > 10) { y = 2 } else { v[3] = 4 }
-
-To be documented.
-
-\subsubsection ast-example-3-section Java arrays: struct Array { int length, int *data };
-
-To be documented.
-
-
 \section data-structures-from-ast-to-goto-program-section Data structures: from AST to GOTO program
 
-\subsection goto-programt-section goto_programt
-
 See \ref goto-programs, \ref goto_programt and [instructiont](\ref goto_programt::instructiont).
-
-\subsection goto-program-example-section Example:
-
-\subsubsection goto-program-example-1-section Unsigned mult (unsigned a, unsigned b) { int acc, i; for (i = 0; i < b; i++) acc += a; return acc; }
-
-To be documented.
-
 
 \section front-end-languages-generating-codet-from-multiple-languages-section Front-end languages: generating codet from multiple languages
 

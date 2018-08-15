@@ -130,3 +130,17 @@ digraph G {
   2 -> 3 [label="Command line options, file names"];
 }
 \enddot
+
+\subsection ast-examples-section Examples: how to represent the AST of statements, in C and in java
+
+\subsubsection ast-example-1-section x = y + 123
+
+To be documented..
+
+\subsubsection ast-example-2-section if (x > 10) { y = 2 } else { v[3] = 4 }
+
+To be documented.
+
+\subsubsection ast-example-3-section Java arrays: struct Array { int length, int *data };
+
+To be documented.

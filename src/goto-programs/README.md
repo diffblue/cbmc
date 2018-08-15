@@ -371,3 +371,9 @@ previous stage:
   block.
 
 This stage concludes the *analysis-independent* program transformations.
+
+\subsection goto-program-example-section Example:
+
+\subsubsection goto-program-example-1-section Unsigned mult (unsigned a, unsigned b) { int acc, i; for (i = 0; i < b; i++) acc += a; return acc; }
+
+To be documented.
