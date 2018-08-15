@@ -1,4 +1,6 @@
-[![Build Status][travis_img]][travis] [![Build Status][appveyor_img]][appveyor]
+[![Build Status][travis_img]][travis]
+![Build Status][codebuild_img]
+![Build Status][codebuild_windows_img]
 
 About
 =====
@@ -56,5 +58,5 @@ License
 
 [travis]: https://travis-ci.org/diffblue/cbmc
 [travis_img]: https://travis-ci.org/diffblue/cbmc.svg?branch=develop
-[appveyor]: https://ci.appveyor.com/project/diffblue/cbmc/
-[appveyor_img]: https://ci.appveyor.com/api/projects/status/github/diffblue/cbmc?svg=true&branch=develop
+[codebuild_img]: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoieVl4UDBKaVU2NEZIeE9GKzhMVWJUQ1RORXRZeGFEdm9LZnhvbWt4Q3oxb29uOTdWZDhZUkUvK2Z0eTBndU5pWkcyUXFZb1pDRVpBNXVob3R0R2tYZkdFPSIsIml2UGFyYW1ldGVyU3BlYyI6IkZ0TzR2a21XbHFkWnlYMkwiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=develop
+[codebuild_windows_img]: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiTFQ4Q0lCSEc1Rk5NcmlzaFZDdU44Vk8zY0c1VCtIVWMwWnJMRitmVFI5bE94Q3dhekVPMWRobFU2Q0xTTlpDSWZUQ3J1eksrWW1rSll1OExXdll2bExZPSIsIml2UGFyYW1ldGVyU3BlYyI6InpqcloyaEdxbjBiQUtvNysiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=develop
