@@ -135,6 +135,7 @@ void cpp_typecheckt::typecheck_compound_type(
   cpp_scopet *dest_scope=nullptr;
   bool has_body=type.find(ID_body).is_not_nil();
   bool tag_only_declaration=type.get_bool(ID_C_tag_only_declaration);
+  bool is_union = type.id() == ID_union;
 
   if(!has_tag)
   {
@@ -263,10 +264,20 @@ void cpp_typecheckt::typecheck_compound_type(
     }
   }
 
-  // create type symbol
-  symbol_typet symbol_type(symbol_name);
-  qualifiers.write(symbol_type);
-  type.swap(symbol_type);
+  if(is_union)
+  {
+    // create union tag
+    union_tag_typet tag_type(symbol_name);
+    qualifiers.write(tag_type);
+    type.swap(tag_type);
+  }
+  else
+  {
+    // create type symbol
+    symbol_typet symbol_type(symbol_name);
+    qualifiers.write(symbol_type);
+    type.swap(symbol_type);
+  }
 }
 
 void cpp_typecheckt::typecheck_compound_declarator(
