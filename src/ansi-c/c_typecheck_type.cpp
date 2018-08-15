@@ -93,6 +93,11 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_symbol_type(to_symbol_type(type));
   else if(type.id() == ID_typedef_type)
     typecheck_typedef_type(type);
+  else if(type.id() == ID_struct_tag ||
+          type.id() == ID_union_tag)
+  {
+    // nothing to do, these stay as is
+  }
   else if(type.id()==ID_vector)
     typecheck_vector_type(to_vector_type(type));
   else if(type.id()==ID_custom_unsignedbv ||
