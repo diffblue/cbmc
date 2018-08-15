@@ -141,8 +141,19 @@ abstract_object_pointert data_dependency_contextt::set_data_deps(
   const dependencest &dependencies) const
 {
   // If the dependencies will not change, just return 'this'
-  if(data_deps == dependencies)
+  abstract_objectt::locationst intersection;
+
+  std::set_intersection(
+    data_deps.cbegin(),
+    data_deps.cend(),
+    dependencies.cbegin(),
+    dependencies.cend(),
+    std::inserter(intersection, intersection.end()),
+    location_ordert());
+  if(intersection.size()==data_deps.size() &&
+     intersection.size()==dependencies.size())
     return shared_from_this();
+
 
   const auto &result=
     std::dynamic_pointer_cast<data_dependency_contextt>(mutable_clone());
