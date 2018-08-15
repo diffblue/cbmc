@@ -3,7 +3,6 @@ DIRS = analyses \
        assembler \
        big-int \
        cbmc \
-       clobber \
        cpp \
        goto-analyzer \
        goto-cc \
