@@ -14,7 +14,6 @@ DIRS = analyses \
        json \
        langapi \
        linking \
-       memory-models \
        pointer-analysis \
        solvers \
        util \

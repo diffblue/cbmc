@@ -69,7 +69,6 @@ set_target_properties(
     langapi
     linking
     miniBDD
-    mmcc
     pointer-analysis
     solvers
     test-bigint
