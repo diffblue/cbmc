@@ -240,6 +240,9 @@ bool flow_insensitive_analysis_baset::do_function_call(
     // get the state at the beginning of the function
     locationt l_begin=goto_function.body.instructions.begin();
 
+    DATA_INVARIANT(
+      l_begin->function == f_it->first, "function names have to match");
+
     // do the edge from the call site to the beginning of the function
     new_data=state.transform(ns, l_call, l_begin);
 
