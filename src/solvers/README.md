@@ -60,6 +60,20 @@ different decision procedures, roughly one per directory.
 
 * sat/:   Back-ends for a variety of SAT solvers and DIMACS output.
 
+\section solver-apis Solver APIs
+
+\subsection flattening-section Flattening
+
+To be documented.
+
+\subsection smt-solving-api-section SMT solving API
+
+To be documented.
+
+\subsection sat-solving-api-section SAT solving API
+
+To be documented.
+
 \section sat-smt-encoding SAT/SMT Encoding
 
 In the \ref solvers directory.
@@ -80,7 +94,6 @@ digraph G {
 	2 -> 3 [label="propositional variables as bitvectors, constraints"];
 }
 \enddot
-
 
 ---
 

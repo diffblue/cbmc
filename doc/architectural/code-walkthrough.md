@@ -62,19 +62,6 @@ See \ref symex-overview.
 
 See \ref solvers-overview.
 
-\subsection flattening-section Flattening
-
-To be documented.
-
-\subsection smt-solving-api-section SMT solving API
-
-To be documented.
-
-\subsection sat-solving-api-section SAT solving API
-
-To be documented.
-
-
 \section  static-analysis-apis-section Static analysis APIs
 
 See \ref analyses and \ref pointer-analysis.
