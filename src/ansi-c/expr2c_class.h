@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_EXPR2C_CLASS_H
 #define CPROVER_ANSI_C_EXPR2C_CLASS_H
 
+#include "expr2c.h"
+
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -23,7 +25,13 @@ class namespacet;
 class expr2ct
 {
 public:
-  explicit expr2ct(const namespacet &_ns):ns(_ns), sizeof_nesting(0) { }
+  explicit expr2ct(
+    const namespacet &_ns,
+    const expr2c_configurationt &configuration =
+      expr2c_configurationt::default_configuration)
+    : ns(_ns), configuration(configuration), sizeof_nesting(0)
+  {
+  }
   virtual ~expr2ct() { }
 
   virtual std::string convert(const typet &src);
@@ -31,8 +39,12 @@ public:
 
   void get_shorthands(const exprt &expr);
 
+  std::string
+  convert_with_identifier(const typet &src, const std::string &identifier);
+
 protected:
   const namespacet &ns;
+  const expr2c_configurationt &configuration;
 
   virtual std::string convert_rec(
     const typet &src,
