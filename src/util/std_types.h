@@ -1041,6 +1041,12 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_type<array_typet>(const typet &type)
+{
+  return type.id() == ID_array;
+}
+
 /*! \brief Cast a generic typet to an \ref array_typet
  *
  * This is an unchecked conversion. \a type must be known to be \ref
@@ -1053,7 +1059,7 @@ public:
 */
 inline const array_typet &to_array_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_array);
+  PRECONDITION(can_cast_type<array_typet>(type));
   return static_cast<const array_typet &>(type);
 }
 
@@ -1062,7 +1068,7 @@ inline const array_typet &to_array_type(const typet &type)
 */
 inline array_typet &to_array_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_array);
+  PRECONDITION(can_cast_type<array_typet>(type));
   return static_cast<array_typet &>(type);
 }
 
