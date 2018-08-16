@@ -3,7 +3,7 @@
 
 This module provides a front end for Java.
 
-\section java-bytecode-conversion-section The 2 step conversion from bytecode to codet
+\section java-bytecode-conversion-section Overview of conversion from bytecode to codet
 
 To be documented.
 
