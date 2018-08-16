@@ -1,0 +1,12 @@
+CORE
+dummy_parameter.c
+invariant-diagnostics
+^EXIT=(0|127|134|137)$
+^SIGNAL=0$
+--- begin invariant violation report ---
+invariant with diagnostics failure
+invariant diagnostics information
+^(Backtrace)|(Backtraces not supported)$
+--
+^warning: ignoring
+^VERIFICATION SUCCESSFUL$

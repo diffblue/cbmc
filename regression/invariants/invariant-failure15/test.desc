@@ -1,0 +1,11 @@
+CORE
+dummy_parameter.c
+precondition-diagnostics
+^EXIT=(0|127|134|137)$
+^SIGNAL=0$
+--- begin invariant violation report ---
+precondition diagnostics information
+^(Backtrace)|(Backtraces not supported)$
+--
+^warning: ignoring
+^VERIFICATION SUCCESSFUL$
