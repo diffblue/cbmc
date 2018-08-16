@@ -38,11 +38,24 @@ public:
 protected:
   struct slicer_entryt
   {
-    slicer_entryt() : reaches_assertion(false), reachable_from_assertion(false)
+    slicer_entryt()
+      : backward_state(dfs_statust::NOT_SEEN),
+        reachable_from_assertion(false)
     {
     }
 
-    bool reaches_assertion;
+    /// The status of each node during backwards depth-first traversal:
+    /// A functions starts out NOT_SEEN, is raised to BODY_SEEN if we have seen
+    /// a call to this function but know where it was called from (at this point
+    /// we mark the function and anything reachable from it), then may finally
+    /// be raised to BODY_AND_CALLERS_SEEN if we don't know what function calls
+    /// this function, and therefore mark all of its callers as well.
+    enum class dfs_statust
+    {
+      NOT_SEEN,
+      BODY_SEEN,
+      BODY_AND_CALLERS_SEEN
+    } backward_state;
     bool reachable_from_assertion;
   };
 

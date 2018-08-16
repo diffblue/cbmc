@@ -55,7 +55,7 @@ static bool is_same_target(
 
 /// Perform backwards depth-first search of the control-flow graph of the
 /// goto program, starting from the nodes corresponding to the criterion and
-/// the instructions that might be executed concurrently. Set reaches_assertion
+/// the instructions that might be executed concurrently. Set backward_state
 /// to true for every instruction visited.
 /// \param is_threaded Instructions that might be executed concurrently
 /// \param criterion the criterion we are trying to hit
@@ -74,9 +74,18 @@ void reachability_slicert::fixedpoint_to_assertions(
     const auto caller_is_known = stack.back().caller_is_known;
     stack.pop_back();
 
-    if(node.reaches_assertion)
+    if(
+       node.backward_state ==
+         slicer_entryt::dfs_statust::BODY_AND_CALLERS_SEEN ||
+       (caller_is_known &&
+        node.backward_state == slicer_entryt::dfs_statust::BODY_SEEN))
+    {
       continue;
-    node.reaches_assertion = true;
+    }
+    node.backward_state =
+      caller_is_known ?
+      slicer_entryt::dfs_statust::BODY_SEEN :
+      slicer_entryt::dfs_statust::BODY_AND_CALLERS_SEEN;
 
     for(const auto &edge : node.in)
     {
@@ -111,8 +120,8 @@ void reachability_slicert::fixedpoint_to_assertions(
 
 /// Perform forwards depth-first search of the control-flow graph of the
 /// goto program, starting from the nodes corresponding to the criterion and
-/// the instructions that might be executed concurrently. Set reaches_assertion
-/// to true for every instruction visited.
+/// the instructions that might be executed concurrently. Set
+/// reachable_from_assertion to true for every instruction visited.
 /// \param is_threaded Instructions that might be executed concurrently
 /// \param criterion the criterion we are trying to hit
 void reachability_slicert::fixedpoint_from_assertions(
@@ -182,7 +191,7 @@ void reachability_slicert::fixedpoint_from_assertions(
 }
 
 /// This function removes all instructions that have the flag
-/// reaches_assertion or reachable_from_assertion set to true;
+/// backward_state or reachable_from_assertion set to true;
 void reachability_slicert::slice(goto_functionst &goto_functions)
 {
   // now replace those instructions that do not reach any assertions
@@ -195,9 +204,12 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
       {
         const cfgt::nodet &e=cfg[cfg.entry_map[i_it]];
         if(
-          !e.reaches_assertion && !e.reachable_from_assertion &&
+          e.backward_state == slicer_entryt::dfs_statust::NOT_SEEN &&
+          !e.reachable_from_assertion &&
           !i_it->is_end_function())
+        {
           i_it->make_assumption(false_exprt());
+        }
       }
 
       // replace unreachable code by skip
