@@ -8,9 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "byte_operators.h"
 
-#include <cassert>
-
-#include "invariant.h"
 #include "config.h"
 
 irep_idt byte_extract_id()

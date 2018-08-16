@@ -13,8 +13,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include "std_expr.h"
+#include "invariant.h"
 #include "simplify_utils.h"
+#include "std_expr.h"
 
 void guardt::guard_expr(exprt &dest) const
 {
@@ -52,8 +53,7 @@ exprt guardt::as_expr(guard_listt::const_iterator it) const
   dest.reserve_operands(guard_list.size());
   for(; it!=guard_list.end(); it++)
   {
-    if(!it->is_boolean())
-      throw "guard is expected to be Boolean";
+    PRECONDITION(it->is_boolean());
     dest.copy_to_operands(*it);
   }
 
@@ -63,7 +63,7 @@ exprt guardt::as_expr(guard_listt::const_iterator it) const
 
 void guardt::add(const exprt &expr)
 {
-  assert(expr.type().id()==ID_bool);
+  PRECONDITION(expr.type().id() == ID_bool);
 
   if(is_false() || expr.is_true())
     return;

@@ -360,8 +360,8 @@ protected:
 template<class N>
 void grapht<N>::add_undirected_edge(node_indext a, node_indext b)
 {
-  assert(a<nodes.size());
-  assert(b<nodes.size());
+  PRECONDITION(a < nodes.size());
+  PRECONDITION(b < nodes.size());
   nodet &na=nodes[a];
   nodet &nb=nodes[b];
   na.add_out(b);
@@ -497,7 +497,8 @@ void grapht<N>::shortest_path(
     path.push_front(dest);
     if(distance[dest]==0 ||
        previous[dest]==src) break; // we are there
-    assert(dest!=previous[dest]);
+    INVARIANT(
+      dest != previous[dest], "loops cannot be part of the shortest path");
     dest=previous[dest];
   }
 }
@@ -536,12 +537,20 @@ void grapht<N>::disconnect_unreachable(const std::vector<node_indext> &src)
   std::size_t reachable_idx = 0;
   for(std::size_t i = 0; i < nodes.size(); i++)
   {
+    // Holds since `reachable` contains node indices (i.e., all elements are
+    // smaller than `nodes.size()`), `reachable` is sorted, indices from `0` to
+    // `nodes.size()-1` are iterated over by variable i in order, and
+    // `reachable_idx` is only incremented when `i == reachable[reachable_idx]`
+    // holds.
+    INVARIANT(
+      reachable_idx >= reachable.size() || i <= reachable[reachable_idx],
+      "node index i is smaller or equal to the node index at "
+      "reachable[reachable_idx], when reachable_idx is within bounds");
+
     if(reachable_idx >= reachable.size())
       remove_edges(i);
     else if(i == reachable[reachable_idx])
       reachable_idx++;
-    else if(i > reachable[reachable_idx])
-      throw "error disconnecting unreachable nodes";
     else
       remove_edges(i);
   }
@@ -787,7 +796,9 @@ void grapht<N>::tarjan(tarjant &t, node_indext v) const
   {
     while(true)
     {
-      assert(!t.scc_stack.empty());
+      INVARIANT(
+        !t.scc_stack.empty(),
+        "stack of strongly connected components should have another component");
       node_indext vp=t.scc_stack.top();
       t.scc_stack.pop();
       t.in_scc[vp]=false;

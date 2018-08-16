@@ -56,6 +56,10 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
 {
   const irep_idt &type_id=type.id();
 
+  PRECONDITION_WITH_DIAGNOSTICS(
+    type_id != ID_code,
+    source_location.as_string() + ": cannot initialize code type");
+
   if(type_id==ID_unsignedbv ||
      type_id==ID_signedbv ||
      type_id==ID_pointer ||
@@ -160,10 +164,15 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
         if(nondet)
           return side_effect_expr_nondett(type, source_location);
 
-        error().source_location=source_location;
-        error() << "failed to zero-initialize array of non-fixed size `"
-                << format(array_type.size()) << "'" << eom;
-        throw 0;
+        std::ostringstream oss;
+        oss << format(array_type.size());
+
+        INVARIANT_WITH_DIAGNOSTICS(
+          false,
+          "non-infinite array size expression must be convertible to an "
+          "integer",
+          source_location.as_string() +
+            ": failed to zero-initialize array of size `" + oss.str() + "'");
       }
 
       DATA_INVARIANT(
@@ -188,10 +197,14 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       if(nondet)
         return side_effect_expr_nondett(type, source_location);
 
-      error().source_location=source_location;
-      error() << "failed to zero-initialize vector of non-fixed size `"
-              << format(vector_type.size()) << "'" << eom;
-      throw 0;
+      std::ostringstream oss;
+      oss << format(vector_type.size());
+
+      INVARIANT_WITH_DIAGNOSTICS(
+        false,
+        "vector size must be convertible to an integer",
+        source_location.as_string() +
+          ": failed to zero-initialize vector of size `" + oss.str() + "'");
     }
 
     DATA_INVARIANT(
@@ -322,9 +335,12 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
   }
   else
   {
-    error().source_location=source_location;
-    error() << "failed to initialize `" << format(type) << "'" << eom;
-    throw 0;
+    std::ostringstream oss;
+    oss << format(type);
+
+    PRECONDITION_WITH_DIAGNOSTICS(
+      false,
+      source_location.as_string() + ": cannot initialize " + oss.str() + "'");
   }
 }
 
