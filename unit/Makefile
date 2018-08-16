@@ -35,6 +35,7 @@ SRC += unit_tests.cpp \
        util/irep_sharing.cpp \
        util/message.cpp \
        util/optional.cpp \
+       util/replace_symbol.cpp \
        util/sharing_node.cpp \
        util/sharing_map.cpp \
        util/small_map.cpp \
