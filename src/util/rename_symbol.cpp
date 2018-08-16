@@ -170,7 +170,7 @@ bool rename_symbolt::rename(typet &dest) const
       }
     }
   }
-  else if(dest.id()==ID_symbol)
+  else if(dest.id() == ID_symbol_type)
   {
     type_mapt::const_iterator it=
       type_map.find(to_symbol_type(dest).get_identifier());
@@ -253,7 +253,7 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
         return true;
     }
   }
-  else if(dest.id()==ID_symbol)
+  else if(dest.id() == ID_symbol_type)
   {
     const irep_idt &identifier = to_symbol_type(dest).get_identifier();
     return type_map.find(identifier) != type_map.end();
