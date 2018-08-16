@@ -33,4 +33,23 @@ public:
   std::string what() const noexcept;
 };
 
+class system_exceptiont
+{
+private:
+  std::string reason;
+
+public:
+  system_exceptiont(const std::string &reason) : reason(reason)
+  {
+  }
+
+  std::string what() const noexcept
+  {
+    std::string res;
+    res += "System Exception\n";
+    res += "Reason: " + reason + "\n";
+    return res;
+  }
+};
+
 #endif // CPROVER_UTIL_EXCEPTION_UTILS_H

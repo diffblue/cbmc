@@ -76,6 +76,12 @@ int parse_options_baset::main()
     std::cerr << e.what() << "\n";
     return CPROVER_EXIT_USAGE_ERROR;
   }
+  catch(system_exceptiont &e)
+  {
+    std::cerr << e.what() << "\n";
+    return CPROVER_EXIT_EXCEPTION;
+  }
+
   return CPROVER_EXIT_SUCCESS;
 }
 
