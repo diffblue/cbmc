@@ -120,8 +120,8 @@ private:
     const namespacet &ns,
     ci_lazy_methods_neededt &needed_lazy_methods);
 
-  void add_clinit_call_for_pointer_type(
-    const pointer_typet &pointer_type,
+  void add_clinit_call(
+    const irep_idt &class_id,
     const symbol_tablet &symbol_table,
     ci_lazy_methods_neededt &needed_lazy_methods);
 
