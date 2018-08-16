@@ -26,7 +26,11 @@ TEST_CASE("Replace all symbols in expression", "[core][util][replace_symbol]")
   exprt other_expr("other");
 
   replace_symbolt r;
+  REQUIRE(r.empty());
+
   r.insert("a", other_expr);
+  REQUIRE(r.replaces_symbol("a"));
+  REQUIRE(r.get_expr_map().size() == 1);
 
   REQUIRE(r.replace(binary) == false);
   REQUIRE(binary.op0() == other_expr);
@@ -37,8 +41,12 @@ TEST_CASE("Replace all symbols in expression", "[core][util][replace_symbol]")
   REQUIRE(r.replace(s2) == true);
   REQUIRE(s2 == symbol_exprt("b", typet("some_type")));
 
+
   REQUIRE(r.replace(array_type) == false);
   REQUIRE(array_type.size() == other_expr);
+
+  REQUIRE(r.erase("a") == 1);
+  REQUIRE(r.empty());
 }
 
 TEST_CASE("Lvalue only", "[core][util][replace_symbol]")
