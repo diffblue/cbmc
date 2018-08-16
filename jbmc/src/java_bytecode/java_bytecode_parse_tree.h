@@ -98,6 +98,14 @@ struct java_bytecode_parse_treet
       return instructions.back();
     }
 
+    /// Java annotations that were applied to parameters of this method
+    /// \remarks Each element in the vector corresponds to the annotations on
+    /// the parameter of this method with the matching index. A parameter that
+    /// does not have annotations can have an entry in this vector that is an
+    /// empty annotationst. Trailing parameters that have no annotations may be
+    /// entirely omitted from this vector.
+    std::vector<annotationst> parameter_annotations;
+
     struct exceptiont
     {
       exceptiont()
