@@ -467,6 +467,9 @@ void remove_asmt::process_function(
       it->make_skip();
       did_something = true;
 
+      for(auto &instruction : tmp_dest.instructions)
+        instruction.function = it->function;
+
       goto_programt::targett next=it;
       next++;
 
