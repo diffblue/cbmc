@@ -207,12 +207,22 @@ bool java_bytecode_languaget::parse(
       java_cp_include_files);
     if(config.java.main_class.empty())
     {
-      auto manifest = java_class_loader.jar_pool(path).get_manifest();
-      std::string manifest_main_class=manifest["Main-Class"];
+      const std::string &entry_method = config.main;
+      // If we have an entry method, we can derive a main class.
+      if(!entry_method.empty())
+      {
+        const auto last_dot_position = entry_method.find_last_of('.');
+        main_class = entry_method.substr(0, last_dot_position);
+      }
+      else
+      {
+        auto manifest = java_class_loader.jar_pool(path).get_manifest();
+        std::string manifest_main_class = manifest["Main-Class"];
 
-      // if the manifest declares a Main-Class line, we got a main class
-      if(manifest_main_class!="")
-        main_class=manifest_main_class;
+        // if the manifest declares a Main-Class line, we got a main class
+        if(!manifest_main_class.empty())
+          main_class = manifest_main_class;
+      }
     }
     else
       main_class=config.java.main_class;
