@@ -100,4 +100,3 @@ void memory_analyzer_parse_optionst::help()
 }
 
 #endif // __linux__
-
