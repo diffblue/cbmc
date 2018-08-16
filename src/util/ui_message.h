@@ -71,7 +71,6 @@ protected:
   virtual void print(
     unsigned level,
     const std::string &message,
-    int sequence_number,
     const source_locationt &location) override;
 
   virtual void print(
@@ -84,20 +83,17 @@ protected:
 
   virtual void xml_ui_msg(
     const std::string &type,
-    const std::string &msg1,
-    const std::string &msg2,
+    const std::string &msg,
     const source_locationt &location);
 
   virtual void json_ui_msg(
     const std::string &type,
-    const std::string &msg1,
-    const std::string &msg2,
+    const std::string &msg,
     const source_locationt &location);
 
   virtual void ui_msg(
     const std::string &type,
-    const std::string &msg1,
-    const std::string &msg2,
+    const std::string &msg,
     const source_locationt &location);
 
   const char *level_string(unsigned level);

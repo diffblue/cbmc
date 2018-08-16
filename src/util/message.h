@@ -50,7 +50,6 @@ public:
   virtual void print(
     unsigned level,
     const std::string &message,
-    int sequence_number,
     const source_locationt &location);
 
   virtual void flush(unsigned level)
@@ -89,7 +88,6 @@ public:
   virtual void print(
     unsigned level,
     const std::string &message,
-    int,
     const source_locationt &)
   {
     print(level, message);
@@ -276,7 +274,6 @@ public:
       m.message.message_handler->print(
         m.message_level,
         m.str(),
-        -1,
         m.source_location);
       m.message.message_handler->flush(m.message_level);
     }
