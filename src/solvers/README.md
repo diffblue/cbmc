@@ -60,11 +60,11 @@ different decision procedures, roughly one per directory.
 
 * sat/:   Back-ends for a variety of SAT solvers and DIMACS output.
 
-\section solver-apis Solver APIs
-
-\subsection flattening-section Flattening
+\section flattening-section Flattening
 
 To be documented.
+
+\section solver-apis Solver APIs
 
 \subsection smt-solving-api-section SMT solving API
 
