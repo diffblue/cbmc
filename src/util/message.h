@@ -65,7 +65,7 @@ public:
   void set_verbosity(unsigned _verbosity) { verbosity=_verbosity; }
   unsigned get_verbosity() const { return verbosity; }
 
-  unsigned get_message_count(unsigned level) const
+  std::size_t get_message_count(unsigned level) const
   {
     if(level>=message_count.size())
       return 0;
@@ -75,7 +75,7 @@ public:
 
 protected:
   unsigned verbosity;
-  std::vector<unsigned> message_count;
+  std::vector<std::size_t> message_count;
 };
 
 class null_message_handlert:public message_handlert
