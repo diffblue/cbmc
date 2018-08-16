@@ -249,6 +249,11 @@ invariant_violated_string(
 #define __this_function__ __func__
 #endif
 
+// We wrap macros that take __VA_ARGS__ as an argument with EXPAND_MACRO(). This
+// is to account for the behaviour of msvc, which otherwise would not expand
+// __VA_ARGS__ to multiple arguments in the outermost macro invocation.
+#define EXPAND_MACRO(x) x
+
 #define GET_MACRO(X1, X2, X3, X4, X5, X6, MACRO, ...) MACRO
 
 // This macro dispatches to the macros MACRO<n> (with 1 <= n <= 6) and calls
@@ -257,16 +262,16 @@ invariant_violated_string(
 #define REDIRECT(MACRO, ...)                                                   \
   do                                                                           \
   {                                                                            \
-    GET_MACRO(                                                                 \
-      __VA_ARGS__,                                                             \
-      MACRO##6,                                                                \
-      MACRO##5,                                                                \
-      MACRO##4,                                                                \
-      MACRO##3,                                                                \
-      MACRO##2,                                                                \
-      MACRO##1,                                                                \
-      DUMMY_MACRO_ARG)                                                         \
-    (__VA_ARGS__);                                                             \
+    EXPAND_MACRO(                                                              \
+      GET_MACRO(                                                               \
+        __VA_ARGS__,                                                           \
+        MACRO##6,                                                              \
+        MACRO##5,                                                              \
+        MACRO##4,                                                              \
+        MACRO##3,                                                              \
+        MACRO##2,                                                              \
+        MACRO##1,                                                              \
+        DUMMY_MACRO_ARG)(__VA_ARGS__));                                        \
   } while(false)
 
 #define INVARIANT2(CONDITION, REASON)                                          \
@@ -311,7 +316,7 @@ invariant_violated_string(
 // Short hand macros. The variants *_STRUCTURED below allow to specify a custom
 // exception, and are equivalent to INVARIANT_STRUCTURED.
 
-#define INVARIANT(...) REDIRECT(INVARIANT, __VA_ARGS__)
+#define INVARIANT(...) EXPAND_MACRO(REDIRECT(INVARIANT, __VA_ARGS__))
 
 // The condition should only contain (unmodified) inputs to the method. Inputs
 // include arguments passed to the function, as well as member variables that
@@ -325,10 +330,10 @@ invariant_violated_string(
 #define PRECONDITION2(CONDITION, DIAGNOSTICS)                                  \
   INVARIANT3(CONDITION, "Precondition", DIAGNOSTICS)
 
-#define PRECONDITION(...) REDIRECT(PRECONDITION, __VA_ARGS__)
+#define PRECONDITION(...) EXPAND_MACRO(REDIRECT(PRECONDITION, __VA_ARGS__))
 
-#define PRECONDITION_STRUCTURED(CONDITION, TYPENAME, ...) \
-  INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__)
+#define PRECONDITION_STRUCTURED(CONDITION, TYPENAME, ...)                      \
+  EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))
 
 // The condition should only contain variables that will be returned /
 // output without further modification.
@@ -342,10 +347,10 @@ invariant_violated_string(
 #define POSTCONDITION2(CONDITION, DIAGNOSTICS)                                 \
   INVARIANT3(CONDITION, "Postcondition", DIAGNOSTICS)
 
-#define POSTCONDITION(...) REDIRECT(POSTCONDITION, __VA_ARGS__)
+#define POSTCONDITION(...) EXPAND_MACRO(REDIRECT(POSTCONDITION, __VA_ARGS__))
 
-#define POSTCONDITION_STRUCTURED(CONDITION, TYPENAME, ...) \
-  INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__)
+#define POSTCONDITION_STRUCTURED(CONDITION, TYPENAME, ...)                     \
+  EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))
 
 // The condition should only contain (unmodified) values that were
 // changed by a previous method call.
@@ -359,15 +364,15 @@ invariant_violated_string(
 #define CHECK_RETURN2(CONDITION, DIAGNOSTICS)                                  \
   INVARIANT3(CONDITION, "Check return value", DIAGNOSTICS)
 
-#define CHECK_RETURN(...) REDIRECT(CHECK_RETURN, __VA_ARGS__)
+#define CHECK_RETURN(...) EXPAND_MACRO(REDIRECT(CHECK_RETURN, __VA_ARGS__))
 
-#define CHECK_RETURN_STRUCTURED(CONDITION, TYPENAME, ...)  \
-  INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__)
+#define CHECK_RETURN_STRUCTURED(CONDITION, TYPENAME, ...)                      \
+  EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))
 
 // This should be used to mark dead code
 #define UNREACHABLE INVARIANT2(false, "Unreachable")
-#define UNREACHABLE_STRUCTURED(TYPENAME, ...) \
-  INVARIANT_STRUCTURED(false, TYPENAME, __VA_ARGS__)
+#define UNREACHABLE_STRUCTURED(TYPENAME, ...)                                  \
+  EXPAND_MACRO(INVARIANT_STRUCTURED(false, TYPENAME, __VA_ARGS__))
 
 // This condition should be used to document that assumptions that are
 // made on goto_functions, goto_programs, exprts, etc. being well formed.
@@ -376,10 +381,10 @@ invariant_violated_string(
 #define DATA_INVARIANT3(CONDITION, REASON, DIAGNOSTICS)                        \
   INVARIANT3(CONDITION, REASON, DIAGNOSTICS)
 
-#define DATA_INVARIANT(...) REDIRECT(DATA_INVARIANT, __VA_ARGS__)
+#define DATA_INVARIANT(...) EXPAND_MACRO(REDIRECT(DATA_INVARIANT, __VA_ARGS__))
 
-#define DATA_INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) \
-  INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__)
+#define DATA_INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...)                    \
+  EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))
 
 // Legacy annotations
 
