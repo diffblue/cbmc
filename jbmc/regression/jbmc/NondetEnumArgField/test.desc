@@ -1,0 +1,9 @@
+CORE
+NondetEnumArgField.class
+--function NondetEnumArgField.test --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
+^VERIFICATION FAILED$
+--
+--
+The test checks that even when none of the enum constants are referenced in user
+code, a nondet enum (in this case, a field of an argument) is still correctly
+loaded and initialized.
