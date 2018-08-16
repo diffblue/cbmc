@@ -50,7 +50,6 @@ public:
   virtual void print(
     unsigned level,
     const std::string &message,
-    int sequence_number,
     const source_locationt &location);
 
   virtual void flush(unsigned level)
@@ -65,7 +64,7 @@ public:
   void set_verbosity(unsigned _verbosity) { verbosity=_verbosity; }
   unsigned get_verbosity() const { return verbosity; }
 
-  unsigned get_message_count(unsigned level) const
+  std::size_t get_message_count(unsigned level) const
   {
     if(level>=message_count.size())
       return 0;
@@ -75,7 +74,7 @@ public:
 
 protected:
   unsigned verbosity;
-  std::vector<unsigned> message_count;
+  std::vector<std::size_t> message_count;
 };
 
 class null_message_handlert:public message_handlert
@@ -89,7 +88,6 @@ public:
   virtual void print(
     unsigned level,
     const std::string &message,
-    int,
     const source_locationt &)
   {
     print(level, message);
@@ -276,7 +274,6 @@ public:
       m.message.message_handler->print(
         m.message_level,
         m.str(),
-        -1,
         m.source_location);
       m.message.message_handler->flush(m.message_level);
     }

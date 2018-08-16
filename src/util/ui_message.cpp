@@ -149,7 +149,7 @@ void ui_message_handlert::print(
     {
       source_locationt location;
       location.make_nil();
-      print(level, message, -1, location);
+      print(level, message, location);
       if(always_flush)
         flush(level);
     }
@@ -206,7 +206,6 @@ void ui_message_handlert::print(
 void ui_message_handlert::print(
   unsigned level,
   const std::string &message,
-  int sequence_number,
   const source_locationt &location)
 {
   message_handlert::print(level, message);
@@ -217,7 +216,7 @@ void ui_message_handlert::print(
     {
     case uit::PLAIN:
       message_handlert::print(
-        level, message, sequence_number, location);
+        level, message, location);
       break;
 
     case uit::XML_UI:
@@ -230,10 +229,7 @@ void ui_message_handlert::print(
 
       const char *type=level_string(level);
 
-      std::string sequence_number_str=
-        sequence_number>=0?std::to_string(sequence_number):"";
-
-      ui_msg(type, tmp_message, sequence_number_str, location);
+      ui_msg(type, tmp_message, location);
     }
     break;
     }
@@ -242,8 +238,7 @@ void ui_message_handlert::print(
 
 void ui_message_handlert::ui_msg(
   const std::string &type,
-  const std::string &msg1,
-  const std::string &msg2,
+  const std::string &msg,
   const source_locationt &location)
 {
   switch(get_ui())
@@ -252,11 +247,11 @@ void ui_message_handlert::ui_msg(
     break;
 
   case uit::XML_UI:
-    xml_ui_msg(type, msg1, msg2, location);
+    xml_ui_msg(type, msg, location);
     break;
 
   case uit::JSON_UI:
-    json_ui_msg(type, msg1, msg2, location);
+    json_ui_msg(type, msg, location);
     break;
   }
 }
@@ -264,7 +259,6 @@ void ui_message_handlert::ui_msg(
 void ui_message_handlert::xml_ui_msg(
   const std::string &type,
   const std::string &msg1,
-  const std::string &,
   const source_locationt &location)
 {
   xmlt result;
@@ -287,7 +281,6 @@ void ui_message_handlert::xml_ui_msg(
 void ui_message_handlert::json_ui_msg(
   const std::string &type,
   const std::string &msg1,
-  const std::string &,
   const source_locationt &location)
 {
   INVARIANT(json_stream, "JSON stream must be initialized before use");

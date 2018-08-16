@@ -100,7 +100,6 @@ void console_message_handlert::flush(unsigned level)
 void gcc_message_handlert::print(
   unsigned level,
   const std::string &message,
-  int,
   const source_locationt &location)
 {
   const irep_idt file=location.get_file();
