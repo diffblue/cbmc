@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <regex>
 
-#include <ansi-c/expr2c_class.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
 #include <util/arith_tools.h>
@@ -27,7 +26,11 @@ symbol_analyzert::symbol_analyzert(
   const symbol_tablet &st,
   gdb_apit &gdb,
   message_handlert &handler)
-  : messaget(handler), gdb_api(gdb), ns(st), c_converter(ns), id_counter(0)
+  : messaget(handler),
+    gdb_api(gdb),
+    ns(st),
+    c_converter(ns, expr2c_configurationt::clean_configuration),
+    id_counter(0)
 {
 }
 

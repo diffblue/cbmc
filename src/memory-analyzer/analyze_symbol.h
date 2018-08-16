@@ -28,7 +28,7 @@ public:
 private:
   gdb_apit &gdb_api;
   const namespacet ns;
-  expr2c_pretty_structt c_converter;
+  expr2ct c_converter;
 
   code_blockt generated_code;
   size_t id_counter;
