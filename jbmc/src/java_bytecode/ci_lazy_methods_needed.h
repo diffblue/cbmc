@@ -34,6 +34,11 @@ public:
       pointer_type_selector(pointer_type_selector)
   {}
 
+  std::unordered_set<irep_idt> get_instantiated_classes()
+  {
+    return instantiated_classes;
+  }
+
   void add_needed_method(const irep_idt &);
   // Returns true if new
   bool add_needed_class(const irep_idt &);
