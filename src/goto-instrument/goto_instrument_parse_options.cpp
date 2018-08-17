@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <ostream>
 
 #include <util/config.h>
 #include <util/exit_codes.h>
@@ -658,17 +659,34 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
-    if(cmdline.isset("call-graph"))
+    if(cmdline.isset("call-graph") || cmdline.isset("show-callsites"))
     {
       do_indirect_call_and_rtti_removal();
       call_grapht call_graph(goto_model);
 
+      std::ofstream output_file;
+      if(cmdline.get_value("show-callsites") != "-")
+      {
+        output_file.open(cmdline.get_value("show-callsites"));
+        if(!output_file.is_open())
+          std::runtime_error("failed to open callsite output file");
+      }
+
+      if(cmdline.isset("show-callsites"))
+      {
+        call_graph.drop_internal_functions();
+        call_graph.add_by_address(goto_model.goto_functions, "__BY_ADDRESS__");
+      }
+
+      std::ostream &output_stream =
+        output_file.is_open() ? output_file : std::cout;
+
       if(cmdline.isset("xml"))
-        call_graph.output_xml(std::cout);
+        call_graph.output_xml(output_stream);
       else if(cmdline.isset("dot"))
-        call_graph.output_dot(std::cout);
+        call_graph.output_dot(output_stream);
       else
-        call_graph.output(std::cout);
+        call_graph.output(output_stream);
 
       return CPROVER_EXIT_SUCCESS;
     }
@@ -1563,6 +1581,8 @@ void goto_instrument_parse_optionst::help()
     " --call-graph                 show graph of function calls\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --reachable-call-graph       show graph of function calls potentially reachable from main function\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --show-callsites filename    list function call graph (includes functions for pointers, '-' for stdout)\n"
     HELP_SHOW_CLASS_HIERARCHY
     // NOLINTNEXTLINE(whitespace/line_length)
     " --show-threaded              show instructions that may be executed by more than one thread\n"

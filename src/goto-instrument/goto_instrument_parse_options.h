@@ -54,7 +54,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(log):" \
   "(max-var):(max-po-trans):(ignore-arrays)" \
   "(cfg-kill)(no-dependencies)(force-loop-duplication)" \
-  "(call-graph)(reachable-call-graph)" \
+  "(call-graph)(show-callsites):(reachable-call-graph)" \
   OPT_SHOW_CLASS_HIERARCHY \
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(nondet-volatile)(isr):" \
