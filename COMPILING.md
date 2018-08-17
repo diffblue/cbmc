@@ -37,11 +37,11 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    To compile JBMC, you additionally need the JDK and the java-models-library.
    For the JDK, on Debian-like distributions, do as root:
    ```
-   apt-get install unzip openjdk-8-jdk
+   apt-get install openjdk-8-jdk maven
    ```
    On Red Hat/Fedora or derivates, do as root:
    ```
-   dnf install unzip java-1.8.0-openjdk-devel
+   dnf install java-1.8.0-openjdk-devel maven
    ```
 
 2. As a user, get the CBMC source via
