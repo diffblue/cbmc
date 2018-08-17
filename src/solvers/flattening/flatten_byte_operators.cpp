@@ -79,7 +79,7 @@ static exprt unpack_rec(
     {
       index_exprt index(src, from_integer(i, index_type()));
       replace_symbolt replace;
-      replace.insert(ID_C_incomplete, index);
+      replace.insert(dummy, index);
 
       for(const auto &op : sub.operands())
       {

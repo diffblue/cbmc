@@ -26,12 +26,6 @@ public:
   typedef std::unordered_map<irep_idt, exprt> expr_mapt;
   typedef std::unordered_map<irep_idt, typet> type_mapt;
 
-  void insert(const irep_idt &identifier,
-                     const exprt &expr)
-  {
-    expr_map.insert(std::pair<irep_idt, exprt>(identifier, expr));
-  }
-
   void insert(const class symbol_exprt &old_expr,
               const exprt &new_expr);
 

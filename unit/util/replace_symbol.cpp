@@ -28,7 +28,7 @@ TEST_CASE("Replace all symbols in expression", "[core][util][replace_symbol]")
   replace_symbolt r;
   REQUIRE(r.empty());
 
-  r.insert("a", other_expr);
+  r.insert(s1, other_expr);
   REQUIRE(r.replaces_symbol("a"));
   REQUIRE(r.get_expr_map().size() == 1);
 
@@ -63,7 +63,7 @@ TEST_CASE("Lvalue only", "[core][util][replace_symbol]")
   constant_exprt c("some_value", typet("some_type"));
 
   replace_symbolt r;
-  r.insert("a", c);
+  r.insert(s1, c);
 
   REQUIRE(r.replace(binary) == false);
   REQUIRE(binary.op0() == address_of_exprt(s1));

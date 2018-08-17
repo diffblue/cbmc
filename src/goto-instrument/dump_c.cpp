@@ -915,7 +915,7 @@ void dump_ct::cleanup_harness(code_blockt &b)
   if(!ns.lookup("argc'", argc_sym))
   {
     symbol_exprt argc("argc", argc_sym->type);
-    replace.insert(argc_sym->name, argc);
+    replace.insert(argc_sym->symbol_expr(), argc);
     code_declt d(argc);
     decls.add(d);
   }
@@ -923,7 +923,7 @@ void dump_ct::cleanup_harness(code_blockt &b)
   if(!ns.lookup("argv'", argv_sym))
   {
     symbol_exprt argv("argv", argv_sym->type);
-    replace.insert(argv_sym->name, argv);
+    replace.insert(argv_sym->symbol_expr(), argv);
     code_declt d(argv);
     decls.add(d);
   }
@@ -931,7 +931,7 @@ void dump_ct::cleanup_harness(code_blockt &b)
   if(!ns.lookup("return'", return_sym))
   {
     symbol_exprt return_value("return_value", return_sym->type);
-    replace.insert(return_sym->name, return_value);
+    replace.insert(return_sym->symbol_expr(), return_value);
     code_declt d(return_value);
     decls.add(d);
   }
