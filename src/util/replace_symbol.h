@@ -24,16 +24,9 @@ class replace_symbolt
 {
 public:
   typedef std::unordered_map<irep_idt, exprt> expr_mapt;
-  typedef std::unordered_map<irep_idt, typet> type_mapt;
 
   void insert(const class symbol_exprt &old_expr,
               const exprt &new_expr);
-
-  void insert(const irep_idt &identifier,
-                     const typet &type)
-  {
-    type_map.insert(std::pair<irep_idt, typet>(identifier, type));
-  }
 
   /// \brief Replaces a symbol with a constant
   /// If you are replacing symbols with constants in an l-value, you can
@@ -66,23 +59,21 @@ public:
   void clear()
   {
     expr_map.clear();
-    type_map.clear();
   }
 
   bool empty() const
   {
-    return expr_map.empty() && type_map.empty();
+    return expr_map.empty();
   }
 
   std::size_t erase(const irep_idt &id)
   {
-    return expr_map.erase(id) + type_map.erase(id);
+    return expr_map.erase(id);
   }
 
   bool replaces_symbol(const irep_idt &id) const
   {
-    return expr_map.find(id) != expr_map.end() ||
-           type_map.find(id) != type_map.end();
+    return expr_map.find(id) != expr_map.end();
   }
 
   replace_symbolt();
@@ -100,7 +91,6 @@ public:
 
 protected:
   expr_mapt expr_map;
-  type_mapt type_map;
 
 protected:
   bool have_to_replace(const exprt &dest) const;

@@ -110,7 +110,7 @@ bool replace_symbolt::replace(
 
 bool replace_symbolt::have_to_replace(const exprt &dest) const
 {
-  if(expr_map.empty() && type_map.empty())
+  if(expr_map.empty())
     return false;
 
   // first look at type
@@ -186,17 +186,6 @@ bool replace_symbolt::replace(typet &dest) const
       if(!replace(*it))
         result=false;
   }
-  else if(dest.id() == ID_symbol_type)
-  {
-    type_mapt::const_iterator it =
-      type_map.find(to_symbol_type(dest).get_identifier());
-
-    if(it!=type_map.end())
-    {
-      dest=it->second;
-      result=false;
-    }
-  }
   else if(dest.id()==ID_array)
   {
     array_typet &array_type=to_array_type(dest);
@@ -209,7 +198,7 @@ bool replace_symbolt::replace(typet &dest) const
 
 bool replace_symbolt::have_to_replace(const typet &dest) const
 {
-  if(expr_map.empty() && type_map.empty())
+  if(expr_map.empty())
     return false;
 
   if(dest.has_subtype())
@@ -250,11 +239,6 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
         it++)
       if(have_to_replace(*it))
         return true;
-  }
-  else if(dest.id() == ID_symbol_type)
-  {
-    const irep_idt &identifier = to_symbol_type(dest).get_identifier();
-    return type_map.find(identifier) != type_map.end();
   }
   else if(dest.id()==ID_array)
     return have_to_replace(to_array_type(dest).size());
