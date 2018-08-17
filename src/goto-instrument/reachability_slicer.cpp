@@ -22,7 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unreachable.h>
 
-#include "util/message.h"
+#include <util/exception_utils.h>
+#include <util/message.h>
 
 #include "full_slicer_class.h"
 #include "reachability_slicer_class.h"
@@ -44,6 +45,14 @@ reachability_slicert::get_sources(
       criterion(cfg[e_it.second].function_id, e_it.first) ||
       is_threaded(e_it.first))
       sources.push_back(e_it.second);
+  }
+
+  if(sources.empty())
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "no slicing criterion found",
+      "--property",
+      "provide at least one property using --property <property>"};
   }
 
   return sources;
