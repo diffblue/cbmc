@@ -125,3 +125,13 @@ std::string invariant_failedt::what() const noexcept
       << backtrace << '\n';
   return out.str();
 }
+
+std::string invariant_with_diagnostics_failedt::what() const noexcept
+{
+  std::string s(invariant_failedt::what());
+
+  if(!s.empty() && s.back() != '\n')
+    s += '\n';
+
+  return s + "Diagnostics: " + diagnostics + '\n';
+}
