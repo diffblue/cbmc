@@ -68,6 +68,8 @@ set_target_properties(
     json
     langapi
     linking
+    memory-analyzer
+    memory-analyzer-lib
     miniBDD
     pointer-analysis
     solvers
