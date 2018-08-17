@@ -105,6 +105,10 @@ CLEANFILES = $(TESTS) \
         miniBDD$(OBJEXT) \
         #Empty last line
 
+ifneq ($(CC),cl)
+    CXXFLAGS += -Wno-keyword-macro
+endif
+
 all: cprover.dir testing-utils.dir
 	$(MAKE) $(MAKEARGS) $(TESTS)
 
