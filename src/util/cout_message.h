@@ -38,15 +38,18 @@ public:
 
   console_message_handlert() : always_flush(false)
   {
+    setup_console();
   }
 
   explicit console_message_handlert(bool always_flush)
     : always_flush(always_flush)
   {
+    setup_console();
   }
 
 protected:
   const bool always_flush;
+  void setup_console();
 };
 
 class gcc_message_handlert:public ui_message_handlert
