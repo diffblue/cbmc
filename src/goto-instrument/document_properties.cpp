@@ -73,7 +73,7 @@ private:
 
 void document_propertiest::strip_space(std::list<linet> &lines)
 {
-  unsigned strip=50;
+  std::size_t strip=50;
 
   for(std::list<linet>::const_iterator it=lines.begin();
       it!=lines.end(); it++)
