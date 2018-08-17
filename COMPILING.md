@@ -220,7 +220,7 @@ require manual modification of build files.
      ```
    - On Red Hat/Fedora or derivates, do
      ```
-     yum install cmake
+     dnf install cmake
      ```
    - On macOS, do
      ```
