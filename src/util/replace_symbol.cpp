@@ -8,8 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "replace_symbol.h"
 
-#include "std_types.h"
+#include "invariant.h"
 #include "std_expr.h"
+#include "std_types.h"
 
 replace_symbolt::replace_symbolt()
 {
@@ -23,6 +24,7 @@ void replace_symbolt::insert(
   const symbol_exprt &old_expr,
   const exprt &new_expr)
 {
+  PRECONDITION(old_expr.type() == new_expr.type());
   expr_map.insert(std::pair<irep_idt, exprt>(
     old_expr.get_identifier(), new_expr));
 }
@@ -34,6 +36,9 @@ bool replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
   if(it == expr_map.end())
     return true;
 
+  DATA_INVARIANT(
+    s.type() == it->second.type(),
+    "type of symbol to be replaced should match");
   static_cast<exprt &>(s) = it->second;
 
   return false;
@@ -247,6 +252,18 @@ void unchecked_replace_symbolt::insert(
   const exprt &new_expr)
 {
   expr_map.emplace(old_expr.get_identifier(), new_expr);
+}
+
+bool unchecked_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
+{
+  expr_mapt::const_iterator it = expr_map.find(s.get_identifier());
+
+  if(it == expr_map.end())
+    return true;
+
+  static_cast<exprt &>(s) = it->second;
+
+  return false;
 }
 
 bool address_of_aware_replace_symbolt::replace(exprt &dest) const

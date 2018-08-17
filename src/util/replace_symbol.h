@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_map>
 
 /// Replace expression or type symbols by an expression or type, respectively.
+/// The resolved type of the symbol must match the type of the replacement.
 class replace_symbolt
 {
 public:
@@ -91,6 +92,9 @@ public:
   }
 
   void insert(const symbol_exprt &old_expr, const exprt &new_expr);
+
+private:
+  bool replace_symbol_expr(symbol_exprt &dest) const override;
 };
 
 /// Replace symbols with constants while maintaining syntactically valid

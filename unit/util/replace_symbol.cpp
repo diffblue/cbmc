@@ -23,7 +23,7 @@ TEST_CASE("Replace all symbols in expression", "[core][util][replace_symbol]")
   array_typet array_type(typet("sub-type"), s1);
   REQUIRE(array_type.size() == s1);
 
-  exprt other_expr("other");
+  exprt other_expr("other", typet("some_type"));
 
   replace_symbolt r;
   REQUIRE(r.empty());
