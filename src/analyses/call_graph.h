@@ -160,6 +160,13 @@ public:
   /// Remove all nodes and edges that refer to internal functions
   void drop_internal_functions();
 
+  /// Add edges from caller_name to all functions whose address is consumed
+  /// \param goto_functions: function of the program to analyze
+  /// \param caller_name: name of the node to be used as the caller
+  void add_by_address(
+    const goto_functionst &goto_functions,
+    const irep_idt &caller_name);
+
 protected:
   void add(const irep_idt &function,
            const goto_programt &body);

@@ -330,3 +330,17 @@ void call_grapht::drop_internal_functions()
 
   edges.swap(keep_edges);
 }
+
+void call_grapht::add_by_address(
+  const goto_functionst &goto_functions,
+  const irep_idt &caller_name)
+{
+  std::unordered_set<irep_idt> address_functions;
+  compute_address_taken_functions(goto_functions, address_functions);
+
+  for(const auto &address_function : address_functions)
+    if(!is_internal_name(id2string(address_function)))
+      add(caller_name, address_function);
+
+  nodes.insert(caller_name);
+}
