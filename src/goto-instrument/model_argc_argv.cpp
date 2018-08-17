@@ -130,7 +130,7 @@ bool model_argc_argv(
     {
       value = symbol_pair.second.value;
 
-      replace_symbolt replace;
+      unchecked_replace_symbolt replace;
       replace.insert(ARGC, ns.lookup("argc'").symbol_expr());
       replace.insert(ARGV, ns.lookup("argv'").symbol_expr());
       replace(value);

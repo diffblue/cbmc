@@ -97,4 +97,14 @@ protected:
   bool have_to_replace(const typet &type) const;
 };
 
+class unchecked_replace_symbolt : public replace_symbolt
+{
+public:
+  unchecked_replace_symbolt()
+  {
+  }
+
+  void insert(const symbol_exprt &old_expr, const exprt &new_expr);
+};
+
 #endif // CPROVER_UTIL_REPLACE_SYMBOL_H

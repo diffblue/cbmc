@@ -245,3 +245,10 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
 
   return false;
 }
+
+void unchecked_replace_symbolt::insert(
+  const symbol_exprt &old_expr,
+  const exprt &new_expr)
+{
+  expr_map.emplace(old_expr.get_identifier(), new_expr);
+}
