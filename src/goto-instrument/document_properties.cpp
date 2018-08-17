@@ -75,11 +75,10 @@ void document_propertiest::strip_space(std::list<linet> &lines)
 {
   std::size_t strip=50;
 
-  for(std::list<linet>::const_iterator it=lines.begin();
-      it!=lines.end(); it++)
+  for(const auto &line : lines)
   {
-    for(std::size_t j=0; j<strip && j<it->text.size(); j++)
-      if(it->text[j]!=' ')
+    for(std::size_t j = 0; j < strip && j < line.text.size(); j++)
+      if(line.text[j] != ' ')
       {
         strip=j;
         break;
@@ -88,14 +87,13 @@ void document_propertiest::strip_space(std::list<linet> &lines)
 
   if(strip!=0)
   {
-    for(std::list<linet>::iterator it=lines.begin();
-        it!=lines.end(); it++)
+    for(auto &line : lines)
     {
-      if(it->text.size()>=strip)
-        it->text=std::string(it->text, strip, std::string::npos);
+      if(line.text.size() >= strip)
+        line.text = std::string(line.text, strip, std::string::npos);
 
-      if(it->text.size()>=MAXWIDTH)
-        it->text=std::string(it->text, 0, MAXWIDTH);
+      if(line.text.size() >= MAXWIDTH)
+        line.text = std::string(line.text, 0, MAXWIDTH);
     }
   }
 }
@@ -104,18 +102,17 @@ std::string escape_latex(const std::string &s, bool alltt)
 {
   std::string dest;
 
-  for(std::size_t i=0; i<s.size(); i++)
+  for(auto ch : s)
   {
-    if(s[i]=='\\' || s[i]=='{' || s[i]=='}')
+    if(ch == '\\' || ch == '{' || ch == '}')
       dest+="\\";
 
-    if(!alltt &&
-       (s[i]=='_' || s[i]=='$' || s[i]=='~' ||
-        s[i]=='^' || s[i]=='%' || s[i]=='#' ||
-        s[i]=='&'))
+    if(
+      !alltt && (ch == '_' || ch == '$' || ch == '~' || ch == '^' ||
+                 ch == '%' || ch == '#' || ch == '&'))
       dest+="\\";
 
-    dest+=s[i];
+    dest += ch;
   }
 
   return dest;
@@ -125,14 +122,15 @@ std::string escape_html(const std::string &s)
 {
   std::string dest;
 
-  for(std::size_t i=0; i<s.size(); i++)
+  for(auto ch : s)
   {
-    switch(s[i])
+    switch(ch)
     {
     case '&': dest+="&amp;"; break;
     case '<': dest+="&lt;"; break;
     case '>': dest+="&gt;"; break;
-    default: dest+=s[i];
+    default:
+      dest += ch;
     }
   }
 
@@ -141,8 +139,8 @@ std::string escape_html(const std::string &s)
 
 bool is_empty(const std::string &s)
 {
-  for(std::size_t i=0; i<s.size(); i++)
-    if(isgraph(s[i]))
+  for(auto ch : s)
+    if(isgraph(ch))
       return false;
 
   return true;
@@ -230,10 +228,9 @@ void document_propertiest::get_code(
 
   // build dest
 
-  for(std::list<linet>::iterator it=lines.begin();
-      it!=lines.end(); it++)
+  for(const auto &line : lines)
   {
-    std::string line_no=std::to_string(it->line_number);
+    std::string line_no = std::to_string(line.line_number);
 
     std::string tmp;
 
@@ -245,9 +242,9 @@ void document_propertiest::get_code(
 
       line_no+"  ";
 
-      tmp+=escape_latex(it->text, true);
+      tmp += escape_latex(line.text, true);
 
-      if(it->line_number==line_int)
+      if(line.line_number == line_int)
         tmp="{\\ttb{}"+tmp+"}";
 
       break;
@@ -258,9 +255,9 @@ void document_propertiest::get_code(
 
       line_no+"&nbsp;&nbsp;";
 
-      tmp+=escape_html(it->text);
+      tmp += escape_html(line.text);
 
-      if(it->line_number==line_int)
+      if(line.line_number == line_int)
         tmp="<em>"+tmp+"</em>";
 
       break;
@@ -295,11 +292,10 @@ void document_propertiest::doit()
     }
   }
 
-  for(claim_sett::const_iterator it=claim_set.begin();
-      it!=claim_set.end(); it++)
+  for(const auto &claim : claim_set)
   {
     std::string code;
-    const source_locationt &source_location=it->first;
+    const source_locationt &source_location = claim.first;
 
     get_code(source_location, code);
 
@@ -314,12 +310,8 @@ void document_propertiest::doit()
 
       out << '\n';
 
-      for(std::set<irep_idt>::const_iterator
-          s_it=it->second.comment_set.begin();
-          s_it!=it->second.comment_set.end();
-          s_it++)
-        out << "\\claim{" << escape_latex(id2string(*s_it), false)
-            << "}\n";
+      for(const auto &comment : claim.second.comment_set)
+        out << "\\claim{" << escape_latex(id2string(comment), false) << "}\n";
 
       out << '\n';
 
@@ -341,12 +333,9 @@ void document_propertiest::doit()
 
       out << '\n';
 
-      for(std::set<irep_idt>::const_iterator
-          s_it=it->second.comment_set.begin();
-          s_it!=it->second.comment_set.end();
-          s_it++)
+      for(const auto &comment : claim.second.comment_set)
         out << "<div class=\"description\">\n"
-            << escape_html(id2string(*s_it)) << '\n'
+            << escape_html(id2string(comment)) << '\n'
             << "</div>\n";
 
       out << '\n';
