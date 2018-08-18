@@ -252,7 +252,12 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id()==ID_clang_builtin_convertvector)
   {
+    // This has one operand and a type, and acts like a typecast
+    DATA_INVARIANT(expr.operands().size()==1, "clang_builtin_convertvector has one operand");
     typecheck_type(expr.type());
+    typecast_exprt tmp(expr.op0(), expr.type());
+    tmp.add_source_location()=expr.source_location();
+    expr.swap(tmp);
   }
   else if(expr.id()==ID_builtin_offsetof)
     typecheck_expr_builtin_offsetof(expr);
@@ -2191,6 +2196,31 @@ exprt c_typecheck_baset::do_special_functions(
     bswap_expr.add_source_location()=source_location;
 
     return bswap_expr;
+  }
+  else if(identifier=="__builtin_nontemporal_load")
+  {
+    typecheck_function_call_arguments(expr);
+
+    if(expr.arguments().size()!=1)
+    {
+      err_location(f_op);
+      error() << identifier << " expects one operand" << eom;
+      throw 0;
+    }
+
+    // these return the subtype of the argument
+    exprt &ptr_arg=expr.arguments().front();
+
+    if(ptr_arg.type().id()!=ID_pointer)
+    {
+      err_location(f_op);
+      error() << "__builtin_nontemporal_load takes pointer as argument" << eom;
+      throw 0;
+    }
+
+    expr.type()=expr.arguments().front().type().subtype();
+
+    return expr;
   }
   else if(
     identifier == "__builtin_fpclassify" ||
