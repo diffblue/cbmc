@@ -185,6 +185,12 @@ bool java_bytecode_languaget::parse(
   const std::string &path)
 {
   PRECONDITION(language_options_initialized);
+
+  java_class_loader.clear_classpath();
+
+  for(const auto &p : config.java.classpath)
+    java_class_loader.add_classpath_entry(p);
+
   java_class_loader.set_message_handler(get_message_handler());
   java_class_loader.set_java_cp_include_files(java_cp_include_files);
   java_class_loader.add_load_classes(java_load_classes);
@@ -232,7 +238,7 @@ bool java_bytecode_languaget::parse(
         main_jar_classes.push_back(kv.first);
     }
     else
-      java_class_loader.add_jar_file(path);
+      java_class_loader.add_classpath_entry(path);
   }
   else
     UNREACHABLE;

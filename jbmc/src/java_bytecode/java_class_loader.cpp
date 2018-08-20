@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/suffix.h>
 #include <util/prefix.h>
-#include <util/config.h>
 
 #include "java_bytecode_parser.h"
 
@@ -67,6 +66,11 @@ java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
   }
 
   return class_map.at(class_name);
+}
+
+void java_class_loadert::add_classpath_entry(const std::string &path)
+{
+  classpath_entries.push_back(path);
 }
 
 optionalt<java_bytecode_parse_treet> java_class_loadert::get_class_from_jar(
@@ -124,20 +128,8 @@ java_class_loadert::get_parse_tree(
     return parse_trees;
   }
 
-  // First add all given JAR files
-  for(const auto &jar_file : jar_files)
-  {
-    jar_index_optcreft index = read_jar_file(jar_file);
-    if(!index)
-      continue;
-    optionalt<java_bytecode_parse_treet> parse_tree =
-      get_class_from_jar(class_name, jar_file, *index);
-    if(parse_tree)
-      parse_trees.emplace_back(std::move(*parse_tree));
-  }
-
-  // Then add everything on the class path
-  for(const auto &cp_entry : config.java.classpath)
+  // Rummage through the class path
+  for(const auto &cp_entry : classpath_entries)
   {
     if(has_suffix(cp_entry, ".jar"))
     {
@@ -234,12 +226,12 @@ void java_class_loadert::load_entire_jar(
   if(!jar_index)
     return;
 
-  jar_files.push_front(jar_path);
+  classpath_entries.push_front(jar_path);
 
   for(const auto &e : jar_index->get())
     operator()(e.first);
 
-  jar_files.pop_front();
+  classpath_entries.pop_front();
 }
 
 java_class_loadert::jar_index_optcreft java_class_loadert::read_jar_file(

@@ -123,13 +123,14 @@ public:
       lazy_methods_mode(lazy_methods_modet::LAZY_METHODS_MODE_EAGER),
       string_refinement_enabled(false),
       pointer_type_selector(std::move(pointer_type_selector))
-  {}
+  {
+  }
 
   java_bytecode_languaget():
     java_bytecode_languaget(
       std::unique_ptr<select_pointer_typet>(new select_pointer_typet()))
-  {}
-
+  {
+  }
 
   bool from_expr(
     const exprt &expr,
