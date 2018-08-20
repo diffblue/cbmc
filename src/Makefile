@@ -64,7 +64,7 @@ goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
 
-memory-analyzer.dir: util.dir goto-programs.dir
+memory-analyzer.dir: util.dir goto-programs.dir ansi-c.dir
 
 # building for a particular directory
 

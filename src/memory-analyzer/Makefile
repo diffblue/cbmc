@@ -13,7 +13,7 @@ LIBS = \
 	../util/util.a \
 	../big-int/big-int.a \
 	../langapi/langapi.a
-	
+
 	
 
 CLEANFILES = memory-analyzer$(EXEEXT) 
