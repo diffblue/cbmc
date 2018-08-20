@@ -18,18 +18,6 @@ See \ref goto-programs, \ref goto_programt and [instructiont](\ref goto_programt
 
 See \ref langapi.
 
-\subsubsection parse-section Parse
-
-See \ref language_uit::parse().
-
-\subsubsection typecheck-section Typecheck
-
-See \ref language_uit::typecheck().
-
-\subsubsection final-section Final
-
-See \ref language_uit::final().
-
 \subsection languages-c-section C
 
 See \ref ansi-c.
