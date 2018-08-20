@@ -6,6 +6,7 @@ SRC = bytecode_info.cpp \
       expr2java.cpp \
       generic_parameter_specialization_map_keys.cpp \
       jar_file.cpp \
+      jar_pool.cpp \
       java_bytecode_convert_class.cpp \
       java_bytecode_convert_method.cpp \
       java_bytecode_concurrency_instrumentation.cpp \

@@ -252,7 +252,7 @@ java_class_loadert::jar_index_optcreft java_class_loadert::read_jar_file(
   std::vector<std::string> filenames;
   try
   {
-    filenames = this->jar_pool(jar_path).filenames();
+    filenames = jar_pool(jar_path).filenames();
   }
   catch(const std::runtime_error &)
   {
@@ -324,34 +324,4 @@ std::string java_class_loadert::class_name_to_file(const irep_idt &class_name)
   result+=".class";
 
   return result;
-}
-
-jar_filet &java_class_loadert::jar_pool(
-  const std::string &file_name)
-{
-  const auto it=m_archives.find(file_name);
-  if(it==m_archives.end())
-  {
-    // VS: Can't construct in place
-    auto file = jar_filet(file_name);
-    return m_archives.emplace(file_name, std::move(file)).first->second;
-  }
-  else
-    return it->second;
-}
-
-jar_filet &java_class_loadert::jar_pool(
-  const std::string &buffer_name,
-  const void *pmem,
-  size_t size)
-{
-  const auto it=m_archives.find(buffer_name);
-  if(it==m_archives.end())
-  {
-    // VS: Can't construct in place
-    auto file = jar_filet(pmem, size);
-    return m_archives.emplace(buffer_name, std::move(file)).first->second;
-  }
-  else
-    return it->second;
 }
