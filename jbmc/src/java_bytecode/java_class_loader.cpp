@@ -238,23 +238,29 @@ java_class_loadert::get_parse_tree(
   return parse_trees;
 }
 
-/// Load all class files from a .jar file, and store name of .jar in
-/// `classpath_entreies`.
+/// Load all class files from a .jar file
 /// \param jar_path: the path for the .jar to load
-void java_class_loadert::load_entire_jar(
+std::vector<irep_idt> java_class_loadert::load_entire_jar(
   const std::string &jar_path)
 {
   jar_index_optcreft jar_index = read_jar_file(jar_path);
   if(!jar_index)
-    return;
+    return {};
 
   classpath_entries.push_front(
     classpath_entryt(classpath_entryt::JAR, jar_path));
 
+  std::vector<irep_idt> classes;
+
   for(const auto &e : jar_index->get())
+  {
     operator()(e.first);
+    classes.push_back(e.first);
+  }
 
   classpath_entries.pop_front();
+
+  return classes;
 }
 
 java_class_loadert::jar_index_optcreft java_class_loadert::read_jar_file(

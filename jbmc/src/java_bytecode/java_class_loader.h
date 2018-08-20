@@ -97,7 +97,7 @@ public:
   static std::string file_to_class_name(const std::string &);
   static std::string class_name_to_file(const irep_idt &);
 
-  void load_entire_jar(const std::string &jar_path);
+  std::vector<irep_idt> load_entire_jar(const std::string &jar_path);
 
   const jar_indext &get_jar_index(const std::string &jar_path)
   {
