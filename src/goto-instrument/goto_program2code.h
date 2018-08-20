@@ -96,6 +96,8 @@ protected:
   std::unordered_set<irep_idt> type_names_set;
   std::unordered_set<irep_idt> const_removed;
 
+  void copy_source_location(goto_programt::const_targett, codet &dst);
+
   void build_loop_map();
   void build_dead_map();
   void scan_for_varargs();

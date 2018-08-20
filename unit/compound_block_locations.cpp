@@ -1,0 +1,179 @@
+/*******************************************************************\
+
+Module: Test that compound blocks get a location
+
+Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
+
+\*******************************************************************/
+
+#include "compound_block_locations.h"
+
+#include <testing-utils/catch.hpp>
+
+#include <fstream>
+#include <utility>
+
+#include <ansi-c/ansi_c_language.h>
+
+#include <cbmc/cbmc_parse_options.h>
+
+#include <goto-instrument/goto_program2code.h>
+
+#include <goto-programs/goto_model.h>
+
+#include <langapi/language_ui.h>
+#include <langapi/mode.h>
+
+#include <util/cmdline.h>
+#include <util/config.h>
+#include <util/cout_message.h>
+#include <util/options.h>
+#include <util/tempfile.h>
+
+SCENARIO("Compound blocks should have a location")
+{
+  compound_block_locationst checker;
+
+  checker.check(
+    "/*  1 */  int main()   \n"
+    "/*  2 */  {            \n"
+    "/*  3 */    int x;     \n"
+    "/*  4 */    if(x)      \n"
+    "/*  5 */      x = 1;   \n"
+    "/*  6 */  }            \n",
+    {{ID_ifthenelse, 4}});
+
+  checker.check(
+    "/*  1 */  int main()   \n"
+    "/*  2 */  {            \n"
+    "/*  3 */    int x;     \n"
+    "/*  4 */    if(x)      \n"
+    "/*  5 */    {          \n"
+    "/*  6 */      x = 1;   \n"
+    "/*  7 */      x = 1;   \n"
+    "/*  8 */    }          \n"
+    "/*  9 */  }            \n",
+    {{ID_ifthenelse, 4}});
+
+  checker.check(
+    "/*  1 */  int main()   \n"
+    "/*  2 */  {            \n"
+    "/*  3 */    int x;     \n"
+    "/*  4 */    if(x)      \n"
+    "/*  5 */      x = 1;   \n"
+    "/*  6 */    else       \n"
+    "/*  7 */      x = 1;   \n"
+    "/*  8 */  }            \n",
+    {{ID_ifthenelse, 4}});
+
+  checker.check(
+    "/*  1 */  int main()         \n"
+    "/*  2 */  {                  \n"
+    "/*  3 */    int x;           \n"
+    "/*  4 */    if(x)            \n"
+    "/*  5 */      x = 1;         \n"
+    "/*  6 */    else if(x == 2)  \n"
+    "/*  7 */    {                \n"
+    "/*  8 */      x = 1;         \n"
+    "/*  9 */      x = 1;         \n"
+    "/* 10 */    }                \n"
+    "/* 11 */    else             \n"
+    "/* 12 */      x = 1;         \n"
+    "/* 13 */  }                  \n",
+    {{ID_ifthenelse, 4}, {ID_ifthenelse, 6}});
+}
+
+void compound_block_locationst::check(
+  const std::string &program,
+  const std::list<std::pair<const irep_idt, const unsigned>> &expected)
+{
+  INFO("Given the following program:\n" + program);
+  check_compound_block_locations(program, expected);
+}
+
+void compound_block_locationst::check_compound_block_locations(
+  const std::string &program,
+  const std::list<std::pair<const irep_idt, const unsigned>> &expected)
+{
+  temporary_filet tmp("compound-block-locations_", ".c");
+  std::ofstream of(tmp().c_str());
+  REQUIRE(of.is_open());
+
+  of << program << std::endl;
+  of.close();
+
+  register_language(new_ansi_c_language);
+  cmdlinet cmdline;
+  cmdline.args.push_back(tmp());
+  config.main = "main";
+  config.set(cmdline);
+
+  optionst opts;
+  cbmc_parse_optionst::set_default_options(opts);
+
+  ui_message_handlert mh(cmdline, "compound-block-locations");
+  mh.set_verbosity(0);
+  messaget log(mh);
+
+  goto_modelt gm;
+  int ret;
+  ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, log, mh);
+  REQUIRE(ret == -1);
+
+  const auto found = gm.goto_functions.function_map.find("main");
+  REQUIRE(found != gm.goto_functions.function_map.end());
+
+  code_blockt block;
+  symbol_tablet st_copy(gm.symbol_table);
+  std::list<irep_idt> local_static, type_names;
+  std::unordered_set<irep_idt> typedef_names;
+  std::set<std::string> system_headers;
+  goto_program2codet g2c(
+    "main",
+    found->second.body,
+    st_copy,
+    block,
+    local_static,
+    type_names,
+    typedef_names,
+    system_headers);
+  g2c();
+
+  std::list<std::pair<const irep_idt, const unsigned>> copy(expected);
+  recurse_on_block(block, copy);
+
+  std::stringstream ss;
+  ss << "Expected but did not observe the following lines to have blocks with "
+     << "locations: ";
+  for(const auto &pair : copy)
+    ss << "'" << types.at(pair.first) << "' at line "
+       << std::to_string(pair.second) << ", ";
+  INFO(ss.str());
+  REQUIRE(copy.empty());
+}
+
+void compound_block_locationst::recurse_on_block(
+  const exprt &expr,
+  std::list<std::pair<const irep_idt, const unsigned>> &expected)
+{
+  if(expr.id() == ID_code)
+  {
+    const codet code = to_code(expr);
+    for(const auto &pair : types)
+    {
+      if(code.get_statement() != pair.first)
+        continue;
+      INFO("Found an instruction of type " + pair.second);
+      const auto &top = expected.front();
+      REQUIRE(code.get_statement() == top.first);
+      const source_locationt &loc = code.source_location();
+      REQUIRE(loc.is_not_nil());
+      REQUIRE(std::stoul(loc.get_line().c_str()) == top.second);
+      expected.pop_front();
+      break;
+    }
+  }
+
+  for(const auto &child : expr.operands())
+    recurse_on_block(child, expected);
+}

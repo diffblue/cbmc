@@ -615,6 +615,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     simplify(i.cond(), ns);
     i.then_case()=code_breakt();
 
+    copy_source_location(target, i);
+
     w.body().move_to_operands(i);
   }
 
@@ -1098,6 +1100,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   code_ifthenelset i;
   i.then_case()=code_blockt();
 
+  copy_source_location(target, i);
+
   // some nesting of loops and branches we might not be able to deal with
   if(target->is_backwards_goto() ||
       (upper_bound!=goto_program.instructions.end() &&
@@ -1181,6 +1185,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
       simplify(i.cond(), ns);
       i.then_case().swap(cont);
 
+      copy_source_location(target, i);
+
       dest.move_to_operands(i);
     }
     else
@@ -1212,6 +1218,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     i.cond()=target->guard;
     simplify(i.cond(), ns);
     i.then_case().swap(brk);
+
+    copy_source_location(target, i);
 
     if(i.cond().is_true())
       dest.move_to_operands(i.then_case());
@@ -1277,6 +1285,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
     i.cond()=target->guard;
     simplify(i.cond(), ns);
     i.then_case().swap(goto_code);
+
+    copy_source_location(target, i);
 
     dest.move_to_operands(i);
   }
@@ -2020,4 +2030,14 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       }
     }
   }
+}
+
+void goto_program2codet::copy_source_location(
+  goto_programt::const_targett src,
+  codet &dst)
+{
+  if(src->code.source_location().is_not_nil())
+    dst.add_source_location() = src->code.source_location();
+  else if(src->source_location.is_not_nil())
+    dst.add_source_location() = src->source_location;
 }

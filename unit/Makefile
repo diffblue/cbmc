@@ -14,6 +14,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/does_remove_const/does_expr_lose_const.cpp \
        analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
+       compound_block_locations.cpp \
        goto-programs/goto_trace_output.cpp \
        interpreter/interpreter.cpp \
        json/json_parser.cpp \
@@ -90,6 +91,7 @@ BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
           ../src/goto-instrument/cover_instrument_mcdc$(OBJEXT) \
           ../src/goto-instrument/cover_instrument_other$(OBJEXT) \
           ../src/goto-instrument/cover_util$(OBJEXT) \
+          ../src/goto-instrument/goto_program2code$(OBJEXT) \
           ../src/goto-instrument/reachability_slicer$(OBJEXT) \
           ../src/goto-instrument/nondet_static$(OBJEXT) \
           ../src/goto-instrument/full_slicer$(OBJEXT) \
