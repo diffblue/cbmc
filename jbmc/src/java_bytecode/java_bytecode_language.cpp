@@ -385,7 +385,7 @@ bool java_bytecode_languaget::parse(
 /// We set opaque fields as final to avoid assuming they can be overridden.
 /// \param parse_tree: class parse tree
 /// \param symbol_table: global symbol table
-static void infer_opaque_type_fields(
+void infer_opaque_type_fields(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table)
 {
@@ -529,7 +529,7 @@ static exprt get_ldc_result(
 ///   added.
 /// \param string_refinement_enabled: true if `--refine-stings` is active,
 ///   which changes how string literals are structured.
-static void generate_constant_global_variables(
+void generate_constant_global_variables(
   java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
   bool string_refinement_enabled)
@@ -661,7 +661,7 @@ static irep_idt get_any_incomplete_ancestor_for_stub_static_field(
 /// \param class_hierarchy: global class hierarchy
 /// \param log: message handler used to log warnings when stub static fields are
 ///   found belonging to non-stub classes.
-static void create_stub_global_symbols(
+void create_stub_global_symbols(
   const java_bytecode_parse_treet &parse_tree,
   symbol_table_baset &symbol_table,
   const class_hierarchyt &class_hierarchy,
