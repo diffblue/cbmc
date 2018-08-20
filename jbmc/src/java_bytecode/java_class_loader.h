@@ -17,9 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/fixed_keys_map_wrapper.h>
 
+#include "jar_file.h"
+#include "jar_pool.h"
 #include "java_bytecode_parse_tree.h"
 #include "java_class_loader_limit.h"
-#include "jar_file.h"
 
 class java_class_loadert:public messaget
 {
@@ -99,20 +100,8 @@ public:
     return class_map.at(class_name).front();
   }
 
-  /// Load jar archive or retrieve from cache if already loaded
-  /// \param filename name of the file
-  jar_filet &jar_pool(const std::string &filename);
-
-  /// Load jar archive or retrieve from cache if already loaded
-  /// \param buffer_name name of the original file
-  /// \param pmem memory pointer to the contents of the file
-  /// \param size size of the memory buffer
-  /// Note that this mocks the existence of a file which may
-  /// or may not exist since  the actual data bis retrieved from memory.
-  jar_filet &jar_pool(
-    const std::string &buffer_name,
-    const void *pmem,
-    size_t size);
+  /// a cache for jar_filet, by path name
+  jar_poolt jar_pool;
 
 private:
   /// Either a regular expression matching files that will be allowed to be
@@ -134,8 +123,6 @@ private:
   /// The jar_indext for each jar file we've read
   std::map<std::string, jar_indext> jars_by_path;
 
-  /// Jar files that have been loaded
-  std::map<std::string, jar_filet> m_archives;
   /// Map from class names to the bytecode parse trees
   parse_tree_with_overridest_mapt class_map;
 
