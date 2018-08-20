@@ -81,7 +81,7 @@ public:
   static std::string file_to_class_name(const std::string &);
   static std::string class_name_to_file(const irep_idt &);
 
-  void load_entire_jar(java_class_loader_limitt &, const std::string &jar_path);
+  void load_entire_jar(const std::string &jar_path);
 
   const jar_indext &get_jar_index(const std::string &jar_path)
   {
@@ -100,20 +100,16 @@ public:
   }
 
   /// Load jar archive or retrieve from cache if already loaded
-  /// \param limit
   /// \param filename name of the file
-  jar_filet &jar_pool(
-    java_class_loader_limitt &limit, const std::string &filename);
+  jar_filet &jar_pool(const std::string &filename);
 
   /// Load jar archive or retrieve from cache if already loaded
-  /// \param limit
   /// \param buffer_name name of the original file
   /// \param pmem memory pointer to the contents of the file
   /// \param size size of the memory buffer
   /// Note that this mocks the existence of a file which may
   /// or may not exist since  the actual data bis retrieved from memory.
   jar_filet &jar_pool(
-    java_class_loader_limitt &limit,
     const std::string &buffer_name,
     const void *pmem,
     size_t size);
@@ -145,14 +141,14 @@ private:
 
   typedef optionalt<std::reference_wrapper<const jar_indext>>
     jar_index_optcreft;
+
   jar_index_optcreft read_jar_file(
-    java_class_loader_limitt &class_loader_limit,
     const std::string &jar_path);
+
   optionalt<java_bytecode_parse_treet> get_class_from_jar(
     const irep_idt &class_name,
     const std::string &jar_file,
-    const jar_indext &jar_index,
-    java_class_loader_limitt &class_loader_limit);
+    const jar_indext &jar_index);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H
