@@ -119,8 +119,21 @@ private:
   /// information.
   std::string java_cp_include_files;
 
+  /// An entry in the classpath
+  struct classpath_entryt
+  {
+    using kindt = enum { JAR, DIRECTORY };
+    kindt kind;
+    std::string path;
+
+    classpath_entryt(kindt _kind, const std::string &_path)
+      : kind(_kind), path(_path)
+    {
+    }
+  };
+
   /// List of entries in the classpath
-  std::list<std::string> classpath_entries;
+  std::list<classpath_entryt> classpath_entries;
 
   /// Classes to be explicitly loaded
   std::vector<irep_idt> java_load_classes;
