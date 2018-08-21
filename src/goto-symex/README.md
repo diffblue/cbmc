@@ -7,17 +7,12 @@
 
 This directory contains a symbolic evaluation system for goto-programs.
 This takes a goto-program and translates it to an equation system by
-traversing the program, branching and merging and unwinding loops as
-needed. Each reverse goto has a separate counter (the actual counting is
-handled by `cbmc`, see the `–unwind` and `–unwind-set` options). When a
-counter limit is reach, an assertion can be added to explicitly show
-when analysis is incomplete.  The symbolic execution includes constant
-folding so loops that have a constant number of iterations will be
-handled completely (assuming the unwinding limit is sufficient).
+traversing the program, branching and merging and unwinding loops and recursion
+as needed.
 
 The output of the symbolic execution is a system of equations; an object
-containing a list of `symex_target_elements`, each of which are
-equalities between `expr` expressions. See `symex_target_equation.h`.
+containing a list of \ref symex_target_equationt::SSA_stept structures, each of
+which are equalities between \ref exprt expressions.
 The output is in static, single assignment (SSA) form, which is *not*
 the case for goto-programs.
 
@@ -50,22 +45,64 @@ The \ref bmct creates a goto_symext to symbolically execute the
 goto-program, thereby filling the equation, which can then be passed
 along to the SAT solver.
 
-The symbolic execution state is maintained by goto_symex_statet. This is
-a memory-heavy data structure, so goto_symext creates it on-demand and
-lets it go out-of-scope as soon as possible. However, the process of
-symbolic execution fills out an additional \ref symbol_tablet
+The class \ref goto_symext holds the global state of the symbol executor, while
+\ref goto_symex_statet holds the program state at a particular point in
+symbolic execution. In straight-line code a single \ref goto_symex_statet is
+maintained, being transformed by each instruction in turn, but these state
+objects are cloned and merged at control-flow forks and joins respectively.
+\ref goto_symex_statet contains an instance of \ref value_sett, used to track
+what objects pointers may refer to, and a constant propagator domain used to
+try to simplify assignments and (more usefully) resolve branch instructions.
+
+This is a memory-heavy data structure, so goto_symext creates it on-demand and
+lets it go out-of-scope as soon as possible.
+
+The process of
+symbolic execution generates an additional \ref symbol_tablet
 "symbol table" of dynamically-created objects; this symbol table is
 needed when solving the equation. This symbol table must thus be
 exported out of the state before it is torn down; this is done through
 the parameter "`new_symbol_table`" passed as a reference to the various
 functions in goto_symext.
 
-The main symbolic execution loop code is goto_symext::symex_step(). This
+The main symbolic execution loop code is \ref goto_symext::symex_step. This
 function case-switches over the type of the instruction that we're
 currently executing, and calls various other functions appropriate to
 the instruction type, i.e. goto_symext::symex_function_call() if the
 current instruction is a function call, goto_symext::symex_goto() if the
 current instruction is a goto, etc.
+
+\subsection Loop and recursion unwinding
+
+Each backwards goto and recursive call has a separate counter
+(handled by \ref cbmc or another driver program, see the `--unwind` and
+`--unwind-set` options). The symbolic execution includes constant
+folding so loops that have a constant / bounded number of iterations will often
+be handled completely (assuming the unwinding limit is sufficient).
+When an unwind or recursion limit is reached, an assertion can be added to
+explicitly show when analysis is incomplete.
+
+\subsection \ref goto_symext::clean_expr
+
+Before any expression is incorporated into the output equation set it is passed
+through \ref goto_symext::clean_expr and thus \ref goto_symext::dereference,
+whose primary purpose is to remove dereference operations. It achieves this
+using the \ref value_sett stored in \ref goto_symex_statet, replacing `*x` with
+a construct such as
+`x == &candidate1 ? candidate1 : x == &candidate2 ? candidate2 : x$object`
+
+Note the `x$object` fallback candidate, which is known as a *failed symbol* or
+*failed object*, and represents the unknown object pointed to by `x` when
+neither of the candidates (`candidate1` and `candidate2` here) matched as
+expected. This is of course unsound, since `x$object` and `y$object` are always
+distinct, even if `x` and `y` might actually alias, but at least it ensures
+writes to and subsequent reads from `x` are related.
+
+\ref goto_symext::dereference function also passes its argument to
+\ref goto_symex_statet::rename, which is responsible for both SSA
+renaming symbols and for applying constant propagation where possible. Renaming
+is also performed elsewhere without calling \ref goto_symext::dereference when
+an expression is already known to be pointer-free.
 
 \subsection symex-path Path exploration
 
@@ -73,21 +110,24 @@ By default, CBMC symbolically executes the entire program, building up
 an equation representing all instructions, which it then passes to the
 solver. Notably, it _merges_ paths that diverge due to a goto
 instruction, forming a constraint that represents having taken either of
-the two paths; the code for doing this is goto_symext::merge_goto().
+the two paths; the code for doing this is \ref goto_symext::merge_goto.
 
-CBMC can operate in a different mode when the `--paths` flag is passed
-on the command line. This disables path merging; instead, CBMC executes
-a single path at a time, calling the solver with the equation
+Goto-symex can operate in a different mode when the `--paths` flag is passed
+in the \ref optionst object passed to its constructor (\ref cbmc passes this
+from the corresponding command-line option).
+This disables path merging; instead, symex executes
+a single path at a time, returning each one to its caller, which in the case of
+cbmc then calls its solver with the equation
 representing that path, then continues to execute other paths.
 The 'other paths' that would have been taken when the program branches
-are saved onto a workqueue so that CBMC can continue to execute the
-current path, and then later retrieve saved paths from the workqueue.
+are saved onto a workqueue so that the driver program can continue to execute
+the current path, and then later retrieve saved paths from the workqueue.
 Implementation-wise, \ref bmct passes a worklist to goto_symext in
-bmct::do_language_agnostic_bmc(). If path exploration is enabled,
+\ref bmct::do_language_agnostic_bmc. If path exploration is enabled,
 goto_symext will fill up the worklist whenever it encounters a branch,
 instead of merging the paths on the branch.  After the initial symbolic
-execution (i.e. the first call to bmct::run() in
-bmct::do_language_agnostic_bmc()), \ref bmct continues popping the
+execution (i.e. the first call to \ref bmct::run in
+\ref bmct::do_language_agnostic_bmc), \ref bmct continues popping the
 worklist and executing untaken paths until the worklist empties. Note
 that this means that the default model-checking behaviour is a special
 case of path exploration: when model-checking, the initial symbolic
@@ -154,6 +194,8 @@ time we access x as we walk through the function.
 \section counter-example-production Counter Example Production
 
 In the \ref goto-symex directory.
+
+
 
 **Key classes:**
 * symex_target_equationt
