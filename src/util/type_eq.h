@@ -1,11 +1,14 @@
 /*******************************************************************\
 
-Module:
+Module: Type equality
 
 Author: Daniel Kroening, kroening@kroening.com
+        Maria Svorenova, maria.svorenova@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Type equality
 
 #ifndef CPROVER_UTIL_TYPE_EQ_H
 #define CPROVER_UTIL_TYPE_EQ_H
