@@ -43,6 +43,12 @@ To be documented.
 
 To be documented.
 
+\section java-bytecode-remove-instanceof Remove instanceof
+
+\ref remove_instanceof.h removes the bytecode instruction `instanceof ` and replaces it with two instructions:
+ - check whether the pointer is null
+ - if not null, does the class identifier match the type of any of its subtypes
+
 \section java-bytecode-method-stubbing Method stubbing
 
 To be documented.
