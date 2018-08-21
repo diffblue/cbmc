@@ -24,7 +24,7 @@ To be documented.
 The regression tests are contained in the `regression/` folder.
 They are grouped into directories for each of the tools/modules.
 Each of these contains multiple directories, each of which contains
-input files and one or more`.desc` files that describe what command
+input files and one or more `.desc` files that describe what command
 to run, what output is expected and so on. There is a Perl script,
 `test.pl` that is used to invoke the tests as:
 

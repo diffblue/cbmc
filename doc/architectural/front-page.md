@@ -68,6 +68,10 @@ you can access it <a href=
 
 ### For contributors:
 
+The following pages attempt to provide the information that a developer needs to
+work on CBMC, in a sensible order. In many cases they link to the appropriate
+class-level or module-level documentation.
+
 * \subpage compilation-and-development
 
 * \subpage background-concepts
@@ -76,34 +80,23 @@ you can access it <a href=
 
 * \subpage folder-walkthrough
 
-* \subpage data-structures-core-structures-and-ast
-
-* \subpage data-structures-from-ast-to-goto-program
-
-* \subpage front-end-languages-generating-codet-from-multiple-languages
-
-* \subpage bmct-class
-
-* \subpage symbolic-executors
-
-* \subpage solvers-infrastructure
-
-* \subpage static-analysis-apis
+* \subpage code-walkthrough
 
 * \subpage other-tools
-
-* For higher-level architectural information, each of the pages under
-  the <a href="modules.html">Modules</a>
-  link gives an overview of a directory in the CProver codebase.
-
-* If you already know exactly what you're looking for, the API reference
-  is generated from the codebase. You can search for classes and class
-  members in the search bar at top-right or use one of the links in the
-  sidebar.
 
 * The \subpage tutorial "CBMC Developer Tutorial" helps new contributors
   to CProver to get their feet wet through a series of programming
   exercises - mostly modifying goto-instrument, and thus learning to
   manipulate the main data structures used within CBMC.
+
+For higher-level architectural information, each of the pages under
+the <a href="modules.html">Modules</a>
+link gives an overview of a directory in the CProver codebase.
+
+If you already know exactly what you're looking for, the best place
+to look is the API reference, which
+is generated from the codebase. You can search for classes and class
+members in the search bar at top-right or use one of the links in the
+sidebar.
 
 \defgroup module_hidden _hidden

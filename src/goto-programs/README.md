@@ -5,7 +5,7 @@
 
 \author Kareem Khazem, Martin Brain
 
-\section overview Overview
+\section goto-programs-overview Overview
 Goto programs are the intermediate representation of the CPROVER tool
 chain. They are language independent and similar to many of the compiler
 intermediate languages. Section \ref goto-programs describes the
@@ -371,3 +371,9 @@ previous stage:
   block.
 
 This stage concludes the *analysis-independent* program transformations.
+
+\subsection goto-program-example-section Example:
+
+\subsubsection goto-program-example-1-section Unsigned mult (unsigned a, unsigned b) { int acc, i; for (i = 0; i < b; i++) acc += a; return acc; }
+
+To be documented.
