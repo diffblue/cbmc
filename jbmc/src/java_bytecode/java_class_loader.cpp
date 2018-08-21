@@ -164,9 +164,6 @@ java_class_loadert::get_parse_tree(
           cp_entry.path + '/' + class_file;
 #endif
 
-        if(!class_loader_limit.load_class_file(class_file))
-          continue;
-
         if(std::ifstream(full_path))
         {
           debug() << "Getting class `" << class_name << "' from file "
