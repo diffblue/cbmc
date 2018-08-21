@@ -281,3 +281,51 @@ To be documented.
 \subsubsection ast-example-3-section Java arrays: struct Array { int length, int *data };
 
 To be documented.
+
+\subsection section-goto-typecheck Goto Model Typecheck
+
+Class `typecheckt`.
+
+\subsection irep-serialization `irept` Serialization
+
+The module provides serialisation and deserialisation of
+integer numbers, strings, and `irept` instances.
+
+This is implemented in C++ modules:
+  - `irep_serialization.h`
+  - `irep_serialization.cpp`
+  - `irep_hash_container.h` (applies only to `irept` instances)
+  - `irep_hash_container.cpp` (applies only to `irept` instances)
+
+\subsubsection irep-serialization-numbers Serialization of Numbers
+
+A number is serialiased in 7-bit encoding. For example, given a 2-byte
+number in base 2, like `10101010 01010101`, then it is saves in 3 bytes,
+where each byte takes only 7 bits from the number, reading from the
+left. The 8th bit in each output byte is set to 1 except in the last
+byte, where the bit is 0. That 0 bit indicates the end of the
+encoding of the number. So, the output bytes look like this:
+`11010101 11010100 00000010`.
+
+This is implmented in the function `::write_gb_word`.
+
+The deserialisation does the oposite process and it is implemented in
+`irep_serializationt::read_gb_word`.
+
+\subsubsection irep-serialization-strings Serialization of Strings
+
+A string is encoded as classic 0-terminated C string. However,
+characters `0` and `\\` are escaped by writing additional `\\` 
+before them. 
+
+This is implmented in the function `::write_gb_string` and the
+deserialisation is implemented in `irep_serializationt::read_gb_string`.
+
+Each string which is stored inside an `::irept` instance is saved (meaining
+its characters) into the ouptut stream, only in the first serialisation
+query of the string. In that case, before the string there is also saved
+a computed integer hash code of the string. Then, all subsequent
+serialisation queries save only that integer hash code of the string.
+
+\subsubsection irep-serialization-ireps Serialization of `irept` Instances
+
