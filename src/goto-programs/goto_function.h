@@ -8,6 +8,9 @@ Date: May 2018
 
 \*******************************************************************/
 
+/// \file
+/// Goto Function
+
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_FUNCTION_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_FUNCTION_H
 
@@ -17,13 +20,24 @@ Date: May 2018
 
 #include "goto_program.h"
 
+/// A goto function, consisting of function type (see #type), function body (see
+/// #body), and parameter identifiers (see #parameter_identifiers).
 class goto_functiont
 {
 public:
   goto_programt body;
+
+  /// The type of the function, indicating the return type and parameter types
   code_typet type;
 
   typedef std::vector<irep_idt> parameter_identifierst;
+
+  /// The identifiers of the parameters of this function
+  ///
+  /// Note: This variable is currently unused and the vector is thus always
+  /// empty. In the future the code base may be refactored to fill in the
+  /// parameter identifiers here when creating a `goto_functiont`. For now the
+  /// parameter identifiers should be retrieved from the type (`code_typet`).
   parameter_identifierst parameter_identifiers;
 
   bool body_available() const
