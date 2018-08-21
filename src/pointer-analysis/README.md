@@ -3,7 +3,7 @@
 
 # Folder pointer-analysis
 
-\author Martin Brain
+\author Martin Brain, Chris Smowton
 
 To perform symbolic execution on programs with dereferencing of
 arbitrary pointers, some alias analysis is needed.  `pointer-analysis`
@@ -15,7 +15,20 @@ subtle and sophisticated and thus there may be bugs.
 
 \subsection pointer-analysis-object-numbering Object / expression numbering (object_numberingt)
 
-To be documented.
+Object numbering assigns numbers to expressions, allowing other pointer-analysis
+classes to use small, cheap to compare, cheap to sort numbers in place of
+\ref exprt instances. Numbering also saves memory, as two identical exprt
+objects will be assigned the same number, eliminating redundant storage of the
+same data.
+
+Alternative approaches to the same problem include \ref irept sharing (but this
+only shares when a copy is taken; two identical irepts arrived at by different
+routes will not be shared) and \ref merge_irept (which does merge identical
+ireps, but is still more expensive to compare than numbers).
+
+Object numbering is used by \ref value_sett and cousins (such as
+\ref value_set_fit) in an effort to reduce the memory dedicated to value-set
+storage.
 
 \subsection pointer-analysis-pointer-offset-sum Pointer-offset sum (pointer_offset_sum)
 
