@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module:
+Module: API to expression classes
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -10,22 +10,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_STD_EXPR_H
 #define CPROVER_UTIL_STD_EXPR_H
 
-/*! \file util/std_expr.h
- * \brief API to expression classes
- *
- * \author Daniel Kroening <kroening@kroening.com>
- * \date   Sun Jul 31 21:54:44 BST 2011
-*/
+/// \file util/std_expr.h
+/// API to expression classes
 
 #include "invariant.h"
 #include "std_types.h"
 #include "expr_cast.h"
 
 
-/*! \brief A transition system, consisting of
-           state invariant, initial state predicate,
-           and transition predicate
-*/
+/// transition system, consisting of state invariant, initial state predicate,
+/// and transition predicate.
 class transt:public exprt
 {
 public:
@@ -44,16 +38,11 @@ public:
   const exprt &trans() const { return op2(); }
 };
 
-/*! \brief Cast a generic exprt to a \ref transt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * transt.
- *
- * \param expr Source expression
- * \return Object of type \ref transt
- *
-
-*/
+/// Cast a generic exprt to a \ref transt
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// transt.
+/// \param expr Source expression
+/// \return Object of type \ref transt
 inline const transt &to_trans_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_trans);
@@ -63,9 +52,8 @@ inline const transt &to_trans_expr(const exprt &expr)
   return static_cast<const transt &>(expr);
 }
 
-/*! \copydoc to_trans(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_trans(const exprt &)
+/// \ingroup gr_std_expr
 inline transt &to_trans_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_trans);
@@ -85,8 +73,7 @@ inline void validate_expr(const transt &value)
 }
 
 
-/*! \brief Expression to hold a symbol (variable)
-*/
+/// Expression to hold a symbol (variable)
 class symbol_exprt:public exprt
 {
 public:
@@ -94,25 +81,22 @@ public:
   {
   }
 
-  /*! \brief Constructor
-   * \param identifier Name of symbol
-  */
+  /// Constructor
+  /// \param identifier Name of symbol
   explicit symbol_exprt(const irep_idt &identifier):exprt(ID_symbol)
   {
     set_identifier(identifier);
   }
 
-  /*! \brief Constructor
-   * \param  type Type of symbol
-  */
+  /// Constructor
+  /// \param type Type of symbol
   explicit symbol_exprt(const typet &type):exprt(ID_symbol, type)
   {
   }
 
-  /*! \brief Constructor
-   * \param identifier Name of symbol
-   * \param  type Type of symbol
-  */
+  /// Constructor
+  /// \param identifier Name of symbol
+  /// \param type Type of symbol
   symbol_exprt(
     const irep_idt &identifier,
     const typet &type):exprt(ID_symbol, type)
@@ -131,8 +115,7 @@ public:
   }
 };
 
-/*! \brief Expression to hold a symbol (variable)
-*/
+/// Expression to hold a symbol (variable)
 class decorated_symbol_exprt:public symbol_exprt
 {
 public:
@@ -140,26 +123,23 @@ public:
   {
   }
 
-  /*! \brief Constructor
-   * \param identifier Name of symbol
-  */
+  /// Constructor
+  /// \param identifier Name of symbol
   explicit decorated_symbol_exprt(const irep_idt &identifier):
     symbol_exprt(identifier)
   {
   }
 
-  /*! \brief Constructor
-   * \param  type Type of symbol
-  */
+  /// Constructor
+  /// \param type Type of symbol
   explicit decorated_symbol_exprt(const typet &type):
     symbol_exprt(type)
   {
   }
 
-  /*! \brief Constructor
-   * \param identifier Name of symbol
-   * \param  type Type of symbol
-  */
+  /// Constructor
+  /// \param identifier Name of symbol
+  /// \param  type Type of symbol
   decorated_symbol_exprt(
     const irep_idt &identifier,
     const typet &type):symbol_exprt(identifier, type)
@@ -197,16 +177,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref symbol_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * symbol_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref symbol_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref symbol_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// symbol_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref symbol_exprt
+///
+/// \ingroup gr_std_expr
 inline const symbol_exprt &to_symbol_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_symbol);
@@ -214,9 +193,8 @@ inline const symbol_exprt &to_symbol_expr(const exprt &expr)
   return static_cast<const symbol_exprt &>(expr);
 }
 
-/*! \copydoc to_symbol_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_symbol_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline symbol_exprt &to_symbol_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_symbol);
@@ -234,15 +212,13 @@ inline void validate_expr(const symbol_exprt &value)
 }
 
 
-/*! \brief Expression to hold a nondeterministic choice
-*/
+/// \brief Expression to hold a nondeterministic choice
 class nondet_symbol_exprt:public exprt
 {
 public:
-  /*! \brief Constructor
-   * \param identifier Name of symbol
-   * \param  type Type of symbol
-  */
+  /// \brief Constructor
+  /// \param identifier Name of symbol
+  /// \param  type Type of symbol
   nondet_symbol_exprt(
     const irep_idt &identifier,
     const typet &type):exprt(ID_nondet_symbol, type)
@@ -261,16 +237,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref nondet_symbol_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * nondet_symbol_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref nondet_symbol_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref nondet_symbol_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// nondet_symbol_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref nondet_symbol_exprt
+///
+/// \ingroup gr_std_expr
 inline const nondet_symbol_exprt &to_nondet_symbol_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_nondet_symbol);
@@ -278,9 +253,8 @@ inline const nondet_symbol_exprt &to_nondet_symbol_expr(const exprt &expr)
   return static_cast<const nondet_symbol_exprt &>(expr);
 }
 
-/*! \copydoc to_nondet_symbol_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_nondet_symbol_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline nondet_symbol_exprt &to_nondet_symbol_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_symbol);
@@ -298,8 +272,7 @@ inline void validate_expr(const nondet_symbol_exprt &value)
 }
 
 
-/*! \brief Generic base class for unary expressions
-*/
+/// \brief Generic base class for unary expressions
 class unary_exprt:public exprt
 {
 public:
@@ -348,16 +321,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref unary_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * unary_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref unary_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref unary_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// unary_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref unary_exprt
+///
+/// \ingroup gr_std_expr
 inline const unary_exprt &to_unary_expr(const exprt &expr)
 {
   DATA_INVARIANT(
@@ -366,9 +338,8 @@ inline const unary_exprt &to_unary_expr(const exprt &expr)
   return static_cast<const unary_exprt &>(expr);
 }
 
-/*! \copydoc to_unary_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_unary_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline unary_exprt &to_unary_expr(exprt &expr)
 {
   DATA_INVARIANT(
@@ -383,8 +354,7 @@ template<> inline bool can_cast_expr<unary_exprt>(const exprt &base)
 }
 
 
-/*! \brief absolute value
-*/
+/// \brief absolute value
 class abs_exprt:public unary_exprt
 {
 public:
@@ -398,16 +368,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref abs_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * abs_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref abs_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref abs_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// abs_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref abs_exprt
+///
+/// \ingroup gr_std_expr
 inline const abs_exprt &to_abs_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_abs);
@@ -417,9 +386,8 @@ inline const abs_exprt &to_abs_expr(const exprt &expr)
   return static_cast<const abs_exprt &>(expr);
 }
 
-/*! \copydoc to_abs_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_abs_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline abs_exprt &to_abs_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_abs);
@@ -439,8 +407,7 @@ inline void validate_expr(const abs_exprt &value)
 }
 
 
-/*! \brief The unary minus expression
-*/
+/// \brief The unary minus expression
 class unary_minus_exprt:public unary_exprt
 {
 public:
@@ -461,16 +428,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref unary_minus_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * unary_minus_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref unary_minus_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref unary_minus_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// unary_minus_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref unary_minus_exprt
+///
+/// \ingroup gr_std_expr
 inline const unary_minus_exprt &to_unary_minus_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_unary_minus);
@@ -480,9 +446,8 @@ inline const unary_minus_exprt &to_unary_minus_expr(const exprt &expr)
   return static_cast<const unary_minus_exprt &>(expr);
 }
 
-/*! \copydoc to_unary_minus_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_unary_minus_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline unary_minus_exprt &to_unary_minus_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_unary_minus);
@@ -501,8 +466,7 @@ inline void validate_expr(const unary_minus_exprt &value)
   validate_operands(value, 1, "Unary minus must have one operand");
 }
 
-/*! \brief The byte swap expression
-*/
+/// \brief The byte swap expression
 class bswap_exprt: public unary_exprt
 {
 public:
@@ -529,16 +493,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref bswap_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * bswap_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref bswap_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref bswap_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// bswap_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref bswap_exprt
+///
+/// \ingroup gr_std_expr
 inline const bswap_exprt &to_bswap_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_bswap);
@@ -548,9 +511,8 @@ inline const bswap_exprt &to_bswap_expr(const exprt &expr)
   return static_cast<const bswap_exprt &>(expr);
 }
 
-/*! \copydoc to_bswap_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_bswap_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline bswap_exprt &to_bswap_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_bswap);
@@ -572,9 +534,8 @@ inline void validate_expr(const bswap_exprt &value)
     value.op().type() == value.type(), "bswap type must match operand type");
 }
 
-/*! \brief A generic base class for expressions that are predicates,
-           i.e., boolean-typed.
-*/
+/// \brief A generic base class for expressions that are predicates,
+///        i.e., boolean-typed.
 class predicate_exprt:public exprt
 {
 public:
@@ -603,9 +564,8 @@ public:
   }
 };
 
-/*! \brief A generic base class for expressions that are predicates,
-           i.e., boolean-typed, and that take exactly one argument.
-*/
+/// \brief A generic base class for expressions that are predicates,
+///        i.e., boolean-typed, and that take exactly one argument.
 class unary_predicate_exprt:public unary_exprt
 {
 public:
@@ -629,8 +589,7 @@ protected:
   using exprt::op2; // hide
 };
 
-/*! \brief sign of an expression
-*/
+/// \brief sign of an expression
 class sign_exprt:public unary_predicate_exprt
 {
 public:
@@ -644,8 +603,7 @@ public:
   }
 };
 
-/*! \brief A generic base class for binary expressions
-*/
+/// \brief A generic base class for binary expressions
 class binary_exprt:public exprt
 {
 public:
@@ -689,16 +647,15 @@ protected:
   using exprt::op2; // hide
 };
 
-/*! \brief Cast a generic exprt to a \ref binary_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * binary_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref binary_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref binary_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// binary_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref binary_exprt
+///
+/// \ingroup gr_std_expr
 inline const binary_exprt &to_binary_expr(const exprt &expr)
 {
   DATA_INVARIANT(
@@ -707,9 +664,8 @@ inline const binary_exprt &to_binary_expr(const exprt &expr)
   return static_cast<const binary_exprt &>(expr);
 }
 
-/*! \copydoc to_binary_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_binary_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline binary_exprt &to_binary_expr(exprt &expr)
 {
   DATA_INVARIANT(
@@ -724,9 +680,8 @@ template<> inline bool can_cast_expr<binary_exprt>(const exprt &base)
 }
 
 
-/*! \brief A generic base class for expressions that are predicates,
-           i.e., boolean-typed, and that take exactly two arguments.
-*/
+/// \brief A generic base class for expressions that are predicates,
+///        i.e., boolean-typed, and that take exactly two arguments.
 class binary_predicate_exprt:public binary_exprt
 {
 public:
@@ -747,8 +702,7 @@ public:
   }
 };
 
-/*! \brief A generic base class for relations, i.e., binary predicates
-*/
+/// \brief A generic base class for relations, i.e., binary predicates
 class binary_relation_exprt:public binary_predicate_exprt
 {
 public:
@@ -790,16 +744,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref binary_relation_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * binary_relation_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref binary_relation_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref binary_relation_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// binary_relation_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref binary_relation_exprt
+///
+/// \ingroup gr_std_expr
 inline const binary_relation_exprt &to_binary_relation_expr(const exprt &expr)
 {
   DATA_INVARIANT(
@@ -808,9 +761,8 @@ inline const binary_relation_exprt &to_binary_relation_expr(const exprt &expr)
   return static_cast<const binary_relation_exprt &>(expr);
 }
 
-/*! \copydoc to_binary_relation_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_binary_relation_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
 {
   DATA_INVARIANT(
@@ -825,8 +777,7 @@ template<> inline bool can_cast_expr<binary_relation_exprt>(const exprt &base)
 }
 
 
-/*! \brief A generic base class for multi-ary expressions
-*/
+/// \brief A generic base class for multi-ary expressions
 class multi_ary_exprt:public exprt
 {
 public:
@@ -864,32 +815,29 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref multi_ary_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * multi_ary_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref multi_ary_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref multi_ary_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// multi_ary_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref multi_ary_exprt
+///
+/// \ingroup gr_std_expr
 inline const multi_ary_exprt &to_multi_ary_expr(const exprt &expr)
 {
   return static_cast<const multi_ary_exprt &>(expr);
 }
 
-/*! \copydoc to_multi_ary_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_multi_ary_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline multi_ary_exprt &to_multi_ary_expr(exprt &expr)
 {
   return static_cast<multi_ary_exprt &>(expr);
 }
 
 
-/*! \brief The plus expression
-*/
+/// \brief The plus expression
 class plus_exprt:public multi_ary_exprt
 {
 public:
@@ -913,16 +861,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref plus_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * plus_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref plus_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref plus_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// plus_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref plus_exprt
+///
+/// \ingroup gr_std_expr
 inline const plus_exprt &to_plus_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_plus);
@@ -932,9 +879,8 @@ inline const plus_exprt &to_plus_expr(const exprt &expr)
   return static_cast<const plus_exprt &>(expr);
 }
 
-/*! \copydoc to_plus_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_plus_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline plus_exprt &to_plus_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_plus);
@@ -954,8 +900,7 @@ inline void validate_expr(const plus_exprt &value)
 }
 
 
-/*! \brief binary minus
-*/
+/// \brief binary minus
 class minus_exprt:public binary_exprt
 {
 public:
@@ -971,16 +916,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref minus_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * minus_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref minus_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref minus_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// minus_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref minus_exprt
+///
+/// \ingroup gr_std_expr
 inline const minus_exprt &to_minus_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_minus);
@@ -990,9 +934,8 @@ inline const minus_exprt &to_minus_expr(const exprt &expr)
   return static_cast<const minus_exprt &>(expr);
 }
 
-/*! \copydoc to_minus_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_minus_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline minus_exprt &to_minus_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_minus);
@@ -1012,8 +955,7 @@ inline void validate_expr(const minus_exprt &value)
 }
 
 
-/*! \brief binary multiplication
-*/
+/// \brief binary multiplication
 class mult_exprt:public multi_ary_exprt
 {
 public:
@@ -1029,16 +971,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref mult_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * mult_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref mult_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref mult_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// mult_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref mult_exprt
+///
+/// \ingroup gr_std_expr
 inline const mult_exprt &to_mult_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mult);
@@ -1048,9 +989,8 @@ inline const mult_exprt &to_mult_expr(const exprt &expr)
   return static_cast<const mult_exprt &>(expr);
 }
 
-/*! \copydoc to_mult_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_mult_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline mult_exprt &to_mult_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mult);
@@ -1070,8 +1010,7 @@ inline void validate_expr(const mult_exprt &value)
 }
 
 
-/*! \brief division (integer and real)
-*/
+/// \brief division (integer and real)
 class div_exprt:public binary_exprt
 {
 public:
@@ -1087,16 +1026,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref div_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * div_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref div_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref div_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// div_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref div_exprt
+///
+/// \ingroup gr_std_expr
 inline const div_exprt &to_div_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_div);
@@ -1106,9 +1044,8 @@ inline const div_exprt &to_div_expr(const exprt &expr)
   return static_cast<const div_exprt &>(expr);
 }
 
-/*! \copydoc to_div_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_div_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline div_exprt &to_div_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_div);
@@ -1128,8 +1065,7 @@ inline void validate_expr(const div_exprt &value)
 }
 
 
-/*! \brief binary modulo
-*/
+/// \brief binary modulo
 class mod_exprt:public binary_exprt
 {
 public:
@@ -1145,16 +1081,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref mod_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * mod_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref mod_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref mod_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// mod_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref mod_exprt
+///
+/// \ingroup gr_std_expr
 inline const mod_exprt &to_mod_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mod);
@@ -1162,9 +1097,8 @@ inline const mod_exprt &to_mod_expr(const exprt &expr)
   return static_cast<const mod_exprt &>(expr);
 }
 
-/*! \copydoc to_mod_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_mod_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline mod_exprt &to_mod_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mod);
@@ -1182,8 +1116,7 @@ inline void validate_expr(const mod_exprt &value)
 }
 
 
-/*! \brief remainder of division
-*/
+/// \brief remainder of division
 class rem_exprt:public binary_exprt
 {
 public:
@@ -1199,16 +1132,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref rem_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * rem_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref rem_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref rem_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// rem_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref rem_exprt
+///
+/// \ingroup gr_std_expr
 inline const rem_exprt &to_rem_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_rem);
@@ -1216,9 +1148,8 @@ inline const rem_exprt &to_rem_expr(const exprt &expr)
   return static_cast<const rem_exprt &>(expr);
 }
 
-/*! \copydoc to_rem_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_rem_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline rem_exprt &to_rem_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_rem);
@@ -1236,8 +1167,8 @@ inline void validate_expr(const rem_exprt &value)
 }
 
 
-/*! \brief exponentiation
- */
+/// \brief exponentiation
+////
 class power_exprt:public binary_exprt
 {
  public:
@@ -1253,16 +1184,15 @@ class power_exprt:public binary_exprt
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref power_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * power_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref power_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref power_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// power_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref power_exprt
+///
+/// \ingroup gr_std_expr
 inline const power_exprt &to_power_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_power);
@@ -1270,9 +1200,8 @@ inline const power_exprt &to_power_expr(const exprt &expr)
   return static_cast<const power_exprt &>(expr);
 }
 
-/*! \copydoc to_power_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_power_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline power_exprt &to_power_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_power);
@@ -1290,8 +1219,8 @@ inline void validate_expr(const power_exprt &value)
 }
 
 
-/*! \brief falling factorial power
- */
+/// \brief falling factorial power
+////
 class factorial_power_exprt:public binary_exprt
 {
  public:
@@ -1307,16 +1236,15 @@ class factorial_power_exprt:public binary_exprt
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref factorial_power_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * factorial_power_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref factorial_power_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref factorial_power_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// factorial_power_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref factorial_power_exprt
+///
+/// \ingroup gr_std_expr
 inline const factorial_power_exprt &to_factorial_power_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_factorial_power);
@@ -1326,9 +1254,8 @@ inline const factorial_power_exprt &to_factorial_power_expr(const exprt &expr)
   return static_cast<const factorial_power_exprt &>(expr);
 }
 
-/*! \copydoc to_factorial_power_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_factorial_power_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline factorial_power_exprt &to_factorial_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_factorial_power);
@@ -1349,8 +1276,7 @@ inline void validate_expr(const factorial_power_exprt &value)
 }
 
 
-/*! \brief equality
-*/
+/// \brief equality
 class equal_exprt:public binary_relation_exprt
 {
 public:
@@ -1364,16 +1290,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref equal_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * equal_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref equal_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref equal_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// equal_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref equal_exprt
+///
+/// \ingroup gr_std_expr
 inline const equal_exprt &to_equal_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_equal);
@@ -1381,9 +1306,8 @@ inline const equal_exprt &to_equal_expr(const exprt &expr)
   return static_cast<const equal_exprt &>(expr);
 }
 
-/*! \copydoc to_equal_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_equal_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline equal_exprt &to_equal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_equal);
@@ -1401,8 +1325,7 @@ inline void validate_expr(const equal_exprt &value)
 }
 
 
-/*! \brief inequality
-*/
+/// \brief inequality
 class notequal_exprt:public binary_relation_exprt
 {
 public:
@@ -1416,16 +1339,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref notequal_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * notequal_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref notequal_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref notequal_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// notequal_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref notequal_exprt
+///
+/// \ingroup gr_std_expr
 inline const notequal_exprt &to_notequal_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_notequal);
@@ -1435,9 +1357,8 @@ inline const notequal_exprt &to_notequal_expr(const exprt &expr)
   return static_cast<const notequal_exprt &>(expr);
 }
 
-/*! \copydoc to_notequal_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_notequal_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline notequal_exprt &to_notequal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_notequal);
@@ -1457,8 +1378,7 @@ inline void validate_expr(const notequal_exprt &value)
 }
 
 
-/*! \brief array index operator
-*/
+/// \brief array index operator
 class index_exprt:public binary_exprt
 {
 public:
@@ -1504,16 +1424,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref index_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * index_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref index_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref index_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// index_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref index_exprt
+///
+/// \ingroup gr_std_expr
 inline const index_exprt &to_index_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index);
@@ -1523,9 +1442,8 @@ inline const index_exprt &to_index_expr(const exprt &expr)
   return static_cast<const index_exprt &>(expr);
 }
 
-/*! \copydoc to_index_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_index_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline index_exprt &to_index_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index);
@@ -1545,8 +1463,7 @@ inline void validate_expr(const index_exprt &value)
 }
 
 
-/*! \brief array constructor from single element
-*/
+/// \brief array constructor from single element
 class array_of_exprt:public unary_exprt
 {
 public:
@@ -1571,16 +1488,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref array_of_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * array_of_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref array_of_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref array_of_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// array_of_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref array_of_exprt
+///
+/// \ingroup gr_std_expr
 inline const array_of_exprt &to_array_of_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array_of);
@@ -1590,9 +1506,8 @@ inline const array_of_exprt &to_array_of_expr(const exprt &expr)
   return static_cast<const array_of_exprt &>(expr);
 }
 
-/*! \copydoc to_array_of_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_array_of_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline array_of_exprt &to_array_of_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array_of);
@@ -1612,8 +1527,7 @@ inline void validate_expr(const array_of_exprt &value)
 }
 
 
-/*! \brief array constructor from list of elements
-*/
+/// \brief array constructor from list of elements
 class array_exprt:public exprt
 {
 public:
@@ -1627,25 +1541,23 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref array_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * array_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref array_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref array_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// array_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref array_exprt
+///
+/// \ingroup gr_std_expr
 inline const array_exprt &to_array_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array);
   return static_cast<const array_exprt &>(expr);
 }
 
-/*! \copydoc to_array_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_array_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline array_exprt &to_array_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array);
@@ -1679,8 +1591,7 @@ inline void validate_expr(const array_list_exprt &value)
   PRECONDITION(value.operands().size() % 2 == 0);
 }
 
-/*! \brief vector constructor from list of elements
-*/
+/// \brief vector constructor from list of elements
 class vector_exprt:public exprt
 {
 public:
@@ -1694,25 +1605,23 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref vector_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * vector_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref vector_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref vector_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// vector_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref vector_exprt
+///
+/// \ingroup gr_std_expr
 inline const vector_exprt &to_vector_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_vector);
   return static_cast<const vector_exprt &>(expr);
 }
 
-/*! \copydoc to_vector_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_vector_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline vector_exprt &to_vector_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_vector);
@@ -1725,8 +1634,7 @@ template<> inline bool can_cast_expr<vector_exprt>(const exprt &base)
 }
 
 
-/*! \brief union constructor from single element
-*/
+/// \brief union constructor from single element
 class union_exprt:public unary_exprt
 {
 public:
@@ -1769,16 +1677,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref union_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * union_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref union_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref union_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// union_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref union_exprt
+///
+/// \ingroup gr_std_expr
 inline const union_exprt &to_union_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_union);
@@ -1788,9 +1695,8 @@ inline const union_exprt &to_union_expr(const exprt &expr)
   return static_cast<const union_exprt &>(expr);
 }
 
-/*! \copydoc to_union_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_union_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline union_exprt &to_union_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_union);
@@ -1810,8 +1716,7 @@ inline void validate_expr(const union_exprt &value)
 }
 
 
-/*! \brief struct constructor from list of elements
-*/
+/// \brief struct constructor from list of elements
 class struct_exprt:public exprt
 {
 public:
@@ -1828,25 +1733,23 @@ public:
   const exprt &component(const irep_idt &name, const namespacet &ns) const;
 };
 
-/*! \brief Cast a generic exprt to a \ref struct_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * struct_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref struct_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref struct_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// struct_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref struct_exprt
+///
+/// \ingroup gr_std_expr
 inline const struct_exprt &to_struct_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_struct);
   return static_cast<const struct_exprt &>(expr);
 }
 
-/*! \copydoc to_struct_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_struct_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline struct_exprt &to_struct_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_struct);
@@ -1859,8 +1762,7 @@ template<> inline bool can_cast_expr<struct_exprt>(const exprt &base)
 }
 
 
-/*! \brief complex constructor from a pair of numbers
-*/
+/// \brief complex constructor from a pair of numbers
 class complex_exprt:public binary_exprt
 {
 public:
@@ -1900,16 +1802,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref complex_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * complex_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref complex_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref complex_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// complex_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref complex_exprt
+///
+/// \ingroup gr_std_expr
 inline const complex_exprt &to_complex_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_complex);
@@ -1919,9 +1820,8 @@ inline const complex_exprt &to_complex_expr(const exprt &expr)
   return static_cast<const complex_exprt &>(expr);
 }
 
-/*! \copydoc to_complex_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_complex_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline complex_exprt &to_complex_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_complex);
@@ -1943,8 +1843,7 @@ inline void validate_expr(const complex_exprt &value)
 
 class namespacet;
 
-/*! \brief split an expression into a base object and a (byte) offset
-*/
+/// \brief split an expression into a base object and a (byte) offset
 class object_descriptor_exprt:public binary_exprt
 {
 public:
@@ -1979,16 +1878,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref object_descriptor_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * object_descriptor_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref object_descriptor_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref object_descriptor_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// object_descriptor_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref object_descriptor_exprt
+///
+/// \ingroup gr_std_expr
 inline const object_descriptor_exprt &to_object_descriptor_expr(
   const exprt &expr)
 {
@@ -1999,9 +1897,8 @@ inline const object_descriptor_exprt &to_object_descriptor_expr(
   return static_cast<const object_descriptor_exprt &>(expr);
 }
 
-/*! \copydoc to_object_descriptor_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_object_descriptor_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline object_descriptor_exprt &to_object_descriptor_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_object_descriptor);
@@ -2022,8 +1919,7 @@ inline void validate_expr(const object_descriptor_exprt &value)
 }
 
 
-/*! \brief TO_BE_DOCUMENTED
-*/
+/// \brief TO_BE_DOCUMENTED
 class dynamic_object_exprt:public binary_exprt
 {
 public:
@@ -2055,16 +1951,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref dynamic_object_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * dynamic_object_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref dynamic_object_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref dynamic_object_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// dynamic_object_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref dynamic_object_exprt
+///
+/// \ingroup gr_std_expr
 inline const dynamic_object_exprt &to_dynamic_object_expr(
   const exprt &expr)
 {
@@ -2075,9 +1970,8 @@ inline const dynamic_object_exprt &to_dynamic_object_expr(
   return static_cast<const dynamic_object_exprt &>(expr);
 }
 
-/*! \copydoc to_dynamic_object_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_dynamic_object_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline dynamic_object_exprt &to_dynamic_object_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_dynamic_object);
@@ -2098,8 +1992,7 @@ inline void validate_expr(const dynamic_object_exprt &value)
 }
 
 
-/*! \brief semantic type conversion
-*/
+/// \brief semantic type conversion
 class typecast_exprt:public unary_exprt
 {
 public:
@@ -2122,16 +2015,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref typecast_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * typecast_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref typecast_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref typecast_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// typecast_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref typecast_exprt
+///
+/// \ingroup gr_std_expr
 inline const typecast_exprt &to_typecast_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_typecast);
@@ -2141,9 +2033,8 @@ inline const typecast_exprt &to_typecast_expr(const exprt &expr)
   return static_cast<const typecast_exprt &>(expr);
 }
 
-/*! \copydoc to_typecast_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_typecast_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline typecast_exprt &to_typecast_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_typecast);
@@ -2163,8 +2054,7 @@ inline void validate_expr(const typecast_exprt &value)
 }
 
 
-/*! \brief semantic type conversion from/to floating-point formats
-*/
+/// \brief semantic type conversion from/to floating-point formats
 class floatbv_typecast_exprt:public binary_exprt
 {
 public:
@@ -2200,16 +2090,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref floatbv_typecast_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * floatbv_typecast_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref floatbv_typecast_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref floatbv_typecast_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// floatbv_typecast_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref floatbv_typecast_exprt
+///
+/// \ingroup gr_std_expr
 inline const floatbv_typecast_exprt &to_floatbv_typecast_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_floatbv_typecast);
@@ -2219,9 +2108,8 @@ inline const floatbv_typecast_exprt &to_floatbv_typecast_expr(const exprt &expr)
   return static_cast<const floatbv_typecast_exprt &>(expr);
 }
 
-/*! \copydoc to_floatbv_typecast_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_floatbv_typecast_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline floatbv_typecast_exprt &to_floatbv_typecast_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_floatbv_typecast);
@@ -2242,8 +2130,7 @@ inline void validate_expr(const floatbv_typecast_exprt &value)
 }
 
 
-/*! \brief boolean AND
-*/
+/// \brief boolean AND
 class and_exprt:public multi_ary_exprt
 {
 public:
@@ -2278,23 +2165,21 @@ public:
   }
 };
 
-/*! 1) generates a conjunction for two or more operands
- *  2) for one operand, returns the operand
- *  3) returns true otherwise
-*/
+/// 1) generates a conjunction for two or more operands
+///  2) for one operand, returns the operand
+///  3) returns true otherwise
 
 exprt conjunction(const exprt::operandst &);
 
-/*! \brief Cast a generic exprt to a \ref and_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * and_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref and_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref and_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// and_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref and_exprt
+///
+/// \ingroup gr_std_expr
 inline const and_exprt &to_and_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_and);
@@ -2304,9 +2189,8 @@ inline const and_exprt &to_and_expr(const exprt &expr)
   return static_cast<const and_exprt &>(expr);
 }
 
-/*! \copydoc to_and_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_and_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline and_exprt &to_and_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_and);
@@ -2326,8 +2210,7 @@ template<> inline bool can_cast_expr<and_exprt>(const exprt &base)
 // }
 
 
-/*! \brief boolean implication
-*/
+/// \brief boolean implication
 class implies_exprt:public binary_exprt
 {
 public:
@@ -2341,16 +2224,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref implies_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * implies_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref implies_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref implies_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// implies_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref implies_exprt
+///
+/// \ingroup gr_std_expr
 inline const implies_exprt &to_implies_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_implies);
@@ -2358,9 +2240,8 @@ inline const implies_exprt &to_implies_expr(const exprt &expr)
   return static_cast<const implies_exprt &>(expr);
 }
 
-/*! \copydoc to_implies_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_implies_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline implies_exprt &to_implies_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_implies);
@@ -2378,8 +2259,7 @@ inline void validate_expr(const implies_exprt &value)
 }
 
 
-/*! \brief boolean OR
-*/
+/// \brief boolean OR
 class or_exprt:public multi_ary_exprt
 {
 public:
@@ -2414,23 +2294,21 @@ public:
   }
 };
 
-/*! 1) generates a disjunction for two or more operands
- *  2) for one operand, returns the operand
- *  3) returns false otherwise
-*/
+/// 1) generates a disjunction for two or more operands
+///  2) for one operand, returns the operand
+///  3) returns false otherwise
 
 exprt disjunction(const exprt::operandst &);
 
-/*! \brief Cast a generic exprt to a \ref or_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * or_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref or_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref or_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// or_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref or_exprt
+///
+/// \ingroup gr_std_expr
 inline const or_exprt &to_or_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_or);
@@ -2440,9 +2318,8 @@ inline const or_exprt &to_or_expr(const exprt &expr)
   return static_cast<const or_exprt &>(expr);
 }
 
-/*! \copydoc to_or_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_or_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline or_exprt &to_or_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_or);
@@ -2462,8 +2339,7 @@ template<> inline bool can_cast_expr<or_exprt>(const exprt &base)
 // }
 
 
-/*! \brief Boolean XOR
-*/
+/// \brief Boolean XOR
 class xor_exprt:public multi_ary_exprt
 {
 public:
@@ -2477,25 +2353,23 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref xor_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * xor_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref xor_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref xor_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// xor_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref xor_exprt
+///
+/// \ingroup gr_std_expr
 inline const xor_exprt &to_xor_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_xor);
   return static_cast<const xor_exprt &>(expr);
 }
 
-/*! \copydoc to_bitxor_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_bitxor_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline xor_exprt &to_xor_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_xor);
@@ -2516,8 +2390,7 @@ template<> inline bool can_cast_expr<xor_exprt>(const exprt &base)
 // }
 
 
-/*! \brief Bit-wise negation of bit-vectors
-*/
+/// \brief Bit-wise negation of bit-vectors
 class bitnot_exprt:public unary_exprt
 {
 public:
@@ -2531,16 +2404,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref bitnot_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * bitnot_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref bitnot_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref bitnot_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// bitnot_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref bitnot_exprt
+///
+/// \ingroup gr_std_expr
 inline const bitnot_exprt &to_bitnot_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitnot);
@@ -2549,9 +2421,8 @@ inline const bitnot_exprt &to_bitnot_expr(const exprt &expr)
   return static_cast<const bitnot_exprt &>(expr);
 }
 
-/*! \copydoc to_bitnot_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_bitnot_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline bitnot_exprt &to_bitnot_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitnot);
@@ -2570,8 +2441,7 @@ template<> inline bool can_cast_expr<bitnot_exprt>(const exprt &base)
 // }
 
 
-/*! \brief Bit-wise OR
-*/
+/// \brief Bit-wise OR
 class bitor_exprt:public multi_ary_exprt
 {
 public:
@@ -2586,16 +2456,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref bitor_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * bitor_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref bitor_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref bitor_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// bitor_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref bitor_exprt
+///
+/// \ingroup gr_std_expr
 inline const bitor_exprt &to_bitor_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitor);
@@ -2605,9 +2474,8 @@ inline const bitor_exprt &to_bitor_expr(const exprt &expr)
   return static_cast<const bitor_exprt &>(expr);
 }
 
-/*! \copydoc to_bitor_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_bitor_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline bitor_exprt &to_bitor_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitor);
@@ -2631,8 +2499,7 @@ template<> inline bool can_cast_expr<bitor_exprt>(const exprt &base)
 // }
 
 
-/*! \brief Bit-wise XOR
-*/
+/// \brief Bit-wise XOR
 class bitxor_exprt:public multi_ary_exprt
 {
 public:
@@ -2646,16 +2513,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref bitxor_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * bitxor_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref bitxor_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref bitxor_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// bitxor_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref bitxor_exprt
+///
+/// \ingroup gr_std_expr
 inline const bitxor_exprt &to_bitxor_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitxor);
@@ -2665,9 +2531,8 @@ inline const bitxor_exprt &to_bitxor_expr(const exprt &expr)
   return static_cast<const bitxor_exprt &>(expr);
 }
 
-/*! \copydoc to_bitxor_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_bitxor_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline bitxor_exprt &to_bitxor_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitxor);
@@ -2691,8 +2556,7 @@ template<> inline bool can_cast_expr<bitxor_exprt>(const exprt &base)
 // }
 
 
-/*! \brief Bit-wise AND
-*/
+/// \brief Bit-wise AND
 class bitand_exprt:public multi_ary_exprt
 {
 public:
@@ -2707,16 +2571,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref bitand_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * bitand_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref bitand_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref bitand_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// bitand_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref bitand_exprt
+///
+/// \ingroup gr_std_expr
 inline const bitand_exprt &to_bitand_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitand);
@@ -2726,9 +2589,8 @@ inline const bitand_exprt &to_bitand_expr(const exprt &expr)
   return static_cast<const bitand_exprt &>(expr);
 }
 
-/*! \copydoc to_bitand_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_bitand_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline bitand_exprt &to_bitand_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitand);
@@ -2752,8 +2614,7 @@ template<> inline bool can_cast_expr<bitand_exprt>(const exprt &base)
 // }
 
 
-/*! \brief A base class for shift operators
-*/
+/// \brief A base class for shift operators
 class shift_exprt:public binary_exprt
 {
 public:
@@ -2797,16 +2658,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref shift_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * shift_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref shift_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref shift_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// shift_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref shift_exprt
+///
+/// \ingroup gr_std_expr
 inline const shift_exprt &to_shift_expr(const exprt &expr)
 {
   DATA_INVARIANT(
@@ -2815,9 +2675,8 @@ inline const shift_exprt &to_shift_expr(const exprt &expr)
   return static_cast<const shift_exprt &>(expr);
 }
 
-/*! \copydoc to_shift_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_shift_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline shift_exprt &to_shift_expr(exprt &expr)
 {
   DATA_INVARIANT(
@@ -2835,8 +2694,7 @@ inline shift_exprt &to_shift_expr(exprt &expr)
 // }
 
 
-/*! \brief Left shift
-*/
+/// \brief Left shift
 class shl_exprt:public shift_exprt
 {
 public:
@@ -2855,8 +2713,7 @@ public:
   }
 };
 
-/*! \brief Arithmetic right shift
-*/
+/// \brief Arithmetic right shift
 class ashr_exprt:public shift_exprt
 {
 public:
@@ -2875,8 +2732,7 @@ public:
   }
 };
 
-/*! \brief Logical right shift
-*/
+/// \brief Logical right shift
 class lshr_exprt:public shift_exprt
 {
 public:
@@ -2895,8 +2751,7 @@ public:
   }
 };
 
-/*! \brief Bit-vector replication
-*/
+/// \brief Bit-vector replication
 class replication_exprt:public binary_exprt
 {
 public:
@@ -2935,16 +2790,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref replication_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * replication_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref replication_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref replication_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// replication_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref replication_exprt
+///
+/// \ingroup gr_std_expr
 inline const replication_exprt &to_replication_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_replication);
@@ -2954,9 +2808,8 @@ inline const replication_exprt &to_replication_expr(const exprt &expr)
   return static_cast<const replication_exprt &>(expr);
 }
 
-/*! \copydoc to_replication_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_replication_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline replication_exprt &to_replication_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_replication);
@@ -2976,8 +2829,7 @@ inline void validate_expr(const replication_exprt &value)
 }
 
 
-/*! \brief Extracts a single bit of a bit-vector operand
-*/
+/// \brief Extracts a single bit of a bit-vector operand
 class extractbit_exprt:public binary_predicate_exprt
 {
 public:
@@ -3016,16 +2868,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref extractbit_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * extractbit_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref extractbit_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref extractbit_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// extractbit_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref extractbit_exprt
+///
+/// \ingroup gr_std_expr
 inline const extractbit_exprt &to_extractbit_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_extractbit);
@@ -3035,9 +2886,8 @@ inline const extractbit_exprt &to_extractbit_expr(const exprt &expr)
   return static_cast<const extractbit_exprt &>(expr);
 }
 
-/*! \copydoc to_extractbit_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_extractbit_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline extractbit_exprt &to_extractbit_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_extractbit);
@@ -3057,8 +2907,7 @@ inline void validate_expr(const extractbit_exprt &value)
 }
 
 
-/*! \brief Extracts a sub-range of a bit-vector operand
-*/
+/// \brief Extracts a sub-range of a bit-vector operand
 class extractbits_exprt:public exprt
 {
 public:
@@ -3114,16 +2963,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref extractbits_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * extractbits_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref extractbits_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref extractbits_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// extractbits_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref extractbits_exprt
+///
+/// \ingroup gr_std_expr
 inline const extractbits_exprt &to_extractbits_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_extractbits);
@@ -3133,9 +2981,8 @@ inline const extractbits_exprt &to_extractbits_expr(const exprt &expr)
   return static_cast<const extractbits_exprt &>(expr);
 }
 
-/*! \copydoc to_extractbits_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_extractbits_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline extractbits_exprt &to_extractbits_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_extractbits);
@@ -3155,8 +3002,7 @@ inline void validate_expr(const extractbits_exprt &value)
 }
 
 
-/*! \brief Operator to return the address of an object
-*/
+/// \brief Operator to return the address of an object
 class address_of_exprt:public unary_exprt
 {
 public:
@@ -3178,16 +3024,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref address_of_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * address_of_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref address_of_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref address_of_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// address_of_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref address_of_exprt
+///
+/// \ingroup gr_std_expr
 inline const address_of_exprt &to_address_of_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_address_of);
@@ -3195,9 +3040,8 @@ inline const address_of_exprt &to_address_of_expr(const exprt &expr)
   return static_cast<const address_of_exprt &>(expr);
 }
 
-/*! \copydoc to_address_of_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_address_of_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline address_of_exprt &to_address_of_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_address_of);
@@ -3215,8 +3059,7 @@ inline void validate_expr(const address_of_exprt &value)
 }
 
 
-/*! \brief Boolean negation
-*/
+/// \brief Boolean negation
 class not_exprt:public unary_exprt
 {
 public:
@@ -3231,16 +3074,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref not_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * not_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref not_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref not_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// not_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref not_exprt
+///
+/// \ingroup gr_std_expr
 inline const not_exprt &to_not_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_not);
@@ -3248,9 +3090,8 @@ inline const not_exprt &to_not_expr(const exprt &expr)
   return static_cast<const not_exprt &>(expr);
 }
 
-/*! \copydoc to_not_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_not_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline not_exprt &to_not_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_not);
@@ -3269,8 +3110,7 @@ inline void validate_expr(const not_exprt &value)
 }
 
 
-/*! \brief Operator to dereference a pointer
-*/
+/// \brief Operator to dereference a pointer
 class dereference_exprt:public unary_exprt
 {
 public:
@@ -3305,16 +3145,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref dereference_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * dereference_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref dereference_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref dereference_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// dereference_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref dereference_exprt
+///
+/// \ingroup gr_std_expr
 inline const dereference_exprt &to_dereference_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_dereference);
@@ -3324,9 +3163,8 @@ inline const dereference_exprt &to_dereference_expr(const exprt &expr)
   return static_cast<const dereference_exprt &>(expr);
 }
 
-/*! \copydoc to_dereference_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_dereference_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline dereference_exprt &to_dereference_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_dereference);
@@ -3346,8 +3184,7 @@ inline void validate_expr(const dereference_exprt &value)
 }
 
 
-/*! \brief The trinary if-then-else operator
-*/
+/// \brief The trinary if-then-else operator
 class if_exprt:public exprt
 {
 public:
@@ -3403,16 +3240,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref if_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * if_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref if_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref if_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// if_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref if_exprt
+///
+/// \ingroup gr_std_expr
 inline const if_exprt &to_if_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_if);
@@ -3422,9 +3258,8 @@ inline const if_exprt &to_if_expr(const exprt &expr)
   return static_cast<const if_exprt &>(expr);
 }
 
-/*! \copydoc to_if_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_if_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline if_exprt &to_if_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_if);
@@ -3444,10 +3279,9 @@ inline void validate_expr(const if_exprt &value)
 }
 
 
-/*! \brief Operator to update elements in structs and arrays
-    \remark This expression will eventually be replaced by separate
-            array and struct update operators.
-*/
+/// \brief Operator to update elements in structs and arrays
+///    \remark This expression will eventually be replaced by separate
+///            array and struct update operators.
 class with_exprt:public exprt
 {
 public:
@@ -3496,16 +3330,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref with_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * with_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref with_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref with_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// with_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref with_exprt
+///
+/// \ingroup gr_std_expr
 inline const with_exprt &to_with_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_with);
@@ -3515,9 +3348,8 @@ inline const with_exprt &to_with_expr(const exprt &expr)
   return static_cast<const with_exprt &>(expr);
 }
 
-/*! \copydoc to_with_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_with_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline with_exprt &to_with_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_with);
@@ -3560,16 +3392,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref index_designatort
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * index_designatort.
- *
- * \param expr Source expression
- * \return Object of type \ref index_designatort
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref index_designatort
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// index_designatort.
+///
+/// \param expr Source expression
+/// \return Object of type \ref index_designatort
+///
+/// \ingroup gr_std_expr
 inline const index_designatort &to_index_designator(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index_designator);
@@ -3579,9 +3410,8 @@ inline const index_designatort &to_index_designator(const exprt &expr)
   return static_cast<const index_designatort &>(expr);
 }
 
-/*! \copydoc to_index_designator(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_index_designator(const exprt &)
+/// \ingroup gr_std_expr
 inline index_designatort &to_index_designator(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index_designator);
@@ -3616,16 +3446,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref member_designatort
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * member_designatort.
- *
- * \param expr Source expression
- * \return Object of type \ref member_designatort
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref member_designatort
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// member_designatort.
+///
+/// \param expr Source expression
+/// \return Object of type \ref member_designatort
+///
+/// \ingroup gr_std_expr
 inline const member_designatort &to_member_designator(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member_designator);
@@ -3635,9 +3464,8 @@ inline const member_designatort &to_member_designator(const exprt &expr)
   return static_cast<const member_designatort &>(expr);
 }
 
-/*! \copydoc to_member_designator(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_member_designator(const exprt &)
+/// \ingroup gr_std_expr
 inline member_designatort &to_member_designator(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member_designator);
@@ -3657,8 +3485,7 @@ inline void validate_expr(const member_designatort &value)
 }
 
 
-/*! \brief Operator to update elements in structs and arrays
-*/
+/// \brief Operator to update elements in structs and arrays
 class update_exprt:public exprt
 {
 public:
@@ -3718,16 +3545,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref update_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * update_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref update_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref update_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// update_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref update_exprt
+///
+/// \ingroup gr_std_expr
 inline const update_exprt &to_update_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_update);
@@ -3737,9 +3563,8 @@ inline const update_exprt &to_update_expr(const exprt &expr)
   return static_cast<const update_exprt &>(expr);
 }
 
-/*! \copydoc to_update_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_update_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline update_exprt &to_update_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_update);
@@ -3763,8 +3588,7 @@ inline void validate_expr(const update_exprt &value)
 
 
 #if 0
-/*! \brief update of one element of an array
-*/
+/// \brief update of one element of an array
 class array_update_exprt:public exprt
 {
 public:
@@ -3813,16 +3637,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref array_update_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * array_update_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref array_update_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref array_update_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// array_update_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref array_update_exprt
+///
+/// \ingroup gr_std_expr
 inline const array_update_exprt &to_array_update_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array_update);
@@ -3832,9 +3655,8 @@ inline const array_update_exprt &to_array_update_expr(const exprt &expr)
   return static_cast<const array_update_exprt &>(expr);
 }
 
-/*! \copydoc to_array_update_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_array_update_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline array_update_exprt &to_array_update_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array_update);
@@ -3856,8 +3678,7 @@ inline void validate_expr(const array_update_exprt &value)
 #endif
 
 
-/*! \brief Extract member of struct or union
-*/
+/// \brief Extract member of struct or union
 class member_exprt:public unary_exprt
 {
 public:
@@ -3932,16 +3753,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref member_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * member_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref member_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref member_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// member_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref member_exprt
+///
+/// \ingroup gr_std_expr
 inline const member_exprt &to_member_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member);
@@ -3951,9 +3771,8 @@ inline const member_exprt &to_member_expr(const exprt &expr)
   return static_cast<const member_exprt &>(expr);
 }
 
-/*! \copydoc to_member_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_member_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline member_exprt &to_member_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member);
@@ -3973,8 +3792,7 @@ inline void validate_expr(const member_exprt &value)
 }
 
 
-/*! \brief Evaluates to true if the operand is NaN
-*/
+/// \brief Evaluates to true if the operand is NaN
 class isnan_exprt:public unary_predicate_exprt
 {
 public:
@@ -3988,16 +3806,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref isnan_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * isnan_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref isnan_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref isnan_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// isnan_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref isnan_exprt
+///
+/// \ingroup gr_std_expr
 inline const isnan_exprt &to_isnan_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isnan);
@@ -4005,9 +3822,8 @@ inline const isnan_exprt &to_isnan_expr(const exprt &expr)
   return static_cast<const isnan_exprt &>(expr);
 }
 
-/*! \copydoc to_isnan_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_isnan_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline isnan_exprt &to_isnan_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isnan);
@@ -4025,8 +3841,7 @@ inline void validate_expr(const isnan_exprt &value)
 }
 
 
-/*! \brief Evaluates to true if the operand is infinite
-*/
+/// \brief Evaluates to true if the operand is infinite
 class isinf_exprt:public unary_predicate_exprt
 {
 public:
@@ -4040,16 +3855,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref isinf_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * isinf_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref isinf_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref isinf_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// isinf_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref isinf_exprt
+///
+/// \ingroup gr_std_expr
 inline const isinf_exprt &to_isinf_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isinf);
@@ -4059,9 +3873,8 @@ inline const isinf_exprt &to_isinf_expr(const exprt &expr)
   return static_cast<const isinf_exprt &>(expr);
 }
 
-/*! \copydoc to_isinf_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_isinf_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline isinf_exprt &to_isinf_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isinf);
@@ -4081,8 +3894,7 @@ inline void validate_expr(const isinf_exprt &value)
 }
 
 
-/*! \brief Evaluates to true if the operand is finite
-*/
+/// \brief Evaluates to true if the operand is finite
 class isfinite_exprt:public unary_predicate_exprt
 {
 public:
@@ -4096,16 +3908,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref isfinite_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * isfinite_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref isfinite_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref isfinite_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// isfinite_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref isfinite_exprt
+///
+/// \ingroup gr_std_expr
 inline const isfinite_exprt &to_isfinite_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isfinite);
@@ -4113,9 +3924,8 @@ inline const isfinite_exprt &to_isfinite_expr(const exprt &expr)
   return static_cast<const isfinite_exprt &>(expr);
 }
 
-/*! \copydoc to_isfinite_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_isfinite_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline isfinite_exprt &to_isfinite_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isfinite);
@@ -4133,8 +3943,7 @@ inline void validate_expr(const isfinite_exprt &value)
 }
 
 
-/*! \brief Evaluates to true if the operand is a normal number
-*/
+/// \brief Evaluates to true if the operand is a normal number
 class isnormal_exprt:public unary_predicate_exprt
 {
 public:
@@ -4148,16 +3957,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref isnormal_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * isnormal_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref isnormal_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref isnormal_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// isnormal_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref isnormal_exprt
+///
+/// \ingroup gr_std_expr
 inline const isnormal_exprt &to_isnormal_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isnormal);
@@ -4165,9 +3973,8 @@ inline const isnormal_exprt &to_isnormal_expr(const exprt &expr)
   return static_cast<const isnormal_exprt &>(expr);
 }
 
-/*! \copydoc to_isnormal_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_isnormal_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline isnormal_exprt &to_isnormal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isnormal);
@@ -4185,8 +3992,7 @@ inline void validate_expr(const isnormal_exprt &value)
 }
 
 
-/*! \brief IEEE-floating-point equality
-*/
+/// \brief IEEE-floating-point equality
 class ieee_float_equal_exprt:public binary_relation_exprt
 {
 public:
@@ -4200,16 +4006,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref ieee_float_equal_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * ieee_float_equal_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref ieee_float_equal_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref ieee_float_equal_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// ieee_float_equal_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref ieee_float_equal_exprt
+///
+/// \ingroup gr_std_expr
 inline const ieee_float_equal_exprt &to_ieee_float_equal_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_ieee_float_equal);
@@ -4219,9 +4024,8 @@ inline const ieee_float_equal_exprt &to_ieee_float_equal_expr(const exprt &expr)
   return static_cast<const ieee_float_equal_exprt &>(expr);
 }
 
-/*! \copydoc to_ieee_float_equal_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_ieee_float_equal_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline ieee_float_equal_exprt &to_ieee_float_equal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_ieee_float_equal);
@@ -4242,8 +4046,7 @@ inline void validate_expr(const ieee_float_equal_exprt &value)
 }
 
 
-/*! \brief IEEE floating-point disequality
-*/
+/// \brief IEEE floating-point disequality
 class ieee_float_notequal_exprt:public binary_relation_exprt
 {
 public:
@@ -4258,16 +4061,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref ieee_float_notequal_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * ieee_float_notequal_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref ieee_float_notequal_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref ieee_float_notequal_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// ieee_float_notequal_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref ieee_float_notequal_exprt
+///
+/// \ingroup gr_std_expr
 inline const ieee_float_notequal_exprt &to_ieee_float_notequal_expr(
   const exprt &expr)
 {
@@ -4278,9 +4080,8 @@ inline const ieee_float_notequal_exprt &to_ieee_float_notequal_expr(
   return static_cast<const ieee_float_notequal_exprt &>(expr);
 }
 
-/*! \copydoc to_ieee_float_notequal_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_ieee_float_notequal_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline ieee_float_notequal_exprt &to_ieee_float_notequal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_ieee_float_notequal);
@@ -4301,8 +4102,7 @@ inline void validate_expr(const ieee_float_notequal_exprt &value)
 }
 
 
-/*! \brief IEEE floating-point operations
-*/
+/// \brief IEEE floating-point operations
 class ieee_float_op_exprt:public exprt
 {
 public:
@@ -4352,16 +4152,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref ieee_float_op_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * ieee_float_op_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref ieee_float_op_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to an \ref ieee_float_op_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// ieee_float_op_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref ieee_float_op_exprt
+///
+/// \ingroup gr_std_expr
 inline const ieee_float_op_exprt &to_ieee_float_op_expr(const exprt &expr)
 {
   DATA_INVARIANT(
@@ -4370,9 +4169,8 @@ inline const ieee_float_op_exprt &to_ieee_float_op_expr(const exprt &expr)
   return static_cast<const ieee_float_op_exprt &>(expr);
 }
 
-/*! \copydoc to_ieee_float_op_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_ieee_float_op_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
 {
   DATA_INVARIANT(
@@ -4395,8 +4193,7 @@ inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
 // }
 
 
-/*! \brief An expression denoting a type
-*/
+/// \brief An expression denoting a type
 class type_exprt:public exprt
 {
 public:
@@ -4409,8 +4206,7 @@ public:
   }
 };
 
-/*! \brief A constant literal expression
-*/
+/// \brief A constant literal expression
 class constant_exprt:public exprt
 {
 public:
@@ -4442,25 +4238,23 @@ public:
 };
 
 
-/*! \brief Cast a generic exprt to a \ref constant_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * constant_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref constant_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref constant_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// constant_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref constant_exprt
+///
+/// \ingroup gr_std_expr
 inline const constant_exprt &to_constant_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_constant);
   return static_cast<const constant_exprt &>(expr);
 }
 
-/*! \copydoc to_constant_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_constant_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline constant_exprt &to_constant_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_constant);
@@ -4473,8 +4267,7 @@ template<> inline bool can_cast_expr<constant_exprt>(const exprt &base)
 }
 
 
-/*! \brief The boolean constant true
-*/
+/// \brief The boolean constant true
 class true_exprt:public constant_exprt
 {
 public:
@@ -4484,8 +4277,7 @@ public:
   }
 };
 
-/*! \brief The boolean constant false
-*/
+/// \brief The boolean constant false
 class false_exprt:public constant_exprt
 {
 public:
@@ -4495,8 +4287,7 @@ public:
   }
 };
 
-/*! \brief The NIL expression
-*/
+/// \brief The NIL expression
 class nil_exprt:public exprt
 {
 public:
@@ -4505,8 +4296,7 @@ public:
   }
 };
 
-/*! \brief The null pointer constant
-*/
+/// \brief The null pointer constant
 class null_pointer_exprt:public constant_exprt
 {
 public:
@@ -4516,8 +4306,7 @@ public:
   }
 };
 
-/*! \brief application of (mathematical) function
-*/
+/// \brief application of (mathematical) function
 class function_application_exprt:public binary_exprt
 {
 public:
@@ -4562,16 +4351,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref function_application_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * function_application_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref function_application_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref function_application_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// function_application_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref function_application_exprt
+///
+/// \ingroup gr_std_expr
 inline const function_application_exprt &to_function_application_expr(
   const exprt &expr)
 {
@@ -4582,9 +4370,8 @@ inline const function_application_exprt &to_function_application_expr(
   return static_cast<const function_application_exprt &>(expr);
 }
 
-/*! \copydoc to_function_application_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_function_application_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline function_application_exprt &to_function_application_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_function_application);
@@ -4605,13 +4392,12 @@ inline void validate_expr(const function_application_exprt &value)
 }
 
 
-/*! \brief Concatenation of bit-vector operands
- *
- * This expression takes any number of operands
- * (a restriction to make this binary will happen in the future).
- * The ordering of the operands is the same as in the _new_ SMT 1.x standard,
- * i.e., most-significant operands come first.
-*/
+/// \brief Concatenation of bit-vector operands
+///
+/// This expression takes any number of operands
+/// (a restriction to make this binary will happen in the future).
+/// The ordering of the operands is the same as in the _new_ SMT 1.x standard,
+/// i.e., most-significant operands come first.
 class concatenation_exprt:public exprt
 {
 public:
@@ -4632,16 +4418,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref concatenation_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * concatenation_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref concatenation_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref concatenation_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// concatenation_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref concatenation_exprt
+///
+/// \ingroup gr_std_expr
 inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_concatenation);
@@ -4651,9 +4436,8 @@ inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
   return static_cast<const concatenation_exprt &>(expr);
 }
 
-/*! \copydoc to_concatenation_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_concatenation_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline concatenation_exprt &to_concatenation_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_concatenation);
@@ -4679,8 +4463,7 @@ template<> inline bool can_cast_expr<concatenation_exprt>(const exprt &base)
 // }
 
 
-/*! \brief An expression denoting infinity
-*/
+/// \brief An expression denoting infinity
 class infinity_exprt:public exprt
 {
 public:
@@ -4690,8 +4473,7 @@ public:
   }
 };
 
-/*! \brief A let expression
-*/
+/// \brief A let expression
 class let_exprt:public exprt
 {
 public:
@@ -4732,16 +4514,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref let_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * let_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref let_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref let_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// let_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref let_exprt
+///
+/// \ingroup gr_std_expr
 inline const let_exprt &to_let_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_let);
@@ -4749,9 +4530,8 @@ inline const let_exprt &to_let_expr(const exprt &expr)
   return static_cast<const let_exprt &>(expr);
 }
 
-/*! \copydoc to_let_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_let_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline let_exprt &to_let_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_let);
@@ -4768,8 +4548,7 @@ inline void validate_expr(const let_exprt &value)
   validate_operands(value, 3, "Let must have three operands");
 }
 
-/*! \brief A base class for quantifier expressions
-*/
+/// \brief A base class for quantifier expressions
 class quantifier_exprt:public binary_predicate_exprt
 {
 public:
@@ -4807,16 +4586,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref quantifier_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * quantifier_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref quantifier_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref quantifier_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// quantifier_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref quantifier_exprt
+///
+/// \ingroup gr_std_expr
 inline const quantifier_exprt &to_quantifier_expr(const exprt &expr)
 {
   DATA_INVARIANT(expr.operands().size()==2,
@@ -4824,9 +4602,8 @@ inline const quantifier_exprt &to_quantifier_expr(const exprt &expr)
   return static_cast<const quantifier_exprt &>(expr);
 }
 
-/*! \copydoc to_quantifier_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_quantifier_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline quantifier_exprt &to_quantifier_expr(exprt &expr)
 {
   DATA_INVARIANT(expr.operands().size()==2,
@@ -4845,8 +4622,7 @@ inline void validate_expr(const quantifier_exprt &value)
     "quantifier expressions must have two operands");
 }
 
-/*! \brief A forall expression
-*/
+/// \brief A forall expression
 class forall_exprt:public quantifier_exprt
 {
 public:
@@ -4860,8 +4636,7 @@ public:
   }
 };
 
-/*! \brief An exists expression
-*/
+/// \brief An exists expression
 class exists_exprt:public quantifier_exprt
 {
 public:
@@ -4875,8 +4650,7 @@ public:
   }
 };
 
-/*! \brief The popcount (counting the number of bits set to 1) expression
-*/
+/// \brief The popcount (counting the number of bits set to 1) expression
 class popcount_exprt: public unary_exprt
 {
 public:
@@ -4895,16 +4669,15 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to a \ref popcount_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * popcount_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref popcount_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// \brief Cast a generic exprt to a \ref popcount_exprt
+///
+/// This is an unchecked conversion. \a expr must be known to be \ref
+/// popcount_exprt.
+///
+/// \param expr Source expression
+/// \return Object of type \ref popcount_exprt
+///
+/// \ingroup gr_std_expr
 inline const popcount_exprt &to_popcount_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_popcount);
@@ -4912,9 +4685,8 @@ inline const popcount_exprt &to_popcount_expr(const exprt &expr)
   return static_cast<const popcount_exprt &>(expr);
 }
 
-/*! \copydoc to_popcount_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_popcount_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline popcount_exprt &to_popcount_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_popcount);
