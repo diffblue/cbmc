@@ -18,7 +18,17 @@ This is obsolete.
 
 \subsection analyses-flow-insensitive-analysis Flow-insensitive analysis (flow_insensitive_analysist)
 
-To be documented.
+Framework for flow-insensitive analyses. Maintains a single global abstract
+value which instructions are invited to transform in turn. Unsound (terminates
+too early) if
+(a) there are two or more instructions that incrementally reach a fixed point,
+for example by walking a chain of pointers and updating a points-to set, but
+(b) those instructions are separated by instructions that don't update the
+abstract value (for example, SKIP instructions). Therefore, not recommended for
+new code.
+
+Only current user in-tree is \ref value_set_analysis_fit and its close
+relatives, \ref value_set_analysis_fivrt and \ref value_set_analysis_fivrnst
 
 \section analyses-specific-analyses Specific analyses:
 
