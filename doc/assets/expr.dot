@@ -1,0 +1,18 @@
+graph {
+    graph [pad="0.5", nodesep="1", ranksep="1"];
+    plus [ label="ID_plus", xlabel="exprt" ];
+    const3 [ label="ID_constant", xlabel="exprt" ];
+    const5 [ label="ID_constant", xlabel="exprt" ];
+    val3 [ label="3", xlabel="dstringt" ];
+    val5 [ label="5", xlabel="dstringt" ];
+    ID_integer [ xlabel="typet" ];
+    type3 [ label="ID_integer", xlabel="typet" ];
+    type5 [ label="ID_integer", xlabel="typet" ];
+    plus -- const3 [ label="sub[0]" ];
+    plus -- const5 [ label="sub[1]" ];
+    plus -- ID_integer [ label="named_sub[ID_type]" ];
+    const3 -- val3 [ label="sub[ID_value]" ];
+    const3 -- type3 [ label="sub[ID_type]" ];
+    const5 -- val5 [ label="sub[ID_value]" ];
+    const5 -- type5 [ label="sub[ID_type]" ];
+}

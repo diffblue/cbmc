@@ -3,6 +3,7 @@
 Module: Expression Representation
 
 Author: Daniel Kroening, kroening@kroening.com
+        Joel Allred, joel.allred@diffblue.com
 
 \*******************************************************************/
 
@@ -19,6 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stack>
 
+/// Move the given argument to the end of `exprt`'s operands.
+/// The argument is destroyed and mutated to a reference to a nil `irept`.
+/// \param expr: `exprt` to append to the operands
 void exprt::move_to_operands(exprt &expr)
 {
   operandst &op=operands();
@@ -26,6 +30,10 @@ void exprt::move_to_operands(exprt &expr)
   op.back().swap(expr);
 }
 
+/// Move the given arguments to the end of `exprt`'s operands.
+/// The arguments are destroyed and mutated to a reference to a nil `irept`.
+/// \param e1: first `exprt` to append to the operands
+/// \param e2: second `exprt` to append to the operands
 void exprt::move_to_operands(exprt &e1, exprt &e2)
 {
   operandst &op=operands();
@@ -38,6 +46,11 @@ void exprt::move_to_operands(exprt &e1, exprt &e2)
   op.back().swap(e2);
 }
 
+/// Move the given arguments to the end of `exprt`'s operands.
+/// The arguments are destroyed and mutated to a reference to a nil `irept`.
+/// \param e1: first `exprt` to append to the operands
+/// \param e2: second `exprt` to append to the operands
+/// \param e3: third `exprt` to append to the operands
 void exprt::move_to_operands(exprt &e1, exprt &e2, exprt &e3)
 {
   operandst &op=operands();
@@ -52,11 +65,16 @@ void exprt::move_to_operands(exprt &e1, exprt &e2, exprt &e3)
   op.back().swap(e3);
 }
 
+/// Copy the given argument to the end of `exprt`'s operands.
+/// \param expr: `exprt` to append to the operands
 void exprt::copy_to_operands(const exprt &expr)
 {
   operands().push_back(expr);
 }
 
+/// Copy the given arguments to the end of `exprt`'s operands.
+/// \param e1: first `exprt` to append to the operands
+/// \param e2: second `exprt` to append to the operands
 void exprt::copy_to_operands(const exprt &e1, const exprt &e2)
 {
   operandst &op=operands();
@@ -67,6 +85,10 @@ void exprt::copy_to_operands(const exprt &e1, const exprt &e2)
   op.push_back(e2);
 }
 
+/// Copy the given arguments to the end of `exprt`'s operands.
+/// \param e1: first `exprt` to append to the operands
+/// \param e2: second `exprt` to append to the operands
+/// \param e3: third `exprt` to append to the operands
 void exprt::copy_to_operands(
   const exprt &e1,
   const exprt &e2,
@@ -81,6 +103,9 @@ void exprt::copy_to_operands(
   op.push_back(e3);
 }
 
+/// Create a \ref typecast_exprt to the given type.
+/// \param _type: cast destination type
+/// \deprecated use constructors instead
 void exprt::make_typecast(const typet &_type)
 {
   typecast_exprt new_expr(*this, _type);
@@ -88,6 +113,11 @@ void exprt::make_typecast(const typet &_type)
   swap(new_expr);
 }
 
+/// Negate the expression.
+/// Simplifications:
+///   - If the expression is trivially true, make it false, and vice versa.
+///   - If the expression is an `ID_not`, remove the not.
+/// \deprecated use constructors instead
 void exprt::make_not()
 {
   if(is_true())
@@ -116,11 +146,15 @@ void exprt::make_not()
   swap(new_expr);
 }
 
+/// Return whether the expression is a constant.
+/// \return True if is a constant, false otherwise
 bool exprt::is_constant() const
 {
   return id()==ID_constant;
 }
 
+/// Return whether the expression is a constant representing `true`.
+/// \return True if is a Boolean constant representing `true`, false otherwise.
 bool exprt::is_true() const
 {
   return is_constant() &&
@@ -128,6 +162,8 @@ bool exprt::is_true() const
          get(ID_value)!=ID_false;
 }
 
+/// Return whether the expression is a constant representing `false`.
+/// \return True if is a Boolean constant representing `false`, false otherwise.
 bool exprt::is_false() const
 {
   return is_constant() &&
@@ -135,29 +171,46 @@ bool exprt::is_false() const
          get(ID_value)==ID_false;
 }
 
+/// Replace the expression by a Boolean expression representing \p value.
+/// \param value: the Boolean value to give to the expression
+/// \deprecated use constructors instead
 void exprt::make_bool(bool value)
 {
   *this=exprt(ID_constant, typet(ID_bool));
   set(ID_value, value?ID_true:ID_false);
 }
 
+/// Replace the expression by a Boolean expression representing true.
+/// \deprecated use constructors instead
 void exprt::make_true()
 {
   *this=exprt(ID_constant, typet(ID_bool));
   set(ID_value, ID_true);
 }
 
+/// Replace the expression by a Boolean expression representing false.
+/// \deprecated use constructors instead
 void exprt::make_false()
 {
   *this=exprt(ID_constant, typet(ID_bool));
   set(ID_value, ID_false);
 }
 
+/// Return whether the expression represents a Boolean.
+/// \return True if is a Boolean, false otherwise.
 bool exprt::is_boolean() const
 {
   return type().id()==ID_bool;
 }
 
+/// Return whether the expression is a constant representing 0.
+/// Will consider the following types: ID_integer, ID_natural, ID_rational,
+/// ID_unsignedbv, ID_signedbv, ID_c_bool, ID_c_bit_field, ID_fixedbv,
+/// ID_floatbv, ID_pointer.<br>
+/// For ID_pointer, returns true iff the value is a zero string or a null
+/// pointer.
+/// For everything not in the above list, return false.
+/// \return True if has value 0, false otherwise.
 bool exprt::is_zero() const
 {
   if(is_constant())
@@ -202,6 +255,12 @@ bool exprt::is_zero() const
   return false;
 }
 
+/// Return whether the expression is a constant representing 1.
+/// Will consider the following types: ID_integer, ID_natural, ID_rational,
+/// ID_unsignedbv, ID_signedbv, ID_c_bool, ID_c_bit_field, ID_fixedbv,
+/// ID_floatbv.<br>
+/// For all other types, return false.
+/// \return True if has value 1, false otherwise.
 bool exprt::is_one() const
 {
   if(is_constant())
@@ -243,6 +302,11 @@ bool exprt::is_one() const
   return false;
 }
 
+/// Get a \ref source_locationt from the expression or from its operands
+/// (non-recursively).
+/// If no source location is found, a nil `source_locationt` is returned.
+/// \return A source location if found in the expression or its operands, nil
+/// otherwise.
 const source_locationt &exprt::find_source_location() const
 {
   const source_locationt &l=source_location();
