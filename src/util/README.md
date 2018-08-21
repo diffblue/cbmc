@@ -76,7 +76,11 @@ Within cbmc, strings are represented using \ref irep_idt, or \ref irep_namet
 for keys to [named_sub](\ref irept::dt::named_sub) or
 [comments](\ref irept::dt::comments). By default these are both
 typedefed to \ref dstringt. For debugging purposes you can set `USE_STD_STRING`,
-in which case they are both typedefed to `std::string`.
+in which case they are both typedefed to `std::string`. You can also easily
+convert an [irep_idt](\ref irep_idt) or [irep_namet](\ref irep_namet) to a
+`std::string` using the [id2string](\ref id2string) or
+[name2string](\ref name2string) function, respectively, or either of them to a
+`char*` using the [c_str()](\ref dstringt::c_str) member function.
 
 \ref dstringt stores a string as an index into a large
 static table of strings. This makes it easy to compare if two
@@ -88,7 +92,7 @@ You can refer to this \ref irep_idt as `ID_type`. The other kind of line you
 see is `“IREP_ID_TWO(C_source_location, #source_location)”`, which means the
 \ref irep_idt for the string “#source_location” can be referred to as
 `ID_C_source_location`. The “C” is for comment, meaning that it should be
-stored in the ([comments](\ref irept::dt::comments). Any strings that need
+stored in the [comments](\ref irept::dt::comments). Any strings that need
 to be stored as [irep_idt](\ref irep_idt)s which aren't in `irep_ids.def`
 are added to the end of the table when they are first encountered, and the
 same index is used for all instances.
