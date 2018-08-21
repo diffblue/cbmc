@@ -72,6 +72,13 @@ remove_virtual_functionst::remove_virtual_functionst(
 {
 }
 
+/// Replace specified virtual function call with a static call to its
+/// most derived implementation
+/// \param goto_program [in/out]: GOTO program to modify
+/// \param target iterator: to a function in the supplied GOTO program
+/// to replace. Must point to a virtual function call.
+/// \return Returns a pointer to the statement in the supplied GOTO
+/// program after replaced function call
 goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt &goto_program,
   goto_programt::targett target)
@@ -119,6 +126,21 @@ static void create_static_function_call(
     call.arguments()[0].make_typecast(need_type);
 }
 
+/// Replace virtual function call with a static function call
+/// Achieved by substituting a virtual function with its most derived
+/// implementation. If there's a type mismatch between implementation
+/// and the instance type or if fallback_action is set to
+/// ASSUME_FALSE, then function is substituted with a call to ASSUME(false)
+/// \param goto_program [in/out]: GOTO program to modify
+/// \param target: Iterator to the GOTO instruction in the supplied
+/// GOTO program to be removed. Must point to a function call
+/// \param functions: Dispatch table - all possible implementations of
+/// this function sorted from the least to the most derived
+/// \param fallback_action: - ASSUME_FALSE to replace virtual function
+/// calls with ASSUME(false) or CALL_LAST_FUNCTION to replace them
+/// with the most derived matching call
+/// \return Returns a pointer to the statement in the supplied GOTO
+/// program after replaced function call
 goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt &goto_program,
   goto_programt::targett target,
@@ -223,9 +245,9 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
         // No definition for this type; shouldn't be possible...
         t1->make_assertion(false_exprt());
         t1->source_location.set_comment(
-          ("cannot find calls for " +
-           id2string(code.function().get(ID_identifier)) + " dispatching " +
-           id2string(fun.class_id)));
+          "cannot find calls for " +
+          id2string(code.function().get(ID_identifier)) + " dispatching " +
+          id2string(fun.class_id));
       }
       insertit.first->second=t1;
       // goto final
@@ -465,6 +487,11 @@ void remove_virtual_functionst::get_functions(
     });
 }
 
+/// Returns symbol pointing to a specified method in a specified class
+/// \param class_id: Class identifier to look up
+/// \param component_name: Name of the function to look up
+/// \return nil_exprt instance on error and a symbol_exprt pointing to
+/// the method on success
 exprt remove_virtual_functionst::get_method(
   const irep_idt &class_id,
   const irep_idt &component_name) const
@@ -480,6 +507,9 @@ exprt remove_virtual_functionst::get_method(
   return symbol->symbol_expr();
 }
 
+/// Remove all virtual function calls in a GOTO program and replace
+/// them with calls to their most derived implementations. Returns
+/// true if at least one function has been replaced.
 bool remove_virtual_functionst::remove_virtual_functions(
   goto_programt &goto_program)
 {
@@ -512,6 +542,8 @@ bool remove_virtual_functionst::remove_virtual_functions(
   return did_something;
 }
 
+/// Remove virtual function calls from all functions in the specified
+/// list and replace them with their most derived implementations
 void remove_virtual_functionst::operator()(goto_functionst &functions)
 {
   bool did_something=false;
@@ -531,6 +563,8 @@ void remove_virtual_functionst::operator()(goto_functionst &functions)
     functions.compute_location_numbers();
 }
 
+/// Remove virtual function calls from all functions in the specified
+/// list and replace them with their most derived implementations
 void remove_virtual_functions(
   const symbol_table_baset &symbol_table,
   goto_functionst &goto_functions)
@@ -541,12 +575,14 @@ void remove_virtual_functions(
   rvf(goto_functions);
 }
 
+/// Remove virtual function calls from the specified model
 void remove_virtual_functions(goto_modelt &goto_model)
 {
   remove_virtual_functions(
     goto_model.symbol_table, goto_model.goto_functions);
 }
 
+/// Remove virtual function calls from the specified model function
 void remove_virtual_functions(goto_model_functiont &function)
 {
   class_hierarchyt class_hierarchy;
@@ -555,6 +591,22 @@ void remove_virtual_functions(goto_model_functiont &function)
   rvf.remove_virtual_functions(function.get_goto_function().body);
 }
 
+/// Replace virtual function call with a static function call
+/// Achieved by substituting a virtual function with its most derived
+/// implementation. If there's a type mismatch between implementation
+/// and the instance type or if fallback_action is set to
+/// ASSUME_FALSE, then function is substituted with a call to ASSUME(false)
+/// \param symbol_table: Symbol table
+/// \param goto_program [in/out]: GOTO program to modify
+/// \param instruction: Iterator to the GOTO instruction in the supplied
+/// GOTO program to be removed. Must point to a function call
+/// \param dispatch_table: Dispatch table - all possible implementations of
+/// this function sorted from the least to the most derived
+/// \param fallback_action: - ASSUME_FALSE to replace virtual function
+/// calls with ASSUME(false) or CALL_LAST_FUNCTION to replace them
+/// with the most derived matching call
+/// \return Returns a pointer to the statement in the supplied GOTO
+/// program after replaced function call
 goto_programt::targett remove_virtual_function(
   symbol_tablet &symbol_table,
   goto_programt &goto_program,

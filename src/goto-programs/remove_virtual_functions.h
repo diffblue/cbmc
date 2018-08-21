@@ -9,7 +9,8 @@ Date: April 2016
 \*******************************************************************/
 
 /// \file
-/// Remove Virtual Function (Method) Calls
+/// Functions for replacing virtual function call with a static
+/// function calls in functions, groups of functions and goto programs
 
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
@@ -24,8 +25,6 @@ class goto_model_functiont;
 class goto_modelt;
 class symbol_table_baset;
 
-// remove virtual function calls
-// and replace by case-split
 void remove_virtual_functions(
   goto_modelt &goto_model);
 
