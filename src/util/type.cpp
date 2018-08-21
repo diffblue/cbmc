@@ -1,20 +1,29 @@
 /*******************************************************************\
 
-Module:
+Module: Implementations of some functions of typet
 
 Author: Daniel Kroening, kroening@kroening.com
+        Maria Svorenova, maria.svorenova@diffblue.com
 
 \*******************************************************************/
+
+/// \file
+/// Implementations of some functions of typet
 
 #include "type.h"
 #include "std_types.h"
 #include "namespace.h"
 
+/// Copy the provided type to the subtypes of this type.
+/// \param type The type to add to subtypes
 void typet::copy_to_subtypes(const typet &type)
 {
   subtypes().push_back(type);
 }
 
+/// Move the provided type to the subtypes of this type. Destroys the
+/// provided type.
+/// \param type The type to add to subtypes
 void typet::move_to_subtypes(typet &type)
 {
   subtypest &sub=subtypes();
@@ -22,6 +31,8 @@ void typet::move_to_subtypes(typet &type)
   sub.back().swap(type);
 }
 
+/// Returns true if the type is a rational, real, integer, natural, complex,
+/// unsignedbv, signedbv, floatbv or fixedbv.
 bool is_number(const typet &type)
 {
   const irep_idt &id=type.id();
@@ -36,8 +47,9 @@ bool is_number(const typet &type)
          id==ID_fixedbv;
 }
 
-/// Identify if a given type is constant itself or
-/// contains constant components. Examples include:
+/// Identify whether a given type is constant itself or contains constant
+/// components.
+/// Examples include:
 ///  - const int a;
 ///  - struct contains_constant_pointer {  int x; int * const p; };
 ///  - const int b[3];

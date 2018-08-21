@@ -1,11 +1,14 @@
 /*******************************************************************\
 
-Module:
+Module: Defines typet, type_with_subtypet and type_with_subtypest
 
 Author: Daniel Kroening, kroening@kroening.com
+        Maria Svorenova, maria.svorenova@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Defines typet, type_with_subtypet and type_with_subtypest
 
 #ifndef CPROVER_UTIL_TYPE_H
 #define CPROVER_UTIL_TYPE_H
@@ -17,8 +20,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class namespacet;
 
-/*! \brief The type of an expression
-*/
+/// The type of an expression, extends irept. Types may have subtypes. This is
+/// modeled with two subs named “subtype” (a single type) and “subtypes”
+/// (a vector of types). The class typet only adds specialized methods
+/// for accessing the subtype information to the interface of irept.
+/// For pre-defined types see `std_types.h`.
 class typet:public irept
 {
 public:
@@ -90,7 +96,7 @@ public:
   { remove(ID_subtype); }
   #endif
 
-  void move_to_subtypes(typet &type); // destroys expr
+  void move_to_subtypes(typet &type);
 
   void copy_to_subtypes(const typet &type);
 
@@ -115,6 +121,7 @@ public:
   }
 };
 
+/// Type with a single subtype.
 class type_with_subtypet:public typet
 {
 public:
@@ -136,6 +143,7 @@ public:
   #endif
 };
 
+/// Type with multiple subtypes.
 class type_with_subtypest:public typet
 {
 public:
@@ -169,43 +177,8 @@ public:
     for(typet::subtypest::iterator it=(type).subtypes().begin(); \
         it!=(type).subtypes().end(); ++it)
 
-/*
-
-pre-defined types:
-  universe      // super type
-  type          // another type
-  predicate     // predicate expression (subtype and predicate)
-  uninterpreted // uninterpreted type with identifier
-  empty         // void
-  bool          // true or false
-  abstract      // abstract super type
-  struct        // with components: each component has name and type
-                // the ordering matters
-  rational
-  real
-  integer
-  complex
-  string
-  enum          // with elements
-                // the ordering does not matter
-  tuple         // with components: each component has type
-                // the ordering matters
-  mapping       // domain -> range
-  bv            // no interpretation
-  unsignedbv
-  signedbv      // two's complement
-  floatbv       // IEEE floating point format
-  code
-  pointer       // for ANSI-C (subtype)
-  symbol        // look in symbol table (identifier)
-  number        // generic number super type
-
-*/
-
 bool is_number(const typet &type);
-// rational, real, integer, complex, unsignedbv, signedbv, floatbv
 
-// Is the passed in type const qualified?
 bool is_constant_or_has_constant_components(
     const typet &type,
     const namespacet &ns);
