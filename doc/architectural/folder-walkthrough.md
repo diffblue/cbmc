@@ -35,11 +35,9 @@ containing the code for a different part of the system.
 - Tools
 
   * \ref cbmc
-  * \ref clobber
   * \ref goto-analyzer
   * \ref goto-instrument
   * \ref goto-diff
-  * \ref memory-models
   * \ref goto-cc
   * \ref jbmc
 
