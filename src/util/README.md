@@ -3,25 +3,72 @@
 
 # Folder util
 
-\author Martin Brain, Owen Jones
+\author Martin Brain, Owen Jones, Chris Smowton
 
 \section data_structures Data Structures
 
 \ref util contains some of the key data-structures used in the
 CPROVER codebase.
 
-\subsection irept_section irept: a 4-tuple (data, named-sub, comments, sub)
+\subsection irept_section irept: a general-purpose polymorphic tree
 
-See documentation at \ref irept.
+See detailed documentation at \ref irept.
 
-As that documentation says, [irept](\ref irept)s are generic tree nodes. You
-should think of them as having a single string ([data](irept::data), actually
-an \ref irep_idt) and lots of child nodes, some of which are numbered
+[irept](\ref irept)s are generic tree nodes. You
+should think of each node as holding a single string ([data](irept::data),
+actually an \ref irep_idt) and lots of child nodes, some of which are numbered
 ([sub](\ref irept::dt::sub)) and some of which are labelled, and the label
 can either start with a “\#” ([comments](\ref irept::dt::comments)) or without
 one ([named_sub](\ref irept::dt::named_sub)). The meaning of the “\#” is that
-this child should not be considered important, for example it shouldn't be
-counted when comparing two [irept](\ref irept)s for equality.
+this child shouldn't be counted when comparing two [irept](\ref irept)s for
+equality; this is usually used when making an advisory annotation which does
+not alter the semantics of the program.
+
+They are used to represent many kinds of structured objects throughout the
+CPROVER codebase, such as expressions, types and code. An \ref exprt represents
+expressions, including for example \ref equal_exprt, an equality predicate, or
+\ref dereference_exprt, which represents the `*` unary dereference operator
+found in C. A \ref typet represents a type, and may have other \ref typet nodes
+as children: for example, \ref array_typet represents an array, and has a single
+numbered child that gives the type of the array elements. Finally, \ref codet
+represents imperative statements, such as \ref code_assignt, which represents an
+imperative assignment. It has two numbered operands, its left- and right-hand
+sides.
+
+Note that \ref exprt, \ref codet and similar classes deriving from \ref irept
+do so in order to add constraints to the general tree (for example, providing
+accessor methods with user-friendly names, or enforcing invariants that a node
+must have a certain number of children), but do not override virtual methods or
+add fields.
+
+The implementation of \ref irept allows saving memory by sharing instances of
+its internal storage using a
+[copy-on-write](https://en.wikipedia.org/wiki/Copy-on-write) scheme. For
+example, the statement `irep1.sub()[0] = irep2;` will share rather than copy
+`irep2` and its children, saving memory unless either irept is subsequently
+modified, at which point a copy is made.
+
+\subsection irept_discussion_section Discussion
+
+Many other compiler infrastructures represent a polymorphic tree using nodes
+specialised to a particular expression type: for example, perhaps a binary
+addition operator could be represented using a tag plus two pointers to child
+expressions, rather than allocating a whole irept (including a variable-length
+expression vector and empty maps for storing named subexpressions). This may
+save memory, but inhibits ad-hoc annotations such as tagging the addition
+"does not overflow" without adding that field to addition operations globally
+or maintaining a shadow data structure to track that information. This is easier
+with a general irept structure that can store an arbitrary number of
+arbitrarily-named child nodes.
+
+Another optimisation commonly seen when storing polymorphic trees is to use a
+uniform node data structure (like irept) but to keep the node compact, for
+example storing at most four pointers and transparently allocating extension
+nodes when necessary for an unusually large expression. This provides the best
+of both worlds, obtaining compact storage for common cases such as unannotated
+binary expressions while permitting deviation at times. The downside is that
+implementing such a system is more complex than straightforwardly using C++
+standard data structures as in irept.
 
 \subsection irep_idt_section Strings: dstringt, the string_container and the ID_*
 
