@@ -148,19 +148,103 @@ of a while loop is a statement.
 
 \subsection symbolt_section symbolt, symbol_tablet, and namespacet
 
-To be documented.
+A symbol table is a mapping from symbol names to \ref symbolt objects, which
+store a symbol's name, attributes, type and perhaps value. They are used to
+describe local and global variables, type definitions and function prototypes
+and definitions.
 
-\subsubsection symbol_lifetimes_section Symbol lifetimes, symbol modes, name, base-name, pretty-name; semantic of lifetimes for symex?
+All symbols store a type (an instance of \ref typet). For function or method
+symbols these are \ref code_typet instances.
 
-To be documented.
+Global variable symbols may have a value (an \ref exprt), in which case it is
+used to initialise the global.
 
-\subsubsection storing_symbols_section Storing symbols and hiding symbols (namespacet)
+Method or function symbols may also have a value, in which case it is a
+\ref codet and gives the function definition. A method or function symbol
+without a value is a prototype (for example, it might be an `extern` declaration
+in C). A function symbol that has been converted to a GOTO function *may* be
+replaced with a special "compiled" value, but this varies from driver program to
+program -- at the time of writing, only \ref goto-cc does this.
 
-To be documented.
+Local variables' symbol values are always ignored;
+any initialiser must be explicitly assigned after they are instantiated by a
+declaration (\ref code_declt).
 
-\subsubsection ns_follow_section ns.follow
+Symbol expressions (\ref symbol_exprt) and types (\ref symbol_typet) refer to
+symbols stored in a symbol table. Symbol expressions can be thought of as
+referring to the table for more detail about a symbol (for example, is it a
+local or a global variable, or perhaps a function?), and have a type which must
+match the type given in the symbol table. Symbol types can be thought of as
+shorthands or aliases for a type given in more detail in the symbol table, for
+example permitting a shorthand for a large structure type, as well as permitting
+the construction of expressions referring to that type before its full
+definition is known.
 
-To be documented.
+Note the implementation of \ref symbol_tablet is split into a base interface
+(\ref symbol_table_baset) and an implementation (\ref symbol_tablet). There is
+one alternate implementation (\ref journalling_symbol_tablet) which additionally
+maintains a log or journal of symbol creation, modification and deletions.
+
+Namespaces (\ref namespacet) provide a read-only view on one or more symbol
+tables, and provide helper functions that aid accessing the table. A namespace
+may layer one or more symbol tables, in which case any lookup operation checks
+the 'top' symbol table before moving down the layers towards the 'bottom' symbol
+table, looking up the target symbol name in each successive table until one is
+found. Note class \ref multi_namespacet can layer arbitrary numbers of symbol
+tables, while for historical reasons \ref namespacet can layer up to two.
+
+The namespace wrapper class also provides the \ref namespacet::follow
+operation, which dereferences a `symbol_typet` to retrieve the type it refers
+to, including following a symbol_typet which refers to another symbol which
+eventually refers to a 'real' type.
+
+\subsubsection symbolt_lifetime Symbol lifetimes
+
+Symbols with \ref symbolt::is_static_lifetime set are initialised before a
+program's entry-point is called and live until it ends. Such long-lived
+variables are used to implement globals, but also C's procedure-local static
+variables, which have restricted visiblity but the lifetime of a global.
+They may be marked dead using a \ref code_deadt instruction, but this does not
+render the variable inaccessible, it only indicates that the variable's current
+value will not be read without an intervening write.
+
+Non-type, non-global symbols (those with \ref symbolt::is_static_lifetime and
+\ref symbolt::is_type not set) are local variables, and their lifespan
+description varies depending on context.
+
+In symbol table function definitions (the values of function-typed symbols),
+local variables are created using a \ref code_declt instruction, and live until
+their enclosing \ref code_blockt ends (similar to the C idiom
+`{ int x; ... } // x lifespan ends`). By contrast in GOTO programs locals are
+declared using a DECL instruction and live until a DEAD instruction referring
+to the same symbol. Explicit DEAD instructions are always used rather than
+killing implicitly by exiting a function.
+
+Multiple instances of the same local may be live at the same time by virtue of
+recursive function calls; a dead instruction or scope end always targets the
+most recently allocated instance.
+
+Scoping rules are particular to source languages and are not enforced by
+CPROVER. For example, in standard C it is not possible to refer to a local
+variable across functions without using a pointer, but in some possible source
+languages this is permitted.
+
+\subsubsection symbolt_details Symbol details
+
+Symbols have:
+* A mode, which indicates the source language frontend responsible for creating
+  them. This is mainly used in pretty-printing the symbol table, to indicate
+  the appropriate language frontend to use rendering the symbol's value and/or
+  type. For example, mode == ID_C == "C" indicates that \ref ansi_ct, the C
+  front-end, should be used to pretty-print, which in turn delegates to
+  \ref expr2ct.
+* A base-name and pretty-name, which are a short and user-friendly version of
+  the symbol's definitive name respectively.
+* Several flags (see \ref symbolt for full details), including
+  \ref symbolt::is_static_lifetime (is this a global variable symbol?),
+  \ref symbolt::is_type (is this a type definition),
+  \ref symbolt::is_thread_local (of a variable, are there implicitly instances
+    of this variable per-thread?).
 
 \subsection cmdlinet
 
