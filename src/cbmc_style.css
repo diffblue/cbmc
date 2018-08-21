@@ -25,6 +25,11 @@ h3 {
 	margin: 0.3em 0;
 }
 
+pre.fragment, div.fragment {
+	padding: 5px;
+	margin-left: 10px;
+}
+
 
 a {
 	color: #CA7900;
