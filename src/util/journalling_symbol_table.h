@@ -26,11 +26,12 @@
 ///
 /// journalling_symbol_tablet journal(actual_table); // Wraps real_table
 /// alter_table(journal);
-
+///
 /// for(const auto &added : journal.added())
 /// {
 ///   printf("%s was added\n", added.name);
 /// }
+/// ```
 class journalling_symbol_tablet : public symbol_table_baset
 {
 public:
