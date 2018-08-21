@@ -77,12 +77,20 @@ optionalt<std::string> jar_filet::get_entry(const std::string &name)
   }
 }
 
+/// Wrapper for `std::isspace` from `cctype`
+/// \param ch: the character to check
+/// \return true if the parameter is considered to be a space in the current
+///   locale, else false
 static bool is_space(const char ch)
 {
   return std::isspace(ch) != 0;
 }
 
 /// Remove leading and trailing whitespace characters from string
+/// \param begin: iterator to start search in string
+/// \param end: iterator to end search in string
+/// \return string truncated from begin to end and all whitespace removed at the
+///   begin and end
 static std::string trim(
   const std::string::const_iterator begin,
   const std::string::const_iterator end)
