@@ -213,7 +213,7 @@ public:
   /// \param dest: object map to update
   /// \param n: object number to add; must be mapped to the corresponding
   ///   expression by `object_numbering`.
-  /// \param object: offset into object `n` (may be unknown).
+  /// \param offset: offset into object `n` (may be unknown).
   bool insert(
     object_mapt &dest,
     object_numberingt::number_type n,
@@ -224,7 +224,7 @@ public:
   /// with a differing offset its offset is marked unknown.
   /// \param dest: object map to update
   /// \param expr: expression to add
-  /// \param object: offset into `expr` (may be unknown).
+  /// \param offset: offset into `expr` (may be unknown).
   bool insert(object_mapt &dest, const exprt &expr, const offsett &offset) const
   {
     return insert(dest, object_numbering.number(expr), offset);

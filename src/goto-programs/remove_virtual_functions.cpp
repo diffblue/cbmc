@@ -301,17 +301,18 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 
 /// Used by get_functions to track the most-derived parent that provides an
 /// override of a given function.
-/// \param parameters: `this_id`: class name
-/// \param `last_method_defn`: the most-derived parent of `this_id` to define
+/// \param this_id: class name
+/// \param last_method_defn: the most-derived parent of `this_id` to define
 ///   the requested function
-/// \param `component_name`: name of the function searched for
-/// \param `entry_map`: map of class identifiers to dispatch table entries
-/// \param `resolve_function_call`: function to resolve abstract method call
-/// \return `functions` is assigned a list of {class name, function symbol}
-///   pairs indicating that if `this` is of the given class, then the call will
-///   target the given function. Thus if A <: B <: C and A and C provide
-///   overrides of `f` (but B does not), get_child_functions_rec("C", C.f, "f")
+/// \param component_name: name of the function searched for
+/// \param [out] functions: `functions` is assigned a list of
+///   {class name, function symbol} pairs indicating that if `this` is of the
+///   given class, then the call will target the given function. Thus if
+///   A <: B <: C and A and C provide overrides of `f` (but B does not),
+///   get_child_functions_rec("C", C.f, "f")
 ///   -> [{"C", C.f}, {"B", C.f}, {"A", A.f}]
+/// \param entry_map: map of class identifiers to dispatch table entries
+/// \param resolve_function_call`: function to resolve abstract method call
 void remove_virtual_functionst::get_child_functions_rec(
   const irep_idt &this_id,
   const symbol_exprt &last_method_defn,

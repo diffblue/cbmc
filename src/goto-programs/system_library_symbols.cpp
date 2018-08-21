@@ -257,8 +257,9 @@ void system_library_symbolst::add_to_system_library(
 /// fake symbol with the given type, to determine whether the type alone
 /// is sufficient to classify a symbol of that type as internal.
 /// \param type: the type to check
-/// \return True if the type is an internal type. If specific system headers
-///   need to be included, the out_system_headers will contain the headers.
+/// \param [out] out_system_headers: specific system headers that need to be
+///   included
+/// \return True if the type is an internal type
 bool system_library_symbolst::is_type_internal(
   const typet &type,
   std::set<std::string> &out_system_headers) const
@@ -270,8 +271,9 @@ bool system_library_symbolst::is_type_internal(
 
 /// To find out if a symbol is an internal symbol.
 /// \param symbol: the symbol to check
-/// \return True if the symbol is an internal symbol. If specific system headers
-///   need to be included, the out_system_headers will contain the headers.
+/// \param [out] out_system_headers: specific system headers that need to be
+///   included
+/// \return True if the symbol is an internal symbol
 bool system_library_symbolst::is_symbol_internal_symbol(
   const symbolt &symbol,
   std::set<std::string> &out_system_headers) const

@@ -359,7 +359,7 @@ require_type::require_java_implicitly_generic_class(const typet &class_type)
 /// Verify that a class is a valid java generic class with the
 /// specified list of variables.
 /// \param class_type: the class
-/// \param type_variables: vector of type variables
+/// \param implicit_type_variables: vector of type variables
 /// \return: A reference to the java generic class type.
 java_implicitly_generic_class_typet
 require_type::require_java_implicitly_generic_class(
@@ -403,7 +403,7 @@ require_type::require_complete_java_implicitly_generic_class(
 /// Verify that a class is a complete, valid java generic class with the
 /// specified list of variables.
 /// \param class_type: the class
-/// \param type_variables: vector of type variables
+/// \param implicit_type_variables: vector of type variables
 /// \return: A reference to the java generic class type.
 java_implicitly_generic_class_typet
 require_type::require_complete_java_implicitly_generic_class(
@@ -508,7 +508,7 @@ java_generic_symbol_typet require_type::require_java_generic_symbol_type(
 
 /// Verify that the lambda method handles of a class match the given
 /// expectation.
-/// \param class_struct class type to be verified
+/// \param class_type class type to be verified
 /// \param expected_identifiers expected list of lambda method handle
 ///   references
 /// \return lambda method handles of the class
