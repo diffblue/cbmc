@@ -33,3 +33,21 @@ a {
 .contents a:visited {
 	color: #6237a8;
 }
+
+#nav-tree .label {
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+#nav-tree a {
+	color: MidnightBlue;
+}
+
+#nav-tree .selected a {
+	padding: 0.5em;
+}
+
+#nav-tree .item {
+	font-size: 1.1em;
+	padding: 0.2em;
+}
