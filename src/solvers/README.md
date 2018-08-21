@@ -6,47 +6,156 @@
 
 \section solvers-overview Overview
 
-The basic role of solvers is to answer whether the set of equations given
-is satisfiable.
-One example usage, is to determine whether an assertion in a
-program can be violated.
-We refer to \ref goto-symex for how CBMC and JBMC convert a input program
-and property to a set of equations.
+This directory contains most of the decision procedure code in CPROVER.
+A decision procedure is an algorithm which can check if a set of logical
+statements is satisfiable, i.e. if there is a value for each variable which
+makes all of them true at the same time.  Formally all
+that is needed is determining if they are satisfiable, in practice it
+is often very valuable to know the assignments of the variables.
+Tools (and components) that implement decision procedures are often
+called solvers.  For example a SAT solver is a tool that implements a
+decision procedure for checking the satisfiability of formulae (often
+in CNF) over Boolean variables.  An SMT solver is a tool that
+implements decision procedures for the Satisfiability Modulo Theories
+class of problems.  CPROVER includes its own SMT solver, built on top
+of a SAT solver but can also interface to external solvers.
 
-The secondary role of solvers is to provide a satisfying assignment of
-the variables of the equations, this can for instance be used to construct
-a trace.
+CBMC and JBMC create formulae which describe some of the execution of parts of a
+program (see \ref goto-symex for how this is done) and then use a solver to see
+if there are any executions which break an assertion.  If the formula describing
+the execution and the formula describing the assertion are satisfiable
+then it is possible for the assertion to fail and the assignment of the
+variables can be used to build an error trace (see \ref goto_tracet).  Thus
+the performance and capability of the solver used is crucial to the utility of
+CBMC and JBMC.  Other tools make use of solvers in other ways to handle other
+problems.  It is important to distinguish between goto-models,
+goto-programs, etc. which describe programs and have a semantics in
+terms of execution and formula that have a semantics in terms of
+logic.  Solvers work with formulae and so have no notion of execution
+order, assignment, "before", branching, loops, exceptions,
+side-effects, function calls, etc.  All of these have to be described
+in the formula presented to the decision procedure if you want to reason about them.
 
-The `solvers/` directory contains interfaces to a number of
-different decision procedures, roughly one per directory.
+Other tools use solvers in different ways but the basic interface and
+ideas remain the same.
 
-* prop/:   The basic and common functionality. The key file is
-  `prop_conv.h` which defines `prop_convt`.  This is the base class that
-  is used to interface to the decision procedures. The key functions are
-  `convert` which takes an `exprt` and converts it to the appropriate,
-  solver specific, data structures and `dec_solve` (inherited from
-  `decision_proceduret`) which invokes the actual decision procedures.
-  Individual decision procedures (named `*_dect`) objects can be created
-  but `prop_convt` is the preferred interface for code that uses them.
 
-* flattening/:   A library that converts operations to bit-vectors,
+\section solvers-interfaces Key Interfaces
+
+The most basic interface is `decision_proceduret`.  It gives the
+interface of all decision procedures.  You call `set_to_true` and
+`set_to_false` to give the formulae and then `dec_solve` to check if
+they are satisfiable.  If they are, it returns `D_SATISFIABLE` and you
+can use `get` to find the values in the satisfying assignment (if the
+underlying decision procedure supports this).  If you are implementing
+a solver, then this is the most basic interface you have to support,
+if you are using the solver, this is the best interface to use as it
+does not commit you to any particular kind of solver.  Looking at the
+inheritance diagram from `decision_proceduret` is a good way of
+getting an over-view of the solvers currently supported.
+
+Many (but not all) decision procedures have a notion of logical
+expression and can provide information about logical expressions
+within the solver.  `prop_convt` expands on the interface of
+`decision_proceduret` to add a data-type (`literalt`) and interfaces
+for manipulating logical expressions within the solver.
+
+Within decision procedures it is common to reduce the logical
+expressions to equivalent expressions in a simpler language.  This is
+similar to what a compiler will do in reducing higher-level language
+constructs to simple, assembler like instructions.  This, of course,
+relies on having a decision procedure for the simpler language, just
+as a compiler relies on you having a processor that can handle the
+assembler.  One of the popular choices of "processor" for decision
+procedures are SAT solvers.  These handle a very restricted language
+in which all variables are simple Booleans and all formulae are just
+made of logical gates.  By keeping their input simple, they can be
+made very fast and efficient; kind of like RISC processors.  Like
+processors, creating a good SAT solver is a very specialised skill, so
+CPROVER uses third-party SAT solvers.  By default this is MiniSAT, but
+others are supported (see the `sat/` directory).  To do this it needs a
+software interface to a SAT solver : this is `propt`.  It uses the
+same `literalt` to refer to Boolean variables, just as `prop_convt`
+uses them to refer to logical expressions.  `land`, `lor`, `lxor` and
+so on allow gates to be constructed to express the formulae to be
+solved.  If `cnf_handled_well` is true then you may also use `lcnf` to
+build formulae.  Finally, `prop_solve` will run the decision procedure.
+
+As previously mentioned, many decision procedures reduce formulae to
+CNF and solve with a SAT solver.  `prop_conv_solvert` contains the
+foundations of this conversion.  It implements the `prop_convt` by
+having an instance of `propt` (a SAT solver) and reducing the
+expressions that are input into CNF.  The key entry point to this
+procedure is `prop_conv_solvert::convert` which then splits into
+`prop_conv_solvert::convert_boolean` (which
+uses `propt::land` and so on to convert Boolean expressions) and
+`prop_conv_solvert::convert_rest` which gives an error to start with.
+Various solvers inherit from `prop_conv_solvert` adding to `convert` and
+`convert_rest` to increase the language of expressions that can be
+converted.  `equalityt` adds handling of equality between variables,
+`arrayst` then builds on that to add support for arrays, `boolbvt`
+adds bit-vector operations (plus, negate, multiply, shift, etc.) and
+finally `bv_pointers` adds pointers.  This layering simplifies the
+conversion to CNF and allows parts of it to be over-ridden and
+modified (as `bv_refinementt` and `string_refinementt` do).
+
+
+\section solvers-directories Directories
+
+* `prop/`:   The interfaces above mostly live in `prop/`, which also
+  contains a number of other supporting classes, like `literal.h`.
+
+* `sat/`:   All of the code for interacting and interfacing with SAT
+  solvers.  This is largely a 'leaf' directory and makes little use of
+  external interfaces beyond things in `prop`.  `cnf.h` contains
+  `cnft` and `cnf_solvert` which give default implements `propt`s gate
+  functions (`land`, `lxor`, etc.) in terms of `lcnf` as most modern
+  SAT solvers only have interfaces for handling CNF, not logical
+  gates.  The various satcheck_* files implement the `propt`
+  interfaces (generally with the `cnf_solvert` additions /
+  simplifications) by connecting to various third-party SAT solvers.
+  Finally `satcheck.h` use the build time flags to pick which SAT
+  solvers are available and which should be used as default.
+
+* `qbf/`:   An equivalent of `sat/` for QBF solvers.  These extend
+ the basic language of SAT solvers with universal and existential
+ quantification over Boolean variables.  This makes the solvers more
+ expressive but also slower.  `qbf/` is not used by the main CPROVER
+ tools and the solvers it integrates are somewhat dated.
+
+* `flattening/`:   A library that converts operations to bit-vectors,
   including calling the conversions in `floatbv` as necessary. Is
   implemented as a simple conversion (with caching) and then a
-  post-processing function that adds extra constraints. This is not used
-  by the SMT2 back-ends.
+  post-processing function that adds extra constraints.  The `boolbvt`
+  solver uses these to express bit-vector operations via the `propt`
+  interfaces. This is not used by the SMT2 back-ends.
 
 * smt2/:   Provides the `smt2_dect` type which converts the formulae to
-  SMTLib 2 and then invokes one of Boolector, CVC3, CVC4, MathSAT, Yices or Z3.
+  SMT-LIB 2 and then invokes one of Boolector, CVC3, CVC4, MathSAT, Yices or Z3.
   Note that the interaction with the solver is batched and uses
   temporary files rather than using the interactive command supported by
-  SMTLib 2. With the `–fpa` option, this output mode will not flatten
-  the floating point arithmetic and instead output the proposed SMTLib
-  floating point standard.
+  SMT-LIB 2. With the `–fpa` option, this output mode will not flatten
+  the floating point arithmetic and instead output SMT-LIB floating point standard.
 
-* qbf/:   Back-ends for a variety of QBF solvers. Appears to be no
-  longer used or maintained.
+* `floatbv/`:    This library contains the code that is used to
+  convert floating point variables (`floatbv`) to bit vectors
+  (`bv`). This is referred to as ‘bit-blasting’ and is called in the
+  `solver` code during conversion to SAT or SMT. It also contains the
+  abstraction code described in the FMCAD09 paper.
 
-* sat/:   Back-ends for a variety of SAT solvers and DIMACS output.
+* `lowering/`:  These are `exprt` to `exprt` reductions of operations
+   rather than the `exprt` to `bvt` reductions in `flattening/`
+   allowing them to be used in SMT solvers which do not inherit from
+   `prop_conv_solvert`.
+
+* `refinement/`: Solvers that build on the `bv_pointerst` solver
+   interface and specialise the handling of certain operations to
+   improve performance.
+
+* `miniBDD/`:  A canonical representation of Boolean formulae.
+
+
+
 
 \section flattening-section Flattening
 
