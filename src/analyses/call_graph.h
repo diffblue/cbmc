@@ -18,6 +18,23 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 #include <util/graph.h>
 
+/// A call graph (https://en.wikipedia.org/wiki/Call_graph) for a GOTO model
+/// or GOTO functions collection.
+///
+/// The public constructors build a complete call graph, while
+/// \ref call_grapht::create_from_root_function can be used to create a partial
+/// call graph rooted at a particular function.
+///
+/// The graph is stored as a `std::multimap`, and this class only provides basic
+/// tools to construct and query graphs, but it can be exported to a \ref grapht
+/// and thus processed using the full graph algorithms library using the
+/// \ref get_directed_graph method. See also \ref call_graph_helpers.h for
+/// helper methods that work with such grapht-derived call graphs.
+///
+/// The graph may optionally collect (and export) the callsite associated with
+/// each edge; pass the `collect_callsites` parameter to a constructor if you
+/// want this functionality, and query the \ref call_grapht::callsites
+/// collection.
 class call_grapht
 {
 public:

@@ -24,7 +24,11 @@ To be documented.
 
 \subsection analyses-call-graph Call graph and associated helpers (call_grapht)
 
-To be documented.
+A [https://en.wikipedia.org/wiki/Call_graph](call graph) for a GOTO model or
+GOTO functions collection. \ref call_grapht implements a basic call graph, but
+can also export the graph in \ref grapht format, which permits more advanced
+graph algorithms to be applied; see \ref call_graph_helpers.h for functions
+that work with the \ref grapht representation.
 
 \subsection analyses-dominator Dominator analysis (cfg_dominators_templatet)
 
