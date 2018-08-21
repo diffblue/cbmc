@@ -92,7 +92,17 @@ To be documented.
 
 \subsection analyses-natural-loop Natural loop analysis (natural_loops_templatet)
 
-To be documented.
+A natural loop is when the nodes and edges of a graph make one self-encapsulating
+circle (implemented in /ref natural_loops_templatet) with no incoming edges from external nodes.
+For example A -> B -> C -> D -> A is a natural loop, but if B has an incoming edge from X,
+then it isn't a natural loop, because X is an external node. Outgoing edges don't affect
+the natural-ness of a loop.
+
+/ref cfg_dominators_templatet provides the dominator analysis used to determine if a nodes
+children can only be reached through itself and is thus part of a natural loop, and whose specifics
+is covered in a separate subsection.
+
+A basic description for how a natural loop works is here: https://web.cs.wpi.edu/~kal/PLT/PLT8.6.4.html
 
 \subsection analyses-reaching-definitions Reaching definitions (reaching_definitions_analysist)
 
