@@ -114,4 +114,9 @@ To be documented.
 
 \subsection analyses-interval-analysist Integer interval analysis (interval_analysist) -- both an analysis and a transformation
 
-To be documented.
+\ref interval_analysis interprets instructions of the input \ref goto_modelt
+over the \ref interval_domaint, evaluates variables for each program location
+(as intervals) and instruments the program with assertions representing the
+over-approximation of variable values. The analysis iterates over \ref
+goto_functiont of the input program while instrumenting the locations via \ref
+instrument_intervals.
