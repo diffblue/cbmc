@@ -8,6 +8,16 @@ Author: Peter Schrammel
 
 /// \file
 /// Constant propagation
+///
+/// A simple, unsound constant propagator. Assignments to symbols (local and
+/// global variables) are tracked, and propagated if a unique value is found
+/// at a given use site. Function calls are accounted for (they are assumed to
+/// overwrite all address-taken variables; see \ref dirtyt), but assignments
+/// through pointers are not (they are assumed to have no effect).
+///
+/// Can be restricted to operate over only particular symbols by passing a
+/// predicate to a \ref constant_propagator_ait constructor, in which case this
+/// can be rendered sound by restricting it to non-address-taken variables.
 
 #ifndef CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H
 #define CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H

@@ -30,9 +30,12 @@ To be documented.
 
 To be documented.
 
-\subsection analyses-constant-propagation Constant propagation (constant_propagator_ait)
+\subsection analyses-constant-propagation Constant propagation (\ref constant_propagator_ait)
 
-To be documented.
+A simple, unsound constant propagator. Replaces RHS symbol expressions (variable
+reads) with their values when they appear to have a unique value at a particular
+program point. Unsound with respect to pointer operations on the left-hand side
+of assignments.
 
 \subsection analyses-taint Taint analysis (custom_bitvector_analysist)
 
