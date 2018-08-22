@@ -376,7 +376,7 @@ invariant_violated_string(
 
 // This condition should be used to document that assumptions that are
 // made on goto_functions, goto_programs, exprts, etc. being well formed.
-// "The data structure is corrupt or malformed"
+// "The data structure is not corrupt or malformed"
 #define DATA_INVARIANT2(CONDITION, REASON) INVARIANT2(CONDITION, REASON)
 #define DATA_INVARIANT3(CONDITION, REASON, DIAGNOSTICS)                        \
   INVARIANT3(CONDITION, REASON, DIAGNOSTICS)
