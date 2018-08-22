@@ -136,6 +136,8 @@ a minus expression then you have to check its [id()](\ref irept::id()) (or use
 
 \subsection codet_section codet
 
+See documentation at \ref codet.
+
 \ref exprt represents expressions and \ref codet represents statements.
 \ref codet inherits from \ref exprt, so all [codet](\ref codet)s are
 [exprt](\ref exprt)s, with [id()](\ref irept::id()) `ID_code`.

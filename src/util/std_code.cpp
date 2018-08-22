@@ -1,11 +1,13 @@
 /*******************************************************************\
 
-Module:
+Module: Data structures representing statements in a program
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Data structure representing different types of statements in a program
 
 #include "std_code.h"
 
@@ -21,6 +23,10 @@ const irep_idt &code_deadt::get_identifier() const
   return to_symbol_expr(symbol()).get_identifier();
 }
 
+/// If this `codet` is a \ref code_blockt (i.e.\ it represents a block of
+/// statements), return the unmodified input. Otherwise (i.e.\ the `codet`
+/// represents a single statement), convert it to a \ref code_blockt with the
+/// original statement as its only operand and return the result.
 code_blockt &codet::make_block()
 {
   if(get_statement()==ID_block)
@@ -35,6 +41,8 @@ code_blockt &codet::make_block()
   return static_cast<code_blockt &>(*this);
 }
 
+/// In the case of a `codet` type that represents multiple statements, return
+/// the first of them. Otherwise return the `codet` itself.
 codet &codet::first_statement()
 {
   const irep_idt &statement=get_statement();
@@ -50,6 +58,7 @@ codet &codet::first_statement()
   return *this;
 }
 
+/// \copydoc first_statement()
 const codet &codet::first_statement() const
 {
   const irep_idt &statement=get_statement();
@@ -65,6 +74,8 @@ const codet &codet::first_statement() const
   return *this;
 }
 
+/// In the case of a `codet` type that represents multiple statements, return
+/// the last of them. Otherwise return the `codet` itself.
 codet &codet::last_statement()
 {
   const irep_idt &statement=get_statement();
@@ -80,6 +91,7 @@ codet &codet::last_statement()
   return *this;
 }
 
+/// \copydoc last_statement()
 const codet &codet::last_statement() const
 {
   const irep_idt &statement=get_statement();
