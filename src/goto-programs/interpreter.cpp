@@ -771,8 +771,8 @@ void interpretert::execute_function_call()
 #if 0
   const memory_cellt &cell=memory[address];
 #endif
-  const irep_idt &identifier=address_to_identifier(address);
-  trace_step.identifier=identifier;
+  const irep_idt &identifier = address_to_identifier(address);
+  trace_step.function_identifier = identifier;
 
   const goto_functionst::function_mapt::const_iterator f_it=
     goto_functions.function_map.find(identifier);

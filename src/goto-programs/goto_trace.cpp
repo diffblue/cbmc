@@ -66,7 +66,7 @@ void goto_trace_stept::output(
   if(is_assert() || is_assume() || is_goto())
     out << " (" << cond_value << ")";
   else if(is_function_call() || is_function_return())
-    out << ' ' << identifier;
+    out << ' ' << function_identifier;
 
   if(hidden)
     out << " hidden";
@@ -444,14 +444,14 @@ void show_goto_trace(
     case goto_trace_stept::typet::FUNCTION_CALL:
       function_depth++;
       if(options.show_function_calls)
-        out << "\n#### Function call: " << step.identifier << " (depth "
-            << function_depth << ") ####\n";
+        out << "\n#### Function call: " << step.function_identifier
+            << " (depth " << function_depth << ") ####\n";
       break;
     case goto_trace_stept::typet::FUNCTION_RETURN:
       function_depth--;
       if(options.show_function_calls)
-        out << "\n#### Function return: " << step.identifier << " (depth "
-            << function_depth << ") ####\n";
+        out << "\n#### Function return: " << step.function_identifier
+            << " (depth " << function_depth << ") ####\n";
       break;
     case goto_trace_stept::typet::SPAWN:
     case goto_trace_stept::typet::MEMORY_BARRIER:

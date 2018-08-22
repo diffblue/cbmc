@@ -209,16 +209,16 @@ void symex_target_equationt::location(
 /// just record a location
 void symex_target_equationt::function_call(
   const exprt &guard,
-  const irep_idt &identifier,
+  const irep_idt &function_identifier,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::FUNCTION_CALL;
-  SSA_step.source=source;
-  SSA_step.identifier=identifier;
+  SSA_step.guard = guard;
+  SSA_step.type = goto_trace_stept::typet::FUNCTION_CALL;
+  SSA_step.source = source;
+  SSA_step.function_identifier = function_identifier;
 
   merge_ireps(SSA_step);
 }
@@ -226,16 +226,16 @@ void symex_target_equationt::function_call(
 /// just record a location
 void symex_target_equationt::function_return(
   const exprt &guard,
-  const irep_idt &identifier,
+  const irep_idt &function_identifier,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
-  SSA_step.source=source;
-  SSA_step.identifier=identifier;
+  SSA_step.guard = guard;
+  SSA_step.type = goto_trace_stept::typet::FUNCTION_RETURN;
+  SSA_step.source = source;
+  SSA_step.function_identifier = function_identifier;
 
   merge_ireps(SSA_step);
 }
