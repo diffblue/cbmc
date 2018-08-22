@@ -25,8 +25,8 @@ Author: Thomas Kiley
 #include "goto_model.h"
 
 /// For outputting the GOTO program in a readable JSON format.
-/// \param ns: the namespace to use to resolve names with
-/// \param list_only: output only list of functions, but not their bodies
+/// \param _ns: the namespace to use to resolve names with
+/// \param _list_only: output only list of functions, but not their bodies
 show_goto_functions_jsont::show_goto_functions_jsont(
   const namespacet &_ns,
   bool _list_only)

@@ -95,7 +95,7 @@ typecast_exprt require_expr::require_typecast(const exprt &expr)
 
 /// Verify a given exprt is a side_effect_exprt with appropriate statement.
 /// \param expr: The expression.
-/// \param symbol_name: The intended identifier of statement
+/// \param side_effect_statement: The kind of side effect that is required
 /// \return The expr cast to a side_effect_exprt
 side_effect_exprt require_expr::require_side_effect_expr(
   const exprt &expr,
