@@ -8,100 +8,59 @@
 \section goto-programs-overview Overview
 Goto programs are the intermediate representation of the CPROVER tool
 chain. They are language independent and similar to many of the compiler
-intermediate languages. Section \ref goto-programs describes the
-`goto_programt` and `goto_functionst` data structures in detail. However
-it useful to understand some of the basic concepts. Each function is a
-list of instructions, each of which has a type (one of 18 kinds of
+intermediate languages. Each function is a
+list of instructions, each of which has a type (one of 19 kinds of
 instruction), a code expression, a guard expression and potentially some
 targets for the next instruction. They are not natively in static
 single-assign (SSA) form. Transitions are nondeterministic (although in
 practise the guards on the transitions normally cover form a disjoint
 cover of all possibilities). Local variables have non-deterministic
-values if they are not initialised.  Variables and data within the
-program is commonly one of three types (parameterised by width):
-`unsignedbv_typet`, `signedbv_typet` and `floatbv_typet`, see
-`util/std_types.h` for more information. Goto programs can be serialised
+values if they are not initialised. Goto programs can be serialised
 in a binary (wrapped in ELF headers) format or in XML (see the various
 `_serialization` files).
 
-The `cbmc` option `–show-goto-programs` is often a good starting point
+The `cbmc` option `--show-goto-programs` is often a good starting point
 as it outputs goto-programs in a human readable form. However there are
 a few things to be aware of. Functions have an internal name (for
 example `c::f00`) and a ‘pretty name’ (for example `f00`) and which is
 used depends on whether it is internal or being presented to the user.
-The `main` method is the ‘logical’ main which is not necessarily the
-main method from the code. In the output `NONDET` is use to represent a
-nondeterministic assignment to a variable. Likewise `IF` as a beautified
-`GOTO` instruction where the guard expression is used as the condition.
-`RETURN` instructions may be dropped if they precede an `END_FUNCTION`
-instruction. The comment lines are generated from the `locationt` field
+`NONDET(some_type)` is use to represent a nondeterministic value.
+`IF guard GOTO x` represents a GOTO instruction with a guard, not a distinct
+`IF` instruction.
+The comment lines are generated from the `source_location` field
 of the `instructiont` structure.
-
-`goto-programs/` is one of the few places in the CPROVER codebase that
-templates are used. The intention is to allow the general architecture
-of program and functions to be used for other formalisms.  At the moment
-most of the templates have a single instantiation; for example
-`goto_functionst` and `goto_function_templatet` and `goto_programt` and
-`goto_program_templatet`.
 
 \section data_structures Data Structures
 
-FIXME: This text is partially outdated.
-
-The common starting point for working with goto-programs is the
-`read_goto_binary` function which populates an object of
-`goto_functionst` type. This is defined in `goto_functions.h` and is an
-instantiation of the template `goto_functions_templatet` which is
-contained in `goto_functions_template.h`. They are wrappers around a map
-from strings to `goto_programt`’s and iteration macros are provided.
-Note that `goto_function_templatet` (no `s`) is defined in the same
-header as `goto_functions_templatet` and is gives the C type for the
-function and Boolean which indicates whether the body is available
-(before linking this might not always be true). Also note the slightly
-counter-intuitive naming; `goto_functionst` instances are the top level
+A \ref goto_functionst object contains a set of GOTO programs. Note the
+counter-intuitive naming: `goto_functionst` instances are the top level
 structure representing the program and contain `goto_programt` instances
-which represent the individual functions. At the time of writing
-`goto_functionst` is the only instantiation of the template
-`goto_functions_templatet` but other could be produced if a different
-data-structures / kinds of models were needed for functions.
+which represent the individual functions.
 
-`goto_programt` is also an instantiation of a template. In a similar
-fashion it is `goto_program_templatet` and allows the types of the guard
-and expression used in instructions to be parameterised. Again, this is
-currently the only use of the template. As such there are only really
-helper functions in `goto_program.h` and thus `goto_program_template.h`
-is probably the key file that describes the representation of (C)
-functions in the goto-program format. It is reasonably stable and
-reasonably documented and thus is a good place to start looking at the
-code.
-
-An instance of `goto_program_templatet` is effectively a list of
-instructions (and inner template called `instructiont`). It is important
+An instance of \ref goto_programt is effectively a list of
+instructions (a nested class called \ref goto_programt::instructiont).
+It is important
 to use the copy and insertion functions that are provided as iterators
 are used to link instructions to their predecessors and targets and
-careless manipulation of the list could break these. Likewise there are
-helper macros for iterating over the instructions in an instance of
-`goto_program_templatet` and the use of these is good style and strongly
-encouraged.
+careless manipulation of the list could break these.
 
-Individual instructions are instances of type `instructiont`. They
-represent one step in the function.  Each has a type, an instance of
-`goto_program_instruction_typet` which denotes what kind of instruction
+Individual instructions are instances of type \ref goto_programt::instructiont.
+They represent one step in the function.  Each has a type, an instance of
+\ref goto_program_instruction_typet which denotes what kind of instruction
 it is. They can be computational (such as `ASSIGN` or `FUNCTION_CALL`),
 logical (such as `ASSUME` and `ASSERT`) or informational (such as
-`LOCATION` and `DEAD`). At the time of writing there are 18 possible
+`LOCATION` and `DEAD`). At the time of writing there are 19 possible
 values for `goto_program_instruction_typet` / kinds of instruction.
 Instructions also have a guard field (the condition under which it is
 executed) and a code field (what the instruction does). These may be
-empty depending on the kind of instruction. In the default
-instantiations these are of type `exprt` and `codet` respectively and
-thus covered by the previous discussion of `irept` and its descendents.
-The next instructions (remembering that transitions are guarded by
+empty depending on the kind of instruction.
+These are of type \ref exprt and \ref codet respectively.
+The next instructions (remembering that transitions may be
 non-deterministic) are given by the list `targets` (with the
 corresponding list of labels `labels`) and the corresponding set of
 previous instructions is get by `incoming_edges`. Finally `instructiont`
-have informational `function` and `location` fields that indicate where
-they are in the code.
+has informational `function` and `source_location` fields that indicate where
+they are in the source code.
 
 \section goto-conversion Goto Conversion
 
@@ -124,8 +83,12 @@ digraph G {
 }
 \enddot
 
-At this stage, CBMC constructs a goto-program from a symbol table. It
-does not use the parse tree or the source file at all for this step. This
+At this stage, CBMC constructs a goto-program from a symbol table.
+Each symbol in the symbol table with function type (that is, the symbol's `type`
+field contains a \ref code_typet) will be converted to a corresponding GOTO
+program.
+
+It does not use the parse tree or the source file at all for this step. This
 may seem surprising, because the symbols are stored in a hash table and
 therefore have no intrinsic order; nevertheless, every \ref symbolt is
 associated with a \ref source_locationt, allowing CBMC to figure out the
@@ -282,18 +245,6 @@ This is not the final form of the goto-functions, since the lists of
 instructions will be 'normalized' in the next step (Instrumentation),
 which removes some instructions and adds targets to others.
 
-Note that goto_programt and goto_functionst are each template
-instantiations; they are currently the *only* specialization of
-goto_program_templatet and goto_functions_templatet, respectively. This
-means that the generated Doxygen documentation can be somewhat obtuse
-about the actual types of things, and is unable to generate links to the
-correct classes. Note that the
-\ref goto_programt::instructiont::code "code" member of a
-goto_programt's instruction has type \ref codet (its type in the
-goto_program_templatet documentation is given as "codeT", as this is the
-name of the template's type parameter); similarly, the type of a guard
-of an instruction is \ref guardt.
-
 ---
 \section instrumentation Instrumentation
 
@@ -324,8 +275,15 @@ previous stage:
   are littered with \ref code_skipt "skip" statements. The
   instrumentation stage removes the majority of these.
 
-* Function pointers are removed. They are turned into switch statements
-  (but see the next point; switch statements are further transformed).
+* Variable lifespan implied by \ref code_declt instructions and lexical scopes
+  described by \ref code_blockt nodes is replaced by `DECL` and corresponding
+  `DEAD` instructions. There are therefore no lexical scopes in GOTO programs
+  (not even local variable death on function exit is enforced).
+
+* Expressions with side-effects are explicitly ordered so that there is one
+  effect per instruction (apart from function call instructions, which can
+  still have many). For example, `y = f() + x++` will have become something like
+  `tmp1 = f(); y = tmp1 + x; x = x + 1;`
 
 * Compound blocks are eliminated. There are several subclasses of
   \ref codet that count as 'compound blocks;' therefore, later stages in
@@ -362,13 +320,7 @@ previous stage:
 * \ref code_returnt "return statements" are transformed into
   (unconditional) GOTOs whose target is the \ref END_FUNCTION
   instruction. Each goto_programt should have precisely one such
-  instruction. Note the presence of \ref code_deadt, which has a
-  \ref code_deadt::symbol() "symbol()" member. Deads mark symbols that
-  have just gone out of scope; typically, a GOTO that jumps to an
-  END_FUNCTION instruction is preceded by a series of deads. Deads also
-  follow sequences of instructions that were part of the body of a
-  block (loop, conditional etc.) if there were symbols declared in that
-  block.
+  instruction.
 
 This stage concludes the *analysis-independent* program transformations.
 
