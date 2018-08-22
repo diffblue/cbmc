@@ -163,8 +163,15 @@ void rw_range_sett::get_objects_byte_extract(
       be.op().type(),
       be.id()==ID_byte_extract_little_endian,
       ns);
-    range_spect offset =
-      range_start + map.map_bit(numeric_cast_v<std::size_t>(*index));
+    range_spect offset = range_start;
+    if(*index > 0)
+      offset += map.map_bit(numeric_cast_v<std::size_t>(*index));
+    else
+    {
+      // outside the bounds of immediate byte-extract operand, might still be in
+      // bounds of a parent object
+      offset += to_range_spect(*index);
+    }
     get_objects_rec(mode, be.op(), offset, size);
   }
 }
