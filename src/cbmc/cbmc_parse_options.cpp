@@ -587,7 +587,7 @@ int cbmc_parse_optionst::get_goto_program(
 
     if(cmdline.isset("show-symbol-table"))
     {
-      show_symbol_table(goto_model, ui_message_handler.get_ui());
+      show_symbol_table(goto_model, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
 

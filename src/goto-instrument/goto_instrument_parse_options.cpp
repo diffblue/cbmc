@@ -464,7 +464,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-symbol-table"))
     {
-      ::show_symbol_table(goto_model, get_ui());
+      ::show_symbol_table(goto_model, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -519,7 +519,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("list-symbols"))
     {
-      show_symbol_table_brief(goto_model, get_ui());
+      show_symbol_table_brief(goto_model, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
 
