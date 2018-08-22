@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/suffix.h>
 #include <util/prefix.h>
-#include <util/config.h>
 
 #include "java_bytecode_parser.h"
 
@@ -67,6 +66,19 @@ java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
   }
 
   return class_map.at(class_name);
+}
+
+void java_class_loadert::add_classpath_entry(const std::string &path)
+{
+  if(has_suffix(path, ".jar"))
+  {
+    classpath_entries.push_back(classpath_entryt(classpath_entryt::JAR, path));
+  }
+  else
+  {
+    classpath_entries.push_back(
+      classpath_entryt(classpath_entryt::DIRECTORY, path));
+  }
 }
 
 optionalt<java_bytecode_parse_treet> java_class_loadert::get_class_from_jar(
@@ -124,54 +136,43 @@ java_class_loadert::get_parse_tree(
     return parse_trees;
   }
 
-  // First add all given JAR files
-  for(const auto &jar_file : jar_files)
+  // Rummage through the class path
+  for(const auto &cp_entry : classpath_entries)
   {
-    jar_index_optcreft index = read_jar_file(jar_file);
-    if(!index)
-      continue;
-    optionalt<java_bytecode_parse_treet> parse_tree =
-      get_class_from_jar(class_name, jar_file, *index);
-    if(parse_tree)
-      parse_trees.emplace_back(std::move(*parse_tree));
-  }
-
-  // Then add everything on the class path
-  for(const auto &cp_entry : config.java.classpath)
-  {
-    if(has_suffix(cp_entry, ".jar"))
+    switch(cp_entry.kind)
     {
-      jar_index_optcreft index = read_jar_file(cp_entry);
-      if(!index)
-        continue;
-      optionalt<java_bytecode_parse_treet> parse_tree =
-        get_class_from_jar(class_name, cp_entry, *index);
-      if(parse_tree)
-        parse_trees.emplace_back(std::move(*parse_tree));
-    }
-    else
-    {
-      // Look in the given directory
-      const std::string class_file = class_name_to_file(class_name);
-      const std::string full_path =
-        #ifdef _WIN32
-        cp_entry + '\\' + class_file;
-        #else
-        cp_entry + '/' + class_file;
-        #endif
-
-      if(!class_loader_limit.load_class_file(class_file))
-        continue;
-
-      if(std::ifstream(full_path))
+    case classpath_entryt::JAR:
       {
-        debug()
-          << "Getting class `" << class_name << "' from file " << full_path
-          << eom;
+        jar_index_optcreft index = read_jar_file(cp_entry.path);
+        if(!index)
+          continue;
         optionalt<java_bytecode_parse_treet> parse_tree =
-          java_bytecode_parse(full_path, get_message_handler());
+          get_class_from_jar(class_name, cp_entry.path, *index);
         if(parse_tree)
           parse_trees.emplace_back(std::move(*parse_tree));
+      }
+      break;
+
+    case classpath_entryt::DIRECTORY:
+      {
+        // Look in the given directory
+        const std::string class_file = class_name_to_file(class_name);
+        const std::string full_path =
+#ifdef _WIN32
+          cp_entry.path + '\\' + class_file;
+#else
+          cp_entry.path + '/' + class_file;
+#endif
+
+        if(std::ifstream(full_path))
+        {
+          debug() << "Getting class `" << class_name << "' from file "
+                  << full_path << eom;
+          optionalt<java_bytecode_parse_treet> parse_tree =
+            java_bytecode_parse(full_path, get_message_handler());
+          if(parse_tree)
+            parse_trees.emplace_back(std::move(*parse_tree));
+        }
       }
     }
   }
@@ -234,12 +235,13 @@ void java_class_loadert::load_entire_jar(
   if(!jar_index)
     return;
 
-  jar_files.push_front(jar_path);
+  classpath_entries.push_front(
+    classpath_entryt(classpath_entryt::JAR, jar_path));
 
   for(const auto &e : jar_index->get())
     operator()(e.first);
 
-  jar_files.pop_front();
+  classpath_entries.pop_front();
 }
 
 java_class_loadert::jar_index_optcreft java_class_loadert::read_jar_file(

@@ -74,10 +74,18 @@ public:
     for(const auto &id : classes)
       java_load_classes.push_back(id);
   }
-  void add_jar_file(const std::string &f)
+
+  /// Clear all classpath entries
+  void clear_classpath()
   {
-    jar_files.push_back(f);
+    classpath_entries.clear();
   }
+
+  /// Appends an entry to the class path, used for loading classes.  The
+  /// argument may be
+  /// 1) The name of a directory, used for searching for .class files
+  /// 2) The name of a JAR file
+  void add_classpath_entry(const std::string &);
 
   static std::string file_to_class_name(const std::string &);
   static std::string class_name_to_file(const irep_idt &);
@@ -111,10 +119,21 @@ private:
   /// information.
   std::string java_cp_include_files;
 
-  /// List of filesystem paths to .jar files that will be used, in the given
-  /// order, to find and load a class, provided its name (see \ref
-  /// get_parse_tree).
-  std::list<std::string> jar_files;
+  /// An entry in the classpath
+  struct classpath_entryt
+  {
+    using kindt = enum { JAR, DIRECTORY };
+    kindt kind;
+    std::string path;
+
+    classpath_entryt(kindt _kind, const std::string &_path)
+      : kind(_kind), path(_path)
+    {
+    }
+  };
+
+  /// List of entries in the classpath
+  std::list<classpath_entryt> classpath_entries;
 
   /// Classes to be explicitly loaded
   std::vector<irep_idt> java_load_classes;
