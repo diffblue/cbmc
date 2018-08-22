@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "show_symbol_table.h"
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
 
@@ -68,16 +69,16 @@ void show_symbol_table_plain(
   out << '\n' << "Symbols:" << '\n' << '\n';
 
   // we want to sort alphabetically
-  std::set<std::string> symbols;
+  std::vector<std::string> symbols;
+  symbols.reserve(symbol_table.symbols.size());
 
   for(const auto &symbol_pair : symbol_table.symbols)
-  {
-    symbols.insert(id2string(symbol_pair.first));
-  }
+    symbols.push_back(id2string(symbol_pair.first));
+  std::sort(symbols.begin(), symbols.end());
 
   const namespacet ns(symbol_table);
 
-  for(const std::string &id : symbols)
+  for(const irep_idt &id : symbols)
   {
     const symbolt &symbol=ns.lookup(id);
 
