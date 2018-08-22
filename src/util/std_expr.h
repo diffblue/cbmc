@@ -52,7 +52,7 @@ inline const transt &to_trans_expr(const exprt &expr)
   return static_cast<const transt &>(expr);
 }
 
-/// \copydoc to_trans(const exprt &)
+/// \copydoc to_trans_expr(const exprt &)
 inline transt &to_trans_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_trans);
@@ -114,7 +114,8 @@ public:
   }
 };
 
-/// Expression to hold a symbol (variable)
+/// Expression to hold a symbol (variable) with extra ccessors to
+/// ID_c_static_lifetime and ID_C_thread_local
 class decorated_symbol_exprt:public symbol_exprt
 {
 public:
@@ -516,7 +517,7 @@ inline void validate_expr(const bswap_exprt &value)
 }
 
 /// \brief A generic base class for expressions that are predicates,
-///        i.e., boolean-typed.
+///        i.e., Boolean-typed.
 class predicate_exprt:public exprt
 {
 public:
@@ -546,7 +547,7 @@ public:
 };
 
 /// \brief A generic base class for expressions that are predicates,
-///        i.e., boolean-typed, and that take exactly one argument.
+///        i.e., Boolean-typed, and that take exactly one argument.
 class unary_predicate_exprt:public unary_exprt
 {
 public:
@@ -571,6 +572,7 @@ protected:
 };
 
 /// \brief sign of an expression
+/// Predicate is true if \a _op is negative, false otherwise.
 class sign_exprt:public unary_predicate_exprt
 {
 public:
@@ -659,7 +661,7 @@ template<> inline bool can_cast_expr<binary_exprt>(const exprt &base)
 
 
 /// \brief A generic base class for expressions that are predicates,
-///        i.e., boolean-typed, and that take exactly two arguments.
+///        i.e., Boolean-typed, and that take exactly two arguments.
 class binary_predicate_exprt:public binary_exprt
 {
 public:
@@ -1025,7 +1027,7 @@ inline void validate_expr(const div_exprt &value)
 }
 
 
-/// \brief binary modulo
+/// \brief modulo
 class mod_exprt:public binary_exprt
 {
 public:
@@ -2038,7 +2040,7 @@ inline void validate_expr(const floatbv_typecast_exprt &value)
 }
 
 
-/// \brief boolean AND
+/// \brief Boolean AND
 class and_exprt:public multi_ary_exprt
 {
 public:
@@ -2115,7 +2117,7 @@ template<> inline bool can_cast_expr<and_exprt>(const exprt &base)
 // }
 
 
-/// \brief boolean implication
+/// \brief Boolean implication
 class implies_exprt:public binary_exprt
 {
 public:
@@ -2161,7 +2163,7 @@ inline void validate_expr(const implies_exprt &value)
 }
 
 
-/// \brief boolean OR
+/// \brief Boolean OR
 class or_exprt:public multi_ary_exprt
 {
 public:
@@ -4085,7 +4087,7 @@ template<> inline bool can_cast_expr<constant_exprt>(const exprt &base)
 }
 
 
-/// \brief The boolean constant true
+/// \brief The Boolean constant true
 class true_exprt:public constant_exprt
 {
 public:
@@ -4095,7 +4097,7 @@ public:
   }
 };
 
-/// \brief The boolean constant false
+/// \brief The Boolean constant false
 class false_exprt:public constant_exprt
 {
 public:
