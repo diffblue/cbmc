@@ -5,7 +5,7 @@
 
 \author Martin Brain, Owen Jones, Chris Smowton
 
-\section data_structures Data Structures
+\section util_data_structures Data Structures
 
 \ref util contains some of the key data-structures used in the
 CPROVER codebase.

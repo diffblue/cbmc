@@ -30,7 +30,7 @@ used depends on whether it is internal or being presented to the user.
 The comment lines are generated from the `source_location` field
 of the `instructiont` structure.
 
-\section data_structures Data Structures
+\section goto_data_structures Data Structures
 
 A \ref goto_functionst object contains a set of GOTO programs. Note the
 counter-intuitive naming: `goto_functionst` instances are the top level
