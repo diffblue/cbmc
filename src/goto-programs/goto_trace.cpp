@@ -444,15 +444,34 @@ void show_goto_trace(
     case goto_trace_stept::typet::FUNCTION_CALL:
       function_depth++;
       if(options.show_function_calls)
-        out << "\n#### Function call: " << step.function_identifier
-            << " (depth " << function_depth << ") ####\n";
+      {
+        out << "\n#### Function call: " << step.function_identifier;
+        out << '(';
+
+        bool first = true;
+        for(auto &arg : step.function_arguments)
+        {
+          if(first)
+            first = false;
+          else
+            out << ", ";
+
+          out << from_expr(ns, step.function_identifier, arg);
+        }
+
+        out << ") (depth " << function_depth << ") ####\n";
+      }
       break;
+
     case goto_trace_stept::typet::FUNCTION_RETURN:
       function_depth--;
       if(options.show_function_calls)
+      {
         out << "\n#### Function return: " << step.function_identifier
             << " (depth " << function_depth << ") ####\n";
+      }
       break;
+
     case goto_trace_stept::typet::SPAWN:
     case goto_trace_stept::typet::MEMORY_BARRIER:
     case goto_trace_stept::typet::ATOMIC_BEGIN:
