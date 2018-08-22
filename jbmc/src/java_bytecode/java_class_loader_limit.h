@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/irep.h>
 #include <util/message.h>
 
+/// Class representing a filter for class file loading.
 class java_class_loader_limitt:public messaget
 {
   /// Whether to use regex_matcher instead of set_matcher

@@ -81,6 +81,11 @@ void java_class_loadert::add_classpath_entry(const std::string &path)
   }
 }
 
+/// Load class from jar file.
+/// \param class_name: name of class to load in Java source format
+/// \param jar_file: path of the jar file
+/// \param jar_index: the index of the jar file
+/// \return optional value of parse tree, empty if class cannot be loaded
 optionalt<java_bytecode_parse_treet> java_class_loadert::get_class_from_jar(
   const irep_idt &class_name,
   const std::string &jar_file,
@@ -102,6 +107,11 @@ optionalt<java_bytecode_parse_treet> java_class_loadert::get_class_from_jar(
   return java_bytecode_parse(istream, get_message_handler());
 }
 
+/// Check if class is an overlay class by searching for `ID_overlay_class` in
+/// its list of annotations. TODO(nathan) give a short explanation about what
+/// overlay classes are.
+/// \param c: a `classt` object from a java byte code parse tree
+/// \return true if parsed class is an overlay class, else false
 static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
 {
   return java_bytecode_parse_treet::find_annotation(
@@ -228,6 +238,9 @@ java_class_loadert::get_parse_tree(
   return parse_trees;
 }
 
+/// Load all class files from a .jar file, and store name of .jar in
+/// `classpath_entreies`.
+/// \param jar_path: the path for the .jar to load
 void java_class_loadert::load_entire_jar(
   const std::string &jar_path)
 {
@@ -280,6 +293,12 @@ java_class_loadert::jar_index_optcreft java_class_loadert::read_jar_file(
   return std::cref(jar_index);
 }
 
+/// Convert a file name to the class name. Java interprets folders as packages,
+/// therefore a prefix of `./` is removed if necessary, and all `/` are
+/// converted to `.`. For example a class file `./com/diffblue/test.class` is
+/// converted to the class name `com.diffblue.test`.
+/// \param file: the name of the class file
+/// \return the file name converted to Java class name
 std::string java_class_loadert::file_to_class_name(const std::string &file)
 {
   std::string result=file;
@@ -307,6 +326,10 @@ std::string java_class_loadert::file_to_class_name(const std::string &file)
   return result;
 }
 
+/// Convert a class name to a file name, does the inverse of \ref
+/// file_to_class_name.
+/// \param class_name: the name of the class
+/// \return the class name converted to file name
 std::string java_class_loadert::class_name_to_file(const irep_idt &class_name)
 {
   std::string result=id2string(class_name);

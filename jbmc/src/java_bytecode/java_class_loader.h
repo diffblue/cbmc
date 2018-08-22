@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_parse_tree.h"
 #include "java_class_loader_limit.h"
 
+/// Class responsible to load .class files. Either directly from a specific
+/// file, from a classpath specification or from a Java archive (JAR) file.
 class java_class_loadert:public messaget
 {
 public:
@@ -29,7 +31,10 @@ public:
   /// implementing it for all classes inside a single JAR file
   typedef std::map<irep_idt, std::string> jar_indext;
 
+  /// A list of parse trees supporting overlay classes
   typedef std::list<java_bytecode_parse_treet> parse_tree_with_overlayst;
+  /// A map from class names to list of parse tree where multiple entries can
+  /// exist in case of overlay classes.
   typedef std::map<irep_idt, parse_tree_with_overlayst>
     parse_tree_with_overridest_mapt;
 
@@ -54,6 +59,8 @@ public:
     java_class_loader_limitt &class_loader_limit,
     const irep_idt &class_name);
 
+  /// Set the argument of the class loader limit \ref java_class_loader_limitt
+  /// \param java_cp_include_files: argument string for java_class_loader_limit
   void set_java_cp_include_files(const std::string &java_cp_include_files)
   {
     this->java_cp_include_files = java_cp_include_files;

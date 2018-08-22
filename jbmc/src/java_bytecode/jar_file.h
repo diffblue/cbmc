@@ -18,7 +18,8 @@ Author: Diffblue Ltd
 
 #include "mz_zip_archive.h"
 
-/// Class representing a .jar archive
+/// Class representing a .jar archive. Uses miniz to decompress and index
+/// archive.
 class jar_filet final
 {
 public:
@@ -44,7 +45,8 @@ public:
   /// \param filename Name of the file in the archive
   optionalt<std::string> get_entry(const std::string &filename);
 
-  /// Get contents of the Manifest file in the jar archive
+  /// Get contents of the Manifest file in the jar archive as a key-value map
+  /// (both as strings)
   std::unordered_map<std::string, std::string> get_manifest();
 
   /// Get list of filenames in the archive

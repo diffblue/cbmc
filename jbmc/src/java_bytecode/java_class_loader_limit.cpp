@@ -13,8 +13,38 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <json/json_parser.h>
 
-/// initializes class with either regex matcher or match set
-/// \par parameters: parameter from `java-cp-include-files`
+/// Initializes class with either regex matcher or match set. If the string
+/// starts with an `@` it is treated as a path to a JSON file. Otherwise, it is
+/// treated as a regex.
+///
+/// The regex case describes which class files should be loaded in the form of a
+/// regular expression used with `regex_match`.
+///
+/// The match set is a list of files to load in JSON format, the argument is the
+/// name of the JSON file, prefixed with `@`. The file contains one section to
+/// list the .jar files to load and one section to list the .class files to load
+/// from the .jar.
+///
+/// for example a file called `load.json` with the following content:
+/// {
+///   "jar":
+///   [
+///     "A.jar",
+///     "B.jar"
+///   ],
+///   "classFiles":
+///   [
+///     "jarfile3$A.class",
+///     "jarfile3.class"
+///   ]
+/// }
+/// would be specified via `--java-cp-include-files @load.json` and would
+/// instruct the driver to load `A.jar` and `B.jar` and the two .class files
+/// `jarfile3$A.class` and `jarfile3.class`. All the rest of the .jar files is
+/// ignored.
+///
+/// \param java_cp_include_files: parameter from `java-cp-include-files` in the
+///   format as described above
 void java_class_loader_limitt::setup_class_load_limit(
   const std::string &java_cp_include_files)
 {
@@ -51,7 +81,9 @@ void java_class_loader_limitt::setup_class_load_limit(
   }
 }
 
-/// \par parameters: class file name
+/// Use the class load limiter to decide whether a class file should be loaded
+/// or not.
+/// \param file_name: the name of the class file to load
 /// \return true if file should be loaded, else false
 bool java_class_loader_limitt::load_class_file(const std::string &file_name)
 {
