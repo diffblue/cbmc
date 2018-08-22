@@ -199,6 +199,8 @@ protected:
   std::vector<irep_idt> java_load_classes;
 
 private:
+  virtual std::vector<load_extra_methodst>
+  build_extra_entry_points(const cmdlinet &command_line) const;
   const std::unique_ptr<const select_pointer_typet> pointer_type_selector;
 
   /// Maps synthetic method names on to the particular type of synthetic method
