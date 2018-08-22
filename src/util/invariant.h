@@ -12,7 +12,6 @@ Author: Martin Brain, martin.brain@diffblue.com
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
-#include <tuple>
 #include <type_traits>
 
 /*
