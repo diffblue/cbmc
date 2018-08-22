@@ -201,7 +201,9 @@ std::string expr2javat::convert_constant(
     if(to_integer(src, int_value))
       UNREACHABLE;
 
-    dest += "(char)'" + utf16_native_endian_to_java(int_value.to_long()) + '\'';
+    // Character literals in Java have type 'char', thus no cast is needed.
+    // This is different from C, where charater literals have type 'int'.
+    dest += '\'' + utf16_native_endian_to_java(int_value.to_long()) + '\'';
     return dest;
   }
   else if(src.type()==java_byte_type())
