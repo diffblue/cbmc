@@ -1243,6 +1243,21 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
   {
     rRuntimeAnnotation_attribute(method.annotations);
   }
+  else if(
+    attribute_name == "RuntimeInvisibleParameterAnnotations" ||
+    attribute_name == "RuntimeVisibleParameterAnnotations")
+  {
+    u1 parameter_count = read_u1();
+    // There may be attributes for both runtime-visiible and rutime-invisible
+    // annotations, the length of either array may be longer than the other as
+    // trailing parameters without annotations are omitted.
+    // Extend our parameter_annotations if this one is longer than the one
+    // previously recorded (if any).
+    if(method.parameter_annotations.size() < parameter_count)
+      method.parameter_annotations.resize(parameter_count);
+    for(u2 param_no = 0; param_no < parameter_count; ++param_no)
+      rRuntimeAnnotation_attribute(method.parameter_annotations[param_no]);
+  }
   else if(attribute_name == "Exceptions")
   {
     method.throws_exception_table = rexceptions_attribute();
