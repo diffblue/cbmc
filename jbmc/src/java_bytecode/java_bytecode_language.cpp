@@ -741,36 +741,41 @@ bool java_bytecode_languaget::typecheck(
 
   // Now incrementally elaborate methods
   // that are reachable from this entry point.
-  if(lazy_methods_mode==LAZY_METHODS_MODE_CONTEXT_INSENSITIVE)
+  switch(lazy_methods_mode)
   {
-    // ci: context-insensitive.
-    if(do_ci_lazy_method_conversion(symbol_table, method_bytecode))
-      return true;
-  }
-  else if(lazy_methods_mode==LAZY_METHODS_MODE_EAGER)
-  {
-    journalling_symbol_tablet journalling_symbol_table =
-      journalling_symbol_tablet::wrap(symbol_table);
+    case LAZY_METHODS_MODE_CONTEXT_INSENSITIVE:
+      // ci = context-insensitive
+      if(do_ci_lazy_method_conversion(symbol_table, method_bytecode))
+        return true;
+      break;
+    case LAZY_METHODS_MODE_EAGER:
+      {
+        journalling_symbol_tablet journalling_symbol_table =
+          journalling_symbol_tablet::wrap(symbol_table);
 
-    // Convert all synthetic methods:
-    for(const auto &function_id_and_type : synthetic_methods)
-    {
-      convert_single_method(
-        function_id_and_type.first, journalling_symbol_table);
-    }
-    // Convert all methods for which we have bytecode now
-    for(const auto &method_sig : method_bytecode)
-    {
-      convert_single_method(method_sig.first, journalling_symbol_table);
-    }
-    // Now convert all newly added string methods
-    for(const auto &fn_name : journalling_symbol_table.get_inserted())
-    {
-      if(string_preprocess.implements_function(fn_name))
-        convert_single_method(fn_name, symbol_table);
-    }
+        // Convert all synthetic methods:
+        for(const auto &function_id_and_type : synthetic_methods)
+        {
+          convert_single_method(
+            function_id_and_type.first, journalling_symbol_table);
+        }
+        // Convert all methods for which we have bytecode now
+        for(const auto &method_sig : method_bytecode)
+        {
+          convert_single_method(method_sig.first, journalling_symbol_table);
+        }
+        // Now convert all newly added string methods
+        for(const auto &fn_name : journalling_symbol_table.get_inserted())
+        {
+          if(string_preprocess.implements_function(fn_name))
+            convert_single_method(fn_name, symbol_table);
+        }
+      }
+      break;
+    default:
+      // Our caller is in charge of elaborating methods on demand.
+      break;
   }
-  // Otherwise our caller is in charge of elaborating methods on demand.
 
   // now instrument runtime exceptions
   java_bytecode_instrument(
