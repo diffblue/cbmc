@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define SUBTYPE_IN_GETSUB
 #define SUBTYPES_IN_GETSUB
 
-class namespacet;
-
 /// The type of an expression, extends irept. Types may have subtypes. This is
 /// modeled with two subs named “subtype” (a single type) and “subtypes”
 /// (a vector of types). The class typet only adds specialized methods
@@ -176,11 +174,5 @@ public:
   if((type).has_subtypes()) /* NOLINT(readability/braces) */ \
     for(typet::subtypest::iterator it=(type).subtypes().begin(); \
         it!=(type).subtypes().end(); ++it)
-
-bool is_number(const typet &type);
-
-bool is_constant_or_has_constant_components(
-    const typet &type,
-    const namespacet &ns);
 
 #endif // CPROVER_UTIL_TYPE_H

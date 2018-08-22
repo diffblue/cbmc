@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_map>
 
 class constant_exprt;
+class namespacet;
 
 /// The Boolean type
 class bool_typet:public typet
@@ -1707,5 +1708,11 @@ inline mathematical_function_typet &
   PRECONDITION(type.id()==ID_mathematical_function);
   return static_cast<mathematical_function_typet &>(type);
 }
+
+bool is_number(const typet &type);
+
+bool is_constant_or_has_constant_components(
+  const typet &type,
+  const namespacet &ns);
 
 #endif // CPROVER_UTIL_STD_TYPES_H
