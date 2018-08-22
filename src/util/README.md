@@ -101,15 +101,15 @@ See documentation at \ref dstringt.
 
 \subsection typet_section typet
 
-See \ref typet.
-
-To be documented.
+\ref typet represents the type of an expression. Types may have subtypes,
+stored in two [sub](\ref irept::dt::sub)s named “subtype” (a single type) and
+“subtypes” (a vector of types). For pre-defined types see `std_types.h` and
+`mathematical_types.h`.
 
 \subsubsection symbol_typet_section symbol_typet
 
-See \ref symbol_typet.
-
-To be documented.
+\ref symbol_typet is a type used to store a reference to the symbol table. The
+full \ref symbolt can be retrieved using the identifier of \ref symbol_typet.
 
 \subsection exprt_section exprt
 
