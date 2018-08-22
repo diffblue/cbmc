@@ -425,11 +425,13 @@ void variable_sensitivity_domaint::transform_function_call(
       }
       else
       {
-        // For any parameter that is a pointer, top the value it is pointing
-        // at.
+        // For any parameter that is a non-const pointer, top the value it is
+        // pointing at.
         for(const exprt &called_arg : called_arguments)
         {
-          if(called_arg.type().id()==ID_pointer)
+          if(
+            called_arg.type().id() == ID_pointer &&
+            !called_arg.type().subtype().get_bool(ID_C_constant))
           {
             abstract_object_pointert pointer_value=
               abstract_state.eval(called_arg, ns);
