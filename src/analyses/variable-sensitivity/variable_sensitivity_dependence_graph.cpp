@@ -129,8 +129,51 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
   if(to->is_assign())
   {
     const code_assignt &inst = to_code_assign(to->code);
+    const exprt &rhs=inst.rhs();
 
-    eval_data_deps(inst.rhs(), ns, domain_data_deps);
+    // Handle return value of a 'no body' function
+    if(rhs.id() == ID_side_effect)
+    {
+      const side_effect_exprt &see=to_side_effect_expr(rhs);
+      if(see.get_statement()==ID_nondet)
+      {
+        if(from->is_function_call())
+        {
+          const code_function_callt &cfc=to_code_function_call(from->code);
+          const exprt &call=cfc.function();
+
+          if(call.id()==ID_symbol)
+          {
+            const irep_idt id=to_symbol_expr(call).id();
+            const goto_functionst &goto_functions=dep_graph.goto_functions;
+
+            goto_functionst::function_mapt::const_iterator it=
+              goto_functions.function_map.find(id);
+
+            if(it!=goto_functions.function_map.end())
+            {
+              if(!it->second.body_available()) // body not available
+              {
+                domain_data_deps[from].insert(call);
+              }
+            }
+            else // function not in map
+            {
+              domain_data_deps[from].insert(call);
+            }
+          }
+          else // complex call expression
+          {
+            domain_data_deps[from].insert(call);
+          }
+        }
+      }
+    }
+    else
+    {
+      // Just an ordinary assignement
+      eval_data_deps(rhs, ns, domain_data_deps);
+    }
   }
   else if (to->is_function_call())
   {
