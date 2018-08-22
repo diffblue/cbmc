@@ -53,7 +53,6 @@ inline const transt &to_trans_expr(const exprt &expr)
 }
 
 /// \copydoc to_trans(const exprt &)
-/// \ingroup gr_std_expr
 inline transt &to_trans_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_trans);
@@ -184,8 +183,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref symbol_exprt
-///
-/// \ingroup gr_std_expr
 inline const symbol_exprt &to_symbol_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_symbol);
@@ -194,7 +191,6 @@ inline const symbol_exprt &to_symbol_expr(const exprt &expr)
 }
 
 /// \copydoc to_symbol_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline symbol_exprt &to_symbol_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_symbol);
@@ -244,8 +240,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref nondet_symbol_exprt
-///
-/// \ingroup gr_std_expr
 inline const nondet_symbol_exprt &to_nondet_symbol_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_nondet_symbol);
@@ -254,7 +248,6 @@ inline const nondet_symbol_exprt &to_nondet_symbol_expr(const exprt &expr)
 }
 
 /// \copydoc to_nondet_symbol_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline nondet_symbol_exprt &to_nondet_symbol_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_symbol);
@@ -328,8 +321,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref unary_exprt
-///
-/// \ingroup gr_std_expr
 inline const unary_exprt &to_unary_expr(const exprt &expr)
 {
   DATA_INVARIANT(
@@ -339,7 +330,6 @@ inline const unary_exprt &to_unary_expr(const exprt &expr)
 }
 
 /// \copydoc to_unary_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline unary_exprt &to_unary_expr(exprt &expr)
 {
   DATA_INVARIANT(
@@ -375,8 +365,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref abs_exprt
-///
-/// \ingroup gr_std_expr
 inline const abs_exprt &to_abs_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_abs);
@@ -387,7 +375,6 @@ inline const abs_exprt &to_abs_expr(const exprt &expr)
 }
 
 /// \copydoc to_abs_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline abs_exprt &to_abs_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_abs);
@@ -435,8 +422,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref unary_minus_exprt
-///
-/// \ingroup gr_std_expr
 inline const unary_minus_exprt &to_unary_minus_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_unary_minus);
@@ -447,7 +432,6 @@ inline const unary_minus_exprt &to_unary_minus_expr(const exprt &expr)
 }
 
 /// \copydoc to_unary_minus_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline unary_minus_exprt &to_unary_minus_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_unary_minus);
@@ -500,8 +484,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref bswap_exprt
-///
-/// \ingroup gr_std_expr
 inline const bswap_exprt &to_bswap_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_bswap);
@@ -512,7 +494,6 @@ inline const bswap_exprt &to_bswap_expr(const exprt &expr)
 }
 
 /// \copydoc to_bswap_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline bswap_exprt &to_bswap_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_bswap);
@@ -654,8 +635,6 @@ protected:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref binary_exprt
-///
-/// \ingroup gr_std_expr
 inline const binary_exprt &to_binary_expr(const exprt &expr)
 {
   DATA_INVARIANT(
@@ -665,7 +644,6 @@ inline const binary_exprt &to_binary_expr(const exprt &expr)
 }
 
 /// \copydoc to_binary_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline binary_exprt &to_binary_expr(exprt &expr)
 {
   DATA_INVARIANT(
@@ -751,8 +729,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref binary_relation_exprt
-///
-/// \ingroup gr_std_expr
 inline const binary_relation_exprt &to_binary_relation_expr(const exprt &expr)
 {
   DATA_INVARIANT(
@@ -762,7 +738,6 @@ inline const binary_relation_exprt &to_binary_relation_expr(const exprt &expr)
 }
 
 /// \copydoc to_binary_relation_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
 {
   DATA_INVARIANT(
@@ -822,15 +797,12 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref multi_ary_exprt
-///
-/// \ingroup gr_std_expr
 inline const multi_ary_exprt &to_multi_ary_expr(const exprt &expr)
 {
   return static_cast<const multi_ary_exprt &>(expr);
 }
 
 /// \copydoc to_multi_ary_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline multi_ary_exprt &to_multi_ary_expr(exprt &expr)
 {
   return static_cast<multi_ary_exprt &>(expr);
@@ -868,8 +840,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref plus_exprt
-///
-/// \ingroup gr_std_expr
 inline const plus_exprt &to_plus_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_plus);
@@ -880,7 +850,6 @@ inline const plus_exprt &to_plus_expr(const exprt &expr)
 }
 
 /// \copydoc to_plus_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline plus_exprt &to_plus_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_plus);
@@ -923,8 +892,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref minus_exprt
-///
-/// \ingroup gr_std_expr
 inline const minus_exprt &to_minus_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_minus);
@@ -935,7 +902,6 @@ inline const minus_exprt &to_minus_expr(const exprt &expr)
 }
 
 /// \copydoc to_minus_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline minus_exprt &to_minus_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_minus);
@@ -978,8 +944,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref mult_exprt
-///
-/// \ingroup gr_std_expr
 inline const mult_exprt &to_mult_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mult);
@@ -990,7 +954,6 @@ inline const mult_exprt &to_mult_expr(const exprt &expr)
 }
 
 /// \copydoc to_mult_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline mult_exprt &to_mult_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mult);
@@ -1033,8 +996,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref div_exprt
-///
-/// \ingroup gr_std_expr
 inline const div_exprt &to_div_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_div);
@@ -1045,7 +1006,6 @@ inline const div_exprt &to_div_expr(const exprt &expr)
 }
 
 /// \copydoc to_div_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline div_exprt &to_div_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_div);
@@ -1088,8 +1048,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref mod_exprt
-///
-/// \ingroup gr_std_expr
 inline const mod_exprt &to_mod_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mod);
@@ -1098,7 +1056,6 @@ inline const mod_exprt &to_mod_expr(const exprt &expr)
 }
 
 /// \copydoc to_mod_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline mod_exprt &to_mod_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mod);
@@ -1139,8 +1096,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref rem_exprt
-///
-/// \ingroup gr_std_expr
 inline const rem_exprt &to_rem_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_rem);
@@ -1149,7 +1104,6 @@ inline const rem_exprt &to_rem_expr(const exprt &expr)
 }
 
 /// \copydoc to_rem_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline rem_exprt &to_rem_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_rem);
@@ -1191,8 +1145,6 @@ class power_exprt:public binary_exprt
 ///
 /// \param expr Source expression
 /// \return Object of type \ref power_exprt
-///
-/// \ingroup gr_std_expr
 inline const power_exprt &to_power_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_power);
@@ -1201,7 +1153,6 @@ inline const power_exprt &to_power_expr(const exprt &expr)
 }
 
 /// \copydoc to_power_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline power_exprt &to_power_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_power);
@@ -1220,7 +1171,6 @@ inline void validate_expr(const power_exprt &value)
 
 
 /// \brief falling factorial power
-////
 class factorial_power_exprt:public binary_exprt
 {
  public:
@@ -1243,8 +1193,6 @@ class factorial_power_exprt:public binary_exprt
 ///
 /// \param expr Source expression
 /// \return Object of type \ref factorial_power_exprt
-///
-/// \ingroup gr_std_expr
 inline const factorial_power_exprt &to_factorial_power_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_factorial_power);
@@ -1255,7 +1203,6 @@ inline const factorial_power_exprt &to_factorial_power_expr(const exprt &expr)
 }
 
 /// \copydoc to_factorial_power_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline factorial_power_exprt &to_factorial_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_factorial_power);
@@ -1297,8 +1244,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref equal_exprt
-///
-/// \ingroup gr_std_expr
 inline const equal_exprt &to_equal_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_equal);
@@ -1307,7 +1252,6 @@ inline const equal_exprt &to_equal_expr(const exprt &expr)
 }
 
 /// \copydoc to_equal_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline equal_exprt &to_equal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_equal);
@@ -1346,8 +1290,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref notequal_exprt
-///
-/// \ingroup gr_std_expr
 inline const notequal_exprt &to_notequal_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_notequal);
@@ -1358,7 +1300,6 @@ inline const notequal_exprt &to_notequal_expr(const exprt &expr)
 }
 
 /// \copydoc to_notequal_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline notequal_exprt &to_notequal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_notequal);
@@ -1431,8 +1372,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref index_exprt
-///
-/// \ingroup gr_std_expr
 inline const index_exprt &to_index_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index);
@@ -1443,7 +1382,6 @@ inline const index_exprt &to_index_expr(const exprt &expr)
 }
 
 /// \copydoc to_index_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline index_exprt &to_index_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index);
@@ -1495,8 +1433,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref array_of_exprt
-///
-/// \ingroup gr_std_expr
 inline const array_of_exprt &to_array_of_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array_of);
@@ -1507,7 +1443,6 @@ inline const array_of_exprt &to_array_of_expr(const exprt &expr)
 }
 
 /// \copydoc to_array_of_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline array_of_exprt &to_array_of_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array_of);
@@ -1548,8 +1483,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref array_exprt
-///
-/// \ingroup gr_std_expr
 inline const array_exprt &to_array_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array);
@@ -1557,7 +1490,6 @@ inline const array_exprt &to_array_expr(const exprt &expr)
 }
 
 /// \copydoc to_array_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline array_exprt &to_array_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array);
@@ -1612,8 +1544,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref vector_exprt
-///
-/// \ingroup gr_std_expr
 inline const vector_exprt &to_vector_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_vector);
@@ -1621,7 +1551,6 @@ inline const vector_exprt &to_vector_expr(const exprt &expr)
 }
 
 /// \copydoc to_vector_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline vector_exprt &to_vector_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_vector);
@@ -1684,8 +1613,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref union_exprt
-///
-/// \ingroup gr_std_expr
 inline const union_exprt &to_union_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_union);
@@ -1696,7 +1623,6 @@ inline const union_exprt &to_union_expr(const exprt &expr)
 }
 
 /// \copydoc to_union_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline union_exprt &to_union_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_union);
@@ -1740,8 +1666,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref struct_exprt
-///
-/// \ingroup gr_std_expr
 inline const struct_exprt &to_struct_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_struct);
@@ -1749,7 +1673,6 @@ inline const struct_exprt &to_struct_expr(const exprt &expr)
 }
 
 /// \copydoc to_struct_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline struct_exprt &to_struct_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_struct);
@@ -1809,8 +1732,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref complex_exprt
-///
-/// \ingroup gr_std_expr
 inline const complex_exprt &to_complex_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_complex);
@@ -1821,7 +1742,6 @@ inline const complex_exprt &to_complex_expr(const exprt &expr)
 }
 
 /// \copydoc to_complex_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline complex_exprt &to_complex_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_complex);
@@ -1885,8 +1805,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref object_descriptor_exprt
-///
-/// \ingroup gr_std_expr
 inline const object_descriptor_exprt &to_object_descriptor_expr(
   const exprt &expr)
 {
@@ -1898,7 +1816,6 @@ inline const object_descriptor_exprt &to_object_descriptor_expr(
 }
 
 /// \copydoc to_object_descriptor_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline object_descriptor_exprt &to_object_descriptor_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_object_descriptor);
@@ -1958,8 +1875,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref dynamic_object_exprt
-///
-/// \ingroup gr_std_expr
 inline const dynamic_object_exprt &to_dynamic_object_expr(
   const exprt &expr)
 {
@@ -1971,7 +1886,6 @@ inline const dynamic_object_exprt &to_dynamic_object_expr(
 }
 
 /// \copydoc to_dynamic_object_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline dynamic_object_exprt &to_dynamic_object_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_dynamic_object);
@@ -2022,8 +1936,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref typecast_exprt
-///
-/// \ingroup gr_std_expr
 inline const typecast_exprt &to_typecast_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_typecast);
@@ -2034,7 +1946,6 @@ inline const typecast_exprt &to_typecast_expr(const exprt &expr)
 }
 
 /// \copydoc to_typecast_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline typecast_exprt &to_typecast_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_typecast);
@@ -2097,8 +2008,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref floatbv_typecast_exprt
-///
-/// \ingroup gr_std_expr
 inline const floatbv_typecast_exprt &to_floatbv_typecast_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_floatbv_typecast);
@@ -2109,7 +2018,6 @@ inline const floatbv_typecast_exprt &to_floatbv_typecast_expr(const exprt &expr)
 }
 
 /// \copydoc to_floatbv_typecast_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline floatbv_typecast_exprt &to_floatbv_typecast_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_floatbv_typecast);
@@ -2178,8 +2086,6 @@ exprt conjunction(const exprt::operandst &);
 ///
 /// \param expr Source expression
 /// \return Object of type \ref and_exprt
-///
-/// \ingroup gr_std_expr
 inline const and_exprt &to_and_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_and);
@@ -2190,7 +2096,6 @@ inline const and_exprt &to_and_expr(const exprt &expr)
 }
 
 /// \copydoc to_and_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline and_exprt &to_and_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_and);
@@ -2231,8 +2136,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref implies_exprt
-///
-/// \ingroup gr_std_expr
 inline const implies_exprt &to_implies_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_implies);
@@ -2241,7 +2144,6 @@ inline const implies_exprt &to_implies_expr(const exprt &expr)
 }
 
 /// \copydoc to_implies_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline implies_exprt &to_implies_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_implies);
@@ -2307,8 +2209,6 @@ exprt disjunction(const exprt::operandst &);
 ///
 /// \param expr Source expression
 /// \return Object of type \ref or_exprt
-///
-/// \ingroup gr_std_expr
 inline const or_exprt &to_or_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_or);
@@ -2319,7 +2219,6 @@ inline const or_exprt &to_or_expr(const exprt &expr)
 }
 
 /// \copydoc to_or_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline or_exprt &to_or_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_or);
@@ -2360,8 +2259,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref xor_exprt
-///
-/// \ingroup gr_std_expr
 inline const xor_exprt &to_xor_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_xor);
@@ -2369,7 +2266,6 @@ inline const xor_exprt &to_xor_expr(const exprt &expr)
 }
 
 /// \copydoc to_bitxor_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline xor_exprt &to_xor_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_xor);
@@ -2411,8 +2307,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref bitnot_exprt
-///
-/// \ingroup gr_std_expr
 inline const bitnot_exprt &to_bitnot_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitnot);
@@ -2422,7 +2316,6 @@ inline const bitnot_exprt &to_bitnot_expr(const exprt &expr)
 }
 
 /// \copydoc to_bitnot_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline bitnot_exprt &to_bitnot_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitnot);
@@ -2463,8 +2356,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref bitor_exprt
-///
-/// \ingroup gr_std_expr
 inline const bitor_exprt &to_bitor_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitor);
@@ -2475,7 +2366,6 @@ inline const bitor_exprt &to_bitor_expr(const exprt &expr)
 }
 
 /// \copydoc to_bitor_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline bitor_exprt &to_bitor_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitor);
@@ -2520,8 +2410,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref bitxor_exprt
-///
-/// \ingroup gr_std_expr
 inline const bitxor_exprt &to_bitxor_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitxor);
@@ -2532,7 +2420,6 @@ inline const bitxor_exprt &to_bitxor_expr(const exprt &expr)
 }
 
 /// \copydoc to_bitxor_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline bitxor_exprt &to_bitxor_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitxor);
@@ -2578,8 +2465,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref bitand_exprt
-///
-/// \ingroup gr_std_expr
 inline const bitand_exprt &to_bitand_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitand);
@@ -2590,7 +2475,6 @@ inline const bitand_exprt &to_bitand_expr(const exprt &expr)
 }
 
 /// \copydoc to_bitand_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline bitand_exprt &to_bitand_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitand);
@@ -2665,8 +2549,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref shift_exprt
-///
-/// \ingroup gr_std_expr
 inline const shift_exprt &to_shift_expr(const exprt &expr)
 {
   DATA_INVARIANT(
@@ -2676,7 +2558,6 @@ inline const shift_exprt &to_shift_expr(const exprt &expr)
 }
 
 /// \copydoc to_shift_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline shift_exprt &to_shift_expr(exprt &expr)
 {
   DATA_INVARIANT(
@@ -2797,8 +2678,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref replication_exprt
-///
-/// \ingroup gr_std_expr
 inline const replication_exprt &to_replication_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_replication);
@@ -2809,7 +2688,6 @@ inline const replication_exprt &to_replication_expr(const exprt &expr)
 }
 
 /// \copydoc to_replication_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline replication_exprt &to_replication_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_replication);
@@ -2875,8 +2753,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref extractbit_exprt
-///
-/// \ingroup gr_std_expr
 inline const extractbit_exprt &to_extractbit_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_extractbit);
@@ -2887,7 +2763,6 @@ inline const extractbit_exprt &to_extractbit_expr(const exprt &expr)
 }
 
 /// \copydoc to_extractbit_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline extractbit_exprt &to_extractbit_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_extractbit);
@@ -2970,8 +2845,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref extractbits_exprt
-///
-/// \ingroup gr_std_expr
 inline const extractbits_exprt &to_extractbits_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_extractbits);
@@ -2982,7 +2855,6 @@ inline const extractbits_exprt &to_extractbits_expr(const exprt &expr)
 }
 
 /// \copydoc to_extractbits_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline extractbits_exprt &to_extractbits_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_extractbits);
@@ -3031,8 +2903,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref address_of_exprt
-///
-/// \ingroup gr_std_expr
 inline const address_of_exprt &to_address_of_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_address_of);
@@ -3041,7 +2911,6 @@ inline const address_of_exprt &to_address_of_expr(const exprt &expr)
 }
 
 /// \copydoc to_address_of_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline address_of_exprt &to_address_of_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_address_of);
@@ -3081,8 +2950,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref not_exprt
-///
-/// \ingroup gr_std_expr
 inline const not_exprt &to_not_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_not);
@@ -3091,7 +2958,6 @@ inline const not_exprt &to_not_expr(const exprt &expr)
 }
 
 /// \copydoc to_not_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline not_exprt &to_not_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_not);
@@ -3152,8 +3018,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref dereference_exprt
-///
-/// \ingroup gr_std_expr
 inline const dereference_exprt &to_dereference_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_dereference);
@@ -3164,7 +3028,6 @@ inline const dereference_exprt &to_dereference_expr(const exprt &expr)
 }
 
 /// \copydoc to_dereference_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline dereference_exprt &to_dereference_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_dereference);
@@ -3247,8 +3110,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref if_exprt
-///
-/// \ingroup gr_std_expr
 inline const if_exprt &to_if_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_if);
@@ -3259,7 +3120,6 @@ inline const if_exprt &to_if_expr(const exprt &expr)
 }
 
 /// \copydoc to_if_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline if_exprt &to_if_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_if);
@@ -3337,8 +3197,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref with_exprt
-///
-/// \ingroup gr_std_expr
 inline const with_exprt &to_with_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_with);
@@ -3349,7 +3207,6 @@ inline const with_exprt &to_with_expr(const exprt &expr)
 }
 
 /// \copydoc to_with_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline with_exprt &to_with_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_with);
@@ -3399,8 +3256,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref index_designatort
-///
-/// \ingroup gr_std_expr
 inline const index_designatort &to_index_designator(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index_designator);
@@ -3411,7 +3266,6 @@ inline const index_designatort &to_index_designator(const exprt &expr)
 }
 
 /// \copydoc to_index_designator(const exprt &)
-/// \ingroup gr_std_expr
 inline index_designatort &to_index_designator(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index_designator);
@@ -3453,8 +3307,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref member_designatort
-///
-/// \ingroup gr_std_expr
 inline const member_designatort &to_member_designator(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member_designator);
@@ -3465,7 +3317,6 @@ inline const member_designatort &to_member_designator(const exprt &expr)
 }
 
 /// \copydoc to_member_designator(const exprt &)
-/// \ingroup gr_std_expr
 inline member_designatort &to_member_designator(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member_designator);
@@ -3552,8 +3403,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref update_exprt
-///
-/// \ingroup gr_std_expr
 inline const update_exprt &to_update_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_update);
@@ -3564,7 +3413,6 @@ inline const update_exprt &to_update_expr(const exprt &expr)
 }
 
 /// \copydoc to_update_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline update_exprt &to_update_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_update);
@@ -3644,8 +3492,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref array_update_exprt
-///
-/// \ingroup gr_std_expr
 inline const array_update_exprt &to_array_update_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array_update);
@@ -3656,7 +3502,6 @@ inline const array_update_exprt &to_array_update_expr(const exprt &expr)
 }
 
 /// \copydoc to_array_update_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline array_update_exprt &to_array_update_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array_update);
@@ -3760,8 +3605,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref member_exprt
-///
-/// \ingroup gr_std_expr
 inline const member_exprt &to_member_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member);
@@ -3772,7 +3615,6 @@ inline const member_exprt &to_member_expr(const exprt &expr)
 }
 
 /// \copydoc to_member_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline member_exprt &to_member_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member);
@@ -3813,8 +3655,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref isnan_exprt
-///
-/// \ingroup gr_std_expr
 inline const isnan_exprt &to_isnan_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isnan);
@@ -3823,7 +3663,6 @@ inline const isnan_exprt &to_isnan_expr(const exprt &expr)
 }
 
 /// \copydoc to_isnan_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline isnan_exprt &to_isnan_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isnan);
@@ -3862,8 +3701,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref isinf_exprt
-///
-/// \ingroup gr_std_expr
 inline const isinf_exprt &to_isinf_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isinf);
@@ -3874,7 +3711,6 @@ inline const isinf_exprt &to_isinf_expr(const exprt &expr)
 }
 
 /// \copydoc to_isinf_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline isinf_exprt &to_isinf_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isinf);
@@ -3915,8 +3751,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref isfinite_exprt
-///
-/// \ingroup gr_std_expr
 inline const isfinite_exprt &to_isfinite_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isfinite);
@@ -3925,7 +3759,6 @@ inline const isfinite_exprt &to_isfinite_expr(const exprt &expr)
 }
 
 /// \copydoc to_isfinite_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline isfinite_exprt &to_isfinite_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isfinite);
@@ -3964,8 +3797,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref isnormal_exprt
-///
-/// \ingroup gr_std_expr
 inline const isnormal_exprt &to_isnormal_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isnormal);
@@ -3974,7 +3805,6 @@ inline const isnormal_exprt &to_isnormal_expr(const exprt &expr)
 }
 
 /// \copydoc to_isnormal_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline isnormal_exprt &to_isnormal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_isnormal);
@@ -4013,8 +3843,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref ieee_float_equal_exprt
-///
-/// \ingroup gr_std_expr
 inline const ieee_float_equal_exprt &to_ieee_float_equal_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_ieee_float_equal);
@@ -4025,7 +3853,6 @@ inline const ieee_float_equal_exprt &to_ieee_float_equal_expr(const exprt &expr)
 }
 
 /// \copydoc to_ieee_float_equal_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline ieee_float_equal_exprt &to_ieee_float_equal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_ieee_float_equal);
@@ -4068,8 +3895,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref ieee_float_notequal_exprt
-///
-/// \ingroup gr_std_expr
 inline const ieee_float_notequal_exprt &to_ieee_float_notequal_expr(
   const exprt &expr)
 {
@@ -4081,7 +3906,6 @@ inline const ieee_float_notequal_exprt &to_ieee_float_notequal_expr(
 }
 
 /// \copydoc to_ieee_float_notequal_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline ieee_float_notequal_exprt &to_ieee_float_notequal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_ieee_float_notequal);
@@ -4159,8 +3983,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref ieee_float_op_exprt
-///
-/// \ingroup gr_std_expr
 inline const ieee_float_op_exprt &to_ieee_float_op_expr(const exprt &expr)
 {
   DATA_INVARIANT(
@@ -4170,7 +3992,6 @@ inline const ieee_float_op_exprt &to_ieee_float_op_expr(const exprt &expr)
 }
 
 /// \copydoc to_ieee_float_op_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
 {
   DATA_INVARIANT(
@@ -4245,8 +4066,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref constant_exprt
-///
-/// \ingroup gr_std_expr
 inline const constant_exprt &to_constant_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_constant);
@@ -4254,7 +4073,6 @@ inline const constant_exprt &to_constant_expr(const exprt &expr)
 }
 
 /// \copydoc to_constant_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline constant_exprt &to_constant_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_constant);
@@ -4358,8 +4176,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref function_application_exprt
-///
-/// \ingroup gr_std_expr
 inline const function_application_exprt &to_function_application_expr(
   const exprt &expr)
 {
@@ -4371,7 +4187,6 @@ inline const function_application_exprt &to_function_application_expr(
 }
 
 /// \copydoc to_function_application_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline function_application_exprt &to_function_application_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_function_application);
@@ -4425,8 +4240,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref concatenation_exprt
-///
-/// \ingroup gr_std_expr
 inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_concatenation);
@@ -4437,7 +4250,6 @@ inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
 }
 
 /// \copydoc to_concatenation_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline concatenation_exprt &to_concatenation_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_concatenation);
@@ -4521,8 +4333,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref let_exprt
-///
-/// \ingroup gr_std_expr
 inline const let_exprt &to_let_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_let);
@@ -4531,7 +4341,6 @@ inline const let_exprt &to_let_expr(const exprt &expr)
 }
 
 /// \copydoc to_let_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline let_exprt &to_let_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_let);
@@ -4593,8 +4402,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref quantifier_exprt
-///
-/// \ingroup gr_std_expr
 inline const quantifier_exprt &to_quantifier_expr(const exprt &expr)
 {
   DATA_INVARIANT(expr.operands().size()==2,
@@ -4603,7 +4410,6 @@ inline const quantifier_exprt &to_quantifier_expr(const exprt &expr)
 }
 
 /// \copydoc to_quantifier_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline quantifier_exprt &to_quantifier_expr(exprt &expr)
 {
   DATA_INVARIANT(expr.operands().size()==2,
@@ -4676,8 +4482,6 @@ public:
 ///
 /// \param expr Source expression
 /// \return Object of type \ref popcount_exprt
-///
-/// \ingroup gr_std_expr
 inline const popcount_exprt &to_popcount_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_popcount);
@@ -4686,7 +4490,6 @@ inline const popcount_exprt &to_popcount_expr(const exprt &expr)
 }
 
 /// \copydoc to_popcount_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline popcount_exprt &to_popcount_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_popcount);
