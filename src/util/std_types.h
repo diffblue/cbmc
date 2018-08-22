@@ -112,6 +112,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref symbol_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref symbol_typet.
+template <>
+inline bool can_cast_type<symbol_typet>(const typet &type)
+{
+  return type.id() == ID_symbol_type;
+}
+
 /// \brief Cast a typet to a \ref symbol_typet.
 ///
 /// This is an unchecked conversion. \a type must be known to be
@@ -122,24 +131,15 @@ public:
 /// \return Object of type \ref symbol_typet.
 inline const symbol_typet &to_symbol_type(const typet &type)
 {
-  PRECONDITION(type.id() == ID_symbol_type);
+  PRECONDITION(can_cast_type<symbol_typet>(type));
   return static_cast<const symbol_typet &>(type);
 }
 
 /// \copydoc to_symbol_type(const typet &)
 inline symbol_typet &to_symbol_type(typet &type)
 {
-  PRECONDITION(type.id() == ID_symbol_type);
+  PRECONDITION(can_cast_type<symbol_typet>(type));
   return static_cast<symbol_typet &>(type);
-}
-
-/// Check whether a reference to a typet is a \ref symbol_typet.
-/// \param type Source type.
-/// \return True if \param type is a \ref symbol_typet.
-template <>
-inline bool can_cast_type<symbol_typet>(const typet &type)
-{
-  return type.id() == ID_symbol_type;
 }
 
 /// Base type for structs and unions
@@ -253,6 +253,15 @@ public:
   void set_tag(const irep_idt &tag) { set(ID_tag, tag); }
 };
 
+/// Check whether a reference to a typet is a \ref struct_union_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref struct_union_typet.
+template <>
+inline bool can_cast_type<struct_union_typet>(const typet &type)
+{
+  return type.id() == ID_struct || type.id() == ID_union;
+}
+
 /// \brief Cast a typet to a \ref struct_union_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -263,14 +272,14 @@ public:
 /// \return Object of type \ref struct_union_typet
 inline const struct_union_typet &to_struct_union_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_struct || type.id()==ID_union);
+  PRECONDITION(can_cast_type<struct_union_typet>(type));
   return static_cast<const struct_union_typet &>(type);
 }
 
 /// \copydoc to_struct_union_type(const typet &)
 inline struct_union_typet &to_struct_union_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_struct || type.id()==ID_union);
+  PRECONDITION(can_cast_type<struct_union_typet>(type));
   return static_cast<struct_union_typet &>(type);
 }
 
@@ -285,6 +294,15 @@ public:
   bool is_prefix_of(const struct_typet &other) const;
 };
 
+/// Check whether a reference to a typet is a \ref struct_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref struct_typet.
+template <>
+inline bool can_cast_type<struct_typet>(const typet &type)
+{
+  return type.id() == ID_struct;
+}
+
 /// \brief Cast a typet to a \ref struct_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -295,24 +313,15 @@ public:
 /// \return Object of type \ref struct_typet.
 inline const struct_typet &to_struct_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_struct);
+  PRECONDITION(can_cast_type<struct_typet>(type));
   return static_cast<const struct_typet &>(type);
 }
 
 /// \copydoc to_struct_type(const typet &)
 inline struct_typet &to_struct_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_struct);
+  PRECONDITION(can_cast_type<struct_typet>(type));
   return static_cast<struct_typet &>(type);
-}
-
-/// Check whether a reference to a typet is a \ref struct_typet.
-/// \param type Source type.
-/// \return True if \param type is a \ref struct_typet.
-template <>
-inline bool can_cast_type<struct_typet>(const typet &type)
-{
-  return type.id() == ID_struct;
 }
 
 /// Class type
@@ -402,6 +411,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref class_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref class_typet.
+template <>
+inline bool can_cast_type<class_typet>(const typet &type)
+{
+  return can_cast_type<struct_typet>(type) && type.get_bool(ID_C_class);
+}
+
 /// \brief Cast a typet to a \ref class_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -412,24 +430,15 @@ public:
 /// \return Object of type \ref class_typet.
 inline const class_typet &to_class_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_struct);
+  PRECONDITION(can_cast_type<class_typet>(type));
   return static_cast<const class_typet &>(type);
 }
 
 /// \copydoc to_class_type(const typet &)
 inline class_typet &to_class_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_struct);
+  PRECONDITION(can_cast_type<class_typet>(type));
   return static_cast<class_typet &>(type);
-}
-
-/// Check whether a reference to a typet is a \ref class_typet.
-/// \param type Source type.
-/// \return True if \param type is a \ref class_typet.
-template <>
-inline bool can_cast_type<class_typet>(const typet &type)
-{
-  return can_cast_type<struct_typet>(type) && type.get_bool(ID_C_class);
 }
 
 /// The union type
@@ -443,6 +452,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref union_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref union_typet.
+template <>
+inline bool can_cast_type<union_typet>(const typet &type)
+{
+  return type.id() == ID_union;
+}
+
 /// \brief Cast a typet to a \ref union_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -453,14 +471,14 @@ public:
 /// \return Object of type \ref union_typet
 inline const union_typet &to_union_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_union);
+  PRECONDITION(can_cast_type<union_typet>(type));
   return static_cast<const union_typet &>(type);
 }
 
 /// \copydoc to_union_type(const typet &)
 inline union_typet &to_union_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_union);
+  PRECONDITION(can_cast_type<union_typet>(type));
   return static_cast<union_typet &>(type);
 }
 
@@ -486,6 +504,16 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref tag_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref tag_typet.
+template <>
+inline bool can_cast_type<tag_typet>(const typet &type)
+{
+  return type.id() == ID_c_enum_tag || type.id() == ID_struct_tag ||
+         type.id() == ID_union_tag;
+}
+
 /// \brief Cast a typet to a \ref tag_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -496,18 +524,14 @@ public:
 /// \return Object of type \ref tag_typet.
 inline const tag_typet &to_tag_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_c_enum_tag ||
-               type.id()==ID_struct_tag ||
-               type.id()==ID_union_tag);
+  PRECONDITION(can_cast_type<tag_typet>(type));
   return static_cast<const tag_typet &>(type);
 }
 
 /// \copydoc to_tag_type(const typet &)
 inline tag_typet &to_tag_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_c_enum_tag ||
-               type.id()==ID_struct_tag ||
-               type.id()==ID_union_tag);
+  PRECONDITION(can_cast_type<tag_typet>(type));
   return static_cast<tag_typet &>(type);
 }
 
@@ -521,6 +545,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref struct_tag_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref struct_tag_typet.
+template <>
+inline bool can_cast_type<struct_tag_typet>(const typet &type)
+{
+  return type.id() == ID_struct_tag;
+}
+
 /// \brief Cast a typet to a \ref struct_tag_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -531,14 +564,14 @@ public:
 /// \return Object of type \ref struct_tag_typet
 inline const struct_tag_typet &to_struct_tag_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_struct_tag);
+  PRECONDITION(can_cast_type<struct_tag_typet>(type));
   return static_cast<const struct_tag_typet &>(type);
 }
 
 /// \copydoc to_struct_tag_type(const typet &)
 inline struct_tag_typet &to_struct_tag_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_struct_tag);
+  PRECONDITION(can_cast_type<struct_tag_typet>(type));
   return static_cast<struct_tag_typet &>(type);
 }
 
@@ -552,6 +585,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref union_tag_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref union_tag_typet.
+template <>
+inline bool can_cast_type<union_tag_typet>(const typet &type)
+{
+  return type.id() == ID_union_tag;
+}
+
 /// \brief Cast a typet to a \ref union_tag_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -562,14 +604,14 @@ public:
 /// \return Object of type \ref union_tag_typet.
 inline const union_tag_typet &to_union_tag_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_union_tag);
+  PRECONDITION(can_cast_type<union_tag_typet>(type));
   return static_cast<const union_tag_typet &>(type);
 }
 
 /// \copydoc to_union_tag_type(const typet &)
 inline union_tag_typet &to_union_tag_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_union_tag);
+  PRECONDITION(can_cast_type<union_tag_typet>(type));
   return static_cast<union_tag_typet &>(type);
 }
 
@@ -593,6 +635,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref enumeration_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref enumeration_typet.
+template <>
+inline bool can_cast_type<enumeration_typet>(const typet &type)
+{
+  return type.id() == ID_enumeration;
+}
+
 /// \brief Cast a typet to a \ref enumeration_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -603,14 +654,14 @@ public:
 /// \return Object of type \ref enumeration_typet.
 inline const enumeration_typet &to_enumeration_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_enumeration);
+  PRECONDITION(can_cast_type<enumeration_typet>(type));
   return static_cast<const enumeration_typet &>(type);
 }
 
 /// \copydoc to_enumeration_type(const typet &)
 inline enumeration_typet &to_enumeration_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_enumeration);
+  PRECONDITION(can_cast_type<enumeration_typet>(type));
   return static_cast<enumeration_typet &>(type);
 }
 
@@ -648,6 +699,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref c_enum_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref c_enum_typet.
+template <>
+inline bool can_cast_type<c_enum_typet>(const typet &type)
+{
+  return type.id() == ID_c_enum;
+}
+
 /// \brief Cast a typet to a \ref c_enum_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -658,14 +718,14 @@ public:
 /// \return Object of type \ref c_enum_typet.
 inline const c_enum_typet &to_c_enum_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_c_enum);
+  PRECONDITION(can_cast_type<c_enum_typet>(type));
   return static_cast<const c_enum_typet &>(type);
 }
 
 /// \copydoc to_c_enum_type(const typet &)
 inline c_enum_typet &to_c_enum_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_c_enum);
+  PRECONDITION(can_cast_type<c_enum_typet>(type));
   return static_cast<c_enum_typet &>(type);
 }
 
@@ -679,6 +739,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref c_enum_tag_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref c_enum_tag_typet.
+template <>
+inline bool can_cast_type<c_enum_tag_typet>(const typet &type)
+{
+  return type.id() == ID_c_enum_tag;
+}
+
 /// \brief Cast a typet to a \ref c_enum_tag_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -689,14 +758,14 @@ public:
 /// \return Object of type \ref c_enum_tag_typet.
 inline const c_enum_tag_typet &to_c_enum_tag_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_c_enum_tag);
+  PRECONDITION(can_cast_type<c_enum_tag_typet>(type));
   return static_cast<const c_enum_tag_typet &>(type);
 }
 
 /// \copydoc to_c_enum_tag_type(const typet &)
 inline c_enum_tag_typet &to_c_enum_tag_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_c_enum_tag);
+  PRECONDITION(can_cast_type<c_enum_tag_typet>(type));
   return static_cast<c_enum_tag_typet &>(type);
 }
 
@@ -1024,6 +1093,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref incomplete_array_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref incomplete_array_typet.
+template <>
+inline bool can_cast_type<incomplete_array_typet>(const typet &type)
+{
+  return type.id() == ID_array;
+}
+
 /// \brief Cast a typet to an \ref incomplete_array_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1034,14 +1112,14 @@ public:
 /// \return Object of type \ref incomplete_array_typet.
 inline const incomplete_array_typet &to_incomplete_array_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_array);
+  PRECONDITION(can_cast_type<incomplete_array_typet>(type));
   return static_cast<const incomplete_array_typet &>(type);
 }
 
 /// \copydoc to_incomplete_array_type(const typet &)
 inline incomplete_array_typet &to_incomplete_array_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_array);
+  PRECONDITION(can_cast_type<incomplete_array_typet>(type));
   return static_cast<incomplete_array_typet &>(type);
 }
 
@@ -1088,6 +1166,20 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref bitvector_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref bitvector_typet.
+template <>
+inline bool can_cast_type<bitvector_typet>(const typet &type)
+{
+  return type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+         type.id() == ID_fixedbv || type.id() == ID_floatbv ||
+         type.id() == ID_verilog_signedbv ||
+         type.id() == ID_verilog_unsignedbv || type.id() == ID_bv ||
+         type.id() == ID_pointer || type.id() == ID_c_bit_field ||
+         type.id() == ID_c_bool;
+}
+
 /// \brief Cast a typet to a \ref bitvector_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1098,16 +1190,7 @@ public:
 /// \return Object of type \ref bitvector_typet.
 inline const bitvector_typet &to_bitvector_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_signedbv ||
-               type.id()==ID_unsignedbv ||
-               type.id()==ID_fixedbv ||
-               type.id()==ID_floatbv ||
-               type.id()==ID_verilog_signedbv ||
-               type.id()==ID_verilog_unsignedbv ||
-               type.id()==ID_bv ||
-               type.id()==ID_pointer ||
-               type.id()==ID_c_bit_field ||
-               type.id()==ID_c_bool);
+  PRECONDITION(can_cast_type<bitvector_typet>(type));
 
   return static_cast<const bitvector_typet &>(type);
 }
@@ -1115,16 +1198,7 @@ inline const bitvector_typet &to_bitvector_type(const typet &type)
 /// \copydoc to_bitvector_type(const typet &type)
 inline bitvector_typet &to_bitvector_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_signedbv ||
-               type.id()==ID_unsignedbv ||
-               type.id()==ID_fixedbv ||
-               type.id()==ID_floatbv ||
-               type.id()==ID_verilog_signedbv ||
-               type.id()==ID_verilog_unsignedbv ||
-               type.id()==ID_bv ||
-               type.id()==ID_pointer ||
-               type.id()==ID_c_bit_field ||
-               type.id()==ID_c_bool);
+  PRECONDITION(can_cast_type<bitvector_typet>(type));
 
   return static_cast<bitvector_typet &>(type);
 }
@@ -1139,6 +1213,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref bv_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref bv_typet.
+template <>
+inline bool can_cast_type<bv_typet>(const typet &type)
+{
+  return type.id() == ID_bv;
+}
+
 /// \brief Cast a typet to a \ref bv_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1149,14 +1232,14 @@ public:
 /// \return Object of type \ref bv_typet.
 inline const bv_typet &to_bv_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_bv);
+  PRECONDITION(can_cast_type<bv_typet>(type));
   return static_cast<const bv_typet &>(type);
 }
 
 /// \copydoc to_bv_type(const typet &)
 inline bv_typet &to_bv_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_bv);
+  PRECONDITION(can_cast_type<bv_typet>(type));
   return static_cast<bv_typet &>(type);
 }
 
@@ -1176,6 +1259,15 @@ public:
   constant_exprt largest_expr() const;
 };
 
+/// Check whether a reference to a typet is a \ref unsignedbv_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref unsignedbv_typet.
+template <>
+inline bool can_cast_type<unsignedbv_typet>(const typet &type)
+{
+  return type.id() == ID_unsignedbv;
+}
+
 /// \brief Cast a typet to an \ref unsignedbv_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1186,14 +1278,14 @@ public:
 /// \return Object of type \ref unsignedbv_typet.
 inline const unsignedbv_typet &to_unsignedbv_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_unsignedbv);
+  PRECONDITION(can_cast_type<unsignedbv_typet>(type));
   return static_cast<const unsignedbv_typet &>(type);
 }
 
 /// \copydoc to_unsignedbv_type(const typet &)
 inline unsignedbv_typet &to_unsignedbv_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_unsignedbv);
+  PRECONDITION(can_cast_type<unsignedbv_typet>(type));
   return static_cast<unsignedbv_typet &>(type);
 }
 
@@ -1213,6 +1305,15 @@ public:
   constant_exprt largest_expr() const;
 };
 
+/// Check whether a reference to a typet is a \ref signedbv_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref signedbv_typet.
+template <>
+inline bool can_cast_type<signedbv_typet>(const typet &type)
+{
+  return type.id() == ID_signedbv;
+}
+
 /// \brief Cast a typet to a \ref signedbv_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1223,14 +1324,14 @@ public:
 /// \return Object of type \ref signedbv_typet.
 inline const signedbv_typet &to_signedbv_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_signedbv);
+  PRECONDITION(can_cast_type<signedbv_typet>(type));
   return static_cast<const signedbv_typet &>(type);
 }
 
 /// \copydoc to_signedbv_type(const typet &)
 inline signedbv_typet &to_signedbv_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_signedbv);
+  PRECONDITION(can_cast_type<signedbv_typet>(type));
   return static_cast<signedbv_typet &>(type);
 }
 
@@ -1258,6 +1359,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref fixedbv_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref fixedbv_typet.
+template <>
+inline bool can_cast_type<fixedbv_typet>(const typet &type)
+{
+  return type.id() == ID_fixedbv;
+}
+
 /// \brief Cast a typet to a \ref fixedbv_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1268,8 +1378,15 @@ public:
 /// \return Object of type \ref fixedbv_typet.
 inline const fixedbv_typet &to_fixedbv_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_fixedbv);
+  PRECONDITION(can_cast_type<fixedbv_typet>(type));
   return static_cast<const fixedbv_typet &>(type);
+}
+
+/// \copydoc to_fixedbv_type(const typet &)
+inline fixedbv_typet &to_fixedbv_type(typet &type)
+{
+  PRECONDITION(can_cast_type<fixedbv_typet>(type));
+  return static_cast<fixedbv_typet &>(type);
 }
 
 /// Fixed-width bit-vector with IEEE floating-point interpretation
@@ -1294,6 +1411,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref floatbv_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref floatbv_typet.
+template <>
+inline bool can_cast_type<floatbv_typet>(const typet &type)
+{
+  return type.id() == ID_floatbv;
+}
+
 /// \brief Cast a typet to a \ref floatbv_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1304,8 +1430,15 @@ public:
 /// \return Object of type \ref floatbv_typet.
 inline const floatbv_typet &to_floatbv_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_floatbv);
+  PRECONDITION(can_cast_type<floatbv_typet>(type));
   return static_cast<const floatbv_typet &>(type);
+}
+
+/// \copydoc to_floatbv_type(const typet &)
+inline floatbv_typet &to_floatbv_type(typet &type)
+{
+  PRECONDITION(can_cast_type<floatbv_typet>(type));
+  return static_cast<floatbv_typet &>(type);
 }
 
 /// Type for C bit fields
@@ -1320,6 +1453,15 @@ public:
   // These have a sub-type
 };
 
+/// Check whether a reference to a typet is a \ref c_bit_field_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref c_bit_field_typet.
+template <>
+inline bool can_cast_type<c_bit_field_typet>(const typet &type)
+{
+  return type.id() == ID_c_bit_field;
+}
+
 /// \brief Cast a typet to a \ref c_bit_field_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1330,14 +1472,14 @@ public:
 /// \return Object of type \ref c_bit_field_typet.
 inline const c_bit_field_typet &to_c_bit_field_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_c_bit_field);
+  PRECONDITION(can_cast_type<c_bit_field_typet>(type));
   return static_cast<const c_bit_field_typet &>(type);
 }
 
 /// \copydoc to_c_bit_field_type(const typet &type)
 inline c_bit_field_typet &to_c_bit_field_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_c_bit_field);
+  PRECONDITION(can_cast_type<c_bit_field_typet>(type));
   return static_cast<c_bit_field_typet &>(type);
 }
 
@@ -1356,6 +1498,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref pointer_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref pointer_typet.
+template <>
+inline bool can_cast_type<pointer_typet>(const typet &type)
+{
+  return type.id() == ID_pointer;
+}
+
 /// \brief Cast a typet to a \ref pointer_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1366,7 +1517,7 @@ public:
 /// \return Object of type \ref pointer_typet.
 inline const pointer_typet &to_pointer_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_pointer);
+  PRECONDITION(can_cast_type<pointer_typet>(type));
   const pointer_typet &ret = static_cast<const pointer_typet &>(type);
   validate_type(ret);
   return ret;
@@ -1375,19 +1526,10 @@ inline const pointer_typet &to_pointer_type(const typet &type)
 /// \copydoc to_pointer_type(const typet &)
 inline pointer_typet &to_pointer_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_pointer);
+  PRECONDITION(can_cast_type<pointer_typet>(type));
   pointer_typet &ret = static_cast<pointer_typet &>(type);
   validate_type(ret);
   return ret;
-}
-
-/// Check whether a reference to a typet is a \ref pointer_typet.
-/// \param type Source type.
-/// \return True if \param type is a \ref pointer_typet.
-template <>
-inline bool can_cast_type<pointer_typet>(const typet &type)
-{
-  return type.id() == ID_pointer;
 }
 
 inline void validate_type(const pointer_typet &type)
@@ -1410,6 +1552,16 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref reference_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref reference_typet.
+template <>
+inline bool can_cast_type<reference_typet>(const typet &type)
+{
+  return can_cast_type<pointer_typet>(type) && type.get_bool(ID_C_reference) &&
+         !type.get(ID_width).empty();
+}
+
 /// \brief Cast a typet to a \ref reference_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1420,16 +1572,14 @@ public:
 /// \return Object of type \ref reference_typet.
 inline const reference_typet &to_reference_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_pointer && type.get_bool(ID_C_reference));
-  PRECONDITION(!type.get(ID_width).empty());
+  PRECONDITION(can_cast_type<reference_typet>(type));
   return static_cast<const reference_typet &>(type);
 }
 
 /// \copydoc to_reference_type(const typet &)
 inline reference_typet &to_reference_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_pointer && type.get_bool(ID_C_reference));
-  PRECONDITION(!type.get(ID_width).empty());
+  PRECONDITION(can_cast_type<reference_typet>(type));
   return static_cast<reference_typet &>(type);
 }
 
@@ -1451,6 +1601,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref c_bool_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref c_bool_typet.
+template <>
+inline bool can_cast_type<c_bool_typet>(const typet &type)
+{
+  return type.id() == ID_c_bool;
+}
+
 /// \brief Cast a typet to a \ref c_bool_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1461,14 +1620,14 @@ public:
 /// \return Object of type \ref c_bool_typet.
 inline const c_bool_typet &to_c_bool_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_c_bool);
+  PRECONDITION(can_cast_type<c_bool_typet>(type));
   return static_cast<const c_bool_typet &>(type);
 }
 
 /// \copydoc to_c_bool_type(const typet &)
 inline c_bool_typet &to_c_bool_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_c_bool);
+  PRECONDITION(can_cast_type<c_bool_typet>(type));
   return static_cast<c_bool_typet &>(type);
 }
 
@@ -1483,6 +1642,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref string_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref string_typet.
+template <>
+inline bool can_cast_type<string_typet>(const typet &type)
+{
+  return type.id() == ID_string;
+}
+
 /// \brief Cast a typet to a \ref string_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1493,8 +1661,15 @@ public:
 /// \return Object of type \ref string_typet.
 inline const string_typet &to_string_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_string);
+  PRECONDITION(can_cast_type<string_typet>(type));
   return static_cast<const string_typet &>(type);
+}
+
+/// \copydoc to_string_type(const typet &)
+inline string_typet &to_string_type(typet &type)
+{
+  PRECONDITION(can_cast_type<string_typet>(type));
+  return static_cast<string_typet &>(type);
 }
 
 /// A type for subranges of integers
@@ -1514,6 +1689,15 @@ public:
   void set_to(const mp_integer &to);
 };
 
+/// Check whether a reference to a typet is a \ref range_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref range_typet.
+template <>
+inline bool can_cast_type<range_typet>(const typet &type)
+{
+  return type.id() == ID_range;
+}
+
 /// \brief Cast a typet to a \ref range_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1524,8 +1708,15 @@ public:
 /// \return Object of type \ref range_typet.
 inline const range_typet &to_range_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_range);
+  PRECONDITION(can_cast_type<range_typet>(type));
   return static_cast<const range_typet &>(type);
+}
+
+/// \copydoc to_range_type(const typet &)
+inline range_typet &to_range_type(typet &type)
+{
+  PRECONDITION(can_cast_type<range_typet>(type));
+  return static_cast<range_typet &>(type);
 }
 
 /// The vector type
@@ -1557,6 +1748,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref vector_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref vector_typet.
+template <>
+inline bool can_cast_type<vector_typet>(const typet &type)
+{
+  return type.id() == ID_vector;
+}
+
 /// \brief Cast a typet to a \ref vector_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1567,14 +1767,14 @@ public:
 /// \return Object of type \ref vector_typet.
 inline const vector_typet &to_vector_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_vector);
+  PRECONDITION(can_cast_type<vector_typet>(type));
   return static_cast<const vector_typet &>(type);
 }
 
 /// \copydoc to_vector_type(const typet &)
 inline vector_typet &to_vector_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_vector);
+  PRECONDITION(can_cast_type<vector_typet>(type));
   return static_cast<vector_typet &>(type);
 }
 
@@ -1592,6 +1792,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref complex_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref complex_typet.
+template <>
+inline bool can_cast_type<complex_typet>(const typet &type)
+{
+  return type.id() == ID_complex;
+}
+
 /// \brief Cast a typet to a \ref complex_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1602,14 +1811,14 @@ public:
 /// \return Object of type \ref complex_typet.
 inline const complex_typet &to_complex_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_complex);
+  PRECONDITION(can_cast_type<complex_typet>(type));
   return static_cast<const complex_typet &>(type);
 }
 
 /// \copydoc to_complex_type(const typet &)
 inline complex_typet &to_complex_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_complex);
+  PRECONDITION(can_cast_type<complex_typet>(type));
   return static_cast<complex_typet &>(type);
 }
 
@@ -1686,6 +1895,15 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a \ref mathematical_function_typet.
+/// \param type Source type.
+/// \return True if \param type is a \ref mathematical_function_typet.
+template <>
+inline bool can_cast_type<mathematical_function_typet>(const typet &type)
+{
+  return type.id() == ID_mathematical_function;
+}
+
 /// \brief Cast a typet to a \ref mathematical_function_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
@@ -1697,7 +1915,7 @@ public:
 inline const mathematical_function_typet &
   to_mathematical_function_type(const typet &type)
 {
-  PRECONDITION(type.id()==ID_mathematical_function);
+  PRECONDITION(can_cast_type<mathematical_function_typet>(type));
   return static_cast<const mathematical_function_typet &>(type);
 }
 
@@ -1705,7 +1923,7 @@ inline const mathematical_function_typet &
 inline mathematical_function_typet &
   to_mathematical_function_type(typet &type)
 {
-  PRECONDITION(type.id()==ID_mathematical_function);
+  PRECONDITION(can_cast_type<mathematical_function_typet>(type));
   return static_cast<mathematical_function_typet &>(type);
 }
 
