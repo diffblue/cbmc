@@ -1,10 +1,14 @@
 /*******************************************************************\
 
-Module:
+Module: Pre-defined types
 
 Author: Daniel Kroening, kroening@kroening.com
+        Maria Svorenova, maria.svorenova@diffblue.com
 
 \*******************************************************************/
+
+/// \file
+/// Pre-defined types
 
 #include "std_types.h"
 
@@ -26,6 +30,7 @@ std::size_t floatbv_typet::get_f() const
   return unsafe_string2unsigned(id2string(f));
 }
 
+/// Return the sequence number of the component with given name.
 std::size_t struct_union_typet::component_number(
   const irep_idt &component_name) const
 {
@@ -48,6 +53,7 @@ std::size_t struct_union_typet::component_number(
   return 0;
 }
 
+/// Get the reference to a component with given name.
 const struct_union_typet::componentt &struct_union_typet::get_component(
   const irep_idt &component_name) const
 {
@@ -73,6 +79,10 @@ typet struct_union_typet::component_type(
   return c.type();
 }
 
+/// Returns true if the struct is a prefix of \a other, i.e., if this struct
+/// has n components then the component types and names of this struct must
+/// match the first n components of \a other struct.
+/// \param other Struct type to compare with.
 bool struct_typet::is_prefix_of(const struct_typet &other) const
 {
   const componentst &ot_components=other.components();
@@ -102,12 +112,14 @@ bool struct_typet::is_prefix_of(const struct_typet &other) const
   return true; // ok, *this is a prefix of ot
 }
 
+/// Returns true if the type is a reference.
 bool is_reference(const typet &type)
 {
   return type.id()==ID_pointer &&
          type.get_bool(ID_C_reference);
 }
 
+/// Returns if the type is an R value reference.
 bool is_rvalue_reference(const typet &type)
 {
   return type.id()==ID_pointer &&
