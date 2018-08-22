@@ -577,6 +577,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   goto_programt::const_targett after_loop=loop_end;
   ++after_loop;
   assert(after_loop!=goto_program.instructions.end());
+
+  copy_source_location(target, w);
+
   if(target->get_target()==after_loop)
   {
     w.cond()=not_exprt(target->guard);
