@@ -120,7 +120,7 @@ public:
   bool formatted;
 
   // for function call/return
-  irep_idt identifier;
+  irep_idt function_identifier;
 
   /*! \brief outputs the trace step in ASCII to a given stream
   */

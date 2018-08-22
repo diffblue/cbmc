@@ -190,11 +190,12 @@ void convert(
         xml_call_return.set_attribute("thread", std::to_string(step.thread_nr));
         xml_call_return.set_attribute("step_nr", std::to_string(step.step_nr));
 
-        const symbolt &symbol=ns.lookup(step.identifier);
+        const symbolt &symbol = ns.lookup(step.function_identifier);
         xmlt &xml_function=xml_call_return.new_element("function");
         xml_function.set_attribute(
           "display_name", id2string(symbol.display_name()));
-        xml_function.set_attribute("identifier", id2string(step.identifier));
+        xml_function.set_attribute(
+          "identifier", id2string(step.function_identifier));
         xml_function.new_element()=xml(symbol.location);
 
         if(xml_location.name!="")

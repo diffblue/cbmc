@@ -309,7 +309,7 @@ void build_goto_trace(
       goto_trace_step.format_string = SSA_step.format_string;
       goto_trace_step.io_id = SSA_step.io_id;
       goto_trace_step.formatted = SSA_step.formatted;
-      goto_trace_step.identifier = SSA_step.identifier;
+      goto_trace_step.function_identifier = SSA_step.function_identifier;
 
       // update internal field for specific variables in the counterexample
       update_internal_field(SSA_step, goto_trace_step, ns);

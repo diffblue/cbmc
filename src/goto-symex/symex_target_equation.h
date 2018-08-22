@@ -74,13 +74,13 @@ public:
   // record a function call
   virtual void function_call(
     const exprt &guard,
-    const irep_idt &identifier,
+    const irep_idt &function_identifier,
     const sourcet &source);
 
   // record return from a function
   virtual void function_return(
     const exprt &guard,
-    const irep_idt &identifier,
+    const irep_idt &function_identifier,
     const sourcet &source);
 
   // just record a location
@@ -230,7 +230,7 @@ public:
     std::list<exprt> converted_io_args;
 
     // for function call/return
-    irep_idt identifier;
+    irep_idt function_identifier;
 
     // for SHARED_READ/SHARED_WRITE and ATOMIC_BEGIN/ATOMIC_END
     unsigned atomic_section_id=0;
