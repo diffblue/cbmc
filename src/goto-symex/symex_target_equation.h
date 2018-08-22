@@ -75,6 +75,7 @@ public:
   virtual void function_call(
     const exprt &guard,
     const irep_idt &function_identifier,
+    const std::vector<exprt> &ssa_function_arguments,
     const sourcet &source);
 
   // record return from a function
@@ -163,6 +164,7 @@ public:
   void convert_constraints(decision_proceduret &decision_procedure) const;
   void convert_goto_instructions(prop_convt &prop_conv);
   void convert_guards(prop_convt &prop_conv);
+  void convert_function_calls(decision_proceduret &decision_procedure);
   void convert_io(decision_proceduret &decision_procedure);
 
   exprt make_expression() const;
@@ -231,6 +233,10 @@ public:
 
     // for function call/return
     irep_idt function_identifier;
+
+    // for function calls
+    std::vector<exprt> ssa_function_arguments,
+                       converted_function_arguments;
 
     // for SHARED_READ/SHARED_WRITE and ATOMIC_BEGIN/ATOMIC_END
     unsigned atomic_section_id=0;

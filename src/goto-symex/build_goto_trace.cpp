@@ -304,12 +304,17 @@ void build_goto_trace(
       {
         goto_trace_step.lhs_object.make_nil();
       }
+
       goto_trace_step.type = SSA_step.type;
       goto_trace_step.hidden = SSA_step.hidden;
       goto_trace_step.format_string = SSA_step.format_string;
       goto_trace_step.io_id = SSA_step.io_id;
       goto_trace_step.formatted = SSA_step.formatted;
       goto_trace_step.function_identifier = SSA_step.function_identifier;
+      goto_trace_step.function_arguments = SSA_step.converted_function_arguments;
+
+      for(auto &arg : goto_trace_step.function_arguments)
+        arg = prop_conv.get(arg);
 
       // update internal field for specific variables in the counterexample
       update_internal_field(SSA_step, goto_trace_step, ns);
