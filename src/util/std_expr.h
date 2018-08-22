@@ -41,7 +41,7 @@ public:
 /// Cast a generic exprt to a \ref transt
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// transt.
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref transt
 inline const transt &to_trans_expr(const exprt &expr)
 {
@@ -81,21 +81,21 @@ public:
   }
 
   /// Constructor
-  /// \param identifier Name of symbol
+  /// \param identifier: Name of symbol
   explicit symbol_exprt(const irep_idt &identifier):exprt(ID_symbol)
   {
     set_identifier(identifier);
   }
 
   /// Constructor
-  /// \param type Type of symbol
+  /// \param type: Type of symbol
   explicit symbol_exprt(const typet &type):exprt(ID_symbol, type)
   {
   }
 
   /// Constructor
-  /// \param identifier Name of symbol
-  /// \param type Type of symbol
+  /// \param identifier: Name of symbol
+  /// \param type: Type of symbol
   symbol_exprt(
     const irep_idt &identifier,
     const typet &type):exprt(ID_symbol, type)
@@ -124,22 +124,22 @@ public:
   }
 
   /// Constructor
-  /// \param identifier Name of symbol
+  /// \param identifier: Name of symbol
   explicit decorated_symbol_exprt(const irep_idt &identifier):
     symbol_exprt(identifier)
   {
   }
 
   /// Constructor
-  /// \param type Type of symbol
+  /// \param type: Type of symbol
   explicit decorated_symbol_exprt(const typet &type):
     symbol_exprt(type)
   {
   }
 
   /// Constructor
-  /// \param identifier Name of symbol
-  /// \param  type Type of symbol
+  /// \param identifier: Name of symbol
+  /// \param : type Type of symbol
   decorated_symbol_exprt(
     const irep_idt &identifier,
     const typet &type):symbol_exprt(identifier, type)
@@ -182,7 +182,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// symbol_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref symbol_exprt
 inline const symbol_exprt &to_symbol_expr(const exprt &expr)
 {
@@ -214,8 +214,8 @@ class nondet_symbol_exprt:public exprt
 {
 public:
   /// \brief Constructor
-  /// \param identifier Name of symbol
-  /// \param  type Type of symbol
+  /// \param identifier: Name of symbol
+  /// \param : type Type of symbol
   nondet_symbol_exprt(
     const irep_idt &identifier,
     const typet &type):exprt(ID_nondet_symbol, type)
@@ -239,7 +239,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// nondet_symbol_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref nondet_symbol_exprt
 inline const nondet_symbol_exprt &to_nondet_symbol_expr(const exprt &expr)
 {
@@ -320,7 +320,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// unary_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref unary_exprt
 inline const unary_exprt &to_unary_expr(const exprt &expr)
 {
@@ -364,7 +364,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// abs_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref abs_exprt
 inline const abs_exprt &to_abs_expr(const exprt &expr)
 {
@@ -421,7 +421,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// unary_minus_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref unary_minus_exprt
 inline const unary_minus_exprt &to_unary_minus_expr(const exprt &expr)
 {
@@ -483,7 +483,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// bswap_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref bswap_exprt
 inline const bswap_exprt &to_bswap_expr(const exprt &expr)
 {
@@ -547,7 +547,7 @@ public:
 };
 
 /// \brief A generic base class for expressions that are predicates,
-///        i.e., Boolean-typed, and that take exactly one argument.
+///        i.e., boolean-typed, and that take exactly one argument.
 class unary_predicate_exprt:public unary_exprt
 {
 public:
@@ -635,7 +635,7 @@ protected:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// binary_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref binary_exprt
 inline const binary_exprt &to_binary_expr(const exprt &expr)
 {
@@ -661,7 +661,7 @@ template<> inline bool can_cast_expr<binary_exprt>(const exprt &base)
 
 
 /// \brief A generic base class for expressions that are predicates,
-///        i.e., Boolean-typed, and that take exactly two arguments.
+///        i.e., boolean-typed, and that take exactly two arguments.
 class binary_predicate_exprt:public binary_exprt
 {
 public:
@@ -729,7 +729,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// binary_relation_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref binary_relation_exprt
 inline const binary_relation_exprt &to_binary_relation_expr(const exprt &expr)
 {
@@ -797,7 +797,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// multi_ary_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref multi_ary_exprt
 inline const multi_ary_exprt &to_multi_ary_expr(const exprt &expr)
 {
@@ -840,7 +840,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// plus_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref plus_exprt
 inline const plus_exprt &to_plus_expr(const exprt &expr)
 {
@@ -892,7 +892,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// minus_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref minus_exprt
 inline const minus_exprt &to_minus_expr(const exprt &expr)
 {
@@ -944,7 +944,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// mult_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref mult_exprt
 inline const mult_exprt &to_mult_expr(const exprt &expr)
 {
@@ -996,7 +996,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// div_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref div_exprt
 inline const div_exprt &to_div_expr(const exprt &expr)
 {
@@ -1048,7 +1048,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// mod_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref mod_exprt
 inline const mod_exprt &to_mod_expr(const exprt &expr)
 {
@@ -1096,7 +1096,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// rem_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref rem_exprt
 inline const rem_exprt &to_rem_expr(const exprt &expr)
 {
@@ -1145,7 +1145,7 @@ class power_exprt:public binary_exprt
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// power_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref power_exprt
 inline const power_exprt &to_power_expr(const exprt &expr)
 {
@@ -1193,7 +1193,7 @@ class factorial_power_exprt:public binary_exprt
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// factorial_power_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref factorial_power_exprt
 inline const factorial_power_exprt &to_factorial_power_expr(const exprt &expr)
 {
@@ -1244,7 +1244,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// equal_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref equal_exprt
 inline const equal_exprt &to_equal_expr(const exprt &expr)
 {
@@ -1290,7 +1290,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// notequal_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref notequal_exprt
 inline const notequal_exprt &to_notequal_expr(const exprt &expr)
 {
@@ -1372,7 +1372,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// index_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref index_exprt
 inline const index_exprt &to_index_expr(const exprt &expr)
 {
@@ -1433,7 +1433,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// array_of_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref array_of_exprt
 inline const array_of_exprt &to_array_of_expr(const exprt &expr)
 {
@@ -1483,7 +1483,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// array_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref array_exprt
 inline const array_exprt &to_array_expr(const exprt &expr)
 {
@@ -1544,7 +1544,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// vector_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref vector_exprt
 inline const vector_exprt &to_vector_expr(const exprt &expr)
 {
@@ -1613,7 +1613,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// union_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref union_exprt
 inline const union_exprt &to_union_expr(const exprt &expr)
 {
@@ -1666,7 +1666,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// struct_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref struct_exprt
 inline const struct_exprt &to_struct_expr(const exprt &expr)
 {
@@ -1732,7 +1732,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// complex_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref complex_exprt
 inline const complex_exprt &to_complex_expr(const exprt &expr)
 {
@@ -1805,7 +1805,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// object_descriptor_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref object_descriptor_exprt
 inline const object_descriptor_exprt &to_object_descriptor_expr(
   const exprt &expr)
@@ -1875,7 +1875,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// dynamic_object_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref dynamic_object_exprt
 inline const dynamic_object_exprt &to_dynamic_object_expr(
   const exprt &expr)
@@ -1936,7 +1936,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// typecast_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref typecast_exprt
 inline const typecast_exprt &to_typecast_expr(const exprt &expr)
 {
@@ -2008,7 +2008,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// floatbv_typecast_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref floatbv_typecast_exprt
 inline const floatbv_typecast_exprt &to_floatbv_typecast_expr(const exprt &expr)
 {
@@ -2086,7 +2086,7 @@ exprt conjunction(const exprt::operandst &);
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// and_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref and_exprt
 inline const and_exprt &to_and_expr(const exprt &expr)
 {
@@ -2136,7 +2136,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// implies_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref implies_exprt
 inline const implies_exprt &to_implies_expr(const exprt &expr)
 {
@@ -2209,7 +2209,7 @@ exprt disjunction(const exprt::operandst &);
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// or_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref or_exprt
 inline const or_exprt &to_or_expr(const exprt &expr)
 {
@@ -2259,7 +2259,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// xor_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref xor_exprt
 inline const xor_exprt &to_xor_expr(const exprt &expr)
 {
@@ -2307,7 +2307,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// bitnot_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref bitnot_exprt
 inline const bitnot_exprt &to_bitnot_expr(const exprt &expr)
 {
@@ -2356,7 +2356,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// bitor_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref bitor_exprt
 inline const bitor_exprt &to_bitor_expr(const exprt &expr)
 {
@@ -2410,7 +2410,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// bitxor_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref bitxor_exprt
 inline const bitxor_exprt &to_bitxor_expr(const exprt &expr)
 {
@@ -2465,7 +2465,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// bitand_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref bitand_exprt
 inline const bitand_exprt &to_bitand_expr(const exprt &expr)
 {
@@ -2549,7 +2549,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// shift_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref shift_exprt
 inline const shift_exprt &to_shift_expr(const exprt &expr)
 {
@@ -2678,7 +2678,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// replication_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref replication_exprt
 inline const replication_exprt &to_replication_expr(const exprt &expr)
 {
@@ -2753,7 +2753,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// extractbit_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref extractbit_exprt
 inline const extractbit_exprt &to_extractbit_expr(const exprt &expr)
 {
@@ -2845,7 +2845,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// extractbits_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref extractbits_exprt
 inline const extractbits_exprt &to_extractbits_expr(const exprt &expr)
 {
@@ -2903,7 +2903,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// address_of_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref address_of_exprt
 inline const address_of_exprt &to_address_of_expr(const exprt &expr)
 {
@@ -2950,7 +2950,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// not_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref not_exprt
 inline const not_exprt &to_not_expr(const exprt &expr)
 {
@@ -3018,7 +3018,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// dereference_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref dereference_exprt
 inline const dereference_exprt &to_dereference_expr(const exprt &expr)
 {
@@ -3110,7 +3110,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// if_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref if_exprt
 inline const if_exprt &to_if_expr(const exprt &expr)
 {
@@ -3197,7 +3197,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// with_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref with_exprt
 inline const with_exprt &to_with_expr(const exprt &expr)
 {
@@ -3256,7 +3256,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// index_designatort.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref index_designatort
 inline const index_designatort &to_index_designator(const exprt &expr)
 {
@@ -3307,7 +3307,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// member_designatort.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref member_designatort
 inline const member_designatort &to_member_designator(const exprt &expr)
 {
@@ -3403,7 +3403,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// update_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref update_exprt
 inline const update_exprt &to_update_expr(const exprt &expr)
 {
@@ -3492,7 +3492,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// array_update_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref array_update_exprt
 inline const array_update_exprt &to_array_update_expr(const exprt &expr)
 {
@@ -3605,7 +3605,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// member_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref member_exprt
 inline const member_exprt &to_member_expr(const exprt &expr)
 {
@@ -3655,7 +3655,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// isnan_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref isnan_exprt
 inline const isnan_exprt &to_isnan_expr(const exprt &expr)
 {
@@ -3701,7 +3701,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// isinf_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref isinf_exprt
 inline const isinf_exprt &to_isinf_expr(const exprt &expr)
 {
@@ -3751,7 +3751,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// isfinite_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref isfinite_exprt
 inline const isfinite_exprt &to_isfinite_expr(const exprt &expr)
 {
@@ -3797,7 +3797,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// isnormal_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref isnormal_exprt
 inline const isnormal_exprt &to_isnormal_expr(const exprt &expr)
 {
@@ -3843,7 +3843,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// ieee_float_equal_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref ieee_float_equal_exprt
 inline const ieee_float_equal_exprt &to_ieee_float_equal_expr(const exprt &expr)
 {
@@ -3895,7 +3895,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// ieee_float_notequal_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref ieee_float_notequal_exprt
 inline const ieee_float_notequal_exprt &to_ieee_float_notequal_expr(
   const exprt &expr)
@@ -3983,7 +3983,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// ieee_float_op_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref ieee_float_op_exprt
 inline const ieee_float_op_exprt &to_ieee_float_op_expr(const exprt &expr)
 {
@@ -4066,7 +4066,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// constant_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref constant_exprt
 inline const constant_exprt &to_constant_expr(const exprt &expr)
 {
@@ -4176,7 +4176,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// function_application_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref function_application_exprt
 inline const function_application_exprt &to_function_application_expr(
   const exprt &expr)
@@ -4240,7 +4240,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// concatenation_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref concatenation_exprt
 inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
 {
@@ -4333,7 +4333,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// let_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref let_exprt
 inline const let_exprt &to_let_expr(const exprt &expr)
 {
@@ -4402,7 +4402,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// quantifier_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref quantifier_exprt
 inline const quantifier_exprt &to_quantifier_expr(const exprt &expr)
 {
@@ -4482,7 +4482,7 @@ public:
 /// This is an unchecked conversion. \a expr must be known to be \ref
 /// popcount_exprt.
 ///
-/// \param expr Source expression
+/// \param expr: Source expression
 /// \return Object of type \ref popcount_exprt
 inline const popcount_exprt &to_popcount_expr(const exprt &expr)
 {
