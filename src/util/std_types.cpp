@@ -197,16 +197,6 @@ constant_exprt unsignedbv_typet::largest_expr() const
   return from_integer(largest(), *this);
 }
 
-/// Returns true if the type is a rational, real, integer, natural, complex,
-/// unsignedbv, signedbv, floatbv or fixedbv.
-bool is_number(const typet &type)
-{
-  const irep_idt &id = type.id();
-  return id == ID_rational || id == ID_real || id == ID_integer ||
-         id == ID_natural || id == ID_complex || id == ID_unsignedbv ||
-         id == ID_signedbv || id == ID_floatbv || id == ID_fixedbv;
-}
-
 /// Identify whether a given type is constant itself or contains constant
 /// components.
 /// Examples include:

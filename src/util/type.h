@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// modeled with two subs named “subtype” (a single type) and “subtypes”
 /// (a vector of types). The class typet only adds specialized methods
 /// for accessing the subtype information to the interface of irept.
-/// For pre-defined types see `std_types.h`.
+/// For pre-defined types see `std_types.h` and `mathematical_types.h`.
 class typet:public irept
 {
 public:

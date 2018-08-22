@@ -13,10 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file util/std_expr.h
 /// API to expression classes
 
-#include "invariant.h"
-#include "std_types.h"
 #include "expr_cast.h"
-
+#include "invariant.h"
+#include "mathematical_types.h"
+#include "std_types.h"
 
 /// Transition system, consisting of state invariant, initial state predicate,
 /// and transition predicate.
