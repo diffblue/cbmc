@@ -399,7 +399,7 @@ exprt::operandst java_build_arguments(
 
       init_code.add(
         generate_nondet_switch(
-          id2string(function.base_name) + "_" + std::to_string(param_number),
+          id2string(function.name) + "_" + std::to_string(param_number),
           cases,
           java_int_type(),
           function.location,

@@ -46,7 +46,7 @@ symbol_exprt generate_nondet_int(
   // Declare a symbol for the non deterministic integer.
   const symbol_exprt &nondet_symbol = get_fresh_aux_symbol(
                                         int_type,
-                                        name_prefix + "::nondet_int",
+                                        name_prefix,
                                         "nondet_int",
                                         source_location,
                                         ID_java,
