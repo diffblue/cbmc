@@ -15,7 +15,7 @@ CPROVER codebase.
 See detailed documentation at \ref irept.
 
 [irept](\ref irept)s are generic tree nodes. You
-should think of each node as holding a single string ([data](irept::data),
+should think of each node as holding a single string ([data](\ref irept::data),
 actually an \ref irep_idt) and lots of child nodes, some of which are numbered
 ([sub](\ref irept::dt::sub)) and some of which are labelled, and the label
 can either start with a “\#” ([comments](\ref irept::dt::comments)) or without
