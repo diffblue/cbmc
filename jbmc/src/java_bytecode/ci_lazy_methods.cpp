@@ -103,15 +103,12 @@ bool ci_lazy_methodst::operator()(
 
   // Add any extra entry points specified; we should elaborate these in the
   // same way as the main function.
-  std::vector<irep_idt> extra_entry_points;
   for(const auto &extra_function_generator : lazy_methods_extra_entry_points)
   {
-    const auto &extra_methods = extra_function_generator(symbol_table);
-    extra_entry_points.insert(
-      extra_entry_points.end(), extra_methods.begin(), extra_methods.end());
+    std::vector<irep_idt> extra_methods =
+      extra_function_generator(symbol_table);
+    methods_to_convert_later.insert(extra_methods.begin(), extra_methods.end());
   }
-  methods_to_convert_later.insert(
-    extra_entry_points.begin(), extra_entry_points.end());
 
   std::unordered_set<irep_idt> instantiated_classes;
 
@@ -300,9 +297,7 @@ ci_lazy_methodst::convert_and_analyze_method(
     symbol_table,
     pointer_type_selector);
 
-  const bool could_not_convert_function =
-    method_converter(method_name, needed_methods);
-  if(could_not_convert_function)
+  if(method_converter(method_name, needed_methods))
     return result;
 
   const exprt &method_body = symbol_table.lookup_ref(method_name).value;
