@@ -16,7 +16,7 @@ class solver_resource_limitst
 {
 public:
   /// Set the limit for the solver to time out in seconds
-  virtual void set_time_limit_seconds(uint32_t) = 0;
+  virtual bool set_time_limit_seconds(uint32_t) = 0;
 
   virtual ~solver_resource_limitst() = default;
 };

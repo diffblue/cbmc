@@ -691,7 +691,7 @@ int jbmc_parse_optionst::get_goto_program(
     if(goto_model_ptr == nullptr)
       return CPROVER_EXIT_INTERNAL_ERROR;
 
-    goto_modelt &goto_model = dynamic_cast<goto_modelt &>(*goto_model_ptr);
+    goto_modelt &goto_model = static_cast<goto_modelt &>(*goto_model_ptr);
 
     if(cmdline.isset("validate-goto-model"))
     {

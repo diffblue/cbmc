@@ -135,7 +135,7 @@ goto_tracet single_path_symex_checkert::build_shortest_trace() const
   {
     // NOLINTNEXTLINE(whitespace/braces)
     counterexample_beautificationt{ui_message_handler}(
-      dynamic_cast<boolbvt &>(property_decider->get_solver()),
+      static_cast<boolbvt &>(property_decider->get_solver()),
       property_decider->get_equation());
   }
 

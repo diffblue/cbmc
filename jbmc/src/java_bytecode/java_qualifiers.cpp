@@ -56,7 +56,7 @@ void java_qualifierst::write(typet &src) const
 qualifierst &java_qualifierst::operator+=(const qualifierst &other)
 {
   c_qualifierst::operator+=(other);
-  auto jq = dynamic_cast<const java_qualifierst *>(&other);
+  auto jq = static_cast<const java_qualifierst *>(&other);
   if(jq != nullptr)
   {
     std::copy(
@@ -69,7 +69,7 @@ qualifierst &java_qualifierst::operator+=(const qualifierst &other)
 
 bool java_qualifierst::operator==(const qualifierst &other) const
 {
-  auto jq = dynamic_cast<const java_qualifierst *>(&other);
+  auto jq = static_cast<const java_qualifierst *>(&other);
   if(jq == nullptr)
     return false;
   return c_qualifierst::operator==(other) && annotations == jq->annotations;
@@ -79,7 +79,7 @@ bool java_qualifierst::is_subset_of(const qualifierst &other) const
 {
   if(!c_qualifierst::is_subset_of(other))
     return false;
-  auto jq = dynamic_cast<const java_qualifierst *>(&other);
+  auto jq = static_cast<const java_qualifierst *>(&other);
   if(jq == nullptr)
     return annotations.empty();
   auto &other_a = jq->annotations;

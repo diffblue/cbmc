@@ -50,6 +50,11 @@ public:
   // returns true if an assumption is in the final conflict
   virtual bool is_in_conflict(literalt l) const;
   virtual bool has_is_in_conflict() const { return false; }
+
+  virtual bool set_time_limit_seconds(uint32_t)
+  {
+    return false;
+  }
 };
 
 #endif // CPROVER_SOLVERS_PROP_PROP_CONV_H

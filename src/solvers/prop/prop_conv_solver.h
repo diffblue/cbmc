@@ -98,9 +98,10 @@ public:
     return symbols;
   }
 
-  void set_time_limit_seconds(uint32_t lim) override
+  bool set_time_limit_seconds(uint32_t lim) override
   {
     prop.set_time_limit_seconds(lim);
+    return true;
   }
 
   std::size_t get_number_of_solver_calls() const override;

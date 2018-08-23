@@ -71,12 +71,8 @@ void rd_range_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
-  reaching_definitions_analysist *rd=
-    dynamic_cast<reaching_definitions_analysist*>(&ai);
-  INVARIANT_STRUCTURED(
-    rd!=nullptr,
-    bad_cast_exceptiont,
-    "ai has type reaching_definitions_analysist");
+  reaching_definitions_analysist *rd =
+    static_cast<reaching_definitions_analysist *>(&ai);
 
   assert(bv_container);
 

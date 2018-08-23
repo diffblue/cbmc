@@ -143,8 +143,8 @@ void constant_propagator_domaint::transform(
   // information about dirty variables and config flags are
   // available. Otherwise, the below will be null and we use default
   // values
-  const constant_propagator_ait *cp=
-    dynamic_cast<constant_propagator_ait *>(&ai);
+  const constant_propagator_ait *cp =
+    static_cast<constant_propagator_ait *>(&ai);
   bool have_dirty=(cp!=nullptr);
 
   // Transform on a domain that is bottom is possible

@@ -83,17 +83,7 @@ void solver_factoryt::set_prop_conv_time_limit(prop_convt &prop_conv)
 
   if(timeout_seconds > 0)
   {
-    solver_resource_limitst *solver =
-      dynamic_cast<solver_resource_limitst *>(&prop_conv);
-    if(solver == nullptr)
-    {
-      messaget log(message_handler);
-      log.warning() << "cannot set solver time limit on "
-                    << prop_conv.decision_procedure_text() << messaget::eom;
-      return;
-    }
-
-    solver->set_time_limit_seconds(timeout_seconds);
+    prop_conv.set_time_limit_seconds(timeout_seconds);
   }
 }
 

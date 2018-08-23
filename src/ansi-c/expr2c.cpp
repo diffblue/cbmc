@@ -190,7 +190,7 @@ std::string expr2ct::convert_rec(
   const std::string &declarator)
 {
   std::unique_ptr<qualifierst> clone = qualifiers.clone();
-  c_qualifierst &new_qualifiers = dynamic_cast<c_qualifierst &>(*clone);
+  c_qualifierst &new_qualifiers = static_cast<c_qualifierst &>(*clone);
   new_qualifiers.read(src);
 
   std::string q=new_qualifiers.as_string();

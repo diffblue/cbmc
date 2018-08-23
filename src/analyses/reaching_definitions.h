@@ -355,7 +355,7 @@ public:
   {
     statet &s=concurrency_aware_ait<rd_range_domaint>::get_state(l);
 
-    rd_range_domaint *rd_state=dynamic_cast<rd_range_domaint*>(&s);
+    rd_range_domaint *rd_state = static_cast<rd_range_domaint *>(&s);
     INVARIANT_STRUCTURED(
       rd_state!=nullptr,
       bad_cast_exceptiont,

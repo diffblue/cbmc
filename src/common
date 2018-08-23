@@ -34,11 +34,11 @@ endif
   CP_CFLAGS = -MMD -MP
   CXXFLAGS ?= -Wall -O2
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
-  CP_CXXFLAGS += -MMD -MP -mmacosx-version-min=10.9 -std=c++11 -stdlib=libc++
+  CP_CXXFLAGS += -fno-rtti -MMD -MP -mmacosx-version-min=10.9 -std=c++11 -stdlib=libc++
   LINKFLAGS += -mmacosx-version-min=10.9 -stdlib=libc++
   LINKNATIVE += -mmacosx-version-min=10.9 -stdlib=libc++
 else
-  CP_CXXFLAGS += -MMD -MP -std=c++11
+  CP_CXXFLAGS += -fno-rtti -MMD -MP -std=c++11
 endif
 ifeq ($(filter -O%,$(CXXFLAGS)),)
   CP_CXXFLAGS += -O2
@@ -102,7 +102,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
-  CP_CXXFLAGS += -MMD -MP -std=c++11 -U__STRICT_ANSI__
+  CP_CXXFLAGS += -fno-rtti -MMD -MP -std=c++11 -U__STRICT_ANSI__
   # Cygwin-g++ has problems with statically linking exception code.
   # If linking fails, remove -static.
   LINKFLAGS = -static -std=c++11
@@ -133,7 +133,7 @@ else ifeq ($(BUILD_ENV_),MSVC)
   DEPEXT = .dep
   EXEEXT = .exe
   CFLAGS ?= /W3 /O2 /GF
-  CXXFLAGS ?= /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF
+  CXXFLAGS ?= /GR- /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF
   CP_CFLAGS =
   CP_CXXFLAGS +=
   LINKLIB = lib /NOLOGO /OUT:$@ $^
