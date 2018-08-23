@@ -154,6 +154,30 @@ SCENARIO("Compound blocks should have a location")
     "/* 20 */    }                            \n"
     "/* 21 */  }                              \n",
     {{ID_ifthenelse, 4}, {ID_while, 6}, {ID_while, 13}, {ID_while, 15}});
+
+  checker.check(
+    "/*  1 */  int main()                     \n"
+    "/*  2 */  {                              \n"
+    "/*  3 */    for(int i = 0; i < 1; ++i)   \n"
+    "/*  4 */    {                            \n"
+    "/*  5 */      int x;                     \n"
+    "/*  6 */    }                            \n"
+    "/*  7 */  }                              \n",
+    {{ID_for, 3}});
+
+  checker.check(
+    "/*  1 */  int main()                     \n"
+    "/*  2 */  {                              \n"
+    "/*  3 */    for(int i = 0; i < 1; ++i)   \n"
+    "/*  4 */    {                            \n"
+    "/*  5 */      int x;                     \n"
+    "/*  6 */      for(int j = 0; j < 3; ++j) \n"
+    "/*  7 */      {                          \n"
+    "/*  8 */        int y;                   \n"
+    "/*  9 */      }                          \n"
+    "/* 10 */    }                            \n"
+    "/* 11 */  }                              \n",
+    {{ID_for, 3}, {ID_for, 6}});
 }
 
 void compound_block_locationst::check(

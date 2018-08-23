@@ -636,6 +636,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     w.body().operands().pop_back();
     f.iter().id(ID_side_effect);
 
+    copy_source_location(target, f);
+
     f.body().swap(w.body());
 
     f.swap(w);
