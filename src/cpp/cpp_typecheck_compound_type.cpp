@@ -740,10 +740,10 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         exprt::operandst ops;
         ops.push_back(value);
-        codet defcode =
-          cpp_constructor(source_locationt(), symexpr, ops);
+        auto defcode = cpp_constructor(source_locationt(), symexpr, ops);
+        CHECK_RETURN(defcode.has_value());
 
-        new_symbol->value.swap(defcode);
+        new_symbol->value.swap(defcode.value());
       }
     }
   }

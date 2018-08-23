@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 
 /// \return typechecked code
-codet cpp_typecheckt::cpp_destructor(
+optionalt<codet> cpp_typecheckt::cpp_destructor(
   const source_locationt &source_location,
   const exprt &object)
 {
@@ -31,10 +31,7 @@ codet cpp_typecheckt::cpp_destructor(
 
   // PODs don't need a destructor
   if(cpp_is_pod(tmp_type))
-  {
-    new_code.make_nil();
-    return new_code;
-  }
+    return {};
 
   if(tmp_type.id()==ID_array)
   {
@@ -42,11 +39,7 @@ codet cpp_typecheckt::cpp_destructor(
       to_array_type(tmp_type).size();
 
     if(size_expr.id()=="infinity")
-    {
-      // don't initialize
-      new_code.make_nil();
-      return new_code;
-    }
+      return {}; // don't initialize
 
     exprt tmp_size=size_expr;
     make_constant_index(tmp_size);
@@ -73,9 +66,9 @@ codet cpp_typecheckt::cpp_destructor(
       index_exprt index(object, constant);
       index.add_source_location()=source_location;
 
-      exprt i_code = cpp_destructor(source_location, index);
-
-      new_code.move_to_operands(i_code);
+      auto i_code = cpp_destructor(source_location, index);
+      if(i_code.has_value())
+        new_code.move_to_operands(i_code.value());
     }
   }
   else

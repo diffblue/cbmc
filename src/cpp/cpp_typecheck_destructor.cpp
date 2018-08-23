@@ -144,11 +144,11 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
 
     const bool disabled_access_control = disable_access_control;
     disable_access_control = true;
-    codet dtor_code = cpp_destructor(source_location, member);
+    auto dtor_code = cpp_destructor(source_location, member);
     disable_access_control = disabled_access_control;
 
-    if(dtor_code.is_not_nil())
-      block.move_to_operands(dtor_code);
+    if(dtor_code.has_value())
+      block.move_to_operands(dtor_code.value());
   }
 
   const irept::subt &bases=symbol.type.find(ID_bases).get_sub();
@@ -169,11 +169,11 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
 
     const bool disabled_access_control = disable_access_control;
     disable_access_control = true;
-    exprt dtor_code = cpp_destructor(source_location, object);
+    auto dtor_code = cpp_destructor(source_location, object);
     disable_access_control = disabled_access_control;
 
-    if(dtor_code.is_not_nil())
-      block.move_to_operands(dtor_code);
+    if(dtor_code.has_value())
+      block.move_to_operands(dtor_code.value());
   }
 
   return block;

@@ -178,11 +178,15 @@ void cpp_typecheckt::convert_non_template_declaration(
     if(symbol.is_lvalue &&
        declarator.init_args().has_operands())
     {
-      symbol.value=
-        cpp_constructor(
-          symbol.location,
-          cpp_symbol_expr(symbol),
-          declarator.init_args().operands());
+      auto constructor = cpp_constructor(
+        symbol.location,
+        cpp_symbol_expr(symbol),
+        declarator.init_args().operands());
+
+      if(constructor.has_value())
+        symbol.value = constructor.value();
+      else
+        symbol.value = nil_exprt();
     }
   }
 }

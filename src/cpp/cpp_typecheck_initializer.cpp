@@ -180,10 +180,13 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     exprt::operandst ops;
     ops.push_back(symbol.value);
 
-    symbol.value = cpp_constructor(
-      symbol.value.source_location(),
-      expr_symbol,
-      ops);
+    auto constructor =
+      cpp_constructor(symbol.value.source_location(), expr_symbol, ops);
+
+    if(constructor.has_value())
+      symbol.value = constructor.value();
+    else
+      symbol.value = nil_exprt();
   }
 }
 

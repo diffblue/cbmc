@@ -852,13 +852,13 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
     throw 0;
   }
 
-  exprt code=
-    cpp_constructor(
-      expr.find_source_location(),
-      object_expr,
-      initializer.operands());
+  auto code = cpp_constructor(
+    expr.find_source_location(), object_expr, initializer.operands());
 
-  expr.add(ID_initializer).swap(code);
+  if(code.has_value())
+    expr.add(ID_initializer).swap(code.value());
+  else
+    expr.add(ID_initializer) = nil_exprt();
 
   // we add the size of the object for convenience of the
   // runtime library
@@ -1074,15 +1074,16 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
 
   already_typechecked(new_object);
 
-  codet destructor_code=cpp_destructor(
-    expr.source_location(),
-    new_object);
+  auto destructor_code = cpp_destructor(expr.source_location(), new_object);
 
-  // this isn't typechecked yet
-  if(destructor_code.is_not_nil())
-    typecheck_code(destructor_code);
-
-  expr.set(ID_destructor, destructor_code);
+  if(destructor_code.has_value())
+  {
+    // this isn't typechecked yet
+    typecheck_code(destructor_code.value());
+    expr.set(ID_destructor, destructor_code.value());
+  }
+  else
+    expr.set(ID_destructor, nil_exprt());
 }
 
 void cpp_typecheckt::typecheck_expr_typecast(exprt &)
