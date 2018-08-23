@@ -115,13 +115,8 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
 
         auto i_code = cpp_constructor(source_location, index, tmp_operands);
 
-        if(!i_code.has_value())
-        {
-          new_code.is_nil();
-          break;
-        }
-
-        new_code.move(i_code.value());
+        if(i_code.has_value())
+          new_code.move(i_code.value());
       }
       return new_code;
     }
