@@ -1,7 +1,7 @@
 \ingroup module_hidden 
 \page compilation-and-development Compilation and Development
 
-\author Martin Brain, Peter Schrammel
+\author Martin Brain, Peter Schrammel, Owen Jones
 
 \section compilation-and-development-section-compilation Compilation
 
@@ -14,13 +14,13 @@ The CBMC source code is available on
 Instructions for compiling CBMC using makefiles are
 available in
 [COMPILING.md](https://github.com/diffblue/cbmc/blob/develop/COMPILING.md#what-architecture)
-in the root of the CBMC repository. They cover linux, Solaris 11,
+in the root of the CBMC repository. They cover Linux, Solaris 11,
 FreeBSD 11, MacOS X and Windows.
 
 
 \subsection compilation-and-development-subsection-cmake-files CMake files
 
-There is experimental support for compiling using CMake. Instructions are
+There is also support for compiling using CMake. Instructions are
 available in
 [COMPILING.md](https://github.com/diffblue/cbmc/blob/develop/COMPILING.md#working-with-cmake-experimental)
 in the root of the CBMC repository.
@@ -55,14 +55,14 @@ print statements and code checking that data structures are as expected.
 
 \subsection compilation-and-development-subsection-regression-tests Regression tests
 
-The regression tests are contained in the `regression/` folder. Inside
-`regression/` there is a directory for each of the tools/modules. Each of
-these contains multiple test directories, with names describing
+The regression tests are contained in `regression/` and `jbmc/regression/`.
+Inside these folders there is a directory for each of the tools/modules. Each
+of these contains multiple test directories, with names describing
 what they test. When there are multiple tests in a test directory then
-they should all be testing the same thing. Each test directory contains
-input files and one or more test description files,
+they should be testing very similar aspects of the program's behaviour. Each
+test directory contains input files and one or more test description files,
 which have the ending `.desc`. The test description files describe what command
-to run, what output is expected and so on. The test framework is an in-house
+to run, what output is expected and so on. The test framework is a
 Perl script,
 [test.pl](https://github.com/diffblue/cbmc/blob/develop/regression/test.pl).
 To run all the tests in a directory corresponding to a tool or module:
@@ -70,11 +70,16 @@ To run all the tests in a directory corresponding to a tool or module:
     ../test.pl -c PATH_TO_CBMC
 
 The `--help` option to `test.pl` gives instructions for use and outlines the
-format of the test description files.
+format of the test description files. Most importantly, the first word in a
+test description file is its level, which is one of: `CORE` (should be run in
+CI, should succeed), `THOROUGH` (takes too long to be run in CI, should
+succeed), `FUTURE` (will succeed when a planned feature is added) or
+`KNOWNBUG` (will succeed when a bug is fixed).
 
 If you have compiled CBMC using CMake then another way to run the same tests
 is through `CTest`. From the build directory, the command `ctest -V -L CORE`
-will run all of the tests that are run in CI. `-V` makes it print out more
+will run all of the tests that are  labelled CORE in the desc files and unit
+tests. `-V` makes it print out more
 useful output and `-L CORE` makes it only run tests that have been tagged
 `CORE`. `-R regular_expression` can be used to limit which tests are run, and
 `-N` makes it lists which tests it will run without actually running them. 
@@ -132,10 +137,10 @@ C++ code can be automatically reformatted in the correct way by running
 \section compilation-and-development-section-linting Linting
 
 There is also a linting script, `scripts/cpplint.py`. There is a wrapper
-script to run `cpplint.py` only on lines that have been changed from the
-base branch:
+script to run `cpplint.py` only on lines that differ from another
+branch, e.g. to run it on lines that have been changed from `develop`:
 
-    scripts/run_lint.sh <base-branch>
+    scripts/run_lint.sh develop
 
 There are also instructions for adding this as a git pre-commit hook in
 [CODING_STANDARD.md](https://github.com/diffblue/cbmc/blob/develop/CODING_STANDARD.md#pre-commit-hook-to-run-cpplint-locally).
