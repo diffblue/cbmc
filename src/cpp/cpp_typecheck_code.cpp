@@ -446,7 +446,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   code.swap(new_code);
 }
 
-void cpp_typecheckt::typecheck_block(codet &code)
+void cpp_typecheckt::typecheck_block(code_blockt &code)
 {
   cpp_save_scopet saved_scope(cpp_scopes);
   cpp_scopes.new_block_scope();

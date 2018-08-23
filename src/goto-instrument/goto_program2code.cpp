@@ -1681,12 +1681,9 @@ static bool has_labels(const codet &code)
   return false;
 }
 
-static bool move_label_ifthenelse(
-    exprt &expr,
-    exprt &label_dest)
+static bool move_label_ifthenelse(exprt &expr, exprt &label_dest)
 {
-  if(expr.is_nil() ||
-      to_code(expr).get_statement()!=ID_block)
+  if(expr.is_nil() || to_code(expr).get_statement() != ID_block)
     return false;
 
   code_blockt &block=to_code_block(to_code(expr));

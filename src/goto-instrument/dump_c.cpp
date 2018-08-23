@@ -621,7 +621,7 @@ void dump_ct::cleanup_decl(
     system_headers);
   p2s();
 
-  POSTCONDITION(b.operands().size()==1);
+  POSTCONDITION(b.statements().size() == 1);
   decl.swap(b.op0());
 }
 
@@ -943,10 +943,8 @@ void dump_ct::cleanup_harness(code_blockt &b)
     decls.add(d);
   }
 
-  Forall_operands(it, b)
+  for(auto &code : b.statements())
   {
-    codet &code=to_code(*it);
-
     if(code.get_statement()==ID_function_call)
     {
       exprt &func=to_code_function_call(code).function();
