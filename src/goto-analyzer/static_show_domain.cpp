@@ -34,7 +34,7 @@ void static_show_domain(
   else if(options.get_bool_option("dot") &&
           options.get_bool_option("dependence-graph"))
   {
-    const dependence_grapht *d=dynamic_cast<const dependence_grapht*>(&ai);
+    const dependence_grapht *d = static_cast<const dependence_grapht *>(&ai);
     INVARIANT(d!=nullptr,
               "--dependence-graph sets ai to be a dependence_graph");
 

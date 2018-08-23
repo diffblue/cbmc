@@ -229,7 +229,7 @@ safety_checkert::resultt bmct::stop_on_fail()
     {
       if(options.get_bool_option("beautify"))
         counterexample_beautificationt()(
-          dynamic_cast<boolbvt &>(prop_conv), equation);
+          static_cast<boolbvt &>(prop_conv), equation);
 
       build_error_trace(
         error_trace, ns, equation, prop_conv, ui_message_handler);

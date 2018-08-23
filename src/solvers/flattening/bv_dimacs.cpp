@@ -34,7 +34,7 @@ bool bv_dimacst::write_dimacs()
 
 bool bv_dimacst::write_dimacs(std::ostream &out)
 {
-  dynamic_cast<dimacs_cnft &>(prop).write_dimacs_cnf(out);
+  static_cast<dimacs_cnft &>(prop).write_dimacs_cnf(out);
 
   // we dump the mapping variable<->literals
   for(const auto &s : get_symbols())

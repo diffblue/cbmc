@@ -47,13 +47,13 @@ template <class E>
 void util_rethrow_if_nested(const E &e)
 {
 #ifndef DISABLE_NESTED_EXCEPTIONS
-  std::rethrow_if_nested(e);
+//  std::rethrow_if_nested(e);
 #else
   // Check we've not already thrown the non_nested_support_exception
-  if(!dynamic_cast<const non_nested_exception_support *>(&e))
-  {
-    throw non_nested_exception_support();
-  }
+//  if(!dynamic_cast<const non_nested_exception_support *>(&e))
+//  {
+//    throw non_nested_exception_support();
+//  }
 #endif
 }
 

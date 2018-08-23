@@ -287,7 +287,7 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
     {
       if(options.get_bool_option("beautify"))
         counterexample_beautificationt()(
-          dynamic_cast<boolbvt &>(bmc.prop_conv), bmc.equation);
+          static_cast<boolbvt &>(bmc.prop_conv), bmc.equation);
 
       build_error_trace(
         bmc.error_trace,

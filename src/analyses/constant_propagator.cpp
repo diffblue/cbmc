@@ -140,6 +140,7 @@ void constant_propagator_domaint::transform(
   output(std::cout, ai, ns);
 #endif
 
+#if 0
   // When the domain is used with constant_propagator_ait,
   // information about dirty variables and config flags are
   // available. Otherwise, the below will be null and we use default
@@ -281,6 +282,7 @@ void constant_propagator_domaint::transform(
 #ifdef DEBUG
   std::cout << "After:\n";
   output(std::cout, ai, ns);
+#endif
 #endif
 }
 
