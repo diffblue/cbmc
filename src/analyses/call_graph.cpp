@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "call_graph.h"
 
+#include <goto-programs/compute_called_functions.h>
+
 #include <util/std_expr.h>
 #include <util/xml.h>
 
@@ -303,4 +305,28 @@ optionalt<std::size_t> call_grapht::directed_grapht::get_node_index(
     return optionalt<node_indext>();
   else
     return findit->second;
+}
+
+/// return true, in case name has a CPROVER prefix, or contains a '$' character
+static bool is_internal_name(const irep_idt &name)
+{
+  return has_prefix(id2string(name), CPROVER_PREFIX) ||
+         id2string(name).find('$') != std::string::npos;
+}
+
+void call_grapht::drop_internal_functions()
+{
+  nodest keep_nodes;
+  for(auto &node : nodes)
+    if(!is_internal_name(node))
+      keep_nodes.insert(node);
+
+  nodes.swap(keep_nodes);
+
+  edgest keep_edges;
+  for(auto &edge : edges)
+    if(!is_internal_name(edge.first) && !is_internal_name(edge.second))
+      keep_edges.insert(edge);
+
+  edges.swap(keep_edges);
 }

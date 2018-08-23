@@ -157,6 +157,9 @@ public:
 
   directed_grapht get_directed_graph() const;
 
+  /// Remove all nodes and edges that refer to internal functions
+  void drop_internal_functions();
+
 protected:
   void add(const irep_idt &function,
            const goto_programt &body);
