@@ -178,6 +178,58 @@ SCENARIO("Compound blocks should have a location")
     "/* 10 */    }                            \n"
     "/* 11 */  }                              \n",
     {{ID_for, 3}, {ID_for, 6}});
+
+  // In the absence of a better place to put it, the source location of a
+  // do-while block is equal to the source location of its first statement.
+
+  checker.check(
+    "/*  1 */  int main()                     \n"
+    "/*  2 */  {                              \n"
+    "/*  3 */    do                           \n"
+    "/*  4 */    {                            \n"
+    "/*  5 */      int x;                     \n"
+    "/*  6 */    } while(1);                  \n"
+    "/*  7 */  }                              \n",
+    {{ID_dowhile, 5}});
+
+  checker.check(
+    "/*  1 */  int main()                     \n"
+    "/*  2 */  {                              \n"
+    "/*  3 */    do                           \n"
+    "/*  4 */    {                            \n"
+    "/*  5 */      int x;                     \n"
+    "/*  6 */      int y;                     \n"
+    "/*  7 */      int z = x + y;             \n"
+    "/*  8 */    } while(1);                  \n"
+    "/*  9 */  }                              \n",
+    {{ID_dowhile, 5}});
+
+  checker.check(
+    "/*  1 */  int main()                     \n"
+    "/*  2 */  {                              \n"
+    "/*  3 */    int x;                       \n"
+    "/*  4 */    do                           \n"
+    "/*  5 */    {                            \n"
+    "/*  6 */      int x;                     \n"
+    "/*  7 */      int y;                     \n"
+    "/*  8 */      int z = x + y;             \n"
+    "/*  9 */    } while(x);                  \n"
+    "/* 10 */  }                              \n",
+    {{ID_dowhile, 6}});
+
+  checker.check(
+    "/*  1 */  int main()                     \n"
+    "/*  2 */  {                              \n"
+    "/*  3 */    int x;                       \n"
+    "/*  4 */    if(x)                        \n"
+    "/*  5 */    {                            \n"
+    "/*  6 */      do                         \n"
+    "/*  7 */      {                          \n"
+    "/*  8 */        int y;                   \n"
+    "/*  9 */      } while(x);                \n"
+    "/* 10 */    }                            \n"
+    "/* 11 */  }                              \n",
+    {{ID_ifthenelse, 4}, {ID_dowhile, 8}});
 }
 
 void compound_block_locationst::check(

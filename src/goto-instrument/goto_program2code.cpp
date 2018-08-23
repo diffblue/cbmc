@@ -526,6 +526,8 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
   simplify(d.cond(), ns);
   d.body()=code_blockt();
 
+  copy_source_location(loop_end->targets.front(), d);
+
   loop_last_stack.push_back(std::make_pair(loop_end, true));
 
   for( ; target!=loop_end; ++target)
@@ -658,6 +660,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
       w.body().operands().pop_back();
       d.body().swap(w.body());
+
+      copy_source_location(target, d);
 
       d.swap(w);
     }
