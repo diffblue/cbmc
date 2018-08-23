@@ -37,8 +37,17 @@ class depth_iteratort;
 class const_depth_iteratort;
 class const_unique_depth_iteratort;
 
-/*! \brief Base class for all expressions
-*/
+/// Base class for all expressions.
+/// Inherits from \ref irept and has operands (stored as unnamed children of
+/// `irept`), and a type (which is a named sub with identifier `ID_type`).
+/// The class contains functions to access and modify the operands, as well as
+/// visitor utilities.
+///
+/// The example below shows the irept structure of the sum of integers
+/// 3 and 5.
+/// \dotfile expr.dot
+/// Some context available here: \ref exprt_section
+/// "exprt section in util module"
 class exprt:public irept
 {
 public:
@@ -52,14 +61,14 @@ public:
     add(ID_type, _type);
   }
 
-  // returns the type of the expression
+  /// Return the type of the expression
   typet &type() { return static_cast<typet &>(add(ID_type)); }
   const typet &type() const
   {
     return static_cast<const typet &>(find(ID_type));
   }
 
-  // returns true if there is at least one operand
+  /// Return true if there is at least one operand.
   bool has_operands() const
   { return !operands().empty(); }
 
@@ -96,16 +105,14 @@ public:
   void reserve_operands(operandst::size_type n)
   { operands().reserve(n) ; }
 
-  // destroys expr, e1, e2, e3
   void move_to_operands(exprt &expr);
   void move_to_operands(exprt &e1, exprt &e2);
   void move_to_operands(exprt &e1, exprt &e2, exprt &e3);
-  // does not destroy expr, e1, e2, e3
+
   void copy_to_operands(const exprt &expr);
   void copy_to_operands(const exprt &e1, const exprt &e2);
   void copy_to_operands(const exprt &e1, const exprt &e2, const exprt &e3);
 
-  // the following are deprecated -- use constructors instead
   void make_typecast(const typet &_type);
   void make_not();
 
