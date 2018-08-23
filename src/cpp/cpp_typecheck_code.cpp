@@ -327,16 +327,17 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         // it's a data member
         already_typechecked(symbol_expr);
 
-        exprt call=
+        auto call =
           cpp_constructor(code.source_location(), symbol_expr, code.operands());
 
-        if(call.is_nil())
+        if(call.has_value())
+          code.swap(call.value());
+        else
         {
-          call=codet(ID_skip);
-          call.add_source_location()=code.source_location();
+          auto source_location = code.source_location();
+          code = codet(ID_skip);
+          code.add_source_location() = source_location;
         }
-
-        code.swap(call);
       }
     }
     else
@@ -434,14 +435,11 @@ void cpp_typecheckt::typecheck_decl(codet &code)
 
       already_typechecked(object_expr);
 
-      exprt constructor_call=
-        cpp_constructor(
-          symbol.location,
-          object_expr,
-          declarator.init_args().operands());
+      auto constructor_call = cpp_constructor(
+        symbol.location, object_expr, declarator.init_args().operands());
 
-      if(constructor_call.is_not_nil())
-        new_code.move_to_operands(constructor_call);
+      if(constructor_call.has_value())
+        new_code.move_to_operands(constructor_call.value());
     }
   }
 

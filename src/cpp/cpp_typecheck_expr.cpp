@@ -852,13 +852,13 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
     throw 0;
   }
 
-  exprt code=
-    cpp_constructor(
-      expr.find_source_location(),
-      object_expr,
-      initializer.operands());
+  auto code = cpp_constructor(
+    expr.find_source_location(), object_expr, initializer.operands());
 
-  expr.add(ID_initializer).swap(code);
+  if(code.has_value())
+    expr.add(ID_initializer).swap(code.value());
+  else
+    expr.add(ID_initializer) = nil_exprt();
 
   // we add the size of the object for convenience of the
   // runtime library

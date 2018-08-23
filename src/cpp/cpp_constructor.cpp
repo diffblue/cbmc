@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \param object: non-typechecked object
 /// \param operands: non-typechecked operands
 /// \return typechecked code
-codet cpp_typecheckt::cpp_constructor(
+optionalt<codet> cpp_typecheckt::cpp_constructor(
   const source_locationt &source_location,
   const exprt &object,
   const exprt::operandst &operands)
@@ -56,22 +56,13 @@ codet cpp_typecheckt::cpp_constructor(
     assert(operands.empty() || operands.size()==1);
 
     if(operands.empty() && cpp_is_pod(tmp_type))
-    {
-      codet nil;
-      nil.make_nil();
-      return nil;
-    }
+      return {};
 
     const exprt &size_expr=
       to_array_type(tmp_type).size();
 
     if(size_expr.id() == ID_infinity)
-    {
-      // don't initialize
-      codet nil;
-      nil.make_nil();
-      return nil;
-    }
+      return {}; // don't initialize
 
     exprt tmp_size=size_expr;
     make_constant_index(tmp_size);
@@ -122,23 +113,21 @@ codet cpp_typecheckt::cpp_constructor(
           tmp_operands.push_back(operand);
         }
 
-        exprt i_code =
-          cpp_constructor(source_location, index, tmp_operands);
+        auto i_code = cpp_constructor(source_location, index, tmp_operands);
 
-        if(i_code.is_nil())
+        if(!i_code.has_value())
         {
           new_code.is_nil();
           break;
         }
 
-        new_code.move_to_operands(i_code);
+        new_code.move(i_code.value());
       }
       return new_code;
     }
   }
   else if(cpp_is_pod(tmp_type))
   {
-    code_expressiont new_code;
     exprt::operandst operands_tc=operands;
 
     for(exprt::operandst::iterator
@@ -153,7 +142,7 @@ codet cpp_typecheckt::cpp_constructor(
     if(operands_tc.empty())
     {
       // a POD is NOT initialized
-      new_code.make_nil();
+      return {};
     }
     else if(operands_tc.size()==1)
     {
@@ -163,7 +152,9 @@ codet cpp_typecheckt::cpp_constructor(
       side_effect_exprt assign(ID_assign, typet(), source_location);
       assign.copy_to_operands(object_tc, operands_tc.front());
       typecheck_side_effect_assignment(assign);
+      code_expressiont new_code;
       new_code.expression()=assign;
+      return new_code;
     }
     else
     {
@@ -172,8 +163,6 @@ codet cpp_typecheckt::cpp_constructor(
                  "but got " << operands.size() << eom;
       throw 0;
     }
-
-    return new_code;
   }
   else if(tmp_type.id()==ID_union)
   {
@@ -293,9 +282,7 @@ codet cpp_typecheckt::cpp_constructor(
   else
     UNREACHABLE;
 
-  codet nil;
-  nil.make_nil();
-  return nil;
+  return {};
 }
 
 void cpp_typecheckt::new_temporary(
@@ -316,15 +303,14 @@ void cpp_typecheckt::new_temporary(
 
   already_typechecked(new_object);
 
-  codet new_code =
-    cpp_constructor(source_location, new_object, ops);
+  auto new_code = cpp_constructor(source_location, new_object, ops);
 
-  if(new_code.is_not_nil())
+  if(new_code.has_value())
   {
-    if(new_code.get(ID_statement)==ID_assign)
-      tmp_object_expr.move_to_operands(new_code.op1());
+    if(new_code->get_statement() == ID_assign)
+      tmp_object_expr.move_to_operands(new_code->op1());
     else
-      tmp_object_expr.add(ID_initializer)=new_code;
+      tmp_object_expr.add(ID_initializer) = *new_code;
   }
 
   temporary.swap(tmp_object_expr);

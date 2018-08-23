@@ -188,11 +188,10 @@ void cpp_typecheckt::static_and_dynamic_initialization()
       // use default constructor
       exprt::operandst ops;
 
-      codet call=
-        cpp_constructor(symbol.location, symbol_expr, ops);
+      auto call = cpp_constructor(symbol.location, symbol_expr, ops);
 
-      if(call.is_not_nil())
-        init_block.move_to_operands(call);
+      if(call.has_value())
+        init_block.move(call.value());
     }
   }
 

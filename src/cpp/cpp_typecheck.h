@@ -99,7 +99,7 @@ public:
 
   bool cpp_is_pod(const typet &type) const;
 
-  codet cpp_constructor(
+  optionalt<codet> cpp_constructor(
     const source_locationt &source_location,
     const exprt &object,
     const exprt::operandst &operands);
