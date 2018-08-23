@@ -202,9 +202,9 @@ helpful for GUI-based tasks, e.g., the class viewer, debugging, etc., and can
 be used for building with MSBuild.  Note that you still need to run flex/bison
 using "make generated_files" before opening the project.
 
-# WORKING WITH CMAKE (EXPERIMENTAL)
+# WORKING WITH CMAKE
 
-There is an experimental build based on CMake instead of hand-written
+There is also a build based on CMake instead of hand-written
 makefiles. It should work on a wider variety of systems than the standard
 makefile build, and can integrate better with IDEs and static-analysis tools.
 On Windows, the CMake build does not depend on Cygwin or MinGW, and doesn't
