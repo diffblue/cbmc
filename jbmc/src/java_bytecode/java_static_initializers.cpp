@@ -180,14 +180,25 @@ gen_clinit_eqexpr(const exprt &expr, const clinit_statest state)
 
 /// Generates codet that iterates through the base types of the class specified
 /// by class_name, C, and recursively adds calls to their clinit wrapper.
-/// Finally a call to the clinint wrapper of C is made.
+/// Finally a call to the clinit of C is made. If nondet-static option was
+/// given then all static variables that are not constants (i.e. final) are
+/// then re-assigned to a nondet value.
 /// \param symbol_table: symbol table
 /// \param class_name: name of the class to generate clinit wrapper calls for
 /// \param [out] init_body: appended with calls to clinit wrapper
+/// \param nondet_static: true if nondet-static option was given
+/// \param object_factory_parameters: object factory parameters used to populate
+///   nondet-initialized globals and objects reachable from them (only needed
+///   if nondet-static is true)
+/// \param pointer_type_selector: used to choose concrete types for abstract-
+///   typed globals and fields (only needed if nondet-static is true)
 static void clinit_wrapper_do_recursive_calls(
-  const symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt &class_name,
-  code_blockt &init_body)
+  code_blockt &init_body,
+  const bool nondet_static,
+  const object_factory_parameterst &object_factory_parameters,
+  const select_pointer_typet &pointer_type_selector)
 {
   const symbolt &class_symbol = symbol_table.lookup_ref(class_name);
   for(const auto &base : to_class_type(class_symbol.type).bases())
@@ -209,6 +220,52 @@ static void clinit_wrapper_do_recursive_calls(
     code_function_callt call_real_init;
     call_real_init.function() = find_sym_it->second.symbol_expr();
     init_body.move_to_operands(call_real_init);
+  }
+
+  // If nondet-static option is given, add a standard nondet initialization for
+  // each non-final static field of this class. Note this is the same invocation
+  // used in get_stub_initializer_body and java_static_lifetime_init.
+  if(nondet_static)
+  {
+    object_factory_parameterst parameters = object_factory_parameters;
+    parameters.function_id = clinit_wrapper_name(class_name);
+
+    std::vector<irep_idt> nondet_ids;
+    std::for_each(
+      symbol_table.symbols.begin(),
+      symbol_table.symbols.end(),
+      [&](const std::pair<irep_idt, symbolt> &symbol) {
+        if(
+          symbol.second.type.get(ID_C_class) == class_name &&
+          symbol.second.is_static_lifetime &&
+          !symbol.second.type.get_bool(ID_C_constant))
+        {
+          nondet_ids.push_back(symbol.first);
+        }
+      });
+
+    for(const auto &id : nondet_ids)
+    {
+      const symbol_exprt new_global_symbol =
+        symbol_table.lookup_ref(id).symbol_expr();
+
+      parameters.max_nonnull_tree_depth =
+        is_non_null_library_global(id)
+          ? std::max(
+              size_t(1), object_factory_parameters.max_nonnull_tree_depth)
+          : object_factory_parameters.max_nonnull_tree_depth;
+
+      gen_nondet_init(
+        new_global_symbol,
+        init_body,
+        symbol_table,
+        source_locationt(),
+        false,
+        allocation_typet::DYNAMIC,
+        parameters,
+        pointer_type_selector,
+        update_in_placet::NO_UPDATE_IN_PLACE);
+    }
   }
 }
 
@@ -316,9 +373,9 @@ static void create_clinit_wrapper_symbols(
     "clinit wrapper");
 }
 
-/// Thread safe version of the static initialiser.
+/// Thread safe version of the static initializer.
 ///
-/// Produces the static initialiser wrapper body for the given function. This
+/// Produces the static initializer wrapper body for the given function. This
 /// static initializer implements (a simplification of) the algorithm defined
 /// in Section 5.5 of the JVM Specs. This function, or wrapper, checks whether
 /// static init has already taken place, calls the actual `<clinit>` method if
@@ -365,7 +422,8 @@ static void create_clinit_wrapper_symbols(
 ///   // ...
 ///   java::In::clinit_wrapper();
 ///
-///   java::C::<clinit>();
+///   java::C::<clinit>();  // or nondet-initialization of all static
+///                         // variables of C if nondet-static is true
 ///
 ///   // Setting this variable to INIT_COMPLETE will let other threads "cross"
 ///   // beyond the assume() statement above in this function.
@@ -382,10 +440,19 @@ static void create_clinit_wrapper_symbols(
 /// \param function_id: clinit wrapper function id (the wrapper_method_symbol
 ///   name created by `create_clinit_wrapper_symbols`)
 /// \param symbol_table: global symbol table
-/// \return the body of the static initialiser wrapper
+/// \param nondet_static: true if nondet-static option was given
+/// \param object_factory_parameters: object factory parameters used to populate
+///   nondet-initialized globals and objects reachable from them (only needed
+///   if nondet-static is true)
+/// \param pointer_type_selector: used to choose concrete types for abstract-
+///   typed globals and fields (only needed if nondet-static is true)
+/// \return the body of the static initializer wrapper
 codet get_thread_safe_clinit_wrapper_body(
   const irep_idt &function_id,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  const bool nondet_static,
+  const object_factory_parameterst &object_factory_parameters,
+  const select_pointer_typet &pointer_type_selector)
 {
   const symbolt &wrapper_method_symbol = symbol_table.lookup_ref(function_id);
   irep_idt class_name = wrapper_method_symbol.type.get(ID_C_class);
@@ -532,11 +599,18 @@ codet get_thread_safe_clinit_wrapper_body(
   //  // ...
   //  java::In::clinit_wrapper();
   //
-  //  java::C::<clinit>();
+  //  java::C::<clinit>(); // or nondet-initialization of all static
+  //                       // variables of C if nondet-static is true
   //
   {
     code_blockt init_body;
-    clinit_wrapper_do_recursive_calls(symbol_table, class_name, init_body);
+    clinit_wrapper_do_recursive_calls(
+      symbol_table,
+      class_name,
+      init_body,
+      nondet_static,
+      object_factory_parameters,
+      pointer_type_selector);
     function_body.append(init_body);
   }
 
@@ -557,15 +631,24 @@ codet get_thread_safe_clinit_wrapper_body(
   return function_body;
 }
 
-/// Produces the static initialiser wrapper body for the given function.
+/// Produces the static initializer wrapper body for the given function.
 /// Note: this version of the clinit wrapper is not thread safe.
 /// \param function_id: clinit wrapper function id (the wrapper_method_symbol
 ///   name created by `create_clinit_wrapper_symbols`)
 /// \param symbol_table: global symbol table
-/// \return the body of the static initialiser wrapper/
+/// \param nondet_static: true if nondet-static option was given
+/// \param object_factory_parameters: object factory parameters used to populate
+///   nondet-initialized globals and objects reachable from them (only needed
+///   if nondet-static is true)
+/// \param pointer_type_selector: used to choose concrete types for abstract-
+///   typed globals and fields (only needed if nondet-static is true)
+/// \return the body of the static initializer wrapper
 codet get_clinit_wrapper_body(
   const irep_idt &function_id,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  const bool nondet_static,
+  const object_factory_parameterst &object_factory_parameters,
+  const select_pointer_typet &pointer_type_selector)
 {
   // Assume that class C extends class C' and implements interfaces
   // I1, ..., In. We now create the following function (possibly recursively
@@ -583,7 +666,8 @@ codet get_clinit_wrapper_body(
   //     // ...
   //     java::In::clinit_wrapper();
   //
-  //     java::C::<clinit>();
+  //     java::C::<clinit>(); // or nondet-initialization of all static
+  //                          // variables of C if nondet-static is true
   //   }
   // }
   const symbolt &wrapper_method_symbol = symbol_table.lookup_ref(function_id);
@@ -609,7 +693,13 @@ codet get_clinit_wrapper_body(
   code_assignt set_already_run(already_run_symbol.symbol_expr(), true_exprt());
   init_body.move_to_operands(set_already_run);
 
-  clinit_wrapper_do_recursive_calls(symbol_table, class_name, init_body);
+  clinit_wrapper_do_recursive_calls(
+    symbol_table,
+    class_name,
+    init_body,
+    nondet_static,
+    object_factory_parameters,
+    pointer_type_selector);
 
   wrapper_body.then_case() = init_body;
 

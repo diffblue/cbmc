@@ -29,11 +29,17 @@ void create_static_initializer_wrappers(
 
 codet get_thread_safe_clinit_wrapper_body(
   const irep_idt &function_id,
-  symbol_table_baset &symbol_table);
+  symbol_table_baset &symbol_table,
+  const bool nondet_static,
+  const object_factory_parameterst &object_factory_parameters,
+  const select_pointer_typet &pointer_type_selector);
 
 codet get_clinit_wrapper_body(
   const irep_idt &function_id,
-  symbol_table_baset &symbol_table);
+  symbol_table_baset &symbol_table,
+  const bool nondet_static,
+  const object_factory_parameterst &object_factory_parameters,
+  const select_pointer_typet &pointer_type_selector);
 
 class stub_global_initializer_factoryt
 {

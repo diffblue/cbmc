@@ -124,6 +124,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("cover"))
     parse_cover_options(cmdline, options);
 
+  if(cmdline.isset("nondet-static"))
+    options.set_option("nondet-static", true);
+
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
 
@@ -1094,6 +1097,10 @@ void jbmc_parse_optionst::help()
     "                              --show-goto-functions/properties output\n"
     "                              will be restricted to loaded methods in this case,\n" // NOLINT(*)
     "                              and only output after the symex phase.\n"
+    "\n"
+    "Semantic transformations:\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     "\n"
     "BMC options:\n"
     HELP_BMC

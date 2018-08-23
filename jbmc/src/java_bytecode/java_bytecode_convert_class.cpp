@@ -645,6 +645,8 @@ void java_bytecode_convert_classt::convert(
     // link matches the method used by java_bytecode_convert_method::convert
     // for methods.
     new_symbol.type.set(ID_C_class, class_symbol.name);
+    new_symbol.type.set(ID_C_field, f.name);
+    new_symbol.type.set(ID_C_constant, f.is_final);
     new_symbol.pretty_name=id2string(class_symbol.pretty_name)+
       "."+id2string(f.name);
     new_symbol.mode=ID_java;

@@ -67,6 +67,7 @@ class optionst;
   "(drop-unused-functions)" \
   "(property):(stop-on-fail)(trace)" \
   "(verbosity):" \
+  "(nondet-static)" \
   "(version)" \
   "(cover):(symex-coverage-report):" \
   OPT_TIMESTAMP \
