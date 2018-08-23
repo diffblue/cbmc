@@ -180,10 +180,7 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
     }
     else
     {
-      INVARIANT(
-        false,
-        i.code.find_source_location().as_string() +
-          ": finish_gotos: unexpected goto");
+      UNREACHABLE;
     }
   }
 
@@ -198,7 +195,7 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
     exprt destination=i.code.op0();
 
     DATA_INVARIANT(
-      destination.id() != ID_dereference, "dereference ID not allowed here");
+      destination.id() == ID_dereference, "dereference ID not allowed here");
     DATA_INVARIANT(destination.operands().size() == 1, "expected 1 argument");
 
     exprt pointer=destination.op0();
