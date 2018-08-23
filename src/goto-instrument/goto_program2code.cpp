@@ -921,6 +921,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   s.value()=to_equal_expr(eq_cand).lhs();
   s.body()=code_blockt();
 
+  copy_source_location(target, s);
+
   // find the cases or fall back to convert_goto_if
   cases_listt cases;
   goto_programt::const_targett first_target=
