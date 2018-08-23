@@ -427,9 +427,8 @@ protected:
 
   const struct_typet &this_struct_type();
 
-  codet cpp_destructor(
-      const source_locationt &source_location,
-      const exprt &object);
+  optionalt<codet>
+  cpp_destructor(const source_locationt &source_location, const exprt &object);
 
   // expressions
   void explicit_typecast_ambiguity(exprt &expr);
