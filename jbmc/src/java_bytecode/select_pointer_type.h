@@ -42,6 +42,11 @@ public:
       &generic_parameter_specialization_map,
     const namespacet &ns) const;
 
+  virtual std::set<symbol_typet> get_parameter_alternative_types(
+    const irep_idt &function_name,
+    const irep_idt &parameter_name,
+    const namespacet &ns) const;
+
   pointer_typet specialize_generics(
     const pointer_typet &pointer_type,
     const generic_parameter_specialization_mapt

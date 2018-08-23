@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_object_factory.h"
 #include "java_string_literals.h"
 #include "java_utils.h"
+#include "nondet.h"
+#include <util/fresh_symbol.h>
 
 #define JAVA_MAIN_METHOD "main:([Ljava/lang/String;)V"
 
@@ -317,17 +319,92 @@ exprt::operandst java_build_arguments(
 
     parameters.function_id = goto_functionst::entry_point();
 
-    // generate code to allocate and non-deterministicaly initialize the
-    // argument
-    main_arguments[param_number] = object_factory(
-      p.type(),
-      base_name,
-      init_code,
-      symbol_table,
-      parameters,
-      allocation_typet::LOCAL,
-      function.location,
-      pointer_type_selector);
+    namespacet ns(symbol_table);
+
+    // Generate code to allocate and non-deterministicaly initialize the
+    // argument, if the argument has different possible object types (e.g., from
+    // casts in the function body), then choose one in a non-deterministic way.
+    const auto alternatives =
+      pointer_type_selector.get_parameter_alternative_types(
+        function.name, p.get_identifier(), ns);
+    if(alternatives.empty())
+    {
+      main_arguments[param_number] = object_factory(
+        p.type(),
+        base_name,
+        init_code,
+        symbol_table,
+        parameters,
+        allocation_typet::LOCAL,
+        function.location,
+        pointer_type_selector);
+    }
+    else
+    {
+      INVARIANT(!is_this, "We cannot have different types for `this` here");
+      // create a non-deterministic switch between all possible values for the
+      // type of the parameter.
+      code_switcht code_switch;
+
+      // the idea is to get a new symbol for the parameter value `tmp`
+
+      // then add a non-deterministic switch over all possible input types,
+      // construct the object type at hand and assign to `tmp`
+
+      // switch(...)
+      // {
+      //   case obj1:
+      //     tmp_expr = object_factory(...)
+      //     param = tmp_expr
+      //     break
+      //   ...
+      // }
+      // method(..., param, ...)
+      //
+
+      const symbolt result_symbol = get_fresh_aux_symbol(
+        p.type(),
+        id2string(function.name),
+        "nondet_parameter_" + std::to_string(param_number),
+        function.location,
+        ID_java,
+        symbol_table);
+      main_arguments[param_number] = result_symbol.symbol_expr();
+
+      std::vector<codet> cases(alternatives.size());
+      const auto initialize_parameter = [&](const symbol_typet &type) {
+        code_blockt init_code_for_type;
+        exprt init_expr_for_parameter = object_factory(
+          java_reference_type(type),
+          id2string(base_name) + "_alternative_" +
+            id2string(type.get_identifier()),
+          init_code_for_type,
+          symbol_table,
+          parameters,
+          allocation_typet::DYNAMIC,
+          function.location,
+          pointer_type_selector);
+        init_code_for_type.add(
+          code_assignt(
+            result_symbol.symbol_expr(),
+            typecast_exprt(init_expr_for_parameter, p.type())));
+        return init_code_for_type;
+      };
+
+      std::transform(
+        alternatives.begin(),
+        alternatives.end(),
+        cases.begin(),
+        initialize_parameter);
+
+      init_code.add(
+        generate_nondet_switch(
+          id2string(function.name) + "_" + std::to_string(param_number),
+          cases,
+          java_int_type(),
+          function.location,
+          symbol_table));
+    }
 
     // record as an input
     codet input(ID_input);
