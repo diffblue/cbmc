@@ -974,7 +974,7 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
       ID_statement_expression, void_type(), expr.source_location());
     auto decl_block=code_blockt::from_list(clean_code);
     decl_block.set_statement(ID_decl_block);
-    side_effect_expr.copy_to_operands(decl_block);
+    side_effect_expr.get_sub().push_back(decl_block);
     clean_code.clear();
 
     // We merge the side-effect into the operand of the typecast,
@@ -1024,7 +1024,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       ID_statement_expression, void_type(), expr.source_location());
     auto decl_block=code_blockt::from_list(clean_code);
     decl_block.set_statement(ID_decl_block);
-    side_effect_expr.copy_to_operands(decl_block);
+    side_effect_expr.get_sub().push_back(decl_block);
     clean_code.clear();
 
     // We merge the side-effect into the operand of the typecast,

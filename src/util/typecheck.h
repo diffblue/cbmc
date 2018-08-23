@@ -10,8 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_TYPECHECK_H
 #define CPROVER_UTIL_TYPECHECK_H
 
-#include "expr.h"
 #include "message.h"
+#include "std_code.h"
 
 class typecheckt:public messaget
 {

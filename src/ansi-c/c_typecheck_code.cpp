@@ -32,8 +32,6 @@ void c_typecheck_baset::typecheck_code(codet &code)
     throw 0;
   }
 
-  code.type() = empty_typet();
-
   const irep_idt &statement=code.get_statement();
 
   if(statement==ID_expression)

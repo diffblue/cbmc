@@ -31,36 +31,41 @@ Author: Daniel Kroening, kroening@kroening.com
 /// To distinguish a `codet` from other [exprts](\ref exprt), we set its
 /// [id()](\ref irept::id) to `ID_code`. To distinguish different types of
 /// `codet`, we use a named sub `ID_statement`.
-class codet:public exprt
+class codet : public irept
 {
 public:
+  DEPRECATED("Use codet(statement) instead")
+  codet() : irept(ID_code)
+  {
+  }
+
   /// \param statement: Specifies the type of the `codet` to be constructed,
   ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
   ///   \ref code_assignt.
-  explicit codet(const irep_idt &statement) : exprt(ID_code, empty_typet())
+  explicit codet(const irep_idt &statement) : irept(ID_code)
   {
     set_statement(statement);
   }
 
-  codet(const irep_idt &statement, source_locationt loc)
-    : exprt(ID_code, empty_typet(), std::move(loc))
+  codet(const irep_idt &statement, source_locationt loc) : irept(ID_code)
   {
     set_statement(statement);
+    add_source_location() = std::move(loc);
   }
 
   /// \param statement: Specifies the type of the `codet` to be constructed,
   ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
   ///   \ref code_assignt.
   /// \param _op: any operands to be added
-  explicit codet(const irep_idt &statement, operandst _op) : codet(statement)
+  explicit codet(const irep_idt &statement, irept::subt _sub) : codet(statement)
   {
-    operands() = std::move(_op);
+    get_sub() = std::move(_sub);
   }
 
-  codet(const irep_idt &statement, operandst op, source_locationt loc)
+  codet(const irep_idt &statement, irept::subt _sub, source_locationt loc)
     : codet(statement, std::move(loc))
   {
-    operands() = std::move(op);
+    get_sub() = std::move(_sub);
   }
 
   void set_statement(const irep_idt &statement)
@@ -126,10 +131,99 @@ public:
     check_code(code, vm);
   }
 
-  using exprt::op0;
-  using exprt::op1;
-  using exprt::op2;
-  using exprt::op3;
+  const source_locationt &find_source_location() const;
+
+  const source_locationt &source_location() const
+  {
+    return static_cast<const source_locationt &>(find(ID_C_source_location));
+  }
+
+  source_locationt &add_source_location()
+  {
+    return static_cast<source_locationt &>(add(ID_C_source_location));
+  }
+
+  const exprt &as_expr() const
+  {
+    return *static_cast<const exprt *>(static_cast<const irept *>(this));
+  }
+
+public:
+  // will rename to expr_operandst
+  typedef std::vector<exprt> operandst;
+
+  // returns true if there is at least one operand
+  bool has_operands() const
+  {
+    return !operands().empty();
+  }
+
+  operandst &operands()
+  {
+    return (operandst &)get_sub();
+  }
+
+  const operandst &operands() const
+  {
+    return (const operandst &)get_sub();
+  }
+
+  exprt &op0()
+  {
+    return operands().front();
+  }
+
+  exprt &op1()
+  {
+    return operands()[1];
+  }
+
+  exprt &op2()
+  {
+    return operands()[2];
+  }
+
+  exprt &op3()
+  {
+    return operands()[3];
+  }
+
+  const exprt &op0() const
+  {
+    return operands().front();
+  }
+
+  const exprt &op1() const
+  {
+    return operands()[1];
+  }
+
+  const exprt &op2() const
+  {
+    return operands()[2];
+  }
+
+  const exprt &op3() const
+  {
+    return operands()[3];
+  }
+
+  void reserve_operands(operandst::size_type n)
+  {
+    operands().reserve(n);
+  }
+
+  // destroys expr, e1, e2, e3
+  void move_to_operands(exprt &);
+  void move_to_operands(exprt &, exprt &);
+  void move_to_operands(exprt &, exprt &, exprt &);
+  // does not destroy expr, e1, e2, e3
+  void copy_to_operands(const exprt &);
+  void copy_to_operands(const exprt &, const exprt &);
+  void copy_to_operands(const exprt &, const exprt &, const exprt &);
+  void add_to_operands(const exprt &);
+  void add_to_operands(const exprt &, const exprt &);
+  void add_to_operands(const exprt &, const exprt &, const exprt &);
 
 protected:
   typedef std::vector<codet> code_operandst;
@@ -163,41 +257,48 @@ protected:
 
   const codet &code_op3() const
   { return code_operands()[3]; }
+
+  // destroys expr, e1, e2, e3
+  void move_to_operands(codet &);
+  void move_to_operands(codet &, codet &);
+  void move_to_operands(codet &, codet &, codet &);
+  // does not destroy expr, e1, e2, e3
+  void copy_to_operands(const codet &);
+  void copy_to_operands(const codet &, const codet &);
+  void copy_to_operands(const codet &, const codet &, const codet &);
+
+public:
+  void add_to_operands(const codet &);
+  void add_to_operands(const codet &, const codet &);
+  void add_to_operands(const codet &, const codet &, const codet &);
 };
 
 namespace detail // NOLINT
 {
-
-template<typename Tag>
-inline bool can_cast_code_impl(const exprt &expr, const Tag &tag)
+template <typename Tag>
+inline bool can_cast_code_impl(const codet &code, const Tag &tag)
 {
-  if(const auto ptr = expr_try_dynamic_cast<codet>(expr))
-  {
-    return ptr->get_statement() == tag;
-  }
-  return false;
+  return code.get_statement() == tag;
 }
 
 } // namespace detail
 
-template<> inline bool can_cast_expr<codet>(const exprt &base)
-{
-  return base.id()==ID_code;
-}
+template <typename T>
+inline bool can_cast_code(const codet &base);
 
 // to_code has no validation other than checking the id(), so no validate_expr
 // is provided for codet
 
-inline const codet &to_code(const exprt &expr)
+inline const codet &to_code(const irept &irep)
 {
-  PRECONDITION(expr.id() == ID_code);
-  return static_cast<const codet &>(expr);
+  PRECONDITION(irep.id() == ID_code);
+  return static_cast<const codet &>(irep);
 }
 
-inline codet &to_code(exprt &expr)
+inline codet &to_code(irept &irep)
 {
-  PRECONDITION(expr.id() == ID_code);
-  return static_cast<codet &>(expr);
+  PRECONDITION(irep.id() == ID_code);
+  return static_cast<codet &>(irep);
 }
 
 /// A \ref codet representing sequential composition of program statements.
@@ -224,20 +325,20 @@ public:
   static code_blockt from_list(const std::list<codet> &_list)
   {
     code_blockt result;
-    auto &s=result.statements();
-    s.reserve(_list.size());
-    for(const auto &c : _list)
-      s.push_back(c);
+    auto &o = result.statements();
+    o.reserve(_list.size());
+    for(const auto &statement : _list)
+      o.push_back(statement);
     return result;
   }
 
   explicit code_blockt(const std::vector<codet> &_statements)
-    : codet(ID_block, (const std::vector<exprt> &)_statements)
+    : codet(ID_block, (const irept::subt &)_statements)
   {
   }
 
   explicit code_blockt(std::vector<codet> &&_statements)
-    : codet(ID_block, std::move((std::vector<exprt> &&) _statements))
+    : codet(ID_block, std::move((irept::subt &&) _statements))
   {
   }
 
@@ -281,7 +382,8 @@ public:
   }
 };
 
-template<> inline bool can_cast_expr<code_blockt>(const exprt &base)
+template <>
+inline bool can_cast_code<code_blockt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_block);
 }
@@ -316,7 +418,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_skipt>(const exprt &base)
+template <>
+inline bool can_cast_code<code_skipt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_skip);
 }
@@ -406,7 +509,20 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_assignt>(const exprt &base)
+inline void validate_operands(
+  const codet &value,
+  exprt::operandst::size_type number,
+  const char *message,
+  bool allow_more = false)
+{
+  DATA_INVARIANT(
+    allow_more ? value.operands().size() >= number
+               : value.operands().size() == number,
+    message);
+}
+
+template <>
+inline bool can_cast_code<code_assignt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_assign);
 }
@@ -473,7 +589,8 @@ public:
   }
 };
 
-template<> inline bool can_cast_expr<code_declt>(const exprt &base)
+template <>
+inline bool can_cast_code<code_declt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_decl);
 }
@@ -542,7 +659,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_deadt>(const exprt &base)
+template <>
+inline bool can_cast_code<code_deadt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_dead);
 }
@@ -591,7 +709,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_assumet>(const exprt &base)
+template <>
+inline bool can_cast_code<code_assumet>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_assume);
 }
@@ -643,7 +762,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_assertt>(const exprt &base)
+template <>
+inline bool can_cast_code<code_assertt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_assert);
 }
@@ -705,11 +825,13 @@ public:
     const validation_modet vm = validation_modet::INVARIANT);
 };
 
+#if 0
 template <>
-inline bool can_cast_expr<code_inputt>(const exprt &base)
+inline bool can_cast_expr<code_inputt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_input);
 }
+#endif
 
 inline void validate_expr(const code_inputt &input)
 {
@@ -751,11 +873,13 @@ public:
     const validation_modet vm = validation_modet::INVARIANT);
 };
 
+#if 0
 template <>
 inline bool can_cast_expr<code_outputt>(const exprt &base)
 {
   return detail::can_cast_code_impl(base, ID_output);
 }
+#endif
 
 inline void validate_expr(const code_outputt &output)
 {
@@ -821,7 +945,7 @@ public:
 
   const codet &then_case() const
   {
-    return static_cast<const codet &>(op1());
+    return code_op1();
   }
 
   bool has_else_case() const
@@ -831,17 +955,17 @@ public:
 
   const codet &else_case() const
   {
-    return static_cast<const codet &>(op2());
+    return code_op2();
   }
 
   codet &then_case()
   {
-    return static_cast<codet &>(op1());
+    return code_op1();
   }
 
   codet &else_case()
   {
-    return static_cast<codet &>(op2());
+    return code_op2();
   }
 
 protected:
@@ -851,7 +975,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_ifthenelset>(const exprt &base)
+template <>
+inline bool can_cast_code<code_ifthenelset>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_ifthenelse);
 }
@@ -913,7 +1038,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_switcht>(const exprt &base)
+template <>
+inline bool can_cast_code<code_switcht>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_switch);
 }
@@ -975,7 +1101,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_whilet>(const exprt &base)
+template <>
+inline bool can_cast_code<code_whilet>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_while);
 }
@@ -1037,7 +1164,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_dowhilet>(const exprt &base)
+template <>
+inline bool can_cast_code<code_dowhilet>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_dowhile);
 }
@@ -1134,7 +1262,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_fort>(const exprt &base)
+template <>
+inline bool can_cast_code<code_fort>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_for);
 }
@@ -1186,7 +1315,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_gotot>(const exprt &base)
+template <>
+inline bool can_cast_code<code_gotot>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_goto);
 }
@@ -1319,7 +1449,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_function_callt>(const exprt &base)
+template <>
+inline bool can_cast_code<code_function_callt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_function_call);
 }
@@ -1384,7 +1515,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_returnt>(const exprt &base)
+template <>
+inline bool can_cast_code<code_returnt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_return);
 }
@@ -1452,7 +1584,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_labelt>(const exprt &base)
+template <>
+inline bool can_cast_code<code_labelt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_label);
 }
@@ -1525,7 +1658,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_switch_caset>(const exprt &base)
+template <>
+inline bool can_cast_code<code_switch_caset>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_switch_case);
 }
@@ -1591,13 +1725,13 @@ public:
   /// the statement to be executed when the case applies
   codet &code()
   {
-    return static_cast<codet &>(op2());
+    return static_cast<codet &>(get_sub()[2]);
   }
 
   /// the statement to be executed when the case applies
   const codet &code() const
   {
-    return static_cast<const codet &>(op2());
+    return static_cast<const codet &>(get_sub()[2]);
   }
 
 protected:
@@ -1606,17 +1740,6 @@ protected:
   using codet::op2;
   using codet::op3;
 };
-
-template <>
-inline bool can_cast_expr<code_gcc_switch_case_ranget>(const exprt &base)
-{
-  return detail::can_cast_code_impl(base, ID_gcc_switch_case_range);
-}
-
-inline void validate_expr(const code_gcc_switch_case_ranget &x)
-{
-  validate_operands(x, 3, "gcc-switch-case-range must have three operands");
-}
 
 inline const code_gcc_switch_case_ranget &
 to_code_gcc_switch_case_range(const codet &code)
@@ -1653,7 +1776,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_breakt>(const exprt &base)
+template <>
+inline bool can_cast_code<code_breakt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_break);
 }
@@ -1689,7 +1813,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_continuet>(const exprt &base)
+template <>
+inline bool can_cast_code<code_continuet>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_continue);
 }
@@ -1732,7 +1857,8 @@ public:
   }
 };
 
-template<> inline bool can_cast_expr<code_asmt>(const exprt &base)
+template <>
+inline bool can_cast_code<code_asmt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_asm);
 }
@@ -1870,7 +1996,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_expressiont>(const exprt &base)
+template <>
+inline bool can_cast_code<code_expressiont>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_expression);
 }
@@ -2116,20 +2243,21 @@ public:
     source_locationt loc)
     : side_effect_exprt(
         ID_statement_expression,
-        {std::move(_code)},
+        {},
         std::move(_type),
         std::move(loc))
   {
+    set(ID_statement, std::move(_code));
   }
 
   codet &statement()
   {
-    return to_code(op0());
+    return static_cast<codet &>(add(ID_statement));
   }
 
   const codet &statement() const
   {
-    return to_code(op0());
+    return static_cast<const codet &>(find(ID_statement));
   }
 };
 
@@ -2365,7 +2493,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_push_catcht>(const exprt &base)
+template <>
+inline bool can_cast_code<code_push_catcht>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_push_catch);
 }
@@ -2402,7 +2531,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_pop_catcht>(const exprt &base)
+template <>
+inline bool can_cast_code<code_pop_catcht>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_pop_catch);
 }
@@ -2427,7 +2557,7 @@ static inline const code_pop_catcht &to_code_pop_catch(const codet &code)
 /// landingpadt(symbol_expr("e", ...)))
 class code_landingpadt:public codet
 {
- public:
+public:
   code_landingpadt():codet(ID_exception_landingpad)
   {
     operands().resize(1);
@@ -2442,6 +2572,7 @@ class code_landingpadt:public codet
   {
     return op0();
   }
+
   exprt &catch_expr()
   {
     return op0();
@@ -2454,7 +2585,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_landingpadt>(const exprt &base)
+template <>
+inline bool can_cast_code<code_landingpadt>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_exception_landingpad);
 }
@@ -2536,7 +2668,8 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_try_catcht>(const exprt &base)
+template <>
+inline bool can_cast_code<code_try_catcht>(const codet &base)
 {
   return detail::can_cast_code_impl(base, ID_try_catch);
 }

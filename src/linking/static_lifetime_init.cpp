@@ -105,10 +105,8 @@ void static_lifetime_init(
 
   symbolt &init_symbol = symbol_table.get_writeable_ref(INITIALIZE_FUNCTION);
 
-  init_symbol.value=code_blockt();
-  init_symbol.value.add_source_location()=source_location;
-
-  code_blockt &dest=to_code_block(to_code(init_symbol.value));
+  code_blockt dest;
+  dest.add_source_location() = source_location;
 
   // add the magic label to hide
   dest.add(code_labelt(CPROVER_PREFIX "HIDE", code_skipt()));
@@ -160,4 +158,6 @@ void static_lifetime_init(
       dest.add(function_call);
     }
   }
+
+  init_symbol.value = dest.as_expr();
 }

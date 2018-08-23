@@ -17,7 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/abstract_goto_model.h>
 
+#include "goto_symex_state.h"
 #include "path_storage.h"
+#include "symex_target_equation.h"
 
 class byte_extract_exprt;
 class function_application_exprt;
@@ -28,6 +30,7 @@ class code_assignt;
 class code_function_callt;
 class exprt;
 class goto_symex_statet;
+class guardt;
 class if_exprt;
 class index_exprt;
 class symbol_exprt;
@@ -37,31 +40,21 @@ class side_effect_exprt;
 class symex_assignt;
 class typecast_exprt;
 
-/// Configuration used for a symbolic execution
+/// Configuration of the symbolic execution
 struct symex_configt final
 {
-  /// \brief The maximum depth to take the execution to.
-  /// Depth is a count of the instructions that have been executed on any
-  /// single path.
   unsigned max_depth;
-
   bool doing_path_exploration;
-
   bool allow_pointer_unsoundness;
-
   bool constant_propagation;
-
   bool self_loops_to_assumptions;
-
   bool simplify_opt;
-
   bool unwinding_assertions;
-
   bool partial_loops;
-
   mp_integer debug_level;
 
   /// \brief Should the additional validation checks be run?
+  ///
   /// If this flag is set the checks for renaming (both level1 and level2) are
   /// executed in the goto_symex_statet (in the assignment method).
   bool run_validation_checks;
@@ -76,37 +69,26 @@ struct symex_configt final
 };
 
 /// \brief The main class for the forward symbolic simulator
-/// \remarks
+///
 /// Higher-level architectural information on symbolic execution is
 /// documented in the \ref symex-overview
 /// "Symbolic execution module page".
 class goto_symext
 {
 public:
-  /// A type abbreviation for \ref goto_symex_statet
   typedef goto_symex_statet statet;
 
-  /// Construct a goto_symext to execute a particular program
-  /// \param mh: The message handler to use for log messages
-  /// \param outer_symbol_table: The symbol table for the program to be
-  ///   executed, excluding any symbols added during the symbolic execution
-  /// \param _target: Where to store the equation built up by this execution
-  /// \param options: The options to use to configure this execution
-  /// \param path_storage: Place to storage symbolic execution paths that have
-  /// been halted and can be resumed later
-  /// \param guard_manager: Manager for creating guards
   goto_symext(
     message_handlert &mh,
     const symbol_tablet &outer_symbol_table,
     symex_target_equationt &_target,
     const optionst &options,
-    path_storaget &path_storage,
-    guard_managert &guard_manager)
+    path_storaget &path_storage)
     : should_pause_symex(false),
       symex_config(options),
+      language_mode(),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table),
-      guard_manager(guard_manager),
       target(_target),
       atomic_section_counter(0),
       log(mh),
@@ -117,37 +99,21 @@ public:
   {
   }
 
-  /// A virtual destructor allowing derived classes to be cleaned up correctly
   virtual ~goto_symext() = default;
 
-  /// The type of delegate functions that retrieve a goto_functiont for a
-  /// particular function identifier
-  /// \remarks
-  /// This allows goto_symext to be divorced from the particular type of
-  /// goto_modelt that provides the function bodies
   typedef
     std::function<const goto_functionst::goto_functiont &(const irep_idt &)>
     get_goto_functiont;
 
   /// Return a function to get/load a goto function from the given goto model
-  /// Create a default delegate to retrieve function bodies from a
-  /// goto_functionst
-  /// \param goto_model: The goto model holding the function map from which to
-  ///   retrieve function bodies
-  /// \return A delegate to retrieve function bodies from the given
-  ///   goto_functionst
-  static get_goto_functiont get_goto_function(abstract_goto_modelt &goto_model);
+  static get_goto_functiont get_goto_function(abstract_goto_modelt &);
 
-  /// \brief Symbolically execute the entire program starting from entry point
-  /// \remarks
-  /// The state that goto_symext maintains uses a lot of memory.
-  /// This method therefore deallocates the state as soon as symbolic execution
-  /// has completed. This function is useful to callers that don't care about
-  /// having the state around afterwards.
-  /// \param get_goto_function: The delegate to retrieve function bodies (see
-  ///   \ref get_goto_functiont)
-  /// \param new_symbol_table: A symbol table to store the symbols added during
-  /// symbolic execution
+  /// \brief symex entire program starting from entry point
+  ///
+  /// The state that goto_symext maintains has a large memory footprint.
+  /// This method deallocates the state as soon as symbolic execution
+  /// has completed, so use it if you don't care about having the state
+  /// around afterwards.
   virtual void symex_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
     symbol_tablet &new_symbol_table);
@@ -158,49 +124,37 @@ public:
     symbol_tablet &new_symbol_table);
 
   /// Performs symbolic execution using a state and equation that have
-  /// already been used to symbolically execute part of the program. The state
-  /// is not re-initialized; instead, symbolic execution resumes from the
-  /// program counter of the saved state.
-  /// \param get_goto_function: The delegate to retrieve function bodies (see
-  ///   \ref get_goto_functiont)
-  /// \param saved_state: The symbolic execution state to resume from
-  /// \param saved_equation: The equation as previously built up
-  /// \param new_symbol_table: A symbol table to store the symbols added during
-  ///   symbolic execution
+  /// already been used to symex part of the program. The state is not
+  /// re-initialized; instead, symbolic execution resumes from the program
+  /// counter of the saved state.
   virtual void resume_symex_from_saved_state(
     const get_goto_functiont &get_goto_function,
     const statet &saved_state,
     symex_target_equationt *saved_equation,
     symbol_tablet &new_symbol_table);
 
-  //// \brief Symbolically execute the entire program starting from entry point
+  //// \brief symex entire program starting from entry point
   ///
   /// This method uses the `state` argument as the symbolic execution
   /// state, which is useful for examining the state after this method
   /// returns. The state that goto_symext maintains has a large memory
   /// footprint, so if keeping the state around is not necessary,
   /// clients should instead call goto_symext::symex_from_entry_point_of().
-  /// \param state: The symbolic execution state to use for the execution
-  /// \param get_goto_functions: A functor to retrieve function bodies to
-  ///   execute
-  /// \param new_symbol_table: A symbol table to store the symbols added during
-  ///   symbolic execution
   virtual void symex_with_state(
-    statet &state,
-    const get_goto_functiont &get_goto_functions,
-    symbol_tablet &new_symbol_table);
+    statet &,
+    const get_goto_functiont &,
+    symbol_tablet &);
 
-  /// \brief Set when states are pushed onto the workqueue
+  /// \brief Have states been pushed onto the workqueue?
+  ///
   /// If this flag is set at the end of a symbolic execution run, it means that
-  /// symbolic execution has been paused because we encountered a GOTO
-  /// instruction while doing path exploration, and thus pushed the successor
-  /// states of the GOTO onto path_storage. The symbolic execution caller
-  /// should now choose which successor state to continue executing, and resume
-  /// symbolic execution from that state.
+  /// symex has been paused because we encountered a GOTO instruction while
+  /// doing path exploration, and thus pushed the successor states of the GOTO
+  /// onto path_storage. The symbolic execution caller should now choose which
+  /// successor state to continue executing, and resume symex from that state.
   bool should_pause_symex;
 
 protected:
-  /// The configuration to use for this symbolic execution
   const symex_configt symex_config;
 
   /// Initialize the symbolic execution and the given state with
@@ -212,9 +166,8 @@ protected:
 
   /// Invokes symex_step and verifies whether additional threads can be
   /// executed.
-  /// \param state: Symbolic execution state for current instruction
-  /// \param get_goto_function: The delegate to retrieve function bodies (see
-  ///   \ref get_goto_functiont)
+  /// \param state: Current GOTO symex step.
+  /// \param get_goto_function: function that retrieves function bodies
   void symex_threaded_step(
     statet &state,
     const get_goto_functiont &get_goto_function);
@@ -260,11 +213,12 @@ public:
   irep_idt language_mode;
 
 protected:
-  /// The symbol table associated with the goto-program being executed.
-  /// This symbol table will not have objects that are dynamically created as
-  /// part of symbolic execution added to it; those object are stored in the
-  /// symbol table passed as the `new_symbol_table` argument to the `symex_*`
-  /// methods.
+
+  /// The symbol table associated with the goto-program that we're
+  /// executing. This symbol table will not additionally contain objects
+  /// that are dynamically created as part of symbolic execution; the
+  /// names of those object are stored in the symbol table passed as the
+  /// `new_symbol_table` argument to the `symex_*` methods.
   const symbol_tablet &outer_symbol_table;
 
   /// Initialized just before symbolic execution begins, to point to
@@ -275,17 +229,7 @@ protected:
   /// used during symbolic execution to look up names from the original
   /// goto-program, and the names of dynamically-created objects.
   namespacet ns;
-
-  /// Used to create guards. Guards created with different guard managers cannot
-  /// be combined together, so guards created by goto-symex should not escape
-  /// the scope of this manager.
-  guard_managert &guard_manager;
-
-  /// The equation that this execution is building up
   symex_target_equationt &target;
-
-  /// A monotonically increasing index for each encountered ATOMIC_BEGIN
-  /// instruction
   unsigned atomic_section_counter;
 
   /// Variables that should be killed at the end of the current symex_step
@@ -318,9 +262,9 @@ protected:
   /// have any number of ternary expressions mixed with type casts.
   void process_array_expr(statet &, exprt &);
   exprt make_auto_object(const typet &, statet &);
-  virtual void dereference(exprt &, statet &, bool write);
+  virtual void dereference(exprt &, statet &);
 
-  void dereference_rec(exprt &, statet &, bool write);
+  void dereference_rec(exprt &, statet &);
   exprt address_arithmetic(
     const exprt &,
     statet &,
@@ -404,67 +348,38 @@ protected:
     const std::string &msg,
     statet &);
 
-  /// Symbolically execute an ASSUME instruction or simulate such an execution
-  /// for a synthetic assumption
-  /// \param state: Symbolic execution state for current instruction
-  /// \param cond: The guard of the assumption
-  virtual void symex_assume(statet &state, const exprt &cond);
-  void symex_assume_l2(statet &, const exprt &cond);
+  virtual void symex_assume(statet &, const exprt &cond);
 
-  /// Merge all branches joining at the current program point. Applies
-  /// \ref merge_goto for each goto state (each of which corresponds to previous
-  /// branch).
-  /// \param state: Symbolic execution state to be updated
-  void merge_gotos(statet &state);
+  // gotos
+  void merge_gotos(statet &);
 
-  /// Merge a single branch, the symbolic state of which is held in \p
-  /// goto_state, into the current overall symbolic state. \p goto_state is no
-  /// longer expected to be valid afterwards.
-  /// \param source: source associated with the incoming \p goto_state
-  /// \param goto_state: A state to be merged into this location
-  /// \param state: Symbolic execution state to be updated
-  virtual void merge_goto(
-    const symex_targett::sourcet &source,
-    goto_statet &&goto_state,
-    statet &state);
+  virtual void merge_goto(const goto_statet &goto_state, statet &);
 
-  /// Merge the SSA assignments from goto_state into dest_state
-  /// \param goto_state: A state to be merged into this location
-  /// \param dest_state: Symbolic execution state to be updated
-  void phi_function(const goto_statet &goto_state, statet &dest_state);
+  void merge_value_sets(const goto_statet &goto_state, statet &dest);
 
-  /// Determine whether to unwind a loop
-  /// \param source
-  /// \param context
-  /// \param unwind
-  /// \return true indicates abort, with false we continue
+  void phi_function(const goto_statet &goto_state, statet &);
+
+  // determine whether to unwind a loop -- true indicates abort,
+  // with false we continue.
   virtual bool should_stop_unwind(
     const symex_targett::sourcet &source,
-    const call_stackt &context,
+    const goto_symex_statet::call_stackt &context,
     unsigned unwind);
 
-  virtual void loop_bound_exceeded(statet &state, const exprt &guard);
+  virtual void loop_bound_exceeded(statet &, const exprt &guard);
 
-  /// Log a warning that a function has no body
-  /// \param identifier: The name of the function with no body
-  virtual void no_body(const irep_idt &identifier)
+  virtual void no_body(const irep_idt &)
   {
   }
 
-  /// Symbolically execute a FUNCTION_CALL instruction.
+  /// Symbolic execution of a function call.
   /// Only functions that are symbols are supported, see
-  /// \ref goto_symext::symex_function_call_symbol.
-  /// \param get_goto_function: The delegate to retrieve function bodies (see
-  ///   \ref get_goto_functiont)
-  /// \param state: Symbolic execution state for current instruction
-  /// \param code: The function call instruction
+  /// \ref goto_symext::symex_function_call_symbol
   virtual void symex_function_call(
-    const get_goto_functiont &get_goto_function,
-    statet &state,
-    const code_function_callt &code);
+    const get_goto_functiont &,
+    statet &,
+    const code_function_callt &);
 
-  /// Symbolically execute a END_FUNCTION instruction.
-  /// \param state: Symbolic execution state for current instruction
   virtual void symex_end_of_function(statet &);
 
   /// Symbolic execution of a call to a function call.
@@ -473,14 +388,10 @@ protected:
   /// \ref goto_symext::symex_fkt
   /// For non-special functions see
   /// \ref goto_symext::symex_function_call_code
-  /// \param get_goto_function: The delegate to retrieve function bodies (see
-  ///   \ref get_goto_functiont)
-  /// \param state: Symbolic execution state for current instruction
-  /// \param code: The function call instruction
   virtual void symex_function_call_symbol(
-    const get_goto_functiont &get_goto_function,
-    statet &state,
-    const code_function_callt &code);
+    const get_goto_functiont &,
+    statet &,
+    const code_function_callt &);
 
   /// Symbolic execution of a function call by inlining.
   /// Records the call in \p target by appending a function call step and:
@@ -488,14 +399,10 @@ protected:
   ///    and proceed to executing the code of the function.
   ///   - otherwise assign a nondetministic value to the left-hand-side of the
   ///     call when there is one
-  /// \param get_goto_function: The delegate to retrieve function bodies (see
-  ///   \ref get_goto_functiont)
-  /// \param state: Symbolic execution state for current instruction
-  /// \param call: The function call instruction
   virtual void symex_function_call_code(
-    const get_goto_functiont &get_goto_function,
-    statet &state,
-    const code_function_callt &call);
+    const get_goto_functiont &,
+    statet &,
+    const code_function_callt &);
 
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
@@ -510,25 +417,17 @@ protected:
   /// \param arguments: arguments that are passed to the function
   void parameter_assignments(
     const irep_idt &function_identifier,
-    const goto_functionst::goto_functiont &goto_function,
-    statet &state,
+    const goto_functionst::goto_functiont &,
+    statet &,
     const exprt::operandst &arguments);
 
   // exceptions
-  /// Symbolically execute a THROW instruction
-  /// \param state: Symbolic execution state for current instruction
-  void symex_throw(statet &state);
-  /// Symbolically execute a CATCH instruction
-  /// \param state: Symbolic execution state for current instruction
-  void symex_catch(statet &state);
+  void symex_throw(statet &);
+  void symex_catch(statet &);
 
-  virtual void do_simplify(exprt &expr);
+  virtual void do_simplify(exprt &);
 
-  /// Symbolically execute an ASSIGN instruction or simulate such an execution
-  /// for a synthetic assignment
-  /// \param state: Symbolic execution state for current instruction
-  /// \param code: The assignment to execute
-  void symex_assign(statet &state, const code_assignt &code);
+  void symex_assign(statet &, const code_assignt &);
 
   /// Attempt to constant propagate side effects of the assignment (if any)
   ///
@@ -648,7 +547,7 @@ protected:
   // clang-format on
 
   // havocs the given object
-  void havoc_rec(statet &state, const guardt &guard, const exprt &dest);
+  void havoc_rec(statet &, const guardt &, const exprt &);
 
   typedef symex_targett::assignment_typet assignment_typet;
 
@@ -674,57 +573,20 @@ protected:
   /// \param lhs: The expression to assign to
   /// \param code: The `allocate` expression
   virtual void symex_allocate(
-    statet &state,
-    const exprt &lhs,
-    const side_effect_exprt &code);
-  /// Symbolically execute an OTHER instruction that does a CPP `delete`
-  /// \param state: Symbolic execution state for current instruction
-  /// \param code: The cleaned up CPP `delete` instruction
-  virtual void symex_cpp_delete(statet &state, const codet &code);
-  /// Symbolically execute an assignment instruction that has a CPP `new` or
-  /// `new array` or a Java `new array` on the right hand side
-  /// \param state: Symbolic execution state for current instruction
-  /// \param lhs: The expression to assign to
-  /// \param code: The `new` expression
-  virtual void
-  symex_cpp_new(statet &state, const exprt &lhs, const side_effect_exprt &code);
-  /// Symbolically execute a FUNCTION_CALL instruction for a function whose
-  /// name starts with CPROVER_FKT_PREFIX
-  /// \remarks
-  /// While the name seems to imply that this would be called when symbolic
-  /// execution doesn't know what to do, it may actually be derived from a
-  /// German abbreviation for function.
-  /// This should not be called as these functions should already be removed
-  /// \param state: Symbolic execution state for current instruction
-  /// \param code: The function call instruction
-  virtual void symex_fkt(statet &state, const code_function_callt &code);
-  /// Symbolically execute a FUNCTION_CALL instruction for the `CBMC_trace`
-  /// function
-  /// \param state: Symbolic execution state for current instruction
-  /// \param code: The function call instruction
-  virtual void symex_trace(statet &state, const code_function_callt &code);
-  /// Symbolically execute an OTHER instruction that does a CPP `printf`
-  /// \param state: Symbolic execution state for current instruction
-  /// \param rhs: The cleaned up CPP `printf` instruction
-  virtual void symex_printf(statet &state, const exprt &rhs);
-  /// Symbolically execute an OTHER instruction that does a CPP input
-  /// \param state: Symbolic execution state for current instruction
-  /// \param code: The cleaned up input instruction
-  virtual void symex_input(statet &state, const codet &code);
-  /// Symbolically execute an OTHER instruction that does a CPP output
-  /// \param state: Symbolic execution state for current instruction
-  /// \param code: The cleaned up output instruction
-  virtual void symex_output(statet &state, const codet &code);
+    statet &, const exprt &lhs, const side_effect_exprt &);
+  virtual void symex_cpp_delete(statet &, const codet &);
+  virtual void symex_cpp_new(
+    statet &, const exprt &lhs, const side_effect_exprt &);
+  virtual void symex_fkt(statet &, const code_function_callt &);
+  virtual void symex_trace(statet &, const code_function_callt &);
+  virtual void symex_printf(statet &, const irept &);
+  virtual void symex_input(statet &, const codet &);
+  virtual void symex_output(statet &, const codet &);
 
-  /// A monotonically increasing index for each created dynamic object
   static unsigned dynamic_counter;
 
   void rewrite_quantifiers(exprt &, statet &);
 
-  /// \brief Symbolic execution paths to be resumed later
-  /// \remarks
-  /// Partially-executed symbolic execution \ref path_storaget::patht "paths"
-  /// whose execution can be resumed later
   path_storaget &path_storage;
 
 public:
@@ -744,15 +606,14 @@ protected:
   ///
   /// The actual number of total and remaining VCCs should be assigned to
   /// the relevant members of goto_symex_statet. The members below are used to
-  /// cache the values from goto_symex_statet after symbolic execution has
-  /// ended, so that the user of \ref goto_symext can read those values even
-  /// after the state has been deallocated.
+  /// cache the values from goto_symex_statet after symex has ended, so that
+  /// \ref bmct can read those values even after the state has been deallocated.
 
   unsigned _total_vccs, _remaining_vccs;
   ///@}
 
 public:
-  unsigned get_total_vccs() const
+  unsigned get_total_vccs()
   {
     INVARIANT(
       _total_vccs != std::numeric_limits<unsigned>::max(),
@@ -761,7 +622,7 @@ public:
     return _total_vccs;
   }
 
-  unsigned get_remaining_vccs() const
+  unsigned get_remaining_vccs()
   {
     INVARIANT(
       _remaining_vccs != std::numeric_limits<unsigned>::max(),
@@ -781,7 +642,6 @@ public:
 /// recursion) being entered. 'Next instruction' in this situation refers
 /// to the next one in program order, so it ignores things like unconditional
 /// GOTOs, and only goes until the end of the current function.
-/// \param state: Symbolic execution state to be transformed
 void symex_transition(goto_symext::statet &state);
 
 void symex_transition(

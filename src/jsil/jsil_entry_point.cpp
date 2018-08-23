@@ -38,7 +38,7 @@ static void create_initialize(symbol_tablet &symbol_table)
   code_assignt a(rounding_mode, from_integer(0, rounding_mode.type()));
   init_code.add(a);
 
-  initialize.value=init_code;
+  initialize.value = init_code.as_expr();
 
   if(symbol_table.add(initialize))
     throw "failed to add " INITIALIZE_FUNCTION;

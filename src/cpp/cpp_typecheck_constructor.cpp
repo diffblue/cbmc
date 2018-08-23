@@ -47,7 +47,7 @@ static void copy_parent(
   code_assignt code(dereference_exprt(op0), op1);
   code.add_source_location() = source_location;
 
-  block.operands().push_back(code);
+  block.operands().push_back(code.as_expr());
 }
 
 /// Generate code to copy the member.
@@ -76,7 +76,7 @@ static void copy_member(
   code_expressiont code(assign);
   code.add_source_location() = source_location;
 
-  block.operands().push_back(code);
+  block.operands().push_back(code.as_expr());
 }
 
 /// Generate code to copy the member.
@@ -113,7 +113,7 @@ static void copy_array(
   code_expressiont code(assign);
   code.add_source_location() = source_location;
 
-  block.operands().push_back(code);
+  block.operands().push_back(code.as_expr());
 }
 
 /// Generate code for implicit default constructors
@@ -580,6 +580,7 @@ void cpp_typecheckt::full_member_initialization(
 
       code_ifthenelset cond(
         cpp_namet("@most_derived").as_expr(), std::move(block));
+
       final_initializers.move_to_sub(cond);
     }
 

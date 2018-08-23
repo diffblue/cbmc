@@ -461,15 +461,15 @@ std::string expr2cppt::convert_code(
   const codet &src,
   unsigned indent)
 {
-  const irep_idt &statement=src.get(ID_statement);
+  const irep_idt &statement = src.get_statement();
 
   if(statement==ID_cpp_delete ||
      statement==ID_cpp_delete_array)
-    return convert_code_cpp_delete(src, indent);
+    return convert_code_cpp_delete(src.as_expr(), indent);
 
   if(statement==ID_cpp_new ||
      statement==ID_cpp_new_array)
-    return convert_code_cpp_new(src, indent);
+    return convert_cpp_new(src.as_expr(), indent);
 
   return expr2ct::convert_code(src, indent);
 }
