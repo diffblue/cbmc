@@ -210,6 +210,7 @@ void symex_target_equationt::location(
 void symex_target_equationt::function_call(
   const exprt &guard,
   const irep_idt &function_identifier,
+  const std::vector<exprt> &ssa_function_arguments,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
@@ -219,6 +220,7 @@ void symex_target_equationt::function_call(
   SSA_step.type = goto_trace_stept::typet::FUNCTION_CALL;
   SSA_step.source = source;
   SSA_step.function_identifier = function_identifier;
+  SSA_step.ssa_function_arguments = ssa_function_arguments;
 
   merge_ireps(SSA_step);
 }
@@ -383,6 +385,7 @@ void symex_target_equationt::convert(
     convert_assumptions(prop_conv);
     convert_assertions(prop_conv);
     convert_goto_instructions(prop_conv);
+    convert_function_calls(prop_conv);
     convert_io(prop_conv);
     convert_constraints(prop_conv);
   }
@@ -658,6 +661,39 @@ void symex_target_equationt::convert_assertions(
   prop_conv.set_to_true(disjunction(disjuncts));
 }
 
+/// converts function calls
+/// \par parameters: decision procedure
+/// \return -
+void symex_target_equationt::convert_function_calls(
+  decision_proceduret &dec_proc)
+{
+  std::size_t argument_count=0;
+
+  for(auto &step : SSA_steps)
+    if(!step.ignore)
+    {
+      step.converted_function_arguments.reserve(step.ssa_function_arguments.size());
+
+      for(const auto &arg : step.ssa_function_arguments)
+      {
+        if(arg.is_constant() ||
+           arg.id()==ID_string_constant)
+          step.converted_function_arguments.push_back(arg);
+        else
+        {
+          const irep_idt identifier="symex::args::"+std::to_string(argument_count++);
+          symbol_exprt symbol(identifier, arg.type());
+
+          equal_exprt eq(arg, symbol);
+          merge_irep(eq);
+
+          dec_proc.set_to(eq, true);
+          step.converted_function_arguments.push_back(symbol);
+        }
+      }
+    }
+}
+
 /// converts I/O
 /// \par parameters: decision procedure
 /// \return -
@@ -690,7 +726,6 @@ void symex_target_equationt::convert_io(
     }
 }
 
-
 void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
 {
   merge_irep(SSA_step.guard);
@@ -704,6 +739,9 @@ void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
 
   for(auto &step : SSA_step.io_args)
     merge_irep(step);
+
+  for(auto &arg : SSA_step.ssa_function_arguments)
+    merge_irep(arg);
 
   // converted_io_args is merged in convert_io
 }

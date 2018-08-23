@@ -254,8 +254,14 @@ void goto_symext::symex_function_call_code(
     return;
   }
 
+  // read the arguments -- before the locality renaming
+  exprt::operandst arguments = call.arguments();
+  for(auto &a : arguments)
+    state.rename(a, ns);
+
   // record the call
-  target.function_call(state.guard.as_expr(), identifier, state.source);
+  target.function_call(
+    state.guard.as_expr(), identifier, arguments, state.source);
 
   if(!goto_function.body_available())
   {
@@ -275,11 +281,6 @@ void goto_symext::symex_function_call_code(
     symex_transition(state);
     return;
   }
-
-  // read the arguments -- before the locality renaming
-  exprt::operandst arguments=call.arguments();
-  for(auto &a : arguments)
-    state.rename(a, ns);
 
   // produce a new frame
   PRECONDITION(!state.call_stack().empty());

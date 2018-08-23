@@ -122,6 +122,9 @@ public:
   // for function call/return
   irep_idt function_identifier;
 
+  // for function call
+  std::vector<exprt> function_arguments;
+
   /*! \brief outputs the trace step in ASCII to a given stream
   */
   void output(

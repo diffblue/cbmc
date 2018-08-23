@@ -105,7 +105,8 @@ public:
   virtual void function_call(
     const exprt &guard,
     const irep_idt &function_identifier,
-    const sourcet &source)=0;
+    const std::vector<exprt> &ssa_function_arguments,
+    const sourcet &source) = 0;
 
   // record return from a function
   virtual void function_return(
