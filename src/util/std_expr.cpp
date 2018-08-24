@@ -197,3 +197,16 @@ struct_exprt::component(const irep_idt &name, const namespacet &ns) const
 {
   return ::component(*this, name, ns);
 }
+
+const exprt &object_descriptor_exprt::root_object() const
+{
+  const exprt *p = &object();
+
+  while(p->id() == ID_member || p->id() == ID_index)
+  {
+    assert(!p->operands().empty());
+    p = &p->op0();
+  }
+
+  return *p;
+}
