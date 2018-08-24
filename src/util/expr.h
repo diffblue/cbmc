@@ -139,6 +139,7 @@ public:
     return static_cast<source_locationt &>(add(ID_C_source_location));
   }
 
+protected:
   exprt &add_expr(const irep_idt &name)
   {
     return static_cast<exprt &>(add(name));
@@ -149,6 +150,7 @@ public:
     return static_cast<const exprt &>(find(name));
   }
 
+public:
   void visit(class expr_visitort &visitor);
   void visit(class const_expr_visitort &visitor) const;
 
