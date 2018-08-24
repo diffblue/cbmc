@@ -235,9 +235,9 @@ bool java_bytecode_languaget::parse(
     if(main_class.empty())
     {
       status() << "JAR file without entry point: loading class files" << eom;
-      java_class_loader.load_entire_jar(path);
-      for(const auto &kv : java_class_loader.get_jar_index(path))
-        main_jar_classes.push_back(kv.first);
+      const auto classes = java_class_loader.load_entire_jar(path);
+      for(const auto &c : classes)
+        main_jar_classes.push_back(c);
     }
     else
       java_class_loader.add_classpath_entry(path);

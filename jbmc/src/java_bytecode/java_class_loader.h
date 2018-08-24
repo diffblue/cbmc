@@ -27,10 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class java_class_loadert:public messaget
 {
 public:
-  /// A map associating logical class names with the name of the .class file
-  /// implementing it for all classes inside a single JAR file
-  typedef std::map<irep_idt, std::string> jar_indext;
-
   /// A list of parse trees supporting overlay classes
   typedef std::list<java_bytecode_parse_treet> parse_tree_with_overlayst;
   /// A map from class names to list of parse tree where multiple entries can
@@ -95,14 +91,11 @@ public:
   void add_classpath_entry(const std::string &);
 
   static std::string file_to_class_name(const std::string &);
-  static std::string class_name_to_file(const irep_idt &);
+  static std::string class_name_to_os_file(const irep_idt &);
+  static std::string class_name_to_jar_file(const irep_idt &);
 
-  void load_entire_jar(const std::string &jar_path);
+  std::vector<irep_idt> load_entire_jar(const std::string &jar_path);
 
-  const jar_indext &get_jar_index(const std::string &jar_path)
-  {
-    return jars_by_path.at(jar_path);
-  }
   /// Map from class names to the bytecode parse trees
   fixed_keys_map_wrappert<parse_tree_with_overridest_mapt>
   get_class_with_overlays_map()
@@ -146,22 +139,13 @@ private:
   std::vector<irep_idt> java_load_classes;
   get_extra_class_refs_functiont get_extra_class_refs;
 
-  /// The jar_indext for each jar file we've read
-  std::map<std::string, jar_indext> jars_by_path;
-
   /// Map from class names to the bytecode parse trees
   parse_tree_with_overridest_mapt class_map;
 
-  typedef optionalt<std::reference_wrapper<const jar_indext>>
-    jar_index_optcreft;
+  optionalt<std::vector<irep_idt>> read_jar_file(const std::string &jar_path);
 
-  jar_index_optcreft read_jar_file(
-    const std::string &jar_path);
-
-  optionalt<java_bytecode_parse_treet> get_class_from_jar(
-    const irep_idt &class_name,
-    const std::string &jar_file,
-    const jar_indext &jar_index);
+  optionalt<java_bytecode_parse_treet>
+  get_class_from_jar(const irep_idt &class_name, const std::string &jar_file);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H
