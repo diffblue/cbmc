@@ -108,7 +108,8 @@ std::string graphml_witnesst::convert_assign_rec(
          has_prefix(id2string(comp.get_name()), "$pad"))
         continue;
 
-      assert(it!=assign.rhs().operands().end());
+      INVARIANT(
+        it != assign.rhs().operands().end(), "expression must have operands");
 
       member_exprt member(
         assign.lhs(),
