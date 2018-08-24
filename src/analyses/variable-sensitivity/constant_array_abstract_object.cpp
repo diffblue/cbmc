@@ -289,10 +289,26 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
     }
     else
     {
-      // Reading from somewhere in the array
-      // TODO(tkiley): merge all the values of the array, we may be able to
-      // do better than returning top
-      return env.abstract_object_factory(type().subtype(), ns, true, false);
+      // Although we don't know where we are reading from, and therefore
+      // we should be returning a TOP value, we may still have useful
+      // additional information in elements of the array - such as write
+      // histories so we merge all the known array elements with TOP and return
+      // that.
+
+      // Create a new TOP value of the appropriate element type
+      abstract_object_pointert result =
+        env.abstract_object_factory(type().subtype(), ns, true, false);
+
+      // Merge each known element into the TOP value
+      shared_array_mapt::viewt known_elements;
+      map.get_view(known_elements);
+      bool dummy;
+      for(const auto &element : known_elements)
+      {
+        result = abstract_objectt::merge(result, element.second, dummy);
+      }
+
+      return result;
     }
   }
 }

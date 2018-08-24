@@ -1,0 +1,8 @@
+CORE
+main.c
+--dependence-graph --show
+activate-multi-line-match
+EXIT=0
+SIGNAL=0
+\*\*\*\* 9 file main\.c line 22 function main\nControl dependencies: 28 \[UNCONDITIONAL\]\nData dependencies: 1 \[g_a\[\(signed long int\)i\]\], 2 \[g_a\[\(signed long int\)i\]\], 3 \[g_a\[\(signed long int\)i\]\], 4 \[i\], 6 \[i\], 7 \[g_a\[\(signed long int\)i\]\]
+--
