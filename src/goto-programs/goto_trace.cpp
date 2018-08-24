@@ -285,7 +285,7 @@ bool is_index_member_symbol(const exprt &src)
     return false;
 }
 
-void show_goto_trace(
+void show_full_goto_trace(
   std::ostream &out,
   const namespacet &ns,
   const goto_tracet &goto_trace,
@@ -486,6 +486,94 @@ void show_goto_trace(
       UNREACHABLE;
     }
   }
+}
+
+void show_goto_stack_trace(
+  std::ostream &out,
+  const namespacet &ns,
+  const goto_tracet &goto_trace,
+  const trace_optionst &options)
+{
+  // map from thread number to a call stack
+  std::map<unsigned, std::vector<goto_tracet::stepst::const_iterator>>
+    call_stacks;
+
+  // by default, we show thread 0
+  unsigned thread_to_show = 0;
+
+  for(auto s_it = goto_trace.steps.begin(); s_it != goto_trace.steps.end();
+      s_it++)
+  {
+    const auto &step = *s_it;
+    auto &stack = call_stacks[step.thread_nr];
+
+    if(step.is_assert())
+    {
+      if(!step.cond_value)
+      {
+        stack.push_back(s_it);
+        thread_to_show = step.thread_nr;
+      }
+    }
+    else if(step.is_function_call())
+    {
+      stack.push_back(s_it);
+    }
+    else if(step.is_function_return())
+    {
+      stack.pop_back();
+    }
+  }
+
+  const auto &stack = call_stacks[thread_to_show];
+
+  // print in reverse order
+  for(auto s_it = stack.rbegin(); s_it != stack.rend(); s_it++)
+  {
+    const auto &step = **s_it;
+    if(step.is_assert())
+    {
+      out << "  assertion failure";
+      if(!step.pc->source_location.is_nil())
+        out << ' ' << step.pc->source_location;
+      out << '\n';
+    }
+    else if(step.is_function_call())
+    {
+      out << "  " << step.function_identifier;
+      out << '(';
+
+      bool first = true;
+      for(auto &arg : step.function_arguments)
+      {
+        if(first)
+          first = false;
+        else
+          out << ", ";
+
+        out << from_expr(ns, step.function_identifier, arg);
+      }
+
+      out << ')';
+
+      if(!step.pc->source_location.is_nil())
+        out << ' ' << step.pc->source_location;
+
+      out << '\n';
+    }
+  }
+}
+
+void show_goto_trace(
+  std::ostream &out,
+  const namespacet &ns,
+  const goto_tracet &goto_trace,
+  const trace_optionst &options)
+{
+  if(options.stack_trace)
+    show_goto_stack_trace(out, ns, goto_trace, options);
+  else
+    show_full_goto_trace(out, ns, goto_trace, options);
 }
 
 void show_goto_trace(
