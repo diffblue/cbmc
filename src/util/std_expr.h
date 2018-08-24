@@ -1966,18 +1966,7 @@ public:
     return op0();
   }
 
-  const exprt &root_object() const
-  {
-    const exprt *p=&object();
-
-    while(p->id()==ID_member || p->id()==ID_index)
-    {
-      assert(!p->operands().empty());
-      p=&p->op0();
-    }
-
-    return *p;
-  }
+  const exprt &root_object() const;
 
   exprt &offset()
   {
