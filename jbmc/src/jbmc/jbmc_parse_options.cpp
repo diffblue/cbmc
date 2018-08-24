@@ -652,7 +652,7 @@ int jbmc_parse_optionst::get_goto_program(
     if(cmdline.isset("show-symbol-table"))
     {
       show_symbol_table(
-        lazy_goto_model.symbol_table, ui_message_handler.get_ui());
+        lazy_goto_model.symbol_table, ui_message_handler);
       return 0;
     }
 
@@ -832,7 +832,7 @@ bool jbmc_parse_optionst::show_loaded_functions(
   if(cmdline.isset("show-symbol-table"))
   {
     show_symbol_table(
-      goto_model.get_symbol_table(), ui_message_handler.get_ui());
+      goto_model.get_symbol_table(), ui_message_handler);
     return true;
   }
 

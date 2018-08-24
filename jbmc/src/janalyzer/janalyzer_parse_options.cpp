@@ -377,7 +377,7 @@ int janalyzer_parse_optionst::doit()
   // show it?
   if(cmdline.isset("show-symbol-table"))
   {
-    ::show_symbol_table(goto_model.symbol_table, get_ui());
+    ::show_symbol_table(goto_model.symbol_table, ui_message_handler);
     return CPROVER_EXIT_SUCCESS;
   }
 

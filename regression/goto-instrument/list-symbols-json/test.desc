@@ -1,0 +1,10 @@
+CORE
+test.c
+--list-symbols --json-ui
+"symbolTable": \{
+"main": \{
+"main::1::x": \{
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
