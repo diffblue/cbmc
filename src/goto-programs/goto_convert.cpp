@@ -479,7 +479,7 @@ void goto_convertt::convert(
   else if(statement==ID_while)
     convert_while(to_code_while(code), dest, mode);
   else if(statement==ID_dowhile)
-    convert_dowhile(code, dest, mode);
+    convert_dowhile(to_code_dowhile(code), dest, mode);
   else if(statement==ID_switch)
     convert_switch(to_code_switch(code), dest, mode);
   else if(statement==ID_break)
@@ -1131,21 +1131,14 @@ void goto_convertt::convert_while(
 }
 
 void goto_convertt::convert_dowhile(
-  const codet &code,
+  const code_dowhilet &code,
   goto_programt &dest,
   const irep_idt &mode)
 {
-  if(code.operands().size()!=2)
-  {
-    error().source_location=code.find_source_location();
-    error() << "dowhile takes two operands" << eom;
-    throw 0;
-  }
-
   // save source location
-  source_locationt condition_location=code.op0().find_source_location();
+  source_locationt condition_location=code.cond().find_source_location();
 
-  exprt cond=code.op0();
+  exprt cond=code.cond();
 
   goto_programt sideeffects;
   clean_expr(cond, sideeffects, mode);
@@ -1183,7 +1176,7 @@ void goto_convertt::convert_dowhile(
 
   // do the w label
   goto_programt tmp_w;
-  convert(to_code(code.op1()), tmp_w, mode);
+  convert(code.body(), tmp_w, mode);
   goto_programt::targett w=tmp_w.instructions.begin();
 
   // y: if(c) goto w;

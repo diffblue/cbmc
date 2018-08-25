@@ -234,8 +234,10 @@ protected:
     const code_whilet &code,
     goto_programt &dest,
     const irep_idt &mode);
-  void
-  convert_dowhile(const codet &code, goto_programt &dest, const irep_idt &mode);
+  void convert_dowhile(
+    const code_dowhilet &code,
+    goto_programt &dest,
+    const irep_idt &mode);
   void convert_assume(
     const code_assumet &code,
     goto_programt &dest,
