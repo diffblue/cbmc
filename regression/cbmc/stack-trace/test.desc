@@ -1,0 +1,9 @@
+CORE
+main.c
+--stack-trace
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+^  assertion failure file main.c line 3 .*\n  foo\(2\).*\n  bar\(0\).*\n  main\(\).*
+--
+^warning: ignoring

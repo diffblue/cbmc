@@ -205,6 +205,7 @@ struct trace_optionst
   bool base_prefix;
   bool show_function_calls;
   bool show_code;
+  bool stack_trace;
 
   static const trace_optionst default_options;
 
@@ -215,6 +216,7 @@ struct trace_optionst
     base_prefix = hex_representation;
     show_function_calls = options.get_bool_option("trace-show-function-calls");
     show_code = options.get_bool_option("trace-show-code");
+    stack_trace = options.get_bool_option("stack-trace");
   };
 
 private:
@@ -225,6 +227,7 @@ private:
     base_prefix = false;
     show_function_calls = false;
     show_code = false;
+    stack_trace = false;
   };
 };
 
@@ -246,27 +249,30 @@ void trace_value(
   const exprt &full_lhs,
   const exprt &value);
 
-
-#define OPT_GOTO_TRACE "(trace-json-extended)" \
-                       "(trace-show-function-calls)" \
-                       "(trace-show-code)" \
-                       "(trace-hex)"
+#define OPT_GOTO_TRACE                                                         \
+  "(trace-json-extended)"                                                      \
+  "(trace-show-function-calls)"                                                \
+  "(trace-show-code)"                                                          \
+  "(trace-hex)"                                                                \
+  "(stack-trace)"
 
 #define HELP_GOTO_TRACE                                                        \
   " --trace-json-extended        add rawLhs property to trace\n"               \
   " --trace-show-function-calls  show function calls in plain trace\n"         \
   " --trace-show-code            show original code in plain trace\n"          \
-  " --trace-hex                  represent plain trace values in hex\n"
+  " --trace-hex                  represent plain trace values in hex\n"        \
+  " --stack-trace                give a stack trace only\n"
 
 #define PARSE_OPTIONS_GOTO_TRACE(cmdline, options)                             \
   if(cmdline.isset("trace-json-extended"))                                     \
     options.set_option("trace-json-extended", true);                           \
   if(cmdline.isset("trace-show-function-calls"))                               \
     options.set_option("trace-show-function-calls", true);                     \
-  if(cmdline.isset("trace-show-code"))                                       \
-      options.set_option("trace-show-code", true);                             \
+  if(cmdline.isset("trace-show-code"))                                         \
+    options.set_option("trace-show-code", true);                               \
   if(cmdline.isset("trace-hex"))                                               \
-    options.set_option("trace-hex", true);
-
+    options.set_option("trace-hex", true);                                     \
+  if(cmdline.isset("stack-trace"))                                             \
+    options.set_option("stack-trace", true);
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H

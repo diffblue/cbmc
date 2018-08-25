@@ -135,8 +135,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
      cmdline.isset("outfile"))
     options.set_option("stop-on-fail", true);
 
-  if(cmdline.isset("trace") ||
-     cmdline.isset("stop-on-fail"))
+  if(
+    cmdline.isset("trace") || cmdline.isset("stack-trace") ||
+    cmdline.isset("stop-on-fail"))
     options.set_option("trace", true);
 
   if(cmdline.isset("localize-faults"))
