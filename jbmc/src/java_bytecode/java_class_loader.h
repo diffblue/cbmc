@@ -14,17 +14,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <regex>
 #include <set>
 
-#include <util/message.h>
 #include <util/fixed_keys_map_wrapper.h>
 
 #include "jar_file.h"
-#include "jar_pool.h"
 #include "java_bytecode_parse_tree.h"
+#include "java_class_loader_base.h"
 #include "java_class_loader_limit.h"
 
 /// Class responsible to load .class files. Either directly from a specific
 /// file, from a classpath specification or from a Java archive (JAR) file.
-class java_class_loadert:public messaget
+class java_class_loadert : public java_class_loader_baset
 {
 public:
   /// A list of parse trees supporting overlay classes
@@ -78,22 +77,6 @@ public:
       java_load_classes.push_back(id);
   }
 
-  /// Clear all classpath entries
-  void clear_classpath()
-  {
-    classpath_entries.clear();
-  }
-
-  /// Appends an entry to the class path, used for loading classes.  The
-  /// argument may be
-  /// 1) The name of a directory, used for searching for .class files
-  /// 2) The name of a JAR file
-  void add_classpath_entry(const std::string &);
-
-  static std::string file_to_class_name(const std::string &);
-  static std::string class_name_to_os_file(const irep_idt &);
-  static std::string class_name_to_jar_file(const irep_idt &);
-
   std::vector<irep_idt> load_entire_jar(const std::string &jar_path);
 
   /// Map from class names to the bytecode parse trees
@@ -108,9 +91,6 @@ public:
     return class_map.at(class_name).front();
   }
 
-  /// a cache for jar_filet, by path name
-  jar_poolt jar_pool;
-
 private:
   /// Either a regular expression matching files that will be allowed to be
   /// loaded or a string of the form `@PATH` where PATH is the file path of a
@@ -118,22 +98,6 @@ private:
   /// java_class_loader_limitt::setup_class_load_limit() for further
   /// information.
   std::string java_cp_include_files;
-
-  /// An entry in the classpath
-  struct classpath_entryt
-  {
-    using kindt = enum { JAR, DIRECTORY };
-    kindt kind;
-    std::string path;
-
-    classpath_entryt(kindt _kind, const std::string &_path)
-      : kind(_kind), path(_path)
-    {
-    }
-  };
-
-  /// List of entries in the classpath
-  std::list<classpath_entryt> classpath_entries;
 
   /// Classes to be explicitly loaded
   std::vector<irep_idt> java_load_classes;
@@ -143,9 +107,6 @@ private:
   parse_tree_with_overridest_mapt class_map;
 
   optionalt<std::vector<irep_idt>> read_jar_file(const std::string &jar_path);
-
-  optionalt<java_bytecode_parse_treet>
-  get_class_from_jar(const irep_idt &class_name, const std::string &jar_file);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H
