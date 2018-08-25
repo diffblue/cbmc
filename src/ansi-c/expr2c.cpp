@@ -2980,9 +2980,6 @@ std::string expr2ct::convert_code(
   if(statement==ID_assign)
     return convert_code_assign(to_code_assign(src), indent);
 
-  if(statement==ID_init)
-    return convert_code_init(src, indent);
-
   if(statement=="lock")
     return convert_code_lock(src, indent);
 
@@ -3047,15 +3044,6 @@ std::string expr2ct::convert_code_free(
   }
 
   return indent_str(indent)+"FREE("+convert(src.op0())+");";
-}
-
-std::string expr2ct::convert_code_init(
-  const codet &src,
-  unsigned indent)
-{
-  std::string tmp=convert_binary(src, "=", 2, true);
-
-  return indent_str(indent)+"INIT "+tmp+";";
 }
 
 std::string expr2ct::convert_code_lock(
