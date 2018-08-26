@@ -24,8 +24,8 @@ Author: Diffblue Ltd.
 std::string unwrap_exception(const std::exception &e, int level)
 {
   const std::string msg = e.what();
-  std::vector<std::string> lines;
-  split_string(msg, '\n', lines, false, true);
+  std::vector<std::string> lines =
+    split_string(msg, '\n', false, true);
   std::ostringstream message_stream;
   message_stream << std::string(level, ' ') << "exception: ";
   join_strings(

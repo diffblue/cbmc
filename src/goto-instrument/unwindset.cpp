@@ -23,8 +23,8 @@ void unwindsett::parse_unwind(const std::string &unwind)
 
 void unwindsett::parse_unwindset(const std::string &unwindset)
 {
-  std::vector<std::string> unwindset_loops;
-  split_string(unwindset, ',', unwindset_loops, true, true);
+  std::vector<std::string> unwindset_loops =
+    split_string(unwindset, ',', true, true);
 
   for(auto &val : unwindset_loops)
   {
