@@ -51,7 +51,7 @@ information about their length in bytes.
 The integer format used in class files are unsigned integers of size 8/16/32
 bit, which are named as `u1`/`u2`/`u4`.
 
-\subsection Access flags
+\subsection java-class-access-flags Access Flags
 
 The JVM specification defines different access flags, e.g., `final`, `static`,
 `protected`, `private` etc. where different ones are applicable to the class
@@ -61,14 +61,14 @@ values. Each of these values is defined as a constant with a name prefixed with
 `ACC_` in JBMC, e.g., as `#define ACC_PUBLIC 0x0001` or `#define ACC_ENUM
 0x4000`.
 
-\subsection Constant Pool
+\subsection java-class-constant-pool Constant Pool
 
 The constant pool contains all strings and referred values that are used in the
 .class. This includes the names of the class itself and its super-class, as well
 as the names and signatures of all fields and methods. All strings in the
 constant pool are in UTF-16 format.
 
-\subsection Fields
+\subsection java-class-fields Fields
 
 Each member variable of a class has a field entry with a corresponding field
 information structure. This contains the name of the field, its raw JVM type
@@ -80,7 +80,7 @@ the generic type of an object if applicable.
 The name of the field, the descriptor and the signature are all represented as
 indices into the constant pool of the class file.
 
-\subsection Methods
+\subsection java-class-methods Methods
 
 Methods are represented in a similar way as fields. Each method has an
 associated name, descriptor and optional signature entry in the constant pool
@@ -100,7 +100,7 @@ correct and creates code accordingly. The same holds true for information on
 local variables. It is therefore advisable to compile Java projects with the
 `-g` option that adds debugging information in all cases.
 
-\subsection Attributes
+\subsection java-class-attributes Attributes
 
 The last section contains additional attributes, e.g., `SourceFile` which
 specified from which source file the .class was compiled, `BootstrapMethods`
