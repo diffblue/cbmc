@@ -955,7 +955,6 @@ void cbmc_parse_optionst::help()
     " --dimacs                     generate CNF in DIMACS format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
     " --localize-faults            localize faults (experimental)\n"
-    " --smt1                       use default SMT1 solver (obsolete)\n"
     " --smt2                       use default SMT2 solver (Z3)\n"
     " --boolector                  use Boolector\n"
     " --mathsat                    use MathSAT\n"
