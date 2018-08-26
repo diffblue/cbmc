@@ -104,10 +104,7 @@ bool jsil_convertt::convert_code(const symbolt &symbol, codet &code)
       side_effect_expr_function_callt f_expr=
         to_side_effect_expr_function_call(a.rhs());
 
-      code_function_callt f;
-      f.lhs().swap(a.lhs());
-      f.function().swap(f_expr.function());
-      f.arguments().swap(f_expr.arguments());
+      code_function_callt f(a.lhs(), f_expr.function(), f_expr.arguments());
       f.add_source_location()=code.source_location();
 
       code.swap(f);

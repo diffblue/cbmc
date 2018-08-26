@@ -341,11 +341,8 @@ void goto_convertt::remove_function_call(
   if(!result_is_used)
   {
     assert(expr.operands().size()==2);
-    code_function_callt call;
-    call.function()=expr.op0();
-    call.arguments()=expr.op1().operands();
+    code_function_callt call(nil_exprt(), expr.op0(), expr.op1().operands());
     call.add_source_location()=expr.source_location();
-    call.lhs().make_nil();
     convert_function_call(call, dest, mode);
     expr.make_nil();
     return;
@@ -397,10 +394,8 @@ void goto_convertt::remove_function_call(
 
   {
     goto_programt tmp_program2;
-    code_function_callt call;
-    call.lhs()=new_symbol.symbol_expr();
-    call.function()=expr.op0();
-    call.arguments()=expr.op1().operands();
+    code_function_callt call(
+      new_symbol.symbol_expr(), expr.op0(), expr.op1().operands());
     call.add_source_location()=new_symbol.location;
     convert_function_call(call, dest, mode);
   }

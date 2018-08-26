@@ -865,11 +865,42 @@ inline code_gotot &to_code_goto(codet &code)
 class code_function_callt:public codet
 {
 public:
+  DEPRECATED("Use code_function_callt(...) instead")
   code_function_callt():codet(ID_function_call)
   {
     operands().resize(3);
     lhs().make_nil();
     op2().id(ID_arguments);
+  }
+
+  explicit code_function_callt(const exprt &_function) : codet(ID_function_call)
+  {
+    operands().resize(3);
+    lhs().make_nil();
+    op2().id(ID_arguments);
+    function() = _function;
+  }
+
+  typedef exprt::operandst argumentst;
+
+  code_function_callt(
+    const exprt &_lhs,
+    const exprt &_function,
+    argumentst &&_arguments)
+    : code_function_callt(_function)
+  {
+    lhs() = _lhs;
+    arguments() = std::move(_arguments);
+  }
+
+  code_function_callt(
+    const exprt &_lhs,
+    const exprt &_function,
+    const argumentst &_arguments)
+    : code_function_callt(_function)
+  {
+    lhs() = _lhs;
+    arguments() = _arguments;
   }
 
   exprt &lhs()
@@ -891,8 +922,6 @@ public:
   {
     return op1();
   }
-
-  typedef exprt::operandst argumentst;
 
   argumentst &arguments()
   {

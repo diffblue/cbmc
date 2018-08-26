@@ -309,10 +309,7 @@ void goto_convertt::do_scanf(
     else
     {
       // we'll just do nothing
-      code_function_callt function_call;
-      function_call.lhs()=lhs;
-      function_call.function()=function;
-      function_call.arguments()=arguments;
+      code_function_callt function_call(lhs, function, arguments);
       function_call.add_source_location()=function.source_location();
 
       copy(function_call, FUNCTION_CALL, dest);
@@ -462,8 +459,7 @@ void goto_convertt::do_cpp_new(
 
     tmp_symbol_expr=tmp_symbol.symbol_expr();
 
-    code_function_callt new_call;
-    new_call.function()=new_symbol;
+    code_function_callt new_call(new_symbol);
     if(new_array)
       new_call.arguments().push_back(count);
     new_call.arguments().push_back(object_size);
@@ -493,8 +489,7 @@ void goto_convertt::do_cpp_new(
 
     tmp_symbol_expr=tmp_symbol.symbol_expr();
 
-    code_function_callt new_call;
-    new_call.function()=new_symbol;
+    code_function_callt new_call(new_symbol);
     if(new_array)
       new_call.arguments().push_back(count);
     new_call.arguments().push_back(object_size);
@@ -1552,10 +1547,7 @@ void goto_convertt::do_function_call_symbol(
     new_function.set_identifier(name);
     new_function.type()=f_type;
 
-    code_function_callt function_call;
-    function_call.lhs()=lhs;
-    function_call.function()=new_function;
-    function_call.arguments()=new_arguments;
+    code_function_callt function_call(lhs, new_function, new_arguments);
     function_call.add_source_location()=function.source_location();
 
     if(!symbol_table.has_symbol(name))
@@ -1575,10 +1567,7 @@ void goto_convertt::do_function_call_symbol(
     do_function_call_symbol(*symbol);
 
     // insert function call
-    code_function_callt function_call;
-    function_call.lhs()=lhs;
-    function_call.function()=function;
-    function_call.arguments()=arguments;
+    code_function_callt function_call(lhs, function, arguments);
     function_call.add_source_location()=function.source_location();
 
     copy(function_call, FUNCTION_CALL, dest);

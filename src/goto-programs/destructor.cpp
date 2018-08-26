@@ -42,11 +42,7 @@ code_function_callt get_destructor(
              ns.follow(arg_type.subtype())==type)
           {
             const symbol_exprt symbol_expr(it->get(ID_name), it->type());
-
-            code_function_callt function_call;
-            function_call.function()=symbol_expr;
-
-            return function_call;
+            return code_function_callt(symbol_expr);
           }
         }
       }

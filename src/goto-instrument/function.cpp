@@ -59,17 +59,13 @@ code_function_callt function_to_call(
 
   string_constantt function_id_string(argument);
 
-  code_function_callt call;
-  call.lhs().make_nil();
-  call.function()=
-    symbol_exprt(s_it->second.name, s_it->second.type);
-  call.arguments().resize(1);
-  call.arguments()[0]=
-    typecast_exprt(
+  code_function_callt call(
+    nil_exprt(),
+    symbol_exprt(s_it->second.name, s_it->second.type),
+    {typecast_exprt(
       address_of_exprt(
-        index_exprt(
-          function_id_string, from_integer(0, index_type()))),
-      to_code_type(s_it->second.type).parameters()[0].type());
+        index_exprt(function_id_string, from_integer(0, index_type()))),
+      to_code_type(s_it->second.type).parameters()[0].type())});
 
   return call;
 }
