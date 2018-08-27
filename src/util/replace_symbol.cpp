@@ -181,6 +181,19 @@ bool replace_symbolt::replace(typet &dest) const
       if(!replace(p))
         result=false;
   }
+  else if(dest.id() == ID_union_tag ||
+          dest.id() == ID_struct_tag ||
+          dest.id() == ID_c_enum_tag)
+  {
+    type_mapt::const_iterator it =
+      type_map.find(to_tag_type(dest).get_identifier());
+
+    if(it != type_map.end())
+    {
+      dest = it->second;
+      result = false;
+    }
+  }
   else if(dest.id()==ID_array)
   {
     array_typet &array_type=to_array_type(dest);
