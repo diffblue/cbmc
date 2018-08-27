@@ -121,9 +121,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("show-vcc"))
     options.set_option("show-vcc", true);
 
-  if(cmdline.isset("cover"))
-    parse_cover_options(cmdline, options);
-
   if(cmdline.isset("nondet-static"))
     options.set_option("nondet-static", true);
 
@@ -189,14 +186,8 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("assumptions", false);
 
   // generate unwinding assertions
-  if(cmdline.isset("cover"))
-    options.set_option("unwinding-assertions", false);
-  else
-  {
-    options.set_option(
-      "unwinding-assertions",
-      cmdline.isset("unwinding-assertions"));
-  }
+  if(cmdline.isset("unwinding-assertions"))
+    options.set_option("unwinding-assertions", true);
 
   // generate unwinding assumptions otherwise
   options.set_option(
@@ -559,12 +550,6 @@ int jbmc_parse_optionst::doit()
     // particular function:
     add_failed_symbols(lazy_goto_model.symbol_table);
 
-    // If applicable, parse the coverage instrumentation configuration, which
-    // will be used in process_goto_function:
-    cover_config =
-      get_cover_config(
-        options, lazy_goto_model.symbol_table, get_message_handler());
-
     // Provide show-goto-functions and similar dump functions after symex
     // executes. If --paths is active, these dump routines run after every
     // paths iteration. Its return value indicates that if we ran any dump
@@ -782,20 +767,12 @@ void jbmc_parse_optionst::process_goto_function(
         symbol_table);
     }
 
-    // If using symex-driven function loading we must insert the coverage goals
+    // If using symex-driven function loading we must label the assertions
     // now so symex sees its targets; otherwise we leave this until
     // process_goto_functions, as we haven't run remove_exceptions yet, and that
     // pass alters the CFG.
     if(using_symex_driven_loading)
     {
-      // instrument cover goals
-      if(cmdline.isset("cover"))
-      {
-        INVARIANT(
-          cover_config != nullptr, "cover config should have been parsed");
-        instrument_cover_goals(*cover_config, function, get_message_handler());
-      }
-
       // label the assertions
       label_properties(goto_function.body);
 
@@ -916,16 +893,8 @@ bool jbmc_parse_optionst::process_goto_functions(
       remove_unused_functions(goto_model, get_message_handler());
     }
 
-    // remove skips such that trivial GOTOs are deleted and not considered
-    // for coverage annotation:
+    // remove skips such that trivial GOTOs are deleted
     remove_skip(goto_model);
-
-    // instrument cover goals
-    if(cmdline.isset("cover"))
-    {
-      if(instrument_cover_goals(options, goto_model, get_message_handler()))
-        return true;
-    }
 
     // label the assertions
     // This must be done after adding assertions and
@@ -970,7 +939,7 @@ bool jbmc_parse_optionst::process_goto_functions(
         full_slicer(goto_model);
     }
 
-    // remove any skips introduced since coverage instrumentation
+    // remove any skips introduced
     remove_skip(goto_model);
   }
 
@@ -1079,7 +1048,6 @@ void jbmc_parse_optionst::help()
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
-    " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     HELP_REACHABILITY_SLICER
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
