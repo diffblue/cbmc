@@ -1,0 +1,55 @@
+code {
+	color: red;
+	background-color: WhiteSmoke;
+	border-style: solid;
+	border-width: 1px;
+	border-color: LightGrey;
+	padding: 1px 4px;
+}
+
+h1 {
+	font-size: 1.3em;
+	margin: 0.9em 0;
+}
+
+h2 {
+	font-size: 1.2em;
+	margin: 0.6em 0;
+}
+
+h3 {
+	font-size: 1.1em;
+	margin: 0.3em 0;
+}
+
+pre.fragment, div.fragment {
+	padding: 5px;
+	margin-left: 10px;
+}
+
+
+a {
+	color: #CA7900;
+}
+
+.contents a:visited {
+	color: #6237a8;
+}
+
+#nav-tree .label {
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+#nav-tree a {
+	color: MidnightBlue;
+}
+
+#nav-tree .selected a {
+	padding: 0.5em;
+}
+
+#nav-tree .item {
+	font-size: 1.1em;
+	padding: 0.2em;
+}
