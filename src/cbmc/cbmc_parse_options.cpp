@@ -931,7 +931,6 @@ void cbmc_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show loaded symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
-    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
@@ -942,6 +941,7 @@ void cbmc_parse_optionst::help()
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     HELP_REACHABILITY_SLICER
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
     "Semantic transformations:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
@@ -955,7 +955,6 @@ void cbmc_parse_optionst::help()
     " --dimacs                     generate CNF in DIMACS format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
     " --localize-faults            localize faults (experimental)\n"
-    " --smt1                       use default SMT1 solver (obsolete)\n"
     " --smt2                       use default SMT2 solver (Z3)\n"
     " --boolector                  use Boolector\n"
     " --mathsat                    use MathSAT\n"
@@ -966,7 +965,7 @@ void cbmc_parse_optionst::help()
     " --refine-strings             use string refinement (experimental)\n"
     " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
     " --string-max-input-length    add constraint on the length of input strings\n" // NOLINT(*)
-    " --string-max-length          add constraint on the length of strings"
+    " --string-max-length          add constraint on the length of strings\n"
     "                              (deprecated: use string-max-input-length instead)\n" // NOLINT(*)
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
