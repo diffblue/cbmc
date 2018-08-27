@@ -68,44 +68,6 @@ java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
   return class_map.at(class_name);
 }
 
-void java_class_loadert::add_classpath_entry(const std::string &path)
-{
-  if(has_suffix(path, ".jar"))
-  {
-    classpath_entries.push_back(classpath_entryt(classpath_entryt::JAR, path));
-  }
-  else
-  {
-    classpath_entries.push_back(
-      classpath_entryt(classpath_entryt::DIRECTORY, path));
-  }
-}
-
-/// Load class from jar file.
-/// \param class_name: name of class to load in Java source format
-/// \param jar_file: path of the jar file
-/// \param jar_index: the index of the jar file
-/// \return optional value of parse tree, empty if class cannot be loaded
-optionalt<java_bytecode_parse_treet> java_class_loadert::get_class_from_jar(
-  const irep_idt &class_name,
-  const std::string &jar_file)
-{
-  auto classes = read_jar_file(jar_file);
-  if(!classes.has_value())
-    return {};
-
-  debug()
-    << "Getting class `" << class_name << "' from JAR " << jar_file << eom;
-
-  auto data = jar_pool(jar_file).get_entry(class_name_to_jar_file(class_name));
-
-  if(!data.has_value())
-    return {};
-
-  std::istringstream istream(*data);
-  return java_bytecode_parse(istream, get_message_handler());
-}
-
 /// Check if class is an overlay class by searching for `ID_overlay_class` in
 /// its list of annotations. TODO(nathan) give a short explanation about what
 /// overlay classes are.
@@ -148,39 +110,9 @@ java_class_loadert::get_parse_tree(
   // Rummage through the class path
   for(const auto &cp_entry : classpath_entries)
   {
-    switch(cp_entry.kind)
-    {
-    case classpath_entryt::JAR:
-      {
-        optionalt<java_bytecode_parse_treet> parse_tree =
-          get_class_from_jar(class_name, cp_entry.path);
-        if(parse_tree)
-          parse_trees.emplace_back(std::move(*parse_tree));
-      }
-      break;
-
-    case classpath_entryt::DIRECTORY:
-      {
-        // Look in the given directory
-        const std::string class_file = class_name_to_os_file(class_name);
-        const std::string full_path =
-#ifdef _WIN32
-          cp_entry.path + '\\' + class_file;
-#else
-          cp_entry.path + '/' + class_file;
-#endif
-
-        if(std::ifstream(full_path))
-        {
-          debug() << "Getting class `" << class_name << "' from file "
-                  << full_path << eom;
-          optionalt<java_bytecode_parse_treet> parse_tree =
-            java_bytecode_parse(full_path, get_message_handler());
-          if(parse_tree)
-            parse_trees.emplace_back(std::move(*parse_tree));
-        }
-      }
-    }
+    auto parse_tree = load_class(class_name, cp_entry);
+    if(parse_tree.has_value())
+      parse_trees.emplace_back(std::move(*parse_tree));
   }
 
   auto parse_tree_it = parse_trees.begin();
@@ -284,82 +216,4 @@ java_class_loadert::read_jar_file(const std::string &jar_path)
     }
   }
   return classes;
-}
-
-/// Convert a file name to the class name. Java interprets folders as packages,
-/// therefore a prefix of `./` is removed if necessary, and all `/` are
-/// converted to `.`. For example a class file `./com/diffblue/test.class` is
-/// converted to the class name `com.diffblue.test`.
-/// \param file: the name of the class file
-/// \return the file name converted to Java class name
-std::string java_class_loadert::file_to_class_name(const std::string &file)
-{
-  std::string result=file;
-
-  // Strip .class. Note that the Java class loader would
-  // not do that.
-  if(has_suffix(result, ".class"))
-    result.resize(result.size()-6);
-
-  // Strip a "./" prefix. Note that the Java class loader
-  // would not do that.
-  #ifdef _WIN32
-  while(has_prefix(result, ".\\"))
-    result=std::string(result, 2, std::string::npos);
-  #else
-  while(has_prefix(result, "./"))
-    result=std::string(result, 2, std::string::npos);
-  #endif
-
-  // slash to dot
-  for(std::string::iterator it=result.begin(); it!=result.end(); it++)
-    if(*it=='/')
-      *it='.';
-
-  return result;
-}
-
-/// Convert a class name to a file name, does the inverse of \ref
-/// file_to_class_name.
-/// \param class_name: the name of the class
-/// \return the class name converted to file name
-std::string
-java_class_loadert::class_name_to_jar_file(const irep_idt &class_name)
-{
-  std::string result = id2string(class_name);
-
-  // dots (package name separators) to slash
-  for(std::string::iterator it = result.begin(); it != result.end(); it++)
-    if(*it == '.')
-      *it = '/';
-
-  // add .class suffix
-  result += ".class";
-
-  return result;
-}
-
-/// Convert a class name to a file name, with OS-dependent syntax
-/// \param class_name: the name of the class
-/// \return the class name converted to file name
-std::string
-java_class_loadert::class_name_to_os_file(const irep_idt &class_name)
-{
-  std::string result=id2string(class_name);
-
-  // dots (package name separators) to slash, depending on OS
-  for(std::string::iterator it=result.begin(); it!=result.end(); it++)
-    if(*it=='.')
-    {
-      #ifdef _WIN32
-      *it='\\';
-      #else
-      *it='/';
-      #endif
-    }
-
-  // add .class suffix
-  result+=".class";
-
-  return result;
 }
