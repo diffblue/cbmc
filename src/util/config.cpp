@@ -1301,8 +1301,8 @@ void configt::set_classpath(const std::string &cp)
   const char cp_separator = ':';
 #endif
 
-  std::vector<std::string> class_path;
-  split_string(cp, cp_separator, class_path);
+  std::vector<std::string> class_path =
+    split_string(cp, cp_separator);
   java.classpath.insert(
     java.classpath.end(), class_path.begin(), class_path.end());
 }

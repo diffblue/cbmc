@@ -116,10 +116,14 @@ void split_string(
   right=result[1];
 }
 
-std::vector<std::string> split_string(const std::string &s, char delim)
+std::vector<std::string> split_string(
+  const std::string &s,
+  char delim,
+  bool strip,
+  bool remove_empty)
 {
   std::vector<std::string> result;
-  split_string(s, delim, result);
+  split_string(s, delim, result, strip, remove_empty);
   return result;
 }
 
