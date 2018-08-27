@@ -4,7 +4,6 @@
 DIRS = janalyzer-taint \
        jbmc \
        jbmc-concurrency \
-       jbmc-cover \
        jbmc-inheritance \
        jbmc-strings \
        jdiff \
