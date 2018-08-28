@@ -1,9 +1,9 @@
 CORE
 Test.class
---function Test.det  --verbosity 10 --cover location
-^EXIT=0$
+--function Test.det --verbosity 10
+^EXIT=10$
 ^SIGNAL=0$
-coverage.* file Test.java line 21 .*: SATISFIED
+assertion at file Test.java line 22 .*: FAILURE
 --
 adding lemma .*nondet_infinite_array
 --

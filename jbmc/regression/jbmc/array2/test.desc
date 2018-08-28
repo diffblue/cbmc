@@ -1,7 +1,6 @@
 CORE
 test.class
---function test.f --cover location
-\d+ of \d+ covered
+--function test.f
 ^EXIT=0$
 ^SIGNAL=0$
 --

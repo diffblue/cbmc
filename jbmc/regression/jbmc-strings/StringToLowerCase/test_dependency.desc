@@ -3,8 +3,8 @@ Test.class
 --function Test.withDependency  --verbosity 10 --max-nondet-string-length 10000
 ^EXIT=10$
 ^SIGNAL=0$
-assertion at file Test.java line 44 .*: SUCCESS
-assertion at file Test.java line 46 .*: FAILURE
+assertion at file Test.java line 48 .*: SUCCESS
+assertion at file Test.java line 50 .*: FAILURE
 --
 --
 Check that when there are dependencies, axioms are adde correctly.

@@ -20,6 +20,8 @@ public class Order {
   public boolean setItem(Item item) {
     boolean exists = hasItem();
     this.item = item;
+
+    assert this.item == null;
     return exists;
   }
 }

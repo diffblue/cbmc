@@ -1,8 +1,8 @@
 CORE
 com/diffblue/javatest/nestedobjects/subpackage/Order.class
---json-ui --function 'com.diffblue.javatest.nestedobjects.subpackage.Order.setItem:(Lcom/diffblue/javatest/nestedobjects/subpackage/Item;)Z' --cover location --trace
+--json-ui --function 'com.diffblue.javatest.nestedobjects.subpackage.Order.setItem:(Lcom/diffblue/javatest/nestedobjects/subpackage/Item;)Z' --trace
 activate-multi-line-match
-EXIT=0
+EXIT=10
 SIGNAL=0
 "identifier": "__CPROVER_initialize",\n *"sourceLocation": [{][}]\n *[}],\n *"hidden": false,\n *"internal": true,\n *"stepType": "function-call",
 "internal": true,\n *"lhs": "tmp_object_factory[$][0-9]+",

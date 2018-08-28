@@ -18,7 +18,9 @@ public class Test {
         builder.setCharAt(11, ':');
         builder.setCharAt(16, ':');
         builder.setCharAt(18, ':');
-        return builder.toString();
+        String result = builder.toString();
+        assert result.length() < 5;
+        return result;
     }
 
     public String nonDet(String s, char c, int i)
@@ -42,7 +44,9 @@ public class Test {
         builder.setCharAt(11, ':');
         builder.setCharAt(16, ':');
         builder.setCharAt(18, ':');
-        return builder.toString();
+        String result = builder.toString();
+        assert result.length() < 5;
+        return result;
     }
 
     public String withDependency(boolean b)

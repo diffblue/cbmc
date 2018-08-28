@@ -1,6 +1,6 @@
 CORE
 RefMultidimConstsize.class
---function RefMultidimConstsize.f --cover location --unwind 3
-^EXIT=0$
+--function RefMultidimConstsize.f --unwind 3
+^EXIT=10$
 ^SIGNAL=0$
-y=-*[0-9]+$
+assertion at file RefMultidimConstsize.java line 7 .*: FAILURE

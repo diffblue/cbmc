@@ -3,8 +3,8 @@ Test.class
 --function Test.checkWithDependency --depth 10000
 ^EXIT=10$
 ^SIGNAL=0$
-assertion at file Test.java line 61 .*: SUCCESS
-assertion at file Test.java line 64 .*: FAILURE
+assertion at file Test.java line 63 .*: SUCCESS
+assertion at file Test.java line 66 .*: FAILURE
 --
 --
 Check that when a dependency is present, the correct constraints are added

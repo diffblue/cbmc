@@ -1,9 +1,9 @@
 CORE
 stack_typecast.class
---cover location --function stack_typecast.f
-^EXIT=0$
+--function stack_typecast.f
+^EXIT=10$
 ^SIGNAL=0$
-covered \(100.0%\)
+^VERIFICATION FAILED$
 --
 --
 This tests that there is no invariant violation when modifying the values on the

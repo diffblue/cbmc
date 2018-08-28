@@ -4,11 +4,14 @@ public class A {
       // We use integer constants that we grep for later in a goto program.
       int x = 1001 + i;
       if (i > 0) {
-        x = 1002 + i; // property "java::A.foo:(I)V.coverage.3", see https://github.com/diffblue/cbmc/pull/1943#discussion_r175367063 for a discusison.
+        x = 1002 + i;
         x = 1003 + i;
+        assert false;
       }
-      else
+      else {
         x = 1004 + i;
+        assert false;
+      }
       x = 1005 + i;  
     }
 }

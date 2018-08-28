@@ -11,6 +11,10 @@ public class test {
     if(unknown > 0)
       arr[0]=1;
 
+    if(unknown > 0)
+      assert arr[0] == 1;
+    else
+      assert arr.length == 0;
   }
 
 }

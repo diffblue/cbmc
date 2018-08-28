@@ -1,9 +1,6 @@
 CORE
 RefMultidim2.class
---function RefMultidim2.f --cover location --unwind 3
-\d+ of \d+ covered
-^EXIT=0$
+--function RefMultidim2.f --unwind 3
+^EXIT=10$
 ^SIGNAL=0$
-y=1$
-y=[2-4]$
-y=([05-9]|[1-9][0-9]+|-[1-9][0-9]*)$
+assertion at file RefMultidim2.java line 15 .*: FAILURE

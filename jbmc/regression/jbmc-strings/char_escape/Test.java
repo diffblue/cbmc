@@ -10,10 +10,15 @@ public class Test {
         sb.append(c6);
         sb.append(c7);
         sb.append(c8);
-        if (sb.toString().equals("\b\t\n\f\r\"\'\\"))
+        if (sb.toString().equals("\b\t\n\f\r\"\'\\")) {
+            assert false;
             return true;
-        if (!sb.toString().equals("\b\t\n\f\r\"\'\\"))
+        }
+        if (!sb.toString().equals("\b\t\n\f\r\"\'\\")) {
+            assert false;
             return false;
+        }
+        assert false;
         return true;
     }
 }

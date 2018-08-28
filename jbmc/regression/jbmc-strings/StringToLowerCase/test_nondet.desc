@@ -1,9 +1,9 @@
 CORE
 Test.class
---function Test.nonDet  --verbosity 10 --cover location --max-nondet-string-length 1000
-^EXIT=0$
+--function Test.nonDet  --verbosity 10 --max-nondet-string-length 1000
+^EXIT=10$
 ^SIGNAL=0$
-coverage.* file Test.java line 27 .*: SATISFIED
+assertion at file Test.java line 31 .*: FAILURE
 --
 adding lemma .*nondet_infinite_array
 --

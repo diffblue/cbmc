@@ -1,8 +1,8 @@
 package com.diffblue.regression;
 public class EnumIter {
-    int f() {
+    void f() {
         MyEnum[] a = MyEnum.values();
         int num = a[2].ordinal() + a[3].ordinal();
-        return num ;
+        assert num == 5;
     }
 }

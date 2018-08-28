@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 A.class
---reachability-slice --show-goto-functions --cover location
+--reachability-slice --function A.foo --show-goto-functions
 = \(int\)\(short\)1001
 = \(int\)\(short\)1002
 = \(int\)\(short\)1003

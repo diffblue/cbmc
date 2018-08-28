@@ -19,7 +19,9 @@ public class GenericFields
     public void foo() {
     }
     SimpleWrapper<IWrapper> f(SimpleWrapper<FWrapper> s, SimpleWrapper<AWrapper []> a) {
-      return new SimpleWrapper<>();
+      SimpleWrapper<IWrapper> r = new SimpleWrapper<>();
+      assert r != null;
+      return r;
     }
   }
 }

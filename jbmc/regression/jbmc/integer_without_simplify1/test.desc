@@ -1,6 +1,6 @@
 CORE
 test.class
---no-simplify --function test.f --cover location
+--no-simplify --function test.f
 ^EXIT=0$
 ^SIGNAL=0$
 --

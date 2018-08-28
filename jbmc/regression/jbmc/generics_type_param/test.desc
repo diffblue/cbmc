@@ -1,6 +1,6 @@
 CORE
 GenericFields$SimpleGenericField.class
---cover location --function GenericFields\$SimpleGenericField.foo --verbosity 10
+--function GenericFields\$SimpleGenericField.foo --verbosity 10
 ^EXIT=0$
 ^SIGNAL=0$
 Reading class AWrapper

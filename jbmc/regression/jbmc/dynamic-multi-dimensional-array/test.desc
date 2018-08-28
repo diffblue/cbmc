@@ -1,5 +1,8 @@
 CORE
 TestClass.class
---function TestClass.f --cover location --unwind 2
+--function TestClass.f --unwind 2
 ^EXIT=0$
 ^SIGNAL=0$
+--
+--
+Tests that there is no crash.

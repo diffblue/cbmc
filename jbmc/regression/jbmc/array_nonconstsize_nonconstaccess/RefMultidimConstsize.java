@@ -4,5 +4,6 @@ public class RefMultidimConstsize {
     int j = 1;
     a1[j][1] = new A();
     a1[j][1].a = 1.0f;
+    assert a1[1][j] == null;
   }
 }

@@ -1,7 +1,8 @@
 package com.diffblue.regression;
 public class EnumIter {
-    String f() {
+    void f() {
         MyEnum[] a = MyEnum.values();
-        return a[2].name() + a[3].name();
+        String s = a[2].name() + a[3].name();
+        assert s.equals("CD");
     }
 }

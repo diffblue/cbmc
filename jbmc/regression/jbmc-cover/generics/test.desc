@@ -1,9 +1,0 @@
-CORE
-AbstractTest.class
---cover location --function AbstractTest.getFromAbstract
-^EXIT=0$
-^SIGNAL=0$
-file AbstractTest.java line 18 .* SATISFIED
-file AbstractTest.java line 19 .* SATISFIED
-file AbstractTest.java line 20 .* SATISFIED
-file AbstractTest.java line 21 .* SATISFIED

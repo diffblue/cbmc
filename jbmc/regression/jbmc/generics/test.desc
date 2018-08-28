@@ -1,0 +1,6 @@
+CORE
+AbstractTest.class
+--function AbstractTest.getFromAbstract
+^EXIT=10$
+^SIGNAL=0$
+assertion at file AbstractTest.java line 24 .*: FAILURE

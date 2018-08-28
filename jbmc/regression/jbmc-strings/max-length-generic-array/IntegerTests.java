@@ -4,7 +4,11 @@ public class IntegerTests {
         if (key == null) return null;
         MyGenSet<Integer> ms = new MyGenSet<>();
         ms.array[0] = 101;
-        if (ms.contains(key)) return true;
+        if (ms.contains(key)) {
+          assert false;
+          return true;
+        }
+        assert false;
         return false;
     }
 
@@ -12,7 +16,11 @@ public class IntegerTests {
         if (key == null) return null;
         MySet ms = new MySet();
         ms.array[0] = 101;
-        if (ms.contains(key)) return true;
+        if (ms.contains(key)) {
+          assert false;
+          return true;
+        }
+        assert false;
         return false;
     }
 

@@ -23,6 +23,7 @@ public class Test
         tmp = String.valueOf(-1000003);
         tmp = String.valueOf(1000004);
         tmp = String.valueOf(1000005);
+        assert tmp.length() < 5;
         return tmp;
     }
 
@@ -51,6 +52,7 @@ public class Test
         tmp += String.valueOf(-i + 1);
         tmp += " ";
         tmp += String.valueOf(-i - 2);
+        assert tmp.length() < 5;
         return tmp;
     }
 

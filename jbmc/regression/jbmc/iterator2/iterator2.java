@@ -11,5 +11,6 @@ public class iterator2
         i++;
     }
     for(j=0;j<i;j++);
+    assert false;
   }
 }
