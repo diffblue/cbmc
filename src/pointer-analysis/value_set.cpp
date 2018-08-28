@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/base_type.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
@@ -1755,9 +1756,23 @@ exprt value_sett::make_member(
     assert(src.operands().size()==1);
     return make_member(src.op0(), component_name, ns);
   }
+  else if(src.id()==ID_byte_extract_little_endian ||
+          src.id()==ID_byte_extract_big_endian)
+  {
+    const typet subtype=struct_union_type.component_type(component_name);
+    const auto &byte_extract_expr = to_byte_extract_expr(src);
+    if(struct_union_type.id()==ID_union &&
+       subtype==byte_extract_expr.op().type() &&
+       byte_extract_expr.offset().is_zero())
+    {
+      // rewrite byte_extract(X, 0).member to X
+      // if the type of X is that of the member
+      return byte_extract_expr.op();
+    }
+  }
 
   // give up
-  typet subtype=struct_union_type.component_type(component_name);
+  const typet subtype=struct_union_type.component_type(component_name);
   member_exprt member_expr(src, component_name, subtype);
 
   return member_expr;
