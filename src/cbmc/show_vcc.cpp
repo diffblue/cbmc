@@ -22,9 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void bmct::show_vcc_plain(std::ostream &out)
 {
-  out << "\n" << "VERIFICATION CONDITIONS:" << "\n" << "\n";
-
   bool has_threads=equation.has_threads();
+  bool first=true;
 
   for(symex_target_equationt::SSA_stepst::iterator
       s_it=equation.SSA_steps.begin();
@@ -33,6 +32,11 @@ void bmct::show_vcc_plain(std::ostream &out)
   {
     if(!s_it->is_assert())
       continue;
+
+    if(first)
+      first=false;
+    else
+      out << '\n';
 
     if(s_it->source.pc->source_location.is_not_nil())
       out << s_it->source.pc->source_location << "\n";
@@ -74,8 +78,6 @@ void bmct::show_vcc_plain(std::ostream &out)
     std::string string_value=
       from_expr(ns, s_it->source.pc->function, s_it->cond_expr);
     out << "{" << 1 << "} " << string_value << "\n";
-
-    out << "\n";
   }
 }
 
@@ -162,7 +164,14 @@ void bmct::show_vcc()
     break;
 
   case ui_message_handlert::uit::PLAIN:
-    show_vcc_plain(out);
+    status() << "VERIFICATION CONDITIONS:\n" << eom;
+    if(have_file)
+      show_vcc_plain(out);
+    else
+    {
+      show_vcc_plain(status());
+      status() << eom;
+    }
     break;
   }
 
