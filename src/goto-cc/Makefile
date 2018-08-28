@@ -19,6 +19,7 @@ SRC = armcc_cmdline.cpp \
       linker_script_merge.cpp \
       ms_cl_cmdline.cpp \
       ms_cl_mode.cpp \
+      ms_cl_version.cpp \
       ms_link_cmdline.cpp \
       ms_link_mode.cpp \
       # Empty last line
