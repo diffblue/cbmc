@@ -1032,28 +1032,16 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         not_exprt(dead_object(address, ns)), "dead object"));
     }
 
-    if(flags.is_unknown() || flags.is_dynamic_heap())
-    {
-      const or_exprt dynamic_bounds_violation(
-        dynamic_object_lower_bound(address, ns, nil_exprt()),
-        dynamic_object_upper_bound(address, ns, size));
-
-      conditions.push_back(conditiont(
-        implies_exprt(malloc_object(address, ns), not_exprt(dynamic_bounds_violation)),
-        "pointer outside dynamic object bounds"));
-    }
-
     if(
       flags.is_unknown() || flags.is_dynamic_local() ||
-      flags.is_static_lifetime())
+      flags.is_dynamic_heap() || flags.is_static_lifetime())
     {
       const or_exprt object_bounds_violation(
         object_lower_bound(address, ns, nil_exprt()),
         object_upper_bound(address, ns, size));
 
       conditions.push_back(conditiont(
-        implies_exprt(not_exprt(dynamic_object(address)), not_exprt(object_bounds_violation)),
-        "pointer outside object bounds"));
+        not_exprt(object_bounds_violation), "pointer outside object bounds"));
     }
 
     if(flags.is_unknown() || flags.is_integer_address())
@@ -1149,16 +1137,13 @@ void goto_checkt::bounds_check(
     const exprt &pointer=
       to_dereference_expr(ode.root_object()).pointer();
 
-    if_exprt size(
-      dynamic_object(pointer),
-      typecast_exprt(dynamic_size(ns), object_size(pointer).type()),
-      object_size(pointer));
-
     plus_exprt effective_offset(ode.offset(), pointer_offset(pointer));
 
+    const auto size =
+      typecast_exprt::conditional_cast(
+        object_size(pointer), effective_offset.type());
+
     assert(effective_offset.op0().type()==effective_offset.op1().type());
-    if(effective_offset.type()!=size.type())
-      size.make_typecast(effective_offset.type());
 
     binary_relation_exprt inequality(effective_offset, ID_lt, size);
 
@@ -1170,7 +1155,7 @@ void goto_checkt::bounds_check(
 
     add_guarded_claim(
       precond,
-      name+" dynamic object upper bound",
+      name + " object upper bound",
       "array bounds",
       expr.find_source_location(),
       expr,
