@@ -66,7 +66,10 @@ void bmct::show_vcc_plain(std::ostream &out)
         }
       }
 
-    out << "|--------------------------" << "\n";
+    // Unicode equivalent of "|--------------------------"
+    out << u8"\u251c";
+    for(unsigned i=0; i<26; i++) out << u8"\u2500";
+    out << '\n';
 
     std::string string_value=
       from_expr(ns, s_it->source.pc->function, s_it->cond_expr);
