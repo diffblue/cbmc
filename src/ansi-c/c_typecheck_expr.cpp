@@ -2164,6 +2164,21 @@ exprt c_typecheck_baset::do_special_functions(
 
     return typecast_exprt::conditional_cast(pointer_offset_expr, expr.type());
   }
+  else if(identifier == CPROVER_PREFIX "OBJECT_SIZE")
+  {
+    if(expr.arguments().size() != 1)
+    {
+      err_location(f_op);
+      error() << "object_size expects one operand" << eom;
+      throw 0;
+    }
+
+    unary_exprt object_size_expr(
+      ID_object_size, expr.arguments()[0], size_type());
+    object_size_expr.add_source_location() = source_location;
+
+    return object_size_expr;
+  }
   else if(identifier==CPROVER_PREFIX "POINTER_OBJECT")
   {
     if(expr.arguments().size()!=1)
