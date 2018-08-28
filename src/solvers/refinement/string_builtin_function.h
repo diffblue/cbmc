@@ -253,7 +253,6 @@ public:
 
   string_constraintst constraints(class symbol_generatort &fresh_symbol) const;
 
-  /// \copydoc constraints(class symbol_generatort&)
   string_constraintst
   constraints(string_constraint_generatort &generator) const override
   {

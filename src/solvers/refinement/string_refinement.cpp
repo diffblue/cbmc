@@ -219,11 +219,13 @@ static void display_index_set(
 ///     appears in `P` indexed by some `f(x)` and `val` is in
 ///     the index set of `str` we find `y` such that `f(y)=val` and
 ///     add lemma `P(y)`.
+// NOLINTNEXTLINE(whitespace/line_length)
 ///     (See `instantiate(messaget::mstreamt&,const string_constraintt&,const exprt &,const exprt&)`
 ///      for details)
 ///   * For formulas of the form
 ///     \f$\forall x. P(x) \Rightarrow \exists y .s_0[x+y] \ne s_1[y]) \f$ we
 ///     need to look at the index set of both `s_0` and `s_1`.
+// NOLINTNEXTLINE(whitespace/line_length)
 ///     (See `instantiate(const string_not_contains_constraintt&,const index_set_pairt&,const string_constraint_generatort&,const std::map<string_not_contains_constraintt, symbol_exprt>&)`
 ///      for details)
 static std::vector<exprt> generate_instantiations(
