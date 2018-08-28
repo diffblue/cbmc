@@ -172,6 +172,25 @@ bool simplify_exprt::simplify_member(exprt &expr)
 
       return false;
     }
+    else if(op_type.id() == ID_union)
+    {
+      // rewrite byte_extract(X, 0).member to X
+      // if the type of X is that of the member
+      const auto &byte_extract_expr = to_byte_extract_expr(op);
+      if(byte_extract_expr.offset().is_zero())
+      {
+        const union_typet &union_type = to_union_type(op_type);
+        const typet &subtype = union_type.component_type(component_name);
+
+        if(subtype == byte_extract_expr.op().type())
+        {
+          exprt tmp = byte_extract_expr.op();
+          expr.swap(tmp);
+
+          return false;
+        }
+      }
+    }
   }
   else if(op.id()==ID_union && op_type.id()==ID_union)
   {

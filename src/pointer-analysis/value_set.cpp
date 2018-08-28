@@ -1204,7 +1204,7 @@ void value_sett::assign(
 
         rhs_member=make_member(rhs, name, ns);
 
-        assign(lhs_member, rhs_member, ns, is_simplified, add_to_sets);
+        assign(lhs_member, rhs_member, ns, false, add_to_sets);
       }
     }
   }
