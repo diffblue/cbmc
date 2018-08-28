@@ -87,10 +87,34 @@ int run(
   const std::string &std_error)
 {
   #ifdef _WIN32
-  // we don't support stdin/stdout/stderr redirection on Windows
-  PRECONDITION(std_input.empty());
-  PRECONDITION(std_output.empty());
-  PRECONDITION(std_error.empty());
+  // we use the cmd.exe shell to do stdin/stdout/stderr redirection on Windows
+  if(!std_input.empty() || !std_output.empty() || !std_error.empty())
+  {
+    std::vector<std::string> new_argv = argv;
+    new_argv.insert(new_argv.begin(), "cmd.exe");
+    new_argv.insert(new_argv.begin() + 1, "/c");
+
+    if(!std_input.empty())
+    {
+      new_argv.push_back("<");
+      new_argv.push_back(std_input);
+    }
+
+    if(!std_output.empty())
+    {
+      new_argv.push_back(">");
+      new_argv.push_back(std_output);
+    }
+
+    if(!std_error.empty())
+    {
+      new_argv.push_back("2>");
+      new_argv.push_back(std_error);
+    }
+
+    // this is recursive
+    return run(new_argv[0], new_argv, "", "", "");
+  }
 
   // unicode version of the arguments
   std::vector<std::wstring> wargv;
@@ -107,12 +131,12 @@ int run(
 
   _argv[argv.size()]=NULL;
 
-  // warning: the arguments may still need escaping
+  // warning: the arguments may still need escaping,
+  // as windows will concatenate the argv strings back together,
+  // separating them with spaces
 
   std::wstring wide_what=widen(what);
-
   int status=_wspawnvp(_P_WAIT, wide_what.c_str(), _argv.data());
-
   return status;
 
   #else
