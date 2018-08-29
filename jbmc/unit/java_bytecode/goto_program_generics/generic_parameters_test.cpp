@@ -50,7 +50,8 @@ SCENARIO(
             "field_input",
             "java::Wrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
         THEN("Object 'field_input' has field 'field' of type IWrapper")
         {
@@ -60,7 +61,8 @@ SCENARIO(
             "field",
             "java::IWrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
         THEN("Object 'field_input' has field 'array_field' of type IWrapper[]")
         {
@@ -70,7 +72,8 @@ SCENARIO(
             "array_field",
             "java::array[reference]",
             "java::IWrapper",
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
     }
@@ -126,7 +129,8 @@ SCENARIO(
             "field_input1",
             "java::Wrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
         THEN("Object 'field_input1' has field 'field' of type IWrapper")
         {
@@ -136,7 +140,8 @@ SCENARIO(
             "field",
             "java::IWrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
 
@@ -149,7 +154,8 @@ SCENARIO(
             "field_input2",
             "java::Wrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
         THEN("Object 'field_input2' has field 'field' of type BWrapper")
         {
@@ -159,7 +165,8 @@ SCENARIO(
             "field",
             "java::BWrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
     }
@@ -193,7 +200,8 @@ SCENARIO(
             "field_input1",
             "java::Wrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
         THEN("Object 'field_input1' has field 'field' of type Wrapper")
         {
@@ -204,12 +212,19 @@ SCENARIO(
               "field",
               "java::Wrapper",
               {},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
 
           THEN("Object 'field' has field 'field' of type IWrapper")
           {
             require_goto_statements::require_struct_component_assignment(
-              field_name, {}, "field", "java::IWrapper", {}, entry_point_code);
+              field_name,
+              {},
+              "field",
+              "java::IWrapper",
+              {},
+              entry_point_code,
+              symbol_table);
           }
         }
       }
@@ -243,7 +258,8 @@ SCENARIO(
             "field_input",
             "java::PairWrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
         THEN("Object 'field_input' has field 'key' of type IWrapper")
         {
@@ -253,7 +269,8 @@ SCENARIO(
             "first",
             "java::IWrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
 
         THEN("Object 'field_input' has field 'value' of type IWrapper")
@@ -264,7 +281,8 @@ SCENARIO(
             "second",
             "java::IWrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
     }
@@ -311,7 +329,8 @@ SCENARIO(
             "field",
             "java::IWrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
     }
@@ -362,7 +381,8 @@ SCENARIO(
             "field",
             "java::java.lang.Object",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
     }
@@ -412,7 +432,8 @@ SCENARIO(
               "field",
               "java::GenericFields$GenericInnerOuter$Outer$InnerClass",
               {},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
 
           THEN("Object 'field' has field 't' of type Integer")
           {
@@ -422,7 +443,8 @@ SCENARIO(
               "t",
               "java::java.lang.Integer",
               {},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
           }
         }
       }
@@ -474,7 +496,8 @@ SCENARIO(
             "value",
             "java::java.lang.Integer",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
 
         THEN("Object 'v' has field 'field' of type A")
@@ -486,7 +509,8 @@ SCENARIO(
               "field",
               "java::GenericFields$GenericRewriteParameter$A",
               {},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
 
           THEN("Object 'field' has field 'value' of type Boolean")
           {
@@ -496,7 +520,8 @@ SCENARIO(
               "value",
               "java::java.lang.Boolean",
               {},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
           }
         }
       }
@@ -554,7 +579,8 @@ SCENARIO(
             "f",
             "java::UnsupportedWrapper2",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
         THEN("Object 'f' has unspecialized field 'field'")
         {
@@ -567,7 +593,8 @@ SCENARIO(
             "field",
             "java::java.lang.Object",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
     }
@@ -612,7 +639,8 @@ SCENARIO(
             "f",
             "java::OpaqueWrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
         THEN("Object 'f' has unspecialized field 'field'")
         {
@@ -622,7 +650,8 @@ SCENARIO(
             "field",
             "java::java.lang.Object",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
     }
