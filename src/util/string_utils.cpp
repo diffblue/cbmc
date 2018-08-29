@@ -109,8 +109,7 @@ void split_string(
   std::vector<std::string> result;
 
   split_string(s, delim, result, strip);
-  if(result.size()!=2)
-    throw "split string did not generate exactly 2 parts";
+  CHECK_RETURN(result.size()==2, "Split string must generate exactly 2 parts");
 
   left=result[0];
   right=result[1];

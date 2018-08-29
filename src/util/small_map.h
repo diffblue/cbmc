@@ -136,7 +136,7 @@ private:
     T *mem = (T *)malloc(sizeof(T) * n);
 
     if(!mem)
-      throw std::bad_alloc();
+      throw std::bad_alloc(); // consider INVARIANT?
 
     return mem;
   }
@@ -152,7 +152,7 @@ private:
     T *mem = (T *)realloc((char *)ptr, sizeof(T) * n);
 
     if(!mem)
-      throw std::bad_alloc();
+      throw std::bad_alloc(); // consider INVARIANT?
 
 #ifdef _SMALL_MAP_REALLOC_STATS
     if(ptr == mem)

@@ -1020,7 +1020,7 @@ SHARING_MAPT2(, mapped_type &)::at(
   find_type r=find(k, key_exists);
 
   if(!r.second)
-    throw std::out_of_range(not_found_msg);
+    throw std::out_of_range(not_found_msg); // consider INVARIANT?
 
   return r.first;
 }
@@ -1038,7 +1038,7 @@ SHARING_MAPT2(const, mapped_type &)::at(const key_type &k) const
 {
   const_find_type r=find(k);
   if(!r.second)
-    throw std::out_of_range(not_found_msg);
+    throw std::out_of_range(not_found_msg); // consider INVARIANT?
 
   return r.first;
 }
