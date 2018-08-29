@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "simplify_expr_class.h"
 
-#include <cassert>
 #include <unordered_set>
 
 #include "expr.h"
+#include "invariant.h"
 #include "namespace.h"
 #include "std_expr.h"
 
@@ -245,7 +245,9 @@ bool simplify_exprt::simplify_not(exprt &expr)
   }
   else if(op.id()==ID_exists) // !(exists: a) <-> forall: not a
   {
-    assert(op.operands().size()==2);
+    DATA_INVARIANT(
+      op.operands().size() == 2,
+      "exists expression has two parameters");
     exprt tmp;
     tmp.swap(op);
     expr.swap(tmp);
