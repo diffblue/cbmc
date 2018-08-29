@@ -856,13 +856,19 @@ void java_object_factoryt::gen_nondet_pointer_init(
   const bool allow_null =
     depth > object_factory_parameters.max_nonnull_tree_depth;
 
+  const bool force_non_null =
+    object_factory_parameters.force_non_null && depth == 1;
+  INVARIANT(
+    !(force_non_null && must_be_null),
+    "we cannot prevent and require null object creation at the same time");
+
   if(must_be_null)
   {
     // Add the following code to assignments:
     // <expr> = nullptr;
     new_object_assignments.add(set_null_inst);
   }
-  else if(!allow_null)
+  else if(!allow_null || force_non_null)
   {
     // Add the following code to assignments:
     // <expr> = <aoe>;
