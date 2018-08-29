@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <ostream>
 
+#include "invariant.h"
+
 rationalt &rationalt::operator+=(const rationalt &n)
 {
   rationalt tmp(n);
@@ -48,7 +50,7 @@ rationalt &rationalt::operator*=(const rationalt &n)
 
 rationalt &rationalt::operator/=(const rationalt &n)
 {
-  assert(!n.numerator.is_zero());
+  PRECONDITION(!n.numerator.is_zero());
   numerator*=n.denominator;
   denominator*=n.numerator;
   normalize();
@@ -90,7 +92,7 @@ void rationalt::same_denominator(rationalt &n)
 
 void rationalt::invert()
 {
-  assert(numerator!=0);
+  PRECONDITION(numerator != 0);
   std::swap(numerator, denominator);
 }
 

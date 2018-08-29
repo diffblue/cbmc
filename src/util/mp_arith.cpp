@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "mp_arith.h"
 
-#include <cassert>
 #include <cctype>
 #include <cstdlib>
 #include <limits>
@@ -257,9 +256,9 @@ mp_integer arith_left_shift(
   std::size_t true_size)
 {
   PRECONDITION(a.is_long() && b.is_ulong());
+  PRECONDITION(b <= true_size || a == 0);
+
   ullong_t shift=b.to_ulong();
-  if(shift>true_size && a!=mp_integer(0))
-    throw "shift value out of range";
 
   llong_t result=a.to_long()<<shift;
   llong_t mask=
@@ -280,8 +279,7 @@ mp_integer arith_right_shift(
   PRECONDITION(a.is_long() && b.is_ulong());
   llong_t number=a.to_long();
   ullong_t shift=b.to_ulong();
-  if(shift>true_size)
-    throw "shift value out of range";
+  PRECONDITION(shift <= true_size);
 
   const llong_t sign = (1LL << (true_size - 1)) & number;
   const llong_t pad = (sign == 0) ? 0 : ~((1LL << (true_size - shift)) - 1);
@@ -298,9 +296,9 @@ mp_integer logic_left_shift(
   std::size_t true_size)
 {
   PRECONDITION(a.is_long() && b.is_ulong());
+  PRECONDITION(b <= true_size || a == 0);
+
   ullong_t shift=b.to_ulong();
-  if(shift>true_size && a!=mp_integer(0))
-    throw "shift value out of range";
   llong_t result=a.to_long()<<shift;
   if(true_size<(sizeof(llong_t)*8))
   {
@@ -324,10 +322,9 @@ mp_integer logic_right_shift(
   std::size_t true_size)
 {
   PRECONDITION(a.is_long() && b.is_ulong());
-  ullong_t shift=b.to_ulong();
-  if(shift>true_size)
-    throw "shift value out of range";
+  PRECONDITION(b <= true_size);
 
+  ullong_t shift = b.to_ulong();
   ullong_t result=((ullong_t)a.to_long()) >> shift;
   return result;
 }
@@ -341,10 +338,10 @@ mp_integer rotate_right(
   std::size_t true_size)
 {
   PRECONDITION(a.is_ulong() && b.is_ulong());
+  PRECONDITION(b <= true_size);
+
   ullong_t number=a.to_ulong();
   ullong_t shift=b.to_ulong();
-  if(shift>true_size)
-    throw "shift value out of range";
 
   ullong_t revShift=true_size-shift;
   const ullong_t filter = 1ULL << (true_size - 1);
@@ -361,10 +358,10 @@ mp_integer rotate_left(
   std::size_t true_size)
 {
   PRECONDITION(a.is_ulong() && b.is_ulong());
+  PRECONDITION(b <= true_size);
+
   ullong_t number=a.to_ulong();
   ullong_t shift=b.to_ulong();
-  if(shift>true_size)
-    throw "shift value out of range";
 
   ullong_t revShift=true_size-shift;
   const ullong_t filter = 1ULL << (true_size - 1);

@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_NAMESPACE_H
 #define CPROVER_UTIL_NAMESPACE_H
 
+#include "invariant.h"
 #include "irep.h"
 
 class symbol_tablet;
@@ -33,8 +34,12 @@ public:
   const symbolt &lookup(const irep_idt &name) const
   {
     const symbolt *symbol;
-    if(lookup(name, symbol))
-      throw "identifier "+id2string(name)+" not found";
+    bool not_found = lookup(name, symbol);
+    INVARIANT(
+      !not_found,
+      "we are assuming that a name exists in the namespace "
+      "when this function is called - identifier " +
+        id2string(name) + " was not found");
     return *symbol;
   }
 

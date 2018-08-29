@@ -226,7 +226,7 @@ exprt object_lower_bound(
   exprt p_offset=pointer_offset(pointer);
 
   exprt zero=from_integer(0, p_offset.type());
-  assert(zero.is_not_nil());
+  CHECK_RETURN(zero.is_not_nil());
 
   if(offset.is_not_nil())
   {
