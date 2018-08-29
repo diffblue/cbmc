@@ -2189,18 +2189,13 @@ void java_bytecode_convert_methodt::convert_invoke(
   // inherit a definition from a super-class, we create a new symbol and
   // insert it in the symbol table. The name and type of the method are
   // derived from the information we have in the call.
-  // We fix the access attribute to ID_public, because of the following
+  // We fix the access attribute to ID_private, because of the following
   // reasons:
-  // - We don't know the orignal access attribute and since the .class file
+  // - We don't know the original access attribute and since the .class file is
   //   unavailable, we have no way to know.
-  // - Whatever it was, we assume that the bytecode we are translating
-  //   compiles correctly, so such a method has to be accessible from this
-  //   method.
-  // - We will never generate code that calls that method unless we
-  //   translate bytecode that calls that method. As a result we will never
-  //   generate code that may wrongly assume that such a method is
-  //   accessible if we assume that its access attribute is "more
-  //   accessible" than it actually is.
+  // - The translated method could be an inherited protected method, hence
+  //   accessible from the original caller, but not from the generated test.
+  //   Therefore we must assume that the method is not accessible.
   irep_idt id = arg0.get(ID_identifier);
   if(
     symbol_table.symbols.find(id) == symbol_table.symbols.end() &&
@@ -2213,7 +2208,7 @@ void java_bytecode_convert_methodt::convert_invoke(
     symbol.pretty_name = id2string(arg0.get(ID_C_class)).substr(6) + "." +
                          id2string(symbol.base_name) + "()";
     symbol.type = arg0.type();
-    symbol.type.set(ID_access, ID_public);
+    symbol.type.set(ID_access, ID_private);
     symbol.value.make_nil();
     symbol.mode = ID_java;
     assign_parameter_names(
