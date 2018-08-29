@@ -142,7 +142,7 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
 {
   // These casts usually reduce precision, and thus, usually round.
 
-  assert(expr.operands().size()==2);
+  PRECONDITION(expr.operands().size()==2);
 
   const typet &dest_type=ns.follow(expr.type());
   const typet &src_type=ns.follow(expr.op0().type());
@@ -272,14 +272,16 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
   if(type.id()!=ID_floatbv)
     return true;
 
-  assert(expr.operands().size()==3);
+  PRECONDITION(expr.operands().size()==3);
 
   exprt op0=expr.op0();
   exprt op1=expr.op1();
   exprt op2=expr.op2(); // rounding mode
 
-  assert(ns.follow(op0.type())==type);
-  assert(ns.follow(op1.type())==type);
+  INVARIANT(ns.follow(op0.type())==type,
+            "Expression type of operand must match type of expression");
+  INVARIANT(ns.follow(op1.type())==type,
+            "Expression type of operand must match type of expression");
 
   // Remember that floating-point addition is _NOT_ associative.
   // Thus, we don't re-sort the operands.
@@ -330,7 +332,7 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
 
 bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
 {
-  assert(expr.id()==ID_ieee_float_equal ||
+  PRECONDITION(expr.id()==ID_ieee_float_equal ||
          expr.id()==ID_ieee_float_notequal);
 
   exprt::operandst &operands=expr.operands();

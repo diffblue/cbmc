@@ -245,7 +245,7 @@ bool simplify_exprt::simplify_not(exprt &expr)
   }
   else if(op.id()==ID_exists) // !(exists: a) <-> forall: not a
   {
-    assert(op.operands().size()==2);
+    PRECONDITION(op.operands().size()==2);
     exprt tmp;
     tmp.swap(op);
     expr.swap(tmp);

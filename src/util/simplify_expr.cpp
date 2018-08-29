@@ -225,7 +225,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     inequality.add_source_location()=expr.source_location();
     inequality.lhs()=expr.op0();
     inequality.rhs()=from_integer(0, op_type);
-    assert(inequality.rhs().is_not_nil());
+    CHECK_RETURN(inequality.rhs().is_not_nil());
     simplify_node(inequality);
     expr.swap(inequality);
     return false;
@@ -260,7 +260,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     inequality.add_source_location()=expr.source_location();
     inequality.lhs()=expr.op0();
     inequality.rhs()=from_integer(0, op_type);
-    assert(inequality.rhs().is_not_nil());
+    CHECK_RETURN(inequality.rhs().is_not_nil());
     simplify_node(inequality);
     expr.op0()=inequality;
     simplify_typecast(expr); // recursive call
@@ -488,13 +488,13 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         if(operand.is_true())
         {
           expr=from_integer(1, expr_type);
-          assert(expr.is_not_nil());
+          CHECK_RETURN(expr.is_not_nil());
           return false;
         }
         else if(operand.is_false())
         {
           expr=from_integer(0, expr_type);
-          assert(expr.is_not_nil());
+          CHECK_RETURN(expr.is_not_nil());
           return false;
         }
       }
@@ -1373,7 +1373,7 @@ bool simplify_exprt::simplify_update(exprt &expr)
       std::size_t number=to_struct_type(value_ptr_type).
         component_number(component_name);
 
-      assert(number<value_ptr->operands().size());
+      CHECK_RETURN(number<value_ptr->operands().size());
 
       value_ptr=&value_ptr->operands()[number];
     }
@@ -1409,7 +1409,7 @@ bool simplify_exprt::simplify_object(exprt &expr)
   {
     const typet &op_type=ns.follow(expr.op0().type());
 
-    assert(expr.operands().size()==1);
+    PRECONDITION(expr.operands().size()==1);
 
     if(op_type.id()==ID_pointer)
     {
@@ -1545,7 +1545,7 @@ exprt simplify_exprt::bits2expr(
     for(const auto &component : components)
     {
       mp_integer m_size=pointer_offset_bits(component.type(), ns);
-      assert(m_size>=0);
+      CHECK_RETURN(m_size>=0);
 
       std::string comp_bits=
         std::string(
@@ -1573,7 +1573,7 @@ exprt simplify_exprt::bits2expr(
 
     std::size_t el_size=
       integer2size_t(pointer_offset_bits(type.subtype(), ns));
-    assert(el_size>0);
+    CHECK_RETURN(el_size>0);
 
     array_exprt result(array_type);
     result.reserve_operands(n_el);
@@ -1829,10 +1829,8 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
         op_type_ptr->id()==ID_array;
         op_type_ptr=&(ns.follow(*op_type_ptr).subtype()))
     {
-      // no arrays of zero-sized objects
-      assert(el_size>0);
-      // no arrays of non-byte sized objects
-      assert(el_size%8==0);
+      INVARIANT(el_size>0, "Arrays must not have zero-sized objects");
+      INVARIANT(el_size%8==0, "Arrays must not have non-byte sized objects");
       mp_integer el_bytes=el_size/8;
 
       if(base_type_eq(expr.type(), op_type_ptr->subtype(), ns) ||

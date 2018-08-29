@@ -90,7 +90,7 @@ public:
   symbolt &get_writeable_ref(const irep_idt &name)
   {
     symbolt *symbol = get_writeable(name);
-    if(symbol == nullptr)
+    if(symbol == nullptr) // consider INVARIANT?
       throw std::out_of_range("name not found in symbol_table");
     return *symbol;
   }

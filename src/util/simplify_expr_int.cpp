@@ -42,7 +42,7 @@ bool simplify_exprt::simplify_bswap(bswap_exprt &expr)
     mp_integer new_value=0;
     for(std::size_t bit = 0; bit < width; bit += bits_per_byte)
     {
-      assert(!bytes.empty());
+      INVARIANT(!bytes.empty(), "Vector of bytes must not be empty");
       new_value+=bytes.back()<<bit;
       bytes.pop_back();
     }
@@ -237,7 +237,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
 
   if(c_sizeof_type.is_not_nil())
   {
-    assert(found);
+    INVARIANT(found, "A constant must have been found");
     constant->set(ID_C_c_sizeof_type, c_sizeof_type);
   }
 
@@ -447,7 +447,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
 
   exprt::operandst &operands=expr.operands();
 
-  assert(expr.id()==ID_plus);
+  PRECONDITION(expr.id()==ID_plus);
 
   // floating-point addition is _NOT_ associative; thus,
   // there is special case for float
@@ -522,7 +522,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
                          to_constant_expr(*it)))
             {
               *it=from_integer(0, it->type());
-              assert(it->is_not_nil());
+              CHECK_RETURN(it->is_not_nil());
               result=false;
             }
           }
@@ -555,7 +555,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
       {
         *(itm->second)=from_integer(0, expr.type());
         *it=from_integer(0, expr.type());
-        assert(it->is_not_nil());
+        CHECK_RETURN(it->is_not_nil());
         expr_map.erase(itm);
         result=false;
       }
@@ -582,7 +582,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   if(operands.empty())
   {
     expr=from_integer(0, expr.type());
-    assert(expr.is_not_nil());
+    CHECK_RETURN(expr.is_not_nil());
     return false;
   }
   else if(operands.size()==1)
@@ -603,7 +603,7 @@ bool simplify_exprt::simplify_minus(exprt &expr)
 
   exprt::operandst &operands=expr.operands();
 
-  assert(expr.id()==ID_minus);
+  PRECONDITION(expr.id()==ID_minus);
 
   if(operands.size()!=2)
     return true;
@@ -645,7 +645,7 @@ bool simplify_exprt::simplify_minus(exprt &expr)
     if(operands[0]==operands[1])
     {
       exprt zero=from_integer(0, expr.type());
-      assert(zero.is_not_nil());
+      CHECK_RETURN(zero.is_not_nil());
       expr=zero;
       return false;
     }
@@ -740,7 +740,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     if(expr.op1().type()!=expr.type())
       break;
 
-    assert(a_str.size()==b_str.size());
+    INVARIANT(a_str.size()==b_str.size(), ""); // TODO: appropriate message?
 
     constant_exprt new_op(expr.type());
     std::string new_value;
@@ -855,7 +855,7 @@ bool simplify_exprt::simplify_extractbit(exprt &expr)
 
   std::size_t width=to_bitvector_type(op0_type).get_width();
 
-  assert(expr.operands().size()==2);
+  PRECONDITION(expr.operands().size()==2);
 
   mp_integer i;
 
@@ -1581,7 +1581,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
 
   // now we only have >=, =
 
-  assert(expr.id()==ID_ge || expr.id()==ID_equal);
+  PRECONDITION(expr.id()==ID_ge || expr.id()==ID_equal);
 
   // syntactically equal?
 
@@ -1663,7 +1663,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
 bool simplify_exprt::simplify_inequality_constant(exprt &expr)
 {
   // the constant is always on the RHS
-  assert(expr.op1().is_constant());
+  PRECONDITION(expr.op1().is_constant());
 
   if(expr.op0().id()==ID_if && expr.op0().operands().size()==3)
   {
@@ -1767,7 +1767,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
           {
             constant+=i;
             *it=from_integer(0, it->type());
-            assert(it->is_not_nil());
+            CHECK_RETURN(it->is_not_nil());
             changed=true;
           }
         }
@@ -1908,8 +1908,8 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     else if(expr.id()==ID_gt)
     {
       mp_integer i;
-      if(to_integer(expr.op1(), i))
-        throw "bit-vector constant unexpectedly non-integer";
+      DATA_INVARIANT(!to_integer(expr.op1(), i),
+                     "bit-vector constant must be integer");
 
       if(i==max)
       {
@@ -1934,8 +1934,8 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     else if(expr.id()==ID_le)
     {
       mp_integer i;
-      if(to_integer(expr.op1(), i))
-        throw "bit-vector constant unexpectedly non-integer";
+      DATA_INVARIANT(!to_integer(expr.op1(), i),
+                     "bit-vector constant must be integer");
 
       if(i==max)
       {
