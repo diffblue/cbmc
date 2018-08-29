@@ -7,6 +7,10 @@ This module provides a front end for Java.
 
 To be documented.
 
+\section java-bytecode-array-representation How are Java arrays represented in GOTO
+
+To be documented.
+
 \section java-bytecode-object-factory Object Factory
 
 To be documented.
@@ -167,10 +171,13 @@ operation.
 
 These are converted by \ref remove_java_newt::lower_java_new_array
 
-See TODO: DOC-20: for details on how arrays are represented in codet. It first
-allocates the array object as with a regular Java object. Then the size
-component is set to be the size of the array and the data component is also
-initialized.
+See \ref java-bytecode-array-representation for details on how arrays are
+represented in codet.
+
+A `newarray` is represented as:
+ - an allocation of the array object (the same as with a regular Java object).
+ - Initialize the size component
+ - Initialize the data component
 
 For example the following Java:
 
