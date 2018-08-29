@@ -41,7 +41,9 @@ relating to compilation so that they can be conveniently edited in one place.
 contains commands that are needed in every makefile but which the
 developer is not expected to edit. (There is also
 [another config.inc](https://github.com/diffblue/cbmc/blob/develop/jbmc/src/config.inc)
-which is also included in every makefile in the `jbmc` folder.) 
+which is also included in every makefile in the `jbmc` folder.)
+
+Note, these files are not involved in the CMake build.
  
 
 \subsubsection compilation-and-development-subsubsection-macro-debug Macro DEBUG
@@ -59,31 +61,63 @@ The regression tests are contained in `regression/` and `jbmc/regression/`.
 Inside these folders there is a directory for each of the tools/modules. Each
 of these contains multiple test directories, with names describing
 what they test. When there are multiple tests in a test directory then
-they should be testing very similar aspects of the program's behaviour. Each
+they should all test very similar aspects of the program's behaviour. Each
 test directory contains input files and one or more test description files,
 which have the ending `.desc`. The test description files describe what command
 to run, what output is expected and so on. The test framework is a
 Perl script,
-[test.pl](https://github.com/diffblue/cbmc/blob/develop/regression/test.pl).
-To run all the tests in a directory corresponding to a tool or module:
+[test.pl](https://github.com/diffblue/cbmc/blob/develop/regression/test.pl),
+located in `regression/test.pl`.
 
-    ../test.pl -c PATH_TO_CBMC
-
-The `--help` option to `test.pl` gives instructions for use and outlines the
+The `--help` option to `test.pl` outlines the
 format of the test description files. Most importantly, the first word in a
 test description file is its level, which is one of: `CORE` (should be run in
 CI, should succeed), `THOROUGH` (takes too long to be run in CI, should
 succeed), `FUTURE` (will succeed when a planned feature is added) or
 `KNOWNBUG` (will succeed when a bug is fixed).
 
-If you have compiled CBMC using CMake then another way to run the same tests
-is through `CTest`. From the build directory, the command `ctest -V -L CORE`
-will run all of the tests that are  labelled CORE in the desc files and unit
-tests. `-V` makes it print out more
-useful output and `-L CORE` makes it only run tests that have been tagged
-`CORE`. `-R regular_expression` can be used to limit which tests are run, and
-`-N` makes it lists which tests it will run without actually running them. 
+\subsubsection compilation-and-development-subsubsection-running-regression-tests-with-make Running regression tests with `make`
 
+If you have compiled using `make` then you can run the regression tests
+using `make test`. Run it from `regression/` to run all the regression tests,
+or any of its subfolders to just run the tests in that subfolder.
+
+If you have not compiled using `make` then this won't work, because the
+makefile is expecting to find binaries like `cbmc` and `jbmc` in the source
+folders.
+
+\subsubsection compilation-and-development-subsubsection-running-regression-tests-with-ctest Running regression tests with `ctest`
+
+If you have compiled using CMake then you can run the regression tests (and
+the unit tests) using CTest.
+
+Here are two example commands, to be run from the build directory:
+
+    ctest -V -L CORE -R cpp
+    ctest -V -L CORE -R cpp -E cbmc-cpp
+
+`-V` makes it print out more
+useful output. `-L CORE` makes it only run tests that have been tagged
+`CORE`. `-R regular_expression` can be used to limit which tests are run to
+those which match the given regular expression, and `-E regex` excludes tests
+to those which match the given regular expression.
+So the first command will run all the CORE tests in `regression/cbmc/cpp` and
+`regression/cbmc/cbmc-cpp`, and the second will run all the CORE tests in
+`regression/cbmc/cpp` only. Another useful option is `-N`, which makes CTest
+list which tests it will run without actually running them.
+
+
+\subsubsection compilation-and-development-subsubsection-running-regression-tests-directly-with-test-pl Running regression tests directly with `test.pl`
+
+In a directory corresponding to a tool or module, you can directly run a
+test directory as follows:
+
+    ../test.pl -c PATH_TO_CBMC_FROM_DESC_FILE TEST_DIR
+
+Note that `PATH_TO_CBMC_FROM_DESC_FILE` should either be absolute or be
+relative to the location of the test description files. If `TEST_DIR` is
+not provided then all test directories are run.
+ 
 
 \subsection compilation-and-development-subsection-unit-tests Unit tests
 
@@ -97,6 +131,8 @@ To run the unit tests for CBMC, go to `unit/` and run
 To run the unit tests for JBMC, go to `jbmc/unit/` and run
 
     ../../<build-folder>/bin/java-unit
+
+The unit tests are also included in CTest as `unit` and `java-unit`.
 
 Note that some tests run which are expected to fail - see the summary at
 the end of the run to see how many tests passed, how many failed which were
