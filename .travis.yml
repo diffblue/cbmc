@@ -49,18 +49,14 @@ jobs:
       env:
         NAME: "DOXYGEN-CHECK"
         DOXYGEN_VERSION: "1.8.14"
-      addons:
-        apt:
-          sources:
-            - sourceline: 'deb http://packages.cloud.google.com/apt cloud-sdk-trusty main'
-              key_url: 'https://packages.cloud.google.com/apt/doc/apt-key.gpg'
-          packages:
-            - cmake
-            - google-cloud-sdk
-            - graphviz
       cache:
         directories:
           - ${TRAVIS_BUILD_DIR}/doxygen/build/bin
+      before_install:
+        - curl -sSL "https://packages.cloud.google.com/apt/doc/apt-key.gpg" | sudo -E apt-key add -
+        - echo "deb http://packages.cloud.google.com/apt cloud-sdk-trusty main" | sudo tee -a /etc/apt/sources.list > /dev/null
+        - sudo apt-get update --option Acquire::Retries=100 --option Acquire::http::Timeout="60"
+        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install cmake google-cloud-sdk graphviz
       install:
         - |
           # Build doxygen if it is not in Travis cache
@@ -149,22 +145,24 @@ jobs:
     # Ubuntu Linux with glibc using clang++-3.7, no-debug mode
     - stage: Test different OS/CXX/Flags
       os: linux
-      sudo: false
+      sudo: true
       compiler: clang
       cache: ccache
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
           packages:
             - libwww-perl
-            - clang-3.7
             - g++-5
             - libstdc++-5-dev
             - libubsan0
             - parallel
       before_install:
+        - curl -sSL "http://apt.llvm.org/llvm-snapshot.gpg.key" | sudo -E apt-key add -
+        - echo "deb http://apt.llvm.org/precise/ llvm-toolchain-precise-3.7 main" | sudo tee -a /etc/apt/sources.list > /dev/null
+        - sudo apt-get update --option Acquire::Retries=100 --option Acquire::http::Timeout="60"
+        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install clang-3.7
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
         - ln -s /usr/bin/c++-5 bin/g++
@@ -178,21 +176,23 @@ jobs:
     # Ubuntu Linux with glibc using clang++-3.7, debug mode, disable USE_DSTRING
     - stage: Test different OS/CXX/Flags
       os: linux
-      sudo: false
+      sudo: true
       compiler: clang
       cache: ccache
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
           packages:
             - libwww-perl
-            - clang-3.7
             - g++-5
             - libstdc++-5-dev
             - libubsan0
       before_install:
+        - curl -sSL "http://apt.llvm.org/llvm-snapshot.gpg.key" | sudo -E apt-key add -
+        - echo "deb http://apt.llvm.org/precise/ llvm-toolchain-precise-3.7 main" | sudo tee -a /etc/apt/sources.list > /dev/null
+        - sudo apt-get update --option Acquire::Retries=100 --option Acquire::http::Timeout="60"
+        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install clang-3.7
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
         - ln -s /usr/bin/g++-5 bin/g++
