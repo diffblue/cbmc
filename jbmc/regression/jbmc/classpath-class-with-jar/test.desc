@@ -1,0 +1,8 @@
+CORE
+Test.class
+--classpath `../../../../scripts/format_classpath.sh src.jar .`
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

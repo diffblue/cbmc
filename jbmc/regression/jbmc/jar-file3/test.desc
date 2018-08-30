@@ -1,8 +1,0 @@
-CORE
-C.jar
---function jarfile3.f -classpath A.jar:B.jar
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL
---
-^warning: ignoring

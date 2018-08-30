@@ -1,0 +1,8 @@
+CORE
+C.jar
+--function jarfile3.f -classpath `../../../../scripts/format_classpath.sh A.jar B.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL
+--
+^warning: ignoring

@@ -1,0 +1,10 @@
+KNOWNBUG
+libs/test.jar
+lib/test2.jar --main-class Test.class
+^EXIT=6$
+--
+Invariant check failed
+the program has no entry point
+--
+We don't allow two jar files passed on the command line.
+Issue: 2864

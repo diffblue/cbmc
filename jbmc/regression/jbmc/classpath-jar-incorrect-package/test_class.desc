@@ -1,0 +1,10 @@
+KNOWNBUG
+Test.class
+--classpath test.jar
+^EXIT=6$
+--
+Java main class: Test
+failed to open input file `Test.class'
+--
+Test.class is not in the right directory corresponding to its package.
+Issue: 2864
