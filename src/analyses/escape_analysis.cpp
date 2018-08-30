@@ -406,9 +406,7 @@ void escape_analysist::insert_cleanup(
     const code_typet &function_type=to_code_type(function.type());
 
     goto_function.body.insert_before_swap(location);
-    code_function_callt code;
-    code.lhs().make_nil();
-    code.function()=function;
+    code_function_callt code(function);
     code.function().add_source_location()=source_location;
 
     if(function_type.parameters().size()==1)

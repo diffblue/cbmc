@@ -151,8 +151,7 @@ bool static_lifetime_init(
       code_type.return_type().id() == ID_constructor &&
       code_type.parameters().empty())
     {
-      code_function_callt function_call;
-      function_call.function()=symbol.symbol_expr();
+      code_function_callt function_call(symbol.symbol_expr());
       function_call.add_source_location()=source_location;
       dest.move_to_operands(function_call);
     }

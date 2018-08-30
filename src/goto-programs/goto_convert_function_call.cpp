@@ -166,11 +166,8 @@ void goto_convertt::do_function_call_other(
   // don't know what to do with it
   goto_programt::targett t=dest.add_instruction(FUNCTION_CALL);
 
-  code_function_callt function_call;
+  code_function_callt function_call(lhs, function, arguments);
   function_call.add_source_location()=function.source_location();
-  function_call.lhs()=lhs;
-  function_call.function()=function;
-  function_call.arguments()=arguments;
 
   t->source_location=function.source_location();
   t->code.swap(function_call);

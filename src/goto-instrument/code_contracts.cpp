@@ -301,8 +301,7 @@ void code_contractst::add_contract_check(
   g->source_location=skip->source_location;
 
   // prepare function call including all declarations
-  code_function_callt call;
-  call.function()=ns.lookup(function).symbol_expr();
+  code_function_callt call(ns.lookup(function).symbol_expr());
   replace_symbolt replace;
 
   // decl ret

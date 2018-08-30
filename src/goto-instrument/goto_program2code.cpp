@@ -220,13 +220,11 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
     case ATOMIC_BEGIN:
     case ATOMIC_END:
       {
-        code_function_callt f;
         const code_typet void_t({}, empty_typet());
-        f.function()=symbol_exprt(
-            target->is_atomic_begin() ?
-            "__CPROVER_atomic_begin" :
-            "__CPROVER_atomic_end",
-            void_t);
+        code_function_callt f(symbol_exprt(
+          target->is_atomic_begin() ? "__CPROVER_atomic_begin"
+                                    : "__CPROVER_atomic_end",
+          void_t));
         dest.move_to_operands(f);
         return target;
       }

@@ -213,19 +213,16 @@ bool generate_ansi_c_start_function(
       return true;
     }
 
-    code_function_callt call_init;
-    call_init.lhs().make_nil();
+    code_function_callt call_init(init_it->second.symbol_expr());
     call_init.add_source_location()=symbol.location;
-    call_init.function()=init_it->second.symbol_expr();
 
     init_code.move_to_operands(call_init);
   }
 
   // build call to main function
 
-  code_function_callt call_main;
+  code_function_callt call_main(symbol.symbol_expr());
   call_main.add_source_location()=symbol.location;
-  call_main.function()=symbol.symbol_expr();
   call_main.function().add_source_location()=symbol.location;
 
   if(to_code_type(symbol.type).return_type()!=empty_typet())
