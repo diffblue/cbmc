@@ -2266,8 +2266,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_byte_extract(to_byte_extract_expr(expr)) && result;
   else if(expr.id()==ID_pointer_object)
     result=simplify_pointer_object(expr) && result;
-  else if(expr.id()==ID_dynamic_object)
-    result=simplify_dynamic_object(expr) && result;
+  else if(expr.id()==ID_is_dynamic_object)
+    result=simplify_is_dynamic_object(expr) && result;
   else if(expr.id()==ID_invalid_pointer)
     result=simplify_invalid_pointer(expr) && result;
   else if(expr.id()==ID_object_size)
