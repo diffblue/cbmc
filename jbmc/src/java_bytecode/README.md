@@ -7,6 +7,10 @@ This module provides a front end for Java.
 
 To be documented.
 
+\section java-bytecode-array-representation How are Java arrays represented in GOTO
+
+To be documented.
+
 \section java-bytecode-object-factory Object Factory
 
 To be documented.
@@ -116,9 +120,111 @@ To be documented.
 
 To be documented.
 
-\section java-bytecode-remove-java-new Remove java new
+\section java-bytecode-remove-java-new Remove `new`, `newarray` and `multianewarray` bytecode operators
 
-To be documented.
+\ref remove_java_new.h is responsible for converting the `new`, `newarray` and
+`multianewarray` Java bytecode operation into \ref codet. Specifically it
+converts the bytecode instruction into:  - An ALLOCATE with the size of the
+object being created  - An assignment to the value zeroing its contents  - If an
+array, initializing the size and data components  - If a multi-dimensional
+array, recursively calling `java_new` on each sub array
+
+An ALLOCATE is a \ref side_effect_exprt that is interpreted by \ref
+goto_symext::symex_allocate
+
+_Note: it does not call the constructor as this is done by a separate
+java_bytecode operation._
+
+\subsection java_objects Java Objects (`new`)
+
+The basic `new` operation is represented in Java bytecode by the `new` op
+
+These are converted by \ref remove_java_newt::lower_java_new
+
+For example, the following Java code:
+
+```java
+TestClass f = new TestClass();
+```
+
+Which is represented as the following Java bytecode:
+
+```
+0: new           #2                  // class TestClass
+3: dup
+4: invokespecial #3                  // Method "<init>":()V
+```
+
+The first instruction only is translated into the following `codet`s:
+
+```cpp
+tmp_object1 = side_effect_exprt(ALLOCATE, sizeof(TestClass))
+*tmp_object1 = struct_exprt{.component = 0, ... }
+```
+
+For more details about the zero expression see \ref expr_initializert
+
+\subsection oned_arrays Single Dimensional Arrays (`newarray`)
+
+The new Java array operation is represented in Java bytecode by the `newarray`
+operation.
+
+These are converted by \ref remove_java_newt::lower_java_new_array
+
+See \ref java-bytecode-array-representation for details on how arrays are
+represented in codet.
+
+A `newarray` is represented as:
+ - an allocation of the array object (the same as with a regular Java object).
+ - Initialize the size component
+ - Initialize the data component
+
+For example the following Java:
+
+```java
+TestClass[] tArray = new TestClass[5];
+```
+
+Which is compiled into the following Java bytecode:
+
+```
+8: iconst_5
+9: anewarray     #2                  // class TestClass
+```
+
+Is translated into the following `codet`s:
+
+```cpp
+tmp_object1 = side_effect_exprt(ALLOCATE, sizeof(java::array[referenence]))
+*tmp_object1 = struct_exprt{.size = 0, .data = null}
+tmp_object1->length = length
+tmp_new_data_array1 = side_effect_exprt(java_new_array_data, TestClass)
+tmp_object1->data = tmp_new_data_array1
+ARRAY_SET(tmp_new_data_array1, NULL)
+```
+
+The `ARRAY_SET` `codet` sets all the values to null.
+
+\subsection multidarrays Multi Dimensional Arrays (`newmultiarray`)
+
+The new Java multi dimensional array operation is represented in bytecode by
+`multianewarray`
+
+These are also by \ref remove_java_newt::lower_java_new_array
+
+They work the same as single dimensional arrays but create a for loop for each
+element in the array since these start initialized.
+
+```cpp
+for(tmp_index = 0; tmp_index < dim_size; ++tmp_index)
+{
+  struct java::array[reference] *subarray_init;
+  subarray_init = java_new_array
+  newarray_tmp1->data[tmp_index] = (void *)subarray_init;
+}
+```
+
+`remove_java_new` is then recursively applied to the new `subarray`.
 
 \section java-bytecode-remove-exceptions remove_exceptions
 
