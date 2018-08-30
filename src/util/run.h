@@ -24,6 +24,4 @@ int run(
   const std::string &std_output,
   const std::string &std_error);
 
-int run_shell(const std::string &command);
-
 #endif // CPROVER_UTIL_RUN_H

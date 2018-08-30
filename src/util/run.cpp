@@ -37,15 +37,6 @@ int run(const std::string &what, const std::vector<std::string> &argv)
   return run(what, argv, "", "", "");
 }
 
-int run_shell(const std::string &command)
-{
-  std::string shell="/bin/sh";
-  std::vector<std::string> argv;
-  argv.push_back(shell);
-  argv.push_back(command);
-  return run(shell, argv, "", "", "");
-}
-
 #ifndef _WIN32
 /// open given file to replace either stdin, stderr, stdout
 static int stdio_redirection(int fd, const std::string &file)
