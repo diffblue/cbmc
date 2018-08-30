@@ -39,8 +39,7 @@ public:
 };
 
 /// Cast a generic exprt to a \ref transt
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// transt.
+/// \a expr must be known to be \ref transt.
 /// \param expr: Source expression
 /// \return Object of type \ref transt
 inline const transt &to_trans_expr(const exprt &expr)
@@ -173,8 +172,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref symbol_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// symbol_exprt.
+/// \a expr must be known to be \ref symbol_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref symbol_exprt
@@ -229,8 +227,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref nondet_symbol_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// nondet_symbol_exprt.
+/// \a expr must be known to be \ref nondet_symbol_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref nondet_symbol_exprt
@@ -310,8 +307,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref unary_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// unary_exprt.
+/// \a expr must be known to be \ref unary_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref unary_exprt
@@ -354,8 +350,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref abs_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// abs_exprt.
+/// \a expr must be known to be \ref abs_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref abs_exprt
@@ -411,8 +406,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref unary_minus_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// unary_minus_exprt.
+/// \a expr must be known to be \ref unary_minus_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref unary_minus_exprt
@@ -473,8 +467,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref bswap_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// bswap_exprt.
+/// \a expr must be known to be \ref bswap_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref bswap_exprt
@@ -625,8 +618,7 @@ protected:
 
 /// \brief Cast a generic exprt to a \ref binary_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// binary_exprt.
+/// \a expr must be known to be \ref binary_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref binary_exprt
@@ -719,8 +711,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref binary_relation_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// binary_relation_exprt.
+/// \a expr must be known to be \ref binary_relation_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref binary_relation_exprt
@@ -788,8 +779,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref multi_ary_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// multi_ary_exprt.
+/// \a expr must be known to be \ref multi_ary_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref multi_ary_exprt
@@ -832,8 +822,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref plus_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// plus_exprt.
+/// \a expr must be known to be \ref plus_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref plus_exprt
@@ -884,8 +873,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref minus_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// minus_exprt.
+/// \a expr must be known to be \ref minus_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref minus_exprt
@@ -937,8 +925,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref mult_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// mult_exprt.
+/// \a expr must be known to be \ref mult_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref mult_exprt
@@ -989,8 +976,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref div_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// div_exprt.
+/// \a expr must be known to be \ref div_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref div_exprt
@@ -1041,8 +1027,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref mod_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// mod_exprt.
+/// \a expr must be known to be \ref mod_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref mod_exprt
@@ -1089,8 +1074,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref rem_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// rem_exprt.
+/// \a expr must be known to be \ref rem_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref rem_exprt
@@ -1137,8 +1121,7 @@ class power_exprt:public binary_exprt
 
 /// \brief Cast a generic exprt to a \ref power_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// power_exprt.
+/// \a expr must be known to be \ref power_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref power_exprt
@@ -1185,8 +1168,7 @@ class factorial_power_exprt:public binary_exprt
 
 /// \brief Cast a generic exprt to a \ref factorial_power_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// factorial_power_exprt.
+/// \a expr must be known to be \ref factorial_power_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref factorial_power_exprt
@@ -1236,8 +1218,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref equal_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// equal_exprt.
+/// \a expr must be known to be \ref equal_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref equal_exprt
@@ -1282,8 +1263,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref notequal_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// notequal_exprt.
+/// \a expr must be known to be \ref notequal_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref notequal_exprt
@@ -1364,8 +1344,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref index_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// index_exprt.
+/// \a expr must be known to be \ref index_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref index_exprt
@@ -1398,7 +1377,7 @@ inline void validate_expr(const index_exprt &value)
 }
 
 
-/// \brief array constructor from single element
+/// \brief Array constructor from single element
 class array_of_exprt:public unary_exprt
 {
 public:
@@ -1425,8 +1404,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref array_of_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// array_of_exprt.
+/// \a expr must be known to be \ref array_of_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref array_of_exprt
@@ -1459,7 +1437,7 @@ inline void validate_expr(const array_of_exprt &value)
 }
 
 
-/// \brief array constructor from list of elements
+/// \brief Array constructor from list of elements
 class array_exprt:public exprt
 {
 public:
@@ -1475,8 +1453,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref array_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// array_exprt.
+/// \a expr must be known to be \ref array_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref array_exprt
@@ -1536,8 +1513,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref vector_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// vector_exprt.
+/// \a expr must be known to be \ref vector_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref vector_exprt
@@ -1605,8 +1581,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref union_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// union_exprt.
+/// \a expr must be known to be \ref union_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref union_exprt
@@ -1658,8 +1633,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref struct_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// struct_exprt.
+/// \a expr must be known to be \ref struct_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref struct_exprt
@@ -1724,8 +1698,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref complex_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// complex_exprt.
+/// \a expr must be known to be \ref complex_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref complex_exprt
@@ -1797,8 +1770,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref object_descriptor_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// object_descriptor_exprt.
+/// \a expr must be known to be \ref object_descriptor_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref object_descriptor_exprt
@@ -1867,8 +1839,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref dynamic_object_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// dynamic_object_exprt.
+/// \a expr must be known to be \ref dynamic_object_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref dynamic_object_exprt
@@ -1928,8 +1899,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref typecast_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// typecast_exprt.
+/// \a expr must be known to be \ref typecast_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref typecast_exprt
@@ -2000,8 +1970,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref floatbv_typecast_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// floatbv_typecast_exprt.
+/// \a expr must be known to be \ref floatbv_typecast_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref floatbv_typecast_exprt
@@ -2078,8 +2047,7 @@ exprt conjunction(const exprt::operandst &);
 
 /// \brief Cast a generic exprt to a \ref and_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// and_exprt.
+/// \a expr must be known to be \ref and_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref and_exprt
@@ -2128,8 +2096,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref implies_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// implies_exprt.
+/// \a expr must be known to be \ref implies_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref implies_exprt
@@ -2201,8 +2168,7 @@ exprt disjunction(const exprt::operandst &);
 
 /// \brief Cast a generic exprt to a \ref or_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// or_exprt.
+/// \a expr must be known to be \ref or_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref or_exprt
@@ -2251,8 +2217,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref xor_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// xor_exprt.
+/// \a expr must be known to be \ref xor_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref xor_exprt
@@ -2299,8 +2264,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref bitnot_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// bitnot_exprt.
+/// \a expr must be known to be \ref bitnot_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref bitnot_exprt
@@ -2348,8 +2312,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref bitor_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// bitor_exprt.
+/// \a expr must be known to be \ref bitor_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref bitor_exprt
@@ -2402,8 +2365,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref bitxor_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// bitxor_exprt.
+/// \a expr must be known to be \ref bitxor_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref bitxor_exprt
@@ -2457,8 +2419,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref bitand_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// bitand_exprt.
+/// \a expr must be known to be \ref bitand_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref bitand_exprt
@@ -2541,8 +2502,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref shift_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// shift_exprt.
+/// \a expr must be known to be \ref shift_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref shift_exprt
@@ -2670,8 +2630,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref replication_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// replication_exprt.
+/// \a expr must be known to be \ref replication_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref replication_exprt
@@ -2745,8 +2704,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref extractbit_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// extractbit_exprt.
+/// \a expr must be known to be \ref extractbit_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref extractbit_exprt
@@ -2837,8 +2795,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref extractbits_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// extractbits_exprt.
+/// \a expr must be known to be \ref extractbits_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref extractbits_exprt
@@ -2895,8 +2852,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref address_of_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// address_of_exprt.
+/// \a expr must be known to be \ref address_of_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref address_of_exprt
@@ -2942,8 +2898,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref not_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// not_exprt.
+/// \a expr must be known to be \ref not_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref not_exprt
@@ -3010,8 +2965,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref dereference_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// dereference_exprt.
+/// \a expr must be known to be \ref dereference_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref dereference_exprt
@@ -3102,8 +3056,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref if_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// if_exprt.
+/// \a expr must be known to be \ref if_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref if_exprt
@@ -3189,8 +3142,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref with_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// with_exprt.
+/// \a expr must be known to be \ref with_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref with_exprt
@@ -3248,8 +3200,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref index_designatort
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// index_designatort.
+/// \a expr must be known to be \ref index_designatort.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref index_designatort
@@ -3299,8 +3250,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref member_designatort
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// member_designatort.
+/// \a expr must be known to be \ref member_designatort.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref member_designatort
@@ -3395,8 +3345,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref update_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// update_exprt.
+/// \a expr must be known to be \ref update_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref update_exprt
@@ -3484,8 +3433,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref array_update_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// array_update_exprt.
+/// \a expr must be known to be \ref array_update_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref array_update_exprt
@@ -3597,8 +3545,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref member_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// member_exprt.
+/// \a expr must be known to be \ref member_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref member_exprt
@@ -3647,8 +3594,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref isnan_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// isnan_exprt.
+/// \a expr must be known to be \ref isnan_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref isnan_exprt
@@ -3693,8 +3639,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref isinf_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// isinf_exprt.
+/// \a expr must be known to be \ref isinf_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref isinf_exprt
@@ -3743,8 +3688,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref isfinite_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// isfinite_exprt.
+/// \a expr must be known to be \ref isfinite_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref isfinite_exprt
@@ -3789,8 +3733,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref isnormal_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// isnormal_exprt.
+/// \a expr must be known to be \ref isnormal_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref isnormal_exprt
@@ -3835,8 +3778,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref ieee_float_equal_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// ieee_float_equal_exprt.
+/// \a expr must be known to be \ref ieee_float_equal_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref ieee_float_equal_exprt
@@ -3887,8 +3829,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref ieee_float_notequal_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// ieee_float_notequal_exprt.
+/// \a expr must be known to be \ref ieee_float_notequal_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref ieee_float_notequal_exprt
@@ -3975,8 +3916,7 @@ public:
 
 /// \brief Cast a generic exprt to an \ref ieee_float_op_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// ieee_float_op_exprt.
+/// \a expr must be known to be \ref ieee_float_op_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref ieee_float_op_exprt
@@ -4058,8 +3998,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref constant_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// constant_exprt.
+/// \a expr must be known to be \ref constant_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref constant_exprt
@@ -4168,8 +4107,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref function_application_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// function_application_exprt.
+/// \a expr must be known to be \ref function_application_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref function_application_exprt
@@ -4232,8 +4170,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref concatenation_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// concatenation_exprt.
+/// \a expr must be known to be \ref concatenation_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref concatenation_exprt
@@ -4325,8 +4262,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref let_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// let_exprt.
+/// \a expr must be known to be \ref let_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref let_exprt
@@ -4394,8 +4330,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref quantifier_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// quantifier_exprt.
+/// \a expr must be known to be \ref quantifier_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref quantifier_exprt
@@ -4474,8 +4409,7 @@ public:
 
 /// \brief Cast a generic exprt to a \ref popcount_exprt
 ///
-/// This is an unchecked conversion. \a expr must be known to be \ref
-/// popcount_exprt.
+/// \a expr must be known to be \ref popcount_exprt.
 ///
 /// \param expr: Source expression
 /// \return Object of type \ref popcount_exprt
