@@ -28,6 +28,9 @@ struct object_factory_parameterst final
   /// Maximum value for the non-deterministically-chosen length of a string.
   size_t max_nondet_string_length=MAX_NONDET_STRING_LENGTH;
 
+  /// Minimum value for the non-deterministically-chosen length of a string.
+  size_t min_nondet_string_length = 0;
+
   /// Maximum depth for object hierarchy on input.
   /// Used to prevent object factory to loop infinitely during the
   /// generation of code that allocates/initializes data structures of recursive

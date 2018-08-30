@@ -33,11 +33,13 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #define OPT_STRING_REFINEMENT \
   "(no-refine-strings)" \
   "(string-printable)" \
+  "(string-non-empty)" \
   "(max-nondet-string-length):"
 
 #define HELP_STRING_REFINEMENT \
   " --no-refine-strings          turn off string refinement\n" \
   " --string-printable           restrict to printable strings (experimental)\n" /* NOLINT(*) */ \
+  " --string-non-empty           restrict to non-empty strings (experimental)\n" /* NOLINT(*) */ \
   " --max-nondet-string-length n bound the length of nondet (e.g. input) strings\n" /* NOLINT(*) */
 
 // The integration of the string solver into CBMC is incomplete. Therefore,
