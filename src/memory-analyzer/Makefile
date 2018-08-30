@@ -7,12 +7,12 @@ SRC = analyze_symbol.cpp\
 INCLUDES= -I ..
 
 LIBS = \
-	../ansi-c/ansi-c.a \
-	../goto-programs/goto-programs.a \
-	../linking/linking.a \
-	../util/util.a \
-	../big-int/big-int.a \
-	../langapi/langapi.a
+	../ansi-c/ansi-c$(LIBEXT) \
+	../goto-programs/goto-programs$(LIBEXT) \
+	../linking/linking$(LIBEXT) \
+	../util/util$(LIBEXT) \
+	../big-int/big-int$(LIBEXT) \
+	../langapi/langapi$(LIBEXT)
 
 	
 
