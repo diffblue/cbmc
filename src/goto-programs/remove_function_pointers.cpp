@@ -44,6 +44,20 @@ public:
 
   bool remove_function_pointers(goto_programt &goto_program);
 
+  // a set of function symbols
+  using functionst = remove_const_function_pointerst::functionst;
+
+  /// Replace a call to a dynamic function at location
+  /// target in the given goto-program by a case-split
+  /// over a given set of functions
+  /// \param goto_program The goto program that contains target
+  /// \param target location with function call with function pointer
+  /// \param functions The set of functions to consider
+  void remove_function_pointer(
+    goto_programt &goto_program,
+    goto_programt::targett target,
+    const functionst &functions);
+
 protected:
   const namespacet ns;
   symbol_tablet &symbol_table;
@@ -57,6 +71,11 @@ protected:
   // --remove-const-function-pointers instead of --remove-function-pointers
   bool only_resolve_const_fps;
 
+  /// Replace a call to a dynamic function at location
+  /// target in the given goto-program by determining
+  /// functions that have a compatible signature
+  /// \param goto_program The goto program that contains target
+  /// \param target location with function call with function pointer
   void remove_function_pointer(
     goto_programt &goto_program,
     goto_programt::targett target);
@@ -347,6 +366,19 @@ void remove_function_pointerst::remove_function_pointer(
       functions.insert(expr);
     }
   }
+
+  remove_function_pointer(goto_program, target, functions);
+}
+
+void remove_function_pointerst::remove_function_pointer(
+  goto_programt &goto_program,
+  goto_programt::targett target,
+  const functionst &functions)
+{
+  const code_function_callt &code = to_code_function_call(target->code);
+
+  const exprt &function = code.function();
+  const exprt &pointer = function.op0();
 
   // the final target is a skip
   goto_programt final_skip;
