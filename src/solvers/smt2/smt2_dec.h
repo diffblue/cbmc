@@ -20,8 +20,8 @@ public:
   smt2_temp_filet();
   ~smt2_temp_filet();
 
-  std::ofstream temp_out;
-  std::string temp_out_filename, temp_result_filename;
+  std::ofstream temp_problem;
+  std::string temp_problem_filename, temp_result_filename;
 };
 
 class smt2_stringstreamt

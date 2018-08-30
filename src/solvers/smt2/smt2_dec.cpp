@@ -44,19 +44,18 @@ std::string smt2_dect::decision_procedure_text() const
 
 smt2_temp_filet::smt2_temp_filet()
 {
-  temp_out_filename=get_temporary_file("smt2_dec_out_", "");
+  temp_problem_filename = get_temporary_file("smt2_dec_problem_", "");
 
-  temp_out.open(
-    temp_out_filename.c_str(),
-    std::ios_base::out | std::ios_base::trunc);
+  temp_problem.open(
+    temp_problem_filename.c_str(), std::ios_base::out | std::ios_base::trunc);
 }
 
 smt2_temp_filet::~smt2_temp_filet()
 {
-  temp_out.close();
+  temp_problem.close();
 
-  if(temp_out_filename!="")
-    unlink(temp_out_filename.c_str());
+  if(temp_problem_filename != "")
+    unlink(temp_problem_filename.c_str());
 
   if(temp_result_filename!="")
     unlink(temp_result_filename.c_str());
@@ -68,11 +67,11 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   smt2_temp_filet smt2_temp_file;
 
   // copy from string buffer into file
-  smt2_temp_file.temp_out << stringstream.str();
+  smt2_temp_file.temp_problem << stringstream.str();
 
   // this finishes up and closes the SMT2 file
-  write_footer(smt2_temp_file.temp_out);
-  smt2_temp_file.temp_out.close();
+  write_footer(smt2_temp_file.temp_problem);
+  smt2_temp_file.temp_problem.close();
 
   smt2_temp_file.temp_result_filename=
     get_temporary_file("smt2_dec_result_", "");
@@ -82,26 +81,21 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   switch(solver)
   {
   case solvert::BOOLECTOR:
-    command = "boolector --smt2 "
-            + smt2_temp_file.temp_out_filename
-            + " -m > "
-            + smt2_temp_file.temp_result_filename;
+    command = "boolector --smt2 " + smt2_temp_file.temp_problem_filename +
+              " -m > " + smt2_temp_file.temp_result_filename;
     break;
 
   case solvert::CVC3:
-    command = "cvc3 +model -lang smtlib -output-lang smtlib "
-            + smt2_temp_file.temp_out_filename
-            + " > "
-            + smt2_temp_file.temp_result_filename;
+    command = "cvc3 +model -lang smtlib -output-lang smtlib " +
+              smt2_temp_file.temp_problem_filename + " > " +
+              smt2_temp_file.temp_result_filename;
     break;
 
   case solvert::CVC4:
     // The flags --bitblast=eager --bv-div-zero-const help but only
     // work for pure bit-vector formulas.
-    command = "cvc4 -L smt2 "
-            + smt2_temp_file.temp_out_filename
-            + " > "
-            + smt2_temp_file.temp_result_filename;
+    command = "cvc4 -L smt2 " + smt2_temp_file.temp_problem_filename + " > " +
+              smt2_temp_file.temp_result_filename;
     break;
 
   case solvert::MATHSAT:
@@ -121,23 +115,20 @@ decision_proceduret::resultt smt2_dect::dec_solve()
               " -theory.fp.mode=1"
               " -theory.fp.bit_blast_mode=2"
               " -theory.arr.mode=1"
-              " < "+smt2_temp_file.temp_out_filename
-            + " > "+smt2_temp_file.temp_result_filename;
+              " < " + smt2_temp_file.temp_problem_filename +
+              " > " + smt2_temp_file.temp_result_filename;
     break;
 
   case solvert::YICES:
     //    command = "yices -smt -e "   // Calling convention for older versions
-    command = "yices-smt2 "  //  Calling for 2.2.1
-            + smt2_temp_file.temp_out_filename
-            + " > "
-            + smt2_temp_file.temp_result_filename;
+    command = "yices-smt2 " //  Calling for 2.2.1
+              + smt2_temp_file.temp_problem_filename +
+              " > " + smt2_temp_file.temp_result_filename;
     break;
 
   case solvert::Z3:
-    command = "z3 -smt2 "
-            + smt2_temp_file.temp_out_filename
-            + " > "
-            + smt2_temp_file.temp_result_filename;
+    command = "z3 -smt2 " + smt2_temp_file.temp_problem_filename +
+              " > " + smt2_temp_file.temp_result_filename;
     break;
 
   default:
