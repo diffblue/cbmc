@@ -11,7 +11,8 @@ To be documented.
 The Java language contains high-level programming concepts like virtual
 functions and throw/catch semantics. These need to be rewritten in terms of
 other, more fundamental operations in order to analyse the Java program. This
-operation is referred to as "lowering".
+operation is referred to as "lowering". See Background Concepts for more
+information.
 
 The following lowering operations are done on Java bytecode after converting
 into a basic `codet` representation.
