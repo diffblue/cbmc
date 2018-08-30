@@ -939,6 +939,8 @@ optionalt<size_t> java_generic_symbol_typet::generic_type_index(
 
 std::string pretty_java_type(const typet &type)
 {
+  if(type == java_void_type())
+    return "void";
   if(type == java_int_type())
     return "int";
   else if(type == java_long_type())
