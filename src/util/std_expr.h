@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_cast.h"
 
 
-/// transition system, consisting of state invariant, initial state predicate,
+/// Transition system, consisting of state invariant, initial state predicate,
 /// and transition predicate.
 class transt:public exprt
 {
@@ -80,20 +80,17 @@ public:
   {
   }
 
-  /// Constructor
   /// \param identifier: Name of symbol
   explicit symbol_exprt(const irep_idt &identifier):exprt(ID_symbol)
   {
     set_identifier(identifier);
   }
 
-  /// Constructor
   /// \param type: Type of symbol
   explicit symbol_exprt(const typet &type):exprt(ID_symbol, type)
   {
   }
 
-  /// Constructor
   /// \param identifier: Name of symbol
   /// \param type: Type of symbol
   symbol_exprt(
@@ -114,7 +111,7 @@ public:
   }
 };
 
-/// Expression to hold a symbol (variable) with extra ccessors to
+/// Expression to hold a symbol (variable) with extra accessors to
 /// ID_c_static_lifetime and ID_C_thread_local
 class decorated_symbol_exprt:public symbol_exprt
 {
@@ -123,21 +120,18 @@ public:
   {
   }
 
-  /// Constructor
   /// \param identifier: Name of symbol
   explicit decorated_symbol_exprt(const irep_idt &identifier):
     symbol_exprt(identifier)
   {
   }
 
-  /// Constructor
   /// \param type: Type of symbol
   explicit decorated_symbol_exprt(const typet &type):
     symbol_exprt(type)
   {
   }
 
-  /// Constructor
   /// \param identifier: Name of symbol
   /// \param : type Type of symbol
   decorated_symbol_exprt(
@@ -213,7 +207,6 @@ inline void validate_expr(const symbol_exprt &value)
 class nondet_symbol_exprt:public exprt
 {
 public:
-  /// \brief Constructor
   /// \param identifier: Name of symbol
   /// \param : type Type of symbol
   nondet_symbol_exprt(
@@ -345,7 +338,7 @@ template<> inline bool can_cast_expr<unary_exprt>(const exprt &base)
 }
 
 
-/// \brief absolute value
+/// \brief Absolute value
 class abs_exprt:public unary_exprt
 {
 public:
@@ -547,7 +540,7 @@ public:
 };
 
 /// \brief A generic base class for expressions that are predicates,
-///        i.e., boolean-typed, and that take exactly one argument.
+///        i.e., Boolean-typed, and that take exactly one argument.
 class unary_predicate_exprt:public unary_exprt
 {
 public:
@@ -571,7 +564,7 @@ protected:
   using exprt::op2; // hide
 };
 
-/// \brief sign of an expression
+/// \brief Sign of an expression
 /// Predicate is true if \a _op is negative, false otherwise.
 class sign_exprt:public unary_predicate_exprt
 {
@@ -661,7 +654,7 @@ template<> inline bool can_cast_expr<binary_exprt>(const exprt &base)
 
 
 /// \brief A generic base class for expressions that are predicates,
-///        i.e., boolean-typed, and that take exactly two arguments.
+///        i.e., Boolean-typed, and that take exactly two arguments.
 class binary_predicate_exprt:public binary_exprt
 {
 public:
@@ -755,6 +748,7 @@ template<> inline bool can_cast_expr<binary_relation_exprt>(const exprt &base)
 
 
 /// \brief A generic base class for multi-ary expressions
+/// Associativity is not specified.
 class multi_ary_exprt:public exprt
 {
 public:
@@ -812,6 +806,7 @@ inline multi_ary_exprt &to_multi_ary_expr(exprt &expr)
 
 
 /// \brief The plus expression
+/// Associativity is not specified.
 class plus_exprt:public multi_ary_exprt
 {
 public:
@@ -871,7 +866,7 @@ inline void validate_expr(const plus_exprt &value)
 }
 
 
-/// \brief binary minus
+/// \brief Binary minus
 class minus_exprt:public binary_exprt
 {
 public:
@@ -923,7 +918,8 @@ inline void validate_expr(const minus_exprt &value)
 }
 
 
-/// \brief binary multiplication
+/// \brief Binary multiplication
+/// Associativity is not specified.
 class mult_exprt:public multi_ary_exprt
 {
 public:
@@ -975,7 +971,7 @@ inline void validate_expr(const mult_exprt &value)
 }
 
 
-/// \brief division (integer and real)
+/// \brief Division
 class div_exprt:public binary_exprt
 {
 public:
@@ -1027,7 +1023,7 @@ inline void validate_expr(const div_exprt &value)
 }
 
 
-/// \brief modulo
+/// \brief Modulo
 class mod_exprt:public binary_exprt
 {
 public:
@@ -1075,7 +1071,7 @@ inline void validate_expr(const mod_exprt &value)
 }
 
 
-/// \brief remainder of division
+/// \brief Remainder of division
 class rem_exprt:public binary_exprt
 {
 public:
@@ -1123,8 +1119,7 @@ inline void validate_expr(const rem_exprt &value)
 }
 
 
-/// \brief exponentiation
-////
+/// \brief Exponentiation
 class power_exprt:public binary_exprt
 {
  public:
@@ -1172,7 +1167,7 @@ inline void validate_expr(const power_exprt &value)
 }
 
 
-/// \brief falling factorial power
+/// \brief Falling factorial power
 class factorial_power_exprt:public binary_exprt
 {
  public:
@@ -1225,7 +1220,7 @@ inline void validate_expr(const factorial_power_exprt &value)
 }
 
 
-/// \brief equality
+/// \brief Equality
 class equal_exprt:public binary_relation_exprt
 {
 public:
@@ -1271,7 +1266,7 @@ inline void validate_expr(const equal_exprt &value)
 }
 
 
-/// \brief inequality
+/// \brief Disequality
 class notequal_exprt:public binary_relation_exprt
 {
 public:
@@ -1321,7 +1316,7 @@ inline void validate_expr(const notequal_exprt &value)
 }
 
 
-/// \brief array index operator
+/// \brief Array index operator
 class index_exprt:public binary_exprt
 {
 public:
@@ -1525,7 +1520,7 @@ inline void validate_expr(const array_list_exprt &value)
   PRECONDITION(value.operands().size() % 2 == 0);
 }
 
-/// \brief vector constructor from list of elements
+/// \brief Vector constructor from list of elements
 class vector_exprt:public exprt
 {
 public:
@@ -1565,7 +1560,7 @@ template<> inline bool can_cast_expr<vector_exprt>(const exprt &base)
 }
 
 
-/// \brief union constructor from single element
+/// \brief Union constructor from single element
 class union_exprt:public unary_exprt
 {
 public:
@@ -1644,7 +1639,7 @@ inline void validate_expr(const union_exprt &value)
 }
 
 
-/// \brief struct constructor from list of elements
+/// \brief Struct constructor from list of elements
 class struct_exprt:public exprt
 {
 public:
@@ -1687,7 +1682,7 @@ template<> inline bool can_cast_expr<struct_exprt>(const exprt &base)
 }
 
 
-/// \brief complex constructor from a pair of numbers
+/// \brief Complex constructor from a pair of numbers
 class complex_exprt:public binary_exprt
 {
 public:
@@ -1765,7 +1760,7 @@ inline void validate_expr(const complex_exprt &value)
 
 class namespacet;
 
-/// \brief split an expression into a base object and a (byte) offset
+/// \brief Split an expression into a base object and a (byte) offset
 class object_descriptor_exprt:public binary_exprt
 {
 public:
@@ -1838,7 +1833,7 @@ inline void validate_expr(const object_descriptor_exprt &value)
 }
 
 
-/// \brief TO_BE_DOCUMENTED
+/// Representation of heap-allocated objects
 class dynamic_object_exprt:public binary_exprt
 {
 public:
@@ -1908,7 +1903,7 @@ inline void validate_expr(const dynamic_object_exprt &value)
 }
 
 
-/// \brief semantic type conversion
+/// \brief Semantic type conversion
 class typecast_exprt:public unary_exprt
 {
 public:
@@ -1967,7 +1962,7 @@ inline void validate_expr(const typecast_exprt &value)
 }
 
 
-/// \brief semantic type conversion from/to floating-point formats
+/// \brief Semantic type conversion from/to floating-point formats
 class floatbv_typecast_exprt:public binary_exprt
 {
 public:
@@ -2076,8 +2071,8 @@ public:
 };
 
 /// 1) generates a conjunction for two or more operands
-///  2) for one operand, returns the operand
-///  3) returns true otherwise
+/// 2) for one operand, returns the operand
+/// 3) returns true otherwise
 
 exprt conjunction(const exprt::operandst &);
 
@@ -2199,8 +2194,8 @@ public:
 };
 
 /// 1) generates a disjunction for two or more operands
-///  2) for one operand, returns the operand
-///  3) returns false otherwise
+/// 2) for one operand, returns the operand
+/// 3) returns false otherwise
 
 exprt disjunction(const exprt::operandst &);
 
@@ -3142,8 +3137,8 @@ inline void validate_expr(const if_exprt &value)
 
 
 /// \brief Operator to update elements in structs and arrays
-///    \remark This expression will eventually be replaced by separate
-///            array and struct update operators.
+/// \remark This expression will eventually be replaced by separate
+///         array and struct update operators.
 class with_exprt:public exprt
 {
 public:
@@ -3438,7 +3433,7 @@ inline void validate_expr(const update_exprt &value)
 
 
 #if 0
-/// \brief update of one element of an array
+/// \brief Update of one element of an array
 class array_update_exprt:public exprt
 {
 public:
@@ -4126,7 +4121,7 @@ public:
   }
 };
 
-/// \brief application of (mathematical) function
+/// \brief Application of (mathematical) function
 class function_application_exprt:public binary_exprt
 {
 public:
