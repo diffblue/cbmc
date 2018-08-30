@@ -1,7 +1,9 @@
 /*******************************************************************\
 
-Module: Nondeterministic initialization of certain global scope
-        variables
+Module: Nondeterministically initializes global scope variables, except for
+ constants (such as string literals, final fields) and internal variables
+ (such as CPROVER and symex variables, language specific internal
+ variables).
 
 Author: Daniel Kroening, Michael Tautschnig
 
@@ -10,7 +12,10 @@ Date: November 2011
 \*******************************************************************/
 
 /// \file
-/// Nondeterministic initialization of certain global scope variables
+/// Nondeterministically initializes global scope variables, except for
+/// constants (such as string literals, final fields) and internal variables
+/// (such as CPROVER and symex variables, language specific internal
+/// variables).
 
 #include "nondet_static.h"
 
@@ -50,7 +55,13 @@ bool is_nondet_initializable_static(
          !is_constant_or_has_constant_components(ns.lookup(id).type, ns);
 }
 
-
+/// Nondeterministically initializes global scope variables in a goto-function.
+/// Iterates over instructions in the specified function and replaces all values
+/// assigned to nondet-initializable static variables with nondeterministic
+/// values.
+/// \param ns Namespace for resolving type information.
+/// \param [out] goto_functions Existing goto-functions to be updated.
+/// \param fct_name Name of the goto-function to be updated.
 void nondet_static(
   const namespacet &ns,
   goto_functionst &goto_functions,
@@ -94,6 +105,10 @@ void nondet_static(
   }
 }
 
+/// Nondeterministically initializes global scope variables in
+/// CPROVER_initialize function.
+/// \param ns Namespace for resolving type information.
+/// \param [out] goto_functions Existing goto-functions to be updated.
 void nondet_static(
   const namespacet &ns,
   goto_functionst &goto_functions)
@@ -104,6 +119,11 @@ void nondet_static(
   goto_functions.update();
 }
 
+/// Main entry point of the module. Nondeterministically initializes global
+/// scope variables, except for constants (such as string literals, final
+/// fields) and internal variables (such as CPROVER and symex variables,
+/// language specific internal variables).
+/// \param [out] goto_model Existing goto-model to be updated.
 void nondet_static(goto_modelt &goto_model)
 {
   const namespacet ns(goto_model.symbol_table);
