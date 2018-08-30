@@ -32,6 +32,11 @@ Date: August 2012
 #include <util/unicode.h>
 #include <util/signal_catcher.h>
 
+int run(const std::string &what, const std::vector<std::string> &argv)
+{
+  return run(what, argv, "", "", "");
+}
+
 int run_shell(const std::string &command)
 {
   std::string shell="/bin/sh";
