@@ -7,7 +7,15 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 \*******************************************************************/
 
 /// \file
-/// Compute natural loops in a goto_function
+/// Compute natural loops in a goto_function.
+///
+/// A natural loop is when the nodes and edges of a graph make one self-encapsulating
+/// circle with no incoming edges from external nodes. For example A -> B -> C -> D -> A
+/// is a natural loop, but if B has an incoming edge from X, then it isn't a natural loop,
+/// because X is an external node. Outgoing edges don't affect the natural-ness of a loop.
+///
+/// /ref cfg_dominators_templatet provides the dominator analysis used to determine if a nodes
+/// children can only be reached through itself and is thus part of a natural loop.
 
 #ifndef CPROVER_ANALYSES_NATURAL_LOOPS_H
 #define CPROVER_ANALYSES_NATURAL_LOOPS_H
@@ -20,6 +28,20 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 #include "cfg_dominators.h"
 
+/// Main driver for working out if a class (normally goto_programt) has any natural loops.
+/// \ref compute takes an entire goto_programt, iterates over the instructions and for
+/// any backwards jumps attempts to find out if it's a natural loop.
+///
+/// All instructions in a natural loop are stored into \ref loop_map, keyed by
+/// their head - the target of the backwards goto jump.
+///
+/// \tparam P the program representation and needs:
+///     [field] instruction which is an iterable of type T.
+/// \tparam T iterator of the particular node type, ex: std::list<...>::iterator.
+///     The object this iterator holds needs:
+///         [function] is_backwards_goto() returning a bool.
+///         [function] get_target() which returns an object that needs:
+///             [field] location_number which returns an unsigned int.
 template<class P, class T>
 class natural_loops_templatet
 {
@@ -60,6 +82,8 @@ protected:
   void compute_natural_loop(T, T);
 };
 
+/// A concretized version of
+/// \ref natural_loops_templatet<const goto_programt, goto_programt::const_targett>
 class natural_loopst:
     public natural_loops_templatet<const goto_programt,
                                    goto_programt::const_targett>
@@ -73,11 +97,11 @@ void show_natural_loops(
   const goto_modelt &,
   std::ostream &out);
 
-/// Finds all back-edges and computes the natural loops
 #ifdef DEBUG
 #include <iostream>
 #endif
 
+/// Finds all back-edges and computes the natural loops
 template<class P, class T>
 void natural_loops_templatet<P, T>::compute(P &program)
 {
