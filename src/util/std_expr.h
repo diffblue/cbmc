@@ -38,7 +38,7 @@ public:
   const exprt &trans() const { return op2(); }
 };
 
-/// Cast a generic exprt to a \ref transt
+/// Cast an exprt to a \ref transt
 /// \a expr must be known to be \ref transt.
 /// \param expr: Source expression
 /// \return Object of type \ref transt
@@ -170,7 +170,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref symbol_exprt
+/// \brief Cast an exprt to a \ref symbol_exprt
 ///
 /// \a expr must be known to be \ref symbol_exprt.
 ///
@@ -225,7 +225,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref nondet_symbol_exprt
+/// \brief Cast an exprt to a \ref nondet_symbol_exprt
 ///
 /// \a expr must be known to be \ref nondet_symbol_exprt.
 ///
@@ -305,7 +305,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref unary_exprt
+/// \brief Cast an exprt to a \ref unary_exprt
 ///
 /// \a expr must be known to be \ref unary_exprt.
 ///
@@ -348,7 +348,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref abs_exprt
+/// \brief Cast an exprt to a \ref abs_exprt
 ///
 /// \a expr must be known to be \ref abs_exprt.
 ///
@@ -404,7 +404,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref unary_minus_exprt
+/// \brief Cast an exprt to a \ref unary_minus_exprt
 ///
 /// \a expr must be known to be \ref unary_minus_exprt.
 ///
@@ -465,7 +465,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref bswap_exprt
+/// \brief Cast an exprt to a \ref bswap_exprt
 ///
 /// \a expr must be known to be \ref bswap_exprt.
 ///
@@ -502,7 +502,7 @@ inline void validate_expr(const bswap_exprt &value)
     value.op().type() == value.type(), "bswap type must match operand type");
 }
 
-/// \brief A generic base class for expressions that are predicates,
+/// \brief A base class for expressions that are predicates,
 ///        i.e., Boolean-typed.
 class predicate_exprt:public exprt
 {
@@ -532,7 +532,7 @@ public:
   }
 };
 
-/// \brief A generic base class for expressions that are predicates,
+/// \brief A base class for expressions that are predicates,
 ///        i.e., Boolean-typed, and that take exactly one argument.
 class unary_predicate_exprt:public unary_exprt
 {
@@ -572,7 +572,7 @@ public:
   }
 };
 
-/// \brief A generic base class for binary expressions
+/// \brief A base class for binary expressions
 class binary_exprt:public exprt
 {
 public:
@@ -616,7 +616,7 @@ protected:
   using exprt::op2; // hide
 };
 
-/// \brief Cast a generic exprt to a \ref binary_exprt
+/// \brief Cast an exprt to a \ref binary_exprt
 ///
 /// \a expr must be known to be \ref binary_exprt.
 ///
@@ -645,7 +645,7 @@ template<> inline bool can_cast_expr<binary_exprt>(const exprt &base)
 }
 
 
-/// \brief A generic base class for expressions that are predicates,
+/// \brief A base class for expressions that are predicates,
 ///        i.e., Boolean-typed, and that take exactly two arguments.
 class binary_predicate_exprt:public binary_exprt
 {
@@ -667,7 +667,7 @@ public:
   }
 };
 
-/// \brief A generic base class for relations, i.e., binary predicates
+/// \brief A base class for relations, i.e., binary predicates
 class binary_relation_exprt:public binary_predicate_exprt
 {
 public:
@@ -709,7 +709,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref binary_relation_exprt
+/// \brief Cast an exprt to a \ref binary_relation_exprt
 ///
 /// \a expr must be known to be \ref binary_relation_exprt.
 ///
@@ -738,7 +738,7 @@ template<> inline bool can_cast_expr<binary_relation_exprt>(const exprt &base)
 }
 
 
-/// \brief A generic base class for multi-ary expressions
+/// \brief A base class for multi-ary expressions
 /// Associativity is not specified.
 class multi_ary_exprt:public exprt
 {
@@ -777,7 +777,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref multi_ary_exprt
+/// \brief Cast an exprt to a \ref multi_ary_exprt
 ///
 /// \a expr must be known to be \ref multi_ary_exprt.
 ///
@@ -820,7 +820,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref plus_exprt
+/// \brief Cast an exprt to a \ref plus_exprt
 ///
 /// \a expr must be known to be \ref plus_exprt.
 ///
@@ -871,7 +871,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref minus_exprt
+/// \brief Cast an exprt to a \ref minus_exprt
 ///
 /// \a expr must be known to be \ref minus_exprt.
 ///
@@ -923,7 +923,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref mult_exprt
+/// \brief Cast an exprt to a \ref mult_exprt
 ///
 /// \a expr must be known to be \ref mult_exprt.
 ///
@@ -974,7 +974,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref div_exprt
+/// \brief Cast an exprt to a \ref div_exprt
 ///
 /// \a expr must be known to be \ref div_exprt.
 ///
@@ -1025,7 +1025,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref mod_exprt
+/// \brief Cast an exprt to a \ref mod_exprt
 ///
 /// \a expr must be known to be \ref mod_exprt.
 ///
@@ -1072,7 +1072,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref rem_exprt
+/// \brief Cast an exprt to a \ref rem_exprt
 ///
 /// \a expr must be known to be \ref rem_exprt.
 ///
@@ -1119,7 +1119,7 @@ class power_exprt:public binary_exprt
   }
 };
 
-/// \brief Cast a generic exprt to a \ref power_exprt
+/// \brief Cast an exprt to a \ref power_exprt
 ///
 /// \a expr must be known to be \ref power_exprt.
 ///
@@ -1166,7 +1166,7 @@ class factorial_power_exprt:public binary_exprt
   }
 };
 
-/// \brief Cast a generic exprt to a \ref factorial_power_exprt
+/// \brief Cast an exprt to a \ref factorial_power_exprt
 ///
 /// \a expr must be known to be \ref factorial_power_exprt.
 ///
@@ -1216,7 +1216,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref equal_exprt
+/// \brief Cast an exprt to an \ref equal_exprt
 ///
 /// \a expr must be known to be \ref equal_exprt.
 ///
@@ -1261,7 +1261,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref notequal_exprt
+/// \brief Cast an exprt to an \ref notequal_exprt
 ///
 /// \a expr must be known to be \ref notequal_exprt.
 ///
@@ -1342,7 +1342,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref index_exprt
+/// \brief Cast an exprt to an \ref index_exprt
 ///
 /// \a expr must be known to be \ref index_exprt.
 ///
@@ -1402,7 +1402,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref array_of_exprt
+/// \brief Cast an exprt to an \ref array_of_exprt
 ///
 /// \a expr must be known to be \ref array_of_exprt.
 ///
@@ -1451,7 +1451,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref array_exprt
+/// \brief Cast an exprt to an \ref array_exprt
 ///
 /// \a expr must be known to be \ref array_exprt.
 ///
@@ -1511,7 +1511,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref vector_exprt
+/// \brief Cast an exprt to an \ref vector_exprt
 ///
 /// \a expr must be known to be \ref vector_exprt.
 ///
@@ -1579,7 +1579,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref union_exprt
+/// \brief Cast an exprt to a \ref union_exprt
 ///
 /// \a expr must be known to be \ref union_exprt.
 ///
@@ -1631,7 +1631,7 @@ public:
   const exprt &component(const irep_idt &name, const namespacet &ns) const;
 };
 
-/// \brief Cast a generic exprt to a \ref struct_exprt
+/// \brief Cast an exprt to a \ref struct_exprt
 ///
 /// \a expr must be known to be \ref struct_exprt.
 ///
@@ -1696,7 +1696,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref complex_exprt
+/// \brief Cast an exprt to a \ref complex_exprt
 ///
 /// \a expr must be known to be \ref complex_exprt.
 ///
@@ -1768,7 +1768,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref object_descriptor_exprt
+/// \brief Cast an exprt to an \ref object_descriptor_exprt
 ///
 /// \a expr must be known to be \ref object_descriptor_exprt.
 ///
@@ -1837,7 +1837,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref dynamic_object_exprt
+/// \brief Cast an exprt to a \ref dynamic_object_exprt
 ///
 /// \a expr must be known to be \ref dynamic_object_exprt.
 ///
@@ -1897,7 +1897,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref typecast_exprt
+/// \brief Cast an exprt to a \ref typecast_exprt
 ///
 /// \a expr must be known to be \ref typecast_exprt.
 ///
@@ -1968,7 +1968,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref floatbv_typecast_exprt
+/// \brief Cast an exprt to a \ref floatbv_typecast_exprt
 ///
 /// \a expr must be known to be \ref floatbv_typecast_exprt.
 ///
@@ -2045,7 +2045,7 @@ public:
 
 exprt conjunction(const exprt::operandst &);
 
-/// \brief Cast a generic exprt to a \ref and_exprt
+/// \brief Cast an exprt to a \ref and_exprt
 ///
 /// \a expr must be known to be \ref and_exprt.
 ///
@@ -2094,7 +2094,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref implies_exprt
+/// \brief Cast an exprt to a \ref implies_exprt
 ///
 /// \a expr must be known to be \ref implies_exprt.
 ///
@@ -2166,7 +2166,7 @@ public:
 
 exprt disjunction(const exprt::operandst &);
 
-/// \brief Cast a generic exprt to a \ref or_exprt
+/// \brief Cast an exprt to a \ref or_exprt
 ///
 /// \a expr must be known to be \ref or_exprt.
 ///
@@ -2215,7 +2215,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref xor_exprt
+/// \brief Cast an exprt to a \ref xor_exprt
 ///
 /// \a expr must be known to be \ref xor_exprt.
 ///
@@ -2262,7 +2262,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref bitnot_exprt
+/// \brief Cast an exprt to a \ref bitnot_exprt
 ///
 /// \a expr must be known to be \ref bitnot_exprt.
 ///
@@ -2310,7 +2310,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref bitor_exprt
+/// \brief Cast an exprt to a \ref bitor_exprt
 ///
 /// \a expr must be known to be \ref bitor_exprt.
 ///
@@ -2363,7 +2363,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref bitxor_exprt
+/// \brief Cast an exprt to a \ref bitxor_exprt
 ///
 /// \a expr must be known to be \ref bitxor_exprt.
 ///
@@ -2417,7 +2417,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref bitand_exprt
+/// \brief Cast an exprt to a \ref bitand_exprt
 ///
 /// \a expr must be known to be \ref bitand_exprt.
 ///
@@ -2500,7 +2500,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref shift_exprt
+/// \brief Cast an exprt to a \ref shift_exprt
 ///
 /// \a expr must be known to be \ref shift_exprt.
 ///
@@ -2628,7 +2628,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref replication_exprt
+/// \brief Cast an exprt to a \ref replication_exprt
 ///
 /// \a expr must be known to be \ref replication_exprt.
 ///
@@ -2702,7 +2702,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref extractbit_exprt
+/// \brief Cast an exprt to an \ref extractbit_exprt
 ///
 /// \a expr must be known to be \ref extractbit_exprt.
 ///
@@ -2793,7 +2793,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref extractbits_exprt
+/// \brief Cast an exprt to an \ref extractbits_exprt
 ///
 /// \a expr must be known to be \ref extractbits_exprt.
 ///
@@ -2850,7 +2850,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref address_of_exprt
+/// \brief Cast an exprt to an \ref address_of_exprt
 ///
 /// \a expr must be known to be \ref address_of_exprt.
 ///
@@ -2896,7 +2896,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref not_exprt
+/// \brief Cast an exprt to an \ref not_exprt
 ///
 /// \a expr must be known to be \ref not_exprt.
 ///
@@ -2963,7 +2963,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref dereference_exprt
+/// \brief Cast an exprt to a \ref dereference_exprt
 ///
 /// \a expr must be known to be \ref dereference_exprt.
 ///
@@ -3054,7 +3054,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref if_exprt
+/// \brief Cast an exprt to an \ref if_exprt
 ///
 /// \a expr must be known to be \ref if_exprt.
 ///
@@ -3140,7 +3140,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref with_exprt
+/// \brief Cast an exprt to a \ref with_exprt
 ///
 /// \a expr must be known to be \ref with_exprt.
 ///
@@ -3198,7 +3198,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref index_designatort
+/// \brief Cast an exprt to an \ref index_designatort
 ///
 /// \a expr must be known to be \ref index_designatort.
 ///
@@ -3248,7 +3248,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref member_designatort
+/// \brief Cast an exprt to an \ref member_designatort
 ///
 /// \a expr must be known to be \ref member_designatort.
 ///
@@ -3343,7 +3343,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref update_exprt
+/// \brief Cast an exprt to an \ref update_exprt
 ///
 /// \a expr must be known to be \ref update_exprt.
 ///
@@ -3431,7 +3431,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref array_update_exprt
+/// \brief Cast an exprt to an \ref array_update_exprt
 ///
 /// \a expr must be known to be \ref array_update_exprt.
 ///
@@ -3543,7 +3543,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref member_exprt
+/// \brief Cast an exprt to a \ref member_exprt
 ///
 /// \a expr must be known to be \ref member_exprt.
 ///
@@ -3592,7 +3592,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref isnan_exprt
+/// \brief Cast an exprt to a \ref isnan_exprt
 ///
 /// \a expr must be known to be \ref isnan_exprt.
 ///
@@ -3637,7 +3637,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref isinf_exprt
+/// \brief Cast an exprt to a \ref isinf_exprt
 ///
 /// \a expr must be known to be \ref isinf_exprt.
 ///
@@ -3686,7 +3686,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref isfinite_exprt
+/// \brief Cast an exprt to a \ref isfinite_exprt
 ///
 /// \a expr must be known to be \ref isfinite_exprt.
 ///
@@ -3731,7 +3731,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref isnormal_exprt
+/// \brief Cast an exprt to a \ref isnormal_exprt
 ///
 /// \a expr must be known to be \ref isnormal_exprt.
 ///
@@ -3776,7 +3776,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref ieee_float_equal_exprt
+/// \brief Cast an exprt to an \ref ieee_float_equal_exprt
 ///
 /// \a expr must be known to be \ref ieee_float_equal_exprt.
 ///
@@ -3827,7 +3827,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref ieee_float_notequal_exprt
+/// \brief Cast an exprt to an \ref ieee_float_notequal_exprt
 ///
 /// \a expr must be known to be \ref ieee_float_notequal_exprt.
 ///
@@ -3914,7 +3914,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to an \ref ieee_float_op_exprt
+/// \brief Cast an exprt to an \ref ieee_float_op_exprt
 ///
 /// \a expr must be known to be \ref ieee_float_op_exprt.
 ///
@@ -3996,7 +3996,7 @@ public:
 };
 
 
-/// \brief Cast a generic exprt to a \ref constant_exprt
+/// \brief Cast an exprt to a \ref constant_exprt
 ///
 /// \a expr must be known to be \ref constant_exprt.
 ///
@@ -4105,7 +4105,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref function_application_exprt
+/// \brief Cast an exprt to a \ref function_application_exprt
 ///
 /// \a expr must be known to be \ref function_application_exprt.
 ///
@@ -4168,7 +4168,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref concatenation_exprt
+/// \brief Cast an exprt to a \ref concatenation_exprt
 ///
 /// \a expr must be known to be \ref concatenation_exprt.
 ///
@@ -4260,7 +4260,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref let_exprt
+/// \brief Cast an exprt to a \ref let_exprt
 ///
 /// \a expr must be known to be \ref let_exprt.
 ///
@@ -4328,7 +4328,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref quantifier_exprt
+/// \brief Cast an exprt to a \ref quantifier_exprt
 ///
 /// \a expr must be known to be \ref quantifier_exprt.
 ///
@@ -4407,7 +4407,7 @@ public:
   }
 };
 
-/// \brief Cast a generic exprt to a \ref popcount_exprt
+/// \brief Cast an exprt to a \ref popcount_exprt
 ///
 /// \a expr must be known to be \ref popcount_exprt.
 ///
