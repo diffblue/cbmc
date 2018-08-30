@@ -863,6 +863,12 @@ bool configt::set(const cmdlinet &cmdline)
       // enable Cygwin
       #ifdef _WIN32
       ansi_c.defines.push_back("__CYGWIN__");
+
+      // This works around a problem with parsing gcc attributes
+      // in function parameters. Triggered by mingw header files.
+      // Example:
+      // void some_func(void (__attribute__((stdcall)) *)(void));
+      ansi_c.defines.push_back("__stdcall=");
       #endif
 
       // MinGW has extra defines
