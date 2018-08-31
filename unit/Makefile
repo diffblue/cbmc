@@ -10,13 +10,16 @@ SRC += analyses/ai/ai.cpp \
        analyses/ai/ai_simplify_lhs.cpp \
        analyses/call_graph.cpp \
        analyses/constant_propagator.cpp \
+       analyses/dependence_graph.cpp \
        analyses/disconnect_unreachable_nodes_in_graph.cpp \
        analyses/does_remove_const/does_expr_lose_const.cpp \
        analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
        goto-programs/goto_trace_output.cpp \
        interpreter/interpreter.cpp \
+       json/json_parser.cpp \
        path_strategies.cpp \
+       pointer-analysis/value_set.cpp \
        solvers/floatbv/float_utils.cpp \
        solvers/refinement/array_pool/array_pool.cpp \
        solvers/refinement/string_constraint_generator_valueof/calculate_max_string_length.cpp \
