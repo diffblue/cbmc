@@ -93,9 +93,24 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               $(CPROVER_DIR)/src/util/util$(LIBEXT) \
               $(CPROVER_DIR)/src/big-int/big-int$(LIBEXT) \
               $(CPROVER_DIR)/src/goto-programs/goto-programs$(LIBEXT) \
-              $(CPROVER_DIR)/src/goto-instrument/goto-instrument$(LIBEXT) \
+              $(CPROVER_DIR)/src/goto-symex/goto-symex$(LIBEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/cover$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/cover_basic_blocks$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/cover_filter$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/cover_instrument_branch$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/cover_instrument_condition$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/cover_instrument_decision$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/cover_instrument_location$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/cover_instrument_mcdc$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/cover_instrument_other$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/cover_util$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/reachability_slicer$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/nondet_static$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/full_slicer$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/unwindset$(OBJEXT) \
               $(CPROVER_DIR)/src/pointer-analysis/pointer-analysis$(LIBEXT) \
               $(CPROVER_DIR)/src/langapi/langapi$(LIBEXT) \
+              $(CPROVER_DIR)/src/xmllang/xmllang$(LIBEXT) \
               $(CPROVER_DIR)/src/assembler/assembler$(LIBEXT) \
               $(CPROVER_DIR)/src/analyses/analyses$(LIBEXT) \
               $(CPROVER_DIR)/src/solvers/solvers$(LIBEXT) \

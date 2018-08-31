@@ -73,6 +73,20 @@ BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
           ../src/cbmc/symex_bmc$(OBJEXT) \
           ../src/cbmc/symex_coverage$(OBJEXT) \
           ../src/cbmc/xml_interface$(OBJEXT) \
+          ../src/goto-instrument/cover$(OBJEXT) \
+          ../src/goto-instrument/cover_basic_blocks$(OBJEXT) \
+          ../src/goto-instrument/cover_filter$(OBJEXT) \
+          ../src/goto-instrument/cover_instrument_branch$(OBJEXT) \
+          ../src/goto-instrument/cover_instrument_condition$(OBJEXT) \
+          ../src/goto-instrument/cover_instrument_decision$(OBJEXT) \
+          ../src/goto-instrument/cover_instrument_location$(OBJEXT) \
+          ../src/goto-instrument/cover_instrument_mcdc$(OBJEXT) \
+          ../src/goto-instrument/cover_instrument_other$(OBJEXT) \
+          ../src/goto-instrument/cover_util$(OBJEXT) \
+          ../src/goto-instrument/reachability_slicer$(OBJEXT) \
+          ../src/goto-instrument/nondet_static$(OBJEXT) \
+          ../src/goto-instrument/full_slicer$(OBJEXT) \
+          ../src/goto-instrument/unwindset$(OBJEXT) \
           ../src/xmllang/xmllang$(LIBEXT) \
           ../src/goto-symex/goto-symex$(LIBEXT) \
           ../src/jsil/jsil$(LIBEXT) \
@@ -85,7 +99,6 @@ CPROVER_LIBS =../src/ansi-c/ansi-c$(LIBEXT) \
               ../src/util/util$(LIBEXT) \
               ../src/big-int/big-int$(LIBEXT) \
               ../src/goto-programs/goto-programs$(LIBEXT) \
-              ../src/goto-instrument/goto-instrument$(LIBEXT) \
               ../src/pointer-analysis/pointer-analysis$(LIBEXT) \
               ../src/langapi/langapi$(LIBEXT) \
               ../src/assembler/assembler$(LIBEXT) \
