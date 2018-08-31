@@ -6,8 +6,7 @@ SRC = unit_tests.cpp \
       # Empty last line
 
 # Test source files
-SRC += unit_tests.cpp \
-       analyses/ai/ai.cpp \
+SRC += analyses/ai/ai.cpp \
        analyses/ai/ai_simplify_lhs.cpp \
        analyses/call_graph.cpp \
        analyses/constant_propagator.cpp \
@@ -16,6 +15,7 @@ SRC += unit_tests.cpp \
        analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
        goto-programs/goto_trace_output.cpp \
+       interpreter/interpreter.cpp \
        path_strategies.cpp \
        solvers/floatbv/float_utils.cpp \
        solvers/refinement/array_pool/array_pool.cpp \
@@ -23,11 +23,11 @@ SRC += unit_tests.cpp \
        solvers/refinement/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
        solvers/refinement/string_constraint_generator_valueof/is_digit_with_radix.cpp \
        solvers/refinement/string_refinement/concretize_array.cpp \
-       solvers/refinement/string_refinement/substitute_array_list.cpp \
        solvers/refinement/string_refinement/sparse_array.cpp \
+       solvers/refinement/string_refinement/substitute_array_list.cpp \
        solvers/refinement/string_refinement/union_find_replace.cpp \
-       util/expr.cpp \
        util/expr_cast/expr_cast.cpp \
+       util/expr.cpp \
        util/file_util.cpp \
        util/get_base_name.cpp \
        util/graph.cpp \
@@ -36,16 +36,14 @@ SRC += unit_tests.cpp \
        util/message.cpp \
        util/optional.cpp \
        util/replace_symbol.cpp \
-       util/sharing_node.cpp \
        util/sharing_map.cpp \
+       util/sharing_node.cpp \
        util/small_map.cpp \
        util/small_shared_two_way_ptr.cpp \
        util/string_utils/split_string.cpp \
        util/string_utils/strip_string.cpp \
        util/symbol_table.cpp \
        util/unicode.cpp \
-       catch_example.cpp \
-       interpreter/interpreter.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I.
