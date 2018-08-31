@@ -14,16 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_conv.h"
 
-class smt2_temp_filet
-{
-public:
-  smt2_temp_filet();
-  ~smt2_temp_filet();
-
-  std::ofstream temp_problem;
-  std::string temp_problem_filename, temp_stdout_filename, temp_stderr_filename;
-};
-
 class smt2_stringstreamt
 {
 protected:
