@@ -5,26 +5,29 @@ SRC = $(CPROVER_DIR)/unit/unit_tests.cpp \
       # Empty last line
 
 # Test source files
-SRC += java_bytecode/goto-programs/class_hierarchy_output.cpp \
+SRC += java_bytecode/goto_program_generics/mutually_recursive_generics.cpp \
        java_bytecode/goto-programs/class_hierarchy_graph.cpp \
+       java_bytecode/goto-programs/class_hierarchy_output.cpp \
        java_bytecode/goto-programs/remove_virtual_functions_without_fallback.cpp \
+       java_bytecode/inherited_static_fields/inherited_static_fields.cpp \
        java_bytecode/java_bytecode_convert_class/convert_abstract_class.cpp \
        java_bytecode/java_bytecode_convert_class/convert_java_annotations.cpp \
        java_bytecode/java_bytecode_convert_method/convert_invoke_dynamic.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_generic_class.cpp \
-       java_bytecode/java_bytecode_parser/parse_java_class.cpp \
-       java_bytecode/java_bytecode_parser/parse_java_attributes.cpp \
-       java_bytecode/java_object_factory/gen_nondet_string_init.cpp \
-       java_bytecode/java_bytecode_parse_lambdas/java_bytecode_parse_lambda_method_table.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_superclasses.cpp \
        java_bytecode/java_bytecode_parse_lambdas/java_bytecode_convert_class_lambda_method_handles.cpp \
+       java_bytecode/java_bytecode_parse_lambdas/java_bytecode_parse_lambda_method_table.cpp \
+       java_bytecode/java_bytecode_parser/parse_java_attributes.cpp \
+       java_bytecode/java_bytecode_parser/parse_java_class.cpp \
+       java_bytecode/java_object_factory/gen_nondet_string_init.cpp \
        java_bytecode/java_string_library_preprocess/convert_exprt_to_string_exprt.cpp \
        java_bytecode/java_types/erase_type_arguments.cpp \
        java_bytecode/java_types/generic_type_index.cpp \
        java_bytecode/java_types/java_generic_symbol_type.cpp \
        java_bytecode/java_types/java_type_from_string.cpp \
        java_bytecode/java_utils_test.cpp \
+       java_bytecode/java_virtual_functions/virtual_functions.cpp \
        java_bytecode/load_method_by_regex.cpp \
-       java_bytecode/inherited_static_fields/inherited_static_fields.cpp \
        pointer-analysis/custom_value_set_analysis.cpp \
        solvers/refinement/string_constraint_instantiation/instantiate_not_contains.cpp \
        solvers/refinement/string_refinement/dependency_graph.cpp \
@@ -33,9 +36,6 @@ SRC += java_bytecode/goto-programs/class_hierarchy_output.cpp \
        util/has_subtype.cpp \
        util/parameter_indices.cpp \
        util/simplify_expr.cpp \
-       java_bytecode/java_virtual_functions/virtual_functions.cpp \
-       java_bytecode/java_bytecode_parse_generics/parse_generic_superclasses.cpp \
-       java_bytecode/goto_program_generics/mutually_recursive_generics.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I. -I $(CPROVER_DIR)/src -I $(CPROVER_DIR)/unit
