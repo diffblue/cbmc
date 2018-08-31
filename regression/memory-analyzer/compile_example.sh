@@ -6,5 +6,5 @@ set -e
 
 NAME=${5%.exe}
 
-goto-gcc -g -o $NAME.exe $NAME.c
+../../../src/goto-cc/goto-gcc -g -std=c11 -o $NAME.exe $NAME.c
 $MEMORYANALYZER $@
