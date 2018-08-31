@@ -22,7 +22,8 @@ Module: Non-deterministic object init and choice for CBMC
 /// ```
 /// \param min_value: Minimum value (inclusive) of returned int.
 /// \param max_value: Maximum value (inclusive) of returned int.
-/// \param name_prefix: Prefix for the fresh symbol name generated.
+/// \param name_prefix: Prefix for the fresh symbol name generated (should be
+///   function id)
 /// \param int_type: The type of the int used to non-deterministically choose
 ///   one of the switch cases.
 /// \param source_location: The location to mark the generated int with.
@@ -73,7 +74,7 @@ symbol_exprt generate_nondet_int(
 }
 
 /// Pick nondeterministically between imperative actions 'switch_cases'.
-/// \param name_prefix: Name prefix for fresh symbols
+/// \param name_prefix: Name prefix for fresh symbols (should be function id)
 /// \param switch_cases: List of codet objects to execute in each switch case.
 /// \param int_type: The type of the int used to non-deterministically choose
 ///   one of the switch cases.
