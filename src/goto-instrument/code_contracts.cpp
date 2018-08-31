@@ -189,7 +189,10 @@ void code_contractst::apply_contract(
 
   // TODO: return value could be nil
   if(type.return_type()!=empty_typet())
-    replace.insert("__CPROVER_return_value", call.lhs());
+  {
+    symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
+    replace.insert(ret_val, call.lhs());
+  }
 
   // formal parameters
   code_function_callt::argumentst::const_iterator a_it=
@@ -200,7 +203,10 @@ void code_contractst::apply_contract(
       a_it!=call.arguments().end();
       ++p_it, ++a_it)
     if(!p_it->get_identifier().empty())
-      replace.insert(p_it->get_identifier(), *a_it);
+    {
+      symbol_exprt p(p_it->get_identifier(), p_it->type());
+      replace.insert(p, *a_it);
+    }
 
   replace(requires);
   replace(ensures);
@@ -318,7 +324,8 @@ void code_contractst::add_contract_check(
 
     call.lhs()=r;
 
-    replace.insert("__CPROVER_return_value", r);
+    symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
+    replace.insert(ret_val, r);
   }
 
   // decl parameter1 ...
@@ -339,7 +346,10 @@ void code_contractst::add_contract_check(
     call.arguments().push_back(p);
 
     if(!p_it->get_identifier().empty())
-      replace.insert(p_it->get_identifier(), p);
+    {
+      symbol_exprt cur_p(p_it->get_identifier(), p_it->type());
+      replace.insert(cur_p, p);
+    }
   }
 
   // assume(requires)

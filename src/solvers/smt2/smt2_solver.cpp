@@ -106,10 +106,9 @@ void smt2_solvert::expand_function_applications(exprt &expr)
       std::map<irep_idt, exprt> parameter_map;
       for(std::size_t i=0; i<f_type.domain().size(); i++)
       {
-        const irep_idt p_identifier=
-          f_type.domain()[i].get_identifier();
-
-        replace_symbol.insert(p_identifier, app.arguments()[i]);
+        const auto &var = f_type.domain()[i];
+        const symbol_exprt s(var.get_identifier(), var.type());
+        replace_symbol.insert(s, app.arguments()[i]);
       }
 
       exprt body=f.definition;

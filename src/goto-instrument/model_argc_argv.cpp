@@ -74,6 +74,11 @@ bool model_argc_argv(
     return false;
   }
 
+  const symbolt &argc_primed = ns.lookup("argc'");
+  symbol_exprt ARGC("ARGC", argc_primed.type);
+  const symbolt &argv_primed = ns.lookup("argv'");
+  symbol_exprt ARGV("ARGV", argv_primed.type);
+
   // set the size of ARGV storage to 4096, which matches the minimum
   // guaranteed by POSIX (_POSIX_ARG_MAX):
   // http://pubs.opengroup.org/onlinepubs/009695399/basedefs/limits.h.html
@@ -125,9 +130,9 @@ bool model_argc_argv(
     {
       value = symbol_pair.second.value;
 
-      replace_symbolt replace;
-      replace.insert("ARGC", ns.lookup("argc'").symbol_expr());
-      replace.insert("ARGV", ns.lookup("argv'").symbol_expr());
+      unchecked_replace_symbolt replace;
+      replace.insert(ARGC, ns.lookup("argc'").symbol_expr());
+      replace.insert(ARGV, ns.lookup("argv'").symbol_expr());
       replace(value);
     }
     else if(

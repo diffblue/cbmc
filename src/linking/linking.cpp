@@ -993,7 +993,8 @@ void linkingt::duplicate_object_symbol(
     else if(set_to_new)
       old_symbol.type=new_symbol.type;
 
-    object_type_updates.insert(old_symbol.name, old_symbol.symbol_expr());
+    object_type_updates.insert(
+      old_symbol.symbol_expr(), old_symbol.symbol_expr());
   }
 
   // care about initializers

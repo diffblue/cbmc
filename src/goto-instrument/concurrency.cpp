@@ -89,11 +89,9 @@ void concurrency_instrumentationt::instrument(exprt &expr)
   {
     if(s_it->id()==ID_symbol)
     {
-      const irep_idt identifier=
-        to_symbol_expr(*s_it).get_identifier();
+      const symbol_exprt &s = to_symbol_expr(*s_it);
 
-      shared_varst::const_iterator
-        v_it=shared_vars.find(identifier);
+      shared_varst::const_iterator v_it = shared_vars.find(s.get_identifier());
 
       if(v_it!=shared_vars.end())
       {
@@ -101,7 +99,7 @@ void concurrency_instrumentationt::instrument(exprt &expr)
         // new_expr.array()=symbol_expr();
         // new_expr.index()=symbol_expr();
 
-        replace_symbol.insert(identifier, new_expr);
+        replace_symbol.insert(s, new_expr);
       }
     }
   }
