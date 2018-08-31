@@ -696,7 +696,7 @@ int linker_script_merget::get_linker_script_data(
     debug() << " " << argv[i];
   debug() << eom;
 
-  int rc=run(argv[0], argv, linker_def_infile(), def_out_file);
+  int rc = run(argv[0], argv, linker_def_infile(), def_out_file, "");
   if(rc!=0)
     warning() << "Problem parsing linker script" << eom;
 

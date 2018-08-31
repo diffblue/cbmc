@@ -163,7 +163,7 @@ int ld_modet::run_ld()
     debug() << " " << new_argv[i];
   debug() << eom;
 
-  return run(new_argv[0], new_argv, cmdline.stdin_file, "");
+  return run(new_argv[0], new_argv, cmdline.stdin_file, "", "");
 }
 
 int ld_modet::ld_hybrid_binary(compilet &compiler)

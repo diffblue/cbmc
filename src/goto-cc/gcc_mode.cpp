@@ -835,7 +835,7 @@ int gcc_modet::preprocess(
     debug() << " " << new_argv[i];
   debug() << eom;
 
-  return run(new_argv[0], new_argv, cmdline.stdin_file, stdout_file);
+  return run(new_argv[0], new_argv, cmdline.stdin_file, stdout_file, "");
 }
 
 int gcc_modet::run_gcc(const compilet &compiler)
@@ -878,7 +878,7 @@ int gcc_modet::run_gcc(const compilet &compiler)
     debug() << " " << new_argv[i];
   debug() << eom;
 
-  return run(new_argv[0], new_argv, cmdline.stdin_file);
+  return run(new_argv[0], new_argv, cmdline.stdin_file, "", "");
 }
 
 int gcc_modet::gcc_hybrid_binary(compilet &compiler)

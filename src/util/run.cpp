@@ -32,13 +32,9 @@ Date: August 2012
 #include <util/unicode.h>
 #include <util/signal_catcher.h>
 
-int run_shell(const std::string &command)
+int run(const std::string &what, const std::vector<std::string> &argv)
 {
-  std::string shell="/bin/sh";
-  std::vector<std::string> argv;
-  argv.push_back(shell);
-  argv.push_back(command);
-  return run(shell, argv, "", "", "");
+  return run(what, argv, "", "", "");
 }
 
 #ifndef _WIN32
