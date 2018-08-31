@@ -6,6 +6,28 @@ This module provides a front end for Java.
 \section java-bytecode-conversion-section Overview of conversion from bytecode to codet
 
 To be documented.
+\subsection java-bytecode-lowering-to-goto Lowering to GOTO
+
+The Java language contains high-level programming concepts like virtual
+functions and throw/catch semantics. These need to be rewritten in terms of
+other, more fundamental operations in order to analyse the Java program. This
+operation is referred to as "lowering". See Background Concepts for more
+information.
+
+The following lowering operations are done on Java bytecode after converting
+into a basic `codet` representation.
+
+- \ref java-bytecode-runtime-exceptions "Add runtime exceptions"
+- \ref java-bytecode-remove-java-new "Remove `new` calls"
+- \ref java-bytecode-remove-exceptions "Remove thrown exceptions"
+- \ref java-bytecode-remove-instance-of
+- As well as other non-Java specific transformations (see \ref goto-programs for
+    details on these)
+
+These are performed in `process_goto_function` for example
+\ref jbmc_parse_optionst::process_goto_function
+
+Once these lowerings have been completed, you have a GOTO model that can be handled by \ref goto-symex.
 
 \section java-bytecode-array-representation How are Java arrays represented in GOTO
 
