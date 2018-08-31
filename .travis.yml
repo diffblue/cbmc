@@ -86,7 +86,7 @@ jobs:
     # Ubuntu Linux with glibc using g++-5
     - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
       os: linux
-      sudo: true
+      sudo: false
       compiler: gcc
       cache: ccache
       addons:
@@ -121,7 +121,7 @@ jobs:
     # Ubuntu Linux with glibc using g++-5, debug mode
     - stage: Test different OS/CXX/Flags
       os: linux
-      sudo: true
+      sudo: false
       compiler: gcc
       cache: ccache
       addons:
@@ -207,7 +207,6 @@ jobs:
     # cmake build using g++-5
     - stage: Test different OS/CXX/Flags
       os: linux
-      sudo: true
       compiler: gcc
       cache: ccache
       env:
@@ -233,7 +232,6 @@ jobs:
     # cmake build using g++-7
     - stage: Test different OS/CXX/Flags
       os: linux
-      sudo: true
       compiler: gcc
       cache: ccache
       env:
@@ -259,7 +257,6 @@ jobs:
     # cmake build using clang++-6
     - stage: Test different OS/CXX/Flags
       os: linux
-      sudo: true
       compiler: clang
       cache: ccache
       env:
@@ -314,7 +311,7 @@ jobs:
     - stage: Test different OS/CXX/Flags
       if: type = cron
       os: linux
-      sudo: true
+      sudo: false
       compiler: gcc
       cache: ccache
       addons:
