@@ -123,6 +123,9 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
     extra_entry_points.end(),
     std::back_inserter(extra_methods),
     build_load_method_by_regex);
+  const auto &new_points = build_extra_entry_points(cmd);
+  extra_methods.insert(
+    extra_methods.end(), new_points.begin(), new_points.end());
 
   if(cmd.isset("java-cp-include-files"))
   {
@@ -1206,4 +1209,14 @@ bool java_bytecode_languaget::to_expr(
 
 java_bytecode_languaget::~java_bytecode_languaget()
 {
+}
+
+/// This method should be overloaded to provide alternative approaches for
+/// specifying extra entry points. To provide a regex entry point, the command
+/// line option `--lazy-methods-extra-entry-point` can be used directly.
+std::vector<load_extra_methodst>
+java_bytecode_languaget::build_extra_entry_points(
+  const cmdlinet &command_line) const
+{
+  return {};
 }

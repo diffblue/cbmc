@@ -453,11 +453,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_type<java_generic_typet>(const typet &type)
+{
+  return is_reference(type) && type.get_bool(ID_C_java_generic_type);
+}
+
 /// \param type: the type to check
 /// \return true if type is java type containing with generics, e.g., List<T>
 inline bool is_java_generic_type(const typet &type)
 {
-  return type.get_bool(ID_C_java_generic_type);
+  return can_cast_type<java_generic_typet>(type);
 }
 
 /// \param type: source type
@@ -465,9 +471,7 @@ inline bool is_java_generic_type(const typet &type)
 inline const java_generic_typet &to_java_generic_type(
   const typet &type)
 {
-  PRECONDITION(
-    type.id()==ID_pointer &&
-    is_java_generic_type(type));
+  PRECONDITION(can_cast_type<java_generic_typet>(type));
   return static_cast<const java_generic_typet &>(type);
 }
 
@@ -475,9 +479,7 @@ inline const java_generic_typet &to_java_generic_type(
 /// \return cast of type into java type with generics
 inline java_generic_typet &to_java_generic_type(typet &type)
 {
-  PRECONDITION(
-    type.id()==ID_pointer &&
-    is_java_generic_type(type));
+  PRECONDITION(can_cast_type<java_generic_typet>(type));
   return static_cast<java_generic_typet &>(type);
 }
 
