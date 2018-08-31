@@ -34,6 +34,8 @@ Author: Daniel Kroening
 #include <unistd.h>
 #endif
 
+#include "invariant.h"
+
 /// Substitute for mkstemps (OpenBSD standard) for Windows, where it is
 /// unavailable.
 #ifdef _WIN32
@@ -97,8 +99,9 @@ std::string get_temporary_file(
       MAX_PATH,          // length of the buffer
       lpTempPathBuffer); // buffer for path
 
-  if(dwRetVal>MAX_PATH || (dwRetVal==0))
-    throw "GetTempPath failed"; // NOLINT(readability/throw)
+  // happy to combine into single statement if preferred
+  CHECK_RETURN(dwRetVal<=MAX_PATH)
+  CHECK_RETURN(dwRetVal!=0)
 
   // the path returned by GetTempPath ends with a backslash
   std::string t_template=
@@ -120,8 +123,7 @@ std::string get_temporary_file(
 
   int fd=mkstemps(t_ptr, suffix.size());
 
-  if(fd<0)
-    throw "mkstemps failed";
+  CHECK_RETURN(fd>=0);
 
   close(fd);
 
