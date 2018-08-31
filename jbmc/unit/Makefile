@@ -5,21 +5,41 @@ SRC = $(CPROVER_DIR)/unit/unit_tests.cpp \
       # Empty last line
 
 # Test source files
-SRC += java_bytecode/goto_program_generics/mutually_recursive_generics.cpp \
+SRC += java_bytecode/ci_lazy_methods/lazy_load_lambdas.cpp \
+       java_bytecode/expr2java.cpp \
+       java_bytecode/goto_program_generics/generic_bases_test.cpp \
+       java_bytecode/goto_program_generics/generic_parameters_test.cpp \
+       java_bytecode/goto_program_generics/mutually_recursive_generics.cpp \
        java_bytecode/goto-programs/class_hierarchy_graph.cpp \
        java_bytecode/goto-programs/class_hierarchy_output.cpp \
        java_bytecode/goto-programs/remove_virtual_functions_without_fallback.cpp \
        java_bytecode/inherited_static_fields/inherited_static_fields.cpp \
        java_bytecode/java_bytecode_convert_class/convert_abstract_class.cpp \
        java_bytecode/java_bytecode_convert_class/convert_java_annotations.cpp \
+       java_bytecode/java_bytecode_convert_method/convert_initalizers.cpp \
        java_bytecode/java_bytecode_convert_method/convert_invoke_dynamic.cpp \
+       java_bytecode/java_bytecode_convert_method/convert_method.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_bounded_generic_inner_classes.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_derived_generic_class.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_functions_with_generics.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_array_class.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_generic_class.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_class_with_generic_inner_classes.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_class_with_inner_classes.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_fields.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_functions.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_generic_superclasses.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_wildcard_function.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_nested_generics.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_recursive_generic_class.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_signature_descriptor_mismatch.cpp \
        java_bytecode/java_bytecode_parse_lambdas/java_bytecode_convert_class_lambda_method_handles.cpp \
        java_bytecode/java_bytecode_parse_lambdas/java_bytecode_parse_lambda_method_table.cpp \
+       java_bytecode/java_bytecode_parser/parse_java_annotations.cpp \
        java_bytecode/java_bytecode_parser/parse_java_attributes.cpp \
        java_bytecode/java_bytecode_parser/parse_java_class.cpp \
        java_bytecode/java_object_factory/gen_nondet_string_init.cpp \
+       java_bytecode/java_replace_nondet/replace_nondet.cpp \
        java_bytecode/java_string_library_preprocess/convert_exprt_to_string_exprt.cpp \
        java_bytecode/java_types/erase_type_arguments.cpp \
        java_bytecode/java_types/generic_type_index.cpp \
