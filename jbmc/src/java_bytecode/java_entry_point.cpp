@@ -22,8 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_object_factory.h"
 #include "java_string_literals.h"
 #include "java_utils.h"
-#include "nondet.h"
 #include <util/fresh_symbol.h>
+#include <util/nondet.h>
 
 #define JAVA_MAIN_METHOD "main:([Ljava/lang/String;)V"
 

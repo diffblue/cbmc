@@ -45,6 +45,7 @@ SRC = arith_tools.cpp \
       message.cpp \
       mp_arith.cpp \
       namespace.cpp \
+      nondet.cpp \
       options.cpp \
       parse_options.cpp \
       parser.cpp \
