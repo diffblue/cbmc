@@ -402,6 +402,7 @@ exprt::operandst java_build_arguments(
           id2string(function.name) + "_" + std::to_string(param_number),
           cases,
           java_int_type(),
+          ID_java,
           function.location,
           symbol_table));
     }
