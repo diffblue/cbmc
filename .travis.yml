@@ -49,14 +49,18 @@ jobs:
       env:
         NAME: "DOXYGEN-CHECK"
         DOXYGEN_VERSION: "1.8.14"
+      addons:
+        apt:
+          sources:
+            - sourceline: 'deb http://packages.cloud.google.com/apt cloud-sdk-trusty main'
+              key_url: 'https://packages.cloud.google.com/apt/doc/apt-key.gpg'
+          packages:
+            - cmake
+            - google-cloud-sdk
+            - graphviz
       cache:
         directories:
           - ${TRAVIS_BUILD_DIR}/doxygen/build/bin
-      before_install:
-        - curl -sSL "https://packages.cloud.google.com/apt/doc/apt-key.gpg" | sudo -E apt-key add -
-        - echo "deb http://packages.cloud.google.com/apt cloud-sdk-trusty main" | sudo tee -a /etc/apt/sources.list > /dev/null
-        - sudo apt-get update --option Acquire::Retries=100 --option Acquire::http::Timeout="60"
-        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install cmake google-cloud-sdk graphviz
       install:
         - |
           # Build doxygen if it is not in Travis cache
