@@ -1,0 +1,9 @@
+CORE
+Test.class
+--function Test.checkMinLength
+^EXIT=10$
+^SIGNAL=0$
+assertion.* line 11 function java::Test.checkMinLength.*: FAILURE
+assertion.* line 13 function java::Test.checkMinLength.*: FAILURE
+assertion.* line 17 function java::Test.checkMinLength.*: FAILURE
+assertion.* line 19 function java::Test.checkMinLength.*: FAILURE
