@@ -1235,8 +1235,7 @@ void value_set_fivrnst::apply_code(
     // shouldn't be here
     UNREACHABLE;
   }
-  else if(statement==ID_assign ||
-          statement==ID_init)
+  else if(statement==ID_assign)
   {
     if(code.operands().size()!=2)
       throw "assignment expected to have two operands";

@@ -458,8 +458,6 @@ void goto_convertt::convert(
     convert_expression(to_code_expression(code), dest, mode);
   else if(statement==ID_assign)
     convert_assign(to_code_assign(code), dest, mode);
-  else if(statement==ID_init)
-    convert_init(code, dest, mode);
   else if(statement==ID_assert)
     convert_assert(to_code_assert(code), dest, mode);
   else if(statement==ID_assume)

@@ -1569,8 +1569,7 @@ void value_sett::apply_code_rec(
     // shouldn't be here
     UNREACHABLE;
   }
-  else if(statement==ID_assign ||
-          statement==ID_init)
+  else if(statement==ID_assign)
   {
     if(code.operands().size()!=2)
       throw "assignment expected to have two operands";
