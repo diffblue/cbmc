@@ -489,10 +489,30 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   typecheck_type(type.subtype());
 
   // we don't allow void as subtype
-  if(follow(type.subtype()).id()==ID_empty)
+  if(type.subtype().id() == ID_empty)
   {
     error().source_location=type.source_location();
     error() << "array of voids" << eom;
+    throw 0;
+  }
+
+  // we don't allow incomplete structs or unions as subtype
+  if(
+    follow(type.subtype()).id() == ID_incomplete_struct ||
+    follow(type.subtype()).id() == ID_incomplete_union)
+  {
+    // ISO/IEC 9899 6.7.5.2
+    error().source_location = type.source_location();
+    error() << "array has incomplete element type" << eom;
+    throw 0;
+  }
+
+  // we don't allow functions as subtype
+  if(type.subtype().id() == ID_code)
+  {
+    // ISO/IEC 9899 6.7.5.2
+    error().source_location = type.source_location();
+    error() << "array of function element type" << eom;
     throw 0;
   }
 
