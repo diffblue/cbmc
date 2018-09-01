@@ -247,7 +247,7 @@ void goto_symext::dereference_rec(
         state.get_original_name(to_check);
 
         expr_is_not_null =
-          safe_pointers.at(expr_function).is_safe_dereference(
+          state.safe_pointers.at(expr_function).is_safe_dereference(
             to_check, state.source.pc);
       }
     }

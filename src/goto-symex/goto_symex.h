@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
 
-#include <analyses/local_safe_pointers.h>
-
 #include <util/options.h>
 #include <util/message.h>
 
@@ -468,8 +466,6 @@ protected:
   void rewrite_quantifiers(exprt &, statet &);
 
   path_storaget &path_storage;
-
-  std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
