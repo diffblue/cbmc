@@ -23,8 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
 
-#include "bv_cbmc.h"
-
 void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
 {
   for(auto &g : goal_map)

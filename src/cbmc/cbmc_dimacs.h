@@ -12,17 +12,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CBMC_CBMC_DIMACS_H
 #define CPROVER_CBMC_CBMC_DIMACS_H
 
-#include "bv_cbmc.h"
+#include <solvers/flattening/bv_pointers.h>
 
-class cbmc_dimacst:public bv_cbmct
+class cbmc_dimacst : public bv_pointerst
 {
 public:
   cbmc_dimacst(
     const namespacet &_ns,
     propt &_prop,
-    const std::string &_filename):
-    bv_cbmct(_ns, _prop),
-    filename(_filename)
+    const std::string &_filename)
+    : bv_pointerst(_ns, _prop), filename(_filename)
   {
   }
 

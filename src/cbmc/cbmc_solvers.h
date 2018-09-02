@@ -26,8 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt2/smt2_dec.h>
 #include <goto-symex/symex_target_equation.h>
 
-#include "bv_cbmc.h"
-
 class cbmc_solverst:public messaget
 {
 public:

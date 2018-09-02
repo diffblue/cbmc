@@ -25,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/sat/dimacs_cnf.h>
 
-#include "bv_cbmc.h"
 #include "cbmc_dimacs.h"
 #include "counterexample_beautification.h"
 
@@ -72,14 +71,14 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_default()
 
   solver->prop().set_message_handler(get_message_handler());
 
-  auto bv_cbmc=util_make_unique<bv_cbmct>(ns, solver->prop());
+  auto bv_pointers = util_make_unique<bv_pointerst>(ns, solver->prop());
 
   if(options.get_option("arrays-uf")=="never")
-    bv_cbmc->unbounded_array=bv_cbmct::unbounded_arrayt::U_NONE;
+    bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
   else if(options.get_option("arrays-uf")=="always")
-    bv_cbmc->unbounded_array=bv_cbmct::unbounded_arrayt::U_ALL;
+    bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_ALL;
 
-  solver->set_prop_conv(std::move(bv_cbmc));
+  solver->set_prop_conv(std::move(bv_pointers));
 
   return solver;
 }

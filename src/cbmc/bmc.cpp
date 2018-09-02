@@ -525,7 +525,7 @@ safety_checkert::resultt bmct::stop_on_fail(prop_convt &prop_conv)
     {
       if(options.get_bool_option("beautify"))
         counterexample_beautificationt()(
-          dynamic_cast<bv_cbmct &>(prop_conv), equation);
+          dynamic_cast<boolbvt &>(prop_conv), equation);
 
       error_trace();
       output_graphml(resultt::UNSAFE);

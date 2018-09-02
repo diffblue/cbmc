@@ -29,8 +29,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include "bv_cbmc.h"
-
 class bmc_covert:
   public cover_goalst::observert,
   public messaget

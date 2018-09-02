@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/flattening/bv_minimize.h>
 
-#include "bv_cbmc.h"
-
 class counterexample_beautificationt
 {
 public:
@@ -27,9 +25,8 @@ public:
   {
   }
 
-  void operator()(
-    bv_cbmct &bv_cbmc,
-    const symex_target_equationt &equation);
+  void
+  operator()(boolbvt &boolbv, const symex_target_equationt &equation);
 
 protected:
   void get_minimization_list(

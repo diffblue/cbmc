@@ -1,7 +1,6 @@
 SRC = all_properties.cpp \
       bmc.cpp \
       bmc_cover.cpp \
-      bv_cbmc.cpp \
       cbmc_dimacs.cpp \
       cbmc_languages.cpp \
       cbmc_main.cpp \

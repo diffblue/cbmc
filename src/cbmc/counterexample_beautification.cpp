@@ -78,20 +78,19 @@ counterexample_beautificationt::get_failed_property(
   return equation.SSA_steps.end();
 }
 
-void counterexample_beautificationt::operator()(
-  bv_cbmct &bv_cbmc,
-  const symex_target_equationt &equation)
+void counterexample_beautificationt::
+operator()(boolbvt &boolbv, const symex_target_equationt &equation)
 {
   // find failed property
 
-  failed=get_failed_property(bv_cbmc, equation);
+  failed = get_failed_property(boolbv, equation);
 
   // lock the failed assertion
-  bv_cbmc.set_to(literal_exprt(failed->cond_literal), false);
+  boolbv.set_to(literal_exprt(failed->cond_literal), false);
 
   {
-    bv_cbmc.status() << "Beautifying counterexample (guards)"
-                     << messaget::eom;
+    boolbv.status() << "Beautifying counterexample (guards)"
+                    << messaget::eom;
 
     // compute weights for guards
     typedef std::map<literalt, unsigned> guard_countt;
@@ -114,8 +113,8 @@ void counterexample_beautificationt::operator()(
     }
 
     // give to propositional minimizer
-    prop_minimizet prop_minimize(bv_cbmc);
-    prop_minimize.set_message_handler(bv_cbmc.get_message_handler());
+    prop_minimizet prop_minimize(boolbv);
+    prop_minimize.set_message_handler(boolbv.get_message_handler());
 
     for(const auto &g : guard_count)
       prop_minimize.objective(g.first, g.second);
@@ -125,17 +124,17 @@ void counterexample_beautificationt::operator()(
   }
 
   {
-    bv_cbmc.status() << "Beautifying counterexample (values)"
-                     << messaget::eom;
+    boolbv.status() << "Beautifying counterexample (values)"
+                    << messaget::eom;
 
     // get symbols we care about
     minimization_listt minimization_list;
 
-    get_minimization_list(bv_cbmc, equation, minimization_list);
+    get_minimization_list(boolbv, equation, minimization_list);
 
     // minimize
-    bv_minimizet bv_minimize(bv_cbmc);
-    bv_minimize.set_message_handler(bv_cbmc.get_message_handler());
+    bv_minimizet bv_minimize(boolbv);
+    bv_minimize.set_message_handler(boolbv.get_message_handler());
     bv_minimize(minimization_list);
   }
 }
