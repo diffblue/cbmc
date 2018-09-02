@@ -19,13 +19,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 #include <util/version.h>
 
-#include <solvers/sat/satcheck.h>
+#include <solvers/flattening/bv_dimacs.h>
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/string_refinement.h>
-#include <solvers/smt2/smt2_dec.h>
 #include <solvers/sat/dimacs_cnf.h>
+#include <solvers/sat/satcheck.h>
+#include <solvers/smt2/smt2_dec.h>
 
-#include "cbmc_dimacs.h"
 #include "counterexample_beautification.h"
 
 /// Uses the options to pick an SMT 2.0 solver
@@ -93,8 +93,8 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_dimacs()
 
   std::string filename=options.get_option("outfile");
 
-  auto cbmc_dimacs=util_make_unique<cbmc_dimacst>(ns, *prop, filename);
-  return util_make_unique<solvert>(std::move(cbmc_dimacs), std::move(prop));
+  auto bv_dimacs = util_make_unique<bv_dimacst>(ns, *prop, filename);
+  return util_make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
 }
 
 std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_bv_refinement()
