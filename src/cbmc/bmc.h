@@ -199,10 +199,6 @@ protected:
 
   virtual void freeze_program_variables();
 
-  virtual void show_vcc();
-  virtual void show_vcc_plain(std::ostream &out);
-  virtual void show_vcc_json(std::ostream &out);
-
   trace_optionst trace_options()
   {
     return trace_optionst(options);
