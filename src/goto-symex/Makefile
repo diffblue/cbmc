@@ -11,6 +11,7 @@ SRC = auto_objects.cpp \
       postcondition.cpp \
       precondition.cpp \
       rewrite_union.cpp \
+      show_program.cpp \
       slice.cpp \
       slice_by_trace.cpp \
       symex_assign.cpp \
