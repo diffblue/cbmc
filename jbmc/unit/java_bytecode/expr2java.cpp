@@ -96,21 +96,37 @@ TEST_CASE(
   SECTION("Hex float to string (print a comment)")
   {
     const float value = std::strtod("0x1p+37f", nullptr);
+#ifndef _MSC_VER
     REQUIRE(
       floating_point_to_java_string(value) == "0x1p+37f /* 1.37439e+11 */");
+#else
+    REQUIRE(
+      floating_point_to_java_string(value) ==
+      "0x1.000000p+37f /* 1.37439e+11 */");
+#endif
   }
 
   SECTION("Hex double to string (print a comment)")
   {
     const double value = std::strtod("0x1p+37f", nullptr);
+#ifndef _MSC_VER
     REQUIRE(
       floating_point_to_java_string(value) == "0x1p+37 /* 1.37439e+11 */");
+#else
+    REQUIRE(
+      floating_point_to_java_string(value) ==
+      "0x1.000000p+37 /* 1.37439e+11 */");
+#endif
   }
 
   SECTION("Beyond numeric limits")
   {
+#ifndef _MSC_VER
     REQUIRE(
       floating_point_to_java_string(-5.56268e-309)
         .find("/* -5.56268e-309 */") != std::string::npos);
+#else
+    REQUIRE(floating_point_to_java_string(-5.56268e-309) == "-5.56268e-309");
+#endif
   }
 }
