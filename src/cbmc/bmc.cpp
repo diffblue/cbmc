@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/memory_model_pso.h>
+#include <goto-symex/show_program.h>
 #include <goto-symex/slice.h>
 #include <goto-symex/slice_by_trace.h>
 
@@ -200,90 +201,6 @@ void bmct::report_failure()
   }
 }
 
-void bmct::show_program()
-{
-  unsigned count=1;
-
-  std::cout << "\n" << "Program constraints:" << "\n";
-
-  for(const auto &step : equation.SSA_steps)
-  {
-    std::cout << "// " << step.source.pc->location_number << " ";
-    std::cout << step.source.pc->source_location.as_string() << "\n";
-    const irep_idt &function = step.source.pc->function;
-
-    if(step.is_assignment())
-    {
-      std::string string_value = from_expr(ns, function, step.cond_expr);
-      std::cout << "(" << count << ") " << string_value << "\n";
-
-      if(!step.guard.is_true())
-      {
-        std::string string_value = from_expr(ns, function, step.guard);
-        std::cout << std::string(std::to_string(count).size()+3, ' ');
-        std::cout << "guard: " << string_value << "\n";
-      }
-
-      count++;
-    }
-    else if(step.is_assert())
-    {
-      std::string string_value = from_expr(ns, function, step.cond_expr);
-      std::cout << "(" << count << ") ASSERT("
-                << string_value <<") " << "\n";
-
-      if(!step.guard.is_true())
-      {
-        std::string string_value = from_expr(ns, function, step.guard);
-        std::cout << std::string(std::to_string(count).size()+3, ' ');
-        std::cout << "guard: " << string_value << "\n";
-      }
-
-      count++;
-    }
-    else if(step.is_assume())
-    {
-      std::string string_value = from_expr(ns, function, step.cond_expr);
-      std::cout << "(" << count << ") ASSUME("
-                << string_value <<") " << "\n";
-
-      if(!step.guard.is_true())
-      {
-        std::string string_value = from_expr(ns, function, step.guard);
-        std::cout << std::string(std::to_string(count).size()+3, ' ');
-        std::cout << "guard: " << string_value << "\n";
-      }
-
-      count++;
-    }
-    else if(step.is_constraint())
-    {
-      std::string string_value = from_expr(ns, function, step.cond_expr);
-      std::cout << "(" << count << ") CONSTRAINT("
-                << string_value <<") " << "\n";
-
-      count++;
-    }
-    else if(step.is_shared_read() || step.is_shared_write())
-    {
-      std::string string_value = from_expr(ns, function, step.ssa_lhs);
-      std::cout << "(" << count << ") SHARED_"
-                << (step.is_shared_write()?"WRITE":"READ")
-                << "(" << string_value <<")\n";
-
-      if(!step.guard.is_true())
-      {
-        std::string string_value = from_expr(ns, function, step.guard);
-        std::cout << std::string(std::to_string(count).size()+3, ' ');
-        std::cout << "guard: " << string_value << "\n";
-      }
-
-      count++;
-    }
-  }
-}
-
-
 void bmct::get_memory_model()
 {
   const std::string mm=options.get_option("mm");
@@ -404,7 +321,7 @@ safety_checkert::resultt bmct::execute(
 
     if(options.get_bool_option("program-only"))
     {
-      show_program();
+      show_program(ns, equation);
       return safety_checkert::resultt::SAFE;
     }
 
@@ -507,7 +424,7 @@ void bmct::show()
 
   if(options.get_bool_option("program-only"))
   {
-    show_program();
+    show_program(ns, equation);
   }
 }
 
