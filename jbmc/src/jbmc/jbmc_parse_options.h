@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/bmc.h>
 
-#include <goto-instrument/cover.h>
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_trace.h>
 #include <goto-programs/lazy_goto_model.h>
@@ -69,7 +68,7 @@ class optionst;
   "(verbosity):" \
   "(nondet-static)" \
   "(version)" \
-  "(cover):(symex-coverage-report):" \
+  "(symex-coverage-report):" \
   OPT_TIMESTAMP \
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)" \
   "(ppc-macos)" \
@@ -120,7 +119,6 @@ public:
 
 protected:
   ui_message_handlert ui_message_handler;
-  std::unique_ptr<cover_configt> cover_config;
   path_strategy_choosert path_strategy_chooser;
   object_factory_parameterst object_factory_params;
   bool stub_objects_are_not_null;
