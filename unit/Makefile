@@ -2,7 +2,6 @@
 
 # Source files for test utilities
 SRC = unit_tests.cpp \
-      catch_example.cpp \
       # Empty last line
 
 # Test source files
@@ -115,7 +114,6 @@ CATCH_TEST = unit_tests$(EXEEXT)
 N_CATCH_TESTS = $(shell \
                   cat $$(find . -name "*.cpp" \
                     -and -not -name "miniBDD_new.cpp" \
-                    -and -not -name "catch_example.cpp" \
                     -a -not -name "expr_undefined_casts.cpp") | \
                   grep -c -E "(SCENARIO|TEST_CASE)")
 
