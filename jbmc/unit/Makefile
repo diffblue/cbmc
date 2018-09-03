@@ -60,7 +60,6 @@ java-testing-utils.dir:
 BMC_DEPS =$(CPROVER_DIR)/src/cbmc/all_properties$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/bmc$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/bmc_cover$(OBJEXT) \
-          $(CPROVER_DIR)/src/cbmc/bv_cbmc$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/cbmc_dimacs$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/cbmc_languages$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/cbmc_parse_options$(OBJEXT) \
