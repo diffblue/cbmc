@@ -12,9 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef _WIN32
 #include <windows.h>
-#include <fcntl.h>
-#include <io.h>
-#include <cstdio>
 #endif
 
 #include "unicode.h"
@@ -29,48 +26,29 @@ cerr_message_handlert::cerr_message_handlert():
 {
 }
 
-void console_message_handlert::print(
-  unsigned level,
-  const std::string &message)
+void console_message_handlert::setup_console()
 {
-  message_handlert::print(level, message);
+#ifdef _WIN32
+  // We avoid doing this more than once,
+  // as setting the code page may be slow.
+  static bool code_page_set = false;
 
-  if(verbosity<level)
+  if(!code_page_set)
+  {
+    // We use UTF8 for unicode characters.
+    // 65001 is the magic number for the UTF8 codepage.
+    // https://docs.microsoft.com/en-us/windows/desktop/intl/code-page-identifiers
+    SetConsoleOutputCP(65001);
+    code_page_set = true;
+  }
+#endif
+}
+
+void console_message_handlert::print(unsigned level, const std::string &message)
+{
+  if(verbosity < level)
     return;
 
-  #ifdef _WIN32
-  HANDLE out_handle=
-    GetStdHandle((level>1)?STD_OUTPUT_HANDLE:STD_ERROR_HANDLE);
-
-  // We use UTF16 when we write to the console,
-  // but we write UTF8 otherwise.
-
-  DWORD consoleMode;
-  if(GetConsoleMode(out_handle, &consoleMode))
-  {
-    // writing to the console
-    std::wstring wide_message=widen(message);
-
-    DWORD number_written;
-
-    WriteConsoleW(
-      out_handle, wide_message.c_str(),
-      (DWORD)wide_message.size(), &number_written, NULL);
-
-    WriteConsoleW(out_handle, L"\r\n", 2, &number_written, NULL);
-  }
-  else
-  {
-    // writing to a file
-
-    if(level>=4)
-    {
-      std::cout << message << '\n';
-    }
-    else
-      std::cerr << message << '\n';
-  }
-  #else
   // Messages level 3 or lower go to cerr, messages level 4 or
   // above go to cout.
 
@@ -80,7 +58,6 @@ void console_message_handlert::print(
   }
   else
     std::cerr << message << '\n';
-  #endif
 }
 
 void console_message_handlert::flush(unsigned level)
