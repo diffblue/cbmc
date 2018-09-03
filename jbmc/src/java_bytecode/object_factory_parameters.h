@@ -53,6 +53,9 @@ struct object_factory_parameterst final
 
   /// Function id, used as a prefix for identifiers of temporaries
   irep_idt function_id;
+
+  /// Force non-null at depth 0.
+  bool force_non_null = false;
 };
 
 #endif
