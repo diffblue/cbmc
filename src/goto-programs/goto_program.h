@@ -389,6 +389,12 @@ public:
       instruction_id_builder << type;
       return instruction_id_builder.str();
     }
+
+    /// Syntactic equality: two instructiont are equal if they have the same
+    /// type, code, guard, number of targets, and labels. All other members can
+    /// only be evaluated in the context of a goto_programt (see
+    /// goto_programt::equals).
+    bool equals(const instructiont &other) const;
   };
 
   // Never try to change this to vector-we mutate the list while iterating
@@ -640,6 +646,11 @@ public:
   typedef std::set<irep_idt> decl_identifierst;
   /// get the variables in decl statements
   void get_decl_identifiers(decl_identifierst &decl_identifiers) const;
+
+  /// Syntactic equality: two goto_programt are equal if, and only if, they have
+  /// the same number of instructions, each pair of instructions compares equal,
+  /// and relative jumps have the same distance.
+  bool equals(const goto_programt &other) const;
 };
 
 template <typename Target>
