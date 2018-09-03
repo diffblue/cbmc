@@ -1175,7 +1175,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     status() << "Adding check for maximum call stack size" << eom;
     stack_depth(
       goto_model,
-      unsafe_string2unsigned(cmdline.get_value("stack-depth")));
+      safe_string2size_t(cmdline.get_value("stack-depth")));
   }
 
   // ignore default/user-specified initialization of variables with static
