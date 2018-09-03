@@ -8,18 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_dec.h"
 
-#include <cstdlib>
-
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-// for unlink()
-#include <unistd.h>
-#endif
-
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
 #include <util/run.h>
@@ -44,45 +32,19 @@ std::string smt2_dect::decision_procedure_text() const
      "(unknown)");
 }
 
-smt2_temp_filet::smt2_temp_filet()
-{
-  temp_problem_filename = get_temporary_file("smt2_dec_problem_", "");
-
-  temp_problem.open(
-    temp_problem_filename.c_str(), std::ios_base::out | std::ios_base::trunc);
-}
-
-smt2_temp_filet::~smt2_temp_filet()
-{
-  temp_problem.close();
-
-  if(!temp_problem_filename.empty())
-    unlink(temp_problem_filename.c_str());
-
-  if(!temp_stdout_filename.empty())
-    unlink(temp_stdout_filename.c_str());
-
-  if(!temp_stderr_filename.empty())
-    unlink(temp_stderr_filename.c_str());
-}
-
 decision_proceduret::resultt smt2_dect::dec_solve()
 {
-  // we write the problem into a file
-  smt2_temp_filet smt2_temp_file;
+  temporary_filet temp_file_problem("smt2_dec_problem_", ""),
+    temp_file_stdout("smt2_dec_stdout_", ""),
+    temp_file_stderr("smt2_dec_stderr_", "");
 
-  // copy from string buffer into file
-  smt2_temp_file.temp_problem << stringstream.str();
-
-  // this finishes up and closes the SMT2 file
-  write_footer(smt2_temp_file.temp_problem);
-  smt2_temp_file.temp_problem.close();
-
-  smt2_temp_file.temp_stdout_filename =
-    get_temporary_file("smt2_dec_stdout_", "");
-
-  smt2_temp_file.temp_stderr_filename =
-    get_temporary_file("smt2_dec_stderr_", "");
+  {
+    // we write the problem into a file
+    std::ofstream problem_out(
+      temp_file_problem(), std::ios_base::out | std::ios_base::trunc);
+    problem_out << stringstream.str();
+    write_footer(problem_out);
+  }
 
   std::vector<std::string> argv;
   std::string stdin_filename;
@@ -90,7 +52,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   switch(solver)
   {
   case solvert::BOOLECTOR:
-    argv = {"boolector", "--smt2", smt2_temp_file.temp_problem_filename, "-m"};
+    argv = {"boolector", "--smt2", temp_file_problem(), "-m"};
     break;
 
   case solvert::CVC3:
@@ -100,13 +62,13 @@ decision_proceduret::resultt smt2_dect::dec_solve()
             "smtlib",
             "-output-lang",
             "smtlib",
-            smt2_temp_file.temp_problem_filename};
+            temp_file_problem()};
     break;
 
   case solvert::CVC4:
     // The flags --bitblast=eager --bv-div-zero-const help but only
     // work for pure bit-vector formulas.
-    argv = {"cvc4", "-L", "smt2", smt2_temp_file.temp_problem_filename};
+    argv = {"cvc4", "-L", "smt2", temp_file_problem()};
     break;
 
   case solvert::MATHSAT:
@@ -129,29 +91,25 @@ decision_proceduret::resultt smt2_dect::dec_solve()
             "-theory.fp.bit_blast_mode=2",
             "-theory.arr.mode=1"};
 
-    stdin_filename = smt2_temp_file.temp_problem_filename;
+    stdin_filename = temp_file_problem();
     break;
 
   case solvert::YICES:
     //    command = "yices -smt -e "   // Calling convention for older versions
     // Convention for 2.2.1
-    argv = {"yices-smt2", smt2_temp_file.temp_problem_filename};
+    argv = {"yices-smt2", temp_file_problem()};
     break;
 
   case solvert::Z3:
-    argv = {"z3", "-smt2", smt2_temp_file.temp_problem_filename};
+    argv = {"z3", "-smt2", temp_file_problem()};
     break;
 
   default:
     assert(false);
   }
 
-  int res = run(
-    argv[0],
-    argv,
-    stdin_filename,
-    smt2_temp_file.temp_stdout_filename,
-    smt2_temp_file.temp_stderr_filename);
+  int res =
+    run(argv[0], argv, stdin_filename, temp_file_stdout(), temp_file_stderr());
 
   if(res<0)
   {
@@ -159,8 +117,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     return decision_proceduret::resultt::D_ERROR;
   }
 
-  std::ifstream in(smt2_temp_file.temp_stdout_filename);
-
+  std::ifstream in(temp_file_stdout());
   return read_result(in);
 }
 
