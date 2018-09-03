@@ -37,10 +37,7 @@ private:
   struct configt
   {
     std::size_t refinement_bound=0;
-    /// Concretize strings after solver is finished
-    bool trace=false;
     bool use_counter_example=true;
-    std::size_t max_string_length;
   };
 public:
   /// string_refinementt constructor arguments
