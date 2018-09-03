@@ -378,7 +378,7 @@ void remove_function_pointerst::remove_function_pointer(
   const code_function_callt &code = to_code_function_call(target->code);
 
   const exprt &function = code.function();
-  const exprt &pointer = function.op0();
+  const exprt &pointer = to_dereference_expr(function).pointer();
 
   // the final target is a skip
   goto_programt final_skip;
