@@ -1,4 +1,4 @@
-.PHONY: all cprover.dir testing-utils.dir test
+.PHONY: all cprover.dir test testing-utils-clean
 
 # Source files for test utilities
 SRC = unit_tests.cpp \
@@ -57,8 +57,11 @@ include ../src/common
 cprover.dir:
 	$(MAKE) $(MAKEARGS) -C ../src
 
-testing-utils.dir:
+testing-utils/testing-utils$(LIBEXT): cprover.dir
 	$(MAKE) $(MAKEARGS) -C testing-utils
+
+testing-utils-clean:
+	$(MAKE) $(MAKEARGS) -C testing-utils clean
 
 # We need to link bmc.o to the unit test, so here's everything it depends on...
 BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
@@ -108,17 +111,32 @@ CPROVER_LIBS =../src/ansi-c/ansi-c$(LIBEXT) \
 
 OBJ += $(CPROVER_LIBS) testing-utils/testing-utils$(LIBEXT)
 
-TESTS = unit_tests$(EXEEXT) \
-        miniBDD$(EXEEXT) \
+CATCH_TEST = unit_tests$(EXEEXT)
+N_CATCH_TESTS = $(shell \
+                  cat $$(find . -name "*.cpp" \
+                    -and -not -name "miniBDD_new.cpp" \
+                    -and -not -name "catch_example.cpp" \
+                    -a -not -name "expr_undefined_casts.cpp") | \
+                  grep -c -E "(SCENARIO|TEST_CASE)")
+
+TESTS = miniBDD$(EXEEXT) \
         # Empty last line
 
-CLEANFILES = $(TESTS)
+CLEANFILES = $(CATCH_TEST) $(TESTS) testing-utils/testing-utils$(LIBEXT)
 
-all: cprover.dir testing-utils.dir
-	$(MAKE) $(MAKEARGS) $(TESTS)
+# only add a dependency for libraries to avoid triggering implicit rules, which
+# would cause unnecessary rebuilds
+$(filter %$(LIBEXT), CPROVER_LIBS): cprover.dir
 
-test: all
+all: $(CATCH_TEST) $(TESTS)
+
+clean: testing-utils-clean
+
+test: $(CATCH_TEST) $(TESTS)
 	$(foreach test,$(TESTS), (echo Running: $(test); ./$(test)) &&) true
+	if ! ./$(CATCH_TEST) -l | grep -q "^$(N_CATCH_TESTS) test cases" ; then \
+		./$(CATCH_TEST) -l ; fi
+	./$(CATCH_TEST)
 
 
 ###############################################################################

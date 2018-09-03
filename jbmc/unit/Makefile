@@ -1,4 +1,4 @@
-.PHONY: all cprover.dir jprover.dir testing-utils.dir java-testing-utils.dir test
+.PHONY: all jprover.dir test java-testing-utils-clean
 
 # Source files for test utilities
 SRC = $(CPROVER_DIR)/unit/unit_tests.cpp \
@@ -64,17 +64,17 @@ include ../src/config.inc
 include $(CPROVER_DIR)/src/config.inc
 include $(CPROVER_DIR)/src/common
 
-cprover.dir:
-	$(MAKE) $(MAKEARGS) -C $(CPROVER_DIR)/src
-
 jprover.dir:
 	$(MAKE) $(MAKEARGS) -C ../src
 
-cprover-testing-utils.dir:
+$(CPROVER_DIR)/unit/testing-utils/testing-utils$(LIBEXT): jprover.dir
 	$(MAKE) $(MAKEARGS) -C $(CPROVER_DIR)/unit/testing-utils
 
-java-testing-utils.dir:
+java-testing-utils/java-testing-utils$(LIBEXT): jprover.dir
 	$(MAKE) $(MAKEARGS) -C java-testing-utils
+
+java-testing-utils-clean:
+	$(MAKE) $(MAKEARGS) -C java-testing-utils clean
 
 # We need to link bmc.o to the unit test, so here's everything it depends on...
 BMC_DEPS =$(CPROVER_DIR)/src/cbmc/all_properties$(OBJEXT) \
@@ -138,16 +138,25 @@ OBJ += $(CPROVER_LIBS) \
        $(CPROVER_DIR)/unit/testing-utils/testing-utils$(LIBEXT) \
        java-testing-utils/java-testing-utils$(LIBEXT)
 
-TESTS = unit_tests$(EXEEXT) \
-        # Empty last line
+CATCH_TEST = unit_tests$(EXEEXT)
+N_CATCH_TESTS = $(shell \
+                  cat $$(find . -name "*.cpp" ) | \
+                  grep -c -E "(SCENARIO|TEST_CASE)")
 
-CLEANFILES = $(TESTS)
+CLEANFILES = $(CATCH_TEST) java-testing-utils/java-testing-utils$(LIBEXT)
 
-all: cprover.dir cprover-testing-utils.dir jprover.dir java-testing-utils.dir
-	$(MAKE) $(MAKEARGS) $(TESTS)
+# only add a dependency for libraries to avoid triggering implicit rules, which
+# would cause unnecessary rebuilds
+$(filter %$(LIBEXT), CPROVER_LIBS): jprover.dir
 
-test: all
-	$(foreach test,$(TESTS), (echo Running: $(test); ./$(test)) &&) true
+all: $(CATCH_TEST)
+
+clean: java-testing-utils-clean
+
+test: $(CATCH_TEST)
+	if ! ./$(CATCH_TEST) -l | grep -q "^$(N_CATCH_TESTS) test cases" ; then \
+	  ./$(CATCH_TEST) -l ; fi
+	./$(CATCH_TEST)
 
 
 ###############################################################################
