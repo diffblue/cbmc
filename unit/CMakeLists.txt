@@ -3,9 +3,6 @@ file(GLOB_RECURSE sources "*.cpp" "*.h")
 file(GLOB_RECURSE testing_utils "testing-utils/*.cpp" "testing-utils/*.h")
 
 list(REMOVE_ITEM sources
-    # Used in executables
-    ${CMAKE_CURRENT_SOURCE_DIR}/miniBDD.cpp
-
     # Don't build
     ${CMAKE_CURRENT_SOURCE_DIR}/elf_reader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/smt2_parser.cpp
@@ -48,14 +45,3 @@ add_test(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 set_tests_properties(unit PROPERTIES LABELS "CORE;CBMC")
-
-add_executable(miniBDD miniBDD.cpp)
-target_include_directories(miniBDD
-    PUBLIC
-    ${CBMC_BINARY_DIR}
-    ${CBMC_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
-target_link_libraries(miniBDD solvers ansi-c)
-add_test(NAME miniBDD COMMAND $<TARGET_FILE:miniBDD>)
-set_tests_properties(miniBDD PROPERTIES LABELS "CORE;CBMC")

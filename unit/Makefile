@@ -117,21 +117,17 @@ N_CATCH_TESTS = $(shell \
                     -a -not -name "expr_undefined_casts.cpp") | \
                   grep -c -E "(SCENARIO|TEST_CASE)")
 
-TESTS = miniBDD$(EXEEXT) \
-        # Empty last line
-
-CLEANFILES = $(CATCH_TEST) $(TESTS) testing-utils/testing-utils$(LIBEXT)
+CLEANFILES = $(CATCH_TEST) testing-utils/testing-utils$(LIBEXT)
 
 # only add a dependency for libraries to avoid triggering implicit rules, which
 # would cause unnecessary rebuilds
 $(filter %$(LIBEXT), CPROVER_LIBS): cprover.dir
 
-all: $(CATCH_TEST) $(TESTS)
+all: $(CATCH_TEST)
 
 clean: testing-utils-clean
 
-test: $(CATCH_TEST) $(TESTS)
-	$(foreach test,$(TESTS), (echo Running: $(test); ./$(test)) &&) true
+test: $(CATCH_TEST)
 	if ! ./$(CATCH_TEST) -l | grep -q "^$(N_CATCH_TESTS) test cases" ; then \
 		./$(CATCH_TEST) -l ; fi
 	./$(CATCH_TEST)
@@ -140,7 +136,4 @@ test: $(CATCH_TEST) $(TESTS)
 ###############################################################################
 
 unit_tests$(EXEEXT): $(OBJ)
-	$(LINKBIN)
-
-miniBDD$(EXEEXT): miniBDD$(OBJEXT) $(CPROVER_LIBS)
 	$(LINKBIN)
