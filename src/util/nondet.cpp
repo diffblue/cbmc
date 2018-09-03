@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Non-deterministic object init and choice for JBMC
+Module: Non-deterministic object init and choice for CBMC
 
  Author: Diffblue Ltd.
 
@@ -8,7 +8,6 @@ Module: Non-deterministic object init and choice for JBMC
 
 #include "nondet.h"
 
-#include <java_bytecode/java_types.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
@@ -23,7 +22,8 @@ Module: Non-deterministic object init and choice for JBMC
 /// ```
 /// \param min_value: Minimum value (inclusive) of returned int.
 /// \param max_value: Maximum value (inclusive) of returned int.
-/// \param name_prefix: Prefix for the fresh symbol name generated.
+/// \param name_prefix: Prefix for the fresh symbol name generated (should be
+///   function id)
 /// \param int_type: The type of the int used to non-deterministically choose
 ///   one of the switch cases.
 /// \param source_location: The location to mark the generated int with.
@@ -37,6 +37,7 @@ symbol_exprt generate_nondet_int(
   const int64_t max_value,
   const std::string &name_prefix,
   const typet &int_type,
+  const irep_idt &mode,
   const source_locationt &source_location,
   symbol_table_baset &symbol_table,
   code_blockt &instructions)
@@ -44,14 +45,10 @@ symbol_exprt generate_nondet_int(
   PRECONDITION(min_value < max_value);
 
   // Declare a symbol for the non deterministic integer.
-  const symbol_exprt &nondet_symbol = get_fresh_aux_symbol(
-                                        int_type,
-                                        name_prefix,
-                                        "nondet_int",
-                                        source_location,
-                                        ID_java,
-                                        symbol_table)
-                                        .symbol_expr();
+  const symbol_exprt &nondet_symbol =
+    get_fresh_aux_symbol(
+      int_type, name_prefix, "nondet_int", source_location, mode, symbol_table)
+      .symbol_expr();
   instructions.add(code_declt(nondet_symbol));
 
   // Assign the symbol any non deterministic integer value.
@@ -77,7 +74,7 @@ symbol_exprt generate_nondet_int(
 }
 
 /// Pick nondeterministically between imperative actions 'switch_cases'.
-/// \param name_prefix: Name prefix for fresh symbols
+/// \param name_prefix: Name prefix for fresh symbols (should be function id)
 /// \param switch_cases: List of codet objects to execute in each switch case.
 /// \param int_type: The type of the int used to non-deterministically choose
 ///   one of the switch cases.
@@ -89,6 +86,7 @@ code_blockt generate_nondet_switch(
   const irep_idt &name_prefix,
   const alternate_casest &switch_cases,
   const typet &int_type,
+  const irep_idt &mode,
   const source_locationt &source_location,
   symbol_table_baset &symbol_table)
 {
@@ -105,6 +103,7 @@ code_blockt generate_nondet_switch(
     switch_cases.size() - 1,
     id2string(name_prefix),
     int_type,
+    mode,
     source_location,
     symbol_table,
     result_block);
@@ -112,7 +111,7 @@ code_blockt generate_nondet_switch(
   result_switch.value() = switch_value;
 
   code_blockt switch_block;
-  int64_t case_number = 0;
+  size_t case_number = 0;
   for(const auto &switch_case : switch_cases)
   {
     code_blockt this_block;

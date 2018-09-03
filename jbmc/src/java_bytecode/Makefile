@@ -36,7 +36,6 @@ SRC = bytecode_info.cpp \
       java_utils.cpp \
       load_method_by_regex.cpp \
       mz_zip_archive.cpp \
-      nondet.cpp \
       remove_exceptions.cpp \
       remove_instanceof.cpp \
       remove_java_new.cpp \
