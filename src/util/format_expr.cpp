@@ -88,7 +88,7 @@ static std::ostream &format_rec(std::ostream &os, const multi_ary_exprt &src)
     if(first)
       first = false;
     else
-      os << ' ' << src.id() << ' ';
+      os << ' ' << operator_str << ' ';
 
     const bool need_parentheses = bracket_subexpression(op, src);
 
