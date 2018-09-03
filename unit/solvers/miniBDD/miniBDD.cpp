@@ -18,8 +18,6 @@
 #include <util/arith_tools.h>
 #include <util/expanding_vector.h>
 
-#include <iostream>
-
 class bdd_propt:public propt
 {
 public:

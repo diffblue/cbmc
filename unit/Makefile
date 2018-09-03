@@ -20,6 +20,7 @@ SRC += analyses/ai/ai.cpp \
        path_strategies.cpp \
        pointer-analysis/value_set.cpp \
        solvers/floatbv/float_utils.cpp \
+       solvers/miniBDD/miniBDD.cpp \
        solvers/refinement/array_pool/array_pool.cpp \
        solvers/refinement/string_constraint_generator_valueof/calculate_max_string_length.cpp \
        solvers/refinement/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
@@ -113,7 +114,6 @@ OBJ += $(CPROVER_LIBS) testing-utils/testing-utils$(LIBEXT)
 CATCH_TEST = unit_tests$(EXEEXT)
 N_CATCH_TESTS = $(shell \
                   cat $$(find . -name "*.cpp" \
-                    -and -not -name "miniBDD_new.cpp" \
                     -a -not -name "expr_undefined_casts.cpp") | \
                   grep -c -E "(SCENARIO|TEST_CASE)")
 
