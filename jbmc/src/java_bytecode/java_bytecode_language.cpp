@@ -347,6 +347,7 @@ static symbol_exprt get_or_create_class_literal_symbol(
     new_class_symbol.is_lvalue = true;
     new_class_symbol.is_state_var = true;
     new_class_symbol.is_static_lifetime = true;
+    new_class_symbol.type.set(ID_C_no_nondet_initialization, true);
     symbol_table.add(new_class_symbol);
   }
 
