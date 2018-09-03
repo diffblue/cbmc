@@ -16,14 +16,16 @@ Author: Daniel Kroening, kroening@kroening.com
     defined(__unix__) || \
     defined(__CYGWIN__) || \
     defined(__MACH__)
+// for unlink()
 #include <unistd.h>
 #endif
 
+#include <util/arith_tools.h>
+#include <util/ieee_float.h>
+#include <util/run.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/tempfile.h>
-#include <util/arith_tools.h>
-#include <util/ieee_float.h>
 
 #include "smt2irep.h"
 
@@ -44,22 +46,24 @@ std::string smt2_dect::decision_procedure_text() const
 
 smt2_temp_filet::smt2_temp_filet()
 {
-  temp_out_filename=get_temporary_file("smt2_dec_out_", "");
+  temp_problem_filename = get_temporary_file("smt2_dec_problem_", "");
 
-  temp_out.open(
-    temp_out_filename.c_str(),
-    std::ios_base::out | std::ios_base::trunc);
+  temp_problem.open(
+    temp_problem_filename.c_str(), std::ios_base::out | std::ios_base::trunc);
 }
 
 smt2_temp_filet::~smt2_temp_filet()
 {
-  temp_out.close();
+  temp_problem.close();
 
-  if(temp_out_filename!="")
-    unlink(temp_out_filename.c_str());
+  if(!temp_problem_filename.empty())
+    unlink(temp_problem_filename.c_str());
 
-  if(temp_result_filename!="")
-    unlink(temp_result_filename.c_str());
+  if(!temp_stdout_filename.empty())
+    unlink(temp_stdout_filename.c_str());
+
+  if(!temp_stderr_filename.empty())
+    unlink(temp_stderr_filename.c_str());
 }
 
 decision_proceduret::resultt smt2_dect::dec_solve()
@@ -68,94 +72,94 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   smt2_temp_filet smt2_temp_file;
 
   // copy from string buffer into file
-  smt2_temp_file.temp_out << stringstream.str();
+  smt2_temp_file.temp_problem << stringstream.str();
 
   // this finishes up and closes the SMT2 file
-  write_footer(smt2_temp_file.temp_out);
-  smt2_temp_file.temp_out.close();
+  write_footer(smt2_temp_file.temp_problem);
+  smt2_temp_file.temp_problem.close();
 
-  smt2_temp_file.temp_result_filename=
-    get_temporary_file("smt2_dec_result_", "");
+  smt2_temp_file.temp_stdout_filename =
+    get_temporary_file("smt2_dec_stdout_", "");
 
-  std::string command;
+  smt2_temp_file.temp_stderr_filename =
+    get_temporary_file("smt2_dec_stderr_", "");
+
+  std::vector<std::string> argv;
+  std::string stdin_filename;
 
   switch(solver)
   {
   case solvert::BOOLECTOR:
-    command = "boolector --smt2 "
-            + smt2_temp_file.temp_out_filename
-            + " -m > "
-            + smt2_temp_file.temp_result_filename;
+    argv = {"boolector", "--smt2", smt2_temp_file.temp_problem_filename, "-m"};
     break;
 
   case solvert::CVC3:
-    command = "cvc3 +model -lang smtlib -output-lang smtlib "
-            + smt2_temp_file.temp_out_filename
-            + " > "
-            + smt2_temp_file.temp_result_filename;
+    argv = {"cvc3",
+            "+model",
+            "-lang",
+            "smtlib",
+            "-output-lang",
+            "smtlib",
+            smt2_temp_file.temp_problem_filename};
     break;
 
   case solvert::CVC4:
     // The flags --bitblast=eager --bv-div-zero-const help but only
     // work for pure bit-vector formulas.
-    command = "cvc4 -L smt2 "
-            + smt2_temp_file.temp_out_filename
-            + " > "
-            + smt2_temp_file.temp_result_filename;
+    argv = {"cvc4", "-L", "smt2", smt2_temp_file.temp_problem_filename};
     break;
 
   case solvert::MATHSAT:
     // The options below were recommended by Alberto Griggio
     // on 10 July 2013
-    command = "mathsat -input=smt2"
-              " -preprocessor.toplevel_propagation=true"
-              " -preprocessor.simplification=7"
-              " -dpll.branching_random_frequency=0.01"
-              " -dpll.branching_random_invalidate_phase_cache=true"
-              " -dpll.restart_strategy=3"
-              " -dpll.glucose_var_activity=true"
-              " -dpll.glucose_learnt_minimization=true"
-              " -theory.bv.eager=true"
-              " -theory.bv.bit_blast_mode=1"
-              " -theory.bv.delay_propagated_eqs=true"
-              " -theory.fp.mode=1"
-              " -theory.fp.bit_blast_mode=2"
-              " -theory.arr.mode=1"
-              " < "+smt2_temp_file.temp_out_filename
-            + " > "+smt2_temp_file.temp_result_filename;
+
+    argv = {"mathsat",
+            "-input=smt2",
+            "-preprocessor.toplevel_propagation=true",
+            "-preprocessor.simplification=7",
+            "-dpll.branching_random_frequency=0.01",
+            "-dpll.branching_random_invalidate_phase_cache=true",
+            "-dpll.restart_strategy=3",
+            "-dpll.glucose_var_activity=true",
+            "-dpll.glucose_learnt_minimization=true",
+            "-theory.bv.eager=true",
+            "-theory.bv.bit_blast_mode=1",
+            "-theory.bv.delay_propagated_eqs=true",
+            "-theory.fp.mode=1",
+            "-theory.fp.bit_blast_mode=2",
+            "-theory.arr.mode=1"};
+
+    stdin_filename = smt2_temp_file.temp_problem_filename;
     break;
 
   case solvert::YICES:
     //    command = "yices -smt -e "   // Calling convention for older versions
-    command = "yices-smt2 "  //  Calling for 2.2.1
-            + smt2_temp_file.temp_out_filename
-            + " > "
-            + smt2_temp_file.temp_result_filename;
+    // Convention for 2.2.1
+    argv = {"yices-smt2", smt2_temp_file.temp_problem_filename};
     break;
 
   case solvert::Z3:
-    command = "z3 -smt2 "
-            + smt2_temp_file.temp_out_filename
-            + " > "
-            + smt2_temp_file.temp_result_filename;
+    argv = {"z3", "-smt2", smt2_temp_file.temp_problem_filename};
     break;
 
   default:
     assert(false);
   }
 
-  #if defined(__linux__) || defined(__APPLE__)
-  command+=" 2>&1";
-  #endif
+  int res = run(
+    argv[0],
+    argv,
+    stdin_filename,
+    smt2_temp_file.temp_stdout_filename,
+    smt2_temp_file.temp_stderr_filename);
 
-  int res=system(command.c_str());
   if(res<0)
   {
     error() << "error running SMT2 solver" << eom;
     return decision_proceduret::resultt::D_ERROR;
   }
 
-  std::ifstream in(smt2_temp_file.temp_result_filename.c_str());
+  std::ifstream in(smt2_temp_file.temp_stdout_filename);
 
   return read_result(in);
 }
