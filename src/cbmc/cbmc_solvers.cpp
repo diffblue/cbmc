@@ -118,7 +118,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_bv_refinement()
   bv_refinementt::infot info;
   info.ns=&ns;
   info.prop=prop.get();
-  info.ui=ui;
+  info.output_xml = ui == ui_message_handlert::uit::XML_UI;
 
   // we allow setting some parameters
   if(options.get_bool_option("max-node-refinement"))
@@ -144,7 +144,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_string_refinement()
   prop->set_message_handler(get_message_handler());
   info.prop=prop.get();
   info.refinement_bound=DEFAULT_MAX_NB_REFINEMENT;
-  info.ui=ui;
+  info.output_xml = ui == ui_message_handlert::uit::XML_UI;
   if(options.get_bool_option("max-node-refinement"))
     info.max_node_refinement=
       options.get_unsigned_int_option("max-node-refinement");

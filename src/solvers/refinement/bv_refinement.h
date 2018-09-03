@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 #define CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 
-#include <util/ui_message.h>
-
 #include <solvers/flattening/bv_pointers.h>
 
 #define MAX_STATE 10000
@@ -23,7 +21,7 @@ class bv_refinementt:public bv_pointerst
 private:
   struct configt
   {
-    ui_message_handlert::uit ui=ui_message_handlert::uit::PLAIN;
+    bool output_xml = false;
     /// Max number of times we refine a formula node
     unsigned max_node_refinement=5;
     /// Enable array refinement
