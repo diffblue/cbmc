@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/memory_model_pso.h>
 #include <goto-symex/show_program.h>
+#include <goto-symex/show_vcc.h>
 #include <goto-symex/slice.h>
 #include <goto-symex/slice_by_trace.h>
 
@@ -293,7 +294,7 @@ safety_checkert::resultt bmct::execute(
 
     if(options.get_bool_option("show-vcc"))
     {
-      show_vcc();
+      show_vcc(options, get_message_handler(), ui, ns, equation);
       return safety_checkert::resultt::SAFE; // to indicate non-error
     }
 
@@ -419,7 +420,7 @@ void bmct::show()
 {
   if(options.get_bool_option("show-vcc"))
   {
-    show_vcc();
+    show_vcc(options, get_message_handler(), ui, ns, equation);
   }
 
   if(options.get_bool_option("program-only"))

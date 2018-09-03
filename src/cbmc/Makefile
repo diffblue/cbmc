@@ -7,7 +7,6 @@ SRC = all_properties.cpp \
       cbmc_solvers.cpp \
       counterexample_beautification.cpp \
       fault_localization.cpp \
-      show_vcc.cpp \
       symex_bmc.cpp \
       symex_coverage.cpp \
       xml_interface.cpp \
