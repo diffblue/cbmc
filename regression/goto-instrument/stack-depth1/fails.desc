@@ -1,0 +1,8 @@
+CORE
+main.c
+--stack-depth 1
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+--
+^warning: ignoring
