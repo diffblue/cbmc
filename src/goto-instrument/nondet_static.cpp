@@ -46,6 +46,10 @@ bool is_nondet_initializable_static(
   if(ns.lookup(id).type.get_bool(ID_C_no_nondet_initialization))
     return false;
 
+  // is the type explicitly marked as not to be initialized?
+  if(ns.lookup(id).type.get_bool(ID_C_no_initialization_required))
+    return false;
+
   // static lifetime?
   if(!ns.lookup(id).is_static_lifetime)
     return false;
