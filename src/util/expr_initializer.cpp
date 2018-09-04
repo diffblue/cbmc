@@ -123,12 +123,6 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     result.add_source_location()=source_location;
     return result;
   }
-  else if(type_id==ID_code)
-  {
-    error().source_location=source_location;
-    error() << "cannot initialize code-type" << eom;
-    throw 0;
-  }
   else if(type_id==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
@@ -369,18 +363,9 @@ exprt zero_initializer(
   const source_locationt &source_location,
   const namespacet &ns)
 {
-  std::ostringstream oss;
-  stream_message_handlert mh(oss);
-
-  try
-  {
-    expr_initializert<false> z_i(ns, mh);
-    return z_i(type, source_location);
-  }
-  catch(int)
-  {
-    throw oss.str();
-  }
+  null_message_handlert null_message_handler;
+  expr_initializert<false> z_i(ns, null_message_handler);
+  return z_i(type, source_location);
 }
 
 exprt nondet_initializer(
@@ -388,16 +373,7 @@ exprt nondet_initializer(
   const source_locationt &source_location,
   const namespacet &ns)
 {
-  std::ostringstream oss;
-  stream_message_handlert mh(oss);
-
-  try
-  {
-    expr_initializert<true> z_i(ns, mh);
-    return z_i(type, source_location);
-  }
-  catch(int)
-  {
-    throw oss.str();
-  }
+  null_message_handlert null_message_handler;
+  expr_initializert<true> z_i(ns, null_message_handler);
+  return z_i(type, source_location);
 }
