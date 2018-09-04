@@ -70,7 +70,6 @@ set_target_properties(
     linking
     pointer-analysis
     solvers
-    test-bigint
     testing-utils
     unit
     util
