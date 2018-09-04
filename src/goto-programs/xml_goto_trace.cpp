@@ -90,10 +90,6 @@ void convert(
           full_lhs_value_string=
             from_expr(ns, identifier, step.full_lhs_value);
 
-        if(step.lhs_object_value.type().is_not_nil())
-          type_string=
-            from_type(ns, identifier, step.lhs_object_value.type());
-
         const symbolt *symbol;
         irep_idt base_name, display_name;
 
@@ -110,7 +106,6 @@ void convert(
         xml_assignment.new_element("type").data=type_string;
         xml_assignment.new_element("full_lhs").data=full_lhs_string;
         xml_assignment.new_element("full_lhs_value").data=full_lhs_value_string;
-        xml_assignment.new_element("value").data=value_string;
 
         xml_assignment.set_attribute_bool("hidden", step.hidden);
         xml_assignment.set_attribute("thread", std::to_string(step.thread_nr));
@@ -123,10 +118,6 @@ void convert(
           step.assignment_type==
             goto_trace_stept::assignment_typet::ACTUAL_PARAMETER?
           "actual_parameter":"state");
-
-        if(step.lhs_object_value.is_not_nil())
-          xml_assignment.new_element("value_expression").
-            new_element(xml(step.lhs_object_value, ns));
       }
       break;
 
