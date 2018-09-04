@@ -89,16 +89,20 @@ void output_vcd(
   {
     if(step.is_assignment())
     {
-      irep_idt identifier=step.lhs_object.get_identifier();
-      const typet &type=step.lhs_object.type();
+      auto lhs_object=step.get_lhs_object();
+      if(lhs_object.has_value())
+      {
+        irep_idt identifier=lhs_object->get_identifier();
+        const typet &type=lhs_object->type();
 
-      const auto number=n.number(identifier);
+        const auto number=n.number(identifier);
 
-      const mp_integer width = pointer_offset_bits(type, ns);
+        const mp_integer width = pointer_offset_bits(type, ns);
 
-      if(width>=1)
-        out << "$var reg " << width << " V" << number << " "
-            << identifier << " $end" << "\n";
+        if(width>=1)
+          out << "$var reg " << width << " V" << number << " "
+              << identifier << " $end" << "\n";
+      }
     }
   }
 
@@ -113,30 +117,34 @@ void output_vcd(
     {
     case goto_trace_stept::typet::ASSIGNMENT:
       {
-        irep_idt identifier=step.lhs_object.get_identifier();
-        const typet &type=step.lhs_object.type();
-
-        out << '#' << timestamp << "\n";
-        timestamp++;
-
-        const auto number=n.number(identifier);
-
-        // booleans are special in VCD
-        if(type.id()==ID_bool)
+        auto lhs_object=step.get_lhs_object();
+        if(lhs_object.has_value())
         {
-          if(step.lhs_object_value.is_true())
-            out << "1" << "V" << number << "\n";
-          else if(step.lhs_object_value.is_false())
-            out << "0" << "V" << number << "\n";
+          irep_idt identifier=lhs_object->get_identifier();
+          const typet &type=lhs_object->type();
+
+          out << '#' << timestamp << "\n";
+          timestamp++;
+
+          const auto number=n.number(identifier);
+
+          // booleans are special in VCD
+          if(type.id()==ID_bool)
+          {
+            if(step.full_lhs_value.is_true())
+              out << "1" << "V" << number << "\n";
+            else if(step.full_lhs_value.is_false())
+              out << "0" << "V" << number << "\n";
+            else
+              out << "x" << "V" << number << "\n";
+          }
           else
-            out << "x" << "V" << number << "\n";
-        }
-        else
-        {
-          std::string binary=as_vcd_binary(step.lhs_object_value, ns);
+          {
+            std::string binary=as_vcd_binary(step.full_lhs_value, ns);
 
-          if(binary!="")
-            out << "b" << binary << " V" << number << " " << "\n";
+            if(binary!="")
+              out << "b" << binary << " V" << number << " " << "\n";
+          }
         }
       }
       break;

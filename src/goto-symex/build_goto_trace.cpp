@@ -295,16 +295,6 @@ void build_goto_trace(
       goto_trace_step.thread_nr = SSA_step.source.thread_nr;
       goto_trace_step.pc = SSA_step.source.pc;
       goto_trace_step.comment = SSA_step.comment;
-      if(SSA_step.ssa_lhs.is_not_nil())
-      {
-        goto_trace_step.lhs_object =
-          ssa_exprt(SSA_step.ssa_lhs.get_original_expr());
-      }
-      else
-      {
-        goto_trace_step.lhs_object.make_nil();
-      }
-
       goto_trace_step.type = SSA_step.type;
       goto_trace_step.hidden = SSA_step.hidden;
       goto_trace_step.format_string = SSA_step.format_string;
@@ -333,9 +323,6 @@ void build_goto_trace(
         goto_trace_step.full_lhs = build_full_lhs_rec(
           prop_conv, ns, SSA_step.original_full_lhs, SSA_step.ssa_full_lhs);
       }
-
-      if(SSA_step.ssa_lhs.is_not_nil())
-        goto_trace_step.lhs_object_value = prop_conv.get(SSA_step.ssa_lhs);
 
       if(SSA_step.ssa_full_lhs.is_not_nil())
       {
