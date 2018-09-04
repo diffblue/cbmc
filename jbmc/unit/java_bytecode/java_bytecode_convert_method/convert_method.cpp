@@ -1,6 +1,6 @@
 /*******************************************************************\
 
- Module: Unit tests for converting constructors and static initializers
+ Module: Unit tests for converting methods.
 
  Author: Diffblue Limited.
 
@@ -52,6 +52,45 @@ SCENARIO(
         THEN("The method should be marked as a bridge method")
         {
           REQUIRE_FALSE(function_type.get_bool(ID_is_bridge_method));
+        }
+      }
+    }
+  }
+  GIVEN("A class with a native method")
+  {
+    const symbol_tablet symbol_table = load_java_class(
+      "ClassWithNativeMethod", "./java_bytecode/java_bytecode_convert_method");
+
+    const std::string method_name = "java::ClassWithNativeMethod.f";
+
+    WHEN("When parsing the native method")
+    {
+      const symbolt function_symbol =
+        symbol_table.lookup_ref(method_name + ":()Z");
+
+      const java_method_typet &function_type =
+        require_type::require_java_method(function_symbol.type);
+      THEN("The method symbol should be of java_method_typet")
+      {
+        REQUIRE(function_type.get_bool(ID_C_java_method_type));
+      }
+      THEN("And the method should be marked as a native method")
+      {
+        REQUIRE(to_java_method_type(function_type).get_native());
+      }
+    }
+    WHEN("When parsing a non-native method")
+    {
+      THEN("THe method should not be marked as a native method")
+      {
+        const symbolt function_symbol =
+          symbol_table.lookup_ref(method_name + ":(I)Z");
+
+        const java_method_typet &function_type =
+          require_type::require_java_method(function_symbol.type);
+        THEN("The method should be marked as a native method")
+        {
+          REQUIRE_FALSE(to_java_method_type(function_type).get_native());
         }
       }
     }
