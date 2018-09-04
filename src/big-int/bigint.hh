@@ -129,15 +129,15 @@ public:
   enum { small = sizeof (ullong_t) / sizeof (onedig_t) };
 
 private:
-  unsigned size;			// Length of digit vector.
-  unsigned length;			// Used places in digit vector.
+  std::size_t size;			// Length of digit vector.
+  std::size_t length;			// Used places in digit vector.
   onedig_t *digit;			// Least significant first.
   bool positive;			// Signed magnitude representation.
 
   // Create or resize this.
-  inline void allocate (unsigned digits);
-  inline void reallocate (unsigned digits);
-  inline void resize (unsigned digits);
+  inline void allocate (std::size_t digits);
+  inline void reallocate (std::size_t digits);
+  inline void resize (std::size_t digits);
 
   // Adjust length (e.g. after subtraction).
   inline void adjust();
@@ -148,12 +148,12 @@ private:
 
   // Aux methods, only for internal use.
   inline int ucompare (BigInt const &) const;
-  void add (onedig_t const *, unsigned, bool) _fast;
-  void mul (onedig_t const *, unsigned, bool) _fast;
+  void add (onedig_t const *, std::size_t, bool) _fast;
+  void mul (onedig_t const *, std::size_t, bool) _fast;
 
   // Auxiliary constructor used for temporary or static BigInt.
   // Sets size=0 which indicates that ~BigInt must not delete[].
-  inline BigInt (onedig_t *, unsigned, bool) _fast;
+  inline BigInt (onedig_t *, std::size_t, bool) _fast;
 
 public:
   ~BigInt() _fast;
@@ -183,19 +183,19 @@ public:
 
   // Return an upper bound for the number of digits the textual
   // representation of this might have.
-  unsigned digits (onedig_t = 10) const _fast;
+  std::size_t digits (onedig_t = 10) const _fast;
 
   // Convert into string, right adjusted in field of specified width.
   // Returns pointer to start of number or NULL if field too small.
-  char *as_string (char *, unsigned, onedig_t = 10) const _fasta;
+  char *as_string (char *, std::size_t, onedig_t = 10) const _fasta;
 
   // Convert to/from a binary representation.
 
   // Write and read in a compact byte-wise binary form. Effectively
   // print in base 256 with the most significant digit first. Also
   // read back from such a representation. Return success.
-  bool dump (unsigned char *, unsigned) _fast;
-  void load (unsigned char const *, unsigned) _fast;
+  bool dump (unsigned char *, std::size_t) _fast;
+  void load (unsigned char const *, std::size_t) _fast;
 
   // Conversions to elementary types.
 
@@ -275,11 +275,11 @@ public:
 
   // Returns the largest x such that 2^x <= abs() or 0 if input is 0
   // Not part of original BigInt.
-  unsigned floorPow2 () const _fast;
+  std::size_t floorPow2 () const _fast;
 
   // Sets the number to the power of two given by the exponent
   // Not part of original BigInt.
-  void setPower2 (unsigned exponent) _fast;
+  void setPower2 (std::size_t exponent) _fast;
 
   void swap (BigInt &other)
   {
@@ -293,7 +293,7 @@ public:
 
 // Functions on BigInt. Implementations in bigint-func.cc.
 
-BigInt pow (BigInt const &, unsigned) _fast;
+BigInt pow (BigInt const &, std::size_t) _fast;
 BigInt pow (BigInt const &, BigInt const &, BigInt const &modulus) _fast;
 BigInt sqrt (BigInt const &) _fast;
 BigInt gcd (const BigInt &, const BigInt &) _fast;
