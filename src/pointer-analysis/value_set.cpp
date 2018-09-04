@@ -1202,6 +1202,11 @@ void value_sett::assign(
                 "rhs.type():\n"+rhs.type().pretty()+"\n"+
                 "type:\n"+type.pretty();
 
+        const auto &rhs_type_followed=ns.follow(rhs.type());
+        DATA_INVARIANT(rhs_type_followed.id()==ID_struct ||
+                       rhs_type_followed.id()==ID_union,
+                       "rhs-lhs type equvalence");
+
         rhs_member=make_member(rhs, name, ns);
 
         assign(lhs_member, rhs_member, ns, is_simplified, add_to_sets);
@@ -1724,8 +1729,14 @@ exprt value_sett::make_member(
   const irep_idt &component_name,
   const namespacet &ns)
 {
+  const typet &src_type_followed=
+    ns.follow(src.type());
+
+  PRECONDITION(src_type_followed.id()==ID_struct ||
+               src_type_followed.id()==ID_union);
+
   const struct_union_typet &struct_union_type=
-    to_struct_union_type(ns.follow(src.type()));
+    to_struct_union_type(src_type_followed);
 
   if(src.id()==ID_struct ||
      src.id()==ID_constant)
@@ -1741,18 +1752,28 @@ exprt value_sett::make_member(
     // see if op1 is the member we want
     const exprt &member_operand=src.op1();
 
+    const typet &op0_type_followed=ns.follow(src.op0().type());
+
     if(component_name==member_operand.get(ID_component_name))
       // yes! just take op2
       return src.op2();
-    else
+    else if(op0_type_followed.id()==ID_struct ||
+            op0_type_followed.id()==ID_union)
+    {
       // no! do this recursively
       return make_member(src.op0(), component_name, ns);
+    }
   }
   else if(src.id()==ID_typecast)
   {
     // push through typecast
     assert(src.operands().size()==1);
-    return make_member(src.op0(), component_name, ns);
+
+    const typet &op0_type_followed=ns.follow(src.op0().type());
+
+    if(op0_type_followed.id()==ID_struct ||
+       op0_type_followed.id()==ID_union)
+      return make_member(src.op0(), component_name, ns);
   }
 
   // give up
