@@ -59,6 +59,7 @@ require_goto_statements::require_entry_point_statements(
 /// \param structure_name: The name of variable of type struct
 /// \param superclass_name: The name of the superclass (if given)
 /// \param component_name: The name of the component of the superclass that
+/// \param symbol_table: A symbol table to enable type lookups
 /// should be assigned
 /// \return: All the assignments to that component.
 require_goto_statements::pointer_assignment_locationt
@@ -66,7 +67,8 @@ require_goto_statements::find_struct_component_assignments(
   const std::vector<codet> &statements,
   const irep_idt &structure_name,
   const optionalt<irep_idt> &superclass_name,
-  const irep_idt &component_name)
+  const irep_idt &component_name,
+  const symbol_tablet &symbol_table)
 {
   pointer_assignment_locationt locations;
 
@@ -97,9 +99,13 @@ require_goto_statements::find_struct_component_assignments(
             const irep_idt supercomponent_name =
               "@" + id2string(superclass_name.value());
 
+            object_descriptor_exprt ode;
+            const namespacet ns(symbol_table);
+            ode.build(superclass_expr, ns);
             if(
               superclass_expr.get_component_name() == supercomponent_name &&
-              superclass_expr.symbol().get_identifier() == structure_name)
+              to_symbol_expr(ode.root_object()).get_identifier() ==
+              structure_name)
             {
               if(
                 code_assign.rhs() ==
@@ -122,7 +128,7 @@ require_goto_statements::find_struct_component_assignments(
           // - operand (component of): symbol for \p structure_name
           if(
             member_expr.op().id() == ID_symbol &&
-            member_expr.symbol().get_identifier() == structure_name &&
+            to_symbol_expr(member_expr.op()).get_identifier() == structure_name &&
             member_expr.get_component_name() == component_name)
           {
             if(
@@ -291,6 +297,7 @@ const code_declt &require_goto_statements::require_declaration_of_name(
 /// \param typecast_name The name of the type to which the object is cast (if
 /// there is a typecast)
 /// \param entry_point_instructions The statements to look through
+/// \param symbol_table: A symbol table to enable type lookups
 /// \return The identifier of the variable assigned to the field
 const irep_idt &require_goto_statements::require_struct_component_assignment(
   const irep_idt &structure_name,
@@ -298,7 +305,8 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
   const irep_idt &component_name,
   const irep_idt &component_type_name,
   const optionalt<irep_idt> &typecast_name,
-  const std::vector<codet> &entry_point_instructions)
+  const std::vector<codet> &entry_point_instructions,
+  const symbol_tablet &symbol_table)
 {
   // First we need to find the assignments to the component belonging to
   // the structure_name object
@@ -307,7 +315,8 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
       entry_point_instructions,
       structure_name,
       superclass_name,
-      component_name);
+      component_name,
+      symbol_table);
   REQUIRE(component_assignments.non_null_assignments.size() == 1);
 
   // We are expecting that the resulting statement can be of two forms:
@@ -376,6 +385,7 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
 /// \param array_type_name The type of the array, e.g., java::array[reference]
 /// \param array_component_element_type_name The element type of the array
 /// \param entry_point_instructions The statements to look through
+/// \param symbol_table: A symbol table to enable type lookups
 /// \return The identifier of the variable assigned to the field
 const irep_idt &
 require_goto_statements::require_struct_array_component_assignment(
@@ -384,7 +394,8 @@ require_goto_statements::require_struct_array_component_assignment(
   const irep_idt &array_component_name,
   const irep_idt &array_type_name,
   const irep_idt &array_component_element_type_name,
-  const std::vector<codet> &entry_point_instructions)
+  const std::vector<codet> &entry_point_instructions,
+  const symbol_tablet &symbol_table)
 {
   // First we need to find the assignments to the component belonging to
   // the structure_name object
@@ -393,7 +404,8 @@ require_goto_statements::require_struct_array_component_assignment(
       entry_point_instructions,
       structure_name,
       superclass_name,
-      array_component_name);
+      array_component_name,
+      symbol_table);
   REQUIRE(component_assignments.non_null_assignments.size() == 1);
 
   // We are expecting that the resulting statement is of form:

@@ -58,7 +58,8 @@ SCENARIO(
           "field",
           "java::java.lang.Integer",
           {"java::java.lang.Object"},
-          entry_point_code);
+          entry_point_code,
+          symbol_table);
       }
     }
   }
@@ -90,7 +91,8 @@ SCENARIO(
           "field",
           "java::IWrapper",
           {"java::java.lang.Object"},
-          entry_point_code);
+          entry_point_code,
+          symbol_table);
       }
     }
   }
@@ -122,7 +124,8 @@ SCENARIO(
             "field",
             "java::Wrapper",
             {"java::java.lang.Object"},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
         THEN("Object 'this.field' has correctly specialized field")
         {
@@ -132,7 +135,8 @@ SCENARIO(
             "field",
             "java::IWrapper",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
     }
@@ -167,7 +171,8 @@ SCENARIO(
             "f",
             "java::SuperclassUninst",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
         THEN("The object for 'f' has correctly specialized inherited field")
         {
@@ -177,7 +182,8 @@ SCENARIO(
             "field",
             "java::java.lang.Integer",
             {"java::java.lang.Object"},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
     }
@@ -210,7 +216,8 @@ SCENARIO(
             "f",
             "java::SuperclassMixed",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
         THEN("The object for 'f' has correctly specialized inherited fields")
         {
@@ -220,7 +227,8 @@ SCENARIO(
             "first",
             "java::java.lang.Boolean",
             {"java::java.lang.Object"},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
           require_goto_statements::require_struct_component_assignment(
             f_tmp_name,
@@ -228,7 +236,8 @@ SCENARIO(
             "second",
             "java::IWrapper",
             {"java::java.lang.Object"},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
     }
@@ -265,7 +274,8 @@ SCENARIO(
             "inner",
             "java::SuperclassInnerInst$Inner",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         THEN(
           "The object of 'inner' has correctly specialized inherited "
           "field")
@@ -276,7 +286,8 @@ SCENARIO(
             "field",
             "java::java.lang.Integer",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
 
         const irep_idt &inner_gen_tmp_name =
@@ -286,7 +297,8 @@ SCENARIO(
             "inner_gen",
             "java::SuperclassInnerInst$InnerGen",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         THEN(
           "The object of 'inner_gen' has correctly specialized inherited "
           "field")
@@ -297,7 +309,8 @@ SCENARIO(
             "field",
             "java::java.lang.Boolean",
             {"java::java.lang.Object"},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
         }
       }
     }
@@ -334,7 +347,8 @@ SCENARIO(
             "f",
             "java::SuperclassInnerUninst",
             {},
-            entry_point_code);
+            entry_point_code,
+            symbol_table);
 
         THEN(
           "The object for 'f' has fields 'inner' and 'inner_gen' "
@@ -347,7 +361,8 @@ SCENARIO(
               "inner",
               "java::SuperclassInnerUninst$Inner",
               {},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
           THEN(
             "The object of 'inner' has correctly specialized inherited "
             "field")
@@ -358,7 +373,8 @@ SCENARIO(
               "field",
               "java::IWrapper",
               {"java::java.lang.Object"},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
           }
 
           const irep_idt &inner_gen_tmp_name =
@@ -368,7 +384,8 @@ SCENARIO(
               "inner_gen",
               "java::SuperclassInnerUninst$InnerGen",
               {},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
           THEN(
             "The object of 'inner_gen' has correctly specialized inherited "
             "fields")
@@ -379,14 +396,16 @@ SCENARIO(
               "first",
               "java::IWrapper",
               {"java::java.lang.Object"},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
             require_goto_statements::require_struct_component_assignment(
               inner_gen_tmp_name,
               {"PairWrapper"},
               "second",
               "java::java.lang.Boolean",
               {"java::java.lang.Object"},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
           }
 
           const irep_idt &inner_three_tmp_name =
@@ -396,7 +415,8 @@ SCENARIO(
               "inner_three",
               "java::SuperclassInnerUninst$InnerThree",
               {},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
           THEN(
             "The object of 'inner_three' has correctly specialized "
             "inherited fields")
@@ -407,7 +427,8 @@ SCENARIO(
               "field",
               "java::IWrapper",
               {"java::java.lang.Object"},
-              entry_point_code);
+              entry_point_code,
+              symbol_table);
           }
         }
       }
@@ -463,7 +484,8 @@ SCENARIO(
           "field",
           "java::java.lang.Object",
           {},
-          entry_point_code);
+          entry_point_code,
+          symbol_table);
       }
     }
   }
@@ -506,7 +528,8 @@ SCENARIO(
           "field",
           "java::java.lang.Object",
           {},
-          entry_point_code);
+          entry_point_code,
+          symbol_table);
       }
     }
   }
