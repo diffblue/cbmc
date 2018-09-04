@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/guard.h>
 #include <util/ieee_float.h>
+#include <util/make_unique.h>
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
@@ -78,7 +79,7 @@ public:
 
 protected:
   const namespacet &ns;
-  local_bitvector_analysist *local_bitvector_analysis;
+  std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
   goto_programt::const_targett t;
 
   void check_rec(
@@ -1530,8 +1531,9 @@ void goto_checkt::goto_check(
 
   bool did_something = false;
 
-  local_bitvector_analysist local_bitvector_analysis_obj(goto_function);
-  local_bitvector_analysis=&local_bitvector_analysis_obj;
+  if(enable_pointer_check)
+    local_bitvector_analysis =
+      util_make_unique<local_bitvector_analysist>(goto_function);
 
   goto_programt &goto_program=goto_function.body;
 
