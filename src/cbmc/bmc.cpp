@@ -19,21 +19,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include <goto-programs/graphml_witness.h>
-#include <goto-programs/json_goto_trace.h>
-#include <goto-programs/xml_goto_trace.h>
-
-#include <goto-symex/build_goto_trace.h>
-#include <goto-symex/memory_model_pso.h>
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>
-#include <goto-symex/slice.h>
-#include <goto-symex/slice_by_trace.h>
 
 #include <linking/static_lifetime_init.h>
 
 #include <goto-checker/solver_factory.h>
 
+#include "bmc_util.h"
 #include "counterexample_beautification.h"
 #include "fault_localization.h"
 
@@ -48,84 +41,6 @@ void bmct::freeze_program_variables()
   // this is a hook for cegis
 }
 
-void bmct::error_trace()
-{
-  status() << "Building error trace" << eom;
-
-  goto_tracet &goto_trace=safety_checkert::error_trace;
-  build_goto_trace(equation, prop_conv, ns, goto_trace);
-
-  switch(ui_message_handler.get_ui())
-  {
-  case ui_message_handlert::uit::PLAIN:
-    result() << "Counterexample:" << eom;
-    show_goto_trace(result(), ns, goto_trace, trace_options());
-    result() << eom;
-    break;
-
-  case ui_message_handlert::uit::XML_UI:
-    {
-      xmlt xml;
-      convert(ns, goto_trace, xml);
-      status() << xml;
-    }
-    break;
-
-  case ui_message_handlert::uit::JSON_UI:
-    {
-      if(status().tellp() > 0)
-        status() << eom; // force end of previous message
-      json_stream_objectt &json_result =
-        ui_message_handler.get_json_stream().push_back_stream_object();
-      const goto_trace_stept &step=goto_trace.steps.back();
-      json_result["property"] =
-        json_stringt(step.pc->source_location.get_property_id());
-      json_result["description"] =
-        json_stringt(step.pc->source_location.get_comment());
-      json_result["status"]=json_stringt("failed");
-      json_stream_arrayt &json_trace =
-        json_result.push_back_stream_array("trace");
-      convert<json_stream_arrayt>(ns, goto_trace, json_trace, trace_options());
-    }
-    break;
-  }
-}
-
-/// outputs witnesses in graphml format
-void bmct::output_graphml(resultt result)
-{
-  const std::string graphml=options.get_option("graphml-witness");
-  if(graphml.empty())
-    return;
-
-  graphml_witnesst graphml_witness(ns);
-  if(result==resultt::UNSAFE)
-    graphml_witness(safety_checkert::error_trace);
-  else if(result==resultt::SAFE)
-    graphml_witness(equation);
-  else
-    return;
-
-  if(graphml=="-")
-    write_graphml(graphml_witness.graph(), std::cout);
-  else
-  {
-    std::ofstream out(graphml);
-    write_graphml(graphml_witness.graph(), out);
-  }
-}
-
-void bmct::do_conversion()
-{
-  status() << "converting SSA" << eom;
-
-  // convert SSA
-  equation.convert(prop_conv);
-
-  // hook for cegis to freeze synthesis program vars
-  freeze_program_variables();
-}
-
 decision_proceduret::resultt bmct::run_decision_procedure()
 {
   status() << "Passing problem to "
@@ -135,7 +50,10 @@ decision_proceduret::resultt bmct::run_decision_procedure()
 
   auto solver_start = std::chrono::steady_clock::now();
 
-  do_conversion();
+  convert_symex_target_equation(equation, prop_conv, get_message_handler());
+
+  // hook for cegis to freeze synthesis program vars
+  freeze_program_variables();
 
   status() << "Running " << prop_conv.decision_procedure_text() << eom;
 
@@ -149,103 +67,6 @@ decision_proceduret::resultt bmct::run_decision_procedure()
   }
 
   return dec_result;
-}
-
-void bmct::report_success()
-{
-  report_success(*this, ui_message_handler);
-}
-
-void bmct::report_success(messaget &log, ui_message_handlert &handler)
-{
-  log.result() << log.bold << "VERIFICATION SUCCESSFUL" << log.reset << log.eom;
-
-  switch(handler.get_ui())
-  {
-  case ui_message_handlert::uit::PLAIN:
-    break;
-
-  case ui_message_handlert::uit::XML_UI:
-    {
-      xmlt xml("cprover-status");
-      xml.data="SUCCESS";
-      log.result() << xml;
-    }
-    break;
-
-  case ui_message_handlert::uit::JSON_UI:
-    {
-      json_objectt json_result({{"cProverStatus", json_stringt("success")}});
-      log.result() << json_result;
-    }
-    break;
-  }
-}
-
-void bmct::report_failure()
-{
-  report_failure(*this, ui_message_handler);
-}
-
-void bmct::report_failure(messaget &log, ui_message_handlert &handler)
-{
-  log.result() << log.bold << "VERIFICATION FAILED" << log.reset << log.eom;
-
-  switch(handler.get_ui())
-  {
-  case ui_message_handlert::uit::PLAIN:
-    break;
-
-  case ui_message_handlert::uit::XML_UI:
-    {
-      xmlt xml("cprover-status");
-      xml.data="FAILURE";
-      log.result() << xml;
-    }
-    break;
-
-  case ui_message_handlert::uit::JSON_UI:
-    {
-      json_objectt json_result({{"cProverStatus", json_stringt("failure")}});
-      log.result() << json_result;
-    }
-    break;
-  }
-}
-
-void bmct::get_memory_model()
-{
-  const std::string mm=options.get_option("mm");
-
-  if(mm.empty() || mm=="sc")
-    memory_model=util_make_unique<memory_model_sct>(ns);
-  else if(mm=="tso")
-    memory_model=util_make_unique<memory_model_tsot>(ns);
-  else if(mm=="pso")
-    memory_model=util_make_unique<memory_model_psot>(ns);
-  else
-  {
-    throw invalid_command_line_argument_exceptiont(
-      "invalid parameter " + mm, "--mm", "try values of sc, tso, pso");
-  }
-}
-
-void bmct::setup()
-{
-  get_memory_model();
-
-  {
-    const symbolt *init_symbol;
-    if(!ns.lookup(INITIALIZE_FUNCTION, init_symbol))
-      symex.language_mode=init_symbol->mode;
-  }
-
-  status() << "Starting Bounded Model Checking" << eom;
-
-  symex.last_source_location.make_nil();
-
-  symex.unwindset.parse_unwind(options.get_option("unwind"));
-  symex.unwindset.parse_unwindset(options.get_option("unwindset"));
 }
 
 safety_checkert::resultt bmct::execute(
@@ -293,7 +114,7 @@ safety_checkert::resultt bmct::execute(
                  << equation.SSA_steps.size()
                  << " steps" << eom;
 
-    slice();
+    slice(symex, equation, ns, options, ui_message_handler);
 
     // coverage report
     std::string cov_out=options.get_option("symex-coverage-report");
@@ -330,8 +151,8 @@ safety_checkert::resultt bmct::execute(
     {
       if(options.is_set("paths"))
         return safety_checkert::resultt::PAUSED;
-      report_success();
-      output_graphml(resultt::SAFE);
+      report_success(ui_message_handler);
+      output_graphml(resultt::SAFE, error_trace, equation, ns, options);
       return safety_checkert::resultt::SAFE;
     }
 
@@ -372,55 +193,12 @@ safety_checkert::resultt bmct::execute(
   }
 }
 
-void bmct::slice()
-{
-  if(options.get_option("slice-by-trace")!="")
-  {
-    symex_slice_by_tracet symex_slice_by_trace(ns);
-
-    symex_slice_by_trace.slice_by_trace
-    (options.get_option("slice-by-trace"),
-        equation);
-  }
-  // any properties to check at all?
-  if(equation.has_threads())
-  {
-    // we should build a thread-aware SSA slicer
-    statistics() << "no slicing due to threads" << eom;
-  }
-  else
-  {
-    if(options.get_bool_option("slice-formula"))
-    {
-      ::slice(equation);
-      statistics() << "slicing removed "
-                   << equation.count_ignored_SSA_steps()
-                   << " assignments"<<eom;
-    }
-    else
-    {
-      if(options.get_list_option("cover").empty())
-      {
-        simple_slice(equation);
-        statistics() << "simple slicing removed "
-                     << equation.count_ignored_SSA_steps()
-                     << " assignments"<<eom;
-      }
-    }
-  }
-  statistics() << "Generated " << symex.get_total_vccs() << " VCC(s), "
-               << symex.get_remaining_vccs()
-               << " remaining after simplification" << eom;
-
-  if(options.is_set("paths"))
-    statistics() << "Generated " << symex.path_segment_vccs
-                 << " new VCC(s) along current path segment" << eom;
-}
 
 safety_checkert::resultt bmct::run(
   abstract_goto_modelt &goto_model)
 {
-  setup();
+  memory_model = get_memory_model(options, ns);
+  setup_symex(symex, ns, options, ui_message_handler);
 
   return execute(goto_model);
 }
@@ -435,26 +213,13 @@ safety_checkert::resultt bmct::decide(const goto_functionst &goto_functions)
     return all_properties(goto_functions);
 }
 
-void bmct::show()
-{
-  if(options.get_bool_option("show-vcc"))
-  {
-    show_vcc(options, ui_message_handler, equation);
-  }
-
-  if(options.get_bool_option("program-only"))
-  {
-    show_program(ns, equation);
-  }
-}
-
 safety_checkert::resultt bmct::stop_on_fail()
 {
   switch(run_decision_procedure())
   {
   case decision_proceduret::resultt::D_UNSATISFIABLE:
-    report_success();
-    output_graphml(resultt::SAFE);
+    report_success(ui_message_handler);
+    output_graphml(resultt::SAFE, error_trace, equation, ns, options);
     return resultt::SAFE;
 
   case decision_proceduret::resultt::D_SATISFIABLE:
@@ -464,11 +229,13 @@ safety_checkert::resultt bmct::stop_on_fail()
         counterexample_beautificationt()(
           dynamic_cast<boolbvt &>(prop_conv), equation);
 
-      error_trace();
-      output_graphml(resultt::UNSAFE);
+      build_error_trace(
+        error_trace, ns, equation, prop_conv, ui_message_handler);
+      output_error_trace(error_trace, ns, trace_options(), ui_message_handler);
+      output_graphml(resultt::UNSAFE, error_trace, equation, ns, options);
     }
 
-    report_failure();
+    report_failure(ui_message_handler);
     return resultt::UNSAFE;
 
   default:
@@ -619,11 +386,11 @@ int bmct::do_language_agnostic_bmc(
   {
   case safety_checkert::resultt::SAFE:
     if(opts.is_set("paths"))
-      report_success(message, ui);
+      report_success(ui);
     return CPROVER_EXIT_VERIFICATION_SAFE;
   case safety_checkert::resultt::UNSAFE:
     if(opts.is_set("paths"))
-      report_failure(message, ui);
+      report_failure(ui);
     return CPROVER_EXIT_VERIFICATION_UNSAFE;
   case safety_checkert::resultt::ERROR:
     return CPROVER_EXIT_INTERNAL_ERROR;

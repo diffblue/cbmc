@@ -181,8 +181,6 @@ protected:
 
   virtual resultt decide(const goto_functionst &);
 
-  void do_conversion();
-
   virtual void freeze_program_variables();
 
   trace_optionst trace_options()
@@ -192,18 +190,6 @@ protected:
 
   virtual resultt all_properties(const goto_functionst &goto_functions);
   virtual resultt stop_on_fail();
-  virtual void report_success();
-  virtual void report_failure();
-
-  static void report_success(messaget &, ui_message_handlert &);
-  static void report_failure(messaget &, ui_message_handlert &);
-
-  virtual void error_trace();
-  void output_graphml(resultt result);
-
-  void get_memory_model();
-  void slice();
-  void show();
 
   bool cover(const goto_functionst &goto_functions);
 

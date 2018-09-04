@@ -88,6 +88,7 @@ testing-utils-clean:
 BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
           ../src/cbmc/bmc$(OBJEXT) \
           ../src/cbmc/bmc_cover$(OBJEXT) \
+          ../src/cbmc/bmc_util$(OBJEXT) \
           ../src/cbmc/cbmc_languages$(OBJEXT) \
           ../src/cbmc/cbmc_parse_options$(OBJEXT) \
           ../src/cbmc/counterexample_beautification$(OBJEXT) \

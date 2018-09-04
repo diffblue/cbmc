@@ -26,6 +26,7 @@ Author: Peter Schrammel
 #include <goto-symex/build_goto_trace.h>
 #include <goto-programs/xml_goto_trace.h>
 
+#include "bmc_util.h"
 #include "counterexample_beautification.h"
 
 void fault_localizationt::freeze_guards()
@@ -247,7 +248,9 @@ fault_localizationt::run_decision_procedure(prop_convt &prop_conv)
 
   auto solver_start=std::chrono::steady_clock::now();
 
-  bmc.do_conversion();
+  convert_symex_target_equation(
+    bmc.equation, bmc.prop_conv, get_message_handler());
+  bmc.freeze_program_variables();
 
   freeze_guards();
 
@@ -272,7 +275,7 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
   switch(run_decision_procedure(bmc.prop_conv))
   {
   case decision_proceduret::resultt::D_UNSATISFIABLE:
-    bmc.report_success();
+    report_success(bmc.ui_message_handler);
     return safety_checkert::resultt::SAFE;
 
   case decision_proceduret::resultt::D_SATISFIABLE:
@@ -282,7 +285,14 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
         counterexample_beautificationt()(
           dynamic_cast<boolbvt &>(bmc.prop_conv), bmc.equation);
 
-      bmc.error_trace();
+      build_error_trace(
+        bmc.error_trace,
+        bmc.ns,
+        bmc.equation,
+        bmc.prop_conv,
+        bmc.ui_message_handler);
+      output_error_trace(
+        bmc.error_trace, bmc.ns, bmc.trace_options(), bmc.ui_message_handler);
     }
 
     // localize faults
@@ -307,7 +317,7 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
       break;
     }
 
-    bmc.report_failure();
+    report_failure(bmc.ui_message_handler);
     return safety_checkert::resultt::UNSAFE;
 
   default:
