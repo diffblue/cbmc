@@ -1,0 +1,9 @@
+CORE
+main.c
+--verbosity 10
+^EXIT=0$
+^SIGNAL=0$
+^Visual Studio mode \d+\.\d+ (x86|x64|ARM)$
+--
+^warning: ignoring
+^CONVERSION ERROR$

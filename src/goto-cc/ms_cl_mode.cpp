@@ -28,6 +28,7 @@ Author: CM Wintersteiger, 2006
 #include <util/prefix.h>
 
 #include "compile.h"
+#include "ms_cl_version.h"
 
 static bool has_directory_suffix(const std::string &path)
 {
@@ -59,10 +60,20 @@ int ms_cl_modet::doit()
   const auto verbosity = eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_ERROR, message_handler);
 
-  debug() << "Visual Studio mode" << eom;
+  ms_cl_versiont ms_cl_version;
+  ms_cl_version.get("cl.exe");
+
+  debug() << "Visual Studio mode " << ms_cl_version << eom;
 
   // get configuration
   config.set(cmdline);
+
+  if(ms_cl_version.target == ms_cl_versiont::targett::x86)
+    config.ansi_c.set_32();
+  else if(ms_cl_version.target == ms_cl_versiont::targett::ARM)
+    config.ansi_c.set_32();
+  else if(ms_cl_version.target == ms_cl_versiont::targett::x86)
+    config.ansi_c.set_64();
 
   config.ansi_c.mode=configt::ansi_ct::flavourt::VISUAL_STUDIO;
   compiler.object_file_extension="obj";
