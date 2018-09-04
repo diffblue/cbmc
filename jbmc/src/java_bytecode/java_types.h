@@ -288,6 +288,16 @@ public:
   {
     set(ID_final, is_final);
   }
+
+  bool get_native() const
+  {
+    return get_bool(ID_is_native_method);
+  }
+
+  void set_native(bool is_native)
+  {
+    set(ID_is_native_method, is_native);
+  }
 };
 
 template <>
