@@ -278,6 +278,16 @@ public:
   {
     add(ID_exceptions_thrown_list).get_sub().push_back(irept(exception));
   }
+
+  bool get_is_final() const
+  {
+    return get_bool(ID_final);
+  }
+
+  void set_is_final(bool is_final)
+  {
+    set(ID_final, is_final);
+  }
 };
 
 template <>

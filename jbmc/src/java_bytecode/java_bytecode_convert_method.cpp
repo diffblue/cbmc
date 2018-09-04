@@ -447,6 +447,7 @@ void java_bytecode_convert_methodt::convert(
   // (function) type of the symbol
   java_method_typet method_type = to_java_method_type(method_symbol.type);
   method_type.set(ID_C_class, class_symbol.name);
+  method_type.set_is_final(m.is_final);
   method_return_type = method_type.return_type();
   java_method_typet::parameterst &parameters = method_type.parameters();
 
