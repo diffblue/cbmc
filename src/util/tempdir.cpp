@@ -26,8 +26,8 @@ Author: CM Wintersteiger
 #include <unistd.h>
 #endif
 
-#include "invariant.h"
 #include "file_util.h"
+#include "invariant.h"
 
 std::string get_temporary_directory(const std::string &name_template)
 {
@@ -38,8 +38,9 @@ std::string get_temporary_directory(const std::string &name_template)
     char lpPathBuffer[MAX_PATH+1];
     DWORD dwRetVal = GetTempPathA(dwBufSize, lpPathBuffer);
 
-    if(dwRetVal > dwBufSize || (dwRetVal == 0))
-      throw "GetTempPath failed"; // NOLINT(readability/throw)
+    // happy to join these two into single statement if preferred
+    CHECK_RETURN(dwRetVal <= dwBufSize)
+    CHECK_RETURN(dwRetVal != 0);
 
     // GetTempFileNameA produces <path>\<pre><uuuu>.TMP
     // where <pre> = "TLO"
@@ -47,12 +48,12 @@ std::string get_temporary_directory(const std::string &name_template)
 
     char t[MAX_PATH];
     UINT uRetVal=GetTempFileNameA(lpPathBuffer, "TLO", 0, t);
-    if(uRetVal == 0)
-      throw "GetTempFileName failed"; // NOLINT(readability/throw)
+    CHECK_RETURN(uRetVal != 0);
 
     unlink(t);
-    if(_mkdir(t)!=0)
-      throw "_mkdir failed";
+    int retVal_mkdir{_mkdir(t)};
+    // returns 0 for success, -1 for directory creation failure
+    CHECK_RETURN(retVal_mkdir==0)
 
     result=std::string(t);
 
@@ -68,8 +69,7 @@ std::string get_temporary_directory(const std::string &name_template)
     std::vector<char> t(prefixed_name_template.begin(), prefixed_name_template.end());
     t.push_back('\0'); // add the zero
     const char *td = mkdtemp(t.data());
-    if(!td)
-      throw "mkdtemp failed";
+    CHECK_RETURN(td!=nullptr);
     result=std::string(td);
   #endif
 

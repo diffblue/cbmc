@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
+#include "invariant.h"
 #include "string2int.h"
 
 void xmlt::clear()
@@ -240,7 +241,9 @@ std::string xmlt::unescape(const std::string &str)
         result+=c;
       }
       else
-        throw "XML escape code not implemented"; // NOLINT(readability/throw)
+        // TODO review if this should be an invariant e.g: - effectively the
+        // message is lost
+        UNREACHABLE;
     }
     else
       result+=*it;
