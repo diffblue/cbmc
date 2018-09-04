@@ -19,45 +19,44 @@ Author: Daniel Kroening
 
 #include "static_lifetime_init.h"
 
-void get_symbols_rec(
+static void get_symbols(
   const namespacet &ns,
   const symbolt &symbol,
   find_symbols_sett &dest)
 {
-  dest.insert(symbol.name);
+  std::vector<const symbolt *> working_set;
 
-  find_symbols_sett new_symbols;
+  working_set.push_back(&symbol);
 
-  find_type_and_expr_symbols(symbol.type, new_symbols);
-  find_type_and_expr_symbols(symbol.value, new_symbols);
-
-  if(symbol.type.id()==ID_code)
+  while(!working_set.empty())
   {
-    const code_typet &code_type=to_code_type(symbol.type);
-    const code_typet::parameterst &parameters=code_type.parameters();
+    const symbolt *s = working_set.back();
+    working_set.pop_back();
+    const symbolt &symbol = *s;
 
-    for(code_typet::parameterst::const_iterator
-        it=parameters.begin();
-        it!=parameters.end();
-        it++)
-    {
-      irep_idt id=it->get_identifier();
-      const symbolt *s;
-      // identifiers for prototypes need not exist
-      if(!ns.lookup(id, s))
-        new_symbols.insert(id);
-    }
-  }
+    if(!dest.insert(symbol.name).second)
+      continue;
 
-  for(find_symbols_sett::const_iterator
-      it=new_symbols.begin();
-      it!=new_symbols.end();
-      it++)
-  {
-    if(dest.find(*it)==dest.end())
+    find_symbols_sett new_symbols;
+
+    find_type_and_expr_symbols(symbol.type, new_symbols);
+    find_type_and_expr_symbols(symbol.value, new_symbols);
+
+    for(const auto &s : new_symbols)
+      working_set.push_back(&ns.lookup(s));
+
+    if(symbol.type.id() == ID_code)
     {
-      dest.insert(*it);
-      get_symbols_rec(ns, ns.lookup(*it), dest); // recursive call
+      const code_typet &code_type = to_code_type(symbol.type);
+      const code_typet::parameterst &parameters = code_type.parameters();
+
+      for(const auto &p : parameters)
+      {
+        const symbolt *s;
+        // identifiers for prototypes need not exist
+        if(!ns.lookup(p.get_identifier(), s))
+          working_set.push_back(s);
+      }
     }
   }
 }
@@ -105,7 +104,7 @@ void remove_internal_symbols(
 
     if(special.find(symbol.name)!=special.end())
     {
-      get_symbols_rec(ns, symbol, exported);
+      get_symbols(ns, symbol, exported);
       continue;
     }
 
@@ -135,7 +134,7 @@ void remove_internal_symbols(
       // body? not local (i.e., "static")?
       if(has_body &&
          (!is_file_local || (config.main==symbol.name.c_str())))
-        get_symbols_rec(ns, symbol, exported);
+        get_symbols(ns, symbol, exported);
     }
     else
     {
@@ -144,7 +143,7 @@ void remove_internal_symbols(
       if((has_initializer || !symbol.is_extern) &&
          !is_file_local)
       {
-        get_symbols_rec(ns, symbol, exported);
+        get_symbols(ns, symbol, exported);
       }
     }
   }
