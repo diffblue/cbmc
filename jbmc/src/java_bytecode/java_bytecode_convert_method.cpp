@@ -372,6 +372,8 @@ void java_bytecode_convert_method_lazy(
     member_type.set(ID_is_synchronized, true);
   if(m.is_static)
     member_type.set(ID_is_static, true);
+  if(m.is_native)
+    member_type.set(ID_is_native_method, true);
 
   if(m.is_bridge)
     member_type.set(ID_is_bridge_method, m.is_bridge);
