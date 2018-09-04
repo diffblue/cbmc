@@ -57,3 +57,37 @@ SCENARIO(
     }
   }
 }
+
+SCENARIO(
+  "java_bytecode_convert_final_method",
+  "[core][java_bytecode][java_bytecode_convert_method]")
+{
+  GIVEN("A class with final and non-final methods")
+  {
+    const symbol_tablet symbol_table = load_java_class(
+      "ClassWithFinalMethod", "./java_bytecode/java_bytecode_convert_method");
+
+    WHEN("When parsing a final method")
+    {
+      const symbolt function_symbol =
+        symbol_table.lookup_ref("java::ClassWithFinalMethod.finalFunc:()I");
+      const java_method_typet &function_type =
+        require_type::require_java_method(function_symbol.type);
+      THEN("The method should be marked as final")
+      {
+        REQUIRE(function_type.get_is_final());
+      }
+    }
+    WHEN("When parsing a non-final method")
+    {
+      const symbolt function_symbol =
+        symbol_table.lookup_ref("java::ClassWithFinalMethod.nonFinalFunc:()I");
+      const java_method_typet &function_type =
+        require_type::require_java_method(function_symbol.type);
+      THEN("The method should not be marked as final")
+      {
+        REQUIRE(!function_type.get_is_final());
+      }
+    }
+  }
+}
