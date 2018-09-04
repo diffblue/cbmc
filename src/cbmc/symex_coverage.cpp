@@ -139,15 +139,17 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
   const symex_coveraget::coveraget &coverage):
   coverage_recordt("method")
 {
-  assert(gf_it->second.body_available());
+  PRECONDITION(gf_it->second.body_available());
 
   // identify the file name, inlined functions aren't properly
   // accounted for
   goto_programt::const_targett end_function=
     --gf_it->second.body.instructions.end();
-  assert(end_function->is_end_function());
+  DATA_INVARIANT(
+    end_function->is_end_function(),
+    "last instruction in a function body is end function");
   file_name=end_function->source_location.get_file();
-  assert(!file_name.empty());
+  DATA_INVARIANT(!file_name.empty(), "should have a valid source location");
 
   // compute the maximum coverage of individual source-code lines
   coverage_lines_mapt coverage_lines_map;
@@ -260,11 +262,15 @@ void goto_program_coverage_recordt::compute_coverage_lines(
         for(const auto &cov : c_entry->second)
           std::cerr << cov.second.succ->location_number << '\n';
       }
-      assert(c_entry->second.size()==1 || is_branch);
+      DATA_INVARIANT(
+        c_entry->second.size() == 1 || is_branch,
+        "instructions other than branch instructions have exactly 1 successor");
 
       for(const auto &cov : c_entry->second)
       {
-        assert(cov.second.num_executions>0);
+        DATA_INVARIANT(
+          cov.second.num_executions > 0,
+          "coverage entries can only exist with at least one execution");
 
         if(entry.first->second.hits==0)
           ++lines_covered;
@@ -275,7 +281,9 @@ void goto_program_coverage_recordt::compute_coverage_lines(
         if(is_branch)
         {
           auto cond_entry=entry.first->second.conditions.find(it);
-          assert(cond_entry!=entry.first->second.conditions.end());
+          INVARIANT(
+            cond_entry != entry.first->second.conditions.end(),
+            "branch should have condition");
 
           if(it->get_target()==cov.second.succ)
           {
@@ -439,7 +447,7 @@ bool symex_coveraget::generate_report(
   const goto_functionst &goto_functions,
   const std::string &path) const
 {
-  assert(!path.empty());
+  PRECONDITION(!path.empty());
 
   if(path=="-")
     return output_report(goto_functions, std::cout);

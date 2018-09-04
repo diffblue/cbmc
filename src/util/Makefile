@@ -13,6 +13,7 @@ SRC = arith_tools.cpp \
       expr.cpp \
       expr_initializer.cpp \
       expr_util.cpp \
+      exception_utils.cpp \
       file_util.cpp \
       find_macros.cpp \
       find_symbols.cpp \

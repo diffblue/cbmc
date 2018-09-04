@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <chrono>
 #include <iostream>
 
+#include <util/exception_utils.h>
 #include <util/exit_codes.h>
 
 #include <langapi/language_util.h>
@@ -214,9 +215,8 @@ void bmct::get_memory_model()
     memory_model=util_make_unique<memory_model_psot>(ns);
   else
   {
-    error() << "Invalid memory model " << mm
-            << " -- use one of sc, tso, pso" << eom;
-    throw "invalid memory model";
+    throw invalid_user_input_exceptiont(
+      "invalid parameter " + mm, "--mm", "try values of sc, tso, pso");
   }
 }
 
