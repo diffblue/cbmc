@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include "invariant.h"
 #include "string2int.h"
 #include "string_hash.h"
 #include "irep_hash.h"
