@@ -5,4 +5,7 @@ public class ClassWithFinalMethod {
   public int nonFinalFunc() {
     return 0;
   }
+  public int opaqueFunc() {
+    return OpaqueClass.staticFunc();
+  }
 }
