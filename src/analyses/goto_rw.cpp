@@ -145,7 +145,8 @@ void rw_range_sett::get_objects_byte_extract(
   else
   {
     index*=8;
-    if(index>=pointer_offset_bits(be.op().type(), ns))
+    if(index<0 ||
+       index>=pointer_offset_bits(be.op().type(), ns))
       return;
 
     endianness_mapt map(
