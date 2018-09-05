@@ -36,7 +36,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "(max-nondet-tree-depth):" \
   "(java-max-vla-length):" \
   "(java-cp-include-files):" \
-  "(lazy-methods)" /* will go away */ \
   "(no-lazy-methods)" \
   "(lazy-methods-extra-entry-point):" \
   "(java-load-class):" \

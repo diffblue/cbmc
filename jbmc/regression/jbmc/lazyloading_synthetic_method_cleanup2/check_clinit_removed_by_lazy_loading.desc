@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 Test.class
---lazy-methods --show-goto-functions --function Test.main
+--show-goto-functions --function Test.main
 ^EXIT=0$
 ^SIGNAL=0$
 --
@@ -8,4 +8,4 @@ java::Unused1::clinit_wrapper
 java::Unused2::clinit_wrapper
 Unused2\.<clinit>\(\)
 --
-This doesn't work under symex-driven lazy loading because it is incompatible with --lazy-methods
+This doesn't work under symex-driven lazy loading because it is incompatible with lazy-methods (default)

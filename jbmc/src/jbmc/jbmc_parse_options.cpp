@@ -355,7 +355,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     for(const char *opt :
       { "nondet-static",
         "full-slice",
-        "lazy-methods",
         "reachability-slice",
         "reachability-slice-fb" })
     {

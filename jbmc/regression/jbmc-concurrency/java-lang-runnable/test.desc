@@ -1,6 +1,6 @@
 CORE
 A.class
---function 'A.me:()V' --lazy-methods --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar` --java-threading
+--function 'A.me:()V' --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar` --java-threading
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL

@@ -1,9 +1,9 @@
 CORE symex-driven-lazy-loading-expected-failure
 test.class
---lazy-methods --verbosity 10 --function test.test
+--verbosity 10 --function test.test
 ^EXIT=0$
 ^SIGNAL=0$
 elaborate java::Base\.f:\(\)V
 --
 --
-This doesn't work under symex-driven lazy loading because it is incompatible with --lazy-methods
+This doesn't work under symex-driven lazy loading because it is incompatible with lazy-methods (default)
