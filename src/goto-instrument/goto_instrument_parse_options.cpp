@@ -100,6 +100,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "undefined_functions.h"
 #include "uninitialized.h"
 #include "unwind.h"
+#include "value_set_fi_fp_removal.h"
 #include "wmm/weak_memory.h"
 
 /// invoke main modules
@@ -244,6 +245,23 @@ int goto_instrument_parse_optionst::doit()
         ui_message_handler.get_ui(),
         false);
       #endif
+      if(cmdline.args.size()==2)
+      {
+        status() << "Writing GOTO program to `" << cmdline.args[1] << "'" << eom;
+
+        if(write_goto_binary(
+          cmdline.args[1], goto_model, get_message_handler()))
+          return CPROVER_EXIT_CONVERSION_FAILED;
+        else
+          return CPROVER_EXIT_SUCCESS;
+      }
+      else
+        return CPROVER_EXIT_SUCCESS;
+    }
+
+    if(cmdline.isset("value-set-fi-fp-removal"))
+    {
+      value_set_fi_fp_removal(goto_model);
       if(cmdline.args.size()==2)
       {
         status() << "Writing GOTO program to `" << cmdline.args[1] << "'" << eom;
