@@ -10,6 +10,7 @@
 /// Unit tests for ait
 
 #include <testing-utils/catch.hpp>
+#include <testing-utils/message.h>
 
 #include <analyses/ai.h>
 
@@ -239,8 +240,7 @@ SCENARIO(
 
   goto_model.symbol_table.add(start);
 
-  null_message_handlert nullout;
-  goto_convert(goto_model, nullout);
+  goto_convert(goto_model, null_message_handler);
 
   WHEN("The target program is analysed")
   {

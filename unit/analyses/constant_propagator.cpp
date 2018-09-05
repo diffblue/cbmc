@@ -7,14 +7,13 @@ Author: Diffblue Ltd
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
+#include <testing-utils/message.h>
 
 #include <analyses/constant_propagator.h>
 
 #include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/goto_convert_functions.h>
-
-#include <util/message.h>
 
 static bool starts_with_x(const exprt &e, const namespacet &)
 {
@@ -27,8 +26,6 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
 {
   GIVEN("A simple GOTO program")
   {
-    null_message_handlert null_out;
-
     goto_modelt goto_model;
     namespacet ns(goto_model.symbol_table);
 
@@ -65,7 +62,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
     goto_model.symbol_table.add(local_y);
     goto_model.symbol_table.add(main_function_symbol);
 
-    goto_convert(goto_model, null_out);
+    goto_convert(goto_model, null_message_handler);
 
     const goto_functiont &main_function = goto_model.get_goto_function("main");
 
