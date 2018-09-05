@@ -33,7 +33,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "(java-assume-inputs-non-null)" \
   "(throw-runtime-exceptions)" \
   "(max-nondet-array-length):" \
-  "(java-max-input-tree-depth):" /* will go away */ \
   "(max-nondet-tree-depth):" \
   "(java-max-vla-length):" \
   "(java-cp-include-files):" \

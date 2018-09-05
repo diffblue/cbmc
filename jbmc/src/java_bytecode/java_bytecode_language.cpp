@@ -57,11 +57,6 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
       safe_string2size_t(cmd.get_value("max-nondet-array-length"));
   }
 
-  if(cmd.isset("java-max-input-tree-depth")) // will go away
-  {
-    object_factory_parameters.max_nondet_tree_depth =
-      safe_string2size_t(cmd.get_value("java-max-input-tree-depth"));
-  }
   if(cmd.isset("max-nondet-tree-depth"))
   {
     object_factory_parameters.max_nondet_tree_depth =

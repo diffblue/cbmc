@@ -493,8 +493,8 @@ int jbmc_parse_optionst::doit()
       ? std::stoul(cmdline.get_value("max-nondet-string-length"))
       : MAX_NONDET_STRING_LENGTH;
   object_factory_params.max_nondet_tree_depth =
-    cmdline.isset("java-max-input-tree-depth")
-      ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
+    cmdline.isset("max-nondet-tree-depth")
+      ? std::stoul(cmdline.get_value("max-nondet-tree-depth"))
       : MAX_NONDET_TREE_DEPTH;
 
   stub_objects_are_not_null = cmdline.isset("java-assume-inputs-non-null");
