@@ -31,7 +31,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "(disable-uncaught-exception-check)" \
   "(throw-assertion-error)" \
   "(java-assume-inputs-non-null)" \
-  "(java-throw-runtime-exceptions)" /* will go away */ \
   "(throw-runtime-exceptions)" \
   "(java-max-input-array-length):" /* will go away */ \
   "(max-nondet-array-length):" \
