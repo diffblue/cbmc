@@ -137,13 +137,8 @@ bool simplify_exprt::simplify_sign(exprt &expr)
 }
 #endif
 
-bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
+simplify_exprt::simplify_resultt simplify_exprt::simplify_floatbv_typecast(floatbv_typecast_exprt &expr)
 {
-  // These casts usually reduce precision, and thus, usually round.
-
-  PRECONDITION(expr.id() == ID_floatbv_typecast);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "float typecast has two operands");
 
   const typet &dest_type=ns.follow(expr.type());
   const typet &src_type=ns.follow(expr.op0().type());
@@ -151,12 +146,11 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
   // eliminate redundant casts
   if(dest_type==src_type)
   {
-    expr=expr.op0();
-    return false;
+    return {expr.op0(), was_changedtt::Changed};
   }
 
-  exprt op0=expr.op0();
-  exprt op1=expr.op1(); // rounding mode
+  exprt casted_expr=expr.op0();
+  exprt rounding_mode_expr=expr.op1(); // rounding mode
 
   // We can soundly re-write (float)((double)x op (double)y)
   // to x op y. True for any rounding mode!
@@ -189,34 +183,32 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
   #endif
 
   // constant folding
-  if(op0.is_constant() && op1.is_constant())
+  if(casted_expr.is_constant() && rounding_mode_expr.is_constant())
   {
     mp_integer rounding_mode;
-    if(!to_integer(op1, rounding_mode))
+    if(!to_integer(rounding_mode_expr, rounding_mode))
     {
       if(src_type.id()==ID_floatbv)
       {
         if(dest_type.id()==ID_floatbv) // float to float
         {
-          ieee_floatt result(to_constant_expr(op0));
+          ieee_floatt result(to_constant_expr(casted_expr));
           result.rounding_mode=
             (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
           result.change_spec(
             ieee_float_spect(to_floatbv_type(dest_type)));
-          expr=result.to_expr();
-          return false;
+          return {result.to_expr(), was_changedtt::Changed};
         }
         else if(dest_type.id()==ID_signedbv ||
                 dest_type.id()==ID_unsignedbv)
         {
           if(rounding_mode==ieee_floatt::ROUND_TO_ZERO)
           {
-            ieee_floatt result(to_constant_expr(op0));
+            ieee_floatt result(to_constant_expr(casted_expr));
             result.rounding_mode=
               (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
             mp_integer value=result.to_integer();
-            expr=from_integer(value, dest_type);
-            return false;
+            return {from_integer(value, dest_type), was_changedtt::Changed};
           }
         }
       }
@@ -224,7 +216,7 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
               src_type.id()==ID_unsignedbv)
       {
         mp_integer value;
-        if(!to_integer(op0, value))
+        if(!to_integer(casted_expr, value))
         {
           if(dest_type.id()==ID_floatbv) // int to float
           {
@@ -232,8 +224,7 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
             result.rounding_mode=
               (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
             result.from_integer(value);
-            expr=result.to_expr();
-            return false;
+            return {result.to_expr(), was_changedtt::Changed};
           }
         }
       }
@@ -263,7 +254,7 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
   }
   #endif
 
-  return true;
+  return {expr, was_changedtt::Unchanged};
 }
 
 bool simplify_exprt::simplify_floatbv_op(exprt &expr)
