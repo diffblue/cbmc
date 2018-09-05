@@ -61,13 +61,8 @@ ui_message_handlert::ui_message_handlert(
 
   case uit::JSON_UI:
     {
-      if(!json_stream)
-      {
-        json_stream =
-          std::unique_ptr<json_stream_arrayt>(new json_stream_arrayt(out));
-      }
-
-      INVARIANT(json_stream, "JSON stream must be initialized before use");
+      json_stream =
+        std::unique_ptr<json_stream_arrayt>(new json_stream_arrayt(out));
       json_stream->push_back().make_object()["program"] = json_stringt(program);
     }
     break;

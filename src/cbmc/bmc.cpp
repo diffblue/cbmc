@@ -72,8 +72,10 @@ void bmct::error_trace()
 
   case ui_message_handlert::uit::JSON_UI:
     {
+      if(status().tellp() > 0)
+        status() << eom; // force end of previous message
       json_stream_objectt &json_result =
-        status().json_stream().push_back_stream_object();
+        ui_message_handler.get_json_stream().push_back_stream_object();
       const goto_trace_stept &step=goto_trace.steps.back();
       json_result["property"] =
         json_stringt(step.pc->source_location.get_property_id());
