@@ -2197,6 +2197,7 @@ void java_bytecode_convert_methodt::convert_invoke(
   // - The translated method could be an inherited protected method, hence
   //   accessible from the original caller, but not from the generated test.
   //   Therefore we must assume that the method is not accessible.
+  // We set opaque methods as final to avoid assuming they can be overridden.
   irep_idt id = arg0.get(ID_identifier);
   if(
     symbol_table.symbols.find(id) == symbol_table.symbols.end() &&
@@ -2210,6 +2211,7 @@ void java_bytecode_convert_methodt::convert_invoke(
                          id2string(symbol.base_name) + "()";
     symbol.type = arg0.type();
     symbol.type.set(ID_access, ID_private);
+    to_java_method_type(symbol.type).set_is_final(true);
     symbol.value.make_nil();
     symbol.mode = ID_java;
     assign_parameter_names(

@@ -89,5 +89,16 @@ SCENARIO(
         REQUIRE(!function_type.get_is_final());
       }
     }
+    WHEN("When parsing an opaque method")
+    {
+      const symbolt function_symbol =
+        symbol_table.lookup_ref("java::OpaqueClass.staticFunc:()I");
+      const java_method_typet &function_type =
+        require_type::require_java_method(function_symbol.type);
+      THEN("The method should be marked as final")
+      {
+        REQUIRE(function_type.get_is_final());
+      }
+    }
   }
 }
