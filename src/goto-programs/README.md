@@ -329,3 +329,183 @@ This stage concludes the *analysis-independent* program transformations.
 \subsubsection goto-program-example-1-section Unsigned mult (unsigned a, unsigned b) { int acc, i; for (i = 0; i < b; i++) acc += a; return acc; }
 
 To be documented.
+
+
+\section section-goto-binary Binary Representation
+
+An instance of `::goto_modelt` can be serialised to a binary stream (which is
+typically a file on the disk), and later deserialised from that stream back to
+an equivalent `::goto_modelt` instance.
+
+\subsection subsection-goto-binary-serialisation Serialisation
+
+The serialisation is implemented in C++ modules:
+  - `write_goto_binary.h`
+  - `write_goto_binary.cpp`
+
+To serialise a `::goto_modelt` instance `gm` to a stream `ostr` call the
+function `::write_goto_binary`, e.g. `write_goto_binary(ostr, gm)`.
+
+The content of the written stream will have this structure:
+  - The header:
+    - A magic number: byte `0x7f` followed by 3 characters `GBF`.
+    - A version number written in the 7-bit encoding (see [number serialisation](\ref irep-serialization-numbers)). Currently, only version `4` is supported.
+  - The symbol table:
+    - The number of symbols in the table in the 7-bit encoding.
+    - The array of individual symbols in the table. Each written symbol `s` has this structure:
+      - The `::irept` instance `s.type`.
+      - The `::irept` instance `s.value`.
+      - The `::irept` instance `s.location`.
+      - The string `s.name`.
+      - The string `s.module`.
+      - The string `s.base_name`.
+      - The string `s.mode`.
+      - The string `s.pretty_name`.
+      - The number `0` in the 7-bit encoding.
+      - The flags word in the 7-bit encoding. The bits in the flags word correspond to the following `Boolean` fields (from the most significant bit):
+        - `s.is_weak`
+        - `s.is_type`
+        - `s.is_property`
+        - `s.is_macro`
+        - `s.is_exported`
+        - `s.is_input`
+        - `s.is_output`
+        - `s.is_state_var`
+        - `s.is_parameter`
+        - `s.is_auxiliary`
+        - `0` (corresponding to `s.binding`, i.e. we always clear this info)
+        - `s.is_lvalue`
+        - `s.is_static_lifetime`
+        - `s.is_thread_local`
+        - `s.is_file_local`
+        - `s.is_extern`
+        - `s.is_volatile`
+  - The functions with bodies, i.e. those missing a body are skipped.
+    - The number of functions with bodies in the 7-bit encoding.
+    - The array of individual functions with bodies. Each written function has this structure:
+      - The string with the name of the function.
+      - The number of instructions in the body of the function in the 7-bit encoding.
+      - The array of individual instructions in function's body. Each written instruction `I` has this structure:
+        - The `::irept` instance `I.code`, i.e. data of the instruction, like arguments.
+        - The string `I.function`, i.e. the name of the function this instruction belongs to.
+        - The `::irept` instance `I.source_location`, i.e. the reference to the original source code (file, line).
+        - The word in the 7-bit encoding `I.type`, i.e. the op-code of the instruction.
+        - The `::irept` instance `I.guard`.
+        - The empty string (representing former `I.event`).
+        - The word in the 7-bit encoding `I.target_number`, i.e. the jump target to this instruction from other instructions.
+        - The word in the 7-bit encoding `I.targets.size()`, i.e. the count of jump targets from this instruction.
+        - The array of individual jump targets from this instruction, each written as a word in the 7-bit encoding.
+        - The word in the 7-bit encoding `I.labels.size()`.
+        - The array of individual labels, each written as a word in the 7-bit encoding.
+
+An important propery of the serialisation is that each serialised `::irept`
+instance occurs in the stream exactly once. Namely, in the position of
+its first serialisation query. All other such queries save only a hash
+code (i.e. reference) of the `::irept` instance.
+
+A similar strategy is used for serialisation of string constants
+shared amongst `::irept` instances. Such a string is fully saved only in
+the first serialisation query of an `::irept` instance it appears in and
+all other queries only save its integer hash code.
+
+Details about serialisation of `::irept` instances, strings, and words in
+7-bit encoding can be found [here](\ref irep-serialization).
+
+\subsection subsection-goto-binary-deserialisation Deserialisation
+
+The deserialisation is implemented in C++ modules:
+  - `read_goto_binary.h`
+  - `read_goto_binary.cpp`
+  - `read_bin_goto_object.h`
+  - `read_bin_goto_object.cpp`
+
+The first two modules are responsible for location of the stream with the
+serialised data within a passed file. And the remaining two modules
+perform the actual deserialisation of a `::goto_modelt` instance from
+the located stream.
+
+To deserialise a `::goto_modelt` instance `gm` from a file
+`/some/path/name.gbf` call the function `::read_goto_binary`, e.g.
+`read_goto_binary("/some/path/name.gbf", gm, message_handler)`, where
+`message_handler` must be an instance of `::message_handlert` and serves
+for reporting issues during the process.
+
+The passed binary file is assumed to have the same structure as described in
+the [previous subsection](\ref subsection-goto-binary-serialisation).
+The process of the deserialisation does not involve any seeking in the file.
+The content is read linearly from the beginning to the end. `::irept` instances
+and their string constants are deserialised into the memory only once at their
+first occurrences in the stream. All subsequent deserialisation queries are
+resolved as in-memory references to already deserialised the `::irept`
+instances and/or strings, based on hash code matching.
+
+NOTE: The first deserialisation is detected so that the loaded hash code
+is new. That implies that the full definition follows right after the hash.
+
+Details about serialisation of `::irept` instances, strings, and words in
+7-bit encoding can be found [here](\ref irep-serialization).
+
+\subsubsection subsection-goto-binary-deserialisation-from-elf Deserialisation from ELF image
+
+One can decide to store the serialised stream as a separate section, named
+`goto-cc`, into an ELF image. Then the deserialisation has a support of
+automatic detection of that section in an ELF file and the deserialisation
+will be automatically started from that section.
+
+For reading the ELF images there is used an instance of `::elf_readert`
+implemented in the C++ module:
+  - `elf_reader.h`
+  - `elf_reader.cpp`
+
+\subsubsection subsection-goto-binary-deserialisation-from-mach-o-fat-image Deserialisation from Mach-O fat image
+
+One can decide to store the serialised stream into Mach-O fat image as a
+separate non-empty section with flags `CPU_TYPE_HPPA` and
+`CPU_SUBTYPE_HPPA_7100LC`. Then the deserialisation has a support of
+automatic detection of that section in a Mach-O fat image, extraction
+of the section from the emage into a temporary file (this is done by
+calling `lipo` utility with `-thin hppa7100LC` option), and the
+deserialisation will be automatically started from that temporary
+file.
+
+For reading the Mach-O fat images there is used an instance of
+`::osx_fat_readert` implemented in the C++ module:
+  - `osx_fat_reader.h`
+  - `osx_fat_reader.cpp`
+
+NOTE: This functionality is available only when the modules are built
+on a MacOS machine.
+
+\subsubsection subsection-goto-binary-is-binary-file Checking file type
+
+You can use function `::is_goto_binary` to check whether a passed file contains
+a deserialised `::goto_modelt` instance or not. This is done by checking the
+magic number of the stream (see subsection
+[Serialisation](\ref subsection-goto-binary-serialisation)). However, in the
+case when the deserialised data were stored into ELF or Mach-O fat image, then
+only the check for presence of the concrete section in the image is performed.
+
+\subsubsection subsection-goto-binary-deserialisation-linking Linking Goto Models
+
+Similar to linking of object files together by C/C++ linker, the module
+provides linking of a dereserialised `::goto_modelt` instance into a given
+(i.e. previously deserialised or otherwise created) `::goto_modelt` instance.
+
+This is implemented in function `::read_object_and_link`. The function first
+deserialises the passed file into a temporary `::goto_modelt` instance, and
+then it performs 'linking' of the temporary into a passed destination
+`::goto_modelt` instance.
+
+Details about linking of `::goto_modelt` instances can be found
+[here](\ref section-linking-goto-models).
+
+
+\section section-linking-goto-models Linking Goto Models
+
+C++ modules:
+  - `link_goto_model.h`
+  - `link_goto_model.cpp`
+
+Dependencies:
+  - [linking folder](\ref linking).
+  - [typecheck](\ref section-goto-typecheck).
