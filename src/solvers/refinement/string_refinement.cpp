@@ -924,7 +924,7 @@ static optionalt<exprt> get_array(
   {
     stream << "(sr::get_array) long string (size " << format(arr.length())
            << " = " << n << ") " << format(arr) << eom;
-    stream << "(sr::get_array) consider reducing string-max-input-length so "
+    stream << "(sr::get_array) consider reducing max-nondet-string-length so "
               "that no string exceeds "
            << MAX_CONCRETE_STRING_SIZE
            << " in length and "
