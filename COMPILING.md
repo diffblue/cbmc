@@ -77,16 +77,15 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
 # COMPILATION ON SOLARIS 11
 
+We assume Solaris 11.4 or newer.  To build JBMC, you'll need to install
+Maven 3 manually.
+
 1. As root, get the necessary development tools:
    ```
-   pkg install system/header
-   pkgadd -d http://get.opencsw.org/now
-   /opt/csw/bin/pkgutil -U
-   /opt/csw/bin/pkgutil -i gcc5g++ bison flex git
+   pkg install gcc-c++-7 bison flex
    ```
 2. As a user, get the CBMC source via
    ```
-   export PATH=/opt/csw/bin:$PATH
    git clone https://github.com/diffblue/cbmc cbmc-git
    cd cbmc-git
    ```
