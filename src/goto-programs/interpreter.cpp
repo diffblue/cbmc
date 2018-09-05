@@ -677,15 +677,7 @@ void interpretert::execute_assign()
       goto_trace_stept &trace_step=steps.get_last_step();
       assign(address, rhs);
       trace_step.full_lhs=code_assign.lhs();
-
-      // TODO: need to look at other cases on ssa_exprt
-      // (dereference should be handled on ssa)
-      if(ssa_exprt::can_build_identifier(trace_step.full_lhs))
-      {
-        trace_step.lhs_object=ssa_exprt(trace_step.full_lhs);
-      }
       trace_step.full_lhs_value=get_value(trace_step.full_lhs.type(), rhs);
-      trace_step.lhs_object_value=trace_step.full_lhs_value;
     }
   }
   else if(code_assign.rhs().id()==ID_side_effect)

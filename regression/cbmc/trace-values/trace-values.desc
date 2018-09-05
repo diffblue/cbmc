@@ -1,0 +1,18 @@
+CORE
+trace-values.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+^  local_var=0 .*$
+^  global_var=1 .*$
+^  static_var=2 .*$
+^  local_var=3 .*$
+^  my_nested\[0.*\].array\[1.*\]=4 .*$
+^  my_nested\[1.*\].f=5 .*$
+^  null\$object=6 .*$
+^  junk\$object=7 .*$
+^  dynamic_object1\[1.*\]=8 .*$
+^  my_nested\[1.*\]={ .f=0, .array={ 0, 4, 0 } } .*$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

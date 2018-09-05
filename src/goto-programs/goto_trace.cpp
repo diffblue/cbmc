@@ -24,6 +24,25 @@ Author: Daniel Kroening
 
 #include "printf_formatter.h"
 
+static optionalt<symbol_exprt> get_object_rec(const exprt &src)
+{
+  if(src.id()==ID_symbol)
+    return to_symbol_expr(src);
+  else if(src.id()==ID_member)
+    return get_object_rec(to_member_expr(src).struct_op());
+  else if(src.id()==ID_index)
+    return get_object_rec(to_index_expr(src).array());
+  else if(src.id()==ID_typecast)
+    return get_object_rec(to_typecast_expr(src).op());
+  else
+    return {}; // give up
+}
+
+optionalt<symbol_exprt> goto_trace_stept::get_lhs_object() const
+{
+  return get_object_rec(full_lhs);
+}
+
 void goto_tracet::output(
   const class namespacet &ns,
   std::ostream &out) const
@@ -217,15 +236,15 @@ std::string trace_numeric_value(
 void trace_value(
   std::ostream &out,
   const namespacet &ns,
-  const ssa_exprt &lhs_object,
+  const optionalt<symbol_exprt> &lhs_object,
   const exprt &full_lhs,
   const exprt &value,
   const trace_optionst &options)
 {
   irep_idt identifier;
 
-  if(lhs_object.is_not_nil())
-    identifier=lhs_object.get_object_name();
+  if(lhs_object.has_value())
+    identifier=lhs_object->get_identifier();
 
   std::string value_string;
 
@@ -346,7 +365,7 @@ void show_full_goto_trace(
       if(step.pc->is_assign() ||
          step.pc->is_return() || // returns have a lhs!
          step.pc->is_function_call() ||
-         (step.pc->is_other() && step.lhs_object.is_not_nil()))
+         (step.pc->is_other() && step.full_lhs.is_not_nil()))
       {
         if(prev_step_nr!=step.step_nr || first_step)
         {
@@ -356,23 +375,13 @@ void show_full_goto_trace(
             out, ns, step, step.pc->source_location, step.step_nr, options);
         }
 
-        // see if the full lhs is something clean
-        if(is_index_member_symbol(step.full_lhs))
-          trace_value(
-            out,
-            ns,
-            step.lhs_object,
-            step.full_lhs,
-            step.full_lhs_value,
-            options);
-        else
-          trace_value(
-            out,
-            ns,
-            step.lhs_object,
-            step.lhs_object,
-            step.lhs_object_value,
-            options);
+       trace_value(
+         out,
+         ns,
+         step.get_lhs_object(),
+         step.full_lhs,
+         step.full_lhs_value,
+         options);
       }
       break;
 
@@ -386,7 +395,7 @@ void show_full_goto_trace(
       }
 
       trace_value(
-        out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value, options);
+        out, ns, step.get_lhs_object(), step.full_lhs, step.full_lhs_value, options);
       break;
 
     case goto_trace_stept::typet::OUTPUT:

@@ -71,17 +71,33 @@ void convert(
     case goto_trace_stept::typet::ASSIGNMENT:
     case goto_trace_stept::typet::DECL:
       {
-        irep_idt identifier=step.lhs_object.get_identifier();
+        auto lhs_object=step.get_lhs_object();
+        irep_idt identifier=
+          lhs_object.has_value()?lhs_object->get_identifier():irep_idt();
         xmlt &xml_assignment=dest.new_element("assignment");
 
         if(xml_location.name!="")
           xml_assignment.new_element().swap(xml_location);
 
-        std::string value_string, type_string,
-                    full_lhs_string, full_lhs_value_string;
+        {
+          auto lhs_object=step.get_lhs_object();
 
-        if(step.lhs_object_value.is_not_nil())
-          value_string=from_expr(ns, identifier, step.lhs_object_value);
+          const symbolt *symbol;
+
+          if(lhs_object.has_value() &&
+             !ns.lookup(lhs_object->get_identifier(), symbol))
+          {
+            std::string type_string=from_type(ns, symbol->name, symbol->type);
+
+            xml_assignment.set_attribute("mode", id2string(symbol->mode));
+            xml_assignment.set_attribute("identifier", id2string(symbol->name));
+            xml_assignment.set_attribute("base_name", id2string(symbol->base_name));
+            xml_assignment.set_attribute("display_name", id2string(symbol->display_name()));
+            xml_assignment.new_element("type").data=type_string;
+          }
+        }
+
+        std::string full_lhs_string, full_lhs_value_string;
 
         if(step.full_lhs.is_not_nil())
           full_lhs_string=from_expr(ns, identifier, step.full_lhs);
@@ -90,43 +106,17 @@ void convert(
           full_lhs_value_string=
             from_expr(ns, identifier, step.full_lhs_value);
 
-        if(step.lhs_object_value.type().is_not_nil())
-          type_string=
-            from_type(ns, identifier, step.lhs_object_value.type());
-
-        const symbolt *symbol;
-        irep_idt base_name, display_name;
-
-        if(!ns.lookup(identifier, symbol))
-        {
-          base_name=symbol->base_name;
-          display_name=symbol->display_name();
-          if(type_string=="")
-            type_string=from_type(ns, identifier, symbol->type);
-
-          xml_assignment.set_attribute("mode", id2string(symbol->mode));
-        }
-
-        xml_assignment.new_element("type").data=type_string;
         xml_assignment.new_element("full_lhs").data=full_lhs_string;
         xml_assignment.new_element("full_lhs_value").data=full_lhs_value_string;
-        xml_assignment.new_element("value").data=value_string;
 
         xml_assignment.set_attribute_bool("hidden", step.hidden);
         xml_assignment.set_attribute("thread", std::to_string(step.thread_nr));
-        xml_assignment.set_attribute("identifier", id2string(identifier));
-        xml_assignment.set_attribute("base_name", id2string(base_name));
-        xml_assignment.set_attribute("display_name", id2string(display_name));
         xml_assignment.set_attribute("step_nr", std::to_string(step.step_nr));
 
         xml_assignment.set_attribute("assignment_type",
           step.assignment_type==
             goto_trace_stept::assignment_typet::ACTUAL_PARAMETER?
           "actual_parameter":"state");
-
-        if(step.lhs_object_value.is_not_nil())
-          xml_assignment.new_element("value_expression").
-            new_element(xml(step.lhs_object_value, ns));
       }
       break;
 
