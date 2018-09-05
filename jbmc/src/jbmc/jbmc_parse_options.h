@@ -52,7 +52,6 @@ class optionst;
   "(no-sat-preprocessor)" \
   "(beautify)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
-  "(refine-strings)" /* will go away */ \
   "(no-refine-strings)" \
   "(string-printable)" \
   "(string-max-input-length):" /* will go away */ \

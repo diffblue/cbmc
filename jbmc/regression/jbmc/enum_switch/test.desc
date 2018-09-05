@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 com/diffblue/regression/Foo.class
---trace --depth 1024 --java-max-vla-length 16 --refine-strings --max-nondet-string-length 20 --string-printable --unwind 10 --function "com.diffblue.regression.Foo.foo" --java-unwind-enum-static
+--trace --depth 1024 --java-max-vla-length 16 --max-nondet-string-length 20 --string-printable --unwind 10 --function "com.diffblue.regression.Foo.foo" --java-unwind-enum-static
 assertion at file com/diffblue/regression/Foo.java line 8 .*: FAILURE
 assertion at file com/diffblue/regression/Foo.java line 11 .*: FAILURE
 assertion at file com/diffblue/regression/Foo.java line 14 .*: FAILURE
