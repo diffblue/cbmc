@@ -485,8 +485,8 @@ int jbmc_parse_optionst::doit()
   }
 
   object_factory_params.max_nondet_array_length =
-    cmdline.isset("java-max-input-array-length")
-      ? std::stoul(cmdline.get_value("java-max-input-array-length"))
+    cmdline.isset("max-nondet-array-length")
+      ? std::stoul(cmdline.get_value("max-nondet-array-length"))
       : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
   object_factory_params.max_nondet_string_length =
     cmdline.isset("max-nondet-string-length")

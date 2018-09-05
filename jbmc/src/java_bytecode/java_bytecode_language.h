@@ -32,7 +32,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "(throw-assertion-error)" \
   "(java-assume-inputs-non-null)" \
   "(throw-runtime-exceptions)" \
-  "(java-max-input-array-length):" /* will go away */ \
   "(max-nondet-array-length):" \
   "(java-max-input-tree-depth):" /* will go away */ \
   "(max-nondet-tree-depth):" \

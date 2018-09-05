@@ -51,11 +51,6 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   throw_assertion_error = cmd.isset("throw-assertion-error");
   threading_support = cmd.isset("java-threading");
 
-  if(cmd.isset("java-max-input-array-length")) // will go away
-  {
-    object_factory_parameters.max_nondet_array_length =
-      safe_string2size_t(cmd.get_value("java-max-input-array-length"));
-  }
   if(cmd.isset("max-nondet-array-length"))
   {
     object_factory_parameters.max_nondet_array_length =
