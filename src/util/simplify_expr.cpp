@@ -1365,17 +1365,12 @@ bool simplify_exprt::simplify_update(exprt &expr)
     {
       const irep_idt &component_name=
         e.get(ID_component_name);
-
-      if(!to_struct_type(value_ptr_type).
-         has_component(component_name))
+      const struct_typet &value_ptr_struct_type=to_struct_type(value_ptr_type);
+      if(!value_ptr_struct_type.has_component(component_name))
         return true;
-
-      std::size_t number=to_struct_type(value_ptr_type).
-        component_number(component_name);
-
-      CHECK_RETURN(number < value_ptr->operands().size());
-
-      value_ptr=&value_ptr->operands()[number];
+      auto &designator_as_struct_expr = to_struct_expr(*value_ptr);
+      value_ptr = &designator_as_struct_expr.component(component_name, ns);
+      CHECK_RETURN(value_ptr->id() != ID_nil);
     }
     else
       return true; // give up, unknown designator
@@ -1407,18 +1402,13 @@ bool simplify_exprt::simplify_object(exprt &expr)
   }
   else if(expr.id()==ID_typecast)
   {
-    const typet &op_type=ns.follow(expr.op0().type());
-
-    DATA_INVARIANT(
-      expr.operands().size() == 1,
-      "typecasts must have exactly one argument");
+    auto const& typecast_expr = to_typecast_expr(expr);
+    const typet &op_type=ns.follow(typecast_expr.op().type());
 
     if(op_type.id()==ID_pointer)
     {
       // cast from pointer to pointer
-      exprt tmp;
-      tmp.swap(expr.op0());
-      expr.swap(tmp);
+      expr = typecast_expr.op();
       simplify_object(expr);
       return false;
     }
@@ -1429,10 +1419,10 @@ bool simplify_exprt::simplify_object(exprt &expr)
       // We do a bit of special treatment for (TYPE *)(a+(int)&o) and
       // (TYPE *)(a+(int)((T*)&o+x)), which are re-written to '&o'.
 
-      exprt tmp=expr.op0();
-      if(tmp.id()==ID_plus && tmp.operands().size()==2)
+      exprt casted_expr=typecast_expr.op();
+      if(casted_expr.id()==ID_plus && casted_expr.operands().size()==2)
       {
-        exprt cand=tmp.op0().id()==ID_typecast?tmp.op0():tmp.op1();
+        exprt cand=casted_expr.op0().id()==ID_typecast?casted_expr.op0():casted_expr.op1();
 
         if(cand.id()==ID_typecast &&
            cand.operands().size()==1 &&
