@@ -92,21 +92,32 @@ int main(int argc, char** argv)
   else if(arg=="irep")
     INVARIANT_WITH_IREP(false, "error with irep", pointer_type(void_typet()));
   else if(arg == "invariant-diagnostics")
-    INVARIANT(
+    INVARIANT_WITH_DIAGNOSTICS(
       false,
       "invariant with diagnostics failure",
       "invariant diagnostics information");
   else if(arg == "precondition-diagnostics")
-    PRECONDITION(false, "precondition diagnostics information");
+    PRECONDITION_WITH_DIAGNOSTICS(
+      false, "precondition diagnostics information");
   else if(arg == "postcondition-diagnostics")
-    POSTCONDITION(false, "postcondition diagnostics information");
+    POSTCONDITION_WITH_DIAGNOSTICS(
+      false, "postcondition diagnostics information");
   else if(arg == "check-return-diagnostics")
-    CHECK_RETURN(false, "check return diagnostics information");
+    CHECK_RETURN_WITH_DIAGNOSTICS(
+      false, "check return diagnostics information");
   else if(arg == "data-invariant-diagnostics")
-    DATA_INVARIANT(
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
       false,
       "data invariant with diagnostics failure",
       "data invariant diagnostics information");
+  else if(arg == "invariant-with-lots-of-diagnostics")
+    INVARIANT_WITH_DIAGNOSTICS(
+      false,
+      "an invariant that fails",
+      "diagnostic 1",
+      "diagnostic 2",
+      "diagnostic 3",
+      "diagnostic 4");
   else
     return 1;
 }
