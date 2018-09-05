@@ -1087,7 +1087,7 @@ void jbmc_parse_optionst::help()
     " --refine                     use refinement procedure (experimental)\n"
     " --no-refine-strings          turn off string refinement\n"
     " --string-printable           restrict to printable strings (experimental)\n" // NOLINT(*)
-    " --max-nondet-string-length   bound the length of nondet (e.g. input) strings\n" // NOLINT(*)
+    " --max-nondet-string-length n bound the length of nondet (e.g. input) strings\n" // NOLINT(*)
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)

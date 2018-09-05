@@ -50,8 +50,6 @@ class optionst;
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
   "(refine-strings)" \
   "(string-printable)" \
-  "(string-max-length):" \
-  "(string-max-input-length):" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   OPT_SHOW_GOTO_FUNCTIONS \
