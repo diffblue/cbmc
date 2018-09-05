@@ -122,7 +122,9 @@ public:
 
 void aliasest::do_assignment(const exprt &lhs, const exprt &rhs)
 {
-  if(nsptr->follow(lhs.type()).id()==ID_struct)
+  const typet &lhs_type_followed=nsptr->follow(lhs.type());
+
+  if(lhs_type_followed.id()==ID_struct)
   {
     auto flattened_lhs=flatten_structs(lhs, *nsptr);
     auto flattened_rhs=flatten_structs(rhs, *nsptr);
@@ -130,12 +132,15 @@ void aliasest::do_assignment(const exprt &lhs, const exprt &rhs)
     for(std::size_t i=0; i<flattened_lhs.size(); i++)
       if(i<flattened_rhs.size())
       {
-        optionalt<irep_idt> id;
-        merge_ids(flattened_lhs[i], id);
-        merge_ids(flattened_rhs[i], id);
+        if(flattened_lhs[i].type().id()==ID_pointer)
+        {
+          optionalt<irep_idt> id;
+          merge_ids(flattened_lhs[i], id);
+          merge_ids(flattened_rhs[i], id);
+        }
       }
   }
-  else
+  else if(lhs_type_followed.id()==ID_pointer)
   {
     optionalt<irep_idt> id;
     merge_ids(lhs, id);
@@ -193,8 +198,8 @@ void aliasest::merge_ids(
     {
       merge_happened=true;
       uuf.make_union(no1, no2);
-      std::cout << "MERGING " << dstringt::make_from_table_index(no1)
-                << " " << dstringt::make_from_table_index(no2) << '\n';
+      //std::cout << "MERGING " << dstringt::make_from_table_index(no1)
+      //          << " " << dstringt::make_from_table_index(no2) << '\n';
     }
   }
   else
