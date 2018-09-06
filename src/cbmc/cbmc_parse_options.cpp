@@ -959,8 +959,7 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
-    " --refine-strings             use string refinement (experimental)\n"
-    " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
+    HELP_STRING_REFINEMENT_CBMC
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)

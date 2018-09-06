@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_trace.h>
 
+#include <solvers/refinement/string_refinement.h>
+
 #include "bmc.h"
 #include "xml_interface.h"
 #include "cbmc_solvers.h"
@@ -48,8 +50,7 @@ class optionst;
   "(no-sat-preprocessor)" \
   "(beautify)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
-  "(refine-strings)" \
-  "(string-printable)" \
+  OPT_STRING_REFINEMENT_CBMC \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   OPT_SHOW_GOTO_FUNCTIONS \

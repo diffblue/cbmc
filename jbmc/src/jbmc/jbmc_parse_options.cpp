@@ -1084,9 +1084,7 @@ void jbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
-    " --no-refine-strings          turn off string refinement\n"
-    " --string-printable           restrict to printable strings (experimental)\n" // NOLINT(*)
-    " --max-nondet-string-length n bound the length of nondet (e.g. input) strings\n" // NOLINT(*)
+    HELP_STRING_REFINEMENT
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
