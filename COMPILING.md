@@ -34,8 +34,8 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    yum install gcc72-c++ flex bison perl-libwww-perl patch
    ```
 
-   To compile JBMC, you additionally need the JDK and the java-models-library.
-   For the JDK, on Debian-like distributions, do as root:
+   To compile JBMC, you additionally need the JDK and Maven 3.
+   On Debian-like distributions, do as root:
    ```
    apt-get install openjdk-8-jdk maven
    ```
@@ -108,7 +108,7 @@ Maven 3 manually.
    ```
    To compile JBMC, additionally install
    ```
-   pkg install openjdk8 wget
+   pkg install openjdk8 wget maven3
    ```
 2. As a user, get the CBMC source via
    ```
@@ -146,7 +146,8 @@ Follow these instructions:
    make -C src minisat2-download
    make -C src
    ```
-4. To compile JBMC, do
+4. To compile JBMC, you additionally need Maven 3, which has to be installed
+   manually. Then do
    ```
    make -C jbmc/src setup-submodules
    make -C jbmc/src
@@ -189,7 +190,8 @@ Follow these instructions:
    make -C src DOWNLOADER=wget minisat2-download
    make -C src
    ```
-5. To compile JBMC, open the Cygwin shell and type
+5. To compile JBMC, you additionally need the JDK and Maven 3, which have
+   to be installed manually. Then open the Cygwin shell and type
    ```
    make -C jbmc/src setup-submodules
    make -C jbmc/src
