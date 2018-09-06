@@ -145,9 +145,9 @@ public:
 
 #if defined(CPROVER_INVARIANT_CPROVER_ASSERT)
 // Used to allow CPROVER to check itself
-#define INVARIANT2(CONDITION, REASON)                                          \
+#define INVARIANT(CONDITION, REASON)                                          \
   __CPROVER_assert((CONDITION), "Invariant : " REASON)
-#define INVARIANT3(CONDITION, REASON, DIAGNOSTICS)                             \
+#define INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, ...)                             \
   __CPROVER_assert((CONDITION), "Invariant : " REASON)
 
 #define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) \
@@ -158,11 +158,11 @@ public:
 // This is *not* recommended as it can result in unpredictable behaviour
 // including silently reporting incorrect results.
 // This is also useful for checking side-effect freedom.
-#define INVARIANT2(CONDITION, REASON)                                          \
+#define INVARIANT(CONDITION, REASON)                                          \
   do                                                                           \
   {                                                                            \
   } while(false)
-#define INVARIANT3(CONDITION, REASON, DIAGNOSTICS)                             \
+#define INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, ...)                             \
   do                                                                           \
   {                                                                            \
   } while(false)
@@ -172,8 +172,8 @@ public:
 // Not recommended but provided for backwards compatability
 #include <cassert>
 // NOLINTNEXTLINE(*)
-#define INVARIANT2(CONDITION, REASON) assert((CONDITION) && ((REASON), true))
-#define INVARIANT3(CONDITION, REASON, DIAGNOSTICS)                             \
+#define INVARIANT(CONDITION, REASON) assert((CONDITION) && ((REASON), true))
+#define INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, ...)                             \
   assert((CONDITION) && ((REASON), true)) /* NOLINT */
 // NOLINTNEXTLINE(*)
 #define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) assert((CONDITION))
