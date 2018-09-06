@@ -84,6 +84,11 @@ public:
     return class_map.at(class_name).front();
   }
 
+  void clear_class_map()
+  {
+    class_map.clear();
+  }
+
 private:
   /// Either a regular expression matching files that will be allowed to be
   /// loaded or a string of the form `@PATH` where PATH is the file path of a
