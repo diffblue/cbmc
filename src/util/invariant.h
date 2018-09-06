@@ -142,11 +142,6 @@ public:
 #else
 #define CBMC_NORETURN
 #endif
-// The macros MACRO<n> (e.g., INVARIANT2) are for internal use in this file
-// only. The corresponding macros that take a variable number of arguments (see
-// further below) should be used instead, which in turn call those with a fixed
-// number of arguments. For example, if INVARIANT(...) is called with two
-// arguments, it calls INVARIANT2().
 
 #if defined(CPROVER_INVARIANT_CPROVER_ASSERT)
 // Used to allow CPROVER to check itself
@@ -321,17 +316,17 @@ inline void write_rest_diagnostics(std::ostream &)
 template <typename T, typename... Ts>
 void write_rest_diagnostics(std::ostream &out, T &&next, Ts &&... rest)
 {
-  out << ", " << diagnostic_as_string(std::forward<T>(next));
+  out << "\n" << diagnostic_as_string(std::forward<T>(next));
   write_rest_diagnostics(out, std::forward<Ts>(rest)...);
 }
 
-template <typename T, typename... Ts>
-std::string assemble_diagnostics(T &&first, Ts &&... rest)
+template <typename... Diagnostics>
+std::string assemble_diagnostics(Diagnostics &&... args)
 {
   std::ostringstream out;
-  out << "[ " << diagnostic_as_string(std::forward<T>(first));
-  write_rest_diagnostics(out, std::forward<Ts>(rest)...);
-  out << " ]";
+  out << "\n<< EXTRA DIAGNOSTICS >>";
+  write_rest_diagnostics(out, std::forward<Diagnostics>(args)...);
+  out << "\n<< END EXTRA DIAGNOSTICS >>";
   return out.str();
 }
 } // namespace detail
@@ -457,18 +452,14 @@ CBMC_NORETURN void report_invariant_failure(
 #define CHECK_RETURN_STRUCTURED(CONDITION, TYPENAME, ...)                      \
   EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))
 
-// This should be used to mark dead code
+/// This should be used to mark dead code
 #define UNREACHABLE INVARIANT(false, "Unreachable")
 #define UNREACHABLE_STRUCTURED(TYPENAME, ...)                                  \
   EXPAND_MACRO(INVARIANT_STRUCTURED(false, TYPENAME, __VA_ARGS__))
 
-// This condition should be used to document that assumptions that are
-// made on goto_functions, goto_programs, exprts, etc. being well formed.
-// "The data structure is not corrupt or malformed"
-#define DATA_INVARIANT2(CONDITION, REASON) INVARIANT2(CONDITION, REASON)
-#define DATA_INVARIANT3(CONDITION, REASON, DIAGNOSTICS)                        \
-  INVARIANT3(CONDITION, REASON, DIAGNOSTICS)
-
+/// This condition should be used to document that assumptions that are
+/// made on goto_functions, goto_programs, exprts, etc. being well formed.
+/// "The data structure is not corrupt or malformed"
 #define DATA_INVARIANT(CONDITION, REASON) INVARIANT(CONDITION, REASON)
 #define DATA_INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, ...)                \
   INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, __VA_ARGS__)
@@ -482,6 +473,6 @@ CBMC_NORETURN void report_invariant_failure(
 // to migrate documentation and "error handling" in older code.
 #define TODO INVARIANT(false, "Todo")
 #define UNIMPLEMENTED INVARIANT(false, "Unimplemented")
-#define UNHANDLED_CASE INVARIANT2(false, "Unhandled case")
+#define UNHANDLED_CASE INVARIANT(false, "Unhandled case")
 
 #endif // CPROVER_UTIL_INVARIANT_H

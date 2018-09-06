@@ -197,7 +197,7 @@ struct diagnostics_helpert<source_locationt>
   static std::string
   diagnostics_as_string(const source_locationt &source_location)
   {
-    return source_location.as_string();
+    return "source location: " + source_location.as_string();
   }
 };
 
