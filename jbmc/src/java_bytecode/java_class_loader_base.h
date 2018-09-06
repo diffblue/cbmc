@@ -37,6 +37,10 @@ public:
   /// a cache for jar_filet, by path name
   jar_poolt jar_pool;
 
+  /// load class from classpath entries
+  optionalt<java_bytecode_parse_treet>
+  load_class(const irep_idt &class_name);
+
 protected:
   /// An entry in the classpath
   struct classpath_entryt
