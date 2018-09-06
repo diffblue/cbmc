@@ -12,15 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/value_set_analysis_fi.h>
 
-#if 0
-#include <util/std_code.h>
-#include <util/c_types.h>
 #include <util/namespace.h>
-#include <util/union_find.h>
-#include <util/type_eq.h>
-#include <util/fresh_symbol.h>
-#include <util/expanding_vector.h>
-#endif
 
 #include <iostream>
 
@@ -35,7 +27,7 @@ void value_set_fi_fp_removal(goto_modelt &goto_model)
   std::cout << "Doing FI value set analysis\n";
 
   const namespacet ns(goto_model.symbol_table);
-  value_set_analysis_fit value_sets(ns);
+  value_set_analysis_fit value_sets(ns, value_set_analysis_fit::track_optionst::TRACK_FUNCTION_POINTERS);
   value_sets(goto_model.goto_functions);
 
   std::cout << "Instrumenting\n";
