@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_TYPECHECK_FARGS_H
 #define CPROVER_CPP_CPP_TYPECHECK_FARGS_H
 
+#include <cassert>
+
 #include <util/std_code.h>
 
 class cpp_typecheckt;
