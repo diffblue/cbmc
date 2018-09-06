@@ -24,15 +24,15 @@ Date: November 2011
 #include <linking/static_lifetime_init.h>
 
 /// See the return.
-/// \param sym The symbol expression to analyze.
+/// \param symbol_expr The symbol expression to analyze.
 /// \param ns Namespace for resolving type information
 /// \return True if the symbol expression holds a static symbol which can be
 /// nondeterministically initialized, false otherwise.
 bool is_nondet_initializable_static(
-  const symbol_exprt &sym,
+  const symbol_exprt &symbol_expr,
   const namespacet &ns)
 {
-  const irep_idt &id = sym.get_identifier();
+  const irep_idt &id = symbol_expr.get_identifier();
 
   // is it a __CPROVER_* variable?
   if(has_prefix(id2string(id), CPROVER_PREFIX))
@@ -42,17 +42,23 @@ bool is_nondet_initializable_static(
   if(!ns.get_symbol_table().has_symbol(id))
     return false;
 
+  const symbolt &symbol = ns.lookup(id);
+
   // is the type explicitly marked as not to be nondet initialized?
-  if(ns.lookup(id).type.get_bool(ID_C_no_nondet_initialization))
+  if(symbol.type.get_bool(ID_C_no_nondet_initialization))
+    return false;
+
+  // is the type explicitly marked as not to be initialized?
+  if(symbol.type.get_bool(ID_C_no_initialization_required))
     return false;
 
   // static lifetime?
-  if(!ns.lookup(id).is_static_lifetime)
+  if(!symbol.is_static_lifetime)
     return false;
 
   // constant?
-  return !is_constant_or_has_constant_components(sym.type(), ns) &&
-         !is_constant_or_has_constant_components(ns.lookup(id).type, ns);
+  return !is_constant_or_has_constant_components(symbol_expr.type(), ns) &&
+         !is_constant_or_has_constant_components(symbol.type, ns);
 }
 
 /// Nondeterministically initializes global scope variables in a goto-function.

@@ -26,7 +26,7 @@ class goto_functionst;
 class symbol_exprt;
 
 bool is_nondet_initializable_static(
-  const symbol_exprt &sym,
+  const symbol_exprt &symbol_expr,
   const namespacet &ns);
 
 void nondet_static(
