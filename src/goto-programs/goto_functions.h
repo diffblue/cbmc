@@ -18,6 +18,7 @@ Date: June 2003
 
 #include <util/cprover_prefix.h>
 
+/// A collection of goto functions
 class goto_functionst
 {
 public:
@@ -63,6 +64,7 @@ public:
     return *this;
   }
 
+  /// Remove function from the function map
   void unload(const irep_idt &name) { function_map.erase(name); }
 
   void clear()
@@ -99,6 +101,7 @@ public:
     update_instructions_function();
   }
 
+  /// Get the identifier of the entry point to a goto model
   static inline irep_idt entry_point()
   {
     // do not confuse with C's "int main()"

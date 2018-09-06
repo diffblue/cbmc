@@ -170,6 +170,9 @@ public:
   ///     clears all the catch clauses established as per the above in this
   ///     function?
   ///     Many analysis tools remove these instructions before they start.
+  /// - INCOMPLETE GOTO:
+  ///     goto for which the target is yet to be determined. The target set
+  ///     shall be empty
   class instructiont final
   {
   public:
@@ -421,15 +424,34 @@ public:
     return t;
   }
 
+  /// Get the id of the function that contains the instruction pointed-to by the
+  /// given instruction iterator.
+  ///
+  /// \param l: instruction iterator
+  /// \return id of the function that contains the pointed-to goto instruction
   static const irep_idt get_function_id(
     const_targett l)
   {
+    // The field `function` of an instruction may not always contain the id of
+    // the function it is currently in, due to goto program modifications such
+    // as inlining. For example, if an instruction in a function `f` is inlined
+    // into a function `g`, the instruction may, depending on the arguments to
+    // the inliner, retain the original value of `f` in the function field.
+    // However, instructions of type END_FUNCTION are never inlined into other
+    // functions, hence they contain the id of the function they are in. Thus,
+    // this function takes the END_FUNCTION instruction of the goto program and
+    // returns the value of its function field.
+
     while(!l->is_end_function())
       ++l;
 
     return l->function;
   }
 
+  /// Get the id of the function that contains the given goto program.
+  ///
+  /// \param p: the goto program
+  /// \return id of the function that contains the goto program
   static const irep_idt get_function_id(
     const goto_programt &p)
   {
@@ -474,14 +496,16 @@ public:
     instructions.splice(next, p.instructions);
   }
 
-  /// Insertion before the given target
+  /// Insertion before the instruction pointed-to by the given instruction
+  /// iterator `target`.
   /// \return newly inserted location
   targett insert_before(const_targett target)
   {
     return instructions.insert(target, instructiont());
   }
 
-  /// Insertion after the given target
+  /// Insertion after the instruction pointed-to by the given instruction
+  /// iterator `target`.
   /// \return newly inserted location
   targett insert_after(const_targett target)
   {
@@ -619,6 +643,8 @@ public:
     instructions.clear();
   }
 
+  /// Get an instruction iterator pointing to the END_FUNCTION instruction of
+  /// the goto program
   targett get_end_function()
   {
     PRECONDITION(!instructions.empty());
@@ -628,6 +654,8 @@ public:
     return end_function;
   }
 
+  /// Get an instruction iterator pointing to the END_FUNCTION instruction of
+  /// the goto program
   const_targett get_end_function() const
   {
     PRECONDITION(!instructions.empty());
@@ -653,6 +681,18 @@ public:
   bool equals(const goto_programt &other) const;
 };
 
+/// Get control-flow successors of a given instruction. The instruction is
+/// represented by a pointer `target` of type `Target`. An instruction has
+/// either 0, 1, or 2 successors (more than two successors is deprecated). For
+/// example, an `ASSUME` instruction with the `guard` being a `false_exprt` has
+/// 0 successors, and `ASSIGN` instruction has 1 successor, and a `GOTO`
+/// instruction with the `guard` not being a `true_exprt` has 2 successors.
+///
+/// \tparam Target: type used to represent a pointer to an instruction in a goto
+///   program
+/// \param target: pointer to the instruction of which to get the successors of
+/// \return List of control-flow successors of the pointed-to goto program
+///   instruction
 template <typename Target>
 std::list<Target> goto_programt::get_successors(
   Target target) const

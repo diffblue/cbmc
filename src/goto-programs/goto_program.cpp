@@ -487,6 +487,9 @@ std::string as_string(
   }
 }
 
+/// Assign each loop in the goto program a unique index. Every backwards goto is
+/// considered a loop. The loops are numbered starting from zero and in the
+/// order they appear in the goto program.
 void goto_programt::compute_loop_numbers()
 {
   unsigned nr=0;
@@ -516,6 +519,16 @@ std::ostream &goto_programt::output(
   return out;
 }
 
+/// Assign each target (i.e., an instruction that is in the `targets` list of
+/// another instruction) a unique index.
+///
+/// Instructions that are not targets get target number instructiont::nil_target. The
+/// targets are numbered starting from one and in the order they appear in the
+/// goto program. An instruction is considered a target if it is the target of a
+/// control-flow instruction (either GOTO or START_THREAD), i.e., it is
+/// contained in the `targets` list of those instructions. Instructions that are
+/// reached via straight-line control flow (fall-through for GOTO instructions)
+/// only are not considered targets.
 void goto_programt::compute_target_numbers()
 {
   // reset marking
@@ -564,6 +577,10 @@ void goto_programt::compute_target_numbers()
   }
 }
 
+/// Copy other goto program into this goto program. The current goto program is
+/// cleared, and targets are adjusted as needed
+///
+/// \param src: the goto program to copy from
 void goto_programt::copy_from(const goto_programt &src)
 {
   // Definitions for mapping between the two programs
@@ -604,7 +621,8 @@ void goto_programt::copy_from(const goto_programt &src)
   compute_target_numbers();
 }
 
-// number them
+/// Returns true if the goto program includes an `ASSERT` instruction the guard
+/// of which is not trivially true.
 bool goto_programt::has_assertion() const
 {
   for(const auto &i : instructions)
@@ -614,6 +632,7 @@ bool goto_programt::has_assertion() const
   return false;
 }
 
+/// Compute for each instruction the set of instructions it is a successor of.
 void goto_programt::compute_incoming_edges()
 {
   for(auto &i : instructions)

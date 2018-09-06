@@ -34,7 +34,7 @@ public:
   /// get_goto_functions, or the symbol table returned by get_symbol_table,
   /// so iterators pointing into either may be invalidated.
   /// \param id: function to get
-  /// \return function body
+  /// \return goto function
   virtual const goto_functionst::goto_functiont &get_goto_function(
     const irep_idt &id) = 0;
 
