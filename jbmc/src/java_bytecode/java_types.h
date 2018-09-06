@@ -161,7 +161,7 @@ class java_class_typet:public class_typet
     return set(ID_is_anonymous, is_anonymous_class);
   }
 
-  bool get_final()
+  bool get_final() const
   {
     return get_bool(ID_final);
   }
