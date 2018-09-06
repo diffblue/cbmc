@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_REFERENCE_COUNTING_H
 #define CPROVER_UTIL_REFERENCE_COUNTING_H
 
-#include <cassert>
+#include "invariant.h"
 
 template<typename T>
 // NOLINTNEXTLINE(readability/identifiers)
@@ -33,7 +33,7 @@ public:
   {
     if(d!=nullptr)
     {
-      assert(d->ref_count!=0);
+      PRECONDITION(d->ref_count != 0);
       d->ref_count++;
       #ifdef REFERENCE_COUNTING_DEBUG
       std::cout << "COPY " << d << " " << d->ref_count << '\n';
@@ -96,7 +96,7 @@ protected:
 
   void copy_from(const reference_counting &other)
   {
-    assert(&other!=this); // check if we assign to ourselves
+    PRECONDITION(&other != this); // check if we assign to ourselves
 
     #ifdef REFERENCE_COUNTING_DEBUG
     std::cout << "COPY " << (&other) << "\n";
@@ -121,7 +121,7 @@ void reference_counting<T>::remove_ref(dt *old_d)
   if(old_d==nullptr)
     return;
 
-  assert(old_d->ref_count!=0);
+  PRECONDITION(old_d->ref_count != 0);
 
   #ifdef REFERENCE_COUNTING_DEBUG
   std::cout << "R: " << old_d << " " << old_d->ref_count << '\n';
@@ -172,7 +172,7 @@ void reference_counting<T>::detach()
     remove_ref(old_d);
   }
 
-  assert(d->ref_count==1);
+  POSTCONDITION(d->ref_count == 1);
 
   #ifdef REFERENCE_COUNTING_DEBUG
   std::cout << "DETACH2: " << d << '\n'
