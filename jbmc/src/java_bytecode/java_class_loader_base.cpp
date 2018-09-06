@@ -177,3 +177,16 @@ java_class_loader_baset::get_class_from_directory(
   else
     return {};
 }
+
+optionalt<java_bytecode_parse_treet> java_class_loader_baset::
+load_class(const irep_idt &class_name)
+{
+  for(const auto &cp_entry : classpath_entries)
+  {
+    auto parse_tree = load_class(class_name, cp_entry);
+    if(parse_tree.has_value())
+      return parse_tree;
+  }
+
+  return { };
+}
