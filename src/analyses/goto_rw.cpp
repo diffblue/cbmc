@@ -82,22 +82,29 @@ void rw_range_sett::output(std::ostream &out) const
   }
 }
 
-void rw_range_sett::get_objects_complex(
+void rw_range_sett::get_objects_complex_real(
   get_modet mode,
-  const exprt &expr,
+  const complex_real_exprt &expr,
   const range_spect &range_start,
   const range_spect &size)
 {
-  const exprt &op=expr.op0();
-  assert(op.type().id()==ID_complex);
+  get_objects_rec(mode, expr.op(), range_start, size);
+}
 
-  range_spect sub_size=
+void rw_range_sett::get_objects_complex_imag(
+  get_modet mode,
+  const complex_imag_exprt &expr,
+  const range_spect &range_start,
+  const range_spect &size)
+{
+  const exprt &op = expr.op();
+
+  range_spect sub_size =
     to_range_spect(pointer_offset_bits(op.type().subtype(), ns));
   assert(sub_size>0);
-  range_spect offset=
-    (range_start==-1 || expr.id()==ID_complex_real) ? 0 : sub_size;
+  range_spect offset = range_start == -1 ? 0 : sub_size;
 
-  get_objects_rec(mode, op, range_start+offset, size);
+  get_objects_rec(mode, op, range_start + offset, size);
 }
 
 void rw_range_sett::get_objects_if(
@@ -487,9 +494,12 @@ void rw_range_sett::get_objects_rec(
   const range_spect &range_start,
   const range_spect &size)
 {
-  if(expr.id()==ID_complex_real ||
-     expr.id()==ID_complex_imag)
-    get_objects_complex(mode, expr, range_start, size);
+  if(expr.id() == ID_complex_real)
+    get_objects_complex_real(
+      mode, to_complex_real_expr(expr), range_start, size);
+  else if(expr.id() == ID_complex_imag)
+    get_objects_complex_imag(
+      mode, to_complex_imag_expr(expr), range_start, size);
   else if(expr.id()==ID_typecast)
     get_objects_typecast(
       mode,

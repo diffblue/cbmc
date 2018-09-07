@@ -161,9 +161,15 @@ protected:
     get_modet mode,
     const exprt &expr);
 
-  virtual void get_objects_complex(
+  virtual void get_objects_complex_real(
     get_modet mode,
-    const exprt &expr,
+    const complex_real_exprt &expr,
+    const range_spect &range_start,
+    const range_spect &size);
+
+  virtual void get_objects_complex_imag(
+    get_modet mode,
+    const complex_imag_exprt &expr,
     const range_spect &range_start,
     const range_spect &size);
 
