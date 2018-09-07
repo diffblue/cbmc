@@ -45,17 +45,14 @@ bvt boolbvt::convert_complex(const exprt &expr)
   return conversion_failed(expr);
 }
 
-bvt boolbvt::convert_complex_real(const exprt &expr)
+bvt boolbvt::convert_complex_real(const complex_real_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
     return conversion_failed(expr);
 
-  if(expr.operands().size()!=1)
-    return conversion_failed(expr);
-
-  bvt bv=convert_bv(expr.op0());
+  bvt bv = convert_bv(expr.op());
 
   assert(bv.size()==width*2);
   bv.resize(width); // chop
@@ -63,17 +60,14 @@ bvt boolbvt::convert_complex_real(const exprt &expr)
   return bv;
 }
 
-bvt boolbvt::convert_complex_imag(const exprt &expr)
+bvt boolbvt::convert_complex_imag(const complex_imag_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
     return conversion_failed(expr);
 
-  if(expr.operands().size()!=1)
-    return conversion_failed(expr);
-
-  bvt bv=convert_bv(expr.op0());
+  bvt bv = convert_bv(expr.op());
 
   assert(bv.size()==width*2);
   bv.erase(bv.begin(), bv.begin()+width);
