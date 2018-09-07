@@ -64,9 +64,13 @@ protected:
   CLONE
   virtual abstract_object_pointert merge(
     abstract_object_pointert other) const override;
+  abstract_object_pointert
+  meet(const abstract_object_pointert &other) const override;
 
 private :
   abstract_object_pointert merge_intervals(
+    interval_abstract_value_pointert other) const;
+  abstract_object_pointert meet_intervals(
     interval_abstract_value_pointert other) const;
 
   constant_interval_exprt interval;

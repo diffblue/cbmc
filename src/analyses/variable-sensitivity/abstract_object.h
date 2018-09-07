@@ -86,6 +86,11 @@ public:
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns);
+  abstract_objectt(
+    const typet &type,
+    const exprt &expr,
+    const abstract_environmentt &environment,
+    const namespacet &ns);
 
   virtual ~abstract_objectt() {}
 
@@ -128,7 +133,7 @@ public:
   typedef std::set<goto_programt::const_targett> locationst;
   typedef sharing_mapt<irep_idt, abstract_object_pointert, irep_id_hash>
     shared_mapt;
-    
+
   static void dump_map(std::ostream out, const shared_mapt &m);
   static void dump_map_diff(
     std::ostream out, const shared_mapt &m1, const shared_mapt &m2);
@@ -158,6 +163,14 @@ public:
     abstract_object_pointert op1,
     abstract_object_pointert op2,
     bool &out_modifications);
+
+  static abstract_object_pointert meet(
+    abstract_object_pointert op1,
+    abstract_object_pointert op2,
+    bool &out_modifications);
+
+  virtual abstract_object_pointert
+  meet(const abstract_object_pointert &other) const;
 
   virtual abstract_object_pointert update_location_context(
     const locationst &locations,
@@ -226,6 +239,8 @@ private:
   // part of an abstract_object_merge
   virtual abstract_object_pointert abstract_object_merge_internal(
     const abstract_object_pointert other) const;
+  virtual abstract_object_pointert
+  abstract_object_meet_internal(const abstract_object_pointert &other) const;
 
 protected:
   template<class T>
@@ -247,6 +262,11 @@ protected:
 
   // Sets the state of this object
   virtual abstract_object_pointert merge(abstract_object_pointert other) const;
+
+  abstract_object_pointert
+  abstract_object_meet(const abstract_object_pointert &other) const;
+
+  bool should_use_base_meet(const abstract_object_pointert &other) const;
 
   template<class keyt>
   static bool merge_maps(
