@@ -339,7 +339,15 @@ void interpretert::evaluate(
         evaluate(expr.op0(), dest);
         return;
       }
-      if(expr.has_operands() && !to_integer(expr.op0(), i))
+      else if(expr.has_operands() && !to_integer(expr.op0(), i))
+      {
+        dest.push_back(i);
+        return;
+      }
+      // check if expression is constant null pointer without operands
+      else if(
+        !expr.has_operands() && !to_integer(to_constant_expr(expr), i) &&
+        i.is_zero())
       {
         dest.push_back(i);
         return;
