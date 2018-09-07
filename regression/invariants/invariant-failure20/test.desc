@@ -1,0 +1,9 @@
+CORE
+dummy_parameter.c
+invariant-with-custom-diagnostics
+^EXIT=(0|127|134|137)$
+^SIGNAL=0$
+--- begin invariant violation report ---
+Invariant check failed
+Diagnostic A
+Diagnostic B

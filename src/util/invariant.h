@@ -10,6 +10,7 @@ Author: Martin Brain, martin.brain@diffblue.com
 #define CPROVER_UTIL_INVARIANT_H
 
 #include <cstdlib>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -132,17 +133,21 @@ public:
   }
 };
 
-// The macros MACRO<n> (e.g., INVARIANT2) are for internal use in this file
-// only. The corresponding macros that take a variable number of arguments (see
-// further below) should be used instead, which in turn call those with a fixed
-// number of arguments. For example, if INVARIANT(...) is called with two
-// arguments, it calls INVARIANT2().
+#ifdef __GNUC__
+#define CBMC_NORETURN __attribute((noreturn))
+#elif defined(_MSV_VER)
+#define CBMC_NORETURN __declspec(noreturn)
+#elif __cplusplus >= 201703L
+#define CBMC_NORETURN [[noreturn]]
+#else
+#define CBMC_NORETURN
+#endif
 
 #if defined(CPROVER_INVARIANT_CPROVER_ASSERT)
 // Used to allow CPROVER to check itself
-#define INVARIANT2(CONDITION, REASON)                                          \
+#define INVARIANT(CONDITION, REASON)                                          \
   __CPROVER_assert((CONDITION), "Invariant : " REASON)
-#define INVARIANT3(CONDITION, REASON, DIAGNOSTICS)                             \
+#define INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, ...)                             \
   __CPROVER_assert((CONDITION), "Invariant : " REASON)
 
 #define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) \
@@ -153,11 +158,11 @@ public:
 // This is *not* recommended as it can result in unpredictable behaviour
 // including silently reporting incorrect results.
 // This is also useful for checking side-effect freedom.
-#define INVARIANT2(CONDITION, REASON)                                          \
+#define INVARIANT(CONDITION, REASON)                                          \
   do                                                                           \
   {                                                                            \
   } while(false)
-#define INVARIANT3(CONDITION, REASON, DIAGNOSTICS)                             \
+#define INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, ...)                             \
   do                                                                           \
   {                                                                            \
   } while(false)
@@ -167,8 +172,8 @@ public:
 // Not recommended but provided for backwards compatability
 #include <cassert>
 // NOLINTNEXTLINE(*)
-#define INVARIANT2(CONDITION, REASON) assert((CONDITION) && ((REASON), true))
-#define INVARIANT3(CONDITION, REASON, DIAGNOSTICS)                             \
+#define INVARIANT(CONDITION, REASON) assert((CONDITION) && ((REASON), true))
+#define INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, ...)                             \
   assert((CONDITION) && ((REASON), true)) /* NOLINT */
 // NOLINTNEXTLINE(*)
 #define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) assert((CONDITION))
@@ -191,16 +196,14 @@ void report_exception_to_stderr(const invariant_failedt &);
 /// \param params : (variadic) parameters to forward to ET's constructor
 ///  its backtrace member will be set before it is used.
 template <class ET, typename... Params>
-#ifdef __GNUC__
-__attribute__((noreturn))
-#endif
-typename std::enable_if<std::is_base_of<invariant_failedt, ET>::value>::type
-invariant_violated_structured(
-  const std::string &file,
-  const std::string &function,
-  const int line,
-  const std::string &condition,
-  Params &&... params)
+CBMC_NORETURN
+  typename std::enable_if<std::is_base_of<invariant_failedt, ET>::value>::type
+  invariant_violated_structured(
+    const std::string &file,
+    const std::string &function,
+    const int line,
+    const std::string &condition,
+    Params &&... params)
 {
   std::string backtrace=get_backtrace();
   ET to_throw(
@@ -224,9 +227,7 @@ invariant_violated_structured(
 /// \param line : The line number of the invariant
 /// \param reason : brief description of the invariant violation.
 /// \param condition : the condition this invariant is checking.
-#ifdef __GNUC__
-__attribute__((noreturn))
-#endif
+CBMC_NORETURN
 inline void
 invariant_violated_string(
   const std::string &file,
@@ -239,64 +240,125 @@ invariant_violated_string(
     file, function, line, condition, reason);
 }
 
+namespace detail
+{
+template <typename T>
+struct always_falset : public std::false_type
+{
+};
+} // namespace detail
+
+/// Helper to give us some diagnostic in a usable form on assertion failure.
+/// For now only provides string output
+/// Must be specialised for all types that should be useable as diagnostics
+template <typename T>
+struct diagnostics_helpert
+{
+  // silly construct because C++ won't let us write static_assert(false,...)
+  static_assert(
+    detail::always_falset<T>::value,
+    "to avoid unintended strangeness, diagnostics_helpert needs to be "
+    "specialised for each diagnostic type");
+  static std::string diagnostics_as_string(const T &);
+};
+
+// Standard string specialisations for diagnostics_helper
+// (character arrays, character pointers and std::string)
+
+template <std::size_t N>
+struct diagnostics_helpert<char[N]>
+{
+  static std::string diagnostics_as_string(const char (&string)[N])
+  {
+    return string;
+  }
+};
+template <>
+struct diagnostics_helpert<char *>
+{
+  static std::string diagnostics_as_string(const char *string)
+  {
+    return string;
+  }
+};
+
+template <>
+struct diagnostics_helpert<std::string>
+{
+  // This is deliberately taking a copy instead of a reference
+  // to avoid making an extra copy when passing a temporary string
+  // as a diagnostic
+  static std::string diagnostics_as_string(std::string string)
+  {
+    return string;
+  }
+};
+
+namespace detail
+{
+inline std::string assemble_diagnostics()
+{
+  return "";
+}
+
+template <typename T>
+std::string diagnostic_as_string(T &&val)
+{
+  return diagnostics_helpert<
+    typename std::remove_cv<typename std::remove_reference<T>::type>::type>::
+    diagnostics_as_string(std::forward<T>(val));
+}
+
+inline void write_rest_diagnostics(std::ostream &)
+{
+}
+
+template <typename T, typename... Ts>
+void write_rest_diagnostics(std::ostream &out, T &&next, Ts &&... rest)
+{
+  out << "\n" << diagnostic_as_string(std::forward<T>(next));
+  write_rest_diagnostics(out, std::forward<Ts>(rest)...);
+}
+
+template <typename... Diagnostics>
+std::string assemble_diagnostics(Diagnostics &&... args)
+{
+  std::ostringstream out;
+  out << "\n<< EXTRA DIAGNOSTICS >>";
+  write_rest_diagnostics(out, std::forward<Diagnostics>(args)...);
+  out << "\n<< END EXTRA DIAGNOSTICS >>";
+  return out.str();
+}
+} // namespace detail
+
+template <typename... Diagnostics>
+CBMC_NORETURN void report_invariant_failure(
+  const std::string &file,
+  const std::string &function,
+  int line,
+  std::string reason,
+  std::string condition,
+  Diagnostics &&... diagnostics)
+{
+  invariant_violated_structured<invariant_with_diagnostics_failedt>(
+    file,
+    function,
+    line,
+    reason,
+    condition,
+    detail::assemble_diagnostics(std::forward<Diagnostics>(diagnostics)...));
+}
+
+#define EXPAND_MACRO(x) x
+
 // These require a trailing semicolon by the user, such that INVARIANT
 // behaves syntactically like a function call.
 // NOLINT as macro definitions confuse the linter it seems.
 #ifdef _MSC_VER
-#define __this_function__ __FUNCTION__
+#define CURRENT_FUNCTION_NAME __FUNCTION__
 #else
-#define __this_function__ __func__
+#define CURRENT_FUNCTION_NAME __func__
 #endif
-
-// We wrap macros that take __VA_ARGS__ as an argument with EXPAND_MACRO(). This
-// is to account for the behaviour of msvc, which otherwise would not expand
-// __VA_ARGS__ to multiple arguments in the outermost macro invocation.
-#define EXPAND_MACRO(x) x
-
-#define GET_MACRO(X1, X2, X3, X4, X5, X6, MACRO, ...) MACRO
-
-// This macro dispatches to the macros MACRO<n> (with 1 <= n <= 6) and calls
-// them with the arguments in __VA_ARGS__. The invocation of GET_MACRO() selects
-// MACRO<n> when __VA_ARGS__ consists of n arguments.
-#define REDIRECT(MACRO, ...)                                                   \
-  do                                                                           \
-  {                                                                            \
-    EXPAND_MACRO(                                                              \
-      GET_MACRO(                                                               \
-        __VA_ARGS__,                                                           \
-        MACRO##6,                                                              \
-        MACRO##5,                                                              \
-        MACRO##4,                                                              \
-        MACRO##3,                                                              \
-        MACRO##2,                                                              \
-        MACRO##1,                                                              \
-        DUMMY_MACRO_ARG)(__VA_ARGS__));                                        \
-  } while(false)
-
-#define INVARIANT2(CONDITION, REASON)                                          \
-  do /* NOLINT */                                                              \
-  {                                                                            \
-    if(!(CONDITION))                                                           \
-      invariant_violated_string(                                               \
-        __FILE__,                                                              \
-        __this_function__,                                                     \
-        __LINE__,                                                              \
-        #CONDITION,                                                            \
-        (REASON)); /* NOLINT */                                                \
-  } while(false)
-
-#define INVARIANT3(CONDITION, REASON, DIAGNOSTICS)                             \
-  do /* NOLINT */                                                              \
-  {                                                                            \
-    if(!(CONDITION))                                                           \
-      invariant_violated_structured<invariant_with_diagnostics_failedt>(       \
-        __FILE__,                                                              \
-        __this_function__,                                                     \
-        __LINE__,                                                              \
-        #CONDITION,                                                            \
-        (REASON),                                                              \
-        (DIAGNOSTICS)); /* NOLINT */                                           \
-  } while(false)
 
 #define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...)                         \
   do /* NOLINT */                                                              \
@@ -304,7 +366,7 @@ invariant_violated_string(
     if(!(CONDITION))                                                           \
       invariant_violated_structured<TYPENAME>(                                 \
         __FILE__,                                                              \
-        __this_function__,                                                     \
+        CURRENT_FUNCTION_NAME,                                                 \
         __LINE__,                                                              \
         #CONDITION,                                                            \
         __VA_ARGS__); /* NOLINT */                                             \
@@ -314,8 +376,33 @@ invariant_violated_string(
 
 // Short hand macros. The variants *_STRUCTURED below allow to specify a custom
 // exception, and are equivalent to INVARIANT_STRUCTURED.
+#define INVARIANT(CONDITION, REASON)                                           \
+  do                                                                           \
+  {                                                                            \
+    if(!(CONDITION))                                                           \
+    {                                                                          \
+      invariant_violated_string(                                               \
+        __FILE__, CURRENT_FUNCTION_NAME, __LINE__, REASON, #CONDITION);        \
+    }                                                                          \
+  } while(false)
 
-#define INVARIANT(...) EXPAND_MACRO(REDIRECT(INVARIANT, __VA_ARGS__))
+/// Same as invariant, with one or more diagnostics attached
+/// Diagnostics can be of any type that has a specialisation for
+/// invariant_helpert
+#define INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, ...)                     \
+  do                                                                           \
+  {                                                                            \
+    if(!(CONDITION))                                                           \
+    {                                                                          \
+      report_invariant_failure(                                                \
+        __FILE__,                                                              \
+        CURRENT_FUNCTION_NAME,                                                 \
+        __LINE__,                                                              \
+        REASON,                                                                \
+        #CONDITION,                                                            \
+        __VA_ARGS__);                                                          \
+    }                                                                          \
+  } while(false)
 
 // The condition should only contain (unmodified) inputs to the method. Inputs
 // include arguments passed to the function, as well as member variables that
@@ -325,11 +412,10 @@ invariant_violated_string(
 //
 // The PRECONDITION documents / checks assumptions about the inputs
 // that is the caller's responsibility to make happen before the call.
-#define PRECONDITION1(CONDITION) INVARIANT2(CONDITION, "Precondition")
-#define PRECONDITION2(CONDITION, DIAGNOSTICS)                                  \
-  INVARIANT3(CONDITION, "Precondition", DIAGNOSTICS)
 
-#define PRECONDITION(...) EXPAND_MACRO(REDIRECT(PRECONDITION, __VA_ARGS__))
+#define PRECONDITION(CONDITION) INVARIANT(CONDITION, "Precondition")
+#define PRECONDITION_WITH_DIAGNOSTICS(CONDITION, ...)                          \
+  INVARIANT_WITH_DIAGNOSTICS(CONDITION, "Precondition", __VA_ARGS__)
 
 #define PRECONDITION_STRUCTURED(CONDITION, TYPENAME, ...)                      \
   EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))
@@ -342,11 +428,10 @@ invariant_violated_string(
 // output when it returns, given that it was called with valid inputs.
 // Outputs include the return value of the function, as well as member
 // variables that the function may write.
-#define POSTCONDITION1(CONDITION) INVARIANT2(CONDITION, "Postcondition")
-#define POSTCONDITION2(CONDITION, DIAGNOSTICS)                                 \
-  INVARIANT3(CONDITION, "Postcondition", DIAGNOSTICS)
 
-#define POSTCONDITION(...) EXPAND_MACRO(REDIRECT(POSTCONDITION, __VA_ARGS__))
+#define POSTCONDITION(CONDITION) INVARIANT(CONDITION, "Postcondition")
+#define POSTCONDITION_WITH_DIAGNOSTICS(CONDITION, ...)                         \
+  INVARIANT_WITH_DIAGNOSTICS(CONDITION, "Postcondition", __VA_ARGS__)
 
 #define POSTCONDITION_STRUCTURED(CONDITION, TYPENAME, ...)                     \
   EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))
@@ -359,28 +444,25 @@ invariant_violated_string(
 // A difference between CHECK_RETURN and POSTCONDITION is that CHECK_RETURN is
 // a statement about what the caller expects from a function, whereas a
 // POSTCONDITION is a statement about guarantees made by the function itself.
-#define CHECK_RETURN1(CONDITION) INVARIANT2(CONDITION, "Check return value")
-#define CHECK_RETURN2(CONDITION, DIAGNOSTICS)                                  \
-  INVARIANT3(CONDITION, "Check return value", DIAGNOSTICS)
 
-#define CHECK_RETURN(...) EXPAND_MACRO(REDIRECT(CHECK_RETURN, __VA_ARGS__))
+#define CHECK_RETURN(CONDITION) INVARIANT(CONDITION, "Check return value")
+#define CHECK_RETURN_WITH_DIAGNOSTICS(CONDITION, ...)                          \
+  INVARIANT_WITH_DIAGNOSTICS(CONDITION, "Check return value", __VA_ARGS__)
 
 #define CHECK_RETURN_STRUCTURED(CONDITION, TYPENAME, ...)                      \
   EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))
 
-// This should be used to mark dead code
-#define UNREACHABLE INVARIANT2(false, "Unreachable")
+/// This should be used to mark dead code
+#define UNREACHABLE INVARIANT(false, "Unreachable")
 #define UNREACHABLE_STRUCTURED(TYPENAME, ...)                                  \
   EXPAND_MACRO(INVARIANT_STRUCTURED(false, TYPENAME, __VA_ARGS__))
 
-// This condition should be used to document that assumptions that are
-// made on goto_functions, goto_programs, exprts, etc. being well formed.
-// "The data structure is not corrupt or malformed"
-#define DATA_INVARIANT2(CONDITION, REASON) INVARIANT2(CONDITION, REASON)
-#define DATA_INVARIANT3(CONDITION, REASON, DIAGNOSTICS)                        \
-  INVARIANT3(CONDITION, REASON, DIAGNOSTICS)
-
-#define DATA_INVARIANT(...) EXPAND_MACRO(REDIRECT(DATA_INVARIANT, __VA_ARGS__))
+/// This condition should be used to document that assumptions that are
+/// made on goto_functions, goto_programs, exprts, etc. being well formed.
+/// "The data structure is not corrupt or malformed"
+#define DATA_INVARIANT(CONDITION, REASON) INVARIANT(CONDITION, REASON)
+#define DATA_INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, ...)                \
+  INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, __VA_ARGS__)
 
 #define DATA_INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...)                    \
   EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))
@@ -389,8 +471,8 @@ invariant_violated_string(
 
 // The following should not be used in new code and are only intended
 // to migrate documentation and "error handling" in older code.
-#define TODO INVARIANT2(false, "Todo")
-#define UNIMPLEMENTED INVARIANT2(false, "Unimplemented")
-#define UNHANDLED_CASE INVARIANT2(false, "Unhandled case")
+#define TODO INVARIANT(false, "Todo")
+#define UNIMPLEMENTED INVARIANT(false, "Unimplemented")
+#define UNHANDLED_CASE INVARIANT(false, "Unhandled case")
 
 #endif // CPROVER_UTIL_INVARIANT_H

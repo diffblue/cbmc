@@ -56,6 +56,31 @@ public:
   }
 };
 
+struct DiagnosticA
+{
+};
+struct DiagnosticB
+{
+};
+
+template <>
+struct diagnostics_helpert<DiagnosticA>
+{
+  static std::string diagnostics_as_string(const DiagnosticA &)
+  {
+    return "Diagnostic A";
+  }
+};
+
+template <>
+struct diagnostics_helpert<DiagnosticB>
+{
+  static std::string diagnostics_as_string(const DiagnosticB &)
+  {
+    return "Diagnostic B";
+  }
+};
+
 /// Causes an invariant failure dependent on first argument value.
 /// One ignored argument is accepted to conform with the test.pl script,
 /// which would be the input source file for other cbmc driver programs.
@@ -92,21 +117,38 @@ int main(int argc, char** argv)
   else if(arg=="irep")
     INVARIANT_WITH_IREP(false, "error with irep", pointer_type(void_typet()));
   else if(arg == "invariant-diagnostics")
-    INVARIANT(
+    INVARIANT_WITH_DIAGNOSTICS(
       false,
       "invariant with diagnostics failure",
       "invariant diagnostics information");
   else if(arg == "precondition-diagnostics")
-    PRECONDITION(false, "precondition diagnostics information");
+    PRECONDITION_WITH_DIAGNOSTICS(
+      false, "precondition diagnostics information");
   else if(arg == "postcondition-diagnostics")
-    POSTCONDITION(false, "postcondition diagnostics information");
+    POSTCONDITION_WITH_DIAGNOSTICS(
+      false, "postcondition diagnostics information");
   else if(arg == "check-return-diagnostics")
-    CHECK_RETURN(false, "check return diagnostics information");
+    CHECK_RETURN_WITH_DIAGNOSTICS(
+      false, "check return diagnostics information");
   else if(arg == "data-invariant-diagnostics")
-    DATA_INVARIANT(
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
       false,
       "data invariant with diagnostics failure",
       "data invariant diagnostics information");
+  else if(arg == "invariant-with-lots-of-diagnostics")
+    INVARIANT_WITH_DIAGNOSTICS(
+      false,
+      "an invariant that fails",
+      "diagnostic 1",
+      "diagnostic 2",
+      "diagnostic 3",
+      "diagnostic 4");
+  else if(arg == "invariant-with-custom-diagnostics")
+    INVARIANT_WITH_DIAGNOSTICS(
+      false,
+      "an invariant with some custom diagnostics",
+      DiagnosticA{},
+      DiagnosticB{});
   else
     return 1;
 }
