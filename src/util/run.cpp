@@ -181,6 +181,9 @@ int run(
     }
     else /* fork() returns new pid to the parent process */
     {
+      // must do before resuming signals to avoid race
+      register_child(childpid);
+
       // resume signals
       sigprocmask(SIG_SETMASK, &old_mask, nullptr);
 
@@ -188,10 +191,13 @@ int run(
 
       /* wait for child to exit, and store its status */
       while(waitpid(childpid, &status, 0)==-1)
+      {
         if(errno==EINTR)
           continue; // try again
         else
         {
+          unregister_child();
+
           perror("Waiting for child process failed");
           if(stdin_fd!=STDIN_FILENO)
             close(stdin_fd);
@@ -201,6 +207,9 @@ int run(
             close(stderr_fd);
           return 1;
         }
+      }
+
+      unregister_child();
 
       if(stdin_fd!=STDIN_FILENO)
         close(stdin_fd);
