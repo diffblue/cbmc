@@ -83,6 +83,20 @@ abstract_objectt::abstract_objectt(
     t(expr.type()), bottom(false), top(true)
 {}
 
+/// Ctor for building object of types that differ from the types of input
+/// expressions
+/// \param type explicitly declared type the resulting object should have
+/// \param expr expression used to build the object
+/// \param environment abstract environment to evaluate the expression
+/// \param ns namespace to uncover names inside the expression
+abstract_objectt::abstract_objectt(
+  const typet &type,
+  const exprt &expr,
+  const abstract_environmentt &environment,
+  const namespacet &ns):
+  t(type), bottom(false), top(true)
+{}
+
 /*******************************************************************\
 
 Function: abstract_objectt::type
@@ -160,6 +174,44 @@ abstract_object_pointert abstract_objectt::abstract_object_merge(
  */
 abstract_object_pointert abstract_objectt::abstract_object_merge_internal(
   const abstract_object_pointert other) const
+{
+  // Default implementation
+  return shared_from_this();
+}
+
+/// Base implementation of the meet operation: only used if no more precise
+/// abstraction can be used, can only result in {TOP, BOTTOM, one of the
+/// original objects}
+/// \param other pointer to the abstract object to meet
+/// \return the resulting abstract object pointer
+abstract_object_pointert
+abstract_objectt::meet(const abstract_object_pointert &other) const
+{
+  return abstract_object_meet(other);
+}
+
+/// Helper function for base meet. Two cases: return itself (if trivially
+/// contained in other); return BOTTOM otherwise.
+/// \param other pointer to the other object
+/// \return the resulting object
+abstract_object_pointert abstract_objectt::abstract_object_meet(
+  const abstract_object_pointert &other) const
+{
+  if(is_bottom() || other->top)
+    return this->abstract_object_meet_internal(other);
+
+  internal_abstract_object_pointert met = mutable_clone();
+  met->bottom = true;
+  met->top = false;
+  return met->abstract_object_meet_internal(other);
+}
+
+/// Helper function for base meet, in case additional work was needed. Base
+/// implementation simply return pointer to itself.
+/// \param other pointer to the other object
+/// \return the resulting object
+abstract_object_pointert abstract_objectt::abstract_object_meet_internal(
+  const abstract_object_pointert &other) const
 {
   // Default implementation
   return shared_from_this();
@@ -406,6 +458,36 @@ bool abstract_objectt::should_use_base_merge(
   const abstract_object_pointert other) const
 {
   return is_top() || other->is_bottom() || other->is_top();
+}
+
+/// Interface method for the meet operation. Decides whether to use the base
+/// implementation or if a more precise abstraction is attainable.
+/// \param op1 lhs object for meet
+/// \param op2 rhs object for meet
+/// \param out_modifications reference to a flag indicating modification (result
+/// is not op1)
+/// \return resulting object after meet
+abstract_object_pointert abstract_objectt::meet(
+  abstract_object_pointert op1,
+  abstract_object_pointert op2,
+  bool &out_modifications)
+{
+  abstract_object_pointert result=op1->should_use_base_meet(op2)?
+    op1->abstract_object_meet(op2):op1->meet(op2);
+  // If no modifications, we will return the original pointer
+  out_modifications=result!=op1;
+
+  return result;
+}
+
+/// Helper function to decide if base meet implementation should be used
+/// \param other pointer to the other object to meet
+/// \return true if base implementation would yield the most precise
+/// abstraction anyway
+bool abstract_objectt::should_use_base_meet(
+  const abstract_object_pointert &other) const
+{
+  return is_bottom() || other->is_bottom() || other->is_top();
 }
 
 /**
