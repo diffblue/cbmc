@@ -189,6 +189,12 @@ void cpp_typecheckt::typecheck_type(typet &type)
   else if(type.id() == ID_symbol_type)
   {
   }
+  else if(type.id() == ID_struct_tag)
+  {
+  }
+  else if(type.id() == ID_union_tag)
+  {
+  }
   else if(type.id()==ID_constructor ||
           type.id()==ID_destructor)
   {

@@ -93,6 +93,11 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_symbol_type(to_symbol_type(type));
   else if(type.id() == ID_typedef_type)
     typecheck_typedef_type(type);
+  else if(type.id() == ID_struct_tag ||
+          type.id() == ID_union_tag)
+  {
+    // nothing to do, these stay as is
+  }
   else if(type.id()==ID_vector)
     typecheck_vector_type(to_vector_type(type));
   else if(type.id()==ID_custom_unsignedbv ||
@@ -815,11 +820,21 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     }
   }
 
-  symbol_typet symbol_type(identifier);
-  symbol_type.add_source_location()=type.source_location();
-
   c_qualifierst original_qualifiers(type);
-  type.swap(symbol_type);
+
+  if(type.id() == ID_union)
+  {
+    union_tag_typet tag_type(identifier);
+    tag_type.add_source_location() = type.source_location();
+    type.swap(tag_type);
+  }
+  else
+  {
+    symbol_typet symbol_type(identifier);
+    symbol_type.add_source_location() = type.source_location();
+    type.swap(symbol_type);
+  }
+
   original_qualifiers.write(type);
 }
 
