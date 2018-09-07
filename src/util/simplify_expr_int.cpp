@@ -864,20 +864,15 @@ bool simplify_exprt::simplify_extractbit(exprt &expr)
   if(!is_bitvector_type(src_type))
     return true;
 
-  std::size_t src_bit_width = to_bitvector_type(src_type).get_width();
+  const std::size_t src_bit_width = to_bitvector_type(src_type).get_width();
 
-  if(extractbit_expr.index().id() != ID_constant)
-  {
-    return true;
-  }
-
-  auto index_converted_to_int =
+  const auto index_converted_to_int =
     numeric_cast<mp_integer>(extractbit_expr.index());
   if(!index_converted_to_int.has_value())
   {
     return true;
   }
-  mp_integer index_as_int = index_converted_to_int.has_value();
+  const mp_integer index_as_int = index_converted_to_int.value();
   if(!extractbit_expr.src().is_constant())
     return true;
 
@@ -887,12 +882,15 @@ bool simplify_exprt::simplify_extractbit(exprt &expr)
   const irep_idt &src_value =
     to_constant_expr(extractbit_expr.src()).get_value();
 
-  if(src_value.size() != src_bit_width)
+
+  std::string src_value_as_string=id2string(src_value);
+
+  if(src_value_as_string.size() != src_bit_width)
     return true;
 
-  bool bit =
-    (id2string(src_value)
-       [src_bit_width - numeric_cast_v<std::size_t>(index_as_int) - 1] == '1');
+  const bool bit =
+    (src_value_as_string
+       [src_bit_width - numeric_cast_v<std::size_t>(index_as_int) - 1]=='1');
 
   expr.make_bool(bit);
 
