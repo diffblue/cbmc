@@ -18,6 +18,8 @@ Author:
 #include <mach-o/fat.h>
 #endif
 
+#include <util/run.h>
+
 bool is_osx_fat_magic(char hdr[4])
 {
 #ifdef __APPLE__
@@ -79,7 +81,5 @@ bool osx_fat_readert::extract_gb(
 {
   assert(has_gb_arch);
 
-  std::string command=
-    "lipo -thin hppa7100LC -output \""+dest+"\" \""+source+"\"";
-  return system(command.c_str())!=0;
+  return run("lipo", {"lipo", "-thin", "hppa7100LC", "-output", dest, source});
 }
