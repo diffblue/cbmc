@@ -1458,9 +1458,14 @@ void cpp_typecheckt::convert_anon_struct_union_member(
     cpp_scopes.current_scope().prefix+
     base_name.c_str();
 
-  const symbol_typet symbol_type(struct_union_symbol.name);
+  typet compound_type;
 
-  struct_typet::componentt component(identifier, symbol_type);
+  if(struct_union_symbol.type.id() == ID_union)
+    compound_type = union_tag_typet(struct_union_symbol.name);
+  else
+    compound_type = symbol_typet(struct_union_symbol.name);
+
+  struct_typet::componentt component(identifier, compound_type);
   component.set_access(access);
   component.set_base_name(base_name);
   component.set_pretty_name(base_name);

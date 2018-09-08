@@ -19,17 +19,9 @@ class namespacet;
 class goto_functionst;
 class goto_modelt;
 
-void rewrite_union(
-  exprt &expr,
-  const namespacet &ns);
-
-void rewrite_union(
-  goto_functionst::goto_functiont &goto_function,
-  const namespacet &ns);
-
-void rewrite_union(
-  goto_functionst &goto_functions,
-  const namespacet &ns);
-void rewrite_union(goto_modelt &goto_model);
+void rewrite_union(exprt &);
+void rewrite_union(goto_functionst::goto_functiont &);
+void rewrite_union(goto_functionst &);
+void rewrite_union(goto_modelt &);
 
 #endif // CPROVER_GOTO_SYMEX_REWRITE_UNION_H
