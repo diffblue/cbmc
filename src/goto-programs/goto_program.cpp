@@ -165,7 +165,8 @@ std::ostream &goto_programt::output_instruction(
         instruction.code.find(ID_exception_list).get_sub();
       DATA_INVARIANT(
         instruction.targets.size() == exception_list.size(),
-        "size of target list");
+        "unexpected discrepancy between sizes of instruction"
+        "targets and exception list");
       for(instructiont::targetst::const_iterator
             gt_it=instruction.targets.begin();
           gt_it!=instruction.targets.end();
@@ -223,10 +224,11 @@ void goto_programt::get_decl_identifiers(
     if(it->is_decl())
     {
       DATA_INVARIANT(
-        it->code.get_statement() == ID_decl, "declaration statements");
+        it->code.get_statement() == ID_decl,
+        "expected statement to be declaration statement");
       DATA_INVARIANT(
         it->code.operands().size() == 1,
-        "declaration statement expects 1 operand");
+        "declaration statement expects one operand");
       const symbol_exprt &symbol_expr=to_symbol_expr(it->code.op0());
       decl_identifiers.insert(symbol_expr.get_identifier());
     }
@@ -237,26 +239,24 @@ void parse_lhs_read(const exprt &src, std::list<exprt> &dest)
 {
   if(src.id()==ID_dereference)
   {
-    PRECONDITION(src.operands().size() == 1);
-    dest.push_back(src.op0());
+    dest.push_back(to_dereference_expr(src).pointer());
   }
   else if(src.id()==ID_index)
   {
-    PRECONDITION(src.operands().size() == 2);
-    dest.push_back(src.op1());
-    parse_lhs_read(src.op0(), dest);
+    auto &index_expr = to_index_expr(src);
+    dest.push_back(index_expr.index());
+    parse_lhs_read(index_expr.array(), dest);
   }
   else if(src.id()==ID_member)
   {
-    PRECONDITION(src.operands().size() == 1);
-    parse_lhs_read(src.op0(), dest);
+    parse_lhs_read(to_member_expr(src).compound(), dest);
   }
   else if(src.id()==ID_if)
   {
-    PRECONDITION(src.operands().size() == 3);
-    dest.push_back(src.op0());
-    parse_lhs_read(src.op1(), dest);
-    parse_lhs_read(src.op2(), dest);
+    auto &if_expr = to_if_expr(src);
+    dest.push_back(if_expr.cond());
+    parse_lhs_read(if_expr.true_case(), dest);
+    parse_lhs_read(if_expr.false_case(), dest);
   }
 }
 
@@ -346,9 +346,9 @@ void objects_read(
   else if(src.id()==ID_dereference)
   {
     // this reads what is pointed to plus the pointer
-    PRECONDITION(src.operands().size() == 1);
-    dest.push_back(src);
-    objects_read(src.op0(), dest);
+    auto &deref = to_dereference_expr(src);
+    dest.push_back(deref);
+    objects_read(deref.pointer(), dest);
   }
   else
   {
@@ -376,9 +376,9 @@ void objects_written(
 {
   if(src.id()==ID_if)
   {
-    PRECONDITION(src.operands().size() == 3);
-    objects_written(src.op1(), dest);
-    objects_written(src.op2(), dest);
+    auto &if_expr = to_if_expr(src);
+    objects_written(if_expr.true_case(), dest);
+    objects_written(if_expr.false_case(), dest);
   }
   else
     dest.push_back(src);
@@ -557,7 +557,8 @@ void goto_programt::compute_target_numbers()
     if(i.is_target())
     {
       i.target_number=++cnt;
-      DATA_INVARIANT(i.target_number != 0, "instruction's number cannot be 0");
+      DATA_INVARIANT(
+        i.target_number != 0, "GOTO instruction target cannot be zero");
     }
   }
 
@@ -571,10 +572,10 @@ void goto_programt::compute_target_numbers()
       if(t!=instructions.end())
       {
         DATA_INVARIANT(
-          t->target_number != 0, "instruction's number cannot be 0");
+          t->target_number != 0, "instruction's number cannot be zero");
         DATA_INVARIANT(
           t->target_number != instructiont::nil_target,
-          "instruction cannot be an invalid target");
+          "GOTO instruction target cannot be nil_target");
       }
     }
   }

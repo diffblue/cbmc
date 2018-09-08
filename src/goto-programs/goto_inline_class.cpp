@@ -54,7 +54,7 @@ void goto_inlinet::parameter_assignments(
 
     const irep_idt &identifier=parameter.get_identifier();
 
-    INVARIANT(
+    DATA_INVARIANT(
       !identifier.empty(),
       source_location.as_string() + ": no identifier for function parameter");
 
@@ -842,7 +842,7 @@ void goto_inlinet::goto_inline_logt::copy_from(
   {
     DATA_INVARIANT(
       it2 != to.instructions.end(),
-      "'to' target function is not alllowed to be empty");
+      "'to' target function is not allowed to be empty");
     DATA_INVARIANT(
       it1->location_number == it2->location_number,
       "both functions' instruction should point to the same source");

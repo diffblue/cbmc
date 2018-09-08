@@ -60,10 +60,10 @@ void goto_convertt::remove_assignment(
           statement==ID_assign_bitxor ||
           statement==ID_assign_bitor)
   {
-    INVARIANT(
+    INVARIANT_WITH_DIAGNOSTICS(
       expr.operands().size() == 2,
-      expr.find_source_location().as_string() + ": " + id2string(statement) +
-        " takes two arguments");
+      id2string(statement) + " expects two arguments",
+      expr.find_source_location());
 
     irep_idt new_id;
 
@@ -138,16 +138,16 @@ void goto_convertt::remove_pre(
   bool result_is_used,
   const irep_idt &mode)
 {
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     expr.operands().size() == 1,
-    expr.find_source_location().as_string() +
-      ": preincrement/predecrement must have one operand");
+    "preincrement/predecrement must have one operand",
+    expr.find_source_location());
 
   const irep_idt statement=expr.get_statement();
 
   DATA_INVARIANT(
     statement == ID_preincrement || statement == ID_predecrement,
-    " expected preincrement or predecrement");
+    "expects preincrement or predecrement");
 
   exprt rhs;
   rhs.add_source_location()=expr.source_location();
@@ -227,16 +227,16 @@ void goto_convertt::remove_post(
 
   // we have ...(op++)...
 
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     expr.operands().size() == 1,
-    expr.find_source_location().as_string() +
-      ": postincrement/postdecrement must have one operand");
+    "postincrement/postdecrement must have one operand",
+    expr.find_source_location());
 
   const irep_idt statement=expr.get_statement();
 
   DATA_INVARIANT(
     statement == ID_postincrement || statement == ID_postdecrement,
-    " expected postincrement or postdecrement");
+    "expects postincrement or postdecrement");
 
   exprt rhs;
   rhs.add_source_location()=expr.source_location();
@@ -326,12 +326,13 @@ void goto_convertt::remove_function_call(
   const irep_idt &mode,
   bool result_is_used)
 {
+  INVARIANT_WITH_DIAGNOSTICS(
+    expr.operands().size() == 2,
+    "function_call expects two operands",
+    expr.find_source_location());
+
   if(!result_is_used)
   {
-    DATA_INVARIANT(
-      expr.operands().size() == 2,
-      expr.find_source_location().as_string() +
-        ": function_call expects two operands");
     code_function_callt call(nil_exprt(), expr.op0(), expr.op1().operands());
     call.add_source_location()=expr.source_location();
     convert_function_call(call, dest, mode);
@@ -341,14 +342,10 @@ void goto_convertt::remove_function_call(
 
   // get name of function, if available
 
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     expr.id() == ID_side_effect && expr.get(ID_statement) == ID_function_call,
-    expr.find_source_location().as_string() + ": expected function call");
-
-  DATA_INVARIANT(
-    !expr.operands().empty(),
-    expr.find_source_location().as_string() +
-      ": function_call expects at least one operand");
+    "expects function call",
+    expr.find_source_location());
 
   std::string new_base_name = "return_value";
   irep_idt new_symbol_mode = mode;
@@ -430,7 +427,7 @@ void goto_convertt::remove_cpp_delete(
   side_effect_exprt &expr,
   goto_programt &dest)
 {
-  DATA_INVARIANT(expr.operands().size() == 1, "cpp_delete expected 1 operand");
+  DATA_INVARIANT(expr.operands().size() == 1, "cpp_delete expects one operand");
 
   codet tmp(expr.get_statement());
   tmp.add_source_location()=expr.source_location();
@@ -483,10 +480,10 @@ void goto_convertt::remove_temporary_object(
   goto_programt &dest)
 {
   const irep_idt &mode = expr.get(ID_mode);
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     expr.operands().size() <= 1,
-    expr.find_source_location().as_string() +
-      ": temporary_object takes 0 or 1 operands");
+    "temporary_object takes zero or one operands",
+    expr.find_source_location());
 
   symbolt &new_symbol = new_tmp_symbol(
     expr.type(), "obj", dest, expr.find_source_location(), mode);
@@ -500,10 +497,10 @@ void goto_convertt::remove_temporary_object(
 
   if(expr.find(ID_initializer).is_not_nil())
   {
-    INVARIANT(
+    INVARIANT_WITH_DIAGNOSTICS(
       expr.operands().empty(),
-      expr.find_source_location().as_string() +
-        ": temporary_object takes 0 operands");
+      "temporary_object takes zero operands",
+      expr.find_source_location());
     exprt initializer=static_cast<const exprt &>(expr.find(ID_initializer));
     replace_new_object(new_symbol.symbol_expr(), initializer);
 
@@ -524,15 +521,15 @@ void goto_convertt::remove_statement_expression(
   // The expression is copied into a temporary before the
   // scope is destroyed.
 
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     expr.operands().size() == 1,
-    expr.find_source_location().as_string() +
-      ": statement_expression takes 1 operand");
+    "statement_expression takes one operand",
+    expr.find_source_location());
 
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     expr.op0().id() == ID_code,
-    expr.find_source_location().as_string() +
-      ": statement_expression takes code as operand");
+    "statement_expression takes code as operand",
+    expr.find_source_location());
 
   codet &code=to_code(expr.op0());
 
@@ -543,15 +540,15 @@ void goto_convertt::remove_statement_expression(
     return;
   }
 
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     code.get_statement() == ID_block,
-    code.find_source_location().as_string() +
-      ": statement_expression takes block as operand");
+    "statement_expression takes block as operand",
+    code.find_source_location());
 
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     !code.operands().empty(),
-    expr.find_source_location().as_string() +
-      ": statement_expression takes non-empty block as operand");
+    "statement_expression takes non-empty block as operand",
+    expr.find_source_location());
 
   // get last statement from block, following labels
   codet &last=to_code_block(code).find_last_statement();
