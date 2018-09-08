@@ -75,6 +75,64 @@ static int stdio_redirection(int fd, const std::string &file)
 }
 #endif
 
+#ifdef _WIN32
+// Read
+// https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/
+std::wstring quote_windows_arg(const std::wstring &src)
+{
+  if(src.find_first_of(L" \t\n\v\"") == src.npos)
+    return src;
+
+  std::wstring result = L"\"";
+
+  for(auto it = src.begin();; ++it)
+  {
+    std::size_t NumberBackslashes = 0;
+
+    while(it != src.end() && *it == L'\\')
+    {
+      ++it;
+      ++NumberBackslashes;
+    }
+
+    if(it == src.end())
+    {
+      //
+      // Escape all backslashes, but let the terminating
+      // double quotation mark we add below be interpreted
+      // as a metacharacter.
+      //
+
+      result.append(NumberBackslashes * 2, L'\\');
+      break;
+    }
+    else if(*it == L'"')
+    {
+      //
+      // Escape all backslashes and the following
+      // double quotation mark.
+      //
+
+      result.append(NumberBackslashes * 2 + 1, L'\\');
+      result.push_back(*it);
+    }
+    else
+    {
+      //
+      // Backslashes aren't special here.
+      //
+
+      result.append(NumberBackslashes, L'\\');
+      result.push_back(*it);
+    }
+  }
+
+  result.push_back(L'"');
+
+  return result;
+}
+#endif
+
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,
@@ -112,13 +170,13 @@ int run(
     return run(new_argv[0], new_argv, "", "", "");
   }
 
-  // unicode version of the arguments
+  // unicode and whitespace-quoted version of the arguments
   std::vector<std::wstring> wargv;
 
   wargv.resize(argv.size());
 
   for(std::size_t i=0; i<argv.size(); i++)
-    wargv[i]=widen(argv[i]);
+    wargv[i]=quote_windows_arg(widen(argv[i]));
 
   std::vector<const wchar_t *> _argv(argv.size()+1);
 
@@ -126,10 +184,6 @@ int run(
     _argv[i]=wargv[i].c_str();
 
   _argv[argv.size()]=NULL;
-
-  // warning: the arguments may still need escaping,
-  // as windows will concatenate the argv strings back together,
-  // separating them with spaces
 
   std::wstring wide_what=widen(what);
   int status=_wspawnvp(_P_WAIT, wide_what.c_str(), _argv.data());
