@@ -322,11 +322,12 @@ void dump_ct::convert_compound(
     if(!system_symbols.is_symbol_internal_symbol(symbol, system_headers))
       convert_compound(symbol.type, unresolved, recursive, os);
   }
-  else if(type.id()==ID_c_enum_tag)
+  else if(
+    type.id() == ID_c_enum_tag || type.id() == ID_struct_tag ||
+    type.id() == ID_union_tag)
   {
-    const symbolt &symbol=
-      ns.lookup(to_c_enum_tag_type(type).get_identifier());
-    DATA_INVARIANT(symbol.is_type, "symbol expected to be type symbol");
+    const symbolt &symbol = ns.lookup(to_tag_type(type));
+    DATA_INVARIANT(symbol.is_type, "tag expected to be type symbol");
 
     if(!system_symbols.is_symbol_internal_symbol(symbol, system_headers))
       convert_compound(symbol.type, unresolved, recursive, os);
@@ -672,6 +673,13 @@ void dump_ct::collect_typedefs_rec(
   {
     const symbolt &symbol=
       ns.lookup(to_symbol_type(type).get_identifier());
+    collect_typedefs_rec(symbol.type, early, local_deps);
+  }
+  else if(
+    type.id() == ID_c_enum_tag || type.id() == ID_struct_tag ||
+    type.id() == ID_union_tag)
+  {
+    const symbolt &symbol = ns.lookup(to_tag_type(type));
     collect_typedefs_rec(symbol.type, early, local_deps);
   }
 
