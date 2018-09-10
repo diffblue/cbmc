@@ -105,7 +105,6 @@ static void update_index_set(
 /// \param val: an index expression
 /// \return `axiom` with substitued `qvar`
 static exprt instantiate(
-  messaget::mstreamt &stream,
   const string_constraintt &axiom,
   const exprt &str,
   const exprt &val);
@@ -229,7 +228,6 @@ static void display_index_set(
 ///     (See `instantiate(const string_not_contains_constraintt&,const index_set_pairt&,const string_constraint_generatort&,const std::map<string_not_contains_constraintt, symbol_exprt>&)`
 ///      for details)
 static std::vector<exprt> generate_instantiations(
-  messaget::mstreamt &stream,
   const string_constraint_generatort &generator,
   const index_set_pairt &index_set,
   const string_axiomst &axioms,
@@ -242,7 +240,7 @@ static std::vector<exprt> generate_instantiations(
     for(const auto &univ_axiom : axioms.universal)
     {
       for(const auto &j : i.second)
-        lemmas.push_back(instantiate(stream, univ_axiom, i.first, j));
+        lemmas.push_back(instantiate(univ_axiom, i.first, j));
     }
   }
   for(const auto &nc_axiom : axioms.not_contains)
@@ -762,8 +760,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   initial_index_set(index_sets, ns, axioms);
   update_index_set(index_sets, ns, current_constraints);
   current_constraints.clear();
-  for(const auto &instance : generate_instantiations(
-        debug(), generator, index_sets, axioms, not_contain_witnesses))
+  const auto instances = generate_instantiations(
+    generator, index_sets, axioms, not_contain_witnesses);
+  for(const auto &instance : instances)
     add_lemma(instance);
 
   while((loop_bound_--)>0)
@@ -819,8 +818,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         }
       }
       current_constraints.clear();
-      for(const auto &instance : generate_instantiations(
-            debug(), generator, index_sets, axioms, not_contain_witnesses))
+      const auto instances = generate_instantiations(
+        generator, index_sets, axioms, not_contain_witnesses);
+      for(const auto &instance : instances)
         add_lemma(instance);
     }
     else
@@ -1519,7 +1519,6 @@ exprt simplify_sum(const exprt &f)
 ///   $q + x$, `compute_inverse_function(q,v,f)` returns an expression
 ///   for $v - x$.
 static exprt compute_inverse_function(
-  messaget::mstreamt &stream,
   const exprt &qvar,
   const exprt &val,
   const exprt &f)
@@ -1550,8 +1549,6 @@ static exprt compute_inverse_function(
         "a proper function must have exactly one "
         "occurrences after reduction, or it cancelled out, and it does not"
         " have one"));
-    stream << "in string_refinementt::compute_inverse_function:"
-           << " warning: occurrences of qvar cancelled out " << messaget::eom;
   }
 
   elems.erase(it);
@@ -1830,13 +1827,11 @@ find_indexes(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 /// For instance, if `axiom` corresponds to \f$\forall q. s[q+x]={\tt 'a'} \land
 /// t[q]={\tt 'b'} \f$, `instantiate(axiom,s,v)` would return an expression for
 /// \f$s[v]={\tt 'a'} \land t[v-x]={\tt 'b'}\f$.
-/// \param stream: a message stream
 /// \param axiom: a universally quantified formula `axiom`
 /// \param str: an array of characters
 /// \param val: an index expression
 /// \return instantiated formula
 static exprt instantiate(
-  messaget::mstreamt &stream,
   const string_constraintt &axiom,
   const exprt &str,
   const exprt &val)
@@ -1849,7 +1844,7 @@ static exprt instantiate(
   for(const auto &index : indexes)
   {
     const exprt univ_var_value =
-      compute_inverse_function(stream, axiom.univ_var, val, index);
+      compute_inverse_function(axiom.univ_var, val, index);
     implies_exprt instance(
       and_exprt(
         binary_relation_exprt(axiom.univ_var, ID_ge, axiom.lower_bound),
