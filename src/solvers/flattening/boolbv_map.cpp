@@ -67,7 +67,9 @@ boolbv_mapt::map_entryt &boolbv_mapt::get_map_entry(
     map_entry.literal_map.resize(map_entry.width);
   }
 
-  assert(map_entry.literal_map.size()==map_entry.width);
+  INVARIANT(
+    map_entry.literal_map.size() == map_entry.width,
+    "number of literals in the literal map shall equal the bitvector width");
 
   return map_entry;
 }
@@ -89,15 +91,18 @@ void boolbv_mapt::get_literals(
 {
   map_entryt &map_entry=get_map_entry(identifier, type);
 
-  assert(literals.size()==width);
-  assert(map_entry.literal_map.size()==width);
+  PRECONDITION(literals.size() == width);
+  INVARIANT(
+    map_entry.literal_map.size() == width,
+    "number of literals in the literal map shall equal the bitvector width");
 
   Forall_literals(it, literals)
   {
     literalt &l=*it;
     const std::size_t bit=it-literals.begin();
 
-    assert(bit<map_entry.literal_map.size());
+    INVARIANT(
+      bit < map_entry.literal_map.size(), "bit index shall be within bounds");
     map_bitt &mb=map_entry.literal_map[bit];
 
     if(mb.is_set)
@@ -128,12 +133,15 @@ void boolbv_mapt::set_literals(
   forall_literals(it, literals)
   {
     const literalt &literal=*it;
-    const std::size_t bit=it-literals.begin();
 
-    assert(literal.is_constant() ||
-           literal.var_no()<prop.no_variables());
+    INVARIANT(
+      literal.is_constant() || literal.var_no() < prop.no_variables(),
+      "variable number of non-constant literals shall be within bounds");
 
-    assert(bit<map_entry.literal_map.size());
+    const std::size_t bit = it - literals.begin();
+
+    INVARIANT(
+      bit < map_entry.literal_map.size(), "bit index shall be within bounds");
     map_bitt &mb=map_entry.literal_map[bit];
 
     if(mb.is_set)
