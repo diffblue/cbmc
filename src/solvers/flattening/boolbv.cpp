@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <cassert>
+#include <algorithm>
 #include <map>
 #include <set>
 
@@ -36,7 +36,10 @@ bool boolbvt::literal(
 {
   if(expr.type().id()==ID_bool)
   {
-    assert(bit==0);
+    INVARIANT(
+      bit == 0,
+      "boolean expressions shall be represented by a single bit and hence the "
+      "only valid bit index is 0");
     return prop_conv_solvert::literal(to_symbol_expr(expr), dest);
   }
   else
@@ -54,7 +57,8 @@ bool boolbvt::literal(
 
       const boolbv_mapt::map_entryt &map_entry=it_m->second;
 
-      assert(bit<map_entry.literal_map.size());
+      INVARIANT(
+        bit < map_entry.literal_map.size(), "bit index shall be within bounds");
       if(!map_entry.literal_map[bit].is_set)
         return true;
 
@@ -66,15 +70,11 @@ bool boolbvt::literal(
       const index_exprt &index_expr=to_index_expr(expr);
 
       std::size_t element_width=boolbv_width(index_expr.type());
+      CHECK_RETURN(element_width != 0);
 
-      if(element_width==0)
-        throw "literal expects a bit-vector type";
+      mp_integer index = numeric_cast_v<mp_integer>(index_expr.index());
 
-      mp_integer index;
-      if(to_integer(index_expr.index(), index))
-        throw "literal expects constant index";
-
-      std::size_t offset=integer2unsigned(index*element_width);
+      std::size_t offset = numeric_cast_v<std::size_t>(index * element_width);
 
       return literal(index_expr.array(), bit+offset, dest);
     }
@@ -96,18 +96,16 @@ bool boolbvt::literal(
           return literal(expr.op0(), bit+offset, dest);
 
         std::size_t element_width=boolbv_width(subtype);
-
-        if(element_width==0)
-          throw "literal expects a bit-vector type";
+        CHECK_RETURN(element_width != 0);
 
         offset+=element_width;
       }
 
-      throw "failed to find component";
+      INVARIANT(false, "struct type should have accessed component");
     }
   }
 
-  throw "found no literal for expression";
+  INVARIANT(false, "expression should have a corresponding literal");
 }
 
 const bvt &
@@ -308,7 +306,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id()==ID_float_debug1 ||
           expr.id()==ID_float_debug2)
   {
-    assert(expr.operands().size()==2);
+    DATA_INVARIANT(expr.operands().size() == 2, "");
     bvt bv0=convert_bitvector(expr.op0());
     bvt bv1=convert_bitvector(expr.op1());
     float_utilst float_utils(prop, to_floatbv_type(expr.type()));
@@ -330,8 +328,8 @@ bvt boolbvt::convert_lambda(const exprt &expr)
   if(width==0)
     return conversion_failed(expr);
 
-  if(expr.operands().size()!=2)
-    throw "lambda takes two operands";
+  DATA_INVARIANT(
+    expr.operands().size() == 2, "lambda expression should have two operands");
 
   if(expr.type().id()!=ID_array)
     return conversion_failed(expr);
@@ -358,10 +356,12 @@ bvt boolbvt::convert_lambda(const exprt &expr)
 
     const bvt &tmp=convert_bv(expr_op1);
 
-    std::size_t offset=integer2unsigned(i*tmp.size());
+    INVARIANT(
+      size * tmp.size() == width,
+      "total bitvector width shall equal the number of operands times the size "
+      "per operand");
 
-    if(size*tmp.size()!=width)
-      throw "convert_lambda: unexpected operand width";
+    std::size_t offset = numeric_cast_v<std::size_t>(i * tmp.size());
 
     for(std::size_t j=0; j<tmp.size(); j++)
       bv[offset+j]=tmp[j];
@@ -399,10 +399,8 @@ bvt boolbvt::convert_symbol(const exprt &expr)
   bvt bv;
   bv.resize(width);
 
-  const irep_idt &identifier=expr.get(ID_identifier);
-
-  if(identifier.empty())
-    throw "convert_symbol got empty identifier";
+  const irep_idt &identifier = expr.get(ID_identifier);
+  CHECK_RETURN(!identifier.empty());
 
   if(width==0)
   {
@@ -413,13 +411,15 @@ bvt boolbvt::convert_symbol(const exprt &expr)
   {
     map.get_literals(identifier, type, width, bv);
 
-    forall_literals(it, bv)
-      if(it->var_no()>=prop.no_variables() &&
-        !it->is_constant())
-      {
-        error() << identifier << eom;
-        assert(false);
-      }
+    INVARIANT_WITH_DIAGNOSTICS(
+      std::all_of(
+        bv.begin(),
+        bv.end(),
+        [this](const literalt &l) {
+          return l.var_no() < prop.no_variables() || l.is_constant();
+        }),
+      "variable number of non-constant literals should be within bounds",
+      id2string(identifier));
   }
 
   return bv;
