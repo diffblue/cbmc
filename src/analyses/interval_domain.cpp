@@ -329,10 +329,10 @@ void interval_domaint::assume_rec(
     {
       integer_intervalt &lhs_i=int_map[lhs_identifier];
       integer_intervalt &rhs_i=int_map[rhs_identifier];
-      lhs_i.meet(rhs_i);
-      rhs_i=lhs_i;
-      if(rhs_i.is_bottom())
-        make_bottom();
+      if(id == ID_lt && !lhs_i.is_less_than(rhs_i))
+        lhs_i.make_less_than(rhs_i);
+      if(id == ID_le && !lhs_i.is_less_than_eq(rhs_i))
+        lhs_i.make_less_than_eq(rhs_i);
     }
     else if(is_float(lhs.type()) && is_float(rhs.type()))
     {

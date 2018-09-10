@@ -143,6 +143,47 @@ public:
     }
   }
 
+  void make_bottom()
+  {
+    lower_set = upper_set = true;
+    upper = T();
+    lower = upper + 1;
+  }
+
+  void make_less_than_eq(interval_templatet &i)
+  {
+    if(upper_set && i.upper_set)
+      upper = std::min(upper, i.upper);
+    if(lower_set && i.lower_set)
+      i.lower = std::max(lower, i.lower);
+  }
+
+  void make_less_than(interval_templatet &i)
+  {
+    make_less_than_eq(i);
+    if(singleton() && i.singleton() && lower == i.lower)
+    {
+      make_bottom();
+      i.make_bottom();
+    }
+  }
+
+  bool is_less_than_eq(const interval_templatet &i)
+  {
+    if(i.lower_set && upper_set && upper <= i.lower)
+      return true;
+    else
+      return false;
+  }
+
+  bool is_less_than(const interval_templatet &i)
+  {
+    if(i.lower_set && upper_set && upper < i.lower)
+      return true;
+    else
+      return false;
+  }
+
   void approx_union_with(const interval_templatet &i)
   {
     if(i.lower_set && lower_set)
