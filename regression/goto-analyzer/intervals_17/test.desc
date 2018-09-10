@@ -1,0 +1,8 @@
+CORE
+main.c
+--intervals --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* y\s*<=\s*10: Success$
+--
+^warning: ignoring
