@@ -249,8 +249,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_unary_minus(to_unary_expr(expr));
   else if(expr.id()==ID_unary_plus)
   {
-    assert(expr.operands().size()==1);
-    return convert_bitvector(expr.op0());
+    return convert_bitvector(to_unary_plus_expr(expr).op());
   }
   else if(expr.id()==ID_abs)
     return convert_abs(to_abs_expr(expr));
