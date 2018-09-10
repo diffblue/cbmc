@@ -438,6 +438,49 @@ inline void validate_expr(const unary_minus_exprt &value)
   validate_operands(value, 1, "Unary minus must have one operand");
 }
 
+/// \brief The unary plus expression
+class unary_plus_exprt : public unary_exprt
+{
+public:
+  explicit unary_plus_exprt(const exprt &op)
+    : unary_exprt(ID_unary_plus, op, op.type())
+  {
+  }
+};
+
+/// \brief Cast an exprt to a \ref unary_plus_exprt
+///
+/// \a expr must be known to be \ref unary_plus_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref unary_plus_exprt
+inline const unary_plus_exprt &to_unary_plus_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_unary_plus);
+  DATA_INVARIANT(
+    expr.operands().size() == 1, "unary plus must have one operand");
+  return static_cast<const unary_plus_exprt &>(expr);
+}
+
+/// \copydoc to_unary_minus_expr(const exprt &)
+inline unary_plus_exprt &to_unary_plus_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_unary_plus);
+  DATA_INVARIANT(
+    expr.operands().size() == 1, "unary plus must have one operand");
+  return static_cast<unary_plus_exprt &>(expr);
+}
+
+template <>
+inline bool can_cast_expr<unary_plus_exprt>(const exprt &base)
+{
+  return base.id() == ID_unary_plus;
+}
+inline void validate_expr(const unary_plus_exprt &value)
+{
+  validate_operands(value, 1, "unary plus must have one operand");
+}
+
 /// \brief The byte swap expression
 class bswap_exprt: public unary_exprt
 {
