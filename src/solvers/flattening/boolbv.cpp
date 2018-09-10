@@ -110,7 +110,8 @@ bool boolbvt::literal(
   throw "found no literal for expression";
 }
 
-const bvt &boolbvt::convert_bv(const exprt &expr)
+const bvt &
+boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)
 {
   // check cache first
   std::pair<bv_cachet::iterator, bool> cache_result=
@@ -123,18 +124,27 @@ const bvt &boolbvt::convert_bv(const exprt &expr)
   // Iterators into hash_maps supposedly stay stable
   // even though we are inserting more elements recursively.
 
-  cache_result.first->second=convert_bitvector(expr);
+  const bvt &bv = convert_bitvector(expr);
+
+  INVARIANT_WITH_DIAGNOSTICS(
+    !expected_width || bv.size() == *expected_width,
+    "bitvector width shall match the indicated expected width",
+    expr.find_source_location(),
+    expr.pretty());
+
+  cache_result.first->second = bv;
 
   // check
   forall_literals(it, cache_result.first->second)
   {
     if(freeze_all && !it->is_constant())
       prop.set_frozen(*it);
-    if(it->var_no()==literalt::unused_var_no())
-    {
-      error() << "unused_var_no: " << expr.pretty() << eom;
-      assert(false);
-    }
+
+    INVARIANT_WITH_DIAGNOSTICS(
+      it->var_no() != literalt::unused_var_no(),
+      "variable number must be different from the unused variable number",
+      expr.find_source_location(),
+      expr.pretty());
   }
 
   return cache_result.first->second;

@@ -14,9 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 // convert expression to boolean formula
 //
 
-#include <util/mp_arith.h>
-#include <util/expr.h>
 #include <util/byte_operators.h>
+#include <util/expr.h>
+#include <util/mp_arith.h>
+#include <util/optional.h>
 
 #include "bv_utils.h"
 #include "boolbv_width.h"
@@ -43,7 +44,10 @@ public:
   {
   }
 
-  virtual const bvt &convert_bv(const exprt &expr); // check cache
+  virtual const bvt &convert_bv( // check cache
+    const exprt &expr,
+    const optionalt<std::size_t> expected_width = nullopt);
+
   virtual bvt convert_bitvector(const exprt &expr); // no cache
 
   // overloading
