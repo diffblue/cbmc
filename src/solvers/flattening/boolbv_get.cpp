@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <cassert>
-
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/threeval.h>
@@ -38,14 +36,15 @@ exprt boolbvt::get(const exprt &expr) const
       std::vector<bool> unknown;
       bvt bv;
       std::size_t width=map_entry.width;
-
+      DATA_INVARIANT(
+        map_entry.width <= map_entry.literal_map.size(),
+        "literal width must be less than equal to that returned from SAT "
+        "solver");
       bv.resize(width);
       unknown.resize(width);
 
       for(std::size_t bit_nr=0; bit_nr<width; bit_nr++)
       {
-        assert(bit_nr<map_entry.literal_map.size());
-
         if(map_entry.literal_map[bit_nr].is_set)
         {
           unknown[bit_nr]=false;
@@ -76,8 +75,8 @@ exprt boolbvt::bv_get_rec(
 
   std::size_t width=boolbv_width(type);
 
-  assert(bv.size()==unknown.size());
-  assert(bv.size()>=offset+width);
+  PRECONDITION(bv.size() == unknown.size());
+  PRECONDITION(bv.size() >= offset + width);
 
   if(type.id()==ID_bool)
   {
@@ -164,7 +163,9 @@ exprt boolbvt::bv_get_rec(
       const union_typet &union_type=to_union_type(type);
       const union_typet::componentst &components=union_type.components();
 
-      assert(!components.empty());
+      // Note that gcc at least does allow empty unions in non-pedantic mode
+      // not sure if this can lead to problems here
+      DATA_INVARIANT(!components.empty(), "A union should have members");
 
       // Any idea that's better than just returning the first component?
       std::size_t component_nr=0;
@@ -333,9 +334,9 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
     // get root
     const auto number = arrays.find_number(*opt_num);
 
-    assert(number<index_map.size());
+    CHECK_RETURN(number < index_map.size());
     index_mapt::const_iterator it=index_map.find(number);
-    assert(it!=index_map.end());
+    CHECK_RETURN(it != index_map.end());
     const index_sett &index_set=it->second;
 
     for(index_sett::const_iterator it1=
@@ -414,18 +415,19 @@ mp_integer boolbvt::get_value(
   std::size_t offset,
   std::size_t width)
 {
+  PRECONDITION(bv.size() >= offset + width);
   mp_integer value=0;
   mp_integer weight=1;
 
   for(std::size_t bit_nr=offset; bit_nr<offset+width; bit_nr++)
   {
-    assert(bit_nr<bv.size());
     switch(prop.l_get(bv[bit_nr]).get_value())
     {
      case tvt::tv_enumt::TV_FALSE:   break;
      case tvt::tv_enumt::TV_TRUE:    value+=weight; break;
      case tvt::tv_enumt::TV_UNKNOWN: break;
-     default: assert(false);
+     default:
+       UNREACHABLE;
     }
 
     weight*=2;
