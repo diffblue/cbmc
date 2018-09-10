@@ -256,9 +256,72 @@ To be documented.
 
 To be documented.
 
-\section java-bytecode-lazy-methods-v1 Context Insensitive lazy methods (aka lazy methods v1)
+\section loading-strategies Loading strategies
 
-To be documented.
+Loading strategies are policies that determine what classes and method bodies
+are loaded. On an initial pass, the symbols for all classes in all paths on
+the Java classpath are loaded. Eager loading is a policy that then loads
+all the method bodies for every one of these classes. Lazy loading
+strategies are policies that only load class symbols and/or method bodies
+when they are in some way requested.
+
+The mechanism used to achieve this is initially common to both eager and
+context-insensitive lazy loading. \ref java_bytecode_languaget::typecheck calls
+[java_bytecode_convert_class](\ref java_bytecode_languaget::java_bytecode_convert_class)
+(for each class loaded by the class loader) to create symbols for all classes
+and the methods in them. The methods, along with their parsed representation
+(including bytecode) are also added to a map called
+\ref java_bytecode_languaget::method_bytecode via a reference held in
+\ref java_bytecode_convert_classt::method_bytecode. typecheck then performs a
+switch over the value of
+[lazy_methods_mode](\ref java_bytecode_languaget::lazy_methods_mode) to
+determine which loading strategy to use.
+
+\subsection eager-loading Eager loading
+
+If [lazy_methods_mode](\ref java_bytecode_languaget::lazy_methods_mode) is
+\ref java_bytecode_languaget::LAZY_METHODS_MODE_EAGER then eager loading is
+used. Under eager loading
+\ref java_bytecode_languaget::convert_single_method(const irep_idt &, symbol_table_baset &)
+is called once for each method listed in method_bytecode (described above). This
+then calls
+\ref java_bytecode_languaget::convert_single_method(const irep_idt &, symbol_table_baset &, optionalt<ci_lazy_methods_neededt>)
+without a ci_lazy_methods_neededt object, which calls
+\ref java_bytecode_convert_method, passing in the method parse tree. This in
+turn uses \ref java_bytecode_convert_methodt to turn the bytecode into symbols
+for the parameters and local variables and finish populating the symbol for the
+method, including converting the instructions to a codet.
+
+\subsection java-bytecode-lazy-methods-v1 Context-Insensitive lazy methods (aka lazy methods v1)
+
+Context-insensitive lazy loading is an alternative method body loading strategy
+to eager loading that has been used in Deeptest for a while.
+Context-insensitive lazy loading starts at the method given by the `--function`
+argument and follows type references (e.g. in the definitions of fields and
+method parameters) and function references (at function call sites) to
+locate further classes and methods to load. The following paragraph describes
+the mechanism used.
+
+If [lazy_methods_mode](\ref java_bytecode_languaget::lazy_methods_mode) is
+\ref lazy_methods_modet::LAZY_METHODS_MODE_CONTEXT_INSENSITIVE then
+context-insensitive lazy loading is used. Under this stragegy
+\ref java_bytecode_languaget::do_ci_lazy_method_conversion is called to do all
+conversion. This calls
+\ref ci_lazy_methodst::operator()(symbol_tablet &, method_bytecodet &, const method_convertert &),
+which creates a work list of methods to check, starting with the entry point,
+and classes, starting with the types of any class-typed parameters to the entry
+point. For each method in the work list it calls
+\ref ci_lazy_methodst::convert_and_analyze_method, which calls the same
+java_bytecode_languaget::convert_single_method used by eager loading to do the
+conversion (via a `std::function` object passed in via parameter
+method_converter) and then calls
+\ref ci_lazy_methodst::gather_virtual_callsites to locate virtual calls. Any
+classes that may implement an override of the virtual function called are added
+to the work list. Finally the symbol table is iterated over and methods that
+have been converted, their parameters and local variables, globals accessed
+from these methods and classes are kept, everything else is thrown away. This
+leaves a symbol table that contains reachable symbols fully populated,
+including the instructions for methods converted to a \ref codet.
 
 \section java-bytecode-core-models-library Core Models Library
 
