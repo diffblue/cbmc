@@ -12,6 +12,7 @@ target_link_libraries(jbmc-lib
     ansi-c
     big-int
     cbmc-lib
+    goto-checker
     goto-instrument-lib
     goto-programs
     goto-symex
