@@ -15,22 +15,25 @@ Date: August 2012
 #else
 
 #include <cstring>
-#include <unistd.h>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 
-#include <sys/wait.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #endif
 
-#include <util/invariant.h>
-#include <util/unicode.h>
-#include <util/signal_catcher.h>
+#include <fstream>
+
+#include "invariant.h"
+#include "signal_catcher.h"
+#include "tempfile.h"
+#include "unicode.h"
 
 int run(const std::string &what, const std::vector<std::string> &argv)
 {
@@ -227,4 +230,23 @@ int run(
     return 1;
   }
   #endif
+}
+
+int run(
+  const std::string &what,
+  const std::vector<std::string> &argv,
+  const std::string &std_input,
+  std::ostream &std_output,
+  const std::string &std_error)
+{
+  temporary_filet tmpi("tmp.stdout", "");
+
+  int result = run(what, argv, std_input, tmpi(), std_error);
+
+  std::ifstream instream(tmpi());
+
+  if(instream)
+    std_output << instream.rdbuf(); // copy
+
+  return result;
 }
