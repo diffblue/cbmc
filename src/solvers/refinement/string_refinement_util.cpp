@@ -334,7 +334,7 @@ static void add_dependency_to_string_subexprs(
         if(is_refined_string_type(e.type()))
         {
           const auto string_struct = expr_checked_cast<struct_exprt>(e);
-          const auto string = array_pool.of_argument(string_struct);
+          const auto string = of_argument(array_pool, string_struct);
           dependencies.add_dependency(string, builtin_function_node);
         }
       });
@@ -524,10 +524,11 @@ void string_dependenciest::add_constraints(
     if(test_dependencies.count(nodet(node)))
     {
       const auto &builtin = builtin_function_nodes[node.index];
-      const exprt return_value = builtin.data->add_constraints(generator);
-      generator.add_lemma(equal_exprt(return_value, builtin.data->return_code));
+      string_constraintst constraints = builtin.data->constraints(generator);
+      merge(generator.constraints, std::move(constraints));
     }
     else
-      generator.add_lemma(node.data->length_constraint());
+      generator.constraints.existential.push_back(
+        node.data->length_constraint());
   }
 }

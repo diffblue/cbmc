@@ -63,7 +63,9 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   messaget::mstreamt &stream,
   const namespacet &ns,
   bool use_counter_example,
-  const union_find_replacet &symbol_resolve);
+  const union_find_replacet &symbol_resolve,
+  const std::map<string_not_contains_constraintt, symbol_exprt>
+    &not_contain_witnesses);
 
 static void initial_index_set(
   index_set_pairt &index_set,
@@ -111,7 +113,8 @@ static exprt instantiate(
 static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
   const index_set_pairt &index_set,
-  const string_constraint_generatort &generator);
+  const string_constraint_generatort &generator,
+  const std::map<string_not_contains_constraintt, symbol_exprt> &witnesses);
 
 static optionalt<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
@@ -216,20 +219,22 @@ static void display_index_set(
 ///     appears in `P` indexed by some `f(x)` and `val` is in
 ///     the index set of `str` we find `y` such that `f(y)=val` and
 ///     add lemma `P(y)`.
-///     (See
-// NOLINTNEXTLINE
-///     `instantiate(messaget::mstreamt&,const string_constraintt&,const exprt &,const exprt&)`
+// NOLINTNEXTLINE(whitespace/line_length)
+///     (See `instantiate(messaget::mstreamt&,const string_constraintt&,const exprt &,const exprt&)`
 ///      for details)
 ///   * For formulas of the form
 ///     \f$\forall x. P(x) \Rightarrow \exists y .s_0[x+y] \ne s_1[y]) \f$ we
 ///     need to look at the index set of both `s_0` and `s_1`.
-///     (See `instantiate(const string_not_contains_constraintt &axiom)`
+// NOLINTNEXTLINE(whitespace/line_length)
+///     (See `instantiate(const string_not_contains_constraintt&,const index_set_pairt&,const string_constraint_generatort&,const std::map<string_not_contains_constraintt, symbol_exprt>&)`
 ///      for details)
 static std::vector<exprt> generate_instantiations(
   messaget::mstreamt &stream,
   const string_constraint_generatort &generator,
   const index_set_pairt &index_set,
-  const string_axiomst &axioms)
+  const string_axiomst &axioms,
+  const std::map<string_not_contains_constraintt, symbol_exprt>
+    &not_contain_witnesses)
 {
   std::vector<exprt> lemmas;
   for(const auto &i : index_set.current)
@@ -243,7 +248,7 @@ static std::vector<exprt> generate_instantiations(
   for(const auto &nc_axiom : axioms.not_contains)
   {
     for(const auto &instance :
-      instantiate(nc_axiom, index_set, generator))
+        instantiate(nc_axiom, index_set, generator, not_contain_witnesses))
       lemmas.push_back(instance);
   }
   return lemmas;
@@ -641,7 +646,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   // Generator is also used by get, so we have to use it as a class member
   // but we make sure it is cleared at each `dec_solve` call.
-  generator.clear_constraints();
+  generator.constraints.clear();
   make_char_array_pointer_associations(generator, equations);
 
 #ifdef DEBUG
@@ -686,10 +691,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     supert::set_to(eq, true);
   }
 
-  const auto constraints = generator.get_constraints();
   std::transform(
-    constraints.begin(),
-    constraints.end(),
+    generator.constraints.universal.begin(),
+    generator.constraints.universal.end(),
     std::back_inserter(axioms.universal),
     [&](string_constraintt constraint) {
       constraint.replace_expr(symbol_resolve);
@@ -700,17 +704,17 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       return constraint;
     });
 
-  const auto not_contains_constraints =
-    generator.get_not_contains_constraints();
   std::transform(
-    not_contains_constraints.begin(),
-    not_contains_constraints.end(),
+    generator.constraints.not_contains.begin(),
+    generator.constraints.not_contains.end(),
     std::back_inserter(axioms.not_contains),
     [&](string_not_contains_constraintt axiom) {
       symbol_resolve.replace_expr(axiom);
       return axiom;
     });
 
+  // Used to store information about witnesses for not_contains constraints
+  std::map<string_not_contains_constraintt, symbol_exprt> not_contain_witnesses;
   for(const auto &nc_axiom : axioms.not_contains)
   {
     const auto &witness_type = [&] {
@@ -718,11 +722,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       const typet &index_type = rtype.size().type();
       return array_typet(index_type, infinity_exprt(index_type));
     }();
-    generator.witness[nc_axiom] =
+    not_contain_witnesses[nc_axiom] =
       generator.fresh_symbol("not_contains_witness", witness_type);
   }
 
-  for(const exprt &lemma : generator.get_lemmas())
+  for(const exprt &lemma : generator.constraints.existential)
     add_lemma(lemma);
 
   // Initial try without index set
@@ -740,7 +744,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       debug(),
       ns,
       config_.use_counter_example,
-      symbol_resolve);
+      symbol_resolve,
+      not_contain_witnesses);
     if(satisfied)
     {
       debug() << "check_SAT: the model is correct" << eom;
@@ -757,12 +762,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   initial_index_set(index_sets, ns, axioms);
   update_index_set(index_sets, ns, current_constraints);
   current_constraints.clear();
-  for(const auto &instance :
-        generate_instantiations(
-          debug(),
-          generator,
-          index_sets,
-          axioms))
+  for(const auto &instance : generate_instantiations(
+        debug(), generator, index_sets, axioms, not_contain_witnesses))
     add_lemma(instance);
 
   while((loop_bound_--)>0)
@@ -781,7 +782,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         debug(),
         ns,
         config_.use_counter_example,
-        symbol_resolve);
+        symbol_resolve,
+        not_contain_witnesses);
       if(satisfied)
       {
         debug() << "check_SAT: the model is correct" << eom;
@@ -817,12 +819,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         }
       }
       current_constraints.clear();
-      for(const auto &instance :
-        generate_instantiations(
-          debug(),
-          generator,
-          index_sets,
-          axioms))
+      for(const auto &instance : generate_instantiations(
+            debug(), generator, index_sets, axioms, not_contain_witnesses))
         add_lemma(instance);
     }
     else
@@ -1017,8 +1015,7 @@ void debug_model(
   messaget::mstreamt &stream,
   const namespacet &ns,
   const std::function<exprt(const exprt &)> &super_get,
-  const std::vector<symbol_exprt> &boolean_symbols,
-  const std::vector<symbol_exprt> &index_symbols)
+  const std::vector<symbol_exprt> &symbols)
 {
   stream << "debug_model:" << '\n';
   for(const auto &pointer_array : generator.array_pool.get_arrays_of_pointers())
@@ -1032,13 +1029,7 @@ void debug_model(
            << "  - model: " << format(model) << messaget::eom;
   }
 
-  for(const auto &symbol : boolean_symbols)
-  {
-    stream << " - " << symbol.get_identifier() << ": "
-           << format(super_get(symbol)) << '\n';
-  }
-
-  for(const auto &symbol : index_symbols)
+  for(const auto &symbol : symbols)
   {
     stream << " - " << symbol.get_identifier() << ": "
            << format(super_get(symbol)) << '\n';
@@ -1241,7 +1232,6 @@ static void debug_check_axioms_step(
 }
 
 /// \return true if the current model satisfies all the axioms
-/// \return a Boolean
 static std::pair<bool, std::vector<exprt>> check_axioms(
   const string_axiomst &axioms,
   string_constraint_generatort &generator,
@@ -1249,7 +1239,9 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   messaget::mstreamt &stream,
   const namespacet &ns,
   bool use_counter_example,
-  const union_find_replacet &symbol_resolve)
+  const union_find_replacet &symbol_resolve,
+  const std::map<string_not_contains_constraintt, symbol_exprt>
+    &not_contain_witnesses)
 {
   const auto eom=messaget::eom;
   // clang-format off
@@ -1269,12 +1261,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
 #ifdef DEBUG
   debug_model(
-    generator,
-    stream,
-    ns,
-    get,
-    generator.get_boolean_symbols(),
-    generator.get_index_symbols());
+    generator, stream, ns, get, generator.fresh_symbol.created_symbols);
 #endif
 
   // Maps from indexes of violated universal axiom to a witness of violation
@@ -1320,7 +1307,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   for(std::size_t i = 0; i < axioms.not_contains.size(); i++)
   {
     const string_not_contains_constraintt &nc_axiom=axioms.not_contains[i];
-    const symbol_exprt univ_var = generator.fresh_univ_index(
+    const symbol_exprt univ_var = generator.fresh_symbol(
       "not_contains_univ_var", nc_axiom.s0().length().type());
     const exprt negated_axiom = negation_of_not_contains_constraint(
       nc_axiom, univ_var, [&](const exprt &expr) {
@@ -1378,13 +1365,14 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         const string_not_contains_constraintt &axiom=
           axioms.not_contains[v.first];
 
-        const exprt func_val=generator.get_witness_of(axiom, val);
+        const exprt func_val =
+          index_exprt(not_contain_witnesses.at(axiom), val);
         const exprt comp_val=simplify_sum(plus_exprt(val, func_val));
 
         std::set<std::pair<exprt, exprt>> indices;
         indices.insert(std::pair<exprt, exprt>(comp_val, func_val));
-        const exprt counter=::instantiate_not_contains(
-          axiom, indices, generator)[0];
+        const exprt counter =
+          ::instantiate_not_contains(axiom, indices, not_contain_witnesses)[0];
         lemmas.push_back(counter);
       }
       return { false, lemmas };
@@ -1894,7 +1882,8 @@ static exprt instantiate(
 static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
   const index_set_pairt &index_set,
-  const string_constraint_generatort &generator)
+  const string_constraint_generatort &generator,
+  const std::map<string_not_contains_constraintt, symbol_exprt> &witnesses)
 {
   const array_string_exprt &s0 = axiom.s0();
   const array_string_exprt &s1 = axiom.s1();
@@ -1919,7 +1908,7 @@ static std::vector<exprt> instantiate(
       for(const auto &i0 : index_set0->second)
         index_pairs.insert(expr_pairt(i0, ic1));
 
-    return ::instantiate_not_contains(axiom, index_pairs, generator);
+    return ::instantiate_not_contains(axiom, index_pairs, witnesses);
   }
   return { };
 }
@@ -2028,7 +2017,7 @@ exprt string_refinementt::get(const exprt &expr) const
         get_array(super_get, ns, debug(), arr))
       return *arr_model_opt;
 
-    if(generator.get_created_strings().count(arr))
+    if(generator.array_pool.created_strings().count(arr))
     {
       const exprt length = super_get(arr.length());
       if(const auto n = numeric_cast<std::size_t>(length))

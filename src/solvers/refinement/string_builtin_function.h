@@ -10,6 +10,8 @@
 #include "string_constraint_generator.h"
 
 class array_poolt;
+struct string_constraintst;
+class string_constraint_generatort;
 
 #define CHARACTER_FOR_UNKNOWN '?'
 
@@ -41,8 +43,8 @@ public:
 
   /// Add constraints ensuring that the value of result expression of the
   /// builtin function corresponds to the value of the function call.
-  virtual exprt
-  add_constraints(string_constraint_generatort &constraint_generator) const = 0;
+  virtual string_constraintst
+  constraints(string_constraint_generatort &constraint_generator) const = 0;
 
   /// Constraint ensuring that the length of the strings are coherent with
   /// the function call.
@@ -62,8 +64,8 @@ private:
   string_builtin_functiont() = default;
 
 protected:
-  explicit string_builtin_functiont(const exprt &return_code)
-    : return_code(return_code)
+  explicit string_builtin_functiont(exprt return_code)
+    : return_code(std::move(return_code))
   {
   }
 };
@@ -74,6 +76,16 @@ class string_transformation_builtin_functiont : public string_builtin_functiont
 public:
   array_string_exprt result;
   array_string_exprt input;
+
+  string_transformation_builtin_functiont(
+    exprt return_code,
+    array_string_exprt result,
+    array_string_exprt input)
+    : string_builtin_functiont(std::move(return_code)),
+      result(std::move(result)),
+      input(std::move(result))
+  {
+  }
 
   /// Constructor from arguments of a function application.
   /// The arguments in `fun_args` should be in order:
@@ -128,15 +140,10 @@ public:
     return "concat_char";
   }
 
-  exprt add_constraints(string_constraint_generatort &generator) const override
-  {
-    return generator.add_axioms_for_concat_char(result, input, character);
-  }
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
-  exprt length_constraint() const override
-  {
-    return length_constraint_for_concat_char(result, input);
-  }
+  exprt length_constraint() const override;
 };
 
 /// Setting a character at a particular position of a string
@@ -170,11 +177,8 @@ public:
     return "set_char";
   }
 
-  exprt add_constraints(string_constraint_generatort &generator) const override
-  {
-    return generator.add_axioms_for_set_char(
-      result, input, position, character);
-  }
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
   // \todo: length_constraint is not the best possible name because we also
   // \todo: add constraint about the return code
@@ -203,14 +207,14 @@ public:
     return "to_lower_case";
   }
 
-  exprt add_constraints(string_constraint_generatort &generator) const override
-  {
-    return generator.add_axioms_for_to_lower_case(result, input);
-  };
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override
   {
-    return equal_exprt(result.length(), input.length());
+    return and_exprt(
+      equal_exprt(result.length(), input.length()),
+      equal_exprt(return_code, from_integer(0, return_code.type())));
   };
 };
 
@@ -228,6 +232,17 @@ public:
   {
   }
 
+  string_to_upper_case_builtin_functiont(
+    exprt return_code,
+    array_string_exprt result,
+    array_string_exprt input)
+    : string_transformation_builtin_functiont(
+        std::move(return_code),
+        std::move(result),
+        std::move(input))
+  {
+  }
+
   optionalt<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
 
@@ -236,14 +251,19 @@ public:
     return "to_upper_case";
   }
 
-  exprt add_constraints(string_constraint_generatort &generator) const override
+  string_constraintst constraints(class symbol_generatort &fresh_symbol) const;
+
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override
   {
-    return generator.add_axioms_for_to_upper_case(result, input);
+    return constraints(generator.fresh_symbol);
   };
 
   exprt length_constraint() const override
   {
-    return equal_exprt(result.length(), input.length());
+    return and_exprt(
+      equal_exprt(result.length(), input.length()),
+      equal_exprt(return_code, from_integer(0, return_code.type())));
   };
 };
 
@@ -290,23 +310,10 @@ public:
     return "insert";
   }
 
-  exprt add_constraints(string_constraint_generatort &generator) const override
-  {
-    if(args.size() == 1)
-      return generator.add_axioms_for_insert(result, input1, input2, args[0]);
-    if(args.size() == 3)
-      UNIMPLEMENTED;
-    UNREACHABLE;
-  };
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
-  exprt length_constraint() const override
-  {
-    if(args.size() == 1)
-      return length_constraint_for_insert(result, input1, input2);
-    if(args.size() == 3)
-      UNIMPLEMENTED;
-    UNREACHABLE;
-  };
+  exprt length_constraint() const override;
 
   bool maybe_testing_function() const override
   {
@@ -345,25 +352,10 @@ public:
     return "concat";
   }
 
-  exprt add_constraints(string_constraint_generatort &generator) const override
-  {
-    if(args.size() == 0)
-      return generator.add_axioms_for_concat(result, input1, input2);
-    if(args.size() == 2)
-      return generator.add_axioms_for_concat_substr(
-        result, input1, input2, args[0], args[1]);
-    UNREACHABLE;
-  };
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
-  exprt length_constraint() const override
-  {
-    if(args.size() == 0)
-      return length_constraint_for_concat(result, input1, input2);
-    if(args.size() == 2)
-      return length_constraint_for_concat_substr(
-        result, input1, input2, args[0], args[1]);
-    UNREACHABLE;
-  }
+  exprt length_constraint() const override;
 };
 
 /// String creation from other types
@@ -414,11 +406,8 @@ public:
     return "string_of_int";
   }
 
-  exprt add_constraints(string_constraint_generatort &generator) const override
-  {
-    return generator.add_axioms_for_string_of_int_with_radix(
-      result, arg, radix);
-  }
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override;
 
@@ -475,14 +464,12 @@ public:
     return {};
   }
 
-  exprt add_constraints(string_constraint_generatort &generator) const override
-  {
-    return generator.add_axioms_for_function_application(function_application);
-  };
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override
   {
-    // For now, there is no need for implementing that as `add_constraints`
+    // For now, there is no need for implementing that as `constraints`
     // should always be called on these functions
     UNIMPLEMENTED;
   }

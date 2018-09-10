@@ -16,12 +16,12 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 /// \related string_refinementt
 /// \param [in] axiom: the axiom to instantiate
 /// \param [in] index_pairs: pair of indexes for `axiom.s0()`and `axiom.s1()`
-/// \param [in] generator: generator to be used to get `axiom`'s witness
+/// \param [in] witnesses: `axiom`'s witnesses for non containment
 /// \return the lemmas produced through instantiation
 std::vector<exprt> instantiate_not_contains(
   const string_not_contains_constraintt &axiom,
   const std::set<std::pair<exprt, exprt>> &index_pairs,
-  const string_constraint_generatort &generator)
+  const std::map<string_not_contains_constraintt, symbol_exprt> &witnesses)
 {
   std::vector<exprt> lemmas;
 
@@ -38,7 +38,7 @@ std::vector<exprt> instantiate_not_contains(
     const and_exprt universal_bound(
       binary_relation_exprt(axiom.univ_lower_bound(), ID_le, val),
       binary_relation_exprt(axiom.univ_upper_bound(), ID_gt, val));
-    const exprt f=generator.get_witness_of(axiom, val);
+    const exprt f = index_exprt(witnesses.at(axiom), val);
     const equal_exprt relevancy(f, i1);
     const and_exprt premise(relevancy, axiom.premise(), universal_bound);
 

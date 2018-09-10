@@ -19,10 +19,11 @@ Date:   May 2017
 #include <util/std_expr.h>
 #include <util/unicode.h>
 
+#include "string_builtin_function.h"
 #include "string_constraint_generator.h"
 
 // Format specifier describes how a value should be printed.
-class string_constraint_generatort::format_specifiert
+class format_specifiert
 {
 public:
   // Constants describing the meaning of characters in format specifiers.
@@ -104,9 +105,7 @@ public:
   {
   }
 
-  explicit format_elementt(string_constraint_generatort::format_specifiert fs):
-    type(SPECIFIER),
-    fstring("")
+  explicit format_elementt(format_specifiert fs) : type(SPECIFIER), fstring("")
   {
     fspec.push_back(fs);
   }
@@ -121,7 +120,7 @@ public:
     return type==TEXT;
   }
 
-  string_constraint_generatort::format_specifiert get_format_specifier() const
+  format_specifiert get_format_specifier() const
   {
     PRECONDITION(is_format_specifier());
     return fspec.back();
@@ -142,7 +141,7 @@ public:
 private:
   format_typet type;
   format_textt fstring;
-  std::vector<string_constraint_generatort::format_specifiert> fspec;
+  std::vector<format_specifiert> fspec;
 };
 
 #if 0
@@ -183,8 +182,7 @@ static bool check_format_string(std::string s)
 /// \return Format specifier represented by the matched string. The groups in
 ///   the match should represent: index, flag, width, precision, date and
 ///   conversion type.
-static string_constraint_generatort::format_specifiert
-  format_specifier_of_match(std::smatch &m)
+static format_specifiert format_specifier_of_match(std::smatch &m)
 {
   int index=m[1].str().empty()?-1:std::stoi(m[1].str());
   std::string flag=m[2].str().empty()?"":m[2].str();
@@ -194,15 +192,13 @@ static string_constraint_generatort::format_specifiert
 
   bool dt=(tT!="");
   if(tT=="T")
-    flag.push_back(
-      string_constraint_generatort::format_specifiert::DATE_TIME_UPPER);
+    flag.push_back(format_specifiert::DATE_TIME_UPPER);
 
   INVARIANT(
     m[6].str().length()==1, "format conversion should be one character");
   char conversion=m[6].str()[0];
 
-  return string_constraint_generatort::format_specifiert(
-    index, flag, width, precision, dt, conversion);
+  return format_specifiert(index, flag, width, precision, dt, conversion);
 }
 
 /// Parse the given string into format specifiers and text.
@@ -251,58 +247,78 @@ static exprt get_component_in_struct(
 /// contains the fields: string expr, int, float, char, boolean, hashcode,
 /// date_time. The correct component will be fetched depending on the format
 /// specifier.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param fs: a format specifier
 /// \param arg: a struct containing the possible value of the argument to format
 /// \param index_type: type for indexes in strings
 /// \param char_type: type of characters
+/// \param array_pool: pool of arrays representing strings
+/// \param message: message handler for warnings
+/// \param ns: namespace
 /// \return String expression representing the output of String.format.
-array_string_exprt
-string_constraint_generatort::add_axioms_for_format_specifier(
+static std::pair<array_string_exprt, string_constraintst>
+add_axioms_for_format_specifier(
+  symbol_generatort &fresh_symbol,
   const format_specifiert &fs,
   const struct_exprt &arg,
   const typet &index_type,
-  const typet &char_type)
+  const typet &char_type,
+  array_poolt &array_pool,
+  const messaget &message,
+  const namespacet &ns)
 {
-  const array_string_exprt res = fresh_string(index_type, char_type);
-  exprt return_code;
+  string_constraintst constraints;
+  const array_string_exprt res = array_pool.fresh_string(index_type, char_type);
+  std::pair<exprt, string_constraintst> return_code;
   switch(fs.conversion)
   {
   case format_specifiert::DECIMAL_INTEGER:
-    return_code =
-      add_axioms_for_string_of_int(res, get_component_in_struct(arg, ID_int));
-    return res;
+    return_code = add_axioms_for_string_of_int(
+      fresh_symbol, res, get_component_in_struct(arg, ID_int), 0, ns);
+    return {res, std::move(return_code.second)};
   case format_specifiert::HEXADECIMAL_INTEGER:
-    return_code =
-      add_axioms_from_int_hex(res, get_component_in_struct(arg, ID_int));
-    return res;
+    return_code = add_axioms_from_int_hex(
+      fresh_symbol, res, get_component_in_struct(arg, ID_int));
+    return {res, std::move(return_code.second)};
   case format_specifiert::SCIENTIFIC:
-    add_axioms_from_float_scientific_notation(
-      res, get_component_in_struct(arg, ID_float));
-    return res;
+    return_code = add_axioms_from_float_scientific_notation(
+      fresh_symbol,
+      res,
+      get_component_in_struct(arg, ID_float),
+      array_pool,
+      ns);
+    return {res, std::move(return_code.second)};
   case format_specifiert::DECIMAL_FLOAT:
-    add_axioms_for_string_of_float(res, get_component_in_struct(arg, ID_float));
-    return res;
+    return_code = add_axioms_for_string_of_float(
+      fresh_symbol,
+      res,
+      get_component_in_struct(arg, ID_float),
+      array_pool,
+      ns);
+    return {res, std::move(return_code.second)};
   case format_specifiert::CHARACTER:
-    return_code =
-      add_axioms_from_char(res, get_component_in_struct(arg, ID_char));
-    return res;
+    return_code = add_axioms_from_char(
+      fresh_symbol, res, get_component_in_struct(arg, ID_char));
+    return {res, std::move(return_code.second)};
   case format_specifiert::BOOLEAN:
-    return_code =
-      add_axioms_from_bool(res, get_component_in_struct(arg, ID_boolean));
-    return res;
+    return_code = add_axioms_from_bool(
+      fresh_symbol, res, get_component_in_struct(arg, ID_boolean));
+    return {res, std::move(return_code.second)};
   case format_specifiert::STRING:
-    return get_string_expr(get_component_in_struct(arg, "string_expr"));
+    return {
+      get_string_expr(array_pool, get_component_in_struct(arg, "string_expr")),
+      {}};
   case format_specifiert::HASHCODE:
     return_code = add_axioms_for_string_of_int(
-      res, get_component_in_struct(arg, "hashcode"));
-    return res;
+      fresh_symbol, res, get_component_in_struct(arg, "hashcode"), 0, ns);
+    return {res, std::move(return_code.second)};
   case format_specifiert::LINE_SEPARATOR:
     // TODO: the constant should depend on the system: System.lineSeparator()
     return_code = add_axioms_for_constant(res, "\n");
-    return res;
+    return {res, std::move(return_code.second)};
   case format_specifiert::PERCENT_SIGN:
     return_code = add_axioms_for_constant(res, "%");
-    return res;
+    return {res, std::move(return_code.second)};
   case format_specifiert::SCIENTIFIC_UPPER:
   case format_specifiert::GENERAL_UPPER:
   case format_specifiert::HEXADECIMAL_FLOAT_UPPER:
@@ -312,12 +328,25 @@ string_constraint_generatort::add_axioms_for_format_specifier(
   case format_specifiert::STRING_UPPER:
   case format_specifiert::HASHCODE_UPPER:
   {
-    string_constraint_generatort::format_specifiert fs_lower=fs;
+    format_specifiert fs_lower = fs;
     fs_lower.conversion=tolower(fs.conversion);
-    const array_string_exprt lower_case =
-      add_axioms_for_format_specifier(fs_lower, arg, index_type, char_type);
-    add_axioms_for_to_upper_case(res, lower_case);
-    return res;
+    auto format_specifier_result = add_axioms_for_format_specifier(
+      fresh_symbol,
+      fs_lower,
+      arg,
+      index_type,
+      char_type,
+      array_pool,
+      message,
+      ns);
+
+    const exprt return_code_upper_case =
+      fresh_symbol("return_code_upper_case", get_return_code_type());
+    const string_to_upper_case_builtin_functiont upper_case_function(
+      return_code_upper_case, res, format_specifier_result.first);
+    auto upper_case_constraints = upper_case_function.constraints(fresh_symbol);
+    merge(upper_case_constraints, std::move(format_specifier_result.second));
+    return {res, std::move(upper_case_constraints)};
   }
   case format_specifiert::OCTAL_INTEGER:
   /// \todo Conversion of octal is not implemented.
@@ -329,11 +358,11 @@ string_constraint_generatort::add_axioms_for_format_specifier(
     /// \todo Conversion of date-time is not implemented
     // For all these unimplemented cases we return a non-deterministic string
     message.warning() << "unimplemented format specifier: " << fs.conversion
-                        << message.eom;
-    return fresh_string(index_type, char_type);
+                      << message.eom;
+    return {array_pool.fresh_string(index_type, char_type), {}};
   default:
     message.error() << "invalid format specifier: " << fs.conversion
-                      << message.eom;
+                    << message.eom;
     INVARIANT(
       false, "format specifier must belong to [bBhHsScCdoxXeEfgGaAtT%n]");
     throw 0;
@@ -342,15 +371,24 @@ string_constraint_generatort::add_axioms_for_format_specifier(
 
 /// Parse `s` and add axioms ensuring the output corresponds to the output of
 /// String.format.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result of the format function
 /// \param s: a format string
 /// \param args: a vector of arguments
+/// \param array_pool: pool of arrays representing strings
+/// \param message: message handler for warnings
+/// \param ns: namespace
 /// \return code, 0 on success
-exprt string_constraint_generatort::add_axioms_for_format(
+std::pair<exprt, string_constraintst> add_axioms_for_format(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const std::string &s,
-  const exprt::operandst &args)
+  const exprt::operandst &args,
+  array_poolt &array_pool,
+  const messaget &message,
+  const namespacet &ns)
 {
+  string_constraintst constraints;
   const std::vector<format_elementt> format_strings=parse_format_string(s);
   std::vector<array_string_exprt> intermediary_strings;
   std::size_t arg_count=0;
@@ -383,14 +421,18 @@ exprt string_constraint_generatort::add_axioms_for_format(
           arg=to_struct_expr(args[fs.index-1]);
         }
       }
-      intermediary_strings.push_back(
-        add_axioms_for_format_specifier(fs, arg, index_type, char_type));
+      auto result = add_axioms_for_format_specifier(
+        fresh_symbol, fs, arg, index_type, char_type, array_pool, message, ns);
+      merge(constraints, std::move(result.second));
+      intermediary_strings.push_back(result.first);
     }
     else
     {
-      const array_string_exprt str = fresh_string(index_type, char_type);
-      const exprt return_code =
+      const array_string_exprt str =
+        array_pool.fresh_string(index_type, char_type);
+      auto result =
         add_axioms_for_constant(str, fe.get_format_text().get_content());
+      merge(constraints, result.second);
       intermediary_strings.push_back(str);
     }
   }
@@ -399,8 +441,9 @@ exprt string_constraint_generatort::add_axioms_for_format(
 
   if(intermediary_strings.empty())
   {
-    lemmas.push_back(equal_exprt(res.length(), from_integer(0, index_type)));
-    return return_code;
+    constraints.existential.push_back(
+      equal_exprt(res.length(), from_integer(0, index_type)));
+    return {return_code, constraints};
   }
 
   array_string_exprt str = intermediary_strings[0];
@@ -408,22 +451,28 @@ exprt string_constraint_generatort::add_axioms_for_format(
   if(intermediary_strings.size() == 1)
   {
     // Copy the first string
-    return add_axioms_for_substring(
-      res, str, from_integer(0, index_type), str.length());
+    auto result = add_axioms_for_substring(
+      fresh_symbol, res, str, from_integer(0, index_type), str.length());
+    merge(constraints, std::move(result.second));
+    return {result.first, std::move(constraints)};
   }
 
   // start after the first string and stop before the last
   for(std::size_t i = 1; i < intermediary_strings.size() - 1; ++i)
   {
     const array_string_exprt &intermediary = intermediary_strings[i];
-    const array_string_exprt fresh = fresh_string(index_type, char_type);
-    return_code =
-      bitor_exprt(return_code, add_axioms_for_concat(fresh, str, intermediary));
+    const array_string_exprt fresh =
+      array_pool.fresh_string(index_type, char_type);
+    auto result = add_axioms_for_concat(fresh_symbol, fresh, str, intermediary);
+    return_code = maximum(return_code, result.first);
+    merge(constraints, std::move(result.second));
     str = fresh;
   }
 
-  return bitor_exprt(
-    return_code, add_axioms_for_concat(res, str, intermediary_strings.back()));
+  auto result =
+    add_axioms_for_concat(fresh_symbol, res, str, intermediary_strings.back());
+  merge(constraints, std::move(result.second));
+  return {maximum(result.first, return_code), std::move(constraints)};
 }
 
 /// Construct a string from a constant array.
@@ -452,18 +501,26 @@ utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
 /// Add axioms to specify the Java String.format function.
 /// \todo This is correct only if the first argument (ie the format string) is
 /// constant or does not contain format specifiers.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application
+/// \param array_pool: pool of arrays representing strings
+/// \param message: message handler for warnings
+/// \param ns: namespace
 /// \return A string expression representing the return value of the
 ///   String.format function on the given arguments, assuming the first argument
 ///   in the function application is a constant. Otherwise the first argument is
 ///   returned.
-exprt string_constraint_generatort::add_axioms_for_format(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst> add_axioms_for_format(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  const messaget &message,
+  const namespacet &ns)
 {
   PRECONDITION(f.arguments().size() >= 3);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
-  const array_string_exprt s1 = get_string_expr(f.arguments()[2]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+  const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   unsigned int length;
 
   if(s1.length().id()==ID_constant &&
@@ -474,13 +531,14 @@ exprt string_constraint_generatort::add_axioms_for_format(
       to_array_expr(s1.content()), length);
     // List of arguments after s
     std::vector<exprt> args(f.arguments().begin() + 3, f.arguments().end());
-    return add_axioms_for_format(res, s, args);
+    return add_axioms_for_format(
+      fresh_symbol, res, s, args, array_pool, message, ns);
   }
   else
   {
     message.warning()
       << "ignoring format function with non constant first argument"
       << message.eom;
-    return from_integer(1, f.type());
+    return {from_integer(1, f.type()), {}};
   }
 }

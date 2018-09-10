@@ -19,70 +19,81 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <cmath>
 #include <solvers/floatbv/float_bv.h>
 
-/// Convert an integer to a string
-///
-/// Add axioms corresponding to the String.valueOf(I) java function.
-/// \param f: function application with one integer argument
-/// \return a new string expression
-exprt string_constraint_generatort::add_axioms_from_int(
-  const function_application_exprt &f)
+/// If the expression is a constant expression then we get the value of it as
+/// an unsigned long. If not we return a default value.
+/// \param expr: input expression
+/// \param def: default value to return if we cannot evaluate expr
+/// \param ns: namespace used to simplify the expression
+/// \return the output as an unsigned long
+static unsigned long to_integer_or_default(
+  const exprt &expr,
+  unsigned long def,
+  const namespacet &ns)
 {
-  PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
-  const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
-  if(f.arguments().size() == 4)
-    return add_axioms_for_string_of_int_with_radix(
-      res, f.arguments()[2], f.arguments()[3]);
-  else // f.arguments.size()==3
-    return add_axioms_for_string_of_int(res, f.arguments()[2]);
+  if(const auto i = numeric_cast<unsigned long>(simplify_expr(expr, ns)))
+    return *i;
+  return def;
 }
 
 /// Add axioms corresponding to the String.valueOf(J) java function.
 /// \deprecated should use add_axioms_from_int instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one long argument
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return a new string expression
 DEPRECATED("should use add_axioms_for_string_of_int instead")
-exprt string_constraint_generatort::add_axioms_from_long(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst> add_axioms_from_long(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
   PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   if(f.arguments().size() == 4)
     return add_axioms_for_string_of_int_with_radix(
-      res, f.arguments()[2], f.arguments()[3]);
+      fresh_symbol, res, f.arguments()[2], f.arguments()[3], 0, ns);
   else
-    return add_axioms_for_string_of_int(res, f.arguments()[2]);
+    return add_axioms_for_string_of_int(
+      fresh_symbol, res, f.arguments()[2], 0, ns);
 }
 
 /// Add axioms corresponding to the String.valueOf(Z) java function.
 /// \deprecated This is Java specific and should be implemented in Java instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with a Boolean argument
+/// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
 DEPRECATED("This is Java specific and should be implemented in Java instead")
-exprt string_constraint_generatort::add_axioms_from_bool(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst> add_axioms_from_bool(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_bool(res, f.arguments()[2]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+  return add_axioms_from_bool(fresh_symbol, res, f.arguments()[2]);
 }
 
 /// Add axioms stating that the returned string equals "true" when the Boolean
 /// expression is true and "false" when it is false.
 /// \deprecated This is Java specific and should be implemented in Java instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param b: Boolean expression
 /// \return code 0 on success
 DEPRECATED("This is Java specific and should be implemented in Java instead")
-exprt string_constraint_generatort::add_axioms_from_bool(
+std::pair<exprt, string_constraintst> add_axioms_from_bool(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &b)
 {
   const typet &char_type = res.content().type().subtype();
   PRECONDITION(b.type()==bool_typet() || b.type().id()==ID_c_bool);
-
+  string_constraintst constraints;
   typecast_exprt eq(b, bool_typet());
 
   // We add axioms:
@@ -93,61 +104,69 @@ exprt string_constraint_generatort::add_axioms_from_bool(
 
   std::string str_true="true";
   implies_exprt a1(eq, res.axiom_for_has_length(str_true.length()));
-  lemmas.push_back(a1);
+  constraints.existential.push_back(a1);
 
   for(std::size_t i=0; i<str_true.length(); i++)
   {
     exprt chr=from_integer(str_true[i], char_type);
     implies_exprt a2(eq, equal_exprt(res[i], chr));
-    lemmas.push_back(a2);
+    constraints.existential.push_back(a2);
   }
 
   std::string str_false="false";
   implies_exprt a3(not_exprt(eq), res.axiom_for_has_length(str_false.length()));
-  lemmas.push_back(a3);
+  constraints.existential.push_back(a3);
 
   for(std::size_t i=0; i<str_false.length(); i++)
   {
     exprt chr=from_integer(str_false[i], char_type);
     implies_exprt a4(not_exprt(eq), equal_exprt(res[i], chr));
-    lemmas.push_back(a4);
+    constraints.existential.push_back(a4);
   }
 
-  return from_integer(0, signedbv_typet(32));
+  return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(I) or String.valueOf(J) Java functions applied
 /// on the integer expression.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param input_int: a signed integer expression
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
+/// \param ns: namespace
 /// \return code 0 on success
-exprt string_constraint_generatort::add_axioms_for_string_of_int(
+std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &input_int,
-  size_t max_size)
+  size_t max_size,
+  const namespacet &ns)
 {
   const constant_exprt radix=from_integer(10, input_int.type());
   return add_axioms_for_string_of_int_with_radix(
-    res, input_int, radix, max_size);
+    fresh_symbol, res, input_int, radix, max_size, ns);
 }
 
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(II) or String.valueOf(JI) Java functions applied
 /// on the integer expression.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param input_int: a signed integer expression
 /// \param radix: the radix to use
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
+/// \param ns: namespace
 /// \return code 0 on success
-exprt string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
+std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &input_int,
   const exprt &radix,
-  size_t max_size)
+  size_t max_size,
+  const namespacet &ns)
 {
   PRECONDITION(max_size < std::numeric_limits<size_t>::max());
   const typet &type=input_int.type();
@@ -155,7 +174,7 @@ exprt string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
 
   /// Most of the time we can evaluate radix as an integer. The value 0 is used
   /// to indicate when we can't tell what the radix is.
-  const unsigned long radix_ul=to_integer_or_default(radix, 0);
+  const unsigned long radix_ul = to_integer_or_default(radix, 0, ns);
   CHECK_RETURN((radix_ul>=2 && radix_ul<=36) || radix_ul==0);
 
   if(max_size==0)
@@ -169,10 +188,9 @@ exprt string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
   const typecast_exprt radix_input_type(radix, type);
   const bool strict_formatting=true;
 
-  add_axioms_for_correct_number_format(
+  auto result1 = add_axioms_for_correct_number_format(
     res, radix_as_char, radix_ul, max_size, strict_formatting);
-
-  add_axioms_for_characters_in_integer_string(
+  auto result2 = add_axioms_for_characters_in_integer_string(
     input_int,
     type,
     strict_formatting,
@@ -180,50 +198,53 @@ exprt string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
     max_size,
     radix_input_type,
     radix_ul);
-
-  return from_integer(0, signedbv_typet(32));
+  merge(result2, std::move(result1));
+  return {from_integer(0, get_return_code_type()), std::move(result2)};
 }
 
 /// Returns the integer value represented by the character.
 /// \param chr: a character expression in the following set:
 ///   0123456789abcdef
 /// \return an integer expression
-exprt string_constraint_generatort::int_of_hex_char(const exprt &chr)
+static exprt int_of_hex_char(const exprt &chr)
 {
-  exprt zero_char=constant_char('0', chr.type());
-  exprt nine_char=constant_char('9', chr.type());
-  exprt a_char=constant_char('a', chr.type());
+  const exprt zero_char = from_integer('0', chr.type());
+  const exprt nine_char = from_integer('9', chr.type());
+  const exprt a_char = from_integer('a', chr.type());
   return if_exprt(
     binary_relation_exprt(chr, ID_gt, nine_char),
-    plus_exprt(constant_char(10, chr.type()), minus_exprt(chr, a_char)),
+    plus_exprt(from_integer(10, chr.type()), minus_exprt(chr, a_char)),
     minus_exprt(chr, zero_char));
 }
 
 /// Add axioms stating that the string `res` corresponds to the integer
 /// argument written in hexadecimal.
 /// \deprecated use add_axioms_from_int which takes a radix argument instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param i: an integer argument
 /// \return code 0 on success
 DEPRECATED(
   "use add_axioms_for_string_of_int which takes a radix argument instead")
-exprt string_constraint_generatort::add_axioms_from_int_hex(
+std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &i)
 {
   const typet &type=i.type();
   PRECONDITION(type.id()==ID_signedbv);
+  string_constraintst constraints;
   const typet &index_type = res.length().type();
   const typet &char_type = res.content().type().subtype();
   exprt sixteen=from_integer(16, index_type);
-  exprt minus_char=constant_char('-', char_type);
-  exprt zero_char=constant_char('0', char_type);
-  exprt nine_char=constant_char('9', char_type);
-  exprt a_char=constant_char('a', char_type);
-  exprt f_char=constant_char('f', char_type);
+  exprt minus_char = from_integer('-', char_type);
+  exprt zero_char = from_integer('0', char_type);
+  exprt nine_char = from_integer('9', char_type);
+  exprt a_char = from_integer('a', char_type);
+  exprt f_char = from_integer('f', char_type);
 
   size_t max_size=8;
-  lemmas.push_back(
+  constraints.existential.push_back(
     and_exprt(res.axiom_for_length_gt(0), res.axiom_for_length_le(max_size)));
 
   for(size_t size=1; size<=max_size; size++)
@@ -248,62 +269,71 @@ exprt string_constraint_generatort::add_axioms_from_int_hex(
     }
 
     equal_exprt premise(res.axiom_for_has_length(size));
-    lemmas.push_back(
+    constraints.existential.push_back(
       implies_exprt(premise, and_exprt(equal_exprt(i, sum), all_numbers)));
 
     // disallow 0s at the beginning
     if(size>1)
-      lemmas.push_back(
+      constraints.existential.push_back(
         implies_exprt(premise, not_exprt(equal_exprt(res[0], zero_char))));
   }
-  return from_integer(0, get_return_code_type());
+  return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
 /// Add axioms corresponding to the Integer.toHexString(I) java function
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with an integer argument
+/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
-exprt string_constraint_generatort::add_axioms_from_int_hex(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_int_hex(res, f.arguments()[2]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+  return add_axioms_from_int_hex(fresh_symbol, res, f.arguments()[2]);
 }
 
 /// Conversion from char to string
 ///
-/// \copybrief  string_constraint_generatort::add_axioms_from_char(
-///   const array_string_exprt &res, const exprt &c)
 // NOLINTNEXTLINE
-/// \link string_constraint_generatort::add_axioms_from_char(const array_string_exprt &res, const exprt &c)
+/// \copybrief add_axioms_from_char(symbol_generatort &fresh_symbol, const array_string_exprt &res, const exprt &c)
+// NOLINTNEXTLINE
+/// \link add_axioms_from_char(symbol_generatort &fresh_symbol, const array_string_exprt &res, const exprt &c)
 ///    (More...) \endlink
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]` and character `c`
+/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
-exprt string_constraint_generatort::add_axioms_from_char(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst> add_axioms_from_char(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_char(res, f.arguments()[2]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+  return add_axioms_from_char(fresh_symbol, res, f.arguments()[2]);
 }
 
 /// Add axiom stating that string `res` has length 1 and the character
 /// it contains equals `c`.
 ///
 /// This axiom is: \f$ |{\tt res}| = 1 \land {\tt res}[0] = {\tt c} \f$.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: array of characters expression
 /// \param c: character expression
 /// \return code 0 on success
-exprt string_constraint_generatort::add_axioms_from_char(
+std::pair<exprt, string_constraintst> add_axioms_from_char(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &c)
 {
-  and_exprt lemma(equal_exprt(res[0], c), res.axiom_for_has_length(1));
-  lemmas.push_back(lemma);
-  return from_integer(0, get_return_code_type());
+  const and_exprt lemma(equal_exprt(res[0], c), res.axiom_for_has_length(1));
+  return {from_integer(0, get_return_code_type()), {{lemma}}};
 }
 
 /// Add axioms making the return value true if the given string is a correct
@@ -316,48 +346,49 @@ exprt string_constraint_generatort::add_axioms_from_char(
 /// \param max_size: maximum number of characters
 /// \param strict_formatting: if true, don't allow a leading plus, redundant
 ///   zeros or upper case letters
-void string_constraint_generatort::add_axioms_for_correct_number_format(
+string_constraintst add_axioms_for_correct_number_format(
   const array_string_exprt &str,
   const exprt &radix_as_char,
   const unsigned long radix_ul,
   const std::size_t max_size,
   const bool strict_formatting)
 {
+  string_constraintst constraints;
   const typet &char_type = str.content().type().subtype();
   const typet &index_type = str.length().type();
 
   const exprt &chr=str[0];
-  const equal_exprt starts_with_minus(chr, constant_char('-', char_type));
-  const equal_exprt starts_with_plus(chr, constant_char('+', char_type));
+  const equal_exprt starts_with_minus(chr, from_integer('-', char_type));
+  const equal_exprt starts_with_plus(chr, from_integer('+', char_type));
   const exprt starts_with_digit=
     is_digit_with_radix(chr, strict_formatting, radix_as_char, radix_ul);
 
   // |str| > 0
   const exprt non_empty=str.axiom_for_length_ge(from_integer(1, index_type));
-  lemmas.push_back(non_empty);
+  constraints.existential.push_back(non_empty);
 
   if(strict_formatting)
   {
     // str[0] = '-' || is_digit_with_radix(str[0], radix)
     const or_exprt correct_first(starts_with_minus, starts_with_digit);
-    lemmas.push_back(correct_first);
+    constraints.existential.push_back(correct_first);
   }
   else
   {
     // str[0] = '-' || str[0] = '+' || is_digit_with_radix(str[0], radix)
     const or_exprt correct_first(
       starts_with_minus, starts_with_digit, starts_with_plus);
-    lemmas.push_back(correct_first);
+    constraints.existential.push_back(correct_first);
   }
 
   // str[0]='+' or '-' ==> |str| > 1
   const implies_exprt contains_digit(
     or_exprt(starts_with_minus, starts_with_plus),
     str.axiom_for_length_ge(from_integer(2, index_type)));
-  lemmas.push_back(contains_digit);
+  constraints.existential.push_back(contains_digit);
 
   // |str| <= max_size
-  lemmas.push_back(str.axiom_for_length_le(max_size));
+  constraints.existential.push_back(str.axiom_for_length_le(max_size));
 
   // forall 1 <= i < |str| . is_digit_with_radix(str[i], radix)
   // We unfold the above because we know that it will be used for all i up to
@@ -369,24 +400,25 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
       str.axiom_for_length_ge(from_integer(index+1, index_type)),
       is_digit_with_radix(
         str[index], strict_formatting, radix_as_char, radix_ul));
-    lemmas.push_back(character_at_index_is_digit);
+    constraints.existential.push_back(character_at_index_is_digit);
   }
 
   if(strict_formatting)
   {
-    const exprt zero_char=constant_char('0', char_type);
+    const exprt zero_char = from_integer('0', char_type);
 
     // no_leading_zero : str[0] = '0' => |str| = 1
     const implies_exprt no_leading_zero(
       equal_exprt(chr, zero_char),
       str.axiom_for_has_length(from_integer(1, index_type)));
-    lemmas.push_back(no_leading_zero);
+    constraints.existential.push_back(no_leading_zero);
 
     // no_leading_zero_after_minus : str[0]='-' => str[1]!='0'
     implies_exprt no_leading_zero_after_minus(
       starts_with_minus, not_exprt(equal_exprt(str[1], zero_char)));
-    lemmas.push_back(no_leading_zero_after_minus);
+    constraints.existential.push_back(no_leading_zero_after_minus);
   }
+  return constraints;
 }
 
 /// Add axioms connecting the characters in the input string to the value of the
@@ -401,7 +433,7 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
 /// \param radix: the radix, with the same type as input_int
 /// \param radix_ul: the radix as an unsigned long, or 0 if that can't be
 ///   determined
-void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
+string_constraintst add_axioms_for_characters_in_integer_string(
   const exprt &input_int,
   const typet &type,
   const bool strict_formatting,
@@ -410,9 +442,10 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   const exprt &radix,
   const unsigned long radix_ul)
 {
+  string_constraintst constraints;
   const typet &char_type = str.content().type().subtype();
 
-  const equal_exprt starts_with_minus(str[0], constant_char('-', char_type));
+  const equal_exprt starts_with_minus(str[0], from_integer('-', char_type));
   const constant_exprt zero_expr=from_integer(0, type);
   exprt::operandst digit_constraints;
 
@@ -422,7 +455,7 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   /// Deal with size==1 case separately. There are axioms from
   /// add_axioms_for_correct_number_format which say that the string must
   /// contain at least one digit, so we don't have to worry about "+" or "-".
-  lemmas.push_back(
+  constraints.existential.push_back(
     implies_exprt(str.axiom_for_has_length(1), equal_exprt(input_int, sum)));
 
   for(size_t size=2; size<=max_string_length; size++)
@@ -466,33 +499,40 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
     if(!digit_constraints.empty())
     {
       const implies_exprt a5(premise, conjunction(digit_constraints));
-      lemmas.push_back(a5);
+      constraints.existential.push_back(a5);
     }
 
     const implies_exprt a6(
       and_exprt(premise, not_exprt(starts_with_minus)),
       equal_exprt(input_int, sum));
-    lemmas.push_back(a6);
+    constraints.existential.push_back(a6);
 
     const implies_exprt a7(
       and_exprt(premise, starts_with_minus),
       equal_exprt(input_int, unary_minus_exprt(sum)));
-    lemmas.push_back(a7);
+    constraints.existential.push_back(a7);
   }
+  return constraints;
 }
 
 /// Integer value represented by a string
 ///
 /// Add axioms ensuring the value of the returned integer corresponds
 /// to the value represented by `str`
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments refined_string `str` and
 ///          an optional integer for the radix
+/// \param array_pool: pool of arrays representing strings
+/// \param ns: namespace
 /// \return integer expression equal to the value represented by `str`
-exprt string_constraint_generatort::add_axioms_for_parse_int(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst> add_axioms_for_parse_int(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
   PRECONDITION(f.arguments().size()==1 || f.arguments().size()==2);
-  const array_string_exprt str = get_string_expr(f.arguments()[0]);
+  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   const typet &type=f.type();
   PRECONDITION(type.id()==ID_signedbv);
   const exprt radix=f.arguments().size()==1?
@@ -500,7 +540,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
     static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
   // Most of the time we can evaluate radix as an integer. The value 0 is used
   // to indicate when we can't tell what the radix is.
-  const unsigned long radix_ul=to_integer_or_default(radix, 0);
+  const unsigned long radix_ul = to_integer_or_default(radix, 0, ns);
   PRECONDITION((radix_ul>=2 && radix_ul<=36) || radix_ul==0);
 
   const symbol_exprt input_int=fresh_symbol("parsed_int", type);
@@ -514,14 +554,10 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
   /// add_axioms_for_correct_number_format do not hold.
   /// \note the only thing stopping us from taking longer strings with many
   /// leading zeros is the axioms for correct number format
-  add_axioms_for_correct_number_format(
-    str,
-    radix_as_char,
-    radix_ul,
-    max_string_length,
-    strict_formatting);
+  auto constraints1 = add_axioms_for_correct_number_format(
+    str, radix_as_char, radix_ul, max_string_length, strict_formatting);
 
-  add_axioms_for_characters_in_integer_string(
+  auto constraints2 = add_axioms_for_characters_in_integer_string(
     input_int,
     type,
     strict_formatting,
@@ -529,21 +565,9 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
     max_string_length,
     radix,
     radix_ul);
+  merge(constraints2, std::move(constraints1));
 
-  return input_int;
-}
-
-/// If the expression is a constant expression then we get the value of it as
-/// an unsigned long. If not we return a default value.
-/// \param expr: input expression
-/// \param def: default value to return if we cannot evaluate expr
-/// \return the output as an unsigned long
-unsigned long string_constraint_generatort::to_integer_or_default(
-  const exprt &expr, unsigned long def)
-{
-  mp_integer mp_radix;
-  bool to_integer_failed=to_integer(simplify_expr(expr, ns), mp_radix);
-  return to_integer_failed?def:integer2ulong(mp_radix);
+  return {input_int, std::move(constraints2)};
 }
 
 /// Check if a character is a digit with respect to the given radix, e.g. if the

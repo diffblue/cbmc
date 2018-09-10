@@ -137,6 +137,35 @@ std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
   return result;
 }
 
+string_constraintst string_concatenation_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+
+{
+  auto pair = [&]() -> std::pair<exprt, string_constraintst> {
+    if(args.size() == 0)
+      return add_axioms_for_concat(
+        generator.fresh_symbol, result, input1, input2);
+    if(args.size() == 2)
+    {
+      return add_axioms_for_concat_substr(
+        generator.fresh_symbol, result, input1, input2, args[0], args[1]);
+    }
+    UNREACHABLE;
+  }();
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
+}
+
+exprt string_concatenation_builtin_functiont::length_constraint() const
+{
+  if(args.size() == 0)
+    return length_constraint_for_concat(result, input1, input2);
+  if(args.size() == 2)
+    return length_constraint_for_concat_substr(
+      result, input1, input2, args[0], args[1]);
+  UNREACHABLE;
+}
+
 optionalt<exprt> string_concat_char_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
@@ -158,6 +187,36 @@ optionalt<exprt> string_concat_char_builtin_functiont::eval(
   return make_string(input_opt.value(), type);
 }
 
+/// Set of constraints enforcing that `result` is the concatenation
+/// of `input` with `character`. These constraints are :
+///   * result.length = input.length + 1
+///   * forall i < max(0, result.length). result[i] = input[i]
+///   * result[input.length] = character
+///   * return_code = 0
+string_constraintst string_concat_char_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+{
+  string_constraintst constraints;
+  constraints.existential.push_back(length_constraint());
+  constraints.universal.push_back([&] {
+    const symbol_exprt idx =
+      generator.fresh_symbol("QA_index_concat_char", result.length().type());
+    const exprt upper_bound = zero_if_negative(input.length());
+    return string_constraintt(
+      idx, upper_bound, equal_exprt(input[idx], result[idx]));
+  }());
+  constraints.existential.push_back(
+    equal_exprt(result[input.length()], character));
+  constraints.existential.push_back(
+    equal_exprt(return_code, from_integer(0, return_code.type())));
+  return constraints;
+}
+
+exprt string_concat_char_builtin_functiont::length_constraint() const
+{
+  return length_constraint_for_concat_char(result, input);
+}
+
 optionalt<exprt> string_set_char_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
@@ -174,12 +233,51 @@ optionalt<exprt> string_set_char_builtin_functiont::eval(
   return make_string(input_opt.value(), type);
 }
 
+/// Set of constraints ensuring that `result` is similar to `input`
+/// where the character at index `position` is set to `character`.
+/// If `position` is out of bounds, `input` and `result` are identical.
+/// These constraints are:
+///   1. res.length = str.length
+///      && return_code = (position >= res.length || position < 0) ? 1 : 0
+///   2. 0 <= pos < res.length ==> res[pos]=char
+///   3. forall i < min(res.length, pos). res[i] = str[i]
+///   4. forall pos+1 <= i < res.length. res[i] = str[i]
+string_constraintst string_set_char_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+{
+  string_constraintst constraints;
+  constraints.existential.push_back(length_constraint());
+  constraints.existential.push_back(
+    implies_exprt(
+      and_exprt(
+        binary_relation_exprt(
+          from_integer(0, position.type()), ID_le, position),
+        binary_relation_exprt(position, ID_lt, result.length())),
+      equal_exprt(result[position], character)));
+  constraints.universal.push_back([&] {
+    const symbol_exprt q =
+      generator.fresh_symbol("QA_char_set", position.type());
+    const equal_exprt a3_body(result[q], input[q]);
+    return string_constraintt(
+      q, minimum(zero_if_negative(result.length()), position), a3_body);
+  }());
+  constraints.universal.push_back([&] {
+    const symbol_exprt q2 =
+      generator.fresh_symbol("QA_char_set2", position.type());
+    const plus_exprt lower_bound(position, from_integer(1, position.type()));
+    const equal_exprt a4_body(result[q2], input[q2]);
+    return string_constraintt(
+      q2, lower_bound, zero_if_negative(result.length()), a4_body);
+  }());
+  return constraints;
+}
+
 exprt string_set_char_builtin_functiont::length_constraint() const
 {
   const exprt out_of_bounds = or_exprt(
     binary_relation_exprt(position, ID_ge, input.length()),
     binary_relation_exprt(
-      position, ID_le, from_integer(0, input.length().type())));
+      position, ID_lt, from_integer(0, input.length().type())));
   const exprt return_value = if_exprt(
     out_of_bounds,
     from_integer(1, return_code.type()),
@@ -217,6 +315,84 @@ optionalt<exprt> string_to_lower_case_builtin_functiont::eval(
   return make_string(input_opt.value(), type);
 }
 
+/// Expression which is true for uppercase characters of the Basic Latin and
+/// Latin-1 supplement of unicode.
+static exprt is_upper_case(const exprt &character)
+{
+  const exprt char_A = from_integer('A', character.type());
+  const exprt char_Z = from_integer('Z', character.type());
+  exprt::operandst upper_case;
+  // Characters between 'A' and 'Z' are upper-case
+  upper_case.push_back(
+    and_exprt(
+      binary_relation_exprt(char_A, ID_le, character),
+      binary_relation_exprt(character, ID_le, char_Z)));
+
+  // Characters between 0xc0 (latin capital A with grave)
+  // and 0xd6 (latin capital O with diaeresis) are upper-case
+  upper_case.push_back(
+    and_exprt(
+      binary_relation_exprt(
+        from_integer(0xc0, character.type()), ID_le, character),
+      binary_relation_exprt(
+        character, ID_le, from_integer(0xd6, character.type()))));
+
+  // Characters between 0xd8 (latin capital O with stroke)
+  // and 0xde (latin capital thorn) are upper-case
+  upper_case.push_back(
+    and_exprt(
+      binary_relation_exprt(
+        from_integer(0xd8, character.type()), ID_le, character),
+      binary_relation_exprt(
+        character, ID_le, from_integer(0xde, character.type()))));
+  return disjunction(upper_case);
+}
+
+/// Expression which is true for lower_case characters of the Basic Latin and
+/// Latin-1 supplement of unicode.
+static exprt is_lower_case(const exprt &character)
+{
+  return is_upper_case(
+    minus_exprt(character, from_integer(0x20, character.type())));
+}
+
+/// Set of constraints ensuring `result` corresponds to `input` in which
+/// uppercase characters have been converted to lowercase.
+/// These constraints are:
+///   1. result.length = input.length && return_code = 0
+///   2. forall i < input.length.
+///        result[i] = is_upper_case(input[i]) ? input[i] + diff : input[i]
+///
+/// Where `diff` is the difference between lower case and upper case
+/// characters: `diff = 'a'-'A' = 0x20` and `is_upper_case` is true for the
+/// upper case characters of Basic Latin and Latin-1 supplement of unicode.
+string_constraintst string_to_lower_case_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+{
+  // \todo for now, only characters in Basic Latin and Latin-1 supplement
+  // are supported (up to 0x100), we should add others using case mapping
+  // information from the UnicodeData file.
+  string_constraintst constraints;
+  constraints.existential.push_back(length_constraint());
+  constraints.universal.push_back([&] {
+    const symbol_exprt idx =
+      generator.fresh_symbol("QA_lower_case", result.length().type());
+    const exprt conditional_convert = [&] {
+      // The difference between upper-case and lower-case for the basic
+      // latin and latin-1 supplement is 0x20.
+      const typet &char_type = result.type().subtype();
+      const exprt diff = from_integer(0x20, char_type);
+      const exprt converted =
+        equal_exprt(result[idx], plus_exprt(input[idx], diff));
+      const exprt non_converted = equal_exprt(result[idx], input[idx]);
+      return if_exprt(is_upper_case(input[idx]), converted, non_converted);
+    }();
+    return string_constraintt(
+      idx, zero_if_negative(result.length()), conditional_convert);
+  }());
+  return constraints;
+}
+
 optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
@@ -232,6 +408,36 @@ optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
     from_integer(input_opt.value().size(), result.length().type());
   const array_typet type(result.type().subtype(), length);
   return make_string(input_opt.value(), type);
+}
+
+/// Set of constraints ensuring `result` corresponds to `input` in which
+/// lowercase characters of Basic Latin and Latin-1 supplement of unicode
+/// have been converted to uppercase. These constraints are:
+///   1. res.length = str.length && return_code = 0
+///   2. forall i < str.length.
+///        is_lower_case(str[i]) ? res[i] = str[i] - 0x20 : res[i] = str[i]
+///
+/// \param fresh_symbol: generator of fresh symbols
+/// \return set of constraints
+string_constraintst string_to_upper_case_builtin_functiont::constraints(
+  symbol_generatort &fresh_symbol) const
+{
+  string_constraintst constraints;
+  constraints.existential.push_back(length_constraint());
+  constraints.universal.push_back([&] {
+    const symbol_exprt idx =
+      fresh_symbol("QA_upper_case", result.length().type());
+    const typet &char_type = input.content().type().subtype();
+    const exprt converted =
+      minus_exprt(input[idx], from_integer(0x20, char_type));
+    return string_constraintt(
+      idx,
+      zero_if_negative(result.length()),
+      equal_exprt(
+        result[idx],
+        if_exprt(is_lower_case(input[idx]), converted, input[idx])));
+  }());
+  return constraints;
 }
 
 std::vector<mp_integer> string_insertion_builtin_functiont::eval(
@@ -284,6 +490,30 @@ optionalt<exprt> string_insertion_builtin_functiont::eval(
   return make_string(result_value, type);
 }
 
+string_constraintst string_insertion_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+{
+  if(args.size() == 1)
+  {
+    auto pair = add_axioms_for_insert(
+      generator.fresh_symbol, result, input1, input2, args[0]);
+    pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+    return pair.second;
+  }
+  if(args.size() == 3)
+    UNIMPLEMENTED;
+  UNREACHABLE;
+}
+
+exprt string_insertion_builtin_functiont::length_constraint() const
+{
+  if(args.size() == 1)
+    return length_constraint_for_insert(result, input1, input2);
+  if(args.size() == 3)
+    UNIMPLEMENTED;
+  UNREACHABLE;
+}
+
 /// Constructor from arguments of a function application.
 /// The arguments in `fun_args` should be in order:
 /// an integer `result.length`, a character pointer `&result[0]`,
@@ -331,6 +561,15 @@ optionalt<exprt> string_of_int_builtin_functiont::eval(
   const array_typet type(result.type().subtype(), length_expr);
   return make_string(
     right_to_left_characters.rbegin(), right_to_left_characters.rend(), type);
+}
+
+string_constraintst string_of_int_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+{
+  auto pair = add_axioms_for_string_of_int_with_radix(
+    generator.fresh_symbol, result, arg, radix, 0, generator.ns);
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
 }
 
 exprt string_of_int_builtin_functiont::length_constraint() const
@@ -390,4 +629,13 @@ string_builtin_function_with_no_evalt::string_builtin_function_with_no_evalt(
     else
       args.push_back(fun_args[i]);
   }
+}
+
+string_constraintst string_builtin_function_with_no_evalt::constraints(
+  string_constraint_generatort &generator) const
+{
+  auto pair = generator.add_axioms_for_function_application(
+    generator.fresh_symbol, function_application);
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
 }

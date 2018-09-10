@@ -19,6 +19,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_constraint_generator.h>
 
+#include <iterator>
 #include <limits>
 #include <solvers/refinement/string_refinement_invariant.h>
 
@@ -33,58 +34,6 @@ string_constraint_generatort::string_constraint_generatort(const namespacet &ns)
 {
 }
 
-const std::vector<exprt> &string_constraint_generatort::get_lemmas() const
-{
-  return lemmas;
-}
-
-void string_constraint_generatort::add_lemma(const exprt &expr)
-{
-  lemmas.push_back(expr);
-}
-
-const std::vector<string_constraintt> &
-string_constraint_generatort::get_constraints() const
-{
-  return constraints;
-}
-
-const std::vector<string_not_contains_constraintt> &
-string_constraint_generatort::get_not_contains_constraints() const
-{
-  return not_contains_constraints;
-}
-
-const std::vector<symbol_exprt> &
-string_constraint_generatort::get_index_symbols() const
-{
-  return index_symbols;
-}
-
-const std::vector<symbol_exprt> &
-string_constraint_generatort::get_boolean_symbols() const
-{
-  return boolean_symbols;
-}
-
-const std::set<array_string_exprt> &
-string_constraint_generatort::get_created_strings() const
-{
-  return created_strings;
-}
-
-/// generate constant character expression with character type.
-/// \par parameters: integer representing a character, and a type for
-///   characters;
-/// we do not use char type here because in some languages
-/// (for instance java) characters use more than 8 bits.
-/// \return constant expression corresponding to the character.
-constant_exprt string_constraint_generatort::constant_char(
-  int i, const typet &char_type)
-{
-  return from_integer(i, char_type);
-}
-
 /// generate a new symbol expression of the given type with some prefix
 /// \par parameters: a prefix and a type
 /// \return a symbol of type tp whose name starts with "string_refinement#"
@@ -95,38 +44,11 @@ operator()(const irep_idt &prefix, const typet &type)
   std::ostringstream buf;
   buf << "string_refinement#" << prefix << "#" << ++symbol_count;
   irep_idt name(buf.str());
-  return symbol_exprt(name, type);
-}
-
-/// generate an index symbol to be used as an universaly quantified variable
-/// \par parameters: a prefix
-/// \return a symbol of index type whose name starts with the prefix
-symbol_exprt string_constraint_generatort::fresh_univ_index(
-  const irep_idt &prefix, const typet &type)
-{
-  return fresh_symbol(prefix, type);
-}
-
-/// generate an index symbol which is existentially quantified
-/// \par parameters: a prefix
-/// \return a symbol of index type whose name starts with the prefix
-symbol_exprt string_constraint_generatort::fresh_exist_index(
-  const irep_idt &prefix, const typet &type)
-{
-  symbol_exprt s=fresh_symbol(prefix, type);
-  index_symbols.push_back(s);
-  return s;
-}
-
-/// generate a Boolean symbol which is existentially quantified
-/// \par parameters: a prefix
-/// \return a symbol of index type whose name starts with the prefix
-symbol_exprt string_constraint_generatort::fresh_boolean(
-  const irep_idt &prefix)
-{
-  symbol_exprt b=fresh_symbol(prefix, bool_typet());
-  boolean_symbols.push_back(b);
-  return b;
+  symbol_exprt result(name, type);
+#ifdef DEBUG
+  created_symbols.push_back(result);
+#endif
+  return result;
 }
 
 exprt sum_overflows(const plus_exprt &sum)
@@ -161,15 +83,14 @@ exprt array_poolt::get_length(const array_string_exprt &s) const
 /// construct a string expression whose length and content are new variables
 /// \par parameters: a type for string
 /// \return a string expression
-array_string_exprt string_constraint_generatort::fresh_string(
-  const typet &index_type,
-  const typet &char_type)
+array_string_exprt
+array_poolt::fresh_string(const typet &index_type, const typet &char_type)
 {
   symbol_exprt length = fresh_symbol("string_length", index_type);
   array_typet array_type(char_type, length);
   symbol_exprt content = fresh_symbol("string_content", array_type);
   array_string_exprt str = to_array_string_expr(content);
-  created_strings.insert(str);
+  created_strings_value.insert(str);
   return str;
 }
 
@@ -231,8 +152,14 @@ void array_poolt::insert(
 
   const auto it_bool =
     arrays_of_pointers.insert(std::make_pair(pointer_expr, array_expr));
+  created_strings_value.insert(array_expr);
   INVARIANT(
     it_bool.second, "should not associate two arrays to the same pointer");
+}
+
+const std::set<array_string_exprt> &array_poolt::created_strings() const
+{
+  return created_strings_value;
 }
 
 /// Associate a char array to a char pointer.
@@ -254,7 +181,7 @@ exprt string_constraint_generatort::associate_array_to_pointer(
 
   const exprt &pointer_expr = f.arguments()[1];
   array_pool.insert(pointer_expr, array_expr);
-  created_strings.emplace(to_array_string_expr(array_expr));
+  // created_strings.emplace(to_array_string_expr(array_expr));
   return from_integer(0, f.type());
 }
 
@@ -271,33 +198,51 @@ exprt string_constraint_generatort::associate_length_to_array(
   const exprt &new_length = f.arguments()[1];
 
   const auto &length = array_pool.get_length(array_expr);
-  lemmas.push_back(equal_exprt(length, new_length));
+  constraints.existential.push_back(equal_exprt(length, new_length));
   return from_integer(0, f.type());
 }
 
 /// casts an expression to a string expression, or fetches the actual
 /// string_exprt in the case of a symbol.
+/// \param pool: pool of arrays representing strings
 /// \param expr: an expression of refined string type
 /// \return a string expression
-array_string_exprt
-string_constraint_generatort::get_string_expr(const exprt &expr)
+array_string_exprt get_string_expr(array_poolt &pool, const exprt &expr)
 {
   PRECONDITION(is_refined_string_type(expr.type()));
   const refined_string_exprt &str = to_string_expr(expr);
-  return char_array_of_pointer(str.content(), str.length());
+  return char_array_of_pointer(pool, str.content(), str.length());
 }
 
-void string_constraint_generatort::clear_constraints()
+void string_constraintst::clear()
 {
-  lemmas.clear();
-  constraints.clear();
-  not_contains_constraints.clear();
+  existential.clear();
+  universal.clear();
+  not_contains.clear();
+}
+
+/// Merge two sets of constraints by appending to the first one
+void merge(string_constraintst &result, string_constraintst other)
+{
+  std::move(
+    other.existential.begin(),
+    other.existential.end(),
+    std::back_inserter(result.existential));
+  std::move(
+    other.universal.begin(),
+    other.universal.end(),
+    std::back_inserter(result.universal));
+  std::move(
+    other.not_contains.begin(),
+    other.not_contains.end(),
+    std::back_inserter(result.not_contains));
 }
 
 /// Add constraint on characters of a string.
 ///
 /// This constraint is
 /// \f$ \forall i \in [start, end), low\_char \le s[i] \le high\_char \f$
+/// \param fresh_symbol: generator of fresh symbols
 /// \param s: a string expression
 /// \param start: index of the first character to constrain
 /// \param end: index at which we stop adding constraints
@@ -306,7 +251,8 @@ void string_constraint_generatort::clear_constraints()
 ///        the set of characters that are between `low_char` and `high_char`.
 /// \return a string expression that is linked to the argument through axioms
 ///   that are added to the list
-void string_constraint_generatort::add_constraint_on_characters(
+string_constraintst add_constraint_on_characters(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &s,
   const exprt &start,
   const exprt &end,
@@ -319,14 +265,14 @@ void string_constraint_generatort::add_constraint_on_characters(
   const char &high_char = char_set[2];
 
   // Add constraint
-  const symbol_exprt qvar = fresh_univ_index("char_constr", s.length().type());
+  const symbol_exprt qvar = fresh_symbol("char_constr", s.length().type());
   const exprt chr = s[qvar];
   const and_exprt char_in_set(
     binary_relation_exprt(chr, ID_ge, from_integer(low_char, chr.type())),
     binary_relation_exprt(chr, ID_le, from_integer(high_char, chr.type())));
   const string_constraintt sc(
     qvar, zero_if_negative(start), zero_if_negative(end), char_in_set);
-  constraints.push_back(sc);
+  return {{}, {sc}, {}};
 }
 
 /// Add axioms to ensure all characters of a string belong to a given set.
@@ -335,53 +281,64 @@ void string_constraint_generatort::add_constraint_on_characters(
 /// `char_set` is given by the string `char_set_string` composed of three
 /// characters `low_char`, `-` and `high_char`. Character `c` belongs to
 /// `char_set` if \f$low_char \le c \le high_char\f$.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments: integer `|s|`, character
 ///           pointer `&s[0]`, string `char_set_string`,
 ///           optional integers `start` and `end`
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression whose value is zero
-exprt string_constraint_generatort::add_axioms_for_constrain_characters(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   const auto &args = f.arguments();
   PRECONDITION(3 <= args.size() && args.size() <= 5);
   PRECONDITION(args[2].type().id() == ID_string);
   PRECONDITION(args[2].id() == ID_constant);
-  const array_string_exprt s = char_array_of_pointer(args[1], args[0]);
+
+  const array_string_exprt s =
+    char_array_of_pointer(array_pool, args[1], args[0]);
   const irep_idt &char_set_string = to_constant_expr(args[2]).get_value();
   const exprt &start =
     args.size() >= 4 ? args[3] : from_integer(0, s.length().type());
   const exprt &end = args.size() >= 5 ? args[4] : s.length();
-  add_constraint_on_characters(s, start, end, char_set_string.c_str());
-  return from_integer(0, get_return_code_type());
+  auto constraints = add_constraint_on_characters(
+    fresh_symbol, s, start, end, char_set_string.c_str());
+  return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
 /// Creates a new array if the pointer is not pointing to an array
 /// \todo This should be replaced by make_char_array_for_char_pointer
-array_string_exprt array_poolt::find(const exprt &pointer, const exprt &length)
+const array_string_exprt &
+array_poolt::find(const exprt &pointer, const exprt &length)
 {
   const array_typet array_type(pointer.type().subtype(), length);
-  return make_char_array_for_char_pointer(pointer, array_type);
+  const array_string_exprt array =
+    make_char_array_for_char_pointer(pointer, array_type);
+  return *created_strings_value.insert(array).first;
 }
 
 /// Adds creates a new array if it does not already exists
 /// \todo This should be replaced
 /// by array_poolt.make_char_array_for_char_pointer
-const array_string_exprt &string_constraint_generatort::char_array_of_pointer(
+const array_string_exprt &char_array_of_pointer(
+  array_poolt &pool,
   const exprt &pointer,
   const exprt &length)
 {
-  return *created_strings.insert(array_pool.find(pointer, length)).first;
+  return pool.find(pointer, length);
 }
 
-array_string_exprt array_poolt::find(const refined_string_exprt &str)
-{
-  return find(str.content(), str.length());
-}
-
-array_string_exprt array_poolt::of_argument(const exprt &arg)
+array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg)
 {
   const auto string_argument = expr_checked_cast<struct_exprt>(arg);
-  return find(string_argument.op1(), string_argument.op0());
+  return array_pool.find(string_argument.op1(), string_argument.op0());
+}
+
+signedbv_typet get_return_code_type()
+{
+  return signedbv_typet(32);
 }
 
 static irep_idt get_function_name(const function_application_exprt &expr)
@@ -406,108 +363,111 @@ optionalt<exprt> string_constraint_generatort::make_array_pointer_association(
 /// strings contained in this call are converted to objects of type
 /// `string_exprt`, through adding axioms. Axioms are then added to enforce that
 /// the result corresponds to the function application.
-/// \par parameters: an expression containing a function application
+/// \param fresh_symbol: generator of fresh symbols
+/// \param expr: an expression containing a function application
 /// \return expression corresponding to the result of the function application
-exprt string_constraint_generatort::add_axioms_for_function_application(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_function_application(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &expr)
 {
   const irep_idt &id = get_function_name(expr);
-  exprt res;
 
   if(id==ID_cprover_char_literal_func)
-    res=add_axioms_for_char_literal(expr);
+    return add_axioms_for_char_literal(fresh_symbol, expr);
   else if(id==ID_cprover_string_length_func)
-    res=add_axioms_for_length(expr);
+    return add_axioms_for_length(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_equal_func)
-    res=add_axioms_for_equals(expr);
+    return add_axioms_for_equals(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_equals_ignore_case_func)
-    res=add_axioms_for_equals_ignore_case(expr);
+    return add_axioms_for_equals_ignore_case(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_is_empty_func)
-    res=add_axioms_for_is_empty(expr);
+    return add_axioms_for_is_empty(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_char_at_func)
-    res=add_axioms_for_char_at(expr);
+    return add_axioms_for_char_at(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_is_prefix_func)
-    res=add_axioms_for_is_prefix(expr);
+    return add_axioms_for_is_prefix(fresh_symbol, expr, false, array_pool);
   else if(id==ID_cprover_string_is_suffix_func)
-    res=add_axioms_for_is_suffix(expr);
+    return add_axioms_for_is_suffix(fresh_symbol, expr, false, array_pool);
   else if(id==ID_cprover_string_startswith_func)
-    res=add_axioms_for_is_prefix(expr, true);
+    return add_axioms_for_is_prefix(fresh_symbol, expr, true, array_pool);
   else if(id==ID_cprover_string_endswith_func)
-    res=add_axioms_for_is_suffix(expr, true);
+    return add_axioms_for_is_suffix(fresh_symbol, expr, true, array_pool);
   else if(id==ID_cprover_string_contains_func)
-    res=add_axioms_for_contains(expr);
+    return add_axioms_for_contains(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_hash_code_func)
-    res=add_axioms_for_hash_code(expr);
+    return add_axioms_for_hash_code(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_index_of_func)
-    res=add_axioms_for_index_of(expr);
+    return add_axioms_for_index_of(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_last_index_of_func)
-    res=add_axioms_for_last_index_of(expr);
+    return add_axioms_for_last_index_of(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_parse_int_func)
-    res=add_axioms_for_parse_int(expr);
+    return add_axioms_for_parse_int(fresh_symbol, expr, array_pool, ns);
   else if(id==ID_cprover_string_code_point_at_func)
-    res=add_axioms_for_code_point_at(expr);
+    return add_axioms_for_code_point_at(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_code_point_before_func)
-    res=add_axioms_for_code_point_before(expr);
+    return add_axioms_for_code_point_before(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_code_point_count_func)
-    res=add_axioms_for_code_point_count(expr);
+    return add_axioms_for_code_point_count(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_offset_by_code_point_func)
-    res=add_axioms_for_offset_by_code_point(expr);
+    return add_axioms_for_offset_by_code_point(fresh_symbol, expr);
   else if(id==ID_cprover_string_compare_to_func)
-    res=add_axioms_for_compare_to(expr);
+    return add_axioms_for_compare_to(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_literal_func)
-    res=add_axioms_from_literal(expr);
+    return add_axioms_from_literal(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_concat_code_point_func)
-    res=add_axioms_for_concat_code_point(expr);
+    return add_axioms_for_concat_code_point(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_insert_func)
-    res=add_axioms_for_insert(expr);
+    return add_axioms_for_insert(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_insert_int_func)
-    res=add_axioms_for_insert_int(expr);
+    return add_axioms_for_insert_int(fresh_symbol, expr, array_pool, ns);
   else if(id==ID_cprover_string_insert_long_func)
-    res = add_axioms_for_insert_int(expr);
+    return add_axioms_for_insert_int(fresh_symbol, expr, array_pool, ns);
   else if(id==ID_cprover_string_insert_bool_func)
-    res=add_axioms_for_insert_bool(expr);
+    return add_axioms_for_insert_bool(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_insert_char_func)
-    res=add_axioms_for_insert_char(expr);
+    return add_axioms_for_insert_char(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_insert_double_func)
-    res=add_axioms_for_insert_double(expr);
+    return add_axioms_for_insert_double(fresh_symbol, expr, array_pool, ns);
   else if(id==ID_cprover_string_insert_float_func)
-    res=add_axioms_for_insert_float(expr);
+    return add_axioms_for_insert_float(fresh_symbol, expr, array_pool, ns);
   else if(id==ID_cprover_string_substring_func)
-    res=add_axioms_for_substring(expr);
+    return add_axioms_for_substring(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_trim_func)
-    res=add_axioms_for_trim(expr);
+    return add_axioms_for_trim(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_empty_string_func)
-    res=add_axioms_for_empty_string(expr);
+    return add_axioms_for_empty_string(fresh_symbol, expr);
   else if(id==ID_cprover_string_copy_func)
-    res=add_axioms_for_copy(expr);
+    return add_axioms_for_copy(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_of_int_hex_func)
-    res=add_axioms_from_int_hex(expr);
+    return add_axioms_from_int_hex(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_of_float_func)
-    res=add_axioms_for_string_of_float(expr);
+    return add_axioms_for_string_of_float(fresh_symbol, expr, array_pool, ns);
   else if(id==ID_cprover_string_of_float_scientific_notation_func)
-    res=add_axioms_from_float_scientific_notation(expr);
+    return add_axioms_from_float_scientific_notation(
+      fresh_symbol, expr, array_pool, ns);
   else if(id==ID_cprover_string_of_double_func)
-    res=add_axioms_from_double(expr);
+    return add_axioms_from_double(fresh_symbol, expr, array_pool, ns);
   else if(id==ID_cprover_string_of_long_func)
-    res=add_axioms_from_long(expr);
+    return add_axioms_from_long(fresh_symbol, expr, array_pool, ns);
   else if(id==ID_cprover_string_of_bool_func)
-    res=add_axioms_from_bool(expr);
+    return add_axioms_from_bool(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_of_char_func)
-    res=add_axioms_from_char(expr);
+    return add_axioms_from_char(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_set_length_func)
-    res=add_axioms_for_set_length(expr);
+    return add_axioms_for_set_length(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_delete_func)
-    res=add_axioms_for_delete(expr);
+    return add_axioms_for_delete(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_delete_char_at_func)
-    res=add_axioms_for_delete_char_at(expr);
+    return add_axioms_for_delete_char_at(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_replace_func)
-    res=add_axioms_for_replace(expr);
+    return add_axioms_for_replace(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_intern_func)
-    res=add_axioms_for_intern(expr);
+    return add_axioms_for_intern(fresh_symbol, expr);
   else if(id==ID_cprover_string_format_func)
-    res=add_axioms_for_format(expr);
+    return add_axioms_for_format(fresh_symbol, expr, array_pool, message, ns);
   else if(id == ID_cprover_string_constrain_characters_func)
-    res = add_axioms_for_constrain_characters(expr);
+    return add_axioms_for_constrain_characters(fresh_symbol, expr, array_pool);
   else
   {
     std::string msg(
@@ -515,54 +475,65 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     msg+=id2string(id);
     DATA_INVARIANT(false, string_refinement_invariantt(msg));
   }
-  return res;
+  UNREACHABLE;
 }
 
 /// add axioms to say that the returned string expression is equal to the
 /// argument of the function application
 /// \deprecated should use substring instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one argument, which is a string,
 /// or three arguments: string, integer offset and count
+/// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
 DEPRECATED("should use substring instead")
-exprt string_constraint_generatort::add_axioms_for_copy(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst> add_axioms_for_copy(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   const auto &args=f.arguments();
   PRECONDITION(args.size() == 3 || args.size() == 5);
-  const array_string_exprt res = char_array_of_pointer(args[1], args[0]);
-  const array_string_exprt str = get_string_expr(args[2]);
+  const array_string_exprt res =
+    char_array_of_pointer(array_pool, args[1], args[0]);
+  const array_string_exprt str = get_string_expr(array_pool, args[2]);
   const typet &index_type = str.length().type();
   const exprt offset = args.size() == 3 ? from_integer(0, index_type) : args[3];
   const exprt count = args.size() == 3 ? str.length() : args[4];
-  return add_axioms_for_substring(res, str, offset, plus_exprt(offset, count));
+  return add_axioms_for_substring(
+    fresh_symbol, res, str, offset, plus_exprt(offset, count));
 }
 
 /// Length of a string
 ///
 /// Returns the length of the string argument of the given function application
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with argument string `str`
+/// \param array_pool: pool of arrays representing strings
 /// \return expression `|str|`
-exprt string_constraint_generatort::add_axioms_for_length(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst> add_axioms_for_length(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 1);
-  const array_string_exprt str = get_string_expr(f.arguments()[0]);
-  return str.length();
+  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
+  return {str.length(), {}};
 }
 
-/// expression true exactly when the index is positive
-/// \param x: an index expression
-/// \return a Boolean expression
-exprt string_constraint_generatort::axiom_for_is_positive_index(const exprt &x)
+/// \param x: an expression
+/// \return a Boolean expression true exactly when `x` is positive
+exprt is_positive(const exprt &x)
 {
   return binary_relation_exprt(x, ID_ge, from_integer(0, x.type()));
 }
 
 /// add axioms stating that the returned value is equal to the argument
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one character argument
 /// \return a new character expression
-exprt string_constraint_generatort::add_axioms_for_char_literal(
+std::pair<exprt, string_constraintst> add_axioms_for_char_literal(
+  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
@@ -579,7 +550,7 @@ exprt string_constraint_generatort::add_axioms_for_char_literal(
     const string_constantt s=to_string_constant(arg.op0().op0().op0());
     irep_idt sval=s.get_value();
     CHECK_RETURN(sval.size()==1);
-    return from_integer(unsigned(sval[0]), arg.type());
+    return {from_integer(unsigned(sval[0]), arg.type()), {}};
   }
   else
   {
@@ -595,16 +566,20 @@ exprt string_constraint_generatort::add_axioms_for_char_literal(
 /// Add axioms stating that the character of the string at position given by
 /// second argument is equal to the returned value.
 /// This axiom is \f$ char = str[i] \f$.
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments string `str` and integer `i`
+/// \param array_pool: pool of arrays representing strings
 /// \return character expression `char`
-exprt string_constraint_generatort::add_axioms_for_char_at(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst> add_axioms_for_char_at(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 2);
-  array_string_exprt str = get_string_expr(f.arguments()[0]);
+  array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   symbol_exprt char_sym = fresh_symbol("char", str.type().subtype());
-  lemmas.push_back(equal_exprt(char_sym, str[f.arguments()[1]]));
-  return char_sym;
+  const exprt constraint = equal_exprt(char_sym, str[f.arguments()[1]]);
+  return {char_sym, {{constraint}}};
 }
 
 exprt minimum(const exprt &a, const exprt &b)
@@ -623,4 +598,15 @@ exprt maximum(const exprt &a, const exprt &b)
 exprt zero_if_negative(const exprt &expr)
 {
   return maximum(from_integer(0, expr.type()), expr);
+}
+
+/// Combine the results of two `add_axioms` function by taking the maximum of
+/// the return codes and merging the constraints.
+std::pair<exprt, string_constraintst> combine_results(
+  std::pair<exprt, string_constraintst> result1,
+  std::pair<exprt, string_constraintst> result2)
+{
+  const exprt return_code = maximum(result1.first, result2.first);
+  merge(result2.second, std::move(result1.second));
+  return {return_code, std::move(result2.second)};
 }

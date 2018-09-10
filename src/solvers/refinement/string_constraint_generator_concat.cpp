@@ -28,46 +28,49 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   2. \f$\forall i<|s_1|. res[i]=s_1[i] \f$
 ///   3. \f$\forall i< |res| - |s_1|.\ res[i+|s_1|] = s_2[start\_index'+i]\f$
 ///
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: an array of characters expression
 /// \param s1: an array of characters expression
 /// \param s2: an array of characters expression
 /// \param start_index: integer expression
 /// \param end_index: integer expression
 /// \return integer expression `0`
-exprt string_constraint_generatort::add_axioms_for_concat_substr(
+std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const array_string_exprt &s2,
   const exprt &start_index,
   const exprt &end_index)
 {
+  string_constraintst constraints;
   const typet &index_type = start_index.type();
   const exprt start1 = maximum(start_index, from_integer(0, index_type));
   const exprt end1 = maximum(minimum(end_index, s2.length()), start1);
 
   // Axiom 1.
-  lemmas.push_back(
+  constraints.existential.push_back(
     length_constraint_for_concat_substr(res, s1, s2, start_index, end_index));
 
   // Axiom 2.
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt idx =
-      fresh_univ_index("QA_index_concat", res.length().type());
+      fresh_symbol("QA_index_concat", res.length().type());
     return string_constraintt(
       idx, zero_if_negative(s1.length()), equal_exprt(s1[idx], res[idx]));
   }());
 
   // Axiom 3.
-  constraints.push_back([&] {
+  constraints.universal.push_back([&] {
     const symbol_exprt idx2 =
-      fresh_univ_index("QA_index_concat2", res.length().type());
+      fresh_symbol("QA_index_concat2", res.length().type());
     const equal_exprt res_eq(
       res[plus_exprt(idx2, s1.length())], s2[plus_exprt(start1, idx2)]);
     const minus_exprt upper_bound(res.length(), s1.length());
     return string_constraintt(idx2, zero_if_negative(upper_bound), res_eq);
   }());
 
-  return from_integer(0, get_return_code_type());
+  return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
 /// Add axioms enforcing that the length of `res` is that of the concatenation
@@ -101,37 +104,6 @@ exprt length_constraint_for_concat(
   return equal_exprt(res.length(), plus_exprt(s1.length(), s2.length()));
 }
 
-/// Add axioms enforcing that `res` is the concatenation of `s1` with
-/// character `c`.
-/// These axioms are :
-///   * \f$ |res|=|s1|+1 \f$
-///   * \f$ \forall i<|s1|. res[i]=s1[i] \f$
-///   * \f$ res[|s1|]=c \f$
-///
-/// \param res: string expression
-/// \param s1: string expression
-/// \param c: character expression
-/// \return code 0 on success
-exprt string_constraint_generatort::add_axioms_for_concat_char(
-  const array_string_exprt &res,
-  const array_string_exprt &s1,
-  const exprt &c)
-{
-  const typet &index_type = res.length().type();
-  lemmas.push_back(length_constraint_for_concat_char(res, s1));
-
-  symbol_exprt idx = fresh_univ_index("QA_index_concat_char", index_type);
-  string_constraintt a2(
-    idx, zero_if_negative(s1.length()), equal_exprt(s1[idx], res[idx]));
-  constraints.push_back(a2);
-
-  equal_exprt a3(res[s1.length()], c);
-  lemmas.push_back(a3);
-
-  // We should have a enum type for the possible error codes
-  return from_integer(0, get_return_code_type());
-}
-
 /// Add axioms enforcing that the length of `res` is that of the concatenation
 /// of `s1` with
 exprt length_constraint_for_concat_char(
@@ -146,77 +118,42 @@ exprt length_constraint_for_concat_char(
 /// `s2`.
 ///
 /// \deprecated should use concat_substr instead
+/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string_expression corresponding to the result
 /// \param s1: the string expression to append to
 /// \param s2: the string expression to append to the first one
 /// \return an integer expression
-exprt string_constraint_generatort::add_axioms_for_concat(
+std::pair<exprt, string_constraintst> add_axioms_for_concat(
+  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const array_string_exprt &s2)
 {
   exprt index_zero=from_integer(0, s2.length().type());
-  return add_axioms_for_concat_substr(res, s1, s2, index_zero, s2.length());
-}
-
-/// String concatenation
-///
-/// This primitive accepts 4 or 6 arguments.
-/// \copybrief string_constraint_generatort::add_axioms_for_concat_substr
-/// \link string_constraint_generatort::add_axioms_for_concat_substr
-///   (More...) \endlink
-///
-/// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]`, refined_string `s1`, refined_string `s2`,
-///           optional integer `start_index`, optional integer `end_index`
-/// \return an integer expression
-exprt string_constraint_generatort::add_axioms_for_concat(
-  const function_application_exprt &f)
-{
-  const function_application_exprt::argumentst &args=f.arguments();
-  PRECONDITION(args.size() == 4 || args.size() == 6);
-  const array_string_exprt s1 = get_string_expr(args[2]);
-  const array_string_exprt s2 = get_string_expr(args[3]);
-  const array_string_exprt res = char_array_of_pointer(args[1], args[0]);
-  if(args.size() == 6)
-    return add_axioms_for_concat_substr(res, s1, s2, args[4], args[5]);
-  else // args.size()==4
-    return add_axioms_for_concat(res, s1, s2);
-}
-
-/// Add axioms enforcing that the string represented by the two first
-/// expressions is equal to the concatenation of the string argument and
-/// the character argument of the function application.
-/// \todo This should be merged with add_axioms_for_concat.
-/// \param f: function application with a length, pointer, string and character
-///           argument.
-/// \return code 0 on success
-exprt string_constraint_generatort::add_axioms_for_concat_char(
-  const function_application_exprt &f)
-{
-  const function_application_exprt::argumentst &args = f.arguments();
-  PRECONDITION(args.size() == 4);
-  const array_string_exprt s1 = get_string_expr(args[2]);
-  const exprt &c = args[3];
-  const array_string_exprt res = char_array_of_pointer(args[1], args[0]);
-  return add_axioms_for_concat_char(res, s1, c);
+  return add_axioms_for_concat_substr(
+    fresh_symbol, res, s1, s2, index_zero, s2.length());
 }
 
 /// Add axioms corresponding to the StringBuilder.appendCodePoint(I) function
 /// \deprecated java specific
+/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with two arguments: a string and a code point
+/// \param array_pool: pool of arrays representing strings
 /// \return an expression
-exprt string_constraint_generatort::add_axioms_for_concat_code_point(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 4);
   const array_string_exprt res =
-    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
-  const array_string_exprt s1 = get_string_expr(f.arguments()[2]);
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+  const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   const typet &char_type = s1.content().type().subtype();
   const typet &index_type = s1.length().type();
-  const array_string_exprt code_point = fresh_string(index_type, char_type);
-  const exprt return_code1 =
-    add_axioms_for_code_point(code_point, f.arguments()[3]);
-  return add_axioms_for_concat(res, s1, code_point);
+  const array_string_exprt code_point =
+    array_pool.fresh_string(index_type, char_type);
+  return combine_results(
+    add_axioms_for_code_point(fresh_symbol, code_point, f.arguments()[3]),
+    add_axioms_for_concat(fresh_symbol, res, s1, code_point));
 }
