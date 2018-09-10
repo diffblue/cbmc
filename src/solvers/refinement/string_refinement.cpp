@@ -1836,12 +1836,8 @@ static exprt instantiate(
   const exprt &str,
   const exprt &val)
 {
-  const auto indexes = find_indexes(axiom.body, str, axiom.univ_var);
-  INVARIANT(
-    str.id() == ID_array || indexes.size() <= 1,
-    "non constant array should always be accessed at the same index");
   exprt::operandst conjuncts;
-  for(const auto &index : indexes)
+  for(const auto &index : find_indexes(axiom.body, str, axiom.univ_var))
   {
     const exprt univ_var_value =
       compute_inverse_function(axiom.univ_var, val, index);
