@@ -330,8 +330,7 @@ void interpretert::evaluate(
 
       dest.clear();
     }
-    else if((expr.type().id()==ID_pointer)
-         || (expr.type().id()==ID_address_of))
+    else if(expr.type().id() == ID_pointer)
     {
       mp_integer i=0;
       if(expr.has_operands() && expr.op0().id()==ID_address_of)
