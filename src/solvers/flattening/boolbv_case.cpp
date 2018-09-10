@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_case(const exprt &expr)
 {
+  PRECONDITION(expr.id() == ID_case);
+
   const std::vector<exprt> &operands=expr.operands();
 
   std::size_t width=boolbv_width(expr.type());
@@ -26,11 +28,11 @@ bvt boolbvt::convert_case(const exprt &expr)
   Forall_literals(it, bv)
     *it=prop.new_variable();
 
-  if(operands.size()<3)
-    throw "case takes at least three operands";
+  DATA_INVARIANT(
+    operands.size() >= 3, "case should have at least three operands");
 
-  if((operands.size()%2)!=1)
-    throw "number of case operands must be odd";
+  DATA_INVARIANT(
+    operands.size() % 2 == 1, "number of case operands should be odd");
 
   enum { FIRST, COMPARE, VALUE } what=FIRST;
   bvt compare_bv;
@@ -81,7 +83,7 @@ bvt boolbvt::convert_case(const exprt &expr)
       break;
 
     default:
-      assert(false);
+      UNREACHABLE;
     }
   }
 

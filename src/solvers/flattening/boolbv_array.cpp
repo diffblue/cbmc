@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include "boolbv.h"
+
+#include <util/invariant.h>
 
 bvt boolbvt::convert_array(const exprt &expr)
 {
@@ -18,9 +19,11 @@ bvt boolbvt::convert_array(const exprt &expr)
 
   if(expr.type().id()==ID_array)
   {
-    assert(expr.has_operands());
+    DATA_INVARIANT(
+      expr.has_operands(),
+      "the bit width being nonzero implies that the array has a nonzero size "
+      "in which case the array shall have operands");
     const exprt::operandst &operands=expr.operands();
-    assert(!operands.empty());
     std::size_t op_width=width/operands.size();
 
     bvt bv;
@@ -28,10 +31,7 @@ bvt boolbvt::convert_array(const exprt &expr)
 
     forall_expr(it, operands)
     {
-      const bvt &tmp=convert_bv(*it);
-
-      if(tmp.size()!=op_width)
-        throw "convert_array: unexpected operand width";
+      const bvt &tmp = convert_bv(*it, op_width);
 
       forall_literals(it2, tmp)
         bv.push_back(*it2);

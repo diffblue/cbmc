@@ -447,7 +447,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   }
   else if(expr.id()==ID_concatenation)
   {
-    return SUB::convert_concatenation(expr);
+    return SUB::convert_concatenation(to_concatenation_expr(expr));
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
