@@ -1053,8 +1053,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_unary_plus)
   {
     // A no-op (apart from type promotion)
-    assert(expr.operands().size()==1);
-    convert_expr(expr.op0());
+    convert_expr(to_unary_plus_expr(expr).op());
   }
   else if(expr.id()==ID_sign)
   {
