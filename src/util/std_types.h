@@ -1050,11 +1050,6 @@ public:
   incomplete_array_typet():type_with_subtypet(ID_incomplete_array)
   {
   }
-
-  explicit incomplete_array_typet(const typet &_subtype)
-    : type_with_subtypet(ID_incomplete_array, _subtype)
-  {
-  }
 };
 
 /// Check whether a reference to a typet is a \ref incomplete_array_typet.
