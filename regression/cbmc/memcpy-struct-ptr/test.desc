@@ -1,0 +1,12 @@
+KNOWNBUG
+main.c
+--bounds-check --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main\.assertion\.5\] assertion q\.s->x == 42: SUCCESS$
+^\[main\.assertion\.6\] assertion q\.s->y == 43: SUCCESS$
+--
+^warning: ignoring
+--
+Issue: 2925
