@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 #include <map>
 #include <queue>
+#include <sstream>
 #include <stack>
 #include <vector>
 
@@ -59,6 +60,39 @@ public:
   void erase_out(node_indext n)
   {
     out.erase(n);
+  }
+
+private:
+  /// \brief Node with attributes suitable for Graphviz DOT format
+  ///
+  /// Derived types may override this function to produce more informative DOT
+  /// diagrams than the default implementation, which displays only the node
+  /// index. The return value should be a list of node attributes within square
+  /// brackets that can be parsed by `dot`. Here is a sample implementation for
+  /// a fictional node type with `is_evil()` and `is_pink()` functions:
+  ///
+  ///     std::stringstream ss;
+  ///     ss << "[shape=\"" << is_evil() ? "box" : "diamond"
+  ///        << "\", color=\"" << is_pink() ? "#e91e63" : "#9c27b0"
+  ///        << "\", label=\"this is node " << std::to_string(idx)
+  ///        << "\"]";
+  ///     return ss.str();
+  ///
+  virtual std::string dot_attributes(const node_indext &idx) const
+  {
+    return "";
+  }
+
+public:
+  std::string pretty(const node_indext &idx) const
+  {
+    std::stringstream ss;
+    ss << std::to_string(idx) << " " << dot_attributes(idx);
+    return ss.str();
+  }
+
+  virtual ~graph_nodet()
+  {
   }
 };
 
@@ -877,9 +911,11 @@ void output_dot_generic(
   const std::function<
     void(const node_index_type &, std::function<void(const node_index_type &)>)>
     &for_each_succ,
-  const std::function<std::string(const node_index_type &)> node_to_string)
+  const std::function<std::string(const node_index_type &)> node_to_string,
+  const std::function<std::string(const node_index_type &)> node_to_pretty)
 {
   for_each_node([&](const node_index_type &i) {
+    out << node_to_pretty(i) << ";\n";
     for_each_succ(i, [&](const node_index_type &n) {
       out << node_to_string(i) << " -> " << node_to_string(n) << '\n';
     });
@@ -914,7 +950,7 @@ template <class N>
 void grapht<N>::output_dot(std::ostream &out) const
 {
   const auto for_each_node =
-    [&](const std::function<void(const node_indext &)> &f) {
+    [this](const std::function<void(const node_indext &)> &f) {
       for(node_indext i = 0; i < nodes.size(); ++i)
         f(i);
     };
@@ -925,7 +961,11 @@ void grapht<N>::output_dot(std::ostream &out) const
   };
 
   const auto to_string = [](const node_indext &i) { return std::to_string(i); };
-  output_dot_generic<node_indext>(out, for_each_node, for_each_succ, to_string);
+  const auto to_pretty_string = [this](const node_indext &i) {
+    return nodes[i].pretty(i);
+  };
+  output_dot_generic<node_indext>(
+    out, for_each_node, for_each_succ, to_string, to_pretty_string);
 }
 
 #endif // CPROVER_UTIL_GRAPH_H

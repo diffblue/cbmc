@@ -497,7 +497,8 @@ void string_dependenciest::output_dot(std::ostream &stream) const
     return ostream.str();
   };
   stream << "digraph dependencies {\n";
-  output_dot_generic<nodet>(stream, for_each, for_each_succ, node_to_string);
+  output_dot_generic<nodet>(
+    stream, for_each, for_each_succ, node_to_string, node_to_string);
   stream << '}' << std::endl;
 }
 
