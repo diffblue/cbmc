@@ -390,6 +390,80 @@ int run(
 #endif
 }
 
+/// quote a string for bash and CMD
+static std::string shell_quote(const std::string &src)
+{
+  #ifdef _WIN32
+  // first check if quoting is needed at all
+
+  if(src.find(' ')==std::string::npos &&
+     src.find('"')==std::string::npos &&
+     src.find('&')==std::string::npos &&
+     src.find('|')==std::string::npos &&
+     src.find('(')==std::string::npos &&
+     src.find(')')==std::string::npos &&
+     src.find('<')==std::string::npos &&
+     src.find('>')==std::string::npos &&
+     src.find('^')==std::string::npos)
+  {
+    // seems fine -- return as is
+    return src;
+  }
+
+  std::string result;
+
+  result+='"';
+
+  for(const char ch : src)
+  {
+    if(ch=='"')
+      result+='"'; // quotes are doubled
+    result+=ch;
+  }
+
+  result+='"';
+
+  return result;
+
+  #else
+
+  // first check if quoting is needed at all
+
+  if(src.find(' ')==std::string::npos &&
+     src.find('"')==std::string::npos &&
+     src.find('*')==std::string::npos &&
+     src.find('$')==std::string::npos &&
+     src.find('\\')==std::string::npos &&
+     src.find('?')==std::string::npos &&
+     src.find('&')==std::string::npos &&
+     src.find('|')==std::string::npos &&
+     src.find('>')==std::string::npos &&
+     src.find('<')==std::string::npos &&
+     src.find('^')==std::string::npos &&
+     src.find('\'')==std::string::npos)
+  {
+    // seems fine -- return as is
+    return src;
+  }
+
+  std::string result;
+
+  // the single quotes catch everything but themselves!
+  result+='\'';
+
+  for(const char ch : src)
+  {
+    if(ch=='\'')
+      result+="'\\''";
+    result+=ch;
+  }
+
+  result+='\'';
+
+  return result;
+  #endif
+}
+
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,
@@ -397,6 +471,7 @@ int run(
   std::ostream &std_output,
   const std::string &std_error)
 {
+  #ifdef _WIN32
   temporary_filet tmpi("tmp.stdout", "");
 
   int result = run(what, argv, std_input, tmpi(), std_error);
@@ -407,4 +482,23 @@ int run(
     std_output << instream.rdbuf(); // copy
 
   return result;
+  #else
+  std::string command;
+
+  for(const auto &arg : argv)
+    command += " " + shell_quote(arg);
+
+  FILE *stream=popen(command.c_str(), "r");
+
+  if(stream!=nullptr)
+  {
+    int ch;
+    while((ch=fgetc(stream))!=EOF)
+      std_output << (unsigned char)ch;
+
+    return pclose(stream);
+  }
+  else
+    return -1;
+  #endif
 }
