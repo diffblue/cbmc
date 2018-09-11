@@ -463,4 +463,19 @@ struct irep_full_eq
   }
 };
 
+struct irep_pretty_diagnosticst
+{
+  const irept &irep;
+  explicit irep_pretty_diagnosticst(const irept &irep);
+};
+
+template <>
+struct diagnostics_helpert<irep_pretty_diagnosticst>
+{
+  static std::string diagnostics_as_string(const irep_pretty_diagnosticst &irep)
+  {
+    return irep.irep.pretty();
+  }
+};
+
 #endif // CPROVER_UTIL_IREP_H

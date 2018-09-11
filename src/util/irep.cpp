@@ -689,3 +689,8 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
 
   return result;
 }
+
+irep_pretty_diagnosticst::irep_pretty_diagnosticst(const irept &irep)
+  : irep(irep)
+{
+}

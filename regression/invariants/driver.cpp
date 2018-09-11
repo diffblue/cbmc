@@ -12,10 +12,13 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <string>
 #include <sstream>
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/invariant.h>
 #include <util/invariant_utils.h>
+#include <util/irep.h>
+#include <util/std_expr.h>
 #include <util/std_types.h>
-#include <util/c_types.h>
 
 /// An example of structured invariants-- this contains fields to
 /// describe the error to a catcher, and also produces a human-readable
@@ -149,6 +152,15 @@ int main(int argc, char** argv)
       "an invariant with some custom diagnostics",
       DiagnosticA{},
       DiagnosticB{});
+  else if(arg == "invariant-with-irep-diagnostics")
+  {
+    INVARIANT_WITH_DIAGNOSTICS(
+      false,
+      "an invariant with irep diagnostics",
+      irep_pretty_diagnosticst{
+        plus_exprt{from_integer(8, signedbv_typet(32)),
+                   from_integer(13, signedbv_typet(32))}});
+  }
   else
     return 1;
 }
