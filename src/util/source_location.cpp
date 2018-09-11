@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "source_location.h"
 
 #include <ostream>
+#include <tuple>
 
 #include "file_util.h"
 
@@ -79,4 +80,20 @@ std::ostream &operator << (
     return out;
   out << source_location.as_string();
   return out;
+}
+
+bool operator<(const source_locationt &s1, const source_locationt &s2)
+{
+  if(s1.is_nil())
+  {
+    if(s2.is_nil())
+      return false;
+    return true;
+  }
+  if(s2.is_nil())
+    return false;
+  unsigned s1_line = std::stoul(s1.get_line().c_str());
+  unsigned s2_line = std::stoul(s2.get_line().c_str());
+  return std::tie(s1.get_file(), s1_line, s1) <
+         std::tie(s2.get_file(), s2_line, s2);
 }

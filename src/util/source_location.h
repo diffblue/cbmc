@@ -201,4 +201,7 @@ struct diagnostics_helpert<source_locationt>
   }
 };
 
+/// \brief Compare file names lexicographically, then line numbers numerically
+bool operator<(const source_locationt &, const source_locationt &);
+
 #endif // CPROVER_UTIL_SOURCE_LOCATION_H
