@@ -17,30 +17,29 @@ bvt boolbvt::convert_replication(const replication_exprt &expr)
   if(width==0)
     return conversion_failed(expr);
 
-  mp_integer times;
-  if(to_integer(expr.op0(), times))
-    throw "replication takes constant as first parameter";
+  mp_integer times = numeric_cast_v<mp_integer>(expr.times());
 
   bvt bv;
   bv.resize(width);
 
   const std::size_t u_times=integer2unsigned(times);
-  const bvt &op=convert_bv(expr.op1());
-  std::size_t offset=0;
+  const bvt &op = convert_bv(expr.op());
 
-  for(std::size_t i=0; i<u_times; i++)
+  INVARIANT(
+    op.size() * u_times == bv.size(),
+    "result bitvector width shall be equal to the operand bitvector width times"
+    "the number of replications");
+
+  std::size_t bit_idx = 0;
+
+  for(std::size_t i = 0; i < u_times; i++)
   {
-    if(op.size()+offset>width)
-      throw "replication operand width too big";
-
-    for(std::size_t i=0; i<op.size(); i++)
-      bv[i+offset]=op[i];
-
-    offset+=op.size();
+    for(const auto &bit : op)
+    {
+      bv[bit_idx] = bit;
+      bit_idx++;
+    }
   }
-
-  if(offset!=bv.size())
-    throw "replication operand width too small";
 
   return bv;
 }

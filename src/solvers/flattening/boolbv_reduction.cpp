@@ -13,8 +13,9 @@ literalt boolbvt::convert_reduction(const unary_exprt &expr)
 {
   const bvt &op_bv=convert_bv(expr.op());
 
-  if(op_bv.empty())
-    throw "reduction operators take one non-empty operand";
+  INVARIANT(
+    !op_bv.empty(),
+    "reduction operand bitvector shall have width at least one");
 
   enum { O_OR, O_AND, O_XOR } op;
 
@@ -27,7 +28,7 @@ literalt boolbvt::convert_reduction(const unary_exprt &expr)
   else if(id==ID_reduction_xor || id==ID_reduction_xnor)
     op=O_XOR;
   else
-    throw "unexpected reduction operator";
+    UNREACHABLE;
 
   literalt l=op_bv[0];
 
@@ -53,8 +54,9 @@ bvt boolbvt::convert_bv_reduction(const unary_exprt &expr)
 {
   const bvt &op_bv=convert_bv(expr.op());
 
-  if(op_bv.empty())
-    throw "reduction operators take one non-empty operand";
+  INVARIANT(
+    !op_bv.empty(),
+    "reduction operand bitvector shall have width at least one");
 
   enum { O_OR, O_AND, O_XOR } op;
 
@@ -67,7 +69,7 @@ bvt boolbvt::convert_bv_reduction(const unary_exprt &expr)
   else if(id==ID_reduction_xor || id==ID_reduction_xnor)
     op=O_XOR;
   else
-    throw "unexpected reduction operator";
+    UNREACHABLE;
 
   const typet &op_type=expr.op().type();
 

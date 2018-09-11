@@ -8,9 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <cassert>
-
 #include <util/arith_tools.h>
+#include <util/invariant.h>
 #include <util/replace_expr.h>
 #include <util/simplify_expr.h>
 
@@ -32,8 +31,8 @@ exprt get_quantifier_var_min(
   const exprt &var_expr,
   const exprt &quantifier_expr)
 {
-  assert(quantifier_expr.id()==ID_or ||
-         quantifier_expr.id()==ID_and);
+  PRECONDITION(quantifier_expr.id() == ID_or || quantifier_expr.id() == ID_and);
+
   exprt res;
   res.make_false();
   if(quantifier_expr.id()==ID_or)
@@ -80,8 +79,7 @@ exprt get_quantifier_var_max(
   const exprt &var_expr,
   const exprt &quantifier_expr)
 {
-  assert(quantifier_expr.id()==ID_or ||
-         quantifier_expr.id()==ID_and);
+  PRECONDITION(quantifier_expr.id() == ID_or || quantifier_expr.id() == ID_and);
   exprt res;
   res.make_false();
   if(quantifier_expr.id()==ID_or)
@@ -140,11 +138,14 @@ exprt get_quantifier_var_max(
 bool instantiate_quantifier(exprt &expr,
                             const namespacet &ns)
 {
-  if(!(expr.id()==ID_forall || expr.id()==ID_exists))
-    return true;
+  PRECONDITION(expr.id() == ID_forall || expr.id() == ID_exists);
 
-  assert(expr.operands().size()==2);
-  assert(expr.op0().id()==ID_symbol);
+  DATA_INVARIANT(
+    expr.operands().size() == 2,
+    "quantifier expressions shall have two operands");
+
+  DATA_INVARIANT(
+    expr.op0().id() == ID_symbol, "quantified variable shall be a symbol");
 
   exprt var_expr=expr.op0();
 
@@ -203,6 +204,8 @@ bool instantiate_quantifier(exprt &expr,
 
 literalt boolbvt::convert_quantifier(const exprt &src)
 {
+  PRECONDITION(src.id() == ID_forall || src.id() == ID_exists);
+
   exprt expr(src);
   if(!instantiate_quantifier(expr, ns))
     return SUB::convert_rest(src);

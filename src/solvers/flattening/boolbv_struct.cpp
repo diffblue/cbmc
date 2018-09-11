@@ -19,17 +19,16 @@ bvt boolbvt::convert_struct(const struct_exprt &expr)
 
   const struct_typet::componentst &components=struct_type.components();
 
-  if(expr.operands().size()!=components.size())
-  {
-    error().source_location=expr.find_source_location();
-    error() << "struct: wrong number of arguments" << eom;
-    throw 0;
-  }
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    expr.operands().size() == components.size(),
+    "number of operands of a struct expression shall equal the number of"
+    "components as indicated by its type",
+    expr.find_source_location());
 
   bvt bv;
   bv.resize(width);
 
-  std::size_t offset=0;
+  std::size_t bit_idx = 0;
 
   exprt::operandst::const_iterator op_it=expr.operands().begin();
   for(const auto &comp : components)
@@ -37,35 +36,35 @@ bvt boolbvt::convert_struct(const struct_exprt &expr)
     const typet &subtype=comp.type();
     const exprt &op=*op_it;
 
-    if(!base_type_eq(subtype, op.type(), ns))
-    {
-      error().source_location=expr.find_source_location();
-      error() << "struct: component type does not match: "
-              << subtype.pretty() << " vs. "
-              << op.type().pretty() << eom;
-      throw 0;
-    }
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      base_type_eq(subtype, op.type(), ns),
+      "type of a struct expression operand shall equal the type of the "
+      "corresponding struct component",
+      expr.find_source_location(),
+      subtype.pretty(),
+      op.type().pretty());
 
     std::size_t subtype_width=boolbv_width(subtype);
 
     if(subtype_width!=0)
     {
-      const bvt &op_bv=convert_bv(op);
+      const bvt &op_bv = convert_bv(op, subtype_width);
 
-      assert(offset<width);
-      assert(op_bv.size()==subtype_width);
-      assert(offset+op_bv.size()<=width);
+      INVARIANT(
+        bit_idx + op_bv.size() <= width, "bit index shall be within bounds");
 
-      for(std::size_t j=0; j<op_bv.size(); j++)
-        bv[offset+j]=op_bv[j];
-
-      offset+=op_bv.size();
+      for(const auto &bit : op_bv)
+      {
+        bv[bit_idx] = bit;
+        bit_idx++;
+      }
     }
 
     ++op_it;
   }
 
-  assert(offset==width);
+  INVARIANT(
+    bit_idx == width, "all bits in the bitvector shall have been assigned");
 
   return bv;
 }
