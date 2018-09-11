@@ -320,36 +320,80 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // these should only exist as constants,
     // and should already be typed
   }
-  else if(expr.id()==ID_complex_real ||
-          expr.id()==ID_complex_imag)
+  else if(expr.id() == ID_complex_real)
   {
-    // get the subtype
-    assert(expr.operands().size()==1);
-    const typet &op_type=follow(expr.op0().type());
-    if(op_type.id()!=ID_complex)
+    INVARIANT(
+      expr.operands().size() == 1,
+      "real part retrieval operation should have one operand");
+
+    exprt op = expr.op0();
+    op.type() = follow(op.type());
+
+    if(op.type().id() != ID_complex)
     {
-      if(!is_number(op_type))
+      if(!is_number(op.type()))
       {
-        err_location(expr.op0());
-        error() << "real/imag expect numerical operand, "
-                << "but got `" << to_string(op_type) << "'" << eom;
+        err_location(op);
+        error() << "real part retrieval expects numerical operand, "
+                << "but got `" << to_string(op.type()) << "'" << eom;
         throw 0;
       }
 
-      // we could compile away, I suppose
-      expr.type()=op_type;
-      expr.op0().make_typecast(complex_typet(op_type));
+      typecast_exprt typecast_expr(op, complex_typet(op.type()));
+      complex_real_exprt complex_real_expr(typecast_expr);
+
+      expr.swap(complex_real_expr);
     }
     else
     {
-      expr.type()=op_type.subtype();
+      complex_real_exprt complex_real_expr(op);
 
       // these are lvalues if the operand is one
-      if(expr.op0().get_bool(ID_C_lvalue))
-        expr.set(ID_C_lvalue, true);
+      if(op.get_bool(ID_C_lvalue))
+        complex_real_expr.set(ID_C_lvalue, true);
 
-      if(expr.op0().get_bool(ID_C_constant))
-        expr.set(ID_C_constant, true);
+      if(op.get_bool(ID_C_constant))
+        complex_real_expr.set(ID_C_constant, true);
+
+      expr.swap(complex_real_expr);
+    }
+  }
+  else if(expr.id() == ID_complex_imag)
+  {
+    INVARIANT(
+      expr.operands().size() == 1,
+      "imaginary part retrieval operation should have one operand");
+
+    exprt op = expr.op0();
+    op.type() = follow(op.type());
+
+    if(op.type().id() != ID_complex)
+    {
+      if(!is_number(op.type()))
+      {
+        err_location(op);
+        error() << "real part retrieval expects numerical operand, "
+                << "but got `" << to_string(op.type()) << "'" << eom;
+        throw 0;
+      }
+
+      typecast_exprt typecast_expr(op, complex_typet(op.type()));
+      complex_imag_exprt complex_imag_expr(typecast_expr);
+
+      expr.swap(complex_imag_expr);
+    }
+    else
+    {
+      complex_imag_exprt complex_imag_expr(op);
+
+      // these are lvalues if the operand is one
+      if(op.get_bool(ID_C_lvalue))
+        complex_imag_expr.set(ID_C_lvalue, true);
+
+      if(op.get_bool(ID_C_constant))
+        complex_imag_expr.set(ID_C_constant, true);
+
+      expr.swap(complex_imag_expr);
     }
   }
   else if(expr.id()==ID_generic_selection)

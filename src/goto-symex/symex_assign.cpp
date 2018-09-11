@@ -168,28 +168,29 @@ void goto_symext::symex_assign_rec(
     symex_assign_byte_extract(
       state, to_byte_extract_expr(lhs), full_lhs, rhs, guard, assignment_type);
   }
-  else if(lhs.id()==ID_complex_real ||
-          lhs.id()==ID_complex_imag)
+  else if(lhs.id() == ID_complex_real)
   {
-    // this is stuff like __real__ x = 1;
-    assert(lhs.operands().size()==1);
+    const complex_real_exprt &complex_real_expr = to_complex_real_expr(lhs);
 
-    exprt new_rhs=exprt(ID_complex, lhs.op0().type());
-    new_rhs.operands().resize(2);
+    const complex_imag_exprt complex_imag_expr(complex_real_expr.op());
 
-    if(lhs.id()==ID_complex_real)
-    {
-      new_rhs.op0()=rhs;
-      new_rhs.op1()=unary_exprt(ID_complex_imag, lhs.op0(), lhs.type());
-    }
-    else
-    {
-      new_rhs.op0()=unary_exprt(ID_complex_real, lhs.op0(), lhs.type());
-      new_rhs.op1()=rhs;
-    }
+    complex_exprt new_rhs(
+      rhs, complex_imag_expr, to_complex_type(complex_real_expr.op().type()));
 
     symex_assign_rec(
-      state, lhs.op0(), full_lhs, new_rhs, guard, assignment_type);
+      state, complex_real_expr.op(), full_lhs, new_rhs, guard, assignment_type);
+  }
+  else if(lhs.id() == ID_complex_imag)
+  {
+    const complex_imag_exprt &complex_imag_expr = to_complex_imag_expr(lhs);
+
+    const complex_real_exprt complex_real_expr(complex_imag_expr.op());
+
+    complex_exprt new_rhs(
+      complex_real_expr, rhs, to_complex_type(complex_imag_expr.op().type()));
+
+    symex_assign_rec(
+      state, complex_imag_expr.op(), full_lhs, new_rhs, guard, assignment_type);
   }
   else
     throw "assignment to `"+lhs.id_string()+"' not handled";

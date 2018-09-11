@@ -278,9 +278,9 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id()==ID_complex)
     return convert_complex(expr);
   else if(expr.id()==ID_complex_real)
-    return convert_complex_real(expr);
+    return convert_complex_real(to_complex_real_expr(expr));
   else if(expr.id()==ID_complex_imag)
-    return convert_complex_imag(expr);
+    return convert_complex_imag(to_complex_imag_expr(expr));
   else if(expr.id()==ID_lambda)
     return convert_lambda(expr);
   else if(expr.id()==ID_array_of)

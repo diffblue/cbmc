@@ -1773,6 +1773,99 @@ inline void validate_expr(const complex_exprt &value)
   validate_operands(value, 2, "Complex constructor must have two operands");
 }
 
+/// \brief Real part of the expression describing a complex number.
+class complex_real_exprt : public unary_exprt
+{
+public:
+  explicit complex_real_exprt(const exprt &op)
+    : unary_exprt(ID_complex_real, op, to_complex_type(op.type()).subtype())
+  {
+  }
+};
+
+/// \brief Cast an exprt to a \ref complex_real_exprt
+///
+/// \a expr must be known to be a \ref complex_real_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref complex_real_exprt
+inline const complex_real_exprt &to_complex_real_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_complex_real);
+  DATA_INVARIANT(
+    expr.operands().size() == 1,
+    "real part retrieval operation must have one operand");
+  return static_cast<const complex_real_exprt &>(expr);
+}
+
+/// \copydoc to_complex_real_expr(const exprt &)
+inline complex_real_exprt &to_complex_real_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_complex_real);
+  DATA_INVARIANT(
+    expr.operands().size() == 1,
+    "real part retrieval operation must have one operand");
+  return static_cast<complex_real_exprt &>(expr);
+}
+
+template <>
+inline bool can_cast_expr<complex_real_exprt>(const exprt &base)
+{
+  return base.id() == ID_complex_real;
+}
+
+inline void validate_expr(const complex_real_exprt &expr)
+{
+  validate_operands(
+    expr, 1, "real part retrieval operation must have one operand");
+}
+
+/// \brief Imaginary part of the expression describing a complex number.
+class complex_imag_exprt : public unary_exprt
+{
+public:
+  explicit complex_imag_exprt(const exprt &op)
+    : unary_exprt(ID_complex_imag, op, to_complex_type(op.type()).subtype())
+  {
+  }
+};
+
+/// \brief Cast an exprt to a \ref complex_imag_exprt
+///
+/// \a expr must be known to be a \ref complex_imag_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref complex_imag_exprt
+inline const complex_imag_exprt &to_complex_imag_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_complex_imag);
+  DATA_INVARIANT(
+    expr.operands().size() == 1,
+    "imaginary part retrieval operation must have one operand");
+  return static_cast<const complex_imag_exprt &>(expr);
+}
+
+/// \copydoc to_complex_imag_expr(const exprt &)
+inline complex_imag_exprt &to_complex_imag_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_complex_imag);
+  DATA_INVARIANT(
+    expr.operands().size() == 1,
+    "imaginary part retrieval operation must have one operand");
+  return static_cast<complex_imag_exprt &>(expr);
+}
+
+template <>
+inline bool can_cast_expr<complex_imag_exprt>(const exprt &base)
+{
+  return base.id() == ID_complex_imag;
+}
+
+inline void validate_expr(const complex_imag_exprt &expr)
+{
+  validate_operands(
+    expr, 1, "imaginary part retrieval operation must have one operand");
+}
 
 class namespacet;
 
