@@ -12,6 +12,7 @@ Date: August 2012
 
 #ifdef _WIN32
 #include <process.h>
+#include <windows.h>
 #else
 
 #include <cstring>
@@ -40,14 +41,85 @@ int run(const std::string &what, const std::vector<std::string> &argv)
   return run(what, argv, "", "", "");
 }
 
-#ifndef _WIN32
+#ifdef _WIN32
+#define STDIN_FILENO 0
+#define STDOUT_FILENO 1
+#define STDERR_FILENO 2
+using fdt = HANDLE;
+#else
+using fdt = int;
+#endif
+
 /// open given file to replace either stdin, stderr, stdout
-static int stdio_redirection(int fd, const std::string &file)
+static fdt stdio_redirection(int fd, const std::string &file)
 {
-  int result_fd = fd;
+  fdt result_fd;
+
+#ifdef _WIN32
+  std::string name;
+
+  SECURITY_ATTRIBUTES SecurityAttributes;
+  ZeroMemory(&SecurityAttributes, sizeof SecurityAttributes);
+  SecurityAttributes.bInheritHandle = true;
+
+  switch(fd)
+  {
+  case STDIN_FILENO:
+    name = "stdin";
+    if(file.empty())
+      result_fd = GetStdHandle(STD_INPUT_HANDLE);
+    else
+      result_fd = CreateFileW(
+        widen(file).c_str(),
+        GENERIC_READ,
+        0,
+        &SecurityAttributes,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_READONLY,
+        NULL);
+    break;
+
+  case STDOUT_FILENO:
+    name = "stdout";
+    if(file.empty())
+      result_fd = GetStdHandle(STD_OUTPUT_HANDLE);
+    else
+      result_fd = CreateFileW(
+        widen(file).c_str(),
+        GENERIC_WRITE,
+        0,
+        &SecurityAttributes,
+        CREATE_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+    break;
+
+  case STDERR_FILENO:
+    name = "stderr";
+    if(file.empty())
+      result_fd = GetStdHandle(STD_ERROR_HANDLE);
+    else
+      result_fd = CreateFileW(
+        widen(file).c_str(),
+        GENERIC_WRITE,
+        0,
+        &SecurityAttributes,
+        CREATE_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+    break;
+
+  default:
+    UNREACHABLE;
+  }
+
+  if(result_fd == INVALID_HANDLE_VALUE)
+    perror(("Failed to open " + name + " file " + file).c_str());
+
+#else
 
   if(file.empty())
-    return result_fd;
+    return fd;
 
   int flags = 0, mode = 0;
   std::string name;
@@ -71,10 +143,69 @@ static int stdio_redirection(int fd, const std::string &file)
   }
 
   result_fd = open(file.c_str(), flags, mode);
+
   if(result_fd == -1)
     perror(("Failed to open " + name + " file " + file).c_str());
+#endif
 
   return result_fd;
+}
+
+#ifdef _WIN32
+// Read
+// https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/
+std::wstring quote_windows_arg(const std::wstring &src)
+{
+  if(src.find_first_of(L" \t\n\v\"") == src.npos)
+    return src;
+
+  std::wstring result = L"\"";
+
+  for(auto it = src.begin();; ++it)
+  {
+    std::size_t NumberBackslashes = 0;
+
+    while(it != src.end() && *it == L'\\')
+    {
+      ++it;
+      ++NumberBackslashes;
+    }
+
+    if(it == src.end())
+    {
+      //
+      // Escape all backslashes, but let the terminating
+      // double quotation mark we add below be interpreted
+      // as a metacharacter.
+      //
+
+      result.append(NumberBackslashes * 2, L'\\');
+      break;
+    }
+    else if(*it == L'"')
+    {
+      //
+      // Escape all backslashes and the following
+      // double quotation mark.
+      //
+
+      result.append(NumberBackslashes * 2 + 1, L'\\');
+      result.push_back(*it);
+    }
+    else
+    {
+      //
+      // Backslashes aren't special here.
+      //
+
+      result.append(NumberBackslashes, L'\\');
+      result.push_back(*it);
+    }
+  }
+
+  result.push_back(L'"');
+
+  return result;
 }
 #endif
 
@@ -85,60 +216,87 @@ int run(
   const std::string &std_output,
   const std::string &std_error)
 {
-  #ifdef _WIN32
-  // we use the cmd.exe shell to do stdin/stdout/stderr redirection on Windows
-  if(!std_input.empty() || !std_output.empty() || !std_error.empty())
+#ifdef _WIN32
+  // unicode commandline, quoted
+  std::wstring cmdline;
+
+  // we replace argv[0] by what
+  cmdline = quote_windows_arg(widen(what));
+
+  for(std::size_t i = 1; i < argv.size(); i++)
   {
-    std::vector<std::string> new_argv = argv;
-    new_argv.insert(new_argv.begin(), "cmd.exe");
-    new_argv.insert(new_argv.begin() + 1, "/c");
-
-    if(!std_input.empty())
-    {
-      new_argv.push_back("<");
-      new_argv.push_back(std_input);
-    }
-
-    if(!std_output.empty())
-    {
-      new_argv.push_back(">");
-      new_argv.push_back(std_output);
-    }
-
-    if(!std_error.empty())
-    {
-      new_argv.push_back("2>");
-      new_argv.push_back(std_error);
-    }
-
-    // this is recursive
-    return run(new_argv[0], new_argv, "", "", "");
+    cmdline += L" ";
+    cmdline += quote_windows_arg(widen(argv[i]));
   }
 
-  // unicode version of the arguments
-  std::vector<std::wstring> wargv;
+  PROCESS_INFORMATION piProcInfo;
+  STARTUPINFOW siStartInfo;
 
-  wargv.resize(argv.size());
+  ZeroMemory(&piProcInfo, sizeof piProcInfo);
+  ZeroMemory(&siStartInfo, sizeof siStartInfo);
 
-  for(std::size_t i=0; i<argv.size(); i++)
-    wargv[i]=widen(argv[i]);
+  siStartInfo.cb = sizeof siStartInfo;
 
-  std::vector<const wchar_t *> _argv(argv.size()+1);
+  siStartInfo.hStdInput = stdio_redirection(STDIN_FILENO, std_input);
+  siStartInfo.hStdOutput = stdio_redirection(STDOUT_FILENO, std_output);
+  siStartInfo.hStdError = stdio_redirection(STDERR_FILENO, std_error);
 
-  for(std::size_t i=0; i<wargv.size(); i++)
-    _argv[i]=wargv[i].c_str();
+  siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
-  _argv[argv.size()]=NULL;
+  // CreateProcessW wants to modify the command line
+  std::vector<wchar_t> mutable_cmdline(cmdline.begin(), cmdline.end());
+  mutable_cmdline.push_back(0); // zero termination
+  wchar_t *cmdline_ptr = mutable_cmdline.data();
 
-  // warning: the arguments may still need escaping,
-  // as windows will concatenate the argv strings back together,
-  // separating them with spaces
+  BOOL bSuccess = CreateProcessW(
+    NULL,         // application name
+    cmdline_ptr,  // command line
+    NULL,         // process security attributes
+    NULL,         // primary thread security attributes
+    true,         // handles are inherited
+    0,            // creation flags
+    NULL,         // use parent's environment
+    NULL,         // use parent's current directory
+    &siStartInfo, // STARTUPINFO
+    &piProcInfo); // PROCESS_INFORMATION
 
-  std::wstring wide_what=widen(what);
-  int status=_wspawnvp(_P_WAIT, wide_what.c_str(), _argv.data());
-  return status;
+  if(!bSuccess)
+  {
+    if(!std_input.empty())
+      CloseHandle(siStartInfo.hStdInput);
+    if(!std_output.empty())
+      CloseHandle(siStartInfo.hStdOutput);
+    if(!std_error.empty())
+      CloseHandle(siStartInfo.hStdError);
+    return -1;
+  }
 
-  #else
+  // wait for child to finish
+  WaitForSingleObject(piProcInfo.hProcess, INFINITE);
+
+  if(!std_input.empty())
+    CloseHandle(siStartInfo.hStdInput);
+  if(!std_output.empty())
+    CloseHandle(siStartInfo.hStdOutput);
+  if(!std_error.empty())
+    CloseHandle(siStartInfo.hStdError);
+
+  DWORD exit_code;
+
+  // get exit code
+  if(!GetExitCodeProcess(piProcInfo.hProcess, &exit_code))
+  {
+    CloseHandle(piProcInfo.hProcess);
+    CloseHandle(piProcInfo.hThread);
+    return -1;
+  }
+
+  CloseHandle(piProcInfo.hProcess);
+  CloseHandle(piProcInfo.hThread);
+
+  return exit_code;
+
+#else
   int stdin_fd = stdio_redirection(STDIN_FILENO, std_input);
   int stdout_fd = stdio_redirection(STDOUT_FILENO, std_output);
   int stderr_fd = stdio_redirection(STDERR_FILENO, std_error);
@@ -229,7 +387,7 @@ int run(
 
     return 1;
   }
-  #endif
+#endif
 }
 
 int run(
