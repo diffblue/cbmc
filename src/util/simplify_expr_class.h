@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sys/stat.h>
 #endif
 
+#include <expr.h>
+#include <std_expr.h>
 #include <set>
 
 #include "type.h"
@@ -64,7 +66,15 @@ public:
 
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
-
+  enum class was_changedtt
+  {
+    Changed, Unchanged
+  };
+  struct simplify_resultt
+  {
+    exprt new_expr;
+    was_changedtt was_changed;
+  };
   bool simplify_typecast(exprt &expr);
   bool simplify_extractbit(exprt &expr);
   bool simplify_extractbits(extractbits_exprt &expr);
@@ -75,7 +85,7 @@ public:
   bool simplify_plus(exprt &expr);
   bool simplify_minus(exprt &expr);
   bool simplify_floatbv_op(exprt &expr);
-  bool simplify_floatbv_typecast(exprt &expr);
+  simplify_resultt simplify_floatbv_typecast(floatbv_typecast_exprt &expr);
   bool simplify_shifts(exprt &expr);
   bool simplify_power(exprt &expr);
   bool simplify_bitwise(exprt &expr);

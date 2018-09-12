@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "simplify_expr_class.h"
 
-#include <cassert>
 #include <unordered_set>
 
 #include "expr.h"
+#include "invariant.h"
 #include "namespace.h"
 #include "std_expr.h"
 
@@ -245,13 +245,12 @@ bool simplify_exprt::simplify_not(exprt &expr)
   }
   else if(op.id()==ID_exists) // !(exists: a) <-> forall: not a
   {
-    assert(op.operands().size()==2);
-    exprt tmp;
-    tmp.swap(op);
-    expr.swap(tmp);
-    expr.id(ID_forall);
-    expr.op1().make_not();
-    simplify_node(expr.op1());
+    auto const& op_as_exists = to_exists_expr(op);
+    forall_exprt rewritten_op(op_as_exists.symbol()
+      , op_as_exists.where());
+    rewritten_op.where().make_not();
+    simplify_node(rewritten_op.where());
+    expr = rewritten_op;
     return false;
   }
 
