@@ -2217,6 +2217,18 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
   return result;
 }
 
+inline bool adjust_with_simplify_result(
+  exprt &out,
+  const simplify_exprt::simplify_resultt &in)
+{
+  bool changed = in.was_changed == simplify_exprt::was_changedt::Changed;
+  if(changed)
+  {
+    out = in.simplified_expr;
+  }
+  return !changed;
+}
+
 bool simplify_exprt::simplify_node(exprt &expr)
 {
   if(!expr.has_operands())
@@ -2292,7 +2304,12 @@ bool simplify_exprt::simplify_node(exprt &expr)
           expr.id()==ID_floatbv_div)
     result=simplify_floatbv_op(expr) && result;
   else if(expr.id()==ID_floatbv_typecast)
-    result=simplify_floatbv_typecast(expr) && result;
+  {
+    result =
+      adjust_with_simplify_result(
+        expr, simplify_floatbv_typecast(to_floatbv_typecast_expr(expr))) &&
+      result;
+  }
   else if(expr.id()==ID_unary_minus)
     result=simplify_unary_minus(expr) && result;
   else if(expr.id()==ID_unary_plus)

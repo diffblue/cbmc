@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include <set>
+#include <util/expr.h>
+#include <util/std_expr.h>
 
 #include "type.h"
 #include "mp_arith.h"
@@ -62,6 +64,16 @@ public:
 
   bool do_simplify_if;
 
+  enum class was_changedt
+  {
+    Changed,
+    Unchanged
+  };
+  struct simplify_resultt
+  {
+    exprt simplified_expr;
+    was_changedt was_changed;
+  };
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
 
@@ -75,7 +87,8 @@ public:
   bool simplify_plus(exprt &expr);
   bool simplify_minus(exprt &expr);
   bool simplify_floatbv_op(exprt &expr);
-  bool simplify_floatbv_typecast(exprt &expr);
+  simplify_resultt
+  simplify_floatbv_typecast(const floatbv_typecast_exprt &expr);
   bool simplify_shifts(exprt &expr);
   bool simplify_power(exprt &expr);
   bool simplify_bitwise(exprt &expr);
