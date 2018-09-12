@@ -409,13 +409,13 @@ void value_set_fit::get_value_set_rec(
 
     const typet &type=ns.follow(expr.op0().type());
 
-    DATA_INVARIANT(type.id()==ID_array ||
-                   type.id()==ID_incomplete_array ||
-                   type.id()=="#REF#",
-                   "operand 0 of index expression must be an array");
-
-    get_value_set_rec(expr.op0(), dest, "[]"+suffix,
-                      original_type, ns, recursion_set);
+    if(type.id() == ID_array)
+    {
+      get_value_set_rec(
+        expr.op0(), dest, "[]" + suffix, original_type, ns, recursion_set);
+    }
+    else
+      insert(dest, exprt(ID_unknown, original_type));
 
     return;
   }
@@ -1279,12 +1279,9 @@ void value_set_fit::assign_rec(
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    DATA_INVARIANT(type.id()==ID_array ||
-                   type.id()==ID_incomplete_array ||
-                   type.id()=="#REF#",
-                   "operand 0 of index expression must be an array");
-
-    assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, recursion_set);
+    if(type.id()==ID_array ||
+       type.id()==ID_incomplete_array)
+      assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, recursion_set);
   }
   else if(lhs.id()==ID_member)
   {
@@ -1328,9 +1325,9 @@ void value_set_fit::assign_rec(
 
     assign_rec(typecast_expr.op(), values_rhs, suffix, ns, recursion_set);
   }
-  else if(lhs.id()=="zero_string" ||
-          lhs.id()=="is_zero_string" ||
-          lhs.id()=="zero_string_length")
+  else if(
+    lhs.id() == "zero_string" || lhs.id() == "is_zero_string" ||
+    lhs.id() == "zero_string_length" || lhs.id() == ID_address_of)
   {
     // ignore
   }
