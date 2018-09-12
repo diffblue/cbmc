@@ -1202,9 +1202,14 @@ void value_sett::assign(
                 "rhs.type():\n"+rhs.type().pretty()+"\n"+
                 "type:\n"+type.pretty();
 
-        rhs_member=make_member(rhs, name, ns);
+        const typet &followed = ns.follow(rhs.type());
 
-        assign(lhs_member, rhs_member, ns, is_simplified, add_to_sets);
+        if(followed.id() == ID_struct || followed.id() == ID_union)
+        {
+          rhs_member = make_member(rhs, name, ns);
+
+          assign(lhs_member, rhs_member, ns, is_simplified, add_to_sets);
+        }
       }
     }
   }
@@ -1744,15 +1749,19 @@ exprt value_sett::make_member(
     if(component_name==member_operand.get(ID_component_name))
       // yes! just take op2
       return src.op2();
-    else
+    else if(ns.follow(src.op0().type()).id() == ID_struct)
+    {
       // no! do this recursively
       return make_member(src.op0(), component_name, ns);
+    }
   }
   else if(src.id()==ID_typecast)
   {
     // push through typecast
     assert(src.operands().size()==1);
-    return make_member(src.op0(), component_name, ns);
+    const typet &followed = ns.follow(src.op0().type());
+    if(followed.id() == ID_struct || followed.id() == ID_union)
+      return make_member(src.op0(), component_name, ns);
   }
 
   // give up
