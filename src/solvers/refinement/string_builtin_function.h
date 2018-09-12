@@ -83,7 +83,7 @@ public:
     array_string_exprt input)
     : string_builtin_functiont(std::move(return_code)),
       result(std::move(result)),
-      input(std::move(result))
+      input(std::move(input))
   {
   }
 
