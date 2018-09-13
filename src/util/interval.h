@@ -438,15 +438,22 @@ public:
   static exprt abs(const exprt &expr);
 
 private:
-  static exprt generate_expression(
+  static void generate_expression(
     const exprt &lhs,
     const exprt &rhs,
-    const irep_idt &operation);
-  static exprt
-  generate_multiply_expression(const exprt &lower, const exprt &upper);
-  static exprt generate_multiply_expression_max(const exprt &expr);
-  static exprt
-  generate_multiply_expression_min(const exprt &min, const exprt &other);
+    const irep_idt &operation,
+    std::vector<exprt> &collection);
+  static void append_multiply_expression(
+    const exprt &lower,
+    const exprt &upper,
+    std::vector<exprt> &collection);
+  static void append_multiply_expression_max(
+    const exprt &expr,
+    std::vector<exprt> &collection);
+  static void append_multiply_expression_min(
+    const exprt &min,
+    const exprt &other,
+    std::vector<exprt> &collection);
   static exprt generate_division_expression(const exprt &lhs, const exprt &rhs);
   static exprt generate_modulo_expression(const exprt &lhs, const exprt &rhs);
   static exprt generate_shift_expression(

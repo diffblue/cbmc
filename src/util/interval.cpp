@@ -473,14 +473,10 @@ constant_interval_exprt constant_interval_exprt::get_extremes(
 
   std::vector<exprt> results;
 
-  results.push_back(
-    generate_expression(a.get_lower(), b.get_lower(), operation));
-  results.push_back(
-    generate_expression(a.get_lower(), b.get_upper(), operation));
-  results.push_back(
-    generate_expression(a.get_upper(), b.get_lower(), operation));
-  results.push_back(
-    generate_expression(a.get_upper(), b.get_upper(), operation));
+  generate_expression(a.get_lower(), b.get_lower(), operation, results);
+  generate_expression(a.get_lower(), b.get_upper(), operation, results);
+  generate_expression(a.get_upper(), b.get_lower(), operation, results);
+  generate_expression(a.get_upper(), b.get_upper(), operation, results);
 
   for(auto result : results)
   {
@@ -571,152 +567,116 @@ exprt constant_interval_exprt::get_extreme(
   UNREACHABLE;
 }
 
-exprt constant_interval_exprt::generate_expression(
+void constant_interval_exprt::generate_expression(
   const exprt &lhs,
   const exprt &rhs,
-  const irep_idt &operation)
+  const irep_idt &operation,
+  std::vector<exprt> &collection)
 {
   if(operation == ID_mult)
   {
-    return generate_multiply_expression(lhs, rhs);
+    append_multiply_expression(lhs, rhs, collection);
   }
-
-  if(operation == ID_div)
+  else if(operation == ID_div)
   {
-    return generate_division_expression(lhs, rhs);
+    collection.push_back(generate_division_expression(lhs, rhs));
   }
-
-  if(operation == ID_mod)
+  else if(operation == ID_mod)
   {
-    return generate_modulo_expression(lhs, rhs);
+    collection.push_back(generate_modulo_expression(lhs, rhs));
   }
-
-  if(operation == ID_shl || operation == ID_ashr)
+  else if(operation == ID_shl || operation == ID_ashr)
   {
-    return generate_shift_expression(lhs, rhs, operation);
+    collection.push_back(generate_shift_expression(lhs, rhs, operation));
   }
-
-  UNREACHABLE;
 }
 
-exprt constant_interval_exprt::generate_multiply_expression(
+/// Adds all possible values that may arise from multiplication (more than one,
+/// in case of past the type boundary results).
+/// \param lower lhs of multiplication
+/// \param upper rhs of multiplication
+/// \param collection vector of possible values
+void constant_interval_exprt::append_multiply_expression(
   const exprt &lower,
-  const exprt &upper)
+  const exprt &upper,
+  std::vector<exprt> &collection)
 {
   PRECONDITION(lower.type().is_not_nil() && is_numeric(lower.type()));
 
   if(is_max(lower))
   {
-    return generate_multiply_expression_max(upper);
+    append_multiply_expression_max(upper, collection);
   }
-
-  if(is_max(upper))
+  else if(is_max(upper))
   {
-    return generate_multiply_expression_max(lower);
+    append_multiply_expression_max(lower, collection);
   }
-
-  if(is_min(lower))
+  else if(is_min(lower))
   {
-    return generate_multiply_expression_min(lower, upper);
+    append_multiply_expression_min(lower, upper, collection);
   }
-
-  if(is_min(upper))
+  else if(is_min(upper))
   {
-    return generate_multiply_expression_min(upper, lower);
+    append_multiply_expression_min(upper, lower, collection);
   }
+  else
+  {
+    INVARIANT(
+      !is_extreme(lower) && !is_extreme(upper),
+      "We ruled out extreme cases beforehand");
 
-  INVARIANT(
-    !is_extreme(lower) && !is_extreme(upper),
-    "We ruled out extreme cases beforehand");
-
-  auto result = mult_exprt(lower, upper);
-  return simplified_expr(result);
+    auto result = mult_exprt(lower, upper);
+    collection.push_back(simplified_expr(result));
+  }
 }
 
-exprt constant_interval_exprt::generate_multiply_expression_max(
-  const exprt &expr)
+/// Appends interval bounds that could arise from MAX * expr. Accommodates for
+/// overflows by over-approximating.
+/// \param expr the unknown side of multiplication
+/// \param collection vector of collected bounds
+void constant_interval_exprt::append_multiply_expression_max(
+  const exprt &expr,
+  std::vector<exprt> &collection)
 {
-  if(is_max(expr))
-  {
-    return max_exprt(expr);
-  }
-
   if(is_min(expr))
   {
-    if(is_negative(expr))
-    {
-      return min_exprt(expr);
-    }
-    else
-    {
-      INVARIANT(!is_positive(expr), "Min value cannot be >0.");
-      INVARIANT(is_zero(expr), "Non-negative MIN must be zero.");
-
-      return expr;
-    }
-  }
-
-  INVARIANT(!is_extreme(expr), "We ruled out extreme cases");
-
-  if(is_negative(expr))
-  {
-    return min_exprt(expr);
+    INVARIANT(!is_positive(expr), "Min value cannot be >0.");
+    INVARIANT(
+      is_negative(expr) || is_zero(expr), "Non-negative MIN must be zero.");
   }
 
   if(is_zero(expr))
+    collection.push_back(expr);
+  else
   {
-    return expr;
+    collection.push_back(max_exprt(expr));
+    collection.push_back(min_exprt(expr));
   }
-
-  if(is_positive(expr))
-  {
-    return max_exprt(expr);
-  }
-
-  UNREACHABLE;
-  return nil_exprt();
 }
 
-exprt constant_interval_exprt::generate_multiply_expression_min(
+/// Appends interval bounds that could arise from MIN * other. Accommodates for
+/// overflows by over-approximating.
+/// \param min the side known to be MIN for a given type
+/// \param other the side of unknown value
+/// \param collection reference to the vector of collected boundaries
+void constant_interval_exprt::append_multiply_expression_min(
   const exprt &min,
-  const exprt &other)
+  const exprt &other,
+  std::vector<exprt> &collection)
 {
   PRECONDITION(is_min(min));
+  INVARIANT(!is_positive(min), "Min value cannot be >0.");
+  INVARIANT(is_negative(min) || is_zero(min), "Non-negative MIN must be zero.");
 
-  if(is_max(other))
+  if(is_zero(min))
+    collection.push_back(min);
+  else if(is_zero(other))
+    collection.push_back(other);
+  else
   {
-    if(is_negative(min))
-    {
-      return min_exprt(min);
-    }
-    else
-    {
-      INVARIANT(!is_positive(min), "Min value cannot be >0.");
-      INVARIANT(is_zero(min), "Non-negative MIN must be zero.");
-
-      return min;
-    }
+    collection.push_back(min_exprt(min));
+    collection.push_back(max_exprt(min));
   }
-
-  if(is_min(other))
-  {
-    INVARIANT(
-      !is_positive(min) && !is_positive(other), "Min value cannot be >0.");
-    INVARIANT(
-      is_negative(other) || is_zero(other),
-      "Other was established to be min value, which must be <= 0");
-
-    if(is_negative(min) && is_negative(other))
-    {
-      return max_exprt(min);
-    }
-
-    INVARIANT(is_zero(min) || is_zero(other), "Min value must be <= 0");
-    return (is_zero(min) ? min : other);
-  }
-
-  UNREACHABLE;
-  return nil_exprt();
 }
 
 exprt constant_interval_exprt::generate_division_expression(

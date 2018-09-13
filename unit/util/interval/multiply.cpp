@@ -141,12 +141,12 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
         CHECK(b.has_no_upper_bound());
       }
 
-      THEN("The result is [14, INF]")
+      THEN("The result is [-INF, INF]")
       {
         CAPTURE(result);
 
         CHECK(result.has_no_upper_bound());
-        CHECK(V(result.get_lower()) == 14);
+        CHECK(result.has_no_lower_bound());
       }
     }
   }
