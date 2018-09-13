@@ -8,9 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "satcheck_minisat.h"
 
-#include <cassert>
+#include <algorithm>
 #include <stack>
 
+#include <util/invariant.h>
 #include <util/threeval.h>
 
 #include <Solver.h>
@@ -58,7 +59,7 @@ public:
 
 void minisat_prooft::chain(const vec<ClauseId> &cs, const vec<Var> &xs)
 {
-  assert(cs.size()==xs.size()+1);
+  PRECONDITION(cs.size() == xs.size() + 1);
 
   resolution_proof.clauses.push_back(clauset());
   clauset &c=resolution_proof.clauses.back();
@@ -74,7 +75,7 @@ void minisat_prooft::chain(const vec<ClauseId> &cs, const vec<Var> &xs)
   for(int i=0; i<xs.size(); i++)
   {
     // must be decreasing
-    assert(cs[i]<c_id);
+    INVARIANT(cs[i] < c_id, "clause ID should be within bounds");
     c.steps[i].clause_id=cs[i+1];
     c.steps[i].pivot_var_no=xs[i];
   }
@@ -89,8 +90,10 @@ tvt satcheck_minisat1_baset::l_get(literalt a) const
 
   tvt result;
 
-  assert(a.var_no()!=0);
-  assert(a.var_no()<(unsigned)solver->model.size());
+  INVARIANT(a.var_no() != 0, "variable number should be set");
+  INVARIANT(
+    a.var_no() < (unsigned)solver->model.size(),
+    "variable number should be within bounds");
 
   if(solver->model[a.var_no()]==l_True)
     result=tvt(true);
@@ -135,8 +138,12 @@ void satcheck_minisat1_baset::lcnf(const bvt &bv)
   vec<Lit> c;
   convert(new_bv, c);
 
-  for(unsigned i=0; i<new_bv.size(); i++)
-    assert(new_bv[i].var_no()<(unsigned)solver->nVars());
+  INVARIANT(
+    std::all_of(
+      new_bv.begin(),
+      new_bv.end(),
+      [](const literalt &l) { return l.var_no() < (unsigned)solver->nVars(); }),
+    "variable number should be within bounds");
 
   solver->addClause(c);
 
@@ -145,7 +152,7 @@ void satcheck_minisat1_baset::lcnf(const bvt &bv)
 
 propt::resultt satcheck_minisat1_baset::prop_solve()
 {
-  assert(status!=ERROR);
+  PRECONDITION(status != ERROR);
 
   {
     messaget::status() <<
@@ -217,7 +224,7 @@ void satcheck_minisat1_baset::set_assumptions(const bvt &bv)
   for(bvt::const_iterator it=assumptions.begin();
       it!=assumptions.end();
       it++)
-    assert(!it->is_constant());
+    INVARIANT(!it->is_constant(), "assumptions should be non-constant");
 }
 
 satcheck_minisat1t::satcheck_minisat1t()
