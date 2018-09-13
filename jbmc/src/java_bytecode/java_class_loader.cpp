@@ -88,7 +88,7 @@ static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
 /// \remarks
 ///   Allows multiple definitions of the same class to appear on the
 ///   classpath, so long as all but the first definition are marked with the
-///   attribute `\@java::com.diffblue.OverlayClassImplementation`.
+///   attribute `\@java::org.cprover.OverlayClassImplementation`.
 java_class_loadert::parse_tree_with_overlayst &
 java_class_loadert::get_parse_tree(
   java_class_loader_limitt &class_loader_limit,

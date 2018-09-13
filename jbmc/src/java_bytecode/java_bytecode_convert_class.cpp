@@ -53,10 +53,10 @@ public:
   /// \remarks
   ///   Allows multiple definitions of the same class to appear on the
   ///   classpath, so long as all but the first definition are marked with the
-  ///   attribute `\@java::com.diffblue.OverlayClassImplementation`.
+  ///   attribute `\@java::org.cprover.OverlayClassImplementation`.
   ///   Overlay class definitions can contain methods with the same signature
   ///   as methods in the original class, so long as these are marked with the
-  ///   attribute `\@java::com.diffblue.OverlayMethodImplementation`; such
+  ///   attribute `\@java::org.cprover.OverlayMethodImplementation`; such
   ///   overlay methods are replaced in the original file with the version
   ///   found in the last overlay on the classpath. Later definitions can
   ///   also contain new supporting methods and fields that are merged in.
