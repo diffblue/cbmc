@@ -443,21 +443,19 @@ bool simplify_exprt::simplify_mod(exprt &expr)
   return true;
 }
 
-bool simplify_exprt::simplify_plus(exprt &expr)
+simplify_exprt::simplify_resultt
+simplify_exprt::simplify_plus(const plus_exprt &expr)
 {
-  PRECONDITION(expr.id() == ID_plus);
-
   if(!is_number(expr.type()) &&
      expr.type().id()!=ID_pointer)
-    return true;
+    return {expr, was_changedt::Unchanged};
 
-  bool result=true;
-
-  exprt::operandst &operands=expr.operands();
+  was_changedt was_changed = was_changedt::Unchanged;
+  plus_exprt intermediary_plus_expr = expr;
+  exprt::operandst &operands = intermediary_plus_expr.operands();
 
   // floating-point addition is _NOT_ associative; thus,
   // there is special case for float
-
   if(ns.follow(expr.type()).id()==ID_floatbv)
   {
     // we only merge neighboring constants!
@@ -481,29 +479,37 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   else
   {
     // ((T*)p+a)+b -> (T*)p+(a+b)
-    if(expr.type().id()==ID_pointer &&
-       expr.operands().size()==2 &&
-       expr.op0().id()==ID_plus &&
-       expr.op0().operands().size()==2)
+    if(
+      intermediary_plus_expr.type().id() == ID_pointer &&
+      intermediary_plus_expr.operands().size() == 2 &&
+      intermediary_plus_expr.op0().id() == ID_plus &&
+      intermediary_plus_expr.op0().operands().size() == 2)
     {
-      exprt op0=expr.op0();
+      plus_exprt &pointer_sum_expr = to_plus_expr(intermediary_plus_expr.op0());
 
-      if(expr.op0().op1().id()==ID_plus)
-        op0.op1().copy_to_operands(expr.op1());
+      if(pointer_sum_expr.op1().id() == ID_plus)
+        pointer_sum_expr.op1().copy_to_operands(intermediary_plus_expr.op1());
       else
-        op0.op1()=plus_exprt(op0.op1(), expr.op1());
+        pointer_sum_expr.op1() =
+          plus_exprt(pointer_sum_expr.op1(), intermediary_plus_expr.op1());
 
-      expr.swap(op0);
+      intermediary_plus_expr.swap(pointer_sum_expr);
 
-      simplify_plus(expr.op1());
-      simplify_plus(expr);
+      auto simplify_op_result =
+        simplify_plus(to_plus_expr(intermediary_plus_expr.op1()));
+      if(simplify_op_result.was_changed == was_changedt::Changed)
+      {
+        intermediary_plus_expr.op1() = simplify_op_result.simplified_expr;
+      }
+      auto simplify_intermediary_result = simplify_plus(intermediary_plus_expr);
 
-      return false;
+      return {simplify_intermediary_result.simplified_expr,
+              was_changedt::Changed};
     }
 
     // count the constants
     size_t count=0;
-    forall_operands(it, expr)
+    forall_operands(it, intermediary_plus_expr)
       if(is_number(it->type()) && it->is_constant())
         count++;
 
@@ -513,7 +519,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
       exprt::operandst::iterator const_sum;
       bool const_sum_set=false;
 
-      Forall_operands(it, expr)
+      Forall_operands(it, intermediary_plus_expr)
       {
         if(is_number(it->type()) && it->is_constant())
         {
@@ -529,7 +535,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
             {
               *it=from_integer(0, it->type());
               CHECK_RETURN(it->is_not_nil());
-              result=false;
+              was_changed = was_changedt::Changed;
             }
           }
         }
@@ -559,11 +565,11 @@ bool simplify_exprt::simplify_plus(exprt &expr)
 
       if(itm!=expr_map.end())
       {
-        *(itm->second)=from_integer(0, expr.type());
-        *it=from_integer(0, expr.type());
+        *(itm->second) = from_integer(0, intermediary_plus_expr.type());
+        *it = from_integer(0, intermediary_plus_expr.type());
         CHECK_RETURN(it->is_not_nil());
         expr_map.erase(itm);
-        result=false;
+        was_changed = was_changedt::Changed;
       }
     }
 
@@ -578,7 +584,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
       if(is_number(it->type()) && it->is_zero())
       {
         it=operands.erase(it);
-        result=false;
+        was_changed = was_changedt::Changed;
       }
       else
         it++;
@@ -587,18 +593,16 @@ bool simplify_exprt::simplify_plus(exprt &expr)
 
   if(operands.empty())
   {
-    expr=from_integer(0, expr.type());
-    CHECK_RETURN(expr.is_not_nil());
-    return false;
+    auto result = from_integer(0, expr.type());
+    CHECK_RETURN(result.is_not_nil());
+    return {result, was_changedt::Changed};
   }
   else if(operands.size()==1)
   {
-    exprt tmp(operands.front());
-    expr.swap(tmp);
-    return false;
+    return {operands.front(), was_changedt::Changed};
   }
 
-  return result;
+  return {intermediary_plus_expr, was_changed};
 }
 
 bool simplify_exprt::simplify_minus(exprt &expr)
@@ -637,9 +641,8 @@ bool simplify_exprt::simplify_minus(exprt &expr)
     simplify_unary_minus(tmp2);
 
     plus_exprt tmp(operands[0], tmp2);
-    simplify_plus(tmp);
-
-    expr.swap(tmp);
+    auto result = simplify_plus(tmp);
+    expr.swap(result.simplified_expr);
     return false;
   }
   else if(is_number(expr.type()) &&
@@ -1800,7 +1803,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
         i-=constant;
         expr.op1()=from_integer(i, expr.op1().type());
 
-        simplify_plus(expr.op0());
+        expr.op0() = simplify_plus(to_plus_expr(expr.op0())).simplified_expr;
         simplify_inequality(expr);
         return false;
       }

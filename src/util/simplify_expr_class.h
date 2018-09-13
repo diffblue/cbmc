@@ -84,7 +84,7 @@ public:
   bool simplify_mult(exprt &expr);
   bool simplify_div(exprt &expr);
   bool simplify_mod(exprt &expr);
-  bool simplify_plus(exprt &expr);
+  simplify_resultt simplify_plus(const plus_exprt &expr);
   bool simplify_minus(exprt &expr);
   bool simplify_floatbv_op(exprt &expr);
   simplify_resultt

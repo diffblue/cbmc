@@ -1669,7 +1669,7 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
     expr.offset()=plus_exprt(
       to_byte_extract_expr(expr.op()).offset(),
       expr.offset());
-    simplify_plus(expr.offset());
+    expr.offset() = simplify_plus(to_plus_expr(expr.offset())).simplified_expr;
 
     expr.op()=to_byte_extract_expr(expr.op()).op();
     simplify_byte_extract(expr);
@@ -2293,7 +2293,11 @@ bool simplify_exprt::simplify_node(exprt &expr)
   else if(expr.id()==ID_power)
     result=simplify_power(expr) && result;
   else if(expr.id()==ID_plus)
-    result=simplify_plus(expr) && result;
+  {
+    result =
+      adjust_with_simplify_result(expr, simplify_plus(to_plus_expr(expr))) &&
+      result;
+  }
   else if(expr.id()==ID_minus)
     result=simplify_minus(expr) && result;
   else if(expr.id()==ID_mult)
