@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "float_approximation.h"
 
-#include <cassert>
-
 float_approximationt::~float_approximationt()
 {
 }
