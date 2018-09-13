@@ -51,12 +51,15 @@ static exprt unpack_rec(
     mp_integer element_width=pointer_offset_bits(subtype, ns);
     // this probably doesn't really matter
     #if 0
-    if(element_width<=0)
-      throw "cannot unpack array with non-constant element width:\n"+
-        type.pretty();
-    else if(element_width%8!=0)
-      throw "cannot unpack array of non-byte aligned elements:\n"+
-        type.pretty();
+    INVARIANT(
+      element_width > 0,
+      "element width of array should be constant",
+      irep_pretty_diagnosticst(type));
+
+    INVARIANT(
+      element_width % 8 == 0,
+      "elements in array should be byte-aligned",
+      irep_pretty_diagnosticst(type));
     #endif
 
     if(!unpack_byte_array && element_width==8)
@@ -198,8 +201,6 @@ exprt flatten_byte_extract(
   // by endianness:
   // big-endian: (short)concatenation(01,02)=0x0102
   // little-endian: (short)concatenation(03,04)=0x0304
-
-  assert(src.operands().size()==2);
 
   PRECONDITION(
     src.id() == ID_byte_extract_little_endian ||
@@ -345,14 +346,14 @@ exprt flatten_byte_update(
   const namespacet &ns,
   bool negative_offset)
 {
-  assert(src.operands().size()==3);
+  mp_integer element_size = pointer_offset_size(src.value().type(), ns);
 
-  mp_integer element_size=
-    pointer_offset_size(src.op2().type(), ns);
-  if(element_size<0)
-    throw "byte_update of unknown width:\n"+src.pretty();
+  INVARIANT_WITH_DIAGNOSTICS(
+    element_size >= 0,
+    "size of type in bytes must be known",
+    irep_pretty_diagnosticst(src));
 
-  const typet &t=ns.follow(src.op0().type());
+  const typet &t = ns.follow(src.op().type());
 
   if(t.id()==ID_array)
   {
@@ -368,44 +369,48 @@ exprt flatten_byte_update(
     {
       mp_integer sub_size=pointer_offset_size(subtype, ns);
 
-      if(sub_size==-1)
-        throw "can't flatten byte_update for sub-type without size";
+      INVARIANT(
+        sub_size >= 0,
+        "bit width (rounded to full bytes) of subtype must be known");
 
       // byte array?
       if(sub_size==1)
       {
         // apply 'array-update-with' element_size times
-        exprt result=src.op0();
+        exprt result = src.op();
 
         for(mp_integer i=0; i<element_size; ++i)
         {
-          exprt i_expr=from_integer(i, ns.follow(src.op1().type()));
+          exprt i_expr = from_integer(i, ns.follow(src.offset().type()));
 
           exprt new_value;
 
           if(i==0 && element_size==1) // bytes?
           {
-            new_value=src.op2();
+            new_value = src.value();
             if(new_value.type()!=subtype)
               new_value.make_typecast(subtype);
           }
           else
           {
+            INVARIANT(
+              src.id() == ID_byte_update_little_endian ||
+                src.id() == ID_byte_update_big_endian,
+              "byte update expression should either be little or big endian");
+
             byte_extract_exprt byte_extract_expr(
-              src.id()==ID_byte_update_little_endian?
-                ID_byte_extract_little_endian:
-                src.id()==ID_byte_update_big_endian?
-                  ID_byte_extract_big_endian:
-                    throw "unexpected src.id() in flatten_byte_update",
+              src.id() == ID_byte_update_little_endian
+                ? ID_byte_extract_little_endian
+                : ID_byte_extract_big_endian,
               subtype);
 
-            byte_extract_expr.op()=src.op2();
+            byte_extract_expr.op() = src.value();
             byte_extract_expr.offset()=i_expr;
 
             new_value=flatten_byte_extract(byte_extract_expr, ns);
           }
 
-          const plus_exprt where(src.op1(), i_expr);
+          const plus_exprt where(src.offset(), i_expr);
 
           with_exprt with_expr(result, where, new_value);
           with_expr.type()=src.type();
@@ -417,26 +422,26 @@ exprt flatten_byte_update(
       }
       else // sub_size!=1
       {
-        exprt result=src.op0();
+        exprt result = src.op();
 
         // Number of potentially affected array cells:
         mp_integer num_elements=
           element_size/sub_size+((element_size%sub_size==0)?1:2);
 
-        const auto &offset_type=ns.follow(src.op1().type());
+        const auto &offset_type = ns.follow(src.offset().type());
         exprt zero_offset=from_integer(0, offset_type);
 
         exprt sub_size_expr=from_integer(sub_size, offset_type);
         exprt element_size_expr=from_integer(element_size, offset_type);
 
         // First potentially affected cell:
-        div_exprt first_cell(src.op1(), sub_size_expr);
+        div_exprt first_cell(src.offset(), sub_size_expr);
 
         for(mp_integer i=0; i<num_elements; ++i)
         {
           plus_exprt cell_index(first_cell, from_integer(i, offset_type));
           mult_exprt cell_offset(cell_index, sub_size_expr);
-          index_exprt old_cell_value(src.op0(), cell_index, subtype);
+          index_exprt old_cell_value(src.op(), cell_index, subtype);
           bool is_first_cell=i==0;
           bool is_last_cell=i==num_elements-1;
 
@@ -444,7 +449,7 @@ exprt flatten_byte_update(
           exprt stored_value_offset;
           if(element_size<=sub_size)
           {
-            new_value=src.op2();
+            new_value = src.value();
             stored_value_offset=zero_offset;
           }
           else
@@ -458,19 +463,20 @@ exprt flatten_byte_update(
               stored_value_offset=
                 from_integer(element_size-sub_size, offset_type);
             else
-              stored_value_offset=minus_exprt(cell_offset, src.op1());
+              stored_value_offset = minus_exprt(cell_offset, src.offset());
 
-            auto extract_opcode=
-              src.id()==ID_byte_update_little_endian ?
-              ID_byte_extract_little_endian :
-              src.id()==ID_byte_update_big_endian ?
-              ID_byte_extract_big_endian :
-              throw "unexpected src.id() in flatten_byte_update";
+            INVARIANT(
+              src.id() == ID_byte_update_little_endian ||
+                src.id() == ID_byte_update_big_endian,
+              "byte update expression should either be little or big endian");
+
             byte_extract_exprt byte_extract_expr(
-              extract_opcode,
-              element_size<sub_size ? src.op2().type() : subtype);
+              src.id() == ID_byte_update_little_endian
+                ? ID_byte_extract_little_endian
+                : ID_byte_extract_big_endian,
+              element_size < sub_size ? src.value().type() : subtype);
 
-            byte_extract_expr.op()=src.op2();
+            byte_extract_expr.op() = src.value();
             byte_extract_expr.offset()=stored_value_offset;
 
             new_value=flatten_byte_extract(byte_extract_expr, ns);
@@ -482,15 +488,13 @@ exprt flatten_byte_update(
           // target array cell.
           exprt overwrite_offset;
           if(is_first_cell)
-            overwrite_offset=mod_exprt(src.op1(), sub_size_expr);
+            overwrite_offset = mod_exprt(src.offset(), sub_size_expr);
           else if(is_last_cell)
           {
             // This is intentionally negated; passing is_last_cell
             // to flatten below leads to it being negated again later.
-            overwrite_offset=
-              minus_exprt(
-                minus_exprt(cell_offset, src.op1()),
-                stored_value_offset);
+            overwrite_offset = minus_exprt(
+              minus_exprt(cell_offset, src.offset()), stored_value_offset);
           }
           else
             overwrite_offset=zero_offset;
@@ -517,9 +521,10 @@ exprt flatten_byte_update(
     }
     else
     {
-      throw
-        "flatten_byte_update can only do arrays of scalars right now, "
-        "but got "+subtype.id_string();
+      PRECONDITION_WITH_DIAGNOSTICS(
+        false,
+        "flatten_byte_update can only do arrays of scalars right now",
+        subtype.id_string());
     }
   }
   else if(t.id()==ID_signedbv ||
@@ -530,11 +535,12 @@ exprt flatten_byte_update(
   {
     // do a shift, mask and OR
     mp_integer type_width=pointer_offset_bits(t, ns);
-    assert(type_width>0);
+    CHECK_RETURN(type_width > 0);
     std::size_t width=integer2size_t(type_width);
 
-    if(element_size*8>width)
-      throw "flatten_byte_update to update element that is too large";
+    INVARIANT(
+      element_size * 8 <= width,
+      "element bit width must not be larger than width indicated by type");
 
     // build mask
     exprt mask=
@@ -544,16 +550,16 @@ exprt flatten_byte_update(
     exprt value_extended;
 
     if(width>integer2unsigned(element_size)*8)
-      value_extended=
-        concatenation_exprt(
-          from_integer(
-            0, unsignedbv_typet(width-integer2unsigned(element_size)*8)),
-          src.op2(), t);
+      value_extended = concatenation_exprt(
+        from_integer(
+          0, unsignedbv_typet(width - integer2unsigned(element_size) * 8)),
+        src.value(),
+        t);
     else
-      value_extended=src.op2();
+      value_extended = src.value();
 
-    const typet &offset_type=ns.follow(src.op1().type());
-    mult_exprt offset_times_eight(src.op1(), from_integer(8, offset_type));
+    const typet &offset_type = ns.follow(src.offset().type());
+    mult_exprt offset_times_eight(src.offset(), from_integer(8, offset_type));
 
     binary_predicate_exprt offset_ge_zero(
       offset_times_eight,
@@ -578,7 +584,7 @@ exprt flatten_byte_update(
     }
 
     // original_bits &= ~mask
-    bitand_exprt bitand_expr(src.op0(), bitnot_exprt(mask_shifted));
+    bitand_exprt bitand_expr(src.op(), bitnot_exprt(mask_shifted));
 
     // original_bits |= newvalue
     bitor_exprt bitor_expr(bitand_expr, value_shifted);
@@ -587,8 +593,10 @@ exprt flatten_byte_update(
   }
   else
   {
-    throw "flatten_byte_update can only do array and scalars "
-          "right now, but got "+t.id_string();
+    PRECONDITION_WITH_DIAGNOSTICS(
+      false,
+      "flatten_byte_update can only do arrays and scalars right now",
+      t.id_string());
   }
 }
 
