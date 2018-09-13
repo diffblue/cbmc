@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_INTERPRETER_H
 #define CPROVER_GOTO_PROGRAMS_INTERPRETER_H
 
+#include <util/exception_utils.h>
 #include <util/message.h>
 
 #include "goto_model.h"

@@ -69,12 +69,12 @@ void interpretert::initialize(bool init)
     main_it=goto_functions.function_map.find(goto_functionst::entry_point());
 
   if(main_it==goto_functions.function_map.end())
-    throw "main not found";
+    throw analysis_exceptiont("main not found");
 
   const goto_functionst::goto_functiont &goto_function=main_it->second;
 
   if(!goto_function.body_available())
-    throw "main has no body";
+    throw analysis_exceptiont("main has no body");
 
   pc=goto_function.body.instructions.begin();
   function=main_it;
@@ -292,7 +292,10 @@ void interpretert::step()
   case RETURN:
     trace_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
     if(call_stack.empty())
-      throw "RETURN without call"; // NOLINT(readability/throw)
+    {
+      throw analysis_exceptiont(
+        "RETURN without call"); // NOLINT(readability/throw)
+    }
 
     if(pc->code.operands().size()==1 &&
        call_stack.top().return_value_address!=0)
@@ -317,19 +320,23 @@ void interpretert::step()
 
   case START_THREAD:
     trace_step.type=goto_trace_stept::typet::SPAWN;
-    throw "START_THREAD not yet implemented"; // NOLINT(readability/throw)
+    throw analysis_exceptiont(
+      "START_THREAD not yet implemented"); // NOLINT(readability/throw)
 
   case END_THREAD:
-    throw "END_THREAD not yet implemented"; // NOLINT(readability/throw)
+    throw analysis_exceptiont(
+      "END_THREAD not yet implemented"); // NOLINT(readability/throw)
     break;
 
   case ATOMIC_BEGIN:
     trace_step.type=goto_trace_stept::typet::ATOMIC_BEGIN;
-    throw "ATOMIC_BEGIN not yet implemented"; // NOLINT(readability/throw)
+    throw analysis_exceptiont(
+      "ATOMIC_BEGIN not yet implemented"); // NOLINT(readability/throw)
 
   case ATOMIC_END:
     trace_step.type=goto_trace_stept::typet::ATOMIC_END;
-    throw "ATOMIC_END not yet implemented"; // NOLINT(readability/throw)
+    throw analysis_exceptiont(
+      "ATOMIC_END not yet implemented"); // NOLINT(readability/throw)
 
   case DEAD:
     trace_step.type=goto_trace_stept::typet::DEAD;
@@ -359,7 +366,7 @@ void interpretert::step()
   case CATCH:
     break;
   default:
-    throw "encountered instruction with undefined instruction type";
+    UNREACHABLE; // I'm assuming we'd catch such a thing before this point
   }
   pc=next_pc;
 }
@@ -369,11 +376,9 @@ void interpretert::execute_goto()
 {
   if(evaluate_boolean(pc->guard))
   {
-    if(pc->targets.empty())
-      throw "taken goto without target";
-
-    if(pc->targets.size()>=2)
-      throw "non-deterministic goto encountered";
+    DATA_INVARIANT(
+      pc->targets.size() == 1,
+      "a goto should have exactly one target location");
 
     next_pc=pc->targets.front();
   }
@@ -383,6 +388,10 @@ void interpretert::execute_goto()
 void interpretert::execute_other()
 {
   const irep_idt &statement=pc->code.get_statement();
+  PRECONDITION(
+    statement == ID_expression || statement == ID_array_set ||
+    statement == ID_output);
+
   if(statement==ID_expression)
   {
     DATA_INVARIANT(
@@ -410,8 +419,6 @@ void interpretert::execute_other()
   {
     return;
   }
-  else
-    throw "unexpected OTHER statement: "+id2string(statement);
 }
 
 void interpretert::execute_decl()
@@ -427,8 +434,7 @@ struct_typet::componentt interpretert::get_component(
 {
   const symbolt &symbol=ns.lookup(object);
   const typet real_type=ns.follow(symbol.type);
-  if(real_type.id()!=ID_struct)
-    throw "request for member of non-struct";
+  PRECONDITION(real_type.id() == ID_struct);
 
   const struct_typet &struct_type=to_struct_type(real_type);
   const struct_typet::componentst &components=struct_type.components();
@@ -443,7 +449,7 @@ struct_typet::componentt interpretert::get_component(
     tmp_offset-=get_size(c.type());
   }
 
-  throw "access out of struct bounds";
+  throw analysis_exceptiont("access out of struct bounds");
 }
 
 /// returns the type object corresponding to id
@@ -634,7 +640,7 @@ exprt interpretert::get_value(
     error() << "interpreter: invalid pointer " << rhs[integer2size_t(offset)]
             << " > object count " << memory.size() << eom;
 
-    throw "interpreter: reading from invalid pointer";
+    throw analysis_exceptiont("interpreter: reading from invalid pointer");
   }
   else if(real_type.id()==ID_string)
   {
@@ -724,7 +730,7 @@ void interpretert::assign(
 void interpretert::execute_assume()
 {
   if(!evaluate_boolean(pc->guard))
-    throw "assumption failed";
+    throw analysis_exceptiont("assumption failed");
 }
 
 void interpretert::execute_assert()
@@ -732,7 +738,7 @@ void interpretert::execute_assert()
   if(!evaluate_boolean(pc->guard))
   {
     if((target_assert==pc) || stop_on_assertion)
-      throw "program assertion reached";
+      throw analysis_exceptiont("program assertion reached");
     else if(show)
       error() << "assertion failed at " << pc->location_number
               << "\n" << eom;
@@ -748,9 +754,9 @@ void interpretert::execute_function_call()
   mp_integer address=evaluate_address(function_call.function());
 
   if(address==0)
-    throw "function call to NULL";
+    throw analysis_exceptiont("function call to NULL");
   else if(address>=memory.size())
-    throw "out-of-range function call";
+    throw analysis_exceptiont("out-of-range function call");
 
   // Retrieve the empty last trace step struct we pushed for this step
   // of the interpreter run to fill it with the corresponding data
@@ -764,8 +770,9 @@ void interpretert::execute_function_call()
   const goto_functionst::function_mapt::const_iterator f_it=
     goto_functions.function_map.find(identifier);
 
-  if(f_it==goto_functions.function_map.end())
-    throw "failed to find function "+id2string(identifier);
+  INVARIANT(
+    f_it != goto_functions.function_map.end(),
+    "calls to missing functions should be caught during typechecking");
 
   // return value
   mp_integer return_value_address;
@@ -810,8 +817,10 @@ void interpretert::execute_function_call()
     const code_typet::parameterst &parameters=
       to_code_type(f_it->second.type).parameters();
 
-    if(argument_values.size()<parameters.size())
-      throw "not enough arguments";
+    INVARIANT(
+      argument_values.size() != parameters.size(),
+      "function calls not matching function signatures should be caught during "
+      "typechecking");
 
     for(std::size_t i=0; i<parameters.size(); i++)
     {
