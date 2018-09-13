@@ -119,7 +119,6 @@ exprt value_set_dereferencet::dereference(
 
   if(values.empty())
   {
-    invalid_pointer(pointer, guard);
     may_fail=true;
   }
   else
@@ -268,23 +267,6 @@ bool value_set_dereferencet::dereference_type_compare(
   return false;
 }
 
-void value_set_dereferencet::invalid_pointer(
-  const exprt &pointer,
-  const guardt &guard)
-{
-  if(!options.get_bool_option("pointer-check"))
-    return;
-
-  // constraint that it actually is an invalid pointer
-  guardt tmp_guard(guard);
-  tmp_guard.add(::invalid_pointer(pointer));
-
-  dereference_callback.dereference_failure(
-    "pointer dereference",
-    "invalid pointer",
-    tmp_guard);
-}
-
 value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &what,
   const modet mode,
@@ -297,7 +279,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   if(what.id()==ID_unknown ||
      what.id()==ID_invalid)
   {
-    invalid_pointer(pointer_expr, guard);
     return valuet();
   }
 
@@ -321,27 +302,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     {
       result.ignore = true;
     }
-    else if(options.get_bool_option("pointer-check"))
-    {
-      guardt tmp_guard(guard);
-
-      if(o.offset().is_zero())
-      {
-        tmp_guard.add(null_pointer(pointer_expr));
-
-        dereference_callback.dereference_failure(
-          "pointer dereference",
-          "NULL pointer", tmp_guard);
-      }
-      else
-      {
-        tmp_guard.add(null_object(pointer_expr));
-
-        dereference_callback.dereference_failure(
-          "pointer dereference",
-          "NULL plus offset pointer", tmp_guard);
-      }
-    }
   }
   else if(root_object.id()==ID_dynamic_object)
   {
@@ -360,56 +320,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
     // can't remove here, turn into *p
     result.value=dereference_exprt(pointer_expr, dereference_type);
-
-    if(options.get_bool_option("pointer-check"))
-    {
-      // if(!dynamic_object.valid().is_true())
-      {
-        // check if it is still alive
-        guardt tmp_guard(guard);
-        tmp_guard.add(deallocated(pointer_expr, ns));
-        dereference_callback.dereference_failure(
-          "pointer dereference",
-          "dynamic object deallocated",
-          tmp_guard);
-      }
-
-      if(options.get_bool_option("bounds-check"))
-      {
-        if(!o.offset().is_zero())
-        {
-          // check lower bound
-          guardt tmp_guard(guard);
-          tmp_guard.add(is_malloc_object);
-          tmp_guard.add(
-            dynamic_object_lower_bound(
-              pointer_expr,
-              ns,
-              nil_exprt()));
-          dereference_callback.dereference_failure(
-            "pointer dereference",
-            "dynamic object lower bound", tmp_guard);
-        }
-
-        {
-          // check upper bound
-
-          // we check SAME_OBJECT(__CPROVER_malloc_object, p) &&
-          //          POINTER_OFFSET(p)+size>__CPROVER_malloc_size
-
-          guardt tmp_guard(guard);
-          tmp_guard.add(is_malloc_object);
-          tmp_guard.add(
-            dynamic_object_upper_bound(
-              pointer_expr,
-              ns,
-              size_of_expr(dereference_type, ns)));
-          dereference_callback.dereference_failure(
-            "pointer dereference",
-            "dynamic object upper bound", tmp_guard);
-        }
-      }
-    }
   }
   else if(root_object.id()==ID_integer_address)
   {
@@ -488,8 +398,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     guardt tmp_guard(guard);
     tmp_guard.add(result.pointer_guard);
 
-    valid_check(object, tmp_guard, mode);
-
     const typet &object_type=ns.follow(object.type());
     const exprt &root_object=o.root_object();
     const typet &root_object_type=ns.follow(root_object.type());
@@ -554,8 +462,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       index_exprt index_expr=
         index_exprt(root_object, adjusted_offset, root_object_type.subtype());
 
-      bounds_check(index_expr, tmp_guard);
-
       result.value=index_expr;
 
       if(ns.follow(result.value.type())!=ns.follow(dereference_type))
@@ -589,145 +495,12 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       }
       else
       {
-        if(options.get_bool_option("pointer-check"))
-        {
-          std::ostringstream msg;
-          msg << "memory model not applicable (got `"
-              << format(result.value.type()) << "', expected `"
-              << format(dereference_type) << "')";
-
-          dereference_callback.dereference_failure(
-            "pointer dereference", msg.str(), tmp_guard);
-        }
-
         return valuet(); // give up, no way that this is ok
       }
     }
   }
 
   return result;
-}
-
-void value_set_dereferencet::valid_check(
-  const exprt &object,
-  const guardt &guard,
-  const modet mode)
-{
-  if(!options.get_bool_option("pointer-check"))
-    return;
-
-  const exprt &symbol_expr=get_symbol(object);
-
-  if(symbol_expr.id()==ID_string_constant)
-  {
-    // always valid, but can't write
-
-    if(mode==modet::WRITE)
-    {
-      dereference_callback.dereference_failure(
-        "pointer dereference",
-        "write access to string constant",
-        guard);
-    }
-  }
-  else if(symbol_expr.is_nil() ||
-          symbol_expr.get_bool(ID_C_invalid_object))
-  {
-    // always "valid", shut up
-    return;
-  }
-  else if(symbol_expr.id()==ID_symbol)
-  {
-    const irep_idt identifier=
-      is_ssa_expr(symbol_expr)?
-      to_ssa_expr(symbol_expr).get_object_name():
-      to_symbol_expr(symbol_expr).get_identifier();
-
-    const symbolt &symbol=ns.lookup(identifier);
-
-    if(symbol.type.get_bool(ID_C_is_failed_symbol))
-    {
-      dereference_callback.dereference_failure(
-        "pointer dereference",
-        "invalid pointer",
-        guard);
-    }
-
-    #if 0
-    if(dereference_callback.is_valid_object(identifier))
-      return; // always ok
-    #endif
-  }
-}
-
-void value_set_dereferencet::bounds_check(
-  const index_exprt &expr,
-  const guardt &guard)
-{
-  if(!options.get_bool_option("pointer-check"))
-    return;
-
-  if(!options.get_bool_option("bounds-check"))
-    return;
-
-  const typet &array_type=ns.follow(expr.op0().type());
-
-  if(array_type.id()!=ID_array)
-    throw "bounds check expected array type";
-
-  std::string name=array_name(ns, expr.array());
-
-  {
-    mp_integer i;
-    if(!to_integer(expr.index(), i) &&
-       i>=0)
-    {
-    }
-    else
-    {
-      exprt zero=from_integer(0, expr.index().type());
-
-      if(zero.is_nil())
-        throw "no zero constant of index type "+
-          expr.index().type().pretty();
-
-      binary_relation_exprt
-        inequality(expr.index(), ID_lt, zero);
-
-      guardt tmp_guard(guard);
-      tmp_guard.add(inequality);
-      dereference_callback.dereference_failure(
-        "array bounds",
-        name+" lower bound", tmp_guard);
-    }
-  }
-
-  const exprt &size_expr=
-    to_array_type(array_type).size();
-
-  if(size_expr.id()==ID_infinity)
-  {
-  }
-  else if(size_expr.is_zero() && expr.array().id()==ID_member)
-  {
-    // this is a variable-sized struct field
-  }
-  else
-  {
-    if(size_expr.is_nil())
-      throw "index array operand of wrong type";
-
-    binary_relation_exprt inequality(
-      typecast_exprt::conditional_cast(expr.index(), size_expr.type()),
-      ID_ge,
-      size_expr);
-
-    guardt tmp_guard(guard);
-    tmp_guard.add(inequality);
-    dereference_callback.dereference_failure(
-      "array bounds",
-      name+" upper bound", tmp_guard);
-  }
 }
 
 static bool is_a_bv_type(const typet &type)
@@ -794,21 +567,6 @@ bool value_set_dereferencet::memory_model_conversion(
   // only doing type conversion
   // just do the typecast
   value.make_typecast(to_type);
-
-  // also assert that offset is zero
-
-  if(options.get_bool_option("pointer-check"))
-  {
-    equal_exprt offset_not_zero(offset, from_integer(0, offset.type()));
-    offset_not_zero.make_not();
-
-    guardt tmp_guard(guard);
-    tmp_guard.add(offset_not_zero);
-    dereference_callback.dereference_failure(
-      "word bounds",
-      "offset not zero", tmp_guard);
-  }
-
   return true;
 }
 
@@ -855,55 +613,6 @@ bool value_set_dereferencet::memory_model_bytes(
   }
 
   value=result;
-
-  // are we within the bounds?
-  if(options.get_bool_option("pointer-check"))
-  {
-    // upper bound
-    {
-      exprt from_width=size_of_expr(from_type, ns);
-      INVARIANT(
-        from_width.is_not_nil(),
-        "unknown or invalid type size:\n"+from_type.pretty());
-
-      exprt to_width=
-        to_type.id()==ID_empty?
-        from_integer(0, size_type()):size_of_expr(to_type, ns);
-      INVARIANT(
-        to_width.is_not_nil(),
-        "unknown or invalid type size:\n"+to_type.pretty());
-      INVARIANT(
-        from_width.type()==to_width.type(),
-        "type mismatch on result of size_of_expr");
-
-      minus_exprt bound(from_width, to_width);
-      if(bound.type()!=offset.type())
-        bound.make_typecast(offset.type());
-
-      binary_relation_exprt
-        offset_upper_bound(offset, ID_gt, bound);
-
-      guardt tmp_guard(guard);
-      tmp_guard.add(offset_upper_bound);
-      dereference_callback.dereference_failure(
-        "pointer dereference",
-        "object upper bound", tmp_guard);
-    }
-
-    // lower bound is easy
-    if(!offset.is_zero())
-    {
-      binary_relation_exprt
-        offset_lower_bound(
-          offset, ID_lt, from_integer(0, offset.type()));
-
-      guardt tmp_guard(guard);
-      tmp_guard.add(offset_lower_bound);
-      dereference_callback.dereference_failure(
-        "pointer dereference",
-        "object lower bound", tmp_guard);
-    }
-  }
 
   return true;
 }

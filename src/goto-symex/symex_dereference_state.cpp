@@ -13,13 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 
-void symex_dereference_statet::dereference_failure(
-  const std::string &,
-  const std::string &,
-  const guardt &)
-{
-}
-
 bool symex_dereference_statet::has_failed_symbol(
   const exprt &expr,
   const symbolt *&symbol)
