@@ -48,7 +48,9 @@ public:
 */
 inline const literal_exprt &to_literal_expr(const exprt &expr)
 {
-  assert(expr.id()==ID_literal && !expr.has_operands());
+  PRECONDITION(expr.id() == ID_literal);
+  DATA_INVARIANT(
+    !expr.has_operands(), "literal expression should not have operands");
   return static_cast<const literal_exprt &>(expr);
 }
 
@@ -57,7 +59,9 @@ inline const literal_exprt &to_literal_expr(const exprt &expr)
 */
 inline literal_exprt &to_literal_expr(exprt &expr)
 {
-  assert(expr.id()==ID_literal && !expr.has_operands());
+  PRECONDITION(expr.id() == ID_literal);
+  DATA_INVARIANT(
+    !expr.has_operands(), "literal expression should not have operands");
   return static_cast<literal_exprt &>(expr);
 }
 

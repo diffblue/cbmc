@@ -11,15 +11,16 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include "bdd_expr.h"
 
-#include <util/std_expr.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
+#include <util/invariant.h>
+#include <util/std_expr.h>
 
 #include <sstream>
 
 mini_bddt bdd_exprt::from_expr_rec(const exprt &expr)
 {
-  assert(expr.type().id()==ID_bool);
+  PRECONDITION(expr.type().id() == ID_bool);
 
   if(expr.is_constant())
     return expr.is_false() ? bdd_mgr.False() : bdd_mgr.True();
@@ -29,7 +30,9 @@ mini_bddt bdd_exprt::from_expr_rec(const exprt &expr)
           expr.id()==ID_or ||
           expr.id()==ID_xor)
   {
-    assert(expr.operands().size()>=2);
+    DATA_INVARIANT(
+      expr.operands().size() >= 2,
+      "logical and, or, and xor expressions have at least two operands");
     exprt bin_expr=make_binary(expr);
 
     mini_bddt op0=from_expr_rec(bin_expr.op0());
@@ -103,7 +106,7 @@ exprt bdd_exprt::as_expr(const mini_bddt &r) const
   }
 
   node_mapt::const_iterator entry=node_map.find(r.var());
-  assert(entry!=node_map.end());
+  CHECK_RETURN(entry != node_map.end());
   const exprt &n_expr=entry->second;
 
   if(r.low().is_false())

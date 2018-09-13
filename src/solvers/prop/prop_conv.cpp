@@ -35,7 +35,7 @@ void prop_convt::set_frozen(const bvt &bv)
 
 bool prop_conv_solvert::literal(const symbol_exprt &expr, literalt &dest) const
 {
-  assert(expr.type().id()==ID_bool);
+  PRECONDITION(expr.type().id() == ID_bool);
 
   const irep_idt &identifier = expr.get_identifier();
 
@@ -197,10 +197,13 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   {
     if(expr.is_true())
       return const_literal(true);
-    else if(expr.is_false())
-      return const_literal(false);
     else
-      throw "unknown boolean constant: "+expr.pretty();
+    {
+      INVARIANT(
+        expr.is_false(),
+        "constant expression of type bool should be either true or false");
+      return const_literal(false);
+    }
   }
   else if(expr.id()==ID_symbol)
   {
@@ -216,22 +219,23 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   }
   else if(expr.id()==ID_implies)
   {
-    if(op.size()!=2)
-      throw "implication takes two operands";
-
-    return prop.limplies(convert(op[0]), convert(op[1]));
+    const implies_exprt &implies_expr = to_implies_expr(expr);
+    return prop.limplies(
+      convert(implies_expr.op0()), convert(implies_expr.op1()));
   }
   else if(expr.id()==ID_if)
   {
-    if(op.size()!=3)
-      throw "if takes three operands";
-
-    return prop.lselect(convert(op[0]), convert(op[1]), convert(op[2]));
+    const if_exprt &if_expr = to_if_expr(expr);
+    return prop.lselect(
+      convert(if_expr.cond()),
+      convert(if_expr.true_case()),
+      convert(if_expr.false_case()));
   }
   else if(expr.id()==ID_constraint_select_one)
   {
-    if(op.size()<2)
-      throw "constraint_select_one takes at least two operands";
+    DATA_INVARIANT(
+      op.size() >= 2,
+      "constraint_select_one should have at least two operands");
 
     std::vector<literalt> op_bv;
     op_bv.resize(op.size());
@@ -427,9 +431,10 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
         // set_to_false
         if(expr.id()==ID_implies) // !(a=>b)  ==  (a && !b)
         {
-          assert(expr.operands().size()==2);
-          set_to_true(expr.op0());
-          set_to_false(expr.op1());
+          const implies_exprt &implies_expr = to_implies_expr(expr);
+
+          set_to_true(implies_expr.op0());
+          set_to_false(implies_expr.op1());
           return;
         }
         else if(expr.id()==ID_or) // !(a || b)  ==  (!a && !b)
