@@ -1,5 +1,5 @@
-import com.diffblue.OverlayClassImplementation;
-import com.diffblue.OverlayMethodImplementation;
+import org.cprover.OverlayClassImplementation;
+import org.cprover.OverlayMethodImplementation;
 
 @OverlayClassImplementation
 public class Test

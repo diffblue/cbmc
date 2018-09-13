@@ -1,4 +1,4 @@
-package com.diffblue;
+package org.cprover;
 
 public @interface OverlayMethodImplementation {
 }
