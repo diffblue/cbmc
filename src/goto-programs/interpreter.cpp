@@ -600,7 +600,7 @@ exprt interpretert::get_value(
   {
     return from_integer(rhs[integer2size_t(offset)]!=0?1:0, type);
   }
-  else if((real_type.id()==ID_pointer) || (real_type.id()==ID_address_of))
+  else if(real_type.id() == ID_pointer)
   {
     if(rhs[integer2size_t(offset)]==0)
     {
@@ -1090,4 +1090,3 @@ void interpreter(
     message_handler);
   interpreter();
 }
-

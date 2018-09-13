@@ -306,6 +306,8 @@ protected:
 
   void initialize(bool init);
   void show_state();
+
+  friend class interpreter_testt;
 };
 
 #endif // CPROVER_GOTO_PROGRAMS_INTERPRETER_CLASS_H

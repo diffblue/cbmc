@@ -45,6 +45,7 @@ SRC += unit_tests.cpp \
        util/symbol_table.cpp \
        util/unicode.cpp \
        catch_example.cpp \
+       interpreter/interpreter.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I.
