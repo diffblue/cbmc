@@ -671,3 +671,95 @@ void print_ids(goto_modelt &goto_model)
 
   goto_model.goto_functions.update();
 }
+
+class global_statst
+{
+public:
+  std::size_t global_direct, global_indirect;
+
+  void assign(const exprt &lhs, aliasest &aliases, const namespacet &ns)
+  {
+    if(has_deref(lhs))
+    {
+      auto addresses=aliases.get_addresses(address_of_exprt(lhs));
+
+      bool global_write=false;
+
+      for(const auto &a : addresses)
+      {
+        const auto deref=aliases.deref_address_id(a);
+        if(is_global(deref, ns))
+          global_write=true;
+      }
+
+      if(global_write)
+        global_indirect++;
+    }
+    else
+    {
+      if(is_global(lhs, ns))
+        global_direct++;
+    }
+  }
+
+  static bool is_global(const exprt &src, const namespacet &ns)
+  {
+    if(src.id()==ID_member)
+      return is_global(to_member_expr(src).compound(), ns);
+    else if(src.id()==ID_index)
+      return is_global(to_index_expr(src).array(), ns);
+    else if(src.id()==ID_symbol)
+      return ns.lookup(to_symbol_expr(src)).is_static_lifetime;
+    else
+      return false;
+  }
+
+  static bool has_deref(const exprt &lhs)
+  {
+    if(lhs.id()==ID_dereference)
+      return true;
+    else
+    {
+      for(const auto &op : lhs.operands())
+        if(has_deref(op))
+          return true;
+      return false;
+    }
+  }
+
+  global_statst()
+  {
+    global_direct=0;
+    global_indirect=0;
+  }
+};
+
+void global_stats(const goto_modelt &goto_model)
+{
+  const namespacet ns(goto_model.symbol_table);
+  aliasest aliases;
+
+  aliases(goto_model);
+
+  for(const auto &f : goto_model.goto_functions.function_map)
+  {
+    global_statst global_stats;
+
+    for(const auto &i : f.second.body.instructions)
+    {
+      if(i.is_assign())
+      {
+        const auto &code_assign=to_code_assign(i.code);
+        const auto &lhs=code_assign.lhs();
+        global_stats.assign(lhs, aliases, ns);
+      }
+      else if(i.is_function_call())
+      {
+        const auto &code_function_call=to_code_function_call(i.code);
+        const auto &lhs=code_function_call.lhs();
+        global_stats.assign(lhs, aliases, ns);
+      }
+    }
+    std::cout << f.first << ": " << global_stats.global_direct << " " << global_stats.global_indirect << "\n";
+  }
+}

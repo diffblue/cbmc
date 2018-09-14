@@ -259,6 +259,12 @@ int goto_instrument_parse_optionst::doit()
         return CPROVER_EXIT_SUCCESS;
     }
 
+    if(cmdline.isset("global-stats"))
+    {
+      global_stats(goto_model);
+      return CPROVER_EXIT_SUCCESS;
+    }
+
     if(cmdline.isset("value-set-fi-fp-removal"))
     {
       value_set_fi_fp_removal(goto_model);

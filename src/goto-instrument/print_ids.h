@@ -15,5 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_modelt;
 
 void print_ids(goto_modelt &);
+void global_stats(const goto_modelt &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_PRINT_IDS_H
