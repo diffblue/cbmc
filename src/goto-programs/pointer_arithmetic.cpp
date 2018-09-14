@@ -32,32 +32,33 @@ void pointer_arithmetict::read(const exprt &src)
   }
   else if(src.id()==ID_minus)
   {
-    assert(src.operands().size()==2);
-    read(src.op0());
-    const unary_minus_exprt o(src.op1(), src.op1().type());
-    add_to_offset(o);
+    auto const &minus_src = to_minus_expr(src);
+    read(minus_src.op0());
+    const unary_minus_exprt unary_minus(
+      minus_src.op1(), minus_src.op1().type());
+    add_to_offset(unary_minus);
   }
   else if(src.id()==ID_address_of)
   {
-    assert(src.operands().size()==1);
-    if(src.op0().id()==ID_index)
+    auto const &address_of_src = to_address_of_expr(src);
+    if(address_of_src.op().id() == ID_index)
     {
-      const index_exprt &index_expr=
-        to_index_expr(src.op0());
+      const index_exprt &index_expr = to_index_expr(address_of_src.op());
 
       if(index_expr.index().is_zero())
-        make_pointer(src);
+        make_pointer(address_of_src);
       else
       {
         add_to_offset(index_expr.index());
         // produce &x[0] + i instead of &x[i]
-        exprt new_src=src;
-        new_src.op0().op1()=from_integer(0, index_expr.index().type());
-        make_pointer(new_src);
+        auto new_address_of_src = address_of_src;
+        new_address_of_src.op().op1() =
+          from_integer(0, index_expr.index().type());
+        make_pointer(new_address_of_src);
       }
     }
     else
-      make_pointer(src);
+      make_pointer(address_of_src);
   }
   else
     make_pointer(src);
