@@ -32,11 +32,6 @@ protected:
   goto_symext &goto_symex;
   goto_symext::statet &state;
 
-  virtual void dereference_failure(
-    const std::string &property,
-    const std::string &msg,
-    const guardt &guard);
-
   virtual void get_value_set(
     const exprt &expr,
     value_setst::valuest &value_set);
