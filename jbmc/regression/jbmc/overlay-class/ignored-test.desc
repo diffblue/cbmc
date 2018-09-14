@@ -1,0 +1,10 @@
+CORE
+Test.class
+--classpath `../../../../scripts/format_classpath.sh . annotations . ignored-method` --verbosity 10
+^Ignoring method:  'java::Test\.main:\(\[Ljava/lang/String;\)V'$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^Skipping class Test marked with OverlayClassImplementation but found before original definition$
+^Adding symbol from overlay class:  method 'java::Test\.main:\(\[Ljava/lang/String;\)V'$
