@@ -52,4 +52,13 @@ public:
   }
 };
 
+class deserialization_exceptiont
+{
+public:
+  explicit deserialization_exceptiont(std::string message);
+  std::string what() const noexcept;
+private:
+  std::string message;
+};
+
 #endif // CPROVER_UTIL_EXCEPTION_UTILS_H
