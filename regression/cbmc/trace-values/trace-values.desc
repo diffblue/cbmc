@@ -12,7 +12,7 @@ trace-values.c
 ^  null\$object=6 .*$
 ^  junk\$object=7 .*$
 ^  dynamic_object1\[1.*\]=8 .*$
-^  my_nested\[1.*\]={ .f=0, .array={ 0, 4, 0 } } .*$
+^  my_nested\[1.*\]=\{ .f=0, .array=\{ 0, 4, 0 \} \} .*$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

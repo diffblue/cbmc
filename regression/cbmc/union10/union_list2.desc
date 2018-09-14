@@ -11,8 +11,8 @@ Value sets do not record byte-extract operations with sufficient detail:
   struct list_item *p1 = u.my_list.index;
   struct list_item *p2 = p1->previous;
 yields
-  (29) p1!0@1#2 == byte_extract_little_endian(u!0@1#4, 8l, struct list_item { unsigned int value; unsigned int $pad1; struct list_item *previous; } *)
-  (30) p2!0@1#2 == p1$object#0.previous
+  \(29\) p1!0@1#2 == byte_extract_little_endian\(u!0@1#4, 8l, struct list_item \{ unsigned int value; unsigned int $pad1; struct list_item *previous; \} *\)
+  \(30\) p2!0@1#2 == p1$object#0.previous
 as
-  main::1::p1 = { <integer_address, *, unsigned char> }
+  main::1::p1 = \{ <integer_address, *, unsigned char> \}
 is the only information stored in the value set.
