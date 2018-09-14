@@ -125,8 +125,7 @@ optionalt<Target> numeric_cast(const exprt &arg)
 }
 
 /// Convert an mp_integer to integral type Target
-/// An invariant with fail with message "Bad conversion" if conversion
-/// is not possible.
+/// An invariant with fail if the conversion is not possible.
 /// \tparam Target: type to convert to
 /// \param arg: mp_integer
 /// \return value of type Target
@@ -134,13 +133,12 @@ template <typename Target>
 Target numeric_cast_v(const mp_integer &arg)
 {
   const auto maybe = numeric_castt<Target>{}(arg);
-  INVARIANT(maybe, "Bad conversion");
+  INVARIANT(maybe, "mp_integer should be convertible to target integral type");
   return *maybe;
 }
 
 /// Convert an expression to integral type Target
-/// An invariant with fail with message "Bad conversion" if conversion
-/// is not possible.
+/// An invariant with fail if the conversion is not possible.
 /// \tparam Target: type to convert to
 /// \param arg: constant expression
 /// \return value of type Target
@@ -148,7 +146,10 @@ template <typename Target>
 Target numeric_cast_v(const exprt &arg)
 {
   const auto maybe = numeric_castt<Target>{}(arg);
-  INVARIANT(maybe, "Bad conversion");
+  INVARIANT_WITH_DIAGNOSTICS(
+    maybe,
+    "expression should be convertible to target integral type",
+    irep_pretty_diagnosticst(arg));
   return *maybe;
 }
 
