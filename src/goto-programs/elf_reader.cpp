@@ -10,6 +10,7 @@ Author:
 /// Read ELF
 
 #include "elf_reader.h"
+#include <util/exception_utils.h>
 
 #include <istream>
 
@@ -21,13 +22,13 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     sizeof(elf32_header));
 
   if(!in)
-    throw "failed to read ELF header";
+    throw deserialization_exceptiont("failed to read ELF header");
 
   if(elf32_header.e_ident[0]!=0x7f ||
      elf32_header.e_ident[1]!='E' ||
      elf32_header.e_ident[2]!='L' ||
      elf32_header.e_ident[3]!='F')
-    throw "ELF header malformed (magic)"; // NOLINT(readability/throw)
+    throw deserialization_exceptiont("ELF header malformed (magic)");
 
   elf_class=(elf_classt)elf32_header.e_ident[4];
 
@@ -40,15 +41,15 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     else if(ei_data==2)
       little_endian=false;
     else
-      throw "ELF32 header malformed (EI_DATA)"; // NOLINT(readability/throw)
+      throw deserialization_exceptiont("ELF32 header malformed (EI_DATA)");
 
     if(elf32_header.e_version!=1)
-      throw "unknown ELF32 version";
+      throw deserialization_exceptiont("unknown ELF32 version");
 
     // get offset for section header
     if(elf32_header.e_shoff==0 ||
        elf32_header.e_shnum==0)
-      throw "ELF32 without section header"; // NOLINT(readability/throw)
+      throw deserialization_exceptiont("ELF32 without section header");
 
     elf32_section_header_table.resize(elf32_header.e_shnum);
     number_of_sections=elf32_header.e_shnum;
@@ -68,7 +69,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     // string table
     unsigned string_table_nr=elf32_header.e_shstrndx;
     if(string_table_nr>=elf32_section_header_table.size())
-      throw "ELF32 without string table"; // NOLINT(readability/throw)
+      throw deserialization_exceptiont("ELF32 without string table");
 
     string_table_offset=section_offset(string_table_nr);
   }
@@ -87,15 +88,15 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     else if(ei_data==2)
       little_endian=false;
     else
-      throw "ELF64 header malformed (EI_DATA)"; // NOLINT(readability/throw)
+      throw deserialization_exceptiont("ELF64 header malformed (EI_DATA)");
 
     if(elf64_header.e_version!=1)
-      throw "unknown ELF64 version";
+      throw deserialization_exceptiont("unknown ELF64 version");
 
     // get offset for section header
     if(elf64_header.e_shoff==0 ||
        elf64_header.e_shnum==0)
-      throw "ELF64 without section header"; // NOLINT(readability/throw)
+      throw deserialization_exceptiont("ELF64 without section header");
 
     elf64_section_header_table.resize(elf64_header.e_shnum);
     number_of_sections=elf64_header.e_shnum;
@@ -115,7 +116,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     // string table
     unsigned string_table_nr=elf64_header.e_shstrndx;
     if(string_table_nr>=elf64_section_header_table.size())
-      throw "ELF64 without string table"; // NOLINT(readability/throw)
+      throw deserialization_exceptiont("ELF64 without string table");
 
     string_table_offset=section_offset(string_table_nr);
   }
