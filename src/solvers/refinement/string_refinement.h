@@ -29,6 +29,28 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_refinement_util.h>
 
+// clang-format off
+#define OPT_STRING_REFINEMENT \
+  "(no-refine-strings)" \
+  "(string-printable)" \
+  "(max-nondet-string-length):"
+
+#define HELP_STRING_REFINEMENT \
+  " --no-refine-strings          turn off string refinement\n" \
+  " --string-printable           restrict to printable strings (experimental)\n" /* NOLINT(*) */ \
+  " --max-nondet-string-length n bound the length of nondet (e.g. input) strings\n" /* NOLINT(*) */
+
+// The integration of the string solver into CBMC is incomplete. Therefore,
+// it is not turned on by default and not all options are available.
+#define OPT_STRING_REFINEMENT_CBMC \
+  "(refine-strings)" \
+  "(string-printable)"
+
+#define HELP_STRING_REFINEMENT_CBMC \
+  " --refine-strings             use string refinement (experimental)\n" \
+  " --string-printable           restrict to printable strings (experimental)\n" /* NOLINT(*) */
+// clang-format on
+
 #define DEFAULT_MAX_NB_REFINEMENT std::numeric_limits<size_t>::max()
 
 class string_refinementt final: public bv_refinementt

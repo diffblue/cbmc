@@ -1,9 +1,9 @@
 CORE symex-driven-lazy-loading-expected-failure
 Test.class
---function Test.check --lazy-methods
+--function Test.check
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
-This doesn't work under symex-driven lazy loading because it is incompatible with --lazy-methods
+This doesn't work under symex-driven lazy loading because it is incompatible with lazy-methods (default)

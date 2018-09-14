@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 test.class
---lazy-methods --verbosity 10 --function test.f --lazy-methods-extra-entry-point 'test.*'
+--verbosity 10 --function test.f --lazy-methods-extra-entry-point 'test.*'
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL
@@ -9,4 +9,4 @@ CI lazy methods: elaborate java::test\.sety:\(I\)V
 CI lazy methods: elaborate java::test\.sety:\(F\)V
 --
 --
-This doesn't work under symex-driven lazy loading because it is incompatible with --lazy-methods
+This doesn't work under symex-driven lazy loading because it is incompatible with lazy-methods (default)

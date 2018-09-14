@@ -29,6 +29,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-symex/path_storage.h>
 
+#include <solvers/refinement/string_refinement.h>
+
 #include <java_bytecode/java_bytecode_language.h>
 
 class bmct;
@@ -52,11 +54,7 @@ class optionst;
   "(no-sat-preprocessor)" \
   "(beautify)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
-  "(refine-strings)" /* will go away */ \
-  "(no-refine-strings)" \
-  "(string-printable)" \
-  "(string-max-input-length):" /* will go away */ \
-  "(max-nondet-string-length):" \
+  OPT_STRING_REFINEMENT \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_CLASS_HIERARCHY \

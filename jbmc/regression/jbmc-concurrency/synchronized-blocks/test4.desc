@@ -1,6 +1,6 @@
 CORE
 A.class
---function 'A.aStatic' --lazy-methods
+--function 'A.aStatic'
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

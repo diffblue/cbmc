@@ -1,9 +1,9 @@
 CORE symex-driven-lazy-loading-expected-failure
 Main.class
---lazy-methods
+
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL
 --
 --
-This doesn't work under symex-driven lazy loading because it is incompatible with --lazy-methods
+This doesn't work under symex-driven lazy loading because it is incompatible with lazy-methods (default)

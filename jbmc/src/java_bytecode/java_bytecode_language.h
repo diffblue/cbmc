@@ -31,15 +31,11 @@ Author: Daniel Kroening, kroening@kroening.com
   "(disable-uncaught-exception-check)" \
   "(throw-assertion-error)" \
   "(java-assume-inputs-non-null)" \
-  "(java-throw-runtime-exceptions)" /* will go away */ \
   "(throw-runtime-exceptions)" \
-  "(java-max-input-array-length):" /* will go away */ \
   "(max-nondet-array-length):" \
-  "(java-max-input-tree-depth):" /* will go away */ \
   "(max-nondet-tree-depth):" \
   "(java-max-vla-length):" \
   "(java-cp-include-files):" \
-  "(lazy-methods)" /* will go away */ \
   "(no-lazy-methods)" \
   "(lazy-methods-extra-entry-point):" \
   "(java-load-class):" \

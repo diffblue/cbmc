@@ -355,7 +355,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     for(const char *opt :
       { "nondet-static",
         "full-slice",
-        "lazy-methods",
         "reachability-slice",
         "reachability-slice-fb" })
     {
@@ -485,18 +484,16 @@ int jbmc_parse_optionst::doit()
   }
 
   object_factory_params.max_nondet_array_length =
-    cmdline.isset("java-max-input-array-length")
-      ? std::stoul(cmdline.get_value("java-max-input-array-length"))
+    cmdline.isset("max-nondet-array-length")
+      ? std::stoul(cmdline.get_value("max-nondet-array-length"))
       : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
   object_factory_params.max_nondet_string_length =
     cmdline.isset("max-nondet-string-length")
       ? std::stoul(cmdline.get_value("max-nondet-string-length"))
-      : cmdline.isset("string-max-input-length") // obsolete; will go away
-        ? std::stoul(cmdline.get_value("string-max-input-length"))
-        : MAX_NONDET_STRING_LENGTH;
+      : MAX_NONDET_STRING_LENGTH;
   object_factory_params.max_nondet_tree_depth =
-    cmdline.isset("java-max-input-tree-depth")
-      ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
+    cmdline.isset("max-nondet-tree-depth")
+      ? std::stoul(cmdline.get_value("max-nondet-tree-depth"))
       : MAX_NONDET_TREE_DEPTH;
 
   stub_objects_are_not_null = cmdline.isset("java-assume-inputs-non-null");
@@ -1087,9 +1084,7 @@ void jbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
-    " --no-refine-strings          turn off string refinement\n"
-    " --string-printable           restrict to printable strings (experimental)\n" // NOLINT(*)
-    " --max-nondet-string-length   bound the length of nondet (e.g. input) strings\n" // NOLINT(*)
+    HELP_STRING_REFINEMENT
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
