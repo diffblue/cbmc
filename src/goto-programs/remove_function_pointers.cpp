@@ -281,7 +281,7 @@ void remove_function_pointerst::remove_function_pointer(
   const code_function_callt &code=
     to_code_function_call(target->code);
 
-  const exprt &function=code.function();
+  const auto &function = to_dereference_expr(code.function());
 
   // this better have the right type
   code_typet call_type=to_code_type(function.type());
@@ -296,12 +296,9 @@ void remove_function_pointerst::remove_function_pointer(
         code_typet::parametert(it->type()));
   }
 
-  assert(function.id()==ID_dereference);
-  assert(function.operands().size()==1);
-
   bool found_functions;
 
-  const exprt &pointer=function.op0();
+  const exprt &pointer = function.pointer();
   remove_const_function_pointerst::functionst functions;
   does_remove_constt const_removal_check(goto_program, ns);
   const auto does_remove_const = const_removal_check();
