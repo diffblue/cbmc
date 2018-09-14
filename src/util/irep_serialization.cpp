@@ -16,6 +16,7 @@ Date: May 2007
 #include <sstream>
 #include <iostream>
 
+#include "exception_utils.h"
 #include "string_hash.h"
 
 void irep_serializationt::write_irep(
@@ -95,8 +96,7 @@ void irep_serializationt::read_irep(
 
   if(in.get()!=0)
   {
-    std::cerr << "irep not terminated\n";
-    throw 0;
+    throw deserialization_exceptiont("irep not terminated");
   }
 }
 
@@ -150,7 +150,7 @@ std::size_t irep_serializationt::insert_on_read(
       std::pair<bool, irept>(false, get_nil_irep()));
 
   if(ireps_container.ireps_on_read[id].first)
-    throw "irep id read twice.";
+    throw deserialization_exceptiont("irep id read twice.");
   else
   {
     ireps_container.ireps_on_read[id]=

@@ -11,6 +11,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 #include "json_irep.h"
 
+#include "exception_utils.h"
 #include "irep.h"
 #include "json.h"
 
@@ -103,8 +104,11 @@ irept json_irept::convert_from_json(const jsont &in) const
     have_keys.push_back(keyval.first);
   std::sort(have_keys.begin(), have_keys.end());
   if(have_keys!=std::vector<std::string>{"comment", "id", "namedSub", "sub"})
-    throw "irep JSON representation is missing one of needed keys: "
-      "'id', 'sub', 'namedSub', 'comment'";
+  {
+    throw deserialization_exceptiont(
+      "irep JSON representation is missing one of needed keys: "
+      "'id', 'sub', 'namedSub', 'comment'");
+  }
 
   irept out(in["id"].value);
 
