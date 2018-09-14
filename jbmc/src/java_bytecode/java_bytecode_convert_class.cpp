@@ -501,11 +501,16 @@ void java_bytecode_convert_classt::convert(
   {
     for(const methodt &method : overlay_class.get().methods)
     {
-      if(is_ignored_method(method))
-        continue;
       const irep_idt method_identifier =
         qualified_classname + "." + id2string(method.name)
           + ":" + method.descriptor;
+      if(is_ignored_method(method))
+      {
+        debug()
+          << "Ignoring method:  '" << method_identifier << "'"
+          << eom;
+        continue;
+      }
       if(method_bytecode.contains_method(method_identifier))
       {
         // This method has already been discovered and added to method_bytecode
@@ -544,11 +549,16 @@ void java_bytecode_convert_classt::convert(
   }
   for(const methodt &method : c.methods)
   {
-    if(is_ignored_method(method))
-      continue;
     const irep_idt method_identifier=
       qualified_classname + "." + id2string(method.name)
         + ":" + method.descriptor;
+    if(is_ignored_method(method))
+    {
+      debug()
+        << "Ignoring method:  '" << method_identifier << "'"
+        << eom;
+      continue;
+    }
     if(method_bytecode.contains_method(method_identifier))
     {
       // This method has already been discovered while parsing an overlay
