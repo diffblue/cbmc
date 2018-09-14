@@ -118,11 +118,44 @@ private:
   // see definition below for more info
   static void add_array_types(symbol_tablet &symbol_table);
 
+  /// Check if a method is an overlay method by searching for
+  /// `ID_overlay_method` in its list of annotations.
+  ///
+  /// An overlay method is a method with the annotation
+  /// \@OverlayMethodImplementation. They should only appear in
+  /// [overlay classes](\ref java_class_loader.cpp::is_overlay_class). They
+  /// will be loaded by JBMC instead of the method with the same signature
+  /// in the underlying class. It is an error if there is no method with the
+  /// same signature in the underlying class. It is an error if a method in
+  /// an overlay class has the same signature as a method in the underlying
+  /// class and it isn't marked as an overlay method or an
+  /// [ignored method](\ref java_bytecode_convert_classt::is_ignored_method).
+  ///
+  /// \param method: a `methodt` object from a java bytecode parse tree
+  /// \return true if the method is an overlay method, else false
   static bool is_overlay_method(const methodt &method)
   {
     return method.has_annotation(ID_overlay_method);
   }
 
+  /// Check if a method is an ignored method by searching for
+  /// `ID_ignored_method` in its list of annotations.
+  ///
+  /// An ignored method is a method with the annotation
+  /// \@IgnoredMethodImplementation. They will be ignored by JBMC. They are
+  /// intended for use in
+  /// [overlay classes](\ref java_class_loader.cpp::is_overlay_class), in
+  /// particular for methods which must exist in the overlay class so that
+  /// it will compile, e.g. default constructors, but which we do not want
+  /// to overlay the corresponding method in the
+  /// underlying class. It is an error if a method in
+  /// an overlay class has the same signature as a method in the underlying
+  /// class and it isn't marked as an
+  /// [overlay method](\ref java_bytecode_convert_classt::is_overlay_method)
+  /// or an ignored method.
+  ///
+  /// \param method: a `methodt` object from a java bytecode parse tree
+  /// \return true if the method is an ignored method, else false
   static bool is_ignored_method(const methodt &method)
   {
     return method.has_annotation(ID_ignored_method);
@@ -468,11 +501,16 @@ void java_bytecode_convert_classt::convert(
   {
     for(const methodt &method : overlay_class.get().methods)
     {
-      if(is_ignored_method(method))
-        continue;
       const irep_idt method_identifier =
         qualified_classname + "." + id2string(method.name)
           + ":" + method.descriptor;
+      if(is_ignored_method(method))
+      {
+        debug()
+          << "Ignoring method:  '" << method_identifier << "'"
+          << eom;
+        continue;
+      }
       if(method_bytecode.contains_method(method_identifier))
       {
         // This method has already been discovered and added to method_bytecode
@@ -511,11 +549,16 @@ void java_bytecode_convert_classt::convert(
   }
   for(const methodt &method : c.methods)
   {
-    if(is_ignored_method(method))
-      continue;
     const irep_idt method_identifier=
       qualified_classname + "." + id2string(method.name)
         + ":" + method.descriptor;
+    if(is_ignored_method(method))
+    {
+      debug()
+        << "Ignoring method:  '" << method_identifier << "'"
+        << eom;
+      continue;
+    }
     if(method_bytecode.contains_method(method_identifier))
     {
       // This method has already been discovered while parsing an overlay
