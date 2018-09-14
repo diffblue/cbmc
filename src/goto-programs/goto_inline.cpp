@@ -199,7 +199,8 @@ void goto_partial_inline(
       if(goto_function.is_inlined() ||
          goto_program.instructions.size()<=smallfunc_limit)
       {
-        INVARIANT(i_it->is_function_call(), "is a call");
+        PRECONDITION(i_it->is_function_call());
+
         call_list.push_back(goto_inlinet::callt(i_it, false));
       }
     }
