@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2irep.h"
 
-#include <cassert>
 #include <stack>
 
 #include "smt2_tokenizer.h"

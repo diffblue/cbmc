@@ -968,6 +968,10 @@ public:
   {
   }
 
+  plus_exprt(const typet &type) : multi_ary_exprt(ID_plus, type)
+  {
+  }
+
   plus_exprt(
     const exprt &_lhs,
     const exprt &_rhs):

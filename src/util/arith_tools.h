@@ -125,7 +125,7 @@ optionalt<Target> numeric_cast(const exprt &arg)
 }
 
 /// Convert an mp_integer to integral type Target
-/// An invariant with fail if the conversion is not possible.
+/// An invariant will fail if the conversion is not possible.
 /// \tparam Target: type to convert to
 /// \param arg: mp_integer
 /// \return value of type Target
@@ -138,7 +138,7 @@ Target numeric_cast_v(const mp_integer &arg)
 }
 
 /// Convert an expression to integral type Target
-/// An invariant with fail if the conversion is not possible.
+/// An invariant will fail if the conversion is not possible.
 /// \tparam Target: type to convert to
 /// \param arg: constant expression
 /// \return value of type Target
