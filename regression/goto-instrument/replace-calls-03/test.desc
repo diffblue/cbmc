@@ -1,8 +1,8 @@
 CORE
 main.c
 --replace-calls f:g
-Functions f and g are not type-compatible
-^EXIT=11$
+functions f and g are not type-compatible
+^EXIT=1$
 ^SIGNAL=0$
 --
 ^warning: ignoring
