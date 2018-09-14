@@ -30,7 +30,7 @@ static exprt build_class_identifier(
     const typet &type=ns.follow(e.type());
     const struct_typet &struct_type=to_struct_type(type);
     const struct_typet::componentst &components=struct_type.components();
-    assert(!components.empty());
+    INVARIANT(!components.empty(), "class structs cannot be empty");
 
     const auto &first_member_name=components.front().get_name();
     member_exprt member_expr(
@@ -61,10 +61,9 @@ exprt get_class_identifier_field(
   // Get a pointer from which we can extract a clsid.
   // If it's already a pointer to an object of some sort, just use it;
   // if it's void* then use the suggested type.
+  PRECONDITION(this_expr_in.type().id() == ID_pointer);
 
   exprt this_expr=this_expr_in;
-  assert(this_expr.type().id()==ID_pointer &&
-         "Non-pointer this-arg in remove-virtuals?");
   const auto &points_to=this_expr.type().subtype();
   if(points_to==empty_typet())
     this_expr=typecast_exprt(this_expr, pointer_type(suggested_type));
