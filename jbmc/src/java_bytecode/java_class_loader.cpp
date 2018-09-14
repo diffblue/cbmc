@@ -69,9 +69,25 @@ java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
 }
 
 /// Check if class is an overlay class by searching for `ID_overlay_class` in
-/// its list of annotations. TODO(nathan) give a short explanation about what
-/// overlay classes are.
-/// \param c: a `classt` object from a java byte code parse tree
+/// its list of annotations.
+///
+/// An overlay class is a class with the annotation
+/// \@OverlayClassImplementation. They serve the following purpose. When the JVM
+/// searches the classpath for a particular class, it uses the first match,
+/// and ignores any later matches. JBMC, however, will take account of later
+/// matches as long as they are overlay classes. The
+/// first match is then referred to as the underlying class. The
+/// overlay classes can change the methods of the underlying class in the
+/// following ways: adding a field (by having a new field), adding a method
+/// (by having a new method) or
+/// [changing the definition of a method](\ref java_bytecode_convert_classt::is_overlay_method).
+/// It is an error if a method in an overlay class has the same signature as
+/// a method in the underlying class and it isn't marked as an
+/// [overlay method](\ref java_bytecode_convert_classt::is_overlay_method)
+/// or an
+/// [ignored method](\ref java_bytecode_convert_classt::is_ignored_method).
+///
+/// \param c: a `classt` object from a java bytecode parse tree
 /// \return true if parsed class is an overlay class, else false
 static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
 {
