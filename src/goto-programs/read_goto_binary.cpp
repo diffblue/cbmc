@@ -36,6 +36,20 @@ bool read_goto_binary(
     filename, dest.symbol_table, dest.goto_functions, message_handler);
 }
 
+optionalt<goto_modelt>
+read_goto_binary(const std::string &filename, message_handlert &message_handler)
+{
+  goto_modelt dest;
+
+  if(read_goto_binary(
+       filename, dest.symbol_table, dest.goto_functions, message_handler))
+  {
+    return {};
+  }
+  else
+    return std::move(dest);
+}
+
 bool read_goto_binary(
   const std::string &filename,
   symbol_tablet &symbol_table,
