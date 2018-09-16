@@ -72,10 +72,11 @@ public:
   void output(std::ostream &);
 
 protected:
-  unsigned_union_find uuf;
+  using uuft = unsigned_union_find;
+  uuft uuf;
 
   // map from root to other elements of same set
-  expanding_vectort<std::set<unsigned> > root_map;
+  expanding_vectort<std::set<uuft::size_type> > root_map;
 
   const namespacet *nsptr;
 
@@ -96,15 +97,6 @@ protected:
   }
 
   void get_ids_rec(const exprt &, const std::string &suffix, id_sett &);
-
-  exprt deref_address_id(const irep_idt &id) const
-  {
-    auto it=address_map.find(id);
-    if(it!=address_map.end())
-      return it->second;
-    else
-      return nil_exprt();
-  }
 
   static bool is_address(const irep_idt &id)
   {
