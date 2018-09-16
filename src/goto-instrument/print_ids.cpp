@@ -68,7 +68,7 @@ public:
 
   std::set<exprt> get_objects(const exprt &pointer);
 
-  void output(std::ostream &);
+  void output(std::ostream &) const;
 
 protected:
   using uuft = unsigned_union_find;
@@ -181,7 +181,7 @@ std::set<exprt> aliasest::get_objects(const exprt &src)
   return result;
 }
 
-void aliasest::output(std::ostream &out)
+void aliasest::output(std::ostream &out) const
 {
   for(std::size_t i=0; i<root_map.size(); i++)
     if(!root_map[i].empty())
