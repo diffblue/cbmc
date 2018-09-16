@@ -151,14 +151,10 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
   {
     const code_typet &code_type=to_code_type(src);
     find_symbols(kind, code_type.return_type(), dest);
-    const code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::parameterst::const_iterator
-        it=parameters.begin();
-        it!=parameters.end();
-        it++)
+    for(const auto &p : code_type.parameters())
     {
-      find_symbols(kind, *it, dest);
+      find_symbols(kind, p, dest);
 
       // irep_idt identifier=it->get_identifier();
       // if(!identifier.empty() && (kind==F_TYPE || kind==F_BOTH))

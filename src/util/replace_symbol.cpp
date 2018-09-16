@@ -180,11 +180,9 @@ bool replace_symbolt::replace(typet &dest) const
     code_typet &code_type=to_code_type(dest);
     if(!replace(code_type.return_type()))
       result = false;
-    code_typet::parameterst &parameters=code_type.parameters();
-    for(code_typet::parameterst::iterator it = parameters.begin();
-        it!=parameters.end();
-        it++)
-      if(!replace(*it))
+
+    for(auto &p : code_type.parameters())
+      if(!replace(p))
         result=false;
   }
   else if(dest.id()==ID_array)
@@ -232,13 +230,8 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
     if(have_to_replace(code_type.return_type()))
       return true;
 
-    const code_typet::parameterst &parameters=code_type.parameters();
-
-    for(code_typet::parameterst::const_iterator
-        it=parameters.begin();
-        it!=parameters.end();
-        it++)
-      if(have_to_replace(*it))
+    for(const auto &p : code_type.parameters())
+      if(have_to_replace(p))
         return true;
   }
   else if(dest.id()==ID_array)
