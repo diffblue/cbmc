@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/union_find.h>
 #include <util/type_eq.h>
 #include <util/fresh_symbol.h>
-#include <util/expanding_vector.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -76,7 +75,7 @@ protected:
   uuft uuf;
 
   // map from root to other elements of same set
-  expanding_vectort<std::set<uuft::size_type> > root_map;
+  std::vector<std::set<uuft::size_type> > root_map;
 
   const namespacet *nsptr;
 
@@ -161,12 +160,13 @@ std::set<exprt> aliasest::get_objects(const exprt &src)
     if(is_address(root_id))
       result_ids.insert(root_id);
 
-    for(const auto &alias : root_map[root])
-    {
-      irep_idt alias_id=dstringt::make_from_table_index(alias);
-      if(is_address(alias_id))
-        result_ids.insert(alias_id);
-    }
+    if(root<root_map.size())
+      for(const auto &alias : root_map[root])
+      {
+        irep_idt alias_id=dstringt::make_from_table_index(alias);
+        if(is_address(alias_id))
+          result_ids.insert(alias_id);
+      }
   }
 
   std::set<exprt> result;
@@ -183,7 +183,7 @@ std::set<exprt> aliasest::get_objects(const exprt &src)
 
 void aliasest::output(std::ostream &out)
 {
-  for(std::size_t i=0; i<uuf.size(); i++)
+  for(std::size_t i=0; i<root_map.size(); i++)
     if(!root_map[i].empty())
     {
       out << dstringt::make_from_table_index(i);
@@ -472,9 +472,9 @@ void aliasest::operator()(const goto_modelt &goto_model)
     }
 
     // build root map
-    root_map[uuf.size()];
+    root_map.resize(uuf.size());
 
-    for(std::size_t i=0; i<uuf.size(); i++)
+    for(std::size_t i=0; i<root_map.size(); i++)
       root_map[i].clear();
 
     for(std::size_t i=0; i<uuf.size(); i++)
