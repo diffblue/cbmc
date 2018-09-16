@@ -118,6 +118,10 @@ public:
     const goto_functionst &,
     const irep_idt &function_id,
     const code_function_callt &);
+
+  bool deref_type_compatible(
+    const typet &deref_type,
+    const typet &object_type) const;
 };
 
 void aliasest::do_assignment(const exprt &lhs, const exprt &rhs)
@@ -206,6 +210,35 @@ void aliasest::merge_ids(
     id2=id1;
 }
 
+bool aliasest::deref_type_compatible(const typet &deref_type, const typet &object_type) const
+{
+  if(deref_type.id()==ID_pointer && object_type.id()==ID_pointer)
+    return true;
+
+  if(deref_type==object_type)
+    return true;
+
+  const typet &deref_type_followed=nsptr->follow(deref_type);
+  const typet &object_type_followed=nsptr->follow(object_type);
+
+  // if both are structs, we allow the prefix scenario
+  if(deref_type_followed.id()==ID_struct &&
+     object_type_followed.id()==ID_struct)
+  {
+    const auto &deref_struct = to_struct_type(deref_type_followed);
+    const auto &object_struct = to_struct_type(object_type_followed);
+
+    return deref_struct.is_prefix_of(object_struct);
+  }
+
+  // we allow dereferencing anything using any scalar type
+  if(deref_type.id()==ID_unsignedbv ||
+     deref_type.id()==ID_signedbv)
+    return true;
+
+  return false;
+}
+
 void aliasest::merge_ids_rec(
   const exprt &src,
   const std::string &suffix,
@@ -247,7 +280,8 @@ void aliasest::merge_ids_rec(
     {
       // need to strip '&'
       const auto deref_id=deref_address_id(address);
-      merge_ids_rec(deref_id, suffix, id);
+      if(deref_type_compatible(src.type(), deref_id.type()))
+        merge_ids_rec(deref_id, suffix, id);
     }
   }
   else if(src.id()==ID_address_of)
@@ -260,6 +294,11 @@ void aliasest::merge_ids_rec(
       address_map[final_id]=obj;
       merge_ids(final_id, id);
     }
+  }
+  else if(src.id()==ID_plus || src.id()==ID_minus)
+  {
+    for(const auto &op : src.operands())
+      merge_ids_rec(op, suffix, id);
   }
 }
 
@@ -304,7 +343,8 @@ void aliasest::get_ids_rec(
     {
       // need to strip '&'
       const auto deref_id=deref_address_id(address);
-      get_ids_rec(deref_id, suffix, dest);
+      if(deref_type_compatible(src.type(), deref_id.type()))
+        get_ids_rec(deref_id, suffix, dest);
     }
   }
   else if(src.id()==ID_address_of)
@@ -317,6 +357,11 @@ void aliasest::get_ids_rec(
       address_map[final_id]=obj;
       dest.insert(final_id);
     }
+  }
+  else if(src.id()==ID_plus || src.id()==ID_minus)
+  {
+    for(const auto &op : src.operands())
+      get_ids_rec(op, suffix, dest);
   }
 }
 
