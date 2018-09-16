@@ -260,6 +260,11 @@ void aliasest::merge_ids_rec(
       address_map[final_id]=obj;
       merge_ids(final_id, id);
     }
+    else if(obj.id()==ID_dereference)
+    {
+      const exprt &pointer=to_dereference_expr(obj).pointer();
+      merge_ids_rec(pointer, suffix, id);
+    }
   }
 }
 
@@ -316,6 +321,11 @@ void aliasest::get_ids_rec(
       const irep_idt final_id="&"+id2string(symbol_id);
       address_map[final_id]=obj;
       dest.insert(final_id);
+    }
+    else if(obj.id()==ID_dereference)
+    {
+      const exprt &pointer=to_dereference_expr(obj).pointer();
+      get_ids_rec(pointer, suffix, dest);
     }
   }
 }
@@ -697,6 +707,7 @@ public:
     }
     else
     {
+      std::cout << "LHSb\n";
       if(is_global(lhs, ns))
         global_direct++;
     }
@@ -740,6 +751,12 @@ void global_stats(const goto_modelt &goto_model)
   aliasest aliases;
 
   aliases(goto_model);
+
+  #if 0
+  std::cout << "---------\n";
+  aliases.output(std::cout);
+  std::cout << "---------\n";
+  #endif
 
   for(const auto &f : goto_model.goto_functions.function_map)
   {
