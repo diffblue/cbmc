@@ -253,17 +253,12 @@ void aliasest::merge_ids_rec(
   else if(src.id()==ID_address_of)
   {
     const exprt &obj=to_address_of_expr(src).object();
-    if(obj.id()==ID_symbol)
+    const auto tmp=get_ids(obj);
+    for(const auto &i : tmp)
     {
-      const irep_idt symbol_id=to_symbol_expr(obj).get_identifier();
-      const irep_idt final_id="&"+id2string(symbol_id);
+      const irep_idt final_id="&"+id2string(i);
       address_map[final_id]=obj;
       merge_ids(final_id, id);
-    }
-    else if(obj.id()==ID_dereference)
-    {
-      const exprt &pointer=to_dereference_expr(obj).pointer();
-      merge_ids_rec(pointer, suffix, id);
     }
   }
 }
@@ -315,17 +310,12 @@ void aliasest::get_ids_rec(
   else if(src.id()==ID_address_of)
   {
     const exprt &obj=to_address_of_expr(src).object();
-    if(obj.id()==ID_symbol)
+    const auto tmp=get_ids(obj);
+    for(const auto &i : tmp)
     {
-      const irep_idt symbol_id=to_symbol_expr(obj).get_identifier();
-      const irep_idt final_id="&"+id2string(symbol_id);
+      const irep_idt final_id="&"+id2string(i);
       address_map[final_id]=obj;
       dest.insert(final_id);
-    }
-    else if(obj.id()==ID_dereference)
-    {
-      const exprt &pointer=to_dereference_expr(obj).pointer();
-      get_ids_rec(pointer, suffix, dest);
     }
   }
 }
@@ -691,14 +681,18 @@ public:
   {
     if(has_deref(lhs))
     {
-      auto addresses=aliases.get_addresses(address_of_exprt(lhs));
+      auto ids=aliases.get_ids(lhs);
 
       bool global_write=false;
 
-      for(const auto &a : addresses)
+      for(const auto &id : ids)
       {
-        const auto deref=aliases.deref_address_id(a);
-        if(is_global(deref, ns))
+        // strip anything after '.' or '['
+        std::size_t cut_point=id2string(id).find_first_of(".[");
+        const irep_idt final_id=
+          cut_point==std::string::npos?id:std::string(id2string(id), 0, cut_point);
+
+        if(ns.lookup(final_id).is_static_lifetime)
           global_write=true;
       }
 
@@ -707,7 +701,6 @@ public:
     }
     else
     {
-      std::cout << "LHSb\n";
       if(is_global(lhs, ns))
         global_direct++;
     }
