@@ -58,13 +58,35 @@ class aliasest
 public:
   using id_sett = std::set<irep_idt>;
 
+  void operator()(const goto_modelt &goto_model);
+
+  id_sett get_ids(const exprt &src)
+  {
+    id_sett ids;
+    get_ids(src, ids);
+    return ids;
+  }
+
+  id_sett get_addresses(const exprt &);
+
+  exprt deref_address_id(const irep_idt &id) const
+  {
+    auto it=address_map.find(id);
+    if(it!=address_map.end())
+      return it->second;
+    else
+      return nil_exprt();
+  }
+
+  void output(std::ostream &);
+
+protected:
   unsigned_union_find uuf;
 
   // map from root to other elements of same set
   expanding_vectort<std::set<unsigned> > root_map;
 
   const namespacet *nsptr;
-  void operator()(const goto_modelt &goto_model);  
 
   void merge_ids(
     const irep_idt &id1, 
@@ -77,13 +99,6 @@ public:
 
   void merge_ids_rec(const exprt &, const std::string &suffix, optionalt<irep_idt> &id);
 
-  id_sett get_ids(const exprt &src)
-  {
-    id_sett ids;
-    get_ids(src, ids);
-    return ids;
-  }
-
   void get_ids(const exprt &src, id_sett &dest)
   {
     get_ids_rec(src, "", dest);
@@ -91,22 +106,9 @@ public:
 
   void get_ids_rec(const exprt &, const std::string &suffix, id_sett &);
 
-  void output(std::ostream &);
-
-  id_sett get_addresses(const exprt &);
-
   static bool is_address(const irep_idt &id)
   {
     return !id.empty() && id[0]=='&';
-  }
-
-  exprt deref_address_id(const irep_idt &id) const
-  {
-    auto it=address_map.find(id);
-    if(it!=address_map.end())
-      return it->second;
-    else
-      return nil_exprt();
   }
 
   std::map<irep_idt, exprt> address_map;
