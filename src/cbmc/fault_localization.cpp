@@ -26,7 +26,8 @@ Author: Peter Schrammel
 #include <goto-symex/build_goto_trace.h>
 #include <goto-programs/xml_goto_trace.h>
 
-#include "bmc_util.h"
+#include <goto-checker/bmc_util.h>
+
 #include "counterexample_beautification.h"
 
 void fault_localizationt::freeze_guards()

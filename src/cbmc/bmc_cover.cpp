@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <chrono>
 #include <iomanip>
 
-#include <cbmc/bmc_util.h>
+#include <goto-checker/bmc_util.h>
 
 #include <util/xml.h>
 #include <util/xml_expr.h>

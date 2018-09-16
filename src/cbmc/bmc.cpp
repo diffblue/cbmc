@@ -24,9 +24,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/static_lifetime_init.h>
 
+#include <goto-checker/bmc_util.h>
 #include <goto-checker/solver_factory.h>
 
-#include "bmc_util.h"
 #include "counterexample_beautification.h"
 #include "fault_localization.h"
 

@@ -85,7 +85,6 @@ java-testing-utils-clean:
 BMC_DEPS =$(CPROVER_DIR)/src/cbmc/all_properties$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/bmc$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/bmc_cover$(OBJEXT) \
-          $(CPROVER_DIR)/src/cbmc/bmc_util$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/cbmc_languages$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/cbmc_parse_options$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/counterexample_beautification$(OBJEXT) \
