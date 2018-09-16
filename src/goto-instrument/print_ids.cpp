@@ -67,16 +67,7 @@ public:
     return ids;
   }
 
-  id_sett get_addresses(const exprt &);
-
-  exprt deref_address_id(const irep_idt &id) const
-  {
-    auto it=address_map.find(id);
-    if(it!=address_map.end())
-      return it->second;
-    else
-      return nil_exprt();
-  }
+  std::set<exprt> get_objects(const exprt &pointer);
 
   void output(std::ostream &);
 
@@ -105,6 +96,15 @@ protected:
   }
 
   void get_ids_rec(const exprt &, const std::string &suffix, id_sett &);
+
+  exprt deref_address_id(const irep_idt &id) const
+  {
+    auto it=address_map.find(id);
+    if(it!=address_map.end())
+      return it->second;
+    else
+      return nil_exprt();
+  }
 
   static bool is_address(const irep_idt &id)
   {
@@ -154,9 +154,9 @@ void aliasest::do_assignment(const exprt &lhs, const exprt &rhs)
   }
 }
 
-aliasest::id_sett aliasest::get_addresses(const exprt &src)
+std::set<exprt> aliasest::get_objects(const exprt &src)
 {
-  id_sett result;
+  id_sett result_ids;
   
   const auto ids = get_ids(src);
 
@@ -167,14 +167,23 @@ aliasest::id_sett aliasest::get_addresses(const exprt &src)
     irep_idt root_id=dstringt::make_from_table_index(root);
 
     if(is_address(root_id))
-      result.insert(root_id);
+      result_ids.insert(root_id);
 
     for(const auto &alias : root_map[root])
     {
       irep_idt alias_id=dstringt::make_from_table_index(alias);
       if(is_address(alias_id))
-        result.insert(alias_id);
+        result_ids.insert(alias_id);
     }
+  }
+
+  std::set<exprt> result;
+
+  for(const auto &id : result_ids)
+  {
+    auto it=address_map.find(id);
+    if(it!=address_map.end())
+      result.insert(it->second);
   }
 
   return result;
@@ -277,13 +286,11 @@ void aliasest::merge_ids_rec(
   else if(src.id()==ID_dereference)
   {
     const auto &pointer=to_dereference_expr(src).pointer();
-    const auto addresses=get_addresses(pointer);
-    for(const auto &address : addresses)
+    const auto objects=get_objects(pointer);
+    for(const auto &o : objects)
     {
-      // need to strip '&'
-      const auto deref_id=deref_address_id(address);
-      if(deref_type_compatible(src.type(), deref_id.type()))
-        merge_ids_rec(deref_id, suffix, id);
+      if(deref_type_compatible(src.type(), o.type()))
+        merge_ids_rec(o, suffix, id);
     }
   }
   else if(src.id()==ID_address_of)
@@ -340,13 +347,11 @@ void aliasest::get_ids_rec(
   else if(src.id()==ID_dereference)
   {
     const auto &pointer=to_dereference_expr(src).pointer();
-    const auto addresses=get_addresses(pointer);
-    for(const auto &address : addresses)
+    const auto objects=get_objects(pointer);
+    for(const auto &o : objects)
     {
-      // need to strip '&'
-      const auto deref_id=deref_address_id(address);
-      if(deref_type_compatible(src.type(), deref_id.type()))
-        get_ids_rec(deref_id, suffix, dest);
+      if(deref_type_compatible(src.type(), o.type()))
+        get_ids_rec(o, suffix, dest);
     }
   }
   else if(src.id()==ID_address_of)
@@ -439,17 +444,14 @@ void aliasest::operator()(const goto_modelt &goto_model)
           if(function.id()==ID_dereference)
           {
             const auto &pointer=to_dereference_expr(function).pointer();
-            auto addresses=get_addresses(pointer);
+            auto objects=get_objects(pointer);
 
-            for(const auto &address : addresses)
+            for(const auto &o : objects)
             {
-              // is this a plain function address?
-              // strip leading '&'
-              const auto deref=deref_address_id(address);
-              if(deref.type().id()==ID_code &&
-                 deref.id()==ID_symbol)
+              // is this a plain function?
+              if(o.type().id()==ID_code && o.id()==ID_symbol)
               {
-                const irep_idt &function_id=to_symbol_expr(deref).get_identifier();
+                const irep_idt &function_id=to_symbol_expr(o).get_identifier();
                 do_function_call(goto_model.goto_functions, function_id, function_call);
               }
             }
@@ -693,17 +695,14 @@ void print_ids(goto_modelt &goto_model)
           std::cout << "CALL at " << target->source_location << ":\n";
 
           const auto &pointer=to_dereference_expr(call.function()).pointer();
-          auto addresses=aliases.get_addresses(pointer);
+          auto objects=aliases.get_objects(pointer);
           std::set<symbol_exprt> functions;
 
-          for(const auto &address : addresses)
+          for(const auto &o : objects)
           {
-            // is this a plain function address?
-            // strip leading '&'
-            const auto deref=aliases.deref_address_id(address);
-            if(deref.type().id()==ID_code &&
-               deref.id()==ID_symbol)
-              functions.insert(to_symbol_expr(deref));
+            // is this a plain function?
+            if(o.type().id()==ID_code && o.id()==ID_symbol)
+              functions.insert(to_symbol_expr(o));
           }
 
           for(const auto &f : functions)
