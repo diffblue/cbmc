@@ -160,7 +160,7 @@ aliasest::id_sett aliasest::get_addresses(const exprt &src)
 
   for(const auto &id : ids)
   {
-    unsigned root=uuf.find(id.get_no());
+    auto root=uuf.find(id.get_no());
 
     irep_idt root_id=dstringt::make_from_table_index(root);
 
@@ -196,8 +196,8 @@ void aliasest::merge_ids(
 {
   if(id2.has_value())
   {
-    unsigned no1=id1.get_no();
-    unsigned no2=id2->get_no();
+    auto no1=id1.get_no();
+    auto no2=id2->get_no();
     if(uuf.find(no1)!=uuf.find(no2))
     {
       merge_happened=true;
