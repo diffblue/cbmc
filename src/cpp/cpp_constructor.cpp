@@ -213,18 +213,15 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
 
     irep_idt constructor_name;
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &c : components)
     {
-      const typet &type=it->type();
+      const typet &type = c.type();
 
-      if(!it->get_bool(ID_from_base) &&
-         type.id()==ID_code &&
-         type.find(ID_return_type).id()==ID_constructor)
+      if(
+        !c.get_bool(ID_from_base) && type.id() == ID_code &&
+        type.find(ID_return_type).id() == ID_constructor)
       {
-        constructor_name=it->get(ID_base_name);
+        constructor_name = c.get(ID_base_name);
         break;
       }
     }

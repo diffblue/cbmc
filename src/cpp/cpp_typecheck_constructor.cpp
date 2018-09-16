@@ -283,21 +283,21 @@ void cpp_typecheckt::default_cpctor(
   // Then, we add the member initializers
   const struct_typet::componentst &components=
     to_struct_type(symbol.type).components();
-  for(struct_typet::componentst::const_iterator mem_it=components.begin();
-      mem_it!=components.end(); mem_it++)
+
+  for(const auto &mem_c : components)
   {
     // Take care of virtual tables
-    if(mem_it->get_bool("is_vtptr"))
+    if(mem_c.get_bool("is_vtptr"))
     {
       exprt name(ID_name);
-      name.set(ID_identifier, mem_it->get(ID_base_name));
+      name.set(ID_identifier, mem_c.get(ID_base_name));
       name.add_source_location()=source_location;
 
       cpp_namet cppname;
       cppname.move_to_sub(name);
 
       const symbolt &virtual_table_symbol_type =
-        lookup(mem_it->type().subtype().get(ID_identifier));
+        lookup(mem_c.type().subtype().get(ID_identifier));
 
       const symbolt &virtual_table_symbol_var = lookup(
         id2string(virtual_table_symbol_type.name) + "@" +
@@ -305,12 +305,12 @@ void cpp_typecheckt::default_cpctor(
 
       exprt var=virtual_table_symbol_var.symbol_expr();
       address_of_exprt address(var);
-      assert(address.type()==mem_it->type());
+      assert(address.type() == mem_c.type());
 
       already_typechecked(address);
 
       exprt ptrmember(ID_ptrmember);
-      ptrmember.set(ID_component_name, mem_it->get(ID_name));
+      ptrmember.set(ID_component_name, mem_c.get(ID_name));
       ptrmember.operands().push_back(exprt("cpp-this"));
 
       code_assignt assign(ptrmember, address);
@@ -318,13 +318,12 @@ void cpp_typecheckt::default_cpctor(
       continue;
     }
 
-    if( mem_it->get_bool("from_base")
-      || mem_it->get_bool(ID_is_type)
-      || mem_it->get_bool(ID_is_static)
-      || mem_it->type().id()==ID_code)
-        continue;
+    if(
+      mem_c.get_bool("from_base") || mem_c.get_bool(ID_is_type) ||
+      mem_c.get_bool(ID_is_static) || mem_c.type().id() == ID_code)
+      continue;
 
-    irep_idt mem_name=mem_it->get(ID_base_name);
+    irep_idt mem_name = mem_c.get(ID_base_name);
 
     exprt name(ID_name);
     name.set(ID_identifier, mem_name);
@@ -343,7 +342,7 @@ void cpp_typecheckt::default_cpctor(
       static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
     memberexpr.add_source_location()=source_location;
 
-    if(mem_it->type().id()==ID_array)
+    if(mem_c.type().id() == ID_array)
       memberexpr.set(ID_C_array_ini, true);
 
     mem_init.move_to_operands(memberexpr);
@@ -563,27 +562,24 @@ void cpp_typecheckt::check_member_initializers(
     irep_idt base_name=member_name.get_base_name();
     bool ok=false;
 
-    for(struct_typet::componentst::const_iterator
-        c_it=components.begin();
-        c_it!=components.end();
-        c_it++)
+    for(const auto &c : components)
     {
-      if(c_it->get(ID_base_name)!=base_name)
+      if(c.get(ID_base_name) != base_name)
         continue;
 
       // Data member
-      if(!c_it->get_bool(ID_from_base) &&
-         !c_it->get_bool(ID_is_static) &&
-         c_it->get(ID_type)!=ID_code)
+      if(
+        !c.get_bool(ID_from_base) && !c.get_bool(ID_is_static) &&
+        c.get(ID_type) != ID_code)
       {
         ok=true;
         break;
       }
 
       // Maybe it is a parent constructor?
-      if(c_it->get_bool("is_type"))
+      if(c.get_bool("is_type"))
       {
-        typet type=static_cast<const typet&>(c_it->find(ID_type));
+        typet type = static_cast<const typet &>(c.find(ID_type));
         if(type.id() != ID_symbol_type)
           continue;
 
@@ -605,11 +601,10 @@ void cpp_typecheckt::check_member_initializers(
       }
 
       // Parent constructor
-      if(c_it->get_bool(ID_from_base) &&
-         !c_it->get_bool(ID_is_type) &&
-         !c_it->get_bool(ID_is_static) &&
-         c_it->get(ID_type)==ID_code &&
-         c_it->find(ID_type).get(ID_return_type)==ID_constructor)
+      if(
+        c.get_bool(ID_from_base) && !c.get_bool(ID_is_type) &&
+        !c.get_bool(ID_is_static) && c.get(ID_type) == ID_code &&
+        c.find(ID_type).get(ID_return_type) == ID_constructor)
       {
         typet member_type=(typet&) initializer.find(ID_member);
         typecheck_type(member_type);
@@ -743,12 +738,11 @@ void cpp_typecheckt::full_member_initialization(
           // check if the initializer is a data
           bool is_data=false;
 
-          for(struct_typet::componentst::const_iterator c_it =
-              components.begin(); c_it!=components.end(); c_it++)
+          for(const auto &c : components)
           {
-            if(c_it->get(ID_base_name)==base_name &&
-               c_it->get(ID_type)!=ID_code &&
-               !c_it->get_bool(ID_is_type))
+            if(
+              c.get(ID_base_name) == base_name && c.get(ID_type) != ID_code &&
+              !c.get_bool(ID_is_type))
             {
               is_data=true;
               break;

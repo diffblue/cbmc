@@ -353,13 +353,10 @@ std::string expr2ct::convert_rec(
       dest+=" "+id2string(tag);
     dest+=" {";
 
-    for(union_typet::componentst::const_iterator
-        it=union_type.components().begin();
-        it!=union_type.components().end();
-        it++)
+    for(const auto &c : union_type.components())
     {
       dest+=' ';
-      dest+=convert_rec(it->type(), c_qualifierst(), id2string(it->get_name()));
+      dest += convert_rec(c.type(), c_qualifierst(), id2string(c.get_name()));
       dest+=';';
     }
 
@@ -724,8 +721,7 @@ std::string expr2ct::convert_struct_type(
   {
     dest+=" {";
 
-    for(const struct_union_typet::componentt &component :
-      struct_type.components())
+    for(const auto &component : struct_type.components())
     {
       // Skip padding parameters unless we including them
       if(component.get_is_padding() && !inc_padding_components)
@@ -2071,8 +2067,7 @@ std::string expr2ct::convert_struct(
   bool newline=false;
   size_t last_size=0;
 
-  for(const struct_union_typet::componentt &component :
-    struct_type.components())
+  for(const auto &component : struct_type.components())
   {
     if(o_it->type().id()==ID_code)
       continue;

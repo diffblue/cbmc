@@ -141,12 +141,9 @@ exprt boolbvt::bv_get_rec(
       exprt::operandst op;
       op.reserve(components.size());
 
-      for(struct_typet::componentst::const_iterator
-          it=components.begin();
-          it!=components.end();
-          it++)
+      for(const auto &c : components)
       {
-        const typet &subtype=ns.follow(it->type());
+        const typet &subtype = ns.follow(c.type());
         op.push_back(nil_exprt());
 
         std::size_t sub_width=boolbv_width(subtype);

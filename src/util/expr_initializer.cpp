@@ -212,20 +212,16 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
 
     value.operands().reserve(components.size());
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &c : components)
     {
-      if(it->type().id()==ID_code)
+      if(c.type().id() == ID_code)
       {
-        constant_exprt code_value(ID_nil, it->type());
+        constant_exprt code_value(ID_nil, c.type());
         code_value.add_source_location()=source_location;
         value.copy_to_operands(code_value);
       }
       else
-        value.copy_to_operands(
-          expr_initializer_rec(it->type(), source_location));
+        value.copy_to_operands(expr_initializer_rec(c.type(), source_location));
     }
 
     value.add_source_location()=source_location;
@@ -245,20 +241,17 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
 
     // we need to find the largest member
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &c : components)
     {
       // skip methods
-      if(it->type().id()==ID_code)
+      if(c.type().id() == ID_code)
         continue;
 
-      mp_integer bits=pointer_offset_bits(it->type(), ns);
+      mp_integer bits = pointer_offset_bits(c.type(), ns);
 
       if(bits>component_size)
       {
-        component=*it;
+        component = c;
         found=true;
         component_size=bits;
       }

@@ -78,12 +78,9 @@ void endianness_mapt::build_big_endian(const typet &src)
     const struct_typet &struct_type=to_struct_type(src);
 
     // todo: worry about padding being in wrong order
-    for(struct_typet::componentst::const_iterator
-        it=struct_type.components().begin();
-        it!=struct_type.components().end();
-        it++)
+    for(const auto &c : struct_type.components())
     {
-      build_big_endian(it->type());
+      build_big_endian(c.type());
     }
   }
   else if(src.id()==ID_array)

@@ -165,14 +165,9 @@ bool replace_symbolt::replace(typet &dest) const
      dest.id()==ID_union)
   {
     struct_union_typet &struct_union_type=to_struct_union_type(dest);
-    struct_union_typet::componentst &components=
-      struct_union_type.components();
 
-    for(struct_union_typet::componentst::iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-      if(!replace(*it))
+    for(auto &c : struct_union_type.components())
+      if(!replace(c))
         result=false;
   }
   else if(dest.id()==ID_code)
@@ -214,14 +209,8 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
     const struct_union_typet &struct_union_type=
       to_struct_union_type(dest);
 
-    const struct_union_typet::componentst &components=
-      struct_union_type.components();
-
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-      if(have_to_replace(*it))
+    for(const auto &c : struct_union_type.components())
+      if(have_to_replace(c))
         return true;
   }
   else if(dest.id()==ID_code)

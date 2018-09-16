@@ -219,16 +219,13 @@ void boolbvt::convert_with_struct(
 
   std::size_t offset=0;
 
-  for(struct_typet::componentst::const_iterator
-      it=components.begin();
-      it!=components.end();
-      it++)
+  for(const auto &c : components)
   {
-    const typet &subtype=it->type();
+    const typet &subtype = c.type();
 
     std::size_t sub_width=boolbv_width(subtype);
 
-    if(it->get_name()==component_name)
+    if(c.get_name() == component_name)
     {
       if(!base_type_eq(subtype, op2.type(), ns))
       {

@@ -125,17 +125,14 @@ void boolbvt::convert_update_rec(
       const struct_typet::componentst &components=
         struct_type.components();
 
-      for(struct_typet::componentst::const_iterator
-          it=components.begin();
-          it!=components.end();
-          it++)
+      for(const auto &c : components)
       {
-        const typet &subtype=it->type();
+        const typet &subtype = c.type();
         std::size_t sub_width=boolbv_width(subtype);
 
-        if(it->get_name()==component_name)
+        if(c.get_name() == component_name)
         {
-          component=*it;
+          component = c;
           break; // done
         }
 

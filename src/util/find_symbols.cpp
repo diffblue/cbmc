@@ -138,14 +138,9 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
      src.id()==ID_union)
   {
     const struct_union_typet &struct_union_type=to_struct_union_type(src);
-    const struct_union_typet::componentst &components=
-      struct_union_type.components();
 
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-      find_symbols(kind, *it, dest);
+    for(const auto &c : struct_union_type.components())
+      find_symbols(kind, c, dest);
   }
   else if(src.id()==ID_code)
   {
