@@ -43,8 +43,6 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../$(CPROVER_DIR)/src/cbmc/bmc_cover$(OBJEXT) \
       ../$(CPROVER_DIR)/src/cbmc/counterexample_beautification$(OBJEXT) \
       ../$(CPROVER_DIR)/src/cbmc/fault_localization$(OBJEXT) \
-      ../$(CPROVER_DIR)/src/cbmc/symex_bmc$(OBJEXT) \
-      ../$(CPROVER_DIR)/src/cbmc/symex_coverage$(OBJEXT) \
       # Empty last line
 
 INCLUDES= -I .. -I ../$(CPROVER_DIR)/src

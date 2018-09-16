@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Bounded Model Checking for ANSI-C
 
-#ifndef CPROVER_CBMC_SYMEX_BMC_H
-#define CPROVER_CBMC_SYMEX_BMC_H
+#ifndef CPROVER_GOTO_CHECKER_SYMEX_BMC_H
+#define CPROVER_GOTO_CHECKER_SYMEX_BMC_H
 
 #include <util/message.h>
 #include <util/threeval.h>
@@ -115,4 +115,4 @@ protected:
   symex_coveraget symex_coverage;
 };
 
-#endif // CPROVER_CBMC_SYMEX_BMC_H
+#endif // CPROVER_GOTO_CHECKER_SYMEX_BMC_H

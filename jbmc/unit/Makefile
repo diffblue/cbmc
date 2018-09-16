@@ -89,8 +89,6 @@ BMC_DEPS =$(CPROVER_DIR)/src/cbmc/all_properties$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/cbmc_parse_options$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/counterexample_beautification$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/fault_localization$(OBJEXT) \
-          $(CPROVER_DIR)/src/cbmc/symex_bmc$(OBJEXT) \
-          $(CPROVER_DIR)/src/cbmc/symex_coverage$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/xml_interface$(OBJEXT) \
           $(CPROVER_DIR)/src/jsil/expr2jsil$(OBJEXT) \
           $(CPROVER_DIR)/src/jsil/jsil_convert$(OBJEXT) \
