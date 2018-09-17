@@ -1050,11 +1050,6 @@ public:
   incomplete_array_typet():type_with_subtypet(ID_incomplete_array)
   {
   }
-
-  explicit incomplete_array_typet(const typet &_subtype):
-    type_with_subtypet(ID_array, _subtype)
-  {
-  }
 };
 
 /// Check whether a reference to a typet is a \ref incomplete_array_typet.
@@ -1063,7 +1058,7 @@ public:
 template <>
 inline bool can_cast_type<incomplete_array_typet>(const typet &type)
 {
-  return type.id() == ID_array;
+  return type.id() == ID_incomplete_array;
 }
 
 /// \brief Cast a typet to an \ref incomplete_array_typet
