@@ -15,7 +15,7 @@ CPROVER codebase.
 See detailed documentation at \ref irept.
 
 [irept](\ref irept)s are generic tree nodes. You
-should think of each node as holding a single string ([data](irept::data),
+should think of each node as holding a single string ([data](\ref irept::data),
 actually an \ref irep_idt) and lots of child nodes, some of which are numbered
 ([sub](\ref irept::dt::sub)) and some of which are labelled, and the label
 can either start with a “\#” ([comments](\ref irept::dt::comments)) or without
@@ -101,15 +101,15 @@ See documentation at \ref dstringt.
 
 \subsection typet_section typet
 
-See \ref typet.
-
-To be documented.
+\ref typet represents the type of an expression. Types may have subtypes,
+stored in two [sub](\ref irept::dt::sub)s named “subtype” (a single type) and
+“subtypes” (a vector of types). For pre-defined types see `std_types.h` and
+`mathematical_types.h`.
 
 \subsubsection symbol_typet_section symbol_typet
 
-See \ref symbol_typet.
-
-To be documented.
+\ref symbol_typet is a type used to store a reference to the symbol table. The
+full \ref symbolt can be retrieved using the identifier of \ref symbol_typet.
 
 \subsection exprt_section exprt
 
