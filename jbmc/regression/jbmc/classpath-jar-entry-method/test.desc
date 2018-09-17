@@ -1,0 +1,15 @@
+CORE
+jar_file.jar
+--function RelevantClass.entry --verbosity 10
+^EXIT=10
+^SIGNAL=0
+VERIFICATION FAILED
+Getting class `RelevantClass' from JAR jar_file.jar
+Getting class `RelatedClass' from JAR jar_file.jar
+--
+Getting class `IrrelevantClass' from JAR jar_file.jar
+--
+This test checks that when JBMC is given a jar file as an argument and an entry
+method is specified with --function, only classes that are (possibly
+transitively) referenced from the class containing the entry method are loaded
+by java_class_loadert.
