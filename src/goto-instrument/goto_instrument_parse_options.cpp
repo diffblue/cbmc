@@ -898,9 +898,12 @@ void goto_instrument_parse_optionst::get_goto_program()
 {
   status() << "Reading GOTO program from `" << cmdline.args[0] << "'" << eom;
 
-  if(read_goto_binary(cmdline.args[0],
-    goto_model, get_message_handler()))
+  auto result = read_goto_binary(cmdline.args[0], get_message_handler());
+
+  if(!result.has_value())
     throw 0;
+
+  goto_model = std::move(result.value());
 
   config.set(cmdline);
 }
