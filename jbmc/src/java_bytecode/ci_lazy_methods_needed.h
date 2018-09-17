@@ -12,10 +12,11 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #ifndef CPROVER_JAVA_BYTECODE_CI_LAZY_METHODS_H
 #define CPROVER_JAVA_BYTECODE_CI_LAZY_METHODS_H
 
-#include <vector>
 #include <set>
 #include <unordered_set>
+#include <util/namespace.h>
 #include <util/symbol_table.h>
+#include <vector>
 
 class select_pointer_typet;
 class pointer_typet;
