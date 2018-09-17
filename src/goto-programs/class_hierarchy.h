@@ -57,6 +57,10 @@ public:
 
   void operator()(const symbol_tablet &);
 
+  class_hierarchyt() = default;
+  class_hierarchyt(const class_hierarchyt &) = delete;
+  class_hierarchyt &operator=(const class_hierarchyt &) = delete;
+
   // transitively gets all children
   idst get_children_trans(const irep_idt &id) const
   {

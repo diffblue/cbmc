@@ -10,23 +10,14 @@
 
 #include "resolve_inherited_component.h"
 
-/// See the operator() method comment.
-/// \param symbol_table: The symbol table to resolve the component against
-resolve_inherited_componentt::resolve_inherited_componentt(
-  const symbol_tablet &symbol_table):
-    symbol_table(symbol_table)
-{
-  class_hierarchy(symbol_table);
-}
-
 /// See the operator() method comment
 /// \param symbol_table: The symbol table to resolve the component against
 /// \param class_hierarchy: A prebuilt class_hierachy based on the symbol_table
 ///
 resolve_inherited_componentt::resolve_inherited_componentt(
-  const symbol_tablet &symbol_table, const class_hierarchyt &class_hierarchy):
-    class_hierarchy(class_hierarchy),
-    symbol_table(symbol_table)
+  const symbol_tablet &symbol_table,
+  const class_hierarchyt &clas_hierarchy)
+  : class_hierarchy(clas_hierarchy), symbol_table(symbol_table)
 {
   // We require the class_hierarchy to be already populated if we are being
   // supplied it.
@@ -67,18 +58,21 @@ resolve_inherited_componentt::inherited_componentt
       return inherited_componentt(current_class, component_name);
     }
 
-    const class_hierarchyt::idst &parents=
-      class_hierarchy.class_map[current_class].parents;
+    const auto current_class_id = class_hierarchy.class_map.find(current_class);
+    if(current_class_id != class_hierarchy.class_map.end())
+    {
+      const class_hierarchyt::idst &parents = current_class_id->second.parents;
 
-    if(include_interfaces)
-    {
-      classes_to_visit.insert(
-        classes_to_visit.end(), parents.begin(), parents.end());
-    }
-    else
-    {
-      if(!parents.empty())
-        classes_to_visit.push_back(parents.front());
+      if(include_interfaces)
+      {
+        classes_to_visit.insert(
+          classes_to_visit.end(), parents.begin(), parents.end());
+      }
+      else
+      {
+        if(!parents.empty())
+          classes_to_visit.push_back(parents.front());
+      }
     }
   }
 
