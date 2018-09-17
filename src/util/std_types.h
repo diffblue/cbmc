@@ -32,9 +32,10 @@ public:
   }
 };
 
-/// The NIL type, i.e., an invalid type, no value. Use `optional<typet>`
-/// instead where possible.
-class nil_typet:public typet
+/// The NIL type, i.e., an invalid type, no value.
+/// \deprecated Use `optional<typet>` instead.
+// NOLINTNEXTLINE
+class DEPRECATED("Use `optional<typet>` instead.") nil_typet : public typet
 {
 public:
   nil_typet():typet(static_cast<const typet &>(get_nil_irep()))
