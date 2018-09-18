@@ -57,11 +57,17 @@ Date: June 2006
 #endif
 
 #ifdef _WIN32
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable:4668)
+  // using #if/#elif on undefined macro
+#endif
 #include <direct.h>
 #include <windows.h>
 #define chdir _chdir
 #define popen _popen
 #define pclose _pclose
+#include <util/pragma_pop.def>
 #endif
 
 /// reads and source and object files, compiles and links them into goto program

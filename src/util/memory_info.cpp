@@ -19,8 +19,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #ifdef _WIN32
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable:4668)
+  // using #if/#elif on undefined macro
+#endif
 #include <windows.h>
 #include <psapi.h>
+#include <util/pragma_pop.def>
 #endif
 
 #include <ostream>

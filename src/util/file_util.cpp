@@ -32,6 +32,11 @@ Date: January 2012
 #endif
 
 #ifdef _WIN32
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable:4668)
+  // using #if/#elif on undefined macro
+#endif
 #include <io.h>
 #include <windows.h>
 #include <direct.h>
@@ -39,6 +44,7 @@ Date: January 2012
 #define chdir _chdir
 #define popen _popen
 #define pclose _pclose
+#include <util/pragma_pop.def>
 #endif
 
 /// \return current working directory

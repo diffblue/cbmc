@@ -9,6 +9,11 @@ Author: Daniel Kroening
 #include "tempfile.h"
 
 #ifdef _WIN32
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable:4668)
+  // using #if/#elif on undefined macro
+#endif
 #include <process.h>
 #include <sys/stat.h>
 #include <windows.h>
@@ -17,6 +22,7 @@ Author: Daniel Kroening
 #define getpid _getpid
 #define open _open
 #define close _close
+#include <util/pragma_pop.def>
 #endif
 
 #include <fcntl.h>
