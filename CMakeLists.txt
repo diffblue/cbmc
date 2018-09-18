@@ -68,7 +68,6 @@ set_target_properties(
     json
     langapi
     linking
-    miniBDD
     pointer-analysis
     solvers
     test-bigint

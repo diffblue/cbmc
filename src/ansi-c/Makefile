@@ -115,8 +115,6 @@ cprover_library.inc: library/converter$(EXEEXT) library/*.c
 %.inc: %.h file_converter$(EXEEXT)
 	./file_converter$(EXEEXT) < $< > $@
 
-cprover_library.cpp: cprover_library.inc
-
 ansi_c_internal_additions$(OBJEXT): $(BUILTIN_FILES)
 
 generated_files: \

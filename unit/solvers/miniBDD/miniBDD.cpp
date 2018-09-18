@@ -11,14 +11,14 @@
 
 #include <testing-utils/catch.hpp>
 
-#include <solvers/miniBDD/miniBDD.h>
 #include <solvers/flattening/boolbv.h>
+#include <solvers/miniBDD/miniBDD.h>
+#include <solvers/prop/bdd_expr.h>
 
-#include <util/symbol_table.h>
 #include <util/arith_tools.h>
 #include <util/expanding_vector.h>
-
-#include <iostream>
+#include <util/format_expr.h>
+#include <util/symbol_table.h>
 
 class bdd_propt:public propt
 {
@@ -292,5 +292,71 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
       boolbv.convert(equality);
 
     REQUIRE(!result.is_constant());
+  }
+
+  GIVEN("A bdd for x&y")
+  {
+    mini_bdd_mgrt mgr;
+
+    mini_bddt x_bdd = mgr.Var("x");
+    mini_bddt y_bdd = mgr.Var("y");
+    mini_bddt final_bdd = x_bdd & y_bdd;
+
+    std::ostringstream oss;
+    mgr.DumpDot(oss);
+
+    const std::string dot_string =
+      "digraph BDD {\n"
+      "center = true;\n"
+      "{ rank = same; { node [style=invis]; \"T\" };\n"
+      "  { node [shape=box,fontsize=24]; \"0\"; }\n"
+      "  { node [shape=box,fontsize=24]; \"1\"; }\n"
+      "}\n"
+      "\n"
+      "{ rank=same; { node [shape=plaintext,fontname="
+      "\"Times Italic\",fontsize=24] \" x \" }; \"2\"; \"4\"; }\n"
+      "{ rank=same; { node [shape=plaintext,fontname="
+      "\"Times Italic\",fontsize=24] \" y \" }; \"3\"; }\n"
+      "\n"
+      "{ edge [style = invis]; \" x \" -> \" y \" -> \"T\"; }\n"
+      "\n"
+      "\"2\" -> \"1\" [style=solid,arrowsize=\".75\"];\n"
+      "\"2\" -> \"0\" [style=dashed,arrowsize=\".75\"];\n"
+      "\n"
+      "\"3\" -> \"1\" [style=solid,arrowsize=\".75\"];\n"
+      "\"3\" -> \"0\" [style=dashed,arrowsize=\".75\"];\n"
+      "\n"
+      "\"4\" -> \"3\" [style=solid,arrowsize=\".75\"];\n"
+      "\"4\" -> \"0\" [style=dashed,arrowsize=\".75\"];\n"
+      "\n"
+      "}\n";
+
+    REQUIRE(oss.str() == dot_string);
+  }
+
+  GIVEN("A bdd for (a&b)|!a")
+  {
+    symbol_exprt a("a", bool_typet());
+    symbol_exprt b("b", bool_typet());
+
+    or_exprt o(and_exprt(a, b), not_exprt(a));
+
+    symbol_tablet symbol_table;
+    namespacet ns(symbol_table);
+
+    {
+      std::ostringstream oss;
+      oss << format(o);
+      REQUIRE(oss.str() == "(a ∧ b) ∨ (¬a)");
+    }
+
+    bdd_exprt t(ns);
+    t.from_expr(o);
+
+    {
+      std::ostringstream oss;
+      oss << format(t.as_expr());
+      REQUIRE(oss.str() == "(¬a) ∨ b");
+    }
   }
 }

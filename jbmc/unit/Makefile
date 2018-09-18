@@ -1,30 +1,53 @@
-.PHONY: all cprover.dir jprover.dir testing-utils.dir java-testing-utils.dir test
+.PHONY: all jprover.dir test java-testing-utils-clean
 
 # Source files for test utilities
 SRC = $(CPROVER_DIR)/unit/unit_tests.cpp \
       # Empty last line
 
 # Test source files
-SRC += java_bytecode/goto-programs/class_hierarchy_output.cpp \
+SRC += java_bytecode/ci_lazy_methods/lazy_load_lambdas.cpp \
+       java_bytecode/expr2java.cpp \
+       java_bytecode/goto_program_generics/generic_bases_test.cpp \
+       java_bytecode/goto_program_generics/generic_parameters_test.cpp \
+       java_bytecode/goto_program_generics/mutually_recursive_generics.cpp \
        java_bytecode/goto-programs/class_hierarchy_graph.cpp \
+       java_bytecode/goto-programs/class_hierarchy_output.cpp \
        java_bytecode/goto-programs/remove_virtual_functions_without_fallback.cpp \
+       java_bytecode/inherited_static_fields/inherited_static_fields.cpp \
        java_bytecode/java_bytecode_convert_class/convert_abstract_class.cpp \
        java_bytecode/java_bytecode_convert_class/convert_java_annotations.cpp \
+       java_bytecode/java_bytecode_convert_method/convert_initalizers.cpp \
        java_bytecode/java_bytecode_convert_method/convert_invoke_dynamic.cpp \
+       java_bytecode/java_bytecode_convert_method/convert_method.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_bounded_generic_inner_classes.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_derived_generic_class.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_functions_with_generics.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_array_class.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_generic_class.cpp \
-       java_bytecode/java_bytecode_parser/parse_java_class.cpp \
-       java_bytecode/java_bytecode_parser/parse_java_attributes.cpp \
-       java_bytecode/java_object_factory/gen_nondet_string_init.cpp \
-       java_bytecode/java_bytecode_parse_lambdas/java_bytecode_parse_lambda_method_table.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_class_with_generic_inner_classes.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_class_with_inner_classes.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_fields.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_functions.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_superclasses.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_wildcard_function.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_nested_generics.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_recursive_generic_class.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_signature_descriptor_mismatch.cpp \
        java_bytecode/java_bytecode_parse_lambdas/java_bytecode_convert_class_lambda_method_handles.cpp \
+       java_bytecode/java_bytecode_parse_lambdas/java_bytecode_parse_lambda_method_table.cpp \
+       java_bytecode/java_bytecode_parser/parse_java_annotations.cpp \
+       java_bytecode/java_bytecode_parser/parse_java_attributes.cpp \
+       java_bytecode/java_bytecode_parser/parse_java_class.cpp \
+       java_bytecode/java_object_factory/gen_nondet_string_init.cpp \
+       java_bytecode/java_replace_nondet/replace_nondet.cpp \
        java_bytecode/java_string_library_preprocess/convert_exprt_to_string_exprt.cpp \
        java_bytecode/java_types/erase_type_arguments.cpp \
        java_bytecode/java_types/generic_type_index.cpp \
        java_bytecode/java_types/java_generic_symbol_type.cpp \
        java_bytecode/java_types/java_type_from_string.cpp \
        java_bytecode/java_utils_test.cpp \
+       java_bytecode/java_virtual_functions/virtual_functions.cpp \
        java_bytecode/load_method_by_regex.cpp \
-       java_bytecode/inherited_static_fields/inherited_static_fields.cpp \
        pointer-analysis/custom_value_set_analysis.cpp \
        solvers/refinement/string_constraint_instantiation/instantiate_not_contains.cpp \
        solvers/refinement/string_refinement/dependency_graph.cpp \
@@ -33,9 +56,6 @@ SRC += java_bytecode/goto-programs/class_hierarchy_output.cpp \
        util/has_subtype.cpp \
        util/parameter_indices.cpp \
        util/simplify_expr.cpp \
-       java_bytecode/java_virtual_functions/virtual_functions.cpp \
-       java_bytecode/java_bytecode_parse_generics/parse_generic_superclasses.cpp \
-       java_bytecode/goto_program_generics/mutually_recursive_generics.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I. -I $(CPROVER_DIR)/src -I $(CPROVER_DIR)/unit
@@ -44,17 +64,17 @@ include ../src/config.inc
 include $(CPROVER_DIR)/src/config.inc
 include $(CPROVER_DIR)/src/common
 
-cprover.dir:
-	$(MAKE) $(MAKEARGS) -C $(CPROVER_DIR)/src
-
 jprover.dir:
 	$(MAKE) $(MAKEARGS) -C ../src
 
-cprover-testing-utils.dir:
+$(CPROVER_DIR)/unit/testing-utils/testing-utils$(LIBEXT): jprover.dir
 	$(MAKE) $(MAKEARGS) -C $(CPROVER_DIR)/unit/testing-utils
 
-java-testing-utils.dir:
+java-testing-utils/java-testing-utils$(LIBEXT): jprover.dir
 	$(MAKE) $(MAKEARGS) -C java-testing-utils
+
+java-testing-utils-clean:
+	$(MAKE) $(MAKEARGS) -C java-testing-utils clean
 
 # We need to link bmc.o to the unit test, so here's everything it depends on...
 BMC_DEPS =$(CPROVER_DIR)/src/cbmc/all_properties$(OBJEXT) \
@@ -118,16 +138,25 @@ OBJ += $(CPROVER_LIBS) \
        $(CPROVER_DIR)/unit/testing-utils/testing-utils$(LIBEXT) \
        java-testing-utils/java-testing-utils$(LIBEXT)
 
-TESTS = unit_tests$(EXEEXT) \
-        # Empty last line
+CATCH_TEST = unit_tests$(EXEEXT)
+N_CATCH_TESTS = $(shell \
+                  cat $$(find . -name "*.cpp" ) | \
+                  grep -c -E "(SCENARIO|TEST_CASE)")
 
-CLEANFILES = $(TESTS)
+CLEANFILES = $(CATCH_TEST) java-testing-utils/java-testing-utils$(LIBEXT)
 
-all: cprover.dir cprover-testing-utils.dir jprover.dir java-testing-utils.dir
-	$(MAKE) $(MAKEARGS) $(TESTS)
+# only add a dependency for libraries to avoid triggering implicit rules, which
+# would cause unnecessary rebuilds
+$(filter %$(LIBEXT), CPROVER_LIBS): jprover.dir
 
-test: all
-	$(foreach test,$(TESTS), (echo Running: $(test); ./$(test)) &&) true
+all: $(CATCH_TEST)
+
+clean: java-testing-utils-clean
+
+test: $(CATCH_TEST)
+	if ! ./$(CATCH_TEST) -l | grep -q "^$(N_CATCH_TESTS) test cases" ; then \
+	  ./$(CATCH_TEST) -l ; fi
+	./$(CATCH_TEST)
 
 
 ###############################################################################
