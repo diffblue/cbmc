@@ -17,7 +17,6 @@ Date: June 2006
 #include <util/cmdline.h>
 #include <util/message.h>
 #include <util/rename_symbol.h>
-#include <util/symbol_table.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -28,8 +27,7 @@ class compilet : public messaget
 public:
   // compilation results
   namespacet ns;
-  symbol_tablet symbol_table;
-  goto_functionst compiled_functions;
+  goto_modelt goto_model;
 
   // configuration
   bool echo_file_name;
@@ -73,15 +71,9 @@ public:
 
   bool parse_source(const std::string &);
 
-  bool write_object_file(
-    const std::string &,
-    const symbol_tablet &,
-    goto_functionst &);
+  bool write_object_file(const std::string &, const goto_modelt &);
 
-  bool write_bin_object_file(
-    const std::string &,
-    const symbol_tablet &,
-    goto_functionst &);
+  bool write_bin_object_file(const std::string &, const goto_modelt &);
 
   /// \brief Has this compiler written any object files?
   bool wrote_object_files() const { return wrote_object; }

@@ -156,10 +156,7 @@ protected:
   /// \post Expressions of the shape `&foo[0]`, `&foo`, and `foo`, where `foo`
   ///       is a linker-script defined symbol with type array, have been
   ///       converted to `foo` whose type is `char*`.
-  int pointerize_linker_defined_symbols(
-      goto_functionst &goto_functions,
-      symbol_tablet &symbol_table,
-      const linker_valuest &linker_values);
+  int pointerize_linker_defined_symbols(goto_modelt &, const linker_valuest &);
 
   /// \param expr an expr whose subexpressions may need to be pointerized
   /// \param to_pointerize  The symbols that are contained in the subexpressions
