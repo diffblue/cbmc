@@ -104,7 +104,7 @@ protected:
   cmdlinet &cmdline;
   bool warning_is_fatal;
 
-  unsigned function_body_count(const goto_functionst &) const;
+  std::size_t function_body_count(const goto_functionst &) const;
 
   void add_compiler_specific_defines(class configt &config) const;
 

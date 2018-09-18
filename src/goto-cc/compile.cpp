@@ -615,7 +615,7 @@ bool compilet::write_bin_object_file(
   if(write_goto_binary(outfile, lsymbol_table, functions))
     return true;
 
-  unsigned cnt=function_body_count(functions);
+  const auto cnt = function_body_count(functions);
 
   statistics() << "Functions: " << functions.function_map.size()
                << "; " << cnt << " have a body." << eom;
@@ -673,15 +673,16 @@ compilet::~compilet()
     delete_directory(dir);
 }
 
-unsigned compilet::function_body_count(const goto_functionst &functions) const
+std::size_t
+compilet::function_body_count(const goto_functionst &functions) const
 {
-  int fbs=0;
+  std::size_t count = 0;
 
   for(const auto &f : functions.function_map)
     if(f.second.body_available())
-      fbs++;
+      count++;
 
-  return fbs;
+  return count;
 }
 
 void compilet::add_compiler_specific_defines(configt &config) const
