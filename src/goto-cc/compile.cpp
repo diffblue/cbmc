@@ -640,9 +640,7 @@ bool compilet::parse_source(const std::string &file_name)
   if(typecheck()) // we just want to typecheck this one file here
     return true;
 
-  if((has_suffix(file_name, ".class") ||
-      has_suffix(file_name, ".jar")) &&
-     final())
+  if(final())
     return true;
 
   // so we remove it from the list afterwards
