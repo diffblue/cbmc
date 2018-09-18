@@ -21,14 +21,18 @@ void compute_address_taken_functions(
   forall_operands(it, src)
     compute_address_taken_functions(*it, address_taken);
 
-  if(src.id()==ID_address_of &&
-     src.type().id()==ID_pointer &&
-     src.type().subtype().id()==ID_code)
+  if(src.id() == ID_address_of)
   {
-    assert(src.operands().size()==1);
-    const exprt &op=src.op0();
-    if(op.id()==ID_symbol)
-      address_taken.insert(to_symbol_expr(op).get_identifier());
+    const address_of_exprt &address = to_address_of_expr(src);
+
+    if(
+      address.type().id() == ID_pointer &&
+      address.type().subtype().id() == ID_code)
+    {
+      const exprt &target = address.object();
+      if(target.id() == ID_symbol)
+        address_taken.insert(to_symbol_expr(target).get_identifier());
+    }
   }
 }
 
