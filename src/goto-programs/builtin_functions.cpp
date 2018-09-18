@@ -33,70 +33,22 @@ void goto_convertt::do_prob_uniform(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  const irep_idt &identifier = function.get_identifier();
-
-  // make it a side effect if there is an LHS
-  if(arguments.size()!=2)
-  {
-    error().source_location=function.find_source_location();
-    error() << "`" << identifier
-            << "' expected to have two arguments" << eom;
-    throw 0;
-  }
-
-  if(lhs.is_nil())
-  {
-    error().source_location=function.find_source_location();
-    error() << "`" << identifier << "' expected to have LHS" << eom;
-    throw 0;
-  }
+  PRECONDITION(arguments.size() == 2);
+  PRECONDITION(lhs.is_not_nil());
+  PRECONDITION(
+    lhs.type().id() == ID_unsignedbv || lhs.type().id() == ID_signedbv);
+  PRECONDITION(
+    arguments[0].type().id() == lhs.type().id() &&
+    arguments[1].type().id() == lhs.type().id());
+  PRECONDITION(arguments[0].is_constant() && arguments[1].is_constant());
 
   auto rhs =
     side_effect_exprt("prob_uniform", lhs.type(), function.source_location());
 
-  if(lhs.type().id()!=ID_unsignedbv &&
-     lhs.type().id()!=ID_signedbv)
-  {
-    error().source_location=function.find_source_location();
-    error() << "`" << identifier << "' expected other type" << eom;
-    throw 0;
-  }
+  auto lower_bound = numeric_cast_v<mp_integer>(arguments[0]);
+  auto upper_bound = numeric_cast_v<mp_integer>(arguments[1]);
 
-  if(arguments[0].type().id()!=lhs.type().id() ||
-     arguments[1].type().id()!=lhs.type().id())
-  {
-    error().source_location=function.find_source_location();
-    error() << "`" << identifier
-            << "' expected operands to be of same type as LHS" << eom;
-    throw 0;
-  }
-
-  if(!arguments[0].is_constant() ||
-     !arguments[1].is_constant())
-  {
-    error().source_location=function.find_source_location();
-    error() << "`" << identifier
-            << "' expected operands to be constant literals" << eom;
-    throw 0;
-  }
-
-  mp_integer lb, ub;
-
-  if(to_integer(arguments[0], lb) ||
-     to_integer(arguments[1], ub))
-  {
-    error().source_location=function.find_source_location();
-    error() << "error converting operands" << eom;
-    throw 0;
-  }
-
-  if(lb > ub)
-  {
-    error().source_location=function.find_source_location();
-    error() << "expected lower bound to be smaller or equal to the "
-            << "upper bound" << eom;
-    throw 0;
-  }
+  PRECONDITION(lower_bound <= upper_bound);
 
   rhs.copy_to_operands(arguments[0], arguments[1]);
 
@@ -111,65 +63,22 @@ void goto_convertt::do_prob_coin(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  const irep_idt &identifier = function.get_identifier();
+  PRECONDITION(arguments.size() == 2);
+  PRECONDITION(lhs.is_not_nil());
+  PRECONDITION(lhs.type().id() == ID_bool);
+  PRECONDITION(
+    arguments[0].type().id() == ID_unsignedbv &&
+    arguments[0].id() == ID_constant);
 
   // make it a side effect if there is an LHS
-  if(arguments.size()!=2)
-  {
-    error().source_location=function.find_source_location();
-    error() << "`" << identifier << "' expected to have two arguments"
-            << eom;
-    throw 0;
-  }
-
-  if(lhs.is_nil())
-  {
-    error().source_location=function.find_source_location();
-    error() << "`" << identifier << "' expected to have LHS" << eom;
-    throw 0;
-  }
 
   side_effect_exprt rhs("prob_coin", lhs.type(), function.source_location());
 
-  if(lhs.type()!=bool_typet())
-  {
-    error().source_location=function.find_source_location();
-    error() << "`" << identifier << "' expected bool" << eom;
-    throw 0;
-  }
+  auto num = numeric_cast_v<mp_integer>(arguments[0]);
+  auto den = numeric_cast_v<mp_integer>(arguments[1]);
 
-  if(arguments[0].type().id()!=ID_unsignedbv ||
-     arguments[0].id()!=ID_constant)
-  {
-    error().source_location=function.find_source_location();
-    error() << "`" << identifier << "' expected first operand to be "
-            << "a constant literal of type unsigned long" << eom;
-    throw 0;
-  }
-
-  mp_integer num, den;
-
-  if(to_integer(arguments[0], num) ||
-     to_integer(arguments[1], den))
-  {
-    error().source_location=function.find_source_location();
-    error() << "error converting operands" << eom;
-    throw 0;
-  }
-
-  if(num-den > mp_integer(0))
-  {
-    error().source_location=function.find_source_location();
-    error() << "probability has to be smaller than 1" << eom;
-    throw 0;
-  }
-
-  if(den == mp_integer(0))
-  {
-    error().source_location=function.find_source_location();
-    error() << "denominator may not be zero" << eom;
-    throw 0;
-  }
+  PRECONDITION(num <= den);
+  PRECONDITION(den != 0);
 
   rationalt numerator(num), denominator(den);
   rationalt prob = numerator / denominator;
@@ -227,12 +136,7 @@ void goto_convertt::do_scanf(
 
   if(f_id==CPROVER_PREFIX "scanf")
   {
-    if(arguments.empty())
-    {
-      error().source_location=function.find_source_location();
-      error() << "scanf takes at least one argument" << eom;
-      throw 0;
-    }
+    PRECONDITION(!arguments.empty());
 
     irep_idt format_string;
 
@@ -324,16 +228,10 @@ void goto_convertt::do_input(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
+  PRECONDITION(arguments.size() == 2);
   codet input_code(ID_input);
   input_code.operands()=arguments;
   input_code.add_source_location()=function.source_location();
-
-  if(arguments.size()<2)
-  {
-    error().source_location=function.find_source_location();
-    error() << "input takes at least two arguments" << eom;
-    throw 0;
-  }
 
   copy(input_code, OTHER, dest);
 }
@@ -343,16 +241,10 @@ void goto_convertt::do_output(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
+  PRECONDITION(arguments.size() == 2);
   codet output_code(ID_output);
   output_code.operands()=arguments;
   output_code.add_source_location()=function.source_location();
-
-  if(arguments.size()<2)
-  {
-    error().source_location=function.find_source_location();
-    error() << "output takes at least two arguments" << eom;
-    throw 0;
-  }
 
   copy(output_code, OTHER, dest);
 }
@@ -363,19 +255,8 @@ void goto_convertt::do_atomic_begin(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  if(lhs.is_not_nil())
-  {
-    error().source_location=lhs.find_source_location();
-    error() << "atomic_begin does not expect an LHS" << eom;
-    throw 0;
-  }
-
-  if(!arguments.empty())
-  {
-    error().source_location=function.find_source_location();
-    error() << "atomic_begin takes no arguments" << eom;
-    throw 0;
-  }
+  PRECONDITION(lhs.is_nil());
+  PRECONDITION(arguments.empty());
 
   goto_programt::targett t=dest.add_instruction(ATOMIC_BEGIN);
   t->source_location=function.source_location();
@@ -387,19 +268,8 @@ void goto_convertt::do_atomic_end(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  if(lhs.is_not_nil())
-  {
-    error().source_location=lhs.find_source_location();
-    error() << "atomic_end does not expect an LHS" << eom;
-    throw 0;
-  }
-
-  if(!arguments.empty())
-  {
-    error().source_location=function.find_source_location();
-    error() << "atomic_end takes no arguments" << eom;
-    throw 0;
-  }
+  PRECONDITION(lhs.is_nil());
+  PRECONDITION(arguments.empty());
 
   goto_programt::targett t=dest.add_instruction(ATOMIC_END);
   t->source_location=function.source_location();
@@ -410,12 +280,7 @@ void goto_convertt::do_cpp_new(
   const side_effect_exprt &rhs,
   goto_programt &dest)
 {
-  if(lhs.is_nil())
-  {
-    error().source_location=lhs.find_source_location();
-    error() << "do_cpp_new without lhs is yet to be implemented" << eom;
-    throw 0;
-  }
+  PRECONDITION(lhs.is_not_nil());
 
   // build size expression
   exprt object_size=
@@ -451,8 +316,10 @@ void goto_convertt::do_cpp_new(
     const typet &return_type=
       code_type.return_type();
 
-    assert(code_type.parameters().size()==1 ||
-           code_type.parameters().size()==2);
+    INVARIANT(
+      code_type.parameters().size() == 1 || code_type.parameters().size() == 2,
+      "type of new expression has one or two parameters (a type + optional "
+      "size for new array)");
 
     const symbolt &tmp_symbol =
       new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);
@@ -481,8 +348,10 @@ void goto_convertt::do_cpp_new(
 
     const typet &return_type=code_type.return_type();
 
-    assert(code_type.parameters().size()==2 ||
-           code_type.parameters().size()==3);
+    INVARIANT(
+      code_type.parameters().size() == 2 || code_type.parameters().size() == 3,
+      "type of new expression has 2 or 3 parameters (a type, a location and an "
+      "optional size for a new array)");
 
     const symbolt &tmp_symbol =
       new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);
@@ -506,9 +375,7 @@ void goto_convertt::do_cpp_new(
   }
   else
   {
-    error().source_location=rhs.find_source_location();
-    error() << "cpp_new expected to have 0 or 1 operands" << eom;
-    throw 0;
+    UNREACHABLE;
   }
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
@@ -553,38 +420,18 @@ void goto_convertt::cpp_new_initializer(
 
 exprt goto_convertt::get_array_argument(const exprt &src)
 {
-  if(src.id()==ID_typecast)
+  PRECONDITION(src.id() == ID_typecast || src.id() == ID_address_of);
+
+  if(src.id() == ID_typecast)
   {
-    assert(src.operands().size()==1);
-    return get_array_argument(src.op0());
+    return get_array_argument(to_typecast_expr(src).op());
   }
+  auto const &src_address_of = to_address_of_expr(src);
+  auto const &src_index = to_index_expr(src_address_of.op());
 
-  if(src.id()!=ID_address_of)
-  {
-    error().source_location=src.find_source_location();
-    error() << "expected array-pointer as argument" << eom;
-    throw 0;
-  }
+  PRECONDITION(ns.follow(src_index.array().type()).id() == ID_array);
 
-  assert(src.operands().size()==1);
-
-  if(src.op0().id()!=ID_index)
-  {
-    error().source_location=src.find_source_location();
-    error() << "expected array-element as argument" << eom;
-    throw 0;
-  }
-
-  assert(src.op0().operands().size()==2);
-
-  if(ns.follow(src.op0().op0().type()).id()!=ID_array)
-  {
-    error().source_location=src.find_source_location();
-    error() << "expected array as argument" << eom;
-    throw 0;
-  }
-
-  return src.op0().op0();
+  return src_index.array();
 }
 
 void goto_convertt::do_array_op(
@@ -594,12 +441,7 @@ void goto_convertt::do_array_op(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  if(arguments.size()!=2)
-  {
-    error().source_location=function.find_source_location();
-    error() << id << " expects two arguments" << eom;
-    throw 0;
-  }
+  PRECONDITION(arguments.size() == 2);
 
   codet array_op_statement(id);
   array_op_statement.operands()=arguments;
@@ -641,33 +483,14 @@ void goto_convertt::do_function_call_symbol(
   // lookup symbol
   const irep_idt &identifier=function.get_identifier();
 
-  const symbolt *symbol;
-  if(ns.lookup(identifier, symbol))
-  {
-    error().source_location=function.find_source_location();
-    error() << "error: function `" << identifier << "' not found"
-            << eom;
-    throw 0;
-  }
-
-  if(symbol->type.id()!=ID_code)
-  {
-    error().source_location=function.find_source_location();
-    error() << "error: function `" << identifier
-            << "' type mismatch: expected code" << eom;
-    throw 0;
-  }
+  const symbolt &symbol = ns.lookup(identifier);
+  PRECONDITION(symbol.type.id() == ID_code);
 
   if(identifier==CPROVER_PREFIX "assume" ||
      identifier=="__VERIFIER_assume")
   {
-    if(arguments.size()!=1)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have one argument"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() == 1);
+    PRECONDITION(lhs.is_nil());
 
     goto_programt::targett t=dest.add_instruction(ASSUME);
     t->guard=arguments.front();
@@ -677,36 +500,17 @@ void goto_convertt::do_function_call_symbol(
     // let's double-check the type of the argument
     if(t->guard.type().id()!=ID_bool)
       t->guard.make_typecast(bool_typet());
-
-    if(lhs.is_not_nil())
-    {
-      error().source_location=function.find_source_location();
-      error() << identifier << " expected not to have LHS" << eom;
-      throw 0;
-    }
   }
   else if(identifier=="__VERIFIER_error")
   {
-    if(!arguments.empty())
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have no arguments"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.empty());
+    PRECONDITION(lhs.is_nil());
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
     t->source_location=function.source_location();
     t->source_location.set("user-provided", true);
     t->source_location.set_property_class(ID_assertion);
-
-    if(lhs.is_not_nil())
-    {
-      error().source_location=function.find_source_location();
-      error() << identifier << " expected not to have LHS" << eom;
-      throw 0;
-    }
 
     // __VERIFIER_error has abort() semantics, even if no assertions
     // are being checked
@@ -718,13 +522,8 @@ void goto_convertt::do_function_call_symbol(
   else if(identifier=="assert" &&
           !ns.lookup(identifier).location.get_function().empty())
   {
-    if(arguments.size()!=1)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have one argument"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() == 1);
+    PRECONDITION(lhs.is_nil());
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=arguments.front();
@@ -737,24 +536,12 @@ void goto_convertt::do_function_call_symbol(
     // let's double-check the type of the argument
     if(t->guard.type().id()!=ID_bool)
       t->guard.make_typecast(bool_typet());
-
-    if(lhs.is_not_nil())
-    {
-      error().source_location=function.find_source_location();
-      error() << identifier << " expected not to have LHS" << eom;
-      throw 0;
-    }
   }
   else if(identifier==CPROVER_PREFIX "assert" ||
           identifier==CPROVER_PREFIX "precondition")
   {
-    if(arguments.size()!=2)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have two arguments"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() == 2);
+    PRECONDITION(lhs.is_nil());
 
     bool is_precondition=
       identifier==CPROVER_PREFIX "precondition";
@@ -783,30 +570,11 @@ void goto_convertt::do_function_call_symbol(
     // let's double-check the type of the argument
     if(t->guard.type().id()!=ID_bool)
       t->guard.make_typecast(bool_typet());
-
-    if(lhs.is_not_nil())
-    {
-      error().source_location=function.find_source_location();
-      error() << identifier << " expected not to have LHS" << eom;
-      throw 0;
-    }
   }
   else if(identifier==CPROVER_PREFIX "havoc_object")
   {
-    if(arguments.size()!=1)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have one argument"
-              << eom;
-      throw 0;
-    }
-
-    if(lhs.is_not_nil())
-    {
-      error().source_location=function.find_source_location();
-      error() << identifier << " expected not to have LHS" << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() == 1);
+    PRECONDITION(lhs.is_nil());
 
     goto_programt::targett t=dest.add_instruction(OTHER);
     t->source_location=function.source_location();
@@ -825,24 +593,14 @@ void goto_convertt::do_function_call_symbol(
   else if(identifier==CPROVER_PREFIX "input" ||
           identifier=="__CPROVER::input")
   {
-    if(lhs.is_not_nil())
-    {
-      error().source_location=function.find_source_location();
-      error() << identifier << " expected not to have LHS" << eom;
-      throw 0;
-    }
+    PRECONDITION(lhs.is_nil());
 
     do_input(function, arguments, dest);
   }
   else if(identifier==CPROVER_PREFIX "output" ||
           identifier=="__CPROVER::output")
   {
-    if(lhs.is_not_nil())
-    {
-      error().source_location=function.find_source_location();
-      error() << identifier << " expected not to have LHS" << eom;
-      throw 0;
-    }
+    PRECONDITION(lhs.is_nil());
 
     do_output(function, arguments, dest);
   }
@@ -960,14 +718,7 @@ void goto_convertt::do_function_call_symbol(
     // _wassert is Windows. The arguments are
     // L"expression", L"file.c", line
 
-    if(arguments.size()!=4 &&
-       arguments.size()!=3)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have four arguments"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() >= 3 && arguments.size() <= 4);
 
     const irep_idt description=
       "assertion "+id2string(get_string_constant(arguments[0]));
@@ -1004,10 +755,7 @@ void goto_convertt::do_function_call_symbol(
     }
     else
     {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have four arguments"
-              << eom;
-      throw 0;
+      UNREACHABLE;
     }
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
@@ -1023,15 +771,10 @@ void goto_convertt::do_function_call_symbol(
     // __assert_func is newlib (used by, e.g., cygwin)
     // These take four arguments:
     // "file.c", line, __func__, "expression"
-    if(arguments.size()!=4)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have four arguments"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() == 4);
 
     irep_idt description;
+    // FIXME this try catch block is very sketchy and should be revisited
     try
     {
       description="assertion "+id2string(get_string_constant(arguments[3]));
@@ -1054,13 +797,7 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier==CPROVER_PREFIX "fence")
   {
-    if(arguments.empty())
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier
-              << "' expected to have at least one argument" << eom;
-      throw 0;
-    }
+    PRECONDITION(!arguments.empty());
 
     goto_programt::targett t=dest.add_instruction(OTHER);
     t->source_location=function.source_location();
@@ -1088,13 +825,7 @@ void goto_convertt::do_function_call_symbol(
     // 2) Return value of argument.
     //    This is just dereferencing.
 
-    if(arguments.size()!=1)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have one argument"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() == 1);
 
     exprt list_arg=make_va_list(arguments[0]);
 
@@ -1123,23 +854,13 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier=="__builtin_va_copy")
   {
-    if(arguments.size()!=2)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have two arguments"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() == 2);
 
     exprt dest_expr=make_va_list(arguments[0]);
-    const typecast_exprt src_expr(arguments[1], dest_expr.type());
 
-    if(!is_lvalue(dest_expr))
-    {
-      error().source_location=dest_expr.find_source_location();
-      error() << "va_copy argument expected to be lvalue" << eom;
-      throw 0;
-    }
+    CHECK_RETURN(is_lvalue(dest_expr));
+
+    const typecast_exprt src_expr(arguments[1], dest_expr.type());
 
     goto_programt::targett t=dest.add_instruction(ASSIGN);
     t->source_location=function.source_location();
@@ -1149,24 +870,14 @@ void goto_convertt::do_function_call_symbol(
   {
     // Set the list argument to be the address of the
     // parameter argument.
-    if(arguments.size()!=2)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have two arguments"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() == 2);
 
     exprt dest_expr=make_va_list(arguments[0]);
+    CHECK_RETURN(is_lvalue(dest_expr));
+
     const typecast_exprt src_expr(
       address_of_exprt(arguments[1]), dest_expr.type());
 
-    if(!is_lvalue(dest_expr))
-    {
-      error().source_location=dest_expr.find_source_location();
-      error() << "va_start argument expected to be lvalue" << eom;
-      throw 0;
-    }
 
     goto_programt::targett t=dest.add_instruction(ASSIGN);
     t->source_location=function.source_location();
@@ -1175,22 +886,11 @@ void goto_convertt::do_function_call_symbol(
   else if(identifier=="__builtin_va_end")
   {
     // Invalidates the argument. We do so by setting it to NULL.
-    if(arguments.size()!=1)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have one argument"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() == 1);
 
     exprt dest_expr=make_va_list(arguments[0]);
 
-    if(!is_lvalue(dest_expr))
-    {
-      error().source_location=dest_expr.find_source_location();
-      error() << "va_end argument expected to be lvalue" << eom;
-      throw 0;
-    }
+    CHECK_RETURN(is_lvalue(dest_expr));
 
     // our __builtin_va_list is a pointer
     if(ns.follow(dest_expr.type()).id()==ID_pointer)
@@ -1216,21 +916,8 @@ void goto_convertt::do_function_call_symbol(
     // type __sync_fetch_and_OP(type *ptr, type value, ...)
     // { tmp = *ptr; *ptr OP= value; return tmp; }
 
-    if(arguments.size()<2)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier
-              << "' expected to have at least two arguments" << eom;
-      throw 0;
-    }
-
-    if(arguments[0].type().id()!=ID_pointer)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier << "' expected to have pointer argument"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() >= 2);
+    PRECONDITION(arguments[0].type().id() == ID_pointer);
 
     // build *ptr
     dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
@@ -1284,22 +971,8 @@ void goto_convertt::do_function_call_symbol(
   {
     // type __sync_OP_and_fetch (type *ptr, type value, ...)
     // { *ptr OP= value; return *ptr; }
-
-    if(arguments.size()<2)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier
-              << "' expected to have at least two arguments" << eom;
-      throw 0;
-    }
-
-    if(arguments[0].type().id()!=ID_pointer)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier
-              << "' expected to have pointer argument" << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() >= 2);
+    PRECONDITION(arguments[0].type().id() == ID_pointer);
 
     // build *ptr
     dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
@@ -1358,21 +1031,8 @@ void goto_convertt::do_function_call_symbol(
     // bool __sync_bool_compare_and_swap(
     //   type *ptr, type oldval, type newval, ...)
 
-    if(arguments.size()<3)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier
-              << "' expected to have at least three arguments" << eom;
-      throw 0;
-    }
-
-    if(arguments[0].type().id()!=ID_pointer)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier
-              << "' expected to have pointer argument" << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() >= 3);
+    PRECONDITION(arguments[0].type().id() == ID_pointer);
 
     // build *ptr
     dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
@@ -1417,21 +1077,8 @@ void goto_convertt::do_function_call_symbol(
   {
     // type __sync_val_compare_and_swap(
     //   type *ptr, type oldval, type newval, ...)
-    if(arguments.size()<3)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier
-              << "' expected to have at least three arguments" << eom;
-      throw 0;
-    }
-
-    if(arguments[0].type().id()!=ID_pointer)
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier
-              << "' expected to have pointer argument" << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() >= 4);
+    PRECONDITION(arguments[0].type().id() == ID_pointer);
 
     // build *ptr
     dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
@@ -1505,18 +1152,13 @@ void goto_convertt::do_function_call_symbol(
   {
     // these support two double or two float arguments; we call the
     // appropriate internal version
-    if(arguments.size()!=2 ||
-       (arguments[0].type()!=double_type() &&
-        arguments[0].type()!=float_type()) ||
-       (arguments[1].type()!=double_type() &&
-        arguments[1].type()!=float_type()))
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier
-              << "' expected to have two float/double arguments"
-              << eom;
-      throw 0;
-    }
+    PRECONDITION(arguments.size() == 2);
+    PRECONDITION(
+      arguments[0].type() == double_type() ||
+      arguments[0].type() == float_type());
+    PRECONDITION(
+      arguments[1].type() == double_type() ||
+      arguments[1].type() == float_type());
 
     exprt::operandst new_arguments=arguments;
 
@@ -1564,7 +1206,7 @@ void goto_convertt::do_function_call_symbol(
   }
   else
   {
-    do_function_call_symbol(*symbol);
+    do_function_call_symbol(symbol);
 
     // insert function call
     code_function_callt function_call(lhs, function, arguments);
