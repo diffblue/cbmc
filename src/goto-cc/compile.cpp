@@ -81,17 +81,15 @@ bool compilet::doit()
   add_compiler_specific_defines(config);
 
   // Parse command line for source and object file names
-  for(std::size_t i = 0; i < cmdline.args.size(); i++)
-    if(add_input_file(cmdline.args[i]))
+  for(const auto &arg : cmdline.args)
+    if(add_input_file(arg))
       return true;
 
-  for(std::list<std::string>::const_iterator it = libraries.begin();
-      it!=libraries.end();
-      it++)
+  for(const auto &library : libraries)
   {
-    if(!find_library(*it))
+    if(!find_library(library))
       // GCC is going to complain if this doesn't exist
-      debug() << "Library not found: " << *it << " (ignoring)" << eom;
+      debug() << "Library not found: " << library << " (ignoring)" << eom;
   }
 
   statistics() << "No. of source files: " << source_files.size() << eom;
@@ -308,15 +306,12 @@ bool compilet::find_library(const std::string &name)
 {
   std::string tmp;
 
-  for(std::list<std::string>::const_iterator
-      it=library_paths.begin();
-      it!=library_paths.end();
-      it++)
+  for(const auto &library_path : library_paths)
   {
     #ifdef _WIN32
-    tmp = *it + "\\lib";
+    tmp = library_path + "\\lib";
     #else
-    tmp = *it + "/lib";
+    tmp = library_path + "/lib";
     #endif
 
     std::ifstream in(tmp+name+".a");
@@ -674,21 +669,16 @@ compilet::~compilet()
 {
   // clean up temp dirs
 
-  for(std::list<std::string>::const_iterator it = tmp_dirs.begin();
-      it!=tmp_dirs.end();
-      it++)
-    delete_directory(*it);
+  for(const auto &dir : tmp_dirs)
+    delete_directory(dir);
 }
 
 unsigned compilet::function_body_count(const goto_functionst &functions) const
 {
   int fbs=0;
 
-  for(goto_functionst::function_mapt::const_iterator it=
-      functions.function_map.begin();
-      it != functions.function_map.end();
-      it++)
-    if(it->second.body_available())
+  for(const auto &f : functions.function_map)
+    if(f.second.body_available())
       fbs++;
 
   return fbs;
@@ -719,14 +709,11 @@ void compilet::convert_symbols(goto_functionst &dest)
       symbols.insert(named_symbol.first);
 
     // the symbol table iterators aren't stable
-    for(symbols_sett::const_iterator
-        it=symbols.begin();
-        it!=symbols.end();
-        ++it)
+    for(const auto &symbol : symbols)
     {
-      symbol_tablet::symbolst::const_iterator s_it=
-        symbol_table.symbols.find(*it);
-      assert(s_it!=symbol_table.symbols.end());
+      symbol_tablet::symbolst::const_iterator s_it =
+        symbol_table.symbols.find(symbol);
+      CHECK_RETURN(s_it != symbol_table.symbols.end());
 
       if(
         s_it->second.is_function() && !s_it->second.is_compiled() &&
@@ -734,7 +721,7 @@ void compilet::convert_symbols(goto_functionst &dest)
       {
         debug() << "Compiling " << s_it->first << eom;
         converter.convert_function(s_it->first, dest.function_map[s_it->first]);
-        symbol_table.get_writeable_ref(*it).set_compiled();
+        symbol_table.get_writeable_ref(symbol).set_compiled();
       }
     }
   }
