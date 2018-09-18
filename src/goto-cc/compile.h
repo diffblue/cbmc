@@ -14,17 +14,24 @@ Date: June 2006
 #ifndef CPROVER_GOTO_CC_COMPILE_H
 #define CPROVER_GOTO_CC_COMPILE_H
 
-#include <util/symbol.h>
+#include <util/cmdline.h>
+#include <util/message.h>
 #include <util/rename_symbol.h>
+#include <util/symbol_table.h>
 
-#include <langapi/language_ui.h>
 #include <goto-programs/goto_model.h>
 
-class compilet:public language_uit
+class language_filest;
+
+class compilet : public messaget
 {
 public:
+  // compilation results
   namespacet ns;
+  symbol_tablet symbol_table;
   goto_functionst compiled_functions;
+
+  // configuration
   bool echo_file_name;
   std::string working_directory;
   std::string override_language;
@@ -50,7 +57,7 @@ public:
   // the two options below are mutually exclusive -- use either or
   std::string output_file_object, output_directory_object;
 
-  compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror);
+  compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror);
 
   ~compilet();
 
@@ -58,7 +65,7 @@ public:
   bool find_library(const std::string &);
   bool add_files_from_archive(const std::string &file_name, bool thin_archive);
 
-  bool parse(const std::string &filename);
+  bool parse(const std::string &filename, language_filest &);
   bool parse_stdin();
   bool doit();
   bool compile();

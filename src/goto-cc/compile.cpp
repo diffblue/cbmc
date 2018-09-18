@@ -34,6 +34,7 @@ Date: June 2006
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
 
+#include <langapi/language_file.h>
 #include <langapi/mode.h>
 
 #include <linking/static_lifetime_init.h>
@@ -80,8 +81,8 @@ bool compilet::doit()
   add_compiler_specific_defines(config);
 
   // Parse command line for source and object file names
-  for(std::size_t i=0; i<_cmdline.args.size(); i++)
-    if(add_input_file(_cmdline.args[i]))
+  for(std::size_t i = 0; i < cmdline.args.size(); i++)
+    if(add_input_file(cmdline.args[i]))
       return true;
 
   for(std::list<std::string>::const_iterator it = libraries.begin();
@@ -456,7 +457,9 @@ bool compilet::compile()
 
 /// parses a source file (low-level parsing)
 /// \return true on error, false otherwise
-bool compilet::parse(const std::string &file_name)
+bool compilet::parse(
+  const std::string &file_name,
+  language_filest &language_files)
 {
   if(file_name=="-")
     return parse_stdin();
@@ -527,8 +530,7 @@ bool compilet::parse(const std::string &file_name)
 
     if(lf.language->parse(infile, file_name))
     {
-      if(get_ui()==ui_message_handlert::uit::PLAIN)
-        error() << "PARSING ERROR" << eom;
+      error() << "PARSING ERROR" << eom;
       return true;
     }
   }
@@ -571,8 +573,7 @@ bool compilet::parse_stdin()
   {
     if(language.parse(std::cin, ""))
     {
-      if(get_ui()==ui_message_handlert::uit::PLAIN)
-        error() << "PARSING ERROR" << eom;
+      error() << "PARSING ERROR" << eom;
       return true;
     }
   }
@@ -634,27 +635,32 @@ bool compilet::write_bin_object_file(
 /// \return true on error, false otherwise
 bool compilet::parse_source(const std::string &file_name)
 {
-  if(parse(file_name))
+  language_filest language_files;
+  language_files.set_message_handler(get_message_handler());
+
+  if(parse(file_name, language_files))
     return true;
 
-  if(typecheck()) // we just want to typecheck this one file here
+  // we just typecheck one file here
+  if(language_files.typecheck(symbol_table))
+  {
+    error() << "CONVERSION ERROR" << eom;
     return true;
+  }
 
-  if(final())
+  if(language_files.final(symbol_table))
+  {
+    error() << "CONVERSION ERROR" << eom;
     return true;
+  }
 
-  // so we remove it from the list afterwards
-  language_files.remove_file(file_name);
   return false;
 }
 
 /// constructor
 /// \return nothing
-compilet::compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror):
-  language_uit(_cmdline, mh),
-  ns(symbol_table),
-  cmdline(_cmdline),
-  warning_is_fatal(Werror)
+compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
+  : messaget(mh), ns(symbol_table), cmdline(_cmdline), warning_is_fatal(Werror)
 {
   mode=COMPILE_LINK_EXECUTABLE;
   echo_file_name=false;
