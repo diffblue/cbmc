@@ -11,10 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 
+#include <util/cprover_prefix.h>
+#include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/cprover_prefix.h>
 
 #include <util/c_types.h>
 
@@ -405,18 +406,9 @@ void goto_convertt::clean_expr(
   }
   else if(expr.id()==ID_forall || expr.id()==ID_exists)
   {
-    assert(expr.operands().size()==2);
-    // check if there are side-effects
-    goto_programt tmp;
-    clean_expr(expr.op1(), tmp, mode, true);
-    if(tmp.instructions.empty())
-    {
-      error().source_location=expr.find_source_location();
-      error() << "no side-effects in quantified expressions allowed"
-              << eom;
-      throw 0;
-    }
-    return;
+    DATA_INVARIANT(
+      !has_subexpr(expr, ID_side_effect),
+      "the front-end should check quantified expressions for side-effects");
   }
   else if(expr.id()==ID_address_of)
   {
