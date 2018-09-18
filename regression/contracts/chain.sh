@@ -19,6 +19,7 @@ else
   $goto_cc -o "${name}.gb" "${name}.c"
 fi
 
+rm -f "${name}-mod.gb"
 $goto_instrument ${args} "${name}.gb" "${name}-mod.gb"
 if [ ! -e "${name}-mod.gb" ] ; then
   cp "$name.gb" "${name}-mod.gb"
