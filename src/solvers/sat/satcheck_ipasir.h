@@ -9,11 +9,11 @@ Sample compilation command:
 
 make clean
 make ipasir-build
-CXXFLAGS=-g IPASIR=../../ipasir LIBSOLVER=$(pwd)/ipasir/libipasir.a \
+CXXFLAGS=-g IPASIR=../../ipasir LIBS=$(pwd)/ipasir/libipasir.a \
   CFLAGS="-Wall -O2 -DSATCHECK_IPSAIR" LINKFLAGS="-static" \
   make -j 7 -C $(pwd)/src/;
 
-Note: Make sure, the LIBSOLVER variable is set in the environment!
+Note: Make sure that the LIBS variable is set in the environment!
       The variable should point to the solver you actually want to
       link against.
 

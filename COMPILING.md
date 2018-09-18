@@ -64,9 +64,9 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
 
    Build CBMC with IPASIR and link against the ipasir solver library
-   Note: the LIBSOLVER variable could be pointed towards other solvers
+   Note: the LIBS variable could be pointed towards other solvers
    ```
-   make -C src IPASIR=../../ipasir LIBSOLVER=$(pwd)/ipasir/libipasir.a
+   make -C src IPASIR=../../ipasir LIBS=$(pwd)/ipasir/libipasir.a
    ```
 
 5. To compile JBMC, do
