@@ -34,6 +34,7 @@ Date: June 2006
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
 
+#include <langapi/language_file.h>
 #include <langapi/mode.h>
 
 #include <linking/static_lifetime_init.h>
@@ -75,22 +76,20 @@ Date: June 2006
 /// \return true on error, false otherwise
 bool compilet::doit()
 {
-  compiled_functions.clear();
+  goto_model.goto_functions.clear();
 
   add_compiler_specific_defines(config);
 
   // Parse command line for source and object file names
-  for(std::size_t i=0; i<_cmdline.args.size(); i++)
-    if(add_input_file(_cmdline.args[i]))
+  for(const auto &arg : cmdline.args)
+    if(add_input_file(arg))
       return true;
 
-  for(std::list<std::string>::const_iterator it = libraries.begin();
-      it!=libraries.end();
-      it++)
+  for(const auto &library : libraries)
   {
-    if(!find_library(*it))
+    if(!find_library(library))
       // GCC is going to complain if this doesn't exist
-      debug() << "Library not found: " << *it << " (ignoring)" << eom;
+      debug() << "Library not found: " << library << " (ignoring)" << eom;
   }
 
   statistics() << "No. of source files: " << source_files.size() << eom;
@@ -307,15 +306,12 @@ bool compilet::find_library(const std::string &name)
 {
   std::string tmp;
 
-  for(std::list<std::string>::const_iterator
-      it=library_paths.begin();
-      it!=library_paths.end();
-      it++)
+  for(const auto &library_path : library_paths)
   {
     #ifdef _WIN32
-    tmp = *it + "\\lib";
+    tmp = library_path + "\\lib";
     #else
-    tmp = *it + "/lib";
+    tmp = library_path + "/lib";
     #endif
 
     std::ifstream in(tmp+name+".a");
@@ -350,13 +346,12 @@ bool compilet::link()
 {
   // "compile" hitherto uncompiled functions
   statistics() << "Compiling functions" << eom;
-  convert_symbols(compiled_functions);
+  convert_symbols(goto_model.goto_functions);
 
   // parse object files
   for(const auto &file_name : object_files)
   {
-    if(read_object_and_link(file_name, symbol_table,
-                            compiled_functions, get_message_handler()))
+    if(read_object_and_link(file_name, goto_model, get_message_handler()))
       return true;
   }
 
@@ -367,23 +362,23 @@ bool compilet::link()
     // new symbols may have been added to a previously linked file
     // make sure a new entry point is created that contains all
     // static initializers
-    compiled_functions.function_map.erase(INITIALIZE_FUNCTION);
+    goto_model.goto_functions.function_map.erase(INITIALIZE_FUNCTION);
 
-    symbol_table.remove(goto_functionst::entry_point());
-    compiled_functions.function_map.erase(goto_functionst::entry_point());
+    goto_model.symbol_table.remove(goto_functionst::entry_point());
+    goto_model.goto_functions.function_map.erase(
+      goto_functionst::entry_point());
 
-    if(ansi_c_entry_point(symbol_table, get_message_handler()))
+    if(ansi_c_entry_point(goto_model.symbol_table, get_message_handler()))
       return true;
 
     // entry_point may (should) add some more functions.
-    convert_symbols(compiled_functions);
+    convert_symbols(goto_model.goto_functions);
   }
 
-  if(write_object_file(
-      output_file_executable, symbol_table, compiled_functions))
+  if(write_object_file(output_file_executable, goto_model))
     return true;
 
-  return add_written_cprover_symbols(symbol_table);
+  return add_written_cprover_symbols(goto_model.symbol_table);
 }
 
 /// parses source files and writes object files, or keeps the symbols in the
@@ -423,7 +418,7 @@ bool compilet::compile()
       // output an object file for every source file
 
       // "compile" functions
-      convert_symbols(compiled_functions);
+      convert_symbols(goto_model.goto_functions);
 
       std::string cfn;
 
@@ -440,14 +435,13 @@ bool compilet::compile()
       else
         cfn = output_file_object;
 
-      if(write_object_file(cfn, symbol_table, compiled_functions))
+      if(write_object_file(cfn, goto_model))
         return true;
 
-      if(add_written_cprover_symbols(symbol_table))
+      if(add_written_cprover_symbols(goto_model.symbol_table))
         return true;
 
-      symbol_table.clear(); // clean symbol table for next source file.
-      compiled_functions.clear();
+      goto_model.clear(); // clean symbol table for next source file.
     }
   }
 
@@ -456,7 +450,9 @@ bool compilet::compile()
 
 /// parses a source file (low-level parsing)
 /// \return true on error, false otherwise
-bool compilet::parse(const std::string &file_name)
+bool compilet::parse(
+  const std::string &file_name,
+  language_filest &language_files)
 {
   if(file_name=="-")
     return parse_stdin();
@@ -527,8 +523,7 @@ bool compilet::parse(const std::string &file_name)
 
     if(lf.language->parse(infile, file_name))
     {
-      if(get_ui()==ui_message_handlert::uit::PLAIN)
-        error() << "PARSING ERROR" << eom;
+      error() << "PARSING ERROR" << eom;
       return true;
     }
   }
@@ -571,8 +566,7 @@ bool compilet::parse_stdin()
   {
     if(language.parse(std::cin, ""))
     {
-      if(get_ui()==ui_message_handlert::uit::PLAIN)
-        error() << "PARSING ERROR" << eom;
+      error() << "PARSING ERROR" << eom;
       return true;
     }
   }
@@ -586,10 +580,9 @@ bool compilet::parse_stdin()
 /// \return true on error, false otherwise
 bool compilet::write_object_file(
   const std::string &file_name,
-  const symbol_tablet &lsymbol_table,
-  goto_functionst &functions)
+  const goto_modelt &goto_model)
 {
-  return write_bin_object_file(file_name, lsymbol_table, functions);
+  return write_bin_object_file(file_name, goto_model);
 }
 
 /// writes the goto functions in the function table to a binary format object
@@ -598,15 +591,14 @@ bool compilet::write_object_file(
 /// \return true on error, false otherwise
 bool compilet::write_bin_object_file(
   const std::string &file_name,
-  const symbol_tablet &lsymbol_table,
-  goto_functionst &functions)
+  const goto_modelt &goto_model)
 {
   statistics() << "Writing binary format object `"
                << file_name << "'" << eom;
 
   // symbols
-  statistics() << "Symbols in table: "
-               << lsymbol_table.symbols.size() << eom;
+  statistics() << "Symbols in table: " << goto_model.symbol_table.symbols.size()
+               << eom;
 
   std::ofstream outfile(file_name, std::ios::binary);
 
@@ -616,12 +608,12 @@ bool compilet::write_bin_object_file(
     return true;
   }
 
-  if(write_goto_binary(outfile, lsymbol_table, functions))
+  if(write_goto_binary(outfile, goto_model))
     return true;
 
-  unsigned cnt=function_body_count(functions);
+  const auto cnt = function_body_count(goto_model.goto_functions);
 
-  statistics() << "Functions: " << functions.function_map.size()
+  statistics() << "Functions: " << goto_model.goto_functions.function_map.size()
                << "; " << cnt << " have a body." << eom;
 
   outfile.close();
@@ -634,29 +626,35 @@ bool compilet::write_bin_object_file(
 /// \return true on error, false otherwise
 bool compilet::parse_source(const std::string &file_name)
 {
-  if(parse(file_name))
+  language_filest language_files;
+  language_files.set_message_handler(get_message_handler());
+
+  if(parse(file_name, language_files))
     return true;
 
-  if(typecheck()) // we just want to typecheck this one file here
+  // we just typecheck one file here
+  if(language_files.typecheck(goto_model.symbol_table))
+  {
+    error() << "CONVERSION ERROR" << eom;
     return true;
+  }
 
-  if((has_suffix(file_name, ".class") ||
-      has_suffix(file_name, ".jar")) &&
-     final())
+  if(language_files.final(goto_model.symbol_table))
+  {
+    error() << "CONVERSION ERROR" << eom;
     return true;
+  }
 
-  // so we remove it from the list afterwards
-  language_files.remove_file(file_name);
   return false;
 }
 
 /// constructor
 /// \return nothing
-compilet::compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror):
-  language_uit(_cmdline, mh),
-  ns(symbol_table),
-  cmdline(_cmdline),
-  warning_is_fatal(Werror)
+compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
+  : messaget(mh),
+    ns(goto_model.symbol_table),
+    cmdline(_cmdline),
+    warning_is_fatal(Werror)
 {
   mode=COMPILE_LINK_EXECUTABLE;
   echo_file_name=false;
@@ -670,24 +668,20 @@ compilet::~compilet()
 {
   // clean up temp dirs
 
-  for(std::list<std::string>::const_iterator it = tmp_dirs.begin();
-      it!=tmp_dirs.end();
-      it++)
-    delete_directory(*it);
+  for(const auto &dir : tmp_dirs)
+    delete_directory(dir);
 }
 
-unsigned compilet::function_body_count(const goto_functionst &functions) const
+std::size_t
+compilet::function_body_count(const goto_functionst &functions) const
 {
-  int fbs=0;
+  std::size_t count = 0;
 
-  for(goto_functionst::function_mapt::const_iterator it=
-      functions.function_map.begin();
-      it != functions.function_map.end();
-      it++)
-    if(it->second.body_available())
-      fbs++;
+  for(const auto &f : functions.function_map)
+    if(f.second.body_available())
+      count++;
 
-  return fbs;
+  return count;
 }
 
 void compilet::add_compiler_specific_defines(configt &config) const
@@ -698,31 +692,29 @@ void compilet::add_compiler_specific_defines(configt &config) const
 
 void compilet::convert_symbols(goto_functionst &dest)
 {
-  goto_convert_functionst converter(symbol_table, get_message_handler());
+  goto_convert_functionst converter(
+    goto_model.symbol_table, get_message_handler());
 
   // the compilation may add symbols!
 
   symbol_tablet::symbolst::size_type before=0;
 
-  while(before!=symbol_table.symbols.size())
+  while(before != goto_model.symbol_table.symbols.size())
   {
-    before=symbol_table.symbols.size();
+    before = goto_model.symbol_table.symbols.size();
 
     typedef std::set<irep_idt> symbols_sett;
     symbols_sett symbols;
 
-    for(const auto &named_symbol : symbol_table.symbols)
+    for(const auto &named_symbol : goto_model.symbol_table.symbols)
       symbols.insert(named_symbol.first);
 
     // the symbol table iterators aren't stable
-    for(symbols_sett::const_iterator
-        it=symbols.begin();
-        it!=symbols.end();
-        ++it)
+    for(const auto &symbol : symbols)
     {
-      symbol_tablet::symbolst::const_iterator s_it=
-        symbol_table.symbols.find(*it);
-      assert(s_it!=symbol_table.symbols.end());
+      symbol_tablet::symbolst::const_iterator s_it =
+        goto_model.symbol_table.symbols.find(symbol);
+      CHECK_RETURN(s_it != goto_model.symbol_table.symbols.end());
 
       if(
         s_it->second.is_function() && !s_it->second.is_compiled() &&
@@ -730,7 +722,7 @@ void compilet::convert_symbols(goto_functionst &dest)
       {
         debug() << "Compiling " << s_it->first << eom;
         converter.convert_function(s_it->first, dest.function_map[s_it->first]);
-        symbol_table.get_writeable_ref(*it).set_compiled();
+        goto_model.symbol_table.get_writeable_ref(symbol).set_compiled();
       }
     }
   }

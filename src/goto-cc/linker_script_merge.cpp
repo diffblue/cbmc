@@ -32,12 +32,11 @@ int linker_script_merget::add_linker_script_definitions()
 
   temporary_filet linker_def_outfile("goto-cc-linker-info", ".json");
   std::list<irep_idt> linker_defined_symbols;
-  int fail=
-    get_linker_script_data(
-      linker_defined_symbols,
-      compiler.symbol_table,
-      elf_binary,
-      linker_def_outfile());
+  int fail = get_linker_script_data(
+    linker_defined_symbols,
+    compiler.goto_model.symbol_table,
+    elf_binary,
+    linker_def_outfile());
   // ignore linker script parsing failures until the code is tested more widely
   if(fail!=0)
     return 0;
@@ -58,11 +57,10 @@ int linker_script_merget::add_linker_script_definitions()
     return fail;
   }
 
-  symbol_tablet original_st;
-  goto_functionst original_gf;
+  goto_modelt original_goto_model;
 
-  fail=read_goto_binary(goto_binary, original_st, original_gf,
-      get_message_handler());
+  fail =
+    read_goto_binary(goto_binary, original_goto_model, get_message_handler());
 
   if(fail!=0)
   {
@@ -72,19 +70,20 @@ int linker_script_merget::add_linker_script_definitions()
 
   fail=1;
   linker_valuest linker_values;
-  const auto &pair=original_gf.function_map.find(INITIALIZE_FUNCTION);
-  if(pair==original_gf.function_map.end())
+  const auto &pair =
+    original_goto_model.goto_functions.function_map.find(INITIALIZE_FUNCTION);
+  if(pair == original_goto_model.goto_functions.function_map.end())
   {
     error() << "No " << INITIALIZE_FUNCTION << " found in goto_functions"
             << eom;
     return fail;
   }
-  fail=ls_data2instructions(
-      data,
-      cmdline.get_value('T'),
-      pair->second.body,
-      original_st,
-      linker_values);
+  fail = ls_data2instructions(
+    data,
+    cmdline.get_value('T'),
+    pair->second.body,
+    original_goto_model.symbol_table,
+    linker_values);
   if(fail!=0)
   {
     error() << "Could not add linkerscript defs to " INITIALIZE_FUNCTION << eom;
@@ -98,8 +97,7 @@ int linker_script_merget::add_linker_script_definitions()
   // The keys of linker_values are exactly the elements of
   // linker_defined_symbols, so iterate over linker_values from now on.
 
-  fail=pointerize_linker_defined_symbols(original_gf, original_st,
-      linker_values);
+  fail = pointerize_linker_defined_symbols(original_goto_model, linker_values);
 
   if(fail!=0)
   {
@@ -107,7 +105,7 @@ int linker_script_merget::add_linker_script_definitions()
     return fail;
   }
 
-  fail=compiler.write_object_file(goto_binary, original_st, original_gf);
+  fail = compiler.write_object_file(goto_binary, original_goto_model);
 
   if(fail!=0)
     error() << "Could not write linkerscript-augmented binary" << eom;
@@ -185,17 +183,16 @@ linker_script_merget::linker_script_merget(
 {}
 
 int linker_script_merget::pointerize_linker_defined_symbols(
-      goto_functionst &goto_functions,
-      symbol_tablet &symbol_table,
-      const linker_valuest &linker_values)
+  goto_modelt &goto_model,
+  const linker_valuest &linker_values)
 {
-  const namespacet ns(symbol_table);
+  const namespacet ns(goto_model.symbol_table);
 
   int ret=0;
   // First, pointerize the actual linker-defined symbols
   for(const auto &pair : linker_values)
   {
-    const auto maybe_symbol=symbol_table.get_writeable(pair.first);
+    const auto maybe_symbol = goto_model.symbol_table.get_writeable(pair.first);
     if(!maybe_symbol)
       continue;
     symbolt &entry=*maybe_symbol;
@@ -206,7 +203,7 @@ int linker_script_merget::pointerize_linker_defined_symbols(
 
   // Next, find all occurrences of linker-defined symbols that are _values_
   // of some symbol in the symbol table, and pointerize them too
-  for(const auto &pair : symbol_table.symbols)
+  for(const auto &pair : goto_model.symbol_table.symbols)
   {
     std::list<symbol_exprt> to_pointerize;
     symbols_to_pointerize(linker_values, pair.second.value, to_pointerize);
@@ -215,8 +212,8 @@ int linker_script_merget::pointerize_linker_defined_symbols(
       continue;
     debug() << "Pointerizing the symbol-table value of symbol " << pair.first
             << eom;
-    int fail=pointerize_subexprs_of(
-      symbol_table.get_writeable_ref(pair.first).value,
+    int fail = pointerize_subexprs_of(
+      goto_model.symbol_table.get_writeable_ref(pair.first).value,
       to_pointerize,
       linker_values,
       ns);
@@ -232,7 +229,7 @@ int linker_script_merget::pointerize_linker_defined_symbols(
 
   // Finally, pointerize all occurrences of linker-defined symbols in the
   // goto program
-  for(auto &gf : goto_functions.function_map)
+  for(auto &gf : goto_model.goto_functions.function_map)
   {
     goto_programt &program=gf.second.body;
     Forall_goto_program_instructions(iit, program)

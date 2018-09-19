@@ -14,17 +14,22 @@ Date: June 2006
 #ifndef CPROVER_GOTO_CC_COMPILE_H
 #define CPROVER_GOTO_CC_COMPILE_H
 
-#include <util/symbol.h>
+#include <util/cmdline.h>
+#include <util/message.h>
 #include <util/rename_symbol.h>
 
-#include <langapi/language_ui.h>
 #include <goto-programs/goto_model.h>
 
-class compilet:public language_uit
+class language_filest;
+
+class compilet : public messaget
 {
 public:
+  // compilation results
   namespacet ns;
-  goto_functionst compiled_functions;
+  goto_modelt goto_model;
+
+  // configuration
   bool echo_file_name;
   std::string working_directory;
   std::string override_language;
@@ -50,7 +55,7 @@ public:
   // the two options below are mutually exclusive -- use either or
   std::string output_file_object, output_directory_object;
 
-  compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror);
+  compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror);
 
   ~compilet();
 
@@ -58,7 +63,7 @@ public:
   bool find_library(const std::string &);
   bool add_files_from_archive(const std::string &file_name, bool thin_archive);
 
-  bool parse(const std::string &filename);
+  bool parse(const std::string &filename, language_filest &);
   bool parse_stdin();
   bool doit();
   bool compile();
@@ -66,15 +71,9 @@ public:
 
   bool parse_source(const std::string &);
 
-  bool write_object_file(
-    const std::string &,
-    const symbol_tablet &,
-    goto_functionst &);
+  bool write_object_file(const std::string &, const goto_modelt &);
 
-  bool write_bin_object_file(
-    const std::string &,
-    const symbol_tablet &,
-    goto_functionst &);
+  bool write_bin_object_file(const std::string &, const goto_modelt &);
 
   /// \brief Has this compiler written any object files?
   bool wrote_object_files() const { return wrote_object; }
@@ -97,7 +96,7 @@ protected:
   cmdlinet &cmdline;
   bool warning_is_fatal;
 
-  unsigned function_body_count(const goto_functionst &) const;
+  std::size_t function_body_count(const goto_functionst &) const;
 
   void add_compiler_specific_defines(class configt &config) const;
 
