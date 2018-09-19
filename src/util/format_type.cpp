@@ -81,6 +81,14 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
     return os << "c_enum " << to_c_enum_tag_type(type).get_identifier();
   else if(id == ID_symbol_type)
     return os << "symbol_type " << to_symbol_type(type).get_identifier();
+  else if(id == ID_signedbv)
+    return os << "signedbv[" << to_signedbv_type(type).get_width() << ']';
+  else if(id == ID_unsignedbv)
+    return os << "unsignedbv[" << to_unsignedbv_type(type).get_width() << ']';
+  else if(id == ID_floatbv)
+    return os << "floatbv[" << to_floatbv_type(type).get_width() << ']';
+  else if(id == ID_c_bool)
+    return os << "c_bool[" << to_c_bool_type(type).get_width() << ']';
   else
     return os << id;
 }
