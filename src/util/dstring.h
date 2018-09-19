@@ -151,6 +151,15 @@ public:
     return no;
   }
 
+  // suitable as ordering for sets and maps
+  struct lexicographical_ordering
+  {
+    bool operator()(const dstringt &a, const dstringt &b) const
+    {
+      return a.as_string() < b.as_string();
+    }
+  };
+
 private:
   #ifdef __GNUC__
   constexpr
