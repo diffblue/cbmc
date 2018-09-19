@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 
 #include "expr.h"
+#include "invariant.h"
 
 /*! \brief Symbol table entry.
     \ingroup gr_symbol_table
@@ -106,6 +107,21 @@ public:
   bool is_function() const
   {
     return !is_type && !is_macro && type.id()==ID_code;
+  }
+
+  /// Returns true iff the the symbol's value has been compiled to a goto
+  /// program.
+  bool is_compiled() const
+  {
+    return type.id() == ID_code && value == exprt(ID_compiled);
+  }
+
+  /// Set the symbol's value to "compiled"; to be used once the code-typed value
+  /// has been converted to a goto program.
+  void set_compiled()
+  {
+    PRECONDITION(type.id() == ID_code);
+    value = exprt(ID_compiled);
   }
 };
 
