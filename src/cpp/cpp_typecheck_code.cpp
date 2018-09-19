@@ -230,13 +230,12 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
     if(symbol_expr.get_bool(ID_C_not_accessible))
     {
-      irep_idt access = symbol_expr.get(ID_C_access);
+      const irep_idt &access = symbol_expr.get(ID_C_access);
+      CHECK_RETURN(
+        access == ID_private || access == ID_protected ||
+        access == ID_noaccess);
 
-      assert(access==ID_private ||
-             access==ID_protected ||
-             access=="noaccess");
-
-      if(access==ID_private || access=="noaccess")
+      if(access == ID_private || access == ID_noaccess)
       {
         #if 0
         error().source_location=code.source_location());
@@ -425,7 +424,9 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     // is there a constructor to be called?
     if(symbol.value.is_not_nil())
     {
-      assert(declarator.find("init_args").is_nil());
+      DATA_INVARIANT(
+        declarator.find(ID_init_args).is_nil(),
+        "declarator should not have init_args");
       if(symbol.value.id()==ID_code)
         new_code.copy_to_operands(symbol.value);
     }

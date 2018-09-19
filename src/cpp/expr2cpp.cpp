@@ -457,7 +457,7 @@ std::string expr2cppt::convert_with_precedence(
     return "nullptr";
   else if(src.id()==ID_unassigned)
     return "?";
-  else if(src.id()=="pod_constructor")
+  else if(src.id() == ID_pod_constructor)
     return "pod_constructor";
   else
     return expr2ct::convert_with_precedence(src, precedence);

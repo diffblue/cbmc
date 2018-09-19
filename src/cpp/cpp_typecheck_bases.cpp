@@ -188,19 +188,19 @@ void cpp_typecheckt::add_base_components(
     if(access==ID_public)
     {
       if(comp_access==ID_private)
-        component.set_access("noaccess");
+        component.set_access(ID_noaccess);
     }
     else if(access == ID_protected)
     {
       if(comp_access==ID_private)
-        component.set_access("noaccess");
+        component.set_access(ID_noaccess);
       else
         component.set_access(ID_private);
     }
     else if(access == ID_private)
     {
-      if(comp_access == "noaccess" || comp_access == ID_private)
-        component.set_access("noaccess");
+      if(comp_access == ID_noaccess || comp_access == ID_private)
+        component.set_access(ID_noaccess);
       else
         component.set_access(ID_private);
     }

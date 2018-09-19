@@ -26,7 +26,7 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
   for(std::size_t i=0; i < struct_type.components().size(); i++)
   {
     const struct_typet::componentt &compo=struct_type.components()[i];
-    if(!compo.get_bool("is_virtual"))
+    if(!compo.get_bool(ID_is_virtual))
       continue;
 
     const code_typet &code_type=to_code_type(compo.type());
@@ -35,23 +35,24 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     const pointer_typet &parameter_pointer_type=
       to_pointer_type(code_type.parameters()[0].type());
 
-    irep_idt class_id=parameter_pointer_type.subtype().get("identifier");
+    const irep_idt &class_id =
+      parameter_pointer_type.subtype().get(ID_identifier);
 
     std::map<irep_idt, exprt> &value_map =
       vt_value_maps[class_id];
 
     exprt e=symbol_exprt(compo.get_name(), code_type);
 
-    if(compo.get_bool("is_pure_virtual"))
+    if(compo.get_bool(ID_is_pure_virtual))
     {
       pointer_typet code_pointer_type=pointer_type(code_type);
       e=null_pointer_exprt(code_pointer_type);
-      value_map[compo.get("virtual_name")]=e;
+      value_map[compo.get(ID_virtual_name)] = e;
     }
     else
     {
       address_of_exprt address(e);
-      value_map[compo.get("virtual_name")]=address;
+      value_map[compo.get(ID_virtual_name)] = address;
     }
   }
 
@@ -85,7 +86,7 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     for(const auto &compo : vt_type.components())
     {
       std::map<irep_idt, exprt>::const_iterator cit2 =
-        value_map.find(compo.get("base_name"));
+        value_map.find(compo.get_base_name());
       assert(cit2!=value_map.end());
       const exprt &value=cit2->second;
       assert(value.type()==compo.type());

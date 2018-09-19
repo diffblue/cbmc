@@ -918,7 +918,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         if(component.get_bool(ID_from_base))
           continue;
 
-        if(component.get_bool("is_explicit"))
+        if(component.get_bool(ID_is_explicit))
           continue;
 
         const typet &comp_type =
@@ -974,7 +974,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               exprt func_symb=cpp_symbol_expr(lookup(component.get(ID_name)));
               func_symb.type()=comp_type;
               {
-                exprt tmp("already_typechecked");
+                exprt tmp(ID_already_typechecked);
                 tmp.copy_to_operands(func_symb);
                 func_symb.swap(func_symb);
               }
@@ -1018,14 +1018,14 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               expr_deref.set(ID_C_lvalue, true);
               expr_deref.add_source_location()=expr.source_location();
 
-              exprt new_object("new_object", type);
+              exprt new_object(ID_new_object, type);
               new_object.set(ID_C_lvalue, true);
               new_object.type().set(ID_C_constant, false);
 
               exprt func_symb=cpp_symbol_expr(lookup(component.get(ID_name)));
               func_symb.type()=comp_type;
               {
-                exprt tmp("already_typechecked");
+                exprt tmp(ID_already_typechecked);
                 tmp.copy_to_operands(func_symb);
                 func_symb.swap(func_symb);
               }
@@ -1063,7 +1063,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       if(component.get_bool(ID_from_base))
         continue;
 
-      if(!component.get_bool("is_cast_operator"))
+      if(!component.get_bool(ID_is_cast_operator))
         continue;
 
       assert(component.get(ID_type)==ID_code &&
@@ -1094,7 +1094,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
         exprt member_func(ID_member);
         member_func.add(ID_component_cpp_name)=cpp_func_name;
-        exprt ac("already_typechecked");
+        exprt ac(ID_already_typechecked);
         ac.copy_to_operands(expr);
         member_func.copy_to_operands(ac);
 
@@ -1291,7 +1291,7 @@ bool cpp_typecheckt::reference_binding(
       if(component.get_bool(ID_from_base))
         continue;
 
-      if(!component.get_bool("is_cast_operator"))
+      if(!component.get_bool(ID_is_cast_operator))
         continue;
 
       const code_typet &component_type = to_code_type(component.type());
@@ -1325,7 +1325,7 @@ bool cpp_typecheckt::reference_binding(
 
         exprt member_func(ID_member);
         member_func.add(ID_component_cpp_name)=cpp_func_name;
-        exprt ac("already_typechecked");
+        exprt ac(ID_already_typechecked);
         ac.copy_to_operands(expr);
         member_func.copy_to_operands(ac);
 
