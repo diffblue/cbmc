@@ -33,24 +33,19 @@ void prop_convt::set_frozen(const bvt &bv)
       set_frozen(bit);
 }
 
-bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
+bool prop_conv_solvert::literal(const symbol_exprt &expr, literalt &dest) const
 {
   assert(expr.type().id()==ID_bool);
 
-  if(expr.id()==ID_symbol)
-  {
-    const irep_idt &identifier=
-      to_symbol_expr(expr).get_identifier();
+  const irep_idt &identifier = expr.get_identifier();
 
-    symbolst::const_iterator result=symbols.find(identifier);
+  symbolst::const_iterator result = symbols.find(identifier);
 
-    if(result==symbols.end())
-      return true;
-    dest=result->second;
-    return false;
-  }
+  if(result == symbols.end())
+    return true;
 
-  throw "found no literal for expression";
+  dest = result->second;
+  return false;
 }
 
 literalt prop_conv_solvert::get_literal(const irep_idt &identifier)

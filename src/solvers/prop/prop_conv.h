@@ -106,7 +106,7 @@ public:
   { return prop.has_is_in_conflict(); }
 
   // get literal for expression, if available
-  virtual bool literal(const exprt &expr, literalt &literal) const;
+  bool literal(const symbol_exprt &expr, literalt &literal) const;
 
   bool use_cache = true;
   bool equality_propagation = true;
