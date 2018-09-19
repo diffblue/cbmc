@@ -1,4 +1,4 @@
-#include <cassert>
+#include <util/invariant.h>
 
 // inline functions
 
@@ -18,7 +18,7 @@ inline mini_bddt::mini_bddt(class mini_bdd_nodet *_node):node(_node)
 
 inline mini_bddt &mini_bddt::operator=(const mini_bddt &x)
 {
-  assert(&x!=this);
+  PRECONDITION_WITH_DIAGNOSTICS(&x != this, "cannot assign itself");
   clear();
 
   node=x.node;
@@ -35,45 +35,45 @@ inline mini_bddt::~mini_bddt()
 
 inline bool mini_bddt::is_constant() const
 {
-  assert(is_initialized());
+  PRECONDITION_WITH_DIAGNOSTICS(is_initialized(), "BDD has to be initialized");
   return node->node_number<=1;
 }
 
 inline bool mini_bddt::is_true() const
 {
-  assert(is_initialized());
+  PRECONDITION_WITH_DIAGNOSTICS(is_initialized(), "BDD has to be initialized");
   return node->node_number==1;
 }
 
 inline bool mini_bddt::is_false() const
 {
-  assert(is_initialized());
+  PRECONDITION_WITH_DIAGNOSTICS(is_initialized(), "BDD has to be initialized");
   return node->node_number==0;
 }
 
 inline unsigned mini_bddt::var() const
 {
-  assert(is_initialized());
+  PRECONDITION_WITH_DIAGNOSTICS(is_initialized(), "BDD has to be initialized");
   return node->var;
 }
 
 inline unsigned mini_bddt::node_number() const
 {
-  assert(is_initialized());
+  PRECONDITION_WITH_DIAGNOSTICS(is_initialized(), "BDD has to be initialized");
   return node->node_number;
 }
 
 inline const mini_bddt &mini_bddt::low() const
 {
-  assert(is_initialized());
-  assert(node->node_number>=2);
+  PRECONDITION_WITH_DIAGNOSTICS(is_initialized(), "BDD has to be initialized");
+  PRECONDITION_WITH_DIAGNOSTICS(node->node_number >= 2, "only non-terminal nodes have out-going edges");
   return node->low;
 }
 
 inline const mini_bddt &mini_bddt::high() const
 {
-  assert(is_initialized());
-  assert(node->node_number>=2);
+  PRECONDITION_WITH_DIAGNOSTICS(is_initialized(), "BDD has to be initialized");
+  PRECONDITION_WITH_DIAGNOSTICS(node->node_number >= 2, "only non-terminal nodes have out-going edges");
   return node->high;
 }
 
