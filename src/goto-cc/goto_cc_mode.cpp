@@ -22,6 +22,7 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
+#include <util/exception_utils.h>
 #include <util/parse_options.h>
 #include <util/version.h>
 
@@ -104,6 +105,11 @@ int goto_cc_modet::main(int argc, const char **argv)
   catch(const std::bad_alloc &)
   {
     error() << "Out of memory" << eom;
+    return EX_SOFTWARE;
+  }
+  catch(const cprover_exception_baset &e)
+  {
+    error() << e.what() << eom;
     return EX_SOFTWARE;
   }
 }
