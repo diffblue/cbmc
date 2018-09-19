@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "replace_symbol.h"
 
+#include "expr_util.h"
 #include "invariant.h"
 #include "std_expr.h"
 #include "std_types.h"
@@ -322,7 +323,7 @@ bool address_of_aware_replace_symbolt::replace_symbol_expr(
 
   const exprt &e = it->second;
 
-  if(require_lvalue && e.is_constant()) // Would give non l-value.
+  if(require_lvalue && !is_lvalue(e))
     return true;
 
   static_cast<exprt &>(s) = e;
