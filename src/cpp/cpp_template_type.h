@@ -50,7 +50,7 @@ inline const template_typet &to_template_type(const typet &type)
 inline const typet &template_subtype(const typet &type)
 {
   if(type.id()==ID_template)
-    return type.subtype();
+    return static_cast<const type_with_subtypet &>(type).subtype();
 
   return type;
 }
@@ -58,7 +58,7 @@ inline const typet &template_subtype(const typet &type)
 inline typet &template_subtype(typet &type)
 {
   if(type.id()==ID_template)
-    return type.subtype();
+    return static_cast<type_with_subtypet &>(type).subtype();
 
   return type;
 }

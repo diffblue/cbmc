@@ -100,8 +100,8 @@ exprt boolbvt::bv_get_rec(
   {
     if(type.id()==ID_array)
     {
-      const typet &subtype=type.subtype();
-      std::size_t sub_width=boolbv_width(subtype);
+      const typet &subtype=to_array_type(type).subtype();
+      const std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width!=0)
       {
@@ -182,8 +182,8 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_vector)
     {
-      const typet &subtype=ns.follow(type.subtype());
-      std::size_t sub_width=boolbv_width(subtype);
+      const typet &subtype=ns.follow(to_vector_type(type).subtype());
+      const std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width!=0 && width%sub_width==0)
       {
@@ -200,8 +200,8 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_complex)
     {
-      const typet &subtype=ns.follow(type.subtype());
-      std::size_t sub_width=boolbv_width(subtype);
+      const typet &subtype=ns.follow(to_complex_type(type).subtype());
+      const std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width!=0 && width==sub_width*2)
       {

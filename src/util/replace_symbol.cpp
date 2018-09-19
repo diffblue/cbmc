@@ -162,7 +162,7 @@ bool replace_symbolt::replace(typet &dest) const
   bool result=true;
 
   if(dest.has_subtype())
-    if(!replace(dest.subtype()))
+    if(!replace(to_type_with_subtype(dest).subtype()))
       result=false;
 
   Forall_subtypes(it, dest)
@@ -204,7 +204,7 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
     return false;
 
   if(dest.has_subtype())
-    if(have_to_replace(dest.subtype()))
+    if(have_to_replace(to_type_with_subtype(dest).subtype()))
       return true;
 
   forall_subtypes(it, dest)

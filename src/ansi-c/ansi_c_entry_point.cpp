@@ -345,7 +345,7 @@ bool generate_ansi_c_start_function(
       {
         // assign argv[argc] to NULL
         const null_pointer_exprt null(
-          to_pointer_type(argv_symbol.type.subtype()));
+          to_pointer_type(to_pointer_type(argv_symbol.type).subtype()));
 
         index_exprt index_expr(
           argv_symbol.symbol_expr(), argc_symbol.symbol_expr());

@@ -334,7 +334,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     if(ptr_expr.size()!=1 || int_expr.empty())
       return true;
 
-    typet pointer_sub_type=ptr_expr.front().type().subtype();
+    typet pointer_sub_type = to_pointer_type(ptr_expr.front().type()).subtype();
     if(pointer_sub_type.id()==ID_empty)
       pointer_sub_type=char_type();
 

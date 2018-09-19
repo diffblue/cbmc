@@ -114,9 +114,9 @@ exprt goto_symext::address_arithmetic(
       address_of_exprt &a=to_address_of_expr(result);
 
       // turn &a of type T[i][j] into &(a[0][0])
-      for(const typet *t=&(ns.follow(a.type().subtype()));
-          t->id()==ID_array && !base_type_eq(expr.type(), *t, ns);
-          t=&(ns.follow(*t).subtype()))
+      for(const typet *t = &(ns.follow(to_pointer_type(a.type()).subtype()));
+          t->id() == ID_array && !base_type_eq(expr.type(), *t, ns);
+          t = &(to_array_type(ns.follow(*t)).subtype()))
         a.object()=index_exprt(a.object(), from_integer(0, index_type()));
     }
 
@@ -134,7 +134,7 @@ exprt goto_symext::address_arithmetic(
     typet dest_type_subtype;
 
     if(expr_type.id()==ID_array && !keep_array)
-      dest_type_subtype=expr_type.subtype();
+      dest_type_subtype = to_array_type(expr_type).subtype();
     else
       dest_type_subtype=expr_type;
 
@@ -227,7 +227,7 @@ exprt goto_symext::address_arithmetic(
     typet dest_type_subtype;
 
     if(expr_type.id() == ID_array && !keep_array)
-      dest_type_subtype = expr_type.subtype();
+      dest_type_subtype = to_array_type(expr_type).subtype();
     else
       dest_type_subtype = expr_type;
 
@@ -348,12 +348,14 @@ void goto_symext::dereference_rec(
     exprt &tc_op=to_typecast_expr(expr).op();
 
     // turn &array into &array[0] when casting to pointer-to-element-type
-    if(tc_op.id()==ID_address_of &&
-       to_address_of_expr(tc_op).object().type().id()==ID_array &&
-       base_type_eq(
-         expr.type(),
-         pointer_type(to_address_of_expr(tc_op).object().type().subtype()),
-         ns))
+    if(
+      tc_op.id() == ID_address_of &&
+      to_address_of_expr(tc_op).object().type().id() == ID_array &&
+      base_type_eq(
+        expr.type(),
+        pointer_type(
+          to_array_type(to_address_of_expr(tc_op).object().type()).subtype()),
+        ns))
     {
       expr=
         address_of_exprt(

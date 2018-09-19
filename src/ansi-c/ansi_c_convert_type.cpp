@@ -48,15 +48,17 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_qualifiers.is_volatile=true;
   else if(type.id()==ID_asm)
   {
-    if(type.has_subtype() &&
-       type.subtype().id()==ID_string_constant)
-      c_storage_spec.asm_label=type.subtype().get(ID_value);
+    if(
+      type.has_subtype() &&
+      to_type_with_subtype(type).subtype().id() == ID_string_constant)
+      c_storage_spec.asm_label =
+        to_type_with_subtype(type).subtype().get(ID_value);
   }
-  else if(type.id()==ID_section &&
-          type.has_subtype() &&
-          type.subtype().id()==ID_string_constant)
+  else if(
+    type.id() == ID_section && type.has_subtype() &&
+    to_type_with_subtype(type).subtype().id() == ID_string_constant)
   {
-    c_storage_spec.section=type.subtype().get(ID_value);
+    c_storage_spec.section = to_type_with_subtype(type).subtype().get(ID_value);
   }
   else if(type.id()==ID_const)
     c_qualifiers.is_constant=true;
@@ -226,11 +228,11 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     constructor=true;
   else if(type.id()==ID_destructor)
     destructor=true;
-  else if(type.id()==ID_alias &&
-          type.has_subtype() &&
-          type.subtype().id()==ID_string_constant)
+  else if(
+    type.id() == ID_alias && type.has_subtype() &&
+    to_type_with_subtype(type).subtype().id() == ID_string_constant)
   {
-    c_storage_spec.alias=type.subtype().get(ID_value);
+    c_storage_spec.alias = to_type_with_subtype(type).subtype().get(ID_value);
   }
   else if(type.id()==ID_frontend_pointer)
   {
