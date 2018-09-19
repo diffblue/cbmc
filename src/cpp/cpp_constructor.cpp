@@ -103,12 +103,14 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
         exprt constant=from_integer(i, index_type());
         constant.add_source_location()=source_location;
 
-        index_exprt index(object, constant);
+        // can't use index_exprt, as this requires a type with subtype
+        binary_exprt index(object, ID_index, constant);
         index.add_source_location()=source_location;
 
         if(!operands.empty())
         {
-          index_exprt operand(operands.front(), constant);
+          // can't use index_exprt, as this requires a type with subtype
+          binary_exprt operand(operands.front(), ID_index, constant);
           operand.add_source_location()=source_location;
           tmp_operands.push_back(operand);
         }
