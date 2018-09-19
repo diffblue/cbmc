@@ -1295,8 +1295,13 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
   if(final_array_type.id()==ID_array ||
      final_array_type.id()==ID_vector)
   {
+    expr.type() = final_array_type.subtype();
+
     if(array_expr.get_bool(ID_C_lvalue))
       expr.set(ID_C_lvalue, true);
+
+    if(final_array_type.get_bool(ID_C_constant))
+      expr.type().set(ID_C_constant, true);
   }
   else if(final_array_type.id()==ID_pointer)
   {
@@ -1308,6 +1313,7 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
     expr.move_to_operands(addition);
     expr.id(ID_dereference);
     expr.set(ID_C_lvalue, true);
+    expr.type() = final_array_type.subtype();
   }
   else
   {
@@ -1316,8 +1322,6 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
             << to_string(array_expr.type()) << "'" << eom;
     throw 0;
   }
-
-  expr.type()=final_array_type.subtype();
 }
 
 void c_typecheck_baset::adjust_float_rel(exprt &expr)

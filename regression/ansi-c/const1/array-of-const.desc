@@ -1,0 +1,6 @@
+CORE
+array-of-const.c
+ ^.*: .* is constant$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
