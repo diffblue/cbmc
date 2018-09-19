@@ -8,9 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "qbf_quantor.h"
 
-#include <cassert>
 #include <cstdlib>
 #include <fstream>
+
+#include <util/invariant.h>
 
 qbf_quantort::qbf_quantort()
 {
@@ -22,8 +23,7 @@ qbf_quantort::~qbf_quantort()
 
 tvt qbf_quantort::l_get(literalt) const
 {
-  assert(false);
-  return tvt::unknown();
+  UNREACHABLE;
 }
 
 const std::string qbf_quantort::solver_text()

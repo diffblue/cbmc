@@ -23,7 +23,7 @@ qbf_squolemt::~qbf_squolemt()
 
 tvt qbf_squolemt::l_get(literalt a) const
 {
-  assert(false);
+  UNREACHABLE;
 }
 
 const std::string qbf_squolemt::solver_text()

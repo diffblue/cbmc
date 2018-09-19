@@ -6,9 +6,9 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-
-#include <cassert>
 #include <fstream>
+
+#include <util/invariant.h>
 
 #include <util/string2int.h>
 
@@ -132,12 +132,12 @@ propt::resultt qbf_skizzo_coret::prop_solve()
 
 bool qbf_skizzo_coret::is_in_core(literalt l) const
 {
-  throw "nyi";
+  UNIMPLEMENTED;
 }
 
 qdimacs_coret::modeltypet qbf_skizzo_coret::m_get(literalt a) const
 {
-  throw "nyi";
+  UNIMPLEMENTED;
 }
 
 bool qbf_skizzo_coret::get_certificate(void)
@@ -196,7 +196,10 @@ bool qbf_skizzo_coret::get_certificate(void)
     std::string line;
     std::getline(in, line);
 
-    assert(line=="# QBM file, 1.3");
+    INVARIANT_WITH_DIAGNOSTICS(
+      line == "# QBM file, 1.3",
+      "QBM file has to start with this exact string: ",
+      "# QBM file, 1.3");
 
     while(in)
     {
@@ -215,7 +218,7 @@ bool qbf_skizzo_coret::get_certificate(void)
     size_t ob=line.find('[');
     std::string n_es=line.substr(ob+1, line.find(']')-ob-1);
     n_e=unsafe_string2int(n_es);
-    assert(n_e!=0);
+    INVARIANT(n_e != 0, "there has to be at least one existential variable");
 
     e_list.resize(n_e);
     std::string e_lists=line.substr(line.find(':')+2);
@@ -225,7 +228,7 @@ bool qbf_skizzo_coret::get_certificate(void)
       size_t space=e_lists.find(' ');
 
       int cur=unsafe_string2int(e_lists.substr(0, space));
-      assert(cur!=0);
+      INVARIANT(cur != 0, "variable numbering starts with 1");
 
       e_list[i]=cur;
       if(cur>e_max)
@@ -234,8 +237,7 @@ bool qbf_skizzo_coret::get_certificate(void)
       e_lists=e_lists.substr(space+1);
     }
 
-    if(!result)
-      throw "existential mapping from sKizzo missing";
+    INVARIANT(result, "existential mapping from sKizzo missing");
 
     in.close();
 
@@ -270,7 +272,10 @@ bool qbf_skizzo_coret::get_certificate(void)
         NULL,
         &bdds);
 
-    assert(nroots=2*n_e); // ozziKs documentation guarantees that.
+    INVARIANT(
+      nroots == 2 * n_e,
+      "valid QBM certificate should have twice as much roots as the "
+      "existential variables");
 
     model_bdds.resize(e_max+1, NULL);
 

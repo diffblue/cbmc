@@ -8,10 +8,10 @@ Author: CM Wintersteiger
 
 #include <solvers/prop/literal.h>
 
-#include <cassert>
 #include <fstream>
 
 #include <util/arith_tools.h>
+#include <util/invariant.h>
 #include <util/std_expr.h>
 
 #include <cuddObj.hh> // CUDD Library
@@ -80,8 +80,7 @@ qbf_bdd_coret::~qbf_bdd_coret()
 
 tvt qbf_bdd_coret::l_get(literalt a) const
 {
-  assert(false);
-  return tvt(false);
+  UNREACHABLE;
 }
 
 const std::string qbf_bdd_coret::solver_text()
@@ -122,8 +121,11 @@ propt::resultt qbf_bdd_coret::prop_solve()
 
       *matrix=matrix->ExistAbstract(*bdd_variable_map[var]);
     }
-    else if(it->type==quantifiert::UNIVERSAL)
+    else
     {
+      INVARIANT(
+        it->type == quantifiert::UNIVERSAL,
+        "only handles quantified variables");
       #if 0
       std::cout << "BDD A: " << var << ", " <<
         matrix->nodeCount() << " nodes\n";
@@ -131,8 +133,6 @@ propt::resultt qbf_bdd_coret::prop_solve()
 
       *matrix=matrix->UnivAbstract(*bdd_variable_map[var]);
     }
-    else
-      throw "unquantified variable";
   }
 
   if(*matrix==bdd_manager->bddOne())
@@ -151,12 +151,12 @@ propt::resultt qbf_bdd_coret::prop_solve()
 
 bool qbf_bdd_coret::is_in_core(literalt l) const
 {
-  throw "nyi";
+  UNIMPLEMENTED;
 }
 
 qdimacs_coret::modeltypet qbf_bdd_coret::m_get(literalt a) const
 {
-  throw "nyi";
+  UNIMPLEMENTED;
 }
 
 literalt qbf_bdd_coret::new_variable()
@@ -268,17 +268,17 @@ void qbf_bdd_coret::compress_certificate(void)
 const exprt qbf_bdd_certificatet::f_get(literalt l)
 {
   quantifiert q;
-  if(!find_quantifier(l, q))
-    throw "no model for unquantified variable";
+  PRECONDITION_WITH_DIAGNOSTICS(
+    !find_quantifier(l, q), "no model for unquantified variables");
 
   // universal?
   if(q.type==quantifiert::UNIVERSAL)
   {
-    assert(l.var_no()!=0);
+    INVARIANT(l.var_no() != 0, "input literal wasn't properly initialized");
     variable_mapt::const_iterator it=variable_map.find(l.var_no());
 
-    if(it==variable_map.end())
-      throw "variable map error";
+    INVARIANT(
+      it != variable_map.end(), "variable not found in the variable map");
 
     const exprt &sym=it->second.first;
     unsigned index=it->second.second;
@@ -293,7 +293,9 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
   else
   {
     // skolem functions for existentials
-    assert(q.type==quantifiert::EXISTENTIAL);
+    INVARIANT(
+      q.type == quantifiert::EXISTENTIAL,
+      "only quantified literals are supported");
 
     function_cachet::const_iterator it=function_cache.find(l.var_no());
     if(it!=function_cache.end())
@@ -310,7 +312,9 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
 
     // no cached function, so construct one
 
-    assert(model_bdds[l.var_no()]!=NULL);
+    INVARIANT(
+      model_bdds[l.var_no()] != nullptr,
+      "there must be a model BDD for the literal");
     BDD &model=*model_bdds[l.var_no()];
 
     #if 0

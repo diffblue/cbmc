@@ -12,6 +12,8 @@ Author: CM Wintersteiger
 
 #include "qdimacs_core.h"
 
+#include <util/invariant.h>
+
 class qbf_qube_coret:public qdimacs_coret
 {
 protected:
@@ -51,7 +53,7 @@ public:
 
   virtual const exprt f_get(literalt)
   {
-    throw "qube does not support full certificates.";
+    INVARIANT(false, "qube does not support full certificates.");
   }
 };
 

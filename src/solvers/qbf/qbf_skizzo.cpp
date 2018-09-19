@@ -8,9 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "qbf_skizzo.h"
 
-#include <cassert>
 #include <cstdlib>
 #include <fstream>
+
+#include <util/invariant.h>
 
 qbf_skizzot::qbf_skizzot()
 {
@@ -24,8 +25,7 @@ qbf_skizzot::~qbf_skizzot()
 
 tvt qbf_skizzot::l_get(literalt) const
 {
-  assert(false);
-  return tvt(false);
+  UNREACHABLE;
 }
 
 const std::string qbf_skizzot::solver_text()
