@@ -189,11 +189,12 @@ const exprt qbf_squolem_coret::f_get(literalt l)
 {
   if(squolem->isUniversal(l.var_no()))
   {
-    assert(l.var_no()!=0);
+    INVARIANT_WITH_DIAGNOSTICS(
+      l.var_no() != 0, "unknown variable: ", std::to_string(l.var_no()));
     variable_mapt::const_iterator it=variable_map.find(l.var_no());
 
-    if(it==variable_map.end())
-      throw "variable map error";
+    INVARIANT(
+      it != variable_map.end(), "variable not found in the variable map");
 
     const exprt &sym=it->second.first;
     unsigned index=it->second.second;

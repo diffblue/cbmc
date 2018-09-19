@@ -8,11 +8,11 @@ Author: CM Wintersteiger
 
 #include "qbf_qube_core.h"
 
-#include <cassert>
 #include <cstdlib>
-#include <fstream>
 #include <cstring>
+#include <fstream>
 
+#include <util/invariant.h>
 #include <util/mp_arith.h>
 
 qbf_qube_coret::qbf_qube_coret() : qdimacs_coret()
@@ -131,10 +131,10 @@ propt::resultt qbf_qube_coret::prop_solve()
 
 bool qbf_qube_coret::is_in_core(literalt) const
 {
-  throw "not supported";
+  UNIMPLEMENTED;
 }
 
 qdimacs_coret::modeltypet qbf_qube_coret::m_get(literalt) const
 {
-  throw "not supported";
+  UNIMPLEMENTED;
 }
