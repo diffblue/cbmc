@@ -143,6 +143,35 @@ For more information on the structure of `unit/` and how to tag tests, see
 repository](https://github.com/diffblue/cbmc/blob/develop/CODING_STANDARD.md#unit-tests)
 
 
+\subsection compilation-and-development-subsection-sat-solver Using a different SAT solver
+
+By default, CBMC will assume MiniSat 2 as the SAT back-end. Several other
+solvers are supported (see also
+[config.inc](compilation-and-development-subsubsection-config-inc) above). As a
+more general option, which is not limited to a single SAT solver, you may use
+the IPASIR interface. For example, to use the SAT solver RISS, proceed as
+follows:
+
+1) Build RISS (in particular its IPASIR configuration):
+
+    git clone https://github.com/conp-solutions/riss riss.git
+    cd riss.git
+    mkdir build
+    cd build
+    cmake ..
+    make riss-coprocessor-lib-static
+    cd ../..
+
+2) Build CBMC while enabling the IPASIR back-end:
+    make -C src IPASIR=../../riss.git/riss \
+      LIBS="../../riss.git/build/lib/libriss-coprocessor.a -lpthread"
+
+3) Run CBMC - note that RISS is highly configurable via the RISSCONFIG
+environment variable:
+    export RISSCONFIG=VERBOSE:BMC1
+    ... run CBMC ...
+
+
 \section compilation-and-development-section-documentation Documentation
 
 Apart from the (user-orientated) CBMC user manual and this document, most
