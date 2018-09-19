@@ -129,7 +129,7 @@ protected:
   bool method_has_this;
   std::map<irep_idt, bool> class_has_clinit_method;
   std::map<irep_idt, bool> any_superclass_has_clinit_method;
-  class_hierarchyt class_hierarchy;
+  const class_hierarchyt &class_hierarchy;
 
   enum instruction_sizet
   {
