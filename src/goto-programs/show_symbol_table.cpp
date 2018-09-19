@@ -31,16 +31,16 @@ void show_symbol_table_brief_plain(
   std::ostream &out)
 {
   // we want to sort alphabetically
-  std::set<std::string> symbols;
+  std::set<irep_idt, irep_idt::lexicographical_ordering> symbols;
 
   for(const auto &symbol_pair : symbol_table.symbols)
   {
-    symbols.insert(id2string(symbol_pair.first));
+    symbols.insert(symbol_pair.first);
   }
 
   const namespacet ns(symbol_table);
 
-  for(const std::string &id : symbols)
+  for(const auto &id : symbols)
   {
     const symbolt &symbol=ns.lookup(id);
 
@@ -71,12 +71,15 @@ void show_symbol_table_plain(
   out << '\n' << "Symbols:" << '\n' << '\n';
 
   // we want to sort alphabetically
-  std::vector<std::string> symbols;
+  std::vector<irep_idt> symbols;
   symbols.reserve(symbol_table.symbols.size());
 
   for(const auto &symbol_pair : symbol_table.symbols)
-    symbols.push_back(id2string(symbol_pair.first));
-  std::sort(symbols.begin(), symbols.end());
+    symbols.push_back(symbol_pair.first);
+
+  std::sort(symbols.begin(), symbols.end(), [](irep_idt a, irep_idt b) {
+    return irep_idt::lexicographical_ordering()(a, b);
+  });
 
   const namespacet ns(symbol_table);
 
