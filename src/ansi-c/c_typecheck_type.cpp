@@ -913,15 +913,12 @@ void c_typecheck_baset::typecheck_compound_body(
   {
     std::unordered_set<irep_idt> members;
 
-    for(struct_union_typet::componentst::iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &c : components)
     {
-      if(!members.insert(it->get_name()).second)
+      if(!members.insert(c.get_name()).second)
       {
-        error().source_location=it->source_location();
-        error() << "duplicate member '" << it->get_name() << '\'' << eom;
+        error().source_location = c.source_location();
+        error() << "duplicate member '" << c.get_name() << '\'' << eom;
         throw 0;
       }
     }

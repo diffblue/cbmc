@@ -88,14 +88,11 @@ bool boolbvt::literal(
 
       std::size_t offset=0;
 
-      for(struct_typet::componentst::const_iterator
-          it=components.begin();
-          it!=components.end();
-          it++)
+      for(const auto &c : components)
       {
-        const typet &subtype=it->type();
+        const typet &subtype = c.type();
 
-        if(it->get_name()==component_name)
+        if(c.get_name() == component_name)
           return literal(expr.op0(), bit+offset, dest);
 
         std::size_t element_width=boolbv_width(subtype);

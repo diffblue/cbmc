@@ -160,17 +160,11 @@ mp_integer pointer_offset_bits(
   else if(type.id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(type);
-    const struct_typet::componentst &components=
-      struct_type.components();
-
     mp_integer result=0;
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &c : struct_type.components())
     {
-      const typet &subtype=it->type();
+      const typet &subtype = c.type();
       mp_integer sub_size=pointer_offset_bits(subtype, ns);
       if(sub_size==-1)
         return -1;
@@ -182,19 +176,13 @@ mp_integer pointer_offset_bits(
   else if(type.id()==ID_union)
   {
     const union_typet &union_type=to_union_type(type);
-    const union_typet::componentst &components=
-      union_type.components();
-
     mp_integer result=0;
 
     // compute max
 
-    for(union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &c : union_type.components())
     {
-      const typet &subtype=it->type();
+      const typet &subtype = c.type();
       mp_integer sub_size=pointer_offset_bits(subtype, ns);
       if(sub_size==-1)
         return -1;
@@ -278,22 +266,17 @@ exprt member_offset_expr(
   const irep_idt &member,
   const namespacet &ns)
 {
-  const struct_typet::componentst &components=type.components();
-
   exprt result=from_integer(0, size_type());
   std::size_t bit_field_bits=0;
 
-  for(struct_typet::componentst::const_iterator
-      it=components.begin();
-      it!=components.end();
-      it++)
+  for(const auto &c : type.components())
   {
-    if(it->get_name()==member)
+    if(c.get_name() == member)
       break;
 
-    if(it->type().id()==ID_c_bit_field)
+    if(c.type().id() == ID_c_bit_field)
     {
-      std::size_t w=to_c_bit_field_type(it->type()).get_width();
+      std::size_t w = to_c_bit_field_type(c.type()).get_width();
       bit_field_bits += w;
       const std::size_t bytes = bit_field_bits / 8;
       bit_field_bits %= 8;
@@ -303,7 +286,7 @@ exprt member_offset_expr(
     {
       DATA_INVARIANT(
         bit_field_bits == 0, "padding ensures offset at byte boundaries");
-      const typet &subtype=it->type();
+      const typet &subtype = c.type();
       exprt sub_size=size_of_expr(subtype, ns);
       if(sub_size.is_nil())
         return nil_exprt(); // give up
@@ -376,20 +359,15 @@ exprt size_of_expr(
   else if(type.id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(type);
-    const struct_typet::componentst &components=
-      struct_type.components();
 
     exprt result=from_integer(0, size_type());
     std::size_t bit_field_bits=0;
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &c : struct_type.components())
     {
-      if(it->type().id()==ID_c_bit_field)
+      if(c.type().id() == ID_c_bit_field)
       {
-        std::size_t w=to_c_bit_field_type(it->type()).get_width();
+        std::size_t w = to_c_bit_field_type(c.type()).get_width();
         bit_field_bits += w;
         const std::size_t bytes = bit_field_bits / 8;
         bit_field_bits %= 8;
@@ -399,7 +377,7 @@ exprt size_of_expr(
       {
         DATA_INVARIANT(
           bit_field_bits == 0, "padding ensures offset at byte boundaries");
-        const typet &subtype=it->type();
+        const typet &subtype = c.type();
         exprt sub_size=size_of_expr(subtype, ns);
         if(sub_size.is_nil())
           return nil_exprt();
@@ -415,20 +393,15 @@ exprt size_of_expr(
   else if(type.id()==ID_union)
   {
     const union_typet &union_type=to_union_type(type);
-    const union_typet::componentst &components=
-      union_type.components();
 
     mp_integer max_bytes=0;
     exprt result=from_integer(0, size_type());
 
     // compute max
 
-    for(union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &c : union_type.components())
     {
-      const typet &subtype=it->type();
+      const typet &subtype = c.type();
       exprt sub_size;
 
       mp_integer sub_bits=pointer_offset_bits(subtype, ns);

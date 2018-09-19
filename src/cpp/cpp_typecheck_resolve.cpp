@@ -647,16 +647,9 @@ void cpp_typecheck_resolvet::make_constructors(
     {
       const struct_typet &struct_type=to_struct_type(symbol_type);
 
-      const struct_typet::componentst &components =
-        struct_type.components();
-
       // go over components
-      for(struct_typet::componentst::const_iterator
-          itc=components.begin();
-          itc!=components.end();
-          itc++)
+      for(const auto &component : struct_type.components())
       {
-        const struct_typet::componentt &component=*itc;
         const typet &type=component.type();
 
         if(component.get_bool(ID_from_base))

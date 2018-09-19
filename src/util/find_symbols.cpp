@@ -138,27 +138,18 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
      src.id()==ID_union)
   {
     const struct_union_typet &struct_union_type=to_struct_union_type(src);
-    const struct_union_typet::componentst &components=
-      struct_union_type.components();
 
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-      find_symbols(kind, *it, dest);
+    for(const auto &c : struct_union_type.components())
+      find_symbols(kind, c, dest);
   }
   else if(src.id()==ID_code)
   {
     const code_typet &code_type=to_code_type(src);
     find_symbols(kind, code_type.return_type(), dest);
-    const code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::parameterst::const_iterator
-        it=parameters.begin();
-        it!=parameters.end();
-        it++)
+    for(const auto &p : code_type.parameters())
     {
-      find_symbols(kind, *it, dest);
+      find_symbols(kind, p, dest);
 
       // irep_idt identifier=it->get_identifier();
       // if(!identifier.empty() && (kind==F_TYPE || kind==F_BOTH))
