@@ -392,12 +392,14 @@ java_string_library_preprocesst::process_equals_function_operands(
 /// \param type: a type containing a "data" component
 /// \param symbol_table: symbol table
 /// \return type of the "data" component
-static typet get_data_type(const typet &type, const symbol_tablet &symbol_table)
+static const typet &
+get_data_type(const typet &type, const symbol_tablet &symbol_table)
 {
   PRECONDITION(type.id() == ID_struct || type.id() == ID_symbol_type);
   if(type.id() == ID_symbol_type)
   {
-    symbolt sym=*symbol_table.lookup(to_symbol_type(type).get_identifier());
+    const symbolt &sym =
+      symbol_table.lookup_ref(to_symbol_type(type).get_identifier());
     CHECK_RETURN(sym.type.id() != ID_symbol_type);
     return get_data_type(sym.type, symbol_table);
   }
@@ -410,13 +412,14 @@ static typet get_data_type(const typet &type, const symbol_tablet &symbol_table)
 /// \param type: a type containing a "length" component
 /// \param symbol_table: symbol table
 /// \return type of the "length" component
-static typet
+static const typet &
 get_length_type(const typet &type, const symbol_tablet &symbol_table)
 {
   PRECONDITION(type.id() == ID_struct || type.id() == ID_symbol_type);
   if(type.id() == ID_symbol_type)
   {
-    symbolt sym=*symbol_table.lookup(to_symbol_type(type).get_identifier());
+    const symbolt &sym =
+      symbol_table.lookup_ref(to_symbol_type(type).get_identifier());
     CHECK_RETURN(sym.type.id() != ID_symbol_type);
     return get_length_type(sym.type, symbol_table);
   }
