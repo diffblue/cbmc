@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "miniBDD.h"
 
-#include <cassert>
+#include <util/invariant.h>
 
 #include <iostream>
 
@@ -22,8 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void mini_bdd_nodet::remove_reference()
 {
-  // NOLINTNEXTLINE(build/deprecated)
-  assert(reference_counter!=0);
+  PRECONDITION_WITH_DIAGNOSTICS(
+    reference_counter != 0, "all references were already removed");
 
   reference_counter--;
 
@@ -209,10 +209,12 @@ protected:
 
 mini_bddt mini_bdd_applyt::APP_rec(const mini_bddt &x, const mini_bddt &y)
 {
-  // NOLINTNEXTLINE(build/deprecated)
-  assert(x.is_initialized() && y.is_initialized());
-  // NOLINTNEXTLINE(build/deprecated)
-  assert(x.node->mgr==y.node->mgr);
+  PRECONDITION_WITH_DIAGNOSTICS(
+    x.is_initialized() && y.is_initialized(),
+    "apply can only be called on initialized BDDs");
+  PRECONDITION_WITH_DIAGNOSTICS(
+    x.node->mgr == y.node->mgr,
+    "apply can only be called on BDDs with the same manager");
 
   // dynamic programming
   std::pair<unsigned, unsigned> key(x.node_number(), y.node_number());
@@ -273,10 +275,13 @@ mini_bddt mini_bdd_applyt::APP_non_rec(
     auto &t=stack.top();
     const mini_bddt &x=t.x;
     const mini_bddt &y=t.y;
-    // NOLINTNEXTLINE(build/deprecated)
-    assert(x.is_initialized() && y.is_initialized());
-    // NOLINTNEXTLINE(build/deprecated)
-    assert(x.node->mgr==y.node->mgr);
+
+    INVARIANT(
+      x.is_initialized() && y.is_initialized(),
+      "apply can only be called on initialized BDDs");
+    INVARIANT(
+      x.node->mgr == y.node->mgr,
+      "apply can only be called on BDDs with the same manager");
 
     switch(t.phase)
     {
@@ -302,14 +307,16 @@ mini_bddt mini_bdd_applyt::APP_non_rec(
           {
             t.var=x.var();
             t.phase=stack_elementt::phaset::FINISH;
-            // NOLINTNEXTLINE(build/deprecated)
-            assert(x.low().var()>t.var);
-            // NOLINTNEXTLINE(build/deprecated)
-            assert(y.low().var()>t.var);
-            // NOLINTNEXTLINE(build/deprecated)
-            assert(x.high().var()>t.var);
-            // NOLINTNEXTLINE(build/deprecated)
-            assert(y.high().var()>t.var);
+
+            INVARIANT(
+              x.low().var() > t.var, "applying won't break variable order");
+            INVARIANT(
+              y.low().var() > t.var, "applying won't break variable order");
+            INVARIANT(
+              x.high().var() > t.var, "applying won't break variable order");
+            INVARIANT(
+              y.high().var() > t.var, "applying won't break variable order");
+
             stack.push(stack_elementt(t.lr, x.low(), y.low()));
             stack.push(stack_elementt(t.hr, x.high(), y.high()));
           }
@@ -317,10 +324,12 @@ mini_bddt mini_bdd_applyt::APP_non_rec(
           {
             t.var=x.var();
             t.phase=stack_elementt::phaset::FINISH;
-            // NOLINTNEXTLINE(build/deprecated)
-            assert(x.low().var()>t.var);
-            // NOLINTNEXTLINE(build/deprecated)
-            assert(x.high().var()>t.var);
+
+            INVARIANT(
+              x.low().var() > t.var, "applying won't break variable order");
+            INVARIANT(
+              x.high().var() > t.var, "applying won't break variable order");
+
             stack.push(stack_elementt(t.lr, x.low(), y));
             stack.push(stack_elementt(t.hr, x.high(), y));
           }
@@ -328,10 +337,12 @@ mini_bddt mini_bdd_applyt::APP_non_rec(
           {
             t.var=y.var();
             t.phase=stack_elementt::phaset::FINISH;
-            // NOLINTNEXTLINE(build/deprecated)
-            assert(y.low().var()>t.var);
-            // NOLINTNEXTLINE(build/deprecated)
-            assert(y.high().var()>t.var);
+
+            INVARIANT(
+              y.low().var() > t.var, "applying won't break variable order");
+            INVARIANT(
+              y.high().var() > t.var, "applying won't break variable order");
+
             stack.push(stack_elementt(t.lr, x, y.low()));
             stack.push(stack_elementt(t.hr, x, y.high()));
           }
@@ -350,8 +361,8 @@ mini_bddt mini_bdd_applyt::APP_non_rec(
     }
   }
 
-  // NOLINTNEXTLINE(build/deprecated)
-  assert(u.is_initialized());
+  POSTCONDITION_WITH_DIAGNOSTICS(
+    u.is_initialized(), "the resulting BDD is initialized");
 
   return u;
 }
@@ -378,8 +389,8 @@ mini_bddt mini_bddt::operator^(const mini_bddt &other) const
 
 mini_bddt mini_bddt::operator!() const
 {
-  // NOLINTNEXTLINE(build/deprecated)
-  assert(is_initialized());
+  PRECONDITION_WITH_DIAGNOSTICS(
+    is_initialized(), "BDD has to be initialized for negation");
   return node->mgr->True()^*this;
 }
 
@@ -421,12 +432,13 @@ mini_bddt mini_bdd_mgrt::mk(
   const mini_bddt &low,
   const mini_bddt &high)
 {
+  PRECONDITION_WITH_DIAGNOSTICS(
+    var <= var_table.size(), "cannot make a BDD for an unknown variable");
+  PRECONDITION_WITH_DIAGNOSTICS(
+    low.var() > var, "low-edge would break variable ordering");
   // NOLINTNEXTLINE(build/deprecated)
-  assert(var<=var_table.size());
-  // NOLINTNEXTLINE(build/deprecated)
-  assert(low.var()>var);
-  // NOLINTNEXTLINE(build/deprecated)
-  assert(high.var()>var);
+  PRECONDITION_WITH_DIAGNOSTICS(
+    high.var() > var, "high-edge would break variable ordering");
 
   if(low.node_number()==high.node_number())
     return low;
@@ -525,8 +537,9 @@ mini_bddt restrictt::RES(const mini_bddt &u)
 {
   // replace 'var' in 'u' by constant 'value'
 
-  // NOLINTNEXTLINE(build/deprecated)
-  assert(u.is_initialized());
+  PRECONDITION_WITH_DIAGNOSTICS(
+    u.is_initialized(),
+    "restricting variables can only be done in initialized BDDs");
   mini_bdd_mgrt *mgr=u.node->mgr;
 
   mini_bddt t;
