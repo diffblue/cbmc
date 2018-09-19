@@ -236,6 +236,23 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
           }
         }
       }
+      else if(src_type.id() == ID_c_enum_tag)
+      {
+        // go through underlying type
+        const auto &enum_type = ns.follow_tag(to_c_enum_tag_type(src_type));
+        typecast_exprt tmp1(op0, to_c_enum_type(enum_type).subtype());
+        simplify_typecast(tmp1);
+        if(tmp1.is_constant())
+        {
+          exprt tmp2 = expr;
+          tmp2.op0() = tmp1;
+          if(!simplify_floatbv_typecast(tmp2))
+          {
+            expr = tmp2;
+            return false;
+          }
+        }
+      }
     }
   }
 
