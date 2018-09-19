@@ -70,8 +70,6 @@ public:
     std::size_t bit,
     literalt &literal) const;
 
-  using arrayst::literal;
-
   enum class unbounded_arrayt { U_NONE, U_ALL, U_AUTO };
   unbounded_arrayt unbounded_array;
 
