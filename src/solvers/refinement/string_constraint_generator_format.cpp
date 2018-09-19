@@ -365,7 +365,6 @@ add_axioms_for_format_specifier(
                     << message.eom;
     INVARIANT(
       false, "format specifier must belong to [bBhHsScCdoxXeEfgGaAtT%n]");
-    throw 0;
   }
 }
 
