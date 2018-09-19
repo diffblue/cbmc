@@ -2307,7 +2307,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_unary_plus(expr) && result;
   else if(expr.id()==ID_not)
     result=simplify_not(expr) && result;
-  else if(expr.id()==ID_implies || expr.id()==ID_iff ||
+  else if(expr.id()==ID_implies ||
           expr.id()==ID_or      || expr.id()==ID_xor ||
           expr.id()==ID_and)
     result=simplify_boolean(expr) && result;
