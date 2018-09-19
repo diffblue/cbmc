@@ -517,7 +517,6 @@ public:
   {
     instructions.splice(instructions.end(),
                         p.instructions);
-    // BUG: The iterators to p-instructions are invalidated!
   }
 
   /// Inserts the given program `p` before `target`.
@@ -527,7 +526,6 @@ public:
     goto_programt &p)
   {
     instructions.splice(target, p.instructions);
-    // BUG: The iterators to p-instructions are invalidated!
   }
 
   /// Adds an instruction at the end.
