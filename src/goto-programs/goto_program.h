@@ -512,22 +512,20 @@ public:
     return instructions.insert(std::next(target), instructiont());
   }
 
-  /// Appends the given program, which is destroyed
+  /// Appends the given program `p` to `*this`. `p` is destroyed.
   void destructive_append(goto_programt &p)
   {
     instructions.splice(instructions.end(),
                         p.instructions);
-    // BUG: The iterators to p-instructions are invalidated!
   }
 
-  /// Inserts the given program at the given location.
-  /// The program is destroyed.
+  /// Inserts the given program `p` before `target`.
+  /// The program `p` is destroyed.
   void destructive_insert(
     const_targett target,
     goto_programt &p)
   {
     instructions.splice(target, p.instructions);
-    // BUG: The iterators to p-instructions are invalidated!
   }
 
   /// Adds an instruction at the end.
