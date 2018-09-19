@@ -1018,7 +1018,12 @@ void jbmc_parse_optionst::help()
     "Usage:                       Purpose:\n"
     "\n"
     " jbmc [-?] [-h] [--help]      show help\n"
-    " jbmc class                   name of class to be checked\n"
+    " jbmc class                   name of class or JAR file to be checked\n"
+    "                              In the case of a JAR file, if a main class can be\n" // NOLINT(*)
+    "                              inferred from --main-class, --function, or the JAR\n" // NOLINT(*)
+    "                              manifest (checked in this order), the behavior is\n" // NOLINT(*)
+    "                              the same as running jbmc on the corresponding\n" // NOLINT(*)
+    "                              class file."
     "\n"
     "Analysis options:\n"
     HELP_SHOW_PROPERTIES

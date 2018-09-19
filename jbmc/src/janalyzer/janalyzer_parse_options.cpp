@@ -733,7 +733,12 @@ void janalyzer_parse_optionst::help()
     "Usage:                       Purpose:\n"
     "\n"
     " janalyzer [-?] [-h] [--help] show help\n"
-    " janalyzer class              name of class to be checked\n"
+    " janalyzer class              name of class or JAR file to be checked\n"
+    "                              In the case of a JAR file, if a main class can be\n" // NOLINT(*)
+    "                              inferred from --main-class, --function, or the JAR\n" // NOLINT(*)
+    "                              manifest (checked in this order), the behavior is\n" // NOLINT(*)
+    "                              the same as running janalyzer on the corresponding\n" // NOLINT(*)
+    "                              class file."
     "\n"
     "Task options:\n"
     " --show                       display the abstract domains\n"
