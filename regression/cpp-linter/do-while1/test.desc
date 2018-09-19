@@ -1,8 +1,8 @@
 CORE
 main.cpp
 
-^main\.cpp:31:  Empty loop bodies should use {} or continue  \[whitespace/empty_loop_body\] \[5\]$
-^main\.cpp:38:  Empty loop bodies should use {} or continue  \[whitespace/empty_loop_body\] \[5\]$
+^main\.cpp:31:  Empty loop bodies should use \{\} or continue  \[whitespace/empty_loop_body\] \[5\]$
+^main\.cpp:38:  Empty loop bodies should use \{\} or continue  \[whitespace/empty_loop_body\] \[5\]$
 ^Total errors found: 2$
 ^SIGNAL=0$
 --
