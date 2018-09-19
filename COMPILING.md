@@ -55,21 +55,10 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    make -C src minisat2-download
    make -C src
    ```
+   See doc/architectural/compilation-and-development.md for instructions on how
+   to use a SAT solver other than MiniSat 2.
 
-4. Linking against an IPASIR SAT solver
-
-   Get an IPASIR package and build picosat by default
-   ```
-   make -C src ipasir-build
-   ```
-
-   Build CBMC with IPASIR and link against the ipasir solver library
-   Note: the LIBSOLVER variable could be pointed towards other solvers
-   ```
-   make -C src IPASIR=../../ipasir LIBSOLVER=$(pwd)/ipasir/libipasir.a
-   ```
-
-5. To compile JBMC, do
+4. To compile JBMC, do
    ```
    make -C jbmc/src setup-submodules
    make -C jbmc/src

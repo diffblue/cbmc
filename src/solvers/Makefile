@@ -25,7 +25,6 @@ endif
 ifneq ($(IPASIR),)
   IPASIR_SRC=sat/satcheck_ipasir.cpp
   IPASIR_INCLUDE=-I $(IPASIR)
-  IPASIR_LIB=$(IPASIR)/ipasir.a
   CP_CXXFLAGS += -DHAVE_IPASIR -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
   override CXXFLAGS := $(filter-out -pedantic, $(CXXFLAGS))
 endif
@@ -224,10 +223,10 @@ endif
 ###############################################################################
 
 solvers$(LIBEXT): $(OBJ) $(SOLVER_LIB)
-	$(LINKLIB) $(LIBSOLVER)
+	$(LINKLIB)
 
 -include $(smt2/smt2_solver$(DEPEXT))
 
 smt2_solver$(EXEEXT): $(OBJ) smt2/smt2_solver$(OBJEXT) \
 	../util/util$(LIBEXT) ../langapi/langapi$(LIBEXT) ../big-int/big-int$(LIBEXT) $(SOLVER_LIB)
-	$(LINKBIN) $(LIBSOLVER)
+	$(LINKBIN)
