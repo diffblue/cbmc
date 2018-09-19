@@ -95,13 +95,10 @@ void bv_refinementt::arrays_overapproximated()
       lazy_array_constraints.erase(it++);
       break;
     default:
-      error() << "error in array over approximation check" << eom;
       INVARIANT(
         false,
         string_refinement_invariantt("error in array over approximation "
           "check"));
-      // Placeholder to tell the compiler we bail
-      throw 0;
     }
   }
 

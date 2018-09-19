@@ -554,10 +554,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_char_literal(
   }
   else
   {
-    // convert_char_literal unimplemented
     UNIMPLEMENTED;
-    // For the compiler
-    throw 0;
   }
 }
 
