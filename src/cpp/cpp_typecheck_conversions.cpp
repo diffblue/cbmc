@@ -1295,25 +1295,18 @@ bool cpp_typecheckt::reference_binding(
   }
 
   // conversion operators
-  typet from_type=follow(expr.type());
+  const typet &from_type = follow(expr.type());
   if(from_type.id()==ID_struct)
   {
-    struct_typet from_struct=to_struct_type(from_type);
-
-    for(struct_typet::componentst::const_iterator
-        it=from_struct.components().begin();
-        it != from_struct.components().end(); it++)
+    for(const auto &component : to_struct_type(from_type).components())
     {
-      const irept &component=*it;
-
       if(component.get_bool(ID_from_base))
         continue;
 
       if(!component.get_bool("is_cast_operator"))
         continue;
 
-      const code_typet &component_type =
-        to_code_type(static_cast<const typet&>(component.find(ID_type)));
+      const code_typet &component_type = to_code_type(component.type());
 
       // otherwise it cannot bind directly (not an lvalue)
       if(!is_reference(component_type.return_type()))
