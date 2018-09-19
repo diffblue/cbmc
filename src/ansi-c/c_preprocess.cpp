@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/run.h>
 #include <util/suffix.h>
 #include <util/tempfile.h>
 #include <util/unicode.h>
@@ -379,25 +380,12 @@ bool c_preprocess_visual_studio(
   temporary_filet tmpi("tmp.cl", "");
 
   std::string command = "CL @\"" + command_file_name() + "\"";
-  command += " > \"" + tmpi() + "\"";
   command += " 2> \"" + stderr_file() + "\"";
 
   // _popen isn't very reliable on WIN32
-  // that's why we use system()
-  int result=system(command.c_str());
-
-  std::ifstream instream(tmpi());
-
-  if(!instream)
-  {
-    message.error() << "CL Preprocessing failed (open failed)"
-                    << messaget::eom;
-    return true;
-  }
-
-  outstream << instream.rdbuf(); // copy
-
-  instream.close();
+  // that's why we use run()
+  int result =
+    run("cl", {"cl", "@" + command_file_name()}, "", outstream, stderr_file());
 
   // errors/warnings
   std::ifstream stderr_stream(stderr_file());
@@ -463,30 +451,30 @@ bool c_preprocess_codewarrior(
 
   temporary_filet stderr_file("tmp.stderr", "");
 
-  std::string command;
-
-  command="mwcceppc -E -P -D__CPROVER__ -ppopt line -ppopt full";
+  std::vector<std::string> command = {
+    "mwcceppc", "-E", "-P", "-D__CPROVER__", "-ppopt", "line", "-ppopt full"};
 
   for(const auto &define : config.ansi_c.defines)
-    command+=" -D"+shell_quote(define);
+    command.push_back(" -D" + define);
 
   for(const auto &include_path : config.ansi_c.include_paths)
-    command+=" -I"+shell_quote(include_path);
+    command.push_back(" -I" + include_path);
 
   for(const auto &include_file : config.ansi_c.include_files)
-    command+=" -include "+shell_quote(include_file);
+  {
+    command.push_back(" -include");
+    command.push_back(include_file);
+  }
 
   for(const auto &opt : config.ansi_c.preprocessor_options)
-    command+=" "+opt;
-
-  int result;
+    command.push_back(opt);
 
   temporary_filet tmpi("tmp.cl", "");
-  command+=" \""+file+"\"";
-  command += " -o \"" + tmpi() + "\"";
-  command += " 2> \"" + stderr_file() + "\"";
+  command.push_back(file);
+  command.push_back("-o");
+  command.push_back(tmpi());
 
-  result=system(command.c_str());
+  int result = run(command[0], command, "", "", stderr_file());
 
   std::ifstream stream_i(tmpi());
 
@@ -532,87 +520,88 @@ bool c_preprocess_gcc_clang(
 
   temporary_filet stderr_file("tmp.stderr", "");
 
-  std::string command;
+  std::vector<std::string> argv;
 
   if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
-    command="clang";
+    argv.push_back("clang");
   else
-    command="gcc";
+    argv.push_back("gcc");
 
-  command += " -E -D__CPROVER__";
+  argv.push_back("-E");
+  argv.push_back("-D__CPROVER__");
 
   const irep_idt &arch = config.ansi_c.arch;
 
   if(config.ansi_c.pointer_width == 16)
   {
     if(arch == "i386" || arch == "x86_64" || arch == "x32")
-      command += " -m16";
+      argv.push_back("-m16");
     else if(has_prefix(id2string(arch), "mips"))
-      command += " -mips16";
+      argv.push_back("-mips16");
   }
   else if(config.ansi_c.pointer_width == 32)
   {
     if(arch == "i386" || arch == "x86_64")
-      command += " -m32";
+      argv.push_back("-m32");
     else if(arch == "x32")
-      command += " -mx32";
+      argv.push_back("-mx32");
     else if(has_prefix(id2string(arch), "mips"))
-      command += " -mabi=32";
+      argv.push_back("-mabi=32");
     else if(arch == "powerpc" || arch == "ppc64" || arch == "ppc64le")
-      command += " -m32";
+      argv.push_back("-m32");
     else if(arch == "s390" || arch == "s390x")
-      command += " -m31"; // yes, 31, not 32!
+      argv.push_back("-m31"); // yes, 31, not 32!
     else if(arch == "sparc" || arch == "sparc64")
-      command += " -m32";
+      argv.push_back("-m32");
   }
   else if(config.ansi_c.pointer_width == 64)
   {
     if(arch == "i386" || arch == "x86_64" || arch == "x32")
-      command += " -m64";
+      argv.push_back("-m64");
     else if(has_prefix(id2string(arch), "mips"))
-      command += " -mabi=64";
+      argv.push_back("-mabi=64");
     else if(arch == "powerpc" || arch == "ppc64" || arch == "ppc64le")
-      command += " -m64";
+      argv.push_back("-m64");
     else if(arch == "s390" || arch == "s390x")
-      command += " -m64";
+      argv.push_back("-m64");
     else if(arch == "sparc" || arch == "sparc64")
-      command += " -m64";
+      argv.push_back("-m64");
   }
 
   // The width of wchar_t depends on the OS!
   if(config.ansi_c.wchar_t_width == config.ansi_c.short_int_width)
-    command += " -fshort-wchar";
+    argv.push_back("-fshort-wchar");
 
   if(config.ansi_c.char_is_unsigned)
-    command += " -funsigned-char";
+    argv.push_back("-funsigned-char");
 
   if(config.ansi_c.os == configt::ansi_ct::ost::NO_OS)
-    command += " -nostdinc";
+    argv.push_back("-nostdinc");
 
   // Set the standard
   if(has_suffix(file, ".cpp") || has_suffix(file, ".CPP") ||
-#ifndef _WIN32
+  #ifndef _WIN32
      has_suffix(file, ".C") ||
-#endif
+  #endif
      has_suffix(file, ".c++") || has_suffix(file, ".C++") ||
      has_suffix(file, ".cp") || has_suffix(file, ".CP"))
   {
     switch(config.cpp.cpp_standard)
     {
     case configt::cppt::cpp_standardt::CPP98:
-      command += " -std=gnu++98";
+      argv.push_back("-std=gnu++98");
       break;
 
     case configt::cppt::cpp_standardt::CPP03:
-      command += " -std=gnu++03";
+      argv.push_back("-std=gnu++03");
       break;
 
     case configt::cppt::cpp_standardt::CPP11:
-      command += " -std=gnu++11";
+      argv.push_back("-std=gnu++11");
       break;
 
     case configt::cppt::cpp_standardt::CPP14:
-      command += " -std=gnu++14";
+      argv.push_back("-std=gnu++14");
       break;
     }
   }
@@ -621,30 +610,33 @@ bool c_preprocess_gcc_clang(
     switch(config.ansi_c.c_standard)
     {
     case configt::ansi_ct::c_standardt::C89:
-      command += " -std=gnu++89";
+      argv.push_back("-std=gnu++89");
       break;
 
     case configt::ansi_ct::c_standardt::C99:
-      command += " -std=gnu99";
+      argv.push_back("-std=gnu99");
       break;
 
     case configt::ansi_ct::c_standardt::C11:
-      command += " -std=gnu11";
+      argv.push_back("-std=gnu11");
       break;
     }
   }
 
   for(const auto &define : config.ansi_c.defines)
-    command+=" -D"+shell_quote(define);
+    argv.push_back("-D" + define);
 
   for(const auto &include_path : config.ansi_c.include_paths)
-    command+=" -I"+shell_quote(include_path);
+    argv.push_back("-I" + include_path);
 
   for(const auto &include_file : config.ansi_c.include_files)
-    command+=" -include "+shell_quote(include_file);
+  {
+    argv.push_back("-include");
+    argv.push_back(include_file);
+  }
 
   for(const auto &opt : config.ansi_c.preprocessor_options)
-    command+=" "+opt;
+    argv.push_back(opt);
 
   int result;
 
@@ -660,59 +652,15 @@ bool c_preprocess_gcc_clang(
   }
   #endif
 
-  #ifdef _WIN32
-  temporary_filet tmpi("tmp.gcc", "");
-  command+=" \""+file+"\"";
-  command += " -o \"" + tmpi() + "\"";
-  command += " 2> \"" + stderr_file() + "\"";
+  // the file that is to be preprocessed
+  argv.push_back(file);
 
-  // _popen isn't very reliable on WIN32
-  // that's why we use system() and a temporary file
-  result=system(command.c_str());
-
-  std::ifstream instream(tmpi());
+  // execute clang or gcc
+  result = run(argv[0], argv, "", outstream, stderr_file());
 
   // errors/warnings
   std::ifstream stderr_stream(stderr_file());
   error_parse(stderr_stream, result==0, message);
-
-  if(instream)
-  {
-    outstream << instream.rdbuf();
-    instream.close();
-  }
-  else
-  {
-    message.error() << "GCC preprocessing failed (open failed)"
-                    << messaget::eom;
-    result=1;
-  }
-  #else
-  command+=" \""+file+"\"";
-  command += " 2> \"" + stderr_file() + "\"";
-
-  FILE *stream=popen(command.c_str(), "r");
-
-  if(stream!=nullptr)
-  {
-    int ch;
-    while((ch=fgetc(stream))!=EOF)
-      outstream << (unsigned char)ch;
-
-    result=pclose(stream);
-  }
-  else
-  {
-    message.error() << "GCC preprocessing failed (popen failed)"
-                    << messaget::eom;
-    result=1;
-  }
-
-  // errors/warnings
-  std::ifstream stderr_stream(stderr_file());
-  error_parse(stderr_stream, result==0, message);
-
-  #endif
 
   if(result!=0)
   {
@@ -738,85 +686,48 @@ bool c_preprocess_arm(
 
   temporary_filet stderr_file("tmp.stderr", "");
 
-  std::string command;
+  std::vector<std::string> argv;
 
-  command="armcc -E -D__CPROVER__";
+  argv.push_back("armcc");
+  argv.push_back("-E");
+  argv.push_back("-D__CPROVER__");
 
   if(config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_BIG_ENDIAN)
-    command += " --bigend";
+    argv.push_back("--bigend");
   else
-    command += " --littleend";
+    argv.push_back("--littleend");
 
   if(config.ansi_c.char_is_unsigned)
-    command += " --unsigned_chars";
+    argv.push_back("--unsigned_chars");
   else
-    command += " --signed_chars";
+    argv.push_back("--signed_chars");
 
   // Set the standard
   switch(config.ansi_c.c_standard)
   {
   case configt::ansi_ct::c_standardt::C89:
-    command += " --c90";
+    argv.push_back("--c90");
     break;
 
   case configt::ansi_ct::c_standardt::C99:
   case configt::ansi_ct::c_standardt::C11:
-    command += " --c99";
+    argv.push_back("--c99");
     break;
   }
 
   for(const auto &define : config.ansi_c.defines)
-    command+=" "+shell_quote("-D"+define);
+    argv.push_back("-D" + define);
 
   for(const auto &include_path : config.ansi_c.include_paths)
-    command+=" "+shell_quote("-I"+include_path);
+    argv.push_back("-I" + include_path);
+
+  // the file that is to be preprocessed
+  argv.push_back(file);
 
   int result;
 
-  #ifdef _WIN32
-  temporary_filet tmpi("tmp.cl", "");
-  command+=" \""+file+"\"";
-  command += " > \"" + tmpi() + "\"";
-  command += " 2> \"" + stderr_file() + "\"";
-
-  // _popen isn't very reliable on WIN32
-  // that's why we use system() and a temporary file
-  result=system(command.c_str());
-
-  std::ifstream instream(tmpi());
-
-  if(!instream)
-  {
-    outstream << instream.rdbuf(); // copy
-    instream.close();
-  }
-  else
-  {
-    message.error() << "ARMCC preprocessing failed (fopen failed)"
-                    << messaget::eom;
-    return true;
-  }
-  #else
-  command+=" \""+file+"\"";
-  command += " 2> \"" + stderr_file() + "\"";
-
-  FILE *stream=popen(command.c_str(), "r");
-
-  if(stream!=nullptr)
-  {
-    int ch;
-    while((ch=fgetc(stream))!=EOF)
-      outstream << (unsigned char)ch;
-
-    result=pclose(stream);
-  }
-  else
-  {
-    message.error() << "ARMCC preprocessing failed (popen failed)"
-                    << messaget::eom;
-    return true;
-  }
-  #endif
+  // execute armcc
+  result = run(argv[0], argv, "", outstream, stderr_file());
 
   // errors/warnings
   std::ifstream stderr_stream(stderr_file());
