@@ -1586,8 +1586,8 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
   if(op0.get_bool(ID_C_lvalue))
     expr.set(ID_C_lvalue, true);
 
-  if(op0.get_bool(ID_C_constant) || type.get_bool(ID_C_constant))
-    expr.set(ID_C_constant, true);
+  if(op0.type().get_bool(ID_C_constant) || type.get_bool(ID_C_constant))
+    expr.type().set(ID_C_constant, true);
 
   // copy method identifier
   const irep_idt &identifier=component.get(ID_C_identifier);
