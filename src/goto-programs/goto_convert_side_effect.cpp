@@ -103,12 +103,23 @@ void goto_convertt::remove_assignment(
 
     const typet &op0_type=ns.follow(expr.op0().type());
 
-    // C/C++ Booleans get very special treatment.
     if(op0_type.id()==ID_c_bool)
     {
+      // C/C++ Booleans get very special treatment.
       binary_exprt tmp(expr.op0(), new_id, expr.op1(), expr.op1().type());
       tmp.op0().make_typecast(expr.op1().type());
       rhs=typecast_exprt(is_not_zero(tmp, ns), expr.op0().type());
+    }
+    else if(op0_type.id() == ID_c_enum_tag)
+    {
+      // We convert c_enums to their underlying type, do the
+      // operation, and then convert back
+      const auto &enum_type = ns.follow_tag(to_c_enum_tag_type(op0_type));
+      auto underlying_type = to_c_enum_type(enum_type).subtype();
+      auto op0 = typecast_exprt(expr.op0(), underlying_type);
+      auto op1 = typecast_exprt(expr.op1(), underlying_type);
+      binary_exprt tmp(op0, new_id, op1, underlying_type);
+      rhs = typecast_exprt(tmp, expr.op0().type());
     }
     else
     {
