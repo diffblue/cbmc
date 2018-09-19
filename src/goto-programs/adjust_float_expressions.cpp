@@ -94,11 +94,16 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
        expr.id()==ID_mult || expr.id()==ID_div ||
        expr.id()==ID_rem)
     {
+      DATA_INVARIANT(
+        expr.operands().size() >= 2,
+        "arithmetic operations must have two or more operands");
+
       // make sure we have binary expressions
       if(expr.operands().size()>2)
+      {
         expr=make_binary(expr);
-
-      assert(expr.operands().size()==2);
+        CHECK_RETURN(expr.operands().size() == 2);
+      }
 
       // now add rounding mode
       expr.id(expr.id()==ID_plus?ID_floatbv_plus:
