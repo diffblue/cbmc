@@ -56,7 +56,7 @@ jobs:
               key_url: 'https://packages.cloud.google.com/apt/doc/apt-key.gpg'
           packages:
             - cmake
-            - google-cloud-sdk
+            - google-cloud-sdk=216.0.0-0
             - graphviz
       cache:
         directories:
