@@ -1,0 +1,9 @@
+CORE
+incomplete_component.c
+
+^EXIT=(1|64)$
+^SIGNAL=0$
+^CONVERSION ERROR$
+^incomplete_component\.c:5:1: error: incomplete type not permitted here$
+--
+^warning: ignoring

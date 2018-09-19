@@ -1634,7 +1634,8 @@ member_declaration:
         | member_default_declaring_list ';'
         | ';' /* empty declaration */
         {
-          init($$, ID_declaration);
+          $$=$1; // the ';' becomes the location of the declaration
+          stack($$).id(ID_declaration);
         }
         | static_assert_declaration ';'
         ;
@@ -1651,6 +1652,7 @@ member_default_declaring_list:
 
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_member(true);
+          stack($$).add_source_location()=stack($2).source_location();
           stack($$).type().swap(stack($2));
           PARSER.add_declarator(stack($$), stack($3));
         }
@@ -1686,6 +1688,7 @@ member_declaring_list:
 
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_member(true);
+          stack($$).add_source_location()=stack($2).source_location();
           stack($$).type().swap(stack($2));
           PARSER.add_declarator(stack($$), stack($3));
         }
