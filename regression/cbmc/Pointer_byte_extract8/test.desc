@@ -1,9 +1,9 @@
-KNOWNBUG
+CORE
 main.i
 --bounds-check --32 --no-simplify
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^\[main\.array_bounds\.5\] array.List upper bound: FAILED$
-^\*\* 1 of 9 failed 
+^\[main\.array_bounds\..*\] array.List dynamic object upper bound .*: FAILURE$
+^\*\* 1 of .* failed
 --
 ^warning: ignoring
