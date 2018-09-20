@@ -55,7 +55,7 @@ public:
 
 /// A type for mathematical functions (do not confuse with functions/methods
 /// in code)
-class mathematical_function_typet : public typet
+class mathematical_function_typet : public type_with_subtypest
 {
 public:
   // the domain of the function is composed of zero, one, or
@@ -88,7 +88,7 @@ public:
   using domaint = std::vector<variablet>;
 
   mathematical_function_typet(const domaint &_domain, const typet &_codomain)
-    : typet(ID_mathematical_function)
+    : type_with_subtypest(ID_mathematical_function)
   {
     subtypes().resize(2);
     domain() = _domain;
@@ -97,12 +97,12 @@ public:
 
   domaint &domain()
   {
-    return (domaint &)subtypes()[0].subtypes();
+    return (domaint &)to_type_with_subtypes(subtypes()[0]).subtypes();
   }
 
   const domaint &domain() const
   {
-    return (const domaint &)subtypes()[0].subtypes();
+    return (const domaint &)to_type_with_subtypes(subtypes()[0]).subtypes();
   }
 
   variablet &add_variable()
