@@ -788,7 +788,7 @@ void goto_analyzer_parse_optionst::help()
   std::cout << '\n' << banner_string("GOTO-ANALYZER", CBMC_VERSION) << '\n'
             <<
     "* *                   Copyright (C) 2017-2018                    * *\n"
-    "* *                  Daniel Kroening, DiffBlue                   * *\n"
+    "* *                  Daniel Kroening, Diffblue                   * *\n"
     "* *                   kroening@kroening.com                      * *\n"
     "\n"
     "Usage:                       Purpose:\n"

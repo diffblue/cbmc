@@ -3,7 +3,7 @@
  Module: Unit tests for dependency graph
    solvers/refinement/string_refinement.cpp
 
- Author: DiffBlue Ltd.
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 

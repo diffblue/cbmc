@@ -2,7 +2,7 @@
 
  Module: Unit tests for converting constructors and static initializers
 
- Author: DiffBlue Limited.
+ Author: Diffblue Limited.
 
 \*******************************************************************/
 
