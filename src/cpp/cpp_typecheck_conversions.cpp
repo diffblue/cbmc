@@ -1643,7 +1643,7 @@ bool cpp_typecheckt::const_typecast(
   const typet &type,
   exprt &new_expr)
 {
-  assert(is_reference(expr.type())==false);
+  PRECONDITION(!is_reference(expr.type()));
 
   exprt curr_expr=expr;
 

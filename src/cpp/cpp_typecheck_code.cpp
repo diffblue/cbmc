@@ -258,7 +258,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     // a reference member
     if(symbol_expr.id() == ID_dereference &&
        symbol_expr.op0().id() == ID_member &&
-       symbol_expr.get_bool(ID_C_implicit) == true)
+       symbol_expr.get_bool(ID_C_implicit))
     {
       // treat references as normal pointers
       exprt tmp = symbol_expr.op0();
@@ -286,7 +286,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
       if(symbol_expr.id() == ID_dereference &&
          symbol_expr.op0().id() == ID_member &&
-         symbol_expr.get_bool(ID_C_implicit) == true)
+         symbol_expr.get_bool(ID_C_implicit))
       {
         // treat references as normal pointers
         exprt tmp = symbol_expr.op0();

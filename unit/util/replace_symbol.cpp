@@ -32,17 +32,17 @@ TEST_CASE("Replace all symbols in expression", "[core][util][replace_symbol]")
   REQUIRE(r.replaces_symbol("a"));
   REQUIRE(r.get_expr_map().size() == 1);
 
-  REQUIRE(r.replace(binary) == false);
+  REQUIRE(!r.replace(binary));
   REQUIRE(binary.op0() == other_expr);
 
-  REQUIRE(r.replace(s1) == false);
+  REQUIRE(!r.replace(s1));
   REQUIRE(s1 == other_expr);
 
-  REQUIRE(r.replace(s2) == true);
+  REQUIRE(r.replace(s2));
   REQUIRE(s2 == symbol_exprt("b", typet("some_type")));
 
 
-  REQUIRE(r.replace(array_type) == false);
+  REQUIRE(!r.replace(array_type));
   REQUIRE(array_type.size() == other_expr);
 
   REQUIRE(r.erase("a") == 1);
@@ -65,7 +65,7 @@ TEST_CASE("Lvalue only", "[core][util][replace_symbol]")
   address_of_aware_replace_symbolt r;
   r.insert(s1, c);
 
-  REQUIRE(r.replace(binary) == false);
+  REQUIRE(!r.replace(binary));
   REQUIRE(binary.op0() == address_of_exprt(s1));
   const index_exprt &index_expr =
     to_index_expr(to_address_of_expr(binary.op1()).object());
@@ -76,7 +76,7 @@ TEST_CASE("Lvalue only", "[core][util][replace_symbol]")
   r.erase("a");
   r.insert(s1, address_of);
 
-  REQUIRE(r.replace(binary) == true);
+  REQUIRE(r.replace(binary));
   REQUIRE(binary.op0() == address_of_exprt(s1));
 }
 
@@ -96,7 +96,7 @@ TEST_CASE("Replace always", "[core][util][replace_symbol]")
   unchecked_replace_symbolt r;
   r.insert(s1, c);
 
-  REQUIRE(r.replace(binary) == false);
+  REQUIRE(!r.replace(binary));
   REQUIRE(binary.op0() == address_of_exprt(c));
   const index_exprt &index_expr =
     to_index_expr(to_address_of_expr(binary.op1()).object());
