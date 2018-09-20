@@ -921,8 +921,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         if(component.get_bool(ID_is_explicit))
           continue;
 
-        const typet &comp_type =
-          static_cast<const typet&>(component.find(ID_type));
+        const typet &comp_type = component.type();
 
         if(comp_type.id() !=ID_code)
           continue;
@@ -1058,22 +1057,17 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     bool found=false;
     for(const auto &component : to_struct_type(from).components())
     {
-      const typet comp_type=static_cast<const typet&>(component.find(ID_type));
-
       if(component.get_bool(ID_from_base))
         continue;
 
       if(!component.get_bool(ID_is_cast_operator))
         continue;
 
-      assert(component.get(ID_type)==ID_code &&
-             component.find(ID_type).find(ID_parameters).get_sub().size()==1);
+      const code_typet &comp_type = to_code_type(component.type());
+      DATA_INVARIANT(
+        comp_type.parameters().size() == 1, "expected exactly one parameter");
 
-      typet this_type =
-        static_cast<const typet&>(comp_type.find(ID_parameters)
-                                           .get_sub()
-                                           .front()
-                                           .find(ID_type));
+      typet this_type = comp_type.parameters().front().type();
       this_type.set(ID_C_reference, true);
 
       exprt this_expr(expr);

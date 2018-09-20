@@ -476,11 +476,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
     component.set(ID_is_inline, declaration.member_spec().is_inline());
 
     // the 'virtual' name of the function
-    std::string virtual_name =
-      id2string(component.get_base_name()) +
-      id2string(
-        function_identifier(
-          static_cast<const typet &>(component.find(ID_type))));
+    std::string virtual_name = id2string(component.get_base_name()) +
+                               id2string(function_identifier(component.type()));
 
     if(has_const(method_qualifier))
       virtual_name+="$const";
