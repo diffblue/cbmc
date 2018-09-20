@@ -10,6 +10,7 @@
 /// Unit tests for ai_domain_baset::ai_simplify_lhs
 
 #include <testing-utils/catch.hpp>
+#include <testing-utils/message.h>
 
 #include <analyses/ai.h>
 
@@ -64,7 +65,7 @@ bool constant_simplification_mockt::ai_simplify(
 SCENARIO("ai_domain_baset::ai_simplify_lhs",
   "[core][analyses][ai][ai_simplify_lhs]")
 {
-  ui_message_handlert message_handler;
+  ui_message_handlert message_handler(null_message_handler);
   ansi_c_languaget language;
   language.set_message_handler(message_handler);
 
