@@ -11,6 +11,7 @@ Author: CM Wintersteiger
 
 #include "format_strings.h"
 
+#include <util/exception_utils.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
 
@@ -37,7 +38,9 @@ void parse_flags(
         curtok.flags.push_back(format_tokent::flag_typet::SIGNED_SPACE); break;
       case '+':
         curtok.flags.push_back(format_tokent::flag_typet::SIGN); break;
-      default: throw 0;
+      default:
+        throw unsupported_operation_exceptiont(
+          std::string("unsupported format specifier flag: `") + *it + "'");
     }
     it++;
   }
@@ -175,7 +178,8 @@ void parse_conversion_specifier(
     }
 
     default:
-      throw std::string("unsupported format conversion specifier: `")+*it+"'";
+      throw unsupported_operation_exceptiont(
+        std::string("unsupported format conversion specifier: `") + *it + "'");
   }
   it++;
 }
@@ -210,7 +214,11 @@ format_token_listt parse_format_string(const std::string &arg_string)
       for( ; it!=arg_string.end() && *it!='%'; it++)
         tmp+=*it;
 
-      assert(!token_list.empty());
+      INVARIANT(
+        !token_list.empty() &&
+        token_list.back().type == format_tokent::token_typet::TEXT,
+        "must already have a TEXT token at the back of the token list");
+
       token_list.back().value=tmp;
     }
   }
