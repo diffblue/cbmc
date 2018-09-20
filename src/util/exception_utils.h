@@ -107,4 +107,17 @@ private:
   std::string message;
 };
 
+/// Thrown when an unexpected error occurs during the analysis (e.g., when the
+/// SAT solver returns an error)
+class analysis_exceptiont : public cprover_exception_baset
+{
+public:
+  explicit analysis_exceptiont(std::string reason);
+  std::string what() const override;
+
+private:
+  /// The reason this exception was generated.
+  std::string reason;
+};
+
 #endif // CPROVER_UTIL_EXCEPTION_UTILS_H

@@ -15,9 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 bvt bv_utilst::build_constant(const mp_integer &n, std::size_t width)
 {
   std::string n_str=integer2binary(n, width);
+  CHECK_RETURN(n_str.size() == width);
   bvt result;
   result.resize(width);
-  assert(n_str.size()==width);
   for(std::size_t i=0; i<width; i++)
     result[i]=const_literal(n_str[width-i-1]=='1');
   return result;
@@ -25,7 +25,7 @@ bvt bv_utilst::build_constant(const mp_integer &n, std::size_t width)
 
 literalt bv_utilst::is_one(const bvt &bv)
 {
-  assert(!bv.empty());
+  PRECONDITION(!bv.empty());
   bvt tmp;
   tmp=bv;
   tmp.erase(tmp.begin(), tmp.begin()+1);
@@ -34,7 +34,7 @@ literalt bv_utilst::is_one(const bvt &bv)
 
 void bv_utilst::set_equal(const bvt &a, const bvt &b)
 {
-  assert(a.size()==b.size());
+  PRECONDITION(a.size() == b.size());
   for(std::size_t i=0; i<a.size(); i++)
     prop.set_equal(a[i], b[i]);
 }
@@ -42,35 +42,35 @@ void bv_utilst::set_equal(const bvt &a, const bvt &b)
 bvt bv_utilst::extract(const bvt &a, std::size_t first, std::size_t last)
 {
   // preconditions
-  assert(first<a.size());
-  assert(last<a.size());
-  assert(first<=last);
+  PRECONDITION(first < a.size());
+  PRECONDITION(last < a.size());
+  PRECONDITION(first <= last);
 
   bvt result=a;
   result.resize(last+1);
   if(first!=0)
     result.erase(result.begin(), result.begin()+first);
 
-  assert(result.size()==last-first+1);
+  POSTCONDITION(result.size() == last - first + 1);
   return result;
 }
 
 bvt bv_utilst::extract_msb(const bvt &a, std::size_t n)
 {
   // preconditions
-  assert(n<=a.size());
+  PRECONDITION(n <= a.size());
 
   bvt result=a;
   result.erase(result.begin(), result.begin()+(result.size()-n));
 
-  assert(result.size()==n);
+  POSTCONDITION(result.size() == n);
   return result;
 }
 
 bvt bv_utilst::extract_lsb(const bvt &a, std::size_t n)
 {
   // preconditions
-  assert(n<=a.size());
+  PRECONDITION(n <= a.size());
 
   bvt result=a;
   result.resize(n);
@@ -95,7 +95,7 @@ bvt bv_utilst::concatenate(const bvt &a, const bvt &b) const
 /// If s is true, selects a otherwise selects b
 bvt bv_utilst::select(literalt s, const bvt &a, const bvt &b)
 {
-  assert(a.size()==b.size());
+  PRECONDITION(a.size() == b.size());
 
   bvt result;
 
@@ -112,10 +112,10 @@ bvt bv_utilst::extension(
   representationt rep)
 {
   std::size_t old_size=bv.size();
+  PRECONDITION(old_size != 0);
+
   bvt result=bv;
   result.resize(new_size);
-
-  assert(old_size!=0);
 
   literalt extend_with=
     (rep==representationt::SIGNED && !bv.empty())?bv[old_size-1]:
@@ -300,7 +300,7 @@ void bv_utilst::adder(
   literalt carry_in,
   literalt &carry_out)
 {
-  assert(sum.size()==op.size());
+  PRECONDITION(sum.size() == op.size());
 
   carry_out=carry_in;
 
@@ -315,7 +315,7 @@ literalt bv_utilst::carry_out(
   const bvt &op1,
   literalt carry_in)
 {
-  assert(op0.size()==op1.size());
+  PRECONDITION(op0.size() == op1.size());
 
   literalt carry_out=carry_in;
 
@@ -338,7 +338,7 @@ bvt bv_utilst::add_sub_no_overflow(
 
 bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, bool subtract)
 {
-  assert(op0.size()==op1.size());
+  PRECONDITION(op0.size() == op1.size());
 
   literalt carry_in=const_literal(subtract);
   literalt carry_out;
@@ -437,14 +437,15 @@ void bv_utilst::adder_no_overflow(
     prop.l_set_to_false(
       prop.land(sign_the_same, prop.lxor(sum[sum.size()-1], old_sign)));
   }
-  else if(rep==representationt::UNSIGNED)
+  else
   {
+    INVARIANT(
+      rep == representationt::UNSIGNED,
+      "representation has either value signed or unsigned");
     literalt carry_out;
     adder(sum, tmp_op, const_literal(subtract), carry_out);
     prop.l_set_to(carry_out, subtract);
   }
-  else
-    assert(false);
 }
 
 void bv_utilst::adder_no_overflow(bvt &sum, const bvt &op)
@@ -587,7 +588,7 @@ bvt bv_utilst::inverted(const bvt &bv)
 
 bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
 {
-  assert(!pps.empty());
+  PRECONDITION(!pps.empty());
 
   if(pps.size()==1)
     return pps.front();
@@ -605,7 +606,8 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
                 &b=pps[i*3+1],
                 &c=pps[i*3+2];
 
-      assert(a.size()==b.size() && a.size()==c.size());
+      INVARIANT(a.size() == b.size(), "groups should be of equal size");
+      INVARIANT(a.size() == c.size(), "groups should be of equal size");
 
       bvt s(a.size()), t(a.size());
 
@@ -625,7 +627,7 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
     for(std::size_t i=no_full_adders*3; i<pps.size(); i++)
       new_pps.push_back(pps[i]);
 
-    assert(new_pps.size()<pps.size());
+    POSTCONDITION(new_pps.size() < pps.size());
     return wallace_tree(new_pps);
   }
 }
@@ -706,10 +708,10 @@ bvt bv_utilst::unsigned_multiplier_no_overflow(
 {
   bvt _op0=op0, _op1=op1;
 
+  PRECONDITION(_op0.size() == _op1.size());
+
   if(is_constant(_op1))
     _op0.swap(_op1);
-
-  assert(_op0.size()==_op1.size());
 
   bvt product;
   product.resize(_op0.size());
@@ -772,7 +774,7 @@ bvt bv_utilst::cond_negate(const bvt &bv, const literalt cond)
 
 bvt bv_utilst::absolute_value(const bvt &bv)
 {
-  assert(!bv.empty());
+  PRECONDITION(!bv.empty());
   return cond_negate(bv, bv[bv.size()-1]);
 }
 
@@ -877,7 +879,7 @@ void bv_utilst::divider(
   bvt &remainer,
   representationt rep)
 {
-  assert(prop.has_set_to());
+  PRECONDITION(prop.has_set_to());
 
   switch(rep)
   {
@@ -885,7 +887,8 @@ void bv_utilst::divider(
     signed_divider(op0, op1, result, remainer); break;
   case representationt::UNSIGNED:
     unsigned_divider(op0, op1, result, remainer); break;
-  default: assert(false);
+  default:
+    UNREACHABLE;
   }
 }
 
@@ -983,7 +986,7 @@ void bv_utilst::unsigned_divider(
 /// \return None.
 void bv_utilst::equal_const_register(const bvt &var)
 {
-  assert(!is_constant(var));
+  PRECONDITION(!is_constant(var));
   equal_const_registered.insert(var);
   return;
 }
@@ -999,9 +1002,9 @@ literalt bv_utilst::equal_const_rec(bvt &var, bvt &constant)
 {
   std::size_t size = var.size();
 
-  assert(size != 0);
-  assert(size == constant.size());
-  assert(is_constant(constant));
+  PRECONDITION(size != 0);
+  PRECONDITION(size == constant.size());
+  PRECONDITION(is_constant(constant));
 
   if(size == 1)
   {
@@ -1049,10 +1052,10 @@ literalt bv_utilst::equal_const(const bvt &var, const bvt &constant)
 {
   std::size_t size = constant.size();
 
-  assert(var.size() == size);
-  assert(!is_constant(var));
-  assert(is_constant(constant));
-  assert(size >= 2);
+  PRECONDITION(var.size() == size);
+  PRECONDITION(!is_constant(var));
+  PRECONDITION(is_constant(constant));
+  PRECONDITION(size >= 2);
 
   // These get modified : be careful!
   bvt var_upper;
@@ -1091,8 +1094,12 @@ literalt bv_utilst::equal_const(const bvt &var, const bvt &constant)
   }
 
   // Check we have split the array correctly
-  assert(var_upper.size() + var_lower.size() == size);
-  assert(constant_upper.size() + constant_lower.size() == size);
+  INVARIANT(
+    var_upper.size() + var_lower.size() == size,
+    "lower size plus upper size should equal the total size");
+  INVARIANT(
+    constant_upper.size() + constant_lower.size() == size,
+    "lower size plus upper size should equal the total size");
 
   literalt top_comparison = equal_const_rec(var_upper, constant_upper);
   literalt bottom_comparison = equal_const_rec(var_lower, constant_lower);
@@ -1107,7 +1114,7 @@ literalt bv_utilst::equal_const(const bvt &var, const bvt &constant)
 /// \return The literal that is true if and only if they are equal.
 literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
 {
-  assert(op0.size()==op1.size());
+  PRECONDITION(op0.size() == op1.size());
 
   #ifdef COMPACT_EQUAL_CONST
   // simplify_expr should put the constant on the right
@@ -1150,7 +1157,7 @@ literalt bv_utilst::lt_or_le(
   const bvt &bv1,
   representationt rep)
 {
-  assert(bv0.size() == bv1.size());
+  PRECONDITION(bv0.size() == bv1.size());
 
   literalt top0=bv0[bv0.size()-1],
     top1=bv1[bv1.size()-1];
@@ -1169,7 +1176,8 @@ literalt bv_utilst::lt_or_le(
 
     if(rep==SIGNED)
     {
-      assert(bv0.size() >= 2);
+      INVARIANT(
+        bv0.size() >= 2, "signed bitvectors should have at least two bits");
       start = compareBelow.size() - 2;
 
       literalt firstComp=compareBelow[start];
@@ -1247,10 +1255,13 @@ literalt bv_utilst::lt_or_le(
 
     if(rep==representationt::SIGNED)
       result=prop.lxor(prop.lequal(top0, top1), carry);
-    else if(rep==representationt::UNSIGNED)
-      result=!carry;
     else
-      assert(false);
+    {
+      INVARIANT(
+        rep == representationt::UNSIGNED,
+        "representation has either value signed or unsigned");
+      result = !carry;
+    }
 
     if(or_equal)
       result=prop.lor(result, equal(bv0, bv1));
@@ -1314,7 +1325,7 @@ void bv_utilst::cond_implies_equal(
   const bvt &a,
   const bvt &b)
 {
-  assert(a.size()==b.size());
+  PRECONDITION(a.size() == b.size());
 
   if(prop.cnf_handled_well())
   {

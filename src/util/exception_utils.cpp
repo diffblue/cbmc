@@ -60,18 +60,28 @@ incorrect_goto_program_exceptiont::incorrect_goto_program_exceptiont(
 {
 }
 
+std::string incorrect_goto_program_exceptiont::what() const
+{
+  return message + " (at: " + source_location.as_string() + ")";
+}
+
 unsupported_operation_exceptiont::unsupported_operation_exceptiont(
   std::string message)
   : message(std::move(message))
 {
 }
 
-std::string incorrect_goto_program_exceptiont::what() const
-{
-  return message + " (at: " + source_location.as_string() + ")";
-}
-
 std::string unsupported_operation_exceptiont::what() const
 {
   return message;
+}
+
+analysis_exceptiont::analysis_exceptiont(std::string reason)
+  : reason(std::move(reason))
+{
+}
+
+std::string analysis_exceptiont::what() const
+{
+  return reason;
 }
