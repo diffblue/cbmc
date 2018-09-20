@@ -822,18 +822,17 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
   c_qualifierst original_qualifiers(type);
 
-  if(type.id() == ID_union)
-  {
-    union_tag_typet tag_type(identifier);
-    tag_type.add_source_location() = type.source_location();
-    type.swap(tag_type);
-  }
+  typet tag_type;
+
+  if(type.id() == ID_union || type.id() == ID_incomplete_union)
+    tag_type = union_tag_typet(identifier);
+  else if(type.id() == ID_struct || type.id() == ID_incomplete_struct)
+    tag_type = struct_tag_typet(identifier);
   else
-  {
-    symbol_typet symbol_type(identifier);
-    symbol_type.add_source_location() = type.source_location();
-    type.swap(symbol_type);
-  }
+    UNREACHABLE;
+
+  tag_type.add_source_location() = type.source_location();
+  type.swap(tag_type);
 
   original_qualifiers.write(type);
 }

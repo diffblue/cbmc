@@ -291,17 +291,23 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
   }
   else if(type_id==ID_struct_tag)
   {
-    return
-      expr_initializer_rec(
-        ns.follow_tag(to_struct_tag_type(type)),
-        source_location);
+    exprt result = expr_initializer_rec(
+      ns.follow_tag(to_struct_tag_type(type)), source_location);
+
+    // use the tag type
+    result.type() = type;
+
+    return result;
   }
   else if(type_id==ID_union_tag)
   {
-    return
-      expr_initializer_rec(
-        ns.follow_tag(to_union_tag_type(type)),
-        source_location);
+    exprt result = expr_initializer_rec(
+      ns.follow_tag(to_union_tag_type(type)), source_location);
+
+    // use the tag type
+    result.type() = type;
+
+    return result;
   }
   else if(type_id==ID_string)
   {
