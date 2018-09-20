@@ -191,7 +191,7 @@ public:
   // delete all steps after (not including) s
   void trim_after(stepst::iterator s)
   {
-    assert(s!=steps.end());
+    PRECONDITION(s != steps.end());
     steps.erase(++s, steps.end());
   }
 };

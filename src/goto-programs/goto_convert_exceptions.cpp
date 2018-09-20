@@ -18,12 +18,10 @@ void goto_convertt::convert_msc_try_finally(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  if(code.operands().size()!=2)
-  {
-    error().source_location=code.find_source_location();
-    error() << "msc_try_finally expects two arguments" << eom;
-    throw 0;
-  }
+  INVARIANT_WITH_DIAGNOSTICS(
+    code.operands().size() == 2,
+    "msc_try_finally expects two arguments",
+    code.find_source_location());
 
   goto_programt tmp;
   tmp.add_instruction(SKIP)->source_location=code.source_location();
@@ -57,12 +55,10 @@ void goto_convertt::convert_msc_try_except(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  if(code.operands().size()!=3)
-  {
-    error().source_location=code.find_source_location();
-    error() << "msc_try_except expects three arguments" << eom;
-    throw 0;
-  }
+  INVARIANT_WITH_DIAGNOSTICS(
+    code.operands().size() == 3,
+    "msc_try_except expects three arguments",
+    code.find_source_location());
 
   convert(to_code(code.op0()), dest, mode);
 
@@ -74,12 +70,8 @@ void goto_convertt::convert_msc_leave(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  if(!targets.leave_set)
-  {
-    error().source_location=code.find_source_location();
-    error() << "leave without target" << eom;
-    throw 0;
-  }
+  INVARIANT_WITH_DIAGNOSTICS(
+    targets.leave_set, "leave without target", code.find_source_location());
 
   // need to process destructor stack
   for(std::size_t d=targets.destructor_stack.size();
@@ -101,7 +93,10 @@ void goto_convertt::convert_try_catch(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  assert(code.operands().size()>=2);
+  INVARIANT_WITH_DIAGNOSTICS(
+    code.operands().size() >= 2,
+    "try_catch expects at least two arguments",
+    code.find_source_location());
 
   // add the CATCH-push instruction to 'dest'
   goto_programt::targett catch_push_instruction=dest.add_instruction();
@@ -159,12 +154,10 @@ void goto_convertt::convert_CPROVER_try_catch(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  if(code.operands().size()!=2)
-  {
-    error().source_location=code.find_source_location();
-    error() << "CPROVER_try_catch expects two arguments" << eom;
-    throw 0;
-  }
+  INVARIANT_WITH_DIAGNOSTICS(
+    code.operands().size() == 2,
+    "CPROVER_try_catch expects two arguments",
+    code.find_source_location());
 
   // this is where we go after 'throw'
   goto_programt tmp;
@@ -235,12 +228,10 @@ void goto_convertt::convert_CPROVER_try_finally(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  if(code.operands().size()!=2)
-  {
-    error().source_location=code.find_source_location();
-    error() << "CPROVER_try_finally expects two arguments" << eom;
-    throw 0;
-  }
+  INVARIANT_WITH_DIAGNOSTICS(
+    code.operands().size() == 2,
+    "CPROVER_try_finally expects two arguments",
+    code.find_source_location());
 
   // first put 'finally' code onto destructor stack
   targets.destructor_stack.push_back(to_code(code.op1()));
