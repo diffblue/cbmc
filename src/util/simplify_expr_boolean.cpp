@@ -40,38 +40,6 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
     simplify_node(expr);
     return false;
   }
-  else if(expr.id()==ID_iff)
-  {
-    if(operands.size()!=2 ||
-       operands.front().type().id()!=ID_bool ||
-       operands.back().type().id()!=ID_bool)
-      return true;
-
-    if(operands.front().is_false())
-    {
-      expr.id(ID_not);
-      operands.erase(operands.begin());
-      return false;
-    }
-    else if(operands.front().is_true())
-    {
-      exprt tmp(operands.back());
-      expr.swap(tmp);
-      return false;
-    }
-    else if(operands.back().is_false())
-    {
-      expr.id(ID_not);
-      operands.erase(++operands.begin());
-      return false;
-    }
-    else if(operands.back().is_true())
-    {
-      exprt tmp(operands.front());
-      expr.swap(tmp);
-      return false;
-    }
-  }
   else if(expr.id()==ID_xor)
   {
     bool result=true;

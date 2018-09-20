@@ -58,15 +58,6 @@ mini_bddt bdd_exprt::from_expr_rec(const exprt &expr)
 
     return op0==op1;
   }
-  else if(expr.id()==ID_iff)
-  {
-    assert(expr.operands().size()==2);
-
-    mini_bddt op0=from_expr_rec(expr.op0());
-    mini_bddt op1=from_expr_rec(expr.op1());
-
-    return op0==op1;
-  }
   else if(expr.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(expr);

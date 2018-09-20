@@ -78,8 +78,6 @@ static std::ostream &format_rec(std::ostream &os, const multi_ary_exprt &src)
     operator_str = u8"\u2260"; // /=, U+2260
   else if(src.id() == ID_implies)
     operator_str = u8"\u21d2"; // =>, U+21D2
-  else if(src.id() == ID_iff)
-    operator_str = u8"\u21d4"; // <=>, U+21D4
   else
     operator_str = id2string(src.id());
 
