@@ -942,12 +942,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       if(use_datatypes)
       {
-        INVARIANT(
-          datatype_map.find(bitnot_expr.type()) != datatype_map.end(),
-          "type shall have been mapped to Z3 datatype");
-
-        const std::string &smt_typename =
-          datatype_map.find(bitnot_expr.type())->second;
+        const std::string &smt_typename = datatype_map.at(bitnot_expr.type());
 
         // extract elements
         const vector_typet &vector_type = to_vector_type(bitnot_expr.type());
@@ -1010,12 +1005,8 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       if(use_datatypes)
       {
-        INVARIANT(
-          datatype_map.find(unary_minus_expr.type()) != datatype_map.end(),
-          "type shall have been mapped to Z3 datatype");
-
         const std::string &smt_typename =
-          datatype_map.find(unary_minus_expr.type())->second;
+          datatype_map.at(unary_minus_expr.type());
 
         // extract elements
         const vector_typet &vector_type =
@@ -1807,11 +1798,7 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(vector_type) != datatype_map.end(),
-        "type shall have been mapped to Z3 datatype");
-
-      const std::string &smt_typename = datatype_map.find(vector_type)->second;
+      const std::string &smt_typename = datatype_map.at(vector_type);
 
       out << "(mk-" << smt_typename;
     }
@@ -2596,10 +2583,7 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
 
   if(use_datatypes)
   {
-    INVARIANT(
-      datatype_map.find(struct_type) != datatype_map.end(),
-      "type should have been mapped to Z3 datatype");
-    const std::string &smt_typename = datatype_map.find(struct_type)->second;
+    const std::string &smt_typename = datatype_map.at(struct_type);
 
     // use the constructor for the Z3 datatype
     out << "(mk-" << smt_typename;
@@ -3083,11 +3067,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(vector_type) != datatype_map.end(),
-        "type should have been mapped to Z3 datatype");
-
-      const std::string &smt_typename = datatype_map.find(vector_type)->second;
+      const std::string &smt_typename = datatype_map.at(vector_type);
 
       out << "(mk-" << smt_typename;
     }
@@ -3285,11 +3265,7 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
 
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(vector_type) != datatype_map.end(),
-        "type should have been mapped to Z3 datatype");
-
-      const std::string &smt_typename = datatype_map.find(vector_type)->second;
+      const std::string &smt_typename = datatype_map.at(vector_type);
 
       out << "(mk-" << smt_typename;
     }
@@ -3594,10 +3570,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
 
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(expr_type) != datatype_map.end(),
-        "type shall have been mapped to Z3 datatype");
-      const std::string &smt_typename = datatype_map.find(expr_type)->second;
+      const std::string &smt_typename = datatype_map.at(expr_type);
 
       out << "(update-" << smt_typename << "." << component_name << " ";
       convert_expr(expr.op0());
@@ -3825,10 +3798,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
 
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(vector_type) != datatype_map.end(),
-        "type should have been mapped to Z3 datatype");
-      const std::string &smt_typename = datatype_map.find(vector_type)->second;
+      const std::string &smt_typename = datatype_map.at(vector_type);
 
       // this is easy for constant indicies
 
@@ -3871,10 +3841,7 @@ void smt2_convt::convert_member(const member_exprt &expr)
 
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(struct_type) != datatype_map.end(),
-        "type should have been mapped to Z3 datatype");
-      const std::string &smt_typename = datatype_map.find(struct_type)->second;
+      const std::string &smt_typename = datatype_map.at(struct_type);
 
       out << "(" << smt_typename << "."
           << struct_type.get_component(name).get_name()
@@ -3931,11 +3898,7 @@ void smt2_convt::flatten2bv(const exprt &expr)
   {
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(type) != datatype_map.end(),
-        "type should have been mapped to Z3 datatype");
-
-      const std::string &smt_typename = datatype_map.find(type)->second;
+      const std::string &smt_typename = datatype_map.at(type);
 
       // concatenate elements
       const vector_typet &vector_type=to_vector_type(type);
@@ -3966,11 +3929,7 @@ void smt2_convt::flatten2bv(const exprt &expr)
   {
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(type) != datatype_map.end(),
-        "type should have been mapped to Z3 datatype");
-
-      const std::string &smt_typename = datatype_map.find(type)->second;
+      const std::string &smt_typename = datatype_map.at(type);
 
       // concatenate elements
       const struct_typet &struct_type=to_struct_type(type);
@@ -4033,11 +3992,7 @@ void smt2_convt::unflatten(
   {
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(type) != datatype_map.end(),
-        "type should have been mapped to Z3 datatype");
-
-      const std::string &smt_typename = datatype_map.find(type)->second;
+      const std::string &smt_typename = datatype_map.at(type);
 
       // extract elements
       const vector_typet &vector_type=to_vector_type(type);
@@ -4084,11 +4039,7 @@ void smt2_convt::unflatten(
       {
         out << ")) ";
 
-        INVARIANT(
-          datatype_map.find(type) != datatype_map.end(),
-          "type should have been mapped to Z3 datatype");
-
-        const std::string &smt_typename = datatype_map.find(type)->second;
+        const std::string &smt_typename = datatype_map.at(type);
 
         out << "(mk-" << smt_typename;
 
@@ -4467,10 +4418,7 @@ void smt2_convt::convert_type(const typet &type)
   {
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(type) != datatype_map.end(),
-        "type should have been converted to Z3 datatype");
-      out << datatype_map.find(type)->second;
+      out << datatype_map.at(type);
     }
     else
     {
@@ -4485,10 +4433,7 @@ void smt2_convt::convert_type(const typet &type)
   {
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(type) != datatype_map.end(),
-        "type should have been converted to Z3 datatype");
-      out << datatype_map.find(type)->second;
+      out << datatype_map.at(type);
     }
     else
     {
@@ -4564,10 +4509,7 @@ void smt2_convt::convert_type(const typet &type)
   {
     if(use_datatypes)
     {
-      INVARIANT(
-        datatype_map.find(type) != datatype_map.end(),
-        "type should have been converted to Z3 datatype");
-      out << datatype_map.find(type)->second;
+      out << datatype_map.at(type);
     }
     else
     {
@@ -4617,7 +4559,8 @@ void smt2_convt::find_symbols_rec(
     if(use_datatypes &&
        datatype_map.find(type)==datatype_map.end())
     {
-      std::string smt_typename = "complex."+std::to_string(datatype_map.size());
+      const std::string smt_typename =
+        "complex." + std::to_string(datatype_map.size());
       datatype_map[type] = smt_typename;
 
       out << "(declare-datatypes () ((" << smt_typename << " "
@@ -4645,7 +4588,8 @@ void smt2_convt::find_symbols_rec(
 
       mp_integer size = numeric_cast_v<mp_integer>(vector_type.size());
 
-      std::string smt_typename = "vector."+std::to_string(datatype_map.size());
+      const std::string smt_typename =
+        "vector." + std::to_string(datatype_map.size());
       datatype_map[type] = smt_typename;
 
       out << "(declare-datatypes () ((" << smt_typename << " "
@@ -4668,7 +4612,8 @@ void smt2_convt::find_symbols_rec(
     if(use_datatypes &&
        datatype_map.find(type)==datatype_map.end())
     {
-      std::string smt_typename = "struct."+std::to_string(datatype_map.size());
+      const std::string smt_typename =
+        "struct." + std::to_string(datatype_map.size());
       datatype_map[type] = smt_typename;
       need_decl=true;
     }
@@ -4682,7 +4627,7 @@ void smt2_convt::find_symbols_rec(
     // Declare the corresponding SMT type if we haven't already.
     if(need_decl)
     {
-      std::string smt_typename = datatype_map[type];
+      const std::string &smt_typename = datatype_map.at(type);
 
       // We're going to create a datatype named something like `struct.0'.
       // It's going to have a single constructor named `mk-struct.0' with an
