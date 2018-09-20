@@ -28,36 +28,24 @@ static void copy_parent(
   const irep_idt &arg_name,
   exprt &block)
 {
-  block.operands().push_back(codet());
-
-  codet &code=to_code(block.operands().back());
-  code.add_source_location()=source_location;
-
-  code.set_statement(ID_assign);
-  code.operands().push_back(exprt(ID_dereference));
-
-  code.op0().operands().push_back(exprt("explicit-typecast"));
-
-  exprt &op0=code.op0().op0();
-
-  op0.operands().push_back(exprt("cpp-this"));
-  op0.type()=
-    pointer_type(cpp_namet(parent_base_name, source_location).as_type());
+  exprt op0(
+    "explicit-typecast",
+    pointer_type(cpp_namet(parent_base_name, source_location).as_type()));
+  op0.copy_to_operands(exprt("cpp-this"));
   op0.add_source_location()=source_location;
 
-  code.operands().push_back(exprt("explicit-typecast"));
-  exprt &op1=code.op1();
-
-  op1.type() =
-    pointer_type(cpp_namet(parent_base_name, source_location).as_type());
+  exprt op1(
+    "explicit-typecast",
+    pointer_type(cpp_namet(parent_base_name, source_location).as_type()));
   op1.type().set(ID_C_reference, true);
   op1.type().subtype().set(ID_C_constant, true);
-
-  op1.operands().push_back(exprt(ID_cpp_name));
-  op1.op0().get_sub().push_back(irept(ID_name));
-  op1.op0().get_sub().back().set(ID_identifier, arg_name);
-  op1.op0().get_sub().back().set(ID_C_source_location, source_location);
+  op1.get_sub().push_back(cpp_namet(arg_name, source_location));
   op1.add_source_location()=source_location;
+
+  code_assignt code(dereference_exprt(op0), op1);
+  code.add_source_location() = source_location;
+
+  block.operands().push_back(code);
 }
 
 /// \param member_base_name: name of a member
@@ -69,39 +57,22 @@ static void copy_member(
   const irep_idt &arg_name,
   exprt &block)
 {
-  block.operands().push_back(exprt(ID_code));
-  exprt &code=block.operands().back();
+  cpp_namet op0(member_base_name, source_location);
 
-  code.set(ID_statement, ID_expression);
-  code.add(ID_type)=typet(ID_code);
-  code.operands().push_back(exprt(ID_side_effect));
-  code.op0().set(ID_statement, ID_assign);
-  code.op0().operands().push_back(exprt(ID_cpp_name));
-  code.add_source_location()=source_location;
-
-  exprt &op0=code.op0().op0();
-  op0.add_source_location()=source_location;
-
-  op0.get_sub().push_back(irept(ID_name));
-  op0.get_sub().back().set(ID_identifier, member_base_name);
-  op0.get_sub().back().set(ID_C_source_location, source_location);
-
-  code.op0().operands().push_back(exprt(ID_member));
-
-  exprt &op1=code.op0().op1();
-
-  op1.add(ID_component_cpp_name).id(ID_cpp_name);
-  op1.add(ID_component_cpp_name).get_sub().push_back(irept(ID_name));
-  op1.add(ID_component_cpp_name).get_sub().back().set(
-    ID_identifier, member_base_name);
-  op1.add(ID_component_cpp_name).get_sub().back().set(
-    ID_C_source_location, source_location);
-
-  op1.operands().push_back(exprt(ID_cpp_name));
-  op1.op0().get_sub().push_back(irept(ID_name));
-  op1.op0().get_sub().back().set(ID_identifier, arg_name);
-  op1.op0().get_sub().back().set(ID_C_source_location, source_location);
+  exprt op1(ID_member);
+  op1.add(ID_component_cpp_name, cpp_namet(member_base_name, source_location));
+  op1.copy_to_operands(cpp_namet(arg_name, source_location).as_expr());
   op1.add_source_location()=source_location;
+
+  side_effect_exprt assign(ID_assign, typet(), source_location);
+  assign.copy_to_operands(op0.as_expr());
+  assign.op0().add_source_location() = source_location;
+  assign.copy_to_operands(op1);
+
+  code_expressiont code(assign);
+  code.add_source_location() = source_location;
+
+  block.operands().push_back(code);
 }
 
 /// \param member_base_name: name of array member
@@ -116,44 +87,27 @@ static void copy_array(
   exprt &block)
 {
   // Build the index expression
-  exprt constant=from_integer(i, index_type());
+  const exprt constant = from_integer(i, index_type());
 
-  block.operands().push_back(exprt(ID_code));
-  exprt &code=block.operands().back();
-  code.add_source_location()=source_location;
+  const cpp_namet array(member_base_name, source_location);
 
-  code.set(ID_statement, ID_expression);
-  code.add(ID_type)=typet(ID_code);
-  code.operands().push_back(exprt(ID_side_effect));
-  code.op0().set(ID_statement, ID_assign);
-  code.op0().operands().push_back(exprt(ID_index));
-  exprt &op0=code.op0().op0();
-  op0.operands().push_back(exprt(ID_cpp_name));
-  op0.add_source_location()=source_location;
+  exprt member(ID_member);
+  member.add(
+    ID_component_cpp_name, cpp_namet(member_base_name, source_location));
+  member.copy_to_operands(cpp_namet(arg_name, source_location).as_expr());
 
-  op0.op0().get_sub().push_back(irept(ID_name));
-  op0.op0().get_sub().back().set(ID_identifier, member_base_name);
-  op0.op0().get_sub().back().set(ID_C_source_location, source_location);
-  op0.copy_to_operands(constant);
+  side_effect_exprt assign(ID_assign, typet(), source_location);
 
-  code.op0().operands().push_back(exprt(ID_index));
+  assign.copy_to_operands(index_exprt(array.as_expr(), constant));
+  assign.op0().add_source_location() = source_location;
 
-  exprt &op1=code.op0().op1();
-  op1.operands().push_back(exprt(ID_member));
-  op1.op0().add(ID_component_cpp_name).id(ID_cpp_name);
-  op1.op0().add(ID_component_cpp_name).get_sub().push_back(irept(ID_name));
-  op1.op0().add(ID_component_cpp_name).get_sub().back().set(
-    ID_identifier, member_base_name);
-  op1.op0().add(ID_component_cpp_name).get_sub().back().set(
-    ID_C_source_location, source_location);
+  assign.copy_to_operands(index_exprt(member, constant));
+  assign.op1().add_source_location() = source_location;
 
-  op1.op0().operands().push_back(exprt(ID_cpp_name));
-  op1.op0().op0().get_sub().push_back(irept(ID_name));
-  op1.op0().op0().get_sub().back().set(ID_identifier, arg_name);
-  op1.op0().op0().get_sub().back().set(ID_C_source_location, source_location);
-  op1.copy_to_operands(constant);
+  code_expressiont code(assign);
+  code.add_source_location() = source_location;
 
-  op1.add_source_location()=source_location;
+  block.operands().push_back(code);
 }
 
 /// Generate code for implicit default constructors
