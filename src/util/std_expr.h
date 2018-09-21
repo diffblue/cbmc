@@ -4092,10 +4092,12 @@ public:
 class constant_exprt:public exprt
 {
 public:
+  DEPRECATED("use constant_exprt(value, type) instead")
   constant_exprt():exprt(ID_constant)
   {
   }
 
+  DEPRECATED("use constant_exprt(value, type) instead")
   explicit constant_exprt(const typet &type):exprt(ID_constant, type)
   {
   }
@@ -4149,9 +4151,8 @@ template<> inline bool can_cast_expr<constant_exprt>(const exprt &base)
 class true_exprt:public constant_exprt
 {
 public:
-  true_exprt():constant_exprt(bool_typet())
+  true_exprt() : constant_exprt(ID_true, bool_typet())
   {
-    set_value(ID_true);
   }
 };
 
@@ -4159,9 +4160,8 @@ public:
 class false_exprt:public constant_exprt
 {
 public:
-  false_exprt():constant_exprt(bool_typet())
+  false_exprt() : constant_exprt(ID_false, bool_typet())
   {
-    set_value(ID_false);
   }
 };
 
@@ -4178,9 +4178,9 @@ public:
 class null_pointer_exprt:public constant_exprt
 {
 public:
-  explicit null_pointer_exprt(const pointer_typet &type):constant_exprt(type)
+  explicit null_pointer_exprt(const pointer_typet &type)
+    : constant_exprt(ID_NULL, type)
   {
-    set_value(ID_NULL);
   }
 };
 

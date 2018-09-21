@@ -85,9 +85,7 @@ mp_integer bv_arithmetict::pack() const
 
 exprt bv_arithmetict::to_expr() const
 {
-  constant_exprt result(spec.to_type());
-  result.set_value(integer2binary(value, spec.width));
-  return result;
+  return constant_exprt(integer2binary(value, spec.width), spec.to_type());
 }
 
 bv_arithmetict &bv_arithmetict::operator/=(const bv_arithmetict &other)

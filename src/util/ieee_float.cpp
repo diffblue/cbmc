@@ -696,9 +696,7 @@ void ieee_floatt::divide_and_round(
 
 constant_exprt ieee_floatt::to_expr() const
 {
-  constant_exprt result(spec.to_type());
-  result.set_value(integer2binary(pack(), spec.width()));
-  return result;
+  return constant_exprt(integer2binary(pack(), spec.width()), spec.to_type());
 }
 
 ieee_floatt &ieee_floatt::operator/=(const ieee_floatt &other)

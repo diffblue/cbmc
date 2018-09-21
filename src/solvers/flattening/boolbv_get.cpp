@@ -255,17 +255,13 @@ exprt boolbvt::bv_get_rec(
       mp_integer int_value=binary2integer(value, false);
       mp_integer from=string2integer(type.get_string(ID_from));
 
-      constant_exprt value_expr(type);
-      value_expr.set_value(integer2string(int_value+from));
-      return value_expr;
+      return constant_exprt(integer2string(int_value + from), type);
     }
     break;
 
   default:
   case bvtypet::IS_C_ENUM:
-    constant_exprt value_expr(type);
-    value_expr.set_value(value);
-    return value_expr;
+    return constant_exprt(value, type);
   }
 
   return nil_exprt();

@@ -743,7 +743,6 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
 
     assert(a_str.size()==b_str.size());
 
-    constant_exprt new_op(expr.type());
     std::string new_value;
     new_value.resize(width);
 
@@ -765,7 +764,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     else
       break;
 
-    new_op.set_value(new_value);
+    constant_exprt new_op(new_value, expr.type());
 
     // erase first operand
     expr.operands().erase(expr.operands().begin());
@@ -829,8 +828,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     }
     else if(expr.id()==ID_bitxor)
     {
-      constant_exprt new_op(expr.type());
-      new_op.set_value(integer2binary(0, width));
+      constant_exprt new_op(integer2binary(0, width), expr.type());
       expr.swap(new_op);
       return false;
     }

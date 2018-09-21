@@ -2300,7 +2300,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
     if(src_type.id()==ID_bool)
     {
-      constant_exprt val(dest_type);
+      constant_exprt val(irep_idt(), dest_type);
 
       ieee_floatt a(to_floatbv_type(dest_type));
 

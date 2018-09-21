@@ -45,10 +45,8 @@ constant_exprt fixedbvt::to_expr() const
   fixedbv_typet type;
   type.set_width(spec.width);
   type.set_integer_bits(spec.integer_bits);
-  constant_exprt expr(type);
   assert(spec.width!=0);
-  expr.set_value(integer2binary(v, spec.width));
-  return expr;
+  return constant_exprt(integer2binary(v, spec.width), type);
 }
 
 void fixedbvt::round(const fixedbv_spect &dest_spec)
