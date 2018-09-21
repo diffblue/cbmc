@@ -46,10 +46,10 @@ void show_vcc_plain(
       out << '\n';
 
     if(s_it->source.pc->source_location.is_not_nil())
-      out << s_it->source.pc->source_location << "\n";
+      out << s_it->source.pc->source_location << '\n';
 
     if(s_it->comment != "")
-      out << s_it->comment << "\n";
+      out << s_it->comment << '\n';
 
     symex_target_equationt::SSA_stepst::const_iterator p_it =
       equation.SSA_steps.begin();
@@ -91,7 +91,7 @@ void show_vcc_plain(
     std::size_t count = 1;
     for(const auto &disjunct : disjuncts)
     {
-      out << "{" << count << "} " << format(disjunct) << "\n";
+      out << '{' << count << "} " << format(disjunct) << '\n';
       count++;
     }
   }
