@@ -977,8 +977,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   symbol.type.set(ID_name, symbol.name);
 
   // default access
-  irep_idt access=
-    type.get_bool(ID_C_class)?ID_private:ID_public;
+  irep_idt access = type.default_access();
 
   bool found_ctor=false;
   bool found_dtor=false;
@@ -1119,8 +1118,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   }
 
   // Reset the access type
-  access=
-    type.get_bool(ID_C_class)?ID_private:ID_public;
+  access = type.default_access();
 
   // All the data members are now known.
   // We now deal with the constructors that we are given.

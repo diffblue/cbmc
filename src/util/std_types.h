@@ -216,6 +216,19 @@ public:
 
   irep_idt get_tag() const { return get(ID_tag); }
   void set_tag(const irep_idt &tag) { set(ID_tag, tag); }
+
+  /// A struct may be a class, where members may have access restrictions.
+  bool is_class() const
+  {
+    return id() == ID_struct && get_bool(ID_C_class);
+  }
+
+  /// Return the access specification for members where access has not been
+  /// modified.
+  irep_idt default_access() const
+  {
+    return is_class() ? ID_private : ID_public;
+  }
 };
 
 /// Check whether a reference to a typet is a \ref struct_union_typet.
@@ -311,16 +324,6 @@ public:
   componentst &methods()
   {
     return (methodst &)(add(ID_methods).get_sub());
-  }
-
-  bool is_class() const
-  {
-    return get_bool(ID_C_class);
-  }
-
-  irep_idt default_access() const
-  {
-    return is_class()?ID_private:ID_public;
   }
 
   class baset:public exprt
