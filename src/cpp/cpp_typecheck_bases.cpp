@@ -18,8 +18,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
   std::set<irep_idt> bases;
   std::set<irep_idt> vbases;
 
-  irep_idt default_class_access=
-    type.get_bool(ID_C_class)?ID_private:ID_public;
+  irep_idt default_class_access = type.default_access();
 
   irept::subt &bases_irep=type.add(ID_bases).get_sub();
 
