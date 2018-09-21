@@ -39,6 +39,8 @@ void local_bitvector_analysist::flagst::print(std::ostream &out) const
     out << "+static_lifetime";
   if(is_integer_address())
     out << "+integer_address";
+  if(is_string_constant())
+    out << "+string_constant";
 }
 
 bool local_bitvector_analysist::merge(points_tot &a, points_tot &b)
@@ -236,6 +238,10 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
       return flagst::mk_dynamic_heap();
     else
       return flagst::mk_unknown();
+  }
+  else if(rhs.id()==ID_string_constant)
+  {
+    return flagst::mk_string_constant();
   }
   else
     return flagst::mk_unknown();

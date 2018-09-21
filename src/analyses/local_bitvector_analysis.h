@@ -65,7 +65,8 @@ public:
       B_dynamic_heap=1<<4,
       B_null=1<<5,
       B_static_lifetime=1<<6,
-      B_integer_address=1<<7
+      B_integer_address=1<<7,
+      B_string_constant=1<<8
     };
 
     explicit flagst(const bitst _bits):bits(_bits)
@@ -121,6 +122,11 @@ public:
       return (bits&B_dynamic_local)!=0;
     }
 
+    bool is_string_constant() const
+    {
+      return (bits&B_string_constant)!=0;
+    }
+
     static flagst mk_dynamic_heap()
     {
       return flagst(B_dynamic_heap);
@@ -154,6 +160,11 @@ public:
     static flagst mk_integer_address()
     {
       return flagst(B_integer_address);
+    }
+
+    static flagst mk_string_constant()
+    {
+      return flagst(B_string_constant);
     }
 
     bool is_integer_address() const
