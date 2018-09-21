@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <memory>
 
-#include "message.h"
+#include "cout_message.h"
 #include "json_stream.h"
 #include "timestamper.h"
 
@@ -41,6 +41,7 @@ public:
   }
 
 protected:
+  std::unique_ptr<console_message_handlert> console_message_handler;
   message_handlert *message_handler;
   uit _ui;
   const bool always_flush;
