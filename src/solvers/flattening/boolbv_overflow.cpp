@@ -170,41 +170,6 @@ literalt boolbvt::convert_overflow(const exprt &expr)
 
     return bv_utils.overflow_negate(bv);
   }
-  else if(has_prefix(expr.id_string(), "overflow-typecast-"))
-  {
-    std::size_t bits=unsafe_string2unsigned(id2string(expr.id()).substr(18));
-    INVARIANT(bits != 0, "");
-
-    const exprt::operandst &operands=expr.operands();
-
-    DATA_INVARIANT(
-      operands.size() == 1,
-      "expression " + expr.id_string() + " should have one operand");
-
-    const exprt &op=operands[0];
-
-    const bvt &bv=convert_bv(op);
-
-    INVARIANT(bits < bv.size(), "");
-
-    // signed or unsigned?
-    if(op.type().id()==ID_signedbv)
-    {
-      bvt tmp_bv;
-      for(std::size_t i=bits; i<bv.size(); i++)
-        tmp_bv.push_back(prop.lxor(bv[bits-1], bv[i]));
-
-      return prop.lor(tmp_bv);
-    }
-    else
-    {
-      bvt tmp_bv;
-      for(std::size_t i=bits; i<bv.size(); i++)
-        tmp_bv.push_back(bv[i]);
-
-      return prop.lor(tmp_bv);
-    }
-  }
 
   return SUB::convert_rest(expr);
 }
