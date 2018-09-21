@@ -10,10 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 
-bvt boolbvt::convert_mult(const exprt &expr)
+bvt boolbvt::convert_mult(const mult_exprt &expr)
 {
-  PRECONDITION(expr.id() == ID_mult || expr.id() == "no-overflow-mult");
-
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
@@ -26,8 +24,6 @@ bvt boolbvt::convert_mult(const exprt &expr)
   DATA_INVARIANT(!operands.empty(), "multiplication must have operands");
 
   const exprt &op0=expr.op0();
-
-  bool no_overflow=expr.id()=="no-overflow-mult";
 
   DATA_INVARIANT(
     op0.type() == expr.type(),
@@ -80,10 +76,7 @@ bvt boolbvt::convert_mult(const exprt &expr)
 
       const bvt &op = convert_bv(*it, width);
 
-      if(no_overflow)
-        bv=bv_utils.multiplier_no_overflow(bv, op, rep);
-      else
-        bv=bv_utils.multiplier(bv, op, rep);
+      bv = bv_utils.multiplier(bv, op, rep);
     }
 
     return bv;

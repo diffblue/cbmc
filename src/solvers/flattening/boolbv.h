@@ -152,7 +152,7 @@ protected:
   virtual bvt convert_union(const union_exprt &expr);
   virtual bvt convert_bv_typecast(const typecast_exprt &expr);
   virtual bvt convert_add_sub(const exprt &expr);
-  virtual bvt convert_mult(const exprt &expr);
+  virtual bvt convert_mult(const mult_exprt &expr);
   virtual bvt convert_div(const div_exprt &expr);
   virtual bvt convert_mod(const mod_exprt &expr);
   virtual bvt convert_floatbv_op(const exprt &expr);

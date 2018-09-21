@@ -51,7 +51,7 @@ protected:
   void post_process_arrays() override;
 
   // Refine arithmetic
-  bvt convert_mult(const exprt &expr) override;
+  bvt convert_mult(const mult_exprt &expr) override;
   bvt convert_div(const div_exprt &expr) override;
   bvt convert_mod(const mod_exprt &expr) override;
   bvt convert_floatbv_op(const exprt &expr) override;
