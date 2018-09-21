@@ -41,7 +41,6 @@ TEST_CASE("Replace all symbols in expression", "[core][util][replace_symbol]")
   REQUIRE(r.replace(s2));
   REQUIRE(s2 == symbol_exprt("b", typet("some_type")));
 
-
   REQUIRE(!r.replace(array_type));
   REQUIRE(array_type.size() == other_expr);
 
