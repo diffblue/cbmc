@@ -3928,7 +3928,7 @@ bool Parser::rTemplateArgs(irept &template_args)
       lex.Restore(pos);
       exprt tmp;
       if(rConditionalExpr(tmp, true))
-        exp.id("ambiguous");
+        exp.id(ID_ambiguous);
       #ifdef DEBUG
       std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.1\n";
       #endif
@@ -5860,7 +5860,7 @@ bool Parser::rTypeidExpr(exprt &exp)
         //                        Ptree::List(new Leaf(op), tname,
         //                        new Leaf(cp)));
 
-        exp=exprt("typeid");
+        exp = exprt(ID_typeid);
         set_location(exp, tk);
         return true;
       }
@@ -5879,7 +5879,7 @@ bool Parser::rTypeidExpr(exprt &exp)
         //     Ptree::List(new Leaf(op), subexp, new Leaf(cp))
         //   ));
 
-        exp=exprt("typeid");
+        exp = exprt(ID_typeid);
         set_location(exp, tk);
         return true;
       }
@@ -7916,7 +7916,7 @@ bool Parser::rMSC_leaveStatement(codet &statement)
   if(lex.get_token(tk)!=TOK_MSC_LEAVE)
     return false;
 
-  statement=codet("msc_leave");
+  statement = codet(ID_msc_leave);
   set_location(statement, tk);
 
   return true;

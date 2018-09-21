@@ -54,7 +54,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_expr_this(expr);
   else if(expr.id()=="pointer-to-member")
     convert_pmop(expr);
-  else if(expr.id()=="new_object")
+  else if(expr.id() == ID_new_object)
   {
   }
   else if(operator_is_overloaded(expr))
@@ -405,7 +405,7 @@ void cpp_typecheckt::typecheck_function_expr(
       function_call.arguments().push_back(expr.op0());
       typecheck_side_effect_function_call(function_call);
 
-      exprt tmp("already_typechecked");
+      exprt tmp(ID_already_typechecked);
       tmp.copy_to_operands(function_call);
       function_call.swap(tmp);
 
@@ -529,7 +529,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       exprt member(ID_member);
       member.add(ID_component_cpp_name)= cpp_name;
 
-      exprt tmp("already_typechecked");
+      exprt tmp(ID_already_typechecked);
       tmp.copy_to_operands(expr.op0());
       member.copy_to_operands(tmp);
 
@@ -550,7 +550,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     if(expr.id()==ID_ptrmember)
     {
       add_implicit_dereference(function_call);
-      exprt tmp("already_typechecked");
+      exprt tmp(ID_already_typechecked);
       tmp.move_to_operands(function_call);
       expr.op0().swap(tmp);
       typecheck_expr(expr);
@@ -623,7 +623,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
             exprt member(ID_member);
             member.add(ID_component_cpp_name)=cpp_name;
 
-            exprt tmp("already_typechecked");
+            exprt tmp(ID_already_typechecked);
             tmp.copy_to_operands(expr.op0());
             member.copy_to_operands(tmp);
 
@@ -674,7 +674,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           if(expr.id()==ID_ptrmember)
           {
             add_implicit_dereference(function_call);
-            exprt tmp("already_typechecked");
+            exprt tmp(ID_already_typechecked);
             tmp.move_to_operands(function_call);
             expr.op0()=tmp;
             typecheck_expr(expr);
@@ -821,11 +821,11 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
     expr.type().swap(ptr_type);
   }
 
-  exprt object_expr("new_object", expr.type().subtype());
+  exprt object_expr(ID_new_object, expr.type().subtype());
   object_expr.set(ID_C_lvalue, true);
 
   {
-    exprt tmp("already_typechecked");
+    exprt tmp(ID_already_typechecked);
     tmp.move_to_operands(object_expr);
     object_expr.swap(tmp);
   }
@@ -1108,7 +1108,7 @@ void cpp_typecheckt::typecheck_expr_member(
      to_cpp_name(expr.find(ID_component_cpp_name)).is_destructor() &&
      follow(op0.type()).id()!=ID_struct)
   {
-    exprt tmp("cpp_dummy_destructor");
+    exprt tmp(ID_cpp_dummy_destructor);
     tmp.add_source_location()=expr.source_location();
     expr.swap(tmp);
     return;
@@ -1259,8 +1259,9 @@ void cpp_typecheckt::typecheck_expr_member(
 
     assert(it!=symbol_table.symbols.end());
 
-    if(it->second.value.id()=="cpp_not_typechecked")
-      symbol_table.get_writeable_ref(component_name).value.set("is_used", true);
+    if(it->second.value.id() == ID_cpp_not_typechecked)
+      symbol_table.get_writeable_ref(component_name)
+        .value.set(ID_is_used, true);
   }
 }
 
@@ -1341,8 +1342,7 @@ void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
 
   irept &template_arg=template_arguments.get_sub().front();
 
-  if(template_arg.id()!=ID_type &&
-     template_arg.id()!="ambiguous")
+  if(template_arg.id() != ID_type && template_arg.id() != ID_ambiguous)
   {
     error().source_location=expr.find_source_location();
     error() << id << " expects a type as template argument" << eom;
@@ -1847,7 +1847,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
        id==ID_reinterpret_cast ||
        id==ID_static_cast)
     {
-      expr.id("cast_expression");
+      expr.id(ID_cast_expression);
       return;
     }
   }
@@ -1948,7 +1948,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // now do the function -- this has been postponed
   typecheck_function_expr(expr.function(), cpp_typecheck_fargst(expr));
 
-  if(expr.function().id()=="pod_constructor")
+  if(expr.function().id() == ID_pod_constructor)
   {
     assert(expr.function().type().id()==ID_code);
 
@@ -1985,7 +1985,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
     return;
   }
-  else if(expr.function().id()=="cast_expression")
+  else if(expr.function().id() == ID_cast_expression)
   {
     // These are not really function calls,
     // but usually just type adjustments.
@@ -1993,7 +1993,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     add_implicit_dereference(expr);
     return;
   }
-  else if(expr.function().id()=="cpp_dummy_destructor")
+  else if(expr.function().id() == ID_cpp_dummy_destructor)
   {
     // these don't do anything, e.g., (char*)->~char()
     expr.set(ID_statement, ID_skip);
@@ -2170,7 +2170,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
     exprt member;
 
-    exprt new_object("new_object", tmp_object_expr.type());
+    exprt new_object(ID_new_object, tmp_object_expr.type());
     new_object.set(ID_C_lvalue, true);
 
     assert(follow(tmp_object_expr.type()).id()==ID_struct);
@@ -2303,7 +2303,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
       {
         // create a temporary for the parameter
 
-        exprt arg("already_typechecked");
+        exprt arg(ID_already_typechecked);
         arg.copy_to_operands(*arg_it);
 
         exprt temporary;
@@ -2429,10 +2429,11 @@ void cpp_typecheckt::typecheck_method_application(
     }
   }
 
-  if(symbol.value.id()=="cpp_not_typechecked" &&
-     !symbol.value.get_bool("is_used"))
+  if(
+    symbol.value.id() == ID_cpp_not_typechecked &&
+    !symbol.value.get_bool(ID_is_used))
   {
-    symbol_table.get_writeable_ref(symbol.name).value.set("is_used", true);
+    symbol_table.get_writeable_ref(symbol.name).value.set(ID_is_used, true);
   }
 }
 
@@ -2579,7 +2580,7 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   cpp_name.get_sub().front().set(ID_identifier, str_op);
   cpp_name.get_sub().front().set(ID_C_source_location, expr.source_location());
 
-  exprt already_typechecked("already_typechecked");
+  exprt already_typechecked(ID_already_typechecked);
   already_typechecked.move_to_operands(expr.op0());
 
   exprt member(ID_member);
@@ -2693,8 +2694,8 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
 
     assert(it != symbol_table.symbols.end());
 
-    if(it->second.value.id()=="cpp_not_typechecked")
-      symbol_table.get_writeable_ref(it->first).value.set("is_used", true);
+    if(it->second.value.id() == ID_cpp_not_typechecked)
+      symbol_table.get_writeable_ref(it->first).value.set(ID_is_used, true);
   }
 
   c_typecheck_baset::typecheck_expr_function_identifier(expr);

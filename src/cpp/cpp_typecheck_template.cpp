@@ -175,7 +175,7 @@ void cpp_typecheckt::typecheck_class_template(
   symbol.module=module;
   symbol.type.swap(declaration);
   symbol.is_macro=false;
-  symbol.value=exprt("template_decls");
+  symbol.value = exprt(ID_template_decls);
 
   symbol.pretty_name=
     cpp_scopes.current_scope().prefix+id2string(symbol.base_name);
@@ -384,8 +384,8 @@ void cpp_typecheckt::typecheck_class_template_member(
   symbolt &template_symbol=
     *symbol_table.get_writeable(cpp_id.identifier);
 
-  exprt &template_methods=static_cast<exprt &>(
-    template_symbol.value.add("template_methods"));
+  exprt &template_methods =
+    static_cast<exprt &>(template_symbol.value.add(ID_template_methods));
 
   template_methods.copy_to_operands(declaration);
 
@@ -393,7 +393,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   cpp_save_scopet cpp_saved_scope(cpp_scopes);
 
   const irept &instantiated_with =
-    template_symbol.value.add("instantiated_with");
+    template_symbol.value.add(ID_instantiated_with);
 
   for(std::size_t i=0; i<instantiated_with.get_sub().size(); i++)
   {
@@ -468,7 +468,7 @@ std::string cpp_typecheckt::class_template_identifier(
       // These are not yet typechecked, as they may depend
       // on unassigned template parameters.
 
-      if(it->id()==ID_type || it->id()=="ambiguous")
+      if(it->id() == ID_type || it->id() == ID_ambiguous)
         identifier+=cpp_type2name(it->type());
       else
         identifier+=cpp_expr2name(*it);
@@ -552,8 +552,7 @@ void cpp_typecheckt::convert_class_template_specialization(
     cpp_scopest::id_sett::iterator next=it;
     next++;
 
-    if(lookup((*it)->identifier).type.
-         find("specialization_of").is_not_nil())
+    if(lookup((*it)->identifier).type.find(ID_specialization_of).is_not_nil())
       id_set.erase(it);
 
     it=next;
@@ -918,7 +917,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       {
         typecheck_type(arg.type());
       }
-      else if(arg.id()=="ambiguous")
+      else if(arg.id() == ID_ambiguous)
       {
         typecheck_type(arg.type());
         typet t=arg.type();
@@ -939,7 +938,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         error() << "expected expression, but got type" << eom;
         throw 0;
       }
-      else if(arg.id()=="ambiguous")
+      else if(arg.id() == ID_ambiguous)
       {
         exprt e;
         e.swap(arg.type());

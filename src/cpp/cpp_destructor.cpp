@@ -38,7 +38,7 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
     const exprt &size_expr=
       to_array_type(tmp_type).size();
 
-    if(size_expr.id()=="infinity")
+    if(size_expr.id() == ID_infinity)
       return {}; // don't initialize
 
     exprt tmp_size=size_expr;

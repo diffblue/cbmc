@@ -21,7 +21,7 @@ class cpp_namespace_spect:public exprt
 public:
   cpp_namespace_spect():exprt(ID_cpp_namespace_spec)
   {
-    add("alias").make_nil();
+    alias().make_nil();
   }
 
   typedef std::vector<class cpp_itemt> itemst;
@@ -48,12 +48,12 @@ public:
 
   cpp_namet &alias()
   {
-    return static_cast<cpp_namet &>(add("alias"));
+    return static_cast<cpp_namet &>(add(ID_alias));
   }
 
   const cpp_namet &alias() const
   {
-    return static_cast<const cpp_namet &>(find("alias"));
+    return static_cast<const cpp_namet &>(find(ID_alias));
   }
 
   void output(std::ostream &out) const;

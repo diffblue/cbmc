@@ -158,8 +158,7 @@ void cpp_languaget::show_parse(
     const cpp_linkage_spect &linkage_spec=
       item.get_linkage_spec();
 
-    out << "LINKAGE " << linkage_spec.linkage().get("value")
-        << ":\n";
+    out << "LINKAGE " << linkage_spec.linkage().get(ID_value) << ":\n";
 
     for(cpp_linkage_spect::itemst::const_iterator
         it=linkage_spec.items().begin();

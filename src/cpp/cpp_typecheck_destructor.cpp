@@ -46,8 +46,8 @@ void cpp_typecheckt::default_dtor(
   decl.value().id(ID_code);
   decl.value().add(ID_type).id(ID_code);
   decl.value().set(ID_statement, ID_block);
-  decl.add("cv").make_nil();
-  decl.add("throw_decl").make_nil();
+  decl.add(ID_cv).make_nil();
+  decl.add(ID_throw_decl).make_nil();
 
   dtor.add(ID_type).id(ID_destructor);
   dtor.add(ID_storage_spec).id(ID_cpp_storage_spec);
@@ -76,7 +76,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
   // take care of virtual methods
   for(const auto &c : components)
   {
-    if(c.get_bool("is_vtptr"))
+    if(c.get_bool(ID_is_vtptr))
     {
       exprt name(ID_name);
       name.set(ID_identifier, c.get(ID_base_name));
