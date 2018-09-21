@@ -117,13 +117,7 @@ constant_exprt from_integer(
   }
   else if(type_id==ID_natural)
   {
-    if(int_value<0)
-    {
-      constant_exprt r;
-      r.make_nil();
-      return r;
-    }
-
+    PRECONDITION(int_value >= 0);
     return constant_exprt(integer2string(int_value), type);
   }
   else if(type_id==ID_unsignedbv)
@@ -154,15 +148,16 @@ constant_exprt from_integer(
   }
   else if(type_id==ID_bool)
   {
-    if(int_value==0)
+    PRECONDITION(int_value == 0 || int_value == 1);
+    if(int_value == 0)
       return false_exprt();
-    else if(int_value==1)
+    else
       return true_exprt();
   }
   else if(type_id==ID_pointer)
   {
-    if(int_value==0)
-      return null_pointer_exprt(to_pointer_type(type));
+    PRECONDITION(int_value == 0);
+    return null_pointer_exprt(to_pointer_type(type));
   }
   else if(type_id==ID_c_bit_field)
   {
@@ -182,13 +177,8 @@ constant_exprt from_integer(
     ieee_float.from_integer(int_value);
     return ieee_float.to_expr();
   }
-
-  {
+  else
     PRECONDITION(false);
-    constant_exprt r;
-    r.make_nil();
-    return r;
-  }
 }
 
 /// ceil(log2(size))
