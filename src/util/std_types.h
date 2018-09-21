@@ -189,6 +189,16 @@ public:
     {
       return set(ID_C_is_padding, is_padding);
     }
+
+    bool get_is_final() const
+    {
+      return get_bool(ID_final);
+    }
+
+    void set_is_final(const bool is_final)
+    {
+      set(ID_final, is_final);
+    }
   };
 
   typedef std::vector<componentt> componentst;

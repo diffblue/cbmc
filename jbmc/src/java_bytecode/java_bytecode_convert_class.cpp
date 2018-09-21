@@ -753,6 +753,8 @@ void java_bytecode_convert_classt::convert(
     else
       component.set_access(ID_default);
 
+    component.set_is_final(f.is_final);
+
     // Load annotations
     if(!f.annotations.empty())
     {
