@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/exception_utils.h>
 #include <util/pointer_predicates.h>
 #include <util/type_eq.h>
 
@@ -379,7 +380,9 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
       ++it2;
     }
 
-    assert(components.size()==seen);
+    INVARIANT(
+      components.size() == seen,
+      "some of the symbol's component names were not found in the source");
   }
 
   return nil_exprt();
@@ -549,8 +552,8 @@ void string_abstractiont::abstract_function_call(
 
     if(it1==arguments.end())
     {
-      error() << "function call: not enough arguments" << eom;
-      throw 0;
+      throw incorrect_goto_program_exceptiont(
+        "function call: not enough arguments", target->source_location);
     }
 
     str_args.push_back(exprt());
@@ -562,8 +565,9 @@ void string_abstractiont::abstract_function_call(
     if(str_args.back().type().id()==ID_array &&
         abstract_type.id()==ID_pointer)
     {
-      assert(type_eq(str_args.back().type().subtype(),
-          abstract_type.subtype(), ns));
+      INVARIANT(
+        type_eq(str_args.back().type().subtype(), abstract_type.subtype(), ns),
+        "argument array type differs from formal parameter pointer type");
 
       index_exprt idx(str_args.back(), from_integer(0, index_type()));
       // disable bounds check on that one
@@ -600,19 +604,19 @@ void string_abstractiont::replace_string_macros(
 {
   if(expr.id()=="is_zero_string")
   {
-    assert(expr.operands().size()==1);
+    PRECONDITION(expr.operands().size() == 1);
     exprt tmp=build(expr.op0(), whatt::IS_ZERO, lhs, source_location);
     expr.swap(tmp);
   }
   else if(expr.id()=="zero_string_length")
   {
-    assert(expr.operands().size()==1);
+    PRECONDITION(expr.operands().size() == 1);
     exprt tmp=build(expr.op0(), whatt::LENGTH, lhs, source_location);
     expr.swap(tmp);
   }
   else if(expr.id()=="buffer_size")
   {
-    assert(expr.operands().size()==1);
+    PRECONDITION(expr.operands().size() == 1);
     exprt tmp=build(expr.op0(), whatt::SIZE, false, source_location);
     expr.swap(tmp);
   }
@@ -631,8 +635,10 @@ exprt string_abstractiont::build(
   if(pointer.id()==ID_typecast)
   {
     // cast from another pointer type?
-    assert(pointer.operands().size()==1);
-    if(pointer.op0().type().id()!=ID_pointer)
+    INVARIANT(
+      pointer.operands().size() == 1,
+      "pointer typecast takes exactly 1 argument");
+    if(pointer.op0().type().id() != ID_pointer)
       return build_unknown(what, write);
 
     // recursive call
@@ -669,7 +675,7 @@ const typet &string_abstractiont::build_abstraction_type(const typet &type)
 
   abstraction_types_map.swap(tmp);
   map_entry=tmp.find(eff_type);
-  assert(map_entry!=tmp.end());
+  CHECK_RETURN(map_entry != tmp.end());
   return abstraction_types_map.insert(
       std::make_pair(eff_type, map_entry->second)).first->second;
 }
@@ -836,7 +842,7 @@ bool string_abstractiont::build_if(const if_exprt &o_if,
 bool string_abstractiont::build_array(const array_exprt &object,
     exprt &dest, bool write)
 {
-  assert(is_char_type(object.type().subtype()));
+  PRECONDITION(is_char_type(object.type().subtype()));
 
   // writing is invalid
   if(write)
@@ -847,7 +853,8 @@ bool string_abstractiont::build_array(const array_exprt &object,
   // don't do anything, if we cannot determine the size
   if(to_integer(a_size, size))
     return true;
-  assert(size==object.operands().size());
+  INVARIANT(
+    size == object.operands().size(), "wrong number of array object arguments");
 
   exprt::operandst::const_iterator it=object.operands().begin();
   for(mp_integer i=0; i<size; ++i, ++it)
@@ -860,7 +867,7 @@ bool string_abstractiont::build_array(const array_exprt &object,
 bool string_abstractiont::build_pointer(const exprt &object,
     exprt &dest, bool write)
 {
-  assert(object.type().id()==ID_pointer);
+  PRECONDITION(object.type().id() == ID_pointer);
 
   pointer_arithmetict ptr(object);
   if(ptr.pointer.id()==ID_address_of)
@@ -945,7 +952,7 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
   const symbolt &symbol=ns.lookup(sym.get_identifier());
 
   const typet &abstract_type=build_abstraction_type(symbol.type);
-  assert(!abstract_type.is_nil());
+  CHECK_RETURN(!abstract_type.is_nil());
 
   irep_idt identifier="";
 
@@ -1125,7 +1132,9 @@ goto_programt::targett string_abstractiont::abstract_char_assign(
     if(!build_wrap(i_lhs.array(), new_lhs, true))
     {
       exprt i2=member(new_lhs, whatt::LENGTH);
-      assert(i2.is_not_nil());
+      INVARIANT(
+        i2.is_not_nil(),
+        "failed to create length-component for the left-hand-side");
 
       exprt new_length=i_lhs.index();
       make_type(new_length, i2.type());
@@ -1143,7 +1152,9 @@ goto_programt::targett string_abstractiont::abstract_char_assign(
     if(!build_wrap(ptr.pointer, new_lhs, true))
     {
       const exprt i2=member(new_lhs, whatt::LENGTH);
-      assert(i2.is_not_nil());
+      INVARIANT(
+        i2.is_not_nil(),
+        "failed to create length-component for the left-hand-side");
 
       make_type(ptr.offset, build_type(whatt::LENGTH));
       return
@@ -1171,7 +1182,9 @@ goto_programt::targett string_abstractiont::char_assign(
   goto_programt tmp;
 
   const exprt i1=member(new_lhs, whatt::IS_ZERO);
-  assert(i1.is_not_nil());
+  INVARIANT(
+    i1.is_not_nil(),
+    "failed to create is_zero-component for the left-hand-side");
 
   goto_programt::targett assignment1=tmp.add_instruction();
   assignment1->make_assignment();
@@ -1207,7 +1220,7 @@ goto_programt::targett string_abstractiont::value_assignments(
   if(rhs.id()==ID_if)
     return value_assignments_if(dest, target, lhs, to_if_expr(rhs));
 
-  assert(type_eq(lhs.type(), rhs.type(), ns));
+  PRECONDITION(type_eq(lhs.type(), rhs.type(), ns));
 
   if(lhs.type().id()==ID_array)
   {
@@ -1234,7 +1247,8 @@ goto_programt::targett string_abstractiont::value_assignments(
 
     for(const auto &comp : struct_union_type.components())
     {
-      assert(!comp.get_name().empty());
+      INVARIANT(
+        !comp.get_name().empty(), "struct/union components must have a name");
 
       target=value_assignments(dest, target,
           member_exprt(lhs, comp.get_name(), comp.type()),
@@ -1334,8 +1348,9 @@ exprt string_abstractiont::member(const exprt &a, whatt what)
   if(a.is_nil())
     return a;
 
-  assert(type_eq(a.type(), string_struct, ns) ||
-      is_ptr_string_struct(a.type()));
+  PRECONDITION_WITH_DIAGNOSTICS(
+    type_eq(a.type(), string_struct, ns) || is_ptr_string_struct(a.type()),
+    "either the expression is not a string or it is not a pointer to one");
 
   exprt struct_op=
     a.type().id()==ID_pointer?
