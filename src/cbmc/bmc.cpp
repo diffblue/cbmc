@@ -153,7 +153,7 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
 
 void bmct::report_success()
 {
-  result() << "VERIFICATION SUCCESSFUL" << eom;
+  result() << bold() << "VERIFICATION SUCCESSFUL" << reset() << eom;
 
   switch(ui_message_handler.get_ui())
   {
@@ -180,7 +180,7 @@ void bmct::report_success()
 
 void bmct::report_failure()
 {
-  result() << "VERIFICATION FAILED" << eom;
+  result() << bold() << "VERIFICATION FAILED" << reset() << eom;
 
   switch(ui_message_handler.get_ui())
   {

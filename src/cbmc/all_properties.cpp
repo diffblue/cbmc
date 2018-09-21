@@ -159,10 +159,17 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
       result() << "\n** Results:" << eom;
 
       for(const auto &goal_pair : goal_map)
+      {
         result() << "[" << goal_pair.first << "] "
-                 << goal_pair.second.description << ": "
-                 << goal_pair.second.status_string()
-                 << eom;
+                 << goal_pair.second.description << ": ";
+
+        if(goal_pair.second.status == goalt::statust::SUCCESS)
+          result() << green();
+        else
+          result() << red();
+
+        result() << goal_pair.second.status_string() << reset() << eom;
+      }
 
       if(bmc.options.get_bool_option("trace"))
       {
