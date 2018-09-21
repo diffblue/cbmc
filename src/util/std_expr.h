@@ -310,6 +310,13 @@ public:
   {
     return op0();
   }
+
+  const exprt &op1() const = delete;
+  exprt &op1() = delete;
+  const exprt &op2() const = delete;
+  exprt &op2() = delete;
+  const exprt &op3() const = delete;
+  exprt &op3() = delete;
 };
 
 /// \brief Cast an exprt to a \ref unary_exprt
@@ -666,8 +673,10 @@ public:
     copy_to_operands(_lhs, _rhs);
   }
 
-protected:
-  using exprt::op2; // hide
+  const exprt &op2() const = delete;
+  exprt &op2() = delete;
+  const exprt &op3() const = delete;
+  exprt &op3() = delete;
 };
 
 /// \brief Cast an exprt to a \ref binary_exprt
