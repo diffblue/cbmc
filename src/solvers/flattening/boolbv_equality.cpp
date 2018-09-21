@@ -41,24 +41,24 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
     return record_array_equality(expr);
   }
 
-  const bvt &bv0=convert_bv(expr.lhs());
-  const bvt &bv1=convert_bv(expr.rhs());
+  const bvt &lhs_bv = convert_bv(expr.lhs());
+  const bvt &rhs_bv = convert_bv(expr.rhs());
 
   DATA_INVARIANT(
-    bv0.size() == bv1.size(),
-    std::string("unexpected size mismatch on equality:\n") + "lhs: " +
-      expr.lhs().pretty() + '\n' + "lhs size: " + std::to_string(bv0.size()) +
-      '\n' + "rhs: " + expr.rhs().pretty() + '\n' +
-      "rhs size: " + std::to_string(bv1.size()));
+    lhs_bv.size() == rhs_bv.size(),
+    std::string("unexpected size mismatch on equality:\n") +
+      "lhs: " + expr.lhs().pretty() + '\n' + "lhs size: " +
+      std::to_string(lhs_bv.size()) + '\n' + "rhs: " + expr.rhs().pretty() +
+      '\n' + "rhs size: " + std::to_string(rhs_bv.size()));
 
-  if(bv0.empty())
+  if(lhs_bv.empty())
   {
     // An empty bit-vector comparison. It's not clear
     // what this is meant to say.
     return prop.new_variable();
   }
 
-  return bv_utils.equal(bv0, bv1);
+  return bv_utils.equal(lhs_bv, rhs_bv);
 }
 
 literalt boolbvt::convert_verilog_case_equality(
@@ -75,18 +75,18 @@ literalt boolbvt::convert_verilog_case_equality(
       "######### lhs: " + expr.lhs().pretty() + '\n' +
       "######### rhs: " + expr.rhs().pretty());
 
-  const bvt &bv0=convert_bv(expr.lhs());
-  const bvt &bv1=convert_bv(expr.rhs());
+  const bvt &lhs_bv = convert_bv(expr.lhs());
+  const bvt &rhs_bv = convert_bv(expr.rhs());
 
   DATA_INVARIANT(
-    bv0.size() == bv1.size(),
+    lhs_bv.size() == rhs_bv.size(),
     std::string("unexpected size mismatch on verilog_case_equality:\n") +
       "lhs: " + expr.lhs().pretty() + '\n' + "lhs size: " +
-      std::to_string(bv0.size()) + '\n' + "rhs: " + expr.rhs().pretty() + '\n' +
-      "rhs size: " + std::to_string(bv1.size()));
+      std::to_string(lhs_bv.size()) + '\n' + "rhs: " + expr.rhs().pretty() +
+      '\n' + "rhs size: " + std::to_string(rhs_bv.size()));
 
   if(expr.id()==ID_verilog_case_inequality)
-    return !bv_utils.equal(bv0, bv1);
+    return !bv_utils.equal(lhs_bv, rhs_bv);
   else
-    return bv_utils.equal(bv0, bv1);
+    return bv_utils.equal(lhs_bv, rhs_bv);
 }
