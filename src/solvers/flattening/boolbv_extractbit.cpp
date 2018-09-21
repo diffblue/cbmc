@@ -17,19 +17,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
 {
-  const exprt::operandst &operands=expr.operands();
-
-  if(operands.size()!=2)
-    throw "extractbit takes two operands";
-
-  const bvt &bv0=convert_bv(operands[0]);
+  const bvt &bv0 = convert_bv(expr.src());
 
   // constant?
-  if(operands[1].is_constant())
+  if(expr.index().is_constant())
   {
     mp_integer o;
 
-    if(to_integer(operands[1], o))
+    if(to_integer(expr.index(), o))
       throw "extractbit failed to convert constant index";
 
     if(o<0 || o>=bv0.size())
@@ -38,16 +33,17 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       return bv0[integer2size_t(o)];
   }
 
-  if(operands[0].type().id()==ID_verilog_signedbv ||
-     operands[0].type().id()==ID_verilog_unsignedbv)
+  if(
+    expr.src().type().id() == ID_verilog_signedbv ||
+    expr.src().type().id() == ID_verilog_unsignedbv)
   {
     // TODO
     assert(false);
   }
   else
   {
-    std::size_t width_op0=boolbv_width(operands[0].type());
-    std::size_t width_op1=boolbv_width(operands[1].type());
+    std::size_t width_op0 = boolbv_width(expr.src().type());
+    std::size_t width_op1 = boolbv_width(expr.index().type());
 
     if(width_op0==0 || width_op1==0)
       return SUB::convert_rest(expr);
@@ -56,7 +52,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     unsignedbv_typet index_type(index_width);
 
     equal_exprt equality;
-    equality.lhs()=operands[1]; // index operand
+    equality.lhs() = expr.index();
 
     if(index_type!=equality.lhs().type())
       equality.lhs().make_typecast(index_type);
