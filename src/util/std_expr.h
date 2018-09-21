@@ -75,11 +75,13 @@ inline void validate_expr(const transt &value)
 class symbol_exprt:public exprt
 {
 public:
+  DEPRECATED("use symbol_exprt(identifier, type) instead")
   symbol_exprt():exprt(ID_symbol)
   {
   }
 
   /// \param identifier: Name of symbol
+  DEPRECATED("use symbol_exprt(identifier, type) instead")
   explicit symbol_exprt(const irep_idt &identifier):exprt(ID_symbol)
   {
     set_identifier(identifier);
@@ -115,17 +117,20 @@ public:
 class decorated_symbol_exprt:public symbol_exprt
 {
 public:
+  DEPRECATED("use decorated_symbol_exprt(identifier, type) instead")
   decorated_symbol_exprt()
   {
   }
 
   /// \param identifier: Name of symbol
+  DEPRECATED("use decorated_symbol_exprt(identifier, type) instead")
   explicit decorated_symbol_exprt(const irep_idt &identifier):
     symbol_exprt(identifier)
   {
   }
 
   /// \param type: Type of symbol
+  DEPRECATED("use decorated_symbol_exprt(identifier, type) instead")
   explicit decorated_symbol_exprt(const typet &type):
     symbol_exprt(type)
   {
@@ -260,11 +265,13 @@ inline void validate_expr(const nondet_symbol_exprt &value)
 class unary_exprt:public exprt
 {
 public:
+  DEPRECATED("use unary_exprt(id, op) instead")
   unary_exprt()
   {
     operands().resize(1);
   }
 
+  DEPRECATED("use unary_exprt(id, op) instead")
   explicit unary_exprt(const irep_idt &_id):exprt(_id)
   {
     operands().resize(1);
@@ -338,6 +345,7 @@ template<> inline bool can_cast_expr<unary_exprt>(const exprt &base)
 class abs_exprt:public unary_exprt
 {
 public:
+  DEPRECATED("use abs_exprt(op) instead")
   abs_exprt()
   {
   }
@@ -387,6 +395,7 @@ inline void validate_expr(const abs_exprt &value)
 class unary_minus_exprt:public unary_exprt
 {
 public:
+  DEPRECATED("use unary_minus_exprt(op) instead")
   unary_minus_exprt():unary_exprt(ID_unary_minus)
   {
   }
@@ -619,11 +628,13 @@ public:
 class binary_exprt:public exprt
 {
 public:
+  DEPRECATED("use binary_exprt(lhs, id, rhs) instead")
   binary_exprt()
   {
     operands().resize(2);
   }
 
+  DEPRECATED("use binary_exprt(lhs, id, rhs) instead")
   explicit binary_exprt(const irep_idt &_id):exprt(_id)
   {
     operands().resize(2);
@@ -786,10 +797,12 @@ template<> inline bool can_cast_expr<binary_relation_exprt>(const exprt &base)
 class multi_ary_exprt:public exprt
 {
 public:
+  DEPRECATED("use multi_ary_exprt(id, type) instead")
   multi_ary_exprt()
   {
   }
 
+  DEPRECATED("use multi_ary_exprt(id, type) instead")
   explicit multi_ary_exprt(const irep_idt &_id):exprt(_id)
   {
   }
@@ -843,6 +856,7 @@ inline multi_ary_exprt &to_multi_ary_expr(exprt &expr)
 class plus_exprt:public multi_ary_exprt
 {
 public:
+  DEPRECATED("use plus_exprt(lhs, rhs) instead")
   plus_exprt():multi_ary_exprt(ID_plus)
   {
   }
@@ -902,6 +916,7 @@ inline void validate_expr(const plus_exprt &value)
 class minus_exprt:public binary_exprt
 {
 public:
+  DEPRECATED("use minus_exprt(lhs, rhs) instead")
   minus_exprt():binary_exprt(ID_minus)
   {
   }
@@ -954,6 +969,7 @@ inline void validate_expr(const minus_exprt &value)
 class mult_exprt:public multi_ary_exprt
 {
 public:
+  DEPRECATED("use mult_exprt(lhs, rhs) instead")
   mult_exprt():multi_ary_exprt(ID_mult)
   {
   }
@@ -1005,6 +1021,7 @@ inline void validate_expr(const mult_exprt &value)
 class div_exprt:public binary_exprt
 {
 public:
+  DEPRECATED("use div_exprt(lhs, rhs) instead")
   div_exprt():binary_exprt(ID_div)
   {
   }
@@ -1056,6 +1073,7 @@ inline void validate_expr(const div_exprt &value)
 class mod_exprt:public binary_exprt
 {
 public:
+  DEPRECATED("use mod_exprt(lhs, rhs) instead")
   mod_exprt():binary_exprt(ID_mod)
   {
   }
@@ -1103,6 +1121,7 @@ inline void validate_expr(const mod_exprt &value)
 class rem_exprt:public binary_exprt
 {
 public:
+  DEPRECATED("use rem_exprt(lhs, rhs) instead")
   rem_exprt():binary_exprt(ID_rem)
   {
   }
@@ -1149,7 +1168,8 @@ inline void validate_expr(const rem_exprt &value)
 /// \brief Exponentiation
 class power_exprt:public binary_exprt
 {
- public:
+public:
+  DEPRECATED("use power_exprt(lhs, rhs) instead")
   power_exprt():binary_exprt(ID_power)
   {
   }
@@ -1196,7 +1216,8 @@ inline void validate_expr(const power_exprt &value)
 /// \brief Falling factorial power
 class factorial_power_exprt:public binary_exprt
 {
- public:
+public:
+  DEPRECATED("use factorial_power_exprt(lhs, rhs) instead")
   factorial_power_exprt():binary_exprt(ID_factorial_power)
   {
   }
@@ -1249,6 +1270,7 @@ inline void validate_expr(const factorial_power_exprt &value)
 class equal_exprt:public binary_relation_exprt
 {
 public:
+  DEPRECATED("use equal_exprt(lhs, rhs) instead")
   equal_exprt():binary_relation_exprt(ID_equal)
   {
   }
@@ -1294,6 +1316,7 @@ inline void validate_expr(const equal_exprt &value)
 class notequal_exprt:public binary_relation_exprt
 {
 public:
+  DEPRECATED("use notequal_exprt(lhs, rhs) instead")
   notequal_exprt():binary_relation_exprt(ID_notequal)
   {
   }
@@ -1343,10 +1366,12 @@ inline void validate_expr(const notequal_exprt &value)
 class index_exprt:public binary_exprt
 {
 public:
+  DEPRECATED("use index_exprt(array, index) instead")
   index_exprt():binary_exprt(ID_index)
   {
   }
 
+  DEPRECATED("use index_exprt(array, index) instead")
   explicit index_exprt(const typet &_type):binary_exprt(ID_index, _type)
   {
   }
@@ -1424,6 +1449,7 @@ inline void validate_expr(const index_exprt &value)
 class array_of_exprt:public unary_exprt
 {
 public:
+  DEPRECATED("use array_of_exprt(what, type) instead")
   array_of_exprt():unary_exprt(ID_array_of)
   {
   }
@@ -1484,6 +1510,7 @@ inline void validate_expr(const array_of_exprt &value)
 class array_exprt:public exprt
 {
 public:
+  DEPRECATED("use array_exprt(type) instead")
   array_exprt():exprt(ID_array)
   {
   }
@@ -1544,6 +1571,7 @@ inline void validate_expr(const array_list_exprt &value)
 class vector_exprt:public exprt
 {
 public:
+  DEPRECATED("use vector_exprt(type) instead")
   vector_exprt():exprt(ID_vector)
   {
   }
@@ -1583,10 +1611,12 @@ template<> inline bool can_cast_expr<vector_exprt>(const exprt &base)
 class union_exprt:public unary_exprt
 {
 public:
+  DEPRECATED("use union_exprt(component_name, value, type) instead")
   union_exprt():unary_exprt(ID_union)
   {
   }
 
+  DEPRECATED("use union_exprt(component_name, value, type) instead")
   explicit union_exprt(const typet &_type):
     unary_exprt(ID_union, _type)
   {
@@ -1661,6 +1691,7 @@ inline void validate_expr(const union_exprt &value)
 class struct_exprt:public exprt
 {
 public:
+  DEPRECATED("use struct_exprt(component_name, value, type) instead")
   struct_exprt():exprt(ID_struct)
   {
   }
@@ -1703,10 +1734,12 @@ template<> inline bool can_cast_expr<struct_exprt>(const exprt &base)
 class complex_exprt:public binary_exprt
 {
 public:
+  DEPRECATED("use complex_exprt(r, i, type) instead")
   complex_exprt():binary_exprt(ID_complex)
   {
   }
 
+  DEPRECATED("use complex_exprt(r, i, type) instead")
   explicit complex_exprt(const complex_typet &_type):
     binary_exprt(ID_complex, _type)
   {
@@ -2014,6 +2047,7 @@ inline void validate_expr(const dynamic_object_exprt &value)
 class typecast_exprt:public unary_exprt
 {
 public:
+  DEPRECATED("use typecast_exprt(op, type) instead")
   explicit typecast_exprt(const typet &_type):unary_exprt(ID_typecast, _type)
   {
   }
@@ -2072,6 +2106,7 @@ inline void validate_expr(const typecast_exprt &value)
 class floatbv_typecast_exprt:public binary_exprt
 {
 public:
+  DEPRECATED("use floatbv_typecast_exprt(op, r, type) instead")
   floatbv_typecast_exprt():binary_exprt(ID_floatbv_typecast)
   {
   }
@@ -2220,6 +2255,7 @@ template<> inline bool can_cast_expr<and_exprt>(const exprt &base)
 class implies_exprt:public binary_exprt
 {
 public:
+  DEPRECATED("use implies_exprt(a, b) instead")
   implies_exprt():binary_exprt(ID_implies, bool_typet())
   {
   }
@@ -2388,6 +2424,7 @@ template<> inline bool can_cast_expr<xor_exprt>(const exprt &base)
 class bitnot_exprt:public unary_exprt
 {
 public:
+  DEPRECATED("use bitnot_exprt(op) instead")
   bitnot_exprt():unary_exprt(ID_bitnot)
   {
   }
@@ -2435,6 +2472,7 @@ template<> inline bool can_cast_expr<bitnot_exprt>(const exprt &base)
 class bitor_exprt:public multi_ary_exprt
 {
 public:
+  DEPRECATED("use bitor_exprt(op0, op1) instead")
   bitor_exprt():multi_ary_exprt(ID_bitor)
   {
   }
@@ -2489,6 +2527,7 @@ template<> inline bool can_cast_expr<bitor_exprt>(const exprt &base)
 class bitxor_exprt:public multi_ary_exprt
 {
 public:
+  DEPRECATED("use bitxor_exprt(op0, op1) instead")
   bitxor_exprt():multi_ary_exprt(ID_bitxor)
   {
   }
@@ -2542,6 +2581,7 @@ template<> inline bool can_cast_expr<bitxor_exprt>(const exprt &base)
 class bitand_exprt:public multi_ary_exprt
 {
 public:
+  DEPRECATED("use bitand_exprt(op0, op1) instead")
   bitand_exprt():multi_ary_exprt(ID_bitand)
   {
   }
@@ -2596,10 +2636,12 @@ template<> inline bool can_cast_expr<bitand_exprt>(const exprt &base)
 class shift_exprt:public binary_exprt
 {
 public:
+  DEPRECATED("use shift_exprt(value, id, distance) instead")
   explicit shift_exprt(const irep_idt &_id):binary_exprt(_id)
   {
   }
 
+  DEPRECATED("use shift_exprt(value, id, distance) instead")
   shift_exprt(const irep_idt &_id, const typet &_type):
     binary_exprt(_id, _type)
   {
@@ -2672,6 +2714,7 @@ inline shift_exprt &to_shift_expr(exprt &expr)
 class shl_exprt:public shift_exprt
 {
 public:
+  DEPRECATED("use shl_exprt(value, distance) instead")
   shl_exprt():shift_exprt(ID_shl)
   {
   }
@@ -2691,6 +2734,7 @@ public:
 class ashr_exprt:public shift_exprt
 {
 public:
+  DEPRECATED("use ashl_exprt(value, distance) instead")
   ashr_exprt():shift_exprt(ID_ashr)
   {
   }
@@ -2710,6 +2754,7 @@ public:
 class lshr_exprt:public shift_exprt
 {
 public:
+  DEPRECATED("use lshl_exprt(value, distance) instead")
   lshr_exprt():shift_exprt(ID_lshr)
   {
   }
@@ -2729,10 +2774,12 @@ public:
 class replication_exprt:public binary_exprt
 {
 public:
+  DEPRECATED("use replication_exprt(times, value) instead")
   replication_exprt():binary_exprt(ID_replication)
   {
   }
 
+  DEPRECATED("use replication_exprt(times, value) instead")
   explicit replication_exprt(const typet &_type):
     binary_exprt(ID_replication, _type)
   {
@@ -2803,6 +2850,7 @@ inline void validate_expr(const replication_exprt &value)
 class extractbit_exprt:public binary_predicate_exprt
 {
 public:
+  DEPRECATED("use extractbit_exprt(value, index) instead")
   extractbit_exprt():binary_predicate_exprt(ID_extractbit)
   {
   }
@@ -2877,6 +2925,7 @@ inline void validate_expr(const extractbit_exprt &value)
 class extractbits_exprt:public exprt
 {
 public:
+  DEPRECATED("use extractbits_exprt(value, upper, lower) instead")
   extractbits_exprt():exprt(ID_extractbits)
   {
     operands().resize(3);
@@ -3068,10 +3117,12 @@ inline void validate_expr(const not_exprt &value)
 class dereference_exprt:public unary_exprt
 {
 public:
+  DEPRECATED("use dereference_exprt(pointer) instead")
   dereference_exprt():unary_exprt(ID_dereference)
   {
   }
 
+  DEPRECATED("use dereference_exprt(pointer) instead")
   explicit dereference_exprt(const typet &type):
     unary_exprt(ID_dereference, type)
   {
@@ -3154,6 +3205,7 @@ public:
     copy_to_operands(cond, t, f);
   }
 
+  DEPRECATED("use if_exprt(cond, t, f) instead")
   if_exprt():exprt(ID_if)
   {
     operands().resize(3);
@@ -3240,6 +3292,7 @@ public:
     copy_to_operands(_old, _where, _new_value);
   }
 
+  DEPRECATED("use with_exprt(old, where, new_value) instead")
   with_exprt():exprt(ID_with)
   {
     operands().resize(3);
@@ -3432,12 +3485,14 @@ public:
     copy_to_operands(_old, _designator, _new_value);
   }
 
+  DEPRECATED("use update_exprt(old, where, new_value) instead")
   explicit update_exprt(const typet &_type):
     exprt(ID_update, _type)
   {
     operands().resize(3);
   }
 
+  DEPRECATED("use update_exprt(old, where, new_value) instead")
   update_exprt():exprt(ID_update)
   {
     operands().resize(3);
@@ -3625,6 +3680,7 @@ public:
     set_component_name(c.get_name());
   }
 
+  DEPRECATED("use member_exprt(op, c) instead")
   member_exprt():unary_exprt(ID_member)
   {
   }
@@ -4079,6 +4135,7 @@ inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
 class type_exprt:public exprt
 {
 public:
+  DEPRECATED("use type_exprt(type) instead")
   type_exprt():exprt(ID_type)
   {
   }
@@ -4275,10 +4332,12 @@ inline void validate_expr(const function_application_exprt &value)
 class concatenation_exprt:public exprt
 {
 public:
+  DEPRECATED("use concatenation_exprt(op0, op1, type) instead")
   concatenation_exprt():exprt(ID_concatenation)
   {
   }
 
+  DEPRECATED("use concatenation_exprt(op0, op1, type) instead")
   explicit concatenation_exprt(const typet &_type):
     exprt(ID_concatenation, _type)
   {
@@ -4516,6 +4575,7 @@ public:
 class popcount_exprt: public unary_exprt
 {
 public:
+  DEPRECATED("use popcount_exprt(op, type) instead")
   popcount_exprt(): unary_exprt(ID_popcount)
   {
   }
