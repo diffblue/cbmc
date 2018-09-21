@@ -54,15 +54,46 @@ public:
   void copy_to_operands(const exprt &, const exprt &, const exprt &) = delete;
 };
 
-/// Transition system, consisting of state invariant, initial state predicate,
-/// and transition predicate.
-class transt:public exprt
+/// An expression with three operands
+class ternary_exprt : public exprt
 {
 public:
-  transt()
+  // constructors
+  DEPRECATED("use ternary_exprt(id, op0, op1, op2, type) instead")
+  explicit ternary_exprt(const irep_idt &_id) : exprt(_id)
   {
-    id(ID_trans);
     operands().resize(3);
+  }
+
+  DEPRECATED("use ternary_exprt(id, op0, op1, op2, type) instead")
+  explicit ternary_exprt(const irep_idt &_id, const typet &_type)
+    : exprt(_id, _type)
+  {
+    operands().resize(3);
+  }
+
+  ternary_exprt(
+    const irep_idt &_id,
+    const exprt &_op0,
+    const exprt &_op1,
+    const exprt &_op2,
+    const typet &_type)
+    : exprt(_id, _type)
+  {
+    copy_to_operands(_op0, _op1, _op2);
+  }
+
+  const exprt &op3() const = delete;
+  exprt &op3() = delete;
+};
+
+/// Transition system, consisting of state invariant, initial state predicate,
+/// and transition predicate.
+class transt : public ternary_exprt
+{
+public:
+  transt() : ternary_exprt(ID_trans)
+  {
   }
 
   exprt &invar() { return op0(); }
@@ -3229,29 +3260,22 @@ inline void validate_expr(const dereference_exprt &value)
 
 
 /// \brief The trinary if-then-else operator
-class if_exprt:public exprt
+class if_exprt : public ternary_exprt
 {
 public:
-  if_exprt(const exprt &cond, const exprt &t, const exprt &f):
-    exprt(ID_if, t.type())
+  if_exprt(const exprt &cond, const exprt &t, const exprt &f)
+    : ternary_exprt(ID_if, cond, t, f, t.type())
   {
-    copy_to_operands(cond, t, f);
   }
 
-  if_exprt(
-    const exprt &cond,
-    const exprt &t,
-    const exprt &f,
-    const typet &type):
-    exprt(ID_if, type)
+  if_exprt(const exprt &cond, const exprt &t, const exprt &f, const typet &type)
+    : ternary_exprt(ID_if, cond, t, f, type)
   {
-    copy_to_operands(cond, t, f);
   }
 
   DEPRECATED("use if_exprt(cond, t, f) instead")
-  if_exprt():exprt(ID_if)
+  if_exprt() : ternary_exprt(ID_if)
   {
-    operands().resize(3);
   }
 
   exprt &cond()
@@ -3516,29 +3540,25 @@ inline void validate_expr(const member_designatort &value)
 
 
 /// \brief Operator to update elements in structs and arrays
-class update_exprt:public exprt
+class update_exprt : public ternary_exprt
 {
 public:
   update_exprt(
     const exprt &_old,
     const exprt &_designator,
-    const exprt &_new_value):
-    exprt(ID_update, _old.type())
+    const exprt &_new_value)
+    : ternary_exprt(ID_update, _old, _designator, _new_value, _old.type())
   {
-    copy_to_operands(_old, _designator, _new_value);
   }
 
   DEPRECATED("use update_exprt(old, where, new_value) instead")
-  explicit update_exprt(const typet &_type):
-    exprt(ID_update, _type)
+  explicit update_exprt(const typet &_type) : ternary_exprt(ID_update, _type)
   {
-    operands().resize(3);
   }
 
   DEPRECATED("use update_exprt(old, where, new_value) instead")
-  update_exprt():exprt(ID_update)
+  update_exprt() : ternary_exprt(ID_update)
   {
-    operands().resize(3);
     op1().id(ID_designator);
   }
 

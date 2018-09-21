@@ -122,26 +122,25 @@ inline byte_extract_big_endian_exprt
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class byte_update_exprt:public exprt
+class byte_update_exprt : public ternary_exprt
 {
 public:
-  explicit byte_update_exprt(irep_idt _id):exprt(_id)
+  explicit byte_update_exprt(irep_idt _id) : ternary_exprt(_id)
   {
-    operands().resize(3);
   }
 
-  byte_update_exprt(irep_idt _id, const typet &_type):
-    exprt(_id, _type)
+  byte_update_exprt(irep_idt _id, const typet &_type)
+    : ternary_exprt(_id, _type)
   {
-    operands().resize(3);
   }
 
   byte_update_exprt(
     irep_idt _id,
-    const exprt &_op, const exprt &_offset, const exprt &_value):
-    exprt(_id, _op.type())
+    const exprt &_op,
+    const exprt &_offset,
+    const exprt &_value)
+    : ternary_exprt(_id, _op, _offset, _value, _op.type())
   {
-    copy_to_operands(_op, _offset, _value);
   }
 
   exprt &op() { return op0(); }
