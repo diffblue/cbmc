@@ -20,18 +20,20 @@ Author: Peter Schrammel
 /// Output diff result
 void goto_difft::output_functions() const
 {
-  switch(ui)
+  messaget msg(message_handler);
+
+  switch(message_handler.get_ui())
   {
     case ui_message_handlert::uit::PLAIN:
     {
-      result() << "total number of functions: " << total_functions_count
-               << '\n';
+      msg.result() << "total number of functions: " << total_functions_count
+                   << '\n' << messaget::eom;
       output_function_group("new functions", new_functions, goto_model2);
       output_function_group(
         "modified functions", modified_functions, goto_model2);
       output_function_group(
         "deleted functions", deleted_functions, goto_model1);
-      result() << eom;
+      msg.result() << messaget::eom;
       break;
     }
     case ui_message_handlert::uit::JSON_UI:
@@ -49,12 +51,12 @@ void goto_difft::output_functions() const
         json_result["deletedFunctions"].make_array(),
         deleted_functions,
         goto_model1);
-      result() << json_result;
+      msg.result() << json_result << messaget::eom;
       break;
     }
     case ui_message_handlert::uit::XML_UI:
     {
-      error() << "XML output not supported yet" << eom;
+      msg.error() << "XML output not supported yet" << messaget::eom;
     }
   }
 }
@@ -68,7 +70,7 @@ void goto_difft::output_function_group(
   const std::set<irep_idt> &function_group,
   const goto_modelt &goto_model) const
 {
-  result() << group_name << ":\n";
+  messaget(message_handler).result() << group_name << ':' << messaget::eom;
   for(const auto &function_name : function_group)
   {
     output_function(function_name, goto_model);
@@ -82,11 +84,12 @@ void goto_difft::output_function(
   const irep_idt &function_name,
   const goto_modelt &goto_model) const
 {
+  messaget msg(message_handler);
+
   namespacet ns(goto_model.symbol_table);
   const symbolt &symbol = ns.lookup(function_name);
 
-  result() << "  " << symbol.location.get_file() << ": " << function_name
-           << '\n';
+  msg.result() << "  " << symbol.location.get_file() << ": " << function_name;
 
   if(options.get_bool_option("show-properties"))
   {
@@ -103,9 +106,11 @@ void goto_difft::output_function(
 
       const source_locationt &source_location = ins.source_location;
       irep_idt property_id = source_location.get_property_id();
-      result() << "    " << property_id << '\n';
+      msg.result() << "\n    " << property_id;
     }
   }
+
+  msg.result() << messaget::eom;
 }
 
 /// Convert a function group to JSON

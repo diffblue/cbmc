@@ -152,7 +152,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
 void bmc_all_propertiest::report(const cover_goalst &cover_goals)
 {
-  switch(bmc.ui)
+  switch(bmc.ui_message_handler.get_ui())
   {
   case ui_message_handlert::uit::PLAIN:
     {
@@ -202,8 +202,10 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
 
     case ui_message_handlert::uit::JSON_UI:
     {
+      if(result().tellp() > 0)
+        result() << eom; // force end of previous message
       json_stream_objectt &json_result =
-        result().json_stream().push_back_stream_object();
+        bmc.ui_message_handler.get_json_stream().push_back_stream_object();
       json_stream_arrayt &result_array =
         json_result.push_back_stream_array("result");
 

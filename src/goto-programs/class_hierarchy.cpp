@@ -262,19 +262,20 @@ void class_hierarchyt::output(
 
 void show_class_hierarchy(
   const class_hierarchyt &hierarchy,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui,
+  ui_message_handlert &message_handler,
   bool children_only)
 {
   messaget msg(message_handler);
-  switch(ui)
+  switch(message_handler.get_ui())
   {
   case ui_message_handlert::uit::PLAIN:
     hierarchy.output(msg.result(), children_only);
     msg.result() << messaget::eom;
     break;
   case ui_message_handlert::uit::JSON_UI:
-    hierarchy.output(msg.result().json_stream(), children_only);
+    if(msg.result().tellp() > 0)
+      msg.result() << messaget::eom; // force end of previous message
+    hierarchy.output(message_handler.get_json_stream(), children_only);
     break;
   case ui_message_handlert::uit::XML_UI:
     UNIMPLEMENTED;

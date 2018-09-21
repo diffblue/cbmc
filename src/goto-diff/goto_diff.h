@@ -22,34 +22,31 @@ class json_arrayt;
 class json_objectt;
 class optionst;
 
-class goto_difft:public messaget
+class goto_difft
 {
 public:
   goto_difft(
     const goto_modelt &_goto_model1,
     const goto_modelt &_goto_model2,
     const optionst &_options,
-    message_handlert &_message_handler)
-    : messaget(_message_handler),
+    ui_message_handlert &_message_handler)
+    : message_handler(_message_handler),
       goto_model1(_goto_model1),
       goto_model2(_goto_model2),
       options(_options),
-      ui(ui_message_handlert::uit::PLAIN),
       total_functions_count(0)
   {
   }
 
   virtual bool operator()()=0;
 
-  void set_ui(ui_message_handlert::uit _ui) { ui=_ui; }
-
   virtual void output_functions() const;
 
 protected:
+  ui_message_handlert &message_handler;
   const goto_modelt &goto_model1;
   const goto_modelt &goto_model2;
   const optionst &options;
-  ui_message_handlert::uit ui;
 
   unsigned total_functions_count;
   std::set<irep_idt> new_functions, modified_functions, deleted_functions;

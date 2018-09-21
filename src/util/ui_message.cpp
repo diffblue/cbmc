@@ -19,21 +19,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cout_message.h"
 #include "cmdline.h"
 
-ui_message_handlert::ui_message_handlert()
-  : _ui(uit::PLAIN),
-    always_flush(false),
-    time(timestampert::make(timestampert::clockt::NONE)),
-    out(std::cout),
-    json_stream(nullptr)
-{
-}
-
 ui_message_handlert::ui_message_handlert(
+  message_handlert *message_handler,
   uit __ui,
   const std::string &program,
   bool always_flush,
   timestampert::clockt clock_type)
-  : _ui(__ui),
+  : message_handler(message_handler),
+    _ui(__ui),
     always_flush(always_flush),
     time(timestampert::make(clock_type)),
     out(std::cout),
@@ -61,13 +54,8 @@ ui_message_handlert::ui_message_handlert(
 
   case uit::JSON_UI:
     {
-      if(!json_stream)
-      {
-        json_stream =
-          std::unique_ptr<json_stream_arrayt>(new json_stream_arrayt(out));
-      }
-
-      INVARIANT(json_stream, "JSON stream must be initialized before use");
+      json_stream =
+        std::unique_ptr<json_stream_arrayt>(new json_stream_arrayt(out));
       json_stream->push_back().make_object()["program"] = json_stringt(program);
     }
     break;
@@ -78,6 +66,7 @@ ui_message_handlert::ui_message_handlert(
   const class cmdlinet &cmdline,
   const std::string &program)
   : ui_message_handlert(
+      nullptr,
       cmdline.isset("xml-ui") ? uit::XML_UI : cmdline.isset("json-ui")
                                                 ? uit::JSON_UI
                                                 : uit::PLAIN,
@@ -90,6 +79,12 @@ ui_message_handlert::ui_message_handlert(
                 ? timestampert::clockt::WALL_CLOCK
                 : timestampert::clockt::NONE
         : timestampert::clockt::NONE)
+{
+}
+
+ui_message_handlert::ui_message_handlert(message_handlert &message_handler)
+  : ui_message_handlert(
+      &message_handler, uit::PLAIN, "", false, timestampert::clockt::NONE)
 {
 }
 
@@ -134,13 +129,22 @@ void ui_message_handlert::print(
     {
     case uit::PLAIN:
     {
-      console_message_handlert console_message_handler(always_flush);
       std::stringstream ss;
       const std::string timestamp = time->stamp();
       ss << timestamp << (timestamp.empty() ? "" : " ") << message;
-      console_message_handler.print(level, ss.str());
-      if(always_flush)
-        console_message_handler.flush(level);
+      if(message_handler)
+      {
+        message_handler->print(level, ss.str());
+        if(always_flush)
+          message_handler->flush(level);
+      }
+      else
+      {
+        console_message_handlert msg(always_flush);
+        msg.print(level, ss.str());
+        if(always_flush)
+          msg.flush(level);
+      }
     }
     break;
 
@@ -303,8 +307,15 @@ void ui_message_handlert::flush(unsigned level)
   {
   case uit::PLAIN:
   {
-    console_message_handlert console_message_handler(always_flush);
-    console_message_handler.flush(level);
+    if(message_handler)
+    {
+      message_handler->flush(level);
+    }
+    else
+    {
+      console_message_handlert msg(always_flush);
+      msg.flush(level);
+    }
   }
   break;
 

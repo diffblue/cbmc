@@ -21,7 +21,7 @@ public:
     const goto_modelt &_goto_model1,
     const goto_modelt &_goto_model2,
     const optionst &_options,
-    message_handlert &_message_handler)
+    ui_message_handlert &_message_handler)
     : goto_difft(_goto_model1, _goto_model2, _options, _message_handler)
   {
   }

@@ -288,7 +288,7 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
     // localize faults
     run(ID_nil);
 
-    switch(bmc.ui)
+    switch(bmc.ui_message_handler.get_ui())
     {
     case ui_message_handlert::uit::PLAIN:
     {
@@ -353,7 +353,7 @@ void fault_localizationt::report(
 {
   bmc_all_propertiest::report(cover_goals);
 
-  switch(bmc.ui)
+  switch(bmc.ui_message_handler.get_ui())
   {
   case ui_message_handlert::uit::PLAIN:
     if(cover_goals.number_covered()>0)

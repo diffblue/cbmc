@@ -21,16 +21,9 @@ class ui_message_handlert : public message_handlert
 public:
   enum class uit { PLAIN, XML_UI, JSON_UI };
 
-  ui_message_handlert(
-    uit,
-    const std::string &program,
-    const bool always_flush,
-    timestampert::clockt clock_type);
-
   ui_message_handlert(const class cmdlinet &, const std::string &program);
 
-  /// Default constructor; implementation is in .cpp file
-  ui_message_handlert();
+  explicit ui_message_handlert(message_handlert &);
 
   virtual ~ui_message_handlert();
 
@@ -39,30 +32,28 @@ public:
     return _ui;
   }
 
-  void set_ui(uit __ui)
-  {
-    _ui=__ui;
-    if(_ui == uit::JSON_UI && !json_stream)
-    {
-      json_stream =
-        std::unique_ptr<json_stream_arrayt>(new json_stream_arrayt(out));
-    }
-  }
-
   virtual void flush(unsigned level) override;
 
-  json_stream_arrayt &get_json_stream() override
+  json_stream_arrayt &get_json_stream()
   {
     PRECONDITION(json_stream!=nullptr);
     return *json_stream;
   }
 
 protected:
+  message_handlert *message_handler;
   uit _ui;
   const bool always_flush;
   std::unique_ptr<const timestampert> time;
   std::ostream &out;
   std::unique_ptr<json_stream_arrayt> json_stream;
+
+  ui_message_handlert(
+    message_handlert *,
+    uit,
+    const std::string &program,
+    const bool always_flush,
+    timestampert::clockt clock_type);
 
   virtual void print(
     unsigned level,

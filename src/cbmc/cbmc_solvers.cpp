@@ -72,7 +72,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_default()
     solver->set_prop(util_make_unique<satcheckt>());
   }
 
-  solver->prop().set_message_handler(get_message_handler());
+  solver->prop().set_message_handler(message_handler);
 
   auto bv_pointers = util_make_unique<bv_pointerst>(ns, solver->prop());
 
@@ -92,7 +92,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_dimacs()
   no_incremental_check();
 
   auto prop=util_make_unique<dimacs_cnft>();
-  prop->set_message_handler(get_message_handler());
+  prop->set_message_handler(message_handler);
 
   std::string filename=options.get_option("outfile");
 
@@ -113,12 +113,12 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_bv_refinement()
     return util_make_unique<satcheck_no_simplifiert>();
   }();
 
-  prop->set_message_handler(get_message_handler());
+  prop->set_message_handler(message_handler);
 
   bv_refinementt::infot info;
   info.ns=&ns;
   info.prop=prop.get();
-  info.ui=ui;
+  info.output_xml = output_xml_in_refinement;
 
   // we allow setting some parameters
   if(options.get_bool_option("max-node-refinement"))
@@ -141,10 +141,10 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_string_refinement()
   string_refinementt::infot info;
   info.ns=&ns;
   auto prop=util_make_unique<satcheck_no_simplifiert>();
-  prop->set_message_handler(get_message_handler());
+  prop->set_message_handler(message_handler);
   info.prop=prop.get();
   info.refinement_bound=DEFAULT_MAX_NB_REFINEMENT;
-  info.ui=ui;
+  info.output_xml = output_xml_in_refinement;
   if(options.get_bool_option("max-node-refinement"))
     info.max_node_refinement=
       options.get_unsigned_int_option("max-node-refinement");
@@ -197,7 +197,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_smt2(
     if(options.get_bool_option("fpa"))
       smt2_conv->use_FPA_theory=true;
 
-    smt2_conv->set_message_handler(get_message_handler());
+    smt2_conv->set_message_handler(message_handler);
 
     return util_make_unique<solvert>(std::move(smt2_conv));
   }
@@ -226,7 +226,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_smt2(
     if(options.get_bool_option("fpa"))
       smt2_conv->use_FPA_theory=true;
 
-    smt2_conv->set_message_handler(get_message_handler());
+    smt2_conv->set_message_handler(message_handler);
 
     return util_make_unique<solvert>(std::move(smt2_conv), std::move(out));
   }

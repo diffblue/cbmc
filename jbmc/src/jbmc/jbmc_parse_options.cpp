@@ -523,8 +523,7 @@ int jbmc_parse_optionst::doit()
       path_strategy_chooser,
       options,
       goto_model,
-      ui_message_handler.get_ui(),
-      *this,
+      ui_message_handler,
       configure_bmc);
   }
   else
@@ -557,15 +556,13 @@ int jbmc_parse_optionst::doit()
 
     // The `configure_bmc` callback passed will enable enum-unwind-static if
     // applicable.
-    return
-      bmct::do_language_agnostic_bmc(
-        path_strategy_chooser,
-        options,
-        lazy_goto_model,
-        ui_message_handler.get_ui(),
-        *this,
-        configure_bmc,
-        callback_after_symex);
+    return bmct::do_language_agnostic_bmc(
+      path_strategy_chooser,
+      options,
+      lazy_goto_model,
+      ui_message_handler,
+      configure_bmc,
+      callback_after_symex);
   }
 }
 
@@ -618,8 +615,7 @@ int jbmc_parse_optionst::get_goto_program(
     {
       class_hierarchyt hierarchy;
       hierarchy(lazy_goto_model.symbol_table);
-      show_class_hierarchy(
-        hierarchy, get_message_handler(), ui_message_handler.get_ui());
+      show_class_hierarchy(hierarchy, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
 

@@ -54,7 +54,7 @@ void bmct::error_trace()
   goto_tracet &goto_trace=safety_checkert::error_trace;
   build_goto_trace(equation, prop_conv, ns, goto_trace);
 
-  switch(ui)
+  switch(ui_message_handler.get_ui())
   {
   case ui_message_handlert::uit::PLAIN:
     result() << "Counterexample:" << eom;
@@ -72,8 +72,10 @@ void bmct::error_trace()
 
   case ui_message_handlert::uit::JSON_UI:
     {
+      if(status().tellp() > 0)
+        status() << eom; // force end of previous message
       json_stream_objectt &json_result =
-        status().json_stream().push_back_stream_object();
+        ui_message_handler.get_json_stream().push_back_stream_object();
       const goto_trace_stept &step=goto_trace.steps.back();
       json_result["property"] =
         json_stringt(step.pc->source_location.get_property_id());
@@ -153,7 +155,7 @@ void bmct::report_success()
 {
   result() << "VERIFICATION SUCCESSFUL" << eom;
 
-  switch(ui)
+  switch(ui_message_handler.get_ui())
   {
   case ui_message_handlert::uit::PLAIN:
     break;
@@ -180,7 +182,7 @@ void bmct::report_failure()
 {
   result() << "VERIFICATION FAILED" << eom;
 
-  switch(ui)
+  switch(ui_message_handler.get_ui())
   {
   case ui_message_handlert::uit::PLAIN:
     break;
@@ -294,7 +296,7 @@ safety_checkert::resultt bmct::execute(
 
     if(options.get_bool_option("show-vcc"))
     {
-      show_vcc(options, get_message_handler(), ui, ns, equation);
+      show_vcc(options, ui_message_handler, ns, equation);
       return safety_checkert::resultt::SAFE; // to indicate non-error
     }
 
@@ -420,7 +422,7 @@ void bmct::show()
 {
   if(options.get_bool_option("show-vcc"))
   {
-    show_vcc(options, get_message_handler(), ui, ns, equation);
+    show_vcc(options, ui_message_handler, ns, equation);
   }
 
   if(options.get_bool_option("program-only"))
@@ -478,15 +480,14 @@ int bmct::do_language_agnostic_bmc(
   const path_strategy_choosert &path_strategy_chooser,
   const optionst &opts,
   abstract_goto_modelt &model,
-  const ui_message_handlert::uit &ui,
-  messaget &message,
+  ui_message_handlert &ui,
   std::function<void(bmct &, const symbol_tablet &)> driver_configure_bmc,
   std::function<bool(void)> callback_after_symex)
 {
   safety_checkert::resultt final_result = safety_checkert::resultt::UNKNOWN;
   safety_checkert::resultt tmp_result = safety_checkert::resultt::UNKNOWN;
   const symbol_tablet &symbol_table = model.get_symbol_table();
-  message_handlert &mh = message.get_message_handler();
+  messaget message(ui);
   std::unique_ptr<path_storaget> worklist;
   std::string strategy = opts.get_option("exploration-strategy");
   INVARIANT(
@@ -496,13 +497,15 @@ int bmct::do_language_agnostic_bmc(
   try
   {
     {
-      cbmc_solverst solvers(opts, symbol_table, message.get_message_handler());
-      solvers.set_ui(ui);
+      cbmc_solverst solvers(
+        opts,
+        symbol_table,
+        ui,
+        ui.get_ui() == ui_message_handlert::uit::XML_UI);
       std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
       cbmc_solver = solvers.get_solver();
       prop_convt &pc = cbmc_solver->prop_conv();
-      bmct bmc(opts, symbol_table, mh, pc, *worklist, callback_after_symex);
-      bmc.set_ui(ui);
+      bmct bmc(opts, symbol_table, ui, pc, *worklist, callback_after_symex);
       if(driver_configure_bmc)
         driver_configure_bmc(bmc, symbol_table);
       tmp_result = bmc.run(model);
@@ -546,8 +549,11 @@ int bmct::do_language_agnostic_bmc(
                          << "Starting new path (" << worklist->size()
                          << " to go)\n"
                          << message.eom;
-      cbmc_solverst solvers(opts, symbol_table, message.get_message_handler());
-      solvers.set_ui(ui);
+      cbmc_solverst solvers(
+        opts,
+        symbol_table,
+        ui,
+        ui.get_ui() == ui_message_handlert::uit::XML_UI);
       std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
       cbmc_solver = solvers.get_solver();
       prop_convt &pc = cbmc_solver->prop_conv();
@@ -555,7 +561,7 @@ int bmct::do_language_agnostic_bmc(
       path_explorert pe(
         opts,
         symbol_table,
-        mh,
+        ui,
         pc,
         resume.equation,
         resume.state,

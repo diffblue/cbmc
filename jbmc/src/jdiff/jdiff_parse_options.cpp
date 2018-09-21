@@ -274,8 +274,7 @@ int jdiff_parse_optionst::doit()
   }
 
   java_syntactic_difft sd(
-    goto_model1, goto_model2, options, get_message_handler());
-  sd.set_ui(get_ui());
+    goto_model1, goto_model2, options, ui_message_handler);
   sd();
   sd.output_functions();
 

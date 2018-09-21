@@ -66,7 +66,7 @@ public:
   bmct(
     const optionst &_options,
     const symbol_tablet &outer_symbol_table,
-    message_handlert &_message_handler,
+    ui_message_handlert &_message_handler,
     prop_convt &_prop_conv,
     path_storaget &_path_storage,
     std::function<bool(void)> callback_after_symex)
@@ -83,7 +83,7 @@ public:
         options,
         path_storage),
       prop_conv(_prop_conv),
-      ui(ui_message_handlert::uit::PLAIN),
+      ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
@@ -102,8 +102,6 @@ public:
   void setup();
   safety_checkert::resultt execute(abstract_goto_modelt &);
   virtual ~bmct() { }
-
-  void set_ui(ui_message_handlert::uit _ui) { ui=_ui; }
 
   // the safety_checkert interface
   virtual resultt operator()(
@@ -127,10 +125,9 @@ public:
     const path_strategy_choosert &path_strategy_chooser,
     const optionst &opts,
     abstract_goto_modelt &goto_model,
-    const ui_message_handlert::uit &ui,
-    messaget &message,
-    std::function<void(bmct &, const symbol_tablet &)>
-      driver_configure_bmc = nullptr,
+    ui_message_handlert &ui,
+    std::function<void(bmct &, const symbol_tablet &)> driver_configure_bmc =
+      nullptr,
     std::function<bool(void)> callback_after_symex = nullptr);
 
 protected:
@@ -144,7 +141,7 @@ protected:
   bmct(
     const optionst &_options,
     const symbol_tablet &outer_symbol_table,
-    message_handlert &_message_handler,
+    ui_message_handlert &_message_handler,
     prop_convt &_prop_conv,
     symex_target_equationt &_equation,
     path_storaget &_path_storage,
@@ -162,7 +159,7 @@ protected:
         options,
         path_storage),
       prop_conv(_prop_conv),
-      ui(ui_message_handlert::uit::PLAIN),
+      ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
   {
     symex.constant_propagation = options.get_bool_option("propagation");
@@ -186,7 +183,7 @@ protected:
   prop_convt &prop_conv;
   std::unique_ptr<memory_model_baset> memory_model;
   // use gui format
-  ui_message_handlert::uit ui;
+  ui_message_handlert &ui_message_handler;
 
   virtual decision_proceduret::resultt
     run_decision_procedure(prop_convt &prop_conv);
@@ -259,7 +256,7 @@ public:
   path_explorert(
     const optionst &_options,
     const symbol_tablet &outer_symbol_table,
-    message_handlert &_message_handler,
+    ui_message_handlert &_message_handler,
     prop_convt &_prop_conv,
     symex_target_equationt &saved_equation,
     const goto_symex_statet &saved_state,

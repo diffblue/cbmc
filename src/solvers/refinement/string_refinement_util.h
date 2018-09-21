@@ -9,6 +9,8 @@
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_UTIL_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_UTIL_H
 
+#include <memory>
+
 #include "string_builtin_function.h"
 #include "string_constraint.h"
 #include "string_constraint_generator.h"

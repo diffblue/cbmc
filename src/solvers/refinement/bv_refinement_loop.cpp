@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_refinement.h"
 
-#include <iostream>
-
 #include <util/xml.h>
 
 bv_refinementt::bv_refinementt(const infot &info):
@@ -41,7 +39,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
     status() << "BV-Refinement: iteration " << iteration << eom;
 
     // output the very same information in a structured fashion
-    if(config_.ui==ui_message_handlert::uit::XML_UI)
+    if(config_.output_xml)
     {
       xmlt xml("refinement-iteration");
       xml.data=std::to_string(iteration);

@@ -20,8 +20,7 @@ class symex_target_equationt;
 
 void show_vcc(
   const optionst &options,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui,
+  ui_message_handlert &ui_message_handler,
   const namespacet &ns,
   const symex_target_equationt &equation);
 
