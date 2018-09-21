@@ -181,7 +181,7 @@ bool has_subtype(
     }
     else
     {
-      for(const auto &subtype : top.subtypes())
+      for(const auto &subtype : to_type_with_subtypes(top).subtypes())
         push_if_not_visited(subtype);
     }
   }

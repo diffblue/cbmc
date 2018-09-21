@@ -10,7 +10,7 @@
 #define YYSTYPE_IS_TRIVIAL 1
 
 #define mto(x, y) stack(x).move_to_operands(stack(y))
-#define mts(x, y) (stack_type(x).move_to_subtypes(stack_type(y)))
+#define mts(x, y) (to_type_with_subtypes(stack_type(x)).move_to_subtypes(stack_type(y)))
 #define binary(x, y, l, id, z) { init(x, id); \
   stack(x).add_source_location()=stack(l).source_location(); \
   stack(x).reserve_operands(2); mto(x, y); mto(x, z); }
@@ -123,7 +123,7 @@ static void merge_types(irept &dest, irept &src)
     static_cast<exprt &>(dest).add_source_location()=location;
   }
 
-  static_cast<typet &>(dest).move_to_subtypes(static_cast<typet &>(src));
+  to_type_with_subtypes(static_cast<typet &>(dest)).move_to_subtypes(static_cast<typet &>(src));
 }
 
 /*******************************************************************\

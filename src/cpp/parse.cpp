@@ -480,7 +480,7 @@ void Parser::merge_types(const typet &src, typet &dest)
     // the end of the subtypes container needs to stay the same,
     // since several analysis functions traverse via the end for
     // merged_types
-    typet::subtypest &sub=dest.subtypes();
+    auto &sub = to_type_with_subtypes(dest).subtypes();
     sub.emplace(sub.begin(), src);
   }
 }
