@@ -603,8 +603,8 @@ void cpp_typecheckt::check_member_initializers(
       // Parent constructor
       if(
         c.get_bool(ID_from_base) && !c.get_bool(ID_is_type) &&
-        !c.get_bool(ID_is_static) && c.get(ID_type) == ID_code &&
-        c.find(ID_type).get(ID_return_type) == ID_constructor)
+        !c.get_bool(ID_is_static) && c.type().id() == ID_code &&
+        to_code_type(c.type()).return_type().id() == ID_constructor)
       {
         typet member_type=(typet&) initializer.find(ID_member);
         typecheck_type(member_type);

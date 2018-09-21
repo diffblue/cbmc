@@ -387,7 +387,7 @@ protected:
 
   void move_member_initializers(
     irept &initializers,
-    const typet &type,
+    const code_typet &type,
     exprt &value);
 
   static bool has_const(const typet &type);

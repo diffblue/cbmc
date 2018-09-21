@@ -50,7 +50,7 @@ void template_mapt::apply(typet &type) const
   }
   else if(type.id()==ID_code)
   {
-    apply(static_cast<typet &>(type.add(ID_return_type)));
+    apply(to_code_type(type).return_type());
 
     irept::subt &parameters=type.add(ID_parameters).get_sub();
 

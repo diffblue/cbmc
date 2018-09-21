@@ -927,8 +927,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
 
     code_function_callt &fc=to_code_function_call(last);
 
-    auto return_type =
-      static_cast<const typet &>(fc.function().type().find(ID_return_type));
+    const auto &return_type = to_code_type(fc.function().type()).return_type();
 
     side_effect_expr_function_callt sideeffect(
       fc.function(), fc.arguments(), return_type, fc.source_location());
@@ -1997,9 +1996,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         new_symbol.name=identifier;
         new_symbol.base_name=identifier;
         new_symbol.location=expr.source_location();
-        new_symbol.type=code_typet();
+        new_symbol.type = code_typet({}, return_type);
         new_symbol.type.set(ID_C_incomplete, true);
-        new_symbol.type.add(ID_return_type)=return_type;
 
         // TODO: should also guess some argument types
 

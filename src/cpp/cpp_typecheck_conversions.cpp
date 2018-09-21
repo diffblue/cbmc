@@ -927,7 +927,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         if(comp_type.id() !=ID_code)
           continue;
 
-        if(comp_type.find(ID_return_type).id() !=ID_constructor)
+        if(to_code_type(comp_type).return_type().id() != ID_constructor)
           continue;
 
         // TODO: ellipsis

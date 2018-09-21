@@ -220,12 +220,12 @@ void cpp_convert_typet::read_template(const typet &type)
 void cpp_convert_typet::read_function_type(const typet &type)
 {
   other.push_back(type);
-  typet &t=other.back();
-  t.id(ID_code);
+  other.back().id(ID_code);
+
+  code_typet &t = to_code_type(other.back());
 
   // change subtype to return_type
-  typet &return_type=
-    static_cast<typet &>(t.add(ID_return_type));
+  typet &return_type = t.return_type();
 
   return_type.swap(t.subtype());
   t.remove_subtype();

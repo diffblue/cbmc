@@ -655,7 +655,9 @@ void cpp_typecheck_resolvet::make_constructors(
         if(component.get_bool(ID_from_base))
           continue;
 
-        if(type.find(ID_return_type).id()==ID_constructor)
+        if(
+          type.id() == ID_code &&
+          to_code_type(type).return_type().id() == ID_constructor)
         {
           const symbolt &symb =
             cpp_typecheck.lookup(component.get_name());
