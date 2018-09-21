@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/invariant.h>
 
+#include "merged_type.h"
+
 void ansi_c_declaratort::build(irept &src)
 {
   typet *p=static_cast<typet *>(&src);
@@ -47,8 +49,8 @@ void ansi_c_declaratort::build(irept &src)
     else if(t.id()==ID_merged_type)
     {
       // we always walk down the _last_ member of a merged type
-      assert(!t.subtypes().empty());
-      p=&(t.subtypes().back());
+      auto &merged_type = to_merged_type(t);
+      p = &merged_type.last_type();
     }
     else
       p=&t.subtype();
@@ -105,8 +107,8 @@ typet ansi_c_declarationt::full_type(
     else if(p->id()==ID_merged_type)
     {
       // we always go down on the right-most subtype
-      assert(!p->subtypes().empty());
-      p=&(p->subtypes().back());
+      auto &merged_type = to_merged_type(*p);
+      p = &merged_type.last_type();
     }
     else
       UNREACHABLE;
