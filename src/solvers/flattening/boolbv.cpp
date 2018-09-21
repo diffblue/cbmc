@@ -303,18 +303,6 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_not(to_not_expr(expr));
   else if(expr.id()==ID_power)
      return convert_power(to_binary_expr(expr));
-  else if(expr.id()==ID_float_debug1 ||
-          expr.id()==ID_float_debug2)
-  {
-    DATA_INVARIANT(expr.operands().size() == 2, "");
-    bvt bv0=convert_bitvector(expr.op0());
-    bvt bv1=convert_bitvector(expr.op1());
-    float_utilst float_utils(prop, to_floatbv_type(expr.type()));
-    bvt bv=expr.id()==ID_float_debug1?
-      float_utils.debug1(bv0, bv1):
-      float_utils.debug2(bv0, bv1);
-    return bv;
-  }
   else if(expr.id() == ID_popcount)
     return convert_bv(lower_popcount(to_popcount_expr(expr), ns));
 
