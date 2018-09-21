@@ -373,6 +373,7 @@ void java_bytecode_convert_method_lazy(
   if(m.is_static)
     member_type.set(ID_is_static, true);
   member_type.set_native(m.is_native);
+  member_type.set_is_varargs(m.is_varargs);
 
   if(m.is_bridge)
     member_type.set(ID_is_bridge_method, m.is_bridge);
