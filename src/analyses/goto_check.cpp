@@ -85,8 +85,10 @@ protected:
   void check_rec(
     const exprt &expr,
     guardt &guard,
-    bool address);
-  void check(const exprt &expr);
+    bool address,
+    bool write);
+
+  void check(const exprt &expr, bool write);
 
   struct conditiont
   {
@@ -107,8 +109,8 @@ protected:
   void undefined_shift_check(const shift_exprt &, const guardt &);
   void pointer_rel_check(const exprt &, const guardt &);
   void pointer_overflow_check(const exprt &, const guardt &);
-  void pointer_validity_check(const dereference_exprt &, const guardt &);
-  conditionst address_check(const exprt &address, const exprt &size);
+  void pointer_validity_check(const dereference_exprt &, const guardt &, bool write);
+  conditionst address_check(const exprt &address, const exprt &size, bool write);
   void integer_overflow_check(const exprt &, const guardt &);
   void conversion_check(const exprt &, const guardt &);
   void float_overflow_check(const exprt &, const guardt &);
@@ -933,7 +935,8 @@ void goto_checkt::pointer_overflow_check(
 
 void goto_checkt::pointer_validity_check(
   const dereference_exprt &expr,
-  const guardt &guard)
+  const guardt &guard,
+  const bool write)
 {
   if(!enable_pointer_check)
     return;
@@ -941,7 +944,7 @@ void goto_checkt::pointer_validity_check(
   const exprt &pointer=expr.pointer();
 
   auto conditions =
-    address_check(pointer, size_of_expr(expr.type(), ns));
+    address_check(pointer, size_of_expr(expr.type(), ns), write);
 
   for(const auto &c : conditions)
   {
@@ -956,7 +959,7 @@ void goto_checkt::pointer_validity_check(
 }
 
 goto_checkt::conditionst
-goto_checkt::address_check(const exprt &address, const exprt &size)
+goto_checkt::address_check(const exprt &address, const exprt &size, bool write)
 {
   if(!enable_pointer_check)
     return {};
@@ -1296,7 +1299,11 @@ void goto_checkt::add_guarded_claim(
   }
 }
 
-void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
+void goto_checkt::check_rec(
+  const exprt &expr,
+  guardt &guard,
+  bool address,
+  bool write)
 {
   // we don't look into quantifiers
   if(expr.id()==ID_exists || expr.id()==ID_forall)
@@ -1307,18 +1314,18 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
     if(expr.id()==ID_dereference)
     {
       assert(expr.operands().size()==1);
-      check_rec(expr.op0(), guard, false);
+      check_rec(expr.op0(), guard, false, false);
     }
     else if(expr.id()==ID_index)
     {
       assert(expr.operands().size()==2);
-      check_rec(expr.op0(), guard, true);
-      check_rec(expr.op1(), guard, false);
+      check_rec(expr.op0(), guard, true, false);
+      check_rec(expr.op1(), guard, false, false);
     }
     else
     {
       forall_operands(it, expr)
-        check_rec(*it, guard, true);
+        check_rec(*it, guard, true, false);
     }
     return;
   }
@@ -1326,7 +1333,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
   if(expr.id()==ID_address_of)
   {
     assert(expr.operands().size()==1);
-    check_rec(expr.op0(), guard, true);
+    check_rec(expr.op0(), guard, true, false);
     return;
   }
   else if(expr.id()==ID_and || expr.id()==ID_or)
@@ -1343,7 +1350,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
         throw "`"+expr.id_string()+"' takes Boolean operands only, but got "+
               op.pretty();
 
-      check_rec(op, guard, false);
+      check_rec(op, guard, false, false);
 
       if(expr.id()==ID_or)
         guard.add(not_exprt(op));
@@ -1368,77 +1375,88 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
       throw msg;
     }
 
-    check_rec(expr.op0(), guard, false);
+    check_rec(expr.op0(), guard, false, false);
 
     {
       guardt old_guard=guard;
       guard.add(expr.op0());
-      check_rec(expr.op1(), guard, false);
+      check_rec(expr.op1(), guard, false, write);
       guard.swap(old_guard);
     }
 
     {
       guardt old_guard=guard;
       guard.add(not_exprt(expr.op0()));
-      check_rec(expr.op2(), guard, false);
+      check_rec(expr.op2(), guard, false, write);
       guard.swap(old_guard);
     }
 
     return;
   }
-  else if(expr.id()==ID_member &&
-          to_member_expr(expr).struct_op().id()==ID_dereference)
+  else if(expr.id()==ID_member)
   {
-    const member_exprt &member=to_member_expr(expr);
-    const dereference_exprt &deref=
-      to_dereference_expr(member.struct_op());
+    const auto &member_expr = to_member_expr(expr);
 
-    check_rec(deref.pointer(), guard, false);
-
-    // avoid building the following expressions when pointer_validity_check
-    // would return immediately anyway
-    if(!enable_pointer_check)
-      return;
-
-    // we rewrite s->member into *(s+member_offset)
-    // to avoid requiring memory safety of the entire struct
-
-    exprt member_offset=member_offset_expr(member, ns);
-
-    if(member_offset.is_not_nil())
+    if(member_expr.struct_op().id()==ID_dereference)
     {
-      pointer_typet new_pointer_type = to_pointer_type(deref.pointer().type());
-      new_pointer_type.subtype() = expr.type();
+      const member_exprt &member=to_member_expr(expr);
+      const dereference_exprt &deref=
+        to_dereference_expr(member.struct_op());
 
-      const exprt char_pointer =
-        typecast_exprt::conditional_cast(
-          deref.pointer(), pointer_type(char_type()));
+      check_rec(deref.pointer(), guard, false, false);
 
-      const exprt new_address = typecast_exprt(
-        plus_exprt(
-          char_pointer,
-          typecast_exprt::conditional_cast(member_offset, pointer_diff_type())),
-        char_pointer.type());
+      // avoid building the following expressions when pointer_validity_check
+      // would return immediately anyway
+      if(!enable_pointer_check)
+        return;
 
-      const exprt new_address_casted =
-        typecast_exprt::conditional_cast(new_address, new_pointer_type);
+      // we rewrite s->member into *(s+member_offset)
+      // to avoid requiring memory safety of the entire struct
 
-      dereference_exprt new_deref(new_address_casted, expr.type());
-      new_deref.add_source_location() = deref.source_location();
-      pointer_validity_check(new_deref, guard);
+      exprt member_offset=member_offset_expr(member, ns);
 
-      return;
+      if(member_offset.is_not_nil())
+      {
+        pointer_typet new_pointer_type = to_pointer_type(deref.pointer().type());
+        new_pointer_type.subtype() = expr.type();
+
+        const exprt char_pointer =
+          typecast_exprt::conditional_cast(
+            deref.pointer(), pointer_type(char_type()));
+
+        const exprt new_address = typecast_exprt(
+          plus_exprt(
+            char_pointer,
+            typecast_exprt::conditional_cast(member_offset, pointer_diff_type())),
+          char_pointer.type());
+
+        const exprt new_address_casted =
+          typecast_exprt::conditional_cast(new_address, new_pointer_type);
+
+        dereference_exprt new_deref(new_address_casted, expr.type());
+        new_deref.add_source_location() = deref.source_location();
+        pointer_validity_check(new_deref, guard, write);
+
+        return;
+      }
     }
+
+    check_rec(member_expr.compound(), guard, false, write);
+    return;
+  }
+  else if(expr.id()==ID_index)
+  {
+    const auto &index_expr = to_index_expr(expr);
+    check_rec(index_expr.array(), guard, false, write);
+    check_rec(index_expr.index(), guard, false, false);
+    bounds_check(index_expr, guard);
+    return;
   }
 
   forall_operands(it, expr)
-    check_rec(*it, guard, false);
+    check_rec(*it, guard, false, false);
 
-  if(expr.id()==ID_index)
-  {
-    bounds_check(to_index_expr(expr), guard);
-  }
-  else if(expr.id()==ID_div)
+  if(expr.id()==ID_div)
   {
     div_by_zero_check(to_div_expr(expr), guard);
 
@@ -1491,14 +1509,14 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
     pointer_rel_check(expr, guard);
   else if(expr.id()==ID_dereference)
   {
-    pointer_validity_check(to_dereference_expr(expr), guard);
+    pointer_validity_check(to_dereference_expr(expr), guard, write);
   }
 }
 
-void goto_checkt::check(const exprt &expr)
+void goto_checkt::check(const exprt &expr, bool write)
 {
   guardt guard;
-  check_rec(expr, guard, false);
+  check_rec(expr, guard, false, write);
 }
 
 /// expand the r_ok and w_ok predicates
@@ -1513,7 +1531,8 @@ void goto_checkt::rw_ok_check(exprt &expr)
     DATA_INVARIANT(
       expr.operands().size() == 2, "r/w_ok must have two operands");
 
-    const auto conditions = address_check(expr.op0(), expr.op1());
+    const bool write = expr.id() == ID_w_ok;
+    const auto conditions = address_check(expr.op0(), expr.op1(), write);
     exprt::operandst conjuncts;
     for(const auto &c : conditions)
       conjuncts.push_back(c.assertion);
@@ -1551,7 +1570,7 @@ void goto_checkt::goto_check(
        i.is_target())
       assertions.clear();
 
-    check(i.guard);
+    check(i.guard, false);
 
     // magic ERROR label?
     for(const auto &label : error_labels)
@@ -1577,20 +1596,20 @@ void goto_checkt::goto_check(
 
       if(statement==ID_expression)
       {
-        check(i.code);
+        check(i.code, false);
       }
       else if(statement==ID_printf)
       {
         forall_operands(it, i.code)
-          check(*it);
+          check(*it, false);
       }
     }
     else if(i.is_assign())
     {
       const code_assignt &code_assign=to_code_assign(i.code);
 
-      check(code_assign.lhs());
-      check(code_assign.rhs());
+      check(code_assign.lhs(), true);
+      check(code_assign.rhs(), false);
 
       // the LHS might invalidate any assertion
       invalidate(code_assign.lhs());
@@ -1630,7 +1649,7 @@ void goto_checkt::goto_check(
       }
 
       forall_operands(it, code_function_call)
-        check(*it);
+        check(*it, false);
 
       // the call might invalidate any assertion
       assertions.clear();
@@ -1639,7 +1658,7 @@ void goto_checkt::goto_check(
     {
       if(i.code.operands().size()==1)
       {
-        check(i.code.op0());
+        check(i.code.op0(), false);
         // the return value invalidate any assertion
         invalidate(i.code.op0());
       }
