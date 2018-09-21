@@ -768,9 +768,20 @@ void java_bytecode_convert_methodt::setup_local_variables(
             << " name " << v.var.name << " v.var.descriptor '"
             << v.var.descriptor << "' holes " << v.holes.size() << eom;
 #endif
-    typet t;
-    // TODO: might need changing once descriptor/signature issue is resolved
-    t=java_type_from_string(v.var.descriptor);
+
+    const std::string &method_name = id2string(method_id);
+    const size_t method_name_end = method_name.rfind(":(");
+    const size_t class_name_end = method_name.rfind('.', method_name_end);
+    INVARIANT(
+      method_name_end != std::string::npos &&
+        class_name_end != std::string::npos,
+      "A method name has the format class `.` method `:(`signature`)`.");
+    const std::string class_name = method_name.substr(0, class_name_end);
+
+    const typet t = v.var.signature.has_value()
+                      ? java_type_from_string_with_exception(
+                          v.var.descriptor, v.var.signature, class_name)
+                      : java_type_from_string(v.var.descriptor);
 
     std::ostringstream id_oss;
     id_oss << method_id << "::" << v.var.start_pc << "::" << v.var.name;
