@@ -1,4 +1,4 @@
-// Copyright 2018 Diffblue Limited. All Rights Reserved.
+// Copyright 2018 Diffblue Limited.
 
 /// \file
 /// A wrapper for maps that gives read-write access to elements but without

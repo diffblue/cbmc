@@ -2,7 +2,7 @@
 
  Module: Unit test utilities
 
- Author: Diffblue Limited. All rights reserved.
+ Author: Diffblue Limited.
 
 \*******************************************************************/
 
