@@ -280,7 +280,7 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
               << format(to_let_expr(expr).where());
   else if(id == ID_array || id == ID_struct)
   {
-    os << "{ ";
+    os << '{';
 
     bool first = true;
 
@@ -289,12 +289,12 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
       if(first)
         first = false;
       else
-        os << ", ";
+        os << ',';
 
-      os << format(op);
+      os << ' ' << format(op);
     }
 
-    return os << '}';
+    return os << " }";
   }
   else if(id == ID_if)
   {
