@@ -62,10 +62,10 @@ const struct_union_typet::componentt &struct_union_typet::get_component(
   return static_cast<const componentt &>(get_nil_irep());
 }
 
-typet struct_union_typet::component_type(
-  const irep_idt &component_name) const
+const typet &
+struct_union_typet::component_type(const irep_idt &component_name) const
 {
-  const exprt c=get_component(component_name);
+  const auto &c = get_component(component_name);
   assert(c.is_not_nil());
   return c.type();
 }
