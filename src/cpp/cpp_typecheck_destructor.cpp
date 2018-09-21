@@ -15,12 +15,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 bool cpp_typecheckt::find_dtor(const symbolt &symbol) const
 {
-  const irept &components=
-    symbol.type.find(ID_components);
-
-  forall_irep(cit, components.get_sub())
+  for(const auto &c : to_struct_type(symbol.type).components())
   {
-    if(cit->get(ID_base_name)=="~"+id2string(symbol.base_name))
+    if(c.get(ID_base_name) == "~" + id2string(symbol.base_name))
       return true;
   }
 
@@ -77,21 +74,18 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
     to_struct_union_type(symbol.type).components();
 
   // take care of virtual methods
-  for(struct_union_typet::componentst::const_iterator
-      cit=components.begin();
-      cit!=components.end();
-      cit++)
+  for(const auto &c : components)
   {
-    if(cit->get_bool("is_vtptr"))
+    if(c.get_bool("is_vtptr"))
     {
       exprt name(ID_name);
-      name.set(ID_identifier, cit->get(ID_base_name));
+      name.set(ID_identifier, c.get(ID_base_name));
 
       cpp_namet cppname;
       cppname.move_to_sub(name);
 
       const symbolt &virtual_table_symbol_type =
-        lookup(cit->type().subtype().get(ID_identifier));
+        lookup(c.type().subtype().get(ID_identifier));
 
       const symbolt &virtual_table_symbol_var = lookup(
         id2string(virtual_table_symbol_type.name) + "@" +
@@ -99,12 +93,12 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
 
       exprt var=virtual_table_symbol_var.symbol_expr();
       address_of_exprt address(var);
-      assert(address.type()==cit->type());
+      assert(address.type() == c.type());
 
       already_typechecked(address);
 
       exprt ptrmember(ID_ptrmember);
-      ptrmember.set(ID_component_name, cit->get(ID_name));
+      ptrmember.set(ID_component_name, c.get(ID_name));
       ptrmember.operands().push_back(exprt("cpp-this"));
 
       code_assignt assign(ptrmember, address);

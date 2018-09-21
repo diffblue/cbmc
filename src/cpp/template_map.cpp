@@ -31,11 +31,9 @@ void template_mapt::apply(typet &type) const
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
-    irept::subt &components=type.add(ID_components).get_sub();
-
-    Forall_irep(it, components)
+    for(auto &c : to_struct_union_type(type).components())
     {
-      typet &subtype=static_cast<typet &>(it->add(ID_type));
+      typet &subtype = static_cast<typet &>(c.add(ID_type));
       apply(subtype);
     }
   }

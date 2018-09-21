@@ -455,23 +455,21 @@ void cpp_typecheckt::default_assignop_value(
   }
 
   // Then, we copy the members
-  const irept &components=symbol.type.find(ID_components);
-
-  forall_irep(mem_it, components.get_sub())
+  for(const auto &c : to_struct_type(symbol.type).components())
   {
-    if(mem_it->get_bool(ID_from_base) ||
-       mem_it->get_bool(ID_is_type) ||
-       mem_it->get_bool(ID_is_static) ||
-       mem_it->get_bool("is_vtptr") ||
-       mem_it->get(ID_type)==ID_code)
-      continue;
-
-    irep_idt mem_name=mem_it->get(ID_base_name);
-
-    if(mem_it->get(ID_type)==ID_array)
+    if(
+      c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+      c.get_bool(ID_is_static) || c.get_bool("is_vtptr") ||
+      c.get(ID_type) == ID_code)
     {
-      const exprt &size_expr=
-        to_array_type((typet&)mem_it->find(ID_type)).size();
+      continue;
+    }
+
+    const irep_idt &mem_name = c.get(ID_base_name);
+
+    if(c.get(ID_type) == ID_array)
+    {
+      const exprt &size_expr = to_array_type((typet &)c.find(ID_type)).size();
 
       if(size_expr.id()==ID_infinity)
       {
@@ -811,21 +809,20 @@ void cpp_typecheckt::full_member_initialization(
   }
 
   // Then, we add the member initializers
-  for(struct_typet::componentst::const_iterator mem_it =
-      components.begin(); mem_it!=components.end(); mem_it++)
+  for(const auto &c : components)
   {
     // Take care of virtual tables
-    if(mem_it->get_bool("is_vtptr"))
+    if(c.get_bool("is_vtptr"))
     {
       exprt name(ID_name);
-      name.set(ID_identifier, mem_it->get(ID_base_name));
-      name.add_source_location()=mem_it->source_location();
+      name.set(ID_identifier, c.get(ID_base_name));
+      name.add_source_location() = c.source_location();
 
       cpp_namet cppname;
       cppname.move_to_sub(name);
 
       const symbolt &virtual_table_symbol_type =
-        lookup(mem_it->type().subtype().get(ID_identifier));
+        lookup(c.type().subtype().get(ID_identifier));
 
       const symbolt &virtual_table_symbol_var  =
         lookup(id2string(virtual_table_symbol_type.name) + "@" +
@@ -833,12 +830,12 @@ void cpp_typecheckt::full_member_initialization(
 
       exprt var=virtual_table_symbol_var.symbol_expr();
       address_of_exprt address(var);
-      assert(address.type()==mem_it->type());
+      assert(address.type() == c.type());
 
       already_typechecked(address);
 
       exprt ptrmember(ID_ptrmember);
-      ptrmember.set(ID_component_name, mem_it->get(ID_name));
+      ptrmember.set(ID_component_name, c.get(ID_name));
       ptrmember.operands().push_back(exprt("cpp-this"));
 
       code_assignt assign(ptrmember, address);
@@ -846,13 +843,14 @@ void cpp_typecheckt::full_member_initialization(
       continue;
     }
 
-    if( mem_it->get_bool(ID_from_base)
-      || mem_it->type().id()==ID_code
-      || mem_it->get_bool(ID_is_type)
-      || mem_it->get_bool(ID_is_static))
-        continue;
+    if(
+      c.get_bool(ID_from_base) || c.type().id() == ID_code ||
+      c.get_bool(ID_is_type) || c.get_bool(ID_is_static))
+    {
+      continue;
+    }
 
-    irep_idt mem_name=mem_it->get(ID_base_name);
+    const irep_idt &mem_name = c.get(ID_base_name);
 
     // Check if the initialization list of the constructor
     // explicitly initializes the data member
@@ -880,18 +878,18 @@ void cpp_typecheckt::full_member_initialization(
 
     // If the data member is a reference, it must be explicitly
     // initialized
-    if(!found &&
-       mem_it->find(ID_type).id()==ID_pointer &&
-       mem_it->find(ID_type).get_bool(ID_C_reference))
+    if(
+      !found && c.find(ID_type).id() == ID_pointer &&
+      c.find(ID_type).get_bool(ID_C_reference))
     {
-      error().source_location=mem_it->source_location();
+      error().source_location = c.source_location();
       error() << "reference must be explicitly initialized" << eom;
       throw 0;
     }
 
     // If the data member is not POD and is not explicitly initialized,
     // then its default constructor is called.
-    if(!found && !cpp_is_pod((const typet &)(mem_it->find(ID_type))))
+    if(!found && !cpp_is_pod((const typet &)(c.find(ID_type))))
     {
       irept name(ID_name);
       name.set(ID_identifier, mem_name);
@@ -972,10 +970,8 @@ bool cpp_typecheckt::find_assignop(const symbolt &symbol) const
   const struct_typet &struct_type=to_struct_type(symbol.type);
   const struct_typet::componentst &components=struct_type.components();
 
-  for(std::size_t i=0; i < components.size(); i++)
+  for(const auto &component : components)
   {
-    const struct_typet::componentt &component=components[i];
-
     if(component.get(ID_base_name)!="operator=")
       continue;
 

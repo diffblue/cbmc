@@ -181,9 +181,8 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
 
     // set most-derived bits
     code_blockt block;
-    for(std::size_t i=0; i < struct_type.components().size(); i++)
+    for(const auto &component : struct_type.components())
     {
-      const irept &component=struct_type.components()[i];
       if(component.get(ID_base_name)!="@most_derived")
         continue;
 
