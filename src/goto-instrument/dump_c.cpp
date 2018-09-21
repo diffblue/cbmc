@@ -416,12 +416,8 @@ void dump_ct::convert_compound(
 
   std::stringstream struct_body;
 
-  for(struct_union_typet::componentst::const_iterator
-      it=type.components().begin();
-      it!=type.components().end();
-      it++)
+  for(const auto &comp : type.components())
   {
-    const struct_typet::componentt &comp=*it;
     const typet &comp_type=ns.follow(comp.type());
 
     if(comp_type.id()==ID_code ||
@@ -1236,18 +1232,15 @@ void dump_ct::cleanup_expr(exprt &expr)
 
     PRECONDITION(old_components.size()==old_ops.size());
     exprt::operandst::iterator o_it=old_ops.begin();
-    for(struct_union_typet::componentst::const_iterator
-        it=old_components.begin();
-        it!=old_components.end();
-        ++it)
+    for(const auto &old_comp : old_components)
     {
-      const bool is_zero_bit_field=
-        it->type().id()==ID_c_bit_field &&
-        to_c_bit_field_type(it->type()).get_width()==0;
+      const bool is_zero_bit_field =
+        old_comp.type().id() == ID_c_bit_field &&
+        to_c_bit_field_type(old_comp.type()).get_width() == 0;
 
-      if(!it->get_is_padding() && !is_zero_bit_field)
+      if(!old_comp.get_is_padding() && !is_zero_bit_field)
       {
-        type.components().push_back(*it);
+        type.components().push_back(old_comp);
         expr.move_to_operands(*o_it);
       }
       ++o_it;

@@ -203,18 +203,17 @@ static std::string type2name(
       result+="ST";
     if(type.id()==ID_union)
       result+="UN";
-    const struct_union_typet &t=to_struct_union_type(type);
-    const struct_union_typet::componentst &components = t.components();
     result+='[';
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    bool first = true;
+    for(const auto &c : to_struct_union_type(type).components())
     {
-      if(it!=components.begin())
+      if(!first)
         result+='|';
-      result+=type2name(it->type(), ns, symbol_number);
-      irep_idt component_name = it->get_name();
+      else
+        first = false;
+
+      result += type2name(c.type(), ns, symbol_number);
+      const irep_idt &component_name = c.get_name();
       CHECK_RETURN(!component_name.empty());
       result+="'"+id2string(component_name)+"'";
     }

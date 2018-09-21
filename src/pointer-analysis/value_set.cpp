@@ -886,12 +886,9 @@ void value_sett::get_value_set_rec(
     {
       const struct_typet &struct_type=to_struct_type(op0_type);
 
-      for(struct_union_typet::componentst::const_iterator
-          c_it=struct_type.components().begin();
-          !found && c_it!=struct_type.components().end();
-          c_it++)
+      for(const auto &c : struct_type.components())
       {
-        const irep_idt &name=c_it->get_name();
+        const irep_idt &name = c.get_name();
 
         mp_integer comp_offset=member_offset(struct_type, name, ns);
 
@@ -902,22 +899,19 @@ void value_sett::get_value_set_rec(
 
         found=true;
 
-        member_exprt member(expr.op0(), *c_it);
+        member_exprt member(expr.op0(), c);
         get_value_set_rec(member, dest, suffix, original_type, ns);
+        break;
       }
     }
 
     if(op0_type.id()==ID_union)
     {
-      const union_typet &union_type=to_union_type(op0_type);
-
       // just collect them all
-      for(union_typet::componentst::const_iterator
-          c_it=union_type.components().begin();
-          c_it!=union_type.components().end(); c_it++)
+      for(const auto &c : to_union_type(op0_type).components())
       {
-        const irep_idt &name=c_it->get_name();
-        member_exprt member(expr.op0(), name, c_it->type());
+        const irep_idt &name = c.get_name();
+        member_exprt member(expr.op0(), name, c.type());
         get_value_set_rec(member, dest, suffix, original_type, ns);
       }
     }
@@ -1172,20 +1166,14 @@ void value_sett::assign(
   if(type.id()==ID_struct ||
      type.id()==ID_union)
   {
-    const struct_union_typet &struct_union_type=
-      to_struct_union_type(type);
-
-    for(struct_union_typet::componentst::const_iterator
-        c_it=struct_union_type.components().begin();
-        c_it!=struct_union_type.components().end();
-        c_it++)
+    for(const auto &c : to_struct_union_type(type).components())
     {
-      const typet &subtype=c_it->type();
-      const irep_idt &name = c_it->get_name();
+      const typet &subtype = c.type();
+      const irep_idt &name = c.get_name();
 
       // ignore methods and padding
-      if(subtype.id()==ID_code ||
-         c_it->get_is_padding()) continue;
+      if(subtype.id() == ID_code || c.get_is_padding())
+        continue;
 
       member_exprt lhs_member(lhs, name, subtype);
 

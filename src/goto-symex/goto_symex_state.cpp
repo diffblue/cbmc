@@ -206,14 +206,8 @@ static bool check_renaming(const typet &type)
           type.id()==ID_union ||
           type.id()==ID_class)
   {
-    const struct_union_typet &s_u_type=to_struct_union_type(type);
-    const struct_union_typet::componentst &components=s_u_type.components();
-
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        ++it)
-      if(check_renaming(it->type()))
+    for(const auto &c : to_struct_union_type(type).components())
+      if(check_renaming(c.type()))
         return true;
   }
   else if(type.has_subtype())

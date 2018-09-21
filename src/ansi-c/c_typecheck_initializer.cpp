@@ -268,15 +268,11 @@ void c_typecheck_baset::designator_enter(
     // only a top-level struct may end with a variable-length array
     entry.vla_permitted=designator.empty();
 
-    for(struct_typet::componentst::const_iterator
-        it=struct_type.components().begin();
-        it!=struct_type.components().end();
-        ++it)
+    for(const auto &c : struct_type.components())
     {
-      if(it->type().id()!=ID_code &&
-         !it->get_is_padding())
+      if(c.type().id() != ID_code && !c.get_is_padding())
       {
-        entry.subtype=it->type();
+        entry.subtype = c.type();
         break;
       }
 
@@ -758,38 +754,36 @@ designatort c_typecheck_baset::make_designator(
         do
         {
           repeat=false;
-          unsigned number=0;
+          std::size_t number = 0;
           const struct_union_typet::componentst &components=
             to_struct_union_type(follow(tmp_type)).components();
 
-          for(struct_union_typet::componentst::const_iterator
-              c_it=components.begin();
-              c_it!=components.end();
-              c_it++, number++)
+          for(const auto &c : components)
           {
-            if(c_it->get_name()==component_name)
+            if(c.get_name() == component_name)
             {
               // done!
               entry.index=number;
               entry.size=components.size();
-              entry.subtype=components[entry.index].type();
+              entry.subtype = c.type();
               entry.type=tmp_type;
             }
-            else if(c_it->get_anonymous() &&
-                    (follow(c_it->type()).id()==ID_struct ||
-                     follow(c_it->type()).id()==ID_union) &&
-                    has_component_rec(
-                      c_it->type(), component_name, *this))
+            else if(
+              c.get_anonymous() && (follow(c.type()).id() == ID_struct ||
+                                    follow(c.type()).id() == ID_union) &&
+              has_component_rec(c.type(), component_name, *this))
             {
               entry.index=number;
               entry.size=components.size();
-              entry.subtype=c_it->type();
+              entry.subtype = c.type();
               entry.type=tmp_type;
               tmp_type=entry.subtype;
               designator.push_entry(entry);
               found=repeat=true;
               break;
             }
+
+            ++number;
           }
         }
         while(repeat);

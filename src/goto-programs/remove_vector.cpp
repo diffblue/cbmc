@@ -50,14 +50,8 @@ static bool have_to_remove_vector(const typet &type)
 {
   if(type.id()==ID_struct || type.id()==ID_union)
   {
-    const struct_union_typet &struct_union_type=
-      to_struct_union_type(type);
-
-    for(struct_union_typet::componentst::const_iterator
-        it=struct_union_type.components().begin();
-        it!=struct_union_type.components().end();
-        it++)
-      if(have_to_remove_vector(it->type()))
+    for(const auto &c : to_struct_union_type(type).components())
+      if(have_to_remove_vector(c.type()))
         return true;
   }
   else if(type.id()==ID_pointer ||
