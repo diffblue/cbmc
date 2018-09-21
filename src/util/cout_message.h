@@ -36,17 +36,22 @@ public:
 
   virtual void flush(unsigned level) override;
 
-  console_message_handlert() : always_flush(false)
+  console_message_handlert() : console_message_handlert(false)
   {
   }
 
-  explicit console_message_handlert(bool always_flush)
-    : always_flush(always_flush)
-  {
-  }
+  explicit console_message_handlert(bool always_flush);
+
+  std::string command(unsigned c) const override;
 
 protected:
   const bool always_flush;
+
+  /// true if we are outputting to a proper console
+  bool is_a_tty;
+
+  /// true if we use ECMA-48 SGR to render colors
+  bool use_SGR;
 };
 
 class gcc_message_handlert : public message_handlert

@@ -89,6 +89,14 @@ protected:
     const source_locationt &location);
 
   const char *level_string(unsigned level);
+
+  std::string command(unsigned c) const override
+  {
+    if(message_handler)
+      return message_handler->command(c);
+    else
+      return std::string();
+  }
 };
 
 #define OPT_FLUSH "(flush)"
