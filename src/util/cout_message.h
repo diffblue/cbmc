@@ -54,7 +54,7 @@ protected:
   bool use_SGR;
 };
 
-class gcc_message_handlert : public message_handlert
+class gcc_message_handlert : public console_message_handlert
 {
 public:
   // aims to imitate the messages gcc prints
