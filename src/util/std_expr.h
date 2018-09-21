@@ -4092,10 +4092,12 @@ public:
 class constant_exprt:public exprt
 {
 public:
+  DEPRECATED("use constant_exprt(value, type) instead")
   constant_exprt():exprt(ID_constant)
   {
   }
 
+  DEPRECATED("use constant_exprt(value, type) instead")
   explicit constant_exprt(const typet &type):exprt(ID_constant, type)
   {
   }
