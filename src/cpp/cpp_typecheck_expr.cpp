@@ -512,19 +512,9 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
     if(t0.id()==ID_struct)
     {
-      const struct_typet &struct_type=
-        to_struct_type(t0);
-
-      const struct_typet::componentst &components=
-        struct_type.components();
-
-      for(struct_typet::componentst::const_iterator
-          it=components.begin();
-          it!=components.end();
-          it++)
+      for(const auto &c : to_struct_type(t0).components())
       {
-        if(!it->get_bool(ID_from_base) &&
-           it->get(ID_base_name) == op_name)
+        if(!c.get_bool(ID_from_base) && c.get(ID_base_name) == op_name)
         {
           found_in_struct=true;
           break;
@@ -2205,18 +2195,15 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       const struct_typet::componentst &components=
         to_struct_type(follow(tmp_object_expr.type())).components();
 
-      for(struct_typet::componentst::const_iterator
-          it=components.begin();
-          it!=components.end();
-          it++)
+      for(const auto &c : components)
       {
-        const typet &type=it->type();
+        const typet &type = c.type();
 
-        if(!it->get_bool(ID_from_base) &&
-           type.id()==ID_code &&
-           type.find(ID_return_type).id()==ID_destructor)
+        if(
+          !c.get_bool(ID_from_base) && type.id() == ID_code &&
+          type.find(ID_return_type).id() == ID_destructor)
         {
-          add_method_body(&symbol_table.get_writeable_ref(it->get(ID_name)));
+          add_method_body(&symbol_table.get_writeable_ref(c.get(ID_name)));
           break;
         }
       }

@@ -911,17 +911,10 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       if(from.id()==ID_struct)
         from_struct=to_struct_type(from);
 
-      struct_typet to_struct=to_struct_type(to);
-
       bool found=false;
 
-      for(struct_typet::componentst::const_iterator
-          it=to_struct.components().begin();
-          it != to_struct.components().end();
-          it++)
+      for(const auto &component : to_struct_type(to).components())
       {
-        const irept &component=*it;
-
         if(component.get_bool(ID_from_base))
           continue;
 
@@ -1062,14 +1055,9 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   // conversion operators
   if(from.id()==ID_struct)
   {
-    struct_typet from_struct=to_struct_type(from);
-
     bool found=false;
-    for(struct_typet::componentst::const_iterator
-        it=from_struct.components().begin();
-        it != from_struct.components().end(); it++)
+    for(const auto &component : to_struct_type(from).components())
     {
-      const irept &component=*it;
       const typet comp_type=static_cast<const typet&>(component.find(ID_type));
 
       if(component.get_bool(ID_from_base))

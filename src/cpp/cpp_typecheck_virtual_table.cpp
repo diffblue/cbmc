@@ -82,9 +82,8 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 
     struct_exprt values(symbol_typet(vt_symb_type.name));
 
-    for(std::size_t i=0; i < vt_type.components().size(); i++)
+    for(const auto &compo : vt_type.components())
     {
-      const struct_typet::componentt &compo=vt_type.components()[i];
       std::map<irep_idt, exprt>::const_iterator cit2 =
         value_map.find(compo.get("base_name"));
       assert(cit2!=value_map.end());
