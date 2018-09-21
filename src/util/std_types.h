@@ -775,6 +775,7 @@ public:
   class parametert:public exprt
   {
   public:
+    DEPRECATED("use parametert(type) instead")
     parametert():exprt(ID_parameter)
     {
     }
