@@ -406,7 +406,6 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   // now do actual work
 
-  struct_typet::componentt component;
   irep_idt identifier;
 
   // the below is a temporary hack
@@ -427,11 +426,10 @@ void cpp_typecheckt::typecheck_compound_declarator(
     identifier=base_name;
   }
 
-  component.set(ID_name, identifier);
-  component.type()=final_type;
+  struct_typet::componentt component(identifier, final_type);
   component.set(ID_access, access);
   component.set(ID_base_name, base_name);
-  component.set(ID_pretty_name, base_name);
+  component.set_pretty_name(base_name);
   component.add_source_location()=cpp_name.source_location();
 
   if(cpp_name.is_operator())
@@ -573,13 +571,11 @@ void cpp_typecheckt::typecheck_compound_declarator(
         CHECK_RETURN(!failed);
 
         // add a virtual-table pointer
-        struct_typet::componentt compo;
-        compo.type()=pointer_type(symbol_typet(vt_name));
-        compo.set_name(id2string(symbol.name) +"::@vtable_pointer");
+        struct_typet::componentt compo(
+          id2string(symbol.name) + "::@vtable_pointer",
+          pointer_type(symbol_typet(vt_name)));
         compo.set(ID_base_name, "@vtable_pointer");
-        compo.set(
-          ID_pretty_name,
-          id2string(symbol.base_name) +"@vtable_pointer");
+        compo.set_pretty_name(id2string(symbol.base_name) + "@vtable_pointer");
         compo.set("is_vtptr", true);
         compo.set(ID_access, ID_public);
         components.push_back(compo);
@@ -594,11 +590,11 @@ void cpp_typecheckt::typecheck_compound_declarator(
       component.set("is_virtual", is_virtual);
 
       // add an entry to the virtual table
-      struct_typet::componentt vt_entry;
-      vt_entry.type()=pointer_type(component.type());
-      vt_entry.set_name(id2string(vt_name)+"::"+virtual_name);
+      struct_typet::componentt vt_entry(
+        id2string(vt_name) + "::" + virtual_name,
+        pointer_type(component.type()));
       vt_entry.set(ID_base_name, virtual_name);
-      vt_entry.set(ID_pretty_name, virtual_name);
+      vt_entry.set_pretty_name(virtual_name);
       vt_entry.set(ID_access, ID_public);
       vt_entry.add_source_location()=symbol.location;
       virtual_table.components().push_back(vt_entry);

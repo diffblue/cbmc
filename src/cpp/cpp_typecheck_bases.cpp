@@ -102,14 +102,12 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
   {
     // add a flag to determine
     // if this is the most-derived-object
-    struct_typet::componentt most_derived;
+    struct_typet::componentt most_derived(
+      cpp_scopes.current_scope().prefix + "::" + "@most_derived", bool_typet());
 
-    most_derived.type()=bool_typet();
     most_derived.set_access(ID_public);
     most_derived.set(ID_base_name, "@most_derived");
-    most_derived.set_name(
-      cpp_scopes.current_scope().prefix+"::"+"@most_derived");
-    most_derived.set(ID_pretty_name, "@most_derived");
+    most_derived.set_pretty_name("@most_derived");
     most_derived.add_source_location()=type.source_location();
     put_compound_into_scope(most_derived);
 
