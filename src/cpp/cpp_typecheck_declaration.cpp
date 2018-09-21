@@ -92,7 +92,7 @@ void cpp_typecheckt::convert_anonymous_union(
 
     cpp_idt &id=cpp_scopes.current_scope().insert(base_name);
     id.id_class = cpp_idt::id_classt::SYMBOL;
-    id.identifier = c.get(ID_name);
+    id.identifier = c.get_name();
     id.class_identifier=union_symbol.name;
     id.is_member=true;
   }

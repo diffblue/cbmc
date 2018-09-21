@@ -186,7 +186,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
       if(component.get_base_name() != "@most_derived")
         continue;
 
-      member_exprt member(object_tc, component.get(ID_name), bool_typet());
+      member_exprt member(object_tc, component.get_name(), bool_typet());
       member.add_source_location()=source_location;
       member.set(ID_C_lvalue, object_tc.get_bool(ID_C_lvalue));
 

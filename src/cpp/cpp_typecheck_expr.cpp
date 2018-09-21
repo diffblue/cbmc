@@ -2203,7 +2203,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
           !c.get_bool(ID_from_base) && type.id() == ID_code &&
           type.find(ID_return_type).id() == ID_destructor)
         {
-          add_method_body(&symbol_table.get_writeable_ref(c.get(ID_name)));
+          add_method_body(&symbol_table.get_writeable_ref(c.get_name()));
           break;
         }
       }

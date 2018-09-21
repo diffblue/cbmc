@@ -515,7 +515,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       false,
       false);
 
-    return lookup(to_struct_type(symb.type).components().back().get(ID_name));
+    return lookup(to_struct_type(symb.type).components().back().get_name());
   }
 
   // not a class template, not a class template method,

@@ -211,7 +211,7 @@ void cpp_typecheckt::zero_initializer(
       if(component.get_bool(ID_is_static))
         continue;
 
-      member_exprt member(object, component.get(ID_name), component.type());
+      member_exprt member(object, component.get_name(), component.type());
 
       // recursive call
       zero_initializer(member, component.type(), source_location, ops);

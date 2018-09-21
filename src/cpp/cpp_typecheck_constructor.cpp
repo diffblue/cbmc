@@ -310,7 +310,7 @@ void cpp_typecheckt::default_cpctor(
       already_typechecked(address);
 
       exprt ptrmember(ID_ptrmember);
-      ptrmember.set(ID_component_name, mem_c.get(ID_name));
+      ptrmember.set(ID_component_name, mem_c.get_name());
       ptrmember.operands().push_back(exprt("cpp-this"));
 
       code_assignt assign(ptrmember, address);
@@ -835,7 +835,7 @@ void cpp_typecheckt::full_member_initialization(
       already_typechecked(address);
 
       exprt ptrmember(ID_ptrmember);
-      ptrmember.set(ID_component_name, c.get(ID_name));
+      ptrmember.set(ID_component_name, c.get_name());
       ptrmember.operands().push_back(exprt("cpp-this"));
 
       code_assignt assign(ptrmember, address);

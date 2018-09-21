@@ -440,11 +440,12 @@ void value_sett::get_value_set_rec(
         const struct_union_typet &struct_union_type=
           to_struct_union_type(expr_type);
 
-        const std::string first_component_name=
-          struct_union_type.components().front().get_string(ID_name);
+        const irep_idt &first_component_name =
+          struct_union_type.components().front().get_name();
 
-        v_it=values.find(
-            id2string(identifier)+"."+first_component_name+suffix);
+        v_it = values.find(
+          id2string(identifier) + "." + id2string(first_component_name) +
+          suffix);
       }
 
       // not found? try without suffix
@@ -1180,7 +1181,7 @@ void value_sett::assign(
         c_it++)
     {
       const typet &subtype=c_it->type();
-      const irep_idt &name=c_it->get(ID_name);
+      const irep_idt &name = c_it->get_name();
 
       // ignore methods and padding
       if(subtype.id()==ID_code ||

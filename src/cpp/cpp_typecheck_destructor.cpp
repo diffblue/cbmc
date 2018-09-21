@@ -98,7 +98,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
       already_typechecked(address);
 
       exprt ptrmember(ID_ptrmember);
-      ptrmember.set(ID_component_name, c.get(ID_name));
+      ptrmember.set(ID_component_name, c.get_name());
       ptrmember.operands().push_back(exprt("cpp-this"));
 
       code_assignt assign(ptrmember, address);
