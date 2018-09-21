@@ -1066,6 +1066,13 @@ goto_checkt::address_check(const exprt &address, const exprt &size, bool write)
         "invalid integer address"));
     }
 
+    if(flags.is_string_constant() && write)
+    {
+      conditions.push_back(conditiont(
+        false_exprt(),
+        "string constant modified"));
+    }
+
     return conditions;
   }
 }
