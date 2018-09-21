@@ -65,8 +65,8 @@ void show_vcc_plain(
         {
           out << "{-" << count << "} " << format(p_it->cond_expr) << '\n';
 
-#if 0
-          out << "GUARD: " << format(p_it->guard_expr) << '\n';
+#ifdef DEBUG
+          out << "GUARD: " << format(p_it->guard) << '\n';
           out << '\n';
 #endif
 
