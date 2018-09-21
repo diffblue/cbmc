@@ -12,14 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "std_expr.h"
 
-string_constantt::string_constantt():
-  exprt(ID_string_constant)
+string_constantt::string_constantt() : nullary_exprt(ID_string_constant)
 {
   set_value(irep_idt());
 }
 
-string_constantt::string_constantt(const irep_idt &_value):
-  exprt(ID_string_constant)
+string_constantt::string_constantt(const irep_idt &_value)
+  : nullary_exprt(ID_string_constant)
 {
   set_value(_value);
 }

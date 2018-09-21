@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "expr.h"
 
-class string_constantt:public exprt
+class string_constantt : public nullary_exprt
 {
 public:
   DEPRECATED("use string_constantt(value) instead")

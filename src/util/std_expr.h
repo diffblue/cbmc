@@ -18,6 +18,42 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mathematical_types.h"
 #include "std_types.h"
 
+/// An expression without operands
+class nullary_exprt : public exprt
+{
+public:
+  // constructors
+  DEPRECATED("use nullary_exprt(id, type) instead")
+  explicit nullary_exprt(const irep_idt &_id) : exprt(_id)
+  {
+  }
+
+  nullary_exprt(const irep_idt &_id, const typet &_type) : exprt(_id, _type)
+  {
+  }
+
+  /// remove all operand methods
+  operandst &operands() = delete;
+  const operandst &operands() const = delete;
+
+  const exprt &op0() const = delete;
+  exprt &op0() = delete;
+  const exprt &op1() const = delete;
+  exprt &op1() = delete;
+  const exprt &op2() const = delete;
+  exprt &op2() = delete;
+  const exprt &op3() const = delete;
+  exprt &op3() = delete;
+
+  void move_to_operands(exprt &) = delete;
+  void move_to_operands(exprt &, exprt &) = delete;
+  void move_to_operands(exprt &, exprt &, exprt &) = delete;
+
+  void copy_to_operands(const exprt &expr) = delete;
+  void copy_to_operands(const exprt &, const exprt &) = delete;
+  void copy_to_operands(const exprt &, const exprt &, const exprt &) = delete;
+};
+
 /// Transition system, consisting of state invariant, initial state predicate,
 /// and transition predicate.
 class transt:public exprt
@@ -72,31 +108,30 @@ inline void validate_expr(const transt &value)
 
 
 /// Expression to hold a symbol (variable)
-class symbol_exprt:public exprt
+class symbol_exprt : public nullary_exprt
 {
 public:
   DEPRECATED("use symbol_exprt(identifier, type) instead")
-  symbol_exprt():exprt(ID_symbol)
+  symbol_exprt() : nullary_exprt(ID_symbol)
   {
   }
 
   /// \param identifier: Name of symbol
   DEPRECATED("use symbol_exprt(identifier, type) instead")
-  explicit symbol_exprt(const irep_idt &identifier):exprt(ID_symbol)
+  explicit symbol_exprt(const irep_idt &identifier) : nullary_exprt(ID_symbol)
   {
     set_identifier(identifier);
   }
 
   /// \param type: Type of symbol
-  explicit symbol_exprt(const typet &type):exprt(ID_symbol, type)
+  explicit symbol_exprt(const typet &type) : nullary_exprt(ID_symbol, type)
   {
   }
 
   /// \param identifier: Name of symbol
   /// \param type: Type of symbol
-  symbol_exprt(
-    const irep_idt &identifier,
-    const typet &type):exprt(ID_symbol, type)
+  symbol_exprt(const irep_idt &identifier, const typet &type)
+    : nullary_exprt(ID_symbol, type)
   {
     set_identifier(identifier);
   }
@@ -137,7 +172,7 @@ public:
   }
 
   /// \param identifier: Name of symbol
-  /// \param : type Type of symbol
+  /// \param type: Type of symbol
   decorated_symbol_exprt(
     const irep_idt &identifier,
     const typet &type):symbol_exprt(identifier, type)
@@ -207,14 +242,13 @@ inline void validate_expr(const symbol_exprt &value)
 
 
 /// \brief Expression to hold a nondeterministic choice
-class nondet_symbol_exprt:public exprt
+class nondet_symbol_exprt : public nullary_exprt
 {
 public:
   /// \param identifier: Name of symbol
   /// \param type: Type of symbol
-  nondet_symbol_exprt(
-    const irep_idt &identifier,
-    const typet &type):exprt(ID_nondet_symbol, type)
+  nondet_symbol_exprt(const irep_idt &identifier, const typet &type)
+    : nullary_exprt(ID_nondet_symbol, type)
   {
     set_identifier(identifier);
   }
@@ -4141,15 +4175,15 @@ inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
 
 
 /// \brief An expression denoting a type
-class type_exprt:public exprt
+class type_exprt : public nullary_exprt
 {
 public:
   DEPRECATED("use type_exprt(type) instead")
-  type_exprt():exprt(ID_type)
+  type_exprt() : nullary_exprt(ID_type)
   {
   }
 
-  explicit type_exprt(const typet &type):exprt(ID_type, type)
+  explicit type_exprt(const typet &type) : nullary_exprt(ID_type, type)
   {
   }
 };
@@ -4232,10 +4266,11 @@ public:
 };
 
 /// \brief The NIL expression
-class nil_exprt:public exprt
+class nil_exprt : public nullary_exprt
 {
 public:
-  nil_exprt():exprt(static_cast<const exprt &>(get_nil_irep()))
+  nil_exprt()
+    : nullary_exprt(static_cast<const nullary_exprt &>(get_nil_irep()))
   {
   }
 };
@@ -4402,11 +4437,11 @@ template<> inline bool can_cast_expr<concatenation_exprt>(const exprt &base)
 
 
 /// \brief An expression denoting infinity
-class infinity_exprt:public exprt
+class infinity_exprt : public nullary_exprt
 {
 public:
-  explicit infinity_exprt(const typet &_type):
-    exprt(ID_infinity, _type)
+  explicit infinity_exprt(const typet &_type)
+    : nullary_exprt(ID_infinity, _type)
   {
   }
 };
