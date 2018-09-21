@@ -514,7 +514,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     {
       for(const auto &c : to_struct_type(t0).components())
       {
-        if(!c.get_bool(ID_from_base) && c.get(ID_base_name) == op_name)
+        if(!c.get_bool(ID_from_base) && c.get_base_name() == op_name)
         {
           found_in_struct=true;
           break;

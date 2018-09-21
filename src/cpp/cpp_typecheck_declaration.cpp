@@ -80,7 +80,7 @@ void cpp_typecheckt::convert_anonymous_union(
       throw 0;
     }
 
-    const irep_idt &base_name = c.get(ID_base_name);
+    const irep_idt &base_name = c.get_base_name();
 
     if(cpp_scopes.current_scope().contains(base_name))
     {

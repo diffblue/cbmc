@@ -17,7 +17,7 @@ bool cpp_typecheckt::find_dtor(const symbolt &symbol) const
 {
   for(const auto &c : to_struct_type(symbol.type).components())
   {
-    if(c.get(ID_base_name) == "~" + id2string(symbol.base_name))
+    if(c.get_base_name() == "~" + id2string(symbol.base_name))
       return true;
   }
 
@@ -79,7 +79,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
     if(c.get_bool("is_vtptr"))
     {
       exprt name(ID_name);
-      name.set(ID_identifier, c.get(ID_base_name));
+      name.set(ID_identifier, c.get_base_name());
 
       cpp_namet cppname;
       cppname.move_to_sub(name);
@@ -124,7 +124,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
       continue;
 
     irept name(ID_name);
-    name.set(ID_identifier, cit->get(ID_base_name));
+    name.set(ID_identifier, cit->get_base_name());
     name.set(ID_C_source_location, source_location);
 
     cpp_namet cppname;

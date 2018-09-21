@@ -183,7 +183,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
     code_blockt block;
     for(const auto &component : struct_type.components())
     {
-      if(component.get(ID_base_name)!="@most_derived")
+      if(component.get_base_name() != "@most_derived")
         continue;
 
       member_exprt member(object_tc, component.get(ID_name), bool_typet());
@@ -220,7 +220,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
         !c.get_bool(ID_from_base) && type.id() == ID_code &&
         type.find(ID_return_type).id() == ID_constructor)
       {
-        constructor_name = c.get(ID_base_name);
+        constructor_name = c.get_base_name();
         break;
       }
     }
