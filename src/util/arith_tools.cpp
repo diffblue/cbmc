@@ -113,9 +113,7 @@ constant_exprt from_integer(
 
   if(type_id==ID_integer)
   {
-    constant_exprt result(type);
-    result.set_value(integer2string(int_value));
-    return result;
+    return constant_exprt(integer2string(int_value), type);
   }
   else if(type_id==ID_natural)
   {
@@ -125,45 +123,34 @@ constant_exprt from_integer(
       r.make_nil();
       return r;
     }
-    constant_exprt result(type);
-    result.set_value(integer2string(int_value));
-    return result;
+
+    return constant_exprt(integer2string(int_value), type);
   }
   else if(type_id==ID_unsignedbv)
   {
     std::size_t width=to_unsignedbv_type(type).get_width();
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_bv)
   {
     std::size_t width=to_bv_type(type).get_width();
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_signedbv)
   {
     std::size_t width=to_signedbv_type(type).get_width();
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_c_enum)
   {
     const std::size_t width =
       to_c_enum_type(type).subtype().get_size_t(ID_width);
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_c_bool)
   {
     std::size_t width=to_c_bool_type(type).get_width();
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_bool)
   {
@@ -180,9 +167,7 @@ constant_exprt from_integer(
   else if(type_id==ID_c_bit_field)
   {
     std::size_t width=to_c_bit_field_type(type).get_width();
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_fixedbv)
   {

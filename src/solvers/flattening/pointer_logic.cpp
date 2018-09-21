@@ -80,30 +80,24 @@ exprt pointer_logict::pointer_expr(
   {
     if(pointer.offset==0)
     {
-      constant_exprt result(type);
-      result.set_value(ID_NULL);
+      null_pointer_exprt result(type);
       return result;
     }
     else
     {
-      constant_exprt null(type);
-      null.set_value(ID_NULL);
+      null_pointer_exprt null(type);
       return plus_exprt(null,
         from_integer(pointer.offset, pointer_diff_type()));
     }
   }
   else if(pointer.object==invalid_object) // INVALID?
   {
-    constant_exprt result(type);
-    result.set_value("INVALID");
-    return result;
+    return constant_exprt("INVALID", type);
   }
 
   if(pointer.object>=objects.size())
   {
-    constant_exprt result(type);
-    result.set_value("INVALID-"+std::to_string(pointer.object));
-    return result;
+    return constant_exprt("INVALID-" + std::to_string(pointer.object), type);
   }
 
   const exprt &object_expr=objects[pointer.object];

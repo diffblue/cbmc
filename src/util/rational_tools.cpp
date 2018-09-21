@@ -83,8 +83,5 @@ constant_exprt from_rational(const rationalt &a)
   std::string d=integer2string(a.get_numerator());
   if(a.get_denominator()!=1)
     d+="/"+integer2string(a.get_denominator());
-  constant_exprt result;
-  result.type()=rational_typet();
-  result.set_value(d);
-  return result;
+  return constant_exprt(d, rational_typet());
 }
