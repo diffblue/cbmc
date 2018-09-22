@@ -3018,12 +3018,11 @@ void c_typecheck_baset::typecheck_expr_unary_boolean(exprt &expr)
 
   implicit_typecast_bool(operand);
 
-  // This is not quite accurate: the standard says the result
-  // should be of type 'int'.
-  // We do 'bool' anyway to get more compact formulae. Eventually,
-  // this should be achieved by means of simplification, and not
-  // in the frontend.
+  // Note that the standard says the result should be of type 'int',
+  // and not 'bool', as one might believe. We achieve this using a cast.
+  // Note that these are 'bool' in C++.
   expr.type()=bool_typet();
+  implicit_typecast(expr, signed_int_type());
 }
 
 bool c_typecheck_baset::gcc_vector_types_compatible(
@@ -3371,12 +3370,10 @@ void c_typecheck_baset::typecheck_expr_binary_boolean(exprt &expr)
   implicit_typecast_bool(expr.op0());
   implicit_typecast_bool(expr.op1());
 
-  // This is not quite accurate: the standard says the result
-  // should be of type 'int'.
-  // We do 'bool' anyway to get more compact formulae. Eventually,
-  // this should be achieved by means of simplification, and not
-  // in the frontend.
+  // Note that the standard says the result should be of type 'int',
+  // and not 'bool', as one might believe. We achieve this using a cast.
   expr.type()=bool_typet();
+  implicit_typecast(expr, signed_int_type());
 }
 
 void c_typecheck_baset::typecheck_side_effect_assignment(
