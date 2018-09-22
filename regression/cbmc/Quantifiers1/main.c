@@ -8,6 +8,9 @@ int main()
   // ACSL style
   assert(\forall int i; ((i>=0 && i<10) ==> (zero_array[i]==0)));
 
+  // the operand gets converted implicitly to bool
+  assert(\forall int i; 2);
+
   const unsigned N=10;
   unsigned i=0;
   char c[N];
