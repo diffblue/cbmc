@@ -18,15 +18,82 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mathematical_types.h"
 #include "std_types.h"
 
-/// Transition system, consisting of state invariant, initial state predicate,
-/// and transition predicate.
-class transt:public exprt
+/// An expression without operands
+class nullary_exprt : public exprt
 {
 public:
-  transt()
+  // constructors
+  DEPRECATED("use nullary_exprt(id, type) instead")
+  explicit nullary_exprt(const irep_idt &_id) : exprt(_id)
   {
-    id(ID_trans);
+  }
+
+  nullary_exprt(const irep_idt &_id, const typet &_type) : exprt(_id, _type)
+  {
+  }
+
+  /// remove all operand methods
+  operandst &operands() = delete;
+  const operandst &operands() const = delete;
+
+  const exprt &op0() const = delete;
+  exprt &op0() = delete;
+  const exprt &op1() const = delete;
+  exprt &op1() = delete;
+  const exprt &op2() const = delete;
+  exprt &op2() = delete;
+  const exprt &op3() const = delete;
+  exprt &op3() = delete;
+
+  void move_to_operands(exprt &) = delete;
+  void move_to_operands(exprt &, exprt &) = delete;
+  void move_to_operands(exprt &, exprt &, exprt &) = delete;
+
+  void copy_to_operands(const exprt &expr) = delete;
+  void copy_to_operands(const exprt &, const exprt &) = delete;
+  void copy_to_operands(const exprt &, const exprt &, const exprt &) = delete;
+};
+
+/// An expression with three operands
+class ternary_exprt : public exprt
+{
+public:
+  // constructors
+  DEPRECATED("use ternary_exprt(id, op0, op1, op2, type) instead")
+  explicit ternary_exprt(const irep_idt &_id) : exprt(_id)
+  {
     operands().resize(3);
+  }
+
+  DEPRECATED("use ternary_exprt(id, op0, op1, op2, type) instead")
+  explicit ternary_exprt(const irep_idt &_id, const typet &_type)
+    : exprt(_id, _type)
+  {
+    operands().resize(3);
+  }
+
+  ternary_exprt(
+    const irep_idt &_id,
+    const exprt &_op0,
+    const exprt &_op1,
+    const exprt &_op2,
+    const typet &_type)
+    : exprt(_id, _type)
+  {
+    copy_to_operands(_op0, _op1, _op2);
+  }
+
+  const exprt &op3() const = delete;
+  exprt &op3() = delete;
+};
+
+/// Transition system, consisting of state invariant, initial state predicate,
+/// and transition predicate.
+class transt : public ternary_exprt
+{
+public:
+  transt() : ternary_exprt(ID_trans)
+  {
   }
 
   exprt &invar() { return op0(); }
@@ -72,31 +139,30 @@ inline void validate_expr(const transt &value)
 
 
 /// Expression to hold a symbol (variable)
-class symbol_exprt:public exprt
+class symbol_exprt : public nullary_exprt
 {
 public:
   DEPRECATED("use symbol_exprt(identifier, type) instead")
-  symbol_exprt():exprt(ID_symbol)
+  symbol_exprt() : nullary_exprt(ID_symbol)
   {
   }
 
   /// \param identifier: Name of symbol
   DEPRECATED("use symbol_exprt(identifier, type) instead")
-  explicit symbol_exprt(const irep_idt &identifier):exprt(ID_symbol)
+  explicit symbol_exprt(const irep_idt &identifier) : nullary_exprt(ID_symbol)
   {
     set_identifier(identifier);
   }
 
   /// \param type: Type of symbol
-  explicit symbol_exprt(const typet &type):exprt(ID_symbol, type)
+  explicit symbol_exprt(const typet &type) : nullary_exprt(ID_symbol, type)
   {
   }
 
   /// \param identifier: Name of symbol
   /// \param type: Type of symbol
-  symbol_exprt(
-    const irep_idt &identifier,
-    const typet &type):exprt(ID_symbol, type)
+  symbol_exprt(const irep_idt &identifier, const typet &type)
+    : nullary_exprt(ID_symbol, type)
   {
     set_identifier(identifier);
   }
@@ -137,7 +203,7 @@ public:
   }
 
   /// \param identifier: Name of symbol
-  /// \param : type Type of symbol
+  /// \param type: Type of symbol
   decorated_symbol_exprt(
     const irep_idt &identifier,
     const typet &type):symbol_exprt(identifier, type)
@@ -207,14 +273,13 @@ inline void validate_expr(const symbol_exprt &value)
 
 
 /// \brief Expression to hold a nondeterministic choice
-class nondet_symbol_exprt:public exprt
+class nondet_symbol_exprt : public nullary_exprt
 {
 public:
   /// \param identifier: Name of symbol
-  /// \param : type Type of symbol
-  nondet_symbol_exprt(
-    const irep_idt &identifier,
-    const typet &type):exprt(ID_nondet_symbol, type)
+  /// \param type: Type of symbol
+  nondet_symbol_exprt(const irep_idt &identifier, const typet &type)
+    : nullary_exprt(ID_nondet_symbol, type)
   {
     set_identifier(identifier);
   }
@@ -310,6 +375,13 @@ public:
   {
     return op0();
   }
+
+  const exprt &op1() const = delete;
+  exprt &op1() = delete;
+  const exprt &op2() const = delete;
+  exprt &op2() = delete;
+  const exprt &op3() const = delete;
+  exprt &op3() = delete;
 };
 
 /// \brief Cast an exprt to a \ref unary_exprt
@@ -666,8 +738,10 @@ public:
     copy_to_operands(_lhs, _rhs);
   }
 
-protected:
-  using exprt::op2; // hide
+  const exprt &op2() const = delete;
+  exprt &op2() = delete;
+  const exprt &op3() const = delete;
+  exprt &op3() = delete;
 };
 
 /// \brief Cast an exprt to a \ref binary_exprt
@@ -3186,29 +3260,22 @@ inline void validate_expr(const dereference_exprt &value)
 
 
 /// \brief The trinary if-then-else operator
-class if_exprt:public exprt
+class if_exprt : public ternary_exprt
 {
 public:
-  if_exprt(const exprt &cond, const exprt &t, const exprt &f):
-    exprt(ID_if, t.type())
+  if_exprt(const exprt &cond, const exprt &t, const exprt &f)
+    : ternary_exprt(ID_if, cond, t, f, t.type())
   {
-    copy_to_operands(cond, t, f);
   }
 
-  if_exprt(
-    const exprt &cond,
-    const exprt &t,
-    const exprt &f,
-    const typet &type):
-    exprt(ID_if, type)
+  if_exprt(const exprt &cond, const exprt &t, const exprt &f, const typet &type)
+    : ternary_exprt(ID_if, cond, t, f, type)
   {
-    copy_to_operands(cond, t, f);
   }
 
   DEPRECATED("use if_exprt(cond, t, f) instead")
-  if_exprt():exprt(ID_if)
+  if_exprt() : ternary_exprt(ID_if)
   {
-    operands().resize(3);
   }
 
   exprt &cond()
@@ -3473,29 +3540,25 @@ inline void validate_expr(const member_designatort &value)
 
 
 /// \brief Operator to update elements in structs and arrays
-class update_exprt:public exprt
+class update_exprt : public ternary_exprt
 {
 public:
   update_exprt(
     const exprt &_old,
     const exprt &_designator,
-    const exprt &_new_value):
-    exprt(ID_update, _old.type())
+    const exprt &_new_value)
+    : ternary_exprt(ID_update, _old, _designator, _new_value, _old.type())
   {
-    copy_to_operands(_old, _designator, _new_value);
   }
 
   DEPRECATED("use update_exprt(old, where, new_value) instead")
-  explicit update_exprt(const typet &_type):
-    exprt(ID_update, _type)
+  explicit update_exprt(const typet &_type) : ternary_exprt(ID_update, _type)
   {
-    operands().resize(3);
   }
 
   DEPRECATED("use update_exprt(old, where, new_value) instead")
-  update_exprt():exprt(ID_update)
+  update_exprt() : ternary_exprt(ID_update)
   {
-    operands().resize(3);
     op1().id(ID_designator);
   }
 
@@ -4132,15 +4195,15 @@ inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
 
 
 /// \brief An expression denoting a type
-class type_exprt:public exprt
+class type_exprt : public nullary_exprt
 {
 public:
   DEPRECATED("use type_exprt(type) instead")
-  type_exprt():exprt(ID_type)
+  type_exprt() : nullary_exprt(ID_type)
   {
   }
 
-  explicit type_exprt(const typet &type):exprt(ID_type, type)
+  explicit type_exprt(const typet &type) : nullary_exprt(ID_type, type)
   {
   }
 };
@@ -4223,10 +4286,11 @@ public:
 };
 
 /// \brief The NIL expression
-class nil_exprt:public exprt
+class nil_exprt : public nullary_exprt
 {
 public:
-  nil_exprt():exprt(static_cast<const exprt &>(get_nil_irep()))
+  nil_exprt()
+    : nullary_exprt(static_cast<const nullary_exprt &>(get_nil_irep()))
   {
   }
 };
@@ -4393,11 +4457,11 @@ template<> inline bool can_cast_expr<concatenation_exprt>(const exprt &base)
 
 
 /// \brief An expression denoting infinity
-class infinity_exprt:public exprt
+class infinity_exprt : public nullary_exprt
 {
 public:
-  explicit infinity_exprt(const typet &_type):
-    exprt(ID_infinity, _type)
+  explicit infinity_exprt(const typet &_type)
+    : nullary_exprt(ID_infinity, _type)
   {
   }
 };

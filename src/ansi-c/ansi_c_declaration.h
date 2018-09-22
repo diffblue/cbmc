@@ -14,12 +14,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/std_expr.h>
 #include <util/symbol.h>
 
-class ansi_c_declaratort:public exprt
+class ansi_c_declaratort : public nullary_exprt
 {
 public:
-  ansi_c_declaratort():exprt(ID_declarator)
+  ansi_c_declaratort() : nullary_exprt(ID_declarator)
   {
   }
 
