@@ -211,7 +211,7 @@ class nondet_symbol_exprt:public exprt
 {
 public:
   /// \param identifier: Name of symbol
-  /// \param : type Type of symbol
+  /// \param type: Type of symbol
   nondet_symbol_exprt(
     const irep_idt &identifier,
     const typet &type):exprt(ID_nondet_symbol, type)
