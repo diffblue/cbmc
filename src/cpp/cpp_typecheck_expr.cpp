@@ -1178,8 +1178,9 @@ void cpp_typecheckt::typecheck_expr_member(
 
     if(symbol_expr.id()==ID_symbol)
     {
-      if(symbol_expr.type().id()==ID_code &&
-         symbol_expr.type().get(ID_return_type)==ID_constructor)
+      if(
+        symbol_expr.type().id() == ID_code &&
+        to_code_type(symbol_expr.type()).return_type().id() == ID_constructor)
       {
         error().source_location=expr.find_source_location();
         error() << "error: member `"
@@ -1866,7 +1867,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
     if(symbol_expr.operands().empty() ||
        symbol_expr.op0().is_nil())
     {
-      if(symbol_expr.type().get(ID_return_type)!=ID_constructor)
+      if(to_code_type(symbol_expr.type()).return_type().id() != ID_constructor)
       {
         if(cpp_scopes.current_scope().this_expr.is_nil())
         {
@@ -2201,7 +2202,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
         if(
           !c.get_bool(ID_from_base) && type.id() == ID_code &&
-          type.find(ID_return_type).id() == ID_destructor)
+          to_code_type(type).return_type().id() == ID_destructor)
         {
           add_method_body(&symbol_table.get_writeable_ref(c.get(ID_name)));
           break;

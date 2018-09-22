@@ -91,7 +91,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     return;
 
   // if it is a destructor, add the implicit code
-  if(symbol.type.get(ID_return_type)==ID_destructor)
+  if(to_code_type(symbol.type).return_type().id() == ID_destructor)
   {
     const symbolt &msymb=lookup(symbol.type.get(ID_C_member_name));
 

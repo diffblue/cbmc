@@ -131,7 +131,7 @@ symbolt &cpp_declarator_convertert::convert(
 
     // If it is a constructor, we take care of the
     // object initialization
-    if(final_type.get(ID_return_type)==ID_constructor)
+    if(to_code_type(final_type).return_type().id() == ID_constructor)
     {
       const cpp_namet &name=declarator.name();
 
@@ -326,11 +326,10 @@ void cpp_declarator_convertert::handle_initializer(
 {
   exprt &value=declarator.value();
 
-  // moves member initializers into 'value'
-  cpp_typecheck.move_member_initializers(
-    declarator.member_initializers(),
-    symbol.type,
-    value);
+  // moves member initializers into 'value' - only methods have these
+  if(symbol.type.id() == ID_code)
+    cpp_typecheck.move_member_initializers(
+      declarator.member_initializers(), to_code_type(symbol.type), value);
 
   // any initializer to be done?
   if(value.is_nil())

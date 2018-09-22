@@ -218,7 +218,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
 
       if(
         !c.get_bool(ID_from_base) && type.id() == ID_code &&
-        type.find(ID_return_type).id() == ID_constructor)
+        to_code_type(type).return_type().id() == ID_constructor)
       {
         constructor_name = c.get(ID_base_name);
         break;

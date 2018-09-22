@@ -490,7 +490,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     if(has_volatile(method_qualifier))
       virtual_name += "$volatile";
 
-    if(component.type().get(ID_return_type)==ID_destructor)
+    if(to_code_type(component.type()).return_type().id() == ID_destructor)
       virtual_name="@dtor";
 
     // The method may be virtual implicitly.
@@ -802,7 +802,7 @@ void cpp_typecheckt::put_compound_into_scope(
     id.class_identifier=cpp_scopes.current_scope().identifier;
     id.is_member=true;
     id.is_constructor =
-      compound.find(ID_type).get(ID_return_type)==ID_constructor;
+      to_code_type(compound.type()).return_type().id() == ID_constructor;
     id.is_method=true;
     id.is_static_member=compound.get_bool(ID_is_static);
 
@@ -1226,12 +1226,9 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
 void cpp_typecheckt::move_member_initializers(
   irept &initializers,
-  const typet &type,
+  const code_typet &type,
   exprt &value)
 {
-  bool is_constructor=
-    type.find(ID_return_type).id()==ID_constructor;
-
   // see if we have initializers
   if(!initializers.get_sub().empty())
   {
@@ -1239,7 +1236,7 @@ void cpp_typecheckt::move_member_initializers(
       static_cast<const source_locationt &>(
         initializers.find(ID_C_source_location));
 
-    if(!is_constructor)
+    if(type.return_type().id() != ID_constructor)
     {
       error().source_location=location;
       error() << "only constructors are allowed to "
@@ -1275,7 +1272,7 @@ void cpp_typecheckt::typecheck_member_function(
 {
   symbolt symbol;
 
-  typet &type=component.type();
+  code_typet &type = to_code_type(component.type());
 
   if(component.get_bool(ID_is_static))
   {
