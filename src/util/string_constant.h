@@ -15,7 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class string_constantt:public exprt
 {
 public:
+  DEPRECATED("use string_constantt(value) instead")
   string_constantt();
+
   explicit string_constantt(const irep_idt &value);
 
   void set_value(const irep_idt &value);
