@@ -45,7 +45,7 @@ bool static_show_domain(
   }
   else
   {
-    INVARIANT(options.get_bool_option("text"), "Other output formats handled");
+    // 'text' or console output
     ai.output(goto_model, out);
   }
 

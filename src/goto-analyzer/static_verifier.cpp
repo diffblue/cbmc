@@ -143,10 +143,8 @@ bool static_verifier(
     m.status() << "Writing XML report" << messaget::eom;
     out << xml_result;
   }
-  else
+  else if(options.get_bool_option("text"))
   {
-    INVARIANT(options.get_bool_option("text"), "Other output formats handled");
-
     forall_goto_functions(f_it, goto_model.goto_functions)
     {
       m.progress() << "Checking " << f_it->first << messaget::eom;
@@ -201,6 +199,62 @@ bool static_verifier(
       }
 
       out << '\n';
+    }
+  }
+  else
+  {
+    forall_goto_functions(f_it, goto_model.goto_functions)
+    {
+      if(!f_it->second.body.has_assertion())
+        continue;
+
+      m.result() << "******** Function " << f_it->first << messaget::eom;
+
+      forall_goto_program_instructions(i_it, f_it->second.body)
+      {
+        if(!i_it->is_assert())
+          continue;
+
+        exprt e(i_it->guard);
+        auto dp = ai.abstract_state_before(i_it);
+        const ai_domain_baset &domain(*dp);
+        domain.ai_simplify(e, ns);
+
+        m.result() << '[' << i_it->source_location.get_property_id() << ']'
+                   << ' ';
+
+        m.result() << i_it->source_location;
+
+        if(!i_it->source_location.get_comment().empty())
+          m.result() << ", " << i_it->source_location.get_comment();
+
+        m.result() << ": ";
+
+        if(e.is_true())
+        {
+          m.result() << "Success";
+          pass++;
+        }
+        else if(e.is_false())
+        {
+          m.result() << "Failure (if reachable)";
+          fail++;
+        }
+        else if(domain.is_bottom())
+        {
+          m.result() << "Success (unreachable)";
+          pass++;
+        }
+        else
+        {
+          m.result() << "Unknown";
+          unknown++;
+        }
+
+        m.result() << messaget::eom;
+      }
+
+      m.result() << messaget::eom;
     }
   }
 
