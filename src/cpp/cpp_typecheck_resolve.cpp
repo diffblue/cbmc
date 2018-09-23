@@ -624,14 +624,14 @@ void cpp_typecheck_resolvet::make_constructors(
       // 1. no arguments, default initialization
       {
         const code_typet t1({}, it->type());
-        exprt pod_constructor1("pod_constructor", t1);
+        exprt pod_constructor1(ID_pod_constructor, t1);
         new_identifiers.push_back(pod_constructor1);
       }
 
       // 2. one argument, copy/conversion
       {
         const code_typet t2({code_typet::parametert(it->type())}, it->type());
-        exprt pod_constructor2("pod_constructor", t2);
+        exprt pod_constructor2(ID_pod_constructor, t2);
         new_identifiers.push_back(pod_constructor2);
       }
 
@@ -639,7 +639,7 @@ void cpp_typecheck_resolvet::make_constructors(
       if(symbol_type.id()==ID_c_enum_tag)
       {
         const code_typet t3({code_typet::parametert(signed_int_type())}, it->type());
-        exprt pod_constructor3("pod_constructor", t3);
+        exprt pod_constructor3(ID_pod_constructor, t3);
         new_identifiers.push_back(pod_constructor3);
       }
     }
@@ -655,7 +655,9 @@ void cpp_typecheck_resolvet::make_constructors(
         if(component.get_bool(ID_from_base))
           continue;
 
-        if(type.find(ID_return_type).id()==ID_constructor)
+        if(
+          type.id() == ID_code &&
+          to_code_type(type).return_type().id() == ID_constructor)
         {
           const symbolt &symb =
             cpp_typecheck.lookup(component.get_name());
@@ -674,7 +676,7 @@ void cpp_typecheck_resolvet::resolve_argument(
   exprt &argument,
   const cpp_typecheck_fargst &fargs)
 {
-  if(argument.id()=="ambiguous") // could come from a template parameter
+  if(argument.id() == ID_ambiguous) // could come from a template parameter
   {
     // this must be resolved in the template scope
     cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
@@ -1104,8 +1106,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
     const irep_idt id=(*it)->identifier;
     const symbolt &s=cpp_typecheck.lookup(id);
 
-    irep_idt specialization_of=s.type.get("specialization_of");
-    if(specialization_of=="")
+    if(s.type.get(ID_specialization_of).empty())
       continue;
 
     const cpp_declarationt &cpp_declaration=
@@ -1320,7 +1321,7 @@ void cpp_typecheck_resolvet::show_identifiers(
         out << "member ";
         id="."+id2string(base_name);
       }
-      else if(id_expr.id()=="pod_constructor")
+      else if(id_expr.id() == ID_pod_constructor)
       {
         out << "constructor ";
         id="";
@@ -1698,7 +1699,7 @@ exprt cpp_typecheck_resolvet::resolve(
 
     cpp_typecheck.error().source_location=result.source_location());
     cpp_typecheck.str
-      << "error: member `" << result.get("component_name").c_str()
+      << "error: member `" << result.get(ID_component_name)
       << "' is not accessible";
     throw 0;
     #endif

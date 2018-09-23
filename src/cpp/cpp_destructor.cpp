@@ -38,7 +38,7 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
     const exprt &size_expr=
       to_array_type(tmp_type).size();
 
-    if(size_expr.id()=="infinity")
+    if(size_expr.id() == ID_infinity)
       return {}; // don't initialize
 
     exprt tmp_size=size_expr;
@@ -92,7 +92,7 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
 
       if(
         !c.get_bool(ID_from_base) && type.id() == ID_code &&
-        type.find(ID_return_type).id() == ID_destructor)
+        to_code_type(type).return_type().id() == ID_destructor)
       {
         dtor_name = c.get_base_name();
         break;

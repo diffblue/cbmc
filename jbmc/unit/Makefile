@@ -39,6 +39,7 @@ SRC += java_bytecode/ci_lazy_methods/lazy_load_lambdas.cpp \
        java_bytecode/java_bytecode_parser/parse_java_annotations.cpp \
        java_bytecode/java_bytecode_parser/parse_java_attributes.cpp \
        java_bytecode/java_bytecode_parser/parse_java_class.cpp \
+       java_bytecode/java_bytecode_parser/parse_java_field.cpp \
        java_bytecode/java_object_factory/gen_nondet_string_init.cpp \
        java_bytecode/java_replace_nondet/replace_nondet.cpp \
        java_bytecode/java_string_library_preprocess/convert_exprt_to_string_exprt.cpp \

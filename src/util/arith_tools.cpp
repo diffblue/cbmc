@@ -113,76 +113,56 @@ constant_exprt from_integer(
 
   if(type_id==ID_integer)
   {
-    constant_exprt result(type);
-    result.set_value(integer2string(int_value));
-    return result;
+    return constant_exprt(integer2string(int_value), type);
   }
   else if(type_id==ID_natural)
   {
-    if(int_value<0)
-    {
-      constant_exprt r;
-      r.make_nil();
-      return r;
-    }
-    constant_exprt result(type);
-    result.set_value(integer2string(int_value));
-    return result;
+    PRECONDITION(int_value >= 0);
+    return constant_exprt(integer2string(int_value), type);
   }
   else if(type_id==ID_unsignedbv)
   {
     std::size_t width=to_unsignedbv_type(type).get_width();
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_bv)
   {
     std::size_t width=to_bv_type(type).get_width();
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_signedbv)
   {
     std::size_t width=to_signedbv_type(type).get_width();
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_c_enum)
   {
     const std::size_t width =
       to_c_enum_type(type).subtype().get_size_t(ID_width);
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_c_bool)
   {
     std::size_t width=to_c_bool_type(type).get_width();
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_bool)
   {
-    if(int_value==0)
+    PRECONDITION(int_value == 0 || int_value == 1);
+    if(int_value == 0)
       return false_exprt();
-    else if(int_value==1)
+    else
       return true_exprt();
   }
   else if(type_id==ID_pointer)
   {
-    if(int_value==0)
-      return null_pointer_exprt(to_pointer_type(type));
+    PRECONDITION(int_value == 0);
+    return null_pointer_exprt(to_pointer_type(type));
   }
   else if(type_id==ID_c_bit_field)
   {
     std::size_t width=to_c_bit_field_type(type).get_width();
-    constant_exprt result(type);
-    result.set_value(integer2binary(int_value, width));
-    return result;
+    return constant_exprt(integer2binary(int_value, width), type);
   }
   else if(type_id==ID_fixedbv)
   {
@@ -197,13 +177,8 @@ constant_exprt from_integer(
     ieee_float.from_integer(int_value);
     return ieee_float.to_expr();
   }
-
-  {
+  else
     PRECONDITION(false);
-    constant_exprt r;
-    r.make_nil();
-    return r;
-  }
 }
 
 /// ceil(log2(size))

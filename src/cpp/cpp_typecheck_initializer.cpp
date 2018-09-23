@@ -94,9 +94,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
           ait!=code_type.parameters().end();
           ait++)
       {
-        exprt new_object("new_object");
+        exprt new_object(ID_new_object, ait->type());
         new_object.set(ID_C_lvalue, true);
-        new_object.type() = ait->type();
 
         if(ait->get(ID_C_base_name)==ID_this)
         {

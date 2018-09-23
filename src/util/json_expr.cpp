@@ -276,9 +276,9 @@ json_objectt json(
     }
     else if(type.id()==ID_c_enum_tag)
     {
-      constant_exprt tmp;
-      tmp.type()=ns.follow_tag(to_c_enum_tag_type(type));
-      tmp.set_value(to_constant_expr(expr).get_value());
+      constant_exprt tmp(
+        to_constant_expr(expr).get_value(),
+        ns.follow_tag(to_c_enum_tag_type(type)));
       return json(tmp, ns, mode);
     }
     else if(type.id()==ID_bv)

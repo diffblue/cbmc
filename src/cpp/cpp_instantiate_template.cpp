@@ -44,8 +44,8 @@ std::string cpp_typecheckt::template_suffix(
       result+=',';
 
     const exprt expr=*it;
-
-    assert(expr.id()!="ambiguous");
+    DATA_INVARIANT(
+      expr.id() != ID_ambiguous, "template argument must not be ambiguous");
 
     if(expr.id()==ID_type)
     {
@@ -162,8 +162,8 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   new_symbol.type.set(ID_template_class_instance, true);
   new_symbol.type.add_source_location()=template_symbol.location;
   new_symbol.type.set(
-    "specialization_template_args", specialization_template_args);
-  new_symbol.type.set("full_template_args", full_template_args);
+    ID_specialization_template_args, specialization_template_args);
+  new_symbol.type.set(ID_full_template_args, full_template_args);
   new_symbol.type.set(ID_identifier, template_symbol.name);
   new_symbol.mode=template_symbol.mode;
   new_symbol.base_name=template_symbol.base_name;
@@ -205,9 +205,9 @@ void cpp_typecheckt::elaborate_class_template(
       type.source_location(),
       lookup(t_type.get(ID_identifier)),
       static_cast<const cpp_template_args_tct &>(
-        t_type.find("specialization_template_args")),
+        t_type.find(ID_specialization_template_args)),
       static_cast<const cpp_template_args_tct &>(
-        t_type.find("full_template_args")));
+        t_type.find(ID_full_template_args)));
   }
 }
 
@@ -377,7 +377,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   {
     // need non-const handle on template symbol
     symbolt &s=*symbol_table.get_writeable(template_symbol.name);
-    irept &instantiated_with=s.value.add("instantiated_with");
+    irept &instantiated_with = s.value.add(ID_instantiated_with);
     instantiated_with.get_sub().push_back(specialization_template_args);
   }
 
@@ -415,9 +415,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
     convert_non_template_declaration(new_decl);
 
     // also instantiate all the template methods
-    const exprt &template_methods=
-      static_cast<const exprt &>(
-        template_symbol.value.find("template_methods"));
+    const exprt &template_methods = static_cast<const exprt &>(
+      template_symbol.value.find(ID_template_methods));
 
     for(auto &tm : template_methods.operands())
     {

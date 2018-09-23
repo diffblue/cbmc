@@ -192,8 +192,7 @@ void goto_convertt::do_printf(
   if(f_id==CPROVER_PREFIX "printf" ||
      f_id=="printf")
   {
-    typet return_type=
-      static_cast<const typet &>(function.type().find(ID_return_type));
+    const typet &return_type = to_code_type(function.type()).return_type();
     side_effect_exprt printf_code(
       ID_printf, return_type, function.source_location());
 

@@ -168,6 +168,15 @@ bool java_bytecode_languaget::preprocess(
   return true;
 }
 
+/// We set the main class (i.e.\ class to start the class loading analysis from,
+/// see \ref java_class_loadert) depending on the file type of `path`.
+/// `path` can be the name of either a .class file or a .jar file.
+/// If it is a .class file, the top-level class in this file is the main class.
+/// If it is a .jar file, we first check for the main class in three steps
+/// 1) the argument of the --main-class command-line option,
+/// 2) the class implied by the argument of the --function option,
+/// 3) the manifest file of the JAR.
+/// If no main class was found, all classes in the JAR file are loaded.
 bool java_bytecode_languaget::parse(
   std::istream &,
   const std::string &path)
@@ -207,12 +216,22 @@ bool java_bytecode_languaget::parse(
       java_cp_include_files);
     if(config.java.main_class.empty())
     {
-      auto manifest = java_class_loader.jar_pool(path).get_manifest();
-      std::string manifest_main_class=manifest["Main-Class"];
+      const std::string &entry_method = config.main;
+      // If we have an entry method, we can derive a main class.
+      if(!entry_method.empty())
+      {
+        const auto last_dot_position = entry_method.find_last_of('.');
+        main_class = entry_method.substr(0, last_dot_position);
+      }
+      else
+      {
+        auto manifest = java_class_loader.jar_pool(path).get_manifest();
+        std::string manifest_main_class = manifest["Main-Class"];
 
-      // if the manifest declares a Main-Class line, we got a main class
-      if(manifest_main_class!="")
-        main_class=manifest_main_class;
+        // if the manifest declares a Main-Class line, we got a main class
+        if(!manifest_main_class.empty())
+          main_class = manifest_main_class;
+      }
     }
     else
       main_class=config.java.main_class;

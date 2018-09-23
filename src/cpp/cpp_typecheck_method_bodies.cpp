@@ -36,7 +36,7 @@ void cpp_typecheckt::typecheck_method_bodies()
       add_argc_argv(method_symbol);
 
     exprt &body=method_symbol.value;
-    if(body.id()=="cpp_not_typechecked")
+    if(body.id() == ID_cpp_not_typechecked)
       continue;
 
 #ifdef DEBUG

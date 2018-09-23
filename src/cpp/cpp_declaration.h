@@ -108,23 +108,23 @@ public:
   cpp_template_args_non_tct &partial_specialization_args()
   {
     return static_cast<cpp_template_args_non_tct &>(
-      add("partial_specialization_args"));
+      add(ID_partial_specialization_args));
   }
 
   const cpp_template_args_non_tct &partial_specialization_args() const
   {
     return static_cast<const cpp_template_args_non_tct &>(
-      find("partial_specialization_args"));
+      find(ID_partial_specialization_args));
   }
 
   void set_specialization_of(const irep_idt &id)
   {
-    set("specialization_of", id);
+    set(ID_specialization_of, id);
   }
 
   irep_idt get_specialization_of() const
   {
-    return get("specialization_of");
+    return get(ID_specialization_of);
   }
 
   void set_is_typedef()

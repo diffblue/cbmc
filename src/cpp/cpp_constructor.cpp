@@ -84,7 +84,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
        // Override constantness
       object_tc.type().set("ID_C_constant", false);
       object_tc.set("ID_C_lvalue", true);
-      side_effect_exprt assign("assign");
+      side_effect_exprt assign(ID_assign);
       assign.add_source_location()=source_location;
       assign.copy_to_operands(object_tc, op_tc);
       typecheck_side_effect_assignment(assign);
@@ -192,7 +192,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
 
       exprt val=false_exprt();
 
-      if(!component.get_bool("from_base"))
+      if(!component.get_bool(ID_from_base))
         val=true_exprt();
 
       side_effect_exprt assign(ID_assign, typet(), source_location);
@@ -218,7 +218,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
 
       if(
         !c.get_bool(ID_from_base) && type.id() == ID_code &&
-        type.find(ID_return_type).id() == ID_constructor)
+        to_code_type(type).return_type().id() == ID_constructor)
       {
         constructor_name = c.get_base_name();
         break;
@@ -257,8 +257,9 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
       to_side_effect_expr_function_call(initializer.op0());
 
     exprt &tmp_this=func_ini.arguments().front();
-    assert(tmp_this.id()==ID_address_of
-           && tmp_this.op0().id()=="new_object");
+    DATA_INVARIANT(
+      to_address_of_expr(tmp_this).object().id() == ID_new_object,
+      "expected new_object operand in address_of expression");
 
     tmp_this=address_of_exprt(object_tc);
 

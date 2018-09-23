@@ -207,8 +207,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
   init_symbol.value.swap(init_block);
   init_symbol.mode=ID_cpp;
   init_symbol.module=module;
-  init_symbol.type=code_typet();
-  init_symbol.type.add(ID_return_type)=typet(ID_constructor);
+  init_symbol.type = code_typet({}, typet(ID_constructor));
   init_symbol.is_type=false;
   init_symbol.is_macro=false;
 
@@ -229,8 +228,9 @@ void cpp_typecheckt::do_not_typechecked()
     {
       const symbolt &symbol=named_symbol.second;
 
-      if(symbol.value.id()=="cpp_not_typechecked" &&
-         symbol.value.get_bool("is_used"))
+      if(
+        symbol.value.id() == ID_cpp_not_typechecked &&
+        symbol.value.get_bool(ID_is_used))
       {
         assert(symbol.type.id()==ID_code);
         symbolt &symbol=*symbol_table.get_writeable(named_symbol.first);
@@ -261,7 +261,7 @@ void cpp_typecheckt::do_not_typechecked()
 
   for(const auto &named_symbol : symbol_table.symbols)
   {
-    if(named_symbol.second.value.id()=="cpp_not_typechecked")
+    if(named_symbol.second.value.id() == ID_cpp_not_typechecked)
       symbol_table.get_writeable_ref(named_symbol.first).value.make_nil();
   }
 }
