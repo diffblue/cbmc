@@ -94,7 +94,7 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
         !c.get_bool(ID_from_base) && type.id() == ID_code &&
         to_code_type(type).return_type().id() == ID_destructor)
       {
-        dtor_name = c.get(ID_base_name);
+        dtor_name = c.get_base_name();
         break;
       }
     }

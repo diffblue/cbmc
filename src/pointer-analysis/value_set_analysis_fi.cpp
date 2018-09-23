@@ -109,10 +109,7 @@ void value_set_analysis_fit::get_entries_rec(
         it++)
     {
       get_entries_rec(
-        identifier,
-        suffix+"."+it->get_string(ID_name),
-        it->type(),
-        dest);
+        identifier, suffix + "." + id2string(it->get_name()), it->type(), dest);
     }
   }
   else if(t.id()==ID_array)

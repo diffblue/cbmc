@@ -871,13 +871,12 @@ void c_typecheck_baset::typecheck_compound_body(
 
       for(const auto &declarator : declaration.declarators())
       {
-        struct_union_typet::componentt new_component;
+        struct_union_typet::componentt new_component(
+          declarator.get_base_name(), declaration.full_type(declarator));
 
         new_component.add_source_location()=
           declarator.source_location();
-        new_component.set(ID_name, declarator.get_base_name());
-        new_component.set(ID_pretty_name, declarator.get_base_name());
-        new_component.type()=declaration.full_type(declarator);
+        new_component.set_pretty_name(declarator.get_base_name());
 
         typecheck_type(new_component.type());
 

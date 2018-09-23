@@ -210,7 +210,7 @@ void cpp_typecheckt::zero_initializer(
       if(component.get_bool(ID_is_static))
         continue;
 
-      member_exprt member(object, component.get(ID_name), component.type());
+      member_exprt member(object, component.get_name(), component.type());
 
       // recursive call
       zero_initializer(member, component.type(), source_location, ops);
@@ -244,7 +244,7 @@ void cpp_typecheckt::zero_initializer(
     // Select the largest component for zero-initialization
     mp_integer max_comp_size=0;
 
-    exprt comp=nil_exprt();
+    union_typet::componentt comp;
 
     for(const auto &component : to_union_type(final_type).components())
     {
@@ -269,7 +269,7 @@ void cpp_typecheckt::zero_initializer(
     if(max_comp_size>0)
     {
       irept name(ID_name);
-      name.set(ID_identifier, comp.get(ID_base_name));
+      name.set(ID_identifier, comp.get_base_name());
       name.set(ID_C_source_location, source_location);
 
       cpp_namet cpp_name;

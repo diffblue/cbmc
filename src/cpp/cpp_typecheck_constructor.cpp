@@ -290,7 +290,7 @@ void cpp_typecheckt::default_cpctor(
     if(mem_c.get_bool(ID_is_vtptr))
     {
       exprt name(ID_name);
-      name.set(ID_identifier, mem_c.get(ID_base_name));
+      name.set(ID_identifier, mem_c.get_base_name());
       name.add_source_location()=source_location;
 
       cpp_namet cppname;
@@ -310,7 +310,7 @@ void cpp_typecheckt::default_cpctor(
       already_typechecked(address);
 
       exprt ptrmember(ID_ptrmember);
-      ptrmember.set(ID_component_name, mem_c.get(ID_name));
+      ptrmember.set(ID_component_name, mem_c.get_name());
       ptrmember.operands().push_back(exprt("cpp-this"));
 
       code_assignt assign(ptrmember, address);
@@ -325,7 +325,7 @@ void cpp_typecheckt::default_cpctor(
       continue;
     }
 
-    irep_idt mem_name = mem_c.get(ID_base_name);
+    const irep_idt &mem_name = mem_c.get_base_name();
 
     exprt name(ID_name);
     name.set(ID_identifier, mem_name);
@@ -467,7 +467,7 @@ void cpp_typecheckt::default_assignop_value(
       continue;
     }
 
-    const irep_idt &mem_name = c.get(ID_base_name);
+    const irep_idt &mem_name = c.get_base_name();
 
     if(c.get(ID_type) == ID_array)
     {
@@ -564,7 +564,7 @@ void cpp_typecheckt::check_member_initializers(
 
     for(const auto &c : components)
     {
-      if(c.get(ID_base_name) != base_name)
+      if(c.get_base_name() != base_name)
         continue;
 
       // Data member
@@ -741,7 +741,7 @@ void cpp_typecheckt::full_member_initialization(
           for(const auto &c : components)
           {
             if(
-              c.get(ID_base_name) == base_name && c.get(ID_type) != ID_code &&
+              c.get_base_name() == base_name && c.get(ID_type) != ID_code &&
               !c.get_bool(ID_is_type))
             {
               is_data=true;
@@ -817,7 +817,7 @@ void cpp_typecheckt::full_member_initialization(
     if(c.get_bool(ID_is_vtptr))
     {
       exprt name(ID_name);
-      name.set(ID_identifier, c.get(ID_base_name));
+      name.set(ID_identifier, c.get_base_name());
       name.add_source_location() = c.source_location();
 
       cpp_namet cppname;
@@ -837,7 +837,7 @@ void cpp_typecheckt::full_member_initialization(
       already_typechecked(address);
 
       exprt ptrmember(ID_ptrmember);
-      ptrmember.set(ID_component_name, c.get(ID_name));
+      ptrmember.set(ID_component_name, c.get_name());
       ptrmember.operands().push_back(exprt("cpp-this"));
 
       code_assignt assign(ptrmember, address);
@@ -852,7 +852,7 @@ void cpp_typecheckt::full_member_initialization(
       continue;
     }
 
-    const irep_idt &mem_name = c.get(ID_base_name);
+    const irep_idt &mem_name = c.get_base_name();
 
     // Check if the initialization list of the constructor
     // explicitly initializes the data member
@@ -974,7 +974,7 @@ bool cpp_typecheckt::find_assignop(const symbolt &symbol) const
 
   for(const auto &component : components)
   {
-    if(component.get(ID_base_name)!="operator=")
+    if(component.get_base_name() != "operator=")
       continue;
 
     if(component.get_bool(ID_is_static))
