@@ -30,7 +30,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cpp/cprover_library.h>
 
+#include <goto-checker/all_properties_verifier.h>
 #include <goto-checker/bmc_util.h>
+#include <goto-checker/multi_path_symex_only_checker.h>
+#include <goto-checker/properties.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/initialize_goto_model.h>
@@ -551,6 +554,19 @@ int cbmc_parse_optionst::doit()
   if(cmdline.isset("validate-goto-model"))
   {
     goto_model.validate(validation_modet::INVARIANT);
+  }
+
+  if(
+    options.get_bool_option("program-only") ||
+    options.get_bool_option("show-vcc"))
+  {
+    if(!options.get_bool_option("paths"))
+    {
+      all_properties_verifiert<multi_path_symex_only_checkert> verifier(
+        options, ui_message_handler, goto_model);
+      (void)verifier();
+      return CPROVER_EXIT_SUCCESS;
+    }
   }
 
   return bmct::do_language_agnostic_bmc(
