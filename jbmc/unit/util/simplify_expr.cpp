@@ -52,7 +52,8 @@ void test_unnecessary_cast(const typet &type)
         typecast_exprt(symbol_exprt("foo", java_int_type()), type),
         namespacet(symbol_tablet()));
 
-      REQUIRE(simplified.id()==ID_typecast);
+      if(type != java_boolean_type())
+        REQUIRE(simplified.id() == ID_typecast);
       REQUIRE(simplified.type()==type);
     }
   }

@@ -361,6 +361,20 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     }
   }
 
+  // '(bvtype)c' --> 'c?1:0' for boolean 'c'
+  if(
+    op_type.id() == ID_bool &&
+    (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv ||
+     expr_type.id() == ID_c_bool))
+  {
+    exprt one = from_integer(1, expr_type);
+    exprt zero = from_integer(0, expr_type);
+    if_exprt tmp(expr.op0(), std::move(one), std::move(zero));
+    simplify_if_preorder(tmp);
+    expr.swap(tmp);
+    return false;
+  }
+
   // eliminate casts to _Bool
   if(expr_type.id()==ID_c_bool &&
      op_type.id()!=ID_bool)
