@@ -93,7 +93,7 @@ literalt prop_minimizet::constraint()
 void prop_minimizet::operator()()
 {
   // we need to use assumptions
-  assert(prop_conv.has_set_assumptions());
+  PRECONDITION(prop_conv.has_set_assumptions());
 
   _iterations=0;
   _number_satisfied=0;
