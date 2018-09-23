@@ -24,6 +24,11 @@ Author: Martin Brain, martin.brain@diffblue.com
 /// error AND the software is not safe (w.r.t. current analysis / config / spec)
 #define CPROVER_EXIT_VERIFICATION_UNSAFE 10
 
+/// Verification inconclusive indicates the analysis has been performed without
+/// error AND the software is neither safe nor unsafe
+/// (w.r.t. current analysis / config / spec)
+#define CPROVER_EXIT_VERIFICATION_INCONCLUSIVE 5
+
 /// A usage error is returned when the command line is invalid or conflicting.
 #define CPROVER_EXIT_USAGE_ERROR 1
 // should contemplate EX_USAGE from sysexits.h
