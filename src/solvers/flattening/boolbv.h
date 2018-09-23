@@ -164,7 +164,7 @@ protected:
   virtual bvt convert_cond(const exprt &expr);
   virtual bvt convert_shift(const binary_exprt &expr);
   virtual bvt convert_bitwise(const exprt &expr);
-  virtual bvt convert_unary_minus(const unary_exprt &expr);
+  virtual bvt convert_unary_minus(const unary_minus_exprt &expr);
   virtual bvt convert_abs(const abs_exprt &expr);
   virtual bvt convert_concatenation(const concatenation_exprt &expr);
   virtual bvt convert_replication(const replication_exprt &expr);

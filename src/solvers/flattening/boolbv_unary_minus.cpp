@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv_type.h"
 
-bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
+bvt boolbvt::convert_unary_minus(const unary_minus_exprt &expr)
 {
   const typet &type=ns.follow(expr.type());
 
@@ -32,8 +32,6 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
 
   bvtypet bvtype=get_bvtype(type);
   bvtypet op_bvtype = get_bvtype(op.type());
-
-  bool no_overflow=(expr.id()=="no-overflow-unary-minus");
 
   if(bvtype==bvtypet::IS_UNKNOWN &&
      (type.id()==ID_vector || type.id()==ID_complex))
@@ -79,27 +77,17 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
   }
   else if(bvtype==bvtypet::IS_FIXED && op_bvtype==bvtypet::IS_FIXED)
   {
-    if(no_overflow)
-      return bv_utils.negate_no_overflow(op_bv);
-    else
-      return bv_utils.negate(op_bv);
+    return bv_utils.negate(op_bv);
   }
   else if(bvtype==bvtypet::IS_FLOAT && op_bvtype==bvtypet::IS_FLOAT)
   {
-    INVARIANT(!no_overflow, "");
     float_utilst float_utils(prop, to_floatbv_type(expr.type()));
     return float_utils.negate(op_bv);
   }
   else if((op_bvtype==bvtypet::IS_SIGNED || op_bvtype==bvtypet::IS_UNSIGNED) &&
           (bvtype==bvtypet::IS_SIGNED || bvtype==bvtypet::IS_UNSIGNED))
   {
-    if(no_overflow)
-      prop.l_set_to(bv_utils.overflow_negate(op_bv), false);
-
-    if(no_overflow)
-      return bv_utils.negate_no_overflow(op_bv);
-    else
-      return bv_utils.negate(op_bv);
+    return bv_utils.negate(op_bv);
   }
 
   return conversion_failed(expr);
