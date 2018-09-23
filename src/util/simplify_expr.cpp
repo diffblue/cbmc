@@ -539,20 +539,22 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     }
   }
 
-  #if 0
-  // (T)(a?b:c) --> a?(T)b:(T)c
-  if(expr.op0().id()==ID_if &&
-     expr.op0().operands().size()==3)
+  // (T)(c?x:y) --> c?(T)x:(T)y
+  // This may be expensive if (T) is more complex than the type
+  // of the if-expression. To avoid, we restrict to the case of
+  // constant 'x'/'y'; (T)x and (T)y should then simplify further.
+  if(
+    expr.op0().id() == ID_if && expr.op0().operands().size() == 3 &&
+    expr.op0().op1().is_constant() && expr.op0().op2().is_constant())
   {
     typecast_exprt tmp_op1(expr.op0().op1(), expr_type);
     typecast_exprt tmp_op2(expr.op0().op2(), expr_type);
     simplify_typecast(tmp_op1);
     simplify_typecast(tmp_op2);
     expr=if_exprt(expr.op0().op0(), tmp_op1, tmp_op2, expr_type);
-    simplify_if(to_if_expr(expr));
+    simplify_if_preorder(to_if_expr(expr));
     return false;
   }
-  #endif
 
   const irep_idt &expr_type_id=expr_type.id();
   const exprt &operand=expr.op0();
