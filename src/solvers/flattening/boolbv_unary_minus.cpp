@@ -23,23 +23,14 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
   if(width==0)
     return conversion_failed(expr);
 
-  const exprt::operandst &operands=expr.operands();
+  const exprt &op = expr.op();
 
-  if(operands.size()!=1)
-    throw "unary minus takes one operand";
-
-  const exprt &op0=expr.op0();
-
-  const bvt &op_bv=convert_bv(op0);
+  const bvt &op_bv = convert_bv(op, width);
 
   bvtypet bvtype=get_bvtype(type);
-  bvtypet op_bvtype=get_bvtype(op0.type());
-  std::size_t op_width=op_bv.size();
+  bvtypet op_bvtype = get_bvtype(op.type());
 
   bool no_overflow=(expr.id()=="no-overflow-unary-minus");
-
-  if(op_width==0 || op_width!=width)
-    return conversion_failed(expr);
 
   if(bvtype==bvtypet::IS_UNKNOWN &&
      (type.id()==ID_vector || type.id()==ID_complex))
@@ -48,8 +39,14 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
 
     std::size_t sub_width=boolbv_width(subtype);
 
-    if(sub_width==0 || width%sub_width!=0)
-      throw "unary-: unexpected vector operand width";
+    INVARIANT(
+      sub_width > 0,
+      "bitvector representation of type needs to have at least one bit");
+
+    INVARIANT(
+      width % sub_width == 0,
+      "total bitvector width needs to be a multiple of the component bitvector "
+      "widths");
 
     std::size_t size=width/sub_width;
     bvt bv;
@@ -62,7 +59,8 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
 
       for(std::size_t j=0; j<tmp_op.size(); j++)
       {
-        assert(i*sub_width+j<op_bv.size());
+        INVARIANT(
+          i * sub_width + j < op_bv.size(), "bit index shall be within bounds");
         tmp_op[j]=op_bv[i*sub_width+j];
       }
 
@@ -76,11 +74,14 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
       else
         tmp_result=bv_utils.negate(tmp_op);
 
-      assert(tmp_result.size()==sub_width);
+      INVARIANT(
+        tmp_result.size() == sub_width,
+        "bitvector after negation shall have same bit width");
 
       for(std::size_t j=0; j<tmp_result.size(); j++)
       {
-        assert(i*sub_width+j<bv.size());
+        INVARIANT(
+          i * sub_width + j < bv.size(), "bit index shall be within bounds");
         bv[i*sub_width+j]=tmp_result[j];
       }
     }
@@ -96,7 +97,7 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
   }
   else if(bvtype==bvtypet::IS_FLOAT && op_bvtype==bvtypet::IS_FLOAT)
   {
-    assert(!no_overflow);
+    INVARIANT(!no_overflow, "");
     float_utilst float_utils(prop, to_floatbv_type(expr.type()));
     return float_utils.negate(op_bv);
   }

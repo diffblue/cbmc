@@ -281,7 +281,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id()==ID_array)
     return convert_array(expr);
   else if(expr.id()==ID_vector)
-    return convert_vector(expr);
+    return convert_vector(to_vector_expr(expr));
   else if(expr.id()==ID_complex)
     return convert_complex(to_complex_expr(expr));
   else if(expr.id()==ID_complex_real)
