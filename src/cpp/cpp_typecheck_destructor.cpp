@@ -130,17 +130,18 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
       block.move_to_operands(dtor_code.value());
   }
 
-  const irept::subt &bases=symbol.type.find(ID_bases).get_sub();
+  if(symbol.type.id() == ID_union)
+    return block;
+
+  const auto &bases = to_struct_type(symbol.type).bases();
 
   // call the base destructors in the reverse order
-  for(irept::subt::const_reverse_iterator
-      bit=bases.rbegin();
-      bit!=bases.rend();
+  for(class_typet::basest::const_reverse_iterator bit = bases.rbegin();
+      bit != bases.rend();
       bit++)
   {
-    assert(bit->id()==ID_base);
-    assert(bit->find(ID_type).id() == ID_symbol_type);
-    const symbolt &psymb = lookup(bit->find(ID_type).get(ID_identifier));
+    DATA_INVARIANT(bit->id() == ID_base, "base class expression expected");
+    const symbolt &psymb = lookup(to_symbol_type(bit->type()).get_identifier());
 
     symbol_exprt this_ptr(ID_this, pointer_type(symbol.type));
     dereference_exprt object(this_ptr, psymb.type);

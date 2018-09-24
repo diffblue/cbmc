@@ -1135,10 +1135,18 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           if(declarator.find(ID_member_initializers).is_nil())
             declarator.set(ID_member_initializers, ID_member_initializers);
 
-          check_member_initializers(
-            type.add(ID_bases),
-            type.components(),
-            declarator.member_initializers());
+          if(type.id() == ID_union)
+          {
+            check_member_initializers(
+              {}, type.components(), declarator.member_initializers());
+          }
+          else
+          {
+            check_member_initializers(
+              to_struct_type(type).bases(),
+              type.components(),
+              declarator.member_initializers());
+          }
 
           full_member_initialization(
             type,
@@ -1634,15 +1642,12 @@ void cpp_typecheckt::get_bases(
   const struct_typet &type,
   std::set<irep_idt> &set_bases) const
 {
-  const irept::subt &bases=type.find(ID_bases).get_sub();
-
-  forall_irep(it, bases)
+  for(const auto &b : type.bases())
   {
-    assert(it->id()==ID_base);
-    assert(it->get(ID_type) == ID_symbol_type);
+    DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-    const struct_typet &base=
-      to_struct_type(lookup(it->find(ID_type).get(ID_identifier)).type);
+    const struct_typet &base =
+      to_struct_type(lookup(to_symbol_type(b.type()).get_identifier()).type);
 
     set_bases.insert(base.get(ID_name));
     get_bases(base, set_bases);
@@ -1656,17 +1661,14 @@ void cpp_typecheckt::get_virtual_bases(
   if(std::find(vbases.begin(), vbases.end(), type.get(ID_name))!=vbases.end())
     return;
 
-  const irept::subt &bases=type.find(ID_bases).get_sub();
-
-  forall_irep(it, bases)
+  for(const auto &b : type.bases())
   {
-    assert(it->id()==ID_base);
-    assert(it->get(ID_type) == ID_symbol_type);
+    DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-    const struct_typet &base=
-      to_struct_type(lookup(it->find(ID_type).get(ID_identifier)).type);
+    const struct_typet &base =
+      to_struct_type(lookup(to_symbol_type(b.type()).get_identifier()).type);
 
-    if(it->get_bool(ID_virtual))
+    if(b.get_bool(ID_virtual))
       vbases.push_back(base.get(ID_name));
 
     get_virtual_bases(base, vbases);

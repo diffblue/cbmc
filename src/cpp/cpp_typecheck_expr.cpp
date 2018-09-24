@@ -33,11 +33,12 @@ bool cpp_typecheckt::find_parent(
   const irep_idt &base_name,
   irep_idt &identifier)
 {
-  forall_irep(bit, symb.type.find(ID_bases).get_sub())
+  for(const auto &b : to_struct_type(symb.type).bases())
   {
-    if(lookup(bit->find(ID_type).get(ID_identifier)).base_name == base_name)
+    const irep_idt &id = to_symbol_type(b.type()).get_identifier();
+    if(lookup(id).base_name == base_name)
     {
-      identifier=bit->find(ID_type).get(ID_identifier);
+      identifier = id;
       return true;
     }
   }
