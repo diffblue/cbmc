@@ -17,20 +17,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
 {
-  const bvt &bv0 = convert_bv(expr.src());
+  const bvt &src_bv = convert_bv(expr.src());
 
   // constant?
   if(expr.index().is_constant())
   {
-    mp_integer o;
+    mp_integer index_as_integer;
 
-    if(to_integer(expr.index(), o))
+    if(to_integer(expr.index(), index_as_integer))
       throw "extractbit failed to convert constant index";
 
-    if(o<0 || o>=bv0.size())
+    if(index_as_integer < 0 || index_as_integer >= src_bv.size())
       return prop.new_variable(); // out of range!
     else
-      return bv0[integer2size_t(o)];
+      return src_bv[integer2size_t(index_as_integer)];
   }
 
   if(
@@ -42,13 +42,14 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
   }
   else
   {
-    std::size_t width_op0 = boolbv_width(expr.src().type());
-    std::size_t width_op1 = boolbv_width(expr.index().type());
+    std::size_t src_bv_width = boolbv_width(expr.src().type());
+    std::size_t index_bv_width = boolbv_width(expr.index().type());
 
-    if(width_op0==0 || width_op1==0)
+    if(src_bv_width == 0 || index_bv_width == 0)
       return SUB::convert_rest(expr);
 
-    std::size_t index_width = std::max(address_bits(width_op0), width_op1);
+    std::size_t index_width =
+      std::max(address_bits(src_bv_width), index_bv_width);
     unsignedbv_typet index_type(index_width);
 
     equal_exprt equality;
@@ -60,29 +61,29 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     if(prop.has_set_to())
     {
       // free variable
-      literalt l=prop.new_variable();
+      literalt literal = prop.new_variable();
 
       // add implications
-      for(std::size_t i=0; i<bv0.size(); i++)
+      for(std::size_t i = 0; i < src_bv.size(); i++)
       {
         equality.rhs()=from_integer(i, index_type);
-        literalt equal=prop.lequal(l, bv0[i]);
+        literalt equal = prop.lequal(literal, src_bv[i]);
         prop.l_set_to_true(prop.limplies(convert(equality), equal));
       }
 
-      return l;
+      return literal;
     }
     else
     {
-      literalt l=prop.new_variable();
+      literalt literal = prop.new_variable();
 
-      for(std::size_t i=0; i<bv0.size(); i++)
+      for(std::size_t i = 0; i < src_bv.size(); i++)
       {
         equality.rhs()=from_integer(i, index_type);
-        l=prop.lselect(convert(equality), bv0[i], l);
+        literal = prop.lselect(convert(equality), src_bv[i], literal);
       }
 
-      return l;
+      return literal;
     }
   }
 
