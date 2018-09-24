@@ -19,7 +19,6 @@ SRC = adjust_float_expressions.cpp \
       goto_inline_class.cpp \
       goto_inline.cpp \
       goto_program.cpp \
-      goto_program_template.cpp \
       goto_trace.cpp \
       graphml_witness.cpp \
       initialize_goto_model.cpp \
