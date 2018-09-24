@@ -62,7 +62,6 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
     // Must have a finite size
     mp_integer array_size = numeric_cast_v<mp_integer>(array_type.size());
-
     {
       // see if the index address is constant
       // many of these are compacted by simplify_expr
@@ -117,12 +116,10 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       binary_relation_exprt lower_bound(
         from_integer(0, index.type()), ID_le, index);
+      CHECK_RETURN(lower_bound.lhs().is_not_nil());
       binary_relation_exprt upper_bound(
         index, ID_lt, from_integer(array_size, index.type()));
-
-      if(lower_bound.lhs().is_nil() ||
-         upper_bound.rhs().is_nil())
-        throw "number conversion failed (2)";
+      CHECK_RETURN(upper_bound.rhs().is_not_nil());
 
       and_exprt range_condition(lower_bound, upper_bound);
       implies_exprt implication(range_condition, value_equality);
@@ -174,11 +171,12 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       for(mp_integer i=0; i<array_size; i=i+1)
       {
         index_equality.rhs()=from_integer(i, index_equality.lhs().type());
+        CHECK_RETURN(index_equality.rhs().is_not_nil());
 
-        if(index_equality.rhs().is_nil())
-          throw "number conversion failed (1)";
-
-        assert(it != array.operands().end());
+        INVARIANT(
+          it != array.operands().end(),
+          "this loop iterates over the array, so `it` shouldn't be increased "
+          "past the array's end");
 
         value_equality.rhs()=*it++;
 
@@ -200,10 +198,8 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
     // get literals for the whole array
 
-    const bvt &array_bv=convert_bv(array);
-
-    if(array_size*width!=array_bv.size())
-      throw "unexpected array size";
+    const bvt &array_bv =
+      convert_bv(array, numeric_cast_v<std::size_t>(array_size * width));
 
     // TODO: maybe a shifter-like construction would be better
     // Would be a lot more compact but propagate worse
@@ -231,9 +227,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       for(mp_integer i=0; i<array_size; i=i+1)
       {
         index_equality.rhs()=from_integer(i, index_equality.lhs().type());
-
-        if(index_equality.rhs().is_nil())
-          throw "number conversion failed (1)";
+        CHECK_RETURN(index_equality.rhs().is_not_nil());
 
         mp_integer offset=i*width;
 
@@ -258,7 +252,9 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       typet constant_type=index.type(); // type of index operand
 
-      assert(array_size>0);
+      DATA_INVARIANT(
+        array_size > 0,
+        "non-positive array sizes are forbidden in goto programs");
 
       for(mp_integer i=0; i<array_size; i=i+1)
       {
