@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/exception_utils.h>
 #include <util/invariant.h>
 
 bool goto_symext::get_unwind_recursion(
@@ -53,8 +54,9 @@ void goto_symext::parameter_assignments(
 
     const irep_idt &identifier=parameter.get_identifier();
 
-    if(identifier.empty())
-      throw "no identifier for function parameter";
+    INVARIANT(
+      !identifier.empty(),
+      "function pointer parameter must have an identifier");
 
     const symbolt &symbol=ns.lookup(identifier);
     symbol_exprt lhs=symbol.symbol_expr();
@@ -119,7 +121,7 @@ void goto_symext::parameter_assignments(
           error << "function call: parameter \"" << identifier
                 << "\" type mismatch: got " << rhs.type().pretty()
                 << ", expected " << parameter_type.pretty();
-          throw error.str();
+          throw unsupported_operation_exceptiont(error.str());
         }
       }
 
@@ -172,14 +174,11 @@ void goto_symext::symex_function_call(
 {
   const exprt &function=code.function();
 
-  if(function.id()==ID_symbol)
-    symex_function_call_symbol(get_goto_function, state, code);
-  else if(function.id()==ID_if)
-    throw "symex_function_call can't do if";
-  else if(function.id()==ID_dereference)
-    throw "symex_function_call can't do dereference";
-  else
-    throw "unexpected function for symex_function_call: "+function.id_string();
+  // If at some point symex_function_call can support more
+  // expression ids(), like ID_Dereference, please expand the
+  // precondition appropriately.
+  PRECONDITION(function.id() == ID_symbol);
+  symex_function_call_symbol(get_goto_function, state, code);
 }
 
 void goto_symext::symex_function_call_symbol(
@@ -434,28 +433,18 @@ void goto_symext::return_assignment(statet &state)
 
   target.location(state.guard.as_expr(), state.source);
 
-  if(code.operands().size()==1)
+  PRECONDITION(code.operands().size() == 1 || frame.return_value.is_nil());
+
+  exprt value = code.op0();
+
+  if(frame.return_value.is_not_nil())
   {
-    exprt value=code.op0();
+    code_assignt assignment(frame.return_value, value);
 
-    if(frame.return_value.is_not_nil())
-    {
-      code_assignt assignment(frame.return_value, value);
+    INVARIANT(
+      base_type_eq(assignment.lhs().type(), assignment.rhs().type(), ns),
+      "goto_symext::return_assignment type mismatch");
 
-      if(!base_type_eq(assignment.lhs().type(),
-                       assignment.rhs().type(), ns))
-        throw
-          "goto_symext::return_assignment type mismatch at "+
-          instruction.source_location.as_string()+":\n"+
-          "assignment.lhs().type():\n"+assignment.lhs().type().pretty()+"\n"+
-          "assignment.rhs().type():\n"+assignment.rhs().type().pretty();
-
-      symex_assign(state, assignment);
-    }
-  }
-  else
-  {
-    if(frame.return_value.is_not_nil())
-      throw "return with unexpected value";
+    symex_assign(state, assignment);
   }
 }

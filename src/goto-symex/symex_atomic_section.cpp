@@ -11,15 +11,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
+#include <util/exception_utils.h>
+
 void goto_symext::symex_atomic_begin(statet &state)
 {
   if(state.guard.is_false())
     return;
 
-  // we don't allow any nesting of atomic sections
-  if(state.atomic_section_id!=0)
-    throw "nested atomic section detected at "+
-      state.source.pc->source_location.as_string();
+  if(state.atomic_section_id != 0)
+    throw incorrect_goto_program_exceptiont(
+      "we don't support nesting of atomic sections",
+      state.source.pc->source_location);
 
   state.atomic_section_id=++atomic_section_counter;
   state.read_in_atomic_section.clear();
@@ -36,8 +38,9 @@ void goto_symext::symex_atomic_end(statet &state)
   if(state.guard.is_false())
     return;
 
-  if(state.atomic_section_id==0)
-    throw "ATOMIC_END unmatched"; // NOLINT(readability/throw)
+  if(state.atomic_section_id == 0)
+    throw incorrect_goto_program_exceptiont(
+      "ATOMIC_END unmatched", state.source.pc->source_location);
 
   const unsigned atomic_section_id=state.atomic_section_id;
   state.atomic_section_id=0;
@@ -51,7 +54,7 @@ void goto_symext::symex_atomic_end(statet &state)
     r.set_level_2(r_it->second.first);
 
     // guard is the disjunction over reads
-    assert(!r_it->second.second.empty());
+    PRECONDITION(!r_it->second.second.empty());
     guardt read_guard(r_it->second.second.front());
     for(std::list<guardt>::const_iterator
         it=++(r_it->second.second.begin());
@@ -77,7 +80,7 @@ void goto_symext::symex_atomic_end(statet &state)
     w.set_level_2(state.level2.current_count(w.get_identifier()));
 
     // guard is the disjunction over writes
-    assert(!w_it->second.empty());
+    PRECONDITION(!w_it->second.empty());
     guardt write_guard(w_it->second.front());
     for(std::list<guardt>::const_iterator
         it=++(w_it->second.begin());

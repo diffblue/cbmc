@@ -15,9 +15,10 @@ Author: Daniel Kroening
 
 #include <cassert>
 
-#include <util/threeval.h>
-#include <util/simplify_expr.h>
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
+#include <util/simplify_expr.h>
+#include <util/threeval.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/prop/prop.h>
@@ -92,8 +93,11 @@ exprt build_full_lhs_rec(
           id==ID_byte_extract_big_endian)
   {
     exprt tmp=src_original;
-    assert(tmp.operands().size()==2);
-    tmp.op0()=build_full_lhs_rec(prop_conv, ns, tmp.op0(), src_ssa.op0());
+    tmp.op0() = build_full_lhs_rec(
+      prop_conv,
+      ns,
+      to_byte_extract_expr(tmp).op(),
+      to_byte_extract_expr(src_ssa).op());
 
     // re-write into big case-split
   }
@@ -229,7 +233,7 @@ void build_goto_trace(
       else if(it->is_atomic_end() && current_time<0)
         current_time*=-1;
 
-      assert(current_time>=0);
+      INVARIANT(current_time >= 0, "time keeping inconsistency");
       // move any steps gathered in an atomic section
 
       if(time_before<0)

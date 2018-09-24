@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/invariant_utils.h>
+#include <util/optional.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/string2int.h>
@@ -45,8 +46,7 @@ void goto_symext::symex_allocate(
   const exprt &lhs,
   const side_effect_exprt &code)
 {
-  if(code.operands().size()!=2)
-    throw "allocate expected to have two operands";
+  PRECONDITION(code.operands().size() == 2);
 
   if(lhs.is_nil())
     return; // ignore
@@ -162,8 +162,8 @@ void goto_symext::symex_allocate(
   state.rename(zero_init, ns); // to allow constant propagation
   simplify(zero_init, ns);
 
-  if(!zero_init.is_constant())
-    throw "allocate expects constant as second argument";
+  INVARIANT(
+    zero_init.is_constant(), "allocate expects constant as second argument");
 
   if(!zero_init.is_zero() && !zero_init.is_false())
   {
@@ -175,13 +175,9 @@ void goto_symext::symex_allocate(
         ns,
         null_message);
 
-    if(zero_value.is_not_nil())
-    {
-      code_assignt assignment(value_symbol.symbol_expr(), zero_value);
-      symex_assign(state, assignment);
-    }
-    else
-      throw "failed to zero initialize dynamic object";
+    CHECK_RETURN(zero_value.is_not_nil());
+    code_assignt assignment(value_symbol.symbol_expr(), zero_value);
+    symex_assign(state, assignment);
   }
   else
   {
@@ -234,8 +230,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
   const exprt &lhs,
   const side_effect_exprt &code)
 {
-  if(code.operands().size()!=1)
-    throw "va_arg_next expected to have one operand";
+  PRECONDITION(code.operands().size() == 1);
 
   if(lhs.is_nil())
     return; // ignore
@@ -313,8 +308,7 @@ void goto_symext::symex_printf(
   statet &state,
   const exprt &rhs)
 {
-  if(rhs.operands().empty())
-    throw "printf expected to have at least one operand";
+  PRECONDITION(!rhs.operands().empty());
 
   exprt tmp_rhs=rhs;
   state.rename(tmp_rhs, ns);
@@ -339,8 +333,7 @@ void goto_symext::symex_input(
   statet &state,
   const codet &code)
 {
-  if(code.operands().size()<2)
-    throw "input expected to have at least two operands";
+  PRECONDITION(code.operands().size() >= 2);
 
   exprt id_arg=code.op0();
 
@@ -364,8 +357,7 @@ void goto_symext::symex_output(
   statet &state,
   const codet &code)
 {
-  if(code.operands().size()<2)
-    throw "output expected to have at least two operands";
+  PRECONDITION(code.operands().size() >= 2);
 
   exprt id_arg=code.op0();
 
@@ -397,8 +389,7 @@ void goto_symext::symex_cpp_new(
 {
   bool do_array;
 
-  if(code.type().id()!=ID_pointer)
-    throw "new expected to return pointer";
+  PRECONDITION(code.type().id() == ID_pointer);
 
   do_array =
     (code.get(ID_statement) == ID_cpp_new_array ||
@@ -466,23 +457,22 @@ void goto_symext::symex_trace(
   statet &state,
   const code_function_callt &code)
 {
-  if(code.arguments().size()<2)
-    // NOLINTNEXTLINE(readability/throw)
-    throw "symex_trace expects at least two arguments";
+  PRECONDITION(code.arguments().size() >= 2);
 
   int debug_thresh=unsafe_string2int(options.get_option("debug-level"));
 
   mp_integer debug_lvl;
+  optionalt<mp_integer> maybe_debug =
+    numeric_cast<mp_integer>(code.arguments()[0]);
+  DATA_INVARIANT(
+    maybe_debug.has_value(), "CBMC_trace expects constant as first argument");
+  debug_lvl = maybe_debug.value();
 
-  if(to_integer(code.arguments()[0], debug_lvl))
-    // NOLINTNEXTLINE(readability/throw)
-    throw "CBMC_trace expects constant as first argument";
-
-  if(code.arguments()[1].id()!="implicit_address_of" ||
-     code.arguments()[1].operands().size()!=1 ||
-     code.arguments()[1].op0().id()!=ID_string_constant)
-    // NOLINTNEXTLINE(readability/throw)
-    throw "CBMC_trace expects string constant as second argument";
+  DATA_INVARIANT(
+    code.arguments()[1].id() == "implicit_address_of" &&
+      code.arguments()[1].operands().size() == 1 &&
+      code.arguments()[1].op0().id() == ID_string_constant,
+    "CBMC_trace expects string constant as second argument");
 
   if(mp_integer(debug_thresh)>=debug_lvl)
   {
@@ -532,37 +522,33 @@ void goto_symext::symex_macro(
 {
   const irep_idt &identifier=code.op0().get(ID_identifier);
 
-  if(identifier==CPROVER_MACRO_PREFIX "waitfor")
-  {
-    #if 0
-    exprt new_fc("waitfor", fc.type());
+  PRECONDITION(identifier == CPROVER_MACRO_PREFIX "waitfor");
+#if 0
+  exprt new_fc("waitfor", fc.type());
 
-    if(fc.operands().size()!=4)
-      throw "waitfor expected to have four operands";
+  if(fc.operands().size()!=4)
+    throw "waitfor expected to have four operands";
 
-    exprt &cycle_var=fc.op1();
-    exprt &bound=fc.op2();
-    exprt &predicate=fc.op3();
+  exprt &cycle_var=fc.op1();
+  exprt &bound=fc.op2();
+  exprt &predicate=fc.op3();
 
-    if(cycle_var.id()!=ID_symbol)
-      throw "waitfor expects symbol as first operand but got "+
-            cycle_var.id();
+  if(cycle_var.id()!=ID_symbol)
+    throw "waitfor expects symbol as first operand but got "+
+          cycle_var.id();
 
-    exprt new_cycle_var(cycle_var);
-    new_cycle_var.id("waitfor_symbol");
-    new_cycle_var.copy_to_operands(bound);
+  exprt new_cycle_var(cycle_var);
+  new_cycle_var.id("waitfor_symbol");
+  new_cycle_var.copy_to_operands(bound);
 
-    replace_expr(cycle_var, new_cycle_var, predicate);
+  replace_expr(cycle_var, new_cycle_var, predicate);
 
-    new_fc.operands().resize(4);
-    new_fc.op0().swap(cycle_var);
-    new_fc.op1().swap(new_cycle_var);
-    new_fc.op2().swap(bound);
-    new_fc.op3().swap(predicate);
+  new_fc.operands().resize(4);
+  new_fc.op0().swap(cycle_var);
+  new_fc.op1().swap(new_cycle_var);
+  new_fc.op2().swap(bound);
+  new_fc.op3().swap(predicate);
 
-    fc.swap(new_fc);
-    #endif
-  }
-  else
-    throw "unknown macro: "+id2string(identifier);
+  fc.swap(new_fc);
+#endif
 }

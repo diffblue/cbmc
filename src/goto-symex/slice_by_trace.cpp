@@ -16,12 +16,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 
-#include <util/string2int.h>
-#include <util/simplify_expr.h>
 #include <util/arith_tools.h>
-#include <util/std_expr.h>
-#include <util/guard.h>
+#include <util/exception_utils.h>
 #include <util/format_expr.h>
+#include <util/guard.h>
+#include <util/simplify_expr.h>
+#include <util/std_expr.h>
+#include <util/string2int.h>
 
 void symex_slice_by_tracet::slice_by_trace(
   std::string trace_files,
@@ -79,6 +80,11 @@ void symex_slice_by_tracet::slice_by_trace(
   {
     exprt g_copy(*i);
 
+    DATA_INVARIANT(
+      g_copy.id() == ID_symbol || g_copy.id() == ID_not ||
+        g_copy.id() == ID_and || g_copy.id() == ID_constant,
+      "guards should only be and, symbol, constant, or `not'");
+
     if(g_copy.id()==ID_symbol || g_copy.id() == ID_not)
     {
       g_copy.make_not();
@@ -91,10 +97,6 @@ void symex_slice_by_tracet::slice_by_trace(
       copy_last.make_not();
       simplify(copy_last, ns);
       implications.insert(copy_last);
-    }
-    else if(!(g_copy.id()==ID_constant))
-    {
-      throw "guards should only be and, symbol, constant, or `not'";
     }
   }
 
@@ -122,7 +124,8 @@ void symex_slice_by_tracet::read_trace(std::string filename)
   std::cout << "Reading trace from file " << filename << '\n';
   std::ifstream file(filename);
   if(file.fail())
-    throw "failed to read from trace file";
+    throw invalid_user_input_exceptiont(
+      "invalid file to read trace from: " + filename, "");
 
   // In case not the first trace read
   alphabet.clear();
@@ -219,9 +222,10 @@ void symex_slice_by_tracet::parse_events(std::string read_line)
     const std::string::size_type vnext=read_line.find(",", vidx);
     std::string event=read_line.substr(vidx, vnext - vidx);
     eis.insert(event);
-    if((!alphabet.empty()) &&
-       ((alphabet.count(event)!=0)!=alphabet_parity))
-      throw "trace uses symbol not in alphabet: "+event;
+    PRECONDITION(!alphabet.empty());
+    INVARIANT(
+      (alphabet.count(event) != 0) == alphabet_parity,
+      "trace uses symbol not in alphabet: " + event);
     if(vnext==std::string::npos)
       break;
     vidx=vnext;

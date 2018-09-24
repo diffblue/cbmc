@@ -76,21 +76,16 @@ bool postconditiont::is_used_address_of(
   }
   else if(expr.id()==ID_index)
   {
-    assert(expr.operands().size()==2);
-
-    return
-      is_used_address_of(expr.op0(), identifier) ||
-      is_used(expr.op1(), identifier);
+    return is_used_address_of(to_index_expr(expr).array(), identifier) ||
+           is_used(to_index_expr(expr).index(), identifier);
   }
   else if(expr.id()==ID_member)
   {
-    assert(expr.operands().size()==1);
-    return is_used_address_of(expr.op0(), identifier);
+    return is_used_address_of(to_member_expr(expr).compound(), identifier);
   }
   else if(expr.id()==ID_dereference)
   {
-    assert(expr.operands().size()==1);
-    return is_used(expr.op0(), identifier);
+    return is_used(to_dereference_expr(expr).pointer(), identifier);
   }
 
   return false;
@@ -154,9 +149,7 @@ bool postconditiont::is_used(
 {
   if(expr.id()==ID_address_of)
   {
-    // only do index!
-    assert(expr.operands().size()==1);
-    return is_used_address_of(expr.op0(), identifier);
+    return is_used_address_of(to_address_of_expr(expr).object(), identifier);
   }
   else if(expr.id()==ID_symbol &&
           expr.get_bool(ID_C_SSA_symbol))
@@ -169,12 +162,9 @@ bool postconditiont::is_used(
   }
   else if(expr.id()==ID_dereference)
   {
-    assert(expr.operands().size()==1);
-
     // aliasing may happen here
-
     value_setst::valuest expr_set;
-    value_set.get_value_set(expr.op0(), expr_set, ns);
+    value_set.get_value_set(to_dereference_expr(expr).pointer(), expr_set, ns);
     std::unordered_set<irep_idt> symbols;
 
     for(value_setst::valuest::const_iterator

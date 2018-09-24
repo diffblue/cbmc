@@ -78,19 +78,17 @@ void preconditiont::compute_address_of(exprt &dest)
   }
   else if(dest.id()==ID_index)
   {
-    assert(dest.operands().size()==2);
-    compute_address_of(dest.op0());
-    compute(dest.op1());
+    auto &index_expr = to_index_expr(dest);
+    compute_address_of(index_expr.array());
+    compute(index_expr.index());
   }
   else if(dest.id()==ID_member)
   {
-    assert(dest.operands().size()==1);
-    compute_address_of(dest.op0());
+    compute_address_of(to_member_expr(dest).compound());
   }
   else if(dest.id()==ID_dereference)
   {
-    assert(dest.operands().size()==1);
-    compute(dest.op0());
+    compute(to_dereference_expr(dest).pointer());
   }
 }
 
@@ -104,19 +102,18 @@ void preconditiont::compute_rec(exprt &dest)
   if(dest.id()==ID_address_of)
   {
     // only do index!
-    assert(dest.operands().size()==1);
-    compute_address_of(dest.op0());
+    compute_address_of(to_address_of_expr(dest).object());
   }
   else if(dest.id()==ID_dereference)
   {
-    assert(dest.operands().size()==1);
+    auto &deref_expr = to_dereference_expr(dest);
 
     const irep_idt &lhs_identifier=SSA_step.ssa_lhs.get_object_name();
 
     // aliasing may happen here
 
     value_setst::valuest expr_set;
-    value_sets.get_values(target, dest.op0(), expr_set);
+    value_sets.get_values(target, deref_expr.pointer(), expr_set);
     std::unordered_set<irep_idt> symbols;
 
     for(value_setst::valuest::const_iterator
@@ -129,15 +126,15 @@ void preconditiont::compute_rec(exprt &dest)
     {
       // may alias!
       exprt tmp;
-      tmp.swap(dest.op0());
+      tmp.swap(deref_expr.pointer());
       dereference(target, tmp, ns, value_sets);
-      dest.swap(tmp);
-      compute_rec(dest);
+      deref_expr.swap(tmp);
+      compute_rec(deref_expr);
     }
     else
     {
       // nah, ok
-      compute_rec(dest.op0());
+      compute_rec(deref_expr.pointer());
     }
   }
   else if(dest==SSA_step.ssa_lhs.get_original_expr())

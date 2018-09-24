@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
+#include <util/exception_utils.h>
 #include <util/pointer_offset_size.h>
 
 #include "goto_symex_state.h"
@@ -37,15 +38,19 @@ void goto_symext::symex_assign(
 
     if(statement==ID_function_call)
     {
-      assert(!side_effect_expr.operands().empty());
+      DATA_INVARIANT(
+        !side_effect_expr.operands().empty(),
+        "function call stamement expects non-empty list of side effects");
 
-      if(side_effect_expr.op0().id()!=ID_symbol)
-        throw "symex_assign: expected symbol as function";
+      DATA_INVARIANT(
+        side_effect_expr.op0().id() == ID_symbol,
+        "expected symbol as function");
 
       const irep_idt &identifier=
         to_symbol_expr(side_effect_expr.op0()).get_identifier();
 
-      throw "symex_assign: unexpected function call: "+id2string(identifier);
+      throw unsupported_operation_exceptiont(
+        "symex_assign: unexpected function call: " + id2string(identifier));
     }
     else if(
       statement == ID_cpp_new || statement == ID_cpp_new_array ||
@@ -55,14 +60,13 @@ void goto_symext::symex_assign(
       symex_allocate(state, lhs, side_effect_expr);
     else if(statement==ID_printf)
     {
-      if(lhs.is_not_nil())
-        throw "printf: unexpected assignment";
+      PRECONDITION(lhs.is_nil());
       symex_printf(state, side_effect_expr);
     }
     else if(statement==ID_gcc_builtin_va_arg_next)
       symex_gcc_builtin_va_arg_next(state, lhs, side_effect_expr);
     else
-      throw "symex_assign: unexpected side effect: "+id2string(statement);
+      UNREACHABLE;
   }
   else
   {
@@ -91,12 +95,12 @@ exprt goto_symext::add_to_lhs(
   const exprt &lhs,
   const exprt &what)
 {
-  assert(lhs.id()!=ID_symbol);
+  PRECONDITION(lhs.id() != ID_symbol);
   exprt tmp_what=what;
 
   if(tmp_what.id()!=ID_symbol)
   {
-    assert(tmp_what.operands().size()>=1);
+    PRECONDITION(tmp_what.operands().size() >= 1);
     tmp_what.op0().make_nil();
   }
 
@@ -106,12 +110,16 @@ exprt goto_symext::add_to_lhs(
 
   while(p->is_not_nil())
   {
-    assert(p->id()!=ID_symbol);
-    assert(p->operands().size()>=1);
+    INVARIANT(
+      p->id() != ID_symbol,
+      "expected pointed-to expression not to be a symbol");
+    INVARIANT(
+      p->operands().size() >= 1,
+      "expected pointed-to expression to have at least one operand");
     p=&p->op0();
   }
 
-  assert(p->is_nil());
+  INVARIANT(p->is_nil(), "expected pointed-to expression to be nil");
 
   *p=tmp_what;
   return new_lhs;
@@ -141,12 +149,13 @@ void goto_symext::symex_assign_rec(
     else if(type.id()==ID_union)
     {
       // should have been replaced by byte_extract
-      throw "symex_assign_rec: unexpected assignment to union member";
+      throw unsupported_operation_exceptiont(
+        "symex_assign_rec: unexpected assignment to union member");
     }
     else
-      throw
-        "symex_assign_rec: unexpected assignment to member of `"+
-        type.id_string()+"'";
+      throw unsupported_operation_exceptiont(
+        "symex_assign_rec: unexpected assignment to member of `" +
+        type.id_string() + "'");
   }
   else if(lhs.id()==ID_if)
     symex_assign_if(
@@ -170,6 +179,7 @@ void goto_symext::symex_assign_rec(
   }
   else if(lhs.id() == ID_complex_real)
   {
+    // this is stuff like __real__ x = 1;
     const complex_real_exprt &complex_real_expr = to_complex_real_expr(lhs);
 
     const complex_imag_exprt complex_imag_expr(complex_real_expr.op());
@@ -193,7 +203,8 @@ void goto_symext::symex_assign_rec(
       state, complex_imag_expr.op(), full_lhs, new_rhs, guard, assignment_type);
   }
   else
-    throw "assignment to `"+lhs.id_string()+"' not handled";
+    throw unsupported_operation_exceptiont(
+      "assignment to `" + lhs.id_string() + "' not handled");
 }
 
 void goto_symext::symex_assign_symbol(
@@ -283,9 +294,6 @@ void goto_symext::symex_assign_typecast(
   assignment_typet assignment_type)
 {
   // these may come from dereferencing on the lhs
-
-  assert(lhs.operands().size()==1);
-
   exprt rhs_typecasted=rhs;
   rhs_typecasted.make_typecast(lhs.op0().type());
 
@@ -303,29 +311,20 @@ void goto_symext::symex_assign_array(
   guardt &guard,
   assignment_typet assignment_type)
 {
-  // lhs must be index operand
-  // that takes two operands: the first must be an array
-  // the second is the index
-
-  if(lhs.operands().size()!=2)
-    throw "index must have two operands";
-
   const exprt &lhs_array=lhs.array();
   const exprt &lhs_index=lhs.index();
-  const typet &lhs_type=ns.follow(lhs_array.type());
+  const typet &lhs_index_type = ns.follow(lhs_array.type());
 
-  if(lhs_type.id()!=ID_array)
-    throw "index must take array type operand, but got `"+
-          lhs_type.id_string()+"'";
+  PRECONDITION(lhs_index_type.id() == ID_array);
 
-  #ifdef USE_UPDATE
+#ifdef USE_UPDATE
 
   // turn
   //   a[i]=e
   // into
   //   a'==UPDATE(a, [i], e)
 
-  update_exprt new_rhs(lhs_type);
+  update_exprt new_rhs(lhs_index_type);
   new_rhs.old()=lhs_array;
   new_rhs.designator().push_back(index_designatort(lhs_index));
   new_rhs.new_value()=rhs;
@@ -342,7 +341,7 @@ void goto_symext::symex_assign_array(
   //   a'==a WITH [i:=e]
 
   with_exprt new_rhs(lhs_array, lhs_index, rhs);
-  new_rhs.type() = lhs_type;
+  new_rhs.type() = lhs_index_type;
 
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
@@ -369,9 +368,7 @@ void goto_symext::symex_assign_struct_member(
   // typecasts involved? C++ does that for inheritance.
   if(lhs_struct.id()==ID_typecast)
   {
-    assert(lhs_struct.operands().size()==1);
-
-    if(lhs_struct.op0().id() == ID_null_object)
+    if(to_typecast_expr(lhs_struct).op0().id() == ID_null_object)
     {
       // ignore, and give up
       return;
