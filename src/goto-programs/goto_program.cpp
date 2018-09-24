@@ -699,6 +699,7 @@ bool goto_programt::equals(const goto_programt &other) const
   return true;
 }
 
+/// Outputs a string representation of a `goto_program_instruction_typet`
 std::ostream &operator<<(std::ostream &out, goto_program_instruction_typet t)
 {
   switch(t)
