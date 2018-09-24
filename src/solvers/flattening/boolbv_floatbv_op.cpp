@@ -88,9 +88,10 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
   bvt rounding_mode_as_bv = convert_bv(rounding_mode);
 
   const typet &resolved_type = ns.follow(expr.type());
-  DATA_INVARIANT(
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
     lhs.type() == resolved_type && rhs.type() == resolved_type,
-    "float op with mixed types:\n" + expr.pretty());
+    "both operands of a floating point operator must have the same type",
+    irep_pretty_diagnosticst{expr});
 
   float_utilst float_utils(prop);
 
@@ -111,7 +112,7 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
     else if(expr.id()==ID_floatbv_rem)
       return float_utils.rem(lhs_as_bv, rhs_as_bv);
     else
-      throw "unexpected operator "+expr.id_string();
+      UNREACHABLE;
   }
   else if(resolved_type.id() == ID_vector || resolved_type.id() == ID_complex)
   {
@@ -124,8 +125,10 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
       std::size_t width = boolbv_width(resolved_type);
       std::size_t sub_width=boolbv_width(subtype);
 
-      if(sub_width==0 || width%sub_width!=0)
-        throw "convert_floatbv_op: unexpected vector operand width";
+      DATA_INVARIANT(
+        sub_width > 0 && width % sub_width == 0,
+        "width of a vector subtype must be positive and evenly divide the "
+        "width of the vector");
 
       std::size_t size=width/sub_width;
       bvt result_bv;
@@ -151,10 +154,14 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
         else if(expr.id()==ID_floatbv_div)
           sub_result_bv = float_utils.div(lhs_sub_bv, rhs_sub_bv);
         else
-          assert(false);
+          UNREACHABLE;
 
-        assert(sub_result_bv.size() == sub_width);
-        assert(i * sub_width + sub_width - 1 < result_bv.size());
+        INVARIANT(
+          sub_result_bv.size() == sub_width,
+          "we constructed a new vector of the right size");
+        INVARIANT(
+          i * sub_width + sub_width - 1 < result_bv.size(),
+          "the sub-bitvector fits into the result bitvector");
         std::copy(
           sub_result_bv.begin(),
           sub_result_bv.end(),
