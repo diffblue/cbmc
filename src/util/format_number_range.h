@@ -15,6 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <vector>
 
-std::string format_number_range(std::vector<unsigned> &);
+std::string format_number_range(const std::vector<unsigned> &);
 
 #endif // CPROVER_UTIL_FORMAT_NUMBER_RANGE_H
