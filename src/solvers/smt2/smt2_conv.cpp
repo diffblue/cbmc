@@ -4102,7 +4102,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   // special treatment for "set_to(a=b, true)" where
   // a is a new symbol
 
-  if(expr.id()==ID_equal && value==true)
+  if(expr.id() == ID_equal && value)
   {
     const equal_exprt &equal_expr=to_equal_expr(expr);
 
