@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/arith_tools.h>
+#include <util/exception_utils.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
@@ -22,10 +23,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
   // constant?
   if(expr.index().is_constant())
   {
-    mp_integer index_as_integer;
-
-    if(to_integer(expr.index(), index_as_integer))
-      throw "extractbit failed to convert constant index";
+    mp_integer index_as_integer = numeric_cast_v<mp_integer>(expr.index());
 
     if(index_as_integer < 0 || index_as_integer >= src_bv.size())
       return prop.new_variable(); // out of range!
@@ -37,8 +35,9 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     expr.src().type().id() == ID_verilog_signedbv ||
     expr.src().type().id() == ID_verilog_unsignedbv)
   {
-    // TODO
-    assert(false);
+    throw unsupported_operation_exceptiont(
+      "extractbit expression not implemented for verilog integers in "
+      "flattening solver");
   }
   else
   {
