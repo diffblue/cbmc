@@ -18,11 +18,8 @@ bvt boolbvt::convert_if(const if_exprt &expr)
 
   literalt cond=convert(expr.cond());
 
-  const bvt &true_case_bv = convert_bv(expr.true_case());
-  const bvt &false_case_bv = convert_bv(expr.false_case());
-
-  if(true_case_bv.size() != width || false_case_bv.size() != width)
-    throw "operand size mismatch for if "+expr.pretty();
+  const bvt &true_case_bv = convert_bv(expr.true_case(), width);
+  const bvt &false_case_bv = convert_bv(expr.false_case(), width);
 
   return bv_utils.select(cond, true_case_bv, false_case_bv);
 }
