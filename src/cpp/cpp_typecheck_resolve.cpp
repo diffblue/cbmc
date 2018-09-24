@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/string_constant.h>
 
 #include <ansi-c/anonymous_member.h>
+#include <ansi-c/merged_type.h>
 
 #include "cpp_typecheck.h"
 #include "cpp_template_type.h"
@@ -1892,12 +1893,9 @@ void cpp_typecheck_resolvet::guess_template_args(
   else if(template_type.id()==ID_merged_type)
   {
     // look at subtypes
-    for(typet::subtypest::const_iterator
-        it=template_type.subtypes().begin();
-        it!=template_type.subtypes().end();
-        it++)
+    for(const auto &t : to_merged_type(template_type).subtypes())
     {
-      guess_template_args(*it, desired_type);
+      guess_template_args(t, desired_type);
     }
   }
   else if(is_reference(template_type) ||

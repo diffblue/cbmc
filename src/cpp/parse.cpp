@@ -14,13 +14,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <cassert>
 #include <map>
 
+#include <util/c_types.h>
 #include <util/expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
 #include <ansi-c/ansi_c_y.tab.h>
-#include <util/c_types.h>
+#include <ansi-c/merged_type.h>
 
 #include "cpp_token_buffer.h"
 #include "cpp_member_spec.h"
@@ -401,8 +402,8 @@ protected:
     {
       if(p->id()==ID_merged_type)
       {
-        assert(!p->subtypes().empty());
-        p=&p->subtypes().back();
+        auto &merged_type = to_merged_type(*p);
+        p = &merged_type.last_type();
       }
       else
         p=&p->subtype();
@@ -470,7 +471,7 @@ void Parser::merge_types(const typet &src, typet &dest)
     if(dest.id()!=ID_merged_type)
     {
       source_locationt location=dest.source_location();
-      typet tmp(ID_merged_type);
+      merged_typet tmp;
       tmp.move_to_subtypes(dest);
       tmp.add_source_location()=location;
       dest=tmp;
@@ -481,7 +482,6 @@ void Parser::merge_types(const typet &src, typet &dest)
     // merged_types
     typet::subtypest &sub=dest.subtypes();
     sub.emplace(sub.begin(), src);
-    POSTCONDITION(!dest.subtypes().empty());
   }
 }
 
@@ -3344,8 +3344,8 @@ bool Parser::optPtrOperator(typet &ptrs)
   {
     if(it->id()==ID_merged_type)
     {
-      assert(!it->subtypes().empty());
-      it->subtypes().back().subtype().swap(ptrs);
+      auto &merged_type = to_merged_type(*it);
+      merged_type.last_type().subtype().swap(ptrs);
     }
     else
     {
