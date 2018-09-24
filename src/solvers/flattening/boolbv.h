@@ -131,7 +131,7 @@ protected:
   virtual literalt convert_verilog_case_equality(
     const binary_relation_exprt &expr);
   virtual literalt convert_ieee_float_rel(const exprt &expr);
-  virtual literalt convert_quantifier(const exprt &expr);
+  virtual literalt convert_quantifier(const quantifier_exprt &expr);
 
   virtual bvt convert_index(const exprt &array, const mp_integer &index);
   virtual bvt convert_index(const index_exprt &expr);

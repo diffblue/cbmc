@@ -463,9 +463,9 @@ literalt boolbvt::convert_rest(const exprt &expr)
   else if(expr.id()==ID_extractbit)
     return convert_extractbit(to_extractbit_expr(expr));
   else if(expr.id()==ID_forall)
-    return convert_quantifier(expr);
+    return convert_quantifier(to_quantifier_expr(expr));
   else if(expr.id()==ID_exists)
-    return convert_quantifier(expr);
+    return convert_quantifier(to_quantifier_expr(expr));
   else if(expr.id()==ID_let)
   {
     bvt bv=convert_let(to_let_expr(expr));
