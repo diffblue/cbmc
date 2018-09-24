@@ -1186,15 +1186,11 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
     if(lex.LookAhead(0) == TOK_IDENTIFIER)
     {
-      cpp_namet cpp_name;
       cpp_tokent tk2;
       lex.get_token(tk2);
 
-      exprt name(ID_name);
-      name.set(ID_identifier, tk2.data.get(ID_C_base_name));
-      set_location(name, tk2);
-      cpp_name.get_sub().push_back(name);
-      declarator.name().swap(cpp_name);
+      declarator.name() = cpp_namet(tk2.data.get(ID_C_base_name));
+      set_location(declarator.name(), tk2);
 
       add_id(declarator.name(), new_scopet::kindt::TYPE_TEMPLATE_PARAMETER);
 
@@ -3549,8 +3545,7 @@ bool Parser::rName(irept &name)
       std::cout << std::string(__indent, ' ') << "Parser::rName 5\n";
       #endif
       lex.get_token(tk);
-      components.push_back(irept(ID_name));
-      components.back().set(ID_identifier, tk.data.get(ID_C_base_name));
+      components.push_back(cpp_namet::namet(tk.data.get(ID_C_base_name)));
       set_location(components.back(), tk);
 
       {
@@ -3814,8 +3809,7 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
 
     case TOK_IDENTIFIER:
       lex.get_token(tk);
-      components.push_back(irept(ID_name));
-      components.back().set(ID_identifier, tk.data.get(ID_C_base_name));
+      components.push_back(cpp_namet::namet(tk.data.get(ID_C_base_name)));
       set_location(components.back(), tk);
 
       {
@@ -6930,7 +6924,7 @@ bool Parser::rVarNameCore(exprt &name)
   std::cout << std::string(__indent, ' ') << "Parser::rVarNameCore 0\n";
   #endif
 
-  name=exprt(ID_cpp_name);
+  name = cpp_namet().as_expr();
   irept::subt &components=name.get_sub();
 
   if(lex.LookAhead(0)==TOK_TYPENAME)
@@ -6979,8 +6973,7 @@ bool Parser::rVarNameCore(exprt &name)
       #endif
 
       lex.get_token(tk);
-      components.push_back(irept(ID_name));
-      components.back().set(ID_identifier, tk.data.get(ID_C_base_name));
+      components.push_back(cpp_namet::namet(tk.data.get(ID_C_base_name)));
       set_location(components.back(), tk);
 
       // may be followed by template arguments
@@ -7817,12 +7810,7 @@ bool Parser::rTryStatement(codet &statement)
       assert(declaration.declarators().size()==1);
 
       if(declaration.declarators().front().name().is_nil())
-      {
-        irept name(ID_name);
-        name.set(ID_identifier, "#anon");
-        declaration.declarators().front().name()=cpp_namet();
-        declaration.declarators().front().name().get_sub().push_back(name);
-      }
+        declaration.declarators().front().name() = cpp_namet("#anon");
 
       codet code_decl;
       code_decl.set_statement(ID_decl);

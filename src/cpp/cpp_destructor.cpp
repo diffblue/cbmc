@@ -102,10 +102,7 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
     // there is always a destructor for non-PODs
     assert(dtor_name!="");
 
-    irept cpp_name(ID_cpp_name);
-    cpp_name.get_sub().push_back(irept(ID_name));
-    cpp_name.get_sub().back().set(ID_identifier, dtor_name);
-    cpp_name.get_sub().back().set(ID_C_source_location, source_location);
+    cpp_namet cpp_name(dtor_name, source_location);
 
     exprt member(ID_member);
     member.add(ID_component_cpp_name) = cpp_name;

@@ -41,12 +41,7 @@ void cpp_typecheckt::convert_anonymous_union(
   // unnamed object
   std::string identifier="#anon_union"+std::to_string(anon_counter++);
 
-  irept name(ID_name);
-  name.set(ID_identifier, identifier);
-  name.set(ID_C_source_location, declaration.source_location());
-
-  cpp_namet cpp_name;
-  cpp_name.move_to_sub(name);
+  const cpp_namet cpp_name(identifier, declaration.source_location());
   cpp_declaratort declarator;
   declarator.name()=cpp_name;
 

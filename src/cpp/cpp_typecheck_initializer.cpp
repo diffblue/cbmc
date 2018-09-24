@@ -268,12 +268,7 @@ void cpp_typecheckt::zero_initializer(
 
     if(max_comp_size>0)
     {
-      irept name(ID_name);
-      name.set(ID_identifier, comp.get_base_name());
-      name.set(ID_C_source_location, source_location);
-
-      cpp_namet cpp_name;
-      cpp_name.move_to_sub(name);
+      const cpp_namet cpp_name(comp.get_base_name(), source_location);
 
       exprt member(ID_member);
       member.copy_to_operands(object);
