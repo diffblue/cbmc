@@ -789,17 +789,9 @@ void cpp_typecheckt::full_member_initialization(
 /// \return return true if a copy constructor is found
 bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
 {
-  const struct_typet &struct_type=to_struct_type(symbol.type);
-  const struct_typet::componentst &components=struct_type.components();
-
-  for(struct_typet::componentst::const_iterator
-      cit=components.begin();
-      cit!=components.end();
-      cit++)
+  for(const auto &component : to_struct_type(symbol.type).components())
   {
     // Skip non-ctor
-    const struct_typet::componentt &component=*cit;
-
     if(component.type().id()!=ID_code ||
        to_code_type(component.type()).return_type().id() !=ID_constructor)
       continue;

@@ -127,15 +127,9 @@ std::string expr2javat::convert_struct(
   bool first=true;
   size_t last_size=0;
 
-  for(struct_typet::componentst::const_iterator
-      c_it=components.begin();
-      c_it!=components.end();
-      c_it++)
+  for(const auto &c : components)
   {
-    if(c_it->type().id()==ID_code)
-    {
-    }
-    else
+    if(c.type().id() != ID_code)
     {
       std::string tmp=convert(*o_it);
       std::string sep;
@@ -155,7 +149,7 @@ std::string expr2javat::convert_struct(
 
       dest+=sep;
       dest+='.';
-      dest+=c_it->get_string(ID_pretty_name);
+      dest += id2string(c.get_pretty_name());
       dest+='=';
       dest+=tmp;
     }

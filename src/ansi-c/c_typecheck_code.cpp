@@ -372,13 +372,8 @@ bool c_typecheck_baset::is_complete_type(const typet &type) const
   }
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
-    const struct_union_typet::componentst &components=
-      to_struct_union_type(type).components();
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-      if(!is_complete_type(it->type()))
+    for(const auto &c : to_struct_union_type(type).components())
+      if(!is_complete_type(c.type()))
         return false;
   }
   else if(type.id()==ID_vector)

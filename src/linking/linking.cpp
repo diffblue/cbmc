@@ -72,23 +72,17 @@ std::string linkingt::type_to_string_verbose(
       result+=" "+tag;
     result+=" {\n";
 
-    const struct_union_typet::componentst &components=
-      to_struct_union_type(followed).components();
-
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &c : to_struct_union_type(followed).components())
     {
-      const typet &subtype=it->type();
+      const typet &subtype = c.type();
       result+="  ";
       result+=type_to_string(ns, symbol.name, subtype);
       result+=' ';
 
-      if(it->get_base_name()!="")
-        result+=id2string(it->get_base_name());
+      if(!c.get_base_name().empty())
+        result += id2string(c.get_base_name());
       else
-        result+=id2string(it->get_name());
+        result += id2string(c.get_name());
 
       result+=";\n";
     }
@@ -686,11 +680,8 @@ void linkingt::duplicate_code_symbol(
           const typet &src_type=t1.id()==ID_union?t2:t1;
 
           bool found=false;
-          for(union_typet::componentst::const_iterator
-              it=union_type.components().begin();
-              !found && it!=union_type.components().end();
-              it++)
-            if(base_type_eq(it->type(), src_type, ns))
+          for(const auto &c : union_type.components())
+            if(base_type_eq(c.type(), src_type, ns))
             {
               found=true;
               if(warn_msg.empty())

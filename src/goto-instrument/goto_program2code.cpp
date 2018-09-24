@@ -1439,16 +1439,8 @@ void goto_program2codet::add_local_types(const typet &type)
          !type_names_set.insert(identifier).second)
         return;
 
-      const struct_union_typet &struct_union_type=
-        to_struct_union_type(full_type);
-      const struct_union_typet::componentst &components=
-        struct_union_type.components();
-
-      for(struct_union_typet::componentst::const_iterator
-          it=components.begin();
-          it!=components.end();
-          ++it)
-        add_local_types(it->type());
+      for(const auto &c : to_struct_union_type(full_type).components())
+        add_local_types(c.type());
 
       assert(!identifier.empty());
       type_names.push_back(identifier);

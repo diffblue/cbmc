@@ -56,18 +56,12 @@ mp_integer alignment(const typet &type, const namespacet &ns)
     result=alignment(type.subtype(), ns);
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
-    const struct_union_typet::componentst &components=
-      to_struct_union_type(type).components();
-
     result=1;
 
     // get the max
     // (should really be the smallest common denominator)
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-      result=std::max(result, alignment(it->type(), ns));
+    for(const auto &c : to_struct_union_type(type).components())
+      result = std::max(result, alignment(c.type(), ns));
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||

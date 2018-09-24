@@ -621,28 +621,20 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
         else
         {
           // maybe anonymous?
-
-          const struct_union_typet::componentst &components=
-            struct_union_type.components();
-
           bool found2=false;
 
-          for(struct_union_typet::componentst::const_iterator
-              c_it=components.begin();
-              c_it!=components.end();
-              c_it++)
+          for(const auto &c : struct_union_type.components())
           {
-            if(c_it->get_anonymous() &&
-               (follow(c_it->type()).id()==ID_struct ||
-                follow(c_it->type()).id()==ID_union))
+            if(
+              c.get_anonymous() && (follow(c.type()).id() == ID_struct ||
+                                    follow(c.type()).id() == ID_union))
             {
-              if(has_component_rec(c_it->type(), component_name, *this))
+              if(has_component_rec(c.type(), component_name, *this))
               {
                 if(type.id()==ID_struct)
                 {
-                  exprt o=
-                    member_offset_expr(
-                      to_struct_type(type), c_it->get_name(), *this);
+                  exprt o = member_offset_expr(
+                    to_struct_type(type), c.get_name(), *this);
 
                   if(o.is_nil())
                   {
@@ -658,7 +650,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
                   result=plus_exprt(result, o);
                 }
 
-                typet tmp=follow(c_it->type());
+                typet tmp = follow(c.type());
                 type=tmp;
                 assert(type.id()==ID_union || type.id()==ID_struct);
                 found2=true;
@@ -1099,21 +1091,15 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       op.make_typecast(signed_int_type());
 
     // we need to find a member with the right type
-    const union_typet &union_type=to_union_type(expr_type);
-    const union_typet::componentst &components=union_type.components();
-
-    for(union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &c : to_union_type(expr_type).components())
     {
-      if(base_type_eq(it->type(), op.type(), *this))
+      if(base_type_eq(c.type(), op.type(), *this))
       {
         // found! build union constructor
         union_exprt union_expr(expr.type());
         union_expr.add_source_location()=expr.source_location();
         union_expr.op()=op;
-        union_expr.set_component_name(it->get_name());
+        union_expr.set_component_name(c.get_name());
         expr=union_expr;
         expr.set(ID_C_lvalue, true);
         return;

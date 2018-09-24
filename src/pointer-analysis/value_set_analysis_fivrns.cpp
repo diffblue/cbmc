@@ -89,17 +89,10 @@ void value_set_analysis_fivrnst::get_entries_rec(
   if(t.id()==ID_struct ||
      t.id()==ID_union)
   {
-    const struct_typet &struct_type=to_struct_type(t);
-
-    const struct_typet::componentst &c=struct_type.components();
-
-    for(struct_typet::componentst::const_iterator
-        it=c.begin();
-        it!=c.end();
-        it++)
+    for(const auto &c : to_struct_union_type(t).components())
     {
       get_entries_rec(
-        identifier, suffix + "." + id2string(it->get_name()), it->type(), dest);
+        identifier, suffix + "." + id2string(c.get_name()), c.type(), dest);
     }
   }
   else if(t.id()==ID_array)
@@ -179,19 +172,9 @@ bool value_set_analysis_fivrnst::check_type(const typet &type)
     else if(type.id()==ID_struct ||
             type.id()==ID_union)
     {
-      const struct_typet &struct_type=to_struct_type(type);
-
-      const struct_typet::componentst &components=
-        struct_type.components();
-
-      for(struct_typet::componentst::const_iterator
-          it=components.begin();
-          it!=components.end();
-          it++)
-      {
-        if(check_type(it->type()))
+      for(const auto &c : to_struct_union_type(type).components())
+        if(check_type(c.type()))
           return true;
-      }
     }
     else if(type.id()==ID_array)
       return check_type(type.subtype());
