@@ -24,15 +24,18 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
     throw 0;
   }
 
-  mp_integer upper_as_int, lower_as_int;
   auto const &src_bv = convert_bv(expr.src());
+
+  auto const maybe_upper_as_int = numeric_cast<mp_integer>(expr.upper());
+  auto const maybe_lower_as_int = numeric_cast<mp_integer>(expr.lower());
 
   // We only do constants for now.
   // Should implement a shift here.
-  if(
-    to_integer(expr.op1(), upper_as_int) ||
-    to_integer(expr.op2(), lower_as_int))
+  if(!maybe_upper_as_int.has_value() || !maybe_lower_as_int.has_value())
     return conversion_failed(expr);
+
+  auto upper_as_int = maybe_upper_as_int.value();
+  auto lower_as_int = maybe_lower_as_int.value();
 
   if(upper_as_int < 0 || upper_as_int >= src_bv.size())
   {
