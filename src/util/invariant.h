@@ -382,7 +382,7 @@ CBMC_NORETURN void report_invariant_failure(
     if(!(CONDITION))                                                           \
     {                                                                          \
       invariant_violated_string(                                               \
-        __FILE__, CURRENT_FUNCTION_NAME, __LINE__, REASON, #CONDITION);        \
+        __FILE__, CURRENT_FUNCTION_NAME, __LINE__, #CONDITION, REASON);        \
     }                                                                          \
   } while(false)
 
