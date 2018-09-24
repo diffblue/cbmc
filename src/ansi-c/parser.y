@@ -376,8 +376,8 @@ gcc_builtin_expressions:
         {
           $$=$1;
           stack($$).id(ID_gcc_builtin_types_compatible_p);
-          typet &type_arg=(typet &)(stack($$).add(ID_type_arg));
-          typet::subtypest &subtypes=type_arg.subtypes();
+          auto &type_arg=static_cast<type_with_subtypest &>(stack($$).add(ID_type_arg));
+          auto &subtypes=type_arg.subtypes();
           subtypes.resize(2);
           subtypes[0].swap(stack($3));
           subtypes[1].swap(stack($5));
@@ -1855,7 +1855,7 @@ parameter_type_list:
         {
           typet tmp(ID_ellipsis);
           $$=$1;
-          stack_type($$).move_to_subtypes(tmp);
+          to_type_with_subtypes(stack_type($$)).move_to_subtypes(tmp);
         }
         ;
 
@@ -3189,7 +3189,7 @@ postfixing_abstract_declarator:
           set($$, ID_code);
           stack_type($$).subtype()=typet(ID_abstract);
           stack_type($$).add(ID_parameters).get_sub().
-            swap((irept::subt &)(stack_type($3).subtypes()));
+            swap((irept::subt &)(to_type_with_subtypes(stack_type($3)).subtypes()));
           PARSER.pop_scope();
           adjust_KnR_parameters(stack($$).add(ID_parameters), stack($5));
           stack($$).set(ID_C_KnR, true);
@@ -3219,7 +3219,7 @@ parameter_postfixing_abstract_declarator:
           set($$, ID_code);
           stack_type($$).subtype()=typet(ID_abstract);
           stack_type($$).add(ID_parameters).get_sub().
-            swap((irept::subt &)(stack_type($3).subtypes()));
+            swap((irept::subt &)(to_type_with_subtypes(stack_type($3)).subtypes()));
           PARSER.pop_scope();
 
           if(stack($5).is_not_nil())

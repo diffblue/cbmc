@@ -229,7 +229,7 @@ void cpp_typecheckt::default_cpctor(
   // Parameter declaration
   cpp_declarationt parameter_decl;
   parameter_decl.set(ID_type, ID_merged_type);
-  typet::subtypest &sub=parameter_decl.type().subtypes();
+  auto &sub = to_type_with_subtypes(parameter_decl.type()).subtypes();
   sub.push_back(
     static_cast<const typet &>(static_cast<const irept &>(cppcomp)));
   irept constnd(ID_const);
@@ -397,7 +397,7 @@ void cpp_typecheckt::default_assignop(
   cpp_declarationt &args_decl=
     static_cast<cpp_declarationt&>(args.get_sub().back());
 
-  typet::subtypest &args_decl_type_sub=args_decl.type().subtypes();
+  auto &args_decl_type_sub = to_type_with_subtypes(args_decl.type()).subtypes();
 
   args_decl.type().id(ID_merged_type);
   args_decl_type_sub.push_back(typet(ID_cpp_name));
