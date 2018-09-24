@@ -7,6 +7,8 @@ string
 Test invariant failure
 Invariant check failed
 ^(Backtrace)|(Backtraces not supported)$
+^Condition: false$
+^Reason: Test invariant failure$
 --
 ^warning: ignoring
 ^VERIFICATION SUCCESSFUL$
