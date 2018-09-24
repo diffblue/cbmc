@@ -12,6 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/floatbv/float_utils.h>
 
+#include <algorithm>
+#include <iterator>
+
 #include "boolbv_type.h"
 
 bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
@@ -48,42 +51,28 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
       "total bitvector width needs to be a multiple of the component bitvector "
       "widths");
 
-    std::size_t size=width/sub_width;
     bvt bv;
-    bv.resize(width);
 
-    for(std::size_t i=0; i<size; i++)
+    for(std::size_t sub_idx = 0; sub_idx < width; sub_idx += sub_width)
     {
       bvt tmp_op;
-      tmp_op.resize(sub_width);
 
-      for(std::size_t j=0; j<tmp_op.size(); j++)
-      {
-        INVARIANT(
-          i * sub_width + j < op_bv.size(), "bit index shall be within bounds");
-        tmp_op[j]=op_bv[i*sub_width+j];
-      }
+      const auto sub_it = std::next(op_bv.begin(), sub_idx);
+      std::copy_n(sub_it, sub_width, std::back_inserter(tmp_op));
 
-      bvt tmp_result;
-
-      if(type.subtype().id()==ID_floatbv)
+      if(type.subtype().id() == ID_floatbv)
       {
         float_utilst float_utils(prop, to_floatbv_type(subtype));
-        tmp_result=float_utils.negate(tmp_op);
+        tmp_op = float_utils.negate(tmp_op);
       }
       else
-        tmp_result=bv_utils.negate(tmp_op);
+        tmp_op = bv_utils.negate(tmp_op);
 
       INVARIANT(
-        tmp_result.size() == sub_width,
+        tmp_op.size() == sub_width,
         "bitvector after negation shall have same bit width");
 
-      for(std::size_t j=0; j<tmp_result.size(); j++)
-      {
-        INVARIANT(
-          i * sub_width + j < bv.size(), "bit index shall be within bounds");
-        bv[i*sub_width+j]=tmp_result[j];
-      }
+      std::copy(tmp_op.begin(), tmp_op.end(), std::back_inserter(bv));
     }
 
     return bv;
