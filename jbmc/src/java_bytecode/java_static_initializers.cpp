@@ -656,7 +656,7 @@ codet get_clinit_wrapper_body(
   //
   // java::C::clinit_wrapper()
   // {
-  //   if (java::C::clinit_already_run == false)
+  //   if (!java::C::clinit_already_run)
   //   {
   //     java::C::clinit_already_run = true; // before recursive calls!
   //
