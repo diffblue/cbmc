@@ -33,7 +33,7 @@ void template_mapt::apply(typet &type) const
   {
     for(auto &c : to_struct_union_type(type).components())
     {
-      typet &subtype = static_cast<typet &>(c.add(ID_type));
+      typet &subtype = c.type();
       apply(subtype);
     }
   }

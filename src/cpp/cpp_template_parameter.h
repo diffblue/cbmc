@@ -43,17 +43,6 @@ public:
   {
     return set(ID_identifier, identifier);
   }
-
-  // the type of expression parameters
-  typet &type()
-  {
-    return static_cast<typet &>(add(ID_type));
-  }
-
-  const typet &type() const
-  {
-    return static_cast<const typet &>(find(ID_type));
-  }
   #endif
 
   exprt &default_argument()

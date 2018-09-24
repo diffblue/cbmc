@@ -2314,7 +2314,7 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
         cpp_typecheck.lookup(id.identifier);
 
       // Template struct? Really needs arguments to be a scope!
-      if(symbol.type.get(ID_type)==ID_struct)
+      if(symbol.type.id() == ID_struct)
       {
         id.print(std::cout);
         assert(id.is_scope);

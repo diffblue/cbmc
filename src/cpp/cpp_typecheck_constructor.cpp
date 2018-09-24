@@ -462,16 +462,16 @@ void cpp_typecheckt::default_assignop_value(
     if(
       c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
       c.get_bool(ID_is_static) || c.get_bool(ID_is_vtptr) ||
-      c.get(ID_type) == ID_code)
+      c.type().id() == ID_code)
     {
       continue;
     }
 
     const irep_idt &mem_name = c.get_base_name();
 
-    if(c.get(ID_type) == ID_array)
+    if(c.type().id() == ID_array)
     {
-      const exprt &size_expr = to_array_type((typet &)c.find(ID_type)).size();
+      const exprt &size_expr = to_array_type(c.type()).size();
 
       if(size_expr.id()==ID_infinity)
       {
@@ -570,7 +570,7 @@ void cpp_typecheckt::check_member_initializers(
       // Data member
       if(
         !c.get_bool(ID_from_base) && !c.get_bool(ID_is_static) &&
-        c.get(ID_type) != ID_code)
+        c.type().id() != ID_code)
       {
         ok=true;
         break;
@@ -579,11 +579,10 @@ void cpp_typecheckt::check_member_initializers(
       // Maybe it is a parent constructor?
       if(c.get_bool(ID_is_type))
       {
-        typet type = static_cast<const typet &>(c.find(ID_type));
-        if(type.id() != ID_symbol_type)
+        if(c.type().id() != ID_symbol_type)
           continue;
 
-        const symbolt &symb=lookup(type.get(ID_identifier));
+        const symbolt &symb = lookup(to_symbol_type(c.type()).get_identifier());
         if(symb.type.id()!=ID_struct)
           break;
 
@@ -741,7 +740,7 @@ void cpp_typecheckt::full_member_initialization(
           for(const auto &c : components)
           {
             if(
-              c.get_base_name() == base_name && c.get(ID_type) != ID_code &&
+              c.get_base_name() == base_name && c.type().id() != ID_code &&
               !c.get_bool(ID_is_type))
             {
               is_data=true;
@@ -881,8 +880,8 @@ void cpp_typecheckt::full_member_initialization(
     // If the data member is a reference, it must be explicitly
     // initialized
     if(
-      !found && c.find(ID_type).id() == ID_pointer &&
-      c.find(ID_type).get_bool(ID_C_reference))
+      !found && c.type().id() == ID_pointer &&
+      c.type().get_bool(ID_C_reference))
     {
       error().source_location = c.source_location();
       error() << "reference must be explicitly initialized" << eom;
@@ -891,7 +890,7 @@ void cpp_typecheckt::full_member_initialization(
 
     // If the data member is not POD and is not explicitly initialized,
     // then its default constructor is called.
-    if(!found && !cpp_is_pod((const typet &)(c.find(ID_type))))
+    if(!found && !cpp_is_pod(c.type()))
     {
       irept name(ID_name);
       name.set(ID_identifier, mem_name);
