@@ -228,14 +228,10 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
     // there is always a constructor for non-PODs
     assert(constructor_name!="");
 
-    irept cpp_name(ID_cpp_name);
-    cpp_name.get_sub().push_back(irept(ID_name));
-    cpp_name.get_sub().back().set(ID_identifier, constructor_name);
-    cpp_name.get_sub().back().set(ID_C_source_location, source_location);
-
     side_effect_expr_function_callt function_call;
     function_call.add_source_location()=source_location;
-    function_call.function().swap(static_cast<exprt&>(cpp_name));
+    function_call.function() =
+      cpp_namet(constructor_name, source_location).as_expr();
     function_call.arguments().reserve(operands_tc.size());
 
     for(exprt::operandst::iterator

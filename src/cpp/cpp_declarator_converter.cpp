@@ -45,8 +45,7 @@ symbolt &cpp_declarator_convertert::convert(
     type.swap(declarator.name().get_sub().back());
     declarator.type().subtype()=type;
     cpp_typecheck.typecheck_type(type);
-    irept name(ID_name);
-    name.set(ID_identifier, "("+cpp_type2name(type)+")");
+    cpp_namet::namet name("(" + cpp_type2name(type) + ")");
     declarator.name().get_sub().back().swap(name);
   }
 

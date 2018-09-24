@@ -209,7 +209,7 @@ void cpp_typecheckt::typecheck_function_template(
   assert(declaration.declarators().size()==1);
 
   cpp_declaratort &declarator=declaration.declarators()[0];
-  const cpp_namet &cpp_name=to_cpp_name(declarator.add(ID_name));
+  const cpp_namet &cpp_name = declarator.name();
 
   // do template arguments
   // this also sets up the template scope
@@ -312,7 +312,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   assert(declaration.declarators().size()==1);
 
   cpp_declaratort &declarator=declaration.declarators()[0];
-  const cpp_namet &cpp_name=to_cpp_name(declarator.add(ID_name));
+  const cpp_namet &cpp_name = declarator.name();
 
   assert(cpp_name.is_qualified() ||
          cpp_name.has_template_args());
@@ -755,12 +755,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
 
     // it may be anonymous
     if(declarator.name().is_nil())
-    {
-      irept name(ID_name);
-      name.set(ID_identifier, "anon#"+std::to_string(++anon_count));
-      declarator.name()=cpp_namet();
-      declarator.name().get_sub().push_back(name);
-    }
+      declarator.name() = cpp_namet("anon#" + std::to_string(++anon_count));
 
     #if 1
     // The declarator needs to be just a name
@@ -1070,7 +1065,7 @@ void cpp_typecheckt::convert_template_declaration(
     assert(declaration.declarators().size()>=1);
 
     cpp_declaratort &declarator=declaration.declarators()[0];
-    const cpp_namet &cpp_name=to_cpp_name(declarator.add(ID_name));
+    const cpp_namet &cpp_name = declarator.name();
 
     if(cpp_name.is_qualified() ||
        cpp_name.has_template_args())

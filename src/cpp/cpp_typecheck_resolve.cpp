@@ -886,7 +886,6 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   irep_idt &base_name,
   cpp_template_args_non_tct &template_args)
 {
-  assert(cpp_name.id()==ID_cpp_name);
   assert(!cpp_name.get_sub().empty());
 
   original_scope=&cpp_typecheck.cpp_scopes.current_scope();

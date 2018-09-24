@@ -162,13 +162,8 @@ void cpp_typecheckt::default_ctor(
   const irep_idt &base_name,
   cpp_declarationt &ctor) const
 {
-  exprt name(ID_name);
-  name.set(ID_identifier, base_name);
-  name.add_source_location()=source_location;
-
   cpp_declaratort decl;
-  decl.name().id(ID_cpp_name);
-  decl.name().move_to_sub(name);
+  decl.name() = cpp_namet(base_name, source_location);
   decl.type()=typet(ID_function_type);
   decl.type().subtype().make_nil();
   decl.add_source_location()=source_location;
@@ -204,20 +199,10 @@ void cpp_typecheckt::default_cpctor(
   std::string param_identifier("ref");
 
   // Compound name
-  irept comp_name(ID_name);
-  comp_name.set(ID_identifier, symbol.base_name);
-  comp_name.set(ID_C_source_location, source_location);
-
-  cpp_namet cppcomp;
-  cppcomp.move_to_sub(comp_name);
+  const cpp_namet cppcomp(symbol.base_name, source_location);
 
   // Parameter name
-  exprt param_name(ID_name);
-  param_name.add_source_location()=source_location;
-  param_name.set(ID_identifier, param_identifier);
-
-  cpp_namet cpp_parameter;
-  cpp_parameter.move_to_sub(param_name);
+  const cpp_namet cpp_parameter(param_identifier, source_location);
 
   // Parameter declarator
   cpp_declaratort parameter_tor;
@@ -230,8 +215,7 @@ void cpp_typecheckt::default_cpctor(
   cpp_declarationt parameter_decl;
   parameter_decl.set(ID_type, ID_merged_type);
   auto &sub = to_type_with_subtypes(parameter_decl.type()).subtypes();
-  sub.push_back(
-    static_cast<const typet &>(static_cast<const irept &>(cppcomp)));
+  sub.push_back(cppcomp.as_type());
   irept constnd(ID_const);
   sub.push_back(static_cast<const typet &>(constnd));
   parameter_decl.move_to_operands(parameter_tor);
@@ -264,18 +248,12 @@ void cpp_typecheckt::default_cpctor(
       irep_idt ctor_name=parsymb.base_name;
 
       // Call the parent default copy constructor
-      exprt name(ID_name);
-      name.set(ID_identifier, ctor_name);
-      name.add_source_location()=source_location;
-
-      cpp_namet cppname;
-      cppname.move_to_sub(name);
+      const cpp_namet cppname(ctor_name, source_location);
 
       codet mem_init(ID_member_initializer);
       mem_init.add_source_location()=source_location;
       mem_init.set(ID_member, cppname);
-      mem_init.copy_to_operands(
-        static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
+      mem_init.copy_to_operands(cpp_parameter.as_expr());
       initializers.move_to_sub(mem_init);
     }
   }
@@ -289,12 +267,7 @@ void cpp_typecheckt::default_cpctor(
     // Take care of virtual tables
     if(mem_c.get_bool(ID_is_vtptr))
     {
-      exprt name(ID_name);
-      name.set(ID_identifier, mem_c.get_base_name());
-      name.add_source_location()=source_location;
-
-      cpp_namet cppname;
-      cppname.move_to_sub(name);
+      const cpp_namet cppname(mem_c.get_base_name(), source_location);
 
       const symbolt &virtual_table_symbol_type =
         lookup(mem_c.type().subtype().get(ID_identifier));
@@ -327,12 +300,7 @@ void cpp_typecheckt::default_cpctor(
 
     const irep_idt &mem_name = mem_c.get_base_name();
 
-    exprt name(ID_name);
-    name.set(ID_identifier, mem_name);
-    name.add_source_location()=source_location;
-
-    cpp_namet cppname;
-    cppname.move_to_sub(name);
+    const cpp_namet cppname(mem_name, source_location);
 
     codet mem_init(ID_member_initializer);
     mem_init.set(ID_member, cppname);
@@ -340,8 +308,7 @@ void cpp_typecheckt::default_cpctor(
 
     exprt memberexpr(ID_member);
     memberexpr.set(ID_component_cpp_name, cppname);
-    memberexpr.copy_to_operands(
-      static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
+    memberexpr.copy_to_operands(cpp_parameter.as_expr());
     memberexpr.add_source_location()=source_location;
 
     if(mem_c.type().id() == ID_array)
@@ -400,12 +367,8 @@ void cpp_typecheckt::default_assignop(
   auto &args_decl_type_sub = to_type_with_subtypes(args_decl.type()).subtypes();
 
   args_decl.type().id(ID_merged_type);
-  args_decl_type_sub.push_back(typet(ID_cpp_name));
-  args_decl_type_sub.back().get_sub().push_back(irept(ID_name));
-  args_decl_type_sub.back().get_sub().back().set(
-    ID_identifier, symbol.base_name);
-  args_decl_type_sub.back().get_sub().back().set(
-    ID_C_source_location, source_location);
+  args_decl_type_sub.push_back(
+    cpp_namet(symbol.base_name, source_location).as_type());
 
   args_decl_type_sub.push_back(typet(ID_const));
   args_decl.operands().push_back(exprt(ID_cpp_declarator));
@@ -414,9 +377,7 @@ void cpp_typecheckt::default_assignop(
   cpp_declaratort &args_decl_declor=
     static_cast<cpp_declaratort&>(args_decl.operands().back());
 
-  args_decl_declor.name().id(ID_cpp_name);
-  args_decl_declor.name().get_sub().push_back(irept(ID_name));
-  args_decl_declor.name().get_sub().back().add(ID_identifier).id(arg_name);
+  args_decl_declor.name() = cpp_namet(arg_name, source_location);
   args_decl_declor.add_source_location()=source_location;
 
   args_decl_declor.type()=pointer_type(typet(ID_nil));
@@ -521,8 +482,6 @@ void cpp_typecheckt::check_member_initializers(
   {
     const irept &initializer=*init_it;
     assert(initializer.is_not_nil());
-
-    assert(initializer.get(ID_member)==ID_cpp_name);
 
     const cpp_namet &member_name=
       to_cpp_name(initializer.find(ID_member));
@@ -666,15 +625,7 @@ void cpp_typecheckt::full_member_initialization(
       // ifthenelse only gets to have two operands (instead of three)
       codet cond(ID_ifthenelse);
 
-      {
-        cpp_namet most_derived;
-        most_derived.get_sub().push_back(irept(ID_name));
-        most_derived.get_sub().back().set(ID_identifier, "@most_derived");
-
-        exprt tmp;
-        tmp.swap(most_derived);
-        cond.move_to_operands(tmp);
-      }
+      cond.copy_to_operands(cpp_namet("@most_derived").as_expr());
 
       code_blockt block;
 
@@ -684,11 +635,7 @@ void cpp_typecheckt::full_member_initialization(
         if(!cpp_is_pod(symb.type))
         {
           // default initializer
-          irept name(ID_name);
-          name.set(ID_identifier, symb.base_name);
-
-          cpp_namet cppname;
-          cppname.move_to_sub(name);
+          const cpp_namet cppname(symb.base_name);
 
           codet mem_init(ID_member_initializer);
           mem_init.set(ID_member, cppname);
@@ -723,8 +670,6 @@ void cpp_typecheckt::full_member_initialization(
       forall_irep(m_it, initializers.get_sub())
       {
         irept initializer=*m_it;
-
-        assert(initializer.get(ID_member)==ID_cpp_name);
 
         const cpp_namet &member_name=
           to_cpp_name(initializer.find(ID_member));
@@ -773,11 +718,7 @@ void cpp_typecheckt::full_member_initialization(
       // Call the parent default constructor
       if(!found)
       {
-        irept name(ID_name);
-        name.set(ID_identifier, ctor_name);
-
-        cpp_namet cppname;
-        cppname.move_to_sub(name);
+        const cpp_namet cppname(ctor_name);
 
         codet mem_init(ID_member_initializer);
         mem_init.set(ID_member, cppname);
@@ -790,15 +731,7 @@ void cpp_typecheckt::full_member_initialization(
         // ifthenelse only gets to have two operands (instead of three)
         codet cond(ID_ifthenelse);
 
-        {
-          cpp_namet most_derived;
-          most_derived.get_sub().push_back(irept(ID_name));
-          most_derived.get_sub().back().set(ID_identifier, "@most_derived");
-
-          exprt tmp;
-          tmp.swap(most_derived);
-          cond.move_to_operands(tmp);
-        }
+        cond.copy_to_operands(cpp_namet("@most_derived").as_expr());
 
         {
           codet tmp(ID_member_initializer);
@@ -816,12 +749,7 @@ void cpp_typecheckt::full_member_initialization(
     // Take care of virtual tables
     if(c.get_bool(ID_is_vtptr))
     {
-      exprt name(ID_name);
-      name.set(ID_identifier, c.get_base_name());
-      name.add_source_location() = c.source_location();
-
-      cpp_namet cppname;
-      cppname.move_to_sub(name);
+      const cpp_namet cppname(c.get_base_name(), c.source_location());
 
       const symbolt &virtual_table_symbol_type =
         lookup(c.type().subtype().get(ID_identifier));
@@ -893,11 +821,7 @@ void cpp_typecheckt::full_member_initialization(
     // then its default constructor is called.
     if(!found && !cpp_is_pod((const typet &)(c.find(ID_type))))
     {
-      irept name(ID_name);
-      name.set(ID_identifier, mem_name);
-
-      cpp_namet cppname;
-      cppname.move_to_sub(name);
+      cpp_namet cppname(mem_name);
 
       codet mem_init(ID_member_initializer);
       mem_init.set(ID_member, cppname);

@@ -32,14 +32,8 @@ void cpp_typecheckt::default_dtor(
   assert(symbol.type.id()==ID_struct ||
          symbol.type.id()==ID_union);
 
-  irept name;
-  name.id(ID_name);
-  name.set(ID_identifier, "~"+id2string(symbol.base_name));
-  name.set(ID_C_source_location, symbol.location);
-
   cpp_declaratort decl;
-  decl.name().id(ID_cpp_name);
-  decl.name().move_to_sub(name);
+  decl.name() = cpp_namet("~" + id2string(symbol.base_name), symbol.location);
   decl.type().id(ID_function_type);
   decl.type().subtype().make_nil();
 
@@ -78,11 +72,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
   {
     if(c.get_bool(ID_is_vtptr))
     {
-      exprt name(ID_name);
-      name.set(ID_identifier, c.get_base_name());
-
-      cpp_namet cppname;
-      cppname.move_to_sub(name);
+      const cpp_namet cppname(c.get_base_name());
 
       const symbolt &virtual_table_symbol_type =
         lookup(c.type().subtype().get(ID_identifier));
@@ -123,12 +113,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
        cpp_is_pod(type))
       continue;
 
-    irept name(ID_name);
-    name.set(ID_identifier, cit->get_base_name());
-    name.set(ID_C_source_location, source_location);
-
-    cpp_namet cppname;
-    cppname.get_sub().push_back(name);
+    const cpp_namet cppname(cit->get_base_name(), source_location);
 
     exprt member(ID_ptrmember, type);
     member.set(ID_component_cpp_name, cppname);
