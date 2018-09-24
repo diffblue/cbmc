@@ -551,7 +551,7 @@ exprt interpretert::get_value(
   }
   else if(real_type.id()==ID_array)
   {
-    constant_exprt result(type);
+    array_exprt result(to_array_type(real_type));
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
 
     // Get size of array
@@ -603,12 +603,7 @@ exprt interpretert::get_value(
   else if(real_type.id() == ID_pointer)
   {
     if(rhs[integer2size_t(offset)]==0)
-    {
-      // NULL pointer
-      constant_exprt result(type);
-      result.set_value(ID_NULL);
-      return result;
-    }
+      return null_pointer_exprt(to_pointer_type(real_type)); // NULL pointer
 
     if(rhs[integer2size_t(offset)]<memory.size())
     {
