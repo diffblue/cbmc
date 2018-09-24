@@ -61,16 +61,18 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     }
 
     // Must have a finite size
-    mp_integer array_size;
-    if(to_integer(array_type.size(), array_size))
-      throw "failed to convert array size";
+    mp_integer array_size = numeric_cast_v<mp_integer>(array_type.size());
 
-    // see if the index address is constant
-    // many of these are compacted by simplify_expr
-    // but variable location writes will block this
-    mp_integer index_value;
-    if(!to_integer(index, index_value))
-      return convert_index(array, index_value);
+    {
+      // see if the index address is constant
+      // many of these are compacted by simplify_expr
+      // but variable location writes will block this
+      auto maybe_index_value = numeric_cast<mp_integer>(index);
+      if(maybe_index_value.has_value())
+      {
+        return convert_index(array, maybe_index_value.value());
+      }
+    }
 
     // Special case : arrays of one thing (useful for constants)
     // TODO : merge with ACTUAL_ARRAY_HACK so that ranges of the same
