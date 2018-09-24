@@ -302,6 +302,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // replace declaration by symbol expression
     symbol_exprt bound=to_symbol_expr(expr.op0().op0());
     expr.op0().swap(bound);
+
+    implicit_typecast_bool(expr.op1());
   }
   else if(expr.id()==ID_label)
   {
