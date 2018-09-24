@@ -79,82 +79,89 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
   if(operands.size()!=3)
     throw "operator "+expr.id_string()+" takes three operands";
 
-  const exprt &op0=expr.op0(); // first operand
-  const exprt &op1=expr.op1(); // second operand
-  const exprt &op2=expr.op2(); // rounding mode
+  const exprt &lhs = expr.op0();
+  const exprt &rhs = expr.op1();
+  const exprt &rounding_mode = expr.op2();
 
-  bvt bv0=convert_bv(op0);
-  bvt bv1=convert_bv(op1);
-  bvt bv2=convert_bv(op2);
+  bvt lhs_as_bv = convert_bv(lhs);
+  bvt rhs_as_bv = convert_bv(rhs);
+  bvt rounding_mode_as_bv = convert_bv(rounding_mode);
 
-  const typet &type=ns.follow(expr.type());
+  const typet &resolved_type = ns.follow(expr.type());
   DATA_INVARIANT(
-    op0.type() == type && op1.type() == type,
+    lhs.type() == resolved_type && rhs.type() == resolved_type,
     "float op with mixed types:\n" + expr.pretty());
 
   float_utilst float_utils(prop);
 
-  float_utils.set_rounding_mode(bv2);
+  float_utils.set_rounding_mode(rounding_mode_as_bv);
 
-  if(type.id()==ID_floatbv)
+  if(resolved_type.id() == ID_floatbv)
   {
     float_utils.spec=ieee_float_spect(to_floatbv_type(expr.type()));
 
     if(expr.id()==ID_floatbv_plus)
-      return float_utils.add_sub(bv0, bv1, false);
+      return float_utils.add_sub(lhs_as_bv, rhs_as_bv, false);
     else if(expr.id()==ID_floatbv_minus)
-      return float_utils.add_sub(bv0, bv1, true);
+      return float_utils.add_sub(lhs_as_bv, rhs_as_bv, true);
     else if(expr.id()==ID_floatbv_mult)
-      return float_utils.mul(bv0, bv1);
+      return float_utils.mul(lhs_as_bv, rhs_as_bv);
     else if(expr.id()==ID_floatbv_div)
-      return float_utils.div(bv0, bv1);
+      return float_utils.div(lhs_as_bv, rhs_as_bv);
     else if(expr.id()==ID_floatbv_rem)
-      return float_utils.rem(bv0, bv1);
+      return float_utils.rem(lhs_as_bv, rhs_as_bv);
     else
       throw "unexpected operator "+expr.id_string();
   }
-  else if(type.id()==ID_vector || type.id()==ID_complex)
+  else if(resolved_type.id() == ID_vector || resolved_type.id() == ID_complex)
   {
-    const typet &subtype=ns.follow(type.subtype());
+    const typet &subtype = ns.follow(resolved_type.subtype());
 
     if(subtype.id()==ID_floatbv)
     {
       float_utils.spec=ieee_float_spect(to_floatbv_type(subtype));
 
-      std::size_t width=boolbv_width(type);
+      std::size_t width = boolbv_width(resolved_type);
       std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width==0 || width%sub_width!=0)
         throw "convert_floatbv_op: unexpected vector operand width";
 
       std::size_t size=width/sub_width;
-      bvt bv;
-      bv.resize(width);
+      bvt result_bv;
+      result_bv.resize(width);
 
       for(std::size_t i=0; i<size; i++)
       {
-        bvt tmp_bv0, tmp_bv1, tmp_bv;
+        bvt lhs_sub_bv, rhs_sub_bv, sub_result_bv;
 
-        tmp_bv0.assign(bv0.begin()+i*sub_width, bv0.begin()+(i+1)*sub_width);
-        tmp_bv1.assign(bv1.begin()+i*sub_width, bv1.begin()+(i+1)*sub_width);
+        lhs_sub_bv.assign(
+          lhs_as_bv.begin() + i * sub_width,
+          lhs_as_bv.begin() + (i + 1) * sub_width);
+        rhs_sub_bv.assign(
+          rhs_as_bv.begin() + i * sub_width,
+          rhs_as_bv.begin() + (i + 1) * sub_width);
 
         if(expr.id()==ID_floatbv_plus)
-          tmp_bv=float_utils.add_sub(tmp_bv0, tmp_bv1, false);
+          sub_result_bv = float_utils.add_sub(lhs_sub_bv, rhs_sub_bv, false);
         else if(expr.id()==ID_floatbv_minus)
-          tmp_bv=float_utils.add_sub(tmp_bv0, tmp_bv1, true);
+          sub_result_bv = float_utils.add_sub(lhs_sub_bv, rhs_sub_bv, true);
         else if(expr.id()==ID_floatbv_mult)
-          tmp_bv=float_utils.mul(tmp_bv0, tmp_bv1);
+          sub_result_bv = float_utils.mul(lhs_sub_bv, rhs_sub_bv);
         else if(expr.id()==ID_floatbv_div)
-          tmp_bv=float_utils.div(tmp_bv0, tmp_bv1);
+          sub_result_bv = float_utils.div(lhs_sub_bv, rhs_sub_bv);
         else
           assert(false);
 
-        assert(tmp_bv.size()==sub_width);
-        assert(i*sub_width+sub_width-1<bv.size());
-        std::copy(tmp_bv.begin(), tmp_bv.end(), bv.begin()+i*sub_width);
+        assert(sub_result_bv.size() == sub_width);
+        assert(i * sub_width + sub_width - 1 < result_bv.size());
+        std::copy(
+          sub_result_bv.begin(),
+          sub_result_bv.end(),
+          result_bv.begin() + i * sub_width);
       }
 
-      return bv;
+      return result_bv;
     }
     else
       return conversion_failed(expr);
