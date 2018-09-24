@@ -89,8 +89,6 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_c_bit_field_type(to_c_bit_field_type(type));
   else if(type.id()==ID_typeof)
     typecheck_typeof_type(type);
-  else if(type.id() == ID_symbol_type)
-    typecheck_symbol_type(to_symbol_type(type));
   else if(type.id() == ID_typedef_type)
     typecheck_typedef_type(type);
   else if(type.id() == ID_struct_tag ||
@@ -1456,32 +1454,6 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
 
   type.add_source_location()=source_location;
   c_qualifiers.write(type);
-}
-
-void c_typecheck_baset::typecheck_symbol_type(symbol_typet &type)
-{
-  // we do some consistency checking only
-  const irep_idt &identifier = type.get_identifier();
-
-  symbol_tablet::symbolst::const_iterator s_it=
-    symbol_table.symbols.find(identifier);
-
-  if(s_it==symbol_table.symbols.end())
-  {
-    error().source_location=type.source_location();
-    error() << "type symbol `" << identifier << "' not found"
-            << eom;
-    throw 0;
-  }
-
-  const symbolt &symbol=s_it->second;
-
-  if(!symbol.is_type)
-  {
-    error().source_location=type.source_location();
-    error() << "expected type symbol" << eom;
-    throw 0;
-  }
 }
 
 void c_typecheck_baset::typecheck_typedef_type(typet &type)

@@ -86,8 +86,6 @@ mp_integer alignment(const typet &type, const namespacet &ns)
     result = alignment(ns.follow_tag(to_struct_tag_type(type)), ns);
   else if(type.id() == ID_union_tag)
     result = alignment(ns.follow_tag(to_union_tag_type(type)), ns);
-  else if(type.id() == ID_symbol_type)
-    result = alignment(ns.follow(to_symbol_type(type)), ns);
   else if(type.id()==ID_c_bit_field)
   {
     // we align these according to the 'underlying type'
