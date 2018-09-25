@@ -315,6 +315,9 @@ inline const code_declt &to_code_decl(const codet &code)
   // will be size()==1 in the future
   DATA_INVARIANT(
     code.operands().size() >= 1, "decls must have one or more operands");
+  DATA_INVARIANT(
+    code.op0().id() == ID_symbol, "decls symbols must be a \"symbol\"");
+
   return static_cast<const code_declt &>(code);
 }
 

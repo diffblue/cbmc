@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/config.h>
+#include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/invariant.h>
 #include <util/unicode.h>
@@ -609,6 +610,12 @@ int cbmc_parse_optionst::get_goto_program(
     }
 
     log.status() << config.object_bits_info() << log.eom;
+  }
+
+  catch(incorrect_goto_program_exceptiont &e)
+  {
+    log.error() << e.what() << log.eom;
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   catch(const char *e)

@@ -11,10 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert.h"
 
-#include <cassert>
-
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
+#include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/prefix.h>
@@ -116,10 +115,12 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
       labelst::const_iterator l_it=
         targets.labels.find(goto_label);
 
-      DATA_INVARIANT(
-        l_it != targets.labels.end(),
-        i.code.find_source_location().as_string() + ": goto label '" +
-          id2string(goto_label) + "' not found");
+      if(l_it == targets.labels.end())
+      {
+        throw incorrect_goto_program_exceptiont(
+          "goto label \'" + id2string(goto_label) + "\' not found",
+          i.code.find_source_location());
+      }
 
       i.targets.push_back(l_it->second.first);
     }
@@ -129,10 +130,12 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
 
       labelst::const_iterator l_it=targets.labels.find(goto_label);
 
-      DATA_INVARIANT(
-        l_it != targets.labels.end(),
-        i.code.find_source_location().as_string() + ": goto label '" +
-          id2string(goto_label) + "' not found");
+      if(l_it == targets.labels.end())
+      {
+        throw incorrect_goto_program_exceptiont(
+          "goto label \'" + id2string(goto_label) + "\' not found",
+          i.code.find_source_location());
+      }
 
       i.complete_goto(l_it->second.first);
 
@@ -192,13 +195,8 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
   for(auto &g_it : targets.computed_gotos)
   {
     goto_programt::instructiont &i=*g_it;
-    exprt destination=i.code.op0();
-
-    DATA_INVARIANT(
-      destination.id() == ID_dereference, "dereference ID not allowed here");
-    DATA_INVARIANT(destination.operands().size() == 1, "expected 1 argument");
-
-    exprt pointer=destination.op0();
+    dereference_exprt destination = to_dereference_expr(i.code.op0());
+    exprt pointer = destination.op();
 
     // remember the expression for later checks
     i.type=OTHER;
@@ -516,7 +514,7 @@ void goto_convertt::convert(
     assertion.make_typecast(bool_typet());
     simplify(assertion, ns);
     INVARIANT(
-      assertion.is_false(),
+      !assertion.is_false(),
       code.op0().find_source_location().as_string() + ": static assertion " +
         id2string(get_string_constant(code.op1())));
   }
@@ -580,12 +578,7 @@ void goto_convertt::convert_expression(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  INVARIANT(
-    code.operands().size() == 1,
-    code.find_source_location().as_string() +
-      ": expression statement takes one operand");
-
-  exprt expr=code.op0();
+  exprt expr = code.expression();
 
   if(expr.id()==ID_if)
   {
@@ -622,14 +615,7 @@ void goto_convertt::convert_decl(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  const exprt &op = code.symbol();
-
-  INVARIANT(
-    op.id() == ID_symbol,
-    op.find_source_location().as_string() +
-      ": decl statement expects symbol as operand");
-
-  const irep_idt &identifier = to_symbol_expr(op).get_identifier();
+  const irep_idt &identifier = to_symbol_expr(code.symbol()).get_identifier();
 
   const symbolt &symbol = ns.lookup(identifier);
 
@@ -774,11 +760,8 @@ void goto_convertt::convert_assign(
 
     if(lhs.id()==ID_typecast)
     {
-      INVARIANT(lhs.operands().size() == 1, "typecast takes one operand");
-
       // add a typecast to the rhs
-      exprt new_rhs=rhs;
-      rhs.make_typecast(lhs.op0().type());
+      rhs.make_typecast(to_typecast_expr(lhs).op().type());
 
       // remove typecast from lhs
       exprt tmp=lhs.op0();
@@ -1269,7 +1252,9 @@ void goto_convertt::convert_switch(
   {
     const caset &case_ops=case_pair.second;
 
-    assert(!case_ops.empty());
+    if(case_ops.empty())
+      throw incorrect_goto_program_exceptiont(
+        "switch case range cannot be empty", code.find_source_location());
 
     exprt guard_expr=case_guard(argument, case_ops);
 
@@ -1325,9 +1310,8 @@ void goto_convertt::convert_return(
 {
   if(!targets.return_set)
   {
-    error().source_location=code.find_source_location();
-    error() << "return without target" << eom;
-    throw 0;
+    throw incorrect_goto_program_exceptiont(
+      "return without target", code.find_source_location());
   }
 
   DATA_INVARIANT(
@@ -1763,10 +1747,14 @@ void goto_convertt::generate_conditional_branch(
 {
   if(guard.id()==ID_not)
   {
-    PRECONDITION(guard.operands().size() == 1);
     // simply swap targets
     generate_conditional_branch(
-      guard.op0(), target_false, target_true, source_location, dest, mode);
+      to_not_expr(guard).op(),
+      target_false,
+      target_true,
+      source_location,
+      dest,
+      mode);
     return;
   }
 
@@ -1877,7 +1865,7 @@ irep_idt goto_convertt::get_string_constant(const exprt &expr)
   irep_idt result;
 
   bool res = get_string_constant(expr, result);
-  INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     !res,
     expr.find_source_location().as_string() + ": expected string constant",
     expr.pretty());
