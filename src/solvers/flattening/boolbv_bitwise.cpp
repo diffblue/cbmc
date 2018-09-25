@@ -19,8 +19,7 @@ bvt boolbvt::convert_bitwise(const exprt &expr)
   {
     DATA_INVARIANT(expr.operands().size() == 1, "bitnot takes one operand");
     const exprt &op0=expr.op0();
-    const bvt &op_bv=convert_bv(op0);
-    CHECK_RETURN(op_bv.size() == width);
+    const bvt &op_bv = convert_bv(op0, width);
     return bv_utils.inverted(op_bv);
   }
   else if(expr.id()==ID_bitand || expr.id()==ID_bitor ||
@@ -33,8 +32,7 @@ bvt boolbvt::convert_bitwise(const exprt &expr)
 
     forall_operands(it, expr)
     {
-      const bvt &op=convert_bv(*it);
-      CHECK_RETURN(op.size() == width);
+      const bvt &op = convert_bv(*it, width);
 
       if(it==expr.operands().begin())
         bv=op;

@@ -36,4 +36,6 @@ using optionalt=nonstd::optional<T>; // NOLINT template typedef
 
 typedef nonstd::bad_optional_access bad_optional_accesst;
 
+using nonstd::nullopt;
+
 #endif // CPROVER_UTIL_OPTIONAL_H

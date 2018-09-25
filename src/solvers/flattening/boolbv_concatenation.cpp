@@ -6,10 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include "boolbv.h"
 
-bvt boolbvt::convert_concatenation(const exprt &expr)
+#include <util/invariant.h>
+
+bvt boolbvt::convert_concatenation(const concatenation_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
@@ -18,8 +19,8 @@ bvt boolbvt::convert_concatenation(const exprt &expr)
 
   const exprt::operandst &operands=expr.operands();
 
-  if(operands.empty())
-    throw "concatenation takes at least one operand";
+  DATA_INVARIANT(
+    !operands.empty(), "concatentation shall have at least one operand");
 
   std::size_t offset=width;
   bvt bv;
@@ -29,8 +30,9 @@ bvt boolbvt::convert_concatenation(const exprt &expr)
   {
     const bvt &op=convert_bv(*it);
 
-    if(op.size()>offset)
-      throw "concatenation operand width too big";
+    INVARIANT(
+      op.size() <= offset,
+      "concatentation operand must fit into the result bitvector");
 
     offset-=op.size();
 
@@ -38,8 +40,10 @@ bvt boolbvt::convert_concatenation(const exprt &expr)
       bv[offset+i]=op[i];
   }
 
-  if(offset!=0)
-    throw "concatenation operand width too small";
+  INVARIANT(
+    offset == 0,
+    "all bits in the result bitvector must have been filled up by the "
+    "concatentation operands");
 
   return bv;
 }

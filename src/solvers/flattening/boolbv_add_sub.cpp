@@ -15,6 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_add_sub(const exprt &expr)
 {
+  PRECONDITION(
+    expr.id() == ID_plus || expr.id() == ID_minus ||
+    expr.id() == "no-overflow-plus" || expr.id() == "no-overflow-minus");
+
   const typet &type=ns.follow(expr.type());
 
   if(type.id()!=ID_unsignedbv &&
@@ -33,17 +37,15 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
 
   const exprt::operandst &operands=expr.operands();
 
-  if(operands.empty())
-    throw "operator "+expr.id_string()+" takes at least one operand";
+  DATA_INVARIANT(
+    !operands.empty(),
+    "operator " + expr.id_string() + " takes at least one operand");
 
   const exprt &op0=expr.op0();
   DATA_INVARIANT(
     op0.type() == type, "add/sub with mixed types:\n" + expr.pretty());
 
-  bvt bv=convert_bv(op0);
-
-  if(bv.size()!=width)
-    throw "convert_add_sub: unexpected operand 0 width";
+  bvt bv = convert_bv(op0, width);
 
   bool subtract=(expr.id()==ID_minus ||
                  expr.id()=="no-overflow-minus");
@@ -67,19 +69,16 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
     DATA_INVARIANT(
       it->type() == type, "add/sub with mixed types:\n" + expr.pretty());
 
-    const bvt &op=convert_bv(*it);
-
-    if(op.size()!=width)
-      throw "convert_add_sub: unexpected operand width";
+    const bvt &op = convert_bv(*it, width);
 
     if(type.id()==ID_vector || type.id()==ID_complex)
     {
-      const typet &subtype=ns.follow(type.subtype());
+      std::size_t sub_width = boolbv_width(type.subtype());
 
-      std::size_t sub_width=boolbv_width(subtype);
-
-      if(sub_width==0 || width%sub_width!=0)
-        throw "convert_add_sub: unexpected vector operand width";
+      INVARIANT(sub_width != 0, "vector elements shall have nonzero bit width");
+      INVARIANT(
+        width % sub_width == 0,
+        "total vector bit width shall be a multiple of the element bit width");
 
       std::size_t size=width/sub_width;
       bv.resize(width);
@@ -91,8 +90,9 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
 
         for(std::size_t j=0; j<tmp_op.size(); j++)
         {
-          assert(i*sub_width+j<op.size());
-          tmp_op[j]=op[i*sub_width+j];
+          const std::size_t index = i * sub_width + j;
+          INVARIANT(index < op.size(), "bit index shall be within bounds");
+          tmp_op[j] = op[index];
         }
 
         bvt tmp_result;
@@ -100,25 +100,29 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
 
         for(std::size_t j=0; j<tmp_result.size(); j++)
         {
-          assert(i*sub_width+j<bv.size());
-          tmp_result[j]=bv[i*sub_width+j];
+          const std::size_t index = i * sub_width + j;
+          INVARIANT(index < bv.size(), "bit index shall be within bounds");
+          tmp_result[j] = bv[index];
         }
 
         if(type.subtype().id()==ID_floatbv)
         {
           // needs to change due to rounding mode
-          float_utilst float_utils(prop, to_floatbv_type(subtype));
+          float_utilst float_utils(prop, to_floatbv_type(type.subtype()));
           tmp_result=float_utils.add_sub(tmp_result, tmp_op, subtract);
         }
         else
           tmp_result=bv_utils.add_sub(tmp_result, tmp_op, subtract);
 
-        assert(tmp_result.size()==sub_width);
+        INVARIANT(
+          tmp_result.size() == sub_width,
+          "applying the add/sub operation shall not change the bitwidth");
 
         for(std::size_t j=0; j<tmp_result.size(); j++)
         {
-          assert(i*sub_width+j<bv.size());
-          bv[i*sub_width+j]=tmp_result[j];
+          const std::size_t index = i * sub_width + j;
+          INVARIANT(index < bv.size(), "bit index shall be within bounds");
+          bv[index] = tmp_result[j];
         }
       }
     }

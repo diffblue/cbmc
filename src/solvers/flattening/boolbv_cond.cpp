@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_cond(const exprt &expr)
 {
+  PRECONDITION(expr.id() == ID_cond);
+
   const exprt::operandst &operands=expr.operands();
 
   std::size_t width=boolbv_width(expr.type());
@@ -22,11 +24,10 @@ bvt boolbvt::convert_cond(const exprt &expr)
   bvt bv;
   bv.resize(width);
 
-  if(operands.size()<2)
-    throw "cond takes at least two operands";
+  DATA_INVARIANT(operands.size() >= 2, "cond must have at least two operands");
 
-  if((operands.size()%2)!=0)
-    throw "number of cond operands must be even";
+  DATA_INVARIANT(
+    operands.size() % 2 == 0, "number of cond operands must be even");
 
   if(prop.has_set_to())
   {
@@ -49,13 +50,7 @@ bvt boolbvt::convert_cond(const exprt &expr)
       }
       else
       {
-        const bvt &op=convert_bv(*it);
-
-        DATA_INVARIANT(
-          bv.size() == op.size(),
-          std::string("size of value operand does not match:\n") +
-            "result size: " + std::to_string(bv.size()) +
-            "\noperand: " + std::to_string(op.size()) + '\n' + it->pretty());
+        const bvt &op = convert_bv(*it, bv.size());
 
         literalt value_literal=bv_utils.equal(bv, op);
 
@@ -70,16 +65,16 @@ bvt boolbvt::convert_cond(const exprt &expr)
     // functional version -- go backwards
     for(std::size_t i=expr.operands().size(); i!=0; i-=2)
     {
-      assert(i>=2);
+      INVARIANT(
+        i >= 2,
+        "since the number of operands is even if i is nonzero it must be "
+        "greater than two");
       const exprt &cond=expr.operands()[i-2];
       const exprt &value=expr.operands()[i-1];
 
       literalt cond_literal=convert(cond);
 
-      const bvt &op=convert_bv(value);
-
-      if(bv.size()!=op.size())
-        throw "unexpected operand size in convert_cond";
+      const bvt &op = convert_bv(value, bv.size());
 
       for(std::size_t i=0; i<bv.size(); i++)
         bv[i]=prop.lselect(cond_literal, op[i], bv[i]);

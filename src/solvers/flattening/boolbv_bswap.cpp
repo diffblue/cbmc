@@ -19,8 +19,7 @@ bvt boolbvt::convert_bswap(const bswap_exprt &expr)
   if(width % byte_bits != 0)
     return conversion_failed(expr);
 
-  bvt result = convert_bv(expr.op());
-  CHECK_RETURN(result.size() == width);
+  bvt result = convert_bv(expr.op(), width);
 
   std::size_t dest_base = width;
 

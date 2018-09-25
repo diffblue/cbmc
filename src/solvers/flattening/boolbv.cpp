@@ -110,7 +110,8 @@ bool boolbvt::literal(
   throw "found no literal for expression";
 }
 
-const bvt &boolbvt::convert_bv(const exprt &expr)
+const bvt &
+boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)
 {
   // check cache first
   std::pair<bv_cachet::iterator, bool> cache_result=
@@ -123,18 +124,27 @@ const bvt &boolbvt::convert_bv(const exprt &expr)
   // Iterators into hash_maps supposedly stay stable
   // even though we are inserting more elements recursively.
 
-  cache_result.first->second=convert_bitvector(expr);
+  const bvt &bv = convert_bitvector(expr);
+
+  INVARIANT_WITH_DIAGNOSTICS(
+    !expected_width || bv.size() == *expected_width,
+    "bitvector width shall match the indicated expected width",
+    expr.find_source_location(),
+    irep_pretty_diagnosticst(expr));
+
+  cache_result.first->second = bv;
 
   // check
   forall_literals(it, cache_result.first->second)
   {
     if(freeze_all && !it->is_constant())
       prop.set_frozen(*it);
-    if(it->var_no()==literalt::unused_var_no())
-    {
-      error() << "unused_var_no: " << expr.pretty() << eom;
-      assert(false);
-    }
+
+    INVARIANT_WITH_DIAGNOSTICS(
+      it->var_no() != literalt::unused_var_no(),
+      "variable number must be different from the unused variable number",
+      expr.find_source_location(),
+      irep_pretty_diagnosticst(expr));
   }
 
   return cache_result.first->second;
@@ -231,7 +241,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id()==ID_floatbv_typecast)
     return convert_floatbv_typecast(to_floatbv_typecast_expr(expr));
   else if(expr.id()==ID_concatenation)
-    return convert_concatenation(expr);
+    return convert_concatenation(to_concatenation_expr(expr));
   else if(expr.id()==ID_replication)
     return convert_replication(to_replication_expr(expr));
   else if(expr.id()==ID_extractbits)
@@ -273,7 +283,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id()==ID_vector)
     return convert_vector(expr);
   else if(expr.id()==ID_complex)
-    return convert_complex(expr);
+    return convert_complex(to_complex_expr(expr));
   else if(expr.id()==ID_complex_real)
     return convert_complex_real(to_complex_real_expr(expr));
   else if(expr.id()==ID_complex_imag)
