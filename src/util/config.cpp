@@ -10,15 +10,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdlib>
 
-#include "namespace.h"
-#include "symbol_table.h"
 #include "arith_tools.h"
 #include "cmdline.h"
+#include "cprover_prefix.h"
+#include "exception_utils.h"
+#include "namespace.h"
 #include "simplify_expr.h"
 #include "std_expr.h"
-#include "cprover_prefix.h"
 #include "string2int.h"
 #include "string_utils.h"
+#include "symbol_table.h"
 
 configt config;
 
@@ -945,20 +946,42 @@ bool configt::set(const cmdlinet &cmdline)
   // the same architecture and OS that we are verifying for.
   if(arch==this_arch && os==this_os)
   {
-    assert(ansi_c.int_width==sizeof(int)*8);
-    assert(ansi_c.long_int_width==sizeof(long)*8);
-    assert(ansi_c.bool_width==sizeof(bool)*8);
-    assert(ansi_c.char_width==sizeof(char)*8);
-    assert(ansi_c.short_int_width==sizeof(short)*8);
-    assert(ansi_c.long_long_int_width==sizeof(long long)*8);
-    assert(ansi_c.pointer_width==sizeof(void *)*8);
-    assert(ansi_c.single_width==sizeof(float)*8);
-    assert(ansi_c.double_width==sizeof(double)*8);
-    assert(ansi_c.char_is_unsigned==(static_cast<char>(255)==255));
+    INVARIANT(
+      ansi_c.int_width == sizeof(int) * 8,
+      "int width shall be equal to the system int width");
+    INVARIANT(
+      ansi_c.long_int_width == sizeof(long) * 8,
+      "long int width shall be equal to the system long int width");
+    INVARIANT(
+      ansi_c.bool_width == sizeof(bool) * 8,
+      "bool width shall be equal to the system bool width");
+    INVARIANT(
+      ansi_c.char_width == sizeof(char) * 8,
+      "char width shall be equal to the system char width");
+    INVARIANT(
+      ansi_c.short_int_width == sizeof(short) * 8,
+      "short int width shall be equal to the system short int width");
+    INVARIANT(
+      ansi_c.long_long_int_width == sizeof(long long) * 8,
+      "long long int width shall be equal to the system long long int width");
+    INVARIANT(
+      ansi_c.pointer_width == sizeof(void *) * 8,
+      "pointer width shall be equal to the system pointer width");
+    INVARIANT(
+      ansi_c.single_width == sizeof(float) * 8,
+      "float width shall be equal to the system float width");
+    INVARIANT(
+      ansi_c.double_width == sizeof(double) * 8,
+      "double width shall be equal to the system double width");
+    INVARIANT(
+      ansi_c.char_is_unsigned == (static_cast<char>(255) == 255),
+      "char_is_unsigned flag shall indicate system char unsignedness");
 
     #ifndef _WIN32
     // On Windows, long double width varies by compiler
-    assert(ansi_c.long_double_width==sizeof(long double)*8);
+    INVARIANT(
+      ansi_c.long_double_width == sizeof(long double) * 8,
+      "long double width shall be equal to the system long double width");
     #endif
   }
 
@@ -1026,14 +1049,17 @@ bool configt::set(const cmdlinet &cmdline)
   {
     bv_encoding.object_bits=
       unsafe_string2unsigned(cmdline.get_value("object-bits"));
-    bv_encoding.is_object_bits_default=false;
 
     if(!(0<bv_encoding.object_bits &&
          bv_encoding.object_bits<ansi_c.pointer_width))
     {
-      throw "object-bits must be positive and less than the pointer width ("+
-        std::to_string(ansi_c.pointer_width)+") ";
+      throw invalid_user_input_exceptiont(
+        "object-bits must be positive and less than the pointer width (" +
+          std::to_string(ansi_c.pointer_width) + ") ",
+        "--object_bits");
     }
+
+    bv_encoding.is_object_bits_default = false;
   }
 
   return false;
@@ -1069,21 +1095,17 @@ static irep_idt string_from_ns(
   const irep_idt id=CPROVER_PREFIX "architecture_"+what;
   const symbolt *symbol;
 
-  if(ns.lookup(id, symbol))
-    throw "failed to find "+id2string(id);
+  const bool not_found = ns.lookup(id, symbol);
+  INVARIANT(!not_found, id2string(id) + " must be in namespace");
 
   const exprt &tmp=symbol->value;
 
-  if(tmp.id()!=ID_address_of ||
-     tmp.operands().size()!=1 ||
-     tmp.op0().id()!=ID_index ||
-     tmp.op0().operands().size()!=2 ||
-     tmp.op0().op0().id()!=ID_string_constant)
-  {
-    throw
-      "symbol table configuration entry `"+id2string(id)+
-      "' is not a string constant";
-  }
+  INVARIANT(
+    tmp.id() == ID_address_of && tmp.operands().size() == 1 &&
+      tmp.op0().id() == ID_index && tmp.op0().operands().size() == 2 &&
+      tmp.op0().op0().id() == ID_string_constant,
+    "symbol table configuration entry `" + id2string(id) +
+      "' must be a string constant");
 
   return tmp.op0().op0().get(ID_value);
 }
@@ -1095,21 +1117,24 @@ static unsigned unsigned_from_ns(
   const irep_idt id=CPROVER_PREFIX "architecture_"+what;
   const symbolt *symbol;
 
-  if(ns.lookup(id, symbol))
-    throw "failed to find "+id2string(id);
+  const bool not_found = ns.lookup(id, symbol);
+  INVARIANT(!not_found, id2string(id) + " must be in namespace");
 
   exprt tmp=symbol->value;
   simplify(tmp, ns);
 
-  if(tmp.id()!=ID_constant)
-    throw
-      "symbol table configuration entry `"+id2string(id)+"' is not a constant";
+  INVARIANT(
+    tmp.id() == ID_constant,
+    "symbol table configuration entry `" + id2string(id) +
+      "' must be a constant");
 
   mp_integer int_value;
 
-  if(to_integer(to_constant_expr(tmp), int_value))
-    throw
-      "failed to convert symbol table configuration entry `"+id2string(id)+"'";
+  const bool error = to_integer(to_constant_expr(tmp), int_value);
+  INVARIANT(
+    !error,
+    "symbol table configuration entry `" + id2string(id) +
+      "' must be convertible to mp_integer");
 
   return integer2unsigned(int_value);
 }

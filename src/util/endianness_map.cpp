@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include "invariant.h"
 #include "std_types.h"
 #include "pointer_offset_size.h"
 #include "arith_tools.h"

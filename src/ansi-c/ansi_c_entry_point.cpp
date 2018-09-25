@@ -177,8 +177,7 @@ bool ansi_c_entry_point(
     return false; // give up
   }
 
-  if(static_lifetime_init(symbol_table, symbol.location, message_handler))
-    return true;
+  static_lifetime_init(symbol_table, symbol.location, message_handler);
 
   return generate_ansi_c_start_function(symbol, symbol_table, message_handler);
 }

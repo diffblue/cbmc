@@ -22,17 +22,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
-bool static_lifetime_init(
+void static_lifetime_init(
   symbol_tablet &symbol_table,
   const source_locationt &source_location,
   message_handlert &message_handler)
 {
-  namespacet ns(symbol_table);
+  PRECONDITION(symbol_table.has_symbol(INITIALIZE_FUNCTION));
 
-  const auto maybe_symbol=symbol_table.get_writeable(INITIALIZE_FUNCTION);
-  if(!maybe_symbol)
-    return false;
-  symbolt &init_symbol=*maybe_symbol;
+  const namespacet ns(symbol_table);
+
+  symbolt &init_symbol = symbol_table.get_writeable_ref(INITIALIZE_FUNCTION);
 
   init_symbol.value=code_blockt();
   init_symbol.value.add_source_location()=source_location;
@@ -117,16 +116,10 @@ bool static_lifetime_init(
 
     if(symbol.value.is_nil())
     {
-      try
-      {
-        namespacet ns(symbol_table);
-        rhs=zero_initializer(symbol.type, symbol.location, ns, message_handler);
-        assert(rhs.is_not_nil());
-      }
-      catch(...)
-      {
-        return true;
-      }
+      const namespacet ns(symbol_table);
+      rhs = zero_initializer(symbol.type, symbol.location, ns, message_handler);
+      INVARIANT(
+        rhs.is_not_nil(), "result of zero-initialization must be non-nil");
     }
     else
       rhs=symbol.value;
@@ -156,6 +149,4 @@ bool static_lifetime_init(
       dest.move_to_operands(function_call);
     }
   }
-
-  return false;
 }

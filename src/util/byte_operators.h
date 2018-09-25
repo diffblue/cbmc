@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
+#include "invariant.h"
 #include "std_expr.h"
 
 /*! \brief TO_BE_DOCUMENTED
@@ -51,13 +52,13 @@ public:
 
 inline const byte_extract_exprt &to_byte_extract_expr(const exprt &expr)
 {
-  assert(expr.operands().size()==2);
+  PRECONDITION(expr.operands().size() == 2);
   return static_cast<const byte_extract_exprt &>(expr);
 }
 
 inline byte_extract_exprt &to_byte_extract_expr(exprt &expr)
 {
-  assert(expr.operands().size()==2);
+  PRECONDITION(expr.operands().size() == 2);
   return static_cast<byte_extract_exprt &>(expr);
 }
 
@@ -78,14 +79,20 @@ public:
 inline const byte_extract_little_endian_exprt
   &to_byte_extract_little_endian_expr(const exprt &expr)
 {
-  assert(expr.id()==ID_byte_extract_little_endian && expr.operands().size()==2);
+  PRECONDITION(expr.id() == ID_byte_extract_little_endian);
+  DATA_INVARIANT(
+    expr.operands().size() == 2, "byte extract expressions have two operands");
+
   return static_cast<const byte_extract_little_endian_exprt &>(expr);
 }
 
 inline byte_extract_little_endian_exprt
   &to_byte_extract_little_endian_expr(exprt &expr)
 {
-  assert(expr.id()==ID_byte_extract_little_endian && expr.operands().size()==2);
+  PRECONDITION(expr.id() == ID_byte_extract_little_endian);
+  DATA_INVARIANT(
+    expr.operands().size() == 2, "byte extract expressions have two operands");
+
   return static_cast<byte_extract_little_endian_exprt &>(expr);
 }
 
@@ -109,14 +116,20 @@ public:
 inline const byte_extract_big_endian_exprt
   &to_byte_extract_big_endian_expr(const exprt &expr)
 {
-  assert(expr.id()==ID_byte_extract_big_endian && expr.operands().size()==2);
+  PRECONDITION(expr.id() == ID_byte_extract_big_endian);
+  DATA_INVARIANT(
+    expr.operands().size() == 2, "byte extract expressions have two operands");
+
   return static_cast<const byte_extract_big_endian_exprt &>(expr);
 }
 
 inline byte_extract_big_endian_exprt
   &to_byte_extract_big_endian_expr(exprt &expr)
 {
-  assert(expr.id()==ID_byte_extract_big_endian && expr.operands().size()==2);
+  PRECONDITION(expr.id() == ID_byte_extract_big_endian);
+  DATA_INVARIANT(
+    expr.operands().size() == 2, "byte extract expressions have two operands");
+
   return static_cast<byte_extract_big_endian_exprt &>(expr);
 }
 
@@ -154,13 +167,13 @@ public:
 
 inline const byte_update_exprt &to_byte_update_expr(const exprt &expr)
 {
-  assert(expr.operands().size()==3);
+  PRECONDITION(expr.operands().size() == 3);
   return static_cast<const byte_update_exprt &>(expr);
 }
 
 inline byte_update_exprt &to_byte_update_expr(exprt &expr)
 {
-  assert(expr.operands().size()==3);
+  PRECONDITION(expr.operands().size() == 3);
   return static_cast<byte_update_exprt &>(expr);
 }
 
@@ -184,14 +197,20 @@ public:
 inline const byte_update_little_endian_exprt
   &to_byte_update_little_endian_expr(const exprt &expr)
 {
-  assert(expr.id()==ID_byte_update_little_endian && expr.operands().size()==3);
+  PRECONDITION(expr.id() == ID_byte_update_little_endian);
+  DATA_INVARIANT(
+    expr.operands().size() == 3, "byte update expressions have three operands");
+
   return static_cast<const byte_update_little_endian_exprt &>(expr);
 }
 
 inline byte_update_little_endian_exprt
   &to_byte_update_little_endian_expr(exprt &expr)
 {
-  assert(expr.id()==ID_byte_update_little_endian && expr.operands().size()==3);
+  PRECONDITION(expr.id() == ID_byte_update_little_endian);
+  DATA_INVARIANT(
+    expr.operands().size() == 3, "byte update expressions have three operands");
+
   return static_cast<byte_update_little_endian_exprt &>(expr);
 }
 
@@ -215,14 +234,20 @@ public:
 inline const byte_update_big_endian_exprt
   &to_byte_update_big_endian_expr(const exprt &expr)
 {
-  assert(expr.id()==ID_byte_update_big_endian && expr.operands().size()==3);
+  PRECONDITION(expr.id() == ID_byte_update_big_endian);
+  DATA_INVARIANT(
+    expr.operands().size() == 3, "byte update expressions have three operands");
+
   return static_cast<const byte_update_big_endian_exprt &>(expr);
 }
 
 inline byte_update_big_endian_exprt
   &to_byte_update_big_endian_expr(exprt &expr)
 {
-  assert(expr.id()==ID_byte_update_big_endian && expr.operands().size()==3);
+  PRECONDITION(expr.id() == ID_byte_update_big_endian);
+  DATA_INVARIANT(
+    expr.operands().size() == 3, "byte update expressions have three operands");
+
   return static_cast<byte_update_big_endian_exprt &>(expr);
 }
 

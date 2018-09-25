@@ -66,6 +66,6 @@ std::string format_number_range(const std::vector<unsigned> &input_numbers)
       start_number = *next;
   }
 
-  CHECK_RETURN(!number_range.str().empty());
+  POSTCONDITION(!number_range.str().empty());
   return number_range.str();
 }

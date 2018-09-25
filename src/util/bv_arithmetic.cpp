@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_arithmetic.h"
 
-#include <cassert>
 #include <ostream>
 
 #include "string2int.h"
@@ -90,7 +89,7 @@ exprt bv_arithmetict::to_expr() const
 
 bv_arithmetict &bv_arithmetict::operator/=(const bv_arithmetict &other)
 {
-  assert(other.spec==spec);
+  PRECONDITION(other.spec == spec);
 
   if(other.value==0)
     value=0;
@@ -102,7 +101,7 @@ bv_arithmetict &bv_arithmetict::operator/=(const bv_arithmetict &other)
 
 bv_arithmetict &bv_arithmetict::operator*=(const bv_arithmetict &other)
 {
-  assert(other.spec==spec);
+  PRECONDITION(other.spec == spec);
 
   value*=other.value;
   adjust();
@@ -112,7 +111,7 @@ bv_arithmetict &bv_arithmetict::operator*=(const bv_arithmetict &other)
 
 bv_arithmetict &bv_arithmetict::operator+=(const bv_arithmetict &other)
 {
-  assert(other.spec==spec);
+  PRECONDITION(other.spec == spec);
 
   value+=other.value;
   adjust();
@@ -122,7 +121,7 @@ bv_arithmetict &bv_arithmetict::operator+=(const bv_arithmetict &other)
 
 bv_arithmetict &bv_arithmetict::operator -= (const bv_arithmetict &other)
 {
-  assert(other.spec==spec);
+  PRECONDITION(other.spec == spec);
 
   value-=other.value;
   adjust();
@@ -132,7 +131,7 @@ bv_arithmetict &bv_arithmetict::operator -= (const bv_arithmetict &other)
 
 bv_arithmetict &bv_arithmetict::operator%=(const bv_arithmetict &other)
 {
-  assert(other.spec==spec);
+  PRECONDITION(other.spec == spec);
 
   value%=other.value;
   adjust();
@@ -183,7 +182,7 @@ void bv_arithmetict::change_spec(const bv_spect &dest_spec)
 
 void bv_arithmetict::from_expr(const exprt &expr)
 {
-  assert(expr.is_constant());
+  PRECONDITION(expr.is_constant());
   spec=bv_spect(expr.type());
   value=binary2integer(expr.get_string(ID_value), spec.is_signed);
 }

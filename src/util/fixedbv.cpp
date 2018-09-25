@@ -45,7 +45,7 @@ constant_exprt fixedbvt::to_expr() const
   fixedbv_typet type;
   type.set_width(spec.width);
   type.set_integer_bits(spec.integer_bits);
-  assert(spec.width!=0);
+  PRECONDITION(spec.width != 0);
   return constant_exprt(integer2binary(v, spec.width), type);
 }
 

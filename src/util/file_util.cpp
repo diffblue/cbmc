@@ -13,7 +13,7 @@ Date: January 2012
 
 #include "file_util.h"
 
-#include "invariant.h"
+#include "exception_utils.h"
 
 #include <cerrno>
 #include <cstring>
@@ -53,16 +53,18 @@ std::string get_current_working_directory()
   #ifndef _WIN32
   errno=0;
   char *wd=realpath(".", nullptr);
-  INVARIANT(
-    wd!=nullptr && errno==0,
-    std::string("realpath failed: ")+strerror(errno));
+
+  if(wd == nullptr || errno != 0)
+    throw system_exceptiont(
+      std::string("realpath failed: ") + std::strerror(errno));
 
   std::string working_directory=wd;
   free(wd);
   #else
   char buffer[4096];
   DWORD retval=GetCurrentDirectory(4096, buffer);
-  CHECK_RETURN(retval>0);
+  if(retval == 0)
+    throw system_exceptiont("failed to get current directory of process");
   std::string working_directory(buffer);
   #endif
 
@@ -118,7 +120,8 @@ void delete_directory(const std::string &path)
       struct stat stbuf;
       int result=stat(sub_path.c_str(), &stbuf);
       if(result!=0)
-        throw std::string("Stat failed: ")+std::strerror(errno);
+        throw system_exceptiont(
+          std::string("Stat failed: ") + std::strerror(errno));
 
       if(S_ISDIR(stbuf.st_mode))
         delete_directory(sub_path);
@@ -126,7 +129,8 @@ void delete_directory(const std::string &path)
       {
         result=remove(sub_path.c_str());
         if(result!=0)
-          throw std::string("Remove failed: ")+std::strerror(errno);
+          throw system_exceptiont(
+            std::string("Remove failed: ") + std::strerror(errno));
       }
     }
     closedir(dir);
