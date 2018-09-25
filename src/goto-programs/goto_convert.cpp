@@ -1153,27 +1153,28 @@ exprt goto_convertt::case_guard(
   const exprt &value,
   const exprt::operandst &case_op)
 {
-  exprt dest=exprt(ID_or, bool_typet());
-  dest.reserve_operands(case_op.size());
+  PRECONDITION(!case_op.empty());
 
-  forall_expr(it, case_op)
+  if(case_op.size() == 1)
+    return equal_exprt(value, case_op.at(0));
+  else
   {
-    equal_exprt eq_expr;
-    eq_expr.lhs()=value;
-    eq_expr.rhs()=*it;
-    dest.move_to_operands(eq_expr);
+    exprt dest = exprt(ID_or, bool_typet());
+    dest.reserve_operands(case_op.size());
+
+    forall_expr(it, case_op)
+    {
+      equal_exprt eq_expr;
+      eq_expr.lhs() = value;
+      eq_expr.rhs() = *it;
+      dest.move_to_operands(eq_expr);
+    }
+    INVARIANT(
+      case_op.size() == dest.operands().size(),
+      "case guard conversion should preserve the number of cases");
+
+    return dest;
   }
-
-  CHECK_RETURN(!dest.operands().empty());
-
-  if(dest.operands().size()==1)
-  {
-    exprt tmp;
-    tmp.swap(dest.op0());
-    dest.swap(tmp);
-  }
-
-  return dest;
 }
 
 void goto_convertt::convert_switch(
