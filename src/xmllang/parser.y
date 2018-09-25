@@ -12,6 +12,7 @@ int yyxmlerror(const std::string &error)
   return 0;
 }
 
+#include <util/pragma_wconversion.def>
 %}
 
 %error-verbose

@@ -585,7 +585,10 @@ public:
 
   void set_bits_per_byte(std::size_t bits_per_byte)
   {
+#include "pragma_push.def"
+#include "pragma_wconversion.def"
     set(ID_bits_per_byte, bits_per_byte);
+#include "pragma_pop.def"
   }
 };
 
@@ -1722,7 +1725,10 @@ public:
 
   void set_component_number(std::size_t component_number)
   {
+#include "pragma_push.def"
+#include "pragma_wconversion.def"
     set(ID_component_number, component_number);
+#include "pragma_pop.def"
   }
 };
 

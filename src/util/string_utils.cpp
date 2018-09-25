@@ -26,13 +26,16 @@ std::string strip_string(const std::string &s)
   if(left==s.end())
     return "";
 
-  std::string::size_type i=std::distance(s.begin(), left);
+  const auto i = std::distance(s.begin(), left);
 
   std::string::const_reverse_iterator right
     =std::find_if_not(s.rbegin(), s.rend(), pred);
-  std::string::size_type j=std::distance(right, s.rend())-1;
+  const auto j = std::distance(right, s.rend()) - 1;
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   return s.substr(i, (j-i+1));
+#include <util/pragma_pop.def>
 }
 
 /// Given a string s, split into a sequence of substrings when separated by

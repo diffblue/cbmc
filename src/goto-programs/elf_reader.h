@@ -143,9 +143,12 @@ public:
 
   std::streampos section_offset(std::size_t index) const
   {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     return
       elf_class==ELF32?elf32_section_header_table[index].sh_offset:
                        elf64_section_header_table[index].sh_offset;
+#include <util/pragma_pop.def>
   }
 
   bool has_section(const std::string &name) const;

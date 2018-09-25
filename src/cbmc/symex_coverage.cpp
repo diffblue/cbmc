@@ -206,7 +206,10 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
         xmlt &condition=conditions.new_element("condition");
         condition.set_attribute("number", std::to_string(number++));
         condition.set_attribute("type", "jump");
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         unsigned taken=c.second.false_taken+c.second.true_taken;
+#include <util/pragma_pop.def>
         total_taken+=taken;
         condition.set_attribute("coverage", rate(taken, 2, true));
       }

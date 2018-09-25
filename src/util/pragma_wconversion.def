@@ -1,0 +1,13 @@
+#if defined __clang__
+  // dummy as #pragma diagnostic push must be follows by another #pragma
+  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined __GNUC__
+  // dummy as #pragma diagnostic push must be follows by another #pragma
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined _MSC_VER
+  #pragma warning(disable:4242)
+  #pragma warning(disable:4244)
+  #pragma warning(disable:4245)
+  #pragma warning(disable:4267)
+  #pragma warning(disable:4365)
+#endif

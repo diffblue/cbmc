@@ -159,7 +159,10 @@ jsil_union_typet jsil_union_typet::union_with(
     elements1.begin(), elements1.end(),
     elements2.begin(), elements2.end(),
     elements.begin(), compare_components);
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   elements.resize(it-elements.begin());
+#include <util/pragma_pop.def>
 
   return result;
 }
@@ -176,7 +179,10 @@ jsil_union_typet jsil_union_typet::intersect_with(
     elements1.begin(), elements1.end(),
     elements2.begin(), elements2.end(),
     elements.begin(), compare_components);
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   elements.resize(it-elements.begin());
+#include <util/pragma_pop.def>
 
   return result;
 }

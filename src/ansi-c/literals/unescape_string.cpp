@@ -44,7 +44,10 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
 
   for(unsigned i=0; i<src.size(); i++)
   {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     T ch=(unsigned char)src[i];
+#include <util/pragma_pop.def>
 
     if(ch=='\\') // escape?
     {
@@ -52,7 +55,10 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
       i++;
       assert(i<src.size()); // backslash can't be last character
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       ch=(unsigned char)src[i];
+#include <util/pragma_pop.def>
       switch(ch)
       {
       case '\\': dest.push_back(ch); break;
@@ -106,7 +112,10 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
           // go back
           i--;
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
           ch=hex_to_unsigned(hex.c_str(), hex.size());
+#include <util/pragma_pop.def>
         }
 
         // if T isn't sufficiently wide to hold unsigned values
@@ -117,7 +126,10 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
         break;
 
       default:
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         if(isdigit(ch)) // octal
+#include <util/pragma_pop.def>
         {
           std::string octal;
 
@@ -130,7 +142,10 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
           // go back
           i--;
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
           ch=octal_to_unsigned(octal.c_str(), octal.size());
+#include <util/pragma_pop.def>
           dest.push_back(ch);
         }
         else

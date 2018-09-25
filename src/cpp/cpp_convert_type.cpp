@@ -601,7 +601,10 @@ void cpp_convert_plain_type(typet &type)
   {
     // add width -- we use int, but the standard
     // doesn't guarantee that
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     type.set(ID_width, config.ansi_c.int_width);
+#include <util/pragma_pop.def>
   }
   else
   {

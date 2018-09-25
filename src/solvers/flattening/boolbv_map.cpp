@@ -95,7 +95,10 @@ void boolbv_mapt::get_literals(
   Forall_literals(it, literals)
   {
     literalt &l=*it;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     const std::size_t bit=it-literals.begin();
+#include <util/pragma_pop.def>
 
     assert(bit<map_entry.literal_map.size());
     map_bitt &mb=map_entry.literal_map[bit];
@@ -128,7 +131,10 @@ void boolbv_mapt::set_literals(
   forall_literals(it, literals)
   {
     const literalt &literal=*it;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     const std::size_t bit=it-literals.begin();
+#include <util/pragma_pop.def>
 
     assert(literal.is_constant() ||
            literal.var_no()<prop.no_variables());

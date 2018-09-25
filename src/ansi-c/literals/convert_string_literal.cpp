@@ -39,7 +39,10 @@ std::basic_string<unsigned int> convert_one_string_literal(
     // pad into wide string
     value.resize(utf8_value.size());
     for(std::size_t i=0; i<utf8_value.size(); i++)
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       value[i]=utf8_value[i];
+#include <util/pragma_pop.def>
 
     return value;
   }
@@ -62,7 +65,10 @@ std::basic_string<unsigned int> convert_one_string_literal(
     std::basic_string<unsigned int> value;
     value.resize(char_value.size());
     for(std::size_t i=0; i<char_value.size(); i++)
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       value[i]=char_value[i];
+#include <util/pragma_pop.def>
 
     return value;
   }
@@ -150,7 +156,10 @@ exprt convert_string_literal(const std::string &src)
     {
       // Loss of data here if value[i]>255.
       // gcc issues a warning in this case.
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       char_value[i]=value[i];
+#include <util/pragma_pop.def>
     }
 
     string_constantt result;

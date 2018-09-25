@@ -149,8 +149,11 @@ public:
 
   virtual std::size_t count() const override
   {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     return is_constant+is_volatile+is_restricted+is_atomic+
            is_ptr32+is_ptr64+is_noreturn;
+#include <util/pragma_pop.def>
   }
 };
 

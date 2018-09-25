@@ -49,7 +49,10 @@ bvt bv_utilst::extract(const bvt &a, std::size_t first, std::size_t last)
   bvt result=a;
   result.resize(last+1);
   if(first!=0)
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     result.erase(result.begin(), result.begin()+first);
+#include <util/pragma_pop.def>
 
   POSTCONDITION(result.size() == last - first + 1);
   return result;
@@ -61,7 +64,10 @@ bvt bv_utilst::extract_msb(const bvt &a, std::size_t n)
   PRECONDITION(n <= a.size());
 
   bvt result=a;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   result.erase(result.begin(), result.begin()+(result.size()-n));
+#include <util/pragma_pop.def>
 
   POSTCONDITION(result.size() == n);
   return result;

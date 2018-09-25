@@ -2227,7 +2227,10 @@ std::string expr2ct::convert_array(
       if(last_was_hex)
       {
         // we use "string splicing" to avoid ambiguity
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         if(isxdigit(ch))
+#include <util/pragma_pop.def>
           dest+="\" \"";
 
         last_was_hex=false;

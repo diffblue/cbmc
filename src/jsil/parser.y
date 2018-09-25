@@ -16,6 +16,9 @@ extern char *yyjsiltext;
 #include <util/string_constant.h>
 
 #include "jsil_y.tab.h"
+
+#include <util/pragma_wconversion.def>
+
 /*** token declaration **************************************************/
 %}
 

@@ -20,8 +20,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/threeval.h>
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
 #include <minisat/core/Solver.h>
 #include <minisat/simp/SimpSolver.h>
+#include <util/pragma_pop.def>
 
 #ifndef HAVE_MINISAT2
 #error "Expected HAVE_MINISAT2"
@@ -35,7 +38,10 @@ void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
 
   forall_literals(it, bv)
     if(!it->is_false())
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       dest.push(Minisat::mkLit(it->var_no(), it->sign()));
+#include <util/pragma_pop.def>
 }
 
 template<typename T>
@@ -53,12 +59,15 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 
   using Minisat::lbool;
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   if(solver->model[a.var_no()]==l_True)
     result=tvt(true);
   else if(solver->model[a.var_no()]==l_False)
     result=tvt(false);
   else
     return tvt::unknown();
+#include <util/pragma_pop.def>
 
   if(a.sign())
     result=!result;
@@ -280,7 +289,10 @@ void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
 
   try
   {
-    unsigned v = a.var_no();
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
+    int v = a.var_no();
+#include <util/pragma_pop.def>
     bool sign = a.sign();
 
     // MiniSat2 kills the model in case of UNSAT
@@ -317,7 +329,10 @@ satcheck_minisat2_baset<Minisat::SimpSolver>::~satcheck_minisat2_baset()
 template<typename T>
 bool satcheck_minisat2_baset<T>::is_in_conflict(literalt a) const
 {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   int v=a.var_no();
+#include <util/pragma_pop.def>
 
   for(int i=0; i<solver->conflict.size(); i++)
     if(var(solver->conflict[i])==v)
@@ -356,7 +371,10 @@ void satcheck_minisat_simplifiert::set_frozen(literalt a)
     if(!a.is_constant())
     {
       add_variables();
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       solver->setFrozen(a.var_no(), true);
+#include <util/pragma_pop.def>
     }
   }
   catch(Minisat::OutOfMemoryException)
@@ -371,5 +389,8 @@ bool satcheck_minisat_simplifiert::is_eliminated(literalt a) const
 {
   PRECONDITION(!a.is_constant());
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   return solver->isEliminated(a.var_no());
+#include <util/pragma_pop.def>
 }

@@ -569,7 +569,10 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 
     // erase offset bits
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
     op0.erase(op0.begin()+0, op0.begin()+offset_bits);
+#include <util/pragma_pop.def>
 
     return bv_utils.zero_extension(op0, width);
   }
@@ -752,10 +755,16 @@ void bv_pointerst::do_postponed(
       bvt bv;
       encode(number, bv);
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       bv.erase(bv.begin(), bv.begin()+offset_bits);
+#include <util/pragma_pop.def>
 
       bvt saved_bv=postponed.op;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
+#include <util/pragma_pop.def>
 
       POSTCONDITION(bv.size()==saved_bv.size());
       PRECONDITION(postponed.bv.size()==1);
@@ -798,10 +807,16 @@ void bv_pointerst::do_postponed(
       bvt bv;
       encode(number, bv);
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       bv.erase(bv.begin(), bv.begin()+offset_bits);
+#include <util/pragma_pop.def>
 
       bvt saved_bv=postponed.op;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
+#include <util/pragma_pop.def>
 
       bvt size_bv = convert_bv(object_size);
 

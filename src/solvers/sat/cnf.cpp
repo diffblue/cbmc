@@ -387,7 +387,10 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
 literalt cnft::new_variable()
 {
   literalt l;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   l.set(_no_variables, false);
+#include <util/pragma_pop.def>
 
   set_no_variables(_no_variables+1);
 

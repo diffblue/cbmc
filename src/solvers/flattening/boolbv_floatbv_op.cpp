@@ -135,8 +135,11 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
       {
         bvt tmp_bv0, tmp_bv1, tmp_bv;
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         tmp_bv0.assign(bv0.begin()+i*sub_width, bv0.begin()+(i+1)*sub_width);
         tmp_bv1.assign(bv1.begin()+i*sub_width, bv1.begin()+(i+1)*sub_width);
+#include <util/pragma_pop.def>
 
         if(expr.id()==ID_floatbv_plus)
           tmp_bv=float_utils.add_sub(tmp_bv0, tmp_bv1, false);
@@ -151,7 +154,10 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
 
         assert(tmp_bv.size()==sub_width);
         assert(i*sub_width+sub_width-1<bv.size());
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         std::copy(tmp_bv.begin(), tmp_bv.end(), bv.begin()+i*sub_width);
+#include <util/pragma_pop.def>
       }
 
       return bv;

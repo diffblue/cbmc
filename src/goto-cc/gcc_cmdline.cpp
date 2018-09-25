@@ -222,7 +222,10 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
   add_arg(argv[0]);
 
   argst args;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   args.reserve(argc-1);
+#include <util/pragma_pop.def>
 
   for(int i=1; i<argc; i++)
     args.push_back(argv[i]);

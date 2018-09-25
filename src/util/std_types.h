@@ -1136,7 +1136,10 @@ public:
 
   void set_width(std::size_t width)
   {
+#include "pragma_push.def"
+#include "pragma_wconversion.def"
     set(ID_width, width);
+#include "pragma_pop.def"
   }
 };
 
@@ -1329,7 +1332,10 @@ public:
 
   void set_integer_bits(std::size_t b)
   {
+#include "pragma_push.def"
+#include "pragma_wconversion.def"
     set(ID_integer_bits, b);
+#include "pragma_pop.def"
   }
 };
 
@@ -1381,7 +1387,10 @@ public:
 
   void set_f(std::size_t b)
   {
+#include "pragma_push.def"
+#include "pragma_wconversion.def"
     set(ID_f, b);
+#include "pragma_pop.def"
   }
 };
 

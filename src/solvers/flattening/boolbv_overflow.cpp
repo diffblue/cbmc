@@ -135,7 +135,10 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     if(rep == bv_utilst::representationt::UNSIGNED)
     {
       // get top result bits
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       result.erase(result.begin(), result.begin() + old_size);
+#include <util/pragma_pop.def>
 
       // one of the top bits is non-zero
       overflow=prop.lor(result);
@@ -144,7 +147,10 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     {
       // get top result bits plus sign bit
       DATA_INVARIANT(old_size != 0, "zero-size operand");
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       result.erase(result.begin(), result.begin() + old_size - 1);
+#include <util/pragma_pop.def>
 
       // the sign bit has changed
       literalt sign_change=!prop.lequal(bv0.back(), result.front());

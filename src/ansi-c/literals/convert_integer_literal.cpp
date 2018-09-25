@@ -168,7 +168,10 @@ exprt convert_integer_literal(const std::string &src)
 
   typet type=typet(is_signed?ID_signedbv:ID_unsignedbv);
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   type.set(ID_width, width);
+#include <util/pragma_pop.def>
   type.set(ID_C_c_type, c_type);
 
   exprt result;

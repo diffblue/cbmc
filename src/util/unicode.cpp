@@ -31,7 +31,10 @@ std::string narrow(const wchar_t *s)
   int slength=static_cast<int>(wcslen(s));
   int rlength=
     WideCharToMultiByte(CP_UTF8, 0, s, slength, NULL, 0, NULL, NULL);
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   std::string r(rlength, 0);
+#include <util/pragma_pop.def>
   WideCharToMultiByte(CP_UTF8, 0, s, slength, &r[0], rlength, NULL, NULL);
   return r;
 
@@ -56,7 +59,10 @@ std::wstring widen(const char *s)
   int slength=static_cast<int>(strlen(s));
   int rlength=
     MultiByteToWideChar(CP_UTF8, 0, s, slength, NULL, 0);
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   std::wstring r(rlength, 0);
+#include <util/pragma_pop.def>
   MultiByteToWideChar(CP_UTF8, 0, s, slength, &r[0], rlength);
   return r;
 
@@ -81,7 +87,10 @@ std::string narrow(const std::wstring &s)
   int slength=static_cast<int>(s.size());
   int rlength=
     WideCharToMultiByte(CP_UTF8, 0, &s[0], slength, NULL, 0, NULL, NULL);
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   std::string r(rlength, 0);
+#include <util/pragma_pop.def>
   WideCharToMultiByte(CP_UTF8, 0, &s[0], slength, &r[0], rlength, NULL, NULL);
   return r;
 
@@ -98,7 +107,10 @@ std::wstring widen(const std::string &s)
   int slength=static_cast<int>(s.size());
   int rlength=
     MultiByteToWideChar(CP_UTF8, 0, &s[0], slength, NULL, 0);
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   std::wstring r(rlength, 0);
+#include <util/pragma_pop.def>
   MultiByteToWideChar(CP_UTF8, 0, &s[0], slength, &r[0], rlength);
   return r;
 
@@ -155,7 +167,10 @@ std::vector<std::string> narrow_argv(int argc, const wchar_t **argv_wide)
     return std::vector<std::string>();
 
   std::vector<std::string> argv_narrow;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   argv_narrow.reserve(argc);
+#include <util/pragma_pop.def>
 
   for(int i=0; i!=argc; ++i)
     argv_narrow.push_back(narrow(argv_wide[i]));
@@ -200,6 +215,8 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
     std::string::size_type i=0;
     while(i<in.size())
     {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
       unsigned char c=in[i++];
       unsigned int code=0;
       // the ifs that follow find out how many UTF8 characters (1-4) store the
@@ -245,6 +262,7 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
         // For now, let's replace the character with a space
         code=32;
       }
+#include <util/pragma_pop.def>
 
       utf16_append_code(code, result);
     }

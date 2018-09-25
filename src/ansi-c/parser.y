@@ -26,6 +26,8 @@ extern char *yyansi_ctext;
 
 #include "ansi_c_y.tab.h"
 
+#include <util/pragma_wconversion.def>
+
 // statements have right recursion, deep nesting of statements thus
 // requires more stack space
 #define YYMAXDEPTH 25600

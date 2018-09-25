@@ -236,7 +236,10 @@ std::string xmlt::unescape(const std::string &str)
         result+='&';
       else if(tmp[0]=='#' && tmp[1]!='x')
       {
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
         char c=unsafe_string2int(tmp.substr(1, tmp.size()-1));
+#include <util/pragma_pop.def>
         result+=c;
       }
       else

@@ -168,9 +168,12 @@ bvt float_utilst::conversion(
   // new format.  Note that this is rare and will only
   // happen with very non-standard formats.
 
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   int sourceSmallestNormalExponent=-((1 << (spec.e - 1)) - 1);
   int sourceSmallestDenormalExponent =
     sourceSmallestNormalExponent - spec.f;
+#include <util/pragma_pop.def>
 
   // Using the fact that f doesn't include the hidden bit
 
@@ -391,7 +394,10 @@ bvt float_utilst::limit_distance(
   std::size_t nb_bits = address_bits(limit);
 
   bvt upper_bits=dist;
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   upper_bits.erase(upper_bits.begin(), upper_bits.begin()+nb_bits);
+#include <util/pragma_pop.def>
   literalt or_upper_bits=prop.lor(upper_bits);
 
   bvt lower_bits=dist;
@@ -709,7 +715,10 @@ literalt float_utilst::exponent_all_ones(const bvt &src)
   bvt exponent=src;
 
   // removes the fractional part
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   exponent.erase(exponent.begin(), exponent.begin()+spec.f);
+#include <util/pragma_pop.def>
 
   // removes the sign
   exponent.resize(spec.e);
@@ -722,7 +731,10 @@ literalt float_utilst::exponent_all_zeros(const bvt &src)
   bvt exponent=src;
 
   // removes the fractional part
+#include <util/pragma_push.def>
+#include <util/pragma_wconversion.def>
   exponent.erase(exponent.begin(), exponent.begin()+spec.f);
+#include <util/pragma_pop.def>
 
   // removes the sign
   exponent.resize(spec.e);
