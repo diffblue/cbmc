@@ -178,11 +178,6 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("dot", true);
     options.set_option("outfile", cmdline.get_value("dot"));
   }
-  else
-  {
-    options.set_option("text", true);
-    options.set_option("outfile", "-");
-  }
 
   // The use should either select:
   //  1. a specific analysis, or
@@ -586,14 +581,15 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
   if(options.get_bool_option("general-analysis"))
   {
-
     // Output file factory
     const std::string outfile=options.get_option("outfile");
+
     std::ofstream output_stream;
-    if(!(outfile=="-"))
+    if(outfile != "-" && !outfile.empty())
       output_stream.open(outfile);
 
-    std::ostream &out((outfile=="-") ? std::cout : output_stream);
+    std::ostream &out(
+      (outfile == "-" || outfile.empty()) ? std::cout : output_stream);
 
     if(!out)
     {
@@ -613,7 +609,6 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
                << messaget::eom;
       return CPROVER_EXIT_INTERNAL_ERROR;
     }
-
 
     // Run
     status() << "Computing abstract states" << eom;

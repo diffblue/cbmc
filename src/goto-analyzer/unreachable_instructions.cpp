@@ -233,8 +233,7 @@ bool static_unreachable_instructions(
       }
       else
       {
-        INVARIANT(options.get_bool_option("text"),
-                  "Other output formats handled");
+        // text or console
         output_dead_plain(ns, f_it->second.body, dead_map, out);
       }
     }
@@ -342,14 +341,13 @@ static void list_functions(
       // this to macros/asm renaming
       continue;
 
-    if(options.get_bool_option("text"))
+    if(options.get_bool_option("json"))
     {
-      os << concat_dir_file(
-              id2string(first_location.get_working_directory()),
-              id2string(first_location.get_file())) << " "
-         << decl.base_name << " "
-         << first_location.get_line() << " "
-         << last_location.get_line() << "\n";
+      json_output_function(
+        decl.base_name,
+        first_location,
+        last_location,
+        json_result);
     }
     else if(options.get_bool_option("xml"))
     {
@@ -360,11 +358,15 @@ static void list_functions(
         xml_result);
     }
     else
-      json_output_function(
-        decl.base_name,
-        first_location,
-        last_location,
-        json_result);
+    {
+      // text or console
+      os << concat_dir_file(
+              id2string(first_location.get_working_directory()),
+              id2string(first_location.get_file())) << " "
+         << decl.base_name << " "
+         << first_location.get_line() << " "
+         << last_location.get_line() << "\n";
+    }
   }
 
   if(options.get_bool_option("json") && !json_result.array.empty())
@@ -381,8 +383,6 @@ void unreachable_functions(
   optionst options;
   if(json)
     options.set_option("json", true);
-  else
-    options.set_option("text", true);
 
   std::unordered_set<irep_idt> called = compute_called_functions(goto_model);
 
@@ -397,8 +397,6 @@ void reachable_functions(
   optionst options;
   if(json)
     options.set_option("json", true);
-  else
-    options.set_option("text", true);
 
   std::unordered_set<irep_idt> called = compute_called_functions(goto_model);
 
