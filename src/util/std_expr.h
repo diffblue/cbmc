@@ -1106,6 +1106,23 @@ public:
     binary_exprt(_lhs, ID_div, _rhs)
   {
   }
+
+  exprt &dividend()
+  {
+    return op0();
+  }
+  const exprt &dividend() const
+  {
+    return op0();
+  }
+  exprt &divisor()
+  {
+    return op1();
+  }
+  const exprt &divisor() const
+  {
+    return op1();
+  }
 };
 
 /// \brief Cast an exprt to a \ref div_exprt

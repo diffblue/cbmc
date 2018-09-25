@@ -10,56 +10,58 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 
-bvt boolbvt::convert_div(const div_exprt &expr)
+bvt boolbvt::convert_div(const div_exprt &div_expr)
 {
-  if(expr.type().id()!=ID_unsignedbv &&
-     expr.type().id()!=ID_signedbv &&
-     expr.type().id()!=ID_fixedbv)
-    return conversion_failed(expr);
+  if(
+    div_expr.type().id() != ID_unsignedbv &&
+    div_expr.type().id() != ID_signedbv && div_expr.type().id() != ID_fixedbv)
+    return conversion_failed(div_expr);
 
-  std::size_t width=boolbv_width(expr.type());
+  std::size_t bv_width = boolbv_width(div_expr.type());
 
-  if(width==0)
-    return conversion_failed(expr);
+  if(bv_width == 0)
+    return conversion_failed(div_expr);
 
-  if(expr.op0().type().id()!=expr.type().id() ||
-     expr.op1().type().id()!=expr.type().id())
-    return conversion_failed(expr);
+  if(
+    div_expr.dividend().type().id() != div_expr.type().id() ||
+    div_expr.divisor().type().id() != div_expr.type().id())
+    return conversion_failed(div_expr);
 
-  bvt op0=convert_bv(expr.op0());
-  bvt op1=convert_bv(expr.op1());
+  bvt dividend = convert_bv(div_expr.dividend());
+  bvt divisor = convert_bv(div_expr.divisor());
 
-  if(op0.size()!=width ||
-     op1.size()!=width)
-    throw "convert_div: unexpected operand width";
+  INVARIANT(
+    dividend.size() == divisor.size(),
+    "bitvectors of the same type should have the same length");
 
-  bvt res, rem;
+  bvt result, remainder;
 
-  if(expr.type().id()==ID_fixedbv)
+  if(div_expr.type().id() == ID_fixedbv)
   {
-    std::size_t fraction_bits=
-      to_fixedbv_type(expr.type()).get_fraction_bits();
+    std::size_t fraction_bits =
+      to_fixedbv_type(div_expr.type()).get_fraction_bits();
 
     bvt zeros;
     zeros.resize(fraction_bits, const_literal(false));
 
     // add fraction_bits least-significant bits
-    op0.insert(op0.begin(), zeros.begin(), zeros.end());
-    op1=bv_utils.sign_extension(op1, op1.size()+fraction_bits);
+    dividend.insert(dividend.begin(), zeros.begin(), zeros.end());
+    divisor = bv_utils.sign_extension(divisor, divisor.size() + fraction_bits);
 
-    bv_utils.divider(op0, op1, res, rem, bv_utilst::representationt::SIGNED);
+    bv_utils.divider(
+      dividend, divisor, result, remainder, bv_utilst::representationt::SIGNED);
 
     // cut it down again
-    res.resize(width);
+    result.resize(bv_width);
   }
   else
   {
-    bv_utilst::representationt rep=
-      expr.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
-                                    bv_utilst::representationt::UNSIGNED;
+    bv_utilst::representationt rep = div_expr.type().id() == ID_signedbv
+                                       ? bv_utilst::representationt::SIGNED
+                                       : bv_utilst::representationt::UNSIGNED;
 
-    bv_utils.divider(op0, op1, res, rem, rep);
+    bv_utils.divider(dividend, divisor, result, remainder, rep);
   }
 
-  return res;
+  return result;
 }

@@ -12,62 +12,53 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
 {
-  std::size_t width=boolbv_width(expr.type());
+  std::size_t target_bv_width = boolbv_width(expr.type());
 
-  if(width==0)
+  if(target_bv_width == 0)
     return conversion_failed(expr);
 
-  if(expr.operands().size()!=3)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "extractbits takes three operands" << eom;
-    throw 0;
-  }
+  const bvt &src_bv = convert_bv(expr.src());
 
-  mp_integer o1, o2;
-  const bvt &bv0=convert_bv(expr.op0());
-
+  auto maybe_upper_as_int = numeric_cast<mp_integer>(expr.upper());
+  auto maybe_lower_as_int = numeric_cast<mp_integer>(expr.lower());
   // We only do constants for now.
   // Should implement a shift here.
-  if(to_integer(expr.op1(), o1) ||
-     to_integer(expr.op2(), o2))
+  if(!maybe_upper_as_int.has_value() || !maybe_lower_as_int.has_value())
     return conversion_failed(expr);
+  mp_integer upper_as_int = maybe_upper_as_int.value();
+  mp_integer lower_as_int = maybe_lower_as_int.value();
 
-  if(o1<0 || o1>=bv0.size())
-  {
-    error().source_location=expr.find_source_location();
-    error() << "extractbits: second operand out of range: "
-            << expr.pretty() << eom;
-  }
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    upper_as_int >= 0 && upper_as_int < src_bv.size(),
+    "the upper limit of a selectbits expression is in range",
+    irep_pretty_diagnosticst{expr});
 
-  if(o2<0 || o2>=bv0.size())
-  {
-    error().source_location=expr.find_source_location();
-    error() << "extractbits: third operand out of range: "
-            << expr.pretty() << eom;
-    throw 0;
-  }
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    lower_as_int >= 0 && lower_as_int < src_bv.size(),
+    "the lower limit of a selectbits expression is in range",
+    irep_pretty_diagnosticst{expr});
 
-  if(o2>o1)
-    std::swap(o1, o2);
+  if(lower_as_int > upper_as_int)
+    std::swap(upper_as_int, lower_as_int);
 
-  // now o2<=o1
+  INVARIANT(
+    lower_as_int <= upper_as_int,
+    "the lower limit of selectbits is higher than the upper limit");
 
-  if((o1-o2+1)!=width)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "extractbits: wrong width (expected " << (o1-o2+1)
-            << " but got " << width << "): " << expr.pretty() << eom;
-    throw 0;
-  }
+  auto const total_width = upper_as_int - lower_as_int + 1;
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    total_width == target_bv_width,
+    "the number of extracted bits should match the width of the type the bits "
+    "are being extracted to",
+    irep_pretty_diagnosticst{expr});
 
-  std::size_t offset=integer2unsigned(o2);
+  std::size_t offset = integer2unsigned(lower_as_int);
 
   bvt bv;
-  bv.resize(width);
+  bv.resize(target_bv_width);
 
-  for(std::size_t i=0; i<width; i++)
-    bv[i]=bv0[offset+i];
+  for(std::size_t i = 0; i < target_bv_width; i++)
+    bv[i] = src_bv[offset + i];
 
   return bv;
 }
