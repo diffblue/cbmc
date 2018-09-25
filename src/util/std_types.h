@@ -280,6 +280,67 @@ public:
   }
 
   bool is_prefix_of(const struct_typet &other) const;
+
+  /// A struct may be a class, where members may have access restrictions.
+  bool is_class() const
+  {
+    return get_bool(ID_C_class);
+  }
+
+  /// Base class or struct that a class or struct inherits from.
+  class baset : public exprt
+  {
+  public:
+    baset() : exprt(ID_base)
+    {
+    }
+
+    explicit baset(const typet &base) : exprt(ID_base, base)
+    {
+    }
+  };
+
+  typedef std::vector<baset> basest;
+
+  /// Get the collection of base classes/structs.
+  const basest &bases() const
+  {
+    return (const basest &)find(ID_bases).get_sub();
+  }
+
+  /// Get the collection of base classes/structs.
+  basest &bases()
+  {
+    return (basest &)add(ID_bases).get_sub();
+  }
+
+  /// Add a base class/struct
+  /// \param base: Type of case/class struct to be added.
+  void add_base(const symbol_typet &base)
+  {
+    bases().push_back(baset(base));
+  }
+
+  /// Return the base with the given name, if exists.
+  /// \param id The name of the base we are looking for.
+  /// \return The base if exists.
+  optionalt<baset> get_base(const irep_idt &id) const
+  {
+    for(const auto &b : bases())
+    {
+      if(to_symbol_type(b.type()).get_identifier() == id)
+        return b;
+    }
+    return {};
+  }
+
+  /// Test whether `id` is a base class/struct.
+  /// \param id: symbol type name
+  /// \return True if, and only if, the symbol type `id` is a base class/struct.
+  bool has_base(const irep_idt &id) const
+  {
+    return get_base(id).has_value();
+  }
 };
 
 /// Check whether a reference to a typet is a \ref struct_typet.
@@ -334,53 +395,6 @@ public:
   componentst &methods()
   {
     return (methodst &)(add(ID_methods).get_sub());
-  }
-
-  class baset:public exprt
-  {
-  public:
-    baset():exprt(ID_base)
-    {
-    }
-
-    explicit baset(const typet &base):exprt(ID_base, base)
-    {
-    }
-  };
-
-  typedef std::vector<baset> basest;
-
-  const basest &bases() const
-  {
-    return (const basest &)find(ID_bases).get_sub();
-  }
-
-  basest &bases()
-  {
-    return (basest &)add(ID_bases).get_sub();
-  }
-
-  void add_base(const typet &base)
-  {
-    bases().push_back(baset(base));
-  }
-
-  /// Return the base with the given name, if exists.
-  /// \param id The name of the base we are looking for.
-  /// \return The base if exists.
-  optionalt<baset> get_base(const irep_idt &id) const
-  {
-    for(const auto &b : bases())
-    {
-      if(to_symbol_type(b.type()).get_identifier() == id)
-        return b;
-    }
-    return {};
-  }
-
-  bool has_base(const irep_idt &id) const
-  {
-    return get_base(id).has_value();
   }
 
   bool is_abstract() const

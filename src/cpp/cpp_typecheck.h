@@ -262,7 +262,7 @@ protected:
   codet dtor(const symbolt &symb);
 
   void check_member_initializers(
-    const irept &bases,
+    const struct_typet::basest &bases,
     const struct_typet::componentst &components,
     const irept &initializers);
 

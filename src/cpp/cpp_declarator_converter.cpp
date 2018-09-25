@@ -152,20 +152,16 @@ symbolt &cpp_declarator_convertert::convert(
 
       irep_idt identifier=symbol_expr.type().get(ID_identifier);
       const symbolt &symb=cpp_typecheck.lookup(identifier);
-      const typet &type = symb.type;
-      assert(type.id()==ID_struct);
+      const struct_typet &type = to_struct_type(symb.type);
 
       if(declarator.find(ID_member_initializers).is_nil())
         declarator.set(ID_member_initializers, ID_member_initializers);
 
       cpp_typecheck.check_member_initializers(
-        type.find(ID_bases),
-        to_struct_type(type).components(),
-        declarator.member_initializers());
+        type.bases(), type.components(), declarator.member_initializers());
 
       cpp_typecheck.full_member_initialization(
-        to_struct_type(type),
-        declarator.member_initializers());
+        type, declarator.member_initializers());
     }
 
     if(!storage_spec.is_extern())

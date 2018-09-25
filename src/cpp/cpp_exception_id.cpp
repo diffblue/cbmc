@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_exception_id.h"
 
 #include <util/invariant.h>
+#include <util/std_types.h>
 
 /// turns a type into a list of relevant exception IDs
 void cpp_exception_list_rec(
@@ -48,13 +49,8 @@ void cpp_exception_list_rec(
     dest.push_back("struct_"+src.get_string(ID_tag));
 
     // now do any bases, recursively
-    const irept::subt &bases=src.find(ID_bases).get_sub();
-
-    forall_irep(it, bases)
-    {
-      const typet &type=static_cast<const typet &>(it->find(ID_type));
-      cpp_exception_list_rec(type, ns, suffix, dest);
-    }
+    for(const auto &b : to_struct_type(src).bases())
+      cpp_exception_list_rec(b.type(), ns, suffix, dest);
   }
   else
   {

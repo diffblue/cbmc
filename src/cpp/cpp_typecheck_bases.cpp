@@ -141,19 +141,18 @@ void cpp_typecheckt::add_base_components(
     vbases.insert(from_name);
 
   // look at the the parents of the base type
-  forall_irep(it, from.find(ID_bases).get_sub())
+  for(const auto &b : from.bases())
   {
-    irep_idt sub_access=it->get(ID_access);
+    irep_idt sub_access = b.get(ID_access);
 
     if(access==ID_private)
       sub_access=ID_private;
     else if(access==ID_protected && sub_access!=ID_private)
       sub_access=ID_protected;
 
-    const symbolt &symb=
-      lookup(it->find(ID_type).get(ID_identifier));
+    const symbolt &symb = lookup(to_symbol_type(b.type()).get_identifier());
 
-    bool is_virtual=it->get_bool(ID_virtual);
+    const bool is_virtual = b.get_bool(ID_virtual);
 
     // recursive call
     add_base_components(

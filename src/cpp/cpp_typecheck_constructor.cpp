@@ -186,14 +186,11 @@ void cpp_typecheckt::default_cpctor(
   exprt &block=declarator.value();
 
   // First, we need to call the parent copy constructors
-  const irept &bases=symbol.type.find(ID_bases);
-  forall_irep(parent_it, bases.get_sub())
+  for(const auto &b : to_struct_type(symbol.type).bases())
   {
-    assert(parent_it->id()==ID_base);
-    assert(parent_it->get(ID_type) == ID_symbol_type);
+    DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-    const symbolt &parsymb=
-      lookup(parent_it->find(ID_type).get(ID_identifier));
+    const symbolt &parsymb = lookup(to_symbol_type(b.type()).get_identifier());
 
     if(cpp_is_pod(parsymb.type))
       copy_parent(source_location, parsymb.base_name, param_identifier, block);
@@ -358,15 +355,11 @@ void cpp_typecheckt::default_assignop_value(
   std::string arg_name("ref");
 
   // First, we copy the parents
-  const irept &bases=symbol.type.find(ID_bases);
-
-  forall_irep(parent_it, bases.get_sub())
+  for(const auto &b : to_struct_type(symbol.type).bases())
   {
-    assert(parent_it->id()==ID_base);
-    assert(parent_it->get(ID_type) == ID_symbol_type);
+    DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-    const symbolt &symb=
-      lookup(parent_it->find(ID_type).get(ID_identifier));
+    const symbolt &symb = lookup(to_symbol_type(b.type()).get_identifier());
 
     copy_parent(source_location, symb.base_name, arg_name, block);
   }
@@ -426,7 +419,7 @@ void cpp_typecheckt::default_assignop_value(
 /// \return If an invalid initializer is found, then the method outputs an error
 ///   message and throws a 0 exception.
 void cpp_typecheckt::check_member_initializers(
-  const irept &bases,
+  const struct_typet::basest &bases,
   const struct_typet::componentst &components,
   const irept &initializers)
 {
@@ -450,12 +443,11 @@ void cpp_typecheckt::check_member_initializers(
 
       // check for a direct parent
       bool ok=false;
-      forall_irep(parent_it, bases.get_sub())
+      for(const auto &b : bases)
       {
-        assert(parent_it->get(ID_type) == ID_symbol_type);
-
-        if(member_type.get(ID_identifier)
-          ==parent_it->find(ID_type).get(ID_identifier))
+        if(
+          to_symbol_type(member_type).get_identifier() ==
+          to_symbol_type(b.type()).get_identifier())
         {
           ok=true;
           break;
@@ -500,10 +492,9 @@ void cpp_typecheckt::check_member_initializers(
           break;
 
         // check for a direct parent
-        forall_irep(parent_it, bases.get_sub())
+        for(const auto &b : bases)
         {
-          assert(parent_it->get(ID_type) == ID_symbol_type);
-          if(symb.name==parent_it->find(ID_type).get(ID_identifier))
+          if(symb.name == to_symbol_type(b.type()).get_identifier())
           {
             ok=true;
             break;
@@ -522,12 +513,11 @@ void cpp_typecheckt::check_member_initializers(
         typecheck_type(member_type);
 
         // check for a direct parent
-        forall_irep(parent_it, bases.get_sub())
+        for(const auto &b : bases)
         {
-          assert(parent_it->get(ID_type) == ID_symbol_type);
-
-          if(member_type.get(ID_identifier)==
-             parent_it->find(ID_type).get(ID_identifier))
+          if(
+            member_type.get(ID_identifier) ==
+            to_symbol_type(b.type()).get_identifier())
           {
             ok=true;
             break;
@@ -600,16 +590,13 @@ void cpp_typecheckt::full_member_initialization(
       final_initializers.move_to_sub(cond);
     }
 
-    const irept &bases=struct_union_type.find(ID_bases);
-
     // Subsequently, we need to call the non-POD parent constructors
-    forall_irep(parent_it, bases.get_sub())
+    for(const auto &b : to_struct_type(struct_union_type).bases())
     {
-      assert(parent_it->id()==ID_base);
-      assert(parent_it->get(ID_type) == ID_symbol_type);
+      DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-      const symbolt &ctorsymb=
-        lookup(parent_it->find(ID_type).get(ID_identifier));
+      const symbolt &ctorsymb =
+        lookup(to_symbol_type(b.type()).get_identifier());
 
       if(cpp_is_pod(ctorsymb.type))
         continue;
@@ -659,8 +646,9 @@ void cpp_typecheckt::full_member_initialization(
         if(member_type.id() != ID_symbol_type)
           break;
 
-        if(parent_it->find(ID_type).get(ID_identifier)==
-           member_type.get(ID_identifier))
+        if(
+          to_symbol_type(b.type()).get_identifier() ==
+          to_symbol_type(member_type).get_identifier())
         {
           final_initializers.move_to_sub(initializer);
           found=true;
@@ -678,7 +666,7 @@ void cpp_typecheckt::full_member_initialization(
         final_initializers.move_to_sub(mem_init);
       }
 
-      if(parent_it->get_bool(ID_virtual))
+      if(b.get_bool(ID_virtual))
       {
         // TODO(tautschnig): this code doesn't seem to make much sense as the
         // ifthenelse only gets to have two operands (instead of three)
