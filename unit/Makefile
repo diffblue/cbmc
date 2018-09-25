@@ -44,6 +44,7 @@ SRC += analyses/ai/ai.cpp \
        util/sharing_node.cpp \
        util/small_map.cpp \
        util/small_shared_two_way_ptr.cpp \
+			 util/std_expr.cpp \
        util/string_utils/split_string.cpp \
        util/string_utils/strip_string.cpp \
        util/symbol_table.cpp \
