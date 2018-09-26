@@ -4565,11 +4565,6 @@ inline void validate_expr(const let_exprt &value)
 class quantifier_exprt:public binary_predicate_exprt
 {
 public:
-  explicit quantifier_exprt(const irep_idt &_id):binary_predicate_exprt(_id)
-  {
-    op0()=symbol_exprt();
-  }
-
   quantifier_exprt(
     const irep_idt &_id,
     const symbol_exprt &_symbol,
@@ -4635,10 +4630,6 @@ inline void validate_expr(const quantifier_exprt &value)
 class forall_exprt:public quantifier_exprt
 {
 public:
-  forall_exprt():quantifier_exprt(ID_forall)
-  {
-  }
-
   forall_exprt(const symbol_exprt &_symbol, const exprt &_where)
     : quantifier_exprt(ID_forall, _symbol, _where)
   {
@@ -4649,10 +4640,6 @@ public:
 class exists_exprt:public quantifier_exprt
 {
 public:
-  exists_exprt():quantifier_exprt(ID_exists)
-  {
-  }
-
   exists_exprt(const symbol_exprt &_symbol, const exprt &_where)
     : quantifier_exprt(ID_exists, _symbol, _where)
   {
