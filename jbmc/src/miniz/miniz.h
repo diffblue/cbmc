@@ -173,6 +173,11 @@
 #pragma once
 
 
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4668)
+  // using #if/#elif on undefined macro
+#endif
 
 
 
@@ -1350,4 +1355,8 @@ void *mz_zip_extract_archive_file_to_heap_v2(const char *pZip_filename, const ch
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
 #endif
