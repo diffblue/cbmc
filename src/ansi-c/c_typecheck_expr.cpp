@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_util.h>
 #include <util/ieee_float.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
@@ -296,6 +297,13 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     {
       err_location(expr);
       error() << "expected declaration as operand of quantifier" << eom;
+      throw 0;
+    }
+
+    if(has_subexpr(expr.op1(), ID_side_effect))
+    {
+      err_location(expr);
+      error() << "quantifier must not contain side effects" << eom;
       throw 0;
     }
 
