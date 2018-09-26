@@ -56,11 +56,7 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
 
   const std::size_t offset = integer2unsigned(lower_as_int);
 
-  bvt result_bv;
-  result_bv.resize(bv_width);
-
-  for(std::size_t i = 0; i < bv_width; i++)
-    result_bv[i] = src_bv[offset + i];
+  bvt result_bv(src_bv.begin() + offset, src_bv.begin() + offset + bv_width);
 
   return result_bv;
 }
