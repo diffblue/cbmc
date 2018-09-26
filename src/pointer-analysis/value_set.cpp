@@ -51,6 +51,13 @@ bool value_sett::field_sensitive(
   return ns.follow(type).id()==ID_struct;
 }
 
+const value_sett::entryt *value_sett::find_entry(const value_sett::idt &id)
+  const
+{
+  auto found = values.find(id);
+  return found == values.end() ? nullptr : &found->second;
+}
+
 value_sett::entryt &value_sett::get_entry(
   const entryt &e,
   const typet &type,
@@ -429,13 +436,11 @@ void value_sett::get_value_set_rec(
        expr_type.id()==ID_array)
     {
       // look it up
-      valuest::const_iterator v_it=
-        values.find(id2string(identifier)+suffix);
+      const entryt *entry =
+        find_entry(id2string(identifier) + suffix);
 
       // try first component name as suffix if not yet found
-      if(v_it==values.end() &&
-          (expr_type.id()==ID_struct ||
-           expr_type.id()==ID_union))
+      if(!entry && (expr_type.id() == ID_struct || expr_type.id() == ID_union))
       {
         const struct_union_typet &struct_union_type=
           to_struct_union_type(expr_type);
@@ -443,17 +448,17 @@ void value_sett::get_value_set_rec(
         const irep_idt &first_component_name =
           struct_union_type.components().front().get_name();
 
-        v_it = values.find(
+        entry = find_entry(
           id2string(identifier) + "." + id2string(first_component_name) +
           suffix);
       }
 
       // not found? try without suffix
-      if(v_it==values.end())
-        v_it=values.find(identifier);
+      if(!entry)
+        entry = find_entry(identifier);
 
-      if(v_it!=values.end())
-        make_union(dest, v_it->second.object_map);
+      if(entry)
+        make_union(dest, entry->object_map);
       else
         insert(dest, exprt(ID_unknown, original_type));
     }
@@ -857,16 +862,16 @@ void value_sett::get_value_set_rec(
     const std::string full_name=prefix+suffix;
 
     // look it up
-    valuest::const_iterator v_it=values.find(full_name);
+    const entryt *entry = find_entry(full_name);
 
     // not found? try without suffix
-    if(v_it==values.end())
-      v_it=values.find(prefix);
+    if(!entry)
+      entry = find_entry(prefix);
 
-    if(v_it==values.end())
+    if(!entry)
       insert(dest, exprt(ID_unknown, original_type));
     else
-      make_union(dest, v_it->second.object_map);
+      make_union(dest, entry->object_map);
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)

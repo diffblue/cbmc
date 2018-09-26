@@ -317,6 +317,15 @@ public:
     values.clear();
   }
 
+  /// Finds an entry in this value-set. The interface differs from get_entry
+  /// because get_value_set_rec wants to check for a struct's first component
+  /// before stripping the suffix as is done in get_entry.
+  /// \param id: identifier to find.
+  /// \return a constant pointer to an entry if found, or null otherwise.
+  ///   Note the pointer may be invalidated by insert operations, including
+  ///   get_entry.
+  const entryt *find_entry(const idt &id) const;
+
   /// Gets or inserts an entry in this value-set.
   /// \param e: entry to find. Its `id` and `suffix` fields will be used
   ///   to find a corresponding entry; if a fresh entry is created its
