@@ -12,62 +12,51 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
 {
-  std::size_t width=boolbv_width(expr.type());
+  const std::size_t bv_width = boolbv_width(expr.type());
 
-  if(width==0)
+  if(bv_width == 0)
     return conversion_failed(expr);
 
-  if(expr.operands().size()!=3)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "extractbits takes three operands" << eom;
-    throw 0;
-  }
+  auto const &src_bv = convert_bv(expr.src());
 
-  mp_integer o1, o2;
-  const bvt &bv0=convert_bv(expr.op0());
+  auto const maybe_upper_as_int = numeric_cast<mp_integer>(expr.upper());
+  auto const maybe_lower_as_int = numeric_cast<mp_integer>(expr.lower());
 
   // We only do constants for now.
   // Should implement a shift here.
-  if(to_integer(expr.op1(), o1) ||
-     to_integer(expr.op2(), o2))
+  if(!maybe_upper_as_int.has_value() || !maybe_lower_as_int.has_value())
     return conversion_failed(expr);
 
-  if(o1<0 || o1>=bv0.size())
-  {
-    error().source_location=expr.find_source_location();
-    error() << "extractbits: second operand out of range: "
-            << expr.pretty() << eom;
-  }
+  auto upper_as_int = maybe_upper_as_int.value();
+  auto lower_as_int = maybe_lower_as_int.value();
 
-  if(o2<0 || o2>=bv0.size())
-  {
-    error().source_location=expr.find_source_location();
-    error() << "extractbits: third operand out of range: "
-            << expr.pretty() << eom;
-    throw 0;
-  }
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    upper_as_int >= 0 && upper_as_int < src_bv.size(),
+    "upper end of extracted bits must be within the bitvector",
+    expr.find_source_location(),
+    irep_pretty_diagnosticst{expr});
 
-  if(o2>o1)
-    std::swap(o1, o2);
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    lower_as_int >= 0 && lower_as_int < src_bv.size(),
+    "lower end of extracted bits must be within the bitvector",
+    expr.find_source_location(),
+    irep_pretty_diagnosticst{expr});
 
-  // now o2<=o1
+  if(lower_as_int > upper_as_int)
+    std::swap(upper_as_int, lower_as_int);
 
-  if((o1-o2+1)!=width)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "extractbits: wrong width (expected " << (o1-o2+1)
-            << " but got " << width << "): " << expr.pretty() << eom;
-    throw 0;
-  }
+  // now lower_as_int <= upper_as_int
 
-  std::size_t offset=integer2unsigned(o2);
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    (upper_as_int - lower_as_int + 1) == bv_width,
+    "the difference between upper and lower end of the range must have the "
+    "same width as the resulting bitvector type",
+    expr.find_source_location(),
+    irep_pretty_diagnosticst{expr});
 
-  bvt bv;
-  bv.resize(width);
+  const std::size_t offset = integer2unsigned(lower_as_int);
 
-  for(std::size_t i=0; i<width; i++)
-    bv[i]=bv0[offset+i];
+  bvt result_bv(src_bv.begin() + offset, src_bv.begin() + offset + bv_width);
 
-  return bv;
+  return result_bv;
 }
