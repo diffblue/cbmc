@@ -4491,13 +4491,15 @@ public:
 };
 
 /// \brief A let expression
-class let_exprt:public exprt
+class let_exprt : public ternary_exprt
 {
 public:
-  let_exprt():exprt(ID_let)
+  let_exprt(
+    const symbol_exprt &symbol,
+    const exprt &value,
+    const exprt &where)
+    : ternary_exprt(ID_let, symbol, value, where, where.type())
   {
-    operands().resize(3);
-    op0()=symbol_exprt();
   }
 
   symbol_exprt &symbol()

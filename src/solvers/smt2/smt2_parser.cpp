@@ -188,11 +188,10 @@ exprt smt2_parsert::let_expression()
   // go backwards, build let_expr
   for(auto r_it=bindings.rbegin(); r_it!=bindings.rend(); r_it++)
   {
-    let_exprt let;
-    let.symbol()=symbol_exprt(r_it->first, r_it->second.type());
-    let.value()=r_it->second;
-    let.type()=result.type();
-    let.where().swap(result);
+    const let_exprt let(
+      symbol_exprt(r_it->first, r_it->second.type()),
+      r_it->second,
+      result);
     result=let;
   }
 
