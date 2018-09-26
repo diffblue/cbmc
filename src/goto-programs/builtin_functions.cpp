@@ -900,11 +900,7 @@ void goto_convertt::do_function_call_symbol(
     if(lhs.is_nil())
       return;
 
-    function_application_exprt rhs;
-    rhs.type()=lhs.type();
-    rhs.add_source_location()=function.source_location();
-    rhs.function()=function;
-    rhs.arguments()=arguments;
+    const function_application_exprt rhs(function, arguments, lhs.type());
 
     code_assignt assignment(lhs, rhs);
     assignment.add_source_location()=function.source_location();

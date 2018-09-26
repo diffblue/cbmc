@@ -4333,22 +4333,16 @@ public:
 class function_application_exprt:public binary_exprt
 {
 public:
-  function_application_exprt():binary_exprt(ID_function_application)
-  {
-    op0()=symbol_exprt();
-  }
-
-  explicit function_application_exprt(const typet &_type):
-    binary_exprt(ID_function_application, _type)
-  {
-    op0()=symbol_exprt();
-  }
+  using argumentst = exprt::operandst;
 
   function_application_exprt(
-    const symbol_exprt &_function, const typet &_type):
-      function_application_exprt(_type) // NOLINT(runtime/explicit)
+    const symbol_exprt &_function,
+    const argumentst &_arguments,
+    const typet &_type)
+    : binary_exprt(ID_function_application, _type)
   {
     function()=_function;
+    arguments() = _arguments;
   }
 
   symbol_exprt &function()
@@ -4360,8 +4354,6 @@ public:
   {
     return static_cast<const symbol_exprt &>(op0());
   }
-
-  typedef exprt::operandst argumentst;
 
   argumentst &arguments()
   {

@@ -286,11 +286,6 @@ exprt smt2_parsert::function_application(
   #if 0
   const auto &f = id_map[identifier];
 
-  function_application_exprt result;
-
-  result.function()=symbol_exprt(identifier, f.type);
-  result.arguments()=op;
-
   // check the arguments
   if(op.size()!=f.type.variables().size())
   {
@@ -303,12 +298,12 @@ exprt smt2_parsert::function_application(
     if(op[i].type() != f.type.variables()[i].type())
     {
       error() << "wrong type for arguments for function" << eom;
-      return result;
+      return nil_exprt();
     }
   }
 
-  result.type()=f.type.range();
-  return result;
+  return function_application_exprt(
+    symbol_exprt(identifier, f.type), op, f.type.range());
   #endif
   return nil_exprt();
 }
@@ -675,12 +670,11 @@ exprt smt2_parsert::function_application()
         {
           if(id_it->second.type.id()==ID_mathematical_function)
           {
-            function_application_exprt app;
-            app.function()=symbol_exprt(final_id, id_it->second.type);
-            app.arguments()=op;
-            app.type()=to_mathematical_function_type(
-              id_it->second.type).codomain();
-            return app;
+            return function_application_exprt(
+              symbol_exprt(final_id, id_it->second.type),
+              op,
+              to_mathematical_function_type(
+                id_it->second.type).codomain());
           }
           else
             return symbol_exprt(final_id, id_it->second.type);

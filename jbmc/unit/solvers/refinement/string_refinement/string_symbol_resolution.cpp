@@ -68,8 +68,7 @@ SCENARIO("string_identifiers_resolution_from_equations",
       typet return_type;
       symbol_exprt fun_sym(
         "f", java_method_typet(std::move(parameters), return_type));
-      function_application_exprt fun(fun_sym, bool_typet());
-      fun.operands().push_back(c);
+      const function_application_exprt fun(fun_sym, {c}, bool_typet());
       symbol_exprt bool_sym("bool_b", bool_typet());
       equations.emplace_back(bool_sym, fun);
       union_find_replacet symbol_resolve =
