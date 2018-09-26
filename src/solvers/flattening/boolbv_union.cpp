@@ -22,8 +22,10 @@ bvt boolbvt::convert_union(const union_exprt &expr)
 
   const bvt &op_bv=convert_bv(expr.op());
 
-  if(width<op_bv.size())
-    throw "union: unexpected operand op width";
+  INVARIANT(
+    op_bv.size() <= width,
+    "operand bitvector width shall not be larger than the width indicated by "
+    "the union type");
 
   bvt bv;
   bv.resize(width);
@@ -39,8 +41,9 @@ bvt boolbvt::convert_union(const union_exprt &expr)
   }
   else
   {
-    assert(
-      config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_BIG_ENDIAN);
+    INVARIANT(
+      config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_BIG_ENDIAN,
+      "endianness should be set to either little endian or big endian");
 
     bv_endianness_mapt map_u(expr.type(), false, ns, boolbv_width);
     bv_endianness_mapt map_op(expr.op0().type(), false, ns, boolbv_width);

@@ -142,7 +142,7 @@ protected:
   virtual bvt convert_if(const if_exprt &expr);
   virtual bvt convert_struct(const struct_exprt &expr);
   virtual bvt convert_array(const exprt &expr);
-  virtual bvt convert_vector(const exprt &expr);
+  virtual bvt convert_vector(const vector_exprt &expr);
   virtual bvt convert_complex(const complex_exprt &expr);
   virtual bvt convert_complex_real(const complex_real_exprt &expr);
   virtual bvt convert_complex_imag(const complex_imag_exprt &expr);
@@ -164,7 +164,7 @@ protected:
   virtual bvt convert_cond(const exprt &expr);
   virtual bvt convert_shift(const binary_exprt &expr);
   virtual bvt convert_bitwise(const exprt &expr);
-  virtual bvt convert_unary_minus(const unary_exprt &expr);
+  virtual bvt convert_unary_minus(const unary_minus_exprt &expr);
   virtual bvt convert_abs(const abs_exprt &expr);
   virtual bvt convert_concatenation(const concatenation_exprt &expr);
   virtual bvt convert_replication(const replication_exprt &expr);

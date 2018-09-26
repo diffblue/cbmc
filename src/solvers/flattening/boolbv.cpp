@@ -251,9 +251,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
           expr.id()==ID_bitxnor || expr.id()==ID_bitnor ||
           expr.id()==ID_bitnand)
     return convert_bitwise(expr);
-  else if(expr.id()==ID_unary_minus ||
-          expr.id()=="no-overflow-unary-minus")
-    return convert_unary_minus(to_unary_expr(expr));
+  else if(expr.id() == ID_unary_minus)
+    return convert_unary_minus(to_unary_minus_expr(expr));
   else if(expr.id()==ID_unary_plus)
   {
     return convert_bitvector(to_unary_plus_expr(expr).op());
@@ -281,7 +280,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id()==ID_array)
     return convert_array(expr);
   else if(expr.id()==ID_vector)
-    return convert_vector(expr);
+    return convert_vector(to_vector_expr(expr));
   else if(expr.id()==ID_complex)
     return convert_complex(to_complex_expr(expr));
   else if(expr.id()==ID_complex_real)
