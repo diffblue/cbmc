@@ -141,3 +141,37 @@ SCENARIO(
     }
   }
 }
+
+SCENARIO(
+  "java_bytecode_convert_varargs_method",
+  "[core][java_bytecode][java_bytecode_convert_method]")
+{
+  GIVEN("A class with varargs and non-varargs methods")
+  {
+    const symbol_tablet symbol_table = load_java_class(
+      "ClassWithVarArgsMethod", "./java_bytecode/java_bytecode_convert_method");
+
+    WHEN("When parsing a method with a variable number of arguments")
+    {
+      const symbolt method_symbol = symbol_table.lookup_ref(
+        "java::ClassWithVarArgsMethod.varArgsFunc:([I)I");
+      const java_method_typet &method_type =
+        require_type::require_java_method(method_symbol.type);
+      THEN("The method should be marked as varargs")
+      {
+        REQUIRE(method_type.get_is_varargs());
+      }
+    }
+    WHEN("When parsing a method with constant number of arguments")
+    {
+      const symbolt method_symbol = symbol_table.lookup_ref(
+        "java::ClassWithVarArgsMethod.nonVarArgsFunc:([I)I");
+      const java_method_typet &method_type =
+        require_type::require_java_method(method_symbol.type);
+      THEN("The method should not be marked as varargs")
+      {
+        REQUIRE_FALSE(method_type.get_is_varargs());
+      }
+    }
+  }
+}

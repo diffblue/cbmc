@@ -298,6 +298,16 @@ public:
   {
     set(ID_is_native_method, is_native);
   }
+
+  bool get_is_varargs() const
+  {
+    return get_bool(ID_is_varargs_method);
+  }
+
+  void set_is_varargs(bool is_varargs)
+  {
+    set(ID_is_varargs_method, is_varargs);
+  }
 };
 
 template <>
