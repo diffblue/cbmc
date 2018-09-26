@@ -66,28 +66,22 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
       unsignedbv_typet(32));
 
     // fun1 is s3 = s1.concat(s2)
-    function_application_exprt fun1(fun_type);
-    fun1.function() = symbol_exprt(ID_cprover_string_concat_func);
-    fun1.arguments().push_back(string3.op0());
-    fun1.arguments().push_back(string3.op1());
-    fun1.arguments().push_back(string1);
-    fun1.arguments().push_back(string2);
+    const function_application_exprt fun1(
+      symbol_exprt(ID_cprover_string_concat_func),
+      {string3.op0(), string3.op1(), string1, string2},
+      fun_type);
 
     // fun2 is s5 = s3.concat(s4)
-    function_application_exprt fun2(fun_type);
-    fun2.function() = symbol_exprt(ID_cprover_string_concat_func);
-    fun2.arguments().push_back(string5.op0());
-    fun2.arguments().push_back(string5.op1());
-    fun2.arguments().push_back(string3);
-    fun2.arguments().push_back(string4);
+    const function_application_exprt fun2(
+      symbol_exprt(ID_cprover_string_concat_func),
+      {string5.op0(), string5.op1(), string3, string4},
+      fun_type);
 
     // fun3 is s6 = s5.concat(s2)
-    function_application_exprt fun3(fun_type);
-    fun3.function() = symbol_exprt(ID_cprover_string_concat_func);
-    fun3.arguments().push_back(string6.op0());
-    fun3.arguments().push_back(string6.op1());
-    fun3.arguments().push_back(string5);
-    fun3.arguments().push_back(string2);
+    const function_application_exprt fun3(
+      symbol_exprt(ID_cprover_string_concat_func),
+      {string6.op0(), string6.op1(), string5, string2},
+      fun_type);
 
     const equal_exprt equation1(lhs, fun1);
     const equal_exprt equation2(lhs2, fun2);

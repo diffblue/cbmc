@@ -186,10 +186,10 @@ SCENARIO("instantiate_not_contains",
   GIVEN("The not_contains axioms of String.lastIndexOf(String, Int)")
   {
     // Creating "ab".lastIndexOf("b", 0)
-    function_application_exprt func(
-      symbol_exprt(ID_cprover_string_last_index_of_func), t.length_type());
-    const exprt::operandst args={ab, b, from_integer(2)};
-    func.arguments()=args;
+    const function_application_exprt func(
+      symbol_exprt(ID_cprover_string_last_index_of_func),
+      {ab, b, from_integer(2)},
+      t.length_type());
 
     // Generating the corresponding axioms and simplifying, recording info
     symbol_tablet symtab;

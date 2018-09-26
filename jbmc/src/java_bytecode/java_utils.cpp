@@ -285,9 +285,7 @@ exprt make_function_application(
   declare_function(fun_name, type, symbol_table);
 
   // Function application
-  function_application_exprt call(symbol_exprt(fun_name), type);
-  call.arguments()=arguments;
-  return call;
+  return function_application_exprt(symbol_exprt(fun_name), arguments, type);
 }
 
 /// Strip java:: prefix from given identifier
