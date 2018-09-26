@@ -484,13 +484,6 @@ protected:
     const exprt &src,
     exprt &dest) const;
 
-  /// Marks objects that may be pointed to by `op` as maybe-invalid
-  /// \param op: pointer to invalidate
-  /// \param ns: global namespace
-  void do_free(
-    const exprt &op,
-    const namespacet &ns);
-
   /// Extracts a member from a struct- or union-typed expression.
   /// Usually that means making a `member_exprt`, but this can shortcut
   /// extracting members from constants or with-expressions.

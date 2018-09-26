@@ -372,10 +372,6 @@ protected:
     const std::string &suffix,
     const namespacet &ns,
     bool add_to_sets);
-
-  void do_free(
-    const exprt &op,
-    const namespacet &ns);
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_FIVRNS_H

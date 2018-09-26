@@ -1104,10 +1104,6 @@ void invariant_sett::apply_code(const codet &code)
   {
     // does nothing
   }
-  else if(statement==ID_free)
-  {
-    // does nothing
-  }
   else if(statement==ID_printf)
   {
     // does nothing

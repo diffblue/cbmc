@@ -1269,86 +1269,6 @@ void value_sett::assign(
   }
 }
 
-void value_sett::do_free(
-  const exprt &op,
-  const namespacet &ns)
-{
-  // op must be a pointer
-  if(op.type().id()!=ID_pointer)
-    throw "free expected to have pointer-type operand";
-
-  // find out what it points to
-  object_mapt value_set;
-  get_value_set(op, value_set, ns, false);
-
-  const object_map_dt &object_map=value_set.read();
-
-  // find out which *instances* interest us
-  dynamic_object_id_sett to_mark;
-
-  for(object_map_dt::const_iterator
-      it=object_map.begin();
-      it!=object_map.end();
-      it++)
-  {
-    const exprt &object=object_numbering[it->first];
-
-    if(object.id()==ID_dynamic_object)
-    {
-      const dynamic_object_exprt &dynamic_object=
-        to_dynamic_object_expr(object);
-
-      if(dynamic_object.valid().is_true())
-        to_mark.insert(dynamic_object.get_instance());
-    }
-  }
-
-  // mark these as 'may be invalid'
-  // this, unfortunately, destroys the sharing
-  for(valuest::iterator v_it=values.begin();
-      v_it!=values.end();
-      v_it++)
-  {
-    object_mapt new_object_map;
-
-    const object_map_dt &old_object_map=
-      v_it->second.object_map.read();
-
-    bool changed=false;
-
-    for(object_map_dt::const_iterator
-        o_it=old_object_map.begin();
-        o_it!=old_object_map.end();
-        o_it++)
-    {
-      const exprt &object=object_numbering[o_it->first];
-
-      if(object.id()==ID_dynamic_object)
-      {
-        const dynamic_object_exprt &dynamic_object=
-          to_dynamic_object_expr(object);
-
-        if(to_mark.count(dynamic_object.get_instance())==0)
-          set(new_object_map, *o_it);
-        else
-        {
-          // adjust
-          offsett o = o_it->second;
-          exprt tmp(object);
-          to_dynamic_object_expr(tmp).valid()=exprt(ID_unknown);
-          insert(new_object_map, tmp, o);
-          changed=true;
-        }
-      }
-      else
-        set(new_object_map, *o_it);
-    }
-
-    if(changed)
-      v_it->second.object_map=new_object_map;
-  }
-}
-
 void value_sett::assign_rec(
   const exprt &lhs,
   const object_mapt &values_rhs,
@@ -1604,15 +1524,6 @@ void value_sett::apply_code_rec(
           statement=="cpp_delete[]")
   {
     // does nothing
-  }
-  else if(statement==ID_free)
-  {
-    // this may kill a valid bit
-
-    if(code.operands().size()!=1)
-      throw "free expected to have one operand";
-
-    do_free(code.op0(), ns);
   }
   else if(statement=="lock" || statement=="unlock")
   {
