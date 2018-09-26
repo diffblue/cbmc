@@ -4335,13 +4335,13 @@ class function_application_exprt:public binary_exprt
 public:
   function_application_exprt():binary_exprt(ID_function_application)
   {
-    op0()=symbol_exprt();
+    op0().id(ID_symbol);
   }
 
   explicit function_application_exprt(const typet &_type):
     binary_exprt(ID_function_application, _type)
   {
-    op0()=symbol_exprt();
+    op0().id(ID_symbol);
   }
 
   function_application_exprt(
