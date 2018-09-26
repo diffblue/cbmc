@@ -55,7 +55,10 @@ const value_sett::entryt *value_sett::find_entry(const value_sett::idt &id)
   const
 {
   auto found = values.find(id);
-  return found == values.end() ? nullptr : &found->second;
+  if(found != values.end())
+    return &found->second;
+  else
+    return base_value_set ? base_value_set->find_entry(id) : nullptr;
 }
 
 value_sett::entryt &value_sett::get_entry(
@@ -72,6 +75,14 @@ value_sett::entryt &value_sett::get_entry(
 
   std::pair<valuest::iterator, bool> r=
     values.insert(std::pair<idt, entryt>(index, e));
+
+  if(base_value_set && r.second)
+  {
+    // New entry; copy the existing base entry if found.
+    const entryt *base_entry = base_value_set->find_entry(index);
+    if(base_entry)
+      r.first->second = *base_entry;
+  }
 
   return r.first->second;
 }
@@ -188,6 +199,12 @@ void value_sett::output(
 
     out << " } \n";
   }
+
+  if(base_value_set)
+  {
+    out << "NB. the base value-set (" << base_value_set << ") has a further "
+        << base_value_set->size() << " entries\n";
+  }
 }
 
 exprt value_sett::to_expr(const object_map_dt::value_type &it) const
@@ -212,6 +229,10 @@ exprt value_sett::to_expr(const object_map_dt::value_type &it) const
 
 bool value_sett::make_union(const value_sett::valuest &new_values)
 {
+  // Note this method makes no reference to base_value_set -- we assume that
+  // we share the same base, if any, with new_values. This is enforced in the
+  // make_union(const value_sett &) overload.
+
   bool result=false;
 
   valuest::iterator v_it=values.begin();
@@ -1665,4 +1686,14 @@ exprt value_sett::make_member(
   member_exprt member_expr(src, component_name, subtype);
 
   return member_expr;
+}
+
+void value_sett::set_base_value_set(const value_sett *base)
+{
+  // Simplifying assumptions -- this way we don't need to check for clashing
+  // keys, for example:
+  INVARIANT(size() == 0, "base_value_set cannot be set for a non-empty set");
+  INVARIANT(!base_value_set, "base_value_set cannot be reset");
+
+  base_value_set = base;
 }

@@ -38,10 +38,21 @@ class namespacet;
 /// pairs of an `exprt` and an optional offset if known (0 for both dynamic
 /// objects in the example given above). RHS expressions are represented using
 /// numbering to avoid storing redundant duplicate expressions.
+///
+/// A value_sett may have a base (stored in field base_value_set), in which case
+/// any lookup that fails in this value-set will check the base, and any write
+/// to this value-set will copy any entry in the base into this value-set before
+/// performing the write (i.e. we act as a copy-on-write layer on top of the
+/// base). This makes copying or union'ing value-sets with a common base
+/// cheaper -- the intended use case is for faster local analysis on top of a
+/// large, expensive-to-copy global context. value_sett::make_union requires
+/// that the value-sets being merged have the same base (or both have no base);
+/// it is up to the user to make sure this is true.
+
 class value_sett
 {
 public:
-  value_sett():location_number(0)
+  value_sett():location_number(0), base_value_set(nullptr)
   {
   }
 
@@ -340,6 +351,12 @@ public:
     const entryt &e, const typet &type,
     const namespacet &ns);
 
+  /// Gets the number of entries in this value-set.
+  valuest::size_type size() const
+  {
+    return values.size();
+  }
+
   /// Pretty-print this value-set
   /// \param ns: global namespace
   /// \param [out] out: stream to write to
@@ -366,6 +383,9 @@ public:
   /// \return true if anything changed.
   bool make_union(const value_sett &new_values)
   {
+    INVARIANT(
+      new_values.base_value_set == base_value_set,
+      "Unioned value-sets must have the same base");
     return make_union(new_values.values);
   }
 
@@ -459,6 +479,11 @@ public:
     exprt &expr,
     const namespacet &ns) const;
 
+  /// Set the base value-set, to which failing queries fall through. Note for
+  /// simplicity's sake, at the moment this value-set must be empty when this
+  /// is called, and the base value-set cannot be reset later.
+  void set_base_value_set(const value_sett *base);
+
 protected:
   /// Reads the set of objects pointed to by `expr`, including making
   /// recursive lookups for dereference operations etc.
@@ -550,6 +575,8 @@ protected:
     const namespacet &)
   {
   }
+
+  const value_sett *base_value_set;
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_H
