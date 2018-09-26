@@ -141,7 +141,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
       if(total>(1<<30)) // realistic limit
         throw analysis_exceptiont("array too large for flattening");
 
-      entry.total_width=integer2unsigned(total);
+      entry.total_width = numeric_cast_v<std::size_t>(total);
     }
   }
   else if(type_id==ID_vector)
@@ -162,13 +162,13 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
       if(total>(1<<30)) // realistic limit
         analysis_exceptiont("vector too large for flattening");
 
-      entry.total_width=integer2unsigned(vector_size*sub_width);
+      entry.total_width = numeric_cast_v<std::size_t>(vector_size * sub_width);
     }
   }
   else if(type_id==ID_complex)
   {
-    std::size_t sub_width=operator()(type.subtype());
-    entry.total_width=integer2unsigned(2*sub_width);
+    const mp_integer sub_width = operator()(type.subtype());
+    entry.total_width = numeric_cast_v<std::size_t>(2 * sub_width);
   }
   else if(type_id==ID_code)
   {

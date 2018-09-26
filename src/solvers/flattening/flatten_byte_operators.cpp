@@ -330,7 +330,7 @@ exprt flatten_byte_extract(
   const typet &offset_type=ns.follow(offset.type());
 
   // get 'width'-many bytes, and concatenate
-  std::size_t width_bytes=integer2unsigned(num_elements);
+  const std::size_t width_bytes = numeric_cast_v<std::size_t>(num_elements);
   exprt::operandst op;
   op.reserve(width_bytes);
 
@@ -567,10 +567,12 @@ exprt flatten_byte_update(
     // zero-extend the value, but only if needed
     exprt value_extended;
 
-    if(width>integer2unsigned(element_size)*8)
+    if(width > element_size * 8)
       value_extended = concatenation_exprt(
         from_integer(
-          0, unsignedbv_typet(width - integer2unsigned(element_size) * 8)),
+          0,
+          unsignedbv_typet(
+            width - numeric_cast_v<std::size_t>(element_size) * 8)),
         src.value(),
         t);
     else

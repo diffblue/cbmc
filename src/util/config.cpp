@@ -1136,7 +1136,7 @@ static unsigned unsigned_from_ns(
     "symbol table configuration entry `" + id2string(id) +
       "' must be convertible to mp_integer");
 
-  return integer2unsigned(int_value);
+  return numeric_cast_v<unsigned>(int_value);
 }
 
 void configt::set_from_symbol_table(

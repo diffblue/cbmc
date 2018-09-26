@@ -54,7 +54,7 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
     expr.find_source_location(),
     irep_pretty_diagnosticst{expr});
 
-  const std::size_t offset = integer2unsigned(lower_as_int);
+  const std::size_t offset = numeric_cast_v<std::size_t>(lower_as_int);
 
   bvt result_bv(src_bv.begin() + offset, src_bv.begin() + offset + bv_width);
 

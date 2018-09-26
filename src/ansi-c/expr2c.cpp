@@ -2219,10 +2219,7 @@ std::string expr2ct::convert_array(
       if(it==--src.operands().end())
         break;
 
-      assert(it->is_constant());
-      mp_integer i;
-      to_integer(*it, i);
-      unsigned int ch=integer2unsigned(i);
+      const unsigned int ch = numeric_cast_v<unsigned>(*it);
 
       if(last_was_hex)
       {

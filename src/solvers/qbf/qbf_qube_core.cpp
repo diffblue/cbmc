@@ -12,6 +12,7 @@ Author: CM Wintersteiger
 #include <cstring>
 #include <fstream>
 
+#include <util/arith_tools.h>
 #include <util/invariant.h>
 #include <util/mp_arith.h>
 
@@ -78,9 +79,9 @@ propt::resultt qbf_qube_coret::prop_solve()
       {
         mp_integer b(line.substr(2).c_str());
         if(b<0)
-          assignment[integer2unsigned(b.negate())]=false;
+          assignment[numeric_cast_v<std::size_t>(b.negate())] = false;
         else
-          assignment[integer2unsigned(b)]=true;
+          assignment[numeric_cast_v<std::size_t>(b)] = true;
       }
       else if(line=="s cnf 1")
       {
