@@ -42,8 +42,9 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
     expr.find_source_location(),
     irep_pretty_diagnosticst{expr});
 
-  if(lower_as_int > upper_as_int)
-    std::swap(upper_as_int, lower_as_int);
+  DATA_INVARIANT(
+    lower_as_int <= upper_as_int,
+    "upper bound must be greater or equal to lower bound");
 
   // now lower_as_int <= upper_as_int
 
