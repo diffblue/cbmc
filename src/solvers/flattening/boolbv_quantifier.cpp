@@ -8,9 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <cassert>
-
 #include <util/arith_tools.h>
+#include <util/invariant.h>
+#include <util/optional.h>
 #include <util/replace_expr.h>
 #include <util/simplify_expr.h>
 
@@ -32,8 +32,8 @@ exprt get_quantifier_var_min(
   const exprt &var_expr,
   const exprt &quantifier_expr)
 {
-  assert(quantifier_expr.id()==ID_or ||
-         quantifier_expr.id()==ID_and);
+  PRECONDITION(quantifier_expr.id() == ID_or || quantifier_expr.id() == ID_and);
+
   exprt res;
   res.make_false();
   if(quantifier_expr.id()==ID_or)
@@ -80,8 +80,7 @@ exprt get_quantifier_var_max(
   const exprt &var_expr,
   const exprt &quantifier_expr)
 {
-  assert(quantifier_expr.id()==ID_or ||
-         quantifier_expr.id()==ID_and);
+  PRECONDITION(quantifier_expr.id() == ID_or || quantifier_expr.id() == ID_and);
   exprt res;
   res.make_false();
   if(quantifier_expr.id()==ID_or)
@@ -137,78 +136,74 @@ exprt get_quantifier_var_max(
   return res;
 }
 
-bool instantiate_quantifier(exprt &expr,
-                            const namespacet &ns)
+optionalt<exprt>
+instantiate_quantifier(const quantifier_exprt &expr, const namespacet &ns)
 {
-  if(!(expr.id()==ID_forall || expr.id()==ID_exists))
-    return true;
+  PRECONDITION(expr.id() == ID_forall || expr.id() == ID_exists);
 
-  assert(expr.operands().size()==2);
-  assert(expr.op0().id()==ID_symbol);
-
-  exprt var_expr=expr.op0();
+  const symbol_exprt &var_expr = expr.symbol();
 
   /**
    * We need to rewrite the forall/exists quantifier into
    * an OR/AND expr.
    **/
-  exprt re(expr);
-  exprt tmp(re.op1());
-  re.swap(tmp);
-  re=simplify_expr(re, ns);
+
+  const exprt &re = simplify_expr(expr.where(), ns);
 
   if(re.is_true() || re.is_false())
   {
-    expr=re;
-    return true;
+    return re;
   }
 
-  exprt min_i=get_quantifier_var_min(var_expr, re);
-  exprt max_i=get_quantifier_var_max(var_expr, re);
-  exprt body_expr=re;
-  if(var_expr.is_false() ||
-     min_i.is_false() ||
-     max_i.is_false() ||
-     body_expr.is_false())
-    return false;
+  const exprt &min_i = get_quantifier_var_min(var_expr, re);
+  const exprt &max_i = get_quantifier_var_max(var_expr, re);
 
-  mp_integer lb, ub;
-  to_integer(min_i, lb);
-  to_integer(max_i, ub);
+  if(min_i.is_false() || max_i.is_false())
+    return nullopt;
+
+  mp_integer lb = numeric_cast_v<mp_integer>(min_i);
+  mp_integer ub = numeric_cast_v<mp_integer>(max_i);
 
   if(lb>ub)
-    return false;
+    return nullopt;
 
-  bool res=true;
   std::vector<exprt> expr_insts;
   for(mp_integer i=lb; i<=ub; ++i)
   {
-    exprt constraint_expr=body_expr;
+    exprt constraint_expr = re;
     replace_expr(var_expr,
                  from_integer(i, var_expr.type()),
                  constraint_expr);
     expr_insts.push_back(constraint_expr);
   }
+
   if(expr.id()==ID_forall)
   {
-    expr=conjunction(expr_insts);
+    return conjunction(expr_insts);
   }
-  if(expr.id()==ID_exists)
+  else if(expr.id() == ID_exists)
   {
-    expr=disjunction(expr_insts);
+    return disjunction(expr_insts);
   }
 
-  return res;
+  UNREACHABLE;
+  return nullopt;
 }
 
-literalt boolbvt::convert_quantifier(const exprt &src)
+literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
 {
-  exprt expr(src);
-  if(!instantiate_quantifier(expr, ns))
+  PRECONDITION(src.id() == ID_forall || src.id() == ID_exists);
+
+  quantifier_exprt expr(src);
+  const auto res = instantiate_quantifier(expr, ns);
+
+  if(!res)
+  {
     return SUB::convert_rest(src);
+  }
 
   quantifiert quantifier;
-  quantifier.expr=expr;
+  quantifier.expr = *res;
   quantifier_list.push_back(quantifier);
 
   literalt l=prop.new_variable();

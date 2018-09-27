@@ -4596,6 +4596,8 @@ inline const quantifier_exprt &to_quantifier_expr(const exprt &expr)
 {
   DATA_INVARIANT(expr.operands().size()==2,
                  "quantifier expressions must have two operands");
+  DATA_INVARIANT(
+    expr.op0().id() == ID_symbol, "quantified variable shall be a symbol");
   return static_cast<const quantifier_exprt &>(expr);
 }
 
@@ -4604,6 +4606,8 @@ inline quantifier_exprt &to_quantifier_expr(exprt &expr)
 {
   DATA_INVARIANT(expr.operands().size()==2,
                  "quantifier expressions must have two operands");
+  DATA_INVARIANT(
+    expr.op0().id() == ID_symbol, "quantified variable shall be a symbol");
   return static_cast<quantifier_exprt &>(expr);
 }
 

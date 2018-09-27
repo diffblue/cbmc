@@ -93,7 +93,10 @@ bool boolbvt::type_conversion(
         upper,
         ns.follow(dest_type.subtype()),
         upper_res);
-      assert(lower_res.size()+upper_res.size()==dest_width);
+      INVARIANT(
+        lower_res.size() + upper_res.size() == dest_width,
+        "lower result bitvector size plus upper result bitvector size shall "
+        "equal the destination bitvector size");
       dest=lower_res;
       dest.insert(dest.end(), upper_res.begin(), upper_res.end());
       return false;
@@ -102,7 +105,10 @@ bool boolbvt::type_conversion(
 
   if(src_type.id()==ID_complex)
   {
-    assert(dest_type.id()!=ID_complex);
+    INVARIANT(
+      dest_type.id() == ID_complex,
+      "destination type shall be of complex type when source type is of "
+      "complex type");
     if(dest_type.id()==ID_signedbv ||
        dest_type.id()==ID_unsignedbv ||
        dest_type.id()==ID_floatbv ||
@@ -187,7 +193,9 @@ bool boolbvt::type_conversion(
         return false;
 
       case bvtypet::IS_BV:
-        assert(src_width==dest_width);
+        INVARIANT(
+          src_width == dest_width,
+          "source bitvector size shall equal the destination bitvector size");
         dest=src;
         return false;
 
@@ -202,7 +210,8 @@ bool boolbvt::type_conversion(
 
           dest=convert_bv(f.to_expr());
 
-          assert(src_width==1);
+          INVARIANT(
+            src_width == 1, "bitvector of type boolean shall have width one");
 
           Forall_literals(it, dest)
             *it=prop.land(*it, src[0]);
@@ -245,7 +254,7 @@ bool boolbvt::type_conversion(
       {
         // position in bv
         std::size_t p=dest_fraction_bits+i;
-        assert(p<dest_width);
+        INVARIANT(p < dest_width, "bit index shall be within bounds");
 
         if(i<op_int_bits)
           dest[p]=src[i+op_fraction_bits];
@@ -257,7 +266,9 @@ bool boolbvt::type_conversion(
     }
     else if(src_bvtype==bvtypet::IS_BV)
     {
-      assert(src_width==dest_width);
+      INVARIANT(
+        src_width == dest_width,
+        "source bitvector with shall equal the destination bitvector width");
       dest=src;
       return false;
     }
@@ -299,7 +310,8 @@ bool boolbvt::type_conversion(
       std::size_t fraction_bits=
         to_fixedbv_type(dest_type).get_fraction_bits();
 
-      assert(src_width==1);
+      INVARIANT(
+        src_width == 1, "bitvector of type boolean shall have width one");
 
       for(std::size_t i=0; i<dest_width; i++)
       {
@@ -416,7 +428,8 @@ bool boolbvt::type_conversion(
       {
         // bool to integer
 
-        assert(src_width==1);
+        INVARIANT(
+          src_width == 1, "bitvector of type boolean shall have width one");
 
         for(std::size_t i=0; i<dest_width; i++)
         {
@@ -483,7 +496,9 @@ bool boolbvt::type_conversion(
     break;
 
   case bvtypet::IS_BV:
-    assert(src_width==dest_width);
+    INVARIANT(
+      src_width == dest_width,
+      "source bitvector width shall equal the destination bitvector width");
     dest=src;
     return false;
 
@@ -590,12 +605,10 @@ bool boolbvt::type_conversion(
 /// conversion from bitvector types to boolean
 literalt boolbvt::convert_typecast(const typecast_exprt &expr)
 {
-  assert(expr.operands().size()==1);
-
-  if(expr.op0().type().id()==ID_range)
+  if(expr.op().type().id() == ID_range)
   {
-    mp_integer from=string2integer(expr.op0().type().get_string(ID_from));
-    mp_integer to=string2integer(expr.op0().type().get_string(ID_to));
+    mp_integer from = string2integer(expr.op().type().get_string(ID_from));
+    mp_integer to = string2integer(expr.op().type().get_string(ID_to));
 
     if(from==1 && to==1)
       return const_literal(true);
@@ -603,7 +616,7 @@ literalt boolbvt::convert_typecast(const typecast_exprt &expr)
       return const_literal(false);
   }
 
-  const bvt &bv=convert_bv(expr.op0());
+  const bvt &bv = convert_bv(expr.op());
 
   if(!bv.empty())
     return prop.lor(bv);

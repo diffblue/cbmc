@@ -30,10 +30,7 @@ bvt boolbvt::convert_shift(const binary_exprt &expr)
   if(width==0)
     return conversion_failed(expr);
 
-  const bvt &op=convert_bv(expr.op0());
-
-  if(op.size()!=width)
-    throw "convert_shift: unexpected operand 0 width";
+  const bvt &op = convert_bv(expr.op0(), width);
 
   bv_utilst::shiftt shift;
 
@@ -48,15 +45,13 @@ bvt boolbvt::convert_shift(const binary_exprt &expr)
   else if(expr.id()==ID_ror)
     shift=bv_utilst::shiftt::ROTATE_RIGHT;
   else
-    throw "unexpected shift operator";
+    UNREACHABLE;
 
   // we allow a constant as shift distance
 
   if(expr.op1().is_constant())
   {
-    mp_integer i;
-    if(to_integer(expr.op1(), i))
-      throw "convert_shift: failed to convert constant";
+    mp_integer i = numeric_cast_v<mp_integer>(expr.op1());
 
     std::size_t distance;
 
