@@ -17,9 +17,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stack>
 
+#include <goto-programs/cfg.h>
+#include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unreachable.h>
-#include <goto-programs/cfg.h>
+
+#include "util/message.h"
 
 #include "full_slicer_class.h"
 #include "reachability_slicer_class.h"
@@ -91,8 +94,7 @@ void reachability_slicert::fixedpoint_to_assertions(
           "all function return edges should point to the successor of a "
           "FUNCTION_CALL instruction");
         stack.emplace_back(edge.first, true);
-        stack.emplace_back(
-          cfg.entry_map[std::prev(node.PC)], caller_is_known);
+        stack.emplace_back(cfg.entry_map[std::prev(node.PC)], caller_is_known);
       }
       else if(pred_node.PC->is_function_call())
       {
@@ -193,7 +195,7 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
     {
       Forall_goto_program_instructions(i_it, f_it->second.body)
       {
-        const cfgt::nodet &e=cfg[cfg.entry_map[i_it]];
+        cfgt::nodet &e = cfg[cfg.entry_map[i_it]];
         if(
           !e.reaches_assertion && !e.reachable_from_assertion &&
           !i_it->is_end_function())
@@ -238,6 +240,31 @@ void reachability_slicer(
   reachability_slicert s;
   properties_criteriont p(properties);
   s(goto_model.goto_functions, p, include_forward_reachability);
+}
+
+/// Perform reachability slicing on goto_model for selected functions.
+/// \param goto_model Goto program to slice
+/// \param functions_list The functions relevant for the slicing (i.e. starting
+/// point for the search in the cfg). Anything that is reachable in the CFG
+/// starting from these functions will be kept.
+void function_path_reachability_slicer(
+  goto_modelt &goto_model,
+  const std::string &functions_list)
+{
+  std::istringstream functions_stream(functions_list);
+  std::string single_function;
+  while(std::getline(functions_stream, single_function, ','))
+  {
+    in_function_criteriont matching_criterion(single_function);
+    reachability_slicert slicer;
+    slicer(goto_model.goto_functions, matching_criterion, true);
+  }
+
+  remove_calls_no_bodyt remove_calls_no_body;
+  remove_calls_no_body(goto_model.goto_functions);
+
+  goto_model.goto_functions.update();
+  goto_model.goto_functions.compute_loop_numbers();
 }
 
 /// Perform reachability slicing on goto_model, with respect to criterion
