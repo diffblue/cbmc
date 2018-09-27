@@ -196,7 +196,7 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
   {
     goto_programt::instructiont &i=*g_it;
     dereference_exprt destination = to_dereference_expr(i.code.op0());
-    exprt pointer = destination.op();
+    const exprt pointer = destination.pointer();
 
     // remember the expression for later checks
     i.type=OTHER;
@@ -303,11 +303,6 @@ void goto_convertt::convert_label(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  DATA_INVARIANT(
-    code.operands().size() == 1,
-    code.find_source_location().as_string() +
-      ": label statement expected to have one operand");
-
   // grab the label
   const irep_idt &label=code.get_label();
 
@@ -320,8 +315,8 @@ void goto_convertt::convert_label(
   {
     // the body of the thread is expected to be
     // in the operand.
-    INVARIANT(code.op0().is_not_nil(),
-      "op0 in magic thread creation label is null");
+    DATA_INVARIANT(
+      code.op0().is_not_nil(), "op0 in magic thread creation label is null");
 
     // replace the magic thread creation label with a
     // thread block (START_THREAD...END_THREAD).
@@ -386,18 +381,18 @@ void goto_convertt::convert_gcc_switch_case_range(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() == 3,
-    code.find_source_location().as_string() +
-      ": GCC's switch-case-range statement expected to have three operands");
+    "GCC's switch-case-range statement expected to have three operands",
+    code.find_source_location());
 
   const auto lb = numeric_cast<mp_integer>(code.op0());
   const auto ub = numeric_cast<mp_integer>(code.op1());
 
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     lb.has_value() && ub.has_value(),
-    code.find_source_location().as_string() +
-      ": GCC's switch-case-range statement requires constant bounds");
+    "GCC's switch-case-range statement requires constant bounds",
+    code.find_source_location());
 
   if(*lb > *ub)
   {
@@ -513,10 +508,10 @@ void goto_convertt::convert(
     exprt assertion=code.op0();
     assertion.make_typecast(bool_typet());
     simplify(assertion, ns);
-    INVARIANT(
+    INVARIANT_WITH_DIAGNOSTICS(
       !assertion.is_false(),
-      code.op0().find_source_location().as_string() + ": static assertion " +
-        id2string(get_string_constant(code.op1())));
+      "static assertion " + id2string(get_string_constant(code.op1())),
+      code.op0().find_source_location());
   }
   else if(statement==ID_dead)
     copy(code, DEAD, dest);
@@ -689,10 +684,10 @@ void goto_convertt::convert_assign(
   if(rhs.id()==ID_side_effect &&
      rhs.get(ID_statement)==ID_function_call)
   {
-    INVARIANT(
+    INVARIANT_WITH_DIAGNOSTICS(
       rhs.operands().size() == 2,
-      rhs.find_source_location().as_string() +
-        ": function_call sideeffect takes two operands");
+      "function_call sideeffect takes two operands",
+      rhs.find_source_location());
 
     Forall_operands(it, rhs)
       clean_expr(*it, dest, mode);
@@ -781,10 +776,10 @@ void goto_convertt::convert_init(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() == 2,
-    code.find_source_location().as_string() +
-      ": init statement takes two operands");
+    "init statement takes two operands",
+    code.find_source_location());
 
   // make it an assignment
   codet assignment=code;
@@ -797,10 +792,10 @@ void goto_convertt::convert_cpp_delete(
   const codet &code,
   goto_programt &dest)
 {
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() == 1,
-    code.find_source_location().as_string() +
-      ": cpp_delete statement takes one operand");
+    "cpp_delete statement takes one operand",
+    code.find_source_location());
 
   exprt tmp_op=code.op0();
 
@@ -909,10 +904,10 @@ void goto_convertt::convert_loop_invariant(
   goto_programt no_sideeffects;
   clean_expr(invariant, no_sideeffects, mode);
 
-  INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     no_sideeffects.instructions.empty(),
-    code.find_source_location().as_string() +
-      ": loop invariant is not side-effect free");
+    "loop invariant is not side-effect free",
+    code.find_source_location());
 
   PRECONDITION(loop->is_goto());
   loop->guard.add(ID_C_spec_loop_invariant).swap(invariant);
@@ -1084,9 +1079,10 @@ void goto_convertt::convert_dowhile(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() == 2,
-    code.find_source_location().as_string() + ": dowhile takes two operands");
+    "dowhile takes two operands",
+    code.find_source_location());
 
   // save source location
   source_locationt condition_location=code.cond().find_source_location();
@@ -1253,9 +1249,7 @@ void goto_convertt::convert_switch(
   {
     const caset &case_ops=case_pair.second;
 
-    if(case_ops.empty())
-      throw incorrect_goto_program_exceptiont(
-        "switch case range cannot be empty", code.find_source_location());
+    assert(!case_ops.empty());
 
     exprt guard_expr=case_guard(argument, case_ops);
 
@@ -1290,9 +1284,8 @@ void goto_convertt::convert_break(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  DATA_INVARIANT(
-    targets.break_set,
-    code.find_source_location().as_string() + ": break without target");
+  INVARIANT_WITH_DIAGNOSTICS(
+    targets.break_set, "break without target", code.find_source_location());
 
   // need to process destructor stack
   unwind_destructor_stack(
@@ -1315,10 +1308,10 @@ void goto_convertt::convert_return(
       "return without target", code.find_source_location());
   }
 
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     code.operands().empty() || code.operands().size() == 1,
-    code.find_source_location().as_string() +
-      ": return takes none or one operand");
+    "return takes none or one operand",
+    code.find_source_location());
 
   code_returnt new_code(code);
 
@@ -1338,10 +1331,10 @@ void goto_convertt::convert_return(
 
   if(targets.has_return_value)
   {
-    INVARIANT(
+    INVARIANT_WITH_DIAGNOSTICS(
       new_code.has_return_value(),
-      new_code.find_source_location().as_string() +
-        ": function must return value");
+      "function must return value",
+      new_code.find_source_location());
 
     // Now add a return node to set the return value.
     goto_programt::targett t=dest.add_instruction();
@@ -1351,11 +1344,11 @@ void goto_convertt::convert_return(
   }
   else
   {
-    INVARIANT(
+    INVARIANT_WITH_DIAGNOSTICS(
       !new_code.has_return_value() ||
         new_code.return_value().type().id() == ID_empty,
-      code.find_source_location().as_string() +
-        ": function must not return value");
+      "function must not return value",
+      code.find_source_location());
   }
 
   // Need to process _entire_ destructor stack.
@@ -1372,9 +1365,10 @@ void goto_convertt::convert_continue(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     targets.continue_set,
-    code.find_source_location().as_string() + ": continue without target");
+    "continue without target",
+    code.find_source_location());
 
   // need to process destructor stack
   unwind_destructor_stack(
@@ -1428,10 +1422,10 @@ void goto_convertt::convert_end_thread(
   const codet &code,
   goto_programt &dest)
 {
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     code.operands().empty(),
-    code.find_source_location().as_string() +
-      ": end_thread expects no operands");
+    "end_thread expects no operands",
+    code.find_source_location());
 
   copy(code, END_THREAD, dest);
 }
@@ -1440,10 +1434,10 @@ void goto_convertt::convert_atomic_begin(
   const codet &code,
   goto_programt &dest)
 {
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     code.operands().empty(),
-    code.find_source_location().as_string() +
-      ": atomic_begin expects no operands");
+    "atomic_begin expects no operands",
+    code.find_source_location());
 
   copy(code, ATOMIC_BEGIN, dest);
 }
@@ -1452,10 +1446,10 @@ void goto_convertt::convert_atomic_end(
   const codet &code,
   goto_programt &dest)
 {
-  DATA_INVARIANT(
+  INVARIANT_WITH_DIAGNOSTICS(
     code.operands().empty(),
-    code.find_source_location().as_string() +
-      ": atomic_end expects no operands");
+    ": atomic_end expects no operands",
+    code.find_source_location());
 
   copy(code, ATOMIC_END, dest);
 }
@@ -1465,11 +1459,6 @@ void goto_convertt::convert_ifthenelse(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  DATA_INVARIANT(
-    code.operands().size() == 3,
-    code.find_source_location().as_string() +
-      ": ifthenelse takes three operands");
-
   DATA_INVARIANT(code.then_case().is_not_nil(), "cannot accept an empty body");
 
   bool has_else=
@@ -1865,10 +1854,11 @@ irep_idt goto_convertt::get_string_constant(const exprt &expr)
 {
   irep_idt result;
 
-  bool res = get_string_constant(expr, result);
+  const bool res = get_string_constant(expr, result);
   INVARIANT_WITH_DIAGNOSTICS(
     !res,
-    expr.find_source_location().as_string() + ": expected string constant",
+    "expected string constant",
+    expr.find_source_location(),
     expr.pretty());
 
   return result;
