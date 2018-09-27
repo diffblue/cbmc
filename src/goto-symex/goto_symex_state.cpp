@@ -627,6 +627,49 @@ void goto_symex_statet::rename_address(
   }
 }
 
+static bool needs_renaming(const typet &type, const namespacet &ns)
+{
+  if(type.id() == ID_array)
+  {
+    const auto &array_type = to_array_type(type);
+    return needs_renaming(array_type.subtype(), ns) ||
+           !array_type.size().is_constant();
+  }
+  else if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    const auto &s_u_type = to_struct_union_type(type);
+    const auto &components = s_u_type.components();
+
+    for(const auto &c : components)
+      // be careful, or it might get cyclic
+      if(c.type().id() != ID_pointer && needs_renaming(c.type(), ns))
+        return true;
+
+    return false;
+  }
+  else if(type.id() == ID_pointer)
+  {
+    return needs_renaming(to_pointer_type(type).subtype(), ns);
+  }
+  else if(type.id() == ID_symbol_type)
+  {
+    const symbolt &symbol = ns.lookup(to_symbol_type(type));
+    return needs_renaming(symbol.type, ns);
+  }
+  else if(type.id() == ID_union_tag)
+  {
+    const auto &union_type = ns.follow_tag(to_union_tag_type(type));
+    return needs_renaming(union_type, ns);
+  }
+  else if(type.id() == ID_struct_tag)
+  {
+    const auto &struct_type = ns.follow_tag(to_struct_tag_type(type));
+    return needs_renaming(struct_type, ns);
+  }
+  else
+    return false;
+}
+
 void goto_symex_statet::rename(
   typet &type,
   const irep_idt &l1_identifier,
@@ -659,44 +702,47 @@ void goto_symex_statet::rename(
     }
   }
 
-  if(type.id()==ID_array)
+  if(needs_renaming(type, ns))
   {
-    auto &array_type = to_array_type(type);
-    rename(array_type.subtype(), irep_idt(), ns, level);
-    rename(array_type.size(), ns, level);
-  }
-  else if(type.id() == ID_struct || type.id() == ID_union)
-  {
-    struct_union_typet &s_u_type=to_struct_union_type(type);
-    struct_union_typet::componentst &components=s_u_type.components();
-
-    for(auto &c : components)
+    if(type.id() == ID_array)
     {
-      if(c.type().id() != ID_pointer) // be careful, or it might get cyclic
-        rename(c.type(), irep_idt(), ns, level);
+      auto &array_type = to_array_type(type);
+      rename(array_type.subtype(), irep_idt(), ns, level);
+      rename(array_type.size(), ns, level);
     }
-  }
-  else if(type.id()==ID_pointer)
-  {
-    rename(to_pointer_type(type).subtype(), irep_idt(), ns, level);
-  }
-  else if(type.id() == ID_symbol_type)
-  {
-    const symbolt &symbol = ns.lookup(to_symbol_type(type));
-    type = symbol.type;
-    rename(type, l1_identifier, ns, level);
-  }
-  else if(type.id() == ID_union_tag)
-  {
-    const auto &union_type = ns.follow_tag(to_union_tag_type(type));
-    type = union_type;
-    rename(type, l1_identifier, ns, level);
-  }
-  else if(type.id() == ID_struct_tag)
-  {
-    const typet &struct_type = ns.follow_tag(to_struct_tag_type(type));
-    type = struct_type;
-    rename(type, l1_identifier, ns, level);
+    else if(type.id() == ID_struct || type.id() == ID_union)
+    {
+      struct_union_typet &s_u_type = to_struct_union_type(type);
+      struct_union_typet::componentst &components = s_u_type.components();
+
+      for(auto &c : components)
+      {
+        if(c.type().id() != ID_pointer) // be careful, or it might get cyclic
+          rename(c.type(), irep_idt(), ns, level);
+      }
+    }
+    else if(type.id() == ID_pointer)
+    {
+      rename(to_pointer_type(type).subtype(), irep_idt(), ns, level);
+    }
+    else if(type.id() == ID_symbol_type)
+    {
+      const symbolt &symbol = ns.lookup(to_symbol_type(type));
+      type = symbol.type;
+      rename(type, l1_identifier, ns, level);
+    }
+    else if(type.id() == ID_union_tag)
+    {
+      const auto &union_type = ns.follow_tag(to_union_tag_type(type));
+      type = union_type;
+      rename(type, l1_identifier, ns, level);
+    }
+    else if(type.id() == ID_struct_tag)
+    {
+      const typet &struct_type = ns.follow_tag(to_struct_tag_type(type));
+      type = struct_type;
+      rename(type, l1_identifier, ns, level);
+    }
   }
 
   if(level==L2 &&
