@@ -13,14 +13,15 @@ Author: Daniel Kroening
 
 #include "xml_expr.h"
 
-#include "namespace.h"
-#include "expr.h"
-#include "xml.h"
 #include "arith_tools.h"
-#include "ieee_float.h"
-#include "fixedbv.h"
-#include "std_expr.h"
 #include "config.h"
+#include "expr.h"
+#include "fixedbv.h"
+#include "ieee_float.h"
+#include "invariant.h"
+#include "namespace.h"
+#include "std_expr.h"
+#include "xml.h"
 
 xmlt xml(const source_locationt &location)
 {
@@ -273,7 +274,7 @@ xmlt xml(
     {
       const struct_typet &struct_type=to_struct_type(type);
       const struct_typet::componentst &components=struct_type.components();
-      assert(components.size()==expr.operands().size());
+      PRECONDITION(components.size() == expr.operands().size());
 
       for(unsigned m=0; m<expr.operands().size(); m++)
       {
@@ -285,15 +286,12 @@ xmlt xml(
   }
   else if(expr.id()==ID_union)
   {
+    const union_exprt &union_expr = to_union_expr(expr);
     result.name="union";
 
-    assert(expr.operands().size()==1);
-
     xmlt &e=result.new_element("member");
-    e.new_element(xml(expr.op0(), ns));
-    e.set_attribute(
-      "member_name",
-      id2string(to_union_expr(expr).get_component_name()));
+    e.new_element(xml(union_expr.op(), ns));
+    e.set_attribute("member_name", id2string(union_expr.get_component_name()));
   }
   else
     result.name="unknown";

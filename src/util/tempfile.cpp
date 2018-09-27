@@ -31,6 +31,8 @@ Author: Daniel Kroening
 #include <cstdio>
 #include <cstring>
 
+#include "exception_utils.h"
+
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
     defined(__GNU__) || \
@@ -104,7 +106,7 @@ std::string get_temporary_file(
       lpTempPathBuffer); // buffer for path
 
   if(dwRetVal>MAX_PATH || (dwRetVal==0))
-    throw "GetTempPath failed"; // NOLINT(readability/throw)
+    throw system_exceptiont("Failed to get temporary directory");
 
   // the path returned by GetTempPath ends with a backslash
   std::string t_template=
@@ -127,7 +129,7 @@ std::string get_temporary_file(
   int fd=mkstemps(t_ptr, suffix.size());
 
   if(fd<0)
-    throw "mkstemps failed";
+    throw system_exceptiont("Failed to open temporary file");
 
   close(fd);
 
