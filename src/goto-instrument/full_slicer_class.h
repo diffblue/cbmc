@@ -113,6 +113,23 @@ public:
   }
 };
 
+class in_function_criteriont : public slicing_criteriont
+{
+public:
+  explicit in_function_criteriont(const std::string &function_name)
+    : target_function(function_name)
+  {
+  }
+
+  virtual bool operator()(goto_programt::const_targett target)
+  {
+    return target->function == target_function;
+  }
+
+protected:
+  const irep_idt target_function;
+};
+
 class properties_criteriont:public slicing_criteriont
 {
 public:
