@@ -1,0 +1,8 @@
+CORE
+main.c
+
+^EXIT=1$
+^SIGNAL=0$
+^PARSING ERROR$
+--
+^warning: ignoring

@@ -1,0 +1,8 @@
+KNOWNBUG
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Invariant check failed
