@@ -23,10 +23,19 @@ Author: Martin Brain, martin.brain@diffblue.com
 ** evaluate to a boolean.
 **
 ** As well as the condition they have a text argument that should be
-** used to say why they are true.  The reason should be a string literals.
+** used to say why they are true.  The reason should be a string literal
+** starting with a lower case character.
 ** Longer diagnostics should be output to error(). For example:
 **
-** INVARIANT(x > 0, "x negative and zero case handled by other branches");
+** INVARIANT(
+**   x > 0,
+**   "x should have a positive value as others are handled by other branches");
+**
+** Use "should" style statements for messages in invariants (also see
+** CODING_STANDARD.md). An example would be "array should have a non-zero size")
+** to make both the violation and the expected behavior clear. (As opposed to
+** "no zero size arrays" where it isn't clear if the zero-size array is the
+** problem, or the lack of it).
 **
 ** To help classify different kinds of invariants, various short-hand
 ** macros are provided.
