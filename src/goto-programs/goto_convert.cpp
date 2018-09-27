@@ -1249,7 +1249,8 @@ void goto_convertt::convert_switch(
   {
     const caset &case_ops=case_pair.second;
 
-    assert(!case_ops.empty());
+    if (case_ops.empty())
+      continue;
 
     exprt guard_expr=case_guard(argument, case_ops);
 
