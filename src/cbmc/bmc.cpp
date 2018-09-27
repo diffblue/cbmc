@@ -25,10 +25,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/static_lifetime_init.h>
 
 #include <goto-checker/bmc_util.h>
+#include <goto-checker/counterexample_beautification.h>
 #include <goto-checker/report_util.h>
 #include <goto-checker/solver_factory.h>
 
-#include "counterexample_beautification.h"
 #include "fault_localization.h"
 
 /// Hook used by CEGIS to selectively freeze variables

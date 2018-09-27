@@ -1,4 +1,5 @@
 SRC = bmc_util.cpp \
+      counterexample_beautification.cpp \
       incremental_goto_checker.cpp \
       goto_verifier.cpp \
       multi_path_symex_only_checker.cpp \
