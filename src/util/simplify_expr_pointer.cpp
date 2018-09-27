@@ -196,9 +196,8 @@ bool simplify_exprt::simplify_address_of(exprt &expr)
   else if(object.id()==ID_dereference)
   {
     // simplify &*p to p
-    assert(object.operands().size()==1);
-    exprt tmp=object.op0();
-    expr=tmp;
+    auto const &object_as_dereference_expr = to_dereference_expr(object);
+    expr = object_as_dereference_expr.pointer();
     return false;
   }
 
@@ -410,9 +409,10 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
 bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
 {
-  assert(expr.type().id()==ID_bool);
-  assert(expr.operands().size()==2);
-  assert(expr.id()==ID_equal || expr.id()==ID_notequal);
+  PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
+  PRECONDITION(expr.type().id() == ID_bool);
+  DATA_INVARIANT(
+    expr.operands().size() == 2, "(in)equalities have two operands");
 
   exprt tmp0=expr.op0();
   if(tmp0.id()==ID_typecast)
@@ -426,8 +426,8 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
   if(tmp1.op0().id()==ID_index &&
      to_index_expr(tmp1.op0()).index().is_zero())
     tmp1=address_of_exprt(to_index_expr(tmp1.op0()).array());
-  assert(tmp0.id()==ID_address_of);
-  assert(tmp1.id()==ID_address_of);
+  INVARIANT(tmp0.id() == ID_address_of, "id must be ID_address_of");
+  INVARIANT(tmp1.id() == ID_address_of, "id must be ID_address_of");
 
   if(tmp0.operands().size()!=1)
     return true;
@@ -450,14 +450,15 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
 
 bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
 {
-  assert(expr.type().id()==ID_bool);
-  assert(expr.operands().size()==2);
-  assert(expr.id()==ID_equal || expr.id()==ID_notequal);
+  PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
+  PRECONDITION(expr.type().id() == ID_bool);
+  DATA_INVARIANT(
+    expr.operands().size() == 2, "(in)equalities have two operands");
 
   forall_operands(it, expr)
   {
-    assert(it->id()==ID_pointer_object);
-    assert(it->operands().size()==1);
+    PRECONDITION(it->id() == ID_pointer_object);
+    PRECONDITION(it->operands().size() == 1);
     const exprt &op=it->op0();
 
     if(op.id()==ID_address_of)

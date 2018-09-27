@@ -153,9 +153,9 @@ public:
 */
 inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 {
-  assert(expr.id()==ID_symbol &&
-         expr.get_bool(ID_C_SSA_symbol) &&
-         !expr.has_operands());
+  PRECONDITION(
+    expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol) &&
+    !expr.has_operands());
   return static_cast<const ssa_exprt &>(expr);
 }
 
@@ -164,9 +164,9 @@ inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 */
 inline ssa_exprt &to_ssa_expr(exprt &expr)
 {
-  assert(expr.id()==ID_symbol &&
-         expr.get_bool(ID_C_SSA_symbol) &&
-         !expr.has_operands());
+  PRECONDITION(
+    expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol) &&
+    !expr.has_operands());
   return static_cast<ssa_exprt &>(expr);
 }
 
