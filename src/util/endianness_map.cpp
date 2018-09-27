@@ -83,6 +83,10 @@ void endianness_mapt::build_big_endian(const typet &src)
       build_big_endian(c.type());
     }
   }
+  else if(src.id() == ID_struct_tag)
+  {
+    build_big_endian(ns.follow_tag(to_struct_tag_type(src)));
+  }
   else if(src.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(src);
