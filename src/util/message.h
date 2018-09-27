@@ -65,6 +65,13 @@ public:
     return message_count[level];
   }
 
+  /// \brief Create an ECMA-48 SGR (Select Graphic Rendition) command.
+  /// The default behavior is no action.
+  virtual std::string command(unsigned) const
+  {
+    return std::string();
+  }
+
 protected:
   unsigned verbosity;
   std::vector<std::size_t> message_count;
@@ -273,6 +280,52 @@ public:
   {
     static_cast<std::ostream &>(m) << std::endl;
     return m;
+  }
+
+  /// \brief Create an ECMA-48 SGR (Select Graphic Rendition) command.
+  std::string command(unsigned c) const
+  {
+    if(message_handler)
+      return message_handler->command(c);
+    else
+      return std::string();
+  }
+
+  /// return to default formatting,
+  /// as defined by the terminal
+  std::string reset() const
+  {
+    return command(0);
+  }
+
+  /// render text with red foreground color
+  std::string red() const
+  {
+    return command(31);
+  }
+
+  /// render text with green foreground color
+  std::string green() const
+  {
+    return command(32);
+  }
+
+  /// render text with yellow foreground color
+  std::string yellow() const
+  {
+    return command(33);
+  }
+
+  /// render text with blue foreground color
+  std::string blue() const
+  {
+    return command(34);
+  }
+
+  /// render text with bold font
+  std::string bold() const
+  {
+    return command(1);
   }
 
   mstreamt &get_mstream(unsigned message_level) const

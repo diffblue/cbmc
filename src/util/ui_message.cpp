@@ -11,21 +11,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 
-#include "xml.h"
+#include "cmdline.h"
 #include "json.h"
-#include "xml_expr.h"
 #include "json_expr.h"
 #include "json_stream.h"
-#include "cout_message.h"
-#include "cmdline.h"
+#include "make_unique.h"
+#include "xml.h"
+#include "xml_expr.h"
 
 ui_message_handlert::ui_message_handlert(
-  message_handlert *message_handler,
+  message_handlert *_message_handler,
   uit __ui,
   const std::string &program,
   bool always_flush,
   timestampert::clockt clock_type)
-  : message_handler(message_handler),
+  : message_handler(_message_handler),
     _ui(__ui),
     always_flush(always_flush),
     time(timestampert::make(clock_type)),
@@ -80,6 +80,12 @@ ui_message_handlert::ui_message_handlert(
                 : timestampert::clockt::NONE
         : timestampert::clockt::NONE)
 {
+  if(get_ui() == uit::PLAIN)
+  {
+    console_message_handler =
+      util_make_unique<console_message_handlert>(always_flush);
+    message_handler = &*console_message_handler;
+  }
 }
 
 ui_message_handlert::ui_message_handlert(message_handlert &message_handler)
@@ -132,19 +138,9 @@ void ui_message_handlert::print(
       std::stringstream ss;
       const std::string timestamp = time->stamp();
       ss << timestamp << (timestamp.empty() ? "" : " ") << message;
-      if(message_handler)
-      {
-        message_handler->print(level, ss.str());
-        if(always_flush)
-          message_handler->flush(level);
-      }
-      else
-      {
-        console_message_handlert msg(always_flush);
-        msg.print(level, ss.str());
-        if(always_flush)
-          msg.flush(level);
-      }
+      message_handler->print(level, ss.str());
+      if(always_flush)
+        message_handler->flush(level);
     }
     break;
 
@@ -306,24 +302,12 @@ void ui_message_handlert::flush(unsigned level)
   switch(get_ui())
   {
   case uit::PLAIN:
-  {
-    if(message_handler)
-    {
-      message_handler->flush(level);
-    }
-    else
-    {
-      console_message_handlert msg(always_flush);
-      msg.flush(level);
-    }
-  }
-  break;
+    message_handler->flush(level);
+    break;
 
   case uit::XML_UI:
   case uit::JSON_UI:
-  {
     out << std::flush;
-  }
-  break;
+    break;
   }
 }

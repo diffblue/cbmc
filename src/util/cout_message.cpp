@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <io.h>
 #include <cstdio>
 #include <util/pragma_pop.def>
+#else
+#include <unistd.h>
 #endif
 
 #include "unicode.h"
@@ -33,6 +35,40 @@ cout_message_handlert::cout_message_handlert():
 cerr_message_handlert::cerr_message_handlert():
   stream_message_handlert(std::cerr)
 {
+}
+
+console_message_handlert::console_message_handlert(bool _always_flush)
+  : always_flush(_always_flush), is_a_tty(false), use_SGR(false)
+{
+#ifdef _WIN32
+  HANDLE out_handle=GetStdHandle(STD_OUTPUT_HANDLE);
+
+  DWORD consoleMode;
+  if(GetConsoleMode(out_handle, &consoleMode))
+  {
+    is_a_tty = true;
+
+#ifdef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+    consoleMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    if(SetConsoleMode(out_handle, consoleMode))
+      use_SGR = true;
+#endif
+  }
+#else
+  is_a_tty = isatty(STDOUT_FILENO);
+  use_SGR = is_a_tty;
+#endif
+}
+
+/// Create an ECMA-48 SGR (Select Graphic Rendition) command with
+/// given code.
+/// \param c: ECMA-48 command code
+std::string console_message_handlert::command(unsigned c) const
+{
+  if(!use_SGR)
+    return std::string();
+
+  return "\x1b[" + std::to_string(c) + 'm';
 }
 
 void console_message_handlert::print(
@@ -118,7 +154,7 @@ void gcc_message_handlert::print(
   if(!function.empty())
   {
     if(!file.empty())
-      dest+=id2string(file)+":";
+      dest += command(1) + id2string(file) + ":" + command(0); // bold
     if(dest!="")
       dest+=' ';
     dest+="In function '"+id2string(function)+"':\n";
@@ -126,6 +162,8 @@ void gcc_message_handlert::print(
 
   if(!line.empty())
   {
+    dest += command(1); // bold
+
     if(!file.empty())
       dest+=id2string(file)+":";
 
@@ -137,9 +175,11 @@ void gcc_message_handlert::print(
       dest+=id2string(column)+": ";
 
     if(level==messaget::M_ERROR)
-      dest+="error: ";
+      dest += command(31) + "error: "; // red
     else if(level==messaget::M_WARNING)
-      dest+="warning: ";
+      dest += command(95) + "warning: "; // bright magenta
+
+    dest += command(0); // reset
   }
 
   dest+=message;
