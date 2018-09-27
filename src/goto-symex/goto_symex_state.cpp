@@ -665,22 +665,16 @@ void goto_symex_statet::rename(
     rename(array_type.subtype(), irep_idt(), ns, level);
     rename(array_type.size(), ns, level);
   }
-  else if(type.id()==ID_struct ||
-          type.id()==ID_union ||
-          type.id()==ID_class)
+  else if(type.id() == ID_struct || type.id() == ID_union)
   {
     struct_union_typet &s_u_type=to_struct_union_type(type);
     struct_union_typet::componentst &components=s_u_type.components();
 
-    for(struct_union_typet::componentst::iterator
-        it=components.begin();
-        it!=components.end();
-        ++it)
-      // be careful, or it might get cyclic
-      if(it->type().id()==ID_array)
-        rename(to_array_type(it->type()).size(), ns, level);
-      else if(it->type().id()!=ID_pointer)
-        rename(it->type(), irep_idt(), ns, level);
+    for(auto &c : components)
+    {
+      if(c.type().id() != ID_pointer) // be careful, or it might get cyclic
+        rename(c.type(), irep_idt(), ns, level);
+    }
   }
   else if(type.id()==ID_pointer)
   {
@@ -694,14 +688,14 @@ void goto_symex_statet::rename(
   }
   else if(type.id() == ID_union_tag)
   {
-    const symbolt &symbol = ns.lookup(to_union_tag_type(type));
-    type = symbol.type;
+    const auto &union_type = ns.follow_tag(to_union_tag_type(type));
+    type = union_type;
     rename(type, l1_identifier, ns, level);
   }
   else if(type.id() == ID_struct_tag)
   {
-    const symbolt &symbol = ns.lookup(to_struct_tag_type(type));
-    type=symbol.type;
+    const typet &struct_type = ns.follow_tag(to_struct_tag_type(type));
+    type = struct_type;
     rename(type, l1_identifier, ns, level);
   }
 
