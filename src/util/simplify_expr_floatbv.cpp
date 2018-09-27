@@ -8,13 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "simplify_expr_class.h"
 
-#include <cassert>
-
-#include "expr.h"
-#include "namespace.h"
-#include "ieee_float.h"
-#include "std_expr.h"
 #include "arith_tools.h"
+#include "expr.h"
+#include "ieee_float.h"
+#include "invariant.h"
+#include "namespace.h"
+#include "std_expr.h"
 
 bool simplify_exprt::simplify_isinf(exprt &expr)
 {
@@ -286,17 +285,25 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
 {
   const typet &type=ns.follow(expr.type());
 
-  if(type.id()!=ID_floatbv)
-    return true;
-
-  assert(expr.operands().size()==3);
+  PRECONDITION(type.id() == ID_floatbv);
+  PRECONDITION(
+    expr.id() == ID_floatbv_plus || expr.id() == ID_floatbv_minus ||
+    expr.id() == ID_floatbv_mult || expr.id() == ID_floatbv_div);
+  DATA_INVARIANT(
+    expr.operands().size() == 3,
+    "binary operations have two operands, here an addtional parameter "
+    "is for the rounding mode");
 
   exprt op0=expr.op0();
   exprt op1=expr.op1();
   exprt op2=expr.op2(); // rounding mode
 
-  assert(ns.follow(op0.type())==type);
-  assert(ns.follow(op1.type())==type);
+  INVARIANT(
+    ns.follow(op0.type()) == type,
+    "expression type of operand must match type of expression");
+  INVARIANT(
+    ns.follow(op1.type()) == type,
+    "expression type of operand must match type of expression");
 
   // Remember that floating-point addition is _NOT_ associative.
   // Thus, we don't re-sort the operands.
@@ -347,8 +354,8 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
 
 bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
 {
-  assert(expr.id()==ID_ieee_float_equal ||
-         expr.id()==ID_ieee_float_notequal);
+  PRECONDITION(
+    expr.id() == ID_ieee_float_equal || expr.id() == ID_ieee_float_notequal);
 
   exprt::operandst &operands=expr.operands();
 
