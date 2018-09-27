@@ -101,17 +101,3 @@ temp_dirt::~temp_dirt()
 {
   clear();
 }
-
-temp_working_dirt::temp_working_dirt(const std::string &name_template):
-  temp_dirt(name_template)
-{
-  old_working_directory=get_current_working_directory();
-  if(chdir(path.c_str())!=0)
-    CHECK_RETURN(false);
-}
-
-temp_working_dirt::~temp_working_dirt()
-{
-  if(chdir(old_working_directory.c_str())!=0)
-    CHECK_RETURN(false);
-}
