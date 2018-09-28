@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <util/base_exceptions.h>
+#include <util/base_type.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/format.h>
@@ -358,10 +359,13 @@ void goto_symex_statet::rename(
     else if(expr.id()==ID_if)
     {
       DATA_INVARIANT(
-        to_if_expr(expr).true_case().type() ==
+        base_type_eq(
+          to_if_expr(expr).true_case().type(),
           to_if_expr(expr).false_case().type(),
+          ns),
         "true case of to_if_expr should be of same type "
-        "as false case");
+        "as false case" +
+          expr.pretty());
       expr.type()=to_if_expr(expr).true_case().type();
     }
   }
