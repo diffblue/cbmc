@@ -69,6 +69,11 @@ bool has_subtype(
   const std::function<bool(const typet &)> &pred,
   const namespacet &ns);
 
+bool has_subtype(
+  const typet &type,
+  const std::function<bool(const typet &, const namespacet &)> &pred,
+  const namespacet &ns);
+
 /// returns true if any of the contained types is id
 bool has_subtype(const typet &, const irep_idt &id, const namespacet &);
 
