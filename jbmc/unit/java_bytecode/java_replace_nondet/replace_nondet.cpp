@@ -136,12 +136,17 @@ void load_and_test_method(
   goto_functionst::goto_functiont &goto_function =
     functions.function_map.at(function_name);
 
+  wrapper_goto_modelt goto_model(symbol_table, functions);
   goto_model_functiont model_function(
-    symbol_table, functions, function_name, goto_function);
+    symbol_table,
+    functions,
+    function_name,
+    goto_function,
+    goto_model.get_analysis_cache());
 
   // Emulate some of the passes that we'd normally do before replace_java_nondet
   // is called.
-  remove_instanceof(goto_function, symbol_table, null_message_handler);
+  remove_instanceof(model_function, null_message_handler);
 
   remove_virtual_functions(model_function);
 
