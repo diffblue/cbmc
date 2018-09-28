@@ -702,7 +702,7 @@ void jbmc_parse_optionst::process_goto_function(
   try
   {
     // Removal of RTTI inspection:
-    remove_instanceof(goto_function, symbol_table, get_message_handler());
+    remove_instanceof(function, get_message_handler());
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(function);
 

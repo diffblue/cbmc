@@ -11,7 +11,6 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "remove_instanceof.h"
 
-#include <goto-programs/class_hierarchy.h>
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_convert.h>
 
@@ -24,12 +23,14 @@ class remove_instanceoft
 {
 public:
   remove_instanceoft(
-    symbol_table_baset &symbol_table, message_handlert &message_handler)
-    : symbol_table(symbol_table)
-    , ns(symbol_table)
-    , message_handler(message_handler)
+    symbol_table_baset &symbol_table,
+    const class_hierarchyt &class_hierarchy,
+    message_handlert &message_handler)
+    : symbol_table(symbol_table),
+      ns(symbol_table),
+      class_hierarchy(class_hierarchy),
+      message_handler(message_handler)
   {
-    class_hierarchy(symbol_table);
   }
 
   // Lower instanceof for a single function
@@ -41,7 +42,7 @@ public:
 protected:
   symbol_table_baset &symbol_table;
   namespacet ns;
-  class_hierarchyt class_hierarchy;
+  const class_hierarchyt &class_hierarchy;
   message_handlert &message_handler;
 
   bool lower_instanceof(
@@ -245,44 +246,30 @@ void remove_instanceof(
   goto_programt::targett target,
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
+  const class_hierarchyt &class_hierarchy,
   message_handlert &message_handler)
 {
-  remove_instanceoft rem(symbol_table, message_handler);
+  remove_instanceoft rem(symbol_table, class_hierarchy, message_handler);
   rem.lower_instanceof(goto_program, target);
 }
 
 /// Replace every instanceof in the passed function with an explicit
 /// class-identifier test.
-/// \remarks Extra auxiliary variables may be introduced into symbol_table.
-/// \param function: The function to work on.
-/// \param symbol_table: The symbol table to add symbols to.
+/// \remarks Extra auxiliary variables may be introduced into
+///   goto_model_function's symbol_table.
+/// \param goto_model_function: The function to work on.
 /// \param message_handler: logging output
 void remove_instanceof(
-  goto_functionst::goto_functiont &function,
-  symbol_table_baset &symbol_table,
+  goto_model_functiont &goto_model_function,
   message_handlert &message_handler)
 {
-  remove_instanceoft rem(symbol_table, message_handler);
-  rem.lower_instanceof(function.body);
-}
+  symbol_table_baset &symbol_table = goto_model_function.get_symbol_table();
+  const class_hierarchyt &class_hierarchy(
+    goto_model_function.get_analysis_cache().get_or_create<class_hierarchyt>(
+      symbol_table));
 
-/// Replace every instanceof in every function with an explicit
-/// class-identifier test.
-/// \remarks Extra auxiliary variables may be introduced into symbol_table.
-/// \param goto_functions: The functions to work on.
-/// \param symbol_table: The symbol table to add symbols to.
-/// \param message_handler: logging output
-void remove_instanceof(
-  goto_functionst &goto_functions,
-  symbol_table_baset &symbol_table,
-  message_handlert &message_handler)
-{
-  remove_instanceoft rem(symbol_table, message_handler);
-  bool changed=false;
-  for(auto &f : goto_functions.function_map)
-    changed=rem.lower_instanceof(f.second.body) || changed;
-  if(changed)
-    goto_functions.compute_location_numbers();
+  remove_instanceoft rem(symbol_table, class_hierarchy, message_handler);
+  rem.lower_instanceof(goto_model_function.get_goto_function().body);
 }
 
 /// Replace every instanceof in every function with an explicit
@@ -295,6 +282,14 @@ void remove_instanceof(
   goto_modelt &goto_model,
   message_handlert &message_handler)
 {
-  remove_instanceof(
-    goto_model.goto_functions, goto_model.symbol_table, message_handler);
+  const class_hierarchyt &class_hierarchy(
+    goto_model.get_analysis_cache().get_or_create<class_hierarchyt>(
+      goto_model.symbol_table));
+  remove_instanceoft rem(
+    goto_model.symbol_table, class_hierarchy, message_handler);
+  bool changed=false;
+  for(auto &f : goto_model.goto_functions.function_map)
+    changed=rem.lower_instanceof(f.second.body) || changed;
+  if(changed)
+    goto_model.goto_functions.compute_location_numbers();
 }
