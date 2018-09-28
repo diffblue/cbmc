@@ -27,8 +27,11 @@ static void for_each_atomic_string(
   const array_string_exprt &e,
   const std::function<void(const array_string_exprt &)> f);
 
-bool is_char_type(const typet &type)
+bool is_char_type(const typet &type, const namespacet &ns)
 {
+  if(type.id() == ID_struct_tag)
+    return is_char_type(ns.follow(to_struct_tag_type(type)), ns);
+
   return type.id() == ID_unsignedbv &&
          to_unsignedbv_type(type).get_width() <=
            STRING_REFINEMENT_MAX_CHAR_WIDTH;
@@ -38,12 +41,15 @@ bool is_char_array_type(const typet &type, const namespacet &ns)
 {
   if(type.id() == ID_struct_tag)
     return is_char_array_type(ns.follow_tag(to_struct_tag_type(type)), ns);
-  return type.id() == ID_array && is_char_type(type.subtype());
+  return type.id() == ID_array && is_char_type(type.subtype(), ns);
 }
 
-bool is_char_pointer_type(const typet &type)
+bool is_char_pointer_type(const typet &type, const namespacet &ns)
 {
-  return type.id() == ID_pointer && is_char_type(type.subtype());
+  if(type.id() == ID_struct_tag)
+    return is_char_pointer_type(ns.follow(to_struct_tag_type(type)), ns);
+
+  return type.id() == ID_pointer && is_char_type(type.subtype(), ns);
 }
 
 bool has_char_pointer_subtype(const typet &type, const namespacet &ns)
@@ -312,7 +318,8 @@ static void add_dependency_to_string_subexprs(
   string_dependenciest &dependencies,
   const function_application_exprt &fun_app,
   const string_dependenciest::builtin_function_nodet &builtin_function_node,
-  array_poolt &array_pool)
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
   PRECONDITION(fun_app.arguments()[0].type().id() != ID_pointer);
   if(
@@ -331,7 +338,7 @@ static void add_dependency_to_string_subexprs(
       expr.depth_begin(),
       expr.depth_end(),
       [&](const exprt &e) { // NOLINT
-        if(is_refined_string_type(e.type()))
+        if(is_refined_string_type(ns.follow(e.type())))
         {
           const auto string_struct = expr_checked_cast<struct_exprt>(e);
           const auto string = of_argument(array_pool, string_struct);
@@ -373,7 +380,8 @@ void string_dependenciest::clean_cache()
 bool add_node(
   string_dependenciest &dependencies,
   const equal_exprt &equation,
-  array_poolt &array_pool)
+  array_poolt &array_pool,
+  const namespacet &ns)
 {
   const auto fun_app =
     expr_try_dynamic_cast<function_application_exprt>(equation.rhs());
@@ -406,7 +414,7 @@ bool add_node(
   }
   else
     add_dependency_to_string_subexprs(
-      dependencies, *fun_app, builtin_function_node, array_pool);
+      dependencies, *fun_app, builtin_function_node, array_pool, ns);
 
   return true;
 }
