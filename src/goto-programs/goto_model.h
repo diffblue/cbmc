@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 #include <util/journalling_symbol_table.h>
+#include <util/object_cache.h>
 
 #include "abstract_goto_model.h"
 #include "goto_functions.h"
@@ -30,6 +31,10 @@ public:
   /// GOTO functions. Direct access is deprecated; use the abstract_goto_modelt
   /// interface instead if possible.
   goto_functionst goto_functions;
+
+  // Object that holds all data that should be persistent between passes.
+  // Usually holds objects that are heavy to create but light to update.
+  object_cachet analysis_cache;
 
   void clear()
   {
@@ -51,9 +56,10 @@ public:
   //  explicitly (see https://msdn.microsoft.com/en-us/library/hh567368.aspx
   //  under "Defaulted and Deleted Functions")
 
-  goto_modelt(goto_modelt &&other):
-    symbol_table(std::move(other.symbol_table)),
-    goto_functions(std::move(other.goto_functions))
+  goto_modelt(goto_modelt &&other)
+    : symbol_table(std::move(other.symbol_table)),
+      goto_functions(std::move(other.goto_functions)),
+      analysis_cache(std::move(other.analysis_cache))
   {
   }
 
@@ -61,6 +67,7 @@ public:
   {
     symbol_table=std::move(other.symbol_table);
     goto_functions=std::move(other.goto_functions);
+    analysis_cache = std::move(other.analysis_cache);
     return *this;
   }
 
@@ -76,6 +83,11 @@ public:
   const symbol_tablet &get_symbol_table() const override
   {
     return symbol_table;
+  }
+
+  object_cachet &get_analysis_cache() override
+  {
+    return analysis_cache;
   }
 
   const goto_functionst::goto_functiont &get_goto_function(
@@ -98,9 +110,10 @@ class wrapper_goto_modelt : public abstract_goto_modelt
 public:
   wrapper_goto_modelt(
     const symbol_tablet &symbol_table,
-    const goto_functionst &goto_functions) :
-    symbol_table(symbol_table),
-    goto_functions(goto_functions)
+    const goto_functionst &goto_functions)
+    : symbol_table(symbol_table),
+      goto_functions(goto_functions),
+      analysis_cache()
   {
   }
 
@@ -112,6 +125,11 @@ public:
   const symbol_tablet &get_symbol_table() const override
   {
     return symbol_table;
+  }
+
+  object_cachet &get_analysis_cache() override
+  {
+    return analysis_cache;
   }
 
   const goto_functionst::goto_functiont &get_goto_function(
@@ -129,6 +147,7 @@ public:
 private:
   const symbol_tablet &symbol_table;
   const goto_functionst &goto_functions;
+  object_cachet analysis_cache;
 };
 
 /// Interface providing access to a single function in a GOTO model, plus its
@@ -150,11 +169,13 @@ public:
     journalling_symbol_tablet &symbol_table,
     goto_functionst &goto_functions,
     const irep_idt &function_id,
-    goto_functionst::goto_functiont &goto_function):
-  symbol_table(symbol_table),
-  goto_functions(goto_functions),
-  function_id(function_id),
-  goto_function(goto_function)
+    goto_functionst::goto_functiont &goto_function,
+    object_cachet &analysis_cache)
+    : symbol_table(symbol_table),
+      goto_functions(goto_functions),
+      function_id(function_id),
+      goto_function(goto_function),
+      analysis_cache(analysis_cache)
   {
   }
 
@@ -196,11 +217,20 @@ public:
     return function_id;
   }
 
+  /// Get the analysis_cache for the associated goto_model.
+  /// \return the pass manager used for all persistent data
+  ///   storage between passes.
+  object_cachet &get_analysis_cache()
+  {
+    return analysis_cache;
+  }
+
 private:
   journalling_symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
   irep_idt function_id;
   goto_functionst::goto_functiont &goto_function;
+  object_cachet &analysis_cache;
 };
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_MODEL_H

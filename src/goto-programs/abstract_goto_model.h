@@ -13,6 +13,7 @@ Author: Diffblue Ltd.
 #define CPROVER_GOTO_PROGRAMS_ABSTRACT_GOTO_MODEL_H
 
 #include "goto_functions.h"
+#include <util/object_cache.h>
 #include <util/symbol_table.h>
 
 /// Abstract interface to eager or lazy GOTO models
@@ -49,6 +50,10 @@ public:
   /// underneath them, so this should only be used to lend a reference to code
   /// that cannot also call get_goto_function.
   virtual const symbol_tablet &get_symbol_table() const = 0;
+
+  /// Accessor to get the analysis cache. Caches heavy-to-build data structures
+  /// in a place that can be accessible from any pass.
+  virtual object_cachet &get_analysis_cache() = 0;
 };
 
 #endif

@@ -41,7 +41,8 @@ lazy_goto_modelt::lazy_goto_modelt(
           journalling_symbol_table,
           goto_model->goto_functions,
           function_name,
-          function);
+          function,
+          goto_model->analysis_cache);
         this->post_process_function(model_function, *this);
       },
       driver_program_can_generate_function_body,
@@ -74,7 +75,8 @@ lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
           journalling_symbol_table,
           goto_model->goto_functions,
           function_name,
-          function);
+          function,
+          goto_model->analysis_cache);
         this->post_process_function(model_function, *this);
       },
       other.driver_program_can_generate_function_body,

@@ -124,6 +124,11 @@ public:
     return symbol_table;
   }
 
+  object_cachet &get_analysis_cache() override
+  {
+    return goto_model->analysis_cache;
+  }
+
   bool can_produce_function(const irep_idt &id) const override;
 
   const goto_functionst::goto_functiont &get_goto_function(const irep_idt &id)
