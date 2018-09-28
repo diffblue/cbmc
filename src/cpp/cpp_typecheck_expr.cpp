@@ -35,7 +35,7 @@ bool cpp_typecheckt::find_parent(
 {
   for(const auto &b : to_struct_type(symb.type).bases())
   {
-    const irep_idt &id = to_symbol_type(b.type()).get_identifier();
+    const irep_idt &id = b.type().get_identifier();
     if(lookup(id).base_name == base_name)
     {
       identifier = id;

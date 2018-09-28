@@ -150,7 +150,7 @@ void cpp_typecheckt::add_base_components(
     else if(access==ID_protected && sub_access!=ID_private)
       sub_access=ID_protected;
 
-    const symbolt &symb = lookup(to_symbol_type(b.type()).get_identifier());
+    const symbolt &symb = lookup(b.type());
 
     const bool is_virtual = b.get_bool(ID_virtual);
 

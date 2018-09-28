@@ -141,7 +141,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
       bit++)
   {
     DATA_INVARIANT(bit->id() == ID_base, "base class expression expected");
-    const symbolt &psymb = lookup(to_symbol_type(bit->type()).get_identifier());
+    const symbolt &psymb = lookup(bit->type());
 
     symbol_exprt this_ptr(ID_this, pointer_type(symbol.type));
     dereference_exprt object(this_ptr, psymb.type);
