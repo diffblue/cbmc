@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ieee_float.h"
 #include "invariant.h"
 #include "namespace.h"
+#include "simplify_expr.h"
 #include "std_expr.h"
 
 bool simplify_exprt::simplify_isinf(exprt &expr)
@@ -141,43 +142,43 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
 {
   // These casts usually reduce precision, and thus, usually round.
 
-  assert(expr.operands().size()==2);
+  auto const &floatbv_typecast_expr = to_floatbv_typecast_expr(expr);
 
-  const typet &dest_type=ns.follow(expr.type());
-  const typet &src_type=ns.follow(expr.op0().type());
+  const typet &dest_type = ns.follow(floatbv_typecast_expr.type());
+  const typet &src_type = ns.follow(floatbv_typecast_expr.op().type());
 
   // eliminate redundant casts
   if(dest_type==src_type)
   {
-    expr=expr.op0();
+    expr = floatbv_typecast_expr.op();
     return false;
   }
 
-  exprt op0=expr.op0();
-  exprt op1=expr.op1(); // rounding mode
+  const exprt &casted_expr = floatbv_typecast_expr.op();
+  const exprt &rounding_mode = floatbv_typecast_expr.rounding_mode();
 
   // We can soundly re-write (float)((double)x op (double)y)
   // to x op y. True for any rounding mode!
 
   #if 0
-  if(op0.id()==ID_floatbv_div ||
-     op0.id()==ID_floatbv_mult ||
-     op0.id()==ID_floatbv_plus ||
-     op0.id()==ID_floatbv_minus)
+  if(casted_expr.id()==ID_floatbv_div ||
+     casted_expr.id()==ID_floatbv_mult ||
+     casted_expr.id()==ID_floatbv_plus ||
+     casted_expr.id()==ID_floatbv_minus)
   {
-    if(op0.operands().size()==3 &&
-       op0.op0().id()==ID_typecast &&
-       op0.op1().id()==ID_typecast &&
-       op0.op0().operands().size()==1 &&
-       op0.op1().operands().size()==1 &&
-       ns.follow(op0.op0().type())==dest_type &&
-       ns.follow(op0.op1().type())==dest_type)
+    if(casted_expr.operands().size()==3 &&
+       casted_expr.op0().id()==ID_typecast &&
+       casted_expr.op1().id()==ID_typecast &&
+       casted_expr.op0().operands().size()==1 &&
+       casted_expr.op1().operands().size()==1 &&
+       ns.follow(casted_expr.op0().type())==dest_type &&
+       ns.follow(casted_expr.op1().type())==dest_type)
     {
-      exprt result(op0.id(), expr.type());
+      exprt result(casted_expr.id(), floatbv_typecast_expr.type());
       result.operands().resize(3);
-      result.op0()=op0.op0().op0();
-      result.op1()=op0.op1().op0();
-      result.op2()=op1;
+      result.op0()=casted_expr.op0().op0();
+      result.op1()=casted_expr.op1().op0();
+      result.op2()=rounding_mode;
 
       simplify_node(result);
       expr.swap(result);
@@ -187,18 +188,18 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
   #endif
 
   // constant folding
-  if(op0.is_constant() && op1.is_constant())
+  if(casted_expr.is_constant() && rounding_mode.is_constant())
   {
-    mp_integer rounding_mode;
-    if(!to_integer(op1, rounding_mode))
+    mp_integer rounding_mode_index;
+    if(!to_integer(rounding_mode, rounding_mode_index))
     {
       if(src_type.id()==ID_floatbv)
       {
         if(dest_type.id()==ID_floatbv) // float to float
         {
-          ieee_floatt result(to_constant_expr(op0));
-          result.rounding_mode=
-            (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
+          ieee_floatt result(to_constant_expr(casted_expr));
+          result.rounding_mode =
+            (ieee_floatt::rounding_modet)integer2size_t(rounding_mode_index);
           result.change_spec(
             ieee_float_spect(to_floatbv_type(dest_type)));
           expr=result.to_expr();
@@ -207,11 +208,11 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
         else if(dest_type.id()==ID_signedbv ||
                 dest_type.id()==ID_unsignedbv)
         {
-          if(rounding_mode==ieee_floatt::ROUND_TO_ZERO)
+          if(rounding_mode_index == ieee_floatt::ROUND_TO_ZERO)
           {
-            ieee_floatt result(to_constant_expr(op0));
-            result.rounding_mode=
-              (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
+            ieee_floatt result(to_constant_expr(casted_expr));
+            result.rounding_mode =
+              (ieee_floatt::rounding_modet)integer2size_t(rounding_mode_index);
             mp_integer value=result.to_integer();
             expr=from_integer(value, dest_type);
             return false;
@@ -222,13 +223,13 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
               src_type.id()==ID_unsignedbv)
       {
         mp_integer value;
-        if(!to_integer(op0, value))
+        if(!to_integer(casted_expr, value))
         {
           if(dest_type.id()==ID_floatbv) // int to float
           {
             ieee_floatt result(to_floatbv_type(dest_type));
-            result.rounding_mode=
-              (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
+            result.rounding_mode =
+              (ieee_floatt::rounding_modet)integer2size_t(rounding_mode_index);
             result.from_integer(value);
             expr=result.to_expr();
             return false;
@@ -239,15 +240,16 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
       {
         // go through underlying type
         const auto &enum_type = ns.follow_tag(to_c_enum_tag_type(src_type));
-        typecast_exprt tmp1(op0, to_c_enum_type(enum_type).subtype());
-        simplify_typecast(tmp1);
-        if(tmp1.is_constant())
+        exprt simplified_typecast = simplify_expr(
+          typecast_exprt(casted_expr, to_c_enum_type(enum_type).subtype()), ns);
+        if(simplified_typecast.is_constant())
         {
-          exprt tmp2 = expr;
-          tmp2.op0() = tmp1;
-          if(!simplify_floatbv_typecast(tmp2))
+          floatbv_typecast_exprt new_floatbv_typecast_expr =
+            floatbv_typecast_expr;
+          new_floatbv_typecast_expr.op() = simplified_typecast;
+          if(!simplify_floatbv_typecast(new_floatbv_typecast_expr))
           {
-            expr = tmp2;
+            expr = new_floatbv_typecast_expr;
             return false;
           }
         }
@@ -257,23 +259,17 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
 
   #if 0
   // (T)(a?b:c) --> a?(T)b:(T)c
-  if(expr.op0().id()==ID_if &&
-     expr.op0().operands().size()==3)
+  if(casted_expr.id()==ID_if)
   {
-    binary_exprt tmp_op1(
-      expr.op0().op1(),
-      ID_floatbv_typecast,
-      expr.op1(),
-      dest_type);
-    binary_exprt tmp_op2(
-      expr.op0().op2(),
-      ID_floatbv_typecast,
-      expr.op1(),
-      dest_type);
-    simplify_floatbv_typecast(tmp_op1);
-    simplify_floatbv_typecast(tmp_op2);
-    expr=if_exprt(expr.op0().op0(), tmp_op1, tmp_op2, dest_type);
-    simplify_if(expr);
+    auto const &casted_if_expr = to_if_expr(casted_expr);
+
+    floatbv_typecast_exprt casted_true_case(casted_if_expr.true_case(), rounding_mode, dest_type);
+    floatbv_typecast_exprt casted_false_case(casted_if_expr.false_case(), rounding_mode, dest_type);
+
+    simplify_floatbv_typecast(casted_true_case);
+    simplify_floatbv_typecast(casted_false_case);
+    auto simplified_if_expr = simplify_expr(if_exprt(casted_if_expr.cond(), casted_true_case, casted_false_case, dest_type), ns);
+    expr = simplified_if_expr;
     return false;
   }
   #endif
