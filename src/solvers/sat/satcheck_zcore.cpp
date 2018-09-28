@@ -8,9 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "satcheck_zcore.h"
 
-#include <cassert>
 #include <fstream>
 
+#include <util/invariant.h>
 #include <util/string2int.h>
 
 #include <cstring>
@@ -25,7 +25,7 @@ satcheck_zcoret::~satcheck_zcoret()
 
 tvt satcheck_zcoret::l_get(literalt a) const
 {
-  assert(false);
+  UNREACHABLE;
   return tvt(tvt::tv_enumt::TV_UNKNOWN);
 }
 

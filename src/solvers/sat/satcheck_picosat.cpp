@@ -8,8 +8,9 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "satcheck_picosat.h"
 
-#include <cassert>
+#include <algorithm>
 
+#include <util/invariant.h>
 #include <util/threeval.h>
 
 extern "C"
@@ -66,7 +67,7 @@ void satcheck_picosatt::lcnf(const bvt &bv)
 
 propt::resultt satcheck_picosatt::prop_solve()
 {
-  assert(status!=ERROR);
+  PRECONDITION(status != ERROR);
 
   {
     std::string msg=
@@ -90,7 +91,9 @@ propt::resultt satcheck_picosatt::prop_solve()
   }
   else
   {
-    assert(res==PICOSAT_UNSATISFIABLE);
+    INVARIANT(
+      res == PICOSAT_UNSATISFIABLE,
+      "picosat result should report either sat or unsat");
     msg="SAT checker: instance is UNSATISFIABLE";
     messaget::status() << msg << messaget::eom;
   }
@@ -101,7 +104,7 @@ propt::resultt satcheck_picosatt::prop_solve()
 
 void satcheck_picosatt::set_assignment(literalt a, bool value)
 {
-  assert(false);
+  UNREACHABLE;
 }
 
 satcheck_picosatt::satcheck_picosatt()
@@ -116,7 +119,7 @@ satcheck_picosatt::~satcheck_picosatt()
 
 bool satcheck_picosatt::is_in_conflict(literalt a) const
 {
-  assert(!a.is_constant());
+  PRECONDITION(!a.is_constant());
 
   return picosat_failed_assumption(picosat, a.dimacs())!=0;
 }
@@ -125,6 +128,10 @@ void satcheck_picosatt::set_assumptions(const bvt &bv)
 {
   assumptions=bv;
 
-  forall_literals(it, assumptions)
-    assert(!it->is_constant());
+  INVARIANT(
+    std::all_of(
+      assumptions.begin(),
+      assumptions.end(),
+      [](const literalt &l) { return !l.is_constant(); }),
+    "assumptions should be non-constant");
 }

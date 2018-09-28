@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cnf_clause_list.h"
 
-#include <cassert>
 #include <ostream>
 
 void cnf_clause_listt::lcnf(const bvt &bv)
