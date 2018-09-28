@@ -13,24 +13,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "c_types.h"
-#include "format_expr.h"
-#include "format_type.h"
-#include "invariant.h"
-#include "message.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "std_code.h"
 #include "std_expr.h"
 
 template <bool nondet>
-class expr_initializert : public messaget
+class expr_initializert
 {
 public:
-  expr_initializert(
-    const namespacet &_ns,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    ns(_ns)
+  explicit expr_initializert(const namespacet &_ns) : ns(_ns)
   {
   }
 
@@ -55,10 +47,6 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
   const source_locationt &source_location)
 {
   const irep_idt &type_id=type.id();
-
-  PRECONDITION_WITH_DIAGNOSTICS(
-    type_id != ID_code,
-    source_location.as_string() + ": cannot initialize code type");
 
   if(type_id==ID_unsignedbv ||
      type_id==ID_signedbv ||
@@ -118,6 +106,9 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     {
       exprt sub_zero =
         expr_initializer_rec(to_complex_type(type).subtype(), source_location);
+      if(sub_zero.is_nil())
+        return nil_exprt();
+
       result = complex_exprt(sub_zero, sub_zero, to_complex_type(type));
     }
 
@@ -142,6 +133,8 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     {
       exprt tmpval =
         expr_initializer_rec(array_type.subtype(), source_location);
+      if(tmpval.is_nil())
+        return nil_exprt();
 
       mp_integer array_size;
 
@@ -158,20 +151,12 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       {
         if(nondet)
           return side_effect_expr_nondett(type, source_location);
-
-        std::ostringstream oss;
-        oss << format(array_type.size());
-
-        INVARIANT_WITH_DIAGNOSTICS(
-          false,
-          "non-infinite array size expression must be convertible to an "
-          "integer",
-          source_location.as_string() +
-            ": failed to zero-initialize array of size `" + oss.str() + "'");
+        else
+          return nil_exprt();
       }
 
-      DATA_INVARIANT(
-        array_size >= 0, "array should not have negative size");
+      if(array_size < 0)
+        return nil_exprt();
 
       array_exprt value(array_type);
       value.operands().resize(integer2size_t(array_size), tmpval);
@@ -184,6 +169,8 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     const vector_typet &vector_type=to_vector_type(type);
 
     exprt tmpval = expr_initializer_rec(vector_type.subtype(), source_location);
+    if(tmpval.is_nil())
+      return nil_exprt();
 
     mp_integer vector_size;
 
@@ -191,19 +178,12 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     {
       if(nondet)
         return side_effect_expr_nondett(type, source_location);
-
-      std::ostringstream oss;
-      oss << format(vector_type.size());
-
-      INVARIANT_WITH_DIAGNOSTICS(
-        false,
-        "vector size must be convertible to an integer",
-        source_location.as_string() +
-          ": failed to zero-initialize vector of size `" + oss.str() + "'");
+      else
+        return nil_exprt();
     }
 
-    DATA_INVARIANT(
-      vector_size >= 0, "vector should not have negative size");
+    if(vector_size < 0)
+      return nil_exprt();
 
     vector_exprt value(vector_type);
     value.operands().resize(integer2size_t(vector_size), tmpval);
@@ -229,7 +209,13 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
         value.copy_to_operands(code_value);
       }
       else
-        value.copy_to_operands(expr_initializer_rec(c.type(), source_location));
+      {
+        const exprt member = expr_initializer_rec(c.type(), source_location);
+        if(member.is_nil())
+          return nil_exprt();
+
+        value.copy_to_operands(member);
+      }
     }
 
     value.add_source_location()=source_location;
@@ -277,6 +263,8 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       value.set_component_name(component.get_name());
       value.op()=
         expr_initializer_rec(component.type(), source_location);
+      if(value.op().is_nil())
+        return nil_exprt();
     }
 
     return value;
@@ -329,52 +317,44 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     return result;
   }
   else
-  {
-    std::ostringstream oss;
-    oss << format(type);
-
-    PRECONDITION_WITH_DIAGNOSTICS(
-      false,
-      source_location.as_string() + ": cannot initialize " + oss.str() + "'");
-  }
+    return nil_exprt();
 }
 
-exprt zero_initializer(
-  const typet &type,
-  const source_locationt &source_location,
-  const namespacet &ns,
-  message_handlert &message_handler)
-{
-  expr_initializert<false> z_i(ns, message_handler);
-  return z_i(type, source_location);
-}
-
-exprt nondet_initializer(
-  const typet &type,
-  const source_locationt &source_location,
-  const namespacet &ns,
-  message_handlert &message_handler)
-{
-  expr_initializert<true> z_i(ns, message_handler);
-  return z_i(type, source_location);
-}
-
-exprt zero_initializer(
+/// Create the equivalent of zero for type `type`.
+/// \param type: Type of the target expression.
+/// \param source_location: Location to record in all created sub-expressions.
+/// \param ns: Namespace to perform type symbol/tag lookups.
+/// \return An expression if a constant expression of the input type can be
+/// built.
+optionalt<exprt> zero_initializer(
   const typet &type,
   const source_locationt &source_location,
   const namespacet &ns)
 {
-  null_message_handlert null_message_handler;
-  expr_initializert<false> z_i(ns, null_message_handler);
-  return z_i(type, source_location);
+  expr_initializert<false> z_i(ns);
+  const exprt result = z_i(type, source_location);
+  if(result.is_nil())
+    return {};
+  else
+    return result;
 }
 
-exprt nondet_initializer(
+/// Create a non-deterministic value for type `type`, with all subtypes
+/// independently expanded as non-deterministic values.
+/// \param type: Type of the target expression.
+/// \param source_location: Location to record in all created sub-expressions.
+/// \param ns: Namespace to perform type symbol/tag lookups.
+/// \return An expression if a non-deterministic expression of the input type
+/// can be built.
+optionalt<exprt> nondet_initializer(
   const typet &type,
   const source_locationt &source_location,
   const namespacet &ns)
 {
-  null_message_handlert null_message_handler;
-  expr_initializert<true> z_i(ns, null_message_handler);
-  return z_i(type, source_location);
+  expr_initializert<true> z_i(ns);
+  const exprt result = z_i(type, source_location);
+  if(result.is_nil())
+    return {};
+  else
+    return result;
 }

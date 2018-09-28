@@ -115,7 +115,11 @@ void goto_symext::symex_start_thread(statet &state)
 
     exprt rhs=symbol.value;
     if(rhs.is_nil())
-      rhs=zero_initializer(symbol.type, symbol.location, ns);
+    {
+      const auto zero = zero_initializer(symbol.type, symbol.location, ns);
+      CHECK_RETURN(zero.has_value());
+      rhs = *zero;
+    }
 
     guardt guard;
     symex_assign_symbol(

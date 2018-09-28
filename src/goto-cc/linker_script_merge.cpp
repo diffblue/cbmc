@@ -522,8 +522,9 @@ int linker_script_merget::ls_data2instructions(
     // Push the array initialization to the front now, so that it happens before
     // the initialization of the symbols that point to it.
     namespacet ns(symbol_table);
-    exprt zi=zero_initializer(array_type, array_loc, ns, *message_handler);
-    code_assignt array_assign(array_expr, zi);
+    const auto zi = zero_initializer(array_type, array_loc, ns);
+    CHECK_RETURN(zi.has_value());
+    code_assignt array_assign(array_expr, *zi);
     array_assign.add_source_location()=array_loc;
     goto_programt::instructiont array_assign_i;
     array_assign_i.make_assignment(array_assign);

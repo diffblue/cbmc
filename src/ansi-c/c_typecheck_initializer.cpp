@@ -114,13 +114,16 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // fill up
         tmp.type()=type;
-        exprt zero=
-          zero_initializer(
-            full_type.subtype(),
-            value.source_location(),
-            *this,
-            get_message_handler());
-        tmp.operands().resize(integer2size_t(array_size), zero);
+        const auto zero =
+          zero_initializer(full_type.subtype(), value.source_location(), *this);
+        if(!zero.has_value())
+        {
+          err_location(value);
+          error() << "cannot zero-initialize array with subtype `"
+                  << to_string(full_type.subtype()) << "'" << eom;
+          throw 0;
+        }
+        tmp.operands().resize(integer2size_t(array_size), *zero);
       }
     }
 
@@ -171,13 +174,16 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // fill up
         tmp2.type()=type;
-        exprt zero=
-          zero_initializer(
-            full_type.subtype(),
-            value.source_location(),
-            *this,
-            get_message_handler());
-        tmp2.operands().resize(integer2size_t(array_size), zero);
+        const auto zero =
+          zero_initializer(full_type.subtype(), value.source_location(), *this);
+        if(!zero.has_value())
+        {
+          err_location(value);
+          error() << "cannot zero-initialize array with subtype `"
+                  << to_string(full_type.subtype()) << "'" << eom;
+          throw 0;
+        }
+        tmp2.operands().resize(integer2size_t(array_size), *zero);
       }
     }
 
@@ -395,13 +401,16 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
             to_array_type(full_type).size().is_nil()))
         {
           // we are willing to grow an incomplete or zero-sized array
-          exprt zero=
-            zero_initializer(
-              full_type.subtype(),
-              value.source_location(),
-              *this,
-              get_message_handler());
-          dest->operands().resize(integer2size_t(index)+1, zero);
+          const auto zero = zero_initializer(
+            full_type.subtype(), value.source_location(), *this);
+          if(!zero.has_value())
+          {
+            err_location(value);
+            error() << "cannot zero-initialize array with subtype `"
+                    << to_string(full_type.subtype()) << "'" << eom;
+            throw 0;
+          }
+          dest->operands().resize(integer2size_t(index) + 1, *zero);
 
           // todo: adjust type!
         }
@@ -461,15 +470,17 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       {
         // Note that gcc issues a warning if the union component is switched.
         // Build a union expression from given component.
-        union_exprt union_expr(type);
-        union_expr.op()=
-          zero_initializer(
-            component.type(),
-            value.source_location(),
-            *this,
-            get_message_handler());
+        const auto zero =
+          zero_initializer(component.type(), value.source_location(), *this);
+        if(!zero.has_value())
+        {
+          err_location(value);
+          error() << "cannot zero-initialize union component of type `"
+                  << to_string(component.type()) << "'" << eom;
+          throw 0;
+        }
+        union_exprt union_expr(component.get_name(), *zero, type);
         union_expr.add_source_location()=value.source_location();
-        union_expr.set_component_name(component.get_name());
         *dest=union_expr;
       }
 
@@ -524,15 +535,17 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         const union_typet::componentt &component=
           union_type.components().front();
 
-        union_exprt union_expr(type);
-        union_expr.op()=
-          zero_initializer(
-            component.type(),
-            value.source_location(),
-            *this,
-            get_message_handler());
+        const auto zero =
+          zero_initializer(component.type(), value.source_location(), *this);
+        if(!zero.has_value())
+        {
+          err_location(value);
+          error() << "cannot zero-initialize union component of type `"
+                  << to_string(component.type()) << "'" << eom;
+          throw 0;
+        }
+        union_exprt union_expr(component.get_name(), *zero, type);
         union_expr.add_source_location()=value.source_location();
-        union_expr.set_component_name(component.get_name());
         *dest=union_expr;
       }
     }
@@ -830,9 +843,15 @@ exprt c_typecheck_baset::do_initializer_list(
      full_type.id()==ID_vector)
   {
     // start with zero everywhere
-    result=
-      zero_initializer(
-        type, value.source_location(), *this, get_message_handler());
+    const auto zero = zero_initializer(type, value.source_location(), *this);
+    if(!zero.has_value())
+    {
+      err_location(value.source_location());
+      error() << "cannot zero-initialize `" << to_string(full_type) << "'"
+              << eom;
+      throw 0;
+    }
+    result = *zero;
   }
   else if(full_type.id()==ID_array)
   {
@@ -845,9 +864,15 @@ exprt c_typecheck_baset::do_initializer_list(
     else
     {
       // start with zero everywhere
-      result=
-        zero_initializer(
-          type, value.source_location(), *this, get_message_handler());
+      const auto zero = zero_initializer(type, value.source_location(), *this);
+      if(!zero.has_value())
+      {
+        err_location(value.source_location());
+        error() << "cannot zero-initialize `" << to_string(full_type) << "'"
+                << eom;
+        throw 0;
+      }
+      result = *zero;
     }
 
     // 6.7.9, 14: An array of character type may be initialized by a character

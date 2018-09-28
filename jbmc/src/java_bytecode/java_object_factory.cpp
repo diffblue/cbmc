@@ -1044,19 +1044,17 @@ void java_object_factoryt::gen_nondet_struct_init(
     // passes can easily recognise leaves no uninitialised state behind.
 
     // This code mirrors the `remove_java_new` pass:
-    null_message_handlert nullout;
-    exprt initial_object =
-      zero_initializer(
-        struct_type, source_locationt(), ns, nullout);
+    auto initial_object = zero_initializer(struct_type, source_locationt(), ns);
+    CHECK_RETURN(initial_object.has_value());
     irep_idt qualified_clsid = "java::" + id2string(class_identifier);
     set_class_identifier(
-      to_struct_expr(initial_object), ns, symbol_typet(qualified_clsid));
+      to_struct_expr(*initial_object), ns, symbol_typet(qualified_clsid));
 
     // If the initialised type is a special-cased String type (one with length
     // and data fields introduced by string-library preprocessing), initialise
     // those fields with nondet values:
     skip_special_string_fields = initialize_nondet_string_fields(
-      to_struct_expr(initial_object),
+      to_struct_expr(*initial_object),
       assignments,
       object_factory_parameters.min_nondet_string_length,
       object_factory_parameters.max_nondet_string_length,
@@ -1065,7 +1063,7 @@ void java_object_factoryt::gen_nondet_struct_init(
       symbol_table,
       object_factory_parameters.string_printable);
 
-    assignments.add(code_assignt(expr, initial_object));
+    assignments.add(code_assignt(expr, *initial_object));
   }
 
   for(const auto &component : components)

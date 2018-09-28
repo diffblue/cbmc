@@ -13,30 +13,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_EXPR_INITIALIZER_H
 
 #include "expr.h"
+#include "optional.h"
 
 class message_handlert;
 class namespacet;
 class source_locationt;
 
-exprt zero_initializer(
-  const typet &,
-  const source_locationt &,
-  const namespacet &,
-  message_handlert &);
+optionalt<exprt>
+zero_initializer(const typet &, const source_locationt &, const namespacet &);
 
-exprt nondet_initializer(
-  const typet &,
-  const source_locationt &,
-  const namespacet &,
-  message_handlert &);
-
-// throws a char* in case of failure
-exprt zero_initializer(
-  const typet &,
-  const source_locationt &,
-  const namespacet &);
-
-exprt nondet_initializer(
+optionalt<exprt> nondet_initializer(
   const typet &type,
   const source_locationt &source_location,
   const namespacet &ns);

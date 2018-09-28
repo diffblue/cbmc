@@ -169,16 +169,10 @@ void goto_symext::symex_allocate(
 
   if(!zero_init.is_zero() && !zero_init.is_false())
   {
-    null_message_handlert null_message;
-    exprt zero_value=
-      zero_initializer(
-        object_type,
-        code.source_location(),
-        ns,
-        null_message);
-
-    CHECK_RETURN(zero_value.is_not_nil());
-    code_assignt assignment(value_symbol.symbol_expr(), zero_value);
+    const auto zero_value =
+      zero_initializer(object_type, code.source_location(), ns);
+    CHECK_RETURN(zero_value.has_value());
+    code_assignt assignment(value_symbol.symbol_expr(), *zero_value);
     symex_assign(state, assignment);
   }
   else
@@ -242,7 +236,9 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
   do_simplify(tmp);
   irep_idt id=get_symbol(tmp);
 
-  exprt rhs=zero_initializer(lhs.type(), code.source_location(), ns);
+  const auto zero = zero_initializer(lhs.type(), code.source_location(), ns);
+  CHECK_RETURN(zero.has_value());
+  exprt rhs(*zero);
 
   if(!id.empty())
   {

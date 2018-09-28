@@ -192,8 +192,10 @@ symbol_exprt get_or_create_string_literal_symbol(
       // Other members of JDK's java.lang.String we don't understand
       // without string-refinement. Just zero-init them; consider using
       // test-gen-like nondet object trees instead.
-      literal_init.copy_to_operands(
-        zero_initializer(comp.type(), string_expr.source_location(), ns));
+      const auto init =
+        zero_initializer(comp.type(), string_expr.source_location(), ns);
+      CHECK_RETURN(init.has_value());
+      literal_init.copy_to_operands(*init);
     }
     new_symbol.value = literal_init;
   }

@@ -2951,8 +2951,15 @@ optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
   if(return_type.id() == ID_empty)
     return {};
 
-  return zero_initializer(
-    return_type, location, namespacet(symbol_table), get_message_handler());
+  const auto value =
+    zero_initializer(return_type, location, namespacet(symbol_table));
+  if(!value.has_value())
+  {
+    error().source_location = location;
+    error() << "failed to zero-initialize return type" << eom;
+    throw 0;
+  }
+  return value;
 }
 
 void java_bytecode_convert_methodt::draw_edges_from_ret_to_jsr(
