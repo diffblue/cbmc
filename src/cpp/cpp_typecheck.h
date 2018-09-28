@@ -395,7 +395,7 @@ protected:
   static bool has_auto(const typet &type);
 
   void typecheck_member_function(
-    const irep_idt &compound_identifier,
+    const symbolt &compound_symbol,
     struct_typet::componentt &component,
     irept &initializers,
     const typet &method_qualifier,

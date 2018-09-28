@@ -509,7 +509,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     if(!is_virtual)
     {
       typecheck_member_function(
-        symbol.name, component, initializers,
+        symbol, component, initializers,
         method_qualifier, value);
 
       if(!value.is_nil() && !is_static)
@@ -540,7 +540,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       }
 
       typecheck_member_function(
-        symbol.name,
+        symbol,
         component,
         initializers,
         method_qualifier,
@@ -1262,7 +1262,7 @@ void cpp_typecheckt::move_member_initializers(
 }
 
 void cpp_typecheckt::typecheck_member_function(
-  const irep_idt &compound_identifier,
+  const symbolt &compound_symbol,
   struct_typet::componentt &component,
   irept &initializers,
   const typet &method_qualifier,
@@ -1284,7 +1284,7 @@ void cpp_typecheckt::typecheck_member_function(
   else
   {
     add_this_to_method_type(
-      compound_identifier,
+      compound_symbol.name,
       type,
       method_qualifier);
   }
