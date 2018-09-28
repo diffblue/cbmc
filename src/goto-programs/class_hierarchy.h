@@ -59,6 +59,13 @@ public:
   class_hierarchyt() = default;
   class_hierarchyt(const class_hierarchyt &) = delete;
   class_hierarchyt &operator=(const class_hierarchyt &) = delete;
+  class_hierarchyt(class_hierarchyt &&) = default;
+  class_hierarchyt &operator=(class_hierarchyt &&) = default;
+
+  explicit class_hierarchyt(const symbol_tablet &symbol_table)
+  {
+    (*this)(symbol_table);
+  }
 
   // transitively gets all children
   idst get_children_trans(const irep_idt &id) const
