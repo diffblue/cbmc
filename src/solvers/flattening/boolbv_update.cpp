@@ -42,7 +42,7 @@ void boolbvt::convert_update_rec(
   const exprt &new_value,
   bvt &bv)
 {
-  if(type.id()==ID_symbol)
+  if(type.id() == ID_symbol_type)
     convert_update_rec(
       designators, d, ns.follow(type), offset, new_value, bv);
 
