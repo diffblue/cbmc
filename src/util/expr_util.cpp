@@ -155,6 +155,14 @@ bool has_subtype(
   const std::function<bool(const typet &)> &pred,
   const namespacet &ns)
 {
+  return has_subtype(type, [&pred](const typet &t, const namespacet &) { return pred(t); }, ns);
+}
+
+bool has_subtype(
+  const typet &type,
+  const std::function<bool(const typet &, const namespacet &)> &pred,
+  const namespacet &ns)
+{
   std::vector<std::reference_wrapper<const typet>> stack;
   std::unordered_set<typet, irep_hash> visited;
 
@@ -169,7 +177,7 @@ bool has_subtype(
     const typet &top = stack.back().get();
     stack.pop_back();
 
-    if(pred(top))
+    if(pred(top,ns))
       return true;
     else if(top.id() == ID_symbol)
       push_if_not_visited(ns.follow(top));
