@@ -1821,13 +1821,17 @@ find_indexes(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 }
 
 /// Instantiates a string constraint by substituting the quantifiers.
-/// For a string constraint of the form \f$\forall q. P(x)\f$,
-/// substitute `qvar` the universally quantified variable of `axiom`, by
-/// an index `val`, in `axiom`, so that the index used for `str` equals `val`.
-/// For instance, if `axiom` corresponds to \f$\forall q. s[q+x]={\tt 'a'} \land
-/// t[q]={\tt 'b'} \f$, `instantiate(axiom,s,v)` would return an expression for
-/// \f$s[v]={\tt 'a'} \land t[v-x]={\tt 'b'}\f$.
-/// \param axiom: a universally quantified formula `axiom`
+/// For a string constraint of the form `forall q. P(x)`,
+/// substitute `q` the universally quantified variable of `axiom`, by
+/// an `index`, in `axiom`, so that the index used for `str` equals `val`.
+/// For instance, if `axiom` is `forall q. s[q+x] = 'a' && t[q] = 'b'`,
+/// `instantiate(axiom,s,v)` would return the expression
+/// `s[v] = 'a' && t[v-x] = 'b'`.
+/// If there are several such indexes, the conjunction of the instantiations is
+/// returned, for instance for a formula:
+/// `forall q. s[q+x]='a' && s[q]=c` we would get
+/// `s[v] = 'a' && s[v-x] = c && s[v+x] = 'a' && s[v] = c`.
+/// \param axiom: a universally quantified formula
 /// \param str: an array of characters
 /// \param val: an index expression
 /// \return instantiated formula
