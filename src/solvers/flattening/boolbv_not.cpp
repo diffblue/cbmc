@@ -12,9 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 bvt boolbvt::convert_not(const not_exprt &expr)
 {
   const bvt &op_bv=convert_bv(expr.op());
-
-  if(op_bv.empty())
-    throw "not operator takes one non-empty operand";
+  CHECK_RETURN(!op_bv.empty());
 
   const typet &op_type=expr.op().type();
 

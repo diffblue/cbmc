@@ -28,8 +28,12 @@ bvt boolbvt::convert_member(const member_exprt &expr)
                          from_integer(0, index_type()),
                          expr.type()));
   }
-  else if(struct_op_type.id()==ID_struct)
+  else
   {
+    INVARIANT(
+      struct_op_type.id() == ID_struct,
+      "member_exprt should denote access to a union or struct");
+
     const irep_idt &component_name=expr.get_component_name();
     const struct_typet::componentst &components=
       to_struct_type(struct_op_type).components();
@@ -43,22 +47,18 @@ bvt boolbvt::convert_member(const member_exprt &expr)
 
       if(c.get_name() == component_name)
       {
-        if(!base_type_eq(subtype, expr.type(), ns))
-        {
-          #if 0
-          std::cout << "DEBUG " << expr.pretty() << "\n";
-          #endif
-
-          error().source_location=expr.find_source_location();
-          error() << "member: component type does not match: "
-                  << subtype.pretty() << " vs. "
-                  << expr.type().pretty() << eom;
-          throw 0;
-        }
+        DATA_INVARIANT_WITH_DIAGNOSTICS(
+          base_type_eq(subtype, expr.type(), ns),
+          "struct component type shall match the member expression type",
+          subtype.pretty(),
+          expr.type().pretty());
 
         bvt bv;
         bv.resize(sub_width);
-        assert(offset+sub_width<=struct_bv.size());
+        INVARIANT(
+          offset + sub_width <= struct_bv.size(),
+          "bitvector part corresponding to struct element shall be contained "
+          "within the full struct bitvector");
 
         for(std::size_t i=0; i<sub_width; i++)
           bv[i]=struct_bv[offset+i];
@@ -69,15 +69,10 @@ bvt boolbvt::convert_member(const member_exprt &expr)
       offset+=sub_width;
     }
 
-    error().source_location=expr.find_source_location();
-    error() << "component " << component_name
-            << " not found in structure" << eom;
-    throw 0;
-  }
-  else
-  {
-    error().source_location=expr.find_source_location();
-    error() << "member takes struct or union operand" << eom;
-    throw 0;
+    INVARIANT_WITH_DIAGNOSTICS(
+      false,
+      "struct type shall contain component accessed by member expression",
+      expr.find_source_location(),
+      id2string(component_name));
   }
 }

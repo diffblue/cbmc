@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 
-bvt boolbvt::convert_mult(const exprt &expr)
+bvt boolbvt::convert_mult(const mult_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
@@ -21,22 +21,17 @@ bvt boolbvt::convert_mult(const exprt &expr)
   bv.resize(width);
 
   const exprt::operandst &operands=expr.operands();
-  if(operands.empty())
-    throw "mult without operands";
+  DATA_INVARIANT(!operands.empty(), "multiplication must have operands");
 
   const exprt &op0=expr.op0();
 
-  bool no_overflow=expr.id()=="no-overflow-mult";
+  DATA_INVARIANT(
+    op0.type() == expr.type(),
+    "multiplication operands should have same type as expression");
 
   if(expr.type().id()==ID_fixedbv)
   {
-    if(op0.type()!=expr.type())
-      throw "multiplication with mixed types";
-
-    bv=convert_bv(op0);
-
-    if(bv.size()!=width)
-      throw "convert_mult: unexpected operand width";
+    bv = convert_bv(op0, width);
 
     std::size_t fraction_bits=
       to_fixedbv_type(expr.type()).get_fraction_bits();
@@ -44,16 +39,14 @@ bvt boolbvt::convert_mult(const exprt &expr)
     for(exprt::operandst::const_iterator it=operands.begin()+1;
         it!=operands.end(); it++)
     {
-      if(it->type()!=expr.type())
-        throw "multiplication with mixed types";
+      DATA_INVARIANT(
+        it->type() == expr.type(),
+        "multiplication operands should have same type as expression");
 
       // do a sign extension by fraction_bits bits
       bv=bv_utils.sign_extension(bv, bv.size()+fraction_bits);
 
-      bvt op=convert_bv(*it);
-
-      if(op.size()!=width)
-        throw "convert_mult: unexpected operand width";
+      bvt op = convert_bv(*it, width);
 
       op=bv_utils.sign_extension(op, bv.size());
 
@@ -68,33 +61,22 @@ bvt boolbvt::convert_mult(const exprt &expr)
   else if(expr.type().id()==ID_unsignedbv ||
           expr.type().id()==ID_signedbv)
   {
-    if(op0.type()!=expr.type())
-      throw "multiplication with mixed types";
-
     bv_utilst::representationt rep=
       expr.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
                                     bv_utilst::representationt::UNSIGNED;
 
-    bv=convert_bv(op0);
-
-    if(bv.size()!=width)
-      throw "convert_mult: unexpected operand width";
+    bv = convert_bv(op0, width);
 
     for(exprt::operandst::const_iterator it=operands.begin()+1;
         it!=operands.end(); it++)
     {
-      if(it->type()!=expr.type())
-        throw "multiplication with mixed types";
+      DATA_INVARIANT(
+        it->type() == expr.type(),
+        "multiplication operands should have same type as expression");
 
-      const bvt &op=convert_bv(*it);
+      const bvt &op = convert_bv(*it, width);
 
-      if(op.size()!=width)
-        throw "convert_mult: unexpected operand width";
-
-      if(no_overflow)
-        bv=bv_utils.multiplier_no_overflow(bv, op, rep);
-      else
-        bv=bv_utils.multiplier(bv, op, rep);
+      bv = bv_utils.multiplier(bv, op, rep);
     }
 
     return bv;

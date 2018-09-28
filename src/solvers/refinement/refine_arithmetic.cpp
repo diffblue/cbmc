@@ -50,7 +50,7 @@ bvt bv_refinementt::convert_floatbv_op(const exprt &expr)
   return bv;
 }
 
-bvt bv_refinementt::convert_mult(const exprt &expr)
+bvt bv_refinementt::convert_mult(const mult_exprt &expr)
 {
   if(!config_.refine_arithmetic || expr.type().id()==ID_fixedbv)
     return SUB::convert_mult(expr);
@@ -65,7 +65,7 @@ bvt bv_refinementt::convert_mult(const exprt &expr)
   PRECONDITION(operands.size()>=2);
 
   if(operands.size()>2)
-    return convert_mult(make_binary(expr)); // make binary
+    return convert_mult(to_mult_expr(make_binary(expr))); // make binary
 
   // we keep multiplication by a constant for integers
   if(type.id()!=ID_floatbv)

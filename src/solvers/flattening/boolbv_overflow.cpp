@@ -19,8 +19,9 @@ literalt boolbvt::convert_overflow(const exprt &expr)
   if(expr.id()==ID_overflow_plus ||
      expr.id()==ID_overflow_minus)
   {
-    if(operands.size()!=2)
-      throw "operator "+expr.id_string()+" takes two operands";
+    DATA_INVARIANT(
+      operands.size() == 2,
+      "expression " + expr.id_string() + " should have two operands");
 
     const bvt &bv0=convert_bv(operands[0]);
     const bvt &bv1=convert_bv(operands[1]);
@@ -38,27 +39,25 @@ literalt boolbvt::convert_overflow(const exprt &expr)
   }
   else if(expr.id()==ID_overflow_mult)
   {
-    if(operands.size()!=2)
-      throw "operator "+expr.id_string()+" takes two operands";
+    DATA_INVARIANT(
+      operands.size() == 2,
+      "overflow_mult expression should have two operands");
 
     if(operands[0].type().id()!=ID_unsignedbv &&
        operands[0].type().id()!=ID_signedbv)
       return SUB::convert_rest(expr);
 
     bvt bv0=convert_bv(operands[0]);
-    bvt bv1=convert_bv(operands[1]);
-
-    if(bv0.size()!=bv1.size())
-      throw "operand size mismatch on overflow-*";
+    bvt bv1 = convert_bv(operands[1], bv0.size());
 
     bv_utilst::representationt rep=
       operands[0].type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
                                            bv_utilst::representationt::UNSIGNED;
 
-    if(operands[0].type()!=operands[1].type())
-      throw "operand type mismatch on overflow-*";
+    DATA_INVARIANT(
+      operands[0].type() == operands[1].type(),
+      "operands of overflow_mult expression shall have same type");
 
-    DATA_INVARIANT(bv0.size()==bv1.size(), "operands size mismatch");
     std::size_t old_size=bv0.size();
     std::size_t new_size=old_size*2;
 
@@ -97,8 +96,8 @@ literalt boolbvt::convert_overflow(const exprt &expr)
   }
   else if(expr.id() == ID_overflow_shl)
   {
-    if(operands.size() != 2)
-      throw "operator " + expr.id_string() + " takes two operands";
+    DATA_INVARIANT(
+      operands.size() == 2, "overflow_shl expression should have two operands");
 
     const bvt &bv0=convert_bv(operands[0]);
     const bvt &bv1=convert_bv(operands[1]);
@@ -163,46 +162,13 @@ literalt boolbvt::convert_overflow(const exprt &expr)
   }
   else if(expr.id()==ID_overflow_unary_minus)
   {
-    if(operands.size()!=1)
-      throw "operator "+expr.id_string()+" takes one operand";
+    DATA_INVARIANT(
+      operands.size() == 1,
+      "overflow_unary_minus expression should have one operand");
 
     const bvt &bv=convert_bv(operands[0]);
 
     return bv_utils.overflow_negate(bv);
-  }
-  else if(has_prefix(expr.id_string(), "overflow-typecast-"))
-  {
-    std::size_t bits=unsafe_string2unsigned(id2string(expr.id()).substr(18));
-
-    const exprt::operandst &operands=expr.operands();
-
-    if(operands.size()!=1)
-      throw "operator "+expr.id_string()+" takes one operand";
-
-    const exprt &op=operands[0];
-
-    const bvt &bv=convert_bv(op);
-
-    if(bits>=bv.size() || bits==0)
-      throw "overflow-typecast got wrong number of bits";
-
-    // signed or unsigned?
-    if(op.type().id()==ID_signedbv)
-    {
-      bvt tmp_bv;
-      for(std::size_t i=bits; i<bv.size(); i++)
-        tmp_bv.push_back(prop.lxor(bv[bits-1], bv[i]));
-
-      return prop.lor(tmp_bv);
-    }
-    else
-    {
-      bvt tmp_bv;
-      for(std::size_t i=bits; i<bv.size(); i++)
-        tmp_bv.push_back(bv[i]);
-
-      return prop.lor(tmp_bv);
-    }
   }
 
   return SUB::convert_rest(expr);
