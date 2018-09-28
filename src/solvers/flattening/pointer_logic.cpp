@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "pointer_logic.h"
 
-#include <cassert>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/invariant.h>
@@ -52,13 +50,11 @@ std::size_t pointer_logict::add_object(const exprt &expr)
 
   if(expr.id()==ID_index)
   {
-    assert(expr.operands().size()==2);
-    return add_object(expr.op0());
+    return add_object(to_index_expr(expr).array());
   }
   else if(expr.id()==ID_member)
   {
-    assert(expr.operands().size()==1);
-    return add_object(expr.op0());
+    return add_object(to_member_expr(expr).compound());
   }
 
   return objects.number(expr);
@@ -143,12 +139,15 @@ exprt pointer_logict::object_rec(
 
     for(const auto &c : components)
     {
-      assert(offset>=current_offset);
+      INVARIANT(
+        offset >= current_offset,
+        "when the object has not been found yet its offset must not be smaller"
+        "than the offset of the current struct component");
 
       const typet &subtype=c.type();
 
       mp_integer sub_size=pointer_offset_size(subtype, ns);
-      assert(sub_size>0);
+      CHECK_RETURN(sub_size > 0);
       mp_integer new_offset=current_offset+sub_size;
 
       if(new_offset>offset)
@@ -160,9 +159,7 @@ exprt pointer_logict::object_rec(
           offset-current_offset, pointer_type, tmp);
       }
 
-      assert(new_offset<=offset);
       current_offset=new_offset;
-      assert(current_offset<=offset);
     }
 
     return src;
@@ -177,7 +174,7 @@ pointer_logict::pointer_logict(const namespacet &_ns):ns(_ns)
 {
   // add NULL
   null_object=objects.number(exprt(ID_NULL));
-  assert(null_object==0);
+  CHECK_RETURN(null_object == 0);
 
   // add INVALID
   invalid_object=objects.number(exprt("INVALID"));

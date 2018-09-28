@@ -24,10 +24,9 @@ literalt equalityt::equality(const exprt &e1, const exprt &e2)
 
 literalt equalityt::equality2(const exprt &e1, const exprt &e2)
 {
-  const typet &type=e1.type();
+  PRECONDITION(e1.type() == e2.type());
 
-  if(e2.type()!=e1.type())
-    throw "equality got different types";
+  const typet &type = e1.type();
 
   // check for syntactical equality
 
@@ -36,9 +35,8 @@ literalt equalityt::equality2(const exprt &e1, const exprt &e2)
 
   // check for boolean equality
 
-  if(type.id()==ID_bool)
-    throw "equalityt got boolean equality";
-  // return lequal(convert(e1), convert(e2));
+  INVARIANT(
+    type.id() != ID_bool, "method shall not be used to compare Boolean types");
 
   // look it up
 
