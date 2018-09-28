@@ -604,54 +604,52 @@ bool simplify_exprt::simplify_plus(exprt &expr)
 
 bool simplify_exprt::simplify_minus(exprt &expr)
 {
-  if(!is_number(expr.type()) &&
-     expr.type().id()!=ID_pointer)
+  auto const &minus_expr = to_minus_expr(expr);
+  if(!is_number(minus_expr.type()) && minus_expr.type().id() != ID_pointer)
     return true;
 
-  exprt::operandst &operands=expr.operands();
-
-  assert(expr.id()==ID_minus);
+  const exprt::operandst &operands = minus_expr.operands();
 
   if(operands.size()!=2)
     return true;
 
-  if(is_number(expr.type()) &&
-     is_number(operands[0].type()) &&
-     is_number(operands[1].type()))
+  if(
+    is_number(minus_expr.type()) && is_number(operands[0].type()) &&
+    is_number(operands[1].type()))
   {
     // rewrite "a-b" to "a+(-b)"
-    unary_minus_exprt tmp2(operands[1]);
-    simplify_unary_minus(tmp2);
+    unary_minus_exprt rhs_negated(operands[1]);
+    simplify_unary_minus(rhs_negated);
 
-    plus_exprt tmp(operands[0], tmp2);
-    simplify_node(tmp);
+    plus_exprt plus_expr(operands[0], rhs_negated);
+    simplify_node(plus_expr);
 
-    expr.swap(tmp);
+    expr.swap(plus_expr);
     return false;
   }
-  else if(expr.type().id()==ID_pointer &&
-          operands[0].type().id()==ID_pointer &&
-          is_number(operands[1].type()))
+  else if(
+    minus_expr.type().id() == ID_pointer &&
+    operands[0].type().id() == ID_pointer && is_number(operands[1].type()))
   {
     // pointer arithmetic: rewrite "p-i" to "p+(-i)"
-    unary_minus_exprt tmp2(operands[1]);
-    simplify_unary_minus(tmp2);
+    unary_minus_exprt negated_pointer_offset(operands[1]);
+    simplify_unary_minus(negated_pointer_offset);
 
-    plus_exprt tmp(operands[0], tmp2);
-    simplify_plus(tmp);
+    plus_exprt pointer_offset_expr(operands[0], negated_pointer_offset);
+    simplify_plus(pointer_offset_expr);
 
-    expr.swap(tmp);
+    expr.swap(pointer_offset_expr);
     return false;
   }
-  else if(is_number(expr.type()) &&
-          operands[0].type().id()==ID_pointer &&
-          operands[1].type().id()==ID_pointer)
+  else if(
+    is_number(minus_expr.type()) && operands[0].type().id() == ID_pointer &&
+    operands[1].type().id() == ID_pointer)
   {
     // pointer arithmetic: rewrite "p-p" to "0"
 
     if(operands[0]==operands[1])
     {
-      exprt zero=from_integer(0, expr.type());
+      exprt zero = from_integer(0, minus_expr.type());
       CHECK_RETURN(zero.is_not_nil());
       expr=zero;
       return false;
