@@ -2732,26 +2732,6 @@ exprt c_typecheck_baset::do_special_functions(
 
     return tmp;
   }
-  else if(identifier==CPROVER_PREFIX "float_debug1" ||
-          identifier==CPROVER_PREFIX "float_debug2")
-  {
-    if(expr.arguments().size()!=2)
-    {
-      err_location(f_op);
-      error() << "float_debug expects two operands" << eom;
-      throw 0;
-    }
-
-    const irep_idt &id=
-      identifier==CPROVER_PREFIX "float_debug1"?
-      "float_debug1":"float_debug2";
-
-    exprt float_debug_expr(id, expr.type());
-    float_debug_expr.operands()=expr.arguments();
-    float_debug_expr.add_source_location()=source_location;
-
-    return float_debug_expr;
-  }
   else if(identifier=="__sync_fetch_and_add" ||
           identifier=="__sync_fetch_and_sub" ||
           identifier=="__sync_fetch_and_or" ||
