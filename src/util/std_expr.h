@@ -4642,6 +4642,24 @@ public:
   }
 };
 
+inline const exists_exprt &to_exists_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_exists);
+  DATA_INVARIANT(
+    expr.operands().size() == 2,
+    "exists expressions have exactly two operands");
+  return static_cast<const exists_exprt &>(expr);
+}
+
+inline exists_exprt &to_exists_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_exists);
+  DATA_INVARIANT(
+    expr.operands().size() == 2,
+    "exists expressions have exactly two operands");
+  return static_cast<exists_exprt &>(expr);
+}
+
 /// \brief The popcount (counting the number of bits set to 1) expression
 class popcount_exprt: public unary_exprt
 {
