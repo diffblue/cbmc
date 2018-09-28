@@ -273,10 +273,10 @@ void cpp_typecheckt::typecheck_compound_type(
   }
   else
   {
-    // create type symbol
-    symbol_typet symbol_type(symbol_name);
-    qualifiers.write(symbol_type);
-    type.swap(symbol_type);
+    // create struct tag
+    struct_tag_typet tag_type(symbol_name);
+    qualifiers.write(tag_type);
+    type.swap(tag_type);
   }
 }
 
@@ -569,7 +569,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         // add a virtual-table pointer
         struct_typet::componentt compo(
           id2string(symbol.name) + "::@vtable_pointer",
-          pointer_type(symbol_typet(vt_name)));
+          pointer_type(struct_tag_typet(vt_name)));
         compo.set_base_name("@vtable_pointer");
         compo.set_pretty_name(id2string(symbol.base_name) + "@vtable_pointer");
         compo.set(ID_is_vtptr, true);
@@ -1356,7 +1356,12 @@ void cpp_typecheckt::add_this_to_method_type(
   parameter.set_base_name(ID_this);
   parameter.set_this();
 
-  typet subtype = symbol_typet(compound_symbol.name);
+  typet subtype;
+
+  if(compound_symbol.type.id() == ID_union)
+    subtype = union_tag_typet(compound_symbol.name);
+  else
+    subtype = struct_tag_typet(compound_symbol.name);
 
   if(has_const(method_qualifier))
     subtype.set(ID_C_constant, true);
@@ -1452,7 +1457,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   if(struct_union_symbol.type.id() == ID_union)
     compound_type = union_tag_typet(struct_union_symbol.name);
   else
-    compound_type = symbol_typet(struct_union_symbol.name);
+    compound_type = struct_tag_typet(struct_union_symbol.name);
 
   struct_typet::componentt component(identifier, compound_type);
   component.set_access(access);
