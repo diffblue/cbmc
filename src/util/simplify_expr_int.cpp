@@ -446,20 +446,18 @@ bool simplify_exprt::simplify_mod(exprt &expr)
 
 bool simplify_exprt::simplify_plus(exprt &expr)
 {
-  if(!is_number(expr.type()) &&
-     expr.type().id()!=ID_pointer)
+  auto const &plus_expr = to_plus_expr(expr);
+  if(!is_number(plus_expr.type()) && plus_expr.type().id() != ID_pointer)
     return true;
 
   bool result=true;
 
   exprt::operandst &operands=expr.operands();
 
-  assert(expr.id()==ID_plus);
-
   // floating-point addition is _NOT_ associative; thus,
   // there is special case for float
 
-  if(ns.follow(expr.type()).id()==ID_floatbv)
+  if(ns.follow(plus_expr.type()).id() == ID_floatbv)
   {
     // we only merge neighboring constants!
     Forall_expr(it, operands)
@@ -482,14 +480,13 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   else
   {
     // ((T*)p+a)+b -> (T*)p+(a+b)
-    if(expr.type().id()==ID_pointer &&
-       expr.operands().size()==2 &&
-       expr.op0().id()==ID_plus &&
-       expr.op0().operands().size()==2)
+    if(
+      plus_expr.type().id() == ID_pointer && plus_expr.operands().size() == 2 &&
+      plus_expr.op0().id() == ID_plus && plus_expr.op0().operands().size() == 2)
     {
-      exprt op0=expr.op0();
+      exprt op0 = plus_expr.op0();
 
-      if(expr.op0().op1().id()==ID_plus)
+      if(plus_expr.op0().op1().id() == ID_plus)
         op0.op1().copy_to_operands(expr.op1());
       else
         op0.op1()=plus_exprt(op0.op1(), expr.op1());
@@ -504,7 +501,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
 
     // count the constants
     size_t count=0;
-    forall_operands(it, expr)
+    forall_operands(it, plus_expr)
       if(is_number(it->type()) && it->is_constant())
         count++;
 
@@ -588,7 +585,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
 
   if(operands.empty())
   {
-    expr=from_integer(0, expr.type());
+    expr = from_integer(0, plus_expr.type());
     CHECK_RETURN(expr.is_not_nil());
     return false;
   }
