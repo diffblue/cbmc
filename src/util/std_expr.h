@@ -696,6 +696,39 @@ public:
   }
 };
 
+/// \brief Cast an exprt to a \ref sign_exprt
+///
+/// \a expr must be known to be a \ref sign_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref sign_exprt
+inline const sign_exprt &to_sign_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_sign);
+  DATA_INVARIANT(
+    expr.operands().size() == 1, "sign expression must have one operand");
+  return static_cast<const sign_exprt &>(expr);
+}
+
+/// \copydoc to_sign_expr(const exprt &)
+inline sign_exprt &to_sign_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_sign);
+  DATA_INVARIANT(
+    expr.operands().size() == 1, "sign expression must have one operand");
+  return static_cast<sign_exprt &>(expr);
+}
+
+template <>
+inline bool can_cast_expr<sign_exprt>(const exprt &base)
+{
+  return base.id() == ID_sign;
+}
+inline void validate_expr(const sign_exprt &expr)
+{
+  validate_operands(expr, 1, "sign expression must have one operand");
+}
+
 /// \brief A base class for binary expressions
 class binary_exprt:public exprt
 {
@@ -932,6 +965,10 @@ class plus_exprt:public multi_ary_exprt
 public:
   DEPRECATED("use plus_exprt(lhs, rhs) instead")
   plus_exprt():multi_ary_exprt(ID_plus)
+  {
+  }
+
+  plus_exprt(const typet &type) : multi_ary_exprt(ID_plus, type)
   {
   }
 

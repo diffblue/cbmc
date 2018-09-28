@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
+#include <util/invariant.h>
 #include <util/run.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -105,7 +106,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 
   int res =
