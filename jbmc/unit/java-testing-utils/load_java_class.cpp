@@ -49,7 +49,7 @@ symbol_tablet load_java_class(
   const std::string &main)
 {
   return load_goto_model_from_java_class(java_class_name, class_path, main)
-    ->get_symbol_table();
+    .get_symbol_table();
 }
 
 /// Returns the symbol table from \ref load_goto_model_from_java_class
@@ -66,7 +66,7 @@ symbol_tablet load_java_class(
            main,
            std::move(java_lang),
            command_line)
-    ->get_symbol_table();
+    .get_symbol_table();
 }
 
 /// Go through the process of loading, type-checking and finalising a
@@ -83,7 +83,7 @@ symbol_tablet load_java_class(
 ///   language
 /// \return The goto model containing both the functions and the symbol table
 /// from loading this class.
-std::unique_ptr<goto_modelt> load_goto_model_from_java_class(
+goto_modelt load_goto_model_from_java_class(
   const std::string &java_class_name,
   const std::string &class_path,
   const std::string &main,
@@ -153,7 +153,7 @@ std::unique_ptr<goto_modelt> load_goto_model_from_java_class(
   // Check your working directory and the class path is correctly configured
   // as this often indicates that one of these is wrong.
   REQUIRE_FALSE(class_type.get_bool(ID_incomplete_class));
-  return maybe_goto_model;
+  return std::move(*maybe_goto_model);
 }
 
 /// Returns the symbol table from \ref load_goto_model_from_java_class
@@ -180,7 +180,7 @@ symbol_tablet load_java_class(
 /// See \ref load_goto_model_from_java_class
 /// With the command line configured to disable lazy loading and string
 /// refinement and the language set to be the default java_bytecode language
-std::unique_ptr<goto_modelt> load_goto_model_from_java_class(
+goto_modelt load_goto_model_from_java_class(
   const std::string &java_class_name,
   const std::string &class_path,
   const std::string &main)
