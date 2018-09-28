@@ -31,7 +31,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::Generic",
         {{require_type::type_argument_kindt::Inst,
@@ -54,7 +54,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::GenericTwoParam",
         {{require_type::type_argument_kindt::Inst,
@@ -77,7 +77,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::Generic",
         {{require_type::type_argument_kindt::Var,
@@ -99,7 +99,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::Generic",
         {{require_type::type_argument_kindt::Inst,
@@ -121,7 +121,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::GenericTwoParam",
         {{require_type::type_argument_kindt::Var,
@@ -145,7 +145,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::Generic",
         {{require_type::type_argument_kindt::Inst, "java::java.lang.Integer"}});
@@ -168,7 +168,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::Generic",
         {{require_type::type_argument_kindt::Var,
@@ -193,7 +193,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::Generic",
         {{require_type::type_argument_kindt::Var,
@@ -216,7 +216,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::DerivedGenericMixed2",
         {{require_type::type_argument_kindt::Inst, "java::java.lang.String"}});
@@ -243,12 +243,12 @@ SCENARIO(
       THEN("The superclass is correct")
       {
         const typet &base_type = derived_class_type.bases().at(0).type();
-        require_type::require_symbol(base_type, "java::java.lang.Object");
+        require_type::require_struct_tag(base_type, "java::java.lang.Object");
       }
       THEN("The second interface is correct")
       {
         const typet &base_type = derived_class_type.bases().at(1).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::InterfaceGeneric",
           {{require_type::type_argument_kindt::Inst,
@@ -275,12 +275,12 @@ SCENARIO(
       THEN("The superclass is correct")
       {
         const typet &base_type = derived_class_type.bases().at(0).type();
-        require_type::require_symbol(base_type, "java::java.lang.Object");
+        require_type::require_struct_tag(base_type, "java::java.lang.Object");
       }
       THEN("The second interface is correct")
       {
         const typet &base_type = derived_class_type.bases().at(1).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::InterfaceGeneric",
           {{require_type::type_argument_kindt::Var,
@@ -309,12 +309,12 @@ SCENARIO(
       THEN("The superclass is correct")
       {
         const typet &base_type = derived_class_type.bases().at(0).type();
-        require_type::require_symbol(base_type, "java::java.lang.Object");
+        require_type::require_struct_tag(base_type, "java::java.lang.Object");
       }
       THEN("The second interface is correct")
       {
         const typet &base_type = derived_class_type.bases().at(1).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::InterfaceGeneric",
           {{require_type::type_argument_kindt::Inst,
@@ -323,7 +323,7 @@ SCENARIO(
       THEN("The first interface is correct")
       {
         const typet &base_type = derived_class_type.bases().at(2).type();
-        require_type::require_symbol(base_type, "java::Interface");
+        require_type::require_struct_tag(base_type, "java::Interface");
       }
     }
   }
@@ -348,7 +348,7 @@ SCENARIO(
       THEN("The superclass is correct")
       {
         const typet &base_type = derived_class_type.bases().at(0).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::Generic",
           {{require_type::type_argument_kindt::Inst,
@@ -357,12 +357,12 @@ SCENARIO(
       THEN("The first interface is correct")
       {
         const typet &base_type = derived_class_type.bases().at(1).type();
-        require_type::require_symbol(base_type, "java::Interface");
+        require_type::require_struct_tag(base_type, "java::Interface");
       }
       THEN("The second interface is correct")
       {
         const typet &base_type = derived_class_type.bases().at(2).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::InterfaceGeneric",
           {{require_type::type_argument_kindt::Inst,
@@ -390,7 +390,7 @@ SCENARIO(
       THEN("The superclass is correct")
       {
         const typet &base_type = derived_class_type.bases().at(0).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::GenericTwoParam",
           {{require_type::type_argument_kindt::Var,
@@ -401,12 +401,12 @@ SCENARIO(
       THEN("The first interface is correct")
       {
         const typet &base_type = derived_class_type.bases().at(1).type();
-        require_type::require_symbol(base_type, "java::Interface");
+        require_type::require_struct_tag(base_type, "java::Interface");
       }
       THEN("The second interface is correct")
       {
         const typet &base_type = derived_class_type.bases().at(2).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::InterfaceGeneric",
           {{require_type::type_argument_kindt::Var,
@@ -435,20 +435,20 @@ SCENARIO(
       THEN("The superclass is correct")
       {
         const typet &base_type = derived_class_type.bases().at(0).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::Generic",
           {{require_type::type_argument_kindt::Inst,
-             "java::InterfaceGeneric"}});
+            "java::InterfaceGeneric"}});
       }
       THEN("The interface is correct")
       {
         const typet &base_type = derived_class_type.bases().at(1).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::InterfaceGeneric",
           {{require_type::type_argument_kindt::Inst,
-             "java::java.lang.Integer"}});
+            "java::java.lang.Integer"}});
       }
     }
   }
@@ -473,12 +473,12 @@ SCENARIO(
       THEN("The superclass is correct")
       {
         const typet &base_type = derived_class_type.bases().at(0).type();
-        const java_generic_symbol_typet &superclass_type =
-          require_type::require_java_generic_symbol_type(
+        const java_generic_struct_tag_typet &superclass_type =
+          require_type::require_java_generic_struct_tag_type(
             base_type,
             "java::Generic",
             {{require_type::type_argument_kindt::Inst,
-               "java::InterfaceGeneric"}});
+              "java::InterfaceGeneric"}});
 
         const typet &type_argument = superclass_type.generic_types().at(0);
         require_type::require_java_generic_type(
@@ -489,11 +489,11 @@ SCENARIO(
       THEN("The interface is correct")
       {
         const typet &base_type = derived_class_type.bases().at(1).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::InterfaceGeneric",
           {{require_type::type_argument_kindt::Inst,
-             "java::java.lang.Integer"}});
+            "java::java.lang.Integer"}});
       }
     }
   }
@@ -517,20 +517,20 @@ SCENARIO(
       THEN("The superclass is correct")
       {
         const typet &base_type = derived_class_type.bases().at(0).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::Generic",
           {{require_type::type_argument_kindt::Inst,
-             "java::InterfaceGeneric"}});
+            "java::InterfaceGeneric"}});
       }
       THEN("The interface is correct")
       {
         const typet &base_type = derived_class_type.bases().at(1).type();
-        require_type::require_java_generic_symbol_type(
+        require_type::require_java_generic_struct_tag_type(
           base_type,
           "java::InterfaceGeneric",
           {{require_type::type_argument_kindt::Var,
-             "java::ExtendsAndImplementsSameInterfaceGeneric::T"}});
+            "java::ExtendsAndImplementsSameInterfaceGeneric::T"}});
       }
     }
   }
@@ -549,7 +549,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::GenericBase$ImplicitGeneric",
         {{require_type::type_argument_kindt::Var, "java::GenericBase::T"}});
@@ -570,7 +570,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::GenericBase$ImplicitAndExplicitGeneric",
         {{require_type::type_argument_kindt::Var, "java::GenericBase::T"},
@@ -593,7 +593,7 @@ SCENARIO(
     {
       REQUIRE(derived_class_type.bases().size() == 1);
       const typet &base_type = derived_class_type.bases().at(0).type();
-      require_type::require_java_generic_symbol_type(
+      require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::GenericBase2$ImplicitAndExplicitGeneric",
         {{require_type::type_argument_kindt::Var, "java::GenericBase2::T"},

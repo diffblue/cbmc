@@ -39,7 +39,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -66,7 +66,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -93,7 +93,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -120,7 +120,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::java.lang.Number"));
+          param_x.type(), struct_tag_typet("java::java.lang.Number"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -147,7 +147,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -174,7 +174,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -202,7 +202,7 @@ SCENARIO(
         const java_method_typet::parametert &param_t =
           require_type::require_parameter(func_code, "t");
         require_type::require_pointer(
-          param_t.type(), symbol_typet("java::Generic"));
+          param_t.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -212,7 +212,7 @@ SCENARIO(
         const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
-          param_u.type(), symbol_typet("java::Generic"));
+          param_u.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -240,7 +240,7 @@ SCENARIO(
         const java_method_typet::parametert &param_t =
           require_type::require_parameter(func_code, "t");
         require_type::require_pointer(
-          param_t.type(), symbol_typet("java::Generic"));
+          param_t.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -250,7 +250,7 @@ SCENARIO(
         const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
-          param_u.type(), symbol_typet("java::Generic"));
+          param_u.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -276,7 +276,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -302,7 +302,7 @@ SCENARIO(
       THEN("It has return type pointing to java.lang.Object")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::java.lang.Object"));
+          func_code.return_type(), struct_tag_typet("java::java.lang.Object"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -326,7 +326,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -351,7 +351,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -376,7 +376,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -401,7 +401,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -430,7 +430,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -439,7 +439,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -467,7 +467,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -476,7 +476,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -504,7 +504,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -513,7 +513,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -541,7 +541,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -550,7 +550,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -579,7 +579,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -588,7 +588,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -616,7 +616,7 @@ SCENARIO(
         const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
-          param_u.type(), symbol_typet("java::Generic"));
+          param_u.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -625,7 +625,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -653,7 +653,7 @@ SCENARIO(
         const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
-          param_u.type(), symbol_typet("java::Generic"));
+          param_u.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -662,7 +662,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -690,7 +690,7 @@ SCENARIO(
         const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
-          param_u.type(), symbol_typet("java::Generic"));
+          param_u.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -701,7 +701,7 @@ SCENARIO(
         const java_method_typet::parametert &param_v =
           require_type::require_parameter(func_code, "v");
         require_type::require_pointer(
-          param_v.type(), symbol_typet("java::Generic"));
+          param_v.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -710,7 +710,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -738,7 +738,7 @@ SCENARIO(
         const java_method_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
-          param_u.type(), symbol_typet("java::Generic"));
+          param_u.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -749,7 +749,7 @@ SCENARIO(
         const java_method_typet::parametert &param_v =
           require_type::require_parameter(func_code, "v");
         require_type::require_pointer(
-          param_v.type(), symbol_typet("java::Generic"));
+          param_v.type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286
@@ -758,7 +758,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         require_type::require_pointer(
-          func_code.return_type(), symbol_typet("java::Generic"));
+          func_code.return_type(), struct_tag_typet("java::Generic"));
 
         // TODO: the bounds are not parsed yet; extend tests when fixed -
         // issue TG-1286

@@ -206,7 +206,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   // So long as `this` is already not `void*` typed, the second parameter
   // is ignored:
   exprt this_class_identifier =
-    get_class_identifier_field(this_expr, symbol_typet(irep_idt()), ns);
+    get_class_identifier_field(this_expr, struct_tag_typet(irep_idt()), ns);
 
   // If instructed, add an ASSUME(FALSE) to handle the case where we don't
   // match any expected type:

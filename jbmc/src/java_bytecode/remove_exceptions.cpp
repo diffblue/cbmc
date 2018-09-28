@@ -348,7 +348,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
         t_exc->function=instr_it->function;
 
         // use instanceof to check that this is the correct handler
-        symbol_typet type(stack_catch[i][j].first);
+        struct_tag_typet type(stack_catch[i][j].first);
         type_exprt expr(type);
 
         binary_predicate_exprt check(exc_thrown, ID_java_instanceof, expr);

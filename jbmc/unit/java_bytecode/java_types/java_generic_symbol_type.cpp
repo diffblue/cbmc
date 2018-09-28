@@ -9,17 +9,17 @@
 #include <testing-utils/catch.hpp>
 #include <java_bytecode/java_types.h>
 
-SCENARIO("java_generic_symbol_type", "[core][java_types]")
+SCENARIO("java_generic_struct_tag_type", "[core][java_types]")
 {
   GIVEN("LGenericClass<TX;TY;>;")
   {
-    auto symbol_type = symbol_typet("java::GenericClass");
-    const auto generic_symbol_type = java_generic_symbol_typet(
-      symbol_type, "LGenericClass<TX;TY;>;", "PrefixClassName");
+    auto struct_tag_type = struct_tag_typet("java::GenericClass");
+    const auto generic_struct_tag_type = java_generic_struct_tag_typet(
+      struct_tag_type, "LGenericClass<TX;TY;>;", "PrefixClassName");
 
-    REQUIRE(generic_symbol_type.get_identifier() == "java::GenericClass");
+    REQUIRE(generic_struct_tag_type.get_identifier() == "java::GenericClass");
 
-    auto types = generic_symbol_type.generic_types();
+    auto types = generic_struct_tag_type.generic_types();
     REQUIRE(types.size() == 2);
 
     auto generic_var0 = to_java_generic_parameter(types[0]).type_variable();

@@ -38,7 +38,7 @@ TEST_CASE("Convert exprt to string exprt")
     code_blockt code;
     java_string_library_preprocesst preprocess;
     preprocess.add_string_type("java.lang.String", symbol_table);
-    symbol_typet java_string_type("java::java.lang.String");
+    struct_tag_typet java_string_type("java::java.lang.String");
     symbol_exprt expr("a", pointer_type(java_string_type));
 
     WHEN("String expression is converted to refined string expression")

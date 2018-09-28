@@ -52,7 +52,7 @@ protected:
 
   bool is_char_type(const typet &type) const
   {
-    if(type.id() == ID_symbol_type)
+    if(type.id() == ID_struct_tag)
       return is_char_type(ns.follow(type));
 
     if(type.id()!=ID_signedbv &&

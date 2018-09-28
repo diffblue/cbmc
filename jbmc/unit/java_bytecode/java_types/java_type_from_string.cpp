@@ -41,8 +41,8 @@ SCENARIO("java_type_from_string", "[core][java_types]")
 
   GIVEN("Ljava/util/Map<TK;TV;>;")
   {
-    const auto generic_symbol_type =
+    const auto generic_struct_tag_type =
       java_type_from_string("Ljava/util/Map<TK;TV;>;", "java.util.Map");
-    REQUIRE(generic_symbol_type != nil_typet());
+    REQUIRE(generic_struct_tag_type != nil_typet());
   }
 }

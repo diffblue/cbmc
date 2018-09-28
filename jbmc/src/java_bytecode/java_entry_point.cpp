@@ -106,7 +106,7 @@ static const symbolt *get_class_literal_initializer(
 {
   if(symbol.value.is_not_nil())
     return nullptr;
-  if(symbol.type != symbol_typet("java::java.lang.Class"))
+  if(symbol.type != struct_tag_typet("java::java.lang.Class"))
     return nullptr;
   if(!has_suffix(id2string(symbol.name), JAVA_CLASS_MODEL_SUFFIX))
     return nullptr;
@@ -202,7 +202,7 @@ static void java_static_lifetime_init(
           throw 0;
         }
         set_class_identifier(
-          to_struct_expr(*zero_object), ns, to_symbol_type(sym.type));
+          to_struct_expr(*zero_object), ns, to_struct_tag_type(sym.type));
 
         code_block.add(
           std::move(code_assignt(sym.symbol_expr(), *zero_object)));
@@ -370,7 +370,7 @@ exprt::operandst java_build_arguments(
       main_arguments[param_number] = result_symbol.symbol_expr();
 
       std::vector<codet> cases(alternatives.size());
-      const auto initialize_parameter = [&](const symbol_typet &type) {
+      const auto initialize_parameter = [&](const struct_tag_typet &type) {
         code_blockt init_code_for_type;
         exprt init_expr_for_parameter = object_factory(
           java_reference_type(type),

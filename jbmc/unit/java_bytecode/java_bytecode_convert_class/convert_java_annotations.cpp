@@ -35,7 +35,7 @@ SCENARIO(
         REQUIRE(annotations.size() == 1);
         const auto &annotation = annotations.front();
         const auto &identifier =
-          to_symbol_type(annotation.type.subtype()).get_identifier();
+          to_struct_tag_type(annotation.type.subtype()).get_identifier();
         REQUIRE(id2string(identifier) == "java::MyClassAnnotation");
         const auto &element_value_pair = annotation.element_value_pairs.front();
         const auto &element_name = element_value_pair.element_name;
@@ -62,7 +62,7 @@ SCENARIO(
         REQUIRE(annotations.size() == 1);
         const auto &annotation = annotations.front();
         const auto &identifier =
-          to_symbol_type(annotation.type.subtype()).get_identifier();
+          to_struct_tag_type(annotation.type.subtype()).get_identifier();
         REQUIRE(id2string(identifier) == "java::MyMethodAnnotation");
         const auto &element_value_pair = annotation.element_value_pairs.front();
         const auto &element_name = element_value_pair.element_name;

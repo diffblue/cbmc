@@ -108,8 +108,7 @@ code_ifthenelset java_bytecode_instrumentt::throw_exception(
       struct_union_typet::componentst{});
   }
 
-  pointer_typet exc_ptr_type=
-    pointer_type(symbol_typet(exc_class_name));
+  pointer_typet exc_ptr_type = pointer_type(struct_tag_typet(exc_class_name));
 
   // Allocate and throw an instance of the exception class:
 

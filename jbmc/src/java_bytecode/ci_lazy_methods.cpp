@@ -65,7 +65,7 @@ ci_lazy_methodst::ci_lazy_methodst(
 ///   class
 static bool references_class_model(const exprt &expr)
 {
-  static const symbol_typet class_type("java::java.lang.Class");
+  static const struct_tag_typet class_type("java::java.lang.Class");
 
   for(auto it = expr.depth_begin(); it != expr.depth_end(); ++it)
   {

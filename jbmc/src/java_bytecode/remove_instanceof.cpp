@@ -87,10 +87,10 @@ bool remove_instanceoft::lower_instanceof(
 
   // Find all types we know about that satisfy the given requirement:
   INVARIANT(
-    target_type.id() == ID_symbol_type,
+    target_type.id() == ID_struct_tag,
     "instanceof second operand should have a simple type");
-  const irep_idt &target_name=
-    to_symbol_type(target_type).get_identifier();
+  const irep_idt &target_name =
+    to_struct_tag_type(target_type).get_identifier();
   std::vector<irep_idt> children=
     class_hierarchy.get_children_trans(target_name);
   children.push_back(target_name);
@@ -104,7 +104,7 @@ bool remove_instanceoft::lower_instanceof(
   // Make temporaries to store the class identifier (avoids repeated derefs) and
   // the instanceof result:
 
-  symbol_typet jlo=to_symbol_type(java_lang_object_type().subtype());
+  auto jlo = to_struct_tag_type(java_lang_object_type().subtype());
   exprt object_clsid = get_class_identifier_field(check_ptr, jlo, ns);
 
   symbolt &clsid_tmp_sym = get_fresh_aux_symbol(
