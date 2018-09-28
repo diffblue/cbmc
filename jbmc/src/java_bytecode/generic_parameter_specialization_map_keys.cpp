@@ -136,29 +136,29 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
 /// in the form of a symbol rather than a pointer (as opposed to the function
 /// insert_pairs_for_pointer). Own the keys and pop from their stack
 /// on destruction; otherwise do nothing.
-/// \param symbol_type symbol type to get the specialized generic types from
+/// \param struct_tag_type symbol type to get the specialized generic types from
 /// \param symbol_struct struct type of the symbol type, must be generic if
 /// the symbol is generic
 void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
-  const symbol_typet &symbol_type,
+  const struct_tag_typet &struct_tag_type,
   const typet &symbol_struct)
 {
   // If the struct is:
   // - an incomplete class or
   // - a class that is neither generic nor implicitly generic (this
   //  may be due to unsupported class signature)
-  // then ignore the generic types in the symbol_type and do not add any pairs.
+  // then ignore the generic types in the struct_tag_type and do not add any pairs.
   // TODO TG-1996 should decide how mocking and generics should work
   // together. Currently an incomplete class is never marked as generic. If
   // this changes in TG-1996 then the condition below should be updated.
   if(
-    is_java_generic_symbol_type(symbol_type) &&
+    is_java_generic_struct_tag_type(struct_tag_type) &&
     !to_java_class_type(symbol_struct).get_is_stub() &&
     (is_java_generic_class_type(symbol_struct) ||
      is_java_implicitly_generic_class_type(symbol_struct)))
   {
-    const java_generic_symbol_typet &generic_symbol =
-      to_java_generic_symbol_type(symbol_type);
+    const java_generic_struct_tag_typet &generic_symbol =
+      to_java_generic_struct_tag_type(struct_tag_type);
 
     const std::vector<java_generic_parametert> &generic_parameters =
       get_all_generic_parameters(symbol_struct);

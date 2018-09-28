@@ -116,7 +116,7 @@ SCENARIO(
         const java_generic_typet &type =
           require_type::require_java_generic_type(component.type());
         require_type::require_pointer(
-          type.generic_type_arguments()[0], symbol_typet{"java::BWrapper"});
+          type.generic_type_arguments()[0], struct_tag_typet{"java::BWrapper"});
       }
 
       THEN("Object 'this' has field 'field_input1' of type Wrapper")

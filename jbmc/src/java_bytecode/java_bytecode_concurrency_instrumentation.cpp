@@ -230,7 +230,7 @@ static void instrument_synchronized_code(
 
   // Create the finally block with the same label targeted in the catch-push
   const symbolt &tmp_symbol = get_fresh_aux_symbol(
-    java_reference_type(symbol_typet("java::java.lang.Throwable")),
+    java_reference_type(struct_tag_typet("java::java.lang.Throwable")),
     id2string(symbol.name),
     "caught-synchronized-exception",
     code.source_location(),

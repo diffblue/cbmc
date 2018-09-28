@@ -43,7 +43,7 @@ SCENARIO(
     namespacet ns(symbol_table);
 
     // Declare a String named arg
-    symbol_typet java_string_type("java::java.lang.String");
+    struct_tag_typet java_string_type("java::java.lang.String");
     symbol_exprt expr("arg", java_string_type);
 
     java_object_factory_parameterst object_factory_parameters;

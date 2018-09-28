@@ -36,9 +36,9 @@ SCENARIO(
       const java_class_typet &upper_type =
         to_java_class_type(upper_symbol.type);
       REQUIRE(upper_type.bases().size() == 1);
-      const symbol_typet base_type = require_type::require_symbol(
+      const struct_tag_typet base_type = require_type::require_struct_tag(
         upper_type.bases().at(0).type(), base_generic);
-      REQUIRE_FALSE(is_java_generic_symbol_type(base_type));
+      REQUIRE_FALSE(is_java_generic_struct_tag_type(base_type));
     }
     {
       const symbolt &lower_symbol =
@@ -46,9 +46,9 @@ SCENARIO(
       const java_class_typet &lower_type =
         to_java_class_type(lower_symbol.type);
       REQUIRE(lower_type.bases().size() == 1);
-      const symbol_typet base_type = require_type::require_symbol(
+      const struct_tag_typet base_type = require_type::require_struct_tag(
         lower_type.bases().at(0).type(), base_generic);
-      REQUIRE_FALSE(is_java_generic_symbol_type(base_type));
+      REQUIRE_FALSE(is_java_generic_struct_tag_type(base_type));
     }
     {
       const symbolt &interface_symbol =
@@ -56,9 +56,9 @@ SCENARIO(
       const java_class_typet &interface_type =
         to_java_class_type(interface_symbol.type);
       REQUIRE(interface_type.bases().size() == 2);
-      const symbol_typet base_type = require_type::require_symbol(
+      const struct_tag_typet base_type = require_type::require_struct_tag(
         interface_type.bases().at(1).type(), base_generic_interface);
-      REQUIRE_FALSE(is_java_generic_symbol_type(base_type));
+      REQUIRE_FALSE(is_java_generic_struct_tag_type(base_type));
     }
   }
 }

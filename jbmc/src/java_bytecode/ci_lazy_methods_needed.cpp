@@ -101,7 +101,7 @@ void ci_lazy_methods_neededt::initialize_instantiated_classes_from_pointer(
   const pointer_typet &pointer_type,
   const namespacet &ns)
 {
-  const symbol_typet &class_type = to_symbol_type(pointer_type.subtype());
+  const auto &class_type = to_struct_tag_type(pointer_type.subtype());
   const auto &param_classid = class_type.get_identifier();
 
   // Note here: different arrays may have different element types, so we should
@@ -139,10 +139,10 @@ void ci_lazy_methods_neededt::gather_field_types(
   {
     // If class_type is not a symbol this may be a reference array,
     // but we can't tell what type.
-    if(class_type.id() == ID_symbol_type)
+    if(class_type.id() == ID_struct_tag)
     {
       const typet &element_type =
-        java_array_element_type(to_symbol_type(class_type));
+        java_array_element_type(to_struct_tag_type(class_type));
       if(element_type.id() == ID_pointer)
       {
         // This is a reference array -- mark its element type available.
@@ -154,11 +154,11 @@ void ci_lazy_methods_neededt::gather_field_types(
   {
     for(const auto &field : underlying_type.components())
     {
-      if(field.type().id() == ID_struct || field.type().id() == ID_symbol_type)
+      if(field.type().id() == ID_struct || field.type().id() == ID_struct_tag)
         gather_field_types(field.type(), ns);
       else if(field.type().id() == ID_pointer)
       {
-        if(field.type().subtype().id() == ID_symbol_type)
+        if(field.type().subtype().id() == ID_struct_tag)
         {
           add_all_needed_classes(to_pointer_type(field.type()));
         }

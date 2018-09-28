@@ -70,7 +70,7 @@ symbol_exprt get_or_create_string_literal_symbol(
 {
   PRECONDITION(string_expr.id() == ID_java_string_literal);
   const irep_idt value = string_expr.get(ID_value);
-  const symbol_typet string_type("java::java.lang.String");
+  const struct_tag_typet string_type("java::java.lang.String");
 
   const std::string escaped_symbol_name = escape_non_alnum(id2string(value));
   const std::string escaped_symbol_name_with_prefix =
@@ -96,7 +96,7 @@ symbol_exprt get_or_create_string_literal_symbol(
 
   // Regardless of string refinement setting, at least initialize
   // the literal with @clsid = String
-  symbol_typet jlo_symbol("java::java.lang.Object");
+  struct_tag_typet jlo_symbol("java::java.lang.Object");
   const auto &jlo_struct = to_struct_type(ns.follow(jlo_symbol));
   struct_exprt jlo_init(jlo_symbol);
   const auto &jls_struct = to_struct_type(ns.follow(string_type));

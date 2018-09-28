@@ -105,8 +105,8 @@ java_bytecode_parse_treet::find_annotation(
       if(annotation.type.id() != ID_pointer)
         return false;
       const typet &type = annotation.type.subtype();
-      return type.id() == ID_symbol_type &&
-             to_symbol_type(type).get_identifier() == annotation_type_name;
+      return type.id() == ID_struct_tag &&
+             to_struct_tag_type(type).get_identifier() == annotation_type_name;
     });
   if(annotation_it == annotations.end())
     return {};

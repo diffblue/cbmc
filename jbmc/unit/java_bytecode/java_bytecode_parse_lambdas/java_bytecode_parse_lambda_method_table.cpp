@@ -285,7 +285,7 @@ SCENARIO(
           REQUIRE(id2string(lambda_method.descriptor) == method_type);
 
           const reference_typet dummy_generic_reference_type =
-            java_reference_type(symbol_typet{"java.lang.Object"});
+            java_reference_type(struct_tag_typet{"java.lang.Object"});
 
           // NOLINTNEXTLINE(whitespace/braces)
           fieldref_exprt fieldref{
@@ -318,7 +318,7 @@ SCENARIO(
           REQUIRE(id2string(lambda_method.descriptor) == method_type);
 
           const reference_typet dummy_generic_reference_type =
-            java_reference_type(symbol_typet{"DummyGeneric"});
+            java_reference_type(struct_tag_typet{"DummyGeneric"});
 
           fieldref_exprt fieldref{dummy_generic_reference_type,
                                   "staticSpecalisedGeneric",
@@ -912,7 +912,7 @@ SCENARIO(
             REQUIRE_FALSE(lambda_method.is_static);
 
             const reference_typet dummy_generic_reference_type =
-              java_reference_type(symbol_typet{"java.lang.Object"});
+              java_reference_type(struct_tag_typet{"java.lang.Object"});
 
             // NOLINTNEXTLINE(whitespace/braces)
             const fieldref_exprt reference_fieldref{
@@ -951,7 +951,7 @@ SCENARIO(
             REQUIRE_FALSE(lambda_method.is_static);
 
             const reference_typet dummy_generic_reference_type =
-              java_reference_type(symbol_typet{"DummyGeneric"});
+              java_reference_type(struct_tag_typet{"DummyGeneric"});
 
             // NOLINTNEXTLINE(whitespace/braces)
             const fieldref_exprt generic_reference_fieldref{
@@ -999,7 +999,7 @@ SCENARIO(
 
           // Field ref for getting the outer class
           const reference_typet outer_class_reference_type =
-            java_reference_type(symbol_typet{"OuterMemberLambdas"});
+            java_reference_type(struct_tag_typet{"OuterMemberLambdas"});
           // NOLINTNEXTLINE(whitespace/braces)
           const fieldref_exprt outer_fieldref{
             outer_class_reference_type, "this$0", "OuterMemberLambdas$Inner"};
@@ -1065,7 +1065,7 @@ SCENARIO(
             REQUIRE_FALSE(lambda_method.is_static);
 
             const reference_typet dummy_generic_reference_type =
-              java_reference_type(symbol_typet{"java.lang.Object"});
+              java_reference_type(struct_tag_typet{"java.lang.Object"});
 
             // NOLINTNEXTLINE(whitespace/braces)
             const fieldref_exprt reference_fieldref{
@@ -1107,7 +1107,7 @@ SCENARIO(
             REQUIRE_FALSE(lambda_method.is_static);
 
             const reference_typet dummy_generic_reference_type =
-              java_reference_type(symbol_typet{"DummyGeneric"});
+              java_reference_type(struct_tag_typet{"DummyGeneric"});
 
             // NOLINTNEXTLINE(whitespace/braces)
             const fieldref_exprt generic_reference_fieldref{

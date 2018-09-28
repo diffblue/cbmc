@@ -47,7 +47,7 @@ SCENARIO(
     // ... which is of type `KeyValue` ...
     const auto &subtype = gen_type.subtype();
     const auto &key_value =
-      symbol_table.lookup_ref(to_symbol_type(subtype).get_identifier());
+      symbol_table.lookup_ref(to_struct_tag_type(subtype).get_identifier());
     REQUIRE(key_value.type.id() == ID_struct);
     REQUIRE(key_value.name == "java::KeyValue");
 
@@ -63,8 +63,9 @@ SCENARIO(
         next.type(),
         {{require_type::type_argument_kindt::Var, "java::KeyValue::K"},
          {require_type::type_argument_kindt::Var, "java::KeyValue::V"}});
-    REQUIRE(next_type.subtype().id() == ID_symbol_type);
-    const symbol_typet &next_symbol = to_symbol_type(next_type.subtype());
+    REQUIRE(next_type.subtype().id() == ID_struct_tag);
+    const struct_tag_typet &next_symbol =
+      to_struct_tag_type(next_type.subtype());
     REQUIRE(
       symbol_table.lookup_ref(next_symbol.get_identifier()).name ==
       "java::KeyValue");
@@ -75,8 +76,9 @@ SCENARIO(
         reverse.type(),
         {{require_type::type_argument_kindt::Var, "java::KeyValue::V"},
          {require_type::type_argument_kindt::Var, "java::KeyValue::K"}});
-    REQUIRE(next_type.subtype().id() == ID_symbol_type);
-    const symbol_typet &reverse_symbol = to_symbol_type(reverse_type.subtype());
+    REQUIRE(next_type.subtype().id() == ID_struct_tag);
+    const struct_tag_typet &reverse_symbol =
+      to_struct_tag_type(reverse_type.subtype());
     REQUIRE(
       symbol_table.lookup_ref(next_symbol.get_identifier()).name ==
       "java::KeyValue");

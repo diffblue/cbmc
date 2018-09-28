@@ -380,8 +380,8 @@ void java_bytecode_convert_method_lazy(
   {
     java_method_typet::parameterst &parameters = member_type.parameters();
     java_method_typet::parametert this_p;
-    const reference_typet object_ref_type=
-      java_reference_type(symbol_typet(class_symbol.name));
+    const reference_typet object_ref_type =
+      java_reference_type(struct_tag_typet(class_symbol.name));
     this_p.type()=object_ref_type;
     this_p.set_this();
     parameters.insert(parameters.begin(), this_p);
@@ -655,7 +655,7 @@ static irep_idt get_if_cmp_operator(const irep_idt &stmt)
 
 static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
 {
-  symbol_typet class_type(fieldref.get(ID_class));
+  struct_tag_typet class_type(fieldref.get(ID_class));
 
   const typecast_exprt pointer2(pointer, java_reference_type(class_type));
 
@@ -1181,9 +1181,11 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     {
       if(cur_pc==it->handler_pc)
       {
-        if(catch_type != typet() || it->catch_type == symbol_typet(irep_idt()))
+        if(
+          catch_type != typet() ||
+          it->catch_type == struct_tag_typet(irep_idt()))
         {
-          catch_type=symbol_typet("java::java.lang.Throwable");
+          catch_type = struct_tag_typet("java::java.lang.Throwable");
           break;
         }
         else
@@ -1617,7 +1619,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       const typecast_exprt pointer(op[0], java_array_type(statement[0]));
 
       dereference_exprt array(pointer, pointer.type().subtype());
-      PRECONDITION(pointer.type().subtype().id() == ID_symbol_type);
+      PRECONDITION(pointer.type().subtype().id() == ID_struct_tag);
       array.set(ID_java_member_access, true);
 
       const member_exprt length(array, "length", java_int_type());
@@ -2088,7 +2090,7 @@ void java_bytecode_convert_methodt::convert_invoke(
     if(parameters.empty() || !parameters[0].get_this())
     {
       irep_idt classname = arg0.get(ID_C_class);
-      typet thistype = symbol_typet(classname);
+      typet thistype = struct_tag_typet(classname);
       // Note invokespecial is used for super-method calls as well as
       // constructors.
       if(statement == "invokespecial")
@@ -2504,7 +2506,7 @@ void java_bytecode_convert_methodt::convert_new(
   c = code_assignt(tmp, java_new_expr);
   c.add_source_location() = location;
   codet clinit_call =
-    get_clinit_call(to_symbol_type(arg0.type()).get_identifier());
+    get_clinit_call(to_struct_tag_type(arg0.type()).get_identifier());
   if(clinit_call.get_statement() != ID_skip)
   {
     c = code_blockt({clinit_call, c});
@@ -2518,10 +2520,10 @@ code_blockt java_bytecode_convert_methodt::convert_putstatic(
   const exprt::operandst &op,
   const symbol_exprt &symbol_expr)
 {
-  if(needed_lazy_methods && arg0.type().id() == ID_symbol_type)
+  if(needed_lazy_methods && arg0.type().id() == ID_struct_tag)
   {
     needed_lazy_methods->add_needed_class(
-      to_symbol_type(arg0.type()).get_identifier());
+      to_struct_tag_type(arg0.type()).get_identifier());
   }
 
   code_blockt block;
@@ -2566,18 +2568,18 @@ void java_bytecode_convert_methodt::convert_getstatic(
 {
   if(needed_lazy_methods)
   {
-    if(arg0.type().id() == ID_symbol_type)
+    if(arg0.type().id() == ID_struct_tag)
     {
       needed_lazy_methods->add_needed_class(
-        to_symbol_type(arg0.type()).get_identifier());
+        to_struct_tag_type(arg0.type()).get_identifier());
     }
     else if(arg0.type().id() == ID_pointer)
     {
       const auto &pointer_type = to_pointer_type(arg0.type());
-      if(pointer_type.subtype().id() == ID_symbol_type)
+      if(pointer_type.subtype().id() == ID_struct_tag)
       {
         needed_lazy_methods->add_needed_class(
-          to_symbol_type(pointer_type.subtype()).get_identifier());
+          to_struct_tag_type(pointer_type.subtype()).get_identifier());
       }
     }
     else if(is_assertions_disabled_field)

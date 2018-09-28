@@ -358,11 +358,11 @@ typet java_boolean_type();
 typet java_void_type();
 reference_typet java_reference_type(const typet &subtype);
 reference_typet java_lang_object_type();
-symbol_typet java_classname(const std::string &);
+struct_tag_typet java_classname(const std::string &);
 
 reference_typet java_array_type(const char subtype);
-const typet &java_array_element_type(const symbol_typet &array_symbol);
-typet &java_array_element_type(symbol_typet &array_symbol);
+const typet &java_array_element_type(const struct_tag_typet &array_symbol);
+typet &java_array_element_type(struct_tag_typet &array_symbol);
 bool is_java_array_type(const typet &type);
 bool is_multidim_java_array_type(const typet &type);
 
@@ -397,15 +397,15 @@ bool equal_java_types(const typet &type1, const typet &type2);
 class java_generic_parametert:public reference_typet
 {
 public:
-  typedef symbol_typet type_variablet;
+  typedef struct_tag_typet type_variablet;
 
   java_generic_parametert(
     const irep_idt &_type_var_name,
-    const symbol_typet &_bound):
-    reference_typet(java_reference_type(_bound))
+    const struct_tag_typet &_bound)
+    : reference_typet(java_reference_type(_bound))
   {
     set(ID_C_java_generic_parameter, true);
-    type_variables().push_back(symbol_typet(_type_var_name));
+    type_variables().push_back(struct_tag_typet(_type_var_name));
   }
 
   /// \return the type variable as symbol type
@@ -748,16 +748,16 @@ void get_dependencies_from_generic_parameters(
   const typet &,
   std::set<irep_idt> &);
 
-/// Type for a generic symbol, extends symbol_typet with a
+/// Type for a generic symbol, extends struct_tag_typet with a
 /// vector of java generic types.
 /// This is used to store the type of generic superclasses and interfaces.
-class java_generic_symbol_typet : public symbol_typet
+class java_generic_struct_tag_typet : public struct_tag_typet
 {
 public:
   typedef std::vector<reference_typet> generic_typest;
 
-  java_generic_symbol_typet(
-    const symbol_typet &type,
+  java_generic_struct_tag_typet(
+    const struct_tag_typet &type,
     const std::string &base_ref,
     const std::string &class_name_prefix);
 
@@ -777,26 +777,27 @@ public:
 
 /// \param type: the type to check
 /// \return true if the type is a symbol type with generics
-inline bool is_java_generic_symbol_type(const typet &type)
+inline bool is_java_generic_struct_tag_type(const typet &type)
 {
   return type.get_bool(ID_C_java_generic_symbol);
 }
 
 /// \param type: the type to convert
 /// \return the converted type
-inline const java_generic_symbol_typet &
-to_java_generic_symbol_type(const typet &type)
+inline const java_generic_struct_tag_typet &
+to_java_generic_struct_tag_type(const typet &type)
 {
-  PRECONDITION(is_java_generic_symbol_type(type));
-  return static_cast<const java_generic_symbol_typet &>(type);
+  PRECONDITION(is_java_generic_struct_tag_type(type));
+  return static_cast<const java_generic_struct_tag_typet &>(type);
 }
 
 /// \param type: the type to convert
 /// \return the converted type
-inline java_generic_symbol_typet &to_java_generic_symbol_type(typet &type)
+inline java_generic_struct_tag_typet &
+to_java_generic_struct_tag_type(typet &type)
 {
-  PRECONDITION(is_java_generic_symbol_type(type));
-  return static_cast<java_generic_symbol_typet &>(type);
+  PRECONDITION(is_java_generic_struct_tag_type(type));
+  return static_cast<java_generic_struct_tag_typet &>(type);
 }
 
 /// Take a signature string and remove everything in angle brackets allowing for

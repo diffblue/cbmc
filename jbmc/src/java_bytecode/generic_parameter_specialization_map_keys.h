@@ -1,3 +1,4 @@
+
 /// Author: Diffblue Ltd.
 
 #ifndef CPROVER_JAVA_BYTECODE_GENERIC_PARAMETER_SPECIALIZATION_MAP_KEYS_H
@@ -50,9 +51,8 @@ public:
   void insert_pairs_for_pointer(
     const pointer_typet &pointer_type,
     const typet &pointer_subtype_struct);
-  void insert_pairs_for_symbol(
-    const symbol_typet &symbol_type,
-    const typet &symbol_struct);
+  void
+  insert_pairs_for_symbol(const struct_tag_typet &, const typet &symbol_struct);
 
 private:
   /// Generic parameter specialization map to modify

@@ -33,10 +33,10 @@ SCENARIO(
     THEN("It is an array")
     {
       const pointer_typet &field_t_pointer = require_type::require_pointer(
-        field_t.type(), symbol_typet("java::array[reference]"));
+        field_t.type(), struct_tag_typet("java::array[reference]"));
 
-      const symbol_typet &field_t_subtype =
-        to_symbol_type(field_t_pointer.subtype());
+      const struct_tag_typet &field_t_subtype =
+        to_struct_tag_type(field_t_pointer.subtype());
       const struct_typet &subtype_type = to_struct_type(
         new_symbol_table.lookup_ref(field_t_subtype.get_identifier()).type);
       REQUIRE(is_valid_java_array(subtype_type));
@@ -58,10 +58,10 @@ SCENARIO(
     THEN("It is an array")
     {
       const pointer_typet &field_t2_pointer = require_type::require_pointer(
-        field_t2.type(), symbol_typet("java::array[reference]"));
+        field_t2.type(), struct_tag_typet("java::array[reference]"));
 
-      const symbol_typet &field_t2_subtype =
-        to_symbol_type(field_t2_pointer.subtype());
+      const struct_tag_typet &field_t2_subtype =
+        to_struct_tag_type(field_t2_pointer.subtype());
       const struct_typet &subtype_struct = to_struct_type(
         new_symbol_table.lookup_ref(field_t2_subtype.get_identifier()).type);
       REQUIRE(is_valid_java_array(subtype_struct));
@@ -69,7 +69,8 @@ SCENARIO(
       THEN("The elements have type Generic<T>")
       {
         const typet &element = java_array_element_type(field_t2_subtype);
-        require_type::require_pointer(element, symbol_typet("java::Generic"));
+        require_type::require_pointer(
+          element, struct_tag_typet("java::Generic"));
         require_type::require_java_generic_type(
           element,
           {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
@@ -85,10 +86,10 @@ SCENARIO(
     THEN("It is an array")
     {
       const pointer_typet &field_t3_pointer = require_type::require_pointer(
-        field_t3.type(), symbol_typet("java::array[reference]"));
+        field_t3.type(), struct_tag_typet("java::array[reference]"));
 
-      const symbol_typet &field_t3_subtype =
-        to_symbol_type(field_t3_pointer.subtype());
+      const struct_tag_typet &field_t3_subtype =
+        to_struct_tag_type(field_t3_pointer.subtype());
       const struct_typet &subtype_struct = to_struct_type(
         new_symbol_table.lookup_ref(field_t3_subtype.get_identifier()).type);
       REQUIRE(is_valid_java_array(subtype_struct));
@@ -96,7 +97,8 @@ SCENARIO(
       THEN("The elements have type Generic<Integer>")
       {
         const typet &element = java_array_element_type(field_t3_subtype);
-        require_type::require_pointer(element, symbol_typet("java::Generic"));
+        require_type::require_pointer(
+          element, struct_tag_typet("java::Generic"));
         require_type::require_java_generic_type(
           element,
           {{require_type::type_argument_kindt::Inst,

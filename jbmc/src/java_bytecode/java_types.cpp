@@ -84,7 +84,7 @@ reference_typet java_reference_type(const typet &subtype)
 
 reference_typet java_lang_object_type()
 {
-  return java_reference_type(symbol_typet("java::java.lang.Object"));
+  return java_reference_type(struct_tag_typet("java::java.lang.Object"));
 }
 
 /// Construct an array pointer type. It is a pointer to a symbol with identifier
@@ -117,16 +117,16 @@ reference_typet java_array_type(const char subtype)
 
   irep_idt class_name="array["+subtype_str+"]";
 
-  symbol_typet symbol_type("java::"+id2string(class_name));
-  symbol_type.set(ID_C_base_name, class_name);
-  symbol_type.set(ID_element_type, java_type_from_char(subtype));
+  struct_tag_typet struct_tag_type("java::" + id2string(class_name));
+  struct_tag_type.set(ID_C_base_name, class_name);
+  struct_tag_type.set(ID_element_type, java_type_from_char(subtype));
 
-  return java_reference_type(symbol_type);
+  return java_reference_type(struct_tag_type);
 }
 
 /// Return a const reference to the element type of a given java array type
 /// \param array_symbol The java array type
-const typet &java_array_element_type(const symbol_typet &array_symbol)
+const typet &java_array_element_type(const struct_tag_typet &array_symbol)
 {
   DATA_INVARIANT(
     is_java_array_tag(array_symbol.get_identifier()),
@@ -136,7 +136,7 @@ const typet &java_array_element_type(const symbol_typet &array_symbol)
 
 /// Return a non-const reference to the element type of a given java array type
 /// \param array_symbol The java array type
-typet &java_array_element_type(symbol_typet &array_symbol)
+typet &java_array_element_type(struct_tag_typet &array_symbol)
 {
   DATA_INVARIANT(
     is_java_array_tag(array_symbol.get_identifier()),
@@ -149,12 +149,12 @@ bool is_java_array_type(const typet &type)
 {
   if(
     !can_cast_type<pointer_typet>(type) ||
-    !can_cast_type<symbol_typet>(type.subtype()))
+    !can_cast_type<struct_tag_typet>(type.subtype()))
   {
     return false;
   }
-  const auto &subtype_symbol = to_symbol_type(type.subtype());
-  return is_java_array_tag(subtype_symbol.get_identifier());
+  const auto &subtype_struct_tag = to_struct_tag_type(type.subtype());
+  return is_java_array_tag(subtype_struct_tag.get_identifier());
 }
 
 /// Checks whether the given type is a multi-dimensional array pointer type,
@@ -162,9 +162,8 @@ bool is_java_array_type(const typet &type)
 /// array type.
 bool is_multidim_java_array_type(const typet &type)
 {
-  return is_java_array_type(type) &&
-         is_java_array_type(
-           java_array_element_type(to_symbol_type(type.subtype())));
+  return is_java_array_type(type) && is_java_array_type(java_array_element_type(
+                                       to_struct_tag_type(type.subtype())));
 }
 
 /// See above
@@ -417,13 +416,13 @@ build_class_name(const std::string &src, const std::string &class_name_prefix)
 
   std::string container_class = gather_full_class_name(src);
   std::string identifier = "java::" + container_class;
-  symbol_typet symbol_type(identifier);
-  symbol_type.set(ID_C_base_name, container_class);
+  struct_tag_typet struct_tag_type(identifier);
+  struct_tag_type.set(ID_C_base_name, container_class);
 
   std::size_t f_pos = src.find('<', 1);
   if(f_pos != std::string::npos)
   {
-    java_generic_typet result(symbol_type);
+    java_generic_typet result(struct_tag_type);
     // get generic type information
     do
     {
@@ -441,7 +440,7 @@ build_class_name(const std::string &src, const std::string &class_name_prefix)
     return std::move(result);
   }
 
-  return java_reference_type(symbol_type);
+  return java_reference_type(struct_tag_type);
 }
 
 /// Finds the closing semi-colon ending a ClassTypeSignature that starts at
@@ -611,7 +610,8 @@ typet java_type_from_string(
     irep_idt type_var_name(class_name_prefix+"::"+src.substr(1, src.size()-2));
     return java_generic_parametert(
       type_var_name,
-      to_symbol_type(java_type_from_string("Ljava/lang/Object;").subtype()));
+      to_struct_tag_type(
+        java_type_from_string("Ljava/lang/Object;").subtype()));
   }
   case 'L':
     {
@@ -711,7 +711,8 @@ std::vector<typet> java_generic_type_from_string(
 
     java_generic_parametert type_var_type(
       type_var_name,
-      to_symbol_type(java_type_from_string(bound_type, class_name).subtype()));
+      to_struct_tag_type(
+        java_type_from_string(bound_type, class_name).subtype()));
 
     types.push_back(type_var_type);
     signature=signature.substr(var_sep+1, std::string::npos);
@@ -730,19 +731,19 @@ static std::string slash_to_dot(const std::string &src)
   return result;
 }
 
-symbol_typet java_classname(const std::string &id)
+struct_tag_typet java_classname(const std::string &id)
 {
   if(!id.empty() && id[0]=='[')
-    return to_symbol_type(java_type_from_string(id).subtype());
+    return to_struct_tag_type(java_type_from_string(id).subtype());
 
   std::string class_name=id;
 
   class_name=slash_to_dot(class_name);
   irep_idt identifier="java::"+class_name;
-  symbol_typet symbol_type(identifier);
-  symbol_type.set(ID_C_base_name, class_name);
+  struct_tag_typet struct_tag_type(identifier);
+  struct_tag_type.set(ID_C_base_name, class_name);
 
-  return symbol_type;
+  return struct_tag_type;
 }
 
 /// Programmatic documentation of the structure of a Java array (of either
@@ -800,11 +801,11 @@ bool equal_java_types(const typet &type1, const typet &type2)
   bool arrays_with_same_element_type = true;
   if(
     type1.id() == ID_pointer && type2.id() == ID_pointer &&
-    type1.subtype().id() == ID_symbol_type &&
-    type2.subtype().id() == ID_symbol_type)
+    type1.subtype().id() == ID_struct_tag &&
+    type2.subtype().id() == ID_struct_tag)
   {
-    const symbol_typet &subtype_symbol1 = to_symbol_type(type1.subtype());
-    const symbol_typet &subtype_symbol2 = to_symbol_type(type2.subtype());
+    const auto &subtype_symbol1 = to_struct_tag_type(type1.subtype());
+    const auto &subtype_symbol2 = to_struct_tag_type(type2.subtype());
     if(
       subtype_symbol1.get_identifier() == subtype_symbol2.get_identifier() &&
       is_java_array_tag(subtype_symbol1.get_identifier()))
@@ -847,15 +848,15 @@ void get_dependencies_from_generic_parameters_rec(
       get_dependencies_from_generic_parameters_rec(param.type(), refs);
   }
 
-  // symbol type
-  else if(t.id() == ID_symbol_type)
+  // struct tag
+  else if(t.id() == ID_struct_tag)
   {
-    const symbol_typet &symbol_type = to_symbol_type(t);
-    const irep_idt class_name(symbol_type.get_identifier());
+    const auto &struct_tag_type = to_struct_tag_type(t);
+    const irep_idt class_name(struct_tag_type.get_identifier());
     if(is_java_array_tag(class_name))
     {
       get_dependencies_from_generic_parameters(
-        java_array_element_type(symbol_type), refs);
+        java_array_element_type(struct_tag_type), refs);
     }
     else
       refs.insert(strip_java_namespace_prefix(class_name));
@@ -916,25 +917,27 @@ void get_dependencies_from_generic_parameters(
 /// This assumes that the class named \p class_name_prefix extends or implements
 /// the class \p type, and that \p base_ref corresponds to a generic class.
 /// For instance since HashMap<K,V> extends Map<K,V> we would call
-/// `java_generic_symbol_typet(symbol_typet("Map"), "Ljava/util/Map<TK;TV;>;",
+/// `java_generic_struct_tag_typet(struct_tag_typet("Map"), "Ljava/util/Map<TK;TV;>;",
 /// "java.util.HashMap")` which generates a symbol type with identifier "Map",
 /// and two generic types with identifier "java.util.HashMap::K" and
 /// "java.util.HashMap::V" respectively.
-java_generic_symbol_typet::java_generic_symbol_typet(
-  const symbol_typet &type,
+java_generic_struct_tag_typet::java_generic_struct_tag_typet(
+  const struct_tag_typet &type,
   const std::string &base_ref,
   const std::string &class_name_prefix)
-  : symbol_typet(type)
+  : struct_tag_typet(type)
 {
   set(ID_C_java_generic_symbol, true);
   const typet &base_type = java_type_from_string(base_ref, class_name_prefix);
   PRECONDITION(is_java_generic_type(base_type));
   const java_generic_typet &gen_base_type = to_java_generic_type(base_type);
   INVARIANT(
-    type.get_identifier() == to_symbol_type(gen_base_type.subtype()).get_identifier(),
-    "identifier of "+type.pretty()+"\n and identifier of type "+
-    gen_base_type.subtype().pretty()+"\ncreated by java_type_from_string for "+
-    base_ref+" should be equal");
+    type.get_identifier() ==
+      to_struct_tag_type(gen_base_type.subtype()).get_identifier(),
+    "identifier of " + type.pretty() + "\n and identifier of type " +
+      gen_base_type.subtype().pretty() +
+      "\ncreated by java_type_from_string for " + base_ref +
+      " should be equal");
   generic_types().insert(
     generic_types().end(),
     gen_base_type.generic_type_arguments().begin(),
@@ -945,7 +948,7 @@ java_generic_symbol_typet::java_generic_symbol_typet(
 /// in the vector of generic types.
 /// \param type The parameter type we are looking for.
 /// \return The index of the type in the vector of generic types.
-optionalt<size_t> java_generic_symbol_typet::generic_type_index(
+optionalt<size_t> java_generic_struct_tag_typet::generic_type_index(
   const java_generic_parametert &type) const
 {
   const auto &type_variable = type.get_name();
@@ -984,12 +987,13 @@ std::string pretty_java_type(const typet &type)
     return "byte";
   else if(is_reference(type))
   {
-    if(type.subtype().id() == ID_symbol_type)
+    if(type.subtype().id() == ID_struct_tag)
     {
-      const auto &symbol_type = to_symbol_type(type.subtype());
-      const irep_idt &id = symbol_type.get_identifier();
+      const auto &struct_tag_type = to_struct_tag_type(type.subtype());
+      const irep_idt &id = struct_tag_type.get_identifier();
       if(is_java_array_tag(id))
-        return pretty_java_type(java_array_element_type(symbol_type)) + "[]";
+        return pretty_java_type(java_array_element_type(struct_tag_type)) +
+               "[]";
       else
         return id2string(strip_java_namespace_prefix(id));
     }

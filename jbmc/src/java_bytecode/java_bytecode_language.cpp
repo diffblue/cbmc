@@ -362,7 +362,7 @@ static void infer_opaque_type_fields(
 static symbol_exprt get_or_create_class_literal_symbol(
   const irep_idt &class_id, symbol_tablet &symbol_table)
 {
-  symbol_typet java_lang_Class("java::java.lang.Class");
+  struct_tag_typet java_lang_Class("java::java.lang.Class");
   symbol_exprt symbol_expr(
     id2string(class_id) + JAVA_CLASS_MODEL_SUFFIX,
     java_lang_Class);

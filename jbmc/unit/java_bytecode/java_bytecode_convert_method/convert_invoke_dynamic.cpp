@@ -72,8 +72,8 @@ void validate_lambda_assignment(
   const pointer_typet &lambda_temp_type =
     require_type::require_pointer(side_effect_expr.type(), {});
 
-  const symbol_typet &lambda_implementor_type =
-    require_type::require_symbol(lambda_temp_type.subtype());
+  const struct_tag_typet &lambda_implementor_type =
+    require_type::require_struct_tag(lambda_temp_type.subtype());
 
   const irep_idt &tmp_class_identifier =
     lambda_implementor_type.get_identifier();
@@ -110,7 +110,7 @@ void validate_lambda_assignment(
   const java_class_typet::componentt super_class_component =
     require_type::require_component(tmp_lambda_class_type, "@java.lang.Object");
 
-  const symbol_typet &super_class_type = require_type::require_symbol(
+  const struct_tag_typet &super_class_type = require_type::require_struct_tag(
     super_class_component.type(), "java::java.lang.Object");
 
   THEN("The function in the class should call the lambda method")

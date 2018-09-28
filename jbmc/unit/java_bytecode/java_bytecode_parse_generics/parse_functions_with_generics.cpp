@@ -40,7 +40,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         THEN("x is generic with parameter pointing to java.lang.Integer")
         {
@@ -55,7 +55,7 @@ SCENARIO(
       {
         const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          return_type, struct_tag_typet("java::Generic"));
 
         THEN("It is generic with parameter pointing to java.lang.Integer")
         {
@@ -89,7 +89,7 @@ SCENARIO(
         const java_method_typet::parametert &param_s =
           require_type::require_parameter(func_code, "s");
         require_type::require_pointer(
-          param_s.type(), symbol_typet("java::Generic"));
+          param_s.type(), struct_tag_typet("java::Generic"));
 
         THEN("s is generic with parameter pointing to java.lang.String")
         {
@@ -104,7 +104,7 @@ SCENARIO(
       {
         const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          return_type, struct_tag_typet("java::Generic"));
 
         THEN("It is generic with parameter pointing to java.lang.Integer")
         {
@@ -138,7 +138,7 @@ SCENARIO(
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
-          param_x.type(), symbol_typet("java::Generic"));
+          param_x.type(), struct_tag_typet("java::Generic"));
 
         THEN("x is generic with parameter pointing to java.lang.Integer")
         {
@@ -154,7 +154,7 @@ SCENARIO(
         const java_method_typet::parametert &param_y =
           require_type::require_parameter(func_code, "y");
         require_type::require_pointer(
-          param_y.type(), symbol_typet("java::Generic"));
+          param_y.type(), struct_tag_typet("java::Generic"));
 
         THEN("y is generic with parameter pointing to java.lang.Integer")
         {
@@ -169,7 +169,7 @@ SCENARIO(
       {
         const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          return_type, struct_tag_typet("java::Generic"));
 
         THEN("It is generic with parameter pointing to java.lang.Integer")
         {
@@ -203,7 +203,7 @@ SCENARIO(
         const java_method_typet::parametert &param_s =
           require_type::require_parameter(func_code, "s");
         require_type::require_pointer(
-          param_s.type(), symbol_typet("java::Generic"));
+          param_s.type(), struct_tag_typet("java::Generic"));
 
         THEN("s is generic with parameter pointing to java.lang.String")
         {
@@ -219,7 +219,7 @@ SCENARIO(
         const java_method_typet::parametert &param_b =
           require_type::require_parameter(func_code, "b");
         require_type::require_pointer(
-          param_b.type(), symbol_typet("java::Generic"));
+          param_b.type(), struct_tag_typet("java::Generic"));
 
         THEN("b is generic with parameter pointing to java.lang.Boolean")
         {
@@ -234,7 +234,7 @@ SCENARIO(
       {
         const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          return_type, struct_tag_typet("java::Generic"));
 
         THEN("It is generic with parameter pointing to java.lang.Integer")
         {
@@ -269,14 +269,14 @@ SCENARIO(
         const java_method_typet::parametert &param_inner =
           require_type::require_parameter(func_code, "inner");
         require_type::require_pointer(
-          param_inner.type(), symbol_typet(class_prefix + "$Inner"));
+          param_inner.type(), struct_tag_typet(class_prefix + "$Inner"));
       }
 
       THEN("It has return type pointing to Generic")
       {
         const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          return_type, struct_tag_typet("java::Generic"));
 
         THEN("It is generic with parameter pointing to java.lang.Integer")
         {
