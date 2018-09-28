@@ -32,8 +32,7 @@ enum class remove_exceptions_typest
 };
 
 void remove_exceptions(
-  goto_programt &goto_program,
-  symbol_table_baset &symbol_table,
+  goto_model_functiont &goto_model_function,
   message_handlert &message_handler,
   remove_exceptions_typest type =
     remove_exceptions_typest::DONT_REMOVE_INSTANCEOF);
