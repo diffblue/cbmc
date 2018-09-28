@@ -18,8 +18,6 @@
 
 #include <goto-programs/lazy_goto_model.h>
 
-#include <langapi/mode.h>
-
 #include <java_bytecode/java_bytecode_language.h>
 #include <util/file_util.h>
 
@@ -38,10 +36,9 @@ symbol_tablet load_java_class_lazy(
   const std::string &class_path,
   const std::string &main)
 {
-  register_language(new_java_bytecode_language);
+  std::unique_ptr<languaget> lang = new_java_bytecode_language();
 
-  return load_java_class(
-    java_class_name, class_path, main, get_language_from_mode(ID_java));
+  return load_java_class(java_class_name, class_path, main, std::move(lang));
 }
 
 /// Returns the symbol table from
@@ -192,12 +189,8 @@ std::unique_ptr<goto_modelt> load_goto_model_from_java_class(
   command_line.add_flag("no-lazy-methods");
   command_line.add_flag("no-refine-strings");
 
-  register_language(new_java_bytecode_language);
+  std::unique_ptr<languaget> lang = new_java_bytecode_language();
 
   return load_goto_model_from_java_class(
-    java_class_name,
-    class_path,
-    main,
-    get_language_from_mode(ID_java),
-    command_line);
+    java_class_name, class_path, main, std::move(lang), command_line);
 }
