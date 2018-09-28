@@ -402,8 +402,8 @@ protected:
     exprt &value);
 
   void add_this_to_method_type(
-    const irep_idt &compound_identifier,
-    typet &method_type,
+    const symbolt &compound_symbol,
+    code_typet &method_type,
     const typet &method_qualifier);
 
   // for function overloading

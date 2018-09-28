@@ -1283,10 +1283,7 @@ void cpp_typecheckt::typecheck_member_function(
   }
   else
   {
-    add_this_to_method_type(
-      compound_symbol.name,
-      type,
-      method_qualifier);
+    add_this_to_method_type(compound_symbol, type, method_qualifier);
   }
 
   if(value.id() == ID_cpp_not_typechecked && value.has_operands())
@@ -1344,11 +1341,11 @@ void cpp_typecheckt::typecheck_member_function(
 }
 
 void cpp_typecheckt::add_this_to_method_type(
-  const irep_idt &compound_symbol,
-  typet &type,
+  const symbolt &compound_symbol,
+  code_typet &type,
   const typet &method_qualifier)
 {
-  code_typet::parameterst &parameters=to_code_type(type).parameters();
+  code_typet::parameterst &parameters = type.parameters();
 
   parameters.insert(
     parameters.begin(), code_typet::parametert());
@@ -1359,7 +1356,7 @@ void cpp_typecheckt::add_this_to_method_type(
   parameter.set_base_name(ID_this);
   parameter.set_this();
 
-  typet subtype=symbol_typet(compound_symbol);
+  typet subtype = symbol_typet(compound_symbol.name);
 
   if(has_const(method_qualifier))
     subtype.set(ID_C_constant, true);
