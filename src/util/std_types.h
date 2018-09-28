@@ -291,10 +291,6 @@ public:
   class baset : public exprt
   {
   public:
-    baset() : exprt(ID_base)
-    {
-    }
-
     explicit baset(const typet &base) : exprt(ID_base, base)
     {
     }
