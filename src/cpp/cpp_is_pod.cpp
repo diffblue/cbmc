@@ -25,7 +25,7 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
 
     const struct_typet &struct_type=to_struct_type(type);
 
-    if(!type.find(ID_bases).get_sub().empty())
+    if(!struct_type.bases().empty())
       return false;
 
     const struct_typet::componentst &components=

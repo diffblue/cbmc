@@ -1646,8 +1646,7 @@ void cpp_typecheckt::get_bases(
   {
     DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-    const struct_typet &base =
-      to_struct_type(lookup(to_symbol_type(b.type()).get_identifier()).type);
+    const struct_typet &base = to_struct_type(lookup(b.type()).type);
 
     set_bases.insert(base.get(ID_name));
     get_bases(base, set_bases);
@@ -1665,8 +1664,7 @@ void cpp_typecheckt::get_virtual_bases(
   {
     DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-    const struct_typet &base =
-      to_struct_type(lookup(to_symbol_type(b.type()).get_identifier()).type);
+    const struct_typet &base = to_struct_type(lookup(b.type()).type);
 
     if(b.get_bool(ID_virtual))
       vbases.push_back(base.get(ID_name));

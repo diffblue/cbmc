@@ -291,11 +291,17 @@ public:
   class baset : public exprt
   {
   public:
-    baset() : exprt(ID_base)
+    symbol_typet &type()
     {
+      return to_symbol_type(exprt::type());
     }
 
-    explicit baset(const typet &base) : exprt(ID_base, base)
+    const symbol_typet &type() const
+    {
+      return to_symbol_type(exprt::type());
+    }
+
+    explicit baset(const symbol_typet &base) : exprt(ID_base, base)
     {
     }
   };

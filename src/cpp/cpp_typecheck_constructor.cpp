@@ -190,7 +190,7 @@ void cpp_typecheckt::default_cpctor(
   {
     DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-    const symbolt &parsymb = lookup(to_symbol_type(b.type()).get_identifier());
+    const symbolt &parsymb = lookup(b.type());
 
     if(cpp_is_pod(parsymb.type))
       copy_parent(source_location, parsymb.base_name, param_identifier, block);
@@ -359,7 +359,7 @@ void cpp_typecheckt::default_assignop_value(
   {
     DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-    const symbolt &symb = lookup(to_symbol_type(b.type()).get_identifier());
+    const symbolt &symb = lookup(b.type());
 
     copy_parent(source_location, symb.base_name, arg_name, block);
   }
@@ -595,8 +595,7 @@ void cpp_typecheckt::full_member_initialization(
     {
       DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-      const symbolt &ctorsymb =
-        lookup(to_symbol_type(b.type()).get_identifier());
+      const symbolt &ctorsymb = lookup(b.type());
 
       if(cpp_is_pod(ctorsymb.type))
         continue;

@@ -203,7 +203,7 @@ static void clinit_wrapper_do_recursive_calls(
   const symbolt &class_symbol = symbol_table.lookup_ref(class_name);
   for(const auto &base : to_class_type(class_symbol.type).bases())
   {
-    const auto base_name = to_symbol_type(base.type()).get_identifier();
+    const auto base_name = base.type().get_identifier();
     irep_idt base_init_routine = clinit_wrapper_name(base_name);
     auto findit = symbol_table.symbols.find(base_init_routine);
     if(findit == symbol_table.symbols.end())
@@ -286,7 +286,7 @@ static bool needs_clinit_wrapper(
   for(const class_typet::baset &base : class_type.bases())
   {
     if(symbol_table.has_symbol(
-         clinit_wrapper_name(to_symbol_type(base.type()).get_identifier())))
+         clinit_wrapper_name(base.type().get_identifier())))
     {
       return true;
     }
