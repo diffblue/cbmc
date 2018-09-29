@@ -4,7 +4,7 @@ ROOT = ../
 include config.inc
 
 .PHONY: all
-all: janalyzer.dir jbmc.dir jdiff.dir
+all: janalyzer.dir jbmc.dir jdiff.dir library
 
 # building cbmc proper
 .PHONY: cprover.dir
@@ -25,6 +25,19 @@ jdiff.dir: java_bytecode.dir cprover.dir
 
 .PHONY: miniz.dir
 miniz.dir:
+
+LIBRARY_DIR = ../lib/java-models-library
+
+clean: clean_library
+
+.PHONY: clean_library
+clean_library:
+	rm -rf core-models.jar
+	if [ -d $(LIBRARY_DIR) ]; then cd $(LIBRARY_DIR); mvn clean; fi
+
+.PHONY: library
+library:
+	if [ -d $(LIBRARY_DIR) ]; then (cd $(LIBRARY_DIR); mvn package); cp $(LIBRARY_DIR)/target/core-models.jar java_bytecode/library/ ; fi
 
 $(patsubst %, %.dir, $(DIRS)):
 	## Entering $(basename $@)

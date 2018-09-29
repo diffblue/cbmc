@@ -52,17 +52,7 @@ include ../$(CPROVER_DIR)/src/common
 
 CLEANFILES = java_bytecode$(LIBEXT)
 
-all: library java_bytecode$(LIBEXT)
-
-clean: clean_library
-
-.PHONY: clean_library
-clean_library:
-	$(MAKE) clean -C library
-
-.PHONY: library
-library:
-	$(MAKE) -C library
+all: java_bytecode$(LIBEXT)
 
 ###############################################################################
 
