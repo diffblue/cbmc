@@ -21,11 +21,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 bool cpp_typecheck_fargst::has_class_type() const
 {
-  for(exprt::operandst::const_iterator it=operands.begin();
-      it!=operands.end();
-      it++)
+  for(const auto &op : operands)
   {
-    if(it->type().id()==ID_struct)
+    if(op.type().id() == ID_struct)
       return true;
   }
 
@@ -40,8 +38,8 @@ void cpp_typecheck_fargst::build(
   operands.clear();
   operands.reserve(function_call.op1().operands().size());
 
-  for(std::size_t i=0; i<function_call.op1().operands().size(); i++)
-    operands.push_back(function_call.op1().operands()[i]);
+  for(const auto &op : function_call.op1().operands())
+    operands.push_back(op);
 }
 
 bool cpp_typecheck_fargst::match(

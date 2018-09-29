@@ -51,12 +51,9 @@ void cpp_scopet::lookup(
     return; // done
 
   // using scopes
-  for(scope_listt::iterator
-      it=using_scopes.begin();
-      it!=using_scopes.end();
-      it++)
+  for(const auto &s_ptr : using_scopes)
   {
-    cpp_scopet &other_scope=static_cast<cpp_scopet &>(**it);
+    cpp_scopet &other_scope = static_cast<cpp_scopet &>(*s_ptr);
 
     // Recursive call.
     // Note the different kind!
@@ -67,12 +64,9 @@ void cpp_scopet::lookup(
     return; // done, upwards scopes are hidden
 
   // secondary scopes
-  for(scope_listt::iterator
-      it=secondary_scopes.begin();
-      it!=secondary_scopes.end();
-      it++)
+  for(const auto &s_ptr : secondary_scopes)
   {
-    cpp_scopet &other_scope=static_cast<cpp_scopet &>(**it);
+    cpp_scopet &other_scope = static_cast<cpp_scopet &>(*s_ptr);
 
     // Recursive call.
     // Note the different kind!
@@ -130,12 +124,9 @@ void cpp_scopet::lookup(
     return; // done
 
   // using scopes
-  for(scope_listt::iterator
-      it=using_scopes.begin();
-      it!=using_scopes.end();
-      it++)
+  for(const auto &s_ptr : using_scopes)
   {
-    cpp_scopet &other_scope=static_cast<cpp_scopet &>(**it);
+    cpp_scopet &other_scope = static_cast<cpp_scopet &>(*s_ptr);
 
     // Recursive call.
     // Note the different kind!
@@ -146,12 +137,9 @@ void cpp_scopet::lookup(
     return; // done, upwards scopes are hidden
 
   // secondary scopes
-  for(scope_listt::iterator
-      it=secondary_scopes.begin();
-      it!=secondary_scopes.end();
-      it++)
+  for(const auto &s_ptr : secondary_scopes)
   {
-    cpp_scopet &other_scope=static_cast<cpp_scopet &>(**it);
+    cpp_scopet &other_scope = static_cast<cpp_scopet &>(*s_ptr);
 
     // Recursive call.
     // Note the different kind!

@@ -34,10 +34,8 @@ void cpp_idt::print(std::ostream &out, unsigned indent) const
 
   if(!sub.empty())
   {
-    for(cpp_id_mapt::const_iterator it=sub.begin();
-        it!=sub.end();
-        it++)
-      it->second.print(out, indent+2);
+    for(const auto &s : sub)
+      s.second.print(out, indent + 2);
 
     out << '\n';
   }
@@ -63,22 +61,16 @@ void cpp_idt::print_fields(std::ostream &out, unsigned indent) const
   for(unsigned i=0; i<indent; i++) out << ' ';
   out << "  class_identifier=" << class_identifier << '\n';
 
-  for(scope_listt::const_iterator
-      it=secondary_scopes.begin();
-      it!=secondary_scopes.end();
-      it++)
+  for(const auto &s : secondary_scopes)
   {
     for(unsigned i=0; i<indent; i++) out << ' ';
-    out << "  secondary_scope=" << (*it)->identifier << '\n';
+    out << "  secondary_scope=" << s->identifier << '\n';
   }
 
-  for(scope_listt::const_iterator
-      it=using_scopes.begin();
-      it!=using_scopes.end();
-      it++)
+  for(const auto &s : using_scopes)
   {
     for(unsigned i=0; i<indent; i++) out << ' ';
-    out << "  using_scope=" << (*it)->identifier << '\n';
+    out << "  using_scope=" << s->identifier << '\n';
   }
 
   for(unsigned i=0; i<indent; i++) out << ' ';

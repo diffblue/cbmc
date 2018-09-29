@@ -33,17 +33,13 @@ std::string cpp_typecheckt::template_suffix(
   const cpp_template_args_tct::argumentst &arguments=
     template_args.arguments();
 
-  for(cpp_template_args_tct::argumentst::const_iterator
-      it=arguments.begin();
-      it!=arguments.end();
-      it++)
+  for(const auto &expr : arguments)
   {
     if(first)
       first=false;
     else
       result+=',';
 
-    const exprt expr=*it;
     DATA_INVARIANT(
       expr.id() != ID_ambiguous, "template argument must not be ambiguous");
 
@@ -69,7 +65,7 @@ std::string cpp_typecheckt::template_suffix(
         i=0;
       else if(to_integer(e, i))
       {
-        error().source_location=it->find_source_location();
+        error().source_location = expr.find_source_location();
         error() << "template argument expression expected to be "
                 << "scalar constant, but got `"
                 << to_string(e) << "'" << eom;
@@ -87,17 +83,14 @@ std::string cpp_typecheckt::template_suffix(
 
 void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
 {
-  for(instantiation_stackt::const_iterator
-      s_it=instantiation_stack.begin();
-      s_it!=instantiation_stack.end();
-      s_it++)
+  for(const auto &e : instantiation_stack)
   {
-    const symbolt &symbol=lookup(s_it->identifier);
+    const symbolt &symbol = lookup(e.identifier);
     out << "instantiating `" << symbol.pretty_name << "' with <";
 
-    forall_expr(a_it, s_it->full_template_args.arguments())
+    forall_expr(a_it, e.full_template_args.arguments())
     {
-      if(a_it!=s_it->full_template_args.arguments().begin())
+      if(a_it != e.full_template_args.arguments().begin())
         out << ", ";
 
       if(a_it->id()==ID_type)
@@ -106,7 +99,7 @@ void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
         out << to_string(*a_it);
     }
 
-    out << "> at " << s_it->source_location << '\n';
+    out << "> at " << e.source_location << '\n';
   }
 }
 

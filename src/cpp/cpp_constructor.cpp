@@ -125,13 +125,10 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
   {
     exprt::operandst operands_tc=operands;
 
-    for(exprt::operandst::iterator
-      it=operands_tc.begin();
-      it!=operands_tc.end();
-      it++)
+    for(auto &op : operands_tc)
     {
-      typecheck_expr(*it);
-      add_implicit_dereference(*it);
+      typecheck_expr(op);
+      add_implicit_dereference(op);
     }
 
     if(operands_tc.empty())
@@ -167,13 +164,10 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
   {
     exprt::operandst operands_tc=operands;
 
-    for(exprt::operandst::iterator
-      it=operands_tc.begin();
-      it!=operands_tc.end();
-      it++)
+    for(auto &op : operands_tc)
     {
-      typecheck_expr(*it);
-      add_implicit_dereference(*it);
+      typecheck_expr(op);
+      add_implicit_dereference(op);
     }
 
     const struct_typet &struct_type=
@@ -234,11 +228,8 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
       cpp_namet(constructor_name, source_location).as_expr();
     function_call.arguments().reserve(operands_tc.size());
 
-    for(exprt::operandst::iterator
-        it=operands_tc.begin();
-        it!=operands_tc.end();
-        it++)
-      function_call.op1().copy_to_operands(*it);
+    for(auto &op : operands_tc)
+      function_call.op1().copy_to_operands(op);
 
     typecheck_side_effect_function_call(function_call);
     assert(function_call.get(ID_statement)==ID_temporary_object);

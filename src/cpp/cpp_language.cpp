@@ -142,11 +142,8 @@ bool cpp_languaget::generate_support_functions(
 
 void cpp_languaget::show_parse(std::ostream &out)
 {
-  for(cpp_parse_treet::itemst::const_iterator it=
-      cpp_parse_tree.items.begin();
-      it!=cpp_parse_tree.items.end();
-      it++)
-    show_parse(out, *it);
+  for(const auto &i : cpp_parse_tree.items)
+    show_parse(out, i);
 }
 
 void cpp_languaget::show_parse(
@@ -160,11 +157,8 @@ void cpp_languaget::show_parse(
 
     out << "LINKAGE " << linkage_spec.linkage().get(ID_value) << ":\n";
 
-    for(cpp_linkage_spect::itemst::const_iterator
-        it=linkage_spec.items().begin();
-        it!=linkage_spec.items().end();
-        it++)
-      show_parse(out, *it);
+    for(const auto &i : linkage_spec.items())
+      show_parse(out, i);
 
     out << '\n';
   }
@@ -176,11 +170,8 @@ void cpp_languaget::show_parse(
     out << "NAMESPACE " << namespace_spec.get_namespace()
         << ":\n";
 
-    for(cpp_namespace_spect::itemst::const_iterator
-        it=namespace_spec.items().begin();
-        it!=namespace_spec.items().end();
-        it++)
-      show_parse(out, *it);
+    for(const auto &i : namespace_spec.items())
+      show_parse(out, i);
 
     out << '\n';
   }
