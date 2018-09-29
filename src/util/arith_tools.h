@@ -29,6 +29,7 @@ bool to_integer(const exprt &expr, mp_integer &int_value);
 bool to_integer(const constant_exprt &expr, mp_integer &int_value);
 
 // returns 'true' on error
+DEPRECATED("Use numeric_cast<unsigned>(e) instead")
 bool to_unsigned_integer(const constant_exprt &expr, unsigned &uint_value);
 
 /// Numerical cast provides a unified way of converting from one numerical type
