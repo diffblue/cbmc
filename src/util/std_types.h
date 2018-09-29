@@ -270,6 +270,8 @@ inline struct_union_typet &to_struct_union_type(typet &type)
   return static_cast<struct_union_typet &>(type);
 }
 
+class struct_tag_typet;
+
 /// Structure type, corresponds to C style structs
 class struct_typet:public struct_union_typet
 {
@@ -290,19 +292,9 @@ public:
   class baset : public exprt
   {
   public:
-    symbol_typet &type()
-    {
-      return to_symbol_type(exprt::type());
-    }
-
-    const symbol_typet &type() const
-    {
-      return to_symbol_type(exprt::type());
-    }
-
-    explicit baset(const symbol_typet &base) : exprt(ID_base, base)
-    {
-    }
+    struct_tag_typet &type();
+    const struct_tag_typet &type() const;
+    explicit baset(const struct_tag_typet &base);
   };
 
   typedef std::vector<baset> basest;
@@ -321,23 +313,12 @@ public:
 
   /// Add a base class/struct
   /// \param base: Type of case/class struct to be added.
-  void add_base(const symbol_typet &base)
-  {
-    bases().push_back(baset(base));
-  }
+  void add_base(const struct_tag_typet &base);
 
   /// Return the base with the given name, if exists.
   /// \param id The name of the base we are looking for.
   /// \return The base if exists.
-  optionalt<baset> get_base(const irep_idt &id) const
-  {
-    for(const auto &b : bases())
-    {
-      if(to_symbol_type(b.type()).get_identifier() == id)
-        return b;
-    }
-    return {};
-  }
+  optionalt<baset> get_base(const irep_idt &id) const;
 
   /// Test whether `id` is a base class/struct.
   /// \param id: symbol type name
