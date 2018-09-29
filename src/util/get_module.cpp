@@ -105,10 +105,10 @@ const symbolt &get_module(
   else if(symbolptr_list.size()>=2)
   {
     // sorted alphabetically
-    std::set<std::string> modules;
+    std::set<irep_idt, irep_idt::lexicographical_ordering> modules;
 
     forall_symbolptr_list(it, symbolptr_list)
-      modules.insert(id2string((*it)->pretty_name));
+      modules.insert((*it)->pretty_name);
 
     message.error() << "multiple modules found, please select one:\n";
 
