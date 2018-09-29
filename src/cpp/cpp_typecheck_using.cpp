@@ -27,10 +27,9 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
   resolver.resolve_scope(cpp_using.name(), base_name, template_args);
 
   bool qualified=cpp_using.name().is_qualified();
-  cpp_scopest::id_sett id_set;
 
-  cpp_scopes.current_scope().lookup(
-    base_name, qualified?cpp_scopet::QUALIFIED:cpp_scopet::RECURSIVE, id_set);
+  const auto id_set = cpp_scopes.current_scope().lookup(
+    base_name, qualified ? cpp_scopet::QUALIFIED : cpp_scopet::RECURSIVE);
 
   bool using_directive=cpp_using.get_namespace();
 

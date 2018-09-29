@@ -335,8 +335,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
   {
     cpp_scopet &scope=cpp_scopes.get_scope(subscope_name);
 
-    cpp_scopet::id_sett id_set;
-    scope.lookup(template_symbol.base_name, cpp_scopet::SCOPE_ONLY, id_set);
+    const auto id_set =
+      scope.lookup(template_symbol.base_name, cpp_scopet::SCOPE_ONLY);
 
     if(id_set.size()==1)
     {

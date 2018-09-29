@@ -26,7 +26,7 @@ std::ostream &operator << (std::ostream &out, cpp_scopet::lookup_kindt kind)
   return out;
 }
 
-void cpp_scopet::lookup(
+void cpp_scopet::lookup_rec(
   const irep_idt &base_name,
   lookup_kindt kind,
   id_sett &id_set)
@@ -60,7 +60,7 @@ void cpp_scopet::lookup(
 
     // Recursive call.
     // Note the different kind!
-    other_scope.lookup(base_name, QUALIFIED, id_set);
+    other_scope.lookup_rec(base_name, QUALIFIED, id_set);
   }
 
   if(!id_set.empty())
@@ -76,20 +76,21 @@ void cpp_scopet::lookup(
 
     // Recursive call.
     // Note the different kind!
-    other_scope.lookup(base_name, QUALIFIED, id_set);
+    other_scope.lookup_rec(base_name, QUALIFIED, id_set);
   }
 
   if(kind==QUALIFIED)
     return; // done
+
   if(!id_set.empty())
     return; // done
 
   // ask parent, recursive call
   if(!is_root_scope())
-    get_parent().lookup(base_name, kind, id_set);
+    get_parent().lookup_rec(base_name, kind, id_set);
 }
 
-void cpp_scopet::lookup(
+void cpp_scopet::lookup_rec(
   const irep_idt &base_name,
   lookup_kindt kind,
   cpp_idt::id_classt id_class,
@@ -139,7 +140,7 @@ void cpp_scopet::lookup(
 
     // Recursive call.
     // Note the different kind!
-    other_scope.lookup(base_name, QUALIFIED, id_class, id_set);
+    other_scope.lookup_rec(base_name, QUALIFIED, id_class, id_set);
   }
 
   if(!id_set.empty() && id_class != id_classt::TEMPLATE)
@@ -155,7 +156,7 @@ void cpp_scopet::lookup(
 
     // Recursive call.
     // Note the different kind!
-    other_scope.lookup(base_name, QUALIFIED, id_class, id_set);
+    other_scope.lookup_rec(base_name, QUALIFIED, id_class, id_set);
   }
 
   if(kind==QUALIFIED)
@@ -166,14 +167,15 @@ void cpp_scopet::lookup(
 
   // ask parent, recursive call
   if(!is_root_scope())
-    get_parent().lookup(base_name, kind, id_class, id_set);
+    get_parent().lookup_rec(base_name, kind, id_class, id_set);
 }
 
-void cpp_scopet::lookup_identifier(
+cpp_scopet::id_sett cpp_scopet::lookup_identifier(
   const irep_idt &identifier,
-  cpp_idt::id_classt id_class,
-  id_sett &id_set)
+  cpp_idt::id_classt id_class)
 {
+  id_sett id_set;
+
   for(cpp_id_mapt::iterator n_it=sub.begin();
       n_it!=sub.end(); n_it++)
   {
@@ -195,6 +197,8 @@ void cpp_scopet::lookup_identifier(
         id_set.insert(&parent);
   }
   #endif
+
+  return id_set;
 }
 
 cpp_scopet &cpp_scopet::new_scope(const irep_idt &new_scope_name)
@@ -208,10 +212,7 @@ cpp_scopet &cpp_scopet::new_scope(const irep_idt &new_scope_name)
   return (cpp_scopet &)id;
 }
 
-
 bool cpp_scopet::contains(const irep_idt &base_name)
 {
-  id_sett id_set;
-  lookup(base_name, SCOPE_ONLY, id_set);
-  return !id_set.empty();
+  return !lookup(base_name, SCOPE_ONLY).empty();
 }
