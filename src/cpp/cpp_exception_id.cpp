@@ -38,10 +38,18 @@ void cpp_exception_list_rec(
       cpp_exception_list_rec(src.subtype(), ns, "_ptr"+suffix, dest);
     }
   }
+  else if(src.id() == ID_union_tag)
+  {
+    cpp_exception_list_rec(ns.follow_tag(to_union_tag_type(src)), ns, suffix, dest);
+  }
   else if(src.id()==ID_union)
   {
     // just get tag
     dest.push_back("union_"+src.get_string(ID_tag));
+  }
+  else if(src.id() == ID_struct_tag)
+  {
+    cpp_exception_list_rec(ns.follow_tag(to_struct_tag_type(src)), ns, suffix, dest);
   }
   else if(src.id()==ID_struct)
   {
