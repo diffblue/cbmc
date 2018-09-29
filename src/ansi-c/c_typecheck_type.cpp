@@ -872,8 +872,13 @@ void c_typecheck_baset::typecheck_compound_body(
         struct_union_typet::componentt new_component(
           declarator.get_base_name(), declaration.full_type(declarator));
 
-        new_component.add_source_location()=
-          declarator.source_location();
+        // There may be a declarator, which we use as location for
+        // the component. Otherwise, use location of the declaration.
+        const source_locationt source_location =
+          declarator.get_name().empty() ? declaration.source_location()
+                                        : declarator.source_location();
+
+        new_component.add_source_location() = source_location;
         new_component.set_pretty_name(declarator.get_base_name());
 
         typecheck_type(new_component.type());
@@ -882,7 +887,7 @@ void c_typecheck_baset::typecheck_compound_body(
            (new_component.type().id()!=ID_array ||
             !to_array_type(new_component.type()).is_incomplete()))
         {
-          error().source_location=new_component.type().source_location();
+          error().source_location = source_location;
           error() << "incomplete type not permitted here" << eom;
           throw 0;
         }
