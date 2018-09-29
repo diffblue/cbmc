@@ -207,10 +207,8 @@ symbolt &cpp_declarator_convertert::convert(
 
     if(symbol.type.id()=="cpp-template-type")
     {
-      cpp_scopet::id_sett id_set;
-
-      scope->lookup_identifier(
-        symbol.name, cpp_idt::id_classt::TEMPLATE_PARAMETER, id_set);
+      const auto id_set = scope->lookup_identifier(
+        symbol.name, cpp_idt::id_classt::TEMPLATE_PARAMETER);
 
       if(id_set.empty())
       {
@@ -496,10 +494,8 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 
   if(!is_code)
   {
-    cpp_scopest::id_sett id_set;
-
-    cpp_typecheck.cpp_scopes.current_scope().lookup(
-      base_name, cpp_scopet::SCOPE_ONLY, id_set);
+    const auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+      base_name, cpp_scopet::SCOPE_ONLY);
 
     for(cpp_scopest::id_sett::const_iterator
         id_it=id_set.begin();

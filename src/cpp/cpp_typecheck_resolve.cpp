@@ -914,15 +914,12 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
       template_args=to_cpp_template_args_non_tc(*pos);
     else if(pos->id()=="::")
     {
-      cpp_scopest::id_sett id_set;
-
       if(template_args.is_not_nil())
       {
-        cpp_typecheck.cpp_scopes.current_scope().lookup(
+        const auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
           final_base_name,
-          recursive?cpp_scopet::RECURSIVE:cpp_scopet::QUALIFIED,
-          cpp_idt::id_classt::TEMPLATE,
-          id_set);
+          recursive ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED,
+          cpp_idt::id_classt::TEMPLATE);
 
 #ifdef DEBUG
         std::cout << "S: "
@@ -946,10 +943,9 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
       }
       else
       {
-        cpp_typecheck.cpp_scopes.current_scope().lookup(
+        auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
           final_base_name,
-          recursive?cpp_scopet::RECURSIVE:cpp_scopet::QUALIFIED,
-          id_set);
+          recursive ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED);
 
         filter_for_named_scopes(id_set);
 
@@ -1259,12 +1255,8 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(
   const source_locationt &source_location=cpp_name.source_location();
   bool qualified=cpp_name.is_qualified();
 
-  cpp_scopest::id_sett id_set;
-
-  cpp_typecheck.cpp_scopes.current_scope().lookup(
-    base_name,
-    qualified?cpp_scopet::QUALIFIED:cpp_scopet::RECURSIVE,
-    id_set);
+  auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+    base_name, qualified ? cpp_scopet::QUALIFIED : cpp_scopet::RECURSIVE);
 
   filter_for_namespaces(id_set);
 
@@ -1442,8 +1434,8 @@ exprt cpp_typecheck_resolvet::resolve(
 
   if(template_args.is_nil())
   {
-    cpp_typecheck.cpp_scopes.current_scope().lookup(
-      base_name, lookup_kind, id_set);
+    id_set =
+      cpp_typecheck.cpp_scopes.current_scope().lookup(base_name, lookup_kind);
 
     if(id_set.empty() && !cpp_typecheck.builtin_factory(base_name))
     {
@@ -1456,8 +1448,8 @@ exprt cpp_typecheck_resolvet::resolve(
     }
   }
   else
-    cpp_typecheck.cpp_scopes.current_scope().lookup(
-      base_name, lookup_kind, cpp_idt::id_classt::TEMPLATE, id_set);
+    id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+      base_name, lookup_kind, cpp_idt::id_classt::TEMPLATE);
 
   // Argument-dependent name lookup
   #if 0
@@ -1765,9 +1757,8 @@ void cpp_typecheck_resolvet::guess_template_args(
       irep_idt base_name;
       resolve_scope(cpp_name, base_name, template_args);
 
-      cpp_scopest::id_sett id_set;
-      cpp_typecheck.cpp_scopes.current_scope().lookup(
-        base_name, cpp_scopet::RECURSIVE, id_set);
+      const auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+        base_name, cpp_scopet::RECURSIVE);
 
       // alright, rummage through these
       for(cpp_scopest::id_sett::const_iterator it=id_set.begin();
@@ -1855,9 +1846,8 @@ void cpp_typecheck_resolvet::guess_template_args(
         cpp_template_args_non_tct template_args;
         resolve_scope(cpp_name, base_name, template_args);
 
-        cpp_scopest::id_sett id_set;
-        cpp_typecheck.cpp_scopes.current_scope().lookup(
-          base_name, cpp_scopet::RECURSIVE, id_set);
+        const auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+          base_name, cpp_scopet::RECURSIVE);
 
         // alright, rummage through these
         for(cpp_scopest::id_sett::const_iterator
@@ -2412,10 +2402,9 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
     if(final_type.id()!=ID_struct && final_type.id()!=ID_union)
       continue;
 
-    cpp_scopest::id_sett tmp_set;
     cpp_scopet &scope=
       cpp_typecheck.cpp_scopes.get_scope(final_type.get(ID_name));
-    scope.lookup(base_name, cpp_scopet::SCOPE_ONLY, tmp_set);
+    const auto tmp_set = scope.lookup(base_name, cpp_scopet::SCOPE_ONLY);
     id_set.insert(tmp_set.begin(), tmp_set.end());
   }
 }

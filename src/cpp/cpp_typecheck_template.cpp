@@ -83,12 +83,11 @@ void cpp_typecheckt::typecheck_class_template(
   // Check if the name is already used by a different template
   // in the same scope.
   {
-    cpp_scopet::id_sett id_set;
-    cpp_scopes.current_scope().lookup(
-      base_name,
-      cpp_scopet::SCOPE_ONLY,
-      cpp_scopet::TEMPLATE,
-      id_set);
+    const auto id_set=
+      cpp_scopes.current_scope().lookup(
+        base_name,
+        cpp_scopet::SCOPE_ONLY,
+        cpp_scopet::TEMPLATE);
 
     if(!id_set.empty())
     {
@@ -345,13 +344,10 @@ void cpp_typecheckt::typecheck_class_template_member(
   }
 
   // let's find the class template this function template belongs to.
-  cpp_scopet::id_sett id_set;
-
-  cpp_scopes.current_scope().lookup(
+  const auto id_set = cpp_scopes.current_scope().lookup(
     cpp_name.get_sub().front().get(ID_identifier),
-    cpp_scopet::SCOPE_ONLY, // look only in current scope
-    cpp_scopet::id_classt::TEMPLATE,   // must be template
-    id_set);
+    cpp_scopet::SCOPE_ONLY,           // look only in current scope
+    cpp_scopet::id_classt::TEMPLATE); // must be template
 
   if(id_set.empty())
   {
@@ -539,9 +535,8 @@ void cpp_typecheckt::convert_class_template_specialization(
 
   // get the template symbol
 
-  cpp_scopest::id_sett id_set;
-  cpp_scopes.current_scope().lookup(
-    base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE, id_set);
+  auto id_set = cpp_scopes.current_scope().lookup(
+    base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
 
   // remove any specializations
   for(cpp_scopest::id_sett::iterator
@@ -656,9 +651,8 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
     std::string base_name=
       cpp_name.get_sub()[0].get(ID_identifier).c_str();
 
-    cpp_scopest::id_sett id_set;
-    cpp_scopes.current_scope().lookup(
-      base_name, cpp_scopet::SCOPE_ONLY, id_set);
+    const auto id_set =
+      cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY);
 
     if(id_set.empty())
     {

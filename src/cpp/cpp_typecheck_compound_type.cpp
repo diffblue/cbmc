@@ -105,8 +105,8 @@ cpp_scopet &cpp_typecheckt::tag_scope(
   // Check if we have it already. If so, take it.
 
   // we should only look for tags, but we don't
-  cpp_scopet::id_sett id_set;
-  cpp_scopes.current_scope().lookup(base_name, cpp_scopet::RECURSIVE, id_set);
+  const auto id_set =
+    cpp_scopes.current_scope().lookup(base_name, cpp_scopet::RECURSIVE);
 
   for(const auto &id : id_set)
     if(id->is_class())
@@ -816,10 +816,8 @@ void cpp_typecheckt::put_compound_into_scope(
   else
   {
     // check if it's already there
-    cpp_scopest::id_sett id_set;
-
-    cpp_scopes.current_scope().lookup(
-      base_name, cpp_scopet::SCOPE_ONLY, id_set);
+    const auto id_set =
+      cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY);
 
     for(const auto &id_it : id_set)
     {
