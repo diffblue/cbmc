@@ -112,7 +112,7 @@ pointer_typet select_pointer_typet::specialize_generics(
   {
     // if the pointer is an array, recursively specialize its element type
     const symbol_typet &array_subtype = to_symbol_type(pointer_type.subtype());
-    if(is_java_array_tag(array_subtype.get_identifier()))
+    if(is_java_array_tag(array_subtype))
     {
       const typet &array_element_type = java_array_element_type(array_subtype);
       if(array_element_type.id() == ID_pointer)

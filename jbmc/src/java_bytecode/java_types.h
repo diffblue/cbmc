@@ -376,7 +376,7 @@ std::vector<std::string> parse_raw_list_types(
   char opening_bracket,
   char closing_bracket);
 
-bool is_java_array_tag(const irep_idt &tag);
+bool is_java_array_tag(const symbol_typet &);
 bool is_valid_java_array(const struct_typet &);
 
 bool equal_java_types(const typet &type1, const typet &type2);
