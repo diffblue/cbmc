@@ -1069,12 +1069,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       PRECONDITION(!i_it->args.empty());
 
-      unsigned target;
-      bool ret=to_unsigned_integer(to_constant_expr(i_it->args[0]), target);
-      DATA_INVARIANT(!ret, "target expected to be unsigned integer");
-      targets.insert(target);
+      auto target = numeric_cast<unsigned>(to_constant_expr(i_it->args[0]));
+      DATA_INVARIANT(
+        target.has_value(), "target expected to be unsigned integer");
+      targets.insert(target.value());
 
-      a_entry.first->second.successors.push_back(target);
+      a_entry.first->second.successors.push_back(target.value());
 
       if(i_it->statement=="jsr" ||
          i_it->statement=="jsr_w")
@@ -1094,11 +1094,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
       {
         if(is_label)
         {
-          unsigned target;
-          bool ret=to_unsigned_integer(to_constant_expr(arg), target);
-          DATA_INVARIANT(!ret, "target expected to be unsigned integer");
-          targets.insert(target);
-          a_entry.first->second.successors.push_back(target);
+          auto target = numeric_cast<unsigned>(to_constant_expr(arg));
+          DATA_INVARIANT(
+            target.has_value(), "target expected to be unsigned integer");
+          targets.insert(target.value());
+          a_entry.first->second.successors.push_back(target.value());
         }
         is_label=!is_label;
       }

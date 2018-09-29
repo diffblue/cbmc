@@ -193,8 +193,9 @@ static bool is_store_to_slot(
   {
     // Store with an argument:
     const auto &arg=inst.args[0];
-    bool ret=to_unsigned_integer(to_constant_expr(arg), storeslotidx);
-    CHECK_RETURN(!ret);
+    auto v = numeric_cast<unsigned>(to_constant_expr(arg));
+    CHECK_RETURN(v.has_value());
+    storeslotidx = v.value();
   }
   else
   {
