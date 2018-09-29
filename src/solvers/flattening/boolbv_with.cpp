@@ -98,7 +98,7 @@ void boolbvt::convert_with(
     return convert_with(ns.follow(type), op1, op2, prev_bv, next_bv);
 
   error().source_location=type.source_location();
-  error() << "unexpected with type: " << type.id();
+  error() << "unexpected with type: " << type.id() << eom;
   throw 0;
 }
 
