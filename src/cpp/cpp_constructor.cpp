@@ -222,14 +222,11 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
     // there is always a constructor for non-PODs
     assert(constructor_name!="");
 
-    side_effect_expr_function_callt function_call;
-    function_call.add_source_location()=source_location;
-    function_call.function() =
-      cpp_namet(constructor_name, source_location).as_expr();
-    function_call.arguments().reserve(operands_tc.size());
+    side_effect_expr_function_callt function_call(
+      cpp_namet(constructor_name, source_location).as_expr(),
+      operands_tc);
 
-    for(auto &op : operands_tc)
-      function_call.op1().copy_to_operands(op);
+    function_call.add_source_location()=source_location;
 
     typecheck_side_effect_function_call(function_call);
     assert(function_call.get(ID_statement)==ID_temporary_object);
