@@ -37,11 +37,12 @@ void endianness_mapt::build(const typet &src, bool little_endian)
 
 void endianness_mapt::build_little_endian(const typet &src)
 {
-  mp_integer s=pointer_offset_bits(src, ns); // error is -1
-  if(s<=0)
+  auto s = pointer_offset_bits(src, ns);
+
+  if(!s.has_value())
     return;
 
-  std::size_t new_size=map.size()+integer2size_t(s);
+  std::size_t new_size = map.size() + integer2size_t(*s);
   map.reserve(new_size);
 
   for(std::size_t i=map.size(); i<new_size; ++i)
@@ -62,10 +63,10 @@ void endianness_mapt::build_big_endian(const typet &src)
           src.id()==ID_c_bit_field)
   {
     // these do get re-ordered!
-    mp_integer bits=pointer_offset_bits(src, ns); // error is -1
-    CHECK_RETURN(bits>=0);
+    auto bits = pointer_offset_bits(src, ns); // error is -1
+    CHECK_RETURN(bits.has_value());
 
-    size_t bits_int=integer2size_t(bits), base=map.size();
+    size_t bits_int = integer2size_t(*bits), base = map.size();
 
     for(size_t bit=0; bit<bits_int; bit++)
     {
@@ -115,11 +116,12 @@ void endianness_mapt::build_big_endian(const typet &src)
   {
     // everything else (unions in particular)
     // is treated like a byte-array
-    mp_integer s=pointer_offset_bits(src, ns); // error is -1
-    if(s<=0)
+    auto s = pointer_offset_bits(src, ns); // error is -1
+
+    if(!s.has_value())
       return;
 
-    std::size_t new_size=map.size()+integer2size_t(s);
+    std::size_t new_size = map.size() + integer2size_t(*s);
     map.reserve(new_size);
 
     for(std::size_t i=map.size(); i<new_size; ++i)

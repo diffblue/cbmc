@@ -48,7 +48,9 @@ static exprt unpack_rec(
     const array_typet &array_type=to_array_type(type);
     const typet &subtype=array_type.subtype();
 
-    mp_integer element_width=pointer_offset_bits(subtype, ns);
+    auto element_width = pointer_offset_bits(subtype, ns);
+    CHECK_RETURN(element_width.has_value());
+
     // this probably doesn't really matter
     #if 0
     INVARIANT(
@@ -62,7 +64,7 @@ static exprt unpack_rec(
       irep_pretty_diagnosticst(type));
     #endif
 
-    if(!unpack_byte_array && element_width==8)
+    if(!unpack_byte_array && *element_width == 8)
       return src;
 
     mp_integer num_elements;
@@ -100,12 +102,14 @@ static exprt unpack_rec(
 
     for(const auto &comp : components)
     {
-      mp_integer element_width=pointer_offset_bits(comp.type(), ns);
+      auto element_width = pointer_offset_bits(comp.type(), ns);
 
       // the next member would be misaligned, abort
-      if(element_width<=0 || element_width%8!=0)
+      if(
+        !element_width.has_value() || *element_width == 0 ||
+        *element_width % 8 != 0)
       {
-        throw non_byte_alignedt(struct_type, comp, element_width);
+        throw non_byte_alignedt(struct_type, comp, *element_width);
       }
 
       member_exprt member(src, comp.get_name(), comp.type());
@@ -119,8 +123,12 @@ static exprt unpack_rec(
   {
     // a basic type; we turn that into extractbits while considering
     // endianness
-    mp_integer bits=pointer_offset_bits(type, ns);
-    if(bits<0)
+    auto bits_opt = pointer_offset_bits(type, ns);
+    mp_integer bits;
+
+    if(bits_opt.has_value())
+      bits = *bits_opt;
+    else
     {
       if(to_integer(max_bytes, bits))
       {
@@ -228,12 +236,13 @@ exprt flatten_byte_extract(
     const array_typet &array_type=to_array_type(type);
     const typet &subtype=array_type.subtype();
 
-    mp_integer element_width=pointer_offset_bits(subtype, ns);
+    auto element_width = pointer_offset_bits(subtype, ns);
     mp_integer num_elements;
     // TODO: consider ways of dealing with arrays of unknown subtype
     // size or with a subtype size that does not fit byte boundaries
-    if(element_width>0 && element_width%8==0 &&
-       to_integer(array_type.size(), num_elements))
+    if(
+      element_width.has_value() && *element_width >= 1 &&
+      *element_width % 8 == 0 && to_integer(array_type.size(), num_elements))
     {
       array_exprt array(array_type);
 
@@ -241,7 +250,7 @@ exprt flatten_byte_extract(
       {
         plus_exprt new_offset(
           unpacked.offset(),
-          from_integer(i*element_width, unpacked.offset().type()));
+          from_integer(i * (*element_width), unpacked.offset().type()));
 
         byte_extract_exprt tmp(unpacked);
         tmp.type()=subtype;
@@ -263,10 +272,12 @@ exprt flatten_byte_extract(
 
     for(const auto &comp : components)
     {
-      mp_integer element_width=pointer_offset_bits(comp.type(), ns);
+      auto element_width = pointer_offset_bits(comp.type(), ns);
 
       // the next member would be misaligned, abort
-      if(element_width<=0 || element_width%8!=0)
+      if(
+        !element_width.has_value() || *element_width == 0 ||
+        *element_width % 8 != 0)
       {
         failed=true;
         break;
@@ -295,14 +306,17 @@ exprt flatten_byte_extract(
   const array_typet &array_type=to_array_type(root.type());
   const typet &subtype=array_type.subtype();
 
-  DATA_INVARIANT(pointer_offset_bits(subtype, ns)==8,
-                 "offset bits are byte aligned");
+  auto subtype_bits = pointer_offset_bits(subtype, ns);
 
-  mp_integer size_bits=pointer_offset_bits(unpacked.type(), ns);
-  if(size_bits<0)
+  DATA_INVARIANT(
+    subtype_bits.has_value() && *subtype_bits == 8,
+    "offset bits are byte aligned");
+
+  auto size_bits = pointer_offset_bits(unpacked.type(), ns);
+  if(!size_bits.has_value())
   {
-    mp_integer op0_bits=pointer_offset_bits(unpacked.op().type(), ns);
-    if(op0_bits<0)
+    auto op0_bits = pointer_offset_bits(unpacked.op().type(), ns);
+    if(op0_bits.has_value())
     {
       throw non_const_byte_extraction_sizet(unpacked);
     }
@@ -310,8 +324,8 @@ exprt flatten_byte_extract(
       size_bits=op0_bits;
   }
 
-  mp_integer num_elements=
-    size_bits/8+((size_bits%8==0)?0:1);
+  mp_integer num_elements =
+    (*size_bits) / 8 + (((*size_bits) % 8 == 0) ? 0 : 1);
 
   const typet &offset_type=ns.follow(offset.type());
 
@@ -346,14 +360,16 @@ exprt flatten_byte_update(
   const namespacet &ns,
   bool negative_offset)
 {
-  mp_integer element_size = pointer_offset_size(src.value().type(), ns);
+  const auto element_size_opt = pointer_offset_size(src.value().type(), ns);
 
   INVARIANT_WITH_DIAGNOSTICS(
-    element_size >= 0,
+    element_size_opt.has_value(),
     "size of type in bytes must be known",
     irep_pretty_diagnosticst(src));
 
-  const typet &t = ns.follow(src.op().type());
+  const mp_integer &element_size = *element_size_opt;
+
+  const typet &t=ns.follow(src.op0().type());
 
   if(t.id()==ID_array)
   {
@@ -367,11 +383,13 @@ exprt flatten_byte_update(
        subtype.id()==ID_c_bool ||
        subtype.id()==ID_pointer)
     {
-      mp_integer sub_size=pointer_offset_size(subtype, ns);
+      auto sub_size_opt = pointer_offset_size(subtype, ns);
 
       INVARIANT(
-        sub_size >= 0,
+        sub_size_opt.has_value(),
         "bit width (rounded to full bytes) of subtype must be known");
+
+      const mp_integer &sub_size = *sub_size_opt;
 
       // byte array?
       if(sub_size==1)
@@ -534,9 +552,9 @@ exprt flatten_byte_update(
           t.id()==ID_pointer)
   {
     // do a shift, mask and OR
-    mp_integer type_width=pointer_offset_bits(t, ns);
-    CHECK_RETURN(type_width > 0);
-    std::size_t width=integer2size_t(type_width);
+    const auto type_width = pointer_offset_bits(t, ns);
+    CHECK_RETURN(type_width.has_value() && *type_width > 0);
+    const std::size_t width = integer2size_t(*type_width);
 
     INVARIANT(
       element_size * 8 <= width,

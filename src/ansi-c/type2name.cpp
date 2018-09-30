@@ -86,9 +86,9 @@ static std::string pointer_offset_bits_as_string(
   const typet &type,
   const namespacet &ns)
 {
-  mp_integer bits = pointer_offset_bits(type, ns);
-  CHECK_RETURN(bits != -1);
-  return integer2string(bits);
+  auto bits = pointer_offset_bits(type, ns);
+  CHECK_RETURN(bits.has_value());
+  return integer2string(*bits);
 }
 
 static bool parent_is_sym_check=false;

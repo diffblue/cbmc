@@ -61,12 +61,12 @@ std::string as_vcd_binary(
 
   // build "xxx"
 
-  const mp_integer width = pointer_offset_bits(type, ns);
+  const auto width = pointer_offset_bits(type, ns);
 
-  if(width>=0)
-    return std::string(integer2size_t(width), 'x');
-
-  return "";
+  if(width.has_value())
+    return std::string(integer2size_t(*width), 'x');
+  else
+    return "";
 }
 
 void output_vcd(
@@ -97,11 +97,12 @@ void output_vcd(
 
         const auto number=n.number(identifier);
 
-        const mp_integer width = pointer_offset_bits(type, ns);
+        const auto width = pointer_offset_bits(type, ns);
 
-        if(width>=1)
-          out << "$var reg " << width << " V" << number << " "
-              << identifier << " $end" << "\n";
+        if(width.has_value() && (*width) >= 1)
+          out << "$var reg " << (*width) << " V" << number << " " << identifier
+              << " $end"
+              << "\n";
       }
     }
   }

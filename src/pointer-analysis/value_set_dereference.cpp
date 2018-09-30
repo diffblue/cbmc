@@ -346,6 +346,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         symbol_expr,
         pointer_offset(pointer_expr),
         ns.follow(memory_symbol.type).subtype());
+
       result.value=index_expr;
     }
     else if(dereference_type_compare(
@@ -435,23 +436,21 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       exprt adjusted_offset;
 
       // are we doing a byte?
-      mp_integer element_size =
-        pointer_offset_size(root_object_type.subtype(), ns);
+      auto element_size = pointer_offset_size(root_object_type.subtype(), ns);
 
-      if(element_size==1)
-      {
-        // no need to adjust offset
-        adjusted_offset=offset;
-      }
-      else if(element_size<=0)
+      if(!element_size.has_value() || *element_size == 0)
       {
         throw "unknown or invalid type size of:\n" +
           root_object_type.subtype().pretty();
       }
+      else if(*element_size == 1)
+      {
+        // no need to adjust offset
+        adjusted_offset = offset;
+      }
       else
       {
-        exprt element_size_expr=
-          from_integer(element_size, offset.type());
+        exprt element_size_expr = from_integer(*element_size, offset.type());
 
         adjusted_offset=binary_exprt(
           offset, ID_div, element_size_expr, offset.type());
@@ -593,11 +592,16 @@ bool value_set_dereferencet::memory_model_bytes(
 
   // See if we have an array of bytes already,
   // and we want something byte-sized.
-  if(ns.follow(from_type).id()==ID_array &&
-     pointer_offset_size(ns.follow(from_type).subtype(), ns)==1 &&
-     pointer_offset_size(to_type, ns)==1 &&
-     is_a_bv_type(ns.follow(from_type).subtype()) &&
-     is_a_bv_type(to_type))
+  auto from_type_subtype_size =
+    pointer_offset_size(ns.follow(from_type).subtype(), ns);
+
+  auto to_type_size = pointer_offset_size(to_type, ns);
+
+  if(
+    ns.follow(from_type).id() == ID_array &&
+    from_type_subtype_size.has_value() && *from_type_subtype_size == 1 &&
+    to_type_size.has_value() && *to_type_size == 1 &&
+    is_a_bv_type(ns.follow(from_type).subtype()) && is_a_bv_type(to_type))
   {
     // yes, can use 'index'
     result=index_exprt(value, offset, ns.follow(from_type).subtype());

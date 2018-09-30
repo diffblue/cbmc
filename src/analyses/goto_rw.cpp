@@ -99,10 +99,14 @@ void rw_range_sett::get_objects_complex_imag(
 {
   const exprt &op = expr.op();
 
-  range_spect sub_size =
-    to_range_spect(pointer_offset_bits(op.type().subtype(), ns));
-  assert(sub_size>0);
-  range_spect offset = range_start == -1 ? 0 : sub_size;
+  auto subtype_bits = pointer_offset_bits(op.type().subtype(), ns);
+  CHECK_RETURN(subtype_bits.has_value());
+
+  range_spect sub_size = to_range_spect(*subtype_bits);
+  CHECK_RETURN(sub_size > 0);
+
+  range_spect offset=
+    (range_start==-1 || expr.id()==ID_complex_real) ? 0 : sub_size;
 
   get_objects_rec(mode, op, range_start + offset, size);
 }
@@ -173,8 +177,9 @@ void rw_range_sett::get_objects_shift(
 {
   const exprt simp_distance=simplify_expr(shift.distance(), ns);
 
-  range_spect src_size=
-    to_range_spect(pointer_offset_bits(shift.op().type(), ns));
+  auto op_bits = pointer_offset_bits(shift.op().type(), ns);
+
+  range_spect src_size = op_bits.has_value() ? to_range_spect(*op_bits) : -1;
 
   mp_integer dist;
   if(range_start==-1 ||
@@ -230,15 +235,18 @@ void rw_range_sett::get_objects_member(
 
   const struct_typet &struct_type=to_struct_type(type);
 
-  range_spect offset=
-    to_range_spect(
-      member_offset_bits(
-        struct_type,
-        expr.get_component_name(),
-        ns));
+  auto offset_bits =
+    member_offset_bits(struct_type, expr.get_component_name(), ns);
 
-  if(offset!=-1)
-    offset+=range_start;
+  range_spect offset;
+
+  if(offset_bits.has_value())
+  {
+    offset = to_range_spect(*offset_bits);
+    offset += range_start;
+  }
+  else
+    offset = -1;
 
   get_objects_rec(mode, expr.struct_op(), offset, size);
 }
@@ -259,15 +267,17 @@ void rw_range_sett::get_objects_index(
   {
     const vector_typet &vector_type=to_vector_type(type);
 
-    sub_size=
-      to_range_spect(pointer_offset_bits(vector_type.subtype(), ns));
+    auto subtype_bits = pointer_offset_bits(vector_type.subtype(), ns);
+
+    sub_size = subtype_bits.has_value() ? to_range_spect(*subtype_bits) : -1;
   }
   else if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
 
-    sub_size=
-      to_range_spect(pointer_offset_bits(array_type.subtype(), ns));
+    auto subtype_bits = pointer_offset_bits(array_type.subtype(), ns);
+
+    sub_size = subtype_bits.has_value() ? to_range_spect(*subtype_bits) : -1;
   }
   else
     return;
@@ -302,10 +312,13 @@ void rw_range_sett::get_objects_array(
   const array_typet &array_type=
     to_array_type(ns.follow(expr.type()));
 
-  range_spect sub_size=
-    to_range_spect(pointer_offset_bits(array_type.subtype(), ns));
+  auto subtype_bits = pointer_offset_bits(array_type.subtype(), ns);
 
-  if(sub_size==-1)
+  range_spect sub_size;
+
+  if(subtype_bits.has_value())
+    sub_size = to_range_spect(*subtype_bits);
+  else
   {
     forall_operands(it, expr)
       get_objects_rec(mode, *it, 0, -1);
@@ -342,8 +355,10 @@ void rw_range_sett::get_objects_struct(
   const struct_typet &struct_type=
     to_struct_type(ns.follow(expr.type()));
 
-  range_spect full_size=
-    to_range_spect(pointer_offset_bits(struct_type, ns));
+  auto struct_bits = pointer_offset_bits(struct_type, ns);
+
+  range_spect full_size =
+    struct_bits.has_value() ? to_range_spect(*struct_bits) : -1;
 
   range_spect offset=0;
   range_spect full_r_s=range_start==-1 ? 0 : range_start;
@@ -351,8 +366,9 @@ void rw_range_sett::get_objects_struct(
 
   forall_operands(it, expr)
   {
-    range_spect sub_size=
-      to_range_spect(pointer_offset_bits(it->type(), ns));
+    auto it_bits = pointer_offset_bits(it->type(), ns);
+
+    range_spect sub_size = it_bits.has_value() ? to_range_spect(*it_bits) : -1;
 
     if(offset==-1)
     {
@@ -401,8 +417,9 @@ void rw_range_sett::get_objects_typecast(
 {
   const exprt &op=tc.op();
 
-  range_spect new_size=
-    to_range_spect(pointer_offset_bits(op.type(), ns));
+  auto op_bits = pointer_offset_bits(op.type(), ns);
+
+  range_spect new_size = op_bits.has_value() ? to_range_spect(*op_bits) : -1;
 
   if(range_start==-1)
     new_size=-1;
@@ -537,8 +554,11 @@ void rw_range_sett::get_objects_rec(
   {
     const symbol_exprt &symbol=to_symbol_expr(expr);
     const irep_idt identifier=symbol.get_identifier();
-    range_spect full_size=
-      to_range_spect(pointer_offset_bits(symbol.type(), ns));
+
+    auto symbol_bits = pointer_offset_bits(symbol.type(), ns);
+
+    range_spect full_size =
+      symbol_bits.has_value() ? to_range_spect(*symbol_bits) : -1;
 
     if(full_size==0 ||
        (full_size>0 && range_start>=full_size))
@@ -584,8 +604,10 @@ void rw_range_sett::get_objects_rec(
 
 void rw_range_sett::get_objects_rec(get_modet mode, const exprt &expr)
 {
-  range_spect size=
-    to_range_spect(pointer_offset_bits(expr.type(), ns));
+  auto expr_bits = pointer_offset_bits(expr.type(), ns);
+
+  range_spect size = expr_bits.has_value() ? to_range_spect(*expr_bits) : -1;
+
   get_objects_rec(mode, expr, 0, size);
 }
 
@@ -614,16 +636,24 @@ void rw_range_set_value_sett::get_objects_dereference(
   exprt object=deref;
   dereference(target, object, ns, value_sets);
 
-  range_spect new_size=
-    to_range_spect(pointer_offset_bits(object.type(), ns));
+  auto type_bits = pointer_offset_bits(object.type(), ns);
 
-  if(range_start==-1 || new_size<=range_start)
-    new_size=-1;
-  else
+  range_spect new_size;
+
+  if(type_bits.has_value())
   {
-    new_size-=range_start;
-    new_size=std::min(size, new_size);
+    new_size = to_range_spect(*type_bits);
+
+    if(range_start == -1 || new_size <= range_start)
+      new_size = -1;
+    else
+    {
+      new_size -= range_start;
+      new_size = std::min(size, new_size);
+    }
   }
+  else
+    new_size = -1;
 
   // value_set_dereferencet::build_reference_to will turn *p into
   // DYNAMIC_OBJECT(p) ? *p : invalid_objectN

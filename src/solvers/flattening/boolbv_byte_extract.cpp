@@ -76,11 +76,14 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 
   // see if the byte number is constant and within bounds, else work from the
   // root object
-  const mp_integer op_bytes = pointer_offset_size(expr.op().type(), ns);
+  const auto op_bytes_opt = pointer_offset_size(expr.op().type(), ns);
   auto index = numeric_cast<mp_integer>(expr.offset());
+
   if(
-    (!index.has_value() || (*index < 0 || *index >= op_bytes)) &&
-    (expr.op().id() == ID_member || expr.op().id() == ID_index ||
+    (!index.has_value() || !op_bytes_opt.has_value() ||
+     *index < 0 || *index >= *op_bytes_opt) &&
+    (expr.op().id() == ID_member ||
+     expr.op().id() == ID_index ||
      expr.op().id() == ID_byte_extract_big_endian ||
      expr.op().id() == ID_byte_extract_little_endian))
   {

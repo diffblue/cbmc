@@ -12,8 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_POINTER_OFFSET_SIZE_H
 #define CPROVER_UTIL_POINTER_OFFSET_SIZE_H
 
-#include "mp_arith.h"
 #include "irep.h"
+#include "mp_arith.h"
+#include "optional.h"
 
 class exprt;
 class namespacet;
@@ -22,7 +23,7 @@ class typet;
 class member_exprt;
 class constant_exprt;
 
-// these return -1 on failure
+// these return 'nullopt' on failure
 
 // NOLINTNEXTLINE(readability/identifiers)
 class member_offset_iterator
@@ -40,27 +41,24 @@ public:
   const refst* operator->() const { return &current; }
 };
 
-mp_integer member_offset(
+optionalt<mp_integer> member_offset(
   const struct_typet &type,
   const irep_idt &member,
   const namespacet &ns);
 
-mp_integer member_offset_bits(
+optionalt<mp_integer> member_offset_bits(
   const struct_typet &type,
   const irep_idt &member,
   const namespacet &ns);
 
-mp_integer pointer_offset_size(
-  const typet &type,
-  const namespacet &ns);
+optionalt<mp_integer>
+pointer_offset_size(const typet &type, const namespacet &ns);
 
-mp_integer pointer_offset_bits(
-  const typet &type,
-  const namespacet &ns);
+optionalt<mp_integer>
+pointer_offset_bits(const typet &type, const namespacet &ns);
 
-mp_integer compute_pointer_offset(
-  const exprt &expr,
-  const namespacet &ns);
+optionalt<mp_integer>
+compute_pointer_offset(const exprt &expr, const namespacet &ns);
 
 // these return 'nil' on failure
 

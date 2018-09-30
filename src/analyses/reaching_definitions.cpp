@@ -210,9 +210,11 @@ void rd_range_domaint::transform_function_call(
       if(identifier.empty())
         continue;
 
-      range_spect size=
-        to_range_spect(pointer_offset_bits(param.type(), ns));
-      gen(from, identifier, 0, size);
+      auto param_bits = pointer_offset_bits(param.type(), ns);
+      if(param_bits.has_value())
+        gen(from, identifier, 0, to_range_spect(*param_bits));
+      else
+        gen(from, identifier, 0, -1);
     }
   }
   else

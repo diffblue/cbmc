@@ -1117,9 +1117,12 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
   if(to_integer(expr.lower(), end))
     return true;
 
-  const mp_integer width = pointer_offset_bits(op0_type, ns);
+  const auto width = pointer_offset_bits(op0_type, ns);
 
-  if(start < 0 || start >= width || end < 0 || end >= width)
+  if(!width.has_value())
+    return true;
+
+  if(start < 0 || start >= (*width) || end < 0 || end >= (*width))
     return true;
 
   DATA_INVARIANT(
@@ -1130,15 +1133,13 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
   {
     const irep_idt &value = to_constant_expr(expr.src()).get_value();
 
-    if(value.size()!=width)
+    if(value.size() != *width)
       return true;
 
     std::string svalue=id2string(value);
 
-    std::string extracted_value =
-      svalue.substr(
-        integer2size_t(width - start - 1),
-        integer2size_t(start - end + 1));
+    std::string extracted_value = svalue.substr(
+      integer2size_t(*width - start - 1), integer2size_t(start - end + 1));
 
     constant_exprt result(extracted_value, expr.type());
     expr.swap(result);
@@ -1149,16 +1150,16 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
   {
     // the most-significant bit comes first in an concatenation_exprt, hence we
     // count down
-    mp_integer offset = width;
+    mp_integer offset = *width;
 
     forall_operands(it, expr.src())
     {
-      mp_integer op_width = pointer_offset_bits(it->type(), ns);
+      auto op_width = pointer_offset_bits(it->type(), ns);
 
-      if(op_width <= 0)
+      if(!op_width.has_value() || *op_width <= 0)
         return true;
 
-      if(start + 1 == offset && end + op_width == offset)
+      if(start + 1 == offset && end + *op_width == offset)
       {
         exprt tmp = *it;
         if(tmp.type() != expr.type())
@@ -1168,7 +1169,7 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
         return false;
       }
 
-      offset -= op_width;
+      offset -= *op_width;
     }
   }
 
