@@ -47,22 +47,20 @@ void cpp_typecheckt::typecheck_code(codet &code)
 
 void cpp_typecheckt::typecheck_try_catch(codet &code)
 {
-  codet::operandst &operands=code.operands();
+  bool first = true;
 
-  for(codet::operandst::iterator
-      it=operands.begin();
-      it!=operands.end();
-      it++)
+  for(auto &op : code.operands())
   {
-    if(it==operands.begin())
+    if(first)
     {
       // this is the 'try'
-      typecheck_code(to_code(*it));
+      typecheck_code(to_code(op));
+      first = false;
     }
     else
     {
       // This is (one of) the catch clauses.
-      codet &code=to_code_block(to_code(*it));
+      codet &code = to_code_block(to_code(op));
 
       // look at the catch operand
       assert(!code.operands().empty());
@@ -105,7 +103,7 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
         const typet &type=code_decl.op0().type();
 
         // annotate exception ID
-        it->set(ID_exception_id, cpp_exception_id(type, *this));
+        op.set(ID_exception_id, cpp_exception_id(type, *this));
       }
     }
   }

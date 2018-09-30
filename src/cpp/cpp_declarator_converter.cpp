@@ -497,12 +497,9 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
     const auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
       base_name, cpp_scopet::SCOPE_ONLY);
 
-    for(cpp_scopest::id_sett::const_iterator
-        id_it=id_set.begin();
-        id_it!=id_set.end();
-        id_it++)
+    for(const auto &id_ptr : id_set)
     {
-      const cpp_idt &id=**id_it;
+      const cpp_idt &id = *id_ptr;
       // the name is already in the scope
       // this is ok if they belong to different categories
 
