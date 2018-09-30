@@ -461,8 +461,7 @@ void cpp_typecheck_resolvet::disambiguate_functions(
         // NOLINTNEXTLINE(whitespace/operators)
         1000*template_distance+args_distance;
 
-      distance_map.insert(
-        std::pair<std::size_t, exprt>(total_distance, old_id));
+      distance_map.insert({total_distance, old_id});
     }
   }
 
