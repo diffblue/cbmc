@@ -34,12 +34,7 @@ void cpp_typecheck_fargst::build(
   const side_effect_expr_function_callt &function_call)
 {
   in_use=true;
-
-  operands.clear();
-  operands.reserve(function_call.op1().operands().size());
-
-  for(const auto &op : function_call.op1().operands())
-    operands.push_back(op);
+  operands = function_call.op1().operands();
 }
 
 bool cpp_typecheck_fargst::match(
