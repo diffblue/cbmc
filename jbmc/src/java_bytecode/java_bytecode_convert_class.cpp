@@ -853,10 +853,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     symbol_table.add(local_symbol);
     const auto &local_symexpr=local_symbol.symbol_expr();
 
-    code_blockt clone_body;
-
     code_declt declare_cloned(local_symexpr);
-    clone_body.move_to_operands(declare_cloned);
 
     source_locationt location;
     location.set_function(local_name);
@@ -868,7 +865,6 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
       old_array, length_component.get_name(), length_component.type());
     java_new_array.copy_to_operands(old_length);
     code_assignt create_blank(local_symexpr, java_new_array);
-    clone_body.move_to_operands(create_blank);
 
     member_exprt old_data(
       old_array, data_component.get_name(), data_component.type());
@@ -898,7 +894,6 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     const auto &index_symexpr=index_symbol.symbol_expr();
 
     code_declt declare_index(index_symexpr);
-    clone_body.move_to_operands(declare_index);
 
     code_fort copy_loop;
 
@@ -920,14 +915,13 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     code_assignt copy_cell(new_cell, old_cell);
     copy_loop.body()=copy_cell;
 
-    // End for-loop
-    clone_body.move_to_operands(copy_loop);
-
     member_exprt new_base_class(
       new_array, base_class_component.get_name(), base_class_component.type());
     address_of_exprt retval(new_base_class);
     code_returnt return_inst(retval);
-    clone_body.move_to_operands(return_inst);
+
+    const code_blockt clone_body(
+      {declare_cloned, create_blank, declare_index, copy_loop, return_inst});
 
     symbolt clone_symbol;
     clone_symbol.name=clone_name;

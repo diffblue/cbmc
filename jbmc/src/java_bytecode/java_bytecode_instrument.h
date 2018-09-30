@@ -15,7 +15,7 @@ Date:   June 2017
 #include <util/message.h>
 #include <util/irep.h>
 
-class codet;
+class code_blockt;
 
 void java_bytecode_instrument_symbol(
   symbol_table_baset &symbol_table,
@@ -29,7 +29,7 @@ void java_bytecode_instrument(
   message_handlert &_message_handler);
 
 void java_bytecode_instrument_uncaught_exceptions(
-  codet &init_code,
+  code_blockt &init_code,
   const symbolt &exc_symbol,
   const source_locationt &source_location);
 

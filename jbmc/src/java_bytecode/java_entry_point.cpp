@@ -199,11 +199,10 @@ static void java_static_lifetime_init(
         set_class_identifier(
           to_struct_expr(zero_object), ns, to_symbol_type(sym.type));
 
-        code_block.copy_to_operands(
-          code_assignt(sym.symbol_expr(), zero_object));
+        code_block.add(code_assignt(sym.symbol_expr(), zero_object));
 
         // Then call the init function:
-        code_block.move_to_operands(initializer_call);
+        code_block.move(initializer_call);
       }
       else if(sym.value.is_nil() && sym.type!=empty_typet())
       {
@@ -411,7 +410,7 @@ exprt::operandst java_build_arguments(
     input.op1()=main_arguments[param_number];
     input.add_source_location()=function.location;
 
-    init_code.move_to_operands(input);
+    init_code.move(input);
   }
 
   return main_arguments;
@@ -449,7 +448,7 @@ void java_record_outputs(
     output.op1()=return_symbol.symbol_expr();
     output.add_source_location()=function.location;
 
-    init_code.move_to_operands(output);
+    init_code.move(output);
   }
 
   for(std::size_t param_number=0;
@@ -472,7 +471,7 @@ void java_record_outputs(
       output.op1()=main_arguments[param_number];
       output.add_source_location()=function.location;
 
-      init_code.move_to_operands(output);
+      init_code.move(output);
     }
   }
 
@@ -490,7 +489,7 @@ void java_record_outputs(
   output.op1()=exc_symbol.symbol_expr();
   output.add_source_location()=function.location;
 
-  init_code.move_to_operands(output);
+  init_code.move(output);
 }
 
 main_function_resultt get_main_symbol(
@@ -672,7 +671,7 @@ bool generate_java_start_function(
     code_function_callt call_init(init_it->second.symbol_expr());
     call_init.add_source_location()=symbol.location;
 
-    init_code.move_to_operands(call_init);
+    init_code.move(call_init);
   }
 
   // build call to the main method, of the form
@@ -713,10 +712,9 @@ bool generate_java_start_function(
   symbol_table.add(exc_symbol);
 
   // Zero-initialise the top-level exception catch variable:
-  init_code.copy_to_operands(
-    code_assignt(
-      exc_symbol.symbol_expr(),
-      null_pointer_exprt(to_pointer_type(exc_symbol.type))));
+  init_code.add(code_assignt(
+    exc_symbol.symbol_expr(),
+    null_pointer_exprt(to_pointer_type(exc_symbol.type))));
 
   // create code that allocates the objects used as test arguments and
   // non-deterministically initializes them
@@ -746,26 +744,26 @@ bool generate_java_start_function(
   irept catch_type_list(ID_exception_list);
   irept catch_target_list(ID_label);
 
-  call_block.move_to_operands(push_universal_handler);
+  call_block.move(push_universal_handler);
 
   // we insert the call to the method AFTER the argument initialization code
-  call_block.move_to_operands(call_main);
+  call_block.move(call_main);
 
   // Pop the handler:
   code_pop_catcht pop_handler;
-  call_block.move_to_operands(pop_handler);
-  init_code.move_to_operands(call_block);
+  call_block.move(pop_handler);
+  init_code.move(call_block);
 
   // Normal return: skip the exception handler:
-  init_code.copy_to_operands(code_gotot(after_catch.get_label()));
+  init_code.add(code_gotot(after_catch.get_label()));
 
   // Exceptional return: catch and assign to exc_symbol.
   code_landingpadt landingpad(exc_symbol.symbol_expr());
-  init_code.copy_to_operands(toplevel_catch);
-  init_code.move_to_operands(landingpad);
+  init_code.add(toplevel_catch);
+  init_code.move(landingpad);
 
   // Converge normal and exceptional return:
-  init_code.move_to_operands(after_catch);
+  init_code.move(after_catch);
 
   // declare certain (which?) variables as test outputs
   java_record_outputs(symbol, main_arguments, init_code, symbol_table);

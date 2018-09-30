@@ -215,13 +215,13 @@ exprt allocate_dynamic_object(
     symbols_created.push_back(&malloc_sym);
     code_assignt assign(malloc_sym.symbol_expr(), malloc_expr);
     assign.add_source_location()=loc;
-    output_code.copy_to_operands(assign);
+    output_code.add(assign);
     exprt malloc_symbol_expr=malloc_sym.symbol_expr();
     if(cast_needed)
       malloc_symbol_expr=typecast_exprt(malloc_symbol_expr, target_expr.type());
     code_assignt code(target_expr, malloc_symbol_expr);
     code.add_source_location()=loc;
-    output_code.copy_to_operands(code);
+    output_code.add(code);
     return malloc_sym.symbol_expr();
   }
   else
@@ -230,7 +230,7 @@ exprt allocate_dynamic_object(
     null_pointer_exprt null_pointer_expr(to_pointer_type(target_expr.type()));
     code_assignt code(target_expr, null_pointer_expr);
     code.add_source_location()=loc;
-    output_code.copy_to_operands(code);
+    output_code.add(code);
     return exprt();
   }
 }
@@ -321,7 +321,7 @@ exprt java_object_factoryt::allocate_object(
         aoe=typecast_exprt(aoe, target_expr.type());
       code_assignt code(target_expr, aoe);
       code.add_source_location()=loc;
-      assignments.copy_to_operands(code);
+      assignments.add(code);
       return aoe;
     }
     case allocation_typet::DYNAMIC:
@@ -775,8 +775,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     {
       if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
       {
-        assignments.copy_to_operands(
-          get_null_assignment(expr, pointer_type));
+        assignments.add(get_null_assignment(expr, pointer_type));
       }
       // Otherwise leave it as it is.
       return;
@@ -1056,8 +1055,7 @@ void java_object_factoryt::gen_nondet_struct_init(
       symbol_table,
       object_factory_parameters.string_printable);
 
-    assignments.copy_to_operands(
-      code_assignt(expr, initial_object));
+    assignments.add(code_assignt(expr, initial_object));
   }
 
   for(const auto &component : components)
@@ -1081,7 +1079,7 @@ void java_object_factoryt::gen_nondet_struct_init(
         continue;
       code_assignt code(me, from_integer(0, me.type()));
       code.add_source_location() = loc;
-      assignments.copy_to_operands(code);
+      assignments.add(code);
     }
     else if(skip_special_string_fields && (name == "length" || name == "data"))
     {
@@ -1239,7 +1237,7 @@ void java_object_factoryt::gen_nondet_init(
     code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
 
-    assignments.copy_to_operands(assign);
+    assignments.add(assign);
   }
 }
 
@@ -1330,7 +1328,7 @@ void java_object_factoryt::allocate_nondet_length_array(
   java_new_array.type().subtype().set(ID_element_type, element_type);
   code_assignt assign(lhs, java_new_array);
   assign.add_source_location() = loc;
-  assignments.copy_to_operands(assign);
+  assignments.add(assign);
 }
 
 /// Create code to initialize a Java array whose size will be at most
@@ -1395,7 +1393,7 @@ void java_object_factoryt::gen_nondet_array_init(
   const auto &array_init_symexpr=array_init_symbol.symbol_expr();
   code_assignt data_assign(array_init_symexpr, init_array_expr);
   data_assign.add_source_location()=loc;
-  assignments.copy_to_operands(data_assign);
+  assignments.add(data_assign);
 
   // Emit init loop for(array_init_iter=0; array_init_iter!=array.length;
   //                  ++array_init_iter) init(array[array_init_iter]);
@@ -1410,13 +1408,13 @@ void java_object_factoryt::gen_nondet_array_init(
   exprt counter_expr=counter.symbol_expr();
 
   exprt java_zero=from_integer(0, java_int_type());
-  assignments.copy_to_operands(code_assignt(counter_expr, java_zero));
+  assignments.add(code_assignt(counter_expr, java_zero));
 
   std::string head_name = id2string(counter.base_name) + "_header";
   code_labelt init_head_label(head_name, code_skipt());
   code_gotot goto_head(head_name);
 
-  assignments.move_to_operands(init_head_label);
+  assignments.move(init_head_label);
 
   std::string done_name = id2string(counter.base_name) + "_done";
   code_labelt init_done_label(done_name, code_skipt());
@@ -1426,7 +1424,7 @@ void java_object_factoryt::gen_nondet_array_init(
   done_test.cond()=equal_exprt(counter_expr, length_expr);
   done_test.then_case()=goto_done;
 
-  assignments.move_to_operands(done_test);
+  assignments.move(done_test);
 
   if(update_in_place!=update_in_placet::MUST_UPDATE_IN_PLACE)
   {
@@ -1436,7 +1434,7 @@ void java_object_factoryt::gen_nondet_array_init(
     max_test.cond()=equal_exprt(counter_expr, max_length_expr);
     max_test.then_case()=goto_done;
 
-    assignments.move_to_operands(max_test);
+    assignments.move(max_test);
   }
 
   const dereference_exprt arraycellref(
@@ -1467,9 +1465,9 @@ void java_object_factoryt::gen_nondet_array_init(
   exprt java_one=from_integer(1, java_int_type());
   code_assignt incr(counter_expr, plus_exprt(counter_expr, java_one));
 
-  assignments.move_to_operands(incr);
-  assignments.move_to_operands(goto_head);
-  assignments.move_to_operands(init_done_label);
+  assignments.move(incr);
+  assignments.move(goto_head);
+  assignments.move(init_done_label);
 }
 
 /// We nondet-initialize enums to be equal to one of the constants defined

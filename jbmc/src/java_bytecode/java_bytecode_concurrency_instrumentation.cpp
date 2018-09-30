@@ -135,10 +135,7 @@ static void monitor_exits(codet &code, const codet &monitorexit)
   if(statement == ID_return)
   {
     // Replace the return with a monitor exit plus return block
-    code_blockt return_block;
-    return_block.add(monitorexit);
-    return_block.move_to_operands(code);
-    code = return_block;
+    code = code_blockt({monitorexit, code});
   }
   else if(
     statement == ID_label || statement == ID_block ||
@@ -257,13 +254,7 @@ static void instrument_synchronized_code(
   monitor_exits(code, monitorexit);
 
   // Wrap the code into a try finally
-  code_blockt try_block;
-  try_block.move_to_operands(monitorenter);
-  try_block.move_to_operands(catch_push);
-  try_block.move_to_operands(code);
-  try_block.move_to_operands(catch_pop);
-  try_block.move_to_operands(catch_label);
-  code = try_block;
+  code = code_blockt({monitorenter, catch_push, code, catch_pop, catch_label});
 }
 
 /// Transforms the codet stored in in \p f_code, which is a call to function
@@ -326,17 +317,14 @@ static void instrument_start_thread(
   const code_assignt tmp_d(next_symbol_expr, plus);
   const code_assignt tmp_e(current_symbol.symbol_expr(), next_symbol_expr);
 
-  code_blockt block;
-  block.add(tmp_a);
-  block.add(tmp_b);
-  block.add(tmp_c);
-  block.add(codet(ID_atomic_begin));
-  block.add(tmp_d);
-  block.add(tmp_e);
-  block.add(codet(ID_atomic_end));
-  block.add_source_location() = f_code.source_location();
-
-  code = block;
+  code = code_blockt({tmp_a,
+                      tmp_b,
+                      tmp_c,
+                      codet(ID_atomic_begin),
+                      tmp_d,
+                      tmp_e,
+                      codet(ID_atomic_end)});
+  code.add_source_location() = f_code.source_location();
 }
 
 /// Transforms the codet stored in in \p f_code, which is a call to function
@@ -367,12 +355,9 @@ static void instrument_end_thread(
   codet tmp_a(ID_end_thread);
   const code_labelt tmp_b(lbl2, code_skipt());
 
-  code_blockt block;
-  block.add(tmp_a);
-  block.add(tmp_b);
-  block.add_source_location() = code.source_location();
-
-  code = block;
+  const auto location = code.source_location();
+  code = code_blockt({tmp_a, tmp_b});
+  code.add_source_location() = location;
 }
 
 /// Transforms the codet stored in in \p f_code, which is a call to function

@@ -120,10 +120,10 @@ public:
   static code_blockt from_list(const std::list<codet> &_list)
   {
     code_blockt result;
-    statementst &s=result.statements();
+    auto &s=result.statements();
     s.reserve(_list.size());
     for(const auto &c : _list)
-      o.push_back(c);
+      s.push_back(c);
     return result;
   }
 
@@ -166,31 +166,7 @@ public:
     return static_cast<const source_locationt &>(find(ID_C_end_location));
   }
 
-  codet &find_last_statement()
-  {
-    codet *last=this;
-
-    while(true)
-    {
-      const irep_idt &statement=last->get_statement();
-
-      if(statement==ID_block &&
-         !to_code_block(*last).statements().empty())
-      {
-        last=&to_code_block(*last).statements().back());
-      }
-      else if(statement==ID_label)
-      {
-        DATA_INVARIANT(
-          last->operands().size() == 1, "label must have one operand");
-        last=&(to_code(last->op0()));
-      }
-      else
-        break;
-    }
-
-    return *last;
-  }
+  codet &find_last_statement();
 };
 
 template<> inline bool can_cast_expr<code_blockt>(const exprt &base)
