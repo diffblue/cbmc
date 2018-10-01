@@ -312,8 +312,7 @@ static void infer_opaque_type_fields(
                 + "' (which was missing a field '" + id2string(component_name)
                 + "' referenced from method '" + id2string(method.name)
                 + "') should have an opaque superclass");
-            const symbol_typet &superclass_type =
-              to_symbol_type(class_type->bases().front().type());
+            const auto &superclass_type = class_type->bases().front().type();
             class_symbol_id = superclass_type.get_identifier();
             class_type = &to_class_type(ns.follow(superclass_type));
           }
