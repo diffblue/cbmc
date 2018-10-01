@@ -98,7 +98,8 @@ STATIC_ASSERT(!__builtin_types_compatible_p(unsigned, signed));
 STATIC_ASSERT(!__builtin_types_compatible_p(__int128, unsigned __int128));
 
 // clang doesn't have these
-#if !defined(__clang__)
+#if !defined(__clang__) && \
+    (defined(__ia64__) || defined(__x86_64__) || defined(__i386__))
 #if __GNUC__ >= 7
 STATIC_ASSERT(!__builtin_types_compatible_p(_Float32, float));
 STATIC_ASSERT(!__builtin_types_compatible_p(_Float64, double));
