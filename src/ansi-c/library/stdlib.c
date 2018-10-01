@@ -435,7 +435,7 @@ __CPROVER_HIDE:;
   // As _mid_memalign simplifies for alignment <= MALLOC_ALIGNMENT
   // to a malloc call, it should be sound, if we do it too.
 
-  // The originial posix_memalign check on the pointer is:
+  // The original posix_memalign check on the pointer is:
 
   // void *tmp = malloc(size);
   // if(tmp != NULL){
