@@ -145,11 +145,7 @@ You are now ready to \ref man_cbmc-tutorial "use CBMC"!
 
 ### Building CBMC from Source
 
-Alternatively, the CBMC source code is available [via
-SVN](http://www.cprover.org/svn/cbmc/). To compile the source code,
-follow [these
-instructions](http://www.cprover.org/svn/cbmc/trunk/COMPILING).
-
+See \ref compilation-and-development
 
 
 \subsection man_install-eclipse Installing the Eclipse Plugin
