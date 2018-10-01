@@ -105,8 +105,13 @@ public:
   void reserve_operands(operandst::size_type n)
   { operands().reserve(n) ; }
 
+  DEPRECATED("use copy_to_operands(expr) instead")
   void move_to_operands(exprt &expr);
+
+  DEPRECATED("use copy_to_operands(e1, e2) instead")
   void move_to_operands(exprt &e1, exprt &e2);
+
+  DEPRECATED("use copy_to_operands(e1, e2, e3) instead")
   void move_to_operands(exprt &e1, exprt &e2, exprt &e3);
 
   /// Copy the given argument to the end of `exprt`'s operands.
