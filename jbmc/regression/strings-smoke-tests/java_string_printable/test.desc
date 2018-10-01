@@ -1,6 +1,6 @@
 CORE
 Test.class
---verbosity 10 --function Test.check --max-nondet-string-length 100 --string-printable --java-assume-inputs-non-null --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
+--verbosity 10 --function Test.check --max-nondet-string-length 100 --string-printable --java-assume-inputs-non-null --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 assertion.* file Test.java line 6 .* SUCCESS
