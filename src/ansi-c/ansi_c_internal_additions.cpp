@@ -194,15 +194,20 @@ void ansi_c_internal_additions(std::string &code)
 
     if(
       config.ansi_c.arch == "i386" || config.ansi_c.arch == "x86_64" ||
-      config.ansi_c.arch == "x32" || config.ansi_c.arch == "powerpc" ||
-      config.ansi_c.arch == "ppc64" || config.ansi_c.arch == "ppc64le" ||
-      config.ansi_c.arch == "ia64")
+      config.ansi_c.arch == "x32" || config.ansi_c.arch == "ia64" ||
+      config.ansi_c.arch == "powerpc" || config.ansi_c.arch == "ppc64")
     {
       // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
       // For clang, __float128 is a keyword.
       // For gcc, this is a typedef and not a keyword.
       if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
         code += "typedef __CPROVER_Float128 __float128;\n";
+    }
+    else if(config.ansi_c.arch == "ppc64le")
+    {
+      // https://patchwork.ozlabs.org/patch/792295/
+      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+        code += "typedef __CPROVER_Float128 __ieee128;\n";
     }
     else if(config.ansi_c.arch == "hppa")
     {
