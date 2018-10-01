@@ -135,9 +135,6 @@ void remove_asmt::msc_asm_function_call(
 {
   irep_idt function_identifier = function_base_name;
 
-  code_function_callt function_call;
-  function_call.lhs().make_nil();
-
   const typet void_pointer = pointer_type(void_typet());
 
   code_typet fkt_type({}, void_typet());
@@ -145,7 +142,7 @@ void remove_asmt::msc_asm_function_call(
 
   symbol_exprt fkt(function_identifier, fkt_type);
 
-  function_call.function() = fkt;
+  code_function_callt function_call(fkt);
 
   goto_programt::targett call = dest.add_instruction(FUNCTION_CALL);
   call->code = function_call;

@@ -8103,7 +8103,7 @@ bool Parser::rExprStatement(codet &statement)
     #endif
 
     lex.get_token(tk);
-    statement=codet(ID_skip);
+    statement = code_skipt();
     set_location(statement, tk);
     return true;
   }

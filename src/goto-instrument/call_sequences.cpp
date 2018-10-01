@@ -277,7 +277,7 @@ static void list_calls_and_arguments(
     if(!i_it->is_function_call())
       continue;
 
-    const code_function_callt call=to_code_function_call(i_it->code);
+    const code_function_callt &call = to_code_function_call(i_it->code);
 
     const exprt &f=call.function();
 

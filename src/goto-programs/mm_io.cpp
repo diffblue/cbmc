@@ -66,10 +66,9 @@ void mm_io(
           const typet &pt=ct.parameters()[0].type();
           const typet &st=ct.parameters()[1].type();
           exprt size=size_of_expr(d.type(), ns);
-          code_function_callt fc(mm_io_r);
-          fc.arguments().resize(2);
-          fc.arguments()[0]=typecast_exprt(d.pointer(), pt);
-          fc.arguments()[1]=typecast_exprt(size, st);
+          const code_function_callt fc(
+            mm_io_r,
+            {typecast_exprt(d.pointer(), pt), typecast_exprt(size, st)});
           goto_function.body.insert_before_swap(it);
           it->make_function_call(fc);
           it->source_location=source_location;
@@ -90,11 +89,11 @@ void mm_io(
           const typet &st=ct.parameters()[1].type();
           const typet &vt=ct.parameters()[2].type();
           exprt size=size_of_expr(d.type(), ns);
-          code_function_callt fc(mm_io_w);
-          fc.arguments().resize(3);
-          fc.arguments()[0]=typecast_exprt(d.pointer(), pt);
-          fc.arguments()[1]=typecast_exprt(size, st);
-          fc.arguments()[2]=typecast_exprt(a.rhs(), vt);
+          const code_function_callt fc(
+            mm_io_w,
+            {typecast_exprt(d.pointer(), pt),
+             typecast_exprt(size, st),
+             typecast_exprt(a.rhs(), vt)});
           goto_function.body.insert_before_swap(it);
           it->make_function_call(fc);
           it->source_location=source_location;

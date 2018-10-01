@@ -94,9 +94,8 @@ void interrupt(
       const source_locationt &source_location=
         original_instruction.source_location;
 
-      code_function_callt isr_call;
+      code_function_callt isr_call(interrupt_handler);
       isr_call.add_source_location()=source_location;
-      isr_call.function()=interrupt_handler;
 
       goto_programt::targett t_goto=i_it;
       goto_programt::targett t_call=goto_program.insert_after(t_goto);
@@ -127,9 +126,8 @@ void interrupt(
 
       const source_locationt &source_location=i_it->source_location;
 
-      code_function_callt isr_call;
+      code_function_callt isr_call(interrupt_handler);
       isr_call.add_source_location()=source_location;
-      isr_call.function()=interrupt_handler;
 
       t_goto->make_goto(t_orig);
       t_goto->source_location=source_location;

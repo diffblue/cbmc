@@ -104,12 +104,10 @@ void mutex_init_instrumentation(
       {
         goto_programt::targett t=goto_program.insert_after(it);
 
-        code_function_callt call;
-
-        call.function()=f_it->second.symbol_expr();
-        call.arguments().resize(2);
-        call.arguments()[0]=address_of_exprt(code_assign.lhs());
-        call.arguments()[1]=address_of_exprt(string_constantt("mutex-init"));
+        const code_function_callt call(
+          f_it->second.symbol_expr(),
+          {address_of_exprt(code_assign.lhs()),
+           address_of_exprt(string_constantt("mutex-init"))});
 
         t->make_function_call(call);
         t->source_location=it->source_location;

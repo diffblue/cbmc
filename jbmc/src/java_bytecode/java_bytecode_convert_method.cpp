@@ -973,8 +973,7 @@ codet java_bytecode_convert_methodt::get_clinit_call(
     return code_skipt();
   else
   {
-    code_function_callt ret;
-    ret.function() = findit->second.symbol_expr();
+    const code_function_callt ret(findit->second.symbol_expr());
     if(needed_lazy_methods)
       needed_lazy_methods->add_needed_method(findit->second.name);
     return ret;
@@ -2004,10 +2003,7 @@ codet java_bytecode_convert_methodt::convert_monitorenterexit(
   java_method_typet type(
     {java_method_typet::parametert(java_reference_type(void_typet()))},
     void_typet());
-  code_function_callt call;
-  call.function() = symbol_exprt(descriptor, type);
-  call.lhs().make_nil();
-  call.arguments().push_back(op[0]);
+  code_function_callt call(symbol_exprt(descriptor, type), {op[0]});
   call.add_source_location() = source_location;
   if(needed_lazy_methods && symbol_table.has_symbol(descriptor))
     needed_lazy_methods->add_needed_method(descriptor);
@@ -2737,13 +2733,11 @@ codet java_bytecode_convert_methodt::convert_iinc(
     bytecode_write_typet::VARIABLE,
     to_symbol_expr(locvar).get_identifier());
 
-  code_assignt code_assign;
-  code_assign.lhs() = variable(arg0, 'i', address, NO_CAST);
-  exprt arg1_int_type = arg1;
-  if(arg1.type() != java_int_type())
-    arg1_int_type.make_typecast(java_int_type());
-  code_assign.rhs() =
-    plus_exprt(variable(arg0, 'i', address, CAST_AS_NEEDED), arg1_int_type);
+  const exprt arg1_int_type =
+    typecast_exprt::conditional_cast(arg1, java_int_type());
+  const code_assignt code_assign(
+    variable(arg0, 'i', address, NO_CAST),
+    plus_exprt(variable(arg0, 'i', address, CAST_AS_NEEDED), arg1_int_type));
   block.copy_to_operands(code_assign);
   return block;
 }

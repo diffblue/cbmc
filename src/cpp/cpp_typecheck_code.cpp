@@ -334,7 +334,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         else
         {
           auto source_location = code.source_location();
-          code = codet(ID_skip);
+          code = code_skipt();
           code.add_source_location() = source_location;
         }
       }

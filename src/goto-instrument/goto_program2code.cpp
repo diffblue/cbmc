@@ -1361,16 +1361,11 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
 
     system_headers.insert("pthread.h");
 
-    code_function_callt f;
-    // we don't bother setting the type
-    f.lhs()=cf.lhs();
-    f.function() =
-      symbol_exprt("pthread_create", code_typet({}, empty_typet()));
     const null_pointer_exprt n(pointer_type(empty_typet()));
-    f.arguments().push_back(n);
-    f.arguments().push_back(n);
-    f.arguments().push_back(cf.function());
-    f.arguments().push_back(cf.arguments().front());
+    code_function_callt f(
+      cf.lhs(),
+      symbol_exprt("pthread_create", code_typet({}, empty_typet())),
+      {n, n, cf.function(), cf.arguments().front()});
 
     dest.move_to_operands(f);
     return thread_end;

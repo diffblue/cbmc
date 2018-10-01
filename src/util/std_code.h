@@ -925,6 +925,18 @@ public:
     arguments() = _arguments;
   }
 
+  code_function_callt(const exprt &_function, argumentst &&_arguments)
+    : code_function_callt(_function)
+  {
+    arguments() = std::move(_arguments);
+  }
+
+  code_function_callt(const exprt &_function, const argumentst &_arguments)
+    : code_function_callt(_function)
+  {
+    arguments() = _arguments;
+  }
+
   exprt &lhs()
   {
     return op0();
