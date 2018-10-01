@@ -470,7 +470,7 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
   {
     // these come in as bit-vector literals
     std::size_t width=boolbv_width(type);
-    constant_exprt bv_expr=parse_literal(src, bv_typet(width));
+    constant_exprt bv_expr=parse_literal(src, unsignedbv_typet(width));
 
     mp_integer v = numeric_cast_v<mp_integer>(bv_expr);
 
