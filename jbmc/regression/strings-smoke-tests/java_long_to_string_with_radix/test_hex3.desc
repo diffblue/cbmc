@@ -1,6 +1,6 @@
 CORE
 Test_hex3.class
---verbosity 10 --max-nondet-string-length 100 --function Test_hex3.main
+--verbosity 10 --max-nondet-string-length 100 --function Test_hex3.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 assertion.* line 7 .* SUCCESS$

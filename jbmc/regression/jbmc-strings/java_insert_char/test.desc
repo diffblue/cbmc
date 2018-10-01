@@ -1,6 +1,6 @@
 CORE
 test_insert_char.class
---max-nondet-string-length 1000 --function test_insert_char.main
+--max-nondet-string-length 1000 --function test_insert_char.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion\.1\].* line 8.* FAILURE$

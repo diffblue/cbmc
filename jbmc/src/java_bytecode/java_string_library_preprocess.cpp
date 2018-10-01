@@ -942,72 +942,6 @@ java_string_library_preprocesst::string_literal_to_string_expr(
     ID_cprover_string_literal_func, {expr}, loc, symbol_table, code);
 }
 
-/// Used to provide code for the Java String.equals(Object) function.
-/// \param type: type of the function call
-/// \param loc: location in the program_invocation_name
-/// \param symbol_table: symbol table
-/// \param function_id: unused
-/// \return Code corresponding to:
-/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// IF arg->@class_identifier == "java.lang.String"
-/// THEN
-///   string_expr1 = {this->length; *this->data}
-///   string_expr2 = {arg->length; *arg->data}
-///   bool string_equals_tmp = cprover_string_equal(string_expr1, string_expr2)
-///   return string_equals_tmp
-/// ELSE
-///   return false
-/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-codet java_string_library_preprocesst::make_equals_function_code(
-  const java_method_typet &type,
-  const source_locationt &loc,
-  const irep_idt &function_id,
-  symbol_table_baset &symbol_table)
-{
-  const typet &return_type = type.return_type();
-  exprt::operandst ops;
-  for(const auto &p : type.parameters())
-  {
-    symbol_exprt sym(p.get_identifier(), p.type());
-    ops.push_back(sym);
-  }
-
-  code_ifthenelset code;
-  code.cond() = [&] {
-    const member_exprt class_identifier(
-      checked_dereference(ops[1], ops[1].type().subtype()),
-      "@class_identifier",
-      string_typet());
-    return equal_exprt(
-      class_identifier,
-      constant_exprt("java::java.lang.String", string_typet()));
-  }();
-
-  code.then_case() = [&] {
-    code_blockt instance_case;
-    // Check content equality
-    const symbolt string_equals_sym = get_fresh_aux_symbol(
-      return_type,
-      id2string(function_id),
-      "str_eq",
-      loc,
-      ID_java,
-      symbol_table);
-    const symbol_exprt string_equals = string_equals_sym.symbol_expr();
-    instance_case.add(code_declt(string_equals), loc);
-    const exprt::operandst args =
-      process_equals_function_operands(ops, loc, symbol_table, instance_case);
-    const auto fun_app = make_function_application(
-      ID_cprover_string_equal_func, args, return_type, symbol_table);
-    instance_case.add(code_assignt(string_equals, fun_app), loc);
-    instance_case.add(code_returnt(string_equals), loc);
-    return instance_case;
-  }();
-
-  code.else_case() = code_returnt(from_integer(false, return_type));
-  return code;
-}
-
 /// Provide code for the String.valueOf(F) function.
 /// \param type: type of the function call
 /// \param loc: location in the program_invocation_name
@@ -2031,15 +1965,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_function
     ["java::java.lang.String.endsWith:(Ljava/lang/String;)Z"]=
       ID_cprover_string_endswith_func;
-
-  conversion_table["java::java.lang.String.equals:(Ljava/lang/Object;)Z"] =
-    std::bind(
-      &java_string_library_preprocesst::make_equals_function_code,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2,
-      std::placeholders::_3,
-      std::placeholders::_4);
   cprover_equivalent_to_java_function
     ["java::java.lang.String.equalsIgnoreCase:(Ljava/lang/String;)Z"]=
       ID_cprover_string_equals_ignore_case_func;

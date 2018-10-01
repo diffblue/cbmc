@@ -1,6 +1,6 @@
 CORE
 Test.class
---function Test.test --trace --json-ui
+--function Test.test --trace --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --json-ui
 ^EXIT=10$
 ^SIGNAL=0$
 "reason": "assertion at file Test.java line 14
