@@ -4,9 +4,9 @@ main.c
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
-\/\/ ([0-9]+).*\n.*a\[\(signed long( long)? int\)2\] = 2;(.*\n)*Data dependencies: (\1)\n(.*\n){2,3}.*out = *
+\/\/ ([0-9]+).*\n.*a\[(\(signed long( long)? int\))?2\] = 2;(.*\n)*Data dependencies: (\1)\n(.*\n){2,3}.*out = *
 --
-\/\/ ([0-9]+).*\n.*a\[\(signed long( long)? int\)1\] = 1;(.*\n)*Data dependencies: (\1)\n(.*\n){2,3}.*out = *
+\/\/ ([0-9]+).*\n.*a\[(\(signed long( long)? int\))?1\] = 1;(.*\n)*Data dependencies: (\1)\n(.*\n){2,3}.*out = *
 ^warning: ignoring
 --
 
