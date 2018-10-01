@@ -47,7 +47,7 @@ void class_hierarchy_grapht::populate(const symbol_tablet &symbol_table)
 
       for(const auto &base : struct_type.bases())
       {
-        const irep_idt &parent = to_symbol_type(base.type()).get_identifier();
+        const irep_idt &parent = base.type().get_identifier();
         if(!parent.empty())
         {
           const auto parent_node_it = nodes_by_name.find(parent);
@@ -159,7 +159,7 @@ void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
 
       for(const auto &base : struct_type.bases())
       {
-        const irep_idt &parent = to_symbol_type(base.type()).get_identifier();
+        const irep_idt &parent = base.type().get_identifier();
         if(parent.empty())
           continue;
 
