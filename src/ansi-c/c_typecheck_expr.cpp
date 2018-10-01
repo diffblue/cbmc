@@ -2983,6 +2983,24 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
       return;
     }
   }
+  else if(
+    o_type0.id() == ID_vector && o_type1.id() != ID_vector &&
+    is_number(o_type1))
+  {
+    // convert op1 to the vector type
+    op1.make_typecast(o_type0);
+    expr.type() = o_type0;
+    return;
+  }
+  else if(
+    o_type0.id() != ID_vector && o_type1.id() == ID_vector &&
+    is_number(o_type0))
+  {
+    // convert op0 to the vector type
+    op0.make_typecast(o_type1);
+    expr.type() = o_type1;
+    return;
+  }
 
   // promote!
 
