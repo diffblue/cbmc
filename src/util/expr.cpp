@@ -65,44 +65,6 @@ void exprt::move_to_operands(exprt &e1, exprt &e2, exprt &e3)
   op.back().swap(e3);
 }
 
-/// Copy the given argument to the end of `exprt`'s operands.
-/// \param expr: `exprt` to append to the operands
-void exprt::copy_to_operands(const exprt &expr)
-{
-  operands().push_back(expr);
-}
-
-/// Copy the given arguments to the end of `exprt`'s operands.
-/// \param e1: first `exprt` to append to the operands
-/// \param e2: second `exprt` to append to the operands
-void exprt::copy_to_operands(const exprt &e1, const exprt &e2)
-{
-  operandst &op=operands();
-  #ifndef USE_LIST
-  op.reserve(op.size()+2);
-  #endif
-  op.push_back(e1);
-  op.push_back(e2);
-}
-
-/// Copy the given arguments to the end of `exprt`'s operands.
-/// \param e1: first `exprt` to append to the operands
-/// \param e2: second `exprt` to append to the operands
-/// \param e3: third `exprt` to append to the operands
-void exprt::copy_to_operands(
-  const exprt &e1,
-  const exprt &e2,
-  const exprt &e3)
-{
-  operandst &op=operands();
-  #ifndef USE_LIST
-  op.reserve(op.size()+3);
-  #endif
-  op.push_back(e1);
-  op.push_back(e2);
-  op.push_back(e3);
-}
-
 /// Create a \ref typecast_exprt to the given type.
 /// \param _type: cast destination type
 /// \deprecated use constructors instead
