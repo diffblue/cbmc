@@ -14,13 +14,6 @@ Date: July 2005
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H
 
-/*! \file goto-symex/goto_trace.h
- * \brief Traces through goto programs
- *
- * \author Daniel Kroening <kroening@kroening.com>
- * \date   Sun Jul 31 21:54:44 BST 2011
-*/
-
 #include <iosfwd>
 #include <vector>
 
