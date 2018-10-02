@@ -135,6 +135,23 @@ static void remove_vector(exprt &expr)
     {
       expr.id(ID_array);
     }
+    else if(expr.id() == ID_typecast)
+    {
+      const auto &op = to_typecast_expr(expr).op();
+
+      if(op.type().id() != ID_array)
+      {
+        // (vector-type) x ==> { x, x, ..., x }
+        remove_vector(expr.type());
+        array_typet array_type = to_array_type(expr.type());
+        const auto dimension = numeric_cast_v<std::size_t>(array_type.size());
+        exprt casted_op =
+          typecast_exprt::conditional_cast(op, array_type.subtype());
+        array_exprt array_expr(array_type);
+        array_expr.operands().resize(dimension, op);
+        expr = array_expr;
+      }
+    }
   }
 
   remove_vector(expr.type());

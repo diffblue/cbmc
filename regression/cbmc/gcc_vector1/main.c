@@ -18,6 +18,7 @@ int main()
 
   vector_u x, y, z;
 
+  // vector operator vector
   z.v=x.v+y.v;
 
   assert(z.members[0]==x.members[0]+y.members[0]);
@@ -45,6 +46,22 @@ int main()
   assert(z.members[1]==~x.members[1]);
   assert(z.members[2]==~x.members[2]);
   assert(z.members[3]==~x.members[3]);
+
+  // vector operator scalar
+  z=x;
+  z.v=z.v+1;
+  assert(z.members[0]==x.members[0]+1);
+  assert(z.members[1]==x.members[1]+1);
+  assert(z.members[2]==x.members[2]+1);
+  assert(z.members[3]==x.members[3]+1);
+
+  // unary operators on vectors
+  z=x;
+  z.v=-z.v;
+  assert(z.members[0]==-x.members[0]);
+  assert(z.members[1]==-x.members[1]);
+  assert(z.members[2]==-x.members[2]);
+  assert(z.members[3]==-x.members[3]);
 
   // build vector with typecast
   z.v=(v4si){ 0, 1, 2, 3 };
