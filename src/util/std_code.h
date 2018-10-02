@@ -117,15 +117,24 @@ public:
     return (const code_operandst &)get_sub();
   }
 
-  explicit code_blockt(const std::list<codet> &_list):codet(ID_block)
+  static code_blockt from_list(const std::list<codet> &_list)
   {
-    auto &o = statements();
-    reserve_operands(_list.size());
-    for(std::list<codet>::const_iterator
-        it=_list.begin();
-        it!=_list.end();
-        it++)
-      o.push_back(*it);
+    code_blockt result;
+    statementst &s=result.statements();
+    s.reserve(_list.size());
+    for(const auto &c : _list)
+      o.push_back(c);
+    return result;
+  }
+
+  explicit code_blockt(const std::vector<codet> &_statements):codet(ID_block)
+  {
+    operands()=(const std::vector<exprt> &)_statements;
+  }
+
+  explicit code_blockt(std::vector<codet> &&_statements):codet(ID_block)
+  {
+    operands()=std::move((std::vector<exprt> &&)_statements);
   }
 
   void move(codet &code)
@@ -166,9 +175,9 @@ public:
       const irep_idt &statement=last->get_statement();
 
       if(statement==ID_block &&
-         !last->operands().empty())
+         !to_code_block(*last).statements().empty())
       {
-        last=&to_code(last->operands().back());
+        last=&to_code_block(*last).statements().back());
       }
       else if(statement==ID_label)
       {

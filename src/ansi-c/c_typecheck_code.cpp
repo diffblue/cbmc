@@ -353,7 +353,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
   else
   {
     // build a decl-block
-    code_blockt code_block(new_code);
+    auto code_block=code_blockt::from_list(new_code);
     code_block.set_statement(ID_decl_block);
     code.swap(code_block);
   }
