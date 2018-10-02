@@ -68,6 +68,8 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
     object_factory_parameters.max_nondet_string_length =
       safe_string2size_t(cmd.get_value("max-nondet-string-length"));
   }
+  if(cmd.isset("string-non-empty"))
+    object_factory_parameters.min_nondet_string_length = 1;
 
   object_factory_parameters.string_printable = cmd.isset("string-printable");
   if(cmd.isset("java-max-vla-length"))

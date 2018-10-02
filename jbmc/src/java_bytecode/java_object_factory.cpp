@@ -538,6 +538,7 @@ static codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
 /// \param struct_expr [out]: struct that we may initialize
 /// \param code: block to add pre-requisite declarations (e.g. to allocate a
 ///   data array)
+/// \param min_nondet_string_length: minimum length of strings to initialize
 /// \param max_nondet_string_length: maximum length of strings to initialize
 /// \param loc: location in the source
 /// \param function_id: function ID to associate with auxiliary variables
@@ -573,6 +574,7 @@ static codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
 bool initialize_nondet_string_fields(
   struct_exprt &struct_expr,
   code_blockt &code,
+  const std::size_t &min_nondet_string_length,
   const std::size_t &max_nondet_string_length,
   const source_locationt &loc,
   const irep_idt &function_id,
@@ -627,11 +629,10 @@ bool initialize_nondet_string_fields(
   code.add(code_declt(length_expr));
   code.add(code_assignt(length_expr, nondet_length));
 
-  // assume (length_expr >= 0);
-  code.add(
-    code_assumet(
-      binary_relation_exprt(
-        length_expr, ID_ge, from_integer(0, java_int_type()))));
+  // assume (length_expr >= min_nondet_string_length);
+  const exprt min_length =
+    from_integer(min_nondet_string_length, java_int_type());
+  code.add(code_assumet(binary_relation_exprt(length_expr, ID_ge, min_length)));
 
   // assume (length_expr <= max_input_length)
   if(max_nondet_string_length <= max_value(length_expr.type()))
@@ -1044,15 +1045,15 @@ void java_object_factoryt::gen_nondet_struct_init(
     // If the initialised type is a special-cased String type (one with length
     // and data fields introduced by string-library preprocessing), initialise
     // those fields with nondet values:
-    skip_special_string_fields =
-      initialize_nondet_string_fields(
-        to_struct_expr(initial_object),
-        assignments,
-        object_factory_parameters.max_nondet_string_length,
-        loc,
-        object_factory_parameters.function_id,
-        symbol_table,
-        object_factory_parameters.string_printable);
+    skip_special_string_fields = initialize_nondet_string_fields(
+      to_struct_expr(initial_object),
+      assignments,
+      object_factory_parameters.min_nondet_string_length,
+      object_factory_parameters.max_nondet_string_length,
+      loc,
+      object_factory_parameters.function_id,
+      symbol_table,
+      object_factory_parameters.string_printable);
 
     assignments.copy_to_operands(
       code_assignt(expr, initial_object));
