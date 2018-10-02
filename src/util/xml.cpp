@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
+#include "exception_utils.h"
 #include "string2int.h"
 
 void xmlt::clear()
@@ -240,7 +241,7 @@ std::string xmlt::unescape(const std::string &str)
         result+=c;
       }
       else
-        throw "XML escape code not implemented"; // NOLINT(readability/throw)
+        throw deserialization_exceptiont("unknown XML escape code: " + tmp);
     }
     else
       result+=*it;

@@ -32,7 +32,7 @@ Author: CM Wintersteiger
 #include <unistd.h>
 #endif
 
-#include "invariant.h"
+#include "exception_utils.h"
 #include "file_util.h"
 
 std::string get_temporary_directory(const std::string &name_template)
@@ -45,7 +45,9 @@ std::string get_temporary_directory(const std::string &name_template)
     DWORD dwRetVal = GetTempPathA(dwBufSize, lpPathBuffer);
 
     if(dwRetVal > dwBufSize || (dwRetVal == 0))
-      throw "GetTempPath failed"; // NOLINT(readability/throw)
+    {
+      throw system_exceptiont("Couldn't get temporary path");
+    }
 
     // GetTempFileNameA produces <path>\<pre><uuuu>.TMP
     // where <pre> = "TLO"
@@ -54,12 +56,18 @@ std::string get_temporary_directory(const std::string &name_template)
     char t[MAX_PATH];
     UINT uRetVal=GetTempFileNameA(lpPathBuffer, "TLO", 0, t);
     if(uRetVal == 0)
-      throw "GetTempFileName failed"; // NOLINT(readability/throw)
+    {
+      throw system_exceptiont(
+        std::string("Couldn't get new temporary file name in directory") +
+        lpPathBuffer);
+    }
 
     unlink(t);
-    if(_mkdir(t)!=0)
-      throw "_mkdir failed";
-
+    if(_mkdir(t) != 0)
+    {
+      throw system_exceptiont(
+        std::string("Couldn't create temporary directory at ") + t);
+    }
     result=std::string(t);
 
   #else
@@ -75,7 +83,7 @@ std::string get_temporary_directory(const std::string &name_template)
     t.push_back('\0'); // add the zero
     const char *td = mkdtemp(t.data());
     if(!td)
-      throw "mkdtemp failed";
+      throw system_exceptiont("Failed to create temporary directory");
     result=std::string(td);
   #endif
 

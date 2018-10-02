@@ -46,16 +46,15 @@ void unsigned_union_find::isolate(size_type a)
   if(is_root(a))
   {
     size_type c=nodes[a].count;
+    DATA_INVARIANT(c != 0, "a root cannot have a node count of zero");
 
     // already isolated?
     if(c==1)
       return;
 
-    assert(c>=2);
-
     // find a new root
     size_type new_root=get_other(a);
-    assert(new_root!=a);
+    CHECK_RETURN(new_root != a);
 
     re_root(a, new_root);
   }
@@ -63,8 +62,6 @@ void unsigned_union_find::isolate(size_type a)
   // now it's not a root
   // get its root
   size_type r=find(a);
-
-  // assert(r!=a);
 
   nodes[r].count--;
   nodes[a].parent=a;
@@ -80,13 +77,11 @@ void unsigned_union_find::re_root(size_type old_root, size_type new_root)
   old_root=find(old_root);
 
   // same set?
-  // assert(find(new_root)==old_root);
   if(find(new_root)!=old_root)
     return;
 
-  // make sure we actually do something
-  assert(new_root!=old_root);
-  assert(nodes[old_root].count>=2);
+  PRECONDITION(!is_root(new_root));
+  PRECONDITION(nodes[old_root].count >= 2);
 
   nodes[new_root].parent=new_root;
   nodes[new_root].count=nodes[old_root].count;
@@ -110,7 +105,8 @@ unsigned_union_find::size_type unsigned_union_find::get_other(size_type a)
   check_index(a);
   a=find(a);
 
-  assert(nodes[a].count>=2);
+  // Cannot find another node in a singleton set
+  PRECONDITION(nodes[a].count >= 2);
 
   // find a different member of the same set
   for(size_type i=0; i<size(); i++)
