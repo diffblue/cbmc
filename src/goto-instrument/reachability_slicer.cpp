@@ -245,17 +245,15 @@ void reachability_slicer(
 /// Perform reachability slicing on goto_model for selected functions.
 /// \param goto_model Goto program to slice
 /// \param functions_list The functions relevant for the slicing (i.e. starting
-/// point for the search in the cfg). Anything that is reachable in the CFG
+/// point for the search in the CFG). Anything that is reachable in the CFG
 /// starting from these functions will be kept.
 void function_path_reachability_slicer(
   goto_modelt &goto_model,
-  const std::string &functions_list)
+  const std::list<std::string> &functions_list)
 {
-  std::istringstream functions_stream(functions_list);
-  std::string single_function;
-  while(std::getline(functions_stream, single_function, ','))
+  for(const auto &function : functions_list)
   {
-    in_function_criteriont matching_criterion(single_function);
+    in_function_criteriont matching_criterion(function);
     reachability_slicert slicer;
     slicer(goto_model.goto_functions, matching_criterion, true);
   }

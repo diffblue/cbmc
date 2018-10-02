@@ -1430,6 +1430,15 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       reachability_slicer(goto_model);
   }
 
+  if(cmdline.isset("fp-reachability-slice"))
+  {
+    do_indirect_call_and_rtti_removal();
+
+    status() << "Performing a function pointer reachability slice" << eom;
+    function_path_reachability_slicer(
+      goto_model, cmdline.get_comma_separated_values("fp-reachability-slice"));
+  }
+
   // full slice?
   if(cmdline.isset("full-slice"))
   {
@@ -1610,7 +1619,7 @@ void goto_instrument_parse_optionst::help()
     " --render-cluster-function    clusterises the dot by functions\n"
     "\n"
     "Slicing:\n"
-    " --reachability-slice         slice away instructions that can't reach assertions\n" // NOLINT(*)
+    HELP_REACHABILITY_SLICER
     " --full-slice                 slice away instructions that don't affect assertions\n" // NOLINT(*)
     " --property id                slice with respect to specific property only\n" // NOLINT(*)
     " --slice-global-inits         slice away initializations of unused global variables\n" // NOLINT(*)

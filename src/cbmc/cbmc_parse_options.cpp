@@ -933,6 +933,7 @@ void cbmc_parse_optionst::help()
     " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     HELP_REACHABILITY_SLICER
+    HELP_REACHABILITY_SLICER_FB
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
