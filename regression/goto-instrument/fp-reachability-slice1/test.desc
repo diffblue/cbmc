@@ -1,0 +1,11 @@
+CORE
+main.c
+--fp-reachability-slice c
+^EXIT=0$
+^SIGNAL=0$
+1: ASSUME FALSE
+dead e;
+dead d;
+--
+^warning: ignoring
+dead f;

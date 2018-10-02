@@ -118,6 +118,23 @@ const std::list<std::string> &cmdlinet::get_values(
     return immutable_empty_list;
 }
 
+std::list<std::string>
+cmdlinet::get_comma_separated_values(const char *option) const
+{
+  std::list<std::string> separated_values;
+  auto i = getoptnr(option);
+  if(i.has_value() && !options[*i].values.empty())
+  {
+    std::istringstream values_stream(options[*i].values.front());
+    std::string single_value;
+    while(std::getline(values_stream, single_value, ','))
+    {
+      separated_values.push_back(single_value);
+    }
+  }
+  return separated_values;
+}
+
 optionalt<std::size_t> cmdlinet::getoptnr(char option) const
 {
   for(std::size_t i=0; i<options.size(); i++)

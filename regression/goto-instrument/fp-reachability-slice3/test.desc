@@ -1,0 +1,11 @@
+CORE
+main.c
+--fp-reachability-slice b,c
+^EXIT=0$
+^SIGNAL=0$
+1 file main.c line 34
+--
+^warning: ignoring
+dead d;
+dead e;
+dead f;

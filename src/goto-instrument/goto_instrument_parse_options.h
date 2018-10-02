@@ -71,6 +71,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-struct-alignment)(interval-analysis)(show-intervals)" \
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)(slice-global-inits)" \
+  "(fp-reachability-slice):" \
   "(inline)(partial-inline)(function-inline):(log):(no-caching)" \
   OPT_REMOVE_CONST_FUNCTION_POINTERS \
   "(print-internal-representation)" \
