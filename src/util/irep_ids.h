@@ -22,7 +22,8 @@ Author: Reuben Thomas, reuben.thomas@me.com
 #include <string>
 #endif
 
-/// \file The irep_ids are generated using a technique called
+/// \file
+/// The irep_ids are generated using a technique called
 /// [X-macros](https://en.wikipedia.org/wiki/X_Macro).
 /// The ids are defined in the file irep_ids.def, using a pair of macros
 /// `IREP_ID_ONE` and `IREP_ID_TWO`.

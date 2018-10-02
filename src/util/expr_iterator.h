@@ -19,7 +19,8 @@
 
 // Forward declarations - table of contents
 
-/// \file Forward depth-first search iterators
+/// \file
+/// Forward depth-first search iterators
 /// These iterators' copy operations are expensive, so use auto&, and avoid
 /// std::next(), std::prev() and post-increment iterator
 ///
