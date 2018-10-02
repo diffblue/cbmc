@@ -81,7 +81,7 @@ the instruction type, i.e. goto_symext::symex_function_call() if the
 current instruction is a function call, goto_symext::symex_goto() if the
 current instruction is a goto, etc.
 
-\subsection Loop and recursion unwinding
+\subsection symex-loop-and-recursion-unwinding Loop and recursion unwinding
 
 Each backwards goto and recursive call has a separate counter
 (handled by \ref cbmc or another driver program, see the `--unwind` and
@@ -91,7 +91,7 @@ be handled completely (assuming the unwinding limit is sufficient).
 When an unwind or recursion limit is reached, an assertion can be added to
 explicitly show when analysis is incomplete.
 
-\subsection \ref goto_symext::clean_expr
+\subsection goto-symext-clean-expr goto_symext::clean_expr
 
 Before any expression is incorporated into the output equation set it is passed
 through \ref goto_symext::clean_expr and thus \ref goto_symext::dereference,
