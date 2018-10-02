@@ -547,11 +547,8 @@ void goto_convertt::convert_block(
   std::size_t old_stack_size=targets.destructor_stack.size();
 
   // now convert block
-  forall_operands(it, code)
-  {
-    const codet &b_code=to_code(*it);
+  for(const auto &b_code : code.statements())
     convert(b_code, dest, mode);
-  }
 
   // see if we need to do any destructors -- may have been processed
   // in a prior break/continue/return already, don't create dead code

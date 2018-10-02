@@ -247,11 +247,13 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
 
     tmp_this=address_of_exprt(object_tc);
 
-    if(block.operands().empty())
-      return to_code(initializer);
+    const auto &initializer_code=to_code(initializer);
+
+    if(block.statements().empty())
+      return initializer_code;
     else
     {
-      block.move_to_operands(initializer);
+      block.add(initializer_code);
       return block;
     }
   }

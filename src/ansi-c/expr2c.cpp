@@ -2835,12 +2835,12 @@ std::string expr2ct::convert_code_block(
   std::string dest=indent_str(indent);
   dest+="{\n";
 
-  forall_operands(it, src)
+  for(const auto &statement : src.statements())
   {
-    if(it->get(ID_statement)==ID_label)
-      dest+=convert_code(to_code(*it), indent);
+    if(statement.get_statement() == ID_label)
+      dest += convert_code(statement, indent);
     else
-      dest+=convert_code(to_code(*it), indent+2);
+      dest += convert_code(statement, indent + 2);
 
     dest+="\n";
   }
