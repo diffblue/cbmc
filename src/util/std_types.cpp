@@ -20,14 +20,14 @@ Author: Daniel Kroening, kroening@kroening.com
 std::size_t fixedbv_typet::get_integer_bits() const
 {
   const irep_idt integer_bits=get(ID_integer_bits);
-  assert(!integer_bits.empty());
+  DATA_INVARIANT(!integer_bits.empty(), "integer bits should be set");
   return unsafe_string2unsigned(id2string(integer_bits));
 }
 
 std::size_t floatbv_typet::get_f() const
 {
   const irep_idt &f=get(ID_f);
-  assert(!f.empty());
+  DATA_INVARIANT(!f.empty(), "the mantissa should be set");
   return unsafe_string2unsigned(id2string(f));
 }
 
@@ -66,7 +66,7 @@ const typet &
 struct_union_typet::component_type(const irep_idt &component_name) const
 {
   const auto &c = get_component(component_name);
-  assert(c.is_not_nil());
+  CHECK_RETURN(c.is_not_nil());
   return c.type();
 }
 
