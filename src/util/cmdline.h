@@ -35,6 +35,11 @@ public:
   virtual void set(const std::string &option, const std::string &value);
   virtual void clear();
 
+  bool has_option(const std::string &option) const
+  {
+    return getoptnr(option).has_value();
+  }
+
   typedef std::vector<std::string> argst;
   argst args;
   std::string unknown_arg;

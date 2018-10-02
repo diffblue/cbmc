@@ -29,6 +29,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/refinement/string_refinement/sparse_array.cpp \
        solvers/refinement/string_refinement/substitute_array_list.cpp \
        solvers/refinement/string_refinement/union_find_replace.cpp \
+       util/cmdline.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr.cpp \
        util/file_util.cpp \
