@@ -104,6 +104,7 @@ jobs:
             - parallel
       before_install:
         - mkdir bin
+        - wget --directory-prefix=bin https://github.com/Z3Prover/z3/releases/download/z3-4.7.1/z3-4.7.1-x64-ubuntu-14.04.zip && unzip -d bin bin/z3-4.7.1-x64-ubuntu-14.04.zip && ln -s $PWD/bin/z3-4.7.1-x64-ubuntu-14.04/bin/z3 bin/z3
         - ln -s /usr/bin/gcc-5 bin/gcc
         - ln -s /usr/bin/g++-5 bin/g++
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
@@ -118,7 +119,7 @@ jobs:
       compiler: clang
       cache: ccache
       before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel z3
         - export PATH=$PATH:/usr/local/opt/ccache/libexec
       env: COMPILER="ccache clang++"
 
@@ -171,7 +172,7 @@ jobs:
         - ln -s /usr/bin/gcc-5 bin/gcc
         - ln -s /usr/bin/c++-5 bin/g++
         - export CCACHE_CPP2=yes
-      # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
+        - wget --directory-prefix=bin https://github.com/Z3Prover/z3/releases/download/z3-4.7.1/z3-4.7.1-x64-ubuntu-14.04.zip && unzip -d bin bin/z3-4.7.1-x64-ubuntu-14.04.zip && ln -s $PWD/bin/z3-4.7.1-x64-ubuntu-14.04/bin/z3 bin/z3
       env:
         - COMPILER="ccache /usr/bin/clang++-3.7"
         - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DNDEBUG"
@@ -361,6 +362,7 @@ install:
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
   - env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test-parallel "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2 JOBS=2
+  - env UBSAN_OPTIONS=print_stacktrace=1 make -C regression/cbmc-smt test "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2 JOBS=2
   - make -C unit "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2
   - make -C unit test
   - env UBSAN_OPTIONS=print_stacktrace=1 make -C jbmc/regression test-parallel "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2 JOBS=2

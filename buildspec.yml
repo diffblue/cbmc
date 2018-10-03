@@ -11,6 +11,7 @@ phases:
       - apt-get install -y openjdk-8-jdk
       - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
       - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
+      - wget --directory-prefix=bin https://github.com/Z3Prover/z3/releases/download/z3-4.7.1/z3-4.7.1-x64-ubuntu-14.04.zip && unzip -d bin bin/z3-4.7.1-x64-ubuntu-14.04.zip && ln -s $PWD/bin/z3-4.7.1-x64-ubuntu-14.04/bin/z3 /usr/bin/z3
   build:
     commands:
       - echo Build started on `date`
@@ -24,6 +25,7 @@ phases:
     commands:
       - make -C unit test
       - make -C regression test
+      - make -C regression/cbmc-smt test
       - make -C jbmc/unit test
       - make -C jbmc/regression test
       - echo Build completed on `date`
