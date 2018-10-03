@@ -183,10 +183,10 @@ bool simplify_exprt::simplify_index(exprt &expr)
   else if(array.id()==ID_byte_extract_little_endian ||
           array.id()==ID_byte_extract_big_endian)
   {
-    const typet &array_type=ns.follow(array.type());
-
-    if(array_type.id()==ID_array)
+    if(array.type().id() == ID_array)
     {
+      const auto &array_type = to_array_type(array.type());
+
       // This rewrites byte_extract(s, o, array_type)[i]
       // to byte_extract(s, o+offset, sub_type)
 

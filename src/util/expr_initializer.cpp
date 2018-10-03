@@ -116,7 +116,8 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       result = side_effect_expr_nondett(type, source_location);
     else
     {
-      exprt sub_zero = expr_initializer_rec(type.subtype(), source_location);
+      exprt sub_zero =
+        expr_initializer_rec(to_complex_type(type).subtype(), source_location);
       result = complex_exprt(sub_zero, sub_zero, to_complex_type(type));
     }
 

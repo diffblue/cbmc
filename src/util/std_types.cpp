@@ -249,7 +249,7 @@ bool is_constant_or_has_constant_components(
   // struct contains_constant_pointer b[3] = { {23, &y}, {23, &y}, {23, &y} };
   if(type.has_subtype())
   {
-    const auto &subtype = type.subtype();
+    const auto &subtype = to_type_with_subtype(type).subtype();
     return is_constant_or_has_constant_components(subtype, ns);
   }
 

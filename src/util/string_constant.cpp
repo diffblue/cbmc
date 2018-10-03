@@ -35,7 +35,7 @@ array_exprt string_constantt::to_array_expr() const
 {
   const std::string &str=get_string(ID_value);
   std::size_t string_size=str.size()+1; // we add the zero
-  const typet &char_type=type().subtype();
+  const typet &char_type = to_array_type(type()).subtype();
   bool char_is_unsigned=char_type.id()==ID_unsignedbv;
 
   exprt size=from_integer(string_size, index_type());
@@ -78,7 +78,7 @@ bool string_constantt::from_array_expr(const array_exprt &src)
   id(ID_string_constant);
   type()=src.type();
 
-  const typet &subtype=type().subtype();
+  const typet &subtype = to_array_type(type()).subtype();
 
   // check subtype
   if(subtype!=signed_char_type() &&

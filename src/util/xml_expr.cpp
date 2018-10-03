@@ -84,7 +84,8 @@ xmlt xml(
   else if(type.id()==ID_c_enum_tag)
   {
     // we return the base type
-    return xml(ns.follow_tag(to_c_enum_tag_type(type)).subtype(), ns);
+    return xml(
+      to_c_enum_type(ns.follow_tag(to_c_enum_tag_type(type))).subtype(), ns);
   }
   else if(type.id()==ID_fixedbv)
   {
@@ -94,7 +95,8 @@ xmlt xml(
   else if(type.id()==ID_pointer)
   {
     result.name="pointer";
-    result.new_element("subtype").new_element()=xml(type.subtype(), ns);
+    result.new_element("subtype").new_element() =
+      xml(to_pointer_type(type).subtype(), ns);
   }
   else if(type.id()==ID_bool)
   {
@@ -103,12 +105,14 @@ xmlt xml(
   else if(type.id()==ID_array)
   {
     result.name="array";
-    result.new_element("subtype").new_element()=xml(type.subtype(), ns);
+    result.new_element("subtype").new_element() =
+      xml(to_array_type(type).subtype(), ns);
   }
   else if(type.id()==ID_vector)
   {
     result.name="vector";
-    result.new_element("subtype").new_element()=xml(type.subtype(), ns);
+    result.new_element("subtype").new_element() =
+      xml(to_vector_type(type).subtype(), ns);
     result.new_element("size").new_element()=
       xml(to_vector_type(type).size(), ns);
   }
@@ -163,9 +167,9 @@ xmlt xml(
         id2string(to_constant_expr(expr).get_value()));
       result.set_attribute("width", width);
 
-      const typet &underlying_type=
-        type.id()==ID_c_bit_field?type.subtype():
-        type;
+      const typet &underlying_type = type.id() == ID_c_bit_field
+                                       ? to_c_bit_field_type(type).subtype()
+                                       : type;
 
       bool is_signed=underlying_type.id()==ID_signedbv;
 
@@ -190,7 +194,8 @@ xmlt xml(
     {
       result.name="integer";
       result.set_attribute("binary", expr.get_string(ID_value));
-      result.set_attribute("width", type.subtype().get_string(ID_width));
+      result.set_attribute(
+        "width", to_c_enum_type(type).subtype().get_string(ID_width));
       result.set_attribute("c_type", "enum");
 
       mp_integer i;

@@ -140,5 +140,7 @@ void mutex_init_instrumentation(goto_modelt &goto_model)
 
   Forall_goto_functions(f_it, goto_model.goto_functions)
     mutex_init_instrumentation(
-      goto_model.symbol_table, f_it->second.body, lock_type.subtype());
+      goto_model.symbol_table,
+      f_it->second.body,
+      to_pointer_type(lock_type).subtype());
 }
