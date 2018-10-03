@@ -722,6 +722,16 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
   bool have_body=type.find(ID_components).is_not_nil();
 
+  c_qualifierst original_qualifiers(type);
+
+  // the type symbol, which may get re-used in other declarations, must not
+  // carry any qualifiers (other than transparent_union, which isn't really a
+  // qualifier)
+  c_qualifierst remove_qualifiers;
+  remove_qualifiers.is_transparent_union =
+    original_qualifiers.is_transparent_union;
+  remove_qualifiers.write(type);
+
   if(type.find(ID_tag).is_nil())
   {
     // Anonymous? Must come with body.
@@ -817,8 +827,6 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       }
     }
   }
-
-  c_qualifierst original_qualifiers(type);
 
   typet tag_type;
 

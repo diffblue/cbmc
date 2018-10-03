@@ -29,10 +29,11 @@ static exprt make_member_expr(
   const typet &type=
     ns.follow(struct_union.type());
 
-  if(result.get_bool(ID_C_constant) ||
-     type.get_bool(ID_C_constant) ||
-     struct_union.type().get_bool(ID_C_constant))
-    result.set(ID_C_constant, true);
+  if(
+    type.get_bool(ID_C_constant) || struct_union.type().get_bool(ID_C_constant))
+  {
+    result.type().set(ID_C_constant, true);
+  }
 
   return result;
 }

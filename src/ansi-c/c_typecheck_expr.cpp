@@ -358,8 +358,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       if(op.get_bool(ID_C_lvalue))
         complex_real_expr.set(ID_C_lvalue, true);
 
-      if(op.get_bool(ID_C_constant))
-        complex_real_expr.set(ID_C_constant, true);
+      if(op.type().get_bool(ID_C_constant))
+        complex_real_expr.type().set(ID_C_constant, true);
 
       expr.swap(complex_real_expr);
     }
@@ -396,8 +396,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       if(op.get_bool(ID_C_lvalue))
         complex_imag_expr.set(ID_C_lvalue, true);
 
-      if(op.get_bool(ID_C_constant))
-        complex_imag_expr.set(ID_C_constant, true);
+      if(op.type().get_bool(ID_C_constant))
+        complex_imag_expr.type().set(ID_C_constant, true);
 
       expr.swap(complex_imag_expr);
     }
@@ -2853,7 +2853,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
       if(type.id()==ID_array)
       {
         typet dest_type=pointer_type(void_type());
-        dest_type.subtype().set(ID_C_constant, ID_1);
+        dest_type.subtype().set(ID_C_constant, true);
         implicit_typecast(op, dest_type);
       }
     }
