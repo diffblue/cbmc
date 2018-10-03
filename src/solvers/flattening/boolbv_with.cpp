@@ -92,8 +92,14 @@ void boolbvt::convert_with(
   else if(type.id()==ID_struct)
     return
       convert_with_struct(to_struct_type(type), op1, op2, prev_bv, next_bv);
+  else if(type.id() == ID_struct_tag)
+    return convert_with(
+      ns.follow_tag(to_struct_tag_type(type)), op1, op2, prev_bv, next_bv);
   else if(type.id()==ID_union)
     return convert_with_union(to_union_type(type), op2, prev_bv, next_bv);
+  else if(type.id() == ID_union_tag)
+    return convert_with(
+      ns.follow_tag(to_union_tag_type(type)), op1, op2, prev_bv, next_bv);
   else if(type.id()==ID_symbol)
     return convert_with(ns.follow(type), op1, op2, prev_bv, next_bv);
 
