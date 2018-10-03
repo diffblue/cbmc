@@ -1,0 +1,10 @@
+KNOWNBUG
+return_type1.c
+return_type2.c
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Note issue #3081
