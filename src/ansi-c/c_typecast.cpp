@@ -555,12 +555,6 @@ void c_typecastt::implicit_typecast_followed(
 
       // check qualifiers
 
-      /*
-      if(src_type.subtype().get_bool(ID_C_constant) &&
-         !dest_type.subtype().get_bool(ID_C_constant))
-        warnings.push_back("disregarding const");
-      */
-
       if(src_type.subtype().get_bool(ID_C_volatile) &&
          !dest_type.subtype().get_bool(ID_C_volatile))
         warnings.push_back("disregarding volatile");

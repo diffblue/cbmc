@@ -1,0 +1,7 @@
+CORE
+main.c
+-DTEST=0
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*: .* is constant$
