@@ -182,6 +182,9 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_smt2(
     if(options.get_bool_option("fpa"))
       smt2_dec->use_FPA_theory=true;
 
+    if(options.is_set("data-types") && !options.get_bool_option("data-types"))
+      smt2_dec->use_datatypes=false;
+
     return util_make_unique<solvert>(std::move(smt2_dec));
   }
   else if(filename=="-")
