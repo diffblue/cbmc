@@ -1053,7 +1053,7 @@ bool configt::set(const cmdlinet &cmdline)
     if(!(0<bv_encoding.object_bits &&
          bv_encoding.object_bits<ansi_c.pointer_width))
     {
-      throw invalid_user_input_exceptiont(
+      throw invalid_command_line_argument_exceptiont(
         "object-bits must be positive and less than the pointer width (" +
           std::to_string(ansi_c.pointer_width) + ") ",
         "--object_bits");

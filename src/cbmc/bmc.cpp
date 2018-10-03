@@ -217,7 +217,7 @@ void bmct::get_memory_model()
     memory_model=util_make_unique<memory_model_psot>(ns);
   else
   {
-    throw invalid_user_input_exceptiont(
+    throw invalid_command_line_argument_exceptiont(
       "invalid parameter " + mm, "--mm", "try values of sc, tso, pso");
   }
 }

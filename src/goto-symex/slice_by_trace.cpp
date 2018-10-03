@@ -124,7 +124,7 @@ void symex_slice_by_tracet::read_trace(std::string filename)
   std::cout << "Reading trace from file " << filename << '\n';
   std::ifstream file(filename);
   if(file.fail())
-    throw invalid_user_input_exceptiont(
+    throw invalid_command_line_argument_exceptiont(
       "invalid file to read trace from: " + filename, "");
 
   // In case not the first trace read

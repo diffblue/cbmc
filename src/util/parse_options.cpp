@@ -71,7 +71,7 @@ int parse_options_baset::main()
 
     return doit();
   }
-  catch(const invalid_user_input_exceptiont &e)
+  catch(const invalid_command_line_argument_exceptiont &e)
   {
     std::cerr << e.what() << "\n";
     return CPROVER_EXIT_USAGE_ERROR;

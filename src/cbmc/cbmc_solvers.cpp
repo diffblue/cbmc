@@ -166,7 +166,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_smt2(
   {
     if(solver==smt2_dect::solvert::GENERIC)
     {
-      throw invalid_user_input_exceptiont(
+      throw invalid_command_line_argument_exceptiont(
         "required filename not provided",
         "--outfile",
         "provide a filename with --outfile");
@@ -211,7 +211,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_smt2(
 
     if(!*out)
     {
-      throw invalid_user_input_exceptiont(
+      throw invalid_command_line_argument_exceptiont(
         "failed to open file: " + filename, "--outfile");
     }
 
@@ -236,7 +236,7 @@ void cbmc_solverst::no_beautification()
 {
   if(options.get_bool_option("beautify"))
   {
-    throw invalid_user_input_exceptiont(
+    throw invalid_command_line_argument_exceptiont(
       "the chosen solver does not support beautification", "--beautify");
   }
 }
@@ -249,18 +249,18 @@ void cbmc_solverst::no_incremental_check()
 
   if(all_properties)
   {
-    throw invalid_user_input_exceptiont(
+    throw invalid_command_line_argument_exceptiont(
       "the chosen solver does not support incremental solving",
       "--all_properties");
   }
   else if(cover)
   {
-    throw invalid_user_input_exceptiont(
+    throw invalid_command_line_argument_exceptiont(
       "the chosen solver does not support incremental solving", "--cover");
   }
   else if(incremental_check)
   {
-    throw invalid_user_input_exceptiont(
+    throw invalid_command_line_argument_exceptiont(
       "the chosen solver does not support incremental solving",
       "--incremental-check");
   }

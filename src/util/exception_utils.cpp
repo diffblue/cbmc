@@ -9,7 +9,7 @@ Author: Fotis Koutoulakis, fotis.koutoulakis@diffblue.com
 #include "exception_utils.h"
 #include <utility>
 
-std::string invalid_user_input_exceptiont::what() const
+std::string invalid_command_line_argument_exceptiont::what() const
 {
   std::string res;
   res += "Invalid User Input";
@@ -23,10 +23,11 @@ std::string invalid_user_input_exceptiont::what() const
   return res;
 }
 
-invalid_user_input_exceptiont::invalid_user_input_exceptiont(
-  std::string reason,
-  std::string option,
-  std::string correct_input)
+invalid_command_line_argument_exceptiont::
+  invalid_command_line_argument_exceptiont(
+    std::string reason,
+    std::string option,
+    std::string correct_input)
   : reason(std::move(reason)),
     option(std::move(option)),
     correct_input(std::move(correct_input))
