@@ -165,7 +165,7 @@ void show_vcc(
   {
     of.open(filename);
     if(!of)
-      throw invalid_user_input_exceptiont(
+      throw invalid_command_line_argument_exceptiont(
         "invalid file to read trace from: " + filename, "--outfile");
   }
 

@@ -28,7 +28,7 @@ public:
 /// Thrown when users pass incorrect command line arguments,
 /// for example passing no files to analysis or setting
 /// two mutually exclusive flags
-class invalid_user_input_exceptiont : public cprover_exception_baset
+class invalid_command_line_argument_exceptiont : public cprover_exception_baset
 {
   /// The reason this exception was generated.
   std::string reason;
@@ -39,7 +39,7 @@ class invalid_user_input_exceptiont : public cprover_exception_baset
   std::string correct_input;
 
 public:
-  invalid_user_input_exceptiont(
+  invalid_command_line_argument_exceptiont(
     std::string reason,
     std::string option,
     std::string correct_input = "");
