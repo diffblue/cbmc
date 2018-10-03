@@ -189,7 +189,13 @@ void remove_returnst::do_function_calls(
           exprt rhs;
 
           if(!is_stub)
-            rhs=return_value;
+          {
+            // The return type in the definition of the function may differ
+            // from the return type in the declaration.  We therefore do a
+            // cast.
+            rhs = typecast_exprt::conditional_cast(
+              return_value, function_call.lhs().type());
+          }
           else
             rhs = side_effect_expr_nondett(
               function_call.lhs().type(), i_it->source_location);
@@ -208,7 +214,7 @@ void remove_returnst::do_function_calls(
             goto_programt::targett t_d=goto_program.insert_after(t_a);
             t_d->make_dead();
             t_d->source_location=i_it->source_location;
-            t_d->code=code_deadt(rhs);
+            t_d->code = code_deadt(return_value);
             t_d->function=i_it->function;
           }
         }
