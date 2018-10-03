@@ -216,6 +216,23 @@ exprt goto_symext::address_arithmetic(
     else
       result=address_of_exprt(result);
   }
+  else if(expr.id() == ID_typecast)
+  {
+    const typecast_exprt &tc_expr = to_typecast_expr(expr);
+
+    result = address_arithmetic(tc_expr.op(), state, guard, keep_array);
+
+    // treat &array as &array[0]
+    const typet &expr_type = ns.follow(expr.type());
+    typet dest_type_subtype;
+
+    if(expr_type.id() == ID_array && !keep_array)
+      dest_type_subtype = expr_type.subtype();
+    else
+      dest_type_subtype = expr_type;
+
+    result = typecast_exprt(result, pointer_type(dest_type_subtype));
+  }
   else
     throw unsupported_operation_exceptiont(
       "goto_symext::address_arithmetic does not handle " + expr.id_string());

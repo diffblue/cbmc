@@ -18,6 +18,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/typecheck.h>
 #include <util/std_expr.h>
 
+class casting_replace_symbolt : public replace_symbolt
+{
+private:
+  bool replace_symbol_expr(symbol_exprt &dest) const override;
+};
+
 class linkingt:public typecheckt
 {
 public:
@@ -35,7 +41,7 @@ public:
   virtual void typecheck();
 
   rename_symbolt rename_symbol;
-  unchecked_replace_symbolt object_type_updates;
+  casting_replace_symbolt object_type_updates;
 
 protected:
   bool needs_renaming_type(

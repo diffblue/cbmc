@@ -67,6 +67,15 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     // and have static lifetime
     new_name=root_name;
     symbol.is_static_lifetime=true;
+
+    if(symbol.value.is_not_nil())
+    {
+      // According to the C standard this should be an error, but at least some
+      // versions of Visual Studio insist to use this in their C library, and
+      // GCC just warns as well.
+      warning().source_location = symbol.value.find_source_location();
+      warning() << "`extern' symbol should not have an initializer" << eom;
+    }
   }
   else if(!is_function && symbol.value.id()==ID_code)
   {
