@@ -46,14 +46,6 @@ public:
     return static_cast<typet &>(sub.front());
   }
 
-  typedef std::vector<typet> subtypest;
-
-  subtypest &subtypes()
-  { return (subtypest &)get_sub(); }
-
-  const subtypest &subtypes() const
-  { return (const subtypest &)get_sub(); }
-
   bool has_subtypes() const
   { return !get_sub().empty(); }
 
@@ -62,10 +54,6 @@ public:
 
   void remove_subtype()
   { get_sub().clear(); }
-
-  void move_to_subtypes(typet &type);
-
-  void copy_to_subtypes(const typet &type);
 
   const source_locationt &source_location() const
   {
@@ -130,19 +118,21 @@ public:
 
   explicit type_with_subtypest(const irep_idt &_id):typet(_id) { }
 
-  #if 0
   typedef std::vector<typet> subtypest;
 
   subtypest &subtypes()
-  { return (subtypest &)add(ID_subtypes).get_sub(); }
+  {
+    return (subtypest &)get_sub();
+  }
 
   const subtypest &subtypes() const
-  { return (const subtypest &)find(ID_subtypes).get_sub(); }
+  {
+    return (const subtypest &)get_sub();
+  }
 
-  void move_to_subtypes(typet &type); // destroys expr
+  void move_to_subtypes(typet &type); // destroys type
 
   void copy_to_subtypes(const typet &type);
-  #endif
 };
 
 inline const type_with_subtypest &to_type_with_subtypes(const typet &type)
