@@ -119,12 +119,16 @@ static bool mul_expr(
 
   const irep_idt &type_id=dest.type().id();
 
-  if(type_id==ID_integer || type_id==ID_natural)
+  if(
+    type_id == ID_integer || type_id == ID_natural ||
+    type_id == ID_unsignedbv || type_id == ID_signedbv)
   {
-    dest.set_value(integer2string(
-      string2integer(id2string(dest.get_value()))*
-      string2integer(id2string(expr.get_value()))));
-    return false;
+    mp_integer a, b;
+    if(!to_integer(dest, a) && !to_integer(expr, b))
+    {
+      dest = from_integer(a * b, dest.type());
+      return false;
+    }
   }
   else if(type_id==ID_rational)
   {
@@ -134,15 +138,6 @@ static bool mul_expr(
       dest=from_rational(a*b);
       return false;
     }
-  }
-  else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
-  {
-    // the following works for signed and unsigned integers
-    dest.set_value(integer2binary(
-      binary2integer(id2string(dest.get_value()), false)*
-      binary2integer(id2string(expr.get_value()), false),
-      to_bitvector_type(dest.type()).get_width()));
-    return false;
   }
   else if(type_id==ID_fixedbv)
   {
