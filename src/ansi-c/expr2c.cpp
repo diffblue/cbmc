@@ -1813,7 +1813,7 @@ std::string expr2ct::convert_constant(
 
     bool is_signed=c_enum_type.subtype().id()==ID_signedbv;
 
-    mp_integer int_value=binary2integer(id2string(value), is_signed);
+    mp_integer int_value = bv2integer(id2string(value), is_signed);
     mp_integer i=0;
 
     irep_idt int_value_string=integer2string(int_value);
@@ -1849,8 +1849,8 @@ std::string expr2ct::convert_constant(
           type.id()==ID_c_bit_field ||
           type.id()==ID_c_bool)
   {
-    mp_integer int_value=
-      binary2integer(id2string(value), type.id()==ID_signedbv);
+    mp_integer int_value =
+      bv2integer(id2string(value), type.id() == ID_signedbv);
 
     const irep_idt &c_type=
       type.id()==ID_c_bit_field?type.subtype().get(ID_C_c_type):

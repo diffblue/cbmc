@@ -137,7 +137,7 @@ numeric_representation(const exprt &expr, const trace_optionst &options)
   if(options.hex_representation)
   {
     mp_integer value_int =
-      binary2integer(id2string(to_constant_expr(expr).get_value()), false);
+      bv2integer(id2string(to_constant_expr(expr).get_value()), false);
     result = integer2string(value_int, 16);
     prefix = "0x";
   }

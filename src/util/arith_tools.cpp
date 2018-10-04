@@ -43,17 +43,17 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   }
   else if(type_id==ID_unsignedbv)
   {
-    int_value=binary2integer(id2string(value), false);
+    int_value = bv2integer(id2string(value), false);
     return false;
   }
   else if(type_id==ID_signedbv)
   {
-    int_value=binary2integer(id2string(value), true);
+    int_value = bv2integer(id2string(value), true);
     return false;
   }
   else if(type_id==ID_c_bool)
   {
-    int_value=binary2integer(id2string(value), false);
+    int_value = bv2integer(id2string(value), false);
     return false;
   }
   else if(type_id==ID_c_enum)
@@ -61,12 +61,12 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
     const typet &subtype=to_c_enum_type(type).subtype();
     if(subtype.id()==ID_signedbv)
     {
-      int_value=binary2integer(id2string(value), true);
+      int_value = bv2integer(id2string(value), true);
       return false;
     }
     else if(subtype.id()==ID_unsignedbv)
     {
-      int_value=binary2integer(id2string(value), false);
+      int_value = bv2integer(id2string(value), false);
       return false;
     }
   }
@@ -75,12 +75,12 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
     const typet &subtype=type.subtype();
     if(subtype.id()==ID_signedbv)
     {
-      int_value=binary2integer(id2string(value), true);
+      int_value = bv2integer(id2string(value), true);
       return false;
     }
     else if(subtype.id()==ID_unsignedbv)
     {
-      int_value=binary2integer(id2string(value), false);
+      int_value = bv2integer(id2string(value), false);
       return false;
     }
   }
@@ -123,28 +123,28 @@ constant_exprt from_integer(
   else if(type_id==ID_unsignedbv)
   {
     std::size_t width=to_unsignedbv_type(type).get_width();
-    return constant_exprt(integer2binary(int_value, width), type);
+    return constant_exprt(integer2bv(int_value, width), type);
   }
   else if(type_id==ID_bv)
   {
     std::size_t width=to_bv_type(type).get_width();
-    return constant_exprt(integer2binary(int_value, width), type);
+    return constant_exprt(integer2bv(int_value, width), type);
   }
   else if(type_id==ID_signedbv)
   {
     std::size_t width=to_signedbv_type(type).get_width();
-    return constant_exprt(integer2binary(int_value, width), type);
+    return constant_exprt(integer2bv(int_value, width), type);
   }
   else if(type_id==ID_c_enum)
   {
     const std::size_t width =
       to_c_enum_type(type).subtype().get_size_t(ID_width);
-    return constant_exprt(integer2binary(int_value, width), type);
+    return constant_exprt(integer2bv(int_value, width), type);
   }
   else if(type_id==ID_c_bool)
   {
     std::size_t width=to_c_bool_type(type).get_width();
-    return constant_exprt(integer2binary(int_value, width), type);
+    return constant_exprt(integer2bv(int_value, width), type);
   }
   else if(type_id==ID_bool)
   {
@@ -162,7 +162,7 @@ constant_exprt from_integer(
   else if(type_id==ID_c_bit_field)
   {
     std::size_t width=to_c_bit_field_type(type).get_width();
-    return constant_exprt(integer2binary(int_value, width), type);
+    return constant_exprt(integer2bv(int_value, width), type);
   }
   else if(type_id==ID_fixedbv)
   {
