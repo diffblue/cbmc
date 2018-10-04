@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "float_utils.h"
 
-#include <cassert>
 #include <algorithm>
 
 #include <util/arith_tools.h>
@@ -84,58 +83,57 @@ bvt float_utilst::to_integer(
   std::size_t dest_width,
   bool is_signed)
 {
-  assert(src.size()==spec.width());
-
-  const unbiased_floatt unpacked=unpack(src);
+  PRECONDITION(src.size() == spec.width());
 
   // The following is the usual case in ANSI-C, and we optimize for that.
-  if(rounding_mode_bits.round_to_zero.is_true())
+  PRECONDITION(rounding_mode_bits.round_to_zero.is_true());
+
+  const unbiased_floatt unpacked = unpack(src);
+
+  bvt fraction = unpacked.fraction;
+
+  if(dest_width > fraction.size())
   {
-    bvt fraction=unpacked.fraction;
-
-    if(dest_width>fraction.size())
-    {
-      bvt lsb_extension=bv_utils.build_constant(0U, dest_width-fraction.size());
-      fraction.insert(fraction.begin(),
-                      lsb_extension.begin(),
-                      lsb_extension.end());
-    }
-
-    // if the exponent is positive, shift right
-    bvt offset=bv_utils.build_constant(fraction.size()-1,
-                                       unpacked.exponent.size());
-    bvt distance=bv_utils.sub(offset, unpacked.exponent);
-    bvt shift_result=bv_utils.shift(
-      fraction, bv_utilst::shiftt::SHIFT_LRIGHT, distance);
-
-    // if the exponent is negative, we have zero anyways
-    bvt result=shift_result;
-    literalt exponent_sign=unpacked.exponent[unpacked.exponent.size()-1];
-
-    for(std::size_t i=0; i<result.size(); i++)
-      result[i]=prop.land(result[i], !exponent_sign);
-
-    // chop out the right number of bits from the result
-    if(result.size()>dest_width)
-    {
-      result.resize(dest_width);
-    }
-
-    assert(result.size()==dest_width);
-
-    // if signed, apply sign.
-    if(is_signed)
-      result=bv_utils.cond_negate(result, unpacked.sign);
-    else
-    {
-      // It's unclear what the behaviour for negative floats
-      // to integer shall be.
-    }
-
-    return result;
+    bvt lsb_extension =
+      bv_utils.build_constant(0U, dest_width - fraction.size());
+    fraction.insert(
+      fraction.begin(), lsb_extension.begin(), lsb_extension.end());
   }
+
+  // if the exponent is positive, shift right
+  bvt offset =
+    bv_utils.build_constant(fraction.size() - 1, unpacked.exponent.size());
+  bvt distance = bv_utils.sub(offset, unpacked.exponent);
+  bvt shift_result =
+    bv_utils.shift(fraction, bv_utilst::shiftt::SHIFT_LRIGHT, distance);
+
+  // if the exponent is negative, we have zero anyways
+  bvt result = shift_result;
+  literalt exponent_sign = unpacked.exponent[unpacked.exponent.size() - 1];
+
+  for(std::size_t i = 0; i < result.size(); i++)
+    result[i] = prop.land(result[i], !exponent_sign);
+
+  // chop out the right number of bits from the result
+  if(result.size() > dest_width)
+  {
+    result.resize(dest_width);
+  }
+
+  INVARIANT(
+    result.size() == dest_width,
+    "result bitvector width should equal the destination bitvector width");
+
+  // if signed, apply sign.
+  if(is_signed)
+    result = bv_utils.cond_negate(result, unpacked.sign);
   else
-    throw "unsupported rounding mode";
+  {
+    // It's unclear what the behaviour for negative floats
+    // to integer shall be.
+  }
+
+  return result;
 }
 
 bvt float_utilst::build_constant(const ieee_floatt &src)
@@ -155,7 +153,7 @@ bvt float_utilst::conversion(
   const bvt &src,
   const ieee_float_spect &dest_spec)
 {
-  assert(src.size()==spec.width());
+  PRECONDITION(src.size() == spec.width());
 
   #if 1
   // Catch the special case in which we extend,
@@ -236,7 +234,7 @@ bvt float_utilst::subtract_exponents(
   bvt extended_exponent2=
     bv_utils.sign_extension(src2.exponent, src2.exponent.size()+1);
 
-  assert(extended_exponent1.size()==extended_exponent2.size());
+  PRECONDITION(extended_exponent1.size() == extended_exponent2.size());
 
   // compute shift distance (here is the subtraction)
   return bv_utils.sub(extended_exponent1, extended_exponent2);
@@ -555,8 +553,8 @@ bvt float_utilst::rem(const bvt &src1, const bvt &src2)
 
 bvt float_utilst::negate(const bvt &src)
 {
+  PRECONDITION(!src.empty());
   bvt result=src;
-  assert(!src.empty());
   literalt &sign_bit=result[result.size()-1];
   sign_bit=!sign_bit;
   return result;
@@ -564,8 +562,8 @@ bvt float_utilst::negate(const bvt &src)
 
 bvt float_utilst::abs(const bvt &src)
 {
+  PRECONDITION(!src.empty());
   bvt result=src;
-  assert(!src.empty());
   result[result.size()-1]=const_literal(false);
   return result;
 }
@@ -580,7 +578,7 @@ literalt float_utilst::relation(
   else if(rel==relt::GE)
     return relation(src2, relt::LE, src1); // swapped
 
-  assert(rel==relt::EQ || rel==relt::LT || rel==relt::LE);
+  INVARIANT(rel == relt::EQ || rel == relt::LT || rel == relt::LE, "");
 
   // special cases: -0 and 0 are equal
   literalt is_zero1=is_zero(src1);
@@ -635,7 +633,7 @@ literalt float_utilst::relation(
       return prop.land(prop.lor(or_bv), !NaN);
     }
     else
-      assert(false);
+      UNREACHABLE;
   }
   else if(rel==relt::EQ)
   {
@@ -645,16 +643,15 @@ literalt float_utilst::relation(
       prop.lor(bitwise_equal, both_zero),
       !NaN);
   }
-  else
-    assert(0);
 
   // not reached
+  UNREACHABLE;
   return const_literal(false);
 }
 
 literalt float_utilst::is_zero(const bvt &src)
 {
-  assert(!src.empty());
+  PRECONDITION(!src.empty());
   bvt all_but_sign;
   all_but_sign=src;
   all_but_sign.resize(all_but_sign.size()-1);
@@ -732,9 +729,9 @@ literalt float_utilst::exponent_all_zeros(const bvt &src)
 
 literalt float_utilst::fraction_all_zeros(const bvt &src)
 {
+  PRECONDITION(src.size() == spec.width());
   // does not include hidden bit
   bvt tmp=src;
-  assert(src.size()==spec.width());
   tmp.resize(spec.f);
   return bv_utils.is_zero(tmp);
 }
@@ -789,7 +786,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
   // n-log-n alignment shifter.
   // The worst-case shift is the number of fraction
   // bits minus one, in case the faction is one exactly.
-  assert(!fraction.empty());
+  PRECONDITION(!fraction.empty());
   std::size_t depth = address_bits(fraction.size() - 1);
 
   if(exponent.size()<depth)
@@ -800,7 +797,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
   for(int d=depth-1; d>=0; d--)
   {
     std::size_t distance=(1<<d);
-    assert(fraction.size()>distance);
+    INVARIANT(fraction.size() > distance, "");
 
     // check if first 'distance'-many bits are zeros
     const bvt prefix=bv_utils.extract_msb(fraction, distance);
@@ -815,7 +812,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
       bv_utils.select(prefix_is_zero, shifted, fraction);
 
     // add corresponding weight to exponent
-    assert(d<(signed)exponent_delta.size());
+    INVARIANT(d < (signed)exponent_delta.size(), "");
     exponent_delta[d]=prefix_is_zero;
   }
 
@@ -827,6 +824,8 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
 /// make sure exponent is not too small; the exponent is unbiased
 void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
 {
+  PRECONDITION(exponent.size() >= spec.e);
+
   mp_integer bias=spec.bias();
 
   // Is the exponent strictly less than -bias+1, i.e., exponent<-bias+1?
@@ -835,8 +834,6 @@ void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
   // Note that 1-bias is the exponent represented by 0...01,
   // i.e. the exponent of the smallest normal number and thus the 'base'
   // exponent for subnormal numbers.
-
-  assert(exponent.size()>=spec.e);
 
 #if 1
   // Need to sign extend to avoid overflow.  Note that this is a
@@ -937,7 +934,7 @@ literalt float_utilst::fraction_rounding_decision(
   const literalt sign,
   const bvt &fraction)
 {
-  assert(dest_bits<fraction.size());
+  PRECONDITION(dest_bits < fraction.size());
 
   // we have too many fraction bits
   std::size_t extra_bits=fraction.size()-dest_bits;
@@ -956,7 +953,8 @@ literalt float_utilst::fraction_rounding_decision(
   }
 
   // the rounding bit is the last extra bit
-  assert(extra_bits>=1);
+  INVARIANT(
+    extra_bits >= 1, "the extra bits include at least the rounding bit");
   literalt rounding_bit=fraction[extra_bits-1];
 
   // we get one bit of the fraction for some rounding decisions
@@ -1003,7 +1001,9 @@ void float_utilst::round_fraction(unbiased_floatt &result)
       bv_utils.zeros(padding),
       result.fraction);
 
-    assert(result.fraction.size()==fraction_size);
+    INVARIANT(
+      result.fraction.size() == fraction_size,
+      "sizes should be equal as result.fraction was zero-padded");
   }
   else if(result.fraction.size()==fraction_size) // it stays
   {
@@ -1012,7 +1012,9 @@ void float_utilst::round_fraction(unbiased_floatt &result)
   else // fraction gets smaller -- rounding
   {
     std::size_t extra_bits=result.fraction.size()-fraction_size;
-    assert(extra_bits>=1);
+    INVARIANT(
+      extra_bits >= 1,
+      "the extra bits should at least include the rounding bit");
 
     // this computes the rounding decision
     literalt increment=fraction_rounding_decision(
@@ -1022,7 +1024,10 @@ void float_utilst::round_fraction(unbiased_floatt &result)
     result.fraction=bv_utils.extract(
       result.fraction, extra_bits, result.fraction.size()-1);
 
-    assert(result.fraction.size()==fraction_size);
+    INVARIANT(
+      result.fraction.size() == fraction_size,
+      "sizes should be equal as extra bits were chopped off from "
+      "result.fraction");
 
 #if 0
     // *** does not catch when the overflow goes subnormal -> normal ***
@@ -1083,13 +1088,10 @@ void float_utilst::round_fraction(unbiased_floatt &result)
 
 void float_utilst::round_exponent(unbiased_floatt &result)
 {
+  PRECONDITION(result.exponent.size() >= spec.e);
+
   // do we need to enlarge the exponent?
-  if(result.exponent.size()<spec.e)
-  {
-    // should have been done before
-    assert(false);
-  }
-  else if(result.exponent.size()==spec.e) // it stays
+  if(result.exponent.size() == spec.e) // it stays
   {
     // do nothing
   }
@@ -1149,6 +1151,8 @@ void float_utilst::round_exponent(unbiased_floatt &result)
 /// takes an unbiased float, and applies the bias
 float_utilst::biased_floatt float_utilst::bias(const unbiased_floatt &src)
 {
+  PRECONDITION(src.fraction.size() == spec.f + 1);
+
   biased_floatt result;
 
   result.sign=src.sign;
@@ -1159,7 +1163,6 @@ float_utilst::biased_floatt float_utilst::bias(const unbiased_floatt &src)
   result.exponent=add_bias(src.exponent);
 
   // strip off hidden bit
-  assert(src.fraction.size()==spec.f+1);
 
   literalt hidden_bit=src.fraction[src.fraction.size()-1];
   literalt denormal=!hidden_bit;
@@ -1178,7 +1181,7 @@ float_utilst::biased_floatt float_utilst::bias(const unbiased_floatt &src)
 
 bvt float_utilst::add_bias(const bvt &src)
 {
-  assert(src.size()==spec.e);
+  PRECONDITION(src.size() == spec.e);
 
   return bv_utils.add(
     src,
@@ -1187,7 +1190,7 @@ bvt float_utilst::add_bias(const bvt &src)
 
 bvt float_utilst::sub_bias(const bvt &src)
 {
-  assert(src.size()==spec.e);
+  PRECONDITION(src.size() == spec.e);
 
   return bv_utils.sub(
     src,
@@ -1196,7 +1199,7 @@ bvt float_utilst::sub_bias(const bvt &src)
 
 float_utilst::unbiased_floatt float_utilst::unpack(const bvt &src)
 {
-  assert(src.size()==spec.width());
+  PRECONDITION(src.size() == spec.width());
 
   unbiased_floatt result;
 
@@ -1206,7 +1209,7 @@ float_utilst::unbiased_floatt float_utilst::unpack(const bvt &src)
   result.fraction.push_back(is_normal(src)); // add hidden bit
 
   result.exponent=get_exponent(src);
-  assert(result.exponent.size()==spec.e);
+  INVARIANT(result.exponent.size() == spec.e, "");
 
   // unbias the exponent
   literalt denormal=bv_utils.is_zero(result.exponent);
@@ -1225,8 +1228,8 @@ float_utilst::unbiased_floatt float_utilst::unpack(const bvt &src)
 
 bvt float_utilst::pack(const biased_floatt &src)
 {
-  assert(src.fraction.size()==spec.f);
-  assert(src.exponent.size()==spec.e);
+  PRECONDITION(src.fraction.size() == spec.f);
+  PRECONDITION(src.exponent.size() == spec.e);
 
   bvt result;
   result.resize(spec.width());
