@@ -87,6 +87,12 @@ std::string analysis_exceptiont::what() const
   return reason;
 }
 
+invalid_source_file_exceptiont::invalid_source_file_exceptiont(
+  std::string reason)
+  : reason(std::move(reason))
+{
+}
+
 std::string invalid_source_file_exceptiont::what() const
 {
   return reason;
