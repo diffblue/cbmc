@@ -129,22 +129,24 @@ void goto_trace_stept::output(
 /// \param expr: expression to get numeric representation from
 /// \param options: configuration options
 /// \return a string with the numeric representation
-static std::string
-numeric_representation(const exprt &expr, const trace_optionst &options)
+static std::string numeric_representation(
+  const constant_exprt &expr,
+  const trace_optionst &options)
 {
   std::string result;
   std::string prefix;
+
   if(options.hex_representation)
   {
     mp_integer value_int =
-      bv2integer(id2string(to_constant_expr(expr).get_value()), false);
+      bv2integer(id2string(expr.get_value()), false);
     result = integer2string(value_int, 16);
     prefix = "0x";
   }
   else
   {
     prefix = "0b";
-    result = expr.get_string(ID_value);
+    result = id2string(expr.get_value());
   }
 
   std::ostringstream oss;
@@ -181,7 +183,8 @@ std::string trace_numeric_value(
        type.id()==ID_c_enum ||
        type.id()==ID_c_enum_tag)
     {
-      const std::string &str = numeric_representation(expr, options);
+      const std::string &str =
+        numeric_representation(to_constant_expr(expr), options);
       return str;
     }
     else if(type.id()==ID_bool)
