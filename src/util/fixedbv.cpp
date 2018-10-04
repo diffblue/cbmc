@@ -106,6 +106,18 @@ fixedbvt &fixedbvt::operator*=(const fixedbvt &o)
   return *this;
 }
 
+fixedbvt &fixedbvt::operator+=(const fixedbvt &o)
+{
+  v += o.v;
+  return *this;
+}
+
+fixedbvt &fixedbvt::operator-=(const fixedbvt &o)
+{
+  v -= o.v;
+  return *this;
+}
+
 fixedbvt &fixedbvt::operator/=(const fixedbvt &o)
 {
   v*=power(2, o.spec.get_fraction_bits());
