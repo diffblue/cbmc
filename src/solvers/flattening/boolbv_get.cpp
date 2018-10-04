@@ -71,7 +71,7 @@ exprt boolbvt::bv_get_rec(
   std::size_t offset,
   const typet &type) const
 {
-  if(type.id()==ID_symbol)
+  if(type.id() == ID_symbol_type)
     return bv_get_rec(bv, unknown, offset, ns.follow(type));
 
   std::size_t width=boolbv_width(type);

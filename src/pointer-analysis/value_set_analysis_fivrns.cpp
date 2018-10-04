@@ -178,7 +178,7 @@ bool value_set_analysis_fivrnst::check_type(const typet &type)
     }
     else if(type.id()==ID_array)
       return check_type(type.subtype());
-    else if(type.id()==ID_symbol)
+    else if(type.id() == ID_symbol_type)
       return check_type(ns.follow(type));
 
   return false;

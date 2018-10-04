@@ -100,7 +100,7 @@ void boolbvt::convert_with(
   else if(type.id() == ID_union_tag)
     return convert_with(
       ns.follow_tag(to_union_tag_type(type)), op1, op2, prev_bv, next_bv);
-  else if(type.id()==ID_symbol)
+  else if(type.id() == ID_symbol_type)
     return convert_with(ns.follow(type), op1, op2, prev_bv, next_bv);
 
   error().source_location=type.source_location();
