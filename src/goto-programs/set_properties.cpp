@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "set_properties.h"
 
+#include <util/exception_utils.h>
+
 #include <algorithm>
 #include <unordered_set>
 
@@ -111,7 +113,9 @@ void set_properties(
       set_properties(it->second.body, property_set);
 
   if(!property_set.empty())
-    throw "property "+id2string(*property_set.begin())+" not found";
+    throw invalid_command_line_argument_exceptiont(
+      "property " + id2string(*property_set.begin()) + " unknown",
+      "--property id");
 }
 
 void label_properties(goto_functionst &goto_functions)

@@ -86,6 +86,7 @@ public:
   incorrect_goto_program_exceptiont(
     std::string message,
     source_locationt source_location);
+  explicit incorrect_goto_program_exceptiont(std::string message);
   std::string what() const override;
 
 private:

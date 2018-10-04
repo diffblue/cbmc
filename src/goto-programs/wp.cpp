@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/base_type.h>
 
+#include <util/invariant.h>
+
 bool has_nondet(const exprt &dest)
 {
   forall_operands(it, dest)
@@ -263,6 +265,6 @@ exprt wp(
     return post; // ignored
   else if(statement==ID_fence)
     return post; // ignored
-  else
-    throw "sorry, wp("+id2string(statement)+"...) not implemented";
+  INVARIANT_WITH_DIAGNOSTICS(
+    false, "sorry, wp(", id2string(statement), "...) is not implemented");
 }

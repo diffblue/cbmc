@@ -13,8 +13,10 @@ Author: CM Wintersteiger
 
 #include <fstream>
 
-#include <util/message.h>
+#include <util/exception_utils.h>
+#include <util/invariant.h>
 #include <util/irep_serialization.h>
+#include <util/message.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/goto_model.h>
@@ -148,22 +150,18 @@ bool write_goto_binary(
   irep_serializationt::ireps_containert irepc;
   irep_serializationt irepconverter(irepc);
 
-  switch(version)
-  {
-  case 1:
-  case 2:
-  case 3:
-    throw "version no longer supported";
-
-  case 4:
+  const int current_goto_version = 4;
+  if(version < current_goto_version)
+    throw invalid_command_line_argument_exceptiont(
+      "version " + std::to_string(version) + " no longer supported",
+      "supported version = " + std::to_string(current_goto_version));
+  else if(version > current_goto_version)
+    throw invalid_command_line_argument_exceptiont(
+      "unknown goto binary version " + std::to_string(version),
+      "supported version = " + std::to_string(current_goto_version));
+  else
     return write_goto_binary_v4(
       out, symbol_table, goto_functions, irepconverter);
-
-  default:
-    throw "unknown goto binary version";
-  }
-
-  return false;
 }
 
 /// Writes a goto program to disc
