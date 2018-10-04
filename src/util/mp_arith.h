@@ -55,7 +55,8 @@ const mp_integer binary2integer(const std::string &, bool is_signed);
 const std::string integer2bv(const mp_integer &, std::size_t width);
 
 /// convert a bit-vector representation (possibly signed) to integer
-const mp_integer bv2integer(const std::string &, bool is_signed);
+const mp_integer
+bv2integer(const std::string &, std::size_t width, bool is_signed);
 
 /// \deprecated use numeric_cast_v<unsigned long long> instead
 DEPRECATED("Use numeric_cast_v<unsigned long long> instead")

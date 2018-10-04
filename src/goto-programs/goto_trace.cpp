@@ -136,17 +136,18 @@ static std::string numeric_representation(
   std::string result;
   std::string prefix;
 
+  const irep_idt &value = expr.get_value();
+
   if(options.hex_representation)
   {
-    mp_integer value_int =
-      bv2integer(id2string(expr.get_value()), false);
+    mp_integer value_int = bv2integer(id2string(value), value.size(), false);
     result = integer2string(value_int, 16);
     prefix = "0x";
   }
   else
   {
     prefix = "0b";
-    result = id2string(expr.get_value());
+    result = id2string(value);
   }
 
   std::ostringstream oss;

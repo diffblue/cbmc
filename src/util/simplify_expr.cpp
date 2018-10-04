@@ -669,7 +669,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_signedbv ||
          expr_type_id==ID_floatbv)
       {
-        mp_integer int_value = bv2integer(id2string(value), false);
+        const auto width = to_bv_type(op_type).get_width();
+        mp_integer int_value = bv2integer(id2string(value), width, false);
         expr=from_integer(int_value, expr_type);
         return false;
       }
@@ -811,71 +812,32 @@ bool simplify_exprt::simplify_if_implies(
        expr.op1().is_constant() &&
        cond.op1().type()==expr.op1().type())
     {
-      const irep_idt &type_id=cond.op1().type().id();
-      if(type_id==ID_integer || type_id==ID_natural)
+      mp_integer i1, i2;
+
+      if(
+        !to_integer(to_constant_expr(cond.op1()), i1) &&
+        !to_integer(to_constant_expr(expr.op1()), i2))
       {
-        if(string2integer(cond.op1().get_string(ID_value))>=
-           string2integer(expr.op1().get_string(ID_value)))
-        {
-          new_truth = true;
-          return false;
-        }
-      }
-      else if(type_id==ID_unsignedbv)
-      {
-        const mp_integer i1, i2;
-        if(
-          bv2integer(cond.op1().get_string(ID_value), false) >=
-          bv2integer(expr.op1().get_string(ID_value), false))
-        {
-          new_truth = true;
-          return false;
-        }
-      }
-      else if(type_id==ID_signedbv)
-      {
-        const mp_integer i1, i2;
-        if(
-          bv2integer(cond.op1().get_string(ID_value), true) >=
-          bv2integer(expr.op1().get_string(ID_value), true))
+        if(i1 >= i2)
         {
           new_truth = true;
           return false;
         }
       }
     }
+
     if(cond.op1()==expr.op1() &&
        cond.op0().is_constant() &&
        expr.op0().is_constant() &&
        cond.op0().type()==expr.op0().type())
     {
-      const irep_idt &type_id = cond.op1().type().id();
-      if(type_id==ID_integer || type_id==ID_natural)
+      mp_integer i1, i2;
+
+      if(
+        !to_integer(to_constant_expr(cond.op0()), i1) &&
+        !to_integer(to_constant_expr(expr.op0()), i2))
       {
-        if(string2integer(cond.op1().get_string(ID_value))<=
-           string2integer(expr.op1().get_string(ID_value)))
-        {
-          new_truth = true;
-          return false;
-        }
-      }
-      else if(type_id==ID_unsignedbv)
-      {
-        const mp_integer i1, i2;
-        if(
-          bv2integer(cond.op1().get_string(ID_value), false) <=
-          bv2integer(expr.op1().get_string(ID_value), false))
-        {
-          new_truth = true;
-          return false;
-        }
-      }
-      else if(type_id==ID_signedbv)
-      {
-        const mp_integer i1, i2;
-        if(
-          bv2integer(cond.op1().get_string(ID_value), true) <=
-          bv2integer(expr.op1().get_string(ID_value), true))
+        if(i1 <= i2)
         {
           new_truth = true;
           return false;

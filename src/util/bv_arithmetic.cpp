@@ -184,5 +184,5 @@ void bv_arithmetict::from_expr(const exprt &expr)
 {
   PRECONDITION(expr.is_constant());
   spec=bv_spect(expr.type());
-  value = bv2integer(expr.get_string(ID_value), spec.is_signed);
+  value = bv2integer(expr.get_string(ID_value), spec.width, spec.is_signed);
 }

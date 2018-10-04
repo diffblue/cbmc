@@ -1811,9 +1811,10 @@ std::string expr2ct::convert_constant(
     if(c_enum_type.id()!=ID_c_enum)
       return convert_norep(src, precedence);
 
-    bool is_signed=c_enum_type.subtype().id()==ID_signedbv;
+    const bool is_signed = c_enum_type.subtype().id() == ID_signedbv;
+    const auto width = to_bitvector_type(c_enum_type.subtype()).get_width();
 
-    mp_integer int_value = bv2integer(id2string(value), is_signed);
+    mp_integer int_value = bv2integer(id2string(value), width, is_signed);
     mp_integer i=0;
 
     irep_idt int_value_string=integer2string(int_value);
@@ -1849,8 +1850,10 @@ std::string expr2ct::convert_constant(
           type.id()==ID_c_bit_field ||
           type.id()==ID_c_bool)
   {
+    const auto width = to_bitvector_type(type).get_width();
+
     mp_integer int_value =
-      bv2integer(id2string(value), type.id() == ID_signedbv);
+      bv2integer(id2string(value), width, type.id() == ID_signedbv);
 
     const irep_idt &c_type=
       type.id()==ID_c_bit_field?type.subtype().get(ID_C_c_type):
