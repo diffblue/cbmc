@@ -120,4 +120,16 @@ private:
   std::string reason;
 };
 
+/// Thrown when we can't handle something in an input source file.
+/// For example, if we get C source code that is not syntactically valid
+/// or that has type errors.
+class invalid_source_file_exceptiont : public cprover_exception_baset
+{
+public:
+  std::string what() const override;
+
+private:
+  std::string reason;
+};
+
 #endif // CPROVER_UTIL_EXCEPTION_UTILS_H
