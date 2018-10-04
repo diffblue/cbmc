@@ -26,8 +26,14 @@ class replace_symbolt
 public:
   typedef std::unordered_map<irep_idt, exprt> expr_mapt;
 
+  /// Sets old_expr to be replaced by new_expr if we don't already have a
+  /// replacement; otherwise does nothing (i.e. std::map::insert-like
+  /// behaviour).
   void insert(const class symbol_exprt &old_expr,
               const exprt &new_expr);
+
+  /// Sets old_expr to be replaced by new_expr
+  void set(const class symbol_exprt &old_expr, const exprt &new_expr);
 
   virtual bool replace(exprt &dest) const;
   virtual bool replace(typet &dest) const;
@@ -55,6 +61,11 @@ public:
   std::size_t erase(const irep_idt &id)
   {
     return expr_map.erase(id);
+  }
+
+  expr_mapt::iterator erase(expr_mapt::iterator it)
+  {
+    return expr_map.erase(it);
   }
 
   bool replaces_symbol(const irep_idt &id) const
