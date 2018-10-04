@@ -70,12 +70,16 @@ static bool sum_expr(
 
   const irep_idt &type_id=dest.type().id();
 
-  if(type_id==ID_integer || type_id==ID_natural)
+  if(
+    type_id == ID_integer || type_id == ID_natural ||
+    type_id == ID_unsignedbv || type_id == ID_signedbv)
   {
-    dest.set_value(integer2string(
-      string2integer(id2string(dest.get_value()))+
-      string2integer(id2string(expr.get_value()))));
-    return false;
+    mp_integer a, b;
+    if(!to_integer(dest, a) && !to_integer(expr, b))
+    {
+      dest = from_integer(a + b, dest.type());
+      return false;
+    }
   }
   else if(type_id==ID_rational)
   {
@@ -86,26 +90,17 @@ static bool sum_expr(
       return false;
     }
   }
-  else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
-  {
-    dest.set_value(integer2binary(
-      binary2integer(id2string(dest.get_value()), false)+
-      binary2integer(id2string(expr.get_value()), false),
-      to_bitvector_type(dest.type()).get_width()));
-    return false;
-  }
   else if(type_id==ID_fixedbv)
   {
-    dest.set_value(integer2binary(
-      binary2integer(id2string(dest.get_value()), false)+
-      binary2integer(id2string(expr.get_value()), false),
-      to_bitvector_type(dest.type()).get_width()));
+    fixedbvt f(dest);
+    f += fixedbvt(expr);
+    dest = f.to_expr();
     return false;
   }
   else if(type_id==ID_floatbv)
   {
-    ieee_floatt f(to_constant_expr(dest));
-    f+=ieee_floatt(to_constant_expr(expr));
+    ieee_floatt f(dest);
+    f += ieee_floatt(expr);
     dest=f.to_expr();
     return false;
   }
