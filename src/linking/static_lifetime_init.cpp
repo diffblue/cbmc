@@ -63,12 +63,13 @@ void static_lifetime_init(
       continue;
 
     // special values
-    if(identifier==CPROVER_PREFIX "constant_infinity_uint" ||
-       identifier==CPROVER_PREFIX "memory" ||
-       identifier=="__func__" ||
-       identifier=="__FUNCTION__" ||
-       identifier=="__PRETTY_FUNCTION__")
+    if(
+      identifier == CPROVER_PREFIX "constant_infinity_uint" ||
+      identifier == CPROVER_PREFIX "memory" || identifier == "__func__" ||
+      identifier == "__FUNCTION__" || identifier == "__PRETTY_FUNCTION__")
+    {
       continue;
+    }
 
     // just for linking
     if(has_prefix(id, CPROVER_PREFIX "architecture_"))
