@@ -13,7 +13,6 @@ Date: June 2011
 
 #include "vcd_goto_trace.h"
 
-#include <cassert>
 #include <ctime>
 
 #include <util/numbering.h>
@@ -55,8 +54,7 @@ std::string as_vcd_binary(
   }
   else if(expr.id()==ID_union)
   {
-    assert(expr.operands().size()==1);
-    return as_vcd_binary(expr.op0(), ns);
+    return as_vcd_binary(to_union_expr(expr).op(), ns);
   }
 
   // build "xxx"

@@ -16,9 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/invariant.h>
 #include <util/message.h>
-#include <util/std_expr.h>
 #include <util/std_code.h>
+#include <util/std_expr.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/format_strings.h>
@@ -279,9 +280,9 @@ void string_instrumentationt::do_sprintf(
 
   if(arguments.size()<2)
   {
-    error().source_location=target->source_location;
-    error() << "sprintf expected to have two or more arguments" << eom;
-    throw 0;
+    throw incorrect_source_program_exceptiont(
+      "sprintf expected to have two or more arguments",
+      target->source_location);
   }
 
   goto_programt tmp;
@@ -321,10 +322,9 @@ void string_instrumentationt::do_snprintf(
 
   if(arguments.size()<3)
   {
-    error().source_location=target->source_location;
-    error() << "snprintf expected to have three or more arguments"
-            << eom;
-    throw 0;
+    throw incorrect_source_program_exceptiont(
+      "snprintf expected to have three or more arguments",
+      target->source_location);
   }
 
   goto_programt tmp;
@@ -364,9 +364,8 @@ void string_instrumentationt::do_fscanf(
 
   if(arguments.size()<2)
   {
-    error().source_location=target->source_location;
-    error() << "fscanf expected to have two or more arguments" << eom;
-    throw 0;
+    throw incorrect_source_program_exceptiont(
+      "fscanf expected to have two or more arguments", target->source_location);
   }
 
   goto_programt tmp;
@@ -650,9 +649,8 @@ void string_instrumentationt::do_strchr(
 
   if(arguments.size()!=2)
   {
-    error().source_location=target->source_location;
-    error() << "strchr expected to have two arguments" << eom;
-    throw 0;
+    throw incorrect_source_program_exceptiont(
+      "strchr expected to have two arguments", target->source_location);
   }
 
   goto_programt tmp;
@@ -677,9 +675,8 @@ void string_instrumentationt::do_strrchr(
 
   if(arguments.size()!=2)
   {
-    error().source_location=target->source_location;
-    error() << "strrchr expected to have two arguments" << eom;
-    throw 0;
+    throw incorrect_source_program_exceptiont(
+      "strrchr expected to have two arguments", target->source_location);
   }
 
   goto_programt tmp;
@@ -704,9 +701,8 @@ void string_instrumentationt::do_strstr(
 
   if(arguments.size()!=2)
   {
-    error().source_location=target->source_location;
-    error() << "strstr expected to have two arguments" << eom;
-    throw 0;
+    throw incorrect_source_program_exceptiont(
+      "strstr expected to have two arguments", target->source_location);
   }
 
   goto_programt tmp;
@@ -738,9 +734,8 @@ void string_instrumentationt::do_strtok(
 
   if(arguments.size()!=2)
   {
-    error().source_location=target->source_location;
-    error() << "strtok expected to have two arguments" << eom;
-    throw 0;
+    throw incorrect_source_program_exceptiont(
+      "strtok expected to have two arguments", target->source_location);
   }
 
   goto_programt tmp;
