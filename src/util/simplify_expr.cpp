@@ -677,7 +677,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_signedbv ||
          expr_type_id==ID_floatbv)
       {
-        mp_integer int_value=binary2integer(id2string(value), false);
+        mp_integer int_value = bv2integer(id2string(value), false);
         expr=from_integer(int_value, expr_type);
         return false;
       }
@@ -832,8 +832,9 @@ bool simplify_exprt::simplify_if_implies(
       else if(type_id==ID_unsignedbv)
       {
         const mp_integer i1, i2;
-        if(binary2integer(cond.op1().get_string(ID_value), false)>=
-           binary2integer(expr.op1().get_string(ID_value), false))
+        if(
+          bv2integer(cond.op1().get_string(ID_value), false) >=
+          bv2integer(expr.op1().get_string(ID_value), false))
         {
           new_truth = true;
           return false;
@@ -842,8 +843,9 @@ bool simplify_exprt::simplify_if_implies(
       else if(type_id==ID_signedbv)
       {
         const mp_integer i1, i2;
-        if(binary2integer(cond.op1().get_string(ID_value), true)>=
-           binary2integer(expr.op1().get_string(ID_value), true))
+        if(
+          bv2integer(cond.op1().get_string(ID_value), true) >=
+          bv2integer(expr.op1().get_string(ID_value), true))
         {
           new_truth = true;
           return false;
@@ -868,8 +870,9 @@ bool simplify_exprt::simplify_if_implies(
       else if(type_id==ID_unsignedbv)
       {
         const mp_integer i1, i2;
-        if(binary2integer(cond.op1().get_string(ID_value), false)<=
-           binary2integer(expr.op1().get_string(ID_value), false))
+        if(
+          bv2integer(cond.op1().get_string(ID_value), false) <=
+          bv2integer(expr.op1().get_string(ID_value), false))
         {
           new_truth = true;
           return false;
@@ -878,8 +881,9 @@ bool simplify_exprt::simplify_if_implies(
       else if(type_id==ID_signedbv)
       {
         const mp_integer i1, i2;
-        if(binary2integer(cond.op1().get_string(ID_value), true)<=
-           binary2integer(expr.op1().get_string(ID_value), true))
+        if(
+          bv2integer(cond.op1().get_string(ID_value), true) <=
+          bv2integer(expr.op1().get_string(ID_value), true))
         {
           new_truth = true;
           return false;

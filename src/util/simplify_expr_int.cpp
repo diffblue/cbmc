@@ -821,7 +821,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     }
     else if(expr.id()==ID_bitxor)
     {
-      constant_exprt new_op(integer2binary(0, width), expr.type());
+      constant_exprt new_op(integer2bv(0, width), expr.type());
       expr.swap(new_op);
       return false;
     }

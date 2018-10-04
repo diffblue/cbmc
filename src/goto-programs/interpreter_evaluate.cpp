@@ -382,7 +382,7 @@ void interpretert::evaluate(
     else if(expr.type().id()==ID_c_bool)
     {
       const irep_idt &value=to_constant_expr(expr).get_value();
-      dest.push_back(binary2integer(id2string(value), false));
+      dest.push_back(bv2integer(id2string(value), false));
       return;
     }
     else if(expr.type().id()==ID_bool)
@@ -981,16 +981,16 @@ void interpretert::evaluate(
       }
       else if(expr.type().id()==ID_signedbv)
       {
-        const std::string s=
-          integer2binary(value, to_signedbv_type(expr.type()).get_width());
-        dest.push_back(binary2integer(s, true));
+        const std::string s =
+          integer2bv(value, to_signedbv_type(expr.type()).get_width());
+        dest.push_back(bv2integer(s, true));
         return;
       }
       else if(expr.type().id()==ID_unsignedbv)
       {
-        const std::string s=
-          integer2binary(value, to_unsignedbv_type(expr.type()).get_width());
-        dest.push_back(binary2integer(s, false));
+        const std::string s =
+          integer2bv(value, to_unsignedbv_type(expr.type()).get_width());
+        dest.push_back(bv2integer(s, false));
         return;
       }
       else if((expr.type().id()==ID_bool) || (expr.type().id()==ID_c_bool))
