@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/base_exceptions.h>
 #include <util/exception_utils.h>
+#include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
@@ -77,122 +78,6 @@ void goto_symex_statet::level1t::operator()(ssa_exprt &ssa_expr)
 
   // rename!
   ssa_expr.set_level_1(it->second.second);
-}
-
-/// This function determines what expressions are to be propagated as
-/// "constants"
-bool goto_symex_statet::constant_propagation(const exprt &expr) const
-{
-  if(expr.is_constant())
-    return true;
-
-  if(expr.id()==ID_address_of)
-  {
-    const address_of_exprt &address_of_expr=to_address_of_expr(expr);
-
-    return constant_propagation_reference(address_of_expr.object());
-  }
-  else if(expr.id()==ID_typecast)
-  {
-    const typecast_exprt &typecast_expr=to_typecast_expr(expr);
-
-    return constant_propagation(typecast_expr.op());
-  }
-  else if(expr.id()==ID_plus)
-  {
-    forall_operands(it, expr)
-      if(!constant_propagation(*it))
-        return false;
-
-    return true;
-  }
-  else if(expr.id()==ID_mult)
-  {
-    // propagate stuff with sizeof in it
-    forall_operands(it, expr)
-    {
-      if(it->find(ID_C_c_sizeof_type).is_not_nil())
-        return true;
-      else if(!constant_propagation(*it))
-        return false;
-    }
-
-    return true;
-  }
-  else if(expr.id()==ID_array)
-  {
-    forall_operands(it, expr)
-      if(!constant_propagation(*it))
-        return false;
-
-    return true;
-  }
-  else if(expr.id()==ID_array_of)
-  {
-    return constant_propagation(expr.op0());
-  }
-  else if(expr.id()==ID_with)
-  {
-    // this is bad
-    /*
-    forall_operands(it, expr)
-      if(!constant_propagation(expr.op0()))
-        return false;
-
-    return true;
-    */
-    return false;
-  }
-  else if(expr.id()==ID_struct)
-  {
-    forall_operands(it, expr)
-      if(!constant_propagation(*it))
-        return false;
-
-    return true;
-  }
-  else if(expr.id()==ID_union)
-  {
-    forall_operands(it, expr)
-      if(!constant_propagation(*it))
-        return false;
-
-    return true;
-  }
-  // byte_update works, byte_extract may be out-of-bounds
-  else if(expr.id()==ID_byte_update_big_endian ||
-          expr.id()==ID_byte_update_little_endian)
-  {
-    forall_operands(it, expr)
-      if(!constant_propagation(*it))
-        return false;
-
-    return true;
-  }
-
-  return false;
-}
-
-/// this function determines which reference-typed expressions are constant
-bool goto_symex_statet::constant_propagation_reference(const exprt &expr) const
-{
-  if(expr.id()==ID_symbol)
-    return true;
-  else if(expr.id()==ID_index)
-  {
-    const index_exprt &index_expr=to_index_expr(expr);
-
-    return constant_propagation_reference(index_expr.array()) &&
-           constant_propagation(index_expr.index());
-  }
-  else if(expr.id()==ID_member)
-  {
-    return constant_propagation_reference(to_member_expr(expr).compound());
-  }
-  else if(expr.id()==ID_string_constant)
-    return true;
-
-  return false;
 }
 
 /// write to a variable
@@ -297,6 +182,41 @@ static void assert_l2_renaming(const exprt &expr)
   #endif
 }
 
+class goto_symex_is_constantt : public is_constantt
+{
+protected:
+  bool is_constant(const exprt &expr) const override
+  {
+    if(expr.id() == ID_mult)
+    {
+      // propagate stuff with sizeof in it
+      forall_operands(it, expr)
+      {
+        if(it->find(ID_C_c_sizeof_type).is_not_nil())
+          return true;
+        else if(!is_constant(*it))
+          return false;
+      }
+
+      return true;
+    }
+    else if(expr.id() == ID_with)
+    {
+      // this is bad
+      /*
+      forall_operands(it, expr)
+      if(!is_constant(expr.op0()))
+      return false;
+
+      return true;
+      */
+      return false;
+    }
+
+    return is_constantt::is_constant(expr);
+  }
+};
+
 void goto_symex_statet::assignment(
   ssa_exprt &lhs, // L0/L1
   const exprt &rhs,  // L2
@@ -341,7 +261,7 @@ void goto_symex_statet::assignment(
 
   // for value propagation -- the RHS is L2
 
-  if(!is_shared && record_value && constant_propagation(rhs))
+  if(!is_shared && record_value && goto_symex_is_constantt()(rhs))
     propagation.values[l1_identifier]=rhs;
   else
     propagation.remove(l1_identifier);
