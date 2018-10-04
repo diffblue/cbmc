@@ -10,8 +10,6 @@ Date: June 2003
 
 #include "goto_convert_functions.h"
 
-#include <cassert>
-
 #include <util/base_type.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
@@ -155,14 +153,6 @@ void goto_convert_functionst::convert_function(
      symbol.is_compiled()) /* goto_inline may have removed the body */
     return;
 
-  if(symbol.value.id()!=ID_code)
-  {
-    error().source_location=symbol.value.find_source_location();
-    error() << "got invalid code for function `" << identifier << "'"
-            << eom;
-    throw 0;
-  }
-
   const codet &code=to_code(symbol.value);
 
   source_locationt end_location;
@@ -238,33 +228,9 @@ void goto_convert(
   goto_functionst &functions,
   message_handlert &message_handler)
 {
-  const unsigned errors_before=
-    message_handler.get_message_count(messaget::M_ERROR);
-
   goto_convert_functionst goto_convert_functions(symbol_table, message_handler);
 
-  try
-  {
-    goto_convert_functions.goto_convert(functions);
-  }
-
-  catch(int)
-  {
-    goto_convert_functions.error();
-  }
-
-  catch(const char *e)
-  {
-    goto_convert_functions.error() << e << messaget::eom;
-  }
-
-  catch(const std::string &e)
-  {
-    goto_convert_functions.error() << e << messaget::eom;
-  }
-
-  if(message_handler.get_message_count(messaget::M_ERROR)!=errors_before)
-    throw 0;
+  goto_convert_functions.goto_convert(functions);
 }
 
 void goto_convert(
@@ -273,32 +239,8 @@ void goto_convert(
   goto_functionst &functions,
   message_handlert &message_handler)
 {
-  const unsigned errors_before=
-    message_handler.get_message_count(messaget::M_ERROR);
-
   goto_convert_functionst goto_convert_functions(symbol_table, message_handler);
 
-  try
-  {
-    goto_convert_functions.convert_function(
-      identifier, functions.function_map[identifier]);
-  }
-
-  catch(int)
-  {
-    goto_convert_functions.error();
-  }
-
-  catch(const char *e)
-  {
-    goto_convert_functions.error() << e << messaget::eom;
-  }
-
-  catch(const std::string &e)
-  {
-    goto_convert_functions.error() << e << messaget::eom;
-  }
-
-  if(message_handler.get_message_count(messaget::M_ERROR)!=errors_before)
-    throw 0;
+  goto_convert_functions.convert_function(
+    identifier, functions.function_map[identifier]);
 }

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 
-#include <cassert>
 
 #include <util/replace_expr.h>
 #include <util/source_location.h>
@@ -85,10 +84,11 @@ void goto_convertt::do_function_call(
   }
   else
   {
-    error().source_location=function.find_source_location();
-    error() << "unexpected function argument: " << new_function.id()
-            << eom;
-    throw 0;
+    INVARIANT_WITH_DIAGNOSTICS(
+      false,
+      "unexpected function argument",
+      new_function.id(),
+      function.find_source_location());
   }
 }
 
