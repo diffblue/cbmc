@@ -127,6 +127,7 @@ private:
 class invalid_source_file_exceptiont : public cprover_exception_baset
 {
 public:
+  explicit invalid_source_file_exceptiont(std::string reason);
   std::string what() const override;
 
 private:
