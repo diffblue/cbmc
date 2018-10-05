@@ -35,7 +35,7 @@ codet character_refine_preprocesst::convert_char_function(
 
 /// The returned expression is true when the first argument is in the interval
 /// defined by the lower and upper bounds (included)
-/// \param arg: Expression we want to bound
+/// \param chr: Expression we want to bound
 /// \param lower_bound: Integer lower bound
 /// \param upper_bound: Integer upper bound
 /// \return A Boolean expression
@@ -65,7 +65,7 @@ exprt character_refine_preprocesst::in_list_expr(
 
 /// Determines the number of char values needed to represent the specified
 /// character (Unicode code point).
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A integer expression of the given type
 exprt character_refine_preprocesst::expr_of_char_count(
@@ -308,7 +308,7 @@ codet character_refine_preprocesst::convert_hash_code(conversion_inputt &target)
 /// Returns the leading surrogate (a high surrogate code unit) of the surrogate
 /// pair representing the specified supplementary character (Unicode code point)
 /// in the UTF-16 encoding.
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return An expression of the given type
 exprt character_refine_preprocesst::expr_of_high_surrogate(
@@ -342,7 +342,7 @@ exprt character_refine_preprocesst::expr_of_is_ascii_lower_case(
 }
 
 /// Determines if the specified character is an ASCII uppercase character.
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A Boolean expression
 exprt character_refine_preprocesst::expr_of_is_ascii_upper_case(
@@ -356,7 +356,7 @@ exprt character_refine_preprocesst::expr_of_is_ascii_upper_case(
 ///    TODO: for now this is only for ASCII characters, the
 ///          following unicode categories are not yet considered:
 ///          TITLECASE_LETTER MODIFIER_LETTER OTHER_LETTER LETTER_NUMBER
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return An expression of the given type
 exprt character_refine_preprocesst::expr_of_is_letter(
@@ -374,7 +374,7 @@ exprt character_refine_preprocesst::expr_of_is_letter(
 ///          TITLECASE_LETTER MODIFIER_LETTER OTHER_LETTER LETTER_NUMBER
 ///          and contributory property Other_Alphabetic as defined by the
 ///          Unicode Standard.
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return An expression of the given type
 exprt character_refine_preprocesst::expr_of_is_alphabetic(
@@ -396,7 +396,7 @@ codet character_refine_preprocesst::convert_is_alphabetic(
 /// Determines whether the specified character (Unicode code point) is in the
 /// Basic Multilingual Plane (BMP). Such code points can be represented using a
 /// single char.
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A Boolean expression
 exprt character_refine_preprocesst::expr_of_is_bmp_code_point(
@@ -417,7 +417,7 @@ codet character_refine_preprocesst::convert_is_bmp_code_point(
 }
 
 /// Determines if a character is defined in Unicode.
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return An expression of the given type
 exprt character_refine_preprocesst::expr_of_is_defined(
@@ -519,7 +519,7 @@ codet character_refine_preprocesst::convert_is_digit_int(
 
 /// Determines if the given char value is a Unicode high-surrogate code unit
 /// (also known as leading-surrogate code unit).
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A Boolean expression
 exprt character_refine_preprocesst::expr_of_is_high_surrogate(
@@ -543,7 +543,7 @@ codet character_refine_preprocesst::convert_is_high_surrogate(
 /// '\u001B' '\u007F' through '\u009F'
 ///
 ///    TODO: For now, we ignore the FORMAT general category value
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A Boolean expression
 exprt character_refine_preprocesst::expr_of_is_identifier_ignorable(
@@ -770,7 +770,7 @@ codet character_refine_preprocesst::convert_is_low_surrogate(
 /// specification.
 ///
 ///    TODO: For now only ASCII characters are considered
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return An expression of the given type
 exprt character_refine_preprocesst::expr_of_is_mirrored(
@@ -812,7 +812,7 @@ codet character_refine_preprocesst::convert_is_space(conversion_inputt &target)
 
 /// Determines if the specified character is white space according to Unicode
 /// (SPACE_SEPARATOR, LINE_SEPARATOR, or PARAGRAPH_SEPARATOR)
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A Boolean expression
 exprt character_refine_preprocesst::expr_of_is_space_char(
@@ -846,7 +846,7 @@ codet character_refine_preprocesst::convert_is_space_char_int(
 
 /// Determines whether the specified character (Unicode code point) is in the
 /// supplementary character range.
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A Boolean expression
 exprt character_refine_preprocesst::expr_of_is_supplementary_code_point(
@@ -866,7 +866,7 @@ codet character_refine_preprocesst::convert_is_supplementary_code_point(
 }
 
 /// Determines if the given char value is a Unicode surrogate code unit.
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A Boolean expression
 exprt character_refine_preprocesst::expr_of_is_surrogate(
@@ -902,7 +902,7 @@ codet character_refine_preprocesst::convert_is_surrogate_pair(
 }
 
 /// Determines if the specified character is a titlecase character.
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A Boolean expression
 exprt character_refine_preprocesst::expr_of_is_title_case(
@@ -939,7 +939,7 @@ codet character_refine_preprocesst::convert_is_title_case_int(
 
 /// Determines if the specified character is in the LETTER_NUMBER category of
 /// Unicode
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A Boolean expression
 exprt character_refine_preprocesst::expr_of_is_letter_number(
@@ -966,7 +966,7 @@ exprt character_refine_preprocesst::expr_of_is_letter_number(
 ///
 ///    TODO: For now we do not allow connecting punctuation, combining mark,
 ///          non-spacing mark
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A Boolean expression
 exprt character_refine_preprocesst::expr_of_is_unicode_identifier_part(
@@ -1076,7 +1076,7 @@ codet character_refine_preprocesst::convert_is_valid_code_point(
 /// (SPACE_SEPARATOR, LINE_SEPARATOR, or PARAGRAPH_SEPARATOR) but is not also a
 /// non-breaking space ('\u00A0', '\u2007', '\u202F'). * it is one of these:
 /// U+0009  U+000A U+000B U+000C U+000D U+001C U+001D U+001E U+001F
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A Boolean expression
 exprt character_refine_preprocesst::expr_of_is_whitespace(
@@ -1115,7 +1115,7 @@ codet character_refine_preprocesst::convert_is_whitespace_int(
 /// Returns the trailing surrogate (a low surrogate code unit) of the surrogate
 /// pair representing the specified supplementary character (Unicode code point)
 /// in the UTF-16 encoding.
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A integer expression of the given type
 exprt character_refine_preprocesst::expr_of_low_surrogate(
@@ -1138,7 +1138,7 @@ codet character_refine_preprocesst::convert_low_surrogate(
 
 /// Returns the value obtained by reversing the order of the bytes in the
 /// specified char value.
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A character expression of the given type
 exprt character_refine_preprocesst::expr_of_reverse_bytes(
@@ -1164,7 +1164,7 @@ codet character_refine_preprocesst::convert_reverse_bytes(
 /// (Basic Multilingual Plane or Plane 0) value, the resulting char array has
 /// the same value as codePoint. If the specified code point is a supplementary
 /// code point, the resulting char array has the corresponding surrogate pair.
-/// \param expr: An expression of type character
+/// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return A character array expression of the given type
 exprt character_refine_preprocesst::expr_of_to_chars(
