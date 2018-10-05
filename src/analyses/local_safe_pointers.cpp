@@ -177,7 +177,6 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
 /// \param out: stream to write output to
 /// \param goto_program: GOTO program analysed (the same one passed to
 ///   operator())
-/// \param ns: global namespace
 void local_safe_pointerst::output(
   std::ostream &out, const goto_programt &goto_program)
 {
@@ -219,7 +218,6 @@ void local_safe_pointerst::output(
 /// \param out: stream to write output to
 /// \param goto_program: GOTO program analysed (the same one passed to
 ///   operator())
-/// \param ns: global namespace
 void local_safe_pointerst::output_safe_dereferences(
   std::ostream &out, const goto_programt &goto_program)
 {
