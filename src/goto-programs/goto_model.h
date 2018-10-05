@@ -96,7 +96,7 @@ public:
   /// reported via DATA_INVARIANT violations or exceptions.
   void validate(const validation_modet vm) const
   {
-    symbol_table.validate();
+    symbol_table.validate(vm);
 
     const namespacet ns(symbol_table);
     goto_functions.validate(ns, vm);
