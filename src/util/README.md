@@ -90,7 +90,7 @@ is initially populated from `irep_ids.def`, so for example the fourth entry
 in `irep_ids.def` is `“IREP_ID_ONE(type)”`, so the string “type” has index 3.
 You can refer to this \ref irep_idt as `ID_type`. The other kind of line you
 see is `“IREP_ID_TWO(C_source_location, #source_location)”`, which means the
-\ref irep_idt for the string “#source_location” can be referred to as
+\ref irep_idt for the string “\#source_location” can be referred to as
 `ID_C_source_location`. The “C” is for comment, meaning that it should be
 stored in the [comments](\ref irept::dt::comments). Any strings that need
 to be stored as [irep_idt](\ref irep_idt)s which aren't in `irep_ids.def`

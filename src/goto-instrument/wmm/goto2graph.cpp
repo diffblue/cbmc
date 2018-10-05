@@ -1517,7 +1517,7 @@ void instrumentert::print_outputs(memory_modelt model, bool hide_internals)
   table.close();
 }
 
-/// Note: can be distributed (#define DISTRIBUTED)
+/// Note: can be distributed (\#define DISTRIBUTED)
 #if 1
 // #ifdef _WIN32
 void instrumentert::collect_cycles_by_SCCs(memory_modelt model)

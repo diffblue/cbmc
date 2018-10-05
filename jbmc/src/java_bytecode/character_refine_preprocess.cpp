@@ -475,11 +475,11 @@ codet character_refine_preprocesst::convert_is_defined_int(
 /// DECIMAL_DIGIT_NUMBER.
 ///
 ///   TODO: for now we only support these ranges of digits:
-///         '\u0030' through '\u0039', ISO-LATIN-1 digits ('0' through '9')
-///         '\u0660' through '\u0669', Arabic-Indic digits
-///         '\u06F0' through '\u06F9', Extended Arabic-Indic digits
-///         '\u0966' through '\u096F', Devanagari digits
-///         '\uFF10' through '\uFF19', Fullwidth digits
+///         '\\u0030' through '\\u0039', ISO-LATIN-1 digits ('0' through '9')
+///         '\\u0660' through '\\u0669', Arabic-Indic digits
+///         '\\u06F0' through '\\u06F9', Extended Arabic-Indic digits
+///         '\\u0966' through '\\u096F', Devanagari digits
+///         '\\uFF10' through '\\uFF19', Fullwidth digits
 ///         Many other character ranges contain digits as well.
 /// \param chr: An expression of type character
 /// \param type: A type for the output
@@ -539,8 +539,8 @@ codet character_refine_preprocesst::convert_is_high_surrogate(
 }
 
 /// Determines if the character is one of ignorable in a Java identifier, that
-/// is, it is in one of these ranges: '\u0000' through '\u0008' '\u000E' through
-/// '\u001B' '\u007F' through '\u009F'
+/// is, it is in one of these ranges: '\\u0000' through '\\u0008' '\\u000E'
+/// through '\\u001B' '\\u007F' through '\\u009F'
 ///
 ///    TODO: For now, we ignore the FORMAT general category value
 /// \param chr: An expression of type character
@@ -1074,7 +1074,7 @@ codet character_refine_preprocesst::convert_is_valid_code_point(
 /// Determines if the specified character is white space according to Java. It
 /// is the case when it one of the following: * a Unicode space character
 /// (SPACE_SEPARATOR, LINE_SEPARATOR, or PARAGRAPH_SEPARATOR) but is not also a
-/// non-breaking space ('\u00A0', '\u2007', '\u202F'). * it is one of these:
+/// non-breaking space ('\\u00A0', '\\u2007', '\\u202F'). * it is one of these:
 /// U+0009  U+000A U+000B U+000C U+000D U+001C U+001D U+001E U+001F
 /// \param chr: An expression of type character
 /// \param type: A type for the output
