@@ -43,10 +43,10 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     // elaborate any class template instances given as bases
     elaborate_class_template(base_symbol_expr.type());
 
-    if(base_symbol_expr.type().id() == ID_struct_tag)
-      base_symbol_expr.type().id(ID_symbol_type);
+    if(base_symbol_expr.type().id() == ID_symbol_type)
+      base_symbol_expr.type().id(ID_struct_tag);
 
-    if(base_symbol_expr.type().id() != ID_symbol_type)
+    if(base_symbol_expr.type().id() != ID_struct_tag)
     {
       error().source_location=name.source_location();
       error() << "expected type symbol as struct/class base" << eom;
@@ -54,7 +54,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     }
 
     const symbolt &base_symbol =
-      lookup(to_symbol_type(base_symbol_expr.type()));
+      lookup(to_struct_tag_type(base_symbol_expr.type()));
 
     if(base_symbol.type.id()==ID_incomplete_struct)
     {
