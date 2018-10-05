@@ -162,6 +162,10 @@ void cpp_typecheck_resolvet::remove_duplicates(
       id = to_symbol_expr(old_id).get_identifier();
     else if(old_id.id() == ID_type && old_id.type().id() == ID_symbol_type)
       id = to_symbol_type(old_id.type()).get_identifier();
+    else if(old_id.id() == ID_type && old_id.type().id() == ID_struct_tag)
+      id = to_struct_tag_type(old_id.type()).get_identifier();
+    else if(old_id.id() == ID_type && old_id.type().id() == ID_union_tag)
+      id = to_union_tag_type(old_id.type()).get_identifier();
 
     if(id=="")
     {

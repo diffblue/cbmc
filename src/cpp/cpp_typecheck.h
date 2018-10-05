@@ -395,15 +395,15 @@ protected:
   static bool has_auto(const typet &type);
 
   void typecheck_member_function(
-    const irep_idt &compound_identifier,
+    const symbolt &compound_symbol,
     struct_typet::componentt &component,
     irept &initializers,
     const typet &method_qualifier,
     exprt &value);
 
   void add_this_to_method_type(
-    const irep_idt &compound_identifier,
-    typet &method_type,
+    const symbolt &compound_symbol,
+    code_typet &method_type,
     const typet &method_qualifier);
 
   // for function overloading

@@ -120,7 +120,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   {
     // these appear to have type "struct _GUID"
     // and they are lvalues!
-    expr.type()=symbol_typet("tag-_GUID");
+    expr.type() = struct_tag_typet("tag-_GUID");
     follow(expr.type());
     expr.set(ID_C_lvalue, true);
   }
@@ -717,7 +717,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     if(args.size() > 0 && args[0].get(ID_C_base_name)==ID_this)
     {
       // it's a pointer to member function
-      const symbol_typet symbol(code_type.get(ID_C_member_name));
+      const struct_tag_typet symbol(code_type.get(ID_C_member_name));
       expr.op0().type().add("to-member")=symbol;
 
       if(code_type.get_bool(ID_C_is_virtual))
@@ -980,11 +980,11 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   {
     assert(expr.type().id()==ID_struct);
 
-    symbol_typet symb(expr.type().get(ID_name));
-    symb.add_source_location()=expr.source_location();
+    struct_tag_typet tag(expr.type().get(ID_name));
+    tag.add_source_location() = expr.source_location();
 
     exprt e=expr;
-    new_temporary(e.source_location(), symb, e.operands(), expr);
+    new_temporary(e.source_location(), tag, e.operands(), expr);
   }
 }
 

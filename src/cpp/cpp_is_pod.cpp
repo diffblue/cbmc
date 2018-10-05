@@ -82,6 +82,13 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
     DATA_INVARIANT(symb.is_type, "type symbol is a type");
     return cpp_is_pod(symb.type);
   }
+  else if(type.id() == ID_struct_tag ||
+          type.id() == ID_union_tag)
+  {
+    const symbolt &symb = lookup(to_tag_type(type));
+    DATA_INVARIANT(symb.is_type, "tag symbol is a type");
+    return cpp_is_pod(symb.type);
+  }
 
   // everything else is POD
   return true;
