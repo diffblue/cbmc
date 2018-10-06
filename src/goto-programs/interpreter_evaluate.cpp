@@ -528,7 +528,9 @@ void interpretert::evaluate(
     evaluate(expr.op0(), tmp);
     if(tmp.size()==1)
     {
-      dest.push_back(bitwise_neg(tmp.front()));
+      const auto width = to_bitvector_type(expr.op0().type()).get_width();
+      const mp_integer mask = power(2, width) - 1;
+      dest.push_back(bitwise_xor(tmp.front(), mask));
       return;
     }
   }

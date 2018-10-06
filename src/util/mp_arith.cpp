@@ -249,16 +249,6 @@ mp_integer bitwise_xor(const mp_integer &a, const mp_integer &b)
   return result;
 }
 
-/// bitwise negation bitwise operations only make sense on native objects, hence
-/// the largest object size should be the largest available c++ integer size
-/// (currently long long)
-mp_integer bitwise_neg(const mp_integer &a)
-{
-  PRECONDITION(a.is_ulong());
-  ullong_t result=~a.to_ulong();
-  return result;
-}
-
 /// arithmetic left shift bitwise operations only make sense on native objects,
 /// hence the largest object size should be the largest available c++ integer
 /// size (currently long long)
