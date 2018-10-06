@@ -126,7 +126,11 @@ long long irept::get_long_long(const irep_namet &name) const
 
 void irept::set(const irep_namet &name, const long long value)
 {
+#ifdef USE_DSTRING
+  add(name).id(to_dstring(value));
+#else
   add(name).id(std::to_string(value));
+#endif
 }
 
 void irept::remove(const irep_namet &name)
