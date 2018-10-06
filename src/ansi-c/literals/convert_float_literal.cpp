@@ -32,10 +32,9 @@ exprt convert_float_literal(const std::string &src)
   parse_floatt parsed_float(src);
 
   // In ANSI-C, float literals are double by default,
-  // unless marked with 'f'.
-  // All of these can be complex as well.
-  // This can be overridden with
-  // config.ansi_c.single_precision_constant.
+  // unless marked with 'f' (this can be overridden with
+  // config.ansi_c.single_precision_constant).
+  // Furthermore, floating-point literals can be complex.
 
   floatbv_typet type;
 
