@@ -172,4 +172,11 @@ bool get_bitvector_bit(
 irep_idt
 make_bvrep(const std::size_t width, const std::function<bool(std::size_t)> f);
 
+/// convert an integer to bit-vector representation with given width
+const std::string integer2bv(const mp_integer &, std::size_t width);
+
+/// convert a bit-vector representation (possibly signed) to integer
+const mp_integer
+bv2integer(const std::string &, std::size_t width, bool is_signed);
+
 #endif // CPROVER_UTIL_ARITH_TOOLS_H

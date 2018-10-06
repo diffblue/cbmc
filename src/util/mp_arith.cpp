@@ -186,20 +186,6 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
   #endif
 }
 
-/// convert an integer to bit-vector representation with given width
-const std::string integer2bv(const mp_integer &src, std::size_t width)
-{
-  return integer2binary(src, width);
-}
-
-/// convert a bit-vector representation (possibly signed) to integer
-const mp_integer
-bv2integer(const std::string &src, std::size_t width, bool is_signed)
-{
-  PRECONDITION(src.size() == width);
-  return binary2integer(src, is_signed);
-}
-
 mp_integer::ullong_t integer2ulong(const mp_integer &n)
 {
   PRECONDITION(n.is_ulong());

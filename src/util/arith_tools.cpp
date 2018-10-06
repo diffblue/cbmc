@@ -340,3 +340,17 @@ irep_idt bitvector_bitwise_op(
     return f(get_bitvector_bit(a, width, i));
   });
 }
+
+/// convert an integer to bit-vector representation with given width
+const std::string integer2bv(const mp_integer &src, std::size_t width)
+{
+  return integer2binary(src, width);
+}
+
+/// convert a bit-vector representation (possibly signed) to integer
+const mp_integer
+bv2integer(const std::string &src, std::size_t width, bool is_signed)
+{
+  PRECONDITION(src.size() == width);
+  return binary2integer(src, is_signed);
+}
