@@ -26,7 +26,7 @@ fixedbvt::fixedbvt(const constant_exprt &expr)
 void fixedbvt::from_expr(const constant_exprt &expr)
 {
   spec=fixedbv_spect(to_fixedbv_type(expr.type()));
-  v = bv2integer(id2string(expr.get_value()), spec.width, true);
+  v = bv2integer(expr.get_value(), spec.width, true);
 }
 
 void fixedbvt::from_integer(const mp_integer &i)

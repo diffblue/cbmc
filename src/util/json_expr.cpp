@@ -220,7 +220,7 @@ json_objectt json(
 static std::string binary(const constant_exprt &src)
 {
   const auto width = to_bitvector_type(src.type()).get_width();
-  const auto int_val = bv2integer(id2string(src.get_value()), width, false);
+  const auto int_val = bv2integer(src.get_value(), width, false);
   return integer2binary(int_val, width);
 }
 

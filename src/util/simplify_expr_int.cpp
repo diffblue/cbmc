@@ -790,7 +790,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
       if(
         it->is_constant() &&
         bv2integer(
-          id2string(to_constant_expr(*it).get_value()), width, false) ==
+          to_constant_expr(*it).get_value(), width, false) ==
           power(2, width) - 1 &&
         expr.operands().size() > 1)
       {

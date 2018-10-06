@@ -670,7 +670,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_floatbv)
       {
         const auto width = to_bv_type(op_type).get_width();
-        mp_integer int_value = bv2integer(id2string(value), width, false);
+        const auto int_value = bv2integer(value, width, false);
         expr=from_integer(int_value, expr_type);
         return false;
       }

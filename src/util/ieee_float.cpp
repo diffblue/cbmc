@@ -1062,7 +1062,7 @@ void ieee_floatt::change_spec(const ieee_float_spect &dest_spec)
 void ieee_floatt::from_expr(const constant_exprt &expr)
 {
   spec=ieee_float_spect(to_floatbv_type(expr.type()));
-  unpack(bv2integer(id2string(expr.get_value()), spec.width(), false));
+  unpack(bv2integer(expr.get_value(), spec.width(), false));
 }
 
 mp_integer ieee_floatt::to_integer() const

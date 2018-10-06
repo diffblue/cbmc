@@ -44,19 +44,19 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   else if(type_id==ID_unsignedbv)
   {
     const auto width = to_unsignedbv_type(type).get_width();
-    int_value = bv2integer(id2string(value), width, false);
+    int_value = bv2integer(value, width, false);
     return false;
   }
   else if(type_id==ID_signedbv)
   {
     const auto width = to_signedbv_type(type).get_width();
-    int_value = bv2integer(id2string(value), width, true);
+    int_value = bv2integer(value, width, true);
     return false;
   }
   else if(type_id==ID_c_bool)
   {
     const auto width = to_c_bool_type(type).get_width();
-    int_value = bv2integer(id2string(value), width, false);
+    int_value = bv2integer(value, width, false);
     return false;
   }
   else if(type_id==ID_c_enum)
@@ -65,13 +65,13 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
     if(subtype.id()==ID_signedbv)
     {
       const auto width = to_signedbv_type(type).get_width();
-      int_value = bv2integer(id2string(value), width, true);
+      int_value = bv2integer(value, width, true);
       return false;
     }
     else if(subtype.id()==ID_unsignedbv)
     {
       const auto width = to_unsignedbv_type(type).get_width();
-      int_value = bv2integer(id2string(value), width, false);
+      int_value = bv2integer(value, width, false);
       return false;
     }
   }
@@ -83,17 +83,17 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
 
     if(subtype.id()==ID_signedbv)
     {
-      int_value = bv2integer(id2string(value), width, true);
+      int_value = bv2integer(value, width, true);
       return false;
     }
     else if(subtype.id()==ID_unsignedbv)
     {
-      int_value = bv2integer(id2string(value), width, false);
+      int_value = bv2integer(value, width, false);
       return false;
     }
     else if(subtype.id() == ID_c_bool)
     {
-      int_value = bv2integer(id2string(value), width, false);
+      int_value = bv2integer(value, width, false);
       return false;
     }
   }
@@ -342,15 +342,15 @@ irep_idt bitvector_bitwise_op(
 }
 
 /// convert an integer to bit-vector representation with given width
-const std::string integer2bv(const mp_integer &src, std::size_t width)
+irep_idt integer2bv(const mp_integer &src, std::size_t width)
 {
   return integer2binary(src, width);
 }
 
 /// convert a bit-vector representation (possibly signed) to integer
-const mp_integer
-bv2integer(const std::string &src, std::size_t width, bool is_signed)
+mp_integer
+bv2integer(const irep_idt &src, std::size_t width, bool is_signed)
 {
   PRECONDITION(src.size() == width);
-  return binary2integer(src, is_signed);
+  return binary2integer(id2string(src), is_signed);
 }
