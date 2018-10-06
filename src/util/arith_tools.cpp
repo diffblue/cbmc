@@ -289,36 +289,14 @@ bool get_bvrep_bit(
 {
   PRECONDITION(bit_index < width);
 
-  // The representation is hex, i.e., four bits per letter,
-  // most significant nibble first, using uppercase letters.
-  // No lowercase, no leading zeros (other than for 'zero'),
-  // to ensure canonicity.
-  const auto nibble_index = bit_index / 4;
+  const auto byte_index = bit_index >> 3;
 
-  if(nibble_index >= src.size())
+  if(byte_index >= src.size())
     return false;
 
-  const char nibble = src[src.size() - 1 - nibble_index];
+  unsigned char byte = src[src.size() - 1 - byte_index];
 
-  DATA_INVARIANT(
-    isdigit(nibble) || (nibble >= 'A' && nibble <= 'F'),
-    "bvrep is hexadecimal, upper-case");
-
-  const unsigned char nibble_value =
-    isdigit(nibble) ? nibble - '0' : nibble - 'A' + 10;
-
-  return ((nibble_value >> (bit_index % 4)) & 1) != 0;
-}
-
-/// turn a value 0...15 into '0'-'9', 'A'-'Z'
-static char nibble2hex(unsigned char nibble)
-{
-  PRECONDITION(nibble <= 0xf);
-
-  if(nibble >= 10)
-    return 'A' + nibble - 10;
-  else
-    return '0' + nibble;
+  return ((byte >> (bit_index & 7)) & 1) != 0;
 }
 
 /// construct a bit-vector representation from a functor
@@ -329,38 +307,32 @@ irep_idt
 make_bvrep(const std::size_t width, const std::function<bool(std::size_t)> f)
 {
   std::string result;
-  result.reserve((width + 3) / 4);
-  unsigned char nibble = 0;
+  result.reserve(width / 8 + 1);
+  unsigned byte = 0;
 
   for(std::size_t i = 0; i < width; i++)
   {
-    const auto bit_in_nibble = i % 4;
+    const auto bit_in_byte = i % 8;
 
-    nibble |= ((unsigned char)f(i)) << bit_in_nibble;
+    byte |= ((unsigned)f(i)) << bit_in_byte;
 
-    if(bit_in_nibble == 3)
+    if(bit_in_byte == 7)
     {
-      result += nibble2hex(nibble);
-      nibble = 0;
+      result += (char)byte;
+      byte = 0;
     }
   }
 
-  if(nibble != 0)
-    result += nibble2hex(nibble);
+  if(byte != 0)
+    result += (char)byte;
 
   // drop leading zeros
-  const std::size_t pos = result.find_last_not_of('0');
+  while(!result.empty() && result.back() == 0)
+    result.resize(result.size() - 1);
 
-  if(pos == std::string::npos)
-    return ID_0;
-  else
-  {
-    result.resize(pos + 1);
+  std::reverse(result.begin(), result.end());
 
-    std::reverse(result.begin(), result.end());
-
-    return result;
-  }
+  return result;
 }
 
 /// perform a binary bit-wise operation, given as a functor,
@@ -397,6 +369,19 @@ irep_idt bvrep_bitwise_op(
   });
 }
 
+std::string dump_integer(mp_integer src)
+{
+  std::size_t d = src.digits(256) + 1;
+  unsigned char *buf = new unsigned char[d], *p = buf;
+  src.dump(buf, d);
+  while(d > 0 && *p == 0)
+  {
+    d--;
+    p++;
+  }
+  return std::string((char *)p, d);
+}
+
 /// convert an integer to bit-vector representation with given width
 /// This uses two's complement for negative numbers.
 /// If the value is out of range, it is 'wrapped around'.
@@ -412,22 +397,24 @@ irep_idt integer2bvrep(const mp_integer &src, std::size_t width)
     tmp %= p;
     if(tmp != 0)
       tmp = p - tmp;
-    return integer2string(tmp, 16);
+    return dump_integer(tmp);
   }
   else
   {
     // we 'wrap around' if 'src' is too large
-    return integer2string(src % p, 16);
+    return dump_integer(src % p);
   }
 }
 
 /// convert a bit-vector representation (possibly signed) to integer
 mp_integer bvrep2integer(const irep_idt &src, std::size_t width, bool is_signed)
 {
+  mp_integer tmp;
+  tmp.load((const unsigned char *)id2string(src).data(), src.size());
+
   if(is_signed)
   {
     PRECONDITION(width >= 1);
-    const auto tmp = string2integer(id2string(src), 16);
     const auto p = power(2, width - 1);
     if(tmp >= p)
     {
@@ -440,8 +427,7 @@ mp_integer bvrep2integer(const irep_idt &src, std::size_t width, bool is_signed)
   }
   else
   {
-    const auto result = string2integer(id2string(src), 16);
-    PRECONDITION(result < power(2, width));
-    return result;
+    PRECONDITION(tmp < power(2, width));
+    return tmp;
   }
 }

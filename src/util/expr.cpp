@@ -149,7 +149,8 @@ bool exprt::is_zero() const
       type_id == ID_unsignedbv || type_id == ID_signedbv ||
       type_id == ID_c_bool || type_id == ID_c_bit_field)
     {
-      return constant.value_is_zero_string();
+      // zero is the empty string
+      return constant.get_value().empty();
     }
     else if(type_id==ID_fixedbv)
     {
