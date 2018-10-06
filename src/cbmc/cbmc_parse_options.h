@@ -112,7 +112,7 @@ protected:
 
   void register_languages();
   void get_command_line_options(optionst &);
-  void preprocessing();
+  void preprocessing(const optionst &);
   bool set_properties();
 };
 

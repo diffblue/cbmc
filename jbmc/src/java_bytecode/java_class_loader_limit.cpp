@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <json/json_parser.h>
 
+#include <util/invariant.h>
+
 /// Initializes class with either regex matcher or match set. If the string
 /// starts with an `@` it is treated as a path to a JSON file. Otherwise, it is
 /// treated as a regex.
@@ -48,8 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void java_class_loader_limitt::setup_class_load_limit(
   const std::string &java_cp_include_files)
 {
-  if(java_cp_include_files.empty())
-    throw "class regexp cannot be empty, `get_language_options` not called?";
+  PRECONDITION(!java_cp_include_files.empty());
 
   // '@' signals file reading with list of class files to load
   use_regex_match = java_cp_include_files[0] != '@';

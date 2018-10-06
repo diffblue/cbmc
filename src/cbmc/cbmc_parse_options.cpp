@@ -457,7 +457,7 @@ int cbmc_parse_optionst::doit()
 
   if(cmdline.isset("preprocess"))
   {
-    preprocessing();
+    preprocessing(options);
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -495,7 +495,7 @@ int cbmc_parse_optionst::doit()
       return CPROVER_EXIT_INCORRECT_TASK;
     }
 
-    language->get_language_options(cmdline);
+    language->set_language_options(options);
     language->set_message_handler(get_message_handler());
 
     status() << "Parsing " << filename << eom;
@@ -578,7 +578,7 @@ int cbmc_parse_optionst::get_goto_program(
 
   try
   {
-    goto_model = initialize_goto_model(cmdline, ui_message_handler);
+    goto_model = initialize_goto_model(cmdline, ui_message_handler, options);
 
     if(cmdline.isset("show-symbol-table"))
     {
@@ -645,7 +645,7 @@ int cbmc_parse_optionst::get_goto_program(
   return -1; // no error, continue
 }
 
-void cbmc_parse_optionst::preprocessing()
+void cbmc_parse_optionst::preprocessing(const optionst &options)
 {
   try
   {
@@ -666,7 +666,7 @@ void cbmc_parse_optionst::preprocessing()
     }
 
     std::unique_ptr<languaget> language=get_language_from_filename(filename);
-    language->get_language_options(cmdline);
+    language->set_language_options(options);
 
     if(language==nullptr)
     {

@@ -23,9 +23,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// Constructor
 language_uit::language_uit(
   const cmdlinet &cmdline,
-  ui_message_handlert &_ui_message_handler):
-  _cmdline(cmdline),
-  ui_message_handler(_ui_message_handler)
+  ui_message_handlert &_ui_message_handler,
+  optionst *_options)
+  : _cmdline(cmdline),
+    ui_message_handler(_ui_message_handler),
+    options(_options)
 {
   set_message_handler(ui_message_handler);
 }
@@ -72,7 +74,9 @@ bool language_uit::parse(const std::string &filename)
 
   languaget &language=*lf.language;
   language.set_message_handler(get_message_handler());
-  language.get_language_options(_cmdline);
+
+  if(options != nullptr)
+    language.set_language_options(*options);
 
   status() << "Parsing " << filename << eom;
 

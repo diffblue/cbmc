@@ -82,7 +82,7 @@ public:
       message_handler);
   }
 
-  void initialize(const cmdlinet &cmdline);
+  void initialize(const cmdlinet &cmdline, const optionst &options);
 
   /// Eagerly loads all functions from the symbol table.
   void load_all_functions() const;

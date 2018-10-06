@@ -87,7 +87,9 @@ lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
 }
 //! @endcond
 
-void lazy_goto_modelt::initialize(const cmdlinet &cmdline)
+void lazy_goto_modelt::initialize(
+  const cmdlinet &cmdline,
+  const optionst &options)
 {
   messaget msg(message_handler);
 
@@ -141,7 +143,7 @@ void lazy_goto_modelt::initialize(const cmdlinet &cmdline)
 
       languaget &language=*lf.language;
       language.set_message_handler(message_handler);
-      language.get_language_options(cmdline);
+      language.set_language_options(options);
 
       msg.status() << "Parsing " << filename << messaget::eom;
 
@@ -181,7 +183,7 @@ void lazy_goto_modelt::initialize(const cmdlinet &cmdline)
     // Rebuild the entry-point, using the language annotation of the
     // existing __CPROVER_start function:
     rebuild_lazy_goto_start_functiont rebuild_existing_start(
-      cmdline, *this, message_handler);
+      options, *this, message_handler);
     entry_point_generation_failed=rebuild_existing_start();
   }
   else if(!binaries_provided_start)

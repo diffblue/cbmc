@@ -88,7 +88,7 @@ enum lazy_methods_modet
 class java_bytecode_languaget:public languaget
 {
 public:
-  virtual void get_language_options(const cmdlinet &) override;
+  void set_language_options(const optionst &) override;
 
   virtual bool preprocess(
     std::istream &instream,
@@ -196,7 +196,7 @@ protected:
 
 private:
   virtual std::vector<load_extra_methodst>
-  build_extra_entry_points(const cmdlinet &command_line) const;
+  build_extra_entry_points(const optionst &) const;
   const std::unique_ptr<const select_pointer_typet> pointer_type_selector;
 
   /// Maps synthetic method names on to the particular type of synthetic method
@@ -212,5 +212,7 @@ private:
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();
+
+void parse_java_language_options(const cmdlinet &cmd, optionst &options);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H

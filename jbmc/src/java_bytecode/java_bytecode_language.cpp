@@ -10,14 +10,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-#include <util/symbol_table.h>
-#include <util/suffix.h>
-#include <util/config.h>
 #include <util/cmdline.h>
+#include <util/config.h>
 #include <util/expr_iterator.h>
-#include <util/journalling_symbol_table.h>
-#include <util/string2int.h>
 #include <util/invariant.h>
+#include <util/journalling_symbol_table.h>
+#include <util/options.h>
+#include <util/string2int.h>
+#include <util/suffix.h>
+#include <util/symbol_table.h>
+
 #include <json/json_parser.h>
 
 #include <goto-programs/class_hierarchy.h>
@@ -39,45 +41,71 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr2java.h"
 #include "load_method_by_regex.h"
 
-/// Consume options that are java bytecode specific.
-/// \param Command:line options
-/// \return None
-void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
+/// Parse options that are java bytecode specific.
+/// \param cmd Command line
+/// \param [out] options The options object that will be updated.
+void parse_java_language_options(const cmdlinet &cmd, optionst &options)
 {
-  assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
-  string_refinement_enabled = !cmd.isset("no-refine-strings");
-  throw_runtime_exceptions = cmd.isset("throw-runtime-exceptions");
-  assert_uncaught_exceptions = !cmd.isset("disable-uncaught-exception-check");
-  throw_assertion_error = cmd.isset("throw-assertion-error");
-  threading_support = cmd.isset("java-threading");
+  options.set_option(
+    "java-assume-inputs-non-null", cmd.isset("java-assume-inputs-non-null"));
+  options.set_option(
+    "throw-runtime-exceptions", cmd.isset("throw-runtime-exceptions"));
+  options.set_option(
+    "uncaught-exception-check", !cmd.isset("disable-uncaught-exception-check"));
+  options.set_option(
+    "throw-assertion-error", cmd.isset("throw-assertion-error"));
+  options.set_option("java-threading", cmd.isset("java-threading"));
 
-  if(cmd.isset("max-nondet-array-length"))
-  {
-    object_factory_parameters.max_nondet_array_length =
-      safe_string2size_t(cmd.get_value("max-nondet-array-length"));
-  }
-
-  if(cmd.isset("max-nondet-tree-depth"))
-  {
-    object_factory_parameters.max_nondet_tree_depth =
-      safe_string2size_t(cmd.get_value("max-nondet-tree-depth"));
-  }
-
-  if(cmd.isset("max-nondet-string-length"))
-  {
-    object_factory_parameters.max_nondet_string_length =
-      safe_string2size_t(cmd.get_value("max-nondet-string-length"));
-  }
-  if(cmd.isset("string-non-empty"))
-    object_factory_parameters.min_nondet_string_length = 1;
-
-  object_factory_parameters.string_printable = cmd.isset("string-printable");
   if(cmd.isset("java-max-vla-length"))
-    max_user_array_length =
-      safe_string2size_t(cmd.get_value("java-max-vla-length"));
-  if(cmd.isset("symex-driven-lazy-loading"))
+  {
+    options.set_option(
+      "java-max-vla-length", cmd.get_value("java-max-vla-length"));
+  }
+
+  options.set_option(
+    "symex-driven-lazy-loading", cmd.isset("symex-driven-lazy-loading"));
+
+  if(cmd.isset("java-load-class"))
+    options.set_option("java-load-class", cmd.get_values("java-load-class"));
+
+  if(cmd.isset("java-no-load-class"))
+  {
+    options.set_option(
+      "java-no-load-class", cmd.get_values("java-no-load-class"));
+  }
+  if(cmd.isset("lazy-methods-extra-entry-point"))
+  {
+    options.set_option(
+      "lazy-methods-extra-entry-point",
+      cmd.get_values("lazy-methods-extra-entry-point"));
+  }
+  if(cmd.isset("java-cp-include-files"))
+  {
+    options.set_option(
+      "java-cp-include-files", cmd.get_value("java-cp-include-files"));
+  }
+}
+
+/// Consume options that are java bytecode specific.
+void java_bytecode_languaget::set_language_options(const optionst &options)
+{
+  object_factory_parameters.set(options);
+
+  assume_inputs_non_null =
+    options.get_bool_option("java-assume-inputs-non-null");
+  string_refinement_enabled = options.get_bool_option("refine-strings");
+  throw_runtime_exceptions =
+    options.get_bool_option("throw-runtime-exceptions");
+  assert_uncaught_exceptions =
+    options.get_bool_option("uncaught-exception-check");
+  throw_assertion_error = options.get_bool_option("throw-assertion-error");
+  threading_support = options.get_bool_option("java-threading");
+  max_user_array_length =
+    options.get_unsigned_int_option("java-max-vla-length");
+
+  if(options.get_bool_option("symex-driven-lazy-loading"))
     lazy_methods_mode=LAZY_METHODS_MODE_EXTERNAL_DRIVER;
-  else if(!cmd.isset("no-lazy-methods"))
+  else if(options.get_bool_option("lazy-methods"))
     lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_INSENSITIVE;
   else
     lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
@@ -85,36 +113,36 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   if(throw_runtime_exceptions)
   {
     java_load_classes.insert(
-        java_load_classes.end(),
-        exception_needed_classes.begin(),
-        exception_needed_classes.end());
-  }
-  if(cmd.isset("java-load-class"))
-  {
-    const auto &values = cmd.get_values("java-load-class");
-    java_load_classes.insert(
-        java_load_classes.end(), values.begin(), values.end());
-  }
-  if(cmd.isset("java-no-load-class"))
-  {
-    const auto &values = cmd.get_values("java-no-load-class");
-    no_load_classes = {values.begin(), values.end()};
+      java_load_classes.end(),
+      exception_needed_classes.begin(),
+      exception_needed_classes.end());
   }
 
-  const std::list<std::string> &extra_entry_points=
-    cmd.get_values("lazy-methods-extra-entry-point");
+  if(options.is_set("java-load-class"))
+  {
+    const auto &load_values = options.get_list_option("java-load-class");
+    java_load_classes.insert(
+      java_load_classes.end(), load_values.begin(), load_values.end());
+  }
+  if(options.is_set("java-no-load-class"))
+  {
+    const auto &no_load_values = options.get_list_option("java-no-load-class");
+    no_load_classes = {no_load_values.begin(), no_load_values.end()};
+  }
+  const std::list<std::string> &extra_entry_points =
+    options.get_list_option("lazy-methods-extra-entry-point");
   std::transform(
     extra_entry_points.begin(),
     extra_entry_points.end(),
     std::back_inserter(extra_methods),
     build_load_method_by_regex);
-  const auto &new_points = build_extra_entry_points(cmd);
+  const auto &new_points = build_extra_entry_points(options);
   extra_methods.insert(
     extra_methods.end(), new_points.begin(), new_points.end());
 
-  if(cmd.isset("java-cp-include-files"))
+  java_cp_include_files = options.get_option("java-cp-include-files");
+  if(!java_cp_include_files.empty())
   {
-    java_cp_include_files=cmd.get_value("java-cp-include-files");
     // load file list from JSON file
     if(java_cp_include_files[0]=='@')
     {
@@ -129,7 +157,7 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
         throw "the JSON file has a wrong format";
       jsont include_files=json_cp_config["jar"];
       if(!include_files.is_array())
-         throw "the JSON file has a wrong format";
+        throw "the JSON file has a wrong format";
 
       // add jars from JSON config file to classpath
       for(const jsont &file_entry : include_files.array)
@@ -145,7 +173,7 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   else
     java_cp_include_files=".*";
 
-  nondet_static = cmd.isset("nondet-static");
+  nondet_static = options.get_bool_option("nondet-static");
 
   language_options_initialized=true;
 }
@@ -1219,8 +1247,7 @@ java_bytecode_languaget::~java_bytecode_languaget()
 /// specifying extra entry points. To provide a regex entry point, the command
 /// line option `--lazy-methods-extra-entry-point` can be used directly.
 std::vector<load_extra_methodst>
-java_bytecode_languaget::build_extra_entry_points(
-  const cmdlinet &command_line) const
+java_bytecode_languaget::build_extra_entry_points(const optionst &options) const
 {
   return {};
 }

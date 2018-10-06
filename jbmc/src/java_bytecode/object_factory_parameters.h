@@ -14,6 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/irep.h>
 
+class cmdlinet;
+class optionst;
+
 #define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
 #define MAX_NONDET_STRING_LENGTH \
   static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())
@@ -56,6 +59,11 @@ struct object_factory_parameterst final
 
   /// Function id, used as a prefix for identifiers of temporaries
   irep_idt function_id;
+
+  /// Assigns the parameters from given options
+  void set(const optionst &);
 };
+
+void parse_object_factory_options(const cmdlinet &, optionst &);
 
 #endif
