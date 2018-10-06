@@ -1567,14 +1567,15 @@ optionalt<std::string> simplify_exprt::expr2bits(
        type.id()==ID_floatbv ||
        type.id()==ID_fixedbv)
     {
-      std::string nat=id2string(to_constant_expr(expr).get_value());
-      std::reverse(nat.begin(), nat.end());
+      const auto width = to_bitvector_type(type).get_width();
+      const auto &bvrep = to_constant_expr(expr).get_value();
 
       endianness_mapt map(type, little_endian, ns);
 
-      std::string result=nat;
-      for(std::string::size_type i=0; i<nat.size(); ++i)
-        result[map.map_bit(i)]=nat[i];
+      std::string result(width, ' ');
+
+      for(std::string::size_type i = 0; i < width; ++i)
+        result[map.map_bit(i)] = get_bitvector_bit(bvrep, width, i) ? '1' : '0';
 
       return result;
     }
