@@ -27,7 +27,6 @@ mp_integer operator<<(const mp_integer &, const mp_integer &);
 mp_integer bitwise_or(const mp_integer &, const mp_integer &);
 mp_integer bitwise_and(const mp_integer &, const mp_integer &);
 mp_integer bitwise_xor(const mp_integer &, const mp_integer &);
-mp_integer bitwise_neg(const mp_integer &);
 
 mp_integer arith_left_shift(
   const mp_integer &, const mp_integer &, std::size_t true_size);
