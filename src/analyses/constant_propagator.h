@@ -111,25 +111,13 @@ public:
       return !is_bottom && replace_const.empty();
     }
 
-    // set single identifier
-
-    void set_to(const irep_idt &lhs, const exprt &rhs)
+    void set_to(const symbol_exprt &lhs, const exprt &rhs)
     {
-      replace_const.get_expr_map()[lhs] = rhs;
+      replace_const.set(lhs, rhs);
       is_bottom=false;
     }
 
-    void set_to(const symbol_exprt &lhs, const exprt &rhs)
-    {
-      set_to(lhs.get_identifier(), rhs);
-    }
-
-    bool set_to_top(const symbol_exprt &expr)
-    {
-      return set_to_top(expr.get_identifier());
-    }
-
-    bool set_to_top(const irep_idt &id);
+    bool set_to_top(const symbol_exprt &expr);
 
     void set_dirty_to_top(const dirtyt &dirty, const namespacet &ns);
 

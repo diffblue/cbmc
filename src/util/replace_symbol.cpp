@@ -30,6 +30,13 @@ void replace_symbolt::insert(
     old_expr.get_identifier(), new_expr));
 }
 
+void replace_symbolt::set(const symbol_exprt &old_expr, const exprt &new_expr)
+{
+  PRECONDITION(old_expr.type() == new_expr.type());
+  expr_map[old_expr.get_identifier()] = new_expr;
+}
+
+
 bool replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
 {
   expr_mapt::const_iterator it = expr_map.find(s.get_identifier());
