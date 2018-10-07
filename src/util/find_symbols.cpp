@@ -124,7 +124,7 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
      src.id()!=ID_pointer)
   {
     if(src.has_subtype())
-      find_symbols(kind, src.subtype(), dest);
+      find_symbols(kind, to_type_with_subtype(src).subtype(), dest);
 
     forall_subtypes(it, src)
       find_symbols(kind, *it, dest);

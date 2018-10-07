@@ -57,7 +57,7 @@ void goto_symext::initialize_auto_object(
   else if(type.id()==ID_pointer)
   {
     const pointer_typet &pointer_type=to_pointer_type(type);
-    const typet &subtype=ns.follow(type.subtype());
+    const typet &subtype = ns.follow(pointer_type.subtype());
 
     // we don't like function pointers and
     // we don't like void *
@@ -67,7 +67,7 @@ void goto_symext::initialize_auto_object(
       // could be NULL nondeterministically
 
       address_of_exprt address_of_expr(
-        make_auto_object(type.subtype(), state), pointer_type);
+        make_auto_object(pointer_type.subtype(), state), pointer_type);
 
       if_exprt rhs(
         side_effect_expr_nondett(bool_typet(), expr.source_location()),

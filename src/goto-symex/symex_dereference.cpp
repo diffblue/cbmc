@@ -338,8 +338,11 @@ void goto_symext::dereference_rec(
     exprt &object=address_of_expr.object();
 
     const typet &expr_type=ns.follow(expr.type());
-    expr=address_arithmetic(object, state, guard,
-                            expr_type.subtype().id()==ID_array);
+    expr = address_arithmetic(
+      object,
+      state,
+      guard,
+      to_pointer_type(expr_type).subtype().id() == ID_array);
   }
   else if(expr.id()==ID_typecast)
   {

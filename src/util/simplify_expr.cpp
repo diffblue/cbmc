@@ -321,7 +321,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       (expr.op0().op0().is_constant() &&
        to_constant_expr(expr.op0().op0()).get_value()==ID_NULL)))
   {
-    auto sub_size = pointer_offset_size(op_type.subtype(), ns);
+    auto sub_size = pointer_offset_size(to_pointer_type(op_type).subtype(), ns);
     if(sub_size.has_value())
     {
       // void*
@@ -393,7 +393,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      op_type.id()==ID_pointer &&
      expr.op0().id()==ID_plus)
   {
-    const auto step = pointer_offset_size(op_type.subtype(), ns);
+    const auto step = pointer_offset_size(to_pointer_type(op_type).subtype(), ns);
 
     if(step.has_value() && *step != 0)
     {
@@ -684,8 +684,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     }
     else if(op_type_id==ID_c_enum_tag) // enum to int
     {
-      const typet &base_type=
-        ns.follow_tag(to_c_enum_tag_type(op_type)).subtype();
+      const typet &base_type =
+        to_c_enum_type(ns.follow_tag(to_c_enum_tag_type(op_type))).subtype();
       if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
       {
         // enum constants use the representation of their base type
@@ -1508,7 +1508,7 @@ exprt simplify_exprt::bits2expr(
   }
   else if(type.id()==ID_c_enum)
   {
-    exprt val=bits2expr(bits, type.subtype(), little_endian);
+    exprt val = bits2expr(bits, to_c_enum_type(type).subtype(), little_endian);
     val.type()=type;
     return val;
   }
@@ -1574,7 +1574,7 @@ exprt simplify_exprt::bits2expr(
       UNREACHABLE;
     std::size_t n_el=integer2size_t(size);
 
-    const auto el_size_opt = pointer_offset_bits(type.subtype(), ns);
+    const auto el_size_opt = pointer_offset_bits(array_type.subtype(), ns);
     CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > 0);
 
     const std::size_t el_size = integer2size_t(*el_size_opt);
@@ -1585,7 +1585,7 @@ exprt simplify_exprt::bits2expr(
     for(std::size_t i=0; i<n_el; ++i)
     {
       std::string el_bits=std::string(bits, i*el_size, el_size);
-      exprt el=bits2expr(el_bits, type.subtype(), little_endian);
+      exprt el = bits2expr(el_bits, array_type.subtype(), little_endian);
       if(el.is_nil())
         return nil_exprt();
       result.move_to_operands(el);
@@ -2016,7 +2016,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
       }
       else if(tp.id()==ID_array)
       {
-        auto i = pointer_offset_size(tp.subtype(), ns);
+        auto i = pointer_offset_size(to_array_type(tp).subtype(), ns);
         if(i.has_value())
         {
           const exprt &index=with.where();

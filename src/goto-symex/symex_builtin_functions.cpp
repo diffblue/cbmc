@@ -60,9 +60,11 @@ void goto_symext::symex_allocate(
   const irep_idt &mode = function_symbol->mode;
 
   // is the type given?
-  if(code.type().id()==ID_pointer && code.type().subtype().id()!=ID_empty)
+  if(
+    code.type().id() == ID_pointer &&
+    to_pointer_type(code.type()).subtype().id() != ID_empty)
   {
-    object_type=code.type().subtype();
+    object_type = to_pointer_type(code.type()).subtype();
   }
   else
   {
@@ -190,11 +192,11 @@ void goto_symext::symex_allocate(
 
   if(object_type.id()==ID_array)
   {
-    index_exprt index_expr(value_symbol.type.subtype());
+    const auto &array_type = to_array_type(object_type);
+    index_exprt index_expr(array_type.subtype());
     index_expr.array()=value_symbol.symbol_expr();
     index_expr.index()=from_integer(0, index_type());
-    rhs=address_of_exprt(
-      index_expr, pointer_type(value_symbol.type.subtype()));
+    rhs = address_of_exprt(index_expr, pointer_type(array_type.subtype()));
   }
   else
   {
@@ -391,6 +393,8 @@ void goto_symext::symex_cpp_new(
 
   PRECONDITION(code.type().id() == ID_pointer);
 
+  const auto &pointer_type = to_pointer_type(code.type());
+
   do_array =
     (code.get(ID_statement) == ID_cpp_new_array ||
      code.get(ID_statement) == ID_java_new_array_data);
@@ -418,10 +422,10 @@ void goto_symext::symex_cpp_new(
   {
     exprt size_arg = static_cast<const exprt &>(code.find(ID_size));
     clean_expr(size_arg, state, false);
-    symbol.type = array_typet(code.type().subtype(), size_arg);
+    symbol.type = array_typet(pointer_type.subtype(), size_arg);
   }
   else
-    symbol.type=code.type().subtype();
+    symbol.type = pointer_type.subtype();
 
   symbol.type.set(ID_C_dynamic, true);
 
@@ -429,8 +433,7 @@ void goto_symext::symex_cpp_new(
 
   // make symbol expression
 
-  exprt rhs(ID_address_of, code.type());
-  rhs.type().subtype()=code.type().subtype();
+  exprt rhs(ID_address_of, pointer_type);
 
   if(do_array)
   {

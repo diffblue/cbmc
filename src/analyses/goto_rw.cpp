@@ -616,8 +616,9 @@ void rw_range_sett::get_objects_rec(const typet &type)
   // TODO should recurse into various composite types
   if(type.id()==ID_array)
   {
-    get_objects_rec(type.subtype());
-    get_objects_rec(get_modet::READ, to_array_type(type).size());
+    const auto &array_type = to_array_type(type);
+    get_objects_rec(array_type.subtype());
+    get_objects_rec(get_modet::READ, array_type.size());
   }
 }
 

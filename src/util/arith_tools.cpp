@@ -72,7 +72,7 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   }
   else if(type_id==ID_c_bit_field)
   {
-    const typet &subtype=type.subtype();
+    const typet &subtype = to_c_bit_field_type(type).subtype();
     if(subtype.id()==ID_signedbv)
     {
       int_value = bv2integer(id2string(value), true);
