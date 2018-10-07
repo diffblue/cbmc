@@ -215,6 +215,7 @@ exprt boolbvt::bv_get_rec(
     }
   }
 
+  // most significant bit first
   std::string value;
 
   for(std::size_t bit_nr=offset; bit_nr<offset+width; bit_nr++)
@@ -261,7 +262,11 @@ exprt boolbvt::bv_get_rec(
 
   default:
   case bvtypet::IS_C_ENUM:
-    return constant_exprt(value, type);
+  {
+    const irep_idt bvrep = make_bvrep(
+      width, [&value](size_t i) { return value[value.size() - i - 1] == '1'; });
+    return constant_exprt(bvrep, type);
+  }
   }
 
   return nil_exprt();
