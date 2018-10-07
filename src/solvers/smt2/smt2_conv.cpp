@@ -4761,13 +4761,10 @@ exprt smt2_convt::letify_rec(
   if(map.find(current)->second.count < LET_COUNT)
     return letify_rec(expr, let_order, map, i+1);
 
-  let_exprt let;
-
-  let.symbol() = map.find(current)->second.let_symbol;
-  let.value() = substitute_let(current, map);
-  let.where() = letify_rec(expr, let_order, map, i+1);
-
-  return let;
+  return let_exprt(
+    map.find(current)->second.let_symbol,
+    substitute_let(current, map),
+    letify_rec(expr, let_order, map, i + 1));
 }
 
 void smt2_convt::collect_bindings(
