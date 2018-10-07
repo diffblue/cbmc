@@ -196,12 +196,18 @@ std::size_t irep_serializationt::read_gb_word(std::istream &in)
 
   while(in.good())
   {
+    if(shift_distance >= sizeof(res) * 8)
+      throw deserialization_exceptiont("input number too large");
+
     unsigned char ch=static_cast<unsigned char>(in.get());
     res|=(size_t(ch&0x7f))<<shift_distance;
     shift_distance+=7;
     if((ch&0x80)==0)
       break;
   }
+
+  if(!in.good())
+    throw deserialization_exceptiont("unexpected end of input stream");
 
   return res;
 }
