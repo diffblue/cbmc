@@ -111,11 +111,11 @@ const codet &codet::last_statement() const
 /// \param extra_block: The input code_blockt
 void code_blockt::append(const code_blockt &extra_block)
 {
-  operands().reserve(operands().size()+extra_block.operands().size());
+  statements().reserve(statements().size() + extra_block.statements().size());
 
-  for(const auto &operand : extra_block.operands())
+  for(const auto &statement : extra_block.statements())
   {
-    add(to_code(operand));
+    add(statement);
   }
 }
 
@@ -125,8 +125,8 @@ code_blockt create_fatal_assertion(
   code_blockt result;
   result.copy_to_operands(code_assertt(condition));
   result.copy_to_operands(code_assumet(condition));
-  for(auto &op : result.operands())
-    op.add_source_location() = loc;
+  for(auto &statement : result.statements())
+    statement.add_source_location() = loc;
   result.add_source_location() = loc;
   return result;
 }

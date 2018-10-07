@@ -273,8 +273,9 @@ exprt allocate_dynamic_object_with_decl(
     output_code.add(decl);
   }
 
-  for(const exprt &code : tmp_block.operands())
-    output_code.add(to_code(code));
+  for(const auto &code : tmp_block.statements())
+    output_code.add(code);
+
   return dynamic_object;
 }
 

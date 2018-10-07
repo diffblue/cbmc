@@ -105,9 +105,21 @@ public:
   {
   }
 
+  typedef std::vector<codet> code_operandst;
+
+  code_operandst &statements()
+  {
+    return (code_operandst &)get_sub();
+  }
+
+  const code_operandst &statements() const
+  {
+    return (const code_operandst &)get_sub();
+  }
+
   explicit code_blockt(const std::list<codet> &_list):codet(ID_block)
   {
-    operandst &o=operands();
+    auto &o = statements();
     reserve_operands(_list.size());
     for(std::list<codet>::const_iterator
         it=_list.begin();

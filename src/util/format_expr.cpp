@@ -270,7 +270,7 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
     else if(statement == ID_block)
     {
       os << '{';
-      for(const auto &s : to_code_block(code).operands())
+      for(const auto &s : to_code_block(code).statements())
         os << ' ' << format(s);
       return os << " }";
     }

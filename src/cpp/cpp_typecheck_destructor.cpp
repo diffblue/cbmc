@@ -92,7 +92,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
       ptrmember.operands().push_back(exprt("cpp-this"));
 
       code_assignt assign(ptrmember, address);
-      block.operands().push_back(assign);
+      block.add(assign);
       continue;
     }
   }

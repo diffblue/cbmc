@@ -789,16 +789,16 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
     return this_block;
 
   // Find the child code_blockt where the queried range begins:
-  auto child_iter=this_block.operands().begin();
+  auto child_iter = this_block.statements().begin();
   // Skip any top-of-block declarations;
   // all other children are labelled subblocks.
-  while(child_iter!=this_block.operands().end() &&
-        to_code(*child_iter).get_statement()==ID_decl)
+  while(child_iter != this_block.statements().end() &&
+        child_iter->get_statement() == ID_decl)
     ++child_iter;
-  assert(child_iter!=this_block.operands().end());
+  assert(child_iter != this_block.statements().end());
   std::advance(child_iter, child_offset);
-  assert(child_iter!=this_block.operands().end());
-  auto &child_label=to_code_label(to_code(*child_iter));
+  assert(child_iter != this_block.statements().end());
+  auto &child_label=to_code_label(*child_iter);
   auto &child_block=to_code_block(child_label.code());
 
   bool single_child(afterstart==findlim);
@@ -868,7 +868,7 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
           << findlim_block_start_address << eom;
 
   // Make a new block containing every child of interest:
-  auto &this_block_children=this_block.operands();
+  auto &this_block_children = this_block.statements();
   assert(tree.branch.size()==this_block_children.size());
   for(auto blockidx=child_offset, blocklim=child_offset+nblocks;
       blockidx!=blocklim;
@@ -876,7 +876,7 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
     newblock.move_to_operands(this_block_children[blockidx]);
 
   // Relabel the inner header:
-  to_code_label(to_code(newblock.operands()[0])).set_label(new_label_irep);
+  to_code_label(newblock.statements()[0]).set_label(new_label_irep);
   // Relabel internal gotos:
   replace_goto_target(newblock, child_label_name, new_label_irep);
 
@@ -920,7 +920,7 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   return
     to_code_block(
       to_code_label(
-        to_code(this_block_children[child_offset])).code());
+        this_block_children[child_offset]).code());
 }
 
 static void gather_symbol_live_ranges(
@@ -1765,12 +1765,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
             last_statement.make_block();
             last_statement.operands().insert(
               last_statement.operands().begin(),
-              more_code.operands().begin(),
-              more_code.operands().end());
+              more_code.statements().begin(),
+              more_code.statements().end());
           }
           else
-            forall_operands(o_it, more_code)
-              c.copy_to_operands(*o_it);
+            for(const auto &statement : more_code.statements())
+              c.copy_to_operands(statement);
         }
       }
       a_it2->second.stack=stack;
@@ -1844,7 +1844,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
     if(c.get_statement()!=ID_skip)
     {
-      auto &lastlabel=to_code_label(to_code(root_block.operands().back()));
+      auto &lastlabel = to_code_label(root_block.statements().back());
       auto &add_to_block=to_code_block(lastlabel.code());
       add_to_block.add(c);
     }
@@ -1908,10 +1908,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       v.start_pc + v.length,
       std::numeric_limits<method_offsett>::max());
     code_declt d(v.symbol_expr);
-    block.operands().insert(block.operands().begin(), d);
+    block.statements().insert(block.statements().begin(), d);
   }
 
-  for(auto &block : root_block.operands())
+  for(auto &block : root_block.statements())
     code.move_to_operands(block);
 
   return code;

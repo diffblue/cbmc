@@ -127,14 +127,14 @@ void java_simple_method_stubst::create_method_stub_at(
                     : update_in_placet::NO_UPDATE_IN_PLACE);
 
   // Insert new_instructions into parent block.
-  if(!new_instructions.operands().empty())
+  if(!new_instructions.statements().empty())
   {
-    auto insert_position = parent_block.operands().begin();
+    auto insert_position = parent_block.statements().begin();
     std::advance(insert_position, insert_before_index);
-    parent_block.operands().insert(
+    parent_block.statements().insert(
       insert_position,
-      new_instructions.operands().begin(),
-      new_instructions.operands().end());
+      new_instructions.statements().begin(),
+      new_instructions.statements().end());
   }
 }
 

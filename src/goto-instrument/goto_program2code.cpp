@@ -1690,14 +1690,20 @@ static bool move_label_ifthenelse(
     return false;
 
   code_blockt &block=to_code_block(to_code(expr));
-  if(!block.has_operands() ||
-      to_code(block.operands().back()).get_statement()!=ID_label)
+  if(
+    !block.has_operands() ||
+    block.statements().back().get_statement() != ID_label)
+  {
     return false;
+  }
 
-  code_labelt &label=to_code_label(to_code(block.operands().back()));
+  code_labelt &label = to_code_label(block.statements().back());
+
   if(label.get_label().empty() ||
       label.code().get_statement()!=ID_skip)
+  {
     return false;
+  }
 
   label_dest=label;
   code_skipt s;
