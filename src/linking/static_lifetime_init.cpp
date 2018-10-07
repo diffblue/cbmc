@@ -127,7 +127,7 @@ void static_lifetime_init(
     code_assignt code(symbol.symbol_expr(), rhs);
     code.add_source_location()=symbol.location;
 
-    dest.move_to_operands(code);
+    dest.add(code);
   }
 
   // call designated "initialization" functions
@@ -146,7 +146,7 @@ void static_lifetime_init(
     {
       code_function_callt function_call(symbol.symbol_expr());
       function_call.add_source_location()=source_location;
-      dest.move_to_operands(function_call);
+      dest.add(function_call);
     }
   }
 }

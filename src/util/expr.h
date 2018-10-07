@@ -121,6 +121,13 @@ public:
     operands().push_back(expr);
   }
 
+  /// Copy the given argument to the end of `exprt`'s operands.
+  /// \param expr: `exprt` to append to the operands
+  void copy_to_operands(exprt &&expr)
+  {
+    operands().push_back(std::move(expr));
+  }
+
   /// Copy the given arguments to the end of `exprt`'s operands.
   /// \param e1: first `exprt` to append to the operands
   /// \param e2: second `exprt` to append to the operands
@@ -137,6 +144,19 @@ public:
   /// Copy the given arguments to the end of `exprt`'s operands.
   /// \param e1: first `exprt` to append to the operands
   /// \param e2: second `exprt` to append to the operands
+  void copy_to_operands(exprt &&e1, exprt &&e2)
+  {
+    operandst &op = operands();
+    #ifndef USE_LIST
+    op.reserve(op.size() + 2);
+    #endif
+    op.push_back(std::move(e1));
+    op.push_back(std::move(e2));
+  }
+
+  /// Copy the given arguments to the end of `exprt`'s operands.
+  /// \param e1: first `exprt` to append to the operands
+  /// \param e2: second `exprt` to append to the operands
   /// \param e3: third `exprt` to append to the operands
   void copy_to_operands(const exprt &e1, const exprt &e2, const exprt &e3)
   {
@@ -147,6 +167,21 @@ public:
     op.push_back(e1);
     op.push_back(e2);
     op.push_back(e3);
+  }
+
+  /// Copy the given arguments to the end of `exprt`'s operands.
+  /// \param e1: first `exprt` to append to the operands
+  /// \param e2: second `exprt` to append to the operands
+  /// \param e3: third `exprt` to append to the operands
+  void copy_to_operands(exprt &&e1, exprt &&e2, exprt &&e3)
+  {
+    operandst &op = operands();
+    #ifndef USE_LIST
+    op.reserve(op.size() + 3);
+    #endif
+    op.push_back(std::move(e1));
+    op.push_back(std::move(e2));
+    op.push_back(std::move(e3));
   }
 
   void make_typecast(const typet &_type);

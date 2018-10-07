@@ -208,6 +208,7 @@ static void clinit_wrapper_do_recursive_calls(
     auto findit = symbol_table.symbols.find(base_init_routine);
     if(findit == symbol_table.symbols.end())
       continue;
+
     const code_function_callt call_base(findit->second.symbol_expr());
     init_body.add(call_base);
   }
@@ -689,7 +690,7 @@ codet get_clinit_wrapper_body(
   // add the "already-run = false" statement
   code_blockt init_body;
   code_assignt set_already_run(already_run_symbol.symbol_expr(), true_exprt());
-  init_body.move_to_operands(set_already_run);
+  init_body.move(set_already_run);
 
   clinit_wrapper_do_recursive_calls(
     symbol_table,

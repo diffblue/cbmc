@@ -119,15 +119,42 @@ void code_blockt::append(const code_blockt &extra_block)
   }
 }
 
+codet &code_blockt::find_last_statement()
+{
+  codet *last=this;
+
+  while(true)
+  {
+    const irep_idt &statement=last->get_statement();
+
+    if(statement==ID_block &&
+       !to_code_block(*last).statements().empty())
+    {
+      last=&to_code_block(*last).statements().back();
+    }
+    else if(statement==ID_label)
+    {
+      DATA_INVARIANT(
+        last->operands().size() == 1, "label must have one operand");
+      last=&(to_code(last->op0()));
+    }
+    else
+      break;
+  }
+
+  return *last;
+}
+
 code_blockt create_fatal_assertion(
   const exprt &condition, const source_locationt &loc)
 {
-  code_blockt result;
-  result.copy_to_operands(code_assertt(condition));
-  result.copy_to_operands(code_assumet(condition));
-  for(auto &statement : result.statements())
-    statement.add_source_location() = loc;
+  code_blockt result({code_assertt(condition), code_assumet(condition)});
+
+  for(auto &op : result.statements())
+    op.add_source_location() = loc;
+
   result.add_source_location() = loc;
+
   return result;
 }
 

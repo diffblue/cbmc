@@ -117,15 +117,24 @@ public:
     return (const code_operandst &)get_sub();
   }
 
-  explicit code_blockt(const std::list<codet> &_list):codet(ID_block)
+  static code_blockt from_list(const std::list<codet> &_list)
   {
-    auto &o = statements();
-    reserve_operands(_list.size());
-    for(std::list<codet>::const_iterator
-        it=_list.begin();
-        it!=_list.end();
-        it++)
-      o.push_back(*it);
+    code_blockt result;
+    auto &s=result.statements();
+    s.reserve(_list.size());
+    for(const auto &c : _list)
+      s.push_back(c);
+    return result;
+  }
+
+  explicit code_blockt(const std::vector<codet> &_statements):codet(ID_block)
+  {
+    operands()=(const std::vector<exprt> &)_statements;
+  }
+
+  explicit code_blockt(std::vector<codet> &&_statements):codet(ID_block)
+  {
+    operands()=std::move((std::vector<exprt> &&)_statements);
   }
 
   void move(codet &code)
@@ -136,6 +145,11 @@ public:
   void add(const codet &code)
   {
     copy_to_operands(code);
+  }
+
+  void add(codet &&code)
+  {
+    copy_to_operands(std::move(code));
   }
 
   void add(codet code, const source_locationt &loc)
@@ -152,31 +166,7 @@ public:
     return static_cast<const source_locationt &>(find(ID_C_end_location));
   }
 
-  codet &find_last_statement()
-  {
-    codet *last=this;
-
-    while(true)
-    {
-      const irep_idt &statement=last->get_statement();
-
-      if(statement==ID_block &&
-         !last->operands().empty())
-      {
-        last=&to_code(last->operands().back());
-      }
-      else if(statement==ID_label)
-      {
-        DATA_INVARIANT(
-          last->operands().size() == 1, "label must have one operand");
-        last=&(to_code(last->op0()));
-      }
-      else
-        break;
-    }
-
-    return *last;
-  }
+  codet &find_last_statement();
 };
 
 template<> inline bool can_cast_expr<code_blockt>(const exprt &base)

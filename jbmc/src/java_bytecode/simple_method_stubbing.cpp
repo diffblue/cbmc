@@ -170,7 +170,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
     code_assignt get_argument(
       init_symbol_expression, symbol_exprt(this_argument.get_identifier()));
     get_argument.add_source_location() = synthesized_source_location;
-    new_instructions.copy_to_operands(get_argument);
+    new_instructions.add(get_argument);
     create_method_stub_at(
       this_type,
       init_symbol_expression,
@@ -220,7 +220,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
           0,
           false,
           false);
-      new_instructions.copy_to_operands(code_returnt(to_return));
+      new_instructions.add(code_returnt(to_return));
     }
   }
 

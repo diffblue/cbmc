@@ -193,7 +193,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
       assign.move_to_operands(member, val);
       typecheck_side_effect_assignment(assign);
       code_expressiont code_exp(assign);
-      block.move_to_operands(code_exp);
+      block.move(code_exp);
     }
 
     // enter struct scope

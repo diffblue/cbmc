@@ -1010,7 +1010,7 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
   {
     side_effect_exprt side_effect_expr(
       ID_statement_expression, void_type(), expr.source_location());
-    code_blockt decl_block(clean_code);
+    auto decl_block=code_blockt::from_list(clean_code);
     decl_block.set_statement(ID_decl_block);
     side_effect_expr.copy_to_operands(decl_block);
     clean_code.clear();
@@ -1067,7 +1067,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   {
     side_effect_exprt side_effect_expr(
       ID_statement_expression, void_type(), expr.source_location());
-    code_blockt decl_block(clean_code);
+    auto decl_block=code_blockt::from_list(clean_code);
     decl_block.set_statement(ID_decl_block);
     side_effect_expr.copy_to_operands(decl_block);
     clean_code.clear();
