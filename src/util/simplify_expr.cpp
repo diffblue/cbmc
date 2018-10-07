@@ -1458,7 +1458,9 @@ exprt simplify_exprt::bits2expr(
       tmp[i]=bits[map.map_bit(i)];
 
     std::reverse(tmp.begin(), tmp.end());
-    return constant_exprt(tmp, type);
+
+    mp_integer i = binary2integer(tmp, false);
+    return constant_exprt(integer2bv(i, bits.size()), type);
   }
   else if(type.id()==ID_c_enum)
   {
