@@ -262,3 +262,14 @@ void mp_max(mp_integer &a, const mp_integer &b)
   if(b>a)
     a=b;
 }
+
+/// Get a bit with given index from bit-vector representation.
+/// \param src: the bitvector representation
+/// \param bit_index: index (0 is the least significant)
+bool get_bitvector_bit(const irep_idt &src, std::size_t bit_index)
+{
+  // The representation is binary, using '0'/'1',
+  // most significant bit first.
+  PRECONDITION(bit_index < src.size());
+  return src[src.size() - 1 - bit_index] == '1';
+}
