@@ -62,7 +62,15 @@ void irep_serializationt::reference_convert(
   else
   {
     read_irep(in, irep);
-    insert_on_read(id, irep);
+
+    if(id >= ireps_container.ireps_on_read.size())
+      ireps_container.ireps_on_read.resize(1 + id * 2, {false, get_nil_irep()});
+
+    // guard against self-referencing ireps
+    if(ireps_container.ireps_on_read[id].first)
+      throw deserialization_exceptiont("irep id read twice.");
+
+    ireps_container.ireps_on_read[id] = {true, irep};
   }
 }
 
@@ -138,29 +146,6 @@ std::size_t irep_serializationt::insert_on_write(std::size_t h)
     return ireps_container.ireps_on_write.size();
   else
     return res.first->second;
-}
-
-/// inserts an irep into the hashtable, but only the id-hashtable (only to be
-/// used upon reading ireps from a file)
-/// \par parameters: a size_t and an irep
-/// \return true on success, false otherwise
-std::size_t irep_serializationt::insert_on_read(
-  std::size_t id,
-  const irept &i)
-{
-  if(id>=ireps_container.ireps_on_read.size())
-    ireps_container.ireps_on_read.resize(1+id*2,
-      std::pair<bool, irept>(false, get_nil_irep()));
-
-  if(ireps_container.ireps_on_read[id].first)
-    throw deserialization_exceptiont("irep id read twice.");
-  else
-  {
-    ireps_container.ireps_on_read[id]=
-      std::pair<bool, irept>(true, i);
-  }
-
-  return id;
 }
 
 /// Write 7 bits of `u` each time, least-significant byte first, until we have
