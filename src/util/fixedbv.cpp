@@ -26,7 +26,7 @@ fixedbvt::fixedbvt(const constant_exprt &expr)
 void fixedbvt::from_expr(const constant_exprt &expr)
 {
   spec=fixedbv_spect(to_fixedbv_type(expr.type()));
-  v = bv2integer(expr.get_value(), spec.width, true);
+  v = bvrep2integer(expr.get_value(), spec.width, true);
 }
 
 void fixedbvt::from_integer(const mp_integer &i)
@@ -46,7 +46,7 @@ constant_exprt fixedbvt::to_expr() const
   type.set_width(spec.width);
   type.set_integer_bits(spec.integer_bits);
   PRECONDITION(spec.width != 0);
-  return constant_exprt(integer2bv(v, spec.width), type);
+  return constant_exprt(integer2bvrep(v, spec.width), type);
 }
 
 void fixedbvt::round(const fixedbv_spect &dest_spec)

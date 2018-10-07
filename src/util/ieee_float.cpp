@@ -696,7 +696,7 @@ void ieee_floatt::divide_and_round(
 
 constant_exprt ieee_floatt::to_expr() const
 {
-  return constant_exprt(integer2bv(pack(), spec.width()), spec.to_type());
+  return constant_exprt(integer2bvrep(pack(), spec.width()), spec.to_type());
 }
 
 ieee_floatt &ieee_floatt::operator/=(const ieee_floatt &other)
@@ -1062,7 +1062,7 @@ void ieee_floatt::change_spec(const ieee_float_spect &dest_spec)
 void ieee_floatt::from_expr(const constant_exprt &expr)
 {
   spec=ieee_float_spect(to_floatbv_type(expr.type()));
-  unpack(bv2integer(expr.get_value(), spec.width(), false));
+  unpack(bvrep2integer(expr.get_value(), spec.width(), false));
 }
 
 mp_integer ieee_floatt::to_integer() const

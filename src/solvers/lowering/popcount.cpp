@@ -48,7 +48,7 @@ exprt lower_popcount(const popcount_exprt &expr, const namespacet &ns)
     for(std::size_t i = 0; i < new_width / (2 * shift); ++i)
       bitstring += std::string(shift, '0') + std::string(shift, '1');
     const mp_integer value = binary2integer(bitstring, false);
-    constant_exprt bitmask(integer2bv(value, new_width), x.type());
+    const constant_exprt bitmask(integer2bvrep(value, new_width), x.type());
     // build the expression
     x = plus_exprt(bitand_exprt(x, bitmask), bitand_exprt(shifted_x, bitmask));
   }

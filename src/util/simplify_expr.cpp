@@ -144,7 +144,7 @@ bool simplify_exprt::simplify_popcount(popcount_exprt &expr)
       std::size_t result = 0;
 
       for(std::size_t i = 0; i < width; i++)
-        if(get_bitvector_bit(value, width, i))
+        if(get_bvrep_bit(value, width, i))
           result++;
 
       auto result_expr = from_integer(result, expr.type());
@@ -670,7 +670,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_floatbv)
       {
         const auto width = to_bv_type(op_type).get_width();
-        const auto int_value = bv2integer(value, width, false);
+        const auto int_value = bvrep2integer(value, width, false);
         expr=from_integer(int_value, expr_type);
         return false;
       }
@@ -1460,7 +1460,7 @@ exprt simplify_exprt::bits2expr(
     std::reverse(tmp.begin(), tmp.end());
 
     mp_integer i = binary2integer(tmp, false);
-    return constant_exprt(integer2bv(i, bits.size()), type);
+    return constant_exprt(integer2bvrep(i, bits.size()), type);
   }
   else if(type.id()==ID_c_enum)
   {
@@ -1577,7 +1577,7 @@ optionalt<std::string> simplify_exprt::expr2bits(
       std::string result(width, ' ');
 
       for(std::string::size_type i = 0; i < width; ++i)
-        result[map.map_bit(i)] = get_bitvector_bit(bvrep, width, i) ? '1' : '0';
+        result[map.map_bit(i)] = get_bvrep_bit(bvrep, width, i) ? '1' : '0';
 
       return result;
     }

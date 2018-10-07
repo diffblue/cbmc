@@ -383,7 +383,7 @@ void interpretert::evaluate(
     {
       const irep_idt &value=to_constant_expr(expr).get_value();
       const auto width = to_c_bool_type(expr.type()).get_width();
-      dest.push_back(bv2integer(value, width, false));
+      dest.push_back(bvrep2integer(value, width, false));
       return;
     }
     else if(expr.type().id()==ID_bool)
@@ -985,15 +985,15 @@ void interpretert::evaluate(
       else if(expr.type().id()==ID_signedbv)
       {
         const auto width = to_signedbv_type(expr.type()).get_width();
-        const auto s = integer2bv(value, width);
-        dest.push_back(bv2integer(s, width, true));
+        const auto s = integer2bvrep(value, width);
+        dest.push_back(bvrep2integer(s, width, true));
         return;
       }
       else if(expr.type().id()==ID_unsignedbv)
       {
         const auto width = to_unsignedbv_type(expr.type()).get_width();
-        const auto s = integer2bv(value, width);
-        dest.push_back(bv2integer(s, width, false));
+        const auto s = integer2bvrep(value, width);
+        dest.push_back(bvrep2integer(s, width, false));
         return;
       }
       else if((expr.type().id()==ID_bool) || (expr.type().id()==ID_c_bool))

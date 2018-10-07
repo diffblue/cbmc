@@ -566,7 +566,7 @@ int linker_script_merget::ls_data2instructions(
     symbol_exprt lhs(d["sym"].value, pointer_type(char_type()));
 
     constant_exprt rhs(
-      integer2bv(
+      integer2bvrep(
         string2integer(id2string(symbol_value)),
         unsigned_int_type().get_width()),
       unsigned_int_type());
@@ -630,7 +630,7 @@ int linker_script_merget::ls_data2instructions(
     symbol_exprt lhs(d["sym"].value, pointer_type(char_type()));
 
     constant_exprt rhs;
-    rhs.set_value(integer2bv(
+    rhs.set_value(integer2bvrep(
       string2integer(d["val"].value), unsigned_int_type().get_width()));
     rhs.type()=unsigned_int_type();
 

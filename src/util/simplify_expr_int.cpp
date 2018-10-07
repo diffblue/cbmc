@@ -746,8 +746,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     const irep_idt new_value =
       make_bvrep(width, [&a_val, &b_val, &width, &f](std::size_t i) {
         return f(
-          get_bitvector_bit(a_val, width, i),
-          get_bitvector_bit(b_val, width, i));
+          get_bvrep_bit(a_val, width, i), get_bvrep_bit(b_val, width, i));
       });
 
     constant_exprt new_op(new_value, expr.type());
@@ -789,7 +788,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     {
       if(
         it->is_constant() &&
-        bv2integer(
+        bvrep2integer(
           to_constant_expr(*it).get_value(), width, false) ==
           power(2, width) - 1 &&
         expr.operands().size() > 1)
@@ -816,7 +815,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     }
     else if(expr.id()==ID_bitxor)
     {
-      constant_exprt new_op(integer2bv(0, width), expr.type());
+      constant_exprt new_op(integer2bvrep(0, width), expr.type());
       expr.swap(new_op);
       return false;
     }
@@ -915,9 +914,8 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
 
         const auto new_value = make_bvrep(
           new_width, [&value_i, &value_n, width_i, width_n](std::size_t x) {
-            return x < width_n
-                     ? get_bitvector_bit(value_n, width_n, x)
-                     : get_bitvector_bit(value_i, width_i, x - width_n);
+            return x < width_n ? get_bvrep_bit(value_n, width_n, x)
+                               : get_bvrep_bit(value_i, width_i, x - width_n);
           });
 
         to_constant_expr(opi).set_value(new_value);
@@ -1298,7 +1296,7 @@ bool simplify_exprt::simplify_bitnot(exprt &expr)
         const auto &value = to_constant_expr(op).get_value();
         const auto new_value =
           make_bvrep(width, [&value, &width](std::size_t i) {
-            return !get_bitvector_bit(value, width, i);
+            return !get_bvrep_bit(value, width, i);
           });
         expr = constant_exprt(new_value, op.type());
         return false;
