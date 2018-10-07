@@ -20,10 +20,10 @@ Date: June 2006
 
 #include "goto_functions.h"
 
-/// read goto binary format v4
+/// read goto binary format v5
 /// \par parameters: input stream, symbol_table, functions
 /// \return true on error, false otherwise
-static bool read_bin_goto_object_v4(
+static bool read_bin_goto_object_v5(
   std::istream &in,
   symbol_tablet &symbol_table,
   goto_functionst &functions,
@@ -100,13 +100,11 @@ static bool read_bin_goto_object_v4(
       goto_programt::instructiont &instruction=*itarget;
 
       irepconverter.reference_convert(in, instruction.code);
-      irepconverter.read_string_ref(in); // former function
       irepconverter.reference_convert(in, instruction.source_location);
       instruction.type = (goto_program_instruction_typet)
                               irepconverter.read_gb_word(in);
       instruction.guard.make_nil();
       irepconverter.reference_convert(in, instruction.guard);
-      irepconverter.read_string_ref(in); // former event
       instruction.target_number = irepconverter.read_gb_word(in);
       if(instruction.is_target() &&
          rev_target_map.insert(
@@ -225,13 +223,14 @@ bool read_bin_goto_object(
     case 1:
     case 2:
     case 3:
+    case 4:
       message.error() <<
           "The input was compiled with an old version of "
           "goto-cc; please recompile" << messaget::eom;
       return true;
 
-    case 4:
-      return read_bin_goto_object_v4(
+    case 5:
+      return read_bin_goto_object_v5(
         in, symbol_table, functions, irepconverter);
       break;
 
