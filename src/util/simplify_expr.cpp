@@ -135,25 +135,22 @@ bool simplify_exprt::simplify_popcount(popcount_exprt &expr)
 
   if(op.is_constant())
   {
-    const typet &type=ns.follow(op.type());
+    const typet &op_type = op.type();
 
-    if(type.id()==ID_signedbv ||
-       type.id()==ID_unsignedbv)
+    if(op_type.id() == ID_signedbv || op_type.id() == ID_unsignedbv)
     {
-      mp_integer value;
-      if(!to_integer(op, value))
-      {
-        std::size_t result;
+      const auto width = to_bitvector_type(op_type).get_width();
+      const auto &value = to_constant_expr(op).get_value();
+      std::size_t result = 0;
 
-        for(result=0; value!=0; value=value>>1)
-          if(value.is_odd())
-            result++;
+      for(std::size_t i = 0; i < width; i++)
+        if(get_bitvector_bit(value, i))
+          result++;
 
-        exprt simp_result = from_integer(result, expr.type());
-        expr.swap(simp_result);
+      auto result_expr = from_integer(result, expr.type());
+      expr.swap(result_expr);
 
-        return false;
-      }
+      return false;
     }
   }
 
