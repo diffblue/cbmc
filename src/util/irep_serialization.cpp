@@ -117,35 +117,12 @@ void irep_serializationt::reference_convert(
 {
   std::size_t h=ireps_container.irep_full_hash_container.number(irep);
 
-  // should be merged with insert
-  ireps_containert::ireps_on_writet::const_iterator fi=
-    ireps_container.ireps_on_write.find(h);
+  const auto res = ireps_container.ireps_on_write.insert(
+    {h, ireps_container.ireps_on_write.size()});
 
-  if(fi==ireps_container.ireps_on_write.end())
-  {
-    size_t id=insert_on_write(h);
-    write_gb_word(out, id);
+  write_gb_word(out, res.first->second);
+  if(res.second)
     write_irep(out, irep);
-  }
-  else
-  {
-    write_gb_word(out, fi->second);
-  }
-}
-
-/// inserts an irep into the hashtable
-/// \par parameters: a size_t and an irep
-/// \return true on success, false otherwise
-std::size_t irep_serializationt::insert_on_write(std::size_t h)
-{
-  std::pair<ireps_containert::ireps_on_writet::const_iterator, bool> res=
-    ireps_container.ireps_on_write.insert(
-      std::make_pair(h, ireps_container.ireps_on_write.size()));
-
-  if(!res.second)
-    return ireps_container.ireps_on_write.size();
-  else
-    return res.first->second;
 }
 
 /// Write 7 bits of `u` each time, least-significant byte first, until we have
