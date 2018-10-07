@@ -100,6 +100,9 @@ void irep_serializationt::read_irep(
   }
 }
 
+/// Serialize an irept
+/// \param irep: source irept to serialize
+/// \param out: target output stream
 void irep_serializationt::reference_convert(
   const irept &irep,
   std::ostream &out)
@@ -160,12 +163,12 @@ std::size_t irep_serializationt::insert_on_read(
   return id;
 }
 
-/// outputs 4 characters for a long, most-significant byte first
-/// \par parameters: an output stream and a number
-/// \return nothing
+/// Write 7 bits of `u` each time, least-significant byte first, until we have
+/// zero.
+/// \param out: target stream
+/// \param u: number to write
 void write_gb_word(std::ostream &out, std::size_t u)
 {
-  // we write 7 bits each time, until we have zero
 
   while(true)
   {
@@ -182,9 +185,9 @@ void write_gb_word(std::ostream &out, std::size_t u)
   }
 }
 
-/// reads 4 characters and builds a long int from them
-/// \par parameters: a stream
-/// \return a long
+/// Interpret a stream of byte as a 7-bit encoded unsigned number.
+/// \param in: input stream
+/// \return decoded number
 std::size_t irep_serializationt::read_gb_word(std::istream &in)
 {
   std::size_t res=0;
@@ -204,8 +207,8 @@ std::size_t irep_serializationt::read_gb_word(std::istream &in)
 }
 
 /// outputs the string and then a zero byte.
-/// \par parameters: an output stream and a string
-/// \return nothing
+/// \param out: output stream
+/// \param s: string to output
 void write_gb_string(std::ostream &out, const std::string &s)
 {
   for(std::string::const_iterator it=s.begin();
@@ -221,7 +224,7 @@ void write_gb_string(std::ostream &out, const std::string &s)
 }
 
 /// reads a string from the stream
-/// \par parameters: a stream
+/// \param in: input stream
 /// \return a string
 irep_idt irep_serializationt::read_gb_string(std::istream &in)
 {
@@ -244,9 +247,9 @@ irep_idt irep_serializationt::read_gb_string(std::istream &in)
   return irep_idt(std::string(read_buffer.data(), length));
 }
 
-/// outputs the string reference
-/// \par parameters: an output stream and a string
-/// \return nothing
+/// Output a string and maintain a reference to it
+/// \param out: output stream
+/// \param s: string to output
 void irep_serializationt::write_string_ref(
   std::ostream &out,
   const irep_idt &s)
@@ -265,8 +268,8 @@ void irep_serializationt::write_string_ref(
   }
 }
 
-/// reads a string reference from the stream
-/// \par parameters: a stream
+/// Read a string reference from the stream
+/// \param in: input stream
 /// \return a string
 irep_idt irep_serializationt::read_string_ref(std::istream &in)
 {
