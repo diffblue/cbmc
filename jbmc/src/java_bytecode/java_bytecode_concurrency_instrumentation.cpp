@@ -122,11 +122,7 @@ static codet get_monitor_call(
     return code_skipt();
 
   // Otherwise we create a function call
-  code_function_callt call;
-  call.function() = symbol_exprt(symbol, it->second.type);
-  call.lhs().make_nil();
-  call.arguments().push_back(object);
-  return call;
+  return code_function_callt(symbol_exprt(symbol, it->second.type), {object});
 }
 
 /// Introduces a monitorexit before every return recursively.
@@ -288,11 +284,15 @@ static void instrument_start_thread(
 
   // Create global variable __CPROVER__next_thread_id. Used as a counter
   // in-order to to assign ids to new threads.
-  const symbolt &next_symbol =
-    add_or_get_symbol(
-        symbol_table, next_thread_id, next_thread_id,
-        java_int_type(),
-        from_integer(0, java_int_type()), false, true);
+  const symbol_exprt next_symbol_expr = add_or_get_symbol(
+                                          symbol_table,
+                                          next_thread_id,
+                                          next_thread_id,
+                                          java_int_type(),
+                                          from_integer(0, java_int_type()),
+                                          false,
+                                          true)
+                                          .symbol_expr();
 
   // Create thread-local variable __CPROVER__thread_id. Holds the id of
   // the thread.
@@ -320,14 +320,11 @@ static void instrument_start_thread(
   codet tmp_a(ID_start_thread);
   tmp_a.set(ID_destination, lbl1);
   code_gotot tmp_b(lbl2);
-  code_labelt tmp_c(lbl1);
-  tmp_c.op0() = codet(ID_skip);
+  const code_labelt tmp_c(lbl1, code_skipt());
 
-  exprt plus(ID_plus, java_int_type());
-  plus.copy_to_operands(next_symbol.symbol_expr());
-  plus.copy_to_operands(from_integer(1, java_int_type()));
-  code_assignt tmp_d(next_symbol.symbol_expr(), plus);
-  code_assignt tmp_e(current_symbol.symbol_expr(), next_symbol.symbol_expr());
+  const plus_exprt plus(next_symbol_expr, from_integer(1, java_int_type()));
+  const code_assignt tmp_d(next_symbol_expr, plus);
+  const code_assignt tmp_e(current_symbol.symbol_expr(), next_symbol_expr);
 
   code_blockt block;
   block.add(tmp_a);
@@ -368,8 +365,7 @@ static void instrument_end_thread(
   // A: codet(id=ID_end_thread)
   // B: codet(id=ID_label,label= __CPROVER_THREAD_EXIT_<ID>)
   codet tmp_a(ID_end_thread);
-  code_labelt tmp_b(lbl2);
-  tmp_b.op0() = codet(ID_skip);
+  const code_labelt tmp_b(lbl2, code_skipt());
 
   code_blockt block;
   block.add(tmp_a);

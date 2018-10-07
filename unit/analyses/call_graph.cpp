@@ -48,12 +48,9 @@ SCENARIO("call_graph",
 
     {
       code_blockt calls;
-      code_function_callt call1;
-      call1.function()=symbol_exprt("A", void_function_type);
-      code_function_callt call2;
-      call2.function()=symbol_exprt("B", void_function_type);
-      code_function_callt call3;
-      call3.function()=symbol_exprt("B", void_function_type);
+      code_function_callt call1(symbol_exprt("A", void_function_type));
+      code_function_callt call2(symbol_exprt("B", void_function_type));
+      code_function_callt call3(symbol_exprt("B", void_function_type));
       calls.move_to_operands(call1);
       calls.move_to_operands(call2);
       calls.move_to_operands(call3);
@@ -64,10 +61,8 @@ SCENARIO("call_graph",
 
     {
       code_blockt calls;
-      code_function_callt call1;
-      call1.function()=symbol_exprt("C", void_function_type);
-      code_function_callt call2;
-      call2.function()=symbol_exprt("D", void_function_type);
+      code_function_callt call1(symbol_exprt("C", void_function_type));
+      code_function_callt call2(symbol_exprt("D", void_function_type));
       calls.move_to_operands(call1);
       calls.move_to_operands(call2);
 

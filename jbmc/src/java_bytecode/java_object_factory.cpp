@@ -213,7 +213,7 @@ exprt allocate_dynamic_object(
       ID_java,
       symbol_table);
     symbols_created.push_back(&malloc_sym);
-    code_assignt assign=code_assignt(malloc_sym.symbol_expr(), malloc_expr);
+    code_assignt assign(malloc_sym.symbol_expr(), malloc_expr);
     assign.add_source_location()=loc;
     output_code.copy_to_operands(assign);
     exprt malloc_symbol_expr=malloc_sym.symbol_expr();
@@ -1392,7 +1392,7 @@ void java_object_factoryt::gen_nondet_array_init(
     symbol_table);
   symbols_created.push_back(&array_init_symbol);
   const auto &array_init_symexpr=array_init_symbol.symbol_expr();
-  codet data_assign=code_assignt(array_init_symexpr, init_array_expr);
+  code_assignt data_assign(array_init_symexpr, init_array_expr);
   data_assign.add_source_location()=loc;
   assignments.copy_to_operands(data_assign);
 
@@ -1739,8 +1739,7 @@ void java_object_factoryt::gen_method_call_if_present(
   if(const auto func = symbol_table.lookup(method_name))
   {
     const java_method_typet &type = to_java_method_type(func->type);
-    code_function_callt fun_call;
-    fun_call.function() = func->symbol_expr();
+    code_function_callt fun_call(func->symbol_expr());
     if(type.has_this())
       fun_call.arguments().push_back(address_of_exprt(instance_expr));
     assignments.add(fun_call);

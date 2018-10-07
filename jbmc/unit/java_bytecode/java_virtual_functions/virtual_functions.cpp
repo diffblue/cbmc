@@ -32,7 +32,7 @@ void check_function_call(
   for(const auto &target : targets)
   {
     REQUIRE(target->type == goto_program_instruction_typet::FUNCTION_CALL);
-    const code_function_callt call = to_code_function_call(target->code);
+    const code_function_callt &call = to_code_function_call(target->code);
     REQUIRE(call.function().id() == ID_symbol);
     REQUIRE(to_symbol_expr(call.function()).get_identifier() == function_name);
   }

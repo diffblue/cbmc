@@ -169,33 +169,26 @@ static void java_static_lifetime_init(
         // Argument order is: name, isAnnotation, isArray, isInterface,
         // isSynthetic, isLocalClass, isMemberClass, isEnum
 
-        code_function_callt initializer_call;
-        initializer_call.function() = class_literal_init_method->symbol_expr();
-
-        code_function_callt::argumentst &args = initializer_call.arguments();
-
-        // this:
-        args.push_back(address_of_exprt(sym.symbol_expr()));
-        // name:
-        args.push_back(address_of_exprt(class_name_literal));
-        // isAnnotation:
-        args.push_back(
-          constant_bool(class_symbol.type.get_bool(ID_is_annotation)));
-        // isArray:
-        args.push_back(constant_bool(class_is_array));
-        // isInterface:
-        args.push_back(
-          constant_bool(class_symbol.type.get_bool(ID_interface)));
-        // isSynthetic:
-        args.push_back(
-          constant_bool(class_symbol.type.get_bool(ID_synthetic)));
-        // isLocalClass:
-        args.push_back(nondet_bool);
-        // isMemberClass:
-        args.push_back(nondet_bool);
-        // isEnum:
-        args.push_back(
-          constant_bool(class_symbol.type.get_bool(ID_enumeration)));
+        code_function_callt initializer_call(
+          class_literal_init_method->symbol_expr(),
+          {// this:
+           address_of_exprt(sym.symbol_expr()),
+           // name:
+           address_of_exprt(class_name_literal),
+           // isAnnotation:
+           constant_bool(class_symbol.type.get_bool(ID_is_annotation)),
+           // isArray:
+           constant_bool(class_is_array),
+           // isInterface:
+           constant_bool(class_symbol.type.get_bool(ID_interface)),
+           // isSynthetic:
+           constant_bool(class_symbol.type.get_bool(ID_synthetic)),
+           // isLocalClass:
+           nondet_bool,
+           // isMemberClass:
+           nondet_bool,
+           // isEnum:
+           constant_bool(class_symbol.type.get_bool(ID_enumeration))});
 
         // First initialize the object as prior to a constructor:
         namespacet ns(symbol_table);
@@ -676,10 +669,8 @@ bool generate_java_start_function(
       return true; // give up with error
     }
 
-    code_function_callt call_init;
-    call_init.lhs().make_nil();
+    code_function_callt call_init(init_it->second.symbol_expr());
     call_init.add_source_location()=symbol.location;
-    call_init.function()=init_it->second.symbol_expr();
 
     init_code.move_to_operands(call_init);
   }
@@ -689,15 +680,13 @@ bool generate_java_start_function(
   // where return is a new variable
   // and arg1 ... argn are constructed below as well
 
-  code_function_callt call_main;
-
   source_locationt loc=symbol.location;
   loc.set_function(symbol.name);
   source_locationt &dloc=loc;
 
   // function to call
+  code_function_callt call_main(symbol.symbol_expr());
   call_main.add_source_location()=dloc;
-  call_main.function()=symbol.symbol_expr();
   call_main.function().add_source_location()=dloc;
 
   // if the method return type is not void, store return value in a new variable

@@ -281,8 +281,7 @@ bool taint_analysist::operator()(
            f_it->first!=goto_functionst::entry_point())
         {
           goto_programt::targett t=calls.add_instruction();
-          code_function_callt call;
-          call.function()=ns.lookup(f_it->first).symbol_expr();
+          const code_function_callt call(ns.lookup(f_it->first).symbol_expr());
           t->make_function_call(call);
           calls.add_instruction()->make_goto(end.instructions.begin());
           goto_programt::targett g=gotos.add_instruction();

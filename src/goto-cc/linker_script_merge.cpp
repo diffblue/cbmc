@@ -590,15 +590,13 @@ int linker_script_merget::ls_data2instructions(
   goto_programt::instructionst initialize_instructions=gp.instructions;
   for(const auto &d : data["regions"].array)
   {
-    code_function_callt f;
-    const code_typet void_t({}, empty_typet());
-    f.function()=symbol_exprt(CPROVER_PREFIX "allocated_memory", void_t);
     unsigned start=safe_string2unsigned(d["start"].value);
     unsigned size=safe_string2unsigned(d["size"].value);
     constant_exprt first=from_integer(start, size_type());
     constant_exprt second=from_integer(size, size_type());
-    code_function_callt::argumentst args={first, second};
-    f.arguments()=args;
+    const code_typet void_t({}, empty_typet());
+    code_function_callt f(
+      symbol_exprt(CPROVER_PREFIX "allocated_memory", void_t), {first, second});
 
     source_locationt loc;
     loc.set_file(linker_script);

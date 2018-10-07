@@ -76,8 +76,7 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
         from_integer(0, int_type));
 
     code_blockt then_block;
-    code_function_callt call;
-    call.function() = symbol_exprt("b", void_function_type);
+    code_function_callt call(symbol_exprt("b", void_function_type));
     then_block.move_to_operands(call);
     code_assignt assign_x(
       x_symbol.symbol_expr(), from_integer(1, int_type));

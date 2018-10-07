@@ -844,8 +844,7 @@ void goto_convertt::convert_cpp_delete(
     to_code_type(delete_symbol.type()).parameters().front().type();
 
   code_function_callt delete_call(
-    nil_exprt(), delete_symbol, {typecast_exprt(tmp_op, arg_type)});
-  delete_call.lhs().make_nil();
+    delete_symbol, {typecast_exprt(tmp_op, arg_type)});
   delete_call.add_source_location()=code.source_location();
 
   convert(delete_call, dest, ID_cpp);

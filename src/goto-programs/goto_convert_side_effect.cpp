@@ -344,7 +344,7 @@ void goto_convertt::remove_function_call(
 
   if(!result_is_used)
   {
-    code_function_callt call(nil_exprt(), expr.op0(), expr.op1().operands());
+    code_function_callt call(expr.op0(), expr.op1().operands());
     call.add_source_location()=expr.source_location();
     convert_function_call(call, dest, mode);
     expr.make_nil();

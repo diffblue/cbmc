@@ -60,7 +60,6 @@ code_function_callt function_to_call(
   string_constantt function_id_string(argument);
 
   code_function_callt call(
-    nil_exprt(),
     symbol_exprt(s_it->second.name, s_it->second.type),
     {typecast_exprt(
       address_of_exprt(
