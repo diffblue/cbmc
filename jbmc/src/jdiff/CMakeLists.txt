@@ -15,7 +15,6 @@ target_link_libraries(jdiff-lib
     goto-diff-lib
     goto-instrument-lib
     goto-programs
-    goto-symex
     analyses
     java_bytecode
     langapi

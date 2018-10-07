@@ -39,12 +39,11 @@ Author: Peter Schrammel
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
-
-#include <goto-symex/rewrite_union.h>
 
 #include <goto-instrument/cover.h>
 

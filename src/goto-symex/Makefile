@@ -10,7 +10,6 @@ SRC = auto_objects.cpp \
       path_storage.cpp \
       postcondition.cpp \
       precondition.cpp \
-      rewrite_union.cpp \
       show_program.cpp \
       show_vcc.cpp \
       slice.cpp \

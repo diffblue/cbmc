@@ -24,7 +24,6 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-instrument/cover_instrument_mcdc$(OBJEXT) \
       ../goto-instrument/cover_instrument_other$(OBJEXT) \
       ../goto-instrument/cover_util$(OBJEXT) \
-      ../goto-symex/rewrite_union$(OBJEXT) \
       ../analyses/analyses$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
