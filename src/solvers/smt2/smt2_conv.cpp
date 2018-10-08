@@ -269,11 +269,11 @@ constant_exprt smt2_convt::parse_literal(
     if(type.id()==ID_floatbv)
     {
       const floatbv_typet &floatbv_type=to_floatbv_type(type);
-      constant_exprt s1=parse_literal(src.get_sub()[1], bv_typet(1));
-      constant_exprt s2=
-        parse_literal(src.get_sub()[2], bv_typet(floatbv_type.get_e()));
-      constant_exprt s3=
-        parse_literal(src.get_sub()[3], bv_typet(floatbv_type.get_f()));
+      constant_exprt s1 = parse_literal(src.get_sub()[1], unsignedbv_typet(1));
+      constant_exprt s2 =
+        parse_literal(src.get_sub()[2], unsignedbv_typet(floatbv_type.get_e()));
+      constant_exprt s3 =
+        parse_literal(src.get_sub()[3], unsignedbv_typet(floatbv_type.get_f()));
       // stitch the bits together
       std::string bits=id2string(s1.get_value())+
                        id2string(s2.get_value())+
@@ -310,7 +310,6 @@ constant_exprt smt2_convt::parse_literal(
 
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
-     type.id()==ID_bv ||
      type.id()==ID_c_enum ||
      type.id()==ID_c_bool)
   {
@@ -377,7 +376,7 @@ exprt smt2_convt::parse_union(
   PRECONDITION(!type.components().empty());
   const union_typet::componentt &first=type.components().front();
   std::size_t width=boolbv_width(type);
-  exprt value=parse_rec(src, bv_typet(width));
+  exprt value = parse_rec(src, unsignedbv_typet(width));
   if(value.is_nil())
     return nil_exprt();
   const typecast_exprt converted(value, first.type());
@@ -416,7 +415,7 @@ exprt smt2_convt::parse_struct(
   {
     // These are just flattened, i.e., we expect to see a monster bit vector.
     std::size_t total_width=boolbv_width(type);
-    exprt l=parse_literal(src, bv_typet(total_width));
+    exprt l = parse_literal(src, unsignedbv_typet(total_width));
     if(!l.is_constant())
       return nil_exprt();
 
@@ -457,7 +456,6 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
      type.id()==ID_integer ||
      type.id()==ID_rational ||
      type.id()==ID_real ||
-     type.id()==ID_bv ||
      type.id()==ID_fixedbv ||
      type.id()==ID_floatbv)
   {
@@ -474,7 +472,7 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
   {
     // these come in as bit-vector literals
     std::size_t width=boolbv_width(type);
-    constant_exprt bv_expr=parse_literal(src, bv_typet(width));
+    constant_exprt bv_expr = parse_literal(src, unsignedbv_typet(width));
 
     mp_integer v = numeric_cast_v<mp_integer>(bv_expr);
 
