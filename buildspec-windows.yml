@@ -6,6 +6,11 @@ phases:
       - choco install cyg-get -y --no-progress
       - cyg-get bash patch bison flex make wget perl
       - nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
+      - |
+        $env:Path = "C:\tools\cygwin\bin;$env:Path"
+        cmd /c 'wget --directory-prefix=/cygdrive/c/tools https://github.com/Z3Prover/z3/releases/download/z3-4.7.1/z3-4.7.1-x64-win.zip'
+        Expand-Archive c:\tools\z3-4.7.1-x64-win.zip -DestinationPath C:\tools
+        
 
   build:
     commands:
@@ -64,9 +69,10 @@ phases:
         cd ../..
 
       - |
-        $env:Path = "C:\tools\cygwin\bin;$env:Path"
+        $env:Path = "C:\tools\cygwin\bin;C:\tools\cygwin\bin;c:\tools\z3-4.7.1-x64-win\bin;$env:Path"
         cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C regression test BUILD_ENV=MSVC" '
         cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C regression/goto-cl test BUILD_ENV=MSVC" '
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C regression/cbmc-smt test BUILD_ENV=MSVC" '
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"

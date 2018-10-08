@@ -321,6 +321,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("fpa"))
     options.set_option("fpa", true);
 
+  if(cmdline.isset("no-data-types"))
+    options.set_option("data-types", false);
+
   bool solver_set=false;
 
   if(cmdline.isset("boolector"))
