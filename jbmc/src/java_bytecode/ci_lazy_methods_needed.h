@@ -35,11 +35,6 @@ public:
       pointer_type_selector(pointer_type_selector)
   {}
 
-  std::unordered_set<irep_idt> get_instantiated_classes()
-  {
-    return instantiated_classes;
-  }
-
   void add_needed_method(const irep_idt &);
   // Returns true if new
   bool add_needed_class(const irep_idt &);
@@ -60,6 +55,9 @@ private:
   symbol_tablet &symbol_table;
 
   const select_pointer_typet &pointer_type_selector;
+
+  void
+  add_clinit_call(const irep_idt &class_id, const symbol_tablet &symbol_table);
 
   void initialize_instantiated_classes_from_pointer(
     const pointer_typet &pointer_type,

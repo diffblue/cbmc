@@ -10,6 +10,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// Context-insensitive lazy methods container
 
 #include "ci_lazy_methods.h"
+#include "java_static_initializers.h"
 
 #include <java_bytecode/select_pointer_type.h>
 #include <string>
@@ -23,6 +24,24 @@ void ci_lazy_methods_neededt::add_needed_method(
   const irep_idt &method_symbol_name)
 {
   callable_methods.insert(method_symbol_name);
+}
+
+/// For a given class id, note that its static initializer is needed.
+/// This applies the same logic to the given class that
+/// `java_bytecode_convert_methodt::get_clinit_call` applies e.g. to classes
+/// whose constructor we call in a method body. This duplication is unavoidable
+/// because ci_lazy_methods essentially has to go through the same logic as
+/// __CPROVER_start in its initial setup, and because return values of opaque
+/// methods need to be considered in ci_lazy_methods too.
+/// \param class_id: The given class id
+/// \param symbol_table: Used to look up occurrences of static initializers
+void ci_lazy_methods_neededt::add_clinit_call(
+  const irep_idt &class_id,
+  const symbol_tablet &symbol_table)
+{
+  const irep_idt &clinit_wrapper = clinit_wrapper_name(class_id);
+  if(symbol_table.symbols.count(clinit_wrapper))
+    add_needed_method(clinit_wrapper);
 }
 
 /// Notes class `class_symbol_name` will be instantiated, or a static field
@@ -41,6 +60,14 @@ bool ci_lazy_methods_neededt::add_needed_class(
     class_name_string + ".cproverNondetInitialize:()V");
   if(symbol_table.symbols.count(cprover_validate))
     add_needed_method(cprover_validate);
+
+  // Special case for enums. We may want to generalise this, the comment in
+  // \ref java_object_factoryt::gen_nondet_pointer_init (TG-4689).
+  namespacet ns(symbol_table);
+  const auto &class_type =
+    to_java_class_type(ns.lookup(class_symbol_name).type);
+  if(class_type.get_base("java::java.lang.Enum"))
+    add_clinit_call(class_symbol_name, symbol_table);
 
   return true;
 }
