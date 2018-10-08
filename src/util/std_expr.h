@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file util/std_expr.h
 /// API to expression classes
 
+#include "base_type.h"
 #include "expr_cast.h"
 #include "invariant.h"
 #include "mathematical_types.h"
@@ -771,6 +772,22 @@ public:
     add_to_operands(_lhs, _rhs);
   }
 
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      expr.operands().size() == 2, "binary expression must have two operands");
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
+
   const exprt &op2() const = delete;
   exprt &op2() = delete;
   const exprt &op3() const = delete;
@@ -826,6 +843,25 @@ public:
     const exprt &_op1):binary_exprt(_op0, _id, _op1, bool_typet())
   {
   }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    binary_exprt::check(expr, vm);
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    binary_exprt::validate(expr, ns, vm);
+
+    DATA_CHECK(
+      expr.type().id() == ID_bool,
+      "result of binary predicate expression should be of type bool");
+  }
 };
 
 /// \brief A base class for relations, i.e., binary predicates
@@ -847,6 +883,26 @@ public:
     const exprt &_rhs):
     binary_predicate_exprt(_lhs, _id, _rhs)
   {
+  }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    binary_predicate_exprt::check(expr, vm);
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    binary_predicate_exprt::validate(expr, ns, vm);
+
+    // check types
+    DATA_CHECK(
+      base_type_eq(expr.op0().type(), expr.op1().type(), ns),
+      "lhs and rhs of binary relation expression should have same type");
   }
 
   exprt &lhs()
@@ -1414,6 +1470,21 @@ public:
     binary_relation_exprt(_lhs, ID_equal, _rhs)
   {
   }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    binary_relation_exprt::check(expr, vm);
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    binary_relation_exprt::validate(expr, ns, vm);
+  }
 };
 
 /// \brief Cast an exprt to an \ref equal_exprt
@@ -1425,7 +1496,7 @@ public:
 inline const equal_exprt &to_equal_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_equal);
-  DATA_INVARIANT(expr.operands().size()==2, "Equality must have two operands");
+  equal_exprt::check(expr);
   return static_cast<const equal_exprt &>(expr);
 }
 
@@ -1433,7 +1504,7 @@ inline const equal_exprt &to_equal_expr(const exprt &expr)
 inline equal_exprt &to_equal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_equal);
-  DATA_INVARIANT(expr.operands().size()==2, "Equality must have two operands");
+  equal_exprt::check(expr);
   return static_cast<equal_exprt &>(expr);
 }
 
