@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/c_types.h>
 
-bitvector_typet gcc_float16_type()
+floatbv_typet gcc_float16_type()
 {
   floatbv_typet result=
     ieee_float_spect::half_precision().to_type();
@@ -19,7 +19,7 @@ bitvector_typet gcc_float16_type()
   return result;
 }
 
-bitvector_typet gcc_float32_type()
+floatbv_typet gcc_float32_type()
 {
   // not same as float!
   floatbv_typet result=
@@ -28,7 +28,7 @@ bitvector_typet gcc_float32_type()
   return result;
 }
 
-bitvector_typet gcc_float32x_type()
+floatbv_typet gcc_float32x_type()
 {
   // not same as float!
   floatbv_typet result=
@@ -37,7 +37,7 @@ bitvector_typet gcc_float32x_type()
   return result;
 }
 
-bitvector_typet gcc_float64_type()
+floatbv_typet gcc_float64_type()
 {
   // not same as double!
   floatbv_typet result=
@@ -46,7 +46,7 @@ bitvector_typet gcc_float64_type()
   return result;
 }
 
-bitvector_typet gcc_float64x_type()
+floatbv_typet gcc_float64x_type()
 {
   // not same as double!
   floatbv_typet result=
@@ -55,7 +55,7 @@ bitvector_typet gcc_float64x_type()
   return result;
 }
 
-bitvector_typet gcc_float128_type()
+floatbv_typet gcc_float128_type()
 {
   // not same as long double!
   floatbv_typet result=
@@ -64,7 +64,7 @@ bitvector_typet gcc_float128_type()
   return result;
 }
 
-bitvector_typet gcc_float128x_type()
+floatbv_typet gcc_float128x_type()
 {
   // not same as long double!
   floatbv_typet result=

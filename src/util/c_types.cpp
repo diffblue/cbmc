@@ -182,7 +182,7 @@ unsignedbv_typet char32_t_type()
   return result;
 }
 
-bitvector_typet float_type()
+floatbv_typet float_type()
 {
   floatbv_typet result=
     ieee_float_spect::single_precision().to_type();
@@ -190,7 +190,7 @@ bitvector_typet float_type()
   return result;
 }
 
-bitvector_typet double_type()
+floatbv_typet double_type()
 {
   floatbv_typet result=
     ieee_float_spect::double_precision().to_type();
@@ -198,7 +198,7 @@ bitvector_typet double_type()
   return result;
 }
 
-bitvector_typet long_double_type()
+floatbv_typet long_double_type()
 {
   floatbv_typet result;
   if(config.ansi_c.long_double_width==128)
