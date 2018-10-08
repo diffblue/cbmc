@@ -96,6 +96,7 @@ SRC = arith_tools.cpp \
       union_find.cpp \
       union_find_replace.cpp \
       unwrap_nested_exception.cpp \
+      validate_expressions.cpp \
       version.cpp \
       xml.cpp \
       xml_expr.cpp \
