@@ -166,4 +166,7 @@ void mp_max(mp_integer &a, const mp_integer &b);
 
 bool get_bitvector_bit(const irep_idt &src, std::size_t bit_index);
 
+irep_idt
+make_bvrep(const std::size_t width, const std::function<bool(std::size_t)> f);
+
 #endif // CPROVER_UTIL_ARITH_TOOLS_H

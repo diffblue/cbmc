@@ -273,3 +273,51 @@ bool get_bitvector_bit(const irep_idt &src, std::size_t bit_index)
   PRECONDITION(bit_index < src.size());
   return src[src.size() - 1 - bit_index] == '1';
 }
+
+/// construct a bit-vector representation from a functor
+/// \param width: the width of the bit-vector
+/// \param f: the functor -- the parameter is the bit index
+/// \returns new bitvector representation
+irep_idt
+make_bvrep(const std::size_t width, const std::function<bool(std::size_t)> f)
+{
+  std::string result(width, ' ');
+
+  for(std::size_t i = 0; i < width; i++)
+    result[width - 1 - i] = f(i) ? '1' : '0';
+
+  return result;
+}
+
+/// perform a binary bit-wise operation, given as a functor,
+/// on a bit-vector representation
+/// \param a: the representation of the first bit vector
+/// \param b: the representation of the second bit vector
+/// \param width: the width of the bit-vector
+/// \param f: the functor
+/// \returns new bitvector representation
+irep_idt bitvector_bitwise_op(
+  const irep_idt &a,
+  const irep_idt &b,
+  const std::size_t width,
+  const std::function<bool(bool, bool)> f)
+{
+  return make_bvrep(width, [&a, &b, f](std::size_t i) {
+    return f(get_bitvector_bit(a, i), get_bitvector_bit(b, i));
+  });
+}
+
+/// perform a unary bit-wise operation, given as a functor,
+/// on a bit-vector representation
+/// \param a: the bit-vector representation
+/// \param width: the width of the bit-vector
+/// \param f: the functor
+/// \returns new bitvector representation
+irep_idt bitvector_bitwise_op(
+  const irep_idt &a,
+  const std::size_t width,
+  const std::function<bool(bool)> f)
+{
+  return make_bvrep(
+    width, [&a, f](std::size_t i) { return f(get_bitvector_bit(a, i)); });
+}
