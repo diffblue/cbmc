@@ -1,0 +1,11 @@
+CORE
+NondetEnumOpaqueReturn.class
+--function NondetEnumOpaqueReturn.canChooseSomeConstant --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The test checks that the name and ordinal fields of nondet-initialized enums
+which have been returned by an opaque method correspond to those of an enum
+constant of the same type.
