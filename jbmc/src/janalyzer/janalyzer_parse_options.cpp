@@ -77,6 +77,8 @@ void janalyzer_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
+  parse_java_language_options(cmdline, options);
+
   // check assertions
   if(cmdline.isset("no-assertions"))
     options.set_option("assertions", false);
@@ -350,7 +352,7 @@ int janalyzer_parse_optionst::doit()
 
   try
   {
-    goto_model = initialize_goto_model(cmdline, get_message_handler());
+    goto_model = initialize_goto_model(cmdline, get_message_handler(), options);
   }
 
   catch(const char *e)

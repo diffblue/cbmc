@@ -24,15 +24,13 @@
 ///   function) and symbol table (to replace the _start function symbol) of the
 ///   program.
 /// \param _message_handler: The message handler to report any messages with
-template<typename maybe_lazy_goto_modelt>
+template <typename maybe_lazy_goto_modelt>
 rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::
-rebuild_goto_start_function_baset(
-  const cmdlinet &cmdline,
-  maybe_lazy_goto_modelt &goto_model,
-  message_handlert &message_handler):
-    messaget(message_handler),
-    cmdline(cmdline),
-    goto_model(goto_model)
+  rebuild_goto_start_function_baset(
+    const optionst &options,
+    maybe_lazy_goto_modelt &goto_model,
+    message_handlert &message_handler)
+  : messaget(message_handler), options(options), goto_model(goto_model)
 {
 }
 
@@ -53,7 +51,7 @@ bool rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::operator()()
   std::unique_ptr<languaget> language=get_language_from_mode(mode);
   INVARIANT(language, "No language found for mode: "+id2string(mode));
   language->set_message_handler(get_message_handler());
-  language->get_language_options(cmdline);
+  language->set_language_options(options);
 
   // To create a new entry point we must first remove the old one
   remove_existing_entry_point();

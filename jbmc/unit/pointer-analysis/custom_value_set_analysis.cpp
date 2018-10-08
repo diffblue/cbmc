@@ -17,6 +17,7 @@ Author: Chris Smowton, chris@smowton.net
 #include <langapi/mode.h>
 #include <pointer-analysis/value_set_analysis.h>
 #include <util/config.h>
+#include <util/options.h>
 
 /// An example customised value_sett. It makes a series of small changes
 /// to the underlying value_sett logic, which can then be verified by the
@@ -180,9 +181,11 @@ SCENARIO("test_value_set_analysis",
     command_line.args.push_back("pointer-analysis/CustomVSATest.jar");
 
     register_language(new_java_bytecode_language);
+    optionst options;
+    parse_java_language_options(command_line, options);
 
     goto_modelt goto_model =
-      initialize_goto_model(command_line, null_message_handler);
+      initialize_goto_model(command_line, null_message_handler, options);
 
     null_message_handlert message_handler;
     remove_java_new(goto_model, message_handler);

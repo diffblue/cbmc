@@ -86,6 +86,7 @@ void jbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("assertions", true);
   options.set_option("assumptions", true);
   options.set_option("built-in-assertions", true);
+  options.set_option("lazy-methods", true);
   options.set_option("pretty-names", true);
   options.set_option("propagation", true);
   options.set_option("refine-strings", true);
@@ -106,6 +107,8 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   }
 
   jbmc_parse_optionst::set_default_options(options);
+  parse_java_language_options(cmdline, options);
+  parse_object_factory_options(cmdline, options);
 
   if(cmdline.isset("show-symex-strategies"))
   {
@@ -349,6 +352,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
 
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 
+  if(cmdline.isset("no-lazy-methods"))
+    options.set_option("lazy-methods", false);
+
   if(cmdline.isset("symex-driven-lazy-loading"))
   {
     options.set_option("symex-driven-lazy-loading", true);
@@ -452,7 +458,7 @@ int jbmc_parse_optionst::doit()
       return 6;
     }
 
-    language->get_language_options(cmdline);
+    language->set_language_options(options);
     language->set_message_handler(get_message_handler());
 
     status() << "Parsing " << filename << eom;
@@ -483,20 +489,10 @@ int jbmc_parse_optionst::doit()
     };
   }
 
-  object_factory_params.max_nondet_array_length =
-    cmdline.isset("max-nondet-array-length")
-      ? std::stoul(cmdline.get_value("max-nondet-array-length"))
-      : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
-  object_factory_params.max_nondet_string_length =
-    cmdline.isset("max-nondet-string-length")
-      ? std::stoul(cmdline.get_value("max-nondet-string-length"))
-      : MAX_NONDET_STRING_LENGTH;
-  object_factory_params.max_nondet_tree_depth =
-    cmdline.isset("max-nondet-tree-depth")
-      ? std::stoul(cmdline.get_value("max-nondet-tree-depth"))
-      : MAX_NONDET_TREE_DEPTH;
+  object_factory_params.set(options);
 
-  stub_objects_are_not_null = cmdline.isset("java-assume-inputs-non-null");
+  stub_objects_are_not_null =
+    options.get_bool_option("java-assume-inputs-non-null");
 
   if(!cmdline.isset("symex-driven-lazy-loading"))
   {
@@ -531,7 +527,7 @@ int jbmc_parse_optionst::doit()
     // Use symex-driven lazy loading:
     lazy_goto_modelt lazy_goto_model=lazy_goto_modelt::from_handler_object(
       *this, options, get_message_handler());
-    lazy_goto_model.initialize(cmdline);
+    lazy_goto_model.initialize(cmdline, options);
 
     // The precise wording of this error matches goto-symex's complaint when no
     // __CPROVER_start exists (if we just go ahead and run it anyway it will
@@ -608,7 +604,7 @@ int jbmc_parse_optionst::get_goto_program(
   {
     lazy_goto_modelt lazy_goto_model=lazy_goto_modelt::from_handler_object(
       *this, options, get_message_handler());
-    lazy_goto_model.initialize(cmdline);
+    lazy_goto_model.initialize(cmdline, options);
 
     // Show the class hierarchy
     if(cmdline.isset("show-class-hierarchy"))

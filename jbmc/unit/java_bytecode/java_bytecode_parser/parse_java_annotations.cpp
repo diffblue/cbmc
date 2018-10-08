@@ -14,6 +14,7 @@
 #include <testing-utils/catch.hpp>
 #include <testing-utils/free_form_cmdline.h>
 #include <testing-utils/message.h>
+#include <util/options.h>
 
 class test_java_bytecode_languaget : public java_bytecode_languaget
 {
@@ -173,7 +174,9 @@ SCENARIO(
       command_line.add_flag("no-refine-strings");
       test_java_bytecode_languaget language;
       language.set_message_handler(null_message_handler);
-      language.get_language_options(command_line);
+      optionst options;
+      parse_java_language_options(command_line, options);
+      language.set_language_options(options);
 
       std::istringstream java_code_stream("ignored");
       language.parse(java_code_stream, "AnnotationsEverywhere.class");

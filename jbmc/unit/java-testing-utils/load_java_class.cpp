@@ -14,6 +14,7 @@
 #include <testing-utils/message.h>
 
 #include <util/config.h>
+#include <util/options.h>
 #include <util/suffix.h>
 
 #include <goto-programs/lazy_goto_model.h>
@@ -119,9 +120,12 @@ goto_modelt load_goto_model_from_java_class(
 
   std::istringstream java_code_stream("ignored");
 
+  optionst options;
+  parse_java_language_options(command_line, options);
+
   // Configure the language, load the class files
   language.set_message_handler(null_message_handler);
-  language.get_language_options(command_line);
+  language.set_language_options(options);
   language.parse(java_code_stream, filename);
   language.typecheck(lazy_goto_model.symbol_table, "");
   language.generate_support_functions(lazy_goto_model.symbol_table);

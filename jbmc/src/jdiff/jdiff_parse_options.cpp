@@ -60,11 +60,13 @@ Author: Peter Schrammel
 #include <goto-diff/goto_diff.h>
 #include <goto-diff/unified_diff.h>
 
+// TODO: do not use language_uit for this; requires a refactoring of
+//   initialize_goto_model to support parsing specific command line files
 jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
   : parse_options_baset(JDIFF_OPTIONS, argc, argv),
-    jdiff_languagest(cmdline, ui_message_handler),
+    jdiff_languagest(cmdline, ui_message_handler, &options),
     ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION),
-    languages2(cmdline, ui_message_handler)
+    languages2(cmdline, ui_message_handler, &options)
 {
 }
 
@@ -73,9 +75,9 @@ jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
   const char **argv,
   const std::string &extra_options)
   : parse_options_baset(JDIFF_OPTIONS + extra_options, argc, argv),
-    jdiff_languagest(cmdline, ui_message_handler),
+    jdiff_languagest(cmdline, ui_message_handler, &options),
     ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION),
-    languages2(cmdline, ui_message_handler)
+    languages2(cmdline, ui_message_handler, &options)
 {
 }
 
@@ -92,6 +94,7 @@ void jdiff_parse_optionst::get_command_line_options(optionst &options)
   // we always require these options
   cmdline.set("no-lazy-methods");
   cmdline.set("no-refine-strings");
+  parse_java_language_options(cmdline, options);
 
   if(cmdline.isset("cover"))
     parse_cover_options(cmdline, options);

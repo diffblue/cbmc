@@ -26,7 +26,8 @@ public:
 
   language_uit(
     const cmdlinet &cmdline,
-    ui_message_handlert &ui_message_handler);
+    ui_message_handlert &ui_message_handler,
+    optionst *options = nullptr);
   virtual ~language_uit();
 
   virtual bool parse();
@@ -53,6 +54,7 @@ public:
 protected:
   const cmdlinet &_cmdline;
   ui_message_handlert &ui_message_handler;
+  optionst *options;
 };
 
 #endif // CPROVER_LANGAPI_LANGUAGE_UI_H

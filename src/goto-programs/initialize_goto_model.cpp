@@ -14,7 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 
+#include <util/cmdline.h>
 #include <util/config.h>
+#include <util/message.h>
 #include <util/unicode.h>
 
 #include <langapi/mode.h>
@@ -27,7 +29,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 goto_modelt initialize_goto_model(
   const cmdlinet &cmdline,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  const optionst &options)
 {
   messaget msg(message_handler);
   const std::vector<std::string> &files=cmdline.args;
@@ -85,7 +88,7 @@ goto_modelt initialize_goto_model(
 
       languaget &language=*lf.language;
       language.set_message_handler(message_handler);
-      language.get_language_options(cmdline);
+      language.set_language_options(options);
 
       msg.status() << "Parsing " << filename << messaget::eom;
 
@@ -125,9 +128,7 @@ goto_modelt initialize_goto_model(
     // Rebuild the entry-point, using the language annotation of the
     // existing __CPROVER_start function:
     rebuild_goto_start_functiont rebuild_existing_start(
-      cmdline,
-      goto_model,
-      msg.get_message_handler());
+      options, goto_model, msg.get_message_handler());
     entry_point_generation_failed=rebuild_existing_start();
   }
   else if(!binaries_provided_start)

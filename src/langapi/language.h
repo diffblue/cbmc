@@ -27,8 +27,8 @@ class symbol_tablet;
 class symbol_table_baset;
 class exprt;
 class namespacet;
+class optionst;
 class typet;
-class cmdlinet;
 
 #define OPT_FUNCTIONS \
   "(function):"
@@ -39,8 +39,10 @@ class cmdlinet;
 class languaget:public messaget
 {
 public:
-  // Parse language-specific options
-  virtual void get_language_options(const cmdlinet &) {}
+  /// Set language-specific options
+  virtual void set_language_options(const optionst &)
+  {
+  }
 
   // parse file
 
