@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
+#include "base_type.h"
+#include "expr.h"
 #include "expr_cast.h"
 #include "invariant.h"
 #include "std_expr.h"
@@ -285,6 +287,39 @@ public:
   {
     return op1();
   }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      code.operands().size() == 2, "assignment must have two operands");
+  }
+
+  static void validate(
+    const codet &code,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(code, vm);
+
+    DATA_CHECK(
+      base_type_eq(code.op0().type(), code.op1().type(), ns),
+      "lhs and rhs of assignment must have same type");
+  }
+
+  static void validate_full(
+    const codet &code,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    for(const exprt &op : code.operands())
+    {
+      validate_full_expr(op, ns, vm);
+    }
+
+    validate(code, ns, vm);
+  }
 };
 
 template<> inline bool can_cast_expr<code_assignt>(const exprt &base)
@@ -300,16 +335,14 @@ inline void validate_expr(const code_assignt & x)
 inline const code_assignt &to_code_assign(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assign);
-  DATA_INVARIANT(
-    code.operands().size() == 2, "assignment must have two operands");
+  code_assignt::check(code);
   return static_cast<const code_assignt &>(code);
 }
 
 inline code_assignt &to_code_assign(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assign);
-  DATA_INVARIANT(
-    code.operands().size() == 2, "assignment must have two operands");
+  code_assignt::check(code);
   return static_cast<code_assignt &>(code);
 }
 
