@@ -51,6 +51,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language.h>
 
 #include <util/config.h>
+#include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/options.h>
 #include <util/unicode.h>
@@ -197,6 +198,10 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   }
   else if(cmdline.isset("simplify"))
   {
+    if(cmdline.get_value("simplify") == "-")
+      throw invalid_command_line_argument_exceptiont(
+        "cannot output goto binary to stdout", "--simplify");
+
     options.set_option("simplify", true);
     options.set_option("outfile", cmdline.get_value("simplify"));
     options.set_option("general-analysis", true);
@@ -634,6 +639,9 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
     }
     else if(options.get_bool_option("simplify"))
     {
+      PRECONDITION(!outfile.empty() && outfile != "-");
+      output_stream.close();
+      output_stream.open(outfile, std::ios::binary);
       result = static_simplifier(goto_model,
                                  *analyzer,
                                  options,
