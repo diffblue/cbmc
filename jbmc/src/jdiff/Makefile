@@ -24,7 +24,6 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../$(CPROVER_DIR)/src/goto-instrument/cover_instrument_mcdc$(OBJEXT) \
       ../$(CPROVER_DIR)/src/goto-instrument/cover_instrument_other$(OBJEXT) \
       ../$(CPROVER_DIR)/src/goto-instrument/cover_util$(OBJEXT) \
-      ../$(CPROVER_DIR)/src/goto-symex/rewrite_union$(OBJEXT) \
       ../$(CPROVER_DIR)/src/analyses/analyses$(LIBEXT) \
       ../$(CPROVER_DIR)/src/langapi/langapi$(LIBEXT) \
       ../$(CPROVER_DIR)/src/xmllang/xmllang$(LIBEXT) \

@@ -4,7 +4,6 @@ jdiff
 goto-diff
 goto-instrument
 goto-programs
-goto-symex # dubious - rewrite_union
 langapi # should go away
 pointer-analysis
 util

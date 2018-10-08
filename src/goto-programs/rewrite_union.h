@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
-#ifndef CPROVER_GOTO_SYMEX_REWRITE_UNION_H
-#define CPROVER_GOTO_SYMEX_REWRITE_UNION_H
+#ifndef CPROVER_GOTO_PROGRAMS_REWRITE_UNION_H
+#define CPROVER_GOTO_PROGRAMS_REWRITE_UNION_H
 
 #include <goto-programs/goto_functions.h>
 
@@ -24,4 +24,4 @@ void rewrite_union(goto_functionst::goto_functiont &);
 void rewrite_union(goto_functionst &);
 void rewrite_union(goto_modelt &);
 
-#endif // CPROVER_GOTO_SYMEX_REWRITE_UNION_H
+#endif // CPROVER_GOTO_PROGRAMS_REWRITE_UNION_H
