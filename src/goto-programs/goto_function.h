@@ -110,6 +110,16 @@ public:
     parameter_identifiers = std::move(other.parameter_identifiers);
     return *this;
   }
+
+  /// Check that the goto function is well-formed
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  void validate(const namespacet &ns, const validation_modet vm) const
+  {
+    body.validate(ns, vm);
+    validate_full_type(type, ns, vm);
+  }
 };
 
 void get_local_identifiers(const goto_functiont &, std::set<irep_idt> &dest);

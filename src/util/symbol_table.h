@@ -109,6 +109,11 @@ public:
   {
     return iteratort(internal_symbols.end());
   }
+
+  /// Check that the symbol table is well-formed
+  void validate() const
+  {
+  }
 };
 
 #endif // CPROVER_UTIL_SYMBOL_TABLE_H
