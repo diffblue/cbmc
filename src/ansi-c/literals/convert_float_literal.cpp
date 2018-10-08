@@ -25,48 +25,49 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "parse_float.h"
 
+/// build an expression from a floating-point literal
+/// \returns either a constant_exprt or a complex_exprt
 exprt convert_float_literal(const std::string &src)
 {
   parse_floatt parsed_float(src);
 
-  exprt result=exprt(ID_constant);
-
   // In ANSI-C, float literals are double by default,
-  // unless marked with 'f'.
-  // All of these can be complex as well.
-  // This can be overridden with
-  // config.ansi_c.single_precision_constant.
+  // unless marked with 'f' (this can be overridden with
+  // config.ansi_c.single_precision_constant).
+  // Furthermore, floating-point literals can be complex.
+
+  floatbv_typet type;
 
   if(parsed_float.is_float)
-    result.type()=float_type();
+    type = float_type();
   else if(parsed_float.is_long)
-    result.type()=long_double_type();
+    type = long_double_type();
   else if(parsed_float.is_float16)
-    result.type()=gcc_float16_type();
+    type = gcc_float16_type();
   else if(parsed_float.is_float32)
-    result.type()=gcc_float32_type();
+    type = gcc_float32_type();
   else if(parsed_float.is_float32x)
-    result.type()=gcc_float32x_type();
+    type = gcc_float32x_type();
   else if(parsed_float.is_float64)
-    result.type()=gcc_float64_type();
+    type = gcc_float64_type();
   else if(parsed_float.is_float64x)
-    result.type()=gcc_float64x_type();
+    type = gcc_float64x_type();
   else if(parsed_float.is_float80)
   {
-    result.type()=ieee_float_spect(64, 15).to_type();
-    result.type().set(ID_C_c_type, ID_long_double);
+    type = ieee_float_spect(64, 15).to_type();
+    type.set(ID_C_c_type, ID_long_double);
   }
   else if(parsed_float.is_float128)
-    result.type()=gcc_float128_type();
+    type = gcc_float128_type();
   else if(parsed_float.is_float128x)
-    result.type()=gcc_float128x_type();
+    type = gcc_float128x_type();
   else
   {
     // default
     if(config.ansi_c.single_precision_constant)
-      result.type()=float_type(); // default
+      type = float_type(); // default
     else
-      result.type()=double_type(); // default
+      type = double_type(); // default
   }
 
   if(parsed_float.is_decimal)
@@ -75,7 +76,7 @@ exprt convert_float_literal(const std::string &src)
     // but these aren't handled anywhere
   }
 
-  ieee_floatt a(to_floatbv_type(result.type()));
+  ieee_floatt a(type);
 
   if(parsed_float.exponent_base==10)
     a.from_base10(parsed_float.significand, parsed_float.exponent);
@@ -84,14 +85,12 @@ exprt convert_float_literal(const std::string &src)
   else
     UNREACHABLE;
 
-  result.set(
-    ID_value,
-    integer2binary(a.pack(), a.spec.width()));
+  constant_exprt result(integer2bv(a.pack(), a.spec.width()), type);
 
   if(parsed_float.is_imaginary)
   {
-    const complex_typet complex_type(result.type());
-    return complex_exprt(from_integer(0, result.type()), result, complex_type);
+    const complex_typet complex_type(type);
+    return complex_exprt(from_integer(0, type), result, complex_type);
   }
 
   return result;
