@@ -390,6 +390,9 @@ int jbmc_parse_optionst::doit()
     return 0; // should contemplate EX_OK from sysexits.h
   }
 
+  eval_verbosity(
+    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
+
   //
   // command line options
   //
@@ -411,9 +414,6 @@ int jbmc_parse_optionst::doit()
     error() << error_msg << eom;
     return 6; // should contemplate EX_SOFTWARE from sysexits.h
   }
-
-  eval_verbosity(
-    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
   //
   // Print a banner
