@@ -75,7 +75,9 @@ public:
 
   typedef goto_functionst::goto_functiont goto_functiont;
 
-  void goto_check(goto_functiont &goto_function, const irep_idt &mode);
+  void goto_check(
+    const irep_idt &function_identifier,
+    goto_functiont &goto_function);
 
   void collect_allocations(const goto_functionst &goto_functions);
 
@@ -1658,11 +1660,13 @@ void goto_checkt::rw_ok_check(exprt &expr)
 }
 
 void goto_checkt::goto_check(
-  goto_functiont &goto_function,
-  const irep_idt &_mode)
+  const irep_idt &function_identifier,
+  goto_functiont &goto_function)
 {
   assertions.clear();
-  mode = _mode;
+
+  const auto &function_symbol = ns.lookup(function_identifier);
+  mode = function_symbol.mode;
 
   bool did_something = false;
 
@@ -1855,8 +1859,9 @@ void goto_checkt::goto_check(
     }
     else if(i.is_end_function())
     {
-      if(i.function==goto_functionst::entry_point() &&
-         enable_memory_leak_check)
+      if(
+        function_identifier == goto_functionst::entry_point() &&
+        enable_memory_leak_check)
       {
         const symbolt &leak=ns.lookup(CPROVER_PREFIX "memory_leak");
         const symbol_exprt leak_expr=leak.symbol_expr();
@@ -1867,7 +1872,7 @@ void goto_checkt::goto_check(
         t->code=code_assignt(leak_expr, leak_expr);
 
         source_locationt source_location;
-        source_location.set_function(i.function);
+        source_location.set_function(function_identifier);
 
         equal_exprt eq(
           leak_expr,
@@ -1926,13 +1931,13 @@ void goto_checkt::goto_check(
 }
 
 void goto_check(
+  const irep_idt &function_identifier,
+  goto_functionst::goto_functiont &goto_function,
   const namespacet &ns,
-  const optionst &options,
-  const irep_idt &mode,
-  goto_functionst::goto_functiont &goto_function)
+  const optionst &options)
 {
   goto_checkt goto_check(ns, options);
-  goto_check.goto_check(goto_function, mode);
+  goto_check.goto_check(function_identifier, goto_function);
 }
 
 void goto_check(
@@ -1946,8 +1951,7 @@ void goto_check(
 
   Forall_goto_functions(it, goto_functions)
   {
-    irep_idt mode=ns.lookup(it->first).mode;
-    goto_check.goto_check(it->second, mode);
+    goto_check.goto_check(it->first, it->second);
   }
 }
 

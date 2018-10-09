@@ -24,10 +24,10 @@ void goto_check(
   goto_functionst &goto_functions);
 
 void goto_check(
+  const irep_idt &function_identifier,
+  goto_functionst::goto_functiont &goto_function,
   const namespacet &ns,
-  const optionst &options,
-  const irep_idt &mode,
-  goto_functionst::goto_functiont &goto_function);
+  const optionst &options);
 
 void goto_check(
   const optionst &options,
