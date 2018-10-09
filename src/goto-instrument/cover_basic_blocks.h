@@ -43,13 +43,16 @@ public:
   virtual void output(std::ostream &out) const = 0;
 
   /// Output warnings about ignored blocks
+  /// \param function_id: name of \p goto_program
   /// \param goto_program: The goto program
   /// \param message_handler: The message handler
   virtual void report_block_anomalies(
+    const irep_idt &function_id,
     const goto_programt &goto_program,
     message_handlert &message_handler)
   {
     // unused parameters
+    (void)function_id;
     (void)goto_program;
     (void)message_handler;
   }
@@ -78,9 +81,11 @@ public:
   source_location_of(std::size_t block_nr) const override;
 
   /// Output warnings about ignored blocks
+  /// \param function_id: name of \p goto_program
   /// \param goto_program: The goto program
   /// \param message_handler: The message handler
   void report_block_anomalies(
+    const irep_idt &function_id,
     const goto_programt &goto_program,
     message_handlert &message_handler) override;
 

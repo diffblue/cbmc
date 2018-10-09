@@ -25,12 +25,14 @@ Date: May 2016
 #include "cover_basic_blocks.h"
 
 /// Applies instrumenters to given goto program
+/// \param function_id: name of \p goto_program
 /// \param goto_program: the goto program
 /// \param instrumenters: the instrumenters
 /// \param mode: mode of the function to instrument (for instance ID_C or
 ///   ID_java)
 /// \param message_handler: a message handler
 void instrument_cover_goals(
+  const irep_idt &function_id,
   goto_programt &goto_program,
   const cover_instrumenterst &instrumenters,
   const irep_idt &mode,
@@ -42,12 +44,14 @@ void instrument_cover_goals(
                     : std::unique_ptr<cover_blocks_baset>(
                         new cover_basic_blockst(goto_program));
 
-  basic_blocks->report_block_anomalies(goto_program, message_handler);
-  instrumenters(goto_program, *basic_blocks);
+  basic_blocks->report_block_anomalies(
+    function_id, goto_program, message_handler);
+  instrumenters(function_id, goto_program, *basic_blocks);
 }
 
 /// Instruments goto program for a given coverage criterion
 /// \param symbol_table: the symbol table
+/// \param function_id: name of \p goto_program
 /// \param goto_program: the goto program
 /// \param criterion: the coverage criterion
 /// \param message_handler: a message handler
@@ -57,6 +61,7 @@ void instrument_cover_goals(
 DEPRECATED("use instrument_cover_goals(goto_programt &...) instead")
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
+  const irep_idt &function_id,
   goto_programt &goto_program,
   coverage_criteriont criterion,
   message_handlert &message_handler)
@@ -68,7 +73,7 @@ void instrument_cover_goals(
   instrumenters.add_from_criterion(criterion, symbol_table, goal_filters);
 
   instrument_cover_goals(
-    goto_program, instrumenters, ID_unknown, message_handler);
+    function_id, goto_program, instrumenters, ID_unknown, message_handler);
 }
 
 /// Create and add an instrumenter based on the given criterion
@@ -249,7 +254,7 @@ std::unique_ptr<cover_configt> get_cover_config(
 /// Instruments a single goto program based on the given configuration
 /// \param cover_config: configuration, produced using get_cover_config
 /// \param function_id: function name
-/// \param function: function function to instrument
+/// \param function: function to instrument
 /// \param message_handler: log output
 static void instrument_cover_goals(
   const cover_configt &cover_config,
@@ -281,6 +286,7 @@ static void instrument_cover_goals(
   if(cover_config.function_filters(function_id, function))
   {
     instrument_cover_goals(
+      function_id,
       function.body,
       cover_config.cover_instrumenters,
       cover_config.mode,
