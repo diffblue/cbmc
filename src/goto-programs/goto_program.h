@@ -833,6 +833,7 @@ std::list<exprt> expressions_written(const goto_programt::instructiont &);
 
 std::string as_string(
   const namespacet &ns,
+  const irep_idt &function,
   const goto_programt::instructiont &);
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
