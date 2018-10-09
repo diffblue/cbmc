@@ -203,12 +203,14 @@ private:
     dependence_graph_test_get_data_deps(const dep_graph_domaint &);
 
   void control_dependencies(
+    const irep_idt &function_id,
     goto_programt::const_targett from,
     goto_programt::const_targett to,
     dependence_grapht &dep_graph);
 
   void data_dependencies(
     goto_programt::const_targett from,
+    const irep_idt &function_to,
     goto_programt::const_targett to,
     dependence_grapht &dep_graph,
     const namespacet &ns);

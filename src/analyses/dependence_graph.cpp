@@ -52,6 +52,7 @@ bool dep_graph_domaint::merge(
 }
 
 void dep_graph_domaint::control_dependencies(
+  const irep_idt &function_id,
   goto_programt::const_targett from,
   goto_programt::const_targett to,
   dependence_grapht &dep_graph)
@@ -82,7 +83,7 @@ void dep_graph_domaint::control_dependencies(
 
   // Get postdominators
 
-  const irep_idt id=from->function;
+  const irep_idt id = function_id;
   const cfg_post_dominatorst &pd=dep_graph.cfg_post_dominators().at(id);
 
   // Check all candidates
@@ -151,6 +152,7 @@ static bool may_be_def_use_pair(
 
 void dep_graph_domaint::data_dependencies(
   goto_programt::const_targett,
+  const irep_idt &function_to,
   goto_programt::const_targett to,
   dependence_grapht &dep_graph,
   const namespacet &ns)
@@ -162,7 +164,7 @@ void dep_graph_domaint::data_dependencies(
   value_setst &value_sets=
     dep_graph.reaching_definitions().get_value_sets();
   rw_range_set_value_sett rw_set(ns, value_sets);
-  goto_rw(to->function, to, rw_set);
+  goto_rw(function_to, to, rw_set);
 
   forall_rw_range_set_r_objects(it, rw_set)
   {
@@ -205,7 +207,7 @@ void dep_graph_domaint::transform(
   {
     if(function_from == function_to)
     {
-      control_dependencies(from, to, *dep_graph);
+      control_dependencies(function_from, from, to, *dep_graph);
     }
     else
     {
@@ -231,9 +233,9 @@ void dep_graph_domaint::transform(
     }
   }
   else
-    control_dependencies(from, to, *dep_graph);
+    control_dependencies(function_from, from, to, *dep_graph);
 
-  data_dependencies(from, to, *dep_graph, ns);
+  data_dependencies(from, function_to, to, *dep_graph, ns);
 }
 
 void dep_graph_domaint::output(
