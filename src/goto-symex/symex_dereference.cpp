@@ -258,7 +258,7 @@ void goto_symext::dereference_rec(
 
     if(state.threads.size() == 1)
     {
-      const irep_idt &expr_function = state.source.pc->function;
+      const irep_idt &expr_function = state.source.function;
       if(!expr_function.empty())
       {
         state.get_original_name(to_check);
