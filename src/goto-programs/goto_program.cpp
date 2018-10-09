@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <iomanip>
 
+#include <util/base_type.h>
 #include <util/std_expr.h>
 
 #include <langapi/language_util.h>
@@ -672,32 +673,36 @@ bool goto_programt::instructiont::check_internal_invariants(
   const symbol_tablet &table,
   messaget &msg) const
 {
+  namespacet ns(table);
   bool found_violation = false;
-  std::vector<std::string> id_collector;
-  auto symbol_finder = [&](const exprt &e) {
+  std::vector<std::vector<std::string>> type_collector;
+  auto type_finder = [&](const exprt &e) {
     if(e.id() == ID_symbol)
     {
       auto symbol_expr = to_symbol_expr(e);
-      if(!table.has_symbol(symbol_expr.get_identifier()))
-        id_collector.push_back(id2string(symbol_expr.get_identifier()));
+      const auto &symbol_id = symbol_expr.get_identifier();
+      if(
+        table.has_symbol(symbol_id) &&
+        !base_type_eq(symbol_expr.type(), table.lookup_ref(symbol_id).type, ns))
+        type_collector.push_back(
+          {id2string(symbol_id),
+           symbol_expr.type().id_string(),
+           table.lookup_ref(symbol_id).type.id_string()});
     }
   };
-
-  if(!table.has_symbol(function))
-    id_collector.push_back(id2string(function));
 
   switch(type)
   {
   case GOTO:
   case ASSUME:
   case ASSERT:
-    guard.visit(symbol_finder);
+    guard.visit(type_finder);
     break;
   case ASSIGN:
   case DECL:
   case DEAD:
   case FUNCTION_CALL:
-    code.visit(symbol_finder);
+    code.visit(type_finder);
     break;
   case OTHER:
   case SKIP:
@@ -715,12 +720,15 @@ bool goto_programt::instructiont::check_internal_invariants(
     break;
   }
 
-  if(!id_collector.empty())
+  if(!type_collector.empty())
   {
-    for(const auto &id : id_collector)
+    for(const auto &type_triple : type_collector)
     {
-      msg.error() << id << " not found (" << source_location << ")"
-                  << messaget::eom;
+      INVARIANT(type_triple.size() > 2, "should have 3 elements");
+      msg.error() << type_triple[0] << " type inconsistency ("
+                  << source_location << ")\n"
+                  << "goto program type: " << type_triple[1] << "\n "
+                  << "symbol table type: " << type_triple[2] << messaget::eom;
     }
     found_violation = true;
   }
