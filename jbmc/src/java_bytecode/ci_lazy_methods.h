@@ -120,11 +120,6 @@ private:
     const namespacet &ns,
     ci_lazy_methods_neededt &needed_lazy_methods);
 
-  void add_clinit_call(
-    const irep_idt &class_id,
-    const symbol_tablet &symbol_table,
-    ci_lazy_methods_neededt &needed_lazy_methods);
-
   void gather_virtual_callsites(
     const exprt &e,
     std::unordered_set<exprt, irep_hash> &result);
