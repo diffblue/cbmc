@@ -27,6 +27,7 @@ void show_loop_ids(
 
 void show_loop_ids(
   ui_message_handlert::uit ui,
+  const irep_idt &function_identifier,
   const goto_programt &goto_program)
 {
   switch(ui)
@@ -39,8 +40,8 @@ void show_loop_ids(
         {
           unsigned loop_id=it->loop_number;
 
-          std::cout << "Loop "
-                    << it->function << "." << loop_id << ":" << "\n";
+          std::cout << "Loop " << function_identifier << "." << loop_id << ":"
+                    << "\n";
 
           std::cout << "  " << it->source_location << "\n";
           std::cout << "\n";
@@ -55,7 +56,8 @@ void show_loop_ids(
         if(it->is_backwards_goto())
         {
           unsigned loop_id=it->loop_number;
-          std::string id=id2string(it->function)+"."+std::to_string(loop_id);
+          std::string id =
+            id2string(function_identifier) + "." + std::to_string(loop_id);
 
           xmlt xml_loop("loop");
           xml_loop.set_attribute("name", id);
@@ -73,6 +75,7 @@ void show_loop_ids(
 
 void show_loop_ids_json(
   ui_message_handlert::uit ui,
+  const irep_idt &function_identifier,
   const goto_programt &goto_program,
   json_arrayt &loops)
 {
@@ -83,7 +86,8 @@ void show_loop_ids_json(
     if(it->is_backwards_goto())
     {
       unsigned loop_id=it->loop_number;
-      std::string id=id2string(it->function)+"."+std::to_string(loop_id);
+      std::string id =
+        id2string(function_identifier) + "." + std::to_string(loop_id);
 
       json_objectt &loop=loops.push_back().make_object();
       loop["name"]=json_stringt(id);
@@ -101,7 +105,7 @@ void show_loop_ids(
     case ui_message_handlert::uit::PLAIN:
     case ui_message_handlert::uit::XML_UI:
       for(const auto &f: goto_functions.function_map)
-        show_loop_ids(ui, f.second.body);
+        show_loop_ids(ui, f.first, f.second.body);
       break;
 
     case ui_message_handlert::uit::JSON_UI:
@@ -109,7 +113,7 @@ void show_loop_ids(
       json_arrayt &loops=json_result["loops"].make_array();
 
       for(const auto &f : goto_functions.function_map)
-        show_loop_ids_json(ui, f.second.body, loops);
+        show_loop_ids_json(ui, f.first, f.second.body, loops);
 
       std::cout << ",\n" << json_result;
       break;
