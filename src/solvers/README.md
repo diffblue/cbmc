@@ -308,7 +308,7 @@ allocates a new string before calling a primitive.
     \copybrief add_axioms_for_parse_int
     \link add_axioms_for_parse_int More... \endlink
 
-\subsection deprecated Deprecated primitives:
+\subsection solvers-deprecated Deprecated primitives:
 
   * `cprover_string_concat_code_point`, `cprover_string_code_point_at`,
     `cprover_string_code_point_before`, `cprover_string_code_point_count`:

@@ -104,8 +104,6 @@ public:
 };
 
 /// Used for debug printing.
-/// \param [in] ns: namespace for `from_expr`
-/// \param [in] identifier: identifier for `from_expr`
 /// \param [in] expr: constraint to render
 /// \return rendered string
 inline std::string to_string(const string_constraintt &expr)
@@ -176,8 +174,6 @@ public:
 };
 
 /// Used for debug printing.
-/// \param [in] ns: namespace for `from_expr`
-/// \param [in] identifier: identifier for `from_expr`
 /// \param [in] expr: constraint to render
 /// \return rendered string
 inline std::string to_string(const string_not_contains_constraintt &expr)

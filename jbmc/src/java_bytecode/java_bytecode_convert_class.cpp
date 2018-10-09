@@ -1068,7 +1068,7 @@ static void find_and_replace_parameters(
 
 /// Convert parsed annotations into the symbol table
 /// \param parsed_annotations: The parsed annotations to convert
-/// \param annotations: The java_annotationt collection to populate
+/// \param java_annotations: The java_annotationt collection to populate
 void convert_annotations(
   const java_bytecode_parse_treet::annotationst &parsed_annotations,
   std::vector<java_annotationt> &java_annotations)
