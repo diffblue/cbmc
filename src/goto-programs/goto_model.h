@@ -111,7 +111,13 @@ public:
       if(!base_type_eq(
            it->second.type, symbol_table.lookup_ref(it->first).type, ns))
       {
-        msg.error() << "error" << messaget::eom;
+        msg.error() << id2string(it->first) << " type inconsistency\n"
+                    << "goto program type: " << it->second.type.id_string()
+                    << "\nsymbol table type: "
+                    << symbol_table.lookup_ref(it->first).type.id_string()
+                    << messaget::eom;
+
+        msg.error() << "" << messaget::eom;
         found_violation = true;
       }
     }
