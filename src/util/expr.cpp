@@ -322,6 +322,24 @@ void exprt::visit(const_expr_visitort &visitor) const
   }
 }
 
+void exprt::visit(const std::function<void(const exprt &)> &f) const
+{
+  std::stack<const exprt *> stack;
+
+  stack.push(this);
+
+  while(!stack.empty())
+  {
+    const exprt &expr = *stack.top();
+    stack.pop();
+
+    f(expr);
+
+    forall_operands(it, expr)
+      stack.push(&(*it));
+  }
+}
+
 depth_iteratort exprt::depth_begin()
 { return depth_iteratort(*this); }
 depth_iteratort exprt::depth_end()

@@ -224,6 +224,7 @@ protected:
 public:
   void visit(class expr_visitort &visitor);
   void visit(class const_expr_visitort &visitor) const;
+  void visit(const std::function<void(const exprt &)> &f) const;
 
   depth_iteratort depth_begin();
   depth_iteratort depth_end();

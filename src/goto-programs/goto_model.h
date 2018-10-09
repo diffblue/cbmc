@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 #include <util/journalling_symbol_table.h>
+#include <util/message.h>
 
 #include "abstract_goto_model.h"
 #include "goto_functions.h"
@@ -94,6 +95,21 @@ public:
   {
     return goto_functions.function_map.find(id) !=
            goto_functions.function_map.end();
+  }
+
+  /// Iterates over the functions inside the goto model and checks invariants
+  /// in all of them. Prints out error message collected.
+  /// \param msg message instance to collect errors
+  /// \return true if any violation was found
+  bool check_internal_invariants(messaget &msg) const
+  {
+    bool found_violation = false;
+    forall_goto_functions(it, goto_functions)
+    {
+      found_violation = found_violation ||
+                        it->second.check_internal_invariants(symbol_table, msg);
+    }
+    return found_violation;
   }
 };
 

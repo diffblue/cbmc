@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/source_location.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
+#include <util/message.h>
 
 /// The type of an instruction in a GOTO program.
 enum goto_program_instruction_typet
@@ -398,6 +399,14 @@ public:
     /// only be evaluated in the context of a goto_programt (see
     /// goto_programt::equals).
     bool equals(const instructiont &other) const;
+
+    /// Iterate over code and guard and collect inconsistencies with symbol
+    /// table.
+    /// \param table the symbol table
+    /// \param msg container to store the error messages
+    /// \return true if any violation was found
+    bool
+    check_internal_invariants(const symbol_tablet &table, messaget &msg) const;
   };
 
   // Never try to change this to vector-we mutate the list while iterating
@@ -677,6 +686,9 @@ public:
   /// the same number of instructions, each pair of instructions compares equal,
   /// and relative jumps have the same distance.
   bool equals(const goto_programt &other) const;
+
+  bool
+  check_internal_invariants(const symbol_tablet &table, messaget &msg) const;
 };
 
 /// Get control-flow successors of a given instruction. The instruction is

@@ -110,6 +110,12 @@ public:
     parameter_identifiers = std::move(other.parameter_identifiers);
     return *this;
   }
+
+  bool
+  check_internal_invariants(const symbol_tablet &table, messaget &msg) const
+  {
+    return body.check_internal_invariants(table, msg);
+  }
 };
 
 void get_local_identifiers(const goto_functiont &, std::set<irep_idt> &dest);

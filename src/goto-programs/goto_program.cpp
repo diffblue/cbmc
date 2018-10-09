@@ -668,6 +668,65 @@ bool goto_programt::instructiont::equals(const instructiont &other) const
   // clang-format on
 }
 
+bool goto_programt::instructiont::check_internal_invariants(
+  const symbol_tablet &table,
+  messaget &msg) const
+{
+  bool found_violation = false;
+  std::vector<std::string> id_collector;
+  auto symbol_finder = [&](const exprt &e) {
+    if(e.id() == ID_symbol)
+    {
+      auto symbol_expr = to_symbol_expr(e);
+      if(!table.has_symbol(symbol_expr.get_identifier()))
+        id_collector.push_back(id2string(symbol_expr.get_identifier()));
+    }
+  };
+
+  if(!table.has_symbol(function))
+    id_collector.push_back(id2string(function));
+
+  switch(type)
+  {
+  case GOTO:
+  case ASSUME:
+  case ASSERT:
+    guard.visit(symbol_finder);
+    break;
+  case ASSIGN:
+  case DECL:
+  case DEAD:
+  case FUNCTION_CALL:
+    code.visit(symbol_finder);
+    break;
+  case OTHER:
+  case SKIP:
+  case LOCATION:
+  case END_FUNCTION:
+  case START_THREAD:
+  case END_THREAD:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case RETURN:
+  case THROW:
+  case CATCH:
+  case NO_INSTRUCTION_TYPE:
+  case INCOMPLETE_GOTO:
+    break;
+  }
+
+  if(!id_collector.empty())
+  {
+    for(const auto &id : id_collector)
+    {
+      msg.error() << id << " not found (" << source_location << ")"
+                  << messaget::eom;
+    }
+    found_violation = true;
+  }
+  return found_violation;
+}
+
 bool goto_programt::equals(const goto_programt &other) const
 {
   if(instructions.size() != other.instructions.size())
@@ -697,6 +756,19 @@ bool goto_programt::equals(const goto_programt &other) const
   }
 
   return true;
+}
+
+bool goto_programt::check_internal_invariants(
+  const symbol_tablet &table,
+  messaget &msg) const
+{
+  bool found_violation = false;
+  forall_goto_program_instructions(it, (*this))
+  {
+    found_violation =
+      found_violation || it->check_internal_invariants(table, msg);
+  }
+  return found_violation;
 }
 
 /// Outputs a string representation of a `goto_program_instruction_typet`
