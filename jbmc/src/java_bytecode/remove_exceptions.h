@@ -27,6 +27,7 @@ Date:   December 2016
 /// and adds the required instrumentation (GOTOs and assignments)
 /// This introduces instanceof expressions.
 void remove_exceptions_using_instanceof(
+  const irep_idt &function_identifier,
   goto_programt &,
   symbol_table_baset &,
   message_handlert &);
@@ -40,6 +41,7 @@ void remove_exceptions_using_instanceof(goto_modelt &, message_handlert &);
 /// and adds the required instrumentation (GOTOs and assignments)
 /// This does not introduce instanceof expressions.
 void remove_exceptions(
+  const irep_idt &function_identifier,
   goto_programt &,
   symbol_table_baset &,
   const class_hierarchyt &,

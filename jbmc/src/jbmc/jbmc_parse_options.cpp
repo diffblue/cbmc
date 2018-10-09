@@ -799,6 +799,7 @@ void jbmc_parse_optionst::process_goto_function(
       // the results are slightly worse than running it in whole-program mode
       // (e.g. dead catch sites will be retained)
       remove_exceptions(
+        function.get_function_id(),
         goto_function.body,
         symbol_table,
         *class_hierarchy.get(),
