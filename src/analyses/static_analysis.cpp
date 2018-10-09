@@ -66,11 +66,12 @@ void static_analysis_baset::operator()(
 }
 
 void static_analysis_baset::operator()(
+  const irep_idt &function_identifier,
   const goto_programt &goto_program)
 {
   initialize(goto_program);
   goto_functionst goto_functions;
-  fixedpoint(goto_program, goto_functions);
+  fixedpoint(function_identifier, goto_program, goto_functions);
 }
 
 void static_analysis_baset::output(
@@ -166,6 +167,7 @@ static_analysis_baset::locationt static_analysis_baset::get_next(
 }
 
 bool static_analysis_baset::fixedpoint(
+  const irep_idt &function_identifier,
   const goto_programt &goto_program,
   const goto_functionst &goto_functions)
 {
@@ -184,7 +186,7 @@ bool static_analysis_baset::fixedpoint(
   {
     locationt l=get_next(working_set);
 
-    if(visit(l, working_set, goto_program, goto_functions))
+    if(visit(function_identifier, l, working_set, goto_program, goto_functions))
       new_data=true;
   }
 
@@ -192,6 +194,7 @@ bool static_analysis_baset::fixedpoint(
 }
 
 bool static_analysis_baset::visit(
+  const irep_idt &function_identifier,
   locationt l,
   working_sett &working_set,
   const goto_programt &goto_program,
@@ -220,14 +223,17 @@ bool static_analysis_baset::visit(
         to_code_function_call(l->code);
 
       do_function_call_rec(
-        l, to_l,
+        function_identifier,
+        l,
+        to_l,
         code.function(),
         code.arguments(),
         new_values,
         goto_functions);
     }
     else
-      new_values.transform(ns, l, to_l);
+      new_values.transform(
+        ns, function_identifier, l, function_identifier, to_l);
 
     statet &other=get_state(to_l);
 
@@ -245,7 +251,9 @@ bool static_analysis_baset::visit(
 }
 
 void static_analysis_baset::do_function_call(
-  locationt l_call, locationt l_return,
+  const irep_idt &calling_function,
+  locationt l_call,
+  locationt l_return,
   const goto_functionst &goto_functions,
   const goto_functionst::function_mapt::const_iterator f_it,
   const exprt::operandst &,
@@ -264,7 +272,7 @@ void static_analysis_baset::do_function_call(
 
     // do the edge from the call site to the beginning of the function
     std::unique_ptr<statet> tmp_state(make_temporary_state(new_state));
-    tmp_state->transform(ns, l_call, l_begin);
+    tmp_state->transform(ns, calling_function, l_call, f_it->first, l_begin);
 
     statet &begin_state=get_state(l_begin);
 
@@ -286,7 +294,7 @@ void static_analysis_baset::do_function_call(
     if(new_data)
     {
       // recursive call
-      fixedpoint(goto_function.body, goto_functions);
+      fixedpoint(f_it->first, goto_function.body, goto_functions);
     }
   }
 
@@ -301,7 +309,7 @@ void static_analysis_baset::do_function_call(
     // do edge from end of function to instruction after call
     std::unique_ptr<statet> tmp_state(
       make_temporary_state(end_of_function));
-    tmp_state->transform(ns, l_end, l_return);
+    tmp_state->transform(ns, f_it->first, l_end, calling_function, l_return);
 
     // propagate those -- not exceedingly precise, this is,
     // as still it contains all the state from the
@@ -311,12 +319,15 @@ void static_analysis_baset::do_function_call(
 
   {
     // effect on current procedure (if any)
-    new_state.transform(ns, l_call, l_return);
+    new_state.transform(
+      ns, calling_function, l_call, calling_function, l_return);
   }
 }
 
 void static_analysis_baset::do_function_call_rec(
-  locationt l_call, locationt l_return,
+  const irep_idt &calling_function,
+  locationt l_call,
+  locationt l_return,
   const exprt &function,
   const exprt::operandst &arguments,
   statet &new_state,
@@ -345,7 +356,9 @@ void static_analysis_baset::do_function_call_rec(
       throw "failed to find function "+id2string(identifier);
 
     do_function_call(
-      l_call, l_return,
+      calling_function,
+      l_call,
+      l_return,
       goto_functions,
       it,
       arguments,
@@ -361,14 +374,18 @@ void static_analysis_baset::do_function_call_rec(
     std::unique_ptr<statet> n2(make_temporary_state(new_state));
 
     do_function_call_rec(
-      l_call, l_return,
+      calling_function,
+      l_call,
+      l_return,
       function.op1(),
       arguments,
       new_state,
       goto_functions);
 
     do_function_call_rec(
-      l_call, l_return,
+      calling_function,
+      l_call,
+      l_return,
       function.op2(),
       arguments,
       *n2,
@@ -392,7 +409,13 @@ void static_analysis_baset::do_function_call_rec(
         const object_descriptor_exprt &o=to_object_descriptor_expr(value);
         std::unique_ptr<statet> n2(make_temporary_state(new_state));
         do_function_call_rec(
-          l_call, l_return, o.object(), arguments, *n2, goto_functions);
+          calling_function,
+          l_call,
+          l_return,
+          o.object(),
+          arguments,
+          *n2,
+          goto_functions);
         merge(new_state, *n2, l_return);
       }
     }
@@ -424,7 +447,7 @@ void static_analysis_baset::sequential_fixedpoint(
 
   forall_goto_functions(it, goto_functions)
     if(functions_done.insert(it->first).second)
-      fixedpoint(it->second.body, goto_functions);
+      fixedpoint(it->first, it->second.body, goto_functions);
 }
 
 void static_analysis_baset::concurrent_fixedpoint(
@@ -442,8 +465,24 @@ void static_analysis_baset::concurrent_fixedpoint(
   generate_state(sh_target);
   statet &shared_state=get_state(sh_target);
 
-  typedef std::list<std::pair<goto_programt const*,
-                              goto_programt::const_targett> > thread_wlt;
+  struct wl_entryt
+  {
+    wl_entryt(
+      const irep_idt &_function_identifier,
+      const goto_programt &_goto_program,
+      locationt _location)
+      : function_identifier(_function_identifier),
+        goto_program(&_goto_program),
+        location(_location)
+    {
+    }
+
+    irep_idt function_identifier;
+    const goto_programt *goto_program;
+    locationt location;
+  };
+
+  typedef std::list<wl_entryt> thread_wlt;
   thread_wlt thread_wl;
 
   forall_goto_functions(it, goto_functions)
@@ -451,7 +490,7 @@ void static_analysis_baset::concurrent_fixedpoint(
     {
       if(is_threaded(t_it))
       {
-        thread_wl.push_back(std::make_pair(&(it->second.body), t_it));
+        thread_wl.push_back(wl_entryt(it->first, it->second.body, t_it));
 
         goto_programt::const_targett l_end=
           it->second.body.instructions.end();
@@ -472,16 +511,21 @@ void static_analysis_baset::concurrent_fixedpoint(
     for(const auto &thread : thread_wl)
     {
       working_sett working_set;
-      put_in_working_set(working_set, thread.second);
+      put_in_working_set(working_set, thread.location);
 
-      statet &begin_state=get_state(thread.second);
-      merge(begin_state, shared_state, thread.second);
+      statet &begin_state = get_state(thread.location);
+      merge(begin_state, shared_state, thread.location);
 
       while(!working_set.empty())
       {
         goto_programt::const_targett l=get_next(working_set);
 
-        visit(l, working_set, *thread.first, goto_functions);
+        visit(
+          thread.function_identifier,
+          l,
+          working_set,
+          *thread.goto_program,
+          goto_functions);
 
         // the underlying domain must make sure that the final state
         // carries all possible values; otherwise we would need to
