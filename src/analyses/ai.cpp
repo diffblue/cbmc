@@ -42,7 +42,7 @@ void ai_baset::output(
 
 void ai_baset::output(
   const namespacet &ns,
-  const irep_idt &identifier,
+  const irep_idt &function_identifier,
   const goto_programt &goto_program,
   std::ostream &out) const
 {
@@ -54,7 +54,7 @@ void ai_baset::output(
     abstract_state_before(i_it)->output(out, *this, ns);
     out << "\n";
     #if 1
-    goto_program.output_instruction(ns, identifier, out, *i_it);
+    goto_program.output_instruction(ns, function_identifier, out, *i_it);
     out << "\n";
     #endif
   }
@@ -82,15 +82,9 @@ jsont ai_baset::output_json(
   return std::move(result);
 }
 
-/// Output the domains for a single function as JSON
-/// \param ns: The namespace
-/// \param goto_program: The goto program
-/// \param identifier: The identifier used to find a symbol to identify the
-///   source language
-/// \return The JSON object
 jsont ai_baset::output_json(
   const namespacet &ns,
-  const irep_idt &identifier,
+  const irep_idt &function_identifier,
   const goto_programt &goto_program) const
 {
   json_arrayt contents;
@@ -99,7 +93,7 @@ jsont ai_baset::output_json(
   {
     // Ideally we need output_instruction_json
     std::ostringstream out;
-    goto_program.output_instruction(ns, identifier, out, *i_it);
+    goto_program.output_instruction(ns, function_identifier, out, *i_it);
 
     json_objectt location(
       {{"locationNumber", json_numbert(std::to_string(i_it->location_number))},
@@ -138,15 +132,9 @@ xmlt ai_baset::output_xml(
   return program;
 }
 
-/// Output the domains for a single function as XML
-/// \param ns: The namespace
-/// \param goto_program: The goto program
-/// \param identifier: The identifier used to find a symbol to identify the
-///   source language
-/// \return The XML object
 xmlt ai_baset::output_xml(
   const namespacet &ns,
-  const irep_idt &identifier,
+  const irep_idt &function_identifier,
   const goto_programt &goto_program) const
 {
   xmlt function_body;
@@ -161,7 +149,7 @@ xmlt ai_baset::output_xml(
 
     // Ideally we need output_instruction_xml
     std::ostringstream out;
-    goto_program.output_instruction(ns, identifier, out, *i_it);
+    goto_program.output_instruction(ns, function_identifier, out, *i_it);
     location.set_attribute("instruction", out.str());
 
     function_body.new_element(location);

@@ -124,6 +124,18 @@ public:
   {
   }
 
+  /// Output the abstract states for a single function
+  /// \param ns: The namespace
+  /// \param function_identifier: The identifier used to find a symbol to
+  ///   identify the \p goto_program's source language
+  /// \param goto_program: The goto program
+  /// \param out: The ostream to direct output to
+  virtual void output(
+    const namespacet &ns,
+    const irep_idt &function_identifier,
+    const goto_programt &goto_program,
+    std::ostream &out) const;
+
   /// Output the abstract states for a whole program
   virtual void output(
     const namespacet &ns,
@@ -137,15 +149,6 @@ public:
   {
     const namespacet ns(goto_model.symbol_table);
     output(ns, goto_model.goto_functions, out);
-  }
-
-  /// Output the abstract states for a function
-  void output(
-    const namespacet &ns,
-    const goto_programt &goto_program,
-    std::ostream &out) const
-  {
-    output(ns, "", goto_program, out);
   }
 
   /// Output the abstract states for a function
@@ -243,38 +246,26 @@ protected:
   /// entry state required by the analysis
   void entry_state(const goto_functionst &goto_functions);
 
-  /// Output the abstract states for a single function
-  /// \param ns: The namespace
-  /// \param goto_program: The goto program
-  /// \param identifier: The identifier used to find a symbol to identify the
-  ///   source language
-  /// \param out: The ostream to direct output to
-  virtual void output(
-    const namespacet &ns,
-    const goto_programt &goto_program,
-    const irep_idt &identifier,
-    std::ostream &out) const;
-
   /// Output the abstract states for a single function as JSON
   /// \param ns: The namespace
   /// \param goto_program: The goto program
-  /// \param identifier: The identifier used to find a symbol to identify the
-  ///   source language
+  /// \param function_identifier: The identifier used to find a symbol to
+  ///   identify the source language
   /// \return The JSON object
   virtual jsont output_json(
     const namespacet &ns,
-    const irep_idt &identifier,
+    const irep_idt &function_identifier,
     const goto_programt &goto_program) const;
 
   /// Output the abstract states for a single function as XML
   /// \param ns: The namespace
   /// \param goto_program: The goto program
-  /// \param identifier: The identifier used to find a symbol to identify the
-  ///   source language
+  /// \param function_identifier: The identifier used to find a symbol to
+  ///   identify the source language
   /// \return The XML object
   virtual xmlt output_xml(
     const namespacet &ns,
-    const irep_idt &identifier,
+    const irep_idt &function_identifier,
     const goto_programt &goto_program) const;
 
   /// The work queue, sorted by location number
