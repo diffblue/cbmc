@@ -267,7 +267,7 @@ void goto_symext::symex_function_call_code(
     no_body(identifier);
 
     // record the return
-    target.function_return(state.guard.as_expr(), identifier, state.source);
+    target.function_return(state.guard.as_expr(), state.source);
 
     if(call.lhs().is_not_nil())
     {
@@ -359,8 +359,7 @@ void goto_symext::pop_frame(statet &state)
 void goto_symext::symex_end_of_function(statet &state)
 {
   // first record the return
-  target.function_return(
-    state.guard.as_expr(), state.source.function, state.source);
+  target.function_return(state.guard.as_expr(), state.source);
 
   // then get rid of the frame
   pop_frame(state);

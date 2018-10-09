@@ -305,7 +305,7 @@ void build_goto_trace(
       goto_trace_step.format_string = SSA_step.format_string;
       goto_trace_step.io_id = SSA_step.io_id;
       goto_trace_step.formatted = SSA_step.formatted;
-      goto_trace_step.function_identifier = SSA_step.function_identifier;
+      goto_trace_step.function_identifier = SSA_step.called_function;
       goto_trace_step.function_arguments = SSA_step.converted_function_arguments;
 
       for(auto &arg : goto_trace_step.function_arguments)
