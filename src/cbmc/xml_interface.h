@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/cmdline.h>
 
+class xmlt;
+
 class xml_interfacet
 {
 public:
@@ -24,7 +26,7 @@ public:
 
 protected:
   void get_xml_options(cmdlinet &cmdline);
-  void get_xml_options(const class xmlt &xml, cmdlinet &cmdline);
+  void get_xml_options(const xmlt &xml, cmdlinet &cmdline);
 };
 
 #endif // CPROVER_CBMC_XML_INTERFACE_H
