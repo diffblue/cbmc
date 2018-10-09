@@ -24,21 +24,25 @@ Author: Daniel Kroening, kroening@kroening.com
 class k_inductiont
 {
 public:
-  typedef goto_functionst::goto_functiont goto_functiont;
-
   k_inductiont(
+    const irep_idt &_function_id,
     goto_functiont &_goto_function,
-    bool _base_case, bool _step_case,
-    unsigned _k):
-    goto_function(_goto_function),
-    local_may_alias(_goto_function),
-    natural_loops(_goto_function.body),
-    base_case(_base_case), step_case(_step_case), k(_k)
+    bool _base_case,
+    bool _step_case,
+    unsigned _k)
+    : function_id(_function_id),
+      goto_function(_goto_function),
+      local_may_alias(_goto_function),
+      natural_loops(_goto_function.body),
+      base_case(_base_case),
+      step_case(_step_case),
+      k(_k)
   {
     k_induction();
   }
 
 protected:
+  const irep_idt &function_id;
   goto_functiont &goto_function;
   local_may_aliast local_may_alias;
   natural_loops_mutablet natural_loops;
@@ -70,8 +74,13 @@ void k_inductiont::process_loop(
   {
     // now unwind k times
     goto_unwindt goto_unwind;
-    goto_unwind.unwind(goto_function.body, loop_head, loop_exit, k,
-                       goto_unwindt::unwind_strategyt::PARTIAL);
+    goto_unwind.unwind(
+      function_id,
+      goto_function.body,
+      loop_head,
+      loop_exit,
+      k,
+      goto_unwindt::unwind_strategyt::PARTIAL);
 
     // assume the loop condition has become false
     goto_programt::instructiont assume(ASSUME);
@@ -96,10 +105,11 @@ void k_inductiont::process_loop(
 
     goto_unwindt goto_unwind;
     goto_unwind.unwind(
+      function_id,
       goto_function.body,
       loop_head,
       loop_exit,
-      k+1,
+      k + 1,
       goto_unwindt::unwind_strategyt::PARTIAL,
       iteration_points);
 
@@ -155,5 +165,5 @@ void k_induction(
   unsigned k)
 {
   Forall_goto_functions(it, goto_model.goto_functions)
-    k_inductiont(it->second, base_case, step_case, k);
+    k_inductiont(it->first, it->second, base_case, step_case, k);
 }
