@@ -54,7 +54,6 @@ void stack_depth(
   goto_programt::targett assert_ins=goto_program.insert_before(first);
   assert_ins->make_assertion(guard);
   assert_ins->source_location=first->source_location;
-  assert_ins->function=first->function;
 
   assert_ins->source_location.set_comment(
     "Stack depth exceeds "+std::to_string(i_depth));
@@ -65,7 +64,6 @@ void stack_depth(
   plus_ins->code=code_assignt(symbol,
       plus_exprt(symbol, from_integer(1, symbol.type())));
   plus_ins->source_location=first->source_location;
-  plus_ins->function=first->function;
 
   goto_programt::targett last=--goto_program.instructions.end();
   assert(last->is_end_function());
@@ -75,7 +73,6 @@ void stack_depth(
   minus_ins.code=code_assignt(symbol,
       minus_exprt(symbol, from_integer(1, symbol.type())));
   minus_ins.source_location=last->source_location;
-  minus_ins.function=last->function;
 
   goto_program.insert_before_swap(last, minus_ins);
 }
@@ -108,7 +105,6 @@ void stack_depth(
   it->make_assignment();
   it->code=code_assignt(sym, from_integer(0, sym.type()));
   // no suitable value for source location -- omitted
-  it->function = INITIALIZE_FUNCTION;
 
   // update counters etc.
   goto_model.goto_functions.update();

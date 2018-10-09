@@ -392,7 +392,7 @@ bool unified_difft::instructions_equal(
   const goto_programt::instructiont &ins1,
   const goto_programt::instructiont &ins2)
 {
-  return ins1.equals(ins2) && ins1.function == ins2.function &&
+  return ins1.equals(ins2) &&
          (ins1.targets.empty() ||
           instructions_equal(*ins1.get_target(), *ins2.get_target()));
 }

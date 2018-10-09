@@ -36,7 +36,6 @@ SCENARIO(
     instructions.emplace_back(goto_program_instruction_typet::DECL);
     code_declt declaration(var_a);
     instructions.back().make_decl(declaration);
-    instructions.back().function = fun_name;
     symbol_table.insert(fun_symbol);
 
     WHEN("Declaring known symbol")

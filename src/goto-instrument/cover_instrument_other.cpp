@@ -86,5 +86,4 @@ void cover_instrument_end_of_function(
   if_it->source_location.set_comment(comment);
   if_it->source_location.set_property_class("reachability_constraint");
   if_it->source_location.set_function(function_id);
-  if_it->function = function_id;
 }

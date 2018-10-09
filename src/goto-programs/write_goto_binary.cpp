@@ -97,7 +97,7 @@ bool write_goto_binary_v4(
         const goto_programt::instructiont &instruction = *i_it;
 
         irepconverter.reference_convert(instruction.code, out);
-        irepconverter.write_string_ref(out, instruction.function);
+        irepconverter.write_string_ref(out, fct.first);
         irepconverter.reference_convert(instruction.source_location, out);
         write_gb_word(out, (long)instruction.type);
         irepconverter.reference_convert(instruction.guard, out);

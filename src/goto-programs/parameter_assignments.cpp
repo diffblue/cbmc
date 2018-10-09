@@ -76,7 +76,6 @@ void parameter_assignmentst::do_function_calls(
           if(rhs.type()!=lhs.type())
             rhs.make_typecast(lhs.type());
           t->code=code_assignt(lhs, rhs);
-          t->function=i_it->function;
         }
       }
 

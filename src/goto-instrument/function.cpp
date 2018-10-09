@@ -91,7 +91,6 @@ void function_enter(
       body.insert_before(body.instructions.begin());
     t->make_function_call(
       function_to_call(goto_model.symbol_table, id, f_it->first));
-    t->function=f_it->first;
   }
 }
 
@@ -123,7 +122,6 @@ void function_exit(
       if(i_it->is_return())
       {
         goto_programt::instructiont call;
-        call.function=f_it->first;
         call.make_function_call(
           function_to_call(goto_model.symbol_table, id, f_it->first));
         body.insert_before_swap(i_it, call);
@@ -154,7 +152,6 @@ void function_exit(
       goto_programt::instructiont call;
       call.make_function_call(
         function_to_call(goto_model.symbol_table, id, f_it->first));
-      call.function=f_it->first;
       body.insert_before_swap(last, call);
     }
   }

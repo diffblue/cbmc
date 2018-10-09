@@ -50,7 +50,6 @@ void build_havoc_code(
     goto_programt::targett t = dest.add(goto_programt::make_assignment(
       code_assignt(std::move(lhs), std::move(rhs)),
       loop_head->source_location));
-    t->function=loop_head->function;
     t->code.add_source_location()=loop_head->source_location;
   }
 }

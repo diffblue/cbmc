@@ -37,7 +37,6 @@ SCENARIO(
     code_deadt removal(var_a);
     instructions.back().make_dead();
     instructions.back().code = removal;
-    instructions.back().function = fun_name;
     symbol_table.insert(fun_symbol);
 
     WHEN("Removing known symbol")

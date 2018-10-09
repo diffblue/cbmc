@@ -328,7 +328,6 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
     const irep_idt property_class=it->source_location.get_property_class();
     const irep_idt comment=it->source_location.get_comment();
     it->source_location=target->source_location;
-    it->function=target->function;
     if(!property_class.empty())
       it->source_location.set_property_class(property_class);
     if(!comment.empty())

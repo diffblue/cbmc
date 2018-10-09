@@ -34,9 +34,6 @@ static void rename_symbols_in_function(
   {
     rename_symbol(iit->code);
     rename_symbol(iit->guard);
-    // we need to update the instruction's function field as
-    // well, with the new symbol for the function
-    iit->function=new_function_name;
   }
 }
 

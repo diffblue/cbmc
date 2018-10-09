@@ -152,10 +152,7 @@ bool model_argc_argv(
     main_symbol.mode);
 
   Forall_goto_program_instructions(it, init_instructions)
-  {
     it->source_location.set_file("<built-in-library>");
-    it->function=goto_model.goto_functions.entry_point();
-  }
 
   goto_functionst::function_mapt::iterator start_entry=
     goto_model.goto_functions.function_map.find(

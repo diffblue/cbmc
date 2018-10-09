@@ -184,7 +184,6 @@ protected:
 
   void parameter_destruction(
     const goto_programt::targett target,
-    const irep_idt &function_name,
     const code_typet &code_type,
     goto_programt &dest);
 

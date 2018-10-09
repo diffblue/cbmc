@@ -78,23 +78,12 @@ public:
   void compute_target_numbers();
   void compute_incoming_edges();
 
-  /// update the function member in each instruction by setting it to
-  /// the goto function's identifier
-  void update_instructions_function()
-  {
-    for(auto &func : function_map)
-    {
-      func.second.update_instructions_function(func.first);
-    }
-  }
-
   void update()
   {
     compute_incoming_edges();
     compute_target_numbers();
     compute_location_numbers();
     compute_loop_numbers();
-    update_instructions_function();
   }
 
   /// Get the identifier of the entry point to a goto model

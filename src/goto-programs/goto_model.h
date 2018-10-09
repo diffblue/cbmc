@@ -194,13 +194,6 @@ public:
     goto_functions.compute_location_numbers(goto_function.body);
   }
 
-  /// Updates the empty function member of each instruction by setting them
-  /// to `function_id`
-  void update_instructions_function()
-  {
-    goto_function.update_instructions_function(function_id);
-  }
-
   /// Get symbol table
   /// \return journalling symbol table that (a) wraps the global symbol table,
   ///   and (b) has recorded all symbol mutations (insertions, updates and
