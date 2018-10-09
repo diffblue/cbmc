@@ -191,7 +191,9 @@ void dep_graph_domaint::data_dependencies(
 }
 
 void dep_graph_domaint::transform(
+  const irep_idt &function_from,
   goto_programt::const_targett from,
+  const irep_idt &function_to,
   goto_programt::const_targett to,
   ai_baset &ai,
   const namespacet &ns)
@@ -202,7 +204,7 @@ void dep_graph_domaint::transform(
   // propagate control dependencies across function calls
   if(from->is_function_call())
   {
-    if(from->function == to->function)
+    if(function_from == function_to)
     {
       control_dependencies(from, to, *dep_graph);
     }

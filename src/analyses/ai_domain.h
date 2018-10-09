@@ -55,7 +55,9 @@ public:
   ///              (from->is_function_call() || from->is_end_function())
 
   virtual void transform(
+    const irep_idt &function_from,
     locationt from,
+    const irep_idt &function_to,
     locationt to,
     ai_baset &ai,
     const namespacet &ns) = 0;

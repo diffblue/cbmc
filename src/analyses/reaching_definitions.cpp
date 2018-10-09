@@ -56,7 +56,9 @@ void rd_range_domaint::populate_cache(const irep_idt &identifier) const
 }
 
 void rd_range_domaint::transform(
+  const irep_idt &function_from,
   locationt from,
+  const irep_idt &function_to,
   locationt to,
   ai_baset &ai,
   const namespacet &ns)
@@ -78,10 +80,10 @@ void rd_range_domaint::transform(
     transform_start_thread(ns, *rd);
   // do argument-to-parameter assignments
   else if(from->is_function_call())
-    transform_function_call(ns, from, to, *rd);
+    transform_function_call(ns, function_from, from, function_to, to, *rd);
   // cleanup parameters
   else if(from->is_end_function())
-    transform_end_function(ns, from, to, *rd);
+    transform_end_function(ns, function_from, from, function_to, to, *rd);
   // lhs assignments
   else if(from->is_assign())
     transform_assign(ns, from, from, *rd);
@@ -167,14 +169,16 @@ void rd_range_domaint::transform_start_thread(
 
 void rd_range_domaint::transform_function_call(
   const namespacet &ns,
+  const irep_idt &function_from,
   locationt from,
+  const irep_idt &function_to,
   locationt to,
   reaching_definitions_analysist &rd)
 {
   const code_function_callt &code=to_code_function_call(from->code);
 
   // only if there is an actual call, i.e., we have a body
-  if(from->function != to->function)
+  if(function_from != function_to)
   {
     for(valuest::iterator it=values.begin();
         it!=values.end();
@@ -229,7 +233,9 @@ void rd_range_domaint::transform_function_call(
 
 void rd_range_domaint::transform_end_function(
   const namespacet &ns,
+  const irep_idt &function_from,
   locationt from,
+  const irep_idt &function_to,
   locationt to,
   reaching_definitions_analysist &rd)
 {
@@ -263,8 +269,7 @@ void rd_range_domaint::transform_end_function(
     }
   }
 
-  const code_typet &code_type=
-    to_code_type(ns.lookup(from->function).type);
+  const code_typet &code_type = to_code_type(ns.lookup(function_from).type);
 
   for(const auto &param : code_type.parameters())
   {

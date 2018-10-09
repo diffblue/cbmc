@@ -81,7 +81,9 @@ public:
     goto_programt::const_targett to);
 
   void transform(
+    const irep_idt &function_from,
     goto_programt::const_targett from,
+    const irep_idt &function_to,
     goto_programt::const_targett to,
     ai_baset &ai,
     const namespacet &ns) final override;

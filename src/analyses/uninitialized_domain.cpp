@@ -19,7 +19,9 @@ Date: January 2010
 #include <list>
 
 void uninitialized_domaint::transform(
+  const irep_idt &function_from,
   locationt from,
+  const irep_idt &function_to,
   locationt,
   ai_baset &,
   const namespacet &ns)

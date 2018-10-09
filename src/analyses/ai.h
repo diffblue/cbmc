@@ -45,13 +45,14 @@ public:
 
   /// Running the interpreter
   void operator()(
+    const irep_idt &function_identifier,
     const goto_programt &goto_program,
     const namespacet &ns)
   {
     goto_functionst goto_functions;
     initialize(goto_program);
     entry_state(goto_program);
-    fixedpoint(goto_program, goto_functions, ns);
+    fixedpoint(function_identifier, goto_program, goto_functions, ns);
     finalize();
   }
 
@@ -75,13 +76,14 @@ public:
   }
 
   void operator()(
+    const irep_idt &function_identifier,
     const goto_functionst::goto_functiont &goto_function,
     const namespacet &ns)
   {
     goto_functionst goto_functions;
     initialize(goto_function);
     entry_state(goto_function.body);
-    fixedpoint(goto_function.body, goto_functions, ns);
+    fixedpoint(function_identifier, goto_function.body, goto_functions, ns);
     finalize();
   }
 
@@ -234,6 +236,7 @@ protected:
 
   // true = found something new
   bool fixedpoint(
+    const irep_idt &function_identifier,
     const goto_programt &goto_program,
     const goto_functionst &goto_functions,
     const namespacet &ns);
@@ -245,6 +248,7 @@ protected:
   void sequential_fixedpoint(
     const goto_functionst &goto_functions,
     const namespacet &ns);
+
   void concurrent_fixedpoint(
     const goto_functionst &goto_functions,
     const namespacet &ns);
@@ -254,6 +258,7 @@ protected:
   // or applications of the abstract transformer
   // true = found something new
   bool visit(
+    const irep_idt &function_identifier,
     locationt l,
     working_sett &working_set,
     const goto_programt &goto_program,
@@ -262,14 +267,18 @@ protected:
 
   // function calls
   bool do_function_call_rec(
-    locationt l_call, locationt l_return,
+    const irep_idt &calling_function_identifier,
+    locationt l_call,
+    locationt l_return,
     const exprt &function,
     const exprt::operandst &arguments,
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
   bool do_function_call(
-    locationt l_call, locationt l_return,
+    const irep_idt &calling_function_identifier,
+    locationt l_call,
+    locationt l_return,
     const goto_functionst &goto_functions,
     const goto_functionst::function_mapt::const_iterator f_it,
     const exprt::operandst &arguments,

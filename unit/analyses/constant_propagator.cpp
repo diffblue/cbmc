@@ -83,7 +83,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
     WHEN("We apply conventional constant propagation")
     {
       constant_propagator_ait constant_propagator(main_function);
-      constant_propagator(main_function, ns);
+      constant_propagator(main_function_symbol.name, main_function, ns);
 
       THEN("The propagator should discover values for both 'x' and 'y'")
       {
@@ -97,7 +97,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
     WHEN("We apply constant propagation for symbols beginning with 'x'")
     {
       constant_propagator_ait constant_propagator(main_function, starts_with_x);
-      constant_propagator(main_function, ns);
+      constant_propagator(main_function_symbol.name, main_function, ns);
 
       THEN("The propagator should discover a value for 'x' but not 'y'")
       {

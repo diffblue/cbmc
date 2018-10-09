@@ -58,7 +58,9 @@ void constant_propagator_domaint::assign_rec(
 }
 
 void constant_propagator_domaint::transform(
+  const irep_idt &function_from,
   locationt from,
+  const irep_idt &function_to,
   locationt to,
   ai_baset &ai,
   const namespacet &ns)
@@ -146,7 +148,7 @@ void constant_propagator_domaint::transform(
       const irep_idt id=symbol_expr.get_identifier();
 
       // Functions with no body
-      if(from->function == to->function)
+      if(function_from == function_to)
       {
         if(id==CPROVER_PREFIX "set_must" ||
            id==CPROVER_PREFIX "get_must" ||
@@ -195,7 +197,7 @@ void constant_propagator_domaint::transform(
     {
       // unresolved call
       INVARIANT(
-        from->function == to->function,
+        function_from == function_to,
         "Unresolved call can only be approximated if a skip");
 
       if(have_dirty)
@@ -208,7 +210,7 @@ void constant_propagator_domaint::transform(
   {
     // erase parameters
 
-    const irep_idt id=from->function;
+    const irep_idt id = function_from;
     const symbolt &symbol=ns.lookup(id);
 
     const code_typet &type=to_code_type(symbol.type);

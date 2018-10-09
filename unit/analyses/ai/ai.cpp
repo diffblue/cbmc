@@ -36,7 +36,13 @@ public:
 
   optionalt<unsigned> path_length;
 
-  void transform(locationt, locationt, ai_baset &, const namespacet &) override
+  void transform(
+    const irep_idt &,
+    locationt,
+    const irep_idt &,
+    locationt,
+    ai_baset &,
+    const namespacet &) override
   {
     if(*path_length < 100)
       ++*path_length;
