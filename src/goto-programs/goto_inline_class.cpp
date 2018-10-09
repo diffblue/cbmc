@@ -285,6 +285,13 @@ void goto_inlinet::insert_function_body(
     for(auto &instruction : body.instructions)
       instruction.function=target->function;
 
+  // make sure the inlined function does not introduce hiding
+  if(goto_function.is_hidden())
+  {
+    for(auto &instruction : body.instructions)
+      instruction.labels.remove("__CPROVER_HIDE");
+  }
+
   replace_return(body, lhs);
 
   goto_programt tmp1;
