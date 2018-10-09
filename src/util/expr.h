@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_EXPR_H
 
 #include "type.h"
+#include "validate.h"
 
 #include <functional>
 #include <list>

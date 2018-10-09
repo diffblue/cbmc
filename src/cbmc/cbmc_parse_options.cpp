@@ -515,10 +515,6 @@ int cbmc_parse_optionst::doit()
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
 
-  INVARIANT(
-    !goto_model.check_internal_invariants(*this),
-    "goto program internal invariants failed");
-
   if(cmdline.isset("show-claims") || // will go away
      cmdline.isset("show-properties")) // use this one
   {
@@ -529,6 +525,12 @@ int cbmc_parse_optionst::doit()
 
   if(set_properties())
     return CPROVER_EXIT_SET_PROPERTIES_FAILED;
+
+  if(cmdline.isset("validate-goto-model"))
+  {
+    namespacet ns(goto_model.symbol_table);
+    goto_model.validate(ns, validation_modet::INVARIANT);
+  }
 
   return bmct::do_language_agnostic_bmc(
     path_strategy_chooser, options, goto_model, ui_message_handler);
@@ -976,6 +978,7 @@ void cbmc_parse_optionst::help()
     " --xml-ui                     use XML-formatted output\n"
     " --xml-interface              bi-directional XML interface\n"
     " --json-ui                    use JSON-formatted output\n"
+    " --validate-goto-model        enables additional well-formedness checks on the goto program\n" // NOLINT(*)
     HELP_GOTO_TRACE
     HELP_FLUSH
     " --verbosity #                verbosity level\n"

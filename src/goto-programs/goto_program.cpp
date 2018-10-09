@@ -669,25 +669,29 @@ bool goto_programt::instructiont::equals(const instructiont &other) const
   // clang-format on
 }
 
-bool goto_programt::instructiont::check_internal_invariants(
+void goto_programt::instructiont::validate(
   const symbol_tablet &table,
-  messaget &msg) const
+  const validation_modet &vm) const
 {
   namespacet ns(table);
-  bool found_violation = false;
   std::vector<std::vector<std::string>> type_collector;
+  std::stringstream location_stream;
+  location_stream << source_location;
+
   auto type_finder = [&](const exprt &e) {
     if(e.id() == ID_symbol)
     {
       auto symbol_expr = to_symbol_expr(e);
       const auto &symbol_id = symbol_expr.get_identifier();
-      if(
-        table.has_symbol(symbol_id) &&
-        !base_type_eq(symbol_expr.type(), table.lookup_ref(symbol_id).type, ns))
-        type_collector.push_back(
-          {id2string(symbol_id),
-           symbol_expr.type().id_string(),
-           table.lookup_ref(symbol_id).type.id_string()});
+
+      if(table.has_symbol(symbol_id))
+        DATA_CHECK(
+          base_type_eq(
+            symbol_expr.type(), table.lookup_ref(symbol_id).type, ns),
+          id2string(symbol_id) + " type inconsistency (" +
+            location_stream.str() + ")\n" + "goto program type: " +
+            symbol_expr.type().id_string() + "\n " + "symbol table type: " +
+            table.lookup_ref(symbol_id).type.id_string());
     }
   };
 
@@ -719,20 +723,6 @@ bool goto_programt::instructiont::check_internal_invariants(
   case INCOMPLETE_GOTO:
     break;
   }
-
-  if(!type_collector.empty())
-  {
-    for(const auto &type_triple : type_collector)
-    {
-      INVARIANT(type_triple.size() > 2, "should have 3 elements");
-      msg.error() << type_triple[0] << " type inconsistency ("
-                  << source_location << ")\n"
-                  << "goto program type: " << type_triple[1] << "\n "
-                  << "symbol table type: " << type_triple[2] << messaget::eom;
-    }
-    found_violation = true;
-  }
-  return found_violation;
 }
 
 bool goto_programt::equals(const goto_programt &other) const
@@ -766,17 +756,14 @@ bool goto_programt::equals(const goto_programt &other) const
   return true;
 }
 
-bool goto_programt::check_internal_invariants(
+void goto_programt::validate(
   const symbol_tablet &table,
-  messaget &msg) const
+  const validation_modet &vm) const
 {
-  bool found_violation = false;
   forall_goto_program_instructions(it, (*this))
   {
-    found_violation =
-      found_violation || it->check_internal_invariants(table, msg);
+    it->validate(table, vm);
   }
-  return found_violation;
 }
 
 /// Outputs a string representation of a `goto_program_instruction_typet`

@@ -111,10 +111,9 @@ public:
     return *this;
   }
 
-  bool
-  check_internal_invariants(const symbol_tablet &table, messaget &msg) const
+  void validate(const symbol_tablet &table, const validation_modet &vm) const
   {
-    return body.check_internal_invariants(table, msg);
+    return body.validate(table, vm);
   }
 };
 

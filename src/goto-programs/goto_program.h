@@ -403,10 +403,8 @@ public:
     /// Iterate over code and guard and collect inconsistencies with symbol
     /// table.
     /// \param table the symbol table
-    /// \param msg container to store the error messages
-    /// \return true if any violation was found
-    bool
-    check_internal_invariants(const symbol_tablet &table, messaget &msg) const;
+    /// \param vm validation mode
+    void validate(const symbol_tablet &table, const validation_modet &vm) const;
   };
 
   // Never try to change this to vector-we mutate the list while iterating
@@ -687,8 +685,7 @@ public:
   /// and relative jumps have the same distance.
   bool equals(const goto_programt &other) const;
 
-  bool
-  check_internal_invariants(const symbol_tablet &table, messaget &msg) const;
+  void validate(const symbol_tablet &table, const validation_modet &vm) const;
 };
 
 /// Get control-flow successors of a given instruction. The instruction is

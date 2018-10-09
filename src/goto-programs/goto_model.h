@@ -99,17 +99,14 @@ public:
 
   /// Iterates over the functions inside the goto model and checks invariants
   /// in all of them. Prints out error message collected.
-  /// \param msg message instance to collect errors
-  /// \return true if any violation was found
-  bool check_internal_invariants(messaget &msg) const
+  /// \param ns namespace for the environment
+  /// \param vm validation mode to be used for error reporting
+  void validate(const namespacet &ns, const validation_modet &vm) const
   {
-    bool found_violation = false;
     forall_goto_functions(it, goto_functions)
     {
-      found_violation = found_violation ||
-                        it->second.check_internal_invariants(symbol_table, msg);
+      it->second.validate(symbol_table, vm);
     }
-    return found_violation;
   }
 };
 
