@@ -233,7 +233,7 @@ void rd_range_domaint::transform_end_function(
   locationt to,
   reaching_definitions_analysist &rd)
 {
-  goto_programt::const_targett call=to;
+  locationt call = to;
   --call;
   const code_function_callt &code=to_code_function_call(call->code);
 
@@ -666,8 +666,8 @@ bool rd_range_domaint::merge(
 /// \return returns true iff there is something new
 bool rd_range_domaint::merge_shared(
   const rd_range_domaint &other,
-  goto_programt::const_targett,
-  goto_programt::const_targett,
+  locationt,
+  locationt,
   const namespacet &ns)
 {
   // TODO: dirty vars

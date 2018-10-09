@@ -384,11 +384,8 @@ private:
   void dummy(const domainT &s) { const statet &x=s; (void)x; }
 
   // not implemented in sequential analyses
-  bool merge_shared(
-    const statet &,
-    goto_programt::const_targett,
-    goto_programt::const_targett,
-    const namespacet &) override
+  bool merge_shared(const statet &, locationt, locationt, const namespacet &)
+    override
   {
     throw "not implemented";
   }
@@ -398,7 +395,8 @@ template<typename domainT>
 class concurrency_aware_ait:public ait<domainT>
 {
 public:
-  typedef typename ait<domainT>::statet statet;
+  using statet = typename ait<domainT>::statet;
+  using locationt = typename statet::locationt;
 
   // constructor
   concurrency_aware_ait():ait<domainT>()
@@ -407,8 +405,8 @@ public:
 
   bool merge_shared(
     const statet &src,
-    goto_programt::const_targett from,
-    goto_programt::const_targett to,
+    locationt from,
+    locationt to,
     const namespacet &ns) override
   {
     statet &dest=this->get_state(to);

@@ -259,7 +259,7 @@ public:
   virtual void initialize(
     const goto_functionst &goto_functions) override;
 
-  virtual statet &get_state(goto_programt::const_targett l) override
+  virtual statet &get_state(locationt l) override
   {
     statet &s=concurrency_aware_ait<rd_range_domaint>::get_state(l);
 
