@@ -515,6 +515,10 @@ int cbmc_parse_optionst::doit()
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
 
+  INVARIANT(
+    !goto_model.check_internal_invariants(*this),
+    "goto program internal invariants failed");
+
   if(cmdline.isset("show-claims") || // will go away
      cmdline.isset("show-properties")) // use this one
   {
