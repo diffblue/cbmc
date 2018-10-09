@@ -139,7 +139,7 @@ void convert(
         for(const auto &arg : step.io_args)
         {
           xml_output.new_element("value").data =
-            from_expr(ns, step.pc->function, arg);
+            from_expr(ns, step.function, arg);
           xml_output.new_element("value_expression").
             new_element(xml(arg, ns));
         }
@@ -158,7 +158,7 @@ void convert(
         for(const auto &arg : step.io_args)
         {
           xml_input.new_element("value").data =
-            from_expr(ns, step.pc->function, arg);
+            from_expr(ns, step.function, arg);
           xml_input.new_element("value_expression").
             new_element(xml(arg, ns));
         }
@@ -169,23 +169,40 @@ void convert(
       break;
 
     case goto_trace_stept::typet::FUNCTION_CALL:
+    {
+      std::string tag = "function_call";
+      xmlt &xml_call_return = dest.new_element(tag);
+
+      xml_call_return.set_attribute_bool("hidden", step.hidden);
+      xml_call_return.set_attribute("thread", std::to_string(step.thread_nr));
+      xml_call_return.set_attribute("step_nr", std::to_string(step.step_nr));
+
+      const symbolt &symbol = ns.lookup(step.called_function);
+      xmlt &xml_function = xml_call_return.new_element("function");
+      xml_function.set_attribute(
+        "display_name", id2string(symbol.display_name()));
+      xml_function.set_attribute("identifier", id2string(symbol.name));
+      xml_function.new_element() = xml(symbol.location);
+
+      if(xml_location.name != "")
+        xml_call_return.new_element().swap(xml_location);
+    }
+    break;
+
     case goto_trace_stept::typet::FUNCTION_RETURN:
       {
-        std::string tag=
-          (step.type==goto_trace_stept::typet::FUNCTION_CALL)?
-          "function_call":"function_return";
+        std::string tag = "function_return";
         xmlt &xml_call_return=dest.new_element(tag);
 
         xml_call_return.set_attribute_bool("hidden", step.hidden);
         xml_call_return.set_attribute("thread", std::to_string(step.thread_nr));
         xml_call_return.set_attribute("step_nr", std::to_string(step.step_nr));
 
-        const symbolt &symbol = ns.lookup(step.function_identifier);
+        const symbolt &symbol = ns.lookup(step.function);
         xmlt &xml_function=xml_call_return.new_element("function");
         xml_function.set_attribute(
           "display_name", id2string(symbol.display_name()));
-        xml_function.set_attribute(
-          "identifier", id2string(step.function_identifier));
+        xml_function.set_attribute("identifier", id2string(step.function));
         xml_function.new_element()=xml(symbol.location);
 
         if(xml_location.name!="")
