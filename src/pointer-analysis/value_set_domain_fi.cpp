@@ -16,17 +16,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool value_set_domain_fit::transform(
   const namespacet &ns,
+  const irep_idt &function_from,
   locationt from_l,
+  const irep_idt &function_to,
   locationt to_l)
 {
   value_set.changed = false;
 
-  value_set.set_from(from_l->function, from_l->location_number);
-  value_set.set_to(to_l->function, to_l->location_number);
+  value_set.set_from(function_from, from_l->location_number);
+  value_set.set_to(function_to, to_l->location_number);
 
-//  std::cout << "transforming: " <<
-//      from_l->function << " " << from_l->location_number << " to " <<
-//      to_l->function << " " << to_l->location_number << '\n';
+  //  std::cout << "transforming: " <<
+  //      from_l->function << " " << from_l->location_number << " to " <<
+  //      to_l->function << " " << to_l->location_number << '\n';
 
   switch(from_l->type)
   {
@@ -49,7 +51,7 @@ bool value_set_domain_fit::transform(
       const code_function_callt &code=
         to_code_function_call(from_l->code);
 
-      value_set.do_function_call(to_l->function, code.arguments(), ns);
+      value_set.do_function_call(function_to, code.arguments(), ns);
     }
     break;
 
