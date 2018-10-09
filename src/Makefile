@@ -60,7 +60,7 @@ goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
                linking.dir analyses.dir goto-instrument.dir \
                solvers.dir json.dir goto-symex.dir
 
-goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
+goto-cc.dir: languages goto-programs.dir linking.dir
 
 # building for a particular directory
 
