@@ -1,0 +1,23 @@
+CORE symex-driven-lazy-loading-expected-failure
+Main.class
+--verbosity 10 --unwind 2 --disable-uncaught-exception-check --throw-assertion-error
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+assertions: "1"
+assumptions: "1"
+java-threading: "0"
+lazy-methods: "1"
+propagation: "1"
+refine-strings: "1"
+sat-preprocessor: "1"
+simplify: "1"
+simplify-if: "1"
+symex-driven-lazy-loading: "0"
+throw-assertion-error: "1"
+throw-runtime-exceptions: "0"
+uncaught-exception-check: "0"
+unwind: "2"
+--
+--
+Symex-driven lazy loading would expect symex-driven-lazy-loading: "1".
