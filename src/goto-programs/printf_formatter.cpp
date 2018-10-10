@@ -47,7 +47,7 @@ void printf_formattert::print(std::ostream &out)
     while(!eol()) process_char(out);
   }
 
-  catch(eol_exceptiont)
+  catch(const eol_exceptiont &)
   {
   }
 }
