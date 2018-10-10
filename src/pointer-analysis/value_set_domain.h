@@ -47,7 +47,9 @@ public:
 
   virtual void transform(
     const namespacet &ns,
+    const irep_idt &function_from,
     locationt from_l,
+    const irep_idt &function_to,
     locationt to_l);
 
   virtual void get_reference_set(

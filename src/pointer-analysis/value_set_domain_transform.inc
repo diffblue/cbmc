@@ -16,7 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 template<class VST>
 void value_set_domain_templatet<VST>::transform(
   const namespacet &ns,
+  const irep_idt &function_from,
   locationt from_l,
+  const irep_idt &function_to,
   locationt to_l)
 {
   switch(from_l->type)
@@ -51,7 +53,7 @@ void value_set_domain_templatet<VST>::transform(
         to_code_function_call(from_l->code);
 
       value_set.do_function_call(
-        to_l->function, code.arguments(), ns);
+        function_to, code.arguments(), ns);
     }
     break;
 
