@@ -15,10 +15,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/arith_tools.h>
+#include <util/exception_utils.h>
 #include <util/invariant.h>
-#include <util/std_types.h>
-#include <util/sparse_vector.h>
 #include <util/message.h>
+#include <util/sparse_vector.h>
+#include <util/std_types.h>
 
 #include "goto_functions.h"
 #include "goto_trace.h"
@@ -279,8 +280,9 @@ protected:
   {
     mp_vectort v;
     evaluate(expr, v);
+    // FIXME not sure if this can happen
     if(v.size()!=1)
-      throw "invalid boolean value";
+      throw analysis_exceptiont("invalid boolean value");
     return v.front()!=0;
   }
 
