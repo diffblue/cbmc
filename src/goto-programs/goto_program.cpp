@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iomanip>
 
 #include <util/std_expr.h>
+#include <util/validate.h>
 
 #include <langapi/language_util.h>
 
@@ -666,6 +667,62 @@ bool goto_programt::instructiont::equals(const instructiont &other) const
     targets.size() == other.targets.size() &&
     labels == other.labels;
   // clang-format on
+}
+
+void goto_programt::instructiont::validate(
+  const namespacet &ns,
+  const validation_modet vm) const
+{
+  validate_full_code(code, ns, vm);
+  validate_full_expr(guard, ns, vm);
+
+  switch(type)
+  {
+  case NO_INSTRUCTION_TYPE:
+    break;
+  case GOTO:
+    break;
+  case ASSUME:
+    break;
+  case ASSERT:
+    break;
+  case OTHER:
+    break;
+  case SKIP:
+    break;
+  case START_THREAD:
+    break;
+  case END_THREAD:
+    break;
+  case LOCATION:
+    break;
+  case END_FUNCTION:
+    break;
+  case ATOMIC_BEGIN:
+    break;
+  case ATOMIC_END:
+    break;
+  case RETURN:
+    break;
+  case ASSIGN:
+    DATA_CHECK(
+      code.get_statement() == ID_assign,
+      "assign instruction should contain an assign statement");
+    DATA_CHECK(targets.empty(), "assign instruction should not have a target");
+    break;
+  case DECL:
+    break;
+  case DEAD:
+    break;
+  case FUNCTION_CALL:
+    break;
+  case THROW:
+    break;
+  case CATCH:
+    break;
+  case INCOMPLETE_GOTO:
+    break;
+  }
 }
 
 bool goto_programt::equals(const goto_programt &other) const

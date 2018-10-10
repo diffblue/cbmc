@@ -20,10 +20,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 #include <util/namespace.h>
-#include <util/symbol_table.h>
 #include <util/source_location.h>
-#include <util/std_expr.h>
 #include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/symbol_table.h>
+
+enum class validation_modet;
 
 /// The type of an instruction in a GOTO program.
 enum goto_program_instruction_typet
@@ -403,11 +405,7 @@ public:
     ///
     /// The validation mode indicates whether well-formedness check failures are
     /// reported via DATA_INVARIANT violations or exceptions.
-    void validate(const namespacet &ns, const validation_modet vm) const
-    {
-      validate_full_code(code, ns, vm);
-      validate_full_expr(guard, ns, vm);
-    }
+    void validate(const namespacet &ns, const validation_modet vm) const;
   };
 
   // Never try to change this to vector-we mutate the list while iterating
