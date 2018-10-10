@@ -111,7 +111,7 @@ class java_class_typet:public class_typet
     return set(ID_access, access);
   }
 
-  const bool get_is_inner_class() const
+  bool get_is_inner_class() const
   {
     return get_bool(ID_is_inner_class);
   }
@@ -141,7 +141,7 @@ class java_class_typet:public class_typet
     return set(ID_super_class, super_class);
   }
 
-  const bool get_is_static_class() const
+  bool get_is_static_class() const
   {
     return get_bool(ID_is_static);
   }
@@ -151,7 +151,7 @@ class java_class_typet:public class_typet
     return set(ID_is_static, is_static_class);
   }
 
-  const bool get_is_anonymous_class() const
+  bool get_is_anonymous_class() const
   {
     return get_bool(ID_is_anonymous);
   }

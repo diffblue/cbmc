@@ -47,10 +47,10 @@ public:
   generic_parameter_specialization_map_keyst &
   operator=(const generic_parameter_specialization_map_keyst &) = delete;
 
-  const void insert_pairs_for_pointer(
+  void insert_pairs_for_pointer(
     const pointer_typet &pointer_type,
     const typet &pointer_subtype_struct);
-  const void insert_pairs_for_symbol(
+  void insert_pairs_for_symbol(
     const symbol_typet &symbol_type,
     const typet &symbol_struct);
 
@@ -60,7 +60,7 @@ private:
   /// Keys of the entries to pop on destruction
   std::vector<irep_idt> erase_keys;
 
-  const void insert_pairs(
+  void insert_pairs(
     const std::vector<java_generic_parametert> &parameters,
     const std::vector<reference_typet> &types);
 };
