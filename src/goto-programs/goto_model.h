@@ -100,29 +100,19 @@ public:
 
   /// Iterates over the functions inside the goto model and checks invariants
   /// in all of them. Prints out error message collected.
-  /// \param msg message instance to collect errors
-  /// \return true if any violation was found
-  bool check_internal_invariants(messaget &msg) const
+  /// \param ns namespace for the environment
+  /// \param vm validation mode to be used for error reporting
+  void validate(const namespacet &ns, const validation_modet &vm) const
   {
-    bool found_violation = false;
-    namespacet ns(symbol_table);
     forall_goto_functions(it, goto_functions)
     {
-      if(!base_type_eq(
-           it->second.type, symbol_table.lookup_ref(it->first).type, ns))
-      {
-        msg.error() << id2string(it->first) << " type inconsistency\n"
-                    << "goto program type: " << it->second.type.id_string()
-                    << "\nsymbol table type: "
-                    << symbol_table.lookup_ref(it->first).type.id_string()
-                    << messaget::eom;
-
-        msg.error() << "" << messaget::eom;
-        found_violation = true;
-      }
+      DATA_CHECK(
+        base_type_eq(
+          it->second.type, symbol_table.lookup_ref(it->first).type, ns),
+        id2string(it->first) + " type inconsistency\ngoto program type: " +
+          it->second.type.id_string() + "\nsymbol table type: " +
+          symbol_table.lookup_ref(it->first).type.id_string());
     }
-
-    return found_violation;
   }
 };
 

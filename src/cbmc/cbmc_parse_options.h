@@ -72,6 +72,7 @@ class optionst;
   OPT_FLUSH \
   "(localize-faults)(localize-faults-method):" \
   OPT_GOTO_TRACE \
+  "(validate-goto-model)" \
   "(claim):(show-claims)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 // clang-format on
 
