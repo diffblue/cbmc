@@ -89,7 +89,13 @@ TAR = tar
 
 minisat2-download:
 	@echo "Downloading Minisat 2.2.1"
-	@$(DOWNLOADER) http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
+	@for i in $$(seq 1 3) ; do \
+	  $(DOWNLOADER) \
+	    http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz && \
+	    exit 0 ; \
+		$(RM) minisat2_2.2.1.orig.tar.gz ; \
+	  if [ $$i -lt 3 ] ; then echo "Re-trying in 10 seconds" 1>&2 ; sleep 10 ; fi ; \
+	done ; exit 1
 	@$(TAR) xfz minisat2_2.2.1.orig.tar.gz
 	@rm -Rf ../minisat-2.2.1
 	@mv minisat2-2.2.1 ../minisat-2.2.1
