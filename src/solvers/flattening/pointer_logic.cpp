@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
 bool pointer_logict::is_dynamic_object(const exprt &expr) const
@@ -104,29 +105,40 @@ exprt pointer_logict::pointer_expr(
   // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
   if(subtype.id() == ID_empty)
     subtype = char_type();
-  const exprt deep_object =
+  exprt deep_object =
     get_subexpression_at_offset(object_expr, pointer.offset, subtype, ns);
   CHECK_RETURN(deep_object.is_not_nil());
+  simplify(deep_object, ns);
   if(deep_object.id() != byte_extract_id())
-    return address_of_exprt(deep_object, type);
+    return typecast_exprt::conditional_cast(
+      address_of_exprt(deep_object), type);
 
   const byte_extract_exprt &be = to_byte_extract_expr(deep_object);
+  const address_of_exprt base(be.op());
   if(be.offset().is_zero())
-    return address_of_exprt(be.op(), type);
+    return typecast_exprt::conditional_cast(base, type);
 
-  const auto subtype_bytes = pointer_offset_size(subtype, ns);
-  CHECK_RETURN(subtype_bytes.has_value() && *subtype_bytes > 0);
-  if(*subtype_bytes > pointer.offset)
+  const auto object_size = pointer_offset_size(be.op().type(), ns);
+  if(object_size.has_value() && *object_size <= 1)
   {
-    return plus_exprt(
-      address_of_exprt(be.op(), pointer_type(char_type())),
-      from_integer(pointer.offset, index_type()));
+    return typecast_exprt::conditional_cast(
+      plus_exprt(base, from_integer(pointer.offset, pointer_diff_type())),
+      type);
+  }
+  else if(object_size.has_value() && pointer.offset % *object_size == 0)
+  {
+    return typecast_exprt::conditional_cast(
+      plus_exprt(
+        base, from_integer(pointer.offset / *object_size, pointer_diff_type())),
+      type);
   }
   else
   {
-    return plus_exprt(
-      address_of_exprt(be.op(), pointer_type(char_type())),
-      from_integer(pointer.offset / *subtype_bytes, index_type()));
+    return typecast_exprt::conditional_cast(
+      plus_exprt(
+        typecast_exprt(base, pointer_type(char_type())),
+        from_integer(pointer.offset, pointer_diff_type())),
+      type);
   }
 }
 
