@@ -16,6 +16,10 @@ Author: Fotis Koutoulakis, fotis.koutoulakis@diffblue.com
 /// Base class for exceptions thrown in the cprover project.
 /// Intended to be used as a convenient way to have a
 /// "catch all and report errors" from application entry points.
+/// Note that the reason we use a custom base class as opposed to
+/// std::exception or one of its derivates to avoid them being accidentally
+/// caught by code expecting standard exceptions to be only thrown by the
+/// standard library.
 class cprover_exception_baset
 {
 public:
@@ -23,6 +27,7 @@ public:
   /// For readability, implementors should not add a leading
   /// or trailing newline to this description.
   virtual std::string what() const = 0;
+  virtual ~cprover_exception_baset() = default;
 };
 
 /// Thrown when users pass incorrect command line arguments,
