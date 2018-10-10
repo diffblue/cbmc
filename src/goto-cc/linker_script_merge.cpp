@@ -730,45 +730,38 @@ int linker_script_merget::goto_and_object_mismatch(
 
 int linker_script_merget::linker_data_is_malformed(const jsont &data) const
 {
-  return (!(data.is_object() &&
-    data.object.find("regions")!=data.object.end() &&
-    data.object.find("addresses")!=data.object.end() &&
-    data["regions"].is_array() &&
-    data["addresses"].is_array() &&
-    std::all_of(data["addresses"].array.begin(),
-                data["addresses"].array.end(),
-                [](const jsont &j)
-                {
-                  return j.is_object() &&
-                         j.object.find("val")!=j.object.end() &&
-                         j.object.find("sym")!=j.object.end() &&
-                         j["val"].is_number() &&
-                         j["sym"].is_string();
-                }) &&
-    std::all_of(data["regions"].array.begin(),
-                   data["regions"].array.end(),
-                   [](const jsont &j)
-                   {
-                     return j.is_object() &&
-                            j.object.find("start")!=j.object.end() &&
-                            j.object.find("size")!=j.object.end() &&
-                            j.object.find("annot")!=j.object.end() &&
-                            j.object.find("commt")!=j.object.end() &&
-                            j.object.find("start-symbol")!=j.object.end() &&
-                            j.object.find("has-end-symbol")!=j.object.end() &&
-                            j.object.find("section")!=j.object.end() &&
-                            j["start"].is_number() &&
-                            j["size"].is_number() &&
-                            j["annot"].is_string() &&
-                            j["start-symbol"].is_string() &&
-                            j["section"].is_string() &&
-                            j["commt"].is_string() &&
-                            ( (j["has-end-symbol"].is_true() &&
-                               j.object.find("end-symbol")!=j.object.end() &&
-                               j["end-symbol"].is_string())
-                            ||(j["has-end-symbol"].is_false() &&
-                               j.object.find("size-symbol")!=j.object.end() &&
-                               j.object.find("end-symbol")==j.object.end() &&
-                               j["size-symbol"].is_string()));
-                   })));
+  return (
+    !(data.is_object() && data.object.find("regions") != data.object.end() &&
+      data.object.find("addresses") != data.object.end() &&
+      data["regions"].is_array() && data["addresses"].is_array() &&
+      std::all_of(
+        data["addresses"].array.begin(),
+        data["addresses"].array.end(),
+        [](const jsont &j) {
+          return j.is_object() && j.object.find("val") != j.object.end() &&
+                 j.object.find("sym") != j.object.end() &&
+                 j["val"].is_number() && j["sym"].is_string();
+        }) &&
+      std::all_of(
+        data["regions"].array.begin(),
+        data["regions"].array.end(),
+        [](const jsont &j) {
+          return j.is_object() && j.object.find("start") != j.object.end() &&
+                 j.object.find("size") != j.object.end() &&
+                 j.object.find("annot") != j.object.end() &&
+                 j.object.find("commt") != j.object.end() &&
+                 j.object.find("start-symbol") != j.object.end() &&
+                 j.object.find("has-end-symbol") != j.object.end() &&
+                 j.object.find("section") != j.object.end() &&
+                 j["start"].is_number() && j["size"].is_number() &&
+                 j["annot"].is_string() && j["start-symbol"].is_string() &&
+                 j["section"].is_string() && j["commt"].is_string() &&
+                 ((j["has-end-symbol"].is_true() &&
+                   j.object.find("end-symbol") != j.object.end() &&
+                   j["end-symbol"].is_string()) ||
+                  (j["has-end-symbol"].is_false() &&
+                   j.object.find("size-symbol") != j.object.end() &&
+                   j.object.find("end-symbol") == j.object.end() &&
+                   j["size-symbol"].is_string()));
+        })));
 }
