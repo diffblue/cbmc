@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_container.h>
 
 #include <langapi/language_util.h>
+#include <util/byte_operators.h>
 
 /// Reads a memory address and loads it into the `dest` variable.
 /// Marks cell as `READ_BEFORE_WRITTEN` if cell has never been written.
@@ -474,11 +475,9 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_bitor)
   {
-    if(expr.operands().size()<2)
-      throw id2string(expr.id())+" expects at least two operands";
-
+    auto const &bitor_expr = to_bitor_expr(expr);
     mp_integer final=0;
-    forall_operands(it, expr)
+    forall_operands(it, bitor_expr)
     {
       mp_vectort tmp;
       evaluate(*it, tmp);
@@ -490,11 +489,10 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_bitand)
   {
-    if(expr.operands().size()<2)
-      throw id2string(expr.id())+" expects at least two operands";
+    auto const &bitand_expr = to_bitand_expr(expr);
 
     mp_integer final=-1;
-    forall_operands(it, expr)
+    forall_operands(it, bitand_expr)
     {
       mp_vectort tmp;
       evaluate(*it, tmp);
@@ -506,11 +504,10 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_bitxor)
   {
-    if(expr.operands().size()<2)
-      throw id2string(expr.id())+" expects at least two operands";
+    auto const &bitxor_expr = to_bitxor_expr(expr);
 
     mp_integer final=0;
-    forall_operands(it, expr)
+    forall_operands(it, bitxor_expr)
     {
       mp_vectort tmp;
       evaluate(*it, tmp);
@@ -522,10 +519,9 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_bitnot)
   {
-    if(expr.operands().size()!=1)
-      throw id2string(expr.id())+" expects one operand";
+    auto const &bitnot_expr = to_bitnot_expr(expr);
     mp_vectort tmp;
-    evaluate(expr.op0(), tmp);
+    evaluate(bitnot_expr.op(), tmp);
     if(tmp.size()==1)
     {
       const auto width = to_bitvector_type(expr.op0().type()).get_width();
@@ -536,88 +532,83 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_shl)
   {
-    if(expr.operands().size()!=2)
-      throw id2string(expr.id())+" expects two operands";
+    auto const &shl_expr = to_shift_expr(expr);
 
-    mp_vectort tmp0, tmp1;
-    evaluate(expr.op0(), tmp0);
-    evaluate(expr.op1(), tmp1);
-    if(tmp0.size()==1 && tmp1.size()==1)
+    mp_vectort op, distance;
+    evaluate(shl_expr.op(), op);
+    evaluate(shl_expr.distance(), distance);
+    if(op.size() == 1 && distance.size() == 1)
     {
-      mp_integer final=arith_left_shift(
-        tmp0.front(),
-        tmp1.front(),
-        to_bitvector_type(expr.op0().type()).get_width());
+      mp_integer final = arith_left_shift(
+        op.front(),
+        distance.front(),
+        to_bitvector_type(shl_expr.op().type()).get_width());
       dest.push_back(final);
       return;
     }
   }
   else if((expr.id()==ID_shr) || (expr.id()==ID_lshr))
   {
-    if(expr.operands().size()!=2)
-      throw id2string(expr.id())+" expects two operands";
+    auto const &shr_or_lshr_expr = to_shift_expr(expr);
 
-    mp_vectort tmp0, tmp1;
-    evaluate(expr.op0(), tmp0);
-    evaluate(expr.op1(), tmp1);
-    if(tmp0.size()==1 && tmp1.size()==1)
+    mp_vectort op, distance;
+    evaluate(shr_or_lshr_expr.op(), op);
+    evaluate(shr_or_lshr_expr.distance(), distance);
+    if(op.size() == 1 && distance.size() == 1)
     {
-      mp_integer final=logic_right_shift(
-        tmp0.front(),
-        tmp1.front(),
-        to_bitvector_type(expr.op0().type()).get_width());
+      mp_integer final = logic_right_shift(
+        op.front(),
+        distance.front(),
+        to_bitvector_type(shr_or_lshr_expr.op().type()).get_width());
       dest.push_back(final);
       return;
     }
   }
   else if(expr.id()==ID_ashr)
   {
-    if(expr.operands().size()!=2)
-      throw id2string(expr.id())+" expects two operands";
-
-    mp_vectort tmp0, tmp1;
-    evaluate(expr.op0(), tmp0);
-    evaluate(expr.op1(), tmp1);
-    if(tmp0.size()==1 && tmp1.size()==1)
+    auto const &ashr_expr = to_shift_expr(expr);
+    mp_vectort op, distance;
+    evaluate(ashr_expr.op(), op);
+    evaluate(ashr_expr.distance(), distance);
+    if(op.size() == 1 && distance.size() == 1)
     {
-      mp_integer final=arith_right_shift(
-        tmp0.front(),
-        tmp1.front(),
-        to_bitvector_type(expr.op0().type()).get_width());
+      mp_integer final = arith_right_shift(
+        op.front(),
+        distance.front(),
+        to_bitvector_type(ashr_expr.op().type()).get_width());
       dest.push_back(final);
       return;
     }
   }
   else if(expr.id()==ID_ror)
   {
-    if(expr.operands().size()!=2)
-      throw id2string(expr.id())+" expects two operands";
-
-    mp_vectort tmp0, tmp1;
-    evaluate(expr.op0(), tmp0);
-    evaluate(expr.op1(), tmp1);
-    if(tmp0.size()==1 && tmp1.size()==1)
+    auto const &ror_expr = to_shift_expr(expr);
+    mp_vectort op, distance;
+    evaluate(ror_expr.op(), op);
+    evaluate(ror_expr.distance(), distance);
+    if(op.size() == 1 && distance.size() == 1)
     {
-      mp_integer final=rotate_right(tmp0.front(),
-        tmp1.front(),
-        to_bitvector_type(expr.op0().type()).get_width());
+      mp_integer final = rotate_right(
+        op.front(),
+        distance.front(),
+        to_bitvector_type(ror_expr.op().type()).get_width());
       dest.push_back(final);
       return;
     }
   }
   else if(expr.id()==ID_rol)
   {
-    if(expr.operands().size()!=2)
-      throw id2string(expr.id())+" expects two operands";
+    auto const &rol_expr = to_shift_expr(expr);
 
-    mp_vectort tmp0, tmp1;
-    evaluate(expr.op0(), tmp0);
-    evaluate(expr.op1(), tmp1);
-    if(tmp0.size()==1 && tmp1.size()==1)
+    mp_vectort op, distance;
+    evaluate(rol_expr.op(), op);
+    evaluate(rol_expr.distance(), distance);
+    if(op.size() == 1 && distance.size() == 1)
     {
-      mp_integer final=rotate_left(tmp0.front(),
-        tmp1.front(),
-        to_bitvector_type(expr.op0().type()).get_width());
+      mp_integer final = rotate_left(
+        op.front(),
+        distance.front(),
+        to_bitvector_type(rol_expr.op().type()).get_width());
       dest.push_back(final);
       return;
     }
@@ -629,42 +620,40 @@ void interpretert::evaluate(
           expr.id()==ID_lt ||
           expr.id()==ID_gt)
   {
-    if(expr.operands().size()!=2)
-      throw id2string(expr.id())+" expects two operands";
+    auto const &relation_expr = to_binary_relation_expr(expr);
 
-    mp_vectort tmp0, tmp1;
-    evaluate(expr.op0(), tmp0);
-    evaluate(expr.op1(), tmp1);
+    mp_vectort lhs, rhs;
+    evaluate(relation_expr.lhs(), lhs);
+    evaluate(relation_expr.rhs(), rhs);
 
-    if(tmp0.size()==1 && tmp1.size()==1)
+    if(lhs.size() == 1 && rhs.size() == 1)
     {
-      const mp_integer &op0=tmp0.front();
-      const mp_integer &op1=tmp1.front();
+      const mp_integer &lhs_as_integer = lhs.front();
+      const mp_integer &rhs_as_integer = rhs.front();
 
       if(expr.id()==ID_equal)
-        dest.push_back(op0==op1);
+        dest.push_back(lhs_as_integer == rhs_as_integer);
       else if(expr.id()==ID_notequal)
-        dest.push_back(op0!=op1);
+        dest.push_back(lhs_as_integer != rhs_as_integer);
       else if(expr.id()==ID_le)
-        dest.push_back(op0<=op1);
+        dest.push_back(lhs_as_integer <= rhs_as_integer);
       else if(expr.id()==ID_ge)
-        dest.push_back(op0>=op1);
+        dest.push_back(lhs_as_integer >= rhs_as_integer);
       else if(expr.id()==ID_lt)
-        dest.push_back(op0<op1);
+        dest.push_back(lhs_as_integer < rhs_as_integer);
       else if(expr.id()==ID_gt)
-        dest.push_back(op0>op1);
+        dest.push_back(lhs_as_integer > rhs_as_integer);
     }
 
     return;
   }
   else if(expr.id()==ID_or)
   {
-    if(expr.operands().empty())
-      throw id2string(expr.id())+" expects at least one operand";
+    auto const &or_expr = to_or_expr(expr);
 
     bool result=false;
 
-    forall_operands(it, expr)
+    forall_operands(it, or_expr)
     {
       mp_vectort tmp;
       evaluate(*it, tmp);
@@ -682,33 +671,31 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_if)
   {
-    if(expr.operands().size()!=3)
-      throw "if expects three operands";
+    auto const &if_expr = to_if_expr(expr);
 
-    mp_vectort tmp0, tmp1;
-    evaluate(expr.op0(), tmp0);
+    mp_vectort condition, if_result;
+    evaluate(if_expr.cond(), condition);
 
-    if(tmp0.size()==1)
+    if(condition.size() == 1)
     {
-      if(tmp0.front()!=0)
-        evaluate(expr.op1(), tmp1);
+      if(condition.front() != 0)
+        evaluate(if_expr.true_case(), if_result);
       else
-        evaluate(expr.op2(), tmp1);
+        evaluate(if_expr.false_case(), if_result);
     }
 
-    if(tmp1.size()==1)
-      dest.push_back(tmp1.front());
+    if(if_result.size() == 1)
+      dest.push_back(if_result.front());
 
     return;
   }
   else if(expr.id()==ID_and)
   {
-    if(expr.operands().empty())
-      throw id2string(expr.id())+" expects at least one operand";
+    auto const &and_expr = to_and_expr(expr);
 
     bool result=true;
 
-    forall_operands(it, expr)
+    forall_operands(it, and_expr)
     {
       mp_vectort tmp;
       evaluate(*it, tmp);
@@ -726,27 +713,26 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_not)
   {
-    if(expr.operands().size()!=1)
-      throw id2string(expr.id())+" expects one operand";
+    auto const &not_expr = to_not_expr(expr);
 
-    mp_vectort tmp;
-    evaluate(expr.op0(), tmp);
+    mp_vectort result_before_not;
+    evaluate(not_expr.op(), result_before_not);
 
-    if(tmp.size()==1)
-      dest.push_back(tmp.front()==0);
+    if(result_before_not.size() == 1)
+      dest.push_back(result_before_not.front() == 0);
 
     return;
   }
   else if(expr.id()==ID_plus)
   {
+    auto const &plus_expr = to_plus_expr(expr);
     mp_integer result=0;
-
-    forall_operands(it, expr)
+    forall_operands(it, plus_expr)
     {
-      mp_vectort tmp;
-      evaluate(*it, tmp);
-      if(tmp.size()==1)
-        result+=tmp.front();
+      mp_vectort operand;
+      evaluate(*it, operand);
+      if(operand.size() == 1)
+        result += operand.front();
     }
 
     dest.push_back(result);
@@ -754,52 +740,53 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_mult)
   {
+    auto const &mult_expr = to_mult_expr(expr);
     // type-dependent!
     mp_integer result;
 
     if(expr.type().id()==ID_fixedbv)
     {
       fixedbvt f;
-      f.spec=fixedbv_spect(to_fixedbv_type(expr.type()));
+      f.spec = fixedbv_spect(to_fixedbv_type(mult_expr.type()));
       f.from_integer(1);
       result=f.get_value();
     }
     else if(expr.type().id()==ID_floatbv)
     {
-      ieee_floatt f(to_floatbv_type(expr.type()));
+      ieee_floatt f(to_floatbv_type(mult_expr.type()));
       f.from_integer(1);
       result=f.pack();
     }
     else
       result=1;
 
-    forall_operands(it, expr)
+    forall_operands(it, mult_expr)
     {
-      mp_vectort tmp;
-      evaluate(*it, tmp);
-      if(tmp.size()==1)
+      mp_vectort operand;
+      evaluate(*it, operand);
+      if(operand.size() == 1)
       {
-        if(expr.type().id()==ID_fixedbv)
+        if(mult_expr.type().id() == ID_fixedbv)
         {
           fixedbvt f1, f2;
-          f1.spec=fixedbv_spect(to_fixedbv_type(expr.type()));
+          f1.spec = fixedbv_spect(to_fixedbv_type(mult_expr.type()));
           f2.spec=fixedbv_spect(to_fixedbv_type(it->type()));
           f1.set_value(result);
-          f2.set_value(tmp.front());
+          f2.set_value(operand.front());
           f1*=f2;
           result=f1.get_value();
         }
-        else if(expr.type().id()==ID_floatbv)
+        else if(mult_expr.type().id() == ID_floatbv)
         {
-          ieee_floatt f1(to_floatbv_type(expr.type()));
+          ieee_floatt f1(to_floatbv_type(mult_expr.type()));
           ieee_floatt f2(to_floatbv_type(it->type()));
           f1.unpack(result);
-          f2.unpack(tmp.front());
+          f2.unpack(operand.front());
           f1*=f2;
           result=f2.pack();
         }
         else
-          result*=tmp.front();
+          result *= operand.front();
       }
     }
 
@@ -808,58 +795,50 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_minus)
   {
-    if(expr.operands().size()!=2)
-      throw "- expects two operands";
+    auto const &minus_expr = to_minus_expr(expr);
 
-    mp_vectort tmp0, tmp1;
-    evaluate(expr.op0(), tmp0);
-    evaluate(expr.op1(), tmp1);
+    mp_vectort minuend, subtrahend;
+    evaluate(minus_expr.op0(), minuend);
+    evaluate(minus_expr.op1(), subtrahend);
 
-    if(tmp0.size()==1 && tmp1.size()==1)
-      dest.push_back(tmp0.front()-tmp1.front());
+    if(minuend.size() == 1 && subtrahend.size() == 1)
+      dest.push_back(minuend.front() - subtrahend.front());
     return;
   }
   else if(expr.id()==ID_div)
   {
-    if(expr.operands().size()!=2)
-      throw "/ expects two operands";
+    auto const &div_expr = to_div_expr(expr);
 
-    mp_vectort tmp0, tmp1;
-    evaluate(expr.op0(), tmp0);
-    evaluate(expr.op1(), tmp1);
+    mp_vectort dividend, divisor;
+    evaluate(div_expr.dividend(), dividend);
+    evaluate(div_expr.divisor(), divisor);
 
-    if(tmp0.size()==1 && tmp1.size()==1)
-      dest.push_back(tmp0.front()/tmp1.front());
+    if(dividend.size() == 1 && divisor.size() == 1)
+      dest.push_back(dividend.front() / divisor.front());
     return;
   }
   else if(expr.id()==ID_unary_minus)
   {
-    if(expr.operands().size()!=1)
-      throw "unary- expects one operand";
+    auto const &unary_minus_expr = to_unary_minus_expr(expr);
 
-    mp_vectort tmp0;
-    evaluate(expr.op0(), tmp0);
+    mp_vectort negated;
+    evaluate(unary_minus_expr.op(), negated);
 
-    if(tmp0.size()==1)
-      dest.push_back(-tmp0.front());
+    if(negated.size() == 1)
+      dest.push_back(-negated.front());
     return;
   }
   else if(expr.id()==ID_address_of)
   {
-    if(expr.operands().size()!=1)
-      throw "address_of expects one operand";
-
-    dest.push_back(evaluate_address(expr.op0()));
+    auto const &address_of_expr = to_address_of_expr(expr);
+    dest.push_back(evaluate_address(address_of_expr.op()));
     return;
   }
   else if(expr.id()==ID_pointer_offset)
   {
-    if(expr.operands().size()!=1)
-      throw "pointer_offset expects one operand";
-    if(expr.op0().type().id()!=ID_pointer)
-      throw "pointer_offset expects a pointer operand";
+    auto const &pointer_offset_expr = to_pointer_offset_expr(expr);
     mp_vectort result;
-    evaluate(expr.op0(), result);
+    evaluate(pointer_offset_expr.op(), result);
     if(result.size()==1)
     {
       // Return the distance, in bytes, between the address returned
@@ -880,12 +859,11 @@ void interpretert::evaluate(
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
   {
-    if(expr.operands().size()!=2)
-      throw "byte_extract should have two operands";
+    auto const &byte_extract_expr = to_byte_extract_expr(expr);
     mp_vectort extract_offset;
-    evaluate(expr.op1(), extract_offset);
+    evaluate(byte_extract_expr.offset(), extract_offset);
     mp_vectort extract_from;
-    evaluate(expr.op0(), extract_from);
+    evaluate(byte_extract_expr.op(), extract_from);
     if(extract_offset.size()==1 && extract_from.size()!=0)
     {
       const typet &target_type=expr.type();
@@ -893,9 +871,7 @@ void interpretert::evaluate(
       // If memory offset is found (which should normally be the case)
       // extract the corresponding data from the appropriate memory location
       if(!byte_offset_to_memory_offset(
-           expr.op0().type(),
-           extract_offset[0],
-           memory_offset))
+           byte_extract_expr.op().type(), extract_offset[0], memory_offset))
       {
         mp_integer target_type_leaves;
         if(!count_type_leaves(target_type, target_type_leaves) &&
@@ -924,13 +900,14 @@ void interpretert::evaluate(
       // simplify.
       if(expr.id() == ID_index)
       {
-        exprt evaluated_index = expr;
-        mp_vectort idx;
-        evaluate(expr.op1(), idx);
-        if(idx.size() == 1)
+        auto const &index_expr = to_index_expr(expr);
+        index_exprt evaluated_index = index_expr;
+        mp_vectort index;
+        evaluate(index_expr.index(), index);
+        if(index.size() == 1)
         {
-          evaluated_index.op1() =
-            constant_exprt(integer2string(idx[0]), expr.op1().type());
+          evaluated_index.index() =
+            constant_exprt(integer2string(index[0]), index_expr.index().type());
         }
         simplified = simplify_expr(evaluated_index, ns);
       }
@@ -966,36 +943,37 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_typecast)
   {
-    if(expr.operands().size()!=1)
-      throw "typecast expects one operand";
+    auto const &typecast_expr = to_typecast_expr(expr);
 
-    mp_vectort tmp;
-    evaluate(expr.op0(), tmp);
+    mp_vectort casted;
+    evaluate(typecast_expr.op(), casted);
 
-    if(tmp.size()==1)
+    if(casted.size() == 1)
     {
-      const mp_integer &value=tmp.front();
+      const mp_integer &value = casted.front();
 
-      if(expr.type().id()==ID_pointer)
+      if(typecast_expr.type().id() == ID_pointer)
       {
         dest.push_back(value);
         return;
       }
-      else if(expr.type().id()==ID_signedbv)
+      else if(typecast_expr.type().id() == ID_signedbv)
       {
         const std::string s =
-          integer2bv(value, to_signedbv_type(expr.type()).get_width());
+          integer2bv(value, to_signedbv_type(typecast_expr.type()).get_width());
         dest.push_back(bv2integer(s, true));
         return;
       }
-      else if(expr.type().id()==ID_unsignedbv)
+      else if(typecast_expr.type().id() == ID_unsignedbv)
       {
-        const std::string s =
-          integer2bv(value, to_unsignedbv_type(expr.type()).get_width());
+        const std::string s = integer2bv(
+          value, to_unsignedbv_type(typecast_expr.type()).get_width());
         dest.push_back(bv2integer(s, false));
         return;
       }
-      else if((expr.type().id()==ID_bool) || (expr.type().id()==ID_c_bool))
+      else if(
+        (typecast_expr.type().id() == ID_bool) ||
+        (typecast_expr.type().id() == ID_c_bool))
       {
         dest.push_back(value!=0);
         return;
@@ -1004,7 +982,8 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_array)
   {
-    forall_operands(it, expr)
+    auto const &array_expr = to_array_expr(expr);
+    forall_operands(it, array_expr)
     {
       evaluate(*it, dest);
     }
@@ -1012,18 +991,19 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_array_of)
   {
-    const auto &ty=to_array_type(expr.type());
+    auto const &array_of_expr = to_array_of_expr(expr);
+    const auto &array_of_type = to_array_type(array_of_expr.type());
     std::vector<mp_integer> size;
-    if(ty.size().id()==ID_infinity)
+    if(array_of_type.size().id() == ID_infinity)
       size.push_back(0);
     else
-      evaluate(ty.size(), size);
+      evaluate(array_of_type.size(), size);
 
     if(size.size()==1)
     {
       std::size_t size_int=integer2size_t(size[0]);
       for(std::size_t i=0; i<size_int; ++i)
-        evaluate(expr.op0(), dest);
+        evaluate(array_of_expr.what(), dest);
       return;
     }
   }
@@ -1104,40 +1084,36 @@ mp_integer interpretert::evaluate_address(
   }
   else if(expr.id()==ID_dereference)
   {
-    if(expr.operands().size()!=1)
-      throw "dereference expects one operand";
+    auto const &dereference_expr = to_dereference_expr(expr);
 
-    mp_vectort tmp0;
-    evaluate(expr.op0(), tmp0);
+    mp_vectort pointer;
+    evaluate(dereference_expr.pointer(), pointer);
 
-    if(tmp0.size()==1)
-      return tmp0.front();
+    if(pointer.size() == 1)
+      return pointer.front();
   }
   else if(expr.id()==ID_index)
   {
-    if(expr.operands().size()!=2)
-      throw "index expects two operands";
+    auto const &index_expr = to_index_expr(expr);
 
-    mp_vectort tmp1;
-    evaluate(expr.op1(), tmp1);
+    mp_vectort index;
+    evaluate(index_expr.index(), index);
 
-    if(tmp1.size()==1)
+    if(index.size() == 1)
     {
-      auto base=evaluate_address(expr.op0(), fail_quietly);
+      auto base = evaluate_address(index_expr.array(), fail_quietly);
       if(!base.is_zero())
-        return base+tmp1.front();
+        return base + index.front();
     }
   }
   else if(expr.id()==ID_member)
   {
-    if(expr.operands().size()!=1)
-      throw "member expects one operand";
+    auto const &member_expr = to_member_expr(expr);
 
-    const struct_typet &struct_type=
-      to_struct_type(ns.follow(expr.op0().type()));
+    const struct_typet &struct_type =
+      to_struct_type(ns.follow(member_expr.compound().type()));
 
-    const irep_idt &component_name=
-      to_member_expr(expr).get_component_name();
+    const irep_idt &component_name = member_expr.get_component_name();
 
     mp_integer offset=0;
 
@@ -1149,44 +1125,45 @@ mp_integer interpretert::evaluate_address(
       offset+=get_size(comp.type());
     }
 
-    auto base=evaluate_address(expr.op0(), fail_quietly);
+    auto base = evaluate_address(member_expr.compound(), fail_quietly);
     if(!base.is_zero())
       return base+offset;
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
   {
-    if(expr.operands().size()!=2)
-      throw "byte_extract should have two operands";
+    auto const &byte_extract_expr = to_byte_extract_expr(expr);
     mp_vectort extract_offset;
-    evaluate(expr.op1(), extract_offset);
+    evaluate(byte_extract_expr.offset(), extract_offset);
     mp_vectort extract_from;
-    evaluate(expr.op0(), extract_from);
+    evaluate(byte_extract_expr.op(), extract_from);
     if(extract_offset.size()==1 && !extract_from.empty())
     {
       mp_integer memory_offset;
-      if(!byte_offset_to_memory_offset(expr.op0().type(),
-        extract_offset[0], memory_offset))
-        return evaluate_address(expr.op0(), fail_quietly)+memory_offset;
+      if(!byte_offset_to_memory_offset(
+           byte_extract_expr.op().type(), extract_offset[0], memory_offset))
+      {
+        return evaluate_address(byte_extract_expr.op(), fail_quietly) +
+               memory_offset;
+      }
     }
   }
   else if(expr.id()==ID_if)
   {
+    auto const &if_expr = to_if_expr(expr);
     mp_vectort result;
     if_exprt address_cond(
-      expr.op0(),
-      address_of_exprt(expr.op1()),
-      address_of_exprt(expr.op2()));
+      if_expr.cond(),
+      address_of_exprt(if_expr.true_case()),
+      address_of_exprt(if_expr.false_case()));
     evaluate(address_cond, result);
     if(result.size()==1)
       return result[0];
   }
   else if(expr.id()==ID_typecast)
   {
-    if(expr.operands().size()!=1)
-      throw "typecast expects one operand";
-
-    return evaluate_address(expr.op0(), fail_quietly);
+    auto const &typecast_expr = to_typecast_expr(expr);
+    return evaluate_address(typecast_expr.op(), fail_quietly);
   }
   if(!fail_quietly)
   {
