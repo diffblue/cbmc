@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file util/std_expr.h
 /// API to expression classes
 
+#include "c_types.h"
 #include "expr_cast.h"
 #include "invariant.h"
 #include "mathematical_types.h"
@@ -4748,6 +4749,31 @@ inline bool can_cast_expr<popcount_exprt>(const exprt &base)
 inline void validate_expr(const popcount_exprt &value)
 {
   validate_operands(value, 1, "popcount must have one operand");
+}
+
+class pointer_offset_exprt : public unary_exprt
+{
+  explicit pointer_offset_exprt(exprt pointer)
+    : unary_exprt(ID_pointer_offset, pointer, signed_size_type())
+  {
+    PRECONDITION(pointer.id() == ID_pointer);
+  }
+};
+
+inline pointer_offset_exprt &to_pointer_offset_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_pointer_offset);
+  PRECONDITION(expr.operands().size() == 1);
+  PRECONDITION(expr.op0().id() == ID_pointer);
+  return static_cast<pointer_offset_exprt &>(expr);
+}
+
+inline const pointer_offset_exprt &to_pointer_offset_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_pointer_offset);
+  PRECONDITION(expr.operands().size() == 1);
+  PRECONDITION(expr.op0().id() == ID_pointer);
+  return static_cast<const pointer_offset_exprt &>(expr);
 }
 
 #endif // CPROVER_UTIL_STD_EXPR_H
