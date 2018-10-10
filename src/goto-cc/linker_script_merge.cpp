@@ -737,7 +737,7 @@ int linker_script_merget::linker_data_is_malformed(const jsont &data) const
     data["addresses"].is_array() &&
     std::all_of(data["addresses"].array.begin(),
                 data["addresses"].array.end(),
-                [](jsont j)
+                [](const jsont &j)
                 {
                   return j.is_object() &&
                          j.object.find("val")!=j.object.end() &&
@@ -747,7 +747,7 @@ int linker_script_merget::linker_data_is_malformed(const jsont &data) const
                 }) &&
     std::all_of(data["regions"].array.begin(),
                    data["regions"].array.end(),
-                   [](jsont j)
+                   [](const jsont &j)
                    {
                      return j.is_object() &&
                             j.object.find("start")!=j.object.end() &&
