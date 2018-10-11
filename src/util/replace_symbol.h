@@ -104,7 +104,7 @@ public:
 
   void insert(const symbol_exprt &old_expr, const exprt &new_expr);
 
-private:
+protected:
   bool replace_symbol_expr(symbol_exprt &dest) const override;
 };
 
