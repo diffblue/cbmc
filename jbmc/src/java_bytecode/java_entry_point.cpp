@@ -638,10 +638,8 @@ bool java_entry_point(
 /// \param message_handler: Where to write output to
 /// \param assume_init_pointers_not_null: When creating pointers, assume they
 ///   always take a non-null value.
-/// \param max_nondet_array_length: The length of the arrays to create when
-///   filling them
-/// \param max_nondet_tree_depth: defines the maximum depth of the object tree
-///   (see java_entry_points documentation for details)
+/// \param assert_uncaught_exceptions: Add an uncaught-exception check
+/// \param object_factory_parameters: Parameters for creation of arguments
 /// \param pointer_type_selector: Logic for substituting types of pointers
 /// \returns true if error occurred on entry point search, false otherwise
 bool generate_java_start_function(
