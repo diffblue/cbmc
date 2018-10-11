@@ -675,8 +675,6 @@ void goto_programt::instructiont::validate(
 {
   namespacet ns(table);
   std::vector<std::vector<std::string>> type_collector;
-  std::stringstream location_stream;
-  location_stream << source_location;
 
   auto type_finder = [&](const exprt &e) {
     if(e.id() == ID_symbol)
@@ -685,13 +683,14 @@ void goto_programt::instructiont::validate(
       const auto &symbol_id = symbol_expr.get_identifier();
 
       if(table.has_symbol(symbol_id))
-        DATA_CHECK(
+        DATA_CHECK_WITH_DIAGNOSTICS(
           base_type_eq(
             symbol_expr.type(), table.lookup_ref(symbol_id).type, ns),
-          id2string(symbol_id) + " type inconsistency (" +
-            location_stream.str() + ")\n" + "goto program type: " +
-            symbol_expr.type().id_string() + "\n " + "symbol table type: " +
-            table.lookup_ref(symbol_id).type.id_string());
+          id2string(symbol_id) + " type inconsistency\n" +
+            "goto program type: " + symbol_expr.type().id_string() + "\n " +
+            "symbol table type: " +
+            table.lookup_ref(symbol_id).type.id_string(),
+          source_location);
     }
   };
 
