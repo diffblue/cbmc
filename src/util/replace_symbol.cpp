@@ -119,7 +119,7 @@ bool replace_symbolt::replace(exprt &dest) const
 
 bool replace_symbolt::have_to_replace(const exprt &dest) const
 {
-  if(expr_map.empty())
+  if(empty())
     return false;
 
   // first look at type
@@ -132,7 +132,7 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
   if(dest.id()==ID_symbol)
   {
     const irep_idt &identifier = to_symbol_expr(dest).get_identifier();
-    return expr_map.find(identifier) != expr_map.end();
+    return replaces_symbol(identifier);
   }
 
   forall_operands(it, dest)
