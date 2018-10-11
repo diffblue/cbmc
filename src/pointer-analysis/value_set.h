@@ -306,12 +306,6 @@ public:
     const idt &identifier,
     const std::string &suffix);
 
-  /// Clears value set (not used in the CBMC repository)
-  void make_any()
-  {
-    values.clear();
-  }
-
   void clear()
   {
     values.clear();

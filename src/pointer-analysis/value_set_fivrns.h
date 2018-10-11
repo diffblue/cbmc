@@ -234,11 +234,6 @@ public:
     const idt &identifier,
     const std::string &suffix);
 
-  void make_any()
-  {
-    values.clear();
-  }
-
   void clear()
   {
     values.clear();
