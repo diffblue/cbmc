@@ -157,10 +157,10 @@ struct is_predecessor_oft
 // Helper routines for the find-initializers code below:
 
 /// See above
-/// `start`: Variable to find the predecessors of `predecessor_map`: Map from
-///   local variables to sets of predecessors
-/// \param Outputs: `result`: populated with all transitive predecessors of
-///   `start` found in `predecessor_map`
+/// \param start: Variable to find the predecessors of
+/// \param predecessor_map: Map from local variables to sets of predecessors
+/// \param [out] result: populated with all transitive predecessors of `start`
+///   found in `predecessor_map`
 static void gather_transitive_predecessors(
   local_variable_with_holest *start,
   const predecessor_mapt &predecessor_map,
@@ -176,8 +176,8 @@ static void gather_transitive_predecessors(
 }
 
 /// See above
-/// \par parameters: `inst`: Java bytecode instruction
-/// `slotidx`: local variable slot number
+/// \param inst: Java bytecode instruction
+/// \param slotidx: local variable slot number
 /// \return Returns true if `inst` is any form of store instruction targeting
 ///   slot `slotidx`
 static bool is_store_to_slot(
@@ -212,9 +212,9 @@ static bool is_store_to_slot(
 }
 
 /// See above
-/// \par parameters: `from`, `to`: bounds of a gap in `var`'s live range,
-/// inclusive and exclusive respectively
-/// \return Adds a hole to `var`, unless it would be of zero size.
+/// \param from: bound of a gap in `var`'s live range (inclusive)
+/// \param to: bound of a gap in `var`'s live range (exclusive)
+/// \param [out] var: A hole is added to `var`, unless it would be of zero size
 static void maybe_add_hole(
   local_variable_with_holest &var,
   java_bytecode_convert_methodt::method_offsett from,
@@ -228,9 +228,9 @@ static void maybe_add_hole(
 }
 
 /// See above
-/// \par parameters: `firstvar`-`varlimit`: range of local variable table
-/// entries to consider
-/// \return `live_variable_at_address` is populated with a sequence of local
+/// \param firstvar: start of range of local variable table entries to consider
+/// \param varlimit: end of range of local variable table entries to consider
+/// \param [out] live_variable_at_address: populated with a sequence of local
 ///   variable table entry pointers, such that `live_variable_at_address[addr]`
 ///   yields the unique table entry covering that address. Asserts if entries
 ///   overlap.
@@ -277,6 +277,8 @@ static void populate_variable_address_map(
 ///   method
 /// \param [out] predecessor_map:
 ///   the output of the function, populated as described above
+/// \param msg_handler:
+///   for reporting warnings
 static void populate_predecessor_map(
   local_variable_table_with_holest::iterator firstvar,
   local_variable_table_with_holest::iterator varlimit,
@@ -417,9 +419,8 @@ static void populate_predecessor_map(
 
 /// Used to find out where to put a variable declaration that subsumes several
 /// variable live ranges.
-/// \par parameters: `merge_vars`: Set of variables we want the common dominator
-///   for.
-/// `dominator_analysis`: Already-initialized dominator tree
+/// \param merge_vars: Set of variables we want the common dominator for
+/// \param dominator_analysis: Already-initialized dominator tree
 /// \return Returns the bytecode address of the closest common dominator of all
 ///   given variable table entries. In the worst case the function entry point
 ///   should always satisfy this criterion.
@@ -475,13 +476,13 @@ static java_bytecode_convert_methodt::method_offsett get_common_dominator(
 }
 
 /// See above
-/// \par parameters: `merge_vars`: a set of 2+ variable table entries to merge
-/// `expanded_live_range_start`: address where the merged variable will be
+/// \param merge_vars: a set of 2+ variable table entries to merge
+/// \param expanded_live_range_start: address where the merged variable will be
 ///   declared
-/// \return Adds holes to `merge_into`, indicating where gaps in the variable's
-///   live range fall. For example, if the declaration happens at address 10 and
-///   the entries in `merge_into` have live ranges [(20-30), (40-50)] then holes
-///   will be added at (10-20) and (30-40).
+/// \param [out] merge_into: Holes are added to `merge_into`, indicating where
+///   gaps in the variable's live range fall. For example, if the declaration
+///   happens at address 10 and the entries in `merge_into` have live ranges
+///   [(20-30), (40-50)] then holes will be added at (10-20) and (30-40).
 static void populate_live_range_holes(
   local_variable_with_holest &merge_into,
   const std::set<local_variable_with_holest *> &merge_vars,
@@ -507,12 +508,13 @@ static void populate_live_range_holes(
 }
 
 /// See above
-/// \par parameters: `merge_vars`: a set of 2+ variable table entries to merge
-/// `dominator_analysis`: already-calculated dominator tree
-/// \return Populates `merge_into` as a combined variable table entry, with live
-///   range holes if the `merge_vars` entries do not cover a contiguous address
-///   range, beginning the combined live range at the common dominator of all
-///   `merge_vars`.
+/// \param merge_vars: a set of 2+ variable table entries to merge
+/// \param dominator_analysis: already-calculated dominator tree
+/// \param [out] merge_into: Populated as a combined variable table entry, with
+///   live range holes if the `merge_vars` entries do not cover a contiguous
+///   address range, beginning the combined live range at the common dominator
+///   of all `merge_vars`.
+/// \param debug_out: stream for debug output
 static void merge_variable_table_entries(
   local_variable_with_holest &merge_into,
   const std::set<local_variable_with_holest *> &merge_vars,
@@ -561,12 +563,14 @@ static void merge_variable_table_entries(
 /// entry with holes, such that after combination we can create a single
 /// GOTO variable per variable table entry, placed at the live range's start
 /// address, which may be moved back so that the declaration dominates all uses.
-/// \par parameters: `firstvar`-`varlimit`: sequence of variable table entries,
+/// Side-effect: merges variable table entries which flow into one another
+/// (e.g. there are branches from one live range to another without
+/// re-initializing the local slot).
+/// \param firstvar: start of sequence of variable table entries,
 ///   all of which should concern the same slot index.
-/// `amap`: Map from bytecode address to instruction
-/// \return Side-effect: merges variable table entries which flow into one
-///   another (e.g. there are branches from one live range to another without
-///   re-initializing the local slot).
+/// \param varlimit: end of sequence of variable table entries
+/// \param amap: map from bytecode address to instruction
+/// \param dominator_analysis: already-calculated dominator tree
 void java_bytecode_convert_methodt::find_initializers_for_slot(
   local_variable_table_with_holest::iterator firstvar,
   local_variable_table_with_holest::iterator varlimit,
@@ -635,11 +639,11 @@ void java_bytecode_convert_methodt::find_initializers_for_slot(
 
 /// Walk a vector, a contiguous block of entries with equal slot index at a
 /// time.
-/// \par parameters: `it1` and `it2`, which are iterators into the same vector,
-/// of which `itend` is the end() iterator.
-/// \return Moves `it1` and `it2` to delimit a sequence of variable table
-///   entries with slot index equal to it2->var.index on entering this function,
-///   or to both equal itend if it2==itend on entry.
+/// `it1` and `it2` are iterators into the same vector, of which `itend` is the
+/// end() iterator.
+/// `it1` and `it2` are moved to delimit a sequence of variable table
+/// entries with slot index equal to it2->var.index on entering this function,
+/// or to both equal itend if it2==itend on entry.
 static void walk_to_next_index(
   local_variable_table_with_holest::iterator &it1,
   local_variable_table_with_holest::iterator &it2,
@@ -659,11 +663,11 @@ static void walk_to_next_index(
 }
 
 /// See `find_initializers_for_slot` above for more detail.
-/// \par parameters: `vars`: Local variable table
-/// `amap`: Map from bytecode index to instruction
-/// `dominator_analysis`: Already computed dominator tree for the Java function
-///   described by `amap`
-/// \return Combines entries in `vars` which flow together
+/// Combines entries in `vars` which flow together.
+/// \param vars: Local variable table
+/// \param amap: Map from bytecode index to instruction
+/// \param dominator_analysis: Already computed dominator tree for the Java
+///   function described by `amap`
 void java_bytecode_convert_methodt::find_initializers(
   local_variable_table_with_holest &vars,
   const address_mapt &amap,
@@ -682,9 +686,9 @@ void java_bytecode_convert_methodt::find_initializers(
     find_initializers_for_slot(it1, it2, amap, dominator_analysis);
 }
 
-/// See above
-/// \par parameters: `vars_with_holes`: variable table
-/// \return Removes zero-size entries from `vars_with_holes`
+/// See above.
+/// Removes zero-size entries from `vars_with_holes`.
+/// \param vars_with_holes: variable table
 static void cleanup_var_table(
   std::vector<local_variable_with_holest> &vars_with_holes)
 {
@@ -708,11 +712,11 @@ static void cleanup_var_table(
 }
 
 /// See `find_initializers_for_slot` above for more detail.
-/// \par parameters: `m`: Java method
-/// `amap`: Map from bytecode indices to instructions in `m`
-/// \return Populates `this->vars_with_holes` equal to
-///   `this->local_variable_table`, only with variable table entries that flow
-///   together combined. Also symbol-table registers all locals.
+/// Populates `this->vars_with_holes` equal to `this->local_variable_table`,
+/// only with variable table entries that flow together combined. Also
+/// symbol-table registers all locals.
+/// \param m: Java method
+/// \param amap: Map from bytecode indices to instructions in `m`
 void java_bytecode_convert_methodt::setup_local_variables(
   const methodt &m,
   const address_mapt &amap)
@@ -825,8 +829,8 @@ void java_bytecode_convert_methodt::setup_local_variables(
 }
 
 /// See above
-/// \par parameters: `address`: Address to find a variable table entry for
-/// `var_list`: List of candidates that use the slot we're interested in
+/// \param address: Address to find a variable table entry for
+/// \param var_list: List of candidates that use the slot we're interested in
 /// \return Returns the list entry covering this address (taking live range
 ///   holes into account), or creates/returns an anonymous variable entry if
 ///   nothing covers `address`.
