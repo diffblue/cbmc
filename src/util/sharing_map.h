@@ -341,7 +341,7 @@ protected:
 
   void iterate(
     const baset &n,
-    const unsigned depth,
+    const unsigned start_depth,
     std::function<void(const key_type &k, const mapped_type &m)> f) const;
 
   void gather_all(const baset &n, const unsigned depth, delta_viewt &delta_view)
@@ -375,13 +375,13 @@ protected:
 SHARING_MAPT(void)
 ::iterate(
   const baset &n,
-  unsigned depth,
+  unsigned start_depth,
   std::function<void(const key_type &k, const mapped_type &m)> f) const
 {
   typedef std::pair<unsigned, const baset *> stack_itemt;
 
   std::stack<stack_itemt> stack;
-  stack.push({depth, &n});
+  stack.push({start_depth, &n});
 
   do
   {

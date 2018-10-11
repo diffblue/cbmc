@@ -100,13 +100,13 @@ std::set<exprt> full_index_set(const array_string_exprt &s)
 }
 
 /// Create the cartesian product of two sets.
-template<class T, class U>
-std::set<std::pair<T, U>> product(const std::set<T> ts, const std::set<U> us)
+template <class X, class Y>
+std::set<std::pair<X, Y>> product(const std::set<X> xs, const std::set<Y> ys)
 {
-  std::set<std::pair<T, U>> s;
-  for(const auto &t : ts)
-    for(const auto &u : us)
-      s.insert(std::pair<T, U>(t, u));
+  std::set<std::pair<X, Y>> s;
+  for(const auto &x : xs)
+    for(const auto &y : ys)
+      s.insert(std::pair<X, Y>(x, y));
   return s;
 }
 

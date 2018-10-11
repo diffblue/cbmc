@@ -50,7 +50,7 @@ public:
   /// If this function returns true, the entire expression should be replaced by
   /// a pointer whose underlying symbol is the symbol returned by
   /// replacement_predicatet::inner_symbol().
-  const bool match(const exprt &expr, const namespacet &ns) const
+  bool match(const exprt &expr, const namespacet &ns) const
   {
     return _match(expr, ns);
   };

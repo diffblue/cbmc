@@ -39,7 +39,7 @@ get_all_generic_parameters(const typet &type)
 /// on destruction; otherwise do nothing.
 /// \param parameters generic parameters that are the keys of the pairs to add
 /// \param types a type to add for each parameter
-const void generic_parameter_specialization_map_keyst::insert_pairs(
+void generic_parameter_specialization_map_keyst::insert_pairs(
   const std::vector<java_generic_parametert> &parameters,
   const std::vector<reference_typet> &types)
 {
@@ -90,7 +90,7 @@ const void generic_parameter_specialization_map_keyst::insert_pairs(
 /// \param pointer_type pointer type to get the specialized generic types from
 /// \param pointer_subtype_struct struct type to which the generic pointer
 /// points, must be generic if the pointer is generic
-const void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
+void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
   const pointer_typet &pointer_type,
   const typet &pointer_subtype_struct)
 {
@@ -139,7 +139,7 @@ const void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
 /// \param symbol_type symbol type to get the specialized generic types from
 /// \param symbol_struct struct type of the symbol type, must be generic if
 /// the symbol is generic
-const void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
+void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
   const symbol_typet &symbol_type,
   const typet &symbol_struct)
 {
