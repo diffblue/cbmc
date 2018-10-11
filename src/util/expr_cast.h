@@ -48,16 +48,6 @@ inline bool can_cast_type(const typet &base);
 /// validate objects in this way at any time.
 inline void validate_expr(const exprt &) {}
 
-/// Called after casting.  Provides a point to check data invariants on the
-/// structure of the typet. By default, this is a no-op, but you can provide an
-/// overload to validate particular types. Should always succeed unless the
-/// program has entered an invalid state. We validate objects at cast time as
-/// that is when these checks have been used historically, but it would be
-/// reasonable to validate objects in this way at any time.
-inline void validate_type(const typet &)
-{
-}
-
 namespace detail // NOLINT
 {
 
@@ -129,9 +119,8 @@ auto type_try_dynamic_cast(TType &base) ->
     "The template argument T must be derived from typet.");
   if(!can_cast_type<typename std::remove_const<T>::type>(base))
     return nullptr;
-  const auto ret = static_cast<returnt>(&base);
-  validate_type(*ret);
-  return ret;
+  TType::check(base);
+  return static_cast<returnt>(&base);
 }
 
 namespace detail // NOLINT

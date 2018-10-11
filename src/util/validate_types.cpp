@@ -24,13 +24,33 @@ Author: Daniel Poetzl
 template <template <typename, typename> class C, typename... Args>
 void call_on_type(const typet &type, Args &&... args)
 {
-  if(type.id() == ID_signedbv)
+  if(type.id() == ID_bv)
   {
-    CALL_ON_TYPE(signedbv_typet);
+    CALL_ON_TYPE(bv_typet);
   }
   else if(type.id() == ID_unsignedbv)
   {
     CALL_ON_TYPE(unsignedbv_typet);
+  }
+  else if(type.id() == ID_signedbv)
+  {
+    CALL_ON_TYPE(signedbv_typet);
+  }
+  else if(type.id() == ID_fixedbv)
+  {
+    CALL_ON_TYPE(fixedbv_typet);
+  }
+  else if(type.id() == ID_floatbv)
+  {
+    CALL_ON_TYPE(floatbv_typet);
+  }
+  else if(type.id() == ID_pointer)
+  {
+    CALL_ON_TYPE(pointer_typet);
+  }
+  else if(type.id() == ID_c_bool)
+  {
+    CALL_ON_TYPE(c_bool_typet);
   }
   else
   {
