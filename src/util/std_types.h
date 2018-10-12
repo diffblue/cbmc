@@ -775,22 +775,22 @@ public:
   typedef std::vector<parametert> parameterst;
 
   /// Constructs a new code type, i.e., function type.
-  /// \param _parameters The vector of function parameters.
-  /// \param _return_type The return type.
-  code_typet(parameterst &&_parameters, typet &&_return_type) : typet(ID_code)
+  /// \param parameters The vector of function parameters.
+  /// \param return_type The return type.
+  code_typet(parameterst &&parameters, typet &&return_type) : typet(ID_code)
   {
-    parameters().swap(_parameters);
-    return_type().swap(_return_type);
+    parameters().swap(parameters);
+    return_type().swap(return_type);
   }
 
   /// Constructs a new code type, i.e., function type.
-  /// \param _parameters The vector of function parameters.
-  /// \param _return_type The return type.
-  code_typet(parameterst &&_parameters, const typet &_return_type)
+  /// \param parameters The vector of function parameters.
+  /// \param return_type The return type.
+  code_typet(parameterst &&parameters, const typet &return_type)
     : typet(ID_code)
   {
-    parameters().swap(_parameters);
-    return_type() = _return_type;
+    parameters().swap(parameters);
+    return_type() = return_type;
   }
 
   /// \deprecated

@@ -478,9 +478,9 @@ class recursion_set_entryt
 public:
   /// Initialize a recursion-set entry owner operating on a given set.
   /// Initially it does not own any set entry.
-  /// \param _recursion_set: set to operate on.
-  explicit recursion_set_entryt(std::unordered_set<irep_idt> &_recursion_set)
-    : recursion_set(_recursion_set)
+  /// \param recursion_set: set to operate on.
+  explicit recursion_set_entryt(std::unordered_set<irep_idt> &recursion_set)
+    : recursion_set(recursion_set)
   { }
 
   /// Removes erase_entry (if set) from the controlled set.
