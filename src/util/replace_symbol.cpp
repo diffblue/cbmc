@@ -323,17 +323,16 @@ bool address_of_aware_replace_symbolt::replace(exprt &dest) const
 bool address_of_aware_replace_symbolt::replace_symbol_expr(
   symbol_exprt &s) const
 {
-  expr_mapt::const_iterator it = expr_map.find(s.get_identifier());
-
-  if(it == expr_map.end())
+  symbol_exprt s_copy = s;
+  if(unchecked_replace_symbolt::replace_symbol_expr(s_copy))
     return true;
 
-  const exprt &e = it->second;
-
-  if(require_lvalue && !is_lvalue(e))
+  if(require_lvalue && !is_lvalue(s_copy))
     return true;
 
-  static_cast<exprt &>(s) = e;
+  // Note s_copy is no longer a symbol_exprt due to the replace operation,
+  // and after this line `s` won't be either
+  s = s_copy;
 
   return false;
 }
