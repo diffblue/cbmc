@@ -8,18 +8,14 @@ jobs:
       env: NAME="clang-format"
       addons:
         apt:
+          sources:
+            - llvm-toolchain-trusty-6.0
           packages:
-            - clang-format-3.8
+            - clang-format-6.0
       install:
       script: |
-        # Apparently update-alternatives doesn't work in Travis containers
-        mkdir -p priority-symlinks
-        ln -s /usr/bin/clang-format-3.8 priority-symlinks/clang-format
-        export PATH=${PWD}/priority-symlinks:${PATH}
-
-        # Now we can do the formatting pass
         clang-format --version
-        git-clang-format-3.8 "${TRAVIS_BRANCH}"
+        git-clang-format-6.0 --binary clang-format-6.0 "${TRAVIS_BRANCH}"
         git diff > formatted.diff
         if [[ -s formatted.diff ]] ; then
           echo 'Formatting error! The following diff shows the required changes'
