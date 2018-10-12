@@ -26,6 +26,7 @@ void show_loop_ids(
 
 void show_loop_ids(
   ui_message_handlert::uit,
+  const irep_idt &function_identifier,
   const goto_programt &);
 
 #endif // CPROVER_GOTO_PROGRAMS_LOOP_IDS_H
