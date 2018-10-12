@@ -86,6 +86,21 @@ protected:
 
 private:
   std::vector<cfgt::node_indext>
+    backward_outwards_walk_from(std::vector<cfgt::node_indext>);
+
+  void backward_inwards_walk_from(std::vector<cfgt::node_indext>);
+
+  std::vector<cfgt::node_indext>
+    forward_outwards_walk_from(std::vector<cfgt::node_indext>);
+
+  void forward_inwards_walk_from(std::vector<cfgt::node_indext>);
+
+  void forward_walk_call_instruction(
+    const cfgt::nodet &call_node,
+    std::vector<cfgt::node_indext> &callsite_successor_stack,
+    std::vector<cfgt::node_indext> &callee_head_stack);
+
+  std::vector<cfgt::node_indext>
   get_sources(const is_threadedt &is_threaded, slicing_criteriont &criterion);
 };
 
