@@ -227,12 +227,13 @@ bool exprt::is_one() const
 {
   if(is_constant())
   {
-    const std::string &value=get_string(ID_value);
-    const irep_idt &type_id=type().id_string();
+    const auto &constant_expr = to_constant_expr(*this);
+    const irep_idt &type_id = type().id();
 
     if(type_id==ID_integer || type_id==ID_natural)
     {
-      mp_integer int_value=string2integer(value);
+      mp_integer int_value =
+        string2integer(id2string(constant_expr.get_value()));
       if(int_value==1)
         return true;
     }
@@ -245,18 +246,19 @@ bool exprt::is_one() const
     }
     else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
     {
-      mp_integer int_value = bv2integer(value, false);
+      mp_integer int_value =
+        bv2integer(id2string(constant_expr.get_value()), false);
       if(int_value==1)
         return true;
     }
     else if(type_id==ID_fixedbv)
     {
-      if(fixedbvt(to_constant_expr(*this))==1)
+      if(fixedbvt(constant_expr) == 1)
         return true;
     }
     else if(type_id==ID_floatbv)
     {
-      if(ieee_floatt(to_constant_expr(*this))==1)
+      if(ieee_floatt(constant_expr) == 1)
         return true;
     }
   }
