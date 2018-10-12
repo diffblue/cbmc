@@ -63,7 +63,6 @@ incorrect_goto_program_exceptiont::incorrect_goto_program_exceptiont(
 
 std::string incorrect_goto_program_exceptiont::what() const
 {
-  return message + " (at: " + source_location.as_string() + ")";
   if(source_location.is_nil())
     return message;
   else
