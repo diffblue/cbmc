@@ -226,7 +226,7 @@ void collect_open_variables(
 
 /// Slice the symex trace with respect to a list of expressions
 /// \param equation: symex trace to be sliced
-/// \param expression: list of expressions, targets for slicing
+/// \param expressions: list of expressions, targets for slicing
 /// \return None. But equation is modified as a side-effect.
 void slice(
   symex_target_equationt &equation,

@@ -19,9 +19,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_util.h"
 
+/// Generate code to copy the parent.
+/// \param source_location: location for generated code
 /// \param parent_base_name: base name of typechecked parent
-/// \param block: non-typechecked block
-/// \return generate code to copy the parent
+/// \param arg_name: name of argument that is being copied
+/// \param [out] block: non-typechecked block
 static void copy_parent(
   const source_locationt &source_location,
   const irep_idt &parent_base_name,
@@ -48,9 +50,11 @@ static void copy_parent(
   block.operands().push_back(code);
 }
 
+/// Generate code to copy the member.
+/// \param source_location: location for generated code
 /// \param member_base_name: name of a member
-/// \param block: non-typechecked block
-/// \return generate code to copy the member
+/// \param arg_name: name of argument that is being copied
+/// \param [out] block: non-typechecked block
 static void copy_member(
   const source_locationt &source_location,
   const irep_idt &member_base_name,
@@ -75,10 +79,12 @@ static void copy_member(
   block.operands().push_back(code);
 }
 
+/// Generate code to copy the member.
+/// \param source_location: location for generated code
 /// \param member_base_name: name of array member
-/// \param index: index to copy
-/// \param block: non-typechecked block
-/// \return generate code to copy the member
+/// \param i: index to copy
+/// \param arg_name: name of argument that is being copied
+/// \param [out] block: non-typechecked block
 static void copy_array(
   const source_locationt &source_location,
   const irep_idt &member_base_name,
