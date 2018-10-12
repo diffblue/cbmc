@@ -219,13 +219,12 @@ static exprt int_of_hex_char(const exprt &chr)
 
 /// Add axioms stating that the string `res` corresponds to the integer
 /// argument written in hexadecimal.
-/// \deprecated use add_axioms_from_int which takes a radix argument instead
+/// \deprecated use add_axioms_from_int_with_radix instead
 /// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param i: an integer argument
 /// \return code 0 on success
-DEPRECATED(
-  "use add_axioms_for_string_of_int which takes a radix argument instead")
+DEPRECATED("use add_axioms_for_string_of_int_with_radix instead")
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
