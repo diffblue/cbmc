@@ -60,6 +60,9 @@ include("${CBMC_SOURCE_DIR}/../cmake/DownloadProject.cmake")
 if("${sat_impl}" STREQUAL "minisat2")
     message(STATUS "Building solvers with minisat2")
 
+    # once we upgrade to CMake 3.7 or higher we can specify multiple URLs as a
+    # fall-back in case the first URL fails (the Makefile-based build retries up
+    # to 2 times)
     download_project(PROJ minisat2
         URL http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
         PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/../scripts/minisat-2.2.1-patch
