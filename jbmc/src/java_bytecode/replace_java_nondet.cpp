@@ -323,6 +323,9 @@ static void replace_java_nondet(goto_programt &goto_program)
   }
 }
 
+/// Replace calls to nondet library functions with an internal nondet
+/// representation in a single function.
+/// \param function: The goto program to modify.
 void replace_java_nondet(goto_model_functiont &function)
 {
   goto_programt &program = function.get_goto_function().body;
@@ -341,6 +344,9 @@ void replace_java_nondet(goto_functionst &goto_functions)
   remove_skip(goto_functions);
 }
 
+/// Replace calls to nondet library functions with an internal nondet
+/// representation.
+/// \param goto_model: The goto program to modify.
 void replace_java_nondet(goto_modelt &goto_model)
 {
   replace_java_nondet(goto_model.goto_functions);
