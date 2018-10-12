@@ -130,7 +130,6 @@ private:
 /// Output the class hierarchy
 /// \param hierarchy: the class hierarchy to be printed
 /// \param message_handler: the message handler
-/// \param ui: the UI format
 /// \param children_only: print the children only and do not print the parents
 void show_class_hierarchy(
   const class_hierarchyt &hierarchy,

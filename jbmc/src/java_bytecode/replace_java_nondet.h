@@ -19,7 +19,7 @@ class goto_model_functiont;
 /// Replace calls to nondet library functions with an internal nondet
 /// representation.
 /// \param goto_model: The goto program to modify.
-void replace_java_nondet(goto_modelt &);
+void replace_java_nondet(goto_modelt &goto_model);
 
 void replace_java_nondet(goto_functionst &);
 

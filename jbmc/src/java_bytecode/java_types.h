@@ -249,19 +249,19 @@ public:
   using code_typet::parametert;
 
   /// Constructs a new code type, i.e. method type
-  /// \param _parameters: the vector of method parameters
-  /// \param _return_type: the return type
-  java_method_typet(parameterst &&_parameters, typet &&_return_type)
-    : code_typet(std::move(_parameters), std::move(_return_type))
+  /// \param parameters: the vector of method parameters
+  /// \param return_type: the return type
+  java_method_typet(parameterst &&parameters, typet &&return_type)
+    : code_typet(std::move(parameters), std::move(return_type))
   {
     set(ID_C_java_method_type, true);
   }
 
   /// Constructs a new code type, i.e. method type
-  /// \param _parameters: the vector of method parameters
-  /// \param _return_type: the return type
-  java_method_typet(parameterst &&_parameters, const typet &_return_type)
-    : code_typet(std::move(_parameters), _return_type)
+  /// \param parameters: the vector of method parameters
+  /// \param return_type: the return type
+  java_method_typet(parameterst &&parameters, const typet &return_type)
+    : code_typet(std::move(parameters), return_type)
   {
     set(ID_C_java_method_type, true);
   }
@@ -695,7 +695,7 @@ inline typet java_type_from_string_with_exception(
 }
 
 /// Get the index in the subtypes array for a given component.
-/// \param t The type we search for the subtypes in.
+/// \param gen_types The subtypes array.
 /// \param identifier The string identifier of the type of the component.
 /// \return Optional with the size if the identifier was found.
 inline const optionalt<size_t> java_generics_get_index_for_subtype(
