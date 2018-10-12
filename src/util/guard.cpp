@@ -40,27 +40,6 @@ void guardt::guard_expr(exprt &dest) const
   }
 }
 
-#if 0
-exprt guardt::as_expr(guard_listt::const_iterator it) const
-{
-  if(it==guard_list.end())
-    return true_exprt();
-  else if(it==--guard_list.end())
-    return guard_list.back();
-
-  exprt dest;
-  dest=exprt(ID_and, typet(ID_bool));
-  dest.reserve_operands(guard_list.size());
-  for(; it!=guard_list.end(); it++)
-  {
-    PRECONDITION(it->is_boolean());
-    dest.copy_to_operands(*it);
-  }
-
-  return dest;
-}
-#endif
-
 void guardt::add(const exprt &expr)
 {
   PRECONDITION(expr.type().id() == ID_bool);
@@ -202,32 +181,3 @@ guardt &operator |= (guardt &g1, const guardt &g2)
 
   return g1;
 }
-
-#if 0
-std::ostream &operator << (std::ostream &out, const guardt &g)
-{
-  forall_expr_list(it, g.guard_list)
-    out << "*** " << it->pretty() << '\n';
-  return out;
-}
-
-#define forall_guard(it, guard_list) \
-  for(guardt::guard_listt::const_iterator it=(guard_list).begin(); \
-      it!=(guard_list).end(); ++it)
-
-bool guardt::is_false() const
-{
-  forall_guard(it, guard_list)
-    if(it->is_false())
-      return true;
-
-  return false;
-}
-
-void guardt::make_false()
-{
-  guard_list.clear();
-  guard_list.push_back(exprt());
-  guard_list.back()=false_exprt();
-}
-#endif
