@@ -217,6 +217,13 @@ json_objectt json(
   return result;
 }
 
+static std::string binary(const constant_exprt &src)
+{
+  const auto width = to_bitvector_type(src.type()).get_width();
+  const auto int_val = bv2integer(id2string(src.get_value()), width, false);
+  return integer2binary(int_val, width);
+}
+
 /// Output a CBMC expression in json.
 /// The mode is used to correctly report types.
 /// \param expr: an expression
@@ -263,7 +270,7 @@ json_objectt json(
       std::size_t width=to_bitvector_type(type).get_width();
 
       result["name"]=json_stringt("integer");
-      result["binary"] = json_stringt(constant_expr.get_value());
+      result["binary"] = json_stringt(binary(constant_expr));
       result["width"]=json_numbert(std::to_string(width));
       result["type"]=json_stringt(type_string);
       result["data"]=json_stringt(value_string);
@@ -271,7 +278,7 @@ json_objectt json(
     else if(type.id()==ID_c_enum)
     {
       result["name"]=json_stringt("integer");
-      result["binary"] = json_stringt(constant_expr.get_value());
+      result["binary"] = json_stringt(binary(constant_expr));
       result["width"] =
         json_numbert(to_c_enum_type(type).subtype().get_string(ID_width));
       result["type"]=json_stringt("enum");
@@ -287,13 +294,13 @@ json_objectt json(
     else if(type.id()==ID_bv)
     {
       result["name"]=json_stringt("bitvector");
-      result["binary"] = json_stringt(constant_expr.get_value());
+      result["binary"] = json_stringt(binary(constant_expr));
     }
     else if(type.id()==ID_fixedbv)
     {
       result["name"]=json_stringt("fixed");
       result["width"]=json_numbert(type.get_string(ID_width));
-      result["binary"] = json_stringt(constant_expr.get_value());
+      result["binary"] = json_stringt(binary(constant_expr));
       result["data"]=
         json_stringt(fixedbvt(to_constant_expr(expr)).to_ansi_c_string());
     }
@@ -301,7 +308,7 @@ json_objectt json(
     {
       result["name"]=json_stringt("float");
       result["width"]=json_numbert(type.get_string(ID_width));
-      result["binary"] = json_stringt(constant_expr.get_value());
+      result["binary"] = json_stringt(binary(constant_expr));
       result["data"]=
         json_stringt(ieee_floatt(to_constant_expr(expr)).to_ansi_c_string());
     }
