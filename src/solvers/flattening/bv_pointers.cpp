@@ -633,7 +633,11 @@ exprt bv_pointerst::bv_get_rec(
   // we treat these like bit-vector constants, but with
   // some additional annotation
 
-  constant_exprt result(value, type);
+  const irep_idt bvrep = make_bvrep(bits, [&value](std::size_t i) {
+    return value[value.size() - 1 - i] == '1';
+  });
+
+  constant_exprt result(bvrep, type);
 
   pointer_logict::pointert pointer;
   pointer.object=integer2size_t(binary2integer(value_addr, false));
