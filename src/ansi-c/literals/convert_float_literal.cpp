@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/ieee_float.h>
@@ -85,12 +84,13 @@ exprt convert_float_literal(const std::string &src)
   else
     UNREACHABLE;
 
-  constant_exprt result(integer2bv(a.pack(), a.spec.width()), type);
+  const constant_exprt result = a.to_expr();
 
   if(parsed_float.is_imaginary)
   {
     const complex_typet complex_type(type);
-    return complex_exprt(from_integer(0, type), result, complex_type);
+    return complex_exprt(
+      ieee_floatt::zero(type).to_expr(), result, complex_type);
   }
 
   return result;
