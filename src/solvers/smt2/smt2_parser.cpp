@@ -975,6 +975,32 @@ typet smt2_parsert::sort()
         return nil_typet();
       }
     }
+    else if(buffer == "Array")
+    {
+      // this gets two sorts as arguments, domain and range
+      auto domain = sort();
+      auto range = sort();
+
+      // eat the ')'
+      if(next_token() != CLOSE)
+      {
+        error() << "expected ')' at end of Array sort" << eom;
+        return nil_typet();
+      }
+
+      // we can turn arrays that map an unsigned bitvector type
+      // to something else into our 'array_typet'
+      if(domain.id() == ID_unsignedbv)
+      {
+        const auto size = to_unsignedbv_type(domain).largest_expr();
+        return array_typet(range, size);
+      }
+      else
+      {
+        error() << "unsupported array sort" << eom;
+        return nil_typet();
+      }
+    }
     else
     {
       error() << "unexpected sort: `" << buffer << '\'' << eom;
