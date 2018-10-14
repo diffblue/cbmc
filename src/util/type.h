@@ -80,8 +80,6 @@ public:
 class type_with_subtypet:public typet
 {
 public:
-  type_with_subtypet() { }
-
   explicit type_with_subtypet(const irep_idt &_id):typet(_id) { }
   type_with_subtypet(const irep_idt &_id, const typet &_subtype):
     typet(_id)
