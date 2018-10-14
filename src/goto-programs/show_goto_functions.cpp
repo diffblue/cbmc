@@ -11,8 +11,6 @@ Author: Peter Schrammel
 
 #include "show_goto_functions.h"
 
-#include <iostream>
-
 #include <util/xml.h>
 #include <util/json.h>
 #include <util/json_expr.h>
