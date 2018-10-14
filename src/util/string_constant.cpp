@@ -52,20 +52,11 @@ array_exprt string_constantt::to_array_expr() const
     int ch=i==string_size-1?0:str[i];
 
     if(char_is_unsigned)
-      ch=(unsigned char)ch;
+      ch = (unsigned char)ch;
+    else
+      ch = (signed char)ch;
 
-    exprt &op=*it;
-
-    op=from_integer(ch, char_type);
-
-    if(ch>=32 && ch<=126)
-    {
-      std::string ch_str="'";
-      if(ch=='\'' || ch=='\\')
-        ch_str+='\\';
-      ch_str+=static_cast<char>(ch);
-      ch_str+="'";
-    }
+    *it = from_integer(ch, char_type);
   }
 
   return dest;
