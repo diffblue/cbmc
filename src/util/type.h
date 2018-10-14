@@ -112,11 +112,22 @@ inline type_with_subtypet &to_type_with_subtype(typet &type)
 class type_with_subtypest:public typet
 {
 public:
+  typedef std::vector<typet> subtypest;
+
   type_with_subtypest() { }
 
   explicit type_with_subtypest(const irep_idt &_id):typet(_id) { }
 
-  typedef std::vector<typet> subtypest;
+  type_with_subtypest(const irep_idt &_id, const subtypest &_subtypes)
+    : typet(_id)
+  {
+    subtypes() = _subtypes;
+  }
+
+  type_with_subtypest(const irep_idt &_id, subtypest &&_subtypes) : typet(_id)
+  {
+    subtypes() = std::move(_subtypes);
+  }
 
   subtypest &subtypes()
   {
