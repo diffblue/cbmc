@@ -75,7 +75,8 @@ void show_goto_functions(
           out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
 
           const symbolt &symbol = ns.lookup(fun.first);
-          out << symbol.display_name() << " /* " << symbol.name << " */\n";
+          out << messaget::bold << symbol.display_name() << messaget::reset
+              << " /* " << symbol.name << " */\n";
           fun.second.body.output(ns, symbol.name, out);
           msg.status() << messaget::eom;
         }
