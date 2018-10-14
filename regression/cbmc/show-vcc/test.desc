@@ -1,0 +1,11 @@
+CORE
+main.c
+--show-vcc
+^EXIT=0$
+^SIGNAL=0$
+^some property$
+^\{-.*\} a!0@1#1$
+^\{-.*\} b!0@1#1$
+^\{1\} c!0@1#1$
+^\{2\} d!0@1#1$
+--
