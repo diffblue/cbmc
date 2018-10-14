@@ -2251,8 +2251,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     expr.swap(tmp);
 }
 
-/// \param type:checked arguments, type-checked function
-/// \return type-adjusted function arguments
+/// \param expr: function call whose arguments need to be checked
 void cpp_typecheckt::typecheck_function_call_arguments(
   side_effect_expr_function_callt &expr)
 {
