@@ -1722,9 +1722,9 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
   // byte extract of full object is object
   // don't do any of the following if endianness doesn't match, as
   // bytes need to be swapped
-  if(offset==0 &&
-     base_type_eq(expr.type(), expr.op().type(), ns) &&
-     byte_extract_id()!=expr.id())
+  if(
+    offset == 0 && base_type_eq(expr.type(), expr.op().type(), ns) &&
+    byte_extract_id() == expr.id())
   {
     exprt tmp=expr.op();
     expr.swap(tmp);
