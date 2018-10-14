@@ -303,40 +303,22 @@ public:
 
   /// return to default formatting,
   /// as defined by the terminal
-  static commandt reset()
-  {
-    return command(0);
-  }
+  static const commandt reset;
 
   /// render text with red foreground color
-  static commandt red()
-  {
-    return command(31);
-  }
+  static const commandt red;
 
   /// render text with green foreground color
-  static commandt green()
-  {
-    return command(32);
-  }
+  static const commandt green;
 
   /// render text with yellow foreground color
-  static commandt yellow()
-  {
-    return command(33);
-  }
+  static const commandt yellow;
 
   /// render text with blue foreground color
-  static commandt blue()
-  {
-    return command(34);
-  }
+  static const commandt blue;
 
   /// render text with bold font
-  static commandt bold()
-  {
-    return command(1);
-  }
+  static const commandt bold;
 
   /// render text with faint font
   static const commandt faint;
