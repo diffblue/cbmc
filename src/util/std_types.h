@@ -1122,29 +1122,14 @@ inline incomplete_array_typet &to_incomplete_array_type(typet &type)
 /// Superclass of anything represented by bits, for example integers (in 32
 /// or 64-bit representation), floating point numbers etc. In contrast, \ref
 /// integer_typet is a direct integer representation.
-class bitvector_typet:public type_with_subtypet
+class bitvector_typet : public typet
 {
 public:
-  explicit bitvector_typet(const irep_idt &_id):type_with_subtypet(_id)
+  explicit bitvector_typet(const irep_idt &_id) : typet(_id)
   {
   }
 
-  bitvector_typet(const irep_idt &_id, const typet &_subtype):
-    type_with_subtypet(_id, _subtype)
-  {
-  }
-
-  bitvector_typet(
-    const irep_idt &_id,
-    const typet &_subtype,
-    std::size_t width):
-    type_with_subtypet(_id, _subtype)
-  {
-    set_width(width);
-  }
-
-  bitvector_typet(const irep_idt &_id, std::size_t width):
-    type_with_subtypet(_id)
+  bitvector_typet(const irep_idt &_id, std::size_t width) : typet(_id)
   {
     set_width(width);
   }
@@ -1485,12 +1470,15 @@ inline floatbv_typet &to_floatbv_type(typet &type)
 }
 
 /// Type for C bit fields
+/// These are both 'bitvector_typet' (they have a width)
+/// and 'type_with_subtypet' (they have a subtype)
 class c_bit_field_typet:public bitvector_typet
 {
 public:
-  explicit c_bit_field_typet(const typet &subtype, std::size_t width):
-    bitvector_typet(ID_c_bit_field, subtype, width)
+  explicit c_bit_field_typet(const typet &_subtype, std::size_t width)
+    : bitvector_typet(ID_c_bit_field, width)
   {
+    subtype() = _subtype;
   }
 
   // These have a sub-type
@@ -1527,12 +1515,15 @@ inline c_bit_field_typet &to_c_bit_field_type(typet &type)
 }
 
 /// The pointer type
+/// These are both 'bitvector_typet' (they have a width)
+/// and 'type_with_subtypet' (they have a subtype)
 class pointer_typet:public bitvector_typet
 {
 public:
-  pointer_typet(const typet &_subtype, std::size_t width):
-    bitvector_typet(ID_pointer, _subtype, width)
+  pointer_typet(const typet &_subtype, std::size_t width)
+    : bitvector_typet(ID_pointer, width)
   {
+    subtype() = _subtype;
   }
 
   signedbv_typet difference_type() const
