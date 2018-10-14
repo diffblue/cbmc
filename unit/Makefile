@@ -43,6 +43,7 @@ SRC += analyses/ai/ai.cpp \
        util/replace_symbol.cpp \
        util/sharing_map.cpp \
        util/sharing_node.cpp \
+       util/simplify_expr.cpp \
        util/small_map.cpp \
        util/small_shared_two_way_ptr.cpp \
 			 util/std_expr.cpp \
