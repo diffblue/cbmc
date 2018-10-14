@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "format_expr.h"
 
 #include "arith_tools.h"
+#include "byte_operators.h"
 #include "expr.h"
 #include "expr_iterator.h"
 #include "fixedbv.h"
@@ -210,6 +211,22 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
   else if(id == ID_typecast)
     return os << "cast(" << format(to_typecast_expr(expr).op()) << ", "
               << format(expr.type()) << ')';
+  else if(
+    id == ID_byte_extract_little_endian || id == ID_byte_extract_big_endian)
+  {
+    const auto &byte_extract_expr = to_byte_extract_expr(expr);
+    return os << id << "(" << format(byte_extract_expr.op()) << ", "
+              << format(byte_extract_expr.offset()) << ", "
+              << format(byte_extract_expr.type()) << ')';
+  }
+  else if(id == ID_byte_update_little_endian || id == ID_byte_update_big_endian)
+  {
+    const auto &byte_update_expr = to_byte_update_expr(expr);
+    return os << id << "(" << format(byte_update_expr.op()) << ", "
+              << format(byte_update_expr.offset()) << ", "
+              << format(byte_update_expr.value()) << ", "
+              << format(byte_update_expr.type()) << ')';
+  }
   else if(id == ID_member)
     return os << format(to_member_expr(expr).op()) << '.'
               << to_member_expr(expr).get_component_name();
