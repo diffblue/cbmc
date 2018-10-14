@@ -83,9 +83,22 @@ void show_vcc_plain(
       out << u8"\u2500";
     out << '\n';
 
-    std::string string_value =
-      from_expr(ns, s_it->source.pc->function, s_it->cond_expr);
-    out << "{" << 1 << "} " << string_value << "\n";
+    // split property into multiple disjunts, if applicable
+    exprt::operandst disjuncts;
+
+    if(s_it->cond_expr.id() == ID_or)
+      disjuncts = to_or_expr(s_it->cond_expr).operands();
+    else
+      disjuncts.push_back(s_it->cond_expr);
+
+    std::size_t count = 1;
+    for(const auto &disjunct : disjuncts)
+    {
+      std::string string_value =
+        from_expr(ns, s_it->source.pc->function, disjunct);
+      out << "{" << count << "} " << string_value << "\n";
+      count++;
+    }
   }
 }
 
