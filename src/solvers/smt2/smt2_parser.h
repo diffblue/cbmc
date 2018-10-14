@@ -109,6 +109,7 @@ protected:
   };
 
   void ignore_command();
+  void datatype_declaration();
   exprt expression();
   exprt function_application();
   exprt function_application_ieee_float_op(

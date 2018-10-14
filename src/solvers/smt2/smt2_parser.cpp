@@ -1183,6 +1183,35 @@ typet smt2_parsert::function_signature_declaration()
   return mathematical_function_typet(domain, codomain);
 }
 
+/// process a datatype declaration (a Z3 extension)
+void smt2_parsert::datatype_declaration()
+{
+  if(next_token() != OPEN)
+    throw error("expected '(' after declare-datatypes");
+
+  while(peek() != CLOSE)
+  {
+    if(next_token() != SYMBOL)
+      throw error("expected symbol in datatype declaration");
+  }
+
+  next_token(); // eat the ')'
+
+  if(next_token() != OPEN)
+    throw error("expected '(' as second argument in datatype declaration");
+
+  while(peek() != CLOSE)
+  {
+    if(next_token() != OPEN)
+      throw error("expected '(' in datatype declaration");
+  }
+
+  next_token(); // eat the ')'
+
+  if(next_token() != CLOSE)
+    throw error("expected ')' at the end of datatype declaration");
+}
+
 void smt2_parsert::command(const std::string &c)
 {
   if(c == "declare-const" || c == "declare-var")
@@ -1201,6 +1230,10 @@ void smt2_parsert::command(const std::string &c)
     auto &entry = id_map[id];
     entry.type = type;
     entry.definition = nil_exprt();
+  }
+  else if(c == "declare-datatypes")
+  {
+    datatype_declaration();
   }
   else if(c=="declare-fun")
   {
