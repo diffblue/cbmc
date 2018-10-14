@@ -52,32 +52,27 @@ void show_goto_functions(
   break;
 
   case ui_message_handlert::uit::PLAIN:
-    if(list_only)
     {
       for(const auto &fun : goto_functions.function_map)
       {
         const symbolt &symbol = ns.lookup(fun.first);
-        msg.status() << '\n'
-                     << symbol.display_name() << " /* " << symbol.name
-                     << (fun.second.body_available() ? ""
-                                                     : ", body not available")
-                     << " */";
-        msg.status() << messaget::eom;
-      }
-    }
-    else
-    {
-      auto &out = msg.status();
-      for(const auto &fun : goto_functions.function_map)
-      {
-        if(fun.second.body_available())
+        const bool has_body = fun.second.body_available();
+
+        if(list_only)
         {
-          out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
+          msg.status() << '\n'
+                       << symbol.display_name() << " /* " << symbol.name
+                       << (has_body ? "" : ", body not available") << " */";
+          msg.status() << messaget::eom;
+        }
+        else if(has_body)
+        {
+          msg.status() << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
 
           const symbolt &symbol = ns.lookup(fun.first);
-          out << messaget::bold << symbol.display_name() << messaget::reset
-              << " /* " << symbol.name << " */\n";
-          fun.second.body.output(ns, symbol.name, out);
+          msg.status() << messaget::bold << symbol.display_name()
+                       << messaget::reset << " /* " << symbol.name << " */\n";
+          fun.second.body.output(ns, symbol.name, msg.status());
           msg.status() << messaget::eom;
         }
       }
