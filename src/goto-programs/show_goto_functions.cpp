@@ -62,14 +62,24 @@ void show_goto_functions(
                      << (fun.second.body_available() ? ""
                                                      : ", body not available")
                      << " */";
+        msg.status() << messaget::eom;
       }
-
-      msg.status() << messaget::eom;
     }
     else
     {
-      goto_functions.output(ns, msg.status());
-      msg.status() << messaget::eom;
+      auto &out = msg.status();
+      for(const auto &fun : goto_functions.function_map)
+      {
+        if(fun.second.body_available())
+        {
+          out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
+
+          const symbolt &symbol = ns.lookup(fun.first);
+          out << symbol.display_name() << " /* " << symbol.name << " */\n";
+          fun.second.body.output(ns, symbol.name, out);
+          msg.status() << messaget::eom;
+        }
+      }
     }
 
     break;
