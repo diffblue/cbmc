@@ -488,11 +488,7 @@ utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
   std::wstring out(length, '?');
 
   for(std::size_t i=0; i<arr.operands().size() && i<length; i++)
-  {
-    auto c = numeric_cast<unsigned>(to_constant_expr(arr.operands()[i]));
-    INVARIANT(c.has_value(), "constant should be convertible to unsigned");
-    out[i] = c.value();
-  }
+    out[i] = numeric_cast_v<unsigned>(to_constant_expr(arr.operands()[i]));
 
   return utf16_native_endian_to_java(out);
 }
