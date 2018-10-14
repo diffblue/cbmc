@@ -240,12 +240,6 @@ public:
       return *this;
     }
 
-    // for feeding in manipulator functions such as eom
-    mstreamt &operator << (mstreamt &(*func)(mstreamt &))
-    {
-      return func(*this);
-    }
-
   private:
     void assign_from(const mstreamt &other)
     {
@@ -257,9 +251,15 @@ public:
     friend class messaget;
   };
 
-  // Feeding 'eom' into the stream triggers
-  // the printing of the message
-  static mstreamt &eom(mstreamt &m)
+  // Feeding 'eom' into the stream triggers the printing of the message
+  // This is implemented as an I/O manipulator (compare to STL's endl).
+  class eomt
+  {
+  };
+
+  static eomt eom;
+
+  friend mstreamt &operator<<(mstreamt &m, eomt)
   {
     if(m.message.message_handler)
     {
@@ -275,55 +275,65 @@ public:
     return m;
   }
 
-  // in lieu of std::endl
-  static mstreamt &endl(mstreamt &m)
+  // This is an I/O manipulator (compare to STL's set_precision).
+  class commandt
   {
-    static_cast<std::ostream &>(m) << std::endl;
-    return m;
+  public:
+    explicit commandt(unsigned _command) : command(_command)
+    {
+    }
+
+    unsigned command;
+  };
+
+  /// feed a command into an mstreamt
+  friend mstreamt &operator<<(mstreamt &m, const commandt &c)
+  {
+    if(m.message.message_handler)
+      return m << m.message.message_handler->command(c.command);
+    else
+      return m;
   }
 
   /// \brief Create an ECMA-48 SGR (Select Graphic Rendition) command.
-  std::string command(unsigned c) const
+  static commandt command(unsigned c)
   {
-    if(message_handler)
-      return message_handler->command(c);
-    else
-      return std::string();
+    return commandt(c);
   }
 
   /// return to default formatting,
   /// as defined by the terminal
-  std::string reset() const
+  static commandt reset()
   {
     return command(0);
   }
 
   /// render text with red foreground color
-  std::string red() const
+  static commandt red()
   {
     return command(31);
   }
 
   /// render text with green foreground color
-  std::string green() const
+  static commandt green()
   {
     return command(32);
   }
 
   /// render text with yellow foreground color
-  std::string yellow() const
+  static commandt yellow()
   {
     return command(33);
   }
 
   /// render text with blue foreground color
-  std::string blue() const
+  static commandt blue()
   {
     return command(34);
   }
 
   /// render text with bold font
-  std::string bold() const
+  static commandt bold()
   {
     return command(1);
   }
