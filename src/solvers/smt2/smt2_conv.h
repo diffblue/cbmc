@@ -36,6 +36,7 @@ public:
   {
     GENERIC,
     BOOLECTOR,
+    CPROVER_SMT2,
     CVC3,
     CVC4,
     MATHSAT,
@@ -74,6 +75,11 @@ public:
       break;
 
     case solvert::BOOLECTOR:
+      break;
+
+    case solvert::CPROVER_SMT2:
+      use_array_of_bool = true;
+      emit_set_logic = false;
       break;
 
     case solvert::CVC3:

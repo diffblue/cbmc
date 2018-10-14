@@ -41,6 +41,8 @@ smt2_dect::solvert cbmc_solverst::get_smt2_solver_type() const
 
   if(options.get_bool_option("boolector"))
     s=smt2_dect::solvert::BOOLECTOR;
+  else if(options.get_bool_option("cprover-smt2"))
+    s = smt2_dect::solvert::CPROVER_SMT2;
   else if(options.get_bool_option("mathsat"))
     s=smt2_dect::solvert::MATHSAT;
   else if(options.get_bool_option("cvc3"))
