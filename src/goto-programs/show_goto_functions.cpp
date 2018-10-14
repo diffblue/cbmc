@@ -51,10 +51,13 @@ void show_goto_functions(
 
   case ui_message_handlert::uit::PLAIN:
     {
-      for(const auto &fun : goto_functions.function_map)
+      // sort alphabetically
+      const auto sorted = goto_functions.sorted();
+
+      for(const auto &fun : sorted)
       {
-        const symbolt &symbol = ns.lookup(fun.first);
-        const bool has_body = fun.second.body_available();
+        const symbolt &symbol = ns.lookup(fun->first);
+        const bool has_body = fun->second.body_available();
 
         if(list_only)
         {
@@ -67,10 +70,9 @@ void show_goto_functions(
         {
           msg.status() << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
 
-          const symbolt &symbol = ns.lookup(fun.first);
           msg.status() << messaget::bold << symbol.display_name()
                        << messaget::reset << " /* " << symbol.name << " */\n";
-          fun.second.body.output(ns, symbol.name, msg.status());
+          fun->second.body.output(ns, symbol.name, msg.status());
           msg.status() << messaget::eom;
         }
       }

@@ -43,10 +43,13 @@ xmlt show_goto_functions_xmlt::convert(
   const goto_functionst &goto_functions)
 {
   xmlt xml_functions=xmlt("functions");
-  for(const auto &function_entry : goto_functions.function_map)
+
+  const auto sorted = goto_functions.sorted();
+
+  for(const auto &function_entry : sorted)
   {
-    const irep_idt &function_name=function_entry.first;
-    const goto_functionst::goto_functiont &function=function_entry.second;
+    const irep_idt &function_name = function_entry->first;
+    const goto_functionst::goto_functiont &function = function_entry->second;
 
     xmlt &xml_function=xml_functions.new_element("function");
     xml_function.set_attribute("name", id2string(function_name));
