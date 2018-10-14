@@ -72,10 +72,6 @@ public:
     function_map.clear();
   }
 
-  void output(
-    const namespacet &ns,
-    std::ostream &out) const;
-
   void compute_location_numbers();
   void compute_location_numbers(goto_programt &);
   void compute_loop_numbers();

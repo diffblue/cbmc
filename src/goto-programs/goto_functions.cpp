@@ -13,25 +13,6 @@ Date: June 2003
 
 #include "goto_functions.h"
 
-void goto_functionst::output(
-  const namespacet &ns,
-  std::ostream &out) const
-{
-  for(const auto &fun : function_map)
-  {
-    if(fun.second.body_available())
-    {
-      out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
-
-      const symbolt &symbol=ns.lookup(fun.first);
-      out << symbol.display_name() << " /* " << symbol.name << " */\n";
-      fun.second.body.output(ns, symbol.name, out);
-
-      out << std::flush;
-    }
-  }
-}
-
 void goto_functionst::compute_location_numbers()
 {
   unused_location_number = 0;
