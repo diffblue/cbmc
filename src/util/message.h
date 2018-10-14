@@ -338,6 +338,15 @@ public:
     return command(1);
   }
 
+  /// render text with faint font
+  static const commandt faint;
+
+  /// render italic text
+  static const commandt italic;
+
+  /// render underlined text
+  static const commandt underline;
+
   mstreamt &get_mstream(unsigned message_level) const
   {
     mstream.message_level=message_level;
