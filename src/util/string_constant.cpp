@@ -70,38 +70,3 @@ array_exprt string_constantt::to_array_expr() const
 
   return dest;
 }
-
-/// convert array constant into string
-/// \return true on error
-bool string_constantt::from_array_expr(const array_exprt &src)
-{
-  id(ID_string_constant);
-  type()=src.type();
-
-  const typet &subtype = to_array_type(type()).subtype();
-
-  // check subtype
-  if(subtype!=signed_char_type() &&
-     subtype!=unsigned_char_type())
-    return true;
-
-  std::string value;
-
-  forall_operands(it, src)
-  {
-    mp_integer int_value=0;
-    if(to_integer(*it, int_value))
-      return true;
-    unsigned unsigned_value=integer2unsigned(int_value);
-    value+=static_cast<char>(unsigned_value);
-  }
-
-  // Drop the implicit zero at the end.
-  // Not clear what the semantics should be if it's not there.
-  if(!value.empty() && value[value.size()-1]==0)
-    value.resize(value.size()-1);
-
-  set_value(value);
-
-  return false;
-}
