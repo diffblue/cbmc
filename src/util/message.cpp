@@ -68,6 +68,19 @@ messaget::~messaget()
 {
 }
 
+// Visual studio requires this (empty) static object
+messaget::eomt messaget::eom;
+
+const messaget::commandt messaget::reset(0);
+const messaget::commandt messaget::bold(1);
+const messaget::commandt messaget::faint(2);
+const messaget::commandt messaget::italic(3);
+const messaget::commandt messaget::underline(4);
+const messaget::commandt messaget::red(31);
+const messaget::commandt messaget::green(32);
+const messaget::commandt messaget::yellow(33);
+const messaget::commandt messaget::blue(34);
+
 /// Parse a (user-)provided string as a verbosity level and set it as the
 /// verbosity of dest.
 /// \param user_input  Input string; if empty, the default verbosity is used.
