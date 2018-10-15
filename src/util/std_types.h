@@ -1714,7 +1714,7 @@ inline string_typet &to_string_type(typet &type)
 class range_typet:public typet
 {
 public:
-  range_typet(const mp_integer &_from, const mp_integer &_to)
+  range_typet(const mp_integer &_from, const mp_integer &_to) : typet(ID_range)
   {
     set_from(_from);
     set_to(_to);
