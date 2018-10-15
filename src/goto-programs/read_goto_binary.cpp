@@ -260,8 +260,10 @@ bool read_object_and_link(
 }
 
 /// \brief reads an object file, and also updates the config
-/// \param file_name file name of the goto binary
-/// \param message_handler for diagnostics
+/// \param file_name: file name of the goto binary
+/// \param dest_symbol_table: symbol table to update
+/// \param dest_functions: collection of goto functions to update
+/// \param message_handler: for diagnostics
 /// \return true on error, false otherwise
 bool read_object_and_link(
   const std::string &file_name,

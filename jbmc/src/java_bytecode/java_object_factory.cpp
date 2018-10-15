@@ -176,6 +176,7 @@ private:
 /// \param allocate_type: type of the object allocated
 /// \param symbol_table: symbol table
 /// \param loc: location in the source
+/// \param function_id: function ID to associate with auxiliary variables
 /// \param output_code: code block to which the necessary code is added
 /// \param symbols_created: created symbols to be declared by the caller
 /// \param cast_needed: Boolean flags saying where we need to cast the malloc
@@ -242,6 +243,7 @@ exprt allocate_dynamic_object(
 ///   allocated
 /// \param symbol_table: symbol table
 /// \param loc: location in the source
+/// \param function_id: function ID to associate with auxiliary variables
 /// \param output_code: code block to which the necessary code is added
 /// \return the dynamic object created
 exprt allocate_dynamic_object_with_decl(
@@ -392,6 +394,8 @@ code_assignt java_object_factoryt::get_null_assignment(
 ///   NO_UPDATE_IN_PLACE: initialize `expr` from scratch
 ///   MUST_UPDATE_IN_PLACE: reinitialize an existing object
 ///   MAY_UPDATE_IN_PLACE: invalid input
+/// \param location:
+///   Source location associated with nondet-initialization.
 void java_object_factoryt::gen_pointer_target_init(
   code_blockt &assignments,
   const exprt &expr,
@@ -707,6 +711,8 @@ bool initialize_nondet_string_fields(
 ///   * MAY_UPDATE_IN_PLACE: generate a runtime nondet branch between the NO_
 ///     and MUST_ cases.
 ///   * MUST_UPDATE_IN_PLACE: reinitialize an existing object
+/// \param location:
+///   Source location associated with nondet-initialization.
 void java_object_factoryt::gen_nondet_pointer_init(
   code_blockt &assignments,
   const exprt &expr,
@@ -930,6 +936,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
 /// \param depth:
 ///   Number of times that a pointer has been dereferenced from the root of the
 ///   object tree that we are initializing.
+/// \param location:
+///   Source location associated with nondet-initialization.
 /// \return
 ///   A symbol expression of type \p replacement_pointer corresponding to a
 ///   pointer to object `tmp_object` (see above).
@@ -994,6 +1002,8 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
 ///   NO_UPDATE_IN_PLACE: initialize `expr` from scratch
 ///   MUST_UPDATE_IN_PLACE: reinitialize an existing object
 ///   MAY_UPDATE_IN_PLACE: invalid input
+/// \param location:
+///   Source location associated with nondet-initialization.
 void java_object_factoryt::gen_nondet_struct_init(
   code_blockt &assignments,
   const exprt &expr,
@@ -1159,6 +1169,8 @@ void java_object_factoryt::gen_nondet_struct_init(
 ///   MAY_UPDATE_IN_PLACE: generate a runtime nondet branch between the NO_
 ///   and MUST_ cases.
 ///   MUST_UPDATE_IN_PLACE: reinitialize an existing object
+/// \param location:
+///   Source location associated with nondet-initialization.
 void java_object_factoryt::gen_nondet_init(
   code_blockt &assignments,
   const exprt &expr,
@@ -1307,6 +1319,8 @@ const symbol_exprt java_object_factoryt::gen_nondet_int_init(
 /// \param element_type:
 ///   Actual element type of the array (the array for all reference types will
 ///   have void* type, but this will be annotated as the true member type).
+/// \param location:
+///   Source location associated with nondet-initialization.
 /// \return Appends instructions to `assignments`
 void java_object_factoryt::allocate_nondet_length_array(
   code_blockt &assignments,

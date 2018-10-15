@@ -695,8 +695,8 @@ inline typet java_type_from_string_with_exception(
 }
 
 /// Get the index in the subtypes array for a given component.
-/// \param t The type we search for the subtypes in.
-/// \param identifier The string identifier of the type of the component.
+/// \param gen_types: The subtypes array.
+/// \param identifier: The string identifier of the type of the component.
 /// \return Optional with the size if the identifier was found.
 inline const optionalt<size_t> java_generics_get_index_for_subtype(
   const std::vector<java_generic_parametert> &gen_types,

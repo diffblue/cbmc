@@ -27,14 +27,12 @@ void optionst::set_option(const std::string &option,
   set_option(option, std::string(value?"1":"0"));
 }
 
-void optionst::set_option(const std::string &option,
-                          const signed int value)
+void optionst::set_option(const std::string &option, const int value)
 {
   set_option(option, std::to_string(value));
 }
 
-void optionst::set_option(const std::string &option,
-                          const unsigned int value)
+void optionst::set_option(const std::string &option, const unsigned value)
 {
   set_option(option, std::to_string(value));
 }
