@@ -4653,6 +4653,23 @@ def CheckAssert(filename, clean_lines, linenum, error):
 
 
 
+def Check__CPROVER_(filename, clean_lines, linenum, error):
+  """Check for uses of __CPROVER_.
+
+  Args:
+    filename: The name of the current file.
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The number of the line to check.
+    error: The function to call with any errors found.
+  """
+  line = clean_lines.lines[linenum]
+  match = Match(r'.*__CPROVER_.*', line)
+  if match:
+    error(filename, linenum, 'build/deprecated', 4,
+          'use CPROVER_PREFIX instead of __CPROVER_')
+
+
+
 def GetLineWidth(line):
   """Determines the width of the line in column positions.
 
@@ -4880,6 +4897,7 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
   #CheckCheck(filename, clean_lines, linenum, error)
   CheckAltTokens(filename, clean_lines, linenum, error)
   CheckAssert(filename, clean_lines, linenum, error)
+  Check__CPROVER_(filename, clean_lines, linenum, error)
   classinfo = nesting_state.InnermostClass()
   if classinfo:
     CheckSectionSpacing(filename, clean_lines, classinfo, linenum, error)
