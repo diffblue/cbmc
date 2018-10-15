@@ -22,11 +22,14 @@ clean: clean_library
 .PHONY: clean_library
 clean_library:
 	rm -rf core-models.jar
-	if [ -d $(LIBRARY_DIR) ]; then cd $(LIBRARY_DIR); mvn clean; fi
+	if [ -d $(LIBRARY_DIR) ]; then cd $(LIBRARY_DIR); mvn --quiet clean; fi
 
 .PHONY: library
 library:
-	if [ -d $(LIBRARY_DIR) ]; then (cd $(LIBRARY_DIR); mvn package); cp $(LIBRARY_DIR)/target/core-models.jar .; fi
+	if [ -d $(LIBRARY_DIR) ]; then \
+		(cd $(LIBRARY_DIR); mvn --quiet package); \
+		cp $(LIBRARY_DIR)/target/core-models.jar .; \
+	fi
 
 ###############################################################################
 
