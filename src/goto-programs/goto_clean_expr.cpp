@@ -557,13 +557,11 @@ void goto_convertt::rewrite_let(
   let_result.is_auxiliary = true;
 
   auto &let_expr = to_let_expr(expr);
-  code_blockt equivalent_block;
   code_declt bound_declaration(let_expr.symbol());
-  equivalent_block.move_to_operands(bound_declaration);
   code_assignt bound_assignment(let_expr.symbol(), let_expr.value());
-  equivalent_block.move_to_operands(bound_assignment);
   code_assignt result_assignment(let_result.symbol_expr(), let_expr.where());
-  equivalent_block.move_to_operands(result_assignment);
+  code_blockt equivalent_block(
+    {bound_declaration, bound_assignment, result_assignment});
   expr = let_result.symbol_expr();
   convert(equivalent_block, dest, mode);
 }
