@@ -331,12 +331,12 @@ optionalt<symbolt> java_bytecode_convert_methodt::get_lambda_method_symbol(
 /// This creates a method symbol in the symtab, but doesn't actually perform
 /// method conversion just yet. The caller should call
 /// java_bytecode_convert_method later to give the symbol/method a body.
-/// \par parameters: `class_symbol`: class this method belongs to
-/// `method_identifier`: fully qualified method name, including type descriptor
-///   (e.g. "x.y.z.f:(I)")
-/// `m`: parsed method object to convert
-/// `symbol_table`: global symbol table (will be modified)
-/// `message_handler`: message handler to collect warnings
+/// \param class_symbol: The class this method belongs to
+/// \param method_identifier: The fully qualified method name, including type
+///   descriptor (e.g. "x.y.z.f:(I)")
+/// \param m: The parsed method object to convert.
+/// \param symbol_table: The global symbol table (will be modified).
+/// \param message_handler: A message handler to collect warnings.
 void java_bytecode_convert_method_lazy(
   const symbolt &class_symbol,
   const irep_idt &method_identifier,
@@ -674,10 +674,9 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
 
 /// Find all goto statements in 'repl' that target 'old_label' and redirect them
 /// to 'new_label'.
-/// \par parameters: 'repl', a block of code in which to perform replacement,
-///   and
-/// an old_label that should be replaced throughout by new_label.
-/// \return None (side-effects on repl)
+/// \param [in,out] repl: A block of code in which to perform replacement.
+/// \param old_label: The label to be replaced.
+/// \param new_label: The label to replace `old_label` with.
 void java_bytecode_convert_methodt::replace_goto_target(
   codet &repl,
   const irep_idt &old_label,
@@ -704,12 +703,12 @@ void java_bytecode_convert_methodt::replace_goto_target(
 /// encloses bytecode address range [address_start,address_limit).
 /// 'next_block_start_address' is the start address of 'tree's successor sibling
 /// and is used to determine when the range spans out of its bounds.
-/// \par parameters: 'tree', a code block descriptor, and 'this_block', the
-///   corresponding
-/// actual code_blockt. 'address_start' and 'address_limit', the Java
-/// bytecode offsets searched for. 'next_block_start_address', the
-/// bytecode offset of tree/this_block's successor sibling, or UINT_MAX
-/// if none exists.
+/// \param tree: A code block descriptor.
+/// \param this_block: The corresponding actual \ref code_blockt.
+/// \param address_start: the Java bytecode offsets searched for.
+/// \param address_limit: the Java bytecode offsets searched for.
+/// \param next_block_start_address: The bytecode offset of tree/this_block's
+///   successor sibling, or UINT_MAX if none exists.
 /// \return Returns the code_blockt most closely enclosing the given address
 ///   range.
 code_blockt &java_bytecode_convert_methodt::get_block_for_pcrange(
@@ -738,12 +737,17 @@ code_blockt &java_bytecode_convert_methodt::get_block_for_pcrange(
 /// )^, and return a reference to the new branch highlighted with ^^. 'tree' and
 /// 'this_block' trees are always maintained with equal shapes. ('this_block'
 /// may additionally contain code_declt children which are ignored for this
-/// purpose)
-/// \par parameters: See above, plus the bytecode address map 'amap' and
-///   'allow_merge'
-/// which is always true except when called from get_block_for_pcrange
-/// \return See above, plus potential side-effects on 'tree' and 'this_block' as
-///   described in 'Purpose'
+/// purpose).
+/// \param [in, out] tree: A code block descriptor.
+/// \param [in,out] this_block: The corresponding actual \ref code_blockt.
+/// \param address_start: the Java bytecode offsets searched for.
+/// \param address_limit: the Java bytecode offsets searched for.
+/// \param next_block_start_address: The bytecode offset of tree/this_block's
+///   successor sibling, or UINT_MAX if none exists.
+/// \param amap: The bytecode address map.
+/// \param allow_merge: Whether modifying the block tree is allowed. This is
+///   always true except when called from `get_block_for_pcrange`.
+/// \return The code_blockt most closely enclosing the given address range.
 code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   block_tree_nodet &tree,
   code_blockt &this_block,

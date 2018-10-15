@@ -98,7 +98,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 }
 
 /// Create a concrete function call to replace a virtual one
-/// \param call [in/out]: the function call to update
+/// \param call [in,out]: the function call to update
 /// \param function_symbol: the function to be called
 /// \param ns: namespace
 static void create_static_function_call(
