@@ -122,6 +122,7 @@ static std::string architecture_string(T value, const char *s)
 
 void ansi_c_internal_additions(std::string &code)
 {
+  // clang-format off
   // do the built-in types and variables
   code+=
     "# 1 \"<built-in-additions>\"\n"
@@ -179,6 +180,7 @@ void ansi_c_internal_additions(std::string &code)
     // by the entry-point construction.
     "void " INITIALIZE_FUNCTION "(void);\n"
     "\n";
+  // clang-format on
 
   // GCC junk stuff, also for CLANG and ARM
   if(
