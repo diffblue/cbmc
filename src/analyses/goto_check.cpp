@@ -390,13 +390,9 @@ void goto_checkt::ranged_type_check(const exprt &expr, const guardt &guard)
   const exprt &upper_bound =
     static_cast<const exprt &>(real_type.find("upper_bound"));
 
-  binary_relation_exprt no_overflow_upper(ID_le);
-  no_overflow_upper.lhs() = expr.op0();
-  no_overflow_upper.rhs() = upper_bound;
+  binary_relation_exprt no_overflow_upper(expr.op0(), ID_le, upper_bound);
 
-  binary_relation_exprt no_overflow_lower(ID_ge);
-  no_overflow_lower.lhs() = expr.op0();
-  no_overflow_lower.rhs() = lower_bound;
+  binary_relation_exprt no_overflow_lower(expr.op0(), ID_ge, lower_bound);
 
   add_guarded_claim(
     and_exprt(no_overflow_lower, no_overflow_upper),
