@@ -149,37 +149,7 @@ std::string expr2cppt::convert_rec(
   {
     const irep_idt c_type=src.get(ID_C_c_type);
 
-    if(c_type==ID_signed_char)
-      return q+"signed char"+d;
-    else if(c_type==ID_unsigned_char)
-      return q+"unsigned char"+d;
-    else if(c_type==ID_char)
-      return q+"char"+d;
-    else if(c_type==ID_signed_short_int)
-      return q+"short"+d;
-    else if(c_type==ID_unsigned_short_int)
-      return q+"unsigned short"+d;
-    else if(c_type==ID_signed_int)
-      return q+"int"+d;
-    else if(c_type==ID_unsigned_int)
-      return q+"unsigned"+d;
-    else if(c_type==ID_signed_long_int)
-      return q+"long"+d;
-    else if(c_type==ID_unsigned_long_int)
-      return q+"unsigned long"+d;
-    else if(c_type==ID_signed_long_long_int)
-      return q+"long long"+d;
-    else if(c_type==ID_unsigned_long_long_int)
-      return q+"unsigned long long"+d;
-    else if(c_type==ID_wchar_t)
-      return q+"wchar_t"+d;
-    else if(c_type==ID_float)
-      return q+"float"+d;
-    else if(c_type==ID_double)
-      return q+"double"+d;
-    else if(c_type==ID_long_double)
-      return q+"long double"+d;
-    else if(c_type==ID_bool)
+    if(c_type == ID_bool)
       return q+"bool"+d;
     else
       return expr2ct::convert_rec(src, qualifiers, declarator);
