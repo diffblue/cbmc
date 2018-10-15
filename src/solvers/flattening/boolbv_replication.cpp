@@ -22,7 +22,7 @@ bvt boolbvt::convert_replication(const replication_exprt &expr)
   bvt bv;
   bv.resize(width);
 
-  const std::size_t u_times=integer2unsigned(times);
+  const std::size_t u_times = numeric_cast_v<std::size_t>(times);
   const bvt &op = convert_bv(expr.op());
 
   INVARIANT(

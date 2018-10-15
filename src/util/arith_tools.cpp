@@ -100,7 +100,7 @@ bool to_unsigned_integer(const constant_exprt &expr, unsigned &uint_value)
     return true;
   else
   {
-    uint_value=integer2unsigned(i);
+    uint_value = numeric_cast_v<unsigned>(i);
     return false;
   }
 }

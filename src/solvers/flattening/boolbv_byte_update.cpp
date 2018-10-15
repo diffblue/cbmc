@@ -60,7 +60,7 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
         bv_endianness_mapt map_op(op.type(), false, ns, boolbv_width);
         bv_endianness_mapt map_value(value.type(), false, ns, boolbv_width);
 
-        std::size_t offset_i=integer2unsigned(offset);
+        const std::size_t offset_i = numeric_cast_v<std::size_t>(offset);
 
         for(std::size_t i=0; i<update_width; i++)
         {

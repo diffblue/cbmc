@@ -152,7 +152,8 @@ void boolbvt::convert_with_array(
 
     if(op1_value>=0 && op1_value<size) // bounds check
     {
-      std::size_t offset=integer2unsigned(op1_value*op2_bv.size());
+      const std::size_t offset =
+        numeric_cast_v<std::size_t>(op1_value * op2_bv.size());
 
       for(std::size_t j=0; j<op2_bv.size(); j++)
         next_bv[offset+j]=op2_bv[j];
@@ -169,7 +170,7 @@ void boolbvt::convert_with_array(
 
     literalt eq_lit=convert(equal_exprt(op1, counter));
 
-    std::size_t offset=integer2unsigned(i*op2_bv.size());
+    const std::size_t offset = numeric_cast_v<std::size_t>(i * op2_bv.size());
 
     for(std::size_t j=0; j<op2_bv.size(); j++)
       next_bv[offset+j]=
