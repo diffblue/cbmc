@@ -1624,10 +1624,6 @@ bool is_rvalue_reference(const typet &type);
 class c_bool_typet:public bitvector_typet
 {
 public:
-  c_bool_typet():bitvector_typet(ID_c_bool)
-  {
-  }
-
   explicit c_bool_typet(std::size_t width):
     bitvector_typet(ID_c_bool, width)
   {
