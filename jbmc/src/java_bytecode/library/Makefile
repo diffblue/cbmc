@@ -27,7 +27,7 @@ clean_library:
 .PHONY: library
 library:
 	if [ -d $(LIBRARY_DIR) ]; then \
-		(cd $(LIBRARY_DIR); mvn --quiet package); \
+		(cd $(LIBRARY_DIR); mvn --quiet -Dmaven.test.skip=true package); \
 		cp $(LIBRARY_DIR)/target/core-models.jar .; \
 	fi
 
