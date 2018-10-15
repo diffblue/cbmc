@@ -13,11 +13,12 @@ Author:
 
 #include <cstdlib>
 
-#include <util/config.h>
 #include <util/arith_tools.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
+#include <util/config.h>
+#include <util/expr_util.h>
 #include <util/simplify_expr.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 #include <ansi-c/c_qualifiers.h>
 #include <util/c_types.h>
@@ -220,6 +221,13 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
     return true;
   }
 
+  if(expr.type().id() == ID_bool || expr.type().id() == ID_c_bool)
+  {
+    new_expr = expr;
+    new_expr.make_typecast(int_type);
+    return true;
+  }
+
   if(expr.type().id()==ID_c_enum_tag)
   {
     new_expr=expr;
@@ -301,11 +309,13 @@ bool cpp_typecheckt::standard_conversion_integral_conversion(
      type.id()!=ID_unsignedbv)
       return false;
 
-  if(expr.type().id()!=ID_signedbv &&
-     expr.type().id()!=ID_unsignedbv &&
-     expr.type().id()!=ID_bool &&
-     expr.type().id()!=ID_c_enum_tag)
+  if(
+    expr.type().id() != ID_signedbv && expr.type().id() != ID_unsignedbv &&
+    expr.type().id() != ID_c_bool && expr.type().id() != ID_bool &&
+    expr.type().id() != ID_c_enum_tag)
+  {
     return false;
+  }
 
   if(expr.get_bool(ID_C_lvalue))
     return false;
@@ -632,16 +642,18 @@ bool cpp_typecheckt::standard_conversion_boolean(
   if(expr.get_bool(ID_C_lvalue))
     return false;
 
-  if(expr.type().id()!=ID_signedbv &&
-     expr.type().id()!=ID_unsignedbv &&
-     expr.type().id()!=ID_pointer &&
-     expr.type().id()!=ID_c_enum_tag)
+  if(
+    expr.type().id() != ID_signedbv && expr.type().id() != ID_unsignedbv &&
+    expr.type().id() != ID_pointer && expr.type().id() != ID_bool &&
+    expr.type().id() != ID_c_enum_tag)
+  {
     return false;
+  }
 
   c_qualifierst qual_from;
   qual_from.read(expr.type());
 
-  bool_typet Bool;
+  typet Bool = c_bool_type();
   qual_from.write(Bool);
 
   new_expr=expr;
@@ -781,10 +793,16 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
       rank += 3;
     }
-    else if(type.id()==ID_bool)
+    else if(type.id() == ID_c_bool)
     {
       if(!standard_conversion_boolean(curr_expr, new_expr))
         return false;
+
+      rank += 3;
+    }
+    else if(type.id() == ID_bool)
+    {
+      new_expr = is_not_zero(curr_expr, *this);
 
       rank += 3;
     }
@@ -1794,11 +1812,10 @@ bool cpp_typecheckt::reinterpret_typecast(
     return true;
   }
 
-  if((e.type().id()==ID_unsignedbv ||
-      e.type().id()==ID_signedbv ||
-      e.type().id()==ID_bool) &&
-     type.id()==ID_pointer &&
-     !is_reference(type))
+  if(
+    (e.type().id() == ID_unsignedbv || e.type().id() == ID_signedbv ||
+     e.type().id() == ID_c_bool || e.type().id() == ID_bool) &&
+    type.id() == ID_pointer && !is_reference(type))
   {
     // integer to pointer
     if(simplify_expr(e, *this).is_zero())

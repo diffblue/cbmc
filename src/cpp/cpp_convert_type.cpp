@@ -104,7 +104,7 @@ void cpp_convert_typet::read_rec(const typet &type)
     int128_cnt++;
   else if(type.id()==ID_complex)
     complex_cnt++;
-  else if(type.id()==ID_bool)
+  else if(type.id() == ID_c_bool)
     cpp_bool_cnt++;
   else if(type.id()==ID_proper_bool)
     proper_bool_cnt++;
@@ -414,7 +414,7 @@ void cpp_convert_typet::write(typet &type)
        int64_cnt || int128_cnt || ptr32_cnt || ptr64_cnt)
       throw "illegal type modifier for C++ bool";
 
-    type.id(ID_bool);
+    type = c_bool_type();
   }
   else if(proper_bool_cnt)
   {
@@ -602,6 +602,10 @@ void cpp_convert_plain_type(typet &type)
     // add width -- we use int, but the standard
     // doesn't guarantee that
     type.set(ID_width, config.ansi_c.int_width);
+  }
+  else if(type.id() == ID_c_bool)
+  {
+    type.set(ID_width, config.ansi_c.bool_width);
   }
   else
   {

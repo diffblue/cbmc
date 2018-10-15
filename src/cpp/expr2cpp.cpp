@@ -110,7 +110,7 @@ std::string expr2cppt::convert_constant(
   const constant_exprt &src,
   unsigned &precedence)
 {
-  if(src.type().id()==ID_bool)
+  if(src.type().id() == ID_c_bool)
   {
     // C++ has built-in Boolean constants, in contrast to C
     if(src.is_true())
@@ -346,6 +346,10 @@ std::string expr2cppt::convert_rec(
   {
     // only really used in error messages
     return "{ ... }";
+  }
+  else if(src.id() == ID_c_bool)
+  {
+    return q + "bool" + d;
   }
   else
     return expr2ct::convert_rec(src, qualifiers, declarator);

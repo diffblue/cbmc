@@ -970,12 +970,10 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
       irept::subt::const_iterator next=pos+1;
       assert(next != cpp_name.get_sub().end());
 
-      if(next->id() == ID_cpp_name ||
-         next->id() == ID_pointer ||
-         next->id() == ID_int ||
-         next->id() == ID_char ||
-         next->id() == ID_bool ||
-         next->id() == ID_merged_type)
+      if(
+        next->id() == ID_cpp_name || next->id() == ID_pointer ||
+        next->id() == ID_int || next->id() == ID_char ||
+        next->id() == ID_c_bool || next->id() == ID_merged_type)
       {
         // it's a cast operator
         irept next_ir=*next;

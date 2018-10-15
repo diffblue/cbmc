@@ -2453,7 +2453,9 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     case TOK_GCC_INT128: type_id=ID_gcc_int128; break;
     case TOK_GCC_FLOAT80: type_id=ID_gcc_float80; break;
     case TOK_GCC_FLOAT128: type_id=ID_gcc_float128; break;
-    case TOK_BOOL: type_id=ID_bool; break;
+    case TOK_BOOL:
+      type_id = ID_c_bool;
+      break;
     case TOK_CPROVER_BOOL: type_id=ID_proper_bool; break;
     case TOK_AUTO: type_id = ID_auto; break;
     default: type_id=irep_idt();
@@ -6713,7 +6715,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
   case TOK_TRUE:
     lex.get_token(tk);
-    exp=true_exprt();
+    exp = typecast_exprt(true_exprt(), c_bool_type());
     set_location(exp, tk);
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 4\n";
@@ -6722,7 +6724,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
   case TOK_FALSE:
     lex.get_token(tk);
-    exp=false_exprt();
+    exp = typecast_exprt(false_exprt(), c_bool_type());
     set_location(exp, tk);
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 5\n";

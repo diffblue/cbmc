@@ -13,8 +13,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <string>
 
-#include <util/type.h>
+#include <util/cprover_prefix.h>
 #include <util/std_types.h>
+#include <util/type.h>
 
 static std::string do_prefix(const std::string &s)
 {
@@ -103,8 +104,10 @@ std::string cpp_type2name(const typet &type)
 
   if(type.id()==ID_empty || type.id()==ID_void)
     result+="void";
-  else if(type.id()==ID_bool)
+  else if(type.id() == ID_c_bool)
     result+="bool";
+  else if(type.id() == ID_bool)
+    result += CPROVER_PREFIX "bool";
   else if(type.id()==ID_pointer)
   {
     if(is_reference(type))
