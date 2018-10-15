@@ -10,11 +10,12 @@ jobs:
         apt:
           sources:
             - llvm-toolchain-trusty-6.0
+            - ubuntu-toolchain-r-test
           packages:
             - clang-format-6.0
       install:
       script: |
-        clang-format --version
+        clang-format-6.0 --version
         git-clang-format-6.0 --binary clang-format-6.0 "${TRAVIS_BRANCH}"
         git diff > formatted.diff
         if [[ -s formatted.diff ]] ; then
