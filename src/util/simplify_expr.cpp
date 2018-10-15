@@ -252,12 +252,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      op_type.id()!=ID_bool)
   {
     // rewrite (_Bool)x to (_Bool)(x!=0)
-    binary_relation_exprt inequality;
-    inequality.id(op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal);
-    inequality.add_source_location()=expr.source_location();
-    inequality.lhs()=expr.op0();
-    inequality.rhs()=from_integer(0, op_type);
-    CHECK_RETURN(inequality.rhs().is_not_nil());
+    exprt inequality = is_not_zero(expr.op0(), ns);
     simplify_node(inequality);
     expr.op0()=inequality;
     simplify_typecast(expr); // recursive call
