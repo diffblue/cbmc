@@ -79,7 +79,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref symbol_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref symbol_typet.
+/// \return True if \p type is a \ref symbol_typet.
 template <>
 inline bool can_cast_type<symbol_typet>(const typet &type)
 {
@@ -243,7 +243,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref struct_union_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref struct_union_typet.
+/// \return True if \p type is a \ref struct_union_typet.
 template <>
 inline bool can_cast_type<struct_union_typet>(const typet &type)
 {
@@ -351,7 +351,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref struct_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref struct_typet.
+/// \return True if \p type is a \ref struct_typet.
 template <>
 inline bool can_cast_type<struct_typet>(const typet &type)
 {
@@ -411,7 +411,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref class_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref class_typet.
+/// \return True if \p type is a \ref class_typet.
 template <>
 inline bool can_cast_type<class_typet>(const typet &type)
 {
@@ -452,7 +452,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref union_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref union_typet.
+/// \return True if \p type is a \ref union_typet.
 template <>
 inline bool can_cast_type<union_typet>(const typet &type)
 {
@@ -504,7 +504,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref tag_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref tag_typet.
+/// \return True if \p type is a \ref tag_typet.
 template <>
 inline bool can_cast_type<tag_typet>(const typet &type)
 {
@@ -545,7 +545,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref struct_tag_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref struct_tag_typet.
+/// \return True if \p type is a \ref struct_tag_typet.
 template <>
 inline bool can_cast_type<struct_tag_typet>(const typet &type)
 {
@@ -585,7 +585,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref union_tag_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref union_tag_typet.
+/// \return True if \p type is a \ref union_tag_typet.
 template <>
 inline bool can_cast_type<union_tag_typet>(const typet &type)
 {
@@ -635,7 +635,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref enumeration_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref enumeration_typet.
+/// \return True if \p type is a \ref enumeration_typet.
 template <>
 inline bool can_cast_type<enumeration_typet>(const typet &type)
 {
@@ -699,7 +699,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref c_enum_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref c_enum_typet.
+/// \return True if \p type is a \ref c_enum_typet.
 template <>
 inline bool can_cast_type<c_enum_typet>(const typet &type)
 {
@@ -739,7 +739,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref c_enum_tag_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref c_enum_tag_typet.
+/// \return True if \p type is a \ref c_enum_tag_typet.
 template <>
 inline bool can_cast_type<c_enum_tag_typet>(const typet &type)
 {
@@ -984,7 +984,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref code_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref code_typet.
+/// \return True if \p type is a \ref code_typet.
 template <>
 inline bool can_cast_type<code_typet>(const typet &type)
 {
@@ -1050,7 +1050,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref array_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref array_typet.
+/// \return True if \p type is a \ref array_typet.
 template <>
 inline bool can_cast_type<array_typet>(const typet &type)
 {
@@ -1089,7 +1089,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref incomplete_array_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref incomplete_array_typet.
+/// \return True if \p type is a \ref incomplete_array_typet.
 template <>
 inline bool can_cast_type<incomplete_array_typet>(const typet &type)
 {
@@ -1162,7 +1162,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref bitvector_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref bitvector_typet.
+/// \return True if \p type is a \ref bitvector_typet.
 template <>
 inline bool can_cast_type<bitvector_typet>(const typet &type)
 {
@@ -1209,7 +1209,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref bv_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref bv_typet.
+/// \return True if \p type is a \ref bv_typet.
 template <>
 inline bool can_cast_type<bv_typet>(const typet &type)
 {
@@ -1264,7 +1264,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref unsignedbv_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref unsignedbv_typet.
+/// \return True if \p type is a \ref unsignedbv_typet.
 template <>
 inline bool can_cast_type<unsignedbv_typet>(const typet &type)
 {
@@ -1320,7 +1320,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref signedbv_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref signedbv_typet.
+/// \return True if \p type is a \ref signedbv_typet.
 template <>
 inline bool can_cast_type<signedbv_typet>(const typet &type)
 {
@@ -1384,7 +1384,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref fixedbv_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref fixedbv_typet.
+/// \return True if \p type is a \ref fixedbv_typet.
 template <>
 inline bool can_cast_type<fixedbv_typet>(const typet &type)
 {
@@ -1446,7 +1446,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref floatbv_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref floatbv_typet.
+/// \return True if \p type is a \ref floatbv_typet.
 template <>
 inline bool can_cast_type<floatbv_typet>(const typet &type)
 {
@@ -1498,7 +1498,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref c_bit_field_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref c_bit_field_typet.
+/// \return True if \p type is a \ref c_bit_field_typet.
 template <>
 inline bool can_cast_type<c_bit_field_typet>(const typet &type)
 {
@@ -1543,7 +1543,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref pointer_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref pointer_typet.
+/// \return True if \p type is a \ref pointer_typet.
 template <>
 inline bool can_cast_type<pointer_typet>(const typet &type)
 {
@@ -1596,7 +1596,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref reference_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref reference_typet.
+/// \return True if \p type is a \ref reference_typet.
 template <>
 inline bool can_cast_type<reference_typet>(const typet &type)
 {
@@ -1645,7 +1645,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref c_bool_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref c_bool_typet.
+/// \return True if \p type is a \ref c_bool_typet.
 template <>
 inline bool can_cast_type<c_bool_typet>(const typet &type)
 {
@@ -1695,7 +1695,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref string_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref string_typet.
+/// \return True if \p type is a \ref string_typet.
 template <>
 inline bool can_cast_type<string_typet>(const typet &type)
 {
@@ -1742,7 +1742,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref range_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref range_typet.
+/// \return True if \p type is a \ref range_typet.
 template <>
 inline bool can_cast_type<range_typet>(const typet &type)
 {
@@ -1801,7 +1801,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref vector_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref vector_typet.
+/// \return True if \p type is a \ref vector_typet.
 template <>
 inline bool can_cast_type<vector_typet>(const typet &type)
 {
@@ -1845,7 +1845,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref complex_typet.
 /// \param type Source type.
-/// \return True if \param type is a \ref complex_typet.
+/// \return True if \p type is a \ref complex_typet.
 template <>
 inline bool can_cast_type<complex_typet>(const typet &type)
 {
