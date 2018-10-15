@@ -3,7 +3,6 @@ Thank you for your contribution. Please make sure your pull request fulfils all 
 --->
 
 - [ ] Each commit message has a non-empty body, explaining why the change was made.
-- [ ] My contribution is formatted in line with CODING_STANDARD.md.
 - [ ] Methods or procedures I have added are documented, following the guidelines provided in CODING_STANDARD.md.
 - [ ] Regression or unit tests are included, or existing tests cover the modified code (in this case I have detailed which ones those are in the commit message).
 - [ ] My commit message includes data points confirming performance improvements (if claimed).
