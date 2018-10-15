@@ -222,7 +222,7 @@ _ERROR_CATEGORIES = [
     'readability/constructors',
     'readability/dowhile',
     'readability/fn_size',
-    'readability/function_comment'
+    'readability/function_comment',
     'readability/identifier_spacing',
     'readability/identifiers',
     'readability/inheritance',
