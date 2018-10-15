@@ -1947,10 +1947,10 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
       {
         const struct_typet &struct_type=to_struct_type(tp);
         const irep_idt &component_name=with.where().get(ID_component_name);
+        const typet &c_type = struct_type.get_component(component_name).type();
 
         // is this a bit field?
-        if(struct_type.get_component(component_name).type().id()==
-           ID_c_bit_field)
+        if(c_type.id() == ID_c_bit_field || c_type.id() == ID_bool)
         {
           // don't touch -- might not be byte-aligned
         }

@@ -42,6 +42,12 @@ member_offset_iterator &member_offset_iterator::operator++()
       current.second += bit_field_bits / 8;
       bit_field_bits %= 8;
     }
+    else if(comp.type().id() == ID_bool)
+    {
+      ++bit_field_bits;
+      current.second += bit_field_bits / 8;
+      bit_field_bits %= 8;
+    }
     else
     {
       DATA_INVARIANT(
@@ -288,7 +294,16 @@ exprt member_offset_expr(
       bit_field_bits += w;
       const std::size_t bytes = bit_field_bits / 8;
       bit_field_bits %= 8;
-      result=plus_exprt(result, from_integer(bytes, result.type()));
+      if(bytes > 0)
+        result = plus_exprt(result, from_integer(bytes, result.type()));
+    }
+    else if(c.type().id() == ID_bool)
+    {
+      ++bit_field_bits;
+      const std::size_t bytes = bit_field_bits / 8;
+      bit_field_bits %= 8;
+      if(bytes > 0)
+        result = plus_exprt(result, from_integer(bytes, result.type()));
     }
     else
     {
@@ -315,6 +330,15 @@ exprt size_of_expr(
   {
     const auto &array_type = to_array_type(type);
 
+    // special-case arrays of bits
+    if(array_type.subtype().id() == ID_bool)
+    {
+      auto bits = pointer_offset_bits(array_type, ns);
+
+      if(bits.has_value())
+        return from_integer((*bits + 7) / 8, size_type());
+    }
+
     exprt sub = size_of_expr(array_type.subtype(), ns);
     if(sub.is_nil())
       return nil_exprt();
@@ -335,7 +359,18 @@ exprt size_of_expr(
   }
   else if(type.id()==ID_vector)
   {
-    exprt sub = size_of_expr(to_vector_type(type).subtype(), ns);
+    const auto &vector_type = to_vector_type(type);
+
+    // special-case vectors of bits
+    if(vector_type.subtype().id() == ID_bool)
+    {
+      auto bits = pointer_offset_bits(vector_type, ns);
+
+      if(bits.has_value())
+        return from_integer((*bits + 7) / 8, size_type());
+    }
+
+    exprt sub = size_of_expr(vector_type.subtype(), ns);
     if(sub.is_nil())
       return nil_exprt();
 
@@ -381,7 +416,16 @@ exprt size_of_expr(
         bit_field_bits += w;
         const std::size_t bytes = bit_field_bits / 8;
         bit_field_bits %= 8;
-        result=plus_exprt(result, from_integer(bytes, result.type()));
+        if(bytes > 0)
+          result = plus_exprt(result, from_integer(bytes, result.type()));
+      }
+      else if(c.type().id() == ID_bool)
+      {
+        ++bit_field_bits;
+        const std::size_t bytes = bit_field_bits / 8;
+        bit_field_bits %= 8;
+        if(bytes > 0)
+          result = plus_exprt(result, from_integer(bytes, result.type()));
       }
       else
       {

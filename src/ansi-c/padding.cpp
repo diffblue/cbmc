@@ -226,6 +226,10 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
         const auto width = to_c_bit_field_type(it->type()).get_width();
         bit_field_bits += width;
       }
+      else if(it->type().id() == ID_bool)
+      {
+        ++bit_field_bits;
+      }
       else
       {
         // keep track of offset
@@ -280,6 +284,10 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         // count the bits
         const std::size_t width = to_c_bit_field_type(it->type()).get_width();
         bit_field_bits+=width;
+      }
+      else if(it->type().id() == ID_bool)
+      {
+        ++bit_field_bits;
       }
       else if(bit_field_bits!=0)
       {
@@ -346,6 +354,18 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         offset+=bytes;
         continue;
       }
+    }
+    else if(it_type.id() == ID_bool)
+    {
+      a = alignment(it_type, ns);
+      if(max_alignment < a)
+        max_alignment = a;
+
+      ++bit_field_bits;
+      const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
+      bit_field_bits %= config.ansi_c.char_width;
+      offset += bytes;
+      continue;
     }
     else
       a=alignment(it_type, ns);

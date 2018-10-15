@@ -152,8 +152,12 @@ bool simplify_exprt::simplify_member(exprt &expr)
       const struct_typet::componentt &component=
         struct_type.get_component(component_name);
 
-      if(component.is_nil() || component.type().id()==ID_c_bit_field)
+      if(
+        component.is_nil() || component.type().id() == ID_c_bit_field ||
+        component.type().id() == ID_bool)
+      {
         return true;
+      }
 
       // add member offset to index
       auto offset_int = member_offset(struct_type, component_name, ns);
