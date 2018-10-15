@@ -455,7 +455,7 @@ void dump_ct::convert_compound(
       s=type_to_string(comp_type);
     }
 
-    if(s.find("__CPROVER_bitvector")==std::string::npos)
+    if(s.find(CPROVER_PREFIX "bitvector") == std::string::npos)
     {
       struct_body << s;
     }

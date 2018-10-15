@@ -1508,11 +1508,11 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
     type.set(ID_C_alignment, alignment);
 
   // CPROVER extensions
-  if(symbol.base_name=="__CPROVER_rational")
+  if(symbol.base_name == CPROVER_PREFIX "rational")
   {
     type=rational_typet();
   }
-  else if(symbol.base_name=="__CPROVER_integer")
+  else if(symbol.base_name == CPROVER_PREFIX "integer")
   {
     type=integer_typet();
   }

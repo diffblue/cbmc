@@ -656,9 +656,14 @@ int linker_script_merget::get_linker_script_data(
     const std::string &def_out_file)
 {
   for(auto const &pair : symbol_table.symbols)
-    if(pair.second.is_extern && pair.second.value.is_nil() &&
-       pair.second.name!="__CPROVER_memory")
+  {
+    if(
+      pair.second.is_extern && pair.second.value.is_nil() &&
+      pair.second.name != CPROVER_PREFIX "memory")
+    {
       linker_defined_symbols.push_back(pair.second.name);
+    }
+  }
 
   std::ostringstream linker_def_str;
   std::copy(

@@ -320,10 +320,11 @@ void custom_bitvector_domaint::transform(
       {
         const irep_idt &identifier=to_symbol_expr(function).get_identifier();
 
-        if(identifier=="__CPROVER_set_must" ||
-           identifier=="__CPROVER_clear_must" ||
-           identifier=="__CPROVER_set_may" ||
-           identifier=="__CPROVER_clear_may")
+        if(
+          identifier == CPROVER_PREFIX "set_must" ||
+          identifier == CPROVER_PREFIX "clear_must" ||
+          identifier == CPROVER_PREFIX "set_may" ||
+          identifier == CPROVER_PREFIX "clear_may")
         {
           if(code_function_call.arguments().size()==2)
           {
@@ -333,13 +334,13 @@ void custom_bitvector_domaint::transform(
             // initialize to make Visual Studio happy
             modet mode = modet::SET_MUST;
 
-            if(identifier=="__CPROVER_set_must")
+            if(identifier == CPROVER_PREFIX "set_must")
               mode=modet::SET_MUST;
-            else if(identifier=="__CPROVER_clear_must")
+            else if(identifier == CPROVER_PREFIX "clear_must")
               mode=modet::CLEAR_MUST;
-            else if(identifier=="__CPROVER_set_may")
+            else if(identifier == CPROVER_PREFIX "set_may")
               mode=modet::SET_MAY;
-            else if(identifier=="__CPROVER_clear_may")
+            else if(identifier == CPROVER_PREFIX "clear_may")
               mode=modet::CLEAR_MAY;
             else
               UNREACHABLE;

@@ -222,8 +222,8 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       {
         const code_typet void_t({}, empty_typet());
         code_function_callt f(symbol_exprt(
-          target->is_atomic_begin() ? "__CPROVER_atomic_begin"
-                                    : "__CPROVER_atomic_end",
+          target->is_atomic_begin() ? CPROVER_PREFIX "atomic_begin"
+                                    : CPROVER_PREFIX "atomic_end",
           void_t));
         dest.move_to_operands(f);
         return target;
@@ -255,7 +255,7 @@ void goto_program2codet::convert_labels(
   if(target->is_target())
   {
     std::stringstream label;
-    label << "__CPROVER_DUMP_L" << target->target_number;
+    label << CPROVER_PREFIX "DUMP_L" << target->target_number;
     code_labelt l(label.str(), code_blockt());
     l.add_source_location()=target->source_location;
     target_label=l.get_label();
@@ -269,9 +269,12 @@ void goto_program2codet::convert_labels(
       it!=target->labels.end();
       ++it)
   {
-    if(has_prefix(id2string(*it), "__CPROVER_ASYNC_") ||
-        has_prefix(id2string(*it), "__CPROVER_DUMP_L"))
+    if(
+      has_prefix(id2string(*it), CPROVER_PREFIX "ASYNC_") ||
+      has_prefix(id2string(*it), CPROVER_PREFIX "DUMP_L"))
+    {
       continue;
+    }
 
     // keep all original labels
     labels_in_use.insert(*it);
@@ -1250,16 +1253,19 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
       it!=target->get_target()->labels.end();
       ++it)
   {
-    if(has_prefix(id2string(*it), "__CPROVER_ASYNC_") ||
-        has_prefix(id2string(*it), "__CPROVER_DUMP_L"))
+    if(
+      has_prefix(id2string(*it), CPROVER_PREFIX "ASYNC_") ||
+      has_prefix(id2string(*it), CPROVER_PREFIX "DUMP_L"))
+    {
       continue;
+    }
 
     label << *it;
     break;
   }
 
   if(label.str().empty())
-    label << "__CPROVER_DUMP_L" << target->get_target()->target_number;
+    label << CPROVER_PREFIX "DUMP_L" << target->get_target()->target_number;
 
   labels_in_use.insert(label.str());
 
@@ -1313,7 +1319,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
         it=target->labels.begin();
         it!=target->labels.end();
         ++it)
-      if(has_prefix(id2string(*it), "__CPROVER_ASYNC_"))
+      if(has_prefix(id2string(*it), CPROVER_PREFIX "ASYNC_"))
       {
         labels_in_use.insert(*it);
 
@@ -1379,7 +1385,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
       it=target->labels.begin();
       it!=target->labels.end();
       ++it)
-    if(has_prefix(id2string(*it), "__CPROVER_ASYNC_"))
+    if(has_prefix(id2string(*it), CPROVER_PREFIX "ASYNC_"))
     {
       labels_in_use.insert(*it);
 

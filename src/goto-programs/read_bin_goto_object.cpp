@@ -125,7 +125,7 @@ static bool read_bin_goto_object_v4(
       {
         irep_idt label=irepconverter.read_string_ref(in);
         instruction.labels.push_back(label);
-        if(label=="__CPROVER_HIDE")
+        if(label == CPROVER_PREFIX "HIDE")
           hidden=true;
         // The above info is normally in the type of the goto_functiont object,
         // which should likely be stored in the binary.

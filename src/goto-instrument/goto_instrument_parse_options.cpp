@@ -994,7 +994,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     if(cmdline.isset("show-custom-bitvector-analysis") ||
        cmdline.isset("custom-bitvector-analysis"))
-      config.ansi_c.defines.push_back("__CPROVER_CUSTOM_BITVECTOR_ANALYSIS");
+    {
+      config.ansi_c.defines.push_back(
+        std::string(CPROVER_PREFIX) + "CUSTOM_BITVECTOR_ANALYSIS");
+    }
 
     // add the library
     status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;

@@ -289,7 +289,7 @@ void goto_inlinet::insert_function_body(
   if(goto_function.is_hidden())
   {
     for(auto &instruction : body.instructions)
-      instruction.labels.remove("__CPROVER_HIDE");
+      instruction.labels.remove(CPROVER_PREFIX "HIDE");
   }
 
   replace_return(body, lhs);
@@ -661,13 +661,9 @@ const goto_inlinet::goto_functiont &goto_inlinet::goto_inline_transitive(
 
 bool goto_inlinet::is_ignored(const irep_idt id) const
 {
-  return
-    id=="__CPROVER_cleanup" ||
-    id=="__CPROVER_set_must" ||
-    id=="__CPROVER_set_may" ||
-    id=="__CPROVER_clear_must" ||
-    id=="__CPROVER_clear_may" ||
-    id=="__CPROVER_cover";
+  return id == CPROVER_PREFIX "cleanup" || id == CPROVER_PREFIX "set_must" ||
+         id == CPROVER_PREFIX "set_may" || id == CPROVER_PREFIX "clear_must" ||
+         id == CPROVER_PREFIX "clear_may" || id == CPROVER_PREFIX "cover";
 }
 
 bool goto_inlinet::check_inline_map(

@@ -43,7 +43,8 @@ void slice_global_inits(goto_modelt &goto_model)
     call_grapht::create_from_root_function(goto_model, entry_point, false);
   const auto directed_graph = call_graph.get_directed_graph();
   INVARIANT(
-    !directed_graph.empty(), "At least __CPROVER_start should be reachable");
+    !directed_graph.empty(),
+    "at least " + id2string(entry_point) + " should be reachable");
 
   // gather all symbols used by reachable functions
 

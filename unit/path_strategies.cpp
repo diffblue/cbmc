@@ -168,7 +168,7 @@ SCENARIO("path strategies")
       "/*  1 */   int main()                       \n"
       "/*  2 */   {                                \n"
       "/*  3 */     int x;                         \n"
-      "/*  4 */     __CPROVER_assume(x == 1);      \n"
+      "/*  4 */     " CPROVER_PREFIX "assume(x == 1);\n"
       "/*  5 */                                    \n"
       "/*  6 */     while(x)                       \n"
       "/*  7 */       --x;                         \n"

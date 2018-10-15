@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/cprover_prefix.h>
 #include <util/find_symbols.h>
 #include <util/fixedbv.h>
 #include <util/lispexpr.h>
@@ -213,7 +214,7 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_string)
   {
-    return q+"__CPROVER_string"+d;
+    return q + CPROVER_PREFIX + "string" + d;
   }
   else if(src.id()==ID_natural ||
           src.id()==ID_integer ||
@@ -244,7 +245,7 @@ std::string expr2ct::convert_rec(
     {
       std::string swidth=src.get_string(ID_width);
       std::string fwidth=src.get_string(ID_f);
-      return q+"__CPROVER_floatbv["+swidth+"]["+fwidth+"]";
+      return q + CPROVER_PREFIX + "floatbv[" + swidth + "][" + fwidth + "]";
     }
   }
   else if(src.id()==ID_fixedbv)
@@ -252,9 +253,8 @@ std::string expr2ct::convert_rec(
     const std::size_t width=to_fixedbv_type(src).get_width();
 
     const std::size_t fraction_bits=to_fixedbv_type(src).get_fraction_bits();
-    return
-      q+"__CPROVER_fixedbv["+std::to_string(width)+"]["+
-      std::to_string(fraction_bits)+"]"+d;
+    return q + CPROVER_PREFIX + "fixedbv[" + std::to_string(width) + "][" +
+           std::to_string(fraction_bits) + "]" + d;
   }
   else if(src.id()==ID_c_bit_field)
   {
@@ -323,8 +323,8 @@ std::string expr2ct::convert_rec(
     }
     else
     {
-      return q+sign_str+
-             "__CPROVER_bitvector["+integer2string(width)+"]"+d;
+      return q + sign_str + CPROVER_PREFIX + "bitvector[" +
+             integer2string(width) + "]" + d;
     }
   }
   else if(src.id()==ID_struct)
@@ -2982,10 +2982,10 @@ std::string expr2ct::convert_code(
     return convert_code_unlock(src, indent);
 
   if(statement==ID_atomic_begin)
-    return indent_str(indent)+"__CPROVER_atomic_begin();";
+    return indent_str(indent) + CPROVER_PREFIX + "atomic_begin();";
 
   if(statement==ID_atomic_end)
-    return indent_str(indent)+"__CPROVER_atomic_end();";
+    return indent_str(indent) + CPROVER_PREFIX + "atomic_end();";
 
   if(statement==ID_function_call)
     return convert_code_function_call(to_code_function_call(src), indent);
@@ -3282,7 +3282,8 @@ std::string expr2ct::convert_code_assume(
     return convert_norep(src, precedence);
   }
 
-  return indent_str(indent)+"__CPROVER_assume("+convert(src.op0())+");";
+  return indent_str(indent) + CPROVER_PREFIX + "assume(" + convert(src.op0()) +
+         ");";
 }
 
 std::string expr2ct::convert_code_label(
@@ -3551,10 +3552,10 @@ std::string expr2ct::convert_with_precedence(
     return convert_function(src, "POINTER_OBJECT", precedence=16);
 
   else if(src.id()=="get_must")
-    return convert_function(src, "__CPROVER_get_must", precedence=16);
+    return convert_function(src, CPROVER_PREFIX "get_must", precedence = 16);
 
   else if(src.id()=="get_may")
-    return convert_function(src, "__CPROVER_get_may", precedence=16);
+    return convert_function(src, CPROVER_PREFIX "get_may", precedence = 16);
 
   else if(src.id()=="object_value")
     return convert_function(src, "OBJECT_VALUE", precedence=16);
@@ -3572,7 +3573,8 @@ std::string expr2ct::convert_with_precedence(
     return convert_function(src, "POINTER_CONS", precedence=16);
 
   else if(src.id()==ID_invalid_pointer)
-    return convert_function(src, "__CPROVER_invalid_pointer", precedence=16);
+    return convert_function(
+      src, CPROVER_PREFIX "invalid_pointer", precedence = 16);
 
   else if(src.id()==ID_dynamic_object)
     return convert_function(src, "DYNAMIC_OBJECT", precedence=16);

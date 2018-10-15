@@ -311,7 +311,7 @@ void goto_convertt::convert_label(
   // magic thread creation label.
   // The "__CPROVER_ASYNC_" signals the start of a sequence of instructions
   // that can be executed in parallel, i.e, a new thread.
-  if(has_prefix(id2string(label), "__CPROVER_ASYNC_"))
+  if(has_prefix(id2string(label), CPROVER_PREFIX "ASYNC_"))
   {
     // the body of the thread is expected to be
     // in the operand.
