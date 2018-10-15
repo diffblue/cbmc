@@ -341,10 +341,6 @@ jobs:
         - COMPILER="ccache g++"
       script: echo "This is coverity build. No need for tests."
 
-  allow_failures:
-    - <<: *formatting-stage
-    - <<: *linter-stage
-
 install:
   - ccache -z
   - ccache --max-size=1G
