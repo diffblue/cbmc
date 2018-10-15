@@ -31,8 +31,8 @@ Date: April 2016
 #include <goto-programs/remove_skip.h>
 
 /// Set up argv with up to max_argc pointers into an array of 4096 bytes.
-/// \param symbol_table: Input program's symbol table
-/// \param goto_functions: Input program's intermediate representation
+/// \param goto_model: Contains the input program's symbol table and
+///   intermediate representation
 /// \param max_argc: User-specified maximum number of arguments to be modelled
 /// \param message_handler: message logging
 /// \return True, if and only if modelling succeeded
