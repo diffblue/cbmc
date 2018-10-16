@@ -9,8 +9,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 \*******************************************************************/
 
 #include "json_symtab_language.h"
+#include "json_symbol_table.h"
 #include <json/json_parser.h>
-#include <util/json_symbol_table.h>
 #include <util/namespace.h>
 
 /// Parse a goto program in json form.
