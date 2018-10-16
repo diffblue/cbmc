@@ -79,7 +79,7 @@ void show_loop_ids_json(
   const goto_programt &goto_program,
   json_arrayt &loops)
 {
-  assert(ui==ui_message_handlert::uit::JSON_UI); // use function above
+  PRECONDITION(ui == ui_message_handlert::uit::JSON_UI); // use function above
 
   forall_goto_program_instructions(it, goto_program)
   {

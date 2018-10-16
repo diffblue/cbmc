@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "printf_formatter.h"
 
-#include <cassert>
 #include <sstream>
 
 #include <util/c_types.h>

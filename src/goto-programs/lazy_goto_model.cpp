@@ -11,6 +11,7 @@
 
 #include <util/cmdline.h>
 #include <util/config.h>
+#include <util/exception_utils.h>
 #include <util/journalling_symbol_table.h>
 #include <util/unicode.h>
 
@@ -96,8 +97,11 @@ void lazy_goto_modelt::initialize(
   const std::vector<std::string> &files=cmdline.args;
   if(files.empty())
   {
-    msg.error() << "Please provide a program" << messaget::eom;
-    throw 0;
+    throw invalid_command_line_argument_exceptiont(
+      "no program provided",
+      "source file names",
+      "one or more paths to a goto binary or a source file in a supported "
+      "language");
   }
 
   std::vector<std::string> binaries, sources;
@@ -124,9 +128,8 @@ void lazy_goto_modelt::initialize(
 
       if(!infile)
       {
-        msg.error() << "failed to open input file `" << filename
-                    << '\'' << messaget::eom;
-        throw 0;
+        throw system_exceptiont(
+          "failed to open input file `" + filename + '\'');
       }
 
       language_filet &lf=add_language_file(filename);
@@ -134,11 +137,8 @@ void lazy_goto_modelt::initialize(
 
       if(lf.language==nullptr)
       {
-        source_locationt location;
-        location.set_file(filename);
-        msg.error().source_location=location;
-        msg.error() << "failed to figure out type of file" << messaget::eom;
-        throw 0;
+        throw invalid_source_file_exceptiont(
+          "failed to figure out type of file `" + filename + '\'');
       }
 
       languaget &language=*lf.language;
@@ -149,8 +149,7 @@ void lazy_goto_modelt::initialize(
 
       if(language.parse(infile, filename))
       {
-        msg.error() << "PARSING ERROR" << messaget::eom;
-        throw 0;
+        throw invalid_source_file_exceptiont("PARSING ERROR");
       }
 
       lf.get_modules();
@@ -160,8 +159,7 @@ void lazy_goto_modelt::initialize(
 
     if(language_files.typecheck(symbol_table))
     {
-      msg.error() << "CONVERSION ERROR" << messaget::eom;
-      throw 0;
+      throw invalid_source_file_exceptiont("CONVERSION ERROR");
     }
   }
 
@@ -170,7 +168,12 @@ void lazy_goto_modelt::initialize(
     msg.status() << "Reading GOTO program from file" << messaget::eom;
 
     if(read_object_and_link(file, *goto_model, message_handler))
-      throw 0;
+    {
+      source_locationt source_location;
+      source_location.set_file(file);
+      throw incorrect_goto_program_exceptiont(
+        "failed to read/link goto model", source_location);
+    }
   }
 
   bool binaries_provided_start =
@@ -205,8 +208,7 @@ void lazy_goto_modelt::initialize(
 
   if(entry_point_generation_failed)
   {
-    msg.error() << "SUPPORT FUNCTION GENERATION ERROR" << messaget::eom;
-    throw 0;
+    throw invalid_source_file_exceptiont("SUPPORT FUNCTION GENERATION ERROR");
   }
 
   // stupid hack

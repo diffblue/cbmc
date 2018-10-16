@@ -127,7 +127,7 @@ exprt remove_const_function_pointerst::resolve_symbol(
 bool remove_const_function_pointerst::try_resolve_function_call(
   const exprt &expr, functionst &out_functions)
 {
-  assert(out_functions.empty());
+  PRECONDITION(out_functions.empty());
   const exprt &simplified_expr=simplify_expr(expr, ns);
   bool resolved=false;
   functionst resolved_functions;

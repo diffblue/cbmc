@@ -1,8 +1,8 @@
 CORE
 main.c
 --replace-calls f:g --replace-calls h:f
-Function f cannot both be replaced and be a replacement
-^EXIT=11$
+function f cannot both be replaced and be a replacement
+^EXIT=1$
 ^SIGNAL=0$
 --
 ^warning: ignoring
