@@ -233,7 +233,7 @@ std::string trace_numeric_value(
 }
 
 void trace_value(
-  std::ostream &out,
+  messaget::mstreamt &out,
   const namespacet &ns,
   const optionalt<symbol_exprt> &lhs_object,
   const exprt &full_lhs,
@@ -264,7 +264,7 @@ void trace_value(
 }
 
 void show_state_header(
-  std::ostream &out,
+  messaget::mstreamt &out,
   const namespacet &ns,
   const goto_trace_stept &state,
   const source_locationt &source_location,
@@ -304,7 +304,7 @@ bool is_index_member_symbol(const exprt &src)
 }
 
 void show_full_goto_trace(
-  std::ostream &out,
+  messaget::mstreamt &out,
   const namespacet &ns,
   const goto_tracet &goto_trace,
   const trace_optionst &options)
@@ -497,7 +497,7 @@ void show_full_goto_trace(
 }
 
 void show_goto_stack_trace(
-  std::ostream &out,
+  messaget::mstreamt &out,
   const namespacet &ns,
   const goto_tracet &goto_trace,
   const trace_optionst &options)
@@ -573,7 +573,7 @@ void show_goto_stack_trace(
 }
 
 void show_goto_trace(
-  std::ostream &out,
+  messaget::mstreamt &out,
   const namespacet &ns,
   const goto_tracet &goto_trace,
   const trace_optionst &options)
@@ -585,7 +585,7 @@ void show_goto_trace(
 }
 
 void show_goto_trace(
-  std::ostream &out,
+  messaget::mstreamt &out,
   const namespacet &ns,
   const goto_tracet &goto_trace)
 {

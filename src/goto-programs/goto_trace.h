@@ -17,6 +17,7 @@ Date: July 2005
 #include <iosfwd>
 #include <vector>
 
+#include <util/message.h>
 #include <util/namespace.h>
 #include <util/options.h>
 #include <util/ssa_expr.h>
@@ -223,18 +224,18 @@ private:
 };
 
 void show_goto_trace(
-  std::ostream &out,
+  messaget::mstreamt &out,
   const namespacet &,
   const goto_tracet &);
 
 void show_goto_trace(
-  std::ostream &out,
+  messaget::mstreamt &out,
   const namespacet &,
   const goto_tracet &,
   const trace_optionst &);
 
 void trace_value(
-  std::ostream &out,
+  messaget::mstreamt &out,
   const namespacet &,
   const optionalt<symbol_exprt> &lhs_object,
   const exprt &full_lhs,
