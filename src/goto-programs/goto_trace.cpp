@@ -245,22 +245,20 @@ void trace_value(
   if(lhs_object.has_value())
     identifier=lhs_object->get_identifier();
 
-  std::string value_string;
+  out << "  " << from_expr(ns, identifier, full_lhs) << '=';
 
   if(value.is_nil())
-    value_string="(assignment removed)";
+    out << "(assignment removed)";
   else
   {
-    value_string=from_expr(ns, identifier, value);
+    out << from_expr(ns, identifier, value);
 
     // the binary representation
-    value_string += " (" + trace_numeric_value(value, ns, options) + ')';
+    out << ' ' << messaget::faint << '('
+        << trace_numeric_value(value, ns, options) << ')' << messaget::reset;
   }
 
-  out << "  "
-      << from_expr(ns, identifier, full_lhs)
-      << '=' << value_string
-      << '\n';
+  out << '\n';
 }
 
 void show_state_header(
@@ -322,10 +320,10 @@ void show_full_goto_trace(
       if(!step.cond_value)
       {
         out << '\n';
-        out << "Violated property:" << '\n';
+        out << messaget::red << "Violated property:" << messaget::reset << '\n';
         if(!step.pc->source_location.is_nil())
           out << "  " << step.pc->source_location << '\n';
-        out << "  " << step.comment << '\n';
+        out << "  " << messaget::red << step.comment << messaget::reset << '\n';
 
         if(step.pc->is_assert())
           out << "  " << from_expr(ns, step.pc->function, step.pc->guard)
