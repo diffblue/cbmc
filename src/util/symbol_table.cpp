@@ -128,6 +128,10 @@ void symbol_tablet::validate(const validation_modet vm) const
     const auto symbol_key = elem.first;
     const auto &symbol = elem.second;
 
+    // First of all, ensure symbol well-formedness
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm, symbol.is_well_formed(), "Symbol is malformed: ", symbol_key);
+
     // Check that symbols[id].name == id
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,

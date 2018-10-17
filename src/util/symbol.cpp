@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "source_location.h"
 #include "std_expr.h"
+#include "suffix.h"
 
 /// Dump the state of a symbol object to a given output stream.
 /// \param out: The stream to output object state to.
@@ -120,4 +121,26 @@ void symbolt::swap(symbolt &b)
 symbol_exprt symbolt::symbol_expr() const
 {
   return symbol_exprt(name, type);
+}
+
+/// Check that the instance object is well formed.
+/// \return: true if well-formed; false otherwise.
+bool symbolt::is_well_formed() const
+{
+  // Well-formedness criterion number 1 is for a symbol
+  // to have a non-empty mode (see #1880)
+  if(mode.empty())
+  {
+    return false;
+  }
+
+  // Well-formedness criterion number 2 is for a symbol
+  // to have it's base name as a suffix to it's more
+  // general name.
+  if(!has_suffix(id2string(name), id2string(base_name)))
+  {
+    return false;
+  }
+
+  return true;
 }

@@ -35,10 +35,11 @@ SCENARIO(
     symbol_tablet symbol_table;
 
     symbolt symbol;
-    irep_idt symbol_name = "Test";
+    irep_idt symbol_name = "Test_TestBase";
     symbol.name = symbol_name;
     symbol.base_name = "TestBase";
     symbol.module = "TestModule";
+    symbol.mode = "C";
 
     symbol_table.insert(symbol);
 

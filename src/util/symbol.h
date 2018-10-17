@@ -121,6 +121,9 @@ public:
     PRECONDITION(type.id() == ID_code);
     value = exprt(ID_compiled);
   }
+
+  /// Check that a symbol is well formed.
+  bool is_well_formed() const;
 };
 
 std::ostream &operator<<(std::ostream &out, const symbolt &symbol);
