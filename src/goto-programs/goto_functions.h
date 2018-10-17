@@ -72,10 +72,6 @@ public:
     function_map.clear();
   }
 
-  void output(
-    const namespacet &ns,
-    std::ostream &out) const;
-
   void compute_location_numbers();
   void compute_location_numbers(goto_programt &);
   void compute_loop_numbers();
@@ -118,6 +114,9 @@ public:
     for(const auto &fun : other.function_map)
       function_map[fun.first].copy_from(fun.second);
   }
+
+  std::vector<function_mapt::const_iterator> sorted() const;
+  std::vector<function_mapt::iterator> sorted();
 };
 
 #define Forall_goto_functions(it, functions) \

@@ -41,10 +41,13 @@ json_objectt show_goto_functions_jsont::convert(
 {
   json_arrayt json_functions;
   const json_irept no_comments_irep_converter(false);
-  for(const auto &function_entry : goto_functions.function_map)
+
+  const auto sorted = goto_functions.sorted();
+
+  for(const auto &function_entry : sorted)
   {
-    const irep_idt &function_name=function_entry.first;
-    const goto_functionst::goto_functiont &function=function_entry.second;
+    const irep_idt &function_name = function_entry->first;
+    const goto_functionst::goto_functiont &function = function_entry->second;
 
     json_objectt &json_function=
       json_functions.push_back(jsont()).make_object();

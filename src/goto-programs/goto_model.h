@@ -37,12 +37,6 @@ public:
     goto_functions.clear();
   }
 
-  void output(std::ostream &out) const
-  {
-    namespacet ns(symbol_table);
-    goto_functions.output(ns, out);
-  }
-
   goto_modelt()
   {
   }
