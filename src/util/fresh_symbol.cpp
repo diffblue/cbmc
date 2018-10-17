@@ -17,14 +17,16 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "symbol.h"
 #include "symbol_table_base.h"
 
-/// Installs a fresh-named symbol with the requested name pattern
-/// \par parameters: `type`: type of new symbol
-/// `name_prefix`, `basename_prefix`: new symbol will be named
-///   name_prefix::basename_prefix$num unless name_prefix is empty, in which
+/// Installs a fresh-named symbol with the requested name pattern.
+/// \param type: The type of the new symbol.
+/// \param name_prefix: The new symbol will be named
+///   `name_prefix::basename_prefix$num` unless name_prefix is empty, in which
 ///   case the :: prefix is omitted.
-/// `source_location`: new symbol source loc
-/// `symbol_mode`: new symbol mode
-/// `symbol_table`: table to add the new symbol to
+/// \param basename_prefix: See `name_prefix`.
+/// \param source_location: The source location for the new symbol.
+/// \param symbol_mode: The mode for the new symbol, e.g. ID_C, ID_java.
+/// \param symbol_table: The symbol table to add the new symbol to.
+/// \return The new symbol.
 symbolt &get_fresh_aux_symbol(
   const typet &type,
   const std::string &name_prefix,
