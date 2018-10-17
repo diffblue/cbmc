@@ -82,7 +82,7 @@ void goto_trace_stept::output(
   }
 
   if(is_assert() || is_assume() || is_goto())
-    out << " (" << cond_value << ")";
+    out << " (" << cond_value << ')';
   else if(is_function_call() || is_function_return())
     out << ' ' << function_identifier;
 
@@ -254,13 +254,13 @@ void trace_value(
     value_string=from_expr(ns, identifier, value);
 
     // the binary representation
-    value_string += " (" + trace_numeric_value(value, ns, options) + ")";
+    value_string += " (" + trace_numeric_value(value, ns, options) + ')';
   }
 
   out << "  "
       << from_expr(ns, identifier, full_lhs)
-      << "=" << value_string
-      << "\n";
+      << '=' << value_string
+      << '\n';
 }
 
 void show_state_header(
@@ -271,23 +271,20 @@ void show_state_header(
   unsigned step_nr,
   const trace_optionst &options)
 {
-  out << "\n";
+  out << '\n';
 
   if(step_nr == 0)
     out << "Initial State";
   else
     out << "State " << step_nr;
 
-  out << " " << source_location << " thread " << state.thread_nr << "\n";
-  out << "----------------------------------------------------"
-      << "\n";
+  out << ' ' << source_location << " thread " << state.thread_nr << '\n';
+  out << "----------------------------------------------------" << '\n';
 
   if(options.show_code)
   {
-    out << as_string(ns, *state.pc)
-        << "\n";
-    out << "----------------------------------------------------"
-        << "\n";
+    out << as_string(ns, *state.pc) << '\n';
+    out << "----------------------------------------------------" << '\n';
   }
 }
 
@@ -324,33 +321,33 @@ void show_full_goto_trace(
     case goto_trace_stept::typet::ASSERT:
       if(!step.cond_value)
       {
-        out << "\n";
-        out << "Violated property:" << "\n";
+        out << '\n';
+        out << "Violated property:" << '\n';
         if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << "\n";
-        out << "  " << step.comment << "\n";
+          out << "  " << step.pc->source_location << '\n';
+        out << "  " << step.comment << '\n';
 
         if(step.pc->is_assert())
           out << "  " << from_expr(ns, step.pc->function, step.pc->guard)
               << '\n';
 
-        out << "\n";
+        out << '\n';
       }
       break;
 
     case goto_trace_stept::typet::ASSUME:
       if(!step.cond_value)
       {
-        out << "\n";
-        out << "Violated assumption:" << "\n";
+        out << '\n';
+        out << "Violated assumption:" << '\n';
         if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << "\n";
+          out << "  " << step.pc->source_location << '\n';
 
         if(step.pc->is_assume())
           out << "  " << from_expr(ns, step.pc->function, step.pc->guard)
               << '\n';
 
-        out << "\n";
+        out << '\n';
       }
       break;
 
@@ -403,13 +400,13 @@ void show_full_goto_trace(
         printf_formattert printf_formatter(ns);
         printf_formatter(id2string(step.format_string), step.io_args);
         printf_formatter.print(out);
-        out << "\n";
+        out << '\n';
       }
       else
       {
         show_state_header(
           out, ns, step, step.pc->source_location, step.step_nr, options);
-        out << "  OUTPUT " << step.io_id << ":";
+        out << "  OUTPUT " << step.io_id << ':';
 
         for(std::list<exprt>::const_iterator
             l_it=step.io_args.begin();
@@ -417,21 +414,21 @@ void show_full_goto_trace(
             l_it++)
         {
           if(l_it!=step.io_args.begin())
-            out << ";";
-          out << " " << from_expr(ns, step.pc->function, *l_it);
+            out << ';';
+          out << ' ' << from_expr(ns, step.pc->function, *l_it);
 
           // the binary representation
-          out << " (" << trace_numeric_value(*l_it, ns, options) << ")";
+          out << " (" << trace_numeric_value(*l_it, ns, options) << ')';
         }
 
-        out << "\n";
+        out << '\n';
       }
       break;
 
     case goto_trace_stept::typet::INPUT:
       show_state_header(
         out, ns, step, step.pc->source_location, step.step_nr, options);
-      out << "  INPUT " << step.io_id << ":";
+      out << "  INPUT " << step.io_id << ':';
 
       for(std::list<exprt>::const_iterator
           l_it=step.io_args.begin();
@@ -439,14 +436,14 @@ void show_full_goto_trace(
           l_it++)
       {
         if(l_it!=step.io_args.begin())
-          out << ";";
-        out << " " << from_expr(ns, step.pc->function, *l_it);
+          out << ';';
+        out << ' ' << from_expr(ns, step.pc->function, *l_it);
 
         // the binary representation
-        out << " (" << trace_numeric_value(*l_it, ns, options) << ")";
+        out << " (" << trace_numeric_value(*l_it, ns, options) << ')';
       }
 
-      out << "\n";
+      out << '\n';
       break;
 
     case goto_trace_stept::typet::FUNCTION_CALL:
