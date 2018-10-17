@@ -174,6 +174,7 @@ extern char *yyansi_ctext;
 %token TOK_EXISTS      "exists"
 %token TOK_ACSL_FORALL "\\forall"
 %token TOK_ACSL_EXISTS "\\exists"
+%token TOK_ACSL_LET    "\\let"
 %token TOK_ARRAY_OF    "array_of"
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
 %token TOK_CPROVER_FLOATBV "__CPROVER_floatbv"
@@ -190,6 +191,7 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_ENSURES  "__CPROVER_ensures"
 %token TOK_IMPLIES     "==>"
 %token TOK_EQUIVALENT  "<==>"
+%token TOK_XORXOR      "^^"
 %token TOK_TRUE        "TRUE"
 %token TOK_FALSE       "FALSE"
 %token TOK_REAL        "__real__"
@@ -775,9 +777,15 @@ logical_and_expression:
         { binary($$, $1, $2, ID_and, $3); }
         ;
 
-logical_or_expression:
+logical_xor_expression:
           logical_and_expression
-        | logical_or_expression TOK_OROR logical_and_expression
+        | logical_xor_expression TOK_XORXOR logical_and_expression
+        { binary($$, $1, $2, ID_xor, $3); }
+        ;
+
+logical_or_expression:
+          logical_xor_expression
+        | logical_or_expression TOK_OROR logical_xor_expression
         { binary($$, $1, $2, ID_or, $3); }
         ;
 

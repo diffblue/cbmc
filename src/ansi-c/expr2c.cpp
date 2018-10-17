@@ -3815,7 +3815,7 @@ std::string expr2ct::convert_with_precedence(
     return convert_multi_ary(src, "||", precedence=4, false);
 
   else if(src.id()==ID_xor)
-    return convert_multi_ary(src, "^", precedence=7, false);
+    return convert_multi_ary(src, "!=", precedence = 9, false);
 
   else if(src.id()==ID_implies)
     return convert_binary(src, "==>", precedence=3, true);

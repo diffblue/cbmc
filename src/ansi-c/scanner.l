@@ -1223,39 +1223,65 @@ __decltype          { if(PARSER.cpp98 &&
 "__CPROVER_requires"     { loc(); return TOK_CPROVER_REQUIRES; }
 "__CPROVER_ensures"      { loc(); return TOK_CPROVER_ENSURES; }
 
-"\x22\x00" |
+"\xe2\x88\x80" |
 "\\forall"      { /* Non-standard, obviously. Found in ACSL syntax. */
                   loc(); return TOK_ACSL_FORALL;
                 }
 
-"\x22\x03" |
+"\xe2\x88\x83" |
 "\\exists"      { /* Non-standard, obviously. Found in ACSL syntax. */
                   loc(); return TOK_ACSL_EXISTS;
                 }
-"\x21\xD2" |
+
+"\\let"         { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_ACSL_LET;
+                }
+
+"\xe2\x87\x92" |
 "==>"           { /* Non-standard, obviously. Found in Spec# and ACSL syntax. */
                   loc(); return TOK_IMPLIES;
                 }
 
-"\x21\xD4" |
+"\xe2\x87\x94" |
 "<==>"          { /* Non-standard, obviously. Found in Spec# and ACSL syntax. */
                   loc(); return TOK_EQUIVALENT;
                 }
 
-"\x22\x65"      { /* Non-standard, obviously. Found in ACSL syntax. */
+"\xe2\x89\xa5"  { /* Non-standard, obviously. Found in ACSL syntax. */
                   loc(); return TOK_GE;
                 }
 
-"\x22\x64"      { /* Non-standard, obviously. Found in ACSL syntax. */
+"\xe2\x89\xa1"  { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_EQ;
+                }
+
+"\xe2\x89\xa2"  { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_NE;
+                }
+
+"\xe2\x89\xa4"  { /* Non-standard, obviously. Found in ACSL syntax. */
                   loc(); return TOK_LE;
                 }
 
-"\x22\x27"      { /* Non-standard, obviously. Found in ACSL syntax. */
+"\xe2\x88\xa7"  { /* Non-standard, obviously. Found in ACSL syntax. */
                   loc(); return TOK_ANDAND;
                 }
 
-"\x22\x28"      { /* Non-standard, obviously. Found in ACSL syntax. */
+"\xe2\x88\xa8"  { /* Non-standard, obviously. Found in ACSL syntax. */
                   loc(); return TOK_OROR;
+                }
+
+"\xc2\xac"      { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return '!';
+                }
+
+"\xe2\x8a\xbb" |
+"^^"            { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_XORXOR;
+                }
+
+"\xe2\x88\x92"  { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return '-';
                 }
 
 "\\true"        { /* Non-standard, obviously. Found in ACSL syntax. */
