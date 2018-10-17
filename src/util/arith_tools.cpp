@@ -265,12 +265,17 @@ void mp_max(mp_integer &a, const mp_integer &b)
 
 /// Get a bit with given index from bit-vector representation.
 /// \param src: the bitvector representation
+/// \param width: the number of bits in the bitvector
 /// \param bit_index: index (0 is the least significant)
-bool get_bitvector_bit(const irep_idt &src, std::size_t bit_index)
+bool get_bitvector_bit(
+  const irep_idt &src,
+  std::size_t width,
+  std::size_t bit_index)
 {
   // The representation is binary, using '0'/'1',
   // most significant bit first.
-  PRECONDITION(bit_index < src.size());
+  PRECONDITION(bit_index < width);
+  PRECONDITION(src.size() == width);
   return src[src.size() - 1 - bit_index] == '1';
 }
 
@@ -302,8 +307,8 @@ irep_idt bitvector_bitwise_op(
   const std::size_t width,
   const std::function<bool(bool, bool)> f)
 {
-  return make_bvrep(width, [&a, &b, f](std::size_t i) {
-    return f(get_bitvector_bit(a, i), get_bitvector_bit(b, i));
+  return make_bvrep(width, [&a, &b, &width, f](std::size_t i) {
+    return f(get_bitvector_bit(a, width, i), get_bitvector_bit(b, width, i));
   });
 }
 
@@ -318,6 +323,7 @@ irep_idt bitvector_bitwise_op(
   const std::size_t width,
   const std::function<bool(bool)> f)
 {
-  return make_bvrep(
-    width, [&a, f](std::size_t i) { return f(get_bitvector_bit(a, i)); });
+  return make_bvrep(width, [&a, &width, f](std::size_t i) {
+    return f(get_bitvector_bit(a, width, i));
+  });
 }

@@ -744,8 +744,10 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
       UNREACHABLE;
 
     const irep_idt new_value =
-      make_bvrep(width, [&a_val, &b_val, &f](std::size_t i) {
-        return f(get_bitvector_bit(a_val, i), get_bitvector_bit(b_val, i));
+      make_bvrep(width, [&a_val, &b_val, &width, &f](std::size_t i) {
+        return f(
+          get_bitvector_bit(a_val, width, i),
+          get_bitvector_bit(b_val, width, i));
       });
 
     constant_exprt new_op(new_value, expr.type());
@@ -1278,9 +1280,10 @@ bool simplify_exprt::simplify_bitnot(exprt &expr)
       if(op.id()==ID_constant)
       {
         const auto &value = to_constant_expr(op).get_value();
-        const auto new_value = make_bvrep(width, [&value](std::size_t i) {
-          return !get_bitvector_bit(value, i);
-        });
+        const auto new_value =
+          make_bvrep(width, [&value, &width](std::size_t i) {
+            return !get_bitvector_bit(value, width, i);
+          });
         expr = constant_exprt(new_value, op.type());
         return false;
       }
