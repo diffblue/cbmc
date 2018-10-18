@@ -43,17 +43,20 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   }
   else if(type_id==ID_unsignedbv)
   {
-    int_value = bv2integer(id2string(value), false);
+    const auto width = to_unsignedbv_type(type).get_width();
+    int_value = bv2integer(id2string(value), width, false);
     return false;
   }
   else if(type_id==ID_signedbv)
   {
-    int_value = bv2integer(id2string(value), true);
+    const auto width = to_signedbv_type(type).get_width();
+    int_value = bv2integer(id2string(value), width, true);
     return false;
   }
   else if(type_id==ID_c_bool)
   {
-    int_value = bv2integer(id2string(value), false);
+    const auto width = to_c_bool_type(type).get_width();
+    int_value = bv2integer(id2string(value), width, false);
     return false;
   }
   else if(type_id==ID_c_enum)
@@ -61,26 +64,36 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
     const typet &subtype=to_c_enum_type(type).subtype();
     if(subtype.id()==ID_signedbv)
     {
-      int_value = bv2integer(id2string(value), true);
+      const auto width = to_signedbv_type(type).get_width();
+      int_value = bv2integer(id2string(value), width, true);
       return false;
     }
     else if(subtype.id()==ID_unsignedbv)
     {
-      int_value = bv2integer(id2string(value), false);
+      const auto width = to_unsignedbv_type(type).get_width();
+      int_value = bv2integer(id2string(value), width, false);
       return false;
     }
   }
   else if(type_id==ID_c_bit_field)
   {
-    const typet &subtype = to_c_bit_field_type(type).subtype();
+    const auto &c_bit_field_type = to_c_bit_field_type(type);
+    const auto width = c_bit_field_type.get_width();
+    const typet &subtype = c_bit_field_type.subtype();
+
     if(subtype.id()==ID_signedbv)
     {
-      int_value = bv2integer(id2string(value), true);
+      int_value = bv2integer(id2string(value), width, true);
       return false;
     }
     else if(subtype.id()==ID_unsignedbv)
     {
-      int_value = bv2integer(id2string(value), false);
+      int_value = bv2integer(id2string(value), width, false);
+      return false;
+    }
+    else if(subtype.id() == ID_c_bool)
+    {
+      int_value = bv2integer(id2string(value), width, false);
       return false;
     }
   }

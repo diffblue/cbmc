@@ -193,8 +193,10 @@ const std::string integer2bv(const mp_integer &src, std::size_t width)
 }
 
 /// convert a bit-vector representation (possibly signed) to integer
-const mp_integer bv2integer(const std::string &src, bool is_signed)
+const mp_integer
+bv2integer(const std::string &src, std::size_t width, bool is_signed)
 {
+  PRECONDITION(src.size() == width);
   return binary2integer(src, is_signed);
 }
 
