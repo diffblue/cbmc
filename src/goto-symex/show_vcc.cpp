@@ -10,16 +10,16 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Output of the verification conditions (VCCs)
 
 #include "show_vcc.h"
+#include "symex_target_equation.h"
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 #include <goto-symex/symex_target_equation.h>
 
-#include <langapi/language_util.h>
-#include <langapi/mode.h>
-
 #include <util/exception_utils.h>
+#include <util/format_expr.h>
 #include <util/json.h>
 #include <util/json_expr.h>
 #include <util/ui_message.h>
@@ -46,10 +46,10 @@ void show_vcc_plain(
       out << '\n';
 
     if(s_it->source.pc->source_location.is_not_nil())
-      out << s_it->source.pc->source_location << "\n";
+      out << s_it->source.pc->source_location << '\n';
 
     if(s_it->comment != "")
-      out << s_it->comment << "\n";
+      out << s_it->comment << '\n';
 
     symex_target_equationt::SSA_stepst::const_iterator p_it =
       equation.SSA_steps.begin();
@@ -63,14 +63,11 @@ void show_vcc_plain(
       {
         if(!p_it->ignore)
         {
-          std::string string_value =
-            from_expr(ns, p_it->source.pc->function, p_it->cond_expr);
-          out << "{-" << count << "} " << string_value << "\n";
+          out << "{-" << count << "} " << format(p_it->cond_expr) << '\n';
 
-#if 0
-          languages.from_expr(p_it->guard_expr, string_value);
-          out << "GUARD: " << string_value << "\n";
-          out << "\n";
+#ifdef DEBUG
+          out << "GUARD: " << format(p_it->guard) << '\n';
+          out << '\n';
 #endif
 
           count++;
@@ -94,9 +91,7 @@ void show_vcc_plain(
     std::size_t count = 1;
     for(const auto &disjunct : disjuncts)
     {
-      std::string string_value =
-        from_expr(ns, s_it->source.pc->function, disjunct);
-      out << "{" << count << "} " << string_value << "\n";
+      out << '{' << count << "} " << format(disjunct) << '\n';
       count++;
     }
   }
@@ -147,15 +142,15 @@ void show_vcc_json(
         (p_it->is_assume() || p_it->is_assignment() || p_it->is_constraint()) &&
         !p_it->ignore)
       {
-        std::string string_value =
-          from_expr(ns, p_it->source.pc->function, p_it->cond_expr);
-        json_constraints.push_back(json_stringt(string_value));
+        std::ostringstream string_value;
+        string_value << format(p_it->cond_expr);
+        json_constraints.push_back(json_stringt(string_value.str()));
       }
     }
 
-    std::string string_value =
-      from_expr(ns, s_it->source.pc->function, s_it->cond_expr);
-    object["expression"] = json_stringt(string_value);
+    std::ostringstream string_value;
+    string_value << format(s_it->cond_expr);
+    object["expression"] = json_stringt(string_value.str());
   }
 
   out << ",\n" << json_result;
