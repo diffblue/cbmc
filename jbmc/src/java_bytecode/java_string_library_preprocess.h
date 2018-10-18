@@ -43,7 +43,6 @@ public:
 
   void initialize_known_type_table();
   void initialize_conversion_table();
-  void initialize_refined_string_type();
 
   bool implements_function(const irep_idt &function_id) const;
   void get_all_function_names(std::unordered_set<irep_idt> &methods) const;
@@ -151,12 +150,6 @@ private:
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
-  codet make_string_to_char_array_code(
-    const java_method_typet &type,
-    const source_locationt &loc,
-    const irep_idt &function_id,
-    symbol_tablet &symbol_table);
-
   codet make_string_format_code(
     const java_method_typet &type,
     const source_locationt &loc,
@@ -254,13 +247,6 @@ private:
     symbol_table_baset &symbol_table,
     code_blockt &code);
 
-  exprt allocate_fresh_array(
-    const typet &type,
-    const source_locationt &loc,
-    const irep_idt &function_id,
-    symbol_tablet &symbol_table,
-    code_blockt &code);
-
   codet code_return_function_application(
     const irep_idt &function_name,
     const exprt::operandst &arguments,
@@ -346,12 +332,6 @@ private:
     code_blockt &code);
 
   exprt get_object_at_index(const exprt &argv, std::size_t index);
-
-  codet make_init_from_array_code(
-    const java_method_typet &type,
-    const source_locationt &loc,
-    const irep_idt &function_id,
-    symbol_table_baset &symbol_table);
 };
 
 exprt make_nondet_infinite_char_array(
