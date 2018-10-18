@@ -24,6 +24,7 @@ endmacro(add_test_pl_tests)
 # running tests in parallel, it is important that these directories are
 # listed with decreasing runtimes (i.e. longest running at the top)
 add_subdirectory(cbmc)
+add_subdirectory(cbmc-library)
 add_subdirectory(goto-analyzer)
 add_subdirectory(ansi-c)
 add_subdirectory(goto-instrument)
