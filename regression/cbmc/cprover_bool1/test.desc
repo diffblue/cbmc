@@ -1,0 +1,10 @@
+CORE
+main.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+x != \(__CPROVER_bool\)y
+--
+x != \(_Bool\)y
+^warning: ignoring

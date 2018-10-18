@@ -205,7 +205,7 @@ std::string expr2ct::convert_rec(
 
   if(src.id()==ID_bool)
   {
-    return q+"_Bool"+d;
+    return q + CPROVER_PREFIX + "bool" + d;
   }
   else if(src.id()==ID_c_bool)
   {
