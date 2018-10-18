@@ -3,22 +3,23 @@
 
 #ifdef __GNUC__
 
-void f00 (float f)
+void f00(float f)
 {
-  if (f > 0x1.FFFFFEp+127) {
+  if(f > 0x1.FFFFFEp+127)
+  {
     assert(isinf(f));
   }
 }
 
 #endif
 
-int main (void)
+int main(void)
 {
-  #ifdef __GNUC__
+#ifdef __GNUC__
   float f;
 
   f00(f);
-  #endif
+#endif
 
   return 0;
 }

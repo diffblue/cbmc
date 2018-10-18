@@ -8,12 +8,12 @@
 
 int main()
 {
-	char data[20];
+  char data[20];
 
-	if(read(0, data, 100) < 0)
-		printf("An error has occurred");
-	else
-		printf("Read occurred");
+  if(read(0, data, 100) < 0)
+    printf("An error has occurred");
+  else
+    printf("Read occurred");
 
-	return 0;
+  return 0;
 }

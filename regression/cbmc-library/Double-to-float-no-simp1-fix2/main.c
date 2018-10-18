@@ -2,26 +2,28 @@
 
 #ifdef __GNUC__
 #include <assert.h>
-#include <math.h>
 #include <fenv.h>
+#include <math.h>
 
-float setRoundingModeAndCast(int mode, double d) {
+float setRoundingModeAndCast(int mode, double d)
+{
   fesetround(mode);
   return (float)d;
 }
 
-void test (int mode, double d, float result) {
-  float f = setRoundingModeAndCast(mode,d);
+void test(int mode, double d, float result)
+{
+  float f = setRoundingModeAndCast(mode, d);
   assert(f == result);
   return;
 }
 #endif
 
-int main (void)
+int main(void)
 {
-  #ifdef __GNUC__
+#ifdef __GNUC__
   test(FE_TONEAREST, 0x1.fffffffffffffp+1023, +INFINITY);
-  #endif
+#endif
 
   return 1;
 }

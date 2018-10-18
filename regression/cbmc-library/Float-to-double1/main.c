@@ -10,7 +10,7 @@ float nondet_float();
 
 int main()
 {
-  float f=nondet_float();
+  float f = nondet_float();
 
   double d = (double)f;
   float ff = (float)d;

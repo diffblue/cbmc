@@ -5,7 +5,7 @@
 
 typedef uint32_t literal;
 
-literal neg (literal l)
+literal neg(literal l)
 {
   return l ^ 0x1;
 }
@@ -25,20 +25,20 @@ typedef struct _clause
 
 } clause;
 
-clause * createClause (literal *lits, uint32_t count)
+clause *createClause(literal *lits, uint32_t count)
 {
   assert(count >= 2);
 
   size_t s = sizeof(clause) + count * sizeof(literal);
   clause *c = malloc(s);
 
-  memset(c,0,s);
+  memset(c, 0, s);
 
   c->length = c;
   c->first_watch = lits[0];
   c->second_watch = lits[1];
 
-  for (uint32_t i = 2; i < count; ++i)
+  for(uint32_t i = 2; i < count; ++i)
   {
     c->body[i - 2] = lits[i];
   }
@@ -46,10 +46,11 @@ clause * createClause (literal *lits, uint32_t count)
   return c;
 }
 
-int main (void) {
+int main(void)
+{
   uint32_t line[4] = {0x23, 0x42, 0x43, 0x22};
 
-  clause *c = createClause(line,4);
+  clause *c = createClause(line, 4);
 
   assert(c->wl_next == NULL);
   assert(c->wl_prev == NULL);

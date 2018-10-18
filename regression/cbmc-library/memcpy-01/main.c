@@ -1,5 +1,5 @@
-#include <string.h>
 #include <assert.h>
+#include <string.h>
 
 struct without_ptr
 {
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
   memcpy(&m, &k, sizeof(struct with_int_ptr));
   assert(m.i == (int *)44);
   assert(m.j == 45);
-  
+
   struct with_struct_ptr p;
   p.s = &w;
   p.t = 46;
@@ -46,6 +46,6 @@ int main(int argc, char **argv)
   assert(q.s->x == 42);
   assert(q.s->y == 43);
   assert(q.t == 46);
-  
+
   return 0;
 }

@@ -10,9 +10,9 @@
 #include <assert.h>
 #include <math.h>
 
-int main (void)
+int main(void)
 {
-  #ifdef __GNUC__
+#ifdef __GNUC__
   // Visual Studio won't parse the hexadecimal floating-point literal
   float largestSubnormalFloat = 0x1.fffffcp-127f;
 
@@ -27,7 +27,7 @@ int main (void)
   char b = __CPROVER_isnormalf(largestSubnormalFloat);
 
   assert(!b);
-  #endif
+#endif
 
   return 0;
 }

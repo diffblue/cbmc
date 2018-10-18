@@ -14,25 +14,25 @@ int main()
 
 int main()
 {
-  #ifdef FE_DOWNWARD
+#ifdef FE_DOWNWARD
   fesetround(FE_DOWNWARD);
-  assert(fegetround()==FE_DOWNWARD);
-  #endif
+  assert(fegetround() == FE_DOWNWARD);
+#endif
 
-  #ifdef FE_TONEAREST
+#ifdef FE_TONEAREST
   fesetround(FE_TONEAREST);
-  assert(fegetround()==FE_TONEAREST);
-  #endif
+  assert(fegetround() == FE_TONEAREST);
+#endif
 
-  #ifdef FE_TOWARDZERO
+#ifdef FE_TOWARDZERO
   fesetround(FE_TOWARDZERO);
-  assert(fegetround()==FE_TOWARDZERO);
-  #endif
+  assert(fegetround() == FE_TOWARDZERO);
+#endif
 
-  #ifdef FE_UPWARD
+#ifdef FE_UPWARD
   fesetround(FE_UPWARD);
-  assert(fegetround()==FE_UPWARD);
-  #endif
+  assert(fegetround() == FE_UPWARD);
+#endif
 }
 
 #endif

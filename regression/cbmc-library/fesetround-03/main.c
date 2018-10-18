@@ -10,16 +10,16 @@
 int main()
 {
   fesetround(FE_DOWNWARD);
-  assert(FLT_ROUNDS==3);
+  assert(FLT_ROUNDS == 3);
 
   fesetround(FE_TONEAREST);
-  assert(FLT_ROUNDS==1);
+  assert(FLT_ROUNDS == 1);
 
   fesetround(FE_TOWARDZERO);
-  assert(FLT_ROUNDS==0);
+  assert(FLT_ROUNDS == 0);
 
   fesetround(FE_UPWARD);
-  assert(FLT_ROUNDS==2);
+  assert(FLT_ROUNDS == 2);
 }
 
 #else

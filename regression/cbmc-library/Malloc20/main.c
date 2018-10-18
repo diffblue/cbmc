@@ -10,8 +10,7 @@ struct nettle_buffer
   size_t size;
 };
 
-void
-nettle_buffer_init(struct nettle_buffer *buffer)
+void nettle_buffer_init(struct nettle_buffer *buffer)
 {
   buffer->contents = 0;
   buffer->alloc = 0;
@@ -21,17 +20,22 @@ nettle_buffer_init(struct nettle_buffer *buffer)
 
 int nettle_buffer_grow(struct nettle_buffer *buffer, size_t length)
 {
-  if (buffer->condition) return 0; // Uncommenting this line fixes the bug.
+  if(buffer->condition)
+    return 0; // Uncommenting this line fixes the bug.
 
-  size_t alloc = buffer->alloc * 2 + length + 100; // Replcing alloc size by a constant fixes the bug.
+  size_t alloc = buffer->alloc * 2 + length +
+                 100; // Replcing alloc size by a constant fixes the bug.
   //size_t alloc = 103;
-  uint8_t *p = (uint8_t *) malloc(alloc);
+  uint8_t *p = (uint8_t *)malloc(alloc);
   buffer->contents = p;
   buffer->alloc = alloc;
   return 1;
 }
 
-int nettle_buffer_write(struct nettle_buffer *buffer, size_t length, const uint8_t *data)
+int nettle_buffer_write(
+  struct nettle_buffer *buffer,
+  size_t length,
+  const uint8_t *data)
 {
   memcpy(buffer->contents, data, length);
   return 1;
@@ -44,7 +48,9 @@ int main(void)
   nettle_buffer_grow(&buffer, 3);
   __CPROVER_assert(buffer.size == 0, "buffer.size == 0");
   __CPROVER_assert(buffer.alloc == 103, "buffer.alloc == 103");
-  __CPROVER_assert(nettle_buffer_write(&buffer, 3, "foo"), "nettle_buffer_write(&buffer, 3, \"foo\")");
+  __CPROVER_assert(
+    nettle_buffer_write(&buffer, 3, "foo"),
+    "nettle_buffer_write(&buffer, 3, \"foo\")");
   __CPROVER_assert(buffer.contents[0] == 'f', "buffer.contents[0] == 'f'");
   __CPROVER_assert(buffer.contents[1] == 'o', "buffer.contents[1] == 'o'");
   __CPROVER_assert(buffer.contents[2] == 'o', "buffer.contents[2] == 'o'");
