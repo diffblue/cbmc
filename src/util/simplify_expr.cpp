@@ -144,7 +144,7 @@ bool simplify_exprt::simplify_popcount(popcount_exprt &expr)
       std::size_t result = 0;
 
       for(std::size_t i = 0; i < width; i++)
-        if(get_bitvector_bit(value, i))
+        if(get_bitvector_bit(value, width, i))
           result++;
 
       auto result_expr = from_integer(result, expr.type());

@@ -164,7 +164,10 @@ mp_integer power(const mp_integer &base, const mp_integer &exponent);
 void mp_min(mp_integer &a, const mp_integer &b);
 void mp_max(mp_integer &a, const mp_integer &b);
 
-bool get_bitvector_bit(const irep_idt &src, std::size_t bit_index);
+bool get_bitvector_bit(
+  const irep_idt &src,
+  std::size_t width,
+  std::size_t bit_index);
 
 irep_idt
 make_bvrep(const std::size_t width, const std::function<bool(std::size_t)> f);

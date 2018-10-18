@@ -91,7 +91,7 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
 
     for(std::size_t i=0; i<width; i++)
     {
-      const bool bit = get_bitvector_bit(value, i);
+      const bool bit = get_bitvector_bit(value, width, i);
       bv[i]=const_literal(bit);
     }
 
