@@ -89,6 +89,14 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
     return os << "floatbv[" << to_floatbv_type(type).get_width() << ']';
   else if(id == ID_c_bool)
     return os << "c_bool[" << to_c_bool_type(type).get_width() << ']';
+  else if(id == ID_bool)
+    return os << "\xf0\x9d\x94\xb9"; // u+1D539, 'B'
+  else if(id == ID_integer)
+    return os << "\xe2\x84\xa4"; // u+2124, 'Z'
+  else if(id == ID_natural)
+    return os << "\xe2\x84\x95"; // u+2115, 'N'
+  else if(id == ID_rational)
+    return os << "\xe2\x84\x9a"; // u+211A, 'Q'
   else
     return os << id;
 }
