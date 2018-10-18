@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <assert.h>
 
 struct A {

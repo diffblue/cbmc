@@ -1,5 +1,4 @@
 #include <stdarg.h>
-#include <stdio.h>
 #include <assert.h>
 
 // how to do it:

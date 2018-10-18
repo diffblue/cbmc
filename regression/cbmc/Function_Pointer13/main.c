@@ -1,5 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <assert.h>
 
 typedef unsigned int u32;
@@ -17,11 +15,11 @@ u32 myfunc_2(u32 value2){
 }
 
 int main(void){
-myfuncptr fptr=NULL;
+  myfuncptr fptr = 0;
 u32 value;
 
 
-assert(fptr == NULL);
+  assert(fptr == 0);
 
 fptr=myfunc_1;
 value=2;
