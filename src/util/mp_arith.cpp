@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "mp_arith.h"
 
+#include <algorithm>
 #include <cctype>
 #include <cstdlib>
 #include <limits>
@@ -219,34 +220,68 @@ unsigned integer2unsigned(const mp_integer &n)
   return (unsigned)ull;
 }
 
-/// bitwise or bitwise operations only make sense on native objects, hence the
-/// largest object size should be the largest available c++ integer size
-/// (currently long long)
+/// bitwise binary operation over two integers, given as a functor
+/// \param a: the first integer
+/// \param b: the second integer
+/// \param f: the function over two bits
+mp_integer bitwise(
+  const mp_integer &a,
+  const mp_integer &b,
+  std::function<bool(bool, bool)> f)
+{
+  const auto digits = std::max(a.digits(2), b.digits(2));
+
+  mp_integer result = 0;
+  mp_integer tmp_a = a, tmp_b = b;
+
+  for(std::size_t i = 0; i < digits; i++)
+  {
+    const bool bit_a = tmp_a.is_odd();
+    const bool bit_b = tmp_b.is_odd();
+    const bool bit_result = f(bit_a, bit_b);
+    if(bit_result)
+      result += power(2, i);
+    tmp_a /= 2;
+    tmp_b /= 2;
+  }
+
+  return result;
+}
+
+/// bitwise 'or' of two nonnegative integers
 mp_integer bitwise_or(const mp_integer &a, const mp_integer &b)
 {
-  PRECONDITION(a.is_ulong() && b.is_ulong());
-  ullong_t result=a.to_ulong()|b.to_ulong();
-  return result;
+  PRECONDITION(!a.is_negative() && !b.is_negative());
+
+  // fast path for small numbers
+  if(a.is_ulong() && b.is_ulong())
+    return a.to_ulong() | b.to_ulong();
+
+  return bitwise(a, b, [](bool a, bool b) { return a || b; });
 }
 
-/// bitwise and bitwise operations only make sense on native objects, hence the
-/// largest object size should be the largest available c++ integer size
-/// (currently long long)
+/// bitwise 'and' of two nonnegative integers
 mp_integer bitwise_and(const mp_integer &a, const mp_integer &b)
 {
-  PRECONDITION(a.is_ulong() && b.is_ulong());
-  ullong_t result=a.to_ulong()&b.to_ulong();
-  return result;
+  PRECONDITION(!a.is_negative() && !b.is_negative());
+
+  // fast path for small numbers
+  if(a.is_ulong() && b.is_ulong())
+    return a.to_ulong() & b.to_ulong();
+
+  return bitwise(a, b, [](bool a, bool b) { return a && b; });
 }
 
-/// bitwise xor bitwise operations only make sense on native objects, hence the
-/// largest object size should be the largest available c++ integer size
-/// (currently long long)
+/// bitwise 'xor' of two nonnegative integers
 mp_integer bitwise_xor(const mp_integer &a, const mp_integer &b)
 {
-  PRECONDITION(a.is_ulong() && b.is_ulong());
-  ullong_t result=a.to_ulong()^b.to_ulong();
-  return result;
+  PRECONDITION(!a.is_negative() && !b.is_negative());
+
+  // fast path for small numbers
+  if(a.is_ulong() && b.is_ulong())
+    return a.to_ulong() ^ b.to_ulong();
+
+  return bitwise(a, b, [](bool a, bool b) { return a ^ b; });
 }
 
 /// arithmetic left shift bitwise operations only make sense on native objects,
