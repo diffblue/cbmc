@@ -115,7 +115,7 @@ void goto_symext::symex_goto(statet &state)
     (simpl_state_guard.is_true() ||
      // or there is another block, but we're doing path exploration so
      // we're going to skip over it for now and return to it later.
-     doing_path_exploration))
+     state.doing_path_exploration))
   {
     DATA_INVARIANT(
       instruction.targets.size() > 0,
@@ -182,7 +182,7 @@ void goto_symext::symex_goto(statet &state)
     log.debug() << "Resuming from next instruction '"
                 << state_pc->source_location << "'" << log.eom;
   }
-  else if(doing_path_exploration)
+  else if(state.doing_path_exploration)
   {
     // We should save both the instruction after this goto, and the target of
     // the goto.

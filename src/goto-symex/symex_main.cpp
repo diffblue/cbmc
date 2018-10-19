@@ -301,6 +301,7 @@ void goto_symext::symex_from_entry_point_of(
   }
 
   statet state;
+  state.doing_path_exploration = options.is_set("paths");
 
   initialize_entry_point(
     state,
@@ -330,7 +331,7 @@ void goto_symext::symex_step(
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  if(!doing_path_exploration)
+  if(!state.doing_path_exploration)
     merge_gotos(state);
 
   // depth exceeded?

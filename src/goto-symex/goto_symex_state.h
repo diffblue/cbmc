@@ -45,6 +45,10 @@ public:
     symex_target = target;
   }
 
+  /// Affects what happens at program decision points: whether merge paths or
+  /// save them for later.
+  bool doing_path_exploration;
+
   /// contains symbols that are minted during symbolic execution, such as
   /// dynamically created objects etc. The names in this table are needed
   /// for error traces even after symbolic execution has finished.
