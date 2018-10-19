@@ -32,6 +32,7 @@ SRC = accelerate/accelerate.cpp \
       document_properties.cpp \
       dot.cpp \
       dump_c.cpp \
+      dispatch_loop_detector.cpp \
       full_slicer.cpp \
       function.cpp \
       function_modifies.cpp \

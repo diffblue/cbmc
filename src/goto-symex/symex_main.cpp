@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 
 #include <cassert>
+#include <iostream>
 #include <memory>
 
 #include <util/exception_utils.h>
@@ -336,6 +337,9 @@ void goto_symext::symex_step(
   if(max_depth != 0 && state.depth > max_depth)
     state.guard.add(false_exprt());
   state.depth++;
+
+  std::cout << "Symexing " << instruction.to_string() << " at line "
+            << instruction.source_location << "\n";
 
   // actually do instruction
   switch(instruction.type)
