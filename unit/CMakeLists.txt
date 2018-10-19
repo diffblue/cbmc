@@ -16,13 +16,18 @@ list(REMOVE_ITEM sources
     # Will be built into a separate library and linked
     ${testing_utils}
 
+    # Has additional dependencies, needs to be built as a separate lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/dispatch-loop-detector/dispatch_loop_detector.cpp
+
     # Intended to fail to compile
     ${CMAKE_CURRENT_SOURCE_DIR}/util/expr_cast/expr_undefined_casts.cpp
 )
 
 add_subdirectory(testing-utils)
+add_subdirectory(dispatch-loop-detector)
 
 add_executable(unit ${sources})
+
 target_include_directories(unit
     PUBLIC
     ${CBMC_BINARY_DIR}
@@ -32,6 +37,7 @@ target_include_directories(unit
 target_link_libraries(
         unit
         testing-utils
+        dispatch-loop-detector
         ansi-c
         solvers
         goto-programs

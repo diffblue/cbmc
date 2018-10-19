@@ -63,6 +63,9 @@ include ../src/common
 cprover.dir:
 	$(MAKE) $(MAKEARGS) -C ../src
 
+dispatch-loop-detector/dispatch_loop_detector$(OBJEXT): cprover.dir
+	$(MAKE) $(MAKEARGS) -C dispatch-loop-detector
+
 testing-utils/testing-utils$(LIBEXT): cprover.dir
 	$(MAKE) $(MAKEARGS) -C testing-utils
 
@@ -116,7 +119,10 @@ CPROVER_LIBS =../src/ansi-c/ansi-c$(LIBEXT) \
               $(BMC_DEPS)
               # Empty last line
 
-OBJ += $(CPROVER_LIBS) testing-utils/testing-utils$(LIBEXT)
+OBJ += $(CPROVER_LIBS) \
+			 testing-utils/testing-utils$(LIBEXT) \
+			 dispatch-loop-detector/dispatch_loop_detector$(OBJEXT)
+
 
 CATCH_TEST = unit_tests$(EXEEXT)
 N_CATCH_TESTS = $(shell \
