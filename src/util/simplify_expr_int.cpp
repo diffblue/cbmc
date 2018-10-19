@@ -781,6 +781,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
 
   if(expr.id()==ID_bitand)
   {
+    const auto all_ones = power(2, width) - 1;
     for(exprt::operandst::iterator
         it=expr.operands().begin();
         it!=expr.operands().end();
@@ -788,9 +789,8 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     {
       if(
         it->is_constant() &&
-        bvrep2integer(
-          to_constant_expr(*it).get_value(), width, false) ==
-          power(2, width) - 1 &&
+        bvrep2integer(to_constant_expr(*it).get_value(), width, false) ==
+          all_ones &&
         expr.operands().size() > 1)
       {
         it=expr.operands().erase(it);
