@@ -1449,8 +1449,8 @@ static exprt sum_over_map(
     int second=negated?(-term.second):term.second;
     if(t.id()==ID_constant)
     {
-      std::string value(to_constant_expr(t).get_value().c_str());
-      constants+=binary2integer(value, true)*second;
+      const auto int_value = numeric_cast_v<mp_integer>(to_constant_expr(t));
+      constants += int_value * second;
     }
     else
     {

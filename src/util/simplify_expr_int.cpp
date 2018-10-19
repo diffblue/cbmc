@@ -787,10 +787,12 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
         it!=expr.operands().end();
         ) // no it++
     {
-      if(it->is_constant() &&
-         id2string(to_constant_expr(*it).get_value()).find('0')==
-           std::string::npos &&
-         expr.operands().size()>1)
+      if(
+        it->is_constant() &&
+        bv2integer(
+          id2string(to_constant_expr(*it).get_value()), width, false) ==
+          power(2, width) - 1 &&
+        expr.operands().size() > 1)
       {
         it=expr.operands().erase(it);
         result=false;
@@ -885,8 +887,9 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
       exprt &op=*it;
       if(op.is_true() || op.is_false())
       {
-        bool value=op.is_true();
-        op=constant_exprt(value?ID_1:ID_0, unsignedbv_typet(1));
+        const bool value = op.is_true();
+        op = from_integer(value, unsignedbv_typet(1));
+        result = false;
       }
     }
 
@@ -904,13 +907,24 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
          is_bitvector_type(opn.type()))
       {
         // merge!
-        const std::string new_value=
-          opi.get_string(ID_value)+opn.get_string(ID_value);
-        opi.set(ID_value, new_value);
-        opi.type().set(ID_width, new_value.size());
+        const auto &value_i = to_constant_expr(opi).get_value();
+        const auto &value_n = to_constant_expr(opn).get_value();
+        const auto width_i = to_bitvector_type(opi.type()).get_width();
+        const auto width_n = to_bitvector_type(opn.type()).get_width();
+        const auto new_width = width_i + width_n;
+
+        const auto new_value = make_bvrep(
+          new_width, [&value_i, &value_n, width_i, width_n](std::size_t x) {
+            return x < width_n
+                     ? get_bitvector_bit(value_n, width_n, x)
+                     : get_bitvector_bit(value_i, width_i, x - width_n);
+          });
+
+        to_constant_expr(opi).set_value(new_value);
+        opi.type().set(ID_width, new_width);
         // erase opn
         expr.operands().erase(expr.operands().begin()+i+1);
-        result=true;
+        result = false;
       }
       else
         i++;
@@ -941,7 +955,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
         opi.type().id(ID_verilog_unsignedbv);
         // erase opn
         expr.operands().erase(expr.operands().begin()+i+1);
-        result=true;
+        result = false;
       }
       else
         i++;
@@ -1269,13 +1283,15 @@ bool simplify_exprt::simplify_bitnot(exprt &expr)
 
   exprt &op=operands.front();
 
-  if(expr.type().id()==ID_bv ||
-     expr.type().id()==ID_unsignedbv ||
-     expr.type().id()==ID_signedbv)
-  {
-    const auto width = to_bitvector_type(expr.type()).get_width();
+  const auto &type = expr.type();
 
-    if(op.type()==expr.type())
+  if(
+    type.id() == ID_bv || type.id() == ID_unsignedbv ||
+    type.id() == ID_signedbv)
+  {
+    const auto width = to_bitvector_type(type).get_width();
+
+    if(op.type() == type)
     {
       if(op.id()==ID_constant)
       {
