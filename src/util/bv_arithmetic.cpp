@@ -84,7 +84,7 @@ mp_integer bv_arithmetict::pack() const
 
 exprt bv_arithmetict::to_expr() const
 {
-  return constant_exprt(integer2bv(value, spec.width), spec.to_type());
+  return constant_exprt(integer2bvrep(value, spec.width), spec.to_type());
 }
 
 bv_arithmetict &bv_arithmetict::operator/=(const bv_arithmetict &other)
@@ -184,5 +184,6 @@ void bv_arithmetict::from_expr(const exprt &expr)
 {
   PRECONDITION(expr.is_constant());
   spec=bv_spect(expr.type());
-  value = bv2integer(expr.get_string(ID_value), spec.width, spec.is_signed);
+  value = bvrep2integer(
+    to_constant_expr(expr).get_value(), spec.width, spec.is_signed);
 }

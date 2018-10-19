@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Expression Representation
 
+// clang-format off
+#include "arith_tools.h"
 #include "expr.h"
 #include "expr_iterator.h"
 #include "fixedbv.h"
@@ -17,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational.h"
 #include "rational_tools.h"
 #include "std_expr.h"
+// clang-format on
 
 #include <stack>
 
@@ -248,7 +251,7 @@ bool exprt::is_one() const
     {
       const auto width = to_bitvector_type(type()).get_width();
       mp_integer int_value =
-        bv2integer(id2string(constant_expr.get_value()), width, false);
+        bvrep2integer(id2string(constant_expr.get_value()), width, false);
       if(int_value==1)
         return true;
     }

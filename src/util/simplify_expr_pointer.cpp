@@ -388,8 +388,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     {
       // this is a pointer, we can't use to_integer
       const auto width = to_pointer_type(ptr.type()).get_width();
-      mp_integer number =
-        bv2integer(id2string(c_ptr.get_value()), width, false);
+      mp_integer number = bvrep2integer(c_ptr.get_value(), width, false);
       // a null pointer would have been caught above, return value 0
       // will indicate that conversion failed
       if(number==0)

@@ -140,7 +140,8 @@ static std::string numeric_representation(
 
   if(options.hex_representation)
   {
-    mp_integer value_int = bv2integer(id2string(value), value.size(), false);
+    const mp_integer value_int =
+      bvrep2integer(to_constant_expr(expr).get_value(), value.size(), false);
     result = integer2string(value_int, 16);
     prefix = "0x";
   }
