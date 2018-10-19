@@ -131,24 +131,34 @@ void goto_trace_stept::output(
 /// \return a string with the numeric representation
 static std::string numeric_representation(
   const constant_exprt &expr,
+  const namespacet &ns,
   const trace_optionst &options)
 {
   std::string result;
   std::string prefix;
 
+  const typet &expr_type = expr.type();
+
+  const typet &underlying_type =
+    expr_type.id() == ID_c_enum_tag
+      ? ns.follow_tag(to_c_enum_tag_type(expr_type)).subtype()
+      : expr_type;
+
   const irep_idt &value = expr.get_value();
+
+  const auto width = to_bitvector_type(underlying_type).get_width();
+
+  const mp_integer value_int = bvrep2integer(id2string(value), width, false);
 
   if(options.hex_representation)
   {
-    const mp_integer value_int =
-      bvrep2integer(to_constant_expr(expr).get_value(), value.size(), false);
     result = integer2string(value_int, 16);
     prefix = "0x";
   }
   else
   {
+    result = integer2binary(value_int, width);
     prefix = "0b";
-    result = id2string(value);
   }
 
   std::ostringstream oss;
@@ -185,9 +195,7 @@ std::string trace_numeric_value(
        type.id()==ID_c_enum ||
        type.id()==ID_c_enum_tag)
     {
-      const std::string &str =
-        numeric_representation(to_constant_expr(expr), options);
-      return str;
+      return numeric_representation(to_constant_expr(expr), ns, options);
     }
     else if(type.id()==ID_bool)
     {
