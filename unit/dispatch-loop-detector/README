@@ -1,0 +1,8 @@
+Each of the files in this directory is a test program that will be parsed to
+test the loop detector functionality by unit/dispatch_loop_detector.cpp.
+
+The entire file is a single literal string, written in the C++ raw string
+format---i.e., starting with R"<delimiter>( and ending with)<delimiter>". The
+delimiter in this case is the word "dispatch". These literal strings get
+included into the unit test and assigned to variables, which are then used as
+normal strings.
