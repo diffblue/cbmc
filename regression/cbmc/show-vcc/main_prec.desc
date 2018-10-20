@@ -1,0 +1,9 @@
+CORE
+main_prec.c
+--show-vcc
+^EXIT=0$
+^SIGNAL=0$
+^some property$
+^\{-.*\} main::1::x!0@1#2 = main::1::y!0@1#1 \+ main::1::z!0@1#1$
+^\{-.*\} main::1::a!0@1#2 ⇔ \(main::1::b!0@1#1 ⇔ main::1::c!0@1#1\)$
+--

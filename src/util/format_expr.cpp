@@ -77,6 +77,16 @@ static bool bracket_subexpression(const exprt &sub_expr, const exprt &expr)
     (expr.id() == ID_and || expr.id() == ID_or))
     return false;
 
+  // +, -, *, / bind stronger than ==, !=, <, <=, >, >=
+  if(
+    (sub_expr.id() == ID_plus || sub_expr.id() == ID_minus ||
+     sub_expr.id() == ID_mult || sub_expr.id() == ID_div) &&
+    (expr.id() == ID_equal || expr.id() == ID_notequal || expr.id() == ID_lt ||
+     expr.id() == ID_gt || expr.id() == ID_le || expr.id() == ID_ge))
+  {
+    return false;
+  }
+
   return true;
 }
 
