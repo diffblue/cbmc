@@ -174,7 +174,7 @@ void show_vcc(
     of.open(filename);
     if(!of)
       throw invalid_command_line_argument_exceptiont(
-        "invalid file to read trace from: " + filename, "--outfile");
+        "failed to open output file: " + filename, "--outfile");
   }
 
   std::ostream &out = have_file ? of : std::cout;
