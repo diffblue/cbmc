@@ -3,10 +3,10 @@ main.c
 --intervals
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 8 function main, assertion j<=100: Success$
-^\[main.assertion.2\] file main.c line 11 function main, assertion j<101: Success$
-^\[main.assertion.3\] file main.c line 14 function main, assertion j>100: FAILURE \(if reachable\)$
-^\[main.assertion.4\] file main.c line 17 function main, assertion j<99: UNKNOWN$
-^\[main.assertion.5\] file main.c line 20 function main, assertion j==100: FAILURE \(if reachable\)$
+^\[main.assertion.1\] line 8 assertion j<=100: SUCCESS$
+^\[main.assertion.2\] line 11 assertion j<101: SUCCESS$
+^\[main.assertion.3\] line 14 assertion j>100: FAILURE \(if reachable\)$
+^\[main.assertion.4\] line 17 assertion j<99: UNKNOWN$
+^\[main.assertion.5\] line 20 assertion j==100: FAILURE \(if reachable\)$
 --
 ^warning: ignoring

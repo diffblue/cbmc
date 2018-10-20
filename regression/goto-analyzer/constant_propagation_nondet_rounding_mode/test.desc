@@ -3,11 +3,11 @@ main.c
 --constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
-\[main.assertion.1\] file main.c line 18 function main, assertion \(1.0f / 10.0f\) - f < -0.1f: FAILURE \(if reachable\)
-\[main.assertion.2\] file main.c line 20 function main, assertion \(1.0f / 10.0f\) - f < 0.0f: UNKNOWN
-\[main.assertion.3\] file main.c line 22 function main, assertion \(1.0f / 10.0f\) - f <= 0.0f: SUCCESS
-\[main.assertion.4\] file main.c line 24 function main, assertion \(1.0f / 10.0f\) - f >= 0.0f: UNKNOWN
-\[main.assertion.5\] file main.c line 26 function main, assertion \(1.0f / 10.0f\) - f > 0.0f: FAILURE \(if reachable\)
+\[main.assertion.1\] line 18 assertion \(1.0f / 10.0f\) - f < -0.1f: FAILURE \(if reachable\)
+\[main.assertion.2\] line 20 assertion \(1.0f / 10.0f\) - f < 0.0f: UNKNOWN
+\[main.assertion.3\] line 22 assertion \(1.0f / 10.0f\) - f <= 0.0f: SUCCESS
+\[main.assertion.4\] line 24 assertion \(1.0f / 10.0f\) - f >= 0.0f: UNKNOWN
+\[main.assertion.5\] line 26 assertion \(1.0f / 10.0f\) - f > 0.0f: FAILURE \(if reachable\)
 
 --
 ^warning: ignoring

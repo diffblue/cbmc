@@ -3,6 +3,6 @@ main.c
 --intervals
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 7 function main, assertion x < -10 \|\| x > 100: FAILURE \(if reachable\)$
+^\[main.assertion.1\] line 7 assertion x < -10 \|\| x > 100: FAILURE \(if reachable\)$
 --
 ^warning: ignoring
