@@ -43,7 +43,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
   else if(statement==ID_gcc_switch_case_range)
     typecheck_gcc_switch_case_range(code);
   else if(statement==ID_block)
-    typecheck_block(code);
+    typecheck_block(to_code_block(code));
   else if(statement==ID_decl_block)
   {
   }
@@ -181,22 +181,20 @@ void c_typecheck_baset::typecheck_assign(codet &code)
   implicit_typecast(code.op1(), code.op0().type());
 }
 
-void c_typecheck_baset::typecheck_block(codet &code)
+void c_typecheck_baset::typecheck_block(code_blockt &code)
 {
-  Forall_operands(it, code)
-    typecheck_code(to_code(*it));
+  for(auto &c : code.statements())
+    typecheck_code(c);
 
   // do decl-blocks
 
   code_blockt new_ops;
-  new_ops.operands().reserve(code.operands().size());
+  new_ops.statements().reserve(code.statements().size());
 
-  Forall_operands(it1, code)
+  for(auto &code_op : code.statements())
   {
-    if(it1->is_nil())
+    if(code_op.is_nil())
       continue;
-
-    codet &code_op=to_code(*it1);
 
     if(code_op.get_statement()==ID_label)
     {
@@ -217,7 +215,7 @@ void c_typecheck_baset::typecheck_block(codet &code)
       new_ops.move(code_op);
   }
 
-  code.operands().swap(new_ops.operands());
+  code.statements().swap(new_ops.statements());
 }
 
 void c_typecheck_baset::typecheck_break(codet &code)

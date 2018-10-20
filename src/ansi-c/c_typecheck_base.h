@@ -125,7 +125,7 @@ protected:
 
   virtual void typecheck_assign(codet &expr);
   virtual void typecheck_asm(codet &code);
-  virtual void typecheck_block(codet &code);
+  virtual void typecheck_block(code_blockt &code);
   virtual void typecheck_break(codet &code);
   virtual void typecheck_continue(codet &code);
   virtual void typecheck_decl(codet &code);

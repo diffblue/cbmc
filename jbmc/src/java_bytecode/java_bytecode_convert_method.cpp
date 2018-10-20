@@ -1773,8 +1773,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
               more_code.statements().end());
           }
           else
-            for(const auto &statement : more_code.statements())
-              c.copy_to_operands(statement);
+            to_code_block(c).append(more_code);
         }
       }
       a_it2->second.stack=stack;
