@@ -63,7 +63,8 @@ void show_vcc_plain(
       {
         if(!p_it->ignore)
         {
-          out << "{-" << count << "} " << format(p_it->cond_expr) << '\n';
+          out << messaget::faint << "{-" << count << "} " << messaget::reset
+              << format(p_it->cond_expr) << '\n';
 
 #ifdef DEBUG
           out << "GUARD: " << format(p_it->guard) << '\n';
@@ -75,10 +76,10 @@ void show_vcc_plain(
       }
 
     // Unicode equivalent of "|--------------------------"
-    out << u8"\u251c";
+    out << messaget::faint << u8"\u251c";
     for(unsigned i = 0; i < 26; i++)
       out << u8"\u2500";
-    out << '\n';
+    out << messaget::reset << '\n';
 
     // split property into multiple disjunts, if applicable
     exprt::operandst disjuncts;
@@ -91,7 +92,8 @@ void show_vcc_plain(
     std::size_t count = 1;
     for(const auto &disjunct : disjuncts)
     {
-      out << '{' << count << "} " << format(disjunct) << '\n';
+      out << messaget::faint << '{' << count << "} " << messaget::reset
+          << format(disjunct) << '\n';
       count++;
     }
 
