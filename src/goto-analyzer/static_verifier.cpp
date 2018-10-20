@@ -44,7 +44,9 @@ bool static_verifier(
 
     forall_goto_functions(f_it, goto_model.goto_functions)
     {
-      m.progress() << "Checking " << f_it->first << messaget::eom;
+      const auto &symbol = ns.lookup(f_it->first);
+
+      m.progress() << "Checking " << symbol.display_name() << messaget::eom;
 
       if(!f_it->second.body.has_assertion())
         continue;
@@ -94,7 +96,9 @@ bool static_verifier(
 
     forall_goto_functions(f_it, goto_model.goto_functions)
     {
-      m.progress() << "Checking " << f_it->first << messaget::eom;
+      const auto &symbol = ns.lookup(f_it->first);
+
+      m.progress() << "Checking " << symbol.display_name() << messaget::eom;
 
       if(!f_it->second.body.has_assertion())
         continue;
@@ -147,12 +151,14 @@ bool static_verifier(
   {
     forall_goto_functions(f_it, goto_model.goto_functions)
     {
-      m.progress() << "Checking " << f_it->first << messaget::eom;
+      const auto &symbol = ns.lookup(f_it->first);
+
+      m.progress() << "Checking " << symbol.display_name() << messaget::eom;
 
       if(!f_it->second.body.has_assertion())
         continue;
 
-      out << "******** Function " << f_it->first << '\n';
+      out << "******** Function " << symbol.display_name() << '\n';
 
       forall_goto_program_instructions(i_it, f_it->second.body)
       {
@@ -208,7 +214,10 @@ bool static_verifier(
       if(!f_it->second.body.has_assertion())
         continue;
 
-      m.result() << "******** Function " << f_it->first << messaget::eom;
+      const auto &symbol = ns.lookup(f_it->first);
+
+      m.result() << "******** Function " << symbol.display_name()
+                 << messaget::eom;
 
       forall_goto_program_instructions(i_it, f_it->second.body)
       {
