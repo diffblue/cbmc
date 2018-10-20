@@ -1,6 +1,6 @@
 FUTURE
 main.c
---intervals --verify
+--intervals
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] file main.c line 30 function main, assertion y\[i\]>=-1.0f \&\& y\[i\]<=1.0f: UNKNOWN$

@@ -1,6 +1,6 @@
 CORE
 main.c
---intervals --verify
+--intervals
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] file main.c line 8 function main, assertion i >= 1 && i <= 2: SUCCESS$

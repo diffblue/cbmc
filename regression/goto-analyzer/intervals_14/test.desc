@@ -1,6 +1,6 @@
 FUTURE
 main.c
---intervals --verify
+--intervals
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] file main.c line 12 function main, assertion i<50: UNKNOWN$
