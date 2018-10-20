@@ -63,6 +63,10 @@ static bool bracket_subexpression(const exprt &sub_expr, const exprt &expr)
   if(!sub_expr.has_operands())
     return false;
 
+  // no need if subexpression isn't an infix operator
+  if(infix_map.find(sub_expr.id()) == infix_map.end())
+    return false;
+
   // * and / bind stronger than + and -
   if(
     (sub_expr.id() == ID_mult || sub_expr.id() == ID_div) &&

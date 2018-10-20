@@ -347,7 +347,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     {
       std::ostringstream oss;
       oss << format(o);
-      REQUIRE(oss.str() == "(a ∧ b) ∨ (¬a)");
+      REQUIRE(oss.str() == "(a ∧ b) ∨ ¬a");
     }
 
     bdd_exprt t(ns);
@@ -356,7 +356,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     {
       std::ostringstream oss;
       oss << format(t.as_expr());
-      REQUIRE(oss.str() == "(¬a) ∨ b");
+      REQUIRE(oss.str() == "¬a ∨ b");
     }
   }
 }
