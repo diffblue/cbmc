@@ -30,6 +30,29 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <stack>
 
+// expressions that are rendered with infix operators
+struct infix_opt
+{
+  const char *rep;
+};
+
+const std::map<irep_idt, infix_opt> infix_map = {
+  {ID_plus, {"+"}},
+  {ID_minus, {"-"}},
+  {ID_mult, {"*"}},
+  {ID_div, {"/"}},
+  {ID_equal, {"="}},
+  {ID_notequal, {u8"\u2260"}}, // /=, U+2260
+  {ID_and, {u8"\u2227"}},      // wedge, U+2227
+  {ID_or, {u8"\u2228"}},       // vee, U+2228
+  {ID_xor, {u8"\u2295"}},      // + in circle, U+2295
+  {ID_implies, {u8"\u21d2"}},  // =>, U+21D2
+  {ID_le, {u8"\u2264"}},       // <=, U+2264
+  {ID_ge, {u8"\u2265"}},       // >=, U+2265
+  {ID_lt, {"<"}},
+  {ID_gt, {">"}},
+};
+
 /// We use the precendences that most readers expect
 /// (i.e., the ones you learn in primary school),
 /// and stay clear of the surprising ones that C has.
@@ -63,31 +86,20 @@ static std::ostream &format_rec(std::ostream &os, const multi_ary_exprt &src)
 {
   bool first = true;
 
-  std::string operator_str;
+  std::string operator_str = id2string(src.id()); // default
 
-  if(src.id() == ID_and)
-    operator_str = u8"\u2227"; // wedge, U+2227
-  else if(src.id() == ID_or)
-    operator_str = u8"\u2228"; // vee, U+2228
-  else if(src.id() == ID_xor)
-    operator_str = u8"\u2295"; // + in circle, U+2295
-  else if(src.id() == ID_le)
-    operator_str = u8"\u2264"; // <=, U+2264
-  else if(src.id() == ID_ge)
-    operator_str = u8"\u2265"; // >=, U+2265
-  else if(src.id() == ID_notequal)
-    operator_str = u8"\u2260"; // /=, U+2260
-  else if(src.id() == ID_implies)
-    operator_str = u8"\u21d2"; // =>, U+21D2
-  else if(src.id() == ID_equal)
+  if(
+    src.id() == ID_equal && !src.operands().empty() &&
+    src.op0().type().id() == ID_bool)
   {
-    if(!src.operands().empty() && src.op0().type().id() == ID_bool)
-      operator_str = u8"\u21d4"; // <=>, U+21D4
-    else
-      operator_str = "=";
+    operator_str = u8"\u21d4"; // <=>, U+21D4
   }
   else
-    operator_str = id2string(src.id());
+  {
+    auto infix_map_it = infix_map.find(src.id());
+    if(infix_map_it != infix_map.end())
+      operator_str = infix_map_it->second.rep;
+  }
 
   for(const auto &op : src.operands())
   {
