@@ -3,71 +3,71 @@ sensitivity_test_constants_array_of_constants_array.c
 --variable --arrays --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion a\[1\]\[2\]==0: Success$
-^\[main.assertion.2\] .* assertion a\[1\]\[2\]==1: Failure \(if reachable\)$
-^\[main.assertion.3\] .* assertion b\[1\]\[2\]==5: Success$
-^\[main.assertion.4\] .* assertion b\[1\]\[2\]==0: Failure \(if reachable\)$
-^\[main.assertion.5\] .* assertion \*\(b\[1\]\+2\)==5: Success$
-^\[main.assertion.6\] .* assertion \*\(b\[1\]\+2\)==0: Failure \(if reachable\)$
-^\[main.assertion.7\] .* assertion \(\*\(b\+1\)\)\[2\]==5: Success$
-^\[main.assertion.8\] .* assertion \(\*\(b\+1\)\)\[2\]==0: Failure \(if reachable\)$
-^\[main.assertion.9\] .* assertion \*\(\*\(b\+1\)\+2\)==5: Success$
-^\[main.assertion.10\] .* assertion \*\(\*\(b\+1\)\+2\)==0: Failure \(if reachable\)$
-^\[main.assertion.11\] .* assertion 1\[b\]\[2\]==5: Success$
-^\[main.assertion.12\] .* assertion 1\[b\]\[2\]==0: Failure \(if reachable\)$
-^\[main.assertion.13\] .* assertion \*\(1\[b\]\+2\)==5: Success$
-^\[main.assertion.14\] .* assertion \*\(1\[b\]\+2\)==0: Failure \(if reachable\)$
-^\[main.assertion.15\] .* assertion \(\*\(1\+b\)\)\[2\]==5: Unknown$
-^\[main.assertion.16\] .* assertion \(\*\(1\+b\)\)\[2\]==0: Unknown$
-^\[main.assertion.17\] .* assertion \*\(\*\(1\+b\)\+2\)==5: Unknown$
-^\[main.assertion.18\] .* assertion \*\(\*\(1\+b\)\+2\)==0: Unknown$
-^\[main.assertion.19\] .* assertion 2\[1\[b\]\]==5: Success$
-^\[main.assertion.20\] .* assertion 2\[1\[b\]\]==0: Failure \(if reachable\)$
-^\[main.assertion.21\] .* assertion \*\(2\+1\[b\]\)==5: Unknown$
-^\[main.assertion.22\] .* assertion \*\(2\+1\[b\]\)==0: Unknown$
-^\[main.assertion.23\] .* assertion \*\(2\+\*\(1\+b\)\)==5: Unknown$
-^\[main.assertion.24\] .* assertion \*\(2\+\*\(1\+b\)\)==0: Unknown$
-^\[main.assertion.25\] .* assertion a\[0\]\[1\]==0: Success$
-^\[main.assertion.26\] .* assertion a\[0\]\[1\]==1: Failure \(if reachable\)$
-^\[main.assertion.27\] .* assertion a\[0\]\[2\]==0: Success$
-^\[main.assertion.28\] .* assertion b\[0\]\[1\]==2: Unknown$
-^\[main.assertion.29\] .* assertion b\[0\]\[1\]==3: Unknown$
-^\[main.assertion.30\] .* assertion b\[0\]\[2\]==2: Success$
-^\[main.assertion.31\] .* assertion a\[i\]\[1\]==0: Success$
-^\[main.assertion.32\] .* assertion a\[i\]\[1\]==1: Failure \(if reachable\)$
-^\[main.assertion.33\] .* assertion a\[1\]\[i\]==0: Success$
-^\[main.assertion.34\] .* assertion a\[1\]\[i\]==1: Failure \(if reachable\)$
-^\[main.assertion.35\] .* assertion a\[i\]\[i\]==0: Success$
-^\[main.assertion.36\] .* assertion a\[i\]\[i\]==1: Failure \(if reachable\)$
-^\[main.assertion.37\] .* assertion a\[j\]\[1\]==0: Unknown$
-^\[main.assertion.38\] .* assertion a\[j\]\[1\]==1: Unknown$
-^\[main.assertion.39\] .* assertion a\[1\]\[j\]==0: Unknown$
-^\[main.assertion.40\] .* assertion a\[1\]\[j\]==1: Unknown$
-^\[main.assertion.41\] .* assertion a\[j\]\[j\]==0: Unknown$
-^\[main.assertion.42\] .* assertion a\[j\]\[j\]==1: Unknown$
-^\[main.assertion.43\] .* assertion b\[i\]\[1\]==1: Success$
-^\[main.assertion.44\] .* assertion b\[i\]\[1\]==11: Failure \(if reachable\)$
-^\[main.assertion.45\] .* assertion b\[1\]\[i\]==3: Success$
-^\[main.assertion.46\] .* assertion b\[1\]\[i\]==11: Failure \(if reachable\)$
-^\[main.assertion.47\] .* assertion b\[i\]\[i\]==0: Success$
-^\[main.assertion.48\] .* assertion b\[i\]\[i\]==11: Failure \(if reachable\)$
-^\[main.assertion.49\] .* assertion b\[j\]\[1\]==1: Unknown$
-^\[main.assertion.50\] .* assertion b\[j\]\[1\]==11: Unknown$
-^\[main.assertion.51\] .* assertion b\[1\]\[j\]==3: Unknown$
-^\[main.assertion.52\] .* assertion b\[1\]\[j\]==11: Unknown$
-^\[main.assertion.53\] .* assertion b\[j\]\[j\]==0: Unknown$
-^\[main.assertion.54\] .* assertion b\[j\]\[j\]==11: Unknown$
-^\[main.assertion.55\] .* assertion a\[100\]\[0\]==0: Unknown$
-^\[main.assertion.56\] .* assertion a\[0\]\[100\]==0: Unknown$
-^\[main.assertion.57\] .* assertion c==0: Success$
-^\[main.assertion.58\] .* assertion c==0: Success$
-^\[main.assertion.59\] .* assertion ei\[0\]\[1\]==1: Success$
-^\[main.assertion.60\] .* assertion ei\[0\]\[1\]==0: Failure \(if reachable\)$
-^\[main.assertion.61\] .* assertion ei\[2\]\[1\]==0: Success$
-^\[main.assertion.62\] .* assertion ei\[2\]\[1\]==1: Failure \(if reachable\)$
-^\[main.assertion.63\] .* assertion ej\[0\]\[1\]==0: Unknown$
-^\[main.assertion.64\] .* assertion ej\[2\]\[1\]==0: Unknown$
-^\[main.assertion.65\] .* assertion ek\[0\]\[1\]==0: Unknown$
-^\[main.assertion.66\] .* assertion c==0: Success$
+^\[main.assertion.1\] .* assertion a\[1\]\[2\]==0: SUCCESS$
+^\[main.assertion.2\] .* assertion a\[1\]\[2\]==1: FAILURE \(if reachable\)$
+^\[main.assertion.3\] .* assertion b\[1\]\[2\]==5: SUCCESS$
+^\[main.assertion.4\] .* assertion b\[1\]\[2\]==0: FAILURE \(if reachable\)$
+^\[main.assertion.5\] .* assertion \*\(b\[1\]\+2\)==5: SUCCESS$
+^\[main.assertion.6\] .* assertion \*\(b\[1\]\+2\)==0: FAILURE \(if reachable\)$
+^\[main.assertion.7\] .* assertion \(\*\(b\+1\)\)\[2\]==5: SUCCESS$
+^\[main.assertion.8\] .* assertion \(\*\(b\+1\)\)\[2\]==0: FAILURE \(if reachable\)$
+^\[main.assertion.9\] .* assertion \*\(\*\(b\+1\)\+2\)==5: SUCCESS$
+^\[main.assertion.10\] .* assertion \*\(\*\(b\+1\)\+2\)==0: FAILURE \(if reachable\)$
+^\[main.assertion.11\] .* assertion 1\[b\]\[2\]==5: SUCCESS$
+^\[main.assertion.12\] .* assertion 1\[b\]\[2\]==0: FAILURE \(if reachable\)$
+^\[main.assertion.13\] .* assertion \*\(1\[b\]\+2\)==5: SUCCESS$
+^\[main.assertion.14\] .* assertion \*\(1\[b\]\+2\)==0: FAILURE \(if reachable\)$
+^\[main.assertion.15\] .* assertion \(\*\(1\+b\)\)\[2\]==5: UNKNOWN$
+^\[main.assertion.16\] .* assertion \(\*\(1\+b\)\)\[2\]==0: UNKNOWN$
+^\[main.assertion.17\] .* assertion \*\(\*\(1\+b\)\+2\)==5: UNKNOWN$
+^\[main.assertion.18\] .* assertion \*\(\*\(1\+b\)\+2\)==0: UNKNOWN$
+^\[main.assertion.19\] .* assertion 2\[1\[b\]\]==5: SUCCESS$
+^\[main.assertion.20\] .* assertion 2\[1\[b\]\]==0: FAILURE \(if reachable\)$
+^\[main.assertion.21\] .* assertion \*\(2\+1\[b\]\)==5: UNKNOWN$
+^\[main.assertion.22\] .* assertion \*\(2\+1\[b\]\)==0: UNKNOWN$
+^\[main.assertion.23\] .* assertion \*\(2\+\*\(1\+b\)\)==5: UNKNOWN$
+^\[main.assertion.24\] .* assertion \*\(2\+\*\(1\+b\)\)==0: UNKNOWN$
+^\[main.assertion.25\] .* assertion a\[0\]\[1\]==0: SUCCESS$
+^\[main.assertion.26\] .* assertion a\[0\]\[1\]==1: FAILURE \(if reachable\)$
+^\[main.assertion.27\] .* assertion a\[0\]\[2\]==0: SUCCESS$
+^\[main.assertion.28\] .* assertion b\[0\]\[1\]==2: UNKNOWN$
+^\[main.assertion.29\] .* assertion b\[0\]\[1\]==3: UNKNOWN$
+^\[main.assertion.30\] .* assertion b\[0\]\[2\]==2: SUCCESS$
+^\[main.assertion.31\] .* assertion a\[i\]\[1\]==0: SUCCESS$
+^\[main.assertion.32\] .* assertion a\[i\]\[1\]==1: FAILURE \(if reachable\)$
+^\[main.assertion.33\] .* assertion a\[1\]\[i\]==0: SUCCESS$
+^\[main.assertion.34\] .* assertion a\[1\]\[i\]==1: FAILURE \(if reachable\)$
+^\[main.assertion.35\] .* assertion a\[i\]\[i\]==0: SUCCESS$
+^\[main.assertion.36\] .* assertion a\[i\]\[i\]==1: FAILURE \(if reachable\)$
+^\[main.assertion.37\] .* assertion a\[j\]\[1\]==0: UNKNOWN$
+^\[main.assertion.38\] .* assertion a\[j\]\[1\]==1: UNKNOWN$
+^\[main.assertion.39\] .* assertion a\[1\]\[j\]==0: UNKNOWN$
+^\[main.assertion.40\] .* assertion a\[1\]\[j\]==1: UNKNOWN$
+^\[main.assertion.41\] .* assertion a\[j\]\[j\]==0: UNKNOWN$
+^\[main.assertion.42\] .* assertion a\[j\]\[j\]==1: UNKNOWN$
+^\[main.assertion.43\] .* assertion b\[i\]\[1\]==1: SUCCESS$
+^\[main.assertion.44\] .* assertion b\[i\]\[1\]==11: FAILURE \(if reachable\)$
+^\[main.assertion.45\] .* assertion b\[1\]\[i\]==3: SUCCESS$
+^\[main.assertion.46\] .* assertion b\[1\]\[i\]==11: FAILURE \(if reachable\)$
+^\[main.assertion.47\] .* assertion b\[i\]\[i\]==0: SUCCESS$
+^\[main.assertion.48\] .* assertion b\[i\]\[i\]==11: FAILURE \(if reachable\)$
+^\[main.assertion.49\] .* assertion b\[j\]\[1\]==1: UNKNOWN$
+^\[main.assertion.50\] .* assertion b\[j\]\[1\]==11: UNKNOWN$
+^\[main.assertion.51\] .* assertion b\[1\]\[j\]==3: UNKNOWN$
+^\[main.assertion.52\] .* assertion b\[1\]\[j\]==11: UNKNOWN$
+^\[main.assertion.53\] .* assertion b\[j\]\[j\]==0: UNKNOWN$
+^\[main.assertion.54\] .* assertion b\[j\]\[j\]==11: UNKNOWN$
+^\[main.assertion.55\] .* assertion a\[100\]\[0\]==0: UNKNOWN$
+^\[main.assertion.56\] .* assertion a\[0\]\[100\]==0: UNKNOWN$
+^\[main.assertion.57\] .* assertion c==0: SUCCESS$
+^\[main.assertion.58\] .* assertion c==0: SUCCESS$
+^\[main.assertion.59\] .* assertion ei\[0\]\[1\]==1: SUCCESS$
+^\[main.assertion.60\] .* assertion ei\[0\]\[1\]==0: FAILURE \(if reachable\)$
+^\[main.assertion.61\] .* assertion ei\[2\]\[1\]==0: SUCCESS$
+^\[main.assertion.62\] .* assertion ei\[2\]\[1\]==1: FAILURE \(if reachable\)$
+^\[main.assertion.63\] .* assertion ej\[0\]\[1\]==0: UNKNOWN$
+^\[main.assertion.64\] .* assertion ej\[2\]\[1\]==0: UNKNOWN$
+^\[main.assertion.65\] .* assertion ek\[0\]\[1\]==0: UNKNOWN$
+^\[main.assertion.66\] .* assertion c==0: SUCCESS$
 --
 ^warning: ignoring

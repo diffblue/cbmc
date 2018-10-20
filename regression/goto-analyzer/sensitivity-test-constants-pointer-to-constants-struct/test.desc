@@ -3,12 +3,12 @@ sensitivity_test_constants_pointer_to_constants_struct.c
 --variable --pointers --structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion \(\*p\).a==0: Success$
-^\[main.assertion.2\] .* assertion \(\*p\).a==1: Failure \(if reachable\)$
-^\[main.assertion.3\] .* assertion p->a==0: Success$
-^\[main.assertion.4\] .* assertion p->a==1: Failure \(if reachable\)$
-^\[main.assertion.5\] .* assertion p->b==2.0: Success$
-^\[main.assertion.6\] .* assertion p->b==1.0: Failure \(if reachable\)$
+^\[main.assertion.1\] .* assertion \(\*p\).a==0: SUCCESS$
+^\[main.assertion.2\] .* assertion \(\*p\).a==1: FAILURE \(if reachable\)$
+^\[main.assertion.3\] .* assertion p->a==0: SUCCESS$
+^\[main.assertion.4\] .* assertion p->a==1: FAILURE \(if reachable\)$
+^\[main.assertion.5\] .* assertion p->b==2.0: SUCCESS$
+^\[main.assertion.6\] .* assertion p->b==1.0: FAILURE \(if reachable\)$
 --
 ^warning: ignoring
 --

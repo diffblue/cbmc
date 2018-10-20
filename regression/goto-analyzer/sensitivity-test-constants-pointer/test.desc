@@ -3,19 +3,19 @@ sensitivity_test_constants_pointer.c
 --variable --pointers --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion x==&a: Success$
-^\[main.assertion.2\] .* assertion x==&b: Failure \(if reachable\)$
-^\[main.assertion.3\] .* assertion x==x2: Success$
-^\[main.assertion.4\] .* assertion x==y: Failure \(if reachable\)$
-^\[main.assertion.5\] .* assertion \*x==0: Success$
-^\[main.assertion.6\] .* assertion \*x==1: Failure \(if reachable\)$
-^\[main.assertion.7\] .* assertion \*x==1: Success$
-^\[main.assertion.8\] .* assertion \*x==0: Failure \(if reachable\)$
-^\[main.assertion.9\] .* assertion a==2: Success$
-^\[main.assertion.10\] .* assertion a==0: Failure \(if reachable\)$
-^\[main.assertion.11\] .* assertion x==&a: Success$
-^\[main.assertion.12\] .* assertion \*x==0: Unknown$
-^\[main.assertion.13\] .* assertion x==&a: Unknown$
-^\[main.assertion.14\] .* assertion x==&b: Unknown$
+^\[main.assertion.1\] .* assertion x==&a: SUCCESS$
+^\[main.assertion.2\] .* assertion x==&b: FAILURE \(if reachable\)$
+^\[main.assertion.3\] .* assertion x==x2: SUCCESS$
+^\[main.assertion.4\] .* assertion x==y: FAILURE \(if reachable\)$
+^\[main.assertion.5\] .* assertion \*x==0: SUCCESS$
+^\[main.assertion.6\] .* assertion \*x==1: FAILURE \(if reachable\)$
+^\[main.assertion.7\] .* assertion \*x==1: SUCCESS$
+^\[main.assertion.8\] .* assertion \*x==0: FAILURE \(if reachable\)$
+^\[main.assertion.9\] .* assertion a==2: SUCCESS$
+^\[main.assertion.10\] .* assertion a==0: FAILURE \(if reachable\)$
+^\[main.assertion.11\] .* assertion x==&a: SUCCESS$
+^\[main.assertion.12\] .* assertion \*x==0: UNKNOWN$
+^\[main.assertion.13\] .* assertion x==&a: UNKNOWN$
+^\[main.assertion.14\] .* assertion x==&b: UNKNOWN$
 --
 ^warning: ignoring

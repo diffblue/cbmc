@@ -232,22 +232,22 @@ bool static_verifier(
 
         if(e.is_true())
         {
-          m.result() << m.green << "Success" << m.reset;
+          m.result() << m.green << "SUCCESS" << m.reset;
           pass++;
         }
         else if(e.is_false())
         {
-          m.result() << m.red << "Failure" << m.reset << " (if reachable)";
+          m.result() << m.red << "FAILURE" << m.reset << " (if reachable)";
           fail++;
         }
         else if(domain.is_bottom())
         {
-          m.result() << m.green << "Success" << m.reset << " (unreachable)";
+          m.result() << m.green << "SUCCESS" << m.reset << " (unreachable)";
           pass++;
         }
         else
         {
-          m.result() << m.yellow << "Unknown" << m.reset;
+          m.result() << m.yellow << "UNKNOWN" << m.reset;
           unknown++;
         }
 

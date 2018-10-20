@@ -3,8 +3,8 @@ main.c
 --intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 12 function main, assertion i<50: Unknown$
-^\[main.assertion.2\] file main.c line 13 function main, assertion i<51: Unknown$
-^\[main.assertion.3\] file main.c line 14 function main, assertion i<52: Success$
+^\[main.assertion.1\] file main.c line 12 function main, assertion i<50: UNKNOWN$
+^\[main.assertion.2\] file main.c line 13 function main, assertion i<51: UNKNOWN$
+^\[main.assertion.3\] file main.c line 14 function main, assertion i<52: SUCCESS$
 --
 ^warning: ignoring

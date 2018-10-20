@@ -3,14 +3,14 @@ sensitivity_test_constants_struct.c
 --variable --structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion x.a==0: Success$
-^\[main.assertion.2\] .* assertion x.a==1: Failure \(if reachable\)$
-^\[main.assertion.3\] .* assertion x.a==0: Success$
-^\[main.assertion.4\] .* assertion x.a==0: Success$
-^\[main.assertion.5\] .* assertion x.b>0.0f: Unknown$
-^\[main.assertion.6\] .* assertion x.b==1.0f: Unknown$
-^\[main.assertion.7\] .* assertion x.a<2: Unknown$
-^\[main.assertion.8\] .* assertion x.a>2: Unknown$
-^\[main.assertion.9\] .* assertion x.a==1: Unknown$
+^\[main.assertion.1\] .* assertion x.a==0: SUCCESS$
+^\[main.assertion.2\] .* assertion x.a==1: FAILURE \(if reachable\)$
+^\[main.assertion.3\] .* assertion x.a==0: SUCCESS$
+^\[main.assertion.4\] .* assertion x.a==0: SUCCESS$
+^\[main.assertion.5\] .* assertion x.b>0.0f: UNKNOWN$
+^\[main.assertion.6\] .* assertion x.b==1.0f: UNKNOWN$
+^\[main.assertion.7\] .* assertion x.a<2: UNKNOWN$
+^\[main.assertion.8\] .* assertion x.a>2: UNKNOWN$
+^\[main.assertion.9\] .* assertion x.a==1: UNKNOWN$
 --
 ^warning: ignoring

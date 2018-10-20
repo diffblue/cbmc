@@ -3,7 +3,7 @@ main.c
 --constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 11 function main, assertion tmp_if_expr: Success$
-^\[main.assertion.2\] file main.c line 12 function main, assertion tmp_if_expr\$1: Failure$
+^\[main.assertion.1\] file main.c line 11 function main, assertion tmp_if_expr: SUCCESS$
+^\[main.assertion.2\] file main.c line 12 function main, assertion tmp_if_expr\$1: FAILURE$
 --
 ^warning: ignoring

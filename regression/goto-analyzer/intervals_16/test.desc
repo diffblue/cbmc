@@ -3,6 +3,6 @@ main.c
 --intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 11 function main, assertion j\s*<\s*52: (Unknown|Failure \(if reachable\))$
+^\[main.assertion.1\] file main.c line 11 function main, assertion j\s*<\s*52: (UNKNOWN|FAILURE \(if reachable\))$
 --
 ^warning: ignoring

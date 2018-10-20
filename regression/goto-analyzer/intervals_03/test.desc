@@ -3,6 +3,6 @@ main.c
 --intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 6 function main, assertion x > -10 \|\| x < 100: Success$
+^\[main.assertion.1\] file main.c line 6 function main, assertion x > -10 \|\| x < 100: SUCCESS$
 --
 ^warning: ignoring
