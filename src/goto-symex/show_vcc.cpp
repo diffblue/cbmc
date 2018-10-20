@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 
 void show_vcc_plain(
-  std::ostream &out,
+  messaget::mstreamt &out,
   const namespacet &ns,
   const symex_target_equationt &equation)
 {
@@ -63,7 +63,8 @@ void show_vcc_plain(
       {
         if(!p_it->ignore)
         {
-          out << "{-" << count << "} " << format(p_it->cond_expr) << '\n';
+          out << messaget::faint << "{-" << count << "} " << messaget::reset
+              << format(p_it->cond_expr) << '\n';
 
 #ifdef DEBUG
           out << "GUARD: " << format(p_it->guard) << '\n';
@@ -75,10 +76,10 @@ void show_vcc_plain(
       }
 
     // Unicode equivalent of "|--------------------------"
-    out << u8"\u251c";
+    out << messaget::faint << u8"\u251c";
     for(unsigned i = 0; i < 26; i++)
       out << u8"\u2500";
-    out << '\n';
+    out << messaget::reset << '\n';
 
     // split property into multiple disjunts, if applicable
     exprt::operandst disjuncts;
@@ -91,9 +92,12 @@ void show_vcc_plain(
     std::size_t count = 1;
     for(const auto &disjunct : disjuncts)
     {
-      out << '{' << count << "} " << format(disjunct) << '\n';
+      out << messaget::faint << '{' << count << "} " << messaget::reset
+          << format(disjunct) << '\n';
       count++;
     }
+
+    out << messaget::eom;
   }
 }
 
@@ -174,7 +178,7 @@ void show_vcc(
     of.open(filename);
     if(!of)
       throw invalid_command_line_argument_exceptiont(
-        "invalid file to read trace from: " + filename, "--outfile");
+        "failed to open output file: " + filename, "--outfile");
   }
 
   std::ostream &out = have_file ? of : std::cout;
@@ -190,13 +194,18 @@ void show_vcc(
     break;
 
   case ui_message_handlert::uit::PLAIN:
-    msg.status() << "VERIFICATION CONDITIONS:\n" << messaget::eom;
     if(have_file)
-      show_vcc_plain(out, ns, equation);
+    {
+      msg.status() << "Verification conditions written to file"
+                   << messaget::eom;
+      stream_message_handlert mout_handler(out);
+      messaget mout(mout_handler);
+      show_vcc_plain(mout.status(), ns, equation);
+    }
     else
     {
+      msg.status() << "VERIFICATION CONDITIONS:\n" << messaget::eom;
       show_vcc_plain(msg.status(), ns, equation);
-      msg.status() << messaget::eom;
     }
     break;
   }
