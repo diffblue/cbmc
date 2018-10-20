@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 
 void show_vcc_plain(
-  std::ostream &out,
+  messaget::mstreamt &out,
   const namespacet &ns,
   const symex_target_equationt &equation)
 {
@@ -94,6 +94,8 @@ void show_vcc_plain(
       out << '{' << count << "} " << format(disjunct) << '\n';
       count++;
     }
+
+    out << messaget::eom;
   }
 }
 
@@ -190,13 +192,18 @@ void show_vcc(
     break;
 
   case ui_message_handlert::uit::PLAIN:
-    msg.status() << "VERIFICATION CONDITIONS:\n" << messaget::eom;
     if(have_file)
-      show_vcc_plain(out, ns, equation);
+    {
+      msg.status() << "Verification conditions written to file"
+                   << messaget::eom;
+      stream_message_handlert mout_handler(out);
+      messaget mout(mout_handler);
+      show_vcc_plain(mout.status(), ns, equation);
+    }
     else
     {
+      msg.status() << "VERIFICATION CONDITIONS:\n" << messaget::eom;
       show_vcc_plain(msg.status(), ns, equation);
-      msg.status() << messaget::eom;
     }
     break;
   }
