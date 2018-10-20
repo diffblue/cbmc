@@ -39,9 +39,10 @@ void goto_check(
   "(pointer-overflow-check)(conversion-check)(undefined-shift-check)" \
   "(float-overflow-check)(nan-check)(no-built-in-assertions)"
 
+// clang-format off
 #define HELP_GOTO_CHECK \
   " --bounds-check               enable array bounds checks\n" \
-  " --pointer-check              enable pointer checks (always enabled for Java)\n" /* NOLINT(whitespace/line_length) */ \
+  " --pointer-check              enable pointer checks\n" /* NOLINT(whitespace/line_length) */ \
   " --memory-leak-check          enable memory leak checks\n" \
   " --div-by-zero-check          enable division by zero checks\n" \
   " --signed-overflow-check      enable signed arithmetic over- and underflow checks\n" /* NOLINT(whitespace/line_length) */ \
@@ -52,6 +53,7 @@ void goto_check(
   " --float-overflow-check       check floating-point for +/-Inf\n" \
   " --nan-check                  check floating-point for NaN\n" \
   " --no-built-in-assertions     ignore assertions in built-in library\n" \
+// clang-format on
 
 #define PARSE_OPTIONS_GOTO_CHECK(cmdline, options) \
   options.set_option("bounds-check", cmdline.isset("bounds-check")); \
