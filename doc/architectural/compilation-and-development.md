@@ -58,12 +58,12 @@ print statements and code checking that data structures are as expected.
 \subsection compilation-and-development-subsection-regression-tests Regression tests
 
 The regression tests are contained in `regression/` and `jbmc/regression/`.
-Inside these folders there is a directory for each of the tools/modules. Each
+Inside these folders there is a directory for each of the modules. Each
 of these contains multiple test directories, with names describing
 what they test. When there are multiple tests in a test directory then
 they should all test very similar aspects of the program's behaviour. Each
 test directory contains input files and one or more test description files,
-which have the ending `.desc`. The test description files describe what command
+which have the ending `.desc`. The test description files specify what command
 to run, what output is expected and so on. The test framework is a
 Perl script,
 [test.pl](https://github.com/diffblue/cbmc/blob/develop/regression/test.pl),
@@ -80,7 +80,9 @@ succeed), `FUTURE` (will succeed when a planned feature is added) or
 
 If you have compiled using `make` then you can run the regression tests
 using `make test`. Run it from `regression/` to run all the regression tests,
-or any of its subfolders to just run the tests in that subfolder.
+or any of its subfolders to just run the tests for that module. The number
+of tests that are run in parallel can be controlled through the environment
+variable `TESTPL_JOBS`.
 
 If you have not compiled using `make` then this won't work, because the
 makefile is expecting to find binaries like `cbmc` and `jbmc` in the source
@@ -109,15 +111,25 @@ list which tests it will run without actually running them.
 
 \subsubsection compilation-and-development-subsubsection-running-regression-tests-directly-with-test-pl Running regression tests directly with `test.pl`
 
-In a directory corresponding to a tool or module, you can directly run a
-test directory as follows:
+It can be useful to run a single test folder in isolation. This can be done by
+running `test.pl` directly. The way that `test.pl` is run varies between the
+different modules, and can be ascertained by looking at the `test` target in
+the makefile. The simple case is when there isn't a file called `chain.sh`.
+Then you can directly run `test.pl` on a single test folder with the
+following command (from the module directory):
 
-    ../test.pl -c PATH_TO_CBMC_FROM_DESC_FILE TEST_DIR
+    ../test.pl -p -c <absolute-path-to-binary> <test-folder>
 
-Note that `PATH_TO_CBMC_FROM_DESC_FILE` should either be absolute or be
-relative to the location of the test description files. If `TEST_DIR` is
-not provided then all test directories are run.
- 
+`-p` makes it print a log of failed tests and `-c` tells it where to find the
+binary to run (the path does not have to be absolute, but it is recommended).
+If `<test-folder>` is not provided then all test directories are run. The
+`--help` option lists all command line options, including `-j` for running
+multiple tests in parallel and `-C`, `-T`, `-F` and `-K` for controlling
+whether `CORE`, `THOROUGH`, `FUTURE` or `KNOWNBUG` tests are run.
+
+When there is a file called `chain.sh` then `test.pl` is called with
+`-c ../chain.sh`, followed by arguments which vary from module to module.
+
 
 \subsection compilation-and-development-subsection-unit-tests Unit tests
 
