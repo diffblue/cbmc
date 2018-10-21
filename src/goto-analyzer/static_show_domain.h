@@ -16,7 +16,7 @@ class goto_modelt;
 class message_handlert;
 class optionst;
 
-bool static_show_domain(
+void static_show_domain(
   const goto_modelt &,
   const ai_baset &,
   const optionst &,
