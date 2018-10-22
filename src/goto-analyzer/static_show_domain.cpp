@@ -17,8 +17,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 /// \param ai: the abstract interpreter after it has been run to fix point
 /// \param options: the parsed user options
 /// \param out: output stream for the printing
-/// \return: false on success with the domain printed to out
-bool static_show_domain(
+void static_show_domain(
   const goto_modelt &goto_model,
   const ai_baset &ai,
   const optionst &options,
@@ -48,6 +47,4 @@ bool static_show_domain(
     // 'text' or console output
     ai.output(goto_model, out);
   }
-
-  return false;
 }

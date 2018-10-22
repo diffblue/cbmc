@@ -621,13 +621,13 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
     // Perform the task
     status() << "Performing task" << eom;
+
     bool result = true;
+
     if(options.get_bool_option("show"))
     {
-      result = static_show_domain(goto_model,
-                                  *analyzer,
-                                  options,
-                                  out);
+      static_show_domain(goto_model, *analyzer, options, out);
+      return CPROVER_EXIT_SUCCESS;
     }
     else if(options.get_bool_option("verify"))
     {
