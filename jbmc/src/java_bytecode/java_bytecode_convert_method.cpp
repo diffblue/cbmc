@@ -1069,9 +1069,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       PRECONDITION(!i_it->args.empty());
 
-      unsigned target;
-      bool ret=to_unsigned_integer(to_constant_expr(i_it->args[0]), target);
-      DATA_INVARIANT(!ret, "target expected to be unsigned integer");
+      auto target = numeric_cast_v<unsigned>(to_constant_expr(i_it->args[0]));
       targets.insert(target);
 
       a_entry.first->second.successors.push_back(target);
@@ -1094,9 +1092,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       {
         if(is_label)
         {
-          unsigned target;
-          bool ret=to_unsigned_integer(to_constant_expr(arg), target);
-          DATA_INVARIANT(!ret, "target expected to be unsigned integer");
+          auto target = numeric_cast_v<unsigned>(to_constant_expr(arg));
           targets.insert(target);
           a_entry.first->second.successors.push_back(target);
         }
