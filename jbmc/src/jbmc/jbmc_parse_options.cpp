@@ -629,6 +629,11 @@ int jbmc_parse_optionst::get_goto_program(
       show_symbol_table(lazy_goto_model.symbol_table, ui_message_handler);
       return 0;
     }
+    else if(cmdline.isset("list-symbols"))
+    {
+      show_symbol_table_brief(lazy_goto_model.symbol_table, ui_message_handler);
+      return 0;
+    }
 
     // Move the model out of the local lazy_goto_model
     // and into the caller's goto_model
@@ -798,6 +803,11 @@ bool jbmc_parse_optionst::show_loaded_functions(
   if(cmdline.isset("show-symbol-table"))
   {
     show_symbol_table(goto_model.get_symbol_table(), ui_message_handler);
+    return true;
+  }
+  else if(cmdline.isset("list-symbols"))
+  {
+    show_symbol_table_brief(goto_model.get_symbol_table(), ui_message_handler);
     return true;
   }
 
@@ -1031,6 +1041,7 @@ void jbmc_parse_optionst::help()
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show loaded symbol table\n"
+    " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
     " --drop-unused-functions      drop functions trivially unreachable\n"
     "                              from main function\n"

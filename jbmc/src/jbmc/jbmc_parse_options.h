@@ -59,7 +59,9 @@ class optionst;
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_CLASS_HIERARCHY \
   "(show-loops)" \
-  "(show-symbol-table)(show-parse-tree)" \
+  "(show-symbol-table)" \
+  "(list-symbols)" \
+  "(show-parse-tree)" \
   OPT_SHOW_PROPERTIES \
   "(drop-unused-functions)" \
   "(property):(stop-on-fail)(trace)" \
