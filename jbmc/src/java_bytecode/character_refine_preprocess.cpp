@@ -402,8 +402,9 @@ codet character_refine_preprocesst::convert_is_alphabetic(
 exprt character_refine_preprocesst::expr_of_is_bmp_code_point(
   const exprt &chr, const typet &type)
 {
-  binary_relation_exprt is_bmp(chr, ID_le, from_integer(0xFFFF, chr.type()));
-  return is_bmp;
+  return and_exprt(
+    binary_relation_exprt(chr, ID_le, from_integer(0xFFFF, chr.type())),
+    binary_relation_exprt(chr, ID_ge, from_integer(0, chr.type())));
 }
 
 /// Converts function call to an assignment of an expression corresponding to
