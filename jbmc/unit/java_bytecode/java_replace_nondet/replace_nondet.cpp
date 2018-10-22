@@ -141,7 +141,9 @@ void load_and_test_method(
 
   // Emulate some of the passes that we'd normally do before replace_java_nondet
   // is called.
-  remove_instanceof(goto_function, symbol_table, null_message_handler);
+  class_hierarchyt class_hierarchy(symbol_table);
+  remove_instanceof(
+    goto_function, symbol_table, class_hierarchy, null_message_handler);
 
   remove_virtual_functions(model_function);
 

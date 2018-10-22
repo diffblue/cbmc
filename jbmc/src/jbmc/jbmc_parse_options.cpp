@@ -552,6 +552,9 @@ int jbmc_parse_optionst::doit()
       *this, options, get_message_handler());
     lazy_goto_model.initialize(cmdline, options);
 
+    class_hierarchy =
+      util_make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);
+
     // The precise wording of this error matches goto-symex's complaint when no
     // __CPROVER_start exists (if we just go ahead and run it anyway it will
     // trip an invariant when it tries to load it)
@@ -629,12 +632,13 @@ int jbmc_parse_optionst::get_goto_program(
       *this, options, get_message_handler());
     lazy_goto_model.initialize(cmdline, options);
 
+    class_hierarchy =
+      util_make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);
+
     // Show the class hierarchy
     if(cmdline.isset("show-class-hierarchy"))
     {
-      class_hierarchyt hierarchy;
-      hierarchy(lazy_goto_model.symbol_table);
-      show_class_hierarchy(hierarchy, ui_message_handler);
+      show_class_hierarchy(*class_hierarchy, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -729,7 +733,8 @@ void jbmc_parse_optionst::process_goto_function(
   try
   {
     // Removal of RTTI inspection:
-    remove_instanceof(goto_function, symbol_table, get_message_handler());
+    remove_instanceof(
+      goto_function, symbol_table, *class_hierarchy, get_message_handler());
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(function);
 
@@ -743,6 +748,7 @@ void jbmc_parse_optionst::process_goto_function(
       remove_exceptions(
         goto_function.body,
         symbol_table,
+        class_hierarchy.get(),
         get_message_handler(),
         remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
     }
@@ -888,6 +894,7 @@ bool jbmc_parse_optionst::process_goto_functions(
     // (introduces instanceof but request it is removed)
     remove_exceptions(
       goto_model,
+      class_hierarchy.get(),
       get_message_handler(),
       remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
 

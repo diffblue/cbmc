@@ -24,12 +24,14 @@ class remove_instanceoft
 {
 public:
   remove_instanceoft(
-    symbol_table_baset &symbol_table, message_handlert &message_handler)
-    : symbol_table(symbol_table)
-    , ns(symbol_table)
-    , message_handler(message_handler)
+    symbol_table_baset &symbol_table,
+    const class_hierarchyt &class_hierarchy,
+    message_handlert &message_handler)
+    : symbol_table(symbol_table),
+      class_hierarchy(class_hierarchy),
+      ns(symbol_table),
+      message_handler(message_handler)
   {
-    class_hierarchy(symbol_table);
   }
 
   // Lower instanceof for a single function
@@ -40,8 +42,8 @@ public:
 
 protected:
   symbol_table_baset &symbol_table;
+  const class_hierarchyt &class_hierarchy;
   namespacet ns;
-  class_hierarchyt class_hierarchy;
   message_handlert &message_handler;
 
   bool lower_instanceof(
@@ -240,14 +242,16 @@ bool remove_instanceoft::lower_instanceof(goto_programt &goto_program)
 /// \param target: The instruction to work on.
 /// \param goto_program: The function body containing the instruction.
 /// \param symbol_table: The symbol table to add symbols to.
+/// \param class_hierarchy: class hierarchy analysis of symbol_table
 /// \param message_handler: logging output
 void remove_instanceof(
   goto_programt::targett target,
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
+  const class_hierarchyt &class_hierarchy,
   message_handlert &message_handler)
 {
-  remove_instanceoft rem(symbol_table, message_handler);
+  remove_instanceoft rem(symbol_table, class_hierarchy, message_handler);
   rem.lower_instanceof(goto_program, target);
 }
 
@@ -256,13 +260,15 @@ void remove_instanceof(
 /// \remarks Extra auxiliary variables may be introduced into symbol_table.
 /// \param function: The function to work on.
 /// \param symbol_table: The symbol table to add symbols to.
+/// \param class_hierarchy: class hierarchy analysis of symbol_table
 /// \param message_handler: logging output
 void remove_instanceof(
   goto_functionst::goto_functiont &function,
   symbol_table_baset &symbol_table,
+  const class_hierarchyt &class_hierarchy,
   message_handlert &message_handler)
 {
-  remove_instanceoft rem(symbol_table, message_handler);
+  remove_instanceoft rem(symbol_table, class_hierarchy, message_handler);
   rem.lower_instanceof(function.body);
 }
 
@@ -271,13 +277,15 @@ void remove_instanceof(
 /// \remarks Extra auxiliary variables may be introduced into symbol_table.
 /// \param goto_functions: The functions to work on.
 /// \param symbol_table: The symbol table to add symbols to.
+/// \param class_hierarchy: class hierarchy analysis of symbol_table
 /// \param message_handler: logging output
 void remove_instanceof(
   goto_functionst &goto_functions,
   symbol_table_baset &symbol_table,
+  const class_hierarchyt &class_hierarchy,
   message_handlert &message_handler)
 {
-  remove_instanceoft rem(symbol_table, message_handler);
+  remove_instanceoft rem(symbol_table, class_hierarchy, message_handler);
   bool changed=false;
   for(auto &f : goto_functions.function_map)
     changed=rem.lower_instanceof(f.second.body) || changed;
@@ -289,12 +297,18 @@ void remove_instanceof(
 /// class-identifier test.
 /// \remarks Extra auxiliary variables may be introduced into symbol_table.
 /// \param goto_model: The functions to work on and the symbol table to add
+/// \param class_hierarchy: class hierarchy analysis of goto_model's symbol
+///   table
 /// \param message_handler: logging output
 /// symbols to.
 void remove_instanceof(
   goto_modelt &goto_model,
+  const class_hierarchyt &class_hierarchy,
   message_handlert &message_handler)
 {
   remove_instanceof(
-    goto_model.goto_functions, goto_model.symbol_table, message_handler);
+    goto_model.goto_functions,
+    goto_model.symbol_table,
+    class_hierarchy,
+    message_handler);
 }
