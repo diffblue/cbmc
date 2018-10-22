@@ -143,64 +143,60 @@ jobs:
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
 
-    # Ubuntu Linux with glibc using clang++-3.7, no-debug mode
+    # Ubuntu Linux with glibc using clang++-6.0, no-debug mode
     - stage: Test different OS/CXX/Flags
       os: linux
-      sudo: true
+      sudo: false
       compiler: clang
       cache: ccache
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
           packages:
             - libwww-perl
             - g++-5
+            - clang-6.0
             - libstdc++-5-dev
             - libubsan0
             - parallel
       before_install:
-        - curl -sSL "http://apt.llvm.org/llvm-snapshot.gpg.key" | sudo -E apt-key add -
-        - echo "deb http://apt.llvm.org/precise/ llvm-toolchain-precise-3.7 main" | sudo tee -a /etc/apt/sources.list > /dev/null
-        - sudo apt-get update --option Acquire::Retries=100 --option Acquire::http::Timeout="60"
-        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install clang-3.7
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
         - ln -s /usr/bin/c++-5 bin/g++
         - export CCACHE_CPP2=yes
-      # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
+      # env: COMPILER=clang++-6.0 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache /usr/bin/clang++-3.7"
+        - COMPILER="ccache /usr/bin/clang++-6.0"
         - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DNDEBUG"
         - CCACHE_CPP2=yes
 
-    # Ubuntu Linux with glibc using clang++-3.7, debug mode, disable USE_DSTRING
+    # Ubuntu Linux with glibc using clang++-6.0, debug mode, disable USE_DSTRING
     - stage: Test different OS/CXX/Flags
       os: linux
-      sudo: true
+      sudo: false
       compiler: clang
       cache: ccache
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
           packages:
             - libwww-perl
             - g++-5
+            - clang-6.0
             - libstdc++-5-dev
             - libubsan0
       before_install:
-        - curl -sSL "http://apt.llvm.org/llvm-snapshot.gpg.key" | sudo -E apt-key add -
-        - echo "deb http://apt.llvm.org/precise/ llvm-toolchain-precise-3.7 main" | sudo tee -a /etc/apt/sources.list > /dev/null
-        - sudo apt-get update --option Acquire::Retries=100 --option Acquire::http::Timeout="60"
-        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install clang-3.7
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
         - ln -s /usr/bin/g++-5 bin/g++
         - export CCACHE_CPP2=yes
-      # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
+      # env: COMPILER=clang++-6.0 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache /usr/bin/clang++-3.7"
+        - COMPILER="ccache /usr/bin/clang++-6.0"
         - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DDEBUG -DUSE_STD_STRING"
         - CCACHE_CPP2=yes
       script: echo "Not running any tests for a debug build."
@@ -208,6 +204,7 @@ jobs:
     # cmake build using g++-5
     - stage: Test different OS/CXX/Flags
       os: linux
+      sudo: false
       compiler: gcc
       cache: ccache
       env:
@@ -233,6 +230,7 @@ jobs:
     # cmake build using g++-7
     - stage: Test different OS/CXX/Flags
       os: linux
+      sudo: false
       compiler: gcc
       cache: ccache
       env:
@@ -258,6 +256,7 @@ jobs:
     # cmake build using clang++-6
     - stage: Test different OS/CXX/Flags
       os: linux
+      sudo: false
       compiler: clang
       cache: ccache
       env:
@@ -291,6 +290,7 @@ jobs:
     # cmake build on OSX, using default clang
     - stage: Test different OS/CXX/Flags
       os: osx
+      sudo: false
       compiler: clang
       cache: ccache
       before_install:
