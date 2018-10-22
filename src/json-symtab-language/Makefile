@@ -1,4 +1,6 @@
-SRC = json_symtab_language.cpp
+SRC = json_symtab_language.cpp \
+	json_symbol_table.cpp \
+	json_symbol.cpp 
 
 INCLUDES= -I ..
 
