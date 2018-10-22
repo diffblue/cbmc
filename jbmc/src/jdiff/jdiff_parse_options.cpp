@@ -345,7 +345,7 @@ bool jdiff_parse_optionst::process_goto_program(
   try
   {
     // remove function pointers
-    status() << "Removal of function pointers and virtual functions" << eom;
+    status() << "Removing function pointers and virtual functions" << eom;
     remove_function_pointers(
       get_message_handler(), goto_model, cmdline.isset("pointer-check"));
 
