@@ -1469,6 +1469,19 @@ public:
   }
 
   // These have a sub-type
+  const typet &subtype() const
+  {
+    const subt &sub = get_sub();
+    DATA_INVARIANT(sub.size() == 1, "c_bit_field_typet must have subtype");
+    return static_cast<const typet &>(sub.front());
+  }
+
+  typet &subtype()
+  {
+    subt &sub = get_sub();
+    DATA_INVARIANT(sub.size() == 1, "c_bit_field_typet must have subtype");
+    return static_cast<typet &>(sub.front());
+  }
 };
 
 /// Check whether a reference to a typet is a \ref c_bit_field_typet.
@@ -1516,6 +1529,21 @@ public:
   signedbv_typet difference_type() const
   {
     return signedbv_typet(get_width());
+  }
+
+  // These have a sub-type
+  const typet &subtype() const
+  {
+    const subt &sub = get_sub();
+    DATA_INVARIANT(sub.size() == 1, "pointer_typet must have subtype");
+    return static_cast<const typet &>(sub.front());
+  }
+
+  typet &subtype()
+  {
+    subt &sub = get_sub();
+    DATA_INVARIANT(sub.size() == 1, "pointer_typet must have subtype");
+    return static_cast<typet &>(sub.front());
   }
 };
 

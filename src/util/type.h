@@ -30,26 +30,6 @@ public:
   typet() { }
 
   explicit typet(const irep_idt &_id):irept(_id) { }
-  typet(const irep_idt &_id, const typet &_subtype):irept(_id)
-  {
-    subtype()=_subtype;
-  }
-
-  const typet &subtype() const
-  {
-    if(get_sub().empty())
-      return static_cast<const typet &>(get_nil_irep());
-    return static_cast<const typet &>(get_sub().front());
-  }
-
-  typet &subtype()
-  {
-    subt &sub=get_sub();
-    if(sub.empty())
-      sub.resize(1);
-    return static_cast<typet &>(sub.front());
-  }
-
   bool has_subtypes() const
   { return !get_sub().empty(); }
 
@@ -136,7 +116,10 @@ class type_with_subtypet:public typet
 {
 public:
   DEPRECATED("use type_with_subtypet(id, subtype) instead")
-  explicit type_with_subtypet(const irep_idt &_id):typet(_id) { }
+  explicit type_with_subtypet(const irep_idt &_id) : typet(_id)
+  {
+    get_sub().resize(1);
+  }
 
   type_with_subtypet(const irep_idt &_id, const typet &_subtype):
     typet(_id)
@@ -144,24 +127,30 @@ public:
     subtype()=_subtype;
   }
 
-  #if 0
   const typet &subtype() const
-  { return (typet &)find(ID_subtype); }
+  {
+    const subt &sub = get_sub();
+    DATA_INVARIANT(sub.size() == 1, "type_with_subtypet must have subtype");
+    return static_cast<const typet &>(sub.front());
+  }
 
   typet &subtype()
-  { return (typet &)add(ID_subtype); }
-  #endif
+  {
+    subt &sub = get_sub();
+    DATA_INVARIANT(sub.size() == 1, "type_with_subtypet must have subtype");
+    return static_cast<typet &>(sub.front());
+  }
 };
 
 inline const type_with_subtypet &to_type_with_subtype(const typet &type)
 {
-  PRECONDITION(type.has_subtype());
+  PRECONDITION(type.get_sub().size() == 1);
   return static_cast<const type_with_subtypet &>(type);
 }
 
 inline type_with_subtypet &to_type_with_subtype(typet &type)
 {
-  PRECONDITION(type.has_subtype());
+  PRECONDITION(type.get_sub().size() == 1);
   return static_cast<type_with_subtypet &>(type);
 }
 
