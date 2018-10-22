@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "invariant.h"
 #include "irep.h"
+#include "optional.h"
 #include "prefix.h"
 
 #include <string>
@@ -184,6 +185,8 @@ public:
   {
     return static_cast<const source_locationt &>(get_nil_irep());
   }
+
+  optionalt<std::string> full_path() const;
 
 protected:
   std::string as_string(bool print_cwd) const;
