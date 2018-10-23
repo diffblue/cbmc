@@ -314,8 +314,9 @@ safety_checkert::resultt bmct::execute(
     }
 
     // any properties to check at all?
-    if(!options.get_bool_option("program-only") &&
-       symex.remaining_vccs==0)
+    if(
+      !options.get_bool_option("program-only") &&
+      symex.get_remaining_vccs() == 0)
     {
       report_success();
       output_graphml(resultt::SAFE);
@@ -392,9 +393,8 @@ void bmct::slice()
       }
     }
   }
-  statistics() << "Generated "
-               << symex.total_vccs<<" VCC(s), "
-               << symex.remaining_vccs
+  statistics() << "Generated " << symex.get_total_vccs() << " VCC(s), "
+               << symex.get_remaining_vccs()
                << " remaining after simplification" << eom;
 }
 

@@ -211,16 +211,19 @@ public:
     propagationt propagation;
     unsigned atomic_section_id;
     std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
+    unsigned total_vccs, remaining_vccs;
 
-    explicit goto_statet(const goto_symex_statet &s):
-      depth(s.depth),
-      level2_current_names(s.level2.current_names),
-      value_set(s.value_set),
-      guard(s.guard),
-      source(s.source),
-      propagation(s.propagation),
-      atomic_section_id(s.atomic_section_id),
-      safe_pointers(s.safe_pointers)
+    explicit goto_statet(const goto_symex_statet &s)
+      : depth(s.depth),
+        level2_current_names(s.level2.current_names),
+        value_set(s.value_set),
+        guard(s.guard),
+        source(s.source),
+        propagation(s.propagation),
+        atomic_section_id(s.atomic_section_id),
+        safe_pointers(s.safe_pointers),
+        total_vccs(s.total_vccs),
+        remaining_vccs(s.remaining_vccs)
     {
     }
 
@@ -250,7 +253,9 @@ public:
       propagation(s.propagation),
       safe_pointers(s.safe_pointers),
       value_set(s.value_set),
-      atomic_section_id(s.atomic_section_id)
+      atomic_section_id(s.atomic_section_id),
+      total_vccs(s.total_vccs),
+      remaining_vccs(s.remaining_vccs)
   {
     level2.current_names = s.level2_current_names;
   }
@@ -345,6 +350,8 @@ public:
     written_in_atomic_sectiont;
   read_in_atomic_sectiont read_in_atomic_section;
   written_in_atomic_sectiont written_in_atomic_section;
+
+  unsigned total_vccs, remaining_vccs;
 
   class threadt
   {

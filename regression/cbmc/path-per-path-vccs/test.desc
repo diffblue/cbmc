@@ -1,0 +1,8 @@
+CORE
+main.c
+--paths lifo --unwind 1 --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
