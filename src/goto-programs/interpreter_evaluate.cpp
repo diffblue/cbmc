@@ -930,8 +930,7 @@ void interpretert::evaluate(
         evaluate(expr.op1(), idx);
         if(idx.size() == 1)
         {
-          evaluated_index.op1() =
-            constant_exprt(integer2string(idx[0]), expr.op1().type());
+          evaluated_index.op1() = from_integer(idx[0], expr.op1().type());
         }
         simplified = simplify_expr(evaluated_index, ns);
       }
