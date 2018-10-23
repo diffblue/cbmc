@@ -266,9 +266,6 @@ static void show_symbol_table_brief_json_ui(
     if(symbol.type.is_not_nil())
       ptr->from_type(symbol.type, type_str, ns);
 
-    if(symbol.value.is_not_nil())
-      ptr->from_expr(symbol.value, value_str, ns);
-
     json_objectt symbol_json;
     symbol_json["prettyName"] = json_stringt(symbol.pretty_name);
     symbol_json["baseName"] = json_stringt(symbol.base_name);

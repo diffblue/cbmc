@@ -1,0 +1,6 @@
+CORE
+Test.class
+--list-symbols
+^java::Test\.main:\(\[Ljava/lang/String;\)V \(struct java::array\[reference\] \*\) -> void$
+^EXIT=0$
+^SIGNAL=0$
