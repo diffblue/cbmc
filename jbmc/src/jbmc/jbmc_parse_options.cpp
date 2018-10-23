@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exit_codes.h>
 #include <util/invariant.h>
 #include <util/unicode.h>
+#include <util/xml.h>
 #include <util/version.h>
 
 #include <langapi/language.h>
@@ -390,6 +391,9 @@ int jbmc_parse_optionst::doit()
     return 0; // should contemplate EX_OK from sysexits.h
   }
 
+  eval_verbosity(
+    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
+
   //
   // command line options
   //
@@ -412,15 +416,34 @@ int jbmc_parse_optionst::doit()
     return 6; // should contemplate EX_SOFTWARE from sysexits.h
   }
 
-  eval_verbosity(
-    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
-
   //
   // Print a banner
   //
   status() << "JBMC version " << CBMC_VERSION << " " << sizeof(void *) * 8
            << "-bit " << config.this_architecture() << " "
            << config.this_operating_system() << eom;
+
+  // output the options
+  switch(ui_message_handler.get_ui())
+  {
+    case ui_message_handlert::uit::PLAIN:
+      conditional_output(debug(), [&options](messaget::mstreamt &mstream) {
+        mstream << "\nOptions: \n";
+        options.output(mstream);
+        mstream << messaget::eom;
+      });
+      break;
+    case ui_message_handlert::uit::JSON_UI:
+    {
+      json_objectt json_options;
+      json_options["options"] = options.to_json();
+      debug() << json_options;
+      break;
+    }
+    case ui_message_handlert::uit::XML_UI:
+      debug() << options.to_xml();
+      break;
+  }
 
   register_language(new_ansi_c_language);
   register_language(new_java_bytecode_language);

@@ -16,6 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <list>
 
+class json_objectt;
+class xmlt;
+
 class optionst
 {
 public:
@@ -54,6 +57,10 @@ public:
     option_map=other.option_map;
     return *this;
   }
+
+  json_objectt to_json() const;
+  xmlt to_xml() const;
+  void output(std::ostream &out) const;
 
 protected:
   option_mapt option_map;

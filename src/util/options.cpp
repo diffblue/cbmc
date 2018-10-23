@@ -11,7 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "options.h"
 
+#include "json.h"
 #include "string2int.h"
+#include "xml.h"
 
 void optionst::set_option(const std::string &option,
                           const std::string &value)
@@ -83,4 +85,53 @@ const optionst::value_listt &optionst::get_list_option(
     return empty_list;
   else
     return it->second;
+}
+
+/// Returns the options as JSON key value pairs
+json_objectt optionst::to_json() const
+{
+  json_objectt json_options;
+  for(const auto &option_pair : option_map)
+  {
+    json_arrayt &values = json_options[option_pair.first].make_array();
+    for(const auto &value : option_pair.second)
+      values.push_back(json_stringt(value));
+  }
+  return json_options;
+}
+
+/// Returns the options in XML format
+xmlt optionst::to_xml() const
+{
+  xmlt xml_options("options");
+  for(const auto &option_pair : option_map)
+  {
+    xmlt &xml_option = xml_options.new_element("option");
+    xml_option.set_attribute("name", option_pair.first);
+    for(const auto &value : option_pair.second)
+    {
+      xmlt &xml_value = xml_option.new_element("value");
+      xml_value.data = value;
+    }
+  }
+  return xml_options;
+}
+
+/// Outputs the options to `out`
+void optionst::output(std::ostream &out) const
+{
+  for(const auto &option_pair : option_map)
+  {
+    out << option_pair.first << ": ";
+    bool first = true;
+    for(const auto &value : option_pair.second)
+    {
+      if(first)
+        first = false;
+      else
+        out << ", ";
+      out << '"' << value << '"';
+    }
+    out << "\n";
+  }
 }
