@@ -203,3 +203,10 @@ void scratch_programt::append_loop(
     }
   }
 }
+
+optionst scratch_programt::get_default_options()
+{
+  optionst ret;
+  ret.set_option("simplify", true);
+  return ret;
+}
