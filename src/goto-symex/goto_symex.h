@@ -274,7 +274,7 @@ protected:
 
   // guards
 
-  irep_idt guard_identifier;
+  const irep_idt guard_identifier;
 
   // symex
   virtual void symex_transition(
