@@ -235,7 +235,6 @@ bool remove_instanceoft::lower_instanceof(goto_programt &goto_program)
   return true;
 }
 
-
 /// Replace an instanceof in the expression or guard of the passed instruction
 /// of the given function body with an explicit class-identifier test.
 /// \remarks Extra auxiliary variables may be introduced into symbol_table.
