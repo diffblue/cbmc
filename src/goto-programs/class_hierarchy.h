@@ -57,6 +57,10 @@ public:
   void operator()(const symbol_tablet &);
 
   class_hierarchyt() = default;
+  explicit class_hierarchyt(const symbol_tablet &symbol_table)
+  {
+    (*this)(symbol_table);
+  }
   class_hierarchyt(const class_hierarchyt &) = delete;
   class_hierarchyt &operator=(const class_hierarchyt &) = delete;
 
