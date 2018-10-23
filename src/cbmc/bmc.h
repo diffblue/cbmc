@@ -86,7 +86,6 @@ public:
       ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
   {
-    symex.constant_propagation=options.get_bool_option("propagation");
     symex.record_coverage=
       !options.get_option("symex-coverage-report").empty();
     symex.self_loops_to_assumptions =
@@ -162,7 +161,6 @@ protected:
       ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
   {
-    symex.constant_propagation = options.get_bool_option("propagation");
     symex.record_coverage =
       !options.get_option("symex-coverage-report").empty();
     INVARIANT(
