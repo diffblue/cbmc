@@ -25,7 +25,7 @@ symex_bmct::symex_bmct(
   const optionst &options,
   path_storaget &path_storage)
   : goto_symext(mh, outer_symbol_table, _target, options, path_storage),
-    record_coverage(false),
+    record_coverage(!options.get_option("symex-coverage-report").empty()),
     symex_coverage(ns)
 {
 }

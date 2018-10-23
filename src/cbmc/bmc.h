@@ -86,8 +86,6 @@ public:
       ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
   {
-    symex.record_coverage=
-      !options.get_option("symex-coverage-report").empty();
   }
 
   virtual resultt run(const goto_functionst &goto_functions)
@@ -159,8 +157,6 @@ protected:
       ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
   {
-    symex.record_coverage =
-      !options.get_option("symex-coverage-report").empty();
     INVARIANT(
       options.get_bool_option("paths"),
       "Should only use saved equation & goto_state constructor "
