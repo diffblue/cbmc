@@ -3,4 +3,4 @@ add_library(json-symtab-language ${sources})
 
 generic_includes(json-symtab-language)
 
-#target_link_libraries(json-symtab-language util)
+target_link_libraries(json-symtab-language json util)
