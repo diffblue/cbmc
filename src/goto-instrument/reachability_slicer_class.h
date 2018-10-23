@@ -24,7 +24,7 @@ class reachability_slicert
 public:
   void operator()(
     goto_functionst &goto_functions,
-    slicing_criteriont &criterion,
+    const slicing_criteriont &criterion,
     bool include_forward_reachability)
   {
     cfg(goto_functions);
@@ -76,11 +76,11 @@ protected:
 
   void fixedpoint_to_assertions(
     const is_threadedt &is_threaded,
-    slicing_criteriont &criterion);
+    const slicing_criteriont &criterion);
 
   void fixedpoint_from_assertions(
     const is_threadedt &is_threaded,
-    slicing_criteriont &criterion);
+    const slicing_criteriont &criterion);
 
   void slice(goto_functionst &goto_functions);
 
@@ -100,8 +100,9 @@ private:
     std::vector<cfgt::node_indext> &callsite_successor_stack,
     std::vector<cfgt::node_indext> &callee_head_stack);
 
-  std::vector<cfgt::node_indext>
-  get_sources(const is_threadedt &is_threaded, slicing_criteriont &criterion);
+  std::vector<cfgt::node_indext> get_sources(
+    const is_threadedt &is_threaded,
+    const slicing_criteriont &criterion);
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_CLASS_H

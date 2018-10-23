@@ -33,12 +33,12 @@ class slicing_criteriont
 {
 public:
   virtual ~slicing_criteriont();
-  virtual bool operator()(goto_programt::const_targett)=0;
+  virtual bool operator()(goto_programt::const_targett) const = 0;
 };
 
 void full_slicer(
   goto_functionst &goto_functions,
   const namespacet &ns,
-  slicing_criteriont &criterion);
+  const slicing_criteriont &criterion);
 
 #endif // CPROVER_GOTO_INSTRUMENT_FULL_SLICER_H

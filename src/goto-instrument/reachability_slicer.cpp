@@ -35,7 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 std::vector<reachability_slicert::cfgt::node_indext>
 reachability_slicert::get_sources(
   const is_threadedt &is_threaded,
-  slicing_criteriont &criterion)
+  const slicing_criteriont &criterion)
 {
   std::vector<cfgt::node_indext> sources;
   for(const auto &e_it : cfg.entry_map)
@@ -164,7 +164,7 @@ void reachability_slicert::backward_inwards_walk_from(
 /// \param criterion the criterion we are trying to hit
 void reachability_slicert::fixedpoint_to_assertions(
   const is_threadedt &is_threaded,
-  slicing_criteriont &criterion)
+  const slicing_criteriont &criterion)
 {
   std::vector<cfgt::node_indext> sources = get_sources(is_threaded, criterion);
 
@@ -302,7 +302,7 @@ void reachability_slicert::forward_inwards_walk_from(
 /// \param criterion the criterion we are trying to hit
 void reachability_slicert::fixedpoint_from_assertions(
   const is_threadedt &is_threaded,
-  slicing_criteriont &criterion)
+  const slicing_criteriont &criterion)
 {
   std::vector<cfgt::node_indext> sources = get_sources(is_threaded, criterion);
 
