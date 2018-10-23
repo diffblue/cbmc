@@ -88,8 +88,6 @@ public:
   {
     symex.record_coverage=
       !options.get_option("symex-coverage-report").empty();
-    symex.self_loops_to_assumptions =
-      options.get_bool_option("self-loops-to-assumptions");
   }
 
   virtual resultt run(const goto_functionst &goto_functions)

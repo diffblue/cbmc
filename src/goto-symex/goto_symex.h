@@ -60,9 +60,10 @@ public:
       doing_path_exploration(options.is_set("paths")),
       allow_pointer_unsoundness(
         options.get_bool_option("allow-pointer-unsoundness")),
-      self_loops_to_assumptions(true),
       language_mode(),
       constant_propagation(options.get_bool_option("propagation")),
+      self_loops_to_assumptions(
+        options.get_bool_option("self-loops-to-assumptions")),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table),
       target(_target),
@@ -210,14 +211,13 @@ public:
   // these bypass the target maps
   virtual void symex_step_goto(statet &, bool taken);
 
-  bool self_loops_to_assumptions;
-
   /// language_mode: ID_java, ID_C or another language identifier
   /// if we know the source language in use, irep_idt() otherwise.
   irep_idt language_mode;
 
 protected:
   const bool constant_propagation;
+  const bool self_loops_to_assumptions;
 
   /// The symbol table associated with the goto-program that we're
   /// executing. This symbol table will not additionally contain objects
