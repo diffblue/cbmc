@@ -94,10 +94,6 @@ void goto_symext::symex_other(
     clean_expr(clean_code, state, false);
     symex_cpp_delete(state, clean_code);
   }
-  else if(statement==ID_free)
-  {
-    // ignore
-  }
   else if(statement==ID_printf)
   {
     codet clean_code=code;

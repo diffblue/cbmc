@@ -2996,9 +2996,6 @@ std::string expr2ct::convert_code(
   if(statement==ID_switch_case)
     return convert_code_switch_case(to_code_switch_case(src), indent);
 
-  if(statement==ID_free)
-    return convert_code_free(src, indent);
-
   if(statement==ID_array_set)
     return convert_code_array_set(src, indent);
 
@@ -3026,19 +3023,6 @@ std::string expr2ct::convert_code_assign(
   std::string dest=indent_str(indent)+tmp+";";
 
   return dest;
-}
-
-std::string expr2ct::convert_code_free(
-  const codet &src,
-  unsigned indent)
-{
-  if(src.operands().size()!=1)
-  {
-    unsigned precedence;
-    return convert_norep(src, precedence);
-  }
-
-  return indent_str(indent)+"FREE("+convert(src.op0())+");";
 }
 
 std::string expr2ct::convert_code_lock(

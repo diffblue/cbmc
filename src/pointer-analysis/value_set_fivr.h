@@ -378,10 +378,6 @@ protected:
     assign_recursion_sett &recursion_set,
     bool add_to_sets);
 
-  void do_free(
-    const exprt &op,
-    const namespacet &ns);
-
   void flatten(
     const entryt &e,
     object_mapt &dest) const;

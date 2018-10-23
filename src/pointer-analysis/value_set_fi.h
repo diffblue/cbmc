@@ -339,10 +339,6 @@ protected:
     const namespacet &ns,
     assign_recursion_sett &recursion_set);
 
-  void do_free(
-    const exprt &op,
-    const namespacet &ns);
-
   void flatten(const entryt &e, object_mapt &dest) const;
 
   void flatten_rec(

@@ -259,8 +259,6 @@ exprt wp(
     return post;
   else if(statement==ID_printf)
     return post; // ignored
-  else if(statement==ID_free)
-    return post; // ignored
   else if(statement==ID_asm)
     return post; // ignored
   else if(statement==ID_fence)
