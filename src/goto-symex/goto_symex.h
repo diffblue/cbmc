@@ -55,7 +55,6 @@ public:
     const optionst &options,
     path_storaget &path_storage)
     : should_pause_symex(false),
-      options(options),
       max_depth(options.get_unsigned_int_option("depth")),
       doing_path_exploration(options.is_set("paths")),
       allow_pointer_unsoundness(
@@ -64,6 +63,10 @@ public:
       constant_propagation(options.get_bool_option("propagation")),
       self_loops_to_assumptions(
         options.get_bool_option("self-loops-to-assumptions")),
+      simplify_opt(options.get_bool_option("simplify")),
+      unwinding_assertions(options.get_bool_option("unwinding-assertions")),
+      partial_loops(options.get_bool_option("partial-loops")),
+      debug_level(options.get_option("debug-level")),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table),
       target(_target),
@@ -201,8 +204,6 @@ protected:
     const get_goto_functiont &,
     statet &);
 
-  const optionst &options;
-
   const unsigned max_depth;
   const bool doing_path_exploration;
   const bool allow_pointer_unsoundness;
@@ -218,6 +219,10 @@ public:
 protected:
   const bool constant_propagation;
   const bool self_loops_to_assumptions;
+  const bool simplify_opt;
+  const bool unwinding_assertions;
+  const bool partial_loops;
+  const std::string debug_level;
 
   /// The symbol table associated with the goto-program that we're
   /// executing. This symbol table will not additionally contain objects

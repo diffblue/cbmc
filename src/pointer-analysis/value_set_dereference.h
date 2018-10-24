@@ -32,8 +32,6 @@ public:
   /*! \brief Constructor
    * \param _ns Namespace
    * \param _new_symbol_table A symbol_table to store new symbols in
-   * \param _options Options, in particular whether pointer checks are
-            to be performed
    * \param _dereference_callback Callback object for error reporting
    * \param _language_mode Mode for any new symbols created to represent
             a dereference failure
@@ -43,13 +41,11 @@ public:
   value_set_dereferencet(
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
-    const optionst &_options,
     dereference_callbackt &_dereference_callback,
     const irep_idt _language_mode,
     bool _exclude_null_derefs):
     ns(_ns),
     new_symbol_table(_new_symbol_table),
-    options(_options),
     dereference_callback(_dereference_callback),
     language_mode(_language_mode),
     exclude_null_derefs(_exclude_null_derefs)
@@ -83,7 +79,6 @@ public:
 private:
   const namespacet &ns;
   symbol_tablet &new_symbol_table;
-  const optionst &options;
   dereference_callbackt &dereference_callback;
   /// language_mode: ID_java, ID_C or another language identifier
   /// if we know the source language in use, irep_idt() otherwise.

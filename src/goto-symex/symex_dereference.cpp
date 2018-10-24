@@ -281,7 +281,6 @@ void goto_symext::dereference_rec(
     value_set_dereferencet dereference(
       ns,
       state.symbol_table,
-      options,
       symex_dereference_state,
       language_mode,
       expr_is_not_null);
