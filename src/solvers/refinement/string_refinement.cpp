@@ -633,9 +633,6 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   }
 #endif
 
-  debug() << "dec_solve: Replacing char pointer symbols" << eom;
-  replace_symbols_in_equations(symbol_resolve, equations);
-
   debug() << "dec_solve: Replacing string ids in function applications" << eom;
   for(equal_exprt &eq : equations)
   {
@@ -657,7 +654,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   std::vector<equal_exprt> local_equations;
   for(const equal_exprt &eq : equations)
   {
-    if(!add_node(dependencies, eq, generator.array_pool))
+    equal_exprt eq_copy = eq;
+    // Char array symbols are replaced by cannonical element to ensure
+    // equal arrays are associated to the same nodes in the graph.
+    symbol_resolve.replace_expr(eq_copy);
+    if(!add_node(dependencies, eq_copy, generator.array_pool))
       local_equations.push_back(eq);
   }
   equations.clear();
