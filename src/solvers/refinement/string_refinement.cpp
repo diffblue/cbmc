@@ -301,12 +301,15 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 }
 
 /// Add association for each char pointer in the equation
+/// \param symbol_solver: a union_find_replacet object to keep track of
+///   char pointer equations
 /// \param equations: vector of equations
 /// \param ns: namespace
 /// \param stream: output stream
 /// \return union_find_replacet where char pointer that have been set equal
 ///         by an equation are associated to the same element
-static union_find_replacet generate_symbol_resolution_from_equations(
+static void add_equations_for_symbol_resolution(
+  union_find_replacet &symbol_solver,
   const std::vector<equal_exprt> &equations,
   const namespacet &ns,
   messaget::mstreamt &stream)
@@ -314,7 +317,6 @@ static union_find_replacet generate_symbol_resolution_from_equations(
   const auto eom = messaget::eom;
   const std::string log_message =
     "WARNING string_refinement.cpp generate_symbol_resolution_from_equations:";
-  union_find_replacet solver;
   for(const equal_exprt &eq : equations)
   {
     const exprt &lhs = eq.lhs();
@@ -335,7 +337,7 @@ static union_find_replacet generate_symbol_resolution_from_equations(
 
     if(is_char_pointer_type(rhs.type()))
     {
-      solver.make_union(lhs, rhs);
+      symbol_solver.make_union(lhs, rhs);
     }
     else if(rhs.id() == ID_function_application)
     {
@@ -355,7 +357,7 @@ static union_find_replacet generate_symbol_resolution_from_equations(
             const member_exprt lhs_data(lhs, comp.get_name(), comp.type());
             const exprt rhs_data = simplify_expr(
               member_exprt(rhs, comp.get_name(), comp.type()), ns);
-            solver.make_union(lhs_data, rhs_data);
+            symbol_solver.make_union(lhs_data, rhs_data);
           }
         }
       }
@@ -366,7 +368,6 @@ static union_find_replacet generate_symbol_resolution_from_equations(
       }
     }
   }
-  return solver;
 }
 
 /// This is meant to be used on the lhs of an equation with string subtype.
@@ -613,9 +614,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 #endif
 
   debug() << "dec_solve: Build symbol solver from equations" << eom;
-  // This is used by get, that's why we use a class member here
-  symbol_resolve =
-    generate_symbol_resolution_from_equations(equations, ns, debug());
+  // symbol_resolve is used by get and is kept between calls to dec_solve,
+  // that's why we use a class member here
+  add_equations_for_symbol_resolution(symbol_resolve, equations, ns, debug());
 #ifdef DEBUG
   debug() << "symbol resolve:" << eom;
   for(const auto &pair : symbol_resolve.to_vector())
