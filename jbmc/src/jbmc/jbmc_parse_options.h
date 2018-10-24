@@ -123,6 +123,8 @@ protected:
   object_factory_parameterst object_factory_params;
   bool stub_objects_are_not_null;
 
+  std::unique_ptr<class_hierarchyt> class_hierarchy;
+
   void get_command_line_options(optionst &);
   int get_goto_program(
     std::unique_ptr<goto_modelt> &goto_model, const optionst &);

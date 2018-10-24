@@ -667,13 +667,17 @@ bool janalyzer_parse_optionst::process_goto_program(const optionst &options)
     status() << "Removing function pointers and virtual functions" << eom;
     remove_function_pointers(
       get_message_handler(), goto_model, cmdline.isset("pointer-check"));
+
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
+
     // remove Java throw and catch
     // This introduces instanceof, so order is important:
-    remove_exceptions(goto_model, get_message_handler());
-    // remove rtti
-    remove_instanceof(goto_model, get_message_handler());
+    remove_exceptions(goto_model, nullptr, get_message_handler());
+
+    // Java instanceof -> clsid comparison:
+    class_hierarchyt class_hierarchy(goto_model.symbol_table);
+    remove_instanceof(goto_model, class_hierarchy, get_message_handler());
 
     // do partial inlining
     status() << "Partial Inlining" << eom;

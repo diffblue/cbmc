@@ -345,16 +345,20 @@ bool jdiff_parse_optionst::process_goto_program(
   try
   {
     // remove function pointers
-    status() << "Removal of function pointers and virtual functions" << eom;
+    status() << "Removing function pointers and virtual functions" << eom;
     remove_function_pointers(
       get_message_handler(), goto_model, cmdline.isset("pointer-check"));
 
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
-    // remove catch and throw
-    remove_exceptions(goto_model, get_message_handler());
+
+    // remove Java throw and catch
+    // This introduces instanceof, so order is important:
+    remove_exceptions(goto_model, nullptr, get_message_handler());
+
     // Java instanceof -> clsid comparison:
-    remove_instanceof(goto_model, get_message_handler());
+    class_hierarchyt class_hierarchy(goto_model.symbol_table);
+    remove_instanceof(goto_model, class_hierarchy, get_message_handler());
 
     mm_io(goto_model);
 
