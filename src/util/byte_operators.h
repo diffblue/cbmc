@@ -67,86 +67,9 @@ irep_idt byte_update_id();
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class byte_extract_little_endian_exprt:public byte_extract_exprt
-{
-public:
-  byte_extract_little_endian_exprt():
-    byte_extract_exprt(ID_byte_extract_little_endian)
-  {
-  }
-};
-
-inline const byte_extract_little_endian_exprt
-  &to_byte_extract_little_endian_expr(const exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_byte_extract_little_endian);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "byte extract expressions have two operands");
-
-  return static_cast<const byte_extract_little_endian_exprt &>(expr);
-}
-
-inline byte_extract_little_endian_exprt
-  &to_byte_extract_little_endian_expr(exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_byte_extract_little_endian);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "byte extract expressions have two operands");
-
-  return static_cast<byte_extract_little_endian_exprt &>(expr);
-}
-
-/*! \brief TO_BE_DOCUMENTED
-*/
-class byte_extract_big_endian_exprt:public byte_extract_exprt
-{
-public:
-  byte_extract_big_endian_exprt():
-    byte_extract_exprt(ID_byte_extract_big_endian)
-  {
-  }
-
-  byte_extract_big_endian_exprt(
-    const exprt &_op, const exprt &_offset, const typet &_type):
-    byte_extract_exprt(ID_byte_extract_big_endian, _op, _offset, _type)
-  {
-  }
-};
-
-inline const byte_extract_big_endian_exprt
-  &to_byte_extract_big_endian_expr(const exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_byte_extract_big_endian);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "byte extract expressions have two operands");
-
-  return static_cast<const byte_extract_big_endian_exprt &>(expr);
-}
-
-inline byte_extract_big_endian_exprt
-  &to_byte_extract_big_endian_expr(exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_byte_extract_big_endian);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "byte extract expressions have two operands");
-
-  return static_cast<byte_extract_big_endian_exprt &>(expr);
-}
-
-/*! \brief TO_BE_DOCUMENTED
-*/
 class byte_update_exprt : public ternary_exprt
 {
 public:
-  explicit byte_update_exprt(irep_idt _id) : ternary_exprt(_id)
-  {
-  }
-
-  byte_update_exprt(irep_idt _id, const typet &_type)
-    : ternary_exprt(_id, _type)
-  {
-  }
-
   byte_update_exprt(
     irep_idt _id,
     const exprt &_op,
@@ -175,80 +98,6 @@ inline byte_update_exprt &to_byte_update_expr(exprt &expr)
 {
   PRECONDITION(expr.operands().size() == 3);
   return static_cast<byte_update_exprt &>(expr);
-}
-
-/*! \brief TO_BE_DOCUMENTED
-*/
-class byte_update_little_endian_exprt:public byte_update_exprt
-{
-public:
-  byte_update_little_endian_exprt():
-    byte_update_exprt(ID_byte_update_little_endian)
-  {
-  }
-
-  byte_update_little_endian_exprt(
-    const exprt &_op, const exprt &_offset, const exprt &_value):
-    byte_update_exprt(ID_byte_update_little_endian, _op, _offset, _value)
-  {
-  }
-};
-
-inline const byte_update_little_endian_exprt
-  &to_byte_update_little_endian_expr(const exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_byte_update_little_endian);
-  DATA_INVARIANT(
-    expr.operands().size() == 3, "byte update expressions have three operands");
-
-  return static_cast<const byte_update_little_endian_exprt &>(expr);
-}
-
-inline byte_update_little_endian_exprt
-  &to_byte_update_little_endian_expr(exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_byte_update_little_endian);
-  DATA_INVARIANT(
-    expr.operands().size() == 3, "byte update expressions have three operands");
-
-  return static_cast<byte_update_little_endian_exprt &>(expr);
-}
-
-/*! \brief TO_BE_DOCUMENTED
-*/
-class byte_update_big_endian_exprt:public byte_update_exprt
-{
-public:
-  byte_update_big_endian_exprt():
-    byte_update_exprt(ID_byte_update_big_endian)
-  {
-  }
-
-  byte_update_big_endian_exprt(
-    const exprt &_op, const exprt &_offset, const exprt &_value):
-    byte_update_exprt(ID_byte_update_big_endian, _op, _offset, _value)
-  {
-  }
-};
-
-inline const byte_update_big_endian_exprt
-  &to_byte_update_big_endian_expr(const exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_byte_update_big_endian);
-  DATA_INVARIANT(
-    expr.operands().size() == 3, "byte update expressions have three operands");
-
-  return static_cast<const byte_update_big_endian_exprt &>(expr);
-}
-
-inline byte_update_big_endian_exprt
-  &to_byte_update_big_endian_expr(exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_byte_update_big_endian);
-  DATA_INVARIANT(
-    expr.operands().size() == 3, "byte update expressions have three operands");
-
-  return static_cast<byte_update_big_endian_exprt &>(expr);
 }
 
 #endif // CPROVER_UTIL_BYTE_OPERATORS_H
