@@ -285,6 +285,7 @@ private:
   /// provided as arguments to the constructor of this class.
   void perform_symbolic_execution(
     goto_symext::get_goto_functiont get_goto_function) override;
+};
 
 #define OPT_BMC                                                                \
   "(program-only)"                                                             \
@@ -323,6 +324,5 @@ private:
   " --no-pretty-names            do not simplify identifiers\n"                \
   " --graphml-witness filename   write the witness in GraphML format to "      \
   "filename\n" // NOLINT(*)
-};
 
 #endif // CPROVER_CBMC_BMC_H
