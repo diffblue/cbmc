@@ -272,12 +272,14 @@ SCENARIO("path strategies")
 
 void symex_eventt::validate_result(
   listt &events,
-  const safety_checkert::resultt result)
+  const safety_checkert::resultt result,
+  std::size_t &counter)
 {
   INFO(
     "Expecting result to be '"
     << (result == safety_checkert::resultt::SAFE ? "success" : "failure")
-    << "'");
+    << "' (item at index [" << counter << "] in expected results list");
+  ++counter;
 
   REQUIRE(result != safety_checkert::resultt::ERROR);
 
@@ -297,7 +299,8 @@ void symex_eventt::validate_result(
 
 void symex_eventt::validate_resume(
   listt &events,
-  const goto_symex_statet &state)
+  const goto_symex_statet &state,
+  std::size_t &counter)
 {
   REQUIRE(!events.empty());
 
@@ -305,17 +308,24 @@ void symex_eventt::validate_resume(
 
   if(state.has_saved_jump_target)
   {
-    INFO("Expecting resume to be 'jump' to line " << dst);
+    INFO(
+      "Expecting resume to be 'jump' to line "
+      << dst << " (item at index [" << counter
+      << "] in expected resumes list)");
     REQUIRE(events.front().first == symex_eventt::enumt::JUMP);
   }
   else if(state.has_saved_next_instruction)
   {
-    INFO("Expecting resume to be 'next' to line " << dst);
+    INFO(
+      "Expecting resume to be 'next' to line "
+      << dst << " (item at index [" << counter
+      << "] in expected resumes list)");
     REQUIRE(events.front().first == symex_eventt::enumt::NEXT);
   }
   else
     REQUIRE(false);
 
+  ++counter;
   REQUIRE(events.front().second == dst);
 
   events.pop_front();
@@ -372,7 +382,9 @@ void _check_with_strategy(
 
   bmct bmc(opts, gm.get_symbol_table(), mh, pc, *worklist, callback);
   safety_checkert::resultt result = bmc.run(gm);
-  symex_eventt::validate_result(events, result);
+
+  std::size_t expected_results_cnt = 0;
+  symex_eventt::validate_result(events, result, expected_results_cnt);
 
   if(
     result == safety_checkert::resultt::UNSAFE &&
@@ -388,7 +400,7 @@ void _check_with_strategy(
     prop_convt &pc = cbmc_solver->prop_conv();
     path_storaget::patht &resume = worklist->peek();
 
-    symex_eventt::validate_resume(events, resume.state);
+    symex_eventt::validate_resume(events, resume.state, expected_results_cnt);
 
     path_explorert pe(
       opts,
@@ -401,7 +413,7 @@ void _check_with_strategy(
       callback);
     result = pe.run(gm);
 
-    symex_eventt::validate_result(events, result);
+    symex_eventt::validate_result(events, result, expected_results_cnt);
     worklist->pop();
 
     if(
