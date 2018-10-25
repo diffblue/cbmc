@@ -134,6 +134,9 @@ protected:
   void rbytecode(methodt::instructionst &);
   void get_class_refs();
   void get_class_refs_rec(const typet &);
+  void get_annotation_class_refs(
+    const java_bytecode_parse_treet::annotationst &annotations);
+  void get_annotation_value_class_refs(const exprt &value);
   void parse_local_variable_type_table(methodt &method);
   optionalt<lambda_method_handlet>
   parse_method_handle(const class method_handle_infot &entry);
@@ -547,8 +550,11 @@ void java_bytecode_parsert::get_class_refs()
     }
   }
 
+  get_annotation_class_refs(parse_tree.parsed_class.annotations);
+
   for(const auto &field : parse_tree.parsed_class.fields)
   {
+    get_annotation_class_refs(field.annotations);
     typet field_type;
     if(field.signature.has_value())
     {
@@ -570,6 +576,9 @@ void java_bytecode_parsert::get_class_refs()
 
   for(const auto &method : parse_tree.parsed_class.methods)
   {
+    get_annotation_class_refs(method.annotations);
+    for(const auto &parameter_annotations : method.parameter_annotations)
+      get_annotation_class_refs(parameter_annotations);
     typet method_type;
     if(method.signature.has_value())
     {
@@ -633,6 +642,41 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
   }
   else if(src.id()==ID_pointer)
     get_class_refs_rec(src.subtype());
+}
+
+/// For each of the given annotations, get a reference to its class and
+/// recursively get class references of the values it stores.
+void java_bytecode_parsert::get_annotation_class_refs(
+  const java_bytecode_parse_treet::annotationst &annotations)
+{
+  for(const auto &annotation : annotations)
+  {
+    get_class_refs_rec(annotation.type);
+    for(const auto &element_value_pair : annotation.element_value_pairs)
+      get_annotation_value_class_refs(element_value_pair.value);
+  }
+}
+
+/// See \ref java_bytecode_parsert::get_annotation_class_refs.
+/// For the different cases of `exprt`, see \ref
+/// java_bytecode_parsert::get_relement_value.
+void java_bytecode_parsert::get_annotation_value_class_refs(const exprt &value)
+{
+  if(const auto &symbol_expr = expr_try_dynamic_cast<symbol_exprt>(value))
+  {
+    const irep_idt &value_id = symbol_expr->get_identifier();
+    const typet value_type = java_type_from_string(id2string(value_id));
+    get_class_refs_rec(value_type);
+  }
+  else if(const auto &array_expr = expr_try_dynamic_cast<array_exprt>(value))
+  {
+    for(const exprt &operand : array_expr->operands())
+      get_annotation_value_class_refs(operand);
+  }
+  // TODO: enum and nested annotation cases (once these are correctly parsed by
+  // get_relement_value).
+  // Note that in the cases where expr is a string or primitive type, no
+  // additional class references are needed.
 }
 
 void java_bytecode_parsert::rconstant_pool()
