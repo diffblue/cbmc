@@ -55,6 +55,8 @@ public:
     return !entry_point_exists;
   }
 
+  ~json_symtab_languaget() override = default;
+
 protected:
   void follow_type_symbols(symbol_tablet &symbol_table);
   void follow_type_symbols(irept &irep, const namespacet &ns);
