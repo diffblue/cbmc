@@ -525,11 +525,9 @@ void java_bytecode_parsert::rClassFile()
   parse_tree.loading_successful=true;
 }
 
+/// Get the class references for the benefit of a dependency analysis.
 void java_bytecode_parsert::get_class_refs()
 {
-  // Get the class references for the benefit of a dependency
-  // analysis.
-
   for(const auto &c : constant_pool)
   {
     switch(c.tag)
