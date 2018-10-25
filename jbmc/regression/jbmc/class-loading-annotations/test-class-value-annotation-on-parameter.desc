@@ -1,0 +1,9 @@
+CORE
+ClassValueAnnotationOnParameter.class
+--verbosity 10
+Getting class `MyClassA' from file \.[\\/]MyClassA\.class
+--
+MyClassB
+--
+This test checks that classes that are given as values of an annotation at method parameter level
+are loaded by java_class_loadert.
