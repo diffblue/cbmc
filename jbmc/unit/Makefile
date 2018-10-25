@@ -58,6 +58,9 @@ SRC += java_bytecode/ci_lazy_methods/lazy_load_lambdas.cpp \
        util/has_subtype.cpp \
        util/parameter_indices.cpp \
        util/simplify_expr.cpp \
+       $(CPROVER_DIR)/src/json-symtab-language/json_symtab_language.cpp \
+       $(CPROVER_DIR)/src/json-symtab-language/json_symbol.cpp \
+       $(CPROVER_DIR)/src/json-symtab-language/json_symbol_table.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I. -I $(CPROVER_DIR)/src -I $(CPROVER_DIR)/unit
