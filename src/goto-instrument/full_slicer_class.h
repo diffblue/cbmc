@@ -41,7 +41,7 @@ public:
   void operator()(
     goto_functionst &goto_functions,
     const namespacet &ns,
-    slicing_criteriont &criterion);
+    const slicing_criteriont &criterion);
 
 protected:
   struct cfg_nodet
@@ -107,7 +107,7 @@ protected:
 class assert_criteriont:public slicing_criteriont
 {
 public:
-  virtual bool operator()(goto_programt::const_targett target)
+  virtual bool operator()(goto_programt::const_targett target) const
   {
     return target->is_assert();
   }
@@ -121,7 +121,7 @@ public:
   {
   }
 
-  virtual bool operator()(goto_programt::const_targett target)
+  virtual bool operator()(goto_programt::const_targett target) const
   {
     return target->function == target_function;
   }
@@ -139,7 +139,7 @@ public:
   {
   }
 
-  virtual bool operator()(goto_programt::const_targett target)
+  virtual bool operator()(goto_programt::const_targett target) const
   {
     if(!target->is_assert())
       return false;

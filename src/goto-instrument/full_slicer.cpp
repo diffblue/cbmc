@@ -284,7 +284,7 @@ static bool implicit(goto_programt::const_targett target)
 void full_slicert::operator()(
   goto_functionst &goto_functions,
   const namespacet &ns,
-  slicing_criteriont &criterion)
+  const slicing_criteriont &criterion)
 {
   // build the CFG data structure
   cfg(goto_functions);
@@ -367,7 +367,7 @@ void full_slicert::operator()(
 void full_slicer(
   goto_functionst &goto_functions,
   const namespacet &ns,
-  slicing_criteriont &criterion)
+  const slicing_criteriont &criterion)
 {
   full_slicert()(goto_functions, ns, criterion);
 }

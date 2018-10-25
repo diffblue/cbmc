@@ -24,7 +24,7 @@ class reachability_slicert
 public:
   void operator()(
     goto_functionst &goto_functions,
-    slicing_criteriont &criterion,
+    const slicing_criteriont &criterion,
     bool include_forward_reachability)
   {
     cfg(goto_functions);
@@ -76,17 +76,33 @@ protected:
 
   void fixedpoint_to_assertions(
     const is_threadedt &is_threaded,
-    slicing_criteriont &criterion);
+    const slicing_criteriont &criterion);
 
   void fixedpoint_from_assertions(
     const is_threadedt &is_threaded,
-    slicing_criteriont &criterion);
+    const slicing_criteriont &criterion);
 
   void slice(goto_functionst &goto_functions);
 
 private:
   std::vector<cfgt::node_indext>
-  get_sources(const is_threadedt &is_threaded, slicing_criteriont &criterion);
+    backward_outwards_walk_from(std::vector<cfgt::node_indext>);
+
+  void backward_inwards_walk_from(std::vector<cfgt::node_indext>);
+
+  std::vector<cfgt::node_indext>
+    forward_outwards_walk_from(std::vector<cfgt::node_indext>);
+
+  void forward_inwards_walk_from(std::vector<cfgt::node_indext>);
+
+  void forward_walk_call_instruction(
+    const cfgt::nodet &call_node,
+    std::vector<cfgt::node_indext> &callsite_successor_stack,
+    std::vector<cfgt::node_indext> &callee_head_stack);
+
+  std::vector<cfgt::node_indext> get_sources(
+    const is_threadedt &is_threaded,
+    const slicing_criteriont &criterion);
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_CLASS_H
