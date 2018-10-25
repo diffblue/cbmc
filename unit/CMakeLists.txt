@@ -37,6 +37,7 @@ target_link_libraries(
         goto-programs
         goto-instrument-lib
         cbmc-lib
+        json-symtab-language
 )
 
 add_test(

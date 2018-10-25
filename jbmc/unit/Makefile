@@ -58,9 +58,6 @@ SRC += java_bytecode/ci_lazy_methods/lazy_load_lambdas.cpp \
        util/has_subtype.cpp \
        util/parameter_indices.cpp \
        util/simplify_expr.cpp \
-       $(CPROVER_DIR)/src/json-symtab-language/json_symtab_language.cpp \
-       $(CPROVER_DIR)/src/json-symtab-language/json_symbol.cpp \
-       $(CPROVER_DIR)/src/json-symtab-language/json_symbol_table.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I. -I $(CPROVER_DIR)/src -I $(CPROVER_DIR)/unit
@@ -111,6 +108,7 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               $(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
               $(CPROVER_DIR)/src/cpp/cpp$(LIBEXT) \
               $(CPROVER_DIR)/src/json/json$(LIBEXT) \
+	      $(CPROVER_DIR)/src/json_symtab_language/json_symtab_language$(LIBEXT) \
               $(CPROVER_DIR)/src/linking/linking$(LIBEXT) \
               $(CPROVER_DIR)/src/util/util$(LIBEXT) \
               $(CPROVER_DIR)/src/big-int/big-int$(LIBEXT) \
