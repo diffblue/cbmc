@@ -291,7 +291,7 @@ public:
   {
     typename state_mapt::iterator it=state_map.find(l);
     if(it==state_map.end())
-      throw "failed to find state";
+      throw std::out_of_range("failed to find state");
 
     return it->second;
   }
@@ -300,7 +300,7 @@ public:
   {
     typename state_mapt::const_iterator it=state_map.find(l);
     if(it==state_map.end())
-      throw "failed to find state";
+      throw std::out_of_range("failed to find state");
 
     return it->second;
   }
@@ -324,7 +324,7 @@ protected:
   {
     typename state_mapt::iterator it=state_map.find(l);
     if(it==state_map.end())
-      throw "failed to find state";
+      throw std::out_of_range("failed to find state");
 
     return it->second;
   }
@@ -333,7 +333,7 @@ protected:
   {
     typename state_mapt::const_iterator it=state_map.find(l);
     if(it==state_map.end())
-      throw "failed to find state";
+      throw std::out_of_range("failed to find state");
 
     return it->second;
   }
