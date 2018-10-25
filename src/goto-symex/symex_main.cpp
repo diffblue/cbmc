@@ -52,6 +52,7 @@ void goto_symext::vcc(
   statet &state)
 {
   state.total_vccs++;
+  path_segment_vccs++;
 
   exprt expr=vcc_expr;
 

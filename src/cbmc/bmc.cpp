@@ -270,9 +270,6 @@ safety_checkert::resultt bmct::execute(
     const goto_functionst &goto_functions =
       goto_model.get_goto_functions();
 
-    if(symex.should_pause_symex)
-      return safety_checkert::resultt::PAUSED;
-
     // This provides the driver program the opportunity to do things like a
     // symbol-table or goto-functions dump instead of actually running the
     // checker, like show-vcc except driver-program specific.
@@ -282,9 +279,14 @@ safety_checkert::resultt bmct::execute(
     if(driver_callback_after_symex && driver_callback_after_symex())
       return safety_checkert::resultt::SAFE; // to indicate non-error
 
-    // add a partial ordering, if required
     if(equation.has_threads())
     {
+      // When doing path exploration in a concurrent setting, we should avoid
+      // model-checking the program until we reach the end of a path.
+      if(symex.should_pause_symex)
+        return safety_checkert::resultt::PAUSED;
+
+      // add a partial ordering, if required
       memory_model->set_message_handler(get_message_handler());
       (*memory_model)(equation);
     }
@@ -328,6 +330,8 @@ safety_checkert::resultt bmct::execute(
       !options.get_bool_option("program-only") &&
       symex.get_remaining_vccs() == 0)
     {
+      if(options.is_set("paths"))
+        return safety_checkert::resultt::PAUSED;
       report_success();
       output_graphml(resultt::SAFE);
       return safety_checkert::resultt::SAFE;
@@ -339,7 +343,10 @@ safety_checkert::resultt bmct::execute(
       return safety_checkert::resultt::SAFE;
     }
 
-    return decide(goto_functions, prop_conv);
+    if(!options.is_set("paths") || symex.path_segment_vccs > 0)
+      return decide(goto_functions, prop_conv);
+
+    return safety_checkert::resultt::PAUSED;
   }
 
   catch(const std::string &error_str)
@@ -406,6 +413,10 @@ void bmct::slice()
   statistics() << "Generated " << symex.get_total_vccs() << " VCC(s), "
                << symex.get_remaining_vccs()
                << " remaining after simplification" << eom;
+
+  if(options.is_set("paths"))
+    statistics() << "Generated " << symex.path_segment_vccs
+                 << " new VCC(s) along current path segment" << eom;
 }
 
 safety_checkert::resultt bmct::run(
@@ -494,8 +505,8 @@ int bmct::do_language_agnostic_bmc(
   std::function<void(bmct &, const symbol_tablet &)> driver_configure_bmc,
   std::function<bool(void)> callback_after_symex)
 {
-  safety_checkert::resultt final_result = safety_checkert::resultt::UNKNOWN;
-  safety_checkert::resultt tmp_result = safety_checkert::resultt::UNKNOWN;
+  safety_checkert::resultt final_result = safety_checkert::resultt::SAFE;
+  safety_checkert::resultt tmp_result = safety_checkert::resultt::SAFE;
   const symbol_tablet &symbol_table = model.get_symbol_table();
   messaget message(ui);
   std::unique_ptr<path_storaget> worklist;
@@ -554,11 +565,6 @@ int bmct::do_language_agnostic_bmc(
 
     while(!worklist->empty())
     {
-      if(tmp_result != safety_checkert::resultt::PAUSED)
-        message.status() << "___________________________\n"
-                         << "Starting new path (" << worklist->size()
-                         << " to go)\n"
-                         << message.eom;
       cbmc_solverst solvers(
         opts,
         symbol_table,
@@ -613,12 +619,14 @@ int bmct::do_language_agnostic_bmc(
   switch(final_result)
   {
   case safety_checkert::resultt::SAFE:
+    if(opts.is_set("paths"))
+      report_success(message, ui);
     return CPROVER_EXIT_VERIFICATION_SAFE;
   case safety_checkert::resultt::UNSAFE:
+    if(opts.is_set("paths"))
+      report_failure(message, ui);
     return CPROVER_EXIT_VERIFICATION_UNSAFE;
   case safety_checkert::resultt::ERROR:
-    return CPROVER_EXIT_INTERNAL_ERROR;
-  case safety_checkert::resultt::UNKNOWN:
     return CPROVER_EXIT_INTERNAL_ERROR;
   case safety_checkert::resultt::PAUSED:
     UNREACHABLE;

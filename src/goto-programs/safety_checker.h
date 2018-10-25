@@ -42,10 +42,6 @@ public:
     /// doing path exploration; the symex state has been saved, and symex should
     /// be resumed by the caller.
     PAUSED,
-    /// We haven't yet assigned a safety check result to this object. A value of
-    /// UNKNOWN can be used to initialize a resultt object, and that object may
-    /// then safely be used with the |= and &= operators.
-    UNKNOWN
   };
 
   // check whether all assertions in goto_functions are safe
@@ -76,9 +72,6 @@ operator&=(safety_checkert::resultt &a, safety_checkert::resultt const &b)
     b != safety_checkert::resultt::PAUSED);
   switch(a)
   {
-  case safety_checkert::resultt::UNKNOWN:
-    a = b;
-    return a;
   case safety_checkert::resultt::ERROR:
     return a;
   case safety_checkert::resultt::SAFE:
@@ -107,9 +100,6 @@ operator|=(safety_checkert::resultt &a, safety_checkert::resultt const &b)
     b != safety_checkert::resultt::PAUSED);
   switch(a)
   {
-  case safety_checkert::resultt::UNKNOWN:
-    a = b;
-    return a;
   case safety_checkert::resultt::SAFE:
     return a;
   case safety_checkert::resultt::ERROR:
