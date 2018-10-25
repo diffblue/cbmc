@@ -153,9 +153,14 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
 
 void bmct::report_success()
 {
-  result() << bold << "VERIFICATION SUCCESSFUL" << reset << eom;
+  report_success(*this, ui_message_handler);
+}
 
-  switch(ui_message_handler.get_ui())
+void bmct::report_success(messaget &log, ui_message_handlert &handler)
+{
+  log.result() << log.bold << "VERIFICATION SUCCESSFUL" << log.reset << log.eom;
+
+  switch(handler.get_ui())
   {
   case ui_message_handlert::uit::PLAIN:
     break;
@@ -164,7 +169,7 @@ void bmct::report_success()
     {
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
-      result() << xml;
+      log.result() << xml;
     }
     break;
 
@@ -172,7 +177,7 @@ void bmct::report_success()
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("success");
-      result() << json_result;
+      log.result() << json_result;
     }
     break;
   }
@@ -180,9 +185,14 @@ void bmct::report_success()
 
 void bmct::report_failure()
 {
-  result() << bold << "VERIFICATION FAILED" << reset << eom;
+  report_failure(*this, ui_message_handler);
+}
 
-  switch(ui_message_handler.get_ui())
+void bmct::report_failure(messaget &log, ui_message_handlert &handler)
+{
+  log.result() << log.bold << "VERIFICATION FAILED" << log.reset << log.eom;
+
+  switch(handler.get_ui())
   {
   case ui_message_handlert::uit::PLAIN:
     break;
@@ -191,7 +201,7 @@ void bmct::report_failure()
     {
       xmlt xml("cprover-status");
       xml.data="FAILURE";
-      result() << xml;
+      log.result() << xml;
     }
     break;
 
@@ -199,7 +209,7 @@ void bmct::report_failure()
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("failure");
-      result() << json_result;
+      log.result() << json_result;
     }
     break;
   }
