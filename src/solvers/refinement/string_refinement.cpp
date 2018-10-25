@@ -653,7 +653,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   debug() << "dec_solve: compute dependency graph and remove function "
           << "applications captured by the dependencies:" << eom;
-  std::vector<exprt> local_equations;
+  std::vector<equal_exprt> local_equations;
   for(const equal_exprt &eq : equations)
   {
     if(!add_node(dependencies, eq, generator.array_pool))
