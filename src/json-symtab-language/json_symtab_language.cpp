@@ -109,3 +109,8 @@ void json_symtab_languaget::show_parse(std::ostream &out)
 {
   parsed_json_file.output(out);
 }
+
+std::unique_ptr<languaget> new_json_symtab_language()
+{
+  return util_make_unique<json_symtab_languaget>();
+}

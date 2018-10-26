@@ -64,9 +64,11 @@ protected:
   jsont parsed_json_file;
 };
 
-inline std::unique_ptr<languaget> new_json_symtab_language()
-{
-  return util_make_unique<json_symtab_languaget>();
-}
+//inline std::unique_ptr<languaget> new_json_symtab_language()
+//{
+//  return util_make_unique<json_symtab_languaget>();
+//}
+
+std::unique_ptr<languaget> new_json_symtab_language();
 
 #endif
