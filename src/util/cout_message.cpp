@@ -159,7 +159,8 @@ void gcc_message_handlert::print(
               string(messaget::reset);
     if(dest!="")
       dest+=' ';
-    dest+="In function '"+id2string(function)+"':\n";
+    dest += "In function " + string(messaget::bold) + '\'' +
+            id2string(function) + '\'' + string(messaget::reset) + ":\n";
   }
 
   if(!line.empty())
