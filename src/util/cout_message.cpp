@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cout_message.h"
 
+#include <fstream>
 #include <iostream>
 
 #ifdef _WIN32
@@ -185,6 +186,26 @@ void gcc_message_handlert::print(
   dest+=message;
 
   print(level, dest);
+
+  const auto file_name = location.full_path();
+  if(file_name.has_value() && !line.empty())
+  {
+#ifdef _WIN32
+    std::ifstream in(widen(file_name.value()));
+#else
+    std::ifstream in(file_name.value());
+#endif
+    if(in)
+    {
+      const auto line_number = std::stoull(id2string(line));
+      std::string line;
+      for(std::size_t l = 0; l < line_number; l++)
+        std::getline(in, line);
+
+      if(in)
+        print(level, " " + line); // gcc adds a space, clang doesn't
+    }
+  }
 }
 
 void gcc_message_handlert::print(

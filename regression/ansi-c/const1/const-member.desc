@@ -2,6 +2,7 @@ CORE
 const-member.c
 
 ^.*: .* is constant$
+^   const_struct_ptr->field = 123;$
 ^EXIT=(1|64)$
 ^SIGNAL=0$
 --
