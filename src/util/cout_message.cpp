@@ -155,7 +155,8 @@ void gcc_message_handlert::print(
   if(!function.empty())
   {
     if(!file.empty())
-      dest += command(1) + id2string(file) + ":" + command(0); // bold
+      dest += string(messaget::bold) + id2string(file) + ":" +
+              string(messaget::reset);
     if(dest!="")
       dest+=' ';
     dest+="In function '"+id2string(function)+"':\n";
@@ -163,7 +164,7 @@ void gcc_message_handlert::print(
 
   if(!line.empty())
   {
-    dest += command(1); // bold
+    dest += string(messaget::bold);
 
     if(!file.empty())
       dest+=id2string(file)+":";
@@ -176,11 +177,11 @@ void gcc_message_handlert::print(
       dest+=id2string(column)+": ";
 
     if(level==messaget::M_ERROR)
-      dest += command(31) + "error: "; // red
+      dest += string(messaget::red) + "error: ";
     else if(level==messaget::M_WARNING)
-      dest += command(95) + "warning: "; // bright magenta
+      dest += string(messaget::bright_magenta) + "warning: ";
 
-    dest += command(0); // reset
+    dest += string(messaget::reset);
   }
 
   dest+=message;

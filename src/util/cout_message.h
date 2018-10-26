@@ -66,6 +66,13 @@ public:
     unsigned level,
     const std::string &message,
     const source_locationt &location) override;
+
+private:
+  /// feed a command into a string
+  std::string string(const messaget::commandt &c) const
+  {
+    return command(c.command);
+  }
 };
 
 #endif // CPROVER_UTIL_COUT_MESSAGE_H
