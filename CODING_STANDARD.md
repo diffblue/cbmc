@@ -81,10 +81,15 @@ Formatting is enforced using clang-format. For more information about this, see
 - The priority of documentation is readability. Therefore, feel free to use
   Doxygen features, or to add whitespace for multi-paragraph comment blocks if
   necessary.
-- A comment block should immediately precede the definition of the entity it
-  documents, which will generally mean that it will live in the source file.
-  This allows us to take advantage of the one definition rule. If each entity
-  is defined only once, then it is also documented only once.
+- For functions or methods that provide an interface to a module, a comment
+  block should immediately precede the declaration of the entity
+  it documents. This implies that it will live in the header file.
+  The documentions should focus on the externally visible behavior, and
+  should discuss the implementation only to the extent necessary for
+  understanding usage. The implementation should be explained using
+  comments in the definition of the function or method.
+- Functions or methods that are internal to a module are documented in a
+  comment block that precedes the definition.
 - The documentation block must *immediately* precede the entity it documents.
   Don't insert empty lines between docs and functions, because this will
   confuse Doxygen.
