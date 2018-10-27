@@ -354,6 +354,7 @@ install:
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
   - env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test-parallel "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2 JOBS=2
+  - scripts/delete_failing_smt2_solver_tests ; env UBSAN_OPTIONS=print_stacktrace=1 make -C regression/cbmc test-cprover-smt2
   - make -C unit "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2
   - make -C unit test
   - env UBSAN_OPTIONS=print_stacktrace=1 make -C jbmc/regression test-parallel "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2 JOBS=2
