@@ -145,68 +145,72 @@ void gcc_message_handlert::print(
   const std::string &message,
   const source_locationt &location)
 {
-  const irep_idt file=location.get_file();
-  const irep_idt line=location.get_line();
-  const irep_idt column=location.get_column();
-  const irep_idt function=location.get_function();
+  message_handlert::print(level, message);
 
-  std::string dest;
-
-  if(!function.empty())
+  if(verbosity >= level)
   {
-    if(!file.empty())
-      dest += string(messaget::bold) + id2string(file) + ":" +
-              string(messaget::reset);
-    if(dest!="")
-      dest+=' ';
-    dest += "In function " + string(messaget::bold) + '\'' +
-            id2string(function) + '\'' + string(messaget::reset) + ":\n";
-  }
+    // gcc appears to send everything to cerr
+    auto &out = std::cerr;
 
-  if(!line.empty())
-  {
-    dest += string(messaget::bold);
+    const irep_idt file = location.get_file();
+    const irep_idt line = location.get_line();
+    const irep_idt column = location.get_column();
+    const irep_idt function = location.get_function();
 
-    if(!file.empty())
-      dest+=id2string(file)+":";
-
-    dest+=id2string(line)+":";
-
-    if(column.empty())
-      dest+="1: ";
-    else
-      dest+=id2string(column)+": ";
-
-    if(level==messaget::M_ERROR)
-      dest += string(messaget::red) + "error: ";
-    else if(level==messaget::M_WARNING)
-      dest += string(messaget::bright_magenta) + "warning: ";
-
-    dest += string(messaget::reset);
-  }
-
-  dest+=message;
-
-  print(level, dest);
-
-  const auto file_name = location.full_path();
-  if(file_name.has_value() && !line.empty())
-  {
-#ifdef _WIN32
-    std::ifstream in(widen(file_name.value()));
-#else
-    std::ifstream in(file_name.value());
-#endif
-    if(in)
+    if(!function.empty())
     {
-      const auto line_number = std::stoull(id2string(line));
-      std::string line;
-      for(std::size_t l = 0; l < line_number; l++)
-        std::getline(in, line);
-
-      if(in)
-        print(level, " " + line); // gcc adds a space, clang doesn't
+      if(!file.empty())
+        out << string(messaget::bold) << file << ':' << string(messaget::reset)
+            << ' ';
+      out << "In function " << string(messaget::bold) << '\'' << function
+          << '\'' << string(messaget::reset) << ":\n";
     }
+
+    if(!line.empty())
+    {
+      out << string(messaget::bold);
+
+      if(!file.empty())
+        out << file << ':';
+
+      out << line << ':';
+
+      if(column.empty())
+        out << "1: ";
+      else
+        out << column << ": ";
+
+      if(level == messaget::M_ERROR)
+        out << string(messaget::red) << "error: ";
+      else if(level == messaget::M_WARNING)
+        out << string(messaget::bright_magenta) << "warning: ";
+
+      out << string(messaget::reset);
+    }
+
+    out << message << '\n';
+
+    const auto file_name = location.full_path();
+    if(file_name.has_value() && !line.empty())
+    {
+#ifdef _WIN32
+      std::ifstream in(widen(file_name.value()));
+#else
+      std::ifstream in(file_name.value());
+#endif
+      if(in)
+      {
+        const auto line_number = std::stoull(id2string(line));
+        std::string line;
+        for(std::size_t l = 0; l < line_number; l++)
+          std::getline(in, line);
+
+        if(in)
+          out << ' ' << line << '\n'; // gcc adds a space, clang doesn't
+      }
+    }
+
+    out << std::flush;
   }
 }
 
