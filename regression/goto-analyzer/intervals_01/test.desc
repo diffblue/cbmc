@@ -3,13 +3,13 @@ main.c
 --intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 7 function main, assertion i\s*>=\s*10: Success$
-^\[main.assertion.2\] file main.c line 10 function main, assertion i\s*!=\s*30: Success$
-^\[main.assertion.3\] file main.c line 13 function main, assertion i\s*!=\s*15: Unknown$
-^\[main.assertion.4\] file main.c line 16 function main, assertion 0: Success$
-^\[main.assertion.5\] file main.c line 19 function main, assertion j\s*>=\s*10: Success$
-^\[main.assertion.6\] file main.c line 22 function main, assertion i\s*>=\s*j: Unknown$
-^\[main.assertion.7\] file main.c line 25 function main, assertion i\s*>=\s*11: Success$
-^\[main.assertion.8]\ file main.c line 28 function main, assertion j\s*<\s*100: Success$
+^\[main.assertion.1\] file main.c line 7 function main, assertion i\s*>=\s*10: SUCCESS$
+^\[main.assertion.2\] file main.c line 10 function main, assertion i\s*!=\s*30: SUCCESS$
+^\[main.assertion.3\] file main.c line 13 function main, assertion i\s*!=\s*15: UNKNOWN$
+^\[main.assertion.4\] file main.c line 16 function main, assertion 0: SUCCESS$
+^\[main.assertion.5\] file main.c line 19 function main, assertion j\s*>=\s*10: SUCCESS$
+^\[main.assertion.6\] file main.c line 22 function main, assertion i\s*>=\s*j: UNKNOWN$
+^\[main.assertion.7\] file main.c line 25 function main, assertion i\s*>=\s*11: SUCCESS$
+^\[main.assertion.8]\ file main.c line 28 function main, assertion j\s*<\s*100: SUCCESS$
 --
 ^warning: ignoring

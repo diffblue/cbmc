@@ -3,22 +3,22 @@ sensitivity_test_two_value_struct_of_two_value_array.c
 --variable --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion x.a\[0\]==0: Unknown$
-^\[main.assertion.2\] .* assertion \*\(x.a\+0\)==0: Unknown$
-^\[main.assertion.3\] .* assertion \*\(0\+x.a\)==0: Unknown$
-^\[main.assertion.4\] .* assertion 0\[x.a\]==0: Unknown$
-^\[main.assertion.5\] .* assertion x.a\[0\]==0: Unknown$
-^\[main.assertion.6\] .* assertion x.a\[1\]==1: Unknown$
-^\[main.assertion.7\] .* assertion x.b\[0\]==3.0f: Unknown$
-^\[main.assertion.8\] .* assertion x.a\[0\]==0: Unknown$
-^\[main.assertion.9\] .* assertion x.a\[1\]==1: Unknown$
-^\[main.assertion.10\] .* assertion x.b\[2\]>0.0f: Unknown$
-^\[main.assertion.11\] .* assertion x.b\[2\]==15.0f: Unknown$
-^\[main.assertion.12\] .* assertion x.b\[2\]==1.0f: Unknown$
-^\[main.assertion.13\] .* assertion x.b\[0\]==3.0f: Unknown$
-^\[main.assertion.14\] .* assertion x.a\[0\]<12: Unknown$
-^\[main.assertion.15\] .* assertion x.a\[0\]>2: Unknown$
-^\[main.assertion.16\] .* assertion x.a\[0\]==0: Unknown$
-^\[main.assertion.17\] .* assertion x.a\[1\]==1: Unknown$
+^\[main.assertion.1\] .* assertion x.a\[0\]==0: UNKNOWN$
+^\[main.assertion.2\] .* assertion \*\(x.a\+0\)==0: UNKNOWN$
+^\[main.assertion.3\] .* assertion \*\(0\+x.a\)==0: UNKNOWN$
+^\[main.assertion.4\] .* assertion 0\[x.a\]==0: UNKNOWN$
+^\[main.assertion.5\] .* assertion x.a\[0\]==0: UNKNOWN$
+^\[main.assertion.6\] .* assertion x.a\[1\]==1: UNKNOWN$
+^\[main.assertion.7\] .* assertion x.b\[0\]==3.0f: UNKNOWN$
+^\[main.assertion.8\] .* assertion x.a\[0\]==0: UNKNOWN$
+^\[main.assertion.9\] .* assertion x.a\[1\]==1: UNKNOWN$
+^\[main.assertion.10\] .* assertion x.b\[2\]>0.0f: UNKNOWN$
+^\[main.assertion.11\] .* assertion x.b\[2\]==15.0f: UNKNOWN$
+^\[main.assertion.12\] .* assertion x.b\[2\]==1.0f: UNKNOWN$
+^\[main.assertion.13\] .* assertion x.b\[0\]==3.0f: UNKNOWN$
+^\[main.assertion.14\] .* assertion x.a\[0\]<12: UNKNOWN$
+^\[main.assertion.15\] .* assertion x.a\[0\]>2: UNKNOWN$
+^\[main.assertion.16\] .* assertion x.a\[0\]==0: UNKNOWN$
+^\[main.assertion.17\] .* assertion x.a\[1\]==1: UNKNOWN$
 --
 ^warning: ignoring

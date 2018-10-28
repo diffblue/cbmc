@@ -3,16 +3,16 @@ sensitivity_test_constants_struct_of_constants_struct.c
 --variable --structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion x.s1.a==0: Success$
-^\[main.assertion.2\] .* assertion x.s2.b==3.0f: Success$
-^\[main.assertion.3\] .* assertion x.s1.a==0: Success$
-^\[main.assertion.4\] .* assertion x.s1.a==10: Failure \(if reachable\)$
-^\[main.assertion.5\] .* assertion x.s1.b==1.0f: Success$
-^\[main.assertion.6\] .* assertion x.s2.b==3.0f: Unknown$
-^\[main.assertion.7\] .* assertion x.s2.b==0.0f: Unknown$
-^\[main.assertion.8\] .* assertion x.s1.a==20: Unknown$
-^\[main.assertion.9\] .* assertion x.s1.a<30: Unknown$
-^\[main.assertion.10\] .* assertion x.s2.a==22: Unknown$
-^\[main.assertion.11\] .* assertion x.s2.a<30: Unknown$
+^\[main.assertion.1\] .* assertion x.s1.a==0: SUCCESS$
+^\[main.assertion.2\] .* assertion x.s2.b==3.0f: SUCCESS$
+^\[main.assertion.3\] .* assertion x.s1.a==0: SUCCESS$
+^\[main.assertion.4\] .* assertion x.s1.a==10: FAILURE \(if reachable\)$
+^\[main.assertion.5\] .* assertion x.s1.b==1.0f: SUCCESS$
+^\[main.assertion.6\] .* assertion x.s2.b==3.0f: UNKNOWN$
+^\[main.assertion.7\] .* assertion x.s2.b==0.0f: UNKNOWN$
+^\[main.assertion.8\] .* assertion x.s1.a==20: UNKNOWN$
+^\[main.assertion.9\] .* assertion x.s1.a<30: UNKNOWN$
+^\[main.assertion.10\] .* assertion x.s2.a==22: UNKNOWN$
+^\[main.assertion.11\] .* assertion x.s2.a<30: UNKNOWN$
 --
 ^warning: ignoring

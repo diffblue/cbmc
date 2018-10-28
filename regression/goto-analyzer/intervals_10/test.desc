@@ -5,8 +5,8 @@ main.c
 ^SIGNAL=0$
 ^\[main.assertion.1\] file main.c line 8 function main, assertion j<=100: Success$
 ^\[main.assertion.2\] file main.c line 11 function main, assertion j<101: Success$
-^\[main.assertion.3\] file main.c line 14 function main, assertion j>100: Failure \(if reachable\)$
-^\[main.assertion.4\] file main.c line 17 function main, assertion j<99: Unknown$
-^\[main.assertion.5\] file main.c line 20 function main, assertion j==100: Failure \(if reachable\)$
+^\[main.assertion.3\] file main.c line 14 function main, assertion j>100: FAILURE \(if reachable\)$
+^\[main.assertion.4\] file main.c line 17 function main, assertion j<99: UNKNOWN$
+^\[main.assertion.5\] file main.c line 20 function main, assertion j==100: FAILURE \(if reachable\)$
 --
 ^warning: ignoring

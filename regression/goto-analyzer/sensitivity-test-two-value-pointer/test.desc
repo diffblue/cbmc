@@ -3,19 +3,19 @@ sensitivity_test_two_value_pointer.c
 --variable --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion x==&a: Unknown$
-^\[main.assertion.2\] .* assertion x==&b: Unknown$
-^\[main.assertion.3\] .* assertion x==x2: Unknown$
-^\[main.assertion.4\] .* assertion x==y: Unknown$
-^\[main.assertion.5\] .* assertion \*x==0: Unknown$
-^\[main.assertion.6\] .* assertion \*x==1: Unknown$
-^\[main.assertion.7\] .* assertion \*x==1: Unknown$
-^\[main.assertion.8\] .* assertion \*x==0: Unknown$
-^\[main.assertion.9\] .* assertion a==2: Unknown$
-^\[main.assertion.10\] .* assertion a==0: Unknown$
-^\[main.assertion.11\] .* assertion x==&a: Unknown$
-^\[main.assertion.12\] .* assertion \*x==0: Unknown$
-^\[main.assertion.13\] .* assertion x==&a: Unknown$
-^\[main.assertion.14\] .* assertion x==&b: Unknown$
+^\[main.assertion.1\] .* assertion x==&a: UNKNOWN$
+^\[main.assertion.2\] .* assertion x==&b: UNKNOWN$
+^\[main.assertion.3\] .* assertion x==x2: UNKNOWN$
+^\[main.assertion.4\] .* assertion x==y: UNKNOWN$
+^\[main.assertion.5\] .* assertion \*x==0: UNKNOWN$
+^\[main.assertion.6\] .* assertion \*x==1: UNKNOWN$
+^\[main.assertion.7\] .* assertion \*x==1: UNKNOWN$
+^\[main.assertion.8\] .* assertion \*x==0: UNKNOWN$
+^\[main.assertion.9\] .* assertion a==2: UNKNOWN$
+^\[main.assertion.10\] .* assertion a==0: UNKNOWN$
+^\[main.assertion.11\] .* assertion x==&a: UNKNOWN$
+^\[main.assertion.12\] .* assertion \*x==0: UNKNOWN$
+^\[main.assertion.13\] .* assertion x==&a: UNKNOWN$
+^\[main.assertion.14\] .* assertion x==&b: UNKNOWN$
 --
 ^warning: ignoring

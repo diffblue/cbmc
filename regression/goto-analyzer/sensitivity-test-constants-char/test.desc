@@ -3,7 +3,7 @@ sensitivity_test_constants_char.c
 --variable --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion x=='a': Success$
-^\[main.assertion.2\] .* assertion x=='b': Failure \(if reachable\)$
+^\[main.assertion.1\] .* assertion x=='a': SUCCESS$
+^\[main.assertion.2\] .* assertion x=='b': FAILURE \(if reachable\)$
 --
 ^warning: ignoring

@@ -3,28 +3,28 @@ sensitivity_test_constants_int.c
 --variable --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion x==0: Success$
-^\[main.assertion.2\] .* assertion x==1: Failure \(if reachable\)$
-^\[main.assertion.3\] .* assertion x==y: Unknown$
-^\[main.assertion.4\] .* assertion x<1: Success$
-^\[main.assertion.5\] .* assertion x<-1: Failure \(if reachable\)$
-^\[main.assertion.6\] .* assertion x<y: Unknown$
-^\[main.assertion.7\] .* assertion x>-1: Success$
-^\[main.assertion.8\] .* assertion x>1: Failure \(if reachable\)$
-^\[main.assertion.9\] .* assertion x>y: Unknown$
-^\[main.assertion.10\] .* assertion x!=1: Success$
-^\[main.assertion.11\] .* assertion x!=0: Failure \(if reachable\)$
-^\[main.assertion.12\] .* assertion x!=y: Unknown$
-^\[main.assertion.13\] .* assertion !\(x==1\): Success$
-^\[main.assertion.14\] .* assertion !\(x==0\): Failure \(if reachable\)$
-^\[main.assertion.15\] .* assertion !\(x==y\): Unknown$
-^\[main.assertion.16\] .* assertion y<2: Unknown$
-^\[main.assertion.17\] .* assertion y>2: Unknown$
-^\[main.assertion.18\] .* assertion y==1: Unknown$
-^\[main.assertion.19\] .* assertion z==0: Success$
-^\[main.assertion.20\] .* assertion z==10: Failure \(if reachable\)$
-^\[main.assertion.21\] .* assertion x==0: Success \(unreachable\)$
-^\[main.assertion.22\] .* assertion x==1: Success \(unreachable\)$
-^\[main.assertion.23\] .* assertion y==0: Success \(unreachable\)$
+^\[main.assertion.1\] .* assertion x==0: SUCCESS$
+^\[main.assertion.2\] .* assertion x==1: FAILURE \(if reachable\)$
+^\[main.assertion.3\] .* assertion x==y: UNKNOWN$
+^\[main.assertion.4\] .* assertion x<1: SUCCESS$
+^\[main.assertion.5\] .* assertion x<-1: FAILURE \(if reachable\)$
+^\[main.assertion.6\] .* assertion x<y: UNKNOWN$
+^\[main.assertion.7\] .* assertion x>-1: SUCCESS$
+^\[main.assertion.8\] .* assertion x>1: FAILURE \(if reachable\)$
+^\[main.assertion.9\] .* assertion x>y: UNKNOWN$
+^\[main.assertion.10\] .* assertion x!=1: SUCCESS$
+^\[main.assertion.11\] .* assertion x!=0: FAILURE \(if reachable\)$
+^\[main.assertion.12\] .* assertion x!=y: UNKNOWN$
+^\[main.assertion.13\] .* assertion !\(x==1\): SUCCESS$
+^\[main.assertion.14\] .* assertion !\(x==0\): FAILURE \(if reachable\)$
+^\[main.assertion.15\] .* assertion !\(x==y\): UNKNOWN$
+^\[main.assertion.16\] .* assertion y<2: UNKNOWN$
+^\[main.assertion.17\] .* assertion y>2: UNKNOWN$
+^\[main.assertion.18\] .* assertion y==1: UNKNOWN$
+^\[main.assertion.19\] .* assertion z==0: SUCCESS$
+^\[main.assertion.20\] .* assertion z==10: FAILURE \(if reachable\)$
+^\[main.assertion.21\] .* assertion x==0: SUCCESS \(unreachable\)$
+^\[main.assertion.22\] .* assertion x==1: SUCCESS \(unreachable\)$
+^\[main.assertion.23\] .* assertion y==0: SUCCESS \(unreachable\)$
 --
 ^warning: ignoring

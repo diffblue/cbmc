@@ -3,7 +3,7 @@ main.c
 --intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 30 function main, assertion y\[i\]>=-1.0f \&\& y\[i\]<=1.0f: Unknown$
-^\[main.assertion.2\] file main.c line 35 function main, assertion y\[i\]>=-1.0f \&\& y\[i\]<=1.0f: Unknown$
+^\[main.assertion.1\] file main.c line 30 function main, assertion y\[i\]>=-1.0f \&\& y\[i\]<=1.0f: UNKNOWN$
+^\[main.assertion.2\] file main.c line 35 function main, assertion y\[i\]>=-1.0f \&\& y\[i\]<=1.0f: UNKNOWN$
 --
 ^warning: ignoring

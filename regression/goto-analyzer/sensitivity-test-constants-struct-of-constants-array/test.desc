@@ -3,22 +3,22 @@ sensitivity_test_constants_struct_of_constants_array.c
 --variable --structs --arrays --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion x.a\[0\]==0: Success$
-^\[main.assertion.2\] .* assertion \*\(x.a\+0\)==0: Success$
-^\[main.assertion.3\] .* assertion \*\(0\+x.a\)==0: Success$
-^\[main.assertion.4\] .* assertion 0\[x.a\]==0: Success$
-^\[main.assertion.5\] .* assertion x.a\[0\]==0: Success$
-^\[main.assertion.6\] .* assertion x.a\[1\]==1: Success$
-^\[main.assertion.7\] .* assertion x.b\[0\]==3.0f: Success$
-^\[main.assertion.8\] .* assertion x.a\[0\]==0: Success$
-^\[main.assertion.9\] .* assertion x.a\[1\]==1: Success$
-^\[main.assertion.10\] .* assertion x.b\[2\]>0.0f: Unknown$
-^\[main.assertion.11\] .* assertion x.b\[2\]==15.0f: Unknown$
-^\[main.assertion.12\] .* assertion x.b\[2\]==1.0f: Unknown$
-^\[main.assertion.13\] .* assertion x.b\[0\]==3.0f: Success$
-^\[main.assertion.14\] .* assertion x.a\[0\]<12: Unknown$
-^\[main.assertion.15\] .* assertion x.a\[0\]>2: Unknown$
-^\[main.assertion.16\] .* assertion x.a\[0\]==0: Unknown$
-^\[main.assertion.17\] .* assertion x.a\[1\]==1: Success$
+^\[main.assertion.1\] .* assertion x.a\[0\]==0: SUCCESS$
+^\[main.assertion.2\] .* assertion \*\(x.a\+0\)==0: SUCCESS$
+^\[main.assertion.3\] .* assertion \*\(0\+x.a\)==0: SUCCESS$
+^\[main.assertion.4\] .* assertion 0\[x.a\]==0: SUCCESS$
+^\[main.assertion.5\] .* assertion x.a\[0\]==0: SUCCESS$
+^\[main.assertion.6\] .* assertion x.a\[1\]==1: SUCCESS$
+^\[main.assertion.7\] .* assertion x.b\[0\]==3.0f: SUCCESS$
+^\[main.assertion.8\] .* assertion x.a\[0\]==0: SUCCESS$
+^\[main.assertion.9\] .* assertion x.a\[1\]==1: SUCCESS$
+^\[main.assertion.10\] .* assertion x.b\[2\]>0.0f: UNKNOWN$
+^\[main.assertion.11\] .* assertion x.b\[2\]==15.0f: UNKNOWN$
+^\[main.assertion.12\] .* assertion x.b\[2\]==1.0f: UNKNOWN$
+^\[main.assertion.13\] .* assertion x.b\[0\]==3.0f: SUCCESS$
+^\[main.assertion.14\] .* assertion x.a\[0\]<12: UNKNOWN$
+^\[main.assertion.15\] .* assertion x.a\[0\]>2: UNKNOWN$
+^\[main.assertion.16\] .* assertion x.a\[0\]==0: UNKNOWN$
+^\[main.assertion.17\] .* assertion x.a\[1\]==1: SUCCESS$
 --
 ^warning: ignoring

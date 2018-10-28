@@ -3,7 +3,7 @@ main.c
 --intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^[main.assertion.1] file main.c line 8 function main, assertion j < 0: Success$
-^[main.assertion.2] file main.c line 11 function main, assertion j < 0: Success$
+^[main.assertion.1] file main.c line 8 function main, assertion j < 0: SUCCESS$
+^[main.assertion.2] file main.c line 11 function main, assertion j < 0: SUCCESS$
 --
 ^warning: ignoring

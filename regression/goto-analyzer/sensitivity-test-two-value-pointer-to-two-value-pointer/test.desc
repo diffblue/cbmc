@@ -3,11 +3,11 @@ sensitivity_test_two_value_pointer_to_two_value_pointer.c
 --variable --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion \*\*x==0: Unknown$
-^\[main.assertion.2\] .* assertion \*\*x==1: Unknown$
-^\[main.assertion.3\] .* assertion \*\*x==1: Unknown$
-^\[main.assertion.4\] .* assertion \*\*x==0: Unknown$
-^\[main.assertion.5\] .* assertion a==2: Unknown$
-^\[main.assertion.6\] .* assertion a==1: Unknown$
+^\[main.assertion.1\] .* assertion \*\*x==0: UNKNOWN$
+^\[main.assertion.2\] .* assertion \*\*x==1: UNKNOWN$
+^\[main.assertion.3\] .* assertion \*\*x==1: UNKNOWN$
+^\[main.assertion.4\] .* assertion \*\*x==0: UNKNOWN$
+^\[main.assertion.5\] .* assertion a==2: UNKNOWN$
+^\[main.assertion.6\] .* assertion a==1: UNKNOWN$
 --
 ^warning: ignoring
