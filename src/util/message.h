@@ -317,6 +317,30 @@ public:
   /// render text with blue foreground color
   static const commandt blue;
 
+  /// render text with magenta foreground color
+  static const commandt magenta;
+
+  /// render text with cyan foreground color
+  static const commandt cyan;
+
+  /// render text with bright red foreground color
+  static const commandt bright_red;
+
+  /// render text with bright green foreground color
+  static const commandt bright_green;
+
+  /// render text with bright yellow foreground color
+  static const commandt bright_yellow;
+
+  /// render text with bright blue foreground color
+  static const commandt bright_blue;
+
+  /// render text with bright magenta foreground color
+  static const commandt bright_magenta;
+
+  /// render text with bright cyan foreground color
+  static const commandt bright_cyan;
+
   /// render text with bold font
   static const commandt bold;
 

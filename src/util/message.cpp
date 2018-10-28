@@ -80,6 +80,14 @@ const messaget::commandt messaget::red(31);
 const messaget::commandt messaget::green(32);
 const messaget::commandt messaget::yellow(33);
 const messaget::commandt messaget::blue(34);
+const messaget::commandt messaget::magenta(35);
+const messaget::commandt messaget::cyan(36);
+const messaget::commandt messaget::bright_red(91);
+const messaget::commandt messaget::bright_green(92);
+const messaget::commandt messaget::bright_yellow(93);
+const messaget::commandt messaget::bright_blue(94);
+const messaget::commandt messaget::bright_magenta(95);
+const messaget::commandt messaget::bright_cyan(96);
 
 /// Parse a (user-)provided string as a verbosity level and set it as the
 /// verbosity of dest.
