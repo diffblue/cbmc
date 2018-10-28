@@ -122,13 +122,13 @@ bitvector_typet char_type()
   {
     unsignedbv_typet result(config.ansi_c.char_width);
     result.set(ID_C_c_type, ID_char);
-    return result;
+    return std::move(result);
   }
   else
   {
     signedbv_typet result(config.ansi_c.char_width);
     result.set(ID_C_c_type, ID_char);
-    return result;
+    return std::move(result);
   }
 }
 
@@ -152,13 +152,13 @@ bitvector_typet wchar_t_type()
   {
     unsignedbv_typet result(config.ansi_c.wchar_t_width);
     result.set(ID_C_c_type, ID_wchar_t);
-    return result;
+    return std::move(result);
   }
   else
   {
     signedbv_typet result(config.ansi_c.wchar_t_width);
     result.set(ID_C_c_type, ID_wchar_t);
-    return result;
+    return std::move(result);
   }
 }
 

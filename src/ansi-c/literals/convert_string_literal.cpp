@@ -156,6 +156,6 @@ exprt convert_string_literal(const std::string &src)
     string_constantt result;
     result.set_value(char_value);
 
-    return result;
+    return std::move(result);
   }
 }

@@ -788,7 +788,7 @@ exprt float_bvt::relation(
       and_bv.copy_to_operands(not_exprt(both_zero));
       and_bv.copy_to_operands(not_exprt(nan));
 
-      return and_bv;
+      return std::move(and_bv);
     }
     else if(rel==relt::LE)
     {

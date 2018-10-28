@@ -50,7 +50,7 @@ exprt build_full_lhs_rec(
         build_full_lhs_rec(prop_conv, ns,
           to_index_expr(src_original).array(),
           to_index_expr(src_ssa).array());
-      return tmp;
+      return std::move(tmp);
     }
 
     return src_original;
@@ -80,14 +80,14 @@ exprt build_full_lhs_rec(
     else if(tmp.is_false())
       return tmp2.false_case();
     else
-      return tmp2;
+      return std::move(tmp2);
   }
   else if(id==ID_typecast)
   {
     typecast_exprt tmp=to_typecast_expr(src_original);
     tmp.op()=build_full_lhs_rec(prop_conv, ns,
       to_typecast_expr(src_original).op(), to_typecast_expr(src_ssa).op());
-    return tmp;
+    return std::move(tmp);
   }
   else if(id==ID_byte_extract_little_endian ||
           id==ID_byte_extract_big_endian)

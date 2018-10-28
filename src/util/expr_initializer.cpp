@@ -136,7 +136,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       value.type().id(ID_array);
       value.type().set(ID_size, from_integer(0, size_type()));
       value.add_source_location()=source_location;
-      return value;
+      return std::move(value);
     }
     else
     {
@@ -152,7 +152,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
 
         array_of_exprt value(tmpval, array_type);
         value.add_source_location()=source_location;
-        return value;
+        return std::move(value);
       }
       else if(to_integer(array_type.size(), array_size))
       {
@@ -176,7 +176,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       array_exprt value(array_type);
       value.operands().resize(integer2size_t(array_size), tmpval);
       value.add_source_location()=source_location;
-      return value;
+      return std::move(value);
     }
   }
   else if(type_id==ID_vector)
@@ -209,7 +209,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     value.operands().resize(integer2size_t(vector_size), tmpval);
     value.add_source_location()=source_location;
 
-    return value;
+    return std::move(value);
   }
   else if(type_id==ID_struct)
   {
@@ -234,7 +234,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
 
     value.add_source_location()=source_location;
 
-    return value;
+    return std::move(value);
   }
   else if(type_id==ID_union)
   {
@@ -279,7 +279,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
         expr_initializer_rec(component.type(), source_location);
     }
 
-    return value;
+    return std::move(value);
   }
   else if(type_id == ID_symbol_type)
   {

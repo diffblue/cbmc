@@ -156,7 +156,7 @@ static exprt unpack_rec(
   to_array_type(array.type()).size()=
     from_integer(array.operands().size(), size_type());
 
-  return array;
+  return std::move(array);
 }
 
 /// rewrite byte extraction from an array to byte extraction from a

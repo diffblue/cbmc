@@ -33,7 +33,7 @@ exprt disjunction(const exprt::operandst &op)
   {
     or_exprt result;
     result.operands()=op;
-    return result;
+    return std::move(result);
   }
 }
 
@@ -57,7 +57,7 @@ exprt conjunction(const exprt::operandst &op)
   {
     and_exprt result;
     result.operands()=op;
-    return result;
+    return std::move(result);
   }
 }
 

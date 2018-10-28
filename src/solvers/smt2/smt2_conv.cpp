@@ -392,7 +392,7 @@ exprt smt2_convt::parse_struct(
   result.operands().resize(components.size(), nil_exprt());
 
   if(components.empty())
-    return result;
+    return std::move(result);
 
   if(use_datatypes)
   {
@@ -400,7 +400,7 @@ exprt smt2_convt::parse_struct(
     //  (mk-struct.1 <component0> <component1> ... <componentN>)
 
     if(src.get_sub().size()!=components.size()+1)
-      return result; // give up
+      return std::move(result); // give up
 
     for(std::size_t i=0; i<components.size(); i++)
     {
@@ -441,7 +441,7 @@ exprt smt2_convt::parse_struct(
     }
   }
 
-  return result;
+  return std::move(result);
 }
 
 exprt smt2_convt::parse_rec(const irept &src, const typet &_type)

@@ -2095,7 +2095,7 @@ exprt c_typecheck_baset::do_special_functions(
       expr.arguments()[0], "get_must", expr.arguments()[1]);
     get_must_expr.add_source_location()=source_location;
 
-    return get_must_expr;
+    return std::move(get_must_expr);
   }
   else if(identifier==CPROVER_PREFIX "get_may")
   {
@@ -2112,7 +2112,7 @@ exprt c_typecheck_baset::do_special_functions(
       expr.arguments()[0], "get_may", expr.arguments()[1]);
     get_may_expr.add_source_location()=source_location;
 
-    return get_may_expr;
+    return std::move(get_may_expr);
   }
   else if(identifier==CPROVER_PREFIX "invalid_pointer")
   {
@@ -2157,7 +2157,7 @@ exprt c_typecheck_baset::do_special_functions(
     is_zero_string_expr.set(ID_C_lvalue, true); // make it an lvalue
     is_zero_string_expr.add_source_location()=source_location;
 
-    return is_zero_string_expr;
+    return std::move(is_zero_string_expr);
   }
   else if(identifier==CPROVER_PREFIX "zero_string_length")
   {
@@ -2217,7 +2217,7 @@ exprt c_typecheck_baset::do_special_functions(
       ID_object_size, expr.arguments()[0], size_type());
     object_size_expr.add_source_location() = source_location;
 
-    return object_size_expr;
+    return std::move(object_size_expr);
   }
   else if(identifier==CPROVER_PREFIX "POINTER_OBJECT")
   {
@@ -2250,7 +2250,7 @@ exprt c_typecheck_baset::do_special_functions(
     bswap_exprt bswap_expr(expr.arguments().front(), 8, expr.type());
     bswap_expr.add_source_location()=source_location;
 
-    return bswap_expr;
+    return std::move(bswap_expr);
   }
   else if(identifier=="__builtin_nontemporal_load")
   {
@@ -2363,7 +2363,7 @@ exprt c_typecheck_baset::do_special_functions(
         ieee_float_spect::double_precision()).to_expr();
     inf_expr.add_source_location()=source_location;
 
-    return inf_expr;
+    return std::move(inf_expr);
   }
   else if(identifier==CPROVER_PREFIX "inff")
   {
@@ -2372,7 +2372,7 @@ exprt c_typecheck_baset::do_special_functions(
         ieee_float_spect::single_precision()).to_expr();
     inff_expr.add_source_location()=source_location;
 
-    return inff_expr;
+    return std::move(inff_expr);
   }
   else if(identifier==CPROVER_PREFIX "infl")
   {
@@ -2381,7 +2381,7 @@ exprt c_typecheck_baset::do_special_functions(
       ieee_floatt::plus_infinity(ieee_float_spect(type)).to_expr();
     infl_expr.add_source_location()=source_location;
 
-    return infl_expr;
+    return std::move(infl_expr);
   }
   else if(identifier==CPROVER_PREFIX "abs" ||
           identifier==CPROVER_PREFIX "labs" ||
@@ -2400,7 +2400,7 @@ exprt c_typecheck_baset::do_special_functions(
     abs_exprt abs_expr(expr.arguments().front());
     abs_expr.add_source_location()=source_location;
 
-    return abs_expr;
+    return std::move(abs_expr);
   }
   else if(identifier==CPROVER_PREFIX "allocate")
   {
@@ -2414,7 +2414,7 @@ exprt c_typecheck_baset::do_special_functions(
     side_effect_exprt malloc_expr(ID_allocate, expr.type(), source_location);
     malloc_expr.operands()=expr.arguments();
 
-    return malloc_expr;
+    return std::move(malloc_expr);
   }
   else if(
     identifier == CPROVER_PREFIX "r_ok" || identifier == CPROVER_PREFIX "w_ok")
@@ -2431,7 +2431,7 @@ exprt c_typecheck_baset::do_special_functions(
     predicate_exprt ok_expr(id, expr.arguments()[0], expr.arguments()[1]);
     ok_expr.add_source_location() = source_location;
 
-    return ok_expr;
+    return std::move(ok_expr);
   }
   else if(identifier==CPROVER_PREFIX "isinff" ||
           identifier==CPROVER_PREFIX "isinfd" ||
@@ -2536,7 +2536,7 @@ exprt c_typecheck_baset::do_special_functions(
     popcount_exprt popcount_expr(expr.arguments().front(), expr.type());
     popcount_expr.add_source_location()=source_location;
 
-    return popcount_expr;
+    return std::move(popcount_expr);
   }
   else if(identifier==CPROVER_PREFIX "equal")
   {
@@ -2559,7 +2559,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    return equality_expr;
+    return std::move(equality_expr);
   }
   else if(identifier=="__builtin_expect")
   {

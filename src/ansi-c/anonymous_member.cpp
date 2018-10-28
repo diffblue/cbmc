@@ -35,7 +35,7 @@ static exprt make_member_expr(
     result.type().set(ID_C_constant, true);
   }
 
-  return result;
+  return std::move(result);
 }
 
 exprt get_component_rec(

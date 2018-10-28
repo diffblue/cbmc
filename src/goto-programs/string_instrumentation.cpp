@@ -33,7 +33,7 @@ exprt is_zero_string(
   predicate_exprt result("is_zero_string");
   result.copy_to_operands(what);
   result.set("lhs", write);
-  return result;
+  return std::move(result);
 }
 
 exprt zero_string_length(

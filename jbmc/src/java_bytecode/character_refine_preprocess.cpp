@@ -319,7 +319,7 @@ exprt character_refine_preprocesst::expr_of_high_surrogate(
   exprt u400=from_integer(0x0400, type);
 
   plus_exprt high_surrogate(uD800, div_exprt(minus_exprt(chr, u10000), u400));
-  return high_surrogate;
+  return std::move(high_surrogate);
 }
 
 /// Converts function call to an assignment of an expression corresponding to
@@ -496,7 +496,7 @@ exprt character_refine_preprocesst::expr_of_is_digit(
   or_exprt digit(
     or_exprt(latin_digit, or_exprt(arabic_indic_digit, extended_digit)),
     or_exprt(devanagari_digit, fullwidth_digit));
-  return digit;
+  return std::move(digit);
 }
 
 /// Converts function call to an assignment of an expression corresponding to
@@ -555,7 +555,7 @@ exprt character_refine_preprocesst::expr_of_is_identifier_ignorable(
      or_exprt(
       in_interval_expr(chr, 0x000E, 0x001B),
       in_interval_expr(chr, 0x007F, 0x009F)));
-  return ignorable;
+  return std::move(ignorable);
 }
 
 /// Converts function call to an assignment of an expression corresponding to
@@ -1235,7 +1235,7 @@ exprt character_refine_preprocesst::expr_of_to_lower_case(
     plus_exprt(chr, from_integer('a', type)), from_integer('A', type));
 
   if_exprt res(expr_of_is_ascii_upper_case(chr, type), transformed, chr);
-  return res;
+  return std::move(res);
 }
 
 /// Converts function call to an assignment of an expression corresponding to
@@ -1291,7 +1291,7 @@ exprt character_refine_preprocesst::expr_of_to_title_case(
           plus_9,
           chr))));
 
-  return res;
+  return std::move(res);
 }
 
 /// Converts function call to an assignment of an expression corresponding to
@@ -1328,7 +1328,7 @@ exprt character_refine_preprocesst::expr_of_to_upper_case(
     plus_exprt(chr, from_integer('A', type)), from_integer('a', type));
 
   if_exprt res(expr_of_is_ascii_lower_case(chr, type), transformed, chr);
-  return res;
+  return std::move(res);
 }
 
 /// Converts function call to an assignment of an expression corresponding to

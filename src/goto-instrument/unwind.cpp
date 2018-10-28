@@ -346,5 +346,5 @@ jsont goto_unwindt::unwind_logt::output_log_json() const
       target->location_number));
   }
 
-  return json_result;
+  return std::move(json_result);
 }

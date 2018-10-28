@@ -1572,7 +1572,7 @@ exprt java_bytecode_parsert::get_relement_value()
       {
         values.operands().push_back(get_relement_value());
       }
-      return values;
+      return std::move(values);
     }
 
   case 's':

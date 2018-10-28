@@ -121,7 +121,7 @@ exprt is_not_zero(
   binary_exprt comparison(src, id, zero, bool_typet());
   comparison.add_source_location()=src.source_location();
 
-  return comparison;
+  return std::move(comparison);
 }
 
 exprt boolean_negate(const exprt &src)

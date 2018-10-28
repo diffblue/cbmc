@@ -131,7 +131,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
   }
 
   if(symbol.type.id() == ID_union)
-    return block;
+    return std::move(block);
 
   const auto &bases = to_struct_type(symbol.type).bases();
 
@@ -156,5 +156,5 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
       block.add(dtor_code.value());
   }
 
-  return block;
+  return std::move(block);
 }

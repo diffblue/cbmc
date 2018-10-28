@@ -157,7 +157,7 @@ exprt boolbvt::bv_get_rec(
 
       struct_exprt dest(type);
       dest.operands().swap(op);
-      return dest;
+      return std::move(dest);
     }
     else if(type.id()==ID_union)
     {
@@ -178,7 +178,7 @@ exprt boolbvt::bv_get_rec(
 
       value.op()=bv_get_rec(bv, unknown, offset, subtype);
 
-      return value;
+      return std::move(value);
     }
     else if(type.id()==ID_vector)
     {
@@ -195,7 +195,7 @@ exprt boolbvt::bv_get_rec(
           value.operands().push_back(
             bv_get_rec(bv, unknown, i*sub_width, subtype));
 
-        return value;
+        return std::move(value);
       }
     }
     else if(type.id()==ID_complex)

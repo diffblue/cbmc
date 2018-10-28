@@ -357,7 +357,7 @@ exprt value_set_fivrt::to_expr(object_map_dt::const_iterator it) const
 
   od.type()=od.object().type();
 
-  return od;
+  return std::move(od);
 }
 
 bool value_set_fivrt::make_union(

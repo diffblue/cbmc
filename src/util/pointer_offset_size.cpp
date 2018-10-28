@@ -331,7 +331,7 @@ exprt size_of_expr(
     mult_exprt result(size, sub);
     simplify(result, ns);
 
-    return result;
+    return std::move(result);
   }
   else if(type.id()==ID_vector)
   {
@@ -351,7 +351,7 @@ exprt size_of_expr(
     mult_exprt result(size, sub);
     simplify(result, ns);
 
-    return result;
+    return std::move(result);
   }
   else if(type.id()==ID_complex)
   {
@@ -364,7 +364,7 @@ exprt size_of_expr(
     mult_exprt result(size, sub);
     simplify(result, ns);
 
-    return result;
+    return std::move(result);
   }
   else if(type.id()==ID_struct)
   {

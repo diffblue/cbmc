@@ -18,5 +18,5 @@ exprt cpp_symbol_expr(const symbolt &symbol)
   if(symbol.is_lvalue)
     tmp.set(ID_C_lvalue, true);
 
-  return tmp;
+  return std::move(tmp);
 }

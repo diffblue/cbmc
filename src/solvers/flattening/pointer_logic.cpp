@@ -77,7 +77,7 @@ exprt pointer_logict::pointer_expr(
     if(pointer.offset==0)
     {
       null_pointer_exprt result(type);
-      return result;
+      return std::move(result);
     }
     else
     {

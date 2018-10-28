@@ -1395,7 +1395,7 @@ exprt cpp_typecheck_resolvet::resolve(
       string_constantt s;
       s.set_value(source_location.get_function());
       s.add_source_location()=source_location;
-      return s;
+      return std::move(s);
     }
   }
 
