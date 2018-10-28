@@ -145,7 +145,7 @@ class optionst;
   "(non-null)(show-non-null)" \
   "(constants)" \
   "(dependence-graph)" \
-  "(show)(verify)(simplify):" \
+  "(show)(verify)(simplify):(show-on-source)" \
   "(location-sensitive)(concurrent)" \
   "(no-simplify-slicing)" \
 // clang-format on
