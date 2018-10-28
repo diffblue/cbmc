@@ -133,7 +133,7 @@ codet java_bytecode_instrumentt::throw_exception(
   if_code.cond()=cond;
   if_code.then_case() = code_blockt({assign_new, code_expressiont(throw_expr)});
 
-  return if_code;
+  return std::move(if_code);
 }
 
 
@@ -205,7 +205,7 @@ codet java_bytecode_instrumentt::check_array_access(
   bounds_checks.add(create_fatal_assertion(ge_zero, low_check_loc));
   bounds_checks.add(create_fatal_assertion(lt_length, high_check_loc));
 
-  return bounds_checks;
+  return std::move(bounds_checks);
 }
 
 /// Checks whether `class1` is an instance of `class2` and throws
@@ -255,7 +255,7 @@ codet java_bytecode_instrumentt::check_class_cast(
   notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
   conditional_check.cond()=std::move(op_not_null);
   conditional_check.then_case()=std::move(check_code);
-  return conditional_check;
+  return std::move(conditional_check);
 }
 
 /// Checks whether `expr` is null and throws NullPointerException/
@@ -540,7 +540,7 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
   if(result==code_blockt())
     return {};
   else
-    return result;
+    return std::move(result);
 }
 
 /// Instruments `expr`

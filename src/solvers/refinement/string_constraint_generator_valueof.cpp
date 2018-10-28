@@ -632,7 +632,7 @@ exprt is_digit_with_radix(
     }
     else
     {
-      return is_digit_when_radix_gt_10;
+      return std::move(is_digit_when_radix_gt_10);
     }
   }
 }

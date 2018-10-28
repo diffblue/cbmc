@@ -50,7 +50,7 @@ exprt functionst::arguments_equal(const exprt::operandst &o1,
     conjuncts[i]=equal_exprt(lhs, rhs);
   }
 
-  return and_expr;
+  return std::move(and_expr);
 }
 
 void functionst::add_function_constraints(const function_infot &info)

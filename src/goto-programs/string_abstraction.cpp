@@ -1367,5 +1367,5 @@ exprt string_abstractiont::member(const exprt &a, whatt what)
 
   member_exprt result(struct_op, component_name, build_type(what));
 
-  return result;
+  return std::move(result);
 }

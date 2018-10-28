@@ -1039,7 +1039,7 @@ codet java_string_library_preprocesst::make_float_to_string_code(
 
   // Return str
   code.add(code_returnt(str), loc);
-  return code;
+  return std::move(code);
 }
 
 /// Generate the goto code for string initialization.
@@ -1088,7 +1088,7 @@ codet java_string_library_preprocesst::make_init_function_from_call(
     code_assign_string_expr_to_java_string(arg_this, string_expr, symbol_table),
     loc);
 
-  return code;
+  return std::move(code);
 }
 
 /// Call a cprover internal function, assign the result to object `this` and
@@ -1114,7 +1114,7 @@ codet java_string_library_preprocesst::
     loc);
   const symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
   code.add(code_returnt(arg_this), loc);
-  return code;
+  return std::move(code);
 }
 
 /// Call a cprover internal function and assign the result to object `this`.
@@ -1266,7 +1266,7 @@ exprt java_string_library_preprocesst::get_object_at_index(
     data_member, from_integer(index, java_int_type()), data_member.type());
   dereference_exprt data_at_index(
     data_pointer_plus_index, data_pointer_plus_index.type().subtype());
-  return data_at_index;
+  return std::move(data_at_index);
 }
 
 /// Helper for format function. Adds code:
@@ -1393,7 +1393,7 @@ exprt java_string_library_preprocesst::make_argument_for_format(
   }
 
   code.add(code_not_null, loc);
-  return arg_i_struct;
+  return std::move(arg_i_struct);
 }
 
 /// Used to provide code for the Java String.format function.
@@ -1451,7 +1451,7 @@ codet java_string_library_preprocesst::make_string_format_code(
       java_string, string_expr, symbol_table),
     loc);
   code.add(code_returnt(java_string), loc);
-  return code;
+  return std::move(code);
 }
 
 /// Used to provide our own implementation of the java.lang.Object.getClass()
@@ -1532,7 +1532,7 @@ codet java_string_library_preprocesst::make_object_get_class_code(
 
   // > return class1;
   code.add(code_returnt(class1), loc);
-  return code;
+  return std::move(code);
 }
 
 /// Provide code for a function that calls a function from the solver and simply
@@ -1558,7 +1558,7 @@ codet java_string_library_preprocesst::make_function_from_call(
     code_return_function_application(
       function_name, args, type.return_type(), symbol_table),
     loc);
-  return code;
+  return std::move(code);
 }
 
 /// Provide code for a function that calls a function from the solver and return
@@ -1600,7 +1600,7 @@ codet java_string_library_preprocesst::make_string_returning_function_from_call(
 
   // Return value
   code.add(code_returnt(str), loc);
-  return code;
+  return std::move(code);
 }
 
 /// Generates code for a function which copies a string object to a new string
@@ -1643,7 +1643,7 @@ codet java_string_library_preprocesst::make_copy_string_code(
 
   // Return value
   code.add(code_returnt(str), loc);
-  return code;
+  return std::move(code);
 }
 
 /// Generates code for a constructor of a string object from another string
@@ -1684,7 +1684,7 @@ codet java_string_library_preprocesst::make_copy_constructor_code(
     code_assign_string_expr_to_java_string(arg_this, string_expr, symbol_table),
     loc);
 
-  return code;
+  return std::move(code);
 }
 
 /// Generates code for the String.length method
@@ -1714,7 +1714,7 @@ codet java_string_library_preprocesst::make_string_length_code(
   code_returnt ret(get_length(deref, symbol_table));
   ret.add_source_location() = loc;
 
-  return ret;
+  return std::move(ret);
 }
 
 bool java_string_library_preprocesst::implements_function(

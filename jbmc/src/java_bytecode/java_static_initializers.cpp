@@ -627,7 +627,7 @@ codet get_thread_safe_clinit_wrapper_body(
     function_body.add(code_returnt());
   }
 
-  return function_body;
+  return std::move(function_body);
 }
 
 /// Produces the static initializer wrapper body for the given function.
@@ -702,7 +702,7 @@ codet get_clinit_wrapper_body(
 
   wrapper_body.then_case() = init_body;
 
-  return wrapper_body;
+  return std::move(wrapper_body);
 }
 
 
@@ -891,5 +891,5 @@ codet stub_global_initializer_factoryt::get_stub_initializer_body(
       update_in_placet::NO_UPDATE_IN_PLACE);
   }
 
-  return static_init_body;
+  return std::move(static_init_body);
 }

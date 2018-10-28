@@ -118,7 +118,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
         if(i_code.has_value())
           new_code.move(i_code.value());
       }
-      return new_code;
+      return std::move(new_code);
     }
   }
   else if(cpp_is_pod(tmp_type))
@@ -146,7 +146,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
       typecheck_side_effect_assignment(assign);
       code_expressiont new_code;
       new_code.expression()=assign;
-      return new_code;
+      return std::move(new_code);
     }
     else
     {
@@ -254,7 +254,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
     else
     {
       block.add(initializer_code);
-      return block;
+      return std::move(block);
     }
   }
   else

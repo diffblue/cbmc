@@ -482,7 +482,7 @@ exprt interpretert::get_value(
       result.copy_to_operands(operand);
     }
 
-    return result;
+    return std::move(result);
   }
   else if(real_type.id()==ID_array)
   {
@@ -509,7 +509,7 @@ exprt interpretert::get_value(
         offset+i*subtype_size);
       result.copy_to_operands(operand);
     }
-    return result;
+    return std::move(result);
   }
   if(use_non_det &&
      memory[integer2ulong(offset)].initialized!=
@@ -547,7 +547,7 @@ exprt interpretert::get_value(
       tmp_offset+=size;
       result.copy_to_operands(operand);
     }
-    return result;
+    return std::move(result);
   }
   else if(real_type.id()==ID_array)
   {
@@ -575,7 +575,7 @@ exprt interpretert::get_value(
           offset+i*subtype_size);
       result.copy_to_operands(operand);
     }
-    return result;
+    return std::move(result);
   }
   else if(real_type.id()==ID_floatbv)
   {
@@ -628,7 +628,7 @@ exprt interpretert::get_value(
         symbol_expr,
         from_integer(offset, integer_typet()));
 
-      return index_expr;
+      return std::move(index_expr);
     }
 
     error() << "interpreter: invalid pointer " << rhs[integer2size_t(offset)]

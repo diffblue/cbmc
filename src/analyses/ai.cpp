@@ -82,7 +82,7 @@ jsont ai_baset::output_json(
     }
   }
 
-  return result;
+  return std::move(result);
 }
 
 /// Output the domains for a single function as JSON
@@ -113,7 +113,7 @@ jsont ai_baset::output_json(
     contents.push_back(location);
   }
 
-  return contents;
+  return std::move(contents);
 }
 
 /// Output the domains for the whole program as XML

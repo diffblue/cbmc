@@ -29,5 +29,5 @@ exprt pointer_offset_sum(const exprt &a, const exprt &b)
   if(b.type() != a.type())
     new_offset.op1().make_typecast(a.type());
 
-  return new_offset;
+  return std::move(new_offset);
 }

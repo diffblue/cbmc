@@ -21,7 +21,7 @@ typet c_bit_field_replacement_type(
   {
     bitvector_typet result=to_bitvector_type(subtype);
     result.set_width(src.get_width());
-    return result;
+    return std::move(result);
   }
   else if(subtype.id()==ID_c_enum_tag)
   {
@@ -33,7 +33,7 @@ typet c_bit_field_replacement_type(
     {
       bitvector_typet result=to_bitvector_type(sub_subtype);
       result.set_width(src.get_width());
-      return result;
+      return std::move(result);
     }
     else
       return nil_typet();

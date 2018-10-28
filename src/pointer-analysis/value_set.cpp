@@ -207,7 +207,7 @@ exprt value_sett::to_expr(const object_map_dt::value_type &it) const
 
   od.type()=od.object().type();
 
-  return od;
+  return std::move(od);
 }
 
 bool value_sett::make_union(const value_sett::valuest &new_values)
@@ -1666,5 +1666,5 @@ exprt value_sett::make_member(
   const typet &subtype = struct_union_type.component_type(component_name);
   member_exprt member_expr(src, component_name, subtype);
 
-  return member_expr;
+  return std::move(member_expr);
 }

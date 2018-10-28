@@ -269,5 +269,5 @@ exprt c_nondet_symbol_factory(
     init_code.move(input_code);
   }
 
-  return main_symbol_expr;
+  return std::move(main_symbol_expr);
 }

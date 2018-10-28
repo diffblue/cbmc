@@ -1519,7 +1519,7 @@ exprt simplify_exprt::bits2expr(
       m_offset_bits += *m_size;
     }
 
-    return result;
+    return std::move(result);
   }
   else if(type.id()==ID_array)
   {
@@ -1547,7 +1547,7 @@ exprt simplify_exprt::bits2expr(
       result.move_to_operands(el);
     }
 
-    return result;
+    return std::move(result);
   }
 
   return nil_exprt();

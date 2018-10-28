@@ -299,7 +299,7 @@ jsont dep_graph_domaint::output_json(
     link["type"]=json_stringt("data");
   }
 
-  return graph;
+  return std::move(graph);
 }
 
 void dependence_grapht::add_dep(

@@ -238,7 +238,7 @@ exprt value_set_fit::to_expr(const object_map_dt::value_type &it) const
 
   od.type()=od.object().type();
 
-  return od;
+  return std::move(od);
 }
 
 bool value_set_fit::make_union(const value_set_fit::valuest &new_values)

@@ -415,7 +415,7 @@ build_class_name(const std::string &src, const std::string &class_name_prefix)
       // Look for the next generic type info (if it exists)
       f_pos = src.find('<', e_pos + 1);
     } while(f_pos != std::string::npos);
-    return result;
+    return std::move(result);
   }
 
   return java_reference_type(symbol_type);

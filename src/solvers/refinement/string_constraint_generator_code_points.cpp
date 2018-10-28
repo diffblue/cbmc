@@ -112,7 +112,7 @@ exprt pair_value(exprt char1, exprt char2, typet return_type)
   mult_exprt m1(mod_exprt(char1, hex0800), hex0400);
   mod_exprt m2(char2, hex0400);
   plus_exprt pair_value(hex010000, plus_exprt(m1, m2));
-  return pair_value;
+  return std::move(pair_value);
 }
 
 /// add axioms corresponding to the String.codePointAt java function

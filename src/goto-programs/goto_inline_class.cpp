@@ -911,5 +911,5 @@ jsont goto_inlinet::goto_inline_logt::output_inline_log_json() const
     json_new.push_back()=json_numbert(std::to_string(end->location_number));
   }
 
-  return json_result;
+  return std::move(json_result);
 }

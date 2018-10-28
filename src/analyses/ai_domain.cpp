@@ -19,7 +19,7 @@ jsont ai_domain_baset::output_json(const ai_baset &ai, const namespacet &ns)
   std::ostringstream out;
   output(out, ai, ns);
   json_stringt json(out.str());
-  return json;
+  return std::move(json);
 }
 
 xmlt ai_domain_baset::output_xml(const ai_baset &ai, const namespacet &ns) const

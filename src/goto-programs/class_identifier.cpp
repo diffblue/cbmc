@@ -41,7 +41,7 @@ static exprt build_class_identifier(
     if(first_member_name=="@class_identifier")
     {
       // found it
-      return member_expr;
+      return std::move(member_expr);
     }
     else
     {

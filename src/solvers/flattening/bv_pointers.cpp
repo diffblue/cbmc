@@ -647,7 +647,7 @@ exprt bv_pointerst::bv_get_rec(
   result.copy_to_operands(
     pointer_logic.pointer_expr(pointer, to_pointer_type(type)));
 
-  return result;
+  return std::move(result);
 }
 
 void bv_pointerst::encode(std::size_t addr, bvt &bv)
