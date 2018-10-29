@@ -51,7 +51,7 @@ void goto_symext::vcc(
   const std::string &msg,
   statet &state)
 {
-  total_vccs++;
+  state.total_vccs++;
 
   exprt expr=vcc_expr;
 
@@ -69,7 +69,7 @@ void goto_symext::vcc(
 
   state.guard.guard_expr(expr);
 
-  remaining_vccs++;
+  state.remaining_vccs++;
   target.assertion(state.guard.as_expr(), expr, msg, state.source);
 }
 
@@ -149,6 +149,10 @@ void goto_symext::symex_threaded_step(
   statet &state, const get_goto_functiont &get_goto_function)
 {
   symex_step(get_goto_function, state);
+
+  _total_vccs = state.total_vccs;
+  _remaining_vccs = state.remaining_vccs;
+
   if(should_pause_symex)
     return;
 

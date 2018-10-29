@@ -60,8 +60,6 @@ public:
       doing_path_exploration(options.is_set("paths")),
       allow_pointer_unsoundness(
         options.get_bool_option("allow-pointer-unsoundness")),
-      total_vccs(0),
-      remaining_vccs(0),
       constant_propagation(true),
       self_loops_to_assumptions(true),
       language_mode(),
@@ -71,7 +69,9 @@ public:
       atomic_section_counter(0),
       log(mh),
       guard_identifier("goto_symex::\\guard"),
-      path_storage(path_storage)
+      path_storage(path_storage),
+      _total_vccs(std::numeric_limits<unsigned>::max()),
+      _remaining_vccs(std::numeric_limits<unsigned>::max())
   {
   }
 
@@ -208,9 +208,6 @@ protected:
 public:
   // these bypass the target maps
   virtual void symex_step_goto(statet &, bool taken);
-
-  // statistics
-  unsigned total_vccs, remaining_vccs;
 
   bool constant_propagation;
   bool self_loops_to_assumptions;
@@ -466,6 +463,36 @@ protected:
   void rewrite_quantifiers(exprt &, statet &);
 
   path_storaget &path_storage;
+
+protected:
+  /// @{\name Statistics
+  ///
+  /// The actual number of total and remaining VCCs should be assigned to
+  /// the relevant members of goto_symex_statet. The members below are used to
+  /// cache the values from goto_symex_statet after symex has ended, so that
+  /// \ref bmct can read those values even after the state has been deallocated.
+
+  unsigned _total_vccs, _remaining_vccs;
+  ///@}
+
+public:
+  unsigned get_total_vccs()
+  {
+    INVARIANT(
+      _total_vccs != std::numeric_limits<unsigned>::max(),
+      "symex_threaded_step should have been executed at least once before "
+      "attempting to read total_vccs");
+    return _total_vccs;
+  }
+
+  unsigned get_remaining_vccs()
+  {
+    INVARIANT(
+      _remaining_vccs != std::numeric_limits<unsigned>::max(),
+      "symex_threaded_step should have been executed at least once before "
+      "attempting to read remaining_vccs");
+    return _remaining_vccs;
+  }
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_H

@@ -27,6 +27,8 @@ goto_symex_statet::goto_symex_statet()
   : depth(0),
     symex_target(nullptr),
     atomic_section_id(0),
+    total_vccs(0),
+    remaining_vccs(0),
     record_events(true),
     dirty()
 {
