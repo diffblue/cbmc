@@ -26,6 +26,7 @@ SRC = bytecode_info.cpp \
       java_entry_point.cpp \
       java_local_variable_table.cpp \
       java_object_factory.cpp \
+      java_object_factory_parameters.cpp \
       java_pointer_casts.cpp \
       java_qualifiers.cpp \
       java_root_class.cpp \
@@ -35,7 +36,6 @@ SRC = bytecode_info.cpp \
       java_types.cpp \
       java_utils.cpp \
       load_method_by_regex.cpp \
-      object_factory_parameters.cpp \
       mz_zip_archive.cpp \
       remove_exceptions.cpp \
       remove_instanceof.cpp \

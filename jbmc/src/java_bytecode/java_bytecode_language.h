@@ -13,9 +13,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ci_lazy_methods.h"
 #include "ci_lazy_methods_needed.h"
 #include "java_class_loader.h"
+#include "java_object_factory_parameters.h"
 #include "java_static_initializers.h"
 #include "java_string_library_preprocess.h"
-#include "object_factory_parameters.h"
 #include "select_pointer_type.h"
 #include "synthetic_methods_map.h"
 
@@ -179,7 +179,7 @@ protected:
   java_class_loadert java_class_loader;
   bool threading_support;
   bool assume_inputs_non_null;      // assume inputs variables to be non-null
-  object_factory_parameterst object_factory_parameters;
+  java_object_factory_parameterst object_factory_parameters;
   size_t max_user_array_length;     // max size for user code created arrays
   method_bytecodet method_bytecode;
   lazy_methods_modet lazy_methods_mode;

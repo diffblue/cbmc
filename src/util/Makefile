@@ -48,6 +48,7 @@ SRC = arith_tools.cpp \
       mp_arith.cpp \
       namespace.cpp \
       nondet.cpp \
+      object_factory_parameters.cpp \
       options.cpp \
       parse_options.cpp \
       parser.cpp \

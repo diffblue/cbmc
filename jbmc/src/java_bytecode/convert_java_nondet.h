@@ -20,7 +20,7 @@ class symbol_table_baset;
 class goto_modelt;
 class goto_model_functiont;
 class message_handlert;
-struct object_factory_parameterst;
+struct java_object_factory_parameterst;
 
 /// Converts side_effect_exprt_nondett expressions using java_object_factory.
 /// For example, NONDET(SomeClass *) may become a nondet choice between a null
@@ -40,12 +40,12 @@ void convert_nondet(
   goto_functionst &goto_functions,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  const object_factory_parameterst &object_factory_parameters);
+  const java_object_factory_parameterst &object_factory_parameters);
 
 void convert_nondet(
   goto_modelt &,
   message_handlert &,
-  const object_factory_parameterst &object_factory_parameters);
+  const java_object_factory_parameterst &object_factory_parameters);
 
 /// Converts side_effect_exprt_nondett expressions using java_object_factory.
 /// For example, NONDET(SomeClass *) may become a nondet choice between a null
@@ -64,7 +64,7 @@ void convert_nondet(
 void convert_nondet(
   goto_model_functiont &function,
   message_handlert &message_handler,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const irep_idt &mode);
 
 #endif // CPROVER_JAVA_BYTECODE_CONVERT_NONDET_H

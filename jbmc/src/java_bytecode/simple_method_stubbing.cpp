@@ -26,7 +26,7 @@ public:
   java_simple_method_stubst(
     symbol_table_baset &_symbol_table,
     bool _assume_non_null,
-    const object_factory_parameterst &_object_factory_parameters,
+    const java_object_factory_parameterst &_object_factory_parameters,
     message_handlert &_message_handler)
     : symbol_table(_symbol_table),
       assume_non_null(_assume_non_null),
@@ -52,7 +52,7 @@ public:
 protected:
   symbol_table_baset &symbol_table;
   bool assume_non_null;
-  const object_factory_parameterst &object_factory_parameters;
+  const java_object_factory_parameterst &object_factory_parameters;
   message_handlert &message_handler;
 };
 
@@ -110,7 +110,7 @@ void java_simple_method_stubst::create_method_stub_at(
   if(is_constructor)
     to_init = dereference_exprt(to_init, expected_base);
 
-  object_factory_parameterst parameters = object_factory_parameters;
+  java_object_factory_parameterst parameters = object_factory_parameters;
   if(assume_non_null)
     parameters.min_null_tree_depth = 1;
 
@@ -198,7 +198,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
       const exprt &to_return = to_return_symbol.symbol_expr();
       if(to_return_symbol.type.id() != ID_pointer)
       {
-        object_factory_parameterst parameters = object_factory_parameters;
+        java_object_factory_parameterst parameters = object_factory_parameters;
         if(assume_non_null)
           parameters.min_null_tree_depth = 1;
 
@@ -255,7 +255,7 @@ void java_generate_simple_method_stub(
   const irep_idt &function_name,
   symbol_table_baset &symbol_table,
   bool assume_non_null,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   message_handlert &message_handler)
 {
   java_simple_method_stubst stub_generator(
@@ -276,7 +276,7 @@ void java_generate_simple_method_stub(
 void java_generate_simple_method_stubs(
   symbol_table_baset &symbol_table,
   bool assume_non_null,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   message_handlert &message_handler)
 {
   // The intent here is to apply stub_generator.check_method_stub() to
