@@ -178,12 +178,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     typecheck_c_bit_field_type(to_c_bit_field_type(type));
   }
-  else if(type.id()==ID_unsignedbv ||
-          type.id()==ID_signedbv ||
-          type.id()==ID_bool ||
-          type.id()==ID_floatbv ||
-          type.id()==ID_fixedbv ||
-          type.id()==ID_empty)
+  else if(
+    type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
+    type.id() == ID_bool || type.id() == ID_c_bool || type.id() == ID_floatbv ||
+    type.id() == ID_fixedbv || type.id() == ID_empty)
   {
   }
   else if(type.id() == ID_symbol_type)
