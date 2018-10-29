@@ -3237,7 +3237,8 @@ void java_bytecode_convert_methodt::save_stack_entries(
     }
     if(replace)
     {
-      create_stack_tmp_var(tmp_var_prefix, tmp_var_type, block, stack_entry);
+      create_stack_tmp_var(
+          tmp_var_prefix, stack_entry.type(), block, stack_entry);
     }
   }
 }
