@@ -1212,7 +1212,7 @@ void java_object_factoryt::gen_nondet_init(
   {
     // types different from pointer or structure:
     // bool, int, float, byte, char, ...
-    exprt rhs = type.id() == ID_c_bool ? get_nondet_bool(type)
+    exprt rhs = type.id() == ID_c_bool ? get_nondet_bool(type, loc)
                                        : side_effect_expr_nondett(type, loc);
     code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
