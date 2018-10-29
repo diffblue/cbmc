@@ -17,6 +17,195 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include <analyses/ai.h>
 
+struct static_verifier_resultt
+{
+  // clang-format off
+  enum { TRUE, FALSE, BOTTOM, UNKNOWN } status;
+  // clang-format on
+  source_locationt source_location;
+  irep_idt function_id;
+};
+
+static void static_verifier_json(
+  const std::vector<static_verifier_resultt> &results,
+  messaget &m,
+  std::ostream &out)
+{
+  m.status() << "Writing JSON report" << messaget::eom;
+
+  json_arrayt json_result;
+
+  for(const auto &result : results)
+  {
+    json_objectt &j = json_result.push_back().make_object();
+
+    switch(result.status)
+    {
+    case static_verifier_resultt::TRUE:
+      j["status"] = json_stringt("SUCCESS");
+      break;
+
+    case static_verifier_resultt::FALSE:
+      j["status"] = json_stringt("FAILURE (if reachable)");
+      break;
+
+    case static_verifier_resultt::BOTTOM:
+      j["status"] = json_stringt("SUCCESS (unreachable)");
+      break;
+
+    case static_verifier_resultt::UNKNOWN:
+      j["status"] = json_stringt("UNKNOWN");
+      break;
+    }
+
+    j["sourceLocation"] = json(result.source_location);
+  }
+
+  out << json_result;
+}
+
+static void static_verifier_xml(
+  const std::vector<static_verifier_resultt> &results,
+  messaget &m,
+  std::ostream &out)
+{
+  m.status() << "Writing XML report" << messaget::eom;
+
+  xmlt xml_result;
+
+  for(const auto &result : results)
+  {
+    xmlt &x = xml_result.new_element("result");
+
+    switch(result.status)
+    {
+    case static_verifier_resultt::TRUE:
+      x.set_attribute("status", "SUCCESS");
+      break;
+
+    case static_verifier_resultt::FALSE:
+      x.set_attribute("status", "FAILURE (if reachable)");
+      break;
+
+    case static_verifier_resultt::BOTTOM:
+      x.set_attribute("status", "SUCCESS (unreachable)");
+      break;
+
+    case static_verifier_resultt::UNKNOWN:
+      x.set_attribute("status", "UNKNOWN");
+    }
+
+    x.set_attribute("file", id2string(result.source_location.get_file()));
+    x.set_attribute("line", id2string(result.source_location.get_line()));
+    x.set_attribute(
+      "description", id2string(result.source_location.get_comment()));
+  }
+
+  out << xml_result;
+}
+
+static void static_verifier_text(
+  const std::vector<static_verifier_resultt> &results,
+  const namespacet &ns,
+  messaget &m,
+  std::ostream &out)
+{
+  irep_idt last_function_id;
+
+  for(const auto &result : results)
+  {
+    if(last_function_id != result.function_id)
+    {
+      if(!last_function_id.empty())
+        out << '\n';
+      last_function_id = result.function_id;
+      const auto &symbol = ns.lookup(last_function_id);
+      out << "******** Function " << symbol.display_name() << '\n';
+    }
+
+    out << '[' << result.source_location.get_property_id() << ']' << ' ';
+
+    out << result.source_location;
+
+    if(!result.source_location.get_comment().empty())
+      out << ", " << result.source_location.get_comment();
+
+    out << ": ";
+
+    switch(result.status)
+    {
+    case static_verifier_resultt::TRUE:
+      out << "Success";
+      break;
+
+    case static_verifier_resultt::FALSE:
+      out << "Failure (if reachable)";
+      break;
+
+    case static_verifier_resultt::BOTTOM:
+      out << "Success (unreachable)";
+      break;
+
+    case static_verifier_resultt::UNKNOWN:
+      out << "Unknown";
+      break;
+    }
+
+    out << '\n';
+  }
+}
+
+static void static_verifier_console(
+  const std::vector<static_verifier_resultt> &results,
+  const namespacet &ns,
+  messaget &m,
+  std::ostream &out)
+{
+  irep_idt last_function_id;
+
+  for(const auto &result : results)
+  {
+    if(last_function_id != result.function_id)
+    {
+      if(!last_function_id.empty())
+        out << '\n';
+      last_function_id = result.function_id;
+      const auto &symbol = ns.lookup(last_function_id);
+      out << "******** Function " << symbol.display_name() << '\n';
+    }
+
+    m.result() << '[' << result.source_location.get_property_id() << ']' << ' ';
+
+    m.result() << result.source_location;
+
+    if(!result.source_location.get_comment().empty())
+      m.result() << ", " << result.source_location.get_comment();
+
+    m.result() << ": ";
+
+    switch(result.status)
+    {
+    case static_verifier_resultt::TRUE:
+      m.result() << m.green << "SUCCESS" << m.reset;
+      break;
+
+    case static_verifier_resultt::FALSE:
+      m.result() << m.red << "FAILURE" << m.reset << " (if reachable)";
+      break;
+
+    case static_verifier_resultt::BOTTOM:
+      m.result() << m.green << "SUCCESS" << m.reset << " (unreachable)";
+      break;
+
+    case static_verifier_resultt::UNKNOWN:
+      m.result() << m.yellow << "UNKNOWN" << m.reset;
+      break;
+    }
+
+    m.result() << messaget::eom;
+  }
+}
+
 /// Runs the analyzer and then prints out the domain
 /// \param goto_model: the program analyzed
 /// \param ai: the abstract interpreter after it has been run to fix point
@@ -38,16 +227,7 @@ bool static_verifier(
   messaget m(message_handler);
   m.status() << "Checking assertions" << messaget::eom;
 
-  struct resultt
-  {
-    // clang-format off
-    enum { TRUE, FALSE, BOTTOM, UNKNOWN } status;
-    // clang-format on
-    source_locationt source_location;
-    irep_idt function_id;
-  };
-
-  std::vector<resultt> results;
+  std::vector<static_verifier_resultt> results;
 
   for(const auto &f : goto_model.goto_functions.function_map)
   {
@@ -68,27 +248,27 @@ bool static_verifier(
       const ai_domain_baset &domain(*dp);
       domain.ai_simplify(e, ns);
 
-      results.push_back(resultt());
+      results.push_back(static_verifier_resultt());
       auto &result = results.back();
 
       if(e.is_true())
       {
-        result.status = resultt::TRUE;
+        result.status = static_verifier_resultt::TRUE;
         ++pass;
       }
       else if(e.is_false())
       {
-        result.status = resultt::FALSE;
+        result.status = static_verifier_resultt::FALSE;
         ++fail;
       }
       else if(domain.is_bottom())
       {
-        result.status = resultt::BOTTOM;
+        result.status = static_verifier_resultt::BOTTOM;
         ++pass;
       }
       else
       {
-        result.status = resultt::UNKNOWN;
+        result.status = static_verifier_resultt::UNKNOWN;
         ++unknown;
       }
 
@@ -99,167 +279,19 @@ bool static_verifier(
 
   if(options.get_bool_option("json"))
   {
-    m.status() << "Writing JSON report" << messaget::eom;
-
-    json_arrayt json_result;
-
-    for(const auto &result : results)
-    {
-      json_objectt &j = json_result.push_back().make_object();
-
-      switch(result.status)
-      {
-      case resultt::TRUE:
-        j["status"] = json_stringt("SUCCESS");
-        break;
-
-      case resultt::FALSE:
-        j["status"] = json_stringt("FAILURE (if reachable)");
-        break;
-
-      case resultt::BOTTOM:
-        j["status"] = json_stringt("SUCCESS (unreachable)");
-        break;
-
-      case resultt::UNKNOWN:
-        j["status"] = json_stringt("UNKNOWN");
-        ++unknown;
-        break;
-      }
-
-      j["sourceLocation"] = json(result.source_location);
-    }
-
-    out << json_result;
+    static_verifier_json(results, m, out);
   }
   else if(options.get_bool_option("xml"))
   {
-    m.status() << "Writing XML report" << messaget::eom;
-
-    xmlt xml_result;
-
-    for(const auto &result : results)
-    {
-      xmlt &x = xml_result.new_element("result");
-
-      switch(result.status)
-      {
-      case resultt::TRUE:
-        x.set_attribute("status", "SUCCESS");
-        break;
-
-      case resultt::FALSE:
-        x.set_attribute("status", "FAILURE (if reachable)");
-        break;
-
-      case resultt::BOTTOM:
-        x.set_attribute("status", "SUCCESS (unreachable)");
-        break;
-
-      case resultt::UNKNOWN:
-        x.set_attribute("status", "UNKNOWN");
-      }
-
-      x.set_attribute("file", id2string(result.source_location.get_file()));
-      x.set_attribute("line", id2string(result.source_location.get_line()));
-      x.set_attribute(
-        "description", id2string(result.source_location.get_comment()));
-    }
-
-    out << xml_result;
+    static_verifier_xml(results, m, out);
   }
   else if(options.get_bool_option("text"))
   {
-    irep_idt last_function_id;
-
-    for(const auto &result : results)
-    {
-      if(last_function_id != result.function_id)
-      {
-        if(!last_function_id.empty())
-          out << '\n';
-        last_function_id = result.function_id;
-        const auto &symbol = ns.lookup(last_function_id);
-        out << "******** Function " << symbol.display_name() << '\n';
-      }
-
-      out << '[' << result.source_location.get_property_id() << ']' << ' ';
-
-      out << result.source_location;
-
-      if(!result.source_location.get_comment().empty())
-        out << ", " << result.source_location.get_comment();
-
-      out << ": ";
-
-      switch(result.status)
-      {
-      case resultt::TRUE:
-        out << "Success";
-        break;
-
-      case resultt::FALSE:
-        out << "Failure (if reachable)";
-        break;
-
-      case resultt::BOTTOM:
-        out << "Success (unreachable)";
-        break;
-
-      case resultt::UNKNOWN:
-        out << "Unknown";
-        break;
-      }
-
-      out << '\n';
-    }
+    static_verifier_text(results, ns, m, out);
   }
   else
   {
-    irep_idt last_function_id;
-
-    for(const auto &result : results)
-    {
-      if(last_function_id != result.function_id)
-      {
-        if(!last_function_id.empty())
-          out << '\n';
-        last_function_id = result.function_id;
-        const auto &symbol = ns.lookup(last_function_id);
-        out << "******** Function " << symbol.display_name() << '\n';
-      }
-
-      m.result() << '[' << result.source_location.get_property_id() << ']'
-                 << ' ';
-
-      m.result() << result.source_location;
-
-      if(!result.source_location.get_comment().empty())
-        m.result() << ", " << result.source_location.get_comment();
-
-      m.result() << ": ";
-
-      switch(result.status)
-      {
-      case resultt::TRUE:
-        m.result() << m.green << "SUCCESS" << m.reset;
-        break;
-
-      case resultt::FALSE:
-        m.result() << m.red << "FAILURE" << m.reset << " (if reachable)";
-        break;
-
-      case resultt::BOTTOM:
-        m.result() << m.green << "SUCCESS" << m.reset << " (unreachable)";
-        break;
-
-      case resultt::UNKNOWN:
-        m.result() << m.yellow << "UNKNOWN" << m.reset;
-        break;
-      }
-
-      m.result() << messaget::eom;
-    }
+    static_verifier_console(results, ns, m, out);
   }
 
   m.status() << m.bold << "Summary: "
