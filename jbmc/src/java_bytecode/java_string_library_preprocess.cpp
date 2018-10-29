@@ -33,7 +33,7 @@ Date:   April 2017
 
 /// \return tag of a struct prefixed by "java::" or symbolic tag
 /// empty string if not symbol or struct
-irep_idt get_tag(const typet &type)
+static irep_idt get_tag(const typet &type)
 {
   /// \todo Use follow instead of assuming tag to symbol relationship.
   if(type.id() == ID_symbol_type)
@@ -169,7 +169,7 @@ bool java_string_library_preprocesst::is_java_char_array_pointer_type(
 }
 
 /// \return the type of the length field in java Strings.
-typet string_length_type()
+static typet string_length_type()
 {
   return java_int_type();
 }
