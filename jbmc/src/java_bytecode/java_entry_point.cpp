@@ -193,13 +193,18 @@ static void java_static_lifetime_init(
         // First initialize the object as prior to a constructor:
         namespacet ns(symbol_table);
 
-        exprt zero_object =
-          zero_initializer(
-            sym.type, source_locationt(), ns, message_handler);
+        auto zero_object = zero_initializer(sym.type, source_locationt(), ns);
+        if(!zero_object.has_value())
+        {
+          messaget message(message_handler);
+          message.error() << "failed to zero-initialize " << sym.name
+                          << messaget::eom;
+          throw 0;
+        }
         set_class_identifier(
-          to_struct_expr(zero_object), ns, to_symbol_type(sym.type));
+          to_struct_expr(*zero_object), ns, to_symbol_type(sym.type));
 
-        code_block.add(code_assignt(sym.symbol_expr(), zero_object));
+        code_block.add(code_assignt(sym.symbol_expr(), *zero_object));
 
         // Then call the init function:
         code_block.move(initializer_call);

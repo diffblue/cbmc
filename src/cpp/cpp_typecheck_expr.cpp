@@ -870,15 +870,18 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
   {
     // Default value, e.g., int()
     typecheck_type(expr.type());
-    exprt new_expr=
-      ::zero_initializer(
-        expr.type(),
-        expr.find_source_location(),
-        *this,
-        get_message_handler());
+    auto new_expr =
+      ::zero_initializer(expr.type(), expr.find_source_location(), *this);
+    if(!new_expr.has_value())
+    {
+      err_location(expr.find_source_location());
+      error() << "cannot zero-initialize `" << to_string(expr.type()) << "'"
+              << eom;
+      throw 0;
+    }
 
-    new_expr.add_source_location()=expr.source_location();
-    expr=new_expr;
+    new_expr->add_source_location() = expr.source_location();
+    expr = *new_expr;
   }
   else if(expr.operands().size()==1)
   {

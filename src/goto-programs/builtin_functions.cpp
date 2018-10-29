@@ -1192,13 +1192,10 @@ void goto_convertt::do_function_call_symbol(
     {
       goto_programt::targett t=dest.add_instruction(ASSIGN);
       t->source_location=function.source_location();
-      exprt zero=
-        zero_initializer(
-          dest_expr.type(),
-          function.source_location(),
-          ns,
-          get_message_handler());
-      t->code=code_assignt(dest_expr, zero);
+      const auto zero =
+        zero_initializer(dest_expr.type(), function.source_location(), ns);
+      CHECK_RETURN(zero.has_value());
+      t->code = code_assignt(dest_expr, *zero);
     }
   }
   else if(identifier=="__sync_fetch_and_add" ||

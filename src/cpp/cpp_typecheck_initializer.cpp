@@ -306,13 +306,16 @@ void cpp_typecheckt::zero_initializer(
   }
   else
   {
-    exprt value=
-      ::zero_initializer(
-        final_type, source_location, *this, get_message_handler());
+    const auto value = ::zero_initializer(final_type, source_location, *this);
+    if(!value.has_value())
+    {
+      err_location(source_location);
+      error() << "cannot zero-initialize `" << to_string(final_type) << "'"
+              << eom;
+      throw 0;
+    }
 
-    code_assignt assign;
-    assign.lhs()=object;
-    assign.rhs()=value;
+    code_assignt assign(object, *value);
     assign.add_source_location()=source_location;
 
     typecheck_expr(assign.op0());

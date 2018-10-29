@@ -708,12 +708,14 @@ void java_bytecode_convert_classt::convert(
       new_symbol.type.set(ID_C_access, ID_default);
 
     const namespacet ns(symbol_table);
-    new_symbol.value=
-      zero_initializer(
-        field_type,
-        class_symbol.location,
-        ns,
-        get_message_handler());
+    const auto value = zero_initializer(field_type, class_symbol.location, ns);
+    if(!value.has_value())
+    {
+      error().source_location = class_symbol.location;
+      error() << "failed to zero-initialize " << f.name << eom;
+      throw 0;
+    }
+    new_symbol.value = *value;
 
     // Load annotations
     if(!f.annotations.empty())
