@@ -15,6 +15,7 @@ Author: Diffblue Ltd.
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/namespace.h>
+#include <util/nondet_bool.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
@@ -40,15 +41,6 @@ static const symbolt &c_new_tmp_symbol(
   tmp_symbol.is_static_lifetime=static_lifetime;
 
   return tmp_symbol;
-}
-
-/// \param type: Desired type (C_bool or plain bool)
-/// \param loc: source location
-/// \return nondet expr of that type
-static exprt c_get_nondet_bool(const typet &type, const source_locationt &loc)
-{
-  // We force this to 0 and 1 and won't consider other values
-  return typecast_exprt(side_effect_expr_nondett(bool_typet(), loc), type);
 }
 
 class symbol_factoryt
@@ -188,7 +180,7 @@ void symbol_factoryt::gen_nondet_init(
     //   <expr> = NONDET(_BOOL);
     // Else add the following code to assignments:
     //   <expr> = NONDET(type);
-    exprt rhs = type.id() == ID_c_bool ? c_get_nondet_bool(type, loc)
+    exprt rhs = type.id() == ID_c_bool ? get_nondet_bool(type, loc)
                                        : side_effect_expr_nondett(type, loc);
     code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;

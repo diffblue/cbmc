@@ -18,9 +18,8 @@ Author: Chris Smowton, chris@smowton.net
 /// \param type desired type (C_bool or plain bool)
 /// \param source_location source location
 /// \return nondet expr of that type
-inline exprt get_nondet_bool(
-  const typet &type,
-  const source_locationt &source_location)
+inline exprt
+get_nondet_bool(const typet &type, const source_locationt &source_location)
 {
   // We force this to 0 and 1 and won't consider
   // other values.
