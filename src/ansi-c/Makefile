@@ -13,6 +13,7 @@ SRC = anonymous_member.cpp \
       builtin_factory.cpp \
       c_misc.cpp \
       c_nondet_symbol_factory.cpp \
+      c_object_factory_parameters.cpp \
       c_preprocess.cpp \
       c_qualifiers.cpp \
       c_storage_spec.cpp \
