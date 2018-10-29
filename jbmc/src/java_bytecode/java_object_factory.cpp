@@ -860,8 +860,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
 
   auto set_null_inst=get_null_assignment(expr, pointer_type);
 
-  const bool allow_null =
-    depth > object_factory_parameters.max_nonnull_tree_depth;
+  const bool allow_null = depth > object_factory_parameters.min_null_tree_depth;
 
   if(must_be_null)
   {

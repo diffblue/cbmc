@@ -100,7 +100,7 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
     const auto &nondet_expr = to_side_effect_expr_nondet(op);
 
     if(!nondet_expr.get_nullable())
-      object_factory_parameters.max_nonnull_tree_depth = 1;
+      object_factory_parameters.min_null_tree_depth = 1;
 
     const source_locationt &source_loc = target->source_location;
 

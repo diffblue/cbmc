@@ -219,7 +219,7 @@ static void java_static_lifetime_init(
 
         object_factory_parameterst parameters = object_factory_parameters;
         if(not_allow_null && !is_class_model)
-          parameters.max_nonnull_tree_depth = 1;
+          parameters.min_null_tree_depth = 1;
 
         gen_nondet_init(
           sym.symbol_expr(),
@@ -309,10 +309,10 @@ exprt::operandst java_build_arguments(
     object_factory_parameterst parameters = object_factory_parameters;
     // only pointer must be non-null
     if(assume_init_pointers_not_null || is_this)
-      parameters.max_nonnull_tree_depth = 1;
+      parameters.min_null_tree_depth = 1;
     // in main() also the array elements of the argument must be non-null
     if(is_main)
-      parameters.max_nonnull_tree_depth = 2;
+      parameters.min_null_tree_depth = 2;
 
     parameters.function_id = goto_functionst::entry_point();
 

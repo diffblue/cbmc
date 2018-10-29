@@ -110,7 +110,7 @@ void java_simple_method_stubst::create_method_stub_at(
 
   object_factory_parameterst parameters = object_factory_parameters;
   if(assume_non_null)
-    parameters.max_nonnull_tree_depth = 1;
+    parameters.min_null_tree_depth = 1;
 
   // Generate new instructions.
   code_blockt new_instructions;
@@ -198,7 +198,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
       {
         object_factory_parameterst parameters = object_factory_parameters;
         if(assume_non_null)
-          parameters.max_nonnull_tree_depth = 1;
+          parameters.min_null_tree_depth = 1;
 
         gen_nondet_init(
           to_return,

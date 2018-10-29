@@ -248,11 +248,10 @@ static void clinit_wrapper_do_recursive_calls(
       const symbol_exprt new_global_symbol =
         symbol_table.lookup_ref(id).symbol_expr();
 
-      parameters.max_nonnull_tree_depth =
+      parameters.min_null_tree_depth =
         is_non_null_library_global(id)
-          ? std::max(
-              size_t(1), object_factory_parameters.max_nonnull_tree_depth)
-          : object_factory_parameters.max_nonnull_tree_depth;
+          ? std::max(size_t(1), object_factory_parameters.min_null_tree_depth)
+          : object_factory_parameters.min_null_tree_depth;
 
       gen_nondet_init(
         new_global_symbol,
@@ -872,10 +871,10 @@ codet stub_global_initializer_factoryt::get_stub_initializer_body(
     const symbol_exprt new_global_symbol =
       symbol_table.lookup_ref(it->second).symbol_expr();
 
-    parameters.max_nonnull_tree_depth =
+    parameters.min_null_tree_depth =
       is_non_null_library_global(it->second)
-        ? object_factory_parameters.max_nonnull_tree_depth + 1
-        : object_factory_parameters.max_nonnull_tree_depth;
+        ? object_factory_parameters.min_null_tree_depth + 1
+        : object_factory_parameters.min_null_tree_depth;
 
     source_locationt location;
     location.set_function(function_id);
