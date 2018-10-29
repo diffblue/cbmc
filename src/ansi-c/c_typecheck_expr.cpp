@@ -985,6 +985,12 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
     error() << "sizeof cannot be applied to bit fields" << eom;
     throw 0;
   }
+  else if(type.id() == ID_bool)
+  {
+    err_location(expr);
+    error() << "sizeof cannot be applied to single bits" << eom;
+    throw 0;
+  }
   else if(type.id() == ID_empty)
   {
     // This is a gcc extension.
@@ -1737,6 +1743,13 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
   {
     err_location(expr);
     error() << "cannot take address of a bit field" << eom;
+    throw 0;
+  }
+
+  if(op.type().id() == ID_bool)
+  {
+    err_location(expr);
+    error() << "cannot take address of a single bit" << eom;
     throw 0;
   }
 
