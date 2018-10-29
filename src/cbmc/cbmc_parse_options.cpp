@@ -109,6 +109,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   }
 
   cbmc_parse_optionst::set_default_options(options);
+  parse_c_object_factory_options(cmdline, options);
 
   if(cmdline.isset("cover") && cmdline.isset("unwinding-assertions"))
   {
@@ -933,6 +934,10 @@ void cbmc_parse_optionst::help()
     " --round-to-plus-inf          rounding towards plus infinity\n"
     " --round-to-minus-inf         rounding towards minus infinity\n"
     " --round-to-zero              rounding towards zero\n"
+    " --max-nondet-tree-depth N    limit size of nondet (e.g. input) object tree;\n" /* NOLINT(*) */ \
+    "                              at level N pointers are set to null\n" /* NOLINT(*) */ \
+    " --min-null-tree-depth N      minimum level at which a pointer can first be\n" /* NOLINT(*) */ \
+    "                              NULL in a recursively nondet initialized struct\n" /* NOLINT(*) */ \
     HELP_FUNCTIONS
     "\n"
     "Program representations:\n"

@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CBMC_CBMC_PARSE_OPTIONS_H
 #define CPROVER_CBMC_CBMC_PARSE_OPTIONS_H
 
+#include <ansi-c/c_object_factory_parameters.h>
+
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>
@@ -75,6 +77,7 @@ class optionst;
   "(localize-faults)(localize-faults-method):" \
   OPT_GOTO_TRACE \
   OPT_VALIDATE \
+  "(max-nondet-tree-depth):" \
   "(claim):(show-claims)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 // clang-format on
 
