@@ -120,7 +120,7 @@ public:
 protected:
   ui_message_handlert ui_message_handler;
   path_strategy_choosert path_strategy_chooser;
-  object_factory_parameterst object_factory_params;
+  java_object_factory_parameterst object_factory_params;
   bool stub_objects_are_not_null;
 
   std::unique_ptr<class_hierarchyt> class_hierarchy;

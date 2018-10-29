@@ -94,7 +94,7 @@ exprt object_factory(
   const irep_idt base_name,
   code_blockt &init_code,
   symbol_table_baset &symbol_table,
-  object_factory_parameterst parameters,
+  java_object_factory_parameterst parameters,
   allocation_typet alloc_type,
   const source_locationt &location,
   const select_pointer_typet &pointer_type_selector);
@@ -104,7 +104,7 @@ exprt object_factory(
   const irep_idt base_name,
   code_blockt &init_code,
   symbol_tablet &symbol_table,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   allocation_typet alloc_type,
   const source_locationt &location);
 
@@ -122,7 +122,7 @@ void gen_nondet_init(
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   update_in_placet update_in_place);
 
@@ -133,7 +133,7 @@ void gen_nondet_init(
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   update_in_placet update_in_place);
 
 exprt allocate_dynamic_object(

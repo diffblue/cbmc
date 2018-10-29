@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Java Object Factory
+Module: Object Factory
 
 Author: Diffblue Ltd
 
