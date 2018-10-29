@@ -22,27 +22,6 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/goto_functions.h>
 
-/// Create a new temporary static symbol
-/// \param symbol_table: The symbol table to create the symbol in
-/// \param loc: The location to assign to the symbol
-/// \param type: The type of symbol to create
-/// \param static_lifetime: Whether the symbol should have a static lifetime
-/// \param prefix: The prefix to use for the symbol's basename
-/// \return Returns a reference to the new symbol
-static const symbolt &c_new_tmp_symbol(
-  symbol_tablet &symbol_table,
-  const source_locationt &loc,
-  const typet &type,
-  const bool static_lifetime,
-  const std::string &prefix="tmp")
-{
-  symbolt &tmp_symbol = get_fresh_aux_symbol(
-    type, id2string(loc.get_function()), prefix, loc, ID_C, symbol_table);
-  tmp_symbol.is_static_lifetime=static_lifetime;
-
-  return tmp_symbol;
-}
-
 class symbol_factoryt
 {
   std::vector<const symbolt *> &symbols_created;
@@ -87,12 +66,14 @@ exprt symbol_factoryt::allocate_object(
   const typet &allocate_type,
   const bool static_lifetime)
 {
-  const symbolt &aux_symbol=
-    c_new_tmp_symbol(
-      symbol_table,
-      loc,
-      allocate_type,
-      static_lifetime);
+  symbolt &aux_symbol = get_fresh_aux_symbol(
+    allocate_type,
+    id2string(loc.get_function()),
+    "tmp",
+    loc,
+    ID_C,
+    symbol_table);
+  aux_symbol.is_static_lifetime = static_lifetime;
   symbols_created.push_back(&aux_symbol);
 
   const typet &allocate_type_resolved=ns.follow(allocate_type);
