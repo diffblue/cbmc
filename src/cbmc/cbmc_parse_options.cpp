@@ -109,6 +109,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   }
 
   cbmc_parse_optionst::set_default_options(options);
+  parse_c_object_factory_options(cmdline, options);
 
   if(cmdline.isset("cover") && cmdline.isset("unwinding-assertions"))
   {
@@ -933,6 +934,7 @@ void cbmc_parse_optionst::help()
     " --round-to-plus-inf          rounding towards plus infinity\n"
     " --round-to-minus-inf         rounding towards minus infinity\n"
     " --round-to-zero              rounding towards zero\n"
+    HELP_ANSI_C_LANGUAGE
     HELP_FUNCTIONS
     "\n"
     "Program representations:\n"
