@@ -40,10 +40,8 @@ propt::resultt qbf_qubet::prop_solve()
     return resultt::P_SATISFIABLE;
 
   {
-    messaget::status() <<
-      "QuBE: " <<
-      no_variables() << " variables, " <<
-      no_clauses() << " clauses" << eom;
+    log.status() << "QuBE: " << no_variables() << " variables, " << no_clauses()
+                 << " clauses" << messaget::eom;
   }
 
   std::string qbf_tmp_file="qube.qdimacs";
@@ -95,19 +93,19 @@ propt::resultt qbf_qubet::prop_solve()
 
     if(!result_found)
     {
-      messaget::error() << "QuBE failed: unknown result" << eom;
+      log.error() << "QuBE failed: unknown result" << messaget::eom;
       return resultt::P_ERROR;
     }
   }
 
   if(result)
   {
-    messaget::status() << "QuBE: TRUE" << eom;
+    log.status() << "QuBE: TRUE" << messaget::eom;
     return resultt::P_SATISFIABLE;
   }
   else
   {
-    messaget::status() << "QuBE: FALSE" << eom;
+    log.status() << "QuBE: FALSE" << messaget::eom;
     return resultt::P_UNSATISFIABLE;
   }
 

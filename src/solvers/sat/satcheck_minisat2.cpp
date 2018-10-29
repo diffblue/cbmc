@@ -78,7 +78,7 @@ void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
   }
   catch(Minisat::OutOfMemoryException)
   {
-    messaget::error() << "SAT checker ran out of memory" << eom;
+    log.error() << "SAT checker ran out of memory" << messaget::eom;
     status = statust::ERROR;
     throw std::bad_alloc();
   }
@@ -144,7 +144,7 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
   }
   catch(const Minisat::OutOfMemoryException &)
   {
-    messaget::error() << "SAT checker ran out of memory" << eom;
+    log.error() << "SAT checker ran out of memory" << messaget::eom;
     status = statust::ERROR;
     throw std::bad_alloc();
   }
@@ -167,8 +167,8 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 {
   PRECONDITION(status != statust::ERROR);
 
-  messaget::statistics() << (no_variables() - 1) << " variables, "
-                         << solver->nClauses() << " clauses" << eom;
+  log.statistics() << (no_variables() - 1) << " variables, "
+                   << solver->nClauses() << " clauses" << messaget::eom;
 
   try
   {
@@ -176,8 +176,8 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 
     if(!solver->okay())
     {
-      messaget::status() <<
-        "SAT checker inconsistent: instance is UNSATISFIABLE" << eom;
+      log.status() << "SAT checker inconsistent: instance is UNSATISFIABLE"
+                   << messaget::eom;
     }
     else
     {
@@ -190,8 +190,8 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 
       if(has_false)
       {
-        messaget::status() <<
-          "got FALSE as assumption: instance is UNSATISFIABLE" << eom;
+        log.status() << "got FALSE as assumption: instance is UNSATISFIABLE"
+                     << messaget::eom;
       }
       else
       {
@@ -209,7 +209,7 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
           solver_to_interrupt=solver;
           old_handler=signal(SIGALRM, interrupt_solver);
           if(old_handler==SIG_ERR)
-            warning() << "Failed to set solver time limit" << eom;
+            log.warning() << "Failed to set solver time limit" << messaget::eom;
           else
             alarm(time_limit_seconds);
         }
@@ -227,8 +227,8 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 
         if(time_limit_seconds!=0)
         {
-          messaget::warning() <<
-            "Time limit ignored (not supported on Win32 yet)" << messaget::eom;
+          log.warning() << "Time limit ignored (not supported on Win32 yet)"
+                        << messaget::eom;
         }
 
         lbool solver_result=
@@ -238,21 +238,21 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 
         if(solver_result==l_True)
         {
-          messaget::status() <<
-            "SAT checker: instance is SATISFIABLE" << eom;
+          log.status() << "SAT checker: instance is SATISFIABLE"
+                       << messaget::eom;
           CHECK_RETURN(solver->model.size()>0);
           status=statust::SAT;
           return resultt::P_SATISFIABLE;
         }
         else if(solver_result==l_False)
         {
-          messaget::status() <<
-            "SAT checker: instance is UNSATISFIABLE" << eom;
+          log.status() << "SAT checker: instance is UNSATISFIABLE"
+                       << messaget::eom;
         }
         else
         {
-          messaget::status() <<
-            "SAT checker: timed out or other error" << eom;
+          log.status() << "SAT checker: timed out or other error"
+                       << messaget::eom;
           status=statust::ERROR;
           return resultt::P_ERROR;
         }
@@ -264,8 +264,7 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
   }
   catch(const Minisat::OutOfMemoryException &)
   {
-    messaget::error() <<
-      "SAT checker ran out of memory" << eom;
+    log.error() << "SAT checker ran out of memory" << messaget::eom;
     status=statust::ERROR;
     return resultt::P_ERROR;
   }
@@ -288,7 +287,7 @@ void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
   }
   catch(const Minisat::OutOfMemoryException &)
   {
-    messaget::error() << "SAT checker ran out of memory" << eom;
+    log.error() << "SAT checker ran out of memory" << messaget::eom;
     status = statust::ERROR;
     throw std::bad_alloc();
   }
@@ -342,9 +341,23 @@ satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert():
 {
 }
 
+satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert(
+  message_handlert &message_handler)
+  : satcheck_minisat_no_simplifiert()
+{
+  log.set_message_handler(message_handler);
+}
+
 satcheck_minisat_simplifiert::satcheck_minisat_simplifiert():
   satcheck_minisat2_baset<Minisat::SimpSolver>(new Minisat::SimpSolver)
 {
+}
+
+satcheck_minisat_simplifiert::satcheck_minisat_simplifiert(
+  message_handlert &message_handler)
+  : satcheck_minisat_simplifiert()
+{
+  log.set_message_handler(message_handler);
 }
 
 void satcheck_minisat_simplifiert::set_frozen(literalt a)
@@ -359,7 +372,7 @@ void satcheck_minisat_simplifiert::set_frozen(literalt a)
   }
   catch(const Minisat::OutOfMemoryException &)
   {
-    messaget::error() << "SAT checker ran out of memory" << eom;
+    log.error() << "SAT checker ran out of memory" << messaget::eom;
     status = statust::ERROR;
     throw std::bad_alloc();
   }

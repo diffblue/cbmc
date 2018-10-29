@@ -21,10 +21,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class propt:public messaget
+class propt
 {
 public:
   propt() { }
+
   virtual ~propt() { }
 
   // boolean operators
@@ -113,12 +114,14 @@ public:
   // Resource limits:
   virtual void set_time_limit_seconds(uint32_t)
   {
-    warning() << "CPU limit ignored (not implemented)" << eom;
+    log.warning() << "CPU limit ignored (not implemented)" << messaget::eom;
   }
 
 protected:
   // to avoid a temporary for lcnf(...)
   bvt lcnf_bv;
+
+  messaget log;
 };
 
 #endif // CPROVER_SOLVERS_PROP_PROP_H

@@ -18,6 +18,7 @@ class dimacs_cnft:public cnf_clause_listt
 {
 public:
   dimacs_cnft();
+  explicit dimacs_cnft(message_handlert &);
   virtual ~dimacs_cnft() { }
 
   virtual void write_dimacs_cnf(std::ostream &out);
