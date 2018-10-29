@@ -1,6 +1,7 @@
 CORE
 const-array.c
  ^.*: .* is constant$
+^   array\[1\] = 2;$
 ^EXIT=(1|64)$
 ^SIGNAL=0$
 --
