@@ -1,10 +1,10 @@
 CORE
 main.c
 --property main.assertion.1 --property main.assertion.3
+activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION FAILED
-^.*main.assertion.1.*SUCCESS
-^.*main.assertion.3.*FAILURE
+^VERIFICATION FAILED$
+^main.c function main\n\[main\.assertion\.1\] .* SUCCESS\n\[main\.assertion\.3\] .* FAILURE$
 --
 ^warning: ignoring

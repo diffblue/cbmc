@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "all_properties_class.h"
 
+#include <algorithm>
 #include <chrono>
 
 #include <util/xml.h>
@@ -158,17 +159,63 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
     {
       result() << "\n** Results:" << eom;
 
-      for(const auto &goal_pair : goal_map)
-      {
-        result() << "[" << goal_pair.first << "] "
-                 << goal_pair.second.description << ": ";
+      // collect goals in a vector
+      std::vector<goal_mapt::const_iterator> goals;
 
-        if(goal_pair.second.status == goalt::statust::SUCCESS)
+      for(auto g_it = goal_map.begin(); g_it != goal_map.end(); g_it++)
+        goals.push_back(g_it);
+
+      // now determine an ordering for those goals:
+      // 1. alphabetical ordering of file name
+      // 2. numerical ordering of line number
+      // 3. alphabetical ordering of goal ID
+      std::sort(
+        goals.begin(),
+        goals.end(),
+        [](goal_mapt::const_iterator git1, goal_mapt::const_iterator git2) {
+          const auto &g1 = git1->second.source_location;
+          const auto &g2 = git2->second.source_location;
+          if(g1.get_file() != g2.get_file())
+            return id2string(g1.get_file()) < id2string(g2.get_file());
+          else if(!g1.get_line().empty() && !g2.get_line().empty())
+            return std::stoul(id2string(g1.get_line())) <
+                   std::stoul(id2string(g2.get_line()));
+          else
+            return id2string(git1->first) < id2string(git2->first);
+        });
+
+      // now show in the order we have determined
+
+      irep_idt previous_function;
+      for(const auto &g : goals)
+      {
+        const auto &l = g->second.source_location;
+
+        if(l.get_function() != previous_function)
+        {
+          if(!previous_function.empty())
+            result() << '\n';
+          previous_function = l.get_function();
+          if(!previous_function.empty())
+          {
+            if(!l.get_file().empty())
+              result() << l.get_file() << ' ';
+            if(!l.get_function().empty())
+              result() << "function " << l.get_function();
+            result() << eom;
+          }
+        }
+
+        result() << faint << '[' << g->first << "] " << reset;
+
+        result() << g->second.description << ": ";
+
+        if(g->second.status == goalt::statust::SUCCESS)
           result() << green;
         else
           result() << red;
 
-        result() << goal_pair.second.status_string() << reset << eom;
+        result() << g->second.status_string() << reset << eom;
       }
 
       if(bmc.options.get_bool_option("trace"))

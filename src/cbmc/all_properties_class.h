@@ -40,6 +40,7 @@ public:
       instancest;
     instancest instances;
     std::string description;
+    source_locationt source_location;
 
     // if failed, we compute a goto_trace for the first failing instance
     enum statust { UNKNOWN, FAILURE, SUCCESS, ERROR } status;
@@ -64,6 +65,7 @@ public:
       const goto_programt::instructiont &instruction):
       status(statust::UNKNOWN)
     {
+      source_location = instruction.source_location;
       description=id2string(instruction.source_location.get_comment());
     }
 
