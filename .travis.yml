@@ -9,14 +9,14 @@ jobs:
       addons:
         apt:
           sources:
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-trusty-7
             - ubuntu-toolchain-r-test
           packages:
-            - clang-format-6.0
+            - clang-format-7
       install:
       script: |
-        clang-format-6.0 --version
-        git-clang-format-6.0 --binary clang-format-6.0 "${TRAVIS_BRANCH}"
+        clang-format-7 --version
+        git-clang-format-7 --binary clang-format-7 "${TRAVIS_BRANCH}"
         git diff > formatted.diff
         if [[ -s formatted.diff ]] ; then
           echo 'Formatting error! The following diff shows the required changes'
@@ -143,7 +143,7 @@ jobs:
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
 
-    # Ubuntu Linux with glibc using clang++-6.0, no-debug mode
+    # Ubuntu Linux with glibc using clang++-7, no-debug mode
     - stage: Test different OS/CXX/Flags
       os: linux
       sudo: false
@@ -153,11 +153,11 @@ jobs:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-trusty-7
           packages:
             - libwww-perl
             - g++-5
-            - clang-6.0
+            - clang-7
             - libstdc++-5-dev
             - libubsan0
             - parallel
@@ -166,13 +166,13 @@ jobs:
         - ln -s /usr/bin/gcc-5 bin/gcc
         - ln -s /usr/bin/c++-5 bin/g++
         - export CCACHE_CPP2=yes
-      # env: COMPILER=clang++-6.0 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
+      # env: COMPILER=clang++-7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache /usr/bin/clang++-6.0"
+        - COMPILER="ccache /usr/bin/clang++-7"
         - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DNDEBUG"
         - CCACHE_CPP2=yes
 
-    # Ubuntu Linux with glibc using clang++-6.0, debug mode, disable USE_DSTRING
+    # Ubuntu Linux with glibc using clang++-7, debug mode, disable USE_DSTRING
     - stage: Test different OS/CXX/Flags
       os: linux
       sudo: false
@@ -182,11 +182,11 @@ jobs:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-trusty-7
           packages:
             - libwww-perl
             - g++-5
-            - clang-6.0
+            - clang-7
             - libstdc++-5-dev
             - libubsan0
       before_install:
@@ -194,9 +194,9 @@ jobs:
         - ln -s /usr/bin/gcc-5 bin/gcc
         - ln -s /usr/bin/g++-5 bin/g++
         - export CCACHE_CPP2=yes
-      # env: COMPILER=clang++-6.0 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
+      # env: COMPILER=clang++-7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache /usr/bin/clang++-6.0"
+        - COMPILER="ccache /usr/bin/clang++-7"
         - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DDEBUG -DUSE_STD_STRING"
         - CCACHE_CPP2=yes
       script: echo "Not running any tests for a debug build."
@@ -265,11 +265,11 @@ jobs:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-trusty-7
           packages:
             - libwww-perl
             - g++-5
-            - clang-6.0
+            - clang-7
             - libstdc++-5-dev
             - libubsan0
             - parallel
@@ -282,7 +282,7 @@ jobs:
       install:
         - ccache -z
         - ccache --max-size=1G
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/clang++-6.0' '-DCMAKE_CXX_FLAGS=-Qunused-arguments'
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/clang++-7' '-DCMAKE_CXX_FLAGS=-Qunused-arguments'
         - git submodule update --init --recursive
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE -j2)
