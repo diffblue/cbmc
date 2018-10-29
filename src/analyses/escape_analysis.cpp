@@ -11,16 +11,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "escape_analysis.h"
 
+#include <util/cprover_prefix.h>
 #include <util/simplify_expr.h>
 
 bool escape_domaint::is_tracked(const symbol_exprt &symbol)
 {
   const irep_idt &identifier=symbol.get_identifier();
-  if(identifier=="__CPROVER_memory_leak" ||
-     identifier=="__CPROVER_malloc_object" ||
-     identifier=="__CPROVER_dead_object" ||
-     identifier=="__CPROVER_deallocated")
+  if(
+    identifier == CPROVER_PREFIX "memory_leak" ||
+    identifier == CPROVER_PREFIX "malloc_object" ||
+    identifier == CPROVER_PREFIX "dead_object" ||
+    identifier == CPROVER_PREFIX "deallocated")
+  {
     return false;
+  }
 
   return true;
 }
@@ -217,7 +221,7 @@ void escape_domaint::transform(
       if(function.id()==ID_symbol)
       {
         const irep_idt &identifier=to_symbol_expr(function).get_identifier();
-        if(identifier=="__CPROVER_cleanup")
+        if(identifier == CPROVER_PREFIX "cleanup")
         {
           if(code_function_call.arguments().size()==2)
           {

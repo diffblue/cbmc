@@ -25,7 +25,7 @@ static std::string get_cprover_library_text(
     "#undef inline\n";
 
   if(config.ansi_c.string_abstraction)
-    library_text << "#define __CPROVER_STRING_ABSTRACTION\n";
+    library_text << "#define " CPROVER_PREFIX "STRING_ABSTRACTION\n";
 
   // cprover_library.inc may not have been generated when running Doxygen, thus
   // make Doxygen skip this part

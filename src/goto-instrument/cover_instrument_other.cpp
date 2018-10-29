@@ -53,7 +53,7 @@ void cover_cover_instrumentert::instrument(
     if(
       code_function_call.function().id() == ID_symbol &&
       to_symbol_expr(code_function_call.function()).get_identifier() ==
-        "__CPROVER_cover" &&
+        CPROVER_PREFIX "cover" &&
       code_function_call.arguments().size() == 1)
     {
       const exprt c = code_function_call.arguments()[0];

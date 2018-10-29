@@ -49,11 +49,11 @@ void cpp_internal_additions(std::ostream &out)
 
   // types
   out << "typedef __typeof__(sizeof(int)) __CPROVER::size_t;" << '\n';
-  out << "typedef __CPROVER::size_t __CPROVER_size_t;" << '\n';
+  out << "typedef __CPROVER::size_t " CPROVER_PREFIX "size_t;" << '\n';
   out << "typedef "
       << c_type_as_string(signed_size_type().get(ID_C_c_type))
       << " __CPROVER::ssize_t;" << '\n';
-  out << "typedef __CPROVER::ssize_t __CPROVER_ssize_t;" << '\n';
+  out << "typedef __CPROVER::ssize_t " CPROVER_PREFIX "ssize_t;" << '\n';
 
   // new and delete are in the root namespace!
   out << "void operator delete(void *);" << '\n';
@@ -63,25 +63,28 @@ void cpp_internal_additions(std::ostream &out)
 
   // CPROVER extensions
   out << "const unsigned __CPROVER::constant_infinity_uint;" << '\n';
-  out << "typedef void __CPROVER_integer;" << '\n';
-  out << "typedef void __CPROVER_rational;" << '\n';
-  // TODO
-  // out << "thread_local unsigned long __CPROVER_thread_id = 0;" << '\n';
-  out << "__CPROVER_bool "
-      << "__CPROVER_threads_exited[__CPROVER::constant_infinity_uint];" << '\n';
-  out << "unsigned long __CPROVER_next_thread_id = 0;" << '\n';
+  out << "typedef void " CPROVER_PREFIX "integer;" << '\n';
+  out << "typedef void " CPROVER_PREFIX "rational;" << '\n';
+  // TODO: thread_local is still broken
+  // out << "thread_local unsigned long "
+  //     << CPROVER_PREFIX "thread_id = 0;" << '\n';
+  out << CPROVER_PREFIX "bool "
+      << CPROVER_PREFIX "threads_exited[__CPROVER::constant_infinity_uint];"
+      << '\n';
+  out << "unsigned long " CPROVER_PREFIX "next_thread_id = 0;" << '\n';
   out << "extern unsigned char "
-      << "__CPROVER_memory[__CPROVER::constant_infinity_uint];" << '\n';
+      << CPROVER_PREFIX "memory[__CPROVER::constant_infinity_uint];" << '\n';
 
   // malloc
-  out << "const void *__CPROVER_deallocated = 0;" << '\n';
-  out << "const void *__CPROVER_dead_object = 0;" << '\n';
-  out << "const void *__CPROVER_malloc_object = 0;" << '\n';
-  out << "__CPROVER::size_t __CPROVER_malloc_size;" << '\n';
-  out << "__CPROVER_bool __CPROVER_malloc_is_new_array = 0;" << '\n';
-  out << "const void *__CPROVER_memory_leak = 0;" << '\n';
-  out << "void *__CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero);"
+  out << "const void *" CPROVER_PREFIX "deallocated = 0;" << '\n';
+  out << "const void *" CPROVER_PREFIX "dead_object = 0;" << '\n';
+  out << "const void *" CPROVER_PREFIX "malloc_object = 0;" << '\n';
+  out << "__CPROVER::size_t " CPROVER_PREFIX "malloc_size;" << '\n';
+  out << "" CPROVER_PREFIX "bool " CPROVER_PREFIX "malloc_is_new_array = 0;"
       << '\n';
+  out << "const void *" CPROVER_PREFIX "memory_leak = 0;" << '\n';
+  out << "void *" CPROVER_PREFIX "allocate("
+      << CPROVER_PREFIX "size_t size, " CPROVER_PREFIX "bool zero);" << '\n';
 
   // auxiliaries for new/delete
   out << "void *__new(__CPROVER::size_t);" << '\n';
@@ -93,22 +96,22 @@ void cpp_internal_additions(std::ostream &out)
   out << "void __delete_array(void *);" << '\n';
 
   // float
-  // TODO: should the thread_local
-  out << "int __CPROVER_rounding_mode = "
+  // TODO: should be thread_local
+  out << "int " CPROVER_PREFIX "rounding_mode = "
       << std::to_string(config.ansi_c.rounding_mode) << ';' << '\n';
 
   // pipes, write, read, close
-  out << "struct __CPROVER_pipet {\n"
+  out << "struct " CPROVER_PREFIX "pipet {\n"
       << "  bool widowed;\n"
       << "  char data[4];\n"
       << "  short next_avail;\n"
       << "  short next_unread;\n"
       << "};\n";
-  out << "extern struct __CPROVER_pipet "
-      << "__CPROVER_pipes[__CPROVER::constant_infinity_uint];" << '\n';
+  out << "extern struct " CPROVER_PREFIX "pipet "
+      << "" CPROVER_PREFIX "pipes[__CPROVER::constant_infinity_uint];" << '\n';
   // offset to make sure we don't collide with other fds
-  out << "extern const int __CPROVER_pipe_offset;" << '\n';
-  out << "unsigned __CPROVER_pipe_count=0;" << '\n';
+  out << "extern const int " CPROVER_PREFIX "pipe_offset;" << '\n';
+  out << "unsigned " CPROVER_PREFIX "pipe_count=0;" << '\n';
 
   // This function needs to be declared, or otherwise can't be called
   // by the entry-point construction.
@@ -133,7 +136,7 @@ void cpp_internal_additions(std::ostream &out)
       // For gcc, this is a typedef and not a keyword.
       // C++ doesn't have _Float128.
       if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
-        out << "typedef __CPROVER_Float128 __float128;" << '\n';
+        out << "typedef " CPROVER_PREFIX "Float128 __float128;" << '\n';
     }
     else if(config.ansi_c.arch == "hppa")
     {
@@ -153,7 +156,7 @@ void cpp_internal_additions(std::ostream &out)
       // Note that __float80 is a typedef, and not a keyword,
       // and that C++ doesn't have _Float64x.
       if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
-        out << "typedef __CPROVER_Float80 __float80;" << '\n';
+        out << "typedef " CPROVER_PREFIX "Float80 __float80;" << '\n';
     }
 
     // On 64-bit systems, gcc has typedefs

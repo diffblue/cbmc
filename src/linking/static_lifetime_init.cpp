@@ -39,7 +39,7 @@ void static_lifetime_init(
   code_blockt &dest=to_code_block(to_code(init_symbol.value));
 
   // add the magic label to hide
-  dest.add(code_labelt("__CPROVER_HIDE", code_skipt()));
+  dest.add(code_labelt(CPROVER_PREFIX "HIDE", code_skipt()));
 
   // do assignments based on "value"
 

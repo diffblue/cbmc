@@ -77,11 +77,13 @@ SCENARIO(
               std::regex_replace(line, spaces, " "), numbers, ""));
         }
 
-        const std::vector<std::string> reference_code = { // NOLINT
+        // clang-format off
+        // NOLINTNEXTLINE
+        const std::vector<std::string> reference_code = {
           "int tmp_object_factory;",
           "tmp_object_factory = NONDET(int);",
-          "__CPROVER_assume(tmp_object_factory >= 0);",
-          "__CPROVER_assume(tmp_object_factory <= 20);",
+          CPROVER_PREFIX "assume(tmp_object_factory >= 0);",
+          CPROVER_PREFIX "assume(tmp_object_factory <= 20);",
           "char (*string_data_pointer)[INFINITY()];",
           "string_data_pointer = "
             "ALLOCATE(char [INFINITY()], INFINITY(), false);",
@@ -98,6 +100,7 @@ SCENARIO(
             "=\"java::java.lang.String\" },"
             " .length=tmp_object_factory, "
             ".data=*string_data_pointer };"};
+        // clang-format on
 
         for(std::size_t i = 0;
             i < code_string.size() && i < reference_code.size();

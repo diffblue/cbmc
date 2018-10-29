@@ -423,7 +423,7 @@ void cpp_convert_typet::write(typet &type)
        char16_t_cnt || char32_t_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || int128_cnt || ptr32_cnt || ptr64_cnt)
-      throw "illegal type modifier for __CPROVER_bool";
+      throw "illegal type modifier for " CPROVER_PREFIX "bool";
 
     type.id(ID_bool);
   }

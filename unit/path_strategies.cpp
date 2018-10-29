@@ -164,17 +164,20 @@ SCENARIO("path strategies")
       opts.set_option("unwind", 2U);
     };
 
+    // clang-format off
     c =
-      "/*  1 */   int main()                       \n"
-      "/*  2 */   {                                \n"
-      "/*  3 */     int x;                         \n"
-      "/*  4 */     __CPROVER_assume(x == 1);      \n"
-      "/*  5 */                                    \n"
-      "/*  6 */     while(x)                       \n"
-      "/*  7 */       --x;                         \n"
-      "/*  8 */                                    \n"
-      "/*  9 */     assert(x);                     \n"
-      "/* 10 */   }                                \n";
+      "/*  1 */   int main()                          \n"
+      "/*  2 */   {                                   \n"
+      "/*  3 */     int x;                            \n"
+      "/*  4 */     " CPROVER_PREFIX
+      "assume(x == 1); \n"
+      "/*  5 */                                       \n"
+      "/*  6 */     while(x)                          \n"
+      "/*  7 */       --x;                            \n"
+      "/*  8 */                                       \n"
+      "/*  9 */     assert(x);                        \n"
+      "/* 10 */   }                                   \n";
+    // clang-format on
 
     check_with_strategy(
       "lifo",

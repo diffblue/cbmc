@@ -87,8 +87,8 @@ void mutex_init_instrumentation(
   goto_programt &goto_program,
   typet lock_type)
 {
-  symbol_tablet::symbolst::const_iterator f_it=
-    symbol_table.symbols.find("__CPROVER_set_must");
+  symbol_tablet::symbolst::const_iterator f_it =
+    symbol_table.symbols.find(CPROVER_PREFIX "set_must");
 
   if(f_it==symbol_table.symbols.end())
     return;

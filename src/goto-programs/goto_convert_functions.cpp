@@ -74,7 +74,7 @@ bool goto_convert_functionst::hide(const goto_programt &goto_program)
   forall_goto_program_instructions(i_it, goto_program)
   {
     for(const auto &label : i_it->labels)
-      if(label=="__CPROVER_HIDE")
+      if(label == CPROVER_PREFIX "HIDE")
         return true;
   }
 

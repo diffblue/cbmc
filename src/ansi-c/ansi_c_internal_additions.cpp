@@ -109,77 +109,78 @@ const char windows_builtin_headers[]=
 
 static std::string architecture_string(const std::string &value, const char *s)
 {
-  return std::string("const char *__CPROVER_architecture_")+
-         std::string(s)+
-         "=\""+value+"\";\n";
+  return std::string("const char *" CPROVER_PREFIX "architecture_") +
+         std::string(s) + "=\"" + value + "\";\n";
 }
 
 template <typename T>
 static std::string architecture_string(T value, const char *s)
 {
-  return std::string("const int __CPROVER_architecture_")+
-         std::string(s)+
-         "="+std::to_string(value)+";\n";
+  return std::string("const int " CPROVER_PREFIX "architecture_") +
+         std::string(s) + "=" + std::to_string(value) + ";\n";
 }
 
 void ansi_c_internal_additions(std::string &code)
 {
+  // clang-format off
   // do the built-in types and variables
   code+=
     "# 1 \"<built-in-additions>\"\n"
-    "typedef __typeof__(sizeof(int)) __CPROVER_size_t;\n"
+    "typedef __typeof__(sizeof(int)) " CPROVER_PREFIX "size_t;\n"
     "typedef "+c_type_as_string(signed_size_type().get(ID_C_c_type))+
-      " __CPROVER_ssize_t;\n"
-    "const unsigned __CPROVER_constant_infinity_uint;\n"
-    "typedef void __CPROVER_integer;\n"
-    "typedef void __CPROVER_rational;\n"
-    "__CPROVER_thread_local unsigned long __CPROVER_thread_id=0;\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];\n"
-    "unsigned long __CPROVER_next_thread_id=0;\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];\n"
+      " " CPROVER_PREFIX "ssize_t;\n"
+    "const unsigned " CPROVER_PREFIX "constant_infinity_uint;\n"
+    "typedef void " CPROVER_PREFIX "integer;\n"
+    "typedef void " CPROVER_PREFIX "rational;\n"
+    CPROVER_PREFIX "thread_local unsigned long " CPROVER_PREFIX "thread_id=0;\n"
+    CPROVER_PREFIX "bool " CPROVER_PREFIX "threads_exited["
+      CPROVER_PREFIX "constant_infinity_uint];\n"
+    "unsigned long " CPROVER_PREFIX "next_thread_id=0;\n"
+    "extern unsigned char " CPROVER_PREFIX "memory["
+      CPROVER_PREFIX "constant_infinity_uint];\n"
 
     // malloc
-    "const void *__CPROVER_deallocated=0;\n"
-    "const void *__CPROVER_dead_object=0;\n"
-    "const void *__CPROVER_malloc_object=0;\n"
-    "__CPROVER_size_t __CPROVER_malloc_size;\n"
-    "__CPROVER_bool __CPROVER_malloc_is_new_array=0;\n" // for C++
-    "const void *__CPROVER_memory_leak=0;\n"
-    "void *__CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero);\n"
+    "const void *" CPROVER_PREFIX "deallocated=0;\n"
+    "const void *" CPROVER_PREFIX "dead_object=0;\n"
+    "const void *" CPROVER_PREFIX "malloc_object=0;\n"
+    CPROVER_PREFIX "size_t " CPROVER_PREFIX "malloc_size;\n"
+    CPROVER_PREFIX "bool " CPROVER_PREFIX "malloc_is_new_array=0;\n" // for C++
+    "const void *" CPROVER_PREFIX "memory_leak=0;\n"
+    "void *" CPROVER_PREFIX "allocate("
+      CPROVER_PREFIX "size_t size, " CPROVER_PREFIX "bool zero);\n"
 
     // this is ANSI-C
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "extern __CPROVER_thread_local const char __func__[__CPROVER_constant_infinity_uint];\n"
+    "extern " CPROVER_PREFIX "thread_local const char __func__["
+      CPROVER_PREFIX "constant_infinity_uint];\n"
 
     // this is GCC
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "extern __CPROVER_thread_local const char __FUNCTION__[__CPROVER_constant_infinity_uint];\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "extern __CPROVER_thread_local const char __PRETTY_FUNCTION__[__CPROVER_constant_infinity_uint];\n"
+    "extern " CPROVER_PREFIX "thread_local const char __FUNCTION__["
+      CPROVER_PREFIX "constant_infinity_uint];\n"
+    "extern " CPROVER_PREFIX "thread_local const char __PRETTY_FUNCTION__["
+      CPROVER_PREFIX "constant_infinity_uint];\n"
 
     // float stuff
-    "int __CPROVER_thread_local __CPROVER_rounding_mode="+
+    "int " CPROVER_PREFIX "thread_local " CPROVER_PREFIX "rounding_mode="+
       std::to_string(config.ansi_c.rounding_mode)+";\n"
 
     // pipes, write, read, close
-    "struct __CPROVER_pipet {\n"
+    "struct " CPROVER_PREFIX "pipet {\n"
     "  _Bool widowed;\n"
     "  char data[4];\n"
     "  short next_avail;\n"
     "  short next_unread;\n"
     "};\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];\n"
+    "extern struct " CPROVER_PREFIX "pipet " CPROVER_PREFIX "pipes["
+      CPROVER_PREFIX "constant_infinity_uint];\n"
     // offset to make sure we don't collide with other fds
-    "extern const int __CPROVER_pipe_offset;\n"
-    "unsigned __CPROVER_pipe_count=0;\n"
+    "extern const int " CPROVER_PREFIX "pipe_offset;\n"
+    "unsigned " CPROVER_PREFIX "pipe_count=0;\n"
     "\n"
     // This function needs to be declared, or otherwise can't be called
     // by the entry-point construction.
     "void " INITIALIZE_FUNCTION "(void);\n"
     "\n";
+  // clang-format on
 
   // GCC junk stuff, also for CLANG and ARM
   if(
@@ -201,13 +202,13 @@ void ansi_c_internal_additions(std::string &code)
       // For clang, __float128 is a keyword.
       // For gcc, this is a typedef and not a keyword.
       if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
-        code += "typedef __CPROVER_Float128 __float128;\n";
+        code += "typedef " CPROVER_PREFIX "Float128 __float128;\n";
     }
     else if(config.ansi_c.arch == "ppc64le")
     {
       // https://patchwork.ozlabs.org/patch/792295/
       if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
-        code += "typedef __CPROVER_Float128 __ieee128;\n";
+        code += "typedef " CPROVER_PREFIX "Float128 __ieee128;\n";
     }
     else if(config.ansi_c.arch == "hppa")
     {
@@ -225,7 +226,7 @@ void ansi_c_internal_additions(std::string &code)
       // clang doesn't do __float80
       // Note that __float80 is a typedef, and not a keyword.
       if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
-        code += "typedef __CPROVER_Float64x __float80;\n";
+        code += "typedef " CPROVER_PREFIX "Float64x __float80;\n";
     }
 
     // On 64-bit systems, gcc has typedefs

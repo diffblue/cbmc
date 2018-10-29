@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
+#include <util/cprover_prefix.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -105,9 +106,8 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     {
       static int uniform_array_counter;  // Temporary hack
 
-      std::string identifier=
-        "__CPROVER_internal_uniform_array_"+
-        std::to_string(uniform_array_counter++);
+      const std::string identifier = CPROVER_PREFIX "internal_uniform_array_" +
+                                     std::to_string(uniform_array_counter++);
 
       symbol_exprt result(identifier, expr.type());
       bv = convert_bv(result);
@@ -146,9 +146,8 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       // Symbol for output
       static int actual_array_counter;  // Temporary hack
 
-      std::string identifier=
-        "__CPROVER_internal_actual_array_"+
-        std::to_string(actual_array_counter++);
+      const std::string identifier = CPROVER_PREFIX "internal_actual_array_" +
+                                     std::to_string(actual_array_counter++);
 
       symbol_exprt result(identifier, expr.type());
       bv = convert_bv(result);

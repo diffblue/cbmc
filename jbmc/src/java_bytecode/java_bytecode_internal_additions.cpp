@@ -21,7 +21,7 @@ void java_internal_additions(symbol_table_baset &dest)
 
   {
     symbolt symbol;
-    symbol.base_name="__CPROVER_rounding_mode";
+    symbol.base_name = CPROVER_PREFIX "rounding_mode";
     symbol.name=CPROVER_PREFIX "rounding_mode";
     symbol.type=signed_int_type();
     symbol.mode=ID_C;
@@ -35,7 +35,7 @@ void java_internal_additions(symbol_table_baset &dest)
 
   {
     symbolt symbol;
-    symbol.base_name="__CPROVER_malloc_object";
+    symbol.base_name = CPROVER_PREFIX "malloc_object";
     symbol.name=CPROVER_PREFIX "malloc_object";
     symbol.type=pointer_type(empty_typet());
     symbol.mode=ID_C;

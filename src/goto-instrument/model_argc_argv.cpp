@@ -91,7 +91,7 @@ bool model_argc_argv(
       << "  " CPROVER_PREFIX "assume(ARGC>=1);\n"
       << "  " CPROVER_PREFIX "assume(ARGC<=" << max_argc << ");\n"
       << "  char arg_string[4096];\n"
-      << "  __CPROVER_input(\"arg_string\", &arg_string[0]);\n"
+      << "  " CPROVER_PREFIX "input(\"arg_string\", &arg_string[0]);\n"
       << "  for(int i=0; i<ARGC && i<" << max_argc << "; ++i)\n"
       << "  {\n"
       << "    unsigned len;\n"
