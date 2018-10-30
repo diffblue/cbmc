@@ -12,6 +12,8 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_ANSI_C_C_NONDET_SYMBOL_FACTORY_H
 #define CPROVER_ANSI_C_C_NONDET_SYMBOL_FACTORY_H
 
+#include "c_object_factory_parameters.h"
+
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 
@@ -21,6 +23,7 @@ symbol_exprt c_nondet_symbol_factory(
   const irep_idt base_name,
   const typet &type,
   const source_locationt &,
-  bool allow_null);
+  bool allow_null,
+  const c_object_factory_parameterst &object_factory_parameters);
 
 #endif // CPROVER_ANSI_C_C_NONDET_SYMBOL_FACTORY_H

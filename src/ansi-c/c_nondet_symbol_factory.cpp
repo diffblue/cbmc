@@ -29,18 +29,21 @@ class symbol_factoryt
   const source_locationt &loc;
   const bool assume_non_null;
   namespacet ns;
+  const c_object_factory_parameterst &object_factory_params;
 
 public:
   symbol_factoryt(
     std::vector<const symbolt *> &_symbols_created,
     symbol_tablet &_symbol_table,
     const source_locationt &loc,
-    const bool _assume_non_null):
-      symbols_created(_symbols_created),
+    const bool _assume_non_null,
+    const c_object_factory_parameterst &object_factory_params)
+    : symbols_created(_symbols_created),
       symbol_table(_symbol_table),
       loc(loc),
       assume_non_null(_assume_non_null),
-      ns(_symbol_table)
+      ns(_symbol_table),
+      object_factory_params(object_factory_params)
   {}
 
   exprt allocate_object(
@@ -179,6 +182,8 @@ void symbol_factoryt::gen_nondet_init(
 /// \param type: The type for the symbol created
 /// \param loc: The location to assign to generated code
 /// \param allow_null: Whether to allow a null value when type is a pointer
+/// \param object_factory_parameters configuration parameters for the object
+///   factory
 /// \return Returns the symbol_exprt for the symbol created
 symbol_exprt c_nondet_symbol_factory(
   code_blockt &init_code,
@@ -186,7 +191,8 @@ symbol_exprt c_nondet_symbol_factory(
   const irep_idt base_name,
   const typet &type,
   const source_locationt &loc,
-  bool allow_null)
+  bool allow_null,
+  const c_object_factory_parameterst &object_factory_parameters)
 {
   irep_idt identifier=id2string(goto_functionst::entry_point())+
     "::"+id2string(base_name);
@@ -209,10 +215,7 @@ symbol_exprt c_nondet_symbol_factory(
   symbols_created.push_back(main_symbol_ptr);
 
   symbol_factoryt state(
-    symbols_created,
-    symbol_table,
-    loc,
-    !allow_null);
+    symbols_created, symbol_table, loc, !allow_null, object_factory_parameters);
   code_blockt assignments;
   state.gen_nondet_init(assignments, main_symbol_expr);
 

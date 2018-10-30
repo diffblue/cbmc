@@ -70,8 +70,7 @@ public:
   /// complete. Functions introduced here are visible to lazy loading and
   /// can influence its decisions (e.g. picking the types of input parameters
   /// and globals), whereas anything introduced during `final` cannot.
-  virtual bool generate_support_functions(
-    symbol_tablet &symbol_table)=0;
+  virtual bool generate_support_functions(symbol_tablet &symbol_table) = 0;
 
   // add external dependencies of a given module to set
 
