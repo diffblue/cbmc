@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language.h>
 
 #include "ansi_c_parse_tree.h"
+#include "c_object_factory_parameters.h"
 
 // clang-format off
 #define OPT_ANSI_C_LANGUAGE \
@@ -33,6 +34,11 @@ Author: Daniel Kroening, kroening@kroening.com
 class ansi_c_languaget:public languaget
 {
 public:
+  void set_language_options(const optionst &options) override
+  {
+    object_factory_params.set(options);
+  }
+
   bool preprocess(
     std::istream &instream,
     const std::string &path,
@@ -87,6 +93,8 @@ public:
 protected:
   ansi_c_parse_treet parse_tree;
   std::string parse_path;
+
+  c_object_factory_parameterst object_factory_params;
 };
 
 std::unique_ptr<languaget> new_ansi_c_language();

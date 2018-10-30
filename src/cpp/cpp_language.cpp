@@ -137,7 +137,8 @@ bool cpp_languaget::typecheck(
 bool cpp_languaget::generate_support_functions(
   symbol_tablet &symbol_table)
 {
-  return ansi_c_entry_point(symbol_table, get_message_handler());
+  return ansi_c_entry_point(
+    symbol_table, get_message_handler(), object_factory_params);
 }
 
 void cpp_languaget::show_parse(std::ostream &out)

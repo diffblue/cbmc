@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <memory>
 
+#include <ansi-c/c_object_factory_parameters.h>
+
 #include <util/make_unique.h> // unique_ptr
 
 #include <langapi/language.h>
@@ -23,6 +25,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class cpp_languaget:public languaget
 {
 public:
+  void set_language_options(const optionst &options) override
+  {
+    object_factory_params.set(options);
+  }
+
   bool preprocess(
     std::istream &instream,
     const std::string &path,
@@ -87,6 +94,8 @@ public:
 protected:
   cpp_parse_treet cpp_parse_tree;
   std::string parse_path;
+
+  c_object_factory_parameterst object_factory_params;
 
   void show_parse(std::ostream &out, const cpp_itemt &item);
 
