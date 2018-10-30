@@ -208,6 +208,9 @@ protected:
   virtual void report_success();
   virtual void report_failure();
 
+  static void report_success(messaget &, ui_message_handlert &);
+  static void report_failure(messaget &, ui_message_handlert &);
+
   virtual void error_trace();
   void output_graphml(resultt result);
 

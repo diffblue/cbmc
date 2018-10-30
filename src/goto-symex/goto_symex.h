@@ -70,6 +70,7 @@ public:
       log(mh),
       guard_identifier("goto_symex::\\guard"),
       path_storage(path_storage),
+      path_segment_vccs(0),
       _total_vccs(std::numeric_limits<unsigned>::max()),
       _remaining_vccs(std::numeric_limits<unsigned>::max())
   {
@@ -463,6 +464,18 @@ protected:
   void rewrite_quantifiers(exprt &, statet &);
 
   path_storaget &path_storage;
+
+public:
+  /// \brief Number of VCCs generated during the run of this goto_symext object
+  ///
+  /// This member is always initialized to `0` upon construction of this object.
+  /// It therefore differs from goto_symex_statet::total_vccs, which persists
+  /// across the creation of several goto_symext objects. When CBMC is run in
+  /// path-exploration mode, the meaning of this member is "the number of VCCs
+  /// generated between the last branch point and the current instruction,"
+  /// while goto_symex_statet::total_vccs records the total number of VCCs
+  /// generated along the entire path from the beginning of the program.
+  std::size_t path_segment_vccs;
 
 protected:
   /// @{\name Statistics

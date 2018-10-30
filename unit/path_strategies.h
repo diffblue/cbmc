@@ -36,10 +36,13 @@ public:
     return pairt(kind, -1);
   }
 
-  static void
-  validate_result(listt &events, const safety_checkert::resultt result);
+  static void validate_result(
+    listt &events,
+    const safety_checkert::resultt result,
+    std::size_t &);
 
-  static void validate_resume(listt &events, const goto_symex_statet &state);
+  static void
+  validate_resume(listt &events, const goto_symex_statet &state, std::size_t &);
 };
 
 void _check_with_strategy(
