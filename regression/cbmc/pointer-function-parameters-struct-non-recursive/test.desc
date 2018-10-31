@@ -1,0 +1,11 @@
+CORE
+main.c
+--function func --min-null-tree-depth 10
+^EXIT=10$
+^SIGNAL=0$
+\[func.assertion.1\] line [0-9]+ assertion p != .*((NULL)|0).*: SUCCESS
+\[func.assertion.2\] line [0-9]+ assertion p != &dummy: SUCCESS
+\[func.assertion.3\] line [0-9]+ assertion p->data >= 4854549: FAILURE
+\[func.assertion.4\] line [0-9]+ assertion p->data < 4854549: FAILURE
+--
+^warning: ignoring
