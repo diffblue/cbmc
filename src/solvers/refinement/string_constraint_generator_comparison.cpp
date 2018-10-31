@@ -211,7 +211,7 @@ string_constraint_generatort::add_axioms_for_hash_code(
       equal_exprt(it.first.length(), str.length()),
       and_exprt(
         notequal_exprt(str[i], it.first[i]),
-        and_exprt(axiom_for_length_gt(str, i), is_positive(i))));
+        and_exprt(length_gt(str, i), is_positive(i))));
     constraints.existential.push_back(or_exprt(c1, or_exprt(c2, c3)));
   }
   return {hash, std::move(constraints)};
@@ -274,14 +274,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
       typecast_exprt(s1.length(), return_type),
       typecast_exprt(s2.length(), return_type)));
   const or_exprt guard1(
-    and_exprt(axiom_for_length_le(s1, s2.length()), axiom_for_length_gt(s1, x)),
-    and_exprt(length_ge(s1, s2.length()), axiom_for_length_gt(s2, x)));
+    and_exprt(length_le(s1, s2.length()), length_gt(s1, x)),
+    and_exprt(length_ge(s1, s2.length()), length_gt(s2, x)));
   const and_exprt cond1(ret_char_diff, guard1);
   const or_exprt guard2(
-    and_exprt(
-      axiom_for_length_gt(s2, s1.length()), axiom_for_has_length(s1, x)),
-    and_exprt(
-      axiom_for_length_gt(s1, s2.length()), axiom_for_has_length(s2, x)));
+    and_exprt(length_gt(s2, s1.length()), axiom_for_has_length(s1, x)),
+    and_exprt(length_gt(s1, s2.length()), axiom_for_has_length(s2, x)));
   const and_exprt cond2(ret_length_diff, guard2);
 
   const implies_exprt a3(
@@ -339,16 +337,15 @@ string_constraint_generatort::add_axioms_for_intern(
     if(it.second!=str)
     {
       symbol_exprt i = fresh_symbol("index_intern", index_type);
-      constraints.existential.push_back(
+      constraints.existential.push_back(or_exprt(
+        equal_exprt(it.second, intern),
         or_exprt(
-          equal_exprt(it.second, intern),
-          or_exprt(
-            notequal_exprt(str.length(), it.first.length()),
+          notequal_exprt(str.length(), it.first.length()),
+          and_exprt(
+            equal_exprt(str.length(), it.first.length()),
             and_exprt(
-              equal_exprt(str.length(), it.first.length()),
-              and_exprt(
-                notequal_exprt(str[i], it.first[i]),
-                and_exprt(axiom_for_length_gt(str, i), is_positive(i)))))));
+              notequal_exprt(str[i], it.first[i]),
+              and_exprt(length_gt(str, i), is_positive(i)))))));
     }
 
   return {intern, std::move(constraints)};
