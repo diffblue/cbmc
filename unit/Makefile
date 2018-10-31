@@ -40,6 +40,7 @@ SRC += analyses/ai/ai.cpp \
        util/irep_sharing.cpp \
        util/message.cpp \
        util/optional.cpp \
+       util/pointer_offset_size.cpp \
        util/replace_symbol.cpp \
        util/sharing_map.cpp \
        util/sharing_node.cpp \
