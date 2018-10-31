@@ -21,71 +21,45 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ssa_expr.h"
 #include "std_expr.h"
 
-member_offset_iterator::member_offset_iterator(
-  const struct_typet &_type,
-  const namespacet &_ns):
-  current({0, 0}),
-  type(_type),
-  ns(_ns),
-  bit_field_bits(0)
+optionalt<mp_integer> member_offset(
+  const struct_typet &type,
+  const irep_idt &member,
+  const namespacet &ns)
 {
-}
+  mp_integer result = 0;
+  std::size_t bit_field_bits = 0;
 
-member_offset_iterator &member_offset_iterator::operator++()
-{
-  if(current.second!=-1) // Already failed?
+  for(const auto &comp : type.components())
   {
-    const auto &comp=type.components()[current.first];
-    if(comp.type().id()==ID_c_bit_field)
+    if(comp.get_name() == member)
+      return result;
+
+    if(comp.type().id() == ID_c_bit_field)
     {
-      // take the extra bytes needed
-      std::size_t w=to_c_bit_field_type(comp.type()).get_width();
+      const std::size_t w = to_c_bit_field_type(comp.type()).get_width();
       bit_field_bits += w;
-      current.second += bit_field_bits / 8;
+      result += bit_field_bits / 8;
       bit_field_bits %= 8;
     }
     else if(comp.type().id() == ID_bool)
     {
       ++bit_field_bits;
-      current.second += bit_field_bits / 8;
+      result += bit_field_bits / 8;
       bit_field_bits %= 8;
     }
     else
     {
       DATA_INVARIANT(
         bit_field_bits == 0, "padding ensures offset at byte boundaries");
-      const typet &subtype=comp.type();
-
-      auto sub_size = pointer_offset_size(subtype, ns);
-
+      const auto sub_size = pointer_offset_size(comp.type(), ns);
       if(!sub_size.has_value())
-        current.second=-1; // give up
+        return {};
       else
-        current.second += *sub_size;
+        result += *sub_size;
     }
   }
-  ++current.first;
-  return *this;
-}
 
-optionalt<mp_integer> member_offset(
-  const struct_typet &type,
-  const irep_idt &member,
-  const namespacet &ns)
-{
-  const struct_typet::componentst &components=type.components();
-  member_offset_iterator offsets(type, ns);
-
-  for(struct_typet::componentst::const_iterator
-      it=components.begin();
-      it!=components.end() && offsets->second!=-1;
-      ++it, ++offsets)
-  {
-    if(it->get_name()==member)
-      break;
-  }
-
-  return offsets->second;
+  return result;
 }
 
 optionalt<mp_integer> member_offset_bits(
