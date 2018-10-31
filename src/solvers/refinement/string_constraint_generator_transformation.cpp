@@ -208,7 +208,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
   const exprt a4 = length_ge(res, from_integer(0, index_type));
   constraints.existential.push_back(a4);
 
-  const exprt a5 = axiom_for_length_le(res, str.length());
+  const exprt a5 = length_le(res, str.length());
   constraints.existential.push_back(a5);
 
   symbol_exprt n = fresh_symbol("QA_index_trim", index_type);

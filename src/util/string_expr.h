@@ -79,7 +79,7 @@ binary_relation_exprt length_gt(const T &lhs, mp_integer i)
 }
 
 template <typename T>
-binary_relation_exprt axiom_for_length_le(const T &lhs, const exprt &rhs)
+binary_relation_exprt length_le(const T &lhs, const exprt &rhs)
 {
   PRECONDITION(rhs.type() == lhs.length().type());
   return binary_relation_exprt(lhs.length(), ID_le, rhs);
@@ -88,7 +88,7 @@ binary_relation_exprt axiom_for_length_le(const T &lhs, const exprt &rhs)
 template <typename T>
 binary_relation_exprt axiom_for_length_le(const T &lhs, mp_integer i)
 {
-  return axiom_for_length_le(lhs, from_integer(i, lhs.length().type()));
+  return length_le(lhs, from_integer(i, lhs.length().type()));
 }
 
 template <typename T>
