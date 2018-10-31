@@ -245,7 +245,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
 
   size_t max_size=8;
   constraints.existential.push_back(
-    and_exprt(length_gt(res, 0), axiom_for_length_le(res, max_size)));
+    and_exprt(length_gt(res, 0), length_le(res, max_size)));
 
   for(size_t size=1; size<=max_size; size++)
   {
@@ -388,7 +388,7 @@ string_constraintst add_axioms_for_correct_number_format(
   constraints.existential.push_back(contains_digit);
 
   // |str| <= max_size
-  constraints.existential.push_back(axiom_for_length_le(str, max_size));
+  constraints.existential.push_back(length_le(str, max_size));
 
   // forall 1 <= i < |str| . is_digit_with_radix(str[i], radix)
   // We unfold the above because we know that it will be used for all i up to
