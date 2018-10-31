@@ -37,7 +37,7 @@ public:
   java_string_library_preprocesst()
     : char_type(java_char_type()),
       index_type(java_int_type()),
-      refined_string_type(index_type, char_type)
+      refined_string_type(index_type, pointer_type(char_type))
   {
   }
 

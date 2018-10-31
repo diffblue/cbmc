@@ -22,7 +22,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 refined_string_typet::refined_string_typet(
   const typet &index_type,
-  const typet &content_type)
+  const pointer_typet &content_type)
 {
   components().emplace_back("length", index_type);
   components().emplace_back("content", content_type);
