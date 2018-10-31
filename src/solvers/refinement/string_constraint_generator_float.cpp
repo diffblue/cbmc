@@ -278,8 +278,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
   // no_trailing_zero: forall j:[2, max_size[. !(|res| = j+1 && res[j] = '0')
   // a3 : int_expr = sum_j 10^j (j < |res| ? res[j] - '0' : 0)
 
-  and_exprt a1(res.axiom_for_length_gt(1),
-               res.axiom_for_length_le(max));
+  const and_exprt a1(
+    axiom_for_length_gt(res, 1), axiom_for_length_le(res, max));
   constraints.existential.push_back(a1);
 
   equal_exprt starts_with_dot(res[0], from_integer('.', char_type));

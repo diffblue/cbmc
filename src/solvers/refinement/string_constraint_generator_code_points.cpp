@@ -43,10 +43,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point(
   exprt hex0400=from_integer(0x0400, type);
 
   binary_relation_exprt small(code_point, ID_lt, hex010000);
-  implies_exprt a1(small, res.axiom_for_has_length(1));
+  implies_exprt a1(small, axiom_for_has_length(res, 1));
   constraints.existential.push_back(a1);
 
-  implies_exprt a2(not_exprt(small), res.axiom_for_has_length(2));
+  implies_exprt a2(not_exprt(small), axiom_for_has_length(res, 2));
   constraints.existential.push_back(a2);
 
   typecast_exprt code_point_as_char(code_point, char_type);

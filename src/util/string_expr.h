@@ -26,14 +26,17 @@ private:
   {
     return static_cast<child_t *>(this)->length();
   }
+
   const exprt &length() const
   {
     return static_cast<const child_t *>(this)->length();
   }
+
   exprt &content()
   {
     return static_cast<child_t *>(this)->content();
   }
+
   const exprt &content() const
   {
     return static_cast<const child_t *>(this)->content();
@@ -48,54 +51,58 @@ public:
     return index_exprt(content(), i);
   }
 
-  index_exprt operator[] (int i) const
+  index_exprt operator[](int i) const
   {
     return index_exprt(content(), from_integer(i, length().type()));
   }
-
-  // Comparison on the length of the strings
-  binary_relation_exprt axiom_for_length_ge(
-    const exprt &rhs) const
-  {
-    PRECONDITION(rhs.type() == length().type());
-    return binary_relation_exprt(length(), ID_ge, rhs);
-  }
-
-  binary_relation_exprt axiom_for_length_gt(
-    const exprt &rhs) const
-  {
-    PRECONDITION(rhs.type() == length().type());
-    return binary_relation_exprt(rhs, ID_lt, length());
-  }
-
-  binary_relation_exprt axiom_for_length_gt(mp_integer i) const
-  {
-    return axiom_for_length_gt(from_integer(i, length().type()));
-  }
-
-  binary_relation_exprt axiom_for_length_le(
-    const exprt &rhs) const
-  {
-    PRECONDITION(rhs.type() == length().type());
-    return binary_relation_exprt(length(), ID_le, rhs);
-  }
-
-  binary_relation_exprt axiom_for_length_le(mp_integer i) const
-  {
-    return axiom_for_length_le(from_integer(i, length().type()));
-  }
-
-  equal_exprt axiom_for_has_length(const exprt &rhs) const
-  {
-    PRECONDITION(rhs.type() == length().type());
-    return equal_exprt(length(), rhs);
-  }
-
-  equal_exprt axiom_for_has_length(mp_integer i) const
-  {
-    return axiom_for_has_length(from_integer(i, length().type()));
-  }
 };
+
+// Comparison on the length of the strings
+template <typename T>
+binary_relation_exprt axiom_for_length_ge(const T &lhs, const exprt &rhs)
+{
+  PRECONDITION(rhs.type() == lhs.length().type());
+  return binary_relation_exprt(lhs.length(), ID_ge, rhs);
+}
+
+template <typename T>
+binary_relation_exprt axiom_for_length_gt(const T &lhs, const exprt &rhs)
+{
+  PRECONDITION(rhs.type() == lhs.length().type());
+  return binary_relation_exprt(rhs, ID_lt, lhs.length());
+}
+
+template <typename T>
+binary_relation_exprt axiom_for_length_gt(const T &lhs, mp_integer i)
+{
+  return axiom_for_length_gt(lhs, from_integer(i, lhs.length().type()));
+}
+
+template <typename T>
+binary_relation_exprt axiom_for_length_le(const T &lhs, const exprt &rhs)
+{
+  PRECONDITION(rhs.type() == lhs.length().type());
+  return binary_relation_exprt(lhs.length(), ID_le, rhs);
+}
+
+template <typename T>
+binary_relation_exprt axiom_for_length_le(const T &lhs, mp_integer i)
+{
+  return axiom_for_length_le(lhs, from_integer(i, lhs.length().type()));
+}
+
+template <typename T>
+equal_exprt axiom_for_has_length(const T &lhs, const exprt &rhs)
+{
+  PRECONDITION(rhs.type() == lhs.length().type());
+  return equal_exprt(lhs.length(), rhs);
+}
+
+template <typename T>
+equal_exprt axiom_for_has_length(const T &lhs, mp_integer i)
+{
+  return axiom_for_has_length(lhs, from_integer(i, lhs.length().type()));
+}
 
 // Representation of strings as arrays
 class array_string_exprt : public string_exprt<array_string_exprt>, public exprt
