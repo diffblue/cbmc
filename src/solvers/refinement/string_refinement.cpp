@@ -270,12 +270,15 @@ static void make_char_array_pointer_associations(
   }
 }
 
-void replace_symbols_in_equations(
-  const union_find_replacet &symbol_resolve,
-  std::vector<equal_exprt> &equations)
+/// Substitute sub-expressions in equation by representative elements of
+/// `symbol_resolve` whenever possible.
+/// Similar to `symbol_resolve.replace_expr` but doesn't mutate the expression
+/// and returns the transformed expression instead.
+static exprt
+replace_expr_copy(const union_find_replacet &symbol_resolve, exprt expr)
 {
-  for(equal_exprt &eq : equations)
-    symbol_resolve.replace_expr(eq);
+  symbol_resolve.replace_expr(expr);
+  return expr;
 }
 
 /// Record the constraints to ensure that the expression is true when
@@ -654,11 +657,15 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   std::vector<equal_exprt> local_equations;
   for(const equal_exprt &eq : equations)
   {
-    equal_exprt eq_copy = eq;
-    // Char array symbols are replaced by cannonical element to ensure
-    // equal arrays are associated to the same nodes in the graph.
-    symbol_resolve.replace_expr(eq_copy);
-    if(!add_node(dependencies, eq_copy, generator.array_pool))
+    // Ensures that arrays that are equal, are associated to the same nodes
+    // in the graph.
+    const equal_exprt eq_with_char_array_replaced_with_representative_elements =
+      to_equal_expr(replace_expr_copy(symbol_resolve, eq));
+    const bool node_added = add_node(
+      dependencies,
+      eq_with_char_array_replaced_with_representative_elements,
+      generator.array_pool);
+    if(!node_added)
       local_equations.push_back(eq);
   }
   equations.clear();
