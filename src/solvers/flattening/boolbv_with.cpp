@@ -125,9 +125,9 @@ void boolbvt::convert_with_array(
 
   const exprt &array_size=type.size();
 
-  mp_integer size;
+  const auto size = numeric_cast<mp_integer>(array_size);
 
-  if(to_integer(array_size, size))
+  if(!size.has_value())
   {
     error().source_location=type.source_location();
     error() << "convert_with_array expects constant array size" << eom;
@@ -136,7 +136,7 @@ void boolbvt::convert_with_array(
 
   const bvt &op2_bv=convert_bv(op2);
 
-  if(size*op2_bv.size()!=prev_bv.size())
+  if(*size * op2_bv.size() != prev_bv.size())
   {
     error().source_location=type.source_location();
     error() << "convert_with_array: unexpected operand 2 width" << eom;
@@ -150,7 +150,7 @@ void boolbvt::convert_with_array(
     // Yes, it is!
     next_bv=prev_bv;
 
-    if(op1_value>=0 && op1_value<size) // bounds check
+    if(op1_value >= 0 && op1_value < *size) // bounds check
     {
       const std::size_t offset =
         numeric_cast_v<std::size_t>(op1_value * op2_bv.size());

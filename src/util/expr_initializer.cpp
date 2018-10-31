@@ -136,8 +136,6 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       if(tmpval.is_nil())
         return nil_exprt();
 
-      mp_integer array_size;
-
       if(array_type.size().id()==ID_infinity)
       {
         if(nondet)
@@ -147,7 +145,9 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
         value.add_source_location()=source_location;
         return std::move(value);
       }
-      else if(to_integer(array_type.size(), array_size))
+
+      const auto array_size = numeric_cast<mp_integer>(array_type.size());
+      if(!array_size.has_value())
       {
         if(nondet)
           return side_effect_expr_nondett(type, source_location);
@@ -155,11 +155,11 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
           return nil_exprt();
       }
 
-      if(array_size < 0)
+      if(*array_size < 0)
         return nil_exprt();
 
       array_exprt value(array_type);
-      value.operands().resize(integer2size_t(array_size), tmpval);
+      value.operands().resize(numeric_cast_v<std::size_t>(*array_size), tmpval);
       value.add_source_location()=source_location;
       return std::move(value);
     }
@@ -172,21 +172,14 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     if(tmpval.is_nil())
       return nil_exprt();
 
-    mp_integer vector_size;
-
-    if(to_integer(vector_type.size(), vector_size))
-    {
-      if(nondet)
-        return side_effect_expr_nondett(type, source_location);
-      else
-        return nil_exprt();
-    }
+    const mp_integer vector_size =
+      numeric_cast_v<mp_integer>(vector_type.size());
 
     if(vector_size < 0)
       return nil_exprt();
 
     vector_exprt value(vector_type);
-    value.operands().resize(integer2size_t(vector_size), tmpval);
+    value.operands().resize(numeric_cast_v<std::size_t>(vector_size), tmpval);
     value.add_source_location()=source_location;
 
     return std::move(value);

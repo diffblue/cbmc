@@ -38,11 +38,11 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
 
   // see if the byte number is constant
 
-  mp_integer index;
-  if(!to_integer(offset_expr, index))
+  const auto index = numeric_cast<mp_integer>(offset_expr);
+  if(index.has_value())
   {
     // yes!
-    mp_integer offset=index*8;
+    const mp_integer offset = *index * 8;
 
     if(offset+update_width>mp_integer(bv.size()) || offset<0)
     {

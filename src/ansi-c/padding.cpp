@@ -35,12 +35,15 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   const exprt &given_alignment=
     static_cast<const exprt &>(type.find(ID_C_alignment));
 
-  mp_integer a_int;
+  mp_integer a_int = 0;
 
   // we trust it blindly, no matter how nonsensical
-  if(given_alignment.is_nil() ||
-     to_integer(given_alignment, a_int))
-    a_int=0;
+  if(given_alignment.is_not_nil())
+  {
+    const auto a = numeric_cast<mp_integer>(given_alignment);
+    if(a.has_value())
+      a_int = *a;
+  }
 
   // alignment but no packing
   if(a_int>0 && !type.get_bool(ID_C_packed))
@@ -402,17 +405,16 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
   }
 
   // any explicit alignment for the struct?
-  if(type.find(ID_C_alignment).is_not_nil())
+  const exprt &alignment =
+    static_cast<const exprt &>(type.find(ID_C_alignment));
+  if(alignment.is_not_nil())
   {
-    const exprt &alignment=
-      static_cast<const exprt &>(type.find(ID_C_alignment));
     if(alignment.id()!=ID_default)
     {
-      exprt tmp=alignment;
-      simplify(tmp, ns);
-      mp_integer tmp_i;
-      if(!to_integer(tmp, tmp_i) && tmp_i>max_alignment)
-        max_alignment=tmp_i;
+      const auto tmp_i = numeric_cast<mp_integer>(simplify_expr(alignment, ns));
+
+      if(tmp_i.has_value() && *tmp_i > max_alignment)
+        max_alignment = *tmp_i;
     }
   }
   // Is the struct packed, without any alignment specification?

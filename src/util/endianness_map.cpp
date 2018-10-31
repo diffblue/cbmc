@@ -92,13 +92,13 @@ void endianness_mapt::build_big_endian(const typet &src)
     const array_typet &array_type=to_array_type(src);
 
     // array size constant?
-    mp_integer s;
-    if(!to_integer(array_type.size(), s))
+    auto s = numeric_cast<mp_integer>(array_type.size());
+    if(s.has_value())
     {
-      while(s>0)
+      while(*s > 0)
       {
         build_big_endian(array_type.subtype());
-        --s;
+        --(*s);
       }
     }
   }
@@ -106,11 +106,9 @@ void endianness_mapt::build_big_endian(const typet &src)
   {
     const vector_typet &vector_type=to_vector_type(src);
 
-    mp_integer s;
-    if(to_integer(vector_type.size(), s))
-      CHECK_RETURN(false);
+    mp_integer s = numeric_cast_v<mp_integer>(vector_type.size());
 
-    while(s>0)
+    while(s > 0)
     {
       build_big_endian(vector_type.subtype());
       --s;

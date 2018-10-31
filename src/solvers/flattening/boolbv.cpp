@@ -323,9 +323,9 @@ bvt boolbvt::convert_lambda(const exprt &expr)
   const exprt &array_size=
     to_array_type(expr.type()).size();
 
-  mp_integer size;
+  const auto size = numeric_cast<mp_integer>(array_size);
 
-  if(to_integer(array_size, size))
+  if(!size.has_value())
     return conversion_failed(expr);
 
   typet counter_type=expr.op0().type();
@@ -333,7 +333,7 @@ bvt boolbvt::convert_lambda(const exprt &expr)
   bvt bv;
   bv.resize(width);
 
-  for(mp_integer i=0; i<size; ++i)
+  for(mp_integer i = 0; i < *size; ++i)
   {
     exprt counter=from_integer(i, counter_type);
 
@@ -343,7 +343,7 @@ bvt boolbvt::convert_lambda(const exprt &expr)
     const bvt &tmp=convert_bv(expr_op1);
 
     INVARIANT(
-      size * tmp.size() == width,
+      *size * tmp.size() == width,
       "total bitvector width shall equal the number of operands times the size "
       "per operand");
 

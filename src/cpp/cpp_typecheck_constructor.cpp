@@ -395,13 +395,11 @@ void cpp_typecheckt::default_assignop_value(
         continue;
       }
 
-      mp_integer size;
-      bool to_int=to_integer(size_expr, size);
-      CHECK_RETURN(!to_int);
-      CHECK_RETURN(size>=0);
+      const auto size = numeric_cast<mp_integer>(size_expr);
+      CHECK_RETURN(!size.has_value());
+      CHECK_RETURN(*size >= 0);
 
-      exprt::operandst empty_operands;
-      for(mp_integer i=0; i < size; ++i)
+      for(mp_integer i = 0; i < *size; ++i)
         copy_array(source_location, mem_name, i, arg_name, block);
     }
     else

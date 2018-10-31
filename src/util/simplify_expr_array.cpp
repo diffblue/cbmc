@@ -116,40 +116,41 @@ bool simplify_exprt::simplify_index(exprt &expr)
   else if(array.id()==ID_constant ||
           array.id()==ID_array)
   {
-    mp_integer i;
+    const auto i = numeric_cast<mp_integer>(expr.op1());
 
-    if(to_integer(expr.op1(), i))
+    if(!i.has_value())
     {
     }
-    else if(i<0 || i>=array.operands().size())
+    else if(*i < 0 || *i >= array.operands().size())
     {
       // out of bounds
     }
     else
     {
       // ok
-      exprt tmp=array.operands()[integer2size_t(i)];
+      exprt tmp = array.operands()[numeric_cast_v<std::size_t>(*i)];
       expr.swap(tmp);
       return false;
     }
   }
   else if(array.id()==ID_string_constant)
   {
-    mp_integer i;
+    const auto i = numeric_cast<mp_integer>(expr.op1());
 
     const irep_idt &value=array.get(ID_value);
 
-    if(to_integer(expr.op1(), i))
+    if(!i.has_value())
     {
     }
-    else if(i<0 || i>value.size())
+    else if(*i < 0 || *i > value.size())
     {
       // out of bounds
     }
     else
     {
       // terminating zero?
-      char v=(i==value.size())?0:value[integer2size_t(i)];
+      const char v =
+        (*i == value.size()) ? 0 : value[numeric_cast_v<std::size_t>(*i)];
       exprt tmp=from_integer(v, expr.type());
       expr.swap(tmp);
       return false;
