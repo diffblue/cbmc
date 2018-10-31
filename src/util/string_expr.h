@@ -55,12 +55,6 @@ public:
 
   // Comparison on the length of the strings
   binary_relation_exprt axiom_for_length_ge(
-    const string_exprt &rhs) const
-  {
-    return binary_relation_exprt(length(), ID_ge, rhs.length());
-  }
-
-  binary_relation_exprt axiom_for_length_ge(
     const exprt &rhs) const
   {
     PRECONDITION(rhs.type() == length().type());
@@ -74,21 +68,9 @@ public:
     return binary_relation_exprt(rhs, ID_lt, length());
   }
 
-  binary_relation_exprt axiom_for_length_gt(
-    const string_exprt &rhs) const
-  {
-    return binary_relation_exprt(rhs.length(), ID_lt, length());
-  }
-
   binary_relation_exprt axiom_for_length_gt(mp_integer i) const
   {
     return axiom_for_length_gt(from_integer(i, length().type()));
-  }
-
-  binary_relation_exprt axiom_for_length_le(
-    const string_exprt &rhs) const
-  {
-    return binary_relation_exprt(length(), ID_le, rhs.length());
   }
 
   binary_relation_exprt axiom_for_length_le(
@@ -101,25 +83,6 @@ public:
   binary_relation_exprt axiom_for_length_le(mp_integer i) const
   {
     return axiom_for_length_le(from_integer(i, length().type()));
-  }
-
-  binary_relation_exprt axiom_for_length_lt(
-    const string_exprt &rhs) const
-  {
-    return binary_relation_exprt(length(), ID_lt, rhs.length());
-  }
-
-  binary_relation_exprt axiom_for_length_lt(
-    const exprt &rhs) const
-  {
-    PRECONDITION(rhs.type() == length().type());
-    return binary_relation_exprt(length(), ID_lt, rhs);
-  }
-
-  equal_exprt axiom_for_has_same_length_as(
-    const string_exprt &rhs) const
-  {
-    return equal_exprt(length(), rhs.length());
   }
 
   equal_exprt axiom_for_has_length(const exprt &rhs) const
