@@ -182,8 +182,9 @@ inline void validate_expr(const refined_string_exprt &x)
 {
   INVARIANT(x.id() == ID_struct, "refined string exprs are struct");
   validate_operands(x, 2, "refined string expr has length and content fields");
-  INVARIANT(x.length().type().id() == ID_signedbv, "length is an unsigned int");
-  INVARIANT(x.content().type().id() == ID_array, "content is an array");
+  INVARIANT(
+    x.length().type().id() == ID_signedbv, "length should be a signed int");
+  INVARIANT(x.content().type().id() == ID_array, "content should be an array");
 }
 
 #endif
