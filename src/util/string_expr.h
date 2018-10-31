@@ -44,17 +44,6 @@ private:
 
 protected:
   string_exprt() = default;
-
-public:
-  exprt operator[](const exprt &i) const
-  {
-    return index_exprt(content(), i);
-  }
-
-  index_exprt operator[](int i) const
-  {
-    return index_exprt(content(), from_integer(i, length().type()));
-  }
 };
 
 // Comparison on the length of the strings
@@ -126,6 +115,16 @@ public:
   const exprt &content() const
   {
     return *this;
+  }
+
+  exprt operator[](const exprt &i) const
+  {
+    return index_exprt(content(), i);
+  }
+
+  index_exprt operator[](int i) const
+  {
+    return index_exprt(content(), from_integer(i, length().type()));
   }
 };
 
