@@ -16,36 +16,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include "refined_string_type.h"
 #include "std_expr.h"
 
-// Given an representation of strings as exprt that implements `length` and
-// `content` this provides additional useful methods.
-template <typename child_t>
-class string_exprt
-{
-private:
-  exprt &length()
-  {
-    return static_cast<child_t *>(this)->length();
-  }
-
-  const exprt &length() const
-  {
-    return static_cast<const child_t *>(this)->length();
-  }
-
-  exprt &content()
-  {
-    return static_cast<child_t *>(this)->content();
-  }
-
-  const exprt &content() const
-  {
-    return static_cast<const child_t *>(this)->content();
-  }
-
-protected:
-  string_exprt() = default;
-};
-
 // Comparison on the length of the strings
 template <typename T>
 binary_relation_exprt length_ge(const T &lhs, const exprt &rhs)
@@ -94,7 +64,7 @@ equal_exprt length_eq(const T &lhs, mp_integer i)
 }
 
 // Representation of strings as arrays
-class array_string_exprt : public string_exprt<array_string_exprt>, public exprt
+class array_string_exprt : public exprt
 {
 public:
   exprt &length()
@@ -141,8 +111,7 @@ inline const array_string_exprt &to_array_string_expr(const exprt &expr)
 }
 
 // Represent strings as a struct with a length field and a content field
-class refined_string_exprt : public struct_exprt,
-                             public string_exprt<refined_string_exprt>
+class refined_string_exprt : public struct_exprt
 {
 public:
   refined_string_exprt() : struct_exprt()
