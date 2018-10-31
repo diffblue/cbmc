@@ -78,11 +78,6 @@ protected:
   exprt pointer_expr(
     const mp_integer &offset,
     const exprt &object) const;
-
-  exprt object_rec(
-    const mp_integer &offset,
-    const typet &pointer_type,
-    const exprt &src) const;
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_POINTER_LOGIC_H

@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
 // global data, horrible
@@ -471,6 +472,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // try to build a member/index expression - do not use byte_extract
       exprt subexpr = get_subexpression_at_offset(
         root_object_subexpression, o.offset(), dereference_type, ns);
+      if(subexpr.is_not_nil())
+        simplify(subexpr, ns);
       if(subexpr.is_not_nil() && subexpr.id() != byte_extract_id())
       {
         // Successfully found a member, array index, or combination thereof

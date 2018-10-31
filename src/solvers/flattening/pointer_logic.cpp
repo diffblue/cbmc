@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_logic.h"
 
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
@@ -98,76 +99,35 @@ exprt pointer_logict::pointer_expr(
 
   const exprt &object_expr=objects[pointer.object];
 
-  exprt deep_object=object_rec(pointer.offset, type, object_expr);
+  typet subtype = type.subtype();
+  // This is a gcc extension.
+  // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
+  if(subtype.id() == ID_empty)
+    subtype = char_type();
+  const exprt deep_object =
+    get_subexpression_at_offset(object_expr, pointer.offset, subtype, ns);
+  CHECK_RETURN(deep_object.is_not_nil());
+  if(deep_object.id() != byte_extract_id())
+    return address_of_exprt(deep_object, type);
 
-  return address_of_exprt(deep_object, type);
-}
+  const byte_extract_exprt &be = to_byte_extract_expr(deep_object);
+  if(be.offset().is_zero())
+    return address_of_exprt(be.op(), type);
 
-exprt pointer_logict::object_rec(
-  const mp_integer &offset,
-  const typet &pointer_type,
-  const exprt &src) const
-{
-  if(src.type().id()==ID_array)
+  const auto subtype_bytes = pointer_offset_size(subtype, ns);
+  CHECK_RETURN(subtype_bytes.has_value() && *subtype_bytes > 0);
+  if(*subtype_bytes > pointer.offset)
   {
-    auto size = pointer_offset_size(src.type().subtype(), ns);
-
-    if(!size.has_value() || *size == 0)
-      return src;
-
-    mp_integer index = offset / (*size);
-    mp_integer rest = offset % (*size);
-    if(rest<0)
-      rest=-rest;
-
-    index_exprt tmp(src.type().subtype());
-    tmp.index()=from_integer(index, typet(ID_integer));
-    tmp.array()=src;
-
-    return object_rec(rest, pointer_type, tmp);
+    return plus_exprt(
+      address_of_exprt(be.op(), pointer_type(char_type())),
+      from_integer(pointer.offset, index_type()));
   }
-  else if(src.type().id()==ID_struct)
+  else
   {
-    const struct_typet::componentst &components=
-      to_struct_type(src.type()).components();
-
-    if(offset<0)
-      return src;
-
-    mp_integer current_offset=0;
-
-    for(const auto &c : components)
-    {
-      INVARIANT(
-        offset >= current_offset,
-        "when the object has not been found yet its offset must not be smaller"
-        "than the offset of the current struct component");
-
-      const typet &subtype=c.type();
-
-      const auto sub_size = pointer_offset_size(subtype, ns);
-      CHECK_RETURN(sub_size.has_value() && *sub_size != 0);
-
-      mp_integer new_offset = current_offset + *sub_size;
-
-      if(new_offset>offset)
-      {
-        // found it
-        member_exprt tmp(src, c);
-
-        return object_rec(
-          offset-current_offset, pointer_type, tmp);
-      }
-
-      current_offset=new_offset;
-    }
-
-    return src;
+    return plus_exprt(
+      address_of_exprt(be.op(), pointer_type(char_type())),
+      from_integer(pointer.offset / *subtype_bytes, index_type()));
   }
-  else if(src.type().id()==ID_union)
-    return src;
-
-  return src;
 }
 
 pointer_logict::pointer_logict(const namespacet &_ns):ns(_ns)
