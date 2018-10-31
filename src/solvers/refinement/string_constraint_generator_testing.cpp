@@ -137,8 +137,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
   symbol_exprt is_empty = fresh_symbol("is_empty");
   array_string_exprt s0 = get_string_expr(array_pool, f.arguments()[0]);
   std::vector<exprt> constraints;
-  constraints.push_back(implies_exprt(is_empty, axiom_for_has_length(s0, 0)));
-  constraints.push_back(implies_exprt(axiom_for_has_length(s0, 0), is_empty));
+  constraints.push_back(implies_exprt(is_empty, length_eq(s0, 0)));
+  constraints.push_back(implies_exprt(length_eq(s0, 0), is_empty));
   return {typecast_exprt(is_empty, f.type()), {constraints}};
 }
 

@@ -99,7 +99,7 @@ equal_exprt length_eq(const T &lhs, const exprt &rhs)
 }
 
 template <typename T>
-equal_exprt axiom_for_has_length(const T &lhs, mp_integer i)
+equal_exprt length_eq(const T &lhs, mp_integer i)
 {
   return length_eq(lhs, from_integer(i, lhs.length().type()));
 }

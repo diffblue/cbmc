@@ -103,7 +103,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
   // a4 : forall i < |"false"|. !eq => res[i]="false"[i]
 
   std::string str_true="true";
-  const implies_exprt a1(eq, axiom_for_has_length(res, str_true.length()));
+  const implies_exprt a1(eq, length_eq(res, str_true.length()));
   constraints.existential.push_back(a1);
 
   for(std::size_t i=0; i<str_true.length(); i++)
@@ -114,8 +114,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
   }
 
   std::string str_false="false";
-  const implies_exprt a3(
-    not_exprt(eq), axiom_for_has_length(res, str_false.length()));
+  const implies_exprt a3(not_exprt(eq), length_eq(res, str_false.length()));
   constraints.existential.push_back(a3);
 
   for(std::size_t i=0; i<str_false.length(); i++)
@@ -268,7 +267,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
       all_numbers=and_exprt(all_numbers, is_number);
     }
 
-    const equal_exprt premise = axiom_for_has_length(res, size);
+    const equal_exprt premise = length_eq(res, size);
     constraints.existential.push_back(
       implies_exprt(premise, and_exprt(equal_exprt(i, sum), all_numbers)));
 
@@ -332,7 +331,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_char(
   const array_string_exprt &res,
   const exprt &c)
 {
-  const and_exprt lemma(equal_exprt(res[0], c), axiom_for_has_length(res, 1));
+  const and_exprt lemma(equal_exprt(res[0], c), length_eq(res, 1));
   return {from_integer(0, get_return_code_type()), {{lemma}}};
 }
 
@@ -455,7 +454,7 @@ string_constraintst add_axioms_for_characters_in_integer_string(
   /// add_axioms_for_correct_number_format which say that the string must
   /// contain at least one digit, so we don't have to worry about "+" or "-".
   constraints.existential.push_back(
-    implies_exprt(axiom_for_has_length(str, 1), equal_exprt(input_int, sum)));
+    implies_exprt(length_eq(str, 1), equal_exprt(input_int, sum)));
 
   for(size_t size=2; size<=max_string_length; size++)
   {
@@ -493,7 +492,7 @@ string_constraintst add_axioms_for_characters_in_integer_string(
     }
     sum=new_sum;
 
-    const equal_exprt premise = axiom_for_has_length(str, size);
+    const equal_exprt premise = length_eq(str, size);
 
     if(!digit_constraints.empty())
     {
