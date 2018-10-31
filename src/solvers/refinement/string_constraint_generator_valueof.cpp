@@ -245,7 +245,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
 
   size_t max_size=8;
   constraints.existential.push_back(
-    and_exprt(axiom_for_length_gt(res, 0), axiom_for_length_le(res, max_size)));
+    and_exprt(length_gt(res, 0), axiom_for_length_le(res, max_size)));
 
   for(size_t size=1; size<=max_size; size++)
   {
