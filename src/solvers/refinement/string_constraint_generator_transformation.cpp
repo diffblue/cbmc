@@ -197,15 +197,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
 
   // Axiom 1.
   constraints.existential.push_back(
-    axiom_for_length_ge(str, plus_exprt(idx, res.length())));
+    length_ge(str, plus_exprt(idx, res.length())));
 
   binary_relation_exprt a2(idx, ID_ge, from_integer(0, index_type));
   constraints.existential.push_back(a2);
 
-  const exprt a3 = axiom_for_length_ge(str, idx);
+  const exprt a3 = length_ge(str, idx);
   constraints.existential.push_back(a3);
 
-  const exprt a4 = axiom_for_length_ge(res, from_integer(0, index_type));
+  const exprt a4 = length_ge(res, from_integer(0, index_type));
   constraints.existential.push_back(a4);
 
   const exprt a5 = axiom_for_length_le(res, str.length());

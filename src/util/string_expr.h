@@ -59,7 +59,7 @@ public:
 
 // Comparison on the length of the strings
 template <typename T>
-binary_relation_exprt axiom_for_length_ge(const T &lhs, const exprt &rhs)
+binary_relation_exprt length_ge(const T &lhs, const exprt &rhs)
 {
   PRECONDITION(rhs.type() == lhs.length().type());
   return binary_relation_exprt(lhs.length(), ID_ge, rhs);
