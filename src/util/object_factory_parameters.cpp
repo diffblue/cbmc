@@ -23,6 +23,11 @@ void object_factory_parameterst::set(const optionst &options)
     max_nondet_tree_depth =
       options.get_unsigned_int_option("max-nondet-tree-depth");
   }
+  if(options.is_set("min-null-tree-depth"))
+  {
+    min_null_tree_depth =
+      options.get_unsigned_int_option("min-null-tree-depth");
+  }
   if(options.is_set("max-nondet-string-length"))
   {
     max_nondet_string_length =
@@ -53,6 +58,11 @@ void parse_object_factory_options(const cmdlinet &cmdline, optionst &options)
   {
     options.set_option(
       "max-nondet-tree-depth", cmdline.get_value("max-nondet-tree-depth"));
+  }
+  if(cmdline.isset("min-null-tree-depth"))
+  {
+    options.set_option(
+      "min-null-tree-depth", cmdline.get_value("min-null-tree-depth"));
   }
   if(cmdline.isset("max-nondet-string-length"))
   {

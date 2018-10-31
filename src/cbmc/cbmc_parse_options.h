@@ -78,6 +78,7 @@ class optionst;
   OPT_GOTO_TRACE \
   OPT_VALIDATE \
   "(max-nondet-tree-depth):" \
+  "(min-null-tree-depth):" \
   "(claim):(show-claims)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 // clang-format on
 
