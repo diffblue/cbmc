@@ -409,8 +409,7 @@ string_constraintst add_axioms_for_correct_number_format(
 
     // no_leading_zero : str[0] = '0' => |str| = 1
     const implies_exprt no_leading_zero(
-      equal_exprt(chr, zero_char),
-      axiom_for_has_length(str, from_integer(1, index_type)));
+      equal_exprt(chr, zero_char), length_eq(str, from_integer(1, index_type)));
     constraints.existential.push_back(no_leading_zero);
 
     // no_leading_zero_after_minus : str[0]='-' => str[1]!='0'

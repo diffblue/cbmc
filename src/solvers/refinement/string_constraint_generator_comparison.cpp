@@ -278,8 +278,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
     and_exprt(length_ge(s1, s2.length()), length_gt(s2, x)));
   const and_exprt cond1(ret_char_diff, guard1);
   const or_exprt guard2(
-    and_exprt(length_gt(s2, s1.length()), axiom_for_has_length(s1, x)),
-    and_exprt(length_gt(s1, s2.length()), axiom_for_has_length(s2, x)));
+    and_exprt(length_gt(s2, s1.length()), length_eq(s1, x)),
+    and_exprt(length_gt(s1, s2.length()), length_eq(s2, x)));
   const and_exprt cond2(ret_length_diff, guard2);
 
   const implies_exprt a3(
