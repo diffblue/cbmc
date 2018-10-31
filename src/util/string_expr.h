@@ -155,8 +155,6 @@ public:
     return op1();
   }
 
-  static exprt within_bounds(const exprt &idx, const exprt &bound);
-
   friend inline refined_string_exprt &to_string_expr(exprt &expr);
 };
 
