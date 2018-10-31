@@ -42,7 +42,6 @@ exprt::operandst build_function_environment(
       base_name,
       p.type(),
       p.source_location(),
-      true,
       object_factory_parameters);
   }
 
