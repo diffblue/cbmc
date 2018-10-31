@@ -104,7 +104,7 @@ public:
 };
 
 /// Used for debug printing.
-/// \param [in] expr: constraint to render
+/// \param expr: constraint to render
 /// \return rendered string
 inline std::string to_string(const string_constraintt &expr)
 {
@@ -116,98 +116,50 @@ inline std::string to_string(const string_constraintt &expr)
 }
 
 /// Constraints to encode non containement of strings.
-class string_not_contains_constraintt : public exprt
+/// string_not contains_constraintt are formulas of the form:
+/// ```
+/// forall x in [univ_lower_bound, univ_upper_bound[.
+///   premise(x) =>
+///     exists y in [exists_lower_bound, exists_upper_bound[. s0[x+y] != s1[y]
+/// ```
+struct string_not_contains_constraintt
 {
-public:
-  // string_not contains_constraintt are formula of the form:
-  // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s0[x+y] != s1[y]
-
-  string_not_contains_constraintt(
-    exprt univ_lower_bound,
-    exprt univ_bound_sup,
-    exprt premise,
-    exprt exists_bound_inf,
-    exprt exists_bound_sup,
-    const array_string_exprt &s0,
-    const array_string_exprt &s1)
-    : exprt(ID_string_not_contains_constraint)
-  {
-    copy_to_operands(univ_lower_bound, univ_bound_sup, premise);
-    copy_to_operands(exists_bound_inf, exists_bound_sup, s0);
-    copy_to_operands(s1);
-  };
-
-  const exprt &univ_lower_bound() const
-  {
-    return op0();
-  }
-
-  const exprt &univ_upper_bound() const
-  {
-    return op1();
-  }
-
-  const exprt &premise() const
-  {
-    return op2();
-  }
-
-  const exprt &exists_lower_bound() const
-  {
-    return op3();
-  }
-
-  const exprt &exists_upper_bound() const
-  {
-    return operands()[4];
-  }
-
-  const array_string_exprt &s0() const
-  {
-    return to_array_string_expr(operands()[5]);
-  }
-
-  const array_string_exprt &s1() const
-  {
-    return to_array_string_expr(operands()[6]);
-  }
+  exprt univ_lower_bound;
+  exprt univ_upper_bound;
+  exprt premise;
+  exprt exists_lower_bound;
+  exprt exists_upper_bound;
+  array_string_exprt s0;
+  array_string_exprt s1;
 };
 
-/// Used for debug printing.
-/// \param [in] expr: constraint to render
-/// \return rendered string
-inline std::string to_string(const string_not_contains_constraintt &expr)
-{
-  std::ostringstream out;
-  out << "forall x in [" << format(expr.univ_lower_bound()) << ", "
-      << format(expr.univ_upper_bound()) << "). " << format(expr.premise())
-      << " => ("
-      << "exists y in [" << format(expr.exists_lower_bound()) << ", "
-      << format(expr.exists_upper_bound()) << "). " << format(expr.s0())
-      << "[x+y] != " << format(expr.s1()) << "[y])";
-  return out.str();
-}
+std::string to_string(const string_not_contains_constraintt &expr);
 
-inline const string_not_contains_constraintt
-&to_string_not_contains_constraint(const exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_string_not_contains_constraint);
-  DATA_INVARIANT(
-    expr.operands().size()==7,
-    string_refinement_invariantt("string_not_contains_constraintt must have 7 "
-      "operands"));
-  return static_cast<const string_not_contains_constraintt &>(expr);
-}
+void replace(
+  const union_find_replacet &replace_map,
+  string_not_contains_constraintt &constraint);
 
-inline string_not_contains_constraintt
-&to_string_not_contains_constraint(exprt &expr)
+bool operator==(
+  const string_not_contains_constraintt &left,
+  const string_not_contains_constraintt &right);
+
+// NOLINTNEXTLINE [allow specialization within 'std']
+namespace std
 {
-  PRECONDITION(expr.id()==ID_string_not_contains_constraint);
-  DATA_INVARIANT(
-    expr.operands().size()==7,
-    string_refinement_invariantt("string_not_contains_constraintt must have 7 "
-      "operands"));
-  return static_cast<string_not_contains_constraintt &>(expr);
+template <>
+// NOLINTNEXTLINE [struct identifier 'hash' does not end in t]
+struct hash<string_not_contains_constraintt>
+{
+  size_t operator()(const string_not_contains_constraintt &constraint) const
+  {
+    return irep_hash()(constraint.univ_lower_bound) ^
+           irep_hash()(constraint.univ_upper_bound) ^
+           irep_hash()(constraint.exists_lower_bound) ^
+           irep_hash()(constraint.exists_upper_bound) ^
+           irep_hash()(constraint.premise) ^ irep_hash()(constraint.s0) ^
+           irep_hash()(constraint.s1);
+  }
+};
 }
 
 #endif

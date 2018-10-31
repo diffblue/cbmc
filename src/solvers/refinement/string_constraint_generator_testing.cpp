@@ -266,14 +266,14 @@ std::pair<exprt, string_constraintst> add_axioms_for_contains(
     implies_exprt(contains, equal_exprt(s1[qvar], s0[qvar_shifted])));
   constraints.universal.push_back(a4);
 
-  string_not_contains_constraintt a5(
+  const string_not_contains_constraintt a5 = {
     from_integer(0, index_type),
     plus_exprt(from_integer(1, index_type), length_diff),
     and_exprt(not_exprt(contains), s0.axiom_for_length_ge(s1.length())),
     from_integer(0, index_type),
     s1.length(),
     s0,
-    s1);
+    s1};
   constraints.not_contains.push_back(a5);
 
   return {typecast_exprt(contains, f.type()), std::move(constraints)};
