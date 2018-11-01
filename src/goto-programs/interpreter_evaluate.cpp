@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_container.h>
 
 #include <langapi/language_util.h>
+#include <util/expr_util.h>
 
 /// Reads a memory address and loads it into the `dest` variable.
 /// Marks cell as `READ_BEFORE_WRITTEN` if cell has never been written.
@@ -347,12 +348,13 @@ void interpretert::evaluate(
     {
       if(expr.has_operands())
       {
-        if(expr.op0().id() == ID_address_of)
+        const exprt &object = skip_typecast(expr.op0());
+        if(object.id() == ID_address_of)
         {
-          evaluate(expr.op0(), dest);
+          evaluate(object, dest);
           return;
         }
-        else if(const auto i = numeric_cast<mp_integer>(expr.op0()))
+        else if(const auto i = numeric_cast<mp_integer>(object))
         {
           dest.push_back(*i);
           return;
