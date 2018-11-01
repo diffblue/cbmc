@@ -149,7 +149,7 @@ public:
 
   void add(codet &&code)
   {
-    copy_to_operands(std::move(code));
+    add_to_operands(std::move(code));
   }
 
   void add(codet code, const source_locationt &loc)
