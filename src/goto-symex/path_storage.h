@@ -36,7 +36,7 @@ public:
     {
     }
 
-    explicit patht(const patht &other)
+    patht(const patht &other)
       : equation(other.equation), state(other.state, &equation)
     {
     }
