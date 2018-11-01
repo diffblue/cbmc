@@ -345,24 +345,28 @@ void interpretert::evaluate(
     }
     else if(expr.type().id() == ID_pointer)
     {
-      mp_integer i=0;
       if(expr.has_operands() && expr.op0().id()==ID_address_of)
       {
         evaluate(expr.op0(), dest);
         return;
       }
-      else if(expr.has_operands() && !to_integer(expr.op0(), i))
+      else if(expr.has_operands())
       {
-        dest.push_back(i);
-        return;
+        if(const auto i = numeric_cast<mp_integer>(expr.op0()))
+        {
+          dest.push_back(*i);
+          return;
+        }
       }
       // check if expression is constant null pointer without operands
-      else if(
-        !expr.has_operands() && !to_integer(to_constant_expr(expr), i) &&
-        i.is_zero())
+      else if(!expr.has_operands())
       {
-        dest.push_back(i);
-        return;
+        const auto i = numeric_cast<mp_integer>(expr);
+        if(i && i->is_zero())
+        {
+          dest.push_back(*i);
+          return;
+        }
       }
     }
     else if(expr.type().id()==ID_floatbv)
