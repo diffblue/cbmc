@@ -105,13 +105,14 @@ public:
   void reserve_operands(operandst::size_type n)
   { operands().reserve(n) ; }
 
-  DEPRECATED("use copy_to_operands(expr) instead")
+  DEPRECATED("use add_to_operands(std::move(expr)) instead")
   void move_to_operands(exprt &expr);
 
-  DEPRECATED("use copy_to_operands(e1, e2) instead")
+  DEPRECATED("use add_to_operands(std::move(e1), std::move(e2)) instead")
   void move_to_operands(exprt &e1, exprt &e2);
 
-  DEPRECATED("use copy_to_operands(e1, e2, e3) instead")
+  DEPRECATED(
+    "use add_to_operands(std::move(e1), std::move(e2), std::move(e3)) instead")
   void move_to_operands(exprt &e1, exprt &e2, exprt &e3);
 
   /// Copy the given argument to the end of `exprt`'s operands.
@@ -121,9 +122,16 @@ public:
     operands().push_back(expr);
   }
 
-  /// Copy the given argument to the end of `exprt`'s operands.
+  /// Add the given argument to the end of `exprt`'s operands.
   /// \param expr: `exprt` to append to the operands
-  void copy_to_operands(exprt &&expr)
+  void add_to_operands(const exprt &expr)
+  {
+    copy_to_operands(expr);
+  }
+
+  /// Add the given argument to the end of `exprt`'s operands.
+  /// \param expr: `exprt` to append to the operands
+  void add_to_operands(exprt &&expr)
   {
     operands().push_back(std::move(expr));
   }
@@ -141,10 +149,18 @@ public:
     op.push_back(e2);
   }
 
-  /// Copy the given arguments to the end of `exprt`'s operands.
+  /// Add the given arguments to the end of `exprt`'s operands.
   /// \param e1: first `exprt` to append to the operands
   /// \param e2: second `exprt` to append to the operands
-  void copy_to_operands(exprt &&e1, exprt &&e2)
+  void add_to_operands(const exprt &e1, const exprt &e2)
+  {
+    copy_to_operands(e1, e2);
+  }
+
+  /// Add the given arguments to the end of `exprt`'s operands.
+  /// \param e1: first `exprt` to append to the operands
+  /// \param e2: second `exprt` to append to the operands
+  void add_to_operands(exprt &&e1, exprt &&e2)
   {
     operandst &op = operands();
     #ifndef USE_LIST
@@ -152,6 +168,15 @@ public:
     #endif
     op.push_back(std::move(e1));
     op.push_back(std::move(e2));
+  }
+
+  /// Add the given arguments to the end of `exprt`'s operands.
+  /// \param e1: first `exprt` to append to the operands
+  /// \param e2: second `exprt` to append to the operands
+  /// \param e3: third `exprt` to append to the operands
+  void add_to_operands(const exprt &e1, const exprt &e2, const exprt &e3)
+  {
+    copy_to_operands(e1, e2, e3);
   }
 
   /// Copy the given arguments to the end of `exprt`'s operands.
@@ -169,11 +194,11 @@ public:
     op.push_back(e3);
   }
 
-  /// Copy the given arguments to the end of `exprt`'s operands.
+  /// Add the given arguments to the end of `exprt`'s operands.
   /// \param e1: first `exprt` to append to the operands
   /// \param e2: second `exprt` to append to the operands
   /// \param e3: third `exprt` to append to the operands
-  void copy_to_operands(exprt &&e1, exprt &&e2, exprt &&e3)
+  void add_to_operands(exprt &&e1, exprt &&e2, exprt &&e3)
   {
     operandst &op = operands();
     #ifndef USE_LIST
