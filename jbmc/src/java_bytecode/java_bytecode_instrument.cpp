@@ -329,7 +329,7 @@ void java_bytecode_instrumentt::add_expr_instrumentation(
     if(expr_instrumentation->get_statement() == ID_block)
       block.append(to_code_block(*expr_instrumentation));
     else
-      block.move(*expr_instrumentation);
+      block.add(std::move(*expr_instrumentation));
   }
 }
 
@@ -476,7 +476,7 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
   forall_operands(it, expr)
   {
     if(optionalt<codet> op_result = instrument_expr(*it))
-      result.move(*op_result);
+      result.add(std::move(*op_result));
   }
 
   // Add any check due at this node:
@@ -498,7 +498,7 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
             dereference_expr,
             plus_expr.op1(),
             expr.source_location());
-        result.move(bounds_check);
+        result.add(std::move(bounds_check));
       }
     }
   }
@@ -534,7 +534,7 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
       check_null_dereference(
         dereference_expr.op0(),
         dereference_expr.source_location());
-    result.move(null_dereference_check);
+    result.add(std::move(null_dereference_check));
   }
 
   if(result==code_blockt())
@@ -598,7 +598,7 @@ void java_bytecode_instrument_uncaught_exceptions(
   assert_location.set_comment("no uncaught exception");
   assert_no_exception.add_source_location() = assert_location;
 
-  init_code.move(assert_no_exception);
+  init_code.add(std::move(assert_no_exception));
 }
 
 /// Instruments all the code in the symbol_table with

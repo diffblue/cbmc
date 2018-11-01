@@ -117,7 +117,7 @@ exprt symbol_factoryt::allocate_object(
   //   <target_expr> = &tmp$<temporary_counter>
   code_assignt assign(target_expr, aoe);
   assign.add_source_location()=loc;
-  assignments.move(assign);
+  assignments.add(std::move(assign));
 
   return aoe;
 }
@@ -178,7 +178,7 @@ void symbol_factoryt::gen_nondet_init(
       null_check.then_case()=set_null_inst;
       null_check.else_case()=non_null_inst;
 
-      assignments.move(null_check);
+      assignments.add(std::move(null_check));
     }
   }
   // TODO(OJones): Add support for structs and arrays
@@ -193,7 +193,7 @@ void symbol_factoryt::gen_nondet_init(
     code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
 
-    assignments.move(assign);
+    assignments.add(std::move(assign));
   }
 }
 
@@ -249,7 +249,7 @@ symbol_exprt c_nondet_symbol_factory(
   {
     code_declt decl(symbol_ptr->symbol_expr());
     decl.add_source_location()=loc;
-    init_code.move(decl);
+    init_code.add(std::move(decl));
   }
 
   init_code.append(assignments);
@@ -266,7 +266,7 @@ symbol_exprt c_nondet_symbol_factory(
         from_integer(0, index_type())));
     input_code.op1()=symbol_ptr->symbol_expr();
     input_code.add_source_location()=loc;
-    init_code.move(input_code);
+    init_code.add(std::move(input_code));
   }
 
   return main_symbol_expr;

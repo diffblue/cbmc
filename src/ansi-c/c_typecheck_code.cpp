@@ -433,7 +433,7 @@ void c_typecheck_baset::typecheck_for(codet &code)
         code_blockt code_block;
         code_block.add_source_location()=code.op3().source_location();
 
-        code_block.move(to_code(code.op3()));
+        code_block.add(std::move(to_code(code.op3())));
         code.op3().swap(code_block);
       }
       typecheck_code(to_code(code.op3()));
@@ -461,9 +461,9 @@ void c_typecheck_baset::typecheck_for(codet &code)
     }
 
     code_block.reserve_operands(2);
-    code_block.move(to_code(code.op0()));
+    code_block.add(std::move(to_code(code.op0())));
     code.op0().make_nil();
-    code_block.move(code);
+    code_block.add(std::move(code));
     code.swap(code_block);
     typecheck_code(code); // recursive call
   }

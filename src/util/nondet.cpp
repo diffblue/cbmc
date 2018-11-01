@@ -125,6 +125,6 @@ code_blockt generate_nondet_switch(
   }
 
   result_switch.body() = switch_block;
-  result_block.move(result_switch);
+  result_block.add(std::move(result_switch));
   return result_block;
 }

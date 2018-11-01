@@ -296,13 +296,13 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
                               .symbol_expr();
     code_declt init_decl(init_sym);
     init_decl.add_source_location() = location;
-    for_body.move(init_decl);
+    for_body.add(std::move(init_decl));
 
     code_assignt init_subarray(init_sym, sub_java_new);
     code_assignt assign_subarray(
       deref_expr, typecast_exprt(init_sym, deref_expr.type()));
     for_body.move(init_subarray);
-    for_body.move(assign_subarray);
+    for_body.add(std::move(assign_subarray));
 
     for_loop.init() = code_assignt(tmp_i, from_integer(0, tmp_i.type()));
     for_loop.cond() = binary_relation_exprt(tmp_i, ID_lt, rhs.op0());
