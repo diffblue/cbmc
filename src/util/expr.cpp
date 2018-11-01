@@ -104,8 +104,7 @@ void exprt::make_not()
   }
   else
   {
-    new_expr=exprt(ID_not, type());
-    new_expr.move_to_operands(*this);
+    new_expr = not_exprt(*this);
   }
 
   swap(new_expr);
