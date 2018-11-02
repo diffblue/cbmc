@@ -72,7 +72,7 @@ jobs:
       script:
         - echo $PATH
         - doxygen --version
-        - scripts/travis_doxygen.sh
+        - scripts/run_doxygen.sh
       before_cache:
       after_success:
         # Google Cloud Integration
