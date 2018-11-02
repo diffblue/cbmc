@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <cassert>
+#include <algorithm>
 
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
@@ -80,26 +80,16 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     // this rather than as a series of individual options.
     #define UNIFORM_ARRAY_HACK
     #ifdef UNIFORM_ARRAY_HACK
-    bool is_uniform = false;
+    bool is_uniform = array.id() == ID_array_of;
 
-    if(array.id()==ID_array_of)
+    if(array.id() == ID_constant || array.id() == ID_array)
     {
-      is_uniform = true;
-    }
-    else if(array.id()==ID_constant || array.id()==ID_array)
-    {
-      bool found_exception = false;
-      forall_expr(it, array.operands())
-      {
-        if(*it != array.op0())
-        {
-          found_exception = true;
-          break;
-        }
-      }
-
-      if(!found_exception)
-        is_uniform = true;
+      is_uniform =
+        array.operands().size() <= 1 ||
+        std::all_of(
+          ++array.operands().begin(),
+          array.operands().end(),
+          [&array](const exprt &expr) { return expr == array.op0(); });
     }
 
     if(is_uniform && prop.has_set_to())
