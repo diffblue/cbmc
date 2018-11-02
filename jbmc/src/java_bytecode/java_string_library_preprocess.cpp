@@ -632,17 +632,28 @@ exprt make_nondet_infinite_char_array(
   const array_typet array_type(
     java_char_type(), infinity_exprt(java_int_type()));
   const symbolt data_sym = get_fresh_aux_symbol(
-    array_type,
+    pointer_type(array_type),
     id2string(function_id),
-    "nondet_infinite_array",
+    "nondet_infinite_array_pointer",
     loc,
     ID_java,
     symbol_table);
-  const symbol_exprt data_expr = data_sym.symbol_expr();
-  code.add(code_declt(data_expr), loc);
-  const side_effect_expr_nondett nondet_data(data_expr.type(), loc);
-  code.add(code_assignt(data_expr, nondet_data), loc);
-  return data_expr;
+
+  const exprt data_pointer = data_sym.symbol_expr();
+  std::vector<const symbolt *> created_symbols;
+  allocate_dynamic_object(
+    data_pointer,
+    array_type,
+    symbol_table,
+    loc,
+    function_id,
+    code,
+    created_symbols,
+    false);
+  const exprt nondet_data = side_effect_expr_nondett(array_type, loc);
+  const exprt data = dereference_exprt(data_pointer, array_type);
+  code.add(code_assignt(data, nondet_data), loc);
+  return data;
 }
 
 /// Add a call to a primitive of the string solver, letting it know that
