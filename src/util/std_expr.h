@@ -1823,16 +1823,15 @@ inline void validate_expr(const union_exprt &value)
 
 
 /// \brief Struct constructor from list of elements
-class struct_exprt:public exprt
+class struct_exprt : public multi_ary_exprt
 {
 public:
   DEPRECATED("use struct_exprt(component_name, value, type) instead")
-  struct_exprt():exprt(ID_struct)
+  struct_exprt() : multi_ary_exprt(ID_struct)
   {
   }
 
-  explicit struct_exprt(const typet &_type):
-    exprt(ID_struct, _type)
+  explicit struct_exprt(const typet &_type) : multi_ary_exprt(ID_struct, _type)
   {
   }
 
