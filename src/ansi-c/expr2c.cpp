@@ -618,9 +618,7 @@ std::string expr2ct::convert_rec(
   {
     const vector_typet &vector_type=to_vector_type(src);
 
-    mp_integer size_int;
-    to_integer(vector_type.size(), size_int);
-
+    const mp_integer size_int = numeric_cast_v<mp_integer>(vector_type.size());
     std::string dest="__gcc_v"+integer2string(size_int);
 
     std::string tmp=convert(vector_type.subtype());

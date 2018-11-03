@@ -96,8 +96,7 @@ exprt get_quantifier_var_max(
       if(expr_eq(var_expr, x.op0()) && x.op1().id()==ID_constant)
       {
         exprt over_expr=x.op1();
-        mp_integer over_i;
-        to_integer(over_expr, over_i);
+        mp_integer over_i = numeric_cast_v<mp_integer>(over_expr);
         /**
          * Due to the ''simplify'',
          * the ''over_i'' value we obtain here is not the exact
@@ -125,8 +124,7 @@ exprt get_quantifier_var_max(
       if(expr_eq(var_expr, y.op0()) && y.op1().id()==ID_constant)
       {
         exprt over_expr=y.op1();
-        mp_integer over_i;
-        to_integer(over_expr, over_i);
+        mp_integer over_i = numeric_cast_v<mp_integer>(over_expr);
         over_i-=1;
         res=from_integer(over_i, y.op1().type());
         return res;

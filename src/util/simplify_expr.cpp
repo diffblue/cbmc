@@ -1525,10 +1525,7 @@ exprt simplify_exprt::bits2expr(
   {
     const array_typet &array_type=to_array_type(type);
 
-    mp_integer size;
-    if(to_integer(array_type.size(), size))
-      UNREACHABLE;
-    std::size_t n_el=integer2size_t(size);
+    const std::size_t n_el = numeric_cast_v<std::size_t>(array_type.size());
 
     const auto el_size_opt = pointer_offset_bits(array_type.subtype(), ns);
     CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > 0);

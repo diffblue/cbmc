@@ -203,13 +203,13 @@ std::string trace_numeric_value(
     }
     else if(type.id()==ID_integer)
     {
-      mp_integer i;
-      if(!to_integer(expr, i) && i>=0)
+      const auto i = numeric_cast<mp_integer>(expr);
+      if(i.has_value() && *i >= 0)
       {
         if(options.hex_representation)
-          return "0x" + integer2string(i, 16);
+          return "0x" + integer2string(*i, 16);
         else
-          return "0b" + integer2string(i, 2);
+          return "0b" + integer2string(*i, 2);
       }
     }
   }

@@ -90,9 +90,7 @@ refined_string_exprt make_refined_string_exprt(const array_string_exprt &arr)
 /// \return the corresponding index set
 std::set<exprt> full_index_set(const array_string_exprt &s)
 {
-  PRECONDITION(s.length().is_constant());
-  mp_integer n;
-  to_integer(s.length(), n);
+  const mp_integer n = numeric_cast_v<mp_integer>(s.length());
   std::set<exprt> ret;
   for(mp_integer i=0; i<n; ++i)
     ret.insert(from_integer(i));

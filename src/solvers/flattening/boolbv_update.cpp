@@ -84,13 +84,11 @@ void boolbvt::convert_update_rec(
     std::size_t element_size=boolbv_width(subtype);
 
     // iterate over array
-    mp_integer size;
-    if(to_integer(array_type.size(), size))
-      throw "update: failed to get array size";
+    const std::size_t size = numeric_cast_v<std::size_t>(array_type.size());
 
     bvt tmp_bv=bv;
 
-    for(std::size_t i=0; i!=integer2size_t(size); ++i)
+    for(std::size_t i = 0; i != size; ++i)
     {
       std::size_t new_offset=offset+i*element_size;
 

@@ -254,8 +254,7 @@ void interval_domaint::assume_rec(
 
     if(is_int(lhs.type()) && is_int(rhs.type()))
     {
-      mp_integer tmp;
-      to_integer(rhs, tmp);
+      mp_integer tmp = numeric_cast_v<mp_integer>(rhs);
       if(id==ID_lt)
         --tmp;
       integer_intervalt &ii=int_map[lhs_identifier];
@@ -280,8 +279,7 @@ void interval_domaint::assume_rec(
 
     if(is_int(lhs.type()) && is_int(rhs.type()))
     {
-      mp_integer tmp;
-      to_integer(lhs, tmp);
+      mp_integer tmp = numeric_cast_v<mp_integer>(lhs);
       if(id==ID_lt)
         ++tmp;
       integer_intervalt &ii=int_map[rhs_identifier];

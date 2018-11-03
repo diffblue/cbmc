@@ -247,8 +247,7 @@ xmlt xml(
       result.name="integer";
       result.set_attribute("c_type", "_Bool");
       result.set_attribute("binary", expr.get_string(ID_value));
-      mp_integer b;
-      to_integer(to_constant_expr(expr), b);
+      const mp_integer b = numeric_cast_v<mp_integer>(expr);
       result.data=integer2string(b);
     }
     else
