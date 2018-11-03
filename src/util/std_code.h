@@ -335,28 +335,25 @@ inline code_declt &to_code_decl(codet &code)
 class code_deadt:public codet
 {
 public:
-  DEPRECATED("use code_deadt(symbol) instead")
-  code_deadt():codet(ID_dead)
+  explicit code_deadt(const symbol_exprt &symbol) : codet(ID_dead)
   {
-    operands().resize(1);
+    add_to_operands(symbol);
   }
 
-  explicit code_deadt(const exprt &symbol):codet(ID_dead)
+  symbol_exprt &symbol()
   {
-    copy_to_operands(symbol);
+    return static_cast<symbol_exprt &>(op0());
   }
 
-  exprt &symbol()
+  const symbol_exprt &symbol() const
   {
-    return op0();
+    return static_cast<const symbol_exprt &>(op0());
   }
 
-  const exprt &symbol() const
+  const irep_idt &get_identifier() const
   {
-    return op0();
+    return symbol().get_identifier();
   }
-
-  const irep_idt &get_identifier() const;
 };
 
 template<> inline bool can_cast_expr<code_deadt>(const exprt &base)
@@ -374,6 +371,9 @@ inline const code_deadt &to_code_dead(const codet &code)
   PRECONDITION(code.get_statement() == ID_dead);
   DATA_INVARIANT(
     code.operands().size() == 1, "dead statement must have one operand");
+  DATA_INVARIANT(
+    to_unary_expr(code).op().id() == ID_symbol,
+    "dead statement must take symbol operand");
   return static_cast<const code_deadt &>(code);
 }
 
@@ -382,6 +382,9 @@ inline code_deadt &to_code_dead(codet &code)
   PRECONDITION(code.get_statement() == ID_dead);
   DATA_INVARIANT(
     code.operands().size() == 1, "dead statement must have one operand");
+  DATA_INVARIANT(
+    to_unary_expr(code).op().id() == ID_symbol,
+    "dead statement must take symbol operand");
   return static_cast<code_deadt &>(code);
 }
 

@@ -85,8 +85,8 @@ void full_slicert::operator()(
     }
     else if(e_it->first->is_dead())
     {
-      const exprt &s=to_code_dead(e_it->first->code).symbol();
-      decl_dead[to_symbol_expr(s).get_identifier()].push(e_it->second);
+      const auto &s=to_code_dead(e_it->first->code).symbol();
+      decl_dead[s.get_identifier()].push(e_it->second);
     }
   }
 
