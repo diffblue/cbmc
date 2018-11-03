@@ -98,7 +98,7 @@ protected:
   acceleration_utilst utils;
   exprt loop_counter;
   distinguish_mapt distinguishing_points;
-  std::list<exprt> distinguishers;
+  std::list<symbol_exprt> distinguishers;
   expr_sett modified;
   goto_programt fixed;
   std::list<distinguish_valuest> accelerated_paths;
