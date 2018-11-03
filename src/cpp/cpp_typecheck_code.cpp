@@ -100,7 +100,7 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
           to_code_decl(to_code(code.op0().op0()));
 
         // get the type
-        const typet &type=code_decl.op0().type();
+        const typet &type = code_decl.symbol().type();
 
         // annotate exception ID
         op.set(ID_exception_id, cpp_exception_id(type, *this));

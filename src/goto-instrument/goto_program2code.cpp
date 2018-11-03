@@ -458,7 +458,7 @@ goto_programt::const_targett goto_program2codet::convert_decl(
     codet &dest)
 {
   code_declt d=to_code_decl(target->code);
-  symbol_exprt &symbol=to_symbol_expr(d.symbol());
+  symbol_exprt &symbol = d.symbol();
 
   goto_programt::const_targett next=target;
   ++next;

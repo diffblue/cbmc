@@ -93,7 +93,7 @@ void constant_propagator_domaint::transform(
   if(from->is_decl())
   {
     const code_declt &code_decl=to_code_decl(from->code);
-    const symbol_exprt &symbol=to_symbol_expr(code_decl.symbol());
+    const symbol_exprt &symbol = code_decl.symbol();
     values.set_to_top(symbol);
   }
   else if(from->is_assign())

@@ -894,7 +894,9 @@ void dump_ct::convert_global_variable(
   }
 
   if(!func.empty() && !symbol.is_extern)
-    local_static_decls[symbol.name]=d;
+  {
+    local_static_decls.emplace(symbol.name, d);
+  }
   else if(!symbol.value.is_nil())
   {
     os << "// " << symbol.name << '\n';
