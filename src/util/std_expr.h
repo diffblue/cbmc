@@ -1682,11 +1682,11 @@ template<> inline bool can_cast_expr<array_exprt>(const exprt &base)
 
 /// Array constructor from a list of index-element pairs
 /// Operands are index/value pairs, alternating.
-class array_list_exprt : public exprt
+class array_list_exprt : public multi_ary_exprt
 {
 public:
   explicit array_list_exprt(const array_typet &_type)
-    : exprt(ID_array_list, _type)
+    : multi_ary_exprt(ID_array_list, _type)
   {
   }
 };
