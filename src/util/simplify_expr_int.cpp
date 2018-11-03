@@ -477,7 +477,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
       exprt op0 = plus_expr.op0();
 
       if(plus_expr.op0().op1().id() == ID_plus)
-        op0.op1().copy_to_operands(expr.op1());
+        op0.op1().add_to_operands(expr.op1());
       else
         op0.op1()=plus_exprt(op0.op1(), expr.op1());
 

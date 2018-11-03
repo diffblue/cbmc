@@ -191,7 +191,7 @@ public:
     const typet &type)
     : struct_exprt(type)
   {
-    copy_to_operands(_length, _content);
+    add_to_operands(_length, _content);
   }
 
   refined_string_exprt(const exprt &_length, const exprt &_content)
