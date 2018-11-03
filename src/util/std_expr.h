@@ -1642,16 +1642,16 @@ inline void validate_expr(const array_of_exprt &value)
 
 
 /// \brief Array constructor from list of elements
-class array_exprt:public exprt
+class array_exprt : public multi_ary_exprt
 {
 public:
   DEPRECATED("use array_exprt(type) instead")
-  array_exprt():exprt(ID_array)
+  array_exprt() : multi_ary_exprt(ID_array)
   {
   }
 
-  explicit array_exprt(const array_typet &_type):
-    exprt(ID_array, _type)
+  explicit array_exprt(const array_typet &_type)
+    : multi_ary_exprt(ID_array, _type)
   {
   }
 };
