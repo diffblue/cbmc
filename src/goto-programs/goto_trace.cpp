@@ -205,7 +205,12 @@ std::string trace_numeric_value(
     {
       mp_integer i;
       if(!to_integer(expr, i) && i>=0)
-        return integer2string(i, 2);
+      {
+        if(options.hex_representation)
+          return "0x" + integer2string(i, 16);
+        else
+          return "0b" + integer2string(i, 2);
+      }
     }
   }
   else if(expr.id()==ID_array)
