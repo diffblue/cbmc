@@ -1101,13 +1101,14 @@ static irep_idt string_from_ns(
   const exprt &tmp=symbol->value;
 
   INVARIANT(
-    tmp.id() == ID_address_of && tmp.operands().size() == 1 &&
-      tmp.op0().id() == ID_index && tmp.op0().operands().size() == 2 &&
-      tmp.op0().op0().id() == ID_string_constant,
+    tmp.id() == ID_address_of &&
+      to_address_of_expr(tmp).object().id() == ID_index &&
+      to_index_expr(to_address_of_expr(tmp).object()).array().id() ==
+        ID_string_constant,
     "symbol table configuration entry `" + id2string(id) +
       "' must be a string constant");
 
-  return tmp.op0().op0().get(ID_value);
+  return to_index_expr(to_address_of_expr(tmp).object()).array().get(ID_value);
 }
 
 static unsigned unsigned_from_ns(

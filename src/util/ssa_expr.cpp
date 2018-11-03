@@ -77,9 +77,10 @@ bool ssa_exprt::can_build_identifier(const exprt &expr)
 {
   if(expr.id()==ID_symbol)
     return true;
-  else if(expr.id()==ID_member ||
-          expr.id()==ID_index)
-    return can_build_identifier(expr.op0());
+  else if(expr.id() == ID_member)
+    return can_build_identifier(to_member_expr(expr).compound());
+  else if(expr.id() == ID_index)
+    return can_build_identifier(to_index_expr(expr).array());
   else
     return false;
 }

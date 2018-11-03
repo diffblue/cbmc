@@ -39,42 +39,47 @@ static exprt simplify_json_expr(
     {
       const irep_idt &value=to_constant_expr(src).get_value();
 
-      if(value!=ID_NULL &&
-         (value!=std::string(value.size(), '0') ||
-          !config.ansi_c.NULL_is_zero) &&
-         src.operands().size()==1 &&
-         src.op0().id()!=ID_constant)
-        // try to simplify the constant pointer
-        return simplify_json_expr(src.op0(), ns);
+      if(
+        value != ID_NULL &&
+        (value != std::string(value.size(), '0') ||
+         !config.ansi_c.NULL_is_zero) &&
+        src.operands().size() == 1 &&
+        to_unary_expr(src).op().id() != ID_constant)
+      // try to simplify the constant pointer
+      {
+        return simplify_json_expr(to_unary_expr(src).op(), ns);
+      }
     }
   }
-  else if(src.id()==ID_address_of &&
-          src.operands().size()==1 &&
-          src.op0().id()==ID_member &&
-          id2string(to_member_expr(
-            src.op0()).get_component_name()).find("@")!=std::string::npos)
+  else if(
+    src.id() == ID_address_of &&
+    to_address_of_expr(src).object().id() == ID_member &&
+    id2string(
+      to_member_expr(to_address_of_expr(src).object()).get_component_name())
+        .find("@") != std::string::npos)
   {
     // simplify expressions of the form &member_expr(object, @class_identifier)
-    return simplify_json_expr(src.op0(), ns);
+    return simplify_json_expr(to_address_of_expr(src).object(), ns);
   }
-  else if(src.id()==ID_address_of &&
-          src.operands().size()==1 &&
-          src.op0().id()==ID_index &&
-          to_index_expr(src.op0()).index().id()==ID_constant &&
-          to_constant_expr(
-            to_index_expr(src.op0()).index()).value_is_zero_string())
+  else if(
+    src.id() == ID_address_of &&
+    to_address_of_expr(src).object().id() == ID_index &&
+    to_index_expr(to_address_of_expr(src).object()).index().id() ==
+      ID_constant &&
+    to_constant_expr(to_index_expr(to_address_of_expr(src).object()).index())
+      .value_is_zero_string())
   {
     // simplify expressions of the form  &array[0]
-    return simplify_json_expr(to_index_expr(src.op0()).array(), ns);
+    return simplify_json_expr(
+      to_index_expr(to_address_of_expr(src).object()).array(), ns);
   }
   else if(src.id()==ID_member &&
-          src.operands().size()==1 &&
           id2string(
             to_member_expr(src).get_component_name())
               .find("@")!=std::string::npos)
   {
     // simplify expressions of the form  member_expr(object, @class_identifier)
-    return simplify_json_expr(src.op0(), ns);
+    return simplify_json_expr(to_member_expr(src).struct_op(), ns);
   }
 
   return src;
@@ -317,11 +322,15 @@ json_objectt json(
       result["name"]=json_stringt("pointer");
       result["type"]=json_stringt(type_string);
       exprt simpl_expr=simplify_json_expr(expr, ns);
-      if(simpl_expr.get(ID_value)==ID_NULL ||
-         // remove typecast on NULL
-         (simpl_expr.id()==ID_constant && simpl_expr.type().id()==ID_pointer &&
-          simpl_expr.op0().get(ID_value)==ID_NULL))
+      if(
+        simpl_expr.get(ID_value) == ID_NULL ||
+        // remove typecast on NULL
+        (simpl_expr.id() == ID_constant &&
+         simpl_expr.type().id() == ID_pointer &&
+         to_unary_expr(simpl_expr).op().get(ID_value) == ID_NULL))
+      {
         result["data"]=json_stringt(value_string);
+      }
       else if(simpl_expr.id()==ID_symbol)
       {
         const irep_idt &ptr_id=to_symbol_expr(simpl_expr).get_identifier();

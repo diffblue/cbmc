@@ -134,9 +134,7 @@ codet &code_blockt::find_last_statement()
     }
     else if(statement==ID_label)
     {
-      DATA_INVARIANT(
-        last->operands().size() == 1, "label must have one operand");
-      last=&(to_code(last->op0()));
+      last = &(to_code_label(*last).code());
     }
     else
       break;

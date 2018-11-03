@@ -435,7 +435,7 @@ void goto_symext::return_assignment(statet &state)
 
   PRECONDITION(code.operands().size() == 1 || frame.return_value.is_nil());
 
-  exprt value = code.op0();
+  exprt value = code.return_value();
 
   if(frame.return_value.is_not_nil())
   {

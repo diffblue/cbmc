@@ -56,8 +56,8 @@ exprt make_binary(const exprt &expr)
     exprt tmp=expr;
     tmp.operands().clear();
     tmp.operands().resize(2);
-    tmp.op0().swap(previous);
-    tmp.op1()=*it;
+    to_binary_expr(tmp).op0().swap(previous);
+    to_binary_expr(tmp).op1() = *it;
     previous.swap(tmp);
   }
 
@@ -126,8 +126,8 @@ exprt is_not_zero(
 
 exprt boolean_negate(const exprt &src)
 {
-  if(src.id()==ID_not && src.operands().size()==1)
-    return src.op0();
+  if(src.id() == ID_not)
+    return to_not_expr(src).op();
   else if(src.is_true())
     return false_exprt();
   else if(src.is_false())

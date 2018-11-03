@@ -233,11 +233,13 @@ void goto_symext::symex_goto(statet &state)
     // produce new guard symbol
     exprt guard_expr;
 
-    if(new_guard.id()==ID_symbol ||
-       (new_guard.id()==ID_not &&
-        new_guard.operands().size()==1 &&
-        new_guard.op0().id()==ID_symbol))
+    if(
+      new_guard.id() == ID_symbol ||
+      (new_guard.id() == ID_not &&
+       to_not_expr(new_guard).op().id() == ID_symbol))
+    {
       guard_expr=new_guard;
+    }
     else
     {
       symbol_exprt guard_symbol_expr=
