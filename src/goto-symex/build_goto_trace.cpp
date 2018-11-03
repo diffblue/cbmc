@@ -228,7 +228,11 @@ void build_goto_trace(
         exprt clock_value=prop_conv.get(
           symbol_exprt(partial_order_concurrencyt::rw_clock_id(it)));
 
-        to_integer(clock_value, current_time);
+        const auto cv = numeric_cast<mp_integer>(clock_value);
+        if(cv.has_value())
+          current_time = *cv;
+        else
+          current_time = 0;
       }
       else if(it->is_atomic_end() && current_time<0)
         current_time*=-1;

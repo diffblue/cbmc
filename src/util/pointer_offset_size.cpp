@@ -106,16 +106,12 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
     if(!sub.has_value())
       return {};
 
-    // get size
-    const exprt &size=to_array_type(type).size();
+    // get size - we can only distinguish the elements if the size is constant
+    const auto size = numeric_cast<mp_integer>(to_array_type(type).size());
+    if(!size.has_value())
+      return {};
 
-    // constant?
-    mp_integer i;
-
-    if(to_integer(size, i))
-      return {}; // we cannot distinguish the elements
-
-    return (*sub) * i;
+    return (*sub) * (*size);
   }
   else if(type.id()==ID_vector)
   {
@@ -124,15 +120,10 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
       return {};
 
     // get size
-    const exprt &size=to_vector_type(type).size();
+    const mp_integer size =
+      numeric_cast_v<mp_integer>(to_vector_type(type).size());
 
-    // constant?
-    mp_integer i;
-
-    if(to_integer(size, i))
-      return {}; // we cannot distinguish the elements
-
-    return (*sub) * i;
+    return (*sub) * size;
   }
   else if(type.id()==ID_complex)
   {
@@ -564,12 +555,12 @@ compute_pointer_offset(const exprt &expr, const namespacet &ns)
       const auto &array_type = to_array_type(index_expr.array().type());
       auto sub_size = pointer_offset_size(array_type.subtype(), ns);
 
-      mp_integer i;
-
-      if(
-        sub_size.has_value() && *sub_size > 0 &&
-        !to_integer(index_expr.index(), i))
-        return (*o) + i * (*sub_size);
+      if(sub_size.has_value() && *sub_size > 0)
+      {
+        const auto i = numeric_cast<mp_integer>(index_expr.index());
+        if(i.has_value())
+          return (*o) + (*i) * (*sub_size);
+      }
     }
 
     // don't know
@@ -607,40 +598,38 @@ exprt build_sizeof_expr(
   const typet &type=
     static_cast<const typet &>(expr.find(ID_C_c_sizeof_type));
 
-  mp_integer type_size=-1, val=-1;
-
-  if(type.is_not_nil())
-  {
-    auto tmp = pointer_offset_size(type, ns);
-    if(tmp.has_value())
-      type_size = *tmp;
-  }
-
-  if(type_size<0 ||
-     to_integer(expr, val) ||
-     val<type_size ||
-     (type_size==0 && val>0))
+  if(type.is_nil())
     return nil_exprt();
+
+  const auto type_size = pointer_offset_size(type, ns);
+  auto val = numeric_cast<mp_integer>(expr);
+
+  if(
+    !type_size.has_value() || *type_size < 0 || !val.has_value() ||
+    *val < *type_size || (*type_size == 0 && *val > 0))
+  {
+    return nil_exprt();
+  }
 
   const typet t(size_type());
   DATA_INVARIANT(
-    address_bits(val + 1) <= *pointer_offset_bits(t, ns),
+    address_bits(*val + 1) <= *pointer_offset_bits(t, ns),
     "sizeof value does not fit size_type");
 
   mp_integer remainder=0;
 
-  if(type_size!=0)
+  if(*type_size != 0)
   {
-    remainder=val%type_size;
-    val-=remainder;
-    val/=type_size;
+    remainder = *val % *type_size;
+    *val -= remainder;
+    *val /= *type_size;
   }
 
   exprt result(ID_sizeof, t);
   result.set(ID_type_arg, type);
 
-  if(val>1)
-    result=mult_exprt(result, from_integer(val, t));
+  if(*val > 1)
+    result = mult_exprt(result, from_integer(*val, t));
   if(remainder>0)
     result=plus_exprt(result, from_integer(remainder, t));
 
@@ -735,10 +724,10 @@ exprt get_subexpression_at_offset(
   const typet &target_type,
   const namespacet &ns)
 {
-  mp_integer offset_const;
+  const auto offset_bytes = numeric_cast<mp_integer>(offset);
 
-  if(to_integer(offset, offset_const))
+  if(!offset_bytes.has_value())
     return nil_exprt();
   else
-    return get_subexpression_at_offset(expr, offset_const, target_type, ns);
+    return get_subexpression_at_offset(expr, *offset_bytes, target_type, ns);
 }

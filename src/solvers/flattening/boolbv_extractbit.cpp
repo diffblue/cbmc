@@ -28,7 +28,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     if(index_as_integer < 0 || index_as_integer >= src_bv.size())
       return prop.new_variable(); // out of range!
     else
-      return src_bv[integer2size_t(index_as_integer)];
+      return src_bv[numeric_cast_v<std::size_t>(index_as_integer)];
   }
 
   if(

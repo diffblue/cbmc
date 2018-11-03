@@ -128,16 +128,16 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     const array_typet &array_type=to_array_type(type);
     std::size_t sub_width=operator()(array_type.subtype());
 
-    mp_integer array_size;
+    const auto array_size = numeric_cast<mp_integer>(array_type.size());
 
-    if(to_integer(array_type.size(), array_size))
+    if(!array_size.has_value())
     {
       // we can still use the theory of arrays for this
       entry.total_width=0;
     }
     else
     {
-      mp_integer total=array_size*sub_width;
+      mp_integer total = *array_size * sub_width;
       if(total>(1<<30)) // realistic limit
         throw analysis_exceptiont("array too large for flattening");
 
@@ -149,21 +149,13 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     const vector_typet &vector_type=to_vector_type(type);
     std::size_t sub_width=operator()(vector_type.subtype());
 
-    mp_integer vector_size;
+    const auto vector_size = numeric_cast_v<mp_integer>(vector_type.size());
 
-    if(to_integer(vector_type.size(), vector_size))
-    {
-      // we can still use the theory of arrays for this
-      entry.total_width=0;
-    }
-    else
-    {
-      mp_integer total=vector_size*sub_width;
-      if(total>(1<<30)) // realistic limit
-        analysis_exceptiont("vector too large for flattening");
+    mp_integer total = vector_size * sub_width;
+    if(total > (1 << 30)) // realistic limit
+      analysis_exceptiont("vector too large for flattening");
 
-      entry.total_width = numeric_cast_v<std::size_t>(vector_size * sub_width);
-    }
+    entry.total_width = numeric_cast_v<std::size_t>(vector_size * sub_width);
   }
   else if(type_id==ID_complex)
   {

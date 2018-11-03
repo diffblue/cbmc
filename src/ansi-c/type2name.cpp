@@ -178,14 +178,19 @@ static std::string type2name(
   }
   else if(type.id()==ID_array)
   {
-    const array_typet &t=to_array_type(type);
-    mp_integer size;
-    if(t.size().id()==ID_symbol)
-      result += "ARR" + id2string(to_symbol_expr(t.size()).get_identifier());
-    else if(to_integer(t.size(), size))
-      result+="ARR?";
+    const exprt &size = to_array_type(type).size();
+
+    if(size.id() == ID_symbol)
+      result += "ARR" + id2string(to_symbol_expr(size).get_identifier());
     else
-      result+="ARR"+integer2string(size);
+    {
+      const auto size_int = numeric_cast<mp_integer>(size);
+
+      if(!size_int.has_value())
+        result += "ARR?";
+      else
+        result += "ARR" + integer2string(*size_int);
+    }
   }
   else if(
     type.id() == ID_symbol_type || type.id() == ID_c_enum_tag ||
