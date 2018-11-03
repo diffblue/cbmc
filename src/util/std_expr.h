@@ -1703,16 +1703,16 @@ inline void validate_expr(const array_list_exprt &value)
 }
 
 /// \brief Vector constructor from list of elements
-class vector_exprt:public exprt
+class vector_exprt : public multi_ary_exprt
 {
 public:
   DEPRECATED("use vector_exprt(type) instead")
-  vector_exprt():exprt(ID_vector)
+  vector_exprt() : multi_ary_exprt(ID_vector)
   {
   }
 
-  explicit vector_exprt(const vector_typet &_type):
-    exprt(ID_vector, _type)
+  explicit vector_exprt(const vector_typet &_type)
+    : multi_ary_exprt(ID_vector, _type)
   {
   }
 };
