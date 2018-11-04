@@ -11,27 +11,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "property_checker.h"
 
-std::string property_checkert::as_string(resultt result)
+std::string property_resultst::as_string(resultt result)
 {
   switch(result)
   {
-  case property_checkert::resultt::PASS: return "OK";
-  case property_checkert::resultt::FAIL: return "FAILURE";
-  case property_checkert::resultt::ERROR: return "ERROR";
-  case property_checkert::resultt::UNKNOWN: return "UNKNOWN";
+  case property_resultst::resultt::PASS:
+    return "OK";
+  case property_resultst::resultt::FAIL:
+    return "FAILURE";
+  case property_resultst::resultt::ERROR:
+    return "ERROR";
+  case property_resultst::resultt::UNKNOWN:
+    return "UNKNOWN";
   }
 
   return "";
 }
 
-property_checkert::property_checkert(
-  message_handlert &_message_handler):
-  messaget(_message_handler)
-{
-}
-
-void property_checkert::initialize_property_map(
-  const goto_functionst &goto_functions)
+void property_resultst::initialize(const goto_functionst &goto_functions)
 {
   forall_goto_functions(it, goto_functions)
     if(!it->second.is_inlined() ||
@@ -53,4 +50,9 @@ void property_checkert::initialize_property_map(
         property_status.location=i_it;
       }
     }
+}
+
+property_checkert::property_checkert(message_handlert &_message_handler)
+  : messaget(_message_handler)
+{
 }

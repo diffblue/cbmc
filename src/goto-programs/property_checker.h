@@ -19,22 +19,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_trace.h"
 #include "goto_model.h"
 
-class property_checkert:public messaget
+class property_resultst
 {
 public:
-  property_checkert()
-  {
-  }
-
-  explicit property_checkert(
-    message_handlert &_message_handler);
-
   enum class resultt { PASS, FAIL, ERROR, UNKNOWN };
 
   static std::string as_string(resultt);
-
-  // Check whether all properties in goto_functions hold.
-  virtual resultt operator()(const goto_modelt &)=0;
 
   struct property_statust
   {
@@ -47,6 +37,28 @@ public:
   // the irep_idt is the property id
   typedef std::map<irep_idt, property_statust> property_mapt;
   property_mapt property_map;
+
+  /// return the overall result; this is
+  /// ERROR if any of the results is ERROR, otherwise
+  /// FAIL if any of the results is FAIL, otherwise
+  /// UNKNOWN if any of the results is UNKNOWN, otherwise
+  /// PASS.
+  resultt operatort() const;
+
+  void initialize(const goto_functionst &);
+};
+
+class property_checkert : public messaget
+{
+public:
+  property_checkert()
+  {
+  }
+
+  explicit property_checkert(message_handlert &_message_handler);
+
+  // Check whether all properties in goto_functions hold.
+  virtual property_resultst operator()(const goto_modelt &) = 0;
 
 protected:
   void initialize_property_map(const goto_functionst &);
