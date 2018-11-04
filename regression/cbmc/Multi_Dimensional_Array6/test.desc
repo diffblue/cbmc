@@ -3,8 +3,8 @@ main.c
 --unwind 3 --no-unwinding-assertions
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main\.assertion\.1\] : SUCCESS$
-^\[main\.assertion\.2\] : FAILURE$
+^\[main\.assertion\.1\] .* : SUCCESS$
+^\[main\.assertion\.2\] .* : FAILURE$
 ^\*\* 1 of 2 failed 
 --
 ^warning: ignoring

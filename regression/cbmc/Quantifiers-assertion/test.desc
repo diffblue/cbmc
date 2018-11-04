@@ -2,12 +2,12 @@ CORE
 main.c
 
 ^\*\* Results:$
-^\[main.assertion.1\] Exists-Exists: successful: SUCCESS$
-^\[main.assertion.2\] NotExists-NotExists: successful: SUCCESS$
-^\[main.assertion.3\] NotExists-Exists: failed: FAILURE$
-^\[main.assertion.4\] NotExists-Forall: failed: FAILURE$
-^\[main.assertion.5\] NotForall-Forall: successful: SUCCESS$
-^\[main.assertion.6\] NotForall-NotForall: successful: SUCCESS$
+^\[main.assertion.1\] .* Exists-Exists: successful: SUCCESS$
+^\[main.assertion.2\] .* NotExists-NotExists: successful: SUCCESS$
+^\[main.assertion.3\] .* NotExists-Exists: failed: FAILURE$
+^\[main.assertion.4\] .* NotExists-Forall: failed: FAILURE$
+^\[main.assertion.5\] .* NotForall-Forall: successful: SUCCESS$
+^\[main.assertion.6\] .* NotForall-NotForall: successful: SUCCESS$
 ^\*\* 2 of 6 failed
 ^VERIFICATION FAILED$
 ^EXIT=10$

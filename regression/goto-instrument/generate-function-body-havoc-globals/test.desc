@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^\[main.assertion.1\] assertion global == 10: FAILURE$
-^\[main.assertion.2\] assertion constant_global == 10: SUCCESS$
+^\[main.assertion.1\] .* assertion global == 10: FAILURE$
+^\[main.assertion.2\] .* assertion constant_global == 10: SUCCESS$
 --
 ^warning: ignoring

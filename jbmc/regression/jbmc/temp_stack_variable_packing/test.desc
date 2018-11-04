@@ -1,7 +1,7 @@
 CORE
 Primary.class
 --function Primary.main
-^\[java::Primary.Run:\(\)V\.assertion\.1\] assertion at file Primary\.java line 6 function java::Primary.Run:\(\)V bytecode-index 22: FAILURE$
+^\[java::Primary.Run:\(\)V\.assertion\.1\] line 6 assertion at file Primary\.java line 6 function java::Primary.Run:\(\)V bytecode-index 22: FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

@@ -3,7 +3,7 @@ main.c
 --undefined-shift-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[.*\] shift operand is negative in .*: FAILURE$
+^\[.*\] line 8 shift operand is negative in .*: FAILURE$
 ^\*\* 1 of 2 failed
 ^VERIFICATION FAILED$
 --

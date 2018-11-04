@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^\[main\.precondition_instance\..*] memset destination region writeable: FAILURE$
+^\[main\.precondition_instance\..*] .* memset destination region writeable: FAILURE$
 \*\* 1 of [0-9]+ failed \(.*\)
 --
 ^warning: ignoring

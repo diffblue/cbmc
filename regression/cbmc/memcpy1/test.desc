@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^\[main\.precondition_instance\..*\] memcpy source region readable: FAILURE$
+^\[main\.precondition_instance\..*\] .* memcpy source region readable: FAILURE$
 \*\* 1 of [0-9]+ failed
 --
 ^warning: ignoring

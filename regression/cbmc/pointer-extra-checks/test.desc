@@ -3,37 +3,37 @@ main.c
 --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.pointer_dereference.1\] dereference failure: pointer NULL in \*p: FAILURE$
-^\[main.pointer_dereference.2\] dereference failure: dead object in \*q: SUCCESS$
-^\[main.pointer_dereference.3\] dereference failure: pointer outside object bounds in \*q: SUCCESS$
-^\[main.pointer_dereference.4\] dereference failure: deallocated dynamic object in \*r: SUCCESS$
-^\[main.pointer_dereference.5\] dereference failure: pointer outside dynamic object bounds in \*r: SUCCESS$
-^\[main.pointer_dereference.6\] dereference failure: pointer uninitialized in \*s: FAILURE$
+^\[main.pointer_dereference.1\] .* dereference failure: pointer NULL in \*p: FAILURE$
+^\[main.pointer_dereference.2\] .* dereference failure: dead object in \*q: SUCCESS$
+^\[main.pointer_dereference.3\] .* dereference failure: pointer outside object bounds in \*q: SUCCESS$
+^\[main.pointer_dereference.4\] .* dereference failure: deallocated dynamic object in \*r: SUCCESS$
+^\[main.pointer_dereference.5\] .* dereference failure: pointer outside dynamic object bounds in \*r: SUCCESS$
+^\[main.pointer_dereference.6\] .* dereference failure: pointer uninitialized in \*s: FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer invalid in \*p:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer uninitialized in \*p:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: deallocated dynamic object in \*p:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: dead object in \*p:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside dynamic object bounds in \*p:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside object bounds in \*p:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer NULL in \*q:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer invalid in \*q:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: deallocated dynamic object in \*q:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside dynamic object bounds in \*q:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer uninitialized in \*q:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer NULL in \*r:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer invalid in \*r:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer uninitialized in \*r:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: dead object in \*r:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside object bounds in \*r:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer NULL in \*s:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer invalid in \*s:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: deallocated dynamic object in \*s:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: dead object in \*s:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside dynamic object bounds in \*s:
-^\[main.pointer_dereference.[0-9]+\] dereference failure: pointer outside object bounds in \*s:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer invalid in \*p:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer uninitialized in \*p:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: deallocated dynamic object in \*p:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: dead object in \*p:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer outside dynamic object bounds in \*p:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer outside object bounds in \*p:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer NULL in \*q:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer invalid in \*q:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: deallocated dynamic object in \*q:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer outside dynamic object bounds in \*q:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer uninitialized in \*q:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer NULL in \*r:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer invalid in \*r:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer uninitialized in \*r:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: dead object in \*r:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer outside object bounds in \*r:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer NULL in \*s:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer invalid in \*s:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: deallocated dynamic object in \*s:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: dead object in \*s:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer outside dynamic object bounds in \*s:
+^\[main.pointer_dereference.[0-9]+\] .* dereference failure: pointer outside object bounds in \*s:
 --
 This test ensures that local_bitvector_analysis is correctly labelling obvious
 cases of pointers and that --pointer-check is not generating excess assertions.

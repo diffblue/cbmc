@@ -3,10 +3,10 @@ main.c
 --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main\.pointer_dereference\.2\] dereference failure: invalid integer address in \*p: SUCCESS$
-^\[main\.assertion\.1\] assertion \*p==42: SUCCESS$
-^\[main\.pointer_dereference\.[0-9]+\] dereference failure: invalid integer address in p\[.*1\]: FAILURE$
-^\[main\.assertion\.2\] assertion \*\(p\+1\)==42: SUCCESS$
+^\[main\.pointer_dereference\.2\] .* dereference failure: invalid integer address in \*p: SUCCESS$
+^\[main\.assertion\.1\] .* assertion \*p==42: SUCCESS$
+^\[main\.pointer_dereference\.[0-9]+\] .* dereference failure: invalid integer address in p\[.*1\]: FAILURE$
+^\[main\.assertion\.2\] .* assertion \*\(p\+1\)==42: SUCCESS$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

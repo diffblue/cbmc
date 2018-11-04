@@ -3,8 +3,8 @@ main.c
 --generate-function-body 'havoc_struct' --generate-function-body-options 'havoc,params:.*,globals:(?!__).*'
 ^SIGNAL=0$
 ^EXIT=10$
-^\[main.assertion.1\] assertion globalStruct.non_const == 10: FAILURE$
-^\[main.assertion.2\] assertion globalStruct.is_const == 20: SUCCESS$
-^\[main.assertion.3\] assertion paramStruct.non_const == 11: FAILURE$
-^\[main.assertion.4\] assertion paramStruct.is_const == 21: SUCCESS$
+^\[main.assertion.1\] .* assertion globalStruct.non_const == 10: FAILURE$
+^\[main.assertion.2\] .* assertion globalStruct.is_const == 20: SUCCESS$
+^\[main.assertion.3\] .* assertion paramStruct.non_const == 11: FAILURE$
+^\[main.assertion.4\] .* assertion paramStruct.is_const == 21: SUCCESS$
 ^VERIFICATION FAILED$

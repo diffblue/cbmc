@@ -2,11 +2,11 @@ CORE
 main.c
 
 ^\*\* Results:$
-^\[main.assertion.1\] assertion a\[.*\] == 1: SUCCESS$
-^\[main.assertion.2\] assertion a\[.*\] == 2: SUCCESS$
-^\[main.assertion.3\] assertion a\[.*\] == 3: SUCCESS$
-^\[main.assertion.4\] assertion a\[.*\] == 4: SUCCESS$
-^\[main.assertion.5\] assertion a\[.*\] == 5: SUCCESS$
+^\[main.assertion.1\] .* assertion a\[.*\] == 1: SUCCESS$
+^\[main.assertion.2\] .* assertion a\[.*\] == 2: SUCCESS$
+^\[main.assertion.3\] .* assertion a\[.*\] == 3: SUCCESS$
+^\[main.assertion.4\] .* assertion a\[.*\] == 4: SUCCESS$
+^\[main.assertion.5\] .* assertion a\[.*\] == 5: SUCCESS$
 ^\*\* 0 of 5 failed
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$

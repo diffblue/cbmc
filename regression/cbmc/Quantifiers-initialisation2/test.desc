@@ -2,11 +2,11 @@ CORE
 main.c
 
 ^\*\* Results:$
-^\[main.assertion.1\] forall a\[\]: SUCCESS$
-^\[main.assertion.2\] assertion a\[.*\] > a\[.*\]: SUCCESS$
-^\[main.assertion.3\] assertion a\[.*\] > a\[.*\]: FAILURE$
-^\[main.assertion.4\] forall c\[\]: SUCCESS$
-^\[main.assertion.5\] assertion c\[.*\] >= c\[.*\]: SUCCESS$
+^\[main.assertion.1\] .* forall a\[\]: SUCCESS$
+^\[main.assertion.2\] .* assertion a\[.*\] > a\[.*\]: SUCCESS$
+^\[main.assertion.3\] .* assertion a\[.*\] > a\[.*\]: FAILURE$
+^\[main.assertion.4\] .* forall c\[\]: SUCCESS$
+^\[main.assertion.5\] .* assertion c\[.*\] >= c\[.*\]: SUCCESS$
 ^\*\* 1 of 5 failed
 ^VERIFICATION FAILED$
 ^EXIT=10$

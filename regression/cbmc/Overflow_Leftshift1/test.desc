@@ -3,7 +3,7 @@ main.c
 --signed-overflow-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[.*\] arithmetic overflow on signed shl in .*: FAILURE$
+^\[.*\] .* arithmetic overflow on signed shl in .*: FAILURE$
 ^\*\* 2 of 4 failed
 ^VERIFICATION FAILED$
 --

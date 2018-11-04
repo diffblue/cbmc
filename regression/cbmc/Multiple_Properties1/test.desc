@@ -5,6 +5,6 @@ activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^main.c function main\n\[main\.assertion\.1\] .* SUCCESS\n\[main\.assertion\.3\] .* FAILURE$
+^main.c function main\n\[main\.assertion\.1\] line 5 .* SUCCESS\n\[main\.assertion\.3\] line 9 .* FAILURE$
 --
 ^warning: ignoring

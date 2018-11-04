@@ -2,11 +2,11 @@ CORE
 main.c
 
 ^\*\* Results:$
-^\[main.assertion.1\] assertion a\[.*\]\[.*\] == 0: SUCCESS$
-^\[main.assertion.2\] assertion a\[.*\]\[.*\] == 1: SUCCESS$
-^\[main.assertion.3\] assertion a\[.*\]\[.*\] == 1: SUCCESS$
-^\[main.assertion.4\] assertion a\[.*\]\[.*\] == 2: SUCCESS$
-^\[main.assertion.5\] assertion tmp_if_expr\$\d+: SUCCESS$
+^\[main.assertion.1\] line 9 assertion a\[.*\]\[.*\] == 0: SUCCESS$
+^\[main.assertion.2\] line 10 assertion a\[.*\]\[.*\] == 1: SUCCESS$
+^\[main.assertion.3\] line 11 assertion a\[.*\]\[.*\] == 1: SUCCESS$
+^\[main.assertion.4\] line 12 assertion a\[.*\]\[.*\] == 2: SUCCESS$
+^\[main.assertion.5\] line 13 assertion tmp_if_expr\$\d+: SUCCESS$
 ^\*\* 0 of 5 failed
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
