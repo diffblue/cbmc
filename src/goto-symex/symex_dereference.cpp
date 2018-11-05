@@ -270,7 +270,7 @@ void goto_symext::dereference_rec(
     }
 
     exprt tmp1;
-    tmp1.swap(expr.op0());
+    tmp1.swap(to_dereference_expr(expr).pointer());
 
     // first make sure there are no dereferences in there
     dereference_rec(tmp1, state, guard, false);

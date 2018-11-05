@@ -132,13 +132,20 @@ static bool check_renaming(const exprt &expr)
   if(check_renaming(expr.type()))
     return true;
 
-  if(expr.id()==ID_address_of &&
-     expr.op0().id()==ID_symbol)
-    return check_renaming_l1(expr.op0());
-  else if(expr.id()==ID_address_of &&
-          expr.op0().id()==ID_index)
-    return check_renaming_l1(expr.op0().op0()) ||
-           check_renaming(expr.op0().op1());
+  if(
+    expr.id() == ID_address_of &&
+    to_address_of_expr(expr).object().id() == ID_symbol)
+  {
+    return check_renaming_l1(to_address_of_expr(expr).object());
+  }
+  else if(
+    expr.id() == ID_address_of &&
+    to_address_of_expr(expr).object().id() == ID_index)
+  {
+    const auto index_expr = to_index_expr(to_address_of_expr(expr).object());
+    return check_renaming_l1(index_expr.array()) ||
+           check_renaming(index_expr.index());
+  }
   else if(expr.id()==ID_symbol)
   {
     if(!expr.get_bool(ID_C_SSA_symbol))

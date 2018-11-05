@@ -28,9 +28,8 @@ void goto_symext::symex_decl(statet &state)
   // two-operand decl not supported here
   // we handle the decl with only one operand
   PRECONDITION(code.operands().size() == 1);
-  PRECONDITION(code.op0().id() == ID_symbol);
 
-  symex_decl(state, to_symbol_expr(code.op0()));
+  symex_decl(state, to_symbol_expr(to_code_decl(code).symbol()));
 }
 
 void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)

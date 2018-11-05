@@ -92,12 +92,9 @@ exprt build_full_lhs_rec(
   else if(id==ID_byte_extract_little_endian ||
           id==ID_byte_extract_big_endian)
   {
-    exprt tmp=src_original;
-    tmp.op0() = build_full_lhs_rec(
-      prop_conv,
-      ns,
-      to_byte_extract_expr(tmp).op(),
-      to_byte_extract_expr(src_ssa).op());
+    byte_extract_exprt tmp = to_byte_extract_expr(src_original);
+    tmp.op() = build_full_lhs_rec(
+      prop_conv, ns, tmp.op(), to_byte_extract_expr(src_ssa).op());
 
     // re-write into big case-split
   }
