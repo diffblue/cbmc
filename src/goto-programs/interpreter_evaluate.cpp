@@ -408,10 +408,9 @@ void interpretert::evaluate(
     }
     else
     {
-      mp_integer i;
-      if(!to_integer(expr, i))
+      if(const auto i = numeric_cast<mp_integer>(expr))
       {
-        dest.push_back(i);
+        dest.push_back(*i);
         return;
       }
     }

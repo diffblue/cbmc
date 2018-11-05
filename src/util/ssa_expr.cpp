@@ -35,10 +35,7 @@ static void build_ssa_identifier_rec(
 
     build_ssa_identifier_rec(index.array(), l0, l1, l2, os, l1_object_os);
 
-    mp_integer idx;
-    if(to_integer(to_constant_expr(index.index()), idx))
-      UNREACHABLE;
-
+    const mp_integer idx = numeric_cast_v<mp_integer>(index.index());
     os << '[' << idx << ']';
   }
   else if(expr.id()==ID_symbol)

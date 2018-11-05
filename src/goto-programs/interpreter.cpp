@@ -497,7 +497,7 @@ exprt interpretert::get_value(
     }
     else
     {
-      to_integer(size_expr, count);
+      count = numeric_cast_v<mp_integer>(size_expr);
     }
 
     // Retrieve the value for each member in the array
@@ -564,7 +564,7 @@ exprt interpretert::get_value(
     }
     else
     {
-      to_integer(size_expr, count);
+      count = numeric_cast_v<mp_integer>(size_expr);
     }
 
     // Retrieve the value for each member in the array
@@ -1023,9 +1023,7 @@ mp_integer interpretert::get_size(const typet &type)
       // Go via the binary representation to reproduce any
       // overflow behaviour.
       exprt size_const=from_integer(i[0], size_expr.type());
-      mp_integer size_mp;
-      bool ret=to_integer(size_const, size_mp);
-      CHECK_RETURN(!ret);
+      const mp_integer size_mp = numeric_cast_v<mp_integer>(size_const);
       return subtype_size*size_mp;
     }
     return subtype_size;

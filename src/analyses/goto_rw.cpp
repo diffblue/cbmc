@@ -181,18 +181,15 @@ void rw_range_sett::get_objects_shift(
 
   range_spect src_size = op_bits.has_value() ? to_range_spect(*op_bits) : -1;
 
-  mp_integer dist;
-  if(range_start==-1 ||
-     size==-1 ||
-     src_size==-1 ||
-     to_integer(simp_distance, dist))
+  const auto dist = numeric_cast<mp_integer>(simp_distance);
+  if(range_start == -1 || size == -1 || src_size == -1 || !dist.has_value())
   {
     get_objects_rec(mode, shift.op(), -1, -1);
     get_objects_rec(mode, shift.distance(), -1, -1);
   }
   else
   {
-    range_spect dist_r=to_range_spect(dist);
+    const range_spect dist_r = to_range_spect(*dist);
 
     // not sure whether to worry about
     // config.ansi_c.endianness==configt::ansi_ct::IS_LITTLE_ENDIAN
@@ -284,22 +281,17 @@ void rw_range_sett::get_objects_index(
 
   const exprt simp_index=simplify_expr(expr.index(), ns);
 
-  mp_integer index;
-  if(to_integer(simp_index, index))
-  {
+  const auto index = numeric_cast<mp_integer>(simp_index);
+  if(!index.has_value())
     get_objects_rec(get_modet::READ, expr.index());
-    index=-1;
-  }
 
-  if(range_start==-1 ||
-     sub_size==-1 ||
-     index==-1)
+  if(range_start == -1 || sub_size == -1 || !index.has_value())
     get_objects_rec(mode, expr.array(), -1, size);
   else
     get_objects_rec(
       mode,
       expr.array(),
-      range_start+to_range_spect(index*sub_size),
+      range_start + to_range_spect(*index * sub_size),
       size);
 }
 

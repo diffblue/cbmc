@@ -191,21 +191,17 @@ std::string expr2javat::convert_constant(
     std::string dest;
     dest.reserve(char_representation_length);
 
-    mp_integer int_value;
-    if(to_integer(src, int_value))
-      UNREACHABLE;
+    const char16_t int_value = numeric_cast_v<char16_t>(src);
 
     // Character literals in Java have type 'char', thus no cast is needed.
     // This is different from C, where charater literals have type 'int'.
-    dest += '\'' + utf16_native_endian_to_java(int_value.to_long()) + '\'';
+    dest += '\'' + utf16_native_endian_to_java(int_value) + '\'';
     return dest;
   }
   else if(src.type()==java_byte_type())
   {
     // No byte-literals in Java, so just cast:
-    mp_integer int_value;
-    if(to_integer(src, int_value))
-      UNREACHABLE;
+    const mp_integer int_value = numeric_cast_v<mp_integer>(src);
     std::string dest="(byte)";
     dest+=integer2string(int_value);
     return dest;
@@ -213,9 +209,7 @@ std::string expr2javat::convert_constant(
   else if(src.type()==java_short_type())
   {
     // No short-literals in Java, so just cast:
-    mp_integer int_value;
-    if(to_integer(src, int_value))
-      UNREACHABLE;
+    const mp_integer int_value = numeric_cast_v<mp_integer>(src);
     std::string dest="(short)";
     dest+=integer2string(int_value);
     return dest;
@@ -223,9 +217,7 @@ std::string expr2javat::convert_constant(
   else if(src.type()==java_long_type())
   {
     // long integer literals must have 'L' at the end
-    mp_integer int_value;
-    if(to_integer(src, int_value))
-      UNREACHABLE;
+    const mp_integer int_value = numeric_cast_v<mp_integer>(src);
     std::string dest=integer2string(int_value);
     dest+='L';
     return dest;

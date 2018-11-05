@@ -123,10 +123,9 @@ std::string inv_object_storet::build_string(const exprt &expr) const
       if(expr.get(ID_value)==ID_NULL)
         return "0";
 
-    mp_integer i;
-
-    if(!to_integer(expr, i))
-      return integer2string(i);
+    const auto i = numeric_cast<mp_integer>(expr);
+    if(i.has_value())
+      return integer2string(*i);
   }
 
   // we also like "address_of" and "reference_to"
@@ -455,25 +454,24 @@ void invariant_sett::strengthen_rec(const exprt &expr)
        get_object(expr.op1(), p.second))
       return;
 
-    mp_integer i0, i1;
-    bool have_i0=!to_integer(expr.op0(), i0);
-    bool have_i1=!to_integer(expr.op1(), i1);
+    const auto i0 = numeric_cast<mp_integer>(expr.op0());
+    const auto i1 = numeric_cast<mp_integer>(expr.op1());
 
     if(expr.id()==ID_le)
     {
-      if(have_i0)
-        add_bounds(p.second, lower_interval(i0));
-      else if(have_i1)
-        add_bounds(p.first, upper_interval(i1));
+      if(i0.has_value())
+        add_bounds(p.second, lower_interval(*i0));
+      else if(i1.has_value())
+        add_bounds(p.first, upper_interval(*i1));
       else
         add_le(p);
     }
     else if(expr.id()==ID_lt)
     {
-      if(have_i0)
-        add_bounds(p.second, lower_interval(i0+1));
-      else if(have_i1)
-        add_bounds(p.first, upper_interval(i1-1));
+      if(i0.has_value())
+        add_bounds(p.second, lower_interval(*i0 + 1));
+      else if(i1.has_value())
+        add_bounds(p.first, upper_interval(*i1 - 1));
       else
       {
         add_le(p);
@@ -553,12 +551,12 @@ void invariant_sett::strengthen_rec(const exprt &expr)
        get_object(expr.op1(), p.second))
       return;
 
-    mp_integer i;
-
-    if(!to_integer(expr.op0(), i))
-      add_bounds(p.second, boundst(i));
-    else if(!to_integer(expr.op1(), i))
-      add_bounds(p.first, boundst(i));
+    const auto i0 = numeric_cast<mp_integer>(expr.op0());
+    const auto i1 = numeric_cast<mp_integer>(expr.op1());
+    if(i0.has_value())
+      add_bounds(p.second, boundst(*i0));
+    else if(i1.has_value())
+      add_bounds(p.first, boundst(*i1));
 
     s=p;
     std::swap(s.first, s.second);
@@ -685,10 +683,10 @@ void invariant_sett::get_bounds(unsigned a, boundst &bounds) const
 
   {
     const exprt &e_a=object_store->get_expr(a);
-    mp_integer tmp;
-    if(!to_integer(e_a, tmp))
+    const auto tmp = numeric_cast<mp_integer>(e_a);
+    if(tmp.has_value())
     {
-      bounds=boundst(tmp);
+      bounds = boundst(*tmp);
       return;
     }
 
@@ -858,8 +856,7 @@ exprt invariant_sett::get_constant(const exprt &expr) const
 
         if(e.is_constant())
         {
-          mp_integer value;
-          assert(!to_integer(e, value));
+          const mp_integer value = numeric_cast_v<mp_integer>(e);
 
           if(expr.type().id()==ID_pointer)
           {

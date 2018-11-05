@@ -295,7 +295,7 @@ static void utf16_native_endian_to_java(
 
 /// \param ch: UTF-16 character in architecture-native endianness encoding
 /// \return String in US-ASCII format, with \\uxxxx escapes for other characters
-std::string utf16_native_endian_to_java(const wchar_t ch)
+std::string utf16_native_endian_to_java(const char16_t ch)
 {
   std::ostringstream result;
   const std::locale loc;

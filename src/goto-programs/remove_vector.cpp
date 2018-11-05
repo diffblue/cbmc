@@ -91,8 +91,8 @@ static void remove_vector(exprt &expr)
       remove_vector(expr.type());
       array_typet array_type=to_array_type(expr.type());
 
-      mp_integer dimension;
-      to_integer(array_type.size(), dimension);
+      const mp_integer dimension =
+        numeric_cast_v<mp_integer>(array_type.size());
 
       const typet subtype=array_type.subtype();
       // do component-wise:
@@ -118,8 +118,8 @@ static void remove_vector(exprt &expr)
       remove_vector(expr.type());
       array_typet array_type=to_array_type(expr.type());
 
-      mp_integer dimension;
-      to_integer(array_type.size(), dimension);
+      const mp_integer dimension =
+        numeric_cast_v<mp_integer>(array_type.size());
 
       const typet subtype=array_type.subtype();
       // do component-wise:

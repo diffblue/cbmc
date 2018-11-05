@@ -1110,13 +1110,9 @@ void goto_checkt::bounds_check(
     }
     else
     {
-      mp_integer i;
+      const auto i = numeric_cast<mp_integer>(index);
 
-      if(!to_integer(index, i) && i>=0)
-      {
-        // ok
-      }
-      else
+      if(!i.has_value() || *i < 0)
       {
         exprt effective_offset=ode.offset();
 
