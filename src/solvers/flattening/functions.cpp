@@ -42,11 +42,7 @@ exprt functionst::arguments_equal(const exprt::operandst &o1,
   for(std::size_t i=0; i<o1.size(); i++)
   {
     exprt lhs=o1[i];
-    exprt rhs=o2[i];
-
-    if(lhs.type()!=rhs.type())
-      rhs.make_typecast(lhs.type());
-
+    exprt rhs = typecast_exprt::conditional_cast(o2[i], o1[i].type());
     conjuncts[i]=equal_exprt(lhs, rhs);
   }
 
