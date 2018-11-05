@@ -26,7 +26,7 @@ std::string
 utf32_native_endian_to_utf8(const std::basic_string<unsigned int> &s);
 
 std::wstring utf8_to_utf16_native_endian(const std::string &in);
-std::string utf16_native_endian_to_java(const wchar_t ch);
+std::string utf16_native_endian_to_java(const char16_t ch);
 std::string utf16_native_endian_to_java(const std::wstring &in);
 
 std::vector<std::string> narrow_argv(int argc, const wchar_t **argv_wide);
