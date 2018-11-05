@@ -84,13 +84,21 @@ exprt convert_float_literal(const std::string &src)
   else
     UNREACHABLE;
 
-  const constant_exprt result = a.to_expr();
+  constant_exprt result = a.to_expr();
+  // ieee_floatt::to_expr gives us the representation, but doesn't preserve the
+  // distinction between bitwise-identical types such as _Float32 vs. float,
+  // so ensure we preserve that here:
+  result.type() = type;
 
   if(parsed_float.is_imaginary)
   {
     const complex_typet complex_type(type);
-    return complex_exprt(
-      ieee_floatt::zero(type).to_expr(), result, complex_type);
+
+    constant_exprt zero_real_component = ieee_floatt::zero(type).to_expr();
+    // As above, ensure we preserve the exact type of the literal:
+    zero_real_component.type() = type;
+
+    return complex_exprt(zero_real_component, result, complex_type);
   }
 
   return result;
