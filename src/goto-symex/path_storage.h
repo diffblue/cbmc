@@ -114,6 +114,33 @@ public:
     return size() == 0;
   };
 
+  /// \brief Should symex notify this path_storage on each executed instruction?
+  ///
+  /// If this method returns `false`, there is no need for goto_symext to invoke
+  /// path_storaget::notify_next_instruction() whenever it is about to execute a
+  /// new instruction. This is to avoid needlessly calling an empty function in
+  /// the middle of the tight symex loop; goto_symext can initialize a `const`
+  /// flag with the return value of this function, and look up the value of the
+  /// flag while symexing.
+  virtual inline bool wants_instruction_callback() const
+  {
+    return false;
+  }
+
+  /// \brief Notify that an instruction is about to be symbolically executed
+  ///
+  /// goto_symext can use this method to inform this path_storaget that an
+  /// instruction is about to be symbolically executed. Derived types of
+  /// path_storaget can use this to dynamically modify their path-resuming
+  /// strategy during symbolic execution. This method will not necessarily be
+  /// called on this path_storaget if this implementation of
+  /// path_storaget::wants_instruction_callback() returns `false`.
+  virtual inline void notify_next_instruction(
+    const goto_programt::const_targett &,
+    goto_symex_statet &)
+  {
+  }
+
 private:
   // Derived classes should override these methods, allowing the base class to
   // enforce preconditions.

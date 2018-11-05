@@ -56,6 +56,8 @@ public:
     path_storaget &path_storage)
     : should_pause_symex(false),
       max_depth(options.get_unsigned_int_option("depth")),
+      worklist_wants_instruction_callback(
+        path_storage.wants_instruction_callback()),
       allow_pointer_unsoundness(
         options.get_bool_option("allow-pointer-unsoundness")),
       language_mode(),
@@ -210,6 +212,7 @@ protected:
     statet &);
 
   const unsigned max_depth;
+  const bool worklist_wants_instruction_callback;
   const bool allow_pointer_unsoundness;
 
 public:
