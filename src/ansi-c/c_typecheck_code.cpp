@@ -193,26 +193,8 @@ void c_typecheck_baset::typecheck_block(code_blockt &code)
 
   for(auto &code_op : code.statements())
   {
-    if(code_op.is_nil())
-      continue;
-
-    if(code_op.get_statement()==ID_label)
-    {
-      // these may be nested
-      codet *code_ptr=&code_op;
-
-      while(code_ptr->get_statement()==ID_label)
-      {
-        assert(code_ptr->operands().size()==1);
-        code_ptr=&to_code(code_ptr->op0());
-      }
-
-      // codet &label_op=*code_ptr;
-
-      new_ops.move(code_op);
-    }
-    else
-      new_ops.move(code_op);
+    if(code_op.is_not_nil())
+      new_ops.add(std::move(code_op));
   }
 
   code.statements().swap(new_ops.statements());
