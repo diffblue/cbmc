@@ -76,7 +76,9 @@ void global_may_alias_domaint::get_rhs_aliases_address_of(
 }
 
 void global_may_alias_domaint::transform(
+  const irep_idt &function_from,
   locationt from,
+  const irep_idt &function_to,
   locationt,
   ai_baset &,
   const namespacet &)

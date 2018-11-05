@@ -113,9 +113,13 @@ public:
     bv_container=&_bv_container;
   }
 
-  void
-  transform(locationt from, locationt to, ai_baset &ai, const namespacet &ns)
-    final override;
+  void transform(
+    const irep_idt &function_from,
+    locationt from,
+    const irep_idt &function_to,
+    locationt to,
+    ai_baset &ai,
+    const namespacet &ns) final override;
 
   void output(
     std::ostream &out,
@@ -212,12 +216,16 @@ private:
     reaching_definitions_analysist &rd);
   void transform_function_call(
     const namespacet &ns,
+    const irep_idt &function_from,
     locationt from,
+    const irep_idt &function_to,
     locationt to,
     reaching_definitions_analysist &rd);
   void transform_end_function(
     const namespacet &ns,
+    const irep_idt &function_from,
     locationt from,
+    const irep_idt &function_to,
     locationt to,
     reaching_definitions_analysist &rd);
   void transform_assign(
@@ -256,10 +264,9 @@ public:
 
   virtual ~reaching_definitions_analysist();
 
-  virtual void initialize(
-    const goto_functionst &goto_functions) override;
+  void initialize(const goto_functionst &goto_functions) override;
 
-  virtual statet &get_state(goto_programt::const_targett l) override
+  statet &get_state(locationt l) override
   {
     statet &s=concurrency_aware_ait<rd_range_domaint>::get_state(l);
 

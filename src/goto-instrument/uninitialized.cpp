@@ -28,7 +28,9 @@ public:
   {
   }
 
-  void add_assertions(goto_programt &goto_program);
+  void add_assertions(
+    const irep_idt &function_identifer,
+    goto_programt &goto_program);
 
 protected:
   symbol_tablet &symbol_table;
@@ -63,9 +65,11 @@ void uninitializedt::get_tracking(goto_programt::const_targett i_it)
   }
 }
 
-void uninitializedt::add_assertions(goto_programt &goto_program)
+void uninitializedt::add_assertions(
+  const irep_idt &function_identifier,
+  goto_programt &goto_program)
 {
-  uninitialized_analysis(goto_program, ns);
+  uninitialized_analysis(function_identifier, goto_program, ns);
 
   // find out which variables need tracking
 
@@ -200,7 +204,7 @@ void add_uninitialized_locals_assertions(goto_modelt &goto_model)
   {
     uninitializedt uninitialized(goto_model.symbol_table);
 
-    uninitialized.add_assertions(f_it->second.body);
+    uninitialized.add_assertions(f_it->first, f_it->second.body);
   }
 }
 
@@ -218,7 +222,7 @@ void show_uninitialized(
       out << "//// Function: " << f_it->first << '\n';
       out << "////\n\n";
       uninitialized_analysist uninitialized_analysis;
-      uninitialized_analysis(f_it->second.body, ns);
+      uninitialized_analysis(f_it->first, f_it->second.body, ns);
       uninitialized_analysis.output(ns, f_it->second.body, out);
     }
   }

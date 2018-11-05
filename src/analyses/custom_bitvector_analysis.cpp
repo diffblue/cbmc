@@ -268,7 +268,9 @@ void custom_bitvector_domaint::assign_struct_rec(
 }
 
 void custom_bitvector_domaint::transform(
+  const irep_idt &function_from,
   locationt from,
+  const irep_idt &function_to,
   locationt to,
   ai_baset &ai,
   const namespacet &ns)
@@ -400,7 +402,7 @@ void custom_bitvector_domaint::transform(
         else
         {
           // only if there is an actual call, i.e., we have a body
-          if(from->function != to->function)
+          if(function_from != function_to)
           {
             const code_typet &code_type=
               to_code_type(ns.lookup(identifier).type);

@@ -53,7 +53,9 @@ public:
   }
 
   virtual void transform(
+    const irep_idt &function_from,
     locationt from_l,
+    const irep_idt &function_to,
     locationt to_l,
     ai_baset &ai,
     const namespacet &ns) final override;

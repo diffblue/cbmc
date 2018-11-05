@@ -26,7 +26,13 @@
 class constant_simplification_mockt:public ai_domain_baset
 {
 public:
-  void transform(locationt, locationt, ai_baset &, const namespacet &) override
+  void transform(
+    const irep_idt &,
+    locationt,
+    const irep_idt &,
+    locationt,
+    ai_baset &,
+    const namespacet &) override
   {}
   void make_bottom() override
   {}

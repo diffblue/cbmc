@@ -46,9 +46,13 @@ public:
            old_is_threaded!=is_threaded;
   }
 
-  void
-  transform(locationt from, locationt, ai_baset &, const namespacet &)
-    final override
+  void transform(
+    const irep_idt &,
+    locationt from,
+    const irep_idt &,
+    locationt,
+    ai_baset &,
+    const namespacet &) final override
   {
     INVARIANT(reachable,
               "Transformers are only applied at reachable locations");

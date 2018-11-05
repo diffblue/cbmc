@@ -57,7 +57,9 @@ void interval_domaint::output(
 }
 
 void interval_domaint::transform(
+  const irep_idt &function_from,
   locationt from,
+  const irep_idt &function_to,
   locationt to,
   ai_baset &,
   const namespacet &ns)

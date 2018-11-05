@@ -28,9 +28,13 @@ public:
   {
   }
 
-  void
-  transform(locationt from, locationt to, ai_baset &ai, const namespacet &ns)
-    final override;
+  void transform(
+    const irep_idt &function_from,
+    locationt from,
+    const irep_idt &function_to,
+    locationt to,
+    ai_baset &ai,
+    const namespacet &ns) final override;
 
   void output(
     std::ostream &out,
