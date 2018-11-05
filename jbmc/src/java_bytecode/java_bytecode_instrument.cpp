@@ -43,7 +43,7 @@ protected:
   const bool throw_runtime_exceptions;
   message_handlert &message_handler;
 
-  codet throw_exception(
+  code_ifthenelset throw_exception(
     const exprt &cond,
     const source_locationt &original_loc,
     const irep_idt &exc_name);
@@ -61,7 +61,7 @@ protected:
     const exprt &expr,
     const source_locationt &original_loc);
 
-  codet check_class_cast(
+  code_ifthenelset check_class_cast(
     const exprt &class1,
     const exprt &class2,
     const source_locationt &original_loc);
@@ -92,7 +92,7 @@ const std::vector<std::string> exception_needed_classes = {
 /// \param exc_name: the name of the exception to be thrown
 /// \return Returns the code initialising the throwing the
 /// exception
-codet java_bytecode_instrumentt::throw_exception(
+code_ifthenelset java_bytecode_instrumentt::throw_exception(
   const exprt &cond,
   const source_locationt &original_loc,
   const irep_idt &exc_name)
@@ -133,7 +133,7 @@ codet java_bytecode_instrumentt::throw_exception(
   if_code.cond()=cond;
   if_code.then_case() = code_blockt({assign_new, code_expressiont(throw_expr)});
 
-  return std::move(if_code);
+  return if_code;
 }
 
 
@@ -218,7 +218,7 @@ codet java_bytecode_instrumentt::check_array_access(
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an ClassCastException or emits an
 /// assertion checking the subtype relation
-codet java_bytecode_instrumentt::check_class_cast(
+code_ifthenelset java_bytecode_instrumentt::check_class_cast(
   const exprt &class1,
   const exprt &class2,
   const source_locationt &original_loc)
@@ -255,7 +255,7 @@ codet java_bytecode_instrumentt::check_class_cast(
   notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
   conditional_check.cond()=std::move(op_not_null);
   conditional_check.then_case()=std::move(check_code);
-  return std::move(conditional_check);
+  return conditional_check;
 }
 
 /// Checks whether `expr` is null and throws NullPointerException/

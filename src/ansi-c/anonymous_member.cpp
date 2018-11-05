@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_expr.h>
 
-static exprt make_member_expr(
+static member_exprt make_member_expr(
   const exprt &struct_union,
   const struct_union_typet::componentt &component,
   const namespacet &ns)
@@ -35,7 +35,7 @@ static exprt make_member_expr(
     result.type().set(ID_C_constant, true);
   }
 
-  return std::move(result);
+  return result;
 }
 
 exprt get_component_rec(
@@ -55,12 +55,12 @@ exprt get_component_rec(
 
     if(comp.get_name()==component_name)
     {
-      return make_member_expr(struct_union, comp, ns);
+      return std::move(make_member_expr(struct_union, comp, ns));
     }
     else if(comp.get_anonymous() &&
             (type.id()==ID_struct || type.id()==ID_union))
     {
-      exprt tmp=make_member_expr(struct_union, comp, ns);
+      const member_exprt tmp = make_member_expr(struct_union, comp, ns);
       exprt result=get_component_rec(tmp, component_name, ns);
       if(result.is_not_nil())
         return result;

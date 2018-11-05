@@ -268,7 +268,7 @@ protected:
   // conversion
   void convert(const symbolt &class_symbol, const methodt &);
 
-  codet convert_instructions(
+  code_blockt convert_instructions(
     const methodt &,
     const java_class_typet::java_lambda_method_handlest &);
 
@@ -321,12 +321,12 @@ protected:
     const source_locationt &location,
     const exprt &arg0);
 
-  codet convert_astore(
+  code_blockt convert_astore(
     const irep_idt &statement,
     const exprt::operandst &op,
     const source_locationt &location);
 
-  codet convert_store(
+  code_blockt convert_store(
     const irep_idt &statement,
     const exprt &arg0,
     const exprt::operandst &op,
@@ -342,33 +342,33 @@ protected:
     const source_locationt &location,
     const method_offsett address);
 
-  codet convert_if_cmp(
+  code_ifthenelset convert_if_cmp(
     const java_bytecode_convert_methodt::address_mapt &address_map,
     const irep_idt &statement,
     const exprt::operandst &op,
     const mp_integer &number,
     const source_locationt &location) const;
 
-  codet convert_if(
+  code_ifthenelset convert_if(
     const java_bytecode_convert_methodt::address_mapt &address_map,
     const exprt::operandst &op,
     const irep_idt &id,
     const mp_integer &number,
     const source_locationt &location) const;
 
-  codet convert_ifnonull(
+  code_ifthenelset convert_ifnonull(
     const java_bytecode_convert_methodt::address_mapt &address_map,
     const exprt::operandst &op,
     const mp_integer &number,
     const source_locationt &location) const;
 
-  codet convert_ifnull(
+  code_ifthenelset convert_ifnull(
     const java_bytecode_convert_methodt::address_mapt &address_map,
     const exprt::operandst &op,
     const mp_integer &number,
     const source_locationt &location) const;
 
-  codet convert_iinc(
+  code_blockt convert_iinc(
     const exprt &arg0,
     const exprt &arg1,
     const source_locationt &location,
@@ -394,9 +394,9 @@ protected:
     codet &c,
     exprt::operandst &results);
 
-  codet convert_putfield(const exprt &arg0, const exprt::operandst &op);
+  code_blockt convert_putfield(const exprt &arg0, const exprt::operandst &op);
 
-  codet convert_putstatic(
+  code_blockt convert_putstatic(
     const source_locationt &location,
     const exprt &arg0,
     const exprt::operandst &op,
@@ -464,7 +464,7 @@ protected:
 
   void convert_dup2(exprt::operandst &op, exprt::operandst &results);
 
-  codet convert_switch(
+  code_switcht convert_switch(
     java_bytecode_convert_methodt::address_mapt &address_map,
     const exprt::operandst &op,
     const java_bytecode_parse_treet::instructiont::argst &args,

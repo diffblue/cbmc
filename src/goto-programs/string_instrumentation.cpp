@@ -26,14 +26,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-exprt is_zero_string(
-  const exprt &what,
-  bool write)
+predicate_exprt is_zero_string(const exprt &what, bool write)
 {
   predicate_exprt result("is_zero_string");
   result.copy_to_operands(what);
   result.set("lhs", write);
-  return std::move(result);
+  return result;
 }
 
 exprt zero_string_length(

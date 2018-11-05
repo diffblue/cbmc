@@ -445,7 +445,7 @@ static void create_clinit_wrapper_symbols(
 /// \param pointer_type_selector: used to choose concrete types for abstract-
 ///   typed globals and fields (only needed if nondet-static is true)
 /// \return the body of the static initializer wrapper
-codet get_thread_safe_clinit_wrapper_body(
+code_blockt get_thread_safe_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
@@ -626,7 +626,7 @@ codet get_thread_safe_clinit_wrapper_body(
     function_body.add(code_returnt());
   }
 
-  return std::move(function_body);
+  return function_body;
 }
 
 /// Produces the static initializer wrapper body for the given function.
@@ -641,7 +641,7 @@ codet get_thread_safe_clinit_wrapper_body(
 /// \param pointer_type_selector: used to choose concrete types for abstract-
 ///   typed globals and fields (only needed if nondet-static is true)
 /// \return the body of the static initializer wrapper
-codet get_clinit_wrapper_body(
+code_ifthenelset get_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
@@ -701,7 +701,7 @@ codet get_clinit_wrapper_body(
 
   wrapper_body.then_case() = init_body;
 
-  return std::move(wrapper_body);
+  return wrapper_body;
 }
 
 
@@ -841,7 +841,7 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
 /// \param pointer_type_selector: used to choose concrete types for abstract-
 ///   typed globals and fields.
 /// \return synthetic static initializer body.
-codet stub_global_initializer_factoryt::get_stub_initializer_body(
+code_blockt stub_global_initializer_factoryt::get_stub_initializer_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const object_factory_parameterst &object_factory_parameters,
@@ -890,5 +890,5 @@ codet stub_global_initializer_factoryt::get_stub_initializer_body(
       update_in_placet::NO_UPDATE_IN_PLACE);
   }
 
-  return std::move(static_init_body);
+  return static_init_body;
 }
