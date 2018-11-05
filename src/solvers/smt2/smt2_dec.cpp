@@ -20,17 +20,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 std::string smt2_dect::decision_procedure_text() const
 {
-  return "SMT2 "+logic+
-    (use_FPA_theory?" (with FPA)":"")+
-    " using "+
+  // clang-format off
+  return "SMT2 " + logic + (use_FPA_theory ? " (with FPA)" : "") + " using " +
     (solver==solvert::GENERIC?"Generic":
      solver==solvert::BOOLECTOR?"Boolector":
+     solver==solvert::CPROVER_SMT2?"CPROVER SMT2":
      solver==solvert::CVC3?"CVC3":
      solver==solvert::CVC4?"CVC4":
      solver==solvert::MATHSAT?"MathSAT":
      solver==solvert::YICES?"Yices":
      solver==solvert::Z3?"Z3":
      "(unknown)");
+  // clang-format on
 }
 
 decision_proceduret::resultt smt2_dect::dec_solve()
@@ -54,6 +55,11 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   {
   case solvert::BOOLECTOR:
     argv = {"boolector", "--smt2", temp_file_problem(), "-m"};
+    break;
+
+  case solvert::CPROVER_SMT2:
+    argv = {"smt2_solver"};
+    stdin_filename = temp_file_problem();
     break;
 
   case solvert::CVC3:

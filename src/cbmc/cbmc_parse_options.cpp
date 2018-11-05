@@ -327,6 +327,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("smt2", true);
   }
 
+  if(cmdline.isset("cprover-smt2"))
+  {
+    options.set_option("cprover-smt2", true), solver_set = true;
+    options.set_option("smt2", true);
+  }
+
   if(cmdline.isset("mathsat"))
   {
     options.set_option("mathsat", true), solver_set=true;
@@ -955,8 +961,9 @@ void cbmc_parse_optionst::help()
     " --localize-faults            localize faults (experimental)\n"
     " --smt2                       use default SMT2 solver (Z3)\n"
     " --boolector                  use Boolector\n"
-    " --mathsat                    use MathSAT\n"
+    " --cprover-smt2               use CPROVER SMT2 solver\n"
     " --cvc4                       use CVC4\n"
+    " --mathsat                    use MathSAT\n"
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
