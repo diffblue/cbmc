@@ -1642,16 +1642,16 @@ inline void validate_expr(const array_of_exprt &value)
 
 
 /// \brief Array constructor from list of elements
-class array_exprt:public exprt
+class array_exprt : public multi_ary_exprt
 {
 public:
   DEPRECATED("use array_exprt(type) instead")
-  array_exprt():exprt(ID_array)
+  array_exprt() : multi_ary_exprt(ID_array)
   {
   }
 
-  explicit array_exprt(const array_typet &_type):
-    exprt(ID_array, _type)
+  explicit array_exprt(const array_typet &_type)
+    : multi_ary_exprt(ID_array, _type)
   {
   }
 };
@@ -1682,11 +1682,11 @@ template<> inline bool can_cast_expr<array_exprt>(const exprt &base)
 
 /// Array constructor from a list of index-element pairs
 /// Operands are index/value pairs, alternating.
-class array_list_exprt : public exprt
+class array_list_exprt : public multi_ary_exprt
 {
 public:
   explicit array_list_exprt(const array_typet &_type)
-    : exprt(ID_array_list, _type)
+    : multi_ary_exprt(ID_array_list, _type)
   {
   }
 };
@@ -1703,16 +1703,16 @@ inline void validate_expr(const array_list_exprt &value)
 }
 
 /// \brief Vector constructor from list of elements
-class vector_exprt:public exprt
+class vector_exprt : public multi_ary_exprt
 {
 public:
   DEPRECATED("use vector_exprt(type) instead")
-  vector_exprt():exprt(ID_vector)
+  vector_exprt() : multi_ary_exprt(ID_vector)
   {
   }
 
-  explicit vector_exprt(const vector_typet &_type):
-    exprt(ID_vector, _type)
+  explicit vector_exprt(const vector_typet &_type)
+    : multi_ary_exprt(ID_vector, _type)
   {
   }
 };
@@ -1823,16 +1823,15 @@ inline void validate_expr(const union_exprt &value)
 
 
 /// \brief Struct constructor from list of elements
-class struct_exprt:public exprt
+class struct_exprt : public multi_ary_exprt
 {
 public:
   DEPRECATED("use struct_exprt(component_name, value, type) instead")
-  struct_exprt():exprt(ID_struct)
+  struct_exprt() : multi_ary_exprt(ID_struct)
   {
   }
 
-  explicit struct_exprt(const typet &_type):
-    exprt(ID_struct, _type)
+  explicit struct_exprt(const typet &_type) : multi_ary_exprt(ID_struct, _type)
   {
   }
 
