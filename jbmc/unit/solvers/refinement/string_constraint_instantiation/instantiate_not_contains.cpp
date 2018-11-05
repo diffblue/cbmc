@@ -36,7 +36,7 @@ public:
   }
   refined_string_typet string_type() const
   {
-    return refined_string_typet(length_type(), char_type());
+    return refined_string_typet(length_type(), pointer_type(char_type()));
   }
   array_typet witness_type() const
   {

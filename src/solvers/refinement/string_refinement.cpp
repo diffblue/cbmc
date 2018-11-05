@@ -270,12 +270,15 @@ static void make_char_array_pointer_associations(
   }
 }
 
-void replace_symbols_in_equations(
-  const union_find_replacet &symbol_resolve,
-  std::vector<equal_exprt> &equations)
+/// Substitute sub-expressions in equation by representative elements of
+/// `symbol_resolve` whenever possible.
+/// Similar to `symbol_resolve.replace_expr` but doesn't mutate the expression
+/// and returns the transformed expression instead.
+static exprt
+replace_expr_copy(const union_find_replacet &symbol_resolve, exprt expr)
 {
-  for(equal_exprt &eq : equations)
-    symbol_resolve.replace_expr(eq);
+  symbol_resolve.replace_expr(expr);
+  return expr;
 }
 
 /// Record the constraints to ensure that the expression is true when
@@ -301,12 +304,15 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 }
 
 /// Add association for each char pointer in the equation
+/// \param symbol_solver: a union_find_replacet object to keep track of
+///   char pointer equations
 /// \param equations: vector of equations
 /// \param ns: namespace
 /// \param stream: output stream
 /// \return union_find_replacet where char pointer that have been set equal
 ///         by an equation are associated to the same element
-static union_find_replacet generate_symbol_resolution_from_equations(
+static void add_equations_for_symbol_resolution(
+  union_find_replacet &symbol_solver,
   const std::vector<equal_exprt> &equations,
   const namespacet &ns,
   messaget::mstreamt &stream)
@@ -314,7 +320,6 @@ static union_find_replacet generate_symbol_resolution_from_equations(
   const auto eom = messaget::eom;
   const std::string log_message =
     "WARNING string_refinement.cpp generate_symbol_resolution_from_equations:";
-  union_find_replacet solver;
   for(const equal_exprt &eq : equations)
   {
     const exprt &lhs = eq.lhs();
@@ -335,7 +340,7 @@ static union_find_replacet generate_symbol_resolution_from_equations(
 
     if(is_char_pointer_type(rhs.type()))
     {
-      solver.make_union(lhs, rhs);
+      symbol_solver.make_union(lhs, rhs);
     }
     else if(rhs.id() == ID_function_application)
     {
@@ -355,7 +360,7 @@ static union_find_replacet generate_symbol_resolution_from_equations(
             const member_exprt lhs_data(lhs, comp.get_name(), comp.type());
             const exprt rhs_data = simplify_expr(
               member_exprt(rhs, comp.get_name(), comp.type()), ns);
-            solver.make_union(lhs_data, rhs_data);
+            symbol_solver.make_union(lhs_data, rhs_data);
           }
         }
       }
@@ -366,7 +371,6 @@ static union_find_replacet generate_symbol_resolution_from_equations(
       }
     }
   }
-  return solver;
 }
 
 /// This is meant to be used on the lhs of an equation with string subtype.
@@ -613,9 +617,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 #endif
 
   debug() << "dec_solve: Build symbol solver from equations" << eom;
-  // This is used by get, that's why we use a class member here
-  symbol_resolve =
-    generate_symbol_resolution_from_equations(equations, ns, debug());
+  // symbol_resolve is used by get and is kept between calls to dec_solve,
+  // that's why we use a class member here
+  add_equations_for_symbol_resolution(symbol_resolve, equations, ns, debug());
 #ifdef DEBUG
   debug() << "symbol resolve:" << eom;
   for(const auto &pair : symbol_resolve.to_vector())
@@ -631,9 +635,6 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     debug() << format(pair.first) << " --> " << format(pair.second) << eom;
   }
 #endif
-
-  debug() << "dec_solve: Replacing char pointer symbols" << eom;
-  replace_symbols_in_equations(symbol_resolve, equations);
 
   debug() << "dec_solve: Replacing string ids in function applications" << eom;
   for(equal_exprt &eq : equations)
@@ -653,10 +654,18 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   debug() << "dec_solve: compute dependency graph and remove function "
           << "applications captured by the dependencies:" << eom;
-  std::vector<exprt> local_equations;
+  std::vector<equal_exprt> local_equations;
   for(const equal_exprt &eq : equations)
   {
-    if(!add_node(dependencies, eq, generator.array_pool))
+    // Ensures that arrays that are equal, are associated to the same nodes
+    // in the graph.
+    const equal_exprt eq_with_char_array_replaced_with_representative_elements =
+      to_equal_expr(replace_expr_copy(symbol_resolve, eq));
+    const bool node_added = add_node(
+      dependencies,
+      eq_with_char_array_replaced_with_representative_elements,
+      generator.array_pool);
+    if(!node_added)
       local_equations.push_back(eq);
   }
   equations.clear();

@@ -198,7 +198,7 @@ public:
     : refined_string_exprt(
         _length,
         _content,
-        refined_string_typet(_length.type(), _content.type()))
+        refined_string_typet(_length.type(), to_pointer_type(_content.type())))
   {
   }
 
