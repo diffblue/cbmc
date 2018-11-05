@@ -4,8 +4,8 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-\[main.assertion..\] expected to fail: FAILURE$
+\[main.assertion..\] .* expected to fail: FAILURE$
 \*\* 2 of 2 failed
 --
 ^warning: ignoring
-\[main.assertion..\] expected to fail: SUCCESS$
+\[main.assertion..\] .* expected to fail: SUCCESS$

@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-\[main.assertion.6\] assertion strlen\(A3\) == 4: FAILURE
+\[main.assertion.6\] .* assertion strlen\(A3\) == 4: FAILURE
 \*\* 1 of 9 failed
 --
 ^warning: ignoring

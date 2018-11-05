@@ -1,9 +1,9 @@
 CORE
 main.c
 --apply-code-contracts
-^\[main.1\] Loop invariant violated before entry: SUCCESS$
-^\[main.2\] Loop invariant not preserved: SUCCESS$
-^\[main.assertion.1\] assertion r == 0: FAILURE$
+^\[main.1\] .* Loop invariant violated before entry: SUCCESS$
+^\[main.2\] .* Loop invariant not preserved: SUCCESS$
+^\[main.assertion.1\] .* assertion r == 0: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

@@ -187,6 +187,7 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
       // now show in the order we have determined
 
       irep_idt previous_function;
+      irep_idt current_file;
       for(const auto &g : goals)
       {
         const auto &l = g->second.source_location;
@@ -198,8 +199,9 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
           previous_function = l.get_function();
           if(!previous_function.empty())
           {
-            if(!l.get_file().empty())
-              result() << l.get_file() << ' ';
+            current_file = l.get_file();
+            if(!current_file.empty())
+              result() << current_file << ' ';
             if(!l.get_function().empty())
               result() << "function " << l.get_function();
             result() << eom;
@@ -207,6 +209,12 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
         }
 
         result() << faint << '[' << g->first << "] " << reset;
+
+        if(l.get_file() != current_file)
+          result() << "file " << l.get_file() << ' ';
+
+        if(!l.get_line().empty())
+          result() << "line " << l.get_line() << ' ';
 
         result() << g->second.description << ": ";
 

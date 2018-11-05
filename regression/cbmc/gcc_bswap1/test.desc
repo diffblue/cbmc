@@ -4,8 +4,8 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-\[main\.assertion\.[258]\] assertion __builtin_bswap(16|32|64)\((sb|b|bl)\) == 0: FAILURE$
+\[main\.assertion\.[258]\] .* assertion __builtin_bswap(16|32|64)\((sb|b|bl)\) == 0: FAILURE$
 ^\*\* 3 of 9 failed
 --
 ^warning: ignoring
-\[main\.assertion\.[258]\] assertion __builtin_bswap(16|32|64)\((sb|b|bl)\) == 0: SUCCESS$
+\[main\.assertion\.[258]\] .* assertion __builtin_bswap(16|32|64)\((sb|b|bl)\) == 0: SUCCESS$

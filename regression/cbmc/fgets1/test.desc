@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-\[main.assertion.3\] assertion p\[1\]=='b': FAILURE
+\[main.assertion.3\] line 16 assertion p\[1\]=='b': FAILURE
 \*\* 2 of \d+ failed
 --
 ^warning: ignoring

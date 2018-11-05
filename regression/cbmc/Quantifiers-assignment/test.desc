@@ -2,10 +2,10 @@ CORE
 main.c
 
 ^\*\* Results:$
-^\[main.assertion.1\] assertion x: SUCCESS$
-^\[main.assertion.2\] assertion y: FAILURE$
-^\[main.assertion.3\] assertion z1: SUCCESS$
-^\[main.assertion.4\] assertion z2: SUCCESS$
+^\[main.assertion.1\] .* assertion x: SUCCESS$
+^\[main.assertion.2\] .* assertion y: FAILURE$
+^\[main.assertion.3\] .* assertion z1: SUCCESS$
+^\[main.assertion.4\] .* assertion z2: SUCCESS$
 ^\*\* 1 of 4 failed
 ^VERIFICATION FAILED$
 ^EXIT=10$

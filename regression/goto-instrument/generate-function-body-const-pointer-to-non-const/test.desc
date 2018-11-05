@@ -3,5 +3,5 @@ main.c
 --generate-function-body change_pointer_target_of_const_pointer --generate-function-body-options havoc,params:.*
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion x == 10: FAILURE$
+^\[main.assertion.1\] .* assertion x == 10: FAILURE$
 --

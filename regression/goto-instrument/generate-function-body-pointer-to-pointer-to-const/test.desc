@@ -3,7 +3,7 @@ main.c
 --generate-function-body change_target_of_pointer_to_pointer_to_const --generate-function-body-options havoc,params:.*
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion \*px == 10: SUCCESS$
-^\[main.assertion.2\] assertion x == 10: SUCCESS$
-^\[main.assertion.3\] assertion \*px == 10: FAILURE$
+^\[main.assertion.1\] .* assertion \*px == 10: SUCCESS$
+^\[main.assertion.2\] .* assertion x == 10: SUCCESS$
+^\[main.assertion.3\] .* assertion \*px == 10: FAILURE$
 --

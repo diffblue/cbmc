@@ -4,6 +4,6 @@ catch1.class
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^\[.*\] no uncaught exception: FAILURE$
+^\[.*\] line 15 no uncaught exception: FAILURE$
 --
 ^warning: ignoring

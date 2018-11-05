@@ -3,12 +3,12 @@ main.c
 --generate-function-body 'havoc_union' --generate-function-body-options 'havoc,params:.*,globals:(?!__).*'
 ^SIGNAL=0$
 ^EXIT=10$
-^\[main.assertion.1\] assertion globalUnion.non_const == 10: SUCCESS$
-^\[main.assertion.2\] assertion globalUnion.is_const == 10: SUCCESS$
-^\[main.assertion.3\] assertion paramUnion.non_const == 20: SUCCESS$
-^\[main.assertion.4\] assertion paramUnion.is_const == 20: SUCCESS$
-^\[main.assertion.5\] assertion globalUnion.non_const == 10: FAILURE$
-^\[main.assertion.6\] assertion globalUnion.is_const == 10: FAILURE$
-^\[main.assertion.7\] assertion paramUnion.non_const == 20: FAILURE$
-^\[main.assertion.8\] assertion paramUnion.is_const == 20: FAILURE$
+^\[main.assertion.1\] .* assertion globalUnion.non_const == 10: SUCCESS$
+^\[main.assertion.2\] .* assertion globalUnion.is_const == 10: SUCCESS$
+^\[main.assertion.3\] .* assertion paramUnion.non_const == 20: SUCCESS$
+^\[main.assertion.4\] .* assertion paramUnion.is_const == 20: SUCCESS$
+^\[main.assertion.5\] .* assertion globalUnion.non_const == 10: FAILURE$
+^\[main.assertion.6\] .* assertion globalUnion.is_const == 10: FAILURE$
+^\[main.assertion.7\] .* assertion paramUnion.non_const == 20: FAILURE$
+^\[main.assertion.8\] .* assertion paramUnion.is_const == 20: FAILURE$
 ^VERIFICATION FAILED$

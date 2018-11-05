@@ -3,15 +3,15 @@ main.c
 --generate-function-body 'havoc_complex_struct' --generate-function-body-options 'havoc,params:.*'
 ^SIGNAL=0$
 ^EXIT=10$
-\[main.assertion.1\] assertion main_struct.pointer_contents->struct_contents.some_variable == 11: SUCCESS
-\[main.assertion.2\] assertion main_struct.struct_contents.some_variable == 10: SUCCESS
-\[main.assertion.3\] assertion main_struct.struct_contents.some_constant == 20: SUCCESS
-\[main.assertion.4\] assertion main_struct.union_contents.some_double < 14.0 && main_struct.union_contents.some_double > 12.0: SUCCESS
-\[main.assertion.5\] assertion main_struct.pointer_contents->struct_contents.some_variable == 11: FAILURE
-\[main.assertion.6\] assertion main_struct.struct_contents.some_variable == 10: FAILURE
-\[main.assertion.7\] assertion main_struct.struct_contents.some_constant == 20: SUCCESS
-\[main.assertion.8\] assertion main_struct.union_contents.some_double < 14.0 && main_struct.union_contents.some_double > 12.0: FAILURE
-\[main.assertion.9\] assertion child_struct.struct_contents.some_variable == 11: SUCCESS
-\[main.assertion.10\] assertion child_struct.union_contents.some_integer == 31: SUCCESS
-\[main.assertion.11\] assertion !child_struct.pointer_contents: SUCCESS
+\[main.assertion.1\] .* assertion main_struct.pointer_contents->struct_contents.some_variable == 11: SUCCESS
+\[main.assertion.2\] .* assertion main_struct.struct_contents.some_variable == 10: SUCCESS
+\[main.assertion.3\] .* assertion main_struct.struct_contents.some_constant == 20: SUCCESS
+\[main.assertion.4\] .* assertion main_struct.union_contents.some_double < 14.0 && main_struct.union_contents.some_double > 12.0: SUCCESS
+\[main.assertion.5\] .* assertion main_struct.pointer_contents->struct_contents.some_variable == 11: FAILURE
+\[main.assertion.6\] .* assertion main_struct.struct_contents.some_variable == 10: FAILURE
+\[main.assertion.7\] .* assertion main_struct.struct_contents.some_constant == 20: SUCCESS
+\[main.assertion.8\] .* assertion main_struct.union_contents.some_double < 14.0 && main_struct.union_contents.some_double > 12.0: FAILURE
+\[main.assertion.9\] .* assertion child_struct.struct_contents.some_variable == 11: SUCCESS
+\[main.assertion.10\] .* assertion child_struct.union_contents.some_integer == 31: SUCCESS
+\[main.assertion.11\] .* assertion !child_struct.pointer_contents: SUCCESS
 ^VERIFICATION FAILED$
