@@ -1614,7 +1614,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       // the op is the array size
       PRECONDITION(op.size() == 1 && results.size() == 1);
-      convert_newarray(i_it->source_location, statement, arg0, op, c, results);
+      c = convert_newarray(i_it->source_location, statement, arg0, op, results);
     }
     else if(statement=="multianewarray")
     {
@@ -1627,7 +1627,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       op=pop(dimension);
       assert(results.size()==1);
-      convert_multianewarray(i_it->source_location, arg0, op, c, results);
+      c = convert_multianewarray(i_it->source_location, arg0, op, results);
     }
     else if(statement=="arraylength")
     {
@@ -2430,11 +2430,10 @@ codet &java_bytecode_convert_methodt::do_exception_handling(
   return c;
 }
 
-void java_bytecode_convert_methodt::convert_multianewarray(
+code_blockt java_bytecode_convert_methodt::convert_multianewarray(
   const source_locationt &location,
   const exprt &arg0,
   const exprt::operandst &op,
-  codet &c,
   exprt::operandst &results)
 {
   PRECONDITION(!location.get_line().empty());
@@ -2454,16 +2453,16 @@ void java_bytecode_convert_methodt::convert_multianewarray(
 
   const exprt tmp = tmp_variable("newarray", ref_type);
   create.add(code_assignt(tmp, java_new_array));
-  c = std::move(create);
   results[0] = tmp;
+
+  return create;
 }
 
-void java_bytecode_convert_methodt::convert_newarray(
+code_blockt java_bytecode_convert_methodt::convert_newarray(
   const source_locationt &location,
   const irep_idt &statement,
   const exprt &arg0,
   const exprt::operandst &op,
-  codet &c,
   exprt::operandst &results)
 {
   char element_type;
@@ -2499,18 +2498,20 @@ void java_bytecode_convert_methodt::convert_newarray(
   side_effect_exprt java_new_array(ID_java_new_array, ref_type, location);
   java_new_array.copy_to_operands(op[0]);
 
-  c = code_blockt();
+  code_blockt block;
 
   if(max_array_length != 0)
   {
     constant_exprt size_limit = from_integer(max_array_length, java_int_type());
     binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
     code_assumet assume_le_max_size(le_max_size);
-    to_code_block(c).add(assume_le_max_size);
+    block.add(assume_le_max_size);
   }
   const exprt tmp = tmp_variable("newarray", ref_type);
-  to_code_block(c).add(code_assignt(tmp, java_new_array));
+  block.add(code_assignt(tmp, java_new_array));
   results[0] = tmp;
+
+  return block;
 }
 
 void java_bytecode_convert_methodt::convert_new(

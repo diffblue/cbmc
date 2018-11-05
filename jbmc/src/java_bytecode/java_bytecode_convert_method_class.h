@@ -408,19 +408,17 @@ protected:
     codet &c,
     exprt::operandst &results);
 
-  void convert_newarray(
+  code_blockt convert_newarray(
     const source_locationt &location,
     const irep_idt &statement,
     const exprt &arg0,
     const exprt::operandst &op,
-    codet &c,
     exprt::operandst &results);
 
-  void convert_multianewarray(
+  code_blockt convert_multianewarray(
     const source_locationt &location,
     const exprt &arg0,
     const exprt::operandst &op,
-    codet &c,
     exprt::operandst &results);
 
   codet &do_exception_handling(
