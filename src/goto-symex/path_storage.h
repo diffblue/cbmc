@@ -8,6 +8,10 @@
 #include "goto_symex_state.h"
 #include "symex_target_equation.h"
 
+#include <goto-instrument/dispatch_loop_detector.h>
+
+#include <goto-symex/goto_symex_state.h>
+
 #include <util/cmdline.h>
 #include <util/invariant.h>
 #include <util/optional.h>
@@ -15,6 +19,7 @@
 #include <util/ui_message.h>
 
 #include <memory>
+#include <unordered_set>
 
 /// \brief Storage for symbolic execution paths to be resumed later
 ///
@@ -58,10 +63,14 @@ public:
   struct strategy_contextt
   {
     const goto_functionst &goto_functions;
+    const optionst &options;
     messaget &log;
 
-    strategy_contextt(const goto_functionst &gf, messaget &log)
-      : goto_functions(gf), log(log)
+    strategy_contextt(
+      const goto_functionst &gf,
+      const optionst &opts,
+      messaget &log)
+      : goto_functions(gf), options(opts), log(log)
     {
     }
   };
@@ -189,6 +198,117 @@ private:
   void private_pop() override;
 };
 
+/// \brief Save queue for each case of a dispatch loop
+class path_dispatch_loopt : public path_storaget
+{
+public:
+  explicit path_dispatch_loopt(const dispatch_loop_detectort &, messaget &log);
+
+  void push(const patht &, const patht &) override;
+  std::size_t size() const override;
+  void clear() override;
+  bool inline wants_instruction_callback() const override
+  {
+    return true;
+  }
+  inline void notify_next_instruction(
+    const goto_programt::const_targett &,
+    goto_symex_statet &) override;
+
+protected:
+  class queue_pointert
+  {
+  protected:
+    bool initialized;
+
+  public:
+    goto_programt::const_targett originating_branch;
+    goto_programt::const_targett branch_target;
+    queue_pointert(
+      const goto_programt::const_targett &ob,
+      const goto_programt::const_targett &bt)
+      : initialized(false), originating_branch(ob), branch_target(bt)
+    {
+    }
+
+    bool is_initialized() const
+    {
+      return initialized;
+    }
+    void initialize()
+    {
+      INVARIANT(!initialized, "Tried to initialize a queue_pointert twice");
+      initialized = true;
+    }
+    bool operator==(const queue_pointert &other) const
+    {
+      return initialized == other.is_initialized() &&
+             originating_branch->location_number ==
+               other.originating_branch->location_number &&
+             branch_target->location_number ==
+               other.branch_target->location_number;
+    }
+    bool operator!=(const queue_pointert &other) const
+    {
+      return !(*this == other);
+    }
+    bool operator<(const queue_pointert &other) const
+    {
+      return std::tie(initialized, originating_branch, branch_target) <
+             std::tie(
+               other.initialized,
+               other.originating_branch,
+               other.branch_target);
+    }
+    std::string to_string() const;
+  };
+
+  const dispatch_loop_detectort::dispatch_loopt dispatch_loop;
+  std::list<patht> paths;
+  std::list<patht>::iterator last_peeked;
+  messaget &log;
+  /// \brief The last instruction in the program
+  const goto_programt::const_targett last_program_instruction;
+  const goto_programt::const_targett init_last_program_instruction() const;
+
+  /// \brief Cache of location numbers in targets in dispatch_loop.cases()
+  const std::unordered_set<unsigned> case_locations;
+  const std::unordered_set<unsigned> init_case_locations() const;
+
+  typedef std::map<queue_pointert, std::list<patht>> queuest;
+  queuest queues;
+  std::list<queue_pointert> qq;
+
+  std::map<queue_pointert, goto_programt::const_targett> targets_cache;
+  const std::map<queue_pointert, goto_programt::const_targett>
+  init_targets_cache() const;
+
+  const goto_programt::const_targett jump_back_instruction;
+
+  bool look_out_for_cases;
+  bool should_adjust_qq;
+
+  const queue_pointert invalid;
+  const queue_pointert init_invalid() const;
+  queue_pointert old_qq_head;
+
+  void print_qq(const std::string &) const;
+  void adjust_queue_queues();
+  queuest::iterator find_front_queue()
+  {
+    queuest::iterator ret = queues.find(qq.front());
+    INVARIANT(
+      ret != queues.end(),
+      "There should be a queue headed by the queue pointer " +
+        qq.front().to_string());
+    return ret;
+  }
+
+private:
+  patht &private_peek() override;
+  void private_pop() override;
+};
+
 /// \brief Dummy class for clients who will not use path exploration
 class degenerate_path_storaget : public path_storaget
 {
@@ -254,6 +374,16 @@ public:
   /// invoked from front-ends.
   void
   set_path_strategy_options(const cmdlinet &, optionst &, messaget &) const;
+
+  static bool start_symex_with_path_exploration(const std::string &strategy)
+  {
+    INVARIANT(
+      strategy != "",
+      "This function should only be called if the strategy is non-empty");
+    if(strategy == "dispatch")
+      return false;
+    return true;
+  }
 
 protected:
   std::string default_strategy() const

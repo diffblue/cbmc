@@ -42,6 +42,8 @@ CLEANFILES = goto-symex$(LIBEXT)
 
 all: goto-symex$(LIBEXT)
 
+OBJ += ../goto-instrument/dispatch_loop_detector${OBJEXT}
+
 ###############################################################################
 
 goto-symex$(LIBEXT): $(OBJ)

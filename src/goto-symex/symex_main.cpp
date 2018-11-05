@@ -301,7 +301,10 @@ void goto_symext::symex_from_entry_point_of(
   }
 
   statet state;
-  state.doing_path_exploration = options.is_set("paths");
+  state.doing_path_exploration =
+    doing_path_exploration &&
+    path_strategy_choosert::start_symex_with_path_exploration(
+      exploration_strategy);
 
   initialize_entry_point(
     state,
@@ -331,6 +334,9 @@ void goto_symext::symex_step(
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
+  if(worklist_wants_instruction_callback)
+    path_storage.notify_next_instruction(state.source.pc, state);
+
   if(!state.doing_path_exploration)
     merge_gotos(state);
 
@@ -338,9 +344,6 @@ void goto_symext::symex_step(
   if(max_depth != 0 && state.depth > max_depth)
     state.guard.add(false_exprt());
   state.depth++;
-
-  std::cout << "Symexing " << instruction.to_string() << " at line "
-            << instruction.source_location << "\n";
 
   // actually do instruction
   switch(instruction.type)

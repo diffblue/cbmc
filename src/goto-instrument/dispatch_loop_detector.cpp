@@ -1480,8 +1480,8 @@ void dispatch_loop_detectort::block_nodet::init(
 
 dispatch_loop_detectort::dispatch_loopt::dispatch_loopt(
   const dispatch_loop_detectort &dld)
-  : graph(dld.graph),
-    goto_functions(dld.goto_functions),
+  : goto_functions(dld.goto_functions),
+    graph(dld.graph),
     log(dld.log),
     members(build_members())
 {

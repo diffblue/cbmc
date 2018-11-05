@@ -500,10 +500,10 @@ public:
   {
   public:
     dispatch_loopt(const dispatch_loop_detectort &);
+    const goto_functionst &goto_functions;
 
   protected:
     const grapht<block_nodet> &graph;
-    const goto_functionst &goto_functions;
     messaget &log;
     void get_all_nodes(std::forward_list<block_nodet::node_indext> &) const;
 

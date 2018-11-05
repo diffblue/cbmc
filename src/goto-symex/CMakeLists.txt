@@ -3,4 +3,4 @@ add_library(goto-symex ${sources})
 
 generic_includes(goto-symex)
 
-target_link_libraries(goto-symex util)
+target_link_libraries(goto-symex util goto-instrument-lib)

@@ -76,6 +76,11 @@ public:
       guard_identifier("goto_symex::\\guard"),
       path_storage(path_storage),
       path_segment_vccs(0),
+      doing_path_exploration(options.is_set("paths")),
+      exploration_strategy(
+        options.is_set("exploration-strategy")
+          ? options.get_option("exploration-strategy")
+          : ""),
       _total_vccs(std::numeric_limits<unsigned>::max()),
       _remaining_vccs(std::numeric_limits<unsigned>::max())
   {
@@ -491,6 +496,9 @@ public:
   std::size_t path_segment_vccs;
 
 protected:
+  const bool doing_path_exploration;
+  const std::string exploration_strategy;
+
   /// @{\name Statistics
   ///
   /// The actual number of total and remaining VCCs should be assigned to
