@@ -299,9 +299,9 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     for_body.add(std::move(init_decl));
 
     code_assignt init_subarray(init_sym, sub_java_new);
+    for_body.add(std::move(init_subarray));
     code_assignt assign_subarray(
       deref_expr, typecast_exprt(init_sym, deref_expr.type()));
-    for_body.move(init_subarray);
     for_body.add(std::move(assign_subarray));
 
     for_loop.init() = code_assignt(tmp_i, from_integer(0, tmp_i.type()));

@@ -95,7 +95,6 @@ code_blockt generate_nondet_switch(
   if(switch_cases.size() == 1)
     return code_blockt({switch_cases[0]});
 
-  code_switcht result_switch;
   code_blockt result_block;
 
   const symbol_exprt &switch_value = generate_nondet_int(
@@ -108,8 +107,6 @@ code_blockt generate_nondet_switch(
     symbol_table,
     result_block);
 
-  result_switch.value() = switch_value;
-
   code_blockt switch_block;
   size_t case_number = 0;
   for(const auto &switch_case : switch_cases)
@@ -117,14 +114,13 @@ code_blockt generate_nondet_switch(
     code_blockt this_block;
     this_block.add(switch_case);
     this_block.add(code_breakt());
-    code_switch_caset this_case;
-    this_case.case_op() = from_integer(case_number, switch_value.type());
-    this_case.code() = this_block;
-    switch_block.move(this_case);
+    code_switch_caset this_case(
+      from_integer(case_number, switch_value.type()), this_block);
+    switch_block.add(std::move(this_case));
     ++case_number;
   }
 
-  result_switch.body() = switch_block;
+  code_switcht result_switch(switch_value, switch_block);
   result_block.add(std::move(result_switch));
   return result_block;
 }

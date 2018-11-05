@@ -204,7 +204,8 @@ static void java_static_lifetime_init(
         set_class_identifier(
           to_struct_expr(*zero_object), ns, to_symbol_type(sym.type));
 
-        code_block.add(code_assignt(sym.symbol_expr(), *zero_object));
+        code_block.add(
+          std::move(code_assignt(sym.symbol_expr(), *zero_object)));
 
         // Then call the init function:
         code_block.add(std::move(initializer_call));
@@ -762,7 +763,7 @@ bool generate_java_start_function(
 
   // Exceptional return: catch and assign to exc_symbol.
   code_landingpadt landingpad(exc_symbol.symbol_expr());
-  init_code.add(toplevel_catch);
+  init_code.add(std::move(toplevel_catch));
   init_code.add(std::move(landingpad));
 
   // Converge normal and exceptional return:
