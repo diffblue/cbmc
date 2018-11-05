@@ -5,5 +5,5 @@ invariant-with-irep-diagnostics
 ^SIGNAL=0$
 --- begin invariant violation report ---
 Invariant check failed
-value: 00000000000000000000000000001000
-value: 00000000000000000000000000001101
+value: 8
+value: [dD]

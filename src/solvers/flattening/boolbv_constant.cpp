@@ -81,14 +81,6 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
   {
     const auto &value = expr.get_value();
 
-    if(value.size() != width)
-    {
-      error().source_location=expr.find_source_location();
-      error() << "wrong value length in constant: "
-              << expr.pretty() << eom;
-      throw 0;
-    }
-
     for(std::size_t i=0; i<width; i++)
     {
       const bool bit = get_bvrep_bit(value, width, i);
