@@ -35,7 +35,6 @@ bool scratch_programt::check_sat(bool do_slice)
   output(ns, "scratch", std::cout);
 #endif
 
-  symex.constant_propagation=constant_propagation;
   goto_symex_statet::propagationt::valuest constants;
 
   symex.symex_with_state(symex_state, functions, symex_symbol_table);
@@ -202,4 +201,11 @@ void scratch_programt::append_loop(
       t->targets.push_back(end);
     }
   }
+}
+
+optionst scratch_programt::get_default_options()
+{
+  optionst ret;
+  ret.set_option("simplify", true);
+  return ret;
 }

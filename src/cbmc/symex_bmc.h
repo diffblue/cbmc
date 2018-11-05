@@ -80,7 +80,7 @@ public:
     return symex_coverage.generate_report(goto_functions, path);
   }
 
-  bool record_coverage;
+  const bool record_coverage;
 
   unwindsett unwindset;
 

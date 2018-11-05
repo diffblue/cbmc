@@ -86,11 +86,6 @@ public:
       ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
   {
-    symex.constant_propagation=options.get_bool_option("propagation");
-    symex.record_coverage=
-      !options.get_option("symex-coverage-report").empty();
-    symex.self_loops_to_assumptions =
-      options.get_bool_option("self-loops-to-assumptions");
   }
 
   virtual resultt run(const goto_functionst &goto_functions)
@@ -162,9 +157,6 @@ protected:
       ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
   {
-    symex.constant_propagation = options.get_bool_option("propagation");
-    symex.record_coverage =
-      !options.get_option("symex-coverage-report").empty();
     INVARIANT(
       options.get_bool_option("paths"),
       "Should only use saved equation & goto_state constructor "

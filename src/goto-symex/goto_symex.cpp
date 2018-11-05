@@ -18,7 +18,7 @@ unsigned goto_symext::dynamic_counter=0;
 
 void goto_symext::do_simplify(exprt &expr)
 {
-  if(options.get_bool_option("simplify"))
+  if(simplify_opt)
     simplify(expr, ns);
 }
 

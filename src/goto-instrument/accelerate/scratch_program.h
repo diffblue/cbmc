@@ -43,16 +43,13 @@ public:
       ns(symbol_table, symex_symbol_table),
       equation(),
       path_storage(),
-      options(),
+      options(get_default_options()),
       symex(mh, symbol_table, equation, options, path_storage),
       satcheck(util_make_unique<satcheckt>()),
       satchecker(ns, *satcheck),
       z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
       checker(&z3) // checker(&satchecker)
   {
-    // Unconditionally set for performance reasons. This option setting applies
-    // only to this program.
-    options.set_option("simplify", true);
   }
 
   void append(goto_programt::instructionst &instructions);
@@ -91,6 +88,7 @@ protected:
   bv_pointerst satchecker;
   smt2_dect z3;
   prop_convt *checker;
+  static optionst get_default_options();
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_SCRATCH_PROGRAM_H

@@ -247,7 +247,7 @@ void goto_symext::symex_assign_symbol(
     ssa_lhs,
     ssa_rhs,
     ns,
-    options.get_bool_option("simplify"),
+    simplify_opt,
     constant_propagation,
     allow_pointer_unsoundness);
 
