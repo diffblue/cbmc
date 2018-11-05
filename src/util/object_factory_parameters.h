@@ -40,12 +40,18 @@ struct object_factory_parameterst
   /// Minimum value for the non-deterministically-chosen length of a string.
   size_t min_nondet_string_length = 0;
 
-  /// Maximum depth for object hierarchy on input.
-  /// Used to prevent object factory to loop infinitely during the
-  /// generation of code that allocates/initializes data structures of recursive
-  /// data types or unbounded depth. We bound the maximum number of times we
-  /// dereference a pointer using a 'depth counter'. We set a pointer to null if
-  /// such depth becomes >= than this maximum value.
+  /// Maximum depth of pointer chains (that contain recursion) in the nondet
+  /// generated input objects.
+  ///
+  /// Used to prevent the object factory from looping infinitely during the
+  /// generation of code that allocates/initializes recursive data structures
+  /// (such as a linked list). The object factory tracks the number of times a
+  /// pointer has been dereferenced in a 'depth' counter variable. If a pointer
+  /// to be initialized points to an object of a type that already occured on
+  /// the current pointer chain, and if 'depth' is larger than
+  /// 'max_nondet_tree_depth`, then the pointer is set to null. The parameter
+  /// does not affect non-recursive data structures, which are always
+  /// initialized to their full depth.
   size_t max_nondet_tree_depth = 5;
 
   /// To force a certain depth of non-null objects.
