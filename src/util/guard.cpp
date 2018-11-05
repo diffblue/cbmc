@@ -55,7 +55,7 @@ void guardt::add(const exprt &expr)
   else if(id()!=ID_and)
   {
     and_exprt a;
-    a.copy_to_operands(*this);
+    a.add_to_operands(*this);
     *this=a;
   }
 

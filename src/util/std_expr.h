@@ -80,7 +80,7 @@ public:
     const typet &_type)
     : exprt(_id, _type)
   {
-    copy_to_operands(_op0, _op1, _op2);
+    add_to_operands(_op0, _op1, _op2);
   }
 
   const exprt &op3() const = delete;
@@ -347,7 +347,7 @@ public:
     const exprt &_op):
     exprt(_id, _op.type())
   {
-    copy_to_operands(_op);
+    add_to_operands(_op);
   }
 
   unary_exprt(
@@ -363,7 +363,7 @@ public:
     const typet &_type):
     exprt(_id, _type)
   {
-    copy_to_operands(_op);
+    add_to_operands(_op);
   }
 
   const exprt &op() const
@@ -644,7 +644,7 @@ public:
     const irep_idt &_id,
     const exprt &_op):exprt(_id, bool_typet())
   {
-    copy_to_operands(_op);
+    add_to_operands(_op);
   }
 
   predicate_exprt(
@@ -652,7 +652,7 @@ public:
     const exprt &_op0,
     const exprt &_op1):exprt(_id, bool_typet())
   {
-    copy_to_operands(_op0, _op1);
+    add_to_operands(_op0, _op1);
   }
 };
 
@@ -758,7 +758,7 @@ public:
     const exprt &_rhs):
     exprt(_id, _lhs.type())
   {
-    copy_to_operands(_lhs, _rhs);
+    add_to_operands(_lhs, _rhs);
   }
 
   binary_exprt(
@@ -768,7 +768,7 @@ public:
     const typet &_type):
     exprt(_id, _type)
   {
-    copy_to_operands(_lhs, _rhs);
+    add_to_operands(_lhs, _rhs);
   }
 
   const exprt &op2() const = delete;
@@ -926,7 +926,7 @@ public:
     const exprt &_rhs):
     exprt(_id, _lhs.type())
   {
-    copy_to_operands(_lhs, _rhs);
+    add_to_operands(_lhs, _rhs);
   }
 
   multi_ary_exprt(
@@ -936,7 +936,7 @@ public:
     const typet &_type):
     exprt(_id, _type)
   {
-    copy_to_operands(_lhs, _rhs);
+    add_to_operands(_lhs, _rhs);
   }
 };
 
@@ -2326,7 +2326,7 @@ public:
   and_exprt(const exprt &op0, const exprt &op1, const exprt &op2):
     multi_ary_exprt(ID_and, bool_typet())
   {
-    copy_to_operands(op0, op1, op2);
+    add_to_operands(op0, op1, op2);
   }
 
   and_exprt(
@@ -2448,7 +2448,7 @@ public:
   or_exprt(const exprt &op0, const exprt &op1, const exprt &op2):
     multi_ary_exprt(ID_or, bool_typet())
   {
-    copy_to_operands(op0, op1, op2);
+    add_to_operands(op0, op1, op2);
   }
 
   or_exprt(
@@ -2615,7 +2615,7 @@ public:
   bitor_exprt(const exprt &_op0, const exprt &_op1):
     multi_ary_exprt(ID_bitor, _op0.type())
   {
-    copy_to_operands(_op0, _op1);
+    add_to_operands(_op0, _op1);
   }
 };
 
@@ -2724,7 +2724,7 @@ public:
   bitand_exprt(const exprt &_op0, const exprt &_op1):
     multi_ary_exprt(ID_bitand, _op0.type())
   {
-    copy_to_operands(_op0, _op1);
+    add_to_operands(_op0, _op1);
   }
 };
 
@@ -3073,7 +3073,7 @@ public:
     const exprt &_lower,
     const typet &_type):exprt(ID_extractbits, _type)
   {
-    copy_to_operands(_src, _upper, _lower);
+    add_to_operands(_src, _upper, _lower);
   }
 
   extractbits_exprt(
@@ -3417,7 +3417,7 @@ public:
     const exprt &_new_value):
     exprt(ID_with, _old.type())
   {
-    copy_to_operands(_old, _where, _new_value);
+    add_to_operands(_old, _where, _new_value);
   }
 
   DEPRECATED("use with_exprt(old, where, new_value) instead")
@@ -3501,7 +3501,7 @@ public:
   explicit index_designatort(const exprt &_index):
     exprt(ID_index_designator)
   {
-    copy_to_operands(_index);
+    add_to_operands(_index);
   }
 
   const exprt &index() const
@@ -3707,7 +3707,7 @@ public:
     const exprt &_new_value):
     exprt(ID_array_update, _array.type())
   {
-    copy_to_operands(_array, _index, _new_value);
+    add_to_operands(_array, _index, _new_value);
   }
 
   array_update_exprt():exprt(ID_array_update)
@@ -4184,7 +4184,7 @@ public:
     const exprt &_rm):
     exprt(_id)
   {
-    copy_to_operands(_lhs, _rhs, _rm);
+    add_to_operands(_lhs, _rhs, _rm);
   }
 
   exprt &lhs()
@@ -4464,7 +4464,7 @@ public:
     const exprt &_op0, const exprt &_op1, const typet &_type):
     exprt(ID_concatenation, _type)
   {
-    copy_to_operands(_op0, _op1);
+    add_to_operands(_op0, _op1);
   }
 };
 

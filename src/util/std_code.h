@@ -144,7 +144,7 @@ public:
 
   void add(const codet &code)
   {
-    copy_to_operands(code);
+    add_to_operands(code);
   }
 
   void add(codet &&code)
@@ -219,7 +219,7 @@ public:
 
   code_assignt(const exprt &lhs, const exprt &rhs):codet(ID_assign)
   {
-    copy_to_operands(lhs, rhs);
+    add_to_operands(lhs, rhs);
   }
 
   exprt &lhs()
@@ -284,7 +284,7 @@ public:
 
   explicit code_declt(const exprt &symbol):codet(ID_decl)
   {
-    copy_to_operands(symbol);
+    add_to_operands(symbol);
   }
 
   exprt &symbol()
@@ -400,7 +400,7 @@ public:
 
   explicit code_assumet(const exprt &expr):codet(ID_assume)
   {
-    copy_to_operands(expr);
+    add_to_operands(expr);
   }
 
   const exprt &assumption() const
@@ -447,7 +447,7 @@ public:
 
   explicit code_assertt(const exprt &expr):codet(ID_assert)
   {
-    copy_to_operands(expr);
+    add_to_operands(expr);
   }
 
   const exprt &assertion() const
@@ -1002,7 +1002,7 @@ public:
 
   explicit code_returnt(const exprt &_op):codet(ID_return)
   {
-    copy_to_operands(_op);
+    add_to_operands(_op);
   }
 
   const exprt &return_value() const
@@ -1126,7 +1126,7 @@ public:
   code_switch_caset(
     const exprt &_case_op, const codet &_code):codet(ID_switch_case)
   {
-    copy_to_operands(_case_op, _code);
+    add_to_operands(_case_op, _code);
   }
 
   bool is_default() const
@@ -1256,7 +1256,7 @@ public:
 
   explicit code_asmt(const exprt &expr):codet(ID_asm)
   {
-    copy_to_operands(expr);
+    add_to_operands(expr);
   }
 
   const irep_idt &get_flavor() const
@@ -1303,7 +1303,7 @@ public:
 
   explicit code_expressiont(const exprt &expr):codet(ID_expression)
   {
-    copy_to_operands(expr);
+    add_to_operands(expr);
   }
 
   const exprt &expression() const
@@ -1748,7 +1748,7 @@ class code_landingpadt:public codet
   explicit code_landingpadt(const exprt &catch_expr):
   codet(ID_exception_landingpad)
   {
-    copy_to_operands(catch_expr);
+    add_to_operands(catch_expr);
   }
   const exprt &catch_expr() const
   {
@@ -1825,9 +1825,7 @@ public:
 
   void add_catch(const code_declt &to_catch, const codet &code_catch)
   {
-    operands().reserve(operands().size()+2);
-    copy_to_operands(to_catch);
-    copy_to_operands(code_catch);
+    add_to_operands(to_catch, code_catch);
   }
 };
 

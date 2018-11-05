@@ -199,7 +199,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       {
         constant_exprt code_value(ID_nil, c.type());
         code_value.add_source_location()=source_location;
-        value.copy_to_operands(code_value);
+        value.add_to_operands(std::move(code_value));
       }
       else
       {
@@ -207,7 +207,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
         if(member.is_nil())
           return nil_exprt();
 
-        value.copy_to_operands(member);
+        value.add_to_operands(std::move(member));
       }
     }
 

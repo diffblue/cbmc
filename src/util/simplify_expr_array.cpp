@@ -201,7 +201,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
       simplify_node(final_offset);
 
       exprt result(array.id(), expr.type());
-      result.copy_to_operands(array.op0(), final_offset);
+      result.add_to_operands(array.op0(), final_offset);
       expr.swap(result);
 
       simplify_rec(expr);
