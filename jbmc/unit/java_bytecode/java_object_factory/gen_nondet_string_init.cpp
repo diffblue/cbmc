@@ -84,22 +84,20 @@ SCENARIO(
           "tmp_object_factory = NONDET(int);",
           CPROVER_PREFIX "assume(tmp_object_factory >= 0);",
           CPROVER_PREFIX "assume(tmp_object_factory <= 20);",
-          "char (*string_data_pointer)[INFINITY()];",
-          "string_data_pointer = "
+          "char (*nondet_infinite_array_pointer)[INFINITY()];",
+          "nondet_infinite_array_pointer = "
             "ALLOCATE(char [INFINITY()], INFINITY(), false);",
-          "char nondet_infinite_array[INFINITY()];",
-          "nondet_infinite_array = NONDET(char [INFINITY()]);",
-          "*string_data_pointer = nondet_infinite_array;",
+          "*nondet_infinite_array_pointer = NONDET(char [INFINITY()]);",
           "int return_array;",
           "return_array = cprover_associate_array_to_pointer_func"
-            "(*string_data_pointer, *string_data_pointer);",
+            "(*nondet_infinite_array_pointer, *nondet_infinite_array_pointer);",
           "int return_array;",
           "return_array = cprover_associate_length_to_array_func"
-            "(*string_data_pointer, tmp_object_factory);",
+            "(*nondet_infinite_array_pointer, tmp_object_factory);",
           "arg = { .@java.lang.Object={ .@class_identifier"
             "=\"java::java.lang.String\" },"
             " .length=tmp_object_factory, "
-            ".data=*string_data_pointer };"};
+            ".data=*nondet_infinite_array_pointer };"};
         // clang-format on
 
         for(std::size_t i = 0;
