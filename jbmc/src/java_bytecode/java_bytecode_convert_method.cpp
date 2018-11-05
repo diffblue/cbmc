@@ -236,8 +236,8 @@ const exprt java_bytecode_convert_methodt::variable(
   else
   {
     exprt result=var.symbol_expr;
-    if(do_cast==CAST_AS_NEEDED && t!=result.type())
-      result=typecast_exprt(result, t);
+    if(do_cast == CAST_AS_NEEDED)
+      result = typecast_exprt::conditional_cast(result, t);
     return result;
   }
 }
@@ -1289,9 +1289,8 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       // Return types are promoted in java, so this might need
       // conversion.
       PRECONDITION(op.size() == 1 && results.empty());
-      exprt r=op[0];
-      if(r.type()!=method_return_type)
-        r=typecast_exprt(r, method_return_type);
+      const exprt r =
+        typecast_exprt::conditional_cast(op[0], method_return_type);
       c=code_returnt(r);
     }
     else if(statement==patternt("?astore"))
@@ -2793,17 +2792,11 @@ code_ifthenelset java_bytecode_convert_methodt::convert_if_cmp(
 {
   code_ifthenelset code_branch;
   const irep_idt cmp_op = get_if_cmp_operator(statement);
-
-  binary_relation_exprt condition(op[0], cmp_op, op[1]);
-
-  exprt &lhs(condition.lhs());
-  exprt &rhs(condition.rhs());
-  const typet &lhs_type(lhs.type());
-  if(lhs_type != rhs.type())
-    rhs = typecast_exprt(rhs, lhs_type);
+  binary_relation_exprt condition(
+    op[0], cmp_op, typecast_exprt::conditional_cast(op[1], op[0].type()));
+  condition.add_source_location() = location;
 
   code_branch.cond() = condition;
-  code_branch.cond().add_source_location() = location;
   const method_offsett label_number = numeric_cast_v<method_offsett>(number);
   code_branch.then_case() = code_gotot(label(std::to_string(label_number)));
   code_branch.then_case().add_source_location() =
@@ -2876,8 +2869,8 @@ code_blockt java_bytecode_convert_methodt::convert_store(
   const irep_idt &var_name = to_symbol_expr(var).get_identifier();
 
   exprt toassign = op[0];
-  if('a' == statement[0] && toassign.type() != var.type())
-    toassign = typecast_exprt(toassign, var.type());
+  if('a' == statement[0])
+    toassign = typecast_exprt::conditional_cast(toassign, var.type());
 
   code_blockt block;
 
