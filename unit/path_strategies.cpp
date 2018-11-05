@@ -266,6 +266,52 @@ SCENARIO("path strategies")
          symex_eventt::result(symex_eventt::enumt::FAILURE)});
     }
   }
+  GIVEN("Dispatch loop program")
+  {
+    std::function<void(optionst &)> callback = [](optionst &opts) {
+      opts.set_option("unwind", 1);
+    };
+
+    c =
+#include "dispatch-loop-detector/if_with_assertion.c"
+      ;
+
+    GIVEN("a basic loop dispatch program with an if-else block")
+    {
+      std::function<void(optionst &)> opts_callback = [](optionst &opts) {
+        opts.set_option("unwind", 2U);
+      };
+      check_with_strategy(
+        "dispatch",
+        callback,
+        c,
+        {// do_pink()
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 94),
+         // Now resume from the else-if, and immediately add two new cases to
+         // the queue queue: the else-if call, and the else call
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 96),
+         // Do the else-if call. This is do_red(), which fails
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 98),
+         symex_eventt::result(symex_eventt::enumt::FAILURE),
+         // Else branch
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 102),
+         // Same thing again, but on the second loop iteration
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 94),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 94),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 94),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 96),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 96),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 98),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 96),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 98),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 102),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 98),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 102),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 102),
+
+         symex_eventt::result(symex_eventt::enumt::FAILURE)});
+    }
+  }
 }
 
 // In theory, there should be no need to change the code below when adding new
