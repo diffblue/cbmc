@@ -617,6 +617,18 @@ codet java_string_library_preprocesst::code_return_function_application(
   return code_returnt(fun_app);
 }
 
+/// Create code allocating object of size `size` and assigning it to `lhs`
+/// \param lhs : pointer which will be allocated
+/// \param size : size of the object
+/// \return code allocation object and assigning `lhs`
+static codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
+{
+  side_effect_exprt alloc(ID_allocate, lhs.type(), lhs.source_location());
+  alloc.add_to_operands(size);
+  alloc.add_to_operands(false_exprt());
+  return code_assignt(lhs, alloc);
+}
+
 /// Declare a fresh symbol of type array of character with infinite size.
 /// \param symbol_table: the symbol table
 /// \param loc: source location
@@ -639,17 +651,9 @@ exprt make_nondet_infinite_char_array(
     ID_java,
     symbol_table);
 
-  const exprt data_pointer = data_sym.symbol_expr();
-  std::vector<const symbolt *> created_symbols;
-  allocate_dynamic_object(
-    data_pointer,
-    array_type,
-    symbol_table,
-    loc,
-    function_id,
-    code,
-    created_symbols,
-    false);
+  const symbol_exprt data_pointer = data_sym.symbol_expr();
+  code.add(code_declt(data_pointer));
+  code.add(make_allocate_code(data_pointer, array_type.size()));
   const exprt nondet_data = side_effect_expr_nondett(array_type, loc);
   const exprt data = dereference_exprt(data_pointer, array_type);
   code.add(code_assignt(data, nondet_data), loc);

@@ -526,18 +526,6 @@ static mp_integer max_value(const typet &type)
   UNREACHABLE;
 }
 
-/// Create code allocating object of size `size` and assigning it to `lhs`
-/// \param lhs : pointer which will be allocated
-/// \param size : size of the object
-/// \return code allocation object and assigning `lhs`
-static codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
-{
-  side_effect_exprt alloc(ID_allocate, lhs.type(), lhs.source_location());
-  alloc.copy_to_operands(size);
-  alloc.copy_to_operands(false_exprt());
-  return code_assignt(lhs, alloc);
-}
-
 /// Check if a structure is a nondeterministic String structure, and if it is
 /// initialize its length and data fields.
 /// \param struct_expr [out]: struct that we may initialize
@@ -648,25 +636,8 @@ bool initialize_nondet_string_fields(
       code_assumet(binary_relation_exprt(length_expr, ID_le, max_length)));
   }
 
-  // char (*array_data_init)[INFINITY];
-  const typet data_ptr_type = pointer_type(
-    array_typet(java_char_type(), infinity_exprt(java_int_type())));
-
-  symbolt &data_pointer_sym = get_fresh_aux_symbol(
-    data_ptr_type, "", "string_data_pointer", loc, ID_java, symbol_table);
-  const auto data_pointer = data_pointer_sym.symbol_expr();
-  code.add(code_declt(data_pointer));
-
-  // Dynamic allocation: `data array = allocate char[INFINITY]`
-  code.add(make_allocate_code(data_pointer, infinity_exprt(java_int_type())));
-
-  // `data_expr` is `*data_pointer`
-  // data_expr = nondet(char[INFINITY]) // we use infinity for variable size
-  const dereference_exprt data_expr(data_pointer);
-  const exprt nondet_array =
+  const exprt data_expr =
     make_nondet_infinite_char_array(symbol_table, loc, function_id, code);
-  code.add(code_assignt(data_expr, nondet_array));
-
   struct_expr.operands()[struct_type.component_number("length")] = length_expr;
 
   const address_of_exprt array_pointer(
