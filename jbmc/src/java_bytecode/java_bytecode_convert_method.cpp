@@ -991,7 +991,7 @@ static std::size_t get_bytecode_type_width(const typet &ty)
   return ty.get_size_t(ID_width);
 }
 
-codet java_bytecode_convert_methodt::convert_instructions(
+code_blockt java_bytecode_convert_methodt::convert_instructions(
   const methodt &method,
   const java_class_typet::java_lambda_method_handlest &lambda_method_handles)
 {
@@ -1913,7 +1913,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
   for(auto &block : root_block.statements())
     code.add(block);
 
-  return std::move(code);
+  return code;
 }
 
 codet java_bytecode_convert_methodt::convert_pop(
@@ -1932,7 +1932,7 @@ codet java_bytecode_convert_methodt::convert_pop(
   return c;
 }
 
-codet java_bytecode_convert_methodt::convert_switch(
+code_switcht java_bytecode_convert_methodt::convert_switch(
   java_bytecode_convert_methodt::address_mapt &address_map,
   const exprt::operandst &op,
   const java_bytecode_parse_treet::instructiont::argst &args,
@@ -1983,7 +1983,7 @@ codet java_bytecode_convert_methodt::convert_switch(
   }
 
   code_switch.body() = code_block;
-  return std::move(code_switch);
+  return code_switch;
 }
 
 codet java_bytecode_convert_methodt::convert_monitorenterexit(
@@ -2537,7 +2537,7 @@ void java_bytecode_convert_methodt::convert_new(
   results[0] = tmp;
 }
 
-codet java_bytecode_convert_methodt::convert_putstatic(
+code_blockt java_bytecode_convert_methodt::convert_putstatic(
   const source_locationt &location,
   const exprt &arg0,
   const exprt::operandst &op,
@@ -2566,10 +2566,10 @@ codet java_bytecode_convert_methodt::convert_putstatic(
     bytecode_write_typet::STATIC_FIELD,
     symbol_expr.get_identifier());
   block.add(code_assignt(symbol_expr, op[0]));
-  return std::move(block);
+  return block;
 }
 
-codet java_bytecode_convert_methodt::convert_putfield(
+code_blockt java_bytecode_convert_methodt::convert_putfield(
   const exprt &arg0,
   const exprt::operandst &op)
 {
@@ -2581,7 +2581,7 @@ codet java_bytecode_convert_methodt::convert_putfield(
     bytecode_write_typet::FIELD,
     arg0.get(ID_component_name));
   block.add(code_assignt(to_member(op[0], arg0), op[1]));
-  return std::move(block);
+  return block;
 }
 
 void java_bytecode_convert_methodt::convert_getstatic(
@@ -2698,7 +2698,7 @@ exprt::operandst &java_bytecode_convert_methodt::convert_ushr(
   return results;
 }
 
-codet java_bytecode_convert_methodt::convert_iinc(
+code_blockt java_bytecode_convert_methodt::convert_iinc(
   const exprt &arg0,
   const exprt &arg1,
   const source_locationt &location,
@@ -2722,10 +2722,10 @@ codet java_bytecode_convert_methodt::convert_iinc(
     plus_exprt(variable(arg0, 'i', address, CAST_AS_NEEDED), arg1_int_type));
   block.add(code_assign);
 
-  return std::move(block);
+  return block;
 }
 
-codet java_bytecode_convert_methodt::convert_ifnull(
+code_ifthenelset java_bytecode_convert_methodt::convert_ifnull(
   const java_bytecode_convert_methodt::address_mapt &address_map,
   const exprt::operandst &op,
   const mp_integer &number,
@@ -2740,10 +2740,10 @@ codet java_bytecode_convert_methodt::convert_ifnull(
   code_branch.then_case().add_source_location() =
     address_map.at(label_number).source->source_location;
   code_branch.add_source_location() = location;
-  return std::move(code_branch);
+  return code_branch;
 }
 
-codet java_bytecode_convert_methodt::convert_ifnonull(
+code_ifthenelset java_bytecode_convert_methodt::convert_ifnonull(
   const java_bytecode_convert_methodt::address_mapt &address_map,
   const exprt::operandst &op,
   const mp_integer &number,
@@ -2758,10 +2758,10 @@ codet java_bytecode_convert_methodt::convert_ifnonull(
   code_branch.then_case().add_source_location() =
     address_map.at(label_number).source->source_location;
   code_branch.add_source_location() = location;
-  return std::move(code_branch);
+  return code_branch;
 }
 
-codet java_bytecode_convert_methodt::convert_if(
+code_ifthenelset java_bytecode_convert_methodt::convert_if(
   const java_bytecode_convert_methodt::address_mapt &address_map,
   const exprt::operandst &op,
   const irep_idt &id,
@@ -2780,10 +2780,10 @@ codet java_bytecode_convert_methodt::convert_if(
   code_branch.then_case().add_source_location().set_function(method_id);
   code_branch.add_source_location() = location;
   code_branch.add_source_location().set_function(method_id);
-  return std::move(code_branch);
+  return code_branch;
 }
 
-codet java_bytecode_convert_methodt::convert_if_cmp(
+code_ifthenelset java_bytecode_convert_methodt::convert_if_cmp(
   const java_bytecode_convert_methodt::address_mapt &address_map,
   const irep_idt &statement,
   const exprt::operandst &op,
@@ -2809,7 +2809,7 @@ codet java_bytecode_convert_methodt::convert_if_cmp(
     address_map.at(label_number).source->source_location;
   code_branch.add_source_location() = location;
 
-  return std::move(code_branch);
+  return code_branch;
 }
 
 code_blockt java_bytecode_convert_methodt::convert_ret(
@@ -2864,7 +2864,7 @@ exprt java_bytecode_convert_methodt::convert_aload(
   return java_bytecode_promotion(element);
 }
 
-codet java_bytecode_convert_methodt::convert_store(
+code_blockt java_bytecode_convert_methodt::convert_store(
   const irep_idt &statement,
   const exprt &arg0,
   const exprt::operandst &op,
@@ -2889,10 +2889,10 @@ codet java_bytecode_convert_methodt::convert_store(
   code_assignt assign(var, toassign);
   assign.add_source_location() = location;
   block.add(assign);
-  return std::move(block);
+  return block;
 }
 
-codet java_bytecode_convert_methodt::convert_astore(
+code_blockt java_bytecode_convert_methodt::convert_astore(
   const irep_idt &statement,
   const exprt::operandst &op,
   const source_locationt &location)
@@ -2921,7 +2921,7 @@ codet java_bytecode_convert_methodt::convert_astore(
   code_assignt array_put(element, op[2]);
   array_put.add_source_location() = location;
   block.add(array_put);
-  return std::move(block);
+  return block;
 }
 
 optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(

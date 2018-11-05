@@ -52,7 +52,7 @@ void string_instrumentation(
   goto_modelt &,
   message_handlert &);
 
-exprt is_zero_string(const exprt &what, bool write=false);
+predicate_exprt is_zero_string(const exprt &what, bool write = false);
 exprt zero_string_length(const exprt &what, bool write=false);
 exprt buffer_size(const exprt &what);
 

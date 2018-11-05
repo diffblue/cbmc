@@ -207,7 +207,7 @@ void symbol_factoryt::gen_nondet_init(
 /// \param loc: The location to assign to generated code
 /// \param allow_null: Whether to allow a null value when type is a pointer
 /// \return Returns the symbol_exprt for the symbol created
-exprt c_nondet_symbol_factory(
+symbol_exprt c_nondet_symbol_factory(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   const irep_idt base_name,
@@ -269,5 +269,5 @@ exprt c_nondet_symbol_factory(
     init_code.move(input_code);
   }
 
-  return std::move(main_symbol_expr);
+  return main_symbol_expr;
 }
