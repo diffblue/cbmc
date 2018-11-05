@@ -279,11 +279,42 @@ void trace_value(
   out << '\n';
 }
 
+static std::string
+state_location(const goto_trace_stept &state, const namespacet &ns)
+{
+  std::string result;
+
+  const auto &source_location = state.pc->source_location;
+
+  if(!source_location.get_file().empty())
+    result += "file " + id2string(source_location.get_file());
+
+  if(!state.function.empty())
+  {
+    const symbolt &symbol = ns.lookup(state.function);
+    if(!result.empty())
+      result += ' ';
+    result += "function " + id2string(symbol.display_name());
+  }
+
+  if(!source_location.get_line().empty())
+  {
+    if(!result.empty())
+      result += ' ';
+    result += "line " + id2string(source_location.get_line());
+  }
+
+  if(!result.empty())
+    result += ' ';
+  result += "thread " + std::to_string(state.thread_nr);
+
+  return result;
+}
+
 void show_state_header(
   messaget::mstreamt &out,
   const namespacet &ns,
   const goto_trace_stept &state,
-  const source_locationt &source_location,
   unsigned step_nr,
   const trace_optionst &options)
 {
@@ -294,7 +325,7 @@ void show_state_header(
   else
     out << "State " << step_nr;
 
-  out << ' ' << source_location << " thread " << state.thread_nr << '\n';
+  out << ' ' << state_location(state, ns) << '\n';
   out << "----------------------------------------------------" << '\n';
 
   if(options.show_code)
@@ -340,7 +371,10 @@ void show_full_goto_trace(
         out << '\n';
         out << messaget::red << "Violated property:" << messaget::reset << '\n';
         if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << '\n';
+        {
+          out << "  " << state_location(step, ns) << '\n';
+        }
+
         out << "  " << messaget::red << step.comment << messaget::reset << '\n';
 
         if(step.pc->is_assert())
@@ -381,8 +415,7 @@ void show_full_goto_trace(
         {
           first_step=false;
           prev_step_nr=step.step_nr;
-          show_state_header(
-            out, ns, step, step.pc->source_location, step.step_nr, options);
+          show_state_header(out, ns, step, step.step_nr, options);
         }
 
        trace_value(
@@ -400,8 +433,7 @@ void show_full_goto_trace(
       {
         first_step=false;
         prev_step_nr=step.step_nr;
-        show_state_header(
-          out, ns, step, step.pc->source_location, step.step_nr, options);
+        show_state_header(out, ns, step, step.step_nr, options);
       }
 
       trace_value(
@@ -418,8 +450,7 @@ void show_full_goto_trace(
       }
       else
       {
-        show_state_header(
-          out, ns, step, step.pc->source_location, step.step_nr, options);
+        show_state_header(out, ns, step, step.step_nr, options);
         out << "  OUTPUT " << step.io_id << ':';
 
         for(std::list<exprt>::const_iterator
@@ -441,8 +472,7 @@ void show_full_goto_trace(
       break;
 
     case goto_trace_stept::typet::INPUT:
-      show_state_header(
-        out, ns, step, step.pc->source_location, step.step_nr, options);
+      show_state_header(out, ns, step, step.step_nr, options);
       out << "  INPUT " << step.io_id << ':';
 
       for(std::list<exprt>::const_iterator
