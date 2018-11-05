@@ -8,7 +8,7 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 #include <testing-utils/catch.hpp>
 
-#include <path_strategies.h>
+#include "path_strategies.h"
 
 #include <fstream>
 #include <functional>
@@ -266,6 +266,60 @@ SCENARIO("path strategies")
          symex_eventt::result(symex_eventt::enumt::FAILURE)});
     }
   }
+  GIVEN("Dispatch loop program with if")
+  {
+    c =
+#include "if_with_assertion.c.string"
+      ;
+
+    GIVEN("unwind 1")
+    {
+      check_with_strategy(
+        "dispatch",
+        [](optionst &opts) { opts.set_option("unwind", 1U); },
+        c,
+        {// do_pink()
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 94),
+         // Now resume from the else-if, and immediately add two new cases to
+         // the queue queue: the else-if call, and the else call
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 96),
+         // Do the else-if call. This is do_red(), which fails
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 98),
+         symex_eventt::result(symex_eventt::enumt::FAILURE),
+         // Else branch
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 102),
+
+         // Final failure report
+         symex_eventt::result(symex_eventt::enumt::FAILURE)});
+    }
+  }
+
+  GIVEN("Dispatch loop program with case")
+  {
+    c =
+#include "case_with_assertion.c.string"
+      ;
+
+    GIVEN("unwind 1")
+    {
+      check_with_strategy(
+        "dispatch",
+        [](optionst &opts) { opts.set_option("unwind", 1U); },
+        c,
+        {symex_eventt::resume(symex_eventt::enumt::NEXT, 97),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 102),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 107),
+
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 104),
+         symex_eventt::result(symex_eventt::enumt::FAILURE),
+
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 99),
+
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 94),
+
+         symex_eventt::result(symex_eventt::enumt::FAILURE)});
+    }
+  }
 }
 
 // In theory, there should be no need to change the code below when adding new
@@ -362,6 +416,11 @@ void _check_with_strategy(
   opts.set_option("exploration-strategy", strategy);
 
   opts_callback(opts);
+  std::stringstream ss;
+  ss << "Options:\n---\n";
+  opts.output(ss);
+  ss << "\n---";
+  INFO(ss.str());
 
   ui_message_handlert mh(cmdline, "path-explore");
   mh.set_verbosity(0);

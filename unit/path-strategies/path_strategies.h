@@ -28,11 +28,13 @@ public:
 
   static pairt resume(enumt kind, int location)
   {
+    PRECONDITION(kind == enumt::JUMP || kind == enumt::NEXT);
     return pairt(kind, location);
   }
 
   static pairt result(enumt kind)
   {
+    PRECONDITION(kind == enumt::SUCCESS || kind == enumt::FAILURE);
     return pairt(kind, -1);
   }
 

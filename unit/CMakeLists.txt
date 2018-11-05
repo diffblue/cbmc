@@ -18,6 +18,7 @@ list(REMOVE_ITEM sources
 
     # Has additional dependencies, needs to be built as a separate lib
     ${CMAKE_CURRENT_SOURCE_DIR}/dispatch-loop-detector/dispatch_loop_detector.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/path-strategies/path_strategies.cpp
 
     # Intended to fail to compile
     ${CMAKE_CURRENT_SOURCE_DIR}/util/expr_cast/expr_undefined_casts.cpp
@@ -25,6 +26,7 @@ list(REMOVE_ITEM sources
 
 add_subdirectory(testing-utils)
 add_subdirectory(dispatch-loop-detector)
+add_subdirectory(path-strategies)
 
 add_executable(unit ${sources})
 
@@ -43,6 +45,7 @@ target_link_libraries(
         goto-programs
         goto-instrument-lib
         cbmc-lib
+        path-strategies
 )
 
 add_test(
