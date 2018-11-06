@@ -546,8 +546,8 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
 
   // Start building the program.  Begin by decl'ing each of the
   // master distinguishers.
-  for(std::list<exprt>::iterator it=distinguishers.begin();
-      it!=distinguishers.end();
+  for(std::list<symbol_exprt>::iterator it = distinguishers.begin();
+      it != distinguishers.end();
       ++it)
   {
     program.add_instruction(DECL)->code=code_declt(*it);
@@ -888,8 +888,8 @@ void disjunctive_polynomial_accelerationt::build_fixed()
 
   // Create shadow distinguisher variables.  These guys identify the path that
   // is taken through the fixed-path body.
-  for(std::list<exprt>::iterator it=distinguishers.begin();
-      it!=distinguishers.end();
+  for(std::list<symbol_exprt>::iterator it = distinguishers.begin();
+      it != distinguishers.end();
       ++it)
   {
     exprt &distinguisher=*it;
@@ -1006,8 +1006,8 @@ void disjunctive_polynomial_accelerationt::record_path(
 {
   distinguish_valuest path_val;
 
-  for(std::list<exprt>::iterator it=distinguishers.begin();
-      it!=distinguishers.end();
+  for(std::list<symbol_exprt>::iterator it = distinguishers.begin();
+      it != distinguishers.end();
       ++it)
   {
     path_val[*it]=program.eval(*it).is_true();

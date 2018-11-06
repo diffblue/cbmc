@@ -683,7 +683,7 @@ void add_pointer_to_array_association(
     loc,
     ID_java,
     symbol_table);
-  exprt return_expr = return_sym.symbol_expr();
+  auto return_expr = return_sym.symbol_expr();
   code.add(code_declt(return_expr), loc);
   code.add(
     code_assign_function_application(
@@ -715,7 +715,7 @@ void add_array_to_length_association(
     loc,
     ID_java,
     symbol_table);
-  const exprt return_expr = return_sym.symbol_expr();
+  const auto return_expr = return_sym.symbol_expr();
   code.add(code_declt(return_expr), loc);
   code.add(
     code_assign_function_application(
@@ -747,7 +747,7 @@ void add_character_set_constraint(
   PRECONDITION(pointer.type().id() == ID_pointer);
   symbolt &return_sym = get_fresh_aux_symbol(
     java_int_type(), "cnstr_added", "cnstr_added", loc, ID_java, symbol_table);
-  const exprt return_expr = return_sym.symbol_expr();
+  const auto return_expr = return_sym.symbol_expr();
   code.add(code_declt(return_expr), loc);
   const constant_exprt char_set_expr(char_set, string_typet());
   code.add(
@@ -790,7 +790,7 @@ refined_string_exprt java_string_library_preprocesst::string_expr_of_function(
     loc,
     ID_java,
     symbol_table);
-  const exprt return_code = return_code_sym.symbol_expr();
+  const auto return_code = return_code_sym.symbol_expr();
   code.add(code_declt(return_code), loc);
 
   const refined_string_exprt string_expr =
@@ -1232,7 +1232,7 @@ exprt java_string_library_preprocesst::get_primitive_value_of_object(
   std::string aux_name="tmp_"+id2string(type_name);
   symbolt symbol=get_fresh_aux_symbol(
     value_type, aux_name, aux_name, loc, ID_java, symbol_table);
-  exprt value=symbol.symbol_expr();
+  auto value = symbol.symbol_expr();
 
   // Check that the type of the object is in the symbol table,
   // otherwise there is no safe way of finding its value.
@@ -1340,8 +1340,9 @@ exprt java_string_library_preprocesst::make_argument_for_format(
       std::string tmp_name="tmp_"+id2string(name);
       symbolt field_symbol = get_fresh_aux_symbol(
         type, id2string(function_id), tmp_name, loc, ID_java, symbol_table);
-      field_expr=field_symbol.symbol_expr();
-      code.add(code_declt(field_expr), loc);
+      auto field_symbol_expr = field_symbol.symbol_expr();
+      field_expr = field_symbol_expr;
+      code.add(code_declt(field_symbol_expr), loc);
     }
     else
       field_expr =

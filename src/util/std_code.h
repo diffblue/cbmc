@@ -12,9 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include "expr.h"
 #include "expr_cast.h"
 #include "invariant.h"
+#include "std_expr.h"
 
 /// Data structure for representing an arbitrary statement in a program. Every
 /// specific type of statement (e.g. block of statements, assignment,
@@ -276,28 +276,25 @@ inline code_assignt &to_code_assign(codet &code)
 class code_declt:public codet
 {
 public:
-  DEPRECATED("use code_declt(symbol) instead")
-  code_declt():codet(ID_decl)
-  {
-    operands().resize(1);
-  }
-
-  explicit code_declt(const exprt &symbol):codet(ID_decl)
+  explicit code_declt(const symbol_exprt &symbol) : codet(ID_decl)
   {
     add_to_operands(symbol);
   }
 
-  exprt &symbol()
+  symbol_exprt &symbol()
   {
-    return op0();
+    return static_cast<symbol_exprt &>(op0());
   }
 
-  const exprt &symbol() const
+  const symbol_exprt &symbol() const
   {
-    return op0();
+    return static_cast<const symbol_exprt &>(op0());
   }
 
-  const irep_idt &get_identifier() const;
+  const irep_idt &get_identifier() const
+  {
+    return symbol().get_identifier();
+  }
 };
 
 template<> inline bool can_cast_expr<code_declt>(const exprt &base)

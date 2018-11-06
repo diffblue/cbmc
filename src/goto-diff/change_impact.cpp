@@ -80,8 +80,8 @@ void full_slicert::operator()(
       jumps.push_back(e_it->second);
     else if(e_it->first->is_decl())
     {
-      const exprt &s=to_code_decl(e_it->first->code).symbol();
-      decl_dead[to_symbol_expr(s).get_identifier()].push(e_it->second);
+      const auto &s=to_code_decl(e_it->first->code).symbol();
+      decl_dead[s.get_identifier()].push(e_it->second);
     }
     else if(e_it->first->is_dead())
     {

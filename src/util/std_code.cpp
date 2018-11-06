@@ -13,11 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
-const irep_idt &code_declt::get_identifier() const
-{
-  return to_symbol_expr(symbol()).get_identifier();
-}
-
 const irep_idt &code_deadt::get_identifier() const
 {
   return to_symbol_expr(symbol()).get_identifier();

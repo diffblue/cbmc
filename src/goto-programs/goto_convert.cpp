@@ -607,7 +607,7 @@ void goto_convertt::convert_decl(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  const irep_idt &identifier = to_symbol_expr(code.symbol()).get_identifier();
+  const irep_idt &identifier = code.get_identifier();
 
   const symbolt &symbol = ns.lookup(identifier);
 

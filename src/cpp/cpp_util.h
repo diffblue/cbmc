@@ -13,7 +13,7 @@ Author:
 #include <util/expr.h>
 #include <util/symbol.h>
 
-exprt cpp_symbol_expr(const symbolt &symbol);
+symbol_exprt cpp_symbol_expr(const symbolt &symbol);
 
 inline void already_typechecked(irept &irep)
 {
