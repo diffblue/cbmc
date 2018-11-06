@@ -80,9 +80,7 @@ public:
   {
   }
 
-  virtual ~goto_symext()
-  {
-  }
+  virtual ~goto_symext() = default;
 
   typedef
     std::function<const goto_functionst::goto_functiont &(const irep_idt &)>
