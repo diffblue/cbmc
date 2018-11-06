@@ -130,22 +130,6 @@ public:
     const get_goto_functiont &,
     symbol_tablet &);
 
-  /// Symexes from the first instruction and the given state, terminating as
-  /// soon as the last instruction is reached.  This is useful to explicitly
-  /// symex certain ranges of a program, e.g. in an incremental decision
-  /// procedure.
-  /// \param state Symex state to start with.
-  /// \param get_goto_function retrieves a function body
-  /// \param function_identifier The function with the instruction range
-  /// \param first Entry point in form of a first instruction.
-  /// \param limit Final instruction, which itself will not be symexed.
-  virtual void symex_instruction_range(
-    statet &state,
-    const get_goto_functiont &get_goto_function,
-    const irep_idt &function_identifier,
-    goto_programt::const_targett first,
-    goto_programt::const_targett limit);
-
   /// \brief Have states been pushed onto the workqueue?
   ///
   /// If this flag is set at the end of a symbolic execution run, it means that
