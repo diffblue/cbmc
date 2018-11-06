@@ -53,9 +53,9 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 
   using Minisat::lbool;
 
-  if(solver->model[a.var_no()]==l_True)
+  if(solver->model[a.var_no()]==Minisat::l_True)
     result=tvt(true);
-  else if(solver->model[a.var_no()]==l_False)
+  else if(solver->model[a.var_no()]==Minisat::l_False)
     result=tvt(false);
   else
     return tvt::unknown();
@@ -234,11 +234,11 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
         }
 
         lbool solver_result=
-          solver->solve(solver_assumptions) ? l_True : l_False;
+          solver->solve(solver_assumptions) ? Minisat::l_True : Minisat::l_False;
 
 #endif
 
-        if(solver_result==l_True)
+        if(solver_result==Minisat::l_True)
         {
           messaget::status() <<
             "SAT checker: instance is SATISFIABLE" << eom;
@@ -246,7 +246,7 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
           status=statust::SAT;
           return resultt::P_SATISFIABLE;
         }
-        else if(solver_result==l_False)
+        else if(solver_result==Minisat::l_False)
         {
           messaget::status() <<
             "SAT checker: instance is UNSATISFIABLE" << eom;
