@@ -1,0 +1,9 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\*\* 1 of 2 failed
+--
+^warning: ignoring
