@@ -155,16 +155,6 @@
   parameter 'clas_hierarchy'
 /cbmc/jbmc/src/java_bytecode/select_pointer_type.h:50: warning: The following parameters of select_pointer_typet::specialize_generics(const pointer_typet &pointer_type, const generic_parameter_specialization_mapt &generic_parameter_specialization_map, generic_parameter_recursion_trackingt &visited_nodes) const are not documented:
   parameter 'visited_nodes'
-/cbmc/src/goto-programs/show_goto_functions_xml.cpp:35: warning: Unsupported xml/html tag <functions> found
-/cbmc/src/goto-programs/show_goto_functions_xml.cpp:36: warning: Unsupported xml/html tag <function> found
-/cbmc/src/goto-programs/show_goto_functions_xml.cpp:37: warning: Unsupported xml/html tag <instructions> found
-/cbmc/src/goto-programs/show_goto_functions_xml.cpp:37: warning: Unsupported xml/html tag <location> found
-/cbmc/src/goto-programs/show_goto_functions_xml.cpp:38: warning: Unsupported xml/html tag <instruction_value> found
-/cbmc/src/goto-programs/show_goto_functions_xml.cpp:39: warning: Unsupported xml/html tag </instruction_value> found
-/cbmc/src/goto-programs/show_goto_functions_xml.cpp:39: warning: Unsupported xml/html tag </instruction> found
-/cbmc/src/goto-programs/show_goto_functions_xml.cpp:39: warning: Unsupported xml/html tag </instructions> found
-/cbmc/src/goto-programs/show_goto_functions_xml.cpp:39: warning: Unsupported xml/html tag </function> found
-/cbmc/src/goto-programs/show_goto_functions_xml.cpp:39: warning: Unsupported xml/html tag </functions> found
 /cbmc/src/solvers/refinement/string_refinement.cpp:2099: warning: argument 'expr' of command @param is not found in the argument list of string_constraintt::universal_only_in_index(const string_constraintt &constr)
 /cbmc/src/solvers/refinement/string_refinement.cpp:2106: warning: The following parameters of string_constraintt::universal_only_in_index(const string_constraintt &constr) are not documented:
   parameter 'constr'
