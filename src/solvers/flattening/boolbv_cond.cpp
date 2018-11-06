@@ -10,10 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 
-bvt boolbvt::convert_cond(const exprt &expr)
+bvt boolbvt::convert_cond(const cond_exprt &expr)
 {
-  PRECONDITION(expr.id() == ID_cond);
-
   const exprt::operandst &operands=expr.operands();
 
   std::size_t width=boolbv_width(expr.type());

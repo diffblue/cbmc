@@ -4749,4 +4749,49 @@ inline void validate_expr(const popcount_exprt &value)
   validate_operands(value, 1, "popcount must have one operand");
 }
 
+/// this is a parametric version of an if-expression: it returns
+/// the value of the first case (using the ordering of the operands)
+/// whose condition evaluates to true.
+class cond_exprt : public multi_ary_exprt
+{
+public:
+  explicit cond_exprt(const typet &_type) : multi_ary_exprt(ID_cond, _type)
+  {
+  }
+
+  /// adds a case to a cond expression
+  /// \param condition: the condition for the case
+  /// \param value: the value for the case
+  void add_case(const exprt &condition, const exprt &value)
+  {
+    PRECONDITION(condition.type().id() == ID_bool);
+    operands().reserve(operands().size() + 2);
+    operands().push_back(condition);
+    operands().push_back(value);
+  }
+};
+
+/// \brief Cast an exprt to a \ref cond_exprt
+///
+/// \a expr must be known to be \ref cond_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref cond_exprt
+inline const cond_exprt &to_cond_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_cond);
+  DATA_INVARIANT(
+    expr.operands().size() % 2 != 0, "cond must have even number of operands");
+  return static_cast<const cond_exprt &>(expr);
+}
+
+/// \copydoc to_popcount_expr(const exprt &)
+inline cond_exprt &to_cond_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_cond);
+  DATA_INVARIANT(
+    expr.operands().size() % 2 != 0, "cond must have even number of operands");
+  return static_cast<cond_exprt &>(expr);
+}
+
 #endif // CPROVER_UTIL_STD_EXPR_H
