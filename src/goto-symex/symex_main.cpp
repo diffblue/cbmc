@@ -278,14 +278,6 @@ void goto_symext::symex_instruction_range(
 }
 
 void goto_symext::symex_from_entry_point_of(
-  const goto_functionst &goto_functions,
-  symbol_tablet &new_symbol_table)
-{
-  symex_from_entry_point_of(
-    get_function_from_goto_functions(goto_functions), new_symbol_table);
-}
-
-void goto_symext::symex_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
   symbol_tablet &new_symbol_table)
 {

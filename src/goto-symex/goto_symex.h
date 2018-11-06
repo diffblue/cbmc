@@ -93,16 +93,6 @@ public:
   /// has completed, so use it if you don't care about having the state
   /// around afterwards.
   virtual void symex_from_entry_point_of(
-    const goto_functionst &goto_functions,
-    symbol_tablet &new_symbol_table);
-
-  /// \brief symex entire program starting from entry point
-  ///
-  /// The state that goto_symext maintains has a large memory footprint.
-  /// This method deallocates the state as soon as symbolic execution
-  /// has completed, so use it if you don't care about having the state
-  /// around afterwards.
-  virtual void symex_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
     symbol_tablet &new_symbol_table);
 
