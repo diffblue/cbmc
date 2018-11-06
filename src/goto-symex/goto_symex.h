@@ -383,10 +383,6 @@ protected:
     statet &,
     const goto_functionst::goto_functiont &);
 
-  void add_end_of_function(
-    exprt &code,
-    const irep_idt &identifier);
-
   nondet_symbol_exprt build_symex_nondet(typet &type);
 
   // exceptions
@@ -471,7 +467,6 @@ protected:
   static unsigned nondet_count;
   static unsigned dynamic_counter;
 
-  void read(exprt &);
   void replace_nondet(exprt &);
   void rewrite_quantifiers(exprt &, statet &);
 
