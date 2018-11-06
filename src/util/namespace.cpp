@@ -19,24 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "string2int.h"
 #include "symbol_table.h"
 
-/// Find smallest unused integer i so that prefix + std::to_string(i)
-/// does not exist in the list \p symbols.
-/// \param prefix: A string denoting the prefix we want to find the
-///   smallest suffix of.
-/// \param symbols: The list of symbols we look in for.
-/// \return The small unused suffix size.
-static std::size_t smallest_unused_suffix(
-  const std::string &prefix,
-  const symbol_tablet::symbolst &symbols)
-{
-  std::size_t max_nr = 0;
-
-  while(symbols.find(prefix + std::to_string(max_nr)) != symbols.end())
-    ++max_nr;
-
-  return max_nr;
-}
-
 namespace_baset::~namespace_baset()
 {
 }
@@ -168,10 +150,10 @@ std::size_t namespacet::smallest_unused_suffix(const std::string &prefix) const
   std::size_t m = 0;
 
   if(symbol_table1!=nullptr)
-    m = std::max(m, ::smallest_unused_suffix(prefix, symbol_table1->symbols));
+    m = std::max(m, symbol_table1->smallest_unused_suffix(prefix));
 
   if(symbol_table2!=nullptr)
-    m = std::max(m, ::smallest_unused_suffix(prefix, symbol_table2->symbols));
+    m = std::max(m, symbol_table2->smallest_unused_suffix(prefix));
 
   return m;
 }
@@ -221,7 +203,7 @@ multi_namespacet::smallest_unused_suffix(const std::string &prefix) const
   std::size_t m = 0;
 
   for(const auto &st : symbol_table_list)
-    m = std::max(m, ::smallest_unused_suffix(prefix, st->symbols));
+    m = std::max(m, st->smallest_unused_suffix(prefix));
 
   return m;
 }
