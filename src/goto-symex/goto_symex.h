@@ -103,7 +103,7 @@ public:
   virtual void resume_symex_from_saved_state(
     const get_goto_functiont &get_goto_function,
     const statet &saved_state,
-    symex_target_equationt *const saved_equation,
+    symex_target_equationt *saved_equation,
     symbol_tablet &new_symbol_table);
 
   //// \brief symex entire program starting from entry point
@@ -251,13 +251,9 @@ protected:
   void initialize_auto_object(const exprt &, statet &);
   void process_array_expr(exprt &);
   exprt make_auto_object(const typet &, statet &);
-  virtual void dereference(exprt &, statet &, const bool write);
+  virtual void dereference(exprt &, statet &, bool write);
 
-  void dereference_rec(
-    exprt &,
-    statet &,
-    guardt &,
-    const bool write);
+  void dereference_rec(exprt &, statet &, guardt &, bool write);
 
   void dereference_rec_address_of(
     exprt &,
@@ -357,17 +353,17 @@ protected:
 
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
-    const unsigned thread_nr,
+    unsigned thread_nr,
     unsigned unwind);
 
   void parameter_assignments(
-    const irep_idt function_identifier,
+    const irep_idt &function_identifier,
     const goto_functionst::goto_functiont &,
     statet &,
     const exprt::operandst &arguments);
 
   void locality(
-    const irep_idt function_identifier,
+    const irep_idt &function_identifier,
     statet &,
     const goto_functionst::goto_functiont &);
 

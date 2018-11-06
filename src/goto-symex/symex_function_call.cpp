@@ -27,7 +27,7 @@ bool goto_symext::get_unwind_recursion(
 }
 
 void goto_symext::parameter_assignments(
-  const irep_idt function_identifier,
+  const irep_idt &function_identifier,
   const goto_functionst::goto_functiont &goto_function,
   statet &state,
   const exprt::operandst &arguments)
@@ -368,7 +368,7 @@ void goto_symext::symex_end_of_function(statet &state)
 /// preserves locality of local variables of a given function by applying L1
 /// renaming to the local identifiers
 void goto_symext::locality(
-  const irep_idt function_identifier,
+  const irep_idt &function_identifier,
   statet &state,
   const goto_functionst::goto_functiont &goto_function)
 {
