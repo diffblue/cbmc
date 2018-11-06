@@ -141,7 +141,7 @@ void goto_symext::symex_goto(statet &state)
 
     if(state_pc==goto_target)
     {
-      symex_transition(state, goto_target);
+      symex_transition(state, goto_target, false);
       return; // nothing else to do
     }
   }

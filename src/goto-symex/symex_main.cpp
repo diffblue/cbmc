@@ -144,7 +144,7 @@ void goto_symext::initialize_entry_point(
 
   state.dirty.populate_dirty_for_function(pc->function, entry_point_function);
 
-  symex_transition(state, state.source.pc);
+  symex_transition(state, state.source.pc, false);
 }
 
 void goto_symext::symex_threaded_step(
@@ -167,7 +167,7 @@ void goto_symext::symex_threaded_step(
     std::cout << "********* Now executing thread " << t << '\n';
 #endif
     state.switch_to_thread(t);
-    symex_transition(state, state.source.pc);
+    symex_transition(state, state.source.pc, false);
   }
 }
 

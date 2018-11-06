@@ -242,13 +242,13 @@ protected:
   virtual void symex_transition(
     statet &,
     goto_programt::const_targett to,
-    bool is_backwards_goto=false);
+    bool is_backwards_goto);
 
   virtual void symex_transition(statet &state)
   {
     goto_programt::const_targett next=state.source.pc;
     ++next;
-    symex_transition(state, next);
+    symex_transition(state, next, false);
   }
 
   virtual void symex_goto(statet &);

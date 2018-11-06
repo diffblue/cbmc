@@ -311,7 +311,7 @@ void goto_symext::symex_function_call_code(
 
   state.source.is_set=true;
   state.source.function = identifier;
-  symex_transition(state, goto_function.body.instructions.begin());
+  symex_transition(state, goto_function.body.instructions.begin(), false);
 }
 
 /// pop one call frame
@@ -323,7 +323,7 @@ void goto_symext::pop_frame(statet &state)
     statet::framet &frame=state.top();
 
     // restore program counter
-    symex_transition(state, frame.calling_location.pc);
+    symex_transition(state, frame.calling_location.pc, false);
     state.source.function = frame.calling_location.function;
 
     // restore L1 renaming
