@@ -135,19 +135,19 @@ protected:
     goto_programt &goto_program,
     const goto_programt::targett &instr_it,
     const stack_catcht &stack_catch,
-    const std::vector<exprt> &locals);
+    const std::vector<symbol_exprt> &locals);
 
   bool instrument_throw(
     goto_programt &goto_program,
     const goto_programt::targett &,
     const stack_catcht &,
-    const std::vector<exprt> &);
+    const std::vector<symbol_exprt> &);
 
   bool instrument_function_call(
     goto_programt &goto_program,
     const goto_programt::targett &,
     const stack_catcht &,
-    const std::vector<exprt> &);
+    const std::vector<symbol_exprt> &);
 
   void instrument_exceptions(
     goto_programt &goto_program);
@@ -308,7 +308,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
   goto_programt &goto_program,
   const goto_programt::targett &instr_it,
   const remove_exceptionst::stack_catcht &stack_catch,
-  const std::vector<exprt> &locals)
+  const std::vector<symbol_exprt> &locals)
 {
   // Jump to the universal handler or function end, as appropriate.
   // This will appear after the GOTO-based dynamic dispatch below
@@ -388,7 +388,7 @@ bool remove_exceptionst::instrument_throw(
   goto_programt &goto_program,
   const goto_programt::targett &instr_it,
   const remove_exceptionst::stack_catcht &stack_catch,
-  const std::vector<exprt> &locals)
+  const std::vector<symbol_exprt> &locals)
 {
   PRECONDITION(instr_it->type==THROW);
 
@@ -419,7 +419,7 @@ bool remove_exceptionst::instrument_function_call(
   goto_programt &goto_program,
   const goto_programt::targett &instr_it,
   const stack_catcht &stack_catch,
-  const std::vector<exprt> &locals)
+  const std::vector<symbol_exprt> &locals)
 {
   PRECONDITION(instr_it->type==FUNCTION_CALL);
 
@@ -473,8 +473,8 @@ void remove_exceptionst::instrument_exceptions(
   goto_programt &goto_program)
 {
   stack_catcht stack_catch; // stack of try-catch blocks
-  std::vector<std::vector<exprt>> stack_locals; // stack of local vars
-  std::vector<exprt> locals;
+  std::vector<std::vector<symbol_exprt>> stack_locals; // stack of local vars
+  std::vector<symbol_exprt> locals;
 
   if(goto_program.empty())
     return;

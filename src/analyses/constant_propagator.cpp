@@ -134,7 +134,7 @@ void constant_propagator_domaint::transform(
   else if(from->is_dead())
   {
     const code_deadt &code_dead=to_code_dead(from->code);
-    values.set_to_top(to_symbol_expr(code_dead.symbol()));
+    values.set_to_top(code_dead.symbol());
   }
   else if(from->is_function_call())
   {

@@ -13,11 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
-const irep_idt &code_deadt::get_identifier() const
-{
-  return to_symbol_expr(symbol()).get_identifier();
-}
-
 /// If this `codet` is a \ref code_blockt (i.e.\ it represents a block of
 /// statements), return the unmodified input. Otherwise (i.e.\ the `codet`
 /// represents a single statement), convert it to a \ref code_blockt with the
