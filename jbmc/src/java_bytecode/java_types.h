@@ -171,19 +171,28 @@ class java_class_typet:public class_typet
     set(ID_final, is_final);
   }
 
-  typedef std::vector<symbol_exprt> java_lambda_method_handlest;
+  // it may be better to introduce a class like
+  // class java_lambda_method_handlet : private irept
+  // {
+  //   java_lambda_method_handlet(const irep_idt &id) : irept(id)
+  //   {
+  //   }
+  //
+  //   const irep_idt &get_lambda_method_handle() const
+  //   {
+  //     return id();
+  //   }
+  // };
+  using java_lambda_method_handlest = irept::subt;
 
   const java_lambda_method_handlest &lambda_method_handles() const
   {
-    return (const java_lambda_method_handlest &)find(
-             ID_java_lambda_method_handles)
-      .get_sub();
+    return find(ID_java_lambda_method_handles).get_sub();
   }
 
   java_lambda_method_handlest &lambda_method_handles()
   {
-    return (java_lambda_method_handlest &)add(ID_java_lambda_method_handles)
-      .get_sub();
+    return add(ID_java_lambda_method_handles).get_sub();
   }
 
   void add_lambda_method_handle(const irep_idt &identifier)
