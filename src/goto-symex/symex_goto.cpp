@@ -302,23 +302,6 @@ void goto_symext::symex_goto(statet &state)
   }
 }
 
-void goto_symext::symex_step_goto(statet &state, bool taken)
-{
-  const goto_programt::instructiont &instruction=*state.source.pc;
-
-  exprt guard(instruction.guard);
-  dereference(guard, state, false);
-  state.rename(guard, ns);
-
-  if(!taken)
-    guard.make_not();
-
-  state.guard.guard_expr(guard);
-  do_simplify(guard);
-
-  target.assumption(state.guard.as_expr(), guard, state.source);
-}
-
 void goto_symext::merge_gotos(statet &state)
 {
   statet::framet &frame=state.top();

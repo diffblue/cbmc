@@ -171,8 +171,6 @@ protected:
   const bool allow_pointer_unsoundness;
 
 public:
-  // these bypass the target maps
-  virtual void symex_step_goto(statet &, bool taken);
 
   /// language_mode: ID_java, ID_C or another language identifier
   /// if we know the source language in use, irep_idt() otherwise.
