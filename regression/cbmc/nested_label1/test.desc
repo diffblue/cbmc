@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+This test checks that the assertion is reachable despite being wrapped in a
+nested list of labels, and that jumping to a label in the middle of that list is
+handled correctly.
