@@ -362,6 +362,10 @@ size_t find_closing_semi_colon_for_reference_type(
   const std::string src,
   size_t starting_point = 0);
 
+std::vector<std::string> parse_raw_list_types(
+  std::string src,
+  char opening_bracket,
+  char closing_bracket);
 
 bool is_java_array_tag(const irep_idt &tag);
 bool is_valid_java_array(const struct_typet &);

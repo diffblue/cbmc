@@ -334,13 +334,39 @@ std::vector<typet> parse_list_types(
   const char opening_bracket,
   const char closing_bracket)
 {
+  // Loop over the types in the given string, parsing each one in turn
+  // and adding to the type_list
+  std::vector<typet> type_list;
+  for(const std::string &raw_type :
+      parse_raw_list_types(src, opening_bracket, closing_bracket))
+  {
+    const typet new_type = java_type_from_string(raw_type, class_name_prefix);
+    INVARIANT(new_type != nil_typet(), "Failed to parse type");
+    type_list.push_back(new_type);
+  }
+  return type_list;
+}
+
+/// Given a substring of a descriptor or signature that contains one or more
+/// types parse out the individual type strings.
+/// \param src: The input string that is wrapped in either ( ) or < >
+/// \param opening_bracket: For checking string is passed in as expected, the
+///   opening bracket (i.e. '(' or '<').
+/// \param closing_bracket: For checking string is passed in as expected, the
+///   closing bracket (i.e. ')' or '>').
+/// \return A vector of strings that represent the bytecode type.
+std::vector<std::string> parse_raw_list_types(
+  const std::string src,
+  const char opening_bracket,
+  const char closing_bracket)
+{
   PRECONDITION(src.size() >= 2);
   PRECONDITION(src[0] == opening_bracket);
   PRECONDITION(src[src.size() - 1] == closing_bracket);
 
   // Loop over the types in the given string, parsing each one in turn
   // and adding to the type_list
-  std::vector<typet> type_list;
+  std::vector<std::string> type_list;
   for(std::size_t i = 1; i < src.size() - 1; i++)
   {
     size_t start = i;
@@ -369,10 +395,7 @@ std::vector<typet> parse_list_types(
     }
 
     std::string sub_str = src.substr(start, i - start + 1);
-    const typet &new_type = java_type_from_string(sub_str, class_name_prefix);
-    INVARIANT(new_type != nil_typet(), "Failed to parse type");
-
-    type_list.push_back(new_type);
+    type_list.emplace_back(sub_str);
   }
   return type_list;
 }
