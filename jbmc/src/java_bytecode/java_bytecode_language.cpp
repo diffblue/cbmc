@@ -1198,7 +1198,7 @@ bool java_bytecode_languaget::to_expr(
   exprt &expr,
   const namespacet &ns)
 {
-  #if 0
+#if 0
   expr.make_nil();
 
   // no preprocessing yet...
@@ -1234,13 +1234,13 @@ bool java_bytecode_languaget::to_expr(
   java_bytecode_parser.clear();
 
   return result;
-  #else
+#else
   // unused parameters
   (void)code;
   (void)module;
   (void)expr;
   (void)ns;
-  #endif
+#endif
 
   return true; // fail for now
 }

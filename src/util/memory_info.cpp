@@ -33,7 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void memory_info(std::ostream &out)
 {
-  #if defined(__linux__) && defined(__GLIBC__)
+#if defined(__linux__) && defined(__GLIBC__)
   // NOLINTNEXTLINE(readability/identifiers)
   struct mallinfo m = mallinfo();
   out << "  non-mmapped space allocated from system: " << m.arena << "\n";
@@ -45,21 +45,21 @@ void memory_info(std::ostream &out)
   out << "  space available in freed fastbin blocks: " << m.fsmblks << "\n";
   out << "  total allocated space: " << m.uordblks << "\n";
   out << "  total free space: " << m.fordblks << "\n";
-  #endif
+#endif
 
-  #ifdef _WIN32
+#ifdef _WIN32
   (void)out; // unused parameter
-  #if 0
+#if 0
   PROCESS_MEMORY_COUNTERS pmc;
   if(GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)))
   {
     out << "  PeakWorkingSetSize: " << pmc.PeakWorkingSetSize << "\n";
     out << "  WorkingSetSize: " << pmc.WorkingSetSize << "\n";
   }
-  #endif
-  #endif
+#endif
+#endif
 
-  #ifdef __APPLE__
+#ifdef __APPLE__
   // NOLINTNEXTLINE(readability/identifiers)
   struct task_basic_info t_info;
   mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
@@ -74,5 +74,5 @@ void memory_info(std::ostream &out)
       << static_cast<double>(t.max_size_in_use)/1000000 << "m\n";
   out << "  size_allocated: "
       << static_cast<double>(t.size_allocated)/1000000 << "m\n";
-  #endif
+#endif
 }
