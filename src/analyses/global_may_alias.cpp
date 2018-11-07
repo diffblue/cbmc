@@ -103,6 +103,7 @@ void global_may_alias_domaint::transform(
 
   const goto_programt::instructiont &instruction=*from;
 
+  // clang-format off
   switch(instruction.type)
   {
   case ASSIGN:
@@ -148,6 +149,7 @@ void global_may_alias_domaint::transform(
   case NO_INSTRUCTION_TYPE:
     break;
   }
+  // clang-format on
 }
 
 void global_may_alias_domaint::output(

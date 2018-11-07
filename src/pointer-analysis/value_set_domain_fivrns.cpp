@@ -28,6 +28,7 @@ bool value_set_domain_fivrnst::transform(
     to_l->function << " " << to_l->location_number << '\n';
   #endif
 
+  // clang-format off
   switch(from_l->type)
   {
   case END_FUNCTION:
@@ -66,6 +67,7 @@ bool value_set_domain_fivrnst::transform(
   case NO_INSTRUCTION_TYPE:
     break;
   }
+  // clang-format on
 
   return value_set.handover();
 }

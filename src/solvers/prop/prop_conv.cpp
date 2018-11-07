@@ -473,12 +473,14 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
   statistics() << "Solving with " << prop.solver_text() << eom;
 
+  // clang-format off
   switch(prop.prop_solve())
   {
     case propt::resultt::P_SATISFIABLE: return resultt::D_SATISFIABLE;
     case propt::resultt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
     case propt::resultt::P_ERROR: return resultt::D_ERROR;
   }
+  // clang-format on
 
   UNREACHABLE;
 }

@@ -28,6 +28,7 @@ bool value_set_domain_fit::transform(
 //      from_l->function << " " << from_l->location_number << " to " <<
 //      to_l->function << " " << to_l->location_number << '\n';
 
+  // clang-format off
   switch(from_l->type)
   {
   case GOTO:
@@ -70,6 +71,7 @@ bool value_set_domain_fit::transform(
     // do nothing
     break;
   }
+  // clang-format on
 
   return (value_set.changed);
 }

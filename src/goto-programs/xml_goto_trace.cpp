@@ -40,6 +40,7 @@ void convert(
     if(source_location.is_not_nil() && source_location.get_file()!="")
       xml_location=xml(source_location);
 
+    // clang-format off
     switch(step.type)
     {
     case goto_trace_stept::typet::ASSERT:
@@ -227,6 +228,7 @@ void convert(
         }
       }
     }
+    // clang-format on
 
     if(source_location.is_not_nil() && source_location.get_file()!="")
       previous_source_location=source_location;

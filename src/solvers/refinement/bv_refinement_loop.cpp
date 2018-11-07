@@ -102,12 +102,14 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
   propt::resultt result=prop.prop_solve();
   prop.set_assumptions(parent_assumptions);
 
+  // clang-format off
   switch(result)
   {
     case propt::resultt::P_SATISFIABLE: return resultt::D_SATISFIABLE;
     case propt::resultt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
     case propt::resultt::P_ERROR: return resultt::D_ERROR;
   }
+  // clang-format on
 
   UNREACHABLE;
 }

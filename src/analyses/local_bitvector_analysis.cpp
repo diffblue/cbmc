@@ -268,6 +268,7 @@ void local_bitvector_analysist::build()
     auto &loc_info_src=loc_infos[loc_nr];
     auto loc_info_dest=loc_infos[loc_nr];
 
+    // clang-format off
     switch(instruction.type)
     {
     case ASSIGN:
@@ -328,6 +329,7 @@ void local_bitvector_analysist::build()
     case NO_INSTRUCTION_TYPE:
       break;
     }
+    // clang-format on
 
     for(const auto &succ : node.successors)
     {

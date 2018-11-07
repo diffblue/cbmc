@@ -58,6 +58,7 @@ void goto_trace_stept::output(
 {
   out << "*** ";
 
+  // clang-format off
   switch(type)
   {
   case goto_trace_stept::typet::ASSERT: out << "ASSERT"; break;
@@ -83,6 +84,7 @@ void goto_trace_stept::output(
   case goto_trace_stept::typet::CONSTRAINT: out << "CONSTRAINT"; break;
   case goto_trace_stept::typet::NONE: out << "NONE"; break;
   }
+  // clang-format on
 
   if(is_assert() || is_assume() || is_goto())
     out << " (" << cond_value << ')';

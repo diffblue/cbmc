@@ -99,6 +99,7 @@ std::ostream &operator<<(std::ostream &out, const cpp_idt &cpp_id)
 
 std::ostream &operator<<(std::ostream &out, const cpp_idt::id_classt &id_class)
 {
+  // clang-format off
   switch(id_class)
   {
   case cpp_idt::id_classt::UNKNOWN:           return out<<"UNKNOWN";
@@ -113,6 +114,7 @@ std::ostream &operator<<(std::ostream &out, const cpp_idt::id_classt &id_class)
   case cpp_idt::id_classt::NAMESPACE:         return out<<"NAMESPACE";
   case cpp_idt::id_classt::ENUM:              return out<<"ENUM";
   }
+  // clang-format on
 
   UNREACHABLE;
 }

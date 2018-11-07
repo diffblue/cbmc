@@ -64,6 +64,7 @@ void interval_domaint::transform(
   ai_baset &,
   const namespacet &ns)
 {
+  // clang-format off
   const goto_programt::instructiont &instruction=*from;
   switch(instruction.type)
   {
@@ -124,6 +125,7 @@ void interval_domaint::transform(
   case NO_INSTRUCTION_TYPE:
     break;
   }
+  // clang-format on
 }
 
 /// Sets *this to the mathematical join between the two domains. This can be
