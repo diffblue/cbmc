@@ -25,7 +25,7 @@ phases:
       - make -C unit test
       - make -C regression test
       - scripts/delete_failing_smt2_solver_tests
-      - make -C regression/cbmc test-cprover-smt2
+      - env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
       - make -C jbmc/unit test
       - make -C jbmc/regression test
       - echo Build completed on `date`
