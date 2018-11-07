@@ -12,8 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/invariant.h>
 
+#include <solvers/lowering/expr_lowering.h>
+
 #include "bv_conversion_exceptions.h"
-#include "flatten_byte_operators.h"
 
 literalt boolbvt::convert_equality(const equal_exprt &expr)
 {

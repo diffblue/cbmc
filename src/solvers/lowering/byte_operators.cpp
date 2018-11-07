@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "flatten_byte_operators.h"
+#include "expr_lowering.h"
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
