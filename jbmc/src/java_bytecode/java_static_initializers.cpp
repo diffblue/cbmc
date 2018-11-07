@@ -687,9 +687,8 @@ code_ifthenelset get_clinit_wrapper_body(
   wrapper_body.cond() = check_already_run;
 
   // add the "already-run = false" statement
-  code_blockt init_body;
   code_assignt set_already_run(already_run_symbol.symbol_expr(), true_exprt());
-  init_body.move(set_already_run);
+  code_blockt init_body({set_already_run});
 
   clinit_wrapper_do_recursive_calls(
     symbol_table,

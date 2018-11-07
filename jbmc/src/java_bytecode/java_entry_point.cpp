@@ -204,10 +204,11 @@ static void java_static_lifetime_init(
         set_class_identifier(
           to_struct_expr(*zero_object), ns, to_symbol_type(sym.type));
 
-        code_block.add(code_assignt(sym.symbol_expr(), *zero_object));
+        code_block.add(
+          std::move(code_assignt(sym.symbol_expr(), *zero_object)));
 
         // Then call the init function:
-        code_block.move(initializer_call);
+        code_block.add(std::move(initializer_call));
       }
       else if(sym.value.is_nil() && sym.type!=empty_typet())
       {
@@ -415,7 +416,7 @@ exprt::operandst java_build_arguments(
     input.op1()=main_arguments[param_number];
     input.add_source_location()=function.location;
 
-    init_code.move(input);
+    init_code.add(std::move(input));
   }
 
   return main_arguments;
@@ -453,7 +454,7 @@ void java_record_outputs(
     output.op1()=return_symbol.symbol_expr();
     output.add_source_location()=function.location;
 
-    init_code.move(output);
+    init_code.add(std::move(output));
   }
 
   for(std::size_t param_number=0;
@@ -476,7 +477,7 @@ void java_record_outputs(
       output.op1()=main_arguments[param_number];
       output.add_source_location()=function.location;
 
-      init_code.move(output);
+      init_code.add(std::move(output));
     }
   }
 
@@ -494,7 +495,7 @@ void java_record_outputs(
   output.op1()=exc_symbol.symbol_expr();
   output.add_source_location()=function.location;
 
-  init_code.move(output);
+  init_code.add(std::move(output));
 }
 
 main_function_resultt get_main_symbol(
@@ -674,7 +675,7 @@ bool generate_java_start_function(
     code_function_callt call_init(init_it->second.symbol_expr());
     call_init.add_source_location()=symbol.location;
 
-    init_code.move(call_init);
+    init_code.add(std::move(call_init));
   }
 
   // build call to the main method, of the form
@@ -747,26 +748,26 @@ bool generate_java_start_function(
   irept catch_type_list(ID_exception_list);
   irept catch_target_list(ID_label);
 
-  call_block.move(push_universal_handler);
+  call_block.add(std::move(push_universal_handler));
 
   // we insert the call to the method AFTER the argument initialization code
-  call_block.move(call_main);
+  call_block.add(std::move(call_main));
 
   // Pop the handler:
   code_pop_catcht pop_handler;
-  call_block.move(pop_handler);
-  init_code.move(call_block);
+  call_block.add(std::move(pop_handler));
+  init_code.add(std::move(call_block));
 
   // Normal return: skip the exception handler:
   init_code.add(code_gotot(after_catch.get_label()));
 
   // Exceptional return: catch and assign to exc_symbol.
   code_landingpadt landingpad(exc_symbol.symbol_expr());
-  init_code.add(toplevel_catch);
-  init_code.move(landingpad);
+  init_code.add(std::move(toplevel_catch));
+  init_code.add(std::move(landingpad));
 
   // Converge normal and exceptional return:
-  init_code.move(after_catch);
+  init_code.add(std::move(after_catch));
 
   // declare certain (which?) variables as test outputs
   java_record_outputs(symbol, main_arguments, init_code, symbol_table);

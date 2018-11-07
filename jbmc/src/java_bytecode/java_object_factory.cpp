@@ -1396,7 +1396,7 @@ void java_object_factoryt::gen_nondet_array_init(
   code_labelt init_head_label(head_name, code_skipt());
   code_gotot goto_head(head_name);
 
-  assignments.move(init_head_label);
+  assignments.add(std::move(init_head_label));
 
   std::string done_name = id2string(counter.base_name) + "_done";
   code_labelt init_done_label(done_name, code_skipt());
@@ -1406,7 +1406,7 @@ void java_object_factoryt::gen_nondet_array_init(
   done_test.cond()=equal_exprt(counter_expr, length_expr);
   done_test.then_case()=goto_done;
 
-  assignments.move(done_test);
+  assignments.add(std::move(done_test));
 
   if(update_in_place!=update_in_placet::MUST_UPDATE_IN_PLACE)
   {
@@ -1416,7 +1416,7 @@ void java_object_factoryt::gen_nondet_array_init(
     max_test.cond()=equal_exprt(counter_expr, max_length_expr);
     max_test.then_case()=goto_done;
 
-    assignments.move(max_test);
+    assignments.add(std::move(max_test));
   }
 
   const dereference_exprt arraycellref(
@@ -1447,9 +1447,9 @@ void java_object_factoryt::gen_nondet_array_init(
   exprt java_one=from_integer(1, java_int_type());
   code_assignt incr(counter_expr, plus_exprt(counter_expr, java_one));
 
-  assignments.move(incr);
-  assignments.move(goto_head);
-  assignments.move(init_done_label);
+  assignments.add(std::move(incr));
+  assignments.add(std::move(goto_head));
+  assignments.add(std::move(init_done_label));
 }
 
 /// We nondet-initialize enums to be equal to one of the constants defined

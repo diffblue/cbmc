@@ -137,11 +137,6 @@ public:
     operands()=std::move((std::vector<exprt> &&)_statements);
   }
 
-  void move(codet &code)
-  {
-    move_to_operands(code);
-  }
-
   void add(const codet &code)
   {
     add_to_operands(code);
