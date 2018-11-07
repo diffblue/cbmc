@@ -150,10 +150,10 @@ std::size_t namespacet::smallest_unused_suffix(const std::string &prefix) const
   std::size_t m = 0;
 
   if(symbol_table1!=nullptr)
-    m = std::max(m, symbol_table1->smallest_unused_suffix(prefix));
+    m = std::max(m, symbol_table1->next_unused_suffix(prefix));
 
   if(symbol_table2!=nullptr)
-    m = std::max(m, symbol_table2->smallest_unused_suffix(prefix));
+    m = std::max(m, symbol_table2->next_unused_suffix(prefix));
 
   return m;
 }
@@ -203,7 +203,7 @@ multi_namespacet::smallest_unused_suffix(const std::string &prefix) const
   std::size_t m = 0;
 
   for(const auto &st : symbol_table_list)
-    m = std::max(m, st->smallest_unused_suffix(prefix));
+    m = std::max(m, st->next_unused_suffix(prefix));
 
   return m;
 }

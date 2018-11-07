@@ -50,20 +50,19 @@ public:
   ///   smallest suffix of.
   /// \param start_number: The starting suffix number to search from.
   /// \return The small unused suffix size.
-  std::size_t smallest_unused_suffix(
-      const std::string &prefix,
-      std::size_t start_number) const
+  std::size_t
+  next_unused_suffix(const std::string &prefix, std::size_t start_number) const
   {
-    while(this->symbols.find(prefix + std::to_string(start_number)) != symbols.end())
+    while(this->symbols.find(prefix + std::to_string(start_number)) !=
+          symbols.end())
       ++start_number;
 
     return start_number;
   }
 
-  virtual std::size_t smallest_unused_suffix(
-      const std::string &prefix) const
+  virtual std::size_t next_unused_suffix(const std::string &prefix) const
   {
-    return smallest_unused_suffix(prefix, 0);
+    return next_unused_suffix(prefix, 0);
   }
 
   /// Permits implicit cast to const symbol_tablet &
