@@ -48,15 +48,22 @@ public:
   /// does not exist in the list \p symbols.
   /// \param prefix: A string denoting the prefix we want to find the
   ///   smallest suffix of.
+  /// \param start_number: The starting suffix number to search from.
   /// \return The small unused suffix size.
-  std::size_t smallest_unused_suffix(const std::string &prefix) const
+  std::size_t smallest_unused_suffix(
+      const std::string &prefix,
+      std::size_t start_number) const
   {
-    std::size_t max_nr = 0;
+    while(this->symbols.find(prefix + std::to_string(start_number)) != symbols.end())
+      ++start_number;
 
-    while(this->symbols.find(prefix + std::to_string(max_nr)) != symbols.end())
-      ++max_nr;
+    return start_number;
+  }
 
-    return max_nr;
+  virtual std::size_t smallest_unused_suffix(
+      const std::string &prefix) const
+  {
+    return smallest_unused_suffix(prefix, 0);
   }
 
   /// Permits implicit cast to const symbol_tablet &
