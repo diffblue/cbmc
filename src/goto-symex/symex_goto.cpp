@@ -68,14 +68,10 @@ void goto_symext::symex_goto(statet &state)
     {
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto
-      exprt negated_cond;
-
       if(new_guard.is_true())
-        negated_cond=false_exprt();
+        symex_assume(state, false_exprt());
       else
-        negated_cond=not_exprt(new_guard);
-
-      symex_assume(state, negated_cond);
+        symex_assume(state, not_exprt(new_guard));
 
       // next instruction
       symex_transition(state);
