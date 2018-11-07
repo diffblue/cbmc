@@ -55,9 +55,9 @@ void goto_symext::symex_goto(statet &state)
   goto_programt::const_targett goto_target=
     instruction.get_target();
 
-  bool forward=!instruction.is_backwards_goto();
+  const bool backward = instruction.is_backwards_goto();
 
-  if(!forward) // backwards?
+  if(backward)
   {
     // is it label: goto label; or while(cond); - popular in SV-COMP
     if(
@@ -128,7 +128,7 @@ void goto_symext::symex_goto(statet &state)
   goto_programt::const_targett new_state_pc, state_pc;
   symex_targett::sourcet original_source=state.source;
 
-  if(forward)
+  if(!backward)
   {
     new_state_pc=goto_target;
     state_pc=state.source.pc;
@@ -190,7 +190,7 @@ void goto_symext::symex_goto(statet &state)
     path_storaget::patht next_instruction(target, state);
     next_instruction.state.saved_target = state_pc;
     next_instruction.state.has_saved_next_instruction = true;
-    next_instruction.state.saved_target_is_backwards = !forward;
+    next_instruction.state.saved_target_is_backwards = backward;
 
     path_storaget::patht jump_target(target, state);
     jump_target.state.saved_target = new_state_pc;
@@ -198,7 +198,7 @@ void goto_symext::symex_goto(statet &state)
     // `forward` tells us where the branch we're _currently_ executing is
     // pointing to; this needs to be inverted for the branch that we're saving,
     // so let its truth value for `backwards` be the same as ours for `forward`.
-    jump_target.state.saved_target_is_backwards = forward;
+    jump_target.state.saved_target_is_backwards = !backward;
 
     log.debug() << "Saving next instruction '"
                 << next_instruction.state.saved_target->source_location << "'"
@@ -221,7 +221,7 @@ void goto_symext::symex_goto(statet &state)
 
   goto_state_list.push_back(statet::goto_statet(state));
 
-  symex_transition(state, state_pc, !forward);
+  symex_transition(state, state_pc, backward);
 
   // adjust guards
   if(new_guard.is_true())
@@ -275,7 +275,7 @@ void goto_symext::symex_goto(statet &state)
 
     if(state.has_saved_jump_target)
     {
-      if(forward)
+      if(!backward)
         state.guard.add(guard_expr);
       else
       {
@@ -286,7 +286,7 @@ void goto_symext::symex_goto(statet &state)
     else
     {
       statet::goto_statet &new_state = goto_state_list.back();
-      if(forward)
+      if(!backward)
       {
         new_state.guard.add(guard_expr);
         guard_expr.make_not();
