@@ -24,6 +24,9 @@
  *
  **************************************************************************/
 
+// this is imported code, don't impose formatting rules
+// clang-format off
+
 #ifdef _MSC_VER
 #pragma warning(disable:4548)
   // expression before comma has no effect
@@ -7194,3 +7197,4 @@ mz_bool mz_zip_end(mz_zip_archive *pZip)
 #ifdef __cplusplus
 }
 #endif
+// clang-format on
